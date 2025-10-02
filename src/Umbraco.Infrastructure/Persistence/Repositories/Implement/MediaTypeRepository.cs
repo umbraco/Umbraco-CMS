@@ -90,13 +90,13 @@ internal sealed class MediaTypeRepository : ContentTypeRepositoryBase<IMediaType
         return sql;
     }
 
-    protected override string GetBaseWhereClause() => $"{Constants.DatabaseSchema.Tables.Node}.id = @id";
+    protected override string GetBaseWhereClause() => $"{QuoteTableName(Constants.DatabaseSchema.Tables.Node)}.id = @id";
 
     protected override IEnumerable<string> GetDeleteClauses()
     {
         var l = (List<string>)base.GetDeleteClauses(); // we know it's a list
-        l.Add("DELETE FROM cmsContentType WHERE nodeId = @id");
-        l.Add("DELETE FROM umbracoNode WHERE id = @id");
+        l.Add($"DELETE FROM {QuoteTableName("cmsContentType")} WHERE {QuoteColumnName("nodeId")} = @id");
+        l.Add($"DELETE FROM {QuoteTableName("umbracoNode")} WHERE id = @id");
         return l;
     }
 
@@ -122,10 +122,11 @@ internal sealed class MediaTypeRepository : ContentTypeRepositoryBase<IMediaType
             NodeDto? parent = Database.First<NodeDto>("WHERE id = @ParentId", new { entity.ParentId });
             entity.Path = string.Concat(parent.Path, ",", entity.Id);
             entity.Level = parent.Level + 1;
-            var maxSortOrder =
-                Database.ExecuteScalar<int>(
-                    "SELECT coalesce(max(sortOrder),0) FROM umbracoNode WHERE parentid = @ParentId AND nodeObjectType = @NodeObjectType",
-                    new { entity.ParentId, NodeObjectType = NodeObjectTypeId });
+            Sql<ISqlContext> sql = Sql()
+                .SelectMax<NodeDto>(x => x.SortOrder, 0)
+                .From<NodeDto>()
+                .Where<NodeDto>(x => x.ParentId == entity.ParentId && x.NodeObjectType == NodeObjectTypeId);
+            var maxSortOrder = Database.ExecuteScalar<int>(sql);
             entity.SortOrder = maxSortOrder + 1;
         }
 

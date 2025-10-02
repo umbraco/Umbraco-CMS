@@ -58,10 +58,9 @@ public class PropertyValidationService : IPropertyValidationService
         }
 
         IDataEditor? dataEditor = GetDataEditor(propertyType);
-        if (dataEditor == null)
+        if (dataEditor is null)
         {
-            throw new InvalidOperationException("No property editor found by alias " +
-                                                propertyType.PropertyEditorAlias);
+            return [];
         }
 
         // only validate culture invariant properties if

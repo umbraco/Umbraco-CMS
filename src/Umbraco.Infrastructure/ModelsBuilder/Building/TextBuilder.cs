@@ -84,12 +84,17 @@ public class TextBuilder : Builder
     /// <param name="typeModels">The models to generate.</param>
     public void Generate(StringBuilder sb, IEnumerable<TypeModel> typeModels)
     {
+        // TODO: Ideally this should live in the Umbraco.Cms.DevelopmentMode.Backoffice project, but we dont want to clone the entire thing.
+        // This is only used for in memory auto.
         WriteHeader(sb, Config.IncludeVersionNumberInGeneratedModels);
 
         foreach (var t in TypesUsing)
         {
             sb.AppendFormat("using {0};\n", t);
         }
+
+        // A hack to include the using for the assembly attribute (works because this method is only called from InMemoryModelFactory)
+        sb.AppendLine("using Umbraco.Cms.DevelopmentMode.Backoffice.InMemoryAuto;");
 
         // assembly attributes marker
         sb.Append("\n//ASSATTR\n");

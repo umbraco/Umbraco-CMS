@@ -1,14 +1,12 @@
 import type { ManifestWorkspaceView } from '../../types.js';
 import { UmbWorkspaceViewContext } from './workspace-view.context.js';
 import { UMB_WORKSPACE_EDITOR_CONTEXT } from './workspace-editor.context-token.js';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbBasicState, mergeObservables } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbExtensionsManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
-import { UmbHintController } from '@umbraco-cms/backoffice/hint';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDeepPartialObject } from '@umbraco-cms/backoffice/utils';
-import type { UmbVariantHint } from '@umbraco-cms/backoffice/hint';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 export class UmbWorkspaceEditorContext extends UmbContextBase {
@@ -26,9 +24,13 @@ export class UmbWorkspaceEditorContext extends UmbContextBase {
 			let contexts = this.#contexts;
 
 			// remove ones that are no longer contained in the workspaceViews (And thereby make the new array):
-			const contextsToKeep = contexts.filter(
-				(view) => !manifests.some((manifest) => manifest.alias === view.manifest.alias),
-			);
+			const contextsToKeep = contexts.filter((view) => {
+				const keep = manifests.some((manifest) => manifest.alias === view.manifest.alias);
+				if (!keep) {
+					view.destroy();
+				}
+				return keep;
+			});
 
 			const hasDiff = contextsToKeep.length !== manifests.length;
 			if (hasDiff) {
@@ -40,7 +42,8 @@ export class UmbWorkspaceEditorContext extends UmbContextBase {
 					.forEach((manifest) => {
 						const context = new UmbWorkspaceViewContext(this, manifest);
 						context.setVariantId(this.#variantId);
-						context.hints.inheritFrom(this.#hints);
+						context.setTitle(manifest.meta.label);
+						context.inherit();
 						contexts.push(context);
 					});
 			}
@@ -82,12 +85,9 @@ export class UmbWorkspaceEditorContext extends UmbContextBase {
 	#contexts = new Array<UmbWorkspaceViewContext>();
 
 	#variantId?: UmbVariantId;
-	#hints = new UmbHintController<UmbVariantHint>(this, {});
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_WORKSPACE_EDITOR_CONTEXT);
-
-		this.#hints.inherit();
 
 		this.#init = new UmbExtensionsManifestInitializer(
 			this,
@@ -102,7 +102,6 @@ export class UmbWorkspaceEditorContext extends UmbContextBase {
 
 	setVariantId(variantId: UmbVariantId | undefined): void {
 		this.#variantId = variantId;
-		this.#hints.updateScaffold({ variantId });
 		this.#contexts.forEach((view) => {
 			view.hints.updateScaffold({ variantId });
 		});

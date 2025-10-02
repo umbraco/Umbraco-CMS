@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Delivery.Controllers.Content;
@@ -132,7 +133,9 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
             }
 
 
-            methodParams["version"] = method?.GetCustomAttribute<MapToApiVersionAttribute>()?.Versions?.First().MajorVersion.ToString();
+            methodParams["version"] =
+                method?.GetCustomAttribute<MapToApiVersionAttribute>()?.Versions?.First().MajorVersion.ToString() // get it from the attribute
+                ?? Factory.Services.GetRequiredService<IOptions<ApiVersioningOptions>>()?.Value.DefaultApiVersion.MajorVersion.ToString(); // or use the default version from options
             if (method == null)
             {
                 throw new MissingMethodException(

@@ -60,8 +60,8 @@
     <PackageVersion Include="MiniProfiler.AspNetCore.Mvc" Version="4.5.4" />
     <PackageVersion Include="MiniProfiler.Shared" Version="4.5.4" />
     <PackageVersion Include="ncrontab" Version="3.3.3" />
-    <PackageVersion Include="NPoco" Version="5.7.1" />
-    <PackageVersion Include="NPoco.SqlServer" Version="5.7.1" />
+    <PackageVersion Include="NPoco" Version="6.1.0" />
+    <PackageVersion Include="NPoco.SqlServer" Version="6.1.0" />
     <PackageVersion Include="OpenIddict.Abstractions" Version="6.2.1" />
     <PackageVersion Include="OpenIddict.AspNetCore" Version="6.2.1" />
     <PackageVersion Include="OpenIddict.EntityFrameworkCore" Version="6.2.1" />
@@ -77,8 +77,8 @@
     <PackageVersion Include="Serilog.Sinks.Async" Version="2.1.0" />
     <PackageVersion Include="Serilog.Sinks.File" Version="6.0.0" />
     <PackageVersion Include="Serilog.Sinks.Map" Version="2.0.0" />
-    <PackageVersion Include="SixLabors.ImageSharp" Version="3.1.7" />
-    <PackageVersion Include="SixLabors.ImageSharp.Web" Version="3.1.4" />
+    <PackageVersion Include="SixLabors.ImageSharp" Version="3.1.11" />
+    <PackageVersion Include="SixLabors.ImageSharp.Web" Version="3.1.5" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="8.1.1" />
   </ItemGroup>
   <!-- Transitive pinned versions (only required because our direct dependencies have vulnerable versions of transitive dependencies) -->

@@ -262,6 +262,12 @@ order by T.name, I.name");
     /// <inheritdoc />
     public override bool TryGetDefaultConstraint(IDatabase db, string? tableName, string columnName, [MaybeNullWhen(false)] out string constraintName)
     {
+        if (string.IsNullOrWhiteSpace(tableName))
+        {
+            constraintName = null;
+            return false;
+        }
+
         constraintName = db.Fetch<string>(
                 @"select con.[name] as [constraintName]
 from sys.default_constraints con

@@ -74,6 +74,8 @@ public interface ISqlSyntaxProvider
 
     string ConvertUniqueIdentifierToString => throw new NotImplementedException();
 
+    string ConvertIntegerToBoolean(int value);
+
     /// <summary>
     ///     Returns the default isolation level for the database
     /// </summary>
@@ -103,11 +105,13 @@ public interface ISqlSyntaxProvider
 
     string GetConcat(params string[] args);
 
-    string GetColumn(DatabaseType dbType, string tableName, string columnName, string columnAlias, string? referenceName = null, bool forInsert = false);
+    string GetColumn(DatabaseType dbType, string tableName, string columnName, string? columnAlias, string? referenceName = null, bool forInsert = false);
 
     string GetQuotedTableName(string? tableName);
 
     string GetQuotedColumnName(string? columnName);
+
+    string OrderByGuid(string tableName, string columnName);
 
     string GetQuotedName(string? name);
 
@@ -142,6 +146,8 @@ public interface ISqlSyntaxProvider
     string FormatColumnRename(string? tableName, string? oldName, string? newName);
 
     string FormatTableRename(string? oldName, string? newName);
+
+    string ColumnWithAlias(string tableNameOrAlias, string columnName, string columnAlias = "");
 
     void HandleCreateTable(IDatabase database, TableDefinition tableDefinition, bool skipKeysAndIndexes = false);
 

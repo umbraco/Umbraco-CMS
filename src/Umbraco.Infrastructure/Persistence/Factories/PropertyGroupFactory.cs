@@ -25,7 +25,8 @@ internal static class PropertyGroupFactory
         }
 
         dto.PropertyTypeDtos = propertyGroup.PropertyTypes
-            ?.Select(propertyType => BuildPropertyTypeDto(propertyGroup.Id, propertyType, contentTypeId)).ToList();
+            ?.Select(propertyType => BuildPropertyTypeDto(propertyGroup.Id, propertyType, contentTypeId)).ToList()
+            ?? [];
 
         return dto;
     }

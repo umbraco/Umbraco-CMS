@@ -18,8 +18,10 @@ using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
+using IMapperCollection = Umbraco.Cms.Infrastructure.Persistence.Mappers.IMapperCollection;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// <summary>
@@ -213,17 +215,23 @@ internal sealed class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserR
     public IDictionary<UserState, int> GetUserStates()
     {
         // These keys in this query map to the `Umbraco.Core.Models.Membership.UserState` enum
-        var sql = @"SELECT -1 AS [Key], COUNT(id) AS [Value] FROM umbracoUser
+        var keyAlias = SqlSyntax.GetQuotedName("Key");
+        var valueAlias = SqlSyntax.GetQuotedName("Value");
+        var userTableName = QuoteTableName("umbracoUser");
+        var sql = @$"SELECT -1 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
 UNION
-SELECT 0 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 AND userNoConsole = 0 AND lastLoginDate IS NOT NULL
+SELECT 0 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
+    WHERE {QuoteColumnName("userDisabled")} = 0 AND {QuoteColumnName("userNoConsole")} = 0 AND {QuoteColumnName("lastLoginDate")} IS NOT NULL
 UNION
-SELECT 1 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 1
+SELECT 1 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName} WHERE {QuoteColumnName("userDisabled")} = 1
 UNION
-SELECT 2 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userNoConsole = 1
+SELECT 2 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName} WHERE {QuoteColumnName("userNoConsole")} = 1
 UNION
-SELECT 3 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE lastLoginDate IS NULL AND userDisabled = 1 AND invitedDate IS NOT NULL
+SELECT 3 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
+    WHERE {QuoteColumnName("lastLoginDate")} IS NULL AND {QuoteColumnName("userDisabled")} = 1 AND {QuoteColumnName("invitedDate")} IS NOT NULL
 UNION
-SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 AND userNoConsole = 0 AND lastLoginDate IS NULL";
+SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
+    WHERE {QuoteColumnName("userDisabled")} = 0 AND {QuoteColumnName("userNoConsole")} = 0 AND {QuoteColumnName("lastLoginDate")} IS NULL";
 
         Dictionary<int, int>? result = Database.Dictionary<int, int>(sql);
 
@@ -651,26 +659,37 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             .Select(columns)
             .From<UserDto>();
 
-    protected override string GetBaseWhereClause() => $"{Constants.DatabaseSchema.Tables.User}.id = @id";
+    protected override string GetBaseWhereClause() => $"{QuoteTableName(UserDto.TableName)}.id = @id";
 
     protected override IEnumerable<string> GetDeleteClauses()
     {
+        var userColName = QuoteColumnName("userId");
         var list = new List<string>
         {
-            $"DELETE FROM {Constants.DatabaseSchema.Tables.UserLogin} WHERE userId = @id",
-            $"DELETE FROM {Constants.DatabaseSchema.Tables.User2UserGroup} WHERE userId = @id",
-            $"DELETE FROM {Constants.DatabaseSchema.Tables.User2NodeNotify} WHERE userId = @id",
-            $"DELETE FROM {Constants.DatabaseSchema.Tables.User2ClientId} WHERE userId = @id",
-            $"DELETE FROM {Constants.DatabaseSchema.Tables.UserStartNode} WHERE userId = @id",
-            $"DELETE FROM {Constants.DatabaseSchema.Tables.ExternalLoginToken} WHERE externalLoginId = (SELECT id FROM {Constants.DatabaseSchema.Tables.ExternalLogin} WHERE userOrMemberKey = @key)",
-            $"DELETE FROM {Constants.DatabaseSchema.Tables.ExternalLogin} WHERE userOrMemberKey = @key",
-            $"DELETE FROM {Constants.DatabaseSchema.Tables.User} WHERE id = @id",
+            $"DELETE FROM {QuoteTableName(UserLoginDto.TableName)} WHERE {userColName} = @id",
+            $"DELETE FROM {QuoteTableName(User2UserGroupDto.TableName)} WHERE {userColName} = @id",
+            $"DELETE FROM {QuoteTableName(User2NodeNotifyDto.TableName)} WHERE {userColName} = @id",
+            $"DELETE FROM {QuoteTableName(User2ClientIdDto.TableName)} WHERE {userColName} = @id",
+            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.UserStartNode)} WHERE {userColName} = @id",
+            @$"DELETE FROM {QuoteTableName(ExternalLoginTokenDto.TableName)} WHERE {QuoteColumnName("externalLoginId")} =
+                (SELECT id FROM {QuoteTableName(ExternalLoginDto.TableName)} WHERE {QuoteColumnName("userOrMemberKey")} = @key)",
+            $"DELETE FROM {QuoteTableName(ExternalLoginDto.TableName)} WHERE {QuoteColumnName("userOrMemberKey")} = @key",
+            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.User)} WHERE id = @id",
         };
         return list;
     }
 
     protected override void PersistDeletedItem(IUser entity)
     {
+        // Clear user group caches for any user groups associated with the deleted user.
+        // We need to do this because the count of the number of users in the user group is cached
+        // along with the user group, and if we've made changes to the user groups assigned to the user,
+        // the count for the groups need to be refreshed.
+        foreach (IReadOnlyUserGroup group in entity.Groups)
+        {
+            ClearRepositoryCacheForUserGroup(group.Id);
+        }
+
         IEnumerable<string> deletes = GetDeleteClauses();
         foreach (var delete in deletes)
         {
@@ -712,17 +731,30 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
 
         if (entity.IsPropertyDirty("Groups"))
         {
-            // lookup all assigned
-            List<UserGroupDto>? assigned = entity.Groups == null || entity.Groups.Any() == false
-                ? new List<UserGroupDto>()
-                : Database.Fetch<UserGroupDto>(
-                    "SELECT * FROM umbracoUserGroup WHERE userGroupAlias IN (@aliases)",
-                    new { aliases = entity.Groups.Select(x => x.Alias) });
+            // Lookup all assigned groups.
+            List<UserGroupDto> assigned = [];
+            if (entity.Groups.Any())
+            {
+                Sql<ISqlContext> sql = SqlContext.Sql()
+                    .SelectAll()
+                    .From<UserGroupDto>()
+                    .WhereIn<UserGroupDto>(x => x.Alias, entity.Groups.Select(x => x.Alias).ToArray());
+                assigned = Database.Fetch<UserGroupDto>(sql);
+            }
 
             foreach (UserGroupDto? groupDto in assigned)
             {
                 var dto = new User2UserGroupDto { UserGroupId = groupDto.Id, UserId = entity.Id };
                 Database.Insert(dto);
+            }
+
+            // Clear user group caches for the user groups associated with the new user.
+            // We need to do this because the count of the number of users in the user group is cached
+            // along with the user group, and if we've made changes to the user groups assigned to the user,
+            // the count for the groups need to be refreshed.
+            foreach (IReadOnlyUserGroup group in entity.Groups)
+            {
+                ClearRepositoryCacheForUserGroup(group.Id);
             }
         }
 
@@ -817,44 +849,86 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
 
         if (entity.IsPropertyDirty("StartContentIds") || entity.IsPropertyDirty("StartMediaIds"))
         {
+            Sql<ISqlContext> sql = SqlContext.Sql()
+                .SelectAll()
+                .From<UserStartNodeDto>()
+                .Where<UserStartNodeDto>(x => x.UserId == entity.Id);
             List<UserStartNodeDto>? assignedStartNodes =
-                Database.Fetch<UserStartNodeDto>(
-                    "SELECT * FROM umbracoUserStartNode WHERE userId = @userId",
-                    new { userId = entity.Id });
+                Database.Fetch<UserStartNodeDto>(sql);
+
             if (entity.IsPropertyDirty("StartContentIds"))
             {
-                AddingOrUpdateStartNodes(entity, assignedStartNodes, UserStartNodeDto.StartNodeTypeValue.Content,
-                    entity.StartContentIds);
+                AddingOrUpdateStartNodes(entity, assignedStartNodes, UserStartNodeDto.StartNodeTypeValue.Content, entity.StartContentIds);
             }
 
             if (entity.IsPropertyDirty("StartMediaIds"))
             {
-                AddingOrUpdateStartNodes(entity, assignedStartNodes, UserStartNodeDto.StartNodeTypeValue.Media,
-                    entity.StartMediaIds);
+                AddingOrUpdateStartNodes(entity, assignedStartNodes, UserStartNodeDto.StartNodeTypeValue.Media, entity.StartMediaIds);
             }
         }
 
         if (entity.IsPropertyDirty("Groups"))
         {
-            //lookup all assigned
-            List<UserGroupDto>? assigned = entity.Groups == null || entity.Groups.Any() == false
-                ? new List<UserGroupDto>()
-                : Database.Fetch<UserGroupDto>(
-                    "SELECT * FROM umbracoUserGroup WHERE userGroupAlias IN (@aliases)",
-                    new { aliases = entity.Groups.Select(x => x.Alias) });
+            // Get all user groups Ids currently assigned to the user.
+            Sql<ISqlContext> sql = SqlContext.Sql()
+                .Select<User2UserGroupDto>(x => x.UserGroupId)
+                .From<User2UserGroupDto>()
+                .Where<User2UserGroupDto>(c => c.UserId == entity.Id);
 
-            //first delete all
-            // TODO: We could do this a nicer way instead of "Nuke and Pave"
-            Database.Delete<User2UserGroupDto>("WHERE UserId = @UserId", new { UserId = entity.Id });
+            List<int> existingUserGroupIds = Database.Fetch<int>(sql);
 
-            foreach (UserGroupDto? groupDto in assigned)
+            // Get the user groups Ids that need to be removed and added.
+            var userGroupsIdsToRemove = existingUserGroupIds
+                .Except(entity.Groups.Select(x => x.Id))
+                .ToList();
+            var userGroupIdsToAdd = entity.Groups
+                .Select(x => x.Id)
+                .Except(existingUserGroupIds)
+                .ToList();
+
+            // Remove user groups that are no longer assigned to the user.
+            if (userGroupsIdsToRemove.Count > 0)
             {
-                var dto = new User2UserGroupDto { UserGroupId = groupDto.Id, UserId = entity.Id };
-                Database.Insert(dto);
+                Database.Delete<User2UserGroupDto>(
+                    Sql()
+                        .Where<User2UserGroupDto>(x => x.UserId == entity.Id)
+                        .WhereIn<User2UserGroupDto>(x => x.UserGroupId, userGroupsIdsToRemove));
+            }
+
+            // Add user groups that are newly assigned to the user.
+            if (userGroupIdsToAdd.Count > 0)
+            {
+                IEnumerable<User2UserGroupDto> user2UserGroupDtos = userGroupIdsToAdd
+                    .Select(userGroupId => new User2UserGroupDto
+                    {
+                        UserGroupId = userGroupId,
+                        UserId = entity.Id,
+                    });
+                Database.InsertBulk(user2UserGroupDtos);
+            }
+
+            // Clear user group caches for any user group that have been removed or added.
+            // We need to do this because the count of the number of users in the user group is cached
+            // along with the user group, and if we've made changes to the user groups assigned to the user,
+            // the count for the groups need to be refreshed.
+            var userGroupIdsToRefresh = userGroupsIdsToRemove
+                .Union(userGroupIdsToAdd)
+                .ToList();
+            foreach (int userGroupIdToRefresh in userGroupIdsToRefresh)
+            {
+                ClearRepositoryCacheForUserGroup(userGroupIdToRefresh);
             }
         }
 
         entity.ResetDirtyProperties();
+    }
+
+    private void ClearRepositoryCacheForUserGroup(int id)
+    {
+        IAppPolicyCache userGroupCache = AppCaches.IsolatedCaches.GetOrCreate<IUserGroup>();
+
+        string cacheKey = RepositoryCacheKeys.GetKey<IUserGroup, int>(id);
+        userGroupCache.Clear(cacheKey);
     }
 
     private void AddingOrUpdateStartNodes(IEntity entity, IEnumerable<UserStartNodeDto> current,
@@ -867,16 +941,18 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
 
         var assignedIds = current.Where(x => x.StartNodeType == (int)startNodeType).Select(x => x.StartNode).ToArray();
 
-        //remove the ones not assigned to the entity
+        // remove the ones not assigned to the entity
         var toDelete = assignedIds.Except(entityStartIds).ToArray();
         if (toDelete.Length > 0)
         {
-            Database.Delete<UserStartNodeDto>(
-                "WHERE UserId = @UserId AND startNode IN (@startNodes)",
-                new { UserId = entity.Id, startNodes = toDelete });
+            Sql<ISqlContext> sql = SqlContext.Sql()
+                .Delete<UserStartNodeDto>()
+                .Where<UserStartNodeDto>(x => x.UserId == entity.Id)
+                .WhereIn<UserStartNodeDto>(x => x.StartNode, toDelete);
+            Database.Execute(sql);
         }
 
-        //add the ones not currently in the db
+        // add the ones not currently in the db
         var toAdd = entityStartIds.Except(assignedIds).ToArray();
         foreach (var i in toAdd)
         {
@@ -891,12 +967,13 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
 
     public int GetCountByQuery(IQuery<IUser>? query)
     {
-        Sql<ISqlContext> sqlClause = GetBaseQuery("umbracoUser.id");
+        var userIdQuoted = SqlSyntax.GetQuotedColumn(UserDto.TableName, "id");
+        Sql<ISqlContext> sqlClause = GetBaseQuery(userIdQuoted);
         var translator = new SqlTranslator<IUser>(sqlClause, query);
         Sql<ISqlContext> subquery = translator.Translate();
         //get the COUNT base query
         Sql<ISqlContext>? sql = GetBaseQuery(true)
-            .Append(new Sql("WHERE umbracoUser.id IN (" + subquery.SQL + ")", subquery.Arguments));
+            .Append(new Sql($"WHERE {userIdQuoted} IN ({subquery.SQL})", subquery.Arguments));
 
         return Database.ExecuteScalar<int>(sql);
     }
@@ -1059,23 +1136,16 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             }
         }
 
+        var userIdQuoted = SqlSyntax.GetQuotedColumn("umbracoUser", "id");
         if (includeUserGroups != null && includeUserGroups.Length > 0)
         {
-            const string subQuery = @"AND (umbracoUser.id IN (SELECT DISTINCT umbracoUser.id
-                    FROM umbracoUser
-                    INNER JOIN umbracoUser2UserGroup ON umbracoUser2UserGroup.userId = umbracoUser.id
-                    INNER JOIN umbracoUserGroup ON umbracoUserGroup.id = umbracoUser2UserGroup.userGroupId
-                    WHERE umbracoUserGroup.userGroupAlias IN (@userGroups)))";
+            string subQuery = GetSuQueryInExclude("IN");
             filterSql?.Append(subQuery, new { userGroups = includeUserGroups });
         }
 
         if (excludeUserGroups != null && excludeUserGroups.Length > 0)
         {
-            const string subQuery = @"AND (umbracoUser.id NOT IN (SELECT DISTINCT umbracoUser.id
-                    FROM umbracoUser
-                    INNER JOIN umbracoUser2UserGroup ON umbracoUser2UserGroup.userId = umbracoUser.id
-                    INNER JOIN umbracoUserGroup ON umbracoUserGroup.id = umbracoUser2UserGroup.userGroupId
-                    WHERE umbracoUserGroup.userGroupAlias IN (@userGroups)))";
+            string subQuery = GetSuQueryInExclude("NOT IN");
             filterSql?.Append(subQuery, new { userGroups = excludeUserGroups });
         }
 
@@ -1164,6 +1234,19 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         // map references
         PerformGetReferencedDtos(pagedResult.Items);
         return pagedResult.Items.Select(x => UserFactory.BuildEntity(_globalSettings, x, _permissionMappers));
+    }
+
+    private string GetSuQueryInExclude(string inOrNotIn)
+    {
+        var userIdQuoted = SqlSyntax.GetQuotedColumn("umbracoUser", "id");
+        // this is used to get the correct query for the in or not in clause
+        return @$"AND ({userIdQuoted} {inOrNotIn} (SELECT DISTINCT {userIdQuoted}
+            FROM {QuoteTableName("umbracoUser")}
+            INNER JOIN {QuoteTableName("umbracoUser2UserGroup")}
+            ON {SqlSyntax.GetQuotedColumn("umbracoUser2UserGroup", "userId")} = {userIdQuoted}
+            INNER JOIN {QuoteTableName("umbracoUserGroup")}
+            ON {SqlSyntax.GetQuotedColumn("umbracoUserGroup", "id")} = {SqlSyntax.GetQuotedColumn("umbracoUser2UserGroup", "userGroupId")}
+            WHERE {SqlSyntax.GetQuotedColumn("umbracoUserGroup", "userGroupAlias")} IN (@userGroups)))";
     }
 
     public IEnumerable<string> GetAllClientIds()
@@ -1285,7 +1368,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         // Delete the OpenIddict tokens for the users associated with the removed providers.
         // The following is safe from SQL injection as we are dealing with GUIDs, not strings.
         var userKeysForInClause = string.Join("','", userKeysAssociatedWithRemovedProviders.Select(x => x.ToString()));
-        Database.Execute("DELETE FROM umbracoOpenIddictTokens WHERE Subject IN ('" + userKeysForInClause + "')");
+        Database.Execute($"DELETE FROM {QuoteTableName("umbracoOpenIddictTokens")} WHERE {QuoteColumnName("Subject")} IN ('{userKeysForInClause}')");
     }
 
     #endregion

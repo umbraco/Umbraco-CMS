@@ -880,70 +880,6 @@
         ]
       }
     },
-    "/umbraco/management/api/v1/data-type/{id}/references": {
-      "get": {
-        "tags": [
-          "Data Type"
-        ],
-        "operationId": "GetDataTypeByIdReferences",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "oneOf": [
-                      {
-                        "$ref": "#/components/schemas/DataTypeReferenceResponseModel"
-                      }
-                    ]
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ProblemDetails"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "The resource is protected and requires an authentication token"
-          },
-          "403": {
-            "description": "The authenticated user does not have access to this resource"
-          }
-        },
-        "deprecated": true,
-        "security": [
-          {
-            "Backoffice-User": [ ]
-          }
-        ]
-      }
-    },
     "/umbraco/management/api/v1/data-type/configuration": {
       "get": {
         "tags": [
@@ -7883,6 +7819,85 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/document/{id}/available-segment-options": {
+      "get": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "GetDocumentByIdAvailableSegmentOptions",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/PagedSegmentResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProblemDetails"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "deprecated": true,
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/document/{id}/copy": {
       "post": {
         "tags": [
@@ -11094,6 +11109,75 @@
                   "oneOf": [
                     {
                       "$ref": "#/components/schemas/PagedDocumentRecycleBinItemResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/recycle-bin/document/siblings": {
+      "get": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "GetRecycleBinDocumentSiblings",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "before",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "dataTypeId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/SubsetDocumentRecycleBinItemResponseModel"
                     }
                   ]
                 }
@@ -18474,6 +18558,75 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/recycle-bin/media/siblings": {
+      "get": {
+        "tags": [
+          "Media"
+        ],
+        "operationId": "GetRecycleBinMediaSiblings",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "before",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "dataTypeId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/SubsetMediaRecycleBinItemResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/tree/media/ancestors": {
       "get": {
         "tags": [
@@ -20203,6 +20356,67 @@
                   "oneOf": [
                     {
                       "$ref": "#/components/schemas/PagedMemberTypeTreeItemResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/tree/member-type/siblings": {
+      "get": {
+        "tags": [
+          "Member Type"
+        ],
+        "operationId": "GetTreeMemberTypeSiblings",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "before",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/SubsetMemberTypeTreeItemResponseModel"
                     }
                   ]
                 }
@@ -23641,6 +23855,66 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/tree/partial-view/siblings": {
+      "get": {
+        "tags": [
+          "Partial View"
+        ],
+        "operationId": "GetTreePartialViewSiblings",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "before",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/SubsetFileSystemTreeItemPresentationModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/preview": {
       "delete": {
         "tags": [
@@ -25612,6 +25886,66 @@
                   "oneOf": [
                     {
                       "$ref": "#/components/schemas/PagedFileSystemTreeItemPresentationModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/tree/script/siblings": {
+      "get": {
+        "tags": [
+          "Script"
+        ],
+        "operationId": "GetTreeScriptSiblings",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "before",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/SubsetFileSystemTreeItemPresentationModel"
                     }
                   ]
                 }
@@ -27718,6 +28052,66 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/tree/stylesheet/siblings": {
+      "get": {
+        "tags": [
+          "Stylesheet"
+        ],
+        "operationId": "GetTreeStylesheetSiblings",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "before",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/SubsetFileSystemTreeItemPresentationModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/tag": {
       "get": {
         "tags": [
@@ -29718,6 +30112,92 @@
           },
           "404": {
             "description": "Not Found"
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "User Data"
+        ],
+        "operationId": "DeleteUserDataById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  },
+                  "nullable": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  },
+                  "nullable": true
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDataOperationStatusModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  },
+                  "nullable": true
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDataOperationStatusModel"
+                }
+              }
+            }
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
@@ -36875,9 +37355,6 @@
                   "$ref": "#/components/schemas/DocumentPropertyValuePermissionPresentationModel"
                 },
                 {
-                  "$ref": "#/components/schemas/DocumentTypePermissionPresentationModel"
-                },
-                {
                   "$ref": "#/components/schemas/UnknownTypePermissionPresentationModel"
                 }
               ]
@@ -37164,9 +37641,6 @@
                   "$ref": "#/components/schemas/DocumentPropertyValuePermissionPresentationModel"
                 },
                 {
-                  "$ref": "#/components/schemas/DocumentTypePermissionPresentationModel"
-                },
-                {
                   "$ref": "#/components/schemas/UnknownTypePermissionPresentationModel"
                 }
               ]
@@ -37193,41 +37667,13 @@
         ],
         "type": "string"
       },
-      "DataTypeContentTypeReferenceModel": {
-        "required": [
-          "icon",
-          "id",
-          "name",
-          "type"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "type": {
-            "type": "string",
-            "nullable": true
-          },
-          "name": {
-            "type": "string",
-            "nullable": true
-          },
-          "icon": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
       "DataTypeItemResponseModel": {
         "required": [
           "editorAlias",
+          "flags",
           "id",
           "isDeletable",
-          "name",
-          "signs"
+          "name"
         ],
         "type": "object",
         "properties": {
@@ -37235,12 +37681,12 @@
             "type": "string",
             "format": "uuid"
           },
-          "signs": {
+          "flags": {
             "type": "array",
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/SignModel"
+                  "$ref": "#/components/schemas/FlagModel"
                 }
               ]
             }
@@ -37272,49 +37718,6 @@
           },
           "value": {
             "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "DataTypePropertyReferenceModel": {
-        "required": [
-          "alias",
-          "name"
-        ],
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "alias": {
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
-      "DataTypeReferenceResponseModel": {
-        "required": [
-          "contentType",
-          "properties"
-        ],
-        "type": "object",
-        "properties": {
-          "contentType": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/DataTypeContentTypeReferenceModel"
-              }
-            ]
-          },
-          "properties": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/DataTypePropertyReferenceModel"
-                }
-              ]
-            }
           }
         },
         "additionalProperties": false
@@ -37367,12 +37770,12 @@
       },
       "DataTypeTreeItemResponseModel": {
         "required": [
+          "flags",
           "hasChildren",
           "id",
           "isDeletable",
           "isFolder",
-          "name",
-          "signs"
+          "name"
         ],
         "type": "object",
         "properties": {
@@ -37391,12 +37794,12 @@
             ],
             "nullable": true
           },
-          "signs": {
+          "flags": {
             "type": "array",
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/SignModel"
+                  "$ref": "#/components/schemas/FlagModel"
                 }
               ]
             }
@@ -37624,9 +38027,9 @@
       },
       "DictionaryItemItemResponseModel": {
         "required": [
+          "flags",
           "id",
-          "name",
-          "signs"
+          "name"
         ],
         "type": "object",
         "properties": {
@@ -37634,12 +38037,12 @@
             "type": "string",
             "format": "uuid"
           },
-          "signs": {
+          "flags": {
             "type": "array",
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/SignModel"
+                  "$ref": "#/components/schemas/FlagModel"
                 }
               ]
             }
@@ -37758,9 +38161,9 @@
       "DocumentBlueprintItemResponseModel": {
         "required": [
           "documentType",
+          "flags",
           "id",
-          "name",
-          "signs"
+          "name"
         ],
         "type": "object",
         "properties": {
@@ -37768,12 +38171,12 @@
             "type": "string",
             "format": "uuid"
           },
-          "signs": {
+          "flags": {
             "type": "array",
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/SignModel"
+                  "$ref": "#/components/schemas/FlagModel"
                 }
               ]
             }
@@ -37794,8 +38197,8 @@
       "DocumentBlueprintResponseModel": {
         "required": [
           "documentType",
+          "flags",
           "id",
-          "signs",
           "values",
           "variants"
         ],
@@ -37825,12 +38228,12 @@
             "type": "string",
             "format": "uuid"
           },
-          "signs": {
+          "flags": {
             "type": "array",
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/SignModel"
+                  "$ref": "#/components/schemas/FlagModel"
                 }
               ]
             }
@@ -37847,11 +38250,11 @@
       },
       "DocumentBlueprintTreeItemResponseModel": {
         "required": [
+          "flags",
           "hasChildren",
           "id",
           "isFolder",
-          "name",
-          "signs"
+          "name"
         ],
         "type": "object",
         "properties": {
@@ -37870,12 +38273,12 @@
             ],
             "nullable": true
           },
-          "signs": {
+          "flags": {
             "type": "array",
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/SignModel"
+                  "$ref": "#/components/schemas/FlagModel"
                 }
               ]
             }
@@ -37901,10 +38304,10 @@
         "required": [
           "ancestors",
           "documentType",
+          "flags",
           "id",
           "isProtected",
           "isTrashed",
-          "signs",
           "sortOrder",
           "values",
           "variants"
@@ -37935,12 +38338,12 @@
             "type": "string",
             "format": "uuid"
           },
-          "signs": {
+          "flags": {
             "type": "array",
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/SignModel"
+                  "$ref": "#/components/schemas/FlagModel"
                 }
               ]
             }
@@ -38010,11 +38413,11 @@
       "DocumentItemResponseModel": {
         "required": [
           "documentType",
+          "flags",
           "hasChildren",
           "id",
           "isProtected",
           "isTrashed",
-          "signs",
           "variants"
         ],
         "type": "object",
@@ -38023,12 +38426,12 @@
             "type": "string",
             "format": "uuid"
           },
-          "signs": {
+          "flags": {
             "type": "array",
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/SignModel"
+                  "$ref": "#/components/schemas/FlagModel"
                 }
               ]
             }
@@ -38268,10 +38671,9 @@
       "DocumentResponseModel": {
         "required": [
           "documentType",
+          "flags",
           "id",
           "isTrashed",
-          "signs",
-          "urls",
           "values",
           "variants"
         ],
@@ -38301,12 +38703,12 @@
             "type": "string",
             "format": "uuid"
           },
-          "signs": {
+          "flags": {
             "type": "array",
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/SignModel"
+                  "$ref": "#/components/schemas/FlagModel"
                 }
               ]
             }
@@ -38317,17 +38719,6 @@
                 "$ref": "#/components/schemas/DocumentTypeReferenceResponseModel"
               }
             ]
-          },
-          "urls": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/DocumentUrlInfoModel"
-                }
-              ]
-            },
-            "deprecated": true
           },
           "template": {
             "oneOf": [
@@ -38348,12 +38739,12 @@
           "ancestors",
           "createDate",
           "documentType",
+          "flags",
           "hasChildren",
           "id",
           "isProtected",
           "isTrashed",
           "noAccess",
-          "signs",
           "variants"
         ],
         "type": "object",
@@ -38373,12 +38764,12 @@
             ],
             "nullable": true
           },
-          "signs": {
+          "flags": {
             "type": "array",
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/SignModel"
+                  "$ref": "#/components/schemas/FlagModel"
                 }
               ]
             }
@@ -38428,9 +38819,9 @@
       },
       "DocumentTypeBlueprintItemResponseModel": {
         "required": [
+          "flags",
           "id",
-          "name",
-          "signs"
+          "name"
         ],
         "type": "object",
         "properties": {
@@ -38438,12 +38829,12 @@
             "type": "string",
             "format": "uuid"
           },
-          "signs": {
+          "flags": {
             "type": "array",
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/SignModel"
+                  "$ref": "#/components/schemas/FlagModel"
                 }
               ]
             }
@@ -38608,10 +38999,10 @@
       },
       "DocumentTypeItemResponseModel": {
         "required": [
+          "flags",
           "id",
           "isElement",
-          "name",
-          "signs"
+          "name"
         ],
         "type": "object",
         "properties": {
@@ -38619,12 +39010,12 @@
             "type": "string",
             "format": "uuid"
           },
-          "signs": {
+          "flags": {
             "type": "array",
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/SignModel"
+                  "$ref": "#/components/schemas/FlagModel"
                 }
               ]
             }
@@ -38645,36 +39036,6 @@
           }
         },
         "additionalProperties": false
-      },
-      "DocumentTypePermissionPresentationModel": {
-        "required": [
-          "$type",
-          "documentTypeAlias",
-          "verbs"
-        ],
-        "type": "object",
-        "properties": {
-          "$type": {
-            "type": "string"
-          },
-          "verbs": {
-            "uniqueItems": true,
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "documentTypeAlias": {
-            "type": "string"
-          }
-        },
-        "additionalProperties": false,
-        "discriminator": {
-          "propertyName": "$type",
-          "mapping": {
-            "DocumentTypePermissionPresentationModel": "#/components/schemas/DocumentTypePermissionPresentationModel"
-          }
-        }
       },
       "DocumentTypePropertyTypeContainerResponseModel": {
         "required": [
@@ -38997,13 +39358,13 @@
       },
       "DocumentTypeTreeItemResponseModel": {
         "required": [
+          "flags",
           "hasChildren",
           "icon",
           "id",
           "isElement",
           "isFolder",
-          "name",
-          "signs"
+          "name"
         ],
         "type": "object",
         "properties": {
@@ -39022,12 +39383,12 @@
             ],
             "nullable": true
           },
-          "signs": {
+          "flags": {
             "type": "array",
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/SignModel"
+                  "$ref": "#/components/schemas/FlagModel"
                 }
               ]
             }
@@ -39153,6 +39514,8 @@
       },
       "DocumentVariantItemResponseModel": {
         "required": [
+          "flags",
+          "id",
           "name",
           "state"
         ],
@@ -39164,6 +39527,21 @@
           "culture": {
             "type": "string",
             "nullable": true
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "readOnly": true
+          },
+          "flags": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/FlagModel"
+                }
+              ]
+            }
           },
           "state": {
             "$ref": "#/components/schemas/DocumentVariantStateModel"
@@ -39195,6 +39573,8 @@
       "DocumentVariantResponseModel": {
         "required": [
           "createDate",
+          "flags",
+          "id",
           "name",
           "state",
           "updateDate"
@@ -39238,6 +39618,21 @@
             "type": "string",
             "format": "date-time",
             "nullable": true
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "readOnly": true
+          },
+          "flags": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/FlagModel"
+                }
+              ]
+            }
           }
         },
         "additionalProperties": false
@@ -39308,8 +39703,8 @@
       "DocumentVersionResponseModel": {
         "required": [
           "documentType",
+          "flags",
           "id",
-          "signs",
           "values",
           "variants"
         ],
@@ -39339,12 +39734,12 @@
             "type": "string",
             "format": "uuid"
           },
-          "signs": {
+          "flags": {
             "type": "array",
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/SignModel"
+                  "$ref": "#/components/schemas/FlagModel"
                 }
               ]
             }
@@ -39665,6 +40060,18 @@
           },
           "isFolder": {
             "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "FlagModel": {
+        "required": [
+          "alias"
+        ],
+        "type": "object",
+        "properties": {
+          "alias": {
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -40362,9 +40769,9 @@
       },
       "MediaCollectionResponseModel": {
         "required": [
+          "flags",
           "id",
           "mediaType",
-          "signs",
           "sortOrder",
           "values",
           "variants"
@@ -40395,12 +40802,12 @@
             "type": "string",
             "format": "uuid"
           },
-          "signs": {
+          "flags": {
             "type": "array",
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/SignModel"
+                  "$ref": "#/components/schemas/FlagModel"
                 }
               ]
             }
@@ -40441,11 +40848,11 @@
       },
       "MediaItemResponseModel": {
         "required": [
+          "flags",
           "hasChildren",
           "id",
           "isTrashed",
           "mediaType",
-          "signs",
           "variants"
         ],
         "type": "object",
@@ -40454,12 +40861,12 @@
             "type": "string",
             "format": "uuid"
           },
-          "signs": {
+          "flags": {
             "type": "array",
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/SignModel"
+                  "$ref": "#/components/schemas/FlagModel"
                 }
               ]
             }
@@ -40584,11 +40991,10 @@
       },
       "MediaResponseModel": {
         "required": [
+          "flags",
           "id",
           "isTrashed",
           "mediaType",
-          "signs",
-          "urls",
           "values",
           "variants"
         ],
@@ -40618,26 +41024,15 @@
             "type": "string",
             "format": "uuid"
           },
-          "signs": {
+          "flags": {
             "type": "array",
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/SignModel"
+                  "$ref": "#/components/schemas/FlagModel"
                 }
               ]
             }
-          },
-          "urls": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/MediaUrlInfoModel"
-                }
-              ]
-            },
-            "deprecated": true
           },
           "isTrashed": {
             "type": "boolean"
@@ -40655,12 +41050,12 @@
       "MediaTreeItemResponseModel": {
         "required": [
           "createDate",
+          "flags",
           "hasChildren",
           "id",
           "isTrashed",
           "mediaType",
           "noAccess",
-          "signs",
           "variants"
         ],
         "type": "object",
@@ -40680,12 +41075,12 @@
             ],
             "nullable": true
           },
-          "signs": {
+          "flags": {
             "type": "array",
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/SignModel"
+                  "$ref": "#/components/schemas/FlagModel"
                 }
               ]
             }
@@ -40836,9 +41231,9 @@
       },
       "MediaTypeItemResponseModel": {
         "required": [
+          "flags",
           "id",
-          "name",
-          "signs"
+          "name"
         ],
         "type": "object",
         "properties": {
@@ -40846,12 +41241,12 @@
             "type": "string",
             "format": "uuid"
           },
-          "signs": {
+          "flags": {
             "type": "array",
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/SignModel"
+                  "$ref": "#/components/schemas/FlagModel"
                 }
               ]
             }
@@ -41168,13 +41563,13 @@
       },
       "MediaTypeTreeItemResponseModel": {
         "required": [
+          "flags",
           "hasChildren",
           "icon",
           "id",
           "isDeletable",
           "isFolder",
-          "name",
-          "signs"
+          "name"
         ],
         "type": "object",
         "properties": {
@@ -41193,12 +41588,12 @@
             ],
             "nullable": true
           },
-          "signs": {
+          "flags": {
             "type": "array",
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/SignModel"
+                  "$ref": "#/components/schemas/FlagModel"
                 }
               ]
             }
@@ -41371,9 +41766,9 @@
       },
       "MemberGroupItemResponseModel": {
         "required": [
+          "flags",
           "id",
-          "name",
-          "signs"
+          "name"
         ],
         "type": "object",
         "properties": {
@@ -41381,12 +41776,12 @@
             "type": "string",
             "format": "uuid"
           },
-          "signs": {
+          "flags": {
             "type": "array",
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/SignModel"
+                  "$ref": "#/components/schemas/FlagModel"
                 }
               ]
             }
@@ -41416,10 +41811,10 @@
       },
       "MemberItemResponseModel": {
         "required": [
+          "flags",
           "id",
           "kind",
           "memberType",
-          "signs",
           "variants"
         ],
         "type": "object",
@@ -41428,12 +41823,12 @@
             "type": "string",
             "format": "uuid"
           },
-          "signs": {
+          "flags": {
             "type": "array",
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/SignModel"
+                  "$ref": "#/components/schemas/FlagModel"
                 }
               ]
             }
@@ -41507,6 +41902,7 @@
         "required": [
           "email",
           "failedPasswordAttempts",
+          "flags",
           "groups",
           "id",
           "isApproved",
@@ -41514,7 +41910,6 @@
           "isTwoFactorEnabled",
           "kind",
           "memberType",
-          "signs",
           "username",
           "values",
           "variants"
@@ -41545,12 +41940,12 @@
             "type": "string",
             "format": "uuid"
           },
-          "signs": {
+          "flags": {
             "type": "array",
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/SignModel"
+                  "$ref": "#/components/schemas/FlagModel"
                 }
               ]
             }
@@ -41696,9 +42091,9 @@
       },
       "MemberTypeItemResponseModel": {
         "required": [
+          "flags",
           "id",
-          "name",
-          "signs"
+          "name"
         ],
         "type": "object",
         "properties": {
@@ -41706,12 +42101,12 @@
             "type": "string",
             "format": "uuid"
           },
-          "signs": {
+          "flags": {
             "type": "array",
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/SignModel"
+                  "$ref": "#/components/schemas/FlagModel"
                 }
               ]
             }
@@ -42016,11 +42411,11 @@
       },
       "MemberTypeTreeItemResponseModel": {
         "required": [
+          "flags",
           "hasChildren",
           "icon",
           "id",
-          "name",
-          "signs"
+          "name"
         ],
         "type": "object",
         "properties": {
@@ -42039,12 +42434,12 @@
             ],
             "nullable": true
           },
-          "signs": {
+          "flags": {
             "type": "array",
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/SignModel"
+                  "$ref": "#/components/schemas/FlagModel"
                 }
               ]
             }
@@ -42173,7 +42568,7 @@
         "type": "object",
         "properties": {
           "mode": {
-            "$ref": "#/components/schemas/ModelsModeModel"
+            "type": "string"
           },
           "canGenerate": {
             "type": "boolean"
@@ -42198,15 +42593,6 @@
           }
         },
         "additionalProperties": false
-      },
-      "ModelsModeModel": {
-        "enum": [
-          "Nothing",
-          "InMemoryAuto",
-          "SourceCodeManual",
-          "SourceCodeAuto"
-        ],
-        "type": "string"
       },
       "MoveDataTypeRequestModel": {
         "type": "object",
@@ -42308,10 +42694,10 @@
       },
       "NamedEntityTreeItemResponseModel": {
         "required": [
+          "flags",
           "hasChildren",
           "id",
-          "name",
-          "signs"
+          "name"
         ],
         "type": "object",
         "properties": {
@@ -42330,12 +42716,12 @@
             ],
             "nullable": true
           },
-          "signs": {
+          "flags": {
             "type": "array",
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/SignModel"
+                  "$ref": "#/components/schemas/FlagModel"
                 }
               ]
             }
@@ -44401,10 +44787,9 @@
       "PublishedDocumentResponseModel": {
         "required": [
           "documentType",
+          "flags",
           "id",
           "isTrashed",
-          "signs",
-          "urls",
           "values",
           "variants"
         ],
@@ -44434,12 +44819,12 @@
             "type": "string",
             "format": "uuid"
           },
-          "signs": {
+          "flags": {
             "type": "array",
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/SignModel"
+                  "$ref": "#/components/schemas/FlagModel"
                 }
               ]
             }
@@ -44450,17 +44835,6 @@
                 "$ref": "#/components/schemas/DocumentTypeReferenceResponseModel"
               }
             ]
-          },
-          "urls": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/DocumentUrlInfoModel"
-                }
-              ]
-            },
-            "deprecated": true
           },
           "template": {
             "oneOf": [
@@ -44631,10 +45005,10 @@
       },
       "RelationTypeItemResponseModel": {
         "required": [
+          "flags",
           "id",
           "isDeletable",
-          "name",
-          "signs"
+          "name"
         ],
         "type": "object",
         "properties": {
@@ -44642,12 +45016,12 @@
             "type": "string",
             "format": "uuid"
           },
-          "signs": {
+          "flags": {
             "type": "array",
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/SignModel"
+                  "$ref": "#/components/schemas/FlagModel"
                 }
               ]
             }
@@ -45034,6 +45408,14 @@
           },
           "alias": {
             "type": "string"
+          },
+          "cultures": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true,
+            "deprecated": true
           }
         },
         "additionalProperties": false
@@ -45142,18 +45524,6 @@
                 "$ref": "#/components/schemas/ReferenceByIdModel"
               }
             ]
-          }
-        },
-        "additionalProperties": false
-      },
-      "SignModel": {
-        "required": [
-          "alias"
-        ],
-        "type": "object",
-        "properties": {
-          "alias": {
-            "type": "string"
           }
         },
         "additionalProperties": false
@@ -45360,6 +45730,35 @@
         },
         "additionalProperties": false
       },
+      "SubsetDocumentRecycleBinItemResponseModel": {
+        "required": [
+          "items",
+          "totalAfter",
+          "totalBefore"
+        ],
+        "type": "object",
+        "properties": {
+          "totalBefore": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalAfter": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentRecycleBinItemResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "SubsetDocumentTreeItemResponseModel": {
         "required": [
           "items",
@@ -45418,6 +45817,64 @@
         },
         "additionalProperties": false
       },
+      "SubsetFileSystemTreeItemPresentationModel": {
+        "required": [
+          "items",
+          "totalAfter",
+          "totalBefore"
+        ],
+        "type": "object",
+        "properties": {
+          "totalBefore": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalAfter": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/FileSystemTreeItemPresentationModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "SubsetMediaRecycleBinItemResponseModel": {
+        "required": [
+          "items",
+          "totalAfter",
+          "totalBefore"
+        ],
+        "type": "object",
+        "properties": {
+          "totalBefore": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalAfter": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/MediaRecycleBinItemResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "SubsetMediaTreeItemResponseModel": {
         "required": [
           "items",
@@ -45469,6 +45926,35 @@
               "oneOf": [
                 {
                   "$ref": "#/components/schemas/MediaTypeTreeItemResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "SubsetMemberTypeTreeItemResponseModel": {
+        "required": [
+          "items",
+          "totalAfter",
+          "totalBefore"
+        ],
+        "type": "object",
+        "properties": {
+          "totalBefore": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalAfter": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/MemberTypeTreeItemResponseModel"
                 }
               ]
             }
@@ -45578,9 +46064,9 @@
       "TemplateItemResponseModel": {
         "required": [
           "alias",
+          "flags",
           "id",
-          "name",
-          "signs"
+          "name"
         ],
         "type": "object",
         "properties": {
@@ -45588,12 +46074,12 @@
             "type": "string",
             "format": "uuid"
           },
-          "signs": {
+          "flags": {
             "type": "array",
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/SignModel"
+                  "$ref": "#/components/schemas/FlagModel"
                 }
               ]
             }
@@ -47255,9 +47741,6 @@
                   "$ref": "#/components/schemas/DocumentPropertyValuePermissionPresentationModel"
                 },
                 {
-                  "$ref": "#/components/schemas/DocumentTypePermissionPresentationModel"
-                },
-                {
                   "$ref": "#/components/schemas/UnknownTypePermissionPresentationModel"
                 }
               ]
@@ -47578,9 +48061,9 @@
       },
       "UserGroupItemResponseModel": {
         "required": [
+          "flags",
           "id",
-          "name",
-          "signs"
+          "name"
         ],
         "type": "object",
         "properties": {
@@ -47588,12 +48071,12 @@
             "type": "string",
             "format": "uuid"
           },
-          "signs": {
+          "flags": {
             "type": "array",
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/SignModel"
+                  "$ref": "#/components/schemas/FlagModel"
                 }
               ]
             }
@@ -47695,9 +48178,6 @@
                   "$ref": "#/components/schemas/DocumentPropertyValuePermissionPresentationModel"
                 },
                 {
-                  "$ref": "#/components/schemas/DocumentTypePermissionPresentationModel"
-                },
-                {
                   "$ref": "#/components/schemas/UnknownTypePermissionPresentationModel"
                 }
               ]
@@ -47749,10 +48229,10 @@
       "UserItemResponseModel": {
         "required": [
           "avatarUrls",
+          "flags",
           "id",
           "kind",
-          "name",
-          "signs"
+          "name"
         ],
         "type": "object",
         "properties": {
@@ -47760,12 +48240,12 @@
             "type": "string",
             "format": "uuid"
           },
-          "signs": {
+          "flags": {
             "type": "array",
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/SignModel"
+                  "$ref": "#/components/schemas/FlagModel"
                 }
               ]
             }
@@ -48204,9 +48684,9 @@
         "required": [
           "enabled",
           "events",
+          "flags",
           "id",
           "name",
-          "signs",
           "types",
           "url"
         ],
@@ -48216,12 +48696,12 @@
             "type": "string",
             "format": "uuid"
           },
-          "signs": {
+          "flags": {
             "type": "array",
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/SignModel"
+                  "$ref": "#/components/schemas/FlagModel"
                 }
               ]
             }

@@ -325,18 +325,6 @@ export abstract class UmbBlockManagerContext<
 		);
 	}
 
-	/**
-	 * @deprecated Use `createWithPresets` instead. Which is Async. Will be removed in v.17
-	 * @param contentElementTypeKey
-	 * @param partialLayoutEntry
-	 * @param originData
-	 */
-	abstract create(
-		contentElementTypeKey: string,
-		partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey'>,
-		originData?: BlockOriginDataType,
-	): never;
-
 	abstract createWithPresets(
 		contentElementTypeKey: string,
 		partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey'>,
@@ -414,7 +402,11 @@ export abstract class UmbBlockManagerContext<
 		if (segments) {
 			controller.setSegments(segments);
 		}
-		const values = await controller.create(valueDefinitions);
+		const values = await controller.create(valueDefinitions, {
+			entityType: 'block',
+			entityUnique: key,
+			entityTypeUnique: contentTypeKey,
+		});
 
 		// Set culture and segment for all values:
 

@@ -93,6 +93,30 @@ namespace Umbraco.Extensions
         }
 
         /// <summary>
+        /// Appends a OR IN clause to the Sql statement.
+        /// </summary>
+        /// <typeparam name="TDto">The type of the first Dto.</typeparam>
+        /// <typeparam name="TDto2">The type of the second Dto.</typeparam>
+        /// <param name="sql">The Sql statement.</param>
+        /// <param name="field">An expression specifying the first field.</param>
+        /// <param name="values">First values.</param>
+        /// <param name="field2">An expression specifying the second field.</param>
+        /// <param name="values2">Second values.</param>
+        /// <returns>The Sql statement.</returns>
+        public static Sql<ISqlContext> WhereInOr<TDto, TDto2>(
+            this Sql<ISqlContext> sql,
+            Expression<Func<TDto, object?>> field,
+            Expression<Func<TDto2, object?>> field2,
+            IEnumerable? values,
+            IEnumerable? values2)
+        {
+            var fieldName = sql.SqlContext.SqlSyntax.GetFieldName(field);
+            var fieldName2 = sql.SqlContext.SqlSyntax.GetFieldName(field2);
+            sql.Where($"{fieldName} IN (@values) OR {fieldName2} IN (@values2)", new { values }, new { values2 });
+            return sql;
+        }
+
+        /// <summary>
         /// Appends a WHERE IN clause to the Sql statement.
         /// </summary>
         /// <typeparam name="TDto">The type of the Dto.</typeparam>
@@ -141,7 +165,7 @@ namespace Umbraco.Extensions
         {
             var fieldName = sql.SqlContext.SqlSyntax.GetFieldName(fieldSelector);
             var concat = sql.SqlContext.SqlSyntax.GetWildcardConcat(concatDefault);
-            var likeSelect = sql.SqlContext.SqlSyntax.GetConcat(valuesSql?.SQL ?? string.Empty, concat);
+            var likeSelect = sql.SqlContext.SqlSyntax.GetConcat($"({valuesSql?.SQL})", concat);
             sql.Where($"{fieldName} LIKE {likeSelect}", valuesSql?.Arguments);
             return sql;
         }
@@ -418,6 +442,26 @@ namespace Umbraco.Extensions
         }
 
         /// <summary>
+        /// Appends a GROUP BY clause to the Sql statement.
+        /// </summary>
+        /// <typeparam name="TDto">The type of the Dto.</typeparam>
+        /// <param name="sql">The Sql statement.</param>
+        /// <param name="tableAlias">A table alias.</param>
+        /// <param name="fields">Expression specifying the fields.</param>
+        /// <returns>The Sql statement.</returns>
+        public static Sql<ISqlContext> GroupBy<TDto>(
+            this Sql<ISqlContext> sql,
+            string tableAlias,
+            params Expression<Func<TDto, object?>>[] fields)
+        {
+            ISqlSyntaxProvider sqlSyntax = sql.SqlContext.SqlSyntax;
+            var columns = fields.Length == 0
+                ? sql.GetColumns<TDto>(withAlias: false)
+                : fields.Select(x => sqlSyntax.GetFieldName(x, tableAlias)).ToArray();
+            return sql.GroupBy(columns);
+        }
+
+        /// <summary>
         /// Appends more ORDER BY or GROUP BY fields to the Sql statement.
         /// </summary>
         /// <typeparam name="TDto">The type of the Dto.</typeparam>
@@ -572,7 +616,8 @@ namespace Umbraco.Extensions
                 join += " " + sql.SqlContext.SqlSyntax.GetQuotedTableName(alias);
             }
 
-            return sql.LeftJoin(join);
+            sql.Append("LEFT JOIN " + join, nestedSelect.Arguments);
+            return new Sql<ISqlContext>.SqlJoinClause<ISqlContext>(sql);
         }
 
         /// <summary>
@@ -703,6 +748,64 @@ namespace Umbraco.Extensions
         }
 
         /// <summary>
+        /// Adds a SQL SELECT statement to retrieve the maximum value of the specified field from the table associated
+        /// with the specified DTO type.
+        /// </summary>
+        /// <typeparam name="TDto">The type of the Data Transfer Object (DTO) that represents the table from which the maximum value will be
+        /// selected.</typeparam>
+        /// <param name="sql">The SQL query builder to which the SELECT statement will be appended. Cannot be <see langword="null"/>.</param>
+        /// <param name="field">An expression specifying the field for which the maximum value will be calculated. Cannot be <see
+        /// langword="null"/>.</param>
+        /// <returns>A modified SQL query builder that includes the SELECT statement for the maximum value of the specified
+        /// field.</returns>
+        public static Sql<ISqlContext> SelectMax<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> field)
+        {
+            ArgumentNullException.ThrowIfNull(sql);
+            ArgumentNullException.ThrowIfNull(field);
+
+            return sql.Select($"MAX ({sql.SqlContext.SqlSyntax.GetFieldName(field)})");
+        }
+
+        /// <summary>
+        /// Adds a SQL SELECT statement to retrieve the maximum value of the specified field from the table associated
+        /// with the specified DTO type.
+        /// </summary>
+        /// <typeparam name="TDto">The type of the Data Transfer Object (DTO) that represents the table from which the maximum value will be
+        /// selected.</typeparam>
+        /// <param name="sql">The SQL query builder to which the SELECT statement will be appended. Cannot be <see langword="null"/>.</param>
+        /// <param name="field">An expression specifying the field for which the maximum value will be calculated. Cannot be <see
+        /// langword="null"/>.</param>
+        /// <param name="coalesceValue">COALESCE int value.</param>
+        /// <returns>A modified SQL query builder that includes the SELECT statement for the maximum value of the specified
+        /// field or the coalesceValue.</returns>
+        public static Sql<ISqlContext> SelectMax<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> field, int coalesceValue)
+        {
+            ArgumentNullException.ThrowIfNull(sql);
+            ArgumentNullException.ThrowIfNull(field);
+
+            return sql.Select($"COALESCE(MAX ({sql.SqlContext.SqlSyntax.GetFieldName(field)}), {coalesceValue})");
+        }
+
+        /// <summary>
+        /// Adds a SQL SELECT statement to retrieve the sum of the values of the specified field from the table associated
+        /// with the specified DTO type.
+        /// </summary>
+        /// <typeparam name="TDto">The type of the Data Transfer Object (DTO) that represents the table from which the maximum value will be
+        /// selected.</typeparam>
+        /// <param name="sql">The SQL query builder to which the SELECT statement will be appended. Cannot be <see langword="null"/>.</param>
+        /// <param name="field">An expression specifying the field for which the maximum value will be calculated. Cannot be <see
+        /// langword="null"/>.</param>
+        /// <returns>A modified SQL query builder that includes the SELECT statement for the maximum value of the specified
+        /// field.</returns>
+        public static Sql<ISqlContext> SelectSum<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> field)
+        {
+            ArgumentNullException.ThrowIfNull(sql);
+            ArgumentNullException.ThrowIfNull(field);
+
+            return sql.Select($"SUM ({sql.SqlContext.SqlSyntax.GetFieldName(field)})");
+        }
+
+        /// <summary>
         /// Creates a SELECT COUNT(*) Sql statement.
         /// </summary>
         /// <param name="sql">The origin sql.</param>
@@ -821,6 +924,29 @@ namespace Umbraco.Extensions
             }
 
             var columns = sql.GetColumns(columnExpressions: fields);
+            sql.Append("SELECT DISTINCT " + string.Join(", ", columns));
+            return sql;
+        }
+
+        /// <summary>
+        /// Creates a SELECT DISTINCT Sql statement.
+        /// </summary>
+        /// <typeparam name="TDto">The type of the DTO to select.</typeparam>
+        /// <param name="sql">The origin sql.</param>
+        /// <param name="tableAlias">A table alias.</param>
+        /// <param name="fields">Expressions indicating the columns to select.</param>
+        /// <returns>The Sql statement.</returns>
+        /// <remarks>
+        /// <para>If <paramref name="fields"/> is empty, all columns are selected.</para>
+        /// </remarks>
+        public static Sql<ISqlContext> SelectDistinct<TDto>(this Sql<ISqlContext> sql, string tableAlias, params Expression<Func<TDto, object?>>[] fields)
+        {
+            if (sql == null)
+            {
+                throw new ArgumentNullException(nameof(sql));
+            }
+
+            var columns = sql.GetColumns(tableAlias: tableAlias, columnExpressions: fields);
             sql.Append("SELECT DISTINCT " + string.Join(", ", columns));
             return sql;
         }
@@ -1244,6 +1370,19 @@ namespace Umbraco.Extensions
             // FROM optional SQL server, but not elsewhere.
             sql.Append($"DELETE FROM {sql.SqlContext.SqlSyntax.GetQuotedTableName(tableName)}");
             return sql;
+        }
+
+        /// <summary>
+        /// Deletes records from a table based on a predicate.
+        /// </summary>
+        /// <typeparam name="TDto">Table definition.</typeparam>
+        /// <param name="sql">SqlConext</param>
+        /// <param name="predicate">A predicate to transform and append to the Sql statement (WHERE clause).</param>
+        /// <returns></returns>
+        public static Sql<ISqlContext> Delete<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, bool>> predicate)
+        {
+            (string s, object[] a) = sql.SqlContext.VisitDto(predicate);
+            return sql.Delete<TDto>().Where(s, a);
         }
 
         #endregion

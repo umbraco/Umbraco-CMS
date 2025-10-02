@@ -1,10 +1,17 @@
-import { css, customElement, html } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, ifDefined, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-tree-load-more-button')
 export class UmbTreeLoadMoreButtonElement extends UmbLitElement {
+	@property({ type: Boolean })
+	loading: boolean = false;
+
 	override render() {
+		const state: UUIButtonState = this.loading ? 'waiting' : undefined;
+
 		return html`<uui-button
+			state=${ifDefined(state)}
 			data-mark="tree:load-more"
 			id="load-more"
 			look="secondary"

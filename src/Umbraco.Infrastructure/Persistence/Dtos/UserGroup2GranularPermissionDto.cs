@@ -4,10 +4,13 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-[TableName(Constants.DatabaseSchema.Tables.UserGroup2GranularPermission)]
+[TableName(TableName)]
+[PrimaryKey("id", AutoIncrement = true)]
 [ExplicitColumns]
 public class UserGroup2GranularPermissionDto
 {
+    public const string TableName = Constants.DatabaseSchema.Tables.UserGroup2GranularPermission;
+
     [Column("id")]
     [PrimaryKeyColumn(Name = "PK_umbracoUserGroup2GranularPermissionDto", AutoIncrement = true)]
     public int Id { get; set; }

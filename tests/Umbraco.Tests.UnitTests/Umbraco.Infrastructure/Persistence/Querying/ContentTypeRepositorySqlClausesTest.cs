@@ -188,12 +188,12 @@ public class ContentTypeRepositorySqlClausesTest : BaseUsingSqlSyntax
         string expectedSQL =
 @"DELETE FROM [umbracoUserGroup2GranularPermission]
 WHERE (([umbracoUserGroup2GranularPermission].[uniqueId] = @0))
-AND ([umbracoUserGroup2GranularPermission].[permission] LIKE CONCAT((SELECT 
- CONVERT(nvarchar(36), [cmsPropertyType].[UniqueID])
+AND ([umbracoUserGroup2GranularPermission].[permission] LIKE CONCAT(((SELECT 
+ CONVERT(nvarchar(36), [cmsPropertyType].[UniqueId])
  
 FROM [cmsPropertyType]
 WHERE (([cmsPropertyType].[id] = @1))
-),'|%'))".Replace("\r", string.Empty);
+)),'|%'))".Replace("\r", string.Empty);
         var typedSql = sql.SQL;
         Assert.That(typedSql, Is.EqualTo(expectedSQL));
     }

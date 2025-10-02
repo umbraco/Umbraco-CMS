@@ -9,19 +9,23 @@ import type { UmbContentCollectionWorkspaceContext } from '../collection/content
 import type { UmbContentWorkspaceContext } from './content-workspace-context.interface.js';
 import { UmbContentDetailValidationPathTranslator } from './content-detail-validation-path-translator.js';
 import { UmbContentValidationToHintsManager } from './content-validation-to-hints.manager.js';
-import { appendToFrozenArray, mergeObservables, UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
+import {
+	appendToFrozenArray,
+	mergeObservables,
+	observeMultiple,
+	UmbArrayState,
+} from '@umbraco-cms/backoffice/observable-api';
 import { firstValueFrom, map } from '@umbraco-cms/backoffice/external/rxjs';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
 import { UmbDataTypeDetailRepository, UmbDataTypeItemRepositoryManager } from '@umbraco-cms/backoffice/data-type';
-import { UmbDeprecation, UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
+import { UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
 import { UmbEntityDetailWorkspaceContextBase, UmbWorkspaceSplitViewManager } from '@umbraco-cms/backoffice/workspace';
 import {
 	UmbEntityUpdatedEvent,
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
-import { UmbHintContext } from '@umbraco-cms/backoffice/hint';
 import { UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
 import {
 	UmbPropertyValuePresetVariantBuilderController,
@@ -52,7 +56,6 @@ import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import type { UmbPropertyTypePresetModel, UmbPropertyTypePresetModelTypeModel } from '@umbraco-cms/backoffice/property';
 import type { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 import type { UmbSegmentCollectionItemModel } from '@umbraco-cms/backoffice/segment';
-import type { UmbVariantHint } from '@umbraco-cms/backoffice/hint';
 
 export interface UmbContentDetailWorkspaceContextArgs<
 	DetailModelType extends UmbContentDetailModel<VariantModelType>,
@@ -141,9 +144,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 	readonly collection: UmbContentCollectionManager;
 
-	/* Hints */
-	readonly hints = new UmbHintContext<UmbVariantHint>(this);
-
 	/* Variant Options */
 	// TODO: Optimize this so it uses either a App Language Context? [NL]
 	#languageRepository = new UmbLanguageCollectionRepository(this);
@@ -221,7 +221,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			this,
 			this.structure,
 			this.validationContext,
-			this.hints,
+			this.view.hints,
 		);
 
 		this.variantOptions = mergeObservables(
@@ -335,6 +335,17 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		);
 
 		this.observe(
+			observeMultiple([this.splitView.activeVariantByIndex(0), this.variants]),
+			([activeVariant, variants]) => {
+				const variantName = variants.find(
+					(v) => v.culture === activeVariant?.culture && v.segment === activeVariant?.segment,
+				)?.name;
+				this.view.setTitle(variantName);
+			},
+			null,
+		);
+
+		this.observe(
 			this.varies,
 			(varies) => {
 				this._data.setVaries(varies);
@@ -382,8 +393,12 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	}
 
 	protected override async _scaffoldProcessData(data: DetailModelType): Promise<DetailModelType> {
+		const contentTypeUnique: string | undefined = (data as any)[this.#contentTypePropertyName].unique;
+		if (!contentTypeUnique) {
+			throw new Error(`Could not find content type unique on property '${this.#contentTypePropertyName}'`);
+		}
 		// Load the content type structure, usually this comes from the data, but in this case we are making the data, and we need this to be able to complete the data. [NL]
-		await this.structure.loadType((data as any)[this.#contentTypePropertyName].unique);
+		await this.structure.loadType(contentTypeUnique);
 
 		/**
 		 * TODO: Should we also set Preset Values when loading Content, because maybe content contains uncreated Cultures or Segments.
@@ -393,6 +408,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		const cultures = this.#languages.getValue().map((x) => x.unique);
 
 		if (this.structure.variesBySegment) {
+			// TODO: v.17 Engage please note we have not implemented support for segments yet. [NL]
 			console.warn('Segments are not yet implemented for preset');
 		}
 		// TODO: Add Segments for Presets:
@@ -432,7 +448,11 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			controller.setSegments(segments);
 		}
 
-		const presetValues = await controller.create(valueDefinitions);
+		const presetValues = await controller.create(valueDefinitions, {
+			entityType: this.getEntityType(),
+			entityUnique: data.unique,
+			entityTypeUnique: contentTypeUnique,
+		});
 
 		// Don't just set the values, as we could have some already populated from a blueprint.
 		// If we have a value from both a blueprint and a preset, use the latter as priority.
@@ -715,21 +735,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	};
 
 	/* validation */
-	/**
-	 * Run the mandatory validation for the save data
-	 * @deprecated Use the public runMandatoryValidationForSaveData instead. Will be removed in v. 17.
-	 * @protected
-	 * @param {DetailModelType} saveData - The data to validate
-	 * @memberof UmbContentDetailWorkspaceContextBase
-	 */
-	protected async _runMandatoryValidationForSaveData(saveData: DetailModelType, variantIds: Array<UmbVariantId> = []) {
-		new UmbDeprecation({
-			removeInVersion: '17',
-			deprecated: '_runMandatoryValidationForSaveData',
-			solution: 'Use the public runMandatoryValidationForSaveData instead.',
-		}).warn();
-		this.runMandatoryValidationForSaveData(saveData, variantIds);
-	}
 
 	/**
 	 * Run the mandatory validation for the save data
@@ -801,7 +806,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	 * Request a submit of the workspace, in the case of Document Workspaces the validation does not need to be valid for this to be submitted.
 	 * @returns {Promise<void>} a promise which resolves once it has been completed.
 	 */
-	public override requestSubmit() {
+	public override requestSubmit(): Promise<void> {
 		return this._handleSubmit();
 	}
 
@@ -811,7 +816,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 	/**
 	 * Request a save of the workspace, in the case of Document Workspaces the validation does not need to be valid for this to be saved.
-	 * @returns {Promise<void>} a promise which resolves once it has been completed.
+	 * @returns {Promise<void>} A promise which resolves once it has been completed.
 	 */
 	public requestSave() {
 		return this._handleSave();
@@ -827,11 +832,11 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		return this._data.constructData(variantIds);
 	}
 
-	protected async _handleSubmit() {
+	protected async _handleSubmit(): Promise<void> {
 		await this._handleSave();
 		this._closeModal();
 	}
-	protected async _handleSave() {
+	protected async _handleSave(): Promise<void> {
 		const data = this.getData();
 		if (!data) {
 			throw new Error('Data is missing');
@@ -857,7 +862,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 				value: { selection: selected },
 			}).catch(() => undefined);
 
-			if (!result?.selection.length) return;
+			if (!result?.selection.length) {
+				return Promise.reject('Cannot save without selecting at least one variant.');
+			}
 
 			variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
 		} else {
@@ -877,23 +884,13 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 				() => false,
 			);
 			if (valid || this.#ignoreValidationResultOnSubmit) {
-				return this.performCreateOrUpdate(variantIds, saveData);
+				await this.performCreateOrUpdate(variantIds, saveData);
+			} else {
+				return Promise.reject('Validation issues prevent saving');
 			}
 		} else {
 			await this.performCreateOrUpdate(variantIds, saveData);
 		}
-	}
-
-	/**
-	 * Perform the create or update of the content
-	 * @deprecated Use the public performCreateOrUpdate instead. Will be removed in v. 17.
-	 * @protected
-	 * @param {Array<UmbVariantId>} variantIds
-	 * @param {DetailModelType} saveData
-	 * @memberof UmbContentDetailWorkspaceContextBase
-	 */
-	protected async _performCreateOrUpdate(variantIds: Array<UmbVariantId>, saveData: DetailModelType) {
-		await this.performCreateOrUpdate(variantIds, saveData);
 	}
 
 	/**

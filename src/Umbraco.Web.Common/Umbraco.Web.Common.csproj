@@ -5,7 +5,7 @@
     <Description>Contains the web assembly needed to run Umbraco CMS.</Description>
     <RootNamespace>Umbraco.Cms.Web.Common</RootNamespace>
   </PropertyGroup>
-  
+
   <PropertyGroup>
     <!--
       TODO: Fix and remove overrides:
@@ -21,7 +21,7 @@
     -->
     <WarningsNotAsErrors>$(WarningsNotAsErrors),SA1117,SA1401,SA1134,ASP0019,CS0618,SYSLIB0051,IDE0040,SA1400,SA1405,CS0419,CS1574,SA1649</WarningsNotAsErrors>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
@@ -30,7 +30,6 @@
     <PackageReference Include="Asp.Versioning.Mvc" />
     <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" />
     <PackageReference Include="Dazinator.Extensions.FileProviders" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" />
     <PackageReference Include="MiniProfiler.AspNetCore.Mvc" />
     <PackageReference Include="Serilog.AspNetCore" />
   </ItemGroup>

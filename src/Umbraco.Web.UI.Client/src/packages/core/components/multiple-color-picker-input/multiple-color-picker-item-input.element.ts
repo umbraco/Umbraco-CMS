@@ -189,7 +189,7 @@ export class UmbMultipleColorPickerItemInputElement extends UUIFormControlMixin(
 							<uui-button
 								compact
 								label=${this.localize.term('actions_delete')}
-								look="primary"
+								look="outline"
 								?disabled=${this.disabled}
 								@click=${this.#onDelete}>
 								<uui-icon name="icon-trash"></uui-icon>

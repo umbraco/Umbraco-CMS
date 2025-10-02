@@ -69,17 +69,19 @@ internal sealed class PermissionRepository<TEntity> : EntityRepositoryBase<int, 
         }
         else
         {
-            foreach (IEnumerable<int> entityGroup in entityIds.InGroupsOf(Constants.Sql.MaxParameterCount -
-                                                                    userGroupIds.Length))
+            foreach (IEnumerable<int> entityGroup in entityIds.InGroupsOf(Constants.Sql.MaxParameterCount - userGroupIds.Length))
             {
+                // Need to use a List here because the expression tree cannot convert the array when used in Contains.
+                // See ExpressionTests.Sql_In().
+                List<int> userGroupsIdsAsList = [.. userGroupIds];
                 Sql<ISqlContext> sql = Sql()
                     .Select<UserGroup2GranularPermissionDto>("gp").AndSelect("ug.id as userGroupId, en.id as entityId")
                     .From<UserGroupDto>("ug")
                     .InnerJoin<UserGroup2GranularPermissionDto>("gp")
-                    .On<UserGroup2GranularPermissionDto, UserGroupDto>((left, right) => left.UserGroupKey == right.Key && userGroupIds.Contains(right.Id), "gp", "ug")
+                    .On<UserGroup2GranularPermissionDto, UserGroupDto>((left, right) => left.UserGroupKey == right.Key && userGroupsIdsAsList.Contains(right.Id), "gp", "ug")
                     .InnerJoin<NodeDto>("en")
                     .On<UserGroup2GranularPermissionDto, NodeDto>((left, right) => left.UniqueId == right.UniqueId, "gp", "en")
-                    .Where<NodeDto>(en =>  entityGroup.Contains(en.NodeId), "en");
+                    .Where<NodeDto>(en => entityGroup.Contains(en.NodeId), "en");
 
                 List<UserGroup2GranularPermissionWithIdsDto> permissions =
                     AmbientScope.Database.Fetch<UserGroup2GranularPermissionWithIdsDto>(sql);

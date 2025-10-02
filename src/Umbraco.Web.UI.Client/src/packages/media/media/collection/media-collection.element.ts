@@ -101,7 +101,6 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 	}
 }
 
-/** @deprecated Should be exported as `element` only; to be removed in Umbraco 17. */
 export default UmbMediaCollectionElement;
 
 export { UmbMediaCollectionElement as element };

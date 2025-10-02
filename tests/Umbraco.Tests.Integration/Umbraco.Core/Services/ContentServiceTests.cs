@@ -2094,7 +2094,8 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
 
         var user = await UserService.GetAsync(Constants.Security.SuperUserKey);
         var userGroup = await UserGroupService.GetAsync(user.Groups.First().Alias);
-        Assert.IsNotNull(NotificationService.CreateNotification(user, content1, "X"));
+        NotificationService.TryCreateNotification(user, content1, "X", out Notification? notification);
+        Assert.IsNotNull(notification);
 
         ContentService.SetPermission(content1, "A", new[] { userGroup.Id });
         var updateDomainResult = await DomainService.UpdateDomainsAsync(
@@ -2734,6 +2735,9 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         Assert.That(sut.GetValue<string>("multiUrlPicker"),
             Is.EqualTo("[{\"name\":\"https://test.com\",\"url\":\"https://test.com\"}]"));
         Assert.That(sut.GetValue<string>("tags"), Is.EqualTo("this,is,tags"));
+        Assert.That(
+            sut.GetValue<string>("dateTimeWithTimeZone"),
+            Is.EqualTo("{\"date\":\"2025-01-22T18:33:01.0000000+01:00\",\"timeZone\":\"Europe/Copenhagen\"}"));
     }
 
     [Test]

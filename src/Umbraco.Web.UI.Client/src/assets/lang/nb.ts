@@ -479,6 +479,7 @@ export default {
 		error: 'Feil',
 		excludeFromSubFolders: 'Søk bare i denne mappen',
 		field: 'Felt',
+		fields: 'Felter',
 		fieldFor: 'Felt for %0%',
 		findDocument: 'Finn',
 		first: 'Første',
@@ -1219,8 +1220,7 @@ export default {
 		confirmCancelBlockCreationMessage: 'Er du sikker på at du vil avbryte opprettelsen?',
 		confirmDeleteBlockAreaMessage: 'Er du sikker på at du vil slette dette området?',
 		confirmDeleteBlockAreaNotice: 'Alle blokker som for øyeblikket er opprettet i dette området, vil bli slettet.',
-		confirmDeleteBlockGroupMessage:
-			'Er du sikker på at du vil slette gruppen <strong>%0%</strong> og alle blokk-konfigurasjonene for denne?',
+		confirmDeleteBlockGroupMessage: 'Er du sikker på at du vil slette gruppen <strong>%0%</strong>?',
 		confirmDeleteBlockGroupNotice:
 			'Innholdet i disse blokkene vil fortsatt være tilstede, men redigering av dette innholdet\n      vil ikke lenger være tilgjengelig og vil bli vist som ikke støttet innhold.\n    ',
 		confirmDeleteBlockMessage: 'Er du sikker på at du vil slette innholdet <strong>%0%</strong>?',

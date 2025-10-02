@@ -6,8 +6,10 @@ using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Infrastructure.Scoping;
@@ -45,7 +47,8 @@ internal sealed class NotificationsRepositoryTest : UmbracoIntegrationTest
             var entity = Mock.Of<IEntity>(e => e.Id == node.NodeId);
             var user = Mock.Of<IUser>(e => e.Id == node.UserId);
 
-            var notification = repo.CreateNotification(user, entity, "A");
+            repo.TryCreateNotification(user, entity, "A", out Notification? notification);
+            Assert.IsNotNull(notification);
 
             Assert.AreEqual("A", notification.Action);
             Assert.AreEqual(node.NodeId, notification.EntityId);
@@ -94,7 +97,7 @@ internal sealed class NotificationsRepositoryTest : UmbracoIntegrationTest
                 };
                 var result = ScopeAccessor.AmbientScope.Database.Insert(node);
                 var entity = Mock.Of<IEntity>(e => e.Id == node.NodeId);
-                var notification = repo.CreateNotification(i % 2 == 0 ? userAdmin : userNew, entity, i.ToString(CultureInfo.InvariantCulture));
+                repo.TryCreateNotification(i % 2 == 0 ? userAdmin : userNew, entity, i.ToString(CultureInfo.InvariantCulture), out Notification? notification);
             }
 
             var notifications = repo.GetUserNotifications(userAdmin);
@@ -157,7 +160,7 @@ internal sealed class NotificationsRepositoryTest : UmbracoIntegrationTest
                 };
                 ScopeAccessor.AmbientScope.Database.Insert(userDto);
                 var userNew = Mock.Of<IUser>(e => e.Id == userDto.Id);
-                var notification = repo.CreateNotification(userNew, i % 2 == 0 ? entity1 : entity2, i.ToString(CultureInfo.InvariantCulture));
+                repo.TryCreateNotification(userNew, i % 2 == 0 ? entity1 : entity2, i.ToString(CultureInfo.InvariantCulture), out Notification? notification);
             }
 
             var notifications = repo.GetEntityNotifications(entity1);
@@ -220,7 +223,7 @@ internal sealed class NotificationsRepositoryTest : UmbracoIntegrationTest
                 };
                 ScopeAccessor.AmbientScope.Database.Insert(userDto);
                 var userNew = Mock.Of<IUser>(e => e.Id == userDto.Id);
-                var notification = repo.CreateNotification(userNew, i % 2 == 0 ? entity1 : entity2, i.ToString(CultureInfo.InvariantCulture));
+                repo.TryCreateNotification(userNew, i % 2 == 0 ? entity1 : entity2, i.ToString(CultureInfo.InvariantCulture), out Notification? notification);
             }
 
             var delCount = repo.DeleteNotifications(entity1);
@@ -269,7 +272,7 @@ internal sealed class NotificationsRepositoryTest : UmbracoIntegrationTest
                 };
                 var result = ScopeAccessor.AmbientScope.Database.Insert(node);
                 var entity = Mock.Of<IEntity>(e => e.Id == node.NodeId);
-                var notification = repo.CreateNotification(i % 2 == 0 ? userAdmin : userNew, entity, i.ToString(CultureInfo.InvariantCulture));
+                repo.TryCreateNotification(i % 2 == 0 ? userAdmin : userNew, entity, i.ToString(CultureInfo.InvariantCulture), out Notification? notification);
             }
 
             var delCount = repo.DeleteNotifications(userAdmin);

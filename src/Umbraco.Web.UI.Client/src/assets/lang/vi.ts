@@ -853,6 +853,7 @@ export default {
 		email: 'Email',
 		error: 'Lỗi',
 		field: 'Trường',
+		fields: 'Trường',
 		fieldFor: 'Trường cho %0%',
 		toggleFor: 'Chuyển đổi cho %0%',
 		findDocument: 'Tìm kiếm',
@@ -2371,6 +2372,7 @@ export default {
 		openBackofficeSearch: 'Mở tìm kiếm backoffice',
 		openCloseBackofficeHelp: 'Mở/Đóng trợ giúp backoffice',
 		openCloseBackofficeProfileOptions: 'Mở/Đóng tùy chọn hồ sơ của bạn',
+		profileOptions: 'Tùy chọn hồ sơ',
 		assignDomainDescription: 'Thiết lập Ngôn ngữ và Tên miền cho %0%',
 		createDescription: 'Tạo nút mới dưới %0%',
 		protectDescription: 'Thiết lập hạn chế truy cập trên %0%',
@@ -2409,6 +2411,7 @@ export default {
 		searchContentTree: 'Tìm kiếm cây nội dung',
 		maxAmount: 'Số lượng tối đa',
 		expandChildItems: 'Mở rộng các mục con cho',
+		collapseChildItems: 'Thu gọn các mục con cho',
 		openContextNode: 'Mở nút ngữ cảnh cho %0%',
 	},
 	references: {

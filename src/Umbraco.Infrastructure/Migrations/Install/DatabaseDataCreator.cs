@@ -9,7 +9,9 @@ using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Install;
@@ -856,6 +858,25 @@ internal sealed class DatabaseDataCreator
                 SortOrder = 2,
                 UniqueId = Constants.DataTypes.Guids.MediaPicker3MultipleImagesGuid,
                 Text = "Multiple Image Media Picker",
+                NodeObjectType = Constants.ObjectTypes.DataType,
+                CreateDate = DateTime.UtcNow,
+            },
+            Constants.DatabaseSchema.Tables.Node,
+            "id");
+        ConditionalInsert(
+            Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
+            Constants.DataTypes.Guids.DateTimePickerWithTimeZone,
+            new NodeDto
+            {
+                NodeId = 1055,
+                Trashed = false,
+                ParentId = -1,
+                UserId = -1,
+                Level = 1,
+                Path = "-1,1055",
+                SortOrder = 2,
+                UniqueId = Constants.DataTypes.Guids.DateTimePickerWithTimeZoneGuid,
+                Text = "Date Time Picker (with time zone)",
                 NodeObjectType = Constants.ObjectTypes.DataType,
                 CreateDate = DateTime.UtcNow,
             },
@@ -1828,7 +1849,7 @@ internal sealed class DatabaseDataCreator
                 };
                 _database.Insert(Constants.DatabaseSchema.Tables.Language, "id", false, dto);
                 isDefault = false;
-                id++;
+                id += 1;
             }
         }
         else
@@ -2298,6 +2319,22 @@ internal sealed class DatabaseDataCreator
                     DbType = "Ntext",
                     Configuration = "{\"filter\":\"" + ImageMediaTypeKey +
                                     "\", \"multiple\": true}",
+                });
+        }
+
+        if (_database.Exists<NodeDto>(1055))
+        {
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.DataType,
+                "pk",
+                false,
+                new DataTypeDto
+                {
+                    NodeId = 1055,
+                    EditorAlias = Constants.PropertyEditors.Aliases.DateTimeWithTimeZone,
+                    EditorUiAlias = "Umb.PropertyEditorUi.DateTimeWithTimeZonePicker",
+                    DbType = "Ntext",
+                    Configuration = "{\"timeFormat\": \"HH:mm\", \"timeZones\": {\"mode\": \"all\"}}",
                 });
         }
     }

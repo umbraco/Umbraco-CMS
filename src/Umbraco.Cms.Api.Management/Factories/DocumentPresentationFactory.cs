@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Mapping.Content;
-using Umbraco.Cms.Api.Management.Services.Signs;
+using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Item;
@@ -26,7 +26,7 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
     private readonly IPublicAccessService _publicAccessService;
     private readonly TimeProvider _timeProvider;
     private readonly IIdKeyMap _idKeyMap;
-    private readonly SignProviderCollection _signProviderCollection;
+    private readonly FlagProviderCollection _flagProviderCollection;
 
     [Obsolete("Please use the controller with all parameters. Scheduled for removal in Umbraco 18")]
     public DocumentPresentationFactory(
@@ -43,7 +43,7 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
             publicAccessService,
             timeProvider,
             idKeyMap,
-            StaticServiceProvider.Instance.GetRequiredService<SignProviderCollection>())
+            StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>())
     {
     }
 
@@ -54,7 +54,7 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
         IPublicAccessService publicAccessService,
         TimeProvider timeProvider,
         IIdKeyMap idKeyMap,
-        SignProviderCollection signProviderCollection)
+        FlagProviderCollection flagProviderCollection)
     {
         _umbracoMapper = umbracoMapper;
         _documentUrlFactory = documentUrlFactory;
@@ -62,7 +62,7 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
         _publicAccessService = publicAccessService;
         _timeProvider = timeProvider;
         _idKeyMap = idKeyMap;
-        _signProviderCollection = signProviderCollection;
+        _flagProviderCollection = flagProviderCollection;
     }
 
     public async Task<PublishedDocumentResponseModel> CreatePublishedResponseModelAsync(IContent content)
@@ -114,7 +114,7 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
 
         responseModel.Variants = CreateVariantsItemResponseModels(entity);
 
-        PopulateSignsOnDocuments(responseModel);
+        PopulateFlagsOnDocuments(responseModel);
 
         return responseModel;
     }
@@ -143,7 +143,7 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
                 Culture = null,
             };
 
-            PopulateSignsOnVariants(model);
+            PopulateFlagsOnVariants(model);
             yield return model;
             yield break;
         }
@@ -157,7 +157,7 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
                 State = DocumentVariantStateHelper.GetState(entity, cultureNamePair.Key)
             };
 
-            PopulateSignsOnVariants(model);
+            PopulateFlagsOnVariants(model);
             yield return model;
         }
     }
@@ -212,19 +212,19 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
         return Attempt.SucceedWithStatus(ContentPublishingOperationStatus.Success, model);
     }
 
-    private void PopulateSignsOnDocuments(DocumentItemResponseModel model)
+    private void PopulateFlagsOnDocuments(DocumentItemResponseModel model)
     {
-        foreach (ISignProvider signProvider in _signProviderCollection.Where(x => x.CanProvideSigns<DocumentItemResponseModel>()))
+        foreach (IFlagProvider signProvider in _flagProviderCollection.Where(x => x.CanProvideFlags<DocumentItemResponseModel>()))
         {
-            signProvider.PopulateSignsAsync([model]).GetAwaiter().GetResult();
+            signProvider.PopulateFlagsAsync([model]).GetAwaiter().GetResult();
         }
     }
 
-    private void PopulateSignsOnVariants(DocumentVariantItemResponseModel model)
+    private void PopulateFlagsOnVariants(DocumentVariantItemResponseModel model)
     {
-        foreach (ISignProvider signProvider in _signProviderCollection.Where(x => x.CanProvideSigns<DocumentVariantItemResponseModel>()))
+        foreach (IFlagProvider signProvider in _flagProviderCollection.Where(x => x.CanProvideFlags<DocumentVariantItemResponseModel>()))
         {
-            signProvider.PopulateSignsAsync([model]).GetAwaiter().GetResult();
+            signProvider.PopulateFlagsAsync([model]).GetAwaiter().GetResult();
         }
     }
 }

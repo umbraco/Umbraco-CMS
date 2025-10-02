@@ -498,10 +498,15 @@ namespace Umbraco.Cms.Core.Services
                 ordering = Ordering.By("sortOrder");
             }
 
+            // Need to use a List here because the expression tree cannot convert the array when used in Contains.
+            // See ExpressionTests.Sql_In().
+            List<int> contentTypeIdsAsList = [.. contentTypeIds];
+
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             scope.ReadLock(Constants.Locks.MediaTree);
+
             return _mediaRepository.GetPage(
-                Query<IMedia>()?.Where(x => contentTypeIds.Contains(x.ContentTypeId)), pageIndex, pageSize, out totalRecords, filter, ordering);
+                Query<IMedia>()?.Where(x => contentTypeIdsAsList.Contains(x.ContentTypeId)), pageIndex, pageSize, out totalRecords, filter, ordering);
         }
 
         /// <summary>

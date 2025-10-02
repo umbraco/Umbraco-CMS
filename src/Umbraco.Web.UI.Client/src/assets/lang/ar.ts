@@ -2109,6 +2109,7 @@ export default {
 		openBackofficeSearch: 'فتح بحث المكتب الخلفي',
 		openCloseBackofficeHelp: 'فتح/إغلاق مساعدة المكتب الخلفي',
 		openCloseBackofficeProfileOptions: 'فتح/إغلاق خيارات ملفك الشخصي',
+		profileOptions: 'خيارات الملف الشخصي',
 		assignDomainDescription: 'إعداد الثقافة وأسماء النطاقات لـ %0%',
 		createDescription: 'إنشاء عقدة جديدة تحت %0%',
 		protectDescription: 'إعداد قيود الوصول على %0%',

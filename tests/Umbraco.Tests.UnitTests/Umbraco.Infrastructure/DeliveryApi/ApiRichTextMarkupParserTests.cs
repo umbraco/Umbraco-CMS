@@ -79,6 +79,45 @@ public class ApiRichTextMarkupParserTests
         Assert.AreEqual(expectedOutput, parsedHtml);
     }
 
+    [TestCase("#some-anchor")]
+    [TestCase("?something=true")]
+    [TestCase("#!some-hashbang")]
+    [TestCase("?something=true#some-anchor")]
+    public void Can_Parse_LocalLinks_With_Postfix(string postfix)
+    {
+        var key1 = Guid.Parse("eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f");
+        var data1 = new MockData()
+            .WithKey(key1)
+            .WithRoutePath($"/self/{postfix}")
+            .WithRouteStartPath("self");
+
+        var key2 = Guid.Parse("cc143afe-4cbf-46e5-b399-c9f451384373");
+        var data2 = new MockData()
+            .WithKey(key2)
+            .WithRoutePath($"/other/{postfix}")
+            .WithRouteStartPath("other");
+
+        var mockData = new Dictionary<Guid, MockData>
+        {
+            { key1, data1 },
+            { key2, data2 },
+        };
+
+        var parser = BuildDefaultSut(mockData);
+
+        var html =
+            $@"<p>Rich text outside of the blocks with a link to <a type=""document"" href=""/{{localLink:eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f}}{postfix}"" title=""itself"">itself</a><br><br></p>
+<p>and to the <a type=""document"" href=""/{{localLink:cc143afe-4cbf-46e5-b399-c9f451384373}}{postfix}"" title=""other page"">other page</a></p>";
+
+        var expectedOutput =
+            $@"<p>Rich text outside of the blocks with a link to <a href=""/self/{postfix}"" title=""itself"" data-start-item-path=""self"" data-start-item-id=""eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f"">itself</a><br><br></p>
+<p>and to the <a href=""/other/{postfix}"" title=""other page"" data-start-item-path=""other"" data-start-item-id=""cc143afe-4cbf-46e5-b399-c9f451384373"">other page</a></p>";
+
+        var parsedHtml = parser.Parse(html);
+
+        Assert.AreEqual(expectedOutput, parsedHtml);
+    }
+
     [Test]
     public void Can_Parse_Inline_LocalImages()
     {

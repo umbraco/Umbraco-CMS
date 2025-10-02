@@ -57,7 +57,7 @@ internal sealed class AuditEntryRepository : EntityRepositoryBase<int, IAuditEnt
             .From<AuditEntryDto>()
             .Where<AuditEntryDto>(x => x.Id == id);
 
-        AuditEntryDto dto = Database.FirstOrDefault<AuditEntryDto>(sql);
+        AuditEntryDto? dto = Database.FirstOrDefault<AuditEntryDto>(sql);
         return dto == null ? null : AuditEntryFactory.BuildEntity(dto);
     }
 
@@ -107,7 +107,7 @@ internal sealed class AuditEntryRepository : EntityRepositoryBase<int, IAuditEnt
     }
 
     /// <inheritdoc />
-    protected override string GetBaseWhereClause() => $"{Constants.DatabaseSchema.Tables.AuditEntry}.id = @id";
+    protected override string GetBaseWhereClause() => $"{QuoteTableName(AuditEntryDto.TableName)}.id = @id";
 
     /// <inheritdoc />
     protected override IEnumerable<string> GetDeleteClauses() =>
@@ -160,7 +160,7 @@ internal sealed class AuditEntryRepository : EntityRepositoryBase<int, IAuditEnt
                 }
             }
 
-            Sql<ISqlContext> sqlInsert = Sql($"INSERT INTO {Constants.DatabaseSchema.Tables.AuditEntry} ({cols})")
+            Sql<ISqlContext> sqlInsert = Sql($"INSERT INTO {QuoteTableName(AuditEntryDto.TableName)} ({cols})")
                 .Append("VALUES (")
                 .Append(sqlValues)
                 .Append(")");

@@ -669,13 +669,8 @@ namespace Umbraco.Cms.Core.Services
             return _memberRepository.GetPage(query, pageIndex, pageSize, out totalRecords, null, Ordering.By("LoginName"));
         }
 
-        /// <summary>
-        /// Gets a list of Members based on a property search
-        /// </summary>
-        /// <param name="propertyTypeAlias">Alias of the PropertyType to search for</param>
-        /// <param name="value"><see cref="string"/> Value to match</param>
-        /// <param name="matchType">The type of match to make as <see cref="StringPropertyMatchType"/>. Default is <see cref="StringPropertyMatchType.Exact"/></param>
-        /// <returns><see cref="IEnumerable{IMember}"/></returns>
+        /// <inheritdoc />
+        [Obsolete("Please use Search (Examine) instead, scheduled for removal in Umbraco 18.")]
         public IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, string value, StringPropertyMatchType matchType = StringPropertyMatchType.Exact)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
@@ -703,13 +698,8 @@ namespace Umbraco.Cms.Core.Services
             return _memberRepository.Get(query);
         }
 
-        /// <summary>
-        /// Gets a list of Members based on a property search
-        /// </summary>
-        /// <param name="propertyTypeAlias">Alias of the PropertyType to search for</param>
-        /// <param name="value"><see cref="int"/> Value to match</param>
-        /// <param name="matchType">The type of match to make as <see cref="StringPropertyMatchType"/>. Default is <see cref="StringPropertyMatchType.Exact"/></param>
-        /// <returns><see cref="IEnumerable{IMember}"/></returns>
+        /// <inheritdoc />
+        [Obsolete("Please use Search (Examine) instead, scheduled for removal in Umbraco 18.")]
         public IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, int value, ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
@@ -740,12 +730,8 @@ namespace Umbraco.Cms.Core.Services
             return _memberRepository.Get(query);
         }
 
-        /// <summary>
-        /// Gets a list of Members based on a property search
-        /// </summary>
-        /// <param name="propertyTypeAlias">Alias of the PropertyType to search for</param>
-        /// <param name="value"><see cref="bool"/> Value to match</param>
-        /// <returns><see cref="IEnumerable{IMember}"/></returns>
+        /// <inheritdoc />
+        [Obsolete("Please use Search (Examine) instead, scheduled for removal in Umbraco 18.")]
         public IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, bool value)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
@@ -755,13 +741,8 @@ namespace Umbraco.Cms.Core.Services
             return _memberRepository.Get(query);
         }
 
-        /// <summary>
-        /// Gets a list of Members based on a property search
-        /// </summary>
-        /// <param name="propertyTypeAlias">Alias of the PropertyType to search for</param>
-        /// <param name="value"><see cref="System.DateTime"/> Value to match</param>
-        /// <param name="matchType">The type of match to make as <see cref="StringPropertyMatchType"/>. Default is <see cref="StringPropertyMatchType.Exact"/></param>
-        /// <returns><see cref="IEnumerable{IMember}"/></returns>
+        /// <inheritdoc />
+        [Obsolete("Please use Search (Examine) instead, scheduled for removal in Umbraco 18.")]
         public IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, DateTime value, ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);

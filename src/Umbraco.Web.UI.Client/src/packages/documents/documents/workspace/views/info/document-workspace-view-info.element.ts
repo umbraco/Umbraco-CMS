@@ -267,12 +267,12 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 
 	#renderScheduledPublishDate() {
 		if (!this._variant?.scheduledPublishDate) return nothing;
-		return this.#renderDate(this._variant.scheduledPublishDate, 'content_releaseDate', 'Publish At');
+		return this.#renderDate(this._variant.scheduledPublishDate, 'content_releaseDate', 'Publish at');
 	}
 
 	#renderScheduledUnpublishDate() {
 		if (!this._variant?.scheduledUnpublishDate) return nothing;
-		return this.#renderDate(this._variant.scheduledUnpublishDate, 'content_expireDate', 'Remove At');
+		return this.#renderDate(this._variant.scheduledUnpublishDate, 'content_expireDate', 'Remove at');
 	}
 
 	#renderDate(date: string, labelKey: string, labelText: string) {

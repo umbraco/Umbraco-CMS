@@ -357,6 +357,9 @@ export default {
 		saveAndPublishModalTitle: 'Save and publish',
 		publishModalTitle: 'Publish',
 		openSplitViewForVariant: (variant: string) => `Open ${variant} in split view`,
+		sharedAcrossCultures: 'Shared across cultures',
+		sharedAcrossSegments: 'Shared across segments',
+		shared: 'Shared',
 	},
 	blueprints: {
 		createBlueprintFrom: "Create a new Document Blueprint from '%0%'",
@@ -857,6 +860,7 @@ export default {
 		email: 'Email',
 		error: 'Error',
 		field: 'Field',
+		fields: 'Fields',
 		fieldFor: 'Field for %0%',
 		toggleFor: 'Toggle for %0%',
 		findDocument: 'Find',
@@ -2369,6 +2373,7 @@ export default {
 		openBackofficeSearch: 'Open backoffice search',
 		openCloseBackofficeHelp: 'Open/Close backoffice help',
 		openCloseBackofficeProfileOptions: 'Open/Close your profile options',
+		profileOptions: 'Profile options',
 		assignDomainDescription: 'Setup Culture and Hostnames for %0%',
 		createDescription: 'Create new node under %0%',
 		protectDescription: 'Setup access restrictions on %0%',
@@ -2407,6 +2412,7 @@ export default {
 		searchContentTree: 'Search content tree',
 		maxAmount: 'Maximum amount',
 		expandChildItems: 'Expand child items for',
+		collapseChildItems: 'Collapse child items for',
 		openContextNode: 'Open context node for',
 	},
 	references: {
@@ -2594,12 +2600,13 @@ export default {
 		addSettingsElementType: 'Add settings',
 		confirmDeleteBlockTitle: 'Delete %0%?',
 		confirmDeleteBlockMessage: 'Are you sure you want to delete this %0%?',
+		confirmDeleteBlockTypeTitle: 'Delete block configuration?',
 		confirmDeleteBlockTypeMessage: 'Are you sure you want to delete the block configuration <strong>%0%</strong>?',
 		confirmDeleteBlockTypeNotice:
 			'The content of this block will still be present, editing of this content will no longer be available and will be shown as unsupported content.',
 		confirmDeleteBlockGroupTitle: 'Delete group?',
 		confirmDeleteBlockGroupMessage:
-			'Are you sure you want to delete group <strong>%0%</strong> and all the Block configurations of this?',
+			'Are you sure you want to delete group <strong>%0%</strong>?',
 		confirmDeleteBlockGroupNotice:
 			'The content of these Blocks will still be present, editing of this content will no longer be available and will be shown as unsupported content.',
 		blockConfigurationOverlayTitle: "Configuration of '%0%'",
@@ -2773,6 +2780,7 @@ export default {
 		wordWrapConfigDescription: 'Enable word wrapping in the code editor.',
 	},
 	rte: {
+		label: 'Rich Text Editor',
 		config_blocks: 'Available Blocks',
 		config_blocks_description: 'Define the available blocks.',
 		config_ignoreUserStartNodes: 'Ignore User Start Nodes',
@@ -2832,10 +2840,35 @@ export default {
 		resetUrlLabel: 'Reset',
 	},
 	missingEditor: {
+		title: 'This property type is no longer available.',
 		description:
-			'<p><strong>Error!</strong> This property type is no longer available. Please reach out to your administrator.</p>',
+			"Don't worry, your content is safe and publishing this document won't overwrite it or remove it.<br/>Please contact your site administrator to resolve this issue.",
+		detailsTitle: 'Additional details',
 		detailsDescription:
-			'<p>This property type is no longer available.<br/>Please contact your administrator so they can either delete this property or restore the property type.</p><p><strong>Data:</strong></p>',
+			"To resolve this you should either restore the property editor, change the property to use a supported data type or remove the property if it's no longer needed.",
+		detailsDataType: 'Data type',
+		detailsPropertyEditor: 'Property editor',
+		detailsData: 'Data',
+		detailsHide: 'Hide details',
+		detailsShow: 'Show details',
+	},
+	dateTimePicker: {
+		local: 'Local',
+		differentTimeZoneLabel: (offset: string, localDate: string) =>
+			`The selected time (${offset}) is equivalent to ${localDate} in your local time.`,
+		config_format: 'Format',
+		config_format_datetime: 'Date and time',
+		config_format_dateOnly: 'Date only',
+		config_format_timeOnly: 'Time only',
+		config_timeFormat: 'Time format',
+		config_timeZones: 'Time zones',
+		config_timeZones_description: 'Select the time zones that the editor should be able to pick from.',
+		config_timeZones_all: 'All - Display all available time zones',
+		config_timeZones_local: 'Local - Display only the local time zone',
+		config_timeZones_custom: 'Custom - Display a pre-defined list of time zones',
+		emptyDate: 'Please select a date',
+		emptyTimeZone: 'Please select a time zone',
+		invalidTimeZone: 'The selected time zone is not valid',
 	},
 	uiCulture: {
 		ar: 'العربية',

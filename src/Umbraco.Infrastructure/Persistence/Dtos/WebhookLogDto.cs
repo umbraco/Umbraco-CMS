@@ -4,11 +4,13 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-[TableName(Constants.DatabaseSchema.Tables.WebhookLog)]
-[PrimaryKey("id")]
+[TableName(TableName)]
+[PrimaryKey("id", AutoIncrement = true)]
 [ExplicitColumns]
 internal sealed class WebhookLogDto
 {
+    public const string TableName = Constants.DatabaseSchema.Tables.WebhookLog;
+
     [Column("id")]
     [PrimaryKeyColumn(AutoIncrement = true)]
     public int Id { get; set; }
