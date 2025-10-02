@@ -87,6 +87,10 @@ public static class AppCacheExtensions
         {
             result = await getCacheItemAsync();
             provider.Insert(cacheKey, () => result, timeout, isSliding);
+        }
+
+        if (result == null)
+        {
             return default;
         }
 
