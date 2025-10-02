@@ -39,7 +39,7 @@ public class SetAvatarUsersControllerTests : ManagementApiUserGroupTestBase<SetA
         var response = await UserService.CreateAsync(Constants.Security.SuperUserKey, model);
         _userKey = response.Result.CreatedUser.Key;
 
-        await TemporaryFileService.CreateAsync(new CreateTemporaryFileModel { Key = _avatarKey, FileName = "File.png" });
+        await TemporaryFileService.CreateAsync(new CreateTemporaryFileModel { Key = _avatarKey, FileName = Guid.NewGuid() + ".png" });
     }
 
     protected override Expression<Func<SetAvatarUserController, object>> MethodSelector =>
