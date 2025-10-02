@@ -16,6 +16,5 @@ export * from './link/index.js';
 export * from './table/index.js';
 export * from './text-direction/index.js';
 export * from './text-indent/index.js';
-export * from './trailing-node/index.js';
 
 export type * from './types.js';
