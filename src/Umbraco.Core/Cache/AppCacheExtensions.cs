@@ -43,9 +43,16 @@ public static class AppCacheExtensions
     public static T? GetCacheItem<T>(this IAppCache provider, string cacheKey)
     {
         var result = provider.Get(cacheKey);
-        if (IsRetrievedItemNull(result))
+        if (result == null)
         {
             return default;
+        }
+
+        // If we've retrieved the specific string that represents null in the cache, return it only if we are requesting it (via a typed request for a string).
+        // Otherwise consider it a null value.
+        if (RetrievedNullRepresentationInCache(result))
+        {
+            return RequestedNullRepresentationInCache<T>() ? (T)result : default;
         }
 
         return result.TryConvertTo<T>().Result;
@@ -54,13 +61,23 @@ public static class AppCacheExtensions
     public static T? GetCacheItem<T>(this IAppCache provider, string cacheKey, Func<T> getCacheItem)
     {
         var result = provider.Get(cacheKey, () => getCacheItem());
-        if (IsRetrievedItemNull(result))
+        if (result == null)
         {
             return default;
+        }
+
+        // If we've retrieved the specific string that represents null in the cache, return it only if we are requesting it (via a typed request for a string).
+        // Otherwise consider it a null value.
+        if (RetrievedNullRepresentationInCache(result))
+        {
+            return RequestedNullRepresentationInCache<T>() ? (T)result : default;
         }
 
         return result.TryConvertTo<T>().Result;
     }
 
-    private static bool IsRetrievedItemNull(object? result) => result is null or (object)Cms.Core.Constants.Cache.NullRepresentationInCache;
+    private static bool RetrievedNullRepresentationInCache(object result) => result == (object)Cms.Core.Constants.Cache.NullRepresentationInCache;
+
+    private static bool RequestedNullRepresentationInCache<T>() => typeof(T) == typeof(string);
+
 }
