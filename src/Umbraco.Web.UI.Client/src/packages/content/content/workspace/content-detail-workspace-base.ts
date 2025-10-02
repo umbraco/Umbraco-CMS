@@ -682,6 +682,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		// TODO: Implement queueing of these operations to ensure this does not execute too often. [NL]
 
 		// Find inner values to determine if any of this holds variants that needs to be created.
+		if (variantId.isInvariant() && typeof value === 'object' && value !== null) {
+			// TODO: Use the property value flat mapper to run through values to capture variant ids. [NL]
+		}
 
 		/**
 		 * Handling of Not-Culture but Segment variant properties: [NL]
