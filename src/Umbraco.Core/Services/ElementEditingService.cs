@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services.Filters;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
@@ -26,7 +27,8 @@ internal sealed class ElementEditingService
         IElementValidationService validationService,
         IOptionsMonitor<ContentSettings> optionsMonitor,
         IRelationService relationService,
-        IElementContainerService containerService)
+        IElementContainerService containerService,
+        ContentTypeFilterCollection contentTypeFilters)
         : base(
             elementService,
             contentTypeService,
@@ -37,7 +39,8 @@ internal sealed class ElementEditingService
             userIdKeyResolver,
             validationService,
             optionsMonitor,
-            relationService)
+            relationService,
+            contentTypeFilters)
     {
         _logger = logger;
         _containerService = containerService;
