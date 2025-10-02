@@ -232,6 +232,7 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 
 	#renderGroupInput(groupKey: string, groupName?: string) {
 		return html`<div class="group-handle">
+			<uui-icon name="icon-grip"></uui-icon>
 			<uui-input
 				auto-width
 				label="Group"
@@ -255,10 +256,16 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 			}
 
 			.group-handle {
+				display: flex;
+				align-items: center;
 				padding: var(--uui-size-1);
 				margin-top: var(--uui-size-6);
 				margin-bottom: var(--uui-size-4);
 				cursor: grab;
+			}
+
+			.group-handle:active {
+				cursor: grabbing;
 			}
 
 			.group-handle:hover {
