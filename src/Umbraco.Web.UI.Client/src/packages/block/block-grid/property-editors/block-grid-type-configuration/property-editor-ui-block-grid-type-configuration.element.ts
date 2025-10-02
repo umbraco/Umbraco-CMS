@@ -234,33 +234,30 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 		return html`<div class="group-handle">
 			<uui-icon name="icon-grip"></uui-icon>
 			<uui-input
-				auto-width
 				label="Group"
 				.value=${groupName ?? ''}
 				@change=${(e: UUIInputEvent) => this.#onGroupNameChange(e, groupKey)}>
-				<uui-button compact slot="append" label="delete" @click=${() => this.#deleteGroup(groupKey)}>
-					<uui-icon name="icon-trash"></uui-icon>
-				</uui-button>
 			</uui-input>
+			<uui-button
+				compact
+				label=${this.localize.term('general_delete')}
+				look="outline"
+				@click=${() => this.#deleteGroup(groupKey)}>
+				<uui-icon name="icon-trash"></uui-icon>
+			</uui-button>
 		</div>`;
 	}
 
 	static override styles = [
 		UmbTextStyles,
 		css`
-			uui-input:not(:hover, :focus) {
-				border: 1px solid transparent;
-			}
-			uui-input:not(:hover, :focus) uui-button {
-				opacity: 0;
-			}
-
 			.group-handle {
 				display: flex;
 				align-items: center;
-				padding: var(--uui-size-1);
+				padding: var(--uui-size-3) var(--uui-size-1);
 				margin-top: var(--uui-size-6);
 				margin-bottom: var(--uui-size-4);
+				gap: var(--uui-size-1);
 				cursor: grab;
 			}
 
@@ -275,6 +272,10 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 
 			.group:has([drag-placeholder]) {
 				opacity: 0.2;
+			}
+
+			uui-input {
+				flex: 1;
 			}
 		`,
 	];
