@@ -24,12 +24,12 @@ public class DictionaryRepositoryTest : UmbracoIntegrationTest
 
     private IDictionaryRepository CreateRepository() => GetRequiredService<IDictionaryRepository>();
 
-    private IDictionaryRepository CreateRepositoryWithCache() =>
+    private IDictionaryRepository CreateRepositoryWithCache(AppCaches cache) =>
 
         // Create a repository with a real runtime cache.
         new DictionaryRepository(
             GetRequiredService<IScopeAccessor>(),
-            AppCaches.Create(Mock.Of<IRequestCache>()),
+            cache,
             GetRequiredService<ILogger<DictionaryRepository>>(),
             GetRequiredService<ILoggerFactory>());
 
@@ -410,7 +410,8 @@ public class DictionaryRepositoryTest : UmbracoIntegrationTest
     [Test]
     public void Can_Perform_Cached_Request_For_Existing_Value_By_Key_On_DictionaryRepository_With_Cache()
     {
-        var repository = CreateRepositoryWithCache();
+        var cache = AppCaches.Create(Mock.Of<IRequestCache>());
+        var repository = CreateRepositoryWithCache(cache);
 
         using (ScopeProvider.CreateScope())
         {
@@ -433,12 +434,21 @@ public class DictionaryRepositoryTest : UmbracoIntegrationTest
 
             Assert.AreEqual("Read More", dictionaryItem.Translations.Single(x => x.LanguageIsoCode == "en-US").Value);
         }
+
+        cache.IsolatedCaches.ClearCache<IDictionaryItem>();
+        using (ScopeProvider.CreateScope())
+        {
+            var dictionaryItem = repository.Get("Read More");
+
+            Assert.AreEqual("Read More (updated)", dictionaryItem.Translations.Single(x => x.LanguageIsoCode == "en-US").Value);
+        }
     }
 
     [Test]
     public void Can_Perform_Cached_Request_For_NonExisting_Value_By_Key_On_DictionaryRepository_With_Cache()
     {
-        var repository = CreateRepositoryWithCache();
+        var cache = AppCaches.Create(Mock.Of<IRequestCache>());
+        var repository = CreateRepositoryWithCache(cache);
 
         using (ScopeProvider.CreateScope())
         {
@@ -460,6 +470,14 @@ public class DictionaryRepositoryTest : UmbracoIntegrationTest
             var dictionaryItem = repository.Get("Read More Updated");
 
             Assert.IsNull(dictionaryItem);
+        }
+
+        cache.IsolatedCaches.ClearCache<IDictionaryItem>();
+        using (ScopeProvider.CreateScope())
+        {
+            var dictionaryItem = repository.Get("Read More Updated");
+
+            Assert.IsNotNull(dictionaryItem);
         }
     }
 
