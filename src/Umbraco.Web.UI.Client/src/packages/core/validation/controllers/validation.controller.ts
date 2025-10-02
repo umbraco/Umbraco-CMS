@@ -414,7 +414,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 				const notValidValidators = this.#validators.filter((v) => v.isValid === false);
 				console.warn(
 					`Missing validation messages to represent why a child validation context is invalid.
-					This could be because the Validator does not have a 'data-path' and therefor not able to set a message to the Validation Context.
+					This could be because the Validator does not have a 'data-path' and therefore not able to set a message to the Validation Context.
 					These Validators was not valid, one of these did not set a message to represent their state:`,
 					notValidValidators,
 				);

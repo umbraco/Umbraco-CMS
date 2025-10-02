@@ -2853,7 +2853,7 @@ export default {
 		detailsShow: 'Show details',
 		missingUiTitle: 'The configured property editor UI could not be found.',
 		missingUiDetailsDescription:
-			'This property editor UI is missing. Ensure your custom UI is registered correctly and the alias matches your configuration. For implementation details, see the <a href="https://docs.umbraco.com/umbraco-cms/customizing/property-editors/composition/property-editor-ui" target="_blank" rel="noopener">documentation</a>.',
+			'This property editor UI is missing. Ensure your custom UI is registered correctly and the alias matches your configuration.<br/>For implementation details, refer to the <a href="https://docs.umbraco.com/umbraco-cms/customizing/property-editors/composition/property-editor-ui" target="_blank" rel="noopener">documentation</a>.',
 		dataTypeMissingEditor: 'Property Editor not found',
 		dataTypeMissingEditorMessage: 'This property editor could not be found.',
 		dataTypeMissingEditorUi: 'Property Editor UI not found',

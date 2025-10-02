@@ -2847,7 +2847,7 @@ export default {
 		detailsShow: 'Mostrar detalhes',
 		missingUiTitle: 'A interface do editor de propriedades configurada não foi encontrada.',
 		missingUiDetailsDescription:
-			'Esta interface do editor de propriedades não foi encontrada. Certifique-se de que esta está registada corretamente e que o alias corresponde à sua configuração. Para detalhes de implementação, consulte a <a href="https://docs.umbraco.com/umbraco-cms/customizing/property-editors/composition/property-editor-ui" target="_blank" rel="noopener">documentação</a>.',
+			'Esta interface do editor de propriedades não foi encontrada. Certifique-se de que esta está registada corretamente e que o alias corresponde à sua configuração.<br/>Para detalhes de implementação, consulte a <a href="https://docs.umbraco.com/umbraco-cms/customizing/property-editors/composition/property-editor-ui" target="_blank" rel="noopener">documentação</a>.',
 		dataTypeMissingEditor: 'Editor de propriedades não encontrado',
 		dataTypeMissingEditorMessage: 'Este editor de propriedades não foi encontrado.',
 		dataTypeMissingEditorUi: 'Interface do editor de propriedades não encontrada',
