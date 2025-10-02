@@ -60,7 +60,7 @@ export class UmbPropertyValueFlatMapperController extends UmbControllerBase {
 					}
 				}
 
-				return undefined;
+				return properties;
 			});
 
 			mappedValues.push(mapperOfThisProperty);
