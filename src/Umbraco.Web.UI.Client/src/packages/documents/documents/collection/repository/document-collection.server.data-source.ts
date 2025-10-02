@@ -48,7 +48,9 @@ export class UmbDocumentCollectionServerDataSource implements UmbCollectionDataS
 					unique: item.id,
 					entityType: UMB_DOCUMENT_ENTITY_TYPE,
 					contentTypeAlias: item.documentType.alias,
-					createDate: new Date(variant.createDate),
+					createDate: item.variants
+						.map((v) => new Date(v.createDate))
+						.reduce((earliest, current) => (current < earliest ? current : earliest)),
 					creator: item.creator,
 					icon: item.documentType.icon,
 					isProtected: item.isProtected,
@@ -56,7 +58,9 @@ export class UmbDocumentCollectionServerDataSource implements UmbCollectionDataS
 					name: variant.name,
 					sortOrder: item.sortOrder,
 					state: variant.state,
-					updateDate: new Date(variant.updateDate),
+					updateDate: item.variants
+						.map((v) => new Date(v.updateDate))
+						.reduce((latest, current) => (current > latest ? current : latest)),
 					updater: item.updater,
 					values: item.values.map((item) => {
 						return { alias: item.alias, value: item.value as string };

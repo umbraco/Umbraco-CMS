@@ -16,7 +16,7 @@ export const data: Array<UmbMockTemplateModel> = [
 		name: 'Doc 1',
 		hasChildren: false,
 		alias: 'Doc1',
-		signs: [],
+		flags: [],
 		content: `@using Umbraco.Extensions
 		@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem>
 		@{
@@ -37,7 +37,7 @@ export const data: Array<UmbMockTemplateModel> = [
 		name: 'Test',
 		hasChildren: true,
 		alias: 'Test',
-		signs: [],
+		flags: [],
 		content:
 			'@using Umbraco.Cms.Web.Common.PublishedModels;\n@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ContentModels.Test>\r\n@using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;\r\n@{\r\n\tLayout = null;\r\n}',
 	},
@@ -48,7 +48,7 @@ export const data: Array<UmbMockTemplateModel> = [
 		name: 'Child',
 		hasChildren: false,
 		alias: 'Test',
-		signs: [],
+		flags: [],
 		content:
 			'@using Umbraco.Cms.Web.Common.PublishedModels;\n@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ContentModels.Test>\r\n@using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;\r\n@{\r\n\tLayout = "Test.cshtml";\r\n}',
 	},
@@ -59,7 +59,7 @@ export const data: Array<UmbMockTemplateModel> = [
 		masterTemplate: { id: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71' },
 		hasChildren: false,
 		alias: 'hasMasterTemplate',
-		signs: [],
+		flags: [],
 		content:
 			'@using Umbraco.Cms.Web.Common.PublishedModels;\n@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ContentModels.Test>\r\n@using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;\r\n@{\r\n\tLayout = "Test.cshtml";\r\n}',
 	},
@@ -69,7 +69,7 @@ export const data: Array<UmbMockTemplateModel> = [
 		name: 'Forbidden',
 		hasChildren: false,
 		alias: 'Forbidden',
-		signs: [],
+		flags: [],
 		content: `console.log('You are not allowed to see this template!');`,
 	},
 ];

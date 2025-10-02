@@ -158,7 +158,7 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 				view.hints.setPathFilter((paths) => paths[0].includes('tab/') === false);
 			}
 
-			view.setBrowserTitle(tabName);
+			view.setTitle(tabName);
 			view.inheritFrom(this.#viewContext);
 
 			this.observe(
@@ -191,7 +191,7 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 		// ViewAlias null is only for the root tab, therefor we can implement this hack.
 		if (viewAlias === null) {
 			// Specific hack for the Generic tab to only show its name if there are other tabs.
-			view.setBrowserTitle(this._tabs && this._tabs?.length > 0 ? '#general_generic' : undefined);
+			view.setTitle(this._tabs && this._tabs?.length > 0 ? '#general_generic' : undefined);
 		}
 		view.provideAt(component as any);
 	}

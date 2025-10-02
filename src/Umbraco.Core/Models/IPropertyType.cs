@@ -24,6 +24,9 @@ public interface IPropertyType : IEntity, IRememberBeingDirty
     /// </summary>
     int DataTypeId { get; set; }
 
+    /// <summary>
+    ///     Gets or sets the Guid unique identifier of the datatype for this property type.
+    /// </summary>
     Guid DataTypeKey { get; set; }
 
     /// <summary>

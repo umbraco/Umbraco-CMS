@@ -115,7 +115,7 @@ export class UmbContentWorkspacePropertyElement extends UmbLitElement {
 					this._workspaceContext.propertyWriteGuard.isPermittedForVariantAndProperty(
 						propertyVariantId,
 						this._propertyType,
-						propertyVariantId,
+						this._datasetVariantId,
 					),
 					(write) => {
 						this._writeable = write;
