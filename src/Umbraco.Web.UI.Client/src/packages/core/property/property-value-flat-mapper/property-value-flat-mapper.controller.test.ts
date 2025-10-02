@@ -154,7 +154,7 @@ describe('UmbPropertyValueFlatMapperController', () => {
 						value: {
 							id: 'inner-value',
 							nestedValue: {
-								editorAlias: 'test-editor',
+								editorAlias: 'test-editor-no-mapper',
 								alias: 'another',
 								culture: null,
 								segment: null,

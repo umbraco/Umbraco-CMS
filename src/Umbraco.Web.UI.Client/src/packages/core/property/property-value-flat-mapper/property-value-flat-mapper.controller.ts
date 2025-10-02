@@ -24,9 +24,11 @@ export class UmbPropertyValueFlatMapperController extends UmbControllerBase {
 		incomingProperty: UmbPropertyValueDataPotentiallyWithEditorAlias<ValueType>,
 		mapper: (property: UmbPropertyValueDataPotentiallyWithEditorAlias) => ReturnType | Promise<ReturnType>,
 	): Promise<Array<ReturnType> | undefined> {
+		const mapOfThisProperty: ReturnType = await mapper(incomingProperty);
+
 		const editorAlias = (incomingProperty as any).editorAlias as string | undefined;
 		if (!editorAlias) {
-			return undefined;
+			return [mapOfThisProperty];
 		}
 
 		// Find the resolver for this editor alias:
@@ -36,17 +38,15 @@ export class UmbPropertyValueFlatMapperController extends UmbControllerBase {
 		)[0];
 
 		if (!manifest) {
-			return undefined;
+			return [mapOfThisProperty];
 		}
 
 		const api = await createExtensionApi(this, manifest);
 		if (!api) {
-			return undefined;
+			return [mapOfThisProperty];
 		}
 
 		(api as any).manifest = manifest;
-
-		const mapperOfThisProperty: ReturnType = await mapper(incomingProperty);
 
 		if (api.processValues) {
 			let mappedValues: Array<ReturnType> = [];
@@ -64,12 +64,12 @@ export class UmbPropertyValueFlatMapperController extends UmbControllerBase {
 			});
 
 			// push in the front of the mapped values, so that the outer property is first in the array:
-			mappedValues.splice(0, 0, mapperOfThisProperty);
+			mappedValues.splice(0, 0, mapOfThisProperty);
 
 			return mappedValues;
 		}
 
 		// the api did not provide a value processor, so we will return the incoming property:
-		return [mapperOfThisProperty];
+		return [mapOfThisProperty];
 	}
 }
