@@ -36,7 +36,6 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(blockGridDataTypeName);
 });
 
-// FLAKY TEST FOR PIPELINE TEST; REMOVE AFTER
 test('can create content with a block grid with an empty block in a area', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   firstElementTypeId = await umbracoApi.documentType.createEmptyElementType(firstElementTypeName);
@@ -48,7 +47,6 @@ test('can create content with a block grid with an empty block in a area', {tag:
   await umbracoUi.content.goToContentWithName(contentName);
 
   // Act
-  await umbracoUi.content.clickAddBlockGridElementWithName(firstElementTypeName);
   await umbracoUi.content.clickAddBlockGridElementWithName(firstElementTypeName);
   await umbracoUi.content.clickSelectBlockElementWithName(firstElementTypeName);
   await umbracoUi.content.clickLinkWithName(areaCreateLabel);
