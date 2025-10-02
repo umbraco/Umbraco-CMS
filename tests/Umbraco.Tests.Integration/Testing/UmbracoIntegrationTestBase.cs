@@ -27,7 +27,7 @@ public abstract class UmbracoIntegrationTestBase
     private static ITestDatabase? s_dbInstance;
     private static TestDbMeta s_fixtureDbMeta;
     protected static int s_testCount = 1;
-    private readonly List<Action> _fixtureTeardown = [];
+    private readonly List<Action> _fixtureTeardown = new();
     private readonly Queue<Action> _testTeardown = new();
     private bool _firstTestInFixture = true;
 
@@ -176,11 +176,13 @@ public abstract class UmbracoIntegrationTestBase
             var settings = new TestDatabaseSettings
             {
                 FilesPath = Path.Combine(TestHelper.WorkingDirectory, "databases"),
-                DatabaseType = Configuration.GetValue<TestDatabaseSettings.TestDatabaseType>("Tests:Database:DatabaseType"),
+                DatabaseType =
+                    Configuration.GetValue<TestDatabaseSettings.TestDatabaseType>("Tests:Database:DatabaseType"),
                 PrepareThreadCount = Configuration.GetValue<int>("Tests:Database:PrepareThreadCount"),
                 EmptyDatabasesCount = Configuration.GetValue<int>("Tests:Database:EmptyDatabasesCount"),
                 SchemaDatabaseCount = Configuration.GetValue<int>("Tests:Database:SchemaDatabaseCount"),
-                SQLServerMasterConnectionString = Configuration.GetValue<string>("Tests:Database:SQLServerMasterConnectionString"),
+                SQLServerMasterConnectionString =
+                    Configuration.GetValue<string>("Tests:Database:SQLServerMasterConnectionString"),
             };
 
             Directory.CreateDirectory(settings.FilesPath);

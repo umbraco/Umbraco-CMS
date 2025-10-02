@@ -27,7 +27,8 @@ using Umbraco.Cms.Tests.Integration.TestServerTest;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi;
 
-[UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture, Boot = true)]
+[TestFixture]
+[UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture, Logger = UmbracoTestOptions.Logger.Console, Boot = true)]
 public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
     where T : ManagementApiControllerBase
 {

@@ -16,32 +16,32 @@ public abstract class ManagementApiUserGroupTestBase<T> : ManagementApiTest<T>
 
     protected virtual UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.OK,
+        ExpectedStatusCode = HttpStatusCode.OK
     };
 
     protected virtual UserGroupAssertionModel EditorUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Forbidden,
+        ExpectedStatusCode = HttpStatusCode.Forbidden
     };
 
     protected virtual UserGroupAssertionModel SensitiveDataUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Forbidden,
+        ExpectedStatusCode = HttpStatusCode.Forbidden
     };
 
     protected virtual UserGroupAssertionModel TranslatorUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Forbidden,
+        ExpectedStatusCode = HttpStatusCode.Forbidden
     };
 
     protected virtual UserGroupAssertionModel WriterUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Forbidden,
+        ExpectedStatusCode = HttpStatusCode.Forbidden
     };
 
     protected virtual UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Unauthorized,
+        ExpectedStatusCode = HttpStatusCode.Unauthorized
     };
 
     // Admin

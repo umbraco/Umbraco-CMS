@@ -33,7 +33,7 @@ using Umbraco.Cms.Web.Website.Controllers;
 namespace Umbraco.Cms.Tests.Integration.TestServerTest
 {
     [TestFixture]
-    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture, Logger = UmbracoTestOptions.Logger.Console, Boot = true)]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console, Boot = true)]
     public abstract class UmbracoTestServerTestBase : UmbracoIntegrationTestBase
     {
         private static readonly Dictionary<string, WebApplicationFactory<UmbracoTestServerTestBase>> _factoryCache = new();
@@ -64,16 +64,12 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
         {
         }
 
-        // protected virtual void  CustomMvcSetup(IMvcBuilder mvcBuilder)
-        // {
-        // }
-
-
         protected virtual void CustomTestAuthSetup(IServiceCollection services)
         {
             // Add a test auth scheme with a test auth handler to authn and assign the user
             services.AddAuthentication(TestAuthHandler.TestAuthenticationScheme)
-                .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.TestAuthenticationScheme, options => { });
+                .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.TestAuthenticationScheme,
+                    options => { });
         }
 
         [SetUp]
@@ -102,13 +98,27 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
 
             Client = Factory.CreateClient(new WebApplicationFactoryClientOptions
             {
-                AllowAutoRedirect = false,
-                BaseAddress = new Uri("https://localhost/"),
+                AllowAutoRedirect = false, BaseAddress = new Uri("https://localhost/", UriKind.Absolute),
             });
         }
 
         private WebApplicationFactory<UmbracoTestServerTestBase> CreateNewFactory()
         {
+            /*
+             * It's worth noting that our usage of WebApplicationFactory is non-standard,
+             * the intent is that your Startup.ConfigureServices is called just like
+             * when the app starts up, then replacements are registered in this class with
+             * builder.ConfigureServices (builder.ConfigureTestServices has hung around from before the
+             * generic host switchover).
+             *
+             * This is currently a pain to refactor towards due to UmbracoBuilder+TypeFinder+TypeLoader setup but
+             * we should get there one day.
+             *
+             * However we need to separate the testing framework we provide for downstream projects from our own tests.
+             * We cannot use the Umbraco.Web.UI startup yet as that is not available downstream.
+             *
+             * See https://docs.microsoft.com/en-us/aspnet/core/test/integration-tests
+             */
             return new UmbracoWebApplicationFactory<UmbracoTestServerTestBase>(CreateHostBuilder)
                 .WithWebHostBuilder(builder =>
                 {
@@ -161,8 +171,8 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
         protected string GetManagementApiUrl<T>(Expression<Func<T, object>> methodSelector)
             where T : ManagementApiControllerBase
         {
-            var method = ExpressionHelper.GetMethodInfo(methodSelector);
-            var methodParams = ExpressionHelper.GetMethodParams(methodSelector) ?? new Dictionary<string, object>();
+            MethodInfo? method = ExpressionHelper.GetMethodInfo(methodSelector);
+            IDictionary<string, object?> methodParams = ExpressionHelper.GetMethodParams(methodSelector) ?? new Dictionary<string, object?>();
 
             // Remove the CancellationToken from the method params, this is automatically added by the framework
             // So we do not want to add this to the query string
@@ -218,6 +228,7 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
                     configBuilder.Sources.Clear();
                     configBuilder.AddInMemoryCollection(InMemoryConfiguration);
                     configBuilder.AddConfiguration(GlobalSetupTeardown.TestConfiguration);
+
                     Configuration = configBuilder.Build();
                 })
                 .ConfigureWebHost(builder =>
@@ -225,9 +236,10 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
                     builder.ConfigureServices((context, services) =>
                     {
                         context.HostingEnvironment = TestHelper.GetWebHostEnvironment();
-                        ConfigureUmbracoServices(services);
+                        ConfigureServices(services);
                         ConfigureTestServices(services);
                         services.AddUnique(CreateLoggerFactory());
+
                         if (!TestOptions.Boot)
                         {
                             // If boot is false, we don't want the CoreRuntime hosted service to start
@@ -254,7 +266,7 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
 
         protected virtual T GetRequiredService<T>() => Factory.Services.GetRequiredService<T>();
 
-        private void ConfigureUmbracoServices(IServiceCollection services)
+        protected void ConfigureServices(IServiceCollection services)
         {
             services.AddTransient<TestUmbracoDatabaseFactoryProvider>();
 
@@ -275,7 +287,8 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
                 .AddBackOfficeAuthentication()
                 .AddBackOfficeIdentity()
                 .AddMembersIdentity()
-                .AddMvcAndRazor(mvcBuilder =>
+                // .AddBackOfficeAuthorizationPolicies(TestAuthHandler.TestAuthenticationScheme)
+                .AddMvcAndRazor(mvcBuilding: mvcBuilder =>
                 {
                     // Adds Umbraco.Web.Common
                     mvcBuilder.AddApplicationPart(typeof(RenderController).Assembly);
@@ -304,6 +317,7 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
                 .AddTestServices(TestHelper); // This is the important one!
 
             CustomTestSetup(builder);
+
             builder.Build();
         }
 
@@ -325,28 +339,27 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
 }
 
 public class TestDatabaseHostedLifecycleService : IHostedLifecycleService
+{
+    private readonly Action _action;
+
+    public TestDatabaseHostedLifecycleService(Action action)
     {
-        private readonly Action _action;
-
-        public TestDatabaseHostedLifecycleService(Action action)
-        {
-            _action = action;
-        }
-
-        public Task StartAsync(CancellationToken cancellationToken) => Task.CompletedTask;
-
-        public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
-
-        public Task StartedAsync(CancellationToken cancellationToken) => Task.CompletedTask;
-
-        public Task StartingAsync(CancellationToken cancellationToken)
-        {
-            _action();
-            return Task.CompletedTask;
-        }
-
-        public Task StoppedAsync(CancellationToken cancellationToken) => Task.CompletedTask;
-
-        public Task StoppingAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+        _action = action;
     }
 
+    public Task StartAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+
+    public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+
+    public Task StartedAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+
+    public Task StartingAsync(CancellationToken cancellationToken)
+    {
+        _action();
+        return Task.CompletedTask;
+    }
+
+    public Task StoppedAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+
+    public Task StoppingAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+}
