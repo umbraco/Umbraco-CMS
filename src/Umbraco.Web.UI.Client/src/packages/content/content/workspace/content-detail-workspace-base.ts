@@ -294,9 +294,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 						} as VariantOptionModelType;
 
 						// Find all segments that are either generic (undefined) or that contains this culture
-						const availableSegments = segments.filter(
-							(s) => typeof s.cultures === 'undefined' || (s.cultures !== null && s.cultures.includes(language.unique)),
-						);
+						const availableSegments = segments.filter((s) => !s.cultures || s.cultures.includes(language.unique));
 						const segmentsForCulture = availableSegments.map((segment) => {
 							return {
 								variant: variants.find((x) => x.culture === language.unique && x.segment === segment.alias),
