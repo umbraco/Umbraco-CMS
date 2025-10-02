@@ -8,9 +8,10 @@ public class LogLevelCountLogViewerControllerTests : ManagementApiUserGroupTestB
 {
     protected override Expression<Func<LogLevelCountLogViewerController, object>> MethodSelector => x => x.LogLevelCounts(CancellationToken.None, null, null);
 
+    // We get the InternalServerError for the admin because it has access, but there is no log file to view
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.OK
+        ExpectedStatusCode = HttpStatusCode.InternalServerError
     };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
