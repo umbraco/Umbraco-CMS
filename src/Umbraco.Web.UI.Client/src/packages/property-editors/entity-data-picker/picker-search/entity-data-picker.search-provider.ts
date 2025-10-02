@@ -26,7 +26,7 @@ export class UmbEntityDataPickerSearchProvider
 		await this.#init;
 		const api = this.#pickerDataSourceContext?.getDataSourceApi();
 		if (!api) throw new Error('No data source API set');
-		return api.requestSearch?.(args);
+		return api.search?.(args);
 	}
 }
 

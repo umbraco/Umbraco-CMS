@@ -5,6 +5,12 @@ import {
 	UmbMediaSearchRepository,
 	UmbMediaTreeRepository,
 } from '@umbraco-cms/backoffice/media';
+import type { UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
+import type {
+	UmbTreeAncestorsOfRequestArgs,
+	UmbTreeChildrenOfRequestArgs,
+	UmbTreeRootItemsRequestArgs,
+} from '@umbraco-cms/backoffice/tree';
 
 export class UmbMediaPickerPropertyEditorDataSource
 	extends UmbControllerBase
@@ -15,19 +21,19 @@ export class UmbMediaPickerPropertyEditorDataSource
 	#search = new UmbMediaSearchRepository(this);
 	#config: any;
 
-	setConfig(config: any): void {
+	setConfig(config: any) {
 		this.#config = config;
 	}
 
-	getConfig(): any {
+	getConfig() {
 		return this.#config;
 	}
 
-	requestTreeRoot(): Promise<any> {
+	requestTreeRoot() {
 		return this.#tree.requestTreeRoot();
 	}
 
-	requestTreeRootItems(args: any): Promise<any> {
+	requestTreeRootItems(args: UmbTreeRootItemsRequestArgs) {
 		return this.#tree.requestTreeRootItems({
 			skip: args.skip,
 			take: args.take,
@@ -36,7 +42,7 @@ export class UmbMediaPickerPropertyEditorDataSource
 		});
 	}
 
-	requestTreeItemsOf(args: any): Promise<any> {
+	requestTreeItemsOf(args: UmbTreeChildrenOfRequestArgs) {
 		return this.#tree.requestTreeItemsOf({
 			parent: args.parent,
 			skip: args.skip,
@@ -46,15 +52,15 @@ export class UmbMediaPickerPropertyEditorDataSource
 		});
 	}
 
-	requestTreeItemAncestors(args: any): Promise<any> {
+	requestTreeItemAncestors(args: UmbTreeAncestorsOfRequestArgs) {
 		return this.#tree.requestTreeItemAncestors({ treeItem: args.treeItem });
 	}
 
-	requestItems(uniques: Array<string>): Promise<any> {
+	requestItems(uniques: Array<string>) {
 		return this.#item.requestItems(uniques);
 	}
 
-	requestSearch(args: any): Promise<any> {
+	search(args: UmbSearchRequestArgs) {
 		return this.#search.search(args);
 	}
 }

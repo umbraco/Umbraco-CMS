@@ -28,7 +28,7 @@ export class UmbEntityDataPickerTreeRepository extends UmbRepositoryBase impleme
 		await this.#init;
 		const api = this.#pickerDataSourceContext?.getDataSourceApi() as UmbPickerPropertyEditorTreeDataSource;
 		if (!api) throw new Error('No data source API set');
-		return api.requestTreeRoot({});
+		return api.requestTreeRoot();
 	}
 
 	async requestTreeRootItems(args: UmbTreeRootItemsRequestArgs) {

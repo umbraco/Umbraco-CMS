@@ -1,5 +1,6 @@
 import type { UmbPickerPropertyEditorCollectionDataSource } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import type { UmbCollectionFilterModel } from '@umbraco-cms/backoffice/collection';
 import { UmbLanguageCollectionRepository, UmbLanguageItemRepository } from '@umbraco-cms/backoffice/language';
 
 export class UmbLanguagePickerPropertyEditorDataSource
@@ -10,7 +11,7 @@ export class UmbLanguagePickerPropertyEditorDataSource
 	#item = new UmbLanguageItemRepository(this);
 	#config: any;
 
-	setConfig(config: any): void {
+	setConfig(config: any) {
 		this.#config = config;
 	}
 
@@ -18,11 +19,11 @@ export class UmbLanguagePickerPropertyEditorDataSource
 		return this.#config;
 	}
 
-	requestCollection(args: any): Promise<any> {
+	requestCollection(args: UmbCollectionFilterModel) {
 		return this.#collection.requestCollection({ skip: args.skip, take: args.take });
 	}
 
-	requestItems(uniques: Array<string>): Promise<any> {
+	requestItems(uniques: Array<string>) {
 		return this.#item.requestItems(uniques);
 	}
 }

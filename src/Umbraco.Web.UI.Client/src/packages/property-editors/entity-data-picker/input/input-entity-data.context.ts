@@ -202,7 +202,7 @@ export class UmbEntityDataPickerInputContext extends UmbControllerBase {
 
 	#createTreeItemPickerModalToken(api: UmbPickerPropertyEditorTreeDataSource) {
 		// TODO: can we find a better way to check if the api supports search?
-		const supportsSearch = typeof api.requestSearch === 'function';
+		const supportsSearch = typeof api.search === 'function';
 
 		return new UmbModalToken<UmbTreePickerModalData<UmbEntityDataPickerItemModel>, UmbTreePickerModalValue>(
 			UMB_TREE_PICKER_MODAL_ALIAS,
@@ -225,7 +225,7 @@ export class UmbEntityDataPickerInputContext extends UmbControllerBase {
 	}
 
 	#createCollectionItemPickerModalToken(api: UmbPickerPropertyEditorTreeDataSource) {
-		const supportsSearch = typeof api.requestSearch === 'function';
+		const supportsSearch = typeof api.search === 'function';
 
 		return new UmbModalToken<
 			UmbCollectionItemPickerModalData<UmbEntityDataPickerItemModel>,

@@ -6,6 +6,12 @@ import {
 	UmbDocumentTreeRepository,
 } from '@umbraco-cms/backoffice/document';
 import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/document-type';
+import type { UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
+import type {
+	UmbTreeAncestorsOfRequestArgs,
+	UmbTreeChildrenOfRequestArgs,
+	UmbTreeRootItemsRequestArgs,
+} from '@umbraco-cms/backoffice/tree';
 
 export class UmbDocumentPickerPropertyEditorDataSource
 	extends UmbControllerBase
@@ -16,7 +22,7 @@ export class UmbDocumentPickerPropertyEditorDataSource
 	#search = new UmbDocumentSearchRepository(this);
 	#config: any;
 
-	setConfig(config: any): void {
+	setConfig(config: any) {
 		this.#config = config;
 	}
 
@@ -24,11 +30,11 @@ export class UmbDocumentPickerPropertyEditorDataSource
 		return this.#config;
 	}
 
-	requestTreeRoot(): Promise<any> {
+	requestTreeRoot() {
 		return this.#tree.requestTreeRoot();
 	}
 
-	requestTreeRootItems(args: any): Promise<any> {
+	requestTreeRootItems(args: UmbTreeRootItemsRequestArgs) {
 		return this.#tree.requestTreeRootItems({
 			skip: args.skip,
 			take: args.take,
@@ -37,7 +43,7 @@ export class UmbDocumentPickerPropertyEditorDataSource
 		});
 	}
 
-	requestTreeItemsOf(args: any): Promise<any> {
+	requestTreeItemsOf(args: UmbTreeChildrenOfRequestArgs) {
 		return this.#tree.requestTreeItemsOf({
 			parent: args.parent,
 			skip: args.skip,
@@ -47,15 +53,15 @@ export class UmbDocumentPickerPropertyEditorDataSource
 		});
 	}
 
-	requestTreeItemAncestors(args: any): Promise<any> {
+	requestTreeItemAncestors(args: UmbTreeAncestorsOfRequestArgs) {
 		return this.#tree.requestTreeItemAncestors({ treeItem: args.treeItem });
 	}
 
-	requestItems(uniques: Array<string>): Promise<any> {
+	requestItems(uniques: Array<string>) {
 		return this.#item.requestItems(uniques);
 	}
 
-	requestSearch(args: any): Promise<any> {
+	search(args: UmbSearchRequestArgs) {
 		const filterString = this.#config?.find((x: any) => x.alias === 'filter')?.value;
 		const filterArray = filterString ? filterString.split(',') : [];
 		const allowedContentTypes = filterArray.map((x: string) => ({
