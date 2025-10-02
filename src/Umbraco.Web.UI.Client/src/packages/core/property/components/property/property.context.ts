@@ -197,7 +197,7 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase {
 				if (propertyVariantId.segment !== null) {
 					shareMessage = 'content_sharedAcrossCultures';
 				} else {
-					// if not then we know its shared across everything.
+					// if not then we know it's shared across everything.
 					shareMessage = 'content_shared';
 				}
 			}
