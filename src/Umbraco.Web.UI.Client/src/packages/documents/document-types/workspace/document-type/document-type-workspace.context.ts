@@ -206,16 +206,6 @@ export class UmbDocumentTypeWorkspaceContext
 		this.setAllowedTemplateIds([templateEntity, ...allowedTemplates]);
 		this.setDefaultTemplate(templateEntity);
 	}
-
-	/**
-	 * @deprecated Use the createScaffold method instead. Will be removed in 17.
-	 * @param presetAlias
-	 * @param {UmbEntityModel} parent
-	 * @memberof UmbMediaTypeWorkspaceContext
-	 */
-	async create(parent: UmbEntityModel, presetAlias: string | null) {
-		this.#onScaffoldSetup(parent, presetAlias);
-	}
 }
 
 export { UmbDocumentTypeWorkspaceContext as api };

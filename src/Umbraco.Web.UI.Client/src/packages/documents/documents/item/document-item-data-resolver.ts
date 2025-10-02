@@ -3,7 +3,7 @@ import type { UmbDocumentItemModel } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { UmbBooleanState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbBasicState, UmbBooleanState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { type UmbVariantContext, UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
 
 type UmbDocumentItemDataResolverModel = Omit<UmbDocumentItemModel, 'parent' | 'hasChildren'>;
@@ -14,8 +14,10 @@ type UmbDocumentItemDataResolverModel = Omit<UmbDocumentItemModel, 'parent' | 'h
  * @class UmbDocumentItemDataResolver
  * @augments {UmbControllerBase}
  */
-export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataResolverModel> extends UmbControllerBase {
-	#data = new UmbObjectState<DataType | undefined>(undefined);
+export class UmbDocumentItemDataResolver<
+	DocumentItemModel extends UmbDocumentItemDataResolverModel,
+> extends UmbControllerBase {
+	#data = new UmbObjectState<DocumentItemModel | undefined>(undefined);
 
 	public readonly unique = this.#data.asObservablePart((x) => x?.unique);
 	public readonly icon = this.#data.asObservablePart((x) => x?.documentType.icon);
@@ -29,6 +31,12 @@ export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataRes
 
 	#isDraft = new UmbBooleanState(undefined);
 	public readonly isDraft = this.#isDraft.asObservable();
+
+	#createDate = new UmbBasicState<Date | undefined>(undefined);
+	public readonly createDate = this.#createDate.asObservable();
+
+	#updateDate = new UmbBasicState<Date | undefined>(undefined);
+	public readonly updateDate = this.#updateDate.asObservable();
 
 	#variantContext?: UmbVariantContext;
 	#fallbackCulture?: string | null;
@@ -66,20 +74,29 @@ export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataRes
 	}
 
 	/**
-	 * Get the current item
-	 * @returns {DataType | undefined} The current item
+	 * Get the display culture or fallback culture
+	 * @returns {string | null | undefined} The display culture or fallback culture
 	 * @memberof UmbDocumentItemDataResolver
 	 */
-	getData(): DataType | undefined {
+	getCulture(): string | null | undefined {
+		return this.#displayCulture || this.#fallbackCulture;
+	}
+
+	/**
+	 * Get the current item
+	 * @returns {DocumentItemModel | undefined} The current item
+	 * @memberof UmbDocumentItemDataResolver
+	 */
+	getData(): DocumentItemModel | undefined {
 		return this.#data.getValue();
 	}
 
 	/**
 	 * Set the current item
-	 * @param {DataType | undefined} data The current item
+	 * @param {DocumentItemModel | undefined} data The current item
 	 * @memberof UmbDocumentItemDataResolver
 	 */
-	setData(data: DataType | undefined) {
+	setData(data: DocumentItemModel | undefined) {
 		this.#data.setValue(data);
 		this.#setVariantAwareValues();
 	}
@@ -139,6 +156,24 @@ export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataRes
 		return (await this.observe(this.isTrashed).asPromise()) ?? false;
 	}
 
+	/**
+	 * Get the create date of the item
+	 * @returns {Promise<Date>} The create date of the item
+	 * @memberof UmbDocumentItemDataResolver
+	 */
+	async getCreateDate(): Promise<Date> {
+		return (await this.observe(this.createDate).asPromise()) || undefined;
+	}
+
+	/**
+	 * Get the update date of the item
+	 * @returns {Promise<Date>} The update date of the item
+	 * @memberof UmbDocumentItemDataResolver
+	 */
+	async getUpdateDate(): Promise<Date> {
+		return (await this.observe(this.updateDate).asPromise()) || undefined;
+	}
+
 	#setVariantAwareValues() {
 		if (!this.#variantContext) return;
 		if (!this.#displayCulture) return;
@@ -147,6 +182,8 @@ export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataRes
 		this.#setName();
 		this.#setIsDraft();
 		this.#setState();
+		this.#setCreateDate();
+		this.#setUpdateDate();
 	}
 
 	async #setName() {
@@ -170,6 +207,28 @@ export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataRes
 		const variant = await this.#getCurrentVariant();
 		const state = variant?.state || UmbDocumentVariantState.NOT_CREATED;
 		this.#state.setValue(state);
+	}
+
+	async #setCreateDate() {
+		const variant = await this.#getCurrentVariant();
+		if (variant) {
+			this.#createDate.setValue(variant.createDate);
+			return;
+		}
+
+		const fallbackCreateDate = this.#findVariant(this.#fallbackCulture!)?.createDate;
+		this.#createDate.setValue(fallbackCreateDate);
+	}
+
+	async #setUpdateDate() {
+		const variant = await this.#getCurrentVariant();
+		if (variant) {
+			this.#updateDate.setValue(variant.updateDate);
+			return;
+		}
+
+		const fallbackUpdateDate = this.#findVariant(this.#fallbackCulture!)?.updateDate;
+		this.#updateDate.setValue(fallbackUpdateDate);
 	}
 
 	#findVariant(culture: string | undefined) {
