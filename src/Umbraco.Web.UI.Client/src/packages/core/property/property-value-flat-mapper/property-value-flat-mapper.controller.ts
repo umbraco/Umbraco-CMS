@@ -46,24 +46,29 @@ export class UmbPropertyValueFlatMapperController extends UmbControllerBase {
 
 		(api as any).manifest = manifest;
 
-		const propertyValue: ReturnType = await mapper(incomingProperty);
+		const mapperOfThisProperty: ReturnType = await mapper(incomingProperty);
 
 		if (api.processValues) {
-			return await api.processValues(incomingProperty, async (properties) => {
+			let mappedValues: Array<ReturnType> = [];
+			// TODO: can we extract this method, to avoid it being recreated again and again [NL]
+			await api.processValues(incomingProperty, async (properties) => {
 				// Transform the values:
-				const mappedValues = await Promise.all(
-					properties.flatMap(async (property) => {
-						return (await this.#mapValues(property, mapper)) ?? property;
-					}),
-				);
+				for (const property of properties) {
+					const incomingMapValues = await this.#mapValues(property, mapper);
+					if (incomingMapValues) {
+						mappedValues = mappedValues.concat(incomingMapValues);
+					}
+				}
 
-				mappedValues.push(propertyValue);
-
-				return mappedValues;
+				return undefined;
 			});
+
+			mappedValues.push(mapperOfThisProperty);
+
+			return mappedValues;
 		}
 
 		// the api did not provide a value processor, so we will return the incoming property:
-		return [propertyValue];
+		return [mapperOfThisProperty];
 	}
 }
