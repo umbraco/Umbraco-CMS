@@ -271,4 +271,14 @@ export const manifests: Array<ManifestLocalization> = [
 		},
 		js: () => import('../../../assets/lang/zh-tw.js'),
 	},
+	{
+		type: 'localization',
+		alias: 'Umb.Localization.VI',
+		weight: 100,
+		name: 'Vietnamese Backoffice UI Localization',
+		meta: {
+			culture: 'vi',
+		},
+		js: () => import('../../../assets/lang/vi.js'),
+	},
 ];

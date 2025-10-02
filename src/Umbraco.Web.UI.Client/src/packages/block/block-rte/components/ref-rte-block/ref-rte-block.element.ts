@@ -84,10 +84,6 @@ export class UmbRefRteBlockElement extends UmbLitElement {
 			umb-icon,
 			umb-ufm-render {
 				z-index: 1;
-
-				&::selection {
-					color: var(--uui-color-default-contrast);
-				}
 			}
 		`,
 	];

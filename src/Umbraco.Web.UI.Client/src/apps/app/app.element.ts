@@ -22,6 +22,7 @@ import { filter, first, firstValueFrom } from '@umbraco-cms/backoffice/external/
 import { hasOwnOpener, redirectToStoredPath } from '@umbraco-cms/backoffice/utils';
 import { UmbApiInterceptorController } from '@umbraco-cms/backoffice/resources';
 import { umbHttpClient } from '@umbraco-cms/backoffice/http-client';
+import { UmbViewContext } from '@umbraco-cms/backoffice/view';
 
 import './app-logo.element.js';
 import './app-oauth.element.js';
@@ -159,6 +160,8 @@ export class UmbAppElement extends UmbLitElement {
 		new UmbContextDebugController(this);
 
 		new UmbNetworkConnectionStatusManager(this);
+
+		new UmbViewContext(this, null);
 	}
 
 	override connectedCallback(): void {

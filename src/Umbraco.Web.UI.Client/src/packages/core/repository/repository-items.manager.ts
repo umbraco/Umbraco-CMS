@@ -1,4 +1,5 @@
 import type { UmbItemRepository } from './item/index.js';
+import type { UmbRepositoryItemsStatus } from './types.js';
 import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
@@ -9,14 +10,6 @@ import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbEntityUpdatedEvent } from '@umbraco-cms/backoffice/entity-action';
 
 const ObserveRepositoryAlias = Symbol();
-
-interface UmbRepositoryItemsStatus {
-	state: {
-		type: 'success' | 'error' | 'loading';
-		error?: string;
-	};
-	unique: string;
-}
 
 export class UmbRepositoryItemsManager<ItemType extends { unique: string }> extends UmbControllerBase {
 	//

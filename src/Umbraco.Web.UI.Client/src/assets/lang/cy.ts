@@ -2172,6 +2172,7 @@ export default {
 		openBackofficeSearch: 'Agor chwiliad swyddfa gefn',
 		openCloseBackofficeHelp: 'Agor/Cau cymorth swyddfa gefn',
 		openCloseBackofficeProfileOptions: 'Agor/Cau eich opsiynau proffil',
+		profileOptions: 'Opsiynau proffil',
 		assignDomainDescription: 'Sefydli Diwylliannau ac Enwau Gwesteia am %0%',
 		createDescription: 'Creu nod newydd o dan %0%',
 		protectDescription: 'Sefydli Mynediad Cyhoeddus ar %0%',
@@ -2210,6 +2211,7 @@ export default {
 		searchContentTree: "Chwilio'r coeden cynnwys",
 		maxAmount: 'Uchafswm',
 		expandChildItems: 'Ehangu eitemau plentyn ar gyfer',
+		collapseChildItems: 'Cuddio eitemau plant ar gyfer',
 		openContextNode: 'Agor nod cyd-destun ar gyfer',
 	},
 	references: {

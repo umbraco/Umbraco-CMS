@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
-using Umbraco.Cms.Api.Management.Services.Signs;
+using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core.Services;
 
@@ -19,8 +19,8 @@ public class RootMemberTypeTreeController : MemberTypeTreeControllerBase
     }
 
     [ActivatorUtilitiesConstructor]
-    public RootMemberTypeTreeController(IEntityService entityService, SignProviderCollection signProviders, IMemberTypeService memberTypeService)
-        : base(entityService, signProviders, memberTypeService)
+    public RootMemberTypeTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IMemberTypeService memberTypeService)
+        : base(entityService, flagProviders, memberTypeService)
     {
     }
 

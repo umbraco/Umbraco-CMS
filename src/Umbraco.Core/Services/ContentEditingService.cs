@@ -1,11 +1,13 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services.Filters;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
 
@@ -36,7 +38,8 @@ internal sealed class ContentEditingService
         ILocalizationService localizationService,
         ILanguageService languageService,
         IOptionsMonitor<ContentSettings> optionsMonitor,
-        IRelationService relationService)
+        IRelationService relationService,
+        ContentTypeFilterCollection contentTypeFilters)
         : base(
             contentService,
             contentTypeService,
@@ -48,7 +51,8 @@ internal sealed class ContentEditingService
             contentValidationService,
             treeEntitySortingService,
             optionsMonitor,
-            relationService)
+            relationService,
+            contentTypeFilters)
     {
         _propertyEditorCollection = propertyEditorCollection;
         _templateService = templateService;
@@ -101,8 +105,8 @@ internal sealed class ContentEditingService
         {
             // If no cultures are provided, we are asking to validate all cultures. But if the user doesn't have access to all, we
             // should only validate the ones they do.
-            var allCultures = (await _languageService.GetAllAsync()).Select(x => x.IsoCode).ToList();
-            return allowedCultures.Count == allCultures.Count ? null : allowedCultures;
+            IEnumerable<string> allCultures = await _languageService.GetAllIsoCodesAsync();
+            return allowedCultures.Count == allCultures.Count() ? null : allowedCultures;
         }
 
         // If explicit cultures are provided, we should only validate the ones the user has access to.
