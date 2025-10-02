@@ -32,9 +32,9 @@ export interface MetaPropertyEditorUi {
 		 */
 		enabled: boolean;
 		/**
-		 * A list of allowed data source aliases that can be used with this property editor UI.
-		 * If not specified, any data source can be used.
-		 * @example ["pickerPropertyEditorCollectionDataSource", "pickerPropertyEditorTreeDataSource"]
+		 * A list of allowed property editor data source kinds that can be used with this property editor UI.
+		 * If not specified, any data sources can be used.
+		 * @example ["pickerCollection", "pickerTree"]
 		 */
 		forDataSourceTypes: string[];
 	};

@@ -1,6 +1,7 @@
 import type { UmbPropertyEditorDataSourceItemModel } from '../item/types.js';
 import { UMB_PROPERTY_EDITOR_DATA_SOURCE_ENTITY_TYPE } from '../entity.js';
-import type { UmbSearchDataSource, UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
+import type { UmbPropertyEditorDataSourceSearchRequestArgs } from './types.js';
+import type { UmbSearchDataSource } from '@umbraco-cms/backoffice/search';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -14,14 +15,18 @@ export class UmbPropertyEditorDataSourceSearchExtensionRegistryDataSource
 	extends UmbControllerBase
 	implements UmbSearchDataSource<UmbPropertyEditorDataSourceItemModel>
 {
-	async search(args: UmbSearchRequestArgs) {
-		// TODO: make a getByTypes method in the registry
-		const collectionExtensions = umbExtensionsRegistry.getByType('pickerPropertyEditorCollectionDataSource');
-		const treeExtensions = umbExtensionsRegistry.getByType('pickerPropertyEditorTreeDataSource');
-		const extensions = [...collectionExtensions, ...treeExtensions];
+	async search(args: UmbPropertyEditorDataSourceSearchRequestArgs) {
+		const extensions = umbExtensionsRegistry.getByType('propertyEditorDataSource');
+
+		const extensionsWithAllowedDataSourceTypes = extensions.filter((ext) => {
+			if (args.dataSourceTypes && args.dataSourceTypes.length > 0) {
+				return args.dataSourceTypes.includes(ext.dataSourceType);
+			}
+			return true;
+		});
 
 		// Simple filter by name or alias
-		const filteredExtensions = extensions.filter(
+		const filteredExtensions = extensionsWithAllowedDataSourceTypes.filter(
 			(item) =>
 				item.name.toLowerCase().includes(args.query.toLowerCase()) ||
 				item.alias.toLowerCase().includes(args.query.toLowerCase()),
@@ -30,7 +35,7 @@ export class UmbPropertyEditorDataSourceSearchExtensionRegistryDataSource
 		const items: UmbPropertyEditorDataSourceItemModel[] = filteredExtensions.map((extension) => ({
 			entityType: UMB_PROPERTY_EDITOR_DATA_SOURCE_ENTITY_TYPE,
 			unique: extension.alias,
-			name: extension.name,
+			name: extension.meta.label,
 			icon: extension.meta?.icon,
 		}));
 

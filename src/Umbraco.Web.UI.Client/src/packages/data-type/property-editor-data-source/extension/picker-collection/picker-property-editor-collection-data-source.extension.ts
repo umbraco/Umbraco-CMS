@@ -1,7 +1,8 @@
-import type { UmbPickerPropertyEditorCollectionDataSource } from './types.js';
+import type { UmbPickerPropertyEditorCollectionDataSource } from '../types.js';
 import type { PropertyEditorSettings } from '@umbraco-cms/backoffice/property-editor';
 import type { ManifestApi } from '@umbraco-cms/backoffice/extension-api';
 
+/*
 export interface ManifestPickerPropertyEditorCollectionDataSource
 	extends ManifestApi<UmbPickerPropertyEditorCollectionDataSource> {
 	type: 'pickerPropertyEditorCollectionDataSource';
@@ -20,3 +21,4 @@ declare global {
 		UmbPickerPropertyEditorCollectionDataSource: ManifestPickerPropertyEditorCollectionDataSource;
 	}
 }
+*/

@@ -1,19 +1,12 @@
 import type { UmbPropertyEditorDataSourceItemModel } from '../item/data/types.js';
-import { UMB_PROPERTY_EDITOR_DATA_SOURCE_ITEM_REPOSITORY_ALIAS } from '../item/constants.js';
-import { UMB_PROPERTY_EDITOR_DATA_SOURCE_COLLECTION_MENU_ALIAS } from '../collection/constants.js';
+
+import { UmbPropertyEditorDataSourcePickerInputContext } from './property-editor-data-source-input.context.js';
 import { css, html, customElement, property, state, repeat, nothing, when } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
-import {
-	UMB_COLLECTION_ITEM_PICKER_MODAL_ALIAS,
-	type UmbCollectionItemPickerModalData,
-	type UmbCollectionItemPickerModalValue,
-} from '@umbraco-cms/backoffice/collection';
-import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-input-property-editor-data-source')
 export class UmbInputPropertyEditorDataSourceElement extends UUIFormControlMixin(UmbLitElement, '') {
@@ -79,9 +72,6 @@ export class UmbInputPropertyEditorDataSourceElement extends UUIFormControlMixin
 	@property({ type: String, attribute: 'min-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
-	@property({ type: Object, attribute: false })
-	public filter: (language: UmbPropertyEditorDataSourceItemModel) => boolean = () => true;
-
 	@property({ type: Array })
 	public set selection(uniques: Array<string>) {
 		this.#pickerContext.setSelection(uniques);
@@ -120,27 +110,18 @@ export class UmbInputPropertyEditorDataSourceElement extends UUIFormControlMixin
 	}
 	#readonly = false;
 
+	@property({ type: Array, attribute: 'data-source-types' })
+	public set dataSourceTypes(value: Array<string>) {
+		this.#pickerContext.setDataSourceTypes(value);
+	}
+	public get dataSourceTypes(): Array<string> {
+		return this.#pickerContext.getDataSourceTypes();
+	}
+
 	@state()
 	private _items: Array<UmbPropertyEditorDataSourceItemModel> = [];
 
-	#modalToken = new UmbModalToken<UmbCollectionItemPickerModalData, UmbCollectionItemPickerModalValue>(
-		UMB_COLLECTION_ITEM_PICKER_MODAL_ALIAS,
-		{
-			modal: {
-				type: 'sidebar',
-				size: 'small',
-			},
-			data: {
-				collectionMenuAlias: UMB_PROPERTY_EDITOR_DATA_SOURCE_COLLECTION_MENU_ALIAS,
-			},
-		},
-	);
-
-	#pickerContext = new UmbPickerInputContext<UmbPropertyEditorDataSourceItemModel>(
-		this,
-		UMB_PROPERTY_EDITOR_DATA_SOURCE_ITEM_REPOSITORY_ALIAS,
-		this.#modalToken,
-	);
+	#pickerContext = new UmbPropertyEditorDataSourcePickerInputContext(this);
 
 	constructor() {
 		super();
@@ -166,10 +147,7 @@ export class UmbInputPropertyEditorDataSourceElement extends UUIFormControlMixin
 	}
 
 	#openPicker() {
-		this.#pickerContext.openPicker({
-			filter: this.filter,
-			multiple: this.max > 1 ? true : false,
-		});
+		this.#pickerContext.openPicker();
 	}
 
 	#onRemove(item: UmbPropertyEditorDataSourceItemModel) {

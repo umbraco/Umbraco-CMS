@@ -7,8 +7,9 @@ export const manifests: Array<UmbExtensionManifest> = [
 	...itemManifests,
 	...searchManifests,
 	{
-		type: 'pickerPropertyEditorTreeDataSource',
-		alias: 'Umb.PickerPropertyEditorTreeDataSource.Document',
+		type: 'propertyEditorDataSource',
+		dataSourceType: 'pickerTree',
+		alias: 'Umb.PropertyEditorDataSource.DocumentPicker',
 		name: 'Document Picker Tree Data Source',
 		api: () => import('./test-document-picker-data-source.js'),
 		meta: {
@@ -34,8 +35,9 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 	},
 	{
-		type: 'pickerPropertyEditorTreeDataSource',
-		alias: 'Umb.PickerPropertyEditorTreeDataSource.Media',
+		type: 'propertyEditorDataSource',
+		dataSourceType: 'pickerTree',
+		alias: 'Umb.PropertyEditorDataSource.MediaPicker',
 		name: 'Media Picker Tree Data Source',
 		api: () => import('./test-media-picker-data-source.js'),
 		meta: {
@@ -45,8 +47,9 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 	},
 	{
-		type: 'pickerPropertyEditorCollectionDataSource',
-		alias: 'Umb.PickerPropertyEditorCollectionDataSource.Language',
+		type: 'propertyEditorDataSource',
+		dataSourceType: 'pickerCollection',
+		alias: 'Umb.PropertyEditorDataSource.LanguagePicker',
 		name: 'Language Picker Collection Data Source',
 		api: () => import('./test-language-picker-data-source.js'),
 		meta: {
@@ -56,9 +59,10 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 	},
 	{
-		type: 'pickerPropertyEditorCollectionDataSource',
-		alias: 'Umb.PickerPropertyEditorCollectionDataSource.Webhook',
-		name: 'Webhook Picker Collection Data Source',
+		type: 'propertyEditorDataSource',
+		dataSourceType: 'pickerCollection',
+		alias: 'Umb.PropertyEditorDataSource.WebhookPicker',
+		name: 'Webhook Picker Data Source',
 		api: () => import('./test-webhook-picker-data-source.js'),
 		meta: {
 			label: 'Webhooks',
@@ -67,9 +71,10 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 	},
 	{
-		type: 'pickerPropertyEditorCollectionDataSource',
-		alias: 'Umb.PickerPropertyEditorCollectionDataSource.User',
-		name: 'User Picker Collection Data Source',
+		type: 'propertyEditorDataSource',
+		dataSourceType: 'pickerCollection',
+		alias: 'Umb.PropertyEditorDataSource.UserPicker',
+		name: 'User Picker Data Source',
 		api: () => import('./test-user-picker-data-source.js'),
 		meta: {
 			label: 'Users',

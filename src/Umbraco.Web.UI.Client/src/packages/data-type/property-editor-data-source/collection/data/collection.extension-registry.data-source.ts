@@ -12,10 +12,7 @@ export class UmbPropertyEditorDataSourceCollectionExtensionRegistryDataSource
 	implements UmbCollectionDataSource<UmbPropertyEditorDataSourceCollectionItemModel>
 {
 	async getCollection(args: UmbPropertyEditorDataSourceCollectionFilterModel) {
-		// TODO: make a getByTypes method in the registry
-		const collectionExtensions = umbExtensionsRegistry.getByType('pickerPropertyEditorCollectionDataSource');
-		const treeExtensions = umbExtensionsRegistry.getByType('pickerPropertyEditorTreeDataSource');
-		const extensions = [...collectionExtensions, ...treeExtensions];
+		const extensions = umbExtensionsRegistry.getByType('propertyEditorDataSource');
 
 		const filtered = extensions.filter((manifest) =>
 			manifest.name.toLowerCase().includes(args.filter?.toLowerCase() ?? ''),

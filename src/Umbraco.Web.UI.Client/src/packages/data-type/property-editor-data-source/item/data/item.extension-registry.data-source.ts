@@ -14,10 +14,7 @@ export class UmbPropertyEditorDataSourceItemExtensionRegistryDataSource
 	async getItems(uniques: Array<string>) {
 		if (!uniques) throw new Error('Uniques are missing');
 
-		// TODO: make a getByTypes method in the registry
-		const collectionExtensions = umbExtensionsRegistry.getByType('pickerPropertyEditorCollectionDataSource');
-		const treeExtensions = umbExtensionsRegistry.getByType('pickerPropertyEditorTreeDataSource');
-		const extensions = [...collectionExtensions, ...treeExtensions];
+		const extensions = umbExtensionsRegistry.getByType('propertyEditorDataSource');
 
 		const items: Array<UmbPropertyEditorDataSourceItemModel> = extensions
 			.filter((manifest) => uniques.includes(manifest.alias))
