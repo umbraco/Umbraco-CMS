@@ -34,26 +34,15 @@ export class UmbMediaPickerPropertyEditorDataSource
 	}
 
 	requestTreeRootItems(args: UmbTreeRootItemsRequestArgs) {
-		return this.#tree.requestTreeRootItems({
-			skip: args.skip,
-			take: args.take,
-			paging: args.paging,
-			foldersOnly: args.foldersOnly,
-		});
+		return this.#tree.requestTreeRootItems(args);
 	}
 
 	requestTreeItemsOf(args: UmbTreeChildrenOfRequestArgs) {
-		return this.#tree.requestTreeItemsOf({
-			parent: args.parent,
-			skip: args.skip,
-			take: args.take,
-			paging: args.paging,
-			foldersOnly: args.foldersOnly,
-		});
+		return this.#tree.requestTreeItemsOf(args);
 	}
 
 	requestTreeItemAncestors(args: UmbTreeAncestorsOfRequestArgs) {
-		return this.#tree.requestTreeItemAncestors({ treeItem: args.treeItem });
+		return this.#tree.requestTreeItemAncestors(args);
 	}
 
 	requestItems(uniques: Array<string>) {

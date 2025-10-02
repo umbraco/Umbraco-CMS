@@ -20,7 +20,7 @@ export class UmbWebhookPickerPropertyEditorDataSource
 	}
 
 	requestCollection(args: UmbCollectionFilterModel) {
-		return this.#collection.requestCollection({ skip: args.skip, take: args.take });
+		return this.#collection.requestCollection(args);
 	}
 
 	requestItems(uniques: Array<string>) {
