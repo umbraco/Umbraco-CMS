@@ -10,4 +10,10 @@ public interface IDistributedJobRepository
     /// </summary>
     /// <returns></returns>
     string? GetRunnableJob();
+
+    /// <summary>
+    /// Finishes the job by marking the IsRunning column false and updating LastRun and LastAttemptedRun columns.
+    /// </summary>
+    /// <param name="jobName"></param>
+    void FinishJob(string jobName);
 }

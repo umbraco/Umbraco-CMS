@@ -21,11 +21,48 @@ public class DistributedJobRepository(IScopeAccessor scopeAccessor) : IDistribut
         Sql<ISqlContext> sql = scopeAccessor.AmbientScope.SqlContext.Sql()
             .Select<DistributedJobDto>()
             .From<DistributedJobDto>()
-            .Where("lastRun + period < @0", cutoffTicks);
+            .Where("lastRun + period < @0", cutoffTicks)
+            .Where<DistributedJobDto>(x => x.IsRunning == false);
 
-        DistributedJobDto? job = scopeAccessor.AmbientScope.Database.FirstOrDefault<DistributedJobDto>(sql);
+        IUmbracoDatabase database = scopeAccessor.AmbientScope.Database;
+        DistributedJobDto? job = database.FirstOrDefault<DistributedJobDto>(sql);
+
+        if (job is not null)
+        {
+            job.LastAttemptedRun = DateTime.UtcNow;
+            job.IsRunning = true;
+            database.Update(job);
+        }
 
 
         return job?.Name;
+    }
+
+    /// <inheritdoc />
+    public void FinishJob(string jobName)
+    {
+        if (scopeAccessor.AmbientScope is null)
+        {
+            return;
+        }
+
+        Sql<ISqlContext> sql = scopeAccessor.AmbientScope.SqlContext.Sql()
+            .Select<DistributedJobDto>()
+            .From<DistributedJobDto>()
+            .Where<DistributedJobDto>(x => x.Name == jobName);
+
+        IUmbracoDatabase database = scopeAccessor.AmbientScope.Database;
+        DistributedJobDto? job = database.FirstOrDefault<DistributedJobDto>(sql);
+
+        if (job is null)
+        {
+            return;
+        }
+
+        DateTime currentDateTime = DateTime.UtcNow;
+        job.LastAttemptedRun = currentDateTime;
+        job.LastRun = currentDateTime;
+        job.IsRunning = false;
+        database.Update(job);
     }
 }

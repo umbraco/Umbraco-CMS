@@ -84,6 +84,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.TryAddTransient<IReservedFieldNamesService, ReservedFieldNamesService>();
         builder.Services.AddUnique<IContentSearchService, ContentSearchService>();
         builder.Services.AddUnique<IMediaSearchService, MediaSearchService>();
+        builder.Services.AddUnique<IDistributedJobService, DistributedJobService>();
 
         return builder;
     }

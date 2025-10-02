@@ -6,7 +6,7 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey("key", AutoIncrement = false)]
+[PrimaryKey("id", AutoIncrement = true)]
 [ExplicitColumns]
 internal sealed class DistributedJobDto
 {
@@ -26,4 +26,11 @@ internal sealed class DistributedJobDto
 
     [Column("period")]
     public long Period { get; set; }
+
+    [Column("IsRunning")]
+    public bool IsRunning { get; set; }
+
+    [Column("lastAttemptedRun")]
+    [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
+    public DateTime LastAttemptedRun { get; set; }
 }

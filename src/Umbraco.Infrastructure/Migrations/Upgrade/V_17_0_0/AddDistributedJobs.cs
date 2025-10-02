@@ -27,7 +27,7 @@ public class AddDistributedJobs : AsyncMigrationBase
 
         foreach (IDistributedBackgroundJob distributedJob in _distributedBackgroundJobs)
         {
-            Database.Insert(Constants.DatabaseSchema.Tables.DistributedJob, "id", true, new DistributedJobDto { Name = distributedJob.Name, Period = distributedJob.Period.Ticks, LastRun = DateTime.UtcNow });
+            Database.Insert(Constants.DatabaseSchema.Tables.DistributedJob, "id", true, new DistributedJobDto { Name = distributedJob.Name, Period = distributedJob.Period.Ticks, LastRun = DateTime.UtcNow, IsRunning = false, LastAttemptedRun = DateTime.UtcNow});
         }
 
         return Task.CompletedTask;

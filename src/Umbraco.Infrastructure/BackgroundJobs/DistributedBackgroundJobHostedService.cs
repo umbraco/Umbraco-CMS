@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Infrastructure.Persistence.Repositories;
+using Umbraco.Cms.Infrastructure.Services;
 
 namespace Umbraco.Cms.Infrastructure.BackgroundJobs;
 
@@ -14,22 +14,27 @@ public class DistributedBackgroundJobHostedService : BackgroundService
 {
     private readonly ILogger<DistributedBackgroundJobHostedService> _logger;
     private readonly IRuntimeState _runtimeState;
-    private readonly IDistributedJobRepository _distributedJobRepository;
+    private readonly IDistributedJobService _distributedJobService;
     private readonly IEnumerable<IDistributedBackgroundJob> _distributedBackgroundJobs;
-    private readonly ICoreScopeProvider _coreScopeProvider;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DistributedBackgroundJobHostedService"/> class.
+    /// </summary>
+    /// <param name="logger"></param>
+    /// <param name="runtimeState"></param>
+    /// <param name="distributedJobService"></param>
+    /// <param name="distributedBackgroundJobs"></param>
+    /// <param name="coreScopeProvider"></param>
     public DistributedBackgroundJobHostedService(
         ILogger<DistributedBackgroundJobHostedService> logger,
         IRuntimeState runtimeState,
-        IDistributedJobRepository distributedJobRepository,
-        IEnumerable<IDistributedBackgroundJob> distributedBackgroundJobs,
-        ICoreScopeProvider coreScopeProvider)
+        IDistributedJobService distributedJobService,
+        IEnumerable<IDistributedBackgroundJob> distributedBackgroundJobs)
     {
         _logger = logger;
         _runtimeState = runtimeState;
-        _distributedJobRepository = distributedJobRepository;
+        _distributedJobService = distributedJobService;
         _distributedBackgroundJobs = distributedBackgroundJobs;
-        _coreScopeProvider = coreScopeProvider;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -40,7 +45,7 @@ public class DistributedBackgroundJobHostedService : BackgroundService
         {
             while (await timer.WaitForNextTickAsync(stoppingToken))
             {
-                await DoWork();
+                await RunRunnableJob();
             }
         }
         catch (OperationCanceledException)
@@ -49,7 +54,7 @@ public class DistributedBackgroundJobHostedService : BackgroundService
         }
     }
 
-    private async Task DoWork()
+    private async Task RunRunnableJob()
     {
         // Do not run distributed jobs if we aren't in Run level, as we might not have booted properly.
         if(_runtimeState.Level != RuntimeLevel.Run)
@@ -57,11 +62,7 @@ public class DistributedBackgroundJobHostedService : BackgroundService
             return;
         }
 
-
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
-
-
-        var jobName = _distributedJobRepository.GetRunnableJob();
+        var jobName = await _distributedJobService.TryTakeRunnableJobAsync();
 
         if (jobName is null)
         {
@@ -81,6 +82,6 @@ public class DistributedBackgroundJobHostedService : BackgroundService
 
         await job.RunJobAsync();
 
-        scope.Complete();
+        await _distributedJobService.FinishJobAsync(job.Name);
     }
 }
