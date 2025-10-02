@@ -12,7 +12,8 @@ export const imagingHandlers = [
 
 		const response: GetImagingResizeUrlsResponse = media.map((item) => ({
 			id: item.id,
-			urlInfos: item.urls,
+			// TODO: Figure out where to populate the `urlInfos` array, as the server's `MediaResponseModel` removed the deprecated `urls` property. [LK]
+			urlInfos: [], // item.urls,
 		}));
 
 		return res(

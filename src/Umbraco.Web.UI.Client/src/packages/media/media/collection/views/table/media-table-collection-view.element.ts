@@ -1,10 +1,10 @@
 import { UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN } from '../../../paths.js';
-import type { UmbMediaCollectionFilterModel, UmbMediaCollectionItemModel } from '../../types.js';
+import type { UmbMediaCollectionItemModel } from '../../types.js';
 import { UMB_MEDIA_COLLECTION_CONTEXT } from '../../media-collection.context-token.js';
 import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbDefaultCollectionContext, UmbCollectionColumnConfiguration } from '@umbraco-cms/backoffice/collection';
+import type { UmbCollectionColumnConfiguration } from '@umbraco-cms/backoffice/collection';
 import type {
 	UmbTableColumn,
 	UmbTableConfig,
@@ -52,7 +52,7 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 	@state()
 	private _selection: Array<string> = [];
 
-	#collectionContext?: UmbDefaultCollectionContext<UmbMediaCollectionItemModel, UmbMediaCollectionFilterModel>;
+	#collectionContext?: typeof UMB_MEDIA_COLLECTION_CONTEXT.TYPE;
 
 	constructor() {
 		super();

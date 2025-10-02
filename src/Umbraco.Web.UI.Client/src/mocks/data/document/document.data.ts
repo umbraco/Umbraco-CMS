@@ -11,7 +11,6 @@ export type UmbMockDocumentModel = DocumentResponseModel & DocumentTreeItemRespo
 export const data: Array<UmbMockDocumentModel> = [
 	{
 		ancestors: [],
-		urls: [],
 		template: null,
 		id: 'the-simplest-document-id',
 		createDate: '2023-02-06T15:32:05.350038',
@@ -50,12 +49,6 @@ export const data: Array<UmbMockDocumentModel> = [
 	},
 	{
 		ancestors: [],
-		urls: [
-			{
-				culture: 'en-US',
-				url: '/',
-			},
-		],
 		template: null,
 		id: 'all-property-editors-document-id',
 		createDate: '2023-02-06T15:32:05.350038',
@@ -677,12 +670,6 @@ export const data: Array<UmbMockDocumentModel> = [
 	},
 	{
 		ancestors: [],
-		urls: [
-			{
-				culture: 'en-US',
-				url: '/',
-			},
-		],
 		template: null,
 		id: 'c05da24d-7740-447b-9cdc-bd8ce2172e38',
 		createDate: '2023-02-06T15:32:05.350038',
@@ -861,7 +848,6 @@ export const data: Array<UmbMockDocumentModel> = [
 	},
 	{
 		ancestors: [],
-		urls: [],
 		template: null,
 		id: 'fd56a0b5-01a0-4da2-b428-52773bfa9cc4',
 		createDate: '2023-02-06T15:32:05.350038',
@@ -949,12 +935,6 @@ export const data: Array<UmbMockDocumentModel> = [
 	},
 	{
 		ancestors: [],
-		urls: [
-			{
-				culture: 'en-US',
-				url: '/',
-			},
-		],
 		template: null,
 		id: 'simple-document-id',
 		createDate: '2023-02-06T15:32:05.350038',
@@ -1001,12 +981,6 @@ export const data: Array<UmbMockDocumentModel> = [
 	},
 	{
 		ancestors: [],
-		urls: [
-			{
-				culture: 'en-US',
-				url: '/',
-			},
-		],
 		template: null,
 		id: 'all-rtes-id',
 		createDate: '2023-02-06T15:32:05.350038',
@@ -1071,12 +1045,6 @@ export const data: Array<UmbMockDocumentModel> = [
 	},
 	{
 		ancestors: [],
-		urls: [
-			{
-				culture: 'en-US',
-				url: '/',
-			},
-		],
 		template: null,
 		id: 'block-editors-document-id',
 		createDate: '2023-02-06T15:32:05.350038',
@@ -1341,7 +1309,6 @@ export const data: Array<UmbMockDocumentModel> = [
 	},
 	{
 		ancestors: [],
-		urls: [],
 		template: null,
 		id: 'forbidden',
 		createDate: '2023-02-06T15:32:05.350038',
