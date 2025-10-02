@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Web;
@@ -39,6 +40,9 @@ public class AliasUrlProvider : IUrlProvider
 
         requestConfig.OnChange(x => _requestConfig = x);
     }
+
+    /// <inheritdoc />
+    public string Alias => $"{Constants.UrlProviders.Content}ByAlias";
 
     // note - at the moment we seem to accept pretty much anything as an alias
     // without any form of validation ... could even prob. kill the XPath ...
@@ -120,7 +124,7 @@ public class AliasUrlProvider : IUrlProvider
             {
                 var path = "/" + alias;
                 var uri = new Uri(path, UriKind.Relative);
-                yield return UrlInfo.Url(_uriUtility.UriFromUmbraco(uri, _requestConfig).ToString());
+                yield return UrlInfo.FromUri(_uriUtility.UriFromUmbraco(uri, _requestConfig), Alias);
             }
         }
         else
@@ -152,13 +156,19 @@ public class AliasUrlProvider : IUrlProvider
                 {
                     var path = "/" + alias;
                     var uri = new Uri(CombinePaths(domainUri.Uri.GetLeftPart(UriPartial.Authority), path));
-                    yield return UrlInfo.Url(
-                        _uriUtility.UriFromUmbraco(uri, _requestConfig).ToString(),
-                        domainUri.Culture);
+                    yield return UrlInfo.FromUri(_uriUtility.UriFromUmbraco(uri, _requestConfig), Alias, domainUri.Culture);
                 }
             }
         }
     }
+
+    #endregion
+
+    #region GetPreviewUrl
+
+    /// <inheritdoc />
+    public Task<UrlInfo?> GetPreviewUrlAsync(IContent content, string? culture, string? segment)
+        => Task.FromResult<UrlInfo?>(null);
 
     #endregion
 

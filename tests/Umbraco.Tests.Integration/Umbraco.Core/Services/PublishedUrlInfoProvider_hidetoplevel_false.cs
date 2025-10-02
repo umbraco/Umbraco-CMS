@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -35,11 +36,13 @@ internal sealed class PublishedUrlInfoProvider_hidetoplevel_false : PublishedUrl
         var childOfSecondRootUrls = await PublishedUrlInfoProvider.GetAllAsync(childOfSecondRoot);
 
         Assert.AreEqual(1, subPageUrls.Count);
-        Assert.IsTrue(subPageUrls.First().IsUrl);
-        Assert.AreEqual("/textpage/text-page-1/", subPageUrls.First().Text);
+        Assert.IsNotNull(subPageUrls.First().Url);
+        Assert.AreEqual("/textpage/text-page-1/", subPageUrls.First().Url!.ToString());
+        Assert.AreEqual(Constants.UrlProviders.Content, subPageUrls.First().Provider);
 
         Assert.AreEqual(1, childOfSecondRootUrls.Count);
-        Assert.IsTrue(childOfSecondRootUrls.First().IsUrl);
-        Assert.AreEqual("/second-root/text-page-1/", childOfSecondRootUrls.First().Text);
+        Assert.IsNotNull(childOfSecondRootUrls.First().Url);
+        Assert.AreEqual("/second-root/text-page-1/", childOfSecondRootUrls.First().Url!.ToString());
+        Assert.AreEqual(Constants.UrlProviders.Content, childOfSecondRootUrls.First().Provider);
     }
 }

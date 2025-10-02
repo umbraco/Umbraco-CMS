@@ -4,8 +4,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Web;
@@ -16,6 +16,7 @@ namespace Umbraco.Cms.Core.Routing;
 /// <summary>
 ///     Provides urls.
 /// </summary>
+[Obsolete("Use NewDefaultUrlProvider instead. Scheduled for removal in V18.")]
 public class DefaultUrlProvider : IUrlProvider
 {
     private readonly ILocalizationService _localizationService;
@@ -75,6 +76,9 @@ public class DefaultUrlProvider : IUrlProvider
         StaticServiceProvider.Instance.GetRequiredService<IPublishedUrlProvider>())
     {
     }
+
+    /// <inheritdoc />
+    public string Alias => $"{Constants.UrlProviders.Content}Legacy";
 
     #region GetOtherUrls
 
@@ -136,7 +140,7 @@ public class DefaultUrlProvider : IUrlProvider
 
             var uri = new Uri(CombinePaths(d.Uri.GetLeftPart(UriPartial.Path), path));
             uri = _uriUtility.UriFromUmbraco(uri, _requestSettings);
-            yield return UrlInfo.Url(uri.ToString(), culture);
+            yield return UrlInfo.FromUri(uri, Alias, culture);
         }
     }
 
@@ -196,12 +200,20 @@ public class DefaultUrlProvider : IUrlProvider
         if (domainUri is not null || string.IsNullOrEmpty(culture) ||
             culture.Equals(defaultCulture, StringComparison.InvariantCultureIgnoreCase))
         {
-            var url = AssembleUrl(domainUri, path, current, mode).ToString();
-            return UrlInfo.Url(url, culture);
+            Uri url = AssembleUrl(domainUri, path, current, mode);
+            return UrlInfo.FromUri(url, Alias, culture);
         }
 
         return null;
     }
+
+    #endregion
+
+    #region GetPreviewUrl
+
+    /// <inheritdoc />
+    public Task<UrlInfo?> GetPreviewUrlAsync(IContent content, string? culture, string? segment)
+        => Task.FromResult<UrlInfo?>(null);
 
     #endregion
 

@@ -39,7 +39,7 @@ public class DefaultMediaUrlProvider : IMediaUrlProvider
         if (_mediaPathGenerators.TryGetMediaPath(propType?.EditorAlias, value, out var path))
         {
             Uri url = _urlAssembler.AssembleUrl(path!, current, mode);
-            return UrlInfo.Url(url.ToString(), culture);
+            return UrlInfo.FromUri(url, Constants.UrlProviders.Media, culture);
         }
 
         return null;
