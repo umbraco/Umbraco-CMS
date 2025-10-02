@@ -67,7 +67,7 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 						.propertyEditorUiAlias=${this._propertyEditorUiAlias}
 						.propertyEditorUiIcon=${this._propertyEditorUiIcon}
 						.propertyEditorSchemaAlias=${this._propertyEditorSchemaAlias}
-						${umbBindToValidation(this)}>
+						${umbBindToValidation(this, '$.editorUiAlias', this._propertyEditorUiAlias)}>
 					</umb-data-type-details-workspace-property-editor-picker>
 				</umb-property-layout>
 			</uui-box>
