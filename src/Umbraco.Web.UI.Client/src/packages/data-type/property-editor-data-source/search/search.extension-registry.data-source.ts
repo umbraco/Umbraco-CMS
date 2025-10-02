@@ -25,11 +25,14 @@ export class UmbPropertyEditorDataSourceSearchExtensionRegistryDataSource
 			return true;
 		});
 
+		const lowerCaseQuery = args.query.toLowerCase();
+
 		// Simple filter by name or alias
 		const filteredExtensions = extensionsWithAllowedDataSourceTypes.filter(
 			(item) =>
-				item.name.toLowerCase().includes(args.query.toLowerCase()) ||
-				item.alias.toLowerCase().includes(args.query.toLowerCase()),
+				item.meta.label.toLowerCase().includes(lowerCaseQuery) ||
+				item.name.toLowerCase().includes(lowerCaseQuery) ||
+				item.alias.toLowerCase().includes(lowerCaseQuery),
 		);
 
 		const items: UmbPropertyEditorDataSourceItemModel[] = filteredExtensions.map((extension) => ({
