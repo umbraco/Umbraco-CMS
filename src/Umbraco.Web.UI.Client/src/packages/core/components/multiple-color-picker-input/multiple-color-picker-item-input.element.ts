@@ -149,7 +149,7 @@ export class UmbMultipleColorPickerItemInputElement extends UUIFormControlMixin(
 		return html`
 			<umb-form-validation-message id="validation-message" @invalid=${this.#onInvalid} @valid=${this.#onValid}>
 				<div id="item">
-					${this.disabled || this.readonly ? nothing : html`<uui-icon name="icon-grip"></uui-icon>`}
+					${this.disabled || this.readonly ? nothing : html`<uui-icon name="icon-grip" class="handle"></uui-icon>`}
 					<div class="color-wrapper">
 						<uui-input
 							id="input"
@@ -248,6 +248,14 @@ export class UmbMultipleColorPickerItemInputElement extends UUIFormControlMixin(
 				padding: 0;
 				margin: 0;
 				position: absolute;
+			}
+
+			.handle {
+				cursor: grab;
+			}
+
+			.handle:active {
+				cursor: grabbing;
 			}
 		`,
 	];
