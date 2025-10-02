@@ -5,8 +5,10 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
+/// <inheritdoc />
 public class DistributedJobRepository(IScopeAccessor scopeAccessor) : IDistributedJobRepository
 {
+    /// <inheritdoc />
     public string? GetRunnableJob()
     {
         if (scopeAccessor.AmbientScope is null)
@@ -14,12 +16,16 @@ public class DistributedJobRepository(IScopeAccessor scopeAccessor) : IDistribut
             return null;
         }
 
+        long cutoffTicks = DateTimeOffset.Now.Ticks;
+
         Sql<ISqlContext> sql = scopeAccessor.AmbientScope.SqlContext.Sql()
             .Select<DistributedJobDto>()
             .From<DistributedJobDto>()
-            .Where<DistributedJobDto>(x => x.LastRun > DateTime.Now.AddMinutes(-5));
+            .Where("lastRun + period < @0", cutoffTicks);
+
+        DistributedJobDto? job = scopeAccessor.AmbientScope.Database.FirstOrDefault<DistributedJobDto>(sql);
 
 
-        return null;
+        return job?.Name;
     }
 }
