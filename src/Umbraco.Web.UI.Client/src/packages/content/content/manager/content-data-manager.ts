@@ -89,6 +89,7 @@ export class UmbContentWorkspaceDataManager<
 		const currentData = this.getCurrent();
 		if (!currentData) throw new Error('Data is missing');
 
+		// If varies by segment:
 		if (!variantId.isSegmentInvariant()) {
 			// The server requires a segment name. It doesn't matter what it is as long as it is not empty. The server will overwrite it with the name of the default.
 			update = { ...update, name: 'Segment' } as ModelVariantType;
