@@ -2681,6 +2681,8 @@ export default {
 		pickSpecificAllowance: 'Pick group or Block',
 		allowanceMinimum: 'Set a minimum requirement',
 		allowanceMaximum: 'Set a maximum requirement',
+		rangeAllowed: 'Number of blocks',
+		specifiedAllowance: 'Allowed block types',
 		block: 'Block',
 		tabBlock: 'Block',
 		tabBlockTypeSettings: 'Settings',
