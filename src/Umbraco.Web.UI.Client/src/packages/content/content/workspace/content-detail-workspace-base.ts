@@ -28,6 +28,7 @@ import {
 } from '@umbraco-cms/backoffice/entity-action';
 import { UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
 import {
+	UmbPropertyValueFlatMapperController,
 	UmbPropertyValuePresetVariantBuilderController,
 	UmbVariantPropertyGuardManager,
 } from '@umbraco-cms/backoffice/property';
@@ -287,7 +288,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 				if (variesByCulture && variesBySegment) {
 					return languages.flatMap((language) => {
 						const culture = {
-							variant: variants.find((x) => x.culture === language.unique),
+							variant: variants.find((x) => x.culture === language.unique && x.segment === null),
 							language,
 							culture: language.unique,
 							segment: null,
@@ -496,10 +497,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	 * @memberof UmbContentDetailWorkspaceContextBase
 	 */
 	public setName(name: string, variantId?: UmbVariantId): void {
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
-		// TODO: fix type error
-		this._data.updateVariantData(variantId ?? UmbVariantId.CreateInvariant(), { name });
+		this._data.updateVariantData(variantId ?? UmbVariantId.CreateInvariant(), { name } as Partial<VariantModelType>);
 	}
 
 	/**
@@ -661,49 +659,65 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 		const currentData = this.getData();
 		if (currentData) {
-			const values = appendToFrozenArray(
+			const values: DetailModelType['values'] = appendToFrozenArray(
 				currentData.values ?? [],
 				entry,
 				(x) => x.alias === alias && variantId!.compare(x),
 			);
 
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-ignore
-			// TODO: fix type error
-			this._data.updateCurrent({ values });
-		}
+			this.#ensureVariantsExistsForProperty(variantId, entry);
 
-		await this.#ensureVariantsExistsForPropertyValue(property, variantId, value);
+			this._data.updateCurrent({ values } as Partial<DetailModelType>);
+		}
 
 		this.finishPropertyValueChange();
 	}
 
-	async #ensureVariantsExistsForPropertyValue(property: UmbPropertyTypeModel, variantId: UmbVariantId, value: unknown) {
+	async #ensureVariantsExistsForProperty(variantId: UmbVariantId, entry: UmbElementValueModel) {
 		// TODO: Implement queueing of these operations to ensure this does not execute too often. [NL]
 
+		const cultureOptions = await firstValueFrom(this.variantOptions);
+		let valueVariantIds: Array<UmbVariantId> = [];
+
 		// Find inner values to determine if any of this holds variants that needs to be created.
-		if (variantId.isInvariant() && typeof value === 'object' && value !== null) {
-			// TODO: Use the property value flat mapper to run through values to capture variant ids. [NL]
+		if (variantId.isInvariant() && entry.value) {
+			valueVariantIds = await new UmbPropertyValueFlatMapperController(this).flatMap(entry, (property) => {
+				return UmbVariantId.CreateFromPartial(property);
+			});
 		}
 
+		valueVariantIds.push(variantId);
 		/**
 		 * Handling of Not-Culture but Segment variant properties: [NL]
 		 * We need to ensure variant-entries across all culture variants for the given segment variant, when er property is configured to vary by segment but not culture.
 		 * This is the only different case, in all other cases its fine to just target the given variant.
 		 */
-		if (this.getVariesByCulture() && property.variesByCulture === false && property.variesBySegment === true) {
-			// get all culture options:
-			const cultureOptions = await firstValueFrom(this.variantOptions);
-			for (const cultureOption of cultureOptions) {
-				if (cultureOption.segment === variantId.segment) {
-					this._data.ensureVariantData(UmbVariantId.Create(cultureOption));
+		let variantOptionsToCheck: Array<UmbVariantId> = [];
+		for (const variant of valueVariantIds) {
+			// If a non-culture but segmented value, then spread across all cultures for the given segment:
+			if (this.getVariesByCulture() && variant.culture === null && variant.segment !== null) {
+				// get all culture options:
+				for (const cultureOption of cultureOptions) {
+					if (cultureOption.segment === variant.segment) {
+						variantOptionsToCheck.push(UmbVariantId.Create(cultureOption));
+					}
 				}
+				// If a non-segmented but culture-variant value, then spread across all segments for the given culture:
 			}
-		} else {
-			// otherwise we know the property variant-id will be matching with a variant:
-			this._data.ensureVariantData(variantId);
+			if (this.getVariesBySegment() && variant.culture !== null && variant.segment === null) {
+				// get all culture options:
+				for (const cultureOption of cultureOptions) {
+					if (cultureOption.culture === variant.culture) {
+						variantOptionsToCheck.push(UmbVariantId.Create(cultureOption));
+					}
+				}
+			} else if (cultureOptions.some((x) => variant.compare(x))) {
+				// otherwise we can parse the variant-id on:
+				variantOptionsToCheck.push(variant);
+			}
 		}
-		// TODO: Make one method to ensure multiple variants, in order to gather the update into one operation. [NL]
+
+		this._data.ensureVariantsData(variantOptionsToCheck);
 	}
 
 	public initiatePropertyValueChange() {
