@@ -1,3 +1,4 @@
+import { UMB_ENTITY_DATA_PICKER_DATA_SOURCE_API_CONTEXT } from '../input/entity-data-picker-data-source.context.token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
@@ -9,42 +10,45 @@ import type {
 } from '@umbraco-cms/backoffice/tree';
 
 export class UmbEntityDataPickerTreeRepository extends UmbRepositoryBase implements UmbTreeRepository, UmbApi {
-	#treeRepository?: UmbTreeRepository;
-
 	#init: Promise<[any]>;
+	#pickerDataSourceContext?: typeof UMB_ENTITY_DATA_PICKER_DATA_SOURCE_API_CONTEXT.TYPE;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
 
 		this.#init = Promise.all([
-			this.consumeContext('testy', (instance) => {
-				this.#treeRepository = instance?.tree;
+			this.consumeContext(UMB_ENTITY_DATA_PICKER_DATA_SOURCE_API_CONTEXT, (context) => {
+				this.#pickerDataSourceContext = context;
 			}).asPromise(),
 		]);
 	}
 
 	async requestTreeRoot() {
 		await this.#init;
-		if (!this.#treeRepository) throw new Error('No tree repository set');
-		return this.#treeRepository.requestTreeRoot();
+		const api = this.#pickerDataSourceContext?.getDataSourceApi();
+		if (!api) throw new Error('No data source API set');
+		return api.requestTreeRoot({});
 	}
 
 	async requestTreeRootItems(args: UmbTreeRootItemsRequestArgs) {
 		await this.#init;
-		if (!this.#treeRepository) throw new Error('No tree repository set');
-		return this.#treeRepository.requestTreeRootItems(args);
+		const api = this.#pickerDataSourceContext?.getDataSourceApi();
+		if (!api) throw new Error('No data source API set');
+		return api.requestTreeRootItems(args);
 	}
 
 	async requestTreeItemsOf(args: UmbTreeChildrenOfRequestArgs) {
 		await this.#init;
-		if (!this.#treeRepository) throw new Error('No tree repository set');
-		return this.#treeRepository.requestTreeItemsOf(args);
+		const api = this.#pickerDataSourceContext?.getDataSourceApi();
+		if (!api) throw new Error('No data source API set');
+		return api.requestTreeItemsOf(args);
 	}
 
 	async requestTreeItemAncestors(args: UmbTreeAncestorsOfRequestArgs) {
 		await this.#init;
-		if (!this.#treeRepository) throw new Error('No tree repository set');
-		return this.#treeRepository.requestTreeItemAncestors(args);
+		const api = this.#pickerDataSourceContext?.getDataSourceApi();
+		if (!api) throw new Error('No data source API set');
+		return api.requestTreeItemAncestors(args);
 	}
 
 	/**
@@ -53,8 +57,9 @@ export class UmbEntityDataPickerTreeRepository extends UmbRepositoryBase impleme
 	 */
 	async rootTreeItems() {
 		await this.#init;
-		if (!this.#treeRepository) throw new Error('No tree repository set');
-		return this.#treeRepository?.rootTreeItems();
+		const api = this.#pickerDataSourceContext?.getDataSourceApi();
+		if (!api) throw new Error('No data source API set');
+		return [];
 	}
 
 	/**
@@ -63,13 +68,9 @@ export class UmbEntityDataPickerTreeRepository extends UmbRepositoryBase impleme
 	 */
 	async treeItemsOf() {
 		await this.#init;
-		if (!this.#treeRepository) throw new Error('No tree repository set');
-		return this.#treeRepository?.treeItemsOf();
-	}
-
-	override destroy(): void {
-		this.#treeRepository = undefined;
-		super.destroy();
+		const api = this.#pickerDataSourceContext?.getDataSourceApi();
+		if (!api) throw new Error('No data source API set');
+		return [];
 	}
 }
 

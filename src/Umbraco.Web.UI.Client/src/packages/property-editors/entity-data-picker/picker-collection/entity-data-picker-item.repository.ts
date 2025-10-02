@@ -1,3 +1,4 @@
+import { UMB_ENTITY_DATA_PICKER_DATA_SOURCE_API_CONTEXT } from '../input/entity-data-picker-data-source.context.token.js';
 import type { UmbCollectionFilterModel, UmbCollectionRepository } from '@umbraco-cms/backoffice/collection';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
@@ -7,28 +8,24 @@ export class UmbEntityDataPickerCollectionRepository
 	extends UmbRepositoryBase
 	implements UmbCollectionRepository, UmbApi
 {
-	#collectionRepository?: UmbCollectionRepository;
 	#init: Promise<[any]>;
+	#pickerDataSourceContext?: typeof UMB_ENTITY_DATA_PICKER_DATA_SOURCE_API_CONTEXT.TYPE;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
 
 		this.#init = Promise.all([
-			this.consumeContext('testy', (instance) => {
-				this.#collectionRepository = instance?.collection;
+			this.consumeContext(UMB_ENTITY_DATA_PICKER_DATA_SOURCE_API_CONTEXT, (context) => {
+				this.#pickerDataSourceContext = context;
 			}).asPromise(),
 		]);
 	}
 
 	async requestCollection(filter: UmbCollectionFilterModel) {
 		await this.#init;
-		if (!this.#collectionRepository) throw new Error('No collection repository set');
-		return this.#collectionRepository.requestCollection(filter);
-	}
-
-	override destroy(): void {
-		this.#collectionRepository = undefined;
-		super.destroy();
+		const api = this.#pickerDataSourceContext?.getDataSourceApi();
+		if (!api) throw new Error('No data source API set');
+		return api.requestCollection(filter);
 	}
 }
 

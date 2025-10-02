@@ -1,13 +1,14 @@
-import { UMB_ENTITY_DATA_PICKER_COLLECTION_MENU_ALIAS } from './constants.js';
-
-const collectionRepositoryAlias = 'Umb.Repository.EntityDataPickerCollection';
+import {
+	UMB_ENTITY_DATA_PICKER_COLLECTION_MENU_ALIAS,
+	UMB_ENTITY_DATA_PICKER_COLLECTION_REPOSITORY_ALIAS,
+} from './constants.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'repository',
-		alias: collectionRepositoryAlias,
+		alias: UMB_ENTITY_DATA_PICKER_COLLECTION_REPOSITORY_ALIAS,
 		name: 'Entity Data Picker Collection Repository',
-		api: () => import('./entity-data-picker-collection.repository.js'),
+		api: () => import('./entity-data-picker-item.repository.js'),
 	},
 	{
 		type: 'collectionMenu',
@@ -15,7 +16,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		alias: UMB_ENTITY_DATA_PICKER_COLLECTION_MENU_ALIAS,
 		name: 'Entity Data Picker Collection Menu',
 		meta: {
-			collectionRepositoryAlias,
+			collectionRepositoryAlias: UMB_ENTITY_DATA_PICKER_COLLECTION_REPOSITORY_ALIAS,
 		},
 	},
 ];

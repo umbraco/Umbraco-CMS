@@ -1,25 +1,32 @@
-import type { UmbCollectionRepository } from '@umbraco-cms/backoffice/collection';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
-import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
-import type { UmbSearchRepository } from '@umbraco-cms/backoffice/search';
-import type { UmbTreeRepository } from '@umbraco-cms/backoffice/tree';
 
 export type * from './picker-property-editor-collection-data-source.extension.js';
 export type * from './picker-property-editor-tree-data-source.extension.js';
 
 // TODO: should these interface be renamed to Repository instead of DataSource?
-export interface UmbPickerPropertyEditorTreeDataSource extends UmbApi {
-	tree: UmbTreeRepository;
+
+export interface UmbPickerPropertyEditorDataSource extends UmbApi {
+	setConfig(config: any): void;
+	getConfig(config: any): any;
+
 	// TODO: Change 'any' to a more specific type
-	item: UmbItemRepository<any>;
-	// TODO: Change 'any' to a more specific type
-	search?: UmbSearchRepository<any>;
+	// Items
+	requestItems(args: any): Promise<any>;
+
+	// Search
+	requestSearch?(args: any): Promise<any>;
 }
 
-export interface UmbPickerPropertyEditorCollectionDataSource extends UmbApi {
-	collection: UmbCollectionRepository;
+export interface UmbPickerPropertyEditorTreeDataSource extends UmbPickerPropertyEditorDataSource, UmbApi {
 	// TODO: Change 'any' to a more specific type
-	item: UmbItemRepository<any>;
-	// TODO: Change 'any' to a more specific type
-	search?: UmbSearchRepository<any>;
+	// Tree
+	requestTreeRoot(args: any): Promise<any>;
+	requestTreeRootItems(args: any): Promise<any>;
+	requestTreeItemsOf(args: any): Promise<any>;
+	requestTreeItemAncestors(args: any): Promise<any>;
+}
+
+export interface UmbPickerPropertyEditorCollectionDataSource extends UmbPickerPropertyEditorDataSource, UmbApi {
+	// Collection
+	requestCollection(args: any): Promise<any>;
 }

@@ -1,7 +1,9 @@
-import type { UmbEntityDataItemModel } from '../types.js';
 import { UMB_ENTITY_DATA_PICKER_COLLECTION_MENU_ALIAS } from '../picker-collection/constants.js';
 import { UMB_ENTITY_DATA_PICKER_TREE_ALIAS } from '../picker-tree/constants.js';
 import { UMB_ENTITY_DATA_PICKER_SEARCH_PROVIDER_ALIAS } from '../picker-search/constants.js';
+import { UMB_ENTITY_DATA_PICKER_ITEM_REPOSITORY_ALIAS } from '../constants.js';
+import type { UmbEntityDataItemModel } from '../picker-item/types.js';
+import { UmbEntityDataPickerDataSourceApiContext } from './entity-data-picker-data-source.context.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import {
 	UMB_COLLECTION_ITEM_PICKER_MODAL_ALIAS,
@@ -36,16 +38,19 @@ type ManifestDataSourceType =
 	| ManifestPickerPropertyEditorCollectionDataSource;
 
 export class UmbEntityDataPickerInputContext extends UmbControllerBase {
-	#itemManager = new UmbRepositoryItemsManager<UmbEntityDataItemModel>(this);
+	#itemManager = new UmbRepositoryItemsManager<UmbEntityDataItemModel>(
+		this,
+		UMB_ENTITY_DATA_PICKER_ITEM_REPOSITORY_ALIAS,
+	);
 	public readonly selection = this.#itemManager.uniques;
 	public readonly selectedItems = this.#itemManager.items;
 	public readonly statuses = this.#itemManager.statuses;
 
 	#dataSourceAlias?: string;
-	#dataSourceConfig?: UmbPropertyEditorConfigCollection;
 	#dataSourceApiInitializer?: UmbExtensionApiInitializer<ManifestDataSourceType>;
 
 	#pickerModalToken?: UmbModalToken<UmbPickerModalData<UmbEntityDataItemModel>, UmbPickerModalValue>;
+	#dataSourceApiContext = new UmbEntityDataPickerDataSourceApiContext(this);
 
 	/**
 	 * Define a minimum amount of selected items in this input, for this input to be valid.
@@ -96,7 +101,7 @@ export class UmbEntityDataPickerInputContext extends UmbControllerBase {
 	 * @memberof UmbEntityDataPickerInputContext
 	 */
 	setDataSourceConfig(config: UmbPropertyEditorConfigCollection | undefined) {
-		this.#dataSourceConfig = config;
+		this.#dataSourceApiContext.setConfig(config);
 	}
 
 	/**
@@ -105,7 +110,7 @@ export class UmbEntityDataPickerInputContext extends UmbControllerBase {
 	 * @memberof UmbEntityDataPickerInputContext
 	 */
 	getDataSourceConfig(): UmbPropertyEditorConfigCollection | undefined {
-		return this.#dataSourceConfig;
+		return this.#dataSourceApiContext.getConfig();
 	}
 
 	getSelection() {
@@ -177,34 +182,33 @@ export class UmbEntityDataPickerInputContext extends UmbControllerBase {
 			[this._host],
 			(permitted, ctrl) => {
 				if (!permitted) {
-					this.#itemManager.setItemRepository(undefined);
+					// TODO: clean up if not permitted
 					return;
 				}
 
-				this.provideContext('testy', ctrl.api);
+				const dataSourceApi = ctrl.api;
+				dataSourceApi.setConfig(this.getDataSourceConfig());
 
-				const itemRepository = ctrl.api.item;
+				this.#dataSourceApiContext.setDataSourceApi(dataSourceApi);
 
-				if (!itemRepository) {
-					console.warn(
-						`The data source with alias ${dataSourceAlias} did not provide an item repository for the picker to use.`,
-					);
-				}
-
-				// TODO: make it possible to also provide an item repository alias
-				this.#itemManager.setItemRepository(itemRepository);
+				// TODO: can we find a better way to check if the api is a tree or collection data source?
+				const isTreeDataSource =
+					typeof dataSourceApi.requestTreeRoot === 'function' && typeof dataSourceApi.requestTreeItemsOf === 'function';
 
 				// Choose the picker type based on what the data source supports
-				if (ctrl.api.tree) {
-					this.#pickerModalToken = this.#createTreeItemPickerModalToken(ctrl.api);
+				if (isTreeDataSource) {
+					this.#pickerModalToken = this.#createTreeItemPickerModalToken(dataSourceApi);
 				} else {
-					this.#pickerModalToken = this.#createCollectionItemPickerModalToken(ctrl.api);
+					this.#pickerModalToken = this.#createCollectionItemPickerModalToken(dataSourceApi);
 				}
 			},
 		);
 	}
 
 	#createTreeItemPickerModalToken(api: UmbPickerPropertyEditorTreeDataSource) {
+		// TODO: can we find a better way to check if the api supports search?
+		const supportsSearch = typeof api.requestSearch === 'function';
+
 		return new UmbModalToken<UmbTreePickerModalData<UmbEntityDataItemModel>, UmbTreePickerModalValue>(
 			UMB_TREE_PICKER_MODAL_ALIAS,
 			{
@@ -215,7 +219,7 @@ export class UmbEntityDataPickerInputContext extends UmbControllerBase {
 				data: {
 					treeAlias: UMB_ENTITY_DATA_PICKER_TREE_ALIAS,
 					expandTreeRoot: true,
-					search: api.search
+					search: supportsSearch
 						? {
 								providerAlias: UMB_ENTITY_DATA_PICKER_SEARCH_PROVIDER_ALIAS,
 							}
@@ -226,6 +230,8 @@ export class UmbEntityDataPickerInputContext extends UmbControllerBase {
 	}
 
 	#createCollectionItemPickerModalToken(api: UmbPickerPropertyEditorTreeDataSource) {
+		const supportsSearch = typeof api.requestSearch === 'function';
+
 		return new UmbModalToken<
 			UmbCollectionItemPickerModalData<UmbEntityDataItemModel>,
 			UmbCollectionItemPickerModalValue
@@ -236,7 +242,7 @@ export class UmbEntityDataPickerInputContext extends UmbControllerBase {
 			},
 			data: {
 				collectionMenuAlias: UMB_ENTITY_DATA_PICKER_COLLECTION_MENU_ALIAS,
-				search: api.search
+				search: supportsSearch
 					? {
 							providerAlias: UMB_ENTITY_DATA_PICKER_SEARCH_PROVIDER_ALIAS,
 						}

@@ -18,9 +18,16 @@ export const manifests: Array<UmbExtensionManifest> = [
 			settings: {
 				properties: [
 					{
-						alias: 'testSetting',
-						label: 'From Document Data Source',
-						propertyEditorUiAlias: 'Umb.PropertyEditorUi.TextBox',
+						alias: 'startNode',
+						label: 'Node type',
+						description: '',
+						propertyEditorUiAlias: 'Umb.PropertyEditorUi.ContentPicker.Source',
+					},
+					{
+						alias: 'filter',
+						label: 'Allow items of type',
+						description: 'Select the applicable types',
+						propertyEditorUiAlias: 'Umb.PropertyEditorUi.ContentPicker.SourceType',
 					},
 				],
 			},

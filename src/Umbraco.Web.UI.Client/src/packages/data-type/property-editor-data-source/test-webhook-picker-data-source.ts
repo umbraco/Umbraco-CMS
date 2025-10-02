@@ -6,8 +6,25 @@ export class UmbWebhookPickerPropertyEditorDataSource
 	extends UmbControllerBase
 	implements UmbPickerPropertyEditorCollectionDataSource
 {
-	collection = new UmbWebhookCollectionRepository(this);
-	item = new UmbWebhookItemRepository(this);
+	#collection = new UmbWebhookCollectionRepository(this);
+	#item = new UmbWebhookItemRepository(this);
+	#config: any;
+
+	setConfig(config: any): void {
+		this.#config = config;
+	}
+
+	getConfig(): any {
+		return this.#config;
+	}
+
+	requestCollection(args: any): Promise<any> {
+		return this.#collection.requestCollection({ skip: args.skip, take: args.take });
+	}
+
+	requestItems(uniques: Array<string>): Promise<any> {
+		return this.#item.requestItems(uniques);
+	}
 }
 
 export { UmbWebhookPickerPropertyEditorDataSource as api };
