@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.ContentEditing.Validation;
@@ -137,7 +138,7 @@ internal abstract class ContentValidationServiceBase<TContentType>
         return invalidCultures.IsCollectionEmpty();
     }
 
-    private async Task<string[]> GetCultureCodes() => (await _languageService.GetAllAsync()).Select(language => language.IsoCode).ToArray();
+    private async Task<string[]> GetCultureCodes() => (await _languageService.GetAllIsoCodesAsync()).ToArray();
 
     private IEnumerable<PropertyValidationError> ValidateProperty(IPropertyType propertyType, PropertyValueModel? propertyValueModel, PropertyValidationContext validationContext)
     {
