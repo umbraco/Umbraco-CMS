@@ -671,26 +671,36 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			// @ts-ignore
 			// TODO: fix type error
 			this._data.updateCurrent({ values });
-
-			/**
-			 * Handling of Not-Culture but Segment variant properties: [NL]
-			 * We need to ensure variant-entries across all culture variants for the given segment variant, when er property is configured to vary by segment but not culture.
-			 * This is the only different case, in all other cases its fine to just target the given variant.
-			 */
-			if (this.getVariesByCulture() && property.variesByCulture === false && property.variesBySegment === true) {
-				// get all culture options:
-				const cultureOptions = await firstValueFrom(this.variantOptions);
-				for (const cultureOption of cultureOptions) {
-					if (cultureOption.segment === variantId.segment) {
-						this._data.ensureVariantData(UmbVariantId.Create(cultureOption));
-					}
-				}
-			} else {
-				// otherwise we know the property variant-id will be matching with a variant:
-				this._data.ensureVariantData(variantId);
-			}
 		}
+
+		await this.#ensureVariantsExistsForPropertyValue(property, variantId, value);
+
 		this.finishPropertyValueChange();
+	}
+
+	async #ensureVariantsExistsForPropertyValue(property: UmbPropertyTypeModel, variantId: UmbVariantId, value: unknown) {
+		// TODO: Implement queueing of these operations to ensure this does not execute too often. [NL]
+
+		// Find inner values to determine if any of this holds variants that needs to be created.
+
+		/**
+		 * Handling of Not-Culture but Segment variant properties: [NL]
+		 * We need to ensure variant-entries across all culture variants for the given segment variant, when er property is configured to vary by segment but not culture.
+		 * This is the only different case, in all other cases its fine to just target the given variant.
+		 */
+		if (this.getVariesByCulture() && property.variesByCulture === false && property.variesBySegment === true) {
+			// get all culture options:
+			const cultureOptions = await firstValueFrom(this.variantOptions);
+			for (const cultureOption of cultureOptions) {
+				if (cultureOption.segment === variantId.segment) {
+					this._data.ensureVariantData(UmbVariantId.Create(cultureOption));
+				}
+			}
+		} else {
+			// otherwise we know the property variant-id will be matching with a variant:
+			this._data.ensureVariantData(variantId);
+		}
+		// TODO: Make one method to ensure multiple variants, in order to gather the update into one operation. [NL]
 	}
 
 	public initiatePropertyValueChange() {
