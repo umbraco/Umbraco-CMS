@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services;
@@ -42,7 +43,7 @@ public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
     public async Task<ISet<UrlInfo>> GetAllAsync(IContent content)
     {
         HashSet<UrlInfo> urlInfos = [];
-        var cultures = (await _languageService.GetAllAsync()).Select(x => x.IsoCode).ToArray();
+        IEnumerable<string> cultures = await _languageService.GetAllIsoCodesAsync();
 
         // First we get the urls of all cultures, using the published router, meaning we respect any extensions.
         foreach (var culture in cultures)
