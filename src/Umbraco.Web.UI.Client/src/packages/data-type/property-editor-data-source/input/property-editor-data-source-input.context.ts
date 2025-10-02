@@ -18,9 +18,6 @@ const modalToken = new UmbModalToken<UmbCollectionItemPickerModalData, UmbCollec
 			type: 'sidebar',
 			size: 'small',
 		},
-		data: {
-			collectionMenuAlias: UMB_PROPERTY_EDITOR_DATA_SOURCE_COLLECTION_MENU_ALIAS,
-		},
 	},
 );
 
@@ -47,22 +44,22 @@ export class UmbPropertyEditorDataSourcePickerInputContext extends UmbPickerInpu
 	override async openPicker(
 		pickerData?: Partial<UmbCollectionItemPickerModalData<UmbPropertyEditorDataSourceItemModel>>,
 	) {
-		const combinedPickerData = {
+		const combinedPickerData: Partial<UmbCollectionItemPickerModalData<UmbPropertyEditorDataSourceItemModel>> = {
 			...pickerData,
-		};
-
-		// set default search data
-		if (!pickerData?.search) {
-			combinedPickerData.search = {
+			collection: {
+				menuAlias: UMB_PROPERTY_EDITOR_DATA_SOURCE_COLLECTION_MENU_ALIAS,
+				filterArgs: {
+					dataSourceTypes: this.getDataSourceTypes(),
+					...pickerData?.collection?.filterArgs,
+				},
+			},
+			search: {
 				providerAlias: UMB_PROPERTY_EDITOR_DATA_SOURCE_SEARCH_PROVIDER_ALIAS,
-				...pickerData?.search,
-			};
-		}
-
-		// pass allowedContentTypes to the search request args
-		combinedPickerData.search!.queryParams = {
-			dataSourceTypes: this.getDataSourceTypes(),
-			...pickerData?.search?.queryParams,
+				queryParams: {
+					dataSourceTypes: this.getDataSourceTypes(),
+					...pickerData?.search?.queryParams,
+				},
+			},
 		};
 
 		await super.openPicker(combinedPickerData);

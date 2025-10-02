@@ -3,7 +3,12 @@ import type { UmbPickerModalData, UmbPickerModalValue } from '@umbraco-cms/backo
 
 export interface UmbCollectionItemPickerModalData<CollectionItemType = UmbEntityModel>
 	extends UmbPickerModalData<CollectionItemType> {
-	collectionMenuAlias?: string;
+	collection: UmbCollectionItemPickerModalCollectionConfig;
+}
+
+export interface UmbCollectionItemPickerModalCollectionConfig<FilterArgsType = Record<string, unknown>> {
+	menuAlias: string;
+	filterArgs?: FilterArgsType;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type

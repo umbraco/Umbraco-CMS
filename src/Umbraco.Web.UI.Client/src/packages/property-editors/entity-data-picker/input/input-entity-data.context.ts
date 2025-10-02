@@ -241,7 +241,9 @@ export class UmbEntityDataPickerInputContext extends UmbControllerBase {
 				size: 'small',
 			},
 			data: {
-				collectionMenuAlias: UMB_ENTITY_DATA_PICKER_COLLECTION_MENU_ALIAS,
+				collection: {
+					menuAlias: UMB_ENTITY_DATA_PICKER_COLLECTION_MENU_ALIAS,
+				},
 				search: supportsSearch
 					? {
 							providerAlias: UMB_ENTITY_DATA_PICKER_SEARCH_PROVIDER_ALIAS,

@@ -14,7 +14,14 @@ export class UmbPropertyEditorDataSourceCollectionExtensionRegistryDataSource
 	async getCollection(args: UmbPropertyEditorDataSourceCollectionFilterModel) {
 		const extensions = umbExtensionsRegistry.getByType('propertyEditorDataSource');
 
-		const filtered = extensions.filter((manifest) =>
+		const extensionsWithAllowedDataSourceTypes = extensions.filter((ext) => {
+			if (args.dataSourceTypes && args.dataSourceTypes.length > 0) {
+				return args.dataSourceTypes.includes(ext.dataSourceType);
+			}
+			return true;
+		});
+
+		const filtered = extensionsWithAllowedDataSourceTypes.filter((manifest) =>
 			manifest.name.toLowerCase().includes(args.filter?.toLowerCase() ?? ''),
 		);
 

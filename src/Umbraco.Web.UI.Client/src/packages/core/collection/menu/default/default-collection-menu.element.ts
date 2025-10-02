@@ -22,6 +22,11 @@ export class UmbDefaultCollectionMenuElement extends UmbLitElement {
 	}
 	public set api(value: UmbDefaultCollectionMenuContext | undefined) {
 		this._api = value;
+
+		if (this._api) {
+			this._api.filterArgs = this.#filterArgs;
+		}
+
 		this.#observeData();
 	}
 
@@ -38,6 +43,19 @@ export class UmbDefaultCollectionMenuElement extends UmbLitElement {
 
 	@property({ attribute: false })
 	filter: (item: UmbCollectionItemModel) => boolean = () => true;
+
+	public get filterArgs(): Record<string, unknown> | undefined {
+		return this.#filterArgs;
+	}
+	public set filterArgs(value: Record<string, unknown> | undefined) {
+		this.#filterArgs = value;
+
+		if (this._api) {
+			this._api.filterArgs = this.#filterArgs;
+		}
+	}
+
+	#filterArgs: Record<string, unknown> | undefined;
 
 	@state()
 	private _items: Array<UmbCollectionItemModel> = [];

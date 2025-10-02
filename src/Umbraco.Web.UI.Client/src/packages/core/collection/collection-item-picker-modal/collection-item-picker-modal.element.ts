@@ -119,9 +119,10 @@ export class UmbCollectionItemPickerModalElement extends UmbModalBaseElement<
 		}
 
 		return html` <umb-collection-menu
-			alias=${ifDefined(this.data?.collectionMenuAlias)}
+			alias=${ifDefined(this.data?.collection?.menuAlias)}
 			.props=${{
 				selectionConfiguration: this._selectionConfiguration,
+				filterArgs: this.data?.collection?.filterArgs,
 				filter: this.data?.filter,
 				selectableFilter: this.data?.pickableFilter,
 			}}

@@ -15,4 +15,6 @@ export interface UmbPropertyEditorDataSourceCollectionItemModel extends UmbColle
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface UmbPropertyEditorDataSourceCollectionFilterModel extends UmbCollectionFilterModel {}
+export interface UmbPropertyEditorDataSourceCollectionFilterModel extends UmbCollectionFilterModel {
+	dataSourceTypes?: Array<string>;
+}

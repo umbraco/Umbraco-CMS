@@ -13,6 +13,7 @@ import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 export class UmbDefaultCollectionMenuContext extends UmbContextBase {
 	public selectableFilter?: (item: UmbCollectionItemModel) => boolean = () => true;
 	public filter?: (item: UmbCollectionItemModel) => boolean = () => true;
+	public filterArgs?: Record<string, unknown>;
 
 	public readonly selection = new UmbSelectionManager(this);
 	public readonly pagination = new UmbPaginationManager();
@@ -86,6 +87,7 @@ export class UmbDefaultCollectionMenuContext extends UmbContextBase {
 		const take = loadMore ? this.#paging.take : this.pagination.getCurrentPageNumber() * this.#paging.take;
 
 		const { data } = await this.#repository!.requestCollection({
+			...this.filterArgs,
 			skip,
 			take,
 		});
