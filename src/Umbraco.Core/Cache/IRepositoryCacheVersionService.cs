@@ -24,5 +24,5 @@ public interface IRepositoryCacheVersionService
     /// <summary>
     /// Registers that the cache has been synced with the database.
     /// </summary>
-    Task SetCachesSyncedAsync();
+    Task SetCachesSyncedAsync(); // TODO: Set caches synced when they are syncde
 }
