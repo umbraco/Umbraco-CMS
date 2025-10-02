@@ -146,7 +146,7 @@ export class UmbMemberWorkspaceContext
 				messages.forEach((message) => {
 					if (this.#hintedMsgs.has(message.key)) return;
 
-					this.hints.addOne({
+					this.view.hints.addOne({
 						unique: message.key,
 						path: [UMB_MEMBER_WORKSPACE_VIEW_MEMBER_ALIAS],
 						text: '!',
@@ -158,7 +158,7 @@ export class UmbMemberWorkspaceContext
 				this.#hintedMsgs.forEach((key) => {
 					if (!messages.some((msg) => msg.key === key)) {
 						this.#hintedMsgs.delete(key);
-						this.hints.removeOne(key);
+						this.view.hints.removeOne(key);
 					}
 				});
 			},

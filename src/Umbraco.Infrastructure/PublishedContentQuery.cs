@@ -144,6 +144,9 @@ public class PublishedContentQuery : IPublishedContentQuery
     public IEnumerable<IPublishedContent> ContentAtRoot()
         => ItemsAtRoot(_publishedContent);
 
+    public IEnumerable<IPublishedContent> ContentAtRoot(string? culture)
+        => ItemsAtRoot(_publishedContent, culture);
+
     #endregion
 
     #region Media
@@ -212,8 +215,8 @@ public class PublishedContentQuery : IPublishedContentQuery
     private IEnumerable<IPublishedContent> ItemsByIds(IPublishedCache? cache, IEnumerable<Guid> ids)
         => ids.Select(eachId => ItemById(eachId, cache)).WhereNotNull();
 
-    private static IEnumerable<IPublishedContent> ItemsAtRoot(IPublishedCache? cache)
-        => cache?.GetAtRoot() ?? Array.Empty<IPublishedContent>();
+    private static IEnumerable<IPublishedContent> ItemsAtRoot(IPublishedCache? cache, string? culture = null)
+        => cache?.GetAtRoot(culture) ?? Array.Empty<IPublishedContent>();
 
     #endregion
 

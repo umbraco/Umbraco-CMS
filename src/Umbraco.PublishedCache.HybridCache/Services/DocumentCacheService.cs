@@ -132,10 +132,8 @@ internal sealed class DocumentCacheService : IDocumentCacheService
             GetEntryOptions(key, preview),
             GenerateTags(key));
 
-        // We don't want to cache removed items, this may cause issues if the L2 serializer changes.
         if (contentCacheNode is null)
         {
-            await _hybridCache.RemoveAsync(cacheKey);
             return null;
         }
 

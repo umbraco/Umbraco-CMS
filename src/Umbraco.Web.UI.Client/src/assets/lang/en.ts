@@ -357,6 +357,9 @@ export default {
 		saveAndPublishModalTitle: 'Save and publish',
 		publishModalTitle: 'Publish',
 		openSplitViewForVariant: (variant: string) => `Open ${variant} in split view`,
+		sharedAcrossCultures: 'Shared across cultures',
+		sharedAcrossSegments: 'Shared across segments',
+		shared: 'Shared',
 	},
 	blueprints: {
 		createBlueprintFrom: "Create a new Document Blueprint from '%0%'",
@@ -2408,6 +2411,7 @@ export default {
 		searchContentTree: 'Search content tree',
 		maxAmount: 'Maximum amount',
 		expandChildItems: 'Expand child items for',
+		collapseChildItems: 'Collapse child items for',
 		openContextNode: 'Open context node for',
 	},
 	references: {
@@ -2595,12 +2599,13 @@ export default {
 		addSettingsElementType: 'Add settings',
 		confirmDeleteBlockTitle: 'Delete %0%?',
 		confirmDeleteBlockMessage: 'Are you sure you want to delete this %0%?',
+		confirmDeleteBlockTypeTitle: 'Delete block configuration?',
 		confirmDeleteBlockTypeMessage: 'Are you sure you want to delete the block configuration <strong>%0%</strong>?',
 		confirmDeleteBlockTypeNotice:
 			'The content of this block will still be present, editing of this content will no longer be available and will be shown as unsupported content.',
 		confirmDeleteBlockGroupTitle: 'Delete group?',
 		confirmDeleteBlockGroupMessage:
-			'Are you sure you want to delete group <strong>%0%</strong> and all the Block configurations of this?',
+			'Are you sure you want to delete group <strong>%0%</strong>?',
 		confirmDeleteBlockGroupNotice:
 			'The content of these Blocks will still be present, editing of this content will no longer be available and will be shown as unsupported content.',
 		blockConfigurationOverlayTitle: "Configuration of '%0%'",

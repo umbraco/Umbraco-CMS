@@ -10,7 +10,8 @@ import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbEntityVariantModel, UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 import type { UUIInputElement, UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
 import type { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import { UMB_HINT_CONTEXT } from '@umbraco-cms/backoffice/hint';
+import type { UmbHint, UmbVariantHint } from '@umbraco-cms/backoffice/hint';
 
 @customElement('umb-workspace-split-view-variant-selector')
 export class UmbWorkspaceSplitViewVariantSelectorElement<
@@ -97,7 +98,34 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 			this.#observeDatasetContext();
 			this.#observeCurrentVariant();
 		});
+
+		this.consumeContext(UMB_HINT_CONTEXT, (context) => {
+			this.observe(
+				context?.descendingHints(),
+				(hints) => {
+					this._hintMap.clear();
+					hints?.forEach((hint) => {
+						if (this.#isVariantHint(hint) && hint.variantId) {
+							// Add the hint if there is no existing hint for this variantId or if the existing hint has a lower weight
+							const existingHint = this._hintMap.get(hint.variantId.toString());
+							if (!existingHint || existingHint.weight < hint.weight) {
+								this._hintMap.set(hint.variantId.toString(), hint);
+							}
+						}
+					});
+					this.requestUpdate('_hintMap');
+				},
+				'umbObserveHints',
+			);
+		});
 	}
+
+	#isVariantHint(hint: UmbHint): hint is UmbVariantHint {
+		return hint && 'variantId' in hint;
+	}
+
+	@state()
+	private _hintMap = new Map<string, UmbVariantHint>();
 
 	async #observeVariants(workspaceContext?: UmbVariantDatasetWorkspaceContext) {
 		this.observe(
@@ -321,6 +349,16 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 	override render() {
 		if (!this._variantId) return nothing;
 
+		let firstHintOnInactiveVariant: UmbVariantHint | undefined;
+
+		if (this._activeVariant) {
+			const hintsOrderedByWeight = Array.from(this._hintMap.values()).sort((a, b) => (b.weight || 0) - (a.weight || 0));
+			firstHintOnInactiveVariant = hintsOrderedByWeight.find((hint) => {
+				if (!hint.variantId) return false;
+				return !hint.variantId.isInvariant() && this.#isVariantActive(hint.variantId) === false;
+			});
+		}
+
 		return html`
 			<uui-input
 				id="name-input"
@@ -350,6 +388,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 								${this.#renderReadOnlyTag(this._activeVariant?.culture)}
 								<uui-symbol-expand .open=${this._variantSelectorOpen}></uui-symbol-expand>
 							</uui-button>
+							${!this._variantSelectorOpen ? this.#renderHintBadge(firstHintOnInactiveVariant) : nothing}
 							${this._activeVariants.length > 1
 								? html`
 										<uui-button slot="append" compact id="variant-close" @click=${this.#closeSplitView}>
@@ -379,8 +418,11 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 		const variantId = UmbVariantId.Create(variantOption);
 		const notCreated = this.#isCreateMode(variantOption, variantId);
 		const subVariantOptions = this.#getSegmentVariantOptionsForCulture(variantOption, variantId);
+		const hint = this._hintMap.get(variantId.toString());
+		const active = this.#isVariantActive(variantId);
+
 		return html`
-			<div class="variant culture-variant ${this.#isVariantActive(variantId) ? 'selected' : ''}">
+			<div class="variant culture-variant ${active ? 'selected' : ''}">
 				${this._variesBySegment && this.#isCreated(variantOption) && subVariantOptions.length > 0
 					? html`<div class="expand-area">${this.#renderExpandToggle(variantId)}</div>`
 					: nothing}
@@ -401,12 +443,19 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 					</div>
 					<div class="specs-info">${this.#getVariantSpecInfo(variantOption)}</div>
 				</button>
-				${this.#renderSplitViewButton(variantOption)}
+				${this.#renderHintBadge(!active ? hint : undefined)} ${this.#renderSplitViewButton(variantOption)}
 			</div>
 			${this.#isVariantExpanded(variantId)
 				? html` ${subVariantOptions.map((option) => this.#renderSegmentVariantOption(option))} `
 				: nothing}
 		`;
+	}
+
+	#renderHintBadge(hint?: UmbVariantHint) {
+		if (!hint) return nothing;
+		return html` <umb-badge slot="append" .color=${hint.color ?? 'default'} ?attention=${hint.color === 'invalid'}
+			>${hint.text}</umb-badge
+		>`;
 	}
 
 	#isCreated(variantOption: VariantOptionModelType) {
@@ -466,7 +515,11 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 			return variantOption?.segmentInfo?.name ?? this._labelDefault;
 		}
 
-		return variantOption.variant?.name ?? variantOption.language.name;
+		if (variantOption.variant?.name && variantOption.variant?.name.trim() !== '') {
+			return variantOption.variant?.name;
+		}
+
+		return variantOption.language.name;
 	}
 
 	#getVariantSpecInfo(variantOption: VariantOptionModelType | undefined) {

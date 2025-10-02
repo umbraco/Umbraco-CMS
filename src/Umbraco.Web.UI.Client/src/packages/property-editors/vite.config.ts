@@ -14,6 +14,7 @@ export default defineConfig({
 			'entry-point': 'entry-point.ts',
 			'umbraco-package': 'umbraco-package.ts',
 			manifests: 'manifests.ts',
+			'content-picker/index': './content-picker/index.ts',
 		},
 	}),
 });

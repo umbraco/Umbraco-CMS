@@ -398,4 +398,35 @@ internal sealed partial class UserServiceCrudTests
         Assert.IsNotNull(updatedUser.StartMediaIds);
         Assert.IsEmpty(updatedUser.StartMediaIds);
     }
+
+    [TestCase(false, false)]
+    [TestCase(true, true)]
+    public async Task Cannot_Remove_Admin_Group_From_Only_Admin_User(bool createAdditionalAdminUser, bool expectSuccess)
+    {
+        var userService = CreateUserService(securitySettings: new SecuritySettings { UsernameIsEmail = false });
+
+        if (createAdditionalAdminUser)
+        {
+            var (updateModel, _) = await CreateUserForUpdate(userService);
+            updateModel.UserGroupKeys = new HashSet<Guid> { Constants.Security.AdminGroupKey };
+            var updateResult = await userService.UpdateAsync(Constants.Security.SuperUserKey, updateModel);
+            Assert.IsTrue(updateResult.Success);
+        }
+
+        var adminUser = await userService.GetAsync(Constants.Security.SuperUserKey);
+        var adminUserUpdateModel = await MapUserToUpdateModel(adminUser);
+        adminUserUpdateModel.Email = "admin@test.com";
+        adminUserUpdateModel.UserGroupKeys = new HashSet<Guid> { Constants.Security.EditorGroupKey };
+        var adminUserUpdateResult = await userService.UpdateAsync(Constants.Security.SuperUserKey, adminUserUpdateModel);
+
+        if (expectSuccess)
+        {
+            Assert.IsTrue(adminUserUpdateResult.Success);
+        }
+        else
+        {
+            Assert.IsFalse(adminUserUpdateResult.Success);
+            Assert.AreEqual(UserOperationStatus.AdminUserGroupMustNotBeEmpty, adminUserUpdateResult.Status);
+        }
+    }
 }

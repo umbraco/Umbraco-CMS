@@ -9,7 +9,12 @@ import type { UmbContentCollectionWorkspaceContext } from '../collection/content
 import type { UmbContentWorkspaceContext } from './content-workspace-context.interface.js';
 import { UmbContentDetailValidationPathTranslator } from './content-detail-validation-path-translator.js';
 import { UmbContentValidationToHintsManager } from './content-validation-to-hints.manager.js';
-import { appendToFrozenArray, mergeObservables, UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
+import {
+	appendToFrozenArray,
+	mergeObservables,
+	observeMultiple,
+	UmbArrayState,
+} from '@umbraco-cms/backoffice/observable-api';
 import { firstValueFrom, map } from '@umbraco-cms/backoffice/external/rxjs';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
@@ -21,7 +26,6 @@ import {
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
-import { UmbHintContext } from '@umbraco-cms/backoffice/hint';
 import { UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
 import {
 	UmbPropertyValuePresetVariantBuilderController,
@@ -52,7 +56,6 @@ import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import type { UmbPropertyTypePresetModel, UmbPropertyTypePresetModelTypeModel } from '@umbraco-cms/backoffice/property';
 import type { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 import type { UmbSegmentCollectionItemModel } from '@umbraco-cms/backoffice/segment';
-import type { UmbVariantHint } from '@umbraco-cms/backoffice/hint';
 
 export interface UmbContentDetailWorkspaceContextArgs<
 	DetailModelType extends UmbContentDetailModel<VariantModelType>,
@@ -141,9 +144,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 	readonly collection: UmbContentCollectionManager;
 
-	/* Hints */
-	readonly hints = new UmbHintContext<UmbVariantHint>(this);
-
 	/* Variant Options */
 	// TODO: Optimize this so it uses either a App Language Context? [NL]
 	#languageRepository = new UmbLanguageCollectionRepository(this);
@@ -221,7 +221,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			this,
 			this.structure,
 			this.validationContext,
-			this.hints,
+			this.view.hints,
 		);
 
 		this.variantOptions = mergeObservables(
@@ -330,6 +330,17 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 						this.#variantValidationContexts.push(context);
 					}
 				});
+			},
+			null,
+		);
+
+		this.observe(
+			observeMultiple([this.splitView.activeVariantByIndex(0), this.variants]),
+			([activeVariant, variants]) => {
+				const variantName = variants.find(
+					(v) => v.culture === activeVariant?.culture && v.segment === activeVariant?.segment,
+				)?.name;
+				this.view.setTitle(variantName);
 			},
 			null,
 		);
@@ -661,8 +672,23 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			// TODO: fix type error
 			this._data.updateCurrent({ values });
 
-			// TODO: Ideally we should move this type of logic to the act of saving [NL]
-			this._data.ensureVariantData(variantId);
+			/**
+			 * Handling of Not-Culture but Segment variant properties: [NL]
+			 * We need to ensure variant-entries across all culture variants for the given segment variant, when er property is configured to vary by segment but not culture.
+			 * This is the only different case, in all other cases its fine to just target the given variant.
+			 */
+			if (this.getVariesByCulture() && property.variesByCulture === false && property.variesBySegment === true) {
+				// get all culture options:
+				const cultureOptions = await firstValueFrom(this.variantOptions);
+				for (const cultureOption of cultureOptions) {
+					if (cultureOption.segment === variantId.segment) {
+						this._data.ensureVariantData(UmbVariantId.Create(cultureOption));
+					}
+				}
+			} else {
+				// otherwise we know the property variant-id will be matching with a variant:
+				this._data.ensureVariantData(variantId);
+			}
 		}
 		this.finishPropertyValueChange();
 	}
@@ -810,7 +836,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	 * Request a submit of the workspace, in the case of Document Workspaces the validation does not need to be valid for this to be submitted.
 	 * @returns {Promise<void>} a promise which resolves once it has been completed.
 	 */
-	public override requestSubmit() {
+	public override requestSubmit(): Promise<void> {
 		return this._handleSubmit();
 	}
 
@@ -820,7 +846,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 	/**
 	 * Request a save of the workspace, in the case of Document Workspaces the validation does not need to be valid for this to be saved.
-	 * @returns {Promise<void>} a promise which resolves once it has been completed.
+	 * @returns {Promise<void>} A promise which resolves once it has been completed.
 	 */
 	public requestSave() {
 		return this._handleSave();
@@ -836,11 +862,11 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		return this._data.constructData(variantIds);
 	}
 
-	protected async _handleSubmit() {
+	protected async _handleSubmit(): Promise<void> {
 		await this._handleSave();
 		this._closeModal();
 	}
-	protected async _handleSave() {
+	protected async _handleSave(): Promise<void> {
 		const data = this.getData();
 		if (!data) {
 			throw new Error('Data is missing');
@@ -866,7 +892,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 				value: { selection: selected },
 			}).catch(() => undefined);
 
-			if (!result?.selection.length) return;
+			if (!result?.selection.length) {
+				return Promise.reject('Cannot save without selecting at least one variant.');
+			}
 
 			variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
 		} else {
@@ -886,7 +914,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 				() => false,
 			);
 			if (valid || this.#ignoreValidationResultOnSubmit) {
-				return this.performCreateOrUpdate(variantIds, saveData);
+				await this.performCreateOrUpdate(variantIds, saveData);
+			} else {
+				return Promise.reject('Validation issues prevent saving');
 			}
 		} else {
 			await this.performCreateOrUpdate(variantIds, saveData);
