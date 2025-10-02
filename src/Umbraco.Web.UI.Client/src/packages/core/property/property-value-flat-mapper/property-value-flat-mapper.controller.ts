@@ -9,20 +9,24 @@ export class UmbPropertyValueFlatMapperController extends UmbControllerBase {
 	 * @param {UmbPropertyValueDataPotentiallyWithEditorAlias} property - The property data.
 	 * @returns {Promise<UmbPropertyValueDataPotentiallyWithEditorAlias>} - A promise that resolves to the mapped data.
 	 */
-	async flatMap<ReturnType, ValueType>(
-		property: UmbPropertyValueDataPotentiallyWithEditorAlias<ValueType>,
-		mapper: (property: UmbPropertyValueDataPotentiallyWithEditorAlias) => ReturnType | Promise<ReturnType>,
+	async flatMap<ReturnType, ValueType, PropertyType extends UmbPropertyValueDataPotentiallyWithEditorAlias<ValueType>>(
+		property: PropertyType,
+		mapper: (property: PropertyType) => ReturnType | Promise<ReturnType>,
 	): Promise<Array<ReturnType>> {
-		const result = await this.#mapValues<ReturnType, ValueType>(property, mapper);
+		const result = await this.#mapValues<ReturnType, ValueType, PropertyType>(property, mapper);
 
 		this.destroy();
 
 		return result ?? [];
 	}
 
-	async #mapValues<ReturnType, ValueType>(
-		incomingProperty: UmbPropertyValueDataPotentiallyWithEditorAlias<ValueType>,
-		mapper: (property: UmbPropertyValueDataPotentiallyWithEditorAlias) => ReturnType | Promise<ReturnType>,
+	async #mapValues<
+		ReturnType,
+		ValueType,
+		PropertyType extends UmbPropertyValueDataPotentiallyWithEditorAlias<ValueType>,
+	>(
+		incomingProperty: PropertyType,
+		mapper: (property: PropertyType) => ReturnType | Promise<ReturnType>,
 	): Promise<Array<ReturnType> | undefined> {
 		const mapOfThisProperty: ReturnType = await mapper(incomingProperty);
 
@@ -30,7 +34,6 @@ export class UmbPropertyValueFlatMapperController extends UmbControllerBase {
 		if (!editorAlias) {
 			return [mapOfThisProperty];
 		}
-
 		// Find the resolver for this editor alias:
 		const manifest = umbExtensionsRegistry.getByTypeAndFilter(
 			'propertyValueResolver',
