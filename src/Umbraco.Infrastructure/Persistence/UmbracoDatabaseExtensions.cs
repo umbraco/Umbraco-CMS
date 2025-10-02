@@ -37,7 +37,7 @@ internal static class UmbracoDatabaseExtensions
         // create the wildcard where clause
         ISqlSyntaxProvider sqlSyntax = database.SqlContext.SqlSyntax;
         var whereParam = sqlSyntax.GetStringColumnWildcardComparison(
-            sqlSyntax.GetQuotedColumnName("key"),
+            sqlSyntax.GetColumn(database.SqlContext.DatabaseType, KeyValueDto.TableName, "key", null),
             0,
             TextColumnType.NVarchar);
 

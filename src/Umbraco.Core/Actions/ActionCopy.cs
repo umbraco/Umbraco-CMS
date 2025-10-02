@@ -21,12 +21,6 @@ public class ActionCopy : IAction
     public string Alias => ActionAlias;
 
     /// <inheritdoc />
-    public string Category => Constants.Conventions.PermissionCategories.StructureCategory;
-
-    /// <inheritdoc />
-    public string Icon => "icon-documents";
-
-    /// <inheritdoc />
     public bool ShowInNotifier => true;
 
     /// <inheritdoc />

@@ -19,7 +19,7 @@ import { firstValueFrom, map } from '@umbraco-cms/backoffice/external/rxjs';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
 import { UmbDataTypeDetailRepository, UmbDataTypeItemRepositoryManager } from '@umbraco-cms/backoffice/data-type';
-import { UmbDeprecation, UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
+import { UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
 import { UmbEntityDetailWorkspaceContextBase, UmbWorkspaceSplitViewManager } from '@umbraco-cms/backoffice/workspace';
 import {
 	UmbEntityUpdatedEvent,
@@ -750,21 +750,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	};
 
 	/* validation */
-	/**
-	 * Run the mandatory validation for the save data
-	 * @deprecated Use the public runMandatoryValidationForSaveData instead. Will be removed in v. 17.
-	 * @protected
-	 * @param {DetailModelType} saveData - The data to validate
-	 * @memberof UmbContentDetailWorkspaceContextBase
-	 */
-	protected async _runMandatoryValidationForSaveData(saveData: DetailModelType, variantIds: Array<UmbVariantId> = []) {
-		new UmbDeprecation({
-			removeInVersion: '17',
-			deprecated: '_runMandatoryValidationForSaveData',
-			solution: 'Use the public runMandatoryValidationForSaveData instead.',
-		}).warn();
-		this.runMandatoryValidationForSaveData(saveData, variantIds);
-	}
 
 	/**
 	 * Run the mandatory validation for the save data
@@ -921,18 +906,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		} else {
 			await this.performCreateOrUpdate(variantIds, saveData);
 		}
-	}
-
-	/**
-	 * Perform the create or update of the content
-	 * @deprecated Use the public performCreateOrUpdate instead. Will be removed in v. 17.
-	 * @protected
-	 * @param {Array<UmbVariantId>} variantIds
-	 * @param {DetailModelType} saveData
-	 * @memberof UmbContentDetailWorkspaceContextBase
-	 */
-	protected async _performCreateOrUpdate(variantIds: Array<UmbVariantId>, saveData: DetailModelType) {
-		await this.performCreateOrUpdate(variantIds, saveData);
 	}
 
 	/**

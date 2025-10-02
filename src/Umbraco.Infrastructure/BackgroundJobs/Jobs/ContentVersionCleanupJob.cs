@@ -50,7 +50,7 @@ public class ContentVersionCleanupJob : IRecurringBackgroundJob
         }
 
 
-        var count = _service.PerformContentVersionCleanup(DateTime.Now).Count;
+        var count = _service.PerformContentVersionCleanup(DateTime.UtcNow).Count;
 
         if (count > 0)
         {

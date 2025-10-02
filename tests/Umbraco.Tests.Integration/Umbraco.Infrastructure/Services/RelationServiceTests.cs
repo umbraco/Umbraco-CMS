@@ -232,7 +232,7 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
     {
         var rs = RelationService;
 
-        var date = DateTime.Now.AddDays(-10);
+        var date = DateTime.UtcNow.AddDays(-10);
         var newRelations = CreateRelations(10);
         foreach (var r in newRelations)
         {
@@ -244,7 +244,7 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
         RelationService.Save(newRelations);
         Assert.IsTrue(newRelations.All(x => x.UpdateDate == date));
 
-        var newDate = DateTime.Now.AddDays(-5);
+        var newDate = DateTime.UtcNow.AddDays(-5);
         foreach (var r in newRelations)
         {
             r.UpdateDate = newDate;

@@ -1,5 +1,5 @@
 import { customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
-import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
+import type { Editor } from '../../externals.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-tiptap-statusbar-word-count')

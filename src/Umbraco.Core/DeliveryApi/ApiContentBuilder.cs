@@ -7,19 +7,6 @@ namespace Umbraco.Cms.Core.DeliveryApi;
 
 public sealed class ApiContentBuilder : ApiContentBuilderBase<IApiContent>, IApiContentBuilder
 {
-    [Obsolete("Please use the constructor that takes an IVariationContextAccessor instead. Scheduled for removal in V17.")]
-    public ApiContentBuilder(
-        IApiContentNameProvider apiContentNameProvider,
-        IApiContentRouteBuilder apiContentRouteBuilder,
-        IOutputExpansionStrategyAccessor outputExpansionStrategyAccessor)
-        : this(
-            apiContentNameProvider,
-            apiContentRouteBuilder,
-            outputExpansionStrategyAccessor,
-            StaticServiceProvider.Instance.CreateInstance<IVariationContextAccessor>())
-    {
-    }
-
     public ApiContentBuilder(
         IApiContentNameProvider apiContentNameProvider,
         IApiContentRouteBuilder apiContentRouteBuilder,

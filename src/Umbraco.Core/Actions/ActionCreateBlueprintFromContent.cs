@@ -25,10 +25,4 @@ public class ActionCreateBlueprintFromContent : IAction
 
     /// <inheritdoc />
     public bool CanBePermissionAssigned => true;
-
-    /// <inheritdoc />
-    public string Icon => Constants.Icons.Blueprint;
-
-    /// <inheritdoc />
-    public string Category => Constants.Conventions.PermissionCategories.ContentCategory;
 }

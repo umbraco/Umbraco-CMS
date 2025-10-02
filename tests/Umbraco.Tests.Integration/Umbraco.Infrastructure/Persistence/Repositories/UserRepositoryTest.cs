@@ -425,7 +425,7 @@ internal sealed class UserRepositoryTest : UmbracoIntegrationTest
 
             // manually update this record to be in the past
             ScopeAccessor.AmbientScope.Database.Execute(ScopeAccessor.AmbientScope.SqlContext.Sql()
-                .Update<UserLoginDto>(u => u.Set(x => x.LoggedOutUtc, DateTime.UtcNow.AddDays(-100)))
+                .Update<UserLoginDto>(u => u.Set(x => x.LoggedOut, DateTime.UtcNow.AddDays(-100)))
                 .Where<UserLoginDto>(x => x.SessionId == sessionId));
 
             var isValid = repository.ValidateLoginSession(user.Id, sessionId);

@@ -17,16 +17,3 @@ export interface UmbClipboardEntryDetailModel<MetaType = object> extends UmbClip
 	 */
 	values: UmbClipboardEntryValuesType;
 }
-
-/**
- * @deprecated
- * @see UmbClipboardEntryDetailModel
- */
-export interface UmbClipboardEntry<Type extends string = string, MetaType = object, DataType = unknown> {
-	type: Type;
-	unique: string;
-	name: string;
-	icons: Array<string>;
-	meta: MetaType;
-	data: Array<DataType>;
-}

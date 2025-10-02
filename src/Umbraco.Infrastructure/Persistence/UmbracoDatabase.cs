@@ -79,7 +79,10 @@ public class UmbracoDatabase : Database, IUmbracoDatabase
 
         if (_mapperCollection != null)
         {
-            Mappers.AddRange(_mapperCollection);
+            foreach (IMapper mapper in _mapperCollection)
+            {
+                Mappers.Add(mapper);
+            }
         }
 
         InitCommandTimeout();

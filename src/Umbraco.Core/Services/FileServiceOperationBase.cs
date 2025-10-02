@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -16,14 +18,41 @@ public abstract class FileServiceOperationBase<TRepository, TEntity, TOperationS
 {
     private readonly ILogger<StylesheetService> _logger;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
-    private readonly IAuditRepository _auditRepository;
+    private readonly IAuditService _auditService;
 
-    protected FileServiceOperationBase(ICoreScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory, TRepository repository, ILogger<StylesheetService> logger, IUserIdKeyResolver userIdKeyResolver, IAuditRepository auditRepository)
+    protected FileServiceOperationBase(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        TRepository repository,
+        ILogger<StylesheetService> logger,
+        IUserIdKeyResolver userIdKeyResolver,
+        IAuditService auditService)
         : base(provider, loggerFactory, eventMessagesFactory, repository)
     {
         _logger = logger;
         _userIdKeyResolver = userIdKeyResolver;
-        _auditRepository = auditRepository;
+        _auditService = auditService;
+    }
+
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+    protected FileServiceOperationBase(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        TRepository repository,
+        ILogger<StylesheetService> logger,
+        IUserIdKeyResolver userIdKeyResolver,
+        IAuditRepository auditRepository)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            repository,
+            logger,
+            userIdKeyResolver,
+            StaticServiceProvider.Instance.GetRequiredService<IAuditService>())
+    {
     }
 
     protected abstract TOperationStatus Success { get; }
@@ -249,10 +278,7 @@ public abstract class FileServiceOperationBase<TRepository, TEntity, TOperationS
     }
 
     private async Task AuditAsync(AuditType type, Guid userKey)
-    {
-        var userId = await _userIdKeyResolver.GetAsync(userKey);
-        _auditRepository.Save(new AuditItem(-1, type, userId, EntityType));
-    }
+        => await _auditService.AddAsync(type, userKey, -1, EntityType);
 
     private string GetFilePath(string? parentPath, string fileName)
         => Path.Join(parentPath, fileName);

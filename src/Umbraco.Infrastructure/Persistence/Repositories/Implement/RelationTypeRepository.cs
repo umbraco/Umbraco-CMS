@@ -113,13 +113,14 @@ internal sealed class RelationTypeRepository : EntityRepositoryBase<int, IRelati
         return sql;
     }
 
-    protected override string GetBaseWhereClause() => $"{Constants.DatabaseSchema.Tables.RelationType}.id = @id";
+    protected override string GetBaseWhereClause() => $"{QuoteTableName(Constants.DatabaseSchema.Tables.RelationType)}.id = @id";
 
     protected override IEnumerable<string> GetDeleteClauses()
     {
         var list = new List<string>
         {
-            "DELETE FROM umbracoRelation WHERE relType = @id", "DELETE FROM umbracoRelationType WHERE id = @id",
+            $"DELETE FROM {QuoteTableName("umbracoRelation")} WHERE {QuoteColumnName("relType")} = @id",
+            $"DELETE FROM {QuoteTableName("umbracoRelationType")} WHERE id = @id",
         };
         return list;
     }

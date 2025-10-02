@@ -52,7 +52,6 @@ const collectDictionaryIcons = async () => {
 
 				const icon = {
 					name: iconDef.name,
-					legacy: iconDef.legacy, // TODO: Deprecated, remove in v.17.
 					hidden: iconDef.legacy ?? iconDef.internal,
 					fileName: iconFileName,
 					svg,
@@ -147,10 +146,8 @@ const collectDiskIcons = async (icons) => {
 
 		// Only append not already defined icons:
 		if (!icons.find((x) => x.name === iconName)) {
-			// remove legacy for v.17 (Deprecated)
 			const icon = {
 				name: iconName,
-				legacy: true,
 				hidden: true,
 				fileName: iconFileName,
 				svg,
@@ -184,11 +181,8 @@ const generateJS = (icons) => {
 	const JSPath = `${moduleDirectory}/icons.ts`;
 
 	const iconDescriptors = icons.map((icon) => {
-		// remove legacy for v.17 (Deprecated)
-		// Notice how legacy also makes an icon hidden. Legacy will be removed in v.17, but still used in the dictionary for legacy icons. But outward they are both hidden. [NL]
 		return `{
 			name: "${icon.name}",
-			${icon.legacy ? 'legacy: true,' : ''}
 			${icon.hidden || icon.legacy ? 'hidden: true,' : ''}
 			path: () => import("./icons/${icon.fileName}.js"),
 		}`

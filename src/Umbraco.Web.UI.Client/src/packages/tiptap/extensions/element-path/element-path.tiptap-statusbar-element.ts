@@ -1,6 +1,6 @@
+import type { Editor } from '../../externals.js';
 import { css, customElement, html, map, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 
 @customElement('umb-tiptap-statusbar-element-path')
 export class UmbTiptapStatusbarElementPathElement extends UmbLitElement {

@@ -2,13 +2,11 @@
 // See LICENSE for more details.
 
 using MailKit.Net.Smtp;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using MimeKit.IO;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Mail;
 using Umbraco.Cms.Core.Models.Email;
@@ -30,32 +28,6 @@ public class EmailSender : IEmailSender
     private GlobalSettings _globalSettings;
     private readonly IEmailSenderClient _emailSenderClient;
 
-    [Obsolete("Please use the non-obsolete constructor. Will be removed in V17.")]
-    public EmailSender(
-        ILogger<EmailSender> logger,
-        IOptionsMonitor<GlobalSettings> globalSettings,
-        IEventAggregator eventAggregator)
-        : this(logger, globalSettings, eventAggregator,null, null)
-    {
-    }
-
-    [Obsolete("Please use the non-obsolete constructor. Will be removed in V17.")]
-    public EmailSender(
-        ILogger<EmailSender> logger,
-        IOptionsMonitor<GlobalSettings> globalSettings,
-        IEventAggregator eventAggregator,
-        INotificationHandler<SendEmailNotification>? handler1,
-        INotificationAsyncHandler<SendEmailNotification>? handler2)
-    {
-        _logger = logger;
-        _eventAggregator = eventAggregator;
-        _globalSettings = globalSettings.CurrentValue;
-        _notificationHandlerRegistered = handler1 is not null || handler2 is not null;
-        _emailSenderClient = StaticServiceProvider.Instance.GetRequiredService<IEmailSenderClient>();
-        globalSettings.OnChange(x => _globalSettings = x);
-    }
-
-    [ActivatorUtilitiesConstructor]
     public EmailSender(
         ILogger<EmailSender> logger,
         IOptionsMonitor<GlobalSettings> globalSettings,

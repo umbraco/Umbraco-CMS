@@ -19,32 +19,7 @@ public class SerilogLogger : IDisposable
 
     public ILogger SerilogLog { get; }
 
-    [Obsolete("Scheduled for removal in Umbraco 17.")]
-    public static SerilogLogger CreateWithDefaultConfiguration(
-        IHostingEnvironment hostingEnvironment,
-        ILoggingConfiguration loggingConfiguration,
-        IConfiguration configuration) =>
-        CreateWithDefaultConfiguration(hostingEnvironment, loggingConfiguration, configuration, out _);
-
-    public void Dispose() => SerilogLog.DisposeIfDisposable();
-
-    /// <summary>
-    ///     Creates a logger with some pre-defined configuration and remainder from config file
-    /// </summary>
-    /// <remarks>Used by UmbracoApplicationBase to get its logger.</remarks>
-    [Obsolete("Scheduled for removal in Umbraco 17.")]
-    public static SerilogLogger CreateWithDefaultConfiguration(
-        IHostingEnvironment hostingEnvironment,
-        ILoggingConfiguration loggingConfiguration,
-        IConfiguration configuration,
-        out UmbracoFileConfiguration umbracoFileConfig)
-    {
-        LoggerConfiguration? serilogConfig = new LoggerConfiguration()
-            .MinimalConfiguration(hostingEnvironment, loggingConfiguration, configuration, out umbracoFileConfig)
-            .ReadFrom.Configuration(configuration);
-
-        return new SerilogLogger(serilogConfig);
-    }
+    public void Dispose() => (SerilogLog as IDisposable)?.Dispose();
 
     public bool IsEnabled(Type reporting, LogLevel level)
         => LoggerFor(reporting).IsEnabled(MapLevel(level));

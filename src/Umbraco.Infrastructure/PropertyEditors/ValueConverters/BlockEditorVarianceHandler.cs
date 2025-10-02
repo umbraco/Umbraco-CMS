@@ -17,18 +17,6 @@ public sealed class BlockEditorVarianceHandler
         _contentTypeService = contentTypeService;
     }
 
-    [Obsolete("Please use the method that allows alignment for a collection of values. Scheduled for removal in V17.")]
-    public async Task AlignPropertyVarianceAsync(BlockPropertyValue blockPropertyValue, IPropertyType propertyType, string? culture)
-    {
-        culture ??= await _languageService.GetDefaultIsoCodeAsync();
-        if (propertyType.VariesByCulture() != VariesByCulture(blockPropertyValue))
-        {
-            blockPropertyValue.Culture = propertyType.VariesByCulture()
-                ? culture
-                : null;
-        }
-    }
-
     /// <summary>
     /// Aligns a collection of block property values for variance changes.
     /// </summary>
