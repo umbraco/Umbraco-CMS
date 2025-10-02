@@ -29,10 +29,11 @@ namespace Umbraco.Cms
             private readonly GlobalSettings _globalSettings;
             private readonly ILogger<CacheInstructionService> _logger;
             private readonly ILastSyncedManager _lastSyncedManager;
+            private readonly IRepositoryCacheVersionService _repositoryCacheVersionService;
             private readonly IProfilingLogger _profilingLogger;
             private readonly Lock _syncLock = new();
 
-            [Obsolete("Use the overload that requires ILastSyncedManager. Scheduled for removal in V18.")]
+            [Obsolete("Use the overload that requires ILastSyncedManager and IRepositoryCacheVersionService. Scheduled for removal in V18.")]
             public CacheInstructionService(
                 ICoreScopeProvider provider,
                 ILoggerFactory loggerFactory,
@@ -49,7 +50,8 @@ namespace Umbraco.Cms
                      profilingLogger,
                      logger,
                      globalSettings,
-                     StaticServiceProvider.Instance.GetRequiredService<ILastSyncedManager>())
+                     StaticServiceProvider.Instance.GetRequiredService<ILastSyncedManager>(),
+                     StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>())
             {
             }
 
@@ -61,13 +63,15 @@ namespace Umbraco.Cms
                 IProfilingLogger profilingLogger,
                 ILogger<CacheInstructionService> logger,
                 IOptions<GlobalSettings> globalSettings,
-                ILastSyncedManager lastSyncedManager)
+                ILastSyncedManager lastSyncedManager,
+                IRepositoryCacheVersionService repositoryCacheVersionService)
                 : base(provider, loggerFactory, eventMessagesFactory)
             {
                 _cacheInstructionRepository = cacheInstructionRepository;
                 _profilingLogger = profilingLogger;
                 _logger = logger;
                 _lastSyncedManager = lastSyncedManager;
+                _repositoryCacheVersionService = repositoryCacheVersionService;
                 _globalSettings = globalSettings.Value;
             }
 
@@ -177,6 +181,7 @@ namespace Umbraco.Cms
                         {
                             _lastSyncedManager.SaveLastSyncedExternalAsync(lastId).GetAwaiter().GetResult();
                             _lastSyncedManager.SaveLastSyncedInternalAsync(lastId).GetAwaiter().GetResult();
+                            _repositoryCacheVersionService.SetCachesSyncedAsync();
                         }
 
                         scope.Complete();
@@ -202,6 +207,7 @@ namespace Umbraco.Cms
                         if (numberOfInstructionsProcessed > 0)
                         {
                             _lastSyncedManager.SaveLastSyncedInternalAsync(lastId).GetAwaiter().GetResult();
+                            _repositoryCacheVersionService.SetCachesSyncedAsync();
                         }
 
                         scope.Complete();
