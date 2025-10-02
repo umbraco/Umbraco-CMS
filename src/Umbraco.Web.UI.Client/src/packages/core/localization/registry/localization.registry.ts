@@ -118,6 +118,9 @@ export class UmbLocalizationRegistry {
 			)
 			// Subscribe to the observable to trigger the loading of translations
 			.subscribe();
+
+		// Always register the fallback language (en) to ensure there is always at least one language available
+		this.loadLanguage(UMB_DEFAULT_LOCALIZATION_CULTURE);
 	}
 
 	#loadExtension = async (extension: ManifestLocalization) => {

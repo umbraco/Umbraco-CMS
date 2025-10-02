@@ -54,6 +54,10 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 		);
 	}
 
+	#getSectionName(section: UmbExtensionManifestInitializer<ManifestSection>) {
+		return section.manifest?.meta.label ? this.localize.string(section.manifest?.meta.label) : section.manifest?.name;
+	}
+
 	#getSectionPath(manifest: ManifestSection | undefined) {
 		return `section/${manifest?.meta.pathname}`;
 	}
@@ -108,12 +112,10 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 							?active="${this._currentSectionAlias === section.alias}"
 							@click=${(event: PointerEvent) => this.#onSectionClick(event, section.manifest)}
 							href="${this.#getSectionPath(section.manifest)}"
-							label="${ifDefined(
-								section.manifest?.meta.label
-									? this.localize.string(section.manifest?.meta.label)
-									: section.manifest?.name,
-							)}"
-							data-mark="section-link:${section.alias}"></uui-tab>
+							label="${ifDefined(this.#getSectionName(section))}"
+							data-mark="section-link:${section.alias}"
+							>${this.#getSectionName(section)}</uui-tab
+						>
 					`,
 				)}
 			</uui-tab-group>

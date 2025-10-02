@@ -29,6 +29,7 @@ export class UmbPickerInputContext<
 
 	public readonly selection;
 	public readonly selectedItems;
+	public readonly statuses;
 	public readonly interactionMemory = new UmbInteractionMemoryManager(this);
 
 	/**
@@ -84,6 +85,7 @@ export class UmbPickerInputContext<
 		this.#itemManager = new UmbRepositoryItemsManager<PickedItemType>(this, repositoryAlias, getUniqueMethod);
 
 		this.selection = this.#itemManager.uniques;
+		this.statuses = this.#itemManager.statuses;
 		this.selectedItems = this.#itemManager.items;
 	}
 
@@ -116,12 +118,12 @@ export class UmbPickerInputContext<
 
 	async requestRemoveItem(unique: string) {
 		const item = this.#itemManager.getItems().find((item) => this.#getUnique(item) === unique);
-		if (!item) throw new Error('Could not find item with unique: ' + unique);
 
+		const name = item?.name ?? '#general_notFound';
 		await umbConfirmModal(this, {
 			color: 'danger',
-			headline: `#actions_remove ${item.name}?`,
-			content: `#defaultdialogs_confirmremove ${item.name}?`,
+			headline: `#actions_remove ${name}?`,
+			content: `#defaultdialogs_confirmremove ${name}?`,
 			confirmLabel: '#actions_remove',
 		});
 
@@ -131,6 +133,7 @@ export class UmbPickerInputContext<
 	#removeItem(unique: string) {
 		const newSelection = this.getSelection().filter((value) => value !== unique);
 		this.setSelection(newSelection);
+		this.#itemManager.removeStatus(unique);
 		this.getHostElement().dispatchEvent(new UmbChangeEvent());
 	}
 }

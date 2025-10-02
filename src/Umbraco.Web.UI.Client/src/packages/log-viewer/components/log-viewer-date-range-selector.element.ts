@@ -102,7 +102,7 @@ export class UmbLogViewerDateRangeSelectorElement extends UmbLitElement {
 
 			:host([horizontal]) .input-container {
 				display: flex;
-				align-items: baseline;
+				align-items: center;
 				gap: var(--uui-size-space-3);
 			}
 		`,

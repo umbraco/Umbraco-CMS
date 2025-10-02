@@ -2,10 +2,11 @@ import { UmbModalToken } from '../token/modal-token.js';
 import type { UmbModalConfig, UmbModalType } from '../types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UUIModalElement, UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
-import { umbDeepMerge } from '@umbraco-cms/backoffice/utils';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { umbDeepMerge } from '@umbraco-cms/backoffice/utils';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbViewController } from '@umbraco-cms/backoffice/view';
 import { UMB_ROUTE_CONTEXT } from '@umbraco-cms/backoffice/router';
 import type { ElementLoaderProperty } from '@umbraco-cms/backoffice/extension-api';
 import type { IRouterSlot } from '@umbraco-cms/backoffice/router';
@@ -61,6 +62,8 @@ export class UmbModalContext<
 	#size = new UmbStringState<UUIModalSidebarSize>('small');
 	public readonly size = this.#size.asObservable();
 
+	public readonly view;
+
 	constructor(
 		host: UmbControllerHost,
 		modalAlias: string | UmbModalToken<ModalData, ModalValue>,
@@ -71,6 +74,9 @@ export class UmbModalContext<
 		this.router = args.router ?? null;
 		this.alias = modalAlias;
 
+		this.view = new UmbViewController(this, modalAlias.toString());
+
+		let title: string | undefined = undefined;
 		let size = 'small';
 
 		if (this.alias instanceof UmbModalToken) {
@@ -78,7 +84,10 @@ export class UmbModalContext<
 			size = this.alias.getDefaultModal()?.size ?? size;
 			this.element = this.alias.getDefaultModal()?.element || this.element;
 			this.backdropBackground = this.alias.getDefaultModal()?.backdropBackground || this.backdropBackground;
+			title = this.alias.getDefaultModal()?.title ?? undefined;
 		}
+
+		this.view.setTitle(title);
 
 		this.type = args.modal?.type || this.type;
 		size = args.modal?.size ?? size;
