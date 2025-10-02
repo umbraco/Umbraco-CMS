@@ -1,6 +1,6 @@
-import type { UmbSubmittableWorkspaceContext } from './submittable-workspace-context.interface.js';
+import type { UmbWorkspaceContext } from '../../workspace-context.interface.js';
 
-export interface UmbPublishableWorkspaceContext extends UmbSubmittableWorkspaceContext {
+export interface UmbPublishableWorkspaceContext extends UmbWorkspaceContext {
 	saveAndPublish(): Promise<void>;
 	publish(): Promise<void>;
 	unpublish(): Promise<void>;

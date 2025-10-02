@@ -2735,6 +2735,9 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         Assert.That(sut.GetValue<string>("multiUrlPicker"),
             Is.EqualTo("[{\"name\":\"https://test.com\",\"url\":\"https://test.com\"}]"));
         Assert.That(sut.GetValue<string>("tags"), Is.EqualTo("this,is,tags"));
+        Assert.That(
+            sut.GetValue<string>("dateTimeWithTimeZone"),
+            Is.EqualTo("{\"date\":\"2025-01-22T18:33:01.0000000+01:00\",\"timeZone\":\"Europe/Copenhagen\"}"));
     }
 
     [Test]

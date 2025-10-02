@@ -1,4 +1,3 @@
-import type { UmbMediaTypeWorkspaceContext } from '../../media-type-workspace.context.js';
 import type { UmbInputMediaTypeElement } from '../../../components/input-media-type/input-media-type.element.js';
 import { UMB_MEDIA_TYPE_WORKSPACE_CONTEXT } from '../../media-type-workspace.context-token.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
@@ -13,7 +12,7 @@ import type { UUIToggleElement } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-media-type-workspace-view-structure')
 export class UmbMediaTypeWorkspaceViewStructureElement extends UmbLitElement implements UmbWorkspaceViewElement {
-	#workspaceContext?: UmbMediaTypeWorkspaceContext;
+	#workspaceContext?: typeof UMB_MEDIA_TYPE_WORKSPACE_CONTEXT.TYPE;
 
 	@state()
 	private _allowedAtRoot?: boolean;
@@ -27,7 +26,6 @@ export class UmbMediaTypeWorkspaceViewStructureElement extends UmbLitElement imp
 	constructor() {
 		super();
 
-		// TODO: Figure out if this is the best way to consume the context or if it can be strongly typed with an UmbContextToken
 		this.consumeContext(UMB_MEDIA_TYPE_WORKSPACE_CONTEXT, (context) => {
 			this.#workspaceContext = context;
 			this._observeMediaType();

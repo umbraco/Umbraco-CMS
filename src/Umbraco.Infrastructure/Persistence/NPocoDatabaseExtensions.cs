@@ -225,15 +225,17 @@ public static partial class NPocoDatabaseExtensions
     /// <returns></returns>
     public static string EscapeAtSymbols(string value)
     {
-        if (value.Contains("@") == false)
+        if (value.Contains('@') == false)
         {
             return value;
         }
 
         // this fancy regex will only match a single @ not a double, etc...
-        var regex = new Regex("(?<!@)@(?!@)");
-        return regex.Replace(value, "@@");
+        return AtRegex().Replace(value, "@@");
     }
+
+    [GeneratedRegex("(?<!@)@(?!@)")]
+    private static partial Regex AtRegex();
 
     /// <summary>
     ///     Returns the underlying connection as a typed connection - this is used to unwrap the profiled mini profiler stuff

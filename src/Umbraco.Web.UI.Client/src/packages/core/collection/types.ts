@@ -8,20 +8,9 @@ export type * from './extensions/types.js';
 export type * from './conditions/types.js';
 export type * from './workspace-view/types.js';
 
-/** @deprecated No longer used internally. This will be removed in Umbraco 17. [LK] */
-export interface UmbCollectionBulkActionPermissions {
-	allowBulkCopy: boolean;
-	allowBulkDelete: boolean;
-	allowBulkMove: boolean;
-	allowBulkPublish: boolean;
-	allowBulkUnpublish: boolean;
-}
-
 export interface UmbCollectionConfiguration {
 	unique?: UmbEntityUnique;
 	dataTypeId?: string;
-	/** @deprecated No longer used internally. This will be removed in Umbraco 17. [LK] */
-	allowedEntityBulkActions?: UmbCollectionBulkActionPermissions;
 	layouts?: Array<UmbCollectionLayoutConfiguration>;
 	orderBy?: string;
 	orderDirection?: string;

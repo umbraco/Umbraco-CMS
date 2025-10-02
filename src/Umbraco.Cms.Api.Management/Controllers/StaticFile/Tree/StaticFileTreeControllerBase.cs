@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Controllers.Tree;
 using Umbraco.Cms.Api.Management.Routing;
@@ -17,17 +17,19 @@ public class StaticFileTreeControllerBase : FileSystemTreeControllerBase
     private readonly IFileSystemTreeService _fileSystemTreeService;
     private static readonly string[] _allowedRootFolders = { $"{Path.DirectorySeparatorChar}App_Plugins", $"{Path.DirectorySeparatorChar}wwwroot" };
 
-    public StaticFileTreeControllerBase(IPhysicalFileSystem physicalFileSystem, IFileSystemTreeService fileSystemTreeService)
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
+    public StaticFileTreeControllerBase(IPhysicalFileSystem physicalFileSystem)
+        : base(StaticServiceProvider.Instance.GetRequiredService<IPhysicalFileSystemTreeService>())
+    {
+        FileSystem = physicalFileSystem;
+        _fileSystemTreeService = StaticServiceProvider.Instance.GetRequiredService<IPhysicalFileSystemTreeService>();
+    }
+
+    public StaticFileTreeControllerBase(IPhysicalFileSystem physicalFileSystem, IPhysicalFileSystemTreeService fileSystemTreeService)
         : base (fileSystemTreeService)
     {
         FileSystem = physicalFileSystem;
         _fileSystemTreeService = fileSystemTreeService;
-    }
-
-    [Obsolete("Please use the other constructor. Scheduled for removal in Umbraco 19")]
-    public StaticFileTreeControllerBase(IPhysicalFileSystem physicalFileSystem)
-        : this(physicalFileSystem, StaticServiceProvider.Instance.GetRequiredService<IFileSystemTreeService>())
-    {
     }
 
     protected override IFileSystem FileSystem { get; }

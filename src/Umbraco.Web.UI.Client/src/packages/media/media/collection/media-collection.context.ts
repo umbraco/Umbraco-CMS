@@ -9,12 +9,6 @@ export class UmbMediaCollectionContext extends UmbDefaultCollectionContext<
 	UmbMediaCollectionItemModel,
 	UmbMediaCollectionFilterModel
 > {
-	/**
-	 * The thumbnail items that are currently displayed in the collection.
-	 * @deprecated Use the `<umb-imaging-thumbnail>` element instead. This will be removed in Umbraco 17.
-	 */
-	public readonly thumbnailItems = this.items;
-
 	#placeholders = new UmbArrayState<UmbMediaCollectionItemModel>([], (x) => x.unique);
 	public readonly placeholders = this.#placeholders.asObservable();
 
