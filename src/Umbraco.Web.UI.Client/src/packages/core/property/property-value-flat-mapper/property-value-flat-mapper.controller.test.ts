@@ -1,12 +1,6 @@
 import { expect } from '@open-wc/testing';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import type {
-	ManifestPropertyValueResolver,
-	ManifestPropertyValueCloner,
-	UmbPropertyValueData,
-	UmbPropertyValueResolver,
-	UmbPropertyValueCloner,
-} from '../types.js';
+import type { ManifestPropertyValueResolver, UmbPropertyValueData, UmbPropertyValueResolver } from '../types.js';
 import type { UmbVariantDataModel } from '@umbraco-cms/backoffice/variant';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
@@ -97,21 +91,19 @@ describe('UmbPropertyValueFlatMapperController', () => {
 				culture: null,
 				segment: null,
 				value: {
-					id: 'not-updated-id',
+					id: 'value',
 				},
 			};
 
 			const result = await ctrl.flatMap(property, (property) => {
-				return 'hi';
+				return (property.value as any).id;
 			});
 
-			console.log('result', result);
-
 			expect(result.length).to.be.equal(1);
-			expect(result[0]).to.be.equal('hi');
+			expect(result[0]).to.be.equal('value');
 		});
 
-		it('maps only inner values', async () => {
+		it('maps first level inner values', async () => {
 			const ctrlHost = new UmbTestControllerHostElement();
 			const ctrl = new UmbPropertyValueFlatMapperController(ctrlHost);
 
@@ -121,83 +113,53 @@ describe('UmbPropertyValueFlatMapperController', () => {
 				culture: null,
 				segment: null,
 				value: {
-					id: 'not-updated-id',
+					id: 'value',
 					nestedValue: {
 						editorAlias: 'test-editor',
 						alias: 'some',
 						culture: null,
 						segment: null,
 						value: {
-							id: 'inner-not-updated-id',
+							id: 'inner-value',
 						},
 					},
 				},
 			};
 
 			const result = await ctrl.flatMap(property, (property) => {
-				return property.value;
+				return (property.value as any).id;
 			});
 
-			expect((result[1] as any)?.id).to.be.equal('not-updated-id');
-			expect((result[0] as any)?.id).to.be.equal('inner-not-updated-id');
+			expect(result.length).to.be.equal(2);
+			expect(result[0]).to.be.equal('value');
+			expect(result[1]).to.be.equal('inner-value');
 		});
-		/*
-		it('clones value and inner values', async () => {
-			const ctrlHost = new UmbTestControllerHostElement();
-			const ctrl = new UmbPropertyValueCloneController(ctrlHost);
 
-			const value = {
+		it('maps values for two levels', async () => {
+			const ctrlHost = new UmbTestControllerHostElement();
+			const ctrl = new UmbPropertyValueFlatMapperController(ctrlHost);
+
+			const property = {
 				editorAlias: 'test-editor',
 				alias: 'test',
 				culture: null,
 				segment: null,
 				value: {
-					id: 'not-updated-id',
+					id: 'value',
 					nestedValue: {
 						editorAlias: 'test-editor',
 						alias: 'some',
 						culture: null,
 						segment: null,
 						value: {
-							id: 'inner-not-updated-id',
-						},
-					},
-				},
-			};
-
-			const result = await ctrl.clone(value);
-
-			expect((result.value as TestPropertyValueNestedType | undefined)?.id).to.be.equal('updated-id');
-			expect((result.value as TestPropertyValueNestedType | undefined)?.nestedValue?.value?.id).to.be.equal(
-				'updated-id',
-			);
-		});
-
-		it('clones value and inner values for two levels', async () => {
-			const ctrlHost = new UmbTestControllerHostElement();
-			const ctrl = new UmbPropertyValueCloneController(ctrlHost);
-
-			const value = {
-				editorAlias: 'test-editor',
-				alias: 'test',
-				culture: null,
-				segment: null,
-				value: {
-					id: 'not-updated-id',
-					nestedValue: {
-						editorAlias: 'test-editor',
-						alias: 'some',
-						culture: null,
-						segment: null,
-						value: {
-							id: 'inner-not-updated-id',
+							id: 'inner-value',
 							nestedValue: {
 								editorAlias: 'test-editor',
 								alias: 'another',
 								culture: null,
 								segment: null,
 								value: {
-									id: 'inner-inner-not-updated-id',
+									id: 'inner-inner-value',
 								},
 							},
 						},
@@ -205,20 +167,14 @@ describe('UmbPropertyValueFlatMapperController', () => {
 				},
 			};
 
-			const result = await ctrl.clone(value);
+			const result = await ctrl.flatMap(property, (property) => {
+				return (property.value as any).id;
+			});
 
-			expect((result.value as TestPropertyValueNestedType | undefined)?.id).to.be.equal('updated-id');
-			expect((result.value as TestPropertyValueNestedType | undefined)?.nestedValue?.value?.id).to.be.equal(
-				'updated-id',
-			);
-			expect(
-				(
-					(result.value as TestPropertyValueNestedType | undefined)?.nestedValue?.value as
-						| TestPropertyValueNestedType
-						| undefined
-				)?.nestedValue?.value?.id,
-			).to.be.equal('updated-id');
+			expect(result.length).to.be.equal(3);
+			expect(result[0]).to.be.equal('value');
+			expect(result[1]).to.be.equal('inner-value');
+			expect(result[2]).to.be.equal('inner-inner-value');
 		});
-	*/
 	});
 });

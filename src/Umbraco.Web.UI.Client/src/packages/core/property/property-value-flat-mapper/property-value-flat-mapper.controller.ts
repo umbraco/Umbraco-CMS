@@ -63,7 +63,8 @@ export class UmbPropertyValueFlatMapperController extends UmbControllerBase {
 				return properties;
 			});
 
-			mappedValues.push(mapperOfThisProperty);
+			// push in the front of the mapped values, so that the outer property is first in the array:
+			mappedValues.splice(0, 0, mapperOfThisProperty);
 
 			return mappedValues;
 		}
