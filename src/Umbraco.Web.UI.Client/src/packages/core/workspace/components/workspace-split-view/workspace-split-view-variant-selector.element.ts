@@ -402,11 +402,27 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 		const subVariantOptions = this.#getSegmentVariantOptionsForCulture(variantOption, variantId);
 		const hint = this._hintMap.get(variantId.toString());
 		const active = this.#isVariantActive(variantId);
+		const isExpanded = this.#isVariantExpanded(variantId);
+		let subHint: UmbVariantHint | undefined;
+		if (!hint && !isExpanded) {
+			// Loop through the sub variants to find a hint if the culture variant does not have one.
+			for (const subVariant of subVariantOptions) {
+				const subVariantId = UmbVariantId.Create(subVariant);
+				console.log(subVariantId, this._hintMap);
+				const foundHint = this._hintMap.get(subVariantId.toString());
+				if (foundHint) {
+					subHint = foundHint;
+					break;
+				}
+			}
+		}
 
 		return html`
 			<div class="variant culture-variant ${active ? 'selected' : ''}">
 				${this._variesBySegment && this.#isCreated(variantOption) && subVariantOptions.length > 0
-					? html`<div class="expand-area">${this.#renderExpandToggle(variantId)}</div>`
+					? html`<div class="expand-area">
+							${this.#renderExpandToggle(variantId)}${this.#renderSubHintBadge(!isExpanded ? subHint : undefined)}
+						</div>`
 					: nothing}
 
 				<button
@@ -427,10 +443,15 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 				</button>
 				${this.#renderHintBadge(!active ? hint : undefined)} ${this.#renderSplitViewButton(variantOption)}
 			</div>
-			${this.#isVariantExpanded(variantId)
-				? html` ${subVariantOptions.map((option) => this.#renderSegmentVariantOption(option))} `
-				: nothing}
+			${isExpanded ? html` ${subVariantOptions.map((option) => this.#renderSegmentVariantOption(option))} ` : nothing}
 		`;
+	}
+
+	#renderSubHintBadge(hint?: UmbVariantHint) {
+		if (!hint) return nothing;
+		return html` <umb-badge .color=${hint.color ?? 'default'} ?attention=${hint.color === 'invalid'}
+			>${hint.text}</umb-badge
+		>`;
 	}
 
 	#renderHintBadge(hint?: UmbVariantHint) {
@@ -458,6 +479,8 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 	#renderSegmentVariantOption(variantOption: VariantOptionModelType) {
 		const variantId = UmbVariantId.Create(variantOption);
 		const notCreated = this.#isCreateMode(variantOption, variantId);
+		const hint = this._hintMap.get(variantId.toString());
+		const active = this.#isVariantActive(variantId);
 
 		return html`
 			<div class="variant segment-variant ${this.#isVariantActive(variantId) ? 'selected' : ''}">
@@ -478,7 +501,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 					</div>
 					<div class="specs-info">${this.#getVariantSpecInfo(variantOption)}</div>
 				</button>
-				${this.#renderSplitViewButton(variantOption)}
+				${this.#renderHintBadge(!active ? hint : undefined)} ${this.#renderSplitViewButton(variantOption)}
 			</div>
 		`;
 	}
