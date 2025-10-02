@@ -25,7 +25,7 @@ import {
 	UmbFormControlMixin,
 	UmbValidationContext,
 } from '@umbraco-cms/backoffice/validation';
-import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import { jsonStringComparison, observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
 import { UMB_CONTENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
 
@@ -339,15 +339,22 @@ export class UmbPropertyEditorUIBlockListElement
 			]).pipe(debounceTime(20)),
 			([layouts, contents, settings, exposes]) => {
 				if (layouts.length === 0) {
+					if (this.value === undefined) {
+						return;
+					}
 					super.value = undefined;
 				} else {
-					super.value = {
+					const newValue = {
 						...super.value,
 						layout: { [UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS]: layouts },
 						contentData: contents,
 						settingsData: settings,
 						expose: exposes,
 					};
+					if (jsonStringComparison(this.value, newValue)) {
+						return;
+					}
+					super.value = newValue;
 				}
 
 				// If we don't have a value set from the outside or an internal value, we don't want to set the value.
