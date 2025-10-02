@@ -197,7 +197,6 @@ export class UmbDataTypeWorkspaceContext
 				this.#propertyEditorUISettingsDefaultData = manifest?.meta.settings?.defaultData || [];
 				const manifestPropertyEditorSchemaAlias = manifest?.meta.propertyEditorSchemaAlias;
 				if (manifestPropertyEditorSchemaAlias) {
-					// Fallback to the default property editor schema for this property editor UI.
 					this.setPropertyEditorSchemaAlias(manifestPropertyEditorSchemaAlias);
 				}
 				this.#mergeConfigProperties();
