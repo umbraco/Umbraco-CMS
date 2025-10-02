@@ -1,6 +1,5 @@
 import type { UmbItemRepository } from './item/index.js';
 import type { UmbRepositoryItemsStatus } from './types.js';
-import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { type ManifestRepository, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -14,7 +13,6 @@ const ObserveRepositoryAlias = Symbol();
 export class UmbRepositoryItemsManager<ItemType extends { unique: string }> extends UmbControllerBase {
 	//
 	repository?: UmbItemRepository<ItemType>;
-	#getUnique: (entry: ItemType) => string | undefined;
 
 	#init: Promise<unknown>;
 	#initResolve!: (value: unknown) => void;
@@ -30,7 +28,7 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 	#uniques = new UmbArrayState<string>([], (x) => x);
 	uniques = this.#uniques.asObservable();
 
-	#items = new UmbArrayState<ItemType>([], (x) => this.#getUnique(x));
+	#items = new UmbArrayState<ItemType>([], (x) => x.unique);
 	items = this.#items.asObservable();
 
 	#statuses = new UmbArrayState<UmbRepositoryItemsStatus>([], (x) => x.unique);
@@ -41,14 +39,9 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 	 * Creates an instance of UmbRepositoryItemsManager.
 	 * @param {UmbControllerHost} host - The host for the controller.
 	 * @param {string} repositoryAlias - The alias of the repository to use.
-	 * @param {((entry: ItemType) => string | undefined)} [getUniqueMethod] - DEPRECATED since 15.3. Will be removed in v.17.0: A method to get the unique key from the item.
 	 * @memberof UmbRepositoryItemsManager
 	 */
-	constructor(
-		host: UmbControllerHost,
-		repositoryAlias?: string,
-		getUniqueMethod?: (entry: ItemType) => string | undefined,
-	) {
+	constructor(host: UmbControllerHost, repositoryAlias?: string) {
 		super(host);
 
 		this.#init = new Promise((resolve) => {
@@ -58,17 +51,6 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 		if (repositoryAlias) {
 			this.#initItemRepository(repositoryAlias);
 		}
-
-		this.#getUnique = getUniqueMethod
-			? (entry: ItemType) => {
-					new UmbDeprecation({
-						deprecated: 'The getUniqueMethod parameter.',
-						removeInVersion: '17.0.0',
-						solution: 'The required unique property on the item will be used instead.',
-					}).warn();
-					return getUniqueMethod(entry);
-				}
-			: (entry) => entry.unique;
 
 		this.observe(
 			this.uniques,
@@ -83,7 +65,7 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 				const items = this.#items.getValue();
 				if (
 					uniques.length === items.length &&
-					uniques.every((unique) => items.find((item) => this.#getUnique(item) === unique))
+					uniques.every((unique) => items.find((item) => item.unique === unique))
 				) {
 					this.#items.setValue(this.#sortByUniques(items));
 				} else {
@@ -140,7 +122,7 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 	}
 
 	itemByUnique(unique: string) {
-		return this.#items.asObservablePart((items) => items.find((item) => this.#getUnique(item) === unique));
+		return this.#items.asObservablePart((items) => items.find((item) => item.unique === unique));
 	}
 
 	async getItemByUnique(unique: string) {
@@ -193,9 +175,7 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 		// find uniques not resolved:
 		if (data) {
 			// find rejected uniques:
-			const rejectedUniques = requestedUniques.filter(
-				(unique) => !data.find((item) => this.#getUnique(item) === unique),
-			);
+			const rejectedUniques = requestedUniques.filter((unique) => !data.find((item) => item.unique === unique));
 			const resolvedUniques = requestedUniques.filter((unique) => !rejectedUniques.includes(unique));
 			this.#items.remove(rejectedUniques);
 
@@ -251,7 +231,7 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 
 		if (data) {
 			const items = this.getItems();
-			const item = items.find((item) => this.#getUnique(item) === unique);
+			const item = items.find((item) => item.unique === unique);
 
 			if (item) {
 				const index = items.indexOf(item);
@@ -266,8 +246,8 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 		if (!data) return [];
 		const uniques = this.getUniques();
 		return [...data].sort((a, b) => {
-			const aIndex = uniques.indexOf(this.#getUnique(a) ?? '');
-			const bIndex = uniques.indexOf(this.#getUnique(b) ?? '');
+			const aIndex = uniques.indexOf(a.unique ?? '');
+			const bIndex = uniques.indexOf(b.unique ?? '');
 			return aIndex - bIndex;
 		});
 	}
@@ -279,7 +259,7 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 		if (items.length === 0) return;
 
 		// Ignore events if the entity is not in the list of items.
-		const item = items.find((item) => this.#getUnique(item) === eventUnique);
+		const item = items.find((item) => item.unique === eventUnique);
 		if (!item) return;
 
 		this.#reloadItem(item.unique);

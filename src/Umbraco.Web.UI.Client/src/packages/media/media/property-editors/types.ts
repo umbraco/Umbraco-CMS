@@ -6,12 +6,6 @@ export type UmbMediaPickerPropertyValueEntry = {
 	crops: Array<UmbCropModel>;
 };
 
-/**
- * @deprecated Use UmbMediaPickerPropertyValueEntry instead — Will be removed in v.17.
- * Also notice this is a modal for the entry type, use UmbMediaPickerPropertyValueModel for the type of the value.
- */
-export type UmbMediaPickerPropertyValue = UmbMediaPickerPropertyValueEntry;
-
 export type UmbMediaPickerValueModel = Array<UmbMediaPickerPropertyValueEntry>;
 
 export type UmbCropModel = {

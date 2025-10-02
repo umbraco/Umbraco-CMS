@@ -1,5 +1,4 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.Tree;
-using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Api.Management.ViewModels.Tree;
 
 namespace Umbraco.Cms.Api.Management.Services.FileSystem;
 
@@ -9,8 +8,7 @@ public interface IFileSystemTreeService
 
     FileSystemTreeItemPresentationModel[] GetPathViewModels(string path, int skip, int take, out long totalItems);
 
-    FileSystemTreeItemPresentationModel[] GetSiblingsViewModels(string path, int before, int after, out long totalBefore,
-        out long totalAfter);
+    FileSystemTreeItemPresentationModel[] GetSiblingsViewModels(string path, int before, int after, out long totalBefore, out long totalAfter);
 
     string[] GetDirectories(string path);
 
