@@ -14,6 +14,6 @@ public class ConfigureFormOptions : IConfigureOptions<FormOptions>
 
         // convert from KB to bytes
         options.MultipartBodyLengthLimit = _runtimeSettings.Value.MaxRequestLength.HasValue
-            ? _runtimeSettings.Value.MaxRequestLength.Value * 1024
+            ? (long)_runtimeSettings.Value.MaxRequestLength.Value * 1024
             : long.MaxValue;
 }
