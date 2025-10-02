@@ -99,6 +99,7 @@ export class UmbManagementApiServerEventContext extends UmbContextBase {
 				...payload,
 				clientTimestamp: new Date().toISOString(),
 			};
+			console.log("connection.on.notify",payload,event)
 
 			this.#events.next(event);
 		});
