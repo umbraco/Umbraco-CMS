@@ -434,6 +434,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 					<div class="variant-info">
 						<div class="variant-name">
 							${this.#getVariantDisplayName(variantOption)}${this.#renderReadOnlyTag(variantId.culture)}
+							${this.#renderHintBadge(!active ? hint : undefined)}
 						</div>
 						<div class="variant-details">
 							<span>${this._renderVariantDetails(variantOption)}</span>
@@ -441,7 +442,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 					</div>
 					<div class="specs-info">${this.#getVariantSpecInfo(variantOption)}</div>
 				</button>
-				${this.#renderHintBadge(!active ? hint : undefined)} ${this.#renderSplitViewButton(variantOption)}
+				${this.#renderSplitViewButton(variantOption)}
 			</div>
 			${isExpanded ? html` ${subVariantOptions.map((option) => this.#renderSegmentVariantOption(option))} ` : nothing}
 		`;
@@ -456,7 +457,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 
 	#renderHintBadge(hint?: UmbVariantHint) {
 		if (!hint) return nothing;
-		return html` <umb-badge slot="append" .color=${hint.color ?? 'default'} ?attention=${hint.color === 'invalid'}
+		return html` <umb-badge inline-mode .color=${hint.color ?? 'default'} ?attention=${hint.color === 'invalid'}
 			>${hint.text}</umb-badge
 		>`;
 	}
@@ -493,7 +494,9 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 					${notCreated ? html`<uui-icon class="add-icon" name="icon-add"></uui-icon>` : nothing}
 					<div class="variant-info">
 						<div class="variant-name">
-							${this.#getVariantDisplayName(variantOption)}${this.#renderReadOnlyTag(variantId.culture)}
+							${this.#getVariantDisplayName(variantOption)}${this.#renderReadOnlyTag(
+								variantId.culture,
+							)}${this.#renderHintBadge(!active ? hint : undefined)}
 						</div>
 						<div class="variant-details">
 							<span>${this._renderVariantDetails(variantOption)}</span>
@@ -501,7 +504,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 					</div>
 					<div class="specs-info">${this.#getVariantSpecInfo(variantOption)}</div>
 				</button>
-				${this.#renderHintBadge(!active ? hint : undefined)} ${this.#renderSplitViewButton(variantOption)}
+				${this.#renderSplitViewButton(variantOption)}
 			</div>
 		`;
 	}
