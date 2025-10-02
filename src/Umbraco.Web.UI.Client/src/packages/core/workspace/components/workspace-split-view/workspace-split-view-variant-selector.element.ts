@@ -12,6 +12,7 @@ import type { UUIInputElement, UUIPopoverContainerElement } from '@umbraco-cms/b
 import type { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UMB_HINT_CONTEXT } from '@umbraco-cms/backoffice/hint';
 import type { UmbHint, UmbVariantHint } from '@umbraco-cms/backoffice/hint';
+import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 
 @customElement('umb-workspace-split-view-variant-selector')
 export class UmbWorkspaceSplitViewVariantSelectorElement<
