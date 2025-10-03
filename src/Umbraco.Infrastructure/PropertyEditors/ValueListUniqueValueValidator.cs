@@ -18,7 +18,22 @@ public class ValueListUniqueValueValidator : IValueValidator
     public ValueListUniqueValueValidator(IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
         => _configurationEditorJsonSerializer = configurationEditorJsonSerializer;
 
-    public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration, PropertyValidationContext validationContext)
+    public IEnumerable<ValidationResult> Validate(
+        object? value,
+        string? valueType,
+        object? dataTypeConfiguration,
+        PropertyValidationContext validationContext)
+        => ValidateInternal(value, "items");
+
+    public IEnumerable<ValidationResult> Validate(
+        object? value,
+        string? valueType,
+        object? dataTypeConfiguration,
+        PropertyValidationContext validationContext,
+        ConfigurationField field)
+        => ValidateInternal(value, field.Key);
+
+    private IEnumerable<ValidationResult> ValidateInternal(object? value, string fieldName)
     {
         if (value is null)
         {
@@ -40,7 +55,7 @@ public class ValueListUniqueValueValidator : IValueValidator
 
         if (items is null)
         {
-            yield return new ValidationResult($"The configuration value {value} is not a valid value list configuration", ["items"]);
+            yield return new ValidationResult($"The configuration value {value} is not a valid value list configuration", [fieldName]);
             yield break;
         }
 
@@ -53,7 +68,7 @@ public class ValueListUniqueValueValidator : IValueValidator
 
         foreach (var duplicateValue in duplicateValues)
         {
-            yield return new ValidationResult($"The value \"{duplicateValue}\" must be unique", new[] { "items" });
+            yield return new ValidationResult($"The value \"{duplicateValue}\" must be unique", [fieldName]);
         }
     }
 }
