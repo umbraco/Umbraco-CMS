@@ -12,7 +12,6 @@ public class UmbracoWebApplicationFactory<TStartup> : WebApplicationFactory<TSta
     private readonly Action<IHost> _beforeStart;
     private readonly Func<IHostBuilder> _createHostBuilder;
     private IHost _host;
-    private bool _disposed;
 
     /// <summary>
     ///     Constructor to create a new WebApplicationFactory
@@ -33,15 +32,8 @@ public class UmbracoWebApplicationFactory<TStartup> : WebApplicationFactory<TSta
         return _host;
     }
 
-    protected override void Dispose(bool disposing)
+    public void ClearHost()
     {
-        if(_disposed)
-        {
-            return;
-        }
-
         _host.StopAsync().GetAwaiter().GetResult();
-        base.Dispose(disposing);
-        _disposed = true;
     }
 }
