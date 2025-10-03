@@ -395,7 +395,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 	protected async loadSegments() {
 		console.warn(
-			`UmbContentDetailWorkspaceContextBase: Segments are not yet fully implemented for "${this.getEntityType()}" types.`,
+			`UmbContentDetailWorkspaceContextBase: Segments are not implemented in the workspace context for "${this.getEntityType()}" types.`,
 		);
 		this._segments.setValue([]);
 	}
