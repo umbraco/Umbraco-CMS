@@ -93,7 +93,7 @@ export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElemen
 		this.addValidator(
 			'patternMismatch',
 			() => {
-				return 'The low value must not be exceed the high value';
+				return '#validation_rangeExceeds';
 			},
 			() => {
 				return this._minValue !== undefined && this._maxValue !== undefined ? this._minValue > this._maxValue : false;
