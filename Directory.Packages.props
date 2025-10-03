@@ -62,9 +62,9 @@
     <PackageVersion Include="ncrontab" Version="3.4.0" />
     <PackageVersion Include="NPoco" Version="6.1.0" />
     <PackageVersion Include="NPoco.SqlServer" Version="6.1.0" />
-    <PackageVersion Include="OpenIddict.Abstractions" Version="6.2.1" />
-    <PackageVersion Include="OpenIddict.AspNetCore" Version="6.2.1" />
-    <PackageVersion Include="OpenIddict.EntityFrameworkCore" Version="6.2.1" />
+    <PackageVersion Include="OpenIddict.Abstractions" Version="7.1.0" />
+    <PackageVersion Include="OpenIddict.AspNetCore" Version="7.1.0" />
+    <PackageVersion Include="OpenIddict.EntityFrameworkCore" Version="7.1.0" />
     <PackageVersion Include="Serilog" Version="4.2.0" />
     <PackageVersion Include="Serilog.AspNetCore" Version="9.0.0" />
     <PackageVersion Include="Serilog.Enrichers.Process" Version="3.0.0" />
