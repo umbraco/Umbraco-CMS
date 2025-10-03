@@ -32,8 +32,9 @@ public class UmbracoWebApplicationFactory<TStartup> : WebApplicationFactory<TSta
         return _host;
     }
 
-    public void ClearHost()
+    protected override void Dispose(bool disposing)
     {
         _host.StopAsync().GetAwaiter().GetResult();
+        base.Dispose(disposing);
     }
 }
