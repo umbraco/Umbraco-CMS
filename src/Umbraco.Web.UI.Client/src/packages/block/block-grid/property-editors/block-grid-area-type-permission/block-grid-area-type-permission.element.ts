@@ -51,7 +51,7 @@ export class UmbPropertyEditorUIBlockGridAreaTypePermissionElement
 				.map((item) => {
 					const blockType = this._blockTypes?.find((block) => block.contentElementTypeKey === item.unique);
 					if (blockType) {
-						return { type: blockType, name: item.name };
+						return { type: blockType, name: item.name, icon: item.icon };
 					}
 					return undefined;
 				})
@@ -193,7 +193,10 @@ export class UmbPropertyEditorUIBlockGridAreaTypePermissionElement
 			this._blockGroups,
 			(group) => group.key,
 			(group) =>
-				html`<uui-combobox-list-option .value=${group.key} ?selected=${area.groupKey === group.key}>
+				html`<uui-combobox-list-option
+					.value=${group.key}
+					?selected=${area.groupKey === group.key}>
+					<uui-icon name="icon-folder"></uui-icon>
 					${group.name}
 				</uui-combobox-list-option>`,
 		);
@@ -207,6 +210,7 @@ export class UmbPropertyEditorUIBlockGridAreaTypePermissionElement
 				html`<uui-combobox-list-option
 					.value=${block.type.contentElementTypeKey}
 					?selected=${area.elementTypeKey === block.type.contentElementTypeKey}>
+					<uui-icon name=${block.icon}></uui-icon>
 					${block.name}
 				</uui-combobox-list-option>`,
 		);
