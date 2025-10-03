@@ -33,7 +33,7 @@ export class UmbPropertyEditorUIBlockGridAreaTypePermissionElement
 	private _blockTypes?: Array<UmbBlockTypeWithGroupKey>;
 
 	@state()
-	private _blockTypesWithElementName: Array<{ type: UmbBlockTypeWithGroupKey; name: string }> = [];
+	private _blockTypesWithElementName: Array<{ type: UmbBlockTypeWithGroupKey; name: string; icon: string | null | undefined }> = [];
 
 	@state()
 	private _blockGroups: Array<UmbBlockGridTypeGroupType> = [];
@@ -55,7 +55,7 @@ export class UmbPropertyEditorUIBlockGridAreaTypePermissionElement
 					}
 					return undefined;
 				})
-				.filter((x) => x !== undefined) as Array<{ type: UmbBlockTypeWithGroupKey; name: string }>;
+				.filter((x) => x !== undefined) as Array<{ type: UmbBlockTypeWithGroupKey; name: string; icon: string | null | undefined }>;
 		});
 
 		this.consumeContext(UMB_DATA_TYPE_WORKSPACE_CONTEXT, async (context) => {
