@@ -12,6 +12,7 @@ import {
 } from '@umbraco-cms/backoffice/collection';
 import type {
 	ManifestPropertyEditorDataSource,
+	UmbPickerPropertyEditorDataSource,
 	UmbPickerPropertyEditorTreeDataSource,
 } from '@umbraco-cms/backoffice/data-type';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
@@ -181,8 +182,9 @@ export class UmbEntityDataPickerInputContext extends UmbControllerBase {
 					return;
 				}
 
-				const dataSourceApi = ctrl.api;
-				dataSourceApi.setConfig(this.getDataSourceConfig());
+				// TODO: Check if it is a picker data source
+				const dataSourceApi = ctrl.api as UmbPickerPropertyEditorDataSource;
+				dataSourceApi.setConfig?.(this.getDataSourceConfig());
 
 				this.#dataSourceApiContext.setDataSourceApi(dataSourceApi);
 

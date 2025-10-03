@@ -2,7 +2,7 @@ import type {
 	UmbPickerPropertyEditorTreeDataSource,
 	UmbPropertyEditorDataSourceConfigModel,
 	UmbSearchablePickerPropertyEditorDataSource,
-} from './types.js';
+} from '../../src/packages/data-type/property-editor-data-source/types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import {
 	UmbMediaItemRepository,
@@ -16,7 +16,7 @@ import type {
 	UmbTreeRootItemsRequestArgs,
 } from '@umbraco-cms/backoffice/tree';
 
-export class UmbMediaPickerPropertyEditorDataSource
+export class ExampleMediaPickerPropertyEditorDataSource
 	extends UmbControllerBase
 	implements UmbPickerPropertyEditorTreeDataSource, UmbSearchablePickerPropertyEditorDataSource
 {
@@ -58,4 +58,4 @@ export class UmbMediaPickerPropertyEditorDataSource
 	}
 }
 
-export { UmbMediaPickerPropertyEditorDataSource as api };
+export { ExampleMediaPickerPropertyEditorDataSource as api };

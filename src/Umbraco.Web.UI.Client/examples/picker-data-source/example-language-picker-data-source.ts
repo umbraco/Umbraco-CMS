@@ -1,9 +1,12 @@
-import type { UmbPickerPropertyEditorCollectionDataSource, UmbPropertyEditorDataSourceConfigModel } from './types.js';
+import type {
+	UmbPickerPropertyEditorCollectionDataSource,
+	UmbPropertyEditorDataSourceConfigModel,
+} from '../../src/packages/data-type/property-editor-data-source/types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbCollectionFilterModel } from '@umbraco-cms/backoffice/collection';
 import { UmbLanguageCollectionRepository, UmbLanguageItemRepository } from '@umbraco-cms/backoffice/language';
 
-export class UmbLanguagePickerPropertyEditorDataSource
+export class ExampleLanguagePickerPropertyEditorDataSource
 	extends UmbControllerBase
 	implements UmbPickerPropertyEditorCollectionDataSource
 {
@@ -19,4 +22,4 @@ export class UmbLanguagePickerPropertyEditorDataSource
 	}
 }
 
-export { UmbLanguagePickerPropertyEditorDataSource as api };
+export { ExampleLanguagePickerPropertyEditorDataSource as api };

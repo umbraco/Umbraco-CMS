@@ -1,9 +1,12 @@
-import type { UmbPickerPropertyEditorCollectionDataSource, UmbPropertyEditorDataSourceConfigModel } from './types.js';
+import type {
+	UmbPickerPropertyEditorCollectionDataSource,
+	UmbPropertyEditorDataSourceConfigModel,
+} from '../../src/packages/data-type/property-editor-data-source/types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbCollectionFilterModel } from '@umbraco-cms/backoffice/collection';
 import { UmbUserCollectionRepository, UmbUserItemRepository } from '@umbraco-cms/backoffice/user';
 
-export class UmbUserPickerPropertyEditorDataSource
+export class ExampleUserPickerPropertyEditorDataSource
 	extends UmbControllerBase
 	implements UmbPickerPropertyEditorCollectionDataSource
 {
@@ -19,4 +22,4 @@ export class UmbUserPickerPropertyEditorDataSource
 	}
 }
 
-export { UmbUserPickerPropertyEditorDataSource as api };
+export { ExampleUserPickerPropertyEditorDataSource as api };

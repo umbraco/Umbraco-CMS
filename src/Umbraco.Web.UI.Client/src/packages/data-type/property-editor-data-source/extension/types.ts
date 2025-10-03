@@ -8,10 +8,11 @@ import type { UmbTreeRepository } from '@umbraco-cms/backoffice/tree';
 export type * from './property-data-source.extension.js';
 
 export interface UmbPropertyEditorDataSource extends UmbApi {
-	setConfig?(config: UmbPropertyEditorDataSourceConfigModel): void;
-	getConfig?(): UmbPropertyEditorDataSourceConfigModel;
+	setConfig?(config: UmbPropertyEditorDataSourceConfigModel | undefined): void;
+	getConfig?(): UmbPropertyEditorDataSourceConfigModel | undefined;
 }
 
+// TODO: interfaces to picker/tree/collection etc modules
 export interface UmbPickerPropertyEditorDataSource
 	extends UmbPropertyEditorDataSource,
 		UmbItemRepository<any>,
