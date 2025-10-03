@@ -77,9 +77,11 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 			(ext) => ext.forEntityTypes.includes(this.entityType!),
 			async (actions) => {
 				this._numberOfActions = actions.length;
+				const oldFirstManifest = this._firstActionManifest;
 				this._firstActionManifest =
 					this._numberOfActions > 0 ? (actions[0].manifest as ManifestEntityActionDefaultKind) : undefined;
-				this.#createFirstActionApi();
+				await this.#createFirstActionApi();
+				this.requestUpdate('_firstActionManifest', oldFirstManifest);
 			},
 			'umbEntityActionsObserver',
 		);
@@ -89,6 +91,7 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 
 	async #createFirstActionApi() {
 		if (!this._firstActionManifest) return;
+		const oldFirstApi = this._firstActionApi;
 		this._firstActionApi = await createExtensionApi(this, this._firstActionManifest, [
 			{ unique: this.unique, entityType: this.entityType, meta: this._firstActionManifest.meta },
 		]);
@@ -96,6 +99,7 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 			(this._firstActionApi as any).manifest = this._firstActionManifest;
 			this._firstActionHref = await this._firstActionApi.getHref();
 		}
+		this.requestUpdate('_firstActionApi', oldFirstApi);
 	}
 
 	async #onFirstActionClick(event: PointerEvent) {
