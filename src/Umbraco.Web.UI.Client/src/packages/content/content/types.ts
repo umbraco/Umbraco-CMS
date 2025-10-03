@@ -1,3 +1,4 @@
+import type { UmbEntityFlag } from '@umbraco-cms/backoffice/entity';
 import type { UmbPropertyValueData } from '@umbraco-cms/backoffice/property';
 import type { UmbEntityVariantModel } from '@umbraco-cms/backoffice/variant';
 
@@ -28,8 +29,9 @@ export interface UmbContentDetailModel<VariantModelType extends UmbEntityVariant
 	unique: string;
 	entityType: string;
 	variants: Array<VariantModelType>;
+	flags: Array<UmbEntityFlag>;
 }
 
 export interface UmbContentLikeDetailModel
 	extends UmbElementDetailModel,
-		Partial<Pick<UmbContentDetailModel, 'variants'>> {}
+		Partial<Pick<UmbContentDetailModel, 'variants' | 'flags'>> {}

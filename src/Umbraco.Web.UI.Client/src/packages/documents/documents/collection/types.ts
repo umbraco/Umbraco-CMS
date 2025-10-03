@@ -1,6 +1,6 @@
 import type { UmbDocumentEntityType } from '../entity.js';
-import type { UmbDocumentItemVariantModel } from '../item/repository/types.js';
-import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import type { UmbDocumentItemVariantWithFlagsModel } from '../item/repository/types.js';
+import type { UmbEntityModel, UmbEntityWithFlags } from '@umbraco-cms/backoffice/entity';
 import type { UmbCollectionFilterModel } from '@umbraco-cms/backoffice/collection';
 
 export interface UmbDocumentCollectionFilterModel extends UmbCollectionFilterModel {
@@ -12,7 +12,7 @@ export interface UmbDocumentCollectionFilterModel extends UmbCollectionFilterMod
 	userDefinedProperties: Array<{ alias: string; header: string; isSystem: boolean }>;
 }
 
-export interface UmbDocumentCollectionItemModel {
+export interface UmbDocumentCollectionItemModel extends UmbEntityWithFlags {
 	ancestors: Array<UmbEntityModel>;
 	unique: string;
 	entityType: UmbDocumentEntityType;
@@ -27,7 +27,7 @@ export interface UmbDocumentCollectionItemModel {
 		icon: string;
 		alias: string;
 	};
-	variants: Array<UmbDocumentItemVariantModel>;
+	variants: Array<UmbDocumentItemVariantWithFlagsModel>;
 
 	/**
 	 * @deprecated From 15.3.0. Will be removed in 17.0.0. Use state in variants array instead.

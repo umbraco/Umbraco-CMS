@@ -1,3 +1,5 @@
+// TODO: This does not belong here, lets move it to the icon package.
+
 export const umbracoColors = [
 	{ alias: 'text', varName: '--uui-color-text' },
 	{ alias: 'yellow', varName: '--uui-palette-sunglow' },

@@ -88,10 +88,12 @@ const mapper = (item: DocumentTreeItemResponseModel): UmbDocumentTreeItemModel =
 				culture: variant.culture || null,
 				segment: null, // TODO: add segment to the backend API?
 				state: variant.state,
+				flags: variant.flags,
 			};
 		}),
 		name: item.variants[0]?.name, // TODO: this is not correct. We need to get it from the variants. This is a temp solution.
 		isFolder: false,
 		createDate: item.createDate,
+		flags: item.flags,
 	};
 };
