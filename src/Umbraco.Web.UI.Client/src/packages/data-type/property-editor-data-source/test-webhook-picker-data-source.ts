@@ -9,15 +9,6 @@ export class UmbWebhookPickerPropertyEditorDataSource
 {
 	#collection = new UmbWebhookCollectionRepository(this);
 	#item = new UmbWebhookItemRepository(this);
-	#config: any;
-
-	setConfig(config: any): void {
-		this.#config = config;
-	}
-
-	getConfig(): any {
-		return this.#config;
-	}
 
 	requestCollection(args: UmbCollectionFilterModel) {
 		return this.#collection.requestCollection(args);

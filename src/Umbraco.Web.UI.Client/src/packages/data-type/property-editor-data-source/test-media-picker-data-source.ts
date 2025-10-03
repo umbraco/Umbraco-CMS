@@ -1,4 +1,8 @@
-import type { UmbPickerPropertyEditorTreeDataSource } from './types.js';
+import type {
+	UmbPickerPropertyEditorTreeDataSource,
+	UmbPropertyEditorDataSourceConfigModel,
+	UmbSearchablePickerPropertyEditorDataSource,
+} from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import {
 	UmbMediaItemRepository,
@@ -14,18 +18,18 @@ import type {
 
 export class UmbMediaPickerPropertyEditorDataSource
 	extends UmbControllerBase
-	implements UmbPickerPropertyEditorTreeDataSource
+	implements UmbPickerPropertyEditorTreeDataSource, UmbSearchablePickerPropertyEditorDataSource
 {
 	#tree = new UmbMediaTreeRepository(this);
 	#item = new UmbMediaItemRepository(this);
 	#search = new UmbMediaSearchRepository(this);
-	#config: any;
+	#config: UmbPropertyEditorDataSourceConfigModel = [];
 
-	setConfig(config: any) {
+	setConfig(config: UmbPropertyEditorDataSourceConfigModel) {
 		this.#config = config;
 	}
 
-	getConfig() {
+	getConfig(): UmbPropertyEditorDataSourceConfigModel {
 		return this.#config;
 	}
 

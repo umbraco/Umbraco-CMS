@@ -1,4 +1,8 @@
-import type { UmbPickerPropertyEditorTreeDataSource } from './types.js';
+import type {
+	UmbPickerPropertyEditorTreeDataSource,
+	UmbPropertyEditorDataSourceConfigModel,
+	UmbSearchablePickerPropertyEditorDataSource,
+} from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import {
 	UmbDocumentItemRepository,
@@ -15,18 +19,18 @@ import type {
 
 export class UmbDocumentPickerPropertyEditorDataSource
 	extends UmbControllerBase
-	implements UmbPickerPropertyEditorTreeDataSource
+	implements UmbPickerPropertyEditorTreeDataSource, UmbSearchablePickerPropertyEditorDataSource
 {
 	#tree = new UmbDocumentTreeRepository(this);
 	#item = new UmbDocumentItemRepository(this);
 	#search = new UmbDocumentSearchRepository(this);
-	#config: any;
+	#config: UmbPropertyEditorDataSourceConfigModel = [];
 
-	setConfig(config: any) {
+	setConfig(config: UmbPropertyEditorDataSourceConfigModel) {
 		this.#config = config;
 	}
 
-	getConfig(): any {
+	getConfig(): UmbPropertyEditorDataSourceConfigModel {
 		return this.#config;
 	}
 
@@ -51,7 +55,7 @@ export class UmbDocumentPickerPropertyEditorDataSource
 	}
 
 	search(args: UmbSearchRequestArgs) {
-		const filterString = this.#config?.find((x: any) => x.alias === 'filter')?.value;
+		const filterString = this.#config?.find((x) => x.alias === 'filter')?.value as string;
 		const filterArray = filterString ? filterString.split(',') : [];
 		const allowedContentTypes = filterArray.map((x: string) => ({
 			unique: x,
