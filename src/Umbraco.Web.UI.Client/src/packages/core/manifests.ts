@@ -1,6 +1,7 @@
 import { manifests as authManifests } from './auth/manifests.js';
 import { manifests as collectionManifests } from './collection/manifests.js';
 import { manifests as cultureManifests } from './culture/manifests.js';
+import { manifests as dashboardManifests } from './dashboard/manifests.js';
 import { manifests as debugManifests } from './debug/manifests.js';
 import { manifests as entityActionManifests } from './entity-action/manifests.js';
 import { manifests as entityBulkActionManifests } from './entity-bulk-action/manifests.js';
@@ -21,6 +22,7 @@ import { manifests as temporaryFileManifests } from './temporary-file/manifests.
 import { manifests as themeManifests } from './themes/manifests.js';
 import { manifests as treeManifests } from './tree/manifests.js';
 import { manifests as workspaceManifests } from './workspace/manifests.js';
+import { manifests as tempLocationManifests } from './_temp-poc-location/manifests.js';
 
 import type { UmbExtensionManifestKind } from './extension-registry/index.js';
 
@@ -28,6 +30,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 	...authManifests,
 	...collectionManifests,
 	...cultureManifests,
+	...dashboardManifests,
 	...debugManifests,
 	...entityActionManifests,
 	...entityBulkActionManifests,
@@ -48,4 +51,5 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 	...themeManifests,
 	...treeManifests,
 	...workspaceManifests,
+	...tempLocationManifests,
 ];
