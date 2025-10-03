@@ -23,10 +23,10 @@ namespace Umbraco.Cms.Tests.Integration.Testing;
 [NonParallelizable]
 public abstract class UmbracoIntegrationTestBase
 {
-    private static readonly Lock s_dbLocker = new();
-    private static ITestDatabase? s_dbInstance;
-    private static TestDbMeta s_fixtureDbMeta;
-    protected static int s_testCount = 1;
+    private static readonly Lock _dbLocker = new();
+    private static ITestDatabase? _dbInstance;
+    private static TestDbMeta _fixtureDbMeta;
+    protected static int TestCount = 1;
     private readonly List<Action> _fixtureTeardown = new();
     private readonly Queue<Action> _testTeardown = new();
     private bool _firstTestInFixture = true;
@@ -45,7 +45,7 @@ public abstract class UmbracoIntegrationTestBase
 
     [SetUp]
     public virtual void SetUp_Logging() =>
-        TestContext.Out.Write($"Start test {s_testCount++}: {TestContext.CurrentContext.Test.Name}");
+        TestContext.Out.Write($"Start test {TestCount++}: {TestContext.CurrentContext.Test.Name}");
 
     [TearDown]
     public void TearDown_Logging() =>
@@ -150,20 +150,20 @@ public abstract class UmbracoIntegrationTestBase
     {
         if (_firstTestInFixture)
         {
-            s_fixtureDbMeta = withSchema ? db.AttachSchema() : db.AttachEmpty();
-            AddOnFixtureTearDown(() => db.Detach(s_fixtureDbMeta));
+            _fixtureDbMeta = withSchema ? db.AttachSchema() : db.AttachEmpty();
+            AddOnFixtureTearDown(() => db.Detach(_fixtureDbMeta));
         }
 
-        return s_fixtureDbMeta;
+        return _fixtureDbMeta;
     }
 
     private ITestDatabase GetOrCreateDatabase(ILoggerFactory loggerFactory, TestUmbracoDatabaseFactoryProvider dbFactory)
     {
-        lock (s_dbLocker)
+        lock (_dbLocker)
         {
-            if (s_dbInstance != null)
+            if (_dbInstance != null)
             {
-                return s_dbInstance;
+                return _dbInstance;
             }
 
             var settings = new TestDatabaseSettings
@@ -180,9 +180,9 @@ public abstract class UmbracoIntegrationTestBase
 
             Directory.CreateDirectory(settings.FilesPath);
 
-            s_dbInstance = TestDatabaseFactory.Create(settings, dbFactory, loggerFactory);
+            _dbInstance = TestDatabaseFactory.Create(settings, dbFactory, loggerFactory);
 
-            return s_dbInstance;
+            return _dbInstance;
         }
     }
 }
