@@ -49,7 +49,7 @@ export class UmbPropertyValueFlatMapperController extends UmbControllerBase {
 			return [mapOfThisProperty];
 		}
 
-		(api as any).manifest = manifest;
+		api.manifest = manifest;
 
 		if (api.processValues) {
 			let mappedValues: Array<ReturnType> = [];
