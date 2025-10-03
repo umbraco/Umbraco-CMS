@@ -1,0 +1,18 @@
+{
+  "$schema": "../../umbraco-package-schema.json",
+  "name": "My.Extension",
+  "extensions": [
+    {
+      "type": "propertyEditorUi",
+      "alias": "Custom.TextEditor",
+      "name": "Custom Text Editor",
+      "element": "/App_Plugins/custom-property-editor/dist/customtexteditor.js",
+      "meta": {
+        "label": "Custom Text Editor",
+        "propertyEditorSchemaAlias": "Umbraco.TextBox",
+        "icon": "icon-edit",
+        "group": "Custom"
+      }
+    }
+  ]
+}
