@@ -29,3 +29,4 @@ export * from './ref-item/index.js';
 export * from './split-panel/index.js';
 export * from './stack/index.js';
 export * from './table/index.js';
+export * from './view-loader/view-loader.element.js';
