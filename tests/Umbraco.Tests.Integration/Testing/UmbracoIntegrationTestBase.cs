@@ -108,19 +108,16 @@ public abstract class UmbracoIntegrationTestBase
         return NullLoggerFactory.Instance;
     }
 
-    protected void UseTestDatabase(IApplicationBuilder app)
-        => UseTestDatabase(app.ApplicationServices);
-
     protected void UseTestDatabase(IServiceProvider serviceProvider)
     {
-        var state = serviceProvider.GetRequiredService<IRuntimeState>();
-        var databaseFactory = serviceProvider.GetRequiredService<IUmbracoDatabaseFactory>();
-        var connectionStrings = serviceProvider.GetRequiredService<IOptionsMonitor<ConnectionStrings>>();
-
         if (TestOptions.Database == UmbracoTestOptions.Database.None)
         {
             return;
         }
+
+        var state = serviceProvider.GetRequiredService<IRuntimeState>();
+        var databaseFactory = serviceProvider.GetRequiredService<IUmbracoDatabaseFactory>();
+        var connectionStrings = serviceProvider.GetRequiredService<IOptionsMonitor<ConnectionStrings>>();
 
         var db = GetOrCreateDatabase(
             serviceProvider.GetRequiredService<ILoggerFactory>(),
@@ -139,11 +136,7 @@ public abstract class UmbracoIntegrationTestBase
         connectionStrings.CurrentValue.ConnectionString = meta.ConnectionString;
         connectionStrings.CurrentValue.ProviderName = meta.Provider;
         state.DetermineRuntimeLevel();
-
-        if (TestOptions.Database != UmbracoTestOptions.Database.None)
-        {
-            serviceProvider.GetRequiredService<IEventAggregator>().Publish(new UnattendedInstallNotification());
-        }
+        serviceProvider.GetRequiredService<IEventAggregator>().Publish(new UnattendedInstallNotification());
     }
 
     private TestDbMeta SetupPerTestDatabase(ITestDatabase db, bool withSchema)
