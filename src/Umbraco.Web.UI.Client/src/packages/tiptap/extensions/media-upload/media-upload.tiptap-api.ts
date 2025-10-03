@@ -56,9 +56,9 @@ export default class UmbTiptapMediaUploadExtensionApi extends UmbTiptapExtension
 		return [
 			Extension.create({
 				name: 'umbMediaUpload',
-				onCreate() {
-					this.parent?.();
-					const host = this.editor.view.dom;
+				onCreate({ editor }) {
+					this.parent?.({ editor });
+					const host = editor.view.dom;
 
 					host.addEventListener('dragover', (event) => {
 						// Required to allow drop events
@@ -71,7 +71,7 @@ export default class UmbTiptapMediaUploadExtensionApi extends UmbTiptapExtension
 						const files = event.dataTransfer?.files;
 						if (!files) return;
 
-						self.#uploadTemporaryFile(files, this.editor);
+						self.#uploadTemporaryFile(files, editor);
 					});
 
 					host.addEventListener('paste', (event) => {
@@ -84,7 +84,7 @@ export default class UmbTiptapMediaUploadExtensionApi extends UmbTiptapExtension
 						const files = event.clipboardData?.files;
 						if (!files) return;
 
-						self.#uploadTemporaryFile(files, this.editor);
+						self.#uploadTemporaryFile(files, editor);
 					});
 				},
 			}),

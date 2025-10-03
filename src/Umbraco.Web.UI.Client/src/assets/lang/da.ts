@@ -2473,8 +2473,7 @@ export default {
 		confirmDeleteBlockTypeNotice:
 			'Indholdet vil stadigt eksistere, men redigering af dette indhold vil ikke\n      være muligt. Indholdet vil blive vist som ikke understøttet indhold.\n    ',
 		confirmDeleteBlockGroupTitle: 'Slet gruppe?',
-		confirmDeleteBlockGroupMessage:
-			'Er du sikker på at du vil slette gruppen <strong>%0%</strong>?',
+		confirmDeleteBlockGroupMessage: 'Er du sikker på at du vil slette gruppen <strong>%0%</strong>?',
 		confirmDeleteBlockGroupNotice:
 			'Indholdet af gruppens blokke vil stadigt eksistere, men redigering af dette indhold vil ikke\n      være muligt. Indholdet vil blive vist som ikke understøttet indhold.\n    ',
 		blockConfigurationOverlayTitle: "Konfiguration af '%0%'",

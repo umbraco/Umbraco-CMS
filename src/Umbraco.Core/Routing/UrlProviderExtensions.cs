@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
@@ -66,7 +67,7 @@ public static class UrlProviderExtensions
         // and, not only for those assigned to domains in the branch, because we want
         // to show what GetUrl() would return, for every culture.
         var urls = new HashSet<UrlInfo>();
-        var cultures = (await languageService.GetAllAsync()).Select(x => x.IsoCode).ToList();
+        IEnumerable<string> cultures = await languageService.GetAllIsoCodesAsync();
 
         // get all URLs for all cultures
         // in a HashSet, so de-duplicates too

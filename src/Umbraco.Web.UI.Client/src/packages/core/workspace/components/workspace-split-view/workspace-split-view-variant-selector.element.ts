@@ -402,11 +402,26 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 		const subVariantOptions = this.#getSegmentVariantOptionsForCulture(variantOption, variantId);
 		const hint = this._hintMap.get(variantId.toString());
 		const active = this.#isVariantActive(variantId);
+		const isExpanded = this.#isVariantExpanded(variantId);
+		let subHint: UmbVariantHint | undefined;
+		if (!hint && !isExpanded) {
+			// Loop through the sub variants to find a hint if the culture variant does not have one.
+			for (const subVariant of subVariantOptions) {
+				const subVariantId = UmbVariantId.Create(subVariant);
+				const foundHint = this._hintMap.get(subVariantId.toString());
+				if (foundHint) {
+					subHint = foundHint;
+					break;
+				}
+			}
+		}
 
 		return html`
 			<div class="variant culture-variant ${active ? 'selected' : ''}">
 				${this._variesBySegment && this.#isCreated(variantOption) && subVariantOptions.length > 0
-					? html`<div class="expand-area">${this.#renderExpandToggle(variantId)}</div>`
+					? html`<div class="expand-area">
+							${this.#renderExpandToggle(variantId)}${this.#renderSubHintBadge(!isExpanded ? subHint : undefined)}
+						</div>`
 					: nothing}
 
 				<button
@@ -418,6 +433,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 					<div class="variant-info">
 						<div class="variant-name">
 							${this.#getVariantDisplayName(variantOption)}${this.#renderReadOnlyTag(variantId.culture)}
+							${this.#renderHintBadge(!active ? hint : undefined)}
 						</div>
 						<div class="variant-details">
 							<span>${this._renderVariantDetails(variantOption)}</span>
@@ -425,17 +441,22 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 					</div>
 					<div class="specs-info">${this.#getVariantSpecInfo(variantOption)}</div>
 				</button>
-				${this.#renderHintBadge(!active ? hint : undefined)} ${this.#renderSplitViewButton(variantOption)}
+				${this.#renderSplitViewButton(variantOption)}
 			</div>
-			${this.#isVariantExpanded(variantId)
-				? html` ${subVariantOptions.map((option) => this.#renderSegmentVariantOption(option))} `
-				: nothing}
+			${isExpanded ? html` ${subVariantOptions.map((option) => this.#renderSegmentVariantOption(option))} ` : nothing}
 		`;
+	}
+
+	#renderSubHintBadge(hint?: UmbVariantHint) {
+		if (!hint) return nothing;
+		return html` <umb-badge .color=${hint.color ?? 'default'} ?attention=${hint.color === 'invalid'}
+			>${hint.text}</umb-badge
+		>`;
 	}
 
 	#renderHintBadge(hint?: UmbVariantHint) {
 		if (!hint) return nothing;
-		return html` <umb-badge slot="append" .color=${hint.color ?? 'default'} ?attention=${hint.color === 'invalid'}
+		return html` <umb-badge inline-mode .color=${hint.color ?? 'default'} ?attention=${hint.color === 'invalid'}
 			>${hint.text}</umb-badge
 		>`;
 	}
@@ -458,6 +479,8 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 	#renderSegmentVariantOption(variantOption: VariantOptionModelType) {
 		const variantId = UmbVariantId.Create(variantOption);
 		const notCreated = this.#isCreateMode(variantOption, variantId);
+		const hint = this._hintMap.get(variantId.toString());
+		const active = this.#isVariantActive(variantId);
 
 		return html`
 			<div class="variant segment-variant ${this.#isVariantActive(variantId) ? 'selected' : ''}">
@@ -470,7 +493,9 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 					${notCreated ? html`<uui-icon class="add-icon" name="icon-add"></uui-icon>` : nothing}
 					<div class="variant-info">
 						<div class="variant-name">
-							${this.#getVariantDisplayName(variantOption)}${this.#renderReadOnlyTag(variantId.culture)}
+							${this.#getVariantDisplayName(variantOption)}${this.#renderReadOnlyTag(
+								variantId.culture,
+							)}${this.#renderHintBadge(!active ? hint : undefined)}
 						</div>
 						<div class="variant-details">
 							<span>${this._renderVariantDetails(variantOption)}</span>
@@ -497,7 +522,11 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 			return variantOption?.segmentInfo?.name ?? this._labelDefault;
 		}
 
-		return variantOption.variant?.name ?? variantOption.language.name;
+		if (variantOption.variant?.name && variantOption.variant?.name.trim() !== '') {
+			return variantOption.variant?.name;
+		}
+
+		return variantOption.language.name;
 	}
 
 	#getVariantSpecInfo(variantOption: VariantOptionModelType | undefined) {

@@ -211,11 +211,7 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
 
     private async Task<Attempt<IEnumerable<string>, UserGroupOperationStatus>> MapLanguageIdsToIsoCodeAsync(IEnumerable<int> ids)
     {
-        IEnumerable<ILanguage> languages = await _languageService.GetAllAsync();
-        string[] isoCodes = languages
-            .Where(x => ids.Contains(x.Id))
-            .Select(x => x.IsoCode)
-            .ToArray();
+        string[] isoCodes = await _languageService.GetIsoCodesByIdsAsync(ids.ToArray());
 
         // if a language id does not exist, it simply not returned.
         // We do this so we don't have to clean up user group data when deleting languages and to make it easier to restore accidentally removed languages
