@@ -36,10 +36,18 @@ export class UmbPropertyEditorUIIconPickerElement extends UmbLitElement implemen
 	private _color = '';
 
 	private async _openModal() {
-		const data = await umbOpenModal(this, UMB_ICON_PICKER_MODAL).catch(() => undefined);
+		const data = await umbOpenModal(this, UMB_ICON_PICKER_MODAL, {
+			value: {
+				icon: this._icon,
+				color: this._color,
+			},
+		}).catch(() => undefined);
+
 		if (!data) return;
 
-		if (data.color) {
+		if (!data.icon) {
+			this.value = '';
+		} else if (data.color) {
 			this.value = `${data.icon} color-${data.color}`;
 		} else {
 			this.value = data.icon as string;
@@ -55,9 +63,13 @@ export class UmbPropertyEditorUIIconPickerElement extends UmbLitElement implemen
 				label=${this.localize.term('defaultdialogs_selectIcon')}
 				look="outline"
 				@click=${this._openModal}>
-				${this._color
-					? html` <uui-icon name="${this._icon}" style="color:var(${extractUmbColorVariable(this._color)})"></uui-icon>`
-					: html` <uui-icon name="${this._icon}"></uui-icon>`}
+				${!this._icon
+					? html` <uui-icon name="icon-block" style="opacity:.45"> </uui-icon> `
+					: this._color
+						? html`
+								<uui-icon name="${this._icon}" style="color:var(${extractUmbColorVariable(this._color)})"> </uui-icon>
+							`
+						: html` <uui-icon name="${this._icon}"></uui-icon> `}
 			</uui-button>
 		`;
 	}

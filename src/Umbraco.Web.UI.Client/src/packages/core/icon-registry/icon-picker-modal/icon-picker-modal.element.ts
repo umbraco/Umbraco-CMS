@@ -64,9 +64,12 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 	}
 
 	#changeIcon(e: InputEvent | KeyboardEvent, iconName: string) {
-		if (e.type == 'click' || (e.type == 'keyup' && (e as KeyboardEvent).key == 'Enter')) {
-			this.modalContext?.updateValue({ icon: iconName });
-		}
+		const isActivate = e.type === 'click' || (e.type === 'keyup' && (e as KeyboardEvent).key === 'Enter');
+		if (!isActivate) return;
+
+		const nextIcon = this._currentIcon === iconName ? '' : iconName;
+
+		this.modalContext?.updateValue({ icon: nextIcon });
 	}
 
 	#onColorChange(e: UUIColorSwatchesEvent) {
@@ -75,16 +78,20 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 		this._currentColor = colorAlias;
 	}
 
+	#clearIcon = () => {
+		this.modalContext?.updateValue({ icon: '' });
+	};
+
 	override render() {
 		// TODO: Missing localization in general. [NL]
 		return html`
-			<umb-body-layout headline="Select Icon">
+			<umb-body-layout headline=${this.localize.term('defaultdialogs_selectIcon')}>
 				<div id="container">
 					${this.renderSearch()}
 					<hr />
 					<uui-color-swatches
 						.value=${this._currentColor}
-						label="Color switcher for icons"
+						label=${this.localize.term('defaultdialogs_colorSwitcher')}
 						@change=${this.#onColorChange}>
 						${
 							// TODO: Missing localization for the color aliases. [NL]
@@ -101,7 +108,18 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 						}
 					</uui-color-swatches>
 					<hr />
-					<uui-scroll-container id="icons">${this.renderIcons()}</uui-scroll-container>
+					<uui-scroll-container id="icons">
+						<uui-button
+							class=${!this._currentIcon ? 'selected' : ''}
+							label=${this.localize.term('defaultdialogs_noIcon')}
+							title=${this.localize.term('defaultdialogs_noIcon')}
+							@click=${this.#clearIcon}
+							@keyup=${(e: KeyboardEvent) => {
+								if (e.key === 'Enter' || e.key === ' ') this.#clearIcon();
+							}}>
+							<uui-icon name="icon-block" style="opacity:.35"></uui-icon> </uui-button
+						>${this.renderIcons()}</uui-scroll-container
+					>
 				</div>
 				<uui-button
 					slot="actions"
@@ -199,7 +217,7 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 				border-radius: var(--uui-border-radius);
 				font-size: 16px; /* specific for icons */
 			}
-			#icons uui-button:focus,
+			#icons uui-button:focus-visible,
 			#icons uui-button:hover,
 			#icons uui-button.selected {
 				outline: 2px solid var(--uui-color-selected);

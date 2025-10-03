@@ -531,6 +531,7 @@ export default {
 		anchorLinkPicker: 'Anchor or querystring',
 		anchorInsert: 'Name',
 		closeThisWindow: 'Close this window',
+		colorSwitcher: 'Color switcher',
 		confirmdelete: (name: string) => `Are you sure you want to delete${name ? ` <strong>${name}</strong>` : ''}?`,
 		confirmdeleteNumberOfItems: 'Are you sure you want to delete <strong>%0%</strong> of <strong>%1%</strong> items',
 		confirmdisable: 'Are you sure you want to disable',
@@ -621,6 +622,7 @@ export default {
 		selectUser: 'Select user',
 		selectUsers: 'Select users',
 		chooseUsers: 'Choose users',
+		noIcon: 'No icon',
 		noIconsFound: 'No icons were found',
 		noMacroParams: 'There are no parameters for this macro',
 		noMacros: 'There are no macros available to insert',
@@ -2604,8 +2606,7 @@ export default {
 		confirmDeleteBlockTypeNotice:
 			'The content of this block will still be present, editing of this content will no longer be available and will be shown as unsupported content.',
 		confirmDeleteBlockGroupTitle: 'Delete group?',
-		confirmDeleteBlockGroupMessage:
-			'Are you sure you want to delete group <strong>%0%</strong>?',
+		confirmDeleteBlockGroupMessage: 'Are you sure you want to delete group <strong>%0%</strong>?',
 		confirmDeleteBlockGroupNotice:
 			'The content of these Blocks will still be present, editing of this content will no longer be available and will be shown as unsupported content.',
 		blockConfigurationOverlayTitle: "Configuration of '%0%'",
