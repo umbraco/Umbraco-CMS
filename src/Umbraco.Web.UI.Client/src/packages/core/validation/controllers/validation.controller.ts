@@ -355,7 +355,10 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 		this.#validators.push(validator);
 		//validator.addEventListener('change', this.#onValidatorChange);
 		if (this.#validationMode) {
-			this.validate();
+			this.validate().then(
+				() => true,
+				() => false,
+			);
 		}
 	}
 
