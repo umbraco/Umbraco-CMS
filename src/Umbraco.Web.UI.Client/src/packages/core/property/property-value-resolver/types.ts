@@ -1,7 +1,7 @@
 import type { UmbPropertyValueData } from '../types/index.js';
+import type { ManifestPropertyValueResolver } from './property-value-resolver.extension.js';
 import type { UmbVariantDataModel } from '@umbraco-cms/backoffice/variant';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
-import type { ManifestPropertyValueResolver } from './property-value-resolver.extension.js';
 
 export type * from './property-value-resolver.extension.js';
 

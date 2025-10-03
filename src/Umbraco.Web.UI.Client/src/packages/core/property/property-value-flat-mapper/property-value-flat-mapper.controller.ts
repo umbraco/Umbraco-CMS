@@ -7,6 +7,7 @@ export class UmbPropertyValueFlatMapperController extends UmbControllerBase {
 	/**
 	 * Maps the property values of the given property data.
 	 * @param {UmbPropertyValueDataPotentiallyWithEditorAlias} property - The property data.
+	 * @param mapper
 	 * @returns {Promise<UmbPropertyValueDataPotentiallyWithEditorAlias>} - A promise that resolves to the mapped data.
 	 */
 	async flatMap<ReturnType, ValueType, PropertyType extends UmbPropertyValueDataPotentiallyWithEditorAlias<ValueType>>(

@@ -5,7 +5,6 @@ import type {
 	UmbTreeRootItemsRequestArgs,
 } from '@umbraco-cms/backoffice/tree';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbManagementApiTreeRootItemsRequestArgs extends UmbTreeRootItemsRequestArgs {
 	paging: UmbOffsetPaginationRequestModel;
 }

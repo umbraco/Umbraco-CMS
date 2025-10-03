@@ -692,7 +692,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		 * We need to ensure variant-entries across all culture variants for the given segment variant, when er property is configured to vary by segment but not culture.
 		 * This is the only different case, in all other cases its fine to just target the given variant.
 		 */
-		let variantOptionsToCheck: Array<UmbVariantId> = [];
+		const variantOptionsToCheck: Array<UmbVariantId> = [];
 		for (const variant of valueVariantIds) {
 			// If a non-culture but segmented value, then spread across all cultures for the given segment:
 			if (this.getVariesByCulture() && variant.culture === null && variant.segment !== null) {
