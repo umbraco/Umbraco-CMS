@@ -6,3 +6,7 @@ export class UmbDefaultSectionContext extends UmbSectionContext {
 		super(host);
 	}
 }
+
+export default UmbDefaultSectionContext;
+
+export { UmbDefaultSectionContext as api };
