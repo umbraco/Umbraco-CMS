@@ -100,7 +100,7 @@
     <!-- Azure.Identity, Microsoft.EntityFrameworkCore.SqlServer and Dazinator.Extensions.FileProviders brings in a legacy version of System.Text.Encodings.Web -->
     <PackageVersion Include="System.Text.Encodings.Web" Version="10.0.0-preview.7.25380.108" />
     <!-- NPoco.SqlServer brings in a vulnerable version of Microsoft.Data.SqlClient  -->
-    <PackageVersion Include="Microsoft.Data.SqlClient" Version="6.0.1" />
+    <PackageVersion Include="Microsoft.Data.SqlClient" Version="6.1.1" />
     <!-- Examine.Lucene brings in a vulnerable version of Lucene.Net.Replicator -->
     <PackageVersion Include="Lucene.Net.Replicator" Version="4.8.0-beta00017" />
   </ItemGroup>
