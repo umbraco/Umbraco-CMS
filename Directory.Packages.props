@@ -59,7 +59,7 @@
     <PackageVersion Include="MessagePack" Version="3.1.4" />
     <PackageVersion Include="MiniProfiler.AspNetCore.Mvc" Version="4.5.4" />
     <PackageVersion Include="MiniProfiler.Shared" Version="4.5.4" />
-    <PackageVersion Include="ncrontab" Version="3.3.3" />
+    <PackageVersion Include="ncrontab" Version="3.4.0" />
     <PackageVersion Include="NPoco" Version="6.1.0" />
     <PackageVersion Include="NPoco.SqlServer" Version="6.1.0" />
     <PackageVersion Include="OpenIddict.Abstractions" Version="6.2.1" />
