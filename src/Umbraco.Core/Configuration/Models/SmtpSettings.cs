@@ -96,4 +96,9 @@ public class SmtpSettings : ValidatableEntryBase
     ///     Gets or sets a value for the SMTP password.
     /// </summary>
     public string? Password { get; set; }
+
+    /// <summary>
+    ///     Gets or sets a value for the time until an email expires.
+    /// </summary>
+    public TimeSpan? EmailExpiration { get; set; }
 }

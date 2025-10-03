@@ -68,7 +68,7 @@ public class EmailUserForgotPasswordSender : IUserForgotPasswordSender
 
         var message = new EmailMessage(senderEmail, address.ToString(), emailSubject, emailBody, true);
 
-        await _emailSender.SendAsync(message, Constants.Web.EmailTypes.PasswordReset, true);
+        await _emailSender.SendAsync(message, Constants.Web.EmailTypes.PasswordReset, true, new TimeSpan(1, 0, 0));
     }
 
     public bool CanSend() => _securitySettings.AllowPasswordReset && _emailSender.CanSendRequiredEmail();
