@@ -15,7 +15,7 @@ import {
 	type UUIModalSidebarElement,
 	type UUIModalSidebarSize,
 } from '@umbraco-cms/backoffice/external/uui';
-import { UMB_ROUTE_CONTEXT, type UmbRouterSlotElement } from '@umbraco-cms/backoffice/router';
+import type { UmbRouterSlotElement } from '@umbraco-cms/backoffice/router';
 import { createExtensionElement, loadManifestElement } from '@umbraco-cms/backoffice/extension-api';
 import { UmbContextBoundary, UmbContextProvider } from '@umbraco-cms/backoffice/context-api';
 import { UmbContextProxyController } from '@umbraco-cms/backoffice/context-proxy';
@@ -93,7 +93,10 @@ export class UmbModalElement extends UmbLitElement {
 			this.#modalRouterElement = document.createElement('div');
 			// Notice inline styling here is used cause the element is not appended into this elements shadowDom but outside and there by gets into the element via a slot.
 			this.#modalRouterElement.style.display = 'contents';
-			new UmbContextBoundary(this.#modalRouterElement, UMB_ROUTE_CONTEXT).hostConnected();
+			// Create a context boundary to prevent route context requests from bubbling up through the modal
+			if (this.#modalContext.routeContextToken) {
+				new UmbContextBoundary(this.#modalRouterElement, this.#modalContext.routeContextToken).hostConnected();
+			}
 		}
 
 		this.element.appendChild(this.#modalRouterElement);
