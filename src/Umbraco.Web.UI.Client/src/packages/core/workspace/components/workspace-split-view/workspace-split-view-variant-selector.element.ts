@@ -408,7 +408,6 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 			// Loop through the sub variants to find a hint if the culture variant does not have one.
 			for (const subVariant of subVariantOptions) {
 				const subVariantId = UmbVariantId.Create(subVariant);
-				console.log(subVariantId, this._hintMap);
 				const foundHint = this._hintMap.get(subVariantId.toString());
 				if (foundHint) {
 					subHint = foundHint;
