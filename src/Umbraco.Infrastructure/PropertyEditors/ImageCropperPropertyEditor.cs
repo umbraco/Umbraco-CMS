@@ -29,6 +29,7 @@ public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
     INotificationHandler<MediaDeletedNotification>,
     INotificationHandler<MediaSavingNotification>,
     INotificationHandler<MediaMovedToRecycleBinNotification>,
+    INotificationHandler<MediaMovedNotification>,
     INotificationHandler<MemberDeletedNotification>
 {
     private readonly UploadAutoFillProperties _autoFillProperties;
@@ -138,7 +139,15 @@ public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
     }
 
     /// <inheritdoc/>
-    public void Handle(MediaMovedToRecycleBinNotification notification) => RenameContainedFiles(notification.MoveInfoCollection.Select(x => x.Entity));
+    public void Handle(MediaMovedToRecycleBinNotification notification) => SuffixContainedFiles(
+        notification.MoveInfoCollection
+            .Select(x => x.Entity));
+
+    /// <inheritdoc/>
+    public void Handle(MediaMovedNotification notification) => RemoveSuffixFromContainedFiles(
+        notification.MoveInfoCollection
+            .Where(x => x.OriginalPath.StartsWith($"{Constants.System.RootString},{Constants.System.RecycleBinMediaString}"))
+            .Select(x => x.Entity));
 
     /// <inheritdoc/>
     public void Handle(MemberDeletedNotification notification) => DeleteContainedFiles(notification.DeletedEntities);
@@ -243,16 +252,35 @@ public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
         return relative ? _mediaFileManager.FileSystem.GetRelativePath(source) : source;
     }
 
+    /// <summary>
+    /// Deletes all file upload property files contained within a collection of content entities.
+    /// </summary>
+    /// <param name="deletedEntities">Delete media entities.</param>
     private void DeleteContainedFiles(IEnumerable<IContentBase> deletedEntities)
     {
         IEnumerable<string> filePathsToDelete = ContainedFilePaths(deletedEntities);
         _mediaFileManager.DeleteMediaFiles(filePathsToDelete);
     }
 
-    private void RenameContainedFiles(IEnumerable<IMedia> trashedMedia)
+    /// <summary>
+    /// Renames all file upload property files contained within a collection of media entities that have been moved to the recycle bin.
+    /// </summary>
+    /// <param name="trashedMedia">Media entities that have been moved to the recycle bin.</param>
+    private void SuffixContainedFiles(IEnumerable<IMedia> trashedMedia)
     {
         IEnumerable<string> filePathsToRename = ContainedFilePaths(trashedMedia);
-        _mediaFileManager.SuffixMediaFiles(filePathsToRename, ".deleted");
+        _mediaFileManager.SuffixMediaFiles(filePathsToRename, Constants.Conventions.Media.TrashedMediaSuffix);
+    }
+
+    /// <summary>
+    /// Renames all file upload property files contained within a collection of media entities that have been restore from the recycle bin.
+    /// </summary>
+    /// <param name="restoredMedia">Media entities that have been restored from the recycle bin.</param>
+    private void RemoveSuffixFromContainedFiles(IEnumerable<IMedia> restoredMedia)
+    {
+        IEnumerable<string> filePathsToRename = ContainedFilePaths(restoredMedia)
+            .Select(x => Path.ChangeExtension(x, Constants.Conventions.Media.TrashedMediaSuffix + Path.GetExtension(x)));
+        _mediaFileManager.RemoveSuffixFromMediaFiles(filePathsToRename, Constants.Conventions.Media.TrashedMediaSuffix);
     }
 
     /// <summary>

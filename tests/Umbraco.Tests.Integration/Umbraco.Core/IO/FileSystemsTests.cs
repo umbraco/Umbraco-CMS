@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.IO;
 using System.Text;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Hosting;
@@ -70,7 +69,7 @@ internal sealed class FileSystemsTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Suffix_Media_Files()
+    public void Can_Add_And_Remove_Suffix_To_And_From_Media_Files()
     {
         var mediaFileManager = GetRequiredService<MediaFileManager>();
         var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes("test"));
@@ -81,10 +80,18 @@ internal sealed class FileSystemsTests : UmbracoIntegrationTest
         var physPath = hostingEnvironment.MapPathWebRoot(Path.Combine("media", virtualPath));
         Assert.IsTrue(File.Exists(physPath));
 
-        mediaFileManager.SuffixMediaFiles([virtualPath], ".deleted");
+        // Add .deleted suffix.
+        mediaFileManager.SuffixMediaFiles([virtualPath], Cms.Core.Constants.Conventions.Media.TrashedMediaSuffix);
         Assert.IsFalse(File.Exists(physPath));
 
-        physPath = hostingEnvironment.MapPathWebRoot(Path.Combine("media", virtualPath.Replace("file.txt", "file.deleted.txt")));
+        var virtualPathWithSuffix = virtualPath.Replace("file.txt", $"file{Cms.Core.Constants.Conventions.Media.TrashedMediaSuffix}.txt");
+        physPath = hostingEnvironment.MapPathWebRoot(Path.Combine("media", virtualPathWithSuffix));
+        Assert.IsTrue(File.Exists(physPath));
+
+        // Remove .deleted suffix.
+        mediaFileManager.RemoveSuffixFromMediaFiles([virtualPathWithSuffix], Cms.Core.Constants.Conventions.Media.TrashedMediaSuffix);
+        Assert.IsFalse(File.Exists(physPath));
+        physPath = hostingEnvironment.MapPathWebRoot(Path.Combine("media", virtualPath));
         Assert.IsTrue(File.Exists(physPath));
     }
 

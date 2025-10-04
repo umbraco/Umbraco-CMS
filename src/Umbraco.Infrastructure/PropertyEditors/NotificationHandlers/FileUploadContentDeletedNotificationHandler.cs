@@ -21,6 +21,7 @@ internal sealed class FileUploadContentDeletedNotificationHandler : FileUploadNo
     INotificationHandler<ContentDeletedBlueprintNotification>,
     INotificationHandler<MediaDeletedNotification>,
     INotificationHandler<MediaMovedToRecycleBinNotification>,
+    INotificationHandler<MediaMovedNotification>,
     INotificationHandler<MemberDeletedNotification>
 {
     private readonly BlockEditorValues<BlockListValue, BlockListLayoutItem> _blockListEditorValues;
@@ -50,7 +51,15 @@ internal sealed class FileUploadContentDeletedNotificationHandler : FileUploadNo
     public void Handle(MediaDeletedNotification notification) => DeleteContainedFiles(notification.DeletedEntities);
 
     /// <inheritdoc/>
-    public void Handle(MediaMovedToRecycleBinNotification notification) => RenameContainedFiles(notification.MoveInfoCollection.Select(x => x.Entity));
+    public void Handle(MediaMovedToRecycleBinNotification notification) => SuffixContainedFiles(
+        notification.MoveInfoCollection
+            .Select(x => x.Entity));
+
+    /// <inheritdoc/>
+    public void Handle(MediaMovedNotification notification) => RemoveSuffixFromContainedFiles(
+        notification.MoveInfoCollection
+            .Where(x => x.OriginalPath.StartsWith($"{Constants.System.RootString},{Constants.System.RecycleBinMediaString}"))
+            .Select(x => x.Entity));
 
     /// <inheritdoc/>
     public void Handle(MemberDeletedNotification notification) => DeleteContainedFiles(notification.DeletedEntities);
@@ -69,10 +78,21 @@ internal sealed class FileUploadContentDeletedNotificationHandler : FileUploadNo
     /// Renames all file upload property files contained within a collection of media entities that have been moved to the recycle bin.
     /// </summary>
     /// <param name="trashedMedia">Media entities that have been moved to the recycle bin.</param>
-    private void RenameContainedFiles(IEnumerable<IMedia> trashedMedia)
+    private void SuffixContainedFiles(IEnumerable<IMedia> trashedMedia)
     {
         IEnumerable<string> filePathsToRename = ContainedFilePaths(trashedMedia);
-        MediaFileManager.SuffixMediaFiles(filePathsToRename, ".deleted");
+        MediaFileManager.SuffixMediaFiles(filePathsToRename, Constants.Conventions.Media.TrashedMediaSuffix);
+    }
+
+    /// <summary>
+    /// Renames all file upload property files contained within a collection of media entities that have been restore from the recycle bin.
+    /// </summary>
+    /// <param name="restoredMedia">Media entities that have been restored from the recycle bin.</param>
+    private void RemoveSuffixFromContainedFiles(IEnumerable<IMedia> restoredMedia)
+    {
+        IEnumerable<string> filePathsToRename = ContainedFilePaths(restoredMedia)
+            .Select(x => Path.ChangeExtension(x, Constants.Conventions.Media.TrashedMediaSuffix + Path.GetExtension(x)));
+        MediaFileManager.RemoveSuffixFromMediaFiles(filePathsToRename, Constants.Conventions.Media.TrashedMediaSuffix);
     }
 
     /// <summary>

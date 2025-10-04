@@ -71,6 +71,24 @@ public sealed class MediaFileManager
             },
             "Failed to rename media file '{File}'.");
 
+    /// <summary>
+    /// Removes a suffix from media files.
+    /// </summary>
+    /// <param name="files">Files to remove a suffix from.</param>
+    /// <param name="suffix">The suffix to remove.</param>
+    /// <remarks>
+    /// The suffix will be removed prior to the file extension, e.g. "image.deleted.jpg" with suffix ".deleted" will become "image.jpg".
+    /// </remarks>
+    public void RemoveSuffixFromMediaFiles(IEnumerable<string> files, string suffix)
+        => PerformMediaFileOperation(
+            files,
+            file =>
+            {
+                var fileWithSuffixRemoved = file.Replace(suffix + Path.GetExtension(file), Path.GetExtension(file));
+                FileSystem.MoveFile(file, fileWithSuffixRemoved);
+            },
+            "Failed to rename media file '{File}'.");
+
     private void PerformMediaFileOperation(IEnumerable<string> files, Action<string> fileOperation, string errorMessage)
     {
         files = files.Distinct();

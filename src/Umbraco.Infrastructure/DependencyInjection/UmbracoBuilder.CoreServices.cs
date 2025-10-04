@@ -368,6 +368,7 @@ public static partial class UmbracoBuilderExtensions
             .AddNotificationHandler<ContentDeletedBlueprintNotification, FileUploadContentDeletedNotificationHandler>()
             .AddNotificationHandler<MediaDeletedNotification, FileUploadContentDeletedNotificationHandler>()
             .AddNotificationHandler<MediaMovedToRecycleBinNotification, FileUploadContentDeletedNotificationHandler>()
+            .AddNotificationHandler<MediaMovedNotification, FileUploadContentDeletedNotificationHandler>()
             .AddNotificationHandler<MemberDeletedNotification, FileUploadContentDeletedNotificationHandler>()
             .AddNotificationHandler<MediaSavingNotification, FileUploadMediaSavingNotificationHandler>()
             .AddNotificationHandler<ContentCopiedNotification, ImageCropperPropertyEditor>()
@@ -375,6 +376,7 @@ public static partial class UmbracoBuilderExtensions
             .AddNotificationHandler<MediaDeletedNotification, ImageCropperPropertyEditor>()
             .AddNotificationHandler<MediaSavingNotification, ImageCropperPropertyEditor>()
             .AddNotificationHandler<MediaMovedToRecycleBinNotification, ImageCropperPropertyEditor>()
+            .AddNotificationHandler<MediaMovedNotification, ImageCropperPropertyEditor>()
             .AddNotificationHandler<MemberDeletedNotification, ImageCropperPropertyEditor>()
             .AddNotificationHandler<ContentTypeCacheRefresherNotification, ConstructorCacheClearNotificationHandler>()
             .AddNotificationHandler<DataTypeCacheRefresherNotification, ConstructorCacheClearNotificationHandler>();
