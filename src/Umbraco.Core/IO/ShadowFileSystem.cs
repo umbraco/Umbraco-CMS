@@ -167,6 +167,60 @@ internal sealed partial class ShadowFileSystem : IFileSystem
         Nodes[NormPath(path)] = new ShadowNode(true, false);
     }
 
+    public void MoveFile(string source, string target, bool overrideIfExists = true)
+    {
+        var normSource = NormPath(source);
+        var normTarget = NormPath(target);
+        if (Nodes.TryGetValue(normSource, out ShadowNode? sf) == false || sf.IsDir || sf.IsDelete)
+        {
+            if (Inner.FileExists(source) == false)
+            {
+                throw new FileNotFoundException("Source file does not exist.");
+            }
+        }
+
+        if (Nodes.TryGetValue(normTarget, out ShadowNode? tf) && tf.IsExist && (tf.IsDir || overrideIfExists == false))
+        {
+            throw new IOException(string.Format("A file at path '{0}' already exists", target));
+        }
+
+        var parts = normTarget.Split(Constants.CharArrays.ForwardSlash);
+        for (var i = 0; i < parts.Length - 1; i++)
+        {
+            var dirPath = string.Join("/", parts.Take(i + 1));
+            if (Nodes.TryGetValue(dirPath, out ShadowNode? sd))
+            {
+                if (sd.IsFile)
+                {
+                    throw new InvalidOperationException("Invalid path.");
+                }
+
+                if (sd.IsDelete)
+                {
+                    Nodes[dirPath] = new ShadowNode(false, true);
+                }
+            }
+            else
+            {
+                if (Inner.DirectoryExists(dirPath))
+                {
+                    continue;
+                }
+
+                if (Inner.FileExists(dirPath))
+                {
+                    throw new InvalidOperationException("Invalid path.");
+                }
+
+                Nodes[dirPath] = new ShadowNode(false, true);
+            }
+        }
+
+        _sfs.MoveFile(normSource, normTarget, overrideIfExists);
+        Nodes[normSource] = new ShadowNode(true, false);
+        Nodes[normTarget] = new ShadowNode(false, false);
+    }
+
     public bool FileExists(string path)
     {
         if (Nodes.TryGetValue(NormPath(path), out ShadowNode? sf))
