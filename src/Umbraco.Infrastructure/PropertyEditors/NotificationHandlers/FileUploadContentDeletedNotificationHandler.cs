@@ -1,6 +1,8 @@
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache.PropertyEditors;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
@@ -14,7 +16,8 @@ using Umbraco.Cms.Infrastructure.Extensions;
 namespace Umbraco.Cms.Infrastructure.PropertyEditors.NotificationHandlers;
 
 /// <summary>
-/// Provides base class for notification handler that processes file uploads when a content entity is deleted, removing associated files.
+/// Provides base class for notification handler that processes file uploads when a content entity is deleted or media
+/// operations are carried out, processing the associated files.
 /// </summary>
 internal sealed class FileUploadContentDeletedNotificationHandler : FileUploadNotificationHandlerBase,
     INotificationHandler<ContentDeletedNotification>,
@@ -26,6 +29,7 @@ internal sealed class FileUploadContentDeletedNotificationHandler : FileUploadNo
 {
     private readonly BlockEditorValues<BlockListValue, BlockListLayoutItem> _blockListEditorValues;
     private readonly BlockEditorValues<BlockGridValue, BlockGridLayoutItem> _blockGridEditorValues;
+    private ImagingSettings _imagingSettings;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FileUploadContentDeletedNotificationHandler"/> class.
@@ -34,11 +38,15 @@ internal sealed class FileUploadContentDeletedNotificationHandler : FileUploadNo
         IJsonSerializer jsonSerializer,
         MediaFileManager mediaFileManager,
         IBlockEditorElementTypeCache elementTypeCache,
-        ILogger<FileUploadContentDeletedNotificationHandler> logger)
+        ILogger<FileUploadContentDeletedNotificationHandler> logger,
+        IOptionsMonitor<ImagingSettings> imagingSettings)
         : base(jsonSerializer, mediaFileManager, elementTypeCache)
     {
         _blockListEditorValues = new(new BlockListEditorDataConverter(jsonSerializer), elementTypeCache, logger);
         _blockGridEditorValues = new(new BlockGridEditorDataConverter(jsonSerializer), elementTypeCache, logger);
+
+        _imagingSettings = imagingSettings.CurrentValue;
+        imagingSettings.OnChange(x => _imagingSettings = x);
     }
 
     /// <inheritdoc/>
@@ -51,15 +59,31 @@ internal sealed class FileUploadContentDeletedNotificationHandler : FileUploadNo
     public void Handle(MediaDeletedNotification notification) => DeleteContainedFiles(notification.DeletedEntities);
 
     /// <inheritdoc/>
-    public void Handle(MediaMovedToRecycleBinNotification notification) => SuffixContainedFiles(
-        notification.MoveInfoCollection
-            .Select(x => x.Entity));
+    public void Handle(MediaMovedToRecycleBinNotification notification)
+    {
+        if (_imagingSettings.EnableMediaRecycleBinProtection is false)
+        {
+            return;
+        }
+
+        SuffixContainedFiles(
+            notification.MoveInfoCollection
+                .Select(x => x.Entity));
+    }
 
     /// <inheritdoc/>
-    public void Handle(MediaMovedNotification notification) => RemoveSuffixFromContainedFiles(
-        notification.MoveInfoCollection
-            .Where(x => x.OriginalPath.StartsWith($"{Constants.System.RootString},{Constants.System.RecycleBinMediaString}"))
-            .Select(x => x.Entity));
+    public void Handle(MediaMovedNotification notification)
+    {
+        if (_imagingSettings.EnableMediaRecycleBinProtection is false)
+        {
+            return;
+        }
+
+        RemoveSuffixFromContainedFiles(
+            notification.MoveInfoCollection
+                .Where(x => x.OriginalPath.StartsWith($"{Constants.System.RootString},{Constants.System.RecycleBinMediaString}"))
+                .Select(x => x.Entity));
+    }
 
     /// <inheritdoc/>
     public void Handle(MemberDeletedNotification notification) => DeleteContainedFiles(notification.DeletedEntities);
