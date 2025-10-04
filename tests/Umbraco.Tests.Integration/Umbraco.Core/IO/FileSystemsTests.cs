@@ -69,6 +69,25 @@ internal sealed class FileSystemsTests : UmbracoIntegrationTest
         Assert.IsTrue(Directory.Exists(physPath));
     }
 
+    [Test]
+    public void Can_Suffix_Media_Files()
+    {
+        var mediaFileManager = GetRequiredService<MediaFileManager>();
+        var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes("test"));
+        var virtualPath = mediaFileManager.GetMediaPath("file.txt", Guid.NewGuid(), Guid.NewGuid());
+        mediaFileManager.FileSystem.AddFile(virtualPath, memoryStream);
+
+        var hostingEnvironment = GetRequiredService<IHostingEnvironment>();
+        var physPath = hostingEnvironment.MapPathWebRoot(Path.Combine("media", virtualPath));
+        Assert.IsTrue(File.Exists(physPath));
+
+        mediaFileManager.SuffixMediaFiles([virtualPath], ".deleted");
+        Assert.IsFalse(File.Exists(physPath));
+
+        physPath = hostingEnvironment.MapPathWebRoot(Path.Combine("media", virtualPath.Replace("file.txt", "file.deleted.txt")));
+        Assert.IsTrue(File.Exists(physPath));
+    }
+
     // TODO: don't make sense anymore
     /*
     [Test]

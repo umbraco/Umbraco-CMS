@@ -20,6 +20,7 @@ internal sealed class FileUploadContentDeletedNotificationHandler : FileUploadNo
     INotificationHandler<ContentDeletedNotification>,
     INotificationHandler<ContentDeletedBlueprintNotification>,
     INotificationHandler<MediaDeletedNotification>,
+    INotificationHandler<MediaMovedToRecycleBinNotification>,
     INotificationHandler<MemberDeletedNotification>
 {
     private readonly BlockEditorValues<BlockListValue, BlockListLayoutItem> _blockListEditorValues;
@@ -49,16 +50,29 @@ internal sealed class FileUploadContentDeletedNotificationHandler : FileUploadNo
     public void Handle(MediaDeletedNotification notification) => DeleteContainedFiles(notification.DeletedEntities);
 
     /// <inheritdoc/>
+    public void Handle(MediaMovedToRecycleBinNotification notification) => RenameContainedFiles(notification.MoveInfoCollection.Select(x => x.Entity));
+
+    /// <inheritdoc/>
     public void Handle(MemberDeletedNotification notification) => DeleteContainedFiles(notification.DeletedEntities);
 
     /// <summary>
     /// Deletes all file upload property files contained within a collection of content entities.
     /// </summary>
-    /// <param name="deletedEntities"></param>
+    /// <param name="deletedEntities">Delete media entities.</param>
     private void DeleteContainedFiles(IEnumerable<IContentBase> deletedEntities)
     {
         IReadOnlyList<string> filePathsToDelete = ContainedFilePaths(deletedEntities);
         MediaFileManager.DeleteMediaFiles(filePathsToDelete);
+    }
+
+    /// <summary>
+    /// Renames all file upload property files contained within a collection of media entities that have been moved to the recycle bin.
+    /// </summary>
+    /// <param name="trashedMedia">Media entities that have been moved to the recycle bin.</param>
+    private void RenameContainedFiles(IEnumerable<IMedia> trashedMedia)
+    {
+        IEnumerable<string> filePathsToRename = ContainedFilePaths(trashedMedia);
+        MediaFileManager.SuffixMediaFiles(filePathsToRename, ".deleted");
     }
 
     /// <summary>

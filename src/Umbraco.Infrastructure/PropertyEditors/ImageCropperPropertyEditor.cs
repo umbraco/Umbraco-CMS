@@ -24,8 +24,11 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     ValueType = ValueTypes.Json,
     ValueEditorIsReusable = true)]
 public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
-    INotificationHandler<ContentCopiedNotification>, INotificationHandler<ContentDeletedNotification>,
-    INotificationHandler<MediaDeletedNotification>, INotificationHandler<MediaSavingNotification>,
+    INotificationHandler<ContentCopiedNotification>,
+    INotificationHandler<ContentDeletedNotification>,
+    INotificationHandler<MediaDeletedNotification>,
+    INotificationHandler<MediaSavingNotification>,
+    INotificationHandler<MediaMovedToRecycleBinNotification>,
     INotificationHandler<MemberDeletedNotification>
 {
     private readonly UploadAutoFillProperties _autoFillProperties;
@@ -119,10 +122,13 @@ public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
         }
     }
 
+    /// <inheritdoc/>
     public void Handle(ContentDeletedNotification notification) => DeleteContainedFiles(notification.DeletedEntities);
 
+    /// <inheritdoc/>
     public void Handle(MediaDeletedNotification notification) => DeleteContainedFiles(notification.DeletedEntities);
 
+    /// <inheritdoc/>
     public void Handle(MediaSavingNotification notification)
     {
         foreach (IMedia entity in notification.SavedEntities)
@@ -131,6 +137,10 @@ public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
         }
     }
 
+    /// <inheritdoc/>
+    public void Handle(MediaMovedToRecycleBinNotification notification) => RenameContainedFiles(notification.MoveInfoCollection.Select(x => x.Entity));
+
+    /// <inheritdoc/>
     public void Handle(MemberDeletedNotification notification) => DeleteContainedFiles(notification.DeletedEntities);
 
     /// <summary>
@@ -237,6 +247,12 @@ public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
     {
         IEnumerable<string> filePathsToDelete = ContainedFilePaths(deletedEntities);
         _mediaFileManager.DeleteMediaFiles(filePathsToDelete);
+    }
+
+    private void RenameContainedFiles(IEnumerable<IMedia> trashedMedia)
+    {
+        IEnumerable<string> filePathsToRename = ContainedFilePaths(trashedMedia);
+        _mediaFileManager.SuffixMediaFiles(filePathsToRename, ".deleted");
     }
 
     /// <summary>

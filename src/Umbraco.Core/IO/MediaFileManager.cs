@@ -1,7 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Strings;
@@ -40,7 +38,40 @@ public sealed class MediaFileManager
     ///     Delete media files.
     /// </summary>
     /// <param name="files">Files to delete (filesystem-relative paths).</param>
-    public void DeleteMediaFiles(IEnumerable<string> files)
+    public void DeleteMediaFiles(IEnumerable<string> files) =>
+        PerformMediaFileOperation(
+            files,
+            file =>
+            {
+                FileSystem.DeleteFile(file);
+
+                var directory = _mediaPathScheme.GetDeleteDirectory(this, file);
+                if (!directory.IsNullOrWhiteSpace())
+                {
+                    FileSystem.DeleteDirectory(directory!, true);
+                }
+            },
+            "Failed to delete media file '{File}'.");
+
+    /// <summary>
+    /// Adds a suffix to media files.
+    /// </summary>
+    /// <param name="files">Files to append a suffix to.</param>
+    /// <param name="suffix">The suffix to append.</param>
+    /// <remarks>
+    /// The suffix will be added prior to the file extension, e.g. "image.jpg" with suffix ".deleted" will become "image.deleted.jpg".
+    /// </remarks>
+    public void SuffixMediaFiles(IEnumerable<string> files, string suffix)
+        => PerformMediaFileOperation(
+            files,
+            file =>
+            {
+                var suffixedFile = Path.ChangeExtension(file, suffix + Path.GetExtension(file));
+                FileSystem.MoveFile(file, suffixedFile);
+            },
+            "Failed to rename media file '{File}'.");
+
+    private void PerformMediaFileOperation(IEnumerable<string> files, Action<string> fileOperation, string errorMessage)
     {
         files = files.Distinct();
 
@@ -61,17 +92,11 @@ public sealed class MediaFileManager
                     return;
                 }
 
-                FileSystem.DeleteFile(file);
-
-                var directory = _mediaPathScheme.GetDeleteDirectory(this, file);
-                if (!directory.IsNullOrWhiteSpace())
-                {
-                    FileSystem.DeleteDirectory(directory!, true);
-                }
+                fileOperation(file);
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Failed to delete media file '{File}'.", file);
+                _logger.LogError(e, errorMessage, file);
             }
         });
     }
