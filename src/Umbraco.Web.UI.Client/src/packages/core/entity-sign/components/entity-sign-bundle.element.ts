@@ -145,48 +145,40 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 		css`
 			:host {
 				anchor-name: --entity-sign;
-				position: relative; /* fallback for when anchors are not supported */
-				--row-h: 22px;
+				position: relative;
+				--row-h: 22px; /*TODO:Change to ems*/
 				--icon-w: 12px;
-				--pad-x: 4px;
+				--pad-x: 4px; /*TODO:Change to ems*/
 				--ease: cubic-bezier(0.2, 0.8, 0.2, 1);
 			}
 
 			.infobox {
-				position: absolute; /* fallback for when anchors are not supported */
-				left: 100%; /* fallback for when anchors are not supported */
-				bottom: 0; /* fallback for when anchors are not supported */
+				position: absolute;
+				left: 100%;
+				top: 0;
 				background: transparent;
 				padding: 0;
 				font-size: 8px;
-				clip-path: inset(calc((var(--count) - 1) * var(--row-h)) calc(100% - (var(--icon-w) + 2 * var(--pad-x))) 0 0);
+				clip-path: inset(0 calc(100% - (var(--icon-w) + 2 * var(--pad-x))) calc((var(--count) - 1) * var(--row-h)) 0);
 				transition: clip-path 220ms var(--ease);
 				will-change: clip-path;
-			}
-
-			/* CLOSE STATE */
-			@supports (position-anchor: --any-check) {
-				.infobox {
-					position: fixed;
-					position-anchor: --entity-sign;
-					bottom: anchor(bottom);
-					left: anchor(right);
-				}
+				min-height: fit-content;
+				z-index: 1;
 			}
 
 			.infobox > .sign-container {
 				display: flex;
-				align-items: end;
+				align-items: start;
 				gap: 3px;
 				position: relative;
 				z-index: 0;
-				transform: translateY(calc((var(--count) - 1 - var(--i, 0)) * var(--row-h)));
+				transform: translateY(calc(-1 * var(--i, 0) * var(--row-h)));
 				transition: transform 220ms var(--ease);
 				will-change: transform;
 			}
 			.infobox > .sign-container.first-icon {
-				z-index: 1;
 				margin-left: 3px;
+				z-index: 1;
 			}
 			.infobox .sign-container .badge-icon {
 				background: var(--sign-bundle-bg, transparent);
@@ -201,6 +193,11 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 			/*OPEN STATE -- Prevent the hover state in firefox(until support of the position-anchor)*/
 			@supports (position-anchor: --any-check) {
 				.infobox.is-open {
+					position: fixed;
+					position-anchor: --entity-sign;
+					top: anchor(bottom);
+					left: anchor(right);
+					z-index: 2;
 					background: var(--uui-color-surface);
 					font-size: 12px;
 					border-radius: 3px;
