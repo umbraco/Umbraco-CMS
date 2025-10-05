@@ -146,9 +146,9 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 			:host {
 				anchor-name: --entity-sign;
 				position: relative;
-				--row-h: 22px; /*TODO:Change to ems*/
-				--icon-w: 12px;
-				--pad-x: 4px; /*TODO:Change to ems*/
+				--row-h: 1.375rem; /* 22px / 16 */
+				--icon-w: 0.75rem; /* 12px / 16 */
+				--pad-x: 0.25rem; /*  4px / 16 */
 				--ease: cubic-bezier(0.2, 0.8, 0.2, 1);
 			}
 
@@ -163,7 +163,6 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 				transition: clip-path 220ms var(--ease);
 				will-change: clip-path;
 				min-height: fit-content;
-				z-index: 1;
 			}
 
 			.infobox > .sign-container {
@@ -171,7 +170,6 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 				align-items: start;
 				gap: 3px;
 				position: relative;
-				z-index: 0;
 				transform: translateY(calc(-1 * var(--i, 0) * var(--row-h)));
 				transition: transform 220ms var(--ease);
 				will-change: transform;
@@ -197,7 +195,7 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 					position-anchor: --entity-sign;
 					top: anchor(bottom);
 					left: anchor(right);
-					z-index: 2;
+					z-index: 1;
 					background: var(--uui-color-surface);
 					font-size: 12px;
 					border-radius: 3px;
