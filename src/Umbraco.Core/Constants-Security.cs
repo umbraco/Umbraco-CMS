@@ -69,6 +69,8 @@ public static partial class Constants
 
         public const string BackOfficeAuthenticationType = "UmbracoBackOffice";
         public const string BackOfficeExternalAuthenticationType = "UmbracoExternalCookie";
+        public const string BackOfficeExposedAuthenticationType = "UmbracoBackOfficeExposed";
+        public const string BackOfficeExposedCookieName = "UMB_UCONTEXT_EXPOSED";
         public const string BackOfficeExternalCookieName = "UMB_EXTLOGIN";
         public const string BackOfficeTokenAuthenticationType = "UmbracoBackOfficeToken";
         public const string BackOfficeTwoFactorAuthenticationType = "UmbracoTwoFactorCookie";
