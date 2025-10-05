@@ -74,6 +74,7 @@ export default {
 		wasMovedTo: 'was moved to',
 		viewActionsFor: (name) => (name ? `View actions for '${name}'` : 'View actions'),
 		loadMore: 'Load more',
+		showMore: 'Show more',
 	},
 	actionCategories: {
 		content: 'Content',

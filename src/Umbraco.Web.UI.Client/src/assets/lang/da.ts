@@ -74,6 +74,7 @@ export default {
 		readOnly: 'Skrivebeskyttet',
 		trash: 'Papirkurv',
 		loadMore: 'Indlæs flere',
+		showMore: 'Vis flere',
 	},
 	actionCategories: {
 		content: 'Indhold',

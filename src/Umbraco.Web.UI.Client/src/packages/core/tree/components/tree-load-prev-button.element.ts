@@ -1,37 +1,18 @@
-import { css, customElement, html, ifDefined, property } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
+import { css, customElement } from '@umbraco-cms/backoffice/external/lit';
+import { UmbTreeLoadMoreButtonElement } from './tree-load-more-button.element';
 
 @customElement('umb-tree-load-prev-button')
-export class UmbTreeLoadPrevButtonElement extends UmbLitElement {
-	@property({ type: Boolean })
-	loading: boolean = false;
+export class UmbTreeLoadPrevButtonElement extends UmbTreeLoadMoreButtonElement {
+	protected override _dataMark = 'tree:load-prev';
 
-	override render() {
-		const state: UUIButtonState = this.loading ? 'waiting' : undefined;
-		return html`<uui-button
-			state=${ifDefined(state)}
-			data-mark="tree:load-prev"
-			id="load-prev"
-			look="secondary"
-			label=${this.localize.term('actions_loadMore')}></uui-button>`;
-	}
-
-	static override readonly styles = css`
-		:host {
-			position: relative;
-			display: block;
-			padding-left: var(--uui-size-space-3);
-			margin-right: var(--uui-size-space-2);
-			margin-left: calc(var(--uui-menu-item-indent, 0) * var(--uui-size-4));
-		}
-
-		uui-button {
-			width: 100%;
-			height: var(--uui-size---uui-size-layout-3);
-			--uui-box-border-radius: calc(var(--uui-border-radius) * 2);
-		}
-	`;
+	static override readonly styles = [
+		UmbTreeLoadMoreButtonElement.styles,
+		css`
+			:host {
+				margin-bottom: 0;
+			}
+		`,
+	];
 }
 
 declare global {
