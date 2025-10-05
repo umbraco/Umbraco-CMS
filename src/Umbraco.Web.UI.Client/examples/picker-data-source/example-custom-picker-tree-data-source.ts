@@ -16,7 +16,6 @@ export class ExampleCustomPickerTreePropertyEditorDataSource
 			entityType: 'example-root',
 			isFolder: true,
 		};
-		debugger;
 
 		return { data: root };
 	}
@@ -29,8 +28,6 @@ export class ExampleCustomPickerTreePropertyEditorDataSource
 			items: rootItems,
 			total: rootItems.length,
 		};
-
-		debugger;
 
 		return { data };
 	}
