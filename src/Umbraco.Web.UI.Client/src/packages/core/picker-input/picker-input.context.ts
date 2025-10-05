@@ -21,7 +21,7 @@ export class UmbPickerInputContext<
 	PickerModalConfigType extends UmbPickerModalData<PickerItemType> = UmbPickerModalData<PickerItemType>,
 	PickerModalValueType extends UmbPickerModalValue = UmbPickerModalValue,
 > extends UmbContextBase {
-	modalAlias: string | UmbModalToken<UmbPickerModalData<PickerItemType>, PickerModalValueType>;
+	modalAlias?: string | UmbModalToken<UmbPickerModalData<PickerItemType>, PickerModalValueType>;
 	repository?: UmbItemRepository<PickedItemType>;
 
 	#itemManager;
@@ -65,10 +65,13 @@ export class UmbPickerInputContext<
 	constructor(
 		host: UmbControllerHost,
 		repositoryAlias: string,
-		modalAlias: string | UmbModalToken<UmbPickerModalData<PickerItemType>, PickerModalValueType>,
+		modalAlias?: string | UmbModalToken<UmbPickerModalData<PickerItemType>, PickerModalValueType>,
 	) {
 		super(host, UMB_PICKER_INPUT_CONTEXT);
-		this.modalAlias = modalAlias;
+
+		if (modalAlias) {
+			this.modalAlias = modalAlias;
+		}
 
 		this.#itemManager = new UmbRepositoryItemsManager<PickedItemType>(this, repositoryAlias);
 
@@ -88,6 +91,11 @@ export class UmbPickerInputContext<
 
 	async openPicker(pickerData?: Partial<PickerModalConfigType>) {
 		await this.#itemManager.init;
+
+		if (!this.modalAlias) {
+			throw new Error('No modal alias defined for the picker input context.');
+		}
+
 		const modalValue = await umbOpenModal(this, this.modalAlias, {
 			data: {
 				multiple: this._max === 1 ? false : true,

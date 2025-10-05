@@ -16,17 +16,9 @@ import type {
 	UmbPickerPropertyEditorDataSource,
 	UmbPickerPropertyEditorTreeDataSource,
 } from '@umbraco-cms/backoffice/data-type';
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import {
-	umbConfirmModal,
-	UmbModalToken,
-	umbOpenModal,
-	type UmbPickerModalData,
-	type UmbPickerModalValue,
-} from '@umbraco-cms/backoffice/modal';
-import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
+import { UmbModalToken, type UmbPickerModalData } from '@umbraco-cms/backoffice/modal';
 import {
 	UMB_TREE_PICKER_MODAL_ALIAS,
 	type UmbTreePickerModalData,
@@ -36,45 +28,19 @@ import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/
 import { isPickerPropertyEditorTreeDataSource } from 'src/packages/data-type/property-editor-data-source/extension/is-picker-property-editor-tree-data-source.guard.js';
 import { isPickerPropertyEditorCollectionDataSource } from 'src/packages/data-type/property-editor-data-source/extension/is-picker-property-editor-collection-data-source.guard copy.js';
 import { isPickerPropertyEditorSearchableDataSource } from 'src/packages/data-type/property-editor-data-source/extension/is-picker-property-editor-searchable.data-source.guard.js';
+import { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbEntityDataPickerInputContext extends UmbControllerBase {
-	#itemManager = new UmbRepositoryItemsManager<UmbEntityDataPickerItemModel>(
-		this,
-		UMB_ENTITY_DATA_PICKER_ITEM_REPOSITORY_ALIAS,
-	);
-	public readonly selection = this.#itemManager.uniques;
-	public readonly selectedItems = this.#itemManager.items;
-	public readonly statuses = this.#itemManager.statuses;
-
+export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<UmbEntityDataPickerItemModel> {
 	#dataSourceAlias?: string;
 	#dataSourceApiInitializer?: UmbExtensionApiInitializer<ManifestPropertyEditorDataSource>;
+	#dataSourceApi?: UmbPickerPropertyEditorDataSource;
 
-	#pickerModalToken?: UmbModalToken<UmbPickerModalData<UmbEntityDataPickerItemModel>, UmbPickerModalValue>;
 	#dataSourceApiContext = new UmbEntityDataPickerDataSourceApiContext(this);
 
-	/**
-	 * Define a minimum amount of selected items in this input, for this input to be valid.
-	 * @returns {number} The minimum number of items required.
-	 */
-	public get max() {
-		return this._max;
+	constructor(host: UmbControllerHost) {
+		super(host, UMB_ENTITY_DATA_PICKER_ITEM_REPOSITORY_ALIAS);
 	}
-	public set max(value) {
-		this._max = value === undefined ? Infinity : value;
-	}
-	private _max = Infinity;
-
-	/**
-	 * Define a maximum amount of selected items in this input, for this input to be valid.
-	 * @returns {number} The minimum number of items required.
-	 */
-	public get min() {
-		return this._min;
-	}
-	public set min(value) {
-		this._min = value === undefined ? 0 : value;
-	}
-	private _min = 0;
 
 	/**
 	 * Sets the data source alias for the input context.
@@ -113,60 +79,9 @@ export class UmbEntityDataPickerInputContext extends UmbControllerBase {
 		return this.#dataSourceApiContext.getConfig();
 	}
 
-	getSelection() {
-		return this.#itemManager.getUniques();
-	}
-
-	setSelection(selection: Array<string | null>) {
-		// Note: Currently we do not support picking root item. So we filter out null values:
-		this.#itemManager.setUniques(selection.filter((value) => value !== null) as Array<string>);
-	}
-
-	async openPicker() {
-		await this.#itemManager.init;
-
-		if (!this.#pickerModalToken) {
-			console.warn('No modal token is set for the picker, cannot open modal.');
-			return;
-		}
-
-		const modalPresetData: UmbPickerModalData<UmbEntityDataPickerItemModel> = {
-			multiple: this._max === 1 ? false : true,
-		};
-
-		const modalPresetValue: UmbPickerModalValue = {
-			selection: this.getSelection(),
-		};
-
-		const modalValue = (await umbOpenModal(this, this.#pickerModalToken, {
-			data: modalPresetData,
-			value: modalPresetValue,
-		}).catch(() => undefined)) as UmbPickerModalValue | undefined;
-
-		if (!modalValue) return;
-
-		this.setSelection(modalValue.selection);
-		this.getHostElement().dispatchEvent(new UmbChangeEvent());
-	}
-
-	async requestRemoveItem(unique: string) {
-		const item = this.#itemManager.getItems().find((item) => item.unique === unique);
-		const name = item?.name ?? '#general_notFound';
-
-		await umbConfirmModal(this, {
-			color: 'danger',
-			headline: `#actions_remove ${name}?`,
-			content: `#defaultdialogs_confirmremove ${name}?`,
-			confirmLabel: '#actions_remove',
-		});
-
-		this.#removeItem(unique);
-	}
-
-	#removeItem(unique: string) {
-		const newSelection = this.getSelection().filter((value) => value !== unique);
-		this.setSelection(newSelection);
-		this.getHostElement().dispatchEvent(new UmbChangeEvent());
+	override async openPicker(pickerData?: Partial<UmbPickerModalData<UmbEntityDataPickerItemModel>>) {
+		this.modalAlias = this.#getModalToken();
+		await super.openPicker(pickerData);
 	}
 
 	#createDataSourceApi(dataSourceAlias: string | undefined) {
@@ -175,36 +90,40 @@ export class UmbEntityDataPickerInputContext extends UmbControllerBase {
 			return;
 		}
 
-		this.#dataSourceApiInitializer = new UmbExtensionApiInitializer<ManifestPropertyEditorDataSource>(
-			this,
-			umbExtensionsRegistry,
-			dataSourceAlias,
-			[this._host],
-			(permitted, ctrl) => {
-				if (!permitted) {
-					// TODO: clean up if not permitted
-					return;
-				}
+		this.#dataSourceApiInitializer = new UmbExtensionApiInitializer<
+			ManifestPropertyEditorDataSource,
+			UmbExtensionApiInitializer<ManifestPropertyEditorDataSource>,
+			UmbPickerPropertyEditorDataSource
+		>(this, umbExtensionsRegistry, dataSourceAlias, [this._host], (permitted, ctrl) => {
+			if (!permitted) {
+				// TODO: clean up if not permitted
+				return;
+			}
 
-				// TODO: Check if it is a picker data source
-				const dataSourceApi = ctrl.api as UmbPickerPropertyEditorDataSource;
-				dataSourceApi.setConfig?.(this.getDataSourceConfig());
+			// TODO: Check if it is a picker data source
+			this.#dataSourceApi = ctrl.api as UmbPickerPropertyEditorDataSource;
+			this.#dataSourceApi.setConfig?.(this.getDataSourceConfig());
 
-				this.#dataSourceApiContext.setDataSourceApi(dataSourceApi);
+			this.#dataSourceApiContext.setDataSourceApi(this.#dataSourceApi);
+		});
+	}
 
-				const isTreeDataSource = isPickerPropertyEditorTreeDataSource(dataSourceApi);
-				const isCollectionDataSource = isPickerPropertyEditorCollectionDataSource(dataSourceApi);
+	#getModalToken() {
+		if (!this.#dataSourceApi) return;
 
-				// Choose the picker type based on what the data source supports
-				if (isTreeDataSource) {
-					this.#pickerModalToken = this.#createTreeItemPickerModalToken(dataSourceApi);
-				} else if (isCollectionDataSource) {
-					this.#pickerModalToken = this.#createCollectionItemPickerModalToken(dataSourceApi);
-				} else {
-					throw new Error('The data source API is not a supported type of picker data source.');
-				}
-			},
-		);
+		const dataSourceApi = this.#dataSourceApi;
+
+		const isTreeDataSource = isPickerPropertyEditorTreeDataSource(dataSourceApi);
+		const isCollectionDataSource = isPickerPropertyEditorCollectionDataSource(dataSourceApi);
+
+		// Choose the picker type based on what the data source supports
+		if (isTreeDataSource) {
+			return this.#createTreeItemPickerModalToken(dataSourceApi);
+		} else if (isCollectionDataSource) {
+			return this.#createCollectionItemPickerModalToken(dataSourceApi);
+		} else {
+			throw new Error('The data source API is not a supported type of picker data source.');
+		}
 	}
 
 	#createTreeItemPickerModalToken(api: UmbPickerPropertyEditorTreeDataSource) {
