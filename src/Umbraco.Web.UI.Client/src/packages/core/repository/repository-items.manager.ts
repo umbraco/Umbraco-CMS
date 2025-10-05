@@ -215,6 +215,8 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 				},
 				ObserveRepositoryAlias,
 			);
+		} else if (data) {
+			this.#items.setValue(data);
 		}
 	}
 
