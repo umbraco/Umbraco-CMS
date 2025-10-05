@@ -20,6 +20,9 @@ export class UmbServerConnection extends UmbControllerBase {
 	#allowPasswordReset = new UmbBooleanState(false);
 	allowPasswordReset = this.#allowPasswordReset.asObservable();
 
+	#enableMediaRecycleBinProtection = new UmbBooleanState(false);
+	enableMediaRecycleBinProtection = this.#enableMediaRecycleBinProtection.asObservable();
+
 	constructor(host: UmbControllerHost, serverUrl: string) {
 		super(host);
 		this.#url = serverUrl;
@@ -86,5 +89,6 @@ export class UmbServerConnection extends UmbControllerBase {
 		this.#versionCheckPeriod.setValue(data?.versionCheckPeriod);
 		this.#allowLocalLogin.setValue(data?.allowLocalLogin ?? false);
 		this.#allowPasswordReset.setValue(data?.allowPasswordReset ?? false);
+		this.#enableMediaRecycleBinProtection.setValue(data?.enableMediaRecycleBinProtection ?? false);
 	}
 }
