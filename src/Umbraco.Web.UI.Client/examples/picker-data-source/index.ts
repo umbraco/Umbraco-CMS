@@ -1,6 +1,30 @@
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'propertyEditorDataSource',
+		dataSourceType: 'pickerCollection',
+		alias: 'Umb.PropertyEditorDataSource.CustomPickerCollection',
+		name: 'Custom Picker Collection Data Source',
+		api: () => import('./example-custom-picker-collection-data-source.js'),
+		meta: {
+			label: 'Example Items (Collection)',
+			icon: 'icon-list',
+			description: 'Pick example items from a collection',
+		},
+	},
+	{
+		type: 'propertyEditorDataSource',
+		dataSourceType: 'pickerTree',
+		alias: 'Umb.PropertyEditorDataSource.CustomPickerTree',
+		name: 'Custom Picker Tree Data Source',
+		api: () => import('./example-custom-picker-tree-data-source.js'),
+		meta: {
+			label: 'Example Items (Tree)',
+			icon: 'icon-tree',
+			description: 'Pick example items from a tree',
+		},
+	},
+	{
+		type: 'propertyEditorDataSource',
 		dataSourceType: 'pickerTree',
 		alias: 'Umb.PropertyEditorDataSource.DocumentPicker',
 		name: 'Document Picker Tree Data Source',
