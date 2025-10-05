@@ -12,6 +12,7 @@ import {
 } from '@umbraco-cms/backoffice/collection';
 import type {
 	ManifestPropertyEditorDataSource,
+	UmbPickerPropertyEditorCollectionDataSource,
 	UmbPickerPropertyEditorDataSource,
 	UmbPickerPropertyEditorTreeDataSource,
 } from '@umbraco-cms/backoffice/data-type';
@@ -32,6 +33,9 @@ import {
 	type UmbTreePickerModalValue,
 } from '@umbraco-cms/backoffice/tree';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import { isPickerPropertyEditorTreeDataSource } from 'src/packages/data-type/property-editor-data-source/extension/is-picker-property-editor-tree-data-source.guard.js';
+import { isPickerPropertyEditorCollectionDataSource } from 'src/packages/data-type/property-editor-data-source/extension/is-picker-property-editor-collection-data-source.guard copy.js';
+import { isPickerPropertyEditorSearchableDataSource } from 'src/packages/data-type/property-editor-data-source/extension/is-picker-property-editor-searchable.data-source.guard.js';
 
 export class UmbEntityDataPickerInputContext extends UmbControllerBase {
 	#itemManager = new UmbRepositoryItemsManager<UmbEntityDataPickerItemModel>(
@@ -188,23 +192,23 @@ export class UmbEntityDataPickerInputContext extends UmbControllerBase {
 
 				this.#dataSourceApiContext.setDataSourceApi(dataSourceApi);
 
-				// TODO: can we find a better way to check if the api is a tree or collection data source?
-				const isTreeDataSource =
-					typeof dataSourceApi.requestTreeRoot === 'function' && typeof dataSourceApi.requestTreeItemsOf === 'function';
+				const isTreeDataSource = isPickerPropertyEditorTreeDataSource(dataSourceApi);
+				const isCollectionDataSource = isPickerPropertyEditorCollectionDataSource(dataSourceApi);
 
 				// Choose the picker type based on what the data source supports
 				if (isTreeDataSource) {
 					this.#pickerModalToken = this.#createTreeItemPickerModalToken(dataSourceApi);
-				} else {
+				} else if (isCollectionDataSource) {
 					this.#pickerModalToken = this.#createCollectionItemPickerModalToken(dataSourceApi);
+				} else {
+					throw new Error('The data source API is not a supported type of picker data source.');
 				}
 			},
 		);
 	}
 
 	#createTreeItemPickerModalToken(api: UmbPickerPropertyEditorTreeDataSource) {
-		// TODO: can we find a better way to check if the api supports search?
-		const supportsSearch = typeof api.search === 'function';
+		const supportsSearch = isPickerPropertyEditorSearchableDataSource(api);
 
 		return new UmbModalToken<UmbTreePickerModalData<UmbEntityDataPickerItemModel>, UmbTreePickerModalValue>(
 			UMB_TREE_PICKER_MODAL_ALIAS,
@@ -226,8 +230,8 @@ export class UmbEntityDataPickerInputContext extends UmbControllerBase {
 		);
 	}
 
-	#createCollectionItemPickerModalToken(api: UmbPickerPropertyEditorTreeDataSource) {
-		const supportsSearch = typeof api.search === 'function';
+	#createCollectionItemPickerModalToken(api: UmbPickerPropertyEditorCollectionDataSource) {
+		const supportsSearch = isPickerPropertyEditorSearchableDataSource(api);
 
 		return new UmbModalToken<
 			UmbCollectionItemPickerModalData<UmbEntityDataPickerItemModel>,

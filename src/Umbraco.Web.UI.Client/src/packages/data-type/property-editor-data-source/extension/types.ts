@@ -19,7 +19,9 @@ export interface UmbPickerPropertyEditorDataSource
 		UmbApi {}
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface UmbSearchablePickerPropertyEditorDataSource extends UmbSearchRepository<any> {}
+export interface UmbPickerPropertyEditorSearchableDataSource
+	extends UmbPropertyEditorDataSource,
+		UmbSearchRepository<any> {}
 
 export interface UmbPickerPropertyEditorTreeDataSource
 	extends UmbPickerPropertyEditorDataSource,
