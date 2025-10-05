@@ -7,6 +7,7 @@ import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 // import of local component
 import '../input/input-entity-data.element.js';
@@ -77,6 +78,11 @@ export class UmbEntityDataPickerPropertyEditorUIElement
 		return this.shadowRoot?.querySelector<UmbInputEntityDataElement>('umb-input-entity-data')?.focus();
 	}
 
+	#onChange(event: CustomEvent & { target: UmbInputEntityDataElement }) {
+		this.value = event.target.selection;
+		this.dispatchEvent(new UmbChangeEvent());
+	}
+
 	override render() {
 		return html`<umb-input-entity-data
 			.dataSourceAlias="${this.dataSourceAlias}"
@@ -85,7 +91,8 @@ export class UmbEntityDataPickerPropertyEditorUIElement
 			.min-message=${this._minMessage}
 			.max=${this._max}
 			.max-message=${this._maxMessage}
-			?readonly=${this.readonly}></umb-input-entity-data>`;
+			?readonly=${this.readonly}
+			@change=${this.#onChange}></umb-input-entity-data>`;
 	}
 }
 
