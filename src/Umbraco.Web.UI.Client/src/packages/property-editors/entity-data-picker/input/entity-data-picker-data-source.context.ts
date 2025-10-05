@@ -18,7 +18,7 @@ export class UmbEntityDataPickerDataSourceApiContext<
 		this.#dataSourceApi = dataSourceApi;
 	}
 
-	getDataSourceApi() {
+	getDataSourceApi(): DataSourceApiType | undefined {
 		return this.#dataSourceApi;
 	}
 
