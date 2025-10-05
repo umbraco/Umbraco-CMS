@@ -4,7 +4,6 @@ import { UMB_ENTITY_DATA_PICKER_SEARCH_PROVIDER_ALIAS } from '../picker-search/c
 import { UMB_ENTITY_DATA_PICKER_ITEM_REPOSITORY_ALIAS } from '../constants.js';
 import type { UmbEntityDataPickerItemModel } from '../picker-item/types.js';
 import { UmbEntityDataPickerDataSourceApiContext } from './entity-data-picker-data-source.context.js';
-import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import {
 	UMB_COLLECTION_ITEM_PICKER_MODAL_ALIAS,
 	type UmbCollectionItemPickerModalData,
@@ -15,6 +14,7 @@ import type {
 	UmbPickerPropertyEditorCollectionDataSource,
 	UmbPickerPropertyEditorDataSource,
 	UmbPickerPropertyEditorTreeDataSource,
+	UmbPropertyEditorDataSourceConfigModel,
 } from '@umbraco-cms/backoffice/data-type';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -63,19 +63,19 @@ export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<UmbEn
 
 	/**
 	 * Sets the data source config for the input context.
-	 * @param {(UmbPropertyEditorConfigCollection | undefined)} config The data source config.
+	 * @param {(UmbPropertyEditorDataSourceConfigModel | undefined)} config The data source config.
 	 * @memberof UmbEntityDataPickerInputContext
 	 */
-	setDataSourceConfig(config: UmbPropertyEditorConfigCollection | undefined) {
+	setDataSourceConfig(config: UmbPropertyEditorDataSourceConfigModel | undefined) {
 		this.#dataSourceApiContext.setConfig(config);
 	}
 
 	/**
 	 * Gets the data source config for the input context.
-	 * @returns {(UmbPropertyEditorConfigCollection | undefined)} The data source config.
+	 * @returns {(UmbPropertyEditorDataSourceConfigModel | undefined)} The data source config.
 	 * @memberof UmbEntityDataPickerInputContext
 	 */
-	getDataSourceConfig(): UmbPropertyEditorConfigCollection | undefined {
+	getDataSourceConfig(): UmbPropertyEditorDataSourceConfigModel | undefined {
 		return this.#dataSourceApiContext.getConfig();
 	}
 
