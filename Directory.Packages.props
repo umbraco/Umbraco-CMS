@@ -83,9 +83,6 @@
   </ItemGroup>
   <!-- Transitive pinned versions (only required because our direct dependencies have vulnerable versions of transitive dependencies) -->
   <ItemGroup>
-    <!-- Microsoft.EntityFrameworkCore.SqlServer and NPoco.SqlServer brings in a vulnerable version of Azure.Identity -->
-    <!-- Take top-level depedendency on Azure.Identity, because Microsoft.EntityFrameworkCore.SqlServer depends on a vulnerable version -->
-    <PackageVersion Include="Azure.Identity" Version="1.16.0" />
     <!-- Microsoft.EntityFrameworkCore.SqlServer brings in a vulnerable version of System.Runtime.Caching -->
     <PackageVersion Include="System.Runtime.Caching" Version="10.0.0-rc.1.25451.107" />
     <!-- Dazinator.Extensions.FileProviders brings in a vulnerable version of System.Net.Http -->
