@@ -210,7 +210,7 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 				align-items: start;
 				gap: 3px;
 				position: relative;
-				transform: translate(calc((var(--i) * -4px) - 10px), calc((-1 * var(--i) * var(--row-h)) - var(--offset-h)));
+				transform: translate(calc((var(--i) * -5px) - 10px), calc((-1 * var(--i) * var(--row-h)) - var(--offset-h)));
 				transition:
 					transform 120ms var(--ease),
 					visibility 0ms linear 120ms opacity 120ms linear;
