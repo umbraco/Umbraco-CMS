@@ -24,9 +24,16 @@ export class UmbEntityDataPickerCollectionRepository
 
 	async requestCollection(filter: UmbCollectionFilterModel) {
 		await this.#init;
-		const api = this.#pickerDataSourceContext?.getDataSourceApi() as UmbPickerPropertyEditorCollectionDataSource;
-		if (!api) throw new Error('No data source API set');
+		const api = await this.#getApi();
 		return api.requestCollection(filter);
+	}
+
+	async #getApi() {
+		const api = (await this.observe(
+			this.#pickerDataSourceContext?.dataSourceApi,
+		)?.asPromise()) as UmbPickerPropertyEditorCollectionDataSource;
+		if (!api) throw new Error('No data source API set');
+		return api;
 	}
 }
 

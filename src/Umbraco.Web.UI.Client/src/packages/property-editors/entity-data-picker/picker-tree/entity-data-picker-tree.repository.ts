@@ -26,30 +26,34 @@ export class UmbEntityDataPickerTreeRepository extends UmbRepositoryBase impleme
 
 	async requestTreeRoot() {
 		await this.#init;
-		const api = this.#pickerDataSourceContext?.getDataSourceApi() as UmbPickerPropertyEditorTreeDataSource;
-		if (!api) throw new Error('No data source API set');
+		const api = await this.#getApi();
 		return api.requestTreeRoot();
 	}
 
 	async requestTreeRootItems(args: UmbTreeRootItemsRequestArgs) {
 		await this.#init;
-		const api = this.#pickerDataSourceContext?.getDataSourceApi() as UmbPickerPropertyEditorTreeDataSource;
-		if (!api) throw new Error('No data source API set');
+		const api = await this.#getApi();
 		return api.requestTreeRootItems(args);
 	}
 
 	async requestTreeItemsOf(args: UmbTreeChildrenOfRequestArgs) {
 		await this.#init;
-		const api = this.#pickerDataSourceContext?.getDataSourceApi() as UmbPickerPropertyEditorTreeDataSource;
-		if (!api) throw new Error('No data source API set');
+		const api = await this.#getApi();
 		return api.requestTreeItemsOf(args);
 	}
 
 	async requestTreeItemAncestors(args: UmbTreeAncestorsOfRequestArgs) {
 		await this.#init;
-		const api = this.#pickerDataSourceContext?.getDataSourceApi() as UmbPickerPropertyEditorTreeDataSource;
-		if (!api) throw new Error('No data source API set');
+		const api = await this.#getApi();
 		return api.requestTreeItemAncestors(args);
+	}
+
+	async #getApi() {
+		const api = (await this.observe(
+			this.#pickerDataSourceContext?.dataSourceApi,
+		)?.asPromise()) as UmbPickerPropertyEditorTreeDataSource;
+		if (!api) throw new Error('No data source API set');
+		return api;
 	}
 }
 

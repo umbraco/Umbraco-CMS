@@ -23,9 +23,14 @@ export class UmbEntityDataPickerItemRepository
 
 	async requestItems(uniques: Array<string>) {
 		await this.#init;
-		const api = this.#pickerDataSourceContext?.getDataSourceApi();
-		if (!api) throw new Error('No data source API set');
+		const api = await this.#getApi();
 		return api.requestItems(uniques);
+	}
+
+	async #getApi() {
+		const api = await this.observe(this.#pickerDataSourceContext?.dataSourceApi)?.asPromise();
+		if (!api) throw new Error('No data source API set');
+		return api;
 	}
 }
 
