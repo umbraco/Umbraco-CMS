@@ -19,7 +19,7 @@ import type {
 	UmbRepositoryResponse,
 	UmbRepositoryResponseWithAsObservable,
 } from '@umbraco-cms/backoffice/repository';
-import { UmbDeprecation, UmbStateManager } from '@umbraco-cms/backoffice/utils';
+import { UmbStateManager } from '@umbraco-cms/backoffice/utils';
 import { UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbApiError } from '@umbraco-cms/backoffice/resources';
@@ -253,8 +253,10 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 				}
 			}
 		} else if (data) {
-			this._data.setPersisted(data);
-			this._data.setCurrent(data);
+			const processedData = await this._processIncomingData(data);
+
+			this._data.setPersisted(processedData);
+			this._data.setCurrent(processedData);
 
 			this.observe(asObservable?.(), (entity) => this.#onDetailStoreChange(entity), 'umbEntityDetailTypeStoreObserver');
 		}
@@ -309,6 +311,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		let { data } = await request;
 
 		if (data) {
+			data = await this._processIncomingData(data);
 			data = await this._scaffoldProcessData(data);
 
 			if (this.modalContext) {
@@ -327,7 +330,15 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		return data;
 	}
 
+	/**
+	 * @deprecated Override `_processIncomingData` instead. `_scaffoldProcessData` will be removed in v.18.
+	 * @param {DetailModelType} data - The data to process.
+	 * @returns {Promise<DetailModelType>} The processed data.
+	 */
 	protected async _scaffoldProcessData(data: DetailModelType): Promise<DetailModelType> {
+		return data;
+	}
+	protected async _processIncomingData(data: DetailModelType): Promise<DetailModelType> {
 		return data;
 	}
 
@@ -467,15 +478,6 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 */
 	public getHasUnpersistedChanges(): boolean {
 		return this._data.getHasUnpersistedChanges();
-	}
-	// @deprecated use getHasUnpersistedChanges instead, will be removed in v17.0
-	protected _getHasUnpersistedChanges(): boolean {
-		new UmbDeprecation({
-			removeInVersion: '17',
-			deprecated: '_getHasUnpersistedChanges',
-			solution: 'use public getHasUnpersistedChanges instead.',
-		}).warn();
-		return this.getHasUnpersistedChanges();
 	}
 
 	override resetState() {

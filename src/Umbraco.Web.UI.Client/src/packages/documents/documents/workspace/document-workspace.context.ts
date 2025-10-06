@@ -1,7 +1,7 @@
 import { UmbDocumentTypeDetailRepository } from '../../document-types/repository/detail/document-type-detail.repository.js';
 import { UmbDocumentPropertyDatasetContext } from '../property-dataset-context/document-property-dataset.context.js';
 import type { UmbDocumentDetailRepository } from '../repository/index.js';
-import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
+import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS, UmbDocumentSegmentRepository } from '../repository/index.js';
 import type { UmbDocumentDetailModel, UmbDocumentVariantModel } from '../types.js';
 import {
 	UMB_CREATE_DOCUMENT_WORKSPACE_PATH_PATTERN,
@@ -15,12 +15,11 @@ import {
 	UMB_USER_PERMISSION_DOCUMENT_UPDATE,
 } from '../constants.js';
 import { UmbDocumentPreviewRepository } from '../repository/preview/index.js';
-import { UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT, UmbDocumentPublishingRepository } from '../publishing/index.js';
 import { UmbDocumentValidationRepository } from '../repository/validation/index.js';
 import { UMB_DOCUMENT_CONFIGURATION_CONTEXT } from '../index.js';
 import { UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD, UMB_DOCUMENT_WORKSPACE_ALIAS } from './constants.js';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
-import { ensurePathEndsWithSlash, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
+import { ensurePathEndsWithSlash } from '@umbraco-cms/backoffice/utils';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContentDetailWorkspaceContextBase } from '@umbraco-cms/backoffice/content';
 import { UmbDocumentBlueprintDetailRepository } from '@umbraco-cms/backoffice/document-blueprint';
@@ -35,7 +34,6 @@ import type { UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
-import type { UmbPublishableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import type { UmbVariantPropertyGuardRule } from '@umbraco-cms/backoffice/property';
 
 type ContentModel = UmbDocumentDetailModel;
@@ -47,17 +45,8 @@ export class UmbDocumentWorkspaceContext
 		ContentTypeModel,
 		UmbDocumentVariantModel
 	>
-	implements
-		UmbContentWorkspaceContext<ContentModel, ContentTypeModel, UmbDocumentVariantModel>,
-		UmbPublishableWorkspaceContext
+	implements UmbContentWorkspaceContext<ContentModel, ContentTypeModel, UmbDocumentVariantModel>
 {
-	/**
-	 * The publishing repository for the document workspace.
-	 * @deprecated Will be removed in v17. Use the methods on the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.
-	 * @memberof UmbDocumentWorkspaceContext
-	 */
-	public readonly publishingRepository = new UmbDocumentPublishingRepository(this);
-
 	readonly isTrashed = this._data.createObservablePartOfCurrent((data) => data?.isTrashed);
 
 	readonly contentTypeUnique = this._data.createObservablePartOfCurrent((data) => data?.documentType.unique);
@@ -74,7 +63,7 @@ export class UmbDocumentWorkspaceContext
 	readonly templateId = this._data.createObservablePartOfCurrent((data) => data?.template?.unique || null);
 
 	#isTrashedContext = new UmbIsTrashedEntityContext(this);
-	#publishingContext?: typeof UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT.TYPE;
+	#documentSegmentRepository = new UmbDocumentSegmentRepository(this);
 
 	constructor(host: UmbControllerHost) {
 		super(host, {
@@ -122,25 +111,24 @@ export class UmbDocumentWorkspaceContext
 			null,
 		);
 
-		// TODO: Remove this in v17 as we have moved the publishing methods to the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT.
-		this.consumeContext(UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT, (context) => {
-			this.#publishingContext = context;
-		});
-
-		this.observe(this.isNew, (isNew) => {
-			if (isNew === undefined) return;
-			if (isNew) {
-				this.#enforceUserPermission(
-					UMB_USER_PERMISSION_DOCUMENT_CREATE,
-					'You do not have permission to create documents.',
-				);
-			} else {
-				this.#enforceUserPermission(
-					UMB_USER_PERMISSION_DOCUMENT_UPDATE,
-					'You do not have permission to update documents.',
-				);
-			}
-		});
+		this.observe(
+			this.isNew,
+			(isNew) => {
+				if (isNew === undefined) return;
+				if (isNew) {
+					this.#enforceUserPermission(
+						UMB_USER_PERMISSION_DOCUMENT_CREATE,
+						'You do not have permission to create documents.',
+					);
+				} else {
+					this.#enforceUserPermission(
+						UMB_USER_PERMISSION_DOCUMENT_UPDATE,
+						'You do not have permission to update documents.',
+					);
+				}
+			},
+			null,
+		);
 
 		this.routes.setRoutes([
 			{
@@ -222,6 +210,24 @@ export class UmbDocumentWorkspaceContext
 		}
 
 		return response;
+	}
+
+	protected override async loadSegments(): Promise<void> {
+		this.observe(
+			this.unique,
+			async (unique) => {
+				if (!unique) {
+					this._segments.setValue([]);
+					return;
+				}
+				const { data } = await this.#documentSegmentRepository.getDocumentByIdSegmentOptions(unique, {
+					skip: 0,
+					take: 9999,
+				});
+				this._segments.setValue(data?.items ?? []);
+			},
+			'_loadSegmentsUnique',
+		);
 	}
 
 	async create(parent: UmbEntityModel, documentTypeUnique: string, blueprintUnique?: string) {
@@ -335,72 +341,6 @@ export class UmbDocumentWorkspaceContext
 
 		const previewWindow = window.open(previewUrl.toString(), `umbpreview-${unique}`);
 		previewWindow?.focus();
-	}
-
-	public async publish() {
-		new UmbDeprecation({
-			deprecated: 'The Publish method on the UMB_DOCUMENT_WORKSPACE_CONTEXT is deprecated.',
-			removeInVersion: '17.0.0',
-			solution: 'Use the Publish method on the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.',
-		}).warn();
-		if (!this.#publishingContext) throw new Error('Publishing context is missing');
-		await this.#publishingContext.publish();
-	}
-
-	/**
-	 * Save the document and publish it.
-	 * @deprecated Will be removed in v17. Use the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.
-	 */
-	public async saveAndPublish(): Promise<void> {
-		new UmbDeprecation({
-			deprecated: 'The SaveAndPublish method on the UMB_DOCUMENT_WORKSPACE_CONTEXT is deprecated.',
-			removeInVersion: '17.0.0',
-			solution: 'Use the SaveAndPublish method on the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.',
-		}).warn();
-		if (!this.#publishingContext) throw new Error('Publishing context is missing');
-		await this.#publishingContext.saveAndPublish();
-	}
-
-	/**
-	 * Schedule the document to be published at a later date.
-	 * @deprecated Will be removed in v17. Use the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.
-	 */
-	public async schedule() {
-		new UmbDeprecation({
-			deprecated: 'The Schedule method on the UMB_DOCUMENT_WORKSPACE_CONTEXT is deprecated.',
-			removeInVersion: '17.0.0',
-			solution: 'Use the Schedule method on the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.',
-		}).warn();
-		if (!this.#publishingContext) throw new Error('Publishing context is missing');
-		await this.#publishingContext.schedule();
-	}
-
-	/**
-	 * Unpublish the document.
-	 * @deprecated Will be removed in v17. Use the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.
-	 */
-	public async unpublish() {
-		new UmbDeprecation({
-			deprecated: 'The Unpublish method on the UMB_DOCUMENT_WORKSPACE_CONTEXT is deprecated.',
-			removeInVersion: '17.0.0',
-			solution: 'Use the Unpublish method on the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.',
-		}).warn();
-		if (!this.#publishingContext) throw new Error('Publishing context is missing');
-		await this.#publishingContext.unpublish();
-	}
-
-	/**
-	 * Publish the document and all its descendants.
-	 * @deprecated Will be removed in v17. Use the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.
-	 */
-	public async publishWithDescendants() {
-		new UmbDeprecation({
-			deprecated: 'The PublishWithDescendants method on the UMB_DOCUMENT_WORKSPACE_CONTEXT is deprecated.',
-			removeInVersion: '17.0.0',
-			solution: 'Use the PublishWithDescendants method on the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.',
-		}).warn();
-		if (!this.#publishingContext) throw new Error('Publishing context is missing');
-		await this.#publishingContext.publishWithDescendants();
 	}
 
 	public createPropertyDatasetContext(

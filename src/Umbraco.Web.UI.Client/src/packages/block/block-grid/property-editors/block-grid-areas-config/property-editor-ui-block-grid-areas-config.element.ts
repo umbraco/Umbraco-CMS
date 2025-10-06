@@ -159,6 +159,12 @@ export class UmbPropertyEditorUIBlockGridAreasConfigElement
 
 	static override styles = [
 		css`
+			:host {
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-2);
+			}
+
 			.umb-block-grid__area {
 				cursor: move;
 			}

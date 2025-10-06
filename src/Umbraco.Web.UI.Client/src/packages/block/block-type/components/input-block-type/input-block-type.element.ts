@@ -150,10 +150,9 @@ export class UmbInputBlockTypeElement<
 		const contentType = store.getItems([item.contentElementTypeKey]);
 		await umbConfirmModal(this, {
 			color: 'danger',
-			headline: `Remove ${contentType[0]?.name}?`,
-			// TODO: Translations: [NL]
-			content: 'Are you sure you want to remove this Block Type Configuration?',
-			confirmLabel: 'Remove',
+			headline: '#blockEditor_confirmDeleteBlockTypeTitle',
+			content: this.localize.term('blockEditor_confirmDeleteBlockTypeMessage', [contentType[0]?.name]),
+			confirmLabel: '#general_remove',
 		});
 		this.deleteItem(item.contentElementTypeKey);
 	}

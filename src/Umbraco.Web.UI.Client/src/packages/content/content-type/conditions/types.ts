@@ -17,11 +17,6 @@ export type UmbWorkspaceContentTypeAliasConditionConfig = UmbConditionConfigBase
 	 */
 	oneOf?: Array<string>;
 };
-/**
- * @deprecated Use `UmbWorkspaceContentTypeAliasConditionConfig` instead. This will be removed in Umbraco 17.
- */
-// eslint-disable-next-line @typescript-eslint/naming-convention
-export type WorkspaceContentTypeAliasConditionConfig = UmbWorkspaceContentTypeAliasConditionConfig;
 
 declare global {
 	interface UmbExtensionConditionConfigMap {
