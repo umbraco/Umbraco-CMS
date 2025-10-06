@@ -6,6 +6,7 @@ import type { ManifestWorkspaceView, UmbActiveVariant } from '@umbraco-cms/backo
 import type { UmbDeepPartialObject } from '@umbraco-cms/backoffice/utils';
 
 import './document-workspace-split-view-variant-selector.element.js';
+import { UMB_ROUTE_CONTEXT } from '@umbraco-cms/backoffice/router';
 
 @customElement('umb-document-workspace-split-view')
 export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
@@ -35,6 +36,18 @@ export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
 			this.#observeLoading();
 			this.#observeCollectionOverrides();
 		});
+
+		// get current get variables from url, and check if openCollection is set:
+		const urlSearchParams = new URLSearchParams(window.location.search);
+		const openCollection = urlSearchParams.has('openCollection');
+		if (openCollection) {
+			this.getContext(UMB_ROUTE_CONTEXT).then((routeContext) => {
+				if (routeContext) {
+					console.log(routeContext.getBasePath());
+					window.history.replaceState({}, '', routeContext.getActivePath() + '/collection');
+				}
+			});
+		}
 	}
 
 	#observeActiveVariantInfo() {

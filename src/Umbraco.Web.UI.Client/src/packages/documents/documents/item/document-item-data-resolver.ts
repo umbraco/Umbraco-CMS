@@ -22,6 +22,7 @@ export class UmbDocumentItemDataResolver<
 	public readonly unique = this.#data.asObservablePart((x) => x?.unique);
 	public readonly icon = this.#data.asObservablePart((x) => x?.documentType.icon);
 	public readonly isTrashed = this.#data.asObservablePart((x) => x?.isTrashed);
+	public readonly hasCollection = this.#data.asObservablePart((x) => !!x?.documentType.collection);
 
 	#name = new UmbStringState(undefined);
 	public readonly name = this.#name.asObservable();
@@ -172,6 +173,15 @@ export class UmbDocumentItemDataResolver<
 	 */
 	async getUpdateDate(): Promise<Date> {
 		return (await this.observe(this.updateDate).asPromise()) || undefined;
+	}
+
+	/**
+	 * Test if the item has a collection
+	 * @returns {boolean} Boolean of wether the item has a collection.
+	 * @memberof UmbDocumentItemDataResolver
+	 */
+	getHasCollection(): boolean {
+		return this.getData()?.documentType.collection != undefined;
 	}
 
 	#setVariantAwareValues() {

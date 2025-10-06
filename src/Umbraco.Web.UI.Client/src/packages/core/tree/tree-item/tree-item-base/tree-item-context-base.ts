@@ -95,9 +95,18 @@ export abstract class UmbTreeItemContextBase<
 	}
 
 	/**
+	 * Returns the current path value
+	 * @returns {string}
+	 * @memberof UmbTreeItemContextBase
+	 */
+	public getPath() {
+		return this.#path.getValue();
+	}
+
+	/**
 	 * Returns the manifest.
 	 * @returns {ManifestCollection}
-	 * @memberof UmbCollectionContext
+	 * @memberof UmbTreeItemContextBase
 	 * @deprecated Use the `.manifest` property instead.
 	 */
 	public getManifest() {

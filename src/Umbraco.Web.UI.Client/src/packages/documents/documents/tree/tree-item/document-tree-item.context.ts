@@ -4,6 +4,7 @@ import { UmbDefaultTreeItemContext } from '@umbraco-cms/backoffice/tree';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
 import { UmbAncestorsEntityContext } from '@umbraco-cms/backoffice/entity';
+import { mergeObservables } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 	UmbDocumentTreeItemModel,
@@ -17,9 +18,24 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 	readonly name = this.#item.name;
 	readonly icon = this.#item.icon;
 	readonly isDraft = this.#item.isDraft;
+	readonly hasCollection = this.#item.hasCollection;
+	public readonly hasChildrenOrCollection = mergeObservables(
+		[this.hasCollection, this.hasChildren],
+		([hasCollection, hasChildren]) => {
+			return hasCollection || hasChildren;
+		},
+	);
 
 	readonly ancestors = this._treeItem.asObservablePart((item) => item?.ancestors ?? []);
 	readonly isTrashed = this._treeItem.asObservablePart((item) => item?.isTrashed ?? false);
+
+	#asMenu = false;
+	setAsMenu(value: boolean) {
+		this.#asMenu = value;
+	}
+	getAsMenu(): boolean {
+		return this.#asMenu;
+	}
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -36,6 +52,32 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 	public override setTreeItem(treeItem: UmbDocumentTreeItemModel | undefined) {
 		super.setTreeItem(treeItem);
 		this.#item.setData(treeItem);
+	}
+
+	public getHasCollection() {
+		return this.#item.getHasCollection();
+	}
+
+	public override showChildren() {
+		if (this.#asMenu && this.#item.getHasCollection()) {
+			// Collections cannot be expanded via a manu, instead we open the Collection for the user.
+			this.#openCollection();
+			return;
+		}
+		super.showChildren();
+	}
+
+	public override hideChildren() {
+		if (this.#asMenu && this.#item.getHasCollection()) {
+			// Collections in a menu will collapse when already showing children, and instead we open the Collection for the user.
+			this.#openCollection();
+		}
+		super.hideChildren();
+	}
+
+	#openCollection() {
+		// open the collection view for this item:
+		history.pushState(null, '', this.getPath() + '?openCollection=true');
 	}
 }
 

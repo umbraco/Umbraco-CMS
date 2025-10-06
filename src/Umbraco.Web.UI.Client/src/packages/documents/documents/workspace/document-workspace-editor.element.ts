@@ -117,24 +117,25 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 						throw new Error('Workspace context is not available when resolving the default route.');
 					}
 
-					const route = routes.find((route) => route.path === this.#appCulture);
+					// get current get variables from url, and check if openCollection is set:
+					const urlSearchParams = new URLSearchParams(window.location.search);
+					const openCollection = urlSearchParams.has('openCollection');
 
-					if (!route) {
-						const firstVariantPath = routes.find((route) => route.path === this.#variants?.[0]?.unique)?.path;
+					// Is there a path matching the current culture?
+					let path = routes.find((route) => route.path === this.#appCulture)?.path;
 
-						if (firstVariantPath) {
-							history.replaceState({}, '', `${this.#workspaceRoute}/${firstVariantPath}`);
-							return;
-						}
-
-						// TODO: Notice: here is a specific index used for fallback, this could be made more solid [NL]
-						const path = `${this.#workspaceRoute}/${routes[routes.length - 3].path}`;
-
-						history.replaceState({}, '', path);
-						return;
+					if (!path) {
+						// if not is there then a path matching the first variant unique.
+						path = routes.find((route) => route.path === this.#variants?.[0]?.unique)?.path;
 					}
 
-					history.replaceState({}, '', `${this.#workspaceRoute}/${route?.path}`);
+					if (!path) {
+						// If not is there then a path matching the first variant unique that is not a culture.
+						// TODO: Notice: here is a specific index used for fallback, this could be made more solid [NL]
+						path = routes[routes.length - 3].path;
+					}
+
+					history.replaceState({}, '', `${this.#workspaceRoute}/${path}${openCollection ? `?openCollection` : ''}`);
 				},
 			});
 		}

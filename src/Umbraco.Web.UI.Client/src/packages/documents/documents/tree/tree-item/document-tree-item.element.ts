@@ -18,9 +18,15 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 		this.#api = value;
 
 		if (this.#api) {
+			this.#api?.setAsMenu(this._asMenu);
 			this.observe(this.#api.name, (name) => (this._name = name || ''));
 			this.observe(this.#api.isDraft, (isDraft) => (this._isDraft = isDraft || false));
 			this.observe(this.#api.icon, (icon) => (this._icon = icon || ''));
+			this.observe(this.#api.hasChildrenOrCollection, (has) => {
+				const oldValue = this._forceShowExpand;
+				this._forceShowExpand = has;
+				this.requestUpdate('_forceShowExpand', oldValue);
+			});
 		}
 
 		super.api = value;
@@ -35,43 +41,38 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 	@state()
 	private _icon = '';
 
+	@state()
+	private _asMenu = false;
+
+	set asMenu(value: boolean) {
+		this._asMenu = value;
+		this.#api?.setAsMenu(value);
+	}
+	get asMenu(): boolean {
+		return this._asMenu;
+	}
+
 	override renderIconContainer() {
 		const icon = this._icon;
 
 		return html`
 			<span id="icon-container" slot="icon" class=${classMap({ draft: this._isDraft })}>
-				${icon
-					? html`
-							<umb-icon id="icon" slot="icon" name="${this._getIconToRender(icon)}"></umb-icon>
-							${this.#renderStateIcon()}
-						`
-					: nothing}
+				${icon ? html` <umb-icon id="icon" slot="icon" name="${this._getIconToRender(icon)}"></umb-icon> ` : nothing}
 			</span>
 		`;
 	}
 
+	override _renderExpandSymbol = () => {
+		// If this in the menu and it is a collection, then we will enforce the user to the Collection view instead of expanding.
+		if (this._asMenu && this.#api?.getHasCollection()) {
+			return html`<umb-icon data-mark="open-collection" name="icon-list" style="font-size: 8px;"></umb-icon>`;
+		} else {
+			return undefined;
+		}
+	};
+
 	override renderLabel() {
 		return html`<span id="label" slot="label" class=${classMap({ draft: this._isDraft })}>${this._name}</span> `;
-	}
-
-	#renderStateIcon() {
-		if (this.item?.isProtected) {
-			return this.#renderIsProtectedIcon();
-		}
-
-		if (this.item?.documentType.collection) {
-			return this.#renderIsCollectionIcon();
-		}
-
-		return nothing;
-	}
-
-	#renderIsCollectionIcon() {
-		return html`<umb-icon id="state-icon" slot="icon" name="icon-grid" title="Collection"></umb-icon>`;
-	}
-
-	#renderIsProtectedIcon() {
-		return html`<umb-icon id="state-icon" slot="icon" name="icon-lock" title="Protected"></umb-icon>`;
 	}
 
 	static override styles = [

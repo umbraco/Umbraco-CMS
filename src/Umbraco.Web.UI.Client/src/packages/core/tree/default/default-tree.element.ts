@@ -47,6 +47,9 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	@property({ type: Boolean, attribute: false })
 	foldersOnly?: boolean = false;
 
+	@property({ type: Boolean, attribute: false })
+	asMenu?: boolean = false;
+
 	@property({ attribute: false })
 	selectableFilter: (item: UmbTreeItemModelBase) => boolean = () => true;
 
@@ -165,7 +168,11 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 		return html`
 			<umb-tree-item
 				.entityType=${this._treeRoot.entityType}
-				.props=${{ hideActions: this.hideTreeItemActions, item: this._treeRoot }}></umb-tree-item>
+				.props=${{
+					hideActions: this.hideTreeItemActions,
+					item: this._treeRoot,
+					asMenu: this.asMenu,
+				}}></umb-tree-item>
 		`;
 	}
 
@@ -180,7 +187,7 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 					(item) => html`
 						<umb-tree-item
 							.entityType=${item.entityType}
-							.props=${{ hideActions: this.hideTreeItemActions, item }}></umb-tree-item>
+							.props=${{ hideActions: this.hideTreeItemActions, item, asMenu: this.asMenu }}></umb-tree-item>
 					`,
 				)}
 				${this.#renderLoadNextButton()}
