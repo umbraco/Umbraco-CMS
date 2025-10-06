@@ -96,7 +96,7 @@
     <PackageVersion Include="System.Text.RegularExpressions" Version="4.3.1" />
     <!-- OpenIddict.AspNetCore, Npoco.SqlServer and Microsoft.EntityFrameworkCore.SqlServer brings in a vulnerable version of Microsoft.IdentityModel.JsonWebTokens -->
     <!-- Take top-level depedendency on Microsoft.IdentityModel.JsonWebTokens, because OpenIddict.AspNetCore, Npoco.SqlServer and Microsoft.EntityFrameworkCore.SqlServer depends on a vulnerable version -->
-    <PackageVersion Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.8.0" />
+    <PackageVersion Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.14.0" />
     <!-- Azure.Identity, Microsoft.EntityFrameworkCore.SqlServer and Dazinator.Extensions.FileProviders brings in a legacy version of System.Text.Encodings.Web -->
     <PackageVersion Include="System.Text.Encodings.Web" Version="10.0.0-preview.7.25380.108" />
     <!-- NPoco.SqlServer brings in a vulnerable version of Microsoft.Data.SqlClient  -->
