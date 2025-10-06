@@ -105,7 +105,7 @@ internal sealed class FileUploadContentDeletedNotificationHandler : FileUploadNo
     private void SuffixContainedFiles(IEnumerable<IMedia> trashedMedia)
     {
         IEnumerable<string> filePathsToRename = ContainedFilePaths(trashedMedia);
-        MediaFileManager.SuffixMediaFiles(filePathsToRename, Constants.Conventions.Media.TrashedMediaSuffix);
+        RecycleBinMediaProtectionHelper.SuffixContainedFiles(filePathsToRename, MediaFileManager);
     }
 
     /// <summary>
@@ -114,8 +114,7 @@ internal sealed class FileUploadContentDeletedNotificationHandler : FileUploadNo
     /// <param name="restoredMedia">Media entities that have been restored from the recycle bin.</param>
     private void RemoveSuffixFromContainedFiles(IEnumerable<IMedia> restoredMedia)
     {
-        IEnumerable<string> filePathsToRename = ContainedFilePaths(restoredMedia)
-            .Select(x => Path.ChangeExtension(x, Constants.Conventions.Media.TrashedMediaSuffix + Path.GetExtension(x)));
+        IEnumerable<string> filePathsToRename = ContainedFilePaths(restoredMedia);
         MediaFileManager.RemoveSuffixFromMediaFiles(filePathsToRename, Constants.Conventions.Media.TrashedMediaSuffix);
     }
 

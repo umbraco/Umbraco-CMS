@@ -14,6 +14,7 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.PropertyEditors.NotificationHandlers;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
@@ -318,7 +319,7 @@ public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
     private void SuffixContainedFiles(IEnumerable<IMedia> trashedMedia)
     {
         IEnumerable<string> filePathsToRename = ContainedFilePaths(trashedMedia);
-        _mediaFileManager.SuffixMediaFiles(filePathsToRename, Constants.Conventions.Media.TrashedMediaSuffix);
+        RecycleBinMediaProtectionHelper.SuffixContainedFiles(filePathsToRename, _mediaFileManager);
     }
 
     /// <summary>
@@ -327,9 +328,8 @@ public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
     /// <param name="restoredMedia">Media entities that have been restored from the recycle bin.</param>
     private void RemoveSuffixFromContainedFiles(IEnumerable<IMedia> restoredMedia)
     {
-        IEnumerable<string> filePathsToRename = ContainedFilePaths(restoredMedia)
-            .Select(x => Path.ChangeExtension(x, Constants.Conventions.Media.TrashedMediaSuffix + Path.GetExtension(x)));
-        _mediaFileManager.RemoveSuffixFromMediaFiles(filePathsToRename, Constants.Conventions.Media.TrashedMediaSuffix);
+        IEnumerable<string> filePathsToRename = ContainedFilePaths(restoredMedia);
+        RecycleBinMediaProtectionHelper.RemoveSuffixFromContainedFiles(filePathsToRename, _mediaFileManager);
     }
 
     /// <summary>
