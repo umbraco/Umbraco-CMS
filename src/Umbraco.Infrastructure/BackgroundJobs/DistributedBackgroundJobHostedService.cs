@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Services;
 
@@ -41,12 +40,13 @@ public class DistributedBackgroundJobHostedService : BackgroundService
         _distributedJobService = distributedJobService;
         _distributedBackgroundJobs = distributedBackgroundJobs;
         _distributedJobSettings = distributedJobSettings.CurrentValue;
-        distributedJobSettings.OnChange((options) =>
+        distributedJobSettings.OnChange(options =>
         {
             _distributedJobSettings = options;
         });
     }
 
+    /// <inheritdoc />
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         var delayTimer = Stopwatch.StartNew();
