@@ -27,8 +27,15 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 		super.api = value;
 	}
 
-	@state() private _name = '';
-	@state() private _isDraft = false;
+	@state()
+	private _name = '';
+
+	/**
+	 * @internal
+	 * Indicates whether the document is a draft, this is controlled internally but present as an attribute as it affects styling.
+	 */
+	@property({ type: Boolean, reflect: true, attribute: 'draft' })
+	protected _isDraft = false;
 
 	#icon: string | null | undefined;
 
@@ -41,13 +48,16 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 	}
 
 	override renderLabel() {
-		return html`<span id="label" slot="label" class=${classMap({ draft: this._isDraft })}>${this._name}</span> `;
+		return html`<span id="label" slot="label">${this._name}</span> `;
 	}
 
 	static override styles = [
 		...UmbTreeItemElementBase.styles,
 		css`
-			.draft {
+			:host([draft]) #label {
+				opacity: 0.6;
+			}
+			:host([draft]) umb-icon {
 				opacity: 0.6;
 			}
 		`,
