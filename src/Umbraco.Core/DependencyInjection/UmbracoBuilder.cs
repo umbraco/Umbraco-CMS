@@ -343,7 +343,8 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<ILocalizedTextService>(factory => new LocalizedTextService(
                 factory.GetRequiredService<Lazy<LocalizedTextServiceFileSources>>(),
                 factory.GetRequiredService<ILogger<LocalizedTextService>>()));
-            Services.AddUnique<IRepositoryCacheVersionService, RepositoryCacheVersionService>();
+            // Default to a NOOP repository cache version service
+            Services.AddUnique<IRepositoryCacheVersionService, SingleServerCacheVersionService>();
             Services.AddUnique<ILongRunningOperationService, LongRunningOperationService>();
             Services.AddUnique<ILastSyncedManager, LastSyncedManager>();
             Services.AddUnique<IMachineInfoFactory, MachineInfoFactory>();
