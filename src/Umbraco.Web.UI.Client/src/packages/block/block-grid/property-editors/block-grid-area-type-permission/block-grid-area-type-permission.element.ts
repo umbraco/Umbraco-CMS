@@ -247,7 +247,7 @@ export class UmbPropertyEditorUIBlockGridAreaTypePermissionElement
 			}
 
 			uui-combobox strong {
-				padding: 0 var(--uui-size-space-1);
+				padding: var(--uui-size-space-2);
 			}
 
 			uui-combobox-list-option {

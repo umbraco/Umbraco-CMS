@@ -400,17 +400,20 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		this._segments.setValue([]);
 	}
 
-	protected override async _scaffoldProcessData(data: DetailModelType): Promise<DetailModelType> {
+    /**
+     * @deprecated Call `_processIncomingData` instead. `_scaffoldProcessData` will be removed in v.18.
+     */
+	protected override _scaffoldProcessData(data: DetailModelType): Promise<DetailModelType> {
+	    return this._processIncomingData(data);
+	}
+
+	protected override async _processIncomingData(data: DetailModelType): Promise<DetailModelType> {
 		const contentTypeUnique: string | undefined = (data as any)[this.#contentTypePropertyName].unique;
 		if (!contentTypeUnique) {
 			throw new Error(`Could not find content type unique on property '${this.#contentTypePropertyName}'`);
 		}
 		// Load the content type structure, usually this comes from the data, but in this case we are making the data, and we need this to be able to complete the data. [NL]
 		await this.structure.loadType(contentTypeUnique);
-
-		/**
-		 * TODO: Should we also set Preset Values when loading Content, because maybe content contains uncreated Cultures or Segments.
-		 */
 
 		// Set culture and segment for all values:
 		const cultures = this.#languages.getValue().map((x) => x.unique);
@@ -456,11 +459,16 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			controller.setSegments(segments);
 		}
 
-		const presetValues = await controller.create(valueDefinitions, {
+		controller.setValues(data.values);
+
+		const processedValues = await controller.create(valueDefinitions, {
 			entityType: this.getEntityType(),
 			entityUnique: data.unique,
 			entityTypeUnique: contentTypeUnique,
 		});
+
+		/*
+		const presetValues = ...
 
 		// Don't just set the values, as we could have some already populated from a blueprint.
 		// If we have a value from both a blueprint and a preset, use the latter as priority.
@@ -477,8 +485,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		}
 
 		data.values = dataValues;
+		*/
 
-		return data;
+		return { ...data, values: processedValues };
 	}
 
 	/**
