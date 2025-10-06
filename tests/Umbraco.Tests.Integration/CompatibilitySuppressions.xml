@@ -211,4 +211,11 @@
     <Right>lib/net9.0/Umbraco.Tests.Integration.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>
   </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0012</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.TestServerTest.UmbracoTestServerTestBase.CustomMvcSetup(Microsoft.Extensions.DependencyInjection.IMvcBuilder)</Target>
+    <Left>lib/net9.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net9.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
 </Suppressions>
