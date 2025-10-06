@@ -3,7 +3,6 @@ import { customElement, html, property } from '@umbraco-cms/backoffice/external/
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UUISliderEvent } from '@umbraco-cms/backoffice/external/uui';
-import { UmbFormControlMixin } from '../../validation/mixins/index.js';
 
 function splitString(value: string | undefined): Partial<[number | undefined, number | undefined]> {
 	const [from, to] = (value ?? ',').split(',');
