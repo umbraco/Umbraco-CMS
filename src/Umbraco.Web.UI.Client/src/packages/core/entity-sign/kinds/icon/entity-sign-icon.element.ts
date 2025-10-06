@@ -19,8 +19,8 @@ export class UmbEntitySignIconElement extends UmbLitElement implements UmbEntity
 	static override styles = [
 		css`
 			umb-icon {
-				background: var(--sign-bundle-bg);
-				border-radius: 50%;
+				filter: drop-shadow(-1px 0 0 var(--umb-sign-bundle-bg)) drop-shadow(0 -1px 0 var(--umb-sign-bundle-bg))
+					drop-shadow(0 1px 0 var(--umb-sign-bundle-bg));
 			}
 		`,
 	];

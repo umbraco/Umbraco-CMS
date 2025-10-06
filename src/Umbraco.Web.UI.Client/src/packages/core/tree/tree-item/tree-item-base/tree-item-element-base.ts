@@ -175,15 +175,15 @@ export abstract class UmbTreeItemElementBase<
 					@slotchange=${(e: Event) => {
 						this._iconSlotHasChildren = this.#hasNodes(e);
 					}}></slot>
-				${!this._iconSlotHasChildren ? this.#renderIcon() : nothing} ${this.#renderSigns()}
+				${this.#renderSigns()}
 			</div>
 		`;
 	}
 
 	#renderSigns() {
 		return this._item
-			? html`<umb-entity-sign-bundle id="sign-bundle" .entityType=${this._item!.entityType} .entityFlags=${this._flags}
-					>${this._item!.entityType}</umb-entity-sign-bundle
+			? html`<umb-entity-sign-bundle .entityType=${this._item!.entityType} .entityFlags=${this._flags}
+					>${!this._iconSlotHasChildren ? this.#renderIcon() : nothing}</umb-entity-sign-bundle
 				>`
 			: nothing;
 	}
@@ -262,27 +262,21 @@ export abstract class UmbTreeItemElementBase<
 			}
 
 			uui-menu-item {
-				--sign-bundle-bg: var(--uui-color-surface);
+				--umb-sign-bundle-bg: var(--uui-color-surface);
 			}
 
 			uui-menu-item:hover {
-				--sign-bundle-bg: var(--uui-color-surface-emphasis);
+				--umb-sign-bundle-bg: var(--uui-color-surface-emphasis);
 			}
 
 			uui-menu-item[active],
 			uui-menu-item[selected] {
-				--sign-bundle-bg: var(--uui-color-current);
+				--umb-sign-bundle-bg: var(--uui-color-current);
 			}
 
 			uui-menu-item[selected]:hover,
 			uui-menu-item[active]:hover {
-				--sign-bundle-bg: var(--uui-color-current-emphasis);
-			}
-
-			#sign-bundle {
-				position: absolute;
-				bottom: 4px;
-				right: 7px;
+				--umb-sign-bundle-bg: var(--uui-color-current-emphasis);
 			}
 
 			#label {
