@@ -1,6 +1,6 @@
 import type { UmbDocumentTreeItemModel } from '../types.js';
 import type { UmbDocumentTreeItemContext } from './document-tree-item.context.js';
-import { css, html, customElement, classMap, state, property } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTreeItemElementBase } from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-document-tree-item')
@@ -32,7 +32,7 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 
 	#icon: string | null | undefined;
 
-	protected override _extractFlags(item: UmbDocumentTreeItemModel | undefined) {
+	protected override _extractFlags(_item: UmbDocumentTreeItemModel | undefined) {
 		// Empty on purpose and NOT calling super to prevent doing what the base does. [NL]
 	}
 
