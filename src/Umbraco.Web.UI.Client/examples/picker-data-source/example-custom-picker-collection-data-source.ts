@@ -1,11 +1,15 @@
-import type { UmbPickerPropertyEditorCollectionDataSource } from '../../src/packages/data-type/property-editor-data-source/types.js';
+import type {
+	UmbPickerPropertyEditorCollectionDataSource,
+	UmbPickerPropertyEditorSearchableDataSource,
+} from '../../src/packages/data-type/property-editor-data-source/types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbCollectionFilterModel } from '@umbraco-cms/backoffice/collection';
+import type { UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
 import type { UmbEntityDataPickerCollectionItemModel } from 'src/packages/property-editors/entity-data-picker/types.js';
 
 export class ExampleCustomPickerCollectionPropertyEditorDataSource
 	extends UmbControllerBase
-	implements UmbPickerPropertyEditorCollectionDataSource
+	implements UmbPickerPropertyEditorCollectionDataSource, UmbPickerPropertyEditorSearchableDataSource
 {
 	async requestCollection(args: UmbCollectionFilterModel) {
 		// TODO: use args to filter/paginate etc
@@ -21,6 +25,18 @@ export class ExampleCustomPickerCollectionPropertyEditorDataSource
 	async requestItems(uniques: Array<string>) {
 		const items = customItems.filter((x) => uniques.includes(x.unique));
 		return { data: items };
+	}
+
+	async search(args: UmbSearchRequestArgs) {
+		const items = customItems.filter((item) => item.name?.toLowerCase().includes(args.query.toLowerCase()));
+		const total = items.length;
+
+		const data = {
+			items,
+			total,
+		};
+
+		return { data };
 	}
 }
 
