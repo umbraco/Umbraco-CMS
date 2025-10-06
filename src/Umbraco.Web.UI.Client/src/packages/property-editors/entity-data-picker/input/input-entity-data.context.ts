@@ -24,7 +24,6 @@ import {
 	type UmbTreePickerModalData,
 	type UmbTreePickerModalValue,
 } from '@umbraco-cms/backoffice/tree';
-import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { isPickerPropertyEditorTreeDataSource } from 'src/packages/data-type/property-editor-data-source/extension/is-picker-property-editor-tree-data-source.guard.js';
 import { isPickerPropertyEditorCollectionDataSource } from 'src/packages/data-type/property-editor-data-source/extension/is-picker-property-editor-collection-data-source.guard copy.js';
 import { isPickerPropertyEditorSearchableDataSource } from 'src/packages/data-type/property-editor-data-source/extension/is-picker-property-editor-searchable.data-source.guard.js';

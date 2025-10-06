@@ -1,9 +1,9 @@
+import type { UmbPropertyEditorDataSourceItemModel } from '../item/types.js';
 import { UmbPropertyEditorDataSourceSearchExtensionRegistryDataSource } from './search.extension-registry.data-source.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbSearchProvider, UmbSearchRepository, UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
-import type { UmbPropertyEditorDataSourceItemModel } from '../item/types.js';
+import type { UmbSearchRepository, UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
 
 export class UmbPropertyEditorDataSourceSearchRepository
 	extends UmbControllerBase
