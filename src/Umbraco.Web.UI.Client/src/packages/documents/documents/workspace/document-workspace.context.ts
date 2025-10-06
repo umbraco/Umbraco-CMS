@@ -20,6 +20,7 @@ import { UMB_DOCUMENT_CONFIGURATION_CONTEXT } from '../index.js';
 import { UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD, UMB_DOCUMENT_WORKSPACE_ALIAS } from './constants.js';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import { umbPeekError } from '@umbraco-cms/backoffice/notification';
 import { UmbContentDetailWorkspaceContextBase } from '@umbraco-cms/backoffice/content';
 import { UmbDocumentBlueprintDetailRepository } from '@umbraco-cms/backoffice/document-blueprint';
 import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
@@ -305,11 +306,14 @@ export class UmbDocumentWorkspaceContext
 			firstVariantId.segment ?? undefined,
 		);
 
-		// TODO: [LK] Interogate `previewUrlData.message` for any errors.
-
 		if (previewUrlData.url) {
 			const previewWindow = window.open(previewUrlData.url, `umbpreview-${unique}`);
 			previewWindow?.focus();
+			return;
+		}
+
+		if (previewUrlData.message) {
+			umbPeekError(this._host, { color: 'danger', headline: 'Preview error', message: previewUrlData.message });
 		}
 	}
 
