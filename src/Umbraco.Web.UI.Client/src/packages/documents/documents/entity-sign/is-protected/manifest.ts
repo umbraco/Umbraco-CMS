@@ -7,8 +7,10 @@ export const manifests: UmbExtensionManifest = {
 	name: 'Is Protected Document Entity Sign',
 	forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 	forEntityFlags: ['Umb.IsProtected'],
+	weight: 1000,
 	meta: {
 		iconName: 'icon-lock',
 		label: 'Protected',
+		iconColor: 'red',
 	},
 };

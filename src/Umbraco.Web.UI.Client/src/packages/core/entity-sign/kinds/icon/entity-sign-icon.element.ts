@@ -1,17 +1,18 @@
 import type { ManifestEntitySignIconKind } from './types.js';
-import { css, customElement, html, nothing, property } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, ifDefined, nothing, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UmbEntitySignElement } from '../../types.js';
 
 @customElement('umb-entity-sign-icon')
-export class UmbEntitySignIconElement extends UmbLitElement {
+export class UmbEntitySignIconElement extends UmbLitElement implements UmbEntitySignElement {
 	@property({ type: Object, attribute: false })
 	manifest?: ManifestEntitySignIconKind;
 
 	override render() {
 		return this.manifest
 			? html`<umb-icon
-					name=${this.manifest.meta.iconName ?? 'icon-circle-dotted'}
-					title="TODO: ... get it from the API"></umb-icon>`
+					.name=${this.manifest.meta.iconName ?? 'icon-circle-dotted'}
+					.color=${this.manifest.meta.iconColor}></umb-icon>`
 			: nothing;
 	}
 
