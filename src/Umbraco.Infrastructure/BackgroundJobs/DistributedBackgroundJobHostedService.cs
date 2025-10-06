@@ -1,7 +1,9 @@
 ﻿using System.Diagnostics;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Services;
@@ -17,6 +19,7 @@ public class DistributedBackgroundJobHostedService : BackgroundService
     private readonly IRuntimeState _runtimeState;
     private readonly IDistributedJobService _distributedJobService;
     private readonly IEnumerable<IDistributedBackgroundJob> _distributedBackgroundJobs;
+    private DistributedJobSettings _distributedJobSettings;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DistributedBackgroundJobHostedService"/> class.
@@ -25,30 +28,37 @@ public class DistributedBackgroundJobHostedService : BackgroundService
     /// <param name="runtimeState"></param>
     /// <param name="distributedJobService"></param>
     /// <param name="distributedBackgroundJobs"></param>
+    /// <param name="distributedJobSettings"></param>
     public DistributedBackgroundJobHostedService(
         ILogger<DistributedBackgroundJobHostedService> logger,
         IRuntimeState runtimeState,
         IDistributedJobService distributedJobService,
-        IEnumerable<IDistributedBackgroundJob> distributedBackgroundJobs)
+        IEnumerable<IDistributedBackgroundJob> distributedBackgroundJobs,
+        IOptionsMonitor<DistributedJobSettings> distributedJobSettings)
     {
         _logger = logger;
         _runtimeState = runtimeState;
         _distributedJobService = distributedJobService;
         _distributedBackgroundJobs = distributedBackgroundJobs;
+        _distributedJobSettings = distributedJobSettings.CurrentValue;
+        distributedJobSettings.OnChange((options) =>
+        {
+            _distributedJobSettings = options;
+        });
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         var delayTimer = Stopwatch.StartNew();
 
-        while (delayTimer.Elapsed < TimeSpan.FromMinutes(2))
+        while (delayTimer.Elapsed < _distributedJobSettings.Delay)
         {
             await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
         }
 
         delayTimer.Stop();
 
-        using PeriodicTimer timer = new(TimeSpan.FromSeconds(15));
+        using PeriodicTimer timer = new(_distributedJobSettings.Period);
 
         try
         {
