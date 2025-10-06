@@ -10,7 +10,7 @@
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.0.0" />
     <PackageVersion Include="System.Data.DataSetExtensions" Version="4.5.0" />
     <PackageVersion Include="System.Data.Odbc" Version="9.0.9" />
-    <PackageVersion Include="System.Data.OleDb" Version="9.0.4" />
+    <PackageVersion Include="System.Data.OleDb" Version="9.0.9" />
     <PackageVersion Include="System.Reflection.Emit" Version="4.7.0" />
   </ItemGroup>
   <ItemGroup>
