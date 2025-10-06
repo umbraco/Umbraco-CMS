@@ -180,7 +180,7 @@ test('can publish variant content node', async ({umbracoApi, umbracoUi}) => {
   expect(contentData.variants[0].state).toBe('Published');
 });
 
-test('can duplicate a content to root', async ({umbracoApi, umbracoUi}) => {
+test('can duplicate a content node to root', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const duplicatedContentName = contentName + ' (1)';
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
@@ -210,7 +210,7 @@ test('can duplicate a content to root', async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.document.ensureNameNotExists(duplicatedContentName);
 });
 
-test('can duplicate a content to other parent', async ({umbracoApi, umbracoUi}) => {
+test('can duplicate a content node to other parent', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const parentDocumentTypeName = 'ParentDocumentType';
   const parentContentName = 'ParentContent';
