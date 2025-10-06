@@ -9,7 +9,6 @@ export * from './global-contexts/index.js';
 export * from './item/index.js';
 export * from './modals/index.js';
 export * from './paths.js';
-export * from './preview/index.js';
 export * from './publishing/index.js';
 export * from './recycle-bin/index.js';
 export * from './reference/index.js';
