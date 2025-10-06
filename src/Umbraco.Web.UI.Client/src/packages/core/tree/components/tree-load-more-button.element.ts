@@ -11,12 +11,14 @@ export class UmbTreeLoadMoreButtonElement extends UmbLitElement {
 
 	override render() {
 		const state: UUIButtonState = this.loading ? 'waiting' : undefined;
+		const label = this.localize.term('actions_showMore');
 
 		return html`<uui-button
 			state=${ifDefined(state)}
 			data-mark=${this._dataMark}
 			id="load-more"
-			.label=${this.localize.term('actions_showMore')}
+			.label=${label}
+			.title=${label}
 			>…</uui-button
 		>`;
 	}
