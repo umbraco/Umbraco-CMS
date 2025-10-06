@@ -2,16 +2,17 @@ import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension
 
 export const manifest: UmbExtensionManifestKind = {
 	type: 'kind',
-	alias: 'Umb.Kind.PreviewOption.UrlProvider',
+	alias: 'Umb.Kind.WorkspaceActionMenuItem.UrlProvider',
+	matchType: 'workspaceActionMenuItem',
 	matchKind: 'urlProvider',
-	matchType: 'previewOption',
 	manifest: {
-		type: 'previewOption',
+		type: 'workspaceActionMenuItem',
 		kind: 'urlProvider',
 		weight: 1000,
-		api: () => import('./url-provider.preview-option-action.js'),
+		api: () => import('./url-provider.action.js'),
 		elementName: 'umb-workspace-action-menu-item',
-		providerAlias: '',
+		forWorkspaceActions: 'Umb.WorkspaceAction.Document.SaveAndPreview',
+		urlProviderAlias: 'umbDocumentUrlProvider',
 		meta: {
 			icon: '',
 			label: '(Missing label in manifest)',

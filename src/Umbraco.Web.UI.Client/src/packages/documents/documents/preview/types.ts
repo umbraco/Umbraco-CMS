@@ -1,1 +1,1 @@
-export type * from './preview-option/types.js';
+export type * from './workspace-action-menu-item/types.js';
