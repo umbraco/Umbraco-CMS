@@ -25,7 +25,7 @@ public class WebhookFiring : IDistributedBackgroundJob
     private WebhookSettings _webhookSettings;
 
     /// <inheritdoc />
-    public string Name => "Webhook Firing";
+    public string Name => "WebhookFiring";
 
     /// <inheritdoc />
     public TimeSpan Period => _webhookSettings.Period;

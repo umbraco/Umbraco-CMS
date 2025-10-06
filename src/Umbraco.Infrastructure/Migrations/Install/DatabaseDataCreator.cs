@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Infrastructure.BackgroundJobs;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
@@ -196,6 +197,11 @@ internal sealed class DatabaseDataCreator
         if (tableName.Equals(Constants.DatabaseSchema.Tables.LogViewerQuery))
         {
             CreateLogViewerQueryData();
+        }
+
+        if (tableName.Equals(Constants.DatabaseSchema.Tables.DistributedJob))
+        {
+            CreateDistributedJobData();
         }
 
         _logger.LogInformation("Completed creating data in {TableName}", tableName);
@@ -1058,6 +1064,8 @@ internal sealed class DatabaseDataCreator
         _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.WebhookLogs, Name = "WebhookLogs" });
         _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.LongRunningOperations, Name = "LongRunningOperations" });
         _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.DocumentUrls, Name = "DocumentUrls" });
+        _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.DistributedJobs, Name = "DistributedJobs" });
+
     }
 
     private void CreateContentTypeData()
@@ -2369,6 +2377,21 @@ internal sealed class DatabaseDataCreator
             dto.Id = i + 1;
             _database.Insert(Constants.DatabaseSchema.Tables.LogViewerQuery, "id", false, dto);
         }
+    }
+
+    private void CreateDistributedJobData()
+    {
+        _database.Insert(Constants.DatabaseSchema.Tables.DistributedJob, "id", true, new DistributedJobDto { Name = "OpenIddictCleanupJob", Period = 36000000000, LastRun = DateTime.UtcNow, IsRunning = false, LastAttemptedRun = DateTime.UtcNow });
+        _database.Insert(Constants.DatabaseSchema.Tables.DistributedJob, "id", true, new DistributedJobDto { Name = "Webhook Firing", Period = 100000000, LastRun = DateTime.UtcNow, IsRunning = false, LastAttemptedRun = DateTime.UtcNow });
+        _database.Insert(Constants.DatabaseSchema.Tables.DistributedJob, "id", true, new DistributedJobDto { Name = "ContentVersionCleanupJob", Period = 36000000000, LastRun = DateTime.UtcNow, IsRunning = false, LastAttemptedRun = DateTime.UtcNow });
+        _database.Insert(Constants.DatabaseSchema.Tables.DistributedJob, "id", true, new DistributedJobDto { Name = "HealthCheckNotifierJob", Period = 864000000000, LastRun = DateTime.UtcNow, IsRunning = false, LastAttemptedRun = DateTime.UtcNow });
+        _database.Insert(Constants.DatabaseSchema.Tables.DistributedJob, "id", true, new DistributedJobDto { Name = "LogScrubberJob", Period = 144000000000, LastRun = DateTime.UtcNow, IsRunning = false, LastAttemptedRun = DateTime.UtcNow });
+        _database.Insert(Constants.DatabaseSchema.Tables.DistributedJob, "id", true, new DistributedJobDto { Name = "ScheduledPublishingJob", Period = 600000000, LastRun = DateTime.UtcNow, IsRunning = false, LastAttemptedRun = DateTime.UtcNow });
+        _database.Insert(Constants.DatabaseSchema.Tables.DistributedJob, "id", true, new DistributedJobDto { Name = "TemporaryFileCleanupJob", Period = 3000000000, LastRun = DateTime.UtcNow, IsRunning = false, LastAttemptedRun = DateTime.UtcNow });
+        _database.Insert(Constants.DatabaseSchema.Tables.DistributedJob, "id", true, new DistributedJobDto { Name = "WebhookLoggingCleanup", Period = 864000000000, LastRun = DateTime.UtcNow, IsRunning = false, LastAttemptedRun = DateTime.UtcNow });
+        _database.Insert(Constants.DatabaseSchema.Tables.DistributedJob, "id", true, new DistributedJobDto { Name = "CacheInstructionsPruningJob", Period = 600000000, LastRun = DateTime.UtcNow, IsRunning = false, LastAttemptedRun = DateTime.UtcNow });
+        _database.Insert(Constants.DatabaseSchema.Tables.DistributedJob, "id", true, new DistributedJobDto { Name = "LongRunningOperationsCleanupJob", Period = 1200000000, LastRun = DateTime.UtcNow, IsRunning = false, LastAttemptedRun = DateTime.UtcNow });
+
     }
 
     private void ConditionalInsert<TDto>(
