@@ -74,8 +74,7 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 			#info-links {
 				display: grid;
 				grid-template-columns: repeat(auto-fill, minmax(20%, 1fr));
-				grid-gap: var(--uui-size-space-4);
-				max-width: 1000px;
+				grid-gap: var(--uui-size-space-5);
 			}
 
 			.info-link {
