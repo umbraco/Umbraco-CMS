@@ -34,6 +34,7 @@ export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<UmbEn
 	#dataSourceAlias?: string;
 	#dataSourceApiInitializer?: UmbExtensionApiInitializer<ManifestPropertyEditorDataSource>;
 	#dataSourceApi?: UmbPickerPropertyEditorDataSource;
+	#dataSourceConfig?: UmbPropertyEditorDataSourceConfigModel | undefined;
 
 	#dataSourceApiContext = new UmbEntityDataPickerDataSourceApiContext(this);
 
@@ -66,7 +67,7 @@ export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<UmbEn
 	 * @memberof UmbEntityDataPickerInputContext
 	 */
 	setDataSourceConfig(config: UmbPropertyEditorDataSourceConfigModel | undefined) {
-		this.#dataSourceApiContext.setConfig(config);
+		this.#dataSourceConfig = config;
 	}
 
 	/**
@@ -75,7 +76,7 @@ export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<UmbEn
 	 * @memberof UmbEntityDataPickerInputContext
 	 */
 	getDataSourceConfig(): UmbPropertyEditorDataSourceConfigModel | undefined {
-		return this.#dataSourceApiContext.getConfig();
+		return this.#dataSourceConfig;
 	}
 
 	override async openPicker(pickerData?: Partial<UmbPickerModalData<UmbEntityDataPickerItemModel>>) {
@@ -101,7 +102,7 @@ export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<UmbEn
 
 			// TODO: Check if it is a picker data source
 			this.#dataSourceApi = ctrl.api as UmbPickerPropertyEditorDataSource;
-			this.#dataSourceApi.setConfig?.(this.getDataSourceConfig());
+			this.#dataSourceApi.setConfig?.(this.#dataSourceConfig);
 
 			this.#dataSourceApiContext.setDataSourceApi(this.#dataSourceApi);
 		});
