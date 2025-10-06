@@ -13,14 +13,9 @@
     -->
     <WarningsNotAsErrors>$(WarningsNotAsErrors),CS0618</WarningsNotAsErrors>
   </PropertyGroup>
-  
-  <ItemGroup>
-    <PackageReference Include="Examine" />
-  </ItemGroup>
 
   <ItemGroup>
-    <!-- Take top-level depedendency on Lucene.Net.Replicator, because Examine depends on a vulnerable version -->
-    <PackageReference Include="Lucene.Net.Replicator" />
+    <PackageReference Include="Examine" />
   </ItemGroup>
 
   <ItemGroup>

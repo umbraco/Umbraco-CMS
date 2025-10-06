@@ -83,7 +83,5 @@
   </ItemGroup>
   <!-- Transitive pinned versions (only required because our direct dependencies have vulnerable versions of transitive dependencies) -->
   <ItemGroup>
-    <!-- Examine.Lucene brings in a vulnerable version of Lucene.Net.Replicator -->
-    <PackageVersion Include="Lucene.Net.Replicator" Version="4.8.0-beta00017" />
   </ItemGroup>
 </Project>
