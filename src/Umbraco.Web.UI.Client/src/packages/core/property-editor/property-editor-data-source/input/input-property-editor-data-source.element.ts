@@ -1,6 +1,6 @@
 import type { UmbPropertyEditorDataSourceItemModel } from '../item/data/types.js';
 
-import { UmbPropertyEditorDataSourcePickerInputContext } from './property-editor-data-source-input.context.js';
+import { UmbPropertyEditorDataSourcePickerInputContext } from './input-property-editor-data-source.context.js';
 import { css, html, customElement, property, state, repeat, nothing, when } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
