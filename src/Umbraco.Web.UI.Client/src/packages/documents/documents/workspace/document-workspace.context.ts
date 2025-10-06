@@ -19,7 +19,6 @@ import { UmbDocumentValidationRepository } from '../repository/validation/index.
 import { UMB_DOCUMENT_CONFIGURATION_CONTEXT } from '../index.js';
 import { UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD, UMB_DOCUMENT_WORKSPACE_ALIAS } from './constants.js';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
-import { ensurePathEndsWithSlash } from '@umbraco-cms/backoffice/utils';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContentDetailWorkspaceContextBase } from '@umbraco-cms/backoffice/content';
 import { UmbDocumentBlueprintDetailRepository } from '@umbraco-cms/backoffice/document-blueprint';
@@ -29,7 +28,6 @@ import {
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceIsNewRedirectControllerAlias,
 } from '@umbraco-cms/backoffice/workspace';
-import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 import type { UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
@@ -276,11 +274,13 @@ export class UmbDocumentWorkspaceContext
 		await super._handleSave();
 	}
 
-	public async saveAndPreview(): Promise<void> {
-		return await this.#handleSaveAndPreview();
+	public async saveAndPreview(urlProviderAlias?: string): Promise<void> {
+		return await this.#handleSaveAndPreview(urlProviderAlias ?? 'umbDocumentUrlProvider');
 	}
 
-	async #handleSaveAndPreview() {
+	async #handleSaveAndPreview(urlProviderAlias: string) {
+		if (!urlProviderAlias) throw new Error('Url provider alias is missing');
+
 		const unique = this.getUnique();
 		if (!unique) throw new Error('Unique is missing');
 
@@ -296,28 +296,21 @@ export class UmbDocumentWorkspaceContext
 			await this.performCreateOrUpdate(variantIds, saveData);
 		}
 
-		// Tell the server that we're entering preview mode.
-		await new UmbDocumentPreviewRepository(this).enter();
+		// Get the preview URL from the server.
+		const previewRepository = new UmbDocumentPreviewRepository(this);
+		const previewUrlData = await previewRepository.getPreviewUrl(
+			unique,
+			urlProviderAlias,
+			firstVariantId.culture ?? undefined,
+			firstVariantId.segment ?? undefined,
+		);
 
-		const serverContext = await this.getContext(UMB_SERVER_CONTEXT);
-		if (!serverContext) {
-			throw new Error('Server context is missing');
+		// TODO: [LK] Interogate `previewUrlData.message` for any errors.
+
+		if (previewUrlData.url) {
+			const previewWindow = window.open(previewUrlData.url, `umbpreview-${unique}`);
+			previewWindow?.focus();
 		}
-
-		const backofficePath = serverContext.getBackofficePath();
-		const previewUrl = new URL(ensurePathEndsWithSlash(backofficePath) + 'preview', window.location.origin);
-		previewUrl.searchParams.set('id', unique);
-
-		if (firstVariantId.culture) {
-			previewUrl.searchParams.set('culture', firstVariantId.culture);
-		}
-
-		if (firstVariantId.segment) {
-			previewUrl.searchParams.set('segment', firstVariantId.segment);
-		}
-
-		const previewWindow = window.open(previewUrl.toString(), `umbpreview-${unique}`);
-		previewWindow?.focus();
 	}
 
 	public createPropertyDatasetContext(
