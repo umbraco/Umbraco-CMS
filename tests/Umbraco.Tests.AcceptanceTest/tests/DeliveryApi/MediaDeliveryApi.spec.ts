@@ -1,7 +1,7 @@
 import {expect} from '@playwright/test';
 import {test, AliasHelper} from '@umbraco/playwright-testhelpers';
 
-// Media Folder
+// Media Folders
 const rootMediaFolderName = 'RootMediaFolder';
 const childMediaFolderName = 'ChildMediaFolder';
 let rootFolderId = '';
@@ -23,12 +23,12 @@ const customMediaTypeName = 'CustomMediaType';
 // Data Type
 const textStringDataType = 'Textstring';
 const textStringValue = 'This is a test textstring';
-// Constant
+// Constants
 const imageSize = 3;
 const rootImageSize = 5;
 
 test.beforeEach(async ({umbracoApi}) => {
-  // Create a root level folder
+  // Create a folder at root level
   rootFolderId = await umbracoApi.media.createDefaultMediaFolder(rootMediaFolderName);
   // Create child folder
   childFolderId = await umbracoApi.media.createDefaultMediaFolderAndParentId(childMediaFolderName, rootFolderId);
