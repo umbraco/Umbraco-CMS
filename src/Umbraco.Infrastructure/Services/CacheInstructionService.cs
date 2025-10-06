@@ -171,6 +171,7 @@ namespace Umbraco.Cms
             {
                 lock (_syncLock)
                 {
+                    _repositoryCacheVersionService.SetCachesSyncedAsync();
                     using (!_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<CacheInstructionService>("Syncing from database..."))
                     using (ICoreScope scope = ScopeProvider.CreateCoreScope())
                     {
@@ -181,7 +182,6 @@ namespace Umbraco.Cms
                         {
                             _lastSyncedManager.SaveLastSyncedExternalAsync(lastId).GetAwaiter().GetResult();
                             _lastSyncedManager.SaveLastSyncedInternalAsync(lastId).GetAwaiter().GetResult();
-                            _repositoryCacheVersionService.SetCachesSyncedAsync();
                         }
 
                         scope.Complete();
