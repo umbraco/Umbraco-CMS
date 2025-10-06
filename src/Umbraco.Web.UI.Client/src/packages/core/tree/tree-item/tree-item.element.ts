@@ -1,44 +1,40 @@
 import type { ManifestTreeItem } from '../extensions/types.js';
 import UmbDefaultTreeItemContext from './tree-item-default/tree-item-default.context.js';
-import { customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import {
-	UmbExtensionElementAndApiSlotElementBase,
-	umbExtensionsRegistry,
-} from '@umbraco-cms/backoffice/extension-registry';
-import { createObservablePart } from '@umbraco-cms/backoffice/observable-api';
+import type UmbDefaultTreeItemElement from './tree-item-default/tree-item-default.element.js';
+import { customElement, html, nothing, property } from '@umbraco-cms/backoffice/external/lit';
+import { UmbExtensionElementAndApiSlotElementBase } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-tree-item')
 export class UmbTreeItemElement extends UmbExtensionElementAndApiSlotElementBase<ManifestTreeItem> {
 	@property({ type: String, reflect: true })
-	get entityType() {
-		return this.#entityType;
+	entityType?: string;
+
+	override render() {
+		const entityType = this.entityType;
+		if (!entityType) return nothing;
+
+		return html`<umb-extension-with-api-slot
+			type=${this.getExtensionType()}
+			.filter=${(manifest: ManifestTreeItem) => manifest.forEntityTypes.includes(entityType)}
+			.elementProps=${this.props}
+			.fallbackRenderMethod=${() => this.#renderFallbackResultItem()}></umb-extension-with-api-slot>`;
 	}
-	set entityType(newVal) {
-		this.#entityType = newVal;
-		this.#observeEntityType();
-	}
-	#entityType?: string;
 
-	#observeEntityType() {
-		if (!this.#entityType) return;
+	#renderFallbackResultItem() {
+		const element = document.createElement(this.getDefaultElementName()) as UmbDefaultTreeItemElement;
+		const props = this.props;
 
-		const filterByEntityType = (manifest: ManifestTreeItem) => {
-			if (!this.#entityType) return false;
-			return manifest.forEntityTypes.includes(this.#entityType);
-		};
+		// TODO: we could optimize this so we only re-set the updated props.
+		if (props) {
+			Object.keys(props).forEach((key) => {
+				(element as any)[key] = props[key];
+			});
+		}
 
-		this.observe(
-			// TODO: what should we do if there are multiple tree items for an entity type?
-			// This method gets all extensions based on a type, then filters them based on the entity type. and then we get the alias of the first one [NL]
-			createObservablePart(
-				umbExtensionsRegistry.byTypeAndFilter(this.getExtensionType(), filterByEntityType),
-				(x) => x[0]?.alias,
-			),
-			(alias) => {
-				this.alias = alias;
-			},
-			'umbObserveAlias',
-		);
+		const api = new UmbDefaultTreeItemContext(element);
+		element.api = api;
+
+		return element;
 	}
 
 	getExtensionType() {
