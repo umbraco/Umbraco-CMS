@@ -83,8 +83,6 @@
   </ItemGroup>
   <!-- Transitive pinned versions (only required because our direct dependencies have vulnerable versions of transitive dependencies) -->
   <ItemGroup>
-    <!-- Azure.Identity, Microsoft.EntityFrameworkCore.SqlServer and Dazinator.Extensions.FileProviders brings in a legacy version of System.Text.Encodings.Web -->
-    <PackageVersion Include="System.Text.Encodings.Web" Version="10.0.0-rc.1.25451.107" />
     <!-- NPoco.SqlServer brings in a vulnerable version of Microsoft.Data.SqlClient  -->
     <PackageVersion Include="Microsoft.Data.SqlClient" Version="6.1.1" />
     <!-- Examine.Lucene brings in a vulnerable version of Lucene.Net.Replicator -->

@@ -35,11 +35,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Take top-level depedendency on System.Text.Encodings.Web, because Azure.Identity, Microsoft.EntityFrameworkCore.SqlServer, Dazinator.Extensions.FileProviders depends on a vulnerable version -->
-    <PackageReference Include="System.Text.Encodings.Web" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Umbraco.Examine.Lucene\Umbraco.Examine.Lucene.csproj" />
     <ProjectReference Include="..\Umbraco.PublishedCache.HybridCache\Umbraco.PublishedCache.HybridCache.csproj" />
   </ItemGroup>

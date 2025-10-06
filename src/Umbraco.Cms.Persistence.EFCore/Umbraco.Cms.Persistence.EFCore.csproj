@@ -24,11 +24,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Take top-level depedendency on System.Text.Encodings.Web, because Microsoft.EntityFrameworkCore.SqlServer brings in a legacy version -->
-    <PackageReference Include="System.Text.Encodings.Web" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj" />
     <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />
   </ItemGroup>
