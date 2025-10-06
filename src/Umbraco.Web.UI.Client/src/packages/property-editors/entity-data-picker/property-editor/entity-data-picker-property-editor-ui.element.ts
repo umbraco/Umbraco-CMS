@@ -85,6 +85,7 @@ export class UmbEntityDataPickerPropertyEditorUIElement
 
 	override render() {
 		return html`<umb-input-entity-data
+			.selection=${this.value ?? []}
 			.dataSourceAlias="${this.dataSourceAlias}"
 			.config=${this._config}
 			.min=${this._min}
