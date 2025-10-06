@@ -22,6 +22,14 @@ export class UmbEntitySignIconElement extends UmbLitElement implements UmbEntity
 				filter: drop-shadow(-1px 0 0 var(--umb-sign-bundle-bg)) drop-shadow(0 -1px 0 var(--umb-sign-bundle-bg))
 					drop-shadow(0 1px 0 var(--umb-sign-bundle-bg));
 			}
+			umb-icon::before {
+				content: '';
+				position: absolute;
+				z-index: -1;
+				border-radius: 50%;
+				inset: 2px;
+				background-color: var(--umb-sign-bundle-bg);
+			}
 		`,
 	];
 }

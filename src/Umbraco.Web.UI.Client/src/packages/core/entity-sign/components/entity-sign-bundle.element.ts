@@ -17,6 +17,7 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 	}
 
 	set entityType(value: string | undefined) {
+		if (this.#entityType === value) return;
 		this.#entityType = value;
 		this.#gotProperties();
 	}
@@ -27,7 +28,10 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 	}
 
 	set entityFlags(value: Array<UmbEntityFlag> | undefined) {
-		this.#entityFlagAliases = value?.map((x) => x.alias);
+		const entityFlagAliases = value?.map((x) => x.alias);
+		// If they are equal return:
+		if (this.#entityFlagAliases?.join(',') === entityFlagAliases?.join(',')) return;
+		this.#entityFlagAliases = entityFlagAliases;
 		this.#gotProperties();
 	}
 
@@ -123,18 +127,21 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 	};
 
 	override render() {
+		return html`
+			<slot></slot>
+			${this.#renderBundle()}
+		`;
+	}
+	#renderBundle() {
 		if (!this._signs || this._signs.length === 0) return nothing;
 
 		const first = this._signs?.[0];
 		if (!first) return nothing;
-
-		return html`
-			<slot></slot>
-			<div class="infobox ${this._open ? 'is-open' : ''}" style=${`--count:${this._signs.length}`}>
-				${this.#renderOptions()}
-			</div>
-		`;
+		return html`<div class="infobox ${this._open ? 'is-open' : ''}" style=${`--count:${this._signs.length}`}>
+			${this.#renderOptions()}
+		</div>`;
 	}
+
 	#renderOptions() {
 		return this._signs
 			? repeat(
@@ -159,6 +166,7 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 				--icon-w: 0.75rem; /* 12px / 16 */
 				--pad-x: 0.25rem; /*  4px / 16 */
 				--ease: cubic-bezier(0.1, 0, 0.3, 1);
+				--ease-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
 			}
 
 			.infobox {
@@ -174,7 +182,7 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 				clip-path: inset(-10px calc(100% - 30px) calc(100% - 10px) -20px);
 				transition:
 					background-color 80ms 40ms linear,
-					clip-path 80ms var(--ease),
+					clip-path 120ms var(--ease-bounce),
 					font-size 120ms var(--ease);
 				/*will-change: clip-path;*/
 				min-height: fit-content;
@@ -184,13 +192,17 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 				position: absolute;
 				top: 0;
 				left: 0;
+				right: 100%;
+				bottom: 100%;
 				opacity: 0;
 				border-radius: 3px;
 				box-shadow: var(--uui-shadow-depth-2);
 				display: none;
 				transition:
-					all 80ms 40ms linear,
-					display 0 0;
+					right 120ms var(--ease-bounce),
+					bottom 120ms var(--ease-bounce),
+					opacity 120ms linear,
+					display 0 120ms;
 			}
 
 			.infobox > .sign-container {
@@ -233,13 +245,16 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 					--umb-sign-bundle-bg: var(--uui-color-surface);
 				}
 				.infobox.is-open::before {
-					inset: 0;
+					right: 0;
+					bottom: 0;
 					opacity: 100;
 					background-color: var(--uui-color-surface);
 					display: block;
 					transition:
-						all 80ms 40ms linear,
-						display 0 120ms;
+						right 120ms var(--ease-bounce),
+						bottom 120ms var(--ease-bounce),
+						opacity 120ms var(--ease),
+						display 0 0;
 				}
 				.infobox.is-open > .sign-container {
 					transform: none;
