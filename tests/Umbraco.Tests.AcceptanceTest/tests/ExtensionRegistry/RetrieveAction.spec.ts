@@ -15,7 +15,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.media.ensureNameNotExists(mediaName);
 });
 
-test('can retrieve unique and entity type of document', async ({umbracoApi, umbracoUi}) => {
+test('can retrieve unique id and entity type of document', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
@@ -32,7 +32,7 @@ test('can retrieve unique and entity type of document', async ({umbracoApi, umbr
   await umbracoUi.content.doesSuccessNotificationHaveText('document_' + documentId);
 });
 
-test('can retrieve unique and entity type of media', async ({umbracoApi, umbracoUi}) => {
+test('can retrieve unique id and entity type of media', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const mediaId = await umbracoApi.media.createDefaultMediaWithImage(mediaName);
   await umbracoUi.goToBackOffice();
