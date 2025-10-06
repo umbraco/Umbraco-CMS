@@ -2599,12 +2599,13 @@ export default {
 		addSettingsElementType: 'Add settings',
 		confirmDeleteBlockTitle: 'Delete %0%?',
 		confirmDeleteBlockMessage: 'Are you sure you want to delete this %0%?',
+		confirmDeleteBlockTypeTitle: 'Delete block configuration?',
 		confirmDeleteBlockTypeMessage: 'Are you sure you want to delete the block configuration <strong>%0%</strong>?',
 		confirmDeleteBlockTypeNotice:
 			'The content of this block will still be present, editing of this content will no longer be available and will be shown as unsupported content.',
 		confirmDeleteBlockGroupTitle: 'Delete group?',
 		confirmDeleteBlockGroupMessage:
-			'Are you sure you want to delete group <strong>%0%</strong> and all the Block configurations of this?',
+			'Are you sure you want to delete group <strong>%0%</strong>?',
 		confirmDeleteBlockGroupNotice:
 			'The content of these Blocks will still be present, editing of this content will no longer be available and will be shown as unsupported content.',
 		blockConfigurationOverlayTitle: "Configuration of '%0%'",
@@ -2680,6 +2681,8 @@ export default {
 		pickSpecificAllowance: 'Pick group or Block',
 		allowanceMinimum: 'Set a minimum requirement',
 		allowanceMaximum: 'Set a maximum requirement',
+		rangeAllowed: 'Number of blocks',
+		specifiedAllowance: 'Allowed block types',
 		block: 'Block',
 		tabBlock: 'Block',
 		tabBlockTypeSettings: 'Settings',
@@ -2846,9 +2849,17 @@ export default {
 			"To resolve this you should either restore the property editor, change the property to use a supported data type or remove the property if it's no longer needed.",
 		detailsDataType: 'Data type',
 		detailsPropertyEditor: 'Property editor',
+		detailsPropertyEditorUi: 'Property editor UI',
 		detailsData: 'Data',
 		detailsHide: 'Hide details',
 		detailsShow: 'Show details',
+		missingUiTitle: 'The configured property editor UI could not be found.',
+		missingUiDetailsDescription:
+			'This property editor UI is missing. Ensure your custom UI is registered correctly and the alias matches your configuration.<br/>For implementation details, refer to the <a href="https://docs.umbraco.com/umbraco-cms/customizing/property-editors/composition/property-editor-ui" target="_blank" rel="noopener">documentation</a>.',
+		dataTypeMissingEditor: 'Property Editor not found',
+		dataTypeMissingEditorMessage: 'This property editor could not be found.',
+		dataTypeMissingEditorUi: 'Property Editor UI not found',
+		dataTypeMissingEditorUiMessage: 'This property editor UI could not be found.',
 	},
 	uiCulture: {
 		ar: 'العربية',
