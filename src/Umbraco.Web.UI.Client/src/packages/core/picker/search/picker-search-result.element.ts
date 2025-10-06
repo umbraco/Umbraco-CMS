@@ -1,13 +1,12 @@
-import './result-item/default/default-picker-search-result-item.element.js';
 import { UMB_PICKER_CONTEXT } from '../picker.context.token.js';
 import type { UmbPickerContext } from '../picker.context.js';
+import { UmbDefaultPickerSearchResultItemElement } from './result-item/default/default-picker-search-result-item.element.js';
 import type { ManifestPickerSearchResultItem } from './result-item/picker-search-result-item.extension.js';
+import { UmbDefaultPickerSearchResultItemContext } from './result-item/default/default-picker-search-result-item.context.js';
 import { customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbSearchRequestArgs, UmbSearchResultItemModel } from '@umbraco-cms/backoffice/search';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
-import { UmbDefaultPickerSearchResultItemElement } from './result-item/default/default-picker-search-result-item.element.js';
-import { UmbDefaultPickerSearchResultItemContext } from './result-item/default/default-picker-search-result-item.context.js';
 
 type PickableFilterMethodType<T extends UmbEntityModel = UmbEntityModel> = (item: T) => boolean;
 
