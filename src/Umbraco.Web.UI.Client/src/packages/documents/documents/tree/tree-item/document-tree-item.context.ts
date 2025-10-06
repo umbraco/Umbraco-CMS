@@ -32,6 +32,17 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 	#asMenu = false;
 	setAsMenu(value: boolean) {
 		this.#asMenu = value;
+		if (this.#asMenu) {
+			this.observe(
+				this.hasCollection,
+				(hasCollection) => {
+					if (hasCollection) {
+						this._treeItemChildrenManager.setTargetTakeSize(2, 2);
+					}
+				},
+				'_whenMenuObserveHasCollection',
+			);
+		}
 	}
 	getAsMenu(): boolean {
 		return this.#asMenu;

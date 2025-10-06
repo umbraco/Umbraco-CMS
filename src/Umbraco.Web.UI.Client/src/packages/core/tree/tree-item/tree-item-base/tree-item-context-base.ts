@@ -47,18 +47,18 @@ export abstract class UmbTreeItemContextBase<
 	#path = new UmbStringState('');
 	readonly path = this.#path.asObservable();
 
-	#treeItemChildrenManager = new UmbTreeItemChildrenManager<TreeItemType, TreeRootType>(this);
-	public readonly childItems = this.#treeItemChildrenManager.children;
-	public readonly hasChildren = this.#treeItemChildrenManager.hasChildren;
-	public readonly foldersOnly = this.#treeItemChildrenManager.foldersOnly;
-	public readonly pagination = this.#treeItemChildrenManager.offsetPagination;
-	public readonly targetPagination = this.#treeItemChildrenManager.targetPagination;
-	public readonly isLoading = this.#treeItemChildrenManager.isLoading;
-	public readonly isLoadingPrevChildren = this.#treeItemChildrenManager.isLoadingPrevChildren;
-	public readonly isLoadingNextChildren = this.#treeItemChildrenManager.isLoadingNextChildren;
+	protected readonly _treeItemChildrenManager = new UmbTreeItemChildrenManager<TreeItemType, TreeRootType>(this);
+	public readonly childItems = this._treeItemChildrenManager.children;
+	public readonly hasChildren = this._treeItemChildrenManager.hasChildren;
+	public readonly foldersOnly = this._treeItemChildrenManager.foldersOnly;
+	public readonly pagination = this._treeItemChildrenManager.offsetPagination;
+	public readonly targetPagination = this._treeItemChildrenManager.targetPagination;
+	public readonly isLoading = this._treeItemChildrenManager.isLoading;
+	public readonly isLoadingPrevChildren = this._treeItemChildrenManager.isLoadingPrevChildren;
+	public readonly isLoadingNextChildren = this._treeItemChildrenManager.isLoadingNextChildren;
 
 	#treeItemExpansionManager = new UmbTreeItemTargetExpansionManager<TreeItemType, TreeRootType>(this, {
-		childrenManager: this.#treeItemChildrenManager,
+		childrenManager: this._treeItemChildrenManager,
 		targetPaginationManager: this.targetPagination,
 	});
 	isOpen = this.#treeItemExpansionManager.isExpanded;
@@ -76,7 +76,7 @@ export abstract class UmbTreeItemContextBase<
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_TREE_ITEM_CONTEXT);
 		// TODO: Get take size from Tree context
-		this.#treeItemChildrenManager.setTakeSize(50);
+		this._treeItemChildrenManager.setTakeSize(50);
 		this.#consumeContexts();
 		window.addEventListener('navigationend', this.#debouncedCheckIsActive);
 	}
@@ -131,7 +131,7 @@ export abstract class UmbTreeItemContextBase<
 		if (!treeItem.entityType) throw new Error('Could not create tree item context, tree item type is missing');
 		this.entityType = treeItem.entityType;
 
-		this.#treeItemChildrenManager.setTreeItem(treeItem);
+		this._treeItemChildrenManager.setTreeItem(treeItem);
 		this.#treeItemExpansionManager.setTreeItem(treeItem);
 		this.#treeItemEntityActionManager.setTreeItem(treeItem);
 
@@ -155,9 +155,9 @@ export abstract class UmbTreeItemContextBase<
 	 * @memberof UmbTreeItemContextBase
 	 * @returns {Promise<void>}
 	 */
-	public loadChildren = (): Promise<void> => this.#treeItemChildrenManager.loadChildren();
+	public loadChildren = (): Promise<void> => this._treeItemChildrenManager.loadChildren();
 
-	public reloadChildren = (): Promise<void> => this.#treeItemChildrenManager.reloadChildren();
+	public reloadChildren = (): Promise<void> => this._treeItemChildrenManager.reloadChildren();
 
 	/**
 	 * Load more children of the tree item
@@ -165,21 +165,21 @@ export abstract class UmbTreeItemContextBase<
 	 * @memberof UmbTreeItemContextBase
 	 * @returns {Promise<void>}
 	 */
-	public loadMore = (): Promise<void> => this.#treeItemChildrenManager.loadNextChildren();
+	public loadMore = (): Promise<void> => this._treeItemChildrenManager.loadNextChildren();
 
 	/**
 	 * Load previous items of the tree item
 	 * @memberof UmbTreeItemContextBase
 	 * @returns {Promise<void>}
 	 */
-	public loadPrevItems = (): Promise<void> => this.#treeItemChildrenManager.loadPrevChildren();
+	public loadPrevItems = (): Promise<void> => this._treeItemChildrenManager.loadPrevChildren();
 
 	/**
 	 * Load next items of the tree item
 	 * @memberof UmbTreeItemContextBase
 	 * @returns {Promise<void>}
 	 */
-	public loadNextItems = (): Promise<void> => this.#treeItemChildrenManager.loadNextChildren();
+	public loadNextItems = (): Promise<void> => this._treeItemChildrenManager.loadNextChildren();
 
 	public toggleContextMenu() {
 		if (!this.getTreeItem() || !this.entityType || this.unique === undefined) {
@@ -302,7 +302,7 @@ export abstract class UmbTreeItemContextBase<
 		this.observe(
 			this.treeContext?.foldersOnly,
 			(foldersOnly) => {
-				this.#treeItemChildrenManager.setFoldersOnly(foldersOnly ?? false);
+				this._treeItemChildrenManager.setFoldersOnly(foldersOnly ?? false);
 			},
 			'observeFoldersOnly',
 		);
