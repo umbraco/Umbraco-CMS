@@ -14,6 +14,7 @@ export type * from './collection/types.js';
 export type * from './entity.js';
 export type * from './item/types.js';
 export type * from './modals/types.js';
+export type * from './preview/types.js';
 export type * from './publishing/types.js';
 export type * from './recycle-bin/types.js';
 export type * from './tree/types.js';
