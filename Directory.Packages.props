@@ -83,8 +83,6 @@
   </ItemGroup>
   <!-- Transitive pinned versions (only required because our direct dependencies have vulnerable versions of transitive dependencies) -->
   <ItemGroup>
-    <!-- Examine brings in a vulnerable version of System.Security.Cryptography.Xml -->
-    <PackageVersion Include="System.Security.Cryptography.Xml" Version="10.0.0-rc.1.25451.107" />
     <!-- Dazinator.Extensions.FileProviders and MiniProfiler.AspNetCore.Mvc brings in a vulnerable version of System.Text.RegularExpressions -->
     <PackageVersion Include="System.Text.RegularExpressions" Version="4.3.1" />
     <!-- OpenIddict.AspNetCore, Npoco.SqlServer and Microsoft.EntityFrameworkCore.SqlServer brings in a vulnerable version of Microsoft.IdentityModel.JsonWebTokens -->
