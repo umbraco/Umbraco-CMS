@@ -2546,6 +2546,8 @@ export default {
 		pickSpecificAllowance: 'Tilføj gruppe eller blok',
 		allowanceMinimum: 'Sæt minimum krav',
 		allowanceMaximum: 'Sæt maksimum krav',
+		rangeAllowed: 'Antal blokke',
+		specifiedAllowance: 'Tilladte bloktyper',
 		block: 'Blok',
 		tabBlock: 'Blok',
 		tabBlockTypeSettings: 'Indstillinger',
