@@ -17,9 +17,9 @@ internal static class HybridCacheExtensions
     /// Hat-tip: https://github.com/dotnet/aspnetcore/discussions/57191
     /// Will never add or alter the state of any items in the cache.
     /// </remarks>
-    public static async Task<bool> ExistsAsync(this Microsoft.Extensions.Caching.Hybrid.HybridCache cache, string key)
+    public static async Task<bool> ExistsAsync<T>(this Microsoft.Extensions.Caching.Hybrid.HybridCache cache, string key)
     {
-        (bool exists, _) = await TryGetValueAsync<object>(cache, key);
+        (bool exists, _) = await TryGetValueAsync<T>(cache, key);
         return exists;
     }
 
