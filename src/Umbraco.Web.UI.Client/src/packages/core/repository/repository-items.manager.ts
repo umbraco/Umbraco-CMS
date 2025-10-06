@@ -124,6 +124,11 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 		return this.#items.asObservablePart((items) => items.find((item) => this.#getUnique(item) === unique));
 	}
 
+	removeStatus(unique: string) {
+		const newStatuses = this.#statuses.getValue().filter((status) => status.unique !== unique);
+		this.#statuses.setValue(newStatuses);
+	}
+
 	async getItemByUnique(unique: string) {
 		// TODO: Make an observeOnce feature, to avoid this amount of code: [NL]
 		const ctrl = this.observe(this.itemByUnique(unique), () => {}, null);
