@@ -181,6 +181,7 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 			.infobox .sign-container .badge-icon {
 				background: var(--sign-bundle-bg, transparent);
 				border-radius: 50%;
+				border: 1px solid var(--sign-bundle-bg, transparent);
 			}
 
 			.infobox .sign-container .label {
