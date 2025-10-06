@@ -10,8 +10,8 @@ const dataTypeName = 'Textstring';
 const mediaName = 'TestMedia';
 
 test.afterEach(async ({umbracoApi}) => {
-	await umbracoApi.document.ensureNameNotExists(contentName);
-	await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
+  await umbracoApi.document.ensureNameNotExists(contentName);
+  await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.media.ensureNameNotExists(mediaName);
 });
 
@@ -25,7 +25,7 @@ test('can retrieve unique and entity type of document', async ({umbracoApi, umbr
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.clickWorkspaceActionMenuButton(); 
+  await umbracoUi.content.clickWorkspaceActionMenuButton();
   await umbracoUi.content.clickEntityActionWithName('Retrieve');
 
   // Assert
@@ -40,9 +40,9 @@ test('can retrieve unique and entity type of media', async ({umbracoApi, umbraco
 
   // Act
   await umbracoUi.media.goToMediaWithName(mediaName);
-  await umbracoUi.media.clickWorkspaceActionMenuButton(); 
+  await umbracoUi.media.clickWorkspaceActionMenuButton();
   await umbracoUi.media.clickEntityActionWithName('Retrieve');
-  
+
   // Assert
   await umbracoUi.media.doesSuccessNotificationHaveText('media_' + mediaId);
 });

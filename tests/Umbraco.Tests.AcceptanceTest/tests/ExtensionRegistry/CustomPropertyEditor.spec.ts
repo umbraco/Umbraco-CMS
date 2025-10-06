@@ -20,7 +20,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
 });
 
-test('can add custom property editor to a document type', async ({umbracoApi, umbracoUi}) =>{
+test('can add custom property editor to a document type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoUi.goToBackOffice();
   await umbracoUi.dataType.goToSection(ConstantHelper.sections.settings);
@@ -43,7 +43,7 @@ test('can add custom property editor to a document type', async ({umbracoApi, um
 test('can select custom property editor in property editor picker on data type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.documentType.createDefaultDocumentType(documentTypeName);
-  const dataTypeId = await umbracoApi.dataType.create(dataTypeName, editorAlias, editorUiAlias, []); 
+  const dataTypeId = await umbracoApi.dataType.create(dataTypeName, editorAlias, editorUiAlias, []);
   await umbracoUi.goToBackOffice();
   await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
 
@@ -62,14 +62,14 @@ test('can select custom property editor in property editor picker on data type',
   expect(documentTypeData.properties[0].dataType.id).toBe(dataTypeId);
 });
 
-test('can write and read value from custom property editor', async({umbracoApi, umbracoUi}) => {
+test('can write and read value from custom property editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-	const dataTypeValue = [
-      {
-        alias: "maxChars",
-        value: "100",
-      },
-    ];
+  const dataTypeValue = [
+    {
+      alias: "maxChars",
+      value: "100",
+    },
+  ];
   const dataTypeId = await umbracoApi.dataType.create(dataTypeName, editorAlias, editorUiAlias, dataTypeValue);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeId);
   await umbracoApi.document.createDocumentWithTextContent(contentName, documentTypeId, "Test content", dataTypeName);

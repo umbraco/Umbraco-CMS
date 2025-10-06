@@ -8,7 +8,7 @@ const documentTypeName = 'TestDocumentTypeForContent';
 // DataType
 const dataTypeName = 'Textstring';
 
-test.afterEach(async ({ umbracoApi }) => {
+test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.language.ensureIsoCodeNotExists("da");
