@@ -33,6 +33,8 @@ export const data: Array<UmbMockDocumentModel> = [
 				name: 'The Simplest Document',
 				createDate: '2023-02-06T15:32:05.350038',
 				updateDate: '2023-02-06T15:32:24.957009',
+				id: 'the-simplest-document-id',
+				flags: [],
 			},
 		],
 		values: [
@@ -44,7 +46,7 @@ export const data: Array<UmbMockDocumentModel> = [
 				value: 'default value here',
 			},
 		],
-		signs: [],
+		flags: [],
 	},
 	{
 		ancestors: [],
@@ -628,6 +630,8 @@ export const data: Array<UmbMockDocumentModel> = [
 				name: 'All properties',
 				createDate: '2023-02-06T15:31:46.876902',
 				updateDate: '2023-02-06T15:31:51.354764',
+				id: 'all-properties',
+				flags: [],
 			},
 			{
 				state: DocumentVariantStateModel.PUBLISHED,
@@ -637,9 +641,11 @@ export const data: Array<UmbMockDocumentModel> = [
 				name: 'Alle redigeringsfelter',
 				createDate: '2023-02-06T15:31:46.876902',
 				updateDate: '2023-02-06T15:31:51.354764',
+				id: 'alle-redigeringsfelter',
+				flags: [],
 			},
 		],
-		signs: [],
+		flags: [],
 	},
 	{
 		ancestors: [],
@@ -742,6 +748,8 @@ export const data: Array<UmbMockDocumentModel> = [
 				name: 'Article in english',
 				createDate: '2023-02-06T15:31:46.876902',
 				updateDate: '2023-02-06T15:31:51.354764',
+				id: 'article-in-english',
+				flags: [],
 			},
 			{
 				state: DocumentVariantStateModel.PUBLISHED,
@@ -751,6 +759,8 @@ export const data: Array<UmbMockDocumentModel> = [
 				name: 'Artikel på Dansk',
 				createDate: '2023-02-06T15:31:46.876902',
 				updateDate: '2023-02-06T15:31:51.354764',
+				id: 'artikel-pa-dansk',
+				flags: [],
 			},
 			{
 				state: DocumentVariantStateModel.PUBLISHED,
@@ -760,6 +770,8 @@ export const data: Array<UmbMockDocumentModel> = [
 				name: 'Artikel på Norsk',
 				createDate: '2023-02-06T15:31:46.876902',
 				updateDate: '2023-02-06T15:31:51.354764',
+				id: 'artikel-pa-norsk',
+				flags: [],
 			},
 			{
 				state: DocumentVariantStateModel.PUBLISHED_PENDING_CHANGES,
@@ -769,6 +781,8 @@ export const data: Array<UmbMockDocumentModel> = [
 				name: 'Articulo en ingles',
 				createDate: '2023-02-06T15:31:46.876902',
 				updateDate: '2023-02-06T15:31:51.354764',
+				id: 'articulo-en-ingles',
+				flags: [],
 			},
 			{
 				state: DocumentVariantStateModel.NOT_CREATED,
@@ -778,9 +792,11 @@ export const data: Array<UmbMockDocumentModel> = [
 				name: 'Artykuł w języku polskim',
 				createDate: '2023-02-06T15:31:46.876902',
 				updateDate: '2023-02-06T15:31:51.354764',
+				id: 'artykul-w-jezyku-polskim',
+				flags: [],
 			},
 		],
-		signs: [],
+		flags: [],
 	},
 	{
 		ancestors: [],
@@ -864,9 +880,11 @@ export const data: Array<UmbMockDocumentModel> = [
 				name: 'Blog post B',
 				createDate: '2023-02-06T15:32:05.350038',
 				updateDate: '2023-02-06T15:32:24.957009',
+				id: 'blog-post-b',
+				flags: [],
 			},
 		],
-		signs: [],
+		flags: [],
 	},
 	{
 		ancestors: [],
@@ -898,6 +916,8 @@ export const data: Array<UmbMockDocumentModel> = [
 				name: 'Simple Document',
 				createDate: '2023-02-06T15:32:05.350038',
 				updateDate: '2023-02-06T15:32:24.957009',
+				id: 'simple-document',
+				flags: [],
 			},
 		],
 		values: [
@@ -916,7 +936,7 @@ export const data: Array<UmbMockDocumentModel> = [
 				value: undefined,
 			},
 		],
-		signs: [],
+		flags: [],
 	},
 	{
 		ancestors: [],
@@ -947,6 +967,8 @@ export const data: Array<UmbMockDocumentModel> = [
 				name: 'Rich Text Editor',
 				createDate: '2023-02-06T15:32:05.350038',
 				updateDate: '2023-02-06T15:32:24.957009',
+				id: 'rich-text-editor',
+				flags: [],
 			},
 		],
 		values: [
@@ -984,7 +1006,7 @@ export const data: Array<UmbMockDocumentModel> = [
 				},
 			},
 		],
-		signs: [],
+		flags: [],
 	},
 	{
 		ancestors: [],
@@ -1239,6 +1261,8 @@ export const data: Array<UmbMockDocumentModel> = [
 				name: 'All Block Editors',
 				createDate: '2023-02-06T15:31:46.876902',
 				updateDate: '2023-02-06T15:31:51.354764',
+				id: 'all-block-editors',
+				flags: [],
 			},
 			{
 				state: DocumentVariantStateModel.PUBLISHED,
@@ -1248,9 +1272,11 @@ export const data: Array<UmbMockDocumentModel> = [
 				name: 'Alle blok redigeringer',
 				createDate: '2023-02-06T15:31:46.876902',
 				updateDate: '2023-02-06T15:31:51.354764',
+				id: 'alle-blok-redigeringer',
+				flags: [],
 			},
 		],
-		signs: [],
+		flags: [],
 	},
 	{
 		ancestors: [],
@@ -1276,6 +1302,8 @@ export const data: Array<UmbMockDocumentModel> = [
 				name: 'A forbidden document',
 				createDate: '2023-02-06T15:32:05.350038',
 				updateDate: '2023-02-06T15:32:24.957009',
+				id: 'a-forbidden-document',
+				flags: [],
 			},
 			{
 				state: DocumentVariantStateModel.PUBLISHED,
@@ -1285,6 +1313,8 @@ export const data: Array<UmbMockDocumentModel> = [
 				name: 'Et utilgængeligt dokument',
 				createDate: '2023-02-06T15:32:05.350038',
 				updateDate: '2023-02-06T15:32:24.957009',
+				id: 'et-utilgaengeligt-dokument',
+				flags: [],
 			},
 		],
 		values: [
@@ -1296,7 +1326,7 @@ export const data: Array<UmbMockDocumentModel> = [
 				value: 'default value here',
 			},
 		],
-		signs: [],
+		flags: [],
 	},
 	...permissionsTestData,
 ];
