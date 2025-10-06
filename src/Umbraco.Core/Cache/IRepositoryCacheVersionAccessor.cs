@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core.Cache;
 /// to minimize database queries. Cache versions are used to determine if cached repository data is still valid
 /// in distributed environments.
 /// </remarks>
-public interface ICacheVersionAccessor
+public interface IRepositoryCacheVersionAccessor
 {
 
     /// <summary>

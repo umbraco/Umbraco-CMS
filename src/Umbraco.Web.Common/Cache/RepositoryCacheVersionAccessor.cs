@@ -8,20 +8,20 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.Cache;
 
-public class CacheVersionAccessor : ICacheVersionAccessor
+public class RepositoryCacheVersionAccessor : IRepositoryCacheVersionAccessor
 {
     private readonly IRequestCache _requestCache;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IRepositoryCacheVersionRepository _repositoryCacheVersionRepository;
     private readonly ICoreScopeProvider _coreScopeProvider;
-    private readonly ILogger<CacheVersionAccessor> _logger;
+    private readonly ILogger<RepositoryCacheVersionAccessor> _logger;
 
-    public CacheVersionAccessor(
+    public RepositoryCacheVersionAccessor(
         IRequestCache requestCache,
         IHttpContextAccessor httpContextAccessor,
         IRepositoryCacheVersionRepository repositoryCacheVersionRepository,
         ICoreScopeProvider coreScopeProvider,
-        ILogger<CacheVersionAccessor> logger)
+        ILogger<RepositoryCacheVersionAccessor> logger)
     {
         _requestCache = requestCache;
         _httpContextAccessor = httpContextAccessor;
@@ -49,7 +49,7 @@ public class CacheVersionAccessor : ICacheVersionAccessor
     public async Task<RepositoryCacheVersion?> GetAsync(string cacheKey)
     {
         HttpContext? httpcontext = _httpContextAccessor.HttpContext;
-        if (httpcontext is not null && httpcontext.Request.IsClientSideRequest())
+        if (httpcontext?.RequestServices is not null && httpcontext.Request.IsClientSideRequest())
         {
             _logger.LogDebug("Client side request detected, skipping cache version retrieval for key {CacheKey}", cacheKey);
             // We don't want to try and fetch version for client side requests, always assume we're in sync.

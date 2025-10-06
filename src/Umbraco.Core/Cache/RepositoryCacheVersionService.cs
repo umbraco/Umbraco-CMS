@@ -12,19 +12,19 @@ internal class RepositoryCacheVersionService : IRepositoryCacheVersionService
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly IRepositoryCacheVersionRepository _repositoryCacheVersionRepository;
     private readonly ILogger<RepositoryCacheVersionService> _logger;
-    private readonly ICacheVersionAccessor _cacheVersionAccessor;
+    private readonly IRepositoryCacheVersionAccessor _repositoryCacheVersionAccessor;
     private readonly ConcurrentDictionary<string, Guid> _cacheVersions = new();
 
     public RepositoryCacheVersionService(
         ICoreScopeProvider scopeProvider,
         IRepositoryCacheVersionRepository repositoryCacheVersionRepository,
         ILogger<RepositoryCacheVersionService> logger,
-        ICacheVersionAccessor cacheVersionAccessor)
+        IRepositoryCacheVersionAccessor repositoryCacheVersionAccessor)
     {
         _scopeProvider = scopeProvider;
         _repositoryCacheVersionRepository = repositoryCacheVersionRepository;
         _logger = logger;
-        _cacheVersionAccessor = cacheVersionAccessor;
+        _repositoryCacheVersionAccessor = repositoryCacheVersionAccessor;
     }
 
     /// <inheritdoc />
@@ -38,7 +38,7 @@ internal class RepositoryCacheVersionService : IRepositoryCacheVersionService
 
         var cacheKey = GetCacheKey<TEntity>();
 
-        RepositoryCacheVersion? databaseVersion = await _cacheVersionAccessor.GetAsync(cacheKey);
+        RepositoryCacheVersion? databaseVersion = await _repositoryCacheVersionAccessor.GetAsync(cacheKey);
 
         if (databaseVersion?.Version is null)
         {

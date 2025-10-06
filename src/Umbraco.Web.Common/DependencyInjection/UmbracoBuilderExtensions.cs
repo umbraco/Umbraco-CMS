@@ -105,7 +105,7 @@ public static partial class UmbracoBuilderExtensions
         // is just based on AsyncLocal, see https://github.com/dotnet/aspnetcore/blob/main/src/Http/Http/src/HttpContextAccessor.cs
         IHttpContextAccessor httpContextAccessor = new HttpContextAccessor();
         services.AddSingleton(httpContextAccessor);
-        services.AddUnique<ICacheVersionAccessor, CacheVersionAccessor>();
+        services.AddUnique<IRepositoryCacheVersionAccessor, RepositoryCacheVersionAccessor>();
 
         var requestCache = new HttpContextRequestAppCache(httpContextAccessor);
         var appCaches = AppCaches.Create(requestCache);
