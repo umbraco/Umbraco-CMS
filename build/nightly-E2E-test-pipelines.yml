@@ -10,6 +10,7 @@ schedules:
       include:
         - v15/dev
         - main
+        - v17/dev
 
 parameters:
   - name: skipIntegrationTests
@@ -20,7 +21,7 @@ parameters:
   - name: differentAppSettingsAcceptanceTests
     displayName: Run acceptance tests with different app settings
     type: boolean
-    default: false
+    default: true
 
   - name: skipDefaultConfigAcceptanceTests
     displayName: Skip tests with DefaultConfig
