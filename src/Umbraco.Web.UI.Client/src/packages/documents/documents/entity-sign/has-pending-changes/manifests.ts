@@ -4,12 +4,9 @@ export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'entitySign',
 		kind: 'icon',
-		alias: 'Umb.EntitySign.Document.HasCollection',
-		name: 'Has Collection Document Entity Sign',
+		alias: 'Umb.EntitySign.Document.HasPendingChanges',
+		name: 'Has Pending Changes Document Entity Sign',
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
-		meta: {
-			iconName: 'icon-grid',
-			label: 'Has collection',
-		},
+		meta: { iconName: 'icon-edit', label: 'Pending changes' },
 	},
 ];

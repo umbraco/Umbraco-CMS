@@ -1,2 +1,2 @@
-export type * from './has-collection/constants.js';
-export type * from './is-draft/constants.js';
+export type * from './has-schedule/constants.js';
+export type * from './has-pending-changes/constants.js';
