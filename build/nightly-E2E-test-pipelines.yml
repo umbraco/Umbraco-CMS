@@ -121,31 +121,39 @@ stages:
           matrix:
             #            Windows:
             #              vmImage: 'windows-latest'
-            # We split the tests into 3 parts for each OS to reduce the time it takes to run them on the pipeline
-            LinuxPart1Of3:
+            # We split the tests into 4 parts for each OS to reduce the time it takes to run them on the pipeline
+            LinuxPart1Of4:
               vmImage: "ubuntu-latest"
               # Filter tests that are part of the Umbraco.Infrastructure namespace but not part of the Umbraco.Infrastructure.Service namespace
               testFilter: "(FullyQualifiedName~Umbraco.Infrastructure) & (FullyQualifiedName!~Umbraco.Infrastructure.Service)"
-            LinuxPart2Of3:
+            LinuxPart2Of4:
               vmImage: "ubuntu-latest"
               # Filter tests that are part of the Umbraco.Infrastructure.Service namespace
               testFilter: "(FullyQualifiedName~Umbraco.Infrastructure.Service)"
-            LinuxPart3Of3:
+            LinuxPart3Of4:
               vmImage: "ubuntu-latest"
-              # Filter tests that are not part of the Umbraco.Infrastructure namespace. So this will run all tests that are not part of the Umbraco.Infrastructure namespace
-              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure)"
-            macOSPart1Of3:
+              # Filter tests that are not part of the Umbraco.Infrastructure and ManagementApi namespace. So this will run all tests that are not part of the Umbraco.Infrastructure namespace
+              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~ManagementApi)"
+            LinuxPart4Of4:
+              vmImage: "ubuntu-latest"
+              # Filter tests that are part of the ManagementApi namespace
+              testFilter: "(FullyQualifiedName~ManagementApi)"
+            macOSPart1Of4:
               vmImage: "macOS-latest"
               # Filter tests that are part of the Umbraco.Infrastructure namespace but not part of the Umbraco.Infrastructure.Service namespace
               testFilter: "(FullyQualifiedName~Umbraco.Infrastructure) & (FullyQualifiedName!~Umbraco.Infrastructure.Service)"
-            macOSPart2Of3:
+            macOSPart2Of4:
               vmImage: "macOS-latest"
               # Filter tests that are part of the Umbraco.Infrastructure.Service namespace
               testFilter: "(FullyQualifiedName~Umbraco.Infrastructure.Service)"
-            macOSPart3Of3:
+            macOSPart3Of4:
               vmImage: "macOS-latest"
-              # Filter tests that are not part of the Umbraco.Infrastructure namespace.
-              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure)"
+              # Filter tests that are not part of the Umbraco.Infrastructure and ManagementApi namespace.
+              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~ManagementApi)"
+            macOSPart4Of4:
+              vmImage: "macOS-latest"
+              # Filter tests that are part of the ManagementApi namespace.
+              testFilter: "(FullyQualifiedName~ManagementApi)"
         pool:
           vmImage: $(vmImage)
         variables:
@@ -185,43 +193,55 @@ stages:
           SA_PASSWORD: UmbracoAcceptance123!
         strategy:
           matrix:
-            # We split the tests into 3 parts for each OS to reduce the time it takes to run them on the pipeline
-            WindowsPart1Of3:
+            # We split the tests into 4 parts for each OS to reduce the time it takes to run them on the pipeline
+            WindowsPart1Of4:
               vmImage: "windows-latest"
               Tests__Database__DatabaseType: LocalDb
               Tests__Database__SQLServerMasterConnectionString: N/A
               # Filter tests that are part of the Umbraco.Infrastructure namespace but not part of the Umbraco.Infrastructure.Service namespace
               testFilter: "(FullyQualifiedName~Umbraco.Infrastructure) & (FullyQualifiedName!~Umbraco.Infrastructure.Service)"
-            WindowsPart2Of3:
+            WindowsPart2Of4:
               vmImage: "windows-latest"
               Tests__Database__DatabaseType: LocalDb
               Tests__Database__SQLServerMasterConnectionString: N/A
               # Filter tests that are part of the Umbraco.Infrastructure.Service namespace
               testFilter: "(FullyQualifiedName~Umbraco.Infrastructure.Service)"
-            WindowsPart3Of3:
+            WindowsPart3Of4:
               vmImage: "windows-latest"
               Tests__Database__DatabaseType: LocalDb
               Tests__Database__SQLServerMasterConnectionString: N/A
-              # Filter tests that are not part of the Umbraco.Infrastructure namespace. So this will run all tests that are not part of the Umbraco.Infrastructure namespace
-              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure)"
-            LinuxPart1Of3:
+              # Filter tests that are not part of the Umbraco.Infrastructure and ManagementApi namespace.
+              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~ManagementApi)"
+            WindowsPart4Of4:
+              vmImage: "windows-latest"
+              Tests__Database__DatabaseType: LocalDb
+              Tests__Database__SQLServerMasterConnectionString: N/A
+              # Filter tests that are part of the ManagementApi namespace.
+              testFilter: "(FullyQualifiedName~ManagementApi)"
+            LinuxPart1Of4:
               vmImage: "ubuntu-latest"
               Tests__Database__DatabaseType: SqlServer
               Tests__Database__SQLServerMasterConnectionString: "Server=(local);User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True"
               # Filter tests that are part of the Umbraco.Infrastructure namespace but not part of the Umbraco.Infrastructure.Service namespace
               testFilter: "(FullyQualifiedName~Umbraco.Infrastructure) & (FullyQualifiedName!~Umbraco.Infrastructure.Service)"
-            LinuxPart2Of3:
+            LinuxPart2Of4:
               vmImage: "ubuntu-latest"
               Tests__Database__DatabaseType: SqlServer
               Tests__Database__SQLServerMasterConnectionString: "Server=(local);User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True"
               # Filter tests that are part of the Umbraco.Infrastructure.Service namespace
               testFilter: "(FullyQualifiedName~Umbraco.Infrastructure.Service)"
-            LinuxPart3Of3:
+            LinuxPart3Of4:
               vmImage: "ubuntu-latest"
               Tests__Database__DatabaseType: SqlServer
               Tests__Database__SQLServerMasterConnectionString: "Server=(local);User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True"
-              # Filter tests that are not part of the Umbraco.Infrastructure namespace. So this will run all tests that are not part of the Umbraco.Infrastructure namespace
-              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure)"
+              # Filter tests that are not part of the Umbraco.Infrastructure and ManagementApi namespace.
+              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~ManagementApi)"
+            LinuxPart4Of4:
+              vmImage: "ubuntu-latest"
+              Tests__Database__DatabaseType: SqlServer
+              Tests__Database__SQLServerMasterConnectionString: "Server=(local);User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True"
+              # Filter tests that are part of the ManagementApi namespace.
+              testFilter: "(FullyQualifiedName~ManagementApi)"
         pool:
           vmImage: $(vmImage)
         steps:
@@ -479,7 +499,7 @@ stages:
     jobs:
       - job:
         displayName: E2E Tests with Different App settings (SQL Server)
-        condition: ${{ or(eq(parameters.differentAppSettingsAcceptanceTests, true), eq(parameters.skipDefaultConfigAcceptanceTests, true)) }}
+        condition: ${{ eq(parameters.differentAppSettingsAcceptanceTests, true) }}
         timeoutInMinutes: 180
         variables:
           SA_PASSWORD: UmbracoAcceptance123!
