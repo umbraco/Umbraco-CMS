@@ -1,8 +1,9 @@
-import type { ManifestPreviewOption } from '../preview-option/preview-option.extension.js';
+import type { ManifestPreviewOption, MetaPreviewOption } from '../preview-option/preview-option.extension.js';
+import type { UmbPreviewOptionActionBase } from '../preview-option/preview-option-action-base.controller.js';
 import { customElement, html, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbExtensionsElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
+import { createExtensionApi, UmbExtensionsElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type { UmbExtensionElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
@@ -51,14 +52,18 @@ export class UmbSaveAndPreviewWorkspaceActionElement extends UmbLitElement {
 	@state()
 	private _actions: Array<UmbExtensionElementAndApiInitializer<ManifestPreviewOption>> = [];
 
-	private _primaryAction?: UmbExtensionElementAndApiInitializer<ManifestPreviewOption>;
+	@state()
+	private _firstActionManifest?: ManifestPreviewOption;
+
+	@state()
+	private _firstActionApi?: UmbPreviewOptionActionBase<MetaPreviewOption>;
 
 	async #onClick() {
 		this._buttonState = 'waiting';
 
 		try {
-			if (!this._primaryAction?.api) throw new Error('No api defined');
-			await this._primaryAction.api.execute().catch(() => {});
+			if (!this._firstActionApi) throw new Error('No api defined');
+			await this._firstActionApi.execute().catch(() => {});
 			this._buttonState = 'success';
 		} catch (reason) {
 			if (reason) {
@@ -101,14 +106,23 @@ export class UmbSaveAndPreviewWorkspaceActionElement extends UmbLitElement {
 			ManifestPreviewOption,
 			'previewOption',
 			ManifestPreviewOption
-		>(this, umbExtensionsRegistry, 'previewOption', [], undefined, (extensionControllers) => {
-			this._primaryAction = extensionControllers.shift();
-			this._actions = extensionControllers;
+		>(this, umbExtensionsRegistry, 'previewOption', [], undefined, async (actions) => {
+			const firstAction = actions.shift();
+
+			if (firstAction) {
+				this._firstActionManifest = firstAction.manifest;
+				this._firstActionApi = await createExtensionApi(this, firstAction.manifest, []);
+				if (this._firstActionApi) {
+					(this._firstActionApi as any).manifest = this._firstActionManifest;
+				}
+			}
+
+			this._actions = actions;
 		});
 	}
 
 	#renderButton() {
-		const label = this._primaryAction?.manifest?.meta.label || this.#manifest?.meta.label || this.#manifest?.name;
+		const label = this._firstActionManifest?.meta.label || this.#manifest?.meta.label || this.#manifest?.name;
 		return html`
 			<uui-button
 				data-mark="workspace-action:${this.#manifest?.alias}"
@@ -132,6 +146,7 @@ export class UmbSaveAndPreviewWorkspaceActionElement extends UmbLitElement {
 	}
 
 	override render() {
+		if (!this._firstActionManifest || !this._actions.length) return;
 		return when(
 			this._actions.length,
 			() => html`<uui-button-group>${this.#renderButton()}${this.#renderActionMenu()}</uui-button-group>`,
