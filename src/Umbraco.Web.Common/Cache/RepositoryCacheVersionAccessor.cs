@@ -49,7 +49,7 @@ public class RepositoryCacheVersionAccessor : IRepositoryCacheVersionAccessor
     public async Task<RepositoryCacheVersion?> GetAsync(string cacheKey)
     {
         HttpContext? httpcontext = _httpContextAccessor.HttpContext;
-        if (httpcontext?.RequestServices is not null && httpcontext.Request.IsClientSideRequest())
+        if (httpcontext?.RequestServices is not null && httpcontext.Request.IsBackOfficeRequest() is false)
         {
             _logger.LogDebug("Client side request detected, skipping cache version retrieval for key {CacheKey}", cacheKey);
             // We don't want to try and fetch version for client side requests, always assume we're in sync.
