@@ -17,6 +17,7 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 	}
 
 	set entityType(value: string | undefined) {
+		if (this.#entityType === value) return;
 		this.#entityType = value;
 		this.#gotProperties();
 	}
@@ -27,7 +28,10 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 	}
 
 	set entityFlags(value: Array<UmbEntityFlag> | undefined) {
-		this.#entityFlagAliases = value?.map((x) => x.alias);
+		const entityFlagAliases = value?.map((x) => x.alias);
+		// If they are equal return:
+		if (this.#entityFlagAliases?.join(',') === entityFlagAliases?.join(',')) return;
+		this.#entityFlagAliases = entityFlagAliases;
 		this.#gotProperties();
 	}
 
@@ -123,18 +127,21 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 	};
 
 	override render() {
+		return html`
+			<slot></slot>
+			${this.#renderBundle()}
+		`;
+	}
+	#renderBundle() {
 		if (!this._signs || this._signs.length === 0) return nothing;
 
 		const first = this._signs?.[0];
 		if (!first) return nothing;
-
-		return html`
-			<slot></slot>
-			<div class="infobox ${this._open ? 'is-open' : ''}" style=${`--count:${this._signs.length}`}>
-				${this.#renderOptions()}
-			</div>
-		`;
+		return html`<div class="infobox ${this._open ? 'is-open' : ''}" style=${`--count:${this._signs.length}`}>
+			${this.#renderOptions()}
+		</div>`;
 	}
+
 	#renderOptions() {
 		return this._signs
 			? repeat(
