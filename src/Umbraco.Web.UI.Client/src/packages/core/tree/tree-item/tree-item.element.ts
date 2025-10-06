@@ -1,4 +1,5 @@
 import type { ManifestTreeItem } from '../extensions/types.js';
+import UmbDefaultTreeItemContext from './tree-item-default/tree-item-default.context.js';
 import { customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import {
 	UmbExtensionElementAndApiSlotElementBase,
@@ -46,6 +47,10 @@ export class UmbTreeItemElement extends UmbExtensionElementAndApiSlotElementBase
 
 	getDefaultElementName() {
 		return 'umb-default-tree-item';
+	}
+
+	getDefaultApiConstructor() {
+		return UmbDefaultTreeItemContext;
 	}
 }
 

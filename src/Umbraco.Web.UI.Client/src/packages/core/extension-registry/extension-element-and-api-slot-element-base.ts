@@ -41,6 +41,7 @@ export abstract class UmbExtensionElementAndApiSlotElementBase<
 
 	abstract getExtensionType(): string;
 	abstract getDefaultElementName(): string;
+	abstract getDefaultApiConstructor?(): any;
 
 	#observeManifest() {
 		if (!this.alias) return;
