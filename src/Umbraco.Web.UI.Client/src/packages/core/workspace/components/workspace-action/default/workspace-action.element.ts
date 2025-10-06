@@ -2,6 +2,7 @@ import type {
 	ManifestWorkspaceAction,
 	ManifestWorkspaceActionMenuItem,
 	MetaWorkspaceActionDefaultKind,
+	UmbWorkspaceActionArgs,
 	UmbWorkspaceActionDefaultKind,
 } from '../../../types.js';
 import { customElement, html, property, state, when } from '@umbraco-cms/backoffice/external/lit';
@@ -10,6 +11,7 @@ import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbExtensionsElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UmbAction } from '@umbraco-cms/backoffice/action';
 import type { UmbExtensionElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 
@@ -20,7 +22,7 @@ export class UmbWorkspaceActionElement<
 > extends UmbLitElement {
 	#manifest?: ManifestWorkspaceAction<MetaType>;
 	#api?: ApiType;
-	#extensionsController?: UmbExtensionsElementAndApiInitializer<
+	protected _extensionsController?: UmbExtensionsElementAndApiInitializer<
 		ManifestWorkspaceActionMenuItem,
 		'workspaceActionMenuItem',
 		ManifestWorkspaceActionMenuItem
@@ -59,6 +61,10 @@ export class UmbWorkspaceActionElement<
 		return this.#api;
 	}
 
+	protected _actionApi?: UmbAction<UmbWorkspaceActionArgs<MetaType>>;
+
+	protected _buttonLabel?: string;
+
 	@state()
 	private _buttonState?: UUIButtonState;
 
@@ -72,7 +78,7 @@ export class UmbWorkspaceActionElement<
 	private _isDisabled = false;
 
 	@state()
-	private _items: Array<UmbExtensionElementAndApiInitializer<ManifestWorkspaceActionMenuItem>> = [];
+	protected _items: Array<UmbExtensionElementAndApiInitializer<ManifestWorkspaceActionMenuItem>> = [];
 
 	#buttonStateResetTimeoutId: number | null = null;
 
@@ -97,7 +103,7 @@ export class UmbWorkspaceActionElement<
 			}
 		}
 
-		this.#observeExtensions(Array.from(aliases));
+		this.observeExtensions(Array.from(aliases));
 	}
 
 	async #onClick(event: MouseEvent) {
@@ -111,8 +117,9 @@ export class UmbWorkspaceActionElement<
 			}
 
 			try {
-				if (!this.#api) throw new Error('No api defined');
-				await this.#api.execute();
+				const api = this._actionApi ?? this.#api;
+				if (!api) throw new Error('No api defined');
+				await api.execute();
 				this._buttonState = 'success';
 				this.#initButtonStateReset();
 			} catch (reason) {
@@ -153,9 +160,9 @@ export class UmbWorkspaceActionElement<
 		}
 	}
 
-	#observeExtensions(aliases: string[]): void {
-		this.#extensionsController?.destroy();
-		this.#extensionsController = new UmbExtensionsElementAndApiInitializer<
+	protected observeExtensions(aliases: string[]): void {
+		this._extensionsController?.destroy();
+		this._extensionsController = new UmbExtensionsElementAndApiInitializer<
 			ManifestWorkspaceActionMenuItem,
 			'workspaceActionMenuItem',
 			ManifestWorkspaceActionMenuItem
@@ -165,17 +172,15 @@ export class UmbWorkspaceActionElement<
 			'workspaceActionMenuItem',
 			(manifest) => [{ meta: manifest.meta }],
 			(action) => stringOrStringArrayIntersects(action.forWorkspaceActions, aliases),
-			(extensionControllers) => {
-				this._items = extensionControllers;
+			(actions) => {
+				this._items = actions;
 			},
 			undefined, // We can leave the alias to undefined, as we destroy this our selfs.
 		);
 	}
 
 	#renderButton() {
-		const label = this.#manifest?.meta.label
-			? this.localize.string(this.#manifest.meta.label)
-			: (this.#manifest?.name ?? '');
+		const label = this.localize.string(this._buttonLabel || this.#manifest?.meta.label || this.#manifest?.name || '');
 		return html`
 			<uui-button
 				data-mark="workspace-action:${this.#manifest?.alias}"
