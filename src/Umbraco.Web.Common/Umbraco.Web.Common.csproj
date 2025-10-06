@@ -35,8 +35,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Take top-level depedendency on Microsoft.IdentityModel.JsonWebTokens, because OpenIddict.AspNetCore, Npoco.SqlServer and Microsoft.EntityFrameworkCore.SqlServer depends on a vulnerable version -->
-    <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" />
     <!-- Take top-level depedendency on System.Text.Encodings.Web, because Azure.Identity, Microsoft.EntityFrameworkCore.SqlServer, Dazinator.Extensions.FileProviders depends on a vulnerable version -->
     <PackageReference Include="System.Text.Encodings.Web" />
   </ItemGroup>

@@ -83,9 +83,6 @@
   </ItemGroup>
   <!-- Transitive pinned versions (only required because our direct dependencies have vulnerable versions of transitive dependencies) -->
   <ItemGroup>
-    <!-- OpenIddict.AspNetCore, Npoco.SqlServer and Microsoft.EntityFrameworkCore.SqlServer brings in a vulnerable version of Microsoft.IdentityModel.JsonWebTokens -->
-    <!-- Take top-level depedendency on Microsoft.IdentityModel.JsonWebTokens, because OpenIddict.AspNetCore, Npoco.SqlServer and Microsoft.EntityFrameworkCore.SqlServer depends on a vulnerable version -->
-    <PackageVersion Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.14.0" />
     <!-- Azure.Identity, Microsoft.EntityFrameworkCore.SqlServer and Dazinator.Extensions.FileProviders brings in a legacy version of System.Text.Encodings.Web -->
     <PackageVersion Include="System.Text.Encodings.Web" Version="10.0.0-rc.1.25451.107" />
     <!-- NPoco.SqlServer brings in a vulnerable version of Microsoft.Data.SqlClient  -->
