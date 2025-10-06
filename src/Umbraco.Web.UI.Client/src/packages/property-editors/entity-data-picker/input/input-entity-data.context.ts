@@ -15,7 +15,7 @@ import type {
 	UmbPickerPropertyEditorDataSource,
 	UmbPickerPropertyEditorTreeDataSource,
 	UmbPropertyEditorDataSourceConfigModel,
-} from '@umbraco-cms/backoffice/data-type';
+} from '@umbraco-cms/backoffice/property-editor';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbModalToken, type UmbPickerModalData } from '@umbraco-cms/backoffice/modal';
@@ -24,9 +24,9 @@ import {
 	type UmbTreePickerModalData,
 	type UmbTreePickerModalValue,
 } from '@umbraco-cms/backoffice/tree';
-import { isPickerPropertyEditorTreeDataSource } from 'src/packages/data-type/property-editor-data-source/extension/is-picker-property-editor-tree-data-source.guard.js';
-import { isPickerPropertyEditorCollectionDataSource } from 'src/packages/data-type/property-editor-data-source/extension/is-picker-property-editor-collection-data-source.guard copy.js';
-import { isPickerPropertyEditorSearchableDataSource } from 'src/packages/data-type/property-editor-data-source/extension/is-picker-property-editor-searchable.data-source.guard.js';
+import { isPickerPropertyEditorTreeDataSource } from 'src/packages/core/property-editor/property-editor-data-source/extension/is-picker-property-editor-tree-data-source.guard.js';
+import { isPickerPropertyEditorCollectionDataSource } from 'src/packages/core/property-editor/property-editor-data-source/extension/is-picker-property-editor-collection-data-source.guard copy.js';
+import { isPickerPropertyEditorSearchableDataSource } from 'src/packages/core/property-editor/property-editor-data-source/extension/is-picker-property-editor-searchable.data-source.guard.js';
 import { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 

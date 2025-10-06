@@ -6,8 +6,6 @@ import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_PROPERTY_EDITOR_UI_PICKER_MODAL } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
 import { umbBindToValidation } from '@umbraco-cms/backoffice/validation';
-
-import '../../../property-editor-data-source/input/input-property-editor-data-source.element.js';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-data-type-details-workspace-view')

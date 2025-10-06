@@ -2,7 +2,7 @@ import type {
 	UmbPickerPropertyEditorTreeDataSource,
 	UmbPropertyEditorDataSourceConfigModel,
 	UmbPickerPropertyEditorSearchableDataSource,
-} from '../../src/packages/data-type/property-editor-data-source/types.js';
+} from '../../src/packages/core/property-editor/property-editor-data-source/types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import {
 	UmbDocumentItemRepository,

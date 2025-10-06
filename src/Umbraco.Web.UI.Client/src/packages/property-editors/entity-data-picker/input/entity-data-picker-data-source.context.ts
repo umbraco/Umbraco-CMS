@@ -1,7 +1,7 @@
 import { UMB_ENTITY_DATA_PICKER_DATA_SOURCE_API_CONTEXT } from './entity-data-picker-data-source.context.token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbPickerPropertyEditorDataSource } from '@umbraco-cms/backoffice/data-type';
+import type { UmbPickerPropertyEditorDataSource } from '@umbraco-cms/backoffice/property-editor';
 import { UmbBasicState } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbEntityDataPickerDataSourceApiContext<

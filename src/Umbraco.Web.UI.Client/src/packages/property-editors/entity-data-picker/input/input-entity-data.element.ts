@@ -6,9 +6,11 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import type {
+	UmbPropertyEditorConfigCollection,
+	UmbPropertyEditorDataSourceConfigModel,
+} from '@umbraco-cms/backoffice/property-editor';
 import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
-import type { UmbPropertyEditorDataSourceConfigModel } from '@umbraco-cms/backoffice/data-type';
 
 @customElement('umb-input-entity-data')
 export class UmbInputEntityDataElement extends UUIFormControlMixin(UmbLitElement, '') {
