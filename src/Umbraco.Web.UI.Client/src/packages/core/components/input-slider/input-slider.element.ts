@@ -1,3 +1,4 @@
+import { UmbFormControlMixin } from '../../validation/mixins/index.js';
 import { customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
