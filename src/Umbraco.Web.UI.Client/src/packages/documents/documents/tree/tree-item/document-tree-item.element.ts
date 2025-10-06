@@ -39,7 +39,8 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 
 	#icon: string | null | undefined;
 
-	protected override _extractFlags(_item: UmbDocumentTreeItemModel | undefined) {
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	protected override _extractFlags(item: UmbDocumentTreeItemModel | undefined) {
 		// Empty on purpose and NOT calling super to prevent doing what the base does. [NL]
 	}
 
