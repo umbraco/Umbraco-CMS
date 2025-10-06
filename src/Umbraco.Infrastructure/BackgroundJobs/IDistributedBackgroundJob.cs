@@ -1,9 +1,11 @@
 ﻿namespace Umbraco.Cms.Infrastructure.BackgroundJobs;
 
+/// <summary>
+/// A background job that will be executed by an available server. With a single server setup this will always be the same.
+/// With a load balanced setup, the executing server might change every time this needs to be executed.
+/// </summary>
 public interface IDistributedBackgroundJob
 {
-    static readonly TimeSpan DefaultDelay = System.TimeSpan.FromMinutes(3);
-
     /// <summary>
     /// Name of the job
     /// </summary>
@@ -15,12 +17,8 @@ public interface IDistributedBackgroundJob
     TimeSpan Period { get; }
 
     /// <summary>
-    /// Timespan representing the initial delay after application start-up before the first run of the task
-    /// occurs.
+    /// Run the job.
     /// </summary>
-    TimeSpan Delay { get => DefaultDelay; }
-
-    event EventHandler PeriodChanged;
-
+    /// <returns></returns>
     Task RunJobAsync();
 }

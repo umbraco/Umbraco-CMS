@@ -3,13 +3,10 @@
 
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Logging;
-using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
 
@@ -19,7 +16,7 @@ namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
 /// <remarks>
 ///     Will only run on non-replica servers.
 /// </remarks>
-public class LogScrubberJob : IRecurringBackgroundJob
+public class LogScrubberJob : IDistributedBackgroundJob
 {
     private readonly IAuditService _auditService;
     private readonly ILogger<LogScrubberJob> _logger;
@@ -27,10 +24,10 @@ public class LogScrubberJob : IRecurringBackgroundJob
     private readonly ICoreScopeProvider _scopeProvider;
     private LoggingSettings _settings;
 
-    public TimeSpan Period => TimeSpan.FromHours(4);
+    /// <inheritdoc />
+    public string Name => "LogScrubberJob";
 
-    // No-op event as the period never changes on this job
-    public event EventHandler PeriodChanged { add { } remove { } }
+    public TimeSpan Period => TimeSpan.FromHours(4);
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="LogScrubberJob" /> class.

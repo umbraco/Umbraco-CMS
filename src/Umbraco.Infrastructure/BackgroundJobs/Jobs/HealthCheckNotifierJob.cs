@@ -17,17 +17,11 @@ namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
 /// <summary>
 ///     Hosted service implementation for recurring health check notifications.
 /// </summary>
-public class HealthCheckNotifierJob : IRecurringBackgroundJob
+public class HealthCheckNotifierJob : IDistributedBackgroundJob
 {
+    /// <inheritdoc />
+    public string Name => "HealthCheckNotifierJob";
     public TimeSpan Period { get; private set; }
-    public TimeSpan Delay { get; private set; }
-
-    private event EventHandler? _periodChanged;
-    public event EventHandler PeriodChanged
-    {
-        add { _periodChanged += value; }
-        remove { _periodChanged -= value; }
-    }
 
     private readonly HealthCheckCollection _healthChecks;
     private readonly ILogger<HealthCheckNotifierJob> _logger;
@@ -67,14 +61,12 @@ public class HealthCheckNotifierJob : IRecurringBackgroundJob
         _eventAggregator = eventAggregator;
 
         Period = healthChecksSettings.CurrentValue.Notification.Period;
-        Delay = DelayCalculator.GetDelay(healthChecksSettings.CurrentValue.Notification.FirstRunTime, cronTabParser, logger, TimeSpan.FromMinutes(3));
 
 
         healthChecksSettings.OnChange(x =>
         {
             _healthChecksSettings = x;
             Period = x.Notification.Period;
-            _periodChanged?.Invoke(this, EventArgs.Empty);
         });
     }
 

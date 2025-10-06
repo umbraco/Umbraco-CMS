@@ -178,21 +178,20 @@ public static partial class UmbracoBuilderExtensions
     public static IUmbracoBuilder AddRecurringBackgroundJobs(this IUmbracoBuilder builder)
     {
         // Add background jobs
-        builder.Services.AddRecurringBackgroundJob<HealthCheckNotifierJob>();
-        builder.Services.AddRecurringBackgroundJob<LogScrubberJob>();
-        builder.Services.AddRecurringBackgroundJob<ContentVersionCleanupJob>();
-        builder.Services.AddRecurringBackgroundJob<ScheduledPublishingJob>();
         builder.Services.AddRecurringBackgroundJob<TempFileCleanupJob>();
-        builder.Services.AddRecurringBackgroundJob<TemporaryFileCleanupJob>();
         builder.Services.AddRecurringBackgroundJob<InstructionProcessJob>();
         builder.Services.AddRecurringBackgroundJob<TouchServerJob>();
-        // builder.Services.AddRecurringBackgroundJob<WebhookFiring>();
-        builder.Services.AddRecurringBackgroundJob<WebhookLoggingCleanup>();
         builder.Services.AddRecurringBackgroundJob<ReportSiteJob>();
-        builder.Services.AddRecurringBackgroundJob<CacheInstructionsPruningJob>();
-        builder.Services.AddRecurringBackgroundJob<LongRunningOperationsCleanupJob>();
 
         builder.Services.AddSingleton<IDistributedBackgroundJob, WebhookFiring>();
+        builder.Services.AddSingleton<IDistributedBackgroundJob, ContentVersionCleanupJob>();
+        builder.Services.AddSingleton<IDistributedBackgroundJob, HealthCheckNotifierJob>();
+        builder.Services.AddSingleton<IDistributedBackgroundJob, LogScrubberJob>();
+        builder.Services.AddSingleton<IDistributedBackgroundJob, ScheduledPublishingJob>();
+        builder.Services.AddSingleton<IDistributedBackgroundJob, TemporaryFileCleanupJob>();
+        builder.Services.AddSingleton<IDistributedBackgroundJob, WebhookLoggingCleanup>();
+        builder.Services.AddSingleton<IDistributedBackgroundJob, CacheInstructionsPruningJob>();
+        builder.Services.AddSingleton<IDistributedBackgroundJob, LongRunningOperationsCleanupJob>();
         builder.Services.AddHostedService<DistributedBackgroundJobHostedService>();
 
         builder.Services.AddSingleton(RecurringBackgroundJobHostedService.CreateHostedServiceFactory);

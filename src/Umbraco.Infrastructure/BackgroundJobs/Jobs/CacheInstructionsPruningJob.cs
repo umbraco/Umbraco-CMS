@@ -2,14 +2,13 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
-using Umbraco.Cms.Infrastructure.Scoping;
 
 namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
 
 /// <summary>
 /// A background job that prunes cache instructions from the database.
 /// </summary>
-public class CacheInstructionsPruningJob : IRecurringBackgroundJob
+public class CacheInstructionsPruningJob : IDistributedBackgroundJob
 {
     private readonly IOptions<GlobalSettings> _globalSettings;
     private readonly ICacheInstructionRepository _cacheInstructionRepository;
@@ -36,12 +35,7 @@ public class CacheInstructionsPruningJob : IRecurringBackgroundJob
         Period = globalSettings.Value.DatabaseServerMessenger.TimeBetweenPruneOperations;
     }
 
-    /// <inheritdoc />
-    public event EventHandler PeriodChanged
-    {
-        add { }
-        remove { }
-    }
+    public string Name => "CacheInstructionsPruningJob";
 
     /// <inheritdoc />
     public TimeSpan Period { get; }

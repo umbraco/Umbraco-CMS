@@ -24,7 +24,6 @@ public class DistributedBackgroundJobHostedService : BackgroundService
     /// <param name="runtimeState"></param>
     /// <param name="distributedJobService"></param>
     /// <param name="distributedBackgroundJobs"></param>
-    /// <param name="coreScopeProvider"></param>
     public DistributedBackgroundJobHostedService(
         ILogger<DistributedBackgroundJobHostedService> logger,
         IRuntimeState runtimeState,
@@ -39,7 +38,7 @@ public class DistributedBackgroundJobHostedService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        using PeriodicTimer timer = new(TimeSpan.FromMinutes(1));
+        using PeriodicTimer timer = new(TimeSpan.FromSeconds(15));
 
         try
         {

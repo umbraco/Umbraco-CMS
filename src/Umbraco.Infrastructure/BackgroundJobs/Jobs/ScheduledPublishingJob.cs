@@ -17,11 +17,13 @@ namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
 /// <remarks>
 ///     Runs only on non-replica servers.
 /// </remarks>
-public class ScheduledPublishingJob : IRecurringBackgroundJob
+public class ScheduledPublishingJob : IDistributedBackgroundJob
 {
+    /// <inheritdoc />
+    public string Name => "ScheduledPublishingJob";
+
+    /// <inheritdoc />
     public TimeSpan Period { get => TimeSpan.FromMinutes(1); }
-    // No-op event as the period never changes on this job
-    public event EventHandler PeriodChanged { add { } remove { } }
 
 
     private readonly IContentService _contentService;
@@ -50,6 +52,7 @@ public class ScheduledPublishingJob : IRecurringBackgroundJob
         _timeProvider = timeProvider;
     }
 
+    /// <inheritdoc />
     public Task RunJobAsync()
     {
         if (Suspendable.ScheduledPublishing.CanRun == false)

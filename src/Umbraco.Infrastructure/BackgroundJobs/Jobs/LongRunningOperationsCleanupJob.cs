@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
 /// <summary>
 /// Cleans up long-running operations that have exceeded a specified age.
 /// </summary>
-public class LongRunningOperationsCleanupJob : IRecurringBackgroundJob
+public class LongRunningOperationsCleanupJob : IDistributedBackgroundJob
 {
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly ILongRunningOperationRepository _longRunningOperationRepository;
@@ -36,17 +36,10 @@ public class LongRunningOperationsCleanupJob : IRecurringBackgroundJob
     }
 
     /// <inheritdoc />
-    public event EventHandler? PeriodChanged
-    {
-        add { }
-        remove { }
-    }
+    public string Name => "LongRunningOperationsCleanupJob";
 
     /// <inheritdoc />
     public TimeSpan Period { get; }
-
-    /// <inheritdoc/>
-    public TimeSpan Delay { get; } = TimeSpan.FromSeconds(10);
 
     /// <inheritdoc />
     public async Task RunJobAsync()

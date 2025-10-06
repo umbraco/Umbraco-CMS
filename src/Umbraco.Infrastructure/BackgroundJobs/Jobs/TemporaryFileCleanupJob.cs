@@ -3,13 +3,16 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
 
-public class TemporaryFileCleanupJob : IRecurringBackgroundJob
+/// <summary>
+/// Cleans up temporary media files.
+/// </summary>
+public class TemporaryFileCleanupJob : IDistributedBackgroundJob
 {
-    public TimeSpan Period { get => TimeSpan.FromMinutes(5); }
-    public TimeSpan Delay { get => TimeSpan.FromMinutes(5); }
+    /// <inheritdoc />
+    public string Name => "TemporaryFileCleanupJob";
 
-    // No-op event as the period never changes on this job
-    public event EventHandler PeriodChanged { add { } remove { } }
+    /// <inheritdoc />
+    public TimeSpan Period { get => TimeSpan.FromMinutes(5); }
 
     private readonly ILogger<TemporaryFileCleanupJob> _logger;
     private readonly ITemporaryFileService _service;
@@ -26,10 +29,8 @@ public class TemporaryFileCleanupJob : IRecurringBackgroundJob
         _service = temporaryFileService;
     }
 
-    /// <summary>
-    /// Runs the background task to send the anonymous ID
-    /// to telemetry service
-    /// </summary>
+
+    /// <inheritdoc />
     public  async Task RunJobAsync()
     {
         var count = (await _service.CleanUpOldTempFiles()).Count();

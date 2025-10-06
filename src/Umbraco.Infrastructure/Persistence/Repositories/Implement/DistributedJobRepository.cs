@@ -22,20 +22,23 @@ public class DistributedJobRepository(IScopeAccessor scopeAccessor) : IDistribut
             .Select<DistributedJobDto>()
             .From<DistributedJobDto>()
             .Where("lastRun + period < @0", cutoffTicks)
-            .Where<DistributedJobDto>(x => x.IsRunning == false);
+            .Where<DistributedJobDto>(x => x.IsRunning == false)
+            .OrderBy<DistributedJobDto>(x => x.LastRun);
 
         IUmbracoDatabase database = scopeAccessor.AmbientScope.Database;
         DistributedJobDto? job = database.FirstOrDefault<DistributedJobDto>(sql);
 
-        if (job is not null)
+        if (job is null)
         {
-            job.LastAttemptedRun = DateTime.UtcNow;
-            job.IsRunning = true;
-            database.Update(job);
+            return null;
         }
 
+        job.LastAttemptedRun = DateTime.UtcNow;
+        job.IsRunning = true;
+        database.Update(job);
 
-        return job?.Name;
+
+        return job.Name;
     }
 
     /// <inheritdoc />

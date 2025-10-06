@@ -1,18 +1,20 @@
-﻿using System.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using OpenIddict.Abstractions;
 
 namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
 
-// port of the OpenIddict Quartz job for cleaning up - see https://github.com/openiddict/openiddict-core/tree/dev/src/OpenIddict.Quartz
-public class OpenIddictCleanupJob : IRecurringBackgroundJob
-{
-    public TimeSpan Period { get => TimeSpan.FromHours(1); }
-    public TimeSpan Delay { get => TimeSpan.FromMinutes(5); }
 
-    // No-op event as the period never changes on this job
-    public event EventHandler PeriodChanged { add { } remove { } }
+/// <summary>
+/// Port of the OpenIddict Quartz job for cleaning up - see https://github.com/openiddict/openiddict-core/tree/dev/src/OpenIddict.Quartz
+/// </summary>
+public class OpenIddictCleanupJob : IDistributedBackgroundJob
+{
+    /// <inheritdoc />
+    public string Name => "OpenIddictCleanupJob";
+
+    /// <inheritdoc />
+    public TimeSpan Period { get => TimeSpan.FromHours(1); }
 
 
     // keep tokens and authorizations in the database for 7 days
@@ -22,12 +24,18 @@ public class OpenIddictCleanupJob : IRecurringBackgroundJob
     private readonly ILogger<OpenIddictCleanupJob> _logger;
     private readonly IServiceProvider _provider;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="OpenIddictCleanupJob"/> class.
+    /// </summary>
+    /// <param name="logger"></param>
+    /// <param name="provider"></param>
     public OpenIddictCleanupJob(ILogger<OpenIddictCleanupJob> logger, IServiceProvider provider)
     {
         _logger = logger;
         _provider = provider;
     }
 
+    /// <inheritdoc />
     public async Task RunJobAsync()
     {
         // hosted services are registered as singletons, but this particular one consumes scoped services... so

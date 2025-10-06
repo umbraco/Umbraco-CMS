@@ -10,6 +10,9 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
 
+/// <summary>
+/// Fires pending webhooks.
+/// </summary>
 public class WebhookFiring : IDistributedBackgroundJob
 {
     private readonly ILogger<WebhookFiring> _logger;
@@ -21,13 +24,11 @@ public class WebhookFiring : IDistributedBackgroundJob
     private readonly IHttpClientFactory _httpClientFactory;
     private WebhookSettings _webhookSettings;
 
-    public string Name { get; } = "Webhook Firing";
+    /// <inheritdoc />
+    public string Name => "Webhook Firing";
+
+    /// <inheritdoc />
     public TimeSpan Period => _webhookSettings.Period;
-
-    public TimeSpan Delay { get; } = TimeSpan.FromSeconds(20);
-
-    // No-op event as the period never changes on this job
-    public event EventHandler PeriodChanged { add { } remove { } }
 
     public WebhookFiring(
         ILogger<WebhookFiring> logger,
