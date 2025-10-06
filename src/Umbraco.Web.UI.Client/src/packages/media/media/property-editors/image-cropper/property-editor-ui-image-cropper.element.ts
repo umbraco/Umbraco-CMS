@@ -47,11 +47,11 @@ export class UmbPropertyEditorUIImageCropperElement
 
 		this.consumeContext(UMB_IS_TRASHED_ENTITY_CONTEXT, (context) => {
 			this.#trashedEntityContext = context;
-		})
+		});
 
 		this.consumeContext(UMB_SERVER_CONTEXT, (context) => {
 			this.#serverContext = context;
-		})
+		});
 	}
 
 	override firstUpdated() {

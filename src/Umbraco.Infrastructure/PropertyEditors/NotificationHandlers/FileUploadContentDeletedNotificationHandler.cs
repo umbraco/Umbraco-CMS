@@ -109,7 +109,7 @@ internal sealed class FileUploadContentDeletedNotificationHandler : FileUploadNo
     }
 
     /// <summary>
-    /// Renames all file upload property files contained within a collection of media entities that have been restore from the recycle bin.
+    /// Renames all file upload property files contained within a collection of media entities that have been restored from the recycle bin.
     /// </summary>
     /// <param name="restoredMedia">Media entities that have been restored from the recycle bin.</param>
     private void RemoveSuffixFromContainedFiles(IEnumerable<IMedia> restoredMedia)
