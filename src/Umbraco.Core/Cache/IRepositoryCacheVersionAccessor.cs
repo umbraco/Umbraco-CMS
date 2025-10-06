@@ -21,4 +21,6 @@ public interface IRepositoryCacheVersionAccessor
     /// The cache version if found, or <see langword="null"/> if the version doesn't exist or the request is a client-side request.
     /// </returns>
     public Task<RepositoryCacheVersion?> GetAsync(string cacheKey);
+
+    public void CachesSynced();
 }

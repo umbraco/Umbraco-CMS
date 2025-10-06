@@ -76,4 +76,6 @@ public class RepositoryCacheVersionAccessor : IRepositoryCacheVersionAccessor
         _requestCache.Set(cacheKey, databaseVersion);
         return databaseVersion;
     }
+
+    public void CachesSynced() => _requestCache.ClearOfType<RepositoryCacheVersion>();
 }

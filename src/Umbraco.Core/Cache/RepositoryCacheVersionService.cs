@@ -111,6 +111,7 @@ internal class RepositoryCacheVersionService : IRepositoryCacheVersionService
             _cacheVersions[version.Identifier] = Guid.Parse(version.Version);
         }
 
+        _repositoryCacheVersionAccessor.CachesSynced();
         scope.Complete();
     }
 
