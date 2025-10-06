@@ -14,7 +14,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.language.ensureIsoCodeNotExists("da");
 });
 
-test('can lock an invariant content', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test('can lock an invariant content node', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
@@ -34,7 +34,7 @@ test('can lock an invariant content', {tag: '@release'}, async ({umbracoApi, umb
   await umbracoUi.content.isPropertyEditorUiWithNameReadOnly("text-box");
 });
 
-test('can lock a variant content', async ({umbracoApi, umbracoUi}) => {
+test('can lock a variant content node', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.language.createDanishLanguage();
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
