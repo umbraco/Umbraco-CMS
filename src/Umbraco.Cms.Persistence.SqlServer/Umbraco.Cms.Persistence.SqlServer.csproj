@@ -27,11 +27,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Take top-level depedendency on Microsoft.Data.SqlClient, because NPoco.SqlServer depends on a vulnerable version -->
-    <PackageReference Include="Microsoft.Data.SqlClient" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />
   </ItemGroup>
 

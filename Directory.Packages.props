@@ -83,8 +83,6 @@
   </ItemGroup>
   <!-- Transitive pinned versions (only required because our direct dependencies have vulnerable versions of transitive dependencies) -->
   <ItemGroup>
-    <!-- NPoco.SqlServer brings in a vulnerable version of Microsoft.Data.SqlClient  -->
-    <PackageVersion Include="Microsoft.Data.SqlClient" Version="6.1.1" />
     <!-- Examine.Lucene brings in a vulnerable version of Lucene.Net.Replicator -->
     <PackageVersion Include="Lucene.Net.Replicator" Version="4.8.0-beta00017" />
   </ItemGroup>
