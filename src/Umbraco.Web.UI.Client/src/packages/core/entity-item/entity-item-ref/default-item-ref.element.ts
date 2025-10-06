@@ -22,7 +22,7 @@ export class UmbDefaultItemRefElement extends UmbLitElement {
 	}
 
 	#renderIcon(item: UmbDefaultItemModel) {
-		const icon = item.icon || 'icon-shape-triangle';
+		const icon = item.icon || 'icon-circle-dotted';
 		return html`<umb-icon slot="icon" name=${icon}></umb-icon>`;
 	}
 }

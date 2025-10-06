@@ -113,14 +113,19 @@ export class UmbDefaultCollectionMenuElement extends UmbLitElement {
 	}
 
 	#renderItem(item: UmbCollectionItemModel) {
+		const fallbackIcon = 'icon-circle-dotted';
+		const fallbackName = `Unnamed item (${item.unique})`;
+
 		return html`
 			<uui-menu-item
-				label=${item.name ?? ''}
+				label=${item.name ?? fallbackName}
 				selectable
 				@selected=${() => this._api?.selection.select(item.unique)}
 				@deselected=${() => this._api?.selection.deselect(item.unique)}
 				?selected=${this._api?.selection.isSelected(item.unique)}>
-				<uui-icon slot="icon" name=${item.icon}></uui-icon>
+				${item.icon
+					? html`<uui-icon slot="icon" name=${item.icon}></uui-icon>`
+					: html`<uui-icon slot="icon" name=${fallbackIcon}></uui-icon>`}
 			</uui-menu-item>
 		`;
 	}
