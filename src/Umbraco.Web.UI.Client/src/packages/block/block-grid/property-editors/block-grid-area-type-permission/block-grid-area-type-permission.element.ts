@@ -33,7 +33,7 @@ export class UmbPropertyEditorUIBlockGridAreaTypePermissionElement
 	private _blockTypes?: Array<UmbBlockTypeWithGroupKey>;
 
 	@state()
-	private _blockTypesWithElementName: Array<{ type: UmbBlockTypeWithGroupKey; name: string }> = [];
+	private _blockTypesWithElementName: Array<{ type: UmbBlockTypeWithGroupKey; name: string; icon: string | null | undefined }> = [];
 
 	@state()
 	private _blockGroups: Array<UmbBlockGridTypeGroupType> = [];
@@ -51,11 +51,11 @@ export class UmbPropertyEditorUIBlockGridAreaTypePermissionElement
 				.map((item) => {
 					const blockType = this._blockTypes?.find((block) => block.contentElementTypeKey === item.unique);
 					if (blockType) {
-						return { type: blockType, name: item.name };
+						return { type: blockType, name: item.name, icon: item.icon };
 					}
 					return undefined;
 				})
-				.filter((x) => x !== undefined) as Array<{ type: UmbBlockTypeWithGroupKey; name: string }>;
+				.filter((x) => x !== undefined) as Array<{ type: UmbBlockTypeWithGroupKey; name: string; icon: string | null | undefined }>;
 		});
 
 		this.consumeContext(UMB_DATA_TYPE_WORKSPACE_CONTEXT, async (context) => {
@@ -193,7 +193,10 @@ export class UmbPropertyEditorUIBlockGridAreaTypePermissionElement
 			this._blockGroups,
 			(group) => group.key,
 			(group) =>
-				html`<uui-combobox-list-option .value=${group.key} ?selected=${area.groupKey === group.key}>
+				html`<uui-combobox-list-option
+					.value=${group.key}
+					?selected=${area.groupKey === group.key}>
+					<umb-icon name="icon-folder"></umb-icon>
 					${group.name}
 				</uui-combobox-list-option>`,
 		);
@@ -207,6 +210,7 @@ export class UmbPropertyEditorUIBlockGridAreaTypePermissionElement
 				html`<uui-combobox-list-option
 					.value=${block.type.contentElementTypeKey}
 					?selected=${area.elementTypeKey === block.type.contentElementTypeKey}>
+					<umb-icon name=${block.icon}></umb-icon>
 					${block.name}
 				</uui-combobox-list-option>`,
 		);
@@ -243,7 +247,14 @@ export class UmbPropertyEditorUIBlockGridAreaTypePermissionElement
 			}
 
 			uui-combobox strong {
-				padding: 0 var(--uui-size-space-1);
+				padding: var(--uui-size-space-2);
+			}
+
+			uui-combobox-list-option {
+				display: flex;
+				align-items: center;
+				gap: var(--uui-size-space-2);
+				padding: var(--uui-size-2);
 			}
 		`,
 	];
