@@ -11,7 +11,7 @@ export class UmbTreeItemElement extends UmbExtensionElementAndApiSlotElementBase
 
 	override render() {
 		const entityType = this.entityType;
-		if (!entityType) return html``;
+		if (!entityType) return nothing;
 
 		return html`<umb-extension-with-api-slot
 			type=${this.getExtensionType()}
