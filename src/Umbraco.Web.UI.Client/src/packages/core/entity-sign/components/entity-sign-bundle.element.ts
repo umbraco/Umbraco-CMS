@@ -101,28 +101,27 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 		);
 	}
 
-	#openTooltip = () => {
+	#handleHoverTimer(open: boolean, delay: number) {
 		if (this._hoverTimer) clearTimeout(this._hoverTimer);
+		this._hoverTimer = window.setTimeout(() => {
+			this._open = open;
+			this.requestUpdate();
+			this._hoverTimer = undefined;
+		}, delay);
+	}
+
+	#openTooltip = () => {
 		if (!this._open) {
-			this._hoverTimer = window.setTimeout(() => {
-				this._open = true;
-				this.requestUpdate();
-				this._hoverTimer = undefined;
-			}, 240);
+			this.#handleHoverTimer(true, 240);
 		}
 	};
 
 	#cancelOpen = () => {
-		if (this._hoverTimer) {
+		if (this._open) {
+			this.#handleHoverTimer(false, 360);
+		} else if (this._hoverTimer) {
 			clearTimeout(this._hoverTimer);
 			this._hoverTimer = undefined;
-		}
-		if (this._open) {
-			this._hoverTimer = window.setTimeout(() => {
-				this._open = false;
-				this.requestUpdate();
-				this._hoverTimer = undefined;
-			}, 360);
 		}
 	};
 
