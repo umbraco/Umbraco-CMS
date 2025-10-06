@@ -95,6 +95,10 @@ export class UmbSplitPanelElement extends LitElement {
 		const localPos = clamp(pos, 0, width);
 		const percentagePos = (localPos / width) * 100;
 		this.position = percentagePos + '%';
+		
+		// Update ARIA value for divider
+		this.dividerTouchAreaElement.setAttribute('aria-valuenow', percentagePos.toFixed(0));
+		this.dividerTouchAreaElement.setAttribute('aria-valuetext', `Divider at ${percentagePos.toFixed(0)}%`);
 	}
 
 	#updateSplit() {
