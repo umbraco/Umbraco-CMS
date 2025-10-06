@@ -24,8 +24,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Take top-level depedendency on System.Runtime.Caching, because Microsoft.EntityFrameworkCore.SqlServer depends on a vulnerable version -->
-    <PackageReference Include="System.Runtime.Caching" />
     <!-- Take top-level depedendency on System.Text.Encodings.Web, because Microsoft.EntityFrameworkCore.SqlServer brings in a legacy version -->
     <PackageReference Include="System.Text.Encodings.Web" />
   </ItemGroup>
