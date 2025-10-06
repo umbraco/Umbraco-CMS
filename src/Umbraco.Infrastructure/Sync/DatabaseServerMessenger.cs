@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Factories;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Serialization;
@@ -24,6 +25,7 @@ public abstract class DatabaseServerMessenger : ServerMessengerBase, IDisposable
     private readonly IHostingEnvironment _hostingEnvironment;
     private readonly Lazy<SyncBootState?> _initialized;
     private readonly ILastSyncedManager _lastSyncedManager;
+    private readonly IMachineInfoFactory _machineInfoFactory;
 
     private readonly Lock _locko = new();
     /*
@@ -54,7 +56,8 @@ public abstract class DatabaseServerMessenger : ServerMessengerBase, IDisposable
         IJsonSerializer jsonSerializer,
         LastSyncedFileManager lastSyncedFileManager,
         IOptionsMonitor<GlobalSettings> globalSettings)
-        : this(mainDom,
+        : this(
+            mainDom,
             cacheRefreshers,
             logger,
             distributedEnabled,
@@ -63,7 +66,8 @@ public abstract class DatabaseServerMessenger : ServerMessengerBase, IDisposable
             cacheInstructionService,
             jsonSerializer,
             globalSettings,
-            StaticServiceProvider.Instance.GetRequiredService<ILastSyncedManager>()
+            StaticServiceProvider.Instance.GetRequiredService<ILastSyncedManager>(),
+            StaticServiceProvider.Instance.GetRequiredService<IMachineInfoFactory>()
             )
     {
     }
@@ -111,8 +115,8 @@ public abstract class DatabaseServerMessenger : ServerMessengerBase, IDisposable
         ICacheInstructionService cacheInstructionService,
         IJsonSerializer jsonSerializer,
         IOptionsMonitor<GlobalSettings> globalSettings,
-        ILastSyncedManager lastSyncedManager
-    )
+        ILastSyncedManager lastSyncedManager,
+        IMachineInfoFactory machineInfoFactory)
         : base(distributedEnabled, jsonSerializer)
     {
         _cancellationToken = _cancellationTokenSource.Token;
@@ -127,18 +131,9 @@ public abstract class DatabaseServerMessenger : ServerMessengerBase, IDisposable
         _lastSync = DateTime.UtcNow;
         _syncIdle = new ManualResetEvent(true);
         _lastSyncedManager = lastSyncedManager;
+        _machineInfoFactory = machineInfoFactory;
 
         globalSettings.OnChange(x => GlobalSettings = x);
-        // TODO: Use IMachineInfoFactory instead
-        using (var process = Process.GetCurrentProcess())
-        {
-            // See notes on _localIdentity
-            LocalIdentity = Environment.MachineName // eg DOMAIN\SERVER
-                            + "/" + hostingEnvironment.ApplicationId // eg /LM/S3SVC/11/ROOT
-                            + " [P" + process.Id // eg 1234
-                            + "/D" + AppDomain.CurrentDomain.Id // eg 22
-                            + "] " + Guid.NewGuid().ToString("N").ToUpper(); // make it truly unique
-        }
 
         _initialized = new Lazy<SyncBootState?>(InitializeWithMainDom);
     }
@@ -165,7 +160,7 @@ public abstract class DatabaseServerMessenger : ServerMessengerBase, IDisposable
     ///         and debugging purposes.
     ///     </para>
     /// </remarks>
-    protected string LocalIdentity { get; }
+    protected string LocalIdentity => _machineInfoFactory.GetLocalIdentity();
 
     /// <summary>
     ///     Synchronize the server (throttled).
