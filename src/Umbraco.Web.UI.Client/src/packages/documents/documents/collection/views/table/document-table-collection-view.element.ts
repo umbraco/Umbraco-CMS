@@ -135,16 +135,6 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 						};
 					}
 
-					/*
-					const editPath =
-						item.unique && this._workspacePathBuilder
-							? this._workspacePathBuilder({ entityType: item.entityType }) +
-								UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN.generateLocal({
-									unique: item.unique,
-								})
-							: '';
-							*/
-
 					const editPath = UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN.generateAbsolute({
 						unique: item.unique,
 					});
