@@ -41,7 +41,8 @@ export abstract class UmbExtensionElementAndApiSlotElementBase<
 
 	abstract getExtensionType(): string;
 	abstract getDefaultElementName(): string;
-	abstract getDefaultApiConstructor?(): any;
+
+	public getDefaultApiConstructor?(): any;
 
 	#observeManifest() {
 		if (!this.alias) return;
@@ -53,6 +54,7 @@ export abstract class UmbExtensionElementAndApiSlotElementBase<
 			[this],
 			this.#extensionChanged,
 			this.getDefaultElementName(),
+			this.getDefaultApiConstructor?.(),
 		);
 		this.#extensionController.elementProps = this.props;
 	}

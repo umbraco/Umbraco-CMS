@@ -49,7 +49,7 @@ export class UmbTreeItemElement extends UmbExtensionElementAndApiSlotElementBase
 		return 'umb-default-tree-item';
 	}
 
-	getDefaultApiConstructor() {
+	override getDefaultApiConstructor() {
 		return UmbDefaultTreeItemContext;
 	}
 }
