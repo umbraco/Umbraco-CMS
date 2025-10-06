@@ -9,6 +9,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Security;
 
+/// <summary>
+/// Provides OpenIddict server event handlers to expose back-office authentication via a custom authentication scheme.
+/// </summary>
 public class ExposeBackOfficeAuthenticationOpenIddictServerEventsHandler : IOpenIddictServerHandler<OpenIddictServerEvents.GenerateTokenContext>,
     IOpenIddictServerHandler<OpenIddictServerEvents.ApplyRevocationResponseContext>
 {
@@ -16,6 +19,9 @@ public class ExposeBackOfficeAuthenticationOpenIddictServerEventsHandler : IOpen
     private readonly string[] _claimTypes;
     private readonly TimeSpan _timeOut;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ExposeBackOfficeAuthenticationOpenIddictServerEventsHandler"/> class.
+    /// </summary>
     public ExposeBackOfficeAuthenticationOpenIddictServerEventsHandler(
         IHttpContextAccessor httpContextAccessor,
         IOptions<GlobalSettings> globalSettings,
@@ -24,8 +30,9 @@ public class ExposeBackOfficeAuthenticationOpenIddictServerEventsHandler : IOpen
         _httpContextAccessor = httpContextAccessor;
         _timeOut = globalSettings.Value.TimeOut;
 
-        // these are the type identifiers for the claims required by the principal
-        // for the custom authentication scheme 
+        // These are the type identifiers for the claims required by the principal
+        // for the custom authentication scheme.
+        // We make available the ID, user name and allowed applications (sections) claims.
         _claimTypes =
         [
             backOfficeIdentityOptions.Value.ClaimsIdentity.UserIdClaimType,
@@ -34,30 +41,34 @@ public class ExposeBackOfficeAuthenticationOpenIddictServerEventsHandler : IOpen
         ];
     }
 
-    // event handler for when access tokens are generated (created or refreshed)
+    /// <inheritdoc/>
+    /// <remarks>
+    /// Event handler for when access tokens are generated (created or refreshed).
+    /// </remarks>
     public async ValueTask HandleAsync(OpenIddictServerEvents.GenerateTokenContext context)
     {
-        // only proceed if this is a back-office sign-in
+        // Only proceed if this is a back-office sign-in.
         if (context.Principal.Identity?.AuthenticationType != Core.Constants.Security.BackOfficeAuthenticationType)
         {
             return;
         }
 
-        // create a new principal with the claims from the authenticated principal 
+        // Create a new principal with the claims from the authenticated principal.
         var principal = new ClaimsPrincipal(
             new ClaimsIdentity(
                 context.Principal.Claims.Where(claim => _claimTypes.Contains(claim.Type)),
-                Core.Constants.Security.BackOfficeExposedAuthenticationType
-            )
-        );
+                Core.Constants.Security.BackOfficeExposedAuthenticationType));
 
-        // sign-in the new principal for the custom authentication scheme
+        // Sign-in the new principal for the custom authentication scheme.
         await _httpContextAccessor
             .GetRequiredHttpContext()
             .SignInAsync(Core.Constants.Security.BackOfficeExposedAuthenticationType, principal, GetAuthenticationProperties());
     }
 
-    // event handler for when access tokens are revoked
+    /// <inheritdoc/>
+    /// <remarks>
+    /// Event handler for when access tokens are revoked.
+    /// </remarks>
     public async ValueTask HandleAsync(OpenIddictServerEvents.ApplyRevocationResponseContext context)
         => await _httpContextAccessor
             .GetRequiredHttpContext()

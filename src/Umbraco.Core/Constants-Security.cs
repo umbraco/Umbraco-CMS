@@ -69,12 +69,21 @@ public static partial class Constants
 
         public const string BackOfficeAuthenticationType = "UmbracoBackOffice";
         public const string BackOfficeExternalAuthenticationType = "UmbracoExternalCookie";
-        public const string BackOfficeExposedAuthenticationType = "UmbracoBackOfficeExposed";
-        public const string BackOfficeExposedCookieName = "UMB_UCONTEXT_EXPOSED";
         public const string BackOfficeExternalCookieName = "UMB_EXTLOGIN";
         public const string BackOfficeTokenAuthenticationType = "UmbracoBackOfficeToken";
         public const string BackOfficeTwoFactorAuthenticationType = "UmbracoTwoFactorCookie";
         public const string BackOfficeTwoFactorRememberMeAuthenticationType = "UmbracoTwoFactorRememberMeCookie";
+
+        /// <summary>
+        /// Authentication type and scheme used for backoffice users when it is exposed out of the backoffice context via a cookie.
+        /// </summary>
+        public const string BackOfficeExposedAuthenticationType = "UmbracoBackOfficeExposed";
+
+        /// <summary>
+        /// Represents the name of the authentication cookie used to expose the backoffice context out of the backoffice context.
+        /// </summary>
+        public const string BackOfficeExposedCookieName = "UMB_UCONTEXT_EXPOSED";
+
         public const string EmptyPasswordPrefix = "___UIDEMPTYPWORD__";
 
         public const string DefaultMemberTypeAlias = "Member";
