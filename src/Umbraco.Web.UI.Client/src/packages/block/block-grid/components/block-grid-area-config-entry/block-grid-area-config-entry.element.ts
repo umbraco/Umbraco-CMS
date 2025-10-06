@@ -123,7 +123,6 @@ export class UmbBlockGridAreaConfigEntryElement extends UmbLitElement implements
 			.alias {
 				padding: var(--uui-size-space-4);
 			}
-			
 		`,
 	];
 }
