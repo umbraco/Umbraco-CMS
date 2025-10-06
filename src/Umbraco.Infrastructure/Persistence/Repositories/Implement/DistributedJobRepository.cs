@@ -16,17 +16,17 @@ public class DistributedJobRepository(IScopeAccessor scopeAccessor) : IDistribut
             return null;
         }
 
-        long cutoffTicks = DateTimeOffset.Now.Ticks;
-
         Sql<ISqlContext> sql = scopeAccessor.AmbientScope.SqlContext.Sql()
             .Select<DistributedJobDto>()
             .From<DistributedJobDto>()
-            .Where("lastRun + period < @0", cutoffTicks)
             .Where<DistributedJobDto>(x => x.IsRunning == false)
             .OrderBy<DistributedJobDto>(x => x.LastRun);
 
         IUmbracoDatabase database = scopeAccessor.AmbientScope.Database;
-        DistributedJobDto? job = database.FirstOrDefault<DistributedJobDto>(sql);
+        List<DistributedJobDto> jobs = database.Fetch<DistributedJobDto>(sql);
+
+        // Grab the first runnable job.
+        DistributedJobDto? job = jobs.FirstOrDefault(x => x.LastRun < DateTime.UtcNow - TimeSpan.FromTicks(x.Period));
 
         if (job is null)
         {
