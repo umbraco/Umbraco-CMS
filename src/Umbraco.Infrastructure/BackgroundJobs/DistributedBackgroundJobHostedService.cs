@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using System.Diagnostics;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Scoping;
@@ -38,6 +39,15 @@ public class DistributedBackgroundJobHostedService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        var delayTimer = Stopwatch.StartNew();
+
+        while (delayTimer.Elapsed < TimeSpan.FromMinutes(2))
+        {
+            await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
+        }
+
+        delayTimer.Stop();
+
         using PeriodicTimer timer = new(TimeSpan.FromSeconds(15));
 
         try
