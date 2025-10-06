@@ -40,7 +40,7 @@ public class MediaMapDefinition : ContentMapDefinition<IMedia, MediaValueRespons
         mapper.Define<IMedia, MediaCollectionResponseModel>((_, _) => new MediaCollectionResponseModel(), Map);
     }
 
-    // Umbraco.Code.MapAll -Urls -Signs
+    // Umbraco.Code.MapAll -Urls -Flags
     private void Map(IMedia source, MediaResponseModel target, MapperContext context)
     {
         target.Id = source.Key;
@@ -50,7 +50,7 @@ public class MediaMapDefinition : ContentMapDefinition<IMedia, MediaValueRespons
         target.IsTrashed = source.Trashed;
     }
 
-    // Umbraco.Code.MapAll -Signs
+    // Umbraco.Code.MapAll -Flags
     private void Map(IMedia source, MediaCollectionResponseModel target, MapperContext context)
     {
         target.Id = source.Key;

@@ -49,19 +49,18 @@ export class UmbExtensionCollectionElement extends UmbCollectionDefaultElement {
 	static override styles = [
 		css`
 			#toolbar {
-				flex: 1;
 				display: flex;
 				gap: var(--uui-size-space-5);
 				justify-content: space-between;
 				align-items: center;
-			}
 
-			umb-collection-filter-field {
-				width: 100%;
-			}
+				umb-collection-filter-field {
+					flex: 1;
+				}
 
-			uui-select {
-				width: 100%;
+				uui-select {
+					flex: 1;
+				}
 			}
 		`,
 	];

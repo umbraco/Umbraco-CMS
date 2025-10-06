@@ -5,7 +5,7 @@ using Umbraco.Cms.Api.Management.Controllers.Tree;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Api.Management.Services.Entities;
-using Umbraco.Cms.Api.Management.Services.Signs;
+using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
@@ -40,7 +40,7 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
         IDocumentPresentationFactory documentPresentationFactory)
         : this(
               entityService,
-              StaticServiceProvider.Instance.GetRequiredService<SignProviderCollection>(),
+              StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>(),
               userStartNodeEntitiesService,
               dataTypeService,
               publicAccessService,
@@ -53,14 +53,14 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
     [ActivatorUtilitiesConstructor]
     protected DocumentTreeControllerBase(
         IEntityService entityService,
-        SignProviderCollection signProviders,
+        FlagProviderCollection flagProviders,
         IUserStartNodeEntitiesService userStartNodeEntitiesService,
         IDataTypeService dataTypeService,
         IPublicAccessService publicAccessService,
         AppCaches appCaches,
         IBackOfficeSecurityAccessor backofficeSecurityAccessor,
         IDocumentPresentationFactory documentPresentationFactory)
-        : base(entityService, signProviders, userStartNodeEntitiesService, dataTypeService)
+        : base(entityService, flagProviders, userStartNodeEntitiesService, dataTypeService)
     {
         _publicAccessService = publicAccessService;
         _appCaches = appCaches;

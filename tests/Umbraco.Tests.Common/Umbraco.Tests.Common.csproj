@@ -7,7 +7,7 @@
     <IsPackable>true</IsPackable>
     <EnablePackageValidation>$(BaseEnablePackageValidation)</EnablePackageValidation>
   </PropertyGroup>
-  
+
   <PropertyGroup>
     <!--
       TODO: Fix and remove overrides:

@@ -54,6 +54,10 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 		);
 	}
 
+	#getSectionName(section: UmbExtensionManifestInitializer<ManifestSection>) {
+		return section.manifest?.meta.label ? this.localize.string(section.manifest?.meta.label) : section.manifest?.name;
+	}
+
 	#getSectionPath(manifest: ManifestSection | undefined) {
 		return `section/${manifest?.meta.pathname}`;
 	}
@@ -79,6 +83,13 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 
 		const clickedSectionAlias = manifest.alias;
 
+		// If the clicked section is the same as the current section, we just load the original section path to load the section root
+		if (this._currentSectionAlias === clickedSectionAlias) {
+			const sectionPath = this.#getSectionPath(manifest);
+			history.pushState(null, '', sectionPath);
+			return;
+		}
+
 		// Check if we have a stored path for the clicked section
 		if (this.#sectionPathMap.has(clickedSectionAlias)) {
 			const storedPath = this.#sectionPathMap.get(clickedSectionAlias);
@@ -101,12 +112,10 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 							?active="${this._currentSectionAlias === section.alias}"
 							@click=${(event: PointerEvent) => this.#onSectionClick(event, section.manifest)}
 							href="${this.#getSectionPath(section.manifest)}"
-							label="${ifDefined(
-								section.manifest?.meta.label
-									? this.localize.string(section.manifest?.meta.label)
-									: section.manifest?.name,
-							)}"
-							data-mark="section-link:${section.alias}"></uui-tab>
+							label="${ifDefined(this.#getSectionName(section))}"
+							data-mark="section-link:${section.alias}"
+							>${this.#getSectionName(section)}</uui-tab
+						>
 					`,
 				)}
 			</uui-tab-group>

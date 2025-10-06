@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Factories;
-using Umbraco.Cms.Api.Management.Services.Signs;
+using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Media.Collection;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -29,8 +29,8 @@ public class ByKeyMediaCollectionController : MediaCollectionControllerBase
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IUmbracoMapper mapper,
         IMediaCollectionPresentationFactory mediaCollectionPresentationFactory,
-        SignProviderCollection signProviders)
-        : base(mapper, signProviders)
+        FlagProviderCollection flagProviders)
+        : base(mapper, flagProviders)
     {
         _mediaListViewService = mediaListViewService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
@@ -48,7 +48,7 @@ public class ByKeyMediaCollectionController : MediaCollectionControllerBase
             backOfficeSecurityAccessor,
             mapper,
             mediaCollectionPresentationFactory,
-            StaticServiceProvider.Instance.GetRequiredService<SignProviderCollection>())
+            StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>())
     {
     }
 
