@@ -4,18 +4,14 @@ import type {
 	MetaWorkspaceActionDefaultKind,
 	UmbWorkspaceActionDefaultKind,
 } from '../../../types.js';
-import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
-import { html, customElement, property, state, when } from '@umbraco-cms/backoffice/external/lit';
-import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import {
-	type UmbExtensionElementAndApiInitializer,
-	UmbExtensionsElementAndApiInitializer,
-} from '@umbraco-cms/backoffice/extension-api';
+import { customElement, html, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { stringOrStringArrayIntersects } from '@umbraco-cms/backoffice/utils';
-
-import '../../workspace-action-menu/index.js';
+import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbExtensionsElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UmbExtensionElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
+import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-workspace-action')
 export class UmbWorkspaceActionElement<
@@ -167,7 +163,7 @@ export class UmbWorkspaceActionElement<
 			this,
 			umbExtensionsRegistry,
 			'workspaceActionMenuItem',
-			ExtensionApiArgsMethod,
+			(manifest) => [{ meta: manifest.meta }],
 			(action) => stringOrStringArrayIntersects(action.forWorkspaceActions, aliases),
 			(extensionControllers) => {
 				this._items = extensionControllers;
@@ -183,11 +179,11 @@ export class UmbWorkspaceActionElement<
 		return html`
 			<uui-button
 				data-mark="workspace-action:${this.#manifest?.alias}"
-				.href=${this._href}
-				look=${this.#manifest?.meta.look ?? 'default'}
 				color=${this.#manifest?.meta.color ?? 'default'}
+				look=${this.#manifest?.meta.look ?? 'default'}
 				label=${this._additionalOptions ? label + '…' : label}
 				.disabled=${this._isDisabled}
+				.href=${this._href}
 				.state=${this._buttonState}
 				@click=${this.#onClick}></uui-button>
 		`;
@@ -196,16 +192,16 @@ export class UmbWorkspaceActionElement<
 	#renderActionMenu() {
 		return html`
 			<umb-workspace-action-menu
-				.items=${this._items}
-				color="${this.#manifest?.meta.color ?? 'default'}"
-				look="${this.#manifest?.meta.look ?? 'default'}"></umb-workspace-action-menu>
+				color=${this.#manifest?.meta.color ?? 'default'}
+				look=${this.#manifest?.meta.look ?? 'default'}
+				.items=${this._items}></umb-workspace-action-menu>
 		`;
 	}
 
 	override render() {
 		return when(
 			this._items.length,
-			() => html` <uui-button-group> ${this.#renderButton()} ${this.#renderActionMenu()} </uui-button-group> `,
+			() => html`<uui-button-group>${this.#renderButton()}${this.#renderActionMenu()}</uui-button-group>`,
 			() => this.#renderButton(),
 		);
 	}
@@ -222,13 +218,4 @@ declare global {
 	interface HTMLElementTagNameMap {
 		'umb-workspace-action': UmbWorkspaceActionElement;
 	}
-}
-
-/**
- *
- * @param manifest
- * @returns An array of arguments to pass to the extension API initializer.
- */
-function ExtensionApiArgsMethod(manifest: ManifestWorkspaceActionMenuItem) {
-	return [{ meta: manifest.meta }];
 }
