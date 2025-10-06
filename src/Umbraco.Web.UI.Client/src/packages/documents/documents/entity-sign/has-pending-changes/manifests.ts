@@ -7,6 +7,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		alias: 'Umb.EntitySign.Document.HasPendingChanges',
 		name: 'Has Pending Changes Document Entity Sign',
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
+		forEntityFlags: ['Umb.PendingChanges'],
 		meta: { iconName: 'icon-edit', label: 'Pending changes' },
 	},
 ];

@@ -6,8 +6,10 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'icon',
 		alias: 'Umb.EntitySign.Document.HasSchedule',
 		name: 'Has Schedule Document Entity Sign',
-		overwrites: 'Umb.EntitySign.Document.HasPendingChanges',
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
+		forEntityFlags: ['Umb.ScheduledForPublish'],
+		overwrites: 'Umb.EntitySign.Document.HasPendingChanges',
+		weight: 500,
 		meta: {
 			iconName: 'icon-time',
 			label: 'Scheduled publishing',
