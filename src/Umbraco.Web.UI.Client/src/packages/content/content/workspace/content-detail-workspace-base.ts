@@ -392,6 +392,13 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		this.#segments.setValue(data?.items ?? []);
 	}
 
+    /**
+     * @deprecated Call `_processIncomingData` instead. `_scaffoldProcessData` will be removed in v.18.
+     */
+	protected override _scaffoldProcessData(data: DetailModelType): Promise<DetailModelType> {
+	    return this._processIncomingData(data);
+	}
+
 	protected override async _processIncomingData(data: DetailModelType): Promise<DetailModelType> {
 		const contentTypeUnique: string | undefined = (data as any)[this.#contentTypePropertyName].unique;
 		if (!contentTypeUnique) {
