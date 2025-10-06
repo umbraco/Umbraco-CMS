@@ -8,6 +8,7 @@ import {
 	UmbDocumentItemRepository,
 	UmbDocumentSearchRepository,
 	UmbDocumentTreeRepository,
+	type UmbDocumentSearchRequestArgs,
 } from '@umbraco-cms/backoffice/document';
 import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/document-type';
 import type { UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
@@ -57,12 +58,14 @@ export class ExampleDocumentPickerPropertyEditorDataSource
 	search(args: UmbSearchRequestArgs) {
 		const filterString = this.#config?.find((x) => x.alias === 'filter')?.value as string;
 		const filterArray = filterString ? filterString.split(',') : [];
-		const allowedContentTypes = filterArray.map((x: string) => ({
-			unique: x,
-			entityType: UMB_DOCUMENT_TYPE_ENTITY_TYPE,
-		}));
+		const allowedContentTypes: UmbDocumentSearchRequestArgs['allowedContentTypes'] = filterArray.map(
+			(unique: string) => ({
+				entityType: UMB_DOCUMENT_TYPE_ENTITY_TYPE,
+				unique,
+			}),
+		);
 
-		const combinedArgs = { ...args, allowedContentTypes };
+		const combinedArgs: UmbDocumentSearchRequestArgs = { ...args, allowedContentTypes };
 
 		return this.#search.search(combinedArgs);
 	}
