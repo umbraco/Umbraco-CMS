@@ -58,6 +58,9 @@ public class DistributedBackgroundJobHostedService : BackgroundService
 
         delayTimer.Stop();
 
+        // Update all jobs, periods might have changed when restarting.
+        await _distributedJobService.UpdateAllChangedAsync();
+
         using PeriodicTimer timer = new(_distributedJobSettings.Period);
 
         try
@@ -81,7 +84,7 @@ public class DistributedBackgroundJobHostedService : BackgroundService
             return;
         }
 
-        var jobName = await _distributedJobService.TryTakeRunnableJobAsync();
+        var jobName = await _distributedJobService.TryTakeRunnableAsync();
 
         if (jobName is null)
         {
@@ -101,6 +104,6 @@ public class DistributedBackgroundJobHostedService : BackgroundService
 
         await job.RunJobAsync();
 
-        await _distributedJobService.FinishJobAsync(job.Name);
+        await _distributedJobService.FinishAsync(job.Name);
     }
 }

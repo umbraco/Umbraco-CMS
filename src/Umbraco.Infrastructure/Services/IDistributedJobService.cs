@@ -10,12 +10,18 @@ public interface IDistributedJobService
     /// If there are no runnable job, the string will be null
     /// </summary>
     /// <returns>The name of the runnable job.</returns>
-    Task<string?> TryTakeRunnableJobAsync();
+    Task<string?> TryTakeRunnableAsync();
 
     /// <summary>
     /// Finishes a job.
     /// </summary>
     /// <param name="jobName"></param>
     /// <returns></returns>
-    Task FinishJobAsync(string jobName);
+    Task FinishAsync(string jobName);
+
+    /// <summary>
+    /// Will get all jobs and update them IF the period has changed as users may change this via config.
+    /// </summary>
+    /// <returns></returns>
+    Task UpdateAllChangedAsync();
 }

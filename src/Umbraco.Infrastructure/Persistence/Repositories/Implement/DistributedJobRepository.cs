@@ -1,4 +1,7 @@
 ﻿using NPoco;
+using Umbraco.Cms.Core.Exceptions;
+using Umbraco.Cms.Infrastructure.BackgroundJobs;
+using Umbraco.Cms.Infrastructure.Models;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
@@ -6,10 +9,10 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
 /// <inheritdoc />
-public class DistributedJobRepository(IScopeAccessor scopeAccessor) : IDistributedJobRepository
+internal class DistributedJobRepository(IScopeAccessor scopeAccessor) : IDistributedJobRepository
 {
     /// <inheritdoc />
-    public string? GetRunnableJob()
+    public string? GetRunnable()
     {
         if (scopeAccessor.AmbientScope is null)
         {
@@ -42,7 +45,7 @@ public class DistributedJobRepository(IScopeAccessor scopeAccessor) : IDistribut
     }
 
     /// <inheritdoc />
-    public void FinishJob(string jobName)
+    public void Finish(string jobName)
     {
         if (scopeAccessor.AmbientScope is null)
         {
@@ -68,4 +71,54 @@ public class DistributedJobRepository(IScopeAccessor scopeAccessor) : IDistribut
         job.IsRunning = false;
         database.Update(job);
     }
+
+    /// <inheritdoc/>
+    public IEnumerable<DistributedBackgroundJobModel> GetAll()
+    {
+        if (scopeAccessor.AmbientScope is null)
+        {
+            throw new PanicException("No scope, could not get distributed jobs");
+        }
+
+        Sql<ISqlContext> sql = scopeAccessor.AmbientScope.SqlContext.Sql()
+            .Select<DistributedJobDto>()
+            .From<DistributedJobDto>();
+
+        IUmbracoDatabase database = scopeAccessor.AmbientScope.Database;
+        List<DistributedJobDto> jobs = database.Fetch<DistributedJobDto>(sql);
+        return jobs.Select(MapFromDto);
+    }
+
+    /// <inheritdoc/>
+    public void Update(DistributedBackgroundJobModel distributedBackgroundJob)
+    {
+        if (scopeAccessor.AmbientScope is null)
+        {
+            return;
+        }
+
+        DistributedJobDto dto = MapToDto(distributedBackgroundJob);
+
+        scopeAccessor.AmbientScope.Database.Update(dto);
+    }
+
+    private DistributedJobDto MapToDto(DistributedBackgroundJobModel model) =>
+        new()
+        {
+            Name = model.Name,
+            Period = model.Period.Ticks,
+            LastRun = model.LastRun,
+            IsRunning = model.IsRunning,
+            LastAttemptedRun = model.LastAttemptedRun,
+        };
+
+    private DistributedBackgroundJobModel MapFromDto(DistributedJobDto jobDto) =>
+        new()
+        {
+            Name = jobDto.Name,
+            Period = TimeSpan.FromTicks(jobDto.Period),
+            LastRun = jobDto.LastRun,
+            IsRunning = jobDto.IsRunning,
+            LastAttemptedRun = jobDto.LastAttemptedRun,
+        };
 }
