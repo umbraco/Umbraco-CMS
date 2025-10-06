@@ -26,7 +26,7 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 	private _routes?: Array<UmbRoute>;
 
 	@state()
-	private _loading?: Boolean = true;
+	private _loading?: boolean = true;
 
 	constructor() {
 		super();
