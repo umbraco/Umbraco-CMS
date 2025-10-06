@@ -171,10 +171,10 @@ namespace Umbraco.Cms
             {
                 lock (_syncLock)
                 {
-                    _repositoryCacheVersionService.SetCachesSyncedAsync();
                     using (!_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<CacheInstructionService>("Syncing from database..."))
                     using (ICoreScope scope = ScopeProvider.CreateCoreScope())
                     {
+                        _repositoryCacheVersionService.SetCachesSyncedAsync();
                         var lastId = _lastSyncedManager.GetLastSyncedExternalAsync().GetAwaiter().GetResult() ?? 0;
                         var numberOfInstructionsProcessed = ProcessDatabaseInstructions(cacheRefreshers, cancellationToken, localIdentity, ref lastId);
 
@@ -201,13 +201,13 @@ namespace Umbraco.Cms
                     using (!_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<CacheInstructionService>("Syncing from database..."))
                     using (ICoreScope scope = ScopeProvider.CreateCoreScope())
                     {
+                        _repositoryCacheVersionService.SetCachesSyncedAsync();
                         var lastId = _lastSyncedManager.GetLastSyncedInternalAsync().GetAwaiter().GetResult() ?? 0;
                         var numberOfInstructionsProcessed = ProcessDatabaseInstructions(cacheRefreshers, cancellationToken, localIdentity, ref lastId);
 
                         if (numberOfInstructionsProcessed > 0)
                         {
                             _lastSyncedManager.SaveLastSyncedInternalAsync(lastId).GetAwaiter().GetResult();
-                            _repositoryCacheVersionService.SetCachesSyncedAsync();
                         }
 
                         scope.Complete();
