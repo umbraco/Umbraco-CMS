@@ -5,6 +5,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
 import { UmbAncestorsEntityContext } from '@umbraco-cms/backoffice/entity';
 import { mergeObservables } from '@umbraco-cms/backoffice/observable-api';
+import { ensureSlash } from '@umbraco-cms/backoffice/router';
 
 export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 	UmbDocumentTreeItemModel,
@@ -100,7 +101,7 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 
 	#openCollection() {
 		// open the collection view for this item:
-		history.pushState(null, '', this.getPath() + '?openCollection=true');
+		history.pushState(null, '', ensureSlash(this.getPath()) + '?openCollection=true');
 	}
 }
 
