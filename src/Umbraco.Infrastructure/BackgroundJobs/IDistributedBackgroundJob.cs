@@ -7,7 +7,7 @@
 public interface IDistributedBackgroundJob
 {
     /// <summary>
-    /// Name of the job
+    /// Name of the job.
     /// </summary>
     string Name { get; }
 
@@ -19,6 +19,5 @@ public interface IDistributedBackgroundJob
     /// <summary>
     /// Run the job.
     /// </summary>
-    /// <returns></returns>
     Task RunJobAsync();
 }

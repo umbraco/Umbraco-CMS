@@ -1,6 +1,5 @@
 ﻿using NPoco;
 using Umbraco.Cms.Core.Exceptions;
-using Umbraco.Cms.Infrastructure.BackgroundJobs;
 using Umbraco.Cms.Infrastructure.Models;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Scoping;
