@@ -10,16 +10,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories;
 public interface IDistributedJobRepository
 {
     /// <summary>
-    /// Gets the name of the next runnable job from the database, if there are no jobs to run, get a null value.
+    /// Gets a job by name.
     /// </summary>
     /// <returns></returns>
-    string? GetRunnable();
-
-    /// <summary>
-    /// Finishes the job by marking the IsRunning column false and updating LastRun and LastAttemptedRun columns.
-    /// </summary>
-    /// <param name="jobName"></param>
-    void Finish(string jobName);
+    DistributedBackgroundJobModel? GetByName(string jobName);
 
     /// <summary>
     /// Gets all jobs.

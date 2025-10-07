@@ -41,26 +41,50 @@ public class DistributedJobService : IDistributedJobService
 
         scope.EagerWriteLock(Constants.Locks.DistributedJobs);
 
-        var jobName = _distributedJobRepository.GetRunnable();
-
-        IDistributedBackgroundJob? job = _distributedBackgroundJobs.FirstOrDefault(x => x.Name == jobName);
+        IEnumerable<DistributedBackgroundJobModel> jobs = _distributedJobRepository.GetAll();
+        DistributedBackgroundJobModel? job = jobs.FirstOrDefault(x => x.LastRun < DateTime.UtcNow - x.Period);
 
         if (job is null)
         {
-            _logger.LogWarning("Could not find a distributed job with the name '{JobName}'", jobName);
+            // No runnable jobs for now.
+            return null;
+        }
+
+        job.LastAttemptedRun = DateTime.UtcNow;
+        job.IsRunning = true;
+        _distributedJobRepository.Update(job);
+
+        IDistributedBackgroundJob? distributedJob = _distributedBackgroundJobs.FirstOrDefault(x => x.Name == job.Name);
+
+        if (distributedJob is null)
+        {
+            _logger.LogWarning("Could not find a distributed job with the name '{JobName}'", job.Name);
         }
 
         scope.Complete();
 
-        return job;
+        return distributedJob;
     }
 
+    /// <inheritdoc />
     public async Task FinishAsync(string jobName)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
 
         scope.EagerWriteLock(Constants.Locks.DistributedJobs);
-        _distributedJobRepository.Finish(jobName);
+        DistributedBackgroundJobModel? job = _distributedJobRepository.GetByName(jobName);
+
+        if (job is null)
+        {
+            _logger.LogWarning("Could not finish a distributed job with the name '{JobName}'", jobName);
+            return;
+        }
+
+        DateTime currentDateTime = DateTime.UtcNow;
+        job.LastAttemptedRun = currentDateTime;
+        job.LastRun = currentDateTime;
+        job.IsRunning = false;
+        _distributedJobRepository.Update(job);
 
         scope.Complete();
     }
