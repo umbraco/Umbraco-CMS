@@ -49,15 +49,7 @@ public class DistributedBackgroundJobHostedService : BackgroundService
     /// <inheritdoc />
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        var delayTimer = Stopwatch.StartNew();
-
-        while (delayTimer.Elapsed < _distributedJobSettings.Delay)
-        {
-            await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
-        }
-
-        delayTimer.Stop();
-
+        await Task.Delay(_distributedJobSettings.Delay, stoppingToken);
         // Update all jobs, periods might have changed when restarting.
         await _distributedJobService.UpdateAllChangedAsync();
 
