@@ -1,4 +1,4 @@
-import { CSSResult, css, customElement, html, ifDefined, property } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, ifDefined, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 
@@ -23,7 +23,7 @@ export class UmbTreeLoadMoreButtonElement extends UmbLitElement {
 		>`;
 	}
 
-	static override readonly styles: CSSResult[] = [
+	static override readonly styles = [
 		css`
 			:host {
 				position: relative;
