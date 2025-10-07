@@ -199,11 +199,6 @@ internal sealed class DatabaseDataCreator
             CreateLogViewerQueryData();
         }
 
-        if (tableName.Equals(Constants.DatabaseSchema.Tables.DistributedJob))
-        {
-            CreateDistributedJobData();
-        }
-
         _logger.LogInformation("Completed creating data in {TableName}", tableName);
     }
 
@@ -2377,21 +2372,6 @@ internal sealed class DatabaseDataCreator
             dto.Id = i + 1;
             _database.Insert(Constants.DatabaseSchema.Tables.LogViewerQuery, "id", false, dto);
         }
-    }
-
-    private void CreateDistributedJobData()
-    {
-        _database.Insert(Constants.DatabaseSchema.Tables.DistributedJob, "id", true, new DistributedJobDto { Name = "OpenIddictCleanupJob", Period = TimeSpan.FromHours(1).Ticks, LastRun = DateTime.UtcNow, IsRunning = false, LastAttemptedRun = DateTime.UtcNow });
-        _database.Insert(Constants.DatabaseSchema.Tables.DistributedJob, "id", true, new DistributedJobDto { Name = "Webhook Firing", Period = TimeSpan.FromSeconds(10).Ticks, LastRun = DateTime.UtcNow, IsRunning = false, LastAttemptedRun = DateTime.UtcNow });
-        _database.Insert(Constants.DatabaseSchema.Tables.DistributedJob, "id", true, new DistributedJobDto { Name = "ContentVersionCleanupJob", Period = TimeSpan.FromHours(1).Ticks, LastRun = DateTime.UtcNow, IsRunning = false, LastAttemptedRun = DateTime.UtcNow });
-        _database.Insert(Constants.DatabaseSchema.Tables.DistributedJob, "id", true, new DistributedJobDto { Name = "HealthCheckNotifierJob", Period = TimeSpan.FromDays(1).Ticks, LastRun = DateTime.UtcNow, IsRunning = false, LastAttemptedRun = DateTime.UtcNow });
-        _database.Insert(Constants.DatabaseSchema.Tables.DistributedJob, "id", true, new DistributedJobDto { Name = "LogScrubberJob", Period = TimeSpan.FromHours(4).Ticks, LastRun = DateTime.UtcNow, IsRunning = false, LastAttemptedRun = DateTime.UtcNow });
-        _database.Insert(Constants.DatabaseSchema.Tables.DistributedJob, "id", true, new DistributedJobDto { Name = "ScheduledPublishingJob", Period = TimeSpan.FromMinutes(1).Ticks, LastRun = DateTime.UtcNow, IsRunning = false, LastAttemptedRun = DateTime.UtcNow });
-        _database.Insert(Constants.DatabaseSchema.Tables.DistributedJob, "id", true, new DistributedJobDto { Name = "TemporaryFileCleanupJob", Period = TimeSpan.FromMinutes(5).Ticks, LastRun = DateTime.UtcNow, IsRunning = false, LastAttemptedRun = DateTime.UtcNow });
-        _database.Insert(Constants.DatabaseSchema.Tables.DistributedJob, "id", true, new DistributedJobDto { Name = "WebhookLoggingCleanup", Period = TimeSpan.FromDays(1).Ticks, LastRun = DateTime.UtcNow, IsRunning = false, LastAttemptedRun = DateTime.UtcNow });
-        _database.Insert(Constants.DatabaseSchema.Tables.DistributedJob, "id", true, new DistributedJobDto { Name = "CacheInstructionsPruningJob", Period = TimeSpan.FromMinutes(1).Ticks, LastRun = DateTime.UtcNow, IsRunning = false, LastAttemptedRun = DateTime.UtcNow });
-        _database.Insert(Constants.DatabaseSchema.Tables.DistributedJob, "id", true, new DistributedJobDto { Name = "LongRunningOperationsCleanupJob", Period = TimeSpan.FromMinutes(2).Ticks, LastRun = DateTime.UtcNow, IsRunning = false, LastAttemptedRun = DateTime.UtcNow });
-
     }
 
     private void ConditionalInsert<TDto>(
