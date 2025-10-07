@@ -2,7 +2,7 @@ using System.Text.RegularExpressions;
 
 namespace Umbraco.Cms.Core.IO;
 
-internal sealed class ShadowFileSystem : IFileSystem
+internal sealed partial class ShadowFileSystem : IFileSystem
 {
     private readonly IFileSystem _sfs;
 
@@ -392,14 +392,28 @@ internal sealed class ShadowFileSystem : IFileSystem
     }
 
     // copied from System.Web.Util.Wildcard internal
-    internal sealed class WildcardExpression
+    internal sealed partial class WildcardExpression
     {
-        private static readonly Regex MetaRegex = new("[\\+\\{\\\\\\[\\|\\(\\)\\.\\^\\$]");
-        private static readonly Regex QuestRegex = new("\\?");
-        private static readonly Regex StarRegex = new("\\*");
-        private static readonly Regex CommaRegex = new(",");
-        private static readonly Regex SlashRegex = new("(?=/)");
-        private static readonly Regex BackslashRegex = new("(?=[\\\\:])");
+        private static readonly Regex MetaRegex = GetMetaRegex();
+
+        [GeneratedRegex("[\\+\\{\\\\\\[\\|\\(\\)\\.\\^\\$]")]
+        private static partial Regex GetMetaRegex();
+
+        private static readonly Regex QuestRegex = GetQuestRegex();
+
+        [GeneratedRegex("\\?")]
+        private static partial Regex GetQuestRegex();
+
+        private static readonly Regex StarRegex = GetStarRegex();
+
+        [GeneratedRegex("\\*")]
+        private static partial Regex GetStarRegex();
+
+        private static readonly Regex CommaRegex = GetCommaRegex();
+
+        [GeneratedRegex(",")]
+        private static partial Regex GetCommaRegex();
+
         private readonly bool _caseInsensitive;
         private readonly string _pattern;
         private Regex? _regex;

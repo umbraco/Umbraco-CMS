@@ -93,11 +93,11 @@ test('can not publish a mandatory checkbox list with an empty value', {tag: '@re
   await umbracoUi.content.goToContentWithName(contentName);
   // Do not select any checkbox list values and the validation error appears
   await umbracoUi.content.clickSaveAndPublishButton();
-  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.emptyValue);
+  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue);
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
   // Select a checkbox list value and the validation error disappears
   await umbracoUi.content.chooseCheckboxListOption(optionValues[0]);
-  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.emptyValue, false);
+  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue, false);
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
