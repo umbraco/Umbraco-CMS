@@ -15,7 +15,7 @@ internal class DistributedJobRepository(IScopeAccessor scopeAccessor) : IDistrib
     {
         if (scopeAccessor.AmbientScope is null)
         {
-            return null;
+            throw new InvalidOperationException("No scope, could not get distributed jobs");
         }
 
         Sql<ISqlContext> sql = scopeAccessor.AmbientScope.SqlContext.Sql()
@@ -76,7 +76,7 @@ internal class DistributedJobRepository(IScopeAccessor scopeAccessor) : IDistrib
     {
         if (scopeAccessor.AmbientScope is null)
         {
-            throw new PanicException("No scope, could not get distributed jobs");
+            throw new InvalidOperationException("No scope, could not get distributed jobs");
         }
 
         Sql<ISqlContext> sql = scopeAccessor.AmbientScope.SqlContext.Sql()
