@@ -7,10 +7,10 @@ const saveAndPreview: UmbExtensionManifest = {
 	alias: 'Umb.Document.WorkspaceActionMenuItem.SaveAndPreview',
 	name: 'Save And Preview Document Preview Option',
 	forWorkspaceActions: 'Umb.WorkspaceAction.Document.SaveAndPreview',
-	urlProviderAlias: 'umbDocumentUrlProvider',
 	weight: 100,
 	meta: {
 		label: '#buttons_saveAndPreview',
+		urlProviderAlias: 'umbDocumentUrlProvider',
 	},
 };
 

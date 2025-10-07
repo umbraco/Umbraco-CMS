@@ -3,11 +3,13 @@ import type {
 	MetaWorkspaceActionMenuItemDefaultKind,
 } from '@umbraco-cms/backoffice/workspace';
 
-export interface ManifestWorkspaceActionMenuItemPreviewOptionKind<
-	MetaType extends MetaWorkspaceActionMenuItemDefaultKind = MetaWorkspaceActionMenuItemDefaultKind,
-> extends ManifestWorkspaceActionMenuItem<MetaType> {
+export interface ManifestWorkspaceActionMenuItemPreviewOptionKind
+	extends ManifestWorkspaceActionMenuItem<MetaWorkspaceActionMenuItemPreviewOptionKind> {
 	type: 'workspaceActionMenuItem';
 	kind: 'previewOption';
+}
+
+export interface MetaWorkspaceActionMenuItemPreviewOptionKind extends MetaWorkspaceActionMenuItemDefaultKind {
 	urlProviderAlias: string;
 }
 
