@@ -1,15 +1,14 @@
 import { UMB_BACKOFFICE_CONTEXT } from '../backoffice.context.js';
 import type { UmbBackofficeContext } from '../backoffice.context.js';
 import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
-import { css, html, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import type { ManifestSection } from '@umbraco-cms/backoffice/section';
+import { css, customElement, html, ifDefined, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbExtensionManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
+import type { ManifestSection } from '@umbraco-cms/backoffice/section';
 
 @customElement('umb-backoffice-header-sections')
 export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 	@state()
-	private _sections: Array<UmbExtensionManifestInitializer<ManifestSection>> = [];
+	private _sections: Array<ManifestSection> = [];
 
 	@state()
 	private _currentSectionAlias = '';
@@ -35,7 +34,7 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 			this._backofficeContext.allowedSections,
 			(allowedSections) => {
 				const oldValue = this._sections;
-				this._sections = allowedSections;
+				this._sections = allowedSections.map((section) => section.manifest).filter((section) => section !== undefined);
 				this.requestUpdate('_sections', oldValue);
 			},
 			'observeSections',
@@ -52,10 +51,6 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 			},
 			'observeCurrentSection',
 		);
-	}
-
-	#getSectionName(section: UmbExtensionManifestInitializer<ManifestSection>) {
-		return section.manifest?.meta.label ? this.localize.string(section.manifest?.meta.label) : section.manifest?.name;
 	}
 
 	#getSectionPath(manifest: ManifestSection | undefined) {
@@ -107,19 +102,22 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 				${repeat(
 					this._sections,
 					(section) => section.alias,
-					(section) => html`
-						<uui-tab
-							?active="${this._currentSectionAlias === section.alias}"
-							@click=${(event: PointerEvent) => this.#onSectionClick(event, section.manifest)}
-							href="${this.#getSectionPath(section.manifest)}"
-							label="${ifDefined(this.#getSectionName(section))}"
-							data-mark="section-link:${section.alias}"
-							>${this.#getSectionName(section)}</uui-tab
-						>
-					`,
+					(section) => this.#renderItem(section),
 				)}
 			</uui-tab-group>
 		`;
+	}
+
+	#renderItem(manifest: ManifestSection) {
+		const label = this.localize.string(manifest?.meta.label || manifest?.name);
+		return html`<uui-tab
+			data-mark="section-link:${manifest.alias}"
+			href=${this.#getSectionPath(manifest)}
+			label=${ifDefined(label)}
+			?active=${this._currentSectionAlias === manifest.alias}
+			@click=${(event: PointerEvent) => this.#onSectionClick(event, manifest)}
+			>${label}</uui-tab
+		>`;
 	}
 
 	static override styles: CSSResultGroup = [
@@ -131,10 +129,10 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 				height: 60px;
 				flex-basis: 100%;
 				font-size: 16px; /* specific for the header */
+				background-color: var(--uui-color-header-background);
 				--uui-tab-text: var(--uui-color-header-contrast);
 				--uui-tab-text-hover: var(--uui-color-header-contrast-emphasis);
 				--uui-tab-text-active: var(--uui-color-header-contrast-emphasis);
-				background-color: var(--uui-color-header-background);
 				--uui-tab-group-dropdown-background: var(--uui-color-header-surface);
 			}
 		`,
