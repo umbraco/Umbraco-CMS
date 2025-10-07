@@ -14,6 +14,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
 internal sealed class LogViewerQueryRepository : EntityRepositoryBase<int, ILogViewerQuery>, ILogViewerQueryRepository
 {
+    private readonly IRepositoryCacheVersionService _repositoryCacheVersionService;
+    private readonly ICacheSyncService _cacheSyncService;
+
     public LogViewerQueryRepository(
         IScopeAccessor scopeAccessor,
         AppCaches cache,
@@ -28,6 +31,8 @@ internal sealed class LogViewerQueryRepository : EntityRepositoryBase<int, ILogV
             cacheSyncService
             )
     {
+        _repositoryCacheVersionService = repositoryCacheVersionService;
+        _cacheSyncService = cacheSyncService;
     }
 
     public ILogViewerQuery? GetByName(string name) =>
@@ -36,7 +41,7 @@ internal sealed class LogViewerQueryRepository : EntityRepositoryBase<int, ILogV
         GetMany().FirstOrDefault(x => x.Name == name);
 
     protected override IRepositoryCachePolicy<ILogViewerQuery, int> CreateCachePolicy() =>
-        new FullDataSetRepositoryCachePolicy<ILogViewerQuery, int>(GlobalIsolatedCache, ScopeAccessor, GetEntityId, /*expires:*/ false);
+        new FullDataSetRepositoryCachePolicy<ILogViewerQuery, int>(GlobalIsolatedCache, ScopeAccessor,  _repositoryCacheVersionService, _cacheSyncService, GetEntityId, /*expires:*/ false);
 
     protected override IEnumerable<ILogViewerQuery> PerformGetAll(params int[]? ids)
     {

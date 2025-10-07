@@ -20,6 +20,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// </summary>
 internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContentType>, IContentTypeRepository
 {
+    private readonly IRepositoryCacheVersionService _repositoryCacheVersionService;
+    private readonly ICacheSyncService _cacheSyncService;
+
     public ContentTypeRepository(
         IScopeAccessor scopeAccessor,
         AppCaches cache,
@@ -41,6 +44,8 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
             idKeyMap,
             cacheSyncService)
     {
+        _repositoryCacheVersionService = repositoryCacheVersionService;
+        _cacheSyncService = cacheSyncService;
     }
 
     protected override bool SupportsPublishing => ContentType.SupportsPublishingConst;
@@ -103,7 +108,7 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
     }
 
     protected override IRepositoryCachePolicy<IContentType, int> CreateCachePolicy() =>
-        new FullDataSetRepositoryCachePolicy<IContentType, int>(GlobalIsolatedCache, ScopeAccessor, GetEntityId, /*expires:*/ true);
+        new FullDataSetRepositoryCachePolicy<IContentType, int>(GlobalIsolatedCache, ScopeAccessor, _repositoryCacheVersionService, _cacheSyncService, GetEntityId, /*expires:*/ true);
 
     // every GetExists method goes cachePolicy.GetSomething which in turns goes PerformGetAll,
     // since this is a FullDataSet policy - and everything is cached

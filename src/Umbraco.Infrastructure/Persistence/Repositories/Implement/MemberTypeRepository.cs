@@ -21,6 +21,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 internal sealed class MemberTypeRepository : ContentTypeRepositoryBase<IMemberType>, IMemberTypeRepository
 {
     private readonly IShortStringHelper _shortStringHelper;
+    private readonly IRepositoryCacheVersionService _repositoryCacheVersionService;
+    private readonly ICacheSyncService _cacheSyncService;
 
     public MemberTypeRepository(
         IScopeAccessor scopeAccessor,
@@ -41,15 +43,19 @@ internal sealed class MemberTypeRepository : ContentTypeRepositoryBase<IMemberTy
             shortStringHelper,
             repositoryCacheVersionService,
             idKeyMap,
-            cacheSyncService) =>
+            cacheSyncService)
+    {
         _shortStringHelper = shortStringHelper;
+        _repositoryCacheVersionService = repositoryCacheVersionService;
+        _cacheSyncService = cacheSyncService;
+    }
 
     protected override bool SupportsPublishing => MemberType.SupportsPublishingConst;
 
     protected override Guid NodeObjectTypeId => Constants.ObjectTypes.MemberType;
 
     protected override IRepositoryCachePolicy<IMemberType, int> CreateCachePolicy() =>
-        new FullDataSetRepositoryCachePolicy<IMemberType, int>(GlobalIsolatedCache, ScopeAccessor, GetEntityId, /*expires:*/ true);
+        new FullDataSetRepositoryCachePolicy<IMemberType, int>(GlobalIsolatedCache, ScopeAccessor,  _repositoryCacheVersionService, _cacheSyncService, GetEntityId, /*expires:*/ true);
 
     // every GetExists method goes cachePolicy.GetSomething which in turns goes PerformGetAll,
     // since this is a FullDataSet policy - and everything is cached

@@ -19,6 +19,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// </summary>
 internal sealed class RelationTypeRepository : EntityRepositoryBase<int, IRelationType>, IRelationTypeRepository
 {
+    private readonly IRepositoryCacheVersionService _repositoryCacheVersionService;
+    private readonly ICacheSyncService _cacheSyncService;
+
     public RelationTypeRepository(
         IScopeAccessor scopeAccessor,
         AppCaches cache,
@@ -32,10 +35,12 @@ internal sealed class RelationTypeRepository : EntityRepositoryBase<int, IRelati
             repositoryCacheVersionService,
             cacheSyncService)
     {
+        _repositoryCacheVersionService = repositoryCacheVersionService;
+        _cacheSyncService = cacheSyncService;
     }
 
     protected override IRepositoryCachePolicy<IRelationType, int> CreateCachePolicy() =>
-        new FullDataSetRepositoryCachePolicy<IRelationType, int>(GlobalIsolatedCache, ScopeAccessor, GetEntityId, /*expires:*/ true);
+        new FullDataSetRepositoryCachePolicy<IRelationType, int>(GlobalIsolatedCache, ScopeAccessor,  _repositoryCacheVersionService, _cacheSyncService, GetEntityId, /*expires:*/ true);
 
     private static void CheckNullObjectTypeValues(IRelationType entity)
     {

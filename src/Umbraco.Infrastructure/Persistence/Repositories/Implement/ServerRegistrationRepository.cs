@@ -14,6 +14,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 internal sealed class ServerRegistrationRepository : EntityRepositoryBase<int, IServerRegistration>,
     IServerRegistrationRepository
 {
+    private readonly IRepositoryCacheVersionService _repositoryCacheVersionService;
+    private readonly ICacheSyncService _cacheSyncService;
+
     public ServerRegistrationRepository(
         IScopeAccessor scopeAccessor,
         ILogger<ServerRegistrationRepository> logger,
@@ -26,6 +29,8 @@ internal sealed class ServerRegistrationRepository : EntityRepositoryBase<int, I
             repositoryCacheVersionService,
             cacheSyncService)
     {
+        _repositoryCacheVersionService = repositoryCacheVersionService;
+        _cacheSyncService = cacheSyncService;
     }
 
     public void ClearCache() => CachePolicy.ClearAll();
@@ -52,7 +57,7 @@ internal sealed class ServerRegistrationRepository : EntityRepositoryBase<int, I
         // note: this means that the ServerRegistrationRepository does *not* implement scoped cache,
         // and this is because the repository is special and should not participate in scopes
         // (cleanup in v8)
-        new FullDataSetRepositoryCachePolicy<IServerRegistration, int>(AppCaches.RuntimeCache, ScopeAccessor, GetEntityId, /*expires:*/ false);
+        new FullDataSetRepositoryCachePolicy<IServerRegistration, int>(AppCaches.RuntimeCache, ScopeAccessor,  _repositoryCacheVersionService, _cacheSyncService, GetEntityId, /*expires:*/ false);
 
     protected override int PerformCount(IQuery<IServerRegistration>? query) =>
         throw new NotSupportedException("This repository does not support this method.");
