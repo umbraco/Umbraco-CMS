@@ -8,6 +8,14 @@ import type {
 } from '@umbraco-cms/backoffice/modal';
 import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
+export type UmbModalRouteSetupArgs = {
+	router: IRouterSlot;
+	modalManagerContext: UmbModalManagerContext;
+	params: Params;
+	routeHandler: UmbModalRouteHandler;
+	routeContextToken: UmbContextToken<any>;
+};
+
 export interface UmbModalRouteRegistration<
 	UmbModalTokenData extends { [key: string]: any } = { [key: string]: any },
 	UmbModalTokenValue = any,
@@ -21,11 +29,7 @@ export interface UmbModalRouteRegistration<
 	open(params: { [key: string]: string | number }, prepend?: string): void;
 
 	routeSetup(
-		router: IRouterSlot,
-		modalManagerContext: UmbModalManagerContext,
-		params: Params,
-		routeHandler: UmbModalRouteHandler,
-		routeContextToken: UmbContextToken<any>,
+		args: UmbModalRouteSetupArgs,
 	): Promise<undefined | UmbModalContext<UmbModalTokenData, UmbModalTokenValue>>;
 
 	// eslint-disable-next-line @typescript-eslint/naming-convention

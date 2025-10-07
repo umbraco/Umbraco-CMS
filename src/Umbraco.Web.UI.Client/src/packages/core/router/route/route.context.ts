@@ -69,13 +69,13 @@ export class UmbRouteContext extends UmbContextBase {
 			component: EmptyDiv,
 			setup: async (component, info) => {
 				if (!this.#modalContext) return;
-				const modalContext = await modalRegistration.routeSetup(
-					this.#modalRouter,
-					this.#modalContext,
-					info.match.params,
-					this.#routeHandler,
-					UMB_ROUTE_CONTEXT,
-				);
+				const modalContext = await modalRegistration.routeSetup({
+					router: this.#modalRouter,
+					modalManagerContext: this.#modalContext,
+					params: info.match.params,
+					routeHandler: this.#routeHandler,
+					routeContextToken: UMB_ROUTE_CONTEXT,
+				});
 				if (modalContext) {
 					modalContext._internal_setCurrentModalPath(info.match.fragments.consumed);
 				}
