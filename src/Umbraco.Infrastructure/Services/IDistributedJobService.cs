@@ -8,10 +8,11 @@ namespace Umbraco.Cms.Infrastructure.Services;
 public interface IDistributedJobService
 {
     /// <summary>
-    /// Try taking a runnable job, this means locking the table, getting a runnable job, and setting its status to running.
-    /// If there are no runnable job, the string will be null.
+    /// Attempts to claim a runnable distributed job for execution.
     /// </summary>
-    /// <returns>The name of the runnable job.</returns>
+    /// <returns>
+    /// The claimed <see cref="IDistributedBackgroundJob"/> if available, or <see langword="null"/> if no jobs are ready to run.
+    /// </returns>
     Task<IDistributedBackgroundJob?> TryTakeRunnableAsync();
 
     /// <summary>
