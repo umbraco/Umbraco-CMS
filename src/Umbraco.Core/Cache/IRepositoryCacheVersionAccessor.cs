@@ -22,5 +22,12 @@ public interface IRepositoryCacheVersionAccessor
     /// </returns>
     public Task<RepositoryCacheVersion?> GetAsync(string cacheKey);
 
+    /// <summary>
+    /// Notifies the accessor that caches have been synchronized.
+    /// </summary>
+    /// <remarks>
+    /// This method is called after cache synchronization to temporarily bypass version checking,
+    /// preventing recursive sync attempts while repositories reload data from the database.
+    /// </remarks>
     public void CachesSynced();
 }
