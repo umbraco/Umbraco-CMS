@@ -44,6 +44,7 @@ export abstract class UmbTreeItemElementBase<
 		this.#api = value;
 
 		if (this.#api) {
+			this.#api?.setIsMenu(this._isMenu);
 			this.observe(this.#api.childItems, (value) => (this._childItems = value));
 			this.observe(this.#api.hasChildren, (value) => (this._hasChildren = value));
 			this.observe(this.#api.isActive, (value) => (this._isActive = value));
@@ -122,6 +123,17 @@ export abstract class UmbTreeItemElementBase<
 
 	@state()
 	private _hasNextItems = false;
+
+	@state()
+	protected _isMenu = false;
+
+	set isMenu(value: boolean) {
+		this._isMenu = value;
+		this.#api?.setIsMenu(value);
+	}
+	get isMenu(): boolean {
+		return this._isMenu;
+	}
 
 	#initTreeItem() {
 		if (!this.#api) return;
@@ -258,7 +270,7 @@ export abstract class UmbTreeItemElementBase<
 						(item) => html`
 							<umb-tree-item
 								.entityType=${item.entityType}
-								.props=${{ hideActions: this.hideActions, item }}></umb-tree-item>
+								.props=${{ hideActions: this.hideActions, item, isMenu: this.isMenu }}></umb-tree-item>
 						`,
 					)
 				: ''}

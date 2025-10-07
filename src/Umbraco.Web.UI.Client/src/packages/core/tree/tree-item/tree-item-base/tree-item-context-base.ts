@@ -76,6 +76,14 @@ export abstract class UmbTreeItemContextBase<
 	#hasActiveDescendant = new UmbBooleanState(undefined);
 	public readonly hasActiveDescendant = this.#hasActiveDescendant.asObservable();
 
+	#isMenu = false;
+	setIsMenu(isMenu: boolean) {
+		this.#isMenu = isMenu;
+	}
+	getIsMenu() {
+		return this.#isMenu;
+	}
+
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_TREE_ITEM_CONTEXT);
 		// TODO: Get take size from Tree context

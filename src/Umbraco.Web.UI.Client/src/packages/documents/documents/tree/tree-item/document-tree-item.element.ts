@@ -18,7 +18,6 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 		this.#api = value;
 
 		if (this.#api) {
-			this.#api?.setAsMenu(this._asMenu);
 			this.observe(this.#api.name, (name) => (this._name = name || ''));
 			this.observe(this.#api.isDraft, (isDraft) => (this._isDraft = isDraft || false));
 			this.observe(this.#api.icon, (icon) => (this._icon = icon || ''));
@@ -41,17 +40,6 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 	@state()
 	private _icon = '';
 
-	@state()
-	private _asMenu = false;
-
-	set asMenu(value: boolean) {
-		this._asMenu = value;
-		this.#api?.setAsMenu(value);
-	}
-	get asMenu(): boolean {
-		return this._asMenu;
-	}
-
 	override renderIconContainer() {
 		const icon = this._icon;
 
@@ -64,8 +52,8 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 
 	override _renderExpandSymbol = () => {
 		// If this in the menu and it is a collection, then we will enforce the user to the Collection view instead of expanding.
-		// this._forceShowExpand is equivalent to hasCollection for this element.
-		if (this._asMenu && this._forceShowExpand) {
+		// `this._forceShowExpand` is equivalent to hasCollection for this element.
+		if (this._isMenu && this._forceShowExpand) {
 			return html`<umb-icon data-mark="open-collection" name="icon-list" style="font-size: 8px;"></umb-icon>`;
 		} else {
 			return undefined;

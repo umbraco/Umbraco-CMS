@@ -32,10 +32,9 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 	readonly ancestors = this._treeItem.asObservablePart((item) => item?.ancestors ?? []);
 	readonly isTrashed = this._treeItem.asObservablePart((item) => item?.isTrashed ?? false);
 
-	#asMenu = false;
-	setAsMenu(value: boolean) {
-		this.#asMenu = value;
-		if (this.#asMenu) {
+	override setIsMenu(isMenu: boolean) {
+		super.setIsMenu(isMenu);
+		if (isMenu) {
 			this.observe(
 				this.hasCollection,
 				(hasCollection) => {
@@ -56,9 +55,6 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 				'_whenMenuObserveHasCollection',
 			);
 		}
-	}
-	getAsMenu(): boolean {
-		return this.#asMenu;
 	}
 
 	constructor(host: UmbControllerHost) {
@@ -83,7 +79,7 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 	}
 
 	public override showChildren() {
-		if (this.#asMenu && this.#item.getHasCollection()) {
+		if (this.getIsMenu() && this.#item.getHasCollection()) {
 			// Collections cannot be expanded via a manu, instead we open the Collection for the user.
 			this.#openCollection();
 			return;
@@ -92,7 +88,7 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 	}
 
 	public override hideChildren() {
-		if (this.#asMenu && this.#item.getHasCollection()) {
+		if (this.getIsMenu() && this.#item.getHasCollection()) {
 			// Collections in a menu will collapse when already showing children, and instead we open the Collection for the user.
 			this.#openCollection();
 		}
