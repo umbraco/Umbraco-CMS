@@ -111,9 +111,9 @@ export abstract class UmbTreeItemContextBase<
 	 * @returns {Array<UmbEntityModel>}
 	 * @memberof UmbTreeItemContextBase
 	 */
-	public getAscending(): Array<UmbEntityModel> {
+	public getAscending(): Array<UmbEntityModel> | undefined {
 		// This should be supported for all trees.
-		return (this._treeItem.getValue() as any)?.ancestors as Array<UmbEntityModel>;
+		return (this._treeItem.getValue() as any)?.ancestors;
 	}
 
 	/**
@@ -336,9 +336,7 @@ export abstract class UmbTreeItemContextBase<
 		);
 	}
 
-	#debouncedCheckIsActive = debounce(() => this.#checkIsActive(), 100);
-
-	async #checkIsActive() {
+	#checkIsActive = async () => {
 		// don't set the active state if the item is selectable
 		const isSelectable = this.#isSelectable.getValue();
 
@@ -358,21 +356,28 @@ export abstract class UmbTreeItemContextBase<
 		if (!this.entityType || this.unique === undefined) {
 			throw new Error('Could not check active state, entity type or unique is missing');
 		}
-		const path = [...this.getAscending(), { entityType: this.entityType, unique: this.unique }];
 
-		await this.#gotTreeContext;
+		const ascending = this.getAscending();
+		// Only if this type of item has ancestors...
+		if (ascending) {
+			const path = [...ascending, { entityType: this.entityType, unique: this.unique }];
 
-		if (isActive) {
-			this.treeContext?.activeManager.setActive(path);
-		} else {
-			// If this is the current, then remove it:
-			// This is a hack, where we are assuming that another active item would have made its entrance and replaced the 'active' within 2 second. [NL]
-			// The problem is that it may take some time before an item appears in the tree and communicates that its active.
-			// And in the meantime the removal of this would have resulted in the parent closing. And since we don't use Active state to open the tree, then we have a problem.
-			debounce(() => this.treeContext?.activeManager.removeActiveIfMatch(path), 1000);
+			await this.#gotTreeContext;
+
+			if (isActive) {
+				this.treeContext?.activeManager.setActive(path);
+			} else {
+				// If this is the current, then remove it:
+				// This is a hack, where we are assuming that another active item would have made its entrance and replaced the 'active' within 2 second. [NL]
+				// The problem is that it may take some time before an item appears in the tree and communicates that its active.
+				// And in the meantime the removal of this would have resulted in the parent closing. And since we don't use Active state to open the tree, then we have a problem.
+				debounce(() => this.treeContext?.activeManager.removeActiveIfMatch(path), 1000);
+			}
 		}
 		this.#isActive.setValue(isActive);
-	}
+	};
+
+	#debouncedCheckIsActive = debounce(this.#checkIsActive, 100);
 
 	// TODO: use router context
 	constructPath(pathname: string, entityType: string, unique: string | null) {
