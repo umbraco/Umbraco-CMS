@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.DistributedJobs;
 /// <summary>
 /// Port of the OpenIddict Quartz job for cleaning up - see https://github.com/openiddict/openiddict-core/tree/dev/src/OpenIddict.Quartz
 /// </summary>
-internal class OpenIddictCleanupJob : IDistributedBackgroundJob
+public class OpenIddictCleanupJob : IDistributedBackgroundJob
 {
     /// <inheritdoc />
     public string Name => "OpenIddictCleanupJob";
