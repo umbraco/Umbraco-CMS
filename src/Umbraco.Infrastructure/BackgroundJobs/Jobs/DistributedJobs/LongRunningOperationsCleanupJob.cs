@@ -3,12 +3,12 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 
-namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
+namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.DistributedJobs;
 
 /// <summary>
 /// Cleans up long-running operations that have exceeded a specified age.
 /// </summary>
-public class LongRunningOperationsCleanupJob : IRecurringBackgroundJob
+internal class LongRunningOperationsCleanupJob : IDistributedBackgroundJob
 {
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly ILongRunningOperationRepository _longRunningOperationRepository;
@@ -36,20 +36,13 @@ public class LongRunningOperationsCleanupJob : IRecurringBackgroundJob
     }
 
     /// <inheritdoc />
-    public event EventHandler? PeriodChanged
-    {
-        add { }
-        remove { }
-    }
+    public string Name => "LongRunningOperationsCleanupJob";
 
     /// <inheritdoc />
     public TimeSpan Period { get; }
 
-    /// <inheritdoc/>
-    public TimeSpan Delay { get; } = TimeSpan.FromSeconds(10);
-
     /// <inheritdoc />
-    public async Task RunJobAsync()
+    public async Task ExecuteAsync()
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
         await _longRunningOperationRepository.CleanOperationsAsync(_timeProvider.GetUtcNow() - _maxEntryAge);

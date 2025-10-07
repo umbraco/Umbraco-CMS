@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
+using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.DistributedJobs;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.BackgroundJobs.Jobs;
 
@@ -43,7 +44,7 @@ public class CacheInstructionsPruningJobTests
 
         var job = CreateCacheInstructionsPruningJob(timeToRetainInstructions: timeToRetainInstructions);
 
-        await job.RunJobAsync();
+        await job.ExecuteAsync();
 
         _cacheInstructionRepositoryMock.Verify(repo => repo.DeleteInstructionsOlderThan(expectedPruneDate), Times.Once);
     }
