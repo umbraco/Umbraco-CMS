@@ -4,7 +4,6 @@ import type {
 	UmbModalContext,
 	UmbModalManagerContext,
 	UmbModalToken,
-	UmbModalRouteHandler,
 } from '@umbraco-cms/backoffice/modal';
 import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
@@ -12,7 +11,6 @@ export type UmbModalRouteSetupArgs = {
 	router: IRouterSlot;
 	modalManagerContext: UmbModalManagerContext;
 	params: Params;
-	routeHandler: UmbModalRouteHandler;
 	routeContextToken: UmbContextToken<any>;
 };
 

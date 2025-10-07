@@ -8,7 +8,6 @@ import type {
 	UmbModalContext,
 	UmbModalContextClassArgs,
 	UmbModalManagerContext,
-	UmbModalRouteHandler,
 	UmbModalToken,
 } from '@umbraco-cms/backoffice/modal';
 import type { UmbControllerAlias, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -339,7 +338,6 @@ export class UmbModalRouteRegistrationController<
 				modal: {},
 				...modalData,
 				router: args.router,
-				routeHandler: args.routeHandler,
 				routeContextToken: args.routeContextToken,
 			} as UmbModalContextClassArgs<UmbModalToken<UmbModalTokenData, UmbModalTokenValue>>;
 			modalArgs.modal!.key = this.#key;

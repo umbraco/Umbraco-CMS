@@ -1,6 +1,5 @@
 import { UmbModalToken } from '../token/modal-token.js';
 import type { UmbModalConfig, UmbModalType } from '../types.js';
-import type { UmbModalRouteHandler } from './modal-route-handler.interface.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UUIModalElement, UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
@@ -27,7 +26,6 @@ export type UmbModalContextClassArgs<
 	data?: ModalAliasTypeAsToken['DATA'];
 	value?: ModalAliasTypeAsToken['VALUE'];
 	modal?: UmbModalConfig;
-	routeHandler?: UmbModalRouteHandler;
 	routeContextToken?: UmbContextToken<any>;
 };
 
@@ -58,7 +56,6 @@ export class UmbModalContext<
 	public readonly backdropBackground?: string;
 	public readonly router: IRouterSlot | null = null;
 	public readonly alias: string | UmbModalToken<ModalData, ModalValue>;
-	public readonly routeHandler?: UmbModalRouteHandler;
 	public readonly routeContextToken?: UmbContextToken<any>;
 
 	#value;
@@ -78,7 +75,6 @@ export class UmbModalContext<
 		this.key = args.modal?.key || UmbId.new();
 		this.router = args.router ?? null;
 		this.alias = modalAlias;
-		this.routeHandler = args.routeHandler;
 		this.routeContextToken = args.routeContextToken;
 
 		this.view = new UmbViewController(this, modalAlias.toString());
@@ -134,7 +130,10 @@ export class UmbModalContext<
 
 	// eslint-disable-next-line @typescript-eslint/naming-convention
 	async _internal_removeCurrentModal() {
-		this.routeHandler?.removeModalPath(this.#activeModalPath);
+		// Use dynamic import to avoid circular dependency
+		const { UMB_ROUTE_CONTEXT } = await import('@umbraco-cms/backoffice/router');
+		const routeContext = await this.getContext(UMB_ROUTE_CONTEXT);
+		routeContext?._internal_removeModalPath(this.#activeModalPath);
 	}
 
 	forceResolve() {
