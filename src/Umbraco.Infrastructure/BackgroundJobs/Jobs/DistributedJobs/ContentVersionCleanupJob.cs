@@ -3,12 +3,12 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
+namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.DistributedJobs;
 
 /// <summary>
 ///     Recurring hosted service that executes the content history cleanup.
 /// </summary>
-public class ContentVersionCleanupJob : IDistributedBackgroundJob
+internal class ContentVersionCleanupJob : IDistributedBackgroundJob
 {
     /// <inheritdoc />
     public string Name => "ContentVersionCleanupJob";

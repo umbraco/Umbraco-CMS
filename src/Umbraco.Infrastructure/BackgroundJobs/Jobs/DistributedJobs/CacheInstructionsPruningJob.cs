@@ -3,12 +3,12 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 
-namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
+namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.DistributedJobs;
 
 /// <summary>
 /// A background job that prunes cache instructions from the database.
 /// </summary>
-public class CacheInstructionsPruningJob : IDistributedBackgroundJob
+internal class CacheInstructionsPruningJob : IDistributedBackgroundJob
 {
     private readonly IOptions<GlobalSettings> _globalSettings;
     private readonly ICacheInstructionRepository _cacheInstructionRepository;

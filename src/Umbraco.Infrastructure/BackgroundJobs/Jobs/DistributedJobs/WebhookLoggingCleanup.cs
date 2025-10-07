@@ -7,12 +7,12 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
+namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.DistributedJobs;
 
 /// <summary>
 /// Daily background job that removes all webhook log data older than x days as defined by <see cref="WebhookSettings.KeepLogsForDays"/>
 /// </summary>
-public class WebhookLoggingCleanup : IDistributedBackgroundJob
+internal class WebhookLoggingCleanup : IDistributedBackgroundJob
 {
     private readonly ILogger<WebhookLoggingCleanup> _logger;
     private readonly WebhookSettings _webhookSettings;

@@ -3,12 +3,12 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 
-namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
+namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.DistributedJobs;
 
 /// <summary>
 /// Cleans up long-running operations that have exceeded a specified age.
 /// </summary>
-public class LongRunningOperationsCleanupJob : IDistributedBackgroundJob
+internal class LongRunningOperationsCleanupJob : IDistributedBackgroundJob
 {
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly ILongRunningOperationRepository _longRunningOperationRepository;

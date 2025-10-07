@@ -1,18 +1,18 @@
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
+namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.DistributedJobs;
 
 /// <summary>
 /// Cleans up temporary media files.
 /// </summary>
-public class TemporaryFileCleanupJob : IDistributedBackgroundJob
+internal class TemporaryFileCleanupJob : IDistributedBackgroundJob
 {
     /// <inheritdoc />
     public string Name => "TemporaryFileCleanupJob";
 
     /// <inheritdoc />
-    public TimeSpan Period { get => TimeSpan.FromMinutes(5); }
+    public TimeSpan Period => TimeSpan.FromMinutes(5);
 
     private readonly ILogger<TemporaryFileCleanupJob> _logger;
     private readonly ITemporaryFileService _service;

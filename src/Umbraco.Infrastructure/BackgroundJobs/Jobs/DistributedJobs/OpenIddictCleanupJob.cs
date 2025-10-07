@@ -2,19 +2,19 @@
 using Microsoft.Extensions.Logging;
 using OpenIddict.Abstractions;
 
-namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
+namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.DistributedJobs;
 
 
 /// <summary>
 /// Port of the OpenIddict Quartz job for cleaning up - see https://github.com/openiddict/openiddict-core/tree/dev/src/OpenIddict.Quartz
 /// </summary>
-public class OpenIddictCleanupJob : IDistributedBackgroundJob
+internal class OpenIddictCleanupJob : IDistributedBackgroundJob
 {
     /// <inheritdoc />
     public string Name => "OpenIddictCleanupJob";
 
     /// <inheritdoc />
-    public TimeSpan Period { get => TimeSpan.FromHours(1); }
+    public TimeSpan Period => TimeSpan.FromHours(1);
 
 
     // keep tokens and authorizations in the database for 7 days

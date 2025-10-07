@@ -1,24 +1,16 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.HealthChecks;
 using Umbraco.Cms.Core.HealthChecks.NotificationMethods;
 using Umbraco.Cms.Core.Logging;
-using Umbraco.Cms.Core.Runtime;
-using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Sync;
-using Umbraco.Cms.Infrastructure.BackgroundJobs;
-using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
+using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.DistributedJobs;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common;
 
@@ -96,7 +88,6 @@ public class HealthCheckNotifierJobTests
 
 
         var mockScopeProvider = new Mock<IScopeProvider>();
-        var mockLogger = new Mock<ILogger<HealthCheckNotifierJob>>();
         var mockProfilingLogger = new Mock<IProfilingLogger>();
 
         return new HealthCheckNotifierJob(
@@ -104,9 +95,7 @@ public class HealthCheckNotifierJobTests
             checks,
             notifications,
             mockScopeProvider.Object,
-            mockLogger.Object,
             mockProfilingLogger.Object,
-            Mock.Of<ICronTabParser>(),
             Mock.Of<IEventAggregator>());
     }
 

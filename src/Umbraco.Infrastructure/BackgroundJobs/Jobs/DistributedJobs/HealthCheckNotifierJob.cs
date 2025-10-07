@@ -1,9 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.HealthChecks;
@@ -12,19 +10,20 @@ using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Scoping;
 
-namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
+namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.DistributedJobs;
 
 /// <summary>
 ///     Hosted service implementation for recurring health check notifications.
 /// </summary>
-public class HealthCheckNotifierJob : IDistributedBackgroundJob
+internal class HealthCheckNotifierJob : IDistributedBackgroundJob
 {
     /// <inheritdoc />
     public string Name => "HealthCheckNotifierJob";
+
+    /// <inheritdoc/>
     public TimeSpan Period { get; private set; }
 
     private readonly HealthCheckCollection _healthChecks;
-    private readonly ILogger<HealthCheckNotifierJob> _logger;
     private readonly HealthCheckNotificationMethodCollection _notifications;
     private readonly IProfilingLogger _profilingLogger;
     private readonly IEventAggregator _eventAggregator;
@@ -47,16 +46,13 @@ public class HealthCheckNotifierJob : IDistributedBackgroundJob
         HealthCheckCollection healthChecks,
         HealthCheckNotificationMethodCollection notifications,
         ICoreScopeProvider scopeProvider,
-        ILogger<HealthCheckNotifierJob> logger,
         IProfilingLogger profilingLogger,
-        ICronTabParser cronTabParser,
         IEventAggregator eventAggregator)
     {
         _healthChecksSettings = healthChecksSettings.CurrentValue;
         _healthChecks = healthChecks;
         _notifications = notifications;
         _scopeProvider = scopeProvider;
-        _logger = logger;
         _profilingLogger = profilingLogger;
         _eventAggregator = eventAggregator;
 
@@ -70,6 +66,7 @@ public class HealthCheckNotifierJob : IDistributedBackgroundJob
         });
     }
 
+    /// <inheritdoc/>
     public async Task RunJobAsync()
     {
         if (_healthChecksSettings.Notification.Enabled == false)

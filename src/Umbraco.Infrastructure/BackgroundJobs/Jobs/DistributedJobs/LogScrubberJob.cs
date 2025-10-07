@@ -1,14 +1,13 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
+namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.DistributedJobs;
 
 /// <summary>
 ///     Log scrubbing hosted service.
@@ -16,10 +15,9 @@ namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
 /// <remarks>
 ///     Will only run on non-replica servers.
 /// </remarks>
-public class LogScrubberJob : IDistributedBackgroundJob
+internal class LogScrubberJob : IDistributedBackgroundJob
 {
     private readonly IAuditService _auditService;
-    private readonly ILogger<LogScrubberJob> _logger;
     private readonly IProfilingLogger _profilingLogger;
     private readonly ICoreScopeProvider _scopeProvider;
     private LoggingSettings _settings;
@@ -27,6 +25,7 @@ public class LogScrubberJob : IDistributedBackgroundJob
     /// <inheritdoc />
     public string Name => "LogScrubberJob";
 
+    /// <inheritdoc />
     public TimeSpan Period => TimeSpan.FromHours(4);
 
     /// <summary>
@@ -41,21 +40,20 @@ public class LogScrubberJob : IDistributedBackgroundJob
         IAuditService auditService,
         IOptionsMonitor<LoggingSettings> settings,
         ICoreScopeProvider scopeProvider,
-        ILogger<LogScrubberJob> logger,
         IProfilingLogger profilingLogger)
     {
         _auditService = auditService;
         _settings = settings.CurrentValue;
         _scopeProvider = scopeProvider;
-        _logger = logger;
         _profilingLogger = profilingLogger;
         settings.OnChange(x => _settings = x);
     }
 
+    /// <inheritdoc/>
     public async Task RunJobAsync()
     {
         // Ensure we use an explicit scope since we are running on a background thread.
-        using (ICoreScope scope = _scopeProvider.CreateCoreScope())
+        using ICoreScope scope = _scopeProvider.CreateCoreScope();
         using (_profilingLogger.DebugDuration<LogScrubberJob>("Log scrubbing executing", "Log scrubbing complete"))
         {
             await _auditService.CleanLogsAsync((int)_settings.MaxLogAge.TotalMinutes);

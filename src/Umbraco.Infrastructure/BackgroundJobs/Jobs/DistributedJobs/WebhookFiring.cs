@@ -8,12 +8,12 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
+namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.DistributedJobs;
 
 /// <summary>
 /// Fires pending webhooks.
 /// </summary>
-public class WebhookFiring : IDistributedBackgroundJob
+internal class WebhookFiring : IDistributedBackgroundJob
 {
     private readonly ILogger<WebhookFiring> _logger;
     private readonly IWebhookRequestService _webhookRequestService;
@@ -30,6 +30,17 @@ public class WebhookFiring : IDistributedBackgroundJob
     /// <inheritdoc />
     public TimeSpan Period => _webhookSettings.Period;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="WebhookFiring"/> class.
+    /// </summary>
+    /// <param name="logger"></param>
+    /// <param name="webhookRequestService"></param>
+    /// <param name="webhookLogFactory"></param>
+    /// <param name="webhookLogService"></param>
+    /// <param name="webHookService"></param>
+    /// <param name="webhookSettings"></param>
+    /// <param name="coreScopeProvider"></param>
+    /// <param name="httpClientFactory"></param>
     public WebhookFiring(
         ILogger<WebhookFiring> logger,
         IWebhookRequestService webhookRequestService,
@@ -51,6 +62,7 @@ public class WebhookFiring : IDistributedBackgroundJob
         webhookSettings.OnChange(x => _webhookSettings = x);
     }
 
+    /// <inheritdoc />
     public async Task RunJobAsync()
     {
         if (_webhookSettings.Enabled is false)

@@ -3,13 +3,12 @@
 
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Web;
 
-namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
+namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.DistributedJobs;
 
 /// <summary>
 ///     Hosted service implementation for scheduled publishing feature.
@@ -17,13 +16,13 @@ namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
 /// <remarks>
 ///     Runs only on non-replica servers.
 /// </remarks>
-public class ScheduledPublishingJob : IDistributedBackgroundJob
+internal class ScheduledPublishingJob : IDistributedBackgroundJob
 {
     /// <inheritdoc />
     public string Name => "ScheduledPublishingJob";
 
     /// <inheritdoc />
-    public TimeSpan Period { get => TimeSpan.FromMinutes(1); }
+    public TimeSpan Period => TimeSpan.FromMinutes(1);
 
 
     private readonly IContentService _contentService;
