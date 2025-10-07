@@ -243,7 +243,6 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 	#renderMemberTypeOptions() {
 		if (this._entityType !== 'member-type') return nothing;
 		return html` <uui-box class="uui-text">
-			<umb-localize key="" slot="headline">Member type options</umb-localize>
 			<div class="options">
 				<umb-property-layout orientation="vertical">
 					<uui-toggle
