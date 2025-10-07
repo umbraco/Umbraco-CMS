@@ -1,1 +1,6 @@
-export type UmbSliderPropertyEditorUiValue = { from: number; to: number } | undefined;
+export interface UmbSliderPropertyEditorUiValueObject {
+	from: number;
+	to: number;
+}
+
+export type UmbSliderPropertyEditorUiValue = UmbSliderPropertyEditorUiValueObject | undefined;
