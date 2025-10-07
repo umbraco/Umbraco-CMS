@@ -21,6 +21,7 @@ export class UmbDocumentItemDataResolver<
 
 	public readonly unique = this.#data.asObservablePart((x) => x?.unique);
 	public readonly icon = this.#data.asObservablePart((x) => x?.documentType.icon);
+	public readonly typeUnique = this.#data.asObservablePart((x) => x?.documentType.unique);
 	public readonly isTrashed = this.#data.asObservablePart((x) => x?.isTrashed);
 	public readonly hasCollection = this.#data.asObservablePart((x) => !!x?.documentType.collection);
 

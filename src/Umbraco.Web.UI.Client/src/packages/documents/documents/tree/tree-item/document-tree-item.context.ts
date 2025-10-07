@@ -17,6 +17,7 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 
 	readonly name = this.#item.name;
 	readonly icon = this.#item.icon;
+	readonly typeUnique = this.#item.typeUnique;
 	readonly isDraft = this.#item.isDraft;
 	readonly hasCollection = this.#item.hasCollection;
 	public readonly hasChildrenOrCollection = mergeObservables(
