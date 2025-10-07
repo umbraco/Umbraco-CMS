@@ -7,8 +7,13 @@ class UmbUfmTruncateFilterApi extends UmbUfmFilterBase {
 		if (tail === 'true') tail = '…';
 		tail = !tail && tail !== '' ? '…' : tail;
 
+		// Only add ellipsis if the string was actually truncated
+		if (str.length <= length) {
+			return str;
+		}
 		return str.slice(0, length).trim() + tail;
 	}
 }
 
 export { UmbUfmTruncateFilterApi as api };
+export { UmbUfmTruncateFilterApi };
