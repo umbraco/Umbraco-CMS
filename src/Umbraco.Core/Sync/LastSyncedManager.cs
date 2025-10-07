@@ -1,4 +1,5 @@
-﻿using Umbraco.Cms.Core.Persistence.Repositories;
+﻿using System.ComponentModel;
+using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 
 namespace Umbraco.Cms.Core.Sync;
@@ -81,5 +82,13 @@ internal sealed class LastSyncedManager : ILastSyncedManager
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         await _lastSyncedRepository.DeleteEntriesOlderThanAsync(date);
         scope.Complete();
+    }
+
+    // Used for testing purposes only
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    internal void ClearLocalCache()
+    {
+        _lastSyncedInternalId = null;
+        _lastSyncedExternalId = null;
     }
 }
