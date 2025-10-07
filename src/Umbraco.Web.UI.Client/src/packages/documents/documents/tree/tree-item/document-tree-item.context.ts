@@ -27,6 +27,7 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 		},
 	);
 
+	// TODO: Move to API
 	readonly ancestors = this._treeItem.asObservablePart((item) => item?.ancestors ?? []);
 	readonly isTrashed = this._treeItem.asObservablePart((item) => item?.isTrashed ?? false);
 
@@ -39,6 +40,16 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 				(hasCollection) => {
 					if (hasCollection) {
 						this._treeItemChildrenManager.setTargetTakeSize(2, 2);
+
+						this.observe(
+							this.hasActiveDescendant,
+							(active) => {
+								if (active === false) {
+									super.hideChildren();
+								}
+							},
+							'observeCollectionHasActiveDescendant',
+						);
 					}
 				},
 				'_whenMenuObserveHasCollection',

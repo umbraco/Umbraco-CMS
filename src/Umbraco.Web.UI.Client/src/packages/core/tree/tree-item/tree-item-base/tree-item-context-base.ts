@@ -24,6 +24,7 @@ export abstract class UmbTreeItemContextBase<
 	extends UmbContextBase
 	implements UmbTreeItemContext<TreeItemType>
 {
+	#gotTreeContext!: Promise<unknown>;
 	public unique?: UmbEntityUnique;
 	public entityType?: string;
 
@@ -73,6 +74,9 @@ export abstract class UmbTreeItemContextBase<
 
 	#parentContext = new UmbParentEntityContext(this);
 
+	#hasActiveDescendant = new UmbBooleanState(undefined);
+	public readonly hasActiveDescendant = this.#hasActiveDescendant.asObservable();
+
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_TREE_ITEM_CONTEXT);
 		// TODO: Get take size from Tree context
@@ -101,6 +105,16 @@ export abstract class UmbTreeItemContextBase<
 	 */
 	public getPath() {
 		return this.#path.getValue();
+	}
+
+	/**
+	 * Returns the ascending items of this tree item
+	 * @returns {Array<UmbEntityModel>}
+	 * @memberof UmbTreeItemContextBase
+	 */
+	public getAscending(): Array<UmbEntityModel> {
+		// This should be supported for all trees.
+		return (this._treeItem.getValue() as any)?.ancestors as Array<UmbEntityModel>;
 	}
 
 	/**
@@ -254,12 +268,13 @@ export abstract class UmbTreeItemContextBase<
 			this.#sectionSidebarContext = instance;
 		});
 
-		this.consumeContext(UMB_TREE_CONTEXT, (treeContext) => {
+		this.#gotTreeContext = this.consumeContext(UMB_TREE_CONTEXT, (treeContext) => {
 			this.treeContext = treeContext;
 			this.#observeIsSelectable();
 			this.#observeIsSelected();
 			this.#observeFoldersOnly();
-		});
+			this.#observeActive();
+		}).asPromise();
 	}
 
 	getTreeItem() {
@@ -308,6 +323,23 @@ export abstract class UmbTreeItemContextBase<
 		);
 	}
 
+	#observeActive() {
+		if (this.unique === undefined || this.entityType === undefined) return;
+
+		const entity = { entityType: this.entityType, unique: this.unique };
+		this.observe(
+			this.treeContext?.activeManager.hasActiveDescendants(entity),
+			(hasActiveDescendant) => {
+				if (this.#hasActiveDescendant.getValue() === undefined && hasActiveDescendant === false) {
+					return;
+				}
+
+				this.#hasActiveDescendant.setValue(hasActiveDescendant);
+			},
+			'observeActiveDescendant',
+		);
+	}
+
 	#observeSectionPath() {
 		this.observe(
 			this.#sectionContext?.pathname,
@@ -323,7 +355,7 @@ export abstract class UmbTreeItemContextBase<
 
 	#debouncedCheckIsActive = debounce(() => this.#checkIsActive(), 100);
 
-	#checkIsActive() {
+	async #checkIsActive() {
 		// don't set the active state if the item is selectable
 		const isSelectable = this.#isSelectable.getValue();
 
@@ -338,6 +370,24 @@ export abstract class UmbTreeItemContextBase<
 		const location = ensureSlash(window.location.pathname);
 		const comparePath = ensureSlash(this.#path.getValue());
 		const isActive = location.includes(comparePath);
+
+		if (this.#isActive.getValue() === isActive) return;
+		if (!this.entityType || this.unique === undefined) {
+			throw new Error('Could not check active state, entity type or unique is missing');
+		}
+		const path = [...this.getAscending(), { entityType: this.entityType, unique: this.unique }];
+
+		await this.#gotTreeContext;
+
+		if (isActive) {
+			this.treeContext?.activeManager.setActive(path);
+		} else {
+			// If this is the current, then remove it:
+			// This is a hack, where we are assuming that another active item would have made its entrance and replaced the 'active' within 2 second. [NL]
+			// The problem is that it may take some time before an item appears in the tree and communicates that its active.
+			// And in the meantime the removal of this would have resulted in the parent closing. And since we don't use Active state to open the tree, then we have a problem.
+			debounce(() => this.treeContext?.activeManager.removeActiveIfMatch(path), 1000);
+		}
 		this.#isActive.setValue(isActive);
 	}
 

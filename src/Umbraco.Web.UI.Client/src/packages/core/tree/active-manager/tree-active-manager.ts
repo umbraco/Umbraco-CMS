@@ -21,7 +21,7 @@ export class UmbTreeItemActiveManager extends UmbControllerBase {
 	isActive(entity: UmbEntityModel): Observable<boolean> {
 		return this.#active.asObservablePart((entities) => {
 			const index = entities.findIndex((e) => e.entityType === entity.entityType && e.unique === entity.unique);
-			return index > -1 && index < entities.length - 1;
+			return index === entities.length;
 		});
 	}
 
@@ -33,12 +33,8 @@ export class UmbTreeItemActiveManager extends UmbControllerBase {
 	 */
 	hasActiveDescendants(entity: UmbEntityModel): Observable<boolean> {
 		return this.#active.asObservablePart((entities) => {
-			console.log('hasActiveDescendants', entities);
 			const index = entities.findIndex((e) => e.entityType === entity.entityType && e.unique === entity.unique);
-			if (entity.unique === '1a54b053-02f6-4b76-8fb9-c32063b841ad') {
-				console.log('index', index, entities.length);
-			}
-			return index > -1 && index < entities.length - 2;
+			return index > -1 && index < entities.length - 1;
 		});
 	}
 	/**
@@ -58,7 +54,6 @@ export class UmbTreeItemActiveManager extends UmbControllerBase {
 	 * @returns {void}
 	 */
 	setActive(activeChain: Array<UmbEntityModel>): void {
-		console.log('set chain', activeChain);
 		this.#active.setValue(activeChain);
 	}
 
@@ -82,7 +77,7 @@ export class UmbTreeItemActiveManager extends UmbControllerBase {
 				return;
 			}
 		}
-		console.log('remove chain—————');
+		// TODO: Problem!!!! we are removing the active state, but something is loading that wants to add it...
 		// then we can remove it all:
 		this.#active.setValue([]);
 	}
