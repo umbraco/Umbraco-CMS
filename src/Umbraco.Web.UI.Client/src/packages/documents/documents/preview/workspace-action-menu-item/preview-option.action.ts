@@ -1,9 +1,9 @@
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../workspace/document-workspace.context-token.js';
-import type { ManifestWorkspaceActionMenuItemUrlProviderKind } from './url-provider.workspace-action-menu-item.extension.js';
+import type { ManifestWorkspaceActionMenuItemPreviewOptionKind } from './preview-option.workspace-action-menu-item.extension.js';
 import { UmbWorkspaceActionBase } from '@umbraco-cms/backoffice/workspace';
 
 export class UmbDocumentSaveAndPreviewWorkspaceAction extends UmbWorkspaceActionBase {
-	manifest?: ManifestWorkspaceActionMenuItemUrlProviderKind;
+	manifest?: ManifestWorkspaceActionMenuItemPreviewOptionKind;
 
 	override async execute() {
 		const workspaceContext = await this.getContext(UMB_DOCUMENT_WORKSPACE_CONTEXT);

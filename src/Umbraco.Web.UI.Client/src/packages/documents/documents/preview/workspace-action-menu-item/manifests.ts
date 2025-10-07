@@ -1,11 +1,11 @@
-import { manifest as workspaceActionItemKind } from './url-provider.workspace-action-item.kind.js';
+import { manifest as workspaceActionItemKind } from './preview-option.workspace-action-item.kind.js';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 const saveAndPreview: UmbExtensionManifest = {
 	type: 'workspaceActionMenuItem',
-	kind: 'urlProvider',
+	kind: 'previewOption',
 	alias: 'Umb.Document.WorkspaceActionMenuItem.SaveAndPreview',
-	name: 'Save And Preview Document URL Provider Workspace Action Menu Item',
+	name: 'Save And Preview Document Preview Option',
 	forWorkspaceActions: 'Umb.WorkspaceAction.Document.SaveAndPreview',
 	urlProviderAlias: 'umbDocumentUrlProvider',
 	weight: 100,
