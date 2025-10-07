@@ -1,1 +1,1 @@
-export type * from './url-provider.workspace-action-menu-item.extension.js';
+export type * from './preview-option.workspace-action-menu-item.extension.js';

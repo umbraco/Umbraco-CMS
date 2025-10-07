@@ -3,16 +3,16 @@ import type {
 	MetaWorkspaceActionMenuItemDefaultKind,
 } from '@umbraco-cms/backoffice/workspace';
 
-export interface ManifestWorkspaceActionMenuItemUrlProviderKind<
+export interface ManifestWorkspaceActionMenuItemPreviewOptionKind<
 	MetaType extends MetaWorkspaceActionMenuItemDefaultKind = MetaWorkspaceActionMenuItemDefaultKind,
 > extends ManifestWorkspaceActionMenuItem<MetaType> {
 	type: 'workspaceActionMenuItem';
-	kind: 'urlProvider';
+	kind: 'previewOption';
 	urlProviderAlias: string;
 }
 
 declare global {
 	interface UmbExtensionManifestMap {
-		umbWorkspaceActionMenuItemUrlProviderKind: ManifestWorkspaceActionMenuItemUrlProviderKind;
+		umbWorkspaceActionMenuItemPreviewOptionKind: ManifestWorkspaceActionMenuItemPreviewOptionKind;
 	}
 }
