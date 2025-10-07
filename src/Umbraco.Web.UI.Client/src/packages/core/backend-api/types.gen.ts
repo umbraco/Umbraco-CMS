@@ -412,7 +412,7 @@ export type CreateUserGroupRequestModel = {
     mediaStartNode?: ReferenceByIdModel | null;
     mediaRootAccess: boolean;
     fallbackPermissions: Array<string>;
-    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | DocumentTypePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
+    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
     id?: string | null;
 };
 
@@ -471,7 +471,7 @@ export type CurrentUserResponseModel = {
     hasAccessToAllLanguages: boolean;
     hasAccessToSensitiveData: boolean;
     fallbackPermissions: Array<string>;
-    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | DocumentTypePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
+    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
     allowedSections: Array<string>;
     isAdmin: boolean;
 };
@@ -789,12 +789,6 @@ export type DocumentTypeItemResponseModel = {
     isElement: boolean;
     icon?: string | null;
     description?: string | null;
-};
-
-export type DocumentTypePermissionPresentationModel = {
-    $type: string;
-    verbs: Array<string>;
-    documentTypeAlias: string;
 };
 
 export type DocumentTypePropertyTypeContainerResponseModel = {
@@ -2395,6 +2389,12 @@ export type SubsetDocumentBlueprintTreeItemResponseModel = {
     items: Array<DocumentBlueprintTreeItemResponseModel>;
 };
 
+export type SubsetDocumentRecycleBinItemResponseModel = {
+    totalBefore: number;
+    totalAfter: number;
+    items: Array<DocumentRecycleBinItemResponseModel>;
+};
+
 export type SubsetDocumentTreeItemResponseModel = {
     totalBefore: number;
     totalAfter: number;
@@ -2407,6 +2407,18 @@ export type SubsetDocumentTypeTreeItemResponseModel = {
     items: Array<DocumentTypeTreeItemResponseModel>;
 };
 
+export type SubsetFileSystemTreeItemPresentationModel = {
+    totalBefore: number;
+    totalAfter: number;
+    items: Array<FileSystemTreeItemPresentationModel>;
+};
+
+export type SubsetMediaRecycleBinItemResponseModel = {
+    totalBefore: number;
+    totalAfter: number;
+    items: Array<MediaRecycleBinItemResponseModel>;
+};
+
 export type SubsetMediaTreeItemResponseModel = {
     totalBefore: number;
     totalAfter: number;
@@ -2417,6 +2429,12 @@ export type SubsetMediaTypeTreeItemResponseModel = {
     totalBefore: number;
     totalAfter: number;
     items: Array<MediaTypeTreeItemResponseModel>;
+};
+
+export type SubsetMemberTypeTreeItemResponseModel = {
+    totalBefore: number;
+    totalAfter: number;
+    items: Array<MemberTypeTreeItemResponseModel>;
 };
 
 export type SubsetNamedEntityTreeItemResponseModel = {
@@ -2804,7 +2822,7 @@ export type UpdateUserGroupRequestModel = {
     mediaStartNode?: ReferenceByIdModel | null;
     mediaRootAccess: boolean;
     fallbackPermissions: Array<string>;
-    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | DocumentTypePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
+    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
 };
 
 export type UpdateUserGroupsOnUserRequestModel = {
@@ -2905,7 +2923,7 @@ export type UserGroupResponseModel = {
     mediaStartNode?: ReferenceByIdModel | null;
     mediaRootAccess: boolean;
     fallbackPermissions: Array<string>;
-    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | DocumentTypePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
+    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
     id: string;
     isDeletable: boolean;
     aliasCanBeChanged: boolean;
@@ -7196,6 +7214,38 @@ export type GetRecycleBinDocumentRootResponses = {
 
 export type GetRecycleBinDocumentRootResponse = GetRecycleBinDocumentRootResponses[keyof GetRecycleBinDocumentRootResponses];
 
+export type GetRecycleBinDocumentSiblingsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        target?: string;
+        before?: number;
+        after?: number;
+        dataTypeId?: string;
+    };
+    url: '/umbraco/management/api/v1/recycle-bin/document/siblings';
+};
+
+export type GetRecycleBinDocumentSiblingsErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetRecycleBinDocumentSiblingsResponses = {
+    /**
+     * OK
+     */
+    200: SubsetDocumentRecycleBinItemResponseModel;
+};
+
+export type GetRecycleBinDocumentSiblingsResponse = GetRecycleBinDocumentSiblingsResponses[keyof GetRecycleBinDocumentSiblingsResponses];
+
 export type GetTreeDocumentAncestorsData = {
     body?: never;
     path?: never;
@@ -10059,6 +10109,38 @@ export type GetRecycleBinMediaRootResponses = {
 
 export type GetRecycleBinMediaRootResponse = GetRecycleBinMediaRootResponses[keyof GetRecycleBinMediaRootResponses];
 
+export type GetRecycleBinMediaSiblingsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        target?: string;
+        before?: number;
+        after?: number;
+        dataTypeId?: string;
+    };
+    url: '/umbraco/management/api/v1/recycle-bin/media/siblings';
+};
+
+export type GetRecycleBinMediaSiblingsErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetRecycleBinMediaSiblingsResponses = {
+    /**
+     * OK
+     */
+    200: SubsetMediaRecycleBinItemResponseModel;
+};
+
+export type GetRecycleBinMediaSiblingsResponse = GetRecycleBinMediaSiblingsResponses[keyof GetRecycleBinMediaSiblingsResponses];
+
 export type GetTreeMediaAncestorsData = {
     body?: never;
     path?: never;
@@ -10757,6 +10839,37 @@ export type GetTreeMemberTypeRootResponses = {
 };
 
 export type GetTreeMemberTypeRootResponse = GetTreeMemberTypeRootResponses[keyof GetTreeMemberTypeRootResponses];
+
+export type GetTreeMemberTypeSiblingsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        target?: string;
+        before?: number;
+        after?: number;
+    };
+    url: '/umbraco/management/api/v1/tree/member-type/siblings';
+};
+
+export type GetTreeMemberTypeSiblingsErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetTreeMemberTypeSiblingsResponses = {
+    /**
+     * OK
+     */
+    200: SubsetMemberTypeTreeItemResponseModel;
+};
+
+export type GetTreeMemberTypeSiblingsResponse = GetTreeMemberTypeSiblingsResponses[keyof GetTreeMemberTypeSiblingsResponses];
 
 export type GetFilterMemberData = {
     body?: never;
@@ -12097,6 +12210,37 @@ export type GetTreePartialViewRootResponses = {
 
 export type GetTreePartialViewRootResponse = GetTreePartialViewRootResponses[keyof GetTreePartialViewRootResponses];
 
+export type GetTreePartialViewSiblingsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        path?: string;
+        before?: number;
+        after?: number;
+    };
+    url: '/umbraco/management/api/v1/tree/partial-view/siblings';
+};
+
+export type GetTreePartialViewSiblingsErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetTreePartialViewSiblingsResponses = {
+    /**
+     * OK
+     */
+    200: SubsetFileSystemTreeItemPresentationModel;
+};
+
+export type GetTreePartialViewSiblingsResponse = GetTreePartialViewSiblingsResponses[keyof GetTreePartialViewSiblingsResponses];
+
 export type DeletePreviewData = {
     body?: never;
     path?: never;
@@ -12966,6 +13110,37 @@ export type GetTreeScriptRootResponses = {
 
 export type GetTreeScriptRootResponse = GetTreeScriptRootResponses[keyof GetTreeScriptRootResponses];
 
+export type GetTreeScriptSiblingsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        path?: string;
+        before?: number;
+        after?: number;
+    };
+    url: '/umbraco/management/api/v1/tree/script/siblings';
+};
+
+export type GetTreeScriptSiblingsErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetTreeScriptSiblingsResponses = {
+    /**
+     * OK
+     */
+    200: SubsetFileSystemTreeItemPresentationModel;
+};
+
+export type GetTreeScriptSiblingsResponse = GetTreeScriptSiblingsResponses[keyof GetTreeScriptSiblingsResponses];
+
 export type GetSearcherData = {
     body?: never;
     path?: never;
@@ -13803,6 +13978,37 @@ export type GetTreeStylesheetRootResponses = {
 
 export type GetTreeStylesheetRootResponse = GetTreeStylesheetRootResponses[keyof GetTreeStylesheetRootResponses];
 
+export type GetTreeStylesheetSiblingsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        path?: string;
+        before?: number;
+        after?: number;
+    };
+    url: '/umbraco/management/api/v1/tree/stylesheet/siblings';
+};
+
+export type GetTreeStylesheetSiblingsErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetTreeStylesheetSiblingsResponses = {
+    /**
+     * OK
+     */
+    200: SubsetFileSystemTreeItemPresentationModel;
+};
+
+export type GetTreeStylesheetSiblingsResponse = GetTreeStylesheetSiblingsResponses[keyof GetTreeStylesheetSiblingsResponses];
+
 export type GetTagData = {
     body?: never;
     path?: never;
@@ -14591,6 +14797,39 @@ export type PutUserDataErrors = {
 export type PutUserDataError = PutUserDataErrors[keyof PutUserDataErrors];
 
 export type PutUserDataResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type DeleteUserDataByIdData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/user-data/{id}';
+};
+
+export type DeleteUserDataByIdErrors = {
+    /**
+     * Bad Request
+     */
+    400: UserDataOperationStatusModel;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * Not Found
+     */
+    404: UserDataOperationStatusModel;
+};
+
+export type DeleteUserDataByIdError = DeleteUserDataByIdErrors[keyof DeleteUserDataByIdErrors];
+
+export type DeleteUserDataByIdResponses = {
     /**
      * OK
      */
