@@ -113,6 +113,7 @@ export class UmbDefaultCollectionContext<
 	}
 
 	setupView(viewElement: UmbControllerHost) {
+		// TODO: Consider to remove this one as well:
 		new UmbModalRouteRegistrationController(viewElement, UMB_WORKSPACE_MODAL)
 			.addAdditionalPath('entity/:entityType')
 			.onSetup((params) => {

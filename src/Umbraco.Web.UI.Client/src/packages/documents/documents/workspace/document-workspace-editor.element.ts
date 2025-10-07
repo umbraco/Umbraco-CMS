@@ -25,6 +25,9 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 	@state()
 	private _routes?: Array<UmbRoute>;
 
+	@state()
+	private _loading?: boolean = true;
+
 	constructor() {
 		super();
 
@@ -55,11 +58,19 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 				},
 				'_observeForbidden',
 			);
+
+			this.observe(
+				this.#workspaceContext?.loading.isOn,
+				(loading) => {
+					this._loading = loading ?? false;
+				},
+				'_observeLoading',
+			);
 		});
 	}
 
 	#generateRoutes() {
-		if (!this.#variants || !this.#appCulture) {
+		if (!this.#variants || this.#variants.length === 0 || !this.#appCulture) {
 			this._routes = [];
 			return;
 		}
@@ -145,9 +156,9 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 	};
 
 	override render() {
-		return this._routes
+		return !this._loading && this._routes
 			? html`<umb-router-slot .routes=${this._routes} @init=${this._gotWorkspaceRoute}></umb-router-slot>`
-			: '';
+			: html`<umb-view-loader></umb-view-loader>`;
 	}
 
 	static override styles = [
