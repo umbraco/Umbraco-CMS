@@ -186,7 +186,7 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 			<uui-box class="uui-text">
 				<umb-property-layout label=${this.localize.term('general_name')} orientation="vertical" mandatory>
 					<umb-input-with-alias
-						id="name-alias"
+						id="name-input"
 						data-mark="input:entity-name"
 						name="name"
 						slot="editor"
