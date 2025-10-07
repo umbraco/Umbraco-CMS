@@ -2382,7 +2382,7 @@ internal sealed class DatabaseDataCreator
     private void CreateDistributedJobData()
     {
         _database.Insert(Constants.DatabaseSchema.Tables.DistributedJob, "id", true, new DistributedJobDto { Name = "OpenIddictCleanupJob", Period = 36000000000, LastRun = DateTime.UtcNow, IsRunning = false, LastAttemptedRun = DateTime.UtcNow });
-        _database.Insert(Constants.DatabaseSchema.Tables.DistributedJob, "id", true, new DistributedJobDto { Name = "Webhook Firing", Period = 100000000, LastRun = DateTime.UtcNow, IsRunning = false, LastAttemptedRun = DateTime.UtcNow });
+        _database.Insert(Constants.DatabaseSchema.Tables.DistributedJob, "id", true, new DistributedJobDto { Name = "WebhookFiring", Period = 100000000, LastRun = DateTime.UtcNow, IsRunning = false, LastAttemptedRun = DateTime.UtcNow });
         _database.Insert(Constants.DatabaseSchema.Tables.DistributedJob, "id", true, new DistributedJobDto { Name = "ContentVersionCleanupJob", Period = 36000000000, LastRun = DateTime.UtcNow, IsRunning = false, LastAttemptedRun = DateTime.UtcNow });
         _database.Insert(Constants.DatabaseSchema.Tables.DistributedJob, "id", true, new DistributedJobDto { Name = "HealthCheckNotifierJob", Period = 864000000000, LastRun = DateTime.UtcNow, IsRunning = false, LastAttemptedRun = DateTime.UtcNow });
         _database.Insert(Constants.DatabaseSchema.Tables.DistributedJob, "id", true, new DistributedJobDto { Name = "LogScrubberJob", Period = 144000000000, LastRun = DateTime.UtcNow, IsRunning = false, LastAttemptedRun = DateTime.UtcNow });
