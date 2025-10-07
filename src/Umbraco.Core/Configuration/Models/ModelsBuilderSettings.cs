@@ -17,6 +17,7 @@ public class ModelsBuilderSettings
     internal const bool StaticAcceptUnsafeModelsDirectory = false;
     internal const int StaticDebugLevel = 0;
     internal const bool StaticIncludeVersionNumberInGeneratedModels = true;
+    internal const bool StaticGenerateVirtualProperties = true;
     private bool _flagOutOfDateModels = true;
 
     /// <summary>
@@ -77,4 +78,13 @@ public class ModelsBuilderSettings
     /// </remarks>
     [DefaultValue(StaticIncludeVersionNumberInGeneratedModels)]
     public bool IncludeVersionNumberInGeneratedModels { get; set; } = StaticIncludeVersionNumberInGeneratedModels;
+
+    /// <summary>
+    ///     Gets or sets a value indicating whether to mark all properties in the generated models as virtual.
+    /// </summary>
+    /// <remarks>
+    ///     Virtual properties will not work with Hot Reload when running dotnet watch.
+    /// </remarks>
+    [DefaultValue(StaticGenerateVirtualProperties)]
+    public bool GenerateVirtualProperties { get; set; } = StaticGenerateVirtualProperties;
 }
