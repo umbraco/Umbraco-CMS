@@ -409,14 +409,14 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         Sql<ISqlContext> sql;
         try
         {
-            groupKeys = BatchFetch<UserGroupDto>(
-                userIds,
-                batch => SqlContext.Sql()
-                        .Select<UserGroupDto>(x => x.Id, x => x.Key)
-                        .From<UserGroupDto>()
-                        .InnerJoin<User2UserGroupDto>().On<UserGroupDto, User2UserGroupDto>((left, right) => left.Id == right.UserGroupId)
-                        .WhereIn<User2UserGroupDto>(x => x.UserId, batch),
-                Database).Select(x => x.Key).ToList();
+            groupKeys = Database.FetchByGroups<UserGroupDto, int>(userIds, Constants.Sql.MaxParameterCount, ints =>
+            {
+                return SqlContext.Sql()
+                    .Select<UserGroupDto>(x => x.Id, x => x.Key)
+                    .From<UserGroupDto>()
+                    .InnerJoin<User2UserGroupDto>().On<UserGroupDto, User2UserGroupDto>((left, right) => left.Id == right.UserGroupId)
+                    .WhereIn<User2UserGroupDto>(x => x.UserId, ints);
+            }).Select(x => x.Key).ToList();
         }
         catch (DbException)
         {
@@ -428,14 +428,15 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
 
         }
 
+
         // get users2groups
-        List<User2UserGroupDto>? user2Groups = BatchFetch<User2UserGroupDto>(
-            userIds,
-            batch => SqlContext.Sql()
-                    .Select<User2UserGroupDto>()
-                    .From<User2UserGroupDto>()
-                    .WhereIn<User2UserGroupDto>(x => x.UserId, batch),
-            Database);
+        List<User2UserGroupDto>? user2Groups = Database.FetchByGroups<User2UserGroupDto, int>(userIds, Constants.Sql.MaxParameterCount, ints =>
+        {
+            return SqlContext.Sql()
+                .Select<User2UserGroupDto>()
+                .From<User2UserGroupDto>()
+                .WhereIn<User2UserGroupDto>(x => x.UserId, ints);
+        }).ToList();
 
         if (groupIds.Any() is false)
         {
@@ -481,13 +482,13 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             .ToDictionary(x => x.Key, x => x);
 
         // get start nodes
-        List<UserStartNodeDto>? startNodes = BatchFetch<UserStartNodeDto>(
-            userIds,
-            batch => SqlContext.Sql()
-                    .Select<UserStartNodeDto>()
-                    .From<UserStartNodeDto>()
-                    .WhereIn<UserStartNodeDto>(x => x.UserId, batch),
-            Database);
+        List<UserStartNodeDto>? startNodes = Database.FetchByGroups<UserStartNodeDto, int>(userIds, Constants.Sql.MaxParameterCount, ints =>
+        {
+            return SqlContext.Sql()
+                .Select<UserStartNodeDto>()
+                .From<UserStartNodeDto>()
+                .WhereIn<UserStartNodeDto>(x => x.UserId, ints);
+        }).ToList();
 
         // get groups2languages
 
@@ -611,20 +612,6 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             }
         }
 
-    }
-
-    private static List<TDto> BatchFetch<TDto>(IEnumerable<int> userIds, Func<IEnumerable<int>, Sql> buildSql, IUmbracoDatabase database)
-    {
-        var results = new List<TDto>();
-
-        foreach (IEnumerable<int> batch in userIds.InGroupsOf(Constants.Sql.MaxParameterCount))
-        {
-            Sql sql = buildSql(batch);
-            List<TDto> fetched = database.Fetch<TDto>(sql);
-            results.AddRange(fetched);
-        }
-
-        return results;
     }
 
     #endregion
