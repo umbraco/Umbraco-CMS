@@ -8,7 +8,7 @@ public static partial class UmbracoBuilderExtensions
     /// <summary>
     /// Adds the necessary components to support isolated caches in a load balanced environment.
     /// </summary>
-    /// <remarks>This is require to load balance back office.</remarks>
+    /// <remarks>This is required to load balance back office.</remarks>
     public static IUmbracoBuilder LoadBalanceIsolatedCaches(this IUmbracoBuilder builder)
     {
         builder.Services.AddUnique<IRepositoryCacheVersionService, RepositoryCacheVersionService>();
