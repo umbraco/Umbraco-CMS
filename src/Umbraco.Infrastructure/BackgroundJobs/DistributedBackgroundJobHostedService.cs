@@ -17,7 +17,6 @@ public class DistributedBackgroundJobHostedService : BackgroundService
     private readonly ILogger<DistributedBackgroundJobHostedService> _logger;
     private readonly IRuntimeState _runtimeState;
     private readonly IDistributedJobService _distributedJobService;
-    private readonly IEnumerable<IDistributedBackgroundJob> _distributedBackgroundJobs;
     private DistributedJobSettings _distributedJobSettings;
 
     /// <summary>
@@ -26,19 +25,16 @@ public class DistributedBackgroundJobHostedService : BackgroundService
     /// <param name="logger"></param>
     /// <param name="runtimeState"></param>
     /// <param name="distributedJobService"></param>
-    /// <param name="distributedBackgroundJobs"></param>
     /// <param name="distributedJobSettings"></param>
     public DistributedBackgroundJobHostedService(
         ILogger<DistributedBackgroundJobHostedService> logger,
         IRuntimeState runtimeState,
         IDistributedJobService distributedJobService,
-        IEnumerable<IDistributedBackgroundJob> distributedBackgroundJobs,
         IOptionsMonitor<DistributedJobSettings> distributedJobSettings)
     {
         _logger = logger;
         _runtimeState = runtimeState;
         _distributedJobService = distributedJobService;
-        _distributedBackgroundJobs = distributedBackgroundJobs;
         _distributedJobSettings = distributedJobSettings.CurrentValue;
         distributedJobSettings.OnChange(options =>
         {
@@ -71,7 +67,7 @@ public class DistributedBackgroundJobHostedService : BackgroundService
     private async Task RunRunnableJob()
     {
         // Do not run distributed jobs if we aren't in Run level, as we might not have booted properly.
-        if(_runtimeState.Level != RuntimeLevel.Run)
+        if (_runtimeState.Level != RuntimeLevel.Run)
         {
             return;
         }
@@ -103,4 +99,5 @@ public class DistributedBackgroundJobHostedService : BackgroundService
                 _logger.LogError(ex, "An exception occurred while finishing distributed background job '{JobName}'.", job.Name);
             }
         }
+    }
 }
