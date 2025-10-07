@@ -1,7 +1,16 @@
 import type { UmbIconDefinition } from '../types.js';
 import { UMB_ICON_REGISTRY_CONTEXT } from '../icon-registry.context-token.js';
 import type { UmbIconPickerModalData, UmbIconPickerModalValue } from './icon-picker-modal.token.js';
-import { css, customElement, html, nothing, query, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	customElement,
+	html,
+	ifDefined,
+	nothing,
+	query,
+	repeat,
+	state,
+} from '@umbraco-cms/backoffice/external/lit';
 import { extractUmbColorVariable, umbracoColors } from '@umbraco-cms/backoffice/resources';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
@@ -20,12 +29,6 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 
 	@state()
 	private _colorList = umbracoColors.filter((color) => !color.legacy);
-
-	@state()
-	private _currentIcon?: string;
-
-	@state()
-	private _currentColor = 'text';
 
 	constructor() {
 		super();
@@ -47,35 +50,17 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 		}
 	}
 
-	override connectedCallback() {
-		super.connectedCallback();
-		this._iconsFiltered = this.#icons;
-
-		if (this.modalContext) {
-			this.observe(
-				this.modalContext?.value,
-				(newValue) => {
-					this._currentIcon = newValue?.icon;
-					this._currentColor = newValue?.color ?? 'text';
-				},
-				'_observeModalContextValue',
-			);
-		}
-	}
-
 	#changeIcon(e: InputEvent | KeyboardEvent, iconName: string) {
 		const isActivate = e.type === 'click' || (e.type === 'keyup' && (e as KeyboardEvent).key === 'Enter');
 		if (!isActivate) return;
 
-		const nextIcon = this._currentIcon === iconName ? '' : iconName;
-
+		const nextIcon = this.value.icon === iconName ? '' : iconName;
 		this.modalContext?.updateValue({ icon: nextIcon });
 	}
 
 	#onColorChange(e: UUIColorSwatchesEvent) {
 		const colorAlias = e.target.value;
 		this.modalContext?.updateValue({ color: colorAlias });
-		this._currentColor = colorAlias;
 	}
 
 	#clearIcon = () => {
@@ -83,14 +68,13 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 	};
 
 	override render() {
-		// TODO: Missing localization in general. [NL]
 		return html`
 			<umb-body-layout headline=${this.localize.term('defaultdialogs_selectIcon')}>
 				<div id="container">
 					${this.renderSearch()}
 					<hr />
 					<uui-color-swatches
-						.value=${this._currentColor}
+						value=${ifDefined(this.value.color)}
 						label=${this.localize.term('defaultdialogs_colorSwitcher')}
 						@change=${this.#onColorChange}>
 						${
@@ -110,14 +94,14 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 					<hr />
 					<uui-scroll-container id="icons">
 						<uui-button
-							class=${!this._currentIcon ? 'selected' : ''}
+							class=${!this.value.icon ? 'selected' : ''}
 							label=${this.localize.term('defaultdialogs_noIcon')}
 							title=${this.localize.term('defaultdialogs_noIcon')}
 							@click=${this.#clearIcon}
 							@keyup=${(e: KeyboardEvent) => {
 								if (e.key === 'Enter' || e.key === ' ') this.#clearIcon();
 							}}>
-							<uui-icon name="icon-block" style="opacity:.35"></uui-icon> </uui-button
+							<uui-icon style="opacity:.35" name=${ifDefined(this.data?.placeholder)}></uui-icon> </uui-button
 						>${this.renderIcons()}</uui-scroll-container
 					>
 				</div>
@@ -158,11 +142,11 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 						<uui-button
 							label=${icon.name}
 							title=${icon.name}
-							class=${icon.name === this._currentIcon ? 'selected' : ''}
+							class=${icon.name === this.value.icon ? 'selected' : ''}
 							@click=${(e: InputEvent) => this.#changeIcon(e, icon.name)}
 							@keyup=${(e: KeyboardEvent) => this.#changeIcon(e, icon.name)}>
 							<uui-icon
-								style="--uui-icon-color: var(${extractUmbColorVariable(this._currentColor)})"
+								style="--uui-icon-color: var(${extractUmbColorVariable(this.value.color ?? 'text')})"
 								name=${icon.name}></uui-icon>
 						</uui-button>
 					`,
@@ -211,6 +195,30 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 				max-height: 100%;
 				min-height: 0;
 				padding: 2px;
+			}
+
+			#icons uui-button .checker {
+				width: 24px;
+				height: 24px;
+				border-radius: 50%;
+				background:
+					linear-gradient(
+							45deg,
+							transparent 25%,
+							rgba(0, 0, 0, 0.06) 25% 50%,
+							transparent 50% 75%,
+							rgba(0, 0, 0, 0.06) 75%
+						)
+						0 0/10px 10px,
+					linear-gradient(
+							45deg,
+							transparent 25%,
+							rgba(0, 0, 0, 0.06) 25% 50%,
+							transparent 50% 75%,
+							rgba(0, 0, 0, 0.06) 75%
+						)
+						5px 5px/10px 10px;
+				opacity: 0.9;
 			}
 
 			#icons uui-button {
