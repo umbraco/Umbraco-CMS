@@ -84,8 +84,23 @@ public class DistributedBackgroundJobHostedService : BackgroundService
             return;
         }
 
-        await job.RunJobAsync();
-
-        await _distributedJobService.FinishAsync(job.Name);
-    }
+        try
+        {
+            await job.RunJobAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An exception occurred while running distributed background job '{JobName}'.", job.Name);
+        }
+        finally
+        {
+            try
+            {
+                await _distributedJobService.FinishAsync(job.Name);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An exception occurred while finishing distributed background job '{JobName}'.", job.Name);
+            }
+        }
 }
