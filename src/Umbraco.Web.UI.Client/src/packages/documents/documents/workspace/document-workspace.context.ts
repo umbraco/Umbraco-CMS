@@ -314,6 +314,7 @@ export class UmbDocumentWorkspaceContext
 
 		if (previewUrlData.message) {
 			umbPeekError(this._host, { color: 'danger', headline: 'Preview error', message: previewUrlData.message });
+			throw new Error(previewUrlData.message);
 		}
 	}
 
