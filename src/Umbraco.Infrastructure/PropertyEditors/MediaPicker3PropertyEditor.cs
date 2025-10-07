@@ -402,6 +402,8 @@ public class MediaPicker3PropertyEditor : DataEditor
         /// </summary>
         internal sealed class AllowedTypeValidator : ITypedJsonValidator<List<MediaWithCropsDto>, MediaPicker3Configuration>
         {
+            private const string MediaTypeCacheKeyFormat = nameof(AllowedTypeValidator) + "_MediaTypeKey_{0}";
+
             private readonly ILocalizedTextService _localizedTextService;
             private readonly IMediaTypeService _mediaTypeService;
             private readonly IMediaService _mediaService;
@@ -457,18 +459,18 @@ public class MediaPicker3PropertyEditor : DataEditor
                 {
                     // Cache media type lookups since the same media type is likely to be used multiple times in validation,
                     // particularly if we have multiple languages and blocks.
-                    var cacheKey = $"{nameof(AllowedTypeValidator)}_MediaTypeKey_{typeAlias}";
-                    Guid? typeKey = _appCaches.RequestCache.GetCacheItem<Guid?>(cacheKey);
+                    var cacheKey = string.Format(MediaTypeCacheKeyFormat, typeAlias);
+                    string? typeKey = _appCaches.RequestCache.GetCacheItem<string?>(cacheKey);
                     if (typeKey is null)
                     {
-                        typeKey = _mediaTypeService.Get(typeAlias)?.Key;
+                        typeKey = _mediaTypeService.Get(typeAlias)?.Key.ToString();
                         if (typeKey is not null)
                         {
                             _appCaches.RequestCache.Set(cacheKey, typeKey);
                         }
                     }
 
-                    if (typeKey is null || allowedTypes.Contains(typeKey.ToString()) is false)
+                    if (typeKey is null || allowedTypes.Contains(typeKey) is false)
                     {
                         return
                         [
