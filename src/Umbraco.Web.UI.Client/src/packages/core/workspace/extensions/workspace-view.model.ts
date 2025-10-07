@@ -15,8 +15,9 @@ export interface ManifestWorkspaceView<MetaType extends MetaWorkspaceView = Meta
 	meta: MetaType;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface MetaWorkspaceView extends MetaManifestWithView {}
+export interface MetaWorkspaceView extends MetaManifestWithView {
+	redirectUrlSearchParameter?: string;
+}
 
 export interface ManifestWorkspaceViewContentTypeDesignEditorKind extends ManifestWorkspaceView {
 	type: 'workspaceView';

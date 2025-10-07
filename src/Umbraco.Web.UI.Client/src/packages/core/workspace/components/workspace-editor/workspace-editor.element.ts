@@ -118,11 +118,9 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 		let newRoutes: UmbRoute[] = [];
 
 		if (this._workspaceViews.length > 0) {
-			let defaultRouteIndex = 0;
-
-			newRoutes = this._workspaceViews.map((context) => {
+			this._workspaceViews.forEach((context, i) => {
 				const manifest = context.manifest;
-				return {
+				newRoutes.push({
 					path: UMB_WORKSPACE_VIEW_PATH_PATTERN.generateLocal({ viewPathname: manifest.meta.pathname }),
 					component: () => createExtensionElement(manifest),
 					setup: (component?: any) => {
@@ -135,11 +133,21 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 							component.manifest = manifest;
 						}
 					},
-				};
+				});
+				// TODO: Find solution to make this work.
+				/*
+				if (context.manifest.meta.redirectUrlSearchParameter) {
+					newRoutes.push({
+						...newRoutes[i],
+						unique: newRoutes[i].path,
+						path: `?${context.manifest.meta.redirectUrlSearchParameter}`,
+					});
+				}
+					*/
 			});
 
 			// Duplicate first workspace and use it for the empty path scenario. [NL]
-			newRoutes.push({ ...newRoutes[defaultRouteIndex], unique: newRoutes[defaultRouteIndex].path, path: '' });
+			newRoutes.push({ ...newRoutes[0], unique: newRoutes[0].path, path: '', pathMatch: 'full' });
 		}
 
 		// Add a catch-all route for not found

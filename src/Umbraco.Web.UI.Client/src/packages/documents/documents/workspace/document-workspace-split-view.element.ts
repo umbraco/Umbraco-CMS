@@ -37,6 +37,7 @@ export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
 			this.#observeCollectionOverrides();
 		});
 
+		// TODO: Make sure this works when opening a collection when document is already open.
 		// get current get variables from url, and check if openCollection is set:
 		const urlSearchParams = new URLSearchParams(window.location.search);
 		const openCollection = urlSearchParams.has('openCollection');
