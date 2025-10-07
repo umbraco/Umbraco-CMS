@@ -46,8 +46,14 @@ public class DistributedBackgroundJobHostedService : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         await Task.Delay(_distributedJobSettings.Delay, stoppingToken);
+
+        while (_runtimeState.Level != RuntimeLevel.Run)
+        {
+            await Task.Delay(_distributedJobSettings.Delay, stoppingToken);
+        }
+
         // Update all jobs, periods might have changed when restarting.
-        await _distributedJobService.UpdateAllChangedAsync();
+        await _distributedJobService.EnsureJobsAsync();
 
         using PeriodicTimer timer = new(_distributedJobSettings.Period);
 
@@ -66,12 +72,6 @@ public class DistributedBackgroundJobHostedService : BackgroundService
 
     private async Task RunRunnableJob()
     {
-        // Do not run distributed jobs if we aren't in Run level, as we might not have booted properly.
-        if (_runtimeState.Level != RuntimeLevel.Run)
-        {
-            return;
-        }
-
         IDistributedBackgroundJob? job = await _distributedJobService.TryTakeRunnableAsync();
 
         if (job is null)

@@ -1,6 +1,4 @@
-﻿using Umbraco.Cms.Infrastructure.BackgroundJobs;
-using Umbraco.Cms.Infrastructure.Models;
-using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+﻿using Umbraco.Cms.Infrastructure.Models;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories;
 
@@ -22,7 +20,17 @@ public interface IDistributedJobRepository
     IEnumerable<DistributedBackgroundJobModel> GetAll();
 
     /// <summary>
-    /// Updates all jobs.
+    /// Updates a job.
     /// </summary>
     void Update(DistributedBackgroundJobModel distributedBackgroundJob);
+
+    /// <summary>
+    /// Adds a job.
+    /// </summary>
+    void Add(DistributedBackgroundJobModel distributedBackgroundJob);
+
+    /// <summary>
+    /// Deletes a job.
+    /// </summary>
+    void Delete(DistributedBackgroundJobModel distributedBackgroundJob);
 }

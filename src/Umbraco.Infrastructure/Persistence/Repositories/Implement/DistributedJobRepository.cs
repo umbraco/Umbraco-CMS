@@ -57,6 +57,36 @@ internal class DistributedJobRepository(IScopeAccessor scopeAccessor) : IDistrib
         scopeAccessor.AmbientScope.Database.Update(dto);
     }
 
+    /// <inheritdoc/>
+    public void Add(DistributedBackgroundJobModel distributedBackgroundJob)
+    {
+        if (scopeAccessor.AmbientScope is null)
+        {
+            throw new InvalidOperationException("No scope, could not add distributed job");
+        }
+
+        DistributedJobDto dto = MapToDto(distributedBackgroundJob);
+
+        scopeAccessor.AmbientScope.Database.Insert(dto);
+    }
+
+    /// <inheritdoc/>
+    public void Delete(DistributedBackgroundJobModel distributedBackgroundJob)
+    {
+        if (scopeAccessor.AmbientScope is null)
+        {
+            throw new InvalidOperationException("No scope, could not delete distributed job");
+        }
+
+        DistributedJobDto dto = MapToDto(distributedBackgroundJob);
+
+        int rowsAffected = scopeAccessor.AmbientScope.Database.Delete(dto);
+        if (rowsAffected == 0)
+        {
+            throw new InvalidOperationException("Could not delete distributed job, it may have already been deleted");
+        }
+    }
+
     private DistributedJobDto MapToDto(DistributedBackgroundJobModel model) =>
         new()
         {
