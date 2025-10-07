@@ -84,6 +84,7 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 				routes.push({
 					// TODO: When implementing Segments, be aware if using the unique still is URL Safe, cause its most likely not... [NL]
 					path: variantA.unique + '_&_' + variantB.unique,
+					preserveQuery: true,
 					component: this._splitViewElement,
 					setup: (_component, info) => {
 						// Set split view/active info..
@@ -98,6 +99,7 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 			routes.push({
 				// TODO: When implementing Segments, be aware if using the unique still is URL Safe, cause its most likely not... [NL]
 				path: variant.unique,
+				preserveQuery: true,
 				component: this._splitViewElement,
 				setup: (_component, info) => {
 					// cause we might come from a split-view, we need to reset index 1.
@@ -111,6 +113,7 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 			// Using first single view as the default route for now (hence the math below):
 			routes.push({
 				path: '',
+				preserveQuery: true,
 				pathMatch: 'full',
 				resolve: async () => {
 					if (!this.#workspaceContext) {
@@ -118,8 +121,8 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 					}
 
 					// get current get variables from url, and check if openCollection is set:
-					const urlSearchParams = new URLSearchParams(window.location.search);
-					const openCollection = urlSearchParams.has('openCollection');
+					//const urlSearchParams = new URLSearchParams(window.location.search);
+					//const openCollection = urlSearchParams.has('openCollection');
 
 					// Is there a path matching the current culture?
 					let path = routes.find((route) => route.path === this.#appCulture)?.path;
@@ -135,7 +138,7 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 						path = routes[routes.length - 3].path;
 					}
 
-					history.replaceState({}, '', `${this.#workspaceRoute}/${path}${openCollection ? `?openCollection` : ''}`);
+					history.replaceState({}, '', `${this.#workspaceRoute}/${path}`); //${openCollection ? `?openCollection` : ''}
 				},
 			});
 		}
