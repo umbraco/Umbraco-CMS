@@ -117,8 +117,9 @@ public class DistributedJobService : IDistributedJobService
                 {
                     Name = registeredJob.Name,
                     Period = registeredJob.Period,
-                    LastRun = DateTime.MinValue, // Or DateTime.UtcNow if you want it to run immediately
+                    LastRun = DateTime.UtcNow,
                     IsRunning = false,
+                    LastAttemptedRun = DateTime.UtcNow,
                 };
                 _distributedJobRepository.Add(newJob);
             }
