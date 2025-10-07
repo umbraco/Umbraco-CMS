@@ -122,7 +122,6 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 
 			newRoutes = this._workspaceViews.map((context) => {
 				const manifest = context.manifest;
-				console.log(manifest);
 				return {
 					path: UMB_WORKSPACE_VIEW_PATH_PATTERN.generateLocal({ viewPathname: manifest.meta.pathname }),
 					component: () => createExtensionElement(manifest),
