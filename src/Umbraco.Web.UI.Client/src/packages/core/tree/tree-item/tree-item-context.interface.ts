@@ -25,7 +25,6 @@ export interface UmbTreeItemContext<TreeItemType extends UmbTreeItemModel = UmbT
 	targetPagination: UmbTargetPaginationManager;
 	getTreeItem(): TreeItemType | undefined;
 	setTreeItem(treeItem: TreeItemType | undefined): void;
-	toggleContextMenu(): void;
 	select(): void;
 	deselect(): void;
 	constructPath(pathname: string, entityType: string, unique: string): string;
