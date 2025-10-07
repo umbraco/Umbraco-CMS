@@ -329,6 +329,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IMemberTypeService, MemberTypeService>();
             Services.AddUnique<IMemberContentEditingService, MemberContentEditingService>();
             Services.AddUnique<IMemberTypeEditingService, MemberTypeEditingService>();
+            Services.AddUnique<IMemberTypeContainerService, MemberTypeContainerService>();
             Services.AddUnique<INotificationService, NotificationService>();
             Services.AddUnique<ITrackedReferencesService, TrackedReferencesService>();
             Services.AddUnique<ITreeEntitySortingService, TreeEntitySortingService>();

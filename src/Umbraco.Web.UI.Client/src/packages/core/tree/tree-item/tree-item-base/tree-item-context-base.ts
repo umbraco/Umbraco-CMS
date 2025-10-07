@@ -12,7 +12,7 @@ import { UmbBooleanState, UmbObjectState, UmbStringState } from '@umbraco-cms/ba
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbDeprecation, debounce } from '@umbraco-cms/backoffice/utils';
 import { UmbParentEntityContext } from '@umbraco-cms/backoffice/entity';
-import { UMB_SECTION_CONTEXT, UMB_SECTION_SIDEBAR_CONTEXT } from '@umbraco-cms/backoffice/section';
+import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbEntityModel, UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 
@@ -70,7 +70,6 @@ export abstract class UmbTreeItemContextBase<
 	public treeContext?: typeof UMB_TREE_CONTEXT.TYPE;
 
 	#sectionContext?: typeof UMB_SECTION_CONTEXT.TYPE;
-	#sectionSidebarContext?: typeof UMB_SECTION_SIDEBAR_CONTEXT.TYPE;
 
 	#parentContext = new UmbParentEntityContext(this);
 
@@ -195,18 +194,6 @@ export abstract class UmbTreeItemContextBase<
 	 */
 	public loadNextItems = (): Promise<void> => this._treeItemChildrenManager.loadNextChildren();
 
-	public toggleContextMenu() {
-		if (!this.getTreeItem() || !this.entityType || this.unique === undefined) {
-			throw new Error('Could not request children, tree item is not set');
-		}
-
-		this.#sectionSidebarContext?.toggleContextMenu(this.getHostElement(), {
-			entityType: this.entityType,
-			unique: this.unique,
-			headline: this.getTreeItem()?.name || '',
-		});
-	}
-
 	/**
 	 * Selects the tree item
 	 * @memberof UmbTreeItemContextBase
@@ -262,10 +249,6 @@ export abstract class UmbTreeItemContextBase<
 		this.consumeContext(UMB_SECTION_CONTEXT, (instance) => {
 			this.#sectionContext = instance;
 			this.#observeSectionPath();
-		});
-
-		this.consumeContext(UMB_SECTION_SIDEBAR_CONTEXT, (instance) => {
-			this.#sectionSidebarContext = instance;
 		});
 
 		this.#gotTreeContext = this.consumeContext(UMB_TREE_CONTEXT, (treeContext) => {

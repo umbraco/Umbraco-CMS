@@ -5,6 +5,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbBasicState, UmbBooleanState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { type UmbVariantContext, UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
+import type { UmbItemDataResolver } from '@umbraco-cms/backoffice/entity-item';
 
 type UmbDocumentItemDataResolverModel = Omit<UmbDocumentItemModel, 'parent' | 'hasChildren'>;
 
@@ -14,11 +15,13 @@ type UmbDocumentItemDataResolverModel = Omit<UmbDocumentItemModel, 'parent' | 'h
  * @class UmbDocumentItemDataResolver
  * @augments {UmbControllerBase}
  */
-export class UmbDocumentItemDataResolver<
-	DocumentItemModel extends UmbDocumentItemDataResolverModel,
-> extends UmbControllerBase {
+export class UmbDocumentItemDataResolver<DocumentItemModel extends UmbDocumentItemDataResolverModel>
+	extends UmbControllerBase
+	implements UmbItemDataResolver
+{
 	#data = new UmbObjectState<DocumentItemModel | undefined>(undefined);
 
+	public readonly entityType = this.#data.asObservablePart((x) => x?.entityType);
 	public readonly unique = this.#data.asObservablePart((x) => x?.unique);
 	public readonly icon = this.#data.asObservablePart((x) => x?.documentType.icon);
 	public readonly typeUnique = this.#data.asObservablePart((x) => x?.documentType.unique);
@@ -101,6 +104,15 @@ export class UmbDocumentItemDataResolver<
 	setData(data: DocumentItemModel | undefined) {
 		this.#data.setValue(data);
 		this.#setVariantAwareValues();
+	}
+
+	/**
+	 * Get the entity type of the item
+	 * @returns {Promise<string | undefined>} The entity type of the item
+	 * @memberof UmbDocumentItemDataResolver
+	 */
+	async getEntityType(): Promise<string | undefined> {
+		return await this.observe(this.entityType).asPromise();
 	}
 
 	/**

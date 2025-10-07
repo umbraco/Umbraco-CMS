@@ -27,17 +27,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Take top-level depedendency on Azure.Identity, because NPoco.SqlServer depends on a vulnerable version -->
-    <PackageReference Include="Azure.Identity" />
-    <!-- Take top-level depedendency on System.Runtime.Caching, because Microsoft.EntityFrameworkCore.SqlServer depends on a vulnerable version -->
-    <PackageReference Include="System.Runtime.Caching" />
-    <!-- Take top-level depedendency on System.Text.Encodings.Web, because Azure.Identity, Microsoft.EntityFrameworkCore.SqlServer, Dazinator.Extensions.FileProviders depends on a vulnerable version -->
-    <PackageReference Include="System.Text.Encodings.Web" />
-    <!-- Take top-level depedendency on Microsoft.Data.SqlClient, because NPoco.SqlServer depends on a vulnerable version -->
-    <PackageReference Include="Microsoft.Data.SqlClient" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />
   </ItemGroup>
 

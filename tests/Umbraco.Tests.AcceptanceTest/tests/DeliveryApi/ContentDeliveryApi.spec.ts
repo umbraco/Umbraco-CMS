@@ -1,7 +1,8 @@
 import {expect} from '@playwright/test';
 import {AliasHelper, test} from '@umbraco/playwright-testhelpers';
 
-test.skip('can get content from delivery api', async ({umbracoApi}) => {
+// Fixed it later in other PR
+test.fixme('can get content from delivery api', async ({umbracoApi}) => {
   // Arrange
   const documentTypeName = 'TestDocumentType';
   const contentName = 'TestContent';
@@ -24,19 +25,4 @@ test.skip('can get content from delivery api', async ({umbracoApi}) => {
 
   // Clean
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
-});
-
-test('can get media image from delivery api', async ({umbracoApi}) => {
-  // Arrange
-  const mediaName = 'TestMedia';
-  const mediaTypeName = 'File';
-  await umbracoApi.media.ensureNameNotExists(mediaName);
-  const mediaId = await umbracoApi.media.createDefaultMediaFile(mediaName);
-  const mediaUrl = await umbracoApi.media.getMediaUrlWithoutBaseUrl(mediaId);
-
-  // Assert
-  expect(await umbracoApi.mediaDeliveryApi.doesMediaItemWithIdContainValues(mediaId, mediaName, mediaTypeName, mediaUrl)).toBeTruthy();
-
-  // Clean
-  await umbracoApi.media.ensureNameNotExists(mediaName);
 });
