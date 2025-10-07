@@ -121,8 +121,8 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 					}
 
 					// get current get variables from url, and check if openCollection is set:
-					//const urlSearchParams = new URLSearchParams(window.location.search);
-					//const openCollection = urlSearchParams.has('openCollection');
+					const urlSearchParams = new URLSearchParams(window.location.search);
+					const openCollection = urlSearchParams.has('openCollection');
 
 					// Is there a path matching the current culture?
 					let path = routes.find((route) => route.path === this.#appCulture)?.path;
@@ -138,7 +138,7 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 						path = routes[routes.length - 3].path;
 					}
 
-					history.replaceState({}, '', `${this.#workspaceRoute}/${path}`); //${openCollection ? `?openCollection` : ''}
+					history.replaceState({}, '', `${this.#workspaceRoute}/${path}${openCollection ? `/view/collection` : ''}`);
 				},
 			});
 		}
