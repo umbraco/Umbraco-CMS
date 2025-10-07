@@ -94,6 +94,6 @@ public static partial class Constants
         /// <summary>
         ///     All distributed jobs.
         /// </summary>
-        public const int DistributedJobs = -346;
+        public const int DistributedJobs = -347;
     }
 }
