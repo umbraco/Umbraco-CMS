@@ -36,7 +36,7 @@ public class OpenIddictCleanupJob : IDistributedBackgroundJob
     }
 
     /// <inheritdoc />
-    public async Task RunJobAsync()
+    public async Task ExecuteAsync()
     {
         // hosted services are registered as singletons, but this particular one consumes scoped services... so
         // we have to fetch the service dependencies manually using a new scope per invocation.

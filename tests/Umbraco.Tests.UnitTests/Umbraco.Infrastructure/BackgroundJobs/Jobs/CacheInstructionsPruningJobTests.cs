@@ -44,7 +44,7 @@ public class CacheInstructionsPruningJobTests
 
         var job = CreateCacheInstructionsPruningJob(timeToRetainInstructions: timeToRetainInstructions);
 
-        await job.RunJobAsync();
+        await job.ExecuteAsync();
 
         _cacheInstructionRepositoryMock.Verify(repo => repo.DeleteInstructionsOlderThan(expectedPruneDate), Times.Once);
     }

@@ -36,7 +36,7 @@ internal class ContentVersionCleanupJob : IDistributedBackgroundJob
     }
 
     /// <inheritdoc />
-    public Task RunJobAsync()
+    public Task ExecuteAsync()
     {
         // Globally disabled by feature flag
         if (!_settingsMonitor.CurrentValue.ContentVersionCleanupPolicy.EnableCleanup)

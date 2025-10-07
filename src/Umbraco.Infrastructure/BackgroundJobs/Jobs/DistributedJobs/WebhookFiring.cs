@@ -63,7 +63,7 @@ internal class WebhookFiring : IDistributedBackgroundJob
     }
 
     /// <inheritdoc />
-    public async Task RunJobAsync()
+    public async Task ExecuteAsync()
     {
         if (_webhookSettings.Enabled is false)
         {

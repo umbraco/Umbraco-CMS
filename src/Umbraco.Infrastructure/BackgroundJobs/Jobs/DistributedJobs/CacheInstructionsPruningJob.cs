@@ -41,7 +41,7 @@ internal class CacheInstructionsPruningJob : IDistributedBackgroundJob
     public TimeSpan Period { get; }
 
     /// <inheritdoc />
-    public Task RunJobAsync()
+    public Task ExecuteAsync()
     {
         DateTimeOffset pruneDate = _timeProvider.GetUtcNow() - _globalSettings.Value.DatabaseServerMessenger.TimeToRetainInstructions;
         using (ICoreScope scope = _scopeProvider.CreateCoreScope())

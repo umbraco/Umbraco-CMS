@@ -67,7 +67,7 @@ internal class HealthCheckNotifierJob : IDistributedBackgroundJob
     }
 
     /// <inheritdoc/>
-    public async Task RunJobAsync()
+    public async Task ExecuteAsync()
     {
         if (_healthChecksSettings.Notification.Enabled == false)
         {

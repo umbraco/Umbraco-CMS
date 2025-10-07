@@ -50,7 +50,7 @@ internal class LogScrubberJob : IDistributedBackgroundJob
     }
 
     /// <inheritdoc/>
-    public async Task RunJobAsync()
+    public async Task ExecuteAsync()
     {
         // Ensure we use an explicit scope since we are running on a background thread.
         using ICoreScope scope = _scopeProvider.CreateCoreScope();

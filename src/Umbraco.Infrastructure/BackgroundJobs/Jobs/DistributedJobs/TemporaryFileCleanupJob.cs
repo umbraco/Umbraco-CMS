@@ -31,7 +31,7 @@ internal class TemporaryFileCleanupJob : IDistributedBackgroundJob
 
 
     /// <inheritdoc />
-    public  async Task RunJobAsync()
+    public  async Task ExecuteAsync()
     {
         var count = (await _service.CleanUpOldTempFiles()).Count();
 

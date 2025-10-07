@@ -30,7 +30,7 @@ public class ScheduledPublishingJobTests
     public async Task Does_Not_Execute_When_Not_Enabled()
     {
         var sut = CreateScheduledPublishing(enabled: false);
-        await sut.RunJobAsync();
+        await sut.ExecuteAsync();
         VerifyScheduledPublishingNotPerformed();
     }
 
@@ -38,7 +38,7 @@ public class ScheduledPublishingJobTests
     public async Task Executes_And_Performs_Scheduled_Publishing()
     {
         var sut = CreateScheduledPublishing();
-        await sut.RunJobAsync();
+        await sut.ExecuteAsync();
         VerifyScheduledPublishingPerformed();
     }
 

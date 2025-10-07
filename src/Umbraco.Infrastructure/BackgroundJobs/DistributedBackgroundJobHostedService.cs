@@ -82,7 +82,7 @@ public class DistributedBackgroundJobHostedService : BackgroundService
 
         try
         {
-            await job.RunJobAsync();
+            await job.ExecuteAsync();
         }
         catch (Exception ex)
         {

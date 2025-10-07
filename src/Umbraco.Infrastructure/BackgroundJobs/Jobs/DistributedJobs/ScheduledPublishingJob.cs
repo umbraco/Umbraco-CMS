@@ -52,7 +52,7 @@ internal class ScheduledPublishingJob : IDistributedBackgroundJob
     }
 
     /// <inheritdoc />
-    public Task RunJobAsync()
+    public Task ExecuteAsync()
     {
         if (Suspendable.ScheduledPublishing.CanRun == false)
         {

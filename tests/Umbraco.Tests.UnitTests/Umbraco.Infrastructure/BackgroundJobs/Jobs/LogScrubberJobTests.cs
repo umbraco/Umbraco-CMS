@@ -26,7 +26,7 @@ public class LogScrubberJobTests
     public async Task Executes_And_Scrubs_Logs()
     {
         var sut = CreateLogScrubber();
-        await sut.RunJobAsync();
+        await sut.ExecuteAsync();
         VerifyLogsScrubbed();
     }
 

@@ -29,7 +29,7 @@ public class HealthCheckNotifierJobTests
     public async Task Does_Not_Execute_When_Not_Enabled()
     {
         var sut = CreateHealthCheckNotifier(false);
-        await sut.RunJobAsync();
+        await sut.ExecuteAsync();
         VerifyNotificationsNotSent();
     }
 
@@ -37,7 +37,7 @@ public class HealthCheckNotifierJobTests
     public async Task Does_Not_Execute_With_No_Enabled_Notification_Methods()
     {
         var sut = CreateHealthCheckNotifier(notificationEnabled: false);
-        await sut.RunJobAsync();
+        await sut.ExecuteAsync();
         VerifyNotificationsNotSent();
     }
 
@@ -45,7 +45,7 @@ public class HealthCheckNotifierJobTests
     public async Task Executes_With_Enabled_Notification_Methods()
     {
         var sut = CreateHealthCheckNotifier();
-        await sut.RunJobAsync();
+        await sut.ExecuteAsync();
         VerifyNotificationsSent();
     }
 
@@ -53,7 +53,7 @@ public class HealthCheckNotifierJobTests
     public async Task Executes_Only_Enabled_Checks()
     {
         var sut = CreateHealthCheckNotifier();
-        await sut.RunJobAsync();
+        await sut.ExecuteAsync();
         _mockNotificationMethod.Verify(
             x => x.SendAsync(
                 It.Is<HealthCheckResults>(y =>

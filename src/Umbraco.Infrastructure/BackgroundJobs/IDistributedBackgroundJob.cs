@@ -19,5 +19,5 @@ public interface IDistributedBackgroundJob
     /// <summary>
     /// Run the job.
     /// </summary>
-    Task RunJobAsync();
+    Task ExecuteAsync();
 }

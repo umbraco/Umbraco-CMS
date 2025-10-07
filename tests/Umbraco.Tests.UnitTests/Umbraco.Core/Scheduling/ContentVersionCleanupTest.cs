@@ -36,7 +36,7 @@ internal class ContentVersionCleanupTest
         mainDom.Setup(x => x.IsMainDom).Returns(true);
         serverRoleAccessor.Setup(x => x.CurrentServerRole).Returns(ServerRole.SchedulingPublisher);
 
-        await sut.RunJobAsync();
+        await sut.ExecuteAsync();
 
         cleanupService.Verify(x => x.PerformContentVersionCleanup(It.IsAny<DateTime>()), Times.Never);
     }
@@ -60,7 +60,7 @@ internal class ContentVersionCleanupTest
         mainDom.Setup(x => x.IsMainDom).Returns(true);
         serverRoleAccessor.Setup(x => x.CurrentServerRole).Returns(ServerRole.SchedulingPublisher);
 
-        await sut.RunJobAsync();
+        await sut.ExecuteAsync();
 
         cleanupService.Verify(x => x.PerformContentVersionCleanup(It.IsAny<DateTime>()), Times.Once);
     }

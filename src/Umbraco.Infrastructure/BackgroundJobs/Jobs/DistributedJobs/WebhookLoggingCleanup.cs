@@ -41,7 +41,7 @@ internal class WebhookLoggingCleanup : IDistributedBackgroundJob
     public TimeSpan Period => TimeSpan.FromDays(1);
 
     /// <inheritdoc />
-    public async Task RunJobAsync()
+    public async Task ExecuteAsync()
     {
         if (_webhookSettings.EnableLoggingCleanup is false)
         {
