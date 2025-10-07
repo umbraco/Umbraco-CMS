@@ -12,10 +12,10 @@ export const manifest: UmbExtensionManifestKind = {
 		api: () => import('./preview-option.action.js'),
 		elementName: 'umb-workspace-action-menu-item',
 		forWorkspaceActions: 'Umb.WorkspaceAction.Document.SaveAndPreview',
-		urlProviderAlias: 'umbDocumentUrlProvider',
 		meta: {
 			icon: '',
 			label: '(Missing label in manifest)',
+			urlProviderAlias: 'umbDocumentUrlProvider',
 		},
 	},
 };
