@@ -90,5 +90,7 @@ public class DistributedJobService : IDistributedJobService
         {
             _distributedJobRepository.Update(updatedJob);
         }
+
+        scope.Complete();
     }
 }
