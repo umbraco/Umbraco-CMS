@@ -1,7 +1,7 @@
 import { UmbDocumentTypeDetailRepository } from '../../document-types/repository/detail/document-type-detail.repository.js';
 import { UmbDocumentPropertyDatasetContext } from '../property-dataset-context/document-property-dataset.context.js';
 import type { UmbDocumentDetailRepository } from '../repository/index.js';
-import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
+import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS, UmbDocumentSegmentRepository } from '../repository/index.js';
 import type { UmbDocumentDetailModel, UmbDocumentVariantModel } from '../types.js';
 import {
 	UMB_CREATE_DOCUMENT_WORKSPACE_PATH_PATTERN,
@@ -62,6 +62,7 @@ export class UmbDocumentWorkspaceContext
 	readonly templateId = this._data.createObservablePartOfCurrent((data) => data?.template?.unique || null);
 
 	#isTrashedContext = new UmbIsTrashedEntityContext(this);
+	#documentSegmentRepository = new UmbDocumentSegmentRepository(this);
 
 	constructor(host: UmbControllerHost) {
 		super(host, {
@@ -109,20 +110,24 @@ export class UmbDocumentWorkspaceContext
 			null,
 		);
 
-		this.observe(this.isNew, (isNew) => {
-			if (isNew === undefined) return;
-			if (isNew) {
-				this.#enforceUserPermission(
-					UMB_USER_PERMISSION_DOCUMENT_CREATE,
-					'You do not have permission to create documents.',
-				);
-			} else {
-				this.#enforceUserPermission(
-					UMB_USER_PERMISSION_DOCUMENT_UPDATE,
-					'You do not have permission to update documents.',
-				);
-			}
-		});
+		this.observe(
+			this.isNew,
+			(isNew) => {
+				if (isNew === undefined) return;
+				if (isNew) {
+					this.#enforceUserPermission(
+						UMB_USER_PERMISSION_DOCUMENT_CREATE,
+						'You do not have permission to create documents.',
+					);
+				} else {
+					this.#enforceUserPermission(
+						UMB_USER_PERMISSION_DOCUMENT_UPDATE,
+						'You do not have permission to update documents.',
+					);
+				}
+			},
+			null,
+		);
 
 		this.routes.setRoutes([
 			{
@@ -204,6 +209,24 @@ export class UmbDocumentWorkspaceContext
 		}
 
 		return response;
+	}
+
+	protected override async loadSegments(): Promise<void> {
+		this.observe(
+			this.unique,
+			async (unique) => {
+				if (!unique) {
+					this._segments.setValue([]);
+					return;
+				}
+				const { data } = await this.#documentSegmentRepository.getDocumentByIdSegmentOptions(unique, {
+					skip: 0,
+					take: 9999,
+				});
+				this._segments.setValue(data?.items ?? []);
+			},
+			'_loadSegmentsUnique',
+		);
 	}
 
 	async create(parent: UmbEntityModel, documentTypeUnique: string, blueprintUnique?: string) {

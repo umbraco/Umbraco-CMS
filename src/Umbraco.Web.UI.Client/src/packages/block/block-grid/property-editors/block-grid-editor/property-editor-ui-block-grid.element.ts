@@ -17,7 +17,7 @@ import type {
 	UmbPropertyEditorUiElement,
 	UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
-import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import { jsonStringComparison, observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UmbFormControlMixin, UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 import type { UmbBlockTypeGroup } from '@umbraco-cms/backoffice/block-type';
@@ -181,15 +181,22 @@ export class UmbPropertyEditorUIBlockGridElement
 				]).pipe(debounceTime(20)),
 				([layouts, contents, settings, exposes]) => {
 					if (layouts.length === 0) {
+						if (this.value === undefined) {
+							return;
+						}
 						super.value = undefined;
 					} else {
-						super.value = {
+						const newValue = {
 							...super.value,
 							layout: { [UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS]: layouts },
 							contentData: contents,
 							settingsData: settings,
 							expose: exposes,
 						};
+						if (jsonStringComparison(this.value, newValue)) {
+							return;
+						}
+						super.value = newValue;
 					}
 
 					// If we don't have a value set from the outside or an internal value, we don't want to set the value.
