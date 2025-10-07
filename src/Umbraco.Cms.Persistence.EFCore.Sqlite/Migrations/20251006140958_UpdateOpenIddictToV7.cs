@@ -16,7 +16,6 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-
         }
     }
 }
