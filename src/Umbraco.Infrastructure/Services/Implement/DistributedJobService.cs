@@ -1,4 +1,5 @@
-﻿using Umbraco.Cms.Core;
+﻿using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.BackgroundJobs;
 using Umbraco.Cms.Infrastructure.Models;
@@ -12,21 +13,29 @@ public class DistributedJobService : IDistributedJobService
     private readonly ICoreScopeProvider _coreScopeProvider;
     private readonly IDistributedJobRepository _distributedJobRepository;
     private readonly IEnumerable<IDistributedBackgroundJob> _distributedBackgroundJobs;
+    private readonly ILogger<DistributedJobService> _logger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DistributedJobService"/> class.
     /// </summary>
     /// <param name="coreScopeProvider"></param>
     /// <param name="distributedJobRepository"></param>
-    public DistributedJobService(ICoreScopeProvider coreScopeProvider, IDistributedJobRepository distributedJobRepository, IEnumerable<IDistributedBackgroundJob> distributedBackgroundJobs)
+    /// <param name="distributedBackgroundJobs"></param>
+    /// <param name="logger"></param>
+    public DistributedJobService(
+        ICoreScopeProvider coreScopeProvider,
+        IDistributedJobRepository distributedJobRepository,
+        IEnumerable<IDistributedBackgroundJob> distributedBackgroundJobs,
+        ILogger<DistributedJobService> logger)
     {
         _coreScopeProvider = coreScopeProvider;
         _distributedJobRepository = distributedJobRepository;
         _distributedBackgroundJobs = distributedBackgroundJobs;
+        _logger = logger;
     }
 
     /// <inheritdoc />
-    public async Task<string?> TryTakeRunnableAsync()
+    public async Task<IDistributedBackgroundJob?> TryTakeRunnableAsync()
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
 
@@ -34,9 +43,16 @@ public class DistributedJobService : IDistributedJobService
 
         var jobName = _distributedJobRepository.GetRunnable();
 
+        IDistributedBackgroundJob? job = _distributedBackgroundJobs.FirstOrDefault(x => x.Name == jobName);
+
+        if (job is null)
+        {
+            _logger.LogWarning("Could not find a distributed job with the name '{JobName}'", jobName);
+        }
+
         scope.Complete();
 
-        return jobName;
+        return job;
     }
 
     public async Task FinishAsync(string jobName)
@@ -61,7 +77,7 @@ public class DistributedJobService : IDistributedJobService
         foreach (DistributedBackgroundJobModel backgroundJobModel in jobs)
         {
             IDistributedBackgroundJob? distributedBackgroundJob = _distributedBackgroundJobs.FirstOrDefault(x => x.Name == backgroundJobModel.Name);
-            if (distributedBackgroundJob == null || distributedBackgroundJob.Period == backgroundJobModel.Period)
+            if (distributedBackgroundJob is null || distributedBackgroundJob.Period == backgroundJobModel.Period)
             {
                 continue;
             }

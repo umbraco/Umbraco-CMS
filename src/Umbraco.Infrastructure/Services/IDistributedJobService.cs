@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Cms.Infrastructure.Services;
+﻿using Umbraco.Cms.Infrastructure.BackgroundJobs;
+
+namespace Umbraco.Cms.Infrastructure.Services;
 
 /// <summary>
 /// Service for managing distributed jobs
@@ -10,7 +12,7 @@ public interface IDistributedJobService
     /// If there are no runnable job, the string will be null
     /// </summary>
     /// <returns>The name of the runnable job.</returns>
-    Task<string?> TryTakeRunnableAsync();
+    Task<IDistributedBackgroundJob?> TryTakeRunnableAsync();
 
     /// <summary>
     /// Finishes a job.

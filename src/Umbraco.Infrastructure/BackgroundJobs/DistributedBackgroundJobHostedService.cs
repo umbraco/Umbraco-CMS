@@ -84,21 +84,11 @@ public class DistributedBackgroundJobHostedService : BackgroundService
             return;
         }
 
-        var jobName = await _distributedJobService.TryTakeRunnableAsync();
-
-        if (jobName is null)
-        {
-            // No runnable jobs for now, return
-            return;
-        }
-
-        // Try to find the job by name
-        IDistributedBackgroundJob? job = _distributedBackgroundJobs.FirstOrDefault(x => x.Name == jobName);
+        IDistributedBackgroundJob? job = await _distributedJobService.TryTakeRunnableAsync();
 
         if (job is null)
         {
-            // Could not find the job, log..
-            _logger.LogCritical("Could not find a distributed job with the name '{JobName}'", jobName);
+            // No runnable jobs for now, return
             return;
         }
 
