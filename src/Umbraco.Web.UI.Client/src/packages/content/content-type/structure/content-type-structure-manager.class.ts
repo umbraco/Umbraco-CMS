@@ -1018,7 +1018,7 @@ export class UmbContentTypeStructureManager<
 	 * @returns {UmbPropertyTypeContainerMergedModel | undefined} - The merged containers that match the provided merged-container key.
 	 */
 	getMergedContainerByKey(key: string): UmbPropertyTypeContainerMergedModel | undefined {
-		return this.#mergedContainers.find((x) => (x.key = key));
+		return this.#mergedContainers.find((x) => x.key === key);
 	}
 
 	/**
