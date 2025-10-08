@@ -673,6 +673,7 @@ export default {
 		design: 'Design',
 		dictionary: 'Dictionnaire',
 		dimensions: 'Dimensions',
+		dividerPosition: (value: string | number) => `Séparateur à ${value}%`,
 		down: 'Bas',
 		download: 'Télécharger',
 		edit: 'Editer',

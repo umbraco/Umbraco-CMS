@@ -688,6 +688,7 @@ export default {
 		design: 'Ontwerp',
 		dictionary: 'Woordenboek',
 		dimensions: 'Afmetingen',
+		dividerPosition: (value: string | number) => `Verdeler op ${value}%`,
 		discard: 'Gooi weg',
 		down: 'Omlaag',
 		download: 'Download',

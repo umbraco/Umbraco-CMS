@@ -481,6 +481,7 @@ export default {
 		design: 'Diseño',
 		dictionary: 'Diccionario',
 		dimensions: 'Dimensiones',
+		dividerPosition: (value: string | number) => `Divisor en ${value}%`,
 		down: 'Abajo',
 		download: 'Descargar',
 		edit: 'Editar',

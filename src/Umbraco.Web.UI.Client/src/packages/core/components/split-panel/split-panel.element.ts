@@ -1,3 +1,4 @@
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import {
 	type PropertyValueMap,
 	LitElement,
@@ -23,7 +24,7 @@ import { clamp } from '@umbraco-cms/backoffice/utils';
  * @cssprop --umb-split-panel-divider-color - Color of the divider.
  */
 @customElement('umb-split-panel')
-export class UmbSplitPanelElement extends LitElement {
+export class UmbSplitPanelElement extends UmbLitElement {
 	@query('#main') mainElement!: HTMLElement;
 	@query('#divider-touch-area') dividerTouchAreaElement!: HTMLElement;
 	@query('#divider') dividerElement!: HTMLElement;
@@ -91,15 +92,17 @@ export class UmbSplitPanelElement extends LitElement {
 	}
 
 	#setPosition(pos: number) {
-		const { width } = this.mainElement.getBoundingClientRect();
-		const localPos = clamp(pos, 0, width);
-		const percentagePos = (localPos / width) * 100;
-		this.position = percentagePos + '%';
-		
-		// Update ARIA value for divider
-		this.dividerTouchAreaElement.setAttribute('aria-valuenow', percentagePos.toFixed(0));
-		this.dividerTouchAreaElement.setAttribute('aria-valuetext', `Divider at ${percentagePos.toFixed(0)}%`);
-	}
+    const { width } = this.mainElement.getBoundingClientRect();
+    const localPos = clamp(pos, 0, width);
+    const percentagePos = (localPos / width) * 100;
+    this.position = percentagePos + '%';
+    
+	// Update ARIA value for divider
+    const formatted = percentagePos.toFixed(0);
+    const ariaText = this.localize?.term('general_dividerPosition', [formatted]) ?? `Divider at ${formatted}%`;
+
+    this.dividerTouchAreaElement.setAttribute('aria-valuetext', ariaText);
+}
 
 	#updateSplit() {
 		// If lock is none
