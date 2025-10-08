@@ -78,8 +78,11 @@ const mapper = (item: MediaTreeItemResponseModel): UmbMediaTreeItemModel => {
 			return {
 				name: variant.name,
 				culture: variant.culture || null,
+				// Notice: Media variant flags are not yet implemented in the backend.
+				//flags: variant.flags,
 			};
 		}),
 		createDate: item.createDate,
+		flags: item.flags,
 	};
 };

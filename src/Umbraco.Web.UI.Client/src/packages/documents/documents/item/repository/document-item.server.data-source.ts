@@ -55,7 +55,9 @@ const mapper = (item: DocumentItemResponseModel): UmbDocumentItemModel => {
 				culture: variant.culture || null,
 				name: variant.name,
 				state: variant.state,
+				flags: variant.flags,
 			};
 		}),
+		flags: item.flags,
 	};
 };

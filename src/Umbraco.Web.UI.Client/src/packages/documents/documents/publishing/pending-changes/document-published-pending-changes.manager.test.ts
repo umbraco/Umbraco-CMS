@@ -55,6 +55,7 @@ describe('UmbSelectionManager', () => {
 					collection: null,
 				},
 				isTrashed: false,
+				flags: [],
 				variants: [
 					{
 						state: DocumentVariantStateModel.PUBLISHED,
@@ -66,6 +67,7 @@ describe('UmbSelectionManager', () => {
 						updateDate: '2023-02-06T15:32:24.957009',
 						scheduledPublishDate: null,
 						scheduledUnpublishDate: null,
+						flags: [],
 					},
 				],
 				values: [
@@ -120,6 +122,7 @@ describe('UmbSelectionManager', () => {
 					collection: null,
 				},
 				isTrashed: false,
+				flags: [],
 				variants: [
 					{
 						state: DocumentVariantStateModel.PUBLISHED,
@@ -131,6 +134,7 @@ describe('UmbSelectionManager', () => {
 						updateDate: '2023-02-06T15:32:24.957009',
 						scheduledPublishDate: null,
 						scheduledUnpublishDate: null,
+						flags: [],
 					},
 					{
 						state: DocumentVariantStateModel.PUBLISHED,
@@ -142,6 +146,7 @@ describe('UmbSelectionManager', () => {
 						updateDate: '2023-02-06T15:32:24.957009',
 						scheduledPublishDate: null,
 						scheduledUnpublishDate: null,
+						flags: [],
 					},
 				],
 				values: [
