@@ -24,7 +24,7 @@ const SORTER_CONFIG: UmbSorterConfig<UmbPropertyTypeContainerMergedModel, UmbCon
 		identifier: 'content-type-container-sorter',
 		itemSelector: 'umb-content-type-design-editor-group',
 		handleSelector: '.drag-handle',
-		disabledItemSelector: '[inherited]', // Inherited attribute is set by the umb-content-type-design-editor-group.
+		disabledItemSelector: ':not([has-owner-container])', // Inherited attribute is set by the umb-content-type-design-editor-group.
 		containerSelector: '.container-list',
 	};
 
@@ -202,6 +202,16 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 				.observeRouteBuilder((routeBuilder) => {
 					this._editContentTypePath = routeBuilder({});
 				});
+		});
+
+		this.consumeContext(UMB_CONTENT_TYPE_DESIGN_EDITOR_CONTEXT, (context) => {
+			this.observe(
+				context?.isSorting,
+				(isSorting) => {
+					this._sortModeActive = isSorting;
+				},
+				'_observeIsSorting',
+			);
 		});
 
 		this.observe(
