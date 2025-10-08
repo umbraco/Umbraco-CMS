@@ -15,16 +15,13 @@ namespace Umbraco.Cms.Api.Management.Controllers.NewsDashboard;
 [ApiExplorerSettings(GroupName = "Dashboard")]
 public class NewsDashboardController : ManagementApiControllerBase
 {
-    private readonly AppCaches _appCaches;
     private readonly INewsDashboardService _newsDashboardService;
     private readonly ILogger<NewsDashboardController> _logger;
     private readonly IUmbracoVersion _umbracoVersion;
     private readonly ISiteIdentifierService _siteIdentifierService;
-    private static readonly HttpClient HttpClient = new();
 
-    public NewsDashboardController(AppCaches appCaches, INewsDashboardService newsDashboardService, ILogger<NewsDashboardController> logger, IUmbracoVersion umbracoVersion, ISiteIdentifierService siteIdentifierService)
+    public NewsDashboardController(INewsDashboardService newsDashboardService, ILogger<NewsDashboardController> logger, IUmbracoVersion umbracoVersion, ISiteIdentifierService siteIdentifierService)
     {
-        _appCaches = appCaches;
         _newsDashboardService = newsDashboardService;
         _logger = logger;
         _umbracoVersion = umbracoVersion;
@@ -35,36 +32,7 @@ public class NewsDashboardController : ManagementApiControllerBase
     [ProducesResponseType(typeof(IEnumerable<NewsDashboardItem>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetDashboard()
     {
-        var baseUrl = "https://umbraco-dashboard-news.euwest01.umbraco.io";
-        var path = "/api/News";
-        var key = "umbraco-dashboard-news";
-        var version = _umbracoVersion.SemanticVersion.ToSemanticStringWithoutBuild();
-        _siteIdentifierService.TryGetOrCreateSiteIdentifier(out Guid siteIdentifier);
-
-        var url = $"{baseUrl}/{path}?version={version}&siteId={siteIdentifier}";
-
-        IEnumerable<NewsDashboardItem>? content = _appCaches.RuntimeCache.GetCacheItem<IEnumerable<NewsDashboardItem>?>(key);
-        if (content is not null && content.Any())
-        {
-            return Ok(content);
-        }
-
-        try
-        {
-            var json = await HttpClient.GetStringAsync(url);
-
-            if (_newsDashboardService.TryMapModel(json, out IEnumerable<NewsDashboardItem>? model))
-            {
-                _appCaches.RuntimeCache.InsertCacheItem(key, () => model, new TimeSpan(0, 30, 0));
-
-                content = model;
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex.InnerException ?? ex, "Error getting dashboard content from {Url}", url);
-            return NoContent();
-        }
+        IEnumerable<NewsDashboardItem> content = await _newsDashboardService.GetNewsItemsAsync();
 
         return Ok(content);
     }
