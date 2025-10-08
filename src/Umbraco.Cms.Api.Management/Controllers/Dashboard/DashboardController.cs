@@ -9,7 +9,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Dashboard;
 
-[VersionedApiBackOfficeRoute("Dashboard")]
+[VersionedApiBackOfficeRoute("dashboard")]
 [ApiExplorerSettings(GroupName = "Dashboard")]
 public class DashboardController : ManagementApiControllerBase
 {
