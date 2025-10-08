@@ -33,7 +33,11 @@ export class UmbPropertyEditorUIBlockGridAreaTypePermissionElement
 	private _blockTypes?: Array<UmbBlockTypeWithGroupKey>;
 
 	@state()
-	private _blockTypesWithElementName: Array<{ type: UmbBlockTypeWithGroupKey; name: string; icon: string | null | undefined }> = [];
+	private _blockTypesWithElementName: Array<{
+		type: UmbBlockTypeWithGroupKey;
+		name: string;
+		icon: string | null | undefined;
+	}> = [];
 
 	@state()
 	private _blockGroups: Array<UmbBlockGridTypeGroupType> = [];
@@ -55,7 +59,11 @@ export class UmbPropertyEditorUIBlockGridAreaTypePermissionElement
 					}
 					return undefined;
 				})
-				.filter((x) => x !== undefined) as Array<{ type: UmbBlockTypeWithGroupKey; name: string; icon: string | null | undefined }>;
+				.filter((x) => x !== undefined) as Array<{
+				type: UmbBlockTypeWithGroupKey;
+				name: string;
+				icon: string | null | undefined;
+			}>;
 		});
 
 		this.consumeContext(UMB_DATA_TYPE_WORKSPACE_CONTEXT, async (context) => {
@@ -193,9 +201,7 @@ export class UmbPropertyEditorUIBlockGridAreaTypePermissionElement
 			this._blockGroups,
 			(group) => group.key,
 			(group) =>
-				html`<uui-combobox-list-option
-					.value=${group.key}
-					?selected=${area.groupKey === group.key}>
+				html`<uui-combobox-list-option .value=${group.key} ?selected=${area.groupKey === group.key}>
 					<umb-icon name="icon-folder"></umb-icon>
 					${group.name}
 				</uui-combobox-list-option>`,

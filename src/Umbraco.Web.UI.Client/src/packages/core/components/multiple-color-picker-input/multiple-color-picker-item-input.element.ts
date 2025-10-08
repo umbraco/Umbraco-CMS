@@ -72,7 +72,10 @@ export class UmbMultipleColorPickerItemInputElement extends UUIFormControlMixin(
 
 		// If it's 3-digit, expand it
 		if (hex.length === 3) {
-			hex = hex.split('').map(ch => ch + ch).join('');
+			hex = hex
+				.split('')
+				.map((ch) => ch + ch)
+				.join('');
 		}
 
 		return `#${hex}`;
