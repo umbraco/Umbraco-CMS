@@ -18,15 +18,19 @@ public class EmailUserInviteSender : IUserInviteSender
     private readonly IEmailSender _emailSender;
     private readonly ILocalizedTextService _localizedTextService;
     private readonly GlobalSettings _globalSettings;
+    private readonly SecuritySettings _securitySettings;
 
     public EmailUserInviteSender(
         IEmailSender emailSender,
         ILocalizedTextService localizedTextService,
-        IOptions<GlobalSettings> globalSettings)
+        IOptions<GlobalSettings> globalSettings,
+        IOptions<SecuritySettings> securitySettings
+    )
     {
         _emailSender = emailSender;
         _localizedTextService = localizedTextService;
         _globalSettings = globalSettings.Value;
+        _securitySettings = securitySettings.Value;
     }
 
     public async Task InviteUser(UserInvitationMessage invite)
@@ -67,7 +71,7 @@ public class EmailUserInviteSender : IUserInviteSender
 
         var message = new EmailMessage(senderEmail, address.ToString(), emailSubject, emailBody, true);
 
-        await _emailSender.SendAsync(message, Constants.Web.EmailTypes.UserInvite, true, new TimeSpan(72, 0, 0));
+        await _emailSender.SendAsync(message, Constants.Web.EmailTypes.UserInvite, true, _securitySettings.UserInviteEmailExpiry);
     }
 
     public bool CanSendInvites() => _emailSender.CanSendRequiredEmail();
