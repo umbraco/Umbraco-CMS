@@ -60,6 +60,9 @@ export class UmbTreeItemChildrenManager<
 	public readonly isLoadingNextChildren = this.#isLoadingNextChildren.asObservable();
 
 	#takeSize: number = 50;
+	#takeBeforeTarget?: number;
+	#takeAfterTarget?: number;
+
 	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 
 	#treeContext?: typeof UMB_TREE_CONTEXT.TYPE;
@@ -86,6 +89,11 @@ export class UmbTreeItemChildrenManager<
 		this.#takeSize = size;
 		this.offsetPagination.setPageSize(size);
 		this.targetPagination.setTakeSize(size);
+	}
+
+	public setTargetTakeSize(before: number | undefined, after: number | undefined): void {
+		this.#takeBeforeTarget = before;
+		this.#takeAfterTarget = after;
 	}
 
 	public getTakeSize(): number {
@@ -232,10 +240,16 @@ export class UmbTreeItemChildrenManager<
 						 Currently we use 5, but this could be anything that feels "right".
 						 When reloading from target when want to retrieve the same number of items that a currently loaded
 						*/
-						takeBefore: reload ? this.targetPagination.getNumberOfCurrentItemsBeforeBaseTarget() : 5,
+						takeBefore: reload
+							? this.targetPagination.getNumberOfCurrentItemsBeforeBaseTarget()
+							: this.#takeBeforeTarget !== undefined
+								? this.#takeBeforeTarget
+								: 5,
 						takeAfter: reload
 							? this.targetPagination.getNumberOfCurrentItemsAfterBaseTarget()
-							: this.targetPagination.getTakeSize(),
+							: this.#takeAfterTarget !== undefined
+								? this.#takeAfterTarget
+								: this.targetPagination.getTakeSize(),
 					}
 				: undefined;
 
@@ -277,8 +291,8 @@ export class UmbTreeItemChildrenManager<
 				this.targetPagination.setBaseTarget(newBaseTarget);
 				this.#loadChildren();
 			} else {
-				/* 
-					If we can't find a new base target we reload the children from the top. 
+				/*
+					If we can't find a new base target we reload the children from the top.
 					We cancel the base target and load using skip/take pagination instead.
 					This can happen if deep linked to a non existing item or all retries have failed.
 				*/
@@ -354,8 +368,8 @@ export class UmbTreeItemChildrenManager<
 			if (newStartTarget) {
 				this.#loadPrevItemsFromTarget();
 			} else {
-				/* 
-					If we can't find a new end target we reload the children from the top. 
+				/*
+					If we can't find a new end target we reload the children from the top.
 					We cancel the base target and load using skip/take pagination instead.
 				*/
 				this.#resetChildren();
@@ -443,8 +457,8 @@ export class UmbTreeItemChildrenManager<
 			if (newEndTarget) {
 				this.#loadNextItemsFromTarget();
 			} else {
-				/* 
-					If we can't find a new end target we reload the children from the top. 
+				/*
+					If we can't find a new end target we reload the children from the top.
 					We cancel the base target and load using skip/take pagination instead.
 				*/
 				this.#resetChildren();

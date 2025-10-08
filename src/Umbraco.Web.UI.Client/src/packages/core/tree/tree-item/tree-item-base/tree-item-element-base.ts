@@ -1,6 +1,14 @@
 import type { UmbTreeItemContext } from '../index.js';
 import type { UmbTreeItemModel } from '../../types.js';
-import { html, ifDefined, nothing, state, repeat, property } from '@umbraco-cms/backoffice/external/lit';
+import {
+	html,
+	ifDefined,
+	nothing,
+	state,
+	repeat,
+	property,
+	type TemplateResult,
+} from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';
 
@@ -36,6 +44,7 @@ export abstract class UmbTreeItemElementBase<
 		this.#api = value;
 
 		if (this.#api) {
+			this.#api?.setIsMenu(this._isMenu);
 			this.observe(this.#api.childItems, (value) => (this._childItems = value));
 			this.observe(this.#api.hasChildren, (value) => (this._hasChildren = value));
 			this.observe(this.#api.isActive, (value) => (this._isActive = value));
@@ -95,6 +104,9 @@ export abstract class UmbTreeItemElementBase<
 	private _hasChildren = false;
 
 	@state()
+	protected _forceShowExpand = false;
+
+	@state()
 	private _isOpen = false;
 
 	@state()
@@ -111,6 +123,17 @@ export abstract class UmbTreeItemElementBase<
 
 	@state()
 	private _hasNextItems = false;
+
+	@state()
+	protected _isMenu = false;
+
+	set isMenu(value: boolean) {
+		this._isMenu = value;
+		this.#api?.setIsMenu(value);
+	}
+	get isMenu(): boolean {
+		return this._isMenu;
+	}
 
 	#initTreeItem() {
 		if (!this.#api) return;
@@ -130,11 +153,15 @@ export abstract class UmbTreeItemElementBase<
 
 	private _onShowChildren(event: UUIMenuItemEvent) {
 		event.stopPropagation();
+		// Prevent default cause we will now control the show-children state ourself.
+		event.preventDefault();
 		this.#api?.showChildren();
 	}
 
 	private _onHideChildren(event: UUIMenuItemEvent) {
 		event.stopPropagation();
+		// Prevent default cause we will now control the show-children state ourself.
+		event.preventDefault();
 		this.#api?.hideChildren();
 	}
 
@@ -163,13 +190,14 @@ export abstract class UmbTreeItemElementBase<
 				?selectable=${this._isSelectable}
 				?selected=${this._isSelected}
 				.loading=${this._isLoading}
-				.hasChildren=${this._hasChildren}
+				.hasChildren=${this._forceShowExpand || this._hasChildren}
 				.showChildren=${this._isOpen}
 				.caretLabel=${this._isOpen
 					? this.localize.term('visuallyHiddenTexts_collapseChildItems') + ' ' + this._label
 					: this.localize.term('visuallyHiddenTexts_expandChildItems') + ' ' + this._label}
 				label=${ifDefined(this._label)}
-				href="${ifDefined(this._isSelectableContext ? undefined : this._href)}">
+				href="${ifDefined(this._isSelectableContext ? undefined : this._href)}"
+				.renderExpandSymbol=${this._renderExpandSymbol}>
 				${this.#renderLoadPrevButton()} ${this.renderIconContainer()} ${this.renderLabel()} ${this.#renderActions()}
 				${this.#renderChildItems()}
 				<slot></slot>
@@ -193,6 +221,9 @@ export abstract class UmbTreeItemElementBase<
 			${!this._iconSlotHasChildren ? this.#renderIcon() : nothing}
 		`;
 	}
+
+	// eslint-disable-next-line @typescript-eslint/naming-convention
+	_renderExpandSymbol?: () => HTMLElement | TemplateResult<1> | undefined;
 
 	#renderIcon() {
 		const icon = this._item?.icon;
@@ -240,7 +271,7 @@ export abstract class UmbTreeItemElementBase<
 						(item) => html`
 							<umb-tree-item
 								.entityType=${item.entityType}
-								.props=${{ hideActions: this.hideActions, item }}></umb-tree-item>
+								.props=${{ hideActions: this.hideActions, item, isMenu: this.isMenu }}></umb-tree-item>
 						`,
 					)
 				: ''}
