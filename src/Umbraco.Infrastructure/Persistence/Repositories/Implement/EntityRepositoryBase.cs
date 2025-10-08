@@ -22,8 +22,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IReadWriteQueryRepository<TId, TEntity>
     where TEntity : class, IEntity
 {
-    private readonly IRepositoryCacheVersionService _repositoryCacheVersionService;
-    private readonly ICacheSyncService _cacheSyncService;
     private static RepositoryCachePolicyOptions? _defaultOptions;
     private IRepositoryCachePolicy<TEntity, TId>? _cachePolicy;
     private IQuery<TEntity>? _hasIdQuery;
@@ -39,8 +37,8 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
         ICacheSyncService cacheSyncService)
         : base(scopeAccessor, appCaches)
     {
-        _repositoryCacheVersionService = repositoryCacheVersionService;
-        _cacheSyncService = cacheSyncService;
+        RepositoryCacheVersionService = repositoryCacheVersionService;
+        CacheSyncService = cacheSyncService;
         Logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -55,6 +53,10 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
             StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>())
     {
     }
+
+    protected readonly IRepositoryCacheVersionService RepositoryCacheVersionService;
+
+    protected readonly ICacheSyncService CacheSyncService;
 
     /// <summary>
     ///     Gets the logger
@@ -223,8 +225,8 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
             GlobalIsolatedCache,
             ScopeAccessor,
             DefaultOptions,
-            _repositoryCacheVersionService,
-            _cacheSyncService
+            RepositoryCacheVersionService,
+            CacheSyncService
             );
 
     protected abstract TEntity? PerformGet(TId? id);

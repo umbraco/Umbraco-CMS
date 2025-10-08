@@ -30,6 +30,7 @@ internal sealed class ExternalLoginRepository : EntityRepositoryBase<int, IIdent
             cacheSyncService)
     {
     }
+
     /// <summary>
     ///     Query for user tokens
     /// </summary>

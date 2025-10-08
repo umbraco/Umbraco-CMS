@@ -28,9 +28,6 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
     private readonly IFileSystem? _viewsFileSystem;
     private readonly IViewHelper _viewHelper;
     private readonly IOptionsMonitor<RuntimeSettings> _runtimeSettings;
-    private readonly IRepositoryCacheVersionService _repositoryCacheVersionService;
-    private readonly ICacheSyncService _cacheSyncService;
-
     public TemplateRepository(
         IScopeAccessor scopeAccessor,
         AppCaches cache,
@@ -52,8 +49,6 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
         _viewsFileSystem = fileSystems.MvcViewsFileSystem;
         _viewHelper = viewHelper;
         _runtimeSettings = runtimeSettings;
-        _repositoryCacheVersionService = repositoryCacheVersionService;
-        _cacheSyncService = cacheSyncService;
     }
 
     public Stream GetFileContentStream(string filepath)
@@ -99,8 +94,8 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
         new FullDataSetRepositoryCachePolicy<ITemplate, int>(
             GlobalIsolatedCache,
             ScopeAccessor,
-            _repositoryCacheVersionService,
-            _cacheSyncService,
+            RepositoryCacheVersionService,
+            CacheSyncService,
             GetEntityId,
             /*expires:*/ false);
 

@@ -23,8 +23,6 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
 {
     private readonly ILoggerFactory _loggerFactory;
     private readonly ILanguageRepository _languageRepository;
-    private readonly IRepositoryCacheVersionService _repositoryCacheVersionService;
-    private readonly ICacheSyncService _cacheSyncService;
 
     private string QuotedColumn(string columnName) => $"{QuoteTableName(DictionaryDto.TableName)}.{QuoteColumnName(columnName)}";
 
@@ -36,12 +34,10 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
         ILanguageRepository languageRepository,
         IRepositoryCacheVersionService repositoryCacheVersionService,
         ICacheSyncService cacheSyncService)
-        : base(scopeAccessor, cache, logger)
+        : base(scopeAccessor, cache, logger, repositoryCacheVersionService, cacheSyncService)
     {
         _loggerFactory = loggerFactory;
         _languageRepository = languageRepository;
-        _repositoryCacheVersionService = repositoryCacheVersionService;
-        _cacheSyncService = cacheSyncService;
     }
 
     public IDictionaryItem? Get(Guid uniqueId)
@@ -51,8 +47,8 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
             ScopeAccessor,
             AppCaches,
             _loggerFactory.CreateLogger<DictionaryByUniqueIdRepository>(),
-            _repositoryCacheVersionService,
-            _cacheSyncService);
+            RepositoryCacheVersionService,
+            CacheSyncService);
         return uniqueIdRepo.Get(uniqueId);
     }
 
@@ -63,8 +59,8 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
             ScopeAccessor,
             AppCaches,
             _loggerFactory.CreateLogger<DictionaryByUniqueIdRepository>(),
-            _repositoryCacheVersionService,
-            _cacheSyncService);
+            RepositoryCacheVersionService,
+            CacheSyncService);
         return uniqueIdRepo.GetMany(uniqueIds);
     }
 
@@ -75,8 +71,8 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
             ScopeAccessor,
             AppCaches,
             _loggerFactory.CreateLogger<DictionaryByKeyRepository>(),
-            _repositoryCacheVersionService,
-            _cacheSyncService);
+            RepositoryCacheVersionService,
+            CacheSyncService);
         return keyRepo.Get(key);
     }
 
@@ -87,8 +83,8 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
             ScopeAccessor,
             AppCaches,
             _loggerFactory.CreateLogger<DictionaryByKeyRepository>(),
-            _repositoryCacheVersionService,
-            _cacheSyncService);
+            RepositoryCacheVersionService,
+            CacheSyncService);
         return keyRepo.GetMany(keys);
     }
 
@@ -163,8 +159,8 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
             GlobalIsolatedCache,
             ScopeAccessor,
             options,
-            _repositoryCacheVersionService,
-            _cacheSyncService);
+            RepositoryCacheVersionService,
+            CacheSyncService);
     }
 
     private static IDictionaryItem ConvertFromDto(DictionaryDto dto, IDictionary<int, ILanguage> languagesById)

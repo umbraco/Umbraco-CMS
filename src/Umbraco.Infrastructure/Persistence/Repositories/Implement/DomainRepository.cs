@@ -15,9 +15,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
 internal sealed class DomainRepository : EntityRepositoryBase<int, IDomain>, IDomainRepository
 {
-    private readonly IRepositoryCacheVersionService _repositoryCacheVersionService;
-    private readonly ICacheSyncService _cacheSyncService;
-
     public DomainRepository(
         IScopeAccessor scopeAccessor,
         AppCaches cache,
@@ -31,8 +28,6 @@ internal sealed class DomainRepository : EntityRepositoryBase<int, IDomain>, IDo
             repositoryCacheVersionService,
             cacheSyncService)
     {
-        _repositoryCacheVersionService = repositoryCacheVersionService;
-        _cacheSyncService = cacheSyncService;
     }
 
     public IDomain? GetByName(string domainName)
@@ -48,7 +43,7 @@ internal sealed class DomainRepository : EntityRepositoryBase<int, IDomain>, IDo
         => GetMany().Where(x => x.RootContentId == contentId).Where(x => includeWildcards || x.IsWildcard == false);
 
     protected override IRepositoryCachePolicy<IDomain, int> CreateCachePolicy()
-        => new FullDataSetRepositoryCachePolicy<IDomain, int>(GlobalIsolatedCache, ScopeAccessor,  _repositoryCacheVersionService, _cacheSyncService, GetEntityId, false);
+        => new FullDataSetRepositoryCachePolicy<IDomain, int>(GlobalIsolatedCache, ScopeAccessor,  RepositoryCacheVersionService, CacheSyncService, GetEntityId, false);
 
     protected override IDomain? PerformGet(int id)
         // Use the underlying GetAll which will force cache all domains

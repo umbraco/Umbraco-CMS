@@ -15,9 +15,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
 internal sealed class PublicAccessRepository : EntityRepositoryBase<Guid, PublicAccessEntry>, IPublicAccessRepository
 {
-    private readonly IRepositoryCacheVersionService _repositoryCacheVersionService;
-    private readonly ICacheSyncService _cacheSyncService;
-
     public PublicAccessRepository(
         IScopeAccessor scopeAccessor,
         AppCaches cache,
@@ -31,12 +28,10 @@ internal sealed class PublicAccessRepository : EntityRepositoryBase<Guid, Public
             repositoryCacheVersionService,
             cacheSyncService)
     {
-        _repositoryCacheVersionService = repositoryCacheVersionService;
-        _cacheSyncService = cacheSyncService;
     }
 
     protected override IRepositoryCachePolicy<PublicAccessEntry, Guid> CreateCachePolicy() =>
-        new FullDataSetRepositoryCachePolicy<PublicAccessEntry, Guid>(GlobalIsolatedCache, ScopeAccessor,  _repositoryCacheVersionService, _cacheSyncService, GetEntityId, /*expires:*/ false);
+        new FullDataSetRepositoryCachePolicy<PublicAccessEntry, Guid>(GlobalIsolatedCache, ScopeAccessor,  RepositoryCacheVersionService, CacheSyncService, GetEntityId, /*expires:*/ false);
 
     protected override PublicAccessEntry? PerformGet(Guid id) =>
 
