@@ -26,7 +26,7 @@ export class UmbRefRteBlockElement extends UmbLitElement {
 	settings?: UmbBlockDataType;
 
 	@state()
-	_workspaceEditPath?: string;
+	private _workspaceEditPath?: string;
 
 	@property({ attribute: false })
 	config?: UmbBlockEditorCustomViewConfiguration;
@@ -84,10 +84,6 @@ export class UmbRefRteBlockElement extends UmbLitElement {
 			umb-icon,
 			umb-ufm-render {
 				z-index: 1;
-
-				&::selection {
-					color: var(--uui-color-default-contrast);
-				}
 			}
 		`,
 	];

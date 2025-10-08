@@ -164,7 +164,7 @@ test.skip('child is removed from list after child content is deleted', async ({u
   expect(await umbracoApi.document.getChildrenAmount(documentId)).toEqual(1);
 
   // Act
-  await umbracoUi.content.clickCaretButtonForContentName(contentName);
+  await umbracoUi.content.openContentCaretButtonForName(contentName);
   await umbracoUi.content.clickActionsMenuForContent(childContentName);
   await umbracoUi.content.clickTrashActionMenuOption();
   await umbracoUi.content.clickConfirmTrashButton();

@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 
@@ -49,6 +50,15 @@ public interface IDocumentRepository : IContentRepository<int, IContent>, IReadR
     ///     <see cref="Umbraco.Extensions.ContentExtensions.GetStatus(IContent, ContentScheduleCollection, string?)" /> to get the status for a specific culture.
     /// </remarks>
     IEnumerable<IContent> GetContentForRelease(DateTime date);
+
+    /// <summary>
+    ///     Gets the content keys from the provided collection of keys that are scheduled for publishing.
+    /// </summary>
+    /// <param name="documentIds">The IDs of the documents.</param>
+    /// <returns>
+    ///     The provided collection of content keys filtered for those that are scheduled for publishing.
+    /// </returns>
+    IDictionary<int, IEnumerable<ContentSchedule>> GetContentSchedulesByIds(int[] documentIds) => ImmutableDictionary<int, IEnumerable<ContentSchedule>>.Empty;
 
     /// <summary>
     ///     Get the count of published items

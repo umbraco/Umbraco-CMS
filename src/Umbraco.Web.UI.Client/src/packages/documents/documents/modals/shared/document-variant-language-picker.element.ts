@@ -38,10 +38,10 @@ export class UmbDocumentVariantLanguagePickerElement extends UmbLitElement {
 	}
 
 	@state()
-	_selection: Array<string> = [];
+	private _selection: Array<string> = [];
 
 	@state()
-	_isAllSelected: boolean = false;
+	private _isAllSelected: boolean = false;
 
 	/**
 	 * A filter function that determines if an item is pickableFilter or not.

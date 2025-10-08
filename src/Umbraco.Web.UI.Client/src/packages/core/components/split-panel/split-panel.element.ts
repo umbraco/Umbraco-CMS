@@ -54,8 +54,8 @@ export class UmbSplitPanelElement extends LitElement {
 	/** Pixel value for the snap threshold. Determines how close the divider needs to be to a snap point to snap to it. */
 	readonly #SNAP_THRESHOLD = 25 as const;
 
-	@state() _hasStartPanel = false;
-	@state() _hasEndPanel = false;
+	@state() private _hasStartPanel = false;
+	@state() private _hasEndPanel = false;
 	get #hasBothPanels() {
 		return this._hasStartPanel && this._hasEndPanel;
 	}

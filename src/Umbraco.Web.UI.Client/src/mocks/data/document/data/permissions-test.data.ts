@@ -31,8 +31,11 @@ const permissionsTestDocument = {
 			name: 'Permissions',
 			createDate: '2023-02-06T15:32:05.350038',
 			updateDate: '2023-02-06T15:32:24.957009',
+			id: 'permissions',
+			flags: [],
 		},
 	],
+	flags: [],
 };
 
 export const data: Array<UmbMockDocumentModel> = [
@@ -52,7 +55,9 @@ export const data: Array<UmbMockDocumentModel> = [
 		variants: permissionsTestDocument.variants.map((variant) => ({
 			...variant,
 			name: 'Permissions 1',
+			id: 'permissions-1',
 		})),
+		flags: [],
 	},
 	{
 		...permissionsTestDocument,
@@ -69,7 +74,9 @@ export const data: Array<UmbMockDocumentModel> = [
 		variants: permissionsTestDocument.variants.map((variant) => ({
 			...variant,
 			name: 'Permissions 2',
+			id: 'permissions-2',
 		})),
+		flags: [],
 	},
 	{
 		...permissionsTestDocument,
@@ -87,6 +94,7 @@ export const data: Array<UmbMockDocumentModel> = [
 			...variant,
 			name: 'Permissions 2.1',
 		})),
+		flags: [],
 	},
 	{
 		...permissionsTestDocument,
@@ -104,6 +112,7 @@ export const data: Array<UmbMockDocumentModel> = [
 			...variant,
 			name: 'Permissions 2.2',
 		})),
+		flags: [],
 	},
 	{
 		...permissionsTestDocument,
@@ -125,5 +134,6 @@ export const data: Array<UmbMockDocumentModel> = [
 			...variant,
 			name: 'Permissions 2.2.1',
 		})),
+		flags: [],
 	},
 ];

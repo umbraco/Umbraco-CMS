@@ -39,6 +39,7 @@ export interface MetaTiptapToolbarMenuItem<ItemDataType = unknown> {
 	icon?: string;
 	items?: Array<MetaTiptapToolbarMenuItem<ItemDataType>>;
 	label: string;
+	menu?: string;
 	separatorAfter?: boolean;
 	/** @deprecated No longer used, please use `appearance: { style }`. This will be removed in Umbraco 17. [LK] */
 	style?: string;
@@ -55,6 +56,7 @@ export interface ManifestTiptapToolbarExtensionMenuKind
 	type: 'tiptapToolbarExtension';
 	kind: 'menu';
 	items?: Array<MetaTiptapToolbarMenuItem>;
+	menu?: string;
 }
 
 export type MetaTiptapToolbarStyleMenuItem = MetaTiptapToolbarMenuItem<{ tag?: string; class?: string; id?: string }>;

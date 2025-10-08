@@ -28,7 +28,7 @@ export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElemen
 	@property({ type: Number })
 	public set minValue(value: number | undefined) {
 		this._minValue = value;
-		this.updateValue();
+		this.#updateValue();
 	}
 	public get minValue() {
 		return this._minValue;
@@ -40,7 +40,7 @@ export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElemen
 	@property({ type: Number })
 	public set maxValue(value: number | undefined) {
 		this._maxValue = value;
-		this.updateValue();
+		this.#updateValue();
 	}
 	public get maxValue() {
 		return this._maxValue;
@@ -63,7 +63,7 @@ export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElemen
 	@state()
 	private _maxPlaceholder: string = '';
 
-	private updateValue() {
+	#updateValue() {
 		const newValue =
 			this._minValue || this._maxValue ? (this._minValue ?? '') + ',' + (this._maxValue ?? '') : undefined;
 		if (super.value !== newValue) {
@@ -93,7 +93,7 @@ export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElemen
 		this.addValidator(
 			'patternMismatch',
 			() => {
-				return 'The low value must not be exceed the high value';
+				return '#validation_rangeExceeds';
 			},
 			() => {
 				return this._minValue !== undefined && this._maxValue !== undefined ? this._minValue > this._maxValue : false;

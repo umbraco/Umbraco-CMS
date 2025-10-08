@@ -190,7 +190,7 @@ public class UserStartNodeEntitiesService : IUserStartNodeEntitiesService
         if (userStartNodePaths.Any(path => $"{targetParent?.Path},".StartsWith($"{path},")))
         {
             // The requested parent of the target is one of the user start nodes (or a descendant of one), all siblings are by definition allowed.
-            siblings = _entityService.GetSiblings(targetKey, umbracoObjectType, before, after, out totalBefore, out totalAfter, ordering: ordering).ToArray();
+            siblings = _entityService.GetSiblings(targetKey, [umbracoObjectType], before, after, out totalBefore, out totalAfter, ordering: ordering).ToArray();
             return ChildUserAccessEntities(siblings, userStartNodePaths);
         }
 
@@ -206,7 +206,7 @@ public class UserStartNodeEntitiesService : IUserStartNodeEntitiesService
 
         // Even though we know the IDs of the allowed sibling entities to fetch, we still use a Query to yield correctly sorted children.
         IQuery<IUmbracoEntity> query = _scopeProvider.CreateQuery<IUmbracoEntity>().Where(x => allowedSiblingIds.Contains(x.Id));
-        siblings = _entityService.GetSiblings(targetKey, umbracoObjectType, before, after, out totalBefore, out totalAfter, query, ordering).ToArray();
+        siblings = _entityService.GetSiblings(targetKey, [umbracoObjectType], before, after, out totalBefore, out totalAfter, query, ordering).ToArray();
         return ChildUserAccessEntities(siblings, userStartNodePaths);
     }
 

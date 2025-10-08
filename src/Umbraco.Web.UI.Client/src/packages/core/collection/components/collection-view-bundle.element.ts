@@ -19,10 +19,10 @@ interface UmbCollectionViewLayout {
 @customElement('umb-collection-view-bundle')
 export class UmbCollectionViewBundleElement extends UmbLitElement {
 	@state()
-	_views: Array<UmbCollectionViewLayout> = [];
+	private _views: Array<UmbCollectionViewLayout> = [];
 
 	@state()
-	_currentView?: UmbCollectionViewLayout;
+	private _currentView?: UmbCollectionViewLayout;
 
 	@state()
 	private _collectionRootPathName?: string;

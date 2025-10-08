@@ -1,4 +1,3 @@
-using System.Globalization;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
@@ -80,7 +79,27 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
 
     /// <inheritdoc />
     public async Task<Attempt<ILanguage, LanguageOperationStatus>> UpdateAsync(ILanguage language, Guid userKey)
-        => await SaveAsync(
+    {
+        // Create and update dates aren't tracked for languages. They exist on ILanguage due to the
+        // inheritance from IEntity, but we don't store them.
+        // However we have logic in ServerEventSender that will provide SignalR events for created and update operations,
+        // where these dates are used to distinguish between the two (whether or not the entity has an identity cannot
+        // be used here, as these events fire after persistence when the identity is known for both creates and updates).
+        // So ensure we set something that can be distinguished here.
+        if (language.CreateDate == default)
+        {
+            // Set such that it's prior to the update date, but not the default date which will be considered
+            // uninitialized and get reset to the current date at the repository.
+            language.CreateDate = DateTime.MinValue.AddHours(1);
+        }
+
+        if (language.UpdateDate == default)
+        {
+            // TODO (V17): To align with updates of system dates, this needs to change to DateTime.UtcNow.
+            language.UpdateDate = DateTime.Now;
+        }
+
+        return await SaveAsync(
             language,
             () =>
             {
@@ -101,6 +120,7 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
             AuditType.Save,
             "Update Language",
             userKey);
+    }
 
     /// <inheritdoc />
     public async Task<Attempt<ILanguage, LanguageOperationStatus>> CreateAsync(ILanguage language, Guid userKey)

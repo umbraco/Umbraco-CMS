@@ -5,8 +5,7 @@ import { customElement, html, state } from '@umbraco-cms/backoffice/external/lit
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbWorkspaceSplitViewVariantSelectorElement } from '@umbraco-cms/backoffice/workspace';
 
-const elementName = 'umb-document-workspace-split-view-variant-selector';
-@customElement(elementName)
+@customElement('umb-document-workspace-split-view-variant-selector')
 export class UmbDocumentWorkspaceSplitViewVariantSelectorElement extends UmbWorkspaceSplitViewVariantSelectorElement<UmbDocumentVariantOptionModel> {
 	protected override _variantSorter = sortVariants;
 
@@ -61,13 +60,13 @@ export class UmbDocumentWorkspaceSplitViewVariantSelectorElement extends UmbWork
 		return this.localize.term(term);
 	}
 
-	override _renderVariantDetails(variantOption: UmbDocumentVariantOptionModel) {
+	protected override _renderVariantDetails(variantOption: UmbDocumentVariantOptionModel) {
 		return html` ${this.#getVariantState(variantOption)}`;
 	}
 }
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbDocumentWorkspaceSplitViewVariantSelectorElement;
+		'umb-document-workspace-split-view-variant-selector': UmbDocumentWorkspaceSplitViewVariantSelectorElement;
 	}
 }

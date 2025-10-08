@@ -9,7 +9,7 @@ import { UmbTrashEntityAction } from '@umbraco-cms/backoffice/recycle-bin';
  * @augments {UmbEntityActionBase<MetaEntityActionTrashWithRelationKind>}
  */
 export class UmbTrashWithRelationEntityAction extends UmbTrashEntityAction<MetaEntityActionTrashWithRelationKind> {
-	override async _confirmTrash(item: any) {
+	protected override async _confirmTrash(item: any) {
 		await umbOpenModal(this, UMB_TRASH_WITH_RELATION_CONFIRM_MODAL, {
 			data: {
 				unique: item.unique,

@@ -65,10 +65,7 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 		const path = this.#serverFilePathUniqueSerializer.toServerPath(unique);
 		if (!path) throw new Error('Path is missing');
 
-		const { data, error } = await tryExecute(
-			this.#host,
-			ScriptService.getScriptByPath({ path: { path } }),
-		);
+		const { data, error } = await tryExecute(this.#host, ScriptService.getScriptByPath({ path: { path } }));
 
 		if (error || !data) {
 			return { error };

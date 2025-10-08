@@ -28,10 +28,10 @@ export class UmbMemberItemRefElement extends UmbLitElement {
 	standalone = false;
 
 	@state()
-	_editPath = '';
+	private _editPath = '';
 
 	@state()
-	_userHasSectionAccess = false;
+	private _userHasSectionAccess = false;
 
 	constructor() {
 		super();
@@ -48,6 +48,7 @@ export class UmbMemberItemRefElement extends UmbLitElement {
 		]);
 
 		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+			.addUniquePaths(['unique'])
 			.onSetup(() => {
 				return { data: { entityType: UMB_MEMBER_ENTITY_TYPE, preset: {} } };
 			})

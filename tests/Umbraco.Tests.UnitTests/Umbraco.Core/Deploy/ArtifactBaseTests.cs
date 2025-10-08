@@ -12,23 +12,35 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Deploy;
 [TestFixture]
 public class ArtifactBaseTests
 {
-    [Test]
-    public void CanSerialize()
-    {
-        var udi = new GuidUdi("test", Guid.Parse("3382d5433b5749d08919bc9961422a1f"));
-        var artifact = new TestArtifact(udi, new List<ArtifactDependency>()) { Name = "Test Name", Alias = "testAlias" };
-
-        var serialized = JsonSerializer.Serialize(artifact, new JsonSerializerOptions()
+    private readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions
         {
             Converters =
             {
                 new JsonUdiConverter(),
             }
-        });
+        };
 
-        var expected =
-            "{\"Udi\":\"umb://test/3382d5433b5749d08919bc9961422a1f\",\"Dependencies\":[],\"Checksum\":\"test checksum value\",\"Name\":\"Test Name\",\"Alias\":\"testAlias\"}";
+    [Test]
+    public void Can_Serialize()
+    {
+        var udi = new GuidUdi("document", Guid.Parse("3382d5433b5749d08919bc9961422a1f"));
+        var artifact = new TestArtifact(udi, []) { Name = "Test Name", Alias = "testAlias" };
+
+        string serialized = JsonSerializer.Serialize(artifact, _jsonSerializerOptions);
+
+        var expected = "{\"Udi\":\"umb://document/3382d5433b5749d08919bc9961422a1f\",\"Dependencies\":[],\"Checksum\":\"test checksum value\",\"Name\":\"Test Name\",\"Alias\":\"testAlias\"}";
         Assert.AreEqual(expected, serialized);
+    }
+
+    [Test]
+    public void Can_Deserialize()
+    {
+        var serialized = "{\"Udi\":\"umb://document/3382d5433b5749d08919bc9961422a1f\",\"Dependencies\":[],\"Checksum\":\"test checksum value\",\"Name\":\"Test Name\",\"Alias\":\"testAlias\"}";
+
+        TestArtifact? deserialized = JsonSerializer.Deserialize<TestArtifact>(serialized, _jsonSerializerOptions);
+        Assert.IsNotNull(deserialized);
+        Assert.AreEqual("Test Name", deserialized.Name);
+        Assert.AreEqual("testAlias", deserialized.Alias);
     }
 
     [Test]

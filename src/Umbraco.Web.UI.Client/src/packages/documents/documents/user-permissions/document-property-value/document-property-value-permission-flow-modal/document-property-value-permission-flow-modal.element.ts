@@ -15,7 +15,7 @@ export class UmbDocumentPropertyValueUserPermissionFlowModalElement extends UmbM
 	UmbDocumentPropertyValueUserPermissionFlowModalValue
 > {
 	@state()
-	_selection: Array<string> = [];
+	private _selection: Array<string> = [];
 
 	async #next() {
 		if (this._selection.length === 0) {

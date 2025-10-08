@@ -11,7 +11,7 @@ export class UmbBackofficeModalContainerElement extends UmbLitElement {
 	private _modalElementMap: Map<string, UmbModalElement> = new Map();
 
 	@state()
-	_modals: Array<UmbModalContext> = [];
+	private _modals: Array<UmbModalContext> = [];
 
 	@property({ type: Boolean, reflect: true, attribute: 'fill-background' })
 	fillBackground = false;

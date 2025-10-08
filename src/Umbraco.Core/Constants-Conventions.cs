@@ -303,5 +303,16 @@ public static partial class Constants
         {
             public const string Prefix = "umb://";
         }
+
+        /// <summary>
+        ///     Constants for relating to view model flags.
+        /// </summary>
+        public static class Flags
+        {
+            /// <summary>
+            ///     Prefix for all flag aliases.
+            /// </summary>
+            public const string Prefix = "Umb.";
+        }
     }
 }

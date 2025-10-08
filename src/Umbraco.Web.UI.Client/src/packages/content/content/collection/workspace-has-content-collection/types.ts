@@ -7,6 +7,7 @@ export type UmbWorkspaceHasContentCollectionConditionConfig = UmbConditionConfig
 /**
  * @deprecated Use `UmbWorkspaceHasContentCollectionConditionConfig` instead. This will be removed in Umbraco 17.
  */
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export type WorkspaceHasCollectionConditionConfig = UmbWorkspaceHasContentCollectionConditionConfig;
 
 declare global {

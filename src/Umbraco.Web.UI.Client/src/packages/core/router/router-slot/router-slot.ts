@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { GLOBAL_ROUTER_EVENTS_TARGET, ROUTER_SLOT_TAG_NAME } from './config.js';
 import type {
 	Cancel,
@@ -44,7 +45,7 @@ ensureAnchorHistory();
  * @slot - Default content.
  * @event changestate - Dispatched when the router slot state changes.
  */
-// eslint-disable-next-line local-rules/enforce-element-suffix-on-element-class-name, local-rules/umb-class-prefix
+// eslint-disable-next-line local-rules/enforce-element-suffix-on-element-class-name
 export class RouterSlot<D = any, P = any> extends HTMLElement implements IRouterSlot<D, P> {
 	/**
 	 * Method to cancel navigation if changed.

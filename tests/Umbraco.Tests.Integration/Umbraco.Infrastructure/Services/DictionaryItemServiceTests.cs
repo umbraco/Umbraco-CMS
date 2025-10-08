@@ -362,6 +362,11 @@ internal sealed class DictionaryItemServiceTests : UmbracoIntegrationTest
         var result = await DictionaryItemService.UpdateAsync(item, Constants.Security.SuperUserKey);
         Assert.True(result.Success);
 
+        // Verify that the create and update dates can be used to distinguish between creates
+        // and updates (as these fields are used in ServerEventSender to emit a "Created" or "Updated"
+        // event.
+        Assert.Greater(result.Result.UpdateDate, result.Result.CreateDate);
+
         var updatedItem = await DictionaryItemService.GetAsync("Child");
         Assert.NotNull(updatedItem);
 

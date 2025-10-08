@@ -43,6 +43,7 @@ export const data: Array<UmbMockMediaModel> = [
 			},
 		],
 		urls: [],
+		flags: [],
 	},
 	{
 		hasChildren: false,
@@ -73,6 +74,7 @@ export const data: Array<UmbMockMediaModel> = [
 			},
 		],
 		urls: [],
+		flags: [],
 	},
 	{
 		hasChildren: true,
@@ -98,6 +100,7 @@ export const data: Array<UmbMockMediaModel> = [
 			},
 		],
 		urls: [],
+		flags: [],
 	},
 	{
 		hasChildren: true,
@@ -123,6 +126,7 @@ export const data: Array<UmbMockMediaModel> = [
 			},
 		],
 		urls: [],
+		flags: [],
 	},
 	{
 		hasChildren: false,
@@ -153,6 +157,7 @@ export const data: Array<UmbMockMediaModel> = [
 			},
 		],
 		urls: [],
+		flags: [],
 	},
 	{
 		hasChildren: false,
@@ -183,6 +188,7 @@ export const data: Array<UmbMockMediaModel> = [
 			},
 		],
 		urls: [],
+		flags: [],
 	},
 	{
 		hasChildren: false,
@@ -213,6 +219,7 @@ export const data: Array<UmbMockMediaModel> = [
 			},
 		],
 		urls: [],
+		flags: [],
 	},
 	{
 		hasChildren: false,
@@ -243,6 +250,7 @@ export const data: Array<UmbMockMediaModel> = [
 			},
 		],
 		urls: [],
+		flags: [],
 	},
 	{
 		hasChildren: false,
@@ -275,5 +283,6 @@ export const data: Array<UmbMockMediaModel> = [
 			},
 		],
 		urls: [],
+		flags: [],
 	},
 ];

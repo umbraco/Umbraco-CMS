@@ -72,6 +72,8 @@ public interface ISqlSyntaxProvider
 
     string ConvertDecimalToOrderableString { get; }
 
+    string ConvertUniqueIdentifierToString => throw new NotImplementedException();
+
     /// <summary>
     ///     Returns the default isolation level for the database
     /// </summary>

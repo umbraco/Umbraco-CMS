@@ -64,7 +64,7 @@ export class UmbDashboardExamineOverviewElement extends UmbLitElement {
 						>Allows you to view the details of each index and provides some tools for managing the indexes</umb-localize
 					>
 				</p>
-				${this.renderIndexersList()}
+				${this.#renderIndexersList()}
 			</uui-box>
 			<uui-box headline=${this.localize.term('examineManagement_searchers')}>
 				<p>
@@ -74,12 +74,12 @@ export class UmbDashboardExamineOverviewElement extends UmbLitElement {
 						>Shows properties and tools for any configured Searcher (i.e. such as a multi-index searcher)</umb-localize
 					>
 				</p>
-				${this.renderSearchersList()}
+				${this.#renderSearchersList()}
 			</uui-box>
 		`;
 	}
 
-	private renderIndexersList() {
+	#renderIndexersList() {
 		if (this._loadingIndexers) return html`<uui-loader></uui-loader>`;
 		if (!this._indexers) return nothing;
 		return html` <uui-table class="overview">
@@ -96,7 +96,7 @@ export class UmbDashboardExamineOverviewElement extends UmbLitElement {
 		</uui-table>`;
 	}
 
-	private renderSearchersList() {
+	#renderSearchersList() {
 		if (this._loadingSearchers) return html`<uui-loader></uui-loader>`;
 		if (!this._searchers) return nothing;
 		return html`

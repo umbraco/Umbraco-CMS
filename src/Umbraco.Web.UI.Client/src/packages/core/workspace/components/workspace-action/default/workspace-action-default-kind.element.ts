@@ -73,7 +73,7 @@ export class UmbWorkspaceActionElement<
 	private _href?: string;
 
 	@state()
-	_isDisabled = false;
+	private _isDisabled = false;
 
 	@state()
 	private _items: Array<UmbExtensionElementAndApiInitializer<ManifestWorkspaceActionMenuItem>> = [];
@@ -141,7 +141,7 @@ export class UmbWorkspaceActionElement<
 	}
 
 	#initButtonStateReset() {
-		/* When the button has additional options, we do not show the waiting state.  
+		/* When the button has additional options, we do not show the waiting state.
     Therefore, we need to ensure the button state is reset, so we are able to show the success state again. */
 		this.#clearButtonStateResetTimeout();
 

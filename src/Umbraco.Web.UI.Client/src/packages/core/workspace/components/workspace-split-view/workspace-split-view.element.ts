@@ -1,16 +1,19 @@
+import type { ManifestWorkspaceView } from '../../types.js';
 import { UmbWorkspaceSplitViewContext } from './workspace-split-view.context.js';
 import {
 	css,
-	html,
 	customElement,
-	property,
+	html,
 	ifDefined,
+	nothing,
+	property,
 	state,
 	when,
-	nothing,
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { UmbDeepPartialObject } from '@umbraco-cms/backoffice/utils';
+import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 // import local components
 import './workspace-split-view-variant-selector.element.js';
@@ -24,10 +27,16 @@ import './workspace-split-view-variant-selector.element.js';
 @customElement('umb-workspace-split-view')
 export class UmbWorkspaceSplitViewElement extends UmbLitElement {
 	@property({ type: Boolean })
+	public loading = false;
+
+	@property({ type: Boolean })
 	displayNavigation = false;
 
 	@property({ attribute: 'back-path' })
 	public backPath?: string;
+
+	@property({ attribute: false })
+	public overrides?: Array<UmbDeepPartialObject<ManifestWorkspaceView>>;
 
 	@property({ type: Number })
 	public set splitViewIndex(index: number) {
@@ -43,7 +52,10 @@ export class UmbWorkspaceSplitViewElement extends UmbLitElement {
 	@state()
 	private _isNew = false;
 
-	splitViewContext = new UmbWorkspaceSplitViewContext(this);
+	@state()
+	private _variantId?: UmbVariantId;
+
+	readonly splitViewContext = new UmbWorkspaceSplitViewContext(this);
 
 	#onVariantSelectorSlotChanged(e: Event) {
 		this._variantSelectorSlotHasContent = (e.target as HTMLSlotElement).assignedNodes({ flatten: true }).length > 0;
@@ -57,15 +69,26 @@ export class UmbWorkspaceSplitViewElement extends UmbLitElement {
 			(isNew) => {
 				this._isNew = isNew ?? false;
 			},
-			'umbObserveIsNew',
+			null,
+		);
+
+		this.observe(
+			this.splitViewContext.variantId,
+			(variantId) => {
+				this._variantId = variantId;
+			},
+			null,
 		);
 	}
 
 	override render() {
 		return html`
 			<umb-workspace-editor
+				.loading=${this.loading}
 				back-path=${ifDefined(this.backPath)}
 				.hideNavigation=${!this.displayNavigation}
+				.variantId=${this._variantId}
+				.overrides=${this.overrides}
 				.enforceNoFooter=${true}>
 				<slot id="icon" name="icon" slot="header"></slot>
 				<slot id="header" name="variant-selector" slot="header" @slotchange=${this.#onVariantSelectorSlotChanged}>

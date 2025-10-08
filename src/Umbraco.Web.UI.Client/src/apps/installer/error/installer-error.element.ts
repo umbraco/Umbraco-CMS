@@ -8,7 +8,7 @@ import type { UmbProblemDetails } from '@umbraco-cms/backoffice/resources';
 @customElement('umb-installer-error')
 export class UmbInstallerErrorElement extends UmbLitElement {
 	@state()
-	_error?: UmbProblemDetails;
+	private _error?: UmbProblemDetails;
 
 	private _installerContext?: UmbInstallerContext;
 

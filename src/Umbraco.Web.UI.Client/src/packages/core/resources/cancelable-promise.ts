@@ -1,6 +1,6 @@
 import { UmbCancelError } from './umb-error.js';
 
-export interface OnCancel {
+export interface UmbOnCancel {
 	readonly isResolved: boolean;
 	readonly isRejected: boolean;
 	readonly isCancelled: boolean;
@@ -21,7 +21,7 @@ export class UmbCancelablePromise<T> implements Promise<T> {
 		executor: (
 			resolve: (value: T | PromiseLike<T>) => void,
 			reject: (reason?: unknown) => void,
-			onCancel: OnCancel,
+			onCancel: UmbOnCancel,
 		) => void,
 	) {
 		this._isResolved = false;
@@ -67,7 +67,7 @@ export class UmbCancelablePromise<T> implements Promise<T> {
 				get: (): boolean => this._isCancelled,
 			});
 
-			return executor(onResolve, onReject, onCancel as OnCancel);
+			return executor(onResolve, onReject, onCancel as UmbOnCancel);
 		});
 	}
 

@@ -24,17 +24,17 @@ export class UmbDocumentReferenceTableElement extends UmbLitElement {
 	unique = '';
 
 	@state()
-	_items: Array<UmbReferenceModel> = [];
+	private _items: Array<UmbReferenceModel> = [];
 
 	/**
 	 * Indicates if there are more references to load, i.e. if the server has more references to return.
 	 * This is used to determine if the "...and X more references" text should be displayed.
 	 */
 	@state()
-	_hasMoreReferences = 0;
+	private _hasMoreReferences = 0;
 
 	@state()
-	_errorMessage = '';
+	private _errorMessage = '';
 
 	override firstUpdated() {
 		new UmbDeprecation({

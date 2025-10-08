@@ -13,7 +13,7 @@ export class UmbUserAvatarElement extends UmbLitElement {
 	private _allowedFileTypes = 'image/*';
 
 	@query('#AvatarFileField')
-	_avatarFileField?: HTMLInputElement;
+	private _avatarFileField?: HTMLInputElement;
 
 	@query('uui-combobox')
 	private _selectElement!: HTMLInputElement;

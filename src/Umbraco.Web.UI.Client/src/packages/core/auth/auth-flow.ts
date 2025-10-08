@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 /*
  * Copyright 2017 Google Inc.
  *
@@ -235,7 +236,7 @@ export class UmbAuthFlow {
 	 * @returns true if the user is logged in, false otherwise.
 	 */
 	isAuthorized(): boolean {
-		return !!this.#tokenResponse;
+		return !!this.#tokenResponse.getValue();
 	}
 
 	/**

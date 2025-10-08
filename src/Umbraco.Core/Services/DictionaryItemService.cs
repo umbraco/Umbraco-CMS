@@ -159,7 +159,27 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
     /// <inheritdoc />
     public async Task<Attempt<IDictionaryItem, DictionaryItemOperationStatus>> UpdateAsync(
         IDictionaryItem dictionaryItem, Guid userKey)
-        => await SaveAsync(
+    {
+        // Create and update dates aren't tracked for dictionary items. They exist on IDictionaryItem due to the
+        // inheritance from IEntity, but we don't store them.
+        // However we have logic in ServerEventSender that will provide SignalR events for created and update operations,
+        // where these dates are used to distinguish between the two (whether or not the entity has an identity cannot
+        // be used here, as these events fire after persistence when the identity is known for both creates and updates).
+        // So ensure we set something that can be distinguished here.
+        if (dictionaryItem.CreateDate == default)
+        {
+            // Set such that it's prior to the update date, but not the default date which will be considered
+            // uninitialized and get reset to the current date at the repository.
+            dictionaryItem.CreateDate = DateTime.MinValue.AddHours(1);
+        }
+
+        if (dictionaryItem.UpdateDate == default)
+        {
+            // TODO (V17): To align with updates of system dates, this needs to change to DateTime.UtcNow.
+            dictionaryItem.UpdateDate = DateTime.Now;
+        }
+
+        return await SaveAsync(
             dictionaryItem,
             () =>
             {
@@ -174,6 +194,7 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
             AuditType.Save,
             "Update DictionaryItem",
             userKey);
+    }
 
     /// <inheritdoc />
     public async Task<Attempt<IDictionaryItem?, DictionaryItemOperationStatus>> DeleteAsync(Guid id, Guid userKey)

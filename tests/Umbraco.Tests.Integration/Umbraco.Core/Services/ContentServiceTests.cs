@@ -688,6 +688,26 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
+    public void Can_Get_Content_Schedules_By_Keys()
+    {
+        // Arrange
+        var root = ContentService.GetById(Textpage.Id);
+        ContentService.Publish(root!, root!.AvailableCultures.ToArray());
+        var content = ContentService.GetById(Subpage.Id);
+        var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddDays(1), null);
+        ContentService.PersistContentSchedule(content!, contentSchedule);
+        ContentService.Publish(content, content.AvailableCultures.ToArray());
+
+        // Act
+        var keys = ContentService.GetContentSchedulesByIds([Textpage.Key, Subpage.Key, Subpage2.Key]).ToList();
+
+        // Assert
+        Assert.AreEqual(1, keys.Count);
+        Assert.AreEqual(keys[0].Key, Subpage.Id);
+        Assert.AreEqual(keys[0].Value.First().Id, contentSchedule.FullSchedule.First().Id);
+    }
+
+    [Test]
     public void Can_Get_Content_For_Release()
     {
         // Arrange

@@ -7,5 +7,6 @@ export const UMB_CONTENT_WORKSPACE_CONTEXT = new UmbContextToken<
 >(
 	'UmbWorkspaceContext',
 	undefined,
-	(context): context is UmbContentWorkspaceContext => (context as any).IS_CONTENT_WORKSPACE_CONTEXT,
+	(context): context is UmbContentWorkspaceContext =>
+		(context as UmbContentWorkspaceContext).IS_CONTENT_WORKSPACE_CONTEXT,
 );

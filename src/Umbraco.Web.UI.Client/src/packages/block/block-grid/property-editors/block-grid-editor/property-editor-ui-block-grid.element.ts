@@ -107,7 +107,7 @@ export class UmbPropertyEditorUIBlockGridElement
 	}
 
 	@state()
-	_notSupportedVariantSetting?: boolean;
+	private _notSupportedVariantSetting?: boolean;
 
 	constructor() {
 		super();

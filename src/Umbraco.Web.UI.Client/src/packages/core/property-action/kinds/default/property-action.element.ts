@@ -16,7 +16,7 @@ export class UmbPropertyActionElement<
 	#api?: ApiType;
 
 	@state()
-	_href?: string;
+	private _href?: string;
 
 	@property({ attribute: false })
 	public manifest?: ManifestPropertyActionDefaultKind<MetaType>;

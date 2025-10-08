@@ -1,9 +1,10 @@
-import { UMB_IMAGE_CROPPER_EDITOR_MODAL, UMB_MEDIA_PICKER_MODAL } from '../../modals/index.js';
+import { UMB_IMAGE_CROPPER_EDITOR_MODAL } from '../../modals/index.js';
 import type { UmbMediaItemModel, UmbCropModel, UmbMediaPickerPropertyValueEntry } from '../../types.js';
 import { UMB_MEDIA_ITEM_REPOSITORY_ALIAS } from '../../repository/constants.js';
-import type { UmbUploadableItem } from '@umbraco-cms/backoffice/dropzone';
-import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
-import { umbConfirmModal, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UmbMediaPickerInputContext } from '../input-media/input-media.context.js';
+import { UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone';
+import type { UmbDropzoneChangeEvent } from '@umbraco-cms/backoffice/dropzone';
+import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -14,8 +15,14 @@ import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
+import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/media-type';
 
 import '@umbraco-cms/backoffice/imaging';
+import {
+	UmbInteractionMemoriesChangeEvent,
+	type UmbInteractionMemoryModel,
+} from '@umbraco-cms/backoffice/interaction-memory';
+import { jsonStringComparison } from '@umbraco-cms/backoffice/observable-api';
 
 type UmbRichMediaCardModel = {
 	unique: string;
@@ -24,6 +31,7 @@ type UmbRichMediaCardModel = {
 	src?: string;
 	icon?: string;
 	isTrashed?: boolean;
+	isLoading?: boolean;
 };
 
 @customElement('umb-input-rich-media')
@@ -99,6 +107,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 	public override set value(value: Array<UmbMediaPickerPropertyValueEntry> | undefined) {
 		super.value = value;
 		this.#sorter.setModel(value);
+		this.#pickerInputContext.setSelection(value?.map((item) => item.mediaKey) ?? []);
 		this.#itemManager.setUniques(value?.map((x) => x.mediaKey));
 		// Maybe the new value is using an existing media, and there we need to update the cards despite no repository update.
 		this.#populateCards();
@@ -167,6 +176,17 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 	}
 	#readonly = false;
 
+	@property({ type: Array, attribute: false })
+	public get interactionMemories(): Array<UmbInteractionMemoryModel> | undefined {
+		return this.#pickerInputContext.interactionMemory.getAllMemories();
+	}
+	public set interactionMemories(value: Array<UmbInteractionMemoryModel> | undefined) {
+		this.#interactionMemories = value;
+		value?.forEach((memory) => this.#pickerInputContext.interactionMemory.setMemory(memory));
+	}
+
+	#interactionMemories?: Array<UmbInteractionMemoryModel> = [];
+
 	@state()
 	private _cards: Array<UmbRichMediaCardModel> = [];
 
@@ -174,6 +194,8 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 	private _routeBuilder?: UmbModalRouteBuilder;
 
 	readonly #itemManager = new UmbRepositoryItemsManager<UmbMediaItemModel>(this, UMB_MEDIA_ITEM_REPOSITORY_ALIAS);
+
+	readonly #pickerInputContext = new UmbMediaPickerInputContext(this);
 
 	constructor() {
 		super();
@@ -228,6 +250,24 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 				this._routeBuilder = routeBuilder;
 			});
 
+		this.observe(this.#pickerInputContext.selection, (selection) => {
+			this.#addItems(selection);
+		});
+
+		this.observe(
+			this.#pickerInputContext.interactionMemory.memories,
+			(memories) => {
+				// only dispatch the event if the interaction memories have actually changed
+				const isIdentical = jsonStringComparison(memories, this.#interactionMemories);
+
+				if (!isIdentical) {
+					this.#interactionMemories = memories;
+					this.dispatchEvent(new UmbInteractionMemoriesChangeEvent());
+				}
+			},
+			'_observeMemories',
+		);
+
 		this.addValidator(
 			'valueMissing',
 			() => this.requiredMessage ?? UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
@@ -262,16 +302,6 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 	async #populateCards() {
 		const mediaItems = this.#itemManager.getItems();
 
-		if (!mediaItems.length) {
-			this._cards = [];
-			return;
-		}
-		// Check if all media items is loaded.
-		// But notice, it would be nicer UX if we could show a loading state on the cards that are missing(loading) their items.
-		const missingCards = mediaItems.filter((item) => !this._cards.find((card) => card.unique === item.unique));
-		const removedCards = this._cards.filter((card) => !mediaItems.find((item) => card.unique === item.unique));
-		if (missingCards.length === 0 && removedCards.length === 0) return;
-
 		this._cards =
 			this.value?.map((item) => {
 				const media = mediaItems.find((x) => x.unique === item.mediaKey);
@@ -281,6 +311,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 					name: media?.name ?? '',
 					icon: media?.mediaType?.icon,
 					isTrashed: media?.isTrashed ?? false,
+					isLoading: !media,
 				};
 			}) ?? [];
 	}
@@ -292,7 +323,10 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		return true;
 	};
 
-	#addItems(uniques: string[]) {
+	#addItems(additionalMediaKeys: string[]) {
+		// Check that the unique is not already added
+		const uniques = additionalMediaKeys.filter((key) => !this.value?.some((item) => item.mediaKey === key));
+
 		if (!uniques.length) return;
 
 		const additions: Array<UmbMediaPickerPropertyValueEntry> = uniques.map((unique) => ({
@@ -307,40 +341,40 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	async #openPicker() {
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const modalHandler = modalManager?.open(this, UMB_MEDIA_PICKER_MODAL, {
-			data: {
+	#openPicker() {
+		this.#pickerInputContext.openPicker(
+			{
 				multiple: this.multiple,
 				startNode: this.startNode,
 				pickableFilter: this.#pickableFilter,
 			},
-			value: { selection: [] },
-		});
-
-		const data = await modalHandler?.onSubmit().catch(() => null);
-		if (!data) return;
-
-		const selection = data.selection.filter((x) => x !== null) as string[];
-		this.#addItems(selection);
+			{
+				allowedContentTypes: this.allowedContentTypeIds?.map((id) => ({
+					unique: id,
+					entityType: UMB_MEDIA_TYPE_ENTITY_TYPE,
+				})),
+				includeTrashed: false,
+			},
+		);
 	}
 
 	async #onRemove(item: UmbRichMediaCardModel) {
-		await umbConfirmModal(this, {
-			color: 'danger',
-			headline: `${this.localize.term('actions_remove')} ${item.name}?`,
-			content: `${this.localize.term('defaultdialogs_confirmremove')} ${item.name}?`,
-			confirmLabel: this.localize.term('actions_remove'),
-		});
-
-		this.value = this.value?.filter((x) => x.key !== item.unique);
-
-		this.dispatchEvent(new UmbChangeEvent());
+		try {
+			await this.#pickerInputContext.requestRemoveItem(item.media);
+			this.value = this.value?.filter((x) => x.key !== item.unique);
+			this.dispatchEvent(new UmbChangeEvent());
+		} catch {
+			// User cancelled the action
+		}
 	}
 
-	async #onUploadCompleted(e: CustomEvent) {
-		const completed = e.detail as Array<UmbUploadableItem>;
-		const uploaded = completed.map((file) => file.unique);
+	async #onUploadCompleted(e: UmbDropzoneChangeEvent) {
+		if (this.readonly) return;
+
+		// If there are any finished uploadable items, we need to add them to the value
+		const uploaded = e.items
+			.filter((file) => file.status === UmbFileDropzoneItemStatus.COMPLETE)
+			.map((file) => file.unique);
 		this.#addItems(uploaded);
 	}
 
@@ -351,16 +385,17 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		`;
 	}
 
+	// TODO: Consider removing the "progress element" from the dropzone and render that using a context instead. This would allow the media picker to show inline progress items instead [JOV]
 	#renderDropzone() {
 		if (this.readonly) return nothing;
-		if (this._cards && this._cards.length >= this.max) return;
 		return html`<umb-dropzone-media
-			?multiple=${this.max > 1}
-			@complete=${this.#onUploadCompleted}></umb-dropzone-media>`;
+			id="dropzone"
+			?multiple=${this.multiple}
+			@change=${this.#onUploadCompleted}></umb-dropzone-media>`;
 	}
 
 	#renderItems() {
-		if (!this._cards.length) return;
+		if (!this._cards.length) return nothing;
 		return html`
 			${repeat(
 				this._cards,
@@ -371,26 +406,22 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 	}
 
 	#renderAddButton() {
-		if (this._cards && this._cards.length && !this.multiple) return;
-		if (this.readonly && this._cards.length > 0) {
-			return nothing;
-		} else {
-			return html`
-				<uui-button
-					id="btn-add"
-					look="placeholder"
-					@blur=${() => {
-						this.pristine = false;
-						this.checkValidity();
-					}}
-					@click=${this.#openPicker}
-					label=${this.localize.term('general_choose')}
-					?disabled=${this.readonly}>
-					<uui-icon name="icon-add"></uui-icon>
-					${this.localize.term('general_choose')}
-				</uui-button>
-			`;
-		}
+		if (this.readonly) return nothing;
+		return html`
+			<uui-button
+				id="btn-add"
+				look="placeholder"
+				@blur=${() => {
+					this.pristine = false;
+					this.checkValidity();
+				}}
+				@click=${this.#openPicker}
+				label=${this.localize.term('general_choose')}
+				?disabled=${this.readonly}>
+				<uui-icon name="icon-add"></uui-icon>
+				${this.localize.term('general_choose')}
+			</uui-button>
+		`;
 	}
 
 	#renderItem(item: UmbRichMediaCardModel) {
@@ -398,10 +429,16 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		const href = this.readonly ? undefined : this._routeBuilder?.({ key: item.unique });
 		return html`
 			<uui-card-media id=${item.unique} name=${item.name} .href=${href} ?readonly=${this.readonly}>
-				<umb-imaging-thumbnail
-					unique=${item.media}
-					alt=${item.name}
-					icon=${item.icon ?? 'icon-picture'}></umb-imaging-thumbnail>
+				${when(
+					item.isLoading,
+					() => html`<uui-loader-circle></uui-loader-circle>`,
+					() => html`
+						<umb-imaging-thumbnail
+							unique=${item.media}
+							alt=${item.name}
+							icon=${item.icon ?? 'icon-picture'}></umb-imaging-thumbnail>
+					`,
+				)}
 				${this.#renderIsTrashed(item)} ${this.#renderActions(item)}
 			</uui-card-media>
 		`;
@@ -427,7 +464,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		css`
 			:host {
 				position: relative;
@@ -437,6 +474,10 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 				gap: var(--uui-size-space-5);
 				grid-template-columns: repeat(auto-fill, minmax(var(--umb-card-medium-min-width), 1fr));
 				grid-auto-rows: var(--umb-card-medium-min-width);
+			}
+
+			#dropzone {
+				margin-bottom: var(--uui-size-space-5);
 			}
 
 			#btn-add {

@@ -22,10 +22,10 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 	}
 
 	@state()
-	_properties: Array<string> = [];
+	private _properties: Array<string> = [];
 
 	@state()
-	_visibleProperties?: Array<UmbPropertyTypeModel>;
+	private _visibleProperties?: Array<UmbPropertyTypeModel>;
 
 	constructor() {
 		super();

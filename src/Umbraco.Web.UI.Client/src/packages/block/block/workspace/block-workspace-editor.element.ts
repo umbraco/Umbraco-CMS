@@ -28,7 +28,7 @@ export class UmbBlockWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	@state()
-	_headline: string = '';
+	private _headline: string = '';
 
 	override render() {
 		return html`<umb-workspace-editor headline=${this._headline}> </umb-workspace-editor> `;

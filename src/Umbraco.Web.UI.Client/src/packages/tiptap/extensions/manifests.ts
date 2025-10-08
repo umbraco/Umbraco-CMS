@@ -1,678 +1,94 @@
-import { manifests as blockExtensions } from './block/manifests.js';
-import { manifests as styleSelectExtensions } from './style-select/manifests.js';
-import { manifests as tableExtensions } from './table/manifests.js';
-import { manifests as statusbarExtensions } from './statusbar/manifests.js';
-import type { ManifestTiptapExtension } from './tiptap.extension.js';
-import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import { manifest as buttonKind } from './tiptap-toolbar-button.kind.js';
+import { manifest as colorPickerButton } from './tiptap-toolbar-color-picker-button.kind.js';
+import { manifest as menuButton } from './tiptap-toolbar-menu.kind.js';
+import { manifest as styleMenuKind } from './style-menu/style-menu.kind.js';
+import { manifests as anchor } from './anchor/manifests.js';
+import { manifests as block } from './block/manifests.js';
+import { manifests as blockquote } from './blockquote/manifests.js';
+import { manifests as bold } from './bold/manifests.js';
+import { manifests as bulletList } from './bullet-list/manifests.js';
+import { manifests as characterMap } from './character-map/manifests.js';
+import { manifests as clearFormatting } from './clear-formatting/manifests.js';
+import { manifests as codeBlock } from './code-block/manifests.js';
+import { manifests as core } from './core/manifests.js';
+import { manifests as elementPath } from './element-path/manifests.js';
+import { manifests as embeddedMedia } from './embedded-media/manifests.js';
+import { manifests as figure } from './figure/manifests.js';
+import { manifests as fontFamily } from './font-family/manifests.js';
+import { manifests as fontSize } from './font-size/manifests.js';
+import { manifests as heading } from './heading/manifests.js';
+import { manifests as horizontalRule } from './horizontal-rule/manifests.js';
+import { manifests as htmlAttrClass } from './html-attr-class/manifests.js';
+import { manifests as htmlAttrDataset } from './html-attr-dataset/manifests.js';
+import { manifests as htmlAttrId } from './html-attr-id/manifests.js';
+import { manifests as htmlAttrStyle } from './html-attr-style/manifests.js';
+import { manifests as htmlTagDiv } from './html-tag-div/manifests.js';
+import { manifests as htmlTagSpan } from './html-tag-span/manifests.js';
+import { manifests as image } from './image/manifests.js';
+import { manifests as italic } from './italic/manifests.js';
+import { manifests as link } from './link/manifests.js';
+import { manifests as mediaPicker } from './media-picker/manifests.js';
+import { manifests as mediaUpload } from './media-upload/manifests.js';
+import { manifests as orderedList } from './ordered-list/manifests.js';
+import { manifests as strike } from './strike/manifests.js';
+import { manifests as styleSelect } from './style-select/manifests.js';
+import { manifests as subscript } from './subscript/manifests.js';
+import { manifests as superscript } from './superscript/manifests.js';
+import { manifests as table } from './table/manifests.js';
+import { manifests as textAlign } from './text-align/manifests.js';
+import { manifests as textColor } from './text-color/manifests.js';
+import { manifests as textDirection } from './text-direction/manifests.js';
+import { manifests as textIndent } from './text-indent/manifests.js';
+import { manifests as trailingNode } from './trailing-node/manifests.js';
+import { manifests as underline } from './underline/manifests.js';
+import { manifests as undoRedo } from './undo-redo/manifests.js';
+import { manifests as viewSource } from './view-source/manifests.js';
+import { manifests as wordCount } from './word-count/manifests.js';
 
-const kinds: Array<UmbExtensionManifestKind> = [
-	{
-		type: 'kind',
-		alias: 'Umb.Kind.TiptapToolbar.Button',
-		matchKind: 'button',
-		matchType: 'tiptapToolbarExtension',
-		manifest: {
-			element: () => import('../components/toolbar/tiptap-toolbar-button.element.js'),
-		},
-	},
-	{
-		type: 'kind',
-		alias: 'Umb.Kind.TiptapToolbar.ColorPickerButton',
-		matchKind: 'colorPickerButton',
-		matchType: 'tiptapToolbarExtension',
-		manifest: {
-			element: () => import('../components/toolbar/tiptap-toolbar-color-picker-button.element.js'),
-		},
-	},
-	{
-		type: 'kind',
-		alias: 'Umb.Kind.TiptapToolbar.Menu',
-		matchKind: 'menu',
-		matchType: 'tiptapToolbarExtension',
-		manifest: {
-			element: () => import('../components/toolbar/tiptap-toolbar-menu.element.js'),
-		},
-	},
-	{
-		type: 'kind',
-		alias: 'Umb.Kind.TiptapToolbar.StyleMenu',
-		matchKind: 'styleMenu',
-		matchType: 'tiptapToolbarExtension',
-		manifest: {
-			api: () => import('../components/toolbar/style-menu.tiptap-toolbar-api.js'),
-			element: () => import('../components/toolbar/tiptap-toolbar-menu.element.js'),
-		},
-	},
-];
-
-const coreExtensions: Array<ManifestTiptapExtension> = [
-	{
-		type: 'tiptapExtension',
-		alias: 'Umb.Tiptap.RichTextEssentials',
-		name: 'Rich Text Essentials Tiptap Extension',
-		api: () => import('./core/rich-text-essentials.tiptap-api.js'),
-		weight: 1000,
-		meta: {
-			icon: 'icon-browser-window',
-			label: 'Rich Text Essentials',
-			group: '#tiptap_extGroup_formatting',
-			description: 'This is a core extension, it is always enabled by default.',
-		},
-	},
-	{
-		type: 'tiptapExtension',
-		alias: 'Umb.Tiptap.Embed',
-		name: 'Embed Tiptap Extension',
-		api: () => import('./core/embedded-media.tiptap-api.js'),
-		meta: {
-			icon: 'icon-embed',
-			label: '#general_embed',
-			group: '#tiptap_extGroup_media',
-		},
-	},
-	{
-		type: 'tiptapExtension',
-		alias: 'Umb.Tiptap.Link',
-		name: 'Link Tiptap Extension',
-		api: () => import('./core/link.tiptap-api.js'),
-		meta: {
-			icon: 'icon-link',
-			label: '#defaultdialogs_urlLinkPicker',
-			group: '#tiptap_extGroup_interactive',
-		},
-	},
-	{
-		type: 'tiptapExtension',
-		alias: 'Umb.Tiptap.Figure',
-		name: 'Figure Tiptap Extension',
-		api: () => import('./core/figure.tiptap-api.js'),
-		meta: {
-			icon: 'icon-frame',
-			label: 'Figure',
-			group: '#tiptap_extGroup_media',
-		},
-	},
-	{
-		type: 'tiptapExtension',
-		alias: 'Umb.Tiptap.Image',
-		name: 'Image Tiptap Extension',
-		api: () => import('./core/image.tiptap-api.js'),
-		meta: {
-			icon: 'icon-picture',
-			label: 'Image',
-			group: '#tiptap_extGroup_media',
-		},
-	},
-	{
-		type: 'tiptapExtension',
-		kind: 'button',
-		alias: 'Umb.Tiptap.Subscript',
-		name: 'Subscript Tiptap Extension',
-		api: () => import('./core/subscript.tiptap-api.js'),
-		meta: {
-			icon: 'icon-subscript',
-			label: 'Subscript',
-			group: '#tiptap_extGroup_formatting',
-		},
-	},
-	{
-		type: 'tiptapExtension',
-		kind: 'button',
-		alias: 'Umb.Tiptap.Superscript',
-		name: 'Superscript Tiptap Extension',
-		api: () => import('./core/superscript.tiptap-api.js'),
-		meta: {
-			icon: 'icon-superscript',
-			label: 'Superscript',
-			group: '#tiptap_extGroup_formatting',
-		},
-	},
-	{
-		type: 'tiptapExtension',
-		kind: 'button',
-		alias: 'Umb.Tiptap.Underline',
-		name: 'Underline Tiptap Extension',
-		api: () => import('./core/underline.tiptap-api.js'),
-		meta: {
-			icon: 'icon-underline',
-			label: 'Underline',
-			group: '#tiptap_extGroup_formatting',
-		},
-	},
-	{
-		type: 'tiptapExtension',
-		alias: 'Umb.Tiptap.TextAlign',
-		name: 'Text Align Tiptap Extension',
-		api: () => import('./core/text-align.tiptap-api.js'),
-		meta: {
-			icon: 'icon-text-align-justify',
-			label: 'Text Align',
-			group: '#tiptap_extGroup_formatting',
-		},
-	},
-	{
-		type: 'tiptapExtension',
-		alias: 'Umb.Tiptap.TextDirection',
-		name: 'Text Direction Tiptap Extension',
-		api: () => import('./core/text-direction.tiptap-api.js'),
-		meta: {
-			icon: 'icon-text-direction-ltr',
-			label: 'Text Direction',
-			group: '#tiptap_extGroup_formatting',
-		},
-	},
-	{
-		type: 'tiptapExtension',
-		alias: 'Umb.Tiptap.MediaUpload',
-		name: 'Media Upload Tiptap Extension',
-		api: () => import('./core/media-upload.tiptap-api.js'),
-		meta: {
-			icon: 'icon-image-up',
-			label: 'Media Upload',
-			group: '#tiptap_extGroup_media',
-		},
-	},
-	{
-		type: 'tiptapExtension',
-		alias: 'Umb.Tiptap.TextIndent',
-		name: 'Text Indent Tiptap Extension',
-		api: () => import('./core/text-indent.tiptap-api.js'),
-		meta: {
-			icon: 'icon-indent',
-			label: 'Text Indent',
-			group: '#tiptap_extGroup_formatting',
-		},
-	},
-	{
-		type: 'tiptapExtension',
-		alias: 'Umb.Tiptap.WordCount',
-		name: 'Word Count Tiptap Extension',
-		api: () => import('./core/word-count.tiptap-api.js'),
-		meta: {
-			icon: 'icon-speed-gauge',
-			label: 'Word Count',
-			group: '#tiptap_extGroup_interactive',
-		},
-	},
-];
-
-const toolbarExtensions: Array<UmbExtensionManifest> = [
-	{
-		type: 'tiptapToolbarExtension',
-		kind: 'button',
-		alias: 'Umb.Tiptap.Toolbar.SourceEditor',
-		name: 'Source Editor Tiptap Extension',
-		api: () => import('./toolbar/source-editor.tiptap-toolbar-api.js'),
-		meta: {
-			alias: 'umbSourceEditor',
-			icon: 'icon-code-xml',
-			label: '#general_viewSourceCode',
-		},
-	},
-	{
-		type: 'tiptapToolbarExtension',
-		kind: 'button',
-		alias: 'Umb.Tiptap.Toolbar.Bold',
-		name: 'Bold Tiptap Extension',
-		api: () => import('./toolbar/bold.tiptap-toolbar-api.js'),
-		meta: {
-			alias: 'bold',
-			icon: 'icon-bold',
-			label: '#buttons_bold',
-		},
-	},
-	{
-		type: 'tiptapToolbarExtension',
-		kind: 'button',
-		alias: 'Umb.Tiptap.Toolbar.Italic',
-		name: 'Italic Tiptap Extension',
-		api: () => import('./toolbar/italic.tiptap-toolbar-api.js'),
-		meta: {
-			alias: 'italic',
-			icon: 'icon-italic',
-			label: '#buttons_italic',
-		},
-	},
-	{
-		type: 'tiptapToolbarExtension',
-		kind: 'button',
-		alias: 'Umb.Tiptap.Toolbar.Underline',
-		name: 'Underline Tiptap Extension',
-		api: () => import('./toolbar/underline.tiptap-toolbar-api.js'),
-		forExtensions: ['Umb.Tiptap.Underline'],
-		meta: {
-			alias: 'underline',
-			icon: 'icon-underline',
-			label: 'Underline',
-		},
-	},
-	{
-		type: 'tiptapToolbarExtension',
-		kind: 'button',
-		alias: 'Umb.Tiptap.Toolbar.Strike',
-		name: 'Strike Tiptap Extension',
-		api: () => import('./toolbar/strike.tiptap-toolbar-api.js'),
-		meta: {
-			alias: 'strike',
-			icon: 'icon-strikethrough',
-			label: 'Strike',
-		},
-	},
-	{
-		type: 'tiptapToolbarExtension',
-		kind: 'button',
-		alias: 'Umb.Tiptap.Toolbar.ClearFormatting',
-		name: 'Clear Formatting Tiptap Extension',
-		api: () => import('./toolbar/clear-formatting.tiptap-toolbar-api.js'),
-		meta: {
-			alias: 'clear-formatting',
-			icon: 'icon-clear-formatting',
-			label: 'Clear Formatting',
-		},
-	},
-	{
-		type: 'tiptapToolbarExtension',
-		kind: 'button',
-		alias: 'Umb.Tiptap.Toolbar.TextAlignLeft',
-		name: 'Text Align Left Tiptap Extension',
-		api: () => import('./toolbar/text-align-left.tiptap-toolbar-api.js'),
-		forExtensions: ['Umb.Tiptap.TextAlign'],
-		meta: {
-			alias: 'text-align-left',
-			icon: 'icon-text-align-left',
-			label: 'Text Align Left',
-		},
-	},
-	{
-		type: 'tiptapToolbarExtension',
-		kind: 'button',
-		alias: 'Umb.Tiptap.Toolbar.TextAlignCenter',
-		name: 'Text Align Center Tiptap Extension',
-		api: () => import('./toolbar/text-align-center.tiptap-toolbar-api.js'),
-		forExtensions: ['Umb.Tiptap.TextAlign'],
-		meta: {
-			alias: 'text-align-center',
-			icon: 'icon-text-align-center',
-			label: 'Text Align Center',
-		},
-	},
-	{
-		type: 'tiptapToolbarExtension',
-		kind: 'button',
-		alias: 'Umb.Tiptap.Toolbar.TextAlignRight',
-		name: 'Text Align Right Tiptap Extension',
-		api: () => import('./toolbar/text-align-right.tiptap-toolbar-api.js'),
-		forExtensions: ['Umb.Tiptap.TextAlign'],
-		meta: {
-			alias: 'text-align-right',
-			icon: 'icon-text-align-right',
-			label: 'Text Align Right',
-		},
-	},
-	{
-		type: 'tiptapToolbarExtension',
-		kind: 'button',
-		alias: 'Umb.Tiptap.Toolbar.TextAlignJustify',
-		name: 'Text Align Justify Tiptap Extension',
-		api: () => import('./toolbar/text-align-justify.tiptap-toolbar-api.js'),
-		forExtensions: ['Umb.Tiptap.TextAlign'],
-		meta: {
-			alias: 'text-align-justify',
-			icon: 'icon-text-align-justify',
-			label: 'Text Align Justify',
-		},
-	},
-	{
-		type: 'tiptapToolbarExtension',
-		kind: 'colorPickerButton',
-		alias: 'Umb.Tiptap.Toolbar.TextColorBackground',
-		name: 'Text Color Background Tiptap Extension',
-		api: () => import('./toolbar/text-color-background.tiptap-toolbar-api.js'),
-		meta: {
-			alias: 'text-color-background',
-			icon: 'icon-color-bucket',
-			label: 'Background color',
-		},
-	},
-	{
-		type: 'tiptapToolbarExtension',
-		kind: 'colorPickerButton',
-		alias: 'Umb.Tiptap.Toolbar.TextColorForeground',
-		name: 'Text Color Foreground Tiptap Extension',
-		api: () => import('./toolbar/text-color-foreground.tiptap-toolbar-api.js'),
-		meta: {
-			alias: 'text-color-foreground',
-			icon: 'icon-colorpicker',
-			label: 'Color',
-		},
-	},
-	{
-		type: 'tiptapToolbarExtension',
-		kind: 'button',
-		alias: 'Umb.Tiptap.Toolbar.TextDirectionRtl',
-		name: 'Text Direction RTL Tiptap Extension',
-		api: () => import('./toolbar/text-direction-rtl.tiptap-toolbar-api.js'),
-		forExtensions: ['Umb.Tiptap.TextDirection'],
-		meta: {
-			alias: 'text-direction-rtl',
-			icon: 'icon-text-direction-rtl',
-			label: 'Right to left',
-		},
-	},
-	{
-		type: 'tiptapToolbarExtension',
-		kind: 'button',
-		alias: 'Umb.Tiptap.Toolbar.TextDirectionLtr',
-		name: 'Text Direction LTR Tiptap Extension',
-		api: () => import('./toolbar/text-direction-ltr.tiptap-toolbar-api.js'),
-		forExtensions: ['Umb.Tiptap.TextDirection'],
-		meta: {
-			alias: 'text-direction-ltr',
-			icon: 'icon-text-direction-ltr',
-			label: 'Left to right',
-		},
-	},
-	{
-		type: 'tiptapToolbarExtension',
-		kind: 'button',
-		alias: 'Umb.Tiptap.Toolbar.Heading1',
-		name: 'Heading 1 Tiptap Extension',
-		api: () => import('./toolbar/heading1.tiptap-toolbar-api.js'),
-		meta: {
-			alias: 'heading1',
-			icon: 'icon-heading-1',
-			label: 'Heading 1',
-		},
-	},
-	{
-		type: 'tiptapToolbarExtension',
-		kind: 'button',
-		alias: 'Umb.Tiptap.Toolbar.Heading2',
-		name: 'Heading 2 Tiptap Extension',
-		api: () => import('./toolbar/heading2.tiptap-toolbar-api.js'),
-		meta: {
-			alias: 'heading2',
-			icon: 'icon-heading-2',
-			label: 'Heading 2',
-		},
-	},
-	{
-		type: 'tiptapToolbarExtension',
-		kind: 'button',
-		alias: 'Umb.Tiptap.Toolbar.Heading3',
-		name: 'Heading 3 Tiptap Extension',
-		api: () => import('./toolbar/heading3.tiptap-toolbar-api.js'),
-		meta: {
-			alias: 'heading3',
-			icon: 'icon-heading-3',
-			label: 'Heading 3',
-		},
-	},
-	{
-		type: 'tiptapToolbarExtension',
-		kind: 'button',
-		alias: 'Umb.Tiptap.Toolbar.BulletList',
-		name: 'Bullet List Tiptap Extension',
-		api: () => import('./toolbar/bullet-list.tiptap-toolbar-api.js'),
-		meta: {
-			alias: 'bulletList',
-			icon: 'icon-bulleted-list',
-			label: '#buttons_listBullet',
-		},
-	},
-	{
-		type: 'tiptapToolbarExtension',
-		kind: 'button',
-		alias: 'Umb.Tiptap.Toolbar.OrderedList',
-		name: 'Ordered List Tiptap Extension',
-		api: () => import('./toolbar/ordered-list.tiptap-toolbar-api.js'),
-		meta: {
-			alias: 'orderedList',
-			icon: 'icon-ordered-list',
-			label: 'Ordered List',
-		},
-	},
-	{
-		type: 'tiptapToolbarExtension',
-		kind: 'button',
-		alias: 'Umb.Tiptap.Toolbar.Anchor',
-		name: 'Anchor Tiptap Extension',
-		api: () => import('./toolbar/anchor.tiptap-toolbar-api.js'),
-		meta: {
-			alias: 'anchor',
-			icon: 'icon-anchor',
-			label: '#tiptap_anchor',
-		},
-	},
-	{
-		type: 'tiptapToolbarExtension',
-		kind: 'button',
-		alias: 'Umb.Tiptap.Toolbar.Blockquote',
-		name: 'Blockquote Tiptap Extension',
-		api: () => import('./toolbar/blockquote.tiptap-toolbar-api.js'),
-		meta: {
-			alias: 'blockquote',
-			icon: 'icon-blockquote',
-			label: 'Blockquote',
-		},
-	},
-	{
-		type: 'tiptapToolbarExtension',
-		kind: 'button',
-		alias: 'Umb.Tiptap.Toolbar.Link',
-		name: 'Link Tiptap Extension',
-		api: () => import('./toolbar/link.tiptap-toolbar-api.js'),
-		forExtensions: ['Umb.Tiptap.Link'],
-		meta: {
-			alias: 'umbLink',
-			icon: 'icon-link',
-			label: '#defaultdialogs_urlLinkPicker',
-		},
-	},
-	{
-		type: 'tiptapToolbarExtension',
-		kind: 'button',
-		alias: 'Umb.Tiptap.Toolbar.Unlink',
-		name: 'Unlink Tiptap Extension',
-		api: () => import('./toolbar/unlink.tiptap-toolbar-api.js'),
-		element: () => import('../components/toolbar/tiptap-toolbar-button-disabled.element.js'),
-		forExtensions: ['Umb.Tiptap.Link'],
-		meta: {
-			alias: 'unlink',
-			icon: 'icon-unlink',
-			label: 'Unlink',
-		},
-	},
-	{
-		type: 'tiptapToolbarExtension',
-		kind: 'button',
-		alias: 'Umb.Tiptap.Toolbar.CodeBlock',
-		name: 'Code Block Tiptap Extension',
-		api: () => import('./toolbar/code-block.tiptap-toolbar-api.js'),
-		meta: {
-			alias: 'codeBlock',
-			icon: 'icon-code',
-			label: 'Code Block',
-		},
-	},
-	{
-		type: 'tiptapToolbarExtension',
-		kind: 'button',
-		alias: 'Umb.Tiptap.Toolbar.Subscript',
-		name: 'Subscript Tiptap Extension',
-		api: () => import('./toolbar/subscript.tiptap-toolbar-api.js'),
-		forExtensions: ['Umb.Tiptap.Subscript'],
-		meta: {
-			alias: 'subscript',
-			icon: 'icon-subscript',
-			label: 'Subscript',
-		},
-	},
-	{
-		type: 'tiptapToolbarExtension',
-		kind: 'button',
-		alias: 'Umb.Tiptap.Toolbar.Superscript',
-		name: 'Superscript Tiptap Extension',
-		api: () => import('./toolbar/superscript.tiptap-toolbar-api.js'),
-		forExtensions: ['Umb.Tiptap.Superscript'],
-		meta: {
-			alias: 'superscript',
-			icon: 'icon-superscript',
-			label: 'Superscript',
-		},
-	},
-	{
-		type: 'tiptapToolbarExtension',
-		kind: 'button',
-		alias: 'Umb.Tiptap.Toolbar.HorizontalRule',
-		name: 'Horizontal Rule Tiptap Extension',
-		api: () => import('./toolbar/horizontal-rule.tiptap-toolbar-api.js'),
-		meta: {
-			alias: 'horizontalRule',
-			icon: 'icon-horizontal-rule',
-			label: 'Horizontal Rule',
-		},
-	},
-	{
-		type: 'tiptapToolbarExtension',
-		kind: 'button',
-		alias: 'Umb.Tiptap.Toolbar.Undo',
-		name: 'Undo Tiptap Extension',
-		api: () => import('./toolbar/undo.tiptap-toolbar-api.js'),
-		element: () => import('../components/toolbar/tiptap-toolbar-button-disabled.element.js'),
-		meta: {
-			alias: 'undo',
-			icon: 'icon-undo',
-			label: '#buttons_undo',
-		},
-	},
-	{
-		type: 'tiptapToolbarExtension',
-		kind: 'button',
-		alias: 'Umb.Tiptap.Toolbar.Redo',
-		name: 'Redo Tiptap Extension',
-		api: () => import('./toolbar/redo.tiptap-toolbar-api.js'),
-		element: () => import('../components/toolbar/tiptap-toolbar-button-disabled.element.js'),
-		meta: {
-			alias: 'redo',
-			icon: 'icon-redo',
-			label: '#buttons_redo',
-		},
-	},
-	{
-		type: 'tiptapToolbarExtension',
-		kind: 'button',
-		alias: 'Umb.Tiptap.Toolbar.MediaPicker',
-		name: 'Media Picker Tiptap Extension',
-		api: () => import('./toolbar/media-picker.tiptap-toolbar-api.js'),
-		forExtensions: ['Umb.Tiptap.Figure', 'Umb.Tiptap.Image'],
-		meta: {
-			alias: 'umbMedia',
-			icon: 'icon-picture',
-			label: '#general_mediaPicker',
-		},
-	},
-	{
-		type: 'tiptapToolbarExtension',
-		kind: 'button',
-		alias: 'Umb.Tiptap.Toolbar.EmbeddedMedia',
-		name: 'Embedded Media Tiptap Extension',
-		api: () => import('./toolbar/embedded-media.tiptap-toolbar-api.js'),
-		forExtensions: ['Umb.Tiptap.Embed'],
-		meta: {
-			alias: 'umbEmbeddedMedia',
-			icon: 'icon-embed',
-			label: '#general_embed',
-		},
-	},
-	{
-		type: 'tiptapToolbarExtension',
-		kind: 'menu',
-		alias: 'Umb.Tiptap.Toolbar.FontFamily',
-		name: 'Font Family Tiptap Extension',
-		api: () => import('./toolbar/font-family.tiptap-toolbar-api.js'),
-		items: [
-			{ label: 'Sans serif', appearance: { style: 'font-family: sans-serif;' }, data: 'sans-serif' },
-			{ label: 'Serif', appearance: { style: 'font-family: serif;' }, data: 'serif' },
-			{ label: 'Monospace', appearance: { style: 'font-family: monospace;' }, data: 'monospace' },
-			{ label: 'Cursive', appearance: { style: 'font-family: cursive;' }, data: 'cursive' },
-			{ label: 'Fantasy', appearance: { style: 'font-family: fantasy;' }, data: 'fantasy' },
-		],
-		meta: {
-			alias: 'umbFontFamily',
-			icon: 'icon-ruler-alt',
-			label: 'Font family',
-		},
-	},
-	{
-		type: 'tiptapToolbarExtension',
-		kind: 'menu',
-		alias: 'Umb.Tiptap.Toolbar.FontSize',
-		name: 'Font Size Tiptap Extension',
-		api: () => import('./toolbar/font-size.tiptap-toolbar-api.js'),
-		items: [
-			{ label: '8pt', data: '8pt' },
-			{ label: '10pt', data: '10pt' },
-			{ label: '12pt', data: '12pt' },
-			{ label: '14pt', data: '14pt' },
-			{ label: '16pt', data: '16pt' },
-			{ label: '18pt', data: '18pt' },
-			{ label: '24pt', data: '24pt' },
-			{ label: '26pt', data: '26pt' },
-			{ label: '48pt', data: '48pt' },
-		],
-		meta: {
-			alias: 'umbFontSize',
-			icon: 'icon-ruler',
-			label: 'Font size',
-		},
-	},
-	{
-		type: 'tiptapToolbarExtension',
-		kind: 'button',
-		alias: 'Umb.Tiptap.Toolbar.CharacterMap',
-		name: 'Character Map Tiptap Extension',
-		api: () => import('./toolbar/character-map.tiptap-toolbar-api.js'),
-		meta: {
-			alias: 'umbCharacterMap',
-			icon: 'icon-omega',
-			label: '#tiptap_charmap',
-		},
-	},
-	{
-		type: 'tiptapToolbarExtension',
-		kind: 'button',
-		alias: 'Umb.Tiptap.Toolbar.TextIndent',
-		name: 'Text Indent Tiptap Extension',
-		api: () => import('./toolbar/text-indent.tiptap-toolbar-api.js'),
-		forExtensions: ['Umb.Tiptap.TextIndent'],
-		meta: {
-			alias: 'indent',
-			icon: 'icon-indent',
-			label: 'Indent',
-		},
-	},
-	{
-		type: 'tiptapToolbarExtension',
-		kind: 'button',
-		alias: 'Umb.Tiptap.Toolbar.TextOutdent',
-		name: 'Text Outdent Tiptap Extension',
-		api: () => import('./toolbar/text-outdent.tiptap-toolbar-api.js'),
-		forExtensions: ['Umb.Tiptap.TextIndent'],
-		meta: {
-			alias: 'outdent',
-			icon: 'icon-outdent',
-			label: 'Outdent',
-		},
-	},
-];
+const kinds = [buttonKind, colorPickerButton, menuButton, styleMenuKind];
 
 export const manifests = [
 	...kinds,
-	...coreExtensions,
-	...statusbarExtensions,
-	...toolbarExtensions,
-	...blockExtensions,
-	...styleSelectExtensions,
-	...tableExtensions,
+	...anchor,
+	...block,
+	...blockquote,
+	...bold,
+	...bulletList,
+	...characterMap,
+	...clearFormatting,
+	...codeBlock,
+	...core,
+	...elementPath,
+	...embeddedMedia,
+	...figure,
+	...fontFamily,
+	...fontSize,
+	...heading,
+	...horizontalRule,
+	...htmlAttrClass,
+	...htmlAttrDataset,
+	...htmlAttrId,
+	...htmlAttrStyle,
+	...htmlTagDiv,
+	...htmlTagSpan,
+	...image,
+	...italic,
+	...link,
+	...mediaPicker,
+	...mediaUpload,
+	...orderedList,
+	...strike,
+	...styleSelect,
+	...subscript,
+	...superscript,
+	...table,
+	...textAlign,
+	...textColor,
+	...textDirection,
+	...textIndent,
+	...trailingNode,
+	...underline,
+	...undoRedo,
+	...viewSource,
+	...wordCount,
 ];

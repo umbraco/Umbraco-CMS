@@ -174,10 +174,10 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 	private _modalRoute?: UmbModalRouteBuilder;
 
 	@state()
-	_resolvedLinkNames: Array<{ unique: string; name: string }> = [];
+	private _resolvedLinkNames: Array<{ unique: string; name: string }> = [];
 
 	@state()
-	_resolvedLinkUrls: Array<{ unique: string; url: string }> = [];
+	private _resolvedLinkUrls: Array<{ unique: string; url: string }> = [];
 
 	#linkPickerModal;
 

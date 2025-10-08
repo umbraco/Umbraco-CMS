@@ -21,22 +21,22 @@ export class UmbContentWorkspacePropertyElement extends UmbLitElement {
 	}
 
 	@state()
-	_datasetVariantId?: UmbVariantId;
+	private _datasetVariantId?: UmbVariantId;
 
 	@state()
-	_dataPath?: string;
+	private _dataPath?: string;
 
 	@state()
-	_viewable?: boolean;
+	private _viewable?: boolean;
 
 	@state()
-	_writeable?: boolean;
+	private _writeable?: boolean;
 
 	@state()
-	_workspaceContext?: typeof UMB_CONTENT_WORKSPACE_CONTEXT.TYPE;
+	private _workspaceContext?: typeof UMB_CONTENT_WORKSPACE_CONTEXT.TYPE;
 
 	@state()
-	_propertyType?: UmbPropertyTypeModel;
+	private _propertyType?: UmbPropertyTypeModel;
 
 	@state()
 	private _hasAccessToSensitiveData = false;
@@ -115,7 +115,7 @@ export class UmbContentWorkspacePropertyElement extends UmbLitElement {
 					this._workspaceContext.propertyWriteGuard.isPermittedForVariantAndProperty(
 						propertyVariantId,
 						this._propertyType,
-						propertyVariantId,
+						this._datasetVariantId,
 					),
 					(write) => {
 						this._writeable = write;

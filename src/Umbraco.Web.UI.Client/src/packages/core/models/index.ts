@@ -2,7 +2,7 @@ export interface UmbSwatchDetails {
 	label: string;
 	value: string;
 }
-export interface ServertimeOffset {
+export interface UmbServertimeOffset {
 	/**
 	 * offset in minutes relative to UTC
 	 */

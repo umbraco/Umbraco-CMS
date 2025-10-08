@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import type { UmbApi } from '../models/index.js';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

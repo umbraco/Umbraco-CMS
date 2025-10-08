@@ -27,10 +27,10 @@ export class UmbSortChildrenOfModalElement<
 	protected _children: Array<TreeItemModelType> = [];
 
 	@state()
-	_currentPage = 1;
+	private _currentPage = 1;
 
 	@state()
-	_totalPages = 1;
+	private _totalPages = 1;
 
 	@state()
 	protected _tableColumns: Array<UmbTableColumn> = [];

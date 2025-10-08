@@ -18,13 +18,13 @@ export class UmbPropertyEditorUINumberRangeElement
 	implements UmbPropertyEditorUiElement
 {
 	@state()
-	_minValue?: number;
+	private _minValue?: number;
 
 	@state()
-	_maxValue?: number;
+	private _maxValue?: number;
 
 	@state()
-	_validationRange?: UmbNumberRangeValueType;
+	private _validationRange?: UmbNumberRangeValueType;
 
 	@property({ type: Object })
 	public override set value(value: UmbNumberRangeValueType | undefined) {

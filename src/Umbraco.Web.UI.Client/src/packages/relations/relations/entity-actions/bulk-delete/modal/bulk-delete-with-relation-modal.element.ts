@@ -22,7 +22,7 @@ export class UmbBulkDeleteWithRelationConfirmModalElement extends UmbModalBaseEl
 	UmbBulkDeleteWithRelationConfirmModalValue
 > {
 	@state()
-	_referencesConfig?: UmbConfirmBulkActionModalEntityReferencesConfig;
+	private _referencesConfig?: UmbConfirmBulkActionModalEntityReferencesConfig;
 
 	protected override firstUpdated(_changedProperties: PropertyValues): void {
 		super.firstUpdated(_changedProperties);

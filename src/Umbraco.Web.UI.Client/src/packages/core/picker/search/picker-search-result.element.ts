@@ -11,16 +11,16 @@ type PickableFilterMethodType<T extends UmbEntityModel = UmbEntityModel> = (item
 @customElement('umb-picker-search-result')
 export class UmbPickerSearchResultElement extends UmbLitElement {
 	@state()
-	_query?: UmbSearchRequestArgs;
+	private _query?: UmbSearchRequestArgs;
 
 	@state()
-	_searching: boolean = false;
+	private _searching: boolean = false;
 
 	@state()
-	_items: UmbEntityModel[] = [];
+	private _items: UmbEntityModel[] = [];
 
 	@state()
-	_isSearchable: boolean = false;
+	private _isSearchable: boolean = false;
 
 	@property({ attribute: false })
 	pickableFilter: PickableFilterMethodType = () => true;

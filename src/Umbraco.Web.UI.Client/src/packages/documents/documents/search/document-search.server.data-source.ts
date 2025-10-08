@@ -40,6 +40,7 @@ export class UmbDocumentSearchServerDataSource
 					parentId: args.searchFrom?.unique ?? undefined,
 					query: args.query,
 					trashed: args.includeTrashed,
+					dataTypeId: args.dataTypeUnique,
 				},
 			}),
 		);

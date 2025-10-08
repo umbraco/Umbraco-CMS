@@ -69,6 +69,12 @@ public class UmbracoPremigrationPlan : MigrationPlan
         To<V_14_0_0.AddListViewKeysToDocumentTypes>("{0F49E1A4-AFD8-4673-A91B-F64E78C48174}");
 
         // To 16.2.0
+        // - This needs to be a pre-migration as it adds a lock to the process for rebuilding document URLs, which is
+        //   called by a migration for 15. By using a pre-migration we ensure the lock record is in place when migrating
+        //   through 15 versions to the latest.
+        To<V_16_2_0.AddDocumentUrlLock>("{5ECCE7A7-2EFC-47A5-A081-FFD94D9F79AA}");
+
+        // To 17.0.0
         // The lock and table are required to access caches.
         // When logging in, we save the user to the cache so these need to have run.
         To<V_16_2_0.AddCacheVersionDatabaseLock>("{1DC39DC7-A88A-4912-8E60-4FD36246E8D1}");

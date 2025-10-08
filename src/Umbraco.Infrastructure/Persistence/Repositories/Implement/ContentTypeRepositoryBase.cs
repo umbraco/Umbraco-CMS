@@ -445,7 +445,7 @@ AND umbracoNode.id <> @id",
             IEnumerable<int> propertyTypeToDeleteIds = dbPropertyTypeIds.Except(entityPropertyTypes);
             foreach (var propertyTypeId in propertyTypeToDeleteIds)
             {
-                DeletePropertyType(entity.Id, propertyTypeId);
+                DeletePropertyType(entity, propertyTypeId);
             }
         }
 
@@ -654,7 +654,7 @@ AND umbracoNode.id <> @id",
         {
             foreach (var id in orphanPropertyTypeIds)
             {
-                DeletePropertyType(entity.Id, id);
+                DeletePropertyType(entity, id);
             }
         }
 
@@ -1417,16 +1417,27 @@ AND umbracoNode.id <> @id",
         }
     }
 
-    private void DeletePropertyType(int contentTypeId, int propertyTypeId)
+    private void DeletePropertyType(IContentTypeComposition contentType, int propertyTypeId)
     {
-        // first clear dependencies
+        // First clear dependencies.
         Database.Delete<TagRelationshipDto>("WHERE propertyTypeId = @Id", new { Id = propertyTypeId });
         Database.Delete<PropertyDataDto>("WHERE propertyTypeId = @Id", new { Id = propertyTypeId });
 
-        // then delete the property type
+        // Clear the property value permissions, which aren't a hard dependency with a foreign key, but we want to ensure
+        // that any for removed property types are cleared.
+        var uniqueIdAsString = string.Format(SqlContext.SqlSyntax.ConvertUniqueIdentifierToString, "uniqueId");
+        var permissionSearchString = SqlContext.SqlSyntax.GetConcat(
+            "(SELECT " + uniqueIdAsString + " FROM " + Constants.DatabaseSchema.Tables.PropertyType + " WHERE id = @PropertyTypeId)",
+            "'|%'");
+
+        Database.Delete<UserGroup2GranularPermissionDto>(
+            "WHERE uniqueId = @ContentTypeKey AND permission LIKE " + permissionSearchString,
+            new { ContentTypeKey = contentType.Key, PropertyTypeId = propertyTypeId });
+
+        // Finally delete the property type.
         Database.Delete<PropertyTypeDto>(
             "WHERE contentTypeId = @Id AND id = @PropertyTypeId",
-            new { Id = contentTypeId, PropertyTypeId = propertyTypeId });
+            new { contentType.Id, PropertyTypeId = propertyTypeId });
     }
 
     protected void ValidateAlias(TEntity entity)
@@ -1562,20 +1573,16 @@ WHERE {Constants.DatabaseSchema.Tables.Content}.nodeId IN (@ids) AND cmsContentT
         // is included here just to be 100% sure since it has a FK on cmsPropertyType.
         var list = new List<string>
         {
-            "DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @id",
-            "DELETE FROM umbracoUserGroup2Permission WHERE userGroupKey IN (SELECT [umbracoUserGroup].[Key] FROM umbracoUserGroup WHERE Id = @id)",
-            "DELETE FROM umbracoUserGroup2GranularPermission WHERE userGroupKey IN (SELECT [umbracoUserGroup].[Key] FROM umbracoUserGroup WHERE Id = @id)",
-            "DELETE FROM cmsTagRelationship WHERE nodeId = @id",
-            "DELETE FROM cmsContentTypeAllowedContentType WHERE Id = @id",
-            "DELETE FROM cmsContentTypeAllowedContentType WHERE AllowedId = @id",
-            "DELETE FROM cmsContentType2ContentType WHERE parentContentTypeId = @id",
-            "DELETE FROM cmsContentType2ContentType WHERE childContentTypeId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyData +
-            " WHERE propertyTypeId IN (SELECT id FROM cmsPropertyType WHERE contentTypeId = @id)",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyType +
-            " WHERE contentTypeId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyTypeGroup +
-            " WHERE contenttypeNodeId = @id",
+            "DELETE FROM " + Constants.DatabaseSchema.Tables.User2NodeNotify + " WHERE nodeId = @id",
+            "DELETE FROM " + Constants.DatabaseSchema.Tables.UserGroup2GranularPermission + " WHERE uniqueId IN (SELECT uniqueId FROM umbracoNode WHERE id = @id)",
+            "DELETE FROM " + Constants.DatabaseSchema.Tables.TagRelationship + " WHERE nodeId = @id",
+            "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentChildType + " WHERE Id = @id",
+            "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentChildType + " WHERE AllowedId = @id",
+            "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentTypeTree + " WHERE parentContentTypeId = @id",
+            "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentTypeTree + " WHERE childContentTypeId = @id",
+            "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyData + " WHERE propertyTypeId IN (SELECT id FROM cmsPropertyType WHERE contentTypeId = @id)",
+            "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyType + " WHERE contentTypeId = @id",
+            "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyTypeGroup + " WHERE contenttypeNodeId = @id",
         };
         return list;
     }

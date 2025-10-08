@@ -23,7 +23,7 @@ public class EntityServiceTests
 
         if (shouldThrow)
         {
-            Assert.Throws<ArgumentOutOfRangeException>(() => sut.GetSiblings(Guid.NewGuid(), UmbracoObjectTypes.Document, before, after, out _, out _));
+            Assert.Throws<ArgumentOutOfRangeException>(() => sut.GetSiblings(Guid.NewGuid(), [UmbracoObjectTypes.Document], before, after, out _, out _));
         }
     }
 

@@ -1117,8 +1117,6 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             ClearEntityTags(entity, _tagRepository);
         }
 
-        PersistRelations(entity);
-
         entity.ResetDirtyProperties();
 
         // troubleshooting
@@ -1367,8 +1365,6 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
 
                 ClearEntityTags(entity, _tagRepository);
             }
-
-            PersistRelations(entity);
 
             // TODO: note re. tags: explicitly unpublished entities have cleared tags, but masked or trashed entities *still* have tags in the db - so what?
         }
@@ -1722,6 +1718,33 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         AddGetByQueryOrderBy(sql);
 
         return MapDtosToContent(Database.Fetch<DocumentDto>(sql));
+    }
+
+    /// <inheritdoc />
+    public IDictionary<int, IEnumerable<ContentSchedule>> GetContentSchedulesByIds(int[] documentIds)
+    {
+        Sql<ISqlContext> sql = Sql()
+            .Select<ContentScheduleDto>()
+            .From<ContentScheduleDto>()
+            .WhereIn<ContentScheduleDto>(contentScheduleDto => contentScheduleDto.NodeId, documentIds);
+
+        List<ContentScheduleDto>? contentScheduleDtos = Database.Fetch<ContentScheduleDto>(sql);
+
+        IDictionary<int, IEnumerable<ContentSchedule>> dictionary = contentScheduleDtos
+            .GroupBy(contentSchedule => contentSchedule.NodeId)
+            .ToDictionary(
+                group => group.Key,
+                group => group.Select(scheduleDto => new ContentSchedule(
+                    scheduleDto.Id,
+                    LanguageRepository.GetIsoCodeById(scheduleDto.LanguageId) ?? Constants.System.InvariantCulture,
+                    scheduleDto.Date,
+                    scheduleDto.Action == ContentScheduleAction.Release.ToString()
+                        ? ContentScheduleAction.Release
+                        : ContentScheduleAction.Expire))
+                    .ToList().AsEnumerable()); // We have to materialize it here,
+                                               // to avoid this being used after the scope is disposed.
+
+        return dictionary;
     }
 
     /// <inheritdoc />

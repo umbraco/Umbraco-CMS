@@ -38,4 +38,5 @@ test('can schedule publish after unselecting all languages', async ({umbracoUi})
 
   // Assert
   await umbracoUi.content.doesSchedulePublishModalButtonContainDisabledTag(false);
+  await umbracoUi.content.clickSchedulePublishModalButton();
 });

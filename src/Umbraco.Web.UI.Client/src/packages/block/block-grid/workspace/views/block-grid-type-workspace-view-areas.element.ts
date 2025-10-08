@@ -9,10 +9,10 @@ import { UMB_DATA_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/data-ty
 export class UmbBlockGridTypeWorkspaceViewAreasElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	//
 	@state()
-	_areaColumnsConfigurationObject?: UmbPropertyEditorConfig;
+	private _areaColumnsConfigurationObject?: UmbPropertyEditorConfig;
 
 	@state()
-	_areaConfigConfigurationObject?: UmbPropertyEditorConfig;
+	private _areaConfigConfigurationObject?: UmbPropertyEditorConfig;
 
 	constructor() {
 		super();
@@ -22,7 +22,7 @@ export class UmbBlockGridTypeWorkspaceViewAreasElement extends UmbLitElement imp
 				await context?.propertyValueByAlias<undefined | string>('gridColumns'),
 				(value) => {
 					const dataTypeGridColumns = value ? parseInt(value, 10) : 12;
-					this._areaColumnsConfigurationObject = [{ alias: 'placeholder', value: dataTypeGridColumns }];
+					this._areaColumnsConfigurationObject = [{ alias: 'placeholder', value: dataTypeGridColumns }, { alias: 'min', value: 1 }];
 					this._areaConfigConfigurationObject = [{ alias: 'defaultAreaGridColumns', value: dataTypeGridColumns }];
 				},
 				'observeGridColumns',

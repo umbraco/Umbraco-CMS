@@ -56,7 +56,7 @@ public abstract class BlockGridPropertyEditorBase : DataEditor
             BlockEditorVarianceHandler blockEditorVarianceHandler,
             ILanguageService languageService,
             IIOHelper ioHelper)
-            : base(propertyEditors, dataValueReferenceFactories, dataTypeConfigurationCache, shortStringHelper, jsonSerializer, blockEditorVarianceHandler, languageService, ioHelper, attribute)
+            : base(propertyEditors, dataValueReferenceFactories, dataTypeConfigurationCache, shortStringHelper, jsonSerializer, blockEditorVarianceHandler, languageService, ioHelper, attribute, logger)
         {
             BlockEditorValues = new BlockEditorValues<BlockGridValue, BlockGridLayoutItem>(new BlockGridEditorDataConverter(jsonSerializer), elementTypeCache, logger);
             Validators.Add(new BlockEditorValidator<BlockGridValue, BlockGridLayoutItem>(propertyValidationService, BlockEditorValues, elementTypeCache));

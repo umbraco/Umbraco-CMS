@@ -5,7 +5,7 @@ import type { UmbProblemDetails } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import type { UmbNotificationColor } from '@umbraco-cms/backoffice/notification';
-import type { RequestOptions, umbHttpClient } from '@umbraco-cms/backoffice/http-client';
+import type { umbHttpClient } from '@umbraco-cms/backoffice/http-client';
 
 const MAX_RETRIES = 3;
 
@@ -16,7 +16,7 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 	 */
 	#pending401Requests: Array<{
 		request: Request;
-		requestConfig: RequestOptions;
+		requestConfig: unknown;
 		retry: () => Promise<Response>;
 		resolve: (value: Response) => void;
 		reject: (reason?: unknown) => void;
@@ -29,7 +29,7 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 	 * These requests will not be retried, as they are not idempotent.
 	 * Instead, we will notify the user about these requests after re-authentication.
 	 */
-	#nonGet401Requests: Array<{ request: Request; requestConfig: RequestOptions }> = [];
+	#nonGet401Requests: Array<{ request: Request; requestConfig: unknown }> = [];
 
 	/**
 	 * Binds the default interceptors to the client.
@@ -328,6 +328,10 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 
 	/**
 	 * Helper to show a notification error.
+	 * @param headline
+	 * @param message
+	 * @param details
+	 * @param color
 	 */
 	async #peekError(headline: string, message: string, details: unknown, color?: UmbNotificationColor) {
 		// Store the host for usage in the following async context

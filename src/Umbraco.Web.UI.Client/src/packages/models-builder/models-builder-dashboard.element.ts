@@ -74,7 +74,7 @@ export class UmbModelsBuilderDashboardElement extends UmbLitElement {
 									The <strong>ModelsMode</strong> is '${this._modelsBuilder.mode}'. ${this.renderModelsMode()}
 								</li> `
 							: nothing}
-						${this.renderList()}
+						${this._renderList()}
 					</ul>
 				</div>
 				<p class="models-actions">
@@ -99,7 +99,7 @@ export class UmbModelsBuilderDashboardElement extends UmbLitElement {
 		`;
 	}
 
-	private renderList() {
+	private _renderList() {
 		if (this._modelsBuilder?.mode !== ModelsModeModel.NOTHING) {
 			return html`${this._modelsBuilder?.modelsNamespace
 				? html`<li>The <strong>models namespace</strong> is ${this._modelsBuilder.modelsNamespace}.</li>`

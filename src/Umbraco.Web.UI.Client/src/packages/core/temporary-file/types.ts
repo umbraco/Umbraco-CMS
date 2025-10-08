@@ -1,5 +1,7 @@
 import type { TemporaryFileConfigurationResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
+// TODO: Rename this to `UmbTemporaryFileStatus` in a future version.
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export enum TemporaryFileStatus {
 	SUCCESS = 'success',
 	WAITING = 'waiting',

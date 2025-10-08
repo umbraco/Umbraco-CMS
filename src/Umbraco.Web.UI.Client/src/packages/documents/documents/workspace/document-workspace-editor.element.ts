@@ -12,7 +12,7 @@ import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 	//
 	// TODO: Refactor: when having a split view/variants context token, we can rename the split view/variants component to a generic and make this component generic as well. [NL]
-	private splitViewElement = new UmbDocumentWorkspaceSplitViewElement();
+	private _splitViewElement = new UmbDocumentWorkspaceSplitViewElement();
 
 	#appLanguage?: typeof UMB_APP_LANGUAGE_CONTEXT.TYPE;
 	#workspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
@@ -23,7 +23,10 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 	#isForbidden = false;
 
 	@state()
-	_routes?: Array<UmbRoute>;
+	private _routes?: Array<UmbRoute>;
+
+	@state()
+	private _loading?: boolean = true;
 
 	constructor() {
 		super();
@@ -55,18 +58,19 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 				},
 				'_observeForbidden',
 			);
+
+			this.observe(
+				this.#workspaceContext?.loading.isOn,
+				(loading) => {
+					this._loading = loading ?? false;
+				},
+				'_observeLoading',
+			);
 		});
 	}
 
-	#handleVariantFolderPart(index: number, folderPart: string) {
-		const variantSplit = folderPart.split('_');
-		const culture = variantSplit[0];
-		const segment = variantSplit[1];
-		this.#workspaceContext?.splitView.setActiveVariant(index, culture, segment);
-	}
-
 	#generateRoutes() {
-		if (!this.#variants || !this.#appCulture) {
+		if (!this.#variants || this.#variants.length === 0 || !this.#appCulture) {
 			this._routes = [];
 			return;
 		}
@@ -80,13 +84,10 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 				routes.push({
 					// TODO: When implementing Segments, be aware if using the unique still is URL Safe, cause its most likely not... [NL]
 					path: variantA.unique + '_&_' + variantB.unique,
-					component: this.splitViewElement,
+					component: this._splitViewElement,
 					setup: (_component, info) => {
 						// Set split view/active info..
-						const variantSplit = info.match.fragments.consumed.split('_&_');
-						variantSplit.forEach((part, index) => {
-							this.#handleVariantFolderPart(index, part);
-						});
+						this.#workspaceContext?.splitView.setVariantParts(info.match.fragments.consumed);
 					},
 				});
 			});
@@ -97,11 +98,11 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 			routes.push({
 				// TODO: When implementing Segments, be aware if using the unique still is URL Safe, cause its most likely not... [NL]
 				path: variant.unique,
-				component: this.splitViewElement,
+				component: this._splitViewElement,
 				setup: (_component, info) => {
 					// cause we might come from a split-view, we need to reset index 1.
 					this.#workspaceContext?.splitView.removeActiveVariant(1);
-					this.#handleVariantFolderPart(0, info.match.fragments.consumed);
+					this.#workspaceContext?.splitView.handleVariantFolderPart(0, info.match.fragments.consumed);
 				},
 			});
 		});
@@ -155,9 +156,9 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 	};
 
 	override render() {
-		return this._routes
+		return !this._loading && this._routes
 			? html`<umb-router-slot .routes=${this._routes} @init=${this._gotWorkspaceRoute}></umb-router-slot>`
-			: '';
+			: html`<umb-view-loader></umb-view-loader>`;
 	}
 
 	static override styles = [

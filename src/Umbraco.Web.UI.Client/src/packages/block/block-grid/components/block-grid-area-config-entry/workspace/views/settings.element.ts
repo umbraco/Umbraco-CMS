@@ -14,9 +14,10 @@ export class UmbBlockGridAreaTypeWorkspaceViewSettingsElement extends UmbLitElem
 	#dataset?: typeof UMB_PROPERTY_DATASET_CONTEXT.TYPE;
 
 	@state()
-	_minValue?: number;
+	private _minValue?: number;
+
 	@state()
-	_maxValue?: number;
+	private _maxValue?: number;
 
 	constructor() {
 		super();
@@ -57,7 +58,7 @@ export class UmbBlockGridAreaTypeWorkspaceViewSettingsElement extends UmbLitElem
 					property-editor-ui-alias="Umb.PropertyEditorUi.TextBox"></umb-property>
 			</uui-box>
 			<uui-box headline=${'Validation'}>
-				<umb-property-layout label=${'rangeAllowed'}>
+				<umb-property-layout label=${this.localize.term('blockEditor_rangeAllowed')}>
 					<umb-input-number-range
 						slot="editor"
 						.minValue=${this._minValue}
@@ -67,7 +68,7 @@ export class UmbBlockGridAreaTypeWorkspaceViewSettingsElement extends UmbLitElem
 				</umb-property-layout>
 
 				<umb-property
-					label=${'specifiedAllowance'}
+					label=${this.localize.term('blockEditor_specifiedAllowance')}
 					alias="specifiedAllowance"
 					property-editor-ui-alias="Umb.PropertyEditorUi.BlockGridAreaTypePermission"></umb-property>
 			</uui-box>

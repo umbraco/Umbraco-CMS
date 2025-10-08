@@ -291,6 +291,7 @@ export class UmbModalRouteRegistrationController<
 		this.#urlBuilderCallback = callback;
 		return this;
 	}
+	// eslint-disable-next-line @typescript-eslint/naming-convention
 	public _internal_setRouteBuilder(urlBuilder: UmbModalRouteBuilder) {
 		if (!this.#routeContext) return;
 		this.#routeBuilder = urlBuilder;

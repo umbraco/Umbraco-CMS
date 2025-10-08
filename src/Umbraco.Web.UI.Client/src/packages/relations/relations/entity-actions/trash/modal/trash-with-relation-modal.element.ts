@@ -24,10 +24,10 @@ export class UmbTrashWithRelationConfirmModalElement extends UmbModalBaseElement
 	UmbTrashWithRelationConfirmModalValue
 > {
 	@state()
-	_name?: string;
+	private _name?: string;
 
 	@state()
-	_referencesConfig?: UmbConfirmActionModalEntityReferencesConfig;
+	private _referencesConfig?: UmbConfirmActionModalEntityReferencesConfig;
 
 	#itemRepository?: UmbItemRepository<any>;
 

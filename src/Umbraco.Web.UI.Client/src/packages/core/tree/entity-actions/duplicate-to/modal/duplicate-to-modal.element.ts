@@ -9,7 +9,7 @@ const elementName = 'umb-duplicate-to-modal';
 @customElement(elementName)
 export class UmbDuplicateToModalElement extends UmbModalBaseElement<UmbDuplicateToModalData, UmbDuplicateToModalValue> {
 	@state()
-	_destinationUnique?: string | null;
+	private _destinationUnique?: string | null;
 
 	#onTreeSelectionChange(event: UmbSelectionChangeEvent) {
 		const target = event.target as UmbTreeElement;

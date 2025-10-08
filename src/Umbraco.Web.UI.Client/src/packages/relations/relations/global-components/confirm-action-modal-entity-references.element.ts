@@ -26,16 +26,16 @@ export class UmbConfirmActionModalEntityReferencesElement extends UmbLitElement 
 	config?: UmbConfirmActionModalEntityReferencesConfig;
 
 	@state()
-	_referencedByItems: Array<UmbReferenceItemModel> = [];
+	private _referencedByItems: Array<UmbReferenceItemModel> = [];
 
 	@state()
-	_totalReferencedByItems: number = 0;
+	private _totalReferencedByItems: number = 0;
 
 	@state()
-	_totalDescendantsWithReferences: number = 0;
+	private _totalDescendantsWithReferences: number = 0;
 
 	@state()
-	_descendantsWithReferences: Array<any> = [];
+	private _descendantsWithReferences: Array<any> = [];
 
 	#itemRepository?: UmbItemRepository<any>;
 	#referenceRepository?: UmbEntityReferenceRepository;

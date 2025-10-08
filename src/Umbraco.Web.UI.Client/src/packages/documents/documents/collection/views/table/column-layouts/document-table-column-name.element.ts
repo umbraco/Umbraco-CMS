@@ -23,7 +23,7 @@ export class UmbDocumentTableColumnNameElement extends UmbLitElement implements 
 	}
 
 	@state()
-	_name = '';
+	private _name = '';
 
 	#item = new UmbDocumentItemDataResolver(this);
 

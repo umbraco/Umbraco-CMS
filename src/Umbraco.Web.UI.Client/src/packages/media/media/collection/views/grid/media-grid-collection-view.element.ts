@@ -7,9 +7,9 @@ import { css, customElement, html, ifDefined, repeat, state } from '@umbraco-cms
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone';
+import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 
 import '@umbraco-cms/backoffice/imaging';
-import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 
 @customElement('umb-media-grid-collection-view')
 export class UmbMediaGridCollectionViewElement extends UmbLitElement {
@@ -104,7 +104,7 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 				@selected=${() => this.#onSelect(item)}
 				@deselected=${() => this.#onDeselect(item)}>
 				<umb-imaging-thumbnail
-					unique=${item.unique}
+					.unique=${item.unique}
 					alt=${ifDefined(item.name)}
 					icon=${ifDefined(item.icon)}></umb-imaging-thumbnail>
 			</uui-card-media>

@@ -20,5 +20,6 @@ export interface UmbModalRouteRegistration<
 		params: Params,
 	): Promise<undefined | UmbModalContext<UmbModalTokenData, UmbModalTokenValue>>;
 
+	// eslint-disable-next-line @typescript-eslint/naming-convention
 	_internal_setRouteBuilder(builder: UmbModalRouteBuilder): void;
 }

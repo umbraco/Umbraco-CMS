@@ -16,7 +16,7 @@ import type {
 	PagedDataTypeItemResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 
-export interface DataTypeFilterOptions {
+export interface UmbDataTypeFilterOptions {
 	skip: number;
 	take: number;
 	orderBy: string;
@@ -25,10 +25,10 @@ export interface DataTypeFilterOptions {
 	filter?: string;
 }
 
-const editorUiAliasFilter = (filterOptions: DataTypeFilterOptions, item: UmbMockDataTypeModel) =>
+const editorUiAliasFilter = (filterOptions: UmbDataTypeFilterOptions, item: UmbMockDataTypeModel) =>
 	item.editorUiAlias === filterOptions.editorUiAlias;
 
-const dataQueryFilter = (filterOptions: DataTypeFilterOptions, item: UmbMockDataTypeModel) =>
+const dataQueryFilter = (filterOptions: UmbDataTypeFilterOptions, item: UmbMockDataTypeModel) =>
 	queryFilter(filterOptions.filter ?? '', item.name);
 
 class UmbDataTypeMockDB extends UmbEntityMockDbBase<UmbMockDataTypeModel> {
@@ -41,10 +41,10 @@ class UmbDataTypeMockDB extends UmbEntityMockDbBase<UmbMockDataTypeModel> {
 		super(data);
 	}
 
-	filter(options: DataTypeFilterOptions): PagedDataTypeItemResponseModel {
+	filter(options: UmbDataTypeFilterOptions): PagedDataTypeItemResponseModel {
 		const allItems = this.getAll();
 
-		const filterOptions: DataTypeFilterOptions = {
+		const filterOptions: UmbDataTypeFilterOptions = {
 			skip: options.skip || 0,
 			take: options.take || 25,
 			orderBy: options.orderBy || 'name',
@@ -72,6 +72,7 @@ const treeItemMapper = (model: UmbMockDataTypeModel): DataTypeTreeItemResponseMo
 		parent: model.parent,
 		isFolder: model.isFolder,
 		isDeletable: model.isDeletable,
+		flags: model.flags,
 	};
 };
 
@@ -87,6 +88,7 @@ const createFolderMockMapper = (request: CreateFolderRequestModel): UmbMockDataT
 		isDeletable: true,
 		canIgnoreStartNodes: false,
 		values: [],
+		flags: [],
 	};
 };
 
@@ -102,6 +104,7 @@ const createDetailMockMapper = (request: CreateDataTypeRequestModel): UmbMockDat
 		isFolder: false,
 		hasChildren: false,
 		isDeletable: true,
+		flags: [],
 	};
 };
 
@@ -123,6 +126,7 @@ const itemResponseMapper = (item: UmbMockDataTypeModel): DataTypeItemResponseMod
 		name: item.name,
 		editorAlias: item.editorAlias,
 		isDeletable: item.isDeletable,
+		flags: item.flags,
 	};
 };
 

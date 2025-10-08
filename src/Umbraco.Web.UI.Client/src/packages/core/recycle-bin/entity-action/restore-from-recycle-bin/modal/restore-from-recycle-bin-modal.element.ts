@@ -18,13 +18,13 @@ export class UmbRestoreFromRecycleBinModalElement extends UmbModalBaseElement<
 	UmbRestoreFromRecycleBinModalValue
 > {
 	@state()
-	_isAutomaticRestore = false;
+	private _isAutomaticRestore = false;
 
 	@state()
-	_restoreItem?: any;
+	private _restoreItem?: any;
 
 	@state()
-	_destinationItem?: any;
+	private _destinationItem?: any;
 
 	#recycleBinRepository?: UmbRecycleBinRepository;
 

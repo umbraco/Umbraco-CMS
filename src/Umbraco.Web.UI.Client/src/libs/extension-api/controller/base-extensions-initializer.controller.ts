@@ -5,6 +5,7 @@ import type { UmbBaseExtensionInitializer } from './base-extension-initializer.c
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export type PermittedControllerType<ControllerType extends { manifest: any }> = ControllerType & {
 	manifest: Required<Pick<ControllerType, 'manifest'>>;
 };

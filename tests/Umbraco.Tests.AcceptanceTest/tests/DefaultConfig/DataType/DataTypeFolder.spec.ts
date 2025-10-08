@@ -114,7 +114,7 @@ test('can create a folder in a folder in a folder', async ({umbracoApi, umbracoU
 
   // Act
   await umbracoUi.dataType.clickRootFolderCaretButton();
-  await umbracoUi.dataType.clickCaretButtonForName(dataTypeFolderName);
+  await umbracoUi.dataType.openCaretButtonForName(dataTypeFolderName);
   await umbracoUi.dataType.clickActionsMenuForDataType(childFolderName);
   await umbracoUi.dataType.createDataTypeFolder(childOfChildFolderName);
 

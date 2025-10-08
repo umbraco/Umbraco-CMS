@@ -1,6 +1,12 @@
 import { mergeAttributes, Node } from '@tiptap/core';
 
-export const umbEmbeddedMedia = Node.create({
+/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
+export interface UmbEmbeddedMediaOptions {
+	inline: boolean;
+}
+
+/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
+export const umbEmbeddedMedia = Node.create<UmbEmbeddedMediaOptions>({
 	name: 'umbEmbeddedMedia',
 	group() {
 		return this.options.inline ? 'inline' : 'block';
@@ -25,19 +31,13 @@ export const umbEmbeddedMedia = Node.create({
 	},
 
 	parseHTML() {
-		return [
-			{
-				tag: 'div',
-				priority: 100,
-				getAttrs: (dom) => dom.classList.contains('umb-embed-holder') && null,
-			},
-		];
+		return [{ tag: '.umb-embed-holder', priority: 100 }];
 	},
 
 	renderHTML({ HTMLAttributes }) {
 		const { markup, ...attrs } = HTMLAttributes;
 		const embed = document.createRange().createContextualFragment(markup);
-		return ['div', mergeAttributes({ class: 'umb-embed-holder' }, attrs), embed];
+		return [this.options.inline ? 'span' : 'div', mergeAttributes({ class: 'umb-embed-holder' }, attrs), embed];
 	},
 
 	addCommands() {

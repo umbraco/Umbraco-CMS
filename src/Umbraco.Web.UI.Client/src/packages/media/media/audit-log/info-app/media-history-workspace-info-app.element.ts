@@ -13,10 +13,10 @@ import { UmbUserItemRepository } from '@umbraco-cms/backoffice/user';
 @customElement('umb-media-history-workspace-info-app')
 export class UmbMediaHistoryWorkspaceInfoAppElement extends UmbLitElement {
 	@state()
-	_currentPageNumber = 1;
+	private _currentPageNumber = 1;
 
 	@state()
-	_totalPages = 1;
+	private _totalPages = 1;
 
 	@state()
 	private _items: Array<UmbMediaAuditLogModel> = [];
@@ -144,9 +144,9 @@ export class UmbMediaHistoryWorkspaceInfoAppElement extends UmbLitElement {
 							.current=${this._currentPageNumber}
 							.total=${this._totalPages}
 							firstlabel=${this.localize.term('general_first')}
-                            previouslabel=${this.localize.term('general_previous')}
-                            nextlabel=${this.localize.term('general_next')}
-                            lastlabel=${this.localize.term('general_last')}
+							previouslabel=${this.localize.term('general_previous')}
+							nextlabel=${this.localize.term('general_next')}
+							lastlabel=${this.localize.term('general_last')}
 							@change=${this.#onPageChange}></uui-pagination>
 					`
 				: nothing}

@@ -19,13 +19,13 @@ export class UmbDocumentSearchResultItemElement extends UmbLitElement {
 	item?: UmbSearchResultItemModel & UmbDocumentItemModel;
 
 	@state()
-	_currentCulture?: string;
+	private _currentCulture?: string;
 
 	@state()
-	_defaultCulture?: string;
+	private _defaultCulture?: string;
 
 	@state()
-	_variant?: UmbDocumentItemVariantModel;
+	private _variant?: UmbDocumentItemVariantModel;
 
 	constructor() {
 		super();

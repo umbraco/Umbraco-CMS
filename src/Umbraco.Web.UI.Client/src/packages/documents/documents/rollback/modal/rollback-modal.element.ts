@@ -29,10 +29,10 @@ type DocumentVersion = {
 @customElement('umb-rollback-modal')
 export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModalData, UmbRollbackModalValue> {
 	@state()
-	_versions: DocumentVersion[] = [];
+	private _versions: DocumentVersion[] = [];
 
 	@state()
-	_selectedVersion?: {
+	private _selectedVersion?: {
 		date: string;
 		name: string;
 		user: string;
@@ -44,16 +44,16 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 	};
 
 	@state()
-	_selectedCulture: string | null = null;
+	private _selectedCulture: string | null = null;
 
 	@state()
-	_isInvariant = true;
+	private _isInvariant = true;
 
 	@state()
-	_availableVariants: Option[] = [];
+	private _availableVariants: Option[] = [];
 
 	@state()
-	_diffs: Array<{ alias: string; diff: UmbDiffChange[] }> = [];
+	private _diffs: Array<{ alias: string; diff: UmbDiffChange[] }> = [];
 
 	#rollbackRepository = new UmbRollbackRepository(this);
 	#userItemRepository = new UmbUserItemRepository(this);

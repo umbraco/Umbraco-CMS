@@ -47,7 +47,7 @@ export class UmbInputToggleElement extends UmbFormControlMixin(UmbLitElement, ''
 	readonly = false;
 
 	@state()
-	_currentLabel?: string;
+	private _currentLabel?: string;
 
 	protected override firstUpdated(): void {
 		this.addFormControlElement(this.shadowRoot!.querySelector('uui-toggle')!);

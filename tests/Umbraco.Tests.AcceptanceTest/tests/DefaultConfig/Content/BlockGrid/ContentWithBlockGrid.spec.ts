@@ -96,6 +96,7 @@ test('can add a block element in the content', async ({umbracoApi, umbracoUi}) =
 });
 
 test('can edit block element in the content', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
   const updatedText = 'This updated block test';
   await umbracoApi.document.createDefaultDocumentWithABlockGridEditor(contentName, elementTypeId, documentTypeName, customDataTypeName);
   await umbracoUi.goToBackOffice();
@@ -115,6 +116,7 @@ test('can edit block element in the content', async ({umbracoApi, umbracoUi}) =>
 });
 
 test('can delete block element in the content', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
   await umbracoApi.document.createDefaultDocumentWithABlockGridEditor(contentName, elementTypeId, documentTypeName, customDataTypeName);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
@@ -147,7 +149,7 @@ test('cannot add block element if allow in root is disabled', async ({umbracoApi
   await umbracoUi.content.isAddBlockElementButtonVisible(false);
 });
 
-test('cannot add number of block element greater than the maximum amount', async ({umbracoApi, umbracoUi}) => {
+test('cannot add number of block element greater than the maximum amount', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const customDataTypeId = await umbracoApi.dataType.createBlockGridWithABlockAndMinAndMaxAmount(customDataTypeName, elementTypeId, 0, 0);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
@@ -163,8 +165,7 @@ test('cannot add number of block element greater than the maximum amount', async
   await umbracoUi.content.clickCreateModalButton();
 
   // Assert
-  await umbracoUi.content.doesFormValidationMessageContainText('Maximum');
-  await umbracoUi.content.doesFormValidationMessageContainText('too many');
+  await umbracoUi.content.doesFormValidationMessageContainText('Maximum 0 entries, you have entered 1 too many.');
 });
 
 test('can set the label of create button in root', async ({umbracoApi, umbracoUi}) => {
@@ -390,7 +391,7 @@ test('can add a variant block element with invariant RTE Tiptap in the content',
   const customRTEDataTypeId = await umbracoApi.dataType.createDefaultTiptapDataType(customRTEDataTypeName);
   const customElementTypeId = await umbracoApi.documentType.createDefaultElementType(customElementTypeName, groupName, customRTEDataTypeName, customRTEDataTypeId);
   const customDataTypeId = await umbracoApi.dataType.createBlockGridWithPermissions(customDataTypeName, customElementTypeId, true, true);
-  const documentTypeId = await umbracoApi.documentType.createVariantDocumentTypeWithInvariantPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId, 'testGroup', true);
+  const documentTypeId = await umbracoApi.documentType.createVariantDocumentTypeWithInvariantPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
   await umbracoApi.document.createDefaultDocumentWithCulture(contentName, documentTypeId, 'en-US');
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);

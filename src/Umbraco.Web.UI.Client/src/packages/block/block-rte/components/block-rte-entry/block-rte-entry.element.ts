@@ -45,47 +45,49 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	#context = new UmbBlockRteEntryContext(this);
 
 	@state()
-	_showContentEdit = false;
+	private _showContentEdit = false;
 
 	@state()
-	_hasSettings = false;
+	private _hasSettings = false;
 
 	@state()
-	_label = '';
+	private _label = '';
 
 	@state()
-	_icon?: string;
+	private _icon?: string;
 
 	@state()
-	_exposed?: boolean;
+	private _exposed?: boolean;
 
 	@state()
-	_showActions?: boolean;
+	private _showActions?: boolean;
 
 	@state()
-	_workspaceEditContentPath?: string;
+	private _workspaceEditContentPath?: string;
 
 	@state()
-	_workspaceEditSettingsPath?: string;
+	private _workspaceEditSettingsPath?: string;
 
 	@state()
-	_contentTypeAlias?: string;
+	private _contentTypeAlias?: string;
 
 	@state()
-	_contentTypeName?: string;
+	private _contentTypeName?: string;
 
 	@state()
-	_blockViewProps: UmbBlockEditorCustomViewProperties<UmbBlockRteLayoutModel> = {
+	private _blockViewProps: UmbBlockEditorCustomViewProperties<UmbBlockRteLayoutModel> = {
 		contentKey: undefined!,
 		config: { showContentEdit: false, showSettingsEdit: false },
 	}; // Set to undefined cause it will be set before we render.
 
 	// 'content-invalid' attribute is used for styling purpose.
 	@property({ type: Boolean, attribute: 'content-invalid', reflect: true })
+	// eslint-disable-next-line @typescript-eslint/naming-convention
 	_contentInvalid?: boolean;
 
 	// 'settings-invalid' attribute is used for styling purpose.
 	@property({ type: Boolean, attribute: 'settings-invalid', reflect: true })
+	// eslint-disable-next-line @typescript-eslint/naming-convention
 	_settingsInvalid?: boolean;
 
 	#updateBlockViewProps(incoming: Partial<UmbBlockEditorCustomViewProperties<UmbBlockRteLayoutModel>>) {
@@ -275,11 +277,10 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 							type="blockEditorCustomView"
 							default-element="umb-ref-rte-block"
 							.renderMethod=${this.#extensionSlotRenderMethod}
+							.fallbackRenderMethod=${this.#renderBuiltinBlockView}
 							.props=${this._blockViewProps}
 							.filter=${this.#filterBlockCustomViews}
-							single>
-							${this.#renderRefBlock()}
-						</umb-extension-slot>
+							single></umb-extension-slot>
 						${this.#renderActionBar()}
 						${!this._showContentEdit && this._contentInvalid
 							? html`<uui-badge attention color="invalid" label="Invalid content">!</uui-badge>`
@@ -294,6 +295,14 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			? html` <uui-action-bar> ${this.#renderEditAction()} ${this.#renderEditSettingsAction()}</uui-action-bar> `
 			: nothing;
 	}
+
+	#renderBuiltinBlockView = () => {
+		// TODO: Missing unsupported rendering [NL]
+		/*if (this._unsupported) {
+			return this.#renderUnsupportedBlock();
+		}*/
+		return this.#renderRefBlock();
+	};
 
 	#renderRefBlock() {
 		return html`<umb-ref-rte-block

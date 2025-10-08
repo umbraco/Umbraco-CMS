@@ -147,7 +147,7 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 		await Promise.all(
 			layoutEntries.map(async (layoutEntry) => {
 				this._insertBlockFromPropertyValue(layoutEntry, value, originData);
-				// TODO: Missing some way to insert a Block HTML Element into the RTE at the current cursor point. (hopefully the responsibilit can be avoided here, but there is some connection missing at this point) [NL]
+				// TODO: Missing some way to insert a Block HTML Element into the RTE at the current cursor point. (hopefully the responsibility can be avoided here, but there is some connection missing at this point) [NL]
 			}),
 		);
 

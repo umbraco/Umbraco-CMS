@@ -14,7 +14,7 @@ describe('UmbMarkedUfm', () => {
 			{ ufm: '{{=prop1}}', expected: '{<ufm-label-value alias="prop1"></ufm-label-value>}' },
 			{
 				ufm: '{= prop1 | strip-html | truncate:30}',
-				expected: '<ufm-label-value filters="strip-html | truncate:30" alias="prop1"></ufm-label-value>',
+				expected: '<ufm-label-value alias="prop1" filters="strip-html | truncate:30"></ufm-label-value>',
 			},
 			{ ufm: '{umbValue:prop1}', expected: '<ufm-label-value alias="prop1"></ufm-label-value>' },
 			{ ufm: '{#general_add}', expected: '<ufm-localize alias="general_add"></ufm-localize>' },

@@ -1,4 +1,4 @@
-import { UmbTiptapExtensionApiBase } from '../base.js';
+import { UmbTiptapExtensionApiBase } from '../tiptap-extension-api-base.js';
 import { distinctUntilChanged } from '@umbraco-cms/backoffice/external/rxjs';
 import { Node } from '@umbraco-cms/backoffice/external/tiptap';
 import { UMB_BLOCK_RTE_DATA_CONTENT_KEY } from '@umbraco-cms/backoffice/rte';

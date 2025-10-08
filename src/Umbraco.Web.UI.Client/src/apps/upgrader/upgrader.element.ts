@@ -1,5 +1,5 @@
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import type { UpgradeSettingsResponseModelReadable } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UpgradeSettingsResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UpgradeService } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecute, UmbApiError } from '@umbraco-cms/backoffice/resources';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -13,16 +13,16 @@ import './upgrader-view.element.js';
 @customElement('umb-upgrader')
 export class UmbUpgraderElement extends UmbLitElement {
 	@state()
-	private upgradeSettings?: UpgradeSettingsResponseModelReadable;
+	private _upgradeSettings?: UpgradeSettingsResponseModel;
 
 	@state()
-	private fetching = true;
+	private _fetching = true;
 
 	@state()
-	private upgrading = false;
+	private _upgrading = false;
 
 	@state()
-	private errorMessage = '';
+	private _errorMessage = '';
 
 	constructor() {
 		super();
@@ -32,46 +32,46 @@ export class UmbUpgraderElement extends UmbLitElement {
 	override render() {
 		return html`<umb-installer-layout data-test="upgrader">
 			<umb-upgrader-view
-				.fetching=${this.fetching}
-				.upgrading=${this.upgrading}
-				.settings=${this.upgradeSettings}
-				.errorMessage=${this.errorMessage}
-				@onAuthorizeUpgrade=${this._handleSubmit}></umb-upgrader-view>
+				.fetching=${this._fetching}
+				.upgrading=${this._upgrading}
+				.settings=${this._upgradeSettings}
+				.errorMessage=${this._errorMessage}
+				@onAuthorizeUpgrade=${this.#handleSubmit}></umb-upgrader-view>
 		</umb-installer-layout>`;
 	}
 
 	private async _setup() {
-		this.fetching = true;
+		this._fetching = true;
 
 		const { data, error } = await tryExecute(this, UpgradeService.getUpgradeSettings(), { disableNotifications: true });
 
 		if (data) {
-			this.upgradeSettings = data;
+			this._upgradeSettings = data;
 		} else if (error) {
-			this.errorMessage = UmbApiError.isUmbApiError(error)
+			this._errorMessage = UmbApiError.isUmbApiError(error)
 				? (error.problemDetails.detail ?? 'Unknown error, please try again')
 				: error.message;
 		}
 
-		this.fetching = false;
+		this._fetching = false;
 	}
 
-	_handleSubmit = async (e: CustomEvent<SubmitEvent>) => {
+	#handleSubmit = async (e: CustomEvent<SubmitEvent>) => {
 		e.stopPropagation();
-		this.errorMessage = '';
-		this.upgrading = true;
+		this._errorMessage = '';
+		this._upgrading = true;
 
 		const { error } = await tryExecute(this, UpgradeService.postUpgradeAuthorize());
 
 		if (error) {
-			this.errorMessage = UmbApiError.isUmbApiError(error)
+			this._errorMessage = UmbApiError.isUmbApiError(error)
 				? (error.problemDetails.detail ?? 'Unknown error, please try again')
 				: (error.message ?? 'Unknown error, please try again');
 		} else {
 			history.pushState(null, '', 'section/content');
 		}
 
-		this.upgrading = false;
+		this._upgrading = false;
 	};
 }
 

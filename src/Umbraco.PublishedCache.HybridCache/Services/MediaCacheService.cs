@@ -1,4 +1,8 @@
+#if DEBUG
+    using System.Diagnostics;
+#endif
 using Microsoft.Extensions.Caching.Hybrid;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
@@ -6,6 +10,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.HybridCache.Extensions;
 using Umbraco.Cms.Infrastructure.HybridCache.Factories;
 using Umbraco.Cms.Infrastructure.HybridCache.Persistence;
 using Umbraco.Cms.Infrastructure.HybridCache.Serialization;
@@ -23,6 +28,7 @@ internal sealed class MediaCacheService : IMediaCacheService
     private readonly ICacheNodeFactory _cacheNodeFactory;
     private readonly IEnumerable<IMediaSeedKeyProvider> _seedKeyProviders;
     private readonly IPublishedModelFactory _publishedModelFactory;
+    private readonly ILogger<MediaCacheService> _logger;
     private readonly CacheSettings _cacheSettings;
 
     private HashSet<Guid>? _seedKeys;
@@ -55,7 +61,8 @@ internal sealed class MediaCacheService : IMediaCacheService
         ICacheNodeFactory cacheNodeFactory,
         IEnumerable<IMediaSeedKeyProvider> seedKeyProviders,
         IPublishedModelFactory publishedModelFactory,
-        IOptions<CacheSettings> cacheSettings)
+        IOptions<CacheSettings> cacheSettings,
+        ILogger<MediaCacheService> logger)
     {
         _databaseCacheRepository = databaseCacheRepository;
         _idKeyMap = idKeyMap;
@@ -66,6 +73,7 @@ internal sealed class MediaCacheService : IMediaCacheService
         _seedKeyProviders = seedKeyProviders;
         _publishedModelFactory = publishedModelFactory;
         _cacheSettings = cacheSettings.Value;
+        _logger = logger;
     }
 
     public async Task<IPublishedContent?> GetByKeyAsync(Guid key)
@@ -125,18 +133,8 @@ internal sealed class MediaCacheService : IMediaCacheService
             return false;
         }
 
-        ContentCacheNode? contentCacheNode = await _hybridCache.GetOrCreateAsync<ContentCacheNode?>(
-            $"{keyAttempt.Result}", // Unique key to the cache entry
-            cancel => ValueTask.FromResult<ContentCacheNode?>(null));
-
-        if (contentCacheNode is null)
-        {
-            await _hybridCache.RemoveAsync($"{keyAttempt.Result}");
-        }
-
-        return contentCacheNode is not null;
+        return await _hybridCache.ExistsAsync<ContentCacheNode>($"{keyAttempt.Result}");
     }
-
 
     public async Task RefreshMediaAsync(IMedia media)
     {
@@ -155,33 +153,63 @@ internal sealed class MediaCacheService : IMediaCacheService
 
     public async Task SeedAsync(CancellationToken cancellationToken)
     {
-        foreach (Guid key in SeedKeys)
+#if DEBUG
+        var sw = new Stopwatch();
+        sw.Start();
+#endif
+
+        foreach (IEnumerable<Guid> group in SeedKeys.InGroupsOf(_cacheSettings.MediaSeedBatchSize))
         {
-            if (cancellationToken.IsCancellationRequested)
+            var uncachedKeys = new HashSet<Guid>();
+            foreach (Guid key in group)
             {
-                break;
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    break;
+                }
+
+                var cacheKey = GetCacheKey(key, false);
+
+                var existsInCache = await _hybridCache.ExistsAsync<ContentCacheNode>(cacheKey);
+                if (existsInCache is false)
+                {
+                    uncachedKeys.Add(key);
+                }
             }
 
-            var cacheKey = GetCacheKey(key, false);
+            _logger.LogDebug("Uncached key count {KeyCount}", uncachedKeys.Count);
 
-            ContentCacheNode? cachedValue = await _hybridCache.GetOrCreateAsync(
-                cacheKey,
-                async cancel =>
-                {
-                    using ICoreScope scope = _scopeProvider.CreateCoreScope();
-                    ContentCacheNode? mediaCacheNode = await _databaseCacheRepository.GetMediaSourceAsync(key);
-                    scope.Complete();
-                    return mediaCacheNode;
-                },
-                GetSeedEntryOptions(),
-                GenerateTags(key),
-                cancellationToken: cancellationToken);
-
-            if (cachedValue is null)
+            if (uncachedKeys.Count == 0)
             {
-                await _hybridCache.RemoveAsync(cacheKey);
+                continue;
+            }
+
+            using ICoreScope scope = _scopeProvider.CreateCoreScope();
+
+            IEnumerable<ContentCacheNode> cacheNodes = await _databaseCacheRepository.GetMediaSourcesAsync(uncachedKeys);
+
+            scope.Complete();
+
+            _logger.LogDebug("Media nodes to cache {NodeCount}", cacheNodes.Count());
+
+            foreach (ContentCacheNode cacheNode in cacheNodes)
+            {
+                var cacheKey = GetCacheKey(cacheNode.Key, false);
+                await _hybridCache.SetAsync(
+                    cacheKey,
+                    cacheNode,
+                    GetSeedEntryOptions(),
+                    GenerateTags(cacheNode.Key),
+                    cancellationToken: cancellationToken);
             }
         }
+
+#if DEBUG
+        sw.Stop();
+        _logger.LogInformation("Media cache seeding completed in {ElapsedMilliseconds} ms with {SeedCount} seed keys.", sw.ElapsedMilliseconds, SeedKeys.Count);
+#else
+        _logger.LogInformation("Media cache seeding completed with {SeedCount} seed keys.", SeedKeys.Count);
+#endif
     }
 
     public async Task RefreshMemoryCacheAsync(Guid key)
@@ -230,7 +258,7 @@ internal sealed class MediaCacheService : IMediaCacheService
     public void Rebuild(IReadOnlyCollection<int> contentTypeIds)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
-        _databaseCacheRepository.Rebuild(contentTypeIds.ToList());
+        _databaseCacheRepository.Rebuild(mediaTypeIds: contentTypeIds.ToList());
 
         IEnumerable<Guid> mediaTypeKeys = contentTypeIds.Select(x => _idKeyMap.GetKeyForId(x, UmbracoObjectTypes.MediaType))
             .Where(x => x.Success)

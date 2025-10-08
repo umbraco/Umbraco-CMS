@@ -8,13 +8,13 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 @customElement('umb-picker-search-field')
 export class UmbPickerSearchFieldElement extends UmbLitElement {
 	@state()
-	_query: string = '';
+	private _query: string = '';
 
 	@state()
-	_searching: boolean = false;
+	private _searching: boolean = false;
 
 	@state()
-	_isSearchable: boolean = false;
+	private _isSearchable: boolean = false;
 
 	#pickerContext?: UmbPickerContext;
 

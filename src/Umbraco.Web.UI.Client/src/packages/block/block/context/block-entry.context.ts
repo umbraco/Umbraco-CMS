@@ -49,8 +49,8 @@ export abstract class UmbBlockEntryContext<
 	BlockOriginData extends UmbBlockWorkspaceOriginData = UmbBlockWorkspaceOriginData,
 > extends UmbContextBase {
 	//
-	_manager?: BlockManagerContextType;
-	_entries?: BlockEntriesContextType;
+	protected _manager?: BlockManagerContextType;
+	protected _entries?: BlockEntriesContextType;
 
 	#contentKey?: string;
 	#unsupported = new UmbBooleanState(undefined);
@@ -129,14 +129,14 @@ export abstract class UmbBlockEntryContext<
 		return this.#contentElementType.getValue()?.icon;
 	}
 
-	_blockType = new UmbObjectState<BlockType | undefined>(undefined);
+	protected _blockType = new UmbObjectState<BlockType | undefined>(undefined);
 	public readonly blockType = this._blockType.asObservable();
 	public readonly contentElementTypeKey = this._blockType.asObservablePart((x) => x?.contentElementTypeKey);
 	public readonly settingsElementTypeKey = this._blockType.asObservablePart((x) =>
 		x ? (x.settingsElementTypeKey ?? undefined) : null,
 	);
 
-	_layout = new UmbObjectState<BlockLayoutType | undefined>(undefined);
+	protected _layout = new UmbObjectState<BlockLayoutType | undefined>(undefined);
 	public readonly layout = this._layout.asObservable();
 	public readonly contentKey = this._layout.asObservablePart((x) => x?.contentKey);
 	public readonly settingsKey = this._layout.asObservablePart((x) => (x ? (x.settingsKey ?? null) : undefined));
@@ -185,7 +185,7 @@ export abstract class UmbBlockEntryContext<
 	});
 
 	#contentStructureHasProperties = new UmbBooleanState(undefined);
-	_contentStructureHasProperties = this.#contentStructureHasProperties.asObservable();
+	protected _contentStructureHasProperties = this.#contentStructureHasProperties.asObservable();
 
 	#settingsStructure?: UmbContentTypeStructureManager;
 	#settingsStructurePromiseResolve?: () => void;
@@ -276,9 +276,15 @@ export abstract class UmbBlockEntryContext<
 	#settings = new UmbObjectState<UmbBlockDataModel | undefined>(undefined);
 	//public readonly settings = this.#settings.asObservable();
 	protected readonly _settingsValueArray = this.#settings.asObservablePart((x) => x?.values);
-	private readonly settingsDataContentTypeKey = this.#settings.asObservablePart((x) =>
+	private readonly _settingsDataContentTypeKey = this.#settings.asObservablePart((x) =>
 		x ? (x.contentTypeKey ?? undefined) : null,
 	);
+	/**
+	 * @deprecated Use {@link _settingsDataContentTypeKey} instead. This will be removed in Umbraco 18.
+	 */
+	// eslint-disable-next-line
+	private readonly settingsDataContentTypeKey = this._settingsDataContentTypeKey;
+
 	#settingsValuesObservable?: Observable<UmbBlockDataType | undefined>;
 	public async settingsValues() {
 		await this.#settingsStructurePromise;
@@ -366,7 +372,7 @@ export abstract class UmbBlockEntryContext<
 			null,
 		);
 		this.observe(
-			this.settingsDataContentTypeKey,
+			this._settingsDataContentTypeKey,
 			(settingsElementTypeKey) => {
 				if (!settingsElementTypeKey) return;
 				this.#getSettingsStructure(settingsElementTypeKey);
@@ -386,7 +392,7 @@ export abstract class UmbBlockEntryContext<
 
 		// Correct settings data, accordingly to configuration of the BlockType: [NL]
 		this.observe(
-			observeMultiple([this.settingsElementTypeKey, this.settingsDataContentTypeKey]),
+			observeMultiple([this.settingsElementTypeKey, this._settingsDataContentTypeKey]),
 			([settingsElementTypeKey, settingsDataContentTypeKey]) => {
 				// Notice the values are only undefined while we are missing the source of these observables. [NL]
 				if (settingsElementTypeKey === undefined || settingsDataContentTypeKey === undefined) return;
@@ -503,7 +509,7 @@ export abstract class UmbBlockEntryContext<
 		this.#observeReadOnlyState();
 	}
 
-	abstract _gotManager(): void;
+	protected abstract _gotManager(): void;
 
 	#gotEntries() {
 		this.#updateCreatePaths();
@@ -518,7 +524,7 @@ export abstract class UmbBlockEntryContext<
 		);
 	}
 
-	abstract _gotEntries(): void;
+	protected abstract _gotEntries(): void;
 
 	#observeContentData() {
 		if (!this._manager || !this.#contentKey) return;
@@ -555,7 +561,7 @@ export abstract class UmbBlockEntryContext<
 		);
 	}
 
-	abstract _gotContentType(contentType: UmbContentTypeModel | undefined): void;
+	protected abstract _gotContentType(contentType: UmbContentTypeModel | undefined): void;
 
 	async #observeVariantId() {
 		if (!this._manager) {

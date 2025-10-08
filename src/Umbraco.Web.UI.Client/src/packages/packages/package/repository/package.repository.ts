@@ -10,7 +10,7 @@ import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 
 /**
  * A repository for Packages which mimics a tree store.
-
+ 
  */
 export class UmbPackageRepository extends UmbControllerBase implements UmbApi {
 	#init!: Promise<void>;

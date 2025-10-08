@@ -46,10 +46,10 @@ export class UmbSearchModalElement extends UmbLitElement {
 	private _globalSearchers: Array<GlobalSearchers> = [];
 
 	@state()
-	_currentGlobalSearcher?: GlobalSearchers;
+	private _currentGlobalSearcher?: GlobalSearchers;
 
 	@state()
-	_loading: boolean = false;
+	private _loading: boolean = false;
 
 	#searchItemNavIndex = 0;
 

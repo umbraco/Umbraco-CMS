@@ -1,12 +1,18 @@
 import { UMB_PICKER_INPUT_CONTEXT } from './picker-input.context-token.js';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
+import { UmbInteractionMemoryManager } from '@umbraco-cms/backoffice/interaction-memory';
 import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
-import { umbConfirmModal, umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
-import type { UmbModalToken, UmbPickerModalData, UmbPickerModalValue } from '@umbraco-cms/backoffice/modal';
-import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
+import {
+	umbConfirmModal,
+	umbOpenModal,
+	type UmbModalToken,
+	type UmbPickerModalData,
+	type UmbPickerModalValue,
+} from '@umbraco-cms/backoffice/modal';
 
 type PickerItemBaseType = { name: string; unique: string };
 export class UmbPickerInputContext<
@@ -21,8 +27,10 @@ export class UmbPickerInputContext<
 
 	#itemManager;
 
-	selection;
-	selectedItems;
+	public readonly selection;
+	public readonly selectedItems;
+	public readonly statuses;
+	public readonly interactionMemory = new UmbInteractionMemoryManager(this);
 
 	/**
 	 * Define a minimum amount of selected items in this input, for this input to be valid.
@@ -77,6 +85,7 @@ export class UmbPickerInputContext<
 		this.#itemManager = new UmbRepositoryItemsManager<PickedItemType>(this, repositoryAlias, getUniqueMethod);
 
 		this.selection = this.#itemManager.uniques;
+		this.statuses = this.#itemManager.statuses;
 		this.selectedItems = this.#itemManager.items;
 	}
 
@@ -100,6 +109,7 @@ export class UmbPickerInputContext<
 				selection: this.getSelection(),
 			} as PickerModalValueType,
 		}).catch(() => undefined);
+
 		if (!modalValue) return;
 
 		this.setSelection(modalValue.selection);
@@ -108,12 +118,12 @@ export class UmbPickerInputContext<
 
 	async requestRemoveItem(unique: string) {
 		const item = this.#itemManager.getItems().find((item) => this.#getUnique(item) === unique);
-		if (!item) throw new Error('Could not find item with unique: ' + unique);
 
+		const name = item?.name ?? '#general_notFound';
 		await umbConfirmModal(this, {
 			color: 'danger',
-			headline: `Remove ${item.name}?`,
-			content: 'Are you sure you want to remove this item',
+			headline: `#actions_remove ${name}?`,
+			content: `#defaultdialogs_confirmremove ${name}?`,
 			confirmLabel: '#actions_remove',
 		});
 
@@ -123,6 +133,7 @@ export class UmbPickerInputContext<
 	#removeItem(unique: string) {
 		const newSelection = this.getSelection().filter((value) => value !== unique);
 		this.setSelection(newSelection);
+		this.#itemManager.removeStatus(unique);
 		this.getHostElement().dispatchEvent(new UmbChangeEvent());
 	}
 }

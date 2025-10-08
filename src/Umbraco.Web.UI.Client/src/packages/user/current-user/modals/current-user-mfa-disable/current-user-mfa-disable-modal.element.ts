@@ -16,10 +16,10 @@ export class UmbCurrentUserMfaDisableModalElement extends UmbModalBaseElement<
 	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
 
 	@state()
-	_buttonState?: UUIButtonState;
+	private _buttonState?: UUIButtonState;
 
 	@query('#code')
-	_codeInput!: HTMLInputElement;
+	private _codeInput!: HTMLInputElement;
 
 	constructor() {
 		super();

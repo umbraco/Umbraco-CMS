@@ -50,10 +50,10 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 	private _filtered: Array<{ name?: string; blocks: Array<UmbBlockTypeItemWithGroupKey> }> = [];
 
 	@state()
-	_manager?: typeof UMB_BLOCK_MANAGER_CONTEXT.TYPE;
+	private _manager?: typeof UMB_BLOCK_MANAGER_CONTEXT.TYPE;
 
 	@state()
-	_loading = true;
+	private _loading = true;
 
 	constructor() {
 		super();
