@@ -80,7 +80,7 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 
 	public override showChildren() {
 		if (this.getIsMenu() && this.#item.getHasCollection()) {
-			// Collections cannot be expanded via a manu, instead we open the Collection for the user.
+			// Collections cannot be expanded via a menu, instead we open the Collection for the user.
 			this.#openCollection();
 			return;
 		}
