@@ -257,7 +257,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 		this.#labelRender.value = valueObject;
 		// Await one animation frame:
-		await new Promise((resolve) => requestAnimationFrame(() => resolve(true)));
+		await new Promise((resolve) => requestAnimationFrame(() => resolve()));
 		const result = this.#labelRender.toString();
 		this.#name.setValue(result);
 		this.view.setTitle(result);
