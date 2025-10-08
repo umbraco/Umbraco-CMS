@@ -33,11 +33,11 @@ internal class RepositoryCacheVersionService : IRepositoryCacheVersionService
     {
         _logger.LogDebug("Checking if cache for {EntityType} is synced", typeof(TEntity).Name);
 
-        // We have to take a read lock to ensure the cache is not being updated while we check the version.
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
 
         var cacheKey = GetCacheKey<TEntity>();
 
+        // The cache version accessor will take a read lock if the version is not in request cache, so we don't need to take one here.
         RepositoryCacheVersion? databaseVersion = await _repositoryCacheVersionAccessor.GetAsync(cacheKey);
 
         if (databaseVersion?.Version is null)
