@@ -198,6 +198,8 @@ export class UmbContentTypeStructureManager<
 		this.#ownerContentTypeUnique = unique;
 		if (!unique) {
 			this.#initRejection?.(`Content Type structure manager could not load: ${unique}`);
+			this.#initResolver = undefined;
+			this.#initRejection = undefined;
 			return Promise.reject(
 				new Error('The unique identifier is missing. A valid unique identifier is required to load the content type.'),
 			);
@@ -207,6 +209,8 @@ export class UmbContentTypeStructureManager<
 		const result = await this.observe(observable).asPromise();
 		if (!result) {
 			this.#initRejection?.(`Content Type structure manager could not load: ${unique}`);
+			this.#initResolver = undefined;
+			this.#initRejection = undefined;
 			return {
 				error: new UmbError(`Content Type structure manager could not load: ${unique}`),
 				asObservable: () => observable,
@@ -219,10 +223,14 @@ export class UmbContentTypeStructureManager<
 		}).catch(() => {
 			const msg = `Content Type structure manager could not load: ${unique}. Not all Content Types loaded successfully.`;
 			this.#initRejection?.(msg);
+			this.#initResolver = undefined;
+			this.#initRejection = undefined;
 			return Promise.reject(new UmbError(msg));
 		});
 
 		this.#initResolver?.(result);
+		this.#initResolver = undefined;
+		this.#initRejection = undefined;
 		return { data: result, asObservable: () => this.ownerContentType };
 	}
 
@@ -234,6 +242,8 @@ export class UmbContentTypeStructureManager<
 		const { data } = repsonse;
 		if (!data) {
 			this.#initRejection?.(`Content Type structure manager could not create scaffold`);
+			this.#initResolver = undefined;
+			this.#initRejection = undefined;
 			return { error: repsonse.error };
 		}
 
@@ -244,6 +254,8 @@ export class UmbContentTypeStructureManager<
 		// Make a entry in the repo manager:
 		this.#repoManager!.addEntry(data);
 		this.#initResolver?.(data);
+		this.#initResolver = undefined;
+		this.#initRejection = undefined;
 		return repsonse;
 	}
 
@@ -997,15 +1009,20 @@ export class UmbContentTypeStructureManager<
 	*/
 
 	/**
-	 *
-	 * Find merged containers that match the provided container ids.
-	 * Notice if you can provide one or more ids matching the same container and it will still only return return the matching container once.
-	 * @param containerIds - An array of container ids to find merged containers for.
-	 * @param id
+	 * Find a merged container that match the provided container id.
+	 * @param {string} id - The id to find the merged container of.
 	 * @returns {UmbPropertyTypeContainerMergedModel | undefined} - The merged containers that match the provided container ids.
 	 */
 	getMergedContainerById(id: string): UmbPropertyTypeContainerMergedModel | undefined {
 		return this.#mergedContainers.find((x) => x.ids.includes(id));
+	}
+	/**
+	 * Find a merged container that match the provided merged-container key.
+	 * @param {string} key - The key to find the merged container of.
+	 * @returns {UmbPropertyTypeContainerMergedModel | undefined} - The merged containers that match the provided merged-container key.
+	 */
+	getMergedContainerByKey(key: string): UmbPropertyTypeContainerMergedModel | undefined {
+		return this.#mergedContainers.find((x) => x.key === key);
 	}
 
 	/**
