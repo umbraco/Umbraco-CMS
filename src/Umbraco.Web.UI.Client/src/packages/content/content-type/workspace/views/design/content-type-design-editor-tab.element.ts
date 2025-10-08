@@ -113,7 +113,6 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 				return context.structure.getMergedContainerByKey(unique) as UmbPropertyTypeContainerMergedModel | undefined;
 			},
 			requestExternalRemove: async ({ item }) => {
-				console.log('external remove', item);
 				const context = this.#contentTypeWorkspaceContext;
 				if (!context) {
 					throw new Error('Could not get Workspace Context');
@@ -124,7 +123,6 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 				);
 			},
 			requestExternalInsert: async ({ item }) => {
-				console.log('requestExternalInsert', item);
 				const context = this.#contentTypeWorkspaceContext;
 				if (!context) {
 					throw new Error('Could not get Workspace Context');
