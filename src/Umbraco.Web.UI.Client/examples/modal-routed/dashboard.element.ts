@@ -3,8 +3,8 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 
-@customElement('umb-dashboard')
-export class UmbDashboardElement extends UmbElementMixin(LitElement) {
+@customElement('umb-example-dashboard')
+export class UmbExampleDashboardElement extends UmbElementMixin(LitElement) {
 	@state()
 	private _routes: UmbRoute[] = [
 		{
@@ -39,10 +39,10 @@ export class UmbDashboardElement extends UmbElementMixin(LitElement) {
 	static override styles = [UmbTextStyles, css``];
 }
 
-export default UmbDashboardElement;
+export default UmbExampleDashboardElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-dashboard': UmbDashboardElement;
+		'umb-example-dashboard': UmbExampleDashboardElement;
 	}
 }

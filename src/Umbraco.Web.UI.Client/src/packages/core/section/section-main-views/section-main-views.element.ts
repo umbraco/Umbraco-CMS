@@ -63,7 +63,7 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 				setup: (component: UmbDashboardElement) => {
 					component.manifest = manifest;
 				},
-			} as UmbRoute;
+			} as unknown as UmbRoute;
 		});
 
 		const viewRoutes = this._views?.map((manifest) => {
