@@ -1,5 +1,5 @@
 import type { UmbBlockDataModel, UmbBlockDataValueModel, UmbBlockLayoutBaseModel } from '../types.js';
-import { UMB_BLOCK_ENTRIES_CONTEXT, UMB_BLOCK_ENTRY_CONTEXT, UMB_BLOCK_MANAGER_CONTEXT } from '../context/index.js';
+import { UMB_BLOCK_ENTRIES_CONTEXT, UMB_BLOCK_MANAGER_CONTEXT } from '../context/index.js';
 import { UmbBlockWorkspaceEditorElement } from './block-workspace-editor.element.js';
 import { UmbBlockElementManager } from './block-element-manager.js';
 import type { UmbBlockWorkspaceOriginData } from './block-workspace.modal-token.js';
@@ -113,7 +113,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 		this.observe(
 			observeMultiple([this.content.values, this.settings.values]),
-			async ([contentValues, settingsValues]) => {
+			async ([contentValues]) => {
 				this.#renderLabel(contentValues);
 			},
 			'observeContentForLabelRender',
