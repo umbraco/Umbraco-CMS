@@ -1,7 +1,6 @@
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import {
 	type PropertyValueMap,
-	LitElement,
 	css,
 	customElement,
 	html,
