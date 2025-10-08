@@ -7,10 +7,10 @@ import { umbDeepMerge } from '@umbraco-cms/backoffice/utils';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbViewController } from '@umbraco-cms/backoffice/view';
-import { UMB_ROUTE_CONTEXT } from '@umbraco-cms/backoffice/router';
 import type { ElementLoaderProperty } from '@umbraco-cms/backoffice/extension-api';
 import type { IRouterSlot } from '@umbraco-cms/backoffice/router';
 import type { UmbDeepPartialObject } from '@umbraco-cms/backoffice/utils';
+import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export interface UmbModalRejectReason {
 	type: string;
@@ -26,6 +26,7 @@ export type UmbModalContextClassArgs<
 	data?: ModalAliasTypeAsToken['DATA'];
 	value?: ModalAliasTypeAsToken['VALUE'];
 	modal?: UmbModalConfig;
+	routeContextToken?: UmbContextToken<any>;
 };
 
 // TODO: consider splitting this into two separate handlers
@@ -55,6 +56,7 @@ export class UmbModalContext<
 	public readonly backdropBackground?: string;
 	public readonly router: IRouterSlot | null = null;
 	public readonly alias: string | UmbModalToken<ModalData, ModalValue>;
+	public readonly routeContextToken?: UmbContextToken<any>;
 
 	#value;
 	public readonly value;
@@ -73,6 +75,7 @@ export class UmbModalContext<
 		this.key = args.modal?.key || UmbId.new();
 		this.router = args.router ?? null;
 		this.alias = modalAlias;
+		this.routeContextToken = args.routeContextToken;
 
 		this.view = new UmbViewController(this, modalAlias.toString());
 
@@ -127,6 +130,8 @@ export class UmbModalContext<
 
 	// eslint-disable-next-line @typescript-eslint/naming-convention
 	async _internal_removeCurrentModal() {
+		// Use dynamic import to avoid circular dependency
+		const { UMB_ROUTE_CONTEXT } = await import('@umbraco-cms/backoffice/router');
 		const routeContext = await this.getContext(UMB_ROUTE_CONTEXT);
 		routeContext?._internal_removeModalPath(this.#activeModalPath);
 	}

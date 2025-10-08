@@ -3,7 +3,7 @@ import type { IRouterSlot } from '../router-slot/index.js';
 import type { UmbModalRouteRegistration } from '../modal-registration/modal-route-registration.interface.js';
 import { umbGenerateRoutePathBuilder } from '../generate-route-path-builder.function.js';
 import type { UmbRoute } from './route.interface.js';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UMB_ROUTE_CONTEXT } from './route.context-token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
@@ -66,11 +66,12 @@ export class UmbRouteContext extends UmbContextBase {
 			component: EmptyDiv,
 			setup: async (component, info) => {
 				if (!this.#modalContext) return;
-				const modalContext = await modalRegistration.routeSetup(
-					this.#modalRouter,
-					this.#modalContext,
-					info.match.params,
-				);
+				const modalContext = await modalRegistration.routeSetup({
+					router: this.#modalRouter,
+					modalManagerContext: this.#modalContext,
+					params: info.match.params,
+					routeContextToken: UMB_ROUTE_CONTEXT,
+				});
 				if (modalContext) {
 					modalContext._internal_setCurrentModalPath(info.match.fragments.consumed);
 				}
@@ -178,5 +179,3 @@ export class UmbRouteContext extends UmbContextBase {
 		this._internal_modalRouterChanged(undefined);
 	}
 }
-
-export const UMB_ROUTE_CONTEXT = new UmbContextToken<UmbRouteContext>('UmbRouterContext');

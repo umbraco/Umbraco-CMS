@@ -1,8 +1,8 @@
 import type { IRouterSlot, Params } from '../router-slot/index.js';
 import { UMB_ROUTE_PATH_ADDENDUM_CONTEXT } from '../contexts/route-path-addendum.context-token.js';
-import { UMB_ROUTE_CONTEXT } from '../route/route.context.js';
+import { UMB_ROUTE_CONTEXT } from '../route/route.context-token.js';
 import { encodeFolderName } from '../encode-folder-name.function.js';
-import type { UmbModalRouteRegistration } from './modal-route-registration.interface.js';
+import type { UmbModalRouteRegistration, UmbModalRouteSetupArgs } from './modal-route-registration.interface.js';
 import type {
 	UmbModalConfig,
 	UmbModalContext,
@@ -14,6 +14,7 @@ import type { UmbControllerAlias, UmbControllerHost } from '@umbraco-cms/backoff
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDeepPartialObject } from '@umbraco-cms/backoffice/utils';
+import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export type UmbModalRouteBuilder = (params: { [key: string]: string | number } | null) => string;
 
@@ -327,20 +328,21 @@ export class UmbModalRouteRegistrationController<
 		this.#modalContext = undefined;
 	};
 
-	async routeSetup(router: IRouterSlot, modalManagerContext: UmbModalManagerContext, params: Params) {
+	async routeSetup(args: UmbModalRouteSetupArgs) {
 		// If already open, don't do anything:
 		if (this.active) return;
 
-		const modalData = this.#onSetupCallback ? await this.#onSetupCallback(params) : undefined;
+		const modalData = this.#onSetupCallback ? await this.#onSetupCallback(args.params) : undefined;
 		if (modalData !== false) {
-			const args = {
+			const modalArgs = {
 				modal: {},
 				...modalData,
-				router,
+				router: args.router,
+				routeContextToken: args.routeContextToken,
 			} as UmbModalContextClassArgs<UmbModalToken<UmbModalTokenData, UmbModalTokenValue>>;
-			args.modal!.key = this.#key;
+			modalArgs.modal!.key = this.#key;
 
-			this.#modalContext = modalManagerContext.open(this, this.#modalAlias, args);
+			this.#modalContext = args.modalManagerContext.open(this, this.#modalAlias, modalArgs);
 			this.#modalContext.onSubmit().then(this.#onSubmit, this.#onReject);
 			return this.#modalContext;
 		}
