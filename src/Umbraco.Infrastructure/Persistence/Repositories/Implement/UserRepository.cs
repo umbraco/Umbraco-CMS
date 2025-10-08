@@ -376,11 +376,11 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
 
         // get users2groups
 
-        List<User2UserGroupDto>? user2Groups = Database.FetchByGroups<User2UserGroupDto, int>(userIds, Constants.Sql.MaxParameterCount, ints =>
+        var user2Groups = Database.FetchByGroups<User2UserGroupDto, int>(userIds, Constants.Sql.MaxParameterCount, ints =>
         {
             return SqlContext.Sql()
-            .Select<User2UserGroupDto>()
-            .From<User2UserGroupDto>()
+                .Select<User2UserGroupDto>()
+                .From<User2UserGroupDto>()
                 .WhereIn<User2UserGroupDto>(x => x.UserId, ints);
         }).ToList();
         var groupIds = user2Groups.Select(x => x.UserGroupId).ToList();
@@ -424,14 +424,13 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
 
         // get start nodes
 
-        List<UserStartNodeDto>? startNodes = Database.FetchByGroups<UserStartNodeDto, int>(userIds, Constants.Sql.MaxParameterCount, ints =>
+        var startNodes = Database.FetchByGroups<UserStartNodeDto, int>(userIds, Constants.Sql.MaxParameterCount, ints =>
         {
             return SqlContext.Sql()
-            .Select<UserStartNodeDto>()
-            .From<UserStartNodeDto>()
+                .Select<UserStartNodeDto>()
+                .From<UserStartNodeDto>()
                 .WhereIn<UserStartNodeDto>(x => x.UserId, ints);
         }).ToList();
-
 
         // get groups2languages
 
