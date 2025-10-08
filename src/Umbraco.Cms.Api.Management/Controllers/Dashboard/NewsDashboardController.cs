@@ -16,16 +16,10 @@ namespace Umbraco.Cms.Api.Management.Controllers.NewsDashboard;
 public class NewsDashboardController : ManagementApiControllerBase
 {
     private readonly INewsDashboardService _newsDashboardService;
-    private readonly ILogger<NewsDashboardController> _logger;
-    private readonly IUmbracoVersion _umbracoVersion;
-    private readonly ISiteIdentifierService _siteIdentifierService;
 
-    public NewsDashboardController(INewsDashboardService newsDashboardService, ILogger<NewsDashboardController> logger, IUmbracoVersion umbracoVersion, ISiteIdentifierService siteIdentifierService)
+    public NewsDashboardController(INewsDashboardService newsDashboardService)
     {
         _newsDashboardService = newsDashboardService;
-        _logger = logger;
-        _umbracoVersion = umbracoVersion;
-        _siteIdentifierService = siteIdentifierService;
     }
 
     [HttpGet]
