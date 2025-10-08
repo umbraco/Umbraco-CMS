@@ -3,8 +3,8 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
 
-@customElement('umb-block-list-type-workspace-view-settings')
-export class UmbBlockListTypeWorkspaceViewSettingsElement extends UmbLitElement implements UmbWorkspaceViewElement {
+@customElement('umb-block-single-type-workspace-view-settings')
+export class UmbBlockSingleTypeWorkspaceViewSettingsElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	override render() {
 		return html`
 			<uui-box headline=${this.localize.term('blockEditor_headlineEditorAppearance')}>
@@ -105,10 +105,10 @@ export class UmbBlockListTypeWorkspaceViewSettingsElement extends UmbLitElement 
 	];
 }
 
-export default UmbBlockListTypeWorkspaceViewSettingsElement;
+export default UmbBlockSingleTypeWorkspaceViewSettingsElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-block-list-type-workspace-view-settings': UmbBlockListTypeWorkspaceViewSettingsElement;
+		'umb-block-single-type-workspace-view-settings': UmbBlockSingleTypeWorkspaceViewSettingsElement;
 	}
 }

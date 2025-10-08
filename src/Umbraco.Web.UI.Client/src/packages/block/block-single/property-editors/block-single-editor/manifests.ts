@@ -1,28 +1,21 @@
-import { manifest as blockListSchemaManifest } from './Umbraco.BlockList.js';
-import { UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS } from './constants.js';
+import { manifest as blockSingleSchemaManifest } from './Umbraco.SingleBlock.js';
+import { UMB_BLOCK_SINGLE_PROPERTY_EDITOR_SCHEMA_ALIAS } from './constants.js';
 import { UmbStandardBlockValueResolver } from '@umbraco-cms/backoffice/block';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'propertyEditorUi',
-		alias: 'Umb.PropertyEditorUi.BlockList',
-		name: 'Block List Property Editor UI',
-		element: () => import('./property-editor-ui-block-list.element.js'),
+		alias: 'Umb.PropertyEditorUi.BlockSingle',
+		name: 'Block Single Property Editor UI',
+		element: () => import('./property-editor-ui-block-single.element.js'),
 		meta: {
-			label: 'Block List',
-			propertyEditorSchemaAlias: UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS,
-			icon: 'icon-thumbnail-list',
+			label: 'Block Single',
+			propertyEditorSchemaAlias: UMB_BLOCK_SINGLE_PROPERTY_EDITOR_SCHEMA_ALIAS,
+			icon: 'icon-shape-square',
 			group: 'richContent',
 			supportsReadOnly: true,
 			settings: {
 				properties: [
-					{
-						alias: 'useSingleBlockMode',
-						label: 'Single block mode',
-						description:
-							'When in Single block mode, the output will be BlockListItem<>, instead of BlockListModel.\n\n**NOTE:**\nSingle block mode requires a maximum of one available block, and an amount set to minimum 1 and maximum 1 blocks.',
-						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
-					},
 					{
 						alias: 'useLiveEditing',
 						label: 'Live editing mode',
@@ -48,10 +41,10 @@ export const manifests: Array<UmbExtensionManifest> = [
 	},
 	{
 		type: 'propertyValueResolver',
-		alias: 'Umb.PropertyValueResolver.BlockList',
-		name: 'Block Value Resolver',
+		alias: 'Umb.PropertyValueResolver.BlockSingle',
+		name: 'Single Block Value Resolver',
 		api: UmbStandardBlockValueResolver,
-		forEditorAlias: UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS,
+		forEditorAlias: UMB_BLOCK_SINGLE_PROPERTY_EDITOR_SCHEMA_ALIAS,
 	},
-	blockListSchemaManifest,
+	blockSingleSchemaManifest,
 ];
