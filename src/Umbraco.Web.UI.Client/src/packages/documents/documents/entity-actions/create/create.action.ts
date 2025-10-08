@@ -4,11 +4,12 @@ import type { UmbEntityActionArgs } from '@umbraco-cms/backoffice/entity-action'
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
-import type { UmbElement } from '@umbraco-cms/backoffice/element-api';
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
+
 
 
 export class UmbCreateDocumentEntityAction extends UmbEntityActionBase<never> {
-	localize: any;
+    #localization = new UmbLocalizationController(this);
 	constructor(host: UmbControllerHost, args: UmbEntityActionArgs<never>) {
 		super(host, args);
 	}
@@ -34,8 +35,7 @@ export class UmbCreateDocumentEntityAction extends UmbEntityActionBase<never> {
 	}
 
 	getAriaLabel(entityName?: string) {
-		debugger;
-		return this.localize.term('actions_createFor', [entityName ?? '']);
+        return this.#localization.term('actions_createFor', [entityName ?? '']);
 	}
 }
 export default UmbCreateDocumentEntityAction;

@@ -15,15 +15,14 @@ import type {
 	ManifestEntityCreateOptionAction,
 	UmbEntityCreateOptionAction,
 } from '@umbraco-cms/backoffice/entity-create-option-action';
-import type { UmbElement } from '@umbraco-cms/backoffice/element-api';
-
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 
 export class UmbCreateEntityAction extends UmbEntityActionBase<MetaEntityActionCreateKind> {
 	#hasSingleOption = true;
 	#optionsInit?: Promise<void>;
 	#singleOptionApi?: UmbEntityCreateOptionAction;
-	localize: any;
-
+    #localization = new UmbLocalizationController(this);
+	
 	constructor(host: UmbControllerHost, args: UmbEntityActionArgs<MetaEntityActionCreateKind>) {
 		super(host, args);
 
@@ -73,7 +72,7 @@ export class UmbCreateEntityAction extends UmbEntityActionBase<MetaEntityActionC
 	}
 
 	getAriaLabel(entityName?: string) {
-		return this.localize.term('actions_createFor', [entityName ?? '']);
+        return this.#localization.term('actions.createFor', [entityName ?? '']);
 	}
 
 	async #createSingleOptionApi(
