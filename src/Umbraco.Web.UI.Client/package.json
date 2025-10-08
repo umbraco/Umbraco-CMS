@@ -1,7 +1,7 @@
 {
 	"name": "@umbraco-cms/backoffice",
 	"license": "MIT",
-	"version": "16.4.0-rc",
+	"version": "17.0.0-rc",
 	"type": "module",
 	"exports": {
 		".": null,
@@ -128,12 +128,12 @@
 		"./external/dompurify": "./dist-cms/external/dompurify/index.js",
 		"./external/heximal-expressions": "./dist-cms/external/heximal-expressions/index.js",
 		"./external/lit": "./dist-cms/external/lit/index.js",
+		"./external/luxon": "./dist-cms/external/luxon/index.js",
 		"./external/marked": "./dist-cms/external/marked/index.js",
 		"./external/monaco-editor": "./dist-cms/external/monaco-editor/index.js",
 		"./external/openid": "./dist-cms/external/openid/index.js",
 		"./external/rxjs": "./dist-cms/external/rxjs/index.js",
 		"./external/signalr": "./dist-cms/external/signalr/index.js",
-		"./external/tiptap": "./dist-cms/external/tiptap/index.js",
 		"./external/uui": "./dist-cms/external/uui/index.js"
 	},
 	"files": [

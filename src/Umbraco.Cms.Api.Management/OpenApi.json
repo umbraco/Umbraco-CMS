@@ -880,70 +880,6 @@
         ]
       }
     },
-    "/umbraco/management/api/v1/data-type/{id}/references": {
-      "get": {
-        "tags": [
-          "Data Type"
-        ],
-        "operationId": "GetDataTypeByIdReferences",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "oneOf": [
-                      {
-                        "$ref": "#/components/schemas/DataTypeReferenceResponseModel"
-                      }
-                    ]
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ProblemDetails"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "The resource is protected and requires an authentication token"
-          },
-          "403": {
-            "description": "The authenticated user does not have access to this resource"
-          }
-        },
-        "deprecated": true,
-        "security": [
-          {
-            "Backoffice-User": [ ]
-          }
-        ]
-      }
-    },
     "/umbraco/management/api/v1/data-type/configuration": {
       "get": {
         "tags": [
@@ -8714,6 +8650,101 @@
                 }
               }
             }
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/document/{id}/preview-url": {
+      "get": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "GetDocumentByIdPreviewUrl",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "providerAlias",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "culture",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "segment",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/DocumentUrlInfoModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProblemDetails"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProblemDetails"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
           }
         },
         "security": [
@@ -23933,6 +23964,7 @@
             "description": "The resource is protected and requires an authentication token"
           }
         },
+        "deprecated": true,
         "security": [
           {
             "Backoffice-User": [ ]
@@ -37635,34 +37667,6 @@
         ],
         "type": "string"
       },
-      "DataTypeContentTypeReferenceModel": {
-        "required": [
-          "icon",
-          "id",
-          "name",
-          "type"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "type": {
-            "type": "string",
-            "nullable": true
-          },
-          "name": {
-            "type": "string",
-            "nullable": true
-          },
-          "icon": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
       "DataTypeItemResponseModel": {
         "required": [
           "editorAlias",
@@ -37714,49 +37718,6 @@
           },
           "value": {
             "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "DataTypePropertyReferenceModel": {
-        "required": [
-          "alias",
-          "name"
-        ],
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "alias": {
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
-      "DataTypeReferenceResponseModel": {
-        "required": [
-          "contentType",
-          "properties"
-        ],
-        "type": "object",
-        "properties": {
-          "contentType": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/DataTypeContentTypeReferenceModel"
-              }
-            ]
-          },
-          "properties": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/DataTypePropertyReferenceModel"
-                }
-              ]
-            }
           }
         },
         "additionalProperties": false
@@ -38713,7 +38674,6 @@
           "flags",
           "id",
           "isTrashed",
-          "urls",
           "values",
           "variants"
         ],
@@ -38759,17 +38719,6 @@
                 "$ref": "#/components/schemas/DocumentTypeReferenceResponseModel"
               }
             ]
-          },
-          "urls": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/DocumentUrlInfoModel"
-                }
-              ]
-            },
-            "deprecated": true
           },
           "template": {
             "oneOf": [
@@ -39462,6 +39411,8 @@
       "DocumentUrlInfoModel": {
         "required": [
           "culture",
+          "message",
+          "provider",
           "url"
         ],
         "type": "object",
@@ -39471,6 +39422,14 @@
             "nullable": true
           },
           "url": {
+            "type": "string",
+            "nullable": true
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "provider": {
             "type": "string"
           }
         },
@@ -41036,7 +40995,6 @@
           "id",
           "isTrashed",
           "mediaType",
-          "urls",
           "values",
           "variants"
         ],
@@ -41075,17 +41033,6 @@
                 }
               ]
             }
-          },
-          "urls": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/MediaUrlInfoModel"
-                }
-              ]
-            },
-            "deprecated": true
           },
           "isTrashed": {
             "type": "boolean"
@@ -41678,7 +41625,8 @@
             "nullable": true
           },
           "url": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -42620,7 +42568,7 @@
         "type": "object",
         "properties": {
           "mode": {
-            "$ref": "#/components/schemas/ModelsModeModel"
+            "type": "string"
           },
           "canGenerate": {
             "type": "boolean"
@@ -42645,15 +42593,6 @@
           }
         },
         "additionalProperties": false
-      },
-      "ModelsModeModel": {
-        "enum": [
-          "Nothing",
-          "InMemoryAuto",
-          "SourceCodeManual",
-          "SourceCodeAuto"
-        ],
-        "type": "string"
       },
       "MoveDataTypeRequestModel": {
         "type": "object",
@@ -44851,7 +44790,6 @@
           "flags",
           "id",
           "isTrashed",
-          "urls",
           "values",
           "variants"
         ],
@@ -44897,17 +44835,6 @@
                 "$ref": "#/components/schemas/DocumentTypeReferenceResponseModel"
               }
             ]
-          },
-          "urls": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/DocumentUrlInfoModel"
-                }
-              ]
-            },
-            "deprecated": true
           },
           "template": {
             "oneOf": [

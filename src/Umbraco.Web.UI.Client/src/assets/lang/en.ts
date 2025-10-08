@@ -74,6 +74,7 @@ export default {
 		wasMovedTo: 'was moved to',
 		viewActionsFor: (name) => (name ? `View actions for '${name}'` : 'View actions'),
 		loadMore: 'Load more',
+		showMore: 'Show more',
 	},
 	actionCategories: {
 		content: 'Content',
@@ -860,6 +861,7 @@ export default {
 		email: 'Email',
 		error: 'Error',
 		field: 'Field',
+		fields: 'Fields',
 		fieldFor: 'Field for %0%',
 		toggleFor: 'Toggle for %0%',
 		findDocument: 'Find',
@@ -1298,10 +1300,10 @@ export default {
 	},
 	colorPickerConfigurations: {
 		colorsTitle: 'Colours',
-		colorsDescription: 'Add, remove or sort colours',
+		colorsDescription: 'Add, remove or sort colours (and labels).',
 		showLabelTitle: 'Include labels?',
 		showLabelDescription:
-			'Stores colours as a JSON object containing both the colour hex string and label, rather than just the hex string.',
+			'Displays coloured field and a label for each colour in the colour picker, rather than just a coloured field.',
 	},
 	contentPicker: {
 		allowedItemTypes: 'You can only select items of type(s): %0%',
@@ -2860,6 +2862,24 @@ export default {
 		dataTypeMissingEditorMessage: 'This property editor could not be found.',
 		dataTypeMissingEditorUi: 'Property Editor UI not found',
 		dataTypeMissingEditorUiMessage: 'This property editor UI could not be found.',
+	},
+	dateTimePicker: {
+		local: 'Local',
+		differentTimeZoneLabel: (offset: string, localDate: string) =>
+			`The selected time (${offset}) is equivalent to ${localDate} in your local time.`,
+		config_format: 'Format',
+		config_format_datetime: 'Date and time',
+		config_format_dateOnly: 'Date only',
+		config_format_timeOnly: 'Time only',
+		config_timeFormat: 'Time format',
+		config_timeZones: 'Time zones',
+		config_timeZones_description: 'Select the time zones that the editor should be able to pick from.',
+		config_timeZones_all: 'All - Display all available time zones',
+		config_timeZones_local: 'Local - Display only the local time zone',
+		config_timeZones_custom: 'Custom - Display a pre-defined list of time zones',
+		emptyDate: 'Please select a date',
+		emptyTimeZone: 'Please select a time zone',
+		invalidTimeZone: 'The selected time zone is not valid',
 	},
 	uiCulture: {
 		ar: 'العربية',

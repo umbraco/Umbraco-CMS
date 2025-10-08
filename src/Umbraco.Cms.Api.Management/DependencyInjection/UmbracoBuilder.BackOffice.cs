@@ -30,7 +30,7 @@ public static partial class UmbracoBuilderExtensions
         .AddMembersIdentity()
         .AddUmbracoProfiler()
         .AddMvcAndRazor(configureMvc)
-        .AddRecurringBackgroundJobs()
+        .AddBackgroundJobs()
         .AddUmbracoHybridCache()
         .AddDistributedCache()
         .AddCoreNotifications();

@@ -25,10 +25,4 @@ public class ActionNotify : IAction
 
     /// <inheritdoc />
     public bool CanBePermissionAssigned => true;
-
-    /// <inheritdoc />
-    public string Icon => "icon-megaphone";
-
-    /// <inheritdoc />
-    public string Category => Constants.Conventions.PermissionCategories.ContentCategory;
 }

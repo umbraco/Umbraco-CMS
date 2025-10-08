@@ -91,8 +91,11 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
             // need to do a simple query to get the id - put this cache
             var id = IsolatedCache.GetCacheItem(GetByAliasCacheKey(alias), () =>
             {
-                var groupId =
-                    Database.ExecuteScalar<int?>("SELECT id FROM umbracoUserGroup WHERE userGroupAlias=@alias", new { alias });
+                Sql<ISqlContext> sql = Sql()
+                    .Select<UserGroupDto>(x => x.Id)
+                    .From<UserGroupDto>()
+                    .Where<UserGroupDto>(x => x.Alias == alias);
+                var groupId = Database.ExecuteScalar<int?>(sql);
                 if (groupId.HasValue == false)
                 {
                     throw new InvalidOperationException("No group found with alias " + alias);
@@ -115,20 +118,10 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
     {
         // Here we're building up a query that looks like this, a sub query is required because the resulting structure
         // needs to still contain all of the section rows per user group.
-
-        // SELECT *
-        // FROM [umbracoUserGroup]
-        // LEFT JOIN [umbracoUserGroup2App]
-        // ON [umbracoUserGroup].[id] = [umbracoUserGroup2App].[user]
-        // WHERE umbracoUserGroup.id IN (SELECT umbracoUserGroup.id
-        //    FROM [umbracoUserGroup]
-        //    LEFT JOIN [umbracoUserGroup2App]
-        //    ON [umbracoUserGroup].[id] = [umbracoUserGroup2App].[user]
-        //    WHERE umbracoUserGroup2App.app = 'content')
         Sql<ISqlContext> sql = GetBaseQuery(QueryType.Many);
         Sql<ISqlContext> innerSql = GetBaseQuery(QueryType.Ids);
-        innerSql.Where("umbracoUserGroup2App.app = " + SqlSyntax.GetQuotedValue(sectionAlias));
-        sql.Where($"umbracoUserGroup.id IN ({innerSql.SQL})");
+        innerSql.Where<UserGroup2AppDto>(c => c.AppAlias == sectionAlias);
+        sql.WhereIn<UserGroupDto>(c => c.Id, innerSql);
         AppendGroupBy(sql);
 
         return Database.Fetch<UserGroupDto>(sql).Select(x => UserGroupFactory.BuildEntity(_shortStringHelper, x, _permissionMappers));
@@ -303,8 +296,13 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
         ///     Removes all users from a group
         /// </summary>
         /// <param name="groupId">Id of group</param>
-        private void RemoveAllUsersFromGroup(int groupId) =>
-            Database.Delete<User2UserGroupDto>("WHERE userGroupId = @groupId", new { groupId });
+        private void RemoveAllUsersFromGroup(int groupId)
+        {
+            Sql<ISqlContext> sql = Sql()
+                .Delete<User2UserGroupDto>()
+                .Where<User2UserGroupDto>(x => x.UserGroupId == groupId);
+            Database.Execute(sql);
+        }
 
         /// <summary>
         ///     Adds a set of users to a group
@@ -450,7 +448,7 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
                 break;
             case QueryType.Single:
             case QueryType.Many:
-                sql.Select<UserGroupDto>(r => r.Select(x => x.UserGroup2AppDtos), s => s.Append($", COUNT({sql.Columns<User2UserGroupDto>(x => x.UserId)}) AS {SqlSyntax.GetQuotedColumnName("UserCount")}"));
+                sql.Select<UserGroupDto>(r => r.Select(x => x.UserGroup2AppDtos), s => s.Append($", COUNT({sql.Columns<User2UserGroupDto>(x => x.UserId)}) AS {SqlSyntax.GetQuotedName("UserCount")}"));
                 addFrom = true;
                 break;
             default:
@@ -488,17 +486,22 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
                 x => x.DefaultPermissions)
             .AndBy<UserGroup2AppDto>(x => x.AppAlias, x => x.UserGroupId);
 
-    protected override string GetBaseWhereClause() => $"{Constants.DatabaseSchema.Tables.UserGroup}.id = @id";
-
+    protected override string GetBaseWhereClause() => $"{QuoteTableName(UserGroupDto.TableName)}.id = @id";
     protected override IEnumerable<string> GetDeleteClauses()
     {
+        var userGroupId = QuoteColumnName("userGroupId");
+        var userGroupKey = QuoteColumnName("userGroupKey");
+        var key = QuoteColumnName("Key");
+        var umbracoUserGroup = QuoteTableName(UserGroupDto.TableName);
         var list = new List<string>
         {
-            "DELETE FROM umbracoUser2UserGroup WHERE userGroupId = @id",
-            "DELETE FROM umbracoUserGroup2App WHERE userGroupId = @id",
-            "DELETE FROM umbracoUserGroup2Permission WHERE userGroupKey IN (SELECT [umbracoUserGroup].[Key] FROM umbracoUserGroup WHERE Id = @id)",
-            "DELETE FROM umbracoUserGroup2GranularPermission WHERE userGroupKey IN (SELECT [umbracoUserGroup].[Key] FROM umbracoUserGroup WHERE Id = @id)",
-            "DELETE FROM umbracoUserGroup WHERE id = @id",
+            $"DELETE FROM {QuoteTableName("umbracoUser2UserGroup")} WHERE {userGroupId} = @id",
+            $"DELETE FROM {QuoteTableName("umbracoUserGroup2App")} WHERE {userGroupId} = @id",
+            $@"DELETE FROM {QuoteTableName("umbracoUserGroup2Permission")} WHERE {userGroupKey} IN
+                (SELECT {umbracoUserGroup}.{key} FROM {umbracoUserGroup} WHERE id = @id)",
+            $@"DELETE FROM {QuoteTableName("umbracoUserGroup2GranularPermission")} WHERE {userGroupKey} IN
+                (SELECT {umbracoUserGroup}.{key} FROM {umbracoUserGroup} WHERE id = @id)",
+            $"DELETE FROM {umbracoUserGroup} WHERE id = @id",
         };
         return list;
     }
@@ -541,7 +544,10 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
         IUserGroup userGroup = entity;
 
         // First delete all
-        Database.Delete<UserGroup2AppDto>("WHERE UserGroupId = @UserGroupId", new { UserGroupId = userGroup.Id });
+        Sql<ISqlContext> sql = Sql()
+            .Delete<UserGroup2AppDto>()
+            .Where<UserGroup2AppDto>(c => c.UserGroupId == userGroup.Id);
+        Database.Execute(sql);
 
         // Then re-add any associated with the group
         foreach (var app in userGroup.AllowedSections)
@@ -556,7 +562,10 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
         IUserGroup userGroup = entity;
 
         // First delete all
-        Database.Delete<UserGroup2LanguageDto>("WHERE UserGroupId = @UserGroupId", new { UserGroupId = userGroup.Id });
+        Sql<ISqlContext> sql = Sql()
+            .Delete<UserGroup2LanguageDto>()
+            .Where<UserGroup2LanguageDto>(c => c.UserGroupId == userGroup.Id);
+        Database.Execute(sql);
 
         // Then re-add any associated with the group
         foreach (var language in userGroup.AllowedLanguages)
@@ -573,7 +582,10 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
 
     private void PersistPermissions(IUserGroup userGroup)
     {
-        Database.Delete<UserGroup2PermissionDto>("WHERE userGroupKey = @UserGroupKey", new { UserGroupKey = userGroup.Key });
+        Sql<ISqlContext> sql = Sql()
+            .Delete<UserGroup2PermissionDto>()
+            .Where<UserGroup2PermissionDto>(c => c.UserGroupKey == userGroup.Key);
+        Database.Execute(sql);
 
         IEnumerable<UserGroup2PermissionDto> permissionDtos = userGroup.Permissions
             .Select(permission => new UserGroup2PermissionDto { UserGroupKey = userGroup.Key, Permission = permission });
@@ -582,14 +594,19 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
     }
     private void PersistGranularPermissions(IUserGroup userGroup)
     {
-        Database.Delete<UserGroup2GranularPermissionDto>("WHERE userGroupKey = @UserGroupKey", new { UserGroupKey = userGroup.Key });
+        Sql<ISqlContext> sql = Sql()
+            .Delete<UserGroup2GranularPermissionDto>()
+            .Where<UserGroup2GranularPermissionDto>(c => c.UserGroupKey == userGroup.Key);
+        Database.Execute(sql);
 
         IEnumerable<UserGroup2GranularPermissionDto> permissionDtos = userGroup.GranularPermissions
             .Select(permission =>
             {
                 var dto = new UserGroup2GranularPermissionDto
                 {
-                    UserGroupKey = userGroup.Key, Permission = permission.Permission, Context = permission.Context
+                    UserGroupKey = userGroup.Key,
+                    Permission = permission.Permission,
+                    Context = permission.Context
                 };
                 if (permission is INodeGranularPermission nodeGranularPermission)
                 {
@@ -659,7 +676,5 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
         List<UserGroup2GranularPermissionDto> userGroupGranularPermissions = Database.Fetch<UserGroup2GranularPermissionDto>(query);
         return userGroupGranularPermissions.GroupBy(x => x.UserGroupKey).ToDictionary(x => x.Key, x => x.ToList());
     }
-
-
     #endregion
 }

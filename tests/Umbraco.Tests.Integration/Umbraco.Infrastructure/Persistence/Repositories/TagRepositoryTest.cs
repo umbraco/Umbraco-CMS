@@ -652,12 +652,12 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             ContentTypeRepository.Save(contentType);
 
             var content1 = ContentBuilder.CreateSimpleContent(contentType);
-            content1.PublishCulture(CultureImpact.Invariant, DateTime.Now, GetRequiredService<PropertyEditorCollection>());
+            content1.PublishCulture(CultureImpact.Invariant, DateTime.UtcNow, GetRequiredService<PropertyEditorCollection>());
             content1.PublishedState = PublishedState.Publishing;
             DocumentRepository.Save(content1);
 
             var content2 = ContentBuilder.CreateSimpleContent(contentType);
-            content2.PublishCulture(CultureImpact.Invariant, DateTime.Now, GetRequiredService<PropertyEditorCollection>());
+            content2.PublishCulture(CultureImpact.Invariant, DateTime.UtcNow, GetRequiredService<PropertyEditorCollection>());
             content2.PublishedState = PublishedState.Publishing;
             content2.Trashed = true;
             DocumentRepository.Save(content2);

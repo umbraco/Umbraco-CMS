@@ -65,7 +65,7 @@ internal sealed class KeyValueRepository : EntityRepositoryBase<string, IKeyValu
         return sql;
     }
 
-    protected override string GetBaseWhereClause() => Constants.DatabaseSchema.Tables.KeyValue + ".key = @id";
+    protected override string GetBaseWhereClause() => QuoteTableName(Constants.DatabaseSchema.Tables.KeyValue) + ".key = @id";
 
     protected override IEnumerable<string> GetDeleteClauses() => Enumerable.Empty<string>();
 

@@ -229,10 +229,9 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
     protected override IMedia? PerformGet(int id)
     {
         Sql<ISqlContext> sql = GetBaseQuery(QueryType.Single)
-            .Where<NodeDto>(x => x.NodeId == id)
-            .SelectTop(1);
+            .Where<NodeDto>(x => x.NodeId == id);
 
-        ContentDto? dto = Database.Fetch<ContentDto>(sql).FirstOrDefault();
+        ContentDto? dto = Database.FirstOrDefault<ContentDto>(sql);
         return dto == null
             ? null
             : MapDtoToContent(dto);
@@ -316,28 +315,32 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
         GetBaseQuery(isCount ? QueryType.Count : QueryType.Single);
 
     // ah maybe not, that what's used for eg Exists in base repo
-    protected override string GetBaseWhereClause() => $"{Constants.DatabaseSchema.Tables.Node}.id = @id";
+    protected override string GetBaseWhereClause() => $"{QuoteTableName(NodeDto.TableName)}.id = @id";
 
     protected override IEnumerable<string> GetDeleteClauses()
     {
+        var nodeId = QuoteColumnName("nodeId");
+        var uniqueId = QuoteColumnName("uniqueId");
+        var umbracoNode = QuoteTableName(NodeDto.TableName);
         var list = new List<string>
         {
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.User2NodeNotify + " WHERE nodeId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.UserGroup2GranularPermission + " WHERE uniqueId IN (SELECT uniqueId FROM umbracoNode WHERE id = @id)",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.UserStartNode + " WHERE startNode = @id",
-            "UPDATE " + Constants.DatabaseSchema.Tables.UserGroup +
-            " SET startContentId = NULL WHERE startContentId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.Relation + " WHERE parentId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.Relation + " WHERE childId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.TagRelationship + " WHERE nodeId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.Document + " WHERE nodeId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.MediaVersion + " WHERE id IN (SELECT id FROM " +
-            Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id)",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyData + " WHERE versionId IN (SELECT id FROM " +
-            Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id)",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.Content + " WHERE nodeId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.Node + " WHERE id = @id",
+            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.User2NodeNotify)} WHERE {nodeId} = @id",
+            $@"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.UserGroup2GranularPermission)} WHERE {uniqueId} IN
+                (SELECT {uniqueId} FROM {umbracoNode} WHERE id = @id)",
+            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.UserStartNode)} WHERE {QuoteColumnName("startNode")} = @id",
+            $@"UPDATE {QuoteTableName(Constants.DatabaseSchema.Tables.UserGroup)}
+                SET {QuoteColumnName("startContentId")} = NULL WHERE {QuoteColumnName("startContentId")} = @id",
+            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.Relation)} WHERE {QuoteColumnName("parentId")} = @id",
+            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.Relation)} WHERE {QuoteColumnName("childId")} = @id",
+            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.TagRelationship)} WHERE {nodeId} = @id",
+            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.Document)} WHERE {nodeId} = @id",
+            $@"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.MediaVersion)} WHERE id IN
+                (SELECT id FROM {QuoteTableName(Constants.DatabaseSchema.Tables.ContentVersion)} WHERE {nodeId} = @id)",
+            $@"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.PropertyData)} WHERE versionId IN
+                (SELECT id FROM {QuoteTableName(Constants.DatabaseSchema.Tables.ContentVersion)} WHERE {nodeId} = @id)",
+            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.ContentVersion)} WHERE {nodeId} = @id",
+            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.Content)} WHERE {nodeId} = @id",
+            $"DELETE FROM {umbracoNode} WHERE id = @id",
         };
         return list;
     }
@@ -380,19 +383,21 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
         }
 
         Sql<ISqlContext> sql = GetBaseQuery(QueryType.Single, joinMediaVersion: true)
-            .Where<MediaVersionDto>(x => x.Path == umbracoFileValue)
-            .SelectTop(1);
+            .Where<MediaVersionDto>(x => x.Path == umbracoFileValue);
 
-        ContentDto? dto = Database.Fetch<ContentDto>(sql).FirstOrDefault();
+        ContentDto? dto = Database.FirstOrDefault<ContentDto>(sql);
         return dto == null
             ? null
             : MapDtoToContent(dto);
     }
 
+    /// <summary>
+    /// Nothing to do here, media has only one version which must not be deleted.
+    /// Base method is abstract so this must be implemented.
+    /// </summary>
     protected override void PerformDeleteVersion(int id, int versionId)
     {
-        Database.Delete<PropertyDataDto>("WHERE versionId = @versionId", new { versionId });
-        Database.Delete<ContentVersionDto>("WHERE versionId = @versionId", new { versionId });
+        // Nothing to do here, media has only one version which must not be deleted.
     }
 
     #endregion
@@ -598,7 +603,7 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
             Sql<ISqlContext> sql = _outerRepo.GetBaseQuery(QueryType.Single)
                 .Where<NodeDto>(x => x.UniqueId == id);
 
-            ContentDto? dto = Database.Fetch<ContentDto>(sql.SelectTop(1)).FirstOrDefault();
+            ContentDto? dto = Database.FirstOrDefault<ContentDto>(sql);
 
             if (dto == null)
             {

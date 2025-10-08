@@ -246,8 +246,7 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
 
     protected virtual bool PerformExists(TId id)
     {
-        Sql<ISqlContext> sql = GetBaseQuery(true);
-        sql.Where(GetBaseWhereClause(), new { id });
+        Sql<ISqlContext> sql = GetBaseQuery(true).Where(GetBaseWhereClause(), new { id });
         var count = Database.ExecuteScalar<int>(sql);
         return count == 1;
     }
@@ -274,6 +273,6 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
             Database.Execute(delete, new { id = GetEntityId(entity) });
         }
 
-        entity.DeleteDate = DateTime.Now;
+        entity.DeleteDate = DateTime.UtcNow;
     }
 }

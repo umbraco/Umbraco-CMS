@@ -208,7 +208,7 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 							<uui-table-head-cell style="width:0">Score</uui-table-head-cell>
 							<uui-table-head-cell style="width:0">${this.localize.term('general_id')}</uui-table-head-cell>
 							<uui-table-head-cell>${this.localize.term('general_name')}</uui-table-head-cell>
-							<uui-table-head-cell>${this.localize.term('examineManagement_fields')}</uui-table-head-cell>
+							<uui-table-head-cell>${this.localize.term('general_fields')}</uui-table-head-cell>
 							${this.renderHeadCells()}
 						</uui-table-head>
 						${this._searchResults?.map((rowData) => {

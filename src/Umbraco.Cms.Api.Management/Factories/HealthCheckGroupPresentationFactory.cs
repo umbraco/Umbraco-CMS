@@ -41,14 +41,6 @@ public class HealthCheckGroupPresentationFactory : IHealthCheckGroupPresentation
         return groups;
     }
 
-    [Obsolete("Use CreateHealthCheckGroupWithResultViewModelAsync instead. Will be removed in v17.")]
-    public HealthCheckGroupWithResultResponseModel CreateHealthCheckGroupWithResultViewModel(IGrouping<string?, HealthCheck> healthCheckGroup)
-        => CreateHealthCheckGroupWithResultViewModelAsync(healthCheckGroup).GetAwaiter().GetResult();
-
-    [Obsolete("Use CreateHealthCheckGroupWithResultViewModelAsync instead. Will be removed in v17.")]
-    public HealthCheckWithResultPresentationModel CreateHealthCheckWithResultViewModel(HealthCheck healthCheck) =>
-        CreateHealthCheckWithResultViewModelAsync(healthCheck).GetAwaiter().GetResult();
-
     public async Task<HealthCheckGroupWithResultResponseModel> CreateHealthCheckGroupWithResultViewModelAsync(IGrouping<string?, HealthCheck> healthCheckGroup)
     {
         var healthChecks = new List<HealthCheckWithResultPresentationModel>();

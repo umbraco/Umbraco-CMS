@@ -109,6 +109,7 @@ public static partial class Constants
             public const string LongRunningOperation = TableNamePrefix + "LongRunningOperation";
 
             public const string LastSynced = TableNamePrefix + "LastSynced";
+            public const string DistributedJob = TableNamePrefix + "DistributedJob";
         }
     }
 }

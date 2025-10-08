@@ -1,8 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
@@ -39,47 +37,6 @@ namespace Umbraco.Cms.Infrastructure.Routing
             _logger = logger;
             _publishedUrlProvider = publishedUrlProvider;
             _publishedContentStatusFilteringService = publishedContentStatusFilteringService;
-        }
-
-        [Obsolete("Use the non-obsolete constructor. Scheduled for removal in V17.")]
-        public RedirectTracker(
-            IVariationContextAccessor variationContextAccessor,
-            ILocalizationService localizationService,
-            IRedirectUrlService redirectUrlService,
-            IPublishedContentCache contentCache,
-            IDocumentNavigationQueryService navigationQueryService,
-            ILogger<RedirectTracker> logger,
-            IPublishedUrlProvider publishedUrlProvider,
-            IPublishedContentStatusFilteringService publishedContentStatusFilteringService)
-            : this(
-                localizationService,
-                redirectUrlService,
-                contentCache,
-                navigationQueryService,
-                logger,
-                publishedUrlProvider,
-                publishedContentStatusFilteringService)
-        {
-        }
-
-        [Obsolete("Use the non-obsolete constructor. Scheduled for removal in V17.")]
-        public RedirectTracker(
-            IVariationContextAccessor variationContextAccessor,
-            ILocalizationService localizationService,
-            IRedirectUrlService redirectUrlService,
-            IPublishedContentCache contentCache,
-            IDocumentNavigationQueryService navigationQueryService,
-            ILogger<RedirectTracker> logger,
-            IPublishedUrlProvider publishedUrlProvider)
-            : this(
-                localizationService,
-                redirectUrlService,
-                contentCache,
-                navigationQueryService,
-                logger,
-                publishedUrlProvider,
-                StaticServiceProvider.Instance.GetRequiredService<IPublishedContentStatusFilteringService>())
-        {
         }
 
         /// <inheritdoc/>

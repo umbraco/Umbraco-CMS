@@ -2,8 +2,14 @@ import type { UmbDataSourceErrorResponse, UmbDataSourceResponse } from './data-s
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
 export interface UmbPagedModel<T> {
-	total: number;
 	items: Array<T>;
+	total: number;
+}
+
+export interface UmbTargetPagedModel<T> extends UmbPagedModel<T> {
+	// TODO: v18: make mandatory
+	totalAfter?: number;
+	totalBefore?: number;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type

@@ -41,6 +41,11 @@ public static partial class Constants
             public const string BlockList = "Umbraco.BlockList";
 
             /// <summary>
+            ///     Block List.
+            /// </summary>
+            public const string SingleBlock = "Umbraco.SingleBlock";
+
+            /// <summary>
             /// Block Grid.
             /// </summary>
             public const string BlockGrid = "Umbraco.BlockGrid";
@@ -69,6 +74,26 @@ public static partial class Constants
             ///     DateTime.
             /// </summary>
             public const string DateTime = "Umbraco.DateTime";
+
+            /// <summary>
+            ///     Date Time (unspecified).
+            /// </summary>
+            public const string DateTimeUnspecified = "Umbraco.DateTimeUnspecified";
+
+            /// <summary>
+            ///     Date Time (with time zone).
+            /// </summary>
+            public const string DateTimeWithTimeZone = "Umbraco.DateTimeWithTimeZone";
+
+            /// <summary>
+            ///     Date Only.
+            /// </summary>
+            public const string DateOnly = "Umbraco.DateOnly";
+
+            /// <summary>
+            ///     Time Only.
+            /// </summary>
+            public const string TimeOnly = "Umbraco.TimeOnly";
 
             /// <summary>
             ///     DropDown List.

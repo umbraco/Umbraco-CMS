@@ -73,7 +73,7 @@ internal sealed class TwoFactorLoginRepository : EntityRepositoryBase<int, ITwoF
     }
 
     protected override string GetBaseWhereClause() =>
-        Constants.DatabaseSchema.Tables.TwoFactorLogin + ".id = @id";
+        QuoteTableName(Constants.DatabaseSchema.Tables.TwoFactorLogin) + ".id = @id";
 
     protected override IEnumerable<string> GetDeleteClauses() => Enumerable.Empty<string>();
 
