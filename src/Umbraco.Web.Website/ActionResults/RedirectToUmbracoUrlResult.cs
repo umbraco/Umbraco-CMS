@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Web;
 namespace Umbraco.Cms.Web.Website.ActionResults;
 
 /// <summary>
-///     Redirects to the current URL rendering an Umbraco page including it's query strings
+///     Redirects to the current URL rendering an Umbraco page, optionally including its query strings
 /// </summary>
 /// <remarks>
 ///     This is useful if you need to redirect
@@ -40,11 +40,11 @@ public class RedirectToUmbracoUrlResult : IKeepTempDataResult
             throw new ArgumentNullException(nameof(context));
         }
 
-        var destinationUrl = _umbracoContext.OriginalRequestUrl.PathAndQuery;
+        var destinationUrl = _umbracoContext.OriginalRequestUrl.AbsolutePath;
 
         if (_queryString.HasValue)
         {
-            destinationUrl = _umbracoContext.OriginalRequestUrl.AbsolutePath + _queryString.ToUriComponent();
+            destinationUrl += _queryString.ToUriComponent();
         }
 
         context.HttpContext.Response.Redirect(destinationUrl);
