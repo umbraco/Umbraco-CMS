@@ -36,4 +36,6 @@ export interface UmbTreeItemContext<TreeItemType extends UmbTreeItemModel = UmbT
 	loadNextItems(): void;
 	isLoadingPrevChildren: Observable<boolean>;
 	isLoadingNextChildren: Observable<boolean>;
+	setIsMenu(isMenu: boolean): void;
+	getIsMenu(): boolean;
 }

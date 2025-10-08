@@ -14,6 +14,7 @@ import { UmbDeprecation, UmbSelectionManager, debounce } from '@umbraco-cms/back
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry, type ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbTreeItemActiveManager } from '../active-manager/tree-active-manager.js';
 
 export class UmbDefaultTreeContext<
 		TreeItemType extends UmbTreeItemModel,
@@ -52,6 +53,8 @@ export class UmbDefaultTreeContext<
 		childrenManager: this.#treeItemChildrenManager,
 		targetPaginationManager: this.targetPagination,
 	});
+
+	readonly activeManager = new UmbTreeItemActiveManager(this);
 
 	#manifest?: ManifestTree;
 	#repository?: UmbTreeRepository<TreeItemType, TreeRootType>;
