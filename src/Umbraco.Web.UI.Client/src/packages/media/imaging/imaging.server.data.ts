@@ -45,7 +45,7 @@ export class UmbImagingServerDataSource {
 	}
 
 	#mapper(item: MediaUrlInfoResponseModel): UmbMediaUrlModel {
-		const url = item.urlInfos[0]?.url;
+		const url = item.urlInfos[0]?.url ?? undefined;
 		return {
 			unique: item.id,
 			url: url,

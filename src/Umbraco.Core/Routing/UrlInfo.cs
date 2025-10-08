@@ -1,4 +1,5 @@
 using System.Runtime.Serialization;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Routing;
 
@@ -11,17 +12,49 @@ public class UrlInfo : IEquatable<UrlInfo>
     /// <summary>
     ///     Initializes a new instance of the <see cref="UrlInfo" /> class.
     /// </summary>
-    public UrlInfo(string text, bool isUrl, string? culture)
+    public UrlInfo(Uri url, string provider, string? culture, string? message = null, bool isExternal = false)
     {
-        if (string.IsNullOrWhiteSpace(text))
+        if (provider.IsNullOrWhiteSpace())
         {
-            throw new ArgumentException("Value cannot be null or whitespace.", nameof(text));
+            throw new ArgumentException("Value cannot be null or whitespace.", nameof(provider));
         }
 
-        IsUrl = isUrl;
-        Text = text;
+        Url = url;
+        Provider = provider;
+        Culture = culture;
+        Message = message;
+        IsExternal = isExternal;
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="UrlInfo" /> class as a "message only" - that is, not an actual URL.
+    /// </summary>
+    public UrlInfo(string message, string provider, string? culture = null)
+    {
+        if (message.IsNullOrWhiteSpace())
+        {
+            throw new ArgumentException("Value cannot be null or whitespace.", nameof(message));
+        }
+
+        if (provider.IsNullOrWhiteSpace())
+        {
+            throw new ArgumentException("Value cannot be null or whitespace.", nameof(provider));
+        }
+
+        Url = null;
+        Provider = provider;
+        Message = message;
         Culture = culture;
     }
+
+    public static UrlInfo AsUrl(string url, string provider, string? culture = null, bool isExternal = false)
+        => new(new Uri(url, UriKind.RelativeOrAbsolute), provider, culture: culture, isExternal: isExternal);
+
+    public static UrlInfo AsMessage(string message, string provider, string? culture = null)
+        => new(message, provider, culture: culture);
+
+    public static UrlInfo FromUri(Uri uri, string provider, string? culture = null, bool isExternal = false)
+        => new(uri, provider, culture: culture, isExternal: isExternal);
 
     /// <summary>
     ///     Gets the culture.
@@ -30,34 +63,32 @@ public class UrlInfo : IEquatable<UrlInfo>
     public string? Culture { get; }
 
     /// <summary>
-    ///     Gets a value indicating whether the URL is a true URL.
+    ///     Gets the URL.
     /// </summary>
-    /// <remarks>Otherwise, it is a message.</remarks>
-    [DataMember(Name = "isUrl")]
-    public bool IsUrl { get; }
+    [DataMember(Name = "url")]
+    public Uri? Url { get; }
+
+    public string Provider { get; }
 
     /// <summary>
-    ///     Gets the text, which is either the URL, or a message.
+    ///     Gets the message.
     /// </summary>
-    [DataMember(Name = "text")]
-    public string Text { get; }
+    [DataMember(Name = "message")]
+    public string? Message { get; }
+
+    /// <summary>
+    ///     Gets whether this is considered an external or a local URL (remote or local host).
+    /// </summary>
+    [DataMember(Name = "isExternal")]
+    public bool IsExternal { get; }
 
     public static bool operator ==(UrlInfo left, UrlInfo right) => Equals(left, right);
-
-    /// <summary>
-    ///     Creates a <see cref="UrlInfo" /> instance representing a true URL.
-    /// </summary>
-    public static UrlInfo Url(string text, string? culture = null) => new(text, true, culture);
 
     /// <summary>
     ///     Checks equality
     /// </summary>
     /// <param name="other"></param>
     /// <returns></returns>
-    /// <remarks>
-    ///     Compare both culture and Text as invariant strings since URLs are not case sensitive, nor are culture names within
-    ///     Umbraco
-    /// </remarks>
     public bool Equals(UrlInfo? other)
     {
         if (ReferenceEquals(null, other))
@@ -70,14 +101,11 @@ public class UrlInfo : IEquatable<UrlInfo>
             return true;
         }
 
-        return string.Equals(Culture, other.Culture, StringComparison.InvariantCultureIgnoreCase) &&
-               IsUrl == other.IsUrl && string.Equals(Text, other.Text, StringComparison.InvariantCultureIgnoreCase);
+        return string.Equals(Culture, other.Culture, StringComparison.InvariantCultureIgnoreCase)
+               && Url == other.Url
+               && string.Equals(Message, other.Message, StringComparison.InvariantCultureIgnoreCase)
+               && IsExternal == other.IsExternal;
     }
-
-    /// <summary>
-    ///     Creates a <see cref="UrlInfo" /> instance representing a message.
-    /// </summary>
-    public static UrlInfo Message(string text, string? culture = null) => new(text, false, culture);
 
     public override bool Equals(object? obj)
     {
@@ -104,14 +132,16 @@ public class UrlInfo : IEquatable<UrlInfo>
         unchecked
         {
             var hashCode = Culture != null ? StringComparer.InvariantCultureIgnoreCase.GetHashCode(Culture) : 0;
-            hashCode = (hashCode * 397) ^ IsUrl.GetHashCode();
             hashCode = (hashCode * 397) ^
-                       (Text != null ? StringComparer.InvariantCultureIgnoreCase.GetHashCode(Text) : 0);
+                       (Url != null ? Url.GetHashCode() : 0);
+            hashCode = (hashCode * 397) ^
+                       (Message != null ? StringComparer.InvariantCultureIgnoreCase.GetHashCode(Message) : 0);
+            hashCode = (hashCode * 397) ^ IsExternal.GetHashCode();
             return hashCode;
         }
     }
 
     public static bool operator !=(UrlInfo left, UrlInfo right) => !Equals(left, right);
 
-    public override string ToString() => Text;
+    public override string ToString() => Url?.ToString() ?? Message ?? "[empty]";
 }
