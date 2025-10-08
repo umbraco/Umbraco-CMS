@@ -1,4 +1,4 @@
-import type { UmbEntityFlag } from '@umbraco-cms/backoffice/entity';
+import type { UmbEntityFlag } from '@umbraco-cms/backoffice/entity-flag';
 import type { UmbPropertyValueData } from '@umbraco-cms/backoffice/property';
 import type { UmbEntityVariantModel } from '@umbraco-cms/backoffice/variant';
 

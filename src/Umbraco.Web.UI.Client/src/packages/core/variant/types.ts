@@ -3,7 +3,7 @@ import type { UmbVariantId } from './variant-id.class.js';
 import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import type { ScheduleRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbPropertyValueData } from '@umbraco-cms/backoffice/property';
-import type { UmbEntityFlag } from '@umbraco-cms/backoffice/entity';
+import type { UmbEntityFlag } from '@umbraco-cms/backoffice/entity-flag';
 
 export type UmbObjectWithVariantProperties = {
 	culture: string | null;

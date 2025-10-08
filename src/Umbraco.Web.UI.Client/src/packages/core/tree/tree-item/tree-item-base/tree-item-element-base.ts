@@ -4,7 +4,7 @@ import { html, ifDefined, nothing, state, repeat, property, css } from '@umbraco
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbEntityFlag } from '@umbraco-cms/backoffice/entity';
+import type { UmbEntityFlag } from '@umbraco-cms/backoffice/entity-flag';
 
 export abstract class UmbTreeItemElementBase<
 	TreeItemModelType extends UmbTreeItemModel,

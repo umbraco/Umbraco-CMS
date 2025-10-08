@@ -26,6 +26,7 @@ export default defineConfig({
 			'entity-action/index': './entity-action/index.ts',
 			'entity-bulk-action/index': './entity-bulk-action/index.ts',
 			'entity-create-option-action/index': './entity-create-option-action/index.ts',
+			'entity-flag/index': './entity-flag/index.ts',
 			'entity-item/index': './entity-item/index.ts',
 			'entity-sign/index': './entity-sign/index.ts',
 			'entity/index': './entity/index.ts',

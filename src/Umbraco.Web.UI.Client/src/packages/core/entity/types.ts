@@ -9,17 +9,5 @@ export interface UmbNamedEntityModel extends UmbEntityModel {
 	name: string;
 }
 
-// TODO: Should this be in its own package?
-export interface UmbEntityWithFlags extends Omit<UmbEntityModel, 'unique'> {
-	flags: Array<UmbEntityFlag>;
-}
-export interface UmbEntityWithOptionalFlags extends Omit<UmbEntityModel, 'unique'> {
-	flags?: UmbEntityWithFlags['flags'];
-}
-
-export interface UmbEntityFlag {
-	alias: string;
-}
-
 export type * from './entity-type/types.js';
 export type * from './entity-unique/types.js';

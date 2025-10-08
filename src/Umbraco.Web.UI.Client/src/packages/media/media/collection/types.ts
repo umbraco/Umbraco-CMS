@@ -1,6 +1,6 @@
 import type { UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone';
 import type { UmbCollectionFilterModel } from '@umbraco-cms/backoffice/collection';
-import type { UmbEntityWithFlags } from '@umbraco-cms/backoffice/entity';
+import type { UmbEntityWithFlags } from '@umbraco-cms/backoffice/entity-flag';
 
 export interface UmbMediaCollectionFilterModel extends UmbCollectionFilterModel {
 	unique?: string;

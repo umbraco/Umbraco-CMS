@@ -1,4 +1,5 @@
-import type { UmbEntityFlag, UmbEntityModel, UmbEntityWithOptionalFlags } from '@umbraco-cms/backoffice/entity';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import type { UmbEntityWithOptionalFlags } from '@umbraco-cms/backoffice/entity-flag';
 
 export type * from './entity-actions/types.js';
 export type * from './extensions/types.js';

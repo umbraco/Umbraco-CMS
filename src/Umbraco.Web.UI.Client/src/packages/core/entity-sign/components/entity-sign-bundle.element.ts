@@ -4,7 +4,7 @@ import { customElement, html, nothing, property, repeat, state, css } from '@umb
 import { UmbExtensionsElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbEntityFlag } from '../../entity/types.js';
+import type { UmbEntityFlag } from '@umbraco-cms/backoffice/entity-flag';
 
 @customElement('umb-entity-sign-bundle')
 export class UmbEntitySignBundleElement extends UmbLitElement {

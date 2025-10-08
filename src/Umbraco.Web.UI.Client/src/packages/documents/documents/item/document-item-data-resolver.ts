@@ -2,7 +2,7 @@ import { UmbDocumentVariantState } from '../types.js';
 import type { UmbDocumentItemModel } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbEntityFlag } from '@umbraco-cms/backoffice/entity';
+import type { UmbEntityFlag } from '@umbraco-cms/backoffice/entity-flag';
 import type { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import {
 	type Observable,
