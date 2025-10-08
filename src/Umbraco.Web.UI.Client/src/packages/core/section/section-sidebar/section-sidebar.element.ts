@@ -17,11 +17,9 @@ export class UmbSectionSidebarElement extends UmbLitElement {
 
 	override render() {
 		return html`
-			<umb-section-sidebar-context-menu>
-				<uui-scroll-container id="scroll-container">
-					<slot></slot>
-				</uui-scroll-container>
-			</umb-section-sidebar-context-menu>
+			<uui-scroll-container id="scroll-container">
+				<slot></slot>
+			</uui-scroll-container>
 		`;
 	}
 

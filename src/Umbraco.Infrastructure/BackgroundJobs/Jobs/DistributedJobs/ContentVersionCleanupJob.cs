@@ -1,24 +1,21 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Sync;
-using Umbraco.Cms.Infrastructure.BackgroundJobs;
 
-namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
+namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.DistributedJobs;
 
 /// <summary>
 ///     Recurring hosted service that executes the content history cleanup.
 /// </summary>
-public class ContentVersionCleanupJob : IRecurringBackgroundJob
+internal class ContentVersionCleanupJob : IDistributedBackgroundJob
 {
+    /// <inheritdoc />
+    public string Name => "ContentVersionCleanupJob";
 
+    /// <inheritdoc />
     public TimeSpan Period { get => TimeSpan.FromHours(1); }
 
-    // No-op event as the period never changes on this job
-    public event EventHandler PeriodChanged { add { } remove { } }
 
     private readonly ILogger<ContentVersionCleanupJob> _logger;
     private readonly IContentVersionService _service;
@@ -39,7 +36,7 @@ public class ContentVersionCleanupJob : IRecurringBackgroundJob
     }
 
     /// <inheritdoc />
-    public Task RunJobAsync()
+    public Task ExecuteAsync()
     {
         // Globally disabled by feature flag
         if (!_settingsMonitor.CurrentValue.ContentVersionCleanupPolicy.EnableCleanup)

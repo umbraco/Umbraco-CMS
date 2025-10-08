@@ -415,8 +415,6 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 	}
 
 	#renderToolbar() {
-		/**<umb-media-picker-create-item .node=${this._currentMediaEntity.unique}></umb-media-picker-create-item>
-		 * We cannot route to a workspace without the media picker modal is a routeable. Using regular upload button for now... */
 		return html`
 			<div id="toolbar">
 				<div id="search">

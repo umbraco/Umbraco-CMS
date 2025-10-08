@@ -91,6 +91,7 @@ public class DatabaseSchemaCreator
         typeof(WebhookRequestDto),
         typeof(UserDataDto),
         typeof(LongRunningOperationDto),
+        typeof(DistributedJobDto),
     };
 
     private readonly IUmbracoDatabase _database;
