@@ -294,6 +294,7 @@ export class UmbPropertyEditorUIBlockSingleElement
 		super.willUpdate(_changedProperties);
 
 		if (
+			this.mandatory === true &&
 			this.#hasAutoCreatedABlock === false &&
 			this.readonly !== true &&
 			this._layouts?.length === 0 &&
