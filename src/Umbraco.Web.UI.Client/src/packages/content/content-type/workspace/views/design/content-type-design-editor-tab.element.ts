@@ -38,6 +38,20 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 			onChange: ({ model }) => {
 				this._groups = model;
 			},
+			onContainerChange: ({ item }) => {
+				if (this.#containerId === undefined) {
+					throw new Error('ContainerId is not set');
+				}
+				if (item.ownerId === undefined) {
+					// This may be possible later, but for now this is not possible. [NL]
+					throw new Error(
+						'OwnerId is not set for the given container, we cannot move containers that are not owned by the current Document.',
+					);
+				}
+				this.#groupStructureHelper.partialUpdateContainer(item.ownerId, {
+					parent: this.#containerId ? { id: this.#containerId } : null,
+				});
+			},
 			onEnd: ({ item }) => {
 				/*if (this._inherited === undefined) {
 				throw new Error('OwnerTabId is not set, we have not made a local duplicated of this container.');
@@ -92,14 +106,15 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 				}
 			},
 			onRequestDrop: async ({ unique }) => {
-				const context = await this.getContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT);
+				const context = this.#contentTypeWorkspaceContext;
 				if (!context) {
 					throw new Error('Could not get Workspace Context');
 				}
 				return context.structure.getMergedContainerByKey(unique) as UmbPropertyTypeContainerMergedModel | undefined;
 			},
 			requestExternalRemove: async ({ item }) => {
-				const context = await this.getContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT);
+				console.log('external remove', item);
+				const context = this.#contentTypeWorkspaceContext;
 				if (!context) {
 					throw new Error('Could not get Workspace Context');
 				}
@@ -109,7 +124,8 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 				);
 			},
 			requestExternalInsert: async ({ item }) => {
-				const context = await this.getContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT);
+				console.log('requestExternalInsert', item);
+				const context = this.#contentTypeWorkspaceContext;
 				if (!context) {
 					throw new Error('Could not get Workspace Context');
 				}
@@ -164,11 +180,13 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 	private _editContentTypePath?: string;
 
 	#groupStructureHelper = new UmbContentTypeContainerStructureHelper<UmbContentTypeModel>(this);
+	#contentTypeWorkspaceContext?: typeof UMB_CONTENT_TYPE_WORKSPACE_CONTEXT.TYPE;
 
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, (context) => {
+			this.#contentTypeWorkspaceContext = context;
 			this.#groupStructureHelper.setStructureManager(context?.structure);
 
 			const entityType = context?.getEntityType();
@@ -291,6 +309,12 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 				display: grid;
 				gap: 10px;
 				align-content: start;
+			}
+
+			/* Ensure the container-list has some height when its empty so groups can be dropped into it.*/
+			.container-list {
+				margin-top: calc(var(--uui-size-layout-1) * -1);
+				padding-top: var(--uui-size-layout-1);
 			}
 
 			.container-list #convert-to-tab {
