@@ -34,6 +34,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbVariantPropertyGuardRule } from '@umbraco-cms/backoffice/property';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
 type ContentModel = UmbDocumentDetailModel;
 type ContentTypeModel = UmbDocumentTypeDetailModel;
@@ -83,6 +84,15 @@ export class UmbDocumentWorkspaceContext
 			const config = await context?.getDocumentConfiguration();
 			const allowSegmentCreation = config?.allowNonExistingSegmentsCreation ?? false;
 			const allowEditInvariantFromNonDefault = config?.allowEditInvariantFromNonDefault ?? true;
+
+			// Deprecation warning for allowNonExistingSegmentsCreation (default from server is true, so we warn on false)
+			if (!allowSegmentCreation) {
+				new UmbDeprecation({
+					deprecated: 'The "AllowNonExistingSegmentsCreation" setting is deprecated.',
+					removeInVersion: '19.0.0',
+					solution: 'This functionality will be moved to a client-side extension.',
+				}).warn();
+			}
 
 			this._variantOptionsFilter = (variantOption) => {
 				const isNotCreatedSegmentVariant = variantOption.segment && !variantOption.variant;
