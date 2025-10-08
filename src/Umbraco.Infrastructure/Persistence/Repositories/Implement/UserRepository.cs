@@ -417,17 +417,14 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
         Sql<ISqlContext> sql;
         try
         {
-            sql = SqlContext.Sql()
-                .Select<UserGroupDto>(x => x.Id, x => x.Key)
-                .From<UserGroupDto>()
-                .InnerJoin<User2UserGroupDto>().On<UserGroupDto, User2UserGroupDto>((left, right) => left.Id == right.UserGroupId)
-                .WhereIn<User2UserGroupDto>(x => x.UserId, userIds);
-
-            List<UserGroupDto>? userGroups = Database.Fetch<UserGroupDto>(sql);
-
-
-            groupKeys = userGroups.Select(x => x.Key).ToList();
-
+            groupKeys = Database.FetchByGroups<UserGroupDto, int>(userIds, Constants.Sql.MaxParameterCount, ints =>
+            {
+                return SqlContext.Sql()
+                    .Select<UserGroupDto>(x => x.Id, x => x.Key)
+                    .From<UserGroupDto>()
+                    .InnerJoin<User2UserGroupDto>().On<UserGroupDto, User2UserGroupDto>((left, right) => left.Id == right.UserGroupId)
+                    .WhereIn<User2UserGroupDto>(x => x.UserId, ints);
+            }).Select(x => x.Key).ToList();
         }
         catch (DbException)
         {
@@ -441,19 +438,19 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
 
 
         // get users2groups
-        sql = SqlContext.Sql()
-            .Select<User2UserGroupDto>()
-            .From<User2UserGroupDto>()
-            .WhereIn<User2UserGroupDto>(x => x.UserId, userIds);
-
-        List<User2UserGroupDto>? user2Groups = Database.Fetch<User2UserGroupDto>(sql);
+        List<User2UserGroupDto>? user2Groups = Database.FetchByGroups<User2UserGroupDto, int>(userIds, Constants.Sql.MaxParameterCount, ints =>
+        {
+            return SqlContext.Sql()
+                .Select<User2UserGroupDto>()
+                .From<User2UserGroupDto>()
+                .WhereIn<User2UserGroupDto>(x => x.UserId, ints);
+        }).ToList();
 
         if (groupIds.Any() is false)
         {
             //this can happen if we are upgrading, so we try do read from this table, as we counn't because of the key earlier
             groupIds = user2Groups.Select(x => x.UserGroupId).Distinct().ToList();
         }
-
 
         // get groups
         // We wrap this in a try-catch, as this might throw errors when you try to login before having migrated your database
@@ -493,13 +490,13 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
             .ToDictionary(x => x.Key, x => x);
 
         // get start nodes
-
-        sql = SqlContext.Sql()
-            .Select<UserStartNodeDto>()
-            .From<UserStartNodeDto>()
-            .WhereIn<UserStartNodeDto>(x => x.UserId, userIds);
-
-        List<UserStartNodeDto>? startNodes = Database.Fetch<UserStartNodeDto>(sql);
+        List<UserStartNodeDto>? startNodes = Database.FetchByGroups<UserStartNodeDto, int>(userIds, Constants.Sql.MaxParameterCount, ints =>
+        {
+            return SqlContext.Sql()
+                .Select<UserStartNodeDto>()
+                .From<UserStartNodeDto>()
+                .WhereIn<UserStartNodeDto>(x => x.UserId, ints);
+        }).ToList();
 
         // get groups2languages
 
