@@ -14,7 +14,7 @@
     "releaseTest": "npx playwright test DefaultConfig --grep \"@release\""
   },
   "devDependencies": {
-    "@playwright/test": "^1.50",
+    "@playwright/test": "1.50",
     "@types/node": "^20.9.0",
     "prompt": "^1.2.0",
     "tslib": "^2.4.0",
