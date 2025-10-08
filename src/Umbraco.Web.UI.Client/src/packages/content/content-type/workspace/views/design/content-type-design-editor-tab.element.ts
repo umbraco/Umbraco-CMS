@@ -200,21 +200,6 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 				});
 		});
 
-		this.consumeContext(UMB_CONTENT_TYPE_DESIGN_EDITOR_CONTEXT, (context) => {
-			this.observe(
-				context?.isSorting,
-				(isSorting) => {
-					this._sortModeActive = isSorting;
-					if (isSorting) {
-						this.#sorter.enable();
-					} else {
-						this.#sorter.disable();
-					}
-				},
-				'_observeIsSorting',
-			);
-		});
-
 		this.observe(
 			this.#groupStructureHelper.childContainers,
 			(groups) => {
