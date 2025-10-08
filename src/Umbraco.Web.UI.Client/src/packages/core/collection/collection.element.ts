@@ -5,8 +5,7 @@ import { customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbExtensionElementAndApiSlotElementBase } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
-const elementName = 'umb-collection';
-@customElement(elementName)
+@customElement('umb-collection')
 export class UmbCollectionElement<
 	ConfigType extends UmbCollectionConfiguration = UmbCollectionConfiguration,
 	FilterType extends UmbCollectionFilterModel = UmbCollectionFilterModel,
@@ -62,6 +61,6 @@ export class UmbCollectionElement<
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbCollectionElement;
+		'umb-collection': UmbCollectionElement;
 	}
 }

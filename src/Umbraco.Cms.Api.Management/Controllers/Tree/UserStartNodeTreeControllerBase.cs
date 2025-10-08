@@ -1,7 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Models.Entities;
 using Umbraco.Cms.Api.Management.Services.Entities;
-using Umbraco.Cms.Api.Management.Services.Signs;
+using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -29,7 +29,7 @@ public abstract class UserStartNodeTreeControllerBase<TItem> : EntityTreeControl
         IDataTypeService dataTypeService)
         : this(
               entityService,
-              StaticServiceProvider.Instance.GetRequiredService<SignProviderCollection>(),
+              StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>(),
               userStartNodeEntitiesService,
               dataTypeService)
     {
@@ -37,10 +37,10 @@ public abstract class UserStartNodeTreeControllerBase<TItem> : EntityTreeControl
 
     protected UserStartNodeTreeControllerBase(
         IEntityService entityService,
-        SignProviderCollection signProviders,
+        FlagProviderCollection flagProviders,
         IUserStartNodeEntitiesService userStartNodeEntitiesService,
         IDataTypeService dataTypeService)
-        : base(entityService, signProviders)
+        : base(entityService, flagProviders)
     {
         _userStartNodeEntitiesService = userStartNodeEntitiesService;
         _dataTypeService = dataTypeService;

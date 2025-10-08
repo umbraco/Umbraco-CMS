@@ -3,12 +3,12 @@ import type { UmbMemberDetailModel, UmbMemberVariantModel } from '../../types.js
 import { UmbMemberPropertyDatasetContext } from '../../property-dataset-context/member-property-dataset.context.js';
 import { UMB_MEMBER_ENTITY_TYPE, UMB_MEMBER_ROOT_ENTITY_TYPE } from '../../entity.js';
 import { UMB_MEMBER_DETAIL_REPOSITORY_ALIAS } from '../../repository/detail/manifests.js';
+import { UMB_CREATE_MEMBER_WORKSPACE_PATH_PATTERN, UMB_EDIT_MEMBER_WORKSPACE_PATH_PATTERN } from '../../paths.js';
 import {
 	UMB_MEMBER_WORKSPACE_ALIAS,
 	UMB_MEMBER_WORKSPACE_VIEW_MEMBER_ALIAS,
 	UMB_MEMBER_DETAIL_MODEL_VARIANT_SCAFFOLD,
 } from './constants.js';
-import { UmbMemberWorkspaceEditorElement } from './member-workspace-editor.element.js';
 import { UmbMemberTypeDetailRepository, type UmbMemberTypeDetailModel } from '@umbraco-cms/backoffice/member-type';
 import {
 	UmbWorkspaceIsNewRedirectController,
@@ -65,8 +65,8 @@ export class UmbMemberWorkspaceContext
 
 		this.routes.setRoutes([
 			{
-				path: 'create/:memberTypeUnique',
-				component: () => new UmbMemberWorkspaceEditorElement(),
+				path: UMB_CREATE_MEMBER_WORKSPACE_PATH_PATTERN.toString(),
+				component: () => import('./member-workspace-editor.element.js'),
 				setup: async (_component, info) => {
 					const memberTypeUnique = info.match.params.memberTypeUnique;
 					await this.create(memberTypeUnique);
@@ -79,12 +79,12 @@ export class UmbMemberWorkspaceContext
 				},
 			},
 			{
-				path: 'edit/:unique',
-				component: () => new UmbMemberWorkspaceEditorElement(),
-				setup: (_component, info) => {
+				path: UMB_EDIT_MEMBER_WORKSPACE_PATH_PATTERN.toString(),
+				component: () => import('./member-workspace-editor.element.js'),
+				setup: async (_component, info) => {
 					this.removeUmbControllerByAlias(UmbWorkspaceIsNewRedirectControllerAlias);
 					const unique = info.match.params.unique;
-					this.load(unique);
+					await this.load(unique);
 				},
 			},
 		]);
@@ -146,7 +146,7 @@ export class UmbMemberWorkspaceContext
 				messages.forEach((message) => {
 					if (this.#hintedMsgs.has(message.key)) return;
 
-					this.hints.addOne({
+					this.view.hints.addOne({
 						unique: message.key,
 						path: [UMB_MEMBER_WORKSPACE_VIEW_MEMBER_ALIAS],
 						text: '!',
@@ -158,7 +158,7 @@ export class UmbMemberWorkspaceContext
 				this.#hintedMsgs.forEach((key) => {
 					if (!messages.some((msg) => msg.key === key)) {
 						this.#hintedMsgs.delete(key);
-						this.hints.removeOne(key);
+						this.view.hints.removeOne(key);
 					}
 				});
 			},

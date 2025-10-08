@@ -6,7 +6,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'workspace',
 		kind: 'routable',
 		alias: UMB_WEBHOOK_WORKSPACE_ALIAS,
-		name: 'Webhook Root Workspace',
+		name: 'Webhook Workspace',
 		api: () => import('./webhook-workspace.context.js'),
 		meta: {
 			entityType: UMB_WEBHOOK_ENTITY_TYPE,

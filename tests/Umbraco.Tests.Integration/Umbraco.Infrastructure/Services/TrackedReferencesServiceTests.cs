@@ -3,7 +3,9 @@
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Persistence.Relations;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -24,6 +26,13 @@ internal class TrackedReferencesServiceTests : UmbracoIntegrationTest
     private Content Root2 { get; set; }
 
     private IContentType ContentType { get; set; }
+
+    protected override void CustomTestSetup(IUmbracoBuilder builder)
+    {
+        base.CustomTestSetup(builder);
+        builder
+            .AddNotificationHandler<ContentSavedNotification, ContentRelationsUpdate>();
+    }
 
     [SetUp]
     public void Setup() => CreateTestData();
