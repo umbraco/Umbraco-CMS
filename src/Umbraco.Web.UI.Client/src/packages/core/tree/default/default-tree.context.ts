@@ -1,3 +1,4 @@
+import { UmbTreeItemActiveManager } from '../active-manager/tree-active-manager.js';
 import { UmbTreeExpansionManager } from '../expansion-manager/index.js';
 import { UmbTreeItemChildrenManager } from '../tree-item/tree-item-children.manager.js';
 import { UmbTreeItemTargetExpansionManager } from '../tree-item/tree-item-expansion.manager.js';
@@ -14,7 +15,6 @@ import { UmbDeprecation, UmbSelectionManager, debounce } from '@umbraco-cms/back
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry, type ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbTreeItemActiveManager } from '../active-manager/tree-active-manager.js';
 
 export class UmbDefaultTreeContext<
 		TreeItemType extends UmbTreeItemModel,

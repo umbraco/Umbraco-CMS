@@ -21,7 +21,7 @@ export class UmbTreeItemActiveManager extends UmbControllerBase {
 	isActive(entity: UmbEntityModel): Observable<boolean> {
 		return this.#active.asObservablePart((entities) => {
 			const index = entities.findIndex((e) => e.entityType === entity.entityType && e.unique === entity.unique);
-			return index === entities.length;
+			return index === entities.length - 1;
 		});
 	}
 
