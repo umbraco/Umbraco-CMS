@@ -4,7 +4,16 @@ import type { UmbBlockSingleLayoutModel, UmbBlockSingleValueModel } from '../../
 import type { UmbBlockSingleEntryElement } from '../../components/block-single-entry/index.js';
 import { UMB_BLOCK_SINGLE_PROPERTY_EDITOR_SCHEMA_ALIAS } from './constants.js';
 import { UmbLitElement, umbDestroyOnDisconnect } from '@umbraco-cms/backoffice/lit-element';
-import { html, customElement, property, state, repeat, css, nothing } from '@umbraco-cms/backoffice/external/lit';
+import {
+	html,
+	customElement,
+	property,
+	state,
+	repeat,
+	css,
+	nothing,
+	type PropertyValueMap,
+} from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type {
 	UmbPropertyEditorConfigCollection,
@@ -278,6 +287,28 @@ export class UmbPropertyEditorUIBlockSingleElement
 			},
 			null,
 		);
+	}
+
+	#hasAutoCreatedABlock = false;
+	protected override willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+		super.willUpdate(_changedProperties);
+
+		if (
+			this.#hasAutoCreatedABlock === false &&
+			this.readonly !== true &&
+			this._layouts?.length === 0 &&
+			this._blocks?.length === 1
+		) {
+			// Only auto create once.
+			this.#hasAutoCreatedABlock = true;
+			// no blocks, and one Bock type, then auto create a block:
+			const elementKey = this._blocks[0].contentElementTypeKey;
+			this.#managerContext.createWithPresets(elementKey).then((block) => {
+				if (block) {
+					this.#managerContext.insert(block.layout, block.content, block.settings, { index: 0 });
+				}
+			});
+		}
 	}
 
 	#gotPropertyContext(context: typeof UMB_PROPERTY_CONTEXT.TYPE | undefined) {
