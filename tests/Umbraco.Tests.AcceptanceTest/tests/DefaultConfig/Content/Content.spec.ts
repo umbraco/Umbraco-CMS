@@ -179,3 +179,65 @@ test('can publish variant content node', async ({umbracoApi, umbracoUi}) => {
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe('Published');
 });
+
+test('can duplicate a content node to root', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const duplicatedContentName = contentName + ' (1)';
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+  contentId = await umbracoApi.document.createDocumentWithTextContent(contentName, documentTypeId, contentText, dataTypeName);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.clickActionsMenuForContent(contentName);
+  // Duplicate to root
+  await umbracoUi.content.clickDuplicateToActionMenuOption();
+  await umbracoUi.content.clickLabelWithName('Content');
+  await umbracoUi.content.clickDuplicateButton();
+
+  // Assert
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.duplicated);
+  expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
+  expect(await umbracoApi.document.doesNameExist(duplicatedContentName)).toBeTruthy();
+  await umbracoUi.content.isContentInTreeVisible(contentName);
+  await umbracoUi.content.isContentInTreeVisible(duplicatedContentName);
+  const contentData = await umbracoApi.document.getByName(contentName);
+  const duplicatedContentData = await umbracoApi.document.getByName(duplicatedContentName);
+  expect(contentData.values[0].value).toEqual(duplicatedContentData.values[0].value);
+
+  // Clean
+  await umbracoApi.document.ensureNameNotExists(duplicatedContentName);
+});
+
+test('can duplicate a content node to other parent', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const parentDocumentTypeName = 'ParentDocumentType';
+  const parentContentName = 'ParentContent';
+  const listViewDataTypeName = 'List View - Content';
+  const listViewDataTypeData  = await umbracoApi.dataType.getByName(listViewDataTypeName);
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+  contentId = await umbracoApi.document.createDocumentWithTextContent(contentName, documentTypeId, contentText, dataTypeName);
+  const parentDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNodeAndCollectionId(parentDocumentTypeName, documentTypeId, listViewDataTypeData.id);
+  await umbracoApi.document.createDefaultDocument(parentContentName, parentDocumentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.clickActionsMenuForContent(contentName);
+  await umbracoUi.content.clickDuplicateToActionMenuOption();
+  await umbracoUi.content.clickModalMenuItemWithName(parentContentName);
+  await umbracoUi.content.clickDuplicateButton();
+
+  // Assert
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.duplicated);
+  await umbracoUi.content.isContentInTreeVisible(contentName);
+  await umbracoUi.content.isContentInTreeVisible(parentContentName);
+  await umbracoUi.content.openContentCaretButtonForName(parentContentName);
+  await umbracoUi.content.isChildContentInTreeVisible(parentContentName, contentName);
+
+  // Clean
+  await umbracoApi.document.ensureNameNotExists(parentContentName);
+  await umbracoApi.document.ensureNameNotExists(parentDocumentTypeName);
+});

@@ -136,7 +136,9 @@ export abstract class UmbTreeItemElementBase<
 				.loading=${this._isLoading}
 				.hasChildren=${this._hasChildren}
 				.showChildren=${this._isOpen}
-				.caretLabel=${this._isOpen ? this.localize.term('visuallyHiddenTexts_collapseChildItems') +  ' ' + this._label: this.localize.term('visuallyHiddenTexts_expandChildItems') + ' ' + this._label}
+				.caretLabel=${this._isOpen
+					? this.localize.term('visuallyHiddenTexts_collapseChildItems') + ' ' + this._label
+					: this.localize.term('visuallyHiddenTexts_expandChildItems') + ' ' + this._label}
 				label=${this._label}
 				href="${ifDefined(this._isSelectableContext ? undefined : this._href)}">
 				${this.renderIconContainer()} ${this.renderLabel()} ${this.#renderActions()} ${this.#renderChildItems()}

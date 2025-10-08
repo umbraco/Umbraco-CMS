@@ -17,7 +17,6 @@ const createInput = (opts: {
 	type: InputType;
 	name: string;
 	autocomplete: AutoFill;
-	label: string;
 	inputmode: string;
 	autofocus?: boolean;
 }) => {
@@ -28,9 +27,7 @@ const createInput = (opts: {
 	input.id = opts.id;
 	input.required = true;
 	input.inputMode = opts.inputmode;
-	input.ariaLabel = opts.label;
 	input.autofocus = opts.autofocus || false;
-
 	return input;
 };
 
@@ -161,15 +158,11 @@ export default class UmbAuthElement extends UmbLitElement {
 	 * @private
 	 */
 	#initializeForm() {
-		const labelUsername = this.usernameIsEmail ? this.localize.term('auth_email') : this.localize.term('auth_username');
-		const labelPassword = this.localize.term('auth_password');
-
 		this._usernameInput = createInput({
 			id: 'username-input',
 			type: 'text',
 			name: 'username',
 			autocomplete: 'username',
-			label: labelUsername,
 			inputmode: this.usernameIsEmail ? 'email' : '',
 			autofocus: true,
 		});
@@ -178,7 +171,6 @@ export default class UmbAuthElement extends UmbLitElement {
 			type: 'password',
 			name: 'password',
 			autocomplete: 'current-password',
-			label: labelPassword,
 			inputmode: '',
 		});
 		this._usernameLabel = createLabel({
