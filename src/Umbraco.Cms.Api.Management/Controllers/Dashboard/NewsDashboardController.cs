@@ -9,7 +9,7 @@ using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Telemetry;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Api.Management.Controllers.Dashboard;
+namespace Umbraco.Cms.Api.Management.Controllers.NewsDashboard;
 
 [VersionedApiBackOfficeRoute("news-dashboard")]
 [ApiExplorerSettings(GroupName = "Dashboard")]

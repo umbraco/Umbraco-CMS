@@ -4,11 +4,11 @@ using Umbraco.Cms.Core.DependencyInjection;
 
 namespace Umbraco.Cms.Api.Management.DependencyInjection;
 
-internal static class DashboardBuilderExtensions
+internal static class NewsDashboardBuilderExtensions
 {
-    internal static IUmbracoBuilder AddDashboard(this IUmbracoBuilder builder)
+    internal static IUmbracoBuilder AddNewsDashboard(this IUmbracoBuilder builder)
     {
-        builder.Services.AddTransient<INewsDashboardService, NewsDashboardService>();
+        builder.Services.AddSingleton<INewsDashboardService, NewsDashboardService>();
 
         return builder;
     }
