@@ -71,7 +71,8 @@ public static partial class UmbracoBuilderExtensions
                 .AddUserData()
                 .AddSegment()
                 .AddExport()
-                .AddImport();
+                .AddImport()
+                .AddDashboard();
 
             services
                 .ConfigureOptions<ConfigureApiBehaviorOptions>()
