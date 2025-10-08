@@ -222,6 +222,7 @@ export abstract class UmbTreeItemElementBase<
 		`;
 	}
 
+	// eslint-disable-next-line @typescript-eslint/naming-convention
 	_renderExpandSymbol?: () => HTMLElement | TemplateResult<1> | undefined;
 
 	#renderIcon() {

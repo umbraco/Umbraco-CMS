@@ -115,10 +115,10 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 
 	#currentProvidedView?: UmbWorkspaceViewContext;
 	#createRoutes() {
-		let newRoutes: UmbRoute[] = [];
+		const newRoutes: UmbRoute[] = [];
 
 		if (this._workspaceViews.length > 0) {
-			this._workspaceViews.forEach((context, i) => {
+			this._workspaceViews.forEach((context) => {
 				const manifest = context.manifest;
 				const path = UMB_WORKSPACE_VIEW_PATH_PATTERN.generateLocal({ viewPathname: manifest.meta.pathname });
 				newRoutes.push({
