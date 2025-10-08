@@ -42,7 +42,7 @@ public class ConfigureUmbracoSwaggerGenOptions : IConfigureOptions<SwaggerGenOpt
         swaggerGenOptions.DocInclusionPredicate((name, api) =>
         {
             if (api.ActionDescriptor is ControllerActionDescriptor controllerActionDescriptor
-                && controllerActionDescriptor.MethodInfo.HasMapToApiAttribute(name))
+                && controllerActionDescriptor.HasMapToApiAttribute(name))
             {
                 return true;
             }

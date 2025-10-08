@@ -33,7 +33,6 @@ import {
 } from '@umbraco-cms/backoffice/property';
 import { UmbSegmentCollectionRepository } from '@umbraco-cms/backoffice/segment';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import { UmbViewContext } from '@umbraco-cms/backoffice/view';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import {
 	UMB_VALIDATION_CONTEXT,
@@ -144,9 +143,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	readonly splitView = new UmbWorkspaceSplitViewManager();
 
 	readonly collection: UmbContentCollectionManager;
-
-	/* View */
-	readonly view = new UmbViewContext(this, null);
 
 	/* Variant Options */
 	// TODO: Optimize this so it uses either a App Language Context? [NL]
@@ -344,7 +340,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 				const variantName = variants.find(
 					(v) => v.culture === activeVariant?.culture && v.segment === activeVariant?.segment,
 				)?.name;
-				this.view.setBrowserTitle(variantName);
+				this.view.setTitle(variantName);
 			},
 			null,
 		);
@@ -396,17 +392,20 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		this.#segments.setValue(data?.items ?? []);
 	}
 
-	protected override async _scaffoldProcessData(data: DetailModelType): Promise<DetailModelType> {
+	/**
+	 * @deprecated Call `_processIncomingData` instead. `_scaffoldProcessData` will be removed in v.18.
+	 */
+	protected override _scaffoldProcessData(data: DetailModelType): Promise<DetailModelType> {
+		return this._processIncomingData(data);
+	}
+
+	protected override async _processIncomingData(data: DetailModelType): Promise<DetailModelType> {
 		const contentTypeUnique: string | undefined = (data as any)[this.#contentTypePropertyName].unique;
 		if (!contentTypeUnique) {
 			throw new Error(`Could not find content type unique on property '${this.#contentTypePropertyName}'`);
 		}
 		// Load the content type structure, usually this comes from the data, but in this case we are making the data, and we need this to be able to complete the data. [NL]
 		await this.structure.loadType(contentTypeUnique);
-
-		/**
-		 * TODO: Should we also set Preset Values when loading Content, because maybe content contains uncreated Cultures or Segments.
-		 */
 
 		// Set culture and segment for all values:
 		const cultures = this.#languages.getValue().map((x) => x.unique);
@@ -452,11 +451,16 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			controller.setSegments(segments);
 		}
 
-		const presetValues = await controller.create(valueDefinitions, {
+		controller.setValues(data.values);
+
+		const processedValues = await controller.create(valueDefinitions, {
 			entityType: this.getEntityType(),
 			entityUnique: data.unique,
 			entityTypeUnique: contentTypeUnique,
 		});
+
+		/*
+		const presetValues = ...
 
 		// Don't just set the values, as we could have some already populated from a blueprint.
 		// If we have a value from both a blueprint and a preset, use the latter as priority.
@@ -473,8 +477,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		}
 
 		data.values = dataValues;
+		*/
 
-		return data;
+		return { ...data, values: processedValues };
 	}
 
 	/**
@@ -676,8 +681,23 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			// TODO: fix type error
 			this._data.updateCurrent({ values });
 
-			// TODO: Ideally we should move this type of logic to the act of saving [NL]
-			this._data.ensureVariantData(variantId);
+			/**
+			 * Handling of Not-Culture but Segment variant properties: [NL]
+			 * We need to ensure variant-entries across all culture variants for the given segment variant, when er property is configured to vary by segment but not culture.
+			 * This is the only different case, in all other cases its fine to just target the given variant.
+			 */
+			if (this.getVariesByCulture() && property.variesByCulture === false && property.variesBySegment === true) {
+				// get all culture options:
+				const cultureOptions = await firstValueFrom(this.variantOptions);
+				for (const cultureOption of cultureOptions) {
+					if (cultureOption.segment === variantId.segment) {
+						this._data.ensureVariantData(UmbVariantId.Create(cultureOption));
+					}
+				}
+			} else {
+				// otherwise we know the property variant-id will be matching with a variant:
+				this._data.ensureVariantData(variantId);
+			}
 		}
 		this.finishPropertyValueChange();
 	}
@@ -825,7 +845,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	 * Request a submit of the workspace, in the case of Document Workspaces the validation does not need to be valid for this to be submitted.
 	 * @returns {Promise<void>} a promise which resolves once it has been completed.
 	 */
-	public override requestSubmit() {
+	public override requestSubmit(): Promise<void> {
 		return this._handleSubmit();
 	}
 
@@ -835,7 +855,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 	/**
 	 * Request a save of the workspace, in the case of Document Workspaces the validation does not need to be valid for this to be saved.
-	 * @returns {Promise<void>} a promise which resolves once it has been completed.
+	 * @returns {Promise<void>} A promise which resolves once it has been completed.
 	 */
 	public requestSave() {
 		return this._handleSave();
@@ -851,11 +871,11 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		return this._data.constructData(variantIds);
 	}
 
-	protected async _handleSubmit() {
+	protected async _handleSubmit(): Promise<void> {
 		await this._handleSave();
 		this._closeModal();
 	}
-	protected async _handleSave() {
+	protected async _handleSave(): Promise<void> {
 		const data = this.getData();
 		if (!data) {
 			throw new Error('Data is missing');
@@ -881,7 +901,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 				value: { selection: selected },
 			}).catch(() => undefined);
 
-			if (!result?.selection.length) return;
+			if (!result?.selection.length) {
+				return Promise.reject('Cannot save without selecting at least one variant.');
+			}
 
 			variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
 		} else {
@@ -901,7 +923,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 				() => false,
 			);
 			if (valid || this.#ignoreValidationResultOnSubmit) {
-				return this.performCreateOrUpdate(variantIds, saveData);
+				await this.performCreateOrUpdate(variantIds, saveData);
+			} else {
+				return Promise.reject('Validation issues prevent saving');
 			}
 		} else {
 			await this.performCreateOrUpdate(variantIds, saveData);

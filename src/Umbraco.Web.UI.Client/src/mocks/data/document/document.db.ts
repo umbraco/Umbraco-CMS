@@ -70,7 +70,7 @@ const treeItemMapper = (model: UmbMockDocumentModel): DocumentTreeItemResponseMo
 		parent: model.parent,
 		variants: model.variants,
 		createDate: model.createDate,
-		signs: model.signs,
+		flags: model.flags,
 	};
 };
 
@@ -119,10 +119,12 @@ const createMockDocumentMapper = (request: CreateDocumentRequestModel): UmbMockD
 				updateDate: now,
 				state: DocumentVariantStateModel.DRAFT,
 				publishDate: null,
+				id: UmbId.new(),
+				flags: [],
 			};
 		}),
 		urls: [],
-		signs: [],
+		flags: [],
 	};
 };
 
@@ -135,7 +137,7 @@ const detailResponseMapper = (model: UmbMockDocumentModel): DocumentResponseMode
 		urls: model.urls,
 		values: model.values,
 		variants: model.variants,
-		signs: model.signs,
+		flags: model.flags,
 	};
 };
 
@@ -152,7 +154,7 @@ const itemMapper = (model: UmbMockDocumentModel): DocumentItemResponseModel => {
 		isTrashed: model.isTrashed,
 		parent: model.parent,
 		variants: model.variants,
-		signs: model.signs,
+		flags: model.flags,
 	};
 };
 
@@ -172,7 +174,7 @@ const collectionMapper = (model: UmbMockDocumentModel): DocumentCollectionRespon
 		updater: null,
 		values: model.values,
 		variants: model.variants,
-		signs: model.signs,
+		flags: model.flags,
 	};
 };
 

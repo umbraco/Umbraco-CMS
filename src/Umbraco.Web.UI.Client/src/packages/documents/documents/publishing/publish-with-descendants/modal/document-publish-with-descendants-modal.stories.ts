@@ -25,6 +25,7 @@ const modalData: UmbDocumentPublishWithDescendantsModalData = {
 				segment: null,
 				scheduledPublishDate: null,
 				scheduledUnpublishDate: null,
+				flags: [],
 			},
 			language: {
 				entityType: 'language',
@@ -49,6 +50,7 @@ const modalData: UmbDocumentPublishWithDescendantsModalData = {
 				updateDate: null,
 				scheduledPublishDate: null,
 				scheduledUnpublishDate: null,
+				flags: [],
 			},
 			language: {
 				entityType: 'language',
@@ -73,6 +75,7 @@ const modalData: UmbDocumentPublishWithDescendantsModalData = {
 				segment: null,
 				scheduledPublishDate: null,
 				scheduledUnpublishDate: null,
+				flags: [],
 			},
 			language: {
 				entityType: 'language',

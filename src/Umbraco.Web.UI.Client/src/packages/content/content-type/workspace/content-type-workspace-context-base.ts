@@ -7,7 +7,6 @@ import {
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
-import { UmbViewContext } from '@umbraco-cms/backoffice/view';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import type { Observable } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -53,8 +52,6 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 
 	public readonly structure: UmbContentTypeStructureManager<DetailModelType>;
 
-	public readonly view = new UmbViewContext(this, null);
-
 	constructor(host: UmbControllerHost, args: UmbContentTypeWorkspaceContextArgs) {
 		super(host, args);
 
@@ -74,7 +71,7 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 
 		// Keep current data in sync with the owner content type - This is used for the discard changes feature
 		this.observe(this.structure.ownerContentType, (data) => this._data.setCurrent(data), null);
-		this.observe(this.name, (name) => this.view.setBrowserTitle(name), null);
+		this.observe(this.name, (name) => this.view.setTitle(name), null);
 		// TODO: sometimes the browserTitle for a parent view is set later than the child is updating. We need to fix this as well enable a parent browser title to be updating on the go. [NL]
 	}
 
@@ -95,6 +92,7 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 		let { data } = await request;
 
 		if (data) {
+			data = await this._processIncomingData(data);
 			data = await this._scaffoldProcessData(data);
 
 			if (this.modalContext) {

@@ -9,10 +9,11 @@ import {
 	UmbFormControlValidator,
 	UmbObserveValidationStateController,
 } from '@umbraco-cms/backoffice/validation';
-import type {
-	ManifestPropertyEditorUi,
-	UmbPropertyEditorConfigCollection,
-	UmbPropertyEditorConfig,
+import {
+	type ManifestPropertyEditorUi,
+	type UmbPropertyEditorConfigCollection,
+	type UmbPropertyEditorConfig,
+	UMB_MISSING_PROPERTY_EDITOR_UI_UI_ALIAS,
 } from '@umbraco-cms/backoffice/property-editor';
 import type {
 	UmbPropertyTypeAppearanceModel,
@@ -165,7 +166,7 @@ export class UmbPropertyElement extends UmbLitElement {
 	}
 
 	@state()
-	private _variantDifference?: string;
+	private _variantDifferenceTerm?: string;
 
 	@state()
 	private _element?: ManifestPropertyEditorUi['ELEMENT_TYPE'];
@@ -238,7 +239,7 @@ export class UmbPropertyElement extends UmbLitElement {
 		this.observe(
 			this.#propertyContext.variantDifference,
 			(variantDifference) => {
-				this._variantDifference = variantDifference;
+				this._variantDifferenceTerm = variantDifference;
 			},
 			null,
 		);
@@ -294,6 +295,11 @@ export class UmbPropertyElement extends UmbLitElement {
 			this.observe(
 				umbExtensionsRegistry.byTypeAndAlias('propertyEditorUi', this._propertyEditorUiAlias),
 				(manifest) => {
+					if (!manifest && this._propertyEditorUiAlias !== UMB_MISSING_PROPERTY_EDITOR_UI_UI_ALIAS) {
+						this._propertyEditorUiAlias = UMB_MISSING_PROPERTY_EDITOR_UI_UI_ALIAS;
+						this._observePropertyEditorUI();
+						return;
+					}
 					this._gotEditorUI(manifest);
 				},
 				'_observePropertyEditorUI',
@@ -307,7 +313,6 @@ export class UmbPropertyElement extends UmbLitElement {
 		this.#propertyContext.setEditorManifest(manifest ?? undefined);
 
 		if (!manifest) {
-			// TODO: if propertyEditorUiAlias didn't exist in store, we should do some nice fail UI.
 			return;
 		}
 
@@ -418,9 +423,9 @@ export class UmbPropertyElement extends UmbLitElement {
 				?mandatory=${this._mandatory}
 				?invalid=${this._invalid}>
 				${this.#renderPropertyActionMenu()}
-				${this._variantDifference
+				${this._variantDifferenceTerm
 					? html`<div id="variant-info" slot="description">
-							<uui-tag look="secondary">${this._variantDifference}</uui-tag>
+							<uui-tag look="secondary">${this.localize.term(this._variantDifferenceTerm)}</uui-tag>
 						</div> `
 					: ''}
 				${this.#renderPropertyEditor()}

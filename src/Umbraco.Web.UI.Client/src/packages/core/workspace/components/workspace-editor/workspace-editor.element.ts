@@ -62,6 +62,9 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 	public set overrides(value: Array<UmbDeepPartialObject<ManifestWorkspaceView>> | undefined) {
 		this.#navigationContext.setOverrides(value);
 	}
+	public get overrides(): Array<UmbDeepPartialObject<ManifestWorkspaceView>> | undefined {
+		return undefined;
+	}
 
 	@state()
 	private _workspaceViews: Array<UmbWorkspaceViewContext> = [];

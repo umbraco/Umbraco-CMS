@@ -6,6 +6,7 @@ export const UMB_MEMBER_DETAIL_MODEL_VARIANT_SCAFFOLD: UmbMemberVariantModel = {
 	name: '',
 	createDate: null,
 	updateDate: null,
+	flags: [],
 } as const;
 
 export { UMB_MEMBER_WORKSPACE_CONTEXT } from './member-workspace.context-token.js';
