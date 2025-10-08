@@ -314,6 +314,10 @@ export class UmbContentTypeStructureManager<
 		return this.#contentTypes.getValue().find((y) => y.unique === this.#ownerContentTypeUnique);
 	}
 
+	getOwnerContentTypeName() {
+		return this.getOwnerContentType()?.name;
+	}
+
 	getOwnerContentTypeUnique() {
 		return this.#ownerContentTypeUnique;
 	}
