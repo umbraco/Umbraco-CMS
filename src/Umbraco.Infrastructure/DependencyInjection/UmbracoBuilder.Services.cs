@@ -46,6 +46,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IAuditService, AuditService>();
         builder.Services.AddUnique<IAuditEntryService, AuditEntryService>();
         builder.Services.AddUnique<ICacheInstructionService, CacheInstructionService>();
+        builder.Services.AddUnique<ICacheSyncService, CacheSyncService>();
         builder.Services.AddUnique<IBasicAuthService, BasicAuthService>();
         builder.Services.AddUnique<IDataTypeService, DataTypeService>();
         builder.Services.AddUnique<IPackagingService, PackagingService>();

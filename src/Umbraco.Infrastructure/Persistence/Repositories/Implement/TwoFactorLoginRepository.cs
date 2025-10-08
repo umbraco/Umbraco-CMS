@@ -14,9 +14,18 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
 internal sealed class TwoFactorLoginRepository : EntityRepositoryBase<int, ITwoFactorLogin>, ITwoFactorLoginRepository
 {
-    public TwoFactorLoginRepository(IScopeAccessor scopeAccessor, AppCaches cache,
-        ILogger<TwoFactorLoginRepository> logger)
-        : base(scopeAccessor, cache, logger)
+    public TwoFactorLoginRepository(
+        IScopeAccessor scopeAccessor,
+        AppCaches cache,
+        ILogger<TwoFactorLoginRepository> logger,
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            cache,
+            logger,
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
     }
 

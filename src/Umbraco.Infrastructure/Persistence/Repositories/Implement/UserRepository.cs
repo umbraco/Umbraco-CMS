@@ -54,6 +54,8 @@ internal sealed class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserR
     /// <param name="jsonSerializer">The JSON serializer.</param>
     /// <param name="runtimeState">State of the runtime.</param>
     /// <param name="permissionMappers">The permission mappers.</param>
+    /// <param name="globalCache">The app policy cache.</param>
+    /// <param name="repositoryCacheVersionService"></param>
     /// <exception cref="System.ArgumentNullException">
     ///     mapperCollection
     ///     or
@@ -70,8 +72,15 @@ internal sealed class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserR
         IOptions<UserPasswordConfigurationSettings> passwordConfiguration,
         IJsonSerializer jsonSerializer,
         IRuntimeState runtimeState,
-        IEnumerable<IPermissionMapper> permissionMappers)
-        : base(scopeAccessor, appCaches, logger)
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        IEnumerable<IPermissionMapper> permissionMappers,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            appCaches,
+            logger,
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
         _mapperCollection = mapperCollection ?? throw new ArgumentNullException(nameof(mapperCollection));
         _globalSettings = globalSettings.Value ?? throw new ArgumentNullException(nameof(globalSettings));

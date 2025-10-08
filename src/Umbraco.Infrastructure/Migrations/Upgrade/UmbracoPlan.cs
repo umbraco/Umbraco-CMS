@@ -137,5 +137,6 @@ public class UmbracoPlan : MigrationPlan
         To<V_17_0_0.SetDateDefaultsToUtcNow>("{1847C7FF-B021-44EB-BEB0-A77A4376A6F2}");
         To<V_17_0_0.MigrateSystemDatesToUtc>("{7208B20D-6BFC-472E-9374-85EEA817B27D}");
         To<V_17_0_0.AddDistributedJobLock>("{263075BF-F18A-480D-92B4-4947D2EAB772}");
+        To<V_17_0_0.AddLastSyncedTable>("26179D88-58CE-4C92-B4A4-3CBA6E7188AC");
     }
 }
