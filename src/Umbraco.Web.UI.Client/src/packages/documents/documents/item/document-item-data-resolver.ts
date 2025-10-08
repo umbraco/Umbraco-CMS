@@ -190,7 +190,7 @@ export class UmbDocumentItemDataResolver<DocumentItemModel extends UmbDocumentIt
 
 	/**
 	 * Test if the item has a collection
-	 * @returns {boolean} Boolean of wether the item has a collection.
+	 * @returns {boolean} Boolean of whether the item has a collection.
 	 * @memberof UmbDocumentItemDataResolver
 	 */
 	getHasCollection(): boolean {
