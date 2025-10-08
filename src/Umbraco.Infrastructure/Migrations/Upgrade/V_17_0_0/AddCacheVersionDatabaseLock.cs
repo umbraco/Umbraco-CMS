@@ -4,7 +4,7 @@ using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_16_2_0;
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_17_0_0;
 
 public class AddCacheVersionDatabaseLock : AsyncMigrationBase
 {
