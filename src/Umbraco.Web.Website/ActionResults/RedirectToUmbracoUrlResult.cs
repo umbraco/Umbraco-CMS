@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Umbraco.Cms.Core.Web;
@@ -15,11 +16,21 @@ namespace Umbraco.Cms.Web.Website.ActionResults;
 public class RedirectToUmbracoUrlResult : IKeepTempDataResult
 {
     private readonly IUmbracoContext _umbracoContext;
+    private readonly QueryString _queryString;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="RedirectToUmbracoUrlResult" /> class.
     /// </summary>
     public RedirectToUmbracoUrlResult(IUmbracoContext umbracoContext) => _umbracoContext = umbracoContext;
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="RedirectToUmbracoUrlResult" /> class.
+    /// </summary>
+    public RedirectToUmbracoUrlResult(IUmbracoContext umbracoContext, QueryString queryString)
+    {
+        _umbracoContext = umbracoContext;
+        _queryString = queryString;
+    }
 
     /// <inheritdoc />
     public Task ExecuteResultAsync(ActionContext context)
@@ -30,6 +41,11 @@ public class RedirectToUmbracoUrlResult : IKeepTempDataResult
         }
 
         var destinationUrl = _umbracoContext.OriginalRequestUrl.PathAndQuery;
+
+        if (_queryString.HasValue)
+        {
+            destinationUrl = _umbracoContext.OriginalRequestUrl.AbsolutePath + _queryString.ToUriComponent();
+        }
 
         context.HttpContext.Response.Redirect(destinationUrl);
 

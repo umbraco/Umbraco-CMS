@@ -102,6 +102,12 @@ public abstract class SurfaceController : PluginController
         => new(UmbracoContext);
 
     /// <summary>
+    ///     Redirects to the currently rendered Umbraco URL and passes provided querystring
+    /// </summary>
+    protected RedirectToUmbracoUrlResult RedirectToCurrentUmbracoUrl(QueryString queryString)
+        => new(UmbracoContext, queryString);
+
+    /// <summary>
     ///     Returns the currently rendered Umbraco page
     /// </summary>
     protected UmbracoPageResult CurrentUmbracoPage()
