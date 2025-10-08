@@ -34,6 +34,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbVariantPropertyGuardRule } from '@umbraco-cms/backoffice/property';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
 type ContentModel = UmbDocumentDetailModel;
 type ContentTypeModel = UmbDocumentTypeDetailModel;
