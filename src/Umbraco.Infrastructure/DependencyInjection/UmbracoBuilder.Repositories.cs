@@ -83,6 +83,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<INavigationRepository, ContentNavigationRepository>();
         builder.Services.AddUnique<IPublishStatusRepository, PublishStatusRepository>();
         builder.Services.AddUnique<ILongRunningOperationRepository, LongRunningOperationRepository>();
+        builder.Services.AddUnique<IDistributedJobRepository, DistributedJobRepository>();
 
         return builder;
     }

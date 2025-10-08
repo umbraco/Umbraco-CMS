@@ -7,18 +7,25 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
+namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.DistributedJobs;
 
 /// <summary>
 /// Daily background job that removes all webhook log data older than x days as defined by <see cref="WebhookSettings.KeepLogsForDays"/>
 /// </summary>
-public class WebhookLoggingCleanup : IRecurringBackgroundJob
+internal class WebhookLoggingCleanup : IDistributedBackgroundJob
 {
     private readonly ILogger<WebhookLoggingCleanup> _logger;
     private readonly WebhookSettings _webhookSettings;
     private readonly IWebhookLogRepository _webhookLogRepository;
     private readonly ICoreScopeProvider _coreScopeProvider;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="WebhookLoggingCleanup"/> class.
+    /// </summary>
+    /// <param name="logger"></param>
+    /// <param name="webhookSettings"></param>
+    /// <param name="webhookLogRepository"></param>
+    /// <param name="coreScopeProvider"></param>
     public WebhookLoggingCleanup(ILogger<WebhookLoggingCleanup> logger, IOptionsMonitor<WebhookSettings> webhookSettings, IWebhookLogRepository webhookLogRepository, ICoreScopeProvider coreScopeProvider)
     {
         _logger = logger;
@@ -28,20 +35,13 @@ public class WebhookLoggingCleanup : IRecurringBackgroundJob
     }
 
     /// <inheritdoc />
-    // No-op event as the period never changes on this job
-    public event EventHandler PeriodChanged
-    {
-        add { } remove { }
-    }
+    public string Name => "WebhookLoggingCleanup";
 
     /// <inheritdoc />
     public TimeSpan Period => TimeSpan.FromDays(1);
 
     /// <inheritdoc />
-    public TimeSpan Delay { get; } = TimeSpan.FromSeconds(20);
-
-    /// <inheritdoc />
-    public async Task RunJobAsync()
+    public async Task ExecuteAsync()
     {
         if (_webhookSettings.EnableLoggingCleanup is false)
         {

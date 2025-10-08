@@ -1,9 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.HealthChecks;
@@ -12,25 +10,20 @@ using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Scoping;
 
-namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
+namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.DistributedJobs;
 
 /// <summary>
 ///     Hosted service implementation for recurring health check notifications.
 /// </summary>
-public class HealthCheckNotifierJob : IRecurringBackgroundJob
+internal class HealthCheckNotifierJob : IDistributedBackgroundJob
 {
-    public TimeSpan Period { get; private set; }
-    public TimeSpan Delay { get; private set; }
+    /// <inheritdoc />
+    public string Name => "HealthCheckNotifierJob";
 
-    private event EventHandler? _periodChanged;
-    public event EventHandler PeriodChanged
-    {
-        add { _periodChanged += value; }
-        remove { _periodChanged -= value; }
-    }
+    /// <inheritdoc/>
+    public TimeSpan Period { get; private set; }
 
     private readonly HealthCheckCollection _healthChecks;
-    private readonly ILogger<HealthCheckNotifierJob> _logger;
     private readonly HealthCheckNotificationMethodCollection _notifications;
     private readonly IProfilingLogger _profilingLogger;
     private readonly IEventAggregator _eventAggregator;
@@ -53,32 +46,28 @@ public class HealthCheckNotifierJob : IRecurringBackgroundJob
         HealthCheckCollection healthChecks,
         HealthCheckNotificationMethodCollection notifications,
         ICoreScopeProvider scopeProvider,
-        ILogger<HealthCheckNotifierJob> logger,
         IProfilingLogger profilingLogger,
-        ICronTabParser cronTabParser,
         IEventAggregator eventAggregator)
     {
         _healthChecksSettings = healthChecksSettings.CurrentValue;
         _healthChecks = healthChecks;
         _notifications = notifications;
         _scopeProvider = scopeProvider;
-        _logger = logger;
         _profilingLogger = profilingLogger;
         _eventAggregator = eventAggregator;
 
         Period = healthChecksSettings.CurrentValue.Notification.Period;
-        Delay = DelayCalculator.GetDelay(healthChecksSettings.CurrentValue.Notification.FirstRunTime, cronTabParser, logger, TimeSpan.FromMinutes(3));
 
 
         healthChecksSettings.OnChange(x =>
         {
             _healthChecksSettings = x;
             Period = x.Notification.Period;
-            _periodChanged?.Invoke(this, EventArgs.Empty);
         });
     }
 
-    public async Task RunJobAsync()
+    /// <inheritdoc/>
+    public async Task ExecuteAsync()
     {
         if (_healthChecksSettings.Notification.Enabled == false)
         {
