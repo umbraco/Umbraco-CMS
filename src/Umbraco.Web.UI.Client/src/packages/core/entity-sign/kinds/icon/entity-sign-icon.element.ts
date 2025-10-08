@@ -12,7 +12,7 @@ export class UmbEntitySignIconElement extends UmbLitElement implements UmbEntity
 		return this.manifest
 			? html`<umb-icon
 					.name=${this.manifest.meta.iconName ?? 'icon-circle-dotted'}
-					.color=${this.manifest.meta.iconColor}></umb-icon>`
+					.color=${this.manifest.meta.iconColorAlias}></umb-icon>`
 			: nothing;
 	}
 

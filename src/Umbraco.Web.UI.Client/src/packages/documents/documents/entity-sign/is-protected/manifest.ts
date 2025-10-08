@@ -11,6 +11,6 @@ export const manifests: UmbExtensionManifest = {
 	meta: {
 		iconName: 'icon-lock',
 		label: 'Protected',
-		iconColor: 'red',
+		iconColorAlias: 'red',
 	},
 };
