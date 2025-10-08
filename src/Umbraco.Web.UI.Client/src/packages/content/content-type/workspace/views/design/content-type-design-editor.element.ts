@@ -115,7 +115,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	private _hasRootGroups = false;
 
 	@state()
-	private _routes: UmbRoute[] = [];
+	private _routes?: UmbRoute[];
 
 	@state()
 	private _tabs?: Array<UmbPropertyTypeContainerMergedModel>;
