@@ -27,6 +27,7 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 			return hasCollection || hasChildren;
 		},
 	);
+	readonly flags = this.#item.flags;
 
 	// TODO: Move to API
 	readonly ancestors = this._treeItem.asObservablePart((item) => item?.ancestors ?? []);

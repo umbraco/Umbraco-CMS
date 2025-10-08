@@ -71,6 +71,7 @@ export class UmbDocumentTreeServerDataSource
 			isTrashed: item.isTrashed,
 			hasChildren: item.hasChildren,
 			isProtected: item.isProtected,
+			flags: item.flags,
 			documentType: {
 				unique: item.documentType.id,
 				icon: item.documentType.icon,
@@ -82,6 +83,7 @@ export class UmbDocumentTreeServerDataSource
 					culture: variant.culture || null,
 					segment: null, // TODO: add segment to the backend API?
 					state: variant.state,
+					flags: variant.flags,
 				};
 			}),
 			name: item.variants[0]?.name, // TODO: this is not correct. We need to get it from the variants. This is a temp solution.

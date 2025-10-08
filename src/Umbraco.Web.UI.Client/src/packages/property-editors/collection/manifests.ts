@@ -45,6 +45,7 @@ const propertyEditorUiManifest: ManifestPropertyEditorUi = {
 					label: 'Workspace View icon',
 					description: "The icon for the Collection's Workspace View.",
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.IconPicker',
+					config: [{ alias: 'placeholder', value: 'icon-grid' }],
 				},
 				{
 					alias: 'tabName',
