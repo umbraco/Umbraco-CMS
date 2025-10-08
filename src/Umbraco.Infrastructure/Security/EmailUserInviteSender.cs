@@ -24,8 +24,7 @@ public class EmailUserInviteSender : IUserInviteSender
         IEmailSender emailSender,
         ILocalizedTextService localizedTextService,
         IOptions<GlobalSettings> globalSettings,
-        IOptions<SecuritySettings> securitySettings
-    )
+        IOptions<SecuritySettings> securitySettings)
     {
         _emailSender = emailSender;
         _localizedTextService = localizedTextService;
