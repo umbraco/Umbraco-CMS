@@ -4,5 +4,5 @@ namespace Umbraco.Cms.Api.Management.Services.NewsDashboard;
 
 public interface INewsDashboardService
 {
-    Task<IEnumerable<NewsDashboardItem>> GetNewsItemsAsync();
+    Task<NewsDashboardResponseModel> GetArticlesAsync();
 }

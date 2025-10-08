@@ -23,10 +23,10 @@ public class NewsDashboardController : ManagementApiControllerBase
     }
 
     [HttpGet]
-    [ProducesResponseType(typeof(IEnumerable<NewsDashboardItem>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IEnumerable<NewsDashboardResponseModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetDashboard()
     {
-        IEnumerable<NewsDashboardItem> content = await _newsDashboardService.GetNewsItemsAsync();
+        NewsDashboardResponseModel content = await _newsDashboardService.GetArticlesAsync();
 
         return Ok(content);
     }

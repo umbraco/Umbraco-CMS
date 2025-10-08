@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Api.Management.ViewModels.NewsDashboard;
 using Umbraco.Cms.Core.Cache;
@@ -25,7 +26,7 @@ public class NewsDashboardService : INewsDashboardService
         _logger = logger;
     }
 
-    public async Task<IEnumerable<NewsDashboardItem>> GetNewsItemsAsync()
+    public async Task<NewsDashboardResponseModel> GetArticlesAsync()
     {
         var baseUrl = "https://umbraco-dashboard-news.euwest01.umbraco.io";
         var path = "/api/News";
@@ -35,50 +36,44 @@ public class NewsDashboardService : INewsDashboardService
 
         var url = $"{baseUrl}/{path}?version={version}&siteId={siteIdentifier}";
 
-        IEnumerable<NewsDashboardItem>? content = _appCaches.RuntimeCache.GetCacheItem<IEnumerable<NewsDashboardItem>?>(key);
-        if (content is not null && content.Any())
+        NewsDashboardResponseModel? content = _appCaches.RuntimeCache.GetCacheItem<NewsDashboardResponseModel>(key);
+        if (content is not null)
         {
-            return [];
+            return content;
         }
 
         try
         {
             var json = await HttpClient.GetStringAsync(url);
 
-            if (TryMapModel(json, out IEnumerable<NewsDashboardItem>? model))
+            if (TryMapModel(json, out NewsDashboardResponseModel? model))
             {
                 _appCaches.RuntimeCache.InsertCacheItem(key, () => model, new TimeSpan(0, 30, 0));
-
-                if (model is not null)
-                {
-                    content = model;
-                }
+                content = model;
             }
         }
         catch (Exception ex)
         {
             _logger.LogError(ex.InnerException ?? ex, "Error getting dashboard content from {Url}", url);
-            return [];
         }
 
-        return content ?? [];
+        return content ?? new NewsDashboardResponseModel { Articles = [] };
     }
 
-    private bool TryMapModel(string json, out IEnumerable<NewsDashboardItem>? newsDashboardItem)
+    private bool TryMapModel(string json, [MaybeNullWhen(false)] out NewsDashboardResponseModel newsDashboardResponseModel)
     {
         try
         {
-            var options = new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true,
-            };
+            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true, };
 
-            newsDashboardItem = JsonSerializer.Deserialize<List<NewsDashboardItem>>(json, options);
-            return newsDashboardItem is not null && newsDashboardItem.Any();
+            List<NewsDashboardArticleResponseModel>? articles = JsonSerializer.Deserialize<List<NewsDashboardArticleResponseModel>>(json, options);
+            newsDashboardResponseModel = new NewsDashboardResponseModel { Articles = articles ?? [] };
+
+            return true;
         }
         catch (JsonException)
         {
-            newsDashboardItem = null;
+            newsDashboardResponseModel = null;
             return false;
         }
     }
