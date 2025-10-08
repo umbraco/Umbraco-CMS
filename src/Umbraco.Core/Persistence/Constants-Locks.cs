@@ -82,11 +82,6 @@ public static partial class Constants
         public const int WebhookLogs = -343;
 
         /// <summary>
-        ///    The cache version.
-        /// </summary>
-        public const int CacheVersion = -346;
-
-        /// <summary>
         ///     Long-running operations.
         /// </summary>
         public const int LongRunningOperations = -344;
@@ -95,6 +90,11 @@ public static partial class Constants
         ///     All document URLs.
         /// </summary>
         public const int DocumentUrls = -345;
+
+        /// <summary>
+        ///    The cache version.
+        /// </summary>
+        public const int CacheVersion = -346;
 
         /// <summary>
         ///     All distributed jobs.
