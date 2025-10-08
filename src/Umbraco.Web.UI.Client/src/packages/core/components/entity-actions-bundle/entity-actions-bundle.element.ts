@@ -115,11 +115,11 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 
 	#renderMore() {
 		if (this._numberOfActions === 1) return nothing;
-		const ariaLabel = this.localize.term('actions_viewActionsFor', [this.label]);
-		console.log(ariaLabel);
+		const actionsAriaLabel = this.localize.term('buttons_viewActionsFor', [this.label]);
+		console.log(actionsAriaLabel);
 
 		return html`
-			<umb-entity-actions-dropdown .label=${ariaLabel} compact>
+			<umb-entity-actions-dropdown .label=${actionsAriaLabel} compact>
 				<uui-symbol-more slot="label"></uui-symbol-more>
 			</umb-entity-actions-dropdown>
 		`;
@@ -128,11 +128,10 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 	#renderFirstAction() {
 		if (!this._firstActionApi || !this._firstActionManifest) return nothing;
 
-		const ariaLabel = this._firstActionApi.getAriaLabel?.(this.label);
-		console.log(ariaLabel);
-
+		const createAriaLabel = this._firstActionApi.getCreateAriaLabel?.(this.label);
+		console.log(createAriaLabel);
 		return html`<uui-button
-			label=${ifDefined(ariaLabel)}
+			label=${ifDefined(createAriaLabel)}
 			data-mark=${'entity-action:' + this._firstActionManifest.alias}
 			@click=${this.#onFirstActionClick}
 			href="${ifDefined(this._firstActionHref)}">

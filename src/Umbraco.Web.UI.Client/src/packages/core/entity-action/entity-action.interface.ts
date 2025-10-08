@@ -18,5 +18,7 @@ export interface UmbEntityAction<ArgsMetaType> extends UmbAction<UmbEntityAction
 	 */
 	execute(): Promise<void>;
 
-	getAriaLabel?(entityName?: string): string | undefined;
+	getCreateAriaLabel?(entityName?: string): string | undefined;
+	getActionsAriaLabel?(entityName?: string): string | undefined;
+
 }

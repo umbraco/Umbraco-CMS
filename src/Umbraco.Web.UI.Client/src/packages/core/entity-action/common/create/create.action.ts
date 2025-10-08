@@ -71,8 +71,11 @@ export class UmbCreateEntityAction extends UmbEntityActionBase<MetaEntityActionC
 		});
 	}
 
-	getAriaLabel(entityName?: string) {
-        return this.#localization.term('actions.createFor', [entityName ?? '']);
+	getCreateAriaLabel(entityName?: string) {
+        return this.#localization.term('buttons_createFor', [entityName ?? '']);
+	}
+	getActionsAriaLabel(entityName?: string) {
+        return this.#localization.term('buttons_viewActionsFor', [entityName ?? '']);
 	}
 
 	async #createSingleOptionApi(

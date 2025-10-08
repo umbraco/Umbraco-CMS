@@ -121,6 +121,7 @@ export default {
 	},
 	buttons: {
 		clearSelection: 'Auswahl aufheben',
+		createFor: 'Neu erstellen für {0}',
 		select: 'Auswählen',
 		somethingElse: 'Etwas anderes machen',
 		bold: 'Fett',
@@ -154,6 +155,7 @@ export default {
 		styleChoose: 'Stil auswählen',
 		styleShow: 'Stil anzeigen',
 		tableInsert: 'Tabelle einfügen',
+		viewActionsFor: 'Aktion anzeigen für {0}',
 		generateModelsAndClose: 'Erzeuge Daten-Model und schliesse',
 		saveAndGenerateModels: 'Sichern und Daten-Model erzeugen',
 		undo: 'Zurücknehmen',
