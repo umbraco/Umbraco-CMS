@@ -128,7 +128,7 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
                 _idKeyMap.ClearCache(payload.Id);
             }
 
-            if (mediaCache.Success is false)
+            if (mediaCache.Success is false || mediaCache.Result is null)
             {
                 continue;
             }
@@ -136,14 +136,14 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
             // repository cache
             // it *was* done for each pathId but really that does not make sense
             // only need to do it for the current media
-            mediaCache.Result?.Clear(RepositoryCacheKeys.GetKey<IMedia, int>(payload.Id));
-            mediaCache.Result?.Clear(RepositoryCacheKeys.GetKey<IMedia, Guid?>(payload.Key));
+            mediaCache.Result.Clear(RepositoryCacheKeys.GetKey<IMedia, int>(payload.Id));
+            mediaCache.Result.Clear(RepositoryCacheKeys.GetKey<IMedia, Guid?>(payload.Key));
 
             // remove those that are in the branch
             if (payload.ChangeTypes.HasTypesAny(TreeChangeTypes.RefreshBranch | TreeChangeTypes.Remove))
             {
                 var pathid = "," + payload.Id + ",";
-                mediaCache.Result?.ClearOfType<IMedia>((_, v) => v.Path?.Contains(pathid) ?? false);
+                mediaCache.Result.ClearOfType<IMedia>((_, v) => v.Path?.Contains(pathid) ?? false);
             }
         }
 
@@ -152,7 +152,7 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
 
     public override void Refresh(JsonPayload[]? payloads)
     {
-        if (payloads == null)
+        if (payloads is null)
         {
             return;
         }
