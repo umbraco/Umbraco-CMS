@@ -116,7 +116,6 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 	#renderMore() {
 		if (this._numberOfActions === 1) return nothing;
 		const actionsAriaLabel = this.localize.term('buttons_viewActionsFor', [this.label]);
-		console.log(actionsAriaLabel);
 
 		return html`
 			<umb-entity-actions-dropdown .label=${actionsAriaLabel} compact>
@@ -129,20 +128,21 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 		if (!this._firstActionApi || !this._firstActionManifest) return nothing;
 
 		const createAriaLabel = this._firstActionApi.getCreateAriaLabel?.(this.label);
-		console.log(createAriaLabel);
+		const actionName = this.localize.string(this._firstActionManifest.meta.label);
+
 		return html`<uui-button
 			label=${ifDefined(createAriaLabel)}
+			.label=${actionName}
 			data-mark=${'entity-action:' + this._firstActionManifest.alias}
 			@click=${this.#onFirstActionClick}
 			href="${ifDefined(this._firstActionHref)}">
-			${this.localize.string(this._firstActionManifest.meta.label)}
 			<uui-icon name=${ifDefined(this._firstActionManifest.meta.icon)}></uui-icon>
 		</uui-button>`;
 	}
 
 	static override styles = [
 		css`
-			uui-scroll-container {
+			uui-scroll-container {w
 				max-height: 700px;
 			}
 		`,

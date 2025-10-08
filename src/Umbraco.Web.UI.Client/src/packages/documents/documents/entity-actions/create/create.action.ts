@@ -34,8 +34,11 @@ export class UmbCreateDocumentEntityAction extends UmbEntityActionBase<never> {
 		});
 	}
 
-	getAriaLabel(entityName?: string) {
-        return this.#localization.term('actions_createFor', [entityName ?? '']);
+	getCreateAriaLabel(entityName?: string) {
+        return this.#localization.term('buttons_createFor', [entityName ?? '']);
+    }
+	getActionsAriaLabel(entityName?: string) {
+        return this.#localization.term('buttons_viewActionsFor', [entityName ?? '']);
 	}
 }
 export default UmbCreateDocumentEntityAction;

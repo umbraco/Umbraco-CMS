@@ -135,7 +135,7 @@ export default {
 		clearSelection: 'Clear selection',
 		select: 'Select',
 		choose: 'Choose',
-		createFor: 'Create for {0}',
+		createFor: 'Create item for {0}',
 		somethingElse: 'Do something else',
 		bold: 'Bold',
 		deindent: 'Cancel Paragraph Indent',
