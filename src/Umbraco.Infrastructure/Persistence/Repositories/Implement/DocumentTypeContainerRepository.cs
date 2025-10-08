@@ -12,13 +12,15 @@ internal sealed class DocumentTypeContainerRepository : EntityContainerRepositor
         IScopeAccessor scopeAccessor,
         AppCaches cache,
         ILogger<DocumentTypeContainerRepository> logger,
-        IRepositoryCacheVersionService repositoryCacheVersionService)
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
         : base(
             scopeAccessor,
             cache,
             logger,
             Constants.ObjectTypes.DocumentTypeContainer,
-            repositoryCacheVersionService)
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
     }
 }

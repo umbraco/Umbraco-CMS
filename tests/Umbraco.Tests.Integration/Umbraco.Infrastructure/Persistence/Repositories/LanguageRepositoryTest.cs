@@ -366,7 +366,7 @@ internal sealed class LanguageRepositoryTest : UmbracoIntegrationTest
         }
     }
 
-    private LanguageRepository CreateRepository(IScopeProvider provider) => new((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<LanguageRepository>(), Mock.Of<IRepositoryCacheVersionService>());
+    private LanguageRepository CreateRepository(IScopeProvider provider) => new((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<LanguageRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
 
     private async Task CreateTestData()
     {

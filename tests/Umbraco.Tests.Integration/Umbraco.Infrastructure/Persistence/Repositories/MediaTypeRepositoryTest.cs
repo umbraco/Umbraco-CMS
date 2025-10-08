@@ -413,8 +413,8 @@ internal sealed class MediaTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     private MediaTypeRepository CreateRepository(IScopeProvider provider) =>
-        new((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<MediaTypeRepository>(), CommonRepository, LanguageRepository, ShortStringHelper, Mock.Of<IRepositoryCacheVersionService>(), IdKeyMap);
+        new((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<MediaTypeRepository>(), CommonRepository, LanguageRepository, ShortStringHelper, Mock.Of<IRepositoryCacheVersionService>(), IdKeyMap, Mock.Of<ICacheSyncService>());
 
     private EntityContainerRepository CreateContainerRepository(IScopeProvider provider) =>
-        new((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<EntityContainerRepository>(), Constants.ObjectTypes.MediaTypeContainer, Mock.Of<IRepositoryCacheVersionService>());
+        new((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<EntityContainerRepository>(), Constants.ObjectTypes.MediaTypeContainer, Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
 }

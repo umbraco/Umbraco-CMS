@@ -51,16 +51,15 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
     {
         appCaches ??= AppCaches.NoCache;
         var scopeAccessor = (IScopeAccessor)provider;
-        var globalSettings = new GlobalSettings();
         var commonRepository =
             new ContentTypeCommonRepository(scopeAccessor, TemplateRepository, appCaches, ShortStringHelper);
         var languageRepository =
-            new LanguageRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<LanguageRepository>(), Mock.Of<IRepositoryCacheVersionService>());
-        mediaTypeRepository = new MediaTypeRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<MediaTypeRepository>(), commonRepository, languageRepository, ShortStringHelper, Mock.Of<IRepositoryCacheVersionService>(), IdKeyMap);
-        var tagRepository = new TagRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<TagRepository>(), Mock.Of<IRepositoryCacheVersionService>());
-        var relationTypeRepository = new RelationTypeRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>(), Mock.Of<IRepositoryCacheVersionService>());
+            new LanguageRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<LanguageRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
+        mediaTypeRepository = new MediaTypeRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<MediaTypeRepository>(), commonRepository, languageRepository, ShortStringHelper, Mock.Of<IRepositoryCacheVersionService>(), IdKeyMap, Mock.Of<ICacheSyncService>());
+        var tagRepository = new TagRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<TagRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
+        var relationTypeRepository = new RelationTypeRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
         var entityRepository = new EntityRepository(scopeAccessor, AppCaches.Disabled);
-        var relationRepository = new RelationRepository(scopeAccessor, LoggerFactory.CreateLogger<RelationRepository>(), relationTypeRepository, entityRepository, Mock.Of<IRepositoryCacheVersionService>());
+        var relationRepository = new RelationRepository(scopeAccessor, LoggerFactory.CreateLogger<RelationRepository>(), relationTypeRepository, entityRepository, Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
         var propertyEditors =
             new PropertyEditorCollection(new DataEditorCollection(() => Enumerable.Empty<IDataEditor>()));
         var mediaUrlGenerators = new MediaUrlGeneratorCollection(() => Enumerable.Empty<IMediaUrlGenerator>());
@@ -82,7 +81,8 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
             DataTypeService,
             JsonSerializer,
             Mock.Of<IEventAggregator>(),
-            Mock.Of<IRepositoryCacheVersionService>());
+            Mock.Of<IRepositoryCacheVersionService>(),
+            Mock.Of<ICacheSyncService>());
         return repository;
     }
 

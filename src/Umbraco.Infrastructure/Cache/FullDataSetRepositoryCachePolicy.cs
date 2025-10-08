@@ -28,8 +28,8 @@ internal sealed class FullDataSetRepositoryCachePolicy<TEntity, TId> : Repositor
     private readonly Func<TEntity, TId> _entityGetId;
     private readonly bool _expires;
 
-    public FullDataSetRepositoryCachePolicy(IAppPolicyCache cache, IScopeAccessor scopeAccessor, Func<TEntity, TId> entityGetId, bool expires)
-        : base(cache, scopeAccessor)
+    public FullDataSetRepositoryCachePolicy(IAppPolicyCache cache, IScopeAccessor scopeAccessor, IRepositoryCacheVersionService repositoryCacheVersionService, ICacheSyncService cacheSyncService, Func<TEntity, TId> entityGetId, bool expires)
+        : base(cache, scopeAccessor, repositoryCacheVersionService, cacheSyncService)
     {
         _entityGetId = entityGetId;
         _expires = expires;

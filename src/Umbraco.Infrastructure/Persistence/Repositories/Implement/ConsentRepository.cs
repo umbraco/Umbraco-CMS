@@ -24,12 +24,14 @@ internal sealed class ConsentRepository : EntityRepositoryBase<int, IConsent>, I
         IScopeAccessor scopeAccessor,
         AppCaches cache,
         ILogger<ConsentRepository> logger,
-        IRepositoryCacheVersionService repositoryCacheVersionService)
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
         : base(
             scopeAccessor,
             cache,
             logger,
-            repositoryCacheVersionService)
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
     }
 

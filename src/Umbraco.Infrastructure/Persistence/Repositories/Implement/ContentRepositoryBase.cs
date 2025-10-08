@@ -51,8 +51,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             DataValueReferenceFactoryCollection dataValueReferenceFactories,
             IDataTypeService dataTypeService,
             IEventAggregator eventAggregator,
-            IRepositoryCacheVersionService repositoryCacheVersionService)
-            : base(scopeAccessor, cache, logger, repositoryCacheVersionService)
+            IRepositoryCacheVersionService repositoryCacheVersionService,
+            ICacheSyncService cacheSyncService)
+            : base(
+                scopeAccessor,
+                cache,
+                logger,
+                repositoryCacheVersionService,
+                cacheSyncService)
         {
             DataTypeService = dataTypeService;
             LanguageRepository = languageRepository;
@@ -86,7 +92,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 dataValueReferenceFactories,
                 dataTypeService,
                 eventAggregator,
-                StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>())
+                StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>(),
+                StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>())
         {
         }
 

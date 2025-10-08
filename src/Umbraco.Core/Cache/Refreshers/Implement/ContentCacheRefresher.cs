@@ -120,7 +120,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
 
     #region Refresher
 
-    public override void Refresh(JsonPayload[] payloads)
+    public override void RefreshInternal(JsonPayload[] payloads)
     {
         AppCaches.RuntimeCache.ClearOfType<PublicAccessEntry>();
         AppCaches.RuntimeCache.ClearByKey(CacheKeys.ContentRecycleBinCacheKey);
@@ -132,7 +132,6 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         // If published elements become their own entities with relations, instead of just property data, we can revisit this.
         _cacheManager.ElementsCache.Clear();
 
-        var idsRemoved = new HashSet<int>();
         IAppPolicyCache isolatedCache = AppCaches.IsolatedCaches.GetOrCreate<IContent>();
 
         foreach (JsonPayload payload in payloads)
@@ -152,13 +151,22 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
                 var pathid = "," + payload.Id + ",";
                 isolatedCache.ClearOfType<IContent>((k, v) => v.Path?.Contains(pathid) ?? false);
             }
+        }
 
+        base.RefreshInternal(payloads);
+    }
+
+    public override void Refresh(JsonPayload[] payloads)
+    {
+        var idsRemoved = new HashSet<int>();
+
+        foreach (JsonPayload payload in payloads)
+        {
             // if the item is not a blueprint and is being completely removed, we need to refresh the domains cache if any domain was assigned to the content
             if (payload.Blueprint is false && payload.ChangeTypes.HasTypesAny(TreeChangeTypes.Remove))
             {
                 idsRemoved.Add(payload.Id);
             }
-
 
             HandleMemoryCache(payload);
             HandleRouting(payload);

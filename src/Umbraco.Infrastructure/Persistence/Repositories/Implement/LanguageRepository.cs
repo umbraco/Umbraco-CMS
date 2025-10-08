@@ -18,6 +18,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// </summary>
 internal sealed class LanguageRepository : EntityRepositoryBase<int, ILanguage>, ILanguageRepository
 {
+    private readonly IRepositoryCacheVersionService _repositoryCacheVersionService;
+    private readonly ICacheSyncService _cacheSyncService;
+
     // We need to lock this dictionary every time we do an operation on it as the languageRepository is registered as a unique implementation
     // It is used to quickly get isoCodes by Id, or the reverse by avoiding (deep)cloning dtos
     // It is rebuild on PerformGetAll
@@ -28,9 +31,17 @@ internal sealed class LanguageRepository : EntityRepositoryBase<int, ILanguage>,
         IScopeAccessor scopeAccessor,
         AppCaches cache,
         ILogger<LanguageRepository> logger,
-        IRepositoryCacheVersionService repositoryCacheVersionService)
-        : base(scopeAccessor, cache, logger,  repositoryCacheVersionService)
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            cache,
+            logger,
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
+        _repositoryCacheVersionService = repositoryCacheVersionService;
+        _cacheSyncService = cacheSyncService;
     }
 
     private FullDataSetRepositoryCachePolicy<ILanguage, int>? TypedCachePolicy =>
@@ -131,7 +142,7 @@ internal sealed class LanguageRepository : EntityRepositoryBase<int, ILanguage>,
     public int? GetDefaultId() => GetDefault().Id;
 
     protected override IRepositoryCachePolicy<ILanguage, int> CreateCachePolicy() =>
-        new FullDataSetRepositoryCachePolicy<ILanguage, int>(GlobalIsolatedCache, ScopeAccessor, GetEntityId, /*expires:*/ false);
+        new FullDataSetRepositoryCachePolicy<ILanguage, int>(GlobalIsolatedCache, ScopeAccessor,  _repositoryCacheVersionService, _cacheSyncService, GetEntityId, /*expires:*/ false);
 
     protected ILanguage ConvertFromDto(LanguageDto dto)
     {

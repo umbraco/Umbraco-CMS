@@ -12,16 +12,19 @@ internal class RepositoryCacheVersionService : IRepositoryCacheVersionService
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly IRepositoryCacheVersionRepository _repositoryCacheVersionRepository;
     private readonly ILogger<RepositoryCacheVersionService> _logger;
+    private readonly IRepositoryCacheVersionAccessor _repositoryCacheVersionAccessor;
     private readonly ConcurrentDictionary<string, Guid> _cacheVersions = new();
 
     public RepositoryCacheVersionService(
         ICoreScopeProvider scopeProvider,
         IRepositoryCacheVersionRepository repositoryCacheVersionRepository,
-        ILogger<RepositoryCacheVersionService> logger)
+        ILogger<RepositoryCacheVersionService> logger,
+        IRepositoryCacheVersionAccessor repositoryCacheVersionAccessor)
     {
         _scopeProvider = scopeProvider;
         _repositoryCacheVersionRepository = repositoryCacheVersionRepository;
         _logger = logger;
+        _repositoryCacheVersionAccessor = repositoryCacheVersionAccessor;
     }
 
     /// <inheritdoc />
@@ -32,11 +35,10 @@ internal class RepositoryCacheVersionService : IRepositoryCacheVersionService
 
         // We have to take a read lock to ensure the cache is not being updated while we check the version.
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-        scope.ReadLock(Constants.Locks.CacheVersion);
 
         var cacheKey = GetCacheKey<TEntity>();
 
-        RepositoryCacheVersion? databaseVersion = await _repositoryCacheVersionRepository.GetAsync(cacheKey);
+        RepositoryCacheVersion? databaseVersion = await _repositoryCacheVersionAccessor.GetAsync(cacheKey);
 
         if (databaseVersion?.Version is null)
         {
@@ -109,6 +111,7 @@ internal class RepositoryCacheVersionService : IRepositoryCacheVersionService
             _cacheVersions[version.Identifier] = Guid.Parse(version.Version);
         }
 
+        _repositoryCacheVersionAccessor.CachesSynced();
         scope.Complete();
     }
 

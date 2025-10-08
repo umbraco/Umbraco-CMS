@@ -27,8 +27,14 @@ internal sealed class SingleItemsOnlyRepositoryCachePolicy<TEntity, TId> : Defau
         IAppPolicyCache cache,
         IScopeAccessor scopeAccessor,
         RepositoryCachePolicyOptions options,
-        IRepositoryCacheVersionService repositoryCacheVersionService)
-        : base(cache, scopeAccessor, options,  repositoryCacheVersionService)
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(
+            cache,
+            scopeAccessor,
+            options,
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
     }
 
@@ -38,7 +44,8 @@ internal sealed class SingleItemsOnlyRepositoryCachePolicy<TEntity, TId> : Defau
             cache,
             scopeAccessor,
             options,
-            StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>())
+            StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>(),
+            StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>())
     {
     }
 

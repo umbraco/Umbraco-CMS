@@ -19,6 +19,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// </summary>
 internal sealed class MediaTypeRepository : ContentTypeRepositoryBase<IMediaType>, IMediaTypeRepository
 {
+    private readonly IRepositoryCacheVersionService _repositoryCacheVersionService;
+    private readonly ICacheSyncService _cacheSyncService;
+
     public MediaTypeRepository(
         IScopeAccessor scopeAccessor,
         AppCaches cache,
@@ -27,7 +30,8 @@ internal sealed class MediaTypeRepository : ContentTypeRepositoryBase<IMediaType
         ILanguageRepository languageRepository,
         IShortStringHelper shortStringHelper,
         IRepositoryCacheVersionService repositoryCacheVersionService,
-        IIdKeyMap idKeyMap)
+        IIdKeyMap idKeyMap,
+        ICacheSyncService cacheSyncService)
         : base(
             scopeAccessor,
             cache,
@@ -36,8 +40,11 @@ internal sealed class MediaTypeRepository : ContentTypeRepositoryBase<IMediaType
             languageRepository,
             shortStringHelper,
             repositoryCacheVersionService,
-            idKeyMap)
+            idKeyMap,
+            cacheSyncService)
     {
+        _repositoryCacheVersionService = repositoryCacheVersionService;
+        _cacheSyncService = cacheSyncService;
     }
 
     protected override bool SupportsPublishing => MediaType.SupportsPublishingConst;
@@ -45,7 +52,7 @@ internal sealed class MediaTypeRepository : ContentTypeRepositoryBase<IMediaType
     protected override Guid NodeObjectTypeId => Constants.ObjectTypes.MediaType;
 
     protected override IRepositoryCachePolicy<IMediaType, int> CreateCachePolicy() =>
-        new FullDataSetRepositoryCachePolicy<IMediaType, int>(GlobalIsolatedCache, ScopeAccessor, GetEntityId, /*expires:*/ true);
+        new FullDataSetRepositoryCachePolicy<IMediaType, int>(GlobalIsolatedCache, ScopeAccessor,  _repositoryCacheVersionService, _cacheSyncService, GetEntityId, /*expires:*/ true);
 
     // every GetExists method goes cachePolicy.GetSomething which in turns goes PerformGetAll,
     // since this is a FullDataSet policy - and everything is cached

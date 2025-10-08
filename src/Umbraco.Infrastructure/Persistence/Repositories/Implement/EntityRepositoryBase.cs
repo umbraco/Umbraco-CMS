@@ -23,6 +23,7 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
     where TEntity : class, IEntity
 {
     private readonly IRepositoryCacheVersionService _repositoryCacheVersionService;
+    private readonly ICacheSyncService _cacheSyncService;
     private static RepositoryCachePolicyOptions? _defaultOptions;
     private IRepositoryCachePolicy<TEntity, TId>? _cachePolicy;
     private IQuery<TEntity>? _hasIdQuery;
@@ -34,10 +35,12 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
         IScopeAccessor scopeAccessor,
         AppCaches appCaches,
         ILogger<EntityRepositoryBase<TId, TEntity>> logger,
-        IRepositoryCacheVersionService repositoryCacheVersionService)
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
         : base(scopeAccessor, appCaches)
     {
         _repositoryCacheVersionService = repositoryCacheVersionService;
+        _cacheSyncService = cacheSyncService;
         Logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -48,7 +51,8 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
             scopeAccessor,
             appCaches,
             logger,
-            StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>())
+            StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>(),
+            StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>())
     {
     }
 
@@ -215,7 +219,13 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
     ///     Create the repository cache policy
     /// </summary>
     protected virtual IRepositoryCachePolicy<TEntity, TId> CreateCachePolicy()
-        => new DefaultRepositoryCachePolicy<TEntity, TId>(GlobalIsolatedCache, ScopeAccessor, DefaultOptions, _repositoryCacheVersionService);
+        => new DefaultRepositoryCachePolicy<TEntity, TId>(
+            GlobalIsolatedCache,
+            ScopeAccessor,
+            DefaultOptions,
+            _repositoryCacheVersionService,
+            _cacheSyncService
+            );
 
     protected abstract TEntity? PerformGet(TId? id);
 

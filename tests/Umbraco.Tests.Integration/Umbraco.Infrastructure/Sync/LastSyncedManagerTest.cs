@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Sync;
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
 public class LastSyncedManagerTest : UmbracoIntegrationTest
 {
-    private ILastSyncedManager manager => GetRequiredService<ILastSyncedManager>();
+    private LastSyncedManager manager => (LastSyncedManager)GetRequiredService<ILastSyncedManager>();
 
     [Test]
     public async Task Last_Synced_Internal_Id_Is_Initially_Null()
@@ -32,13 +32,13 @@ public class LastSyncedManagerTest : UmbracoIntegrationTest
     [Test]
     public async Task Last_Synced_Internal_Id_Cannot_Be_Negative()
     {
-        Assert.Throws<Exception>(() => manager.SaveLastSyncedInternalAsync(-1).GetAwaiter().GetResult());
+        Assert.Throws<ArgumentException>(() => manager.SaveLastSyncedInternalAsync(-1).GetAwaiter().GetResult());
     }
 
     [Test]
     public async Task Last_Synced_External_Id_Cannot_Be_Negative()
     {
-        Assert.Throws<Exception>(() => manager.SaveLastSyncedExternalAsync(-1).GetAwaiter().GetResult());
+        Assert.Throws<ArgumentException>(() => manager.SaveLastSyncedExternalAsync(-1).GetAwaiter().GetResult());
     }
 
     [Test]
@@ -69,11 +69,13 @@ public class LastSyncedManagerTest : UmbracoIntegrationTest
         Random random = new Random();
         int testId = random.Next();
         await manager.SaveLastSyncedExternalAsync(testId);
+        manager.ClearLocalCache();
 
         // Make sure not to delete if not too old.
         await manager.DeleteOlderThanAsync(DateTime.Now - TimeSpan.FromDays(1));
         int? lastSynced = await manager.GetLastSyncedExternalAsync();
         Assert.NotNull(lastSynced);
+        manager.ClearLocalCache();
 
         // Make sure to delete if too old.
         await manager.DeleteOlderThanAsync(DateTime.Now + TimeSpan.FromDays(1));
@@ -87,11 +89,13 @@ public class LastSyncedManagerTest : UmbracoIntegrationTest
         Random random = new Random();
         int testId = random.Next();
         await manager.SaveLastSyncedInternalAsync(testId);
+        manager.ClearLocalCache();
 
         // Make sure not to delete if not too old.
         await manager.DeleteOlderThanAsync(DateTime.Now - TimeSpan.FromDays(1));
         int? lastSynced = await manager.GetLastSyncedInternalAsync();
         Assert.NotNull(lastSynced);
+        manager.ClearLocalCache();
 
         // Make sure to delete if too old.
         await manager.DeleteOlderThanAsync(DateTime.Now + TimeSpan.FromDays(1));
@@ -111,8 +115,11 @@ public class LastSyncedManagerTest : UmbracoIntegrationTest
 
             await manager.SaveLastSyncedExternalAsync(2);
             await manager.SaveLastSyncedInternalAsync(2);
+            manager.ClearLocalCache();
+
 
             Assert.NotNull(await manager.GetLastSyncedExternalAsync());
+            manager.ClearLocalCache();
 
             await manager.DeleteOlderThanAsync(DateTime.Now);
 

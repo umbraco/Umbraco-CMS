@@ -21,15 +21,18 @@ public abstract class RepositoryCachePolicyBase<TEntity, TId> : IRepositoryCache
     private readonly IAppPolicyCache _globalCache;
     private readonly IScopeAccessor _scopeAccessor;
     private readonly IRepositoryCacheVersionService _cacheVersionService;
+    private readonly ICacheSyncService _cacheSyncService;
 
     protected RepositoryCachePolicyBase(
         IAppPolicyCache globalCache,
         IScopeAccessor scopeAccessor,
-        IRepositoryCacheVersionService cacheVersionService)
+        IRepositoryCacheVersionService cacheVersionService,
+        ICacheSyncService cacheSyncService)
     {
         _globalCache = globalCache ?? throw new ArgumentNullException(nameof(globalCache));
         _scopeAccessor = scopeAccessor ?? throw new ArgumentNullException(nameof(scopeAccessor));
         _cacheVersionService = cacheVersionService;
+        _cacheSyncService = cacheSyncService;
     }
 
     [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
@@ -37,7 +40,8 @@ public abstract class RepositoryCachePolicyBase<TEntity, TId> : IRepositoryCache
     : this(
         globalCache,
         scopeAccessor,
-        StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>())
+        StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>(),
+        StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>())
     {
     }
 
@@ -91,10 +95,12 @@ public abstract class RepositoryCachePolicyBase<TEntity, TId> : IRepositoryCache
     protected void EnsureCacheIsSynced()
     {
         var synced = _cacheVersionService.IsCacheSyncedAsync<TEntity>().GetAwaiter().GetResult();
-        if (synced is false)
+        if (synced)
         {
-            // TODO: Trigger a cache refresh
+            return;
         }
+
+        _cacheSyncService.SyncInternal(CancellationToken.None);
     }
 
     /// <summary>

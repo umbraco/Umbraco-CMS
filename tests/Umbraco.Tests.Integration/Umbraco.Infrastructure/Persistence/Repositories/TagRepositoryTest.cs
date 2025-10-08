@@ -1141,5 +1141,5 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
     }
 
     private TagRepository CreateRepository(IScopeProvider provider) =>
-        new((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<TagRepository>(), Mock.Of<IRepositoryCacheVersionService>());
+        new((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<TagRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
 }

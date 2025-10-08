@@ -18,6 +18,8 @@ internal sealed class RepositoryCacheVersionServiceTests : UmbracoIntegrationTes
 
     private ICoreScopeProvider CoreScopeProvider => GetRequiredService<ICoreScopeProvider>();
 
+    protected override void CustomTestSetup(IUmbracoBuilder builder) => builder.LoadBalanceIsolatedCaches();
+
     [Test]
     public async Task Cache_Is_Initially_Synced()
     {

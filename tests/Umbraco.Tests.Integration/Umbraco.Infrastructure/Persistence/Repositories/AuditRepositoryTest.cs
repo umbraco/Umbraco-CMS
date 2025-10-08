@@ -36,7 +36,7 @@ internal sealed class AuditRepositoryTest : UmbracoIntegrationTest
         var sp = ScopeProvider;
         using (var scope = ScopeProvider.CreateScope())
         {
-            var repo = new AuditRepository((IScopeAccessor)sp, _logger, Mock.Of<IRepositoryCacheVersionService>());
+            var repo = new AuditRepository((IScopeAccessor)sp, _logger, Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
             repo.Save(new AuditItem(-1, AuditType.System, -1, UmbracoObjectTypes.Document.GetName(), "This is a System audit trail"));
 
             var dtos = ScopeAccessor.AmbientScope.Database.Fetch<LogDto>("WHERE id > -1");
@@ -84,7 +84,7 @@ internal sealed class AuditRepositoryTest : UmbracoIntegrationTest
         var sp = ScopeProvider;
         using (var scope = sp.CreateScope())
         {
-            var repo = new AuditRepository((IScopeAccessor)sp, _logger, Mock.Of<IRepositoryCacheVersionService>());
+            var repo = new AuditRepository((IScopeAccessor)sp, _logger, Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
 
             for (var i = 0; i < 100; i++)
             {
@@ -97,7 +97,7 @@ internal sealed class AuditRepositoryTest : UmbracoIntegrationTest
 
         using (var scope = sp.CreateScope())
         {
-            var repo = new AuditRepository((IScopeAccessor)sp, _logger, Mock.Of<IRepositoryCacheVersionService>());
+            var repo = new AuditRepository((IScopeAccessor)sp, _logger, Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
 
             var page = repo.GetPagedResultsByQuery(sp.CreateQuery<IAuditItem>(), 0, 10, out var total, Direction.Descending, null, null);
 
@@ -112,7 +112,7 @@ internal sealed class AuditRepositoryTest : UmbracoIntegrationTest
         var sp = ScopeProvider;
         using (var scope = sp.CreateScope())
         {
-            var repo = new AuditRepository((IScopeAccessor)sp, _logger, Mock.Of<IRepositoryCacheVersionService>());
+            var repo = new AuditRepository((IScopeAccessor)sp, _logger, Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
 
             for (var i = 0; i < 100; i++)
             {
@@ -125,7 +125,7 @@ internal sealed class AuditRepositoryTest : UmbracoIntegrationTest
 
         using (var scope = sp.CreateScope())
         {
-            var repo = new AuditRepository((IScopeAccessor)sp, _logger, Mock.Of<IRepositoryCacheVersionService>());
+            var repo = new AuditRepository((IScopeAccessor)sp, _logger, Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
 
             var query = sp.CreateQuery<IAuditItem>().Where(x => x.UserId == -1);
 
@@ -161,7 +161,7 @@ internal sealed class AuditRepositoryTest : UmbracoIntegrationTest
         var sp = ScopeProvider;
         using (var scope = sp.CreateScope())
         {
-            var repo = new AuditRepository((IScopeAccessor)sp, _logger, Mock.Of<IRepositoryCacheVersionService>());
+            var repo = new AuditRepository((IScopeAccessor)sp, _logger, Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
 
             for (var i = 0; i < 100; i++)
             {
@@ -174,7 +174,7 @@ internal sealed class AuditRepositoryTest : UmbracoIntegrationTest
 
         using (var scope = sp.CreateScope())
         {
-            var repo = new AuditRepository((IScopeAccessor)sp, _logger, Mock.Of<IRepositoryCacheVersionService>());
+            var repo = new AuditRepository((IScopeAccessor)sp, _logger, Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
 
             var page = repo.GetPagedResultsByQuery(
                     sp.CreateQuery<IAuditItem>(),
@@ -198,7 +198,7 @@ internal sealed class AuditRepositoryTest : UmbracoIntegrationTest
         var sp = ScopeProvider;
         using (var scope = sp.CreateScope())
         {
-            var repo = new AuditRepository((IScopeAccessor)sp, _logger, Mock.Of<IRepositoryCacheVersionService>());
+            var repo = new AuditRepository((IScopeAccessor)sp, _logger, Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
 
             for (var i = 0; i < 100; i++)
             {
@@ -211,7 +211,7 @@ internal sealed class AuditRepositoryTest : UmbracoIntegrationTest
 
         using (var scope = sp.CreateScope())
         {
-            var repo = new AuditRepository((IScopeAccessor)sp, _logger, Mock.Of<IRepositoryCacheVersionService>());
+            var repo = new AuditRepository((IScopeAccessor)sp, _logger, Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
 
             var page = repo.GetPagedResultsByQuery(
                     sp.CreateQuery<IAuditItem>(),

@@ -33,6 +33,11 @@ public abstract class JsonCacheRefresherBase<TNotification, TJsonPayload> : Cach
     public virtual void Refresh(string json) =>
         OnCacheUpdated(NotificationFactory.Create<TNotification>(json, MessageType.RefreshByJson));
 
+    /// <inheritdoc />
+    public virtual void RefreshInternal(string json)
+    {
+    }
+
     #region Json
 
     /// <summary>

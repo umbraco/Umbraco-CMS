@@ -237,7 +237,7 @@ internal sealed class RedirectUrlRepositoryTests : UmbracoIntegrationTest
     }
 
     private IRedirectUrlRepository CreateRepository(IScopeProvider provider) =>
-        new RedirectUrlRepository((IScopeAccessor)provider, AppCaches, LoggerFactory.CreateLogger<RedirectUrlRepository>(), Mock.Of<IRepositoryCacheVersionService>());
+        new RedirectUrlRepository((IScopeAccessor)provider, AppCaches, LoggerFactory.CreateLogger<RedirectUrlRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
 
     private IContent _textpage;
     private IContent _subpage;

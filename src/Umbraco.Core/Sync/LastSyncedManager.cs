@@ -1,4 +1,5 @@
-﻿using Umbraco.Cms.Core.Persistence.Repositories;
+﻿using System.ComponentModel;
+using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 
 namespace Umbraco.Cms.Core.Sync;
@@ -8,6 +9,8 @@ internal sealed class LastSyncedManager : ILastSyncedManager
 {
     private readonly ILastSyncedRepository _lastSyncedRepository;
     private readonly ICoreScopeProvider _coreScopeProvider;
+    private int? _lastSyncedInternalId;
+    private int? _lastSyncedExternalId;
 
     public LastSyncedManager(ILastSyncedRepository lastSyncedRepository, ICoreScopeProvider coreScopeProvider)
     {
@@ -18,21 +21,31 @@ internal sealed class LastSyncedManager : ILastSyncedManager
     /// <inheritdoc/>
     public async Task<int?> GetLastSyncedInternalAsync()
     {
+        if (_lastSyncedInternalId is not null)
+        {
+            return _lastSyncedInternalId;
+        }
+
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
-        int? internalId = await _lastSyncedRepository.GetInternalIdAsync();
+        _lastSyncedInternalId = await _lastSyncedRepository.GetInternalIdAsync();
         scope.Complete();
 
-        return internalId;
+        return _lastSyncedInternalId;
     }
 
     /// <inheritdoc/>
     public async Task<int?> GetLastSyncedExternalAsync()
     {
+        if (_lastSyncedExternalId is not null)
+        {
+            return _lastSyncedExternalId;
+        }
+
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
-        int? externalId = await _lastSyncedRepository.GetExternalIdAsync();
+        _lastSyncedExternalId = await _lastSyncedRepository.GetExternalIdAsync();
         scope.Complete();
 
-        return externalId;
+        return _lastSyncedExternalId;
     }
 
     /// <inheritdoc/>
@@ -45,6 +58,7 @@ internal sealed class LastSyncedManager : ILastSyncedManager
 
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         await _lastSyncedRepository.SaveInternalIdAsync(id);
+        _lastSyncedInternalId = id;
         scope.Complete();
     }
 
@@ -58,6 +72,7 @@ internal sealed class LastSyncedManager : ILastSyncedManager
 
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         await _lastSyncedRepository.SaveExternalIdAsync(id);
+        _lastSyncedExternalId = id;
         scope.Complete();
     }
 
@@ -67,5 +82,13 @@ internal sealed class LastSyncedManager : ILastSyncedManager
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         await _lastSyncedRepository.DeleteEntriesOlderThanAsync(date);
         scope.Complete();
+    }
+
+    // Used for testing purposes only
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    internal void ClearLocalCache()
+    {
+        _lastSyncedInternalId = null;
+        _lastSyncedExternalId = null;
     }
 }

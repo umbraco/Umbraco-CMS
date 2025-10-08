@@ -33,7 +33,7 @@ internal sealed class DomainRepositoryTest : UmbracoIntegrationTest
     {
         var accessor = (IScopeAccessor)provider;
         var domainRepository =
-            new DomainRepository(accessor, AppCaches.NoCache, LoggerFactory.CreateLogger<DomainRepository>(), Mock.Of<IRepositoryCacheVersionService>());
+            new DomainRepository(accessor, AppCaches.NoCache, LoggerFactory.CreateLogger<DomainRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
         return domainRepository;
     }
 

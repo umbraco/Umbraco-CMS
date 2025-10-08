@@ -17,12 +17,14 @@ internal sealed class AuditRepository : EntityRepositoryBase<int, IAuditItem>, I
     public AuditRepository(
         IScopeAccessor scopeAccessor,
         ILogger<AuditRepository> logger,
-        IRepositoryCacheVersionService repositoryCacheVersionService)
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
         : base(
             scopeAccessor,
             AppCaches.NoCache,
             logger,
-            repositoryCacheVersionService)
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
     }
 

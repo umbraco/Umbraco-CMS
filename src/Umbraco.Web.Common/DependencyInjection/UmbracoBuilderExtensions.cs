@@ -46,6 +46,7 @@ using Umbraco.Cms.Web.Common;
 using Umbraco.Cms.Web.Common.ApplicationModels;
 using Umbraco.Cms.Web.Common.AspNetCore;
 using Umbraco.Cms.Web.Common.Blocks;
+using Umbraco.Cms.Web.Common.Cache;
 using Umbraco.Cms.Web.Common.Configuration;
 using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Common.DependencyInjection;
@@ -104,6 +105,7 @@ public static partial class UmbracoBuilderExtensions
         // is just based on AsyncLocal, see https://github.com/dotnet/aspnetcore/blob/main/src/Http/Http/src/HttpContextAccessor.cs
         IHttpContextAccessor httpContextAccessor = new HttpContextAccessor();
         services.AddSingleton(httpContextAccessor);
+        services.AddUnique<IRepositoryCacheVersionAccessor, RepositoryCacheVersionAccessor>();
 
         var requestCache = new HttpContextRequestAppCache(httpContextAccessor);
         var appCaches = AppCaches.Create(requestCache);

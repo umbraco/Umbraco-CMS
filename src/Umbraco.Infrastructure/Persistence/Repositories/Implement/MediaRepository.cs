@@ -14,6 +14,7 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
@@ -51,7 +52,8 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
         IDataTypeService dataTypeService,
         IJsonSerializer serializer,
         IEventAggregator eventAggregator,
-        IRepositoryCacheVersionService repositoryCacheVersionService)
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
         : base(
             scopeAccessor,
             cache,
@@ -63,7 +65,8 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
             dataValueReferenceFactories,
             dataTypeService,
             eventAggregator,
-            repositoryCacheVersionService)
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
         _cache = cache;
         _mediaTypeRepository = mediaTypeRepository ?? throw new ArgumentNullException(nameof(mediaTypeRepository));
@@ -75,7 +78,8 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
             scopeAccessor,
             cache,
             loggerFactory.CreateLogger<MediaByGuidReadRepository>(),
-            repositoryCacheVersionService);
+            repositoryCacheVersionService,
+            cacheSyncService);
     }
 
     [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
@@ -110,7 +114,8 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
             dataTypeService,
             serializer,
             eventAggregator,
-            StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>()
+            StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>(),
+            StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>()
             )
     {
     }
@@ -582,8 +587,14 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
             IScopeAccessor scopeAccessor,
             AppCaches cache,
             ILogger<MediaByGuidReadRepository> logger,
-            IRepositoryCacheVersionService repositoryCacheVersionService)
-            : base(scopeAccessor, cache, logger,  repositoryCacheVersionService) =>
+            IRepositoryCacheVersionService repositoryCacheVersionService,
+            ICacheSyncService cacheSyncService)
+            : base(
+                scopeAccessor,
+                cache,
+                logger,
+                repositoryCacheVersionService,
+                cacheSyncService) =>
             _outerRepo = outerRepo;
 
         protected override IMedia? PerformGet(Guid id)

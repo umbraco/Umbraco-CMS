@@ -21,8 +21,14 @@ internal sealed class TagRepository : EntityRepositoryBase<int, ITag>, ITagRepos
         IScopeAccessor scopeAccessor,
         AppCaches cache,
         ILogger<TagRepository> logger,
-        IRepositoryCacheVersionService repositoryCacheVersionService)
-        : base(scopeAccessor, cache, logger, repositoryCacheVersionService)
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            cache,
+            logger,
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
     }
 

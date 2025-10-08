@@ -28,6 +28,8 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
     private readonly IFileSystem? _viewsFileSystem;
     private readonly IViewHelper _viewHelper;
     private readonly IOptionsMonitor<RuntimeSettings> _runtimeSettings;
+    private readonly IRepositoryCacheVersionService _repositoryCacheVersionService;
+    private readonly ICacheSyncService _cacheSyncService;
 
     public TemplateRepository(
         IScopeAccessor scopeAccessor,
@@ -37,13 +39,21 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
         IShortStringHelper shortStringHelper,
         IViewHelper viewHelper,
         IOptionsMonitor<RuntimeSettings> runtimeSettings,
-        IRepositoryCacheVersionService repositoryCacheVersionService)
-        : base(scopeAccessor, cache, logger, repositoryCacheVersionService)
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            cache,
+            logger,
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
         _shortStringHelper = shortStringHelper;
         _viewsFileSystem = fileSystems.MvcViewsFileSystem;
         _viewHelper = viewHelper;
         _runtimeSettings = runtimeSettings;
+        _repositoryCacheVersionService = repositoryCacheVersionService;
+        _cacheSyncService = cacheSyncService;
     }
 
     public Stream GetFileContentStream(string filepath)
@@ -86,8 +96,13 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
     }
 
     protected override IRepositoryCachePolicy<ITemplate, int> CreateCachePolicy() =>
-        new FullDataSetRepositoryCachePolicy<ITemplate, int>(GlobalIsolatedCache, ScopeAccessor,
-            GetEntityId, /*expires:*/ false);
+        new FullDataSetRepositoryCachePolicy<ITemplate, int>(
+            GlobalIsolatedCache,
+            ScopeAccessor,
+            _repositoryCacheVersionService,
+            _cacheSyncService,
+            GetEntityId,
+            /*expires:*/ false);
 
     private IEnumerable<IUmbracoEntity> GetAxisDefinitions(params TemplateDto[] templates)
     {
