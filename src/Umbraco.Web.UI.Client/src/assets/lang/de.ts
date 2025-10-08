@@ -770,6 +770,7 @@ export default {
 		design: 'Design',
 		dictionary: 'Wörterbuch',
 		dimensions: 'Abmessungen',
+		dividerPosition: (value: string | number) => `Trenner bei ${value}%`,
 		discard: 'Verwerfen',
 		down: 'nach unten',
 		download: 'Herunterladen',
