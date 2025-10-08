@@ -15,10 +15,10 @@ import { type UmbVariantContext, UMB_VARIANT_CONTEXT } from '@umbraco-cms/backof
 
 type UmbDocumentItemDataResolverModel = Omit<UmbDocumentItemModel, 'parent' | 'hasChildren'>;
 
-function IsVariantsInvariant(variants: Array<{ culture: string | null }>): boolean {
+function isVariantsInvariant(variants: Array<{ culture: string | null }>): boolean {
 	return variants?.[0]?.culture === null;
 }
-function FindVariant<T extends { culture: string | null }>(variants: Array<T>, culture: string): T | undefined {
+function findVariant<T extends { culture: string | null }>(variants: Array<T>, culture: string): T | undefined {
 	return variants.find((x) => x.culture === culture);
 }
 
@@ -175,7 +175,7 @@ export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataRes
 
 		const variants = this.getData()?.variants;
 		if (variants) {
-			const fallbackName = FindVariant(variants, this.#fallbackCulture!)?.name;
+			const fallbackName = findVariant(variants, this.#fallbackCulture!)?.name;
 			this.#name.setValue(`(${fallbackName})`);
 		} else {
 			this.#name.setValue(undefined);
@@ -210,10 +210,10 @@ export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataRes
 		const variants = this.getData()?.variants;
 		if (!variants) return undefined;
 
-		if (IsVariantsInvariant(variants)) {
+		if (isVariantsInvariant(variants)) {
 			return variants[0];
 		}
 
-		return FindVariant(variants, this.#displayCulture!);
+		return findVariant(variants, this.#displayCulture!);
 	}
 }
