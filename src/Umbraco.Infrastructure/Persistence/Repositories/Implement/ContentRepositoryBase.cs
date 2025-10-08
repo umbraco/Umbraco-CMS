@@ -1,9 +1,11 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -37,21 +39,36 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         private readonly DataValueReferenceFactoryCollection _dataValueReferenceFactories;
         private readonly IEventAggregator _eventAggregator;
 
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="scopeAccessor"></param>
-        /// <param name="cache"></param>
-        /// <param name="logger"></param>
-        /// <param name="languageRepository"></param>
-        /// <param name="relationRepository"></param>
-        /// <param name="relationTypeRepository"></param>
-        /// <param name="dataValueReferenceFactories"></param>
-        /// <param name="dataTypeService"></param>
-        /// <param name="eventAggregator"></param>
-        /// <param name="propertyEditors">
-        ///     Lazy property value collection - must be lazy because we have a circular dependency since some property editors require services, yet these services require property editors
-        /// </param>
+        protected ContentRepositoryBase(
+            IScopeAccessor scopeAccessor,
+            AppCaches cache,
+            ILogger<EntityRepositoryBase<TId, TEntity>> logger,
+            ILanguageRepository languageRepository,
+            IRelationRepository relationRepository,
+            IRelationTypeRepository relationTypeRepository,
+            PropertyEditorCollection propertyEditors,
+            DataValueReferenceFactoryCollection dataValueReferenceFactories,
+            IDataTypeService dataTypeService,
+            IEventAggregator eventAggregator,
+            IRepositoryCacheVersionService repositoryCacheVersionService,
+            ICacheSyncService cacheSyncService)
+            : base(
+                scopeAccessor,
+                cache,
+                logger,
+                repositoryCacheVersionService,
+                cacheSyncService)
+        {
+            DataTypeService = dataTypeService;
+            LanguageRepository = languageRepository;
+            RelationRepository = relationRepository;
+            RelationTypeRepository = relationTypeRepository;
+            PropertyEditors = propertyEditors;
+            _dataValueReferenceFactories = dataValueReferenceFactories;
+            _eventAggregator = eventAggregator;
+        }
+
+        [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
         protected ContentRepositoryBase(
             IScopeAccessor scopeAccessor,
             AppCaches cache,
@@ -63,16 +80,22 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             DataValueReferenceFactoryCollection dataValueReferenceFactories,
             IDataTypeService dataTypeService,
             IEventAggregator eventAggregator)
-            : base(scopeAccessor, cache, logger)
+            : this(
+                scopeAccessor,
+                cache,
+                logger,
+                languageRepository,
+                relationRepository,
+                relationTypeRepository,
+                propertyEditors,
+                dataValueReferenceFactories,
+                dataTypeService,
+                eventAggregator,
+                StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>(),
+                StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>())
         {
-            DataTypeService = dataTypeService;
-            LanguageRepository = languageRepository;
-            RelationRepository = relationRepository;
-            RelationTypeRepository = relationTypeRepository;
-            PropertyEditors = propertyEditors;
-            _dataValueReferenceFactories = dataValueReferenceFactories;
-            _eventAggregator = eventAggregator;
         }
+
 
         protected abstract TRepository This { get; }
 

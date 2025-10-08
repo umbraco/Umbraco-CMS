@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
 using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.DistributedJobs;
 
@@ -69,7 +70,7 @@ public class CacheInstructionsPruningJobTests
             .Setup(g => g.Value)
             .Returns(globalSettings);
 
-        return new CacheInstructionsPruningJob(_globalSettingsMock.Object, _cacheInstructionRepositoryMock.Object, _scopeProviderMock.Object, _timeProviderMock.Object);
+        return new CacheInstructionsPruningJob(_globalSettingsMock.Object, _cacheInstructionRepositoryMock.Object, _scopeProviderMock.Object, _timeProviderMock.Object, Mock.Of<ILastSyncedManager>());
     }
 
     private void SetupScopeProviderMock() =>

@@ -1,4 +1,6 @@
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Services;
@@ -46,4 +48,40 @@ public interface ICacheInstructionService
         CancellationToken cancellationToken,
         string localIdentity,
         int lastId);
+
+    /// <summary>
+    /// Processes all pending database cache instructions using the provided cache refreshers.
+    /// </summary>
+    /// <param name="cacheRefreshers">The collection of cache refreshers to use for processing instructions.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="localIdentity">The local identity of the executing AppDomain.</param>
+    /// <returns>The result of processing all instructions.</returns>
+    ProcessInstructionsResult ProcessAllInstructions(
+        CacheRefresherCollection cacheRefreshers,
+        CancellationToken cancellationToken,
+        string localIdentity)
+        => ProcessInstructions(
+            cacheRefreshers,
+            cancellationToken,
+            localIdentity,
+            StaticServiceProvider.Instance.GetRequiredService<ILastSyncedManager>().GetLastSyncedExternalAsync().GetAwaiter().GetResult() ?? 0);
+
+
+    /// <summary>
+    ///     Processes pending cache instructions from the database for the internal (repository) caches.
+    /// </summary>
+    /// <param name="cacheRefreshers">The collection of cache refreshers to use for processing instructions.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="localIdentity">The local identity of the executing AppDomain.</param>
+    /// <param name="lastId">The ID of the latest processed instruction.</param>
+    /// <returns>The result of processing the internal instructions.</returns>
+    ProcessInstructionsResult ProcessInternalInstructions(
+        CacheRefresherCollection cacheRefreshers,
+        CancellationToken cancellationToken,
+        string localIdentity)
+        => ProcessInstructions(
+            cacheRefreshers,
+            cancellationToken,
+            localIdentity,
+            StaticServiceProvider.Instance.GetRequiredService<ILastSyncedManager>().GetLastSyncedExternalAsync().GetAwaiter().GetResult() ?? 0);
 }
