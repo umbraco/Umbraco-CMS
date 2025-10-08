@@ -121,7 +121,17 @@ public class JsonBlockValueConverter : JsonConverter<BlockValue>
     }
 
     private List<BlockItemData> DeserializeBlockItemData(ref Utf8JsonReader reader, JsonSerializerOptions options, Type typeToConvert, string propertyName)
-        => DeserializeListOf<BlockItemData>(ref reader, options, typeToConvert, propertyName);
+    {
+        try
+        {
+            return DeserializeListOf<BlockItemData>(ref reader, options, typeToConvert, propertyName);
+        }
+        catch (JsonException ex) when (ex.Path?.EndsWith(".values") is true)
+        {
+            // If we hit a JsonException due to the "values" property conflict, attempt the fallback deserialization
+            return FallbackBlockItemDataDeserialization(ref reader, options, typeToConvert, propertyName);
+        }
+    }
 
     private List<BlockItemVariation> DeserializeBlockVariation(ref Utf8JsonReader reader, JsonSerializerOptions options, Type typeToConvert, string propertyName)
         => DeserializeListOf<BlockItemVariation>(ref reader, options, typeToConvert, propertyName);
@@ -224,5 +234,86 @@ public class JsonBlockValueConverter : JsonConverter<BlockValue>
             }
         }
     }
-}
 
+    [Obsolete("Only needed to support the old data schema. Remove in V18.")]
+    private static List<BlockItemData> FallbackBlockItemDataDeserialization(ref Utf8JsonReader reader, JsonSerializerOptions options, Type typeToConvert, string propertyName)
+    {
+        JsonElement arrayElement = JsonSerializer.Deserialize<JsonElement>(ref reader, options);
+        if (arrayElement.ValueKind != JsonValueKind.Array)
+        {
+            throw new JsonException($"Expected array for {propertyName} from type: {typeToConvert.FullName}.");
+        }
+
+        return arrayElement
+            .EnumerateArray()
+            .Select(itemElement => DeserializeBlockItemElement(itemElement, options))
+            .OfType<BlockItemData>()
+            .ToList();
+    }
+
+    [Obsolete("Only needed to support the old data schema. Remove in V18.")]
+    private static BlockItemData? DeserializeBlockItemElement(JsonElement itemElement, JsonSerializerOptions options)
+    {
+        try
+        {
+            BlockItemData? blockItem = JsonSerializer.Deserialize<BlockItemData>(itemElement.GetRawText(), options);
+            if (blockItem is null)
+            {
+                return null;
+            }
+
+            // Ensure the 'values' collection is initialized. This can happen if the JSON contained a conflicting null 'values' property.
+            blockItem.Values ??= [];
+            return blockItem;
+        }
+        catch (JsonException ex) when (ex.Path?.EndsWith(".values") == true && itemElement.TryGetProperty("values", out _))
+        {
+            // Only attempt renaming if we're confident this is a "values" property conflict
+            return DeserializeWithRenamedValues(itemElement, options);
+        }
+    }
+
+    [Obsolete("Only needed to support the old data schema. Remove in V18.")]
+    private static BlockItemData? DeserializeWithRenamedValues(JsonElement itemElement, JsonSerializerOptions options)
+    {
+        var tempPropertyName = $"_values_{Guid.NewGuid():N}";
+        var modifiedJson = CreateModifiedJsonWithRenamedValues(itemElement, tempPropertyName, options);
+        BlockItemData? blockItemData = JsonSerializer.Deserialize<BlockItemData>(modifiedJson, options);
+
+        if (blockItemData != null)
+        {
+            RestoreOriginalValuesPropertyName(blockItemData, tempPropertyName);
+        }
+
+        return blockItemData;
+    }
+
+    [Obsolete("Only needed to support the old data schema. Remove in V18.")]
+    private static string CreateModifiedJsonWithRenamedValues(JsonElement element, string tempPropertyName, JsonSerializerOptions options)
+    {
+        var jsonObject = new Dictionary<string, object?>();
+        foreach (JsonProperty property in element.EnumerateObject())
+        {
+            if (property.Name.Equals("values", StringComparison.OrdinalIgnoreCase))
+            {
+                // Rename the conflicting property to avoid deserialization conflict
+                jsonObject[tempPropertyName] = property.Value;
+                continue;
+            }
+
+            jsonObject[property.Name] = property.Value;
+        }
+
+        return JsonSerializer.Serialize(jsonObject, options);
+    }
+
+    [Obsolete("Only needed to support the old data schema. Remove in V18.")]
+    private static void RestoreOriginalValuesPropertyName(BlockItemData blockItemData, string tempPropertyName)
+    {
+        if (blockItemData.RawPropertyValues.Remove(tempPropertyName, out var valuesData))
+        {
+            // Move the temporarily renamed property back to "values" in RawPropertyValues
+            blockItemData.RawPropertyValues["values"] = valuesData;
+        }
+    }
+}
