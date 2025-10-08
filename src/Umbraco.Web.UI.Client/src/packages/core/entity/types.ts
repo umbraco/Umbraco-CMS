@@ -10,10 +10,10 @@ export interface UmbNamedEntityModel extends UmbEntityModel {
 }
 
 // TODO: Should this be in its own package?
-export interface UmbEntityWithFlags extends UmbEntityModel {
+export interface UmbEntityWithFlags extends Omit<UmbEntityModel, 'unique'> {
 	flags: Array<UmbEntityFlag>;
 }
-export interface UmbEntityWithOptionalFlags extends UmbEntityModel {
+export interface UmbEntityWithOptionalFlags extends Omit<UmbEntityModel, 'unique'> {
 	flags?: UmbEntityWithFlags['flags'];
 }
 

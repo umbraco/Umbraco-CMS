@@ -17,10 +17,6 @@ export interface UmbTreeItemModel extends UmbTreeItemModelBase {
 	parent: UmbEntityModel;
 }
 
-export interface UmbTreeItemWithFlagsModel extends UmbTreeItemModel {
-	flags: Array<UmbEntityFlag>;
-}
-
 export interface UmbTreeRootModel extends UmbTreeItemModelBase {
 	unique: null;
 }

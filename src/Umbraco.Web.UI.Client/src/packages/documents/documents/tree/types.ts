@@ -1,15 +1,15 @@
 import type { UmbDocumentEntityType, UmbDocumentRootEntityType } from '../entity.js';
 import type {
 	UmbTreeChildrenOfRequestArgs,
-	UmbTreeItemWithFlagsModel,
+	UmbTreeItemModel,
 	UmbTreeRootItemsRequestArgs,
 	UmbTreeRootModel,
 } from '@umbraco-cms/backoffice/tree';
 import type { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
-import type { UmbEntityFlag, UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import type { UmbEntityFlag, UmbEntityModel, UmbEntityWithFlags } from '@umbraco-cms/backoffice/entity';
 
-export interface UmbDocumentTreeItemModel extends UmbTreeItemWithFlagsModel {
+export interface UmbDocumentTreeItemModel extends Omit<UmbTreeItemModel, 'flags'>, UmbEntityWithFlags {
 	ancestors: Array<UmbEntityModel>;
 	entityType: UmbDocumentEntityType;
 	noAccess: boolean;
