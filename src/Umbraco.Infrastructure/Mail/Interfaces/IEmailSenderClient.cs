@@ -18,8 +18,8 @@ namespace Umbraco.Cms.Infrastructure.Mail.Interfaces
         /// Sends the email message with an expiration date.
         /// </summary>
         /// <param name="message"></param>
-        /// <param name="emailExpiration"></param>
+        /// <param name="expires"></param>
         /// <returns></returns>
-        public Task SendAsync(EmailMessage message, TimeSpan? emailExpiration);
+        public Task SendAsync(EmailMessage message, TimeSpan? expires);
     }
 }

@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Infrastructure.Mail
             => await SendAsync(message, null);
 
         /// <inheritdoc />
-        public async Task SendAsync(EmailMessage message, TimeSpan? emailExpiration)
+        public async Task SendAsync(EmailMessage message, TimeSpan? expires)
         {
             using var client = new SmtpClient();
 
@@ -44,13 +44,13 @@ namespace Umbraco.Cms.Infrastructure.Mail
 
             if (_globalSettings.IsSmtpExpiryConfigured)
             {
-                emailExpiration ??= _globalSettings.Smtp.EmailExpiration;
+                expires ??= _globalSettings.Smtp.EmailExpiration;
             }
 
-            if (emailExpiration.HasValue)
+            if (expires.HasValue)
             {
                 // `Expires` header needs to be in RFC 1123/2822 compatible format
-                mimeMessage.Headers.Add("Expires", DateTimeOffset.UtcNow.Add(emailExpiration.GetValueOrDefault()).ToString("R"));
+                mimeMessage.Headers.Add("Expires", DateTimeOffset.UtcNow.Add(expires.GetValueOrDefault()).ToString("R"));
             }
 
             if (_globalSettings.Smtp.DeliveryMethod == SmtpDeliveryMethod.Network)

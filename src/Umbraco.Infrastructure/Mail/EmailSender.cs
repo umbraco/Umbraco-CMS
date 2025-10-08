@@ -86,10 +86,10 @@ public class EmailSender : IEmailSender
     /// </summary>
     /// <param name="message"></param>
     /// <param name="emailType"></param>
-    /// <param name="emailExpiration"></param>
+    /// <param name="expires"></param>
     /// <returns></returns>
-    public async Task SendAsync(EmailMessage message, string emailType, TimeSpan? emailExpiration) =>
-        await SendAsyncInternal(message, emailType, false, emailExpiration);
+    public async Task SendAsync(EmailMessage message, string emailType, TimeSpan? expires) =>
+        await SendAsyncInternal(message, emailType, false, expires);
 
     /// <summary>
     ///     Sends the message async
@@ -107,10 +107,10 @@ public class EmailSender : IEmailSender
     /// <param name="message"></param>
     /// <param name="emailType"></param>
     /// <param name="enableNotification"></param>
-    /// <param name="emailExpiration"></param>
+    /// <param name="expires"></param>
     /// <returns></returns>
-    public async Task SendAsync(EmailMessage message, string emailType, bool enableNotification, TimeSpan? emailExpiration) =>
-        await SendAsyncInternal(message, emailType, enableNotification, emailExpiration);
+    public async Task SendAsync(EmailMessage message, string emailType, bool enableNotification, TimeSpan? expires) =>
+        await SendAsyncInternal(message, emailType, enableNotification, expires);
 
     /// <summary>
     ///     Returns true if the application should be able to send a required application email
@@ -123,7 +123,7 @@ public class EmailSender : IEmailSender
                                           || _globalSettings.IsPickupDirectoryLocationConfigured
                                           || _notificationHandlerRegistered;
 
-    private async Task SendAsyncInternal(EmailMessage message, string emailType, bool enableNotification, TimeSpan? emailExpiration)
+    private async Task SendAsyncInternal(EmailMessage message, string emailType, bool enableNotification, TimeSpan? expires)
     {
         if (enableNotification)
         {
@@ -203,7 +203,7 @@ public class EmailSender : IEmailSender
             while (true);
         }
 
-        await _emailSenderClient.SendAsync(message, emailExpiration);
+        await _emailSenderClient.SendAsync(message, expires);
     }
 
 }
