@@ -198,11 +198,9 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		} else {
 			return html`
 				<div id="header">
-					<div>
-						<b>${this.property.name}</b>
-						<i>${this.property.alias}</i>
-						<p>${this.property.description}</p>
-					</div>
+					<p><b>${this.property.name}</b></p>
+					<p><i>${this.property.alias}</i></p>
+					<p>${this.property.description}</p>
 				</div>
 				<div id="editor">
 					${this.renderPropertyTags()}
@@ -453,6 +451,12 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 				border-radius: var(--uui-border-radius);
 			}
 
+			:host([_inherited]) {
+				#header {
+					padding: 0 var(--uui-size-3, 9px);
+				}
+			}
+
 			p {
 				margin-bottom: 0;
 			}
@@ -461,10 +465,6 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 				position: sticky;
 				top: var(--uui-size-space-4);
 				height: min-content;
-			}
-
-			#header > div {
-				padding: 0 var(--uui-size-space-3, 9px);
 			}
 
 			#header i {
@@ -478,7 +478,6 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 			}
 			#editor:not(uui-button) {
 				background-color: var(--uui-color-background);
-				border: 1px dashed var(--uui-button-border-color, var(--uui-color-border-standalone, #c2c2c2));
 				border-radius: var(--uui-button-border-radius, var(--uui-border-radius, 3px));
 				min-height: 143px;
 			}
