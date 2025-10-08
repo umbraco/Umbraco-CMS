@@ -50,6 +50,7 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 		`;
 	}
 
+	// eslint-disable-next-line @typescript-eslint/naming-convention
 	override _renderExpandSymbol = () => {
 		// If this in the menu and it is a collection, then we will enforce the user to the Collection view instead of expanding.
 		// `this._forceShowExpand` is equivalent to hasCollection for this element.
