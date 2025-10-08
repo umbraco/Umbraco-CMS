@@ -197,30 +197,6 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 				padding: 2px;
 			}
 
-			#icons uui-button .checker {
-				width: 24px;
-				height: 24px;
-				border-radius: 50%;
-				background:
-					linear-gradient(
-							45deg,
-							transparent 25%,
-							rgba(0, 0, 0, 0.06) 25% 50%,
-							transparent 50% 75%,
-							rgba(0, 0, 0, 0.06) 75%
-						)
-						0 0/10px 10px,
-					linear-gradient(
-							45deg,
-							transparent 25%,
-							rgba(0, 0, 0, 0.06) 25% 50%,
-							transparent 50% 75%,
-							rgba(0, 0, 0, 0.06) 75%
-						)
-						5px 5px/10px 10px;
-				opacity: 0.9;
-			}
-
 			#icons uui-button {
 				border-radius: var(--uui-border-radius);
 				font-size: 16px; /* specific for icons */
