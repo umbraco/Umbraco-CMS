@@ -99,8 +99,6 @@ export class UmbPropertyEditorUIBlockListElement
 		const useInlineEditingAsDefault = config.getValueByAlias<boolean>('useInlineEditingAsDefault');
 		this.#managerContext.setInlineEditingMode(useInlineEditingAsDefault);
 		this.style.maxWidth = config.getValueByAlias<string>('maxPropertyWidth') ?? '';
-		// TODO:
-		//config.useSingleBlockMode, not done jet
 
 		this.#managerContext.setEditorConfiguration(config);
 
