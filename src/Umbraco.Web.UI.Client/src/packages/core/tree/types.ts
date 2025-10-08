@@ -1,11 +1,11 @@
-import type { UmbEntityFlag, UmbEntityModel, UmbEntityPotentialWithFlags } from '@umbraco-cms/backoffice/entity';
+import type { UmbEntityFlag, UmbEntityModel, UmbEntityWithOptionalFlags } from '@umbraco-cms/backoffice/entity';
 
 export type * from './entity-actions/types.js';
 export type * from './extensions/types.js';
 export type * from './folder/types.js';
 export type * from './tree-menu-item/types.js';
 
-export interface UmbTreeItemModelBase extends UmbEntityPotentialWithFlags {
+export interface UmbTreeItemModelBase extends UmbEntityWithOptionalFlags {
 	name: string;
 	hasChildren: boolean;
 	isFolder: boolean;

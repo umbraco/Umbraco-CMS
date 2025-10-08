@@ -13,7 +13,7 @@ export interface UmbNamedEntityModel extends UmbEntityModel {
 export interface UmbEntityWithFlags extends UmbEntityModel {
 	flags: Array<UmbEntityFlag>;
 }
-export interface UmbEntityPotentialWithFlags extends UmbEntityModel {
+export interface UmbEntityWithOptionalFlags extends UmbEntityModel {
 	flags?: UmbEntityWithFlags['flags'];
 }
 
