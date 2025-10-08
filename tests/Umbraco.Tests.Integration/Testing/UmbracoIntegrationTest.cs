@@ -22,7 +22,7 @@ using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Integration.Attributes;
 using Umbraco.Cms.Tests.Integration.DependencyInjection;
 using Umbraco.Cms.Tests.Integration.Extensions;
-
+using Umbraco.Cms.Web.Common.Cache;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Tests.Integration.Testing;
@@ -187,6 +187,7 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
 
         // custom helper services that might be moved out of tests eventually to benefit the community
         services.AddSingleton<IContentEditingModelFactory, ContentEditingModelFactory>();
+        services.AddUnique<IRepositoryCacheVersionAccessor, RepositoryCacheVersionAccessor>();
 
         builder.Build();
     }
