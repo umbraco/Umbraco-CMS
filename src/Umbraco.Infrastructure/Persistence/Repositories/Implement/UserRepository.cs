@@ -372,15 +372,17 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
 
         List<int> userIds = dtos.Count == 1 ? new List<int> {dtos[0].Id} : dtos.Select(x => x.Id).ToList();
         Dictionary<int, UserDto>? xUsers = dtos.Count == 1 ? null : dtos.ToDictionary(x => x.Id, x => x);
+        Sql<ISqlContext> sql;
 
         // get users2groups
 
-        Sql<ISqlContext> sql = SqlContext.Sql()
+        List<User2UserGroupDto>? user2Groups = Database.FetchByGroups<User2UserGroupDto, int>(userIds, Constants.Sql.MaxParameterCount, ints =>
+        {
+            return SqlContext.Sql()
             .Select<User2UserGroupDto>()
             .From<User2UserGroupDto>()
-            .WhereIn<User2UserGroupDto>(x => x.UserId, userIds);
-
-        List<User2UserGroupDto>? user2Groups = Database.Fetch<User2UserGroupDto>(sql);
+                .WhereIn<User2UserGroupDto>(x => x.UserId, ints);
+        }).ToList();
         var groupIds = user2Groups.Select(x => x.UserGroupId).ToList();
 
         // get groups
@@ -422,12 +424,14 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
 
         // get start nodes
 
-        sql = SqlContext.Sql()
+        List<UserStartNodeDto>? startNodes = Database.FetchByGroups<UserStartNodeDto, int>(userIds, Constants.Sql.MaxParameterCount, ints =>
+        {
+            return SqlContext.Sql()
             .Select<UserStartNodeDto>()
             .From<UserStartNodeDto>()
-            .WhereIn<UserStartNodeDto>(x => x.UserId, userIds);
+                .WhereIn<UserStartNodeDto>(x => x.UserId, ints);
+        }).ToList();
 
-        List<UserStartNodeDto>? startNodes = Database.Fetch<UserStartNodeDto>(sql);
 
         // get groups2languages
 
