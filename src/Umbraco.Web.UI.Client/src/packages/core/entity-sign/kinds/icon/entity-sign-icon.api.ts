@@ -2,7 +2,7 @@ import type { UmbEntitySignApi, UmbEntitySignApiArgs } from '../../extensions/en
 import type { MetaEntitySignIconKind } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbCreateEntityAction implements UmbEntitySignApi {
+export class UmbIconEntitySign implements UmbEntitySignApi {
 	#label: string;
 
 	constructor(host: UmbControllerHost, args: UmbEntitySignApiArgs<MetaEntitySignIconKind>) {
@@ -16,4 +16,4 @@ export class UmbCreateEntityAction implements UmbEntitySignApi {
 	destroy(): void {}
 }
 
-export { UmbCreateEntityAction as api };
+export { UmbIconEntitySign as api };
