@@ -1,9 +1,9 @@
 import type { UmbDocumentEntityType } from '../../entity.js';
-import type { UmbEntityFlag, UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
+import type { UmbEntityFlag, UmbEntityUnique, UmbEntityWithFlags } from '@umbraco-cms/backoffice/entity';
 import type { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 
-export interface UmbDocumentItemModel {
+export interface UmbDocumentItemModel extends UmbEntityWithFlags {
 	documentType: {
 		unique: string;
 		icon: string;
@@ -17,21 +17,11 @@ export interface UmbDocumentItemModel {
 	parent: { unique: UmbEntityUnique } | null; // TODO: Use UmbReferenceByUnique when it support unique as null
 	unique: string;
 	variants: Array<UmbDocumentItemVariantModel>;
-	flags?: Array<UmbEntityFlag>;
-}
-
-export interface UmbDocumentItemWithFlagsModel extends UmbDocumentItemModel {
-	variants: Array<UmbDocumentItemVariantWithFlagsModel>;
-	flags: Array<UmbEntityFlag>;
 }
 
 export interface UmbDocumentItemVariantModel {
 	name: string;
 	culture: string | null;
 	state: DocumentVariantStateModel | null;
-	flags?: Array<UmbEntityFlag>;
-}
-
-export interface UmbDocumentItemVariantWithFlagsModel extends UmbDocumentItemVariantModel {
 	flags: Array<UmbEntityFlag>;
 }

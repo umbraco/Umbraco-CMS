@@ -1,5 +1,5 @@
 import type { UmbDocumentEntityType } from '../entity.js';
-import type { UmbDocumentItemVariantWithFlagsModel } from '../item/repository/types.js';
+import type { UmbDocumentItemVariantModel } from '../item/types.js';
 import type { UmbEntityModel, UmbEntityWithFlags } from '@umbraco-cms/backoffice/entity';
 import type { UmbCollectionFilterModel } from '@umbraco-cms/backoffice/collection';
 
@@ -27,7 +27,7 @@ export interface UmbDocumentCollectionItemModel extends UmbEntityWithFlags {
 		icon: string;
 		alias: string;
 	};
-	variants: Array<UmbDocumentItemVariantWithFlagsModel>;
+	variants: Array<UmbDocumentItemVariantModel>;
 
 	/**
 	 * @deprecated From 15.3.0. Will be removed in 17.0.0. Use state in variants array instead.

@@ -1,5 +1,5 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
-import type { UmbDocumentItemWithFlagsModel } from './types.js';
+import type { UmbDocumentItemModel } from './types.js';
 import { UmbManagementApiDocumentItemDataRequestManager } from './document-item.server.request-manager.js';
 import type { DocumentItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -12,7 +12,7 @@ import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository'
  */
 export class UmbDocumentItemServerDataSource extends UmbItemServerDataSourceBase<
 	DocumentItemResponseModel,
-	UmbDocumentItemWithFlagsModel
+	UmbDocumentItemModel
 > {
 	#itemRequestManager = new UmbManagementApiDocumentItemDataRequestManager(this);
 
@@ -36,7 +36,7 @@ export class UmbDocumentItemServerDataSource extends UmbItemServerDataSourceBase
 	}
 }
 
-const mapper = (item: DocumentItemResponseModel): UmbDocumentItemWithFlagsModel => {
+const mapper = (item: DocumentItemResponseModel): UmbDocumentItemModel => {
 	return {
 		documentType: {
 			collection: item.documentType.collection ? { unique: item.documentType.collection.id } : null,
