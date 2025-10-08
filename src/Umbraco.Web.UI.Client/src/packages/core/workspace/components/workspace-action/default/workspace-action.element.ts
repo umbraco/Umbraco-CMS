@@ -2,20 +2,18 @@ import type {
 	ManifestWorkspaceAction,
 	ManifestWorkspaceActionMenuItem,
 	MetaWorkspaceActionDefaultKind,
+	UmbWorkspaceActionArgs,
 	UmbWorkspaceActionDefaultKind,
 } from '../../../types.js';
-import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
-import { html, customElement, property, state, when } from '@umbraco-cms/backoffice/external/lit';
-import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import {
-	type UmbExtensionElementAndApiInitializer,
-	UmbExtensionsElementAndApiInitializer,
-} from '@umbraco-cms/backoffice/extension-api';
+import { customElement, html, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { stringOrStringArrayIntersects } from '@umbraco-cms/backoffice/utils';
-
-import '../../workspace-action-menu/index.js';
+import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbExtensionsElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UmbAction } from '@umbraco-cms/backoffice/action';
+import type { UmbExtensionElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
+import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-workspace-action')
 export class UmbWorkspaceActionElement<
@@ -24,7 +22,7 @@ export class UmbWorkspaceActionElement<
 > extends UmbLitElement {
 	#manifest?: ManifestWorkspaceAction<MetaType>;
 	#api?: ApiType;
-	#extensionsController?: UmbExtensionsElementAndApiInitializer<
+	protected _extensionsController?: UmbExtensionsElementAndApiInitializer<
 		ManifestWorkspaceActionMenuItem,
 		'workspaceActionMenuItem',
 		ManifestWorkspaceActionMenuItem
@@ -63,6 +61,10 @@ export class UmbWorkspaceActionElement<
 		return this.#api;
 	}
 
+	protected _actionApi?: UmbAction<UmbWorkspaceActionArgs<MetaType>>;
+
+	protected _buttonLabel?: string;
+
 	@state()
 	private _buttonState?: UUIButtonState;
 
@@ -76,7 +78,7 @@ export class UmbWorkspaceActionElement<
 	private _isDisabled = false;
 
 	@state()
-	private _items: Array<UmbExtensionElementAndApiInitializer<ManifestWorkspaceActionMenuItem>> = [];
+	protected _items: Array<UmbExtensionElementAndApiInitializer<ManifestWorkspaceActionMenuItem>> = [];
 
 	#buttonStateResetTimeoutId: number | null = null;
 
@@ -101,7 +103,7 @@ export class UmbWorkspaceActionElement<
 			}
 		}
 
-		this.#observeExtensions(Array.from(aliases));
+		this.observeExtensions(Array.from(aliases));
 	}
 
 	async #onClick(event: MouseEvent) {
@@ -115,8 +117,9 @@ export class UmbWorkspaceActionElement<
 			}
 
 			try {
-				if (!this.#api) throw new Error('No api defined');
-				await this.#api.execute();
+				const api = this._actionApi ?? this.#api;
+				if (!api) throw new Error('No api defined');
+				await api.execute();
 				this._buttonState = 'success';
 				this.#initButtonStateReset();
 			} catch (reason) {
@@ -157,9 +160,9 @@ export class UmbWorkspaceActionElement<
 		}
 	}
 
-	#observeExtensions(aliases: string[]): void {
-		this.#extensionsController?.destroy();
-		this.#extensionsController = new UmbExtensionsElementAndApiInitializer<
+	protected observeExtensions(aliases: string[]): void {
+		this._extensionsController?.destroy();
+		this._extensionsController = new UmbExtensionsElementAndApiInitializer<
 			ManifestWorkspaceActionMenuItem,
 			'workspaceActionMenuItem',
 			ManifestWorkspaceActionMenuItem
@@ -167,27 +170,25 @@ export class UmbWorkspaceActionElement<
 			this,
 			umbExtensionsRegistry,
 			'workspaceActionMenuItem',
-			ExtensionApiArgsMethod,
+			(manifest) => [{ meta: manifest.meta }],
 			(action) => stringOrStringArrayIntersects(action.forWorkspaceActions, aliases),
-			(extensionControllers) => {
-				this._items = extensionControllers;
+			(actions) => {
+				this._items = actions;
 			},
 			undefined, // We can leave the alias to undefined, as we destroy this our selfs.
 		);
 	}
 
 	#renderButton() {
-		const label = this.#manifest?.meta.label
-			? this.localize.string(this.#manifest.meta.label)
-			: (this.#manifest?.name ?? '');
+		const label = this.localize.string(this._buttonLabel || this.#manifest?.meta.label || this.#manifest?.name || '');
 		return html`
 			<uui-button
 				data-mark="workspace-action:${this.#manifest?.alias}"
-				.href=${this._href}
-				look=${this.#manifest?.meta.look ?? 'default'}
 				color=${this.#manifest?.meta.color ?? 'default'}
+				look=${this.#manifest?.meta.look ?? 'default'}
 				label=${this._additionalOptions ? label + '…' : label}
 				.disabled=${this._isDisabled}
+				.href=${this._href}
 				.state=${this._buttonState}
 				@click=${this.#onClick}></uui-button>
 		`;
@@ -196,16 +197,16 @@ export class UmbWorkspaceActionElement<
 	#renderActionMenu() {
 		return html`
 			<umb-workspace-action-menu
-				.items=${this._items}
-				color="${this.#manifest?.meta.color ?? 'default'}"
-				look="${this.#manifest?.meta.look ?? 'default'}"></umb-workspace-action-menu>
+				color=${this.#manifest?.meta.color ?? 'default'}
+				look=${this.#manifest?.meta.look ?? 'default'}
+				.items=${this._items}></umb-workspace-action-menu>
 		`;
 	}
 
 	override render() {
 		return when(
 			this._items.length,
-			() => html` <uui-button-group> ${this.#renderButton()} ${this.#renderActionMenu()} </uui-button-group> `,
+			() => html`<uui-button-group>${this.#renderButton()}${this.#renderActionMenu()}</uui-button-group>`,
 			() => this.#renderButton(),
 		);
 	}
@@ -222,13 +223,4 @@ declare global {
 	interface HTMLElementTagNameMap {
 		'umb-workspace-action': UmbWorkspaceActionElement;
 	}
-}
-
-/**
- *
- * @param manifest
- * @returns An array of arguments to pass to the extension API initializer.
- */
-function ExtensionApiArgsMethod(manifest: ManifestWorkspaceActionMenuItem) {
-	return [{ meta: manifest.meta }];
 }
