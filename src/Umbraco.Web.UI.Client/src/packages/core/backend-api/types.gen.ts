@@ -482,13 +482,6 @@ export enum DataTypeChangeModeModel {
     FALSE_WITH_HELP_TEXT = 'FalseWithHelpText'
 }
 
-export type DataTypeContentTypeReferenceModel = {
-    id: string;
-    type: string | null;
-    name: string | null;
-    icon: string | null;
-};
-
 export type DataTypeItemResponseModel = {
     id: string;
     flags: Array<FlagModel>;
@@ -501,16 +494,6 @@ export type DataTypeItemResponseModel = {
 export type DataTypePropertyPresentationModel = {
     alias: string;
     value?: unknown;
-};
-
-export type DataTypePropertyReferenceModel = {
-    name: string;
-    alias: string;
-};
-
-export type DataTypeReferenceResponseModel = {
-    contentType: DataTypeContentTypeReferenceModel;
-    properties: Array<DataTypePropertyReferenceModel>;
 };
 
 export type DataTypeResponseModel = {
@@ -716,10 +699,6 @@ export type DocumentResponseModel = {
     id: string;
     flags: Array<FlagModel>;
     documentType: DocumentTypeReferenceResponseModel;
-    /**
-     * @deprecated
-     */
-    urls: Array<DocumentUrlInfoModel>;
     template?: ReferenceByIdModel | null;
     isTrashed: boolean;
 };
@@ -865,7 +844,9 @@ export type DocumentTypeTreeItemResponseModel = {
 
 export type DocumentUrlInfoModel = {
     culture: string | null;
-    url: string;
+    url: string | null;
+    message: string | null;
+    provider: string;
 };
 
 export type DocumentUrlInfoResponseModel = {
@@ -1267,10 +1248,6 @@ export type MediaResponseModel = {
     variants: Array<MediaVariantResponseModel>;
     id: string;
     flags: Array<FlagModel>;
-    /**
-     * @deprecated
-     */
-    urls: Array<MediaUrlInfoModel>;
     isTrashed: boolean;
     mediaType: MediaTypeReferenceResponseModel;
 };
@@ -1395,7 +1372,7 @@ export type MediaTypeTreeItemResponseModel = {
 
 export type MediaUrlInfoModel = {
     culture: string | null;
-    url: string;
+    url: string | null;
 };
 
 export type MediaUrlInfoResponseModel = {
@@ -1612,7 +1589,7 @@ export type MemberVariantResponseModel = {
 };
 
 export type ModelsBuilderResponseModel = {
-    mode: ModelsModeModel;
+    mode: string;
     canGenerate: boolean;
     outOfDateModels: boolean;
     lastError?: string | null;
@@ -1620,13 +1597,6 @@ export type ModelsBuilderResponseModel = {
     modelsNamespace?: string | null;
     trackingOutOfDateModels: boolean;
 };
-
-export enum ModelsModeModel {
-    NOTHING = 'Nothing',
-    IN_MEMORY_AUTO = 'InMemoryAuto',
-    SOURCE_CODE_MANUAL = 'SourceCodeManual',
-    SOURCE_CODE_AUTO = 'SourceCodeAuto'
-}
 
 export type MoveDataTypeRequestModel = {
     target?: ReferenceByIdModel | null;
@@ -2137,10 +2107,6 @@ export type PublishedDocumentResponseModel = {
     id: string;
     flags: Array<FlagModel>;
     documentType: DocumentTypeReferenceResponseModel;
-    /**
-     * @deprecated
-     */
-    urls: Array<DocumentUrlInfoModel>;
     template?: ReferenceByIdModel | null;
     isTrashed: boolean;
 };
@@ -3476,41 +3442,6 @@ export type GetDataTypeByIdReferencedByResponses = {
 };
 
 export type GetDataTypeByIdReferencedByResponse = GetDataTypeByIdReferencedByResponses[keyof GetDataTypeByIdReferencedByResponses];
-
-export type GetDataTypeByIdReferencesData = {
-    body?: never;
-    path: {
-        id: string;
-    };
-    query?: never;
-    url: '/umbraco/management/api/v1/data-type/{id}/references';
-};
-
-export type GetDataTypeByIdReferencesErrors = {
-    /**
-     * The resource is protected and requires an authentication token
-     */
-    401: unknown;
-    /**
-     * The authenticated user does not have access to this resource
-     */
-    403: unknown;
-    /**
-     * Not Found
-     */
-    404: ProblemDetails;
-};
-
-export type GetDataTypeByIdReferencesError = GetDataTypeByIdReferencesErrors[keyof GetDataTypeByIdReferencesErrors];
-
-export type GetDataTypeByIdReferencesResponses = {
-    /**
-     * OK
-     */
-    200: Array<DataTypeReferenceResponseModel>;
-};
-
-export type GetDataTypeByIdReferencesResponse = GetDataTypeByIdReferencesResponses[keyof GetDataTypeByIdReferencesResponses];
 
 export type GetDataTypeConfigurationData = {
     body?: never;
@@ -6341,6 +6272,49 @@ export type PutDocumentByIdNotificationsResponses = {
      */
     200: unknown;
 };
+
+export type GetDocumentByIdPreviewUrlData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: {
+        providerAlias?: string;
+        culture?: string;
+        segment?: string;
+    };
+    url: '/umbraco/management/api/v1/document/{id}/preview-url';
+};
+
+export type GetDocumentByIdPreviewUrlErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type GetDocumentByIdPreviewUrlError = GetDocumentByIdPreviewUrlErrors[keyof GetDocumentByIdPreviewUrlErrors];
+
+export type GetDocumentByIdPreviewUrlResponses = {
+    /**
+     * OK
+     */
+    200: DocumentUrlInfoModel;
+};
+
+export type GetDocumentByIdPreviewUrlResponse = GetDocumentByIdPreviewUrlResponses[keyof GetDocumentByIdPreviewUrlResponses];
 
 export type DeleteDocumentByIdPublicAccessData = {
     body?: never;

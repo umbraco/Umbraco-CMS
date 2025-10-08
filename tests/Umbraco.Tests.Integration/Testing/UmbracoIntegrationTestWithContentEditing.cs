@@ -112,7 +112,7 @@ public abstract class UmbracoIntegrationTestWithContentEditing : UmbracoIntegrat
             PublishedTextPageId = createContentResultPublishPage.Result.Content.Id;
         }
 
-        var publishResult = await ContentPublishingService.PublishAsync(PublishedTextPage.Key.Value, CultureAndSchedule, Constants.Security.SuperUserKey);
+        var publishResult = await ContentPublishingService.PublishAsync(PublishedTextPage.Key.Value, [new CulturePublishScheduleModel()], Constants.Security.SuperUserKey);
         Assert.IsTrue(publishResult.Success);
 
         // Create and Save Content "Text Page 1" based on "umbTextpage" -> 1055

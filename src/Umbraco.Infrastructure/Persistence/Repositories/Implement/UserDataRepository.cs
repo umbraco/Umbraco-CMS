@@ -17,13 +17,18 @@ internal sealed class UserDataRepository : IUserDataRepository
 
     public async Task<IUserData?> GetAsync(Guid key)
     {
-        Sql<ISqlContext>? sql = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql()
+        if (_scopeAccessor.AmbientScope is null)
+        {
+            return null;
+        }
+
+        Sql<ISqlContext> sql = _scopeAccessor.AmbientScope.Database.SqlContext.Sql()
             .Select<UserDataDto>()
             .From<UserDataDto>()
             .Where<UserDataDto>(dataDto => dataDto.Key == key)
             .OrderBy<UserDataDto>(dto => dto.Identifier); // need to order to skiptake;
 
-        UserDataDto? dto = await _scopeAccessor.AmbientScope?.Database.FirstOrDefaultAsync<UserDataDto>(sql)!;
+        UserDataDto? dto = await _scopeAccessor.AmbientScope.Database.FirstOrDefaultAsync<UserDataDto>(sql)!;
 
         return dto is null ? null : Map(dto);
     }

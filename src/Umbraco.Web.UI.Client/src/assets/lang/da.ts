@@ -74,6 +74,7 @@ export default {
 		readOnly: 'Skrivebeskyttet',
 		trash: 'Papirkurv',
 		loadMore: 'Indlæs flere',
+		showMore: 'Vis flere',
 	},
 	actionCategories: {
 		content: 'Indhold',
@@ -857,6 +858,7 @@ export default {
 		email: 'E-mail',
 		error: 'Fejl',
 		field: 'Felt',
+		fields: 'Felter',
 		fieldFor: 'Felt for %0%',
 		findDocument: 'Find',
 		first: 'Første',
@@ -1298,10 +1300,10 @@ export default {
 	},
 	colorPickerConfigurations: {
 		colorsTitle: 'Farver',
-		colorsDescription: 'Tilføj, fjern eller sorter farver',
+		colorsDescription: 'Tilføj, fjern eller sorter farver (og etiketter).',
 		showLabelTitle: 'Inkluder label?',
 		showLabelDescription:
-			'Gemmer farver som et Json-objekt, der både indeholder farvens hex streng og label, i stedet for kun at gemme hex strengen.',
+			'Viser et farvet felt og en etiket for hver farve i farvevælgeren i stedet for blot et farvet felt.',
 	},
 	contentPicker: {
 		allowedItemTypes: 'Du kan kun vælge følgende type(r) dokumenter: %0%',

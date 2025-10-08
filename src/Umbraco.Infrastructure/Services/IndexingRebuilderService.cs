@@ -1,18 +1,27 @@
 using Examine;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Infrastructure.Examine;
+using Umbraco.Cms.Infrastructure.Models;
 
 namespace Umbraco.Cms.Infrastructure.Services;
 
+/// <inheritdoc />
 public class IndexingRebuilderService : IIndexingRebuilderService
 {
-    private const string IsRebuildingIndexRuntimeCacheKeyPrefix = "temp_indexing_op_";
-
-    private readonly IAppPolicyCache _runtimeCache;
     private readonly IIndexRebuilder _indexRebuilder;
     private readonly ILogger<IndexingRebuilderService> _logger;
 
+    public IndexingRebuilderService(
+        IIndexRebuilder indexRebuilder,
+        ILogger<IndexingRebuilderService> logger)
+    {
+        _indexRebuilder = indexRebuilder;
+        _logger = logger;
+    }
+
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in V19.")]
     public IndexingRebuilderService(
         AppCaches runtimeCache,
         IIndexRebuilder indexRebuilder,
@@ -20,12 +29,18 @@ public class IndexingRebuilderService : IIndexingRebuilderService
     {
         _indexRebuilder = indexRebuilder;
         _logger = logger;
-        _runtimeCache = runtimeCache.RuntimeCache;
     }
 
+    /// <inheritdoc />
     public bool CanRebuild(string indexName) => _indexRebuilder.CanRebuild(indexName);
 
+    /// <inheritdoc />
+    [Obsolete("Use TryRebuildAsync instead. Scheduled for removal in V19.")]
     public bool TryRebuild(IIndex index, string indexName)
+        => TryRebuildAsync(index, indexName).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    public async Task<bool> TryRebuildAsync(IIndex index, string indexName)
     {
         // Remove it in case there's a handler there already
         index.IndexOperationComplete -= Indexer_IndexOperationComplete;
@@ -35,11 +50,10 @@ public class IndexingRebuilderService : IIndexingRebuilderService
 
         try
         {
-            Set(indexName);
-            _indexRebuilder.RebuildIndex(indexName);
-            return true;
+            Attempt<IndexRebuildResult> attempt = await _indexRebuilder.RebuildIndexAsync(indexName);
+            return attempt.Success;
         }
-        catch(Exception exception)
+        catch (Exception exception)
         {
             // Ensure it's not listening
             index.IndexOperationComplete -= Indexer_IndexOperationComplete;
@@ -48,25 +62,14 @@ public class IndexingRebuilderService : IIndexingRebuilderService
         }
     }
 
-    private void Set(string indexName)
-    {
-        var cacheKey = IsRebuildingIndexRuntimeCacheKeyPrefix + indexName;
-
-        // put temp val in cache which is used as a rudimentary way to know when the indexing is done
-        _runtimeCache.Insert(cacheKey, () => "tempValue", TimeSpan.FromMinutes(5));
-    }
-
-    private void Clear(string? indexName)
-    {
-        var cacheKey = IsRebuildingIndexRuntimeCacheKeyPrefix + indexName;
-        _runtimeCache.Clear(cacheKey);
-    }
-
+    /// <inheritdoc />
+    [Obsolete("Use IsRebuildingAsync() instead. Scheduled for removal in V19.")]
     public bool IsRebuilding(string indexName)
-    {
-        var cacheKey = IsRebuildingIndexRuntimeCacheKeyPrefix + indexName;
-        return _runtimeCache.Get(cacheKey) is not null;
-    }
+        => IsRebuildingAsync(indexName).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    public Task<bool> IsRebuildingAsync(string indexName)
+        => _indexRebuilder.IsRebuildingAsync(indexName);
 
     private void Indexer_IndexOperationComplete(object? sender, EventArgs e)
     {
@@ -80,8 +83,6 @@ public class IndexingRebuilderService : IIndexingRebuilderService
             indexer.IndexOperationComplete -= Indexer_IndexOperationComplete;
         }
 
-        _logger.LogInformation($"Rebuilding index '{indexer?.Name}' done.");
-
-        Clear(indexer?.Name);
+        _logger.LogInformation("Rebuilding index '{IndexerName}' done.", indexer?.Name);
     }
 }

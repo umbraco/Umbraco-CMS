@@ -73,5 +73,8 @@ public class UmbracoPremigrationPlan : MigrationPlan
         //   called by a migration for 15. By using a pre-migration we ensure the lock record is in place when migrating
         //   through 15 versions to the latest.
         To<V_16_2_0.AddDocumentUrlLock>("{5ECCE7A7-2EFC-47A5-A081-FFD94D9F79AA}");
+
+        // To 17.0.0
+        To<V_17_0_0.UpdateToOpenIddictV7>("{D54EE168-C19D-48D8-9006-C7E719AD61FE}");
     }
 }

@@ -28,6 +28,7 @@ public static partial class Constants
         public const string ConfigActiveDirectory = ConfigPrefix + "ActiveDirectory";
         public const string ConfigMarketplace = ConfigPrefix + "Marketplace";
         public const string ConfigLegacyPasswordMigration = ConfigPrefix + "LegacyPasswordMigration";
+        public const string ConfigSystemDateMigration = ConfigPrefix + "SystemDateMigration";
         public const string ConfigContent = ConfigPrefix + "Content";
         public const string ConfigDeliveryApi = ConfigPrefix + "DeliveryApi";
         public const string ConfigCoreDebug = ConfigCorePrefix + "Debug";
@@ -64,6 +65,7 @@ public static partial class Constants
         public const string ConfigWebhook = ConfigPrefix + "Webhook";
         public const string ConfigWebhookPayloadType = ConfigWebhook + ":PayloadType";
         public const string ConfigCache = ConfigPrefix + "Cache";
+        public const string ConfigDistributedJobs = ConfigPrefix + "DistributedJobs";
 
         public static class NamedOptions
         {

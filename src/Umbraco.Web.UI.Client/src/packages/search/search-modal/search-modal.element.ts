@@ -66,7 +66,8 @@ export class UmbSearchModalElement extends UmbLitElement {
 		super.connectedCallback();
 
 		this.addEventListener('keydown', this.#onKeydown);
-		document.addEventListener('click', this.#onDocumentClick); //TODO: Temp solution to close the modal on outside click. We need to look into a generic solution for this.
+		// TODO: Temp solution to close the modal on outside click. We need to look into a generic solution for this. [JMJ]
+		document.addEventListener('click', this.#onDocumentClick);
 
 		requestAnimationFrame(() => {
 			this.#focusInput();

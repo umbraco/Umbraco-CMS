@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Models.Packaging;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Packaging;
@@ -82,7 +83,13 @@ public class PackagingService : IPackagingService
 
         InstallationSummary summary = _packageInstallation.InstallPackageData(compiledPackage, userId, out _);
 
-        _auditService.Add(AuditType.PackagerInstall, userId, -1, "Package", $"Package data installed for package '{compiledPackage.Name}'.");
+        IUser? user = _userService.GetUserById(userId);
+        _auditService.AddAsync(
+            AuditType.PackagerInstall,
+            user?.Key ?? Constants.Security.SuperUserKey,
+            -1,
+            "Package",
+            $"Package data installed for package '{compiledPackage.Name}'.").GetAwaiter().GetResult();
 
         // trigger the ImportedPackage event
         _eventAggregator.Publish(new ImportedPackageNotification(summary).WithStateFrom(importingPackageNotification));
@@ -115,8 +122,12 @@ public class PackagingService : IPackagingService
             return Attempt.FailWithStatus<PackageDefinition?, PackageOperationStatus>(PackageOperationStatus.NotFound, null);
         }
 
-        int currentUserId = (await _userService.GetRequiredUserAsync(userKey)).Id;
-        _auditService.Add(AuditType.Delete, currentUserId, -1, "Package", $"Created package '{package.Name}' deleted. Package key: {key}");
+        Attempt<AuditLogOperationStatus> result = await _auditService.AddAsync(AuditType.Delete, userKey, -1, "Package", $"Created package '{package.Name}' deleted. Package key: {key}");
+        if (result is { Success: false, Result: AuditLogOperationStatus.UserNotFound })
+        {
+            throw new InvalidOperationException($"Could not find user with key: {userKey}");
+        }
+
         _createdPackages.Delete(package.Id);
 
         scope.Complete();
@@ -163,8 +174,11 @@ public class PackagingService : IPackagingService
             return Attempt.FailWithStatus(PackageOperationStatus.DuplicateItemName, package);
         }
 
-        int currentUserId = (await _userService.GetRequiredUserAsync(userKey)).Id;
-        _auditService.Add(AuditType.New, currentUserId, -1, "Package", $"Created package '{package.Name}' created. Package key: {package.PackageId}");
+        Attempt<AuditLogOperationStatus> result = await _auditService.AddAsync(AuditType.New, userKey, -1, "Package", $"Created package '{package.Name}' created. Package key: {package.PackageId}");
+        if (result is { Success: false, Result: AuditLogOperationStatus.UserNotFound })
+        {
+            throw new InvalidOperationException($"Could not find user with key: {userKey}");
+        }
 
         scope.Complete();
 
@@ -180,8 +194,11 @@ public class PackagingService : IPackagingService
             return Attempt.FailWithStatus(PackageOperationStatus.NotFound, package);
         }
 
-        int currentUserId = (await _userService.GetRequiredUserAsync(userKey)).Id;
-        _auditService.Add(AuditType.New, currentUserId, -1, "Package", $"Created package '{package.Name}' updated. Package key: {package.PackageId}");
+        Attempt<AuditLogOperationStatus> result = await _auditService.AddAsync(AuditType.New, userKey, -1, "Package", $"Created package '{package.Name}' updated. Package key: {package.PackageId}");
+        if (result is { Success: false, Result: AuditLogOperationStatus.UserNotFound })
+        {
+            throw new InvalidOperationException($"Could not find user with key: {userKey}");
+        }
 
         scope.Complete();
 

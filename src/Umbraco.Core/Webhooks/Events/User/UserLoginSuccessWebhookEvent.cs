@@ -21,7 +21,7 @@ public class UserLoginSuccessWebhookEvent : WebhookEventBase<UserLoginSuccessNot
 
     public override string Alias => Constants.WebhookEvents.Aliases.UserLoginSuccess;
 
-    public override object? ConvertNotificationToRequestPayload(UserLoginSuccessNotification notification)
+    public override object ConvertNotificationToRequestPayload(UserLoginSuccessNotification notification)
         => new DefaultPayloadModel
         {
             Id = notification.AffectedUserId is not null &&

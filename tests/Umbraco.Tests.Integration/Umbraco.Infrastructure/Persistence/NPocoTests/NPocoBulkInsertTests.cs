@@ -61,9 +61,9 @@ internal sealed class NPocoBulkInsertTests : UmbracoIntegrationTest
                 {
                     ServerAddress = "address" + i,
                     ServerIdentity = "computer" + i,
-                    DateRegistered = DateTime.Now,
+                    DateRegistered = DateTime.UtcNow,
                     IsActive = true,
-                    DateAccessed = DateTime.Now
+                    DateAccessed = DateTime.UtcNow
                 });
             }
 
@@ -88,9 +88,9 @@ internal sealed class NPocoBulkInsertTests : UmbracoIntegrationTest
             {
                 ServerAddress = "address" + i,
                 ServerIdentity = "computer" + i,
-                DateRegistered = DateTime.Now,
+                DateRegistered = DateTime.UtcNow,
                 IsActive = true,
-                DateAccessed = DateTime.Now
+                DateAccessed = DateTime.UtcNow
             });
         }
 
@@ -121,9 +121,9 @@ internal sealed class NPocoBulkInsertTests : UmbracoIntegrationTest
             {
                 ServerAddress = "address" + i,
                 ServerIdentity = "computer" + i,
-                DateRegistered = DateTime.Now,
+                DateRegistered = DateTime.UtcNow,
                 IsActive = true,
-                DateAccessed = DateTime.Now
+                DateAccessed = DateTime.UtcNow
             });
         }
 
@@ -155,9 +155,9 @@ internal sealed class NPocoBulkInsertTests : UmbracoIntegrationTest
             {
                 ServerAddress = "address" + i,
                 ServerIdentity = "computer" + i,
-                DateRegistered = DateTime.Now,
+                DateRegistered = DateTime.UtcNow,
                 IsActive = true,
-                DateAccessed = DateTime.Now
+                DateAccessed = DateTime.UtcNow
             });
         }
 
@@ -185,9 +185,9 @@ internal sealed class NPocoBulkInsertTests : UmbracoIntegrationTest
             {
                 ServerAddress = "address" + i,
                 ServerIdentity = "computer" + i,
-                DateRegistered = DateTime.Now,
+                DateRegistered = DateTime.UtcNow,
                 IsActive = true,
-                DateAccessed = DateTime.Now,
+                DateAccessed = DateTime.UtcNow,
                 IsSchedulingPublisher = true
             });
         }

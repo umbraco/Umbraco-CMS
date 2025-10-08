@@ -25,6 +25,12 @@ export abstract class UmbTreeItemElementBase<
 	@state()
 	private _label?: string;
 
+	@state()
+	private _isLoadingPrevChildren = false;
+
+	@state()
+	private _isLoadingNextChildren = false;
+
 	@property({ type: Object, attribute: false })
 	public set api(value: TreeItemContextType | undefined) {
 		this.#api = value;
@@ -41,6 +47,18 @@ export abstract class UmbTreeItemElementBase<
 			this.observe(this.#api.path, (value) => (this._href = value));
 			this.observe(this.#api.pagination.currentPage, (value) => (this._currentPage = value));
 			this.observe(this.#api.pagination.totalPages, (value) => (this._totalPages = value));
+			this.observe(this.#api.isLoadingPrevChildren, (value) => (this._isLoadingPrevChildren = value ?? false));
+			this.observe(this.#api.isLoadingNextChildren, (value) => (this._isLoadingNextChildren = value ?? false));
+
+			this.observe(
+				this.#api.targetPagination?.totalPrevItems,
+				(value) => (this._hasPreviousItems = value !== undefined ? value > 0 : false),
+			);
+			this.observe(
+				this.#api.targetPagination?.totalNextItems,
+				(value) => (this._hasNextItems = value !== undefined ? value > 0 : false),
+			);
+
 			this.#initTreeItem();
 		}
 	}
@@ -88,6 +106,12 @@ export abstract class UmbTreeItemElementBase<
 	@state()
 	private _currentPage = 1;
 
+	@state()
+	private _hasPreviousItems = false;
+
+	@state()
+	private _hasNextItems = false;
+
 	#initTreeItem() {
 		if (!this.#api) return;
 		if (!this._item) return;
@@ -114,11 +138,16 @@ export abstract class UmbTreeItemElementBase<
 		this.#api?.hideChildren();
 	}
 
-	#onLoadMoreClick = (event: any) => {
+	#onLoadPrev(event: any) {
+		event.stopPropagation();
+		this.#api?.loadPrevItems?.();
+	}
+
+	#onLoadNext(event: any) {
 		event.stopPropagation();
 		const next = (this._currentPage = this._currentPage + 1);
 		this.#api?.pagination.setCurrentPageNumber(next);
-	};
+	}
 
 	// Note: Currently we want to prevent opening when the item is in a selectable context, but this might change in the future.
 	// If we like to be able to open items in selectable context, then we might want to make it as a menu item action, so you have to click ... and chose an action called 'Edit'
@@ -139,11 +168,12 @@ export abstract class UmbTreeItemElementBase<
 				.caretLabel=${this._isOpen
 					? this.localize.term('visuallyHiddenTexts_collapseChildItems') + ' ' + this._label
 					: this.localize.term('visuallyHiddenTexts_expandChildItems') + ' ' + this._label}
-				label=${this._label}
+				label=${ifDefined(this._label)}
 				href="${ifDefined(this._isSelectableContext ? undefined : this._href)}">
-				${this.renderIconContainer()} ${this.renderLabel()} ${this.#renderActions()} ${this.#renderChildItems()}
+				${this.#renderLoadPrevButton()} ${this.renderIconContainer()} ${this.renderLabel()} ${this.#renderActions()}
+				${this.#renderChildItems()}
 				<slot></slot>
-				${this.#renderPaging()}
+				${this.#renderLoadNextButton()}
 			</uui-menu-item>
 		`;
 	}
@@ -217,11 +247,19 @@ export abstract class UmbTreeItemElementBase<
 		`;
 	}
 
-	#renderPaging() {
-		if (this._totalPages <= 1 || this._currentPage === this._totalPages) {
-			return nothing;
-		}
+	#renderLoadPrevButton() {
+		if (!this._hasPreviousItems) return nothing;
+		return html` <umb-tree-load-prev-button
+			@click=${this.#onLoadPrev}
+			.loading=${this._isLoadingPrevChildren}></umb-tree-load-prev-button>`;
+	}
 
-		return html` <umb-tree-load-more-button @click=${this.#onLoadMoreClick}></umb-tree-load-more-button> `;
+	#renderLoadNextButton() {
+		if (!this._hasNextItems) return nothing;
+		return html`
+			<umb-tree-load-more-button
+				@click=${this.#onLoadNext}
+				.loading=${this._isLoadingNextChildren}></umb-tree-load-more-button>
+		`;
 	}
 }

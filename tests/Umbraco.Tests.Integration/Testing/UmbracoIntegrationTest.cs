@@ -90,7 +90,7 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
     public void TearDownAsync()
     {
         _host.StopAsync();
-        Services.DisposeIfDisposable();
+        (Services as IDisposable)?.Dispose();
     }
 
     /// <summary>
@@ -184,6 +184,9 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
 
         CustomTestSetup(builder);
         ExecuteBuilderAttributes(builder);
+
+        // custom helper services that might be moved out of tests eventually to benefit the community
+        services.AddSingleton<IContentEditingModelFactory, ContentEditingModelFactory>();
 
         builder.Build();
     }

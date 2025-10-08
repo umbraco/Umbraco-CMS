@@ -5,7 +5,7 @@ import type {
 	ModelsBuilderResponseModel,
 	OutOfDateStatusResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
-import { ModelsModeModel, OutOfDateTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { OutOfDateTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export const handlers = [
 	rest.post(umbracoPath('/models-builder/build'), async (_req, res, ctx) => {
@@ -35,7 +35,7 @@ export const handlers = [
 
 // Mock Data for now
 const modelBeforeBuild: ModelsBuilderResponseModel = {
-	mode: ModelsModeModel.IN_MEMORY_AUTO,
+	mode: 'InMemoryAuto',
 	canGenerate: true,
 	outOfDateModels: true,
 	lastError: `[plugin:vite:import-analysis] Missing "./directives/unsafe-html.js" export in "lit" package
@@ -56,7 +56,7 @@ at async TransformContext.transform (file:///C:/Users/Umbraco/Documents/Umbraco.
 };
 
 const modelAfterBuild: ModelsBuilderResponseModel = {
-	mode: ModelsModeModel.IN_MEMORY_AUTO,
+	mode: 'InMemoryAuto',
 	canGenerate: true,
 	outOfDateModels: false,
 	lastError: '',

@@ -59,7 +59,7 @@ public class MarkdownEditorValueConverter : PropertyValueConverterBase, IDeliver
 
     public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(string);
 
-    public object ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview, bool expanding)
+    public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview, bool expanding)
     {
         if (inter is not string markdownString || markdownString.IsNullOrWhiteSpace())
         {
