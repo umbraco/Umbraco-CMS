@@ -850,6 +850,7 @@ export default {
 		details: 'Details',
 		dictionary: 'Dictionary',
 		dimensions: 'Dimensions',
+		dividerPosition: (value: string | number) => `Divider at ${value}%`,
 		discard: 'Discard',
 		document: 'Document',
 		down: 'Down',
