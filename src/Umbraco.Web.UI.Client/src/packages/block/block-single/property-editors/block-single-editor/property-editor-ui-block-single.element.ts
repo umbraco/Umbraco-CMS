@@ -1,23 +1,31 @@
-import { UmbBlockListManagerContext } from '../../context/block-list-manager.context.js';
-import { UmbBlockListEntriesContext } from '../../context/block-list-entries.context.js';
-import type { UmbBlockListLayoutModel, UmbBlockListValueModel } from '../../types.js';
-import type { UmbBlockListEntryElement } from '../../components/block-list-entry/index.js';
-import { UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS } from './constants.js';
+import { UmbBlockSingleManagerContext } from '../../context/block-single-manager.context.js';
+import { UmbBlockSingleEntriesContext } from '../../context/block-single-entries.context.js';
+import type { UmbBlockSingleLayoutModel, UmbBlockSingleValueModel } from '../../types.js';
+import type { UmbBlockSingleEntryElement } from '../../components/block-single-entry/index.js';
+import { UMB_BLOCK_SINGLE_PROPERTY_EDITOR_SCHEMA_ALIAS } from './constants.js';
 import { UmbLitElement, umbDestroyOnDisconnect } from '@umbraco-cms/backoffice/lit-element';
-import { html, customElement, property, state, repeat, css, nothing } from '@umbraco-cms/backoffice/external/lit';
+import {
+	html,
+	customElement,
+	property,
+	state,
+	repeat,
+	css,
+	nothing,
+	type PropertyValueMap,
+} from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
-import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 import type { UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import type { UmbBlockLayoutBaseModel } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
 
-import '../../components/block-list-entry/index.js';
+import '../../components/block-single-entry/index.js';
 import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import {
 	extractJsonQueryProps,
@@ -29,24 +37,24 @@ import { jsonStringComparison, observeMultiple } from '@umbraco-cms/backoffice/o
 import { debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
 import { UMB_CONTENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
 
-const SORTER_CONFIG: UmbSorterConfig<UmbBlockListLayoutModel, UmbBlockListEntryElement> = {
+const SORTER_CONFIG: UmbSorterConfig<UmbBlockSingleLayoutModel, UmbBlockSingleEntryElement> = {
 	getUniqueOfElement: (element) => {
 		return element.contentKey!;
 	},
 	getUniqueOfModel: (modelEntry) => {
 		return modelEntry.contentKey;
 	},
-	//identifier: 'block-list-editor',
-	itemSelector: 'umb-block-list-entry',
+	//identifier: 'block-single-editor',
+	itemSelector: 'umb-block-single-entry',
 	//containerSelector: 'EMPTY ON PURPOSE, SO IT BECOMES THE HOST ELEMENT',
 };
 
-@customElement('umb-property-editor-ui-block-list')
-export class UmbPropertyEditorUIBlockListElement
-	extends UmbFormControlMixin<UmbBlockListValueModel | undefined, typeof UmbLitElement, undefined>(UmbLitElement)
+@customElement('umb-property-editor-ui-block-single')
+export class UmbPropertyEditorUIBlockSingleElement
+	extends UmbFormControlMixin<UmbBlockSingleValueModel | undefined, typeof UmbLitElement, undefined>(UmbLitElement)
 	implements UmbPropertyEditorUiElement
 {
-	readonly #sorter = new UmbSorterController<UmbBlockListLayoutModel, UmbBlockListEntryElement>(this, {
+	readonly #sorter = new UmbSorterController<UmbBlockSingleLayoutModel, UmbBlockSingleEntryElement>(this, {
 		...SORTER_CONFIG,
 		onChange: ({ model }) => {
 			this.#entriesContext.setLayouts(model);
@@ -55,10 +63,10 @@ export class UmbPropertyEditorUIBlockListElement
 
 	readonly #validationContext = new UmbValidationContext(this);
 
-	#lastValue: UmbBlockListValueModel | undefined = undefined;
+	#lastValue: UmbBlockSingleValueModel | undefined = undefined;
 
 	@property({ attribute: false })
-	public override set value(value: UmbBlockListValueModel | undefined) {
+	public override set value(value: UmbBlockSingleValueModel | undefined) {
 		this.#lastValue = value;
 
 		if (!value) {
@@ -66,19 +74,19 @@ export class UmbPropertyEditorUIBlockListElement
 			return;
 		}
 
-		const buildUpValue: Partial<UmbBlockListValueModel> = value ? { ...value } : {};
+		const buildUpValue: Partial<UmbBlockSingleValueModel> = value ? { ...value } : {};
 		buildUpValue.layout ??= {};
 		buildUpValue.contentData ??= [];
 		buildUpValue.settingsData ??= [];
 		buildUpValue.expose ??= [];
-		super.value = buildUpValue as UmbBlockListValueModel;
+		super.value = buildUpValue as UmbBlockSingleValueModel;
 
-		this.#managerContext.setLayouts(super.value.layout[UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS] ?? []);
+		this.#managerContext.setLayouts(super.value.layout[UMB_BLOCK_SINGLE_PROPERTY_EDITOR_SCHEMA_ALIAS] ?? []);
 		this.#managerContext.setContents(super.value.contentData);
 		this.#managerContext.setSettings(super.value.settingsData);
 		this.#managerContext.setExposes(super.value.expose);
 	}
-	public override get value(): UmbBlockListValueModel | undefined {
+	public override get value(): UmbBlockSingleValueModel | undefined {
 		return super.value;
 	}
 
@@ -87,11 +95,6 @@ export class UmbPropertyEditorUIBlockListElement
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
-
-		const validationLimit = config.getValueByAlias<UmbNumberRangeValueType>('validationLimit');
-
-		this._limitMin = validationLimit?.min;
-		this._limitMax = validationLimit?.max;
 
 		const blocks = config.getValueByAlias<Array<UmbBlockTypeBaseModel>>('blocks') ?? [];
 		this.#managerContext.setBlockTypes(blocks);
@@ -143,11 +146,6 @@ export class UmbPropertyEditorUIBlockListElement
 	mandatoryMessage?: string | undefined;
 
 	@state()
-	private _limitMin?: number;
-	@state()
-	private _limitMax?: number;
-
-	@state()
 	private _blocks?: Array<UmbBlockTypeBaseModel>;
 
 	@state()
@@ -156,8 +154,8 @@ export class UmbPropertyEditorUIBlockListElement
 	@state()
 	private _catalogueRouteBuilder?: UmbModalRouteBuilder;
 
-	readonly #managerContext = new UmbBlockListManagerContext(this);
-	readonly #entriesContext = new UmbBlockListEntriesContext(this);
+	readonly #managerContext = new UmbBlockSingleManagerContext(this);
+	readonly #entriesContext = new UmbBlockSingleEntriesContext(this);
 
 	@state()
 	private _notSupportedVariantSetting?: boolean;
@@ -215,7 +213,7 @@ export class UmbPropertyEditorUIBlockListElement
 		});
 
 		// TODO: Why is this logic not part of the Block Grid and RTE Editors? [NL]
-		// Observe Blocks and clean up validation messages for content/settings that are not in the block list anymore:
+		// Observe Blocks and clean up validation messages for content/settings that are not in the block single anymore:
 		this.observe(
 			this.#managerContext.layouts,
 			(layouts) => {
@@ -251,25 +249,9 @@ export class UmbPropertyEditorUIBlockListElement
 		});
 
 		this.addValidator(
-			'rangeUnderflow',
-			() =>
-				this.localize.term(
-					'validation_entriesShort',
-					this._limitMin,
-					(this._limitMin ?? 0) - this.#entriesContext.getLength(),
-				),
-			() => !!this._limitMin && this.#entriesContext.getLength() < this._limitMin,
-		);
-
-		this.addValidator(
 			'rangeOverflow',
-			() =>
-				this.localize.term(
-					'validation_entriesExceed',
-					this._limitMax,
-					this.#entriesContext.getLength() - (this._limitMax || 0),
-				),
-			() => !!this._limitMax && this.#entriesContext.getLength() > this._limitMax,
+			() => this.localize.term('validation_entriesExceed', 1, this.#entriesContext.getLength() - 1),
+			() => this.#entriesContext.getLength() > 1,
 		);
 
 		this.addValidator(
@@ -305,6 +287,29 @@ export class UmbPropertyEditorUIBlockListElement
 			},
 			null,
 		);
+	}
+
+	#hasAutoCreatedABlock = false;
+	protected override willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+		super.willUpdate(_changedProperties);
+
+		if (
+			this.mandatory === true &&
+			this.#hasAutoCreatedABlock === false &&
+			this.readonly !== true &&
+			this._layouts?.length === 0 &&
+			this._blocks?.length === 1
+		) {
+			// Only auto create once.
+			this.#hasAutoCreatedABlock = true;
+			// no blocks, and one Bock type, then auto create a block:
+			const elementKey = this._blocks[0].contentElementTypeKey;
+			this.#managerContext.createWithPresets(elementKey).then((block) => {
+				if (block) {
+					this.#managerContext.insert(block.layout, block.content, block.settings, { index: 0 });
+				}
+			});
+		}
 	}
 
 	#gotPropertyContext(context: typeof UMB_PROPERTY_CONTEXT.TYPE | undefined) {
@@ -344,7 +349,7 @@ export class UmbPropertyEditorUIBlockListElement
 				} else {
 					const newValue = {
 						...super.value,
-						layout: { [UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS]: layouts },
+						layout: { [UMB_BLOCK_SINGLE_PROPERTY_EDITOR_SCHEMA_ALIAS]: layouts },
 						contentData: contents,
 						settingsData: settings,
 						expose: exposes,
@@ -356,7 +361,7 @@ export class UmbPropertyEditorUIBlockListElement
 				}
 
 				// If we don't have a value set from the outside or an internal value, we don't want to set the value.
-				// This is added to prevent the block list from setting an empty value on startup.
+				// This is added to prevent the editor from setting an empty value on startup.
 				if (this.#lastValue === undefined && super.value === undefined) {
 					return;
 				}
@@ -379,13 +384,12 @@ export class UmbPropertyEditorUIBlockListElement
 			${repeat(
 				this._layouts,
 				(x) => x.contentKey,
-				(layoutEntry, index) => html`
-					${this.#renderInlineCreateButton(index)}
-					<umb-block-list-entry
+				(layoutEntry) => html`
+					<umb-block-single-entry
 						.contentKey=${layoutEntry.contentKey}
 						.layout=${layoutEntry}
 						${umbDestroyOnDisconnect()}>
-					</umb-block-list-entry>
+					</umb-block-single-entry>
 				`,
 			)}
 			${this.#renderCreateButtonGroup()}
@@ -393,18 +397,12 @@ export class UmbPropertyEditorUIBlockListElement
 	}
 
 	#renderCreateButtonGroup() {
-		if (this.readonly && this._layouts.length > 0) {
+		// Are we in read-only more and have one item, or do we already have an item (special for single block) then hide create button.
+		if ((this.readonly && this._layouts.length > 0) || this._layouts.length >= 1) {
 			return nothing;
 		} else {
 			return html` <uui-button-group> ${this.#renderCreateButton()} ${this.#renderPasteButton()} </uui-button-group> `;
 		}
-	}
-
-	#renderInlineCreateButton(index: number) {
-		if (this.readonly) return nothing;
-		return html`<uui-button-inline-create
-			label=${this._createButtonLabel}
-			href=${this._catalogueRouteBuilder?.({ view: 'create', index: index }) ?? ''}></uui-button-inline-create>`;
 	}
 
 	#renderCreateButton() {
@@ -460,10 +458,10 @@ export class UmbPropertyEditorUIBlockListElement
 	];
 }
 
-export default UmbPropertyEditorUIBlockListElement;
+export default UmbPropertyEditorUIBlockSingleElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-property-editor-ui-block-list': UmbPropertyEditorUIBlockListElement;
+		'umb-property-editor-ui-block-single': UmbPropertyEditorUIBlockSingleElement;
 	}
 }
