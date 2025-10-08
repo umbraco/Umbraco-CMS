@@ -44,7 +44,6 @@ export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
 		if (openCollection) {
 			this.getContext(UMB_ROUTE_CONTEXT).then((routeContext) => {
 				if (routeContext) {
-					console.log(routeContext.getBasePath());
 					window.history.replaceState({}, '', routeContext.getActivePath() + '/view/collection');
 				}
 			});
