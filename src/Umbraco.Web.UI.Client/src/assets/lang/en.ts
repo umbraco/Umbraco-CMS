@@ -23,6 +23,7 @@ export default {
 		copy: 'Duplicate',
 		copyTo: 'Duplicate to',
 		create: 'Create',
+		createFor: (name) => (name ? `Create for '${name}'` : 'Create'),
 		createblueprint: 'Create Document Blueprint',
 		createGroup: 'Create group',
 		createPackage: 'Create Package',

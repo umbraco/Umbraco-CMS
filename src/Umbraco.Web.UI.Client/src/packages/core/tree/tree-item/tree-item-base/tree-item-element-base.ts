@@ -194,7 +194,7 @@ export abstract class UmbTreeItemElementBase<
 				slot="actions"
 				.entityType=${this.#api.entityType}
 				.unique=${this.#api.unique}
-				.label=${this.localize.term('actions_viewActionsFor', [this._label])}>
+				.label=${this._label}>
 			</umb-entity-actions-bundle>
 		`;
 	}
