@@ -19,8 +19,8 @@ import './content-type-design-editor-group.element.js';
 
 const SORTER_CONFIG: UmbSorterConfig<UmbPropertyTypeContainerMergedModel, UmbContentTypeWorkspaceViewEditGroupElement> =
 	{
-		getUniqueOfElement: (element) => element.group?.ownerId,
-		getUniqueOfModel: (modelEntry) => modelEntry.ownerId,
+		getUniqueOfElement: (element) => element.group?.key,
+		getUniqueOfModel: (modelEntry) => modelEntry.key,
 		// TODO: Make specific to the current owner document. [NL]
 		identifier: 'content-type-container-sorter',
 		itemSelector: 'umb-content-type-design-editor-group',
@@ -87,9 +87,8 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 						this.#groupStructureHelper.partialUpdateContainer(entry.ownerId, {
 							sortOrder: ++prevSortOrder,
 						});
-
-						i++;
 					}
+					i++;
 				}
 			},
 			onRequestDrop: async ({ unique }) => {
@@ -97,7 +96,7 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 				if (!context) {
 					throw new Error('Could not get Workspace Context');
 				}
-				return context.structure.getMergedContainerById(unique) as UmbPropertyTypeContainerMergedModel | undefined;
+				return context.structure.getMergedContainerByKey(unique) as UmbPropertyTypeContainerMergedModel | undefined;
 			},
 			requestExternalRemove: async ({ item }) => {
 				const context = await this.getContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT);
