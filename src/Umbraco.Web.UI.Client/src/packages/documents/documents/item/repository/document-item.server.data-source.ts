@@ -54,10 +54,12 @@ const mapper = (item: DocumentItemResponseModel): UmbDocumentItemModel => {
 				culture: variant.culture || null,
 				name: variant.name,
 				state: variant.state,
+				flags: variant.flags,
 				// TODO: [v17] Implement dates when available in the API. [LK]
 				//createDate: new Date(variant.createDate),
 				//updateDate: new Date(variant.updateDate),
 			};
 		}),
+		flags: item.flags,
 	};
 };

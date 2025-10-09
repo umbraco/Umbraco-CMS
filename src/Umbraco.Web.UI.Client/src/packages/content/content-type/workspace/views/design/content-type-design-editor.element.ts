@@ -115,7 +115,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	private _hasRootGroups = false;
 
 	@state()
-	private _routes: UmbRoute[] = [];
+	private _routes?: UmbRoute[];
 
 	@state()
 	private _tabs?: Array<UmbPropertyTypeContainerMergedModel>;
@@ -752,7 +752,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 				transition: opacity 100ms;
 			}
 
-			uui-tab:not(:hover, :focus) .trash {
+			uui-tab:not(:hover, :focus, :focus-within) .trash {
 				opacity: 0;
 				transition: opacity 100ms;
 			}

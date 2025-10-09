@@ -28,7 +28,6 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
     private readonly IFileSystem? _viewsFileSystem;
     private readonly IViewHelper _viewHelper;
     private readonly IOptionsMonitor<RuntimeSettings> _runtimeSettings;
-
     public TemplateRepository(
         IScopeAccessor scopeAccessor,
         AppCaches cache,
@@ -36,8 +35,15 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
         FileSystems fileSystems,
         IShortStringHelper shortStringHelper,
         IViewHelper viewHelper,
-        IOptionsMonitor<RuntimeSettings> runtimeSettings)
-        : base(scopeAccessor, cache, logger)
+        IOptionsMonitor<RuntimeSettings> runtimeSettings,
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            cache,
+            logger,
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
         _shortStringHelper = shortStringHelper;
         _viewsFileSystem = fileSystems.MvcViewsFileSystem;
@@ -85,8 +91,13 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
     }
 
     protected override IRepositoryCachePolicy<ITemplate, int> CreateCachePolicy() =>
-        new FullDataSetRepositoryCachePolicy<ITemplate, int>(GlobalIsolatedCache, ScopeAccessor,
-            GetEntityId, /*expires:*/ false);
+        new FullDataSetRepositoryCachePolicy<ITemplate, int>(
+            GlobalIsolatedCache,
+            ScopeAccessor,
+            RepositoryCacheVersionService,
+            CacheSyncService,
+            GetEntityId,
+            /*expires:*/ false);
 
     private IEnumerable<IUmbracoEntity> GetAxisDefinitions(params TemplateDto[] templates)
     {

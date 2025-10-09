@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using Microsoft.Extensions.Logging;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
@@ -1140,5 +1141,5 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
     }
 
     private TagRepository CreateRepository(IScopeProvider provider) =>
-        new((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<TagRepository>());
+        new((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<TagRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
 }

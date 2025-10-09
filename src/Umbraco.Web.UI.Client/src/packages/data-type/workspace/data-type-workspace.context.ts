@@ -216,7 +216,10 @@ export class UmbDataTypeWorkspaceContext
 					weight: x.weight ?? 1000 + i,
 				}));
 				this.#propertyEditorUISettingsDefaultData = manifest?.meta.settings?.defaultData || [];
-				this.setPropertyEditorSchemaAlias(manifest?.meta.propertyEditorSchemaAlias);
+				const manifestPropertyEditorSchemaAlias = manifest?.meta.propertyEditorSchemaAlias;
+				if (manifestPropertyEditorSchemaAlias) {
+					this.setPropertyEditorSchemaAlias(manifestPropertyEditorSchemaAlias);
+				}
 				this.#mergeConfigProperties();
 			},
 			'editorUi',

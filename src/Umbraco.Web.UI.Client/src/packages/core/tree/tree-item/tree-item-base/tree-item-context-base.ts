@@ -12,7 +12,7 @@ import { UmbBooleanState, UmbObjectState, UmbStringState } from '@umbraco-cms/ba
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbDeprecation, debounce } from '@umbraco-cms/backoffice/utils';
 import { UmbParentEntityContext } from '@umbraco-cms/backoffice/entity';
-import { UMB_SECTION_CONTEXT, UMB_SECTION_SIDEBAR_CONTEXT } from '@umbraco-cms/backoffice/section';
+import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbEntityModel, UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 
@@ -24,6 +24,7 @@ export abstract class UmbTreeItemContextBase<
 	extends UmbContextBase
 	implements UmbTreeItemContext<TreeItemType>
 {
+	#gotTreeContext!: Promise<unknown>;
 	public unique?: UmbEntityUnique;
 	public entityType?: string;
 
@@ -47,18 +48,18 @@ export abstract class UmbTreeItemContextBase<
 	#path = new UmbStringState('');
 	readonly path = this.#path.asObservable();
 
-	#treeItemChildrenManager = new UmbTreeItemChildrenManager<TreeItemType, TreeRootType>(this);
-	public readonly childItems = this.#treeItemChildrenManager.children;
-	public readonly hasChildren = this.#treeItemChildrenManager.hasChildren;
-	public readonly foldersOnly = this.#treeItemChildrenManager.foldersOnly;
-	public readonly pagination = this.#treeItemChildrenManager.offsetPagination;
-	public readonly targetPagination = this.#treeItemChildrenManager.targetPagination;
-	public readonly isLoading = this.#treeItemChildrenManager.isLoading;
-	public readonly isLoadingPrevChildren = this.#treeItemChildrenManager.isLoadingPrevChildren;
-	public readonly isLoadingNextChildren = this.#treeItemChildrenManager.isLoadingNextChildren;
+	protected readonly _treeItemChildrenManager = new UmbTreeItemChildrenManager<TreeItemType, TreeRootType>(this);
+	public readonly childItems = this._treeItemChildrenManager.children;
+	public readonly hasChildren = this._treeItemChildrenManager.hasChildren;
+	public readonly foldersOnly = this._treeItemChildrenManager.foldersOnly;
+	public readonly pagination = this._treeItemChildrenManager.offsetPagination;
+	public readonly targetPagination = this._treeItemChildrenManager.targetPagination;
+	public readonly isLoading = this._treeItemChildrenManager.isLoading;
+	public readonly isLoadingPrevChildren = this._treeItemChildrenManager.isLoadingPrevChildren;
+	public readonly isLoadingNextChildren = this._treeItemChildrenManager.isLoadingNextChildren;
 
 	#treeItemExpansionManager = new UmbTreeItemTargetExpansionManager<TreeItemType, TreeRootType>(this, {
-		childrenManager: this.#treeItemChildrenManager,
+		childrenManager: this._treeItemChildrenManager,
 		targetPaginationManager: this.targetPagination,
 	});
 	isOpen = this.#treeItemExpansionManager.isExpanded;
@@ -69,14 +70,24 @@ export abstract class UmbTreeItemContextBase<
 	public treeContext?: typeof UMB_TREE_CONTEXT.TYPE;
 
 	#sectionContext?: typeof UMB_SECTION_CONTEXT.TYPE;
-	#sectionSidebarContext?: typeof UMB_SECTION_SIDEBAR_CONTEXT.TYPE;
 
 	#parentContext = new UmbParentEntityContext(this);
+
+	#hasActiveDescendant = new UmbBooleanState(undefined);
+	public readonly hasActiveDescendant = this.#hasActiveDescendant.asObservable();
+
+	#isMenu = false;
+	setIsMenu(isMenu: boolean) {
+		this.#isMenu = isMenu;
+	}
+	getIsMenu() {
+		return this.#isMenu;
+	}
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_TREE_ITEM_CONTEXT);
 		// TODO: Get take size from Tree context
-		this.#treeItemChildrenManager.setTakeSize(50);
+		this._treeItemChildrenManager.setTakeSize(50);
 		this.#consumeContexts();
 		window.addEventListener('navigationend', this.#debouncedCheckIsActive);
 	}
@@ -95,9 +106,28 @@ export abstract class UmbTreeItemContextBase<
 	}
 
 	/**
+	 * Returns the current path value
+	 * @returns {string}
+	 * @memberof UmbTreeItemContextBase
+	 */
+	public getPath() {
+		return this.#path.getValue();
+	}
+
+	/**
+	 * Returns the ascending items of this tree item
+	 * @returns {Array<UmbEntityModel>}
+	 * @memberof UmbTreeItemContextBase
+	 */
+	public getAscending(): Array<UmbEntityModel> | undefined {
+		// This should be supported for all trees.
+		return (this._treeItem.getValue() as any)?.ancestors;
+	}
+
+	/**
 	 * Returns the manifest.
 	 * @returns {ManifestCollection}
-	 * @memberof UmbCollectionContext
+	 * @memberof UmbTreeItemContextBase
 	 * @deprecated Use the `.manifest` property instead.
 	 */
 	public getManifest() {
@@ -122,7 +152,7 @@ export abstract class UmbTreeItemContextBase<
 		if (!treeItem.entityType) throw new Error('Could not create tree item context, tree item type is missing');
 		this.entityType = treeItem.entityType;
 
-		this.#treeItemChildrenManager.setTreeItem(treeItem);
+		this._treeItemChildrenManager.setTreeItem(treeItem);
 		this.#treeItemExpansionManager.setTreeItem(treeItem);
 		this.#treeItemEntityActionManager.setTreeItem(treeItem);
 
@@ -146,9 +176,9 @@ export abstract class UmbTreeItemContextBase<
 	 * @memberof UmbTreeItemContextBase
 	 * @returns {Promise<void>}
 	 */
-	public loadChildren = (): Promise<void> => this.#treeItemChildrenManager.loadChildren();
+	public loadChildren = (): Promise<void> => this._treeItemChildrenManager.loadChildren();
 
-	public reloadChildren = (): Promise<void> => this.#treeItemChildrenManager.reloadChildren();
+	public reloadChildren = (): Promise<void> => this._treeItemChildrenManager.reloadChildren();
 
 	/**
 	 * Load more children of the tree item
@@ -156,33 +186,21 @@ export abstract class UmbTreeItemContextBase<
 	 * @memberof UmbTreeItemContextBase
 	 * @returns {Promise<void>}
 	 */
-	public loadMore = (): Promise<void> => this.#treeItemChildrenManager.loadNextChildren();
+	public loadMore = (): Promise<void> => this._treeItemChildrenManager.loadNextChildren();
 
 	/**
 	 * Load previous items of the tree item
 	 * @memberof UmbTreeItemContextBase
 	 * @returns {Promise<void>}
 	 */
-	public loadPrevItems = (): Promise<void> => this.#treeItemChildrenManager.loadPrevChildren();
+	public loadPrevItems = (): Promise<void> => this._treeItemChildrenManager.loadPrevChildren();
 
 	/**
 	 * Load next items of the tree item
 	 * @memberof UmbTreeItemContextBase
 	 * @returns {Promise<void>}
 	 */
-	public loadNextItems = (): Promise<void> => this.#treeItemChildrenManager.loadNextChildren();
-
-	public toggleContextMenu() {
-		if (!this.getTreeItem() || !this.entityType || this.unique === undefined) {
-			throw new Error('Could not request children, tree item is not set');
-		}
-
-		this.#sectionSidebarContext?.toggleContextMenu(this.getHostElement(), {
-			entityType: this.entityType,
-			unique: this.unique,
-			headline: this.getTreeItem()?.name || '',
-		});
-	}
+	public loadNextItems = (): Promise<void> => this._treeItemChildrenManager.loadNextChildren();
 
 	/**
 	 * Selects the tree item
@@ -241,16 +259,13 @@ export abstract class UmbTreeItemContextBase<
 			this.#observeSectionPath();
 		});
 
-		this.consumeContext(UMB_SECTION_SIDEBAR_CONTEXT, (instance) => {
-			this.#sectionSidebarContext = instance;
-		});
-
-		this.consumeContext(UMB_TREE_CONTEXT, (treeContext) => {
+		this.#gotTreeContext = this.consumeContext(UMB_TREE_CONTEXT, (treeContext) => {
 			this.treeContext = treeContext;
 			this.#observeIsSelectable();
 			this.#observeIsSelected();
 			this.#observeFoldersOnly();
-		});
+			this.#observeActive();
+		}).asPromise();
 	}
 
 	getTreeItem() {
@@ -293,9 +308,26 @@ export abstract class UmbTreeItemContextBase<
 		this.observe(
 			this.treeContext?.foldersOnly,
 			(foldersOnly) => {
-				this.#treeItemChildrenManager.setFoldersOnly(foldersOnly ?? false);
+				this._treeItemChildrenManager.setFoldersOnly(foldersOnly ?? false);
 			},
 			'observeFoldersOnly',
+		);
+	}
+
+	#observeActive() {
+		if (this.unique === undefined || this.entityType === undefined) return;
+
+		const entity = { entityType: this.entityType, unique: this.unique };
+		this.observe(
+			this.treeContext?.activeManager.hasActiveDescendants(entity),
+			(hasActiveDescendant) => {
+				if (this.#hasActiveDescendant.getValue() === undefined && hasActiveDescendant === false) {
+					return;
+				}
+
+				this.#hasActiveDescendant.setValue(hasActiveDescendant);
+			},
+			'observeActiveDescendant',
 		);
 	}
 
@@ -312,9 +344,7 @@ export abstract class UmbTreeItemContextBase<
 		);
 	}
 
-	#debouncedCheckIsActive = debounce(() => this.#checkIsActive(), 100);
-
-	#checkIsActive() {
+	#checkIsActive = async () => {
 		// don't set the active state if the item is selectable
 		const isSelectable = this.#isSelectable.getValue();
 
@@ -329,8 +359,33 @@ export abstract class UmbTreeItemContextBase<
 		const location = ensureSlash(window.location.pathname);
 		const comparePath = ensureSlash(this.#path.getValue());
 		const isActive = location.includes(comparePath);
+
+		if (this.#isActive.getValue() === isActive) return;
+		if (!this.entityType || this.unique === undefined) {
+			throw new Error('Could not check active state, entity type or unique is missing');
+		}
+
+		const ascending = this.getAscending();
+		// Only if this type of item has ancestors...
+		if (ascending) {
+			const path = [...ascending, { entityType: this.entityType, unique: this.unique }];
+
+			await this.#gotTreeContext;
+
+			if (isActive) {
+				this.treeContext?.activeManager.setActive(path);
+			} else {
+				// If this is the current, then remove it:
+				// This is a hack, where we are assuming that another active item would have made its entrance and replaced the 'active' within 2 second. [NL]
+				// The problem is that it may take some time before an item appears in the tree and communicates that its active.
+				// And in the meantime the removal of this would have resulted in the parent closing. And since we don't use Active state to open the tree, then we have a problem.
+				debounce(() => this.treeContext?.activeManager.removeActiveIfMatch(path), 1000);
+			}
+		}
 		this.#isActive.setValue(isActive);
-	}
+	};
+
+	#debouncedCheckIsActive = debounce(this.#checkIsActive, 100);
 
 	// TODO: use router context
 	constructPath(pathname: string, entityType: string, unique: string | null) {
