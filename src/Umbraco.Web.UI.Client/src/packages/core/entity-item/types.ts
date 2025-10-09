@@ -8,5 +8,5 @@ export interface UmbDefaultItemModel extends UmbNamedEntityModel {
 export interface UmbItemModel extends UmbEntityModel {
 	unique: string;
 	name?: string;
-	icon?: string;
+	icon?: string | null;
 }
