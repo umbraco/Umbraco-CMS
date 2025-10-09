@@ -37,7 +37,7 @@ const root: UmbMediaPathModel = { name: 'Media', unique: null, entityType: UMB_M
 // TODO: investigate how we can reuse the picker-search-field element, picker context etc.
 @customElement('umb-media-picker-modal')
 export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
-	UmbMediaItemModel,
+	UmbMediaTreeItemModel,
 	UmbMediaPickerModalData,
 	UmbMediaPickerModalValue
 > {
