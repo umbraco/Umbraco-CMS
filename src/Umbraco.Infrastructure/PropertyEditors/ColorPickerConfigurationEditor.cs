@@ -62,10 +62,7 @@ internal class ColorPickerConfigurationEditor : ConfigurationEditor<ColorPickerC
                 var normalized = Normalize(item.Value);
                 if (!seen.Add(normalized))
                 {
-                    if (!duplicates.Contains(normalized, StringComparer.OrdinalIgnoreCase))
-                    {
-                        duplicates.Add(normalized);
-                    }
+                    duplicates.Add(normalized);
                 }
             }
 
