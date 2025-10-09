@@ -9,7 +9,7 @@ export class UmbDefaultPickerSearchResultItemElement extends UmbPickerSearchResu
 		if (!item) return nothing;
 		return html`
 			<umb-ref-item
-				name=${item.name}
+				name=${item.name ?? `(${item.entityType}:${item.unique})`}
 				id=${item.unique}
 				icon=${item.icon ?? 'icon-document'}
 				select-only

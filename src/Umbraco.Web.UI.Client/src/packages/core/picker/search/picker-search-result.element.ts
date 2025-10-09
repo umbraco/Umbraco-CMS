@@ -6,9 +6,9 @@ import { UmbDefaultPickerSearchResultItemContext } from './result-item/default/d
 import { customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbSearchRequestArgs, UmbSearchResultItemModel } from '@umbraco-cms/backoffice/search';
-import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import type { UmbItemModel } from '@umbraco-cms/backoffice/entity-item';
 
-type PickableFilterMethodType<T extends UmbEntityModel = UmbEntityModel> = (item: T) => boolean;
+type PickableFilterMethodType<T extends UmbItemModel = UmbItemModel> = (item: T) => boolean;
 
 @customElement('umb-picker-search-result')
 export class UmbPickerSearchResultElement extends UmbLitElement {
@@ -19,7 +19,7 @@ export class UmbPickerSearchResultElement extends UmbLitElement {
 	private _searching: boolean = false;
 
 	@state()
-	private _items: UmbEntityModel[] = [];
+	private _items: UmbItemModel[] = [];
 
 	@state()
 	private _isSearchable: boolean = false;

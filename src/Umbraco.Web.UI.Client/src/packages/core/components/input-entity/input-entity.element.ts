@@ -5,8 +5,8 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
-import type { UmbUniqueItemModel } from '@umbraco-cms/backoffice/models';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import type { UmbItemModel } from '@umbraco-cms/backoffice/entity-item';
 
 @customElement('umb-input-entity')
 export class UmbInputEntityElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
@@ -60,7 +60,7 @@ export class UmbInputEntityElement extends UmbFormControlMixin<string | undefine
 	#max: number = Infinity;
 
 	@property({ attribute: false })
-	getIcon?: (item: UmbUniqueItemModel) => string;
+	getIcon?: (item: UmbItemModel) => string;
 
 	@property({ type: String, attribute: 'min-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
@@ -93,7 +93,7 @@ export class UmbInputEntityElement extends UmbFormControlMixin<string | undefine
 	}
 
 	@state()
-	private _items?: Array<UmbUniqueItemModel>;
+	private _items?: Array<UmbItemModel>;
 
 	#pickerContext?: UmbPickerInputContext;
 
@@ -133,7 +133,7 @@ export class UmbInputEntityElement extends UmbFormControlMixin<string | undefine
 		});
 	}
 
-	#removeItem(item: UmbUniqueItemModel) {
+	#removeItem(item: UmbItemModel) {
 		this.#pickerContext?.requestRemoveItem(item.unique);
 	}
 
@@ -165,11 +165,11 @@ export class UmbInputEntityElement extends UmbFormControlMixin<string | undefine
 		`;
 	}
 
-	#renderItem(item: UmbUniqueItemModel) {
+	#renderItem(item: UmbItemModel) {
 		if (!item.unique) return;
 		const icon = this.getIcon?.(item) ?? item.icon ?? '';
 		return html`
-			<uui-ref-node name=${item.name} id=${item.unique}>
+			<uui-ref-node name=${item.name ?? `${item.entityType}:${item.unique}`} id=${item.unique}>
 				${when(icon, () => html`<umb-icon slot="icon" name=${icon}></umb-icon>`)}
 				<uui-action-bar slot="actions">
 					<uui-button @click=${() => this.#removeItem(item)} label=${this.localize.term('general_remove')}></uui-button>
