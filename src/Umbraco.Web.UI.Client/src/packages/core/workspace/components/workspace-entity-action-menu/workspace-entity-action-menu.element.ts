@@ -31,11 +31,10 @@ export class UmbWorkspaceEntityActionMenuElement extends UmbLitElement {
 		if (!this._entityType) return nothing;
 		if (this._unique === undefined) return nothing;
 
-		return html`<umb-entity-actions-dropdown>
-			<uui-symbol-more
-				slot="label"
-				data-mark="workspace:action-menu-button"
-				label=${this.localize.term('general_actions')}></uui-symbol-more>
+		return html`<umb-entity-actions-dropdown
+			data-mark="workspace:action-menu-button"
+			label=${this.localize.term('general_actions')}>
+			<uui-symbol-more slot="label"></uui-symbol-more>
 		</umb-entity-actions-dropdown>`;
 	}
 

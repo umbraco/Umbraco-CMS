@@ -6,6 +6,7 @@ import type {
 	UmbInvariantDatasetWorkspaceContext,
 	UmbRoutableWorkspaceContext,
 	ManifestWorkspace,
+	UmbNamableWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
 import {
 	UmbSubmittableWorkspaceContextBase,
@@ -26,7 +27,7 @@ type PropertyTypeDataModel = UmbPropertyTypeScaffoldModel;
 
 export class UmbPropertyTypeWorkspaceContext
 	extends UmbSubmittableWorkspaceContextBase<PropertyTypeDataModel>
-	implements UmbInvariantDatasetWorkspaceContext, UmbRoutableWorkspaceContext
+	implements UmbInvariantDatasetWorkspaceContext, UmbRoutableWorkspaceContext, UmbNamableWorkspaceContext
 {
 	// Just for context token safety:
 	public readonly IS_PROPERTY_TYPE_WORKSPACE_CONTEXT = true;
@@ -62,11 +63,22 @@ export class UmbPropertyTypeWorkspaceContext
 		this.validationContext = new UmbValidationContext(this);
 		this.addValidationContext(this.validationContext);
 
-		this.observe(this.unique, (unique) => {
-			if (unique) {
-				this.validationContext.setDataPath(UmbDataPathPropertyTypeQuery({ id: unique }));
-			}
-		});
+		this.observe(
+			this.unique,
+			(unique) => {
+				if (unique) {
+					this.validationContext.setDataPath(UmbDataPathPropertyTypeQuery({ id: unique }));
+				}
+			},
+			null,
+		);
+		this.observe(
+			this.name,
+			(name) => {
+				this.view.setTitle(name);
+			},
+			null,
+		);
 
 		this.#init = this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, (context) => {
 			this.#contentTypeContext = context;

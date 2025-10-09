@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Dictionary;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.Validators;
 using Umbraco.Cms.Core.Serialization;
@@ -27,16 +28,14 @@ public class PropertyValidationServiceTests
     private void MockObjects(out PropertyValidationService validationService, out IDataType dt)
     {
         var dataTypeService = new Mock<IDataTypeService>();
-        var dataType = Mock.Of<IDataType>(
-            x => x.ConfigurationObject == string.Empty // irrelevant but needs a value
-                 && x.DatabaseType == ValueStorageType.Nvarchar
-                 && x.EditorAlias == Constants.PropertyEditors.Aliases.TextBox);
+        var dataType = Mock.Of<IDataType>(x => x.ConfigurationObject == string.Empty // irrelevant but needs a value
+                                               && x.DatabaseType == ValueStorageType.Nvarchar
+                                               && x.EditorAlias == Constants.PropertyEditors.Aliases.TextBox);
         dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>())).Returns(() => dataType);
         dt = dataType;
 
         // new data editor that returns a TextOnlyValueEditor which will do the validation for the properties
-        var dataEditor = Mock.Of<IDataEditor>(
-            x => x.Alias == Constants.PropertyEditors.Aliases.TextBox);
+        var dataEditor = Mock.Of<IDataEditor>(x => x.Alias == Constants.PropertyEditors.Aliases.TextBox);
         Mock.Get(dataEditor).Setup(x => x.GetValueEditor(It.IsAny<object>()))
             .Returns(new CustomTextOnlyValueEditor(
                 new DataEditorAttribute(Constants.PropertyEditors.Aliases.TextBox),
@@ -44,7 +43,15 @@ public class PropertyValidationServiceTests
                 new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()),
                 Mock.Of<IIOHelper>()));
 
-        var propEditors = new PropertyEditorCollection(new DataEditorCollection(() => new[] { dataEditor }));
+        var languageService = new Mock<ILanguageService>();
+        languageService
+            .Setup(s => s.GetDefaultIsoCodeAsync())
+            .ReturnsAsync(() => "en-US");
+
+        var propEditors = new PropertyEditorCollection(new DataEditorCollection(() => [dataEditor]));
+
+        var contentSettings = new Mock<IOptions<ContentSettings>>();
+        contentSettings.Setup(x => x.Value).Returns(new ContentSettings());
 
         validationService = new PropertyValidationService(
             propEditors,
@@ -52,8 +59,8 @@ public class PropertyValidationServiceTests
             Mock.Of<ILocalizedTextService>(),
             new ValueEditorCache(),
             Mock.Of<ICultureDictionary>(),
-            Mock.Of<ILanguageService>(),
-            Mock.Of<IOptions<ContentSettings>>());
+            languageService.Object,
+            contentSettings.Object);
     }
 
     [Test]
@@ -277,6 +284,23 @@ public class PropertyValidationServiceTests
 
         Assert.IsFalse(result);
         Assert.AreEqual(4, invalid.Length);
+    }
+
+    [TestCase(null)]
+    [TestCase(24)]
+    [TestCase("test")]
+    [TestCase("{\"test\": true}")]
+    public void ValidatePropertyValue_Always_Returns_No_Validation_Errors_For_Missing_Editor(object? value)
+    {
+        MockObjects(out var validationService, out _);
+
+        var p1 = new PropertyType(ShortStringHelper, "Missing.Alias", ValueStorageType.Ntext)
+        {
+            Variations = ContentVariation.Nothing,
+        };
+
+        var result = validationService.ValidatePropertyValue(p1, value, PropertyValidationContext.Empty());
+        Assert.AreEqual(0, result.Count());
     }
 
     // used so we can inject a mock - we should fix the base class DataValueEditor to be able to have the ILocalizedTextField passed

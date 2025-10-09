@@ -73,7 +73,7 @@ export class UmbWebhookDetailServerDataSource implements UmbDetailDataSource<Umb
 			events: data.events,
 			enabled: data.enabled,
 			url: data.url,
-			name: data.name,
+			name: data.name ?? '',
 			description: data.description,
 			contentTypes: data.contentTypeKeys,
 		};

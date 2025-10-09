@@ -33,7 +33,7 @@ const SORTER_CONFIG: UmbSorterConfig<UmbPropertyTypeModel, UmbContentTypeDesignE
 	},
 	identifier: 'content-type-property-sorter',
 	itemSelector: 'umb-content-type-design-editor-property',
-	//disabledItemSelector: '[inherited]',
+	disabledItemSelector: '[_inherited]',
 	//TODO: Set the property list (sorter wrapper) to inherited, if its inherited
 	// This is because we don't want to move local properties into an inherited group container.
 	// Or maybe we do, but we still need to check if the group exists locally, if not, then it needs to be created before we move a property into it.
@@ -188,11 +188,6 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 				context?.isSorting,
 				(isSorting) => {
 					this._sortModeActive = isSorting;
-					if (isSorting) {
-						//this.#sorter.enable();
-					} else {
-						//this.#sorter.disable();
-					}
 				},
 				'_observeIsSorting',
 			);

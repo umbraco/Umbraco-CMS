@@ -4,6 +4,7 @@ using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Controllers.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Item;
 using Umbraco.Cms.Api.Management.ViewModels.RecycleBin;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
@@ -43,6 +44,24 @@ public abstract class RecycleBinControllerBase<TItem> : ContentControllerBase
         PagedViewModel<TItem> result = PagedViewModel(treeItemViewModels, totalItems);
 
         return Task.FromResult<ActionResult<PagedViewModel<TItem>>>(Ok(result));
+    }
+
+    protected async Task<ActionResult<SubsetViewModel<TItem>>> GetSiblings(Guid target, int before, int after)
+    {
+        IEntitySlim[] siblings = GetSiblingEntities(target, before, after, out var totalBefore, out var totalAfter);
+        if (siblings.Length == 0)
+        {
+            return NotFound();
+        }
+
+        IEntitySlim entity = siblings.First();
+        Guid? parentKey = GetParentKey(entity);
+
+        TItem[] treeItemViewModels = MapRecycleBinViewModels(parentKey, siblings);
+
+        SubsetViewModel<TItem> result = SubsetViewModel(treeItemViewModels, totalBefore, totalAfter);
+
+        return Ok(result);
     }
 
     protected virtual TItem MapRecycleBinViewModel(Guid? parentKey, IEntitySlim entity)
@@ -136,4 +155,27 @@ public abstract class RecycleBinControllerBase<TItem> : ContentControllerBase
 
     private PagedViewModel<TItem> PagedViewModel(IEnumerable<TItem> treeItemViewModels, long totalItems)
         => new() { Total = totalItems, Items = treeItemViewModels };
+
+    protected SubsetViewModel<TItem> SubsetViewModel(IEnumerable<TItem> treeItemViewModels, long totalBefore, long totalAfter)
+        => new() { TotalBefore = totalBefore, TotalAfter = totalAfter, Items = treeItemViewModels };
+
+    protected virtual IEntitySlim[] GetSiblingEntities(Guid target, int before, int after, out long totalBefore, out long totalAfter) =>
+        _entityService
+            .GetTrashedSiblings(
+                target,
+                [ItemObjectType],
+                before,
+                after,
+                out totalBefore,
+                out totalAfter,
+                ordering: Ordering.By(nameof(Infrastructure.Persistence.Dtos.NodeDto.Text)))
+            .ToArray();
+
+    /// <summary>
+    /// Gets the parent key for an entity, or root if null or no parent.
+    /// </summary>
+    protected virtual Guid? GetParentKey(IEntitySlim entity) =>
+        entity.ParentId > 0
+            ? _entityService.GetKey(entity.ParentId, ItemObjectType).Result
+            : Constants.System.RootKey;
 }

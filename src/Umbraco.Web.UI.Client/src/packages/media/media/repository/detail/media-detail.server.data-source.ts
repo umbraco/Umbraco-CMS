@@ -45,6 +45,7 @@ export class UmbMediaServerDataSource extends UmbControllerBase implements UmbDe
 				icon: mediaTypeIcon,
 			},
 			isTrashed: false,
+			flags: [],
 			values: [],
 			variants: [
 				{
@@ -53,6 +54,7 @@ export class UmbMediaServerDataSource extends UmbControllerBase implements UmbDe
 					name: '',
 					createDate: null,
 					updateDate: null,
+					flags: [],
 				},
 			],
 		};
@@ -90,6 +92,8 @@ export class UmbMediaServerDataSource extends UmbControllerBase implements UmbDe
 					name: variant.name,
 					createDate: variant.createDate,
 					updateDate: variant.updateDate,
+					// TODO: Media variant flags are not yet implemented in the backend.
+					flags: [],
 				};
 			}),
 			mediaType: {
@@ -98,6 +102,7 @@ export class UmbMediaServerDataSource extends UmbControllerBase implements UmbDe
 				icon: data.mediaType.icon,
 			},
 			isTrashed: data.isTrashed,
+			flags: data.flags,
 		};
 
 		return { data: media };

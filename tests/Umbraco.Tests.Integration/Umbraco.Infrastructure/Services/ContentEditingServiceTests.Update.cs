@@ -587,11 +587,17 @@ public partial class ContentEditingServiceTests
 
         var createResult = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsTrue(createResult.Success);
+        Assert.NotNull(createResult.Result.Content);
 
-        var firstUpdateDateEn = createResult.Result.Content!.GetUpdateDate("en-US")!;
-        var firstUpdateDateDa = createResult.Result.Content!.GetUpdateDate("da-DK")!;
+        // Retrieve the actual stored content to ensure the database truncation of times isn't interfering with the test
+        var createdContent = await ContentEditingService.GetAsync(createResult.Result.Content.Key);
+        Assert.NotNull(createdContent);
+        var firstUpdateDateEn = createdContent.GetUpdateDate("en-US");
+        Assert.IsNotNull(firstUpdateDateEn);
+        var firstUpdateDateDa = createdContent.GetUpdateDate("da-DK");
+        Assert.IsNotNull(firstUpdateDateDa);
 
-        Thread.Sleep(100);
+        await Task.Delay(100);
 
         var updateModel = new ContentUpdateModel
         {
@@ -610,15 +616,13 @@ public partial class ContentEditingServiceTests
 
         // re-get and re-test
         VerifyUpdate(await ContentEditingService.GetAsync(updateResult.Result.Content!.Key));
+        return;
 
         void VerifyUpdate(IContent? updatedContent)
         {
             Assert.IsNotNull(updatedContent);
-            Assert.AreEqual(firstUpdateDateDa?.TruncateTo(DateTimeExtensions.DateTruncate.Millisecond), updatedContent.GetUpdateDate("da-DK")?.TruncateTo(DateTimeExtensions.DateTruncate.Millisecond));
-
-            var lastUpdateDateEn = updatedContent.GetUpdateDate("en-US")
-                                   ?? throw new InvalidOperationException("Expected a publish date for EN");
-            Assert.Greater(lastUpdateDateEn.TruncateTo(DateTimeExtensions.DateTruncate.Millisecond), firstUpdateDateEn?.TruncateTo(DateTimeExtensions.DateTruncate.Millisecond));
+            Assert.AreEqual(firstUpdateDateDa, updatedContent.GetUpdateDate("da-DK"));
+            Assert.Less(firstUpdateDateEn, updatedContent.GetUpdateDate("en-US"));
         }
     }
 
@@ -626,10 +630,16 @@ public partial class ContentEditingServiceTests
     public async Task Updating_Single_Variant_Property_Does_Not_Change_Update_Dates_Of_Other_Variants()
     {
         var content = await CreateCultureVariantContent();
-        var firstUpdateDateEn = content.GetUpdateDate("en-US")
-                                ?? throw new InvalidOperationException("Expected an update date for EN");
-        var firstUpdateDateDa = content.GetUpdateDate("da-DK")
-                                ?? throw new InvalidOperationException("Expected an update date for DA");
+
+        // Retrieve the actual stored content to ensure the database truncation of times isn't interfering with the test
+        var createdContent = await ContentEditingService.GetAsync(content.Key);
+        Assert.NotNull(createdContent);
+        var firstUpdateDateEn = createdContent.GetUpdateDate("en-US");
+        Assert.IsNotNull(firstUpdateDateEn);
+        var firstUpdateDateDa = createdContent.GetUpdateDate("da-DK");
+        Assert.IsNotNull(firstUpdateDateDa);
+
+        await Task.Delay(100);
 
         var updateModel = new ContentUpdateModel
         {
@@ -667,15 +677,13 @@ public partial class ContentEditingServiceTests
 
         // re-get and re-test
         VerifyUpdate(await ContentEditingService.GetAsync(content.Key));
+        return;
 
         void VerifyUpdate(IContent? updatedContent)
         {
             Assert.IsNotNull(updatedContent);
-            Assert.AreEqual(firstUpdateDateEn.TruncateTo(DateTimeExtensions.DateTruncate.Millisecond), updatedContent.GetUpdateDate("en-US")?.TruncateTo(DateTimeExtensions.DateTruncate.Millisecond));
-
-            var lastUpdateDateDa = updatedContent.GetUpdateDate("da-DK")
-                                   ?? throw new InvalidOperationException("Expected an update date for DA");
-            Assert.Greater(lastUpdateDateDa.TruncateTo(DateTimeExtensions.DateTruncate.Millisecond), firstUpdateDateDa.TruncateTo(DateTimeExtensions.DateTruncate.Millisecond));
+            Assert.AreEqual(firstUpdateDateEn, updatedContent.GetUpdateDate("en-US"));
+            Assert.Less(firstUpdateDateDa, updatedContent.GetUpdateDate("da-DK"));
         }
     }
 }

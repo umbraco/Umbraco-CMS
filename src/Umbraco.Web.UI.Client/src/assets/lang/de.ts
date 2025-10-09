@@ -772,6 +772,7 @@ export default {
 		design: 'Design',
 		dictionary: 'Wörterbuch',
 		dimensions: 'Abmessungen',
+		dividerPosition: (value: string | number) => `Trenner bei ${value}%`,
 		discard: 'Verwerfen',
 		down: 'nach unten',
 		download: 'Herunterladen',
@@ -1978,6 +1979,7 @@ export default {
 		openBackofficeSearch: 'Back-Office Suche öffnen',
 		openCloseBackofficeHelp: 'Back-Office Hilfe öffnen / schliessen',
 		openCloseBackofficeProfileOptions: 'Ihre Profil-Einstellungen öffnen / schliessen',
+		profileOptions: 'Profil-Einstellungen',
 	},
 	logViewer: {
 		selectAllLogLevelFilters: 'Wählen Sie Alle',

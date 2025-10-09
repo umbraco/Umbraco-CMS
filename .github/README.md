@@ -40,7 +40,7 @@ Some important documentation links to get you started:
 
 ## Get help
 
-If you need a bit of feedback while building your Umbraco projects, we are [chatty on Discord](https://discord.umbraco.com). Our Discord server serves both a social space but also has channels for questions and answers. Feel free to lurk or join in with your own questions. Or just post your daily Wordle score, up to you!
+If you need a bit of feedback while building your Umbraco projects, we are [chatty on Discord](https://discord.umbraco.com). Our Discord server serves as a social space for all Umbracians. If you have any questions or need some help with a problem, head over to our [dedicated forum](https://forum.umbraco.com/) where the Umbraco Community will be happy to help. 
 
 ## Looking to contribute back to Umbraco?
 
@@ -52,3 +52,4 @@ You came to the right place! Our GitHub repository is available for all kinds of
 Umbraco is contribution-focused and community-driven. If you want to contribute back to the Umbraco source code, please check out our [guide to contributing](CONTRIBUTING.md).
 
 ### Tip: You should not run Umbraco from source code found here. Umbraco is extremely extensible and can do whatever you need. Instead, [install Umbraco as noted above](#looking-to-install-umbraco) and then [extend it any way you want to](https://docs.umbraco.com/umbraco-cms/extending/).
+

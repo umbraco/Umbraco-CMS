@@ -2,7 +2,7 @@ using Umbraco.Cms.Api.Management.ViewModels.Content;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.Document;
 
-public class DocumentVariantResponseModel : VariantResponseModelBase, IHasSigns
+public class DocumentVariantResponseModel : VariantResponseModelBase, IHasFlags
 {
     public DocumentVariantState State { get; set; }
 
@@ -12,21 +12,21 @@ public class DocumentVariantResponseModel : VariantResponseModelBase, IHasSigns
 
     public DateTimeOffset? ScheduledUnpublishDate { get; set; }
 
-    private readonly List<SignModel> _signs = [];
+    private readonly List<FlagModel> _flags = [];
 
     public Guid Id { get; }
 
-    public IEnumerable<SignModel> Signs
+    public IEnumerable<FlagModel> Flags
     {
-        get => _signs.AsEnumerable();
+        get => _flags.AsEnumerable();
         set
         {
-            _signs.Clear();
-            _signs.AddRange(value);
+            _flags.Clear();
+            _flags.AddRange(value);
         }
     }
 
-    public void AddSign(string alias) => _signs.Add(new SignModel { Alias = alias });
+    public void AddFlag(string alias) => _flags.Add(new FlagModel { Alias = alias });
 
-    public void RemoveSign(string alias) => _signs.RemoveAll(x => x.Alias == alias);
+    public void RemoveFlag(string alias) => _flags.RemoveAll(x => x.Alias == alias);
 }
