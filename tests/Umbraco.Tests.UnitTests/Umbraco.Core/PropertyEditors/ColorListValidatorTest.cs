@@ -58,4 +58,21 @@ public class ColorListValidatorTest
                 PropertyValidationContext.Empty());
         Assert.AreEqual(2, result.Count());
     }
+
+    [Test]
+    public void Validates_Color_Vals_Unique()
+    {
+        var validator = new ColorPickerConfigurationEditor.ColorListValidator(ConfigurationEditorJsonSerializer());
+        var result =
+            validator.Validate(
+                new JsonArray(
+                    JsonNode.Parse("""{"value": "FFFFFF", "label": "One"}"""),
+                    JsonNode.Parse("""{"value": "000000", "label": "Two"}"""),
+                    JsonNode.Parse("""{"value": "FFF", "label": "Three"}"""),
+                    JsonNode.Parse("""{"value": "000000", "label": "Four"}""")),
+                null,
+                null,
+                PropertyValidationContext.Empty());
+        Assert.AreEqual(1, result.Count());
+    }
 }
