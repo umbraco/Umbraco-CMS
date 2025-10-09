@@ -80,6 +80,7 @@
 		"./package": "./dist-cms/packages/packages/package/index.js",
 		"./partial-view": "./dist-cms/packages/templating/partial-views/index.js",
 		"./picker-input": "./dist-cms/packages/core/picker-input/index.js",
+		"./picker-property-editor": "./dist-cms/packages/core/picker-property-editor/index.js",
 		"./picker": "./dist-cms/packages/core/picker/index.js",
 		"./property-action": "./dist-cms/packages/core/property-action/index.js",
 		"./property-editor": "./dist-cms/packages/core/property-editor/index.js",

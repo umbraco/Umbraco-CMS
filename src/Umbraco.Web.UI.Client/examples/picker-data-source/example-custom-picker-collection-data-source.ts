@@ -1,9 +1,7 @@
 import type {
 	UmbPickerPropertyEditorCollectionDataSource,
 	UmbPickerPropertyEditorSearchableDataSource,
-} from '../../src/packages/core/property-editor/property-editor-data-source/types.js';
-import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbCollectionFilterModel } from '@umbraco-cms/backoffice/collection';
+} from '@umbraco-cms/backoffice/picker-property-editor';
 import type { UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
 import type { UmbEntityDataPickerCollectionItemModel } from 'src/packages/property-editors/entity-data-picker/types.js';
 

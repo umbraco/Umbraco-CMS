@@ -1,8 +1,8 @@
 import { UMB_ENTITY_DATA_PICKER_DATA_SOURCE_API_CONTEXT } from '../input/entity-data-picker-data-source.context.token.js';
 import type { UmbCollectionFilterModel, UmbCollectionRepository } from '@umbraco-cms/backoffice/collection';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbPickerPropertyEditorCollectionDataSource } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbPickerPropertyEditorCollectionDataSource } from '@umbraco-cms/backoffice/picker-property-editor';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 
 export class UmbEntityDataPickerCollectionRepository

@@ -1,7 +1,6 @@
-import type { UmbPickerPropertyEditorTreeDataSource } from '../../src/packages/core/property-editor/property-editor-data-source/types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbTreeChildrenOfRequestArgs } from '@umbraco-cms/backoffice/tree';
-import type { UmbEntityDataPickerTreeItemModel } from 'src/packages/property-editors/entity-data-picker/picker-tree/types.js';
+import type { UmbPickerPropertyEditorTreeDataSource } from '@umbraco-cms/backoffice/picker-property-editor';
+import type { UmbTreeChildrenOfRequestArgs, UmbTreeItemModel } from '@umbraco-cms/backoffice/tree';
 
 export class ExampleCustomPickerTreePropertyEditorDataSource
 	extends UmbControllerBase

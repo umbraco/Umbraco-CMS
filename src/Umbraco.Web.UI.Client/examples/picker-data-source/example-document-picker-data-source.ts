@@ -1,8 +1,3 @@
-import type {
-	UmbPickerPropertyEditorTreeDataSource,
-	UmbPropertyEditorDataSourceConfigModel,
-	UmbPickerPropertyEditorSearchableDataSource,
-} from '../../src/packages/core/property-editor/property-editor-data-source/types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import {
 	UmbDocumentItemRepository,
@@ -11,6 +6,11 @@ import {
 	type UmbDocumentSearchRequestArgs,
 } from '@umbraco-cms/backoffice/document';
 import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/document-type';
+import type {
+	UmbPickerPropertyEditorSearchableDataSource,
+	UmbPickerPropertyEditorTreeDataSource,
+} from '@umbraco-cms/backoffice/picker-property-editor';
+import type { UmbPropertyEditorDataSourceConfigModel } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
 import type {
 	UmbTreeAncestorsOfRequestArgs,

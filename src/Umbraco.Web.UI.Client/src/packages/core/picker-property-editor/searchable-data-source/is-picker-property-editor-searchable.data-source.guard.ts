@@ -1,4 +1,5 @@
-import type { UmbPickerPropertyEditorSearchableDataSource, UmbPropertyEditorDataSource } from './types.js';
+import type { UmbPickerPropertyEditorSearchableDataSource } from './types.js';
+import type { UmbPropertyEditorDataSource } from '@umbraco-cms/backoffice/property-editor';
 
 /**
  *
