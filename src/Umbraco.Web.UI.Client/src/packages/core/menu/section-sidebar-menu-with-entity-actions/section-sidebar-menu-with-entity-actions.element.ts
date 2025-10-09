@@ -21,18 +21,18 @@ export class UmbSectionSidebarMenuWithEntityActionsElement extends UmbSectionSid
 	}
 
 	override renderHeader() {
-		return html`
-			<div id="header">
-				<h3>${this.localize.string(this.manifest?.meta?.label ?? '')}</h3>
-				<umb-entity-actions-bundle
-					slot="actions"
-					.unique=${this._unique}
-					.entityType=${this.manifest?.meta.entityType}
-					.label=${this.localize.term('actions_viewActionsFor', [this.manifest?.meta.label])}>
-				</umb-entity-actions-bundle>
-			</div>
-		`;
-	}
+    return html`
+        <div id="header">
+            <h3>${this.localize.string(this.manifest?.meta?.label ?? '')}</h3>
+            <umb-entity-actions-bundle
+                slot="actions"
+                .unique=${this._unique}
+                .entityType=${this.manifest?.meta.entityType}
+                .label=${this.localize.string(this.manifest?.meta?.label ?? '')}>
+            </umb-entity-actions-bundle>
+        </div>
+    `;
+}
 
 	static override styles = [
 		...UmbSectionSidebarMenuElement.styles,

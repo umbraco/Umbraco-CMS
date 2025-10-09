@@ -118,7 +118,8 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 		const actionsAriaLabel = this.localize.term('buttons_viewActionsFor', [this.label]);
 
 		return html`
-			<umb-entity-actions-dropdown .label=${actionsAriaLabel} compact>
+			<umb-entity-actions-dropdown 
+			.label=${actionsAriaLabel} compact>
 				<uui-symbol-more slot="label"></uui-symbol-more>
 			</umb-entity-actions-dropdown>
 		`;

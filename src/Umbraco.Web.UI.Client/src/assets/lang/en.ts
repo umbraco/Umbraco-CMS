@@ -168,7 +168,7 @@ export default {
 		styleChoose: 'Choose style',
 		styleShow: 'Show styles',
 		tableInsert: 'Insert table',
-		viewActionsFor: 'View action for {0}',
+		viewActionsFor: 'View actions for {0}',
 		generateModelsAndClose: 'Generate models and close',
 		saveAndGenerateModels: 'Save and generate models',
 		undo: 'Undo',
