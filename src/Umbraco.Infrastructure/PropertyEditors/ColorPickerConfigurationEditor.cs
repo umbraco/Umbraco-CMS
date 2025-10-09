@@ -57,6 +57,52 @@ internal class ColorPickerConfigurationEditor : ConfigurationEditor<ColorPickerC
                     yield return new ValidationResult($"The value {item.Value} is not a valid hex color", new[] { "items" });
                 }
             }
+
+            var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var duplicates = new List<string>();
+
+            foreach (ColorPickerConfiguration.ColorPickerItem item in items)
+            {
+                var normalized = Normalize(item.Value);
+                if (string.IsNullOrWhiteSpace(normalized))
+                {
+                    continue;
+                }
+
+                if (!seen.Add(normalized))
+                {
+                    if (!duplicates.Contains(normalized, StringComparer.OrdinalIgnoreCase))
+                    {
+                        duplicates.Add(normalized);
+                    }
+                }
+            }
+
+            if (duplicates.Count > 0)
+            {
+                yield return new ValidationResult(
+                    $"Duplicate color values are not allowed: {string.Join(", ", duplicates)}",
+                    new[] { "items" });
+            }
+        }
+
+        private static string Normalize(string? value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return string.Empty;
+            }
+
+            var v = value.Trim();
+
+            if (v.StartsWith("#"))
+            {
+                v = v.Substring(1);
+            }
+
+            v = v.ToLowerInvariant();
+
+            return v;
         }
     }
 }
