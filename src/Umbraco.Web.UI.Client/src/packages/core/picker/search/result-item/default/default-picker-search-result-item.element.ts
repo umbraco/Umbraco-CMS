@@ -12,7 +12,7 @@ export class UmbDefaultPickerSearchResultItemElement extends UmbPickerSearchResu
 			<umb-ref-item
 				name=${item.name ?? getItemFallbackName(item)}
 				id=${item.unique}
-				icon=${item.icon ?? getItemFallbackIcon(item)}
+				icon=${item.icon ?? getItemFallbackIcon()}
 				select-only
 				?selectable=${!this.disabled}
 				?selected=${this._isSelected}
