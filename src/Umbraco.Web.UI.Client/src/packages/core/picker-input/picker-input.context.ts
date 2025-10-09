@@ -12,12 +12,11 @@ import {
 	type UmbPickerModalData,
 	type UmbPickerModalValue,
 } from '@umbraco-cms/backoffice/modal';
-
-type PickerItemBaseType = { name: string; unique: string };
+import type { UmbItemModel } from '@umbraco-cms/backoffice/entity-item';
 
 export class UmbPickerInputContext<
-	PickedItemType extends PickerItemBaseType = PickerItemBaseType,
-	PickerItemType extends PickerItemBaseType = PickedItemType,
+	PickedItemType extends UmbItemModel = UmbItemModel,
+	PickerItemType extends UmbItemModel = UmbItemModel,
 	PickerModalConfigType extends UmbPickerModalData<PickerItemType> = UmbPickerModalData<PickerItemType>,
 	PickerModalValueType extends UmbPickerModalValue = UmbPickerModalValue,
 > extends UmbContextBase {
