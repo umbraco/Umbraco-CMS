@@ -105,7 +105,7 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 		}
 
 		event.stopPropagation();
-		await this._firstActionApi?.execute().catch(() => {});
+		await this._firstActionApi?.execute().catch(() => { });
 	}
 
 	override render() {
@@ -143,7 +143,7 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 
 	static override styles = [
 		css`
-			uui-scroll-container {w
+			uui-scroll-container {
 				max-height: 700px;
 			}
 		`,

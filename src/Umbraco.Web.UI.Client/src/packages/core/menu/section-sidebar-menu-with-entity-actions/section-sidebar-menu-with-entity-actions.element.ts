@@ -21,7 +21,7 @@ export class UmbSectionSidebarMenuWithEntityActionsElement extends UmbSectionSid
 	}
 
 	override renderHeader() {
-    return html`
+		return html`
         <div id="header">
             <h3>${this.localize.string(this.manifest?.meta?.label ?? '')}</h3>
             <umb-entity-actions-bundle
@@ -32,7 +32,7 @@ export class UmbSectionSidebarMenuWithEntityActionsElement extends UmbSectionSid
             </umb-entity-actions-bundle>
         </div>
     `;
-}
+	}
 
 	static override styles = [
 		...UmbSectionSidebarMenuElement.styles,
