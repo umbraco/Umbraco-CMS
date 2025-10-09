@@ -4,6 +4,7 @@ import { customElement, html, property, state } from '@umbraco-cms/backoffice/ex
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import type {
+	ManifestPropertyEditorDataSource,
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
@@ -11,6 +12,8 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 // import of local component
 import '../input/input-entity-data.element.js';
+import type { UmbConfigCollectionModel } from '@umbraco-cms/backoffice/utils';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-entity-data-picker-property-editor-ui')
 export class UmbEntityDataPickerPropertyEditorUIElement
@@ -26,7 +29,14 @@ export class UmbEntityDataPickerPropertyEditorUIElement
 	 * @memberof UmbEntityDataPickerPropertyEditorUIElement
 	 */
 	@property({ type: String })
-	dataSourceAlias?: string;
+	private _dataSourceAlias?: string | undefined;
+	public get dataSourceAlias(): string | undefined {
+		return this._dataSourceAlias;
+	}
+	public set dataSourceAlias(value: string | undefined) {
+		this._dataSourceAlias = value;
+		this.#extractDataSourceConfig();
+	}
 
 	/**
 	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
@@ -50,12 +60,15 @@ export class UmbEntityDataPickerPropertyEditorUIElement
 	private _maxMessage = '';
 
 	@state()
-	private _config?: UmbPropertyEditorConfigCollection;
+	private _dataSourceConfig?: UmbConfigCollectionModel;
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
-		if (!config) return;
+		if (!config) {
+			this.#propertyEditorConfigCollection = undefined;
+			return;
+		}
 
-		this._config = config;
+		this.#propertyEditorConfigCollection = config;
 
 		this._min = this.#parseInt(config.getValueByAlias('minNumber'), 0);
 		this._max = this.#parseInt(config.getValueByAlias('maxNumber'), Infinity);
@@ -67,11 +80,44 @@ export class UmbEntityDataPickerPropertyEditorUIElement
 		if (this._min > 0 || this._max < Infinity) {
 			this.checkValidity();
 		}
+
+		this._dataSourceConfig = this.#extractDataSourceConfig();
 	}
+
+	#propertyEditorConfigCollection?: UmbPropertyEditorConfigCollection;
 
 	#parseInt(value: unknown, fallback: number): number {
 		const num = Number(value);
 		return !isNaN(num) && num > 0 ? num : fallback;
+	}
+
+	#extractDataSourceConfig() {
+		if (!this._dataSourceAlias || !this.#propertyEditorConfigCollection) {
+			this._dataSourceConfig = undefined;
+			return;
+		}
+
+		const dataSourceExtension = umbExtensionsRegistry.getByAlias<ManifestPropertyEditorDataSource>(
+			this._dataSourceAlias,
+		);
+
+		if (!dataSourceExtension) {
+			throw new Error(`Data source with alias ${this._dataSourceAlias} not found`);
+		}
+
+		const aliases = dataSourceExtension.meta?.settings?.properties.map((property) => property.alias);
+		const configAliasMatch = this.#propertyEditorConfigCollection.filter((configEntry) =>
+			aliases?.includes(configEntry.alias),
+		);
+
+		const dataSourceConfig: UmbConfigCollectionModel | undefined = configAliasMatch?.map((configEntry) => {
+			return {
+				alias: configEntry.alias,
+				value: configEntry.value,
+			};
+		});
+
+		return dataSourceConfig;
 	}
 
 	override focus() {
@@ -86,8 +132,8 @@ export class UmbEntityDataPickerPropertyEditorUIElement
 	override render() {
 		return html`<umb-input-entity-data
 			.selection=${this.value ?? []}
-			.dataSourceAlias="${this.dataSourceAlias}"
-			.config=${this._config}
+			.dataSourceAlias="${this._dataSourceAlias}"
+			.dataSourceConfig=${this._dataSourceConfig}
 			.min=${this._min}
 			.min-message=${this._minMessage}
 			.max=${this._max}

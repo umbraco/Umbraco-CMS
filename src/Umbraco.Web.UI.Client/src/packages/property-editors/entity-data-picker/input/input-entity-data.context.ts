@@ -8,10 +8,7 @@ import {
 	type UmbCollectionItemPickerModalData,
 	type UmbCollectionItemPickerModalValue,
 } from '@umbraco-cms/backoffice/collection';
-import type {
-	ManifestPropertyEditorDataSource,
-	UmbPropertyEditorDataSourceConfigModel,
-} from '@umbraco-cms/backoffice/property-editor';
+import type { ManifestPropertyEditorDataSource } from '@umbraco-cms/backoffice/property-editor';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbModalToken, type UmbPickerModalData } from '@umbraco-cms/backoffice/modal';
@@ -31,12 +28,13 @@ import {
 	type UmbPickerPropertyEditorTreeDataSource,
 } from '@umbraco-cms/backoffice/picker-property-editor';
 import type { UmbItemModel } from '@umbraco-cms/backoffice/entity-item';
+import type { UmbConfigCollectionModel } from '@umbraco-cms/backoffice/utils';
 
 export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<UmbItemModel> {
 	#dataSourceAlias?: string;
 	#dataSourceApiInitializer?: UmbExtensionApiInitializer<ManifestPropertyEditorDataSource>;
 	#dataSourceApi?: UmbPickerPropertyEditorDataSource;
-	#dataSourceConfig?: UmbPropertyEditorDataSourceConfigModel | undefined;
+	#dataSourceConfig?: UmbConfigCollectionModel | undefined;
 
 	#dataSourceApiContext = new UmbEntityDataPickerDataSourceApiContext(this);
 
@@ -68,8 +66,12 @@ export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<UmbIt
 	 * @param {(UmbPropertyEditorDataSourceConfigModel | undefined)} config The data source config.
 	 * @memberof UmbEntityDataPickerInputContext
 	 */
-	setDataSourceConfig(config: UmbPropertyEditorDataSourceConfigModel | undefined) {
+	setDataSourceConfig(config: UmbConfigCollectionModel | undefined) {
 		this.#dataSourceConfig = config;
+
+		if (this.#dataSourceApi) {
+			this.#dataSourceApi.setConfig?.(config);
+		}
 	}
 
 	/**
@@ -77,7 +79,7 @@ export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<UmbIt
 	 * @returns {(UmbPropertyEditorDataSourceConfigModel | undefined)} The data source config.
 	 * @memberof UmbEntityDataPickerInputContext
 	 */
-	getDataSourceConfig(): UmbPropertyEditorDataSourceConfigModel | undefined {
+	getDataSourceConfig(): UmbConfigCollectionModel | undefined {
 		return this.#dataSourceConfig;
 	}
 

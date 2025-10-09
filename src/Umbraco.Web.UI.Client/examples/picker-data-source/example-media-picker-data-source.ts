@@ -8,7 +8,6 @@ import type {
 	UmbPickerPropertyEditorSearchableDataSource,
 	UmbPickerPropertyEditorTreeDataSource,
 } from '@umbraco-cms/backoffice/picker-property-editor';
-import type { UmbPropertyEditorDataSourceConfigModel } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
 import type {
 	UmbTreeAncestorsOfRequestArgs,
@@ -23,15 +22,6 @@ export class ExampleMediaPickerPropertyEditorDataSource
 	#tree = new UmbMediaTreeRepository(this);
 	#item = new UmbMediaItemRepository(this);
 	#search = new UmbMediaSearchRepository(this);
-	#config: UmbPropertyEditorDataSourceConfigModel = [];
-
-	setConfig(config: UmbPropertyEditorDataSourceConfigModel) {
-		this.#config = config;
-	}
-
-	getConfig(): UmbPropertyEditorDataSourceConfigModel {
-		return this.#config;
-	}
 
 	requestTreeRoot() {
 		return this.#tree.requestTreeRoot();

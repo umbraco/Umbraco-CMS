@@ -1,14 +1,10 @@
 import { UmbEntityDataPickerInputContext } from './input-entity-data.context.js';
 import { css, html, customElement, property, state, repeat, nothing, when } from '@umbraco-cms/backoffice/external/lit';
-import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
+import { splitStringToArray, type UmbConfigCollectionModel } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import type {
-	UmbPropertyEditorConfigCollection,
-	UmbPropertyEditorDataSourceConfigModel,
-} from '@umbraco-cms/backoffice/property-editor';
 import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
 import type { UmbItemModel } from '@umbraco-cms/backoffice/entity-item';
 
@@ -37,23 +33,12 @@ export class UmbInputEntityDataElement extends UUIFormControlMixin(UmbLitElement
 		return this.#pickerInputContext.getDataSourceAlias();
 	}
 
-	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
-		this.#config = config;
-
-		const mappedConfig: UmbPropertyEditorDataSourceConfigModel | undefined = config?.map((configEntry) => {
-			return {
-				alias: configEntry.alias,
-				value: configEntry.value,
-			};
-		});
-
-		this.#pickerInputContext.setDataSourceConfig(mappedConfig);
+	public set dataSourceConfig(config: UmbConfigCollectionModel | undefined) {
+		this.#pickerInputContext.setDataSourceConfig(config);
 	}
-	public get config(): UmbPropertyEditorConfigCollection | undefined {
-		return this.#config;
+	public get dataSourceConfig(): UmbConfigCollectionModel | undefined {
+		return this.#pickerInputContext.getDataSourceConfig();
 	}
-
-	#config?: UmbPropertyEditorConfigCollection;
 
 	/**
 	 * This is a minimum amount of selected items in this input.

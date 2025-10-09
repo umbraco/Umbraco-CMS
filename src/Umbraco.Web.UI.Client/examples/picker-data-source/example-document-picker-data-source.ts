@@ -10,13 +10,13 @@ import type {
 	UmbPickerPropertyEditorSearchableDataSource,
 	UmbPickerPropertyEditorTreeDataSource,
 } from '@umbraco-cms/backoffice/picker-property-editor';
-import type { UmbPropertyEditorDataSourceConfigModel } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
 import type {
 	UmbTreeAncestorsOfRequestArgs,
 	UmbTreeChildrenOfRequestArgs,
 	UmbTreeRootItemsRequestArgs,
 } from '@umbraco-cms/backoffice/tree';
+import { getConfigValue, type UmbConfigCollectionModel } from '@umbraco-cms/backoffice/utils';
 
 export class ExampleDocumentPickerPropertyEditorDataSource
 	extends UmbControllerBase
@@ -25,13 +25,13 @@ export class ExampleDocumentPickerPropertyEditorDataSource
 	#tree = new UmbDocumentTreeRepository(this);
 	#item = new UmbDocumentItemRepository(this);
 	#search = new UmbDocumentSearchRepository(this);
-	#config: UmbPropertyEditorDataSourceConfigModel = [];
+	#config: UmbConfigCollectionModel = [];
 
-	setConfig(config: UmbPropertyEditorDataSourceConfigModel) {
+	setConfig(config: UmbConfigCollectionModel) {
 		this.#config = config;
 	}
 
-	getConfig(): UmbPropertyEditorDataSourceConfigModel {
+	getConfig(): UmbConfigCollectionModel {
 		return this.#config;
 	}
 
@@ -56,7 +56,7 @@ export class ExampleDocumentPickerPropertyEditorDataSource
 	}
 
 	search(args: UmbSearchRequestArgs) {
-		const filterString = this.#config?.find((x) => x.alias === 'filter')?.value as string;
+		const filterString = getConfigValue<string>(this.#config, 'filter');
 		const filterArray = filterString ? filterString.split(',') : [];
 		const allowedContentTypes: UmbDocumentSearchRequestArgs['allowedContentTypes'] = filterArray.map(
 			(unique: string) => ({
