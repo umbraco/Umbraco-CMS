@@ -1,10 +1,10 @@
 import { UmbEntityContext } from '../../entity/entity.context.js';
-import type { UmbEntityAction, ManifestEntityActionDefaultKind } from '@umbraco-cms/backoffice/entity-action';
-import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
-import { html, nothing, customElement, property, state, ifDefined, css } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { css, customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbExtensionsManifestInitializer, createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbEntityAction, ManifestEntityActionDefaultKind } from '@umbraco-cms/backoffice/entity-action';
 
 @customElement('umb-entity-actions-bundle')
 export class UmbEntityActionsBundleElement extends UmbLitElement {
@@ -105,12 +105,12 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 		}
 
 		event.stopPropagation();
-		await this._firstActionApi?.execute().catch(() => { });
+		await this._firstActionApi?.execute().catch(() => {});
 	}
 
 	override render() {
 		if (this._numberOfActions === 0) return nothing;
-		return html`<uui-action-bar slot="actions">${this.#renderMore()} ${this.#renderFirstAction()} </uui-action-bar>`;
+		return html`<uui-action-bar slot="actions">${this.#renderMore()}${this.#renderFirstAction()}</uui-action-bar>`;
 	}
 
 	#renderMore() {

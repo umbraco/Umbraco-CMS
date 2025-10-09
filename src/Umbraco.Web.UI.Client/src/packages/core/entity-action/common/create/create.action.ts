@@ -2,20 +2,15 @@ import { UmbEntityActionBase } from '../../entity-action-base.js';
 import type { UmbEntityActionArgs } from '../../types.js';
 import type { MetaEntityActionCreateKind } from './types.js';
 import { UMB_ENTITY_CREATE_OPTION_ACTION_LIST_MODAL } from './modal/constants.js';
+import { createExtensionApi, UmbExtensionsManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import {
-	type UmbExtensionManifestInitializer,
-	createExtensionApi,
-	UmbExtensionsManifestInitializer,
-	type PermittedControllerType,
-} from '@umbraco-cms/backoffice/extension-api';
 import type {
 	ManifestEntityCreateOptionAction,
 	UmbEntityCreateOptionAction,
 } from '@umbraco-cms/backoffice/entity-create-option-action';
-import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
+import type { PermittedControllerType, UmbExtensionManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbCreateEntityAction extends UmbEntityActionBase<MetaEntityActionCreateKind> {
 	#hasSingleOption = true;
