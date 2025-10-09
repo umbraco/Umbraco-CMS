@@ -23,8 +23,6 @@ export class UmbPropertyEditorDataSourceItemRefElement extends UmbLitElement {
 	override render() {
 		if (!this.item) return nothing;
 
-		console.log(this.item);
-
 		return html`
 			<uui-ref-node
 				name=${this.item.name}
