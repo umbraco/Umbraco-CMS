@@ -41,10 +41,10 @@ public sealed class MemberGroupCacheRefresher : PayloadCacheRefresherBase<Member
 
     #region Refresher
 
-    public override void Refresh(string json)
+    public override void RefreshInternal(JsonPayload[] payloads)
     {
         ClearCache();
-        base.Refresh(json);
+        base.RefreshInternal(payloads);
     }
 
     public override void Refresh(int id)

@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -5,6 +6,7 @@ using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
@@ -56,9 +58,22 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
         IDataTypeService dataTypeService,
         IJsonSerializer serializer,
         IEventAggregator eventAggregator,
-        IOptions<MemberPasswordConfigurationSettings> passwordConfiguration)
-        : base(scopeAccessor, cache, logger, languageRepository, relationRepository, relationTypeRepository,
-            propertyEditors, dataValueReferenceFactories, dataTypeService, eventAggregator)
+        IOptions<MemberPasswordConfigurationSettings> passwordConfiguration,
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            cache,
+            logger,
+            languageRepository,
+            relationRepository,
+            relationTypeRepository,
+            propertyEditors,
+            dataValueReferenceFactories,
+            dataTypeService,
+            eventAggregator,
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
         _memberTypeRepository =
             memberTypeRepository ?? throw new ArgumentNullException(nameof(memberTypeRepository));
@@ -68,7 +83,47 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
         _memberGroupRepository = memberGroupRepository;
         _passwordConfiguration = passwordConfiguration.Value;
         _memberByUsernameCachePolicy =
-            new MemberRepositoryUsernameCachePolicy(GlobalIsolatedCache, ScopeAccessor, DefaultOptions);
+            new MemberRepositoryUsernameCachePolicy(GlobalIsolatedCache, ScopeAccessor, DefaultOptions, repositoryCacheVersionService, cacheSyncService);
+    }
+
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
+    public MemberRepository(
+        IScopeAccessor scopeAccessor,
+        AppCaches cache,
+        ILogger<MemberRepository> logger,
+        IMemberTypeRepository memberTypeRepository,
+        IMemberGroupRepository memberGroupRepository,
+        ITagRepository tagRepository,
+        ILanguageRepository languageRepository,
+        IRelationRepository relationRepository,
+        IRelationTypeRepository relationTypeRepository,
+        IPasswordHasher passwordHasher,
+        PropertyEditorCollection propertyEditors,
+        DataValueReferenceFactoryCollection dataValueReferenceFactories,
+        IDataTypeService dataTypeService,
+        IJsonSerializer serializer,
+        IEventAggregator eventAggregator,
+        IOptions<MemberPasswordConfigurationSettings> passwordConfiguration)
+        : this(
+            scopeAccessor,
+            cache,
+            logger,
+            memberTypeRepository,
+            memberGroupRepository,
+            tagRepository,
+            languageRepository,
+            relationRepository,
+            relationTypeRepository,
+            passwordHasher,
+            propertyEditors,
+            dataValueReferenceFactories,
+            dataTypeService,
+            serializer,
+            eventAggregator,
+            passwordConfiguration,
+            StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>(),
+            StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>())
+    {
     }
 
     /// <summary>

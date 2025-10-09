@@ -4,6 +4,7 @@
 using System.Data.Common;
 using System.Linq;
 using Microsoft.Extensions.Logging;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
@@ -28,7 +29,7 @@ internal sealed class ServerRegistrationRepositoryTest : UmbracoIntegrationTest
     private AppCaches _appCaches;
 
     private ServerRegistrationRepository CreateRepository(IScopeProvider provider) =>
-        new((IScopeAccessor)provider, LoggerFactory.CreateLogger<ServerRegistrationRepository>());
+        new((IScopeAccessor)provider, LoggerFactory.CreateLogger<ServerRegistrationRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
 
     [Test]
     public void Cannot_Add_Duplicate_Server_Identities()

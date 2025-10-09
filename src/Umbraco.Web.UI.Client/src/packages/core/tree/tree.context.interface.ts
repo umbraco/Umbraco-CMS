@@ -1,10 +1,11 @@
-import type { UmbTreeExpansionManager } from './expansion-manager/index.js';
 import type { ManifestTree, UmbTreeItemModel, UmbTreeRootModel, UmbTreeStartNode } from './types.js';
-import type { UmbTreeRootItemsRequestArgs } from './data/types.js';
-import type { UmbTreeRepository } from './data/tree-repository.interface.js';
-import type { UmbTreeExpansionModel } from './expansion-manager/types.js';
 import type { Observable } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
+import type { UmbTreeExpansionManager } from './expansion-manager/index.js';
+import type { UmbTreeExpansionModel } from './expansion-manager/types.js';
+import type { UmbTreeItemActiveManager } from './active-manager/tree-active-manager.js';
+import type { UmbTreeRepository } from './data/tree-repository.interface.js';
+import type { UmbTreeRootItemsRequestArgs } from './data/types.js';
 import type {
 	UmbPaginationManager,
 	UmbSelectionManager,
@@ -17,6 +18,8 @@ export interface UmbTreeContext<
 	RequestArgsType extends UmbTreeRootItemsRequestArgs = UmbTreeRootItemsRequestArgs,
 > extends UmbContextBase {
 	manifest: ManifestTree | undefined;
+
+	readonly activeManager: UmbTreeItemActiveManager;
 
 	readonly treeRoot: Observable<TreeRootType | undefined>;
 	readonly hideTreeRoot: Observable<boolean | undefined>;

@@ -22,6 +22,7 @@ import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-reg
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { umbPeekError } from '@umbraco-cms/backoffice/notification';
 import { UmbContentDetailWorkspaceContextBase } from '@umbraco-cms/backoffice/content';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbDocumentBlueprintDetailRepository } from '@umbraco-cms/backoffice/document-blueprint';
 import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
@@ -34,7 +35,6 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbVariantPropertyGuardRule } from '@umbraco-cms/backoffice/property';
-import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
 type ContentModel = UmbDocumentDetailModel;
 type ContentTypeModel = UmbDocumentTypeDetailModel;

@@ -1,3 +1,4 @@
+import { UmbTreeItemActiveManager } from '../active-manager/tree-active-manager.js';
 import { UmbTreeExpansionManager } from '../expansion-manager/index.js';
 import { UmbTreeItemChildrenManager } from '../tree-item/tree-item-children.manager.js';
 import { UmbTreeItemTargetExpansionManager } from '../tree-item/tree-item-expansion.manager.js';
@@ -52,6 +53,8 @@ export class UmbDefaultTreeContext<
 		childrenManager: this.#treeItemChildrenManager,
 		targetPaginationManager: this.targetPagination,
 	});
+
+	readonly activeManager = new UmbTreeItemActiveManager(this);
 
 	#manifest?: ManifestTree;
 	#repository?: UmbTreeRepository<TreeItemType, TreeRootType>;

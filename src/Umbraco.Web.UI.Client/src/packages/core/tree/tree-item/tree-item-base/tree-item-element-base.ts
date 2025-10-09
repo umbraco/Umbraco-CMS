@@ -1,8 +1,19 @@
 import type { UmbTreeItemContext } from '../index.js';
 import type { UmbTreeItemModel } from '../../types.js';
-import { html, ifDefined, nothing, state, repeat, property } from '@umbraco-cms/backoffice/external/lit';
+import {
+	html,
+	ifDefined,
+	nothing,
+	state,
+	repeat,
+	property,
+	css,
+	type TemplateResult,
+} from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { UmbEntityFlag } from '@umbraco-cms/backoffice/entity-flag';
 
 export abstract class UmbTreeItemElementBase<
 	TreeItemModelType extends UmbTreeItemModel,
@@ -11,6 +22,7 @@ export abstract class UmbTreeItemElementBase<
 	@property({ type: Object, attribute: false })
 	set item(newVal: TreeItemModelType) {
 		this._item = newVal;
+		this._extractFlags(newVal);
 
 		if (this._item) {
 			this._label = this.localize.string(this._item?.name ?? '');
@@ -21,6 +33,18 @@ export abstract class UmbTreeItemElementBase<
 		return this._item;
 	}
 	protected _item?: TreeItemModelType;
+
+	/**
+	 * @param item - The item from which to extract flags.
+	 * @description This method is called whenever the `item` property is set. It extracts the flags from the item and assigns them to the `_flags` state property.
+	 * This method is in some cases overridden in subclasses to customize how flags are extracted!
+	 */
+	protected _extractFlags(item: TreeItemModelType | undefined) {
+		this._flags = item?.flags ?? [];
+	}
+
+	@state()
+	protected _flags?: Array<UmbEntityFlag>;
 
 	@state()
 	private _label?: string;
@@ -36,6 +60,7 @@ export abstract class UmbTreeItemElementBase<
 		this.#api = value;
 
 		if (this.#api) {
+			this.#api?.setIsMenu(this._isMenu);
 			this.observe(this.#api.childItems, (value) => (this._childItems = value));
 			this.observe(this.#api.hasChildren, (value) => (this._hasChildren = value));
 			this.observe(this.#api.isActive, (value) => (this._isActive = value));
@@ -95,6 +120,9 @@ export abstract class UmbTreeItemElementBase<
 	private _hasChildren = false;
 
 	@state()
+	protected _forceShowExpand = false;
+
+	@state()
 	private _isOpen = false;
 
 	@state()
@@ -111,6 +139,17 @@ export abstract class UmbTreeItemElementBase<
 
 	@state()
 	private _hasNextItems = false;
+
+	@state()
+	protected _isMenu = false;
+
+	set isMenu(value: boolean) {
+		this._isMenu = value;
+		this.#api?.setIsMenu(value);
+	}
+	get isMenu(): boolean {
+		return this._isMenu;
+	}
 
 	#initTreeItem() {
 		if (!this.#api) return;
@@ -130,11 +169,15 @@ export abstract class UmbTreeItemElementBase<
 
 	private _onShowChildren(event: UUIMenuItemEvent) {
 		event.stopPropagation();
+		// Prevent default cause we will now control the show-children state ourself.
+		event.preventDefault();
 		this.#api?.showChildren();
 	}
 
 	private _onHideChildren(event: UUIMenuItemEvent) {
 		event.stopPropagation();
+		// Prevent default cause we will now control the show-children state ourself.
+		event.preventDefault();
 		this.#api?.hideChildren();
 	}
 
@@ -163,13 +206,14 @@ export abstract class UmbTreeItemElementBase<
 				?selectable=${this._isSelectable}
 				?selected=${this._isSelected}
 				.loading=${this._isLoading}
-				.hasChildren=${this._hasChildren}
+				.hasChildren=${this._forceShowExpand || this._hasChildren}
 				.showChildren=${this._isOpen}
 				.caretLabel=${this._isOpen
 					? this.localize.term('visuallyHiddenTexts_collapseChildItems') + ' ' + this._label
 					: this.localize.term('visuallyHiddenTexts_expandChildItems') + ' ' + this._label}
 				label=${ifDefined(this._label)}
-				href="${ifDefined(this._isSelectableContext ? undefined : this._href)}">
+				href="${ifDefined(this._isSelectableContext ? undefined : this._href)}"
+				.renderExpandSymbol=${this._renderExpandSymbol}>
 				${this.#renderLoadPrevButton()} ${this.renderIconContainer()} ${this.renderLabel()} ${this.#renderActions()}
 				${this.#renderChildItems()}
 				<slot></slot>
@@ -184,34 +228,50 @@ export abstract class UmbTreeItemElementBase<
 
 	renderIconContainer() {
 		return html`
-			<slot
-				name="icon"
-				slot="icon"
-				@slotchange=${(e: Event) => {
-					this._iconSlotHasChildren = this.#hasNodes(e);
-				}}></slot>
-			${!this._iconSlotHasChildren ? this.#renderIcon() : nothing}
+			<div id="icon-container" slot="icon">
+				<slot
+					name="icon"
+					@slotchange=${(e: Event) => {
+						this._iconSlotHasChildren = this.#hasNodes(e);
+					}}></slot>
+				${this.#renderSigns()}
+			</div>
 		`;
 	}
 
+	// eslint-disable-next-line @typescript-eslint/naming-convention
+	_renderExpandSymbol?: () => HTMLElement | TemplateResult<1> | undefined;
+
+	#renderSigns() {
+		return this._item
+			? html`<umb-entity-sign-bundle .entityType=${this._item!.entityType} .entityFlags=${this._flags}
+					>${!this._iconSlotHasChildren ? this.#renderIcon() : nothing}</umb-entity-sign-bundle
+				>`
+			: nothing;
+	}
+
 	#renderIcon() {
-		const icon = this._item?.icon;
+		const iconName = this._getIconName();
 		const isFolder = this._item?.isFolder;
 
-		if (icon) {
-			return html`<umb-icon slot="icon" name="${this._getIconToRender(icon)}"></umb-icon>`;
+		if (iconName) {
+			return html`<umb-icon name="${this._getIconToRender(iconName)}"></umb-icon>`;
 		}
 
 		if (isFolder) {
-			return html`<umb-icon slot="icon" name="icon-folder"></umb-icon>`;
+			return html`<umb-icon name="icon-folder"></umb-icon>`;
 		}
 
-		return html`<umb-icon slot="icon" name="icon-circle-dotted"></umb-icon>`;
+		return html`<umb-icon name="icon-circle-dotted"></umb-icon>`;
 	}
 
 	protected _getIconToRender(icon: string) {
 		const iconWithoutColor = icon.split(' ')[0];
 		return this._isActive || this._isSelected ? iconWithoutColor : icon;
+	}
+
+	protected _getIconName(): string | null | undefined {
+		return this._item?.icon;
 	}
 
 	renderLabel() {
@@ -240,7 +300,7 @@ export abstract class UmbTreeItemElementBase<
 						(item) => html`
 							<umb-tree-item
 								.entityType=${item.entityType}
-								.props=${{ hideActions: this.hideActions, item }}></umb-tree-item>
+								.props=${{ hideActions: this.hideActions, item, isMenu: this.isMenu }}></umb-tree-item>
 						`,
 					)
 				: ''}
@@ -262,4 +322,38 @@ export abstract class UmbTreeItemElementBase<
 				.loading=${this._isLoadingNextChildren}></umb-tree-load-more-button>
 		`;
 	}
+
+	static override styles = [
+		UmbTextStyles,
+		css`
+			#icon-container {
+				position: relative;
+				font-size: 15px;
+			}
+
+			uui-menu-item {
+				--umb-sign-bundle-bg: var(--uui-color-surface);
+			}
+
+			uui-menu-item:hover {
+				--umb-sign-bundle-bg: var(--uui-color-surface-emphasis);
+			}
+
+			uui-menu-item[active],
+			uui-menu-item[selected] {
+				--umb-sign-bundle-bg: var(--uui-color-current);
+			}
+
+			uui-menu-item[selected]:hover,
+			uui-menu-item[active]:hover {
+				--umb-sign-bundle-bg: var(--uui-color-current-emphasis);
+			}
+
+			#label {
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+		`,
+	];
 }

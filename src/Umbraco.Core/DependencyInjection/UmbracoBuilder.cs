@@ -17,6 +17,7 @@ using Umbraco.Cms.Core.Dictionary;
 using Umbraco.Cms.Core.DynamicRoot;
 using Umbraco.Cms.Core.Editors;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Factories;
 using Umbraco.Cms.Core.Features;
 using Umbraco.Cms.Core.Handlers;
 using Umbraco.Cms.Core.Hosting;
@@ -344,7 +345,11 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<ILocalizedTextService>(factory => new LocalizedTextService(
                 factory.GetRequiredService<Lazy<LocalizedTextServiceFileSources>>(),
                 factory.GetRequiredService<ILogger<LocalizedTextService>>()));
+            // Default to a NOOP repository cache version service
+            Services.AddUnique<IRepositoryCacheVersionService, SingleServerCacheVersionService>();
             Services.AddUnique<ILongRunningOperationService, LongRunningOperationService>();
+            Services.AddUnique<ILastSyncedManager, LastSyncedManager>();
+            Services.AddUnique<IMachineInfoFactory, MachineInfoFactory>();
 
             Services.AddUnique<IEntityXmlSerializer, EntityXmlSerializer>();
 

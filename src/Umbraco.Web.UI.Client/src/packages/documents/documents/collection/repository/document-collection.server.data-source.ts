@@ -49,6 +49,7 @@ export class UmbDocumentCollectionServerDataSource implements UmbCollectionDataS
 					isTrashed: item.isTrashed,
 					sortOrder: item.sortOrder,
 					updater: item.updater,
+					flags: item.flags,
 					values: item.values.map((item) => {
 						return {
 							alias: item.alias,
@@ -69,6 +70,7 @@ export class UmbDocumentCollectionServerDataSource implements UmbCollectionDataS
 							state: item.state,
 							createDate: new Date(item.createDate),
 							updateDate: new Date(item.updateDate),
+							flags: item.flags,
 						};
 					}),
 				};

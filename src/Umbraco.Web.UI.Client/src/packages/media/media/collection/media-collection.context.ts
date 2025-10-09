@@ -27,6 +27,7 @@ export class UmbMediaCollectionContext extends UmbDefaultCollectionContext<
 				updateDate: date,
 				createDate: date,
 				entityType: UMB_MEDIA_PLACEHOLDER_ENTITY_TYPE,
+				flags: [],
 				...placeholder,
 			}))
 			.reverse();

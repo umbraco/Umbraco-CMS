@@ -53,6 +53,7 @@ export class UmbDocumentUnpublishEntityBulkAction extends UmbEntityBulkActionBas
 				segment: null,
 				scheduledPublishDate: null,
 				scheduledUnpublishDate: null,
+				flags: [],
 			},
 			unique: new UmbVariantId(language.unique, null).toString(),
 			culture: language.unique,

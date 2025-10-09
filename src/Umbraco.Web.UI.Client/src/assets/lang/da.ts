@@ -849,6 +849,7 @@ export default {
 		details: 'Detaljer',
 		dictionary: 'Ordbog',
 		dimensions: 'Dimensioner',
+		dividerPosition: (value: string | number) => `Skillevæg ved ${value}%`,
 		discard: 'Kassér',
 		down: 'Ned',
 		download: 'Hent',

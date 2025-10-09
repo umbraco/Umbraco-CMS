@@ -17,8 +17,18 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
 internal sealed class TagRepository : EntityRepositoryBase<int, ITag>, ITagRepository
 {
-    public TagRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<TagRepository> logger)
-        : base(scopeAccessor, cache, logger)
+    public TagRepository(
+        IScopeAccessor scopeAccessor,
+        AppCaches cache,
+        ILogger<TagRepository> logger,
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            cache,
+            logger,
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
     }
 

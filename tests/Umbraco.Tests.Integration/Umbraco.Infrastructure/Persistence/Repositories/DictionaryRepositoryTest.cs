@@ -33,7 +33,9 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
             cache,
             GetRequiredService<ILogger<DictionaryRepository>>(),
             GetRequiredService<ILoggerFactory>(),
-            GetRequiredService<ILanguageRepository>());
+            GetRequiredService<ILanguageRepository>(),
+            GetRequiredService<IRepositoryCacheVersionService>(),
+            GetRequiredService<ICacheSyncService>());
 
     [Test]
     public async Task Can_Perform_Get_By_Key_On_DictionaryRepository()
