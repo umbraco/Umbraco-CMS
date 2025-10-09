@@ -50,25 +50,16 @@ internal class ColorPickerConfigurationEditor : ConfigurationEditor<ColorPickerC
                 yield break;
             }
 
+            var duplicates = new List<string>();
             foreach (ColorPickerConfiguration.ColorPickerItem item in items)
             {
                 if (Regex.IsMatch(item.Value, "^([0-9a-f]{3}|[0-9a-f]{6})$", RegexOptions.IgnoreCase) == false)
                 {
                     yield return new ValidationResult($"The value {item.Value} is not a valid hex color", new[] { "items" });
                 }
-            }
 
-            var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            var duplicates = new List<string>();
-
-            foreach (ColorPickerConfiguration.ColorPickerItem item in items)
-            {
+                var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                 var normalized = Normalize(item.Value);
-                if (string.IsNullOrWhiteSpace(normalized))
-                {
-                    continue;
-                }
-
                 if (!seen.Add(normalized))
                 {
                     if (!duplicates.Contains(normalized, StringComparer.OrdinalIgnoreCase))
