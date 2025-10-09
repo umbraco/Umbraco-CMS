@@ -1,88 +1,67 @@
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbNewsDashboardRepository } from './repository/index.js';
+import { css, customElement, html, repeat, state, unsafeHTML, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { NewsDashboardItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
-import { UmbNewsStoriesRepository } from './repository/index.js';
-import type { ServerNewsStory } from './repository/sources/index.js';
+import './umbraco-welcome-dashboard.element.js';
 
 @customElement('umb-umbraco-news-dashboard')
 export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
-	@state()
-	private _stories: ServerNewsStory[] = [];
-	#repo = new UmbNewsStoriesRepository(this);
+	#repository = new UmbNewsDashboardRepository(this);
 
-	override async firstUpdated() {
-		const res = await this.#repo.getAll();
-		this._stories = res.data ?? [];
+	@state()
+	private _items: Array<NewsDashboardItemResponseModel> = [];
+
+	override connectedCallback() {
+		super.connectedCallback();
+
+		this.#getUmbracoNews();
 	}
 
-	#infoLinks = [
-		{
-			name: this.localize.term('welcomeDashboard_documentationHeadline'),
-			description: this.localize.term('welcomeDashboard_documentationDescription'),
-			href: 'https://docs.umbraco.com/?utm_source=core&utm_medium=dashboard&utm_campaign=docs',
-		},
-		{
-			name: this.localize.term('welcomeDashboard_communityHeadline'),
-			description: this.localize.term('welcomeDashboard_communityDescription'),
-			href: 'https://our.umbraco.com/?utm_source=core&utm_medium=dashboard&utm_content=text&utm_campaign=our_forum',
-		},
-		{
-			name: this.localize.term('welcomeDashboard_resourcesHeadline'),
-			description: this.localize.term('welcomeDashboard_resourcesDescription'),
-			href: 'https://umbraco.com/resources/?utm_source=core&utm_medium=dashboard&utm_content=text&utm_campaign=resources',
-		},
-		{
-			name: this.localize.term('welcomeDashboard_trainingHeadline'),
-			description: this.localize.term('welcomeDashboard_trainingDescription'),
-			href: 'https://umbraco.com/training/?utm_source=core&utm_medium=dashboard&utm_content=text&utm_campaign=training',
-		},
-	];
+	async #getUmbracoNews() {
+		const { items } = await this.#repository.getNewsDashboard();
+		this._items = items;
+	}
 
 	override render() {
-		console.log(this._stories);
+		console.log('render', this._items);
+		if (!this._items) return html`<umb-umbraco-welcome-dashboard></umb-umbraco-welcome-dashboard>`;
 		return html`
-			<!-- Simple block to verify data -->
-			<uui-box headline="Umbraco News">
-				${this._stories.length === 0
-					? html`<p>No stories yet.</p>`
-					: html`
-							<ul>
-								${this._stories.map(
-									(s) => html`
-										<li>
-											<img src=${s.imageUrl ?? ''} alt="" width="60" height="40" />
-											<strong>${s.title}</strong>
-											<span> — ${s.priority}</span>
-											<div>${s.publishedAt}</div>
-										</li>
-									`,
-								)}
-							</ul>
-						`}
+			<uui-box headline="Umbraco News" class="uui-text">
+				${repeat(
+					this._items,
+					(_, index) => index,
+					(item) => this.#renderItem(item),
+				)}
 			</uui-box>
+		`;
+	}
 
-			<div id="info-links" class="uui-text">
-				<uui-box id="our-umbraco">
-					<div>
-						<h2 class="uui-h3">${this.localize.term('welcomeDashboard_ourUmbracoHeadline')}</h2>
-						<p>${this.localize.term('welcomeDashboard_ourUmbracoDescription')}</p>
-						<uui-button
-							look="outline"
-							target="_blank"
-							href="https://our.umbraco.com/?utm_source=core&amp;utm_medium=dashboard&amp;utm_content=image&amp;utm_campaign=our"
-							label=${this.localize.term('welcomeDashboard_ourUmbracoButton')}></uui-button>
-					</div>
-				</uui-box>
-				${this.#infoLinks.map(
-					(link) => html`
-						<a class="info-link" target="_blank" href=${link.href}>
-							<h3 class="uui-h5">${link.name}</h3>
-							<p>${link.description}</p>
-						</a>
+	#renderItem(item: NewsDashboardItemResponseModel) {
+		const tagColor = item.priority === 'High' ? 'danger' : item.priority === 'Medium' ? 'warning' : 'default';
+		return html`
+			<article>
+				<h3>
+					${when(
+						item.url,
+						(url) => html`<a href=${url} target="_blank">${item.header}</a>`,
+						() => html`${item.header}`,
+					)}
+				</h3>
+				<uui-badge color=${tagColor}>${item.priority}</uui-badge>
+				${when(item.imageUrl, (src) => html`<img src=${src} alt=${item.imageAltText ?? ''} />`)}
+				<div>${unsafeHTML(item.body)}</div>
+				${when(
+					item.url,
+					(url) => html`
+						<uui-button class="link" look="primary" href=${url} target="_blank">
+							<uui-icon name="icon-out" slot="extra"></uui-icon>
+							<span>${item.buttonText}</span>
+						</uui-button>
 					`,
 				)}
-			</div>
+			</article>
 		`;
 	}
 
@@ -94,44 +73,19 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 				padding: var(--uui-size-layout-1);
 			}
 
-			p {
+			article {
 				position: relative;
-			}
+				margin-bottom: var(--uui-size-layout-1);
+				padding-bottom: var(--uui-size-layout-1);
+				border-bottom: 1px solid var(--uui-color-border);
 
-			#our-umbraco {
-				grid-column-start: 1;
-				grid-column-end: -1;
-				margin-bottom: var(--uui-size-space-4);
-			}
+				img {
+					max-width: 100%;
+				}
 
-			#info-links {
-				display: grid;
-				grid-template-columns: repeat(auto-fill, minmax(20%, 1fr));
-				grid-gap: var(--uui-size-space-5);
-			}
-
-			.info-link {
-				border: var(--uui-box-border-width, 0) solid
-					var(--uui-box-border-color, var(--uui-color-divider-standalone, #e9e9eb));
-				border-radius: var(--uui-box-border-radius, var(--uui-border-radius, 3px));
-				box-shadow: var(
-					--uui-box-box-shadow,
-					var(--uui-shadow-depth-1, 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24))
-				);
-				background-color: var(--uui-color-surface);
-				text-decoration: none;
-				line-height: 1.5;
-				padding: var(--uui-size-space-4);
-			}
-
-			.info-link h3 {
-				margin-top: 0;
-				margin-bottom: var(--uui-size-space-1);
-			}
-
-			.info-link p {
-				margin-top: 0;
-				margin-bottom: 0;
+				.link > uui-icon {
+					margin-left: var(--uui-size-3);
+				}
 			}
 		`,
 	];
