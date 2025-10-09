@@ -1,5 +1,6 @@
 import { Node, mergeAttributes } from '@tiptap/core';
 
+/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
 export const Anchor = Node.create({
 	name: 'anchor',
 
@@ -33,19 +34,12 @@ export const Anchor = Node.create({
 
 	addOptions() {
 		return {
-			HTMLAttributes: {
-				id: 'id',
-			},
+			HTMLAttributes: { id: '' },
 		};
 	},
 
 	parseHTML() {
-		return [
-			{
-				tag: 'a[id]',
-				getAttrs: (element) => (element.innerHTML === '' ? {} : false),
-			},
-		];
+		return [{ tag: 'a[id]', getAttrs: (element) => (element.innerHTML === '' ? {} : false) }];
 	},
 
 	renderHTML({ HTMLAttributes }) {

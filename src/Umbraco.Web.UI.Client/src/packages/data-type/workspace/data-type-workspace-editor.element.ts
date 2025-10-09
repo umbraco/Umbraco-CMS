@@ -11,7 +11,7 @@ export class UmbDataTypeWorkspaceEditorElement extends UmbLitElement {
 		super();
 
 		this.consumeContext(UMB_DATA_TYPE_WORKSPACE_CONTEXT, (workspaceContext) => {
-			workspaceContext.createPropertyDatasetContext(this);
+			workspaceContext?.createPropertyDatasetContext(this);
 		});
 	}
 

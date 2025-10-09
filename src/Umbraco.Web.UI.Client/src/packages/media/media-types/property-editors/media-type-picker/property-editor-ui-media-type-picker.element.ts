@@ -1,5 +1,5 @@
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbInputMediaTypeElement } from '../../components/index.js';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
@@ -22,10 +22,10 @@ export class UmbPropertyEditorUIMediaTypePickerElement extends UmbLitElement imp
 	}
 
 	@state()
-	_min = 0;
+	private _min = 0;
 
 	@state()
-	_max = Infinity;
+	private _max = Infinity;
 
 	#onChange(event: CustomEvent & { target: UmbInputMediaTypeElement }) {
 		this.value = event.target.value;

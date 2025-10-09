@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 /*
  * Copyright 2017 Google Inc.
  *
@@ -31,6 +32,7 @@ import {
 	TokenResponse,
 } from '@umbraco-cms/backoffice/external/openid';
 import { Subject } from '@umbraco-cms/backoffice/external/rxjs';
+import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 
 const requestor = new FetchRequestor();
 
@@ -93,10 +95,10 @@ export class UmbAuthFlow {
 	readonly #postLogoutRedirectUri: string;
 	readonly #clientId: string;
 	readonly #scope: string;
-	readonly #timeoutSignal;
 
 	// tokens
-	#tokenResponse?: TokenResponse;
+	#tokenResponse = new UmbObjectState<TokenResponse | undefined>(undefined);
+	readonly token$ = this.#tokenResponse.asObservable();
 
 	// external login
 	#link_endpoint;
@@ -113,13 +115,11 @@ export class UmbAuthFlow {
 		openIdConnectUrl: string,
 		redirectUri: string,
 		postLogoutRedirectUri: string,
-		timeoutSignal: Subject<void>,
 		clientId = 'umbraco-back-office',
 		scope = 'offline_access',
 	) {
 		this.#redirectUri = redirectUri;
 		this.#postLogoutRedirectUri = postLogoutRedirectUri;
-		this.#timeoutSignal = timeoutSignal;
 		this.#clientId = clientId;
 		this.#scope = scope;
 
@@ -180,7 +180,7 @@ export class UmbAuthFlow {
 		const tokenResponseJson = await this.#storageBackend.getItem(UMB_STORAGE_TOKEN_RESPONSE_NAME);
 		if (tokenResponseJson) {
 			const response = new TokenResponse(JSON.parse(tokenResponseJson));
-			this.#tokenResponse = response;
+			this.#tokenResponse.setValue(response);
 		}
 	}
 
@@ -236,7 +236,7 @@ export class UmbAuthFlow {
 	 * @returns true if the user is logged in, false otherwise.
 	 */
 	isAuthorized(): boolean {
-		return !!this.#tokenResponse;
+		return !!this.#tokenResponse.getValue();
 	}
 
 	/**
@@ -246,7 +246,7 @@ export class UmbAuthFlow {
 		await this.#storageBackend.removeItem(UMB_STORAGE_TOKEN_RESPONSE_NAME);
 
 		// clear the internal state
-		this.#tokenResponse = undefined;
+		this.#tokenResponse.setValue(undefined);
 	}
 
 	/**
@@ -256,9 +256,9 @@ export class UmbAuthFlow {
 		const signOutPromises: Promise<unknown>[] = [];
 
 		// revoke the access token if it exists
-		if (this.#tokenResponse) {
+		if (this.#tokenResponse.value) {
 			const tokenRevokeRequest = new RevokeTokenRequest({
-				token: this.#tokenResponse.accessToken,
+				token: this.#tokenResponse.value.accessToken,
 				client_id: this.#clientId,
 				token_type_hint: 'access_token',
 			});
@@ -266,9 +266,9 @@ export class UmbAuthFlow {
 			signOutPromises.push(this.#tokenHandler.performRevokeTokenRequest(this.#configuration, tokenRevokeRequest));
 
 			// revoke the refresh token if it exists
-			if (this.#tokenResponse.refreshToken) {
+			if (this.#tokenResponse.value.refreshToken) {
 				const refreshTokenRevokeRequest = new RevokeTokenRequest({
-					token: this.#tokenResponse.refreshToken,
+					token: this.#tokenResponse.value.refreshToken,
 					client_id: this.#clientId,
 					token_type_hint: 'refresh_token',
 				});
@@ -305,25 +305,25 @@ export class UmbAuthFlow {
 	/**
 	 * This method will check if the token needs to be refreshed and if so, it will refresh it and return the new access token.
 	 * If the token does not need to be refreshed, it will return the current access token.
-	 * @returns The access token for the user.
+	 * @returns {Promise<string>} The access token for the user.
 	 */
 	async performWithFreshTokens(): Promise<string> {
 		// if the access token is valid, return it
-		if (this.#tokenResponse?.isValid()) {
-			return Promise.resolve(this.#tokenResponse.accessToken);
+		if (this.#tokenResponse.value?.isValid()) {
+			return Promise.resolve(this.#tokenResponse.value.accessToken);
 		}
 
+		// if the access token is not valid, try to refresh it
 		const success = await this.makeRefreshTokenRequest();
+		const newToken = this.#tokenResponse.value?.accessToken ?? '';
 
 		if (!success) {
+			// if the refresh token request failed, we need to clear the token state
 			this.clearTokenStorage();
-			this.#timeoutSignal.next();
-			return Promise.reject('Missing tokenResponse.');
 		}
 
-		return this.#tokenResponse
-			? Promise.resolve(this.#tokenResponse.accessToken)
-			: Promise.reject('Missing tokenResponse.');
+		// if the refresh token request was successful, return the new access token
+		return Promise.resolve(newToken);
 	}
 
 	/**
@@ -381,8 +381,12 @@ export class UmbAuthFlow {
 	 * Save the current token response to local storage.
 	 */
 	async #saveTokenState() {
-		if (this.#tokenResponse) {
-			await this.#storageBackend.setItem(UMB_STORAGE_TOKEN_RESPONSE_NAME, JSON.stringify(this.#tokenResponse.toJson()));
+		await this.#storageBackend.removeItem(UMB_STORAGE_TOKEN_RESPONSE_NAME);
+		if (this.#tokenResponse.value) {
+			await this.#storageBackend.setItem(
+				UMB_STORAGE_TOKEN_RESPONSE_NAME,
+				JSON.stringify(this.#tokenResponse.value.toJson()),
+			);
 		}
 	}
 
@@ -412,7 +416,7 @@ export class UmbAuthFlow {
 	}
 
 	async makeRefreshTokenRequest(): Promise<boolean> {
-		if (!this.#tokenResponse?.refreshToken) {
+		if (!this.#tokenResponse.value?.refreshToken) {
 			return false;
 		}
 
@@ -421,7 +425,7 @@ export class UmbAuthFlow {
 			redirect_uri: this.#redirectUri,
 			grant_type: GRANT_TYPE_REFRESH_TOKEN,
 			code: undefined,
-			refresh_token: this.#tokenResponse.refreshToken,
+			refresh_token: this.#tokenResponse.value.refreshToken,
 			extras: undefined,
 		});
 
@@ -435,8 +439,9 @@ export class UmbAuthFlow {
 	 */
 	async #performTokenRequest(request: TokenRequest): Promise<boolean> {
 		try {
-			this.#tokenResponse = await this.#tokenHandler.performTokenRequest(this.#configuration, request);
-			this.#saveTokenState();
+			const tokenResponse = await this.#tokenHandler.performTokenRequest(this.#configuration, request);
+			this.#tokenResponse.setValue(tokenResponse);
+			await this.#saveTokenState();
 			return true;
 		} catch (error) {
 			console.error('Token request error', error);

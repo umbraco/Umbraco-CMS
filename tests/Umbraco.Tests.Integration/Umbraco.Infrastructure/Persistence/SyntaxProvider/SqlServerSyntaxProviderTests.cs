@@ -22,7 +22,7 @@ using Umbraco.Cms.Tests.Integration.Testing;
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.SyntaxProvider;
 
 [TestFixture]
-public class SqlServerSyntaxProviderTests : UmbracoIntegrationTest
+internal sealed class SqlServerSyntaxProviderTests : UmbracoIntegrationTest
 {
     private ISqlContext SqlContext => GetRequiredService<IUmbracoDatabaseFactory>().SqlContext;
     private SqlServerSyntaxProvider GetSqlSyntax() => new(Options.Create(new GlobalSettings()));

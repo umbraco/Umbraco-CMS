@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class DictionaryItemServiceTests : UmbracoIntegrationTest
+internal sealed class DictionaryItemServiceTests : UmbracoIntegrationTest
 {
     private Guid _parentItemId;
     private Guid _childItemId;
@@ -361,6 +361,11 @@ public class DictionaryItemServiceTests : UmbracoIntegrationTest
 
         var result = await DictionaryItemService.UpdateAsync(item, Constants.Security.SuperUserKey);
         Assert.True(result.Success);
+
+        // Verify that the create and update dates can be used to distinguish between creates
+        // and updates (as these fields are used in ServerEventSender to emit a "Created" or "Updated"
+        // event.
+        Assert.Greater(result.Result.UpdateDate, result.Result.CreateDate);
 
         var updatedItem = await DictionaryItemService.GetAsync("Child");
         Assert.NotNull(updatedItem);

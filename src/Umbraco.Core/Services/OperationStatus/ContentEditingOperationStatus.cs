@@ -6,6 +6,7 @@ public enum ContentEditingOperationStatus
     CancelledByNotification,
     ContentTypeNotFound,
     ContentTypeCultureVarianceMismatch,
+    ContentTypeSegmentVarianceMismatch,
     NotFound,
     ParentNotFound,
     ParentInvalid,

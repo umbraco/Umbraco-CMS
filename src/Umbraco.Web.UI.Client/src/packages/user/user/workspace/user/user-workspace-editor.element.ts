@@ -37,22 +37,18 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 	override render() {
 		return html`
 			<umb-entity-detail-workspace-editor class="uui-text" .backPath=${UMB_USER_ROOT_WORKSPACE_PATH}>
-				${this.#renderHeader()}
-				<div id="main">
-					<div id="left-column">${this.#renderLeftColumn()}</div>
-					<div id="right-column">${this.#renderRightColumn()}</div>
-				</div>
+				<umb-workspace-header-name-editable slot="header"></umb-workspace-header-name-editable>
+				${this._user
+					? html`<div id="main">
+							<div id="left-column">${this.#renderLeftColumn()}</div>
+							<div id="right-column">${this.#renderRightColumn()}</div>
+						</div>`
+					: nothing}
 			</umb-entity-detail-workspace-editor>
 		`;
 	}
 
-	#renderHeader() {
-		return html` <umb-workspace-header-name-editable slot="header"></umb-workspace-header-name-editable>`;
-	}
-
 	#renderLeftColumn() {
-		if (!this._user) return nothing;
-
 		return html`
 			<umb-stack>
 				<umb-user-workspace-profile-settings></umb-user-workspace-profile-settings>
@@ -63,8 +59,6 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	#renderRightColumn() {
-		if (!this._user) return nothing;
-
 		return html`
 			<umb-stack look="compact">
 				<umb-user-workspace-avatar></umb-user-workspace-avatar>

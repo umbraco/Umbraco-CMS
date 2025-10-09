@@ -13,11 +13,11 @@ export class UmbCurrentUserGroupCondition
 		super(host, args);
 
 		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
-			this.observe(context.currentUser, this.observeCurrentUser, 'umbCurrentUserGroupConditionObserver');
+			this.observe(context?.currentUser, this.#observeCurrentUser, 'umbCurrentUserGroupConditionObserver');
 		});
 	}
 
-	private observeCurrentUser = async (currentUser: UmbCurrentUserModel) => {
+	#observeCurrentUser = async (currentUser: UmbCurrentUserModel) => {
 		// Idea: This part could be refactored to become a shared util, to align these matching feature across conditions. [NL]
 		// Notice doing so it would be interesting to invistigate if it makes sense to combine some of these properties, to enable more specific matching. (But maybe it is only relevant for the combination of match + oneOf) [NL]
 		const { match, oneOf, allOf, noneOf } = this.config;

@@ -681,6 +681,11 @@ internal abstract class ExpressionVisitorBase
                     inBuilder.Append(SqlParameters.Count - 1);
                 }
 
+                if (inFirst)
+                {
+                    inBuilder.Append("NULL");
+                }
+
                 inBuilder.Append(")");
                 return inBuilder.ToString();
 

@@ -48,16 +48,20 @@ export abstract class UmbUserActionConditionBase
 		super(host, args);
 
 		this.consumeContext(UMB_USER_WORKSPACE_CONTEXT, (context) => {
-			this.observe(
-				observeMultiple([context.unique, context.state, context.kind]),
-				([unique, state, kind]) => {
-					this.userUnique = unique ?? undefined;
-					this.userState = state;
-					this.userKind = kind;
-					this._onUserDataChange();
-				},
-				'_umbActiveUser',
-			);
+			if (context) {
+				this.observe(
+					observeMultiple([context.unique, context.state, context.kind]),
+					([unique, state, kind]) => {
+						this.userUnique = unique ?? undefined;
+						this.userState = state;
+						this.userKind = kind;
+						this._onUserDataChange();
+					},
+					'_umbActiveUser',
+				);
+			} else {
+				this.removeUmbControllerByAlias('_umbActiveUser');
+			}
 		});
 	}
 

@@ -15,11 +15,8 @@ export class UmbCreateUserModalElement extends UmbModalBaseElement<
 	UmbCreateUserClientCredentialModalData,
 	UmbCreateUserClientCredentialModalValue
 > {
-	@query('#CreateUserClientCredentialForm')
-	_form?: HTMLFormElement;
-
 	@query('#unique')
-	_inputUniqueElement?: UUIInputElement;
+	private _inputUniqueElement?: UUIInputElement;
 
 	#userClientCredentialRepository = new UmbUserClientCredentialRepository(this);
 

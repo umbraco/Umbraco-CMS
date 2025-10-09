@@ -11,6 +11,9 @@ export class UmbDuplicateDocumentTypeRepository extends UmbRepositoryBase implem
 
 		if (!error) {
 			const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+			if (!notificationContext) {
+				throw new Error('Notification context not found');
+			}
 			const notification = { data: { message: `Duplicated` } };
 			notificationContext.peek('positive', notification);
 		}

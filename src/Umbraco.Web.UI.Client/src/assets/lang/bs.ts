@@ -406,7 +406,6 @@ export default {
 		newPartialViewMacroFromSnippet: 'Novi djelomični prikaz za makro iz isječka',
 		newPartialViewMacroNoMacro: 'Novi djelomični prikaz za makro (bez makroa)',
 		newStyleSheetFile: 'Novi CSS fajl',
-		newRteStyleSheetFile: 'Novi Rich Text Editor CSS fajl',
 	},
 	dashboard: {
 		browser: 'Pregledajte svoju web stranicu',
@@ -1994,6 +1993,7 @@ export default {
 		openBackofficeSearch: 'Otvorite backoffice pretragu',
 		openCloseBackofficeHelp: 'Otvori/Zatvori pomoć za backoffice',
 		openCloseBackofficeProfileOptions: 'Opcije otvaranja/zatvaranja profila',
+		profileOptions: 'Opcije profila',
 		assignDomainDescription: 'Postavite kulturu i imena hostova za %0%',
 		createDescription: 'Kreirajte novi čvor ispod %0%',
 		protectDescription: 'Postavite ograničenja pristupa uključena %0%',

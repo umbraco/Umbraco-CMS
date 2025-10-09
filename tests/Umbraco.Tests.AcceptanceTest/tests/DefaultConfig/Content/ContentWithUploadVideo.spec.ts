@@ -26,13 +26,13 @@ test('can create content with the upload video data type', async ({umbracoApi, u
 
   // Act
   await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -53,7 +53,7 @@ test('can publish content with the upload video data type', async ({umbracoApi, 
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationsHaveCount(2);
+  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -66,7 +66,7 @@ const uploadVideos = [
   {fileExtension: 'ogv', fileName: 'Ogv.ogv'}
 ];
 for (const uploadVideo of uploadVideos) {
-  test(`can upload a video with the ${uploadVideo.fileExtension} extension in the content`, async ({umbracoApi, umbracoUi}) => {
+  test(`can upload a video with the ${uploadVideo.fileExtension} extension in the content`, {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
     const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
@@ -77,10 +77,11 @@ for (const uploadVideo of uploadVideos) {
     // Act
     await umbracoUi.content.goToContentWithName(contentName);
     await umbracoUi.content.uploadFile(uploadVideoPath + uploadVideo.fileName);
+    await umbracoUi.waitForTimeout(500);
     await umbracoUi.content.clickSaveButton();
 
     // Assert
-    await umbracoUi.content.isSuccessNotificationVisible();
+    await umbracoUi.content.isSuccessStateVisibleForSaveButton();
     expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
     const contentData = await umbracoApi.document.getByName(contentName);
     expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
@@ -88,8 +89,7 @@ for (const uploadVideo of uploadVideos) {
   });
 }
 
-// TODO: Remove skip when the front-end is ready. Currently the uploaded video still displays after removing.
-test.skip('can remove a mp4 file in the content', async ({umbracoApi, umbracoUi}) => {
+test('can remove a mp4 file in the content', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const uploadFileName = 'Video.mp4';
   const mineType = 'video/mp4';
@@ -105,7 +105,7 @@ test.skip('can remove a mp4 file in the content', async ({umbracoApi, umbracoUi}
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values).toEqual([]);

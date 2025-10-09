@@ -54,7 +54,7 @@ test('can create content with a block grid with an empty block in a area', {tag:
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
+  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   await umbracoUi.reloadPage();
   await umbracoUi.content.doesBlockContainBlockInAreaWithName(firstElementTypeName, firstAreaName, firstElementTypeName);
   await umbracoUi.content.doesBlockContainBlockCountInArea(firstElementTypeName, firstAreaName, 1);
@@ -80,7 +80,7 @@ test('can create content with a block grid with two empty blocks in a area', asy
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
+  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   await umbracoUi.reloadPage();
   await umbracoUi.content.doesBlockContainCountOfBlockInArea(firstElementTypeName, firstAreaName, firstElementTypeName, 2);
 
@@ -109,7 +109,7 @@ test('can create content with block grid area with a create label', async ({umbr
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
+  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   await umbracoUi.content.doesBlockGridBlockWithAreaContainCreateLabel(firstElementTypeName, createLabel);
 });
 
@@ -130,7 +130,7 @@ test('can create content with block grid area with column span', async ({umbraco
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
+  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   await umbracoUi.content.doesBlockAreaContainColumnSpan(firstElementTypeName, firstAreaName, columnSpan, 0);
 });
 
@@ -151,12 +151,11 @@ test('can create content with block grid area with row span', async ({umbracoApi
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
+  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   await umbracoUi.content.doesBlockAreaContainRowSpan(firstElementTypeName, firstAreaName, rowSpan, 0);
 });
 
-// Remove fixme when this issue is fixed https://github.com/umbraco/Umbraco-CMS/issues/18639
-test.fixme('can create content with block grid area with min allowed', async ({umbracoApi, umbracoUi}) => {
+test('can create content with block grid area with min allowed', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   firstElementTypeId = await umbracoApi.documentType.createEmptyElementType(firstElementTypeName);
   const secondElementTypeId = await umbracoApi.documentType.createEmptyElementType(secondElementTypeName);
@@ -169,7 +168,7 @@ test.fixme('can create content with block grid area with min allowed', async ({u
   await umbracoUi.content.goToContentWithName(contentName);
 
   // Act
-  await umbracoUi.content.clickAddBlockGridElementWithName(firstElementTypeName);
+  await umbracoUi.content.clickAddBlockGridElementWithName('content');
   await umbracoUi.content.clickSelectBlockElementWithName(firstElementTypeName);
   await umbracoUi.content.clickLinkWithName(areaCreateLabel);
   await umbracoUi.content.clickSelectBlockElementInAreaWithName(secondElementTypeName);
@@ -181,14 +180,13 @@ test.fixme('can create content with block grid area with min allowed', async ({u
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
+  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
 
   // Clean
   await umbracoApi.documentType.ensureNameNotExists(secondElementTypeName);
 });
 
-// Remove fixme when this issue is fixed https://github.com/umbraco/Umbraco-CMS/issues/18639
-test.fixme('can create content with block grid area with max allowed', async ({umbracoApi, umbracoUi}) => {
+test('can create content with block grid area with max allowed', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   firstElementTypeId = await umbracoApi.documentType.createEmptyElementType(firstElementTypeName);
   const secondElementTypeId = await umbracoApi.documentType.createEmptyElementType(secondElementTypeName);
@@ -201,11 +199,11 @@ test.fixme('can create content with block grid area with max allowed', async ({u
   await umbracoUi.content.goToContentWithName(contentName);
 
   // Act
-  await umbracoUi.content.clickAddBlockGridElementWithName(firstElementTypeName);
+  await umbracoUi.content.clickAddBlockGridElementWithName('content');
   await umbracoUi.content.clickSelectBlockElementWithName(firstElementTypeName);
   await umbracoUi.content.clickLinkWithName(areaCreateLabel);
   await umbracoUi.content.clickSelectBlockElementInAreaWithName(secondElementTypeName);
-  await umbracoUi.content.isTextWithExactNameVisible('Maximum 0 entries, 1 too many.');
+  await umbracoUi.content.isTextWithExactNameVisible('Maximum 0 entries, you have entered 1 too many.');
   await umbracoUi.content.clickSaveAndPublishButton();
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
   await umbracoUi.content.removeBlockFromArea(firstElementTypeName, firstAreaName, secondElementTypeName);
@@ -213,7 +211,7 @@ test.fixme('can create content with block grid area with max allowed', async ({u
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
+  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
 
   // Clean
   await umbracoApi.documentType.ensureNameNotExists(secondElementTypeName);

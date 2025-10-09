@@ -13,7 +13,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Routing
 {
-    internal class RedirectTracker : IRedirectTracker
+    internal sealed class RedirectTracker : IRedirectTracker
     {
         private readonly ILocalizationService _localizationService;
         private readonly IRedirectUrlService _redirectUrlService;

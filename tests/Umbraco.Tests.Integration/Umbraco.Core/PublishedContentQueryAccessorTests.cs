@@ -9,7 +9,7 @@ using Umbraco.Cms.Tests.Integration.TestServerTest;
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core;
 
 [TestFixture]
-public class PublishedContentQueryAccessorTests : UmbracoTestServerTestBase
+internal sealed class PublishedContentQueryAccessorTests : UmbracoTestServerTestBase
 {
     [Test]
     [LongRunning]

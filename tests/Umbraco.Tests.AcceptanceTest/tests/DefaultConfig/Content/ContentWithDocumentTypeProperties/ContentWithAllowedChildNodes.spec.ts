@@ -25,13 +25,13 @@ test('can create content with allowed child node enabled', async ({umbracoApi, u
 
   // Act
   await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
 
   // Clean
@@ -47,7 +47,7 @@ test('cannot create child content if allowed child node is disabled', async ({um
 
   // Act
   await umbracoUi.content.clickActionsMenuForContent(contentName);
-  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.clickCreateActionMenuOption();
 
   // Assert
   await umbracoUi.content.isDocumentTypeNameVisible(documentTypeName, false);
@@ -69,13 +69,13 @@ test('can create multiple child nodes with different document types', async ({um
 
   // Act
   await umbracoUi.content.clickActionsMenuForContent(contentName);
-  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(secondChildDocumentTypeName);
   await umbracoUi.content.enterContentName(secondChildContentName);
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(secondChildContentName)).toBeTruthy();
   const childData = await umbracoApi.document.getChildren(contentId);
   expect(childData.length).toBe(2);
@@ -83,8 +83,8 @@ test('can create multiple child nodes with different document types', async ({um
   expect(childData[1].variants[0].name).toBe(secondChildContentName);
   // verify that the child content displays in the tree after reloading children
   await umbracoUi.content.clickActionsMenuForContent(contentName);
-  await umbracoUi.content.clickReloadChildrenButton();
-  await umbracoUi.content.clickCaretButtonForContentName(contentName);
+  await umbracoUi.content.clickReloadChildrenActionMenuOption();
+  await umbracoUi.content.openContentCaretButtonForName(contentName);
   await umbracoUi.content.doesContentTreeHaveName(firstChildContentName);
   await umbracoUi.content.doesContentTreeHaveName(secondChildContentName);
 

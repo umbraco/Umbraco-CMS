@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public partial class UserServiceCrudTests : UmbracoIntegrationTestWithContent
+internal sealed partial class UserServiceCrudTests : UmbracoIntegrationTestWithContent
 {
     private IUserGroupService UserGroupService => GetRequiredService<IUserGroupService>();
 
@@ -82,7 +82,8 @@ public partial class UserServiceCrudTests : UmbracoIntegrationTestWithContent
             GetRequiredService<IShortStringHelper>(),
             GetRequiredService<IOptions<ContentSettings>>(),
             GetRequiredService<IIsoCodeValidator>(),
-            GetRequiredService<IUserForgotPasswordSender>());
+            GetRequiredService<IUserForgotPasswordSender>(),
+            GetRequiredService<IUserIdKeyResolver>());
     }
 
 

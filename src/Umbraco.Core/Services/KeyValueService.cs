@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Scoping;
 
 namespace Umbraco.Cms.Core.Services;
 
-internal class KeyValueService : IKeyValueService
+internal sealed class KeyValueService : IKeyValueService
 {
     private readonly IKeyValueRepository _repository;
     private readonly ICoreScopeProvider _scopeProvider;

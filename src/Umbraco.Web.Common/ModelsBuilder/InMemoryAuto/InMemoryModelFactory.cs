@@ -1,18 +1,15 @@
 using System.Collections;
+using System.Collections.Frozen;
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Runtime.Loader;
 using System.Text;
 using System.Text.RegularExpressions;
-using Microsoft.AspNetCore.Mvc.Razor;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Logging;
@@ -25,12 +22,24 @@ using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
 {
-    internal class InMemoryModelFactory : IAutoPublishedModelFactory, IRegisteredObject, IDisposable
+    internal sealed partial class InMemoryModelFactory : IAutoPublishedModelFactory, IRegisteredObject, IDisposable
     {
-        private static readonly Regex s_usingRegex = new Regex("^using(.*);", RegexOptions.Compiled | RegexOptions.Multiline);
-        private static readonly Regex s_aattrRegex = new Regex("^\\[assembly:(.*)\\]", RegexOptions.Compiled | RegexOptions.Multiline);
-        private static readonly Regex s_assemblyVersionRegex = new Regex("AssemblyVersion\\(\"[0-9]+.[0-9]+.[0-9]+.[0-9]+\"\\)", RegexOptions.Compiled);
-        private static readonly string[] s_ourFiles = { "models.hash", "models.generated.cs", "all.generated.cs", "all.dll.path", "models.err", "Compiled" };
+        private static readonly Regex s_usingRegex = GetUsingRegex();
+
+        [GeneratedRegex("^using(.*);", RegexOptions.Multiline | RegexOptions.Compiled)]
+        private static partial Regex GetUsingRegex();
+
+        private static readonly Regex s_aattrRegex = GetAssemblyRegex();
+
+        [GeneratedRegex("^\\[assembly:(.*)\\]", RegexOptions.Multiline | RegexOptions.Compiled)]
+        private static partial Regex GetAssemblyRegex();
+
+        private static readonly Regex s_assemblyVersionRegex = GetAssemblyVersionRegex();
+
+        [GeneratedRegex("AssemblyVersion\\(\"[0-9]+.[0-9]+.[0-9]+.[0-9]+\"\\)", RegexOptions.Compiled)]
+        private static partial Regex GetAssemblyVersionRegex();
+
+        private static readonly FrozenSet<string> s_ourFiles = FrozenSet.Create("models.hash", "models.generated.cs", "all.generated.cs", "all.dll.path", "models.err", "Compiled");
         private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();
         private readonly IProfilingLogger _profilingLogger;
         private readonly ILogger<InMemoryModelFactory> _logger;
@@ -52,56 +61,6 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
         private RoslynCompiler? _roslynCompiler;
         private ModelsBuilderSettings _config;
         private bool _disposedValue;
-
-        [Obsolete("Use a not obsoleted constructor instead. Scheduled for removal in v16")]
-        public InMemoryModelFactory(
-            Lazy<UmbracoServices> umbracoServices,
-            IProfilingLogger profilingLogger,
-            ILogger<InMemoryModelFactory> logger,
-            IOptionsMonitor<ModelsBuilderSettings> config,
-            IHostingEnvironment hostingEnvironment,
-            IApplicationShutdownRegistry hostingLifetime,
-            IPublishedValueFallback publishedValueFallback,
-            InMemoryAssemblyLoadContextManager loadContextManager,
-            RuntimeCompilationCacheBuster runtimeCompilationCacheBuster)
-        {
-            _umbracoServices = umbracoServices;
-            _profilingLogger = profilingLogger;
-            _logger = logger;
-            _config = config.CurrentValue;
-            _hostEnvironment = StaticServiceProvider.Instance.GetRequiredService<IHostEnvironment>();
-            _hostingLifetime = hostingLifetime;
-            _publishedValueFallback = publishedValueFallback;
-            _loadContextManager = loadContextManager;
-            _runtimeCompilationCacheBuster = runtimeCompilationCacheBuster;
-            _errors = new ModelsGenerationError(config, _hostEnvironment);
-            _ver = 1; // zero is for when we had no version
-            _skipver = -1; // nothing to skip
-
-            if (!hostingEnvironment.IsHosted)
-            {
-                return;
-            }
-
-            config.OnChange(x => _config = x);
-            _pureLiveDirectory = new Lazy<string>(PureLiveDirectoryAbsolute);
-
-            if (!Directory.Exists(_pureLiveDirectory.Value))
-            {
-                Directory.CreateDirectory(_pureLiveDirectory.Value);
-            }
-
-            // BEWARE! if the watcher is not properly released then for some reason the
-            // BuildManager will start confusing types - using a 'registered object' here
-            // though we should probably plug into Umbraco's MainDom - which is internal
-            _hostingLifetime.RegisterObject(this);
-            _watcher = new FileSystemWatcher(_pureLiveDirectory.Value);
-            _watcher.Changed += WatcherOnChanged;
-            _watcher.EnableRaisingEvents = true;
-
-            // get it here, this need to be fast
-            _debugLevel = _config.DebugLevel;
-        }
 
         public InMemoryModelFactory(
             Lazy<UmbracoServices> umbracoServices,
@@ -626,7 +585,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
             return assembly;
         }
 
-        private void TryDeleteUnusedAssemblies(string dllPathFile)
+        private static void TryDeleteUnusedAssemblies(string dllPathFile)
         {
             if (File.Exists(dllPathFile))
             {
@@ -851,7 +810,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
             // }
 
             // always ignore our own file changes
-            if (s_ourFiles.Contains(changed))
+            if (changed != null && s_ourFiles.Contains(changed))
             {
                 return;
             }
@@ -872,7 +831,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
             _hostingLifetime.UnregisterObject(this);
         }
 
-        protected virtual void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             if (!_disposedValue)
             {
@@ -897,14 +856,14 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
             Dispose(disposing: true);
         }
 
-        internal class Infos
+        internal sealed class Infos
         {
             public Dictionary<string, Type>? ModelTypeMap { get; set; }
 
             public Dictionary<string, ModelInfo>? ModelInfos { get; set; }
         }
 
-        internal class ModelInfo
+        internal sealed class ModelInfo
         {
             public Type? ParameterType { get; set; }
 

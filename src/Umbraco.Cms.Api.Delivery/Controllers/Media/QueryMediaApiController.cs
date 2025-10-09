@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
@@ -14,7 +14,6 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Delivery.Controllers.Media;
 
-[ApiVersion("1.0")]
 [ApiVersion("2.0")]
 public class QueryMediaApiController : MediaApiControllerBase
 {
@@ -26,19 +25,6 @@ public class QueryMediaApiController : MediaApiControllerBase
         IApiMediaQueryService apiMediaQueryService)
         : base(publishedMediaCache, apiMediaWithCropsResponseBuilder)
         => _apiMediaQueryService = apiMediaQueryService;
-
-    [HttpGet]
-    [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(PagedViewModel<IApiMediaWithCropsResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [Obsolete("Please use version 2 of this API. Will be removed in V15.")]
-    public async Task<IActionResult> Query(
-        string? fetch,
-        [FromQuery] string[] filter,
-        [FromQuery] string[] sort,
-        int skip = 0,
-        int take = 10)
-        => await HandleRequest(fetch, filter, sort, skip, take);
 
     /// <summary>
     ///     Gets a paginated list of media item(s) from query.
@@ -53,15 +39,15 @@ public class QueryMediaApiController : MediaApiControllerBase
     [MapToApiVersion("2.0")]
     [ProducesResponseType(typeof(PagedViewModel<IApiMediaWithCropsResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> QueryV20(
+    public Task<IActionResult> QueryV20(
         string? fetch,
         [FromQuery] string[] filter,
         [FromQuery] string[] sort,
         int skip = 0,
         int take = 10)
-        => await HandleRequest(fetch, filter, sort, skip, take);
+        => Task.FromResult(HandleRequest(fetch, filter, sort, skip, take));
 
-    private async Task<IActionResult> HandleRequest(string? fetch, string[] filter, string[] sort, int skip, int take)
+    private IActionResult HandleRequest(string? fetch, string[] filter, string[] sort, int skip, int take)
     {
         Attempt<PagedModel<Guid>, ApiMediaQueryOperationStatus> queryAttempt = _apiMediaQueryService.ExecuteQuery(fetch, filter, sort, skip, take);
 
@@ -79,6 +65,6 @@ public class QueryMediaApiController : MediaApiControllerBase
             Items = mediaItems.Select(BuildApiMediaWithCrops)
         };
 
-        return await Task.FromResult(Ok(model));
+        return Ok(model);
     }
 }

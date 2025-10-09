@@ -1,17 +1,26 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Core.Services;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
+using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
+using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MemberType.Tree;
 
 [ApiVersion("1.0")]
 public class RootMemberTypeTreeController : MemberTypeTreeControllerBase
 {
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
     public RootMemberTypeTreeController(IEntityService entityService, IMemberTypeService memberTypeService)
         : base(entityService, memberTypeService)
+    {
+    }
+
+    [ActivatorUtilitiesConstructor]
+    public RootMemberTypeTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IMemberTypeService memberTypeService)
+        : base(entityService, flagProviders, memberTypeService)
     {
     }
 

@@ -23,34 +23,34 @@ internal sealed class MediaPermissionService : IMediaPermissionService
     }
 
     /// <inheritdoc/>
-    public async Task<MediaAuthorizationStatus> AuthorizeAccessAsync(IUser user, IEnumerable<Guid> mediaKeys)
+    public Task<MediaAuthorizationStatus> AuthorizeAccessAsync(IUser user, IEnumerable<Guid> mediaKeys)
     {
         foreach (Guid mediaKey in mediaKeys)
         {
             IMedia? media = _mediaService.GetById(mediaKey);
             if (media is null)
             {
-                return MediaAuthorizationStatus.NotFound;
+                return Task.FromResult(MediaAuthorizationStatus.NotFound);
             }
 
             if (user.HasPathAccess(media, _entityService, _appCaches) == false)
             {
-                return MediaAuthorizationStatus.UnauthorizedMissingPathAccess;
+                return Task.FromResult(MediaAuthorizationStatus.UnauthorizedMissingPathAccess);
             }
         }
 
-        return MediaAuthorizationStatus.Success;
+        return Task.FromResult(MediaAuthorizationStatus.Success);
     }
 
     /// <inheritdoc/>
-    public async Task<MediaAuthorizationStatus> AuthorizeRootAccessAsync(IUser user)
-        => user.HasMediaRootAccess(_entityService, _appCaches)
+    public Task<MediaAuthorizationStatus> AuthorizeRootAccessAsync(IUser user)
+        => Task.FromResult(user.HasMediaRootAccess(_entityService, _appCaches)
             ? MediaAuthorizationStatus.Success
-            : MediaAuthorizationStatus.UnauthorizedMissingRootAccess;
+            : MediaAuthorizationStatus.UnauthorizedMissingRootAccess);
 
     /// <inheritdoc/>
-    public async Task<MediaAuthorizationStatus> AuthorizeBinAccessAsync(IUser user)
-        => user.HasMediaBinAccess(_entityService, _appCaches)
+    public Task<MediaAuthorizationStatus> AuthorizeBinAccessAsync(IUser user)
+        => Task.FromResult(user.HasMediaBinAccess(_entityService, _appCaches)
             ? MediaAuthorizationStatus.Success
-            : MediaAuthorizationStatus.UnauthorizedMissingBinAccess;
+            : MediaAuthorizationStatus.UnauthorizedMissingBinAccess);
 }

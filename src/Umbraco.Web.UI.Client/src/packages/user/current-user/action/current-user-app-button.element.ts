@@ -4,7 +4,7 @@ import type {
 	UmbCurrentUserAction,
 } from '../current-user-action.extension.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { html, customElement, ifDefined, state, property } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, ifDefined, state, property, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
 
@@ -16,7 +16,7 @@ export class UmbCurrentUserAppButtonElement<
 	#api?: ApiType;
 
 	@state()
-	_href?: string;
+	private _href?: string;
 
 	@property({ attribute: false })
 	public manifest?: ManifestCurrentUserActionDefaultKind<MetaType>;
@@ -43,13 +43,9 @@ export class UmbCurrentUserAppButtonElement<
 
 	override render() {
 		return html`
-			<uui-button
-				@click=${this.#onClick}
-				look="${this.manifest?.meta.look ?? 'primary'}"
-				color="${this.manifest?.meta.color ?? 'default'}"
-				label="${ifDefined(this.label)}"
-				href="${ifDefined(this._href)}">
-				${this.manifest?.meta.icon ? html`<uui-icon name="${this.manifest.meta.icon}"></uui-icon>` : ''} ${this.label}
+			<uui-button @click=${this.#onClick} look="secondary" label=${ifDefined(this.label)} href=${ifDefined(this._href)}>
+				${this.manifest?.meta.icon ? html`<uui-icon name=${this.manifest.meta.icon}></uui-icon>` : nothing}
+				${this.label}
 			</uui-button>
 		`;
 	}

@@ -8,13 +8,12 @@ const elementName = 'umb-media-tree-item';
 export class UmbMediaTreeItemElement extends UmbTreeItemElementBase<UmbMediaTreeItemModel> {
 	override renderIconContainer() {
 		const icon = this.item?.mediaType.icon;
-		const iconWithoutColor = icon?.split(' ')[0];
 
 		return html`
 			<span id="icon-container" slot="icon">
-				${icon && iconWithoutColor
+				${icon
 					? html`
-							<umb-icon id="icon" slot="icon" name="${this._isActive ? iconWithoutColor : icon}"></umb-icon>
+							<umb-icon id="icon" slot="icon" name="${this._getIconToRender(icon)}"></umb-icon>
 							${this.#renderStateIcon()}
 						`
 					: nothing}

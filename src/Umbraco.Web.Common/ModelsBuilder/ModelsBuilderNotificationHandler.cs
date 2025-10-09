@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder;
 ///     Handles <see cref="UmbracoApplicationStartingNotification" /> and <see cref="ServerVariablesParsingNotification" />
 ///     notifications to initialize MB
 /// </summary>
-internal class ModelsBuilderNotificationHandler :
+internal sealed class ModelsBuilderNotificationHandler :
     INotificationHandler<ServerVariablesParsingNotification>,
     INotificationHandler<ModelBindingErrorNotification>,
     INotificationHandler<TemplateSavingNotification>

@@ -11,9 +11,9 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Cms.Api.Common.Attributes;
 using Umbraco.Cms.Api.Delivery.Controllers.Content;
 using Umbraco.Cms.Api.Management.Controllers;
 using Umbraco.Cms.Api.Management.Controllers.ModelsBuilder;
@@ -31,6 +31,7 @@ using Umbraco.Cms.Tests.Integration.DependencyInjection;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Website.Controllers;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.TestServerTest
 {
@@ -132,7 +133,9 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
             }
 
 
-            methodParams["version"] = method?.GetCustomAttribute<MapToApiVersionAttribute>()?.Versions?.First().MajorVersion.ToString();
+            methodParams["version"] =
+                method?.GetCustomAttribute<MapToApiVersionAttribute>()?.Versions?.First().MajorVersion.ToString() // get it from the attribute
+                ?? Factory.Services.GetRequiredService<IOptions<ApiVersioningOptions>>()?.Value.DefaultApiVersion.MajorVersion.ToString(); // or use the default version from options
             if (method == null)
             {
                 throw new MissingMethodException(
@@ -237,11 +240,8 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
         {
             services.AddTransient<TestUmbracoDatabaseFactoryProvider>();
 
-            Core.Hosting.IHostingEnvironment hostingEnvironment = TestHelper.GetHostingEnvironment();
-
             TypeLoader typeLoader = services.AddTypeLoader(
                 GetType().Assembly,
-                hostingEnvironment,
                 TestHelper.ConsoleLoggerFactory,
                 AppCaches.NoCache,
                 Configuration,
@@ -249,7 +249,7 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
 
             services.AddLogger(TestHelper.GetWebHostEnvironment(), Configuration);
 
-            var builder = new UmbracoBuilder(services, Configuration, typeLoader, TestHelper.ConsoleLoggerFactory, TestHelper.Profiler, AppCaches.NoCache, hostingEnvironment);
+            var builder = new UmbracoBuilder(services, Configuration, typeLoader, TestHelper.ConsoleLoggerFactory, TestHelper.Profiler, AppCaches.NoCache);
             builder.Services.AddTransient<IHostedService>(sp => new TestDatabaseHostedLifecycleService(() => UseTestDatabase(sp)));
 
             builder
@@ -281,7 +281,6 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
 
                     CustomMvcSetup(mvcBuilder);
                 })
-                .AddWebServer()
                 .AddWebsite()
                 .AddUmbracoSqlServerSupport()
                 .AddUmbracoSqliteSupport()

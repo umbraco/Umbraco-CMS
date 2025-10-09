@@ -39,7 +39,7 @@ export class UmbEntityActionDefaultElement<
 	}
 
 	@state()
-	_href?: string;
+	private _href?: string;
 
 	override async focus() {
 		await this.updateComplete;
@@ -49,9 +49,14 @@ export class UmbEntityActionDefaultElement<
 	async #onClickLabel(event: UUIMenuItemEvent) {
 		if (!this._href) {
 			event.stopPropagation();
-			await this.#api?.execute();
+
+			try {
+				await this.#api?.execute();
+				this.dispatchEvent(new UmbActionExecutedEvent());
+			} catch (error) {
+				console.error('Error executing action:', error);
+			}
 		}
-		this.dispatchEvent(new UmbActionExecutedEvent());
 	}
 
 	// TODO: we need to stop the regular click event from bubbling up to the table so it doesn't select the row.
@@ -61,17 +66,18 @@ export class UmbEntityActionDefaultElement<
 	}
 
 	override render() {
-		const label = this.manifest?.meta.label ? this.localize.string(this.manifest.meta.label) : this.manifest?.name;
+		if (!this.manifest) return nothing;
+
+		const label = this.manifest.meta.label ? this.localize.string(this.manifest.meta.label) : this.manifest.name;
 
 		return html`
 			<uui-menu-item
+				data-mark=${'entity-action:' + this.manifest?.alias}
 				label=${ifDefined(this.manifest?.meta.additionalOptions ? label + '…' : label)}
 				href=${ifDefined(this._href)}
 				@click-label=${this.#onClickLabel}
 				@click=${this.#onClick}>
-				${this.manifest?.meta.icon
-					? html`<umb-icon slot="icon" name="${this.manifest?.meta.icon}"></umb-icon>`
-					: nothing}
+				${this.manifest.meta.icon ? html`<umb-icon slot="icon" name="${this.manifest.meta.icon}"></umb-icon>` : nothing}
 			</uui-menu-item>
 		`;
 	}

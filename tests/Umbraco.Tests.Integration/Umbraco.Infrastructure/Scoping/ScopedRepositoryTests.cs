@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class ScopedRepositoryTests : UmbracoIntegrationTest
+internal sealed class ScopedRepositoryTests : UmbracoIntegrationTest
 {
     private IUserService UserService => GetRequiredService<IUserService>();
 
@@ -324,7 +324,7 @@ public class ScopedRepositoryTests : UmbracoIntegrationTest
     public class LocalServerMessenger : ServerMessengerBase
     {
         public LocalServerMessenger()
-            : base(false, new SystemTextJsonSerializer())
+            : base(false, new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()))
         {
         }
 

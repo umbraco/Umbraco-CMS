@@ -11,12 +11,14 @@ import type { EditorState, Transaction } from '@tiptap/pm/state';
 import { Extension } from '@tiptap/core';
 import { AllSelection, TextSelection } from '@tiptap/pm/state';
 
+/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
 export interface TextIndentOptions {
 	minLevel: number;
 	maxLevel: number;
 	types: Array<string>;
 }
 
+/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
 export const TextIndent = Extension.create<TextIndentOptions>({
 	name: 'textIndent',
 

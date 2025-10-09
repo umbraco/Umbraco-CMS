@@ -1,15 +1,17 @@
-import '../../../block-type/components/input-block-type/index.js';
 import { UMB_BLOCK_LIST_TYPE } from '../../constants.js';
 import type { UmbBlockTypeBaseModel, UmbInputBlockTypeElement } from '@umbraco-cms/backoffice/block-type';
-import {
-	type UmbPropertyEditorUiElement,
-	type UmbPropertyEditorConfigCollection,
+import type {
+	UmbPropertyEditorUiElement,
+	UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+
+// TODO: This is across packages, how should we go about getting just a single element from another package? like here we just need the `umb-input-block-type` element.
+import '@umbraco-cms/backoffice/block-type';
 
 /**
  * @element umb-property-editor-ui-block-list-type-configuration

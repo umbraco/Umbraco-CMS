@@ -1,8 +1,8 @@
-﻿using Examine;
+using Examine;
+using Umbraco.Cms.Core.HostedServices;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
-using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Examine.Deferred;
@@ -136,7 +136,7 @@ internal sealed class DeliveryApiContentIndexHandleContentChanges : DeliveryApiC
                 }
             });
 
-    private class CulturePublishStatus : IEquatable<CulturePublishStatus>
+    private sealed class CulturePublishStatus : IEquatable<CulturePublishStatus>
     {
         public required string Culture { get; set; }
 

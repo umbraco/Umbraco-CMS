@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.NPoco
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, WithApplication = true)]
-public class NPocoFetchTests : UmbracoIntegrationTest
+internal sealed class NPocoFetchTests : UmbracoIntegrationTest
 {
     [SetUp]
     protected void SeedDatabase()

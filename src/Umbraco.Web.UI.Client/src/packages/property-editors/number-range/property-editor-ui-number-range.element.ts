@@ -18,24 +18,23 @@ export class UmbPropertyEditorUINumberRangeElement
 	implements UmbPropertyEditorUiElement
 {
 	@state()
-	_minValue?: number;
+	private _minValue?: number;
 
 	@state()
-	_maxValue?: number;
+	private _maxValue?: number;
 
 	@state()
-	_validationRange?: UmbNumberRangeValueType;
+	private _validationRange?: UmbNumberRangeValueType;
 
 	@property({ type: Object })
 	public override set value(value: UmbNumberRangeValueType | undefined) {
-		this.#value = value || { min: undefined, max: undefined };
+		super.value = value || { min: undefined, max: undefined };
 		this._minValue = value?.min;
 		this._maxValue = value?.max;
 	}
 	public override get value() {
-		return this.#value;
+		return super.value;
 	}
-	#value: UmbNumberRangeValueType = { min: undefined, max: undefined };
 
 	public set config(config: UmbPropertyEditorConfigCollection) {
 		if (!config) return;

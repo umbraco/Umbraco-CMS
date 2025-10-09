@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class RelationTypeRepositoryTest : UmbracoIntegrationTest
+internal sealed class RelationTypeRepositoryTest : UmbracoIntegrationTest
 {
     [SetUp]
     public void SetUp() => CreateTestData();
@@ -100,7 +100,7 @@ public class RelationTypeRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository(provider);
 
             // Act
-            var relationType = repository.Get(8) as IRelationTypeWithIsDependency;
+            var relationType = repository.Get(9) as IRelationTypeWithIsDependency;
 
             // Assert
             Assert.That(relationType, Is.Not.Null);
@@ -130,7 +130,7 @@ public class RelationTypeRepositoryTest : UmbracoIntegrationTest
             Assert.That(relationTypes, Is.Not.Null);
             Assert.That(relationTypes.Any(), Is.True);
             Assert.That(relationTypes.Any(x => x == null), Is.False);
-            Assert.That(relationTypes.Count(), Is.EqualTo(8));
+            Assert.That(relationTypes.Count(), Is.EqualTo(9));
         }
     }
 
@@ -165,7 +165,7 @@ public class RelationTypeRepositoryTest : UmbracoIntegrationTest
 
             // Act
             var exists = repository.Exists(3);
-            var doesntExist = repository.Exists(9);
+            var doesntExist = repository.Exists(99);
 
             // Assert
             Assert.That(exists, Is.True);

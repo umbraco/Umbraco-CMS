@@ -10,7 +10,7 @@ export class UmbBlockGridPropertyValueCloner extends UmbBlockPropertyValueCloner
 		super(UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS, args);
 	}
 
-	_cloneLayout(
+	protected override _cloneLayout(
 		layouts: Array<UmbBlockGridLayoutModel> | undefined,
 	): Promise<Array<UmbBlockGridLayoutModel> | undefined> | undefined {
 		return layouts ? Promise.all(layouts.map(this.#cloneLayoutEntry)) : undefined;

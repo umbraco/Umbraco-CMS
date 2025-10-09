@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, PublishedRepositoryEvents = true,
     WithApplication = true)]
-public class MemberTypeServiceTests : UmbracoIntegrationTest
+internal sealed class MemberTypeServiceTests : UmbracoIntegrationTest
 {
     private IMemberService MemberService => GetRequiredService<IMemberService>();
 

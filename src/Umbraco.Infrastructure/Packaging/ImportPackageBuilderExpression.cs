@@ -16,7 +16,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Packaging;
 
-internal class ImportPackageBuilderExpression : MigrationExpressionBase
+internal sealed class ImportPackageBuilderExpression : MigrationExpressionBase
 {
     private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
     private readonly MediaFileManager _mediaFileManager;

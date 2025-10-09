@@ -4,7 +4,6 @@ import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import {
 	UmbArrayState,
 	UmbBasicState,
-	UmbBooleanState,
 	UmbClassState,
 	UmbDeepState,
 	UmbObjectState,
@@ -22,8 +21,9 @@ import type {
 	UmbPropertyTypeAppearanceModel,
 	UmbPropertyTypeValidationModel,
 } from '@umbraco-cms/backoffice/content-type';
+import { UmbReadOnlyStateManager } from '@umbraco-cms/backoffice/utils';
 
-export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPropertyContext<ValueType>> {
+export class UmbPropertyContext<ValueType = any> extends UmbContextBase {
 	#alias = new UmbStringState(undefined);
 	public readonly alias = this.#alias.asObservable();
 
@@ -60,8 +60,8 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPrope
 	#editorManifest = new UmbBasicState<ManifestPropertyEditorUi | undefined>(undefined);
 	public readonly editorManifest = this.#editorManifest.asObservable();
 
-	#isReadOnly = new UmbBooleanState(false);
-	public readonly isReadOnly = this.#isReadOnly.asObservable();
+	public readonly readOnlyState = new UmbReadOnlyStateManager(this);
+	public readonly isReadOnly = this.readOnlyState.isReadOnly;
 
 	/**
 	 * Set the property editor UI element for this property.
@@ -107,9 +107,9 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPrope
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_PROPERTY_CONTEXT);
 
-		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (variantContext) => {
-			this.#datasetContext = variantContext;
-			this.setVariantId(variantContext.getVariantId?.());
+		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (context) => {
+			this.#datasetContext = context;
+			this.setVariantId(context?.getVariantId?.());
 			this._generateVariantDifferenceString();
 			this._observeProperty();
 		});
@@ -160,7 +160,15 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPrope
 		);
 
 		this.observe(this.#datasetContext.readOnly, (value) => {
-			this.#isReadOnly.setValue(value);
+			const unique = 'UMB_DATASET';
+
+			if (value) {
+				this.readOnlyState.addState({
+					unique,
+				});
+			} else {
+				this.readOnlyState.removeState(unique);
+			}
 		});
 	}
 
@@ -171,13 +179,19 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPrope
 
 		let shareMessage;
 		if (contextVariantId && propertyVariantId) {
-			if (contextVariantId.segment !== propertyVariantId.segment) {
-				// TODO: Translate this, ideally the actual culture is mentioned in the message:
-				shareMessage = 'Shared across culture';
+			// If on a Segment viewing a segment-shared property:
+			// TODO: Do not use the content variant id, but know wether the property is configured to vary by segment.
+			// Because we can view a default segment, then we do not know if the property is shared or not. [NL]
+			if (contextVariantId.segment !== null && propertyVariantId.segment === null) {
+				if (contextVariantId.culture !== null) {
+					shareMessage = 'content_sharedAcrossCultures';
+				} else {
+					shareMessage = 'content_sharedAcrossSegments';
+				}
 			}
-			if (contextVariantId.culture !== propertyVariantId.culture) {
-				// TODO: Translate this:
-				shareMessage = 'Shared';
+			// TODO: Do not use the content variant id, but know wether the property is configured to vary by culture. (this is first a problem when we introduce the invariant-variant)
+			if (contextVariantId.culture !== null && propertyVariantId.culture === null) {
+				shareMessage = 'content_shared';
 			}
 		}
 		this.#variantDifference.setValue(shareMessage);
@@ -334,7 +348,7 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPrope
 	 * @memberof UmbPropertyContext
 	 */
 	public getIsReadOnly(): boolean {
-		return this.#isReadOnly.getValue();
+		return this.readOnlyState.getIsReadOnly();
 	}
 
 	public setDataPath(dataPath: string | undefined): void {
@@ -370,7 +384,6 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPrope
 		this.#configValues.destroy();
 		this.#value.destroy();
 		this.#config.destroy();
-		this.#isReadOnly.destroy();
 		this.#datasetContext = undefined;
 	}
 }

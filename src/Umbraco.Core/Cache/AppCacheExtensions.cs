@@ -46,6 +46,13 @@ public static class AppCacheExtensions
             return default;
         }
 
+        // If we've retrieved the specific string that represents null in the cache, return it only if we are requesting it (via a typed request for a string).
+        // Otherwise consider it a null value.
+        if (RetrievedNullRepresentationInCache(result))
+        {
+            return RequestedNullRepresentationInCache<T>() ? (T)result : default;
+        }
+
         return result.TryConvertTo<T>().Result;
     }
 
@@ -55,6 +62,13 @@ public static class AppCacheExtensions
         if (result == null)
         {
             return default;
+        }
+
+        // If we've retrieved the specific string that represents null in the cache, return it only if we are requesting it (via a typed request for a string).
+        // Otherwise consider it a null value.
+        if (RetrievedNullRepresentationInCache(result))
+        {
+            return RequestedNullRepresentationInCache<T>() ? (T)result : default;
         }
 
         return result.TryConvertTo<T>().Result;
@@ -75,8 +89,24 @@ public static class AppCacheExtensions
             provider.Insert(cacheKey, () => result, timeout, isSliding);
         }
 
-        return result == null ? default : result.TryConvertTo<T>().Result;
+        if (result == null)
+        {
+            return default;
+        }
+
+        // If we've retrieved the specific string that represents null in the cache, return it only if we are requesting it (via a typed request for a string).
+        // Otherwise consider it a null value.
+        if (RetrievedNullRepresentationInCache(result))
+        {
+            return RequestedNullRepresentationInCache<T>() ? (T)result : default;
+        }
+
+        return result.TryConvertTo<T>().Result;
     }
+
+    private static bool RetrievedNullRepresentationInCache(object result) => result == (object)Cms.Core.Constants.Cache.NullRepresentationInCache;
+
+    private static bool RequestedNullRepresentationInCache<T>() => typeof(T) == typeof(string);
 
     public static async Task InsertCacheItemAsync<T>(
         this IAppPolicyCache provider,

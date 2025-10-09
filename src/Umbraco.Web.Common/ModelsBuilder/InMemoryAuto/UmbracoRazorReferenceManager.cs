@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto;
  *
  * This class is used by the the ViewCompiler (CollectibleRuntimeViewCompiler) to find the required references when compiling views.
  */
-internal class UmbracoRazorReferenceManager
+internal sealed class UmbracoRazorReferenceManager
 {
     private readonly ApplicationPartManager _partManager;
     private readonly MvcRazorRuntimeCompilationOptions _options;
@@ -33,7 +33,7 @@ internal class UmbracoRazorReferenceManager
         _options = options.Value;
     }
 
-    public virtual IReadOnlyList<MetadataReference> CompilationReferences
+    public IReadOnlyList<MetadataReference> CompilationReferences
     {
         get
         {

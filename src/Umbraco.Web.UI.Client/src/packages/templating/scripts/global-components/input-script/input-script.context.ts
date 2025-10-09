@@ -9,6 +9,3 @@ export class UmbScriptPickerInputContext extends UmbPickerInputContext<UmbScript
 		super(host, UMB_SCRIPT_ITEM_REPOSITORY_ALIAS, UMB_SCRIPT_PICKER_MODAL);
 	}
 }
-
-/** @deprecated Use `UmbScriptPickerInputContext` instead. This method will be removed in Umbraco 15. */
-export { UmbScriptPickerInputContext as UmbScriptPickerContext };

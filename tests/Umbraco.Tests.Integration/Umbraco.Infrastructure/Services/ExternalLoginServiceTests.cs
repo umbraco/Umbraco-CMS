@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class ExternalLoginServiceTests : UmbracoIntegrationTest
+internal sealed class ExternalLoginServiceTests : UmbracoIntegrationTest
 {
     private IUserService UserService => GetRequiredService<IUserService>();
 

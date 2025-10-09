@@ -18,6 +18,7 @@ using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
+using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine;
 
@@ -113,7 +114,9 @@ public abstract class ExamineBaseTest : UmbracoIntegrationTest
                 false,
                 publicAccessServiceMock.Object,
                 scopeProviderMock.Object,
-                parentId);
+                parentId,
+                null,
+                null);
         }
         else
         {

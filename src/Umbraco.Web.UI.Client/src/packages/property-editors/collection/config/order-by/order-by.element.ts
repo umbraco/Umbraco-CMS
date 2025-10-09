@@ -28,7 +28,7 @@ export class UmbPropertyEditorUICollectionOrderByElement extends UmbLitElement i
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, async (instance) => {
 			const workspace = instance;
 			this.observe(
-				await workspace.propertyValueByAlias<Array<UmbCollectionColumnConfiguration>>('includeProperties'),
+				await workspace?.propertyValueByAlias<Array<UmbCollectionColumnConfiguration>>('includeProperties'),
 				(includeProperties) => {
 					if (!includeProperties) return;
 					const options = includeProperties.map((property) => ({

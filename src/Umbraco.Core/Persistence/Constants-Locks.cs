@@ -80,5 +80,15 @@ public static partial class Constants
         ///     All webhook logs.
         /// </summary>
         public const int WebhookLogs = -343;
+
+        /// <summary>
+        ///     Long-running operations.
+        /// </summary>
+        public const int LongRunningOperations = -344;
+
+        /// <summary>
+        ///     All document URLs.
+        /// </summary>
+        public const int DocumentUrls = -345;
     }
 }

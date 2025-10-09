@@ -4,7 +4,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PublishedCache;
 
-internal class PublishedElementPropertyBase : PublishedPropertyBase
+internal sealed class PublishedElementPropertyBase : PublishedPropertyBase
 {
     protected readonly IPublishedElement Element;
 

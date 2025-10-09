@@ -11,8 +11,7 @@ export const manifest: ManifestPropertyEditorSchema = {
 				{
 					alias: 'useLabel',
 					label: '#colorPickerConfigurations_showLabelTitle',
-					description:
-						'{umbLocalize: colorPickerConfigurations_showLabelDescription}',
+					description: '{umbLocalize: colorPickerConfigurations_showLabelDescription}',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 				},
 				{

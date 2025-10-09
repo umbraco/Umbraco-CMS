@@ -1,7 +1,7 @@
 import type { ManifestEntityUserPermission } from '../../entity-user-permission.extension.js';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { html, customElement, property, state, nothing, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state, nothing, ifDefined, css } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbUserPermissionVerbElement } from '@umbraco-cms/backoffice/user';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -90,7 +90,7 @@ export class UmbInputEntityUserPermissionElement extends UmbFormControlMixin(Umb
 					${group !== 'undefined'
 						? html` <h5><umb-localize .key=${`actionCategories_${group}`}>${group}</umb-localize></h5> `
 						: nothing}
-					${manifests.map((manifest) => html` ${this.#renderPermission(manifest)} `)}
+					<div>${manifests.map((manifest) => html` ${this.#renderPermission(manifest)} `)}</div>
 				`,
 			)}
 		`;
@@ -109,6 +109,12 @@ export class UmbInputEntityUserPermissionElement extends UmbFormControlMixin(Umb
 		super.disconnectedCallback();
 		this.#manifestObserver?.destroy();
 	}
+
+	static override styles = css`
+		umb-input-user-permission-verb:not(:last-of-type) {
+			border-bottom: 1px solid var(--uui-color-divider);
+		}
+	`;
 }
 
 export default UmbInputEntityUserPermissionElement;

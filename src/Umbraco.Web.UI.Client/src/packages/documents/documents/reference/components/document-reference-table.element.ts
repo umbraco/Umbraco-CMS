@@ -6,9 +6,15 @@ import {
 	type UmbReferenceModel,
 	isDocumentReference,
 	isMediaReference,
+	isMemberReference,
 	isDefaultReference,
 } from '@umbraco-cms/backoffice/relations';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
+/**
+ * @deprecated Deprecated from 15.4. The element will be removed in v17.0.0. For modals use the <umb-confirm-action-modal-entity-references> or <umb-confirm-bulk-action-modal-entity-references> element instead
+ * @class UmbDocumentReferenceTableElement
+ */
 @customElement('umb-document-reference-table')
 export class UmbDocumentReferenceTableElement extends UmbLitElement {
 	#documentReferenceRepository = new UmbDocumentReferenceRepository(this);
@@ -18,19 +24,26 @@ export class UmbDocumentReferenceTableElement extends UmbLitElement {
 	unique = '';
 
 	@state()
-	_items: Array<UmbReferenceModel> = [];
+	private _items: Array<UmbReferenceModel> = [];
 
 	/**
 	 * Indicates if there are more references to load, i.e. if the server has more references to return.
 	 * This is used to determine if the "...and X more references" text should be displayed.
 	 */
 	@state()
-	_hasMoreReferences = 0;
+	private _hasMoreReferences = 0;
 
 	@state()
-	_errorMessage = '';
+	private _errorMessage = '';
 
 	override firstUpdated() {
+		new UmbDeprecation({
+			removeInVersion: '17',
+			deprecated: '<umb-document-reference-table> element',
+			solution:
+				'For modals use the <umb-confirm-action-modal-entity-references> or <umb-confirm-bulk-action-modal-entity-references> element instead',
+		}).warn();
+
 		this.#getReferences();
 	}
 
@@ -60,6 +73,9 @@ export class UmbDocumentReferenceTableElement extends UmbLitElement {
 		}
 		if (isMediaReference(item)) {
 			return item.mediaType.icon ?? 'icon-picture';
+		}
+		if (isMemberReference(item)) {
+			return item.memberType.icon ?? 'icon-user';
 		}
 		if (isDefaultReference(item)) {
 			return item.icon ?? 'icon-document';

@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services.Navigation;
@@ -33,12 +33,6 @@ public sealed class MediaCache : IPublishedMediaCache
 
     public IPublishedContent? GetById(Guid contentId) => GetByIdAsync(contentId).GetAwaiter().GetResult();
 
-
-    public IPublishedContentType? GetContentType(Guid key) => _publishedContentTypeCache.Get(PublishedItemType.Media, key);
-
-    public IPublishedContentType GetContentType(int id) => _publishedContentTypeCache.Get(PublishedItemType.Media, id);
-
-    public IPublishedContentType GetContentType(string alias) => _publishedContentTypeCache.Get(PublishedItemType.Media, alias);
 
     [Obsolete("Scheduled for removal in v17")]
     public IPublishedContent? GetById(bool preview, Udi contentId)
@@ -86,7 +80,4 @@ public sealed class MediaCache : IPublishedMediaCache
         _mediaNavigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys);
         return rootKeys.Any();
     }
-
-    public IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType) =>
-        _mediaCacheService.GetByContentType(contentType);
 }

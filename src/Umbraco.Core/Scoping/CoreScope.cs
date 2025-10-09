@@ -250,6 +250,8 @@ public class CoreScope : ICoreScope
         _parentScope = coreScope;
     }
 
+    protected bool HasParentScope => _parentScope is not null;
+
     protected void HandleScopedNotifications() => _notificationPublisher?.ScopeExit(Completed.HasValue && Completed.Value);
 
     private void EnsureNotDisposed()

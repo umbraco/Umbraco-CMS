@@ -7,9 +7,13 @@
 
 import madge from 'madge';
 import { join } from 'path';
-import { mkdirSync } from 'fs';
+//import { mkdirSync } from 'fs';
 
-const __dirname = import.meta.dirname;
+//const __dirname = import.meta.dirname;
+
+// Adjust this number as needed.
+const MAX_CIRCULAR_DEPENDENCIES = 1;
+
 const IS_GITHUB_ACTIONS = process.env.GITHUB_ACTIONS === 'true';
 const IS_AZURE_PIPELINES = process.env.TF_BUILD === 'true';
 const baseDir = process.argv[2] || 'src';
@@ -24,9 +28,9 @@ const madgeSetup = await madge(specificPaths, {
 	detectiveOptions: {
 		ts: {
 			skipTypeImports: true,
-			skipAsyncImports: true
-		}
-	}
+			skipAsyncImports: true,
+		},
+	},
 });
 
 console.log('-'.repeat(80));
@@ -40,15 +44,31 @@ if (circular.length) {
 	}
 	console.error('\nPlease fix the circular dependencies before proceeding.\n');
 
+	/*
+	// Curently disabled as we don't have Graphviz installed on the CI servers neither do we use this visualization currently.
+	// Ideally its an opt in feature that is triggered by a environment variable.
 	try {
 		const imagePath = join(__dirname, '../../madge');
 		mkdirSync(imagePath, { recursive: true });
 		const image = await madgeSetup.image(join(imagePath, 'circular.svg'), true);
 		console.log('Circular dependencies graph generated:', image);
 	} catch { console.warn('No image generated. Make sure Graphviz is in your $PATH if you want a visualization'); }
+	*/
 
-	// TODO: Set this to 1 when we have fixed all circular dependencies
-	process.exit(0);
+	// TODO: Remove this check and set an exit with argument 1 when we have fixed all circular dependencies.
+	if (circular.length > MAX_CIRCULAR_DEPENDENCIES) {
+		process.exit(1);
+	} else if (circular.length < MAX_CIRCULAR_DEPENDENCIES) {
+		console.error(
+			`\nYou have fewer circular dependencies (${circular.length}) than anticipated (${MAX_CIRCULAR_DEPENDENCIES}). That is great!\n`,
+		);
+		console.error(
+			`(Now please adjust the number in MAX_CIRCULAR_DEPENDENCIES to ${circular.length} in devops/circular/index.js).\n`,
+		);
+		process.exit(1);
+	} else {
+		process.exit(0);
+	}
 }
 
 console.log('\nNo circular dependencies detected.\n');
@@ -60,16 +80,18 @@ process.exit(0);
  * @param {number} idx The index of the circular dependency.
  */
 function printCircularDependency(circular, idx) {
-	circular = circular.map(file => `${baseDir}/${file}`);
+	circular = circular.map((file) => `${baseDir}/${file}`);
 	const circularPath = circular.join(' -> ');
 
 	if (IS_GITHUB_ACTIONS) {
-		console.error(`::error file=${circular[0]},title=Circular dependency::Circular dependencies detected: ${circularPath}`);
-	}
-	else if (IS_AZURE_PIPELINES) {
-		console.error(`##vso[task.logissue type=error;sourcepath=${circular[0]};]Circular dependencies detected: ${circularPath}`);
+		console.error(
+			`::error file=${circular[0]},title=Circular dependency::Circular dependencies detected: ${circularPath}`,
+		);
+	} else if (IS_AZURE_PIPELINES) {
+		console.error(
+			`##vso[task.logissue type=error;sourcepath=${circular[0]};]Circular dependencies detected: ${circularPath}`,
+		);
 	} else {
 		console.error(idx, '=', circularPath, '\n');
 	}
-
 }

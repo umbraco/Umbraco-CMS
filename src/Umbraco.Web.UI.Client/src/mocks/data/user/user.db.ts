@@ -7,11 +7,13 @@ import type { UmbMockUserModel } from './user.data.js';
 import { data, mfaLoginProviders } from './user.data.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type {
+	CalculatedUserStartNodesResponseModel,
 	CreateUserRequestModel,
 	CurrentUserResponseModel,
 	InviteUserRequestModel,
 	PagedUserResponseModel,
 	UpdateUserGroupsOnUserRequestModel,
+	UserConfigurationResponseModel,
 	UserItemResponseModel,
 	UserResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
@@ -41,6 +43,47 @@ class UmbUserMockDB extends UmbEntityMockDbBase<UmbMockUserModel> {
 
 	constructor(data: UmbMockUserModel[]) {
 		super(data);
+	}
+
+	calculateStartNodes(id: string): CalculatedUserStartNodesResponseModel {
+		const user = this.data.find((user) => user.id === id);
+		if (!user) {
+			throw new Error(`User with id ${id} not found`);
+		}
+
+		return {
+			id: user.id,
+			documentStartNodeIds: user.documentStartNodeIds,
+			mediaStartNodeIds: user.mediaStartNodeIds,
+			hasDocumentRootAccess: user.hasDocumentRootAccess,
+			hasMediaRootAccess: user.hasMediaRootAccess,
+		};
+	}
+
+	clientCredentials(id: string): Array<string> {
+		const user = this.data.find((user) => user.id === id);
+		if (!user) {
+			throw new Error(`User with id ${id} not found`);
+		}
+
+		// TODO: Implement logic to return client credentials for the user
+		return [];
+	}
+
+	getConfiguration(): UserConfigurationResponseModel {
+		return {
+			allowChangePassword: true,
+			allowTwoFactor: true,
+			canInviteUsers: true,
+			passwordConfiguration: {
+				minimumPasswordLength: 8,
+				requireDigit: true,
+				requireLowercase: true,
+				requireUppercase: true,
+				requireNonLetterOrDigit: true,
+			},
+			usernameIsEmail: true,
+		};
 	}
 
 	/**
@@ -203,6 +246,7 @@ const itemMapper = (item: UmbMockUserModel): UserItemResponseModel => {
 		id: item.id,
 		kind: item.kind,
 		name: item.name,
+		flags: item.flags,
 	};
 };
 
@@ -228,6 +272,7 @@ const createMockMapper = (item: CreateUserRequestModel): UmbMockUserModel => {
 		lastPasswordChangeDate: null,
 		isAdmin: item.userGroupIds.map((reference) => reference.id).includes(umbUserGroupMockDb.getAll()[0].id),
 		kind: item.kind,
+		flags: [],
 	};
 };
 

@@ -15,7 +15,7 @@ export class UmbEntityHasChildrenCondition
 		super(host, args);
 
 		this.consumeContext(UMB_HAS_CHILDREN_ENTITY_CONTEXT, (context) => {
-			this.observe(context.hasChildren, (hasChildren) => {
+			this.observe(context?.hasChildren, (hasChildren) => {
 				this.permitted = hasChildren === true;
 			});
 		});

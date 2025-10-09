@@ -9,10 +9,10 @@ import { filterFrozenArray } from '@umbraco-cms/backoffice/observable-api';
 @customElement('umb-user-group-granular-permission-list')
 export class UmbUserGroupGranularPermissionListElement extends UmbLitElement {
 	@state()
-	_userGroupPermissions?: Array<any>;
+	private _userGroupPermissions?: Array<any>;
 
 	@state()
-	_userGroupFallbackPermissions?: Array<string>;
+	private _userGroupFallbackPermissions?: Array<string>;
 
 	#workspaceContext?: typeof UMB_USER_GROUP_WORKSPACE_CONTEXT.TYPE;
 
@@ -23,7 +23,7 @@ export class UmbUserGroupGranularPermissionListElement extends UmbLitElement {
 			this.#workspaceContext = instance;
 
 			this.observe(
-				this.#workspaceContext.data,
+				this.#workspaceContext?.data,
 				(userGroup) => {
 					this._userGroupPermissions = userGroup?.permissions;
 					this._userGroupFallbackPermissions = userGroup?.fallbackPermissions;
@@ -80,6 +80,7 @@ export class UmbUserGroupGranularPermissionListElement extends UmbLitElement {
 			this._userGroupPermissions.filter((permission) => permission.$type === schemaType) || [];
 
 		(extension.component as any).permissions = permissionsForSchemaType;
+		(extension.component as any).fallbackPermissions = this._userGroupFallbackPermissions;
 		extension.component.addEventListener(UmbChangeEvent.TYPE, this.#onValueChange);
 
 		return html`

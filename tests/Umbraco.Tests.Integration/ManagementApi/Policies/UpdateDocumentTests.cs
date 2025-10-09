@@ -8,7 +8,6 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
-using Umbraco.Cms.Core.Models.ContentPublishing;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
@@ -19,7 +18,7 @@ using Umbraco.Cms.Tests.Common.TestHelpers;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.Policies;
 
-public class UpdateDocumentTests : ManagementApiTest<UpdateDocumentController>
+internal sealed class UpdateDocumentTests : ManagementApiTest<UpdateDocumentController>
 {
     private IUserGroupService UserGroupService => GetRequiredService<IUserGroupService>();
 
@@ -84,7 +83,7 @@ public class UpdateDocumentTests : ManagementApiTest<UpdateDocumentController>
 
         var response = await GetManagementApiResponse(model, updateRequestModel);
 
-        AssertResponse(response, model, HttpStatusCode.Forbidden, model.InvariantName);
+        AssertResponse(response, model, HttpStatusCode.Forbidden, model.Variants.Single().Name);
     }
 
     [Test]

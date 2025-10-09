@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// <summary>
 ///     Represents the NPoco implementation of <see cref="IAuditEntryRepository" />.
 /// </summary>
-internal class AuditEntryRepository : EntityRepositoryBase<int, IAuditEntry>, IAuditEntryRepository
+internal sealed class AuditEntryRepository : EntityRepositoryBase<int, IAuditEntry>, IAuditEntryRepository
 {
     /// <summary>
     ///     Initializes a new instance of the <see cref="AuditEntryRepository" /> class.

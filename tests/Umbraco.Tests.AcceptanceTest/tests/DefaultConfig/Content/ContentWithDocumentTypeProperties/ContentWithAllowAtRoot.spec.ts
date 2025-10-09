@@ -18,7 +18,7 @@ test('cannot create content if allow at root is disabled', async ({umbracoApi, u
 
   // Act
   await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.clickCreateActionMenuOption();
 
   // Assert
   await umbracoUi.content.isDocumentTypeNameVisible(documentTypeName, false);

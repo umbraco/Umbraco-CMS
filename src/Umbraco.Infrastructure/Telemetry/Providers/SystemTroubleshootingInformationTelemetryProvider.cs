@@ -14,7 +14,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Telemetry.Providers;
 
-internal class SystemTroubleshootingInformationTelemetryProvider : IDetailedTelemetryProvider, ISystemTroubleshootingInformationService
+internal sealed class SystemTroubleshootingInformationTelemetryProvider : IDetailedTelemetryProvider, ISystemTroubleshootingInformationService
 {
     private readonly IHostEnvironment _hostEnvironment;
     private readonly HostingSettings _hostingSettings;
@@ -45,21 +45,21 @@ internal class SystemTroubleshootingInformationTelemetryProvider : IDetailedTele
         _modelsBuilderSettings = modelsBuilderSettings.CurrentValue;
     }
 
-    private string CurrentWebServer => GetWebServerName();
+    private static string CurrentWebServer => GetWebServerName();
 
-    private string ServerFramework => RuntimeInformation.FrameworkDescription;
+    private static string ServerFramework => RuntimeInformation.FrameworkDescription;
 
     private string ModelsBuilderMode => _modelsBuilderSettings.ModelsMode.ToString();
 
     private string RuntimeMode => _runtimeSettings.Mode.ToString();
 
-    private string CurrentCulture => Thread.CurrentThread.CurrentCulture.ToString();
+    private static string CurrentCulture => Thread.CurrentThread.CurrentCulture.ToString();
 
     private bool IsDebug => _hostingSettings.Debug;
 
     private string AspEnvironment => _hostEnvironment.EnvironmentName;
 
-    private string ServerOs => RuntimeInformation.OSDescription;
+    private static string ServerOs => RuntimeInformation.OSDescription;
 
     private string DatabaseProvider => _umbracoDatabaseFactory.CreateDatabase().DatabaseType.GetProviderName();
 
@@ -96,7 +96,7 @@ internal class SystemTroubleshootingInformationTelemetryProvider : IDetailedTele
             { "Current Server Role", CurrentServerRole },
         };
 
-    private string GetWebServerName()
+    private static string GetWebServerName()
     {
         var processName = Path.GetFileNameWithoutExtension(Process.GetCurrentProcess().ProcessName);
 

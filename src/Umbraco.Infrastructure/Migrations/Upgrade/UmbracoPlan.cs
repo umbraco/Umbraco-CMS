@@ -114,5 +114,21 @@ public class UmbracoPlan : MigrationPlan
 
         // To 15.4.0
         To<V_15_4_0.UpdateDocumentUrlToPersistMultipleSegmentsPerDocument>("{A9E72794-4036-4563-B543-1717C73B8879}");
+        To<V_15_4_0.AddRelationTypeForMembers>("{33D62294-D0DE-4A86-A830-991EB36B96DA}");
+
+        // To 16.0.0
+        To<V_16_0_0.MigrateTinyMceToTiptap>("{C6681435-584F-4BC8-BB8D-BC853966AF0B}");
+        To<V_16_0_0.AddDocumentPropertyPermissions>("{D1568C33-A697-455F-8D16-48060CB954A1}");
+
+        // To 16.2.0
+        To<V_16_2_0.AddLongRunningOperations>("{741C22CF-5FB8-4343-BF79-B97A58C2CCBA}");
+        To<NoopMigration>("{BE11D4D3-3A1F-4598-90D4-B548BD188C48}"); // Originally was V_16_2_0.AddDocumentUrlLock, now moved to a pre-migration.
+
+        // To 16.3.0
+        To<V_16_3_0.AddRichTextEditorCapabilities>("{A917FCBC-C378-4A08-A36C-220C581A6581}");
+        To<V_16_3_0.MigrateMediaTypeLabelProperties>("{FB7073AF-DFAF-4AC1-800D-91F9BD5B5238}");
+
+        // To 16.4.0
+        To<V_16_4_0.CreateMissingTabs>("{6A7D3B80-8B64-4E41-A7C0-02EC39336E97}");
     }
 }

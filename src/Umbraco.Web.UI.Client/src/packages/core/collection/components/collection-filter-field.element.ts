@@ -33,8 +33,12 @@ export class UmbCollectionFilterFieldElement extends UmbLitElement {
 
 	static override readonly styles = [
 		css`
+			:host {
+				display: flex;
+			}
+
 			uui-input {
-				display: block;
+				width: 100%;
 			}
 		`,
 	];

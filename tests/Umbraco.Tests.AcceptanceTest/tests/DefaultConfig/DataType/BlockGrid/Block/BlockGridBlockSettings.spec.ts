@@ -31,7 +31,7 @@ test('can add a label to a block', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible();
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainLabel(blockGridEditorName, elementTypeId, labelText)).toBeTruthy();
 });
 
@@ -51,7 +51,7 @@ test('can remove a label from a block', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible();
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainLabel(blockGridEditorName, elementTypeId, labelText)).toBeFalsy();
 });
 
@@ -86,7 +86,7 @@ test('can add a settings model to a block', {tag: '@smoke'}, async ({umbracoApi,
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible();
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesBlockEditorContainBlocksWithSettingsTypeIds(blockGridEditorName, [settingsElementTypeId])).toBeTruthy();
 });
 
@@ -108,7 +108,7 @@ test('can remove a settings model from a block', async ({umbracoApi, umbracoUi})
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible();
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesBlockEditorContainBlocksWithSettingsTypeIds(blockGridEditorName, [settingsElementTypeId])).toBeFalsy();
 });
 
@@ -116,7 +116,7 @@ test('can enable allow in root from a block', async ({umbracoApi, umbracoUi}) =>
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
-  await umbracoApi.dataType.createBlockGridWithABlock(blockGridEditorName, contentElementTypeId);
+  await umbracoApi.dataType.createBlockGridWithPermissions(blockGridEditorName, contentElementTypeId);
 
   // Act
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
@@ -126,7 +126,7 @@ test('can enable allow in root from a block', async ({umbracoApi, umbracoUi}) =>
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible();
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesBlockEditorBlockHaveAllowInRootEnabled(blockGridEditorName, contentElementTypeId)).toBeTruthy();
 });
 
@@ -134,7 +134,7 @@ test('can enable allow in areas from a block', async ({umbracoApi, umbracoUi}) =
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
-  await umbracoApi.dataType.createBlockGridWithABlock(blockGridEditorName, contentElementTypeId);
+  await umbracoApi.dataType.createBlockGridWithPermissions(blockGridEditorName, contentElementTypeId);
 
   // Act
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
@@ -144,7 +144,7 @@ test('can enable allow in areas from a block', async ({umbracoApi, umbracoUi}) =
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible();
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesBlockEditorBlockHaveAllowInAreasEnabled(blockGridEditorName, contentElementTypeId)).toBeTruthy();
 });
 
@@ -164,7 +164,7 @@ test('can add a column span to a block', {tag: '@smoke'}, async ({umbracoApi, um
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible();
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainColumnSpanOptions(blockGridEditorName, contentElementTypeId, columnSpan)).toBeTruthy();
 });
 
@@ -184,7 +184,7 @@ test('can add multiple column spans to a block', async ({umbracoApi, umbracoUi})
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible();
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainColumnSpanOptions(blockGridEditorName, contentElementTypeId, columnSpan)).toBeTruthy();
 });
 
@@ -204,7 +204,7 @@ test('can remove a column span from a block', async ({umbracoApi, umbracoUi}) =>
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible();
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainColumnSpanOptions(blockGridEditorName, contentElementTypeId, [])).toBeTruthy();
 });
 
@@ -226,7 +226,7 @@ test('can add min and max row span to a block', async ({umbracoApi, umbracoUi}) 
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible();
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainRowSpanOptions(blockGridEditorName, contentElementTypeId, rowSpanMin, rowSpanMax)).toBeTruthy();
 });
 
@@ -248,6 +248,6 @@ test('can remove min and max row spans from a block', async ({umbracoApi, umbrac
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible();
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainRowSpanOptions(blockGridEditorName, contentElementTypeId, rowSpanMin, rowSpanMax)).toBeTruthy();
 });

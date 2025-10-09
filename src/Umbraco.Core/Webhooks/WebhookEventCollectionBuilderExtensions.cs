@@ -12,34 +12,35 @@ public static class WebhookEventCollectionBuilderExtensions
     /// </summary>
     /// <param name="builder">The builder.</param>
     /// <param name="onlyDefault">If set to <c>true</c> only adds the default webhook events instead of all available.</param>
+    /// <param name="payloadType">The configured payload type.</param>
     /// <returns>
     /// The builder.
     /// </returns>
-    public static WebhookEventCollectionBuilder AddCms(this WebhookEventCollectionBuilder builder, bool onlyDefault = false)
+    public static WebhookEventCollectionBuilder AddCms(this WebhookEventCollectionBuilder builder, bool onlyDefault = false, WebhookPayloadType payloadType = Constants.Webhooks.DefaultPayloadType)
         => builder.AddCms(builder =>
         {
             if (onlyDefault)
             {
-                builder.AddDefault();
+                builder.AddDefault(payloadType);
             }
             else
             {
                 builder
-                    .AddContent()
-                    .AddContentType()
-                    .AddDataType()
-                    .AddDictionary()
-                    .AddDomain()
-                    .AddFile()
-                    .AddHealthCheck()
-                    .AddLanguage()
-                    .AddMedia()
-                    .AddMember()
-                    .AddPackage()
-                    .AddPublicAccess()
-                    .AddRelation()
-                    .AddRelationType()
-                    .AddUser();
+                    .AddContent(onlyDefault, payloadType)
+                    .AddContentType(payloadType)
+                    .AddDataType(payloadType)
+                    .AddDictionary(payloadType)
+                    .AddDomain(payloadType)
+                    .AddFile(payloadType)
+                    .AddHealthCheck(payloadType)
+                    .AddLanguage(payloadType)
+                    .AddMedia(payloadType)
+                    .AddMember(onlyDefault, payloadType)
+                    .AddPackage(payloadType)
+                    .AddPublicAccess(payloadType)
+                    .AddRelation(payloadType)
+                    .AddRelationType(payloadType)
+                    .AddUser(onlyDefault, payloadType);
             }
         });
 

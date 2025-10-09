@@ -3,7 +3,7 @@ import { UMB_BLOCK_WORKSPACE_CONTEXT } from '../../block-workspace.context-token
 import type { UmbBlockWorkspaceViewEditTabElement } from './block-workspace-view-edit-tab.element.js';
 import { css, html, customElement, state, repeat, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbContentTypeModel, UmbPropertyTypeContainerModel } from '@umbraco-cms/backoffice/content-type';
+import type { UmbContentTypeModel, UmbPropertyTypeContainerMergedModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import type { UmbRoute, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 import { encodeFolderName } from '@umbraco-cms/backoffice/router';
@@ -34,7 +34,7 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 	private _routes: UmbRoute[] = [];
 
 	@state()
-	_tabs?: Array<UmbPropertyTypeContainerModel>;
+	private _tabs?: Array<UmbPropertyTypeContainerMergedModel>;
 
 	@state()
 	private _routerPath?: string;
@@ -48,7 +48,7 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 		this.#tabsStructureHelper.setIsRoot(true);
 		this.#tabsStructureHelper.setContainerChildType('Tab');
 		this.observe(
-			this.#tabsStructureHelper.mergedContainers,
+			this.#tabsStructureHelper.childContainers,
 			(tabs) => {
 				this._tabs = tabs;
 				this.#createRoutes();
@@ -102,7 +102,7 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 					component: () => import('./block-workspace-view-edit-tab.element.js'),
 					setup: (component) => {
 						(component as UmbBlockWorkspaceViewEditTabElement).managerName = this.#managerName;
-						(component as UmbBlockWorkspaceViewEditTabElement).containerId = tab.id;
+						(component as UmbBlockWorkspaceViewEditTabElement).containerId = tab.ids[0];
 					},
 				});
 			});
@@ -123,6 +123,7 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 			if (!this._hasRootGroups) {
 				routes.push({
 					path: '',
+					pathMatch: 'full',
 					redirectTo: routes[0]?.path,
 				});
 			}

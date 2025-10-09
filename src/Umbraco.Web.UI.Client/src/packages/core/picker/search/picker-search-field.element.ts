@@ -8,13 +8,13 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 @customElement('umb-picker-search-field')
 export class UmbPickerSearchFieldElement extends UmbLitElement {
 	@state()
-	_query: string = '';
+	private _query: string = '';
 
 	@state()
-	_searching: boolean = false;
+	private _searching: boolean = false;
 
 	@state()
-	_isSearchable: boolean = false;
+	private _isSearchable: boolean = false;
 
 	#pickerContext?: UmbPickerContext;
 
@@ -23,9 +23,12 @@ export class UmbPickerSearchFieldElement extends UmbLitElement {
 
 		this.consumeContext(UMB_PICKER_CONTEXT, (context) => {
 			this.#pickerContext = context;
-			this.observe(this.#pickerContext.search.searchable, (isSearchable) => (this._isSearchable = isSearchable));
-			this.observe(this.#pickerContext.search.searching, (searching) => (this._searching = searching));
-			this.observe(this.#pickerContext.search.query, (query) => (this._query = query?.query || ''));
+			this.observe(
+				this.#pickerContext?.search.searchable,
+				(isSearchable) => (this._isSearchable = isSearchable ?? false),
+			);
+			this.observe(this.#pickerContext?.search.searching, (searching) => (this._searching = searching ?? false));
+			this.observe(this.#pickerContext?.search.query, (query) => (this._query = query?.query || ''));
 		});
 	}
 

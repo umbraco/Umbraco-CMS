@@ -11,7 +11,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.Telemetry;
 
 /// <inheritdoc />
-internal class TelemetryService : ITelemetryService
+internal sealed class TelemetryService : ITelemetryService
 {
     private readonly IPackagingService _packagingService;
     private readonly IMetricsConsentService _metricsConsentService;
@@ -36,14 +36,6 @@ internal class TelemetryService : ITelemetryService
         _metricsConsentService = metricsConsentService;
     }
 
-    [Obsolete("Please use GetTelemetryReportDataAsync. Will be removed in V15.")]
-    public bool TryGetTelemetryReportData(out TelemetryReportData? telemetryReportData)
-    {
-        telemetryReportData = GetTelemetryReportDataAsync().GetAwaiter().GetResult();
-
-        return telemetryReportData != null;
-    }
-
     /// <inheritdoc />
     public async Task<TelemetryReportData?> GetTelemetryReportDataAsync()
     {
@@ -61,7 +53,8 @@ internal class TelemetryService : ITelemetryService
         };
     }
 
-    private string? GetVersion() => _metricsConsentService.GetConsentLevel() == TelemetryLevel.Minimal
+    private string? GetVersion()
+        => _metricsConsentService.GetConsentLevel() == TelemetryLevel.Minimal
         ? null
         : _umbracoVersion.SemanticVersion.ToSemanticStringWithoutBuild();
 

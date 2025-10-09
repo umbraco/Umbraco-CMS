@@ -32,24 +32,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		],
 	},
 	{
-		type: 'workspaceView',
-		alias: 'Umb.WorkspaceView.Stylesheet.RichTextEditor',
-		name: 'Stylesheet Workspace Rich Text Editor View',
-		element: () => import('./views/rich-text-rule/stylesheet-rich-text-rule-workspace-view.element.js'),
-		weight: 800,
-		meta: {
-			label: '#stylesheet_tabRules',
-			pathname: 'rich-text-editor',
-			icon: 'icon-font',
-		},
-		conditions: [
-			{
-				alias: UMB_WORKSPACE_CONDITION_ALIAS,
-				match: UMB_STYLESHEET_WORKSPACE_ALIAS,
-			},
-		],
-	},
-	{
 		type: 'workspaceAction',
 		kind: 'default',
 		alias: 'Umb.WorkspaceAction.Stylesheet.Save',

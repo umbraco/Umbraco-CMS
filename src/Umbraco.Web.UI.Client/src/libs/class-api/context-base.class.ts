@@ -7,15 +7,9 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
  * This base provides the necessary for a class to become a context-api controller.
  *
  */
-export abstract class UmbContextBase<
-		ContextType,
-		GivenContextToken extends UmbContextToken<ContextType, ContextType> = UmbContextToken<ContextType, ContextType>,
-	>
-	extends UmbControllerBase
-	implements UmbContext
-{
-	constructor(host: UmbControllerHost, contextToken: GivenContextToken | string) {
+export abstract class UmbContextBase extends UmbControllerBase implements UmbContext {
+	constructor(host: UmbControllerHost, contextToken: UmbContextToken<any> | string) {
 		super(host, contextToken.toString());
-		this.provideContext(contextToken, this as unknown as ContextType);
+		this.provideContext(contextToken, this as any);
 	}
 }

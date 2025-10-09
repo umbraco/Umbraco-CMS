@@ -1,1 +1,2 @@
-export const UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS = 'Umb.Condition.SectionUserPermission';
+export * from './section-alias/constants.js';
+export * from './section-user-permission/constants.js';

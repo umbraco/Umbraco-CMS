@@ -13,6 +13,7 @@ using Umbraco.Cms.Core.Features;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Cms.Web.Common.Filters;
 
 namespace Umbraco.Cms.Api.Management.Controllers;
 
@@ -22,6 +23,7 @@ namespace Umbraco.Cms.Api.Management.Controllers;
 [MapToApi(ManagementApiConfiguration.ApiName)]
 [JsonOptionsName(Constants.JsonOptionsNames.BackOffice)]
 [AppendEventMessages]
+[DisableBrowserCache]
 [Produces("application/json")]
 public abstract class ManagementApiControllerBase : Controller, IUmbracoFeature
 {

@@ -1,14 +1,14 @@
+import { UmbModalBaseElement } from '../../component/modal-base.element.js';
 import type { UmbErrorViewerModalData, UmbErrorViewerModalValue } from './error-viewer-modal.token.js';
 import { css, customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-error-viewer-modal')
 export class UmbErrorViewerModalElement extends UmbModalBaseElement<UmbErrorViewerModalData, UmbErrorViewerModalValue> {
 	@state()
-	_displayError?: string;
+	private _displayError?: string;
 
 	@state()
-	_displayLang?: string;
+	private _displayLang?: string;
 
 	// Code adapted from https://stackoverflow.com/a/57668208/12787
 	// Licensed under the permissions of the CC BY-SA 4.0 DEED

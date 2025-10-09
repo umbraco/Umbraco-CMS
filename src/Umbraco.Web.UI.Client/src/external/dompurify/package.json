@@ -1,0 +1,11 @@
+{
+	"name": "@umbraco-backoffice/dompurify",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"build": "vite build"
+	},
+	"dependencies": {
+		"dompurify": "^3.2.7"
+	}
+}

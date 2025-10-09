@@ -1,9 +1,10 @@
-import type { LogViewerDateRange, UmbLogViewerWorkspaceContext } from '../workspace/logviewer-workspace.context.js';
+import type { UmbLogViewerDateRange, UmbLogViewerWorkspaceContext } from '../workspace/logviewer-workspace.context.js';
 import { UMB_APP_LOG_VIEWER_CONTEXT } from '../workspace/logviewer-workspace.context-token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, property, queryAll, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { query as getQuery, path, toQueryString } from '@umbraco-cms/backoffice/router';
+import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-log-viewer-date-range-selector')
 export class UmbLogViewerDateRangeSelectorElement extends UmbLitElement {
@@ -13,9 +14,6 @@ export class UmbLogViewerDateRangeSelectorElement extends UmbLitElement {
 	@state()
 	private _endDate = '';
 
-	@queryAll('input')
-	private _inputs!: NodeListOf<HTMLInputElement>;
-
 	@property({ type: Boolean, reflect: true })
 	horizontal = false;
 
@@ -23,22 +21,17 @@ export class UmbLogViewerDateRangeSelectorElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.addEventListener('input', this.#setDates);
 		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT, (instance) => {
 			this.#logViewerContext = instance;
 			this.#observeStuff();
 		});
-	}
-	override disconnectedCallback(): void {
-		super.disconnectedCallback();
-		this.removeEventListener('input', this.#setDates);
 	}
 
 	#observeStuff() {
 		if (!this.#logViewerContext) return;
 		this.observe(
 			this.#logViewerContext.dateRange,
-			(dateRange: LogViewerDateRange) => {
+			(dateRange: UmbLogViewerDateRange) => {
 				this._startDate = dateRange.startDate;
 				this._endDate = dateRange.endDate;
 			},
@@ -46,14 +39,17 @@ export class UmbLogViewerDateRangeSelectorElement extends UmbLitElement {
 		);
 	}
 
-	#setDates() {
-		this._inputs.forEach((input) => {
-			if (input.id === 'start-date') {
-				this._startDate = input.value;
-			} else if (input.id === 'end-date') {
-				this._endDate = input.value;
-			}
-		});
+	#setStartDate(e: UUIInputEvent) {
+		this._startDate = e.target.value as string;
+		this.#updateFiltered();
+	}
+
+	#setEndDate(e: UUIInputEvent) {
+		this._endDate = e.target.value as string;
+		this.#updateFiltered();
+	}
+
+	#updateFiltered() {
 		this.#logViewerContext?.setDateRange({ startDate: this._startDate, endDate: this._endDate });
 
 		const query = getQuery();
@@ -71,9 +67,7 @@ export class UmbLogViewerDateRangeSelectorElement extends UmbLitElement {
 			<div class="input-container">
 				<uui-label for="start-date">From:</uui-label>
 				<umb-input-date
-					@click=${(e: Event) => {
-						(e.target as HTMLInputElement).showPicker();
-					}}
+					@change=${this.#setStartDate}
 					id="start-date"
 					type="date"
 					label="From"
@@ -83,9 +77,7 @@ export class UmbLogViewerDateRangeSelectorElement extends UmbLitElement {
 			<div class="input-container">
 				<uui-label for="end-date">To: </uui-label>
 				<umb-input-date
-					@click=${(e: Event) => {
-						(e.target as HTMLInputElement).showPicker();
-					}}
+					@change=${this.#setEndDate}
 					id="end-date"
 					type="date"
 					label="To"
@@ -110,7 +102,7 @@ export class UmbLogViewerDateRangeSelectorElement extends UmbLitElement {
 
 			:host([horizontal]) .input-container {
 				display: flex;
-				align-items: baseline;
+				align-items: center;
 				gap: var(--uui-size-space-3);
 			}
 		`,

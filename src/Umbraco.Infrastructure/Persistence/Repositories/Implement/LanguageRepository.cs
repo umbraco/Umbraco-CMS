@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// <summary>
 ///     Represents a repository for doing CRUD operations for <see cref="Language" />
 /// </summary>
-internal class LanguageRepository : EntityRepositoryBase<int, ILanguage>, ILanguageRepository
+internal sealed class LanguageRepository : EntityRepositoryBase<int, ILanguage>, ILanguageRepository
 {
     // We need to lock this dictionary every time we do an operation on it as the languageRepository is registered as a unique implementation
     // It is used to quickly get isoCodes by Id, or the reverse by avoiding (deep)cloning dtos

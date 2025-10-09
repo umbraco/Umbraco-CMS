@@ -102,7 +102,7 @@ public class MigrateDataTypeConfigurations : MigrationBase
                     PropertyEditorAliases.RichText => HandleRichText(ref configurationData),
                     PropertyEditorAliases.TextBox => HandleTextBoxAndTextArea(ref configurationData),
                     PropertyEditorAliases.TextArea => HandleTextBoxAndTextArea(ref configurationData),
-                    PropertyEditorAliases.TinyMce => HandleRichText(ref configurationData),
+                    "Umbraco.TinyMCE" => HandleRichText(ref configurationData),
                     PropertyEditorAliases.UploadField => HandleUploadField(ref configurationData),
                     _ => false
                 };

@@ -14,7 +14,7 @@ export class UmbSettingsWelcomeDashboardElement extends UmbLitElement {
 						</umb-localize>
 					</p>
 					<uui-button
-						look="primary"
+						look="outline"
 						href="https://docs.umbraco.com/umbraco-cms"
 						label=${this.localize.term('settingsDashboard_getHelp')}
 						target="_blank"></uui-button>
@@ -28,12 +28,12 @@ export class UmbSettingsWelcomeDashboardElement extends UmbLitElement {
 					</p>
 					<div class="button-group">
 						<uui-button
-							look="primary"
-							href="https://our.umbraco.com/forum/"
+							look="outline"
+							href="https://forum.umbraco.com/"
 							label=${this.localize.term('settingsDashboard_goForum')}
 							target="_blank"></uui-button>
 						<uui-button
-							look="primary"
+							look="outline"
 							href="https://discord.umbraco.com"
 							label=${this.localize.term('settingsDashboard_chatWithCommunity')}
 							target="_blank"></uui-button>
@@ -47,7 +47,7 @@ export class UmbSettingsWelcomeDashboardElement extends UmbLitElement {
 						</umb-localize>
 					</p>
 					<uui-button
-						look="primary"
+						look="outline"
 						href="https://umbraco.com/training/"
 						label=${this.localize.term('settingsDashboard_getCertified')}
 						target="_blank"></uui-button>
@@ -60,7 +60,7 @@ export class UmbSettingsWelcomeDashboardElement extends UmbLitElement {
 						</umb-localize>
 					</p>
 					<uui-button
-						look="primary"
+						look="outline"
 						href="https://umbraco.com/support/"
 						label=${this.localize.term('settingsDashboard_getHelp')}
 						target="_blank"></uui-button>
@@ -74,7 +74,7 @@ export class UmbSettingsWelcomeDashboardElement extends UmbLitElement {
 						</umb-localize>
 					</p>
 					<uui-button
-						look="primary"
+						look="outline"
 						href="https://www.youtube.com/c/UmbracoLearningBase"
 						label=${this.localize.term('settingsDashboard_watchVideos')}
 						target="_blank"></uui-button>

@@ -46,7 +46,7 @@ public class TagsPropertyEditor : DataEditor
     protected override IConfigurationEditor CreateConfigurationEditor() =>
         new TagConfigurationEditor(_ioHelper);
 
-    internal class TagPropertyValueEditor : DataValueEditor, IDataValueTags
+    internal sealed class TagPropertyValueEditor : DataValueEditor, IDataValueTags
     {
         private readonly IJsonSerializer _jsonSerializer;
         private readonly IDataTypeService _dataTypeService;
@@ -183,7 +183,7 @@ public class TagsPropertyEditor : DataEditor
         ///         the underlying data is JSON. Yes, this makes little sense.
         ///     </para>
         /// </remarks>
-        private class RequiredJsonValueValidator : IValueRequiredValidator
+        private sealed class RequiredJsonValueValidator : IValueRequiredValidator
         {
             /// <inheritdoc />
             public IEnumerable<ValidationResult> ValidateRequired(object? value, string valueType)

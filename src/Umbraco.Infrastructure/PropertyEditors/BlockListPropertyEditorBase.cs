@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Cache.PropertyEditors;
@@ -12,7 +11,6 @@ using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.PropertyEditors.Validators;
-using StaticServiceProvider = Umbraco.Cms.Core.DependencyInjection.StaticServiceProvider;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -23,15 +21,6 @@ public abstract class BlockListPropertyEditorBase : DataEditor
 {
     private readonly IBlockValuePropertyIndexValueFactory _blockValuePropertyIndexValueFactory;
     private readonly IJsonSerializer _jsonSerializer;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="BlockListPropertyEditorBase"/> class.
-    /// </summary>
-    [Obsolete("Use non-obsoleted ctor. This will be removed in Umbraco 15.")]
-    protected BlockListPropertyEditorBase(IDataValueEditorFactory dataValueEditorFactory, IBlockValuePropertyIndexValueFactory blockValuePropertyIndexValueFactory)
-        : this(dataValueEditorFactory,blockValuePropertyIndexValueFactory, StaticServiceProvider.Instance.GetRequiredService<IJsonSerializer>())
-    {
-    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BlockListPropertyEditorBase"/> class.
@@ -60,7 +49,7 @@ public abstract class BlockListPropertyEditorBase : DataEditor
     /// <summary>
     /// Defines the value editor for the block list property editors.
     /// </summary>
-    internal class BlockListEditorPropertyValueEditor : BlockEditorPropertyValueEditor<BlockListValue, BlockListLayoutItem>
+    internal sealed class BlockListEditorPropertyValueEditor : BlockEditorPropertyValueEditor<BlockListValue, BlockListLayoutItem>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="BlockListEditorPropertyValueEditor"/> class.
@@ -80,7 +69,7 @@ public abstract class BlockListPropertyEditorBase : DataEditor
             BlockEditorVarianceHandler blockEditorVarianceHandler,
             ILanguageService languageService,
             IIOHelper ioHelper)
-            : base(propertyEditors, dataValueReferenceFactories, dataTypeConfigurationCache, shortStringHelper, jsonSerializer, blockEditorVarianceHandler, languageService, ioHelper, attribute)
+            : base(propertyEditors, dataValueReferenceFactories, dataTypeConfigurationCache, shortStringHelper, jsonSerializer, blockEditorVarianceHandler, languageService, ioHelper, attribute, logger)
         {
             BlockEditorValues = new BlockEditorValues<BlockListValue, BlockListLayoutItem>(blockEditorDataConverter, elementTypeCache, logger);
             Validators.Add(new BlockEditorValidator<BlockListValue, BlockListLayoutItem>(propertyValidationService, BlockEditorValues, elementTypeCache));
@@ -96,7 +85,7 @@ public abstract class BlockListPropertyEditorBase : DataEditor
         /// <summary>
         /// Validates the min/max configuration for block list property editors.
         /// </summary>
-        private class MinMaxValidator : BlockEditorMinMaxValidatorBase<BlockListValue, BlockListLayoutItem>
+        private sealed class MinMaxValidator : BlockEditorMinMaxValidatorBase<BlockListValue, BlockListLayoutItem>
         {
             private readonly BlockEditorValues<BlockListValue, BlockListLayoutItem> _blockEditorValues;
 

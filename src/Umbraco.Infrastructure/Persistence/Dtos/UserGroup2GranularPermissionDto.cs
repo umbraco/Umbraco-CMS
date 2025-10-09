@@ -35,7 +35,7 @@ public class UserGroup2GranularPermissionDto
 
 // this is UserGroup2GranularPermissionDto + int ids
 // it is used for handling legacy cases where we use int Ids
-internal class UserGroup2GranularPermissionWithIdsDto : UserGroup2GranularPermissionDto
+internal sealed class UserGroup2GranularPermissionWithIdsDto : UserGroup2GranularPermissionDto
 {
     [Column("entityId")]
     public int EntityId { get; set; }

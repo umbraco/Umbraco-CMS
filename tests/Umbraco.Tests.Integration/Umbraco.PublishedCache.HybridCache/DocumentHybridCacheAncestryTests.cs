@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.PublishedCache.HybridCache;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class DocumentHybridCacheAncestryTests : UmbracoIntegrationTestWithContent
+internal sealed class DocumentHybridCacheAncestryTests : UmbracoIntegrationTestWithContent
 {
     private IContentPublishingService ContentPublishingService => GetRequiredService<IContentPublishingService>();
 

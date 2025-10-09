@@ -8,14 +8,14 @@ export class UmbBlockGridAreaTypeWorkspaceEditorElement extends UmbLitElement {
 	#workspaceContext?: typeof UMB_BLOCK_GRID_AREA_TYPE_WORKSPACE_CONTEXT.TYPE;
 
 	@state()
-	_name?: string;
+	private _name?: string;
 
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_BLOCK_GRID_AREA_TYPE_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
-			this.observe(this.#workspaceContext.name, (name) => {
+			this.observe(this.#workspaceContext?.name, (name) => {
 				this._name = name;
 			});
 			this.#workspaceContext?.createPropertyDatasetContext(this);

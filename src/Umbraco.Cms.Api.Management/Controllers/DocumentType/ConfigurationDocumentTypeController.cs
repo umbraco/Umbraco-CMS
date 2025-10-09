@@ -1,14 +1,9 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
-using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.Core.Features;
 using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentType;
@@ -19,30 +14,8 @@ public class ConfigurationDocumentTypeController : DocumentTypeControllerBase
 {
     private readonly IConfigurationPresentationFactory _configurationPresentationFactory;
 
-    [ActivatorUtilitiesConstructor]
     public ConfigurationDocumentTypeController(IConfigurationPresentationFactory configurationPresentationFactory)
-    {
-        _configurationPresentationFactory = configurationPresentationFactory;
-    }
-
-    [Obsolete("Use the constructor that only accepts IConfigurationPresentationFactory, scheduled for removal in V16")]
-    public ConfigurationDocumentTypeController(
-        UmbracoFeatures umbracoFeatures,
-        IOptionsSnapshot<DataTypesSettings> dataTypesSettings,
-        IOptionsSnapshot<SegmentSettings> segmentSettings,
-        IConfigurationPresentationFactory configurationPresentationFactory)
-    : this(configurationPresentationFactory)
-    {
-    }
-
-    [Obsolete("Use the constructor that only accepts IConfigurationPresentationFactory, scheduled for removal in V16")]
-    public ConfigurationDocumentTypeController(
-        UmbracoFeatures umbracoFeatures,
-        IOptionsSnapshot<DataTypesSettings> dataTypesSettings,
-        IOptionsSnapshot<SegmentSettings> segmentSettings)
-    : this(StaticServiceProvider.Instance.GetRequiredService<IConfigurationPresentationFactory>())
-    {
-    }
+        => _configurationPresentationFactory = configurationPresentationFactory;
 
     [HttpGet("configuration")]
     [MapToApiVersion("1.0")]

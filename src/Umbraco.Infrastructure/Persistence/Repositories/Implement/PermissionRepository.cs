@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 ///     like the normal repository pattern but the standard repository Get commands don't apply and will throw
 ///     <see cref="NotImplementedException" />
 /// </remarks>
-internal class PermissionRepository<TEntity> : EntityRepositoryBase<int, ContentPermissionSet>
+internal sealed class PermissionRepository<TEntity> : EntityRepositoryBase<int, ContentPermissionSet>
     where TEntity : class, IEntity
 {
     public PermissionRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<PermissionRepository<TEntity>> logger)

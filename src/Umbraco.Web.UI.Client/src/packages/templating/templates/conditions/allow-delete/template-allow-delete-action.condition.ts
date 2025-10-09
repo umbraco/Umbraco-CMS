@@ -9,7 +9,7 @@ export class UmbTemplateAllowDeleteActionCondition extends UmbConditionBase<neve
 
 		this.consumeContext(UMB_TREE_ITEM_CONTEXT, (context) => {
 			this.observe(
-				context.hasChildren,
+				context?.hasChildren,
 				(hasChildren) => {
 					this.permitted = hasChildren === false;
 				},

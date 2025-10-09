@@ -1,4 +1,4 @@
-import { UmbTiptapToolbarButtonElement } from '../../components/toolbar/tiptap-toolbar-button.element.js';
+import { UmbTiptapToolbarButtonElement } from './tiptap-toolbar-button.element.js';
 import { css, customElement, html, state, when } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIColorPickerChangeEvent } from '@umbraco-cms/backoffice/external/uui';
 
@@ -14,6 +14,7 @@ export class UmbTiptapToolbarColorPickerButtonElement extends UmbTiptapToolbarBu
 
 	override render() {
 		const label = this.localize.string(this.manifest?.meta.label);
+		const disabled = this.api?.isDisabled(this.editor);
 		return html`
 			<uui-button-group>
 				<uui-button
@@ -21,7 +22,7 @@ export class UmbTiptapToolbarColorPickerButtonElement extends UmbTiptapToolbarBu
 					label=${label}
 					popovertarget=${!this._selectedColor ? 'color-picker-popover' : ''}
 					title=${label}
-					?disabled=${this.api && this.editor && this.api.isDisabled(this.editor)}
+					?disabled=${disabled}
 					@click=${() => this.api?.execute(this.editor, this._selectedColor)}>
 					<div>
 						${when(
@@ -32,13 +33,13 @@ export class UmbTiptapToolbarColorPickerButtonElement extends UmbTiptapToolbarBu
 						<div id="color-selected" style="background-color:${this._selectedColor ?? '#000'};"></div>
 					</div>
 				</uui-button>
-				<uui-button compact popovertarget="color-picker-popover" label="Open color picker">
+				<uui-button compact popovertarget="color-picker-popover" label="Open color picker" ?disabled=${disabled}>
 					<uui-symbol-expand open></uui-symbol-expand>
 				</uui-button>
 				<uui-popover-container id="color-picker-popover" placement="bottom-end">
 					<umb-popover-layout>
 						<uui-scroll-container>
-							<uui-color-picker inline @change=${this.#onChange}></uui-color-picker>
+							<uui-color-picker inline label=${label} @change=${this.#onChange}></uui-color-picker>
 						</uui-scroll-container>
 					</umb-popover-layout>
 				</uui-popover-container>
@@ -66,6 +67,12 @@ export class UmbTiptapToolbarColorPickerButtonElement extends UmbTiptapToolbarBu
 
 			#color-selected {
 				height: var(--uui-size-1);
+			}
+
+			uui-button[disabled] {
+				#color-selected {
+					opacity: 0.3;
+				}
 			}
 		`,
 	];

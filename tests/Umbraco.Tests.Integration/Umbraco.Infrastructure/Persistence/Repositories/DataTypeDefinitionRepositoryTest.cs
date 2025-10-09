@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class DataTypeDefinitionRepositoryTest : UmbracoIntegrationTest
+internal sealed class DataTypeDefinitionRepositoryTest : UmbracoIntegrationTest
 {
     private IDataValueEditorFactory DataValueEditorFactory => GetRequiredService<IDataValueEditorFactory>();
     private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
@@ -250,7 +250,7 @@ public class DataTypeDefinitionRepositoryTest : UmbracoIntegrationTest
             Assert.That(dataTypeDefinitions, Is.Not.Null);
             Assert.That(dataTypeDefinitions.Any(), Is.True);
             Assert.That(dataTypeDefinitions.Any(x => x == null), Is.False);
-            Assert.That(dataTypeDefinitions.Length, Is.EqualTo(34));
+            Assert.That(dataTypeDefinitions.Length, Is.EqualTo(36));
         }
     }
 

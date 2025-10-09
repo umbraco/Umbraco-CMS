@@ -1,10 +1,10 @@
 import type { UmbLocalizeElement } from '../localize.element.js';
-import type { Meta, StoryObj } from '@storybook/web-components';
+import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 import '../localize.element.js';
 
 const meta: Meta<UmbLocalizeElement> = {
-	title: 'API/Localization/UmbLocalizeElement',
+	title: 'Guides/Localization/UmbLocalizeElement',
 	component: 'umb-localize',
 	args: {
 		key: 'general_areyousure',

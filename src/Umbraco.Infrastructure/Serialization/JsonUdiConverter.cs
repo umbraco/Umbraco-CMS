@@ -15,9 +15,14 @@ public sealed class JsonUdiConverter : JsonConverter<Udi>
 
     /// <inheritdoc />
     public override Udi? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-        => reader.GetString() is string value
-        ? UdiParser.Parse(value)
-        : null;
+    {
+        if (reader.GetString() is string value && string.IsNullOrWhiteSpace(value) is false)
+        {
+            return UdiParser.Parse(value);
+        }
+
+        return null;
+    }
 
     /// <inheritdoc />
     public override void Write(Utf8JsonWriter writer, Udi value, JsonSerializerOptions options)

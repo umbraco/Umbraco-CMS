@@ -11,25 +11,28 @@ import type {
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { DirectionModel, LogLevelModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { query } from '@umbraco-cms/backoffice/router';
 import type { UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import { UmbViewContext } from '@umbraco-cms/backoffice/view';
 
-export type PoolingInterval = 0 | 2000 | 5000 | 10000 | 20000 | 30000;
-export interface PoolingCOnfig {
+export type UmbPoolingInterval = 0 | 2000 | 5000 | 10000 | 20000 | 30000;
+export interface UmbPoolingConfig {
 	enabled: boolean;
-	interval: PoolingInterval;
+	interval: UmbPoolingInterval;
 }
-export interface LogViewerDateRange {
+export interface UmbLogViewerDateRange {
 	startDate: string;
 	endDate: string;
 }
 
 // TODO: Revisit usage of workspace for this case...
-export class UmbLogViewerWorkspaceContext extends UmbControllerBase implements UmbWorkspaceContext {
+export class UmbLogViewerWorkspaceContext extends UmbContextBase implements UmbWorkspaceContext {
 	public readonly workspaceAlias: string = 'Umb.Workspace.LogViewer';
 	#repository: UmbLogViewerRepository;
+
+	public readonly view = new UmbViewContext(this, null);
 
 	getEntityType() {
 		return 'log-viewer';
@@ -57,7 +60,7 @@ export class UmbLogViewerWorkspaceContext extends UmbControllerBase implements U
 		return yyyy + '-' + mm + '-' + dd;
 	}
 
-	defaultDateRange: LogViewerDateRange = {
+	defaultDateRange: UmbLogViewerDateRange = {
 		startDate: this.yesterday,
 		endDate: this.today,
 	};
@@ -68,7 +71,7 @@ export class UmbLogViewerWorkspaceContext extends UmbControllerBase implements U
 	#logCount = new UmbObjectState<LogLevelCountsReponseModel | null>(null);
 	logCount = this.#logCount.asObservable();
 
-	#dateRange = new UmbObjectState<LogViewerDateRange>(this.defaultDateRange);
+	#dateRange = new UmbObjectState<UmbLogViewerDateRange>(this.defaultDateRange);
 	dateRange = this.#dateRange.asObservable();
 
 	#loggers = new UmbObjectState<PagedLoggerResponseModel | null>(null);
@@ -93,7 +96,7 @@ export class UmbLogViewerWorkspaceContext extends UmbControllerBase implements U
 	logs = this.#logs.asObservablePart((data) => data?.items);
 	logsTotal = this.#logs.asObservablePart((data) => data?.total);
 
-	#polling = new UmbObjectState<PoolingCOnfig>({ enabled: false, interval: 2000 });
+	#polling = new UmbObjectState<UmbPoolingConfig>({ enabled: false, interval: 2000 });
 	polling = this.#polling.asObservable();
 
 	#sortingDirection = new UmbBasicState<DirectionModel>(DirectionModel.DESCENDING);
@@ -104,11 +107,12 @@ export class UmbLogViewerWorkspaceContext extends UmbControllerBase implements U
 	currentPage = 1;
 
 	constructor(host: UmbControllerHost) {
-		super(host);
+		super(host, UMB_APP_LOG_VIEWER_CONTEXT);
+		// TODO: Revisit usage of workspace for this case... currently no other workspace context provides them self with their own token, we need to update UMB_APP_LOG_VIEWER_CONTEXT to become a workspace context. [NL]
 		this.provideContext(UMB_WORKSPACE_CONTEXT, this);
-		// TODO: Revisit usage of workspace for this case... currently no other workspace context provides them self with their own token.
-		this.provideContext(UMB_APP_LOG_VIEWER_CONTEXT, this);
 		this.#repository = new UmbLogViewerRepository(host);
+
+		this.view.setTitle('#treeHeaders_logViewer');
 	}
 
 	override hostConnected() {
@@ -120,6 +124,7 @@ export class UmbLogViewerWorkspaceContext extends UmbControllerBase implements U
 	override hostDisconnected(): void {
 		super.hostDisconnected();
 		window.removeEventListener('changestate', this.onChangeState);
+		this.stopPolling();
 	}
 
 	onChangeState = () => {
@@ -137,7 +142,7 @@ export class UmbLogViewerWorkspaceContext extends UmbControllerBase implements U
 		}
 		this.setLogLevelsFilter(validLogLevels);
 
-		const dateRange: LogViewerDateRange = this.getDateRange() as LogViewerDateRange;
+		const dateRange: UmbLogViewerDateRange = this.getDateRange() as UmbLogViewerDateRange;
 
 		this.setDateRange({
 			startDate: searchQuery.startDate || dateRange.startDate,
@@ -149,7 +154,7 @@ export class UmbLogViewerWorkspaceContext extends UmbControllerBase implements U
 		this.getLogs();
 	};
 
-	setDateRange(dateRange: Partial<LogViewerDateRange>) {
+	setDateRange(dateRange: Partial<UmbLogViewerDateRange>) {
 		let { startDate, endDate } = dateRange;
 
 		if (!startDate) startDate = this.defaultDateRange.startDate;
@@ -316,10 +321,10 @@ export class UmbLogViewerWorkspaceContext extends UmbControllerBase implements U
 			return;
 		}
 
-		clearInterval(this.#intervalID as number);
+		this.stopPolling();
 	}
 
-	setPollingInterval(interval: PoolingInterval) {
+	setPollingInterval(interval: UmbPoolingInterval) {
 		this.#polling.update({ interval });
 	}
 
@@ -327,6 +332,13 @@ export class UmbLogViewerWorkspaceContext extends UmbControllerBase implements U
 		const direction = this.#sortingDirection.getValue();
 		const newDirection = direction === DirectionModel.ASCENDING ? DirectionModel.DESCENDING : DirectionModel.ASCENDING;
 		this.#sortingDirection.setValue(newDirection);
+	}
+
+	stopPolling() {
+		if (this.#intervalID) {
+			clearInterval(this.#intervalID);
+			this.#intervalID = null;
+		}
 	}
 }
 

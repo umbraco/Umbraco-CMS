@@ -11,6 +11,3 @@ export class UmbTemplatePickerInputContext extends UmbPickerInputContext<UmbTemp
 		super(host, UMB_TEMPLATE_ITEM_REPOSITORY_ALIAS, UMB_TEMPLATE_PICKER_MODAL);
 	}
 }
-
-/** @deprecated Use `UmbTemplatePickerInputContext` instead. This method will be removed in Umbraco 15. */
-export { UmbTemplatePickerInputContext as UmbTemplatePickerContext };

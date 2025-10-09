@@ -7,4 +7,10 @@ export const manifests: Array<ManifestModal> = [
 		name: 'Umb App Auth Modal',
 		element: () => import('./umb-app-auth-modal.element.js'),
 	},
+	{
+		type: 'modal',
+		alias: 'Umb.Modal.AuthTimeout',
+		name: 'Umb Auth Timeout Modal',
+		element: () => import('./umb-auth-timeout-modal.element.js'),
+	},
 ];

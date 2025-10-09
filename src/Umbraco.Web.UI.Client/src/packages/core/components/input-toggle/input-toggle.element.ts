@@ -1,4 +1,4 @@
-import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
@@ -47,7 +47,7 @@ export class UmbInputToggleElement extends UmbFormControlMixin(UmbLitElement, ''
 	readonly = false;
 
 	@state()
-	_currentLabel?: string;
+	private _currentLabel?: string;
 
 	protected override firstUpdated(): void {
 		this.addFormControlElement(this.shadowRoot!.querySelector('uui-toggle')!);
@@ -71,14 +71,6 @@ export class UmbInputToggleElement extends UmbFormControlMixin(UmbLitElement, ''
 			><span>${label}</span>
 		</uui-toggle>`;
 	}
-
-	static override styles = [
-		css`
-			uui-toggle {
-				width: 100%;
-			}
-		`,
-	];
 }
 
 export default UmbInputToggleElement;

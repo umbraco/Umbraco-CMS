@@ -3,13 +3,15 @@ using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
 
-public class DocumentCollectionResponseModel : ContentCollectionResponseModelBase<DocumentValueResponseModel, DocumentVariantResponseModel>
+public class DocumentCollectionResponseModel : ContentCollectionResponseModelBase<DocumentValueResponseModel, DocumentVariantResponseModel>, IHasFlags, IIsProtected
 {
     public DocumentTypeCollectionReferenceResponseModel DocumentType { get; set; } = new();
 
     public bool IsTrashed { get; set; }
 
     public bool IsProtected { get; set; }
+
+    public IEnumerable<ReferenceByIdModel> Ancestors { get; set; } = [];
 
     public string? Updater { get; set; }
 }

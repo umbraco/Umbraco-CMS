@@ -4,8 +4,10 @@ import { UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT } from '../../document-type-workspa
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbContentTypeSortModel } from '@umbraco-cms/backoffice/content-type';
-import type { UmbInputCollectionConfigurationElement } from '@umbraco-cms/backoffice/components';
+import type {
+	UmbContentTypeSortModel,
+	UmbInputContentTypeCollectionConfigurationElement,
+} from '@umbraco-cms/backoffice/content-type';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
 import type { UUIToggleElement } from '@umbraco-cms/backoffice/external/uui';
 
@@ -98,14 +100,14 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 				<umb-property-layout alias="collection" label="${this.localize.term('contentTypeEditor_collection')}">
 					<div slot="description">${this.localize.term('contentTypeEditor_collectionDescription')}</div>
 					<div slot="editor">
-						<umb-input-collection-configuration
+						<umb-input-content-type-collection-configuration
 							default-value="c0808dd3-8133-4e4b-8ce8-e2bea84a96a4"
 							.value=${this._collection ?? undefined}
 							@change=${(e: CustomEvent) => {
-								const unique = (e.target as UmbInputCollectionConfigurationElement).value as string;
+								const unique = (e.target as UmbInputContentTypeCollectionConfigurationElement).value as string;
 								this.#workspaceContext?.setCollection({ unique });
 							}}>
-						</umb-input-collection-configuration>
+						</umb-input-content-type-collection-configuration>
 					</div>
 				</umb-property-layout>
 			</uui-box>

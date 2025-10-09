@@ -31,7 +31,7 @@ public class AllHealthCheckGroupController : HealthCheckGroupControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<HealthCheckGroupResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<HealthCheckGroupResponseModel>>> All(
+    public Task<ActionResult<PagedViewModel<HealthCheckGroupResponseModel>>> All(
         CancellationToken cancellationToken,
         int skip = 0,
         int take = 100)
@@ -46,6 +46,6 @@ public class AllHealthCheckGroupController : HealthCheckGroupControllerBase
             Items = _umbracoMapper.MapEnumerable<IGrouping<string?, Core.HealthChecks.HealthCheck>, HealthCheckGroupResponseModel>(groups.Skip(skip).Take(take))
         };
 
-        return await Task.FromResult(Ok(viewModel));
+        return Task.FromResult<ActionResult<PagedViewModel<HealthCheckGroupResponseModel>>>(Ok(viewModel));
     }
 }

@@ -51,9 +51,7 @@ export class UmbDataTypeTreeServerDataSource extends UmbTreeServerDataSourceBase
 const getRootItems = async (args: UmbTreeRootItemsRequestArgs) => {
 	// eslint-disable-next-line local-rules/no-direct-api-import
 	return DataTypeService.getTreeDataTypeRoot({
-		foldersOnly: args.foldersOnly,
-		skip: args.skip,
-		take: args.take,
+		query: { foldersOnly: args.foldersOnly, skip: args.skip, take: args.take },
 	});
 };
 
@@ -63,10 +61,7 @@ const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		return DataTypeService.getTreeDataTypeChildren({
-			parentId: args.parent.unique,
-			foldersOnly: args.foldersOnly,
-			skip: args.skip,
-			take: args.take,
+			query: { parentId: args.parent.unique, foldersOnly: args.foldersOnly, skip: args.skip, take: args.take },
 		});
 	}
 };
@@ -74,7 +69,7 @@ const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) =>
 	// eslint-disable-next-line local-rules/no-direct-api-import
 	DataTypeService.getTreeDataTypeAncestors({
-		descendantId: args.treeItem.unique,
+		query: { descendantId: args.treeItem.unique },
 	});
 
 const mapper = (item: DataTypeTreeItemResponseModel): UmbDataTypeTreeItemModel => {

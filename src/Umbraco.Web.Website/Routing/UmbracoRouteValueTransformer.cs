@@ -272,7 +272,7 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
         return values;
     }
 
-    private class PostedDataProxyInfo
+    private sealed class PostedDataProxyInfo
     {
         public string? ControllerName { get; set; }
 

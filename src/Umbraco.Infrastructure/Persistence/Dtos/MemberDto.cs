@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(TableName)]
 [PrimaryKey("nodeId", AutoIncrement = false)]
 [ExplicitColumns]
-internal class MemberDto
+internal sealed class MemberDto
 {
     private const string TableName = Constants.DatabaseSchema.Tables.Member;
 
@@ -45,7 +45,7 @@ internal class MemberDto
     [Length(255)]
     public string? SecurityStampToken { get; set; }
 
-    [Column("emailConfirmedDate")]
+    [Column("emailConfirmedDate", ForceToUtc = false)]
     [NullSetting(NullSetting = NullSettings.Null)]
     public DateTime? EmailConfirmedDate { get; set; }
 
@@ -62,15 +62,15 @@ internal class MemberDto
     [Constraint(Default = 1)]
     public bool IsApproved { get; set; }
 
-    [Column("lastLoginDate")]
+    [Column("lastLoginDate", ForceToUtc = false)]
     [NullSetting(NullSetting = NullSettings.Null)]
     public DateTime? LastLoginDate { get; set; }
 
-    [Column("lastLockoutDate")]
+    [Column("lastLockoutDate", ForceToUtc = false)]
     [NullSetting(NullSetting = NullSettings.Null)]
     public DateTime? LastLockoutDate { get; set; }
 
-    [Column("lastPasswordChangeDate")]
+    [Column("lastPasswordChangeDate", ForceToUtc = false)]
     [NullSetting(NullSetting = NullSettings.Null)]
     public DateTime? LastPasswordChangeDate { get; set; }
 

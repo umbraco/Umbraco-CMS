@@ -1,4 +1,7 @@
-import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
+import {
+	UMB_SECTION_ALIAS_CONDITION_ALIAS,
+	UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS,
+} from '@umbraco-cms/backoffice/section';
 
 const sectionAlias = 'Umb.Section.Packages';
 
@@ -32,7 +35,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.SectionAlias',
+				alias: UMB_SECTION_ALIAS_CONDITION_ALIAS,
 				match: sectionAlias,
 			},
 		],
@@ -50,7 +53,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.SectionAlias',
+				alias: UMB_SECTION_ALIAS_CONDITION_ALIAS,
 				match: sectionAlias,
 			},
 		],
@@ -68,7 +71,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.SectionAlias',
+				alias: UMB_SECTION_ALIAS_CONDITION_ALIAS,
 				match: sectionAlias,
 			},
 		],

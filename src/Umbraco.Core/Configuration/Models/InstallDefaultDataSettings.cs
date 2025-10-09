@@ -70,5 +70,5 @@ public class InstallDefaultDataSettings
     ///         https://github.com/umbraco/Umbraco-CMS/blob/v9/dev/src/Umbraco.Infrastructure/Migrations/Install/DatabaseDataCreator.cs.
     ///     </para>
     /// </remarks>
-    public IList<string> Values { get; set; } = new List<string>();
+    public ISet<string> Values { get; set; } = new HashSet<string>();
 }

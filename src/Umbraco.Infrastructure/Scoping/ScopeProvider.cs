@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
     /// <summary>
     /// Implements <see cref="IScopeProvider"/>.
     /// </summary>
-    internal class ScopeProvider :
+    internal sealed class ScopeProvider :
         ICoreScopeProvider,
         IScopeProvider,
         Core.Scoping.IScopeProvider,
@@ -150,7 +150,6 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             otherScope.Attached = true;
             otherScope.OrigScope = AmbientScope;
             otherScope.OrigContext = AmbientContext;
-            otherScope.CallContext = callContext;
 
             PushAmbientScopeContext(otherScope.Context);
             PushAmbientScope(otherScope);

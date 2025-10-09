@@ -31,7 +31,7 @@ test('can add an allowed template to a document type', {tag: '@smoke'}, async ({
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
-  await umbracoUi.documentType.isSuccessNotificationVisible();
+  await umbracoUi.documentType.isSuccessStateVisibleForSaveButton();
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeData.allowedTemplates[0].id).toBe(templateId);
 });
@@ -51,7 +51,7 @@ test('can set an allowed template as default for document type', async ({umbraco
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
-  await umbracoUi.documentType.isSuccessNotificationVisible();
+  await umbracoUi.documentType.isSuccessStateVisibleForSaveButton();
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeData.allowedTemplates).toHaveLength(2);
   expect(documentTypeData.defaultTemplate.id).toBe(secondTemplateId);
@@ -60,8 +60,7 @@ test('can set an allowed template as default for document type', async ({umbraco
   await umbracoApi.template.ensureNameNotExists(secondTemplateName);
 });
 
-// TODO: Remove skip when the front-end is ready. Currently the error displays when remove an allowed template
-test.skip('can remove an allowed template from a document type', async ({umbracoApi, umbracoUi}) => {
+test('can remove an allowed template from a document type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.documentType.createDocumentTypeWithAllowedTemplate(documentTypeName, templateId);
   await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
@@ -69,11 +68,11 @@ test.skip('can remove an allowed template from a document type', async ({umbraco
   // Act
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
   await umbracoUi.documentType.clickDocumentTypeTemplatesTab();
-  await umbracoUi.documentType.clickRemoveWithName(templateName, true);
+  await umbracoUi.documentType.clickRemoveWithName(templateName);
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
-  await umbracoUi.documentType.isSuccessNotificationVisible();
+  await umbracoUi.documentType.isSuccessStateVisibleForSaveButton();
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeData.allowedTemplates).toHaveLength(0);
 });

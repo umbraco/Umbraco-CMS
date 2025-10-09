@@ -34,7 +34,7 @@
         "cases": [
           {
             "condition": "(StarterKit == 'Umbraco.TheStarterKit' && (UmbracoRelease == 'Latest' || UmbracoRelease == 'Custom'))",
-            "value": "14.0.0"
+            "value": "16.0.0"
           },
           {
             "condition": "(StarterKit == 'Umbraco.TheStarterKit' && UmbracoRelease == 'LTS')",

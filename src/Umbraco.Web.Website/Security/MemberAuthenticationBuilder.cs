@@ -59,7 +59,7 @@ public class MemberAuthenticationBuilder : AuthenticationBuilder
     }
 
     // Ensures that the sign in scheme is always the Umbraco member external type
-    private class EnsureMemberScheme<TOptions> : IPostConfigureOptions<TOptions>
+    private sealed class EnsureMemberScheme<TOptions> : IPostConfigureOptions<TOptions>
         where TOptions : RemoteAuthenticationOptions
     {
         public void PostConfigure(string? name, TOptions options)

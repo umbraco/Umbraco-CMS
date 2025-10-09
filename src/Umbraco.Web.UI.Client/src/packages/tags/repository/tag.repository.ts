@@ -18,7 +18,7 @@ export class UmbTagRepository extends UmbControllerBase implements UmbApi {
 
 		this.#init = this.consumeContext(UMB_TAG_STORE_CONTEXT, (instance) => {
 			this.#tagStore = instance;
-		}).asPromise();
+		}).asPromise({ preventTimeout: true });
 	}
 
 	async requestTags(

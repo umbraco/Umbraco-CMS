@@ -50,4 +50,30 @@ export const manifests: Array<UmbExtensionManifest> = [
 			},
 		],
 	},
+	{
+		type: 'workspaceActionMenuItem',
+		kind: 'default',
+		alias: 'example.workspaceActionMenuItem.resetCounter',
+		name: 'Reset Counter Menu Item',
+		api: () => import('./reset-counter-menu-item.action.js'),
+		forWorkspaceActions: 'example.workspaceAction.incrementor',
+		weight: 100,
+		meta: {
+			label: 'Reset Counter',
+			icon: 'icon-refresh',
+		},
+	},
+	{
+		type: 'workspaceFooterApp',
+		alias: 'example.workspaceFooterApp.counterStatus',
+		name: 'Counter Status Footer App',
+		element: () => import('./counter-status-footer-app.element.js'),
+		weight: 900,
+		conditions: [
+			{
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
+				match: 'Umb.Workspace.Document',
+			},
+		],
+	},
 ];

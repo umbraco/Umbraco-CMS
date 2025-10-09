@@ -1,19 +1,22 @@
-﻿import {ConstantHelper, test, AliasHelper} from '@umbraco/playwright-testhelpers';
+﻿import {ConstantHelper, test, AliasHelper, NotificationConstantHelper} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 const contentName = 'TestContent';
 const documentTypeName = 'TestDocumentTypeForContent';
 const dataTypeName = 'Checkbox list';
+const customDataTypeName = 'CustomCheckboxList';
 
 test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.document.ensureNameNotExists(contentName);
+  await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
   await umbracoUi.goToBackOffice();
 });
 
 test.afterEach(async ({umbracoApi}) => {
-  await umbracoApi.document.ensureNameNotExists(contentName); 
+  await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
+  await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
 test('can create content with the checkbox list data type', async ({umbracoApi, umbracoUi}) => {
@@ -25,13 +28,13 @@ test('can create content with the checkbox list data type', async ({umbracoApi, 
 
   // Act
   await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -51,8 +54,7 @@ test('can publish content with the checkbox list data type', async ({umbracoApi,
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationsHaveCount(2);
-  expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
+  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
   expect(contentData.values).toEqual([]);
@@ -60,7 +62,6 @@ test('can publish content with the checkbox list data type', async ({umbracoApi,
 
 test('can create content with the custom checkbox list data type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const customDataTypeName = 'CustomCheckboxList';
   const optionValues = ['testOption1', 'testOption2'];
   const customDataTypeId = await umbracoApi.dataType.createCheckboxListDataType(customDataTypeName, optionValues);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
@@ -73,13 +74,35 @@ test('can create content with the custom checkbox list data type', async ({umbra
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationsHaveCount(2);
-  expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
+  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(customDataTypeName));
   expect(contentData.values[0].value).toEqual([optionValues[0]]);
-
-  // Clean
-  await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
+test('can not publish a mandatory checkbox list with an empty value', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const optionValues = ['testOption1', 'testOption2'];
+  const customDataTypeId = await umbracoApi.dataType.createCheckboxListDataType(customDataTypeName, optionValues);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId, 'Test Group', false, false, true);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  // Do not select any checkbox list values and the validation error appears
+  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue);
+  await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
+  // Select a checkbox list value and the validation error disappears
+  await umbracoUi.content.chooseCheckboxListOption(optionValues[0]);
+  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue, false);
+  await umbracoUi.content.clickSaveAndPublishButton();
+
+  // Assert
+  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(customDataTypeName));
+  expect(contentData.values[0].value).toEqual([optionValues[0]]);
+});

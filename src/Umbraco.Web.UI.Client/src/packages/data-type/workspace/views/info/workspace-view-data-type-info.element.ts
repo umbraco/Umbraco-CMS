@@ -4,18 +4,16 @@ import { css, html, customElement, state } from '@umbraco-cms/backoffice/externa
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
 
-import './data-type-workspace-view-info-reference.element.js';
-
 @customElement('umb-workspace-view-data-type-info')
 export class UmbWorkspaceViewDataTypeInfoElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	@state()
-	_unique: string = '';
+	private _unique: string = '';
 
 	@state()
-	_schemaAlias?: string;
+	private _schemaAlias?: string;
 
 	@state()
-	_uiAlias?: string | null;
+	private _uiAlias?: string | null;
 
 	private _workspaceContext?: typeof UMB_DATA_TYPE_WORKSPACE_CONTEXT.TYPE;
 
@@ -47,8 +45,7 @@ export class UmbWorkspaceViewDataTypeInfoElement extends UmbLitElement implement
 	override render() {
 		return html`
 			<div class="container">
-				<umb-data-type-workspace-view-info-reference
-					.dataTypeUnique=${this._unique}></umb-data-type-workspace-view-info-reference>
+				<umb-extension-slot id="workspace-info-apps" type="workspaceInfoApp"></umb-extension-slot>
 			</div>
 			<div class="container">${this.#renderGeneralInfo()}</div>
 		`;

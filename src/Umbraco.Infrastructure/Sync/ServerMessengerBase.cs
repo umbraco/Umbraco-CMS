@@ -1,8 +1,6 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Sync;
 
@@ -24,14 +22,6 @@ public abstract class ServerMessengerBase : IServerMessenger
     {
         DistributedEnabled = distributedEnabled;
         _jsonSerializer = jsonSerializer;
-    }
-
-    [Obsolete("Use constructor that takes IJsonSerializer, scheduled for removal in V16")]
-    protected ServerMessengerBase(bool distributedEnabled)
-        : this(
-            distributedEnabled,
-            StaticServiceProvider.Instance.GetRequiredService<IJsonSerializer>())
-    {
     }
 
     /// <summary>

@@ -2,10 +2,14 @@ import type {
 	DefaultReferenceResponseModel,
 	DocumentReferenceResponseModel,
 	MediaReferenceResponseModel,
+	MemberReferenceResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 
 export const items: Array<
-	DefaultReferenceResponseModel | DocumentReferenceResponseModel | MediaReferenceResponseModel
+	| DefaultReferenceResponseModel
+	| DocumentReferenceResponseModel
+	| MediaReferenceResponseModel
+	| MemberReferenceResponseModel
 > = [
 	{
 		$type: 'DocumentReferenceResponseModel',
@@ -16,7 +20,9 @@ export const items: Array<
 			alias: 'blogPost',
 			icon: 'icon-document',
 			name: 'Simple Document Type',
+			id: 'simple-document-type-id',
 		},
+		variants: [],
 	} satisfies DocumentReferenceResponseModel,
 	{
 		$type: 'DocumentReferenceResponseModel',
@@ -27,7 +33,9 @@ export const items: Array<
 			alias: 'imageBlock',
 			icon: 'icon-settings',
 			name: 'Image Block',
+			id: 'image-block-id',
 		},
+		variants: [],
 	} satisfies DocumentReferenceResponseModel,
 	{
 		$type: 'MediaReferenceResponseModel',
@@ -37,6 +45,7 @@ export const items: Array<
 			alias: 'image',
 			icon: 'icon-picture',
 			name: 'Image',
+			id: 'media-type-id',
 		},
 	} satisfies MediaReferenceResponseModel,
 	{

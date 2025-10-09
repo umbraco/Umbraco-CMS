@@ -3,24 +3,27 @@ import {
 	UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PRESET_ELEMENT,
 	UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PRESET_TEMPLATE,
 	UMB_EDIT_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN,
-	type UmbCreateDocumentTypeWorkspacePresetType,
 } from '../../paths.js';
+import type { UmbCreateDocumentTypeWorkspacePresetType } from '../../paths.js';
 import type { UmbDocumentTypeDetailModel } from '../../types.js';
 import { UMB_DOCUMENT_TYPE_ENTITY_TYPE, UMB_DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS } from '../../constants.js';
-import { UmbDocumentTypeWorkspaceEditorElement } from './document-type-workspace-editor.element.js';
 import { UMB_DOCUMENT_TYPE_WORKSPACE_ALIAS } from './constants.js';
+import { UmbDocumentTypeWorkspaceEditorElement } from './document-type-workspace-editor.element.js';
+import { CompositionTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbContentTypeWorkspaceContextBase } from '@umbraco-cms/backoffice/content-type';
+import { UmbRequestReloadChildrenOfEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import {
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceIsNewRedirectControllerAlias,
 } from '@umbraco-cms/backoffice/workspace';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UMB_TEMPLATE_ROOT_ENTITY_TYPE, UmbTemplateDetailRepository } from '@umbraco-cms/backoffice/template';
 import type { UmbContentTypeSortModel, UmbContentTypeWorkspaceContext } from '@umbraco-cms/backoffice/content-type';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import type { UmbPathPatternTypeAsEncodedParamsType } from '@umbraco-cms/backoffice/router';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import type { UmbRoutableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
-import type { UmbPathPatternTypeAsEncodedParamsType } from '@umbraco-cms/backoffice/router';
-import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
-import { UmbTemplateDetailRepository } from '@umbraco-cms/backoffice/template';
 
 type DetailModelType = UmbDocumentTypeDetailModel;
 export class UmbDocumentTypeWorkspaceContext
@@ -148,10 +151,22 @@ export class UmbDocumentTypeWorkspaceContext
 				break;
 		}
 
+		if (parent.unique && parent.entityType === UMB_DOCUMENT_TYPE_ENTITY_TYPE) {
+			preset = {
+				...preset,
+				compositions: [
+					{
+						contentType: { unique: parent.unique },
+						compositionType: CompositionTypeModel.INHERITANCE,
+					},
+				],
+			};
+		}
+
 		this.createScaffold({ parent, preset });
 	}
 
-	override async _create(currentData: DetailModelType, parent: UmbEntityModel) {
+	protected override async _create(currentData: DetailModelType, parent: UmbEntityModel) {
 		// TODO: move this responsibility to the template package
 		if (this.createTemplateMode) {
 			await this.#createAndAssignTemplate();
@@ -161,7 +176,7 @@ export class UmbDocumentTypeWorkspaceContext
 			super._create(currentData, parent);
 			this.createTemplateMode = false;
 		} catch (error) {
-			console.log(error);
+			console.warn(error);
 		}
 	}
 
@@ -175,6 +190,16 @@ export class UmbDocumentTypeWorkspaceContext
 		if (!templateScaffold) throw new Error('Could not create template scaffold');
 		const { data: template } = await this.#templateRepository.create(templateScaffold, null);
 		if (!template) throw new Error('Could not create template');
+
+		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+		if (!eventContext) {
+			throw new Error('Could not get the action event context');
+		}
+		const event = new UmbRequestReloadChildrenOfEntityEvent({
+			entityType: UMB_TEMPLATE_ROOT_ENTITY_TYPE,
+			unique: null,
+		});
+		eventContext.dispatchEvent(event);
 
 		const templateEntity = { id: template.unique };
 		const allowedTemplates = this.getAllowedTemplateIds() ?? [];

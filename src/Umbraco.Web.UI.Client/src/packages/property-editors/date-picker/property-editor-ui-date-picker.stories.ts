@@ -1,12 +1,12 @@
 import type { UmbPropertyEditorUIDatePickerElement } from './property-editor-ui-date-picker.element.js';
-import type { Meta, StoryFn } from '@storybook/web-components';
+import type { Meta, StoryFn } from '@storybook/web-components-vite';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import './property-editor-ui-date-picker.element.js';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
 export default {
-	title: 'Property Editor UIs/Date Picker',
+	title: 'Extension Type/Property Editor UI/Date Picker',
 	component: 'umb-property-editor-ui-date-picker',
 	id: 'umb-property-editor-ui-date-picker',
 	args: {
@@ -22,7 +22,7 @@ export default {
 const Template: StoryFn<UmbPropertyEditorUIDatePickerElement> = ({ config, value }) =>
 	html`<umb-property-editor-ui-date-picker .config=${config} .value=${value}></umb-property-editor-ui-date-picker>`;
 
-export const Overview = Template.bind({});
+export const Docs = Template.bind({});
 
 export const WithDateValue = Template.bind({});
 WithDateValue.args = {

@@ -1,10 +1,8 @@
-﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Api.Management.Mapping;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.UserGroup;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
@@ -22,16 +20,6 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
     private readonly ILanguageService _languageService;
     private readonly IPermissionPresentationFactory _permissionPresentationFactory;
     private readonly ILogger<UserGroupPresentationFactory> _logger;
-
-    [Obsolete("Use the new constructor instead, will be removed in v16.")]
-    public UserGroupPresentationFactory(
-        IEntityService entityService,
-        IShortStringHelper shortStringHelper,
-        ILanguageService languageService,
-        IPermissionPresentationFactory permissionPresentationFactory)
-    : this(entityService, shortStringHelper, languageService, permissionPresentationFactory, StaticServiceProvider.Instance.GetRequiredService<ILogger<UserGroupPresentationFactory>>())
-    {
-    }
 
     public UserGroupPresentationFactory(
         IEntityService entityService,
@@ -223,11 +211,7 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
 
     private async Task<Attempt<IEnumerable<string>, UserGroupOperationStatus>> MapLanguageIdsToIsoCodeAsync(IEnumerable<int> ids)
     {
-        IEnumerable<ILanguage> languages = await _languageService.GetAllAsync();
-        string[] isoCodes = languages
-            .Where(x => ids.Contains(x.Id))
-            .Select(x => x.IsoCode)
-            .ToArray();
+        string[] isoCodes = await _languageService.GetIsoCodesByIdsAsync(ids.ToArray());
 
         // if a language id does not exist, it simply not returned.
         // We do this so we don't have to clean up user group data when deleting languages and to make it easier to restore accidentally removed languages

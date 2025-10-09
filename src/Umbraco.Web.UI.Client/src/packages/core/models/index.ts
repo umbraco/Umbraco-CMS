@@ -2,7 +2,7 @@ export interface UmbSwatchDetails {
 	label: string;
 	value: string;
 }
-export interface ServertimeOffset {
+export interface UmbServertimeOffset {
 	/**
 	 * offset in minutes relative to UTC
 	 */
@@ -17,6 +17,10 @@ export interface UmbNumberRangeValueType {
 // TODO: this needs to use the UmbEntityUnique so we ensure that unique can be null
 export interface UmbReferenceByUnique {
 	unique: string;
+}
+
+export interface UmbReferenceByAlias {
+	alias: string;
 }
 
 export interface UmbReferenceByUniqueAndType {

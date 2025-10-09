@@ -4,7 +4,7 @@ using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto;
 
-internal class RuntimeCompilationCacheBuster
+internal sealed class RuntimeCompilationCacheBuster
 {
     private readonly IViewCompilerProvider _viewCompilerProvider;
     private readonly IRazorViewEngine _razorViewEngine;

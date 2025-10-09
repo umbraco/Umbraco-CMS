@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.UrlAndDomains;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Mapper = true, WithApplication = true, Logger = UmbracoTestOptions.Logger.Console)]
-public class DomainAndUrlsTests : UmbracoIntegrationTest
+internal sealed class DomainAndUrlsTests : UmbracoIntegrationTest
 {
     [SetUp]
     public void Setup()

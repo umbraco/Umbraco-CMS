@@ -1,13 +1,15 @@
+import type { UmbSearchFieldPresentationModel, UmbSearchResultModel } from '../../types.js';
 import { UMB_EXAMINE_FIELDS_SETTINGS_MODAL, UMB_EXAMINE_FIELDS_VIEWER_MODAL } from '../modal/constants.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, state, query, property } from '@umbraco-cms/backoffice/external/lit';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
-import type { SearchResultResponseModel, FieldPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { SearcherService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
+import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 
 interface ExposedSearchResultField {
 	name: string;
@@ -20,7 +22,7 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 	searcherName!: string;
 
 	@state()
-	private _searchResults?: SearchResultResponseModel[];
+	private _searchResults?: UmbSearchResultModel[];
 
 	@state()
 	private _exposedFields?: ExposedSearchResultField[];
@@ -34,6 +36,17 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 	@state()
 	private _workspacePath = 'aa';
 
+	@state()
+	private _totalPages = 1;
+
+	@state()
+	private _currentPage = 1;
+
+	@state()
+	private _totalNumberOfResults = 0;
+
+	#paginationManager = new UmbPaginationManager();
+
 	private _onKeyPress(e: KeyboardEvent) {
 		if (e.key == 'Enter') {
 			this._onSearch();
@@ -44,6 +57,12 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 
 	constructor() {
 		super();
+
+		this.#paginationManager.setPageSize(100);
+
+		this.observe(this.#paginationManager.currentPage, (number) => (this._currentPage = number));
+		this.observe(this.#paginationManager.totalPages, (number) => (this._totalPages = number));
+
 		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
 			.addAdditionalPath(':entityType')
 			.onSetup((routingInfo) => {
@@ -58,17 +77,21 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 		if (!this._searchInput.value.length) return;
 		this._searchLoading = true;
 
-		const { data } = await tryExecuteAndNotify(
+		const { data } = await tryExecute(
 			this,
 			SearcherService.getSearcherBySearcherNameQuery({
-				searcherName: this.searcherName,
-				term: this._searchInput.value,
-				take: 100,
-				skip: 0,
+				path: { searcherName: this.searcherName },
+				query: {
+					term: this._searchInput.value,
+					take: this.#paginationManager.getPageSize(),
+					skip: this.#paginationManager.getSkip(),
+				},
 			}),
 		);
 
 		this._searchResults = data?.items ?? [];
+		this.#paginationManager.setTotalItems(data.total);
+		this._totalNumberOfResults = data.total;
 		this._updateFieldFilter();
 		this._searchLoading = false;
 	}
@@ -96,28 +119,21 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 	}
 
 	async #onFieldFilterClick() {
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const modalContext = modalManager.open(this, UMB_EXAMINE_FIELDS_SETTINGS_MODAL, {
+		const value = await umbOpenModal(this, UMB_EXAMINE_FIELDS_SETTINGS_MODAL, {
 			value: { fields: this._exposedFields ?? [] },
-		});
-		await modalContext.onSubmit().catch(() => undefined);
-
-		const value = modalContext.getValue();
+		}).catch(() => undefined);
 
 		this._exposedFields = value?.fields;
 	}
 
-	async #onFieldViewClick(rowData: SearchResultResponseModel) {
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-
-		const modalContext = modalManager.open(this, UMB_EXAMINE_FIELDS_VIEWER_MODAL, {
+	async #onFieldViewClick(rowData: UmbSearchResultModel) {
+		await umbOpenModal(this, UMB_EXAMINE_FIELDS_VIEWER_MODAL, {
 			modal: {
 				type: 'sidebar',
 				size: 'medium',
 			},
-			data: { searchResult: rowData, name: this.getSearchResultNodeName(rowData) },
-		});
-		await modalContext.onSubmit().catch(() => undefined);
+			data: { searchResult: rowData, name: this.#getSearchResultNodeName(rowData) },
+		}).catch(() => undefined);
 	}
 
 	override render() {
@@ -143,13 +159,13 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 						label=${this.localize.term('general_search')}
 						@click="${this._onSearch}"></uui-button>
 				</div>
-				${this.renderSearchResults()}
+				${this.#renderSearchResults()}
 			</uui-box>
 		`;
 	}
 
 	// Find the field named 'nodeName' and return its value if it exists in the fields array
-	private getSearchResultNodeName(searchResult: SearchResultResponseModel): string {
+	#getSearchResultNodeName(searchResult: UmbSearchResultModel): string {
 		const nodeNameField = searchResult.fields?.find((field) => field.name?.toUpperCase() === 'NODENAME');
 		return nodeNameField?.values?.join(', ') ?? '';
 	}
@@ -163,61 +179,86 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 		}
 	}
 
-	private renderSearchResults() {
+	#onPageChange(event: UUIPaginationEvent) {
+		this.#paginationManager.setCurrentPageNumber(event.target?.current);
+		this._onSearch();
+	}
+
+	#renderSearchResults() {
 		if (this._searchLoading) return html`<uui-loader></uui-loader>`;
 		if (!this._searchResults) return nothing;
 		if (!this._searchResults.length) {
 			return html`<p>${this.localize.term('examineManagement_noResults')}</p>`;
 		}
-		return html`<div class="table-container">
-			<uui-scroll-container>
-				<uui-table class="search">
-					<uui-table-head>
-						<uui-table-head-cell style="width:0">Score</uui-table-head-cell>
-						<uui-table-head-cell style="width:0">${this.localize.term('general_id')}</uui-table-head-cell>
-						<uui-table-head-cell>${this.localize.term('general_name')}</uui-table-head-cell>
-						<uui-table-head-cell>${this.localize.term('examineManagement_fields')}</uui-table-head-cell>
-						${this.renderHeadCells()}
-					</uui-table-head>
-					${this._searchResults?.map((rowData) => {
-						const indexType = rowData.fields?.find((field) => field.name === '__IndexType')?.values?.join(', ') ?? '';
-						this.#entityType = this.#getEntityTypeFromIndexType(indexType);
-						const unique = rowData.fields?.find((field) => field.name === '__Key')?.values?.join(', ') ?? '';
+		return html`
+			<div>
+				${this.localize.term(
+					'examineManagement_searchResultsFound',
+					this.#paginationManager.getDisplayStart(),
+					this.#paginationManager.getDisplayEnd(),
+					this._totalNumberOfResults,
+					this._currentPage,
+					this._totalPages,
+				)}
+			</div>
+			<div class="table-container">
+				<uui-scroll-container>
+					<uui-table class="search">
+						<uui-table-head>
+							<uui-table-head-cell style="width:0">Score</uui-table-head-cell>
+							<uui-table-head-cell style="width:0">${this.localize.term('general_id')}</uui-table-head-cell>
+							<uui-table-head-cell>${this.localize.term('general_name')}</uui-table-head-cell>
+							<uui-table-head-cell>${this.localize.term('examineManagement_fields')}</uui-table-head-cell>
+							${this.renderHeadCells()}
+						</uui-table-head>
+						${this._searchResults?.map((rowData) => {
+							const indexType = rowData.fields?.find((field) => field.name === '__IndexType')?.values?.join(', ') ?? '';
+							this.#entityType = this.#getEntityTypeFromIndexType(indexType);
+							const unique = rowData.fields?.find((field) => field.name === '__Key')?.values?.join(', ') ?? '';
 
-						return html`<uui-table-row>
-							<uui-table-cell> ${rowData.score} </uui-table-cell>
-							<uui-table-cell> ${rowData.id} </uui-table-cell>
-							<uui-table-cell>
-								<uui-button
-									look="secondary"
-									label=${this.localize.term('actions_editContent')}
-									href=${this._workspacePath + this.#entityType + '/edit/' + unique}>
-									${this.getSearchResultNodeName(rowData)}
-								</uui-button>
-							</uui-table-cell>
-							<uui-table-cell>
-								<uui-button
-									class="bright"
-									look="secondary"
-									label=${this.localize.term('examineManagement_fieldValues')}
-									@click=${() => this.#onFieldViewClick(rowData)}>
-									${rowData.fields ? Object.keys(rowData.fields).length : ''}
-									${this.localize.term('examineManagement_fields')}
-								</uui-button>
-							</uui-table-cell>
-							${rowData.fields ? this.renderBodyCells(rowData.fields) : ''}
-						</uui-table-row>`;
-					})}
-				</uui-table>
-			</uui-scroll-container>
-			<button class="field-adder" @click="${this.#onFieldFilterClick}">
-				<uui-icon-registry-essential>
-					<uui-tag look="secondary">
-						<uui-icon name="add"></uui-icon>
-					</uui-tag>
-				</uui-icon-registry-essential>
-			</button>
-		</div>`;
+							return html`<uui-table-row>
+								<uui-table-cell> ${rowData.score} </uui-table-cell>
+								<uui-table-cell> ${rowData.id} </uui-table-cell>
+								<uui-table-cell>
+									<uui-button
+										look="secondary"
+										label=${this.localize.term('actions_editContent')}
+										href=${this._workspacePath + this.#entityType + '/edit/' + unique}>
+										${this.#getSearchResultNodeName(rowData)}
+									</uui-button>
+								</uui-table-cell>
+								<uui-table-cell>
+									<uui-button
+										class="bright"
+										look="secondary"
+										label=${this.localize.term('examineManagement_fieldValues')}
+										@click=${() => this.#onFieldViewClick(rowData)}>
+										${rowData.fields ? Object.keys(rowData.fields).length : ''}
+										${this.localize.term('examineManagement_fields')}
+									</uui-button>
+								</uui-table-cell>
+								${rowData.fields ? this.renderBodyCells(rowData.fields) : ''}
+							</uui-table-row>`;
+						})}
+					</uui-table>
+				</uui-scroll-container>
+				<button class="field-adder" @click="${this.#onFieldFilterClick}">
+					<uui-icon-registry-essential>
+						<uui-tag look="secondary">
+							<uui-icon name="add"></uui-icon>
+						</uui-tag>
+					</uui-icon-registry-essential>
+				</button>
+			</div>
+			<uui-pagination
+				.total=${this._totalPages}
+				.current=${this._currentPage}
+				firstlabel=${this.localize.term('general_first')}
+				previouslabel=${this.localize.term('general_previous')}
+				nextlabel=${this.localize.term('general_next')}
+				lastlabel=${this.localize.term('general_last')}
+				@change=${this.#onPageChange}></uui-pagination>
+		`;
 	}
 
 	renderHeadCells() {
@@ -243,7 +284,7 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 		})}`;
 	}
 
-	renderBodyCells(cellData: FieldPresentationModel[]) {
+	renderBodyCells(cellData: UmbSearchFieldPresentationModel[]) {
 		return html`${this._exposedFields?.map((slot) => {
 			return cellData.map((field) => {
 				return slot.exposed && field.name == slot.name

@@ -3,7 +3,7 @@ import { UMB_MEDIA_CREATE_OPTIONS_MODAL } from './media-create-options-modal.tok
 import type { UmbEntityActionArgs } from '@umbraco-cms/backoffice/entity-action';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 
 export class UmbCreateMediaEntityAction extends UmbEntityActionBase<never> {
 	constructor(host: UmbControllerHost, args: UmbEntityActionArgs<never>) {
@@ -22,15 +22,12 @@ export class UmbCreateMediaEntityAction extends UmbEntityActionBase<never> {
 			mediaItem = data[0];
 		}
 
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const modalContext = modalManager.open(this, UMB_MEDIA_CREATE_OPTIONS_MODAL, {
+		await umbOpenModal(this, UMB_MEDIA_CREATE_OPTIONS_MODAL, {
 			data: {
 				parent: { unique: this.args.unique, entityType: this.args.entityType },
 				mediaType: mediaItem ? { unique: mediaItem.mediaType.unique } : null,
 			},
 		});
-
-		await modalContext.onSubmit();
 	}
 }
 

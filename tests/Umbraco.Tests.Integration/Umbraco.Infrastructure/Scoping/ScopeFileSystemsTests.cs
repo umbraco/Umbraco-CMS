@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewEmptyPerTest)]
-public class ScopeFileSystemsTests : UmbracoIntegrationTest
+internal sealed class ScopeFileSystemsTests : UmbracoIntegrationTest
 {
     [SetUp]
     public void SetUp() => ClearFiles(IOHelper);

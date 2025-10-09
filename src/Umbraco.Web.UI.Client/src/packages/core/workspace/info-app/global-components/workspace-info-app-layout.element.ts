@@ -10,7 +10,9 @@ export class UmbWorkspaceInfoAppLayoutElement extends UmbLitElement {
 		return html`
 			<uui-box headline=${ifDefined(this.headline ? this.localize.string(this.headline) : undefined)}>
 				<slot name="header-actions" slot="header-actions"></slot>
-				<slot></slot>
+				<div id="container">
+					<slot></slot>
+				</div>
 			</uui-box>
 		`;
 	}

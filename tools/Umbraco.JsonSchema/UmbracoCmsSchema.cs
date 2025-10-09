@@ -1,8 +1,7 @@
-using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 
-internal class UmbracoCmsSchema
+internal sealed class UmbracoCmsSchema
 {
     public required UmbracoDefinition Umbraco { get; set; }
 
@@ -59,17 +58,11 @@ internal class UmbracoCmsSchema
 
         public required UnattendedSettings Unattended { get; set; }
 
-        [Obsolete("Runtime minification is no longer supported. Will be removed entirely in V16.")]
-        public required RuntimeMinificationSettings RuntimeMinification { get; set; }
-
         public required BasicAuthSettings BasicAuth { get; set; }
 
         public required PackageMigrationSettings PackageMigration { get; set; }
 
         public required LegacyPasswordMigrationSettings LegacyPasswordMigration { get; set; }
-
-        [Obsolete("Scheduled for removal in v16, dashboard manipulation is now done trough frontend extensions.")]
-        public required ContentDashboardSettings ContentDashboard { get; set; }
 
         public required HelpPageSettings HelpPage { get; set; }
 

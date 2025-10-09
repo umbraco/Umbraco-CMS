@@ -84,8 +84,7 @@ public class ScopedNotificationPublisherTests
             Mock.Of<IMediaPathScheme>(),
             loggerFactory.CreateLogger<MediaFileManager>(),
             Mock.Of<IShortStringHelper>(),
-            Mock.Of<IServiceProvider>(),
-            Options.Create(new ContentSettings()));
+            Mock.Of<IServiceProvider>());
 
         eventAggregatorMock = new Mock<IEventAggregator>();
 

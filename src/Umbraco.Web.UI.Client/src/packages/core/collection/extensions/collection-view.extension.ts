@@ -31,13 +31,19 @@ export interface MetaCollectionView {
 /**
  * Condition for when this collection view should be available
  */
-export interface ConditionsCollectionView {
+export interface UmbConditionsCollectionView {
 	/**
 	 * Type of entity this collection view should be available for
 	 * @examples ["media"]
 	 */
 	entityType: string;
 }
+
+/**
+ * @deprecated Use {@link UmbConditionsCollectionView} instead. This will be removed in Umbraco 18.
+ */
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/naming-convention
+export interface ConditionsCollectionView extends UmbConditionsCollectionView {}
 
 declare global {
 	interface UmbExtensionManifestMap {

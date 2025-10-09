@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.DependencyInjection;
 namespace Umbraco.Cms.Web.Common.DependencyInjection;
 
 /// <inheritdoc />
-internal class ScopedServiceProvider : IScopedServiceProvider
+internal sealed class ScopedServiceProvider : IScopedServiceProvider
 {
     private readonly IHttpContextAccessor _accessor;
 

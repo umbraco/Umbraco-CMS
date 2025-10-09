@@ -101,6 +101,11 @@ public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IDeliver
                         continue;
                     }
 
+                    if (string.IsNullOrEmpty(dto.Name))
+                    {
+                        dto.Name = content.Name;
+                    }
+
                     url = content.Url(_publishedUrlProvider);
                 }
 

@@ -36,7 +36,7 @@ public class RebuildIndexerController : IndexerControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> Rebuild(CancellationToken cancellationToken, string indexName)
+    public Task<IActionResult> Rebuild(CancellationToken cancellationToken, string indexName)
     {
         if (!_examineManager.TryGetIndex(indexName, out IIndex? index))
         {
@@ -48,7 +48,7 @@ public class RebuildIndexerController : IndexerControllerBase
                 Type = "Error",
             };
 
-            return await Task.FromResult(NotFound(invalidModelProblem));
+            return Task.FromResult<IActionResult>(NotFound(invalidModelProblem));
         }
 
         if (!_indexingRebuilderService.CanRebuild(index.Name))
@@ -62,14 +62,14 @@ public class RebuildIndexerController : IndexerControllerBase
                 Type = "Error",
             };
 
-            return await Task.FromResult(BadRequest(invalidModelProblem));
+            return Task.FromResult<IActionResult>(BadRequest(invalidModelProblem));
         }
 
         _logger.LogInformation("Rebuilding index '{IndexName}'", indexName);
 
         if (_indexingRebuilderService.TryRebuild(index, indexName))
         {
-            return await Task.FromResult(Ok());
+            return Task.FromResult<IActionResult>(Ok());
         }
 
         var problemDetails = new ProblemDetails
@@ -80,6 +80,6 @@ public class RebuildIndexerController : IndexerControllerBase
             Type = "Error",
         };
 
-        return await Task.FromResult(Conflict(problemDetails));
+        return Task.FromResult<IActionResult>(Conflict(problemDetails));
     }
 }

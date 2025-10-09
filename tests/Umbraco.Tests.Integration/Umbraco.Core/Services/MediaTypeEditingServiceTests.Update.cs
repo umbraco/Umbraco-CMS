@@ -1,11 +1,11 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
-public partial class MediaTypeEditingServiceTests
+internal sealed partial class MediaTypeEditingServiceTests
 {
     [Test]
     public async Task Can_Update_All_Basic_Settings()

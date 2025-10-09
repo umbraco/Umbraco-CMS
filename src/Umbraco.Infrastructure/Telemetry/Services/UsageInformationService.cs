@@ -3,7 +3,7 @@ using Umbraco.Cms.Infrastructure.Telemetry.Interfaces;
 
 namespace Umbraco.Cms.Core.Services;
 
-internal class UsageInformationService : IUsageInformationService
+internal sealed class UsageInformationService : IUsageInformationService
 {
     private readonly IMetricsConsentService _metricsConsentService;
     private readonly IEnumerable<IDetailedTelemetryProvider> _providers;

@@ -1,6 +1,9 @@
-import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import type {
+	UmbPropertyEditorConfigCollection,
+	UmbPropertyEditorUiElement,
+} from '@umbraco-cms/backoffice/property-editor';
+import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_ICON_PICKER_MODAL } from '@umbraco-cms/backoffice/icon';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { extractUmbColorVariable } from '@umbraco-cms/backoffice/resources';
@@ -35,14 +38,29 @@ export class UmbPropertyEditorUIIconPickerElement extends UmbLitElement implemen
 	@state()
 	private _color = '';
 
-	private async _openModal() {
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const modalContext = modalManager.open(this, UMB_ICON_PICKER_MODAL);
+	@state()
+	private _placeholderIcon = '';
 
-		const data = await modalContext?.onSubmit();
+	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
+		if (!config) return;
+		const placeholder = config.getValueByAlias('placeholder');
+		this._placeholderIcon = typeof placeholder === 'string' ? placeholder : '';
+	}
+
+	private async _openModal() {
+		const data = await umbOpenModal(this, UMB_ICON_PICKER_MODAL, {
+			value: {
+				icon: this._icon,
+				color: this._color,
+			},
+			data: { placeholder: this._placeholderIcon },
+		}).catch(() => undefined);
+
 		if (!data) return;
 
-		if (data.color) {
+		if (!data.icon) {
+			this.value = '';
+		} else if (data.color) {
 			this.value = `${data.icon} color-${data.color}`;
 		} else {
 			this.value = data.icon as string;
@@ -52,16 +70,21 @@ export class UmbPropertyEditorUIIconPickerElement extends UmbLitElement implemen
 	}
 
 	override render() {
+		const isEmpty = !this._icon;
+
 		return html`
 			<uui-button
 				compact
+				look="outline"
 				label=${this.localize.term('defaultdialogs_selectIcon')}
-				look="secondary"
-				@click=${this._openModal}
-				style="margin-right: var(--uui-size-space-3)">
-				${this._color
-					? html` <uui-icon name="${this._icon}" style="color:var(${extractUmbColorVariable(this._color)})"></uui-icon>`
-					: html` <uui-icon name="${this._icon}"></uui-icon>`}
+				@click=${this._openModal}>
+				${isEmpty
+					? html` <uui-icon name="${ifDefined(this._placeholderIcon)}" style="opacity:.35"></uui-icon> `
+					: this._color
+						? html`
+								<uui-icon name="${this._icon}" style="color:var(${extractUmbColorVariable(this._color)})"> </uui-icon>
+							`
+						: html`<uui-icon name="${this._icon}"></uui-icon>`}
 			</uui-button>
 		`;
 	}

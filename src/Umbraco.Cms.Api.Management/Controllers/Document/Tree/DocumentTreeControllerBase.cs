@@ -1,12 +1,16 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Controllers.Tree;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Api.Management.Services.Entities;
+using Umbraco.Cms.Api.Management.Services.Flags;
+using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Security;
@@ -25,6 +29,7 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
     private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
     private readonly IDocumentPresentationFactory _documentPresentationFactory;
 
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
     protected DocumentTreeControllerBase(
         IEntityService entityService,
         IUserStartNodeEntitiesService userStartNodeEntitiesService,
@@ -33,7 +38,29 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
         AppCaches appCaches,
         IBackOfficeSecurityAccessor backofficeSecurityAccessor,
         IDocumentPresentationFactory documentPresentationFactory)
-        : base(entityService, userStartNodeEntitiesService, dataTypeService)
+        : this(
+              entityService,
+              StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>(),
+              userStartNodeEntitiesService,
+              dataTypeService,
+              publicAccessService,
+              appCaches,
+              backofficeSecurityAccessor,
+              documentPresentationFactory)
+    {
+    }
+
+    [ActivatorUtilitiesConstructor]
+    protected DocumentTreeControllerBase(
+        IEntityService entityService,
+        FlagProviderCollection flagProviders,
+        IUserStartNodeEntitiesService userStartNodeEntitiesService,
+        IDataTypeService dataTypeService,
+        IPublicAccessService publicAccessService,
+        AppCaches appCaches,
+        IBackOfficeSecurityAccessor backofficeSecurityAccessor,
+        IDocumentPresentationFactory documentPresentationFactory)
+        : base(entityService, flagProviders, userStartNodeEntitiesService, dataTypeService)
     {
         _publicAccessService = publicAccessService;
         _appCaches = appCaches;
@@ -52,6 +79,8 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
         if (entity is IDocumentEntitySlim documentEntitySlim)
         {
             responseModel.IsProtected = _publicAccessService.IsProtected(entity.Path);
+            responseModel.Ancestors = EntityService.GetPathKeys(entity, omitSelf: true)
+                .Select(x => new ReferenceByIdModel(x));
             responseModel.IsTrashed = entity.Trashed;
             responseModel.Id = entity.Key;
             responseModel.CreateDate = entity.CreateDate;

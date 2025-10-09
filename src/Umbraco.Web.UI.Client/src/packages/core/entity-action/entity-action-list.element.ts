@@ -23,7 +23,7 @@ export class UmbEntityActionListElement extends UmbLitElement {
 	}
 
 	@state()
-	_filter?: (extension: ManifestEntityAction<MetaEntityAction>) => boolean;
+	private _filter?: (extension: ManifestEntityAction<MetaEntityAction>) => boolean;
 
 	@property({ type: String })
 	public get unique(): string | null | undefined {
@@ -37,10 +37,10 @@ export class UmbEntityActionListElement extends UmbLitElement {
 	}
 
 	@state()
-	_props: Partial<UmbEntityActionArgs<unknown>> = {};
+	private _props: Partial<UmbEntityActionArgs<unknown>> = {};
 
 	@state()
-	_apiArgs?: UmbApiConstructorArgumentsMethodType<
+	private _apiArgs?: UmbApiConstructorArgumentsMethodType<
 		ManifestEntityAction<MetaEntityAction>,
 		[UmbEntityActionArgs<MetaEntityAction>]
 	>;
@@ -90,6 +90,7 @@ export class UmbEntityActionListElement extends UmbLitElement {
 	static override styles = [
 		css`
 			:host {
+				--uui-menu-item-indent: 0;
 				--uui-menu-item-flat-structure: 1;
 			}
 		`,

@@ -33,6 +33,7 @@ export default defineConfig({
     // When working locally it can be a good idea to use trace: 'on-first-retry' instead of 'retain-on-failure', it can cut the local test times in half.
     trace: 'retain-on-failure',
     ignoreHTTPSErrors: true,
+    testIdAttribute: 'data-mark'
   },
 
   /* Configure projects for major browsers */
@@ -43,14 +44,53 @@ export default defineConfig({
       testMatch: '**/*.setup.ts',
     },
     {
-      name: 'chromium',
+      name: 'defaultConfig',
+      testMatch: 'DefaultConfig/**',
       dependencies: ['setup'],
       use: {
         ...devices['Desktop Chrome'],
         // Use prepared auth state.
         ignoreHTTPSErrors: true,
-        storageState: STORAGE_STATE,
-      },
+        storageState: STORAGE_STATE
+      }
     },
+    {
+      name: 'extensionRegistry',
+      testMatch: 'ExtensionRegistry/*.spec.ts',
+      dependencies: ['setup'],
+      use: {
+        ...devices['Desktop Chrome'],
+        // Use prepared auth state.
+        ignoreHTTPSErrors: true,
+        storageState: STORAGE_STATE
+      }
+    },
+    {
+      name: 'deliveryApi',
+      testMatch: 'DeliveryApi/**',
+      dependencies: ['setup'],
+      use: {
+        ...devices['Desktop Chrome'],
+        // Use prepared auth state.
+        ignoreHTTPSErrors: true,
+        storageState: STORAGE_STATE
+      }
+    },
+    {
+      name: 'externalLoginAzureADB2C',
+      testMatch: 'ExternalLogin/AzureADB2C/**',
+      use: {
+        ...devices['Desktop Chrome'],
+        ignoreHTTPSErrors: true,
+      }
+    },
+    // This project is used to test the install steps, for that we do not need to authenticate.
+    {
+      name: 'unattendedInstallConfig',
+      testMatch: 'UnattendedInstallConfig/**',
+      use: {
+        ...devices['Desktop Chrome']
+      }
+    }
   ],
 });

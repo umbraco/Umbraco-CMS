@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Web.Website.Routing;
 /// Ensures the surface controller requests takes priority over other things like virtual routes.
 /// Also ensures that requests to a surface controller on a virtual route will return 405, like HttpMethodMatcherPolicy ensures for non-virtual route requests.
 /// </summary>
-internal class SurfaceControllerMatcherPolicy : MatcherPolicy, IEndpointSelectorPolicy
+internal sealed class SurfaceControllerMatcherPolicy : MatcherPolicy, IEndpointSelectorPolicy
 {
     private const string Http405EndpointDisplayName = "405 HTTP Method Not Supported";
 

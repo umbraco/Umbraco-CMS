@@ -1,9 +1,9 @@
-import type { SearchResultResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbSearchResultModel } from '../../../types.js';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export type UmbExamineFieldsViewerModalData = {
 	name: string;
-	searchResult: SearchResultResponseModel;
+	searchResult: UmbSearchResultModel;
 };
 
 export type UmbExamineFieldsViewerModalValue = never;

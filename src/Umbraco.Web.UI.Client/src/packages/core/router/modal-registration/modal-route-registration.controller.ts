@@ -1,4 +1,6 @@
-import { UMB_ROUTE_CONTEXT, UMB_ROUTE_PATH_ADDENDUM_CONTEXT } from '../index.js';
+import type { IRouterSlot, Params } from '../router-slot/index.js';
+import { UMB_ROUTE_PATH_ADDENDUM_CONTEXT } from '../contexts/route-path-addendum.context-token.js';
+import { UMB_ROUTE_CONTEXT } from '../route/route.context.js';
 import { encodeFolderName } from '../encode-folder-name.function.js';
 import type { UmbModalRouteRegistration } from './modal-route-registration.interface.js';
 import type {
@@ -12,7 +14,6 @@ import type { UmbControllerAlias, UmbControllerHost } from '@umbraco-cms/backoff
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDeepPartialObject } from '@umbraco-cms/backoffice/utils';
-import type { IRouterSlot, Params } from '@umbraco-cms/backoffice/external/router-slot';
 
 export type UmbModalRouteBuilder = (params: { [key: string]: string | number } | null) => string;
 
@@ -48,7 +49,6 @@ export class UmbModalRouteRegistrationController<
 {
 	//
 	#init;
-	#contextConsumer;
 
 	#addendum?: string;
 	#additionalPath?: string;
@@ -92,20 +92,23 @@ export class UmbModalRouteRegistrationController<
 
 		this.consumeContext(UMB_ROUTE_PATH_ADDENDUM_CONTEXT, (context) => {
 			this.observe(
-				context.addendum,
+				context?.addendum,
 				(addendum) => {
 					this.#addendum = addendum;
-					this.#registerModal();
+					this.#registerModal().catch(() => undefined);
 				},
 				'observeAddendum',
 			);
 		});
 
-		this.#contextConsumer = this.consumeContext(UMB_ROUTE_CONTEXT, (_routeContext) => {
+		this.#init = this.consumeContext(UMB_ROUTE_CONTEXT, (_routeContext) => {
 			this.#routeContext = _routeContext;
-			this.#registerModal();
-		});
-		this.#init = this.#contextConsumer.asPromise();
+			if (this.#routeContext) {
+				this.#registerModal().catch(() => undefined);
+			}
+		})
+			.asPromise({ preventTimeout: true })
+			.catch(() => undefined);
 	}
 
 	/**
@@ -224,7 +227,7 @@ export class UmbModalRouteRegistrationController<
 		this.#modalRegistrationContext = this.#routeContext;
 	}
 
-	async #unregisterModal() {
+	#unregisterModal() {
 		if (!this.#routeContext) return;
 		if (this.#modalRegistrationContext) {
 			this.#modalRegistrationContext.unregisterModal(this);
@@ -292,6 +295,7 @@ export class UmbModalRouteRegistrationController<
 		this.#urlBuilderCallback = callback;
 		return this;
 	}
+	// eslint-disable-next-line @typescript-eslint/naming-convention
 	public _internal_setRouteBuilder(urlBuilder: UmbModalRouteBuilder) {
 		if (!this.#routeContext) return;
 		this.#routeBuilder = urlBuilder;
@@ -349,7 +353,6 @@ export class UmbModalRouteRegistrationController<
 
 	public override destroy(): void {
 		super.destroy();
-		this.#contextConsumer.destroy();
 		this.#modalRegistrationContext = undefined;
 		this.#uniquePaths = undefined as any;
 		this.#routeContext = undefined;

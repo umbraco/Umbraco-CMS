@@ -1,6 +1,4 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -42,58 +40,6 @@ public class MemberTypeService : ContentTypeServiceBase<IMemberTypeRepository, I
     {
         MemberService = memberService;
         _memberTypeRepository = memberTypeRepository;
-    }
-
-    [Obsolete("Please use the constructor taking all parameters. This constructor will be removed in V16.")]
-    public MemberTypeService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IMemberService memberService,
-        IMemberTypeRepository memberTypeRepository,
-        IAuditRepository auditRepository,
-        IMemberTypeContainerRepository entityContainerRepository,
-        IEntityRepository entityRepository,
-        IEventAggregator eventAggregator)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            memberService,
-            memberTypeRepository,
-            auditRepository,
-            entityContainerRepository,
-            entityRepository,
-            eventAggregator,
-            StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>())
-    {
-    }
-
-    [Obsolete("Please use the constructor taking all parameters. This constructor will be removed in V16.")]
-    public MemberTypeService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IMemberService memberService,
-        IMemberTypeRepository memberTypeRepository,
-        IAuditRepository auditRepository,
-        IMemberTypeContainerRepository entityContainerRepository,
-        IEntityRepository entityRepository,
-        IEventAggregator eventAggregator,
-        IUserIdKeyResolver userIdKeyResolver)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            memberService,
-            memberTypeRepository,
-            auditRepository,
-            entityContainerRepository,
-            entityRepository,
-            eventAggregator,
-            userIdKeyResolver,
-            StaticServiceProvider.Instance.GetRequiredService<ContentTypeFilterCollection>())
-    {
     }
 
     // beware! order is important to avoid deadlocks

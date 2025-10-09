@@ -1,5 +1,5 @@
-import type { UUIModalElement, UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 import type { ElementLoaderProperty } from '@umbraco-cms/backoffice/extension-api';
+import type { UUIModalElement, UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 
 export type * from './extensions/types.js';
 
@@ -10,9 +10,9 @@ export interface UmbPickerModalData<ItemType> {
 	search?: UmbPickerModalSearchConfig;
 }
 
-export interface UmbPickerModalSearchConfig {
+export interface UmbPickerModalSearchConfig<QueryParamsType = Record<string, unknown>> {
 	providerAlias: string;
-	queryParams?: object;
+	queryParams?: QueryParamsType;
 }
 
 export interface UmbPickerModalValue {
@@ -35,4 +35,9 @@ export interface UmbModalConfig {
 	 * Set the background property of the modal backdrop
 	 */
 	backdropBackground?: string;
+
+	/**
+	 * Set the title of the modal, this is used as Browser Title
+	 */
+	title?: string;
 }

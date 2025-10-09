@@ -39,6 +39,9 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 				if (!this._manager) return false;
 				const index = routingInfo.index ? parseInt(routingInfo.index) : -1;
 				const clipboardContext = await this.getContext(UMB_CLIPBOARD_PROPERTY_CONTEXT);
+				if (!clipboardContext) {
+					throw new Error('Clipboard context not found');
+				}
 
 				const pasteTranslatorManifests = clipboardContext.getPasteTranslatorManifests(
 					UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS,
@@ -46,6 +49,9 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 
 				// TODO: consider moving some of this logic to the clipboard property context
 				const propertyContext = await this.getContext(UMB_PROPERTY_CONTEXT);
+				if (!propertyContext) {
+					throw new Error('Property context not found');
+				}
 				const config = propertyContext.getConfig();
 				const valueResolver = new UmbClipboardPastePropertyValueTranslatorValueResolver(this);
 
@@ -103,7 +109,9 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 					}
 				} else if (value?.clipboard && value.clipboard.selection?.length && data) {
 					const clipboardContext = await this.getContext(UMB_CLIPBOARD_PROPERTY_CONTEXT);
-
+					if (!clipboardContext) {
+						throw new Error('Clipboard context not found');
+					}
 					const propertyValues = await clipboardContext.readMultiple<UmbBlockListValueModel>(
 						value.clipboard.selection,
 						UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS,

@@ -17,26 +17,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 	},
 	{
 		type: 'workspaceView',
-		kind: 'contentCollection',
-		alias: 'Umb.WorkspaceView.Document.Collection',
-		name: 'Document Workspace Collection View',
-		meta: {
-			label: 'Collection',
-			pathname: 'collection',
-			icon: 'icon-grid',
-		},
-		conditions: [
-			{
-				alias: UMB_WORKSPACE_CONDITION_ALIAS,
-				match: UMB_DOCUMENT_WORKSPACE_ALIAS,
-			},
-			{
-				alias: 'Umb.Condition.WorkspaceHasCollection',
-			},
-		],
-	},
-	{
-		type: 'workspaceView',
 		kind: 'contentEditor',
 		alias: 'Umb.WorkspaceView.Document.Edit',
 		name: 'Document Workspace Edit View',

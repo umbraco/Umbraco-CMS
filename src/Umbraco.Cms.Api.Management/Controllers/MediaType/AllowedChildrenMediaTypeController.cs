@@ -23,15 +23,6 @@ public class AllowedChildrenMediaTypeController : MediaTypeControllerBase
         _umbracoMapper = umbracoMapper;
     }
 
-    [NonAction]
-    [Obsolete("Use the non obsoleted method instead. Scheduled for removal in Umbraco 16.")]
-    public async Task<IActionResult> AllowedChildrenByKey(
-        CancellationToken cancellationToken,
-        Guid id,
-        int skip = 0,
-        int take = 100)
-        => await AllowedChildrenByKey(cancellationToken, id, null, skip, take);
-
     [HttpGet("{id:guid}/allowed-children")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<AllowedMediaType>), StatusCodes.Status200OK)]

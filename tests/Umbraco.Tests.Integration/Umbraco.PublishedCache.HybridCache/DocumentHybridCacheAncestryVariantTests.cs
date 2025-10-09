@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.PublishedCache.HybridCache;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class DocumentHybridCacheAncestryVariantTests : UmbracoIntegrationTest
+internal sealed class DocumentHybridCacheAncestryVariantTests : UmbracoIntegrationTest
 {
     private string _englishIsoCode = "en-US";
     private string _danishIsoCode = "da-DK";

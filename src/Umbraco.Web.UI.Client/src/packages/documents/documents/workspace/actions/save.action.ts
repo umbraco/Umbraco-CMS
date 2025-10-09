@@ -1,68 +1,72 @@
-import type { UmbDocumentVariantModel } from '../../types.js';
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../document-workspace.context-token.js';
 import type UmbDocumentWorkspaceContext from '../document-workspace.context.js';
-import type { UmbVariantState } from '@umbraco-cms/backoffice/utils';
+import type { UmbDocumentVariantModel } from '../../types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import {
-	UmbSubmitWorkspaceAction,
+	UmbSaveWorkspaceAction,
 	type MetaWorkspaceAction,
-	type UmbSubmitWorkspaceActionArgs,
+	type UmbSaveWorkspaceActionArgs,
 	type UmbWorkspaceActionDefaultKind,
 } from '@umbraco-cms/backoffice/workspace';
 
 export class UmbDocumentSaveWorkspaceAction
-	extends UmbSubmitWorkspaceAction<MetaWorkspaceAction, UmbDocumentWorkspaceContext>
+	extends UmbSaveWorkspaceAction<MetaWorkspaceAction, UmbDocumentWorkspaceContext>
 	implements UmbWorkspaceActionDefaultKind<MetaWorkspaceAction>
 {
-	#variants: Array<UmbDocumentVariantModel> = [];
-	#readOnlyStates: Array<UmbVariantState> = [];
+	#variants: Array<UmbDocumentVariantModel> | undefined;
 
-	constructor(host: UmbControllerHost, args: UmbSubmitWorkspaceActionArgs<MetaWorkspaceAction>) {
+	constructor(
+		host: UmbControllerHost,
+		args: UmbSaveWorkspaceActionArgs<MetaWorkspaceAction, UmbDocumentWorkspaceContext>,
+	) {
 		super(host, { workspaceContextToken: UMB_DOCUMENT_WORKSPACE_CONTEXT, ...args });
 	}
 
 	async hasAdditionalOptions() {
 		await this._retrieveWorkspaceContext;
-		const variantOptions = await this.observe(this._workspaceContext!.variantOptions).asPromise();
-		return variantOptions?.length > 1;
+		const variantOptions = await this.observe(this._workspaceContext!.variantOptions)
+			.asPromise()
+			.catch(() => undefined);
+		const cultureVariantOptions = variantOptions?.filter((option) => option.culture);
+		return cultureVariantOptions ? cultureVariantOptions?.length > 1 : false;
 	}
 
-	override _gotWorkspaceContext() {
+	protected override _gotWorkspaceContext() {
 		super._gotWorkspaceContext();
 		this.#observeVariants();
-		this.#observeReadOnlyStates();
+		this.#observeReadOnlyGuardRules();
 	}
 
 	#observeVariants() {
 		this.observe(
 			this._workspaceContext?.variants,
 			(variants) => {
-				this.#variants = variants ?? [];
-				this.#check();
+				this.#variants = variants;
+				this.#checkReadOnlyGuardRules();
 			},
 			'saveWorkspaceActionVariantsObserver',
 		);
 	}
 
-	#observeReadOnlyStates() {
+	#observeReadOnlyGuardRules() {
 		this.observe(
-			this._workspaceContext?.readOnlyState.states,
-			(readOnlyStates) => {
-				this.#readOnlyStates = readOnlyStates ?? [];
-				this.#check();
-			},
-			'saveWorkspaceActionReadOnlyStatesObserver',
+			this._workspaceContext?.readOnlyGuard.rules,
+			() => this.#checkReadOnlyGuardRules(),
+			'umbObserveReadOnlyGuardRules',
 		);
 	}
 
-	#check() {
-		const allVariantsAreReadOnly = this.#variants.every((variant) => {
-			const variantId = new UmbVariantId(variant.culture, variant.segment);
-			return this.#readOnlyStates.some((state) => state.variantId.equal(variantId));
-		});
-
-		return allVariantsAreReadOnly ? this.disable() : this.enable();
+	#checkReadOnlyGuardRules() {
+		const allVariantsAreReadOnly =
+			this.#variants?.filter((variant) =>
+				this._workspaceContext!.readOnlyGuard.getIsPermittedForVariant(UmbVariantId.Create(variant)),
+			).length === this.#variants?.length;
+		if (allVariantsAreReadOnly) {
+			this.disable();
+		} else {
+			this.enable();
+		}
 	}
 }
 

@@ -21,14 +21,15 @@
 		"stylesheet",
 		"svgs",
 		"templating",
-		"tinymce",
 		"tiptap",
 		"umbraco",
 		"Uncategorized",
 		"uninitialize",
 		"unprovide",
 		"unpublishing",
-		"variantable"
+		"variantable",
+		"viewability",
+		"writability"
 	],
 	"exportall.config.folderListener": [],
 	"exportall.config.relExclusion": [],

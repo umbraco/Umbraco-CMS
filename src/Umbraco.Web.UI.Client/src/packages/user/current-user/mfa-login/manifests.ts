@@ -11,7 +11,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			label: '#user_configureTwoFactor',
 			icon: 'icon-rectangle-ellipsis',
-			look: 'secondary',
 		},
 		conditions: [
 			{

@@ -1,7 +1,7 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 import type { UmbDocumentItemModel } from './types.js';
+import { UmbManagementApiDocumentItemDataRequestManager } from './document-item.server.request-manager.js';
 import type { DocumentItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
 
@@ -14,6 +14,8 @@ export class UmbDocumentItemServerDataSource extends UmbItemServerDataSourceBase
 	DocumentItemResponseModel,
 	UmbDocumentItemModel
 > {
+	#itemRequestManager = new UmbManagementApiDocumentItemDataRequestManager(this);
+
 	/**
 	 * Creates an instance of UmbDocumentItemServerDataSource.
 	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
@@ -21,14 +23,18 @@ export class UmbDocumentItemServerDataSource extends UmbItemServerDataSourceBase
 	 */
 	constructor(host: UmbControllerHost) {
 		super(host, {
-			getItems,
 			mapper,
 		});
 	}
-}
 
-/* eslint-disable local-rules/no-direct-api-import */
-const getItems = (uniques: Array<string>) => DocumentService.getItemDocument({ id: uniques });
+	override async getItems(uniques: Array<string>) {
+		if (!uniques) throw new Error('Uniques are missing');
+
+		const { data, error } = await this.#itemRequestManager.getItems(uniques);
+
+		return { data: this._getMappedItems(data), error };
+	}
+}
 
 const mapper = (item: DocumentItemResponseModel): UmbDocumentItemModel => {
 	return {
@@ -49,7 +55,9 @@ const mapper = (item: DocumentItemResponseModel): UmbDocumentItemModel => {
 				culture: variant.culture || null,
 				name: variant.name,
 				state: variant.state,
+				flags: variant.flags,
 			};
 		}),
+		flags: item.flags,
 	};
 };

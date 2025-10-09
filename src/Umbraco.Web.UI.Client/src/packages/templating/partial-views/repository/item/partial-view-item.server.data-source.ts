@@ -1,28 +1,21 @@
 import { UMB_PARTIAL_VIEW_ENTITY_TYPE, UMB_PARTIAL_VIEW_FOLDER_ENTITY_TYPE } from '../../entity.js';
 import type { UmbPartialViewItemModel } from '../../types.js';
+import { UmbManagementApiPartialViewItemDataRequestManager } from './partial-view-item.server.request-manager.js';
 import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
 import type { UmbItemDataSource } from '@umbraco-cms/backoffice/repository';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import { PartialViewService } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
 /**
  * A data source for script items that fetches data from the server
  * @class UmbPartialViewItemServerDataSource
  * @implements {UmbItemDataSource}
  */
-export class UmbPartialViewItemServerDataSource implements UmbItemDataSource<UmbPartialViewItemModel> {
-	#host: UmbControllerHost;
+export class UmbPartialViewItemServerDataSource
+	extends UmbControllerBase
+	implements UmbItemDataSource<UmbPartialViewItemModel>
+{
 	#serverFilePathUniqueSerializer = new UmbServerFilePathUniqueSerializer();
-
-	/**
-	 * Creates an instance of UmbPartialViewItemServerDataSource.
-	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
-	 * @memberof UmbPartialViewItemServerDataSource
-	 */
-	constructor(host: UmbControllerHost) {
-		this.#host = host;
-	}
+	#itemRequestManager = new UmbManagementApiPartialViewItemDataRequestManager(this);
 
 	/**
 	 * Fetches the items for the given uniques from the server
@@ -40,12 +33,7 @@ export class UmbPartialViewItemServerDataSource implements UmbItemDataSource<Umb
 			})
 			.filter((x) => x !== null) as string[];
 
-		const { data, error } = await tryExecuteAndNotify(
-			this.#host,
-			PartialViewService.getItemPartialView({
-				path: paths,
-			}),
-		);
+		const { data, error } = await this.#itemRequestManager.getItems(paths);
 
 		if (data) {
 			const items: Array<UmbPartialViewItemModel> = data.map((item) => {

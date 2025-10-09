@@ -13,6 +13,18 @@ public class UniqueMediaPathScheme : IMediaPathScheme
     /// <inheritdoc />
     public string GetFilePath(MediaFileManager fileManager, Guid itemGuid, Guid propertyGuid, string filename)
     {
+        // Shortening of the Guid to 8 chars risks collisions with GUIDs, which are expected to be very rare.
+        // However with GUID 7, the chance is much higher, as those created in a short period of time could have
+        // the same first 8 characters.
+        // Such GUIDs would have been created via Guid.CreateVersion7() rather than Guid.NewGuid().
+        // We should detect that, throw, and recommend creation of standard GUIDs or the use of a custom IMediaPathScheme instead.
+        if (itemGuid.Version == 7 || propertyGuid.Version == 7)
+        {
+            throw new ArgumentException(
+                "The UniqueMediaPathScheme cannot be used with version 7 GUIDs due to an increased risk of collisions in the generated file paths. " +
+                "Please use version 4 GUIDs created via Guid.NewGuid() or implement and register a different IMediaPathScheme.");
+        }
+
         Guid combinedGuid = GuidUtils.Combine(itemGuid, propertyGuid);
         var directory = GuidUtils.ToBase32String(combinedGuid, DirectoryLength);
 

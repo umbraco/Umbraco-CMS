@@ -1,9 +1,12 @@
 import type { TemporaryFileConfigurationResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
+// TODO: Rename this to `UmbTemporaryFileStatus` in a future version.
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export enum TemporaryFileStatus {
 	SUCCESS = 'success',
 	WAITING = 'waiting',
 	ERROR = 'error',
+	CANCELLED = 'cancelled',
 }
 
 export interface UmbTemporaryFileModel {
@@ -11,7 +14,15 @@ export interface UmbTemporaryFileModel {
 	temporaryUnique: string;
 	status?: TemporaryFileStatus;
 	onProgress?: (progress: number) => void;
+	/**
+	 * The abort signal used to cancel the upload.
+	 * @deprecated Use {@link abortController} instead.
+	 */
 	abortSignal?: AbortSignal;
+	/**
+	 * The abort controller used to cancel the upload.
+	 */
+	abortController?: AbortController;
 }
 
 export type UmbQueueHandlerCallback<TItem extends UmbTemporaryFileModel> = (item: TItem) => Promise<void>;

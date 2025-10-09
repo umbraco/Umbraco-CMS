@@ -7,11 +7,12 @@ import type {
 	UmbTreeChildrenOfRequestArgs,
 	UmbTreeRootItemsRequestArgs,
 } from './types.js';
-import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
-import type { ProblemDetails } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbRepositoryBase, type UmbRepositoryResponse } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { of } from '@umbraco-cms/backoffice/external/rxjs';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
 /**
  * Base class for a tree repository.
@@ -48,21 +49,38 @@ export abstract class UmbTreeRepositoryBase<
 	/**
 	 * Creates an instance of UmbTreeRepositoryBase.
 	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
-	 * @param {UmbTreeDataSourceConstructor<TreeItemType>} treeSourceConstructor
-	 * @param {(string | UmbContextToken<any, any>)} treeStoreContextAlias
+	 * @param {UmbTreeDataSourceConstructor<TreeItemType>} treeSourceConstructor - The constructor for the tree data source
+	 * @param {(string | UmbContextToken<any, any> | undefined)} treeStoreContextAlias - The context alias for the tree store, if any
 	 * @memberof UmbTreeRepositoryBase
 	 */
 	constructor(
 		host: UmbControllerHost,
 		treeSourceConstructor: UmbTreeDataSourceConstructor<TreeItemType>,
-		treeStoreContextAlias: string | UmbContextToken<any, any>,
+		treeStoreContextAlias?: string | UmbContextToken<any, any>,
 	) {
 		super(host);
 		this._treeSource = new treeSourceConstructor(this);
 
-		this._init = this.consumeContext(treeStoreContextAlias, (instance) => {
-			this._treeStore = instance;
-		}).asPromise();
+		if (treeStoreContextAlias) {
+			if (false === treeStoreContextAlias.toString().startsWith('Umb')) {
+				new UmbDeprecation({
+					deprecated: `TreeRepository "${this.constructor.name}" is using a tree store context with alias "${treeStoreContextAlias.toString()}".`,
+					removeInVersion: '18.0.0',
+					solution:
+						'You do not need to supply a tree store context alias, as the tree repository will be queried each time it is needed.',
+				}).warn();
+			}
+
+			// TODO: Remember to remove this in Umbraco 18, as the tree store will not be available in the repository anymore.
+			this._init = this.consumeContext(treeStoreContextAlias, (instance) => {
+				this._treeStore = instance;
+			})
+				.asPromise({ preventTimeout: true })
+				// Ignore the error, we can assume that the flow was stopped (asPromise failed), but it does not mean that the consumption was not successful.
+				.catch(() => undefined);
+		} else {
+			this._init = Promise.resolve();
+		}
 	}
 
 	/**
@@ -70,7 +88,7 @@ export abstract class UmbTreeRepositoryBase<
 	 * @returns {*}
 	 * @memberof UmbTreeRepositoryBase
 	 */
-	abstract requestTreeRoot(): Promise<{ data?: TreeRootType; error?: ProblemDetails }>;
+	abstract requestTreeRoot(): Promise<UmbRepositoryResponse<TreeRootType>>;
 
 	/**
 	 * Requests root items of a tree
@@ -81,13 +99,23 @@ export abstract class UmbTreeRepositoryBase<
 	async requestTreeRootItems(args: TreeRootItemsRequestArgsType) {
 		await this._init;
 
-		const { data, error: _error } = await this._treeSource.getRootItems(args);
-		const error: any = _error;
-		if (data) {
-			this._treeStore!.appendItems(data.items);
+		const { data, error } = await this._treeSource.getRootItems(args);
+
+		if (!this._treeStore) {
+			// If the tree store is not available, then we most likely are in a destructed setting.
+			return {
+				data,
+				error,
+				// Return an observable that does not emit any items, since the store is not available
+				asObservable: () => undefined,
+			};
 		}
 
-		return { data, error, asObservable: () => this._treeStore!.rootItems };
+		if (data) {
+			this._treeStore.appendItems(data.items);
+		}
+
+		return { data, error, asObservable: () => this._treeStore?.rootItems };
 	}
 
 	/**
@@ -103,13 +131,23 @@ export abstract class UmbTreeRepositoryBase<
 		if (args.parent.entityType === null) throw new Error('Parent entity type is missing');
 		await this._init;
 
-		const { data, error: _error } = await this._treeSource.getChildrenOf(args);
-		const error: any = _error;
-		if (data) {
-			this._treeStore!.appendItems(data.items);
+		const { data, error } = await this._treeSource.getChildrenOf(args);
+
+		if (!this._treeStore) {
+			// If the tree store is not available, then we most likely are in a destructed setting.
+			return {
+				data,
+				error,
+				// Return an observable that does not emit any items, since the store is not available
+				asObservable: () => undefined,
+			};
 		}
 
-		return { data, error, asObservable: () => this._treeStore!.childrenOf(args.parent.unique) };
+		if (data) {
+			this._treeStore.appendItems(data.items);
+		}
+
+		return { data, error, asObservable: () => this._treeStore?.childrenOf(args.parent.unique) };
 	}
 
 	/**
@@ -122,20 +160,23 @@ export abstract class UmbTreeRepositoryBase<
 		if (args.treeItem.unique === undefined) throw new Error('Descendant unique is missing');
 		await this._init;
 
-		const { data, error: _error } = await this._treeSource.getAncestorsOf(args);
-		const error: any = _error;
+		const { data, error } = await this._treeSource.getAncestorsOf(args);
+
 		// TODO: implement observable for ancestor items in the store
-		return { data, error };
+		// TODO: Fix the type of error, it should be UmbApiError, but currently it is any.
+		return { data, error: error as any };
 	}
 
 	/**
 	 * Returns a promise with an observable of tree root items
 	 * @returns {*}
 	 * @memberof UmbTreeRepositoryBase
+	 * @deprecated Use `requestTreeRootItems` instead. This method requires the tree store to be available, which is not always the case. It will be removed in Umbraco 18.
 	 */
 	async rootTreeItems() {
 		await this._init;
-		return this._treeStore!.rootItems;
+
+		return this._treeStore?.rootItems ?? of([]);
 	}
 
 	/**
@@ -143,10 +184,12 @@ export abstract class UmbTreeRepositoryBase<
 	 * @param {(string | null)} parentUnique
 	 * @returns {*}
 	 * @memberof UmbTreeRepositoryBase
+	 * @deprecated Use `requestTreeItemsOf` instead. This method requires the tree store to be available, which is not always the case. It will be removed in Umbraco 18.
 	 */
 	async treeItemsOf(parentUnique: string | null) {
 		if (parentUnique === undefined) throw new Error('Parent unique is missing');
 		await this._init;
-		return this._treeStore!.childrenOf(parentUnique);
+
+		return this._treeStore?.childrenOf(parentUnique) ?? of([]);
 	}
 }

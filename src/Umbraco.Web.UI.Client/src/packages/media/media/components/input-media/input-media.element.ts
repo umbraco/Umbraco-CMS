@@ -10,15 +10,18 @@ import {
 	repeat,
 	state,
 } from '@umbraco-cms/backoffice/external/lit';
+import { jsonStringComparison } from '@umbraco-cms/backoffice/observable-api';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { UmbInteractionMemoriesChangeEvent } from '@umbraco-cms/backoffice/interaction-memory';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbSorterController, UmbSorterResolvePlacementAsGrid } from '@umbraco-cms/backoffice/sorter';
-import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
-import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/media-type';
+import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
+import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
+import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 
 import '@umbraco-cms/backoffice/imaging';
 
@@ -61,10 +64,10 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 	 */
 	@property({ type: Number })
 	public set min(value: number) {
-		this.#pickerContext.min = value;
+		this.#pickerInputContext.min = value;
 	}
 	public get min(): number {
-		return this.#pickerContext.min;
+		return this.#pickerInputContext.min;
 	}
 
 	/**
@@ -84,10 +87,10 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 	 */
 	@property({ type: Number })
 	public set max(value: number) {
-		this.#pickerContext.max = value;
+		this.#pickerInputContext.max = value;
 	}
 	public get max(): number {
-		return this.#pickerContext.max;
+		return this.#pickerInputContext.max;
 	}
 
 	/**
@@ -100,15 +103,18 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 	maxMessage = 'This field exceeds the allowed amount of items';
 
 	public set selection(ids: Array<string>) {
-		this.#pickerContext.setSelection(ids);
+		this.#pickerInputContext.setSelection(ids);
 		this.#sorter.setModel(ids);
 	}
 	public get selection(): Array<string> {
-		return this.#pickerContext.getSelection();
+		return this.#pickerInputContext.getSelection();
 	}
 
 	@property({ type: Array })
 	allowedContentTypeIds?: Array<string> | undefined;
+
+	@property({ type: Boolean, attribute: 'include-trashed' })
+	includeTrashed = false;
 
 	@property({ type: Object, attribute: false })
 	startNode?: UmbTreeStartNode;
@@ -116,6 +122,7 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 	@property({ type: String })
 	public override set value(selectionString: string | undefined) {
 		this.selection = splitStringToArray(selectionString);
+		super.value = selectionString; // Call the parent setter to ensure the value change is triggered in the FormControlMixin. [NL]
 	}
 	public override get value(): string | undefined {
 		return this.selection.length > 0 ? this.selection.join(',') : undefined;
@@ -142,13 +149,24 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 	}
 	#readonly = false;
 
+	@property({ type: Array, attribute: false })
+	public get interactionMemories(): Array<UmbInteractionMemoryModel> | undefined {
+		return this.#pickerInputContext.interactionMemory.getAllMemories();
+	}
+	public set interactionMemories(value: Array<UmbInteractionMemoryModel> | undefined) {
+		this.#interactionMemories = value;
+		value?.forEach((memory) => this.#pickerInputContext.interactionMemory.setMemory(memory));
+	}
+
+	#interactionMemories?: Array<UmbInteractionMemoryModel> = [];
+
 	@state()
 	private _editMediaPath = '';
 
 	@state()
 	private _cards: Array<UmbMediaCardItemModel> = [];
 
-	#pickerContext = new UmbMediaPickerInputContext(this);
+	#pickerInputContext = new UmbMediaPickerInputContext(this);
 
 	constructor() {
 		super();
@@ -162,14 +180,28 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 				this._editMediaPath = routeBuilder({});
 			});
 
-		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')));
+		this.observe(this.#pickerInputContext.selection, (selection) => (this.value = selection.join(',')));
 
-		this.observe(this.#pickerContext.selectedItems, async (selectedItems) => {
+		this.observe(this.#pickerInputContext.selectedItems, async (selectedItems) => {
 			const missingCards = selectedItems.filter((item) => !this._cards.find((card) => card.unique === item.unique));
 			if (selectedItems?.length && !missingCards.length) return;
 
 			this._cards = selectedItems ?? [];
 		});
+
+		this.observe(
+			this.#pickerInputContext.interactionMemory.memories,
+			(memories) => {
+				// only dispatch the event if the interaction memories have actually changed
+				const isIdentical = jsonStringComparison(memories, this.#interactionMemories);
+
+				if (!isIdentical) {
+					this.#interactionMemories = memories;
+					this.dispatchEvent(new UmbInteractionMemoriesChangeEvent());
+				}
+			},
+			'_observeMemories',
+		);
 
 		this.addValidator(
 			'rangeUnderflow',
@@ -184,7 +216,7 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 	}
 
 	#openPicker() {
-		this.#pickerContext.openPicker(
+		this.#pickerInputContext.openPicker(
 			{
 				multiple: this.max > 1,
 				startNode: this.startNode,
@@ -194,12 +226,13 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 					unique: id,
 					entityType: UMB_MEDIA_TYPE_ENTITY_TYPE,
 				})),
+				includeTrashed: this.includeTrashed,
 			},
 		);
 	}
 
 	async #onRemove(item: UmbMediaCardItemModel) {
-		await this.#pickerContext.requestRemoveItem(item.unique);
+		await this.#pickerInputContext.requestRemoveItem(item.unique);
 		this._cards = this._cards.filter((x) => x.unique !== item.unique);
 	}
 
@@ -281,9 +314,9 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 			}
 			.container {
 				display: grid;
-				grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-				grid-auto-rows: 150px;
-				gap: var(--uui-size-space-5);
+				gap: var(--uui-size-space-3);
+				grid-template-columns: repeat(auto-fill, minmax(var(--umb-card-medium-min-width), 1fr));
+				grid-auto-rows: var(--umb-card-medium-min-width);
 			}
 
 			#btn-add {

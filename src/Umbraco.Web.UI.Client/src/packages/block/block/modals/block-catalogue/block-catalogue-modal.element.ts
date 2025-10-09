@@ -1,27 +1,44 @@
 import { UMB_BLOCK_WORKSPACE_MODAL } from '../../workspace/index.js';
-import type { UmbBlockTypeGroup, UmbBlockTypeWithGroupKey } from '@umbraco-cms/backoffice/block-type';
+import { UMB_BLOCK_MANAGER_CONTEXT } from '../../context/index.js';
+import type { UmbBlockCatalogueModalData, UmbBlockCatalogueModalValue } from './block-catalogue-modal.token.js';
 import {
-	UMB_BLOCK_MANAGER_CONTEXT,
-	type UmbBlockCatalogueModalData,
-	type UmbBlockCatalogueModalValue,
-} from '@umbraco-cms/backoffice/block';
-import { css, html, customElement, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
-import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import { UMB_MODAL_CONTEXT, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+	css,
+	customElement,
+	html,
+	ifDefined,
+	nothing,
+	repeat,
+	state,
+	when,
+} from '@umbraco-cms/backoffice/external/lit';
+import { transformServerPathToClientPath } from '@umbraco-cms/backoffice/utils';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
-
-// TODO: This is across packages, how should we go about getting just a single element from another package? like here we just need the umb-block-type-card element
-import '@umbraco-cms/backoffice/block-type';
+import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
+import { UMB_DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS } from '@umbraco-cms/backoffice/document-type';
+import { UMB_MODAL_CONTEXT, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
+import type { UmbBlockTypeGroup, UmbBlockTypeWithGroupKey } from '@umbraco-cms/backoffice/block-type';
+import type { UmbDocumentTypeItemModel } from '@umbraco-cms/backoffice/document-type';
 import type { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
+import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+
+type UmbBlockTypeItemWithGroupKey = UmbBlockTypeWithGroupKey & UmbDocumentTypeItemModel;
 
 @customElement('umb-block-catalogue-modal')
 export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 	UmbBlockCatalogueModalData,
 	UmbBlockCatalogueModalValue
 > {
+	readonly #itemManager = new UmbRepositoryItemsManager<UmbDocumentTypeItemModel>(
+		this,
+		UMB_DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS,
+	);
+
 	#search = '';
 
-	private _groupedBlocks: Array<{ name?: string; blocks: Array<UmbBlockTypeWithGroupKey> }> = [];
+	#serverUrl = '';
+
+	private _groupedBlocks: Array<{ name?: string; blocks: Array<UmbBlockTypeItemWithGroupKey> }> = [];
 
 	@state()
 	private _openClipboard?: boolean;
@@ -30,16 +47,23 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 	private _workspacePath?: string;
 
 	@state()
-	private _filtered: Array<{ name?: string; blocks: Array<UmbBlockTypeWithGroupKey> }> = [];
+	private _filtered: Array<{ name?: string; blocks: Array<UmbBlockTypeItemWithGroupKey> }> = [];
 
 	@state()
-	_manager?: typeof UMB_BLOCK_MANAGER_CONTEXT.TYPE;
+	private _manager?: typeof UMB_BLOCK_MANAGER_CONTEXT.TYPE;
+
+	@state()
+	private _loading = true;
 
 	constructor() {
 		super();
 
+		this.consumeContext(UMB_SERVER_CONTEXT, (instance) => {
+			this.#serverUrl = instance?.getServerUrl() ?? '';
+		});
+
 		this.consumeContext(UMB_MODAL_CONTEXT, (modalContext) => {
-			if (modalContext.data.createBlockInWorkspace) {
+			if (modalContext?.data.createBlockInWorkspace) {
 				new UmbModalRouteRegistrationController(this, UMB_BLOCK_WORKSPACE_MODAL)
 					//.addAdditionalPath('block') // No need for additional path specification in this context as this is for sure the only workspace we want to open here.
 					.onSetup(() => {
@@ -60,6 +84,10 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 		this.consumeContext(UMB_BLOCK_MANAGER_CONTEXT, (manager) => {
 			this._manager = manager;
 		});
+
+		this.observe(this.#itemManager.items, async (items) => {
+			this.#observeBlockTypes(items);
+		});
 	}
 
 	override connectedCallback() {
@@ -68,17 +96,37 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 
 		this._openClipboard = this.data.openClipboard ?? false;
 
-		const blocks: Array<UmbBlockTypeWithGroupKey> = this.data.blocks ?? [];
-		const blockGroups: Array<UmbBlockTypeGroup> = this.data.blockGroups ?? [];
+		this.#itemManager.setUniques(this.data.blocks.map((block) => block.contentElementTypeKey));
+	}
+
+	#observeBlockTypes(items: Array<UmbDocumentTypeItemModel> | undefined) {
+		if (!items?.length) return;
+
+		const lookup = items.reduce(
+			(acc, item) => {
+				acc[item.unique] = item;
+				return acc;
+			},
+			{} as { [key: string]: UmbDocumentTypeItemModel },
+		);
+
+		const blocks: Array<UmbBlockTypeItemWithGroupKey> =
+			this.data?.blocks?.map((block) => ({ ...(lookup[block.contentElementTypeKey] ?? {}), ...block })) ?? [];
+
+		const blockGroups: Array<UmbBlockTypeGroup> = this.data?.blockGroups ?? [];
 
 		const noGroupBlocks = blocks.filter((block) => !blockGroups.find((group) => group.key === block.groupKey));
+
 		const grouped = blockGroups.map((group) => ({
 			name: group.name,
 			blocks: blocks.filter((block) => block.groupKey === group.key),
 		}));
 
 		this._groupedBlocks = [{ blocks: noGroupBlocks }, ...grouped];
+
 		this.#updateFiltered();
+
+		this._loading = false;
 	}
 
 	#updateFiltered() {
@@ -87,7 +135,15 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 		} else {
 			const search = this.#search.toLowerCase();
 			this._filtered = this._groupedBlocks.map((group) => {
-				return { ...group, blocks: group.blocks.filter((block) => block.label?.toLocaleLowerCase().includes(search)) };
+				return {
+					...group,
+					blocks: group.blocks.filter(
+						(block) =>
+							block.label?.toLowerCase().includes(search) ||
+							block.name?.toLowerCase().includes(search) ||
+							block.description?.toLowerCase().includes(search),
+					),
+				};
 			});
 		}
 	}
@@ -118,7 +174,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 
 	override render() {
 		return html`
-			<umb-body-layout headline="${this.localize.term('blockEditor_addBlock')}">
+			<umb-body-layout headline=${this.localize.term('blockEditor_addBlock')}>
 				${this.#renderViews()}${this.#renderMain()}
 				<div slot="actions">
 					<uui-button label=${this.localize.term('general_close')} @click=${this._rejectModal}></uui-button>
@@ -137,47 +193,70 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 	}
 
 	#renderClipboard() {
-		return html`<uui-box
-			><umb-clipboard-entry-picker
-				.config=${{ multiple: true, asyncFilter: this.data?.clipboardFilter }}
-				@selection-change=${this.#onClipboardPickerSelectionChange}></umb-clipboard-entry-picker
-		></uui-box>`;
+		return html`
+			<uui-box>
+				<umb-clipboard-entry-picker
+					.config=${{ multiple: true, asyncFilter: this.data?.clipboardFilter }}
+					@selection-change=${this.#onClipboardPickerSelectionChange}></umb-clipboard-entry-picker>
+			</uui-box>
+		`;
 	}
 
 	#renderCreateEmpty() {
+		if (this._loading) return html`<div id="loader"><uui-loader></uui-loader></div>`;
 		return html`
-			${this.data?.blocks && this.data.blocks.length > 8
-				? html`<uui-input
+			${when(
+				this.data?.blocks && this.data?.blocks.length > 8,
+				() => html`
+					<uui-input
 						id="search"
 						@input=${this.#onSearch}
 						label=${this.localize.term('general_search')}
 						placeholder=${this.localize.term('placeholders_search')}>
 						<uui-icon name="icon-search" slot="prepend"></uui-icon>
-					</uui-input>`
-				: nothing}
-			${this._filtered.map(
+					</uui-input>
+				`,
+			)}
+			${repeat(
+				this._filtered,
+				(group) => group.name,
 				(group) => html`
-					${group.name && group.blocks.length !== 0 && group.name !== '' ? html`<h4>${group.name}</h4>` : nothing}
+					${when(group.name && group.blocks.length !== 0 && group.name !== '', () => html`<h4>${group.name}</h4>`)}
 					<div class="blockGroup">
 						${repeat(
 							group.blocks,
 							(block) => block.contentElementTypeKey,
-							(block) => html`
-								<umb-block-type-card
-									.iconFile=${block.thumbnail}
-									.iconColor=${block.iconColor}
-									.backgroundColor=${block.backgroundColor}
-									.contentElementTypeKey=${block.contentElementTypeKey}
-									@open=${() => this.#chooseBlock(block.contentElementTypeKey)}
-									.href=${this._workspacePath && this._manager!.getContentTypeHasProperties(block.contentElementTypeKey)
-										? `${this._workspacePath}create/${block.contentElementTypeKey}`
-										: undefined}>
-								</umb-block-type-card>
-							`,
+							(block) => this.#renderBlockTypeCard(block),
 						)}
 					</div>
 				`,
 			)}
+		`;
+	}
+
+	#renderBlockTypeCard(block: UmbBlockTypeItemWithGroupKey) {
+		const href =
+			this._workspacePath && this._manager!.getContentTypeHasProperties(block.contentElementTypeKey)
+				? `${this._workspacePath}create/${block.contentElementTypeKey}`
+				: undefined;
+
+		const path = block.thumbnail ? transformServerPathToClientPath(block.thumbnail) : undefined;
+		const imgSrc = path ? new URL(path, this.#serverUrl)?.href : undefined;
+
+		return html`
+			<uui-card-block-type
+				href=${ifDefined(href)}
+				name=${this.localize.string(block.name)}
+				description=${this.localize.string(block.description)}
+				.background=${block.backgroundColor}
+				@open=${() => this.#chooseBlock(block.contentElementTypeKey)}>
+				${when(
+					imgSrc,
+					(src) => html`<img src=${src} alt="" />`,
+					() => html`<umb-icon name=${block.icon ?? ''} color=${ifDefined(block.iconColor)}></umb-icon>`,
+				)}
+				<slot name="actions" slot="actions"> </slot>
+			</uui-card-block-type>
 		`;
 	}
 
@@ -204,18 +283,25 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 
 	static override styles = [
 		css`
+			#loader {
+				display: flex;
+				justify-content: center;
+			}
+
 			#search {
 				width: 100%;
 				align-items: center;
 				margin-bottom: var(--uui-size-layout-1);
+
+				> uui-icon {
+					padding-left: var(--uui-size-space-3);
+				}
 			}
-			#search uui-icon {
-				padding-left: var(--uui-size-space-3);
-			}
+
 			.blockGroup {
 				display: grid;
 				gap: 1rem;
-				grid-template-columns: repeat(auto-fill, minmax(min(150px, 100%), 1fr));
+				grid-template-columns: repeat(auto-fill, minmax(min(var(--umb-card-medium-min-width), 100%), 1fr));
 			}
 
 			uui-tab-group {

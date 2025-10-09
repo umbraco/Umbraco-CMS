@@ -19,13 +19,13 @@ test('can create a empty script', {tag: '@smoke'}, async ({umbracoApi, umbracoUi
 
   // Act
   await umbracoUi.script.clickActionsMenuAtRoot();
-  await umbracoUi.script.clickCreateButton();
+  await umbracoUi.script.clickCreateOptionsActionMenuOption();
   await umbracoUi.script.clickNewJavascriptFileButton();
   await umbracoUi.script.enterScriptName(scriptName);
   await umbracoUi.script.clickSaveButton();
 
   // Assert
-  await umbracoUi.script.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  await umbracoUi.script.waitForScriptToBeCreated();
   expect(await umbracoApi.script.doesNameExist(scriptName)).toBeTruthy();
   await umbracoUi.script.isScriptRootTreeItemVisible(scriptName);
 });
@@ -37,14 +37,14 @@ test('can create a script with content', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.script.clickActionsMenuAtRoot();
-  await umbracoUi.script.clickCreateButton();
+  await umbracoUi.script.clickCreateOptionsActionMenuOption();
   await umbracoUi.script.clickNewJavascriptFileButton();
   await umbracoUi.script.enterScriptName(scriptName);
   await umbracoUi.script.enterScriptContent(scriptContent);
   await umbracoUi.script.clickSaveButton();
 
   // Assert
-  await umbracoUi.script.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  await umbracoUi.script.waitForScriptToBeCreated();
   expect(await umbracoApi.script.doesNameExist(scriptName)).toBeTruthy();
   const scriptData = await umbracoApi.script.getByName(scriptName);
   expect(scriptData.content).toBe(scriptContent);
@@ -63,7 +63,7 @@ test('can update a script', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => 
   await umbracoUi.script.clickSaveButton();
 
   // Assert
-  await umbracoUi.script.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.script.isSuccessStateVisibleForSaveButton();
   const updatedScript = await umbracoApi.script.get(scriptPath);
   expect(updatedScript.content).toBe(updatedScriptContent);
 });
@@ -79,7 +79,7 @@ test('can delete a script', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => 
   await umbracoUi.script.clickDeleteAndConfirmButton();
 
   // Assert
-  await umbracoUi.script.doesSuccessNotificationHaveText(NotificationConstantHelper.success.deleted);
+  await umbracoUi.script.waitForScriptToBeDeleted();
   expect(await umbracoApi.script.doesNameExist(scriptName)).toBeFalsy();
   await umbracoUi.script.isScriptRootTreeItemVisible(scriptName, false, false);
 });
@@ -96,23 +96,22 @@ test('can rename a script', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.script.rename(scriptName);
 
   // Assert
-  await umbracoUi.script.doesSuccessNotificationHaveText(NotificationConstantHelper.success.renamed);
+  await umbracoUi.script.waitForScriptToBeRenamed();
   expect(await umbracoApi.script.doesNameExist(scriptName)).toBeTruthy();
   expect(await umbracoApi.script.doesNameExist(wrongScriptName)).toBeFalsy();
 });
 
-test('cannot create a script with an empty name', async ({umbracoApi, umbracoUi}) => {
+test('cannot create a script with an empty name', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoUi.script.goToSection(ConstantHelper.sections.settings);
 
   // Act
   await umbracoUi.script.clickActionsMenuAtRoot();
-  await umbracoUi.script.clickCreateButton();
+  await umbracoUi.script.clickCreateOptionsActionMenuOption();
   await umbracoUi.script.clickNewJavascriptFileButton();
   await umbracoUi.script.clickSaveButton();
 
   // Assert
-  // TODO: Uncomment this when the front-end is ready. Currently there is no error displays.
-  //await umbracoUi.script.isErrorNotificationVisible();
+  await umbracoUi.script.isFailedStateButtonVisible();
   expect(await umbracoApi.script.doesNameExist(scriptName)).toBeFalsy();
 });

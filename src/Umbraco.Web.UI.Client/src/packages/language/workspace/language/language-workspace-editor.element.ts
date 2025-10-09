@@ -5,17 +5,14 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 @customElement('umb-language-workspace-editor')
 export class UmbLanguageWorkspaceEditorElement extends UmbLitElement {
-	#workspaceContext?: typeof UMB_LANGUAGE_WORKSPACE_CONTEXT.TYPE;
-
 	@state()
-	_isNew?: boolean;
+	private _isNew?: boolean;
 
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_LANGUAGE_WORKSPACE_CONTEXT, (context) => {
-			this.#workspaceContext = context;
-			this.observe(this.#workspaceContext.isNew, (isNew) => (this._isNew = isNew));
+			this.observe(context?.isNew, (isNew) => (this._isNew = isNew));
 		});
 	}
 

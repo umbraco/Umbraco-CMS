@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Events;
@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Persistence.EFCore.Scoping;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class EFCoreScopeInfrastructureScopeLockTests : UmbracoIntegrationTest
+internal sealed class EFCoreScopeInfrastructureScopeLockTests : UmbracoIntegrationTest
 {
     private IEFCoreScopeProvider<TestUmbracoDbContext> EfCoreScopeProvider =>
         GetRequiredService<IEFCoreScopeProvider<TestUmbracoDbContext>>();

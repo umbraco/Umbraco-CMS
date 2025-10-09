@@ -183,7 +183,7 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
     /// <summary>
     ///     used to persist a user group with associated users at once
     /// </summary>
-    private class UserGroupWithUsers : EntityBase
+    private sealed class UserGroupWithUsers : EntityBase
     {
         public UserGroupWithUsers(IUserGroup userGroup, int[]? userIds)
         {
@@ -201,7 +201,7 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
     /// <summary>
     ///     used to persist a user group with associated users at once
     /// </summary>
-    private class UserGroupWithUsersRepository : EntityRepositoryBase<int, UserGroupWithUsers>
+    private sealed class UserGroupWithUsersRepository : EntityRepositoryBase<int, UserGroupWithUsers>
     {
         private readonly UserGroupRepository _userGroupRepo;
 
@@ -446,7 +446,6 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
             "DELETE FROM umbracoUser2UserGroup WHERE userGroupId = @id",
             "DELETE FROM umbracoUserGroup2App WHERE userGroupId = @id",
             "DELETE FROM umbracoUserGroup2Permission WHERE userGroupKey IN (SELECT [umbracoUserGroup].[Key] FROM umbracoUserGroup WHERE Id = @id)",
-            "DELETE FROM umbracoUserGroup2GranularPermission WHERE userGroupKey IN (SELECT [umbracoUserGroup].[Key] FROM umbracoUserGroup WHERE Id = @id)",
             "DELETE FROM umbracoUserGroup2GranularPermission WHERE userGroupKey IN (SELECT [umbracoUserGroup].[Key] FROM umbracoUserGroup WHERE Id = @id)",
             "DELETE FROM umbracoUserGroup WHERE id = @id",
         };

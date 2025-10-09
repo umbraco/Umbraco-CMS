@@ -16,6 +16,13 @@ export const UmbWorkspaceIsNewRedirectControllerAlias = Symbol('IsNewRedirectCon
  * @param router
  */
 export class UmbWorkspaceIsNewRedirectController extends UmbControllerBase {
+	/**
+	 * TODO: Figure out why we need this timeout. [NL]
+	 * The problem this fixes it when save & publishing a document open in a modal, like from a collection.
+	 * The redirect triggers something that ends up re-setting the path, making the modal path the one in the browser despite the modal is closed.
+	 */
+	timeout: any | undefined;
+
 	constructor(
 		host: UmbControllerHost,
 		workspaceContext: UmbSubmittableWorkspaceContextBase<unknown>,
@@ -25,21 +32,45 @@ export class UmbWorkspaceIsNewRedirectController extends UmbControllerBase {
 
 		// Navigate to edit route when language is created:
 		this.observe(workspaceContext.isNew, (isNew) => {
+			if (this.timeout) {
+				clearTimeout(this.timeout);
+			}
 			if (isNew === false) {
-				const unique = workspaceContext.getUnique();
-				if (router && unique) {
-					const routerPath = router.absoluteRouterPath;
-					if (routerPath) {
-						const newPath: string = umbUrlPatternToString(ensurePathEndsWithSlash(routerPath) + 'edit/:id', {
-							id: unique,
-						});
-						this.destroy();
-						window.history.replaceState(null, '', newPath);
+				this.timeout = setTimeout(() => {
+					const unique = workspaceContext.getUnique();
+					if (router && unique) {
+						const routerPath = router.absoluteRouterPath;
+						if (routerPath) {
+							const newPath: string = umbUrlPatternToString(ensurePathEndsWithSlash(routerPath) + 'edit/:id', {
+								id: unique,
+							});
+							this.destroy();
+							// get current url:
+							const currentUrl = window.location.href;
+							if (
+								router.localActiveViewPath === undefined ||
+								router.localActiveViewPath === '' ||
+								!currentUrl.includes(router.localActiveViewPath)
+							) {
+								return;
+							}
+							// Check that we are still part of the DOM and thereby relevant:
+							window.history.replaceState(null, '', newPath);
+						}
 					}
-				}
+					this.timeout = undefined;
+				}, 500);
 			}
 		});
 
 		// TODO: If workspace route changes cause of other reasons then this controller should be destroyed.
+	}
+
+	override destroy() {
+		super.destroy();
+		if (this.timeout) {
+			clearTimeout(this.timeout);
+			this.timeout = undefined;
+		}
 	}
 }

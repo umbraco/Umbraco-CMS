@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
@@ -20,4 +21,12 @@ public class UserLoginRequiresVerificationWebhookEvent : WebhookEventBase<UserLo
 
     public override string Alias => Constants.WebhookEvents.Aliases.UserLoginRequiresVerification;
 
+    public override object? ConvertNotificationToRequestPayload(UserLoginRequiresVerificationNotification notification)
+        => new DefaultPayloadModel
+        {
+            Id = notification.AffectedUserId is not null &&
+                 Guid.TryParse(notification.AffectedUserId, out Guid affectedUserGuid)
+                ? affectedUserGuid
+                : Guid.Empty,
+        };
 }

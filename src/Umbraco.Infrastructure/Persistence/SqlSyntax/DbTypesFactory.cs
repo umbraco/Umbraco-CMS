@@ -2,7 +2,7 @@ using System.Data;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 
-internal class DbTypesFactory
+internal sealed class DbTypesFactory
 {
     private readonly Dictionary<Type, DbType> _columnDbTypeMap = new();
     private readonly Dictionary<Type, string> _columnTypeMap = new();

@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class PublicAccessRepositoryTest : UmbracoIntegrationTest
+internal sealed class PublicAccessRepositoryTest : UmbracoIntegrationTest
 {
     private IContentTypeRepository ContentTypeRepository => GetRequiredService<IContentTypeRepository>();
 

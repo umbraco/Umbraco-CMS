@@ -41,9 +41,7 @@ export class UmbMediaTypeTreeServerDataSource extends UmbTreeServerDataSourceBas
 const getRootItems = (args: UmbTreeRootItemsRequestArgs) =>
 	// eslint-disable-next-line local-rules/no-direct-api-import
 	MediaTypeService.getTreeMediaTypeRoot({
-		foldersOnly: args.foldersOnly,
-		skip: args.skip,
-		take: args.take,
+		query: { foldersOnly: args.foldersOnly, skip: args.skip, take: args.take },
 	});
 
 const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
@@ -52,10 +50,7 @@ const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		return MediaTypeService.getTreeMediaTypeChildren({
-			parentId: args.parent.unique,
-			foldersOnly: args.foldersOnly,
-			skip: args.skip,
-			take: args.take,
+			query: { parentId: args.parent.unique, foldersOnly: args.foldersOnly, skip: args.skip, take: args.take },
 		});
 	}
 };
@@ -63,7 +58,7 @@ const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) =>
 	// eslint-disable-next-line local-rules/no-direct-api-import
 	MediaTypeService.getTreeMediaTypeAncestors({
-		descendantId: args.treeItem.unique,
+		query: { descendantId: args.treeItem.unique },
 	});
 
 const mapper = (item: MediaTypeTreeItemResponseModel): UmbMediaTypeTreeItemModel => {

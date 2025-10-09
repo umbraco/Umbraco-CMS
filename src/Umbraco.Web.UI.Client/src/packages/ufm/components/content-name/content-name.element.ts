@@ -6,9 +6,7 @@ import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbMediaItemRepository, UMB_MEDIA_ENTITY_TYPE } from '@umbraco-cms/backoffice/media';
 import { UmbMemberItemRepository, UMB_MEMBER_ENTITY_TYPE } from '@umbraco-cms/backoffice/member';
 
-const elementName = 'ufm-content-name';
-
-@customElement(elementName)
+@customElement('ufm-content-name')
 export class UmbUfmContentNameElement extends UmbUfmElementBase {
 	@property()
 	alias?: string;
@@ -22,7 +20,7 @@ export class UmbUfmContentNameElement extends UmbUfmElementBase {
 
 		this.consumeContext(UMB_UFM_RENDER_CONTEXT, (context) => {
 			this.observe(
-				context.value,
+				context?.value,
 				async (value) => {
 					const temp =
 						this.alias && typeof value === 'object'
@@ -95,6 +93,6 @@ export { UmbUfmContentNameElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbUfmContentNameElement;
+		'ufm-content-name': UmbUfmContentNameElement;
 	}
 }

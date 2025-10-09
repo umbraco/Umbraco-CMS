@@ -54,6 +54,7 @@ export class UmbCreatedPackagesSectionViewElement extends UmbLitElement implemen
 
 		routes.push({
 			path: '',
+			pathMatch: 'full',
 			redirectTo: 'overview',
 		});
 		routes.push({

@@ -3,7 +3,7 @@ using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
-public partial class DocumentNavigationServiceTests
+internal sealed partial class DocumentNavigationServiceTests
 {
     [Test]
     [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF")] // Root

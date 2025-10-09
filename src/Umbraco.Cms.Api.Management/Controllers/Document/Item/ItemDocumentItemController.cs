@@ -1,6 +1,7 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Item;
 using Umbraco.Cms.Core.Models;
@@ -15,7 +16,10 @@ public class ItemDocumentItemController : DocumentItemControllerBase
     private readonly IEntityService _entityService;
     private readonly IDocumentPresentationFactory _documentPresentationFactory;
 
-    public ItemDocumentItemController(IEntityService entityService, IDocumentPresentationFactory documentPresentationFactory)
+    [ActivatorUtilitiesConstructor]
+    public ItemDocumentItemController(
+        IEntityService entityService,
+        IDocumentPresentationFactory documentPresentationFactory)
     {
         _entityService = entityService;
         _documentPresentationFactory = documentPresentationFactory;
@@ -37,7 +41,7 @@ public class ItemDocumentItemController : DocumentItemControllerBase
             .GetAll(UmbracoObjectTypes.Document, ids.ToArray())
             .OfType<IDocumentEntitySlim>();
 
-        IEnumerable<DocumentItemResponseModel> documentItemResponseModels = documents.Select(_documentPresentationFactory.CreateItemResponseModel);
-        return await Task.FromResult(Ok(documentItemResponseModels));
+        IEnumerable<DocumentItemResponseModel> responseModels = documents.Select(_documentPresentationFactory.CreateItemResponseModel);
+        return Ok(responseModels);
     }
 }

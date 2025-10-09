@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(Constants.DatabaseSchema.Tables.Server)]
 [PrimaryKey("id")]
 [ExplicitColumns]
-internal class ServerRegistrationDto
+internal sealed class ServerRegistrationDto
 {
     [Column("id")]
     [PrimaryKeyColumn(AutoIncrement = true)]
@@ -23,11 +23,11 @@ internal class ServerRegistrationDto
     [Index(IndexTypes.UniqueNonClustered, Name = "IX_computerName")] // server identity is unique
     public string? ServerIdentity { get; set; }
 
-    [Column("registeredDate")]
+    [Column("registeredDate", ForceToUtc = false)]
     [Constraint(Default = SystemMethods.CurrentDateTime)]
     public DateTime DateRegistered { get; set; }
 
-    [Column("lastNotifiedDate")]
+    [Column("lastNotifiedDate", ForceToUtc = false)]
     public DateTime DateAccessed { get; set; }
 
     [Column("isActive")]

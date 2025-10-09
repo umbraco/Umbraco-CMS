@@ -6,7 +6,7 @@ import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 @customElement('umb-routable-workspace')
 export class UmbRoutableWorkspaceElement extends UmbLitElement {
 	@state()
-	_routes: UmbRoute[] = [];
+	private _routes: UmbRoute[] = [];
 
 	public set api(api: UmbRoutableWorkspaceContext) {
 		this.observe(api.routes.routes, (routes) => (this._routes = routes));

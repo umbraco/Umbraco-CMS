@@ -175,7 +175,7 @@ public class HttpContextRequestAppCache : FastDictionaryAppCacheBase, IRequestCa
     /// <summary>
     ///     Used as Scoped instance to allow locking within a request
     /// </summary>
-    private class RequestLock
+    private sealed class RequestLock
     {
         public object SyncRoot { get; } = new();
     }

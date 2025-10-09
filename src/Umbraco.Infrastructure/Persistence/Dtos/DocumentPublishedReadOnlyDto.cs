@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(Constants.DatabaseSchema.Tables.Document)]
 [PrimaryKey("versionId", AutoIncrement = false)]
 [ExplicitColumns]
-internal class DocumentPublishedReadOnlyDto
+internal sealed class DocumentPublishedReadOnlyDto
 {
     [Column("nodeId")]
     public int NodeId { get; set; }
@@ -20,6 +20,6 @@ internal class DocumentPublishedReadOnlyDto
     [Column("newest")]
     public bool Newest { get; set; }
 
-    [Column("updateDate")]
+    [Column("updateDate", ForceToUtc = false)]
     public DateTime VersionDate { get; set; }
 }

@@ -17,10 +17,10 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 	}
 
 	@state()
-	private _logLevelCount: LogLevelCountsReponseModel | null = null;
+	private _logLevelCountResponse: LogLevelCountsReponseModel | null = null;
 
 	@state()
-	private logLevelCount: [string, number][] = [];
+	private _logLevelCount: [string, number][] = [];
 
 	@state()
 	private _logLevelCountFilter: string[] = [];
@@ -41,15 +41,15 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 	}
 
 	setLogLevelCount() {
-		this.logLevelCount = this._logLevelCount
-			? Object.entries(this._logLevelCount).filter(([level]) => !this._logLevelCountFilter.includes(level))
+		this._logLevelCount = this._logLevelCountResponse
+			? Object.entries(this._logLevelCountResponse).filter(([level]) => !this._logLevelCountFilter.includes(level))
 			: [];
 	}
 
 	#observeStuff() {
 		if (!this.#logViewerContext) return;
 		this.observe(this.#logViewerContext.logCount, (logLevel) => {
-			this._logLevelCount = logLevel ?? null;
+			this._logLevelCountResponse = logLevel ?? null;
 			this.setLogLevelCount();
 		});
 	}
@@ -61,8 +61,8 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 				<div id="log-types-container">
 					<div id="legend">
 						<ul>
-							${this._logLevelCount
-								? Object.keys(this._logLevelCount).map(
+							${this._logLevelCountResponse
+								? Object.keys(this._logLevelCountResponse).map(
 										(level) =>
 											html`<li>
 												<button
@@ -81,8 +81,8 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 						</ul>
 					</div>
 					<umb-donut-chart .description=${'In chosen date range you have this number of log message of type:'}>
-						${this._logLevelCount
-							? this.logLevelCount.map(
+						${this._logLevelCountResponse
+							? this._logLevelCount.map(
 									([level, number]) =>
 										html`<umb-donut-slice
 											.name=${level}
@@ -125,7 +125,8 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 			#chart {
 				width: 150px;
 				aspect-ratio: 1;
-				background: radial-gradient(white 40%, transparent 41%),
+				background:
+					radial-gradient(white 40%, transparent 41%),
 					conic-gradient(
 						var(--umb-log-viewer-debug-color) 0% 20%,
 						var(--umb-log-viewer-information-color) 20% 40%,

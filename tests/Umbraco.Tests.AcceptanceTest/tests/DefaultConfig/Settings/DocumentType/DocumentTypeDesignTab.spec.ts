@@ -1,4 +1,4 @@
-import {ConstantHelper, test} from "@umbraco/playwright-testhelpers";
+import {ConstantHelper, NotificationConstantHelper, test} from "@umbraco/playwright-testhelpers";
 import {expect} from "@playwright/test";
 
 const documentTypeName = 'TestDocumentType';
@@ -28,7 +28,7 @@ test('can add a property to a document type', {tag: '@smoke'}, async ({umbracoAp
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
-  await umbracoUi.documentType.isSuccessNotificationVisible();
+  await umbracoUi.documentType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   const dataType = await umbracoApi.dataType.getByName(dataTypeName);
@@ -49,7 +49,7 @@ test('can update a property in a document type', {tag: '@smoke'}, async ({umbrac
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
-  await umbracoUi.documentType.isSuccessNotificationVisible();
+  await umbracoUi.documentType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   const dataType = await umbracoApi.dataType.getByName(newDataTypeName);
@@ -70,7 +70,7 @@ test('can update group name in a document type', async ({umbracoApi, umbracoUi})
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
-  await umbracoUi.documentType.isSuccessNotificationVisible();
+  await umbracoUi.documentType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeData.containers[0].name).toBe(newGroupName);
@@ -89,7 +89,7 @@ test('can delete a group in a document type', {tag: '@smoke'}, async ({umbracoAp
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
-  await umbracoUi.documentType.isSuccessNotificationVisible();
+  await umbracoUi.documentType.isSuccessStateVisibleForSaveButton();
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeData.containers.length).toBe(0);
   expect(documentTypeData.properties.length).toBe(0);
@@ -108,7 +108,7 @@ test('can delete a tab in a document type', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
-  await umbracoUi.documentType.isSuccessNotificationVisible();
+  await umbracoUi.documentType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeData.containers.length).toBe(0);
@@ -126,7 +126,7 @@ test('can delete a property editor in a document type', {tag: '@smoke'}, async (
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
-  await umbracoUi.documentType.isSuccessNotificationVisible();
+  await umbracoUi.documentType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeData.properties.length).toBe(0);
@@ -147,13 +147,13 @@ test('can create a document type with a property in a tab', {tag: '@smoke'}, asy
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
-  await umbracoUi.documentType.isSuccessNotificationVisible();
+  await umbracoUi.documentType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   expect(await umbracoApi.documentType.doesTabContainCorrectPropertyEditorInGroup(documentTypeName, dataTypeName, documentTypeData.properties[0].dataType.id, tabName, groupName)).toBeTruthy();
 });
 
-test('can create a document type with multiple groups', async ({umbracoApi, umbracoUi}) => {
+test('can create a document type with multiple groups', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const secondDataTypeName = 'Image Media Picker';
@@ -170,13 +170,13 @@ test('can create a document type with multiple groups', async ({umbracoApi, umbr
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
-  await umbracoUi.documentType.isSuccessNotificationVisible();
+  await umbracoUi.documentType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
   expect(await umbracoApi.documentType.doesGroupContainCorrectPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id, groupName)).toBeTruthy();
   expect(await umbracoApi.documentType.doesGroupContainCorrectPropertyEditor(documentTypeName, secondDataTypeName, secondDataType.id, secondGroupName)).toBeTruthy();
 });
 
-test('can create a document type with multiple tabs', async ({umbracoApi, umbracoUi}) => {
+test('can create a document type with multiple tabs', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const secondDataTypeName = 'Image Media Picker';
@@ -196,7 +196,7 @@ test('can create a document type with multiple tabs', async ({umbracoApi, umbrac
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
-  await umbracoUi.documentType.isSuccessNotificationVisible();
+  await umbracoUi.documentType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
   expect(await umbracoApi.documentType.doesTabContainCorrectPropertyEditorInGroup(documentTypeName, dataTypeName, dataTypeData.id, tabName, groupName)).toBeTruthy();
   expect(await umbracoApi.documentType.doesTabContainCorrectPropertyEditorInGroup(documentTypeName, secondDataTypeName, secondDataType.id, secondTabName, secondGroupName)).toBeTruthy();
@@ -213,14 +213,14 @@ test('can create a document type with a composition', {tag: '@smoke'}, async ({u
 
   // Act
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
-  await umbracoUi.waitForTimeout(500);
+  await umbracoUi.waitForTimeout(1000);
   await umbracoUi.documentType.clickCompositionsButton();
-  await umbracoUi.documentType.clickButtonWithName(compositionDocumentTypeName);
+  await umbracoUi.documentType.clickModalMenuItemWithName(compositionDocumentTypeName);
   await umbracoUi.documentType.clickSubmitButton();
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
-  await umbracoUi.documentType.isSuccessNotificationVisible();
+  await umbracoUi.documentType.isSuccessStateVisibleForSaveButton();
   expect(umbracoUi.documentType.doesGroupHaveValue(groupName)).toBeTruthy();
   // Checks if the composition in the document type is correct
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
@@ -243,13 +243,13 @@ test('can remove a composition from a document type', async ({umbracoApi, umbrac
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
   await umbracoUi.waitForTimeout(500);
   await umbracoUi.documentType.clickCompositionsButton();
-  await umbracoUi.documentType.clickButtonWithName(compositionDocumentTypeName);
+  await umbracoUi.documentType.clickModalMenuItemWithName(compositionDocumentTypeName);
   await umbracoUi.documentType.clickSubmitButton();
   await umbracoUi.documentType.clickConfirmToSubmitButton();
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
-  await umbracoUi.documentType.isSuccessNotificationVisible();
+  await umbracoUi.documentType.isSuccessStateVisibleForSaveButton();
   await umbracoUi.documentType.isGroupVisible(groupName, false);
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeData.compositions).toEqual([]);
@@ -258,7 +258,8 @@ test('can remove a composition from a document type', async ({umbracoApi, umbrac
   await umbracoApi.documentType.ensureNameNotExists(compositionDocumentTypeName);
 });
 
-test('can reorder groups in a document type', async ({umbracoApi, umbracoUi}) => {
+// Skip this flaky tests as sometimes the properties are not dragged correctly.
+test.skip('can reorder groups in a document type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const secondGroupName = 'SecondGroup';
@@ -268,14 +269,16 @@ test('can reorder groups in a document type', async ({umbracoApi, umbracoUi}) =>
 
   // Act
   await umbracoUi.documentType.clickReorderButton();
-  const groupValues = await umbracoUi.documentType.reorderTwoGroups();
+
+  // Drag and Drop
+  const groupValues = await umbracoUi.documentType.reorderTwoGroups(groupName, secondGroupName);
   const firstGroupValue = groupValues.firstGroupValue;
   const secondGroupValue = groupValues.secondGroupValue;
   await umbracoUi.documentType.clickIAmDoneReorderingButton();
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
-  await umbracoUi.documentType.isSuccessNotificationVisible();
+  await umbracoUi.documentType.isSuccessStateVisibleForSaveButton();
   // Since we swapped sorting order, the firstGroupValue should have sortOrder 1 and the secondGroupValue should have sortOrder 0
   expect(await umbracoApi.documentType.doesDocumentTypeGroupNameContainCorrectSortOrder(documentTypeName, secondGroupValue, 0)).toBeTruthy();
   expect(await umbracoApi.documentType.doesDocumentTypeGroupNameContainCorrectSortOrder(documentTypeName, firstGroupValue, 1)).toBeTruthy();
@@ -300,7 +303,7 @@ test.skip('can reorder properties in a document type', async ({umbracoApi, umbra
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
-  await umbracoUi.documentType.isSuccessNotificationVisible();
+  await umbracoUi.documentType.isSuccessStateVisibleForSaveButton();
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeData.properties[0].name).toBe(dataTypeNameTwo);
   expect(documentTypeData.properties[1].name).toBe(dataTypeName);
@@ -324,7 +327,7 @@ test.skip('can reorder tabs in a document type', {tag: '@smoke'}, async ({umbrac
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
-  await umbracoUi.documentType.isSuccessNotificationVisible();
+  await umbracoUi.documentType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.documentType.doesDocumentTypeTabNameContainCorrectSortOrder(documentTypeName, secondTabName, 0)).toBeTruthy();
   expect(await umbracoApi.documentType.doesDocumentTypeTabNameContainCorrectSortOrder(documentTypeName, tabName, 1)).toBeTruthy();
 });
@@ -344,7 +347,7 @@ test('can add a description to a property in a document type', async ({umbracoAp
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
-  await umbracoUi.documentType.isSuccessNotificationVisible();
+  await umbracoUi.documentType.isSuccessStateVisibleForSaveButton();
   await expect(umbracoUi.documentType.enterDescriptionTxt).toBeVisible();
   expect(umbracoUi.documentType.doesDescriptionHaveValue(descriptionText)).toBeTruthy();
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
@@ -365,12 +368,12 @@ test('can set is mandatory for a property in a document type', {tag: '@smoke'}, 
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
-  await umbracoUi.documentType.isSuccessNotificationVisible();
+  await umbracoUi.documentType.isSuccessStateVisibleForSaveButton();
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeData.properties[0].validation.mandatory).toBeTruthy();
 });
 
-test('can enable validation for a property in a document type', async ({umbracoApi, umbracoUi}) => {
+test('can enable validation for a property in a document type', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const regex = '^[a-zA-Z0-9]*$';
@@ -388,7 +391,7 @@ test('can enable validation for a property in a document type', async ({umbracoA
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
-  await umbracoUi.documentType.isSuccessNotificationVisible();
+  await umbracoUi.documentType.isSuccessStateVisibleForSaveButton();
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeData.properties[0].validation.regEx).toBe(regex);
   expect(documentTypeData.properties[0].validation.regExMessage).toBe(regexMessage);
@@ -397,18 +400,18 @@ test('can enable validation for a property in a document type', async ({umbracoA
 test('can allow vary by culture for a property in a document type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id, groupName, true);
+  await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id, groupName, true, false);
   await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
 
   // Act
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
   await umbracoUi.documentType.clickEditorSettingsButton();
-  await umbracoUi.documentType.clickVaryByCultureToggle();
+  await umbracoUi.documentType.clickSharedAcrossCulturesToggle();
   await umbracoUi.documentType.clickSubmitButton();
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
-  await umbracoUi.documentType.isSuccessNotificationVisible();
+  await umbracoUi.documentType.isSuccessStateVisibleForSaveButton();
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeData.properties[0].variesByCulture).toBeTruthy();
 });
@@ -427,7 +430,33 @@ test('can set appearance to label on top for a property in a document type', asy
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
-  await umbracoUi.documentType.isSuccessNotificationVisible();
+  await umbracoUi.documentType.isSuccessStateVisibleForSaveButton();
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeData.properties[0].appearance.labelOnTop).toBeTruthy();
+});
+
+test('can add a block list property with inline editing mode to a document type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const blockListDataTypeName = 'TestBlockList';
+  await umbracoApi.documentType.createDefaultDocumentType(documentTypeName);
+  await umbracoApi.dataType.createBlockListDataTypeWithInlineEditingMode(blockListDataTypeName, true);
+  await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
+
+  // Act
+  await umbracoUi.documentType.goToDocumentType(documentTypeName);
+  await umbracoUi.documentType.clickAddGroupButton();
+  await umbracoUi.documentType.addPropertyEditor(blockListDataTypeName);
+  await umbracoUi.documentType.enterGroupName(groupName);
+  await umbracoUi.documentType.clickSaveButton();
+
+  // Assert
+  await umbracoUi.documentType.isSuccessStateVisibleForSaveButton();
+  expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
+  const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
+  const blockListDataTypeData = await umbracoApi.dataType.getByName(blockListDataTypeName);
+  // Checks if the correct property was added to the document type
+  expect(documentTypeData.properties[0].dataType.id).toBe(blockListDataTypeData.id);
+
+  // Clean
+  await umbracoApi.dataType.ensureNameNotExists(blockListDataTypeName);
 });

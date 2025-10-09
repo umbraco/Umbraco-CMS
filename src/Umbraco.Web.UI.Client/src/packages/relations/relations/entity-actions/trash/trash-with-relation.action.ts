@@ -1,6 +1,6 @@
 import type { MetaEntityActionTrashWithRelationKind } from './types.js';
 import { UMB_TRASH_WITH_RELATION_CONFIRM_MODAL } from './modal/constants.js';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbTrashEntityAction } from '@umbraco-cms/backoffice/recycle-bin';
 
 /**
@@ -9,10 +9,8 @@ import { UmbTrashEntityAction } from '@umbraco-cms/backoffice/recycle-bin';
  * @augments {UmbEntityActionBase<MetaEntityActionTrashWithRelationKind>}
  */
 export class UmbTrashWithRelationEntityAction extends UmbTrashEntityAction<MetaEntityActionTrashWithRelationKind> {
-	override async _confirmTrash(item: any) {
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-
-		const modal = modalManager.open(this, UMB_TRASH_WITH_RELATION_CONFIRM_MODAL, {
+	protected override async _confirmTrash(item: any) {
+		await umbOpenModal(this, UMB_TRASH_WITH_RELATION_CONFIRM_MODAL, {
 			data: {
 				unique: item.unique,
 				entityType: item.entityType,
@@ -20,8 +18,6 @@ export class UmbTrashWithRelationEntityAction extends UmbTrashEntityAction<MetaE
 				referenceRepositoryAlias: this.args.meta.referenceRepositoryAlias,
 			},
 		});
-
-		await modal.onSubmit();
 	}
 }
 

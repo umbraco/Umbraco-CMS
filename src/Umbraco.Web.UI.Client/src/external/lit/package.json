@@ -1,0 +1,11 @@
+{
+	"name": "@umbraco-backoffice/lit",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"build": "vite build"
+	},
+	"dependencies": {
+		"lit": "^3.3.1"
+	}
+}

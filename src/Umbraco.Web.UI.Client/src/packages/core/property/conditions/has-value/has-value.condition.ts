@@ -12,7 +12,7 @@ export class UmbPropertyHasValueCondition
 		super(host, args);
 
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
-			this.observe(context.value, (value) => {
+			this.observe(context?.value, (value) => {
 				this.permitted = value !== undefined;
 			});
 		});

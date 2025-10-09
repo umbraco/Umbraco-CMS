@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Core.Cache;
 ///         keep as a whole in memory.
 ///     </para>
 /// </remarks>
-internal class FullDataSetRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyBase<TEntity, TId>
+internal sealed class FullDataSetRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyBase<TEntity, TId>
     where TEntity : class, IEntity
 {
     protected static readonly TId[] EmptyIds = new TId[0]; // const

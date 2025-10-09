@@ -1,4 +1,4 @@
-import type { UmbBlockTypeWithGroupKey } from '../../types.js';
+import type { UmbBlockTypeBaseModel, UmbBlockTypeWithGroupKey } from '../../types.js';
 import type { UmbBlockTypeCardElement } from '../block-type-card/index.js';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
@@ -14,7 +14,6 @@ import {
 	type UmbDocumentTypePickerModalValue,
 } from '@umbraco-cms/backoffice/document-type';
 import { UmbSorterController, UmbSorterResolvePlacementAsGrid } from '@umbraco-cms/backoffice/sorter';
-import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
 
 import '../block-type-card/index.js';
 
@@ -107,12 +106,17 @@ export class UmbInputBlockTypeElement<
 								presetAlias: 'element',
 							},
 						},
+						// TODO: hide the queryParams and filter config under a "elementTypesOnly" field. [MR]
+						search: {
+							queryParams: {
+								isElementType: true,
+							},
+						},
 						pickableFilter: (docType) =>
 							// Only pick elements:
 							docType.isElement &&
 							// Prevent picking the an already used element type:
-							this.#filter &&
-							this.#filter.find((x) => x.contentElementTypeKey === docType.unique) === undefined,
+							this.#filter?.find((x) => x.contentElementTypeKey === docType.unique) === undefined,
 					},
 					value: {
 						selection: [],
@@ -140,13 +144,15 @@ export class UmbInputBlockTypeElement<
 
 	async #onRequestDelete(item: BlockType) {
 		const store = await this.getContext(UMB_DOCUMENT_TYPE_ITEM_STORE_CONTEXT);
+		if (!store) {
+			return;
+		}
 		const contentType = store.getItems([item.contentElementTypeKey]);
 		await umbConfirmModal(this, {
 			color: 'danger',
-			headline: `Remove ${contentType[0]?.name}?`,
-			// TODO: Translations: [NL]
-			content: 'Are you sure you want to remove this Block Type Configuration?',
-			confirmLabel: 'Remove',
+			headline: '#blockEditor_confirmDeleteBlockTypeTitle',
+			content: this.localize.term('blockEditor_confirmDeleteBlockTypeMessage', [contentType[0]?.name]),
+			confirmLabel: '#general_remove',
 		});
 		this.deleteItem(item.contentElementTypeKey);
 	}
@@ -190,8 +196,8 @@ export class UmbInputBlockTypeElement<
 			div {
 				display: grid;
 				gap: var(--uui-size-space-3);
-				grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-				grid-template-rows: repeat(auto-fill, minmax(160px, 1fr));
+				grid-template-columns: repeat(auto-fill, minmax(var(--umb-card-medium-min-width), 1fr));
+				grid-template-rows: repeat(auto-fill, minmax(var(--umb-card-medium-min-width), 1fr));
 			}
 
 			[drag-placeholder] {

@@ -1,8 +1,6 @@
 using System.Globalization;
 using System.Runtime.InteropServices;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Models;
@@ -49,54 +47,6 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         _eventAggregator = eventAggregator;
         _userIdKeyResolver = userIdKeyResolver;
         _contentTypeFilters = contentTypeFilters;
-    }
-
-    [Obsolete("Use the ctor specifying all dependencies instead")]
-    protected ContentTypeServiceBase(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        TRepository repository,
-        IAuditRepository auditRepository,
-        IEntityContainerRepository containerRepository,
-        IEntityRepository entityRepository,
-        IEventAggregator eventAggregator)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            repository,
-            auditRepository,
-            containerRepository,
-            entityRepository,
-            eventAggregator,
-            StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>())
-    {
-    }
-
-    [Obsolete("Use the ctor specifying all dependencies instead")]
-    protected ContentTypeServiceBase(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        TRepository repository,
-        IAuditRepository auditRepository,
-        IEntityContainerRepository containerRepository,
-        IEntityRepository entityRepository,
-        IEventAggregator eventAggregator,
-        IUserIdKeyResolver userIdKeyResolver)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            repository,
-            auditRepository,
-            containerRepository,
-            entityRepository,
-            eventAggregator,
-            userIdKeyResolver,
-            StaticServiceProvider.Instance.GetRequiredService<ContentTypeFilterCollection>())
-    {
     }
 
     protected TRepository Repository { get; }
@@ -978,17 +928,8 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
                 //var copyingb = (ContentTypeCompositionBase) copying;
                 // but we *know* it has to be a ContentTypeCompositionBase anyways
 
-                // TODO: Fix back to only calling the copyingb.DeepCloneWithResetIdentities when
-                // when ContentTypeBase.DeepCloneWithResetIdentities is overrideable.
-                if (copying is IMediaType mediaTypeToCope)
-                {
-                    copy = (TItem)mediaTypeToCope.DeepCloneWithResetIdentities(alias);
-                }
-                else
-                {
-                    var copyingb = (ContentTypeCompositionBase) (object)copying;
-                    copy = (TItem) (object) copyingb.DeepCloneWithResetIdentities(alias);
-                }
+                var copyingb = copying;
+                copy = (TItem)copyingb.DeepCloneWithResetIdentities(alias);
 
                 copy.Name = copy.Name + " (copy)"; // might not be unique
 

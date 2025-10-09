@@ -11,7 +11,6 @@ export class UmbCustomUfmComponent extends UmbUfmComponentBase {
 	}
 }
 
-// eslint-disable-next-line local-rules/enforce-umb-prefix-on-element-name
 @customElement('ufm-custom-component')
 export class UmbCustomUfmComponentElement extends UmbLitElement {
 	@property()

@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class KeyValueRepositoryTests : UmbracoIntegrationTest
+internal sealed class KeyValueRepositoryTests : UmbracoIntegrationTest
 {
     [Test]
     public void CanSetAndGet()

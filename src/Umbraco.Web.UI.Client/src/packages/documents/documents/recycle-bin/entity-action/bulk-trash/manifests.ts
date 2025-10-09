@@ -1,4 +1,4 @@
-import { UMB_USER_PERMISSION_DOCUMENT_DELETE } from '../../../user-permissions/constants.js';
+import { UMB_USER_PERMISSION_DOCUMENT_DELETE } from '../../../user-permissions/document/constants.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../../entity.js';
 import { UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS } from '../../../item/constants.js';
 import { UMB_DOCUMENT_RECYCLE_BIN_REPOSITORY_ALIAS } from '../../repository/constants.js';

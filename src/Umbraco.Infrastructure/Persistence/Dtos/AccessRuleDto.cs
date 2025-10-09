@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(Constants.DatabaseSchema.Tables.AccessRule)]
 [PrimaryKey("id", AutoIncrement = false)]
 [ExplicitColumns]
-internal class AccessRuleDto
+internal sealed class AccessRuleDto
 {
     [Column("id")]
     [PrimaryKeyColumn(Name = "PK_umbracoAccessRule", AutoIncrement = false)]
@@ -25,11 +25,11 @@ internal class AccessRuleDto
     [Column("ruleType")]
     public string? RuleType { get; set; }
 
-    [Column("createDate")]
+    [Column("createDate", ForceToUtc = false)]
     [Constraint(Default = SystemMethods.CurrentDateTime)]
     public DateTime CreateDate { get; set; }
 
-    [Column("updateDate")]
+    [Column("updateDate", ForceToUtc = false)]
     [Constraint(Default = SystemMethods.CurrentDateTime)]
     public DateTime UpdateDate { get; set; }
 }

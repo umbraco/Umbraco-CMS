@@ -233,10 +233,7 @@ public class TypeFinder : ITypeFinder
             excludeFromResults = new HashSet<Assembly>();
         }
 
-        if (exclusionFilter == null)
-        {
-            exclusionFilter = new string[] { };
-        }
+        exclusionFilter ??= [];
 
         return GetAllAssemblies()
             .Where(x => excludeFromResults.Contains(x) == false

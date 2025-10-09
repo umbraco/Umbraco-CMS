@@ -21,7 +21,7 @@ export interface ManifestBase {
 	name: string;
 
 	/**
-	 * Extensions such as dashboards are ordered by weight with lower numbers being first in the list
+	 * Extensions such as dashboards are ordered by weight with higher numbers being first in the list
 	 */
 	weight?: number;
 }

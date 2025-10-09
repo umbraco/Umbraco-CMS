@@ -3,6 +3,7 @@
 
 using System.Linq;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
@@ -26,7 +27,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class MediaRepositoryTest : UmbracoIntegrationTest
+internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
 {
     [SetUp]
     public void SetUpTestData() => CreateTestData();
@@ -55,7 +56,7 @@ public class MediaRepositoryTest : UmbracoIntegrationTest
             new ContentTypeCommonRepository(scopeAccessor, TemplateRepository, appCaches, ShortStringHelper);
         var languageRepository =
             new LanguageRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<LanguageRepository>());
-        mediaTypeRepository = new MediaTypeRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<MediaTypeRepository>(), commonRepository, languageRepository, ShortStringHelper);
+        mediaTypeRepository = new MediaTypeRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<MediaTypeRepository>(), commonRepository, languageRepository, ShortStringHelper, IdKeyMap);
         var tagRepository = new TagRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<TagRepository>());
         var relationTypeRepository = new RelationTypeRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>());
         var entityRepository = new EntityRepository(scopeAccessor, AppCaches.Disabled);
@@ -64,7 +65,7 @@ public class MediaRepositoryTest : UmbracoIntegrationTest
             new PropertyEditorCollection(new DataEditorCollection(() => Enumerable.Empty<IDataEditor>()));
         var mediaUrlGenerators = new MediaUrlGeneratorCollection(() => Enumerable.Empty<IMediaUrlGenerator>());
         var dataValueReferences =
-            new DataValueReferenceFactoryCollection(() => Enumerable.Empty<IDataValueReferenceFactory>());
+            new DataValueReferenceFactoryCollection(() => Enumerable.Empty<IDataValueReferenceFactory>(), new NullLogger<DataValueReferenceFactoryCollection>());
         var repository = new MediaRepository(
             scopeAccessor,
             appCaches,

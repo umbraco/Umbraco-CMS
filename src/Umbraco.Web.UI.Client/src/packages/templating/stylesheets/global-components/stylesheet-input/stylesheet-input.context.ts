@@ -12,6 +12,3 @@ export class UmbStylesheetPickerInputContext extends UmbPickerInputContext<UmbSt
 		super(host, UMB_STYLESHEET_ITEM_REPOSITORY_ALIAS, UMB_STYLESHEET_PICKER_MODAL);
 	}
 }
-
-/** @deprecated Use `UmbStylesheetPickerInputContext` instead. This method will be removed in Umbraco 15. */
-export { UmbStylesheetPickerInputContext as UmbStylesheetPickerContext };

@@ -10,22 +10,22 @@ export class UmbWebhookWorkspaceEditorElement extends UmbLitElement {
 	#workspaceContext?: typeof UMB_WEBHOOK_WORKSPACE_CONTEXT.TYPE;
 
 	@state()
-	_url: string = '';
+	private _url: string = '';
 
 	@state()
-	_name = '';
+	private _name = '';
 
 	@state()
-	_description = '';
+	private _description = '';
 
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_WEBHOOK_WORKSPACE_CONTEXT, (context) => {
 			this.#workspaceContext = context;
-			this.observe(this.#workspaceContext.url, (url) => (this._url = url ?? ''));
-			this.observe(this.#workspaceContext.name, (name) => (this._name = name ?? ''));
-			this.observe(this.#workspaceContext.description, (description) => (this._description = description ?? ''));
+			this.observe(this.#workspaceContext?.url, (url) => (this._url = url ?? ''));
+			this.observe(this.#workspaceContext?.name, (name) => (this._name = name ?? ''));
+			this.observe(this.#workspaceContext?.description, (description) => (this._description = description ?? ''));
 		});
 	}
 
@@ -74,10 +74,12 @@ export class UmbWebhookWorkspaceEditorElement extends UmbLitElement {
 
 			#name {
 				width: 100%;
+				z-index: 1;
 			}
 
 			#description {
 				width: 100%;
+				margin-top: -1px;
 				--uui-input-height: var(--uui-size-8);
 				--uui-input-border-color: transparent;
 			}

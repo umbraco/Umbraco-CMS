@@ -18,7 +18,7 @@ using Umbraco.Cms.Tests.Common.TestHelpers;
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.Policies;
 
 [TestFixture]
-public class CreateDocumentTests : ManagementApiTest<CreateDocumentController>
+internal sealed class CreateDocumentTests : ManagementApiTest<CreateDocumentController>
 {
     private IUserGroupService UserGroupService => GetRequiredService<IUserGroupService>();
 

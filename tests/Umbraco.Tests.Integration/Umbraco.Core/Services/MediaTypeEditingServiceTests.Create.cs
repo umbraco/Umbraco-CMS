@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
-public partial class MediaTypeEditingServiceTests
+internal sealed partial class MediaTypeEditingServiceTests
 {
     [Test]
     public async Task Can_Create_With_All_Basic_Settings()

@@ -8,7 +8,7 @@ using Umbraco.Cms.Core.Webhooks;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
-internal class WebhookPresentationFactory : IWebhookPresentationFactory
+internal sealed class WebhookPresentationFactory : IWebhookPresentationFactory
 {
     private readonly WebhookEventCollection _webhookEventCollection;
     private readonly IHostingEnvironment _hostingEnvironment;

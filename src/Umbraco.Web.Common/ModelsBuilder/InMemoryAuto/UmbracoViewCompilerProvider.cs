@@ -9,7 +9,7 @@ using Umbraco.Cms.Core.Exceptions;
 
 namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto;
 
-internal class UmbracoViewCompilerProvider : IViewCompilerProvider
+internal sealed class UmbracoViewCompilerProvider : IViewCompilerProvider
 {
     private readonly RazorProjectEngine _razorProjectEngine;
     private readonly UmbracoRazorReferenceManager _umbracoRazorReferenceManager;

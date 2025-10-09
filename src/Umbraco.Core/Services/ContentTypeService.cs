@@ -1,6 +1,4 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -42,56 +40,6 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
             userIdKeyResolver,
             contentTypeFilters) =>
         ContentService = contentService;
-
-    [Obsolete("Use the ctor specifying all dependencies instead")]
-    public ContentTypeService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IContentService contentService,
-        IContentTypeRepository repository,
-        IAuditRepository auditRepository,
-        IDocumentTypeContainerRepository entityContainerRepository,
-        IEntityRepository entityRepository,
-        IEventAggregator eventAggregator)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            contentService,
-            repository,
-            auditRepository,
-            entityContainerRepository,
-            entityRepository,
-            eventAggregator,
-            StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>())
-    { }
-
-    [Obsolete("Use the ctor specifying all dependencies instead")]
-    public ContentTypeService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IContentService contentService,
-        IContentTypeRepository repository,
-        IAuditRepository auditRepository,
-        IDocumentTypeContainerRepository entityContainerRepository,
-        IEntityRepository entityRepository,
-        IEventAggregator eventAggregator,
-        IUserIdKeyResolver userIdKeyResolver)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            contentService,
-            repository,
-            auditRepository,
-            entityContainerRepository,
-            entityRepository,
-            eventAggregator,
-            userIdKeyResolver,
-            StaticServiceProvider.Instance.GetRequiredService<ContentTypeFilterCollection>())
-    { }
 
     protected override int[] ReadLockIds => ContentTypeLocks.ReadLockIds;
 

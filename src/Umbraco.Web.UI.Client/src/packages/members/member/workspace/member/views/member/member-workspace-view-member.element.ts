@@ -9,6 +9,8 @@ import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui'
 
 import './member-workspace-view-member-info.element.js';
 import type { UmbInputMemberGroupElement } from '@umbraco-cms/backoffice/member-group';
+import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
+import { umbBindToValidation } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-member-workspace-view-member')
 export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -20,8 +22,14 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 		this.consumeContext(UMB_MEMBER_WORKSPACE_CONTEXT, (context) => {
 			this._workspaceContext = context;
 
-			this.observe(this._workspaceContext.isNew, (isNew) => {
+			this.observe(this._workspaceContext?.isNew, (isNew) => {
 				this._isNew = !!isNew;
+			});
+		});
+
+		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
+			this.observe(context?.hasAccessToSensitiveData, (hasAccessToSensitiveData) => {
+				this._hasAccessToSensitiveData = hasAccessToSensitiveData === true;
 			});
 		});
 	}
@@ -34,6 +42,9 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 
 	@state()
 	private _isNew = true;
+
+	@state()
+	private _hasAccessToSensitiveData = false;
 
 	#onChange(propertyName: keyof UmbMemberDetailModel, value: UmbMemberDetailModel[keyof UmbMemberDetailModel]) {
 		if (!this._workspaceContext) return;
@@ -70,7 +81,7 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 	};
 
 	#renderPasswordInput() {
-		if (this._isNew) {
+		if (this._isNew && this._workspaceContext) {
 			return html`
 				<umb-property-layout label=${this.localize.term('user_password')} mandatory>
 					<uui-input
@@ -78,7 +89,14 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 						name="newPassword"
 						label=${this.localize.term('user_passwordEnterNew')}
 						type="password"
-						@input=${() => this.#onPasswordUpdate()}></uui-input>
+						@input=${() => this.#onPasswordUpdate()}
+						value=${this._workspaceContext.newPassword}
+						required
+						${umbBindToValidation(
+							this,
+							"$.values[?(@.alias == 'password' && @.culture == null && @.segment == null)].value",
+							this._workspaceContext.newPassword,
+						)}></uui-input>
 				</umb-property-layout>
 
 				<umb-property-layout label="Confirm password" mandatory>
@@ -87,6 +105,7 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 						name="confirmPassword"
 						label="Confirm password"
 						type="password"
+						value=${this._workspaceContext.newPassword}
 						@input=${() => this.#onPasswordUpdate()}></uui-input>
 				</umb-property-layout>
 
@@ -147,6 +166,11 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 							name="login"
 							label=${this.localize.term('general_username')}
 							value=${this._workspaceContext.username}
+							${umbBindToValidation(
+								this,
+								"$.values[?(@.alias == 'username' && @.culture == null && @.segment == null)].value",
+								this._workspaceContext.username,
+							)}
 							required
 							required-message=${this.localize.term('user_loginnameRequired')}
 							@input=${(e: Event) => this.#onChange('username', (e.target as HTMLInputElement).value)}></uui-input>
@@ -158,6 +182,11 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 							name="email"
 							label=${this.localize.term('general_email')}
 							value=${this._workspaceContext.email}
+							${umbBindToValidation(
+								this,
+								"$.values[?(@.alias == 'email' && @.culture == null && @.segment == null)].value",
+								this._workspaceContext.email,
+							)}
 							required
 							required-message=${this.localize.term('user_emailRequired')}
 							@input=${(e: Event) => this.#onChange('email', (e.target as HTMLInputElement).value)}></uui-input>
@@ -172,23 +201,27 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 							.selection=${this._workspaceContext.memberGroups}></umb-input-member-group>
 					</umb-property-layout>
 
-					<umb-property-layout label=${this.localize.term('user_stateApproved')}>
-						<uui-toggle
-							slot="editor"
-							.checked=${this._workspaceContext.isApproved}
-							@change=${(e: UUIBooleanInputEvent) => this.#onChange('isApproved', e.target.checked)}>
-						</uui-toggle>
-					</umb-property-layout>
+					${when(
+						this._hasAccessToSensitiveData,
+						() => html`
+							<umb-property-layout label=${this.localize.term('user_stateApproved')}>
+								<uui-toggle
+									slot="editor"
+									.checked=${this._workspaceContext!.isApproved}
+									@change=${(e: UUIBooleanInputEvent) => this.#onChange('isApproved', e.target.checked)}>
+								</uui-toggle>
+							</umb-property-layout>
 
-					<umb-property-layout label=${this.localize.term('user_stateLockedOut')}>
-						<uui-toggle
-							slot="editor"
-							?disabled=${this._isNew || !this._workspaceContext.isLockedOut}
-							.checked=${this._workspaceContext.isLockedOut}
-							@change=${(e: UUIBooleanInputEvent) => this.#onChange('isLockedOut', e.target.checked)}>
-						</uui-toggle>
-					</umb-property-layout>
-
+							<umb-property-layout label=${this.localize.term('user_stateLockedOut')}>
+								<uui-toggle
+									slot="editor"
+									?disabled=${this._isNew || !this._workspaceContext!.isLockedOut}
+									.checked=${this._workspaceContext!.isLockedOut}
+									@change=${(e: UUIBooleanInputEvent) => this.#onChange('isLockedOut', e.target.checked)}>
+								</uui-toggle>
+							</umb-property-layout>
+						`,
+					)}
 					<umb-property-layout label=${this.localize.term('member_2fa')}>
 						<uui-toggle
 							slot="editor"
@@ -198,6 +231,10 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 						</uui-toggle>
 					</umb-property-layout>
 				</uui-box>
+
+				<div class="container">
+					<umb-extension-slot id="workspace-info-apps" type="workspaceInfoApp"></umb-extension-slot>
+				</div>
 			</div>
 		`;
 	}
@@ -269,6 +306,9 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 			#left-column {
 				/* Is there a way to make the wrapped right column grow only when wrapped? */
 				flex: 9999 1 500px;
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-space-4);
 			}
 			#right-column {
 				flex: 1 1 350px;

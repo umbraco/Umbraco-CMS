@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Cache;
@@ -16,10 +16,9 @@ public class ReloadPublishedCacheController : PublishedCacheControllerBase
     [HttpPost("reload")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> Reload(CancellationToken cancellationToken)
+    public Task<IActionResult> Reload(CancellationToken cancellationToken)
     {
         _distributedCache.RefreshAllPublishedSnapshot();
-        return await Task.FromResult(Ok());
+        return Task.FromResult<IActionResult>(Ok());
     }
 }
-

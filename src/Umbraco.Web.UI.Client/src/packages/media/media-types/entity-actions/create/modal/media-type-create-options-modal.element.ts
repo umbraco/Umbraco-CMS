@@ -41,12 +41,10 @@ export class UmbMediaTypeCreateOptionsModalElement extends UmbModalBaseElement<U
 	async #onCreateFolderClick(event: PointerEvent) {
 		event.stopPropagation();
 
-		try {
-			await this.#createFolderAction?.execute();
-			this._submitModal();
-		} catch (error) {
-			console.error(error);
-		}
+		await this.#createFolderAction
+			?.execute()
+			.then(() => this.modalContext?.submit())
+			.catch(() => undefined);
 	}
 
 	// close the modal when navigating to data type

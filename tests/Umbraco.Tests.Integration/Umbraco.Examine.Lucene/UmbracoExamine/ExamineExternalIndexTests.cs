@@ -1,4 +1,4 @@
-﻿using Examine;
+using Examine;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class ExamineExternalIndexTests : ExamineBaseTest
+internal sealed class ExamineExternalIndexTests : ExamineBaseTest
 {
     private const string ContentName = "TestContent";
 

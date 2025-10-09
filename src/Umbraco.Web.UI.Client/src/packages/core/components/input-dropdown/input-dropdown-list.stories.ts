@@ -1,16 +1,16 @@
-import type { Meta, StoryObj } from '@storybook/web-components';
+import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import './input-dropdown-list.element.js';
 import type { UmbInputDropdownListElement } from './input-dropdown-list.element.js';
 
 const meta: Meta<UmbInputDropdownListElement> = {
-	title: 'Components/Inputs/Dropdown List',
+	title: 'Generic Components/Inputs/Dropdown List',
 	component: 'umb-input-dropdown-list',
 };
 
 export default meta;
 type Story = StoryObj<UmbInputDropdownListElement>;
 
-export const Overview: Story = {
+export const Docs: Story = {
 	args: {
 		options: [
 			{

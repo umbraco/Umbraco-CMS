@@ -1,12 +1,8 @@
-@using Microsoft.Extensions.Options
-@using Umbraco.Cms.Core.Configuration.Models
 @using Umbraco.Cms.Core.Hosting
 @using Umbraco.Cms.Core.Routing
-@using Umbraco.Extensions
-@inject IHostingEnvironment hostingEnvironment
-@inject IOptions<GlobalSettings> globalSettings
+@inject IHostingEnvironment HostingEnvironment
 @{
-    var backOfficePath = globalSettings.Value.GetBackOfficePath(hostingEnvironment);
+    var backOfficePath = HostingEnvironment.GetBackOfficePath();
 }
 <!doctype html>
 <html class="no-js" lang="en">
@@ -17,7 +13,7 @@
 
     <title>Page Not Found</title>
 
-    <link rel="stylesheet" href="@WebPath.Combine(backOfficePath.TrimStart("~") , "website", "/nonodes.css")" />
+    <link rel="stylesheet" href="@WebPath.Combine(backOfficePath, "website", "/nonodes.css")" />
     <style type="text/css">
         body {
             color:initial;
@@ -39,17 +35,16 @@
         <article>
             <div>
                 <h1>Page Not Found</h1>
-                @if (hostingEnvironment.IsDebugMode)
+                @if (HostingEnvironment.IsDebugMode)
                 {
-
                     var reason = (string?)Context.Items["reason"];
                     var message = (string?)Context.Items["message"];
 
-                    if (!reason.IsNullOrWhiteSpace())
+                    if (!string.IsNullOrWhiteSpace(reason))
                     {
                         <h3>@reason</h3>
                     }
-                    if (!message.IsNullOrWhiteSpace())
+                    if (!string.IsNullOrWhiteSpace(message))
                     {
                         <p>@message</p>
                     }

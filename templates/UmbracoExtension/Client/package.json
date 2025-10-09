@@ -9,13 +9,12 @@
     "generate-client": "node scripts/generate-openapi.js https://localhost:44339/umbraco/swagger/umbracoextension/swagger.json"
   },
   "devDependencies": {
-    "@hey-api/client-fetch": "^0.8.3",
-    "@hey-api/openapi-ts": "^0.64.10",
+    "@hey-api/openapi-ts": "0.85.0",
     "@umbraco-cms/backoffice": "^UMBRACO_VERSION_FROM_TEMPLATE",
-    "chalk": "^5.4.1",
-    "cross-env": "^7.0.3",
+    "chalk": "^5.6.2",
+    "cross-env": "^10.1.0",
     "node-fetch": "^3.3.2",
-    "typescript": "^5.8.2",
-    "vite": "^6.2.0"
+    "typescript": "^5.9.3",
+    "vite": "^7.1.9"
   }
 }

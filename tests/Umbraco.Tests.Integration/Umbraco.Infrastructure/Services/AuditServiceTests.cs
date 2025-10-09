@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class AuditServiceTests : UmbracoIntegrationTest
+internal sealed class AuditServiceTests : UmbracoIntegrationTest
 {
     [Test]
     public void GetPage()

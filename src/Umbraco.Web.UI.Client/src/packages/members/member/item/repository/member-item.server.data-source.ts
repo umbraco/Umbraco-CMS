@@ -1,8 +1,8 @@
 import { UMB_MEMBER_ENTITY_TYPE } from '../../entity.js';
 import type { UmbMemberItemModel } from './types.js';
+import { UmbManagementApiMemberItemDataRequestManager } from './member-item.server.request-manager.js';
 import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
 import type { MemberItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { MemberService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
@@ -14,6 +14,8 @@ export class UmbMemberItemServerDataSource extends UmbItemServerDataSourceBase<
 	MemberItemResponseModel,
 	UmbMemberItemModel
 > {
+	#itemRequestManager = new UmbManagementApiMemberItemDataRequestManager(this);
+
 	/**
 	 * Creates an instance of UmbMemberItemServerDataSource.
 	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
@@ -21,14 +23,18 @@ export class UmbMemberItemServerDataSource extends UmbItemServerDataSourceBase<
 	 */
 	constructor(host: UmbControllerHost) {
 		super(host, {
-			getItems,
 			mapper,
 		});
 	}
-}
 
-/* eslint-disable local-rules/no-direct-api-import */
-const getItems = (uniques: Array<string>) => MemberService.getItemMember({ id: uniques });
+	override async getItems(uniques: Array<string>) {
+		if (!uniques) throw new Error('Uniques are missing');
+
+		const { data, error } = await this.#itemRequestManager.getItems(uniques);
+
+		return { data: this._getMappedItems(data), error };
+	}
+}
 
 const mapper = (item: MemberItemResponseModel): UmbMemberItemModel => {
 	return {

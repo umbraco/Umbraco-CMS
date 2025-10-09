@@ -27,14 +27,16 @@ export class UmbResendInviteToUserModalElement extends UmbModalBaseElement<
 		const formData = new FormData(form);
 		const message = formData.get('message') as string;
 
-		await this.#userInviteUserRepository.resendInvite({
+		const { error } = await this.#userInviteUserRepository.resendInvite({
 			user: {
 				unique: this.modalContext.data.user.unique,
 			},
 			message,
 		});
 
-		this._submitModal();
+		if (!error) {
+			this._submitModal();
+		}
 	}
 
 	override render() {

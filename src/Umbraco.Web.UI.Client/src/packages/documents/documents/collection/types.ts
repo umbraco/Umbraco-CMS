@@ -1,5 +1,7 @@
 import type { UmbDocumentEntityType } from '../entity.js';
-import type { UmbDocumentItemVariantModel } from '../item/repository/types.js';
+import type { UmbDocumentItemVariantModel } from '../item/types.js';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import type { UmbEntityWithFlags } from '@umbraco-cms/backoffice/entity-flag';
 import type { UmbCollectionFilterModel } from '@umbraco-cms/backoffice/collection';
 
 export interface UmbDocumentCollectionFilterModel extends UmbCollectionFilterModel {
@@ -11,7 +13,8 @@ export interface UmbDocumentCollectionFilterModel extends UmbCollectionFilterMod
 	userDefinedProperties: Array<{ alias: string; header: string; isSystem: boolean }>;
 }
 
-export interface UmbDocumentCollectionItemModel {
+export interface UmbDocumentCollectionItemModel extends UmbEntityWithFlags {
+	ancestors: Array<UmbEntityModel>;
 	unique: string;
 	entityType: UmbDocumentEntityType;
 	creator?: string | null;

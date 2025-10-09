@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(Constants.DatabaseSchema.Tables.DocumentType)]
 [PrimaryKey("contentTypeNodeId", AutoIncrement = false)]
 [ExplicitColumns]
-internal class ContentTypeTemplateDto
+internal sealed class ContentTypeTemplateDto
 {
     [Column("contentTypeNodeId")]
     [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_cmsDocumentType", OnColumns = "contentTypeNodeId, templateNodeId")]

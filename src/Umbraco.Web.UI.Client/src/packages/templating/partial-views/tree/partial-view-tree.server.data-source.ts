@@ -41,7 +41,7 @@ export class UmbPartialViewTreeServerDataSource extends UmbTreeServerDataSourceB
 
 const getRootItems = (args: UmbTreeRootItemsRequestArgs) =>
 	// eslint-disable-next-line local-rules/no-direct-api-import
-	PartialViewService.getTreePartialViewRoot({ skip: args.skip, take: args.take });
+	PartialViewService.getTreePartialViewRoot({ query: { skip: args.skip, take: args.take } });
 
 const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 	const parentPath = new UmbServerFilePathUniqueSerializer().toServerPath(args.parent.unique);
@@ -51,9 +51,7 @@ const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		return PartialViewService.getTreePartialViewChildren({
-			parentPath,
-			skip: args.skip,
-			take: args.take,
+			query: { parentPath, skip: args.skip, take: args.take },
 		});
 	}
 };
@@ -64,7 +62,7 @@ const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) => {
 
 	// eslint-disable-next-line local-rules/no-direct-api-import
 	return PartialViewService.getTreePartialViewAncestors({
-		descendantPath,
+		query: { descendantPath },
 	});
 };
 

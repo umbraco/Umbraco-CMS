@@ -1,14 +1,12 @@
 import type { SpecificManifestTypeOrManifestBase } from '../types/map.types.js';
+import type { ManifestBase } from '../types/index.js';
+import type { UmbExtensionRegistry } from '../registry/extension.registry.js';
 import { UmbExtensionManifestInitializer } from './extension-manifest-initializer.controller.js';
 import {
 	type PermittedControllerType,
 	UmbBaseExtensionsInitializer,
+	type UmbBaseExtensionsInitializerArgs,
 } from './base-extensions-initializer.controller.js';
-import type {
-	ManifestBase,
-	UmbBaseExtensionsInitializerArgs,
-	UmbExtensionRegistry,
-} from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type

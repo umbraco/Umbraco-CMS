@@ -39,6 +39,7 @@ import * as manifestsHandlers from './handlers/manifests.handlers.js';
 import * as serverHandlers from './handlers/server.handlers.js';
 import { handlers as documentBlueprintHandlers } from './handlers/document-blueprint/index.js';
 import { handlers as temporaryFileHandlers } from './handlers/temporary-file/index.js';
+import { handlers as segmentHandlers } from './handlers/segment.handlers.js';
 
 const handlers = [
 	...backofficeHandlers,
@@ -80,6 +81,7 @@ const handlers = [
 	...userHandlers,
 	...documentBlueprintHandlers,
 	...temporaryFileHandlers,
+	...segmentHandlers,
 	...serverHandlers.serverInformationHandlers,
 	serverHandlers.serverRunningHandler,
 	...manifestsHandlers.manifestEmptyHandlers,

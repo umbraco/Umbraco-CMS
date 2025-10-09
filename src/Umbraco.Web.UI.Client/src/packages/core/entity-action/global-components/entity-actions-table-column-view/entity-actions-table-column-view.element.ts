@@ -1,21 +1,20 @@
-import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
-import { html, nothing, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbEntityModel, UmbNamedEntityModel } from '@umbraco-cms/backoffice/entity';
+import { html, nothing, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-const elementName = 'umb-entity-actions-table-column-view';
-@customElement(elementName)
+@customElement('umb-entity-actions-table-column-view')
 export class UmbEntityActionsTableColumnViewElement extends UmbLitElement {
 	@property({ attribute: false })
-	value?: UmbEntityModel;
-
-	@state()
-	_isOpen = false;
+	value?: UmbEntityModel | UmbNamedEntityModel;
 
 	override render() {
 		if (!this.value) return nothing;
 
 		return html`
-			<umb-entity-actions-bundle .entityType=${this.value.entityType} .unique=${this.value.unique}>
+			<umb-entity-actions-bundle
+				.entityType=${this.value.entityType}
+				.unique=${this.value.unique}
+				.label=${this.localize.term('actions_viewActionsFor', [(this.value as any).name])}>
 			</umb-entity-actions-bundle>
 		`;
 	}
@@ -23,6 +22,6 @@ export class UmbEntityActionsTableColumnViewElement extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbEntityActionsTableColumnViewElement;
+		'umb-entity-actions-table-column-view': UmbEntityActionsTableColumnViewElement;
 	}
 }

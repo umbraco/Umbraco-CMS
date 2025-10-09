@@ -1,17 +1,16 @@
 import type { UmbInstallerContext } from '../installer.context.js';
 import { UMB_INSTALLER_CONTEXT } from '../installer.context.js';
+
 import type { UUIButtonElement } from '@umbraco-cms/backoffice/external/uui';
 import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
 import { css, html, nothing, customElement, property, query, state } from '@umbraco-cms/backoffice/external/lit';
-
 import type {
 	DatabaseInstallRequestModel,
 	DatabaseSettingsPresentationModel,
-	ProblemDetails,
 } from '@umbraco-cms/backoffice/external/backend-api';
-import { ApiError, InstallService } from '@umbraco-cms/backoffice/external/backend-api';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import { InstallService } from '@umbraco-cms/backoffice/external/backend-api';
+import { umbFocus, UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { tryExecute, UmbApiError } from '@umbraco-cms/backoffice/resources';
 
 @customElement('umb-installer-database')
 export class UmbInstallerDatabaseElement extends UmbLitElement {
@@ -165,12 +164,14 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 				};
 
 				const { error } = await tryExecute(
-					InstallService.postInstallValidateDatabase({ requestBody: databaseDetails }),
+					this,
+					InstallService.postInstallValidateDatabase({ body: databaseDetails }),
+					{ disableNotifications: true },
 				);
 
 				if (error) {
 					this._validationErrorMessage = `The server could not validate the database connection. Details: ${
-						error instanceof ApiError ? (error.body as any).detail : error.message
+						UmbApiError.isUmbApiError(error) ? error.problemDetails.detail : error.message
 					}`;
 					this._installButton.state = 'failed';
 					return;
@@ -195,27 +196,8 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 
 		this._installerContext.nextStep();
 
-		const { error: _error } = await tryExecute(
-			InstallService.postInstallSetup({ requestBody: this._installerContext.getData() }),
-		);
-		const error = _error as ProblemDetails | undefined;
-		if (error) {
-			this._handleRejected(error);
-		} else {
-			this._handleFulfilled();
-		}
+		this._installerContext.postInstallSetup();
 	};
-
-	private _handleFulfilled() {
-		// TODO: The post install will probably return a user in the future, so we have to set that context somewhere to let the client know that it is authenticated
-		console.warn('TODO: Set up real authentication');
-		sessionStorage.setItem('is-authenticated', 'true');
-		history.replaceState(null, '', 'section/content');
-	}
-
-	private _handleRejected(e: ProblemDetails) {
-		this._installerContext?.setInstallStatus(e);
-	}
 
 	private _onBack() {
 		this._installerContext?.prevStep();
@@ -256,6 +238,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 		<uui-form-layout-item>
 			<uui-label for="server" slot="label" required>Server address</uui-label>
 			<uui-input
+				${umbFocus()}
 				type="text"
 				id="server"
 				name="server"
@@ -272,6 +255,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 		html` <uui-form-layout-item>
 			<uui-label for="database-name" slot="label" required>Database Name</uui-label>
 			<uui-input
+				${umbFocus()}
 				type="text"
 				.value=${value}
 				id="database-name"
@@ -286,20 +270,8 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 	private _renderCredentials = () => html`
 		<h2 class="uui-h4">Credentials</h2>
 		<hr />
-		<uui-form-layout-item>
-			<uui-checkbox
-				name="useIntegratedAuthentication"
-				label="Use integrated authentication"
-				@change=${this._handleChange}
-				.checked=${this.databaseFormData.useIntegratedAuthentication || false}></uui-checkbox>
-		</uui-form-layout-item>
-		<uui-form-layout-item>
-			<uui-checkbox
-				name="trustServerCertificate"
-				label="Trust the database certificate"
-				@change=${this._handleChange}
-				.checked=${this.databaseFormData.trustServerCertificate || false}></uui-checkbox>
-		</uui-form-layout-item>
+		${this._renderIntegratedAuthentication()}
+		${this._renderTrustDatabaseCertificate()}
 
 			${
 				!this.databaseFormData.useIntegratedAuthentication
@@ -333,6 +305,34 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 			}
 		</uui-form-layout-item>
 	`;
+
+	private _renderIntegratedAuthentication() {
+		if (this._selectedDatabase?.supportsIntegratedAuthentication) {
+			return html`<uui-form-layout-item>
+				<uui-checkbox
+					name="useIntegratedAuthentication"
+					label="Use integrated authentication"
+					@change=${this._handleChange}
+					.checked=${this.databaseFormData.useIntegratedAuthentication || false}></uui-checkbox>
+			</uui-form-layout-item>`;
+		} else {
+			return null;
+		}
+	}
+
+	private _renderTrustDatabaseCertificate() {
+		if (this._selectedDatabase?.supportsTrustServerCertificate) {
+			return html`<uui-form-layout-item>
+				<uui-checkbox
+					name="trustServerCertificate"
+					label="Trust the database certificate"
+					@change=${this._handleChange}
+					.checked=${this.databaseFormData.trustServerCertificate || false}></uui-checkbox>
+			</uui-form-layout-item>`;
+		} else {
+			return null;
+		}
+	}
 
 	private _renderCustom = () => html`
 		<uui-form-layout-item>

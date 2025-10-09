@@ -35,7 +35,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			menus: [UMB_HELP_MENU_ALIAS],
 			label: 'Community Website',
 			icon: 'icon-hearts',
-			href: 'https://our.umbraco.com?utm_source=core&amp;utm_medium=help&amp;utm_content=link&amp;utm_campaign=our',
+			href: 'https://our.umbraco.com?utm_source=core&utm_medium=help&utm_content=link&utm_campaign=our',
 		},
 		conditions: [
 			{

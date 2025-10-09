@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class RedirectUrlRepositoryTests : UmbracoIntegrationTest
+internal sealed class RedirectUrlRepositoryTests : UmbracoIntegrationTest
 {
     [SetUp]
     public void SetUp() => CreateTestData();

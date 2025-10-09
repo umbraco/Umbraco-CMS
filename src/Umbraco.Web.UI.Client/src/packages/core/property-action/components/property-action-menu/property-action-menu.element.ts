@@ -1,7 +1,7 @@
 import type { UmbPropertyActionArgs } from '../../types.js';
+import type { ManifestPropertyAction, MetaPropertyAction } from '../../property-action.extension.js';
 import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import type { ManifestPropertyAction, MetaPropertyAction } from '@umbraco-cms/backoffice/property-action';
 import { UmbExtensionsElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -44,7 +44,12 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 	override render() {
 		if (!this._actions?.length) return nothing;
 		return html`
-			<uui-button id="popover-trigger" popovertarget="property-action-popover" label="Open actions menu" compact>
+			<uui-button
+				id="popover-trigger"
+				popovertarget="property-action-popover"
+				data-mark="open-property-actions"
+				label=${this.localize.term('actions_viewActionsFor')}
+				compact>
 				<uui-symbol-more id="more-symbol"></uui-symbol-more>
 			</uui-button>
 			<uui-popover-container id="property-action-popover">

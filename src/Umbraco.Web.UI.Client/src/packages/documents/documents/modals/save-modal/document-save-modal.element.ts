@@ -1,9 +1,10 @@
 import type { UmbDocumentVariantOptionModel } from '../../types.js';
 import type { UmbDocumentSaveModalData, UmbDocumentSaveModalValue } from './document-save-modal.token.js';
 import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
+import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 import '../shared/document-variant-language-picker.element.js';
 
@@ -15,7 +16,7 @@ export class UmbDocumentSaveModalElement extends UmbModalBaseElement<
 	#selectionManager = new UmbSelectionManager<string>(this);
 
 	@state()
-	_options: Array<UmbDocumentVariantOptionModel> = [];
+	private _options: Array<UmbDocumentVariantOptionModel> = [];
 
 	#pickableFilter = (option: UmbDocumentVariantOptionModel) => {
 		if (!option.variant) {
@@ -56,25 +57,23 @@ export class UmbDocumentSaveModalElement extends UmbModalBaseElement<
 	}
 
 	override render() {
-		return html`<umb-body-layout headline=${this.localize.term('content_saveModalTitle')}>
-			<p id="subtitle">
-				<umb-localize key="content_variantsToSave">Choose which variants to be saved.</umb-localize>
-			</p>
-
-			<umb-document-variant-language-picker
-				.selectionManager=${this.#selectionManager}
-				.variantLanguageOptions=${this._options}
-				.pickableFilter=${this.#pickableFilter}></umb-document-variant-language-picker>
-
-			<div slot="actions">
-				<uui-button label=${this.localize.term('general_close')} @click=${this.#close}></uui-button>
-				<uui-button
-					label="${this.localize.term('buttons_saveAndClose')}"
-					look="primary"
-					color="positive"
-					@click=${this.#submit}></uui-button>
-			</div>
-		</umb-body-layout> `;
+		return html`
+			<uui-dialog-layout headline=${this.localize.term('content_saveModalTitle')}>
+				<umb-document-variant-language-picker
+					.selectionManager=${this.#selectionManager}
+					.variantLanguageOptions=${this._options}
+					.pickableFilter=${this.#pickableFilter}></umb-document-variant-language-picker>
+				<div slot="actions">
+					<uui-button label=${this.localize.term('general_close')} @click=${this.#close}></uui-button>
+					<uui-button
+						${umbFocus()}
+						label="${this.localize.term('buttons_save')}"
+						look="primary"
+						color="positive"
+						@click=${this.#submit}></uui-button>
+				</div>
+			</uui-dialog-layout>
+		`;
 	}
 
 	static override styles = [

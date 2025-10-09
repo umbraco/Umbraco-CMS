@@ -3,7 +3,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 /// <summary>
 ///     Represents a database index definition retrieved by querying the database
 /// </summary>
-internal class DbIndexDefinition
+internal sealed class DbIndexDefinition
 {
     public DbIndexDefinition(Tuple<string, string, string, bool> data)
     {

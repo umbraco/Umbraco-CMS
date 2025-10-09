@@ -21,5 +21,9 @@ public class DocumentTypeMovedWebhookEvent : WebhookEventBase<ContentTypeMovedNo
     public override string Alias => Constants.WebhookEvents.Aliases.DocumentTypeMoved;
 
     public override object? ConvertNotificationToRequestPayload(ContentTypeMovedNotification notification)
-        => notification.MoveInfoCollection;
+        => notification.MoveInfoCollection.Select(moveEvent => new
+        {
+            Id = moveEvent.Entity.Key,
+            NewParentId = moveEvent.NewParentKey,
+        });
 }

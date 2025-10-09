@@ -2,6 +2,7 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Logging.Viewer;
 
+[Obsolete("Use ILogViewerService instead. Scheduled removal in Umbraco 18.")]
 public interface ILogViewer
 {
     bool CanHandleLargeLogs { get; }

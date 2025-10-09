@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
@@ -21,19 +22,5 @@ public class UserDeletedWebhookEvent : WebhookEventBase<UserDeletedNotification>
     public override string Alias => Constants.WebhookEvents.Aliases.UserDeleted;
 
     public override object? ConvertNotificationToRequestPayload(UserDeletedNotification notification)
-    {
-        // TODO: Map more stuff here
-        var result = notification.DeletedEntities.Select(entity => new
-        {
-            entity.Id,
-            entity.Key,
-            entity.Name,
-            entity.Language,
-            entity.Email,
-            entity.Username,
-            entity.FailedPasswordAttempts
-        });
-
-        return result;
-    }
+        => notification.DeletedEntities.Select(entity => new DefaultPayloadModel { Id = entity.Key });
 }

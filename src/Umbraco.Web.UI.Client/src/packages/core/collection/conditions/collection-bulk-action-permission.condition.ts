@@ -16,7 +16,7 @@ export class UmbCollectionBulkActionPermissionCondition
 		super(host, args);
 
 		this.consumeContext(UMB_COLLECTION_CONTEXT, (context) => {
-			const allowedActions = context.getConfig()?.allowedEntityBulkActions;
+			const allowedActions = context?.getConfig()?.allowedEntityBulkActions;
 			this.permitted = allowedActions ? this.config.match(allowedActions) : false;
 		});
 	}

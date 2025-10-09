@@ -6,6 +6,7 @@ type ManifestTypeMapGenerator<ManifestTypes extends ManifestBase> = {
 	[key: string]: ManifestBase;
 };
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export type SpecificManifestTypeOrManifestBase<
 	ManifestTypes extends ManifestBase,
 	T extends string,

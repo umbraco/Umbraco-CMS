@@ -1,11 +1,11 @@
 import { manifests as authManifests } from './auth/manifests.js';
 import { manifests as collectionManifests } from './collection/manifests.js';
-import { manifests as contentManifests } from './content/manifests.js';
-import { manifests as contentTypeManifests } from './content-type/manifests.js';
 import { manifests as cultureManifests } from './culture/manifests.js';
 import { manifests as debugManifests } from './debug/manifests.js';
 import { manifests as entityActionManifests } from './entity-action/manifests.js';
 import { manifests as entityBulkActionManifests } from './entity-bulk-action/manifests.js';
+import { manifests as entityManifests } from './entity/manifests.js';
+import { manifests as entitySignManifests } from './entity-sign/manifests.js';
 import { manifests as extensionManifests } from './extension-registry/manifests.js';
 import { manifests as iconRegistryManifests } from './icon-registry/manifests.js';
 import { manifests as localizationManifests } from './localization/manifests.js';
@@ -15,7 +15,6 @@ import { manifests as pickerManifests } from './picker/manifests.js';
 import { manifests as propertyActionManifests } from './property-action/manifests.js';
 import { manifests as propertyEditorManifests } from './property-editor/manifests.js';
 import { manifests as propertyManifests } from './property/manifests.js';
-import { manifests as propertyTypeManifests } from './property-type/manifests.js';
 import { manifests as recycleBinManifests } from './recycle-bin/manifests.js';
 import { manifests as sectionManifests } from './section/manifests.js';
 import { manifests as serverFileSystemManifests } from './server-file-system/manifests.js';
@@ -29,12 +28,12 @@ import type { UmbExtensionManifestKind } from './extension-registry/index.js';
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
 	...authManifests,
 	...collectionManifests,
-	...contentManifests,
-	...contentTypeManifests,
 	...cultureManifests,
 	...debugManifests,
 	...entityActionManifests,
 	...entityBulkActionManifests,
+	...entityManifests,
+	...entitySignManifests,
 	...extensionManifests,
 	...iconRegistryManifests,
 	...localizationManifests,
@@ -44,7 +43,6 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 	...propertyActionManifests,
 	...propertyEditorManifests,
 	...propertyManifests,
-	...propertyTypeManifests,
 	...recycleBinManifests,
 	...sectionManifests,
 	...serverFileSystemManifests,

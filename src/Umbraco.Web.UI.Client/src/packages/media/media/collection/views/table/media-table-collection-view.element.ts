@@ -59,9 +59,9 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 		this.consumeContext(UMB_MEDIA_COLLECTION_CONTEXT, (collectionContext) => {
 			this.#collectionContext = collectionContext;
 			this.#observeCollectionContext();
-			collectionContext.setupView(this);
+			collectionContext?.setupView(this);
 			this.observe(
-				collectionContext.workspacePathBuilder,
+				collectionContext?.workspacePathBuilder,
 				(builder) => {
 					this._workspacePathBuilder = builder;
 					this.#createTableItems();
@@ -108,6 +108,7 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 					name: this.localize.string(item.header),
 					alias: item.alias,
 					elementName: item.elementName,
+					labelTemplate: item.nameTemplate,
 					allowSorting: true,
 				};
 			});
@@ -144,6 +145,7 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 								.value=${{
 									entityType: item.entityType,
 									unique: item.unique,
+									name: item.name,
 								}}></umb-entity-actions-table-column-view>`,
 						};
 					}

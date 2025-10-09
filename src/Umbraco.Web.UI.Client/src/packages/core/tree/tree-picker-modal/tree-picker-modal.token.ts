@@ -18,6 +18,7 @@ export interface UmbTreePickerModalData<
 	PathPatternParamsType extends UmbPathPatternParamsType = UmbPathPatternParamsType,
 > extends UmbPickerModalData<TreeItemType> {
 	hideTreeRoot?: boolean;
+	expandTreeRoot?: boolean;
 	treeAlias?: string;
 	// Consider if it makes sense to move this into the UmbPickerModalData interface, but for now this is a TreePicker feature. [NL]
 	createAction?: UmbTreePickerModalCreateActionData<PathPatternParamsType>;

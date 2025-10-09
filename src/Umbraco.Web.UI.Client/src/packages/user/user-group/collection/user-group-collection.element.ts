@@ -39,7 +39,7 @@ export class UmbUserGroupCollectionElement extends UmbCollectionDefaultElement {
 	static override styles = [
 		css`
 			uui-input {
-				display: block;
+				width: 100%;
 			}
 		`,
 	];

@@ -9,6 +9,3 @@ export class UmbMemberGroupPickerInputContext extends UmbPickerInputContext<UmbM
 		super(host, UMB_MEMBER_GROUP_ITEM_REPOSITORY_ALIAS, UMB_MEMBER_GROUP_PICKER_MODAL);
 	}
 }
-
-/** @deprecated Use `UmbMemberGroupPickerInputContext` instead. This method will be removed in Umbraco 15. */
-export { UmbMemberGroupPickerInputContext as UmbMemberPickerContext };

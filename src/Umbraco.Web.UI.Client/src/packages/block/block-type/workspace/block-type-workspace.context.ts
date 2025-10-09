@@ -25,6 +25,9 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 	// Just for context token safety:
 	public readonly IS_BLOCK_TYPE_WORKSPACE_CONTEXT = true;
 
+	#gotPropertyContext: Promise<unknown>;
+	#propertyContext?: typeof UMB_PROPERTY_CONTEXT.TYPE;
+
 	#entityType: string;
 	#data = new UmbObjectState<BlockTypeData | undefined>(undefined);
 	readonly data = this.#data.asObservable();
@@ -43,6 +46,10 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 		super(host, args.manifest.alias);
 		const manifest = args.manifest;
 		this.#entityType = manifest.meta?.entityType;
+
+		this.#gotPropertyContext = this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
+			this.#propertyContext = context;
+		}).asPromise({ preventTimeout: true });
 
 		this.routes.setRoutes([
 			{
@@ -84,18 +91,23 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 
 	async load(unique: string) {
 		this.resetState();
-		const context = await this.getContext(UMB_PROPERTY_CONTEXT);
-		this.observe(context.value, (value) => {
-			if (value) {
-				const blockTypeData = value.find((x: UmbBlockTypeBaseModel) => x.contentElementTypeKey === unique);
-				if (blockTypeData) {
-					this.#data.setValue(blockTypeData);
-					return;
+		await this.#gotPropertyContext;
+
+		this.observe(
+			this.#propertyContext?.value,
+			(value) => {
+				if (value) {
+					const blockTypeData = value.find((x: UmbBlockTypeBaseModel) => x.contentElementTypeKey === unique);
+					if (blockTypeData) {
+						this.#data.setValue(blockTypeData);
+						return;
+					}
 				}
-			}
-			// Fallback to undefined:
-			this.#data.setValue(undefined);
-		});
+				// Fallback to undefined:
+				this.#data.setValue(undefined);
+			},
+			'observePropertyValue',
+		);
 	}
 
 	async create(contentElementTypeId: string, groupKey?: string | null) {
@@ -174,10 +186,16 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 			throw new Error('No data to submit.');
 		}
 
-		const context = await this.getContext(UMB_PROPERTY_CONTEXT);
-
-		context.setValue(
-			appendToFrozenArray(context.getValue() ?? [], this.#data.getValue(), (x) => x?.contentElementTypeKey),
+		await this.#gotPropertyContext;
+		if (!this.#propertyContext) {
+			throw new Error('Property context is not available.');
+		}
+		this.#propertyContext.setValue(
+			appendToFrozenArray(
+				this.#propertyContext.getValue() ?? [],
+				this.#data.getValue(),
+				(x) => x?.contentElementTypeKey,
+			),
 		);
 
 		this.setIsNew(false);

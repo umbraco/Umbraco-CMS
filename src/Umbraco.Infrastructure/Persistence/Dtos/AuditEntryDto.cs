@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(Constants.DatabaseSchema.Tables.AuditEntry)]
 [PrimaryKey("id")]
 [ExplicitColumns]
-internal class AuditEntryDto
+internal sealed class AuditEntryDto
 {
     [Column("id")]
     [PrimaryKeyColumn]
@@ -30,7 +30,7 @@ internal class AuditEntryDto
     [Length(Constants.Audit.IpLength)]
     public string? PerformingIp { get; set; }
 
-    [Column("eventDateUtc")]
+    [Column("eventDateUtc", ForceToUtc = false)]
     [Constraint(Default = SystemMethods.CurrentDateTime)]
     public DateTime EventDateUtc { get; set; }
 

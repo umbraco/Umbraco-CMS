@@ -1,5 +1,5 @@
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbTogglePropertyEditorUiValue } from './types.js';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbInputToggleElement } from '@umbraco-cms/backoffice/components';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -35,16 +35,16 @@ export class UmbPropertyEditorUIToggleElement
 	mandatoryMessage = UMB_VALIDATION_FALSE_LOCALIZATION_KEY;
 
 	@state()
-	_ariaLabel?: string;
+	private _ariaLabel?: string;
 
 	@state()
-	_labelOff?: string;
+	private _labelOff?: string;
 
 	@state()
-	_labelOn?: string;
+	private _labelOn?: string;
 
 	@state()
-	_showLabels = false;
+	private _showLabels = false;
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;

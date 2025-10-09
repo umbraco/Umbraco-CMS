@@ -1,16 +1,20 @@
 import { UMB_DOCUMENT_TYPE_FOLDER_REPOSITORY_ALIAS } from '../../../tree/index.js';
-import type { UmbDocumentTypeCreateOptionsModalData } from './constants.js';
 import {
 	UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN,
+	UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PRESET_ELEMENT,
+	UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PRESET_TEMPLATE,
 	type UmbCreateDocumentTypeWorkspacePresetType,
-	type UmbDocumentTypeEntityTypeUnion,
-} from '@umbraco-cms/backoffice/document-type';
+} from '../../../paths.js';
+import type { UmbDocumentTypeEntityTypeUnion } from '../../../entity.js';
+import type { UmbDocumentTypeCreateOptionsModalData } from './constants.js';
 import { html, customElement, map } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbCreateFolderEntityAction } from '@umbraco-cms/backoffice/tree';
 
+const CREATE_FOLDER_PRESET = 'folder';
+
 // Include the types from the DocumentTypeWorkspacePresetType + folder.
-type OptionsPresetType = UmbCreateDocumentTypeWorkspacePresetType | 'folder' | null;
+type OptionsPresetType = UmbCreateDocumentTypeWorkspacePresetType | typeof CREATE_FOLDER_PRESET | null;
 
 /** @deprecated No longer used internally. This will be removed in Umbraco 17. [LK] */
 @customElement('umb-document-type-create-options-modal')
@@ -30,13 +34,13 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbModalBaseElement<Um
 			icon: 'icon-document',
 		},
 		{
-			preset: 'template',
+			preset: UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PRESET_TEMPLATE,
 			label: this.localize.term('create_documentTypeWithTemplate'),
 			description: this.localize.term('create_documentTypeWithTemplateDescription'),
 			icon: 'icon-document-html',
 		},
 		{
-			preset: 'element',
+			preset: UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PRESET_ELEMENT,
 			label: this.localize.term('create_elementType'),
 			description: this.localize.term('create_elementTypeDescription'),
 			icon: 'icon-plugin',
@@ -49,7 +53,7 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbModalBaseElement<Um
 		// 	icon: 'icon-plugin',
 		// },
 		{
-			preset: 'folder',
+			preset: CREATE_FOLDER_PRESET,
 			label: this.localize.term('create_folder'),
 			description: this.localize.term('create_folderDescription'),
 			icon: 'icon-folder',
@@ -67,15 +71,16 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbModalBaseElement<Um
 			meta: { icon: '', label: '', folderRepositoryAlias: UMB_DOCUMENT_TYPE_FOLDER_REPOSITORY_ALIAS },
 		});
 	}
+
 	async #onClick(presetAlias: OptionsPresetType) {
 		switch (presetAlias) {
-			case 'folder': {
+			case CREATE_FOLDER_PRESET: {
 				try {
 					await this.#createFolderAction?.execute();
 					this._submitModal();
 					return;
 				} catch {
-					//console.error(error);
+					return;
 				}
 
 				break;

@@ -11,7 +11,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
-internal class ServerRegistrationRepository : EntityRepositoryBase<int, IServerRegistration>,
+internal sealed class ServerRegistrationRepository : EntityRepositoryBase<int, IServerRegistration>,
     IServerRegistrationRepository
 {
     public ServerRegistrationRepository(IScopeAccessor scopeAccessor, ILogger<ServerRegistrationRepository> logger)

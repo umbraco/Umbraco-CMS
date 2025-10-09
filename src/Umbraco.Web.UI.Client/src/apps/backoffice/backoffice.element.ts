@@ -15,6 +15,7 @@ const CORE_PACKAGES = [
 	import('../../packages/block/umbraco-package.js'),
 	import('../../packages/clipboard/umbraco-package.js'),
 	import('../../packages/code-editor/umbraco-package.js'),
+	import('../../packages/content/umbraco-package.js'),
 	import('../../packages/data-type/umbraco-package.js'),
 	import('../../packages/dictionary/umbraco-package.js'),
 	import('../../packages/documents/umbraco-package.js'),
@@ -24,6 +25,7 @@ const CORE_PACKAGES = [
 	import('../../packages/help/umbraco-package.js'),
 	import('../../packages/language/umbraco-package.js'),
 	import('../../packages/log-viewer/umbraco-package.js'),
+	import('../../packages/management-api/umbraco-package.js'),
 	import('../../packages/markdown-editor/umbraco-package.js'),
 	import('../../packages/media/umbraco-package.js'),
 	import('../../packages/members/umbraco-package.js'),
@@ -42,7 +44,6 @@ const CORE_PACKAGES = [
 	import('../../packages/tags/umbraco-package.js'),
 	import('../../packages/telemetry/umbraco-package.js'),
 	import('../../packages/templating/umbraco-package.js'),
-	import('../../packages/tiny-mce/umbraco-package.js'),
 	import('../../packages/tiptap/umbraco-package.js'),
 	import('../../packages/translation/umbraco-package.js'),
 	import('../../packages/ufm/umbraco-package.js'),
@@ -66,22 +67,25 @@ export class UmbBackofficeElement extends UmbLitElement {
 
 		new UmbBackofficeEntryPointExtensionInitializer(this, umbExtensionsRegistry);
 		new UmbEntryPointExtensionInitializer(this, umbExtensionsRegistry);
+	}
 
-		// So far local packages are this simple to registerer, so no need for a manager to do that:
+	override async firstUpdated() {
+		await this.#extensionsAfterAuth();
+
+		// So far local packages are this simple to register, so no need for a manager to do that:
 		CORE_PACKAGES.forEach(async (packageImport) => {
 			const packageModule = await packageImport;
 			umbExtensionsRegistry.registerMany(packageModule.extensions);
 		});
+	}
 
-		const serverExtensions = new UmbServerExtensionRegistrator(this, umbExtensionsRegistry);
-
-		// TODO: We need to ensure this request is called every time the user logs in, but this should be done somewhere across the app and not here [JOV]
-		this.consumeContext(UMB_AUTH_CONTEXT, (authContext) => {
-			this.observe(authContext.isAuthorized, (isAuthorized) => {
-				if (!isAuthorized) return;
-				serverExtensions.registerPrivateExtensions();
-			});
-		});
+	async #extensionsAfterAuth() {
+		const authContext = await this.getContext(UMB_AUTH_CONTEXT, { preventTimeout: true });
+		if (!authContext) {
+			throw new Error('UmbBackofficeElement requires the UMB_AUTH_CONTEXT to be set.');
+		}
+		await this.observe(authContext.isAuthorized).asPromise();
+		await new UmbServerExtensionRegistrator(this, umbExtensionsRegistry).registerPrivateExtensions();
 	}
 
 	override render() {
@@ -92,7 +96,7 @@ export class UmbBackofficeElement extends UmbLitElement {
 		`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		css`
 			:host {
 				display: flex;

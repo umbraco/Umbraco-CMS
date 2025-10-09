@@ -256,14 +256,14 @@ namespace Umbraco.Cms.Core.Routing
             // if a culture is specified, then try to get domains for that culture
             // (else cultureDomains will be null)
             // do NOT specify a default culture, else it would pick those domains
-            IReadOnlyCollection<DomainAndUri>? cultureDomains = SelectByCulture(domainsAndUris, culture, defaultCulture: null);
+            IReadOnlyList<DomainAndUri>? cultureDomains = SelectByCulture(domainsAndUris, culture, defaultCulture: null);
             IReadOnlyCollection<DomainAndUri> considerForBaseDomains = domainsAndUris;
             if (cultureDomains != null)
             {
                 if (cultureDomains.Count == 1)
                 {
                     // only 1, return
-                    return cultureDomains.First();
+                    return cultureDomains[0];
                 }
 
                 // else restrict to those domains, for base lookup
@@ -272,11 +272,11 @@ namespace Umbraco.Cms.Core.Routing
 
             // look for domains that would be the base of the uri
             // we need to order so example.com/foo matches before example.com/
-            IReadOnlyCollection<DomainAndUri> baseDomains = SelectByBase(considerForBaseDomains.OrderByDescending(d => d.Uri.ToString()).ToList(), uri, culture);
+            List<DomainAndUri> baseDomains = SelectByBase(considerForBaseDomains.OrderByDescending(d => d.Uri.ToString()).ToArray(), uri, culture);
             if (baseDomains.Count > 0)
             {
                 // found, return
-                return baseDomains.First();
+                return baseDomains[0];
             }
 
             // if nothing works, then try to run the filter to select a domain
@@ -296,7 +296,7 @@ namespace Umbraco.Cms.Core.Routing
         private static bool MatchesCulture(DomainAndUri domain, string? culture)
             => culture == null || domain.Culture.InvariantEquals(culture);
 
-        private static IReadOnlyCollection<DomainAndUri> SelectByBase(IReadOnlyCollection<DomainAndUri> domainsAndUris, Uri uri, string? culture)
+        private static List<DomainAndUri> SelectByBase(DomainAndUri[] domainsAndUris, Uri uri, string? culture)
         {
             // look for domains that would be the base of the uri
             // ie current is www.example.com/foo/bar, look for domain www.example.com
@@ -314,7 +314,7 @@ namespace Umbraco.Cms.Core.Routing
             return baseDomains;
         }
 
-        private static IReadOnlyCollection<DomainAndUri>? SelectByCulture(IReadOnlyCollection<DomainAndUri> domainsAndUris, string? culture, string? defaultCulture)
+        private static List<DomainAndUri>? SelectByCulture(DomainAndUri[] domainsAndUris, string? culture, string? defaultCulture)
         {
             // we try our best to match cultures, but may end with a bogus domain
             if (culture is not null)
@@ -388,7 +388,7 @@ namespace Umbraco.Cms.Core.Routing
         public static Uri ParseUriFromDomainName(string domainName, Uri currentUri)
         {
             // turn "/en" into "http://whatever.com/en" so it becomes a parseable uri
-            var name = domainName.StartsWith("/") && currentUri != null
+            var name = domainName.StartsWith("/", StringComparison.Ordinal) && currentUri != null
                 ? currentUri.GetLeftPart(UriPartial.Authority) + domainName
                 : domainName;
             var scheme = currentUri?.Scheme ?? Uri.UriSchemeHttp;
@@ -434,13 +434,18 @@ namespace Umbraco.Cms.Core.Routing
 
         private static Domain? FindDomainInPath(IEnumerable<Domain>? domains, string path, int? rootNodeId, bool isWildcard)
         {
+            if (domains is null)
+            {
+                return null;
+            }
+
             var stopNodeId = rootNodeId ?? -1;
 
             return path.Split(Constants.CharArrays.Comma)
                        .Reverse()
                        .Select(s => int.Parse(s, CultureInfo.InvariantCulture))
                        .TakeWhile(id => id != stopNodeId)
-                       .Select(id => domains?.FirstOrDefault(d => d.ContentId == id && d.IsWildcard == isWildcard))
+                       .Select(id => domains.FirstOrDefault(d => d.ContentId == id && d.IsWildcard == isWildcard))
                        .FirstOrDefault(domain => domain is not null);
         }
 

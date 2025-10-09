@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Querying;
 /// <summary>
 ///     Represents an expression which caches the visitor's result.
 /// </summary>
-internal class CachedExpression : Expression
+internal sealed class CachedExpression : Expression
 {
     private string _visitResult = null!;
 

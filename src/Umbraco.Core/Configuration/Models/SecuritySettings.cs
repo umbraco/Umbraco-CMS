@@ -28,8 +28,8 @@ public class SecuritySettings
 
     internal const int StaticMemberDefaultLockoutTimeInMinutes = 30 * 24 * 60;
     internal const int StaticUserDefaultLockoutTimeInMinutes = 30 * 24 * 60;
-    private const long StaticUserDefaultFailedLoginDurationInMilliseconds = 1000;
-    private const long StaticUserMinimumFailedLoginDurationInMilliseconds = 250;
+    internal const long StaticUserDefaultFailedLoginDurationInMilliseconds = 1000;
+    internal const long StaticUserMinimumFailedLoginDurationInMilliseconds = 250;
     internal const string StaticAuthorizeCallbackPathName = "/umbraco/oauth_complete";
     internal const string StaticAuthorizeCallbackLogoutPathName = "/umbraco/logout";
     internal const string StaticAuthorizeCallbackErrorPathName = "/umbraco/error";

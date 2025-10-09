@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 ///     perform a lot of the underlying logic.
 ///     TODO: Create a helper method to contain most of the underlying logic for the ContentRepository
 /// </remarks>
-internal class DocumentBlueprintRepository : DocumentRepository, IDocumentBlueprintRepository
+internal sealed class DocumentBlueprintRepository : DocumentRepository, IDocumentBlueprintRepository
 {
     public DocumentBlueprintRepository(
         IScopeAccessor scopeAccessor,

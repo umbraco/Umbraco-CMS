@@ -1,5 +1,5 @@
 import type { UmbDataTypeDetailModel } from '../../types.js';
-import { UmbDataTypeServerDataSource } from './data-type-detail.server.data-source.js';
+import { UmbDataTypeServerDataSource } from './server-data-source/data-type-detail.server.data-source.js';
 import type { UmbDataTypeDetailStore } from './data-type-detail.store.js';
 import { UMB_DATA_TYPE_DETAIL_STORE_CONTEXT } from './data-type-detail.store.context-token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -11,11 +11,14 @@ export class UmbDataTypeDetailRepository extends UmbDetailRepositoryBase<UmbData
 	constructor(host: UmbControllerHost) {
 		super(host, UmbDataTypeServerDataSource, UMB_DATA_TYPE_DETAIL_STORE_CONTEXT);
 
-		this.#init = Promise.all([
-			this.consumeContext(UMB_DATA_TYPE_DETAIL_STORE_CONTEXT, (instance) => {
-				this.#detailStore = instance;
-			}).asPromise(),
-		]);
+		this.#init = this.consumeContext(UMB_DATA_TYPE_DETAIL_STORE_CONTEXT, (instance) => {
+			this.#detailStore = instance;
+		})
+			.asPromise({ preventTimeout: true })
+			.catch(() => {
+				// If the context is not available, we can assume that the store is not available.
+				this.#detailStore = undefined;
+			});
 	}
 
 	async byPropertyEditorUiAlias(propertyEditorUiAlias: string) {

@@ -48,7 +48,7 @@ public class MultipleValueValidator : IValueValidator
         }
 
         var invalidValues = values
-            .Where(x => valueListConfiguration.Items.Contains(x) is false)
+            .Where(x => x.IsNullOrWhiteSpace() is false && valueListConfiguration.Items.Contains(x) is false)
             .ToList();
 
         if (invalidValues.Count == 1)

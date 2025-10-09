@@ -4,7 +4,7 @@ import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffic
 import type { ModelsBuilderResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { ModelsBuilderService, ModelsModeModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 @customElement('umb-models-builder-dashboard')
@@ -24,7 +24,7 @@ export class UmbModelsBuilderDashboardElement extends UmbLitElement {
 	}
 
 	private async _getDashboardData() {
-		const { data } = await tryExecuteAndNotify(this, ModelsBuilderService.getModelsBuilderDashboard());
+		const { data } = await tryExecute(this, ModelsBuilderService.getModelsBuilderDashboard());
 		if (data) {
 			this._modelsBuilder = data;
 			return true;
@@ -39,7 +39,7 @@ export class UmbModelsBuilderDashboardElement extends UmbLitElement {
 	}
 
 	private async _postGenerateModels() {
-		const { error } = await tryExecuteAndNotify(this, ModelsBuilderService.postModelsBuilderBuild());
+		const { error } = await tryExecute(this, ModelsBuilderService.postModelsBuilderBuild());
 		if (error) {
 			return false;
 		}
@@ -63,8 +63,8 @@ export class UmbModelsBuilderDashboardElement extends UmbLitElement {
 					look="secondary"
 					label="Reload"
 					@click="${this._onDashboardReload}">
-						Reload
-					</uui-button>
+					Reload
+				</uui-button>
 				<p>Version: ${this._modelsBuilder?.version}</p>
 				<div class="models-description">
 					<p>ModelsBuilder is enabled with the following configuration:</p>
@@ -74,7 +74,7 @@ export class UmbModelsBuilderDashboardElement extends UmbLitElement {
 									The <strong>ModelsMode</strong> is '${this._modelsBuilder.mode}'. ${this.renderModelsMode()}
 								</li> `
 							: nothing}
-						${this.renderList()}
+						${this._renderList()}
 					</ul>
 				</div>
 				<p class="models-actions">
@@ -99,7 +99,7 @@ export class UmbModelsBuilderDashboardElement extends UmbLitElement {
 		`;
 	}
 
-	private renderList() {
+	private _renderList() {
 		if (this._modelsBuilder?.mode !== ModelsModeModel.NOTHING) {
 			return html`${this._modelsBuilder?.modelsNamespace
 				? html`<li>The <strong>models namespace</strong> is ${this._modelsBuilder.modelsNamespace}.</li>`

@@ -45,6 +45,6 @@ public class ReferencedByDocumentController : DocumentControllerBase
             Items = await _relationTypePresentationFactory.CreateReferenceResponseModelsAsync(relationItems.Items),
         };
 
-        return await Task.FromResult(pagedViewModel);
+        return pagedViewModel;
     }
 }

@@ -6,7 +6,7 @@ using Umbraco.Cms.Infrastructure.Scoping;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
-internal class DocumentBlueprintContainerRepository : EntityContainerRepository, IDocumentBlueprintContainerRepository
+internal sealed class DocumentBlueprintContainerRepository : EntityContainerRepository, IDocumentBlueprintContainerRepository
 {
     public DocumentBlueprintContainerRepository(
         IScopeAccessor scopeAccessor,

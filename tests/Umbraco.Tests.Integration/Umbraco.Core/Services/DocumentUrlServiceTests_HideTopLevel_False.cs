@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console)]
-public class DocumentUrlServiceTests_HideTopLevel_False : UmbracoIntegrationTestWithContent
+internal sealed class DocumentUrlServiceTests_HideTopLevel_False : UmbracoIntegrationTestWithContent
 {
     protected IDocumentUrlService DocumentUrlService => GetRequiredService<IDocumentUrlService>();
     protected ILanguageService LanguageService => GetRequiredService<ILanguageService>();
@@ -62,7 +62,7 @@ public class DocumentUrlServiceTests_HideTopLevel_False : UmbracoIntegrationTest
         // Create a subpage
         var subsubpage = ContentBuilder.CreateSimpleContent(ContentType, "Sub Page 1", Subpage.Id);
         subsubpage.Key = new Guid("DF49F477-12F2-4E33-8563-91A7CC1DCDBB");
-        var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.Now.AddMinutes(-5), null);
+        var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddMinutes(-5), null);
         ContentService.Save(subsubpage, -1, contentSchedule);
 
         if (loadDraft is false)
@@ -81,7 +81,7 @@ public class DocumentUrlServiceTests_HideTopLevel_False : UmbracoIntegrationTest
         // Create a second root
         var secondRoot = ContentBuilder.CreateSimpleContent(ContentType, "Second Root", null);
         secondRoot.Key = new Guid("8E21BCD4-02CA-483D-84B0-1FC92702E198");
-        var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.Now.AddMinutes(-5), null);
+        var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddMinutes(-5), null);
         ContentService.Save(secondRoot, -1, contentSchedule);
 
         if (loadDraft is false)
@@ -100,7 +100,7 @@ public class DocumentUrlServiceTests_HideTopLevel_False : UmbracoIntegrationTest
     {
         // Create a second root
         var secondRoot = ContentBuilder.CreateSimpleContent(ContentType, "Second Root", null);
-        var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.Now.AddMinutes(-5), null);
+        var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddMinutes(-5), null);
         ContentService.Save(secondRoot, -1, contentSchedule);
 
         // Create a child of second root

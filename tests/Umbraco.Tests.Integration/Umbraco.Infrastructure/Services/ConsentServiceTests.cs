@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
-public class ConsentServiceTests : UmbracoIntegrationTest
+internal sealed class ConsentServiceTests : UmbracoIntegrationTest
 {
     private IConsentService ConsentService => GetRequiredService<IConsentService>();
 

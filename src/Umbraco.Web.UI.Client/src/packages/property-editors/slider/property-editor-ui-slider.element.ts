@@ -1,5 +1,5 @@
+import type { UmbSliderPropertyEditorUiValue, UmbSliderPropertyEditorUiValueObject } from './types.js';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import type { UmbSliderPropertyEditorUiValue } from './types.js';
 import type { UmbInputSliderElement } from '@umbraco-cms/backoffice/components';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -8,15 +8,37 @@ import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+
+function stringToValueObject(value: string | undefined): Partial<UmbSliderPropertyEditorUiValueObject> {
+	const [from, to] = (value ?? ',').split(',');
+	const fromNumber = makeNumberOrUndefined(from);
+	return { from: fromNumber, to: makeNumberOrUndefined(to, fromNumber) };
+}
+
+function makeNumberOrUndefined(value: string | undefined, fallback?: undefined | number) {
+	if (value === undefined) {
+		return fallback;
+	}
+	const n = Number(value);
+	if (isNaN(n)) {
+		return fallback;
+	}
+	return n;
+}
+
+function undefinedFallback(value: number | undefined, fallback: number) {
+	return value === undefined ? fallback : value;
+}
 
 /**
  * @element umb-property-editor-ui-slider
  */
 @customElement('umb-property-editor-ui-slider')
-export class UmbPropertyEditorUISliderElement extends UmbLitElement implements UmbPropertyEditorUiElement {
-	@property({ type: Object })
-	value: UmbSliderPropertyEditorUiValue | undefined;
-
+export class UmbPropertyEditorUISliderElement
+	extends UmbFormControlMixin<UmbSliderPropertyEditorUiValue, typeof UmbLitElement>(UmbLitElement)
+	implements UmbPropertyEditorUiElement
+{
 	/**
 	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
 	 * @type {boolean}
@@ -77,11 +99,12 @@ export class UmbPropertyEditorUISliderElement extends UmbLitElement implements U
 	constructor() {
 		super();
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
-			this._label = context.getLabel();
+			this._label = context?.getLabel();
 		});
 	}
 
 	protected override firstUpdated() {
+		this.addFormControlElement(this.shadowRoot!.querySelector('umb-input-slider')!);
 		if (this._min && this._max && this._min > this._max) {
 			console.warn(
 				`Property '${this._label}' (Slider) has been misconfigured, 'min' is greater than 'max'. Please correct your data type configuration.`,
@@ -95,13 +118,13 @@ export class UmbPropertyEditorUISliderElement extends UmbLitElement implements U
 		return Number.isNaN(num) ? undefined : num;
 	}
 
-	#getValueObject(value: string) {
-		const [from, to] = value.split(',').map(Number);
-		return { from, to: to ?? from };
-	}
-
 	#onChange(event: CustomEvent & { target: UmbInputSliderElement }) {
-		this.value = this.#getValueObject(event.target.value as string);
+		const partialValue = stringToValueObject(event.target.value as string);
+		const handledFrom = undefinedFallback(partialValue.from, this._initVal1);
+		this.value = {
+			from: handledFrom,
+			to: this._enableRange ? undefinedFallback(partialValue.to, this._initVal2) : handledFrom,
+		};
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
@@ -109,8 +132,8 @@ export class UmbPropertyEditorUISliderElement extends UmbLitElement implements U
 		return html`
 			<umb-input-slider
 				.label=${this._label ?? 'Slider'}
-				.valueLow=${this.value?.from ?? this._initVal1}
-				.valueHigh=${this.value?.to ?? this._initVal2}
+				.valueLow=${undefinedFallback(this.value?.from, this._initVal1)}
+				.valueHigh=${undefinedFallback(this.value?.to, this._initVal2)}
 				.step=${this._step}
 				.min=${this._min}
 				.max=${this._max}

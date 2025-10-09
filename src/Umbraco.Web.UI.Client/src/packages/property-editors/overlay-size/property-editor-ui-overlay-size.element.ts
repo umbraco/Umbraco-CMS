@@ -1,7 +1,7 @@
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import {
-	type UmbPropertyEditorUiElement,
-	type UmbPropertyEditorConfigCollection,
+import type {
+	UmbPropertyEditorUiElement,
+	UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UUIModalSidebarSize, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
@@ -42,7 +42,13 @@ export class UmbPropertyEditorUIOverlaySizeElement extends UmbLitElement impleme
 	}
 
 	override render() {
-		return html`<uui-select .options=${this._list} @change=${this.#onChange}></uui-select>`;
+		return html`
+			<uui-select
+				label=${this.localize.term('rte_config_overlaySize')}
+				.options=${this._list}
+				@change=${this.#onChange}>
+			</uui-select>
+		`;
 	}
 }
 

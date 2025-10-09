@@ -1,0 +1,11 @@
+{
+	"name": "@umbraco-backoffice/monaco-editor",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"build": "vite build"
+	},
+	"dependencies": {
+		"monaco-editor": "^0.54.0"
+	}
+}

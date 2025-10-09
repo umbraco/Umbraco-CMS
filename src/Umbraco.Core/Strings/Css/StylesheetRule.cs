@@ -30,13 +30,13 @@ public class StylesheetRule
             // instead of using string interpolation (for increased performance)
             foreach (var style in
                      Styles?.Split(Constants.CharArrays.Semicolon, StringSplitOptions.RemoveEmptyEntries) ??
-                     Array.Empty<string>())
+                     [])
             {
-                sb.Append("\t").Append(style.StripNewLines().Trim()).Append(";").Append(Environment.NewLine);
+                sb.Append('\t').Append(style.StripNewLines().Trim()).Append(';').Append(Environment.NewLine);
             }
         }
 
-        sb.Append("}");
+        sb.Append('}');
 
         return sb.ToString();
     }

@@ -16,8 +16,8 @@ export class UmbLogViewerLevelTagElement extends LitElement {
 	levelMap: Record<LogLevelModel, LevelMapStyles> = {
 		Verbose: { look: 'secondary' },
 		Debug: {
-			look: 'default',
-			style: 'background-color: var(--umb-log-viewer-debug-color); color: var(--uui-color-surface)',
+			look: 'primary',
+			style: 'background-color: var(--umb-log-viewer-debug-color)',
 		},
 		Information: { look: 'primary', color: 'positive' },
 		Warning: { look: 'primary', color: 'warning' },

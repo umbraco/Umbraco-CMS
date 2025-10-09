@@ -1,4 +1,4 @@
-﻿using NPoco;
+using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(Constants.DatabaseSchema.Tables.WebhookLog)]
 [PrimaryKey("id")]
 [ExplicitColumns]
-internal class WebhookLogDto
+internal sealed class WebhookLogDto
 {
     [Column("id")]
     [PrimaryKeyColumn(AutoIncrement = true)]
@@ -24,7 +24,7 @@ internal class WebhookLogDto
     [NullSetting(NullSetting = NullSettings.NotNull)]
     public string StatusCode { get; set; } = string.Empty;
 
-    [Column(Name = "date")]
+    [Column(Name = "date", ForceToUtc = false)]
     [Index(IndexTypes.NonClustered, Name = "IX_" + Constants.DatabaseSchema.Tables.WebhookLog + "_date")]
     [NullSetting(NullSetting = NullSettings.NotNull)]
     public DateTime Date { get; set; }

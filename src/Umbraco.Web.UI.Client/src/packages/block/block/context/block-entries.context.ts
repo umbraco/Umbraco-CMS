@@ -15,18 +15,10 @@ export abstract class UmbBlockEntriesContext<
 	BlockType extends UmbBlockTypeBaseModel,
 	BlockLayoutType extends UmbBlockLayoutBaseModel,
 	BlockOriginData extends UmbBlockWorkspaceOriginData,
-> extends UmbContextBase<
-	UmbBlockEntriesContext<
-		BlockManagerContextTokenType,
-		BlockManagerContextType,
-		BlockType,
-		BlockLayoutType,
-		BlockOriginData
-	>
-> {
+> extends UmbContextBase {
 	//
-	_manager?: BlockManagerContextType;
-	_retrieveManager;
+	protected _manager?: BlockManagerContextType;
+	protected _retrieveManager;
 
 	protected _catalogueRouteBuilderState = new UmbBasicState<UmbModalRouteBuilder | undefined>(undefined);
 	readonly catalogueRouteBuilder = this._catalogueRouteBuilderState.asObservable();
@@ -53,7 +45,7 @@ export abstract class UmbBlockEntriesContext<
 		this._retrieveManager = this.consumeContext(blockManagerContextToken, (blockGridManager) => {
 			this._manager = blockGridManager;
 			this._gotBlockManager();
-		}).asPromise();
+		}).asPromise({ preventTimeout: true });
 	}
 
 	async getManager() {

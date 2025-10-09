@@ -4,7 +4,7 @@ import type {
 	UmbDocumentPublishWithDescendantsModalValue,
 } from './document-publish-with-descendants-modal.token.js';
 import type { UmbDocumentPublishWithDescendantsModalElement } from './document-publish-with-descendants-modal.element.js';
-import type { Meta, StoryObj } from '@storybook/web-components';
+import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import './document-publish-with-descendants-modal.element.js';
@@ -25,6 +25,7 @@ const modalData: UmbDocumentPublishWithDescendantsModalData = {
 				segment: null,
 				scheduledPublishDate: null,
 				scheduledUnpublishDate: null,
+				flags: [],
 			},
 			language: {
 				entityType: 'language',
@@ -49,6 +50,7 @@ const modalData: UmbDocumentPublishWithDescendantsModalData = {
 				updateDate: null,
 				scheduledPublishDate: null,
 				scheduledUnpublishDate: null,
+				flags: [],
 			},
 			language: {
 				entityType: 'language',
@@ -73,6 +75,7 @@ const modalData: UmbDocumentPublishWithDescendantsModalData = {
 				segment: null,
 				scheduledPublishDate: null,
 				scheduledUnpublishDate: null,
+				flags: [],
 			},
 			language: {
 				entityType: 'language',
@@ -91,7 +94,7 @@ const modalValue: UmbDocumentPublishWithDescendantsModalValue = {
 };
 
 const meta: Meta<UmbDocumentPublishWithDescendantsModalElement> = {
-	title: 'Workspaces/Document/Modals/Publish With Descendants Modal',
+	title: 'Entity/Document/Modals/Publish With Descendants Modal',
 	component: 'umb-document-publish-with-descendants-modal',
 	id: 'umb-document-publish-with-descendants-modal',
 	args: {
@@ -169,7 +172,7 @@ this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (modalManager) => {
 export default meta;
 type Story = StoryObj<UmbDocumentPublishWithDescendantsModalElement>;
 
-export const Overview: Story = {};
+export const Docs: Story = {};
 
 export const Invariant: Story = {
 	args: {

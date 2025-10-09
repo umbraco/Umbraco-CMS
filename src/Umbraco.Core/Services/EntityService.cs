@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Linq.Expressions;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
@@ -318,6 +319,88 @@ public class EntityService : RepositoryService, IEntityService
     }
 
     /// <inheritdoc />
+    public IEnumerable<IEntitySlim> GetSiblings(
+        Guid key,
+        IEnumerable<UmbracoObjectTypes> objectTypes,
+        int before,
+        int after,
+        out long totalBefore,
+        out long totalAfter,
+        IQuery<IUmbracoEntity>? filter = null,
+        Ordering? ordering = null)
+    {
+        if (before < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(before), "The 'before' parameter must be greater than or equal to 0.");
+        }
+
+        if (after < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(after), "The 'after' parameter must be greater than or equal to 0.");
+        }
+
+        ordering ??= new Ordering("sortOrder");
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+
+        var objectTypeGuids = objectTypes.Select(x => x.GetGuid()).ToHashSet();
+
+        IEnumerable<IEntitySlim> siblings = _entityRepository.GetSiblings(
+            objectTypeGuids,
+            key,
+            before,
+            after,
+            filter,
+            ordering,
+            out totalBefore,
+            out totalAfter);
+
+        scope.Complete();
+        return siblings;
+    }
+
+    /// <inheritdoc />
+    public IEnumerable<IEntitySlim> GetTrashedSiblings(
+        Guid key,
+        IEnumerable<UmbracoObjectTypes> objectTypes,
+        int before,
+        int after,
+        out long totalBefore,
+        out long totalAfter,
+        IQuery<IUmbracoEntity>? filter = null,
+        Ordering? ordering = null)
+    {
+        if (before < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(before), "The 'before' parameter must be greater than or equal to 0.");
+        }
+
+        if (after < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(after), "The 'after' parameter must be greater than or equal to 0.");
+        }
+
+        ordering ??= new Ordering("sortOrder");
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+
+        var objectTypeGuids = objectTypes.Select(x => x.GetGuid()).ToHashSet();
+
+        IEnumerable<IEntitySlim> siblings = _entityRepository.GetTrashedSiblings(
+            objectTypeGuids,
+            key,
+            before,
+            after,
+            filter,
+            ordering,
+            out totalBefore,
+            out totalAfter);
+
+        scope.Complete();
+        return siblings;
+    }
+
+    /// <inheritdoc />
     public virtual IEnumerable<IEntitySlim> GetDescendants(int id)
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -398,7 +481,7 @@ public class EntityService : RepositoryService, IEntityService
 
         if (take == 0)
         {
-            totalRecords = CountChildren(parentId, childObjectType, filter);
+            totalRecords = CountChildren(parentId, childObjectType, filter: filter);
             return Enumerable.Empty<IEntitySlim>();
         }
 
@@ -442,6 +525,12 @@ public class EntityService : RepositoryService, IEntityService
         if (ResolveKey(key, objectType, out int parentId) is false)
         {
             totalRecords = 0;
+            return Enumerable.Empty<IEntitySlim>();
+        }
+
+        if (take == 0)
+        {
+            totalRecords = CountChildren(parentId, objectType, true, filter);
             return Enumerable.Empty<IEntitySlim>();
         }
 
@@ -651,17 +740,18 @@ public class EntityService : RepositoryService, IEntityService
         }
     }
 
-    private int CountChildren(int id, UmbracoObjectTypes objectType, IQuery<IUmbracoEntity>? filter = null) =>
-        CountChildren(id, new HashSet<UmbracoObjectTypes>() { objectType }, filter);
+    private int CountChildren(int id, UmbracoObjectTypes objectType, bool trashed = false, IQuery<IUmbracoEntity>? filter = null) =>
+        CountChildren(id, new HashSet<UmbracoObjectTypes>() { objectType }, trashed, filter);
 
     private int CountChildren(
         int id,
         IEnumerable<UmbracoObjectTypes> objectTypes,
+        bool trashed = false,
         IQuery<IUmbracoEntity>? filter = null)
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            IQuery<IUmbracoEntity> query = Query<IUmbracoEntity>().Where(x => x.ParentId == id && x.Trashed == false);
+            IQuery<IUmbracoEntity> query = Query<IUmbracoEntity>().Where(x => x.ParentId == id && x.Trashed == trashed);
 
             var objectTypeGuids = objectTypes.Select(x => x.GetGuid()).ToHashSet();
             return _entityRepository.CountByQuery(query, objectTypeGuids, filter);
@@ -740,7 +830,7 @@ public class EntityService : RepositoryService, IEntityService
 
             if (take == 0)
             {
-                totalRecords = CountChildren(parentId, childObjectTypes, filter);
+                totalRecords = CountChildren(parentId, childObjectTypes, filter: filter);
                 return Array.Empty<IEntitySlim>();
             }
 
@@ -758,5 +848,26 @@ public class EntityService : RepositoryService, IEntityService
             return _entityRepository.GetPagedResultsByQuery(query, objectTypeGuids, pageNumber, pageSize, out totalRecords, filter, ordering);
         }
     }
-}
 
+    /// <inheritdoc/>>
+    public Guid[] GetPathKeys(ITreeEntity entity, bool omitSelf = false)
+    {
+        IEnumerable<int> ids = entity.Path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
+            .Select(x => int.TryParse(x, NumberStyles.Integer, CultureInfo.InvariantCulture, out var val) ? val : -1)
+            .Where(x => x != -1);
+
+        Guid[] keys = ids
+            .Select(x => _idKeyMap.GetKeyForId(x, UmbracoObjectTypes.Document))
+            .Where(x => x.Success)
+            .Select(x => x.Result)
+            .ToArray();
+
+        if (omitSelf)
+        {
+            // Omit the last path key as that will be for the item itself.
+            return keys.Take(keys.Length - 1).ToArray();
+        }
+
+        return keys;
+    }
+}

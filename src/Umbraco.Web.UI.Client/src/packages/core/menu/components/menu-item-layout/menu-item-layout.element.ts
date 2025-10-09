@@ -1,5 +1,6 @@
 import { html, customElement, property, ifDefined, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { ensureSlash } from '@umbraco-cms/backoffice/router';
 import { debounce } from '@umbraco-cms/backoffice/utils';
 
 /**
@@ -62,8 +63,12 @@ export class UmbMenuItemLayoutElement extends UmbLitElement {
 			return;
 		}
 
-		const location = window.location.pathname;
-		this._isActive = location.includes(this.href);
+		/* Check if the current location includes the href of this menu item
+		We ensure that the paths ends with a slash to avoid collisions with paths like /path-1 and /path-1-2 where /path is in both.
+		Instead we compare /path-1/ with /path-1-2/ which wont collide.*/
+		const location = ensureSlash(window.location.pathname);
+		const compareHref = ensureSlash(this.href);
+		this._isActive = location.includes(compareHref);
 	}
 
 	override render() {
@@ -80,7 +85,7 @@ export class UmbMenuItemLayoutElement extends UmbLitElement {
 						slot="actions"
 						.entityType=${this.entityType}
 						.unique=${null}
-						.label=${this.label}>
+						.label=${this.localize.term('actions_viewActionsFor', [this.label])}>
 					</umb-entity-actions-bundle>`
 				: ''}
 			<slot></slot>

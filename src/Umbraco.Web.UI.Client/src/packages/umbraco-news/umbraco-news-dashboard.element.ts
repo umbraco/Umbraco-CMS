@@ -35,7 +35,7 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 						<h2 class="uui-h3">${this.localize.term('welcomeDashboard_ourUmbracoHeadline')}</h2>
 						<p>${this.localize.term('welcomeDashboard_ourUmbracoDescription')}</p>
 						<uui-button
-							look="primary"
+							look="outline"
 							target="_blank"
 							href="https://our.umbraco.com/?utm_source=core&amp;utm_medium=dashboard&amp;utm_content=image&amp;utm_campaign=our"
 							label=${this.localize.term('welcomeDashboard_ourUmbracoButton')}></uui-button>
@@ -74,8 +74,7 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 			#info-links {
 				display: grid;
 				grid-template-columns: repeat(auto-fill, minmax(20%, 1fr));
-				grid-gap: var(--uui-size-space-4);
-				max-width: 1000px;
+				grid-gap: var(--uui-size-space-5);
 			}
 
 			.info-link {

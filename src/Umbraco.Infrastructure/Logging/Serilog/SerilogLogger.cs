@@ -19,7 +19,7 @@ public class SerilogLogger : IDisposable
 
     public ILogger SerilogLog { get; }
 
-    [Obsolete]
+    [Obsolete("Scheduled for removal in Umbraco 17.")]
     public static SerilogLogger CreateWithDefaultConfiguration(
         IHostingEnvironment hostingEnvironment,
         ILoggingConfiguration loggingConfiguration,
@@ -32,7 +32,7 @@ public class SerilogLogger : IDisposable
     ///     Creates a logger with some pre-defined configuration and remainder from config file
     /// </summary>
     /// <remarks>Used by UmbracoApplicationBase to get its logger.</remarks>
-    [Obsolete]
+    [Obsolete("Scheduled for removal in Umbraco 17.")]
     public static SerilogLogger CreateWithDefaultConfiguration(
         IHostingEnvironment hostingEnvironment,
         ILoggingConfiguration loggingConfiguration,

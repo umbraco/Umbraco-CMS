@@ -11,7 +11,7 @@ export class UmbUserGroupEntityUserPermissionListElement extends UmbLitElement {
 	private _fallBackPermissions?: Array<string>;
 
 	@state()
-	private _entityTypes: Array<string> = [];
+	private _groups: Array<{ entityType: string; headline: string }> = [];
 
 	#userGroupWorkspaceContext?: typeof UMB_USER_GROUP_WORKSPACE_CONTEXT.TYPE;
 
@@ -23,7 +23,7 @@ export class UmbUserGroupEntityUserPermissionListElement extends UmbLitElement {
 		this.consumeContext(UMB_USER_GROUP_WORKSPACE_CONTEXT, (instance) => {
 			this.#userGroupWorkspaceContext = instance;
 			this.observe(
-				this.#userGroupWorkspaceContext.fallbackPermissions,
+				this.#userGroupWorkspaceContext?.fallbackPermissions,
 				(fallbackPermissions) => {
 					this._fallBackPermissions = fallbackPermissions;
 				},
@@ -36,7 +36,15 @@ export class UmbUserGroupEntityUserPermissionListElement extends UmbLitElement {
 		this.observe(
 			umbExtensionsRegistry.byType('entityUserPermission'),
 			(manifests) => {
-				this._entityTypes = [...new Set(manifests.flatMap((manifest) => manifest.forEntityTypes))];
+				const entityTypes = [...new Set(manifests.flatMap((manifest) => manifest.forEntityTypes))];
+				this._groups = entityTypes
+					.map((entityType) => {
+						return {
+							entityType,
+							headline: this.localize.term(`user_permissionsEntityGroup_${entityType}`),
+						};
+					})
+					.sort((a, b) => a.headline.localeCompare(b.headline));
 			},
 			'umbUserPermissionsObserver',
 		);
@@ -51,14 +59,14 @@ export class UmbUserGroupEntityUserPermissionListElement extends UmbLitElement {
 	}
 
 	override render() {
-		return html` ${this._entityTypes.map((entityType) => this.#renderPermissionsByEntityType(entityType))} `;
+		return html` ${this._groups.map((group) => this.#renderPermissionsForEntityType(group))}`;
 	}
 
-	#renderPermissionsByEntityType(entityType: string) {
+	#renderPermissionsForEntityType(group: { entityType: string; headline: string }) {
 		return html`
-			<h4><umb-localize .key=${`user_permissionsEntityGroup_${entityType}`}>${entityType}</umb-localize></h4>
+			<h4>${group.headline}</h4>
 			<umb-input-entity-user-permission
-				.entityType=${entityType}
+				.entityType=${group.entityType}
 				.allowedVerbs=${this._fallBackPermissions || []}
 				@change=${this.#onPermissionChange}></umb-input-entity-user-permission>
 		`;

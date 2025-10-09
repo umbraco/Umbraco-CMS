@@ -3,7 +3,7 @@ import './document-publish-modal.element.js';
 import { UmbDocumentVariantState } from '../../../types.js';
 import type { UmbDocumentPublishModalData, UmbDocumentPublishModalValue } from './document-publish-modal.token.js';
 import type { UmbDocumentPublishModalElement } from './document-publish-modal.element.js';
-import type { Meta, StoryObj } from '@storybook/web-components';
+import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 const modalData: UmbDocumentPublishModalData = {
@@ -22,6 +22,7 @@ const modalData: UmbDocumentPublishModalData = {
 				segment: null,
 				scheduledPublishDate: null,
 				scheduledUnpublishDate: null,
+				flags: [],
 			},
 			language: {
 				entityType: 'language',
@@ -46,6 +47,7 @@ const modalData: UmbDocumentPublishModalData = {
 				updateDate: null,
 				scheduledPublishDate: null,
 				scheduledUnpublishDate: null,
+				flags: [],
 			},
 			language: {
 				entityType: 'language',
@@ -70,6 +72,7 @@ const modalData: UmbDocumentPublishModalData = {
 				segment: null,
 				scheduledPublishDate: null,
 				scheduledUnpublishDate: null,
+				flags: [],
 			},
 			language: {
 				entityType: 'language',
@@ -88,7 +91,7 @@ const modalValue: UmbDocumentPublishModalValue = {
 };
 
 const meta: Meta<UmbDocumentPublishModalElement> = {
-	title: 'Workspaces/Document/Modals/Publish',
+	title: 'Entity/Document/Modals/Publish',
 	component: 'umb-document-publish-modal',
 	id: 'umb-document-publish-modal',
 	args: {
@@ -121,6 +124,7 @@ this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (modalManager) => {
 						publishDate: null,
 						updateDate: null,
 						segment: null,
+						flags: [],
 					},
 					language: {
 						entityType: 'language',
@@ -143,6 +147,7 @@ this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (modalManager) => {
 						publishDate: null,
 						updateDate: null,
 						segment: null,
+						flags: [],
 					},
 					language: {
 						entityType: 'language',
@@ -166,4 +171,4 @@ this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (modalManager) => {
 export default meta;
 type Story = StoryObj<UmbDocumentPublishModalElement>;
 
-export const Overview: Story = {};
+export const Docs: Story = {};

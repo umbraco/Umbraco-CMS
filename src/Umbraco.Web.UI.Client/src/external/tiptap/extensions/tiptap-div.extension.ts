@@ -1,5 +1,6 @@
 import { Node, mergeAttributes } from '@tiptap/core';
 
+/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
 export interface DivOptions {
 	/**
 	 * HTML attributes to add to the element.
@@ -9,6 +10,7 @@ export interface DivOptions {
 	HTMLAttributes: Record<string, any>;
 }
 
+/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
 export const Div = Node.create<DivOptions>({
 	name: 'div',
 
@@ -23,10 +25,10 @@ export const Div = Node.create<DivOptions>({
 	},
 
 	parseHTML() {
-		return [{ tag: 'div' }];
+		return [{ tag: this.name }];
 	},
 
 	renderHTML({ HTMLAttributes }) {
-		return ['div', mergeAttributes(this.options.HTMLAttributes, HTMLAttributes), 0];
+		return [this.name, mergeAttributes(this.options.HTMLAttributes, HTMLAttributes), 0];
 	},
 });

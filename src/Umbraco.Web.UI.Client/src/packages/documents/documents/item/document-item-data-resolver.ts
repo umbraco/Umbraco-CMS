@@ -2,14 +2,25 @@ import { UmbDocumentVariantState } from '../types.js';
 import type { UmbDocumentItemModel } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbEntityFlag } from '@umbraco-cms/backoffice/entity-flag';
 import type { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
-import type { UmbAppLanguageContext } from '@umbraco-cms/backoffice/language';
-import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
-import { UmbBooleanState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
-import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
-import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import {
+	type Observable,
+	UmbArrayState,
+	UmbBooleanState,
+	UmbObjectState,
+	UmbStringState,
+} from '@umbraco-cms/backoffice/observable-api';
+import { type UmbVariantContext, UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
 
 type UmbDocumentItemDataResolverModel = Omit<UmbDocumentItemModel, 'parent' | 'hasChildren'>;
+
+function isVariantsInvariant(variants: Array<{ culture: string | null }>): boolean {
+	return variants?.[0]?.culture === null;
+}
+function findVariant<T extends { culture: string | null }>(variants: Array<T>, culture: string): T | undefined {
+	return variants.find((x) => x.culture === culture);
+}
 
 /**
  * A controller for resolving data for a document item
@@ -18,53 +29,57 @@ type UmbDocumentItemDataResolverModel = Omit<UmbDocumentItemModel, 'parent' | 'h
  * @augments {UmbControllerBase}
  */
 export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataResolverModel> extends UmbControllerBase {
-	#defaultCulture?: string;
-	#appCulture?: string;
-	#propertyDataSetCulture?: UmbVariantId;
-	#data?: DataType | undefined;
+	#data = new UmbObjectState<DataType | undefined>(undefined);
 
-	#init: Promise<[UmbAppLanguageContext]>;
-
-	#unique = new UmbStringState(undefined);
-	public readonly unique = this.#unique.asObservable();
+	public readonly unique = this.#data.asObservablePart((x) => x?.unique);
+	public readonly icon = this.#data.asObservablePart((x) => x?.documentType.icon);
+	public readonly isTrashed = this.#data.asObservablePart((x) => x?.isTrashed);
 
 	#name = new UmbStringState(undefined);
 	public readonly name = this.#name.asObservable();
 
-	#icon = new UmbStringState(undefined);
-	public readonly icon = this.#icon.asObservable();
-
-	#state = new UmbStringState(undefined);
-	public readonly state = this.#state.asObservable();
-
-	#isTrashed = new UmbBooleanState(undefined);
-	public readonly isTrashed = this.#isTrashed.asObservable();
+	#state = new UmbStringState<DocumentVariantStateModel | null | undefined>(undefined);
+	public readonly state = this.#state.asObservable() as Observable<DocumentVariantStateModel | null | undefined>;
 
 	#isDraft = new UmbBooleanState(undefined);
 	public readonly isDraft = this.#isDraft.asObservable();
 
+	#flags = new UmbArrayState<UmbEntityFlag>([], (data) => data.alias);
+	public readonly flags = this.#flags.asObservable();
+
+	#variantContext?: UmbVariantContext;
+	#fallbackCulture?: string | null;
+	#displayCulture?: string | null;
+
 	constructor(host: UmbControllerHost) {
 		super(host);
 
-		// We do not depend on this context because we know is it only available in some cases
-		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (context) => {
-			this.#propertyDataSetCulture = context.getVariantId();
-			this.#setVariantAwareValues();
+		this.consumeContext(UMB_VARIANT_CONTEXT, (context) => {
+			this.#variantContext = context;
+			this.#observeVariantContext();
 		});
+	}
 
-		this.#init = Promise.all([
-			this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (context) => {
-				this.observe(context.appLanguageCulture, (culture) => {
-					this.#appCulture = culture;
-					this.#setVariantAwareValues();
-				});
+	#observeVariantContext() {
+		this.observe(
+			this.#variantContext?.displayCulture,
+			(displayCulture) => {
+				if (displayCulture === undefined) return;
+				this.#displayCulture = displayCulture;
+				this.#setVariantAwareValues();
+			},
+			'umbObserveVariantId',
+		);
 
-				this.observe(context.appDefaultLanguage, (value) => {
-					this.#defaultCulture = value?.unique;
-					this.#setVariantAwareValues();
-				});
-			}).asPromise(),
-		]);
+		this.observe(
+			this.#variantContext?.fallbackCulture,
+			(fallbackCulture) => {
+				if (fallbackCulture === undefined) return;
+				this.#fallbackCulture = fallbackCulture;
+				this.#setVariantAwareValues();
+			},
+			'umbObserveFallbackCulture',
+		);
 	}
 
 	/**
@@ -73,7 +88,7 @@ export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataRes
 	 * @memberof UmbDocumentItemDataResolver
 	 */
 	getData(): DataType | undefined {
-		return this.#data;
+		return this.#data.getValue();
 	}
 
 	/**
@@ -82,20 +97,7 @@ export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataRes
 	 * @memberof UmbDocumentItemDataResolver
 	 */
 	setData(data: DataType | undefined) {
-		this.#data = data;
-
-		if (!this.#data) {
-			this.#unique.setValue(undefined);
-			this.#name.setValue(undefined);
-			this.#icon.setValue(undefined);
-			this.#isTrashed.setValue(undefined);
-			this.#isDraft.setValue(undefined);
-			return;
-		}
-
-		this.#unique.setValue(this.#data.unique);
-		this.#icon.setValue(this.#data.documentType.icon);
-		this.#isTrashed.setValue(this.#data.isTrashed);
+		this.#data.setValue(data);
 		this.#setVariantAwareValues();
 	}
 
@@ -105,8 +107,7 @@ export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataRes
 	 * @memberof UmbDocumentItemDataResolver
 	 */
 	async getUnique(): Promise<string | undefined> {
-		await this.#init;
-		return this.#unique.getValue();
+		return await this.observe(this.unique).asPromise();
 	}
 
 	/**
@@ -115,8 +116,7 @@ export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataRes
 	 * @memberof UmbDocumentItemDataResolver
 	 */
 	async getName(): Promise<string> {
-		await this.#init;
-		return this.#name.getValue() || '';
+		return (await this.observe(this.name).asPromise()) || '';
 	}
 
 	/**
@@ -125,8 +125,7 @@ export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataRes
 	 * @memberof UmbDocumentItemDataResolver
 	 */
 	async getIcon(): Promise<string | undefined> {
-		await this.#init;
-		return this.#data?.documentType.icon;
+		return await this.observe(this.icon).asPromise();
 	}
 
 	/**
@@ -135,8 +134,7 @@ export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataRes
 	 * @memberof UmbDocumentItemDataResolver
 	 */
 	async getState(): Promise<DocumentVariantStateModel | null | undefined> {
-		await this.#init;
-		return this.#getCurrentVariant()?.state;
+		return await this.observe(this.state).asPromise();
 	}
 
 	/**
@@ -145,8 +143,7 @@ export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataRes
 	 * @memberof UmbDocumentItemDataResolver
 	 */
 	async getIsDraft(): Promise<boolean> {
-		await this.#init;
-		return this.#isDraft.getValue() ?? false;
+		return (await this.observe(this.isDraft).asPromise()) ?? false;
 	}
 
 	/**
@@ -155,21 +152,34 @@ export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataRes
 	 * @memberof UmbDocumentItemDataResolver
 	 */
 	async getIsTrashed(): Promise<boolean> {
-		await this.#init;
-		return this.#data?.isTrashed ?? false;
+		return (await this.observe(this.isTrashed).asPromise()) ?? false;
 	}
 
 	#setVariantAwareValues() {
+		if (!this.#variantContext) return;
+		if (!this.#displayCulture) return;
+		if (!this.#fallbackCulture) return;
+		if (!this.#data) return;
 		this.#setName();
 		this.#setIsDraft();
 		this.#setState();
+		this.#setFlags();
 	}
 
 	#setName() {
 		const variant = this.#getCurrentVariant();
-		const fallbackName = this.#findVariant(this.#defaultCulture)?.name;
-		const name = variant?.name ?? `(${fallbackName})`;
-		this.#name.setValue(name);
+		if (variant) {
+			this.#name.setValue(variant.name);
+			return;
+		}
+
+		const variants = this.getData()?.variants;
+		if (variants) {
+			const fallbackName = findVariant(variants, this.#fallbackCulture!)?.name;
+			this.#name.setValue(`(${fallbackName})`);
+		} else {
+			this.#name.setValue(undefined);
+		}
 	}
 
 	#setIsDraft() {
@@ -184,20 +194,26 @@ export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataRes
 		this.#state.setValue(state);
 	}
 
-	#findVariant(culture: string | undefined) {
-		return this.#data?.variants.find((x) => x.culture === culture);
+	#setFlags() {
+		const data = this.getData();
+		if (!data) {
+			this.#flags.setValue([]);
+			return;
+		}
+
+		const flags = data.flags ?? [];
+		const variantFlags = this.#getCurrentVariant()?.flags ?? [];
+		this.#flags.setValue([...flags, ...variantFlags]);
 	}
 
 	#getCurrentVariant() {
-		if (this.#isInvariant()) {
-			return this.#data?.variants?.[0];
+		const variants = this.getData()?.variants;
+		if (!variants) return undefined;
+
+		if (isVariantsInvariant(variants)) {
+			return variants[0];
 		}
 
-		const culture = this.#propertyDataSetCulture?.culture || this.#appCulture;
-		return this.#findVariant(culture);
-	}
-
-	#isInvariant() {
-		return this.#data?.variants?.[0]?.culture === null;
+		return findVariant(variants, this.#displayCulture!);
 	}
 }

@@ -63,6 +63,3 @@ export class UmbMemberPickerInputContext extends UmbPickerInputContext<
 		return true;
 	};
 }
-
-/** @deprecated Use `UmbMemberPickerInputContext` instead. This method will be removed in Umbraco 15. */
-export { UmbMemberPickerInputContext as UmbMemberPickerContext };

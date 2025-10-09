@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(Constants.DatabaseSchema.Tables.Template)]
 [PrimaryKey("pk")]
 [ExplicitColumns]
-internal class TemplateDto
+internal sealed class TemplateDto
 {
     [Column("pk")]
     [PrimaryKeyColumn]

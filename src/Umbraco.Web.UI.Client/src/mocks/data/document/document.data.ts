@@ -1,3 +1,4 @@
+import { data as permissionsTestData } from './data/permissions-test.data.js';
 import type {
 	DocumentItemResponseModel,
 	DocumentResponseModel,
@@ -9,12 +10,8 @@ export type UmbMockDocumentModel = DocumentResponseModel & DocumentTreeItemRespo
 
 export const data: Array<UmbMockDocumentModel> = [
 	{
-		urls: [
-			{
-				culture: 'en-US',
-				url: '/',
-			},
-		],
+		ancestors: [],
+		urls: [],
 		template: null,
 		id: 'the-simplest-document-id',
 		createDate: '2023-02-06T15:32:05.350038',
@@ -31,11 +28,13 @@ export const data: Array<UmbMockDocumentModel> = [
 			{
 				state: DocumentVariantStateModel.DRAFT,
 				publishDate: '2023-02-06T15:32:24.957009',
-				culture: 'en-us',
+				culture: 'en-US',
 				segment: null,
 				name: 'The Simplest Document',
 				createDate: '2023-02-06T15:32:05.350038',
 				updateDate: '2023-02-06T15:32:24.957009',
+				id: 'the-simplest-document-id',
+				flags: [],
 			},
 		],
 		values: [
@@ -47,8 +46,10 @@ export const data: Array<UmbMockDocumentModel> = [
 				value: 'default value here',
 			},
 		],
+		flags: [],
 	},
 	{
+		ancestors: [],
 		urls: [
 			{
 				culture: 'en-US',
@@ -71,7 +72,7 @@ export const data: Array<UmbMockDocumentModel> = [
 			{
 				editorAlias: 'Umbraco.RichText',
 				alias: 'richTextEditor',
-				culture: null,
+				culture: 'en-US',
 				segment: null,
 				value: {
 					blocks: {},
@@ -79,9 +80,9 @@ export const data: Array<UmbMockDocumentModel> = [
 						<p>
 							Some value for the RTE with an <a href="https://google.com">external link</a> and an <a type="document" href="/{localLink:c05da24d-7740-447b-9cdc-bd8ce2172e38}">internal link</a> foo foo
 						</p>
-						<div class="umb-macro-holder TestMacro umb-macro-mce_1 mceNonEditable"><!-- <?UMBRACO_MACRO macroAlias="TestMacro" /> --><ins>Macro alias: <strong>TestMacro</strong></ins></div>
+						<div class="umb-macro-holder TestMacro umb-macro-mce_1"><!-- <?UMBRACO_MACRO macroAlias="TestMacro" /> --><ins>Macro alias: <strong>TestMacro</strong></ins></div>
 						<p>The following tests the embed plugin:</p>
-						<div class="mceNonEditable umb-embed-holder" data-embed-height="240" data-embed-width="360" data-embed-constrain="false"><iframe width="360" height="240" src="https://www.youtube.com/embed/QRIWz9SotY4?feature=oembed" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen="allowfullscreen" title="Sleep Token - The Summoning"></iframe></div>
+						<div class="umb-embed-holder" data-embed-height="240" data-embed-width="360" data-embed-constrain="false"><iframe width="360" height="240" src="https://www.youtube.com/embed/QRIWz9SotY4?feature=oembed" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen="allowfullscreen" title="Sleep Token - The Summoning"></iframe></div>
 						<p>End of test content</p>
 					`,
 				},
@@ -122,28 +123,28 @@ export const data: Array<UmbMockDocumentModel> = [
 				alias: 'email',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.ColorPicker',
 				alias: 'colorPicker',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.MultiNodeTreePicker',
 				alias: 'contentPicker',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.ColorPicker.EyeDropper',
 				alias: 'eyeDropper',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.MultiUrlPicker',
@@ -167,7 +168,7 @@ export const data: Array<UmbMockDocumentModel> = [
 				alias: 'multiUrlPicker',
 				culture: 'da-dk',
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.MultiNodeTreePicker',
@@ -203,77 +204,77 @@ export const data: Array<UmbMockDocumentModel> = [
 				alias: 'email',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.TextBox',
 				alias: 'textBox',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.DropDown.Flexible',
 				alias: 'dropdown',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.DropDown.Flexible',
 				alias: 'dropdownMultiple',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.TextArea',
 				alias: 'textArea',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.Slider',
 				alias: 'slider',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.TrueFalse',
 				alias: 'toggle',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.Tags',
 				alias: 'tags',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.MarkdownEditor',
 				alias: 'markdownEditor',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.RadioButtonList',
 				alias: 'radioButtonList',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.CheckBoxList',
 				alias: 'checkboxList',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.BlockList',
@@ -293,39 +294,84 @@ export const data: Array<UmbMockDocumentModel> = [
 						{
 							key: '1234',
 							contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
-							elementProperty: 'Hello world',
+							values: [
+								{
+									editorAlias: 'Umbraco.TextBox',
+									alias: 'elementProperty',
+									culture: null,
+									segment: null,
+									value: 'Hello world 123',
+								},
+							],
 						},
 					],
 					settingsData: [
 						{
 							key: '5678',
 							contentTypeKey: 'all-property-editors-document-type-id',
-							elementProperty: 'Hello world',
-							textBox: 'Hello world 123',
-							blockList: {
-								layout: {
-									'Umbraco.BlockList': [
-										{
-											contentKey: '1234b',
-											settingsKey: '5678b',
-										},
-									],
+							values: [
+								{
+									editorAlias: 'Umbraco.TextBox',
+									alias: 'elementProperty',
+									culture: null,
+									segment: null,
+									value: 'Hello world 123',
 								},
-								contentData: [
-									{
-										key: '1234b',
-										contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
-										elementProperty: 'Hello world',
+								{
+									editorAlias: 'Umbraco.TextBox',
+									alias: 'textBox',
+									culture: null,
+									segment: null,
+									value: 'Hello world 123',
+								},
+								{
+									editorAlias: 'Umbraco.BlockList',
+									alias: 'blockList',
+									culture: null,
+									segment: null,
+									value: {
+										layout: {
+											'Umbraco.BlockList': [
+												{
+													contentKey: '1234b',
+													settingsKey: '5678b',
+												},
+											],
+										},
+										contentData: [
+											{
+												key: '1234b',
+												contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
+												values: [
+													{
+														editorAlias: 'Umbraco.TextBox',
+														alias: 'elementProperty',
+														culture: null,
+														segment: null,
+														value: 'Hello world 123',
+													},
+												],
+											},
+										],
+										settingsData: [
+											{
+												key: '5678b',
+												contentTypeKey: 'all-property-editors-document-type-id',
+												elementProperty: 'Hello world',
+												values: [
+													{
+														editorAlias: 'Umbraco.TextBox',
+														alias: 'elementProperty',
+														culture: null,
+														segment: null,
+														value: 'Hello world 123',
+													},
+												],
+											},
+										],
 									},
-								],
-								settingsData: [
-									{
-										key: '5678b',
-										contentTypeKey: 'all-property-editors-document-type-id',
-										elementProperty: 'Hello world',
-									},
-								],
-							},
+								},
+							],
 						},
 					],
 				},
@@ -335,7 +381,7 @@ export const data: Array<UmbMockDocumentModel> = [
 				alias: 'mediaPicker',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.ImageCropper',
@@ -423,7 +469,7 @@ export const data: Array<UmbMockDocumentModel> = [
 				alias: 'uploadField',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.BlockGrid',
@@ -472,7 +518,15 @@ export const data: Array<UmbMockDocumentModel> = [
 						{
 							key: '1234',
 							contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
-							elementProperty: 'Hello world',
+							values: [
+								{
+									editorAlias: 'Umbraco.TextBox',
+									alias: 'elementProperty',
+									culture: null,
+									segment: null,
+									value: 'Hello world 123',
+								},
+							],
 						},
 						{
 							key: 'a1234',
@@ -494,7 +548,15 @@ export const data: Array<UmbMockDocumentModel> = [
 						{
 							key: '5678',
 							contentTypeKey: 'all-property-editors-document-type-id',
-							elementProperty: 'Hello world',
+							values: [
+								{
+									editorAlias: 'Umbraco.TextBox',
+									alias: 'elementProperty',
+									culture: null,
+									segment: null,
+									value: 'Hello world 123',
+								},
+							],
 						},
 						{
 							key: 'a5678',
@@ -514,70 +576,49 @@ export const data: Array<UmbMockDocumentModel> = [
 				alias: 'blockGrid',
 				culture: null,
 				segment: null,
-				value: null,
-			},
-			{
-				editorAlias: '',
-				alias: 'numberRange',
-				culture: null,
-				segment: null,
-				value: null,
-			},
-			{
-				editorAlias: '',
-				alias: 'orderDirection',
-				culture: null,
-				segment: null,
-				value: null,
-			},
-			{
-				editorAlias: '',
-				alias: 'overlaySize',
-				culture: null,
-				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.Label',
 				alias: 'label',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.Integer',
 				alias: 'integer',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.Decimal',
 				alias: 'decimal',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.MemberPicker',
 				alias: 'memberPicker',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.MemberGroupPicker',
 				alias: 'memberGroupPicker',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.UserPicker',
 				alias: 'userPicker',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 		],
 		variants: [
@@ -589,6 +630,8 @@ export const data: Array<UmbMockDocumentModel> = [
 				name: 'All properties',
 				createDate: '2023-02-06T15:31:46.876902',
 				updateDate: '2023-02-06T15:31:51.354764',
+				id: 'all-properties',
+				flags: [],
 			},
 			{
 				state: DocumentVariantStateModel.PUBLISHED,
@@ -598,10 +641,14 @@ export const data: Array<UmbMockDocumentModel> = [
 				name: 'Alle redigeringsfelter',
 				createDate: '2023-02-06T15:31:46.876902',
 				updateDate: '2023-02-06T15:31:51.354764',
+				id: 'alle-redigeringsfelter',
+				flags: [],
 			},
 		],
+		flags: [],
 	},
 	{
+		ancestors: [],
 		urls: [
 			{
 				culture: 'en-US',
@@ -701,6 +748,8 @@ export const data: Array<UmbMockDocumentModel> = [
 				name: 'Article in english',
 				createDate: '2023-02-06T15:31:46.876902',
 				updateDate: '2023-02-06T15:31:51.354764',
+				id: 'article-in-english',
+				flags: [],
 			},
 			{
 				state: DocumentVariantStateModel.PUBLISHED,
@@ -710,6 +759,8 @@ export const data: Array<UmbMockDocumentModel> = [
 				name: 'Artikel på Dansk',
 				createDate: '2023-02-06T15:31:46.876902',
 				updateDate: '2023-02-06T15:31:51.354764',
+				id: 'artikel-pa-dansk',
+				flags: [],
 			},
 			{
 				state: DocumentVariantStateModel.PUBLISHED,
@@ -719,6 +770,8 @@ export const data: Array<UmbMockDocumentModel> = [
 				name: 'Artikel på Norsk',
 				createDate: '2023-02-06T15:31:46.876902',
 				updateDate: '2023-02-06T15:31:51.354764',
+				id: 'artikel-pa-norsk',
+				flags: [],
 			},
 			{
 				state: DocumentVariantStateModel.PUBLISHED_PENDING_CHANGES,
@@ -728,6 +781,8 @@ export const data: Array<UmbMockDocumentModel> = [
 				name: 'Articulo en ingles',
 				createDate: '2023-02-06T15:31:46.876902',
 				updateDate: '2023-02-06T15:31:51.354764',
+				id: 'articulo-en-ingles',
+				flags: [],
 			},
 			{
 				state: DocumentVariantStateModel.NOT_CREATED,
@@ -737,10 +792,14 @@ export const data: Array<UmbMockDocumentModel> = [
 				name: 'Artykuł w języku polskim',
 				createDate: '2023-02-06T15:31:46.876902',
 				updateDate: '2023-02-06T15:31:51.354764',
+				id: 'artykul-w-jezyku-polskim',
+				flags: [],
 			},
 		],
+		flags: [],
 	},
 	{
+		ancestors: [],
 		urls: [],
 		template: null,
 		id: 'fd56a0b5-01a0-4da2-b428-52773bfa9cc4',
@@ -821,10 +880,14 @@ export const data: Array<UmbMockDocumentModel> = [
 				name: 'Blog post B',
 				createDate: '2023-02-06T15:32:05.350038',
 				updateDate: '2023-02-06T15:32:24.957009',
+				id: 'blog-post-b',
+				flags: [],
 			},
 		],
+		flags: [],
 	},
 	{
+		ancestors: [],
 		urls: [
 			{
 				culture: 'en-US',
@@ -853,6 +916,8 @@ export const data: Array<UmbMockDocumentModel> = [
 				name: 'Simple Document',
 				createDate: '2023-02-06T15:32:05.350038',
 				updateDate: '2023-02-06T15:32:24.957009',
+				id: 'simple-document',
+				flags: [],
 			},
 		],
 		values: [
@@ -861,18 +926,20 @@ export const data: Array<UmbMockDocumentModel> = [
 				alias: 'multiNodeTreePicker',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 			{
 				editorAlias: 'Umbraco.ListView',
 				alias: 'listView',
 				culture: null,
 				segment: null,
-				value: null,
+				value: undefined,
 			},
 		],
+		flags: [],
 	},
 	{
+		ancestors: [],
 		urls: [
 			{
 				culture: 'en-US',
@@ -895,81 +962,54 @@ export const data: Array<UmbMockDocumentModel> = [
 			{
 				state: DocumentVariantStateModel.PUBLISHED,
 				publishDate: '2023-02-06T15:32:24.957009',
-				culture: null,
+				culture: 'en-US',
 				segment: null,
-				name: 'All RTEs',
+				name: 'Rich Text Editor',
 				createDate: '2023-02-06T15:32:05.350038',
 				updateDate: '2023-02-06T15:32:24.957009',
+				id: 'rich-text-editor',
+				flags: [],
 			},
 		],
 		values: [
 			{
 				alias: 'tiptap',
-				editorAlias: 'Umb.PropertyEditorUi.Tiptap',
+				editorAlias: 'Umbraco.RichText',
 				culture: null,
 				segment: null,
 				value: {
-					blocks: undefined,
+					blocks: {
+						layout: {},
+						contentData: [],
+						settingsData: [],
+						expose: [],
+					},
 					markup: `
-						<p><a id="anchor"></a> Here is a link for <a href="https://gist.github.com/leekelleher/9490718" target="_blank">all HTML tags</a>.</p>
-						<p>
-							<span id="foo">Some</span> value for the RTE with an <a href="https://google.com">external link</a> and an <a type="document" href="/{localLink:c05da24d-7740-447b-9cdc-bd8ce2172e38}">internal link</a>.
-						</p>
-						<div data-foo-bar="123">
-							<span>This is a plain old span tag.</span>
-							<span style="color:red;">Hello <span style="color:blue;">world</span>.</span>
-						</div>
-						<table style="width: 100%;">
-							<thead>
-								<tr>
-									<th>Version</th>
-									<th>Date</th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr>
-									<td>15.3</td>
-									<td>2025-03-20</td>
-								</tr>
-								<tr>
-									<td>16.0</td>
-									<td>2025-06-12</td>
-								</tr>
-								<tr>
-									<td>17.0</td>
-									<td>2025-11-27</td>
-								</tr>
-							</tbody>
-						</table>
-						<p>
-							<img width="384" height="228" loading="lazy" alt="Installer illustration" src="/umbraco/backoffice/assets/installer-illustration.svg" />
-						</p>
-						<p>End of test content</p>
-					`,
-				},
-			},
-			{
-				alias: 'tinymce',
-				editorAlias: 'Umb.PropertyEditorUi.TinyMCE',
-				culture: null,
-				segment: null,
-				value: {
-					blocks: undefined,
-					markup: `
-						<p>
-							Some value for the RTE with an <a href="https://google.com">external link</a> and an <a type="document" href="/{localLink:c05da24d-7740-447b-9cdc-bd8ce2172e38}">internal link</a> foo foo
-						</p>
-						<div class="umb-macro-holder TestMacro umb-macro-mce_1 mceNonEditable"><!-- <?UMBRACO_MACRO macroAlias="TestMacro" /> --><ins>Macro alias: <strong>TestMacro</strong></ins></div>
-						<p>
-							<img width="384" height="228" loading="lazy" alt="Installer illustration" src="/umbraco/backoffice/assets/installer-illustration.svg" />
-						</p>
-						<p>End of test content</p>
-					`,
+<p><a id="anchor"></a> Here is a link for <a target="_blank" data-router-slot="disabled" href="https://gist.github.com/leekelleher/9490718" type="external">all HTML tags</a>.</p>
+
+<p>Some value for the RTE with an <a href="https://google.com">external link</a> and an <a type="document" href="/{localLink:c05da24d-7740-447b-9cdc-bd8ce2172e38}">internal link</a> foo foo</p>
+
+<p>The following tests the embed plugin:</p>
+<p><span class="umb-embed-holder" data-embed-height="240" data-embed-width="360" data-embed-constrain="false" data-embed-url="https://www.youtube.com/watch?v=QRIWz9SotY4"><iframe width="360" height="240" src="https://www.youtube.com/embed/QRIWz9SotY4?feature=oembed" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen="allowfullscreen" title="Deep dive into Rich Text Editor"></iframe></span></p>
+
+<p><span id="foo">Some</span> value for the RTE with an <a target="" data-router-slot="disabled" href="https://google.com" type="external">external link</a> and an <a target="" data-router-slot="disabled" href="/{localLink:c05da24d-7740-447b-9cdc-bd8ce2172e38}" type="document">internal link</a>.</p>
+
+<div data-foo-bar="123"><span>This is a plain old span tag.</span> <span style="color: red;">Hello </span><span style="color: blue;">world</span><span style="color: red;">.</span></div>
+
+<table style="min-width: 50px"><colgroup><col style="min-width: 25px"><col style="min-width: 25px"></colgroup><tbody><tr><th colspan="1" rowspan="1"><p> Version</p></th><th colspan="1" rowspan="1"><p>Date</p></th></tr><tr><td colspan="1" rowspan="1"><p>15.3</p></td><td colspan="1" rowspan="1"><p>2025-03-20</p></td></tr><tr><td colspan="1" rowspan="1"><p>16.0</p></td><td colspan="1" rowspan="1"><p>2025-06-12</p></td></tr><tr><td colspan="1" rowspan="1"><p>17.0</p></td><td colspan="1" rowspan="1"><p>2025-11-27</p></td></tr></tbody></table>
+
+<p><img src="/umbraco/backoffice/assets/installer-illustration.svg" alt="Installer illustration" width="384" height="228" loading="lazy"></p>
+
+<div class="umb-macro-holder"><!-- <?UMBRACO_MACRO macroAlias="TestMacro" /> --><ins>Macro alias: <strong>TestMacro</strong></ins></div>
+
+<p>End of test content</p>`,
 				},
 			},
 		],
+		flags: [],
 	},
 	{
+		ancestors: [],
 		urls: [
 			{
 				culture: 'en-US',
@@ -1221,6 +1261,8 @@ export const data: Array<UmbMockDocumentModel> = [
 				name: 'All Block Editors',
 				createDate: '2023-02-06T15:31:46.876902',
 				updateDate: '2023-02-06T15:31:51.354764',
+				id: 'all-block-editors',
+				flags: [],
 			},
 			{
 				state: DocumentVariantStateModel.PUBLISHED,
@@ -1230,7 +1272,61 @@ export const data: Array<UmbMockDocumentModel> = [
 				name: 'Alle blok redigeringer',
 				createDate: '2023-02-06T15:31:46.876902',
 				updateDate: '2023-02-06T15:31:51.354764',
+				id: 'alle-blok-redigeringer',
+				flags: [],
 			},
 		],
+		flags: [],
 	},
+	{
+		ancestors: [],
+		urls: [],
+		template: null,
+		id: 'forbidden',
+		createDate: '2023-02-06T15:32:05.350038',
+		parent: null,
+		documentType: {
+			id: 'the-simplest-document-type-id',
+			icon: 'icon-document',
+		},
+		hasChildren: false,
+		noAccess: false,
+		isProtected: false,
+		isTrashed: false,
+		variants: [
+			{
+				state: DocumentVariantStateModel.PUBLISHED,
+				publishDate: '2023-02-06T15:32:24.957009',
+				culture: 'en-US',
+				segment: null,
+				name: 'A forbidden document',
+				createDate: '2023-02-06T15:32:05.350038',
+				updateDate: '2023-02-06T15:32:24.957009',
+				id: 'a-forbidden-document',
+				flags: [],
+			},
+			{
+				state: DocumentVariantStateModel.PUBLISHED,
+				publishDate: '2023-02-06T15:32:24.957009',
+				culture: 'da-dk',
+				segment: null,
+				name: 'Et utilgængeligt dokument',
+				createDate: '2023-02-06T15:32:05.350038',
+				updateDate: '2023-02-06T15:32:24.957009',
+				id: 'et-utilgaengeligt-dokument',
+				flags: [],
+			},
+		],
+		values: [
+			{
+				editorAlias: 'Umbraco.TextBox',
+				alias: 'prop1',
+				culture: null,
+				segment: null,
+				value: 'default value here',
+			},
+		],
+		flags: [],
+	},
+	...permissionsTestData,
 ];

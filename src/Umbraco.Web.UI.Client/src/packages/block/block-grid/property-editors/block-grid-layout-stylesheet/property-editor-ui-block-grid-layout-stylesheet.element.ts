@@ -4,9 +4,9 @@ import type { UmbInputStaticFileElement } from '@umbraco-cms/backoffice/static-f
 
 import '@umbraco-cms/backoffice/static-file';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import {
-	type UmbPropertyEditorUiElement,
-	type UmbPropertyEditorConfigCollection,
+import type {
+	UmbPropertyEditorUiElement,
+	UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';

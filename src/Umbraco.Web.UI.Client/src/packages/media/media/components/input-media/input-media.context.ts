@@ -7,9 +7,11 @@ import type { UmbMediaTreeItemModel } from '../../tree/types.js';
 import { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbMediaTypeEntityType } from '@umbraco-cms/backoffice/media-type';
+import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
 
 interface UmbMediaPickerInputContextOpenArgs {
 	allowedContentTypes?: Array<{ unique: string; entityType: UmbMediaTypeEntityType }>;
+	includeTrashed?: boolean;
 }
 
 export class UmbMediaPickerInputContext extends UmbPickerInputContext<
@@ -38,9 +40,14 @@ export class UmbMediaPickerInputContext extends UmbPickerInputContext<
 			};
 		}
 
+		const variantContext = await this.getContext(UMB_VARIANT_CONTEXT);
+		const culture = await variantContext?.getDisplayCulture();
+
 		// pass allowedContentTypes to the search request args
 		combinedPickerData.search!.queryParams = {
 			allowedContentTypes: args?.allowedContentTypes,
+			includeTrashed: args?.includeTrashed,
+			culture,
 			...pickerData?.search?.queryParams,
 		};
 

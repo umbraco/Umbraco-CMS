@@ -2,8 +2,6 @@
 // See LICENSE for more details.
 
 using System.Globalization;
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Scoping;
@@ -26,17 +24,6 @@ public sealed class RelateOnTrashNotificationHandler :
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly ILocalizedTextService _textService;
-
-    [Obsolete("Use the new constructor instead, will be removed in V16")]
-    public RelateOnTrashNotificationHandler(
-        IRelationService relationService,
-        IEntityService entityService,
-        ILocalizedTextService textService,
-        IAuditService auditService,
-        IScopeProvider scopeProvider)
-    : this(relationService, entityService, textService, auditService, scopeProvider, StaticServiceProvider.Instance.GetRequiredService<IBackOfficeSecurityAccessor>())
-    {
-    }
 
     public RelateOnTrashNotificationHandler(
         IRelationService relationService,

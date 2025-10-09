@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Infrastructure.PublishedCache;
 
-internal class ReservedFieldNamesService : IReservedFieldNamesService
+internal sealed class ReservedFieldNamesService : IReservedFieldNamesService
 {
     private readonly ContentPropertySettings _contentPropertySettings;
     private readonly MemberPropertySettings _memberPropertySettings;

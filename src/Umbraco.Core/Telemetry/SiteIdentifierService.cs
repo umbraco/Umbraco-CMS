@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 namespace Umbraco.Cms.Core.Telemetry;
 
 /// <inheritdoc />
-internal class SiteIdentifierService : ISiteIdentifierService
+internal sealed class SiteIdentifierService : ISiteIdentifierService
 {
     private readonly IConfigManipulator _configManipulator;
     private readonly ILogger<SiteIdentifierService> _logger;

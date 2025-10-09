@@ -39,9 +39,5 @@ public class ContentRolledBackWebhookEvent : WebhookEventContentBase<ContentRoll
         new List<IContent> { notification.Entity };
 
     protected override object? ConvertEntityToRequestPayload(IContent entity)
-    {
-        // Get preview/saved version of content for a rollback
-        IPublishedContent? publishedContent = _contentCache.GetById(true, entity.Key);
-        return publishedContent is null ? null : _apiContentBuilder.Build(publishedContent);
-    }
+        => new DefaultPayloadModel { Id = entity.Key };
 }

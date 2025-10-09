@@ -13,6 +13,8 @@ public static partial class Constants
         public const int LabelDateTime = -94;
         public const int LabelTime = -98;
         public const int LabelDecimal = -99;
+        public const int LabelBytes = -104;
+        public const int LabelPixels = -105;
 
         public const int Textarea = -89;
         public const int Textbox = -88;
@@ -107,6 +109,7 @@ public static partial class Constants
             /// <summary>
             ///     Guid for List View - Members as string
             /// </summary>
+            [Obsolete("No longer used in Umbraco. Scheduled for removal in Umbraco 17.")]
             public const string ListViewMembers = "AA2C52A0-CE87-4E65-A47C-7DF09358585D";
 
             /// <summary>
@@ -223,6 +226,16 @@ public static partial class Constants
             ///     Guid for Label as decimal
             /// </summary>
             public const string LabelDecimal = "8f1ef1e1-9de4-40d3-a072-6673f631ca64";
+
+            /// <summary>
+            ///     Guid for Label as bytes
+            /// </summary>
+            public const string LabelBytes = "ba5bdbe6-ab3e-46a8-82b3-2c45f10bc47f";
+
+            /// <summary>
+            ///     Guid for Label as pixels
+            /// </summary>
+            public const string LabelPixels = "5eb57825-e15e-4fc7-8e37-fca65cdafbde";
 
             /// <summary>
             ///     Guid for Content Picker

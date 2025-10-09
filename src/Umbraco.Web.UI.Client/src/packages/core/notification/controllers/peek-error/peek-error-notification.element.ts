@@ -13,6 +13,9 @@ export class UmbPeekErrorNotificationElement extends UmbLitElement {
 
 	async #onClick() {
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		if (!modalManager) {
+			throw new Error('Modal manager not found.');
+		}
 
 		modalManager.open(this, UMB_ERROR_VIEWER_MODAL, { data: this.data?.details });
 

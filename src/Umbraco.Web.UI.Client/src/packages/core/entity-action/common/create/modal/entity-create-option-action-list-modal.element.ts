@@ -28,7 +28,7 @@ export class UmbEntityCreateOptionActionListModalElement extends UmbModalBaseEle
 	private _apiControllers: Array<UmbExtensionApiInitializer<ManifestType>> = [];
 
 	@state()
-	_hrefList: Array<string | undefined> = [];
+	private _hrefList: Array<string | undefined> = [];
 
 	protected override updated(_changedProperties: PropertyValues): void {
 		super.updated(_changedProperties);
@@ -68,9 +68,12 @@ export class UmbEntityCreateOptionActionListModalElement extends UmbModalBaseEle
 			throw new Error('No API found');
 		}
 
-		await controller.api.execute();
-
-		this._submitModal();
+		controller.api
+			.execute()
+			.then(() => {
+				this._submitModal();
+			})
+			.catch(() => {});
 	}
 
 	async #onNavigate(event: Event, href: string | undefined) {
@@ -135,7 +138,7 @@ export class UmbEntityCreateOptionActionListModalElement extends UmbModalBaseEle
 				icon=${manifest.meta.icon}
 				href=${ifDefined(href)}
 				target=${this.#getTarget(href)}
-				@open=${(event: Event) => this.#onOpen(event, controller)}
+				@open=${async (event: Event) => await this.#onOpen(event, controller).catch(() => undefined)}
 				@click=${(event: Event) => this.#onNavigate(event, href)}>
 			</umb-ref-item>
 		`;

@@ -131,6 +131,9 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 	}
 
 	static override readonly styles = css`
+		:host {
+			display: contents;
+		}
 		#name {
 			width: 100%;
 			flex: 1 1 auto;
@@ -138,8 +141,6 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 		}
 
 		#alias {
-			max-width: 50%;
-
 			&.muted {
 				opacity: 0.55;
 				padding: var(--uui-size-1, 3px) var(--uui-size-space-3, 9px);
@@ -147,10 +148,10 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 		}
 
 		:host(:invalid:not([pristine])) {
-			color: var(--uui-color-danger);
+			color: var(--uui-color-invalid);
 		}
 		:host(:invalid:not([pristine])) > uui-input {
-			border-color: var(--uui-color-danger);
+			border-color: var(--uui-color-invalid);
 		}
 	`;
 }

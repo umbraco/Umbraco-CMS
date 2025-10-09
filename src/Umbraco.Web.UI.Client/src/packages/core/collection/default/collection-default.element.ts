@@ -23,6 +23,9 @@ umbExtensionsRegistry.register(manifest);
 
 @customElement('umb-collection-default')
 export class UmbCollectionDefaultElement extends UmbLitElement {
+	//
+	#collectionContext?: UmbDefaultCollectionContext;
+
 	@state()
 	private _routes: Array<UmbRoute> = [];
 
@@ -32,7 +35,8 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 	@state()
 	private _isDoneLoading = false;
 
-	#collectionContext?: UmbDefaultCollectionContext<any, any>;
+	@state()
+	private _emptyLabel?: string;
 
 	constructor() {
 		super();
@@ -40,6 +44,7 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 			this.#collectionContext = context;
 			this.#observeCollectionRoutes();
 			this.#observeTotalItems();
+			this.#getEmptyStateLabel();
 			await this.#collectionContext?.requestCollection();
 			this._isDoneLoading = true;
 		});
@@ -69,6 +74,10 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 		);
 	}
 
+	#getEmptyStateLabel() {
+		this._emptyLabel = this.#collectionContext?.getEmptyLabel();
+	}
+
 	override render() {
 		return this._routes
 			? html`
@@ -93,14 +102,17 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 	}
 
 	#renderContent() {
-		return html` ${this.renderPagination()} ${this.renderSelectionActions()} `;
+		return html`${this.renderPagination()} ${this.renderSelectionActions()}`;
 	}
 
 	#renderEmptyState() {
 		if (!this._isDoneLoading) return nothing;
-		return html` <div id="empty-state" class="uui-text">
-			<h4><umb-localize key="collection_noItemsTitle"></umb-localize></h4>
-		</div>`;
+
+		return html`
+			<div id="empty-state" class="uui-text">
+				<h4>${this.localize.string(this._emptyLabel)}</h4>
+			</div>
+		`;
 	}
 
 	static override styles = [

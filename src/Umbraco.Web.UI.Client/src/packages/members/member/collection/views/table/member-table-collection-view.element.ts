@@ -108,6 +108,7 @@ export class UmbMemberTableCollectionViewElement extends UmbLitElement {
 							.value=${{
 								entityType: member.entityType,
 								unique: member.unique,
+								name: member.variants[0].name,
 							}}></umb-entity-actions-table-column-view>`,
 					},
 				],

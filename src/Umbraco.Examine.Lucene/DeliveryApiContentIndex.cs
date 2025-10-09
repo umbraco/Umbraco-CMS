@@ -20,17 +20,6 @@ public class DeliveryApiContentIndex : UmbracoExamineIndex
     // The special path and icon value transformations are not needed in this case
     protected override bool ApplySpecialValueTransformations => false;
 
-    [Obsolete("Use the constructor that takes an IDeliveryApiCompositeIdHandler instead, scheduled for removal in v15")]
-    public DeliveryApiContentIndex(
-        ILoggerFactory loggerFactory,
-        string name,
-        IOptionsMonitor<LuceneDirectoryIndexOptions> indexOptions,
-        IHostingEnvironment hostingEnvironment,
-        IRuntimeState runtimeState)
-        : this(loggerFactory, name, indexOptions, hostingEnvironment, runtimeState, StaticServiceProvider.Instance.GetRequiredService<IDeliveryApiCompositeIdHandler>())
-    {
-    }
-
     public DeliveryApiContentIndex(
         ILoggerFactory loggerFactory,
         string name,

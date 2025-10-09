@@ -12,7 +12,6 @@ using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
@@ -21,13 +20,12 @@ using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
-using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// <summary>
 /// Represents the UserRepository for doing CRUD operations for <see cref="IUser"/>
 /// </summary>
-internal class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserRepository
+internal sealed class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserRepository
 {
     private readonly IMapperCollection _mapperCollection;
     private readonly GlobalSettings _globalSettings;
@@ -38,8 +36,6 @@ internal class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserReposito
     private bool _passwordConfigInitialized;
     private readonly Lock _sqliteValidateSessionLock = new();
     private readonly IDictionary<string, IPermissionMapper> _permissionMappers;
-    private readonly IAppPolicyCache _globalCache;
-    private readonly IScopeAccessor _scopeAccessor;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="UserRepository" /> class.
@@ -56,7 +52,6 @@ internal class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserReposito
     /// <param name="jsonSerializer">The JSON serializer.</param>
     /// <param name="runtimeState">State of the runtime.</param>
     /// <param name="permissionMappers">The permission mappers.</param>
-    /// <param name="globalCache">The app policy cache.</param>
     /// <exception cref="System.ArgumentNullException">
     ///     mapperCollection
     ///     or
@@ -73,18 +68,15 @@ internal class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserReposito
         IOptions<UserPasswordConfigurationSettings> passwordConfiguration,
         IJsonSerializer jsonSerializer,
         IRuntimeState runtimeState,
-        IEnumerable<IPermissionMapper> permissionMappers,
-        IAppPolicyCache globalCache)
+        IEnumerable<IPermissionMapper> permissionMappers)
         : base(scopeAccessor, appCaches, logger)
     {
-        _scopeAccessor = scopeAccessor;
         _mapperCollection = mapperCollection ?? throw new ArgumentNullException(nameof(mapperCollection));
         _globalSettings = globalSettings.Value ?? throw new ArgumentNullException(nameof(globalSettings));
         _passwordConfiguration =
             passwordConfiguration.Value ?? throw new ArgumentNullException(nameof(passwordConfiguration));
         _jsonSerializer = jsonSerializer;
         _runtimeState = runtimeState;
-        _globalCache = globalCache;
         _permissionMappers = permissionMappers.ToDictionary(x => x.Context);
     }
 
@@ -417,17 +409,14 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         Sql<ISqlContext> sql;
         try
         {
-            sql = SqlContext.Sql()
-                .Select<UserGroupDto>(x => x.Id, x => x.Key)
-                .From<UserGroupDto>()
-                .InnerJoin<User2UserGroupDto>().On<UserGroupDto, User2UserGroupDto>((left, right) => left.Id == right.UserGroupId)
-                .WhereIn<User2UserGroupDto>(x => x.UserId, userIds);
-
-            List<UserGroupDto>? userGroups = Database.Fetch<UserGroupDto>(sql);
-
-
-            groupKeys = userGroups.Select(x => x.Key).ToList();
-
+            groupKeys = Database.FetchByGroups<UserGroupDto, int>(userIds, Constants.Sql.MaxParameterCount, ints =>
+            {
+                return SqlContext.Sql()
+                    .Select<UserGroupDto>(x => x.Id, x => x.Key)
+                    .From<UserGroupDto>()
+                    .InnerJoin<User2UserGroupDto>().On<UserGroupDto, User2UserGroupDto>((left, right) => left.Id == right.UserGroupId)
+                    .WhereIn<User2UserGroupDto>(x => x.UserId, ints);
+            }).Select(x => x.Key).ToList();
         }
         catch (DbException)
         {
@@ -441,19 +430,19 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
 
 
         // get users2groups
-        sql = SqlContext.Sql()
-            .Select<User2UserGroupDto>()
-            .From<User2UserGroupDto>()
-            .WhereIn<User2UserGroupDto>(x => x.UserId, userIds);
-
-        List<User2UserGroupDto>? user2Groups = Database.Fetch<User2UserGroupDto>(sql);
+        List<User2UserGroupDto>? user2Groups = Database.FetchByGroups<User2UserGroupDto, int>(userIds, Constants.Sql.MaxParameterCount, ints =>
+        {
+            return SqlContext.Sql()
+                .Select<User2UserGroupDto>()
+                .From<User2UserGroupDto>()
+                .WhereIn<User2UserGroupDto>(x => x.UserId, ints);
+        }).ToList();
 
         if (groupIds.Any() is false)
         {
             //this can happen if we are upgrading, so we try do read from this table, as we counn't because of the key earlier
             groupIds = user2Groups.Select(x => x.UserGroupId).Distinct().ToList();
         }
-
 
         // get groups
         // We wrap this in a try-catch, as this might throw errors when you try to login before having migrated your database
@@ -493,13 +482,13 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             .ToDictionary(x => x.Key, x => x);
 
         // get start nodes
-
-        sql = SqlContext.Sql()
-            .Select<UserStartNodeDto>()
-            .From<UserStartNodeDto>()
-            .WhereIn<UserStartNodeDto>(x => x.UserId, userIds);
-
-        List<UserStartNodeDto>? startNodes = Database.Fetch<UserStartNodeDto>(sql);
+        List<UserStartNodeDto>? startNodes = Database.FetchByGroups<UserStartNodeDto, int>(userIds, Constants.Sql.MaxParameterCount, ints =>
+        {
+            return SqlContext.Sql()
+                .Select<UserStartNodeDto>()
+                .From<UserStartNodeDto>()
+                .WhereIn<UserStartNodeDto>(x => x.UserId, ints);
+        }).ToList();
 
         // get groups2languages
 
@@ -679,6 +668,15 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
 
     protected override void PersistDeletedItem(IUser entity)
     {
+        // Clear user group caches for any user groups associated with the deleted user.
+        // We need to do this because the count of the number of users in the user group is cached
+        // along with the user group, and if we've made changes to the user groups assigned to the user,
+        // the count for the groups need to be refreshed.
+        foreach (IReadOnlyUserGroup group in entity.Groups)
+        {
+            ClearRepositoryCacheForUserGroup(group.Id);
+        }
+
         IEnumerable<string> deletes = GetDeleteClauses();
         foreach (var delete in deletes)
         {
@@ -721,8 +719,8 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         if (entity.IsPropertyDirty("Groups"))
         {
             // lookup all assigned
-            List<UserGroupDto>? assigned = entity.Groups == null || entity.Groups.Any() == false
-                ? new List<UserGroupDto>()
+            List<UserGroupDto>? assigned = entity.Groups.Any() is false
+                ? []
                 : Database.Fetch<UserGroupDto>(
                     "SELECT * FROM umbracoUserGroup WHERE userGroupAlias IN (@aliases)",
                     new { aliases = entity.Groups.Select(x => x.Alias) });
@@ -731,6 +729,15 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             {
                 var dto = new User2UserGroupDto { UserGroupId = groupDto.Id, UserId = entity.Id };
                 Database.Insert(dto);
+            }
+
+            // Clear user group caches for the user groups associated with the new user.
+            // We need to do this because the count of the number of users in the user group is cached
+            // along with the user group, and if we've made changes to the user groups assigned to the user,
+            // the count for the groups need to be refreshed.
+            foreach (IReadOnlyUserGroup group in entity.Groups)
+            {
+                ClearRepositoryCacheForUserGroup(group.Id);
             }
         }
 
@@ -844,25 +851,64 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
 
         if (entity.IsPropertyDirty("Groups"))
         {
-            //lookup all assigned
-            List<UserGroupDto>? assigned = entity.Groups == null || entity.Groups.Any() == false
-                ? new List<UserGroupDto>()
-                : Database.Fetch<UserGroupDto>(
-                    "SELECT * FROM umbracoUserGroup WHERE userGroupAlias IN (@aliases)",
-                    new { aliases = entity.Groups.Select(x => x.Alias) });
+            // Get all user groups Ids currently assigned to the user.
+            var existingUserGroupIds = Database.Fetch<User2UserGroupDto>(
+                    "WHERE UserId = @UserId",
+                    new { UserId = entity.Id })
+                .Select(x => x.UserGroupId)
+                .ToList();
 
-            //first delete all
-            // TODO: We could do this a nicer way instead of "Nuke and Pave"
-            Database.Delete<User2UserGroupDto>("WHERE UserId = @UserId", new { UserId = entity.Id });
+            // Get the user groups Ids that need to be removed and added.
+            var userGroupsIdsToRemove = existingUserGroupIds
+                .Except(entity.Groups.Select(x => x.Id))
+                .ToList();
+            var userGroupIdsToAdd = entity.Groups
+                .Select(x => x.Id)
+                .Except(existingUserGroupIds)
+                .ToList();
 
-            foreach (UserGroupDto? groupDto in assigned)
+            // Remove user groups that are no longer assigned to the user.
+            if (userGroupsIdsToRemove.Count > 0)
             {
-                var dto = new User2UserGroupDto { UserGroupId = groupDto.Id, UserId = entity.Id };
-                Database.Insert(dto);
+                Database.Delete<User2UserGroupDto>(
+                    "WHERE UserId = @UserId AND UserGroupId IN (@userGroupIds)",
+                    new { UserId = entity.Id, userGroupIds = userGroupsIdsToRemove });
+            }
+
+            // Add user groups that are newly assigned to the user.
+            if (userGroupIdsToAdd.Count > 0)
+            {
+                IEnumerable<User2UserGroupDto> user2UserGroupDtos = userGroupIdsToAdd
+                    .Select(userGroupId => new User2UserGroupDto
+                    {
+                        UserGroupId = userGroupId,
+                        UserId = entity.Id,
+                    });
+                Database.InsertBulk(user2UserGroupDtos);
+            }
+
+            // Clear user group caches for any user group that have been removed or added.
+            // We need to do this because the count of the number of users in the user group is cached
+            // along with the user group, and if we've made changes to the user groups assigned to the user,
+            // the count for the groups need to be refreshed.
+            var userGroupIdsToRefresh = userGroupsIdsToRemove
+                .Union(userGroupIdsToAdd)
+                .ToList();
+            foreach (int userGroupIdToRefresh in userGroupIdsToRefresh)
+            {
+                ClearRepositoryCacheForUserGroup(userGroupIdToRefresh);
             }
         }
 
         entity.ResetDirtyProperties();
+    }
+
+    private void ClearRepositoryCacheForUserGroup(int id)
+    {
+        IAppPolicyCache userGroupCache = AppCaches.IsolatedCaches.GetOrCreate<IUserGroup>();
+
+        string cacheKey = RepositoryCacheKeys.GetKey<IUserGroup, int>(id);
+        userGroupCache.Clear(cacheKey);
     }
 
     private void AddingOrUpdateStartNodes(IEntity entity, IEnumerable<UserStartNodeDto> current,
@@ -1268,5 +1314,33 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
 
         return sql;
     }
+
+    /// <inheritdoc />
+    public void InvalidateSessionsForRemovedProviders(IEnumerable<string> currentLoginProviders)
+    {
+        // Get all the user keys associated with the removed providers.
+        Sql<ISqlContext> idsQuery = SqlContext.Sql()
+            .Select<ExternalLoginDto>(x => x.UserOrMemberKey)
+            .From<ExternalLoginDto>()
+            .Where<ExternalLoginDto>(x => !x.LoginProvider.StartsWith(Constants.Security.MemberExternalAuthenticationTypePrefix)) // Only invalidate sessions relating to backoffice users, not members.
+            .WhereNotIn<ExternalLoginDto>(x => x.LoginProvider, currentLoginProviders);
+        List<Guid> userKeysAssociatedWithRemovedProviders = Database.Fetch<Guid>(idsQuery);
+        if (userKeysAssociatedWithRemovedProviders.Count == 0)
+        {
+            return;
+        }
+
+        // Invalidate the security stamps on the users associated with the removed providers.
+        Sql<ISqlContext> updateSecurityStampsQuery = Sql()
+            .Update<UserDto>(u => u.Set(x => x.SecurityStampToken, "0".PadLeft(32, '0')))
+            .WhereIn<UserDto>(x => x.Key, userKeysAssociatedWithRemovedProviders);
+        Database.Execute(updateSecurityStampsQuery);
+
+        // Delete the OpenIddict tokens for the users associated with the removed providers.
+        // The following is safe from SQL injection as we are dealing with GUIDs, not strings.
+        var userKeysForInClause = string.Join("','", userKeysAssociatedWithRemovedProviders.Select(x => x.ToString()));
+        Database.Execute("DELETE FROM umbracoOpenIddictTokens WHERE Subject IN ('" + userKeysForInClause + "')");
+    }
+
     #endregion
 }

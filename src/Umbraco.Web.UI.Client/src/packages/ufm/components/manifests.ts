@@ -1,4 +1,4 @@
-import type { ManifestUfmComponent } from '../ufm-component.extension.js';
+import type { ManifestUfmComponent } from '../extensions/ufm-component.extension.js';
 
 export const manifests: Array<ManifestUfmComponent> = [
 	{

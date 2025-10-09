@@ -63,7 +63,7 @@ export class UmbPreviewElement extends UmbLitElement {
 						src=${this._previewUrl}
 						title="Page preview"
 						@load=${this.#onIFrameLoad}
-						sandbox="allow-scripts"></iframe>
+						sandbox="allow-scripts allow-same-origin"></iframe>
 				</div>
 			</div>
 			<div id="menu">

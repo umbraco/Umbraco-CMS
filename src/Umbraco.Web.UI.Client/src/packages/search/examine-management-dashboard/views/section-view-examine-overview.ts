@@ -4,7 +4,7 @@ import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffic
 import type { IndexResponseModel, SearcherResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { HealthStatusModel, IndexerService, SearcherService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 @customElement('umb-dashboard-examine-overview')
 export class UmbDashboardExamineOverviewElement extends UmbLitElement {
@@ -28,14 +28,14 @@ export class UmbDashboardExamineOverviewElement extends UmbLitElement {
 
 	private async _getIndexers() {
 		this._loadingIndexers = true;
-		const { data } = await tryExecuteAndNotify(this, IndexerService.getIndexer({ take: 9999, skip: 0 }));
+		const { data } = await tryExecute(this, IndexerService.getIndexer({ query: { take: 9999, skip: 0 } }));
 		this._indexers = data?.items ?? [];
 		this._loadingIndexers = false;
 	}
 
 	private async _getSearchers() {
 		this._loadingSearchers = true;
-		const { data } = await tryExecuteAndNotify(this, SearcherService.getSearcher({ take: 9999, skip: 0 }));
+		const { data } = await tryExecute(this, SearcherService.getSearcher({ query: { take: 9999, skip: 0 } }));
 		this._searchers = data?.items ?? [];
 		this._loadingSearchers = false;
 	}
@@ -64,7 +64,7 @@ export class UmbDashboardExamineOverviewElement extends UmbLitElement {
 						>Allows you to view the details of each index and provides some tools for managing the indexes</umb-localize
 					>
 				</p>
-				${this.renderIndexersList()}
+				${this.#renderIndexersList()}
 			</uui-box>
 			<uui-box headline=${this.localize.term('examineManagement_searchers')}>
 				<p>
@@ -74,12 +74,12 @@ export class UmbDashboardExamineOverviewElement extends UmbLitElement {
 						>Shows properties and tools for any configured Searcher (i.e. such as a multi-index searcher)</umb-localize
 					>
 				</p>
-				${this.renderSearchersList()}
+				${this.#renderSearchersList()}
 			</uui-box>
 		`;
 	}
 
-	private renderIndexersList() {
+	#renderIndexersList() {
 		if (this._loadingIndexers) return html`<uui-loader></uui-loader>`;
 		if (!this._indexers) return nothing;
 		return html` <uui-table class="overview">
@@ -96,7 +96,7 @@ export class UmbDashboardExamineOverviewElement extends UmbLitElement {
 		</uui-table>`;
 	}
 
-	private renderSearchersList() {
+	#renderSearchersList() {
 		if (this._loadingSearchers) return html`<uui-loader></uui-loader>`;
 		if (!this._searchers) return nothing;
 		return html`

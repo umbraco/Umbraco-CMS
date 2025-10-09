@@ -1,3 +1,6 @@
+import type { UmbBlockGridTypeGroupType } from '../../types.js';
+import { UMB_BLOCK_GRID_TYPE_WORKSPACE_MODAL } from '../../workspace/index.js';
+import { UMB_BLOCK_GRID_TYPE } from '../../constants.js';
 import type { UmbBlockTypeWithGroupKey, UmbInputBlockTypeElement } from '@umbraco-cms/backoffice/block-type';
 import type {
 	UmbPropertyEditorUiElement,
@@ -15,11 +18,6 @@ import {
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import {
-	UMB_BLOCK_GRID_TYPE,
-	UMB_BLOCK_GRID_TYPE_WORKSPACE_MODAL,
-	type UmbBlockGridTypeGroupType,
-} from '@umbraco-cms/backoffice/block-grid';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import {
 	UMB_PROPERTY_CONTEXT,
@@ -30,6 +28,9 @@ import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/rou
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
+
+// TODO: This is across packages, how should we go about getting just a single element from another package? like here we just need the `umb-input-block-type` element.
+import '@umbraco-cms/backoffice/block-type';
 
 interface MappedGroupWithBlockTypes extends UmbBlockGridTypeGroupType {
 	blocks: Array<UmbBlockTypeWithGroupKey>;
@@ -78,7 +79,7 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 	}
 
 	@state()
-	public _alias?: string;
+	private _alias?: string;
 
 	@property({ type: Object, attribute: false })
 	public config?: UmbPropertyEditorConfigCollection;
@@ -98,13 +99,13 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 		super();
 
 		this.consumeContext(UMB_PROPERTY_CONTEXT, async (context) => {
-			this._alias = context.getAlias();
+			this._alias = context?.getAlias();
 		});
 
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, async (context) => {
 			this.#datasetContext = context;
 			this.observe(
-				await this.#datasetContext.propertyValueByAlias('blockGroups'),
+				await this.#datasetContext?.propertyValueByAlias('blockGroups'),
 				(value) => {
 					this.#blockGroups = (value as Array<UmbBlockGridTypeGroupType>) ?? [];
 					this.#mapValuesToBlockGroups();
@@ -181,7 +182,7 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 		const groupName = this.#blockGroups?.find((group) => group.key === groupKey)?.name ?? '';
 		await umbConfirmModal(this, {
 			headline: '#blockEditor_confirmDeleteBlockGroupTitle',
-			content: this.localize.term('#blockEditor_confirmDeleteBlockGroupMessage', [groupName]),
+			content: this.localize.term('blockEditor_confirmDeleteBlockGroupMessage', [groupName]),
 			color: 'danger',
 			confirmLabel: '#general_delete',
 		});
@@ -231,33 +232,37 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 
 	#renderGroupInput(groupKey: string, groupName?: string) {
 		return html`<div class="group-handle">
+			<uui-icon name="icon-grip"></uui-icon>
 			<uui-input
-				auto-width
 				label="Group"
 				.value=${groupName ?? ''}
 				@change=${(e: UUIInputEvent) => this.#onGroupNameChange(e, groupKey)}>
-				<uui-button compact slot="append" label="delete" @click=${() => this.#deleteGroup(groupKey)}>
-					<uui-icon name="icon-trash"></uui-icon>
-				</uui-button>
 			</uui-input>
+			<uui-button
+				compact
+				label=${this.localize.term('general_delete')}
+				look="outline"
+				@click=${() => this.#deleteGroup(groupKey)}>
+				<uui-icon name="icon-trash"></uui-icon>
+			</uui-button>
 		</div>`;
 	}
 
 	static override styles = [
 		UmbTextStyles,
 		css`
-			uui-input:not(:hover, :focus) {
-				border: 1px solid transparent;
-			}
-			uui-input:not(:hover, :focus) uui-button {
-				opacity: 0;
-			}
-
 			.group-handle {
-				padding: var(--uui-size-1);
+				display: flex;
+				align-items: center;
+				padding: var(--uui-size-3) var(--uui-size-1);
 				margin-top: var(--uui-size-6);
 				margin-bottom: var(--uui-size-4);
+				gap: var(--uui-size-1);
 				cursor: grab;
+			}
+
+			.group-handle:active {
+				cursor: grabbing;
 			}
 
 			.group-handle:hover {
@@ -267,6 +272,10 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 
 			.group:has([drag-placeholder]) {
 				opacity: 0.2;
+			}
+
+			uui-input {
+				flex: 1;
 			}
 		`,
 	];

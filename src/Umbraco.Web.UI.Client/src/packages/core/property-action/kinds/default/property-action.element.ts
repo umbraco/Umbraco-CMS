@@ -16,7 +16,7 @@ export class UmbPropertyActionElement<
 	#api?: ApiType;
 
 	@state()
-	_href?: string;
+	private _href?: string;
 
 	@property({ attribute: false })
 	public manifest?: ManifestPropertyActionDefaultKind<MetaType>;
@@ -34,7 +34,7 @@ export class UmbPropertyActionElement<
 	async #onClickLabel(event: UUIMenuItemEvent) {
 		if (!this._href) {
 			event.stopPropagation();
-			await this.#api?.execute();
+			await this.#api?.execute().catch(() => {});
 		}
 		this.dispatchEvent(new UmbActionExecutedEvent());
 	}

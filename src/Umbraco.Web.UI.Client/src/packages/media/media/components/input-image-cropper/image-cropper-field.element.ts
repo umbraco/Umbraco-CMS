@@ -1,3 +1,5 @@
+import type { UmbImageCropChangeEvent } from './crop-change.event.js';
+import type { UmbFocalPointChangeEvent } from './focalpoint-change.event.js';
 import type { UmbImageCropperElement } from './image-cropper.element.js';
 import type {
 	UmbImageCropperCrop,
@@ -5,15 +7,10 @@ import type {
 	UmbImageCropperFocalPoint,
 	UmbImageCropperPropertyEditorValue,
 } from './types.js';
-import type { UmbImageCropChangeEvent } from './crop-change.event.js';
-import type { UmbFocalPointChangeEvent } from './focalpoint-change.event.js';
 import { css, customElement, html, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-
-import './image-cropper.element.js';
-import './image-cropper-focus-setter.element.js';
-import './image-cropper-preview.element.js';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 
 @customElement('umb-image-cropper-field')
 export class UmbInputImageCropperFieldElement extends UmbLitElement {
@@ -46,7 +43,19 @@ export class UmbInputImageCropperFieldElement extends UmbLitElement {
 	currentCrop?: UmbImageCropperCrop;
 
 	@property({ attribute: false })
-	file?: File;
+	set file(file: File | undefined) {
+		this.#file = file;
+		if (file) {
+			this.fileDataUrl = URL.createObjectURL(file);
+		} else if (this.fileDataUrl) {
+			URL.revokeObjectURL(this.fileDataUrl);
+			this.fileDataUrl = undefined;
+		}
+	}
+	get file() {
+		return this.#file;
+	}
+	#file?: File;
 
 	@property()
 	fileDataUrl?: string;
@@ -60,25 +69,34 @@ export class UmbInputImageCropperFieldElement extends UmbLitElement {
 	@state()
 	src = '';
 
-	get source() {
-		if (this.fileDataUrl) return this.fileDataUrl;
-		if (this.src) return this.src;
-		return '';
+	@state()
+	private _serverUrl = '';
+
+	get source(): string {
+		if (this.src) {
+			// Test that URL is relative:
+			if (this.src.startsWith('/')) {
+				return `${this._serverUrl}${this.src}`;
+			} else {
+				return this.src;
+			}
+		}
+
+		return this.fileDataUrl ?? '';
 	}
 
-	override updated(changedProperties: Map<string | number | symbol, unknown>) {
-		super.updated(changedProperties);
+	constructor() {
+		super();
 
-		if (changedProperties.has('file')) {
-			if (this.file) {
-				const reader = new FileReader();
-				reader.onload = (event) => {
-					this.fileDataUrl = event.target?.result as string;
-				};
-				reader.readAsDataURL(this.file);
-			} else {
-				this.fileDataUrl = undefined;
-			}
+		this.consumeContext(UMB_SERVER_CONTEXT, (context) => {
+			this._serverUrl = context?.getServerUrl() ?? '';
+		});
+	}
+
+	override disconnectedCallback(): void {
+		super.disconnectedCallback();
+		if (this.fileDataUrl) {
+			URL.revokeObjectURL(this.fileDataUrl);
 		}
 	}
 
@@ -157,69 +175,91 @@ export class UmbInputImageCropperFieldElement extends UmbLitElement {
 	}
 
 	protected renderActions() {
-		return html`<slot name="actions"></slot>
+		return html`
+			<slot name="actions"></slot>
 			${when(
-				!this.hideFocalPoint,
-				() =>
-					html`<uui-button
-						label=${this.localize.term('content_resetFocalPoint')}
-						@click=${this.onResetFocalPoint}></uui-button>`,
-			)} `;
+				!this.hideFocalPoint && this.focalPoint.left !== 0.5 && this.focalPoint.top !== 0.5,
+				() => html`
+					<uui-button compact label=${this.localize.term('content_resetFocalPoint')} @click=${this.onResetFocalPoint}>
+						<uui-icon name="icon-axis-rotation"></uui-icon>
+						${this.localize.term('content_resetFocalPoint')}
+					</uui-button>
+				`,
+			)}
+		`;
 	}
 
 	protected renderSide() {
 		if (!this.value || !this.crops) return;
-
 		return repeat(
 			this.crops,
 			(crop) => crop.alias + JSON.stringify(crop.coordinates),
-			(crop) =>
-				html` <umb-image-cropper-preview
-					@click=${() => this.onCropClick(crop)}
+			(crop) => html`
+				<umb-image-cropper-preview
 					.crop=${crop}
 					.focalPoint=${this.focalPoint}
-					.src=${this.source}></umb-image-cropper-preview>`,
+					.src=${this.source}
+					?active=${this.currentCrop?.alias === crop.alias}
+					@click=${() => this.onCropClick(crop)}>
+				</umb-image-cropper-preview>
+			`,
 		);
 	}
-	static override styles = css`
-		:host {
-			display: flex;
-			width: 100%;
-			box-sizing: border-box;
-			gap: var(--uui-size-space-3);
-			height: 400px;
-		}
 
-		#main {
-			max-width: 500px;
-			min-width: 300px;
-			width: 100%;
-			height: 100%;
-			display: flex;
-			gap: var(--uui-size-space-1);
-			flex-direction: column;
-		}
+	static override styles = [
+		css`
+			:host {
+				display: flex;
+				width: 100%;
+				box-sizing: border-box;
+				gap: var(--uui-size-space-3);
+				height: 400px;
+			}
 
-		#actions {
-			display: flex;
-			justify-content: space-between;
-			margin-top: 0.5rem;
-		}
+			#main {
+				max-width: 500px;
+				min-width: 300px;
+				width: 100%;
+				height: 100%;
+				display: flex;
+				gap: var(--uui-size-space-1);
+				flex-direction: column;
+			}
 
-		umb-image-cropper-focus-setter {
-			height: calc(100% - 33px - var(--uui-size-space-1)); /* Temp solution to make room for actions */
-		}
+			#actions {
+				display: flex;
+				justify-content: space-between;
+				margin-top: 0.5rem;
 
-		#side {
-			display: grid;
-			grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-			gap: var(--uui-size-space-3);
-			flex-grow: 1;
-			overflow-y: auto;
-			height: fit-content;
-			max-height: 100%;
-		}
-	`;
+				uui-icon {
+					padding-right: var(--uui-size-1);
+				}
+			}
+
+			slot[name='actions'] {
+				display: block;
+				flex: 1;
+			}
+
+			umb-image-cropper-focus-setter {
+				height: calc(100% - 33px - var(--uui-size-space-1)); /* Temp solution to make room for actions */
+			}
+
+			#side {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+				gap: var(--uui-size-space-3);
+				flex-grow: 1;
+				overflow-y: auto;
+				height: fit-content;
+				max-height: 100%;
+
+				umb-image-cropper-preview[active] {
+					background-color: var(--uui-color-current);
+				}
+			}
+		`,
+	];
 }
 
 declare global {

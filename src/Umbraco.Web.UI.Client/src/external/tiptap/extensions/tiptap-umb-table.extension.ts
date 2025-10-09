@@ -1,21 +1,50 @@
 import { UmbBubbleMenuPlugin } from './tiptap-umb-bubble-menu.extension.js';
-import { CellSelection, TableMap } from '@tiptap/pm/tables';
+import { CellSelection, TableMap, TableView } from '@tiptap/pm/tables';
 import { Decoration, DecorationSet, EditorView } from '@tiptap/pm/view';
 import { EditorState, Plugin, Selection, Transaction } from '@tiptap/pm/state';
 import { findParentNode, Editor } from '@tiptap/core';
-import { Node as PMNode, ResolvedPos } from '@tiptap/pm/model';
+import { Node as ProseMirrorNode, ResolvedPos } from '@tiptap/pm/model';
 import { Table } from '@tiptap/extension-table';
 import { TableCell } from '@tiptap/extension-table-cell';
 import { TableHeader } from '@tiptap/extension-table-header';
 import { TableRow } from '@tiptap/extension-table-row';
 import type { Rect } from '@tiptap/pm/tables';
 
-export const UmbTable = Table.configure({ resizable: true });
+// NOTE: Custom TableView, to allow for custom styles to be applied to the <table> element. [LK]
+// ref: https://github.com/ueberdosis/tiptap/blob/v2.11.5/packages/extension-table/src/TableView.ts
+/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
+export class UmbTableView extends TableView {
+	constructor(node: ProseMirrorNode, cellMinWidth: number) {
+		super(node, cellMinWidth);
+		this.#updateTableStyle(node);
+	}
 
+	override update(node: ProseMirrorNode): boolean {
+		if (!super.update(node)) return false;
+		this.#updateTableStyle(node);
+		return true;
+	}
+
+	#updateTableStyle(node: ProseMirrorNode) {
+		if (node.attrs.style) {
+			// NOTE: The `min-width` inline style is handled by the Tiptap TableView, so we need to preserve it. [LK]
+			const minWidth = this.table.style.minWidth;
+			const styles = node.attrs.style as string;
+			this.table.style.cssText = `${styles}; min-width: ${minWidth};`;
+		}
+	}
+}
+
+/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
+export const UmbTable = Table.configure({ resizable: true, View: UmbTableView });
+
+/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
 export const UmbTableRow = TableRow.extend({
 	allowGapCursor: false,
+	content: '(tableCell | tableHeader)*',
 });
 
+/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
 export const UmbTableHeader = TableHeader.extend({
 	addAttributes() {
 		return {
@@ -46,7 +75,8 @@ export const UmbTableHeader = TableHeader.extend({
 			UmbBubbleMenuPlugin(this.editor, {
 				unique: 'table-column-menu',
 				placement: 'top',
-				elementName: 'umb-tiptap-table-column-menu',
+				elementName: 'umb-tiptap-menu',
+				menuAlias: 'Umb.Menu.Tiptap.TableColumn',
 				shouldShow(props) {
 					return isColumnGripSelected(props);
 				},
@@ -96,6 +126,7 @@ export const UmbTableHeader = TableHeader.extend({
 	},
 });
 
+/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
 export const UmbTableCell = TableCell.extend({
 	addAttributes() {
 		return {
@@ -138,7 +169,8 @@ export const UmbTableCell = TableCell.extend({
 			UmbBubbleMenuPlugin(this.editor, {
 				unique: 'table-row-menu',
 				placement: 'left',
-				elementName: 'umb-tiptap-table-row-menu',
+				elementName: 'umb-tiptap-menu',
+				menuAlias: 'Umb.Menu.Tiptap.TableRow',
 				shouldShow(props) {
 					return isRowGripSelected(props);
 				},
@@ -284,7 +316,7 @@ const getCellsInColumn = (columnIndex: number | number[]) => (selection: Selecti
 
 				return acc;
 			},
-			[] as { pos: number; start: number; node: PMNode | null | undefined }[],
+			[] as { pos: number; start: number; node: ProseMirrorNode | null | undefined }[],
 		);
 	}
 	return null;
@@ -318,7 +350,7 @@ const getCellsInRow = (rowIndex: number | number[]) => (selection: Selection) =>
 
 				return acc;
 			},
-			[] as { pos: number; start: number; node: PMNode | null | undefined }[],
+			[] as { pos: number; start: number; node: ProseMirrorNode | null | undefined }[],
 		);
 	}
 
@@ -348,7 +380,7 @@ const getCellsInTable = (selection: Selection) => {
 	return null;
 };
 
-const findParentNodeClosestToPos = ($pos: ResolvedPos, predicate: (node: PMNode) => boolean) => {
+const findParentNodeClosestToPos = ($pos: ResolvedPos, predicate: (node: ProseMirrorNode) => boolean) => {
 	for (let i = $pos.depth; i > 0; i -= 1) {
 		const node = $pos.node(i);
 
@@ -366,7 +398,7 @@ const findParentNodeClosestToPos = ($pos: ResolvedPos, predicate: (node: PMNode)
 };
 
 const findCellClosestToPos = ($pos: ResolvedPos) => {
-	const predicate = (node: PMNode) => node.type.spec.tableRole && /cell/i.test(node.type.spec.tableRole);
+	const predicate = (node: ProseMirrorNode) => node.type.spec.tableRole && /cell/i.test(node.type.spec.tableRole);
 
 	return findParentNodeClosestToPos($pos, predicate);
 };

@@ -1,4 +1,4 @@
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { ManifestService, PackageService } from '@umbraco-cms/backoffice/external/backend-api';
 import type {
 	CreatePackageRequestModel,
@@ -11,22 +11,22 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
  
  */
 export class UmbPackageServerDataSource {
-	constructor(private readonly host: UmbControllerHost) {}
+	constructor(private readonly _host: UmbControllerHost) {}
 
 	async deleteCreatedPackage(unique: string) {
-		return await tryExecuteAndNotify(this.host, PackageService.deletePackageCreatedById({ id: unique }));
+		return await tryExecute(this._host, PackageService.deletePackageCreatedById({ path: { id: unique } }));
 	}
 
 	getCreatedPackage(unique: string) {
-		return tryExecuteAndNotify(this.host, PackageService.getPackageCreatedById({ id: unique }));
+		return tryExecute(this._host, PackageService.getPackageCreatedById({ path: { id: unique } }));
 	}
 
 	getCreatedPackages({ skip, take }: { skip: number; take: number }) {
-		return tryExecuteAndNotify(this.host, PackageService.getPackageCreated({ skip, take }));
+		return tryExecute(this._host, PackageService.getPackageCreated({ query: { skip, take } }));
 	}
 
 	getCreatePackageDownload(unique: string) {
-		return tryExecuteAndNotify(this.host, PackageService.getPackageCreatedByIdDownload({ id: unique }));
+		return tryExecute(this._host, PackageService.getPackageCreatedByIdDownload({ path: { id: unique } }));
 	}
 
 	/**
@@ -34,7 +34,7 @@ export class UmbPackageServerDataSource {
 	 * @memberof UmbPackageServerDataSource
 	 */
 	getRootItems() {
-		return tryExecuteAndNotify(this.host, ManifestService.getManifestManifest());
+		return tryExecute(this._host, ManifestService.getManifestManifest());
 	}
 
 	/**
@@ -42,7 +42,7 @@ export class UmbPackageServerDataSource {
 	 * @memberof UmbPackageServerDataSource
 	 */
 	getPackageConfiguration() {
-		return tryExecuteAndNotify(this.host, PackageService.getPackageConfiguration());
+		return tryExecute(this._host, PackageService.getPackageConfiguration());
 	}
 
 	/**
@@ -50,14 +50,14 @@ export class UmbPackageServerDataSource {
 	 * @memberof UmbPackageServerDataSource
 	 */
 	getPackageMigrations() {
-		return tryExecuteAndNotify(this.host, PackageService.getPackageMigrationStatus({ skip: 0, take: 9999 }));
+		return tryExecute(this._host, PackageService.getPackageMigrationStatus({ query: { skip: 0, take: 9999 } }));
 	}
 
-	async saveCreatedPackage(requestBody: CreatePackageRequestModel) {
-		return await tryExecuteAndNotify(this.host, PackageService.postPackageCreated({ requestBody }));
+	async saveCreatedPackage(body: CreatePackageRequestModel) {
+		return await tryExecute(this._host, PackageService.postPackageCreated({ body }));
 	}
 
-	async updateCreatedPackage(id: string, requestBody: UpdatePackageRequestModel) {
-		return await tryExecuteAndNotify(this.host, PackageService.putPackageCreatedById({ id, requestBody }));
+	async updateCreatedPackage(id: string, body: UpdatePackageRequestModel) {
+		return await tryExecute(this._host, PackageService.putPackageCreatedById({ path: { id }, body }));
 	}
 }

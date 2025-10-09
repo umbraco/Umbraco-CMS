@@ -4,7 +4,7 @@ using Umbraco.Cms.Tests.Common.Builders;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
-public class PublishedUrlInfoProviderTests : PublishedUrlInfoProviderTestsBase
+internal sealed class PublishedUrlInfoProviderTests : PublishedUrlInfoProviderTestsBase
 {
 
     [Test]
@@ -12,7 +12,7 @@ public class PublishedUrlInfoProviderTests : PublishedUrlInfoProviderTestsBase
     {
         // Create a second root
         var secondRoot = ContentBuilder.CreateSimpleContent(ContentType, "Second Root", null);
-        var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.Now.AddMinutes(-5), null);
+        var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddMinutes(-5), null);
         ContentService.Save(secondRoot, -1, contentSchedule);
 
         // Create a child of second root

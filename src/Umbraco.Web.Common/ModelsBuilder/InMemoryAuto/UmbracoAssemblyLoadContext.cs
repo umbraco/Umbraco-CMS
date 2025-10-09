@@ -3,7 +3,7 @@ using System.Runtime.Loader;
 
 namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto;
 
-internal class UmbracoAssemblyLoadContext : AssemblyLoadContext
+internal sealed class UmbracoAssemblyLoadContext : AssemblyLoadContext
 {
     /// <summary>
     ///     Initializes a new instance of the <see cref="UmbracoAssemblyLoadContext" /> class.

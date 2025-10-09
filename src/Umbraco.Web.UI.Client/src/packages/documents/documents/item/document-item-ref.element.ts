@@ -6,6 +6,8 @@ import { customElement, html, ifDefined, nothing, property, state } from '@umbra
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
+import type { UUISelectableEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-document-item-ref')
 export class UmbDocumentItemRefElement extends UmbLitElement {
@@ -19,29 +21,41 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 		this.#item.setData(value);
 	}
 
-	@property({ type: Boolean })
+	@property({ type: Boolean, reflect: true })
 	readonly = false;
 
 	@property({ type: Boolean })
 	standalone = false;
 
-	@state()
-	_unique = '';
+	@property({ type: Boolean, attribute: 'select-only', reflect: true })
+	selectOnly = false;
+
+	@property({ type: Boolean, reflect: true })
+	selectable = false;
+
+	@property({ type: Boolean, reflect: true })
+	selected = false;
+
+	@property({ type: Boolean, reflect: true })
+	disabled = false;
 
 	@state()
-	_name = '';
+	private _unique = '';
 
 	@state()
-	_icon = '';
+	private _name = '';
 
 	@state()
-	_isTrashed = false;
+	private _icon = '';
 
 	@state()
-	_isDraft = false;
+	private _isTrashed = false;
 
 	@state()
-	_editPath = '';
+	private _isDraft = false;
+
+	@state()
+	private _editPath = '';
 
 	constructor() {
 		super();
@@ -68,6 +82,16 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 		return `${this._editPath}/${path}`;
 	}
 
+	#onSelected(event: UUISelectableEvent) {
+		event.stopPropagation();
+		this.dispatchEvent(new UmbSelectedEvent(this._unique));
+	}
+
+	#onDeselected(event: UUISelectableEvent) {
+		event.stopPropagation();
+		this.dispatchEvent(new UmbDeselectedEvent(this._unique));
+	}
+
 	override render() {
 		if (!this.item) return nothing;
 
@@ -76,7 +100,13 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 				name=${this._name}
 				href=${ifDefined(this.#getHref())}
 				?readonly=${this.readonly}
-				?standalone=${this.standalone}>
+				?standalone=${this.standalone}
+				?select-only=${this.selectOnly}
+				?selectable=${this.selectable}
+				?selected=${this.selected}
+				?disabled=${this.disabled}
+				@selected=${this.#onSelected}
+				@deselected=${this.#onDeselected}>
 				<slot name="actions" slot="actions"></slot>
 				${this.#renderIcon()}${this.#renderIsDraft()} ${this.#renderIsTrashed()}
 			</uui-ref-node>

@@ -5,10 +5,10 @@ test.beforeEach(async ({umbracoUi}) => {
   await umbracoUi.welcomeDashboard.goToSection(ConstantHelper.sections.settings);
 });
 
-test('can click on buttons', async ({umbracoUi}) => {
+test('can click on buttons', {tag: '@release'}, async ({umbracoUi}) => {
   // Arrange
   const getTheHelpYouNeedDocumentationUrl = 'https://docs.umbraco.com/umbraco-cms';
-  const goToTheForumUrl = 'https://our.umbraco.com/forum/';
+  const goToTheForumUrl = 'https://forum.umbraco.com/';
   const chatWithTheCommunityUrl = 'https://discord.umbraco.com';
   const getCertifiedUrl = 'https://umbraco.com/training/';
   const getTheHelpYouNeedSupportUrl = 'https://umbraco.com/support/';

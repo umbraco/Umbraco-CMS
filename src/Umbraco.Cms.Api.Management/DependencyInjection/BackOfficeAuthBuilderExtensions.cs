@@ -79,7 +79,7 @@ public static class BackOfficeAuthBuilderExtensions
     }
 }
 
-internal class BackofficePipelineFilter : UmbracoPipelineFilter
+internal sealed class BackofficePipelineFilter : UmbracoPipelineFilter
 {
     public BackofficePipelineFilter(string name)
         : base(name)

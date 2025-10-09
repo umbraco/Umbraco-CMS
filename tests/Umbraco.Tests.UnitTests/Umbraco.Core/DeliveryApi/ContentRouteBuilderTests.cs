@@ -50,7 +50,7 @@ public class ContentRouteBuilderTests : DeliveryApiTests
         IEnumerable<Guid> ancestorsKeys = [rootKey];
         navigationQueryServiceMock.Setup(x => x.TryGetAncestorsKeys(childKey, out ancestorsKeys)).Returns(true);
 
-        var contentCache = CreatePublishedContentCache("#");
+        var contentCache = CreatePublishedContentCache();
         Mock.Get(contentCache).Setup(x => x.GetById(It.IsAny<bool>(), root.Key)).Returns(root);
         Mock.Get(contentCache).Setup(x => x.GetById(It.IsAny<bool>(), child.Key)).Returns(child);
 
@@ -77,7 +77,7 @@ public class ContentRouteBuilderTests : DeliveryApiTests
         var grandchildKey = Guid.NewGuid();
         var grandchild = SetupInvariantPublishedContent("The Grandchild", grandchildKey, navigationQueryServiceMock, child);
 
-        var contentCache = CreatePublishedContentCache("#");
+        var contentCache = CreatePublishedContentCache();
         Mock.Get(contentCache).Setup(x => x.GetById(It.IsAny<bool>(), root.Key)).Returns(root);
         Mock.Get(contentCache).Setup(x => x.GetById(It.IsAny<bool>(), child.Key)).Returns(child);
         Mock.Get(contentCache).Setup(x => x.GetById(It.IsAny<bool>(), grandchild.Key)).Returns(grandchild);
@@ -104,7 +104,7 @@ public class ContentRouteBuilderTests : DeliveryApiTests
         var childKey = Guid.NewGuid();
         var child = SetupVariantPublishedContent("The Child", childKey, navigationQueryServiceMock, root);
 
-        var contentCache = CreatePublishedContentCache("#");
+        var contentCache = CreatePublishedContentCache();
         Mock.Get(contentCache).Setup(x => x.GetById(It.IsAny<bool>(), root.Key)).Returns(root);
         Mock.Get(contentCache).Setup(x => x.GetById(It.IsAny<bool>(), child.Key)).Returns(child);
 
@@ -136,7 +136,7 @@ public class ContentRouteBuilderTests : DeliveryApiTests
         var childKey = Guid.NewGuid();
         var child = SetupInvariantPublishedContent("The Child", childKey, navigationQueryServiceMock, root);
 
-        var contentCache = CreatePublishedContentCache("#");
+        var contentCache = CreatePublishedContentCache();
         Mock.Get(contentCache).Setup(x => x.GetById(It.IsAny<bool>(), root.Key)).Returns(root);
         Mock.Get(contentCache).Setup(x => x.GetById(It.IsAny<bool>(), child.Key)).Returns(child);
 
@@ -168,7 +168,7 @@ public class ContentRouteBuilderTests : DeliveryApiTests
         var childKey = Guid.NewGuid();
         var child = SetupVariantPublishedContent("The Child", childKey, navigationQueryServiceMock, root);
 
-        var contentCache = CreatePublishedContentCache("#");
+        var contentCache = CreatePublishedContentCache();
         Mock.Get(contentCache).Setup(x => x.GetById(It.IsAny<bool>(), root.Key)).Returns(root);
         Mock.Get(contentCache).Setup(x => x.GetById(It.IsAny<bool>(), child.Key)).Returns(child);
 
@@ -209,7 +209,7 @@ public class ContentRouteBuilderTests : DeliveryApiTests
     {
         var result = GetUnRoutableRoute(resolvedUrl, "/the/content/route");
         Assert.IsNotNull(result);
-        Assert.AreEqual("/the/content/route", result.Path);
+        Assert.AreEqual("/the/content/route/", result.Path);
     }
 
     [TestCase("")]
@@ -266,7 +266,7 @@ public class ContentRouteBuilderTests : DeliveryApiTests
         var childKey = Guid.NewGuid();
         var child = SetupInvariantPublishedContent("The Child", childKey, navigationQueryServiceMock, root, false);
 
-        var contentCache = CreatePublishedContentCache("#");
+        var contentCache = CreatePublishedContentCache();
         Mock.Get(contentCache).Setup(x => x.GetById(It.IsAny<bool>(), root.Key)).Returns(root);
         Mock.Get(contentCache).Setup(x => x.GetById(It.IsAny<bool>(), child.Key)).Returns(child);
 
@@ -293,7 +293,7 @@ public class ContentRouteBuilderTests : DeliveryApiTests
         var childKey = Guid.NewGuid();
         var child = SetupInvariantPublishedContent("The Child", childKey, navigationQueryServiceMock, root, false);
 
-        var contentCache = CreatePublishedContentCache("#");
+        var contentCache = CreatePublishedContentCache();
         Mock.Get(contentCache).Setup(x => x.GetById(It.IsAny<bool>(), root.Key)).Returns(root);
         Mock.Get(contentCache).Setup(x => x.GetById(It.IsAny<bool>(), child.Key)).Returns(child);
 
@@ -321,7 +321,7 @@ public class ContentRouteBuilderTests : DeliveryApiTests
         var requestPreviewServiceMock = new Mock<IRequestPreviewService>();
         requestPreviewServiceMock.Setup(m => m.IsPreview()).Returns(isPreview);
 
-        var contentCache = CreatePublishedContentCache("#");
+        var contentCache = CreatePublishedContentCache();
         Mock.Get(contentCache).Setup(x => x.GetById(It.IsAny<bool>(), root.Key)).Returns(root);
         Mock.Get(contentCache).Setup(x => x.GetById(It.IsAny<bool>(), child.Key)).Returns(child);
 
@@ -355,7 +355,7 @@ public class ContentRouteBuilderTests : DeliveryApiTests
         var childKey = Guid.NewGuid();
         var child = SetupInvariantPublishedContent("The Child", childKey, navigationQueryServiceMock, root);
 
-        var contentCache = CreatePublishedContentCache("#");
+        var contentCache = CreatePublishedContentCache();
         Mock.Get(contentCache).Setup(x => x.GetById(It.IsAny<bool>(), root.Key)).Returns(root);
         Mock.Get(contentCache).Setup(x => x.GetById(It.IsAny<bool>(), child.Key)).Returns(child);
 
@@ -460,7 +460,7 @@ public class ContentRouteBuilderTests : DeliveryApiTests
         var requestPreviewServiceMock = new Mock<IRequestPreviewService>();
         requestPreviewServiceMock.Setup(m => m.IsPreview()).Returns(isPreview);
 
-        contentCache ??= CreatePublishedContentCache("#");
+        contentCache ??= CreatePublishedContentCache();
         apiContentPathProvider ??= SetupApiContentPathProvider(hideTopLevelNodeFromPath, contentCache, navigationQueryService);
 
         return CreateContentRouteBuilder(
@@ -480,25 +480,24 @@ public class ContentRouteBuilderTests : DeliveryApiTests
             .Returns(publishedUrl);
         var contentPathProvider = new ApiContentPathProvider(publishedUrlProviderMock.Object);
 
-        var contentCache = CreatePublishedContentCache(routeById);
+        var contentCache = CreatePublishedContentCache();
         var navigationQueryServiceMock = new Mock<IDocumentNavigationQueryService>();
         var content = SetupVariantPublishedContent("The Content", Guid.NewGuid(), navigationQueryServiceMock);
+
+        var documentUrlServiceMock = new Mock<IDocumentUrlService>();
+        documentUrlServiceMock
+            .Setup(m => m.GetLegacyRouteFormat(It.IsAny<Guid>(), It.IsAny<string?>(), It.IsAny<bool>()))
+            .Returns(routeById);
 
         var builder = CreateContentRouteBuilder(
             contentPathProvider,
             CreateGlobalSettings(),
-            contentCache: contentCache);
+            contentCache: contentCache,
+            documentUrlService: documentUrlServiceMock.Object);
 
         return builder.Build(content);
     }
 
-    private IPublishedContentCache CreatePublishedContentCache(string routeById)
-    {
-        var publishedContentCacheMock = new Mock<IPublishedContentCache>();
-        publishedContentCacheMock
-            .Setup(c => c.GetRouteById(It.IsAny<int>(), It.IsAny<string?>()))
-            .Returns(routeById);
-
-        return publishedContentCacheMock.Object;
-    }
+    private IPublishedContentCache CreatePublishedContentCache()
+        => Mock.Of<IPublishedContentCache>();
 }

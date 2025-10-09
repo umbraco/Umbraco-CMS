@@ -5,7 +5,7 @@ import { UmbTemplateItemRepository } from '../../repository/item/index.js';
 import { UMB_TEMPLATE_PICKER_MODAL } from '../../modals/index.js';
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -51,29 +51,28 @@ export class UmbInputTemplateElement extends UUIFormControlMixin(UmbLitElement, 
 
 	@property({ type: Array })
 	public set selection(newKeys: Array<string> | undefined) {
-		this._selection = newKeys ?? [];
+		this.#selection = newKeys ?? [];
 		this.#observePickedTemplates();
 	}
 	public get selection() {
-		return this._selection;
+		return this.#selection;
 	}
-	_selection: Array<string> = [];
+	#selection: Array<string> = [];
 
-	_defaultUnique = '';
 	@property({ type: String })
 	public set defaultUnique(newId: string) {
-		this._defaultUnique = newId;
+		this.#defaultUnique = newId;
 		super.value = newId;
 	}
 	public get defaultUnique(): string {
-		return this._defaultUnique;
+		return this.#defaultUnique;
 	}
-
-	private _templateItemRepository = new UmbTemplateItemRepository(this);
+	#defaultUnique = '';
 
 	@state()
-	_pickedTemplates: UmbTemplateItemModel[] = [];
+	private _pickedTemplates: UmbTemplateItemModel[] = [];
 
+	#templateItemRepository = new UmbTemplateItemRepository(this);
 	#templatePath = '';
 
 	constructor() {
@@ -91,10 +90,10 @@ export class UmbInputTemplateElement extends UUIFormControlMixin(UmbLitElement, 
 
 	async #observePickedTemplates() {
 		this.observe(
-			(await this._templateItemRepository.requestItems(this._selection)).asObservable(),
+			(await this.#templateItemRepository?.requestItems(this.#selection))?.asObservable?.(),
 			(data) => {
 				const oldValue = this._pickedTemplates;
-				this._pickedTemplates = data;
+				this._pickedTemplates = data ?? [];
 				this.requestUpdate('_pickedTemplates', oldValue);
 			},
 			'_observeTemplates',
@@ -102,7 +101,7 @@ export class UmbInputTemplateElement extends UUIFormControlMixin(UmbLitElement, 
 	}
 
 	protected override getFormElement() {
-		return this;
+		return undefined;
 	}
 
 	#appendTemplates(unique: string[]) {
@@ -124,15 +123,12 @@ export class UmbInputTemplateElement extends UUIFormControlMixin(UmbLitElement, 
 	}
 
 	async #openPicker() {
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const modalContext = modalManager.open(this, UMB_TEMPLATE_PICKER_MODAL, {
+		const value = await umbOpenModal(this, UMB_TEMPLATE_PICKER_MODAL, {
 			data: {
 				multiple: true,
-				pickableFilter: (template) => template.unique !== null && !this._selection.includes(template.unique),
+				pickableFilter: (template) => template.unique !== null && !this.#selection.includes(template.unique),
 			},
-		});
-
-		const value = await modalContext?.onSubmit().catch(() => undefined);
+		}).catch(() => undefined);
 
 		if (!value?.selection) return;
 
@@ -154,7 +150,7 @@ export class UmbInputTemplateElement extends UUIFormControlMixin(UmbLitElement, 
 		In current backoffice we just prevent deleting a default when there are other templates. But if its the only one its okay. This is a weird experience, so we should make something that makes more sense.
 		BTW. its weird cause the damage of removing the default template is equally bad when there is one or more templates.
 		*/
-		this.selection = this._selection.filter((x) => x !== unique);
+		this.selection = this.#selection.filter((x) => x !== unique);
 
 		// If the default template is removed, set the first picked template as default or reset defaultUnique.
 		if (unique === this.defaultUnique) {
@@ -201,8 +197,8 @@ export class UmbInputTemplateElement extends UUIFormControlMixin(UmbLitElement, 
 			:host {
 				display: grid;
 				gap: var(--uui-size-space-3);
-				grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-				grid-template-rows: repeat(auto-fill, minmax(160px, 1fr));
+				grid-template-columns: repeat(auto-fill, minmax(var(--umb-card-medium-min-width), 1fr));
+				grid-template-rows: repeat(auto-fill, minmax(var(--umb-card-medium-min-width), 1fr));
 			}
 
 			#btn-add {

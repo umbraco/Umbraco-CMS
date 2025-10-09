@@ -15,7 +15,7 @@ using static Umbraco.Cms.Core.Persistence.SqlExtensionsStatics;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
-internal class TagRepository : EntityRepositoryBase<int, ITag>, ITagRepository
+internal sealed class TagRepository : EntityRepositoryBase<int, ITag>, ITagRepository
 {
     public TagRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<TagRepository> logger)
         : base(scopeAccessor, cache, logger)
@@ -128,10 +128,13 @@ internal class TagRepository : EntityRepositoryBase<int, ITag>, ITagRepository
         var group = SqlSyntax.GetQuotedColumnName("group");
 
         // insert tags
+        // - Note we are checking in the subquery for the existence of the tag, so we don't insert duplicates, using a case-insensitive comparison (the
+        //   LOWER keyword is consistent across SQLite and SQLServer). This ensures consistent behavior across databases as by default, SQLServer will
+        //   perform a case-insensitive comparison, while SQLite will not.
         var sql1 = $@"INSERT INTO cmsTags (tag, {group}, languageId)
 SELECT tagSet.tag, tagSet.{group}, tagSet.languageId
 FROM {tagSetSql}
-LEFT OUTER JOIN cmsTags ON (tagSet.tag = cmsTags.tag AND tagSet.{group} = cmsTags.{group} AND COALESCE(tagSet.languageId, -1) = COALESCE(cmsTags.languageId, -1))
+LEFT OUTER JOIN cmsTags ON (LOWER(tagSet.tag) = LOWER(cmsTags.tag) AND LOWER(tagSet.{group}) = LOWER(cmsTags.{group}) AND COALESCE(tagSet.languageId, -1) = COALESCE(cmsTags.languageId, -1))
 WHERE cmsTags.id IS NULL";
 
         Database.Execute(sql1);
@@ -142,7 +145,7 @@ SELECT {contentId}, {propertyTypeId}, tagSet2.Id
 FROM (
     SELECT t.Id
     FROM {tagSetSql}
-    INNER JOIN cmsTags as t ON (tagSet.tag = t.tag AND tagSet.{group} = t.{group} AND COALESCE(tagSet.languageId, -1) = COALESCE(t.languageId, -1))
+    INNER JOIN cmsTags as t ON (LOWER(tagSet.tag) = LOWER(t.tag) AND LOWER(tagSet.{group}) = LOWER(t.{group}) AND COALESCE(tagSet.languageId, -1) = COALESCE(t.languageId, -1))
 ) AS tagSet2
 LEFT OUTER JOIN cmsTagRelationship r ON (tagSet2.id = r.tagId AND r.nodeId = {contentId} AND r.propertyTypeID = {propertyTypeId})
 WHERE r.tagId IS NULL";
@@ -242,18 +245,22 @@ WHERE r.tagId IS NULL";
     }
 
     // used to run Distinct() on tags
-    private class TagComparer : IEqualityComparer<ITag>
+    private sealed class TagComparer : IEqualityComparer<ITag>
     {
         public bool Equals(ITag? x, ITag? y) =>
             ReferenceEquals(x, y) // takes care of both being null
-            || (x != null && y != null && x.Text == y.Text && x.Group == y.Group && x.LanguageId == y.LanguageId);
+            || (x != null &&
+                y != null &&
+                string.Equals(x.Text, y.Text, StringComparison.OrdinalIgnoreCase) &&
+                string.Equals(x.Group, y.Group, StringComparison.OrdinalIgnoreCase) &&
+            x.LanguageId == y.LanguageId);
 
         public int GetHashCode(ITag obj)
         {
             unchecked
             {
-                var h = obj.Text.GetHashCode();
-                h = (h * 397) ^ obj.Group.GetHashCode();
+                var h = StringComparer.OrdinalIgnoreCase.GetHashCode(obj.Text);
+                h = (h * 397) ^ StringComparer.OrdinalIgnoreCase.GetHashCode(obj.Group);
                 h = (h * 397) ^ (obj.LanguageId?.GetHashCode() ?? 0);
                 return h;
             }
@@ -269,7 +276,7 @@ WHERE r.tagId IS NULL";
 
     // ReSharper disable once ClassNeverInstantiated.Local
     // ReSharper disable UnusedAutoPropertyAccessor.Local
-    private class TaggedEntityDto
+    private sealed class TaggedEntityDto
     {
         public int NodeId { get; set; }
         public string? PropertyTypeAlias { get; set; }
@@ -531,7 +538,7 @@ WHERE r.tagId IS NULL";
         return sql;
     }
 
-    private Sql<ISqlContext> AddTagsSqlWhere(Sql<ISqlContext> sql, string? culture)
+    private static Sql<ISqlContext> AddTagsSqlWhere(Sql<ISqlContext> sql, string? culture)
     {
         if (culture == null)
         {
@@ -550,7 +557,7 @@ WHERE r.tagId IS NULL";
     private IEnumerable<ITag> ExecuteTagsQuery(Sql sql) =>
         Database.Fetch<TagDto>(sql).Select(TagFactory.BuildEntity);
 
-    private Guid GetNodeObjectType(TaggableObjectTypes type)
+    private static Guid GetNodeObjectType(TaggableObjectTypes type)
     {
         switch (type)
         {

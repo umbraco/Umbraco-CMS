@@ -9,6 +9,3 @@ export class UmbUserPickerInputContext extends UmbPickerInputContext<UmbUserDeta
 		super(host, UMB_USER_ITEM_REPOSITORY_ALIAS, UMB_USER_PICKER_MODAL);
 	}
 }
-
-/** @deprecated Use `UmbUserPickerInputContext` instead. This method will be removed in Umbraco 15. */
-export { UmbUserPickerInputContext as UmbUserPickerContext };

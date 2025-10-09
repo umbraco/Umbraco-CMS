@@ -1,6 +1,8 @@
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.ContentPublishing;
@@ -12,6 +14,8 @@ namespace Umbraco.Cms.Core.Services;
 
 internal sealed class ContentPublishingService : IContentPublishingService
 {
+    private const string PublishBranchOperationType = "ContentPublishBranch";
+
     private readonly ICoreScopeProvider _coreScopeProvider;
     private readonly IContentService _contentService;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
@@ -20,6 +24,8 @@ internal sealed class ContentPublishingService : IContentPublishingService
     private readonly ILanguageService _languageService;
     private ContentSettings _contentSettings;
     private readonly IRelationService _relationService;
+    private readonly ILogger<ContentPublishingService> _logger;
+    private readonly ILongRunningOperationService _longRunningOperationService;
 
     public ContentPublishingService(
         ICoreScopeProvider coreScopeProvider,
@@ -29,7 +35,9 @@ internal sealed class ContentPublishingService : IContentPublishingService
         IContentTypeService contentTypeService,
         ILanguageService languageService,
         IOptionsMonitor<ContentSettings> optionsMonitor,
-        IRelationService relationService)
+        IRelationService relationService,
+        ILogger<ContentPublishingService> logger,
+        ILongRunningOperationService longRunningOperationService)
     {
         _coreScopeProvider = coreScopeProvider;
         _contentService = contentService;
@@ -38,6 +46,8 @@ internal sealed class ContentPublishingService : IContentPublishingService
         _contentTypeService = contentTypeService;
         _languageService = languageService;
         _relationService = relationService;
+        _logger = logger;
+        _longRunningOperationService = longRunningOperationService;
         _contentSettings = optionsMonitor.CurrentValue;
         optionsMonitor.OnChange((contentSettings) =>
         {
@@ -156,7 +166,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
                 return Attempt.FailWithStatus(ContentPublishingOperationStatus.CannotPublishInvariantWhenVariant, new ContentPublishingResult());
             }
 
-            IEnumerable<string> validCultures = (await _languageService.GetAllAsync()).Select(x => x.IsoCode);
+            IEnumerable<string> validCultures = await _languageService.GetAllIsoCodesAsync();
             if (validCultures.ContainsAll(cultures) is false)
             {
                 scope.Complete();
@@ -223,40 +233,96 @@ internal sealed class ContentPublishingService : IContentPublishingService
 
     private async Task<ContentValidationResult> ValidateCurrentContentAsync(IContent content, string[] cultures)
     {
+        IEnumerable<string?> effectiveCultures = content.ContentType.VariesByCulture()
+            ? cultures.Union([null])
+            : [null];
+
         // Would be better to be able to use a mapper/factory, but currently all that functionality is very much presentation logic.
         var model = new ContentUpdateModel()
         {
-            InvariantName = content.Name,
             // NOTE KJA: this needs redoing; we need to make an informed decision whether to include invariant properties, depending on if editing invariant properties is allowed on all variants, or if the default language is included in cultures
-            InvariantProperties = content.Properties.Where(x => x.PropertyType.VariesByCulture() is false).Select(x => new PropertyValueModel()
-            {
-                Alias = x.Alias,
-                Value = x.GetValue()
-            }),
+            Properties = effectiveCultures.SelectMany(culture =>
+                content.Properties.Select(property => property.PropertyType.VariesByCulture() == (culture is not null)
+                    ? new PropertyValueModel
+                    {
+                        Alias = property.Alias,
+                        Value = property.GetValue(culture: culture, segment: null, published: false),
+                        Culture = culture
+                    }
+                    : null)
+                .WhereNotNull())
+                .ToArray(),
             Variants = cultures.Select(culture => new VariantModel()
             {
                 Name = content.GetPublishName(culture) ?? string.Empty,
                 Culture = culture,
-                Segment = null,
-                Properties = content.Properties.Where(prop => prop.PropertyType.VariesByCulture()).Select(prop => new PropertyValueModel()
-                {
-                    Alias = prop.Alias,
-                    Value = prop.GetValue(culture: culture, segment: null, published: false)
-                })
-            })
+                Segment = null
+            }).ToArray()
         };
+
         IContentType? contentType = _contentTypeService.Get(content.ContentType.Key)!;
         ContentValidationResult validationResult = await _contentValidationService.ValidatePropertiesAsync(model, contentType, cultures);
         return validationResult;
     }
 
     /// <inheritdoc />
-    [Obsolete("This method is not longer used as the 'force' parameter has been split into publishing unpublished and force re-published. Please use the overload containing parameters for those options instead. Will be removed in V17.")]
+    [Obsolete("This method is not longer used as the 'force' parameter has been extended into options for publishing unpublished and re-publishing changed content. Please use the overload containing the parameter for those options instead. Scheduled for removal in Umbraco 17.")]
     public async Task<Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus>> PublishBranchAsync(Guid key, IEnumerable<string> cultures, bool force, Guid userKey)
         => await PublishBranchAsync(key, cultures, force ? PublishBranchFilter.IncludeUnpublished : PublishBranchFilter.Default, userKey);
 
     /// <inheritdoc />
+    [Obsolete("Please use the overload containing all parameters. Scheduled for removal in Umbraco 17.")]
     public async Task<Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus>> PublishBranchAsync(Guid key, IEnumerable<string> cultures, PublishBranchFilter publishBranchFilter, Guid userKey)
+        => await PublishBranchAsync(key, cultures, publishBranchFilter, userKey, false);
+
+    /// <inheritdoc />
+    public async Task<Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus>> PublishBranchAsync(
+        Guid key,
+        IEnumerable<string> cultures,
+        PublishBranchFilter publishBranchFilter,
+        Guid userKey,
+        bool useBackgroundThread)
+    {
+        if (useBackgroundThread is false)
+        {
+            Attempt<ContentPublishingBranchInternalResult, ContentPublishingOperationStatus> minimalAttempt
+                = await PerformPublishBranchAsync(key, cultures, publishBranchFilter, userKey, returnContent: true);
+            return MapInternalPublishingAttempt(minimalAttempt);
+        }
+
+        _logger.LogInformation("Starting async background thread for publishing branch.");
+        Attempt<Guid, LongRunningOperationEnqueueStatus> enqueueAttempt = await _longRunningOperationService.RunAsync(
+            PublishBranchOperationType,
+            async _ => await PerformPublishBranchAsync(key, cultures, publishBranchFilter, userKey, returnContent: false),
+            allowConcurrentExecution: true);
+        if (enqueueAttempt.Success)
+        {
+            return Attempt.SucceedWithStatus(
+                ContentPublishingOperationStatus.Accepted,
+                new ContentPublishingBranchResult { AcceptedTaskId = enqueueAttempt.Result });
+        }
+
+        return Attempt.FailWithStatus(
+            ContentPublishingOperationStatus.Unknown,
+            new ContentPublishingBranchResult
+            {
+                FailedItems =
+                [
+                    new ContentPublishingBranchItemResult
+                    {
+                        Key = key,
+                        OperationStatus = ContentPublishingOperationStatus.Unknown,
+                    }
+                ],
+            });
+    }
+
+    private async Task<Attempt<ContentPublishingBranchInternalResult, ContentPublishingOperationStatus>> PerformPublishBranchAsync(
+        Guid key,
+        IEnumerable<string> cultures,
+        PublishBranchFilter publishBranchFilter,
+        Guid userKey,
+        bool returnContent)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         IContent? content = _contentService.GetById(key);
@@ -264,15 +330,16 @@ internal sealed class ContentPublishingService : IContentPublishingService
         {
             return Attempt.FailWithStatus(
                 ContentPublishingOperationStatus.ContentNotFound,
-                new ContentPublishingBranchResult
+                new ContentPublishingBranchInternalResult
                 {
-                    FailedItems = new[]
-                    {
+                    FailedItems =
+                    [
                         new ContentPublishingBranchItemResult
                         {
-                            Key = key, OperationStatus = ContentPublishingOperationStatus.ContentNotFound
+                            Key = key,
+                            OperationStatus = ContentPublishingOperationStatus.ContentNotFound,
                         }
-                    }
+                    ],
                 });
         }
 
@@ -281,9 +348,10 @@ internal sealed class ContentPublishingService : IContentPublishingService
         scope.Complete();
 
         var itemResults = result.ToDictionary(r => r.Content.Key, ToContentPublishingOperationStatus);
-        var branchResult = new ContentPublishingBranchResult
+        var branchResult = new ContentPublishingBranchInternalResult
         {
-            Content = content,
+            ContentKey = content.Key,
+            Content = returnContent ? content : null,
             SucceededItems = itemResults
                 .Where(i => i.Value is ContentPublishingOperationStatus.Success)
                 .Select(i => new ContentPublishingBranchItemResult { Key = i.Key, OperationStatus = i.Value })
@@ -291,14 +359,41 @@ internal sealed class ContentPublishingService : IContentPublishingService
             FailedItems = itemResults
                 .Where(i => i.Value is not ContentPublishingOperationStatus.Success)
                 .Select(i => new ContentPublishingBranchItemResult { Key = i.Key, OperationStatus = i.Value })
-                .ToArray()
+                .ToArray(),
         };
 
-        return branchResult.FailedItems.Any() is false
+        Attempt<ContentPublishingBranchInternalResult, ContentPublishingOperationStatus> attempt = branchResult.FailedItems.Any() is false
             ? Attempt.SucceedWithStatus(ContentPublishingOperationStatus.Success, branchResult)
             : Attempt.FailWithStatus(ContentPublishingOperationStatus.FailedBranch, branchResult);
+
+        return attempt;
     }
 
+    /// <inheritdoc/>
+    public async Task<bool> IsPublishingBranchAsync(Guid taskId)
+        => await _longRunningOperationService.GetStatusAsync(taskId) is LongRunningOperationStatus.Enqueued or LongRunningOperationStatus.Running;
+
+    /// <inheritdoc/>
+    public async Task<Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus>> GetPublishBranchResultAsync(Guid taskId)
+    {
+        Attempt<Attempt<ContentPublishingBranchInternalResult, ContentPublishingOperationStatus>, LongRunningOperationResultStatus> result =
+            await _longRunningOperationService
+                .GetResultAsync<Attempt<ContentPublishingBranchInternalResult, ContentPublishingOperationStatus>>(taskId);
+
+        if (result.Success is false)
+        {
+            return Attempt.FailWithStatus(
+                result.Status switch
+                {
+                    LongRunningOperationResultStatus.OperationNotFound => ContentPublishingOperationStatus.TaskResultNotFound,
+                    LongRunningOperationResultStatus.OperationFailed => ContentPublishingOperationStatus.Failed,
+                    _ => ContentPublishingOperationStatus.Unknown,
+                },
+                new ContentPublishingBranchResult());
+        }
+
+        return MapInternalPublishingAttempt(result.Result);
+    }
 
     /// <inheritdoc/>
     public async Task<Attempt<ContentPublishingOperationStatus>> UnpublishAsync(Guid key, ISet<string>? cultures, Guid userKey)
@@ -311,7 +406,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
             return Attempt.Fail(ContentPublishingOperationStatus.ContentNotFound);
         }
 
-        if (_contentSettings.DisableUnpublishWhenReferenced && _relationService.IsRelated(content.Id))
+        if (_contentSettings.DisableUnpublishWhenReferenced && _relationService.IsRelated(content.Id, RelationDirectionFilter.Child))
         {
             scope.Complete();
             return Attempt<ContentPublishingOperationStatus>.Fail(ContentPublishingOperationStatus.CannotUnpublishWhenReferenced);
@@ -394,7 +489,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
             return Attempt.Fail(ContentPublishingOperationStatus.CannotPublishVariantWhenNotVariant);
         }
 
-        var validCultures = (await _languageService.GetAllAsync()).Select(x => x.IsoCode).ToArray();
+        var validCultures = (await _languageService.GetAllIsoCodesAsync()).ToArray();
 
         foreach (var culture in cultures)
         {
@@ -465,5 +560,20 @@ internal sealed class ContentPublishingService : IContentPublishingService
             PublishResultType.FailedUnpublish => ContentPublishingOperationStatus.Failed,
             PublishResultType.FailedUnpublishCancelledByEvent => ContentPublishingOperationStatus.CancelledByEvent,
             _ => throw new ArgumentOutOfRangeException()
+        };
+
+    private Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus> MapInternalPublishingAttempt(
+        Attempt<ContentPublishingBranchInternalResult, ContentPublishingOperationStatus> minimalAttempt) =>
+        minimalAttempt.Success
+            ? Attempt.SucceedWithStatus(minimalAttempt.Status, MapMinimalPublishingBranchResult(minimalAttempt.Result))
+            : Attempt.FailWithStatus(minimalAttempt.Status, MapMinimalPublishingBranchResult(minimalAttempt.Result));
+
+    private ContentPublishingBranchResult MapMinimalPublishingBranchResult(ContentPublishingBranchInternalResult internalResult) =>
+        new()
+        {
+            Content = internalResult.Content
+                      ?? (internalResult.ContentKey is null ? null : _contentService.GetById(internalResult.ContentKey.Value)),
+            SucceededItems = internalResult.SucceededItems,
+            FailedItems = internalResult.FailedItems,
         };
 }

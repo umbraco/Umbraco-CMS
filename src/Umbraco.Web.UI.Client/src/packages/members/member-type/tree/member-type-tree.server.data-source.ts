@@ -32,7 +32,7 @@ export class UmbMemberTypeTreeServerDataSource extends UmbTreeServerDataSourceBa
 
 const getRootItems = (args: UmbTreeRootItemsRequestArgs) =>
 	// eslint-disable-next-line local-rules/no-direct-api-import
-	MemberTypeService.getTreeMemberTypeRoot({ skip: args.skip, take: args.take });
+	MemberTypeService.getTreeMemberTypeRoot({ query: { skip: args.skip, take: args.take } });
 
 const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 	if (args.parent.unique === null) {
