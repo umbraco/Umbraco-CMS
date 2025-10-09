@@ -8,10 +8,6 @@ internal sealed class NotImplementedEmailSender : IEmailSender
         => throw new NotImplementedException(
             "To send an Email ensure IEmailSender is implemented with a custom implementation");
 
-    public Task SendAsync(EmailMessage message, string emailType, TimeSpan? expires) =>
-        throw new NotImplementedException(
-            "To send an Email ensure IEmailSender is implemented with a custom implementation");
-
     public Task SendAsync(EmailMessage message, string emailType, bool enableNotification) =>
         throw new NotImplementedException(
             "To send an Email ensure IEmailSender is implemented with a custom implementation");

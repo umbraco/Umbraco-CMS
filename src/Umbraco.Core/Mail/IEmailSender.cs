@@ -7,21 +7,28 @@ namespace Umbraco.Cms.Core.Mail;
 /// </summary>
 public interface IEmailSender
 {
-    [Obsolete("Use the overload with expires parameter.")]
+    /// <summary>
+    /// Sends a message asynchronously.
+    /// </summary>
+    [Obsolete("Please use the overload with expires parameter. Scheduled for removal in Umbraco 18.")]
     Task SendAsync(EmailMessage message, string emailType);
 
-    Task SendAsync(EmailMessage message, string emailType, TimeSpan? expires)
-#pragma warning disable CS0618 // Type or member is obsolete
-        => SendAsync(message, emailType);
-#pragma warning restore CS0618 // Type or member is obsolete
-
-    [Obsolete("Use the overload with expires parameter.")]
+    /// <summary>
+    /// Sends a message asynchronously.
+    /// </summary>
+    [Obsolete("Please use the overload with expires parameter. Scheduled for removal in Umbraco 18.")]
     Task SendAsync(EmailMessage message, string emailType, bool enableNotification);
 
-    Task SendAsync(EmailMessage message, string emailType, bool enableNotification, TimeSpan? expires)
+    /// <summary>
+    /// Sends a message asynchronously.
+    /// </summary>
+    Task SendAsync(EmailMessage message, string emailType, bool enableNotification = false, TimeSpan? expires = null)
 #pragma warning disable CS0618 // Type or member is obsolete
         => SendAsync(message, emailType, enableNotification);
 #pragma warning restore CS0618 // Type or member is obsolete
 
+    /// <summary>
+    /// Verifies if the email sender is configured to send emails.
+    /// </summary>
     bool CanSendRequiredEmail();
 }
