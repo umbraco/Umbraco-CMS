@@ -191,6 +191,8 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 				display: grid;
 				grid-template-columns: repeat(auto-fit, minmax(40px, calc((100% / 12) - 10px)));
 				gap: 10px;
+				height: 100%;
+				align-items: flex-start;
 				overflow-y: scroll;
 				max-height: 100%;
 				min-height: 0;
