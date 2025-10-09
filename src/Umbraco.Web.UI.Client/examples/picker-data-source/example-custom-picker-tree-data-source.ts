@@ -1,5 +1,6 @@
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbPickerPropertyEditorTreeDataSource } from '@umbraco-cms/backoffice/picker-property-editor';
+import type { UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
 import type { UmbTreeChildrenOfRequestArgs, UmbTreeItemModel } from '@umbraco-cms/backoffice/tree';
 
 export class ExampleCustomPickerTreePropertyEditorDataSource
@@ -52,6 +53,17 @@ export class ExampleCustomPickerTreePropertyEditorDataSource
 	async requestItems(uniques: Array<string>) {
 		const items = customItems.filter((x) => uniques.includes(x.unique));
 		return { data: items };
+	}
+
+	async search(args: UmbSearchRequestArgs) {
+		const result = customItems.filter((item) => item.name.toLowerCase().includes(args.query.toLowerCase()));
+
+		const data = {
+			items: result,
+			totalItems: result.length,
+		};
+
+		return { data };
 	}
 }
 
