@@ -1,9 +1,9 @@
+import { UMB_USER_GROUP_ENTITY_TYPE } from '../../entity.js';
 import type { UmbUserGroupItemModel } from './types.js';
 import { UmbManagementApiUserGroupItemDataRequestManager } from './user-group-item.server.request-manager.js';
 import type { UserGroupItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UMB_USER_GROUP_ENTITY_TYPE } from '../../entity.js';
 
 /**
  * A server data source for User Group items
