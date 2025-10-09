@@ -3,6 +3,7 @@ import { UmbManagementApiUserGroupItemDataRequestManager } from './user-group-it
 import type { UserGroupItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UMB_USER_GROUP_ENTITY_TYPE } from '../../entity.js';
 
 /**
  * A server data source for User Group items
@@ -37,6 +38,7 @@ export class UmbUserGroupItemServerDataSource extends UmbItemServerDataSourceBas
 
 const mapper = (item: UserGroupItemResponseModel): UmbUserGroupItemModel => {
 	return {
+		entityType: UMB_USER_GROUP_ENTITY_TYPE,
 		unique: item.id,
 		name: item.name,
 		icon: item.icon || null,
