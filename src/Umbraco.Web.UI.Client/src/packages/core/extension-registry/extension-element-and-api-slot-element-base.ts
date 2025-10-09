@@ -1,7 +1,7 @@
 import { umbExtensionsRegistry } from './registry.js';
 import { property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { ManifestElementAndApi } from '@umbraco-cms/backoffice/extension-api';
+import type { ClassConstructor, ManifestElementAndApi } from '@umbraco-cms/backoffice/extension-api';
 import { UmbExtensionElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 
 export abstract class UmbExtensionElementAndApiSlotElementBase<
@@ -42,7 +42,7 @@ export abstract class UmbExtensionElementAndApiSlotElementBase<
 	abstract getExtensionType(): string;
 	abstract getDefaultElementName(): string;
 
-	public getDefaultApiConstructor?(): any;
+	public getDefaultApiConstructor?(): ClassConstructor<any>;
 
 	#observeManifest() {
 		if (!this.alias) return;
