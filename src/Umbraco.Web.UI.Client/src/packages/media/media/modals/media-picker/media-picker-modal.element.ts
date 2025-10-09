@@ -110,6 +110,9 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 	override async connectedCallback(): Promise<void> {
 		super.connectedCallback();
 		if (this.data?.pickableFilter) {
+			// TODO: investigate why we need the ts-ignore here
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
 			this._selectableFilter = this.data?.pickableFilter;
 		}
 	}

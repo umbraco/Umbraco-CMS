@@ -1,6 +1,7 @@
 import type { UmbCollectionItemModel } from '../../item/types.js';
 import type { UmbCollectionSelectionConfiguration } from '../../types.js';
 import type { UmbDefaultCollectionMenuContext } from './default-collection-menu.context.js';
+import { getItemFallbackIcon, getItemFallbackName } from '@umbraco-cms/backoffice/entity-item';
 import {
 	html,
 	customElement,
@@ -113,8 +114,8 @@ export class UmbDefaultCollectionMenuElement extends UmbLitElement {
 	}
 
 	#renderItem(item: UmbCollectionItemModel) {
-		const fallbackIcon = 'icon-circle-dotted';
-		const fallbackName = `Unnamed item (${item.unique})`;
+		const fallbackName = getItemFallbackName(item);
+		const fallbackIcon = getItemFallbackIcon();
 
 		return html`
 			<uui-menu-item

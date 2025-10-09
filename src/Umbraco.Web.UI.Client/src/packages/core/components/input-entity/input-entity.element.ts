@@ -6,7 +6,7 @@ import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
-import type { UmbItemModel } from '@umbraco-cms/backoffice/entity-item';
+import { getItemFallbackName, type UmbItemModel } from '@umbraco-cms/backoffice/entity-item';
 
 @customElement('umb-input-entity')
 export class UmbInputEntityElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
@@ -169,7 +169,7 @@ export class UmbInputEntityElement extends UmbFormControlMixin<string | undefine
 		if (!item.unique) return;
 		const icon = this.getIcon?.(item) ?? item.icon ?? '';
 		return html`
-			<uui-ref-node name=${item.name ?? `${item.entityType}:${item.unique}`} id=${item.unique}>
+			<uui-ref-node name=${item.name ?? getItemFallbackName(item)} id=${item.unique}>
 				${when(icon, () => html`<umb-icon slot="icon" name=${icon}></umb-icon>`)}
 				<uui-action-bar slot="actions">
 					<uui-button @click=${() => this.#removeItem(item)} label=${this.localize.term('general_remove')}></uui-button>
