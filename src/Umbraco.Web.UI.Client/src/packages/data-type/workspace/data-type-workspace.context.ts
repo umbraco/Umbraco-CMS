@@ -16,11 +16,11 @@ import {
 import { appendToFrozenArray, UmbArrayState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type {
-	ManifestPropertyEditorDataSource,
 	PropertyEditorSettingsDefaultData,
 	PropertyEditorSettingsProperty,
 } from '@umbraco-cms/backoffice/property-editor';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestPropertyEditorDataSource } from '@umbraco-cms/backoffice/property-editor-data-source';
 
 type EntityType = UmbDataTypeDetailModel;
 

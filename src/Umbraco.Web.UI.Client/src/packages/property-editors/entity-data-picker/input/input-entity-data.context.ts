@@ -8,7 +8,7 @@ import {
 	type UmbCollectionItemPickerModalData,
 	type UmbCollectionItemPickerModalValue,
 } from '@umbraco-cms/backoffice/collection';
-import type { ManifestPropertyEditorDataSource } from '@umbraco-cms/backoffice/property-editor';
+import type { ManifestPropertyEditorDataSource } from '@umbraco-cms/backoffice/property-editor-data-source';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbModalToken, type UmbPickerModalData } from '@umbraco-cms/backoffice/modal';

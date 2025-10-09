@@ -49,6 +49,7 @@ export default defineConfig({
 			'picker-data-source/index': './picker-data-source/index.ts',
 			'picker/index': './picker/index.ts',
 			'property-action/index': './property-action/index.ts',
+			'property-editor-data-source/index': './property-editor-data-source/index.ts',
 			'property-editor/index': './property-editor/index.ts',
 			'property/index': './property/index.ts',
 			'recycle-bin/index': './recycle-bin/index.ts',

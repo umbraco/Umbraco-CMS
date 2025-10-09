@@ -4,7 +4,6 @@ import { customElement, html, property, state } from '@umbraco-cms/backoffice/ex
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import type {
-	ManifestPropertyEditorDataSource,
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
@@ -14,6 +13,7 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import '../input/input-entity-data.element.js';
 import type { UmbConfigCollectionModel } from '@umbraco-cms/backoffice/utils';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestPropertyEditorDataSource } from '@umbraco-cms/backoffice/property-editor-data-source';
 
 @customElement('umb-entity-data-picker-property-editor-ui')
 export class UmbEntityDataPickerPropertyEditorUIElement
