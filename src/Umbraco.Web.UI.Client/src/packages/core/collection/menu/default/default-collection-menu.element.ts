@@ -145,6 +145,11 @@ export class UmbDefaultCollectionMenuElement extends UmbLitElement {
 	}
 
 	static override styles = css`
+		:host {
+			--uui-menu-item-indent: 0;
+			--uui-menu-item-flat-structure: 1;
+		}
+
 		#load-more {
 			width: 100%;
 		}
