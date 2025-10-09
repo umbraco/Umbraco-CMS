@@ -1,9 +1,10 @@
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import type { UmbCollectionFilterModel, UmbCollectionItemModel } from '@umbraco-cms/backoffice/collection';
 import type {
 	UmbPickerPropertyEditorCollectionDataSource,
 	UmbPickerPropertyEditorSearchableDataSource,
 } from '@umbraco-cms/backoffice/picker-property-editor';
 import type { UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
-import type { UmbEntityDataPickerCollectionItemModel } from 'src/packages/property-editors/entity-data-picker/types.js';
 
 export class ExampleCustomPickerCollectionPropertyEditorDataSource
 	extends UmbControllerBase
@@ -40,7 +41,7 @@ export class ExampleCustomPickerCollectionPropertyEditorDataSource
 
 export { ExampleCustomPickerCollectionPropertyEditorDataSource as api };
 
-const customItems: Array<UmbEntityDataPickerCollectionItemModel> = [
+const customItems: Array<UmbCollectionItemModel> = [
 	{
 		unique: '1',
 		entityType: 'example',

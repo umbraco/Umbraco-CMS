@@ -57,7 +57,7 @@ export class ExampleCustomPickerTreePropertyEditorDataSource
 
 export { ExampleCustomPickerTreePropertyEditorDataSource as api };
 
-const customItems: Array<UmbEntityDataPickerTreeItemModel> = [
+const customItems: Array<UmbTreeItemModel> = [
 	{
 		unique: '1',
 		entityType: 'example',
