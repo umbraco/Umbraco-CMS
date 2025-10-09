@@ -10,8 +10,11 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
-internal sealed class ColorPickerConfigurationEditor : ConfigurationEditor<ColorPickerConfiguration>
+internal sealed partial class ColorPickerConfigurationEditor : ConfigurationEditor<ColorPickerConfiguration>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ColorPickerConfigurationEditor"/> class.
+    /// </summary>
     public ColorPickerConfigurationEditor(IIOHelper ioHelper, IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
         : base(ioHelper)
     {
@@ -19,13 +22,17 @@ internal sealed class ColorPickerConfigurationEditor : ConfigurationEditor<Color
         items.Validators.Add(new ColorListValidator(configurationEditorJsonSerializer));
     }
 
-    internal sealed class ColorListValidator : IValueValidator
+    internal sealed partial class ColorListValidator : IValueValidator
     {
         private readonly IConfigurationEditorJsonSerializer _configurationEditorJsonSerializer;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ColorListValidator"/> class.
+        /// </summary>
         public ColorListValidator(IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
             => _configurationEditorJsonSerializer = configurationEditorJsonSerializer;
 
+        /// <inheritdoc/>
         public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration, PropertyValidationContext validationContext)
         {
             var stringValue = value?.ToString();
@@ -46,21 +53,21 @@ internal sealed class ColorPickerConfigurationEditor : ConfigurationEditor<Color
 
             if (items is null)
             {
-                yield return new ValidationResult($"The configuration value {stringValue} is not a valid color picker configuration", new[] { "items" });
+                yield return new ValidationResult($"The configuration value {stringValue} is not a valid color picker configuration", ["items"]);
                 yield break;
             }
 
+            var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             var duplicates = new List<string>();
             foreach (ColorPickerConfiguration.ColorPickerItem item in items)
             {
-                if (Regex.IsMatch(item.Value, "^([0-9a-f]{3}|[0-9a-f]{6})$", RegexOptions.IgnoreCase) == false)
+                if (ColorPattern().IsMatch(item.Value) == false)
                 {
-                    yield return new ValidationResult($"The value {item.Value} is not a valid hex color", new[] { "items" });
+                    yield return new ValidationResult($"The value {item.Value} is not a valid hex color", ["items"]);
                 }
 
-                var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                 var normalized = Normalize(item.Value);
-                if (!seen.Add(normalized))
+                if (seen.Add(normalized) is false)
                 {
                     duplicates.Add(normalized);
                 }
@@ -70,7 +77,7 @@ internal sealed class ColorPickerConfigurationEditor : ConfigurationEditor<Color
             {
                 yield return new ValidationResult(
                     $"Duplicate color values are not allowed: {string.Join(", ", duplicates)}",
-                    new[] { "items" });
+                    ["items"]);
             }
         }
 
@@ -81,16 +88,17 @@ internal sealed class ColorPickerConfigurationEditor : ConfigurationEditor<Color
                 return string.Empty;
             }
 
-            var v = value.Trim();
+            var normalizedValue = value.Trim().ToLowerInvariant();
 
-            if (v.StartsWith("#"))
+            if (normalizedValue.Length == 3)
             {
-                v = v.Substring(1);
+                normalizedValue = $"{normalizedValue[0]}{normalizedValue[0]}{normalizedValue[1]}{normalizedValue[1]}{normalizedValue[2]}{normalizedValue[2]}";
             }
 
-            v = v.ToLowerInvariant();
-
-            return v;
+            return normalizedValue;
         }
+
+        [GeneratedRegex("^([0-9a-f]{3}|[0-9a-f]{6})$", RegexOptions.IgnoreCase, "en-GB")]
+        private static partial Regex ColorPattern();
     }
 }
