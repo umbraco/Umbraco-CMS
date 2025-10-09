@@ -124,18 +124,15 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 
 	#renderFirstAction() {
 		if (!this._firstActionApi || !this._firstActionManifest) return nothing;
-
-		const createAriaLabel = this._firstActionApi.getCreateAriaLabel?.(this.label);
-		const actionName = this.localize.string(this._firstActionManifest.meta.label);
-
-		return html`<uui-button
-			label=${ifDefined(createAriaLabel)}
-			.label=${actionName}
-			data-mark=${'entity-action:' + this._firstActionManifest.alias}
-			@click=${this.#onFirstActionClick}
-			href="${ifDefined(this._firstActionHref)}">
-			<uui-icon name=${ifDefined(this._firstActionManifest.meta.icon)}></uui-icon>
-		</uui-button>`;
+		return html`
+			<uui-button
+				label=${this.localize.string(this._firstActionManifest.meta.label, this.label)}
+				data-mark=${'entity-action:' + this._firstActionManifest.alias}
+				href=${ifDefined(this._firstActionHref)}
+				@click=${this.#onFirstActionClick}>
+				<umb-icon name=${ifDefined(this._firstActionManifest.meta.icon)}></umb-icon>
+			</uui-button>
+		`;
 	}
 
 	static override styles = [

@@ -21,7 +21,6 @@ export class UmbCreateEntityAction extends UmbEntityActionBase<MetaEntityActionC
 	#hasSingleOption = true;
 	#optionsInit?: Promise<void>;
 	#singleOptionApi?: UmbEntityCreateOptionAction;
-	#localization = new UmbLocalizationController(this);
 
 	constructor(host: UmbControllerHost, args: UmbEntityActionArgs<MetaEntityActionCreateKind>) {
 		super(host, args);
@@ -69,13 +68,6 @@ export class UmbCreateEntityAction extends UmbEntityActionBase<MetaEntityActionC
 				entityType: this.args.entityType,
 			},
 		});
-	}
-
-	getCreateAriaLabel(entityName?: string) {
-		return this.#localization.term('buttons_createFor', [entityName ?? '']);
-	}
-	getActionsAriaLabel(entityName?: string) {
-		return this.#localization.term('buttons_viewActionsFor', [entityName ?? '']);
 	}
 
 	async #createSingleOptionApi(
