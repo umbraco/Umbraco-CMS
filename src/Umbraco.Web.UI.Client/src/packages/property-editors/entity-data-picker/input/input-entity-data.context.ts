@@ -2,7 +2,6 @@ import { UMB_ENTITY_DATA_PICKER_COLLECTION_MENU_ALIAS } from '../picker-collecti
 import { UMB_ENTITY_DATA_PICKER_TREE_ALIAS } from '../picker-tree/constants.js';
 import { UMB_ENTITY_DATA_PICKER_SEARCH_PROVIDER_ALIAS } from '../picker-search/constants.js';
 import { UMB_ENTITY_DATA_PICKER_ITEM_REPOSITORY_ALIAS } from '../constants.js';
-import type { UmbEntityDataPickerItemModel } from '../picker-item/types.js';
 import { UmbEntityDataPickerDataSourceApiContext } from './entity-data-picker-data-source.context.js';
 import {
 	UMB_COLLECTION_ITEM_PICKER_MODAL_ALIAS,
@@ -11,9 +10,6 @@ import {
 } from '@umbraco-cms/backoffice/collection';
 import type {
 	ManifestPropertyEditorDataSource,
-	UmbPickerPropertyEditorCollectionDataSource,
-	UmbPickerPropertyEditorDataSource,
-	UmbPickerPropertyEditorTreeDataSource,
 	UmbPropertyEditorDataSourceConfigModel,
 } from '@umbraco-cms/backoffice/property-editor';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
@@ -24,13 +20,19 @@ import {
 	type UmbTreePickerModalData,
 	type UmbTreePickerModalValue,
 } from '@umbraco-cms/backoffice/tree';
-import { isPickerPropertyEditorTreeDataSource } from 'src/packages/core/property-editor/property-editor-data-source/extension/is-picker-property-editor-tree-data-source.guard.js';
-import { isPickerPropertyEditorCollectionDataSource } from 'src/packages/core/property-editor/property-editor-data-source/extension/is-picker-property-editor-collection-data-source.guard copy.js';
-import { isPickerPropertyEditorSearchableDataSource } from 'src/packages/core/property-editor/property-editor-data-source/extension/is-picker-property-editor-searchable.data-source.guard.js';
 import { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import {
+	isPickerPropertyEditorCollectionDataSource,
+	isPickerPropertyEditorSearchableDataSource,
+	isPickerPropertyEditorTreeDataSource,
+	type UmbPickerPropertyEditorCollectionDataSource,
+	type UmbPickerPropertyEditorDataSource,
+	type UmbPickerPropertyEditorTreeDataSource,
+} from '@umbraco-cms/backoffice/picker-property-editor';
+import type { UmbItemModel } from '@umbraco-cms/backoffice/entity-item';
 
-export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<UmbEntityDataPickerItemModel> {
+export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<UmbItemModel> {
 	#dataSourceAlias?: string;
 	#dataSourceApiInitializer?: UmbExtensionApiInitializer<ManifestPropertyEditorDataSource>;
 	#dataSourceApi?: UmbPickerPropertyEditorDataSource;
@@ -79,7 +81,7 @@ export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<UmbEn
 		return this.#dataSourceConfig;
 	}
 
-	override async openPicker(pickerData?: Partial<UmbPickerModalData<UmbEntityDataPickerItemModel>>) {
+	override async openPicker(pickerData?: Partial<UmbPickerModalData<UmbItemModel>>) {
 		this.modalAlias = this.#getModalToken();
 		await super.openPicker(pickerData);
 	}
@@ -129,7 +131,7 @@ export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<UmbEn
 	#createTreeItemPickerModalToken(api: UmbPickerPropertyEditorTreeDataSource) {
 		const supportsSearch = isPickerPropertyEditorSearchableDataSource(api);
 
-		return new UmbModalToken<UmbTreePickerModalData<UmbEntityDataPickerItemModel>, UmbTreePickerModalValue>(
+		return new UmbModalToken<UmbTreePickerModalData<UmbItemModel>, UmbTreePickerModalValue>(
 			UMB_TREE_PICKER_MODAL_ALIAS,
 			{
 				modal: {
@@ -152,24 +154,24 @@ export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<UmbEn
 	#createCollectionItemPickerModalToken(api: UmbPickerPropertyEditorCollectionDataSource) {
 		const supportsSearch = isPickerPropertyEditorSearchableDataSource(api);
 
-		return new UmbModalToken<
-			UmbCollectionItemPickerModalData<UmbEntityDataPickerItemModel>,
-			UmbCollectionItemPickerModalValue
-		>(UMB_COLLECTION_ITEM_PICKER_MODAL_ALIAS, {
-			modal: {
-				type: 'sidebar',
-				size: 'small',
-			},
-			data: {
-				collection: {
-					menuAlias: UMB_ENTITY_DATA_PICKER_COLLECTION_MENU_ALIAS,
+		return new UmbModalToken<UmbCollectionItemPickerModalData<UmbItemModel>, UmbCollectionItemPickerModalValue>(
+			UMB_COLLECTION_ITEM_PICKER_MODAL_ALIAS,
+			{
+				modal: {
+					type: 'sidebar',
+					size: 'small',
 				},
-				search: supportsSearch
-					? {
-							providerAlias: UMB_ENTITY_DATA_PICKER_SEARCH_PROVIDER_ALIAS,
-						}
-					: undefined,
+				data: {
+					collection: {
+						menuAlias: UMB_ENTITY_DATA_PICKER_COLLECTION_MENU_ALIAS,
+					},
+					search: supportsSearch
+						? {
+								providerAlias: UMB_ENTITY_DATA_PICKER_SEARCH_PROVIDER_ALIAS,
+							}
+						: undefined,
+				},
 			},
-		});
+		);
 	}
 }
