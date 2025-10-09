@@ -64,6 +64,7 @@ internal sealed partial class ColorPickerConfigurationEditor : ConfigurationEdit
                 if (ColorPattern().IsMatch(item.Value) == false)
                 {
                     yield return new ValidationResult($"The value {item.Value} is not a valid hex color", ["items"]);
+                    continue;
                 }
 
                 var normalized = Normalize(item.Value);
