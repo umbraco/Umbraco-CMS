@@ -2,6 +2,7 @@ import { UMB_ENTITY_DATA_PICKER_DATA_SOURCE_API_CONTEXT } from '../input/entity-
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbPickerSearchableDataSource } from '@umbraco-cms/backoffice/picker-data-source';
 import type { UmbSearchProvider, UmbSearchRequestArgs, UmbSearchResultItemModel } from '@umbraco-cms/backoffice/search';
 
 export class UmbEntityDataPickerSearchProvider
@@ -28,7 +29,9 @@ export class UmbEntityDataPickerSearchProvider
 	}
 
 	async #getApi() {
-		const api = await this.observe(this.#pickerDataSourceContext?.dataSourceApi)?.asPromise();
+		const api = (await this.observe(this.#pickerDataSourceContext?.dataSourceApi)?.asPromise()) as
+			| UmbPickerSearchableDataSource
+			| undefined;
 		if (!api) throw new Error('No data source API set');
 		return api;
 	}
