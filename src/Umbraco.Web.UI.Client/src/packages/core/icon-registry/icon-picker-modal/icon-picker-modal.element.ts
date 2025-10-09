@@ -193,7 +193,7 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 				gap: 10px;
 				height: 100%;
 				align-items: flex-start;
-				overflow-y: scroll;
+				overflow-y: auto;
 				max-height: 100%;
 				min-height: 0;
 				padding: 2px;
