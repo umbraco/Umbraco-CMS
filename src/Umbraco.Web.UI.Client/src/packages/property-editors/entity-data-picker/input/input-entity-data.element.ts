@@ -1,4 +1,3 @@
-import type { UmbEntityDataPickerItemModel } from '../picker-item/types.js';
 import { UmbEntityDataPickerInputContext } from './input-entity-data.context.js';
 import { css, html, customElement, property, state, repeat, nothing, when } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
@@ -11,6 +10,7 @@ import type {
 	UmbPropertyEditorDataSourceConfigModel,
 } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
+import type { UmbItemModel } from '@umbraco-cms/backoffice/entity-item';
 
 @customElement('umb-input-entity-data')
 export class UmbInputEntityDataElement extends UUIFormControlMixin(UmbLitElement, '') {
@@ -140,7 +140,7 @@ export class UmbInputEntityDataElement extends UUIFormControlMixin(UmbLitElement
 	#readonly = false;
 
 	@state()
-	private _items: Array<UmbEntityDataPickerItemModel> = [];
+	private _items: Array<UmbItemModel> = [];
 
 	@state()
 	private _statuses?: Array<UmbRepositoryItemsStatus>;

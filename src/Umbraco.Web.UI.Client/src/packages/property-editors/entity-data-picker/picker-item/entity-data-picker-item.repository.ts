@@ -1,12 +1,12 @@
 import { UMB_ENTITY_DATA_PICKER_DATA_SOURCE_API_CONTEXT } from '../input/entity-data-picker-data-source.context.token.js';
-import type { UmbEntityDataPickerItemModel } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbItemModel } from '@umbraco-cms/backoffice/entity-item';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import { UmbRepositoryBase, type UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 
 export class UmbEntityDataPickerItemRepository
 	extends UmbRepositoryBase
-	implements UmbItemRepository<UmbEntityDataPickerItemModel>, UmbApi
+	implements UmbItemRepository<UmbItemModel>, UmbApi
 {
 	#init: Promise<[any]>;
 	#pickerDataSourceContext?: typeof UMB_ENTITY_DATA_PICKER_DATA_SOURCE_API_CONTEXT.TYPE;
