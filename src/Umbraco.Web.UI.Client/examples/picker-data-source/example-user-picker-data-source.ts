@@ -1,11 +1,11 @@
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbCollectionFilterModel } from '@umbraco-cms/backoffice/collection';
-import type { UmbPickerPropertyEditorCollectionDataSource } from '@umbraco-cms/backoffice/picker-property-editor';
+import type { UmbPickerCollectionDataSource } from '@umbraco-cms/backoffice/picker-data-source';
 import { UmbUserCollectionRepository, UmbUserItemRepository } from '@umbraco-cms/backoffice/user';
 
 export class ExampleUserPickerPropertyEditorDataSource
 	extends UmbControllerBase
-	implements UmbPickerPropertyEditorCollectionDataSource
+	implements UmbPickerCollectionDataSource
 {
 	#collection = new UmbUserCollectionRepository(this);
 	#item = new UmbUserItemRepository(this);

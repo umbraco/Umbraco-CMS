@@ -1,7 +1,7 @@
 import { UMB_ENTITY_DATA_PICKER_DATA_SOURCE_API_CONTEXT } from '../input/entity-data-picker-data-source.context.token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
-import type { UmbPickerPropertyEditorTreeDataSource } from '@umbraco-cms/backoffice/picker-property-editor';
+import type { UmbPickerTreeDataSource } from '@umbraco-cms/backoffice/picker-data-source';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 import type {
 	UmbTreeAncestorsOfRequestArgs,
@@ -51,7 +51,7 @@ export class UmbEntityDataPickerTreeRepository extends UmbRepositoryBase impleme
 	async #getApi() {
 		const api = (await this.observe(
 			this.#pickerDataSourceContext?.dataSourceApi,
-		)?.asPromise()) as UmbPickerPropertyEditorTreeDataSource;
+		)?.asPromise()) as UmbPickerTreeDataSource;
 		if (!api) throw new Error('No data source API set');
 		return api;
 	}

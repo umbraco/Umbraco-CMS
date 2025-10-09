@@ -7,9 +7,9 @@ import {
 } from '@umbraco-cms/backoffice/document';
 import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/document-type';
 import type {
-	UmbPickerPropertyEditorSearchableDataSource,
-	UmbPickerPropertyEditorTreeDataSource,
-} from '@umbraco-cms/backoffice/picker-property-editor';
+	UmbPickerSearchableDataSource,
+	UmbPickerTreeDataSource,
+} from '@umbraco-cms/backoffice/picker-data-source';
 import type { UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
 import type {
 	UmbTreeAncestorsOfRequestArgs,
@@ -20,7 +20,7 @@ import { getConfigValue, type UmbConfigCollectionModel } from '@umbraco-cms/back
 
 export class ExampleDocumentPickerPropertyEditorDataSource
 	extends UmbControllerBase
-	implements UmbPickerPropertyEditorTreeDataSource, UmbPickerPropertyEditorSearchableDataSource
+	implements UmbPickerTreeDataSource, UmbPickerSearchableDataSource
 {
 	#tree = new UmbDocumentTreeRepository(this);
 	#item = new UmbDocumentItemRepository(this);

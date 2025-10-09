@@ -1,11 +1,11 @@
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbPickerPropertyEditorTreeDataSource } from '@umbraco-cms/backoffice/picker-property-editor';
+import type { UmbPickerTreeDataSource } from '@umbraco-cms/backoffice/picker-data-source';
 import type { UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
 import type { UmbTreeChildrenOfRequestArgs, UmbTreeItemModel } from '@umbraco-cms/backoffice/tree';
 
 export class ExampleCustomPickerTreePropertyEditorDataSource
 	extends UmbControllerBase
-	implements UmbPickerPropertyEditorTreeDataSource
+	implements UmbPickerTreeDataSource
 {
 	async requestTreeRoot() {
 		const root = {

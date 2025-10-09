@@ -20,20 +20,20 @@ import {
 import { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
-	isPickerPropertyEditorCollectionDataSource,
-	isPickerPropertyEditorSearchableDataSource,
-	isPickerPropertyEditorTreeDataSource,
-	type UmbPickerPropertyEditorCollectionDataSource,
-	type UmbPickerPropertyEditorDataSource,
-	type UmbPickerPropertyEditorTreeDataSource,
-} from '@umbraco-cms/backoffice/picker-property-editor';
+	isPickerCollectionDataSource,
+	isPickerSearchableDataSource,
+	isPickerTreeDataSource,
+	type UmbPickerCollectionDataSource,
+	type UmbPickerDataSource,
+	type UmbPickerTreeDataSource,
+} from '@umbraco-cms/backoffice/picker-data-source';
 import type { UmbItemModel } from '@umbraco-cms/backoffice/entity-item';
 import type { UmbConfigCollectionModel } from '@umbraco-cms/backoffice/utils';
 
 export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<UmbItemModel> {
 	#dataSourceAlias?: string;
 	#dataSourceApiInitializer?: UmbExtensionApiInitializer<ManifestPropertyEditorDataSource>;
-	#dataSourceApi?: UmbPickerPropertyEditorDataSource;
+	#dataSourceApi?: UmbPickerDataSource;
 	#dataSourceConfig?: UmbConfigCollectionModel | undefined;
 
 	#dataSourceApiContext = new UmbEntityDataPickerDataSourceApiContext(this);
@@ -97,7 +97,7 @@ export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<UmbIt
 		this.#dataSourceApiInitializer = new UmbExtensionApiInitializer<
 			ManifestPropertyEditorDataSource,
 			UmbExtensionApiInitializer<ManifestPropertyEditorDataSource>,
-			UmbPickerPropertyEditorDataSource
+			UmbPickerDataSource
 		>(this, umbExtensionsRegistry, dataSourceAlias, [this._host], (permitted, ctrl) => {
 			if (!permitted) {
 				// TODO: clean up if not permitted
@@ -105,7 +105,7 @@ export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<UmbIt
 			}
 
 			// TODO: Check if it is a picker data source
-			this.#dataSourceApi = ctrl.api as UmbPickerPropertyEditorDataSource;
+			this.#dataSourceApi = ctrl.api as UmbPickerDataSource;
 			this.#dataSourceApi.setConfig?.(this.#dataSourceConfig);
 
 			this.#dataSourceApiContext.setDataSourceApi(this.#dataSourceApi);
@@ -117,8 +117,8 @@ export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<UmbIt
 
 		const dataSourceApi = this.#dataSourceApi;
 
-		const isTreeDataSource = isPickerPropertyEditorTreeDataSource(dataSourceApi);
-		const isCollectionDataSource = isPickerPropertyEditorCollectionDataSource(dataSourceApi);
+		const isTreeDataSource = isPickerTreeDataSource(dataSourceApi);
+		const isCollectionDataSource = isPickerCollectionDataSource(dataSourceApi);
 
 		// Choose the picker type based on what the data source supports
 		if (isTreeDataSource) {
@@ -130,8 +130,8 @@ export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<UmbIt
 		}
 	}
 
-	#createTreeItemPickerModalToken(api: UmbPickerPropertyEditorTreeDataSource) {
-		const supportsSearch = isPickerPropertyEditorSearchableDataSource(api);
+	#createTreeItemPickerModalToken(api: UmbPickerTreeDataSource) {
+		const supportsSearch = isPickerSearchableDataSource(api);
 
 		return new UmbModalToken<UmbTreePickerModalData<UmbItemModel>, UmbTreePickerModalValue>(
 			UMB_TREE_PICKER_MODAL_ALIAS,
@@ -153,8 +153,8 @@ export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<UmbIt
 		);
 	}
 
-	#createCollectionItemPickerModalToken(api: UmbPickerPropertyEditorCollectionDataSource) {
-		const supportsSearch = isPickerPropertyEditorSearchableDataSource(api);
+	#createCollectionItemPickerModalToken(api: UmbPickerCollectionDataSource) {
+		const supportsSearch = isPickerSearchableDataSource(api);
 
 		return new UmbModalToken<UmbCollectionItemPickerModalData<UmbItemModel>, UmbCollectionItemPickerModalValue>(
 			UMB_COLLECTION_ITEM_PICKER_MODAL_ALIAS,

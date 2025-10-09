@@ -1,14 +1,14 @@
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbCollectionFilterModel, UmbCollectionItemModel } from '@umbraco-cms/backoffice/collection';
 import type {
-	UmbPickerPropertyEditorCollectionDataSource,
-	UmbPickerPropertyEditorSearchableDataSource,
-} from '@umbraco-cms/backoffice/picker-property-editor';
+	UmbPickerCollectionDataSource,
+	UmbPickerSearchableDataSource,
+} from '@umbraco-cms/backoffice/picker-data-source';
 import type { UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
 
 export class ExampleCustomPickerCollectionPropertyEditorDataSource
 	extends UmbControllerBase
-	implements UmbPickerPropertyEditorCollectionDataSource, UmbPickerPropertyEditorSearchableDataSource
+	implements UmbPickerCollectionDataSource, UmbPickerSearchableDataSource
 {
 	async requestCollection(args: UmbCollectionFilterModel) {
 		// TODO: use args to filter/paginate etc

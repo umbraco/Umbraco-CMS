@@ -2,7 +2,7 @@ import { UMB_ENTITY_DATA_PICKER_DATA_SOURCE_API_CONTEXT } from '../input/entity-
 import type { UmbCollectionFilterModel, UmbCollectionRepository } from '@umbraco-cms/backoffice/collection';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
-import type { UmbPickerPropertyEditorCollectionDataSource } from '@umbraco-cms/backoffice/picker-property-editor';
+import type { UmbPickerCollectionDataSource } from '@umbraco-cms/backoffice/picker-data-source';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 
 export class UmbEntityDataPickerCollectionRepository
@@ -31,7 +31,7 @@ export class UmbEntityDataPickerCollectionRepository
 	async #getApi() {
 		const api = (await this.observe(
 			this.#pickerDataSourceContext?.dataSourceApi,
-		)?.asPromise()) as UmbPickerPropertyEditorCollectionDataSource;
+		)?.asPromise()) as UmbPickerCollectionDataSource;
 		if (!api) throw new Error('No data source API set');
 		return api;
 	}

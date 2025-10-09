@@ -1,11 +1,11 @@
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbCollectionFilterModel } from '@umbraco-cms/backoffice/collection';
-import type { UmbPickerPropertyEditorCollectionDataSource } from '@umbraco-cms/backoffice/picker-property-editor';
+import type { UmbPickerCollectionDataSource } from '@umbraco-cms/backoffice/picker-data-source';
 import { UmbWebhookCollectionRepository, UmbWebhookItemRepository } from '@umbraco-cms/backoffice/webhook';
 
 export class ExampleWebhookPickerPropertyEditorDataSource
 	extends UmbControllerBase
-	implements UmbPickerPropertyEditorCollectionDataSource
+	implements UmbPickerCollectionDataSource
 {
 	#collection = new UmbWebhookCollectionRepository(this);
 	#item = new UmbWebhookItemRepository(this);
