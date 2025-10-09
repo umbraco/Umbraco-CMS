@@ -4,8 +4,11 @@ import type { UmbEntityActionArgs } from '@umbraco-cms/backoffice/entity-action'
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 
 export class UmbCreateMediaEntityAction extends UmbEntityActionBase<never> {
+	    #localization = new UmbLocalizationController(this);
+
 	constructor(host: UmbControllerHost, args: UmbEntityActionArgs<never>) {
 		super(host, args);
 	}
@@ -29,6 +32,13 @@ export class UmbCreateMediaEntityAction extends UmbEntityActionBase<never> {
 			},
 		});
 	}
+	getCreateAriaLabel(entityName?: string) {
+        return this.#localization.term('buttons_createFor', [entityName ?? '']);
+    }
+    
+    getActionsAriaLabel(entityName?: string) {
+        return this.#localization.term('buttons_viewActionsFor', [entityName ?? '']);
+    }
 }
 
 export { UmbCreateMediaEntityAction as api };
