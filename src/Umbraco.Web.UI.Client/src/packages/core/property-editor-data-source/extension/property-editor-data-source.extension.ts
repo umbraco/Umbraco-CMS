@@ -9,9 +9,9 @@ export interface ManifestPropertyEditorDataSource extends ManifestApi<any> {
 }
 
 export interface MetaPropertyEditorDataSource {
-	description: string;
-	icon: string;
 	label: string;
+	description?: string;
+	icon?: string;
 	settings?: PropertyEditorSettings;
 }
 

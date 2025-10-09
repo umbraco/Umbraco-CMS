@@ -22,7 +22,8 @@ export class UmbPropertyEditorDataSourceItemExtensionRegistryDataSource
 				entityType: UMB_PROPERTY_EDITOR_DATA_SOURCE_ENTITY_TYPE,
 				unique: manifest.alias,
 				name: manifest.meta.label ?? manifest.name,
-				icon: manifest.meta.icon ?? 'icon-box',
+				icon: manifest.meta.icon ?? 'icon-database',
+				description: manifest.meta?.description ?? '',
 			}));
 
 		return { data: items };

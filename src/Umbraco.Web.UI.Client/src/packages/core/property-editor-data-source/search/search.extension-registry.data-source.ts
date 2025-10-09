@@ -39,7 +39,8 @@ export class UmbPropertyEditorDataSourceSearchExtensionRegistryDataSource
 			entityType: UMB_PROPERTY_EDITOR_DATA_SOURCE_ENTITY_TYPE,
 			unique: extension.alias,
 			name: extension.meta.label,
-			icon: extension.meta?.icon,
+			icon: extension.meta?.icon ?? 'icon-database',
+			description: extension.meta?.description ?? '',
 		}));
 
 		return {

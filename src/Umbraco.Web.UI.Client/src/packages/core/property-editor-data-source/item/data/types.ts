@@ -1,6 +1,5 @@
-export interface UmbPropertyEditorDataSourceItemModel {
-	entityType: string;
-	unique: string;
+import type { UmbItemModel } from '@umbraco-cms/backoffice/entity-item';
+export interface UmbPropertyEditorDataSourceItemModel extends UmbItemModel {
+	description?: string;
 	name: string;
-	icon: string;
 }
