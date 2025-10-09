@@ -35,7 +35,7 @@ public class SecuritySettings
     internal const string StaticAuthorizeCallbackErrorPathName = "/umbraco/error";
 
     internal const string StaticPasswordResetEmailExpiry = "01:00:00";
-    internal const string StaticUserInviteEmailExpiry = "72:00:00";
+    internal const string StaticUserInviteEmailExpiry = "3.00:00:00";
 
     /// <summary>
     ///     Gets or sets a value indicating whether to keep the user logged in.
