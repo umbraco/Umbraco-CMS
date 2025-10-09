@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Api.Management.ViewModels.NewsDashboard;
@@ -9,15 +9,19 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Services.NewsDashboard;
 
+/// <inheritdoc />
 public class NewsDashboardService : INewsDashboardService
 {
     private readonly AppCaches _appCaches;
     private readonly IUmbracoVersion _umbracoVersion;
     private readonly ISiteIdentifierService _siteIdentifierService;
     private readonly ILogger<NewsDashboardService> _logger;
-    private static readonly HttpClient HttpClient = new();
 
+    private static readonly HttpClient _httpClient = new();
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="NewsDashboardService"/> class.
+    /// </summary>
     public NewsDashboardService(AppCaches appCaches, IUmbracoVersion umbracoVersion, ISiteIdentifierService siteIdentifierService, ILogger<NewsDashboardService> logger)
     {
         _appCaches = appCaches;
@@ -26,17 +30,19 @@ public class NewsDashboardService : INewsDashboardService
         _logger = logger;
     }
 
-    public async Task<NewsDashboardResponseModel> GetArticlesAsync()
+    /// <inheritdoc />
+    public async Task<NewsDashboardResponseModel> GetItemsAsync()
     {
-        var baseUrl = "https://umbraco-dashboard-news.euwest01.umbraco.io";
-        var path = "/api/News";
-        var key = "umbraco-dashboard-news";
+        const string BaseUrl = "https://umbraco-dashboard-news.euwest01.umbraco.io";
+        const string Path = "/api/News";
+
         var version = _umbracoVersion.SemanticVersion.ToSemanticStringWithoutBuild();
         _siteIdentifierService.TryGetOrCreateSiteIdentifier(out Guid siteIdentifier);
 
-        var url = $"{baseUrl}/{path}?version={version}&siteId={siteIdentifier}";
+        var url = $"{BaseUrl}/{Path}?version={version}&siteId={siteIdentifier}";
 
-        NewsDashboardResponseModel? content = _appCaches.RuntimeCache.GetCacheItem<NewsDashboardResponseModel>(key);
+        const string CacheKey = "umbraco-dashboard-news";
+        NewsDashboardResponseModel? content = _appCaches.RuntimeCache.GetCacheItem<NewsDashboardResponseModel>(CacheKey);
         if (content is not null)
         {
             return content;
@@ -44,11 +50,11 @@ public class NewsDashboardService : INewsDashboardService
 
         try
         {
-            var json = await HttpClient.GetStringAsync(url);
+            var json = await _httpClient.GetStringAsync(url);
 
             if (TryMapModel(json, out NewsDashboardResponseModel? model))
             {
-                _appCaches.RuntimeCache.InsertCacheItem(key, () => model, new TimeSpan(0, 30, 0));
+                _appCaches.RuntimeCache.InsertCacheItem(CacheKey, () => model, new TimeSpan(0, 30, 0));
                 content = model;
             }
         }
@@ -57,7 +63,7 @@ public class NewsDashboardService : INewsDashboardService
             _logger.LogError(ex.InnerException ?? ex, "Error getting dashboard content from {Url}", url);
         }
 
-        return content ?? new NewsDashboardResponseModel { Articles = [] };
+        return content ?? new NewsDashboardResponseModel { Items = [] };
     }
 
     private bool TryMapModel(string json, [MaybeNullWhen(false)] out NewsDashboardResponseModel newsDashboardResponseModel)
@@ -66,13 +72,14 @@ public class NewsDashboardService : INewsDashboardService
         {
             var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true, };
 
-            List<NewsDashboardArticleResponseModel>? articles = JsonSerializer.Deserialize<List<NewsDashboardArticleResponseModel>>(json, options);
-            newsDashboardResponseModel = new NewsDashboardResponseModel { Articles = articles ?? [] };
+            List<NewsDashboardItemResponseModel>? items = JsonSerializer.Deserialize<List<NewsDashboardItemResponseModel>>(json, options);
+            newsDashboardResponseModel = new NewsDashboardResponseModel { Items = items ?? [] };
 
             return true;
         }
-        catch (JsonException)
+        catch (JsonException ex)
         {
+            _logger.LogError(ex.InnerException ?? ex, "Error deserializing dashboard news items");
             newsDashboardResponseModel = null;
             return false;
         }

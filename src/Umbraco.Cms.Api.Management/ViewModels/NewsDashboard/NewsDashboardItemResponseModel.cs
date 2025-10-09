@@ -1,6 +1,6 @@
-﻿namespace Umbraco.Cms.Api.Management.ViewModels.NewsDashboard;
+namespace Umbraco.Cms.Api.Management.ViewModels.NewsDashboard;
 
-public class NewsDashboardArticleResponseModel
+public class NewsDashboardItemResponseModel
 {
     public required string Priority { get; set; }
 
