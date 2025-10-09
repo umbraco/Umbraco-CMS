@@ -8,7 +8,6 @@ import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-
 
 export class UmbCreateMediaEntityAction extends UmbEntityActionBase<never> {
 	    #localization = new UmbLocalizationController(this);
-
 	constructor(host: UmbControllerHost, args: UmbEntityActionArgs<never>) {
 		super(host, args);
 	}
@@ -35,10 +34,8 @@ export class UmbCreateMediaEntityAction extends UmbEntityActionBase<never> {
 	getCreateAriaLabel(entityName?: string) {
         return this.#localization.term('buttons_createFor', [entityName ?? '']);
     }
-    
     getActionsAriaLabel(entityName?: string) {
         return this.#localization.term('buttons_viewActionsFor', [entityName ?? '']);
     }
 }
-
 export { UmbCreateMediaEntityAction as api };
