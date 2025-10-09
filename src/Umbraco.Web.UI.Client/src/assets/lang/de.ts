@@ -18,6 +18,7 @@ export default {
 		changeDataType: 'Datentyp ändern',
 		copy: 'Kopieren',
 		create: 'Neu',
+		createFor: (name: string) => (name ? `Neu erstellen für ${name}` : 'Neu'),
 		export: 'Exportieren',
 		createPackage: 'Neues Paket',
 		createGroup: 'Neue Gruppe',
@@ -63,6 +64,7 @@ export default {
 		unlock: 'Freigeben',
 		createblueprint: 'Inhaltsvorlage anlegen',
 		resendInvite: 'Einladung erneut versenden',
+		viewActionsFor: (name: string) => (name ? `Aktionen anzeigen für ${name}` : 'Aktionen anzeigen'),
 	},
 	actionCategories: {
 		content: 'Inhalt',
@@ -121,7 +123,6 @@ export default {
 	},
 	buttons: {
 		clearSelection: 'Auswahl aufheben',
-		createFor: 'Neu erstellen für {0}',
 		select: 'Auswählen',
 		somethingElse: 'Etwas anderes machen',
 		bold: 'Fett',
@@ -155,7 +156,6 @@ export default {
 		styleChoose: 'Stil auswählen',
 		styleShow: 'Stil anzeigen',
 		tableInsert: 'Tabelle einfügen',
-		viewActionsFor: 'Aktion anzeigen für {0}',
 		generateModelsAndClose: 'Erzeuge Daten-Model und schliesse',
 		saveAndGenerateModels: 'Sichern und Daten-Model erzeugen',
 		undo: 'Zurücknehmen',
