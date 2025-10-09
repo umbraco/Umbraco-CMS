@@ -1,9 +1,21 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, customElement, html } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+
+import { UmbNewsStoriesRepository } from './repository/index.js';
+import type { ServerNewsStory } from './repository/sources/index.js';
 
 @customElement('umb-umbraco-news-dashboard')
 export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
+	@state()
+	private _stories: ServerNewsStory[] = [];
+	#repo = new UmbNewsStoriesRepository(this);
+
+	override async firstUpdated() {
+		const res = await this.#repo.getAll();
+		this._stories = res.data ?? [];
+	}
+
 	#infoLinks = [
 		{
 			name: this.localize.term('welcomeDashboard_documentationHeadline'),
@@ -28,7 +40,28 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 	];
 
 	override render() {
+		console.log(this._stories);
 		return html`
+			<!-- Simple block to verify data -->
+			<uui-box headline="Umbraco News">
+				${this._stories.length === 0
+					? html`<p>No stories yet.</p>`
+					: html`
+							<ul>
+								${this._stories.map(
+									(s) => html`
+										<li>
+											<img src=${s.imageUrl ?? ''} alt="" width="60" height="40" />
+											<strong>${s.title}</strong>
+											<span> — ${s.priority}</span>
+											<div>${s.publishedAt}</div>
+										</li>
+									`,
+								)}
+							</ul>
+						`}
+			</uui-box>
+
 			<div id="info-links" class="uui-text">
 				<uui-box id="our-umbraco">
 					<div>
