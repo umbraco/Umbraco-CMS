@@ -1,9 +1,12 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Management.ViewModels.NewsDashboard;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Telemetry;
 using Umbraco.Extensions;
 
@@ -16,18 +19,28 @@ public class NewsDashboardService : INewsDashboardService
     private readonly IUmbracoVersion _umbracoVersion;
     private readonly ISiteIdentifierService _siteIdentifierService;
     private readonly ILogger<NewsDashboardService> _logger;
+    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
+    private readonly GlobalSettings _globalSettings;
 
     private static readonly HttpClient _httpClient = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="NewsDashboardService"/> class.
     /// </summary>
-    public NewsDashboardService(AppCaches appCaches, IUmbracoVersion umbracoVersion, ISiteIdentifierService siteIdentifierService, ILogger<NewsDashboardService> logger)
+    public NewsDashboardService(
+        AppCaches appCaches,
+        IUmbracoVersion umbracoVersion,
+        ISiteIdentifierService siteIdentifierService,
+        ILogger<NewsDashboardService> logger,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        IOptions<GlobalSettings> globalSettings)
     {
         _appCaches = appCaches;
         _umbracoVersion = umbracoVersion;
         _siteIdentifierService = siteIdentifierService;
         _logger = logger;
+        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
+        _globalSettings = globalSettings.Value;
     }
 
     /// <inheritdoc />
@@ -39,7 +52,9 @@ public class NewsDashboardService : INewsDashboardService
         var version = _umbracoVersion.SemanticVersion.ToSemanticStringWithoutBuild();
         _siteIdentifierService.TryGetOrCreateSiteIdentifier(out Guid siteIdentifier);
 
-        var url = $"{BaseUrl}/{Path}?version={version}&siteId={siteIdentifier}";
+        var language = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Language ?? _globalSettings.DefaultUILanguage;
+
+        var url = $"{BaseUrl}/{Path}?version={version}&siteId={siteIdentifier}&language={language}";
 
         const string CacheKey = "umbraco-dashboard-news";
         NewsDashboardResponseModel? content = _appCaches.RuntimeCache.GetCacheItem<NewsDashboardResponseModel>(CacheKey);
