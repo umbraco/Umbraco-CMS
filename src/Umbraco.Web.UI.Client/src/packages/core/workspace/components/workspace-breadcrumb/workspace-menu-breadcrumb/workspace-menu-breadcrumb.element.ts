@@ -78,7 +78,13 @@ export class UmbWorkspaceBreadcrumbElement extends UmbLitElement {
 
 	#getHref(structureItem: UmbStructureItemModel) {
 		if (structureItem.isFolder) return undefined;
-		return `section/${this.#sectionContext?.getPathname()}/workspace/${structureItem.entityType}/edit/${structureItem.unique}`;
+
+		let href = `section/${this.#sectionContext?.getPathname()}`;
+		if (structureItem.unique) {
+			href += `/workspace/${structureItem.entityType}/edit/${structureItem.unique}`;
+		}
+
+		return href;
 	}
 
 	override render() {
