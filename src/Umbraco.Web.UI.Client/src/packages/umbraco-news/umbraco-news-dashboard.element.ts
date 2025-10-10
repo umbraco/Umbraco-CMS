@@ -1,19 +1,20 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, state, repeat, unsafeHTML, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-import { UmbNewsStoriesRepository } from './repository/index.js';
-import type { ServerNewsStory } from './repository/sources/index.js';
+import { UmbNewsDashboardRepository } from './repository/index.js';
+import type { NewsDashboardItemResponseModel } from '../core/backend-api/types.gen.js';
 
 @customElement('umb-umbraco-news-dashboard')
 export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 	@state()
-	private _stories: ServerNewsStory[] = [];
-	#repo = new UmbNewsStoriesRepository(this);
+	private _items: Array<NewsDashboardItemResponseModel> = [];
+	#repo = new UmbNewsDashboardRepository(this);
 
 	override async firstUpdated() {
-		const res = await this.#repo.getAll();
-		this._stories = res.data ?? [];
+		const res = await this.#repo.getNewsDashboard();
+		this._items = res.items ?? [];
+		console.log(this._items);
 	}
 
 	#infoLinks = [
@@ -40,26 +41,31 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 	];
 
 	override render() {
-		console.log(this._stories);
 		return html`
 			<!-- Simple block to verify data -->
 			<uui-box headline="Umbraco News">
-				${this._stories.length === 0
-					? html`<p>No stories yet.</p>`
-					: html`
-							<ul>
-								${this._stories.map(
-									(s) => html`
-										<li>
-											<img src=${s.imageUrl ?? ''} alt="" width="60" height="40" />
-											<strong>${s.title}</strong>
-											<span> — ${s.priority}</span>
-											<div>${s.publishedAt}</div>
-										</li>
-									`,
-								)}
-							</ul>
-						`}
+				<div class="cards">
+					${this._items.map(
+						(i) => html`
+							<article class="card">
+								${i.imageUrl
+									? html`<img class="card-img" src=${i.imageUrl} alt=${i.imageAltText ?? ''} />`
+									: html`<div class="card-img placeholder" aria-hidden="true"></div>`}
+								<div class="card-body">
+									<h4 class="card-title">${i.header}</h4>
+									${i.body ? html`<p class="card-text">${i.body}</p>` : null}
+									${i.url
+										? html`<div class="card-actions">
+												<uui-button look="outline" href=${i.url} target="_blank" rel="noopener">
+													${i.buttonText || 'Open'}
+												</uui-button>
+											</div>`
+										: null}
+								</div>
+							</article>
+						`,
+					)}
+				</div>
 			</uui-box>
 
 			<div id="info-links" class="uui-text">
@@ -132,6 +138,65 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 			.info-link p {
 				margin-top: 0;
 				margin-bottom: 0;
+			}
+
+			:host {
+				display: block;
+				padding: var(--uui-size-layout-1);
+			}
+
+			/* Grid */
+			.cards {
+				display: grid;
+				grid-template-columns: repeat(4, minmax(0, 1fr));
+				gap: var(--uui-size-space-4);
+			}
+			@media (max-width: 1200px) {
+				.cards {
+					grid-template-columns: repeat(2, 1fr);
+				}
+			}
+			@media (max-width: 700px) {
+				.cards {
+					grid-template-columns: 1fr;
+				}
+			}
+
+			/* Card */
+			.card {
+				background: var(--uui-color-surface);
+				border: 1px solid var(--uui-color-divider);
+				border-radius: var(--uui-border-radius, 8px);
+				box-shadow: var(--uui-shadow-depth-1);
+				overflow: hidden;
+				display: flex;
+				flex-direction: column;
+			}
+
+			.card-img {
+				width: 100%;
+				height: 160px;
+				object-fit: cover;
+				display: block;
+				background: var(--uui-color-surface-emphasis);
+			}
+			.card-img.placeholder {
+				height: 8px;
+			}
+
+			.card-body {
+				padding: var(--uui-size-space-4);
+			}
+			.card-title {
+				margin: 0 0 var(--uui-size-space-2) 0;
+			}
+			.card-text {
+				margin: 0 0 var(--uui-size-space-2) 0;
+				color: var(--uui-color-text);
+				opacity: 0.85;
+			}
+			.card-actions {
+				margin-top: var(--uui-size-space-2);
 			}
 		`,
 	];

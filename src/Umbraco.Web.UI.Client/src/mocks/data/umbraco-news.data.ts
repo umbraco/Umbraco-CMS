@@ -1,0 +1,60 @@
+import type { NewsDashboardResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+
+export const umbNewsData: NewsDashboardResponseModel = {
+	items: [
+		{
+			priority: 'High',
+			header: 'News 1 Header',
+			body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed urna dui, convallis in porta sed, tempor non mauris. Aliquam placerat sed nulla a varius. Maecenas elementum tempus luctus. Nulla eu magna turpis. Nunc vel sodales urna. Donec ac ipsum sed ex egestas interdum. Aliquam pellentesque tellus id felis tempor gravida.',
+			buttonText: 'Button text',
+			imageUrl: 'https://umbraco-dashboard-news.euwest01.umbraco.io/media/rxphk1dd/dashboard-11.jpg',
+			imageAltText: 'Test',
+			url: 'https://umbraco.com',
+		},
+		{
+			priority: 'High',
+			header: 'News 2 Header',
+			body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed urna dui, convallis in porta sed, tempor non mauris. Aliquam placerat sed nulla a varius. Maecenas elementum tempus luctus. Nulla eu magna turpis. Nunc vel sodales urna. Donec ac ipsum sed ex egestas interdum. Aliquam pellentesque tellus id felis tempor gravida.',
+			buttonText: 'See more',
+			imageUrl: 'https://umbraco-dashboard-news.euwest01.umbraco.io/media/ezujjyhj/dashboard-12.jpg',
+			imageAltText: '',
+			url: 'https://umbraco.com',
+		},
+		{
+			priority: 'Medium',
+			header: 'News 3 Header',
+			body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed urna dui, convallis in porta sed, tempor non mauris. Aliquam placerat sed nulla a varius. Maecenas elementum tempus luctus. Nulla eu magna turpis. Nunc vel sodales urna. Donec ac ipsum sed ex egestas interdum. Aliquam pellentesque tellus id felis tempor gravida.',
+			buttonText: 'See more',
+			imageUrl: '',
+			imageAltText: '',
+			url: 'https://umbraco.com',
+		},
+		{
+			priority: 'Medium',
+			header: 'News 4 Header',
+			body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed urna dui, convallis in porta sed, tempor non mauris. Aliquam placerat sed nulla a varius. Maecenas elementum tempus luctus. Nulla eu magna turpis. Nunc vel sodales urna. Donec ac ipsum sed ex egestas interdum. Aliquam pellentesque tellus id felis tempor gravida.',
+			buttonText: 'See more',
+			imageUrl: '',
+			imageAltText: '',
+			url: 'https://umbraco.com',
+		},
+		{
+			priority: 'Medium',
+			header: 'News 5 Header',
+			body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed urna dui, convallis in porta sed, tempor non mauris. Aliquam placerat sed nulla a varius. Maecenas elementum tempus luctus. Nulla eu magna turpis. Nunc vel sodales urna. Donec ac ipsum sed ex egestas interdum. Aliquam pellentesque tellus id felis tempor gravida.',
+			buttonText: 'See more',
+			imageUrl: '',
+			imageAltText: '',
+			url: 'https://umbraco.com',
+		},
+		{
+			priority: 'Normal',
+			header: 'Normal',
+			body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed urna dui, convallis in porta sed, tempor non mauris. Aliquam placerat sed nulla a varius. Maecenas elementum tempus luctus. Nulla eu magna turpis. Nunc vel sodales urna. Donec ac ipsum sed ex egestas interdum. Aliquam pellentesque tellus id felis tempor gravida.',
+			buttonText: 'See more',
+			imageUrl: 'https://umbraco-dashboard-news.euwest01.umbraco.io/media/403pgsxa/stability-without-complexity.webp',
+			imageAltText: '',
+			url: 'https://umbraco.com',
+		},
+	],
+};
