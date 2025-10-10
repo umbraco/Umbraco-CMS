@@ -6,12 +6,22 @@ import type { UmbContextCallback } from './context-request.event.js';
 
 const consumedContexts = new WeakMap<object, Map<string, UmbContextConsumerController<any>>>();
 
+export interface UmbConsumeContextOptions<
+	BaseType extends UmbContextMinimal = UmbContextMinimal,
+	ResultType extends BaseType = BaseType,
+> {
+	context: string | UmbContextToken<BaseType, ResultType>;
+	callback?: UmbContextCallback<ResultType>;
+	subscribe?: boolean;
+}
+
 export function consumeContext<
 	BaseType extends UmbContextMinimal = UmbContextMinimal,
 	ResultType extends BaseType = BaseType,
->(contextAlias: string | UmbContextToken<BaseType, ResultType>, callback?: UmbContextCallback<ResultType>) {
+>(options: UmbConsumeContextOptions<BaseType, ResultType>) {
 	return function (target: any, propertyKey: string) {
 		const privatePropertyKey = `__${propertyKey}`;
+		const { context, callback, subscribe = true } = options;
 
 		// Define the reactive property
 		Object.defineProperty(target, propertyKey, {
@@ -19,18 +29,17 @@ export function consumeContext<
 				return this[privatePropertyKey];
 			},
 			set: function (value: ResultType | undefined) {
-				const oldValue = this[privatePropertyKey];
 				this[privatePropertyKey] = value;
 				// Trigger Lit's reactive update system
-				if (this.requestUpdate && oldValue !== value) {
-					this.requestUpdate(propertyKey, oldValue);
+				if (this.requestUpdate) {
+					this.requestUpdate(propertyKey);
 				}
 			},
 			enumerable: true,
 			configurable: true,
 		});
 
-		// Hook into connectedCallback
+		// Hook into connectedCallback for elements
 		const originalConnectedCallback = target.connectedCallback;
 		target.connectedCallback = function () {
 			// Call original connectedCallback first
@@ -47,9 +56,18 @@ export function consumeContext<
 
 			// Only create one consumer per property per instance
 			if (!instanceConsumers.has(propertyKey)) {
-				const contextConsumer = new UmbContextConsumerController(this, contextAlias, (value) => {
+				const contextConsumer = new UmbContextConsumerController(this, context, (value) => {
+					// Set the property value
 					this[propertyKey] = value;
+
+					// Call user callback if provided
 					callback?.(value);
+
+					// If subscribe is false, destroy after first value
+					if (!subscribe) {
+						contextConsumer.destroy?.();
+						instanceConsumers.delete(propertyKey);
+					}
 				});
 
 				instanceConsumers.set(propertyKey, contextConsumer);
@@ -64,7 +82,7 @@ export function consumeContext<
 			if (instanceConsumers) {
 				const consumer = instanceConsumers.get(propertyKey);
 				if (consumer) {
-					consumer.destroy?.(); // Clean up if destroy method exists
+					consumer.destroy?.();
 					instanceConsumers.delete(propertyKey);
 				}
 				if (instanceConsumers.size === 0) {
