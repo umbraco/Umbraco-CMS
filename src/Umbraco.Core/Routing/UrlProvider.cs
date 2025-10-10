@@ -15,12 +15,19 @@ namespace Umbraco.Cms.Core.Routing
     /// </summary>
     public class UrlProvider : IPublishedUrlProvider
     {
-        #region Ctor and configuration
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly IUmbracoContextFactory _umbracoContextFactory;
+        private readonly IEnumerable<IUrlProvider> _urlProviders;
+        private readonly IEnumerable<IMediaUrlProvider> _mediaUrlProviders;
+        private readonly IVariationContextAccessor _variationContextAccessor;
+        private readonly IDocumentNavigationQueryService _navigationQueryService;
+        private readonly IPublishedContentStatusFilteringService _publishedContentStatusFilteringService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UrlProvider"/> class with an Umbraco context and a list of URL providers.
         /// </summary>
         /// <param name="umbracoContextAccessor">The Umbraco context accessor.</param>
+        /// <param name="umbracoContextFactory">The Umbraco context factory.</param>
         /// <param name="routingSettings">Routing settings.</param>
         /// <param name="urlProviders">The list of URL providers.</param>
         /// <param name="mediaUrlProviders">The list of media URL providers.</param>
@@ -29,20 +36,47 @@ namespace Umbraco.Cms.Core.Routing
         /// <param name="publishedContentStatusFilteringService"></param>
         public UrlProvider(
             IUmbracoContextAccessor umbracoContextAccessor,
+            IUmbracoContextFactory umbracoContextFactory,
+            IOptions<WebRoutingSettings> routingSettings,
+            UrlProviderCollection urlProviders,
+            MediaUrlProviderCollection mediaUrlProviders,
+            IVariationContextAccessor variationContextAccessor,
+            IPublishedContentCache contentCache, // Not used, but necessary to avoid ambiguous constructor.
+            IDocumentNavigationQueryService navigationQueryService,
+            IPublishStatusQueryService publishStatusQueryService, // Not used, but necessary to avoid ambiguous constructor.
+            IPublishedContentStatusFilteringService publishedContentStatusFilteringService)
+        {
+            _umbracoContextAccessor = umbracoContextAccessor;
+            _umbracoContextFactory = umbracoContextFactory;
+            _urlProviders = urlProviders;
+            _mediaUrlProviders = mediaUrlProviders;
+            _variationContextAccessor = variationContextAccessor;
+            _navigationQueryService = navigationQueryService;
+            _publishedContentStatusFilteringService = publishedContentStatusFilteringService;
+            Mode = routingSettings.Value.UrlProviderMode;
+        }
+
+        [Obsolete("Use the non-obsolete constructor. Scheduled for removal in V18.")]
+        public UrlProvider(
+            IUmbracoContextAccessor umbracoContextAccessor,
             IOptions<WebRoutingSettings> routingSettings,
             UrlProviderCollection urlProviders,
             MediaUrlProviderCollection mediaUrlProviders,
             IVariationContextAccessor variationContextAccessor,
             IDocumentNavigationQueryService navigationQueryService,
             IPublishedContentStatusFilteringService publishedContentStatusFilteringService)
+            : this(
+                umbracoContextAccessor,
+                StaticServiceProvider.Instance.GetRequiredService<IUmbracoContextFactory>(),
+                routingSettings,
+                urlProviders,
+                mediaUrlProviders,
+                variationContextAccessor,
+                StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>(),
+                navigationQueryService,
+                StaticServiceProvider.Instance.GetRequiredService<IPublishStatusQueryService>(),
+                publishedContentStatusFilteringService)
         {
-            _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
-            _urlProviders = urlProviders;
-            _mediaUrlProviders = mediaUrlProviders;
-            _variationContextAccessor = variationContextAccessor ?? throw new ArgumentNullException(nameof(variationContextAccessor));
-            _navigationQueryService = navigationQueryService;
-            _publishedContentStatusFilteringService = publishedContentStatusFilteringService;
-            Mode = routingSettings.Value.UrlProviderMode;
         }
 
         [Obsolete("Use the non-obsolete constructor. Scheduled for removal in V17.")]
@@ -126,35 +160,28 @@ namespace Umbraco.Cms.Core.Routing
         {
         }
 
-        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
-        private readonly IEnumerable<IUrlProvider> _urlProviders;
-        private readonly IEnumerable<IMediaUrlProvider> _mediaUrlProviders;
-        private readonly IVariationContextAccessor _variationContextAccessor;
-        private readonly IDocumentNavigationQueryService _navigationQueryService;
-        private readonly IPublishedContentStatusFilteringService _publishedContentStatusFilteringService;
-
         /// <summary>
         /// Gets or sets the provider URL mode.
         /// </summary>
         public UrlMode Mode { get; set; }
 
-        #endregion
-
         #region GetUrl
 
         private IPublishedContent? GetDocument(int id)
         {
-            IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
+            IUmbracoContext umbracoContext = GetRequiredUmbracoContext();
             return umbracoContext.Content?.GetById(id);
         }
+
         private IPublishedContent? GetDocument(Guid id)
         {
-            IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
+            IUmbracoContext umbracoContext = GetRequiredUmbracoContext();
             return umbracoContext.Content?.GetById(id);
         }
+
         private IPublishedContent? GetMedia(Guid id)
         {
-            IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
+            IUmbracoContext umbracoContext = GetRequiredUmbracoContext();
             return umbracoContext.Media?.GetById(id);
         }
 
@@ -217,7 +244,7 @@ namespace Umbraco.Cms.Core.Routing
 
             if (current == null)
             {
-                IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
+                IUmbracoContext umbracoContext = GetRequiredUmbracoContext();
                 current = umbracoContext.CleanedUmbracoUrl;
             }
 
@@ -229,7 +256,7 @@ namespace Umbraco.Cms.Core.Routing
 
         public string GetUrlFromRoute(int id, string? route, string? culture)
         {
-            IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
+            IUmbracoContext umbracoContext = GetRequiredUmbracoContext();
             NewDefaultUrlProvider? provider = _urlProviders.OfType<NewDefaultUrlProvider>().FirstOrDefault();
             var url = provider == null
                 ? route // what else?
@@ -253,7 +280,7 @@ namespace Umbraco.Cms.Core.Routing
         /// </remarks>
         public IEnumerable<UrlInfo> GetOtherUrls(int id)
         {
-            IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
+            IUmbracoContext umbracoContext = GetRequiredUmbracoContext();
             return GetOtherUrls(id, umbracoContext.CleanedUmbracoUrl);
         }
 
@@ -333,7 +360,7 @@ namespace Umbraco.Cms.Core.Routing
 
             if (current == null)
             {
-                IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
+                IUmbracoContext umbracoContext = GetRequiredUmbracoContext();
                 current = umbracoContext.CleanedUmbracoUrl;
             }
 
@@ -346,5 +373,16 @@ namespace Umbraco.Cms.Core.Routing
         }
 
         #endregion
+
+        private IUmbracoContext GetRequiredUmbracoContext()
+        {
+            if (_umbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext? umbracoContext))
+            {
+                return umbracoContext;
+            }
+
+            using UmbracoContextReference ctx = _umbracoContextFactory.EnsureUmbracoContext();
+            return ctx.UmbracoContext;
+        }
     }
 }
