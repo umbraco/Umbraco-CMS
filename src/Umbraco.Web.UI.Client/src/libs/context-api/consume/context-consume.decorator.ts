@@ -4,12 +4,27 @@ import type { UmbContextMinimal } from '../types.js';
 import { UmbContextConsumerController } from './context-consumer.controller.js';
 import type { UmbContextCallback } from './context-request.event.js';
 
-export interface UmbConsumeContextOptions<
+export interface UmbConsumeOptions<
 	BaseType extends UmbContextMinimal = UmbContextMinimal,
 	ResultType extends BaseType = BaseType,
 > {
+	/**
+	 * The context to consume, either as a string alias or an UmbContextToken.
+	 */
 	context: string | UmbContextToken<BaseType, ResultType>;
+
+	/**
+	 * An optional callback that is invoked when the context value is set or changes.
+	 * Note, the class instance is probably not fully constructed when this is first invoked.
+	 * If you need to ensure the class is fully constructed, consider using a setter on the property instead.
+	 */
 	callback?: UmbContextCallback<ResultType>;
+
+	/**
+	 * If true, the context consumer will stay active and invoke the callback on context changes.
+	 * If false, the context consumer will be destroyed after the first context value is received.
+	 * @default true
+	 */
 	subscribe?: boolean;
 }
 
@@ -21,18 +36,23 @@ export interface UmbConsumeContextOptions<
  *
  * @example
  * ```ts
- * import {consumeContext} from '@umbraco-cms/backoffice/context-api';
+ * import {consume} from '@umbraco-cms/backoffice/context-api';
  * import {UMB_WORKSPACE_CONTEXT} from './workspace.context-token.js';
  *
  * class MyElement extends UmbLitElement {
- *   @consumeContext({context: UMB_WORKSPACE_CONTEXT})
+ *   @consume({context: UMB_WORKSPACE_CONTEXT})
  *   @state()
  *   accessor workspaceContext?: UmbWorkspaceContext;
+ *
+ *   // One-time consumption
+ *   @consume({context: UMB_USER_CONTEXT, subscribe: false})
+ *   @state()
+ *   accessor currentUser?: UmbUserContext;
  * }
  * ```
  */
 export function consume<BaseType extends UmbContextMinimal = UmbContextMinimal, ResultType extends BaseType = BaseType>(
-	options: UmbConsumeContextOptions<BaseType, ResultType>,
+	options: UmbConsumeOptions<BaseType, ResultType>,
 ) {
 	const { context, callback, subscribe = true } = options;
 
@@ -40,11 +60,15 @@ export function consume<BaseType extends UmbContextMinimal = UmbContextMinimal, 
 		if (typeof nameOrContext === 'object') {
 			// Standard decorators branch (auto-accessors)
 			nameOrContext.addInitializer(function () {
-				// Defer controller creation until after constructor completes
-				Promise.resolve().then(() => {
-					new UmbContextConsumerController(this, context, (value) => {
+				queueMicrotask(() => {
+					const controller = new UmbContextConsumerController(this, context, (value) => {
 						protoOrTarget.set.call(this, value);
 						callback?.(value);
+
+						// If subscribe is false, destroy controller after first value
+						if (!subscribe) {
+							controller.destroy();
+						}
 					});
 				});
 			});
@@ -55,19 +79,21 @@ export function consume<BaseType extends UmbContextMinimal = UmbContextMinimal, 
 
 			if (constructor.addInitializer) {
 				constructor.addInitializer((element: any): void => {
-					// Defer controller creation until after constructor completes
-					// This ensures private fields are initialized
 					queueMicrotask(() => {
-						new UmbContextConsumerController(element, context, (value) => {
-							// Direct assignment - @state/@property will handle reactivity
+						const controller = new UmbContextConsumerController(element, context, (value) => {
 							element[propertyKey] = value;
 							callback?.(value);
+
+							// If subscribe is false, destroy controller after first value
+							if (!subscribe) {
+								controller.destroy();
+							}
 						});
 					});
 				});
 			} else {
 				console.warn(
-					`@consume applied to ${constructor.name}.${String(propertyKey)} but addInitializer is not available. Make sure the class extends LitElement or UmbLitElement`,
+					`@consume applied to ${constructor.name}.${String(propertyKey)} but addInitializer is not available.`,
 				);
 			}
 		}
