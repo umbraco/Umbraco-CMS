@@ -176,12 +176,14 @@ export class UmbInputEntityDataElement extends UUIFormControlMixin(UmbLitElement
 
 	#renderAddButton() {
 		if (this.max > 0 && this.selection.length >= this.max) return nothing;
+		if (this.readonly && this.selection.length > 0) return nothing;
 		return html`
 			<uui-button
 				id="btn-add"
 				look="placeholder"
 				@click=${() => this.#pickerInputContext.openPicker()}
-				label="${this.localize.term('general_choose')}"></uui-button>
+				label="${this.localize.term('general_choose')}"
+				?disabled=${this.readonly}></uui-button>
 		`;
 	}
 
