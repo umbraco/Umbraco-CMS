@@ -18,7 +18,7 @@ export class UmbInputEntityDataElement extends UUIFormControlMixin(UmbLitElement
 			return modelEntry;
 		},
 		identifier: 'Umb.SorterIdentifier.InputEntityData',
-		itemSelector: 'uui-ref-node',
+		itemSelector: 'umb-entity-item-ref',
 		containerSelector: 'uui-ref-list',
 		onChange: ({ model }) => {
 			this.selection = model;
