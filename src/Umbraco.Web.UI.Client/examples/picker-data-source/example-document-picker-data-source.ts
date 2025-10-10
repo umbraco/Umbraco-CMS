@@ -28,6 +28,7 @@ export class ExampleDocumentPickerPropertyEditorDataSource
 	#config: UmbConfigCollectionModel = [];
 
 	setConfig(config: UmbConfigCollectionModel) {
+		// TODO: add examples for all config options
 		this.#config = config;
 	}
 
