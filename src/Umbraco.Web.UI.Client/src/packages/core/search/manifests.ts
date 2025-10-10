@@ -1,6 +1,5 @@
 import { manifests as examineManifests } from './examine-management-dashboard/manifests.js';
 import { UMB_SECTION_ALIAS_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
-import { UMB_SETTINGS_SECTION_ALIAS } from '@umbraco-cms/backoffice/settings';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -34,7 +33,10 @@ export const manifests: Array<UmbExtensionManifest> = [
 		conditions: [
 			{
 				alias: UMB_SECTION_ALIAS_CONDITION_ALIAS,
-				match: UMB_SETTINGS_SECTION_ALIAS,
+				/* TODO: kept as a magic string to avoid illegal import outside of core
+					Move dashboard implementation out of core
+				*/
+				match: 'Umb.Section.Settings',
 			},
 		],
 	},

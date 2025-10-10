@@ -60,6 +60,9 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase {
 	#editorManifest = new UmbBasicState<ManifestPropertyEditorUi | undefined>(undefined);
 	public readonly editorManifest = this.#editorManifest.asObservable();
 
+	#editorDataSourceAlias = new UmbStringState<string | undefined>(undefined);
+	public readonly editorDataSourceAlias = this.#editorDataSourceAlias.asObservable();
+
 	public readonly readOnlyState = new UmbReadOnlyStateManager(this);
 	public readonly isReadOnly = this.readOnlyState.isReadOnly;
 
@@ -93,6 +96,22 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase {
 	 */
 	getEditorManifest(): ManifestPropertyEditorUi | undefined {
 		return this.#editorManifest.getValue();
+	}
+
+	/**
+	 * Set the editor data source alias for this property.
+	 * @param {string | undefined} dataSourceAlias The data source alias to set
+	 */
+	setEditorDataSourceAlias(dataSourceAlias: string | undefined) {
+		this.#editorDataSourceAlias.setValue(dataSourceAlias ?? undefined);
+	}
+
+	/**
+	 * Get the editor data source alias for this property.
+	 * @returns {string | undefined} The editor data source alias for this property.
+	 */
+	getEditorDataSourceAlias(): string | undefined {
+		return this.#editorDataSourceAlias.getValue();
 	}
 
 	// property variant ID:

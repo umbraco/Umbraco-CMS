@@ -1,5 +1,6 @@
 export * from './array/index.js';
 export * from './bytes/bytes.function.js';
+export * from './config-collection/index.js';
 export * from './date/index.js';
 export * from './debounce/debounce.function.js';
 export * from './deprecation/index.js';
