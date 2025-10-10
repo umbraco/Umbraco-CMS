@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -53,10 +54,10 @@ public class ImageCropperValueConverter : PropertyValueConverterBase, IDeliveryA
         {
             value = _jsonSerializer.Deserialize<ImageCropperValue>(sourceString);
         }
-        catch (Exception ex)
+        catch (JsonException ex)
         {
-            // cannot deserialize, assume it may be a raw image URL
-            _logger.LogError(ex, "Could not deserialize string '{JsonString}' into an image cropper value.", sourceString);
+            // Cannot deserialize, assume it may be a raw image URL.
+            _logger.LogDebug(ex, "Could not deserialize string '{JsonString}' into an image cropper value.", sourceString);
             value = new ImageCropperValue { Src = sourceString };
         }
 
