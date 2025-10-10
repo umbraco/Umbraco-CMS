@@ -59,7 +59,14 @@ internal sealed class DeliveryApiContentIndexHandleContentChanges : DeliveryApiC
                 RemoveFromIndex(pendingRemovals, index);
                 pendingRemovals.Clear();
 
-                Reindex(content, index);
+                IndexUpdateKind indexResult = Reindex(content, index);
+
+                // refreshBranch can also mean the whole branch was deleted, this way we know the node was updated and we still need to reindex descendants
+                // This happens when the node is already published and we do a publishbranch
+                if (indexResult == IndexUpdateKind.Updated && changeTypes.HasType(TreeChangeTypes.RefreshBranch))
+                {
+                    ReindexDescendants(content, index);
+                }
             }
         }
 
@@ -68,7 +75,7 @@ internal sealed class DeliveryApiContentIndexHandleContentChanges : DeliveryApiC
         return Task.CompletedTask;
     });
 
-    private void Reindex(IContent content, IIndex index)
+    private IndexUpdateKind Reindex(IContent content, IIndex index)
     {
         // get the currently indexed cultures for the content
         CulturePublishStatus[] existingCultures = index
@@ -95,16 +102,19 @@ internal sealed class DeliveryApiContentIndexHandleContentChanges : DeliveryApiC
             // we likely got here because a removal triggered a "refresh branch" notification, now we
             // need to delete every last culture of this content and all descendants
             RemoveFromIndex(content.Id, index);
-            return;
+            return IndexUpdateKind.Removed;
         }
 
-        // if the published state changed of any culture, chances are there are similar changes ot the content descendants
+        // if the published state changed of any culture, chances are there are similar changes at the content descendants
         // that need to be reflected in the index, so we'll reindex all descendants
         var changedCulturePublishStatus = indexedCultures.Intersect(existingCultures).Count() != existingCultures.Length;
         if (changedCulturePublishStatus)
         {
             ReindexDescendants(content, index);
+            return IndexUpdateKind.UpdatedWithDescendants;
         }
+
+        return IndexUpdateKind.Updated;
     }
 
     private CulturePublishStatus[] UpdateIndex(IContent content, IIndex index)
@@ -178,5 +188,12 @@ internal sealed class DeliveryApiContentIndexHandleContentChanges : DeliveryApiC
         }
 
         public override int GetHashCode() => HashCode.Combine(Culture, Published);
+    }
+
+    private enum IndexUpdateKind
+    {
+        Updated,
+        UpdatedWithDescendants,
+        Removed,
     }
 }
