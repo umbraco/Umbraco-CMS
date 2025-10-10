@@ -14,6 +14,7 @@ import '../input/input-entity-data.element.js';
 import type { UmbConfigCollectionModel } from '@umbraco-cms/backoffice/utils';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { ManifestPropertyEditorDataSource } from '@umbraco-cms/backoffice/property-editor-data-source';
+import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 
 @customElement('umb-entity-data-picker-property-editor-ui')
 export class UmbEntityDataPickerPropertyEditorUIElement
@@ -63,33 +64,19 @@ export class UmbEntityDataPickerPropertyEditorUIElement
 	private _dataSourceConfig?: UmbConfigCollectionModel;
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
-		if (!config) {
-			this.#propertyEditorConfigCollection = undefined;
-			return;
-		}
-
 		this.#propertyEditorConfigCollection = config;
 
-		this._min = this.#parseInt(config.getValueByAlias('minNumber'), 0);
-		this._max = this.#parseInt(config.getValueByAlias('maxNumber'), Infinity);
+		const minMax = config?.getValueByAlias<UmbNumberRangeValueType>('validationLimit');
+		this._min = minMax?.min ?? 0;
+		this._max = minMax?.max ?? Infinity;
 
 		this._minMessage = `${this.localize.term('validation_minCount')} ${this._min} ${this.localize.term('validation_items')}`;
 		this._maxMessage = `${this.localize.term('validation_maxCount')} ${this._max} ${this.localize.term('validation_itemsSelected')}`;
-
-		// NOTE: Run validation immediately, to notify if the value is outside of min/max range. [LK]
-		if (this._min > 0 || this._max < Infinity) {
-			this.checkValidity();
-		}
 
 		this._dataSourceConfig = this.#extractDataSourceConfig();
 	}
 
 	#propertyEditorConfigCollection?: UmbPropertyEditorConfigCollection;
-
-	#parseInt(value: unknown, fallback: number): number {
-		const num = Number(value);
-		return !isNaN(num) && num > 0 ? num : fallback;
-	}
 
 	#extractDataSourceConfig() {
 		if (!this._dataSourceAlias || !this.#propertyEditorConfigCollection) {
