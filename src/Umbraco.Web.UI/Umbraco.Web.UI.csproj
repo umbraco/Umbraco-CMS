@@ -5,6 +5,7 @@
     <EnablePackageValidation>false</EnablePackageValidation>
     <!-- Disable compression for static files, because MapStaticAssets() is not used anyway (yet) -->
     <CompressionEnabled>false</CompressionEnabled>
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -23,13 +24,13 @@
 
   <ItemGroup>
     <!-- Add design/build time support for EF Core migrations -->
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" PrivateAssets="all" Version="9.0.4" />
   </ItemGroup>
 
   <ItemGroup>
     <!-- Ensure the AppLocalIcu setting is the same as the referenced ICU package version and changes are also done to the template project! -->
     <!-- Opt-in to app-local ICU to ensure consistent globalization APIs across different platforms -->
-    <PackageReference Include="Microsoft.ICU.ICU4C.Runtime" VersionOverride="72.1.0.3" />
+    <PackageReference Include="Microsoft.ICU.ICU4C.Runtime" Version="72.1.0.3" />
     <RuntimeHostConfigurationOption Include="System.Globalization.AppLocalIcu" Value="72.1.0.3" Condition="$(RuntimeIdentifier.StartsWith('linux')) or $(RuntimeIdentifier.StartsWith('win')) or ('$(RuntimeIdentifier)' == '' and !$([MSBuild]::IsOSPlatform('osx')))" />
   </ItemGroup>
 
