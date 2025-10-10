@@ -8,13 +8,13 @@ import type {
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-
-// import of local component
-import '../input/input-entity-data.element.js';
 import type { UmbConfigCollectionModel } from '@umbraco-cms/backoffice/utils';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { ManifestPropertyEditorDataSource } from '@umbraco-cms/backoffice/property-editor-data-source';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
+
+// import of local component
+import '../input/input-entity-data.element.js';
 
 @customElement('umb-entity-data-picker-property-editor-ui')
 export class UmbEntityDataPickerPropertyEditorUIElement
@@ -111,9 +111,28 @@ export class UmbEntityDataPickerPropertyEditorUIElement
 		return this.shadowRoot?.querySelector<UmbInputEntityDataElement>('umb-input-entity-data')?.focus();
 	}
 
+	override firstUpdated(changedProperties: Map<string | number | symbol, unknown>) {
+		super.firstUpdated(changedProperties);
+		this.addFormControlElement(this.shadowRoot!.querySelector('umb-input-entity-data')!);
+
+		if (this._min && this._max && this._min > this._max) {
+			console.warn(
+				`Property (Entity Data Picker) has been misconfigured, 'min' is greater than 'max'. Please correct your data type configuration.`,
+				this,
+			);
+		}
+	}
+
 	#onChange(event: CustomEvent & { target: UmbInputEntityDataElement }) {
-		this.value = event.target.selection;
-		this.dispatchEvent(new UmbChangeEvent());
+		const selection = event.target.selection;
+
+		// Ensure the value is of the correct type before setting it.
+		if (Array.isArray(selection)) {
+			this.value = selection;
+			this.dispatchEvent(new UmbChangeEvent());
+		} else {
+			throw new Error('Selection is not of type array. Cannot set property value.');
+		}
 	}
 
 	override render() {
