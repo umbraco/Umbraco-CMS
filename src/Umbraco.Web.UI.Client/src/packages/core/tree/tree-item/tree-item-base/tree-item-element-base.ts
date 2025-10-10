@@ -195,6 +195,9 @@ export abstract class UmbTreeItemElementBase<
 	// Note: Currently we want to prevent opening when the item is in a selectable context, but this might change in the future.
 	// If we like to be able to open items in selectable context, then we might want to make it as a menu item action, so you have to click ... and chose an action called 'Edit'
 	override render() {
+		const caretLabelKey = this._isOpen
+			? 'visuallyHiddenTexts_collapseChildItems'
+			: 'visuallyHiddenTexts_expandChildItems';
 		return html`
 			<uui-menu-item
 				@show-children=${this._onShowChildren}
@@ -208,11 +211,9 @@ export abstract class UmbTreeItemElementBase<
 				.loading=${this._isLoading}
 				.hasChildren=${this._forceShowExpand || this._hasChildren}
 				.showChildren=${this._isOpen}
-				.caretLabel=${this._isOpen
-					? this.localize.term('visuallyHiddenTexts_collapseChildItems') + ' ' + this._label
-					: this.localize.term('visuallyHiddenTexts_expandChildItems') + ' ' + this._label}
+				.caretLabel=${this.localize.term(caretLabelKey) + ' ' + this._label}
 				label=${ifDefined(this._label)}
-				href="${ifDefined(this._isSelectableContext ? undefined : this._href)}"
+				href=${ifDefined(this._isSelectableContext ? undefined : this._href)}>
 				.renderExpandSymbol=${this._renderExpandSymbol}>
 				${this.#renderLoadPrevButton()} ${this.renderIconContainer()} ${this.renderLabel()} ${this.#renderActions()}
 				${this.#renderChildItems()}
@@ -286,7 +287,7 @@ export abstract class UmbTreeItemElementBase<
 				slot="actions"
 				.entityType=${this.#api.entityType}
 				.unique=${this.#api.unique}
-				.label=${this.localize.term('actions_viewActionsFor', [this._label])}>
+				.label=${this._label}>
 			</umb-entity-actions-bundle>
 		`;
 	}
