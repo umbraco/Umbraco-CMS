@@ -65,7 +65,7 @@ const permissions: Array<ManifestEntityUserPermission> = [
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
 			verbs: ['Umb.Document.Create'],
-			label: '#actions_create',
+			label: '#actions_createFor',
 			description: '#actionDescriptions_create',
 		},
 	},
