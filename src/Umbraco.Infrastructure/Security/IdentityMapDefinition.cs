@@ -153,7 +153,7 @@ public class IdentityMapDefinition : IMapDefinition
 
     private static DateTime EnsureUtcWithServerTime(DateTime date) =>
 
-        // We have a server time value here, but the the Kind is UTC, so we can't use .ToUniversalTime() to convert to the UTC
+        // We have a server time value here, but the Kind is UTC, so we can't use .ToUniversalTime() to convert to the UTC
         // value that the LockoutEnd property expects. We need to create a DateTimeOffset with the correct offset.
         DateTime.SpecifyKind(date, DateTimeKind.Local).ToUniversalTime();
 }
