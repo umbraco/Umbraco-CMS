@@ -70,7 +70,7 @@ export class UmbInputPropertyEditorDataSourceElement extends UUIFormControlMixin
 	 * @attr
 	 * @default
 	 */
-	@property({ type: String, attribute: 'min-message' })
+	@property({ type: String, attribute: 'max-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
 	@property({ type: Array })
