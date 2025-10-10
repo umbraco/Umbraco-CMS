@@ -4,12 +4,14 @@ import { splitStringToArray, type UmbConfigCollectionModel } from '@umbraco-cms/
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
 import type { UmbItemModel } from '@umbraco-cms/backoffice/entity-item';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-input-entity-data')
-export class UmbInputEntityDataElement extends UUIFormControlMixin(UmbLitElement, '') {
+export class UmbInputEntityDataElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
+	UmbLitElement,
+) {
 	#sorter = new UmbSorterController<string>(this, {
 		getUniqueOfElement: (element) => {
 			return element.id;
@@ -95,12 +97,13 @@ export class UmbInputEntityDataElement extends UUIFormControlMixin(UmbLitElement
 		return this.#pickerInputContext.getSelection();
 	}
 
-	@property()
-	public override set value(uniques: string) {
-		this.selection = splitStringToArray(uniques);
+	@property({ type: String })
+	public override set value(selectionString: string | undefined) {
+		this.selection = splitStringToArray(selectionString);
+		super.value = selectionString; // Call the parent setter to ensure the value change is triggered in the FormControlMixin. [NL]
 	}
-	public override get value(): string {
-		return this.selection.join(',');
+	public override get value(): string | undefined {
+		return this.selection.length > 0 ? this.selection.join(',') : undefined;
 	}
 
 	/**
