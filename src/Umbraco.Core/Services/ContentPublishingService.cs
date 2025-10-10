@@ -290,11 +290,12 @@ internal sealed class ContentPublishingService : IContentPublishingService
             return MapInternalPublishingAttempt(minimalAttempt);
         }
 
-        _logger.LogInformation("Starting async background thread for publishing branch.");
+        _logger.LogInformation("Starting long running operation for publishing branch.");
         Attempt<Guid, LongRunningOperationEnqueueStatus> enqueueAttempt = await _longRunningOperationService.RunAsync(
             PublishBranchOperationType,
             async _ => await PerformPublishBranchAsync(key, cultures, publishBranchFilter, userKey, returnContent: false),
-            allowConcurrentExecution: true);
+            allowConcurrentExecution: true,
+            runInBackground: false);    // Note we want this to run in the main Umbraco thread pool, so we have access to the UmbracoContext.
         if (enqueueAttempt.Success)
         {
             return Attempt.SucceedWithStatus(
