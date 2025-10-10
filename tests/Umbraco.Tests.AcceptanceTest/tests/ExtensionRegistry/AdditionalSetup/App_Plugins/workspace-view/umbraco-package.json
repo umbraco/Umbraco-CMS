@@ -1,0 +1,24 @@
+{
+  "$schema": "../../umbraco-package-schema.json",
+  "name": "My workspace",
+  "version": "0.1.0",
+  "extensions": [
+    {
+      "type": "workspaceView",
+      "alias": "My.WorkspaceView",
+      "name": "My Workspace View",
+      "element": "/App_Plugins/workspace-view/workspace-view.js",
+      "meta": {
+        "label": "My Workspace View",
+        "pathname": "/my-workspace-view",
+        "icon": "icon-add"
+      },
+      "conditions": [
+        {
+          "alias": "Umb.Condition.WorkspaceAlias",
+          "match": "Umb.Workspace.Document"
+        }
+      ]
+    }
+  ]
+}
