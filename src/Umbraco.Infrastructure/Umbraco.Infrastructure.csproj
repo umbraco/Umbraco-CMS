@@ -43,6 +43,10 @@
 
     <!-- Both Dazinator.Extensions.FileProviders and MiniProfiler.AspNetCore.Mvc bring in a vulnerable version of System.Text.RegularExpressions -->
     <PackageReference Include="System.Text.RegularExpressions" />
+
+    <!-- Take top-level depedendency on these Microsoft.CodeAnalysis.* packages due to conflicts when installing Microsoft.EntityFrameworkCore.Design -->
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" />
   </ItemGroup>
 
   <ItemGroup>
