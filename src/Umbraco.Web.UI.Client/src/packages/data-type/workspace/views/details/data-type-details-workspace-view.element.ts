@@ -109,13 +109,19 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 		if (!this._supportsDataSource) return nothing;
 
 		return html`
-			<umb-property-layout label="Data Source">
+			<umb-property-layout label="Data Source" mandatory>
 				<umb-input-property-editor-data-source
 					.value=${this._propertyEditorDataSourceAlias || ''}
 					.dataSourceTypes=${this._supportedDataSourceTypes}
 					slot="editor"
 					max="1"
-					@change=${this.#onDataSourceChange}></umb-input-property-editor-data-source>
+					@change=${this.#onDataSourceChange}
+					required
+					${umbBindToValidation(
+						this,
+						'$.editorDataSourceAlias',
+						this._propertyEditorDataSourceAlias,
+					)}></umb-input-property-editor-data-source>
 			</umb-property-layout>
 		`;
 	}
