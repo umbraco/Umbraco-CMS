@@ -13,7 +13,7 @@ const manifest: ManifestPropertyEditorUi = {
 		supportsReadOnly: true,
 		supportsDataSource: {
 			enabled: true,
-			forDataSourceTypes: ['pickerTree', 'pickerCollection'],
+			forDataSourceTypes: ['picker'],
 		},
 		settings: {
 			properties: [

@@ -1,7 +1,7 @@
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'propertyEditorDataSource',
-		dataSourceType: 'pickerCollection',
+		dataSourceType: 'picker',
 		alias: 'Umb.PropertyEditorDataSource.CustomPickerCollection',
 		name: 'Custom Picker Collection Data Source',
 		api: () => import('./example-custom-picker-collection-data-source.js'),
@@ -13,7 +13,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 	},
 	{
 		type: 'propertyEditorDataSource',
-		dataSourceType: 'pickerTree',
+		dataSourceType: 'picker',
 		alias: 'Umb.PropertyEditorDataSource.CustomPickerTree',
 		name: 'Custom Picker Tree Data Source',
 		api: () => import('./example-custom-picker-tree-data-source.js'),
@@ -25,9 +25,9 @@ export const manifests: Array<UmbExtensionManifest> = [
 	},
 	{
 		type: 'propertyEditorDataSource',
-		dataSourceType: 'pickerTree',
+		dataSourceType: 'picker',
 		alias: 'Umb.PropertyEditorDataSource.DocumentPicker',
-		name: 'Document Picker Tree Data Source',
+		name: 'Document Picker Data Source',
 		api: () => import('./example-document-picker-data-source.js'),
 		meta: {
 			label: 'Documents',
@@ -53,9 +53,9 @@ export const manifests: Array<UmbExtensionManifest> = [
 	},
 	{
 		type: 'propertyEditorDataSource',
-		dataSourceType: 'pickerTree',
+		dataSourceType: 'picker',
 		alias: 'Umb.PropertyEditorDataSource.MediaPicker',
-		name: 'Media Picker Tree Data Source',
+		name: 'Media Picker Data Source',
 		api: () => import('./example-media-picker-data-source.js'),
 		meta: {
 			label: 'Media',
@@ -65,9 +65,9 @@ export const manifests: Array<UmbExtensionManifest> = [
 	},
 	{
 		type: 'propertyEditorDataSource',
-		dataSourceType: 'pickerCollection',
+		dataSourceType: 'picker',
 		alias: 'Umb.PropertyEditorDataSource.LanguagePicker',
-		name: 'Language Picker Collection Data Source',
+		name: 'Language Picker Data Source',
 		api: () => import('./example-language-picker-data-source.js'),
 		meta: {
 			label: 'Languages',
@@ -77,7 +77,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 	},
 	{
 		type: 'propertyEditorDataSource',
-		dataSourceType: 'pickerCollection',
+		dataSourceType: 'picker',
 		alias: 'Umb.PropertyEditorDataSource.WebhookPicker',
 		name: 'Webhook Picker Data Source',
 		api: () => import('./example-webhook-picker-data-source.js'),
@@ -89,7 +89,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 	},
 	{
 		type: 'propertyEditorDataSource',
-		dataSourceType: 'pickerCollection',
+		dataSourceType: 'picker',
 		alias: 'Umb.PropertyEditorDataSource.UserPicker',
 		name: 'User Picker Data Source',
 		api: () => import('./example-user-picker-data-source.js'),
