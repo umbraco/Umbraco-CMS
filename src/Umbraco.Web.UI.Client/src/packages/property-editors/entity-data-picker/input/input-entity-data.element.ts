@@ -83,7 +83,7 @@ export class UmbInputEntityDataElement extends UUIFormControlMixin(UmbLitElement
 	 * @attr
 	 * @default
 	 */
-	@property({ type: String, attribute: 'min-message' })
+	@property({ type: String, attribute: 'max-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
 	@property({ type: Array })
