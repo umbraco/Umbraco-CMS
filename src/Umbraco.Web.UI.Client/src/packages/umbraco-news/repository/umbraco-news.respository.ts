@@ -1,5 +1,5 @@
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbNewsServerDataSource } from './sources/umbraco-news.server.data';
+import { UmbNewsServerDataSource } from './sources/umbraco-news.server.data.js';
 
 export class UmbNewsDashboardRepository {
 	#host: UmbControllerHost;

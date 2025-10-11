@@ -1,9 +1,8 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, customElement, html, state, repeat, unsafeHTML, when, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, state, unsafeHTML, when, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-
 import { UmbNewsDashboardRepository } from './repository/index.js';
-import type { NewsDashboardItemResponseModel } from '../core/backend-api/types.gen.js';
+import type { NewsDashboardItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 interface NewsDashboardGroupedItems {
 	priority: number;
@@ -67,6 +66,14 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 		if (this._items.length === 0) {
 			return this.#renderDefaultContent();
 		}
+
+		// TODO:
+		// - We are getting and rendering HTML here. Would be good to sanitize it to only allow basic formatting and links.
+		// - Layout needs improvement:
+		//   - Each row should span to fill the container.
+		//   - Spacing between rows.
+		//   - The last row should wrap if there are more than 4, so 4 to a row.
+		// - Styling: general review of matching what we have in Umbraco 13 within the style of the new backoffice.
 		return html`
 			<uui-box headline="Welcome to Umbraco">
 				<div slot="header">Why hello there 😃! This is the Umbraco dashboard. Here you will find various helpful and interesting information about Umbraco.</div>
