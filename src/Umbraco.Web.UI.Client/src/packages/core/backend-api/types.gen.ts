@@ -412,7 +412,7 @@ export type CreateUserGroupRequestModel = {
     mediaStartNode?: ReferenceByIdModel | null;
     mediaRootAccess: boolean;
     fallbackPermissions: Array<string>;
-    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
+    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | DocumentTypePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
     id?: string | null;
 };
 
@@ -471,7 +471,7 @@ export type CurrentUserResponseModel = {
     hasAccessToAllLanguages: boolean;
     hasAccessToSensitiveData: boolean;
     fallbackPermissions: Array<string>;
-    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
+    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | DocumentTypePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
     allowedSections: Array<string>;
     isAdmin: boolean;
 };
@@ -642,6 +642,9 @@ export type DocumentConfigurationResponseModel = {
     disableDeleteWhenReferenced: boolean;
     disableUnpublishWhenReferenced: boolean;
     allowEditInvariantFromNonDefault: boolean;
+    /**
+     * @deprecated
+     */
     allowNonExistingSegmentsCreation: boolean;
 };
 
@@ -768,6 +771,12 @@ export type DocumentTypeItemResponseModel = {
     isElement: boolean;
     icon?: string | null;
     description?: string | null;
+};
+
+export type DocumentTypePermissionPresentationModel = {
+    $type: string;
+    verbs: Array<string>;
+    documentTypeAlias: string;
 };
 
 export type DocumentTypePropertyTypeContainerResponseModel = {
@@ -1632,6 +1641,20 @@ export type NamedEntityTreeItemResponseModel = {
     parent?: ReferenceByIdModel | null;
     flags: Array<FlagModel>;
     name: string;
+};
+
+export type NewsDashboardItemResponseModel = {
+    priority: string;
+    header: string;
+    body?: string | null;
+    buttonText?: string | null;
+    imageUrl?: string | null;
+    imageAltText?: string | null;
+    url?: string | null;
+};
+
+export type NewsDashboardResponseModel = {
+    items: Array<NewsDashboardItemResponseModel>;
 };
 
 export type NoopSetupTwoFactorModel = {
@@ -2788,7 +2811,7 @@ export type UpdateUserGroupRequestModel = {
     mediaStartNode?: ReferenceByIdModel | null;
     mediaRootAccess: boolean;
     fallbackPermissions: Array<string>;
-    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
+    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | DocumentTypePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
 };
 
 export type UpdateUserGroupsOnUserRequestModel = {
@@ -2889,7 +2912,7 @@ export type UserGroupResponseModel = {
     mediaStartNode?: ReferenceByIdModel | null;
     mediaRootAccess: boolean;
     fallbackPermissions: Array<string>;
-    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
+    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | DocumentTypePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
     id: string;
     isDeletable: boolean;
     aliasCanBeChanged: boolean;
@@ -10784,6 +10807,150 @@ export type GetMemberTypeConfigurationResponses = {
 
 export type GetMemberTypeConfigurationResponse = GetMemberTypeConfigurationResponses[keyof GetMemberTypeConfigurationResponses];
 
+export type PostMemberTypeFolderData = {
+    body?: CreateFolderRequestModel;
+    path?: never;
+    query?: never;
+    url: '/umbraco/management/api/v1/member-type/folder';
+};
+
+export type PostMemberTypeFolderErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PostMemberTypeFolderError = PostMemberTypeFolderErrors[keyof PostMemberTypeFolderErrors];
+
+export type PostMemberTypeFolderResponses = {
+    /**
+     * Created
+     */
+    201: unknown;
+};
+
+export type DeleteMemberTypeFolderByIdData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/member-type/folder/{id}';
+};
+
+export type DeleteMemberTypeFolderByIdErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type DeleteMemberTypeFolderByIdError = DeleteMemberTypeFolderByIdErrors[keyof DeleteMemberTypeFolderByIdErrors];
+
+export type DeleteMemberTypeFolderByIdResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type GetMemberTypeFolderByIdData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/member-type/folder/{id}';
+};
+
+export type GetMemberTypeFolderByIdErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type GetMemberTypeFolderByIdError = GetMemberTypeFolderByIdErrors[keyof GetMemberTypeFolderByIdErrors];
+
+export type GetMemberTypeFolderByIdResponses = {
+    /**
+     * OK
+     */
+    200: FolderResponseModel;
+};
+
+export type GetMemberTypeFolderByIdResponse = GetMemberTypeFolderByIdResponses[keyof GetMemberTypeFolderByIdResponses];
+
+export type PutMemberTypeFolderByIdData = {
+    body?: UpdateFolderResponseModel;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/member-type/folder/{id}';
+};
+
+export type PutMemberTypeFolderByIdErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PutMemberTypeFolderByIdError = PutMemberTypeFolderByIdErrors[keyof PutMemberTypeFolderByIdErrors];
+
+export type PutMemberTypeFolderByIdResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
 export type GetTreeMemberTypeRootData = {
     body?: never;
     path?: never;
@@ -11363,6 +11530,29 @@ export type GetModelsBuilderStatusResponses = {
 };
 
 export type GetModelsBuilderStatusResponse = GetModelsBuilderStatusResponses[keyof GetModelsBuilderStatusResponses];
+
+export type GetNewsDashboardData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/umbraco/management/api/v1/news-dashboard';
+};
+
+export type GetNewsDashboardErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+};
+
+export type GetNewsDashboardResponses = {
+    /**
+     * OK
+     */
+    200: NewsDashboardResponseModel;
+};
+
+export type GetNewsDashboardResponse = GetNewsDashboardResponses[keyof GetNewsDashboardResponses];
 
 export type GetObjectTypesData = {
     body?: never;
