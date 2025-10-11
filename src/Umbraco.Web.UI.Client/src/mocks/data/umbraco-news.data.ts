@@ -5,7 +5,7 @@ export const umbNewsData: NewsDashboardResponseModel = {
 		{
 			priority: 'High',
 			header: 'News 1 Header',
-			body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed urna dui, convallis in porta sed, tempor non mauris. Aliquam placerat sed nulla a varius. Maecenas elementum tempus luctus. Nulla eu magna turpis. Nunc vel sodales urna. Donec ac ipsum sed ex egestas interdum. Aliquam pellentesque tellus id felis tempor gravida.',
+			body: '<p>Lorem ipsum <b>dolor sit amet</b>, consectetur adipiscing elit. Sed urna dui, convallis in porta sed, tempor non mauris. Aliquam placerat sed nulla a varius. Maecenas elementum tempus luctus. Nulla eu magna turpis. Nunc vel sodales urna. Donec ac ipsum sed ex egestas interdum. Aliquam pellentesque tellus id felis tempor gravida.</p>',
 			buttonText: 'Button text',
 			imageUrl: 'https://umbraco-dashboard-news.euwest01.umbraco.io/media/rxphk1dd/dashboard-11.jpg',
 			imageAltText: 'Test',
@@ -14,7 +14,7 @@ export const umbNewsData: NewsDashboardResponseModel = {
 		{
 			priority: 'High',
 			header: 'News 2 Header',
-			body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed urna dui, convallis in porta sed, tempor non mauris. Aliquam placerat sed nulla a varius. Maecenas elementum tempus luctus. Nulla eu magna turpis. Nunc vel sodales urna. Donec ac ipsum sed ex egestas interdum. Aliquam pellentesque tellus id felis tempor gravida.',
+			body: '<p>Lorem ipsum <b>dolor sit amet</b>, consectetur adipiscing elit. Sed urna dui, convallis in porta sed, tempor non mauris. Aliquam placerat sed nulla a varius. Maecenas elementum tempus luctus. Nulla eu magna turpis. Nunc vel sodales urna. Donec ac ipsum sed ex egestas interdum. Aliquam pellentesque tellus id felis tempor gravida.</p>',
 			buttonText: 'See more',
 			imageUrl: 'https://umbraco-dashboard-news.euwest01.umbraco.io/media/ezujjyhj/dashboard-12.jpg',
 			imageAltText: '',
@@ -23,7 +23,7 @@ export const umbNewsData: NewsDashboardResponseModel = {
 		{
 			priority: 'Medium',
 			header: 'News 3 Header',
-			body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed urna dui, convallis in porta sed, tempor non mauris. Aliquam placerat sed nulla a varius. Maecenas elementum tempus luctus. Nulla eu magna turpis. Nunc vel sodales urna. Donec ac ipsum sed ex egestas interdum. Aliquam pellentesque tellus id felis tempor gravida.',
+			body: '<p>Lorem ipsum <b>dolor sit amet</b>, consectetur adipiscing elit. Sed urna dui, convallis in porta sed, tempor non mauris. Aliquam placerat sed nulla a varius. Maecenas elementum tempus luctus. Nulla eu magna turpis. Nunc vel sodales urna. Donec ac ipsum sed ex egestas interdum. Aliquam pellentesque tellus id felis tempor gravida.</p>',
 			buttonText: 'See more',
 			imageUrl: '',
 			imageAltText: '',
@@ -32,7 +32,7 @@ export const umbNewsData: NewsDashboardResponseModel = {
 		{
 			priority: 'Medium',
 			header: 'News 4 Header',
-			body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed urna dui, convallis in porta sed, tempor non mauris. Aliquam placerat sed nulla a varius. Maecenas elementum tempus luctus. Nulla eu magna turpis. Nunc vel sodales urna. Donec ac ipsum sed ex egestas interdum. Aliquam pellentesque tellus id felis tempor gravida.',
+			body: '<p>Lorem ipsum <b>dolor sit amet</b>, consectetur adipiscing elit. Sed urna dui, convallis in porta sed, tempor non mauris. Aliquam placerat sed nulla a varius. Maecenas elementum tempus luctus. Nulla eu magna turpis. Nunc vel sodales urna. Donec ac ipsum sed ex egestas interdum. Aliquam pellentesque tellus id felis tempor gravida.</p>',
 			buttonText: 'See more',
 			imageUrl: '',
 			imageAltText: '',
@@ -41,7 +41,7 @@ export const umbNewsData: NewsDashboardResponseModel = {
 		{
 			priority: 'Medium',
 			header: 'News 5 Header',
-			body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed urna dui, convallis in porta sed, tempor non mauris. Aliquam placerat sed nulla a varius. Maecenas elementum tempus luctus. Nulla eu magna turpis. Nunc vel sodales urna. Donec ac ipsum sed ex egestas interdum. Aliquam pellentesque tellus id felis tempor gravida.',
+			body: '<p>Lorem ipsum <b>dolor sit amet</b>, consectetur adipiscing elit. Sed urna dui, convallis in porta sed, tempor non mauris. Aliquam placerat sed nulla a varius. Maecenas elementum tempus luctus. Nulla eu magna turpis. Nunc vel sodales urna. Donec ac ipsum sed ex egestas interdum. Aliquam pellentesque tellus id felis tempor gravida.</p>',
 			buttonText: 'See more',
 			imageUrl: '',
 			imageAltText: '',
@@ -50,7 +50,7 @@ export const umbNewsData: NewsDashboardResponseModel = {
 		{
 			priority: 'Normal',
 			header: 'Normal',
-			body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed urna dui, convallis in porta sed, tempor non mauris. Aliquam placerat sed nulla a varius. Maecenas elementum tempus luctus. Nulla eu magna turpis. Nunc vel sodales urna. Donec ac ipsum sed ex egestas interdum. Aliquam pellentesque tellus id felis tempor gravida.',
+			body: '<p>Lorem ipsum <b>dolor sit amet</b>, consectetur adipiscing elit. Sed urna dui, convallis in porta sed, tempor non mauris. Aliquam placerat sed nulla a varius. Maecenas elementum tempus luctus. Nulla eu magna turpis. Nunc vel sodales urna. Donec ac ipsum sed ex egestas interdum. Aliquam pellentesque tellus id felis tempor gravida.</p>',
 			buttonText: 'See more',
 			imageUrl: 'https://umbraco-dashboard-news.euwest01.umbraco.io/media/403pgsxa/stability-without-complexity.webp',
 			imageAltText: '',

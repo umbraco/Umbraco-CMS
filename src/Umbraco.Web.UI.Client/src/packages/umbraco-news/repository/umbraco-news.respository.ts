@@ -1,15 +1,16 @@
-import { tryExecute } from '@umbraco-cms/backoffice/resources';
-import { NewsDashboardService, type NewsDashboardResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
-import { umbNewsData } from 'src/mocks/data/umbraco-news.data';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbNewsServerDataSource } from './sources/umbraco-news.server.data';
 
-export class UmbNewsDashboardRepository extends UmbRepositoryBase {
+export class UmbNewsDashboardRepository {
+	#host: UmbControllerHost;
+	#newsDataSource: UmbNewsServerDataSource;
+
+	constructor(host: UmbControllerHost) {
+		this.#host = host;
+		this.#newsDataSource = new UmbNewsServerDataSource(this.#host);
+	}
+
 	async getNewsDashboard() {
-		const res = await tryExecute(this, NewsDashboardService.getNewsDashboard());
-		console.log('res in repo', res);
-		const data = res.data as NewsDashboardResponseModel | undefined;
-		if (!data || !data.items?.length) return umbNewsData;
-
-		return data ?? { items: [] };
+		return this.#newsDataSource.getNewsItems();
 	}
 }
