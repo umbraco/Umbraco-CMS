@@ -198,8 +198,8 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		} else {
 			return html`
 				<div id="header">
-					<b>${this.property.name}</b>
-					<i>${this.property.alias}</i>
+					<p><b>${this.property.name}</b></p>
+					<p><i>${this.property.alias}</i></p>
 					<p>${this.property.description}</p>
 				</div>
 				<div id="editor">
@@ -451,6 +451,12 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 				border-radius: var(--uui-border-radius);
 			}
 
+			:host([_inherited]) {
+				#header {
+					padding: 0 var(--uui-size-3, 9px);
+				}
+			}
+
 			p {
 				margin-bottom: 0;
 			}
@@ -469,6 +475,11 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 				position: relative;
 				--uui-button-background-color: var(--uui-color-background);
 				--uui-button-background-color-hover: var(--uui-color-background);
+			}
+			#editor:not(uui-button) {
+				background-color: var(--uui-color-background);
+				border-radius: var(--uui-button-border-radius, var(--uui-border-radius, 3px));
+				min-height: 143px;
 			}
 			#editor uui-action-bar {
 				--uui-button-background-color: var(--uui-color-surface);
