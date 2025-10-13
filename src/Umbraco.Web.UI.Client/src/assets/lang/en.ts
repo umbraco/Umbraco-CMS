@@ -2356,7 +2356,7 @@ export default {
 		noDependency: 'No',
 	},
 	dashboardTabs: {
-		contentIntro: 'Getting Started',
+		contentIntro: 'Welcome to Umbraco',
 		contentRedirectManager: 'Redirect URL Management',
 		mediaFolderBrowser: 'Content',
 		settingsWelcome: 'Welcome',
