@@ -41,7 +41,7 @@ export class UmbManagementApiItemDataCacheInvalidationManager<ItemResponseModelT
 	}
 
 	#observeServerEvents() {
-		// Invalidate cache entries when entities are updated or deleted/trashed
+		// Invalidate cache entries when entities are updated or deleted
 		this.observe(
 			this.#serverEventContext?.byEventSourcesAndEventTypes(this.#eventSources, this.#eventTypes),
 			(event) => {
