@@ -48,7 +48,8 @@ internal sealed class NPocoUpdateBatchTests : UmbracoIntegrationTest
             var updateBatch = servers
                 .Select(x => UpdateBatch.For(x))
                 .ToList();
-            ScopeAccessor.AmbientScope.Database.UpdateBatch(updateBatch, new BatchOptions { BatchSize = 100 });
+            var updated = ScopeAccessor.AmbientScope.Database.UpdateBatch(updateBatch, new BatchOptions { BatchSize = 100 });
+            Assert.AreEqual(3, updated);
             scope.Complete();
         }
 
@@ -59,9 +60,9 @@ internal sealed class NPocoUpdateBatchTests : UmbracoIntegrationTest
             Assert.AreEqual(3, dtos.Count);
             for (var i = 0; i < 3; i++)
             {
-                dtos[i].ServerAddress = servers[i].ServerAddress;
-                dtos[i].ServerIdentity = servers[i].ServerIdentity;
-                dtos[i].IsActive = servers[i].IsActive;
+                Assert.AreEqual(servers[i].ServerAddress, dtos[i].ServerAddress);
+                Assert.AreEqual(servers[i].ServerIdentity, dtos[i].ServerIdentity);
+                Assert.AreEqual(servers[i].IsActive, dtos[i].IsActive);
             }
         }
     }
