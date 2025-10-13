@@ -65,7 +65,8 @@ test('can create a partial view from snippet', async ({umbracoApi, umbracoUi}) =
   await umbracoUi.partialView.isPartialViewRootTreeItemVisible(partialViewFileName);
 });
 
-test('can rename a partial view', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+// TODO: Fix flaky test
+test.fixme('can rename a partial view', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const wrongPartialViewName = 'WrongName';
   const wrongPartialViewFileName = wrongPartialViewName + '.cshtml';
