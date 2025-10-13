@@ -62,33 +62,31 @@ export class UmbPartialViewCreateOptionsModalElement extends UmbModalBaseElement
 
 	override render() {
 		return html`
-			<umb-body-layout headline="Create Partial View">
-				<uui-box>
-					<!-- TODO: construct url -->
-					<uui-menu-item
-						href=${this.#getCreateHref()}
-						label=${this.localize.term('create_newEmptyPartialView')}
-						@click=${this.#onNavigate}>
-						<uui-icon slot="icon" name="icon-document-html"></uui-icon>
-					</uui-menu-item>
+			<uui-dialog-layout headline="Create Partial View">
+				<!-- TODO: construct url -->
+				<uui-menu-item
+					href=${this.#getCreateHref()}
+					label=${this.localize.term('create_newEmptyPartialView')}
+					@click=${this.#onNavigate}>
+					<uui-icon slot="icon" name="icon-document-html"></uui-icon>
+				</uui-menu-item>
 
-					<uui-menu-item
-						@click=${this.#onCreateFromSnippetClick}
-						label="${this.localize.term('create_newPartialViewFromSnippet')}...">
-						<uui-icon slot="icon" name="icon-document-html"></uui-icon>
-					</uui-menu-item>
+				<uui-menu-item
+					@click=${this.#onCreateFromSnippetClick}
+					label="${this.localize.term('create_newPartialViewFromSnippet')}...">
+					<uui-icon slot="icon" name="icon-document-html"></uui-icon>
+				</uui-menu-item>
 
-					<uui-menu-item @click=${this.#onCreateFolderClick} label="${this.localize.term('create_newFolder')}...">
-						<uui-icon slot="icon" name="icon-folder"></uui-icon>
-					</uui-menu-item>
-				</uui-box>
+				<uui-menu-item @click=${this.#onCreateFolderClick} label="${this.localize.term('create_newFolder')}...">
+					<uui-icon slot="icon" name="icon-folder"></uui-icon>
+				</uui-menu-item>
 
 				<uui-button
 					slot="actions"
 					id="cancel"
 					label=${this.localize.term('buttons_confirmActionCancel')}
 					@click="${this._rejectModal}"></uui-button>
-			</umb-body-layout>
+			</uui-dialog-layout>
 		`;
 	}
 }
