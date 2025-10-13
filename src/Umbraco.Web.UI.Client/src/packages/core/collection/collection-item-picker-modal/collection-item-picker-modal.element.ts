@@ -98,6 +98,8 @@ export class UmbCollectionItemPickerModalElement extends UmbModalBaseElement<
 		this.modalContext?.dispatchEvent(new UmbDeselectedEvent(event.unique));
 	}
 
+	#searchSelectableFilter = () => true;
+
 	override render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('general_choose')}>
@@ -106,10 +108,14 @@ export class UmbCollectionItemPickerModalElement extends UmbModalBaseElement<
 			</umb-body-layout>
 		`;
 	}
+
 	#renderSearch() {
+		const selectableFilter =
+			this.data?.search?.pickableFilter ?? this.data?.pickableFilter ?? this.#searchSelectableFilter;
+
 		return html`
 			<umb-picker-search-field></umb-picker-search-field>
-			<umb-picker-search-result .pickableFilter=${this.data?.pickableFilter}></umb-picker-search-result>
+			<umb-picker-search-result .pickableFilter=${selectableFilter}></umb-picker-search-result>
 		`;
 	}
 

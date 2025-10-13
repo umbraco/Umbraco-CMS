@@ -14,6 +14,7 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 import { UmbModalToken, type UmbPickerModalData } from '@umbraco-cms/backoffice/modal';
 import {
 	UMB_TREE_PICKER_MODAL_ALIAS,
+	type UmbTreeItemModel,
 	type UmbTreePickerModalData,
 	type UmbTreePickerModalValue,
 } from '@umbraco-cms/backoffice/tree';
@@ -133,7 +134,7 @@ export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<UmbIt
 	#createTreeItemPickerModalToken(api: UmbPickerTreeDataSource) {
 		const supportsSearch = isPickerSearchableDataSource(api);
 
-		return new UmbModalToken<UmbTreePickerModalData<UmbItemModel>, UmbTreePickerModalValue>(
+		return new UmbModalToken<UmbTreePickerModalData<UmbTreeItemModel>, UmbTreePickerModalValue>(
 			UMB_TREE_PICKER_MODAL_ALIAS,
 			{
 				modal: {
@@ -143,9 +144,12 @@ export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<UmbIt
 				data: {
 					treeAlias: UMB_ENTITY_DATA_PICKER_TREE_ALIAS,
 					hideTreeRoot: true,
+					// TODO: make specific pickable filter for tree to avoid type issues
+					pickableFilter: api.treePickableFilter,
 					search: supportsSearch
 						? {
 								providerAlias: UMB_ENTITY_DATA_PICKER_SEARCH_PROVIDER_ALIAS,
+								pickableFilter: api.searchPickableFilter,
 							}
 						: undefined,
 				},
@@ -167,9 +171,12 @@ export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<UmbIt
 					collection: {
 						menuAlias: UMB_ENTITY_DATA_PICKER_COLLECTION_MENU_ALIAS,
 					},
+					// TODO: make specific pickable filter for collection to avoid type issues
+					pickableFilter: api.collectionPickableFilter,
 					search: supportsSearch
 						? {
 								providerAlias: UMB_ENTITY_DATA_PICKER_SEARCH_PROVIDER_ALIAS,
+								pickableFilter: api.searchPickableFilter,
 							}
 						: undefined,
 				},
