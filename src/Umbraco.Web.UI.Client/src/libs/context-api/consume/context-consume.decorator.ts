@@ -114,43 +114,41 @@ export function consume<BaseType extends UmbContextMinimal = UmbContextMinimal, 
 						}
 					});
 				});
-			} else {
 				// Fallback: wrap hostConnected for classes without addInitializer
-				if ('hostConnected' in protoOrTarget && typeof protoOrTarget.hostConnected === 'function') {
-					const originalHostConnected = protoOrTarget.hostConnected;
+			} else if ('hostConnected' in protoOrTarget && typeof protoOrTarget.hostConnected === 'function') {
+				const originalHostConnected = protoOrTarget.hostConnected;
 
-					protoOrTarget.hostConnected = function (this: any) {
-						// Set up consumer once, using a flag to prevent multiple setups
-						if (!this.__consumeControllers) {
-							this.__consumeControllers = new Map();
+				protoOrTarget.hostConnected = function (this: any) {
+					// Set up consumer once, using a flag to prevent multiple setups
+					if (!this.__consumeControllers) {
+						this.__consumeControllers = new Map();
+					}
+
+					if (!this.__consumeControllers.has(propertyKey)) {
+						if (subscribe) {
+							// Continuous subscription
+							const controller = new UmbContextConsumerController(this, context, (value) => {
+								this[propertyKey] = value;
+								callback?.(value);
+							});
+							this.__consumeControllers.set(propertyKey, controller);
+						} else {
+							// One-time consumption using asPromise()
+							const controller = new UmbContextConsumerController(this, context, callback);
+							controller.asPromise().then((value) => {
+								this[propertyKey] = value;
+							});
+							// Don't store in map since it cleans itself up
 						}
+					}
 
-						if (!this.__consumeControllers.has(propertyKey)) {
-							if (subscribe) {
-								// Continuous subscription
-								const controller = new UmbContextConsumerController(this, context, (value) => {
-									this[propertyKey] = value;
-									callback?.(value);
-								});
-								this.__consumeControllers.set(propertyKey, controller);
-							} else {
-								// One-time consumption using asPromise()
-								const controller = new UmbContextConsumerController(this, context, callback);
-								controller.asPromise().then((value) => {
-									this[propertyKey] = value;
-								});
-								// Don't store in map since it cleans itself up
-							}
-						}
-
-						// Call original hostConnected if it exists
-						originalHostConnected?.call(this);
-					};
-				} else {
-					console.warn(
-						`@consume applied to ${constructor.name}.${String(propertyKey)} but addInitializer is not available. Make sure the class extends UmbLitElement or implements UmbController with hostConnected.`,
-					);
-				}
+					// Call original hostConnected if it exists
+					originalHostConnected?.call(this);
+				};
+			} else {
+				console.warn(
+					`@consume applied to ${constructor.name}.${String(propertyKey)} but addInitializer is not available. Make sure the class extends UmbLitElement or implements UmbController with hostConnected.`,
+				);
 			}
 		}
 	}) as any;
