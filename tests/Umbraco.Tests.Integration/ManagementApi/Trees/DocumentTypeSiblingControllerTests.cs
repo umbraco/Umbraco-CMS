@@ -25,7 +25,6 @@ public class DocumentTypeSiblingControllerTests : ManagementApiUserGroupTestBase
         _secondContentTypeKey = Guid.NewGuid();
         await ContentTypeContainerService.CreateAsync(_secondContentTypeKey, "SecondTest", Constants.System.RootKey,
             Constants.Security.SuperUserKey);
-
     }
 
     protected override Expression<Func<SiblingsDocumentTypeTreeController, object>> MethodSelector =>
