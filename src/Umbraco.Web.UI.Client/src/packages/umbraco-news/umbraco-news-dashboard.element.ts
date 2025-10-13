@@ -100,11 +100,9 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 										() => nothing,
 									)}
 									<div class="card-body">
-										${g.priority === 1
+										${g.priority <= 2
 											? html`<h2 class="card-title">${i.header}</h2>`
-											: g.priority === 2
-												? html`<h3 class="card-title">${i.header}</h3>`
-												: html`<h4 class="card-title">${i.header}</h4>`}
+											: html`<h3 class="card-title">${i.header}</h3>`}
 										${i.body ? html`<div class="card-text">${unsafeHTML(i.body)}</div>` : null}
 										${!isLastRow && i.url
 											? html`<div class="card-actions">
@@ -291,7 +289,7 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 				margin: 0;
 			}
 			.card-text > p {
-				margin: 0;
+				margin: var(--uui-size-space-3) 0;
 			}
 
 			.normal-priority {
