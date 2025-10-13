@@ -100,7 +100,11 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 										() => nothing,
 									)}
 									<div class="card-body">
-										<h4 class="card-title">${i.header}</h4>
+										${g.priority === 1
+											? html`<h2 class="card-title">${i.header}</h2>`
+											: g.priority === 2
+												? html`<h3 class="card-title">${i.header}</h3>`
+												: html`<h4 class="card-title">${i.header}</h4>`}
 										${i.body ? html`<div class="card-text">${unsafeHTML(i.body)}</div>` : null}
 										${!isLastRow && i.url
 											? html`<div class="card-actions">
@@ -112,7 +116,7 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 									</div>
 								`;
 
-								// LAST ROW: whole card is a link (no inner button)
+								// LAST ROW: whole card is a link
 								return isLastRow
 									? i.url
 										? html`
@@ -182,29 +186,9 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 			:host {
 				display: block;
 				padding: var(--uui-size-layout-1);
-			}
-
-			.dashboard-hero {
-				background: var(--uui-color-surface-emphasis);
-				border-radius: var(--uui-border-radius, 8px);
-				padding: var(--uui-size-space-6);
-				text-align: center;
-				margin-bottom: var(--uui-size-space-5);
-			}
-
-			.hero-title {
-				margin: 0 0 var(--uui-size-space-2) 0;
-				font-weight: 700;
-				font-size: 1.5rem;
-				color: var(--uui-color-text);
-			}
-
-			.hero-subtitle {
-				margin: 0;
-				max-width: 60ch;
-				margin-inline: auto;
-				line-height: 1.5;
-				color: var(--uui-color-text-alt);
+				max-width: 1500px;
+				container-type: inline-size;
+				container-name: dashboard;
 			}
 
 			p {
@@ -264,12 +248,12 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 				margin-top: var(--uui-size-space-5);
 			}
 
-			@media (max-width: 1200px) {
+			@container (max-width: 1200px) {
 				.cards {
 					grid-template-columns: repeat(auto-fit, minmax(2, 1fr));
 				}
 			}
-			@media (max-width: 700px) {
+			@container (max-width: 700px) {
 				.cards {
 					grid-template-columns: 1fr;
 				}
@@ -277,7 +261,7 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 
 			/* Card */
 			.card {
-				background: var(--uui-color-surface-emphasis);
+				background: var(--uui-color-surface);
 				border-radius: var(--uui-border-radius, 8px);
 				overflow: hidden;
 				display: flex;
@@ -297,22 +281,26 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 			.card-body {
 				display: flex;
 				flex-direction: column;
-				padding: var(--uui-size-space-4);
+				padding: var(--uui-size-space-4) var(--uui-size-space-6);
 				flex: 1 1 auto;
 				justify-content: space-between;
 			}
+			.card-body > h2,
+			.card-body > h3,
 			.card-body > h4 {
 				margin: 0;
 			}
 
 			.normal-priority {
-				background: var(--uui-color-surface);
 				border: 1px solid var(--uui-color-divider);
 				display: block;
 				text-decoration: none;
 				color: inherit;
 				border-radius: var(--uui-border-radius, 8px);
 				overflow: hidden;
+			}
+			.card-actions {
+				align-self: end;
 			}
 		`,
 	];
