@@ -373,12 +373,13 @@ export class UmbPropertyEditorUIBlockListElement
 		return html`
 			${repeat(
 				this._layouts,
-				(x) => x.contentKey,
-				(layoutEntry, index) => html`
+				(layout, index) => `${index}_${layout.contentKey}`,
+				(layout, index) => html`
 					${this.#renderInlineCreateButton(index)}
 					<umb-block-list-entry
-						.contentKey=${layoutEntry.contentKey}
-						.layout=${layoutEntry}
+						index=${index}
+						.contentKey=${layout.contentKey}
+						.layout=${layout}
 						${umbDestroyOnDisconnect()}>
 					</umb-block-list-entry>
 				`,
@@ -391,7 +392,7 @@ export class UmbPropertyEditorUIBlockListElement
 		if (this.readonly && this._layouts.length > 0) {
 			return nothing;
 		} else {
-			return html` <uui-button-group> ${this.#renderCreateButton()} ${this.#renderPasteButton()} </uui-button-group> `;
+			return html`<uui-button-group>${this.#renderCreateButton()}${this.#renderPasteButton()}</uui-button-group>`;
 		}
 	}
 
