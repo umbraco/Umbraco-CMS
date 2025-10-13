@@ -96,6 +96,15 @@ export class UmbDocumentWorkspaceContext
 			const allowSegmentCreation = config?.allowNonExistingSegmentsCreation ?? false;
 			const allowEditInvariantFromNonDefault = config?.allowEditInvariantFromNonDefault ?? true;
 
+			// Deprecation warning for allowNonExistingSegmentsCreation (default from server is true, so we warn on false)
+			if (!allowSegmentCreation) {
+				new UmbDeprecation({
+					deprecated: 'The "AllowNonExistingSegmentsCreation" setting is deprecated.',
+					removeInVersion: '19.0.0',
+					solution: 'This functionality will be moved to a client-side extension.',
+				}).warn();
+			}
+
 			this._variantOptionsFilter = (variantOption) => {
 				const isNotCreatedSegmentVariant = variantOption.segment && !variantOption.variant;
 
@@ -127,20 +136,24 @@ export class UmbDocumentWorkspaceContext
 			this.#publishingContext = context;
 		});
 
-		this.observe(this.isNew, (isNew) => {
-			if (isNew === undefined) return;
-			if (isNew) {
-				this.#enforceUserPermission(
-					UMB_USER_PERMISSION_DOCUMENT_CREATE,
-					'You do not have permission to create documents.',
-				);
-			} else {
-				this.#enforceUserPermission(
-					UMB_USER_PERMISSION_DOCUMENT_UPDATE,
-					'You do not have permission to update documents.',
-				);
-			}
-		});
+		this.observe(
+			this.isNew,
+			(isNew) => {
+				if (isNew === undefined) return;
+				if (isNew) {
+					this.#enforceUserPermission(
+						UMB_USER_PERMISSION_DOCUMENT_CREATE,
+						'You do not have permission to create documents.',
+					);
+				} else {
+					this.#enforceUserPermission(
+						UMB_USER_PERMISSION_DOCUMENT_UPDATE,
+						'You do not have permission to update documents.',
+					);
+				}
+			},
+			null,
+		);
 
 		this.routes.setRoutes([
 			{

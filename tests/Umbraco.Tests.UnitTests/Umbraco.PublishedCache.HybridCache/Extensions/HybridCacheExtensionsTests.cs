@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Caching.Hybrid;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Infrastructure.HybridCache;
 using Umbraco.Cms.Infrastructure.HybridCache.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.PublishedCache.HybridCache.Extensions;
@@ -27,20 +28,20 @@ public class HybridCacheExtensionsTests
     {
         // Arrange
         string key = "test-key";
-        var expectedValue = "test-value";
+        var expectedValue = new ContentCacheNode { Id = 1234 };
 
         _cacheMock
             .Setup(cache => cache.GetOrCreateAsync(
                 key,
                 null!,
-                It.IsAny<Func<object, CancellationToken, ValueTask<object>>>(),
+                It.IsAny<Func<object, CancellationToken, ValueTask<ContentCacheNode>>>(),
                 It.IsAny<HybridCacheEntryOptions>(),
                 null,
                 CancellationToken.None))
             .ReturnsAsync(expectedValue);
 
         // Act
-        var exists = await HybridCacheExtensions.ExistsAsync(_cacheMock.Object, key);
+        var exists = await HybridCacheExtensions.ExistsAsync<ContentCacheNode>(_cacheMock.Object, key);
 
         // Assert
         Assert.IsTrue(exists);
@@ -56,14 +57,14 @@ public class HybridCacheExtensionsTests
             .Setup(cache => cache.GetOrCreateAsync(
                 key,
                 null!,
-                It.IsAny<Func<object, CancellationToken, ValueTask<object>>>(),
+                It.IsAny<Func<object, CancellationToken, ValueTask<ContentCacheNode>>>(),
                 It.IsAny<HybridCacheEntryOptions>(),
                 null,
                 CancellationToken.None))
             .Returns((
                 string key,
                 object? state,
-                Func<object, CancellationToken, ValueTask<object>> factory,
+                Func<object, CancellationToken, ValueTask<ContentCacheNode>> factory,
                 HybridCacheEntryOptions? options,
                 IEnumerable<string>? tags,
                 CancellationToken token) =>
@@ -72,7 +73,7 @@ public class HybridCacheExtensionsTests
             });
 
         // Act
-        var exists = await HybridCacheExtensions.ExistsAsync(_cacheMock.Object, key);
+        var exists = await HybridCacheExtensions.ExistsAsync<ContentCacheNode>(_cacheMock.Object, key);
 
         // Assert
         Assert.IsFalse(exists);

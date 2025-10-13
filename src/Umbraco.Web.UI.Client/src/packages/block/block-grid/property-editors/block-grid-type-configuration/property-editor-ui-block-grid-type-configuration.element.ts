@@ -182,7 +182,7 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 		const groupName = this.#blockGroups?.find((group) => group.key === groupKey)?.name ?? '';
 		await umbConfirmModal(this, {
 			headline: '#blockEditor_confirmDeleteBlockGroupTitle',
-			content: this.localize.term('#blockEditor_confirmDeleteBlockGroupMessage', [groupName]),
+			content: this.localize.term('blockEditor_confirmDeleteBlockGroupMessage', [groupName]),
 			color: 'danger',
 			confirmLabel: '#general_delete',
 		});
@@ -232,33 +232,37 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 
 	#renderGroupInput(groupKey: string, groupName?: string) {
 		return html`<div class="group-handle">
+			<uui-icon name="icon-grip"></uui-icon>
 			<uui-input
-				auto-width
 				label="Group"
 				.value=${groupName ?? ''}
 				@change=${(e: UUIInputEvent) => this.#onGroupNameChange(e, groupKey)}>
-				<uui-button compact slot="append" label="delete" @click=${() => this.#deleteGroup(groupKey)}>
-					<uui-icon name="icon-trash"></uui-icon>
-				</uui-button>
 			</uui-input>
+			<uui-button
+				compact
+				label=${this.localize.term('general_delete')}
+				look="outline"
+				@click=${() => this.#deleteGroup(groupKey)}>
+				<uui-icon name="icon-trash"></uui-icon>
+			</uui-button>
 		</div>`;
 	}
 
 	static override styles = [
 		UmbTextStyles,
 		css`
-			uui-input:not(:hover, :focus) {
-				border: 1px solid transparent;
-			}
-			uui-input:not(:hover, :focus) uui-button {
-				opacity: 0;
-			}
-
 			.group-handle {
-				padding: var(--uui-size-1);
+				display: flex;
+				align-items: center;
+				padding: var(--uui-size-3) var(--uui-size-1);
 				margin-top: var(--uui-size-6);
 				margin-bottom: var(--uui-size-4);
+				gap: var(--uui-size-1);
 				cursor: grab;
+			}
+
+			.group-handle:active {
+				cursor: grabbing;
 			}
 
 			.group-handle:hover {
@@ -268,6 +272,10 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 
 			.group:has([drag-placeholder]) {
 				opacity: 0.2;
+			}
+
+			uui-input {
+				flex: 1;
 			}
 		`,
 	];

@@ -1,11 +1,11 @@
 import { UmbPropertyEditorUIDropdownElement } from './property-editor-ui-dropdown.element.js';
 import { expect, fixture, html } from '@open-wc/testing';
 import { type UmbTestRunnerWindow, defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
-import { 
-	setupBasicStringConfig, 
-	setupObjectConfig, 
+import {
+	setupBasicStringConfig,
+	setupObjectConfig,
 	setupEmptyConfig,
-	MULTI_SELECT_TEST_DATA
+	MULTI_SELECT_TEST_DATA,
 } from '../utils/property-editor-test-utils.js';
 
 describe('UmbPropertyEditorUIDropdownElement', () => {
@@ -27,19 +27,19 @@ describe('UmbPropertyEditorUIDropdownElement', () => {
 	function getLocalSelectedValues() {
 		const dropdownInput = getLocalDropdownInput();
 		const selectElement = getNativeSelectElement();
-		
+
 		if (dropdownInput) {
 			// Single mode - the dropdown input value might be a string or comma-separated string
 			const value = dropdownInput.value;
 			if (!value) return [];
 			// Handle both single values and comma-separated values
-			return typeof value === 'string' ? value.split(', ').filter(v => v.length > 0) : [value];
+			return typeof value === 'string' ? value.split(', ').filter((v) => v.length > 0) : [value];
 		} else if (selectElement) {
 			// Multiple mode
 			const selectedOptions = selectElement.selectedOptions;
-			return selectedOptions ? Array.from(selectedOptions).map(option => option.value) : [];
+			return selectedOptions ? Array.from(selectedOptions).map((option) => option.value) : [];
 		}
-		
+
 		return [];
 	}
 
@@ -58,7 +58,7 @@ describe('UmbPropertyEditorUIDropdownElement', () => {
 					return multiple;
 				}
 				return undefined;
-			}
+			},
 		} as any;
 	}
 
@@ -193,9 +193,9 @@ describe('UmbPropertyEditorUIDropdownElement', () => {
 						return false;
 					}
 					return undefined;
-				}
+				},
 			} as any;
-			
+
 			element.value = ['Option1'];
 			await element.updateComplete;
 
@@ -209,16 +209,16 @@ describe('UmbPropertyEditorUIDropdownElement', () => {
 						return [
 							{ name: 'Red Color', value: 'red' },
 							{ name: 'Green Color', value: 'green' },
-							{ name: 'Blue Color', value: 'blue' }
+							{ name: 'Blue Color', value: 'blue' },
 						];
 					}
 					if (alias === 'multiple') {
 						return false;
 					}
 					return undefined;
-				}
+				},
 			} as any;
-			
+
 			element.value = ['red'];
 			await element.updateComplete;
 
@@ -227,9 +227,9 @@ describe('UmbPropertyEditorUIDropdownElement', () => {
 
 		it('should handle empty configuration gracefully', async () => {
 			element.config = {
-				getValueByAlias: () => undefined
+				getValueByAlias: () => undefined,
 			} as any;
-			
+
 			element.value = ['test'];
 			await element.updateComplete;
 
