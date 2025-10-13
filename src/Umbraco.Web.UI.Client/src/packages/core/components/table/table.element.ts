@@ -160,7 +160,7 @@ export class UmbTableElement extends UmbLitElement {
 	override updated(changedProperties: Map<string | number | symbol, unknown>) {
 		super.updated(changedProperties);
 		if (changedProperties.has('selection')) {
-			this._selectionMode = !(this.selection.length === 0);
+			this._selectionMode = this.selection.length > 0;
 		}
 	}
 
