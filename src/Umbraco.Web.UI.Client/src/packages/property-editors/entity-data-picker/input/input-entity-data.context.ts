@@ -85,6 +85,9 @@ export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<UmbIt
 	}
 
 	override async openPicker(pickerData?: Partial<UmbPickerModalData<UmbItemModel>>) {
+		// TODO: investigate type issues
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		this.modalAlias = this.#getModalToken();
 		await super.openPicker(pickerData);
 	}
