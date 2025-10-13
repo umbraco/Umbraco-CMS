@@ -39,7 +39,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 		return this.#legacyMergedChildContainers.asObservable();
 	}
 
-	#childContainersMerged = new UmbArrayState<UmbPropertyTypeContainerMergedModel>([], (x) => x.path);
+	#childContainersMerged = new UmbArrayState<UmbPropertyTypeContainerMergedModel>([], (x) => x.key);
 	public readonly childContainers = this.#childContainersMerged.asObservable();
 
 	// Owner containers are containers owned by the owner Content Type (The specific one up for editing)

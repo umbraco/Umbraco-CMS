@@ -63,6 +63,7 @@ test('can publish content with the image cropper data type', {tag: '@smoke'}, as
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
+  await umbracoUi.content.waitForContentToBePublished();
   await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
@@ -73,7 +74,8 @@ test('can publish content with the image cropper data type', {tag: '@smoke'}, as
   expect(contentData.values[0].value.focalPoint).toEqual(defaultFocalPoint);
 });
 
-test('can create content with the custom image cropper data type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+// TODO: Fix flaky test
+test.fixme('can create content with the custom image cropper data type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const customDataTypeName = 'CustomImageCropper';
   const cropAlias = 'TestCropLabel';

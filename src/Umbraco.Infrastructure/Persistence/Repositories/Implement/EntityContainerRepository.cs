@@ -16,9 +16,19 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// </summary>
 internal class EntityContainerRepository : EntityRepositoryBase<int, EntityContainer>, IEntityContainerRepository
 {
-    public EntityContainerRepository(IScopeAccessor scopeAccessor, AppCaches cache,
-        ILogger<EntityContainerRepository> logger, Guid containerObjectType)
-        : base(scopeAccessor, cache, logger)
+    public EntityContainerRepository(
+        IScopeAccessor scopeAccessor,
+        AppCaches cache,
+        ILogger<EntityContainerRepository> logger,
+        Guid containerObjectType,
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            cache,
+            logger,
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
         Guid[] allowedContainers =
         {

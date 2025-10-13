@@ -6,7 +6,6 @@ import { css, customElement, html, state } from '@umbraco-cms/backoffice/externa
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbCollectionColumnConfiguration } from '@umbraco-cms/backoffice/collection';
-import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 import type {
 	UmbTableColumn,
 	UmbTableConfig,
@@ -24,9 +23,6 @@ import './column-layouts/document-table-column-state.element.js';
 
 @customElement('umb-document-table-collection-view')
 export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
-	@state()
-	private _workspacePathBuilder?: UmbModalRouteBuilder;
-
 	@state()
 	private _userDefinedProperties?: Array<UmbCollectionColumnConfiguration>;
 
@@ -70,16 +66,6 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 		this.consumeContext(UMB_DOCUMENT_COLLECTION_CONTEXT, (collectionContext) => {
 			this.#collectionContext = collectionContext;
 			collectionContext?.setupView(this);
-			this.observe(
-				collectionContext?.workspacePathBuilder,
-				(builder) => {
-					this._workspacePathBuilder = builder;
-					if (this.#collectionContext) {
-						this.#createTableItems(this.#collectionContext.getItems());
-					}
-				},
-				'observePath',
-			);
 			this.#observeCollectionContext();
 		});
 	}
@@ -148,13 +134,9 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 						};
 					}
 
-					const editPath =
-						item.unique && this._workspacePathBuilder
-							? this._workspacePathBuilder({ entityType: item.entityType }) +
-								UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN.generateLocal({
-									unique: item.unique,
-								})
-							: '';
+					const editPath = UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN.generateAbsolute({
+						unique: item.unique,
+					});
 
 					return {
 						columnAlias: column.alias,

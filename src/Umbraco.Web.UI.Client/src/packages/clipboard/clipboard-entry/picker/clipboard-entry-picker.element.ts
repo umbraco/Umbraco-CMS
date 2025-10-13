@@ -156,7 +156,7 @@ export class UmbClipboardEntryPickerElement extends UmbLitElement {
 				slot="actions"
 				.entityType=${item.entityType}
 				.unique=${item.unique}
-				.label=${this.localize.term('actions_viewActionsFor', [item.name])}>
+				.label=${this.localize.string(item.name ?? '')}>
 			</umb-entity-actions-bundle>
 		`;
 	}

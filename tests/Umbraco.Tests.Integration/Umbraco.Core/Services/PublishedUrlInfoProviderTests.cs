@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Tests.Common.Builders;
 
@@ -29,13 +30,15 @@ internal sealed class PublishedUrlInfoProviderTests : PublishedUrlInfoProviderTe
 
         // Assert the url of subpage is correct
         Assert.AreEqual(1, subPageUrls.Count);
-        Assert.IsTrue(subPageUrls.First().IsUrl);
-        Assert.AreEqual("/text-page-1/", subPageUrls.First().Text);
+        Assert.IsNotNull(subPageUrls.First().Url);
+        Assert.AreEqual("/text-page-1/", subPageUrls.First().Url!.ToString());
+        Assert.AreEqual(Constants.UrlProviders.Content, subPageUrls.First().Provider);
         Assert.AreEqual(Subpage.Key, DocumentUrlService.GetDocumentKeyByRoute("/text-page-1/", "en-US", null, false));
 
         // Assert the url of child of second root is not exposed
         Assert.AreEqual(1, childOfSecondRootUrls.Count);
-        Assert.IsFalse(childOfSecondRootUrls.First().IsUrl);
+        Assert.IsNull(childOfSecondRootUrls.First().Url);
+        Assert.AreEqual(Constants.UrlProviders.Content, childOfSecondRootUrls.First().Provider);
 
         // Ensure the url without hide top level is not finding the child of second root
         Assert.AreNotEqual(childOfSecondRoot.Key, DocumentUrlService.GetDocumentKeyByRoute("/second-root/text-page-1/", "en-US", null, false));

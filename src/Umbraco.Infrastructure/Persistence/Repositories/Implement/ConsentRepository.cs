@@ -20,8 +20,18 @@ internal sealed class ConsentRepository : EntityRepositoryBase<int, IConsent>, I
     /// <summary>
     ///     Initializes a new instance of the <see cref="ConsentRepository" /> class.
     /// </summary>
-    public ConsentRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<ConsentRepository> logger)
-        : base(scopeAccessor, cache, logger)
+    public ConsentRepository(
+        IScopeAccessor scopeAccessor,
+        AppCaches cache,
+        ILogger<ConsentRepository> logger,
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            cache,
+            logger,
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
     }
 

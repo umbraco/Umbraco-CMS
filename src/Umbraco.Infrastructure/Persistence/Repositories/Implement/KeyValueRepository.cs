@@ -14,8 +14,17 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
 internal sealed class KeyValueRepository : EntityRepositoryBase<string, IKeyValue>, IKeyValueRepository
 {
-    public KeyValueRepository(IScopeAccessor scopeAccessor, ILogger<KeyValueRepository> logger)
-        : base(scopeAccessor, AppCaches.NoCache, logger)
+    public KeyValueRepository(
+        IScopeAccessor scopeAccessor,
+        ILogger<KeyValueRepository> logger,
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            AppCaches.NoCache,
+            logger,
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
     }
 

@@ -116,7 +116,7 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 	#getHref(structureItem: any) {
 		if (structureItem.isFolder) return undefined;
 		const workspaceBasePath = `section/${this.#sectionContext?.getPathname()}/workspace/${structureItem.entityType}/edit`;
-		return `${workspaceBasePath}/${structureItem.unique}/${this._workspaceActiveVariantId?.culture}`;
+		return `${workspaceBasePath}/${structureItem.unique}/${this._workspaceActiveVariantId?.toCultureString()}`;
 	}
 
 	override render() {

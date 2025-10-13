@@ -7,6 +7,7 @@ import {
 } from '../../constants.js';
 import { UMB_DOCUMENT_REFERENCE_REPOSITORY_ALIAS } from '../../reference/constants.js';
 import { UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS } from '../../item/constants.js';
+import { UmbDocumentItemDataResolver } from '../../item/document-item-data-resolver.js';
 import { manifests as bulkTrashManifests } from './bulk-trash/manifests.js';
 import {
 	UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
@@ -25,6 +26,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			itemRepositoryAlias: UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS,
 			recycleBinRepositoryAlias: UMB_DOCUMENT_RECYCLE_BIN_REPOSITORY_ALIAS,
 			referenceRepositoryAlias: UMB_DOCUMENT_REFERENCE_REPOSITORY_ALIAS,
+			itemDataResolver: UmbDocumentItemDataResolver,
 		},
 		conditions: [
 			{

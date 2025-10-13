@@ -24,8 +24,18 @@ internal sealed class LanguageRepository : EntityRepositoryBase<int, ILanguage>,
     private readonly Dictionary<string, int> _codeIdMap = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<int, string> _idCodeMap = new();
 
-    public LanguageRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<LanguageRepository> logger)
-        : base(scopeAccessor, cache, logger)
+    public LanguageRepository(
+        IScopeAccessor scopeAccessor,
+        AppCaches cache,
+        ILogger<LanguageRepository> logger,
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            cache,
+            logger,
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
     }
 
@@ -127,7 +137,7 @@ internal sealed class LanguageRepository : EntityRepositoryBase<int, ILanguage>,
     public int? GetDefaultId() => GetDefault().Id;
 
     protected override IRepositoryCachePolicy<ILanguage, int> CreateCachePolicy() =>
-        new FullDataSetRepositoryCachePolicy<ILanguage, int>(GlobalIsolatedCache, ScopeAccessor, GetEntityId, /*expires:*/ false);
+        new FullDataSetRepositoryCachePolicy<ILanguage, int>(GlobalIsolatedCache, ScopeAccessor,  RepositoryCacheVersionService, CacheSyncService, GetEntityId, /*expires:*/ false);
 
     protected ILanguage ConvertFromDto(LanguageDto dto)
     {
