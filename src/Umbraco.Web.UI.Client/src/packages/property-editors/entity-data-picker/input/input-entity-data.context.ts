@@ -142,7 +142,7 @@ export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<UmbIt
 				},
 				data: {
 					treeAlias: UMB_ENTITY_DATA_PICKER_TREE_ALIAS,
-					expandTreeRoot: true,
+					hideTreeRoot: true,
 					search: supportsSearch
 						? {
 								providerAlias: UMB_ENTITY_DATA_PICKER_SEARCH_PROVIDER_ALIAS,
