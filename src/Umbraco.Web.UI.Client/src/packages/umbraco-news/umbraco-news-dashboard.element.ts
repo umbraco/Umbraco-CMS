@@ -71,7 +71,7 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 
 	override render() {
 		if (!this._loaded) {
-			return;
+			return html`<div class="loader"><uui-loader></uui-loader></div>`;
 		}
 
 		if (this._items.length === 0) {
@@ -187,6 +187,12 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 				max-width: 1500px;
 				container-type: inline-size;
 				container-name: dashboard;
+			}
+
+			.loader {
+				display: flex;
+				justify-content: center;
+				align-items: center;
 			}
 
 			p {
