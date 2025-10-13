@@ -1,2 +1,2 @@
 export * from './umbraco-news.respository.js';
-export type * from './sources/index.js';
+export * from './umbraco-news.server.data-source.js';
