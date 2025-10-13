@@ -1132,8 +1132,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             IEnumerable<PropertyDataDto> propertyDataDtos = PropertyFactory.BuildDtos(entity.ContentType.Variations, entity.VersionId, publishedVersionId, entity.Properties, LanguageRepository, out edited, out editedCultures);
 
-            var sw = new System.Diagnostics.Stopwatch();
-            sw.Start();
             var toUpdate = new List<PropertyDataDto>();
             var toInsert = new List<PropertyDataDto>();
             foreach (PropertyDataDto propertyDataDto in propertyDataDtos)
@@ -1165,9 +1163,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             {
                 Database.InsertBulk(toInsert);
             }
-
-            sw.Stop();
-            Logger.LogInformation("Time taken to update/insert property data: {Elapsed}", sw.Elapsed);
 
             // For any remaining that haven't been processed they need to be deleted
             if (existingPropDataIds.Count > 0)
