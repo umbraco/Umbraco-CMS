@@ -109,9 +109,28 @@ export function provide<
 				}
 
 				Object.defineProperty(protoOrTarget, propertyKey, newDescriptor);
+			} else if ('hostConnected' in protoOrTarget && typeof protoOrTarget.hostConnected === 'function') {
+				const originalHostConnected = protoOrTarget.hostConnected;
+
+				protoOrTarget.hostConnected = function (this: any) {
+					// Set up provider once, using a flag to prevent multiple setups
+					if (!this.__provideControllers) {
+						this.__provideControllers = new Map();
+					}
+
+					if (!this.__provideControllers.has(propertyKey)) {
+						// Get initial value from property if it exists
+						const initialValue = this[propertyKey];
+						const controller = new UmbContextProviderController(this, context, initialValue);
+						this.__provideControllers.set(propertyKey, controller);
+						controllerMap.set(this, controller);
+					}
+
+					originalHostConnected.call(this);
+				};
 			} else {
 				console.warn(
-					`@provide applied to ${constructor.name}.${String(propertyKey)} but addInitializer is not available.`,
+					`@provide applied to ${constructor.name}.${String(propertyKey)} but addInitializer is not available. Make sure the class extends UmbLitElement or implements UmbController with hostConnected.`,
 				);
 			}
 		}
