@@ -1,18 +1,18 @@
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UmbNewsDashboardRepository } from './repository/index.js';
 import {
 	css,
 	customElement,
 	html,
+	nothing,
+	repeat,
 	state,
 	unsafeHTML,
 	when,
-	nothing,
-	repeat,
 } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbNewsDashboardRepository } from './repository/index.js';
-import type { NewsDashboardItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { sanitizeHTML } from '@umbraco-cms/backoffice/utils';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { NewsDashboardItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 interface UmbNewsDashboardGroupedItems {
 	priority: number;
