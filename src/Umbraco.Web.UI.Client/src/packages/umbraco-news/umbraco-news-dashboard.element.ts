@@ -281,13 +281,16 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 			.card-body {
 				display: flex;
 				flex-direction: column;
-				padding: var(--uui-size-space-4) var(--uui-size-space-6);
+				padding: var(--uui-size-space-5);
 				flex: 1 1 auto;
 				justify-content: space-between;
 			}
 			.card-body > h2,
 			.card-body > h3,
 			.card-body > h4 {
+				margin: 0;
+			}
+			.card-text > p {
 				margin: 0;
 			}
 
