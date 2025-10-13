@@ -1,3 +1,13 @@
+/*
+ * Portions of this code are adapted from @lit/context
+ * Copyright 2017 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
+ * Original source: https://github.com/lit/lit/tree/main/packages/context
+ *
+ * @license BSD-3-Clause
+ */
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { UmbContextToken } from '../token/index.js';
 import type { UmbContextMinimal } from '../types.js';
