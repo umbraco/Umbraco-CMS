@@ -267,6 +267,10 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 			.card {
 				background: var(--uui-color-surface);
 				border-radius: var(--uui-border-radius, 8px);
+				box-shadow: var(
+					--uui-box-box-shadow,
+					var(--uui-shadow-depth-1, 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24))
+				);
 				overflow: hidden;
 				display: flex;
 				flex-direction: column;
@@ -278,6 +282,7 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 				object-fit: cover;
 				display: block;
 			}
+
 			.card-img.placeholder {
 				height: 8px;
 			}
@@ -288,24 +293,30 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 				padding: var(--uui-size-space-5);
 				flex: 1 1 auto;
 				justify-content: space-between;
+				gap: var(--uui-size-space-3, 9px);
 			}
-			.card-body > h2,
-			.card-body > h3,
-			.card-body > h4 {
+
+			.card-title {
 				margin: 0;
 			}
+
 			.card-text > p {
-				margin: var(--uui-size-space-3) 0;
+				margin: 0;
 			}
 
 			.normal-priority {
-				border: 1px solid var(--uui-color-divider);
 				display: block;
+				border: 1px solid var(--uui-color-divider);
+				border-radius: var(--uui-border-radius, 8px);
 				text-decoration: none;
 				color: inherit;
-				border-radius: var(--uui-border-radius, 8px);
 				overflow: hidden;
+
+				.card-body {
+					gap: 0;
+				}
 			}
+
 			.card-actions {
 				align-self: end;
 			}
