@@ -102,9 +102,47 @@ export function consume<BaseType extends UmbContextMinimal = UmbContextMinimal, 
 					});
 				});
 			} else {
-				console.warn(
-					`@consume applied to ${constructor.name}.${String(propertyKey)} but addInitializer is not available.`,
-				);
+				// This could be a controller or something else that doesn't support initializers, so we check
+				// if we are in a controller and use `hostConnected` as a fallback.
+				if ('hostConnected' in protoOrTarget && typeof protoOrTarget.hostConnected === 'function') {
+					// Fallback: wrap hostConnected for classes without addInitializer
+					const originalHostConnected = protoOrTarget.hostConnected;
+
+					protoOrTarget.hostConnected = function (this: any) {
+						console.warn(
+							'[Test]: Using fallback hostConnected wrapper for @consume. Consider extending UmbLitElement or UmbController for better support.',
+						);
+						// Set up consumer once, using a flag to prevent multiple setups
+						if (!this.__consumeControllers) {
+							this.__consumeControllers = new Map();
+						}
+
+						if (!this.__consumeControllers.has(propertyKey)) {
+							const controller = new UmbContextConsumerController(this, context, (value) => {
+								this[propertyKey] = value;
+								callback?.(value);
+
+								if (!subscribe) {
+									controller.destroy();
+									this.__consumeControllers.delete(propertyKey);
+								}
+							});
+							this.__consumeControllers.set(propertyKey, controller);
+						}
+
+						// Call original hostConnected if it exists
+						originalHostConnected?.call(this);
+					};
+				} else {
+					// We could consider throwing here instead of just warning.
+					// But for now we just warn the developer that something might be wrong.
+					// Maybe they are using a different kind of decorator that handles initializers differently.
+					// Or maybe they are applying @consume to something that is not a controller at all.
+					// In any case, we cannot guarantee that the context will be consumed correctly.
+					console.warn(
+						`@consume applied to ${constructor.name}.${String(propertyKey)} but addInitializer is not available. Make sure the class extends UmbLitElement or UmbController, or that hostConnected is called manually.`,
+					);
+				}
 			}
 		}
 	}) as any;
