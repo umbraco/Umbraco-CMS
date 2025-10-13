@@ -14,9 +14,9 @@ import { UmbNewsDashboardRepository } from './repository/index.js';
 import type { NewsDashboardItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { sanitizeHTML } from '@umbraco-cms/backoffice/utils';
 
-interface NewsDashboardGroupedItems {
+interface UmbNewsDashboardGroupedItems {
 	priority: number;
-	items: NewsDashboardItemResponseModel[];
+	items: Array<NewsDashboardItemResponseModel>;
 }
 
 @customElement('umb-umbraco-news-dashboard')
@@ -25,7 +25,7 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 	private _items: Array<NewsDashboardItemResponseModel> = [];
 
 	@state()
-	private _groupedItems: Array<NewsDashboardGroupedItems> = [];
+	private _groupedItems: Array<UmbNewsDashboardGroupedItems> = [];
 
 	@state()
 	private _loaded: boolean = false;
@@ -39,7 +39,7 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 		this._loaded = true;
 	}
 
-	#groupItemsByPriority(): Array<NewsDashboardGroupedItems> {
+	#groupItemsByPriority(): Array<UmbNewsDashboardGroupedItems> {
 		const sanitizedItems = this._items.map((i) => ({
 			...i,
 			body: i.body ? sanitizeHTML(i.body) : '',
