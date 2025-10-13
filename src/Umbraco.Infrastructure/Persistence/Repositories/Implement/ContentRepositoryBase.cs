@@ -1155,9 +1155,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             if (toUpdate.Count > 0)
             {
-                // TODO: UpdateBatch doesn't work here - fails with "ExecuteNonQuery: CommandText property has not been initialized".
                 var updateBatch = toUpdate
-                    .Select(x => UpdateBatch.For(x, Database.StartSnapshot(x)))
+                    .Select(x => UpdateBatch.For(x))
                     .ToList();
                 Database.UpdateBatch(updateBatch, new BatchOptions { BatchSize = 100 });
             }

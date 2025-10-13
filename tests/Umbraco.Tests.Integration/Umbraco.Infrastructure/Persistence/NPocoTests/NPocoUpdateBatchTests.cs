@@ -46,7 +46,7 @@ internal sealed class NPocoUpdateBatchTests : UmbracoIntegrationTest
         using (var scope = ScopeProvider.CreateScope())
         {
             var updateBatch = servers
-                .Select(x => UpdateBatch.For(x, ScopeAccessor.AmbientScope.Database.StartSnapshot(x)))
+                .Select(x => UpdateBatch.For(x))
                 .ToList();
             ScopeAccessor.AmbientScope.Database.UpdateBatch(updateBatch, new BatchOptions { BatchSize = 100 });
             scope.Complete();
