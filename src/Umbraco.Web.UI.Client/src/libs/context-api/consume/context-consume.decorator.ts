@@ -32,7 +32,7 @@ export interface UmbConsumeOptions<
 
 	/**
 	 * If true, the context consumer will stay active and invoke the callback on context changes.
-	 * If false, the context consumer will be destroyed after the first context value is received.
+	 * If false, the context consumer will use asPromise() to get the value once and then clean up.
 	 * @default true
 	 */
 	subscribe?: boolean;
@@ -42,6 +42,8 @@ export interface UmbConsumeOptions<
  * A property decorator that adds a UmbContextConsumerController to the component
  * which will try and retrieve a value for the property via the Umbraco Context API.
  *
+ * This decorator follows the same pattern as @lit/context's @consume decorator.
+ *
  * @param options Configuration object containing context, callback, and subscribe options
  *
  * @example
@@ -50,11 +52,12 @@ export interface UmbConsumeOptions<
  * import {UMB_WORKSPACE_CONTEXT} from './workspace.context-token.js';
  *
  * class MyElement extends UmbLitElement {
+ *   // Continuous subscription (default)
  *   @consume({context: UMB_WORKSPACE_CONTEXT})
  *   @state()
  *   accessor workspaceContext?: UmbWorkspaceContext;
  *
- *   // One-time consumption
+ *   // One-time consumption - gets value once then cleans up
  *   @consume({context: UMB_USER_CONTEXT, subscribe: false})
  *   @state()
  *   accessor currentUser?: UmbUserContext;
@@ -68,20 +71,26 @@ export function consume<BaseType extends UmbContextMinimal = UmbContextMinimal, 
 
 	return ((protoOrTarget: any, nameOrContext: PropertyKey | ClassAccessorDecoratorContext<any, ResultType>) => {
 		if (typeof nameOrContext === 'object') {
-			// Standard decorators branch (auto-accessors)
-			nameOrContext.addInitializer(function () {
-				queueMicrotask(() => {
-					const controller = new UmbContextConsumerController(this, context, (value) => {
-						protoOrTarget.set.call(this, value);
-						callback?.(value);
-
-						// If subscribe is false, destroy controller after first value
-						if (!subscribe) {
-							controller.destroy();
+			if ('addInitializer' in nameOrContext) {
+				// Standard decorators branch (auto-accessors)
+				nameOrContext.addInitializer(function () {
+					queueMicrotask(() => {
+						if (subscribe) {
+							// Continuous subscription
+							new UmbContextConsumerController(this, context, (value) => {
+								protoOrTarget.set.call(this, value);
+								callback?.(value);
+							});
+						} else {
+							// One-time consumption using asPromise()
+							const controller = new UmbContextConsumerController(this, context, callback);
+							controller.asPromise().then((value) => {
+								protoOrTarget.set.call(this, value);
+							});
 						}
 					});
 				});
-			});
+			}
 		} else {
 			// Legacy decorators branch (regular properties with @state/@property)
 			const propertyKey = nameOrContext as string;
@@ -90,57 +99,56 @@ export function consume<BaseType extends UmbContextMinimal = UmbContextMinimal, 
 			if (constructor.addInitializer) {
 				constructor.addInitializer((element: any): void => {
 					queueMicrotask(() => {
-						const controller = new UmbContextConsumerController(element, context, (value) => {
-							element[propertyKey] = value;
-							callback?.(value);
-
-							// If subscribe is false, destroy controller after first value
-							if (!subscribe) {
-								controller.destroy();
-							}
-						});
+						if (subscribe) {
+							// Continuous subscription
+							new UmbContextConsumerController(element, context, (value) => {
+								element[propertyKey] = value;
+								callback?.(value);
+							});
+						} else {
+							// One-time consumption using asPromise()
+							const controller = new UmbContextConsumerController(element, context, callback);
+							controller.asPromise().then((value) => {
+								element[propertyKey] = value;
+							});
+						}
 					});
 				});
 			} else {
-				// This could be a controller or something else that doesn't support initializers, so we check
-				// if we are in a controller and use `hostConnected` as a fallback.
+				// Fallback: wrap hostConnected for classes without addInitializer
 				if ('hostConnected' in protoOrTarget && typeof protoOrTarget.hostConnected === 'function') {
-					// Fallback: wrap hostConnected for classes without addInitializer
 					const originalHostConnected = protoOrTarget.hostConnected;
 
 					protoOrTarget.hostConnected = function (this: any) {
-						console.warn(
-							'[Test]: Using fallback hostConnected wrapper for @consume. Consider extending UmbLitElement or UmbController for better support.',
-						);
 						// Set up consumer once, using a flag to prevent multiple setups
 						if (!this.__consumeControllers) {
 							this.__consumeControllers = new Map();
 						}
 
 						if (!this.__consumeControllers.has(propertyKey)) {
-							const controller = new UmbContextConsumerController(this, context, (value) => {
-								this[propertyKey] = value;
-								callback?.(value);
-
-								if (!subscribe) {
-									controller.destroy();
-									this.__consumeControllers.delete(propertyKey);
-								}
-							});
-							this.__consumeControllers.set(propertyKey, controller);
+							if (subscribe) {
+								// Continuous subscription
+								const controller = new UmbContextConsumerController(this, context, (value) => {
+									this[propertyKey] = value;
+									callback?.(value);
+								});
+								this.__consumeControllers.set(propertyKey, controller);
+							} else {
+								// One-time consumption using asPromise()
+								const controller = new UmbContextConsumerController(this, context, callback);
+								controller.asPromise().then((value) => {
+									this[propertyKey] = value;
+								});
+								// Don't store in map since it cleans itself up
+							}
 						}
 
 						// Call original hostConnected if it exists
 						originalHostConnected?.call(this);
 					};
 				} else {
-					// We could consider throwing here instead of just warning.
-					// But for now we just warn the developer that something might be wrong.
-					// Maybe they are using a different kind of decorator that handles initializers differently.
-					// Or maybe they are applying @consume to something that is not a controller at all.
-					// In any case, we cannot guarantee that the context will be consumed correctly.
 					console.warn(
-						`@consume applied to ${constructor.name}.${String(propertyKey)} but addInitializer is not available. Make sure the class extends UmbLitElement or UmbController, or that hostConnected is called manually.`,
+						`@consume applied to ${constructor.name}.${String(propertyKey)} but addInitializer is not available. Make sure the class extends UmbLitElement or implements UmbController with hostConnected.`,
 					);
 				}
 			}
