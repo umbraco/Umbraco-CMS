@@ -19,6 +19,7 @@ export class UmbNewsCardElement extends UmbLitElement {
 		if (!this.item) return nothing;
 
 		const isLastRow = this.priority === 3;
+
 		const showImage = this.priority <= 2 && !!this.item.imageUrl;
 
 		const content = html`
