@@ -15,7 +15,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.media.ensureNameNotExists(mediaName);
 });
 
-test("custom workspace view renders for 'Document' entities", async ({umbracoApi, umbracoUi}) => {
+test('can see the custom workspace view in the content section', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
     const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
