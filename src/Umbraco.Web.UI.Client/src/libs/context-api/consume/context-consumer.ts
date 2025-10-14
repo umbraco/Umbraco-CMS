@@ -194,8 +194,8 @@ export class UmbContextConsumer<
 		const hostElement = this._retrieveHost();
 
 		// Add connection check to prevent requesting on disconnected elements
-		if (!hostElement?.isConnected) {
-			console.warn('UmbContextConsumer: Attempting to request context on disconnected element');
+		if (hostElement && !hostElement.isConnected) {
+			console.warn('UmbContextConsumer: Attempting to request context on disconnected element', hostElement);
 			return;
 		}
 
