@@ -75,7 +75,7 @@ angular.module("umbraco")
                     ui.item.find(".umb-rte").each(function (key, value) {
                         // remove all RTEs in the dragged row and save their settings
                         var rteId = value.id;
-                        var editor = _.findWhere(tinymce.get() , { id: rteId });
+                        var editor = _.findWhere(tinyMCE.get() , { id: rteId });
                         if (editor) {
                             draggedRteSettings[rteId] = editor.settings;
                         }
@@ -92,7 +92,7 @@ angular.module("umbraco")
                         var rteId = value.id;
                         var settings = draggedRteSettings[rteId];
                         if (!settings) {
-                            var editor = _.findWhere(tinymce.get() , { id: rteId });
+                            var editor = _.findWhere(tinyMCE.get() , { id: rteId });
                             if (editor) {
                                 settings = editor.settings;
                             }
@@ -189,7 +189,7 @@ angular.module("umbraco")
                             if ($.inArray(rteId, notIncludedRte) < 0) {
 
                                 // remember this RTEs settings, cause we need to update it later.
-                                var editor = _.findWhere(tinymce.get(), { id: rteId })
+                                var editor = _.findWhere(tinyMCE.get(), { id: rteId })
                                 if (editor) {
                                     draggedRteSettings[rteId] = editor.settings;
                                 }
@@ -203,9 +203,8 @@ angular.module("umbraco")
                             var rteId = $(this).attr("id");
 
                             if ($.inArray(rteId, notIncludedRte) < 0) {
-
                                 // remember this RTEs settings, cause we need to update it later.
-                                var editor = _.findWhere(tinymce.get() , { id: rteId })
+                                var editor = _.findWhere(tinyMCE.get() , { id: rteId })
                                 if (editor) {
                                     draggedRteSettings[rteId] = editor.settings;
                                 }
@@ -236,7 +235,7 @@ angular.module("umbraco")
                         var rteId = value.id;
 
                         // remember this RTEs settings, cause we need to update it later.
-                        var editor = _.findWhere(tinymce.get() , { id: rteId });
+                        var editor = _.findWhere(tinyMCE.get() , { id: rteId });
 
                         // save the dragged RTE settings
                         if (editor) {
@@ -258,7 +257,7 @@ angular.module("umbraco")
                         var rteId = value.id;
                         if ($.inArray(rteId, notIncludedRte) < 0) {
 
-                            var editor = _.findWhere(tinymce.get() , { id: rteId });
+                            var editor = _.findWhere(tinyMCE.get() , { id: rteId });
                             if (editor) {
                                 draggedRteSettings[rteId] = editor.settings;
                             }
