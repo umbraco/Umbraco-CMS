@@ -25,8 +25,8 @@ export interface UmbProvideOptions<BaseType extends UmbContextMinimal, ResultTyp
  * legacy TypeScript experimental decorators for backward compatibility.
  *
  * The provider is created once during initialization with the property's initial value.
- * To update the provided value dynamically, keep a reference to the UmbContextProviderController
- * and update its `instance` property directly, or create a new provider.
+ * To update the provided value dynamically, keep a state inside the provided context instance
+ * and update that state as needed. The context instance itself should remain the same. You can use any of the Umb{*}State classes.
  *
  * @param options Configuration object containing the context token
  *
@@ -48,23 +48,17 @@ export interface UmbProvideOptions<BaseType extends UmbContextMinimal, ResultTyp
  *
  * @example
  * ```ts
- * // For dynamic updates, use the controller directly:
+ * // For dynamic updates, store the state inside the context instance
+ * class MyContext extends UmbContextMinimal {
+ *   someProperty = new UmbStringState('initial value');
+ * }
+ *
  * class MyElement extends UmbLitElement {
+ *   @provide({context: MY_CONTEXT})
  *   private _myContext = new MyContext();
- *   private _providerController: UmbContextProviderController;
  *
- *   constructor() {
- *     super();
- *     this._providerController = new UmbContextProviderController(
- *       this,
- *       MY_CONTEXT,
- *       this._myContext
- *     );
- *   }
- *
- *   updateContext(newValue: MyContext) {
- *     this._myContext = newValue;
- *     this._providerController.instance = newValue;
+ *   updateValue(newValue: string) {
+ *     this._myContext.someProperty.setValue(newValue);
  *   }
  * }
  * ```
