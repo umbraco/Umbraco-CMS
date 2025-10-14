@@ -82,6 +82,9 @@ angular.module("umbraco.directives")
                         //custom initialization for this editor within the grid
                         editor.on('init', function (e) {
 
+                            //register global variable to re-save the dragged RTE settings in the controller
+                            editor.settings = baseLineConfigObj;
+
                             // Used this init event - as opposed to property init_instance_callback
                             // to turn off the loader
                             scope.isLoading = false;
