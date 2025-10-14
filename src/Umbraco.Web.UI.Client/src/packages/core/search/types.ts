@@ -1,4 +1,5 @@
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import type { UmbItemModel } from '@umbraco-cms/backoffice/entity-item';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { FieldPresentationModel, SearchResultResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbPagedModel, UmbRepositoryResponse } from '@umbraco-cms/backoffice/repository';
@@ -11,14 +12,9 @@ export type * from './global-search/types.js';
 
 export type UmbSearchResultModel = SearchResultResponseModel;
 
-// TODO: lower requirement for search provider item type
-export type UmbSearchResultItemModel = {
-	entityType: string;
-	icon?: string | null;
-	name: string;
-	unique: string;
-	href: string;
-};
+export interface UmbSearchResultItemModel extends UmbItemModel {
+	href?: string;
+}
 
 export type UmbSearchRequestArgs = {
 	query: string;

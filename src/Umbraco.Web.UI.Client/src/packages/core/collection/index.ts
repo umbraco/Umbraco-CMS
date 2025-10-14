@@ -2,11 +2,13 @@ import './default/collection-default.element.js';
 import './collection.element.js';
 import './components/index.js';
 
-export * from './default/collection-default.element.js';
+export * from './collection-item-picker-modal/index.js';
 export * from './collection.element.js';
 export * from './components/index.js';
 export * from './conditions/index.js';
-export * from './collection-item-picker-modal/index.js';
+export * from './constants.js';
+export * from './default/collection-default.element.js';
+export * from './global-components.js';
 export * from './workspace-view/index.js';
 
 export * from './default/collection-default.context.js';
