@@ -3,6 +3,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.ContentPublishing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Tests.Integration.Testing;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
@@ -387,5 +388,32 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
         var lastPublishDateEn = content.GetPublishDate(langEn.IsoCode)
                                 ?? throw new InvalidOperationException("Expected a publish date for EN");
         Assert.Greater(lastPublishDateEn, firstPublishDateEn);
+    }
+
+    [Test]
+    public async Task Publishing_Single_Culture_Persists_Expected_Property_Data()
+    {
+        var (langEn, langDa, langBe, contentType) = await SetupVariantDoctypeAsync();
+        var content = await CreateVariantContentAsync(langEn, langDa, langBe, contentType);
+
+        using (var scope = ScopeProvider.CreateScope())
+        {
+            var dtos = scope.Database.Fetch<PropertyDataDto>();
+            Assert.AreEqual(18, dtos.Count);  // 3 properties * 3 cultures * 2 (published + edited).
+            scope.Complete();
+        }
+
+        var publishAttempt = await ContentPublishingService.PublishAsync(
+            content.Key,
+            [new() { Culture = langEn.IsoCode }],
+            Constants.Security.SuperUserKey);
+        Assert.IsTrue(publishAttempt.Success);
+
+        using (var scope = ScopeProvider.CreateScope())
+        {
+            var dtos = scope.Database.Fetch<PropertyDataDto>();
+            Assert.AreEqual(19, dtos.Count); // + 3 for published populated title property, - 2 for existing published properties of other cultures.
+            scope.Complete();
+        }
     }
 }
