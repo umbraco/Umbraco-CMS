@@ -14,6 +14,9 @@ export class UmbBlockGridBlockElement extends UmbLitElement {
 	@property({ type: String, reflect: false })
 	icon?: string;
 
+	@property({ type: Number, attribute: false })
+	index?: number;
+
 	@property({ attribute: false })
 	config?: UmbBlockEditorCustomViewConfiguration;
 
@@ -27,7 +30,7 @@ export class UmbBlockGridBlockElement extends UmbLitElement {
 	settings?: UmbBlockDataType;
 
 	override render() {
-		const blockValue = { ...this.content, $settings: this.settings };
+		const blockValue = { ...this.content, $settings: this.settings, $index: this.index };
 		return html`
 			<umb-ref-grid-block
 				standalone
