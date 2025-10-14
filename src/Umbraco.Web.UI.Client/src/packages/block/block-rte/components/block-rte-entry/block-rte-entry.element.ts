@@ -22,9 +22,6 @@ import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/ext
 @customElement('umb-rte-block')
 export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	@property({ type: String, attribute: 'data-content-key', reflect: true })
-	public get contentKey(): string | undefined {
-		return this._contentKey;
-	}
 	public set contentKey(value: string | undefined) {
 		if (!value) return;
 		this._contentKey = value;
@@ -39,6 +36,9 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			},
 			'observeMessagesForContent',
 		);
+	}
+	public get contentKey(): string | undefined {
+		return this._contentKey;
 	}
 	private _contentKey?: string | undefined;
 
@@ -138,7 +138,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			},
 			null,
 		);
-		// TODO: Implement index.
+		this.observe(this.#context.index, (index) => this.#updateBlockViewProps({ index }), null);
 		this.observe(
 			this.#context.label,
 			(label) => {
@@ -292,7 +292,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 
 	#renderActionBar() {
 		return this._showActions
-			? html` <uui-action-bar> ${this.#renderEditAction()} ${this.#renderEditSettingsAction()}</uui-action-bar> `
+			? html`<uui-action-bar>${this.#renderEditAction()}${this.#renderEditSettingsAction()}</uui-action-bar>`
 			: nothing;
 	}
 
@@ -308,6 +308,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		return html`<umb-ref-rte-block
 			.label=${this._label}
 			.icon=${this._icon}
+			.index=${this._blockViewProps.index}
 			.unpublished=${!this._exposed}
 			.content=${this._blockViewProps.content}
 			.settings=${this._blockViewProps.settings}
