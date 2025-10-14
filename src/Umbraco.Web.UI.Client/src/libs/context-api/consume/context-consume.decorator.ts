@@ -63,10 +63,12 @@ export interface UmbConsumeOptions<
  *   currentUser?: UmbUserContext;
  * }
  * ```
+ *
+ * @returns {ConsumeDecorator} Returns a property decorator function
  */
 export function consume<BaseType extends UmbContextMinimal = UmbContextMinimal, ResultType extends BaseType = BaseType>(
 	options: UmbConsumeOptions<BaseType, ResultType>,
-) {
+): ConsumeDecorator<ResultType> {
 	const { context, callback, subscribe = true } = options;
 
 	return ((protoOrTarget: any, nameOrContext: PropertyKey | ClassAccessorDecoratorContext<any, ResultType>) => {
@@ -193,5 +195,74 @@ export function consume<BaseType extends UmbContextMinimal = UmbContextMinimal, 
 				);
 			}
 		}
-	}) as any;
+	}) as ConsumeDecorator<ResultType>;
 }
+
+/**
+ * Generates a public interface type that removes private and protected fields.
+ * This allows accepting otherwise incompatible versions of the type (e.g. from
+ * multiple copies of the same package in `node_modules`).
+ */
+type Interface<T> = {
+	[K in keyof T]: T[K];
+};
+
+declare class ReactiveElement {
+	static addInitializer?: (initializer: (instance: any) => void) => void;
+}
+
+declare class ReactiveController {
+	hostConnected?: () => void;
+}
+
+/**
+ * A type representing the base class of which the decorator should work
+ * requiring either addInitializer (UmbLitElement) or hostConnected (UmbController).
+ */
+type ReactiveEntity = ReactiveElement | ReactiveController;
+
+type ConsumeDecorator<ValueType> = {
+	// legacy
+	<K extends PropertyKey, Proto extends Interface<ReactiveEntity>>(
+		protoOrDescriptor: Proto,
+		name?: K,
+	): FieldMustMatchProvidedType<Proto, K, ValueType>;
+
+	// standard
+	<C extends Interface<ReactiveEntity>, V extends ValueType>(
+		value: ClassAccessorDecoratorTarget<C, V>,
+		context: ClassAccessorDecoratorContext<C, V>,
+	): void;
+};
+
+// Note TypeScript requires the return type of a decorator to be `void | any`
+type DecoratorReturn = void | any;
+
+type FieldMustMatchProvidedType<Obj, Key extends PropertyKey, ProvidedType> =
+	// First we check whether the object has the property as a required field
+	Obj extends Record<Key, infer ConsumingType>
+		? // Ok, it does, just check whether it's ok to assign the
+			// provided type to the consuming field
+			[ProvidedType] extends [ConsumingType]
+			? DecoratorReturn
+			: {
+					message: 'provided type not assignable to consuming field';
+					provided: ProvidedType;
+					consuming: ConsumingType;
+				}
+		: // Next we check whether the object has the property as an optional field
+			Obj extends Partial<Record<Key, infer ConsumingType>>
+			? // Check assignability again. Note that we have to include undefined
+				// here on the consuming type because it's optional.
+				[ProvidedType] extends [ConsumingType | undefined]
+				? DecoratorReturn
+				: {
+						message: 'provided type not assignable to consuming field';
+						provided: ProvidedType;
+						consuming: ConsumingType | undefined;
+					}
+			: // Ok, the field isn't present, so either someone's using consume
+				// manually, i.e. not as a decorator (maybe don't do that! but if you do,
+				// you're on your own for your type checking, sorry), or the field is
+				// private, in which case we can't check it.
+				DecoratorReturn;

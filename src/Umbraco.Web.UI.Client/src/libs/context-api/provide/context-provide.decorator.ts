@@ -62,15 +62,20 @@ export interface UmbProvideOptions<BaseType extends UmbContextMinimal, ResultTyp
  *   }
  * }
  * ```
+ *
+ * @returns {ProvideDecorator} Returns a property decorator function
  */
 export function provide<
 	BaseType extends UmbContextMinimal = UmbContextMinimal,
 	ResultType extends BaseType = BaseType,
 	InstanceType extends ResultType = ResultType,
->(options: UmbProvideOptions<BaseType, ResultType>) {
+>(options: UmbProvideOptions<BaseType, ResultType>): ProvideDecorator<InstanceType> {
 	const { context } = options;
 
-	return ((protoOrTarget: any, nameOrContext: PropertyKey | ClassAccessorDecoratorContext<any, InstanceType>) => {
+	return ((
+		protoOrTarget: any,
+		nameOrContext: PropertyKey | ClassAccessorDecoratorContext<any, InstanceType>,
+	): void | any => {
 		if (typeof nameOrContext === 'object') {
 			// ===================================================================
 			// STANDARD DECORATORS BRANCH (Stage 3 TC39 Proposal)
@@ -92,13 +97,13 @@ export function provide<
 				get(this: any) {
 					return protoOrTarget.get.call(this);
 				},
-				set(this: any, value: ResultType) {
+				set(this: any, value: InstanceType) {
 					return protoOrTarget.set.call(this, value);
 				},
-				init(this: any, value: ResultType) {
+				init(this: any, value: InstanceType) {
 					// Defer controller creation to avoid timing issues with private fields
 					queueMicrotask(() => {
-						new UmbContextProviderController(this, context, value);
+						new UmbContextProviderController<BaseType, ResultType, InstanceType>(this, context, value);
 					});
 					return value;
 				},
@@ -134,7 +139,7 @@ export function provide<
 					queueMicrotask(() => {
 						// Get initial value from property if it exists
 						const initialValue = element[propertyKey];
-						new UmbContextProviderController(element, context, initialValue);
+						new UmbContextProviderController<BaseType, ResultType, InstanceType>(element, context, initialValue);
 					});
 				});
 			} else if ('hostConnected' in protoOrTarget && typeof protoOrTarget.hostConnected === 'function') {
@@ -150,7 +155,7 @@ export function provide<
 					if (!this.__provideControllers.has(propertyKey)) {
 						// Get initial value from property if it exists
 						const initialValue = this[propertyKey];
-						new UmbContextProviderController(this, context, initialValue);
+						new UmbContextProviderController<BaseType, ResultType, InstanceType>(this, context, initialValue);
 						// Mark as set up to prevent duplicate providers
 						this.__provideControllers.set(propertyKey, true);
 					}
@@ -166,5 +171,74 @@ export function provide<
 				);
 			}
 		}
-	}) as any;
+	}) as ProvideDecorator<ResultType>;
 }
+
+/**
+ * Generates a public interface type that removes private and protected fields.
+ * This allows accepting otherwise compatible versions of the type (e.g. from
+ * multiple copies of the same package in `node_modules`).
+ */
+type Interface<T> = {
+	[K in keyof T]: T[K];
+};
+
+declare class ReactiveElement {
+	static addInitializer?: (initializer: (instance: any) => void) => void;
+}
+
+declare class ReactiveController {
+	hostConnected?: () => void;
+}
+
+/**
+ * A type representing the base class of which the decorator should work
+ * requiring either addInitializer (UmbLitElement) or hostConnected (UmbController).
+ */
+type ReactiveEntity = ReactiveElement | ReactiveController;
+
+type ProvideDecorator<ContextType> = {
+	// legacy
+	<K extends PropertyKey, Proto extends Interface<ReactiveEntity>>(
+		protoOrDescriptor: Proto,
+		name?: K,
+	): FieldMustMatchContextType<Proto, K, ContextType>;
+
+	// standard
+	<C extends Interface<ReactiveEntity>, V extends ContextType>(
+		value: ClassAccessorDecoratorTarget<C, V>,
+		context: ClassAccessorDecoratorContext<C, V>,
+	): void;
+};
+
+// Note TypeScript requires the return type of a decorator to be `void | any`
+type DecoratorReturn = void | any;
+
+type FieldMustMatchContextType<Obj, Key extends PropertyKey, ContextType> =
+	// First we check whether the object has the property as a required field
+	Obj extends Record<Key, infer ProvidingType>
+		? // Ok, it does, just check whether it's ok to assign the
+			// provided type to the consuming field
+			[ProvidingType] extends [ContextType]
+			? DecoratorReturn
+			: {
+					message: 'providing field not assignable to context';
+					context: ContextType;
+					provided: ProvidingType;
+				}
+		: // Next we check whether the object has the property as an optional field
+			Obj extends Partial<Record<Key, infer Providing>>
+			? // Check assignability again. Note that we have to include undefined
+				// here on the providing type because it's optional.
+				[Providing | undefined] extends [ContextType]
+				? DecoratorReturn
+				: {
+						message: 'providing field not assignable to context';
+						context: ContextType;
+						consuming: Providing | undefined;
+					}
+			: // Ok, the field isn't present, so either someone's using provide
+				// manually, i.e. not as a decorator (maybe don't do that! but if you do,
+				// you're on your own for your type checking, sorry), or the field is
+				// private, in which case we can't check it.
+				DecoratorReturn;
