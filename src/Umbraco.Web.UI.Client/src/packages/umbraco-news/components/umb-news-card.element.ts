@@ -114,7 +114,9 @@ export class UmbNewsCardElement extends UmbLitElement {
 				gap: 0;
 			}
 		}
-
+		.normal-priority:hover {
+			color: var(--uui-color-interactive-emphasis);
+		}
 		.card-actions {
 			align-self: end;
 		}

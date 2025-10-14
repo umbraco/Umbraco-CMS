@@ -76,6 +76,18 @@ export class UmbNewsContainerElement extends UmbLitElement {
 			margin-top: var(--uui-size-space-5);
 		}
 
+		/* For when container-type is not been assigned, not so sure about it???*/
+		@media (max-width: 1200px) {
+			.cards {
+				grid-template-columns: repeat(auto-fit, minmax(2, 1fr));
+			}
+		}
+		@media (max-width: 700px) {
+			.cards {
+				grid-template-columns: 1fr;
+			}
+		}
+
 		@container dashboard (max-width: 1200px) {
 			.cards {
 				grid-template-columns: repeat(auto-fit, minmax(2, 1fr));
