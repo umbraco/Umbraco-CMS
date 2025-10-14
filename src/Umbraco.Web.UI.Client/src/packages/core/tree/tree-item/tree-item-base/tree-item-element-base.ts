@@ -213,7 +213,7 @@ export abstract class UmbTreeItemElementBase<
 				.showChildren=${this._isOpen}
 				.caretLabel=${this.localize.term(caretLabelKey) + ' ' + this._label}
 				label=${ifDefined(this._label)}
-				href=${ifDefined(this._isSelectableContext ? undefined : this._href)}>
+				href=${ifDefined(this._isSelectableContext ? undefined : this._href)}
 				.renderExpandSymbol=${this._renderExpandSymbol}>
 				${this.#renderLoadPrevButton()} ${this.renderIconContainer()} ${this.renderLabel()} ${this.#renderActions()}
 				${this.#renderChildItems()}

@@ -1,0 +1,1 @@
+export const UMB_PROPERTY_EDITOR_DATA_SOURCE_COLLECTION_MENU_ALIAS = 'Umb.CollectionMenu.PropertyEditorDataSource';

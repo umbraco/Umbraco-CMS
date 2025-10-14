@@ -40,7 +40,6 @@
     <PackageReference Include="HtmlAgilityPack" />
     <PackageReference Include="MailKit" />
     <PackageReference Include="Markdown" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />

@@ -190,7 +190,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			},
 			null,
 		);
-		// TODO: Implement index.
+		this.observe(this.#context.index, (index) => this.#updateBlockViewProps({ index }), null);
 		this.observe(
 			this.#context.label,
 			(label) => {
@@ -517,6 +517,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			class="umb-block-grid__block--view"
 			.label=${this._label}
 			.icon=${this._icon}
+			.index=${this._blockViewProps.index}
 			.unpublished=${!this._exposed}
 			.config=${this._blockViewProps.config}
 			.content=${this._blockViewProps.content}
@@ -529,6 +530,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			class="umb-block-grid__block--view"
 			.label=${this._label}
 			.icon=${this._icon}
+			.index=${this._blockViewProps.index}
 			.unpublished=${!this._exposed}
 			.config=${this._blockViewProps.config}
 			.content=${this._blockViewProps.content}

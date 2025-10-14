@@ -31,7 +31,7 @@ export interface UmbRepositoryItemsStatus {
  * @template T$ - The type of items returned by the asObservable method, defaults to T. You should only use this if you want to return a different type from the asObservable method.
  */
 export interface UmbRepositoryResponseWithAsObservable<T, T$ = T> extends UmbRepositoryResponse<T> {
-	asObservable: () => Observable<T$> | undefined;
+	asObservable?: () => Observable<T$> | undefined;
 }
 
 export type * from './data-mapper/mapping/types.js';

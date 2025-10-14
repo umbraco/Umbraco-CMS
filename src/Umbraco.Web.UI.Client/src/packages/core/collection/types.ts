@@ -4,9 +4,12 @@ import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import type { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 
 export type * from './action/create/types.js';
-export type * from './extensions/types.js';
 export type * from './conditions/types.js';
+export type * from './extensions/types.js';
+export type * from './item/types.js';
+export type * from './menu/types.js';
 export type * from './workspace-view/types.js';
+export type * from './collection-item-picker-modal/types.js';
 
 export interface UmbCollectionConfiguration {
 	unique?: UmbEntityUnique;
@@ -32,6 +35,12 @@ export interface UmbCollectionLayoutConfiguration {
 	name: string;
 	collectionView: string;
 }
+
+export type UmbCollectionSelectionConfiguration = {
+	multiple?: boolean;
+	selectable?: boolean;
+	selection?: Array<string | null>;
+};
 
 export interface UmbCollectionContext {
 	setConfig(config: UmbCollectionConfiguration): void;
