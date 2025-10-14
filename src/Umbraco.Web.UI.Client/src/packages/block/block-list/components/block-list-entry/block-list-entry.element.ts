@@ -29,19 +29,15 @@ import '../unsupported-list-block/index.js';
  */
 @customElement('umb-block-list-entry')
 export class UmbBlockListEntryElement extends UmbLitElement implements UmbPropertyEditorUiElement {
-	//
 	@property({ type: Number })
-	public get index(): number | undefined {
-		return this.#context.getIndex();
-	}
 	public set index(value: number | undefined) {
 		this.#context.setIndex(value);
 	}
+	public get index(): number | undefined {
+		return this.#context.getIndex();
+	}
 
 	@property({ attribute: false })
-	public get contentKey(): string | undefined {
-		return this._contentKey;
-	}
 	public set contentKey(value: string | undefined) {
 		if (!value) return;
 		this._contentKey = value;
@@ -56,6 +52,9 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			},
 			'observeMessagesForContent',
 		);
+	}
+	public get contentKey(): string | undefined {
+		return this._contentKey;
 	}
 	private _contentKey?: string | undefined;
 
@@ -147,7 +146,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			},
 			null,
 		);
-		// TODO: Implement index.
+		this.observe(this.#context.index, (index) => this.#updateBlockViewProps({ index }), null);
 		this.observe(
 			this.#context.label,
 			(label) => {
@@ -374,6 +373,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		return html`<umb-ref-list-block
 			.label=${this._label}
 			.icon=${this._icon}
+			.index=${this._blockViewProps.index}
 			.unpublished=${!this._exposed}
 			.config=${this._blockViewProps.config}
 			.content=${this._blockViewProps.content}
@@ -385,6 +385,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		return html`<umb-inline-list-block
 			.label=${this._label}
 			.icon=${this._icon}
+			.index=${this._blockViewProps.index}
 			.unpublished=${!this._exposed}
 			.config=${this._blockViewProps.config}
 			.content=${this._blockViewProps.content}
