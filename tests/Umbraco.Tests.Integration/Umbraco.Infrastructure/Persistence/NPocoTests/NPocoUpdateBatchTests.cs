@@ -1,10 +1,8 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Microsoft.Data.SqlClient;
 using NPoco;
 using NUnit.Framework;
-using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -15,49 +13,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.NPoco
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
 internal sealed class NPocoUpdateBatchTests : UmbracoIntegrationTest
 {
-    /*
-    [TableName("Users")]
-    private class User
-    {
-        [Column("Id")]
-        [PrimaryKeyColumn(AutoIncrement = true)]
-        public int Id { get; set; }
-
-        [Column("Name")]
-        public string Name { get; set; }
-    }
-
-    [Test]
-    public void Test()
-    {
-        var user1 = new User { Id = 1, Name = "User 1" };
-        var user2 = new User { Id = 2, Name = "User 2" };
-
-        IDatabase db = new Database("Server=.\\SQLEXPRESS;Database=Temp;Integrated Security=true;TrustServerCertificate=true;", DatabaseType.SqlServer2012, SqlClientFactory.Instance);
-
-        db.Execute("TRUNCATE TABLE Users");
-
-        db.Insert(user1);
-        db.Insert(user2);
-
-        var users = db.Fetch<User>();
-        Assert.AreEqual(2, users.Count);
-        Assert.AreEqual("User 1", users[0].Name);
-
-        user1.Name = "User 1a";
-        users = [user1, user2];
-        var updateBatch = users
-            .Select(x => UpdateBatch.For(x))
-            .ToList();
-        var updated = db.UpdateBatch(updateBatch, new BatchOptions { BatchSize = 100 });
-        Assert.AreEqual(2, updated);
-
-        users = db.Fetch<User>();
-        Assert.AreEqual("User 1a", users[0].Name);
-        Assert.AreEqual("User 2", users[1].Name);
-    }
-    */
-
     [Test]
     public void Can_Update_Batch()
     {
@@ -67,6 +22,7 @@ internal sealed class NPocoUpdateBatchTests : UmbracoIntegrationTest
         {
             servers.Add(new ServerRegistrationDto
             {
+                Id = i + 1,
                 ServerAddress = "address" + i,
                 ServerIdentity = "computer" + i,
                 DateRegistered = DateTime.Now,
@@ -77,7 +33,7 @@ internal sealed class NPocoUpdateBatchTests : UmbracoIntegrationTest
 
         using (var scope = ScopeProvider.CreateScope())
         {
-            ScopeAccessor.AmbientScope.Database.BulkInsertRecords(servers);
+            scope.Database.BulkInsertRecords(servers);
             scope.Complete();
         }
 
@@ -93,15 +49,15 @@ internal sealed class NPocoUpdateBatchTests : UmbracoIntegrationTest
             var updateBatch = servers
                 .Select(x => UpdateBatch.For(x))
                 .ToList();
-            var updated = ScopeAccessor.AmbientScope.Database.UpdateBatch(updateBatch, new BatchOptions { BatchSize = 100 });
-            //Assert.AreEqual(3, updated);
+            var updated = scope.Database.UpdateBatch(updateBatch, new BatchOptions { BatchSize = 100 });
+            Assert.AreEqual(3, updated);
             scope.Complete();
         }
 
         // Assert
         using (var scope = ScopeProvider.CreateScope())
         {
-            var dtos = ScopeAccessor.AmbientScope.Database.Fetch<ServerRegistrationDto>();
+            var dtos = scope.Database.Fetch<ServerRegistrationDto>();
             Assert.AreEqual(3, dtos.Count);
             for (var i = 0; i < 3; i++)
             {
