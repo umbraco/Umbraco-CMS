@@ -3,20 +3,20 @@ import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 //Dashboard
 const dashboardName = 'Welcome Dashboard';
 
-test('custom dashboard is visible in content section', async ({page, umbracoUi}) => {
+test('can see the custom dashboard in content section', async ({umbracoUi}) => {
     // Act
     await umbracoUi.goToBackOffice();
     await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
     // Assert
-    await umbracoUi.content.isDashboardTabVisible(dashboardName, true);
+    await umbracoUi.content.isDashboardTabWithNameVisible(dashboardName, true);
 });
 
-test('custom dashboard is not visible in media section', async ({page, umbracoUi}) => {
+test('can not see the custom dashboard in media section', async ({umbracoUi}) => {
     // Act
     await umbracoUi.goToBackOffice();
     await umbracoUi.content.goToSection(ConstantHelper.sections.media);
 
     // Assert
-    await umbracoUi.content.isDashboardTabVisible(dashboardName, false);
+    await umbracoUi.content.isDashboardTabWithNameVisible(dashboardName, false);
 });
