@@ -1,10 +1,10 @@
-import type { UmbLogViewerWorkspaceContext } from '../../../logviewer-workspace.context.js';
 import { UMB_APP_LOG_VIEWER_CONTEXT } from '../../../logviewer-workspace.context-token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { SavedLogSearchResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
+import { consume } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-log-viewer-saved-searches-overview')
 export class UmbLogViewerSavedSearchesOverviewElement extends UmbLitElement {
@@ -17,20 +17,20 @@ export class UmbLogViewerSavedSearchesOverviewElement extends UmbLitElement {
 	@state()
 	private _total = 0;
 
-	#logViewerContext?: UmbLogViewerWorkspaceContext;
+	#logViewerContext?: typeof UMB_APP_LOG_VIEWER_CONTEXT.TYPE;
 
-	constructor() {
-		super();
-		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT, (instance) => {
-			this.#logViewerContext = instance;
-			this.#logViewerContext?.getSavedSearches({ skip: 0, take: this.#itemsPerPage });
-			this.#observeStuff();
-		});
+	@consume({ context: UMB_APP_LOG_VIEWER_CONTEXT })
+	private set _logViewerContext(value: typeof UMB_APP_LOG_VIEWER_CONTEXT.TYPE | undefined) {
+		this.#logViewerContext = value;
+		this.#getSavedSearches();
+		this.#observeStuff();
+	}
+	private get _logViewerContext() {
+		return this.#logViewerContext;
 	}
 
 	#observeStuff() {
-		if (!this.#logViewerContext) return;
-		this.observe(this.#logViewerContext.savedSearches, (savedSearches) => {
+		this.observe(this._logViewerContext?.savedSearches, (savedSearches) => {
 			this._savedSearches = savedSearches?.items ?? [];
 			this._total = savedSearches?.total ?? 0;
 		});
@@ -38,7 +38,7 @@ export class UmbLogViewerSavedSearchesOverviewElement extends UmbLitElement {
 
 	#getSavedSearches() {
 		const skip = this.#currentPage * this.#itemsPerPage - this.#itemsPerPage;
-		this.#logViewerContext?.getSavedSearches({ skip, take: this.#itemsPerPage });
+		this._logViewerContext?.getSavedSearches({ skip, take: this.#itemsPerPage });
 	}
 
 	#onChangePage(event: UUIPaginationEvent) {

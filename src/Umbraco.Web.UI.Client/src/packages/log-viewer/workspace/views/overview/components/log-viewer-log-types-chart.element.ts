@@ -1,19 +1,21 @@
-import type { UmbLogViewerWorkspaceContext } from '../../../logviewer-workspace.context.js';
 import { UMB_APP_LOG_VIEWER_CONTEXT } from '../../../logviewer-workspace.context-token.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { LogLevelCountsReponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { consume } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-log-viewer-log-types-chart')
 export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
-	#logViewerContext?: UmbLogViewerWorkspaceContext;
-	constructor() {
-		super();
-		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT, (instance) => {
-			this.#logViewerContext = instance;
-			this.#logViewerContext?.getLogCount();
-			this.#observeStuff();
-		});
+	#logViewerContext?: typeof UMB_APP_LOG_VIEWER_CONTEXT.TYPE;
+
+	@consume({ context: UMB_APP_LOG_VIEWER_CONTEXT })
+	private set _logViewerContext(value: typeof UMB_APP_LOG_VIEWER_CONTEXT.TYPE | undefined) {
+		this.#logViewerContext = value;
+		this.#logViewerContext?.getLogCount();
+		this.#observeStuff();
+	}
+	private get _logViewerContext() {
+		return this.#logViewerContext;
 	}
 
 	@state()
@@ -47,8 +49,7 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 	}
 
 	#observeStuff() {
-		if (!this.#logViewerContext) return;
-		this.observe(this.#logViewerContext.logCount, (logLevel) => {
+		this.observe(this._logViewerContext?.logCount, (logLevel) => {
 			this._logLevelCountResponse = logLevel ?? null;
 			this.setLogLevelCount();
 		});
