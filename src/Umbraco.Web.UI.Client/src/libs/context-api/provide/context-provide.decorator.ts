@@ -36,11 +36,11 @@ export interface UmbProvideOptions<BaseType extends UmbContextMinimal, ResultTyp
  * import {UMB_WORKSPACE_CONTEXT} from './workspace.context-token.js';
  *
  * class MyWorkspaceElement extends UmbLitElement {
- *   // Standard decorators (with 'accessor' keyword) - Modern approach
+ *   // Standard decorators - requires 'accessor' keyword
  *   @provide({context: UMB_WORKSPACE_CONTEXT})
  *   accessor workspaceContext = new UmbWorkspaceContext(this);
  *
- *   // Legacy decorators (without 'accessor') - Works with Lit decorators
+ *   // Legacy decorators - works with or without 'accessor'
  *   @provide({context: UMB_WORKSPACE_CONTEXT})
  *   workspaceContext = new UmbWorkspaceContext(this);
  * }
@@ -84,15 +84,16 @@ export function provide<
 			// This branch is used when decorating auto-accessors (with 'accessor' keyword).
 			// Example: @provide({context: TOKEN}) accessor myProp = new MyContext();
 			//
-			// The decorator receives a ClassAccessorDecoratorContext object which provides:
-			// - addInitializer(): Run code during class construction (via init)
-			// - Access to getter/setter through the context object
+			// The decorator receives a ClassAccessorDecoratorContext object and returns
+			// an accessor descriptor that intercepts the property initialization.
 			//
-			// This is the modern, standardized decorator API.
+			// This is the modern, standardized decorator API that will be the standard
+			// when Lit 4.x is released.
 			//
 			// Note: Standard decorators currently don't work with @state()/@property()
 			// decorators, which is why we still need the legacy branch.
 			// ===================================================================
+
 			return {
 				get(this: any) {
 					return protoOrTarget.get.call(this);
@@ -128,6 +129,7 @@ export function provide<
 			// 2. hostConnected wrapper (for UmbController classes)
 			// 3. Warning (if neither is available)
 			// ===================================================================
+
 			const propertyKey = nameOrContext as string;
 			const constructor = protoOrTarget.constructor as any;
 
