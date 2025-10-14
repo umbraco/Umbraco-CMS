@@ -24,6 +24,10 @@ export interface UmbProvideOptions<BaseType extends UmbContextMinimal, ResultTyp
  * This decorator supports both modern "standard" decorators (Stage 3 TC39 proposal) and
  * legacy TypeScript experimental decorators for backward compatibility.
  *
+ * The provider is created once during initialization with the property's initial value.
+ * To update the provided value dynamically, keep a reference to the UmbContextProviderController
+ * and update its `instance` property directly, or create a new provider.
+ *
  * @param options Configuration object containing the context token
  *
  * @example
@@ -41,6 +45,29 @@ export interface UmbProvideOptions<BaseType extends UmbContextMinimal, ResultTyp
  *   workspaceContext = new UmbWorkspaceContext(this);
  * }
  * ```
+ *
+ * @example
+ * ```ts
+ * // For dynamic updates, use the controller directly:
+ * class MyElement extends UmbLitElement {
+ *   private _myContext = new MyContext();
+ *   private _providerController: UmbContextProviderController;
+ *
+ *   constructor() {
+ *     super();
+ *     this._providerController = new UmbContextProviderController(
+ *       this,
+ *       MY_CONTEXT,
+ *       this._myContext
+ *     );
+ *   }
+ *
+ *   updateContext(newValue: MyContext) {
+ *     this._myContext = newValue;
+ *     this._providerController.instance = newValue;
+ *   }
+ * }
+ * ```
  */
 export function provide<
 	BaseType extends UmbContextMinimal = UmbContextMinimal,
@@ -50,18 +77,15 @@ export function provide<
 	const { context } = options;
 
 	return ((protoOrTarget: any, nameOrContext: PropertyKey | ClassAccessorDecoratorContext<any, InstanceType>) => {
-		// Map of instances to controllers
-		const controllerMap = new WeakMap<any, UmbContextProviderController<BaseType, ResultType, InstanceType>>();
-
 		if (typeof nameOrContext === 'object') {
 			// ===================================================================
 			// STANDARD DECORATORS BRANCH (Stage 3 TC39 Proposal)
 			// ===================================================================
 			// This branch is used when decorating auto-accessors (with 'accessor' keyword).
-			// Example: @provide({context: TOKEN}) accessor myProp?: Type;
+			// Example: @provide({context: TOKEN}) accessor myProp = new MyContext();
 			//
 			// The decorator receives a ClassAccessorDecoratorContext object which provides:
-			// - addInitializer(): Run code during class construction
+			// - addInitializer(): Run code during class construction (via init)
 			// - Access to getter/setter through the context object
 			//
 			// This is the modern, standardized decorator API.
@@ -79,8 +103,7 @@ export function provide<
 				init(this: any, value: ResultType) {
 					// Defer controller creation to avoid timing issues with private fields
 					queueMicrotask(() => {
-						const controller = new UmbContextProviderController(this, context, value);
-						controllerMap.set(this, controller);
+						new UmbContextProviderController(this, context, value);
 					});
 					return value;
 				},
@@ -90,7 +113,7 @@ export function provide<
 			// LEGACY DECORATORS BRANCH (TypeScript Experimental)
 			// ===================================================================
 			// This branch is used when decorating regular properties (WITHOUT 'accessor' keyword).
-			// Example: @consume({context: TOKEN}) @state() myProp?: Type;
+			// Example: @provide({context: TOKEN}) myProp = new MyContext();
 			//
 			// The decorator receives:
 			// - protoOrTarget: The class prototype
@@ -109,47 +132,17 @@ export function provide<
 			const constructor = protoOrTarget.constructor as any;
 
 			if (constructor.addInitializer) {
+				// Strategy 1: Use addInitializer if available (LitElement classes)
 				constructor.addInitializer((element: any): void => {
 					// Defer controller creation to avoid timing issues with private fields
 					queueMicrotask(() => {
 						// Get initial value from property if it exists
 						const initialValue = element[propertyKey];
-						const controller = new UmbContextProviderController(element, context, initialValue);
-						controllerMap.set(element, controller);
+						new UmbContextProviderController(element, context, initialValue);
 					});
 				});
-
-				// Proxy any existing setter for this property to notify the controller
-				const descriptor = Object.getOwnPropertyDescriptor(protoOrTarget, propertyKey);
-				let newDescriptor: PropertyDescriptor;
-
-				if (descriptor === undefined) {
-					// No existing descriptor, create a new property
-					const valueMap = new WeakMap<any, ResultType>();
-					newDescriptor = {
-						get(this: any) {
-							return valueMap.get(this);
-						},
-						set(this: any, value: ResultType) {
-							valueMap.set(this, value);
-						},
-						configurable: true,
-						enumerable: true,
-					};
-				} else {
-					// Existing descriptor, wrap the setter
-					const oldSetter = descriptor.set;
-					newDescriptor = {
-						...descriptor,
-						set(this: any, value: ResultType) {
-							oldSetter?.call(this, value);
-						},
-					};
-				}
-
-				Object.defineProperty(protoOrTarget, propertyKey, newDescriptor);
 			} else if ('hostConnected' in protoOrTarget && typeof protoOrTarget.hostConnected === 'function') {
-				// Fallback for UmbController classes without addInitializer
+				// Strategy 2: Wrap hostConnected for UmbController classes without addInitializer
 				const originalHostConnected = protoOrTarget.hostConnected;
 
 				protoOrTarget.hostConnected = function (this: any) {
@@ -161,16 +154,19 @@ export function provide<
 					if (!this.__provideControllers.has(propertyKey)) {
 						// Get initial value from property if it exists
 						const initialValue = this[propertyKey];
-						const controller = new UmbContextProviderController(this, context, initialValue);
-						this.__provideControllers.set(propertyKey, controller);
-						controllerMap.set(this, controller);
+						new UmbContextProviderController(this, context, initialValue);
+						// Mark as set up to prevent duplicate providers
+						this.__provideControllers.set(propertyKey, true);
 					}
 
-					originalHostConnected.call(this);
+					// Call original hostConnected if it exists
+					originalHostConnected?.call(this);
 				};
 			} else {
+				// Strategy 3: No supported initialization method available
 				console.warn(
-					`@provide applied to ${constructor.name}.${String(propertyKey)} but addInitializer is not available. Make sure the class extends UmbLitElement, UmbControllerBase, or implements UmbController with hostConnected.`,
+					`@provide applied to ${constructor.name}.${String(propertyKey)} but neither addInitializer nor hostConnected is available. ` +
+						`Make sure the class extends UmbLitElement, UmbControllerBase, or implements UmbController with hostConnected.`,
 				);
 			}
 		}
