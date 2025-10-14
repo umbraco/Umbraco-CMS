@@ -1,5 +1,5 @@
 import { expect } from '@open-wc/testing';
-import { api as UmbUfmStripHtmlFilterApi } from './strip-html.filter.js';
+import { UmbUfmStripHtmlFilterApi } from './strip-html.filter.js';
 
 describe('UmbUfmStripHtmlFilter', () => {
 	let filter: UmbUfmStripHtmlFilterApi;
