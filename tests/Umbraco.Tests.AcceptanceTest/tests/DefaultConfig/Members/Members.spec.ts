@@ -1,4 +1,4 @@
-﻿import {NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
+﻿import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 let memberId = '';
@@ -241,7 +241,7 @@ test('cannot create member with invalid email', {tag: '@release'}, async ({umbra
 
   // Assert
   await umbracoUi.member.isFailedStateButtonVisible();
-  await umbracoUi.member.doesErrorNotificationHaveText(NotificationConstantHelper.error.invalidEmail);
+  await umbracoUi.member.isValidationMessageVisible(ConstantHelper.validationMessages.invalidEmail);
   expect(await umbracoApi.member.doesNameExist(memberName)).toBeFalsy();
 });
 
@@ -259,7 +259,7 @@ test('cannot update email to an invalid email', async ({umbracoApi, umbracoUi}) 
 
   // Assert
   await umbracoUi.member.isFailedStateButtonVisible();
-  await umbracoUi.member.isErrorNotificationVisible();
+  await umbracoUi.member.isValidationMessageVisible(ConstantHelper.validationMessages.invalidEmail);
   const memberData = await umbracoApi.member.get(memberId);
   expect(memberData.email).toBe(email);
 });

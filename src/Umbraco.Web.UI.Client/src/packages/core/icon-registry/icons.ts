@@ -1810,6 +1810,9 @@ path: () => import("./icons/icon-trash.js"),
 name: "icon-tree",
 path: () => import("./icons/icon-tree.js"),
 },{
+name: "icon-trending-up-down",
+path: () => import("./icons/icon-trending-up-down.js"),
+},{
 name: "icon-trophy",
 path: () => import("./icons/icon-trophy.js"),
 },{
@@ -1976,6 +1979,9 @@ path: () => import("./icons/icon-zoom-out.js"),
 },{
 name: "icon-star",
 path: () => import("./icons/icon-star.js"),
+},{
+name: "icon-stretch-horizontal",
+path: () => import("./icons/icon-stretch-horizontal.js"),
 },{
 name: "icon-database",
 path: () => import("./icons/icon-database.js"),

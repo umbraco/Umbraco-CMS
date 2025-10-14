@@ -11,10 +11,7 @@ export class UmbBlockWorkspaceEditorElement extends UmbLitElement {
 		this.consumeContext(UMB_BLOCK_WORKSPACE_CONTEXT, (context) => {
 			if (context) {
 				this.observe(
-					observeMultiple([
-						context.isNew,
-						context.content.structure.ownerContentTypeObservablePart((contentType) => contentType?.name),
-					]),
+					observeMultiple([context.isNew, context.name]),
 					([isNew, name]) => {
 						this._headline =
 							this.localize.term(isNew ? 'general_add' : 'general_edit') + ' ' + this.localize.string(name);

@@ -53,7 +53,7 @@ export class UmbRestoreFromRecycleBinModalElement extends UmbModalBaseElement<
 
 			this.#setDestinationValue({
 				unique: null,
-				entityType: 'unknown',
+				entityType: this.data?.entityType ?? 'unknown',
 			});
 		}
 

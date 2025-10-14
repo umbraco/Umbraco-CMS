@@ -1,9 +1,9 @@
 import { UmbMediaItemRepository } from '../../repository/index.js';
 import { UMB_MEDIA_CREATE_OPTIONS_MODAL } from './media-create-options-modal.token.js';
-import type { UmbEntityActionArgs } from '@umbraco-cms/backoffice/entity-action';
+import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
+import type { UmbEntityActionArgs } from '@umbraco-cms/backoffice/entity-action';
 
 export class UmbCreateMediaEntityAction extends UmbEntityActionBase<never> {
 	constructor(host: UmbControllerHost, args: UmbEntityActionArgs<never>) {
@@ -30,5 +30,4 @@ export class UmbCreateMediaEntityAction extends UmbEntityActionBase<never> {
 		});
 	}
 }
-
 export { UmbCreateMediaEntityAction as api };
