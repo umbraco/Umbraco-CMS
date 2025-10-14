@@ -21,6 +21,9 @@ export interface UmbProvideOptions<BaseType extends UmbContextMinimal, ResultTyp
  * A property decorator that creates a UmbContextProviderController to provide
  * a context value to child elements via the Umbraco Context API.
  *
+ * This decorator supports both modern "standard" decorators (Stage 3 TC39 proposal) and
+ * legacy TypeScript experimental decorators for backward compatibility.
+ *
  * @param options Configuration object containing the context token
  *
  * @example
@@ -29,9 +32,13 @@ export interface UmbProvideOptions<BaseType extends UmbContextMinimal, ResultTyp
  * import {UMB_WORKSPACE_CONTEXT} from './workspace.context-token.js';
  *
  * class MyWorkspaceElement extends UmbLitElement {
+ *   // Standard decorators (with 'accessor' keyword) - Modern approach
  *   @provide({context: UMB_WORKSPACE_CONTEXT})
- *   @state()
  *   accessor workspaceContext = new UmbWorkspaceContext(this);
+ *
+ *   // Legacy decorators (without 'accessor') - Works with Lit decorators
+ *   @provide({context: UMB_WORKSPACE_CONTEXT})
+ *   workspaceContext = new UmbWorkspaceContext(this);
  * }
  * ```
  */
@@ -47,7 +54,21 @@ export function provide<
 		const controllerMap = new WeakMap<any, UmbContextProviderController<BaseType, ResultType, InstanceType>>();
 
 		if (typeof nameOrContext === 'object') {
-			// Standard decorators branch (auto-accessors)
+			// ===================================================================
+			// STANDARD DECORATORS BRANCH (Stage 3 TC39 Proposal)
+			// ===================================================================
+			// This branch is used when decorating auto-accessors (with 'accessor' keyword).
+			// Example: @provide({context: TOKEN}) accessor myProp?: Type;
+			//
+			// The decorator receives a ClassAccessorDecoratorContext object which provides:
+			// - addInitializer(): Run code during class construction
+			// - Access to getter/setter through the context object
+			//
+			// This is the modern, standardized decorator API.
+			//
+			// Note: Standard decorators currently don't work with @state()/@property()
+			// decorators, which is why we still need the legacy branch.
+			// ===================================================================
 			return {
 				get(this: any) {
 					return protoOrTarget.get.call(this);
@@ -65,7 +86,25 @@ export function provide<
 				},
 			};
 		} else {
-			// Legacy decorators branch (regular properties with @state/@property)
+			// ===================================================================
+			// LEGACY DECORATORS BRANCH (TypeScript Experimental)
+			// ===================================================================
+			// This branch is used when decorating regular properties (WITHOUT 'accessor' keyword).
+			// Example: @consume({context: TOKEN}) @state() myProp?: Type;
+			//
+			// The decorator receives:
+			// - protoOrTarget: The class prototype
+			// - nameOrContext: The property name (string)
+			//
+			// This is the older TypeScript experimental decorator API, still widely used
+			// in Umbraco because it works with @state() and @property() decorators.
+			// The 'accessor' keyword is not compatible with these decorators yet.
+			//
+			// We support three initialization strategies:
+			// 1. addInitializer (if available, e.g., on LitElement classes)
+			// 2. hostConnected wrapper (for UmbController classes)
+			// 3. Warning (if neither is available)
+			// ===================================================================
 			const propertyKey = nameOrContext as string;
 			const constructor = protoOrTarget.constructor as any;
 
@@ -110,6 +149,7 @@ export function provide<
 
 				Object.defineProperty(protoOrTarget, propertyKey, newDescriptor);
 			} else if ('hostConnected' in protoOrTarget && typeof protoOrTarget.hostConnected === 'function') {
+				// Fallback for UmbController classes without addInitializer
 				const originalHostConnected = protoOrTarget.hostConnected;
 
 				protoOrTarget.hostConnected = function (this: any) {
@@ -130,7 +170,7 @@ export function provide<
 				};
 			} else {
 				console.warn(
-					`@provide applied to ${constructor.name}.${String(propertyKey)} but addInitializer is not available. Make sure the class extends UmbLitElement or implements UmbController with hostConnected.`,
+					`@provide applied to ${constructor.name}.${String(propertyKey)} but addInitializer is not available. Make sure the class extends UmbLitElement, UmbControllerBase, or implements UmbController with hostConnected.`,
 				);
 			}
 		}
