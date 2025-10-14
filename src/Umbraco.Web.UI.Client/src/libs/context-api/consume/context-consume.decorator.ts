@@ -45,8 +45,7 @@ export interface UmbConsumeOptions<
  * This decorator supports both modern "standard" decorators (Stage 3 TC39 proposal) and
  * legacy TypeScript experimental decorators for backward compatibility.
  *
- * @param options Configuration object containing context, callback, and subscribe options
- *
+ * @param {UmbConsumeOptions} options Configuration object containing context, callback, and subscribe options
  * @example
  * ```ts
  * import {consume} from '@umbraco-cms/backoffice/context-api';

@@ -28,7 +28,7 @@ export interface UmbProvideOptions<BaseType extends UmbContextMinimal, ResultTyp
  * To update the provided value dynamically, keep a state inside the provided context instance
  * and update that state as needed. The context instance itself should remain the same. You can use any of the Umb{*}State classes.
  *
- * @param options Configuration object containing the context token
+ * @param {UmbProvideOptions} options Configuration object containing the context token
  *
  * @example
  * ```ts
