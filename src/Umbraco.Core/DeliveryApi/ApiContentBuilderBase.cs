@@ -30,7 +30,7 @@ public abstract class ApiContentBuilderBase<T>
 
     public virtual T? Build(IPublishedContent content)
     {
-        IApiContentRoute? route = ApiContentRouteBuilder.Build(content);
+        IApiContentRoute? route = ApiContentRouteBuilder.Build(content, VariationContextAccessor.VariationContext?.Culture);
         if (route is null)
         {
             return default;
