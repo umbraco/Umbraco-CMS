@@ -14,6 +14,8 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { NewsDashboardItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
+import './components/umb-news-card.element.js';
+
 interface UmbNewsDashboardGroupedItems {
 	priority: number;
 	items: Array<NewsDashboardItemResponseModel>;
@@ -83,48 +85,11 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 				this._groupedItems,
 				(g) => g.priority,
 				(g) => html`
-					<div class="cards">
+					<div class="cards" role="list" aria-label=${`Priority ${g.priority}`}>
 						${repeat(
 							g.items,
 							(i, idx) => i.url || i.header || idx,
-							(i) => {
-								const isLastRow = g.priority === 3;
-
-								const content = html`
-									${when(
-										g.priority <= 2,
-										() =>
-											html`${i.imageUrl
-												? html`<img class="card-img" src=${i.imageUrl} alt=${i.imageAltText ?? ''} />`
-												: html`<div class="card-img placeholder" aria-hidden="true"></div>`}`,
-										() => nothing,
-									)}
-									<div class="card-body">
-										${g.priority <= 2
-											? html`<h2 class="card-title">${i.header}</h2>`
-											: html`<h3 class="card-title">${i.header}</h3>`}
-										${i.body ? html`<div class="card-text">${unsafeHTML(i.body)}</div>` : null}
-										${!isLastRow && i.url
-											? html`<div class="card-actions">
-													<uui-button look="outline" href=${i.url} target="_blank">
-														${i.buttonText || 'Open'}
-													</uui-button>
-												</div>`
-											: nothing}
-									</div>
-								`;
-
-								// LAST ROW: whole card is a link
-								return isLastRow
-									? i.url
-										? html`
-												<a class="card normal-priority" role="listitem" href=${i.url} target="_blank" rel="noopener">
-													${content}
-												</a>
-											`
-										: html` <article class="card normal-priority" role="listitem">${content}</article> `
-									: html` <article class="card" role="listitem">${content}</article> `;
-							},
+							(i) => html`<umb-news-card .item=${i} .priority=${g.priority}></umb-news-card>`,
 						)}
 					</div>
 				`,
@@ -252,73 +217,15 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 				margin-top: var(--uui-size-space-5);
 			}
 
-			@container (max-width: 1200px) {
+			@container dashboard (max-width: 1200px) {
 				.cards {
 					grid-template-columns: repeat(auto-fit, minmax(2, 1fr));
 				}
 			}
-			@container (max-width: 700px) {
+			@container dashboard (max-width: 700px) {
 				.cards {
 					grid-template-columns: 1fr;
 				}
-			}
-
-			/* Card */
-			.card {
-				background: var(--uui-color-surface);
-				border-radius: var(--uui-border-radius, 8px);
-				box-shadow: var(
-					--uui-box-box-shadow,
-					var(--uui-shadow-depth-1, 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24))
-				);
-				overflow: hidden;
-				display: flex;
-				flex-direction: column;
-				height: 100%;
-			}
-
-			.card-img {
-				width: 100%;
-				object-fit: cover;
-				display: block;
-			}
-
-			.card-img.placeholder {
-				height: 8px;
-			}
-
-			.card-body {
-				display: flex;
-				flex-direction: column;
-				padding: var(--uui-size-space-5);
-				flex: 1 1 auto;
-				justify-content: space-between;
-				gap: var(--uui-size-space-3, 9px);
-			}
-
-			.card-title {
-				margin: 0;
-			}
-
-			.card-text > p {
-				margin: 0;
-			}
-
-			.normal-priority {
-				display: block;
-				border: 1px solid var(--uui-color-divider);
-				border-radius: var(--uui-border-radius, 8px);
-				text-decoration: none;
-				color: inherit;
-				overflow: hidden;
-
-				.card-body {
-					gap: 0;
-				}
-			}
-
-			.card-actions {
-				align-self: end;
 			}
 		`,
 	];
