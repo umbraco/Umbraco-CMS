@@ -34,6 +34,9 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 	#viewContext?: typeof UMB_VIEW_CONTEXT.TYPE;
 
 	@state()
+	private _loaded = false;
+
+	@state()
 	private _hasRootGroups = false;
 
 	@state()
@@ -84,6 +87,13 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 			this.#structureManager = workspaceContext?.structure;
 			this._tabsStructureHelper.setStructureManager(workspaceContext?.structure);
 			this.#observeRootGroups();
+			this.observe(
+				this.#structureManager?.contentTypeLoaded,
+				(loaded) => {
+					this._loaded = loaded ?? false;
+				},
+				'observeContentTypeLoaded',
+			);
 		});
 	}
 
@@ -158,7 +168,7 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 				view.hints.setPathFilter((paths) => paths[0].includes('tab/') === false);
 			}
 
-			view.setBrowserTitle(tabName);
+			view.setTitle(tabName);
 			view.inheritFrom(this.#viewContext);
 
 			this.observe(
@@ -191,13 +201,15 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 		// ViewAlias null is only for the root tab, therefor we can implement this hack.
 		if (viewAlias === null) {
 			// Specific hack for the Generic tab to only show its name if there are other tabs.
-			view.setBrowserTitle(this._tabs && this._tabs?.length > 0 ? '#general_generic' : undefined);
+			view.setTitle(this._tabs && this._tabs?.length > 0 ? '#general_generic' : undefined);
 		}
 		view.provideAt(component as any);
 	}
 
 	override render() {
-		if (!this._routes || !this._tabs) return;
+		if (!this._loaded || !this._routes || this._routes.length === 0 || !this._tabs) {
+			return html`<umb-view-loader></umb-view-loader>`;
+		}
 		return html`
 			<umb-body-layout header-fit-height>
 				${this._routerPath && (this._tabs.length > 1 || (this._tabs.length === 1 && this._hasRootGroups))

@@ -94,7 +94,7 @@ test('can update property value nested in a block grid area with an RTE with a b
   await umbracoUi.content.clickSelectBlockElementWithName(areaElementTypeName);
   await umbracoUi.content.clickAddBlockGridElementWithName(richTextEditorElementTypeName);
   await umbracoUi.content.clickExactLinkWithName(richTextEditorElementTypeName);
-  await umbracoUi.content.clickInsertBlockButton();
+  await umbracoUi.content.clickTipTapToolbarIconWithTitle('Insert Block');
   await umbracoUi.content.clickExactLinkWithName(blockListElementTypeName, true);
   await umbracoUi.content.clickAddBlockGridElementWithName(textStringElementTypeName);
   await umbracoUi.content.clickExactLinkWithName(textStringElementTypeName);

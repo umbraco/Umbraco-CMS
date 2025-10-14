@@ -21,14 +21,15 @@ export class UmbSectionSidebarMenuWithEntityActionsElement extends UmbSectionSid
 	}
 
 	override renderHeader() {
+		const label = this.localize.string(this.manifest?.meta?.label ?? '');
 		return html`
 			<div id="header">
-				<h3>${this.localize.string(this.manifest?.meta?.label ?? '')}</h3>
+				<h3>${label}</h3>
 				<umb-entity-actions-bundle
 					slot="actions"
 					.unique=${this._unique}
 					.entityType=${this.manifest?.meta.entityType}
-					.label=${this.localize.term('actions_viewActionsFor', [this.manifest?.meta.label])}>
+					.label=${label}>
 				</umb-entity-actions-bundle>
 			</div>
 		`;

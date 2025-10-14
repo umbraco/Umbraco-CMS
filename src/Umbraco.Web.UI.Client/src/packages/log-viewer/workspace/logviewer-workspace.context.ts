@@ -112,7 +112,7 @@ export class UmbLogViewerWorkspaceContext extends UmbContextBase implements UmbW
 		this.provideContext(UMB_WORKSPACE_CONTEXT, this);
 		this.#repository = new UmbLogViewerRepository(host);
 
-		this.view.setBrowserTitle('#treeHeaders_logViewer');
+		this.view.setTitle('#treeHeaders_logViewer');
 	}
 
 	override hostConnected() {
@@ -124,6 +124,7 @@ export class UmbLogViewerWorkspaceContext extends UmbContextBase implements UmbW
 	override hostDisconnected(): void {
 		super.hostDisconnected();
 		window.removeEventListener('changestate', this.onChangeState);
+		this.stopPolling();
 	}
 
 	onChangeState = () => {
@@ -320,7 +321,7 @@ export class UmbLogViewerWorkspaceContext extends UmbContextBase implements UmbW
 			return;
 		}
 
-		clearInterval(this.#intervalID as number);
+		this.stopPolling();
 	}
 
 	setPollingInterval(interval: UmbPoolingInterval) {
@@ -331,6 +332,13 @@ export class UmbLogViewerWorkspaceContext extends UmbContextBase implements UmbW
 		const direction = this.#sortingDirection.getValue();
 		const newDirection = direction === DirectionModel.ASCENDING ? DirectionModel.DESCENDING : DirectionModel.ASCENDING;
 		this.#sortingDirection.setValue(newDirection);
+	}
+
+	stopPolling() {
+		if (this.#intervalID) {
+			clearInterval(this.#intervalID);
+			this.#intervalID = null;
+		}
 	}
 }
 

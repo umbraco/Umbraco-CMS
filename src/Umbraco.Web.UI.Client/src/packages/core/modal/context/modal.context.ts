@@ -87,7 +87,7 @@ export class UmbModalContext<
 			title = this.alias.getDefaultModal()?.title ?? undefined;
 		}
 
-		this.view.setBrowserTitle(title);
+		this.view.setTitle(title);
 
 		this.type = args.modal?.type || this.type;
 		size = args.modal?.size ?? size;

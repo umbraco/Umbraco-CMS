@@ -14,14 +14,11 @@
   <ItemGroup>
     <PackageVersion Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="9.0.4" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.13.0" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.Common" Version="4.13.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.13.0" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="4.13.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="4.13.0" />
     <PackageVersion Include="Microsoft.Data.Sqlite" Version="9.0.4" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.4" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.4" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.4" />
     <PackageVersion Include="Microsoft.Extensions.Caching.Abstractions" Version="9.0.4" />
     <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="9.0.4" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.4" />
@@ -76,8 +73,8 @@
     <PackageVersion Include="Serilog.Sinks.Async" Version="2.1.0" />
     <PackageVersion Include="Serilog.Sinks.File" Version="6.0.0" />
     <PackageVersion Include="Serilog.Sinks.Map" Version="2.0.0" />
-    <PackageVersion Include="SixLabors.ImageSharp" Version="3.1.7" />
-    <PackageVersion Include="SixLabors.ImageSharp.Web" Version="3.1.4" />
+    <PackageVersion Include="SixLabors.ImageSharp" Version="3.1.11" />
+    <PackageVersion Include="SixLabors.ImageSharp.Web" Version="3.1.5" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="8.1.1" />
   </ItemGroup>
   <!-- Transitive pinned versions (only required because our direct dependencies have vulnerable versions of transitive dependencies) -->

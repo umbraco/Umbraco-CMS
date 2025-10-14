@@ -82,7 +82,8 @@ public class MediaPicker3PropertyEditor : DataEditor
             IDataTypeConfigurationCache dataTypeReadCache,
             ILocalizedTextService localizedTextService,
             IMediaTypeService mediaTypeService,
-            IMediaNavigationQueryService mediaNavigationQueryService)
+            IMediaNavigationQueryService mediaNavigationQueryService,
+            AppCaches appCaches)
             : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
         {
             _jsonSerializer = jsonSerializer;
@@ -95,7 +96,7 @@ public class MediaPicker3PropertyEditor : DataEditor
             var validators = new TypedJsonValidatorRunner<List<MediaWithCropsDto>, MediaPicker3Configuration>(
                 jsonSerializer,
                 new MinMaxValidator(localizedTextService),
-                new AllowedTypeValidator(localizedTextService, mediaTypeService, _mediaService),
+                new AllowedTypeValidator(localizedTextService, mediaTypeService, _mediaService, appCaches),
                 new StartNodeValidator(localizedTextService, mediaNavigationQueryService));
 
             Validators.Add(validators);
@@ -401,18 +402,22 @@ public class MediaPicker3PropertyEditor : DataEditor
         /// </summary>
         internal sealed class AllowedTypeValidator : ITypedJsonValidator<List<MediaWithCropsDto>, MediaPicker3Configuration>
         {
+            private const string MediaTypeCacheKeyFormat = nameof(AllowedTypeValidator) + "_MediaTypeKey_{0}";
+
             private readonly ILocalizedTextService _localizedTextService;
             private readonly IMediaTypeService _mediaTypeService;
             private readonly IMediaService _mediaService;
+            private readonly AppCaches _appCaches;
 
             /// <summary>
             /// Initializes a new instance of the <see cref="AllowedTypeValidator"/> class.
             /// </summary>
-            public AllowedTypeValidator(ILocalizedTextService localizedTextService, IMediaTypeService mediaTypeService, IMediaService mediaService)
+            public AllowedTypeValidator(ILocalizedTextService localizedTextService, IMediaTypeService mediaTypeService, IMediaService mediaService, AppCaches appCaches)
             {
                 _localizedTextService = localizedTextService;
                 _mediaTypeService = mediaTypeService;
                 _mediaService = mediaService;
+                _appCaches = appCaches;
             }
 
             /// <inheritdoc/>
@@ -452,9 +457,20 @@ public class MediaPicker3PropertyEditor : DataEditor
 
                 foreach (var typeAlias in distinctTypeAliases)
                 {
-                    IMediaType? type = _mediaTypeService.Get(typeAlias);
+                    // Cache media type lookups since the same media type is likely to be used multiple times in validation,
+                    // particularly if we have multiple languages and blocks.
+                    var cacheKey = string.Format(MediaTypeCacheKeyFormat, typeAlias);
+                    string? typeKey = _appCaches.RequestCache.GetCacheItem<string?>(cacheKey);
+                    if (typeKey is null)
+                    {
+                        typeKey = _mediaTypeService.Get(typeAlias)?.Key.ToString();
+                        if (typeKey is not null)
+                        {
+                            _appCaches.RequestCache.Set(cacheKey, typeKey);
+                        }
+                    }
 
-                    if (type is null || allowedTypes.Contains(type.Key.ToString()) is false)
+                    if (typeKey is null || allowedTypes.Contains(typeKey) is false)
                     {
                         return
                         [

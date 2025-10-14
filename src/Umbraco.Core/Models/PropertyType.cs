@@ -47,6 +47,7 @@ public class PropertyType : EntityBase, IPropertyType, IEquatable<PropertyType>
         if (dataType.HasIdentity)
         {
             _dataTypeId = dataType.Id;
+            _dataTypeKey = dataType.Key;
         }
 
         _propertyEditorAlias = dataType.EditorAlias;
@@ -159,6 +160,7 @@ public class PropertyType : EntityBase, IPropertyType, IEquatable<PropertyType>
         set => SetPropertyValueAndDetectChanges(value, ref _dataTypeId, nameof(DataTypeId));
     }
 
+    /// <inheritdoc />
     [DataMember]
     public Guid DataTypeKey
     {
