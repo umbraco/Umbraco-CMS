@@ -14,7 +14,9 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
  */
 @customElement('umb-property-editor-ui-icon-picker')
 export class UmbPropertyEditorUIIconPickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
-	//
+	@property({ type: Boolean })
+	mandatory?: boolean;
+
 	@property()
 	public set value(v: string) {
 		this._value = v ?? '';
@@ -53,7 +55,7 @@ export class UmbPropertyEditorUIIconPickerElement extends UmbLitElement implemen
 				icon: this._icon,
 				color: this._color,
 			},
-			data: { placeholder: this._placeholderIcon },
+			data: { placeholder: this._placeholderIcon, showEmptyOption: !this.mandatory },
 		}).catch(() => undefined);
 
 		if (!data) return;

@@ -37,7 +37,6 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 		super();
 		this.consumeContext(UMB_ICON_REGISTRY_CONTEXT, (context) => {
 			this.observe(context?.approvedIcons, (icons) => {
-				console.log(context);
 				this.#icons = icons;
 				this.#filterIcons();
 			});
@@ -99,7 +98,7 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 					</uui-color-swatches>
 					<hr />
 					<uui-scroll-container id="icons">
-						${!this._isSearching
+						${this.data?.showEmptyOption && !this._isSearching
 							? html`
 									<uui-button
 										class=${!this.value.icon ? 'selected' : ''}
