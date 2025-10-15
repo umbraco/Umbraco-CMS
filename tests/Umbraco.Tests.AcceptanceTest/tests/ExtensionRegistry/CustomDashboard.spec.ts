@@ -1,6 +1,6 @@
 import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 
-//Dashboard
+// Dashboard
 const dashboardName = 'Welcome Dashboard';
 
 test('can see the custom dashboard in content section', async ({umbracoUi}) => {
