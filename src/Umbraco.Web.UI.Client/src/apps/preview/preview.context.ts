@@ -101,7 +101,7 @@ export class UmbPreviewContext extends UmbContextBase {
 		const urlInfo = this.#culture ? data[0].urlInfos.find((x) => x.culture === this.#culture) : data[0].urlInfos[0];
 
 		if (!urlInfo?.url) return null;
-		return !urlInfo.url.startsWith(this.#serverUrl) ? `${this.#serverUrl}${urlInfo.url}` : urlInfo.url;
+		return urlInfo.url.startsWith('/') ? `${this.#serverUrl}${urlInfo.url}` : urlInfo.url;
 	}
 
 	#getSessionCount(): number {
