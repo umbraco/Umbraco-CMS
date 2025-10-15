@@ -36,7 +36,7 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 	#logViewerContext?: typeof UMB_APP_LOG_VIEWER_CONTEXT.TYPE;
 
 	@consumeContext({ context: UMB_APP_LOG_VIEWER_CONTEXT })
-	private set _logViewerContext(value: typeof UMB_APP_LOG_VIEWER_CONTEXT.TYPE | undefined) {
+	private set _logViewerContext(value) {
 		this.#logViewerContext = value;
 		this.#observeStuff();
 		this.#logViewerContext?.getSavedSearches();
