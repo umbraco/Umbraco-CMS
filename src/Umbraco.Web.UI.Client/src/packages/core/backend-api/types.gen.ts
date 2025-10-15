@@ -381,6 +381,10 @@ export type CreateStylesheetRequestModel = {
     content: string;
 };
 
+export type CreateTemplateForDocumentTypeRequestModel = {
+    documentType: ReferenceByIdModel;
+};
+
 export type CreateTemplateRequestModel = {
     name: string;
     alias: string;
@@ -659,6 +663,9 @@ export type DocumentConfigurationResponseModel = {
     disableDeleteWhenReferenced: boolean;
     disableUnpublishWhenReferenced: boolean;
     allowEditInvariantFromNonDefault: boolean;
+    /**
+     * @deprecated
+     */
     allowNonExistingSegmentsCreation: boolean;
 };
 
@@ -14348,6 +14355,37 @@ export type GetTemplateConfigurationResponses = {
 };
 
 export type GetTemplateConfigurationResponse = GetTemplateConfigurationResponses[keyof GetTemplateConfigurationResponses];
+
+export type PostTemplateForDocumentTypeData = {
+    body?: CreateTemplateForDocumentTypeRequestModel;
+    path?: never;
+    query?: never;
+    url: '/umbraco/management/api/v1/template/for-document-type';
+};
+
+export type PostTemplateForDocumentTypeErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type PostTemplateForDocumentTypeError = PostTemplateForDocumentTypeErrors[keyof PostTemplateForDocumentTypeErrors];
+
+export type PostTemplateForDocumentTypeResponses = {
+    /**
+     * Created
+     */
+    201: unknown;
+};
 
 export type PostTemplateQueryExecuteData = {
     body?: TemplateQueryExecuteModel;

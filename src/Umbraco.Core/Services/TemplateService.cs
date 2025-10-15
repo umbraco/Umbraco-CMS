@@ -1,4 +1,6 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
@@ -6,6 +8,7 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services.ContentTypeEditing;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
@@ -20,6 +23,7 @@ public class TemplateService : RepositoryService, ITemplateService
     private readonly ITemplateContentParserService _templateContentParserService;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly IDefaultViewContentProvider _defaultViewContentProvider;
+    private readonly IContentTypeService _contentTypeService;
 
     public TemplateService(
         ICoreScopeProvider provider,
@@ -30,7 +34,8 @@ public class TemplateService : RepositoryService, ITemplateService
         IAuditRepository auditRepository,
         ITemplateContentParserService templateContentParserService,
         IUserIdKeyResolver userIdKeyResolver,
-        IDefaultViewContentProvider defaultViewContentProvider)
+        IDefaultViewContentProvider defaultViewContentProvider,
+        IContentTypeService contentTypeService)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _shortStringHelper = shortStringHelper;
@@ -39,13 +44,43 @@ public class TemplateService : RepositoryService, ITemplateService
         _templateContentParserService = templateContentParserService;
         _userIdKeyResolver = userIdKeyResolver;
         _defaultViewContentProvider = defaultViewContentProvider;
+        _contentTypeService = contentTypeService;
+    }
+
+    [Obsolete("Use the non-obsolete constructor. Scheduled for removal in v18.")]
+    public TemplateService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IShortStringHelper shortStringHelper,
+        ITemplateRepository templateRepository,
+        IAuditRepository auditRepository,
+        ITemplateContentParserService templateContentParserService,
+        IUserIdKeyResolver userIdKeyResolver,
+        IDefaultViewContentProvider defaultViewContentProvider)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            shortStringHelper,
+            templateRepository,
+            auditRepository,
+            templateContentParserService,
+            userIdKeyResolver,
+            defaultViewContentProvider,
+            StaticServiceProvider.Instance.GetRequiredService<IContentTypeService>())
+    {
     }
 
     /// <inheritdoc />
     public async Task<Attempt<ITemplate, TemplateOperationStatus>> CreateForContentTypeAsync(
-        string contentTypeAlias, string? contentTypeName, Guid userKey)
+        string contentTypeAlias,
+        string? contentTypeName,
+        Guid userKey)
     {
-        ITemplate template = new Template(_shortStringHelper, contentTypeName,
+        ITemplate template = new Template(
+            _shortStringHelper,
+            contentTypeName,
 
             // NOTE: We are NOT passing in the content type alias here, we want to use it's name since we don't
             // want to save template file names as camelCase, the Template ctor will clean the alias as
@@ -71,7 +106,7 @@ public class TemplateService : RepositoryService, ITemplateService
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             var savingEvent = new TemplateSavingNotification(template, eventMessages, true, contentTypeAlias!);
-            if (scope.Notifications.PublishCancelable(savingEvent))
+            if (await scope.Notifications.PublishCancelableAsync(savingEvent))
             {
                 scope.Complete();
                 return Attempt.FailWithStatus(TemplateOperationStatus.CancelledByNotification, template);
@@ -87,6 +122,23 @@ public class TemplateService : RepositoryService, ITemplateService
         }
 
         return Attempt.SucceedWithStatus(TemplateOperationStatus.Success, template);
+    }
+
+    /// <inheritdoc />
+    public async Task<Attempt<ITemplate?, TemplateOperationStatus>> CreateForContentTypeAsync(
+        Guid contentTypeKey,
+        Guid userKey)
+    {
+        IContentType? contentType = await _contentTypeService.GetAsync(contentTypeKey);
+        if (contentType is null)
+        {
+            return Attempt.FailWithStatus(TemplateOperationStatus.ContentTypeNotFound, default(ITemplate));
+        }
+
+        Attempt<ITemplate, TemplateOperationStatus> result = await CreateForContentTypeAsync(contentType.Alias, contentType.Name, userKey);
+        return result.Success
+            ? Attempt.SucceedWithStatus<ITemplate?, TemplateOperationStatus>(result.Status, result.Result)
+            : Attempt.FailWithStatus<ITemplate?, TemplateOperationStatus>(result.Status, result.Result);
     }
 
     /// <inheritdoc />
