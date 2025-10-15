@@ -40,5 +40,5 @@ test('cannot see the custom workspace view in the media section', async ({umbrac
   await umbracoUi.media.goToMediaWithName(mediaName);
 
   // Assert
-  await umbracoUi.media.isWorkspaceViewTabWithAliasVisible("My.WorkspaceView", false);
+  await umbracoUi.media.isWorkspaceViewTabWithAliasVisible('My.WorkspaceView', false);
 });
