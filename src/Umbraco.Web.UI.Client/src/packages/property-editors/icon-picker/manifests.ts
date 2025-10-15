@@ -8,6 +8,16 @@ export const manifests: Array<UmbExtensionManifest> = [
 			label: 'Icon Picker',
 			icon: 'icon-autofill',
 			group: 'common',
+			settings: {
+				properties: [
+					{
+						alias: 'placeholder',
+						label: 'Placeholder icon (empty state)',
+						description: 'Icon name to show when no icon is selected',
+						propertyEditorUiAlias: 'Umb.PropertyEditorUi.IconPicker',
+					},
+				],
+			},
 		},
 	},
 ];

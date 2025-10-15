@@ -753,7 +753,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 				transition: opacity 100ms;
 			}
 
-			uui-tab:not(:hover, :focus) .trash {
+			uui-tab:not(:hover, :focus, :focus-within) .trash {
 				opacity: 0;
 				transition: opacity 100ms;
 			}

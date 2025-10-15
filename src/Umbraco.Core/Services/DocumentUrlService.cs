@@ -432,7 +432,8 @@ public class DocumentUrlService : IDocumentUrlService
 
         if (draftUrlSegments.Any() is false)
         {
-            _logger.LogWarning("No draft URL segments found for document {DocumentKey} in culture {Culture}", document.Key, culture ?? "{null}");
+            // Log at debug level because this is expected when a document is not published in a given language.
+            _logger.LogDebug("No draft URL segments found for document {DocumentKey} in culture {Culture}", document.Key, culture ?? "{null}");
         }
         else
         {

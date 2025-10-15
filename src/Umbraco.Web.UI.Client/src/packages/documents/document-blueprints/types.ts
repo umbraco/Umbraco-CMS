@@ -2,12 +2,12 @@ import type { UmbDocumentBlueprintEntityType } from './entity.js';
 import type { UmbEntityVariantModel, UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import { DocumentVariantStateModel as UmbDocumentBlueprintVariantState } from '@umbraco-cms/backoffice/external/backend-api';
-import type { UmbElementValueModel } from '@umbraco-cms/backoffice/content';
+import type { UmbContentDetailModel, UmbElementValueModel } from '@umbraco-cms/backoffice/content';
 
 export { UmbDocumentBlueprintVariantState };
 export type * from './tree/types.js';
 export type * from './workspace/types.js';
-export interface UmbDocumentBlueprintDetailModel {
+export interface UmbDocumentBlueprintDetailModel extends UmbContentDetailModel {
 	documentType: {
 		unique: string;
 		collection: UmbReferenceByUnique | null;
