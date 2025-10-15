@@ -5,7 +5,7 @@ import { debounce } from '@umbraco-cms/backoffice/utils';
 import { LogLevelModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { path, query, toQueryString } from '@umbraco-cms/backoffice/router';
-import { consume } from '@umbraco-cms/backoffice/context-api';
+import { consumeContext } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-log-viewer-log-level-filter-menu')
 export class UmbLogViewerLogLevelFilterMenuElement extends UmbLitElement {
@@ -17,7 +17,7 @@ export class UmbLogViewerLogLevelFilterMenuElement extends UmbLitElement {
 
 	#logViewerContext?: typeof UMB_APP_LOG_VIEWER_CONTEXT.TYPE;
 
-	@consume({ context: UMB_APP_LOG_VIEWER_CONTEXT })
+	@consumeContext({ context: UMB_APP_LOG_VIEWER_CONTEXT })
 	private set _logViewerContext(value: typeof UMB_APP_LOG_VIEWER_CONTEXT.TYPE | undefined) {
 		this.#logViewerContext = value;
 		this.#observeLogLevelFilter();

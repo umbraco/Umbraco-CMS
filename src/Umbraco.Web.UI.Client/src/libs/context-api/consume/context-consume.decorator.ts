@@ -48,16 +48,16 @@ export interface UmbConsumeOptions<
  * @param {UmbConsumeOptions} options Configuration object containing context, callback, and subscribe options
  * @example
  * ```ts
- * import {consume} from '@umbraco-cms/backoffice/context-api';
+ * import {consumeContext} from '@umbraco-cms/backoffice/context-api';
  * import {UMB_WORKSPACE_CONTEXT} from './workspace.context-token.js';
  *
  * class MyElement extends UmbLitElement {
  *   // Standard decorators (with 'accessor' keyword) - Modern approach
- *   @consume({context: UMB_WORKSPACE_CONTEXT})
+ *   @consumeContext({context: UMB_WORKSPACE_CONTEXT})
  *   accessor workspaceContext?: UmbWorkspaceContext;
  *
  *   // Legacy decorators (without 'accessor') - Works with @state/@property
- *   @consume({context: UMB_USER_CONTEXT, subscribe: false})
+ *   @consumeContext({context: UMB_USER_CONTEXT, subscribe: false})
  *   @state()
  *   currentUser?: UmbUserContext;
  * }
@@ -65,9 +65,10 @@ export interface UmbConsumeOptions<
  *
  * @returns {ConsumeDecorator} Returns a property decorator function
  */
-export function consume<BaseType extends UmbContextMinimal = UmbContextMinimal, ResultType extends BaseType = BaseType>(
-	options: UmbConsumeOptions<BaseType, ResultType>,
-): ConsumeDecorator<ResultType> {
+export function consumeContext<
+	BaseType extends UmbContextMinimal = UmbContextMinimal,
+	ResultType extends BaseType = BaseType,
+>(options: UmbConsumeOptions<BaseType, ResultType>): ConsumeDecorator<ResultType> {
 	const { context, callback, subscribe = true } = options;
 
 	return ((protoOrTarget: any, nameOrContext: PropertyKey | ClassAccessorDecoratorContext<any, ResultType>) => {

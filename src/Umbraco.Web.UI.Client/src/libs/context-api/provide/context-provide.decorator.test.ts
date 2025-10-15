@@ -1,6 +1,6 @@
 import { UmbContextToken } from '../token/context-token.js';
 import type { UmbContextMinimal } from '../types.js';
-import { provide } from './context-provide.decorator.js';
+import { provideContext } from './context-provide.decorator.js';
 import { aTimeout, elementUpdated, expect, fixture } from '@open-wc/testing';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
@@ -21,7 +21,7 @@ class UmbTestContextConsumerClass implements UmbContextMinimal {
 const testToken = new UmbContextToken<UmbTestContextConsumerClass>('my-test-context', 'testApi');
 
 class MyTestRootElement extends UmbLitElement {
-	@provide({ context: testToken })
+	@provideContext({ context: testToken })
 	providerInstance = new UmbTestContextConsumerClass();
 }
 
@@ -60,7 +60,7 @@ describe('@provide decorator', () => {
 
 	it('should work when the decorator is used in a controller', async () => {
 		class MyController extends UmbControllerBase {
-			@provide({ context: testToken })
+			@provideContext({ context: testToken })
 			providerInstance = new UmbTestContextConsumerClass('new value');
 		}
 
@@ -94,7 +94,7 @@ describe('@provide decorator', () => {
 		newProviderInstance.prop = 'new value from provider';
 
 		class MyUpdateTestElement extends UmbLitElement {
-			@provide({ context: testToken })
+			@provideContext({ context: testToken })
 			providerInstance = newProviderInstance;
 		}
 		customElements.define('my-update-provide-test-element', MyUpdateTestElement);

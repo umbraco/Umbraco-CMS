@@ -32,16 +32,16 @@ export interface UmbProvideOptions<BaseType extends UmbContextMinimal, ResultTyp
  *
  * @example
  * ```ts
- * import {provide} from '@umbraco-cms/backoffice/context-api';
+ * import {provideContext} from '@umbraco-cms/backoffice/context-api';
  * import {UMB_WORKSPACE_CONTEXT} from './workspace.context-token.js';
  *
  * class MyWorkspaceElement extends UmbLitElement {
  *   // Standard decorators - requires 'accessor' keyword
- *   @provide({context: UMB_WORKSPACE_CONTEXT})
+ *   @provideContext({context: UMB_WORKSPACE_CONTEXT})
  *   accessor workspaceContext = new UmbWorkspaceContext(this);
  *
  *   // Legacy decorators - works with or without 'accessor'
- *   @provide({context: UMB_WORKSPACE_CONTEXT})
+ *   @provideContext({context: UMB_WORKSPACE_CONTEXT})
  *   workspaceContext = new UmbWorkspaceContext(this);
  * }
  * ```
@@ -54,7 +54,7 @@ export interface UmbProvideOptions<BaseType extends UmbContextMinimal, ResultTyp
  * }
  *
  * class MyElement extends UmbLitElement {
- *   @provide({context: MY_CONTEXT})
+ *   @provideContext({context: MY_CONTEXT})
  *   private _myContext = new MyContext();
  *
  *   updateValue(newValue: string) {
@@ -65,7 +65,7 @@ export interface UmbProvideOptions<BaseType extends UmbContextMinimal, ResultTyp
  *
  * @returns {ProvideDecorator} Returns a property decorator function
  */
-export function provide<
+export function provideContext<
 	BaseType extends UmbContextMinimal = UmbContextMinimal,
 	ResultType extends BaseType = BaseType,
 	InstanceType extends ResultType = ResultType,

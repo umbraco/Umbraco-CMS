@@ -1,7 +1,7 @@
 import { UmbContextToken } from '../token/context-token.js';
 import type { UmbContextMinimal } from '../types.js';
 import { UmbContextProvider } from '../provide/context-provider.js';
-import { consume } from './context-consume.decorator.js';
+import { consumeContext } from './context-consume.decorator.js';
 import { aTimeout, elementUpdated, expect, fixture } from '@open-wc/testing';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
@@ -16,7 +16,7 @@ class UmbTestContextConsumerClass implements UmbContextMinimal {
 const testToken = new UmbContextToken<UmbTestContextConsumerClass>('my-test-context', 'testApi');
 
 class MyTestElement extends UmbLitElement {
-	@consume({ context: testToken })
+	@consumeContext({ context: testToken })
 	contextValue?: UmbTestContextConsumerClass;
 }
 
@@ -45,7 +45,7 @@ describe('@consume decorator', () => {
 
 	it('should work when the decorator is used in a controller', async () => {
 		class MyController extends UmbControllerBase {
-			@consume({ context: testToken })
+			@consumeContext({ context: testToken })
 			contextValue?: UmbTestContextConsumerClass;
 		}
 
@@ -61,7 +61,7 @@ describe('@consume decorator', () => {
 		let callbackCalled = false;
 
 		class MyCallbackTestElement extends UmbLitElement {
-			@consume({
+			@consumeContext({
 				context: testToken,
 				callback: () => {
 					callbackCalled = true;
@@ -97,7 +97,7 @@ describe('@consume decorator', () => {
 
 	it('should be able to consume without subscribing', async () => {
 		class MyNoSubscribeTestController extends UmbControllerBase {
-			@consume({ context: testToken, subscribe: false })
+			@consumeContext({ context: testToken, subscribe: false })
 			contextValue?: UmbTestContextConsumerClass;
 		}
 

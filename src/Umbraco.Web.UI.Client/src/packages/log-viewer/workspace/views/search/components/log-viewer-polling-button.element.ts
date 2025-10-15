@@ -3,7 +3,7 @@ import { UMB_APP_LOG_VIEWER_CONTEXT } from '../../../logviewer-workspace.context
 import { css, html, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbDropdownElement } from '@umbraco-cms/backoffice/components';
-import { consume } from '@umbraco-cms/backoffice/context-api';
+import { consumeContext } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-log-viewer-polling-button')
 export class UmbLogViewerPollingButtonElement extends UmbLitElement {
@@ -17,7 +17,7 @@ export class UmbLogViewerPollingButtonElement extends UmbLitElement {
 
 	#logViewerContext?: typeof UMB_APP_LOG_VIEWER_CONTEXT.TYPE;
 
-	@consume({ context: UMB_APP_LOG_VIEWER_CONTEXT })
+	@consumeContext({ context: UMB_APP_LOG_VIEWER_CONTEXT })
 	private set _logViewerContext(value: typeof UMB_APP_LOG_VIEWER_CONTEXT.TYPE | undefined) {
 		this.#logViewerContext = value;
 		this.#observePoolingConfig();

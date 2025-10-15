@@ -5,7 +5,7 @@ import { css, html, customElement, property, state } from '@umbraco-cms/backoffi
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { query as getQuery, path, toQueryString } from '@umbraco-cms/backoffice/router';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import { consume } from '@umbraco-cms/backoffice/context-api';
+import { consumeContext } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-log-viewer-date-range-selector')
 export class UmbLogViewerDateRangeSelectorElement extends UmbLitElement {
@@ -20,7 +20,7 @@ export class UmbLogViewerDateRangeSelectorElement extends UmbLitElement {
 
 	#logViewerContext?: typeof UMB_APP_LOG_VIEWER_CONTEXT.TYPE;
 
-	@consume({ context: UMB_APP_LOG_VIEWER_CONTEXT })
+	@consumeContext({ context: UMB_APP_LOG_VIEWER_CONTEXT })
 	private set _logViewerContext(value: typeof UMB_APP_LOG_VIEWER_CONTEXT.TYPE | undefined) {
 		this.#logViewerContext = value;
 		this.#observeStuff();

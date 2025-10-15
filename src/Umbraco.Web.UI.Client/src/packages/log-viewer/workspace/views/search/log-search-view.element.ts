@@ -3,7 +3,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
-import { consume } from '@umbraco-cms/backoffice/context-api';
+import { consumeContext } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-log-viewer-search-view')
 export class UmbLogViewerSearchViewElement extends UmbLitElement {
@@ -12,7 +12,7 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 
 	#logViewerContext?: typeof UMB_APP_LOG_VIEWER_CONTEXT.TYPE;
 
-	@consume({ context: UMB_APP_LOG_VIEWER_CONTEXT })
+	@consumeContext({ context: UMB_APP_LOG_VIEWER_CONTEXT })
 	private set _logViewerContext(value: typeof UMB_APP_LOG_VIEWER_CONTEXT.TYPE | undefined) {
 		this.#logViewerContext = value;
 		this.#observeCanShowLogs();

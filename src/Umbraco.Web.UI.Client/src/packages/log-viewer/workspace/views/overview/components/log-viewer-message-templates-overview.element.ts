@@ -4,7 +4,7 @@ import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffic
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { LogTemplateResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
-import { consume } from '@umbraco-cms/backoffice/context-api';
+import { consumeContext } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-log-viewer-message-templates-overview')
 export class UmbLogViewerMessageTemplatesOverviewElement extends UmbLitElement {
@@ -19,7 +19,7 @@ export class UmbLogViewerMessageTemplatesOverviewElement extends UmbLitElement {
 
 	#logViewerContext?: typeof UMB_APP_LOG_VIEWER_CONTEXT.TYPE;
 
-	@consume({ context: UMB_APP_LOG_VIEWER_CONTEXT })
+	@consumeContext({ context: UMB_APP_LOG_VIEWER_CONTEXT })
 	private set _logViewerContext(value: typeof UMB_APP_LOG_VIEWER_CONTEXT.TYPE | undefined) {
 		this.#logViewerContext = value;
 		this.#getMessageTemplates();
