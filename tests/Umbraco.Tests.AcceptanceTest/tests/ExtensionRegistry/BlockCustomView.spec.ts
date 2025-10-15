@@ -55,7 +55,7 @@ test('block custom view appears in a specific block type', async ({ umbracoApi, 
 	await umbracoUi.content.isSingleBlockElementVisible(false);
 });
 
-test('block custom view does not appear in a specific Block Type (BlockList)', async ({ umbracoApi, umbracoUi }) => {
+test('block custom view does not appear in block list editor when configured for block grid only', async ({ umbracoApi, umbracoUi }) => {
 	// Arrange 
 	const textStringDataType = await umbracoApi.dataType.getByName(dataTypeName);
 	const elementTypeId = await umbracoApi.documentType.createDefaultElementType(firstElementTypeName, elementGroupName, dataTypeName, textStringDataType.id);
