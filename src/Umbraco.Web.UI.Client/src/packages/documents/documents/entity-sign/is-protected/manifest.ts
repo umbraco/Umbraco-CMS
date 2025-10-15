@@ -9,7 +9,7 @@ export const manifests: UmbExtensionManifest = {
 	forEntityFlags: ['Umb.IsProtected'],
 	weight: 1000,
 	meta: {
-		iconName: 'icon-lock',
+		iconName: 'icon-block',
 		label: 'Protected',
 		iconColorAlias: 'red',
 	},
