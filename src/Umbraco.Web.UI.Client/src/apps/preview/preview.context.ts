@@ -1,10 +1,12 @@
-import { UmbBooleanState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
+import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbBooleanState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbDocumentPreviewRepository } from '@umbraco-cms/backoffice/document';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 const UMB_LOCALSTORAGE_SESSION_KEY = 'umb:previewSessions';
 
@@ -89,6 +91,19 @@ export class UmbPreviewContext extends UmbContextBase {
 		});
 	}
 
+	async #getPublishedUrl(): Promise<string | undefined | null> {
+		if (!this.#unique) return null;
+
+		// NOTE: We should be reusing `UmbDocumentUrlRepository` here, but the preview app doesn't register the `itemStore` extensions, so can't resolve/consume `UMB_DOCUMENT_URL_STORE_CONTEXT`. [LK]
+		const { data } = await tryExecute(this, DocumentService.getDocumentUrls({ query: { id: [this.#unique] } }));
+
+		if (!data?.length) return null;
+		const urlInfo = this.#culture ? data[0].urlInfos.find((x) => x.culture === this.#culture) : data[0].urlInfos[0];
+
+		if (!urlInfo?.url) return null;
+		return !urlInfo.url.startsWith(this.#serverUrl) ? `${this.#serverUrl}${urlInfo.url}` : urlInfo.url;
+	}
+
 	#getSessionCount(): number {
 		return Math.max(Number(localStorage.getItem(UMB_LOCALSTORAGE_SESSION_KEY)), 0) || 0;
 	}
@@ -170,7 +185,7 @@ export class UmbPreviewContext extends UmbContextBase {
 			this.#webSocket = undefined;
 		}
 
-		const url = this.#previewUrl.getValue() as string;
+		const url = (await this.#getPublishedUrl()) ?? (this.#previewUrl.getValue() as string);
 		window.location.replace(url);
 	}
 
