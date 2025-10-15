@@ -34,7 +34,7 @@ test.afterEach(async ({ umbracoApi }) => {
 	await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
 });
 
-test('block custom view appears in a specific Block Type (BlockGrid)', async ({ umbracoApi, umbracoUi }) => {
+test('block custom view appears in a specific block type', async ({ umbracoApi, umbracoUi }) => {
 	// Arrange 
 	const textStringDataType = await umbracoApi.dataType.getByName(dataTypeName);
 	const elementTypeId = await umbracoApi.documentType.createDefaultElementType(firstElementTypeName, elementGroupName, dataTypeName, textStringDataType.id);
