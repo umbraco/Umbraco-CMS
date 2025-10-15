@@ -71,6 +71,8 @@ export class UmbDefaultCollectionMenuItemElement extends UmbLitElement {
 	static override styles = [UmbTextStyles];
 }
 
+export { UmbDefaultCollectionMenuItemElement as element };
+
 declare global {
 	interface HTMLElementTagNameMap {
 		'umb-default-collection-menu-item': UmbDefaultCollectionMenuItemElement;

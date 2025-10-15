@@ -1,2 +1,2 @@
-export * from './default-collection-menu-item.context.js';
-export * from './default-collection-menu-item.element.js';
+export { UmbDefaultCollectionMenuItemContext } from './default-collection-menu-item.context.js';
+export { UmbDefaultCollectionMenuItemElement } from './default-collection-menu-item.element.js';

@@ -110,3 +110,5 @@ export class UmbDefaultCollectionMenuItemContext<
 		);
 	}
 }
+
+export { UmbDefaultCollectionMenuItemContext as api };
