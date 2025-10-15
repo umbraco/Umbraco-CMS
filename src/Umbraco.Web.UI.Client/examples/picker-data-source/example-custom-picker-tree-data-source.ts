@@ -1,12 +1,21 @@
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbPickerTreeDataSource } from '@umbraco-cms/backoffice/picker-data-source';
-import type { UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
+import type {
+	UmbPickerSearchableDataSource,
+	UmbPickerTreeDataSource,
+} from '@umbraco-cms/backoffice/picker-data-source';
+import type { UmbSearchRequestArgs, UmbSearchResultItemModel } from '@umbraco-cms/backoffice/search';
 import type { UmbTreeChildrenOfRequestArgs, UmbTreeItemModel } from '@umbraco-cms/backoffice/tree';
 
 export class ExampleCustomPickerTreePropertyEditorDataSource
 	extends UmbControllerBase
-	implements UmbPickerTreeDataSource
+	implements UmbPickerTreeDataSource, UmbPickerSearchableDataSource
 {
+	treePickableFilter: (treeItem: UmbTreeItemModel) => boolean = (treeItem) =>
+		!!treeItem.unique && treeItem.entityType === 'example';
+
+	searchPickableFilter: (searchItem: UmbSearchResultItemModel) => boolean = (searchItem) =>
+		!!searchItem.unique && searchItem.entityType === 'example';
+
 	async requestTreeRoot() {
 		const root = {
 			unique: null,
@@ -60,7 +69,7 @@ export class ExampleCustomPickerTreePropertyEditorDataSource
 
 		const data = {
 			items: result,
-			totalItems: result.length,
+			total: result.length,
 		};
 
 		return { data };

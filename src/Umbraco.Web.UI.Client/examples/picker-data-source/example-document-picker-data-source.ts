@@ -3,7 +3,10 @@ import {
 	UmbDocumentItemRepository,
 	UmbDocumentSearchRepository,
 	UmbDocumentTreeRepository,
+	type UmbDocumentSearchItemModel,
 	type UmbDocumentSearchRequestArgs,
+	type UmbDocumentTreeItemModel,
+	type UmbDocumentTreeRootModel,
 } from '@umbraco-cms/backoffice/document';
 import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/document-type';
 import type {
@@ -20,16 +23,21 @@ import { getConfigValue, type UmbConfigCollectionModel } from '@umbraco-cms/back
 
 export class ExampleDocumentPickerPropertyEditorDataSource
 	extends UmbControllerBase
-	implements UmbPickerTreeDataSource, UmbPickerSearchableDataSource
+	implements
+		UmbPickerTreeDataSource<UmbDocumentTreeItemModel, UmbDocumentTreeRootModel>,
+		UmbPickerSearchableDataSource<UmbDocumentSearchItemModel>
 {
 	#tree = new UmbDocumentTreeRepository(this);
 	#item = new UmbDocumentItemRepository(this);
 	#search = new UmbDocumentSearchRepository(this);
 	#config: UmbConfigCollectionModel = [];
 
+	treePickableFilter: (treeItem: UmbDocumentTreeItemModel) => boolean = (treeItem) => !!treeItem.unique;
+
 	setConfig(config: UmbConfigCollectionModel) {
 		// TODO: add examples for all config options
 		this.#config = config;
+		this.#applyPickableFilterFromConfig();
 	}
 
 	getConfig(): UmbConfigCollectionModel {
@@ -57,6 +65,13 @@ export class ExampleDocumentPickerPropertyEditorDataSource
 	}
 
 	search(args: UmbSearchRequestArgs) {
+		const allowedContentTypes = this.#getAllowedDocumentTypesConfig();
+		const combinedArgs: UmbDocumentSearchRequestArgs = { ...args, allowedContentTypes };
+
+		return this.#search.search(combinedArgs);
+	}
+
+	#getAllowedDocumentTypesConfig() {
 		const filterString = getConfigValue<string>(this.#config, 'filter');
 		const filterArray = filterString ? filterString.split(',') : [];
 		const allowedContentTypes: UmbDocumentSearchRequestArgs['allowedContentTypes'] = filterArray.map(
@@ -65,10 +80,14 @@ export class ExampleDocumentPickerPropertyEditorDataSource
 				unique,
 			}),
 		);
+		return allowedContentTypes;
+	}
 
-		const combinedArgs: UmbDocumentSearchRequestArgs = { ...args, allowedContentTypes };
-
-		return this.#search.search(combinedArgs);
+	#applyPickableFilterFromConfig() {
+		const allowedDocumentTypes = this.#getAllowedDocumentTypesConfig();
+		if (!allowedDocumentTypes || allowedDocumentTypes.length === 0) return;
+		this.treePickableFilter = (treeItem: UmbDocumentTreeItemModel) =>
+			allowedDocumentTypes.some((entityType) => entityType.unique === treeItem.documentType.unique);
 	}
 }
 
