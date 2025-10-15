@@ -8,7 +8,6 @@ export const UMB_USER_PERMISSION_DOCUMENT_PUBLISH = 'Umb.Document.Publish';
 export const UMB_USER_PERMISSION_DOCUMENT_PERMISSIONS = 'Umb.Document.Permissions';
 export const UMB_USER_PERMISSION_DOCUMENT_UNPUBLISH = 'Umb.Document.Unpublish';
 export const UMB_USER_PERMISSION_DOCUMENT_DUPLICATE = 'Umb.Document.Duplicate';
-export const UMB_USER_PERMISSION_DOCUMENT_EXPORT_TO_CSV = 'Umb.Document.ExportToCsv';
 export const UMB_USER_PERMISSION_DOCUMENT_MOVE = 'Umb.Document.Move';
 export const UMB_USER_PERMISSION_DOCUMENT_SORT = 'Umb.Document.Sort';
 export const UMB_USER_PERMISSION_DOCUMENT_CULTURE_AND_HOSTNAMES = 'Umb.Document.CultureAndHostnames';
