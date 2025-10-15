@@ -7,6 +7,7 @@ const contentGroupName = 'TestContentGroup';
 const documentTypeName = 'TestDocumentTypeForContent';
 // DataType
 const dataTypeName = 'Textstring';
+const textAreaDataTypeName = 'Textarea';
 // BlockType
 const blockGridName = 'TestBlockGridForContent';
 const blockListName = 'TestBlockListForContent';
@@ -34,7 +35,7 @@ test.afterEach(async ({ umbracoApi }) => {
 	await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
 });
 
-test('block custom view appears in a specific block type', async ({ umbracoApi, umbracoUi }) => {
+test('block custom view appears in a specific block type', async ({umbracoApi, umbracoUi}) => {
 	// Arrange 
 	const textStringDataType = await umbracoApi.dataType.getByName(dataTypeName);
 	const elementTypeId = await umbracoApi.documentType.createDefaultElementType(firstElementTypeName, elementGroupName, dataTypeName, textStringDataType.id);
@@ -55,7 +56,7 @@ test('block custom view appears in a specific block type', async ({ umbracoApi, 
 	await umbracoUi.content.isSingleBlockElementVisible(false);
 });
 
-test('block custom view does not appear in block list editor when configured for block grid only', async ({ umbracoApi, umbracoUi }) => {
+test('block custom view does not appear in block list editor when configured for block grid only', async ({umbracoApi, umbracoUi}) => {
 	// Arrange 
 	const textStringDataType = await umbracoApi.dataType.getByName(dataTypeName);
 	const elementTypeId = await umbracoApi.documentType.createDefaultElementType(firstElementTypeName, elementGroupName, dataTypeName, textStringDataType.id);
@@ -76,7 +77,7 @@ test('block custom view does not appear in block list editor when configured for
 	await umbracoUi.content.isSingleBlockElementVisible();
 });
 
-test('block custom view applies to correct content type', async ({ umbracoApi, umbracoUi }) => {
+test('block custom view applies to correct content type', async ({umbracoApi, umbracoUi}) => {
 	// Arrange 
 	const textStringDataType = await umbracoApi.dataType.getByName(dataTypeName);
 	const firstElementTypeId = await umbracoApi.documentType.createDefaultElementType(firstElementTypeName, elementGroupName, dataTypeName, textStringDataType.id);
@@ -101,13 +102,13 @@ test('block custom view applies to correct content type', async ({ umbracoApi, u
 	await umbracoUi.content.isSingleBlockElementVisible();
 });
 
-test('block custom view can display Content and Setting', async ({ umbracoApi, umbracoUi }) => {
+test('block custom view can display values from the content and settings parts', async ({umbracoApi, umbracoUi}) => {
 	// Arrange
 	const contentValue = 'This is block test';
 	const settingValue = 'This is setting test';
 	const valueText = `Heading and Theme: ${contentValue} - ${settingValue}`;
 	const textStringDataType = await umbracoApi.dataType.getByName(dataTypeName);
-	const textAreaDataType = await umbracoApi.dataType.getByName('Textarea');
+	const textAreaDataType = await umbracoApi.dataType.getByName(textAreaDataTypeName);
 	const elementTypeId = await umbracoApi.documentType.createDefaultElementType(secondElementTypeName, elementGroupName, propertyEditorName, textStringDataType.id);
 	const settingsElementTypeId = await umbracoApi.documentType.createDefaultElementType(settingModelName, groupName, propertyEditorSettingName, textAreaDataType.id);
 	const blockListId = await umbracoApi.dataType.createBlockListDataTypeWithContentAndSettingsElementType(blockListName, elementTypeId, settingsElementTypeId);
