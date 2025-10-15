@@ -40,7 +40,7 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 		});
 
 		this.observe(this._logViewerContext?.isLoadingLogs, (isLoading) => {
-			this._isLoading = isLoading === null ? this._isLoading : (isLoading ?? false);
+			this._isLoading = isLoading ?? this._isLoading;
 		});
 
 		this.observe(this._logViewerContext?.logsTotal, (total) => {
