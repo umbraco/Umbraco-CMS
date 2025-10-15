@@ -6,7 +6,7 @@
 		"build": "vite build"
 	},
 	"dependencies": {
-		"@umbraco-ui/uui": "^1.15.0",
-		"@umbraco-ui/uui-css": "^1.15.0"
+		"@umbraco-ui/uui": "^1.16.0-rc.0",
+		"@umbraco-ui/uui-css": "^1.16.0-rc.0"
 	}
 }

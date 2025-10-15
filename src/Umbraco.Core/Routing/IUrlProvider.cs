@@ -1,3 +1,4 @@
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Cms.Core.Routing;
@@ -38,4 +39,18 @@ public interface IUrlProvider
     ///     </para>
     /// </remarks>
     IEnumerable<UrlInfo> GetOtherUrls(int id, Uri current);
+
+    /// <summary>
+    ///     Gets the preview URL of a content item.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="culture">The culture to preview (null means invariant).</param>
+    /// <param name="segment">The segment to preview (null means no specific segment).</param>
+    /// <returns>The preview URLs of the content item.</returns>
+    Task<UrlInfo?> GetPreviewUrlAsync(IContent content, string? culture, string? segment);
+
+    /// <summary>
+    ///     Gets the alias for the URL provider.
+    /// </summary>
+    public string Alias { get; }
 }

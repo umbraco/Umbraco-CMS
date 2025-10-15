@@ -552,7 +552,7 @@ public class NotificationService : INotificationService
         {
             ThreadPool.QueueUserWorkItem(state =>
             {
-                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                if (_logger.IsEnabled(LogLevel.Debug))
                 {
                     _logger.LogDebug("Begin processing notifications.");
                 }
@@ -564,9 +564,9 @@ public class NotificationService : INotificationService
                     {
                         try
                         {
-                            _emailSender.SendAsync(request.Mail, Constants.Web.EmailTypes.Notification).GetAwaiter()
+                            _emailSender.SendAsync(request.Mail, Constants.Web.EmailTypes.Notification, false, null).GetAwaiter()
                                 .GetResult();
-                            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                            if (_logger.IsEnabled(LogLevel.Debug))
                             {
                                 _logger.LogDebug("Notification '{Action}' sent to {Username} ({Email})", request.Action, request.UserName, request.Email);
                             }

@@ -42,7 +42,7 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 	@state()
 	private _groupId?: string;
 
-	@state()
+	@property({ type: Boolean, reflect: true, attribute: 'has-owner-container' })
 	private _hasOwnerContainer?: boolean;
 
 	// attrbute is used by Sorter Controller in parent scope.
@@ -273,12 +273,11 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 				display: flex;
 				align-items: center;
 				justify-content: space-between;
-				cursor: grab;
 				padding: var(--uui-size-space-4) var(--uui-size-space-5);
 			}
 
-			:host([inherited]) div[slot='header'] {
-				cursor: default;
+			:host([has-owner-container]) div[slot='header'] {
+				cursor: grab;
 			}
 
 			div[slot='header'] > div {

@@ -19,9 +19,10 @@ import { UmbDocumentValidationRepository } from '../repository/validation/index.
 import { UMB_DOCUMENT_CONFIGURATION_CONTEXT } from '../index.js';
 import { UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD, UMB_DOCUMENT_WORKSPACE_ALIAS } from './constants.js';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
-import { ensurePathEndsWithSlash } from '@umbraco-cms/backoffice/utils';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import { umbPeekError } from '@umbraco-cms/backoffice/notification';
 import { UmbContentDetailWorkspaceContextBase } from '@umbraco-cms/backoffice/content';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbDocumentBlueprintDetailRepository } from '@umbraco-cms/backoffice/document-blueprint';
 import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
@@ -29,7 +30,6 @@ import {
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceIsNewRedirectControllerAlias,
 } from '@umbraco-cms/backoffice/workspace';
-import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 import type { UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
@@ -84,6 +84,15 @@ export class UmbDocumentWorkspaceContext
 			const config = await context?.getDocumentConfiguration();
 			const allowSegmentCreation = config?.allowNonExistingSegmentsCreation ?? false;
 			const allowEditInvariantFromNonDefault = config?.allowEditInvariantFromNonDefault ?? true;
+
+			// Deprecation warning for allowNonExistingSegmentsCreation (default from server is true, so we warn on false)
+			if (!allowSegmentCreation) {
+				new UmbDeprecation({
+					deprecated: 'The "AllowNonExistingSegmentsCreation" setting is deprecated.',
+					removeInVersion: '19.0.0',
+					solution: 'This functionality will be moved to a client-side extension.',
+				}).warn();
+			}
 
 			this._variantOptionsFilter = (variantOption) => {
 				const isNotCreatedSegmentVariant = variantOption.segment && !variantOption.variant;
@@ -299,11 +308,13 @@ export class UmbDocumentWorkspaceContext
 		await super._handleSave();
 	}
 
-	public async saveAndPreview(): Promise<void> {
-		return await this.#handleSaveAndPreview();
+	public async saveAndPreview(urlProviderAlias?: string): Promise<void> {
+		return await this.#handleSaveAndPreview(urlProviderAlias ?? 'umbDocumentUrlProvider');
 	}
 
-	async #handleSaveAndPreview() {
+	async #handleSaveAndPreview(urlProviderAlias: string) {
+		if (!urlProviderAlias) throw new Error('Url provider alias is missing');
+
 		const unique = this.getUnique();
 		if (!unique) throw new Error('Unique is missing');
 
@@ -319,28 +330,25 @@ export class UmbDocumentWorkspaceContext
 			await this.performCreateOrUpdate(variantIds, saveData);
 		}
 
-		// Tell the server that we're entering preview mode.
-		await new UmbDocumentPreviewRepository(this).enter();
+		// Get the preview URL from the server.
+		const previewRepository = new UmbDocumentPreviewRepository(this);
+		const previewUrlData = await previewRepository.getPreviewUrl(
+			unique,
+			urlProviderAlias,
+			firstVariantId.culture ?? undefined,
+			firstVariantId.segment ?? undefined,
+		);
 
-		const serverContext = await this.getContext(UMB_SERVER_CONTEXT);
-		if (!serverContext) {
-			throw new Error('Server context is missing');
+		if (previewUrlData.url) {
+			const previewWindow = window.open(previewUrlData.url, `umbpreview-${unique}`);
+			previewWindow?.focus();
+			return;
 		}
 
-		const backofficePath = serverContext.getBackofficePath();
-		const previewUrl = new URL(ensurePathEndsWithSlash(backofficePath) + 'preview', window.location.origin);
-		previewUrl.searchParams.set('id', unique);
-
-		if (firstVariantId.culture) {
-			previewUrl.searchParams.set('culture', firstVariantId.culture);
+		if (previewUrlData.message) {
+			umbPeekError(this._host, { color: 'danger', headline: 'Preview error', message: previewUrlData.message });
+			throw new Error(previewUrlData.message);
 		}
-
-		if (firstVariantId.segment) {
-			previewUrl.searchParams.set('segment', firstVariantId.segment);
-		}
-
-		const previewWindow = window.open(previewUrl.toString(), `umbpreview-${unique}`);
-		previewWindow?.focus();
 	}
 
 	public createPropertyDatasetContext(

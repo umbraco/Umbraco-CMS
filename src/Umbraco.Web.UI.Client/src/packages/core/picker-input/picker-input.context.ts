@@ -12,16 +12,15 @@ import {
 	type UmbPickerModalData,
 	type UmbPickerModalValue,
 } from '@umbraco-cms/backoffice/modal';
-
-type PickerItemBaseType = { name: string; unique: string };
+import type { UmbItemModel } from '@umbraco-cms/backoffice/entity-item';
 
 export class UmbPickerInputContext<
-	PickedItemType extends PickerItemBaseType = PickerItemBaseType,
-	PickerItemType extends PickerItemBaseType = PickedItemType,
+	PickedItemType extends UmbItemModel = UmbItemModel,
+	PickerItemType extends UmbItemModel = UmbItemModel,
 	PickerModalConfigType extends UmbPickerModalData<PickerItemType> = UmbPickerModalData<PickerItemType>,
 	PickerModalValueType extends UmbPickerModalValue = UmbPickerModalValue,
 > extends UmbContextBase {
-	modalAlias: string | UmbModalToken<UmbPickerModalData<PickerItemType>, PickerModalValueType>;
+	modalAlias?: string | UmbModalToken<UmbPickerModalData<PickerItemType>, PickerModalValueType>;
 	repository?: UmbItemRepository<PickedItemType>;
 
 	#itemManager;
@@ -33,6 +32,7 @@ export class UmbPickerInputContext<
 
 	/**
 	 * Define a minimum amount of selected items in this input, for this input to be valid.
+	 * @returns {number} The minimum number of items required.
 	 */
 	public get max() {
 		return this._max;
@@ -44,6 +44,7 @@ export class UmbPickerInputContext<
 
 	/**
 	 * Define a maximum amount of selected items in this input, for this input to be valid.
+	 * @returns {number} The minimum number of items required.
 	 */
 	public get min() {
 		return this._min;
@@ -63,10 +64,13 @@ export class UmbPickerInputContext<
 	constructor(
 		host: UmbControllerHost,
 		repositoryAlias: string,
-		modalAlias: string | UmbModalToken<UmbPickerModalData<PickerItemType>, PickerModalValueType>,
+		modalAlias?: string | UmbModalToken<UmbPickerModalData<PickerItemType>, PickerModalValueType>,
 	) {
 		super(host, UMB_PICKER_INPUT_CONTEXT);
-		this.modalAlias = modalAlias;
+
+		if (modalAlias) {
+			this.modalAlias = modalAlias;
+		}
 
 		this.#itemManager = new UmbRepositoryItemsManager<PickedItemType>(this, repositoryAlias);
 
@@ -86,6 +90,11 @@ export class UmbPickerInputContext<
 
 	async openPicker(pickerData?: Partial<PickerModalConfigType>) {
 		await this.#itemManager.init;
+
+		if (!this.modalAlias) {
+			throw new Error('No modal alias defined for the picker input context.');
+		}
+
 		const modalValue = await umbOpenModal(this, this.modalAlias, {
 			data: {
 				multiple: this._max === 1 ? false : true,

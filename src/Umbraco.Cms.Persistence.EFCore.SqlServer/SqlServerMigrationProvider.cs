@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Persistence.EFCore.Migrations;
 using Umbraco.Extensions;
 
@@ -31,6 +30,7 @@ public class SqlServerMigrationProvider : IMigrationProvider
             EFCoreMigration.InitialCreate => typeof(Migrations.InitialCreate),
             EFCoreMigration.AddOpenIddict => typeof(Migrations.AddOpenIddict),
             EFCoreMigration.UpdateOpenIddictToV5 => typeof(Migrations.UpdateOpenIddictToV5),
+            EFCoreMigration.UpdateOpenIddictToV7 => typeof(Migrations.UpdateOpenIddictToV7),
             _ => throw new ArgumentOutOfRangeException(nameof(migration), $@"Not expected migration value: {migration}")
         };
 }

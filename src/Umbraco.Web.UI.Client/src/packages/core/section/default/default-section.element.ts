@@ -1,21 +1,20 @@
+import type { ManifestSection, UmbSectionElement } from '../types.js';
 import type { ManifestSectionRoute } from '../extensions/section-route.extension.js';
 import type { UmbSectionMainViewElement } from '../section-main-views/section-main-views.element.js';
-import type { ManifestSection, UmbSectionElement } from '../types.js';
-import { UmbDefaultSectionContext } from './default-section.context.js';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, nothing, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import type { IRoute, IRoutingInfo, PageComponent, UmbRoute } from '@umbraco-cms/backoffice/router';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
+import { aliasToPath } from '@umbraco-cms/backoffice/utils';
+import { css, customElement, html, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import {
-	UmbExtensionsElementInitializer,
-	UmbExtensionsManifestInitializer,
 	createExtensionApi,
 	createExtensionElement,
+	UmbExtensionsElementInitializer,
+	UmbExtensionsManifestInitializer,
 } from '@umbraco-cms/backoffice/extension-api';
-import { aliasToPath } from '@umbraco-cms/backoffice/utils';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_MARK_ATTRIBUTE_NAME } from '@umbraco-cms/backoffice/const';
+import type { IRoute, IRoutingInfo, PageComponent, UmbRoute } from '@umbraco-cms/backoffice/router';
+import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 
 /**
  * @class UmbBaseSectionElement
@@ -23,19 +22,7 @@ import { UMB_MARK_ATTRIBUTE_NAME } from '@umbraco-cms/backoffice/const';
  */
 @customElement('umb-section-default')
 export class UmbDefaultSectionElement extends UmbLitElement implements UmbSectionElement {
-	private _manifest?: ManifestSection | undefined;
-
-	@property({ type: Object, attribute: false })
-	public get manifest(): ManifestSection | undefined {
-		return this._manifest;
-	}
-	public set manifest(value: ManifestSection | undefined) {
-		const oldValue = this._manifest;
-		if (oldValue === value) return;
-		this._manifest = value;
-		this.#api.setManifest(value);
-		this.requestUpdate('manifest', oldValue);
-	}
+	public manifest?: ManifestSection;
 
 	@state()
 	private _routes?: Array<UmbRoute>;
@@ -45,9 +32,6 @@ export class UmbDefaultSectionElement extends UmbLitElement implements UmbSectio
 
 	@state()
 	private _splitPanelPosition = '300px';
-
-	// TODO: v17: Move this to a manifest api. It will have to wait for a major as it will be a breaking change.
-	#api = new UmbDefaultSectionContext(this);
 
 	constructor() {
 		super();

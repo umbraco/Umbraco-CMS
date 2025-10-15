@@ -74,6 +74,7 @@ export default {
 		readOnly: 'Skrivebeskyttet',
 		trash: 'Papirkurv',
 		loadMore: 'Indlæs flere',
+		showMore: 'Vis flere',
 	},
 	actionCategories: {
 		content: 'Indhold',
@@ -848,6 +849,7 @@ export default {
 		details: 'Detaljer',
 		dictionary: 'Ordbog',
 		dimensions: 'Dimensioner',
+		dividerPosition: (value: string | number) => `Skillevæg ved ${value}%`,
 		discard: 'Kassér',
 		down: 'Ned',
 		download: 'Hent',

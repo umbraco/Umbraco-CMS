@@ -14,11 +14,11 @@
     "npm": ">=10.9"
   },
   "devDependencies": {
-    "@hey-api/openapi-ts": "0.81.1",
+    "@hey-api/openapi-ts": "0.85.0",
     "@umbraco-cms/backoffice": "16.2.0",
-    "msw": "^2.7.0",
-    "typescript": "^5.9.2",
-    "vite": "^7.1.5"
+    "msw": "^2.11.3",
+    "typescript": "^5.9.3",
+    "vite": "^7.1.9"
   },
   "msw": {
     "workerDirectory": [

@@ -16,11 +16,21 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
 internal sealed class ExternalLoginRepository : EntityRepositoryBase<int, IIdentityUserLogin>, IExternalLoginWithKeyRepository
 {
-    public ExternalLoginRepository(IScopeAccessor scopeAccessor, AppCaches cache,
-        ILogger<ExternalLoginRepository> logger)
-        : base(scopeAccessor, cache, logger)
+    public ExternalLoginRepository(
+        IScopeAccessor scopeAccessor,
+        AppCaches cache,
+        ILogger<ExternalLoginRepository> logger,
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            cache,
+            logger,
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
     }
+
     /// <summary>
     ///     Query for user tokens
     /// </summary>
