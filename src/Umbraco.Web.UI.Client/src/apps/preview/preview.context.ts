@@ -205,8 +205,8 @@ export class UmbPreviewContext extends UmbContextBase {
 		return this.getHostElement().shadowRoot?.querySelector('#wrapper') as HTMLElement;
 	}
 
-	openWebsite() {
-		const url = this.#previewUrl.getValue() as string;
+	async openWebsite() {
+		const url = (await this.#getPublishedUrl()) ?? (this.#previewUrl.getValue() as string);
 		window.open(url, '_blank');
 	}
 
