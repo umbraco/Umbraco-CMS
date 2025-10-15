@@ -68,7 +68,7 @@ export class UmbDefaultCollectionMenuItemElement extends UmbLitElement {
 		`;
 	}
 
-	static override styles = [UmbTextStyles, css``];
+	static override styles = [UmbTextStyles];
 }
 
 declare global {
