@@ -15,7 +15,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.media.ensureNameNotExists(mediaName);
 });
 
-test("custom workspace view renders for 'Document' entities", async ({umbracoApi, umbracoUi}) => {
+test('can see the custom workspace view in the content section', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
@@ -30,7 +30,7 @@ test("custom workspace view renders for 'Document' entities", async ({umbracoApi
   await umbracoUi.content.isWorkspaceViewTabWithAliasVisible("My.WorkspaceView", true);
 });
 
-test("custom workspace view does not render for 'Media' entities", async ({umbracoApi, umbracoUi}) => {
+test("cannot see the custom workspace view in the media section", async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.media.createDefaultMediaWithImage(mediaName);
 
@@ -39,6 +39,6 @@ test("custom workspace view does not render for 'Media' entities", async ({umbra
   await umbracoUi.content.goToSection(ConstantHelper.sections.media);
   await umbracoUi.media.goToMediaWithName(mediaName);
 
-  //Assert
+  // Assert
   await umbracoUi.media.isWorkspaceViewTabWithAliasVisible("My.WorkspaceView", false);
 });
