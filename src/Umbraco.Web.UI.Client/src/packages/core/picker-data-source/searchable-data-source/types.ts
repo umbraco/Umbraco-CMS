@@ -1,4 +1,9 @@
 import type { UmbPickerDataSource } from '../types.js';
-import type { UmbSearchRepository } from '@umbraco-cms/backoffice/search';
+import type { UmbSearchRepository, UmbSearchResultItemModel } from '@umbraco-cms/backoffice/search';
 
-export interface UmbPickerSearchableDataSource extends UmbPickerDataSource, UmbSearchRepository<any> {}
+export interface UmbPickerSearchableDataSource<
+	SearchResultItemType extends UmbSearchResultItemModel = UmbSearchResultItemModel,
+> extends UmbPickerDataSource,
+		UmbSearchRepository<SearchResultItemType> {
+	searchPickableFilter?: (searchItem: SearchResultItemType) => boolean;
+}
