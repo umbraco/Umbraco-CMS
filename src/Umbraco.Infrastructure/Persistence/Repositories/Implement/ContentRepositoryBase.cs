@@ -1132,23 +1132,36 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             IEnumerable<PropertyDataDto> propertyDataDtos = PropertyFactory.BuildDtos(entity.ContentType.Variations, entity.VersionId, publishedVersionId, entity.Properties, LanguageRepository, out edited, out editedCultures);
 
+            var toUpdate = new List<PropertyDataDto>();
+            var toInsert = new List<PropertyDataDto>();
             foreach (PropertyDataDto propertyDataDto in propertyDataDtos)
             {
                 // Check if this already exists and update, else insert a new one
                 if (propertyTypeToPropertyData.TryGetValue((propertyDataDto.PropertyTypeId, propertyDataDto.VersionId, propertyDataDto.LanguageId, propertyDataDto.Segment), out PropertyDataDto? propData))
                 {
                     propertyDataDto.Id = propData.Id;
-                    Database.Update(propertyDataDto);
+                    toUpdate.Add(propertyDataDto);
                 }
                 else
                 {
-                    // TODO: we can speed this up: Use BulkInsert and then do one SELECT to re-retrieve the property data inserted with assigned IDs.
-                    // This is a perfect thing to benchmark with Benchmark.NET to compare perf between Nuget releases.
-                    Database.Insert(propertyDataDto);
+                    toInsert.Add(propertyDataDto);
                 }
 
                 // track which ones have been processed
                 existingPropDataIds.Remove(propertyDataDto.Id);
+            }
+
+            if (toUpdate.Count > 0)
+            {
+                var updateBatch = toUpdate
+                    .Select(x => UpdateBatch.For(x))
+                    .ToList();
+                Database.UpdateBatch(updateBatch, new BatchOptions { BatchSize = 100 });
+            }
+
+            if (toInsert.Count > 0)
+            {
+                Database.InsertBulk(toInsert);
             }
 
             // For any remaining that haven't been processed they need to be deleted

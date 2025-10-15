@@ -10,9 +10,10 @@ export class UmbManagementApiMediaItemDataCacheInvalidationManager extends UmbMa
 	constructor(host: UmbControllerHost) {
 		super(host, {
 			dataCache: mediaItemCache,
-			/* The Media item model includes info about the Media Type. 
+			/* The Media item model includes info about the Media Type.
 			We need to invalidate the cache for both Media and MediaType events. */
 			eventSources: ['Umbraco:CMS:Media', 'Umbraco:CMS:MediaType'],
+			eventTypes: ['Updated', 'Deleted', 'Trashed'],
 		});
 	}
 
