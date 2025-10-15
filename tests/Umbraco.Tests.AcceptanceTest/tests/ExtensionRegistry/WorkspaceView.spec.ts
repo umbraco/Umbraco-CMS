@@ -27,7 +27,7 @@ test('can see the custom workspace view in the content section', async ({umbraco
   await umbracoUi.content.goToContentWithName(contentName);
 
   // Assert
-  await umbracoUi.content.isWorkspaceViewTabWithAliasVisible("My.WorkspaceView", true);
+  await umbracoUi.content.isWorkspaceViewTabWithAliasVisible('My.WorkspaceView', true);
 });
 
 test('cannot see the custom workspace view in the media section', async ({umbracoApi, umbracoUi}) => {
