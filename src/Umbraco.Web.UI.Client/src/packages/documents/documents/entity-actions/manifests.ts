@@ -10,6 +10,7 @@ import { manifests as duplicateManifests } from './duplicate/manifests.js';
 import { manifests as moveManifests } from './move-to/manifests.js';
 import { manifests as sortChildrenOfManifests } from './sort-children-of/manifests.js';
 import { manifests as notificationManifests } from './notifications/manifests.js';
+import { manifests as exportToCsvManifests } from './export-to-csv/manifests.js';
 import { UMB_ENTITY_IS_TRASHED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/recycle-bin';
 
 const entityActions: Array<UmbExtensionManifest> = [
@@ -45,4 +46,5 @@ export const manifests: Array<UmbExtensionManifest> = [
 	...sortChildrenOfManifests,
 	...entityActions,
 	...notificationManifests,
+	...exportToCsvManifests,
 ];
