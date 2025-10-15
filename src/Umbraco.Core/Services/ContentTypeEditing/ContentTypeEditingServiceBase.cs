@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Core.Strings;
@@ -407,7 +407,7 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
     }
 
     // This this method gets aliases across documents, members, and media, so it covers it all
-    private bool ContentTypeAliasIsInUse(string alias) => _contentTypeService.GetAllContentTypeAliases().Contains(alias);
+    private bool ContentTypeAliasIsInUse(string alias) => _contentTypeService.GetAllContentTypeAliases().InvariantContains(alias);
 
     private bool ContentTypeAliasCanBeUsedFor(string alias, Guid key)
     {
