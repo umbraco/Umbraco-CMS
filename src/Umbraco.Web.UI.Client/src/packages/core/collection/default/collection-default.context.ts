@@ -15,7 +15,7 @@ import { UmbArrayState, UmbBasicState, UmbNumberState, UmbObjectState } from '@u
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
-import { UmbSelectionManager, UmbPaginationManager, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
+import { UmbSelectionManager, UmbPaginationManager, UmbDeprecation, debounce } from '@umbraco-cms/backoffice/utils';
 import type { ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -121,11 +121,11 @@ export class UmbDefaultCollectionContext<
 			})
 			.onReject(() => {
 				// TODO: Maybe this can be removed?
-				this.requestCollection();
+				this._requestCollection();
 			})
 			.onSubmit(() => {
 				// TODO: Maybe this can be removed?
-				this.requestCollection();
+				this._requestCollection();
 			})
 			.observeRouteBuilder((routeBuilder) => {
 				this.#workspacePathBuilder.setValue(routeBuilder);
@@ -248,16 +248,30 @@ export class UmbDefaultCollectionContext<
 		return this.manifest?.meta.noItemsLabel ?? this.#config?.noItemsLabel ?? '#collection_noItemsTitle';
 	}
 
+	/* debouncing the load collection method because multiple filters can be set at the same time
+	that will trigger multiple load calls with different filters args */
+	public loadCollection = debounce(() => this._requestCollection(), 100);
+
 	/**
 	 * Requests the collection from the repository.
-	 * @returns {*}
+	 * @returns {Promise<void>}
+	 * @deprecated Deprecated since v.17.0.0. Use `loadCollection` instead.
 	 * @memberof UmbCollectionContext
 	 */
 	public async requestCollection() {
+		new UmbDeprecation({
+			removeInVersion: '19.0.0',
+			deprecated: 'requestCollection',
+			solution: 'Use .loadCollection method instead',
+		}).warn();
+
+		return this._requestCollection();
+	}
+
+	protected async _requestCollection() {
 		await this._init;
 
 		if (!this._configured) this._configure();
-
 		if (!this._repository) throw new Error(`Missing repository for ${this._manifest}`);
 
 		this._loading.setValue(true);
@@ -281,7 +295,7 @@ export class UmbDefaultCollectionContext<
 	 */
 	public setFilter(filter: Partial<FilterModelType>) {
 		this._filter.setValue({ ...this._filter.getValue(), ...filter });
-		this.requestCollection();
+		this.loadCollection();
 	}
 
 	public updateFilter(filter: Partial<FilterModelType>) {
@@ -312,7 +326,7 @@ export class UmbDefaultCollectionContext<
 		const items = this._items.getValue();
 		const hasItem = items.some((item) => item.unique === event.getUnique());
 		if (hasItem) {
-			this.requestCollection();
+			this._requestCollection();
 		}
 	};
 
@@ -324,7 +338,7 @@ export class UmbDefaultCollectionContext<
 		const entityType = entityContext.getEntityType();
 
 		if (unique === event.getUnique() && entityType === event.getEntityType()) {
-			this.requestCollection();
+			this._requestCollection();
 		}
 	};
 
