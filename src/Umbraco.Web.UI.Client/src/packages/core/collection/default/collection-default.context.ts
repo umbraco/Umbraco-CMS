@@ -249,7 +249,7 @@ export class UmbDefaultCollectionContext<
 	}
 
 	/* debouncing the load collection method because multiple filters can be set at the same time
-	that will trigger multiple load calls with different filters args */
+	that will trigger multiple load calls with different filter arguments */
 	public loadCollection = debounce(() => this._requestCollection(), 100);
 
 	/**
