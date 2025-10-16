@@ -33,8 +33,6 @@ export class UmbLogViewerLogLevelFilterMenuElement extends UmbLitElement {
 	}
 
 	#setLogLevel() {
-		if (!this._logViewerContext) return;
-
 		const logLevels = Array.from(this._logLevelSelectorCheckboxes)
 			.filter((checkbox) => checkbox.checked)
 			.map((checkbox) => checkbox.value as LogLevelModel);
