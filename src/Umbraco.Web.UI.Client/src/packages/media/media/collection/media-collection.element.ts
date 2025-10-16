@@ -62,7 +62,6 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 	async #onComplete(event: Event) {
 		event.preventDefault();
 		this._progress = -1;
-		this.#collectionContext?.loadCollection();
 
 		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 		if (!eventContext) {
