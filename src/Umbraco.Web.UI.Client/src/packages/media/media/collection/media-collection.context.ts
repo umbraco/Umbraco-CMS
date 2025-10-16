@@ -5,7 +5,6 @@ import type { UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone
 import { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 export class UmbMediaCollectionContext extends UmbDefaultCollectionContext<
 	UmbMediaCollectionItemModel,
 	UmbMediaCollectionFilterModel
@@ -52,20 +51,9 @@ export class UmbMediaCollectionContext extends UmbDefaultCollectionContext<
 	/**
 	 * Requests the collection from the repository.
 	 * @returns {Promise<void>}
-	 * @deprecated Deprecated since v.17.0.0. Use `loadCollection` instead.
-	 * @memberof UmbMediaCollectionContext
+	 * @memberof UmbCollectionContext
 	 */
-	public override async requestCollection(): Promise<void> {
-		new UmbDeprecation({
-			removeInVersion: '19.0.0',
-			deprecated: 'requestCollection',
-			solution: 'Use .loadCollection method instead',
-		}).warn();
-
-		return this._requestCollection();
-	}
-
-	protected override async _requestCollection() {
+	public override async requestCollection() {
 		await this._init;
 
 		if (!this._configured) this._configure();
