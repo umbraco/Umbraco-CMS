@@ -9,16 +9,29 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { extractUmbColorVariable } from '@umbraco-cms/backoffice/resources';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+
 /**
  * @element umb-property-editor-ui-icon-picker
  */
 @customElement('umb-property-editor-ui-icon-picker')
-export class UmbPropertyEditorUIIconPickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
-	@property({ type: Boolean })
-	mandatory?: boolean;
+export class UmbPropertyEditorUIIconPickerElement
+	extends UmbFormControlMixin<string, typeof UmbLitElement, undefined>(UmbLitElement, undefined)
+	implements UmbPropertyEditorUiElement
+{
+	@property({ type: Boolean, reflect: true })
+	mandatory = false;
+
+	protected override firstUpdated(): void {
+		this.addValidator(
+			'valueMissing',
+			() => 'Icon is required',
+			() => this.mandatory && !this._icon,
+		);
+	}
 
 	@property()
-	public set value(v: string) {
+	public override set value(v: string) {
 		this._value = v ?? '';
 		const parts = this._value.split(' ');
 		if (parts.length === 2) {
@@ -28,8 +41,10 @@ export class UmbPropertyEditorUIIconPickerElement extends UmbLitElement implemen
 			this._icon = this._value;
 			this._color = '';
 		}
+		this.requestUpdate();
 	}
-	public get value() {
+
+	public override get value() {
 		return this._value;
 	}
 	private _value = '';
