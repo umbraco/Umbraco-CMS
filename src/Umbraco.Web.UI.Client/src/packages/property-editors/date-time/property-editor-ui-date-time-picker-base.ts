@@ -34,7 +34,7 @@ export abstract class UmbPropertyEditorUiDateTimePickerElementBase
 {
 	private _timeZoneOptions: Array<UmbTimeZonePickerOption> = [];
 	private _clientTimeZone: UmbTimeZone | undefined;
-	private _timeZoneMode: string | undefined;
+	private _timeZoneMode: UmbTimeZonePickerValue['mode'] | undefined;
 
 	@property({ type: Boolean, reflect: true })
 	readonly = false;
@@ -162,7 +162,6 @@ export abstract class UmbPropertyEditorUiDateTimePickerElementBase
 		this._clientTimeZone = getClientTimeZone();
 		this._timeZoneMode = config?.mode;
 
-		// Retrieve the time zones from the config
 		const dateToCalculateOffset = selectedDate ?? DateTime.now();
 		switch (config?.mode) {
 			case 'all':
@@ -207,6 +206,11 @@ export abstract class UmbPropertyEditorUiDateTimePickerElementBase
 		}
 
 		this.#preselectTimeZone();
+		if (this._selectedDate && this._selectedTimeZone && !this.value?.timeZone) {
+			// If there is a date but no time zone is stored, we assume this property was changed from an editor without time zone support.
+			// In this case, we should update the value to include the selected time zone.
+			this.#updateValue(this._selectedDate.toISO({ includeOffset: false }) || '');
+		}
 	}
 
 	#preselectTimeZone() {
@@ -221,8 +225,6 @@ export abstract class UmbPropertyEditorUiDateTimePickerElementBase
 				this._selectedTimeZone = pickedTimeZone.value;
 				return;
 			}
-		} else if (this.value?.date) {
-			return; // If there is a date but no time zone, we don't preselect anything
 		}
 
 		// Check if we can pre-select the client time zone
@@ -328,7 +330,7 @@ export abstract class UmbPropertyEditorUiDateTimePickerElementBase
 
 		this.value = {
 			date: this.#formatDateValue(dateToStore),
-			timeZone: timeZoneToStore,
+			timeZone: this._timeZoneMode ? timeZoneToStore : undefined,
 		};
 
 		if (updateOffsets) {
