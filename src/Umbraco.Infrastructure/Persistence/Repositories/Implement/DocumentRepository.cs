@@ -1378,6 +1378,11 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
 
         entity.ResetDirtyProperties();
 
+        // need to flush the isolated cache by key explicitly here.
+        // the ContentCacheRefresher does the same thing, but by the time it's invoked, custom notification handlers
+        // might have already consumed the cached version (which at this point is the previous version).
+        IsolatedCache.ClearByKey(RepositoryCacheKeys.GetKey<IContent, Guid>(entity.Key));
+
         // troubleshooting
         //if (Database.ExecuteScalar<int>($"SELECT COUNT(*) FROM {Constants.DatabaseSchema.Tables.DocumentVersion} JOIN {Constants.DatabaseSchema.Tables.ContentVersion} ON {Constants.DatabaseSchema.Tables.DocumentVersion}.id={Constants.DatabaseSchema.Tables.ContentVersion}.id WHERE published=1 AND nodeId=" + content.Id) > 1)
         //{
