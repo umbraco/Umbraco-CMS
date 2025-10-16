@@ -350,7 +350,7 @@ export abstract class UmbPropertyEditorUiDateTimePickerElementBase
 			case 'time':
 				return date.toISOTime({ includeOffset: false }) ?? undefined;
 			default:
-				return date.toISO({ includeOffset: !!this._selectedTimeZone }) ?? undefined;
+				return date.toISO({ includeOffset: !!this._timeZoneMode }) ?? undefined;
 		}
 	}
 
