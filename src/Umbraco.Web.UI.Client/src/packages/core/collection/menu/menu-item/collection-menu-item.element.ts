@@ -36,10 +36,10 @@ export class UmbCollectionMenuItemElement extends UmbExtensionElementAndApiSlotE
 			return manifest.forEntityTypes.includes(this.#entityType);
 		};
 
-		// Check if we can find a matching tree item for the current entity type.
-		// If we can, we will use that one, if not we will render a fallback tree item.
+		// Check if we can find a matching collection menu item for the current entity type.
+		// If we can, we will use that one, if not we will render a fallback collection menu item.
 		this.observe(
-			// TODO: what should we do if there are multiple tree items for an entity type?
+			// TODO: what should we do if there are multiple collection menu items for an entity type?
 			// This method gets all extensions based on a type, then filters them based on the entity type. and then we get the alias of the first one [NL]
 			createObservablePart(
 				umbExtensionsRegistry.byTypeAndFilter(this.getExtensionType(), filterByEntityType),
@@ -48,7 +48,7 @@ export class UmbCollectionMenuItemElement extends UmbExtensionElementAndApiSlotE
 			(alias) => {
 				this.alias = alias;
 
-				// If we don't find any registered tree items for this specific entity type, we will render a fallback tree item.
+				// If we don't find any registered collection menu items for this specific entity type, we will render a fallback collection menu item.
 				// This is on purpose not done with the extension initializer since we don't want to spin up a real extension unless we have to.
 				if (!alias) {
 					this.#renderFallbackItem();
