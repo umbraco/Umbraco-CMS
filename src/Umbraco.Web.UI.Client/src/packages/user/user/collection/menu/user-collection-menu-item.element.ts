@@ -1,7 +1,6 @@
-import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbUserDetailModel } from '../../types.js';
+import { html, customElement, css, state, property, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { css, state, property, nothing } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbUserDetailModel } from '../../types';
 import type { UmbCollectionMenuItemContext } from '@umbraco-cms/backoffice/collection';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 

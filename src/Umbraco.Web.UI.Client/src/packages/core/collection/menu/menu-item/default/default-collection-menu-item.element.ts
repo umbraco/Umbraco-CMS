@@ -1,6 +1,6 @@
 import type { UmbCollectionItemModel } from '../../../item/types.js';
 import type { UmbCollectionMenuItemContext } from '../collection-menu-item-context.interface.js';
-import { html, state, property, css, customElement, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { html, state, property, customElement, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { getItemFallbackIcon, getItemFallbackName } from '@umbraco-cms/backoffice/entity-item';
