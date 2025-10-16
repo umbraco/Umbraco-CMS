@@ -59,8 +59,12 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 		const isActivate = e.type === 'click' || (e.type === 'keyup' && (e as KeyboardEvent).key === 'Enter');
 		if (!isActivate) return;
 
-		const nextIcon = this.value.icon === iconName ? '' : iconName;
-		this.modalContext?.updateValue({ icon: nextIcon });
+		if (this.data?.showEmptyOption) {
+			const nextIcon = this.value.icon === iconName ? '' : iconName;
+			this.modalContext?.updateValue({ icon: nextIcon });
+		} else {
+			this.modalContext?.updateValue({ icon: iconName });
+		}
 	}
 
 	#onColorChange(e: UUIColorSwatchesEvent) {
