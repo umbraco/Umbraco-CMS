@@ -69,7 +69,7 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 
 		this.observe(this._logViewerContext?.filterExpression, (query) => {
 			this._inputQuery = query ?? '';
-			this._isQuerySaved = this._savedSearches.some((search) => search.query === query);
+			this._isQuerySaved = this._savedSearches.some((search) => search.query === this._inputQuery);
 		});
 	}
 
