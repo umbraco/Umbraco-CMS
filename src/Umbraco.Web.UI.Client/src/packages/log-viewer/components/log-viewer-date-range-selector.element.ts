@@ -30,9 +30,8 @@ export class UmbLogViewerDateRangeSelectorElement extends UmbLitElement {
 	}
 
 	#observeStuff() {
-		if (!this._logViewerContext) return;
 		this.observe(
-			this._logViewerContext.dateRange,
+			this._logViewerContext?.dateRange,
 			(dateRange: UmbLogViewerDateRange) => {
 				this._startDate = dateRange.startDate;
 				this._endDate = dateRange.endDate;
