@@ -5,19 +5,27 @@ import { consumeContext } from './context-consume.decorator.js';
 import { aTimeout, elementUpdated, expect, fixture } from '@open-wc/testing';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { html, state } from '@umbraco-cms/backoffice/external/lit';
 
 class UmbTestContextConsumerClass implements UmbContextMinimal {
 	public prop: string = 'value from provider';
 	getHostElement() {
-		return document.body;
+		return undefined as any;
 	}
 }
 
-const testToken = new UmbContextToken<UmbTestContextConsumerClass>('my-test-context', 'testApi');
+const testToken = new UmbContextToken<UmbTestContextConsumerClass>('my-test-context');
 
 class MyTestElement extends UmbLitElement {
-	@consumeContext({ context: testToken })
+	@consumeContext({
+		context: testToken,
+	})
+	@state()
 	contextValue?: UmbTestContextConsumerClass;
+
+	override render() {
+		return html`<div>${this.contextValue?.prop ?? 'no context'}</div>`;
+	}
 }
 
 customElements.define('my-consume-test-element', MyTestElement);
@@ -34,13 +42,17 @@ describe('@consume decorator', () => {
 	});
 
 	afterEach(() => {
-		provider.hostDisconnected();
 		provider.destroy();
 		(provider as any) = undefined;
 	});
 
 	it('should receive a context value when provided on the host', () => {
 		expect(element.contextValue).to.equal(provider.providerInstance());
+		expect(element.contextValue?.prop).to.equal('value from provider');
+	});
+
+	it('should render the value from the context', async () => {
+		expect(element).shadowDom.to.equal('<div>value from provider</div>');
 	});
 
 	it('should work when the decorator is used in a controller', async () => {
