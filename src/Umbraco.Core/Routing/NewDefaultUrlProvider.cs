@@ -28,7 +28,6 @@ public class NewDefaultUrlProvider : IUrlProvider
     private readonly ILogger<DefaultUrlProvider> _logger;
     private readonly ISiteDomainMapper _siteDomainMapper;
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
-    private readonly IUmbracoContextFactory _umbracoContextFactory;
     private readonly UriUtility _uriUtility;
     private RequestHandlerSettings _requestSettings;
     private readonly ILanguageService _languageService;
@@ -45,7 +44,6 @@ public class NewDefaultUrlProvider : IUrlProvider
         ILogger<DefaultUrlProvider> logger,
         ISiteDomainMapper siteDomainMapper,
         IUmbracoContextAccessor umbracoContextAccessor,
-        IUmbracoContextFactory umbracoContextFactory,
         UriUtility uriUtility,
 #pragma warning disable CS0618 // Type or member is obsolete
 #pragma warning disable IDE0060 // Remove unused parameter
@@ -64,7 +62,6 @@ public class NewDefaultUrlProvider : IUrlProvider
         _logger = logger;
         _siteDomainMapper = siteDomainMapper;
         _umbracoContextAccessor = umbracoContextAccessor;
-        _umbracoContextFactory = umbracoContextFactory;
         _uriUtility = uriUtility;
         _publishedContentCache = publishedContentCache;
         _domainCache = domainCache;
@@ -75,46 +72,6 @@ public class NewDefaultUrlProvider : IUrlProvider
         _languageService = languageService;
 
         requestSettings.OnChange(x => _requestSettings = x);
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="NewDefaultUrlProvider"/> class.
-    /// </summary>
-    [Obsolete("Use the non-obsolete constructor. Scheduled for removal in V18.")]
-    public NewDefaultUrlProvider(
-        IOptionsMonitor<RequestHandlerSettings> requestSettings,
-        ILogger<DefaultUrlProvider> logger,
-        ISiteDomainMapper siteDomainMapper,
-        IUmbracoContextAccessor umbracoContextAccessor,
-        UriUtility uriUtility,
-#pragma warning disable CS0618 // Type or member is obsolete
-#pragma warning disable IDE0060 // Remove unused parameter
-        ILocalizationService localizationService,
-#pragma warning restore IDE0060 // Remove unused parameter
-#pragma warning restore CS0618 // Type or member is obsolete
-        IPublishedContentCache publishedContentCache,
-        IDomainCache domainCache,
-        IIdKeyMap idKeyMap,
-        IDocumentUrlService documentUrlService,
-        IDocumentNavigationQueryService navigationQueryService,
-        IPublishedContentStatusFilteringService publishedContentStatusFilteringService,
-        ILanguageService languageService)
-        : this(
-            requestSettings,
-            logger,
-            siteDomainMapper,
-            umbracoContextAccessor,
-            StaticServiceProvider.Instance.GetRequiredService<IUmbracoContextFactory>(),
-            uriUtility,
-            localizationService,
-            publishedContentCache,
-            domainCache,
-            idKeyMap,
-            documentUrlService,
-            navigationQueryService,
-            publishedContentStatusFilteringService,
-            languageService)
-    {
     }
 
     /// <summary>
@@ -266,7 +223,7 @@ public class NewDefaultUrlProvider : IUrlProvider
 
     private string GetLegacyRouteFormatById(Guid key, string? culture)
     {
-        var isDraft = GetRequiredUmbracoContext().InPreviewMode;
+        var isDraft = _umbracoContextAccessor.GetRequiredUmbracoContext().InPreviewMode;
         return _documentUrlService.GetLegacyRouteFormat(key, culture, isDraft);
     }
 
@@ -283,7 +240,7 @@ public class NewDefaultUrlProvider : IUrlProvider
         // this document will still not always be in the memory cache. And thus we have to hit the DB
         // We have the published content now, so we can check if the culture is published, and thus avoid the DB hit.
         string route;
-        var isDraft = GetRequiredUmbracoContext().InPreviewMode;
+        var isDraft = _umbracoContextAccessor.GetRequiredUmbracoContext().InPreviewMode;
         if(isDraft is false && string.IsNullOrWhiteSpace(culture) is false && content.Cultures.Any() && content.IsInvariantOrHasCulture(culture) is false)
         {
             route = "#";
@@ -410,16 +367,5 @@ public class NewDefaultUrlProvider : IUrlProvider
     {
         var path = path1.TrimEnd(Constants.CharArrays.ForwardSlash) + path2;
         return path == "/" ? path : path.TrimEnd(Constants.CharArrays.ForwardSlash);
-    }
-
-    private IUmbracoContext GetRequiredUmbracoContext()
-    {
-        if (_umbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext? umbracoContext))
-        {
-            return umbracoContext;
-        }
-
-        using UmbracoContextReference ctx = _umbracoContextFactory.EnsureUmbracoContext();
-        return ctx.UmbracoContext;
     }
 }
