@@ -51,7 +51,7 @@ test('can create content using an invariant document blueprint', async ({umbraco
   await umbracoUi.content.clickActionsMenuAtRoot();
   await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
-  await umbracoUi.content.clickModalMenuItemWithName(documentBlueprintName);
+  await umbracoUi.content.clickTextButtonWithName(documentBlueprintName);
   await umbracoUi.content.clickSaveButtonForContent();
 
   // Assert
@@ -75,7 +75,7 @@ test('can create content using a variant document blueprint', async ({umbracoApi
   await umbracoUi.content.clickActionsMenuAtRoot();
   await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
-  await umbracoUi.content.clickModalMenuItemWithName(documentBlueprintName);
+  await umbracoUi.content.clickTextButtonWithName(documentBlueprintName);
   await umbracoUi.content.clickSaveButtonForContent();
   await umbracoUi.content.clickSaveButton();
 
@@ -104,7 +104,7 @@ test('can create content with different name using an invariant document bluepri
   await umbracoUi.content.clickActionsMenuAtRoot();
   await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
-  await umbracoUi.content.clickModalMenuItemWithName(documentBlueprintName);
+  await umbracoUi.content.clickTextButtonWithName(documentBlueprintName);
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.clickSaveButtonForContent();
 
@@ -130,7 +130,7 @@ test('can create content with different name using a variant document blueprint'
   await umbracoUi.content.clickActionsMenuAtRoot();
   await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
-  await umbracoUi.content.clickModalMenuItemWithName(documentBlueprintName);
+  await umbracoUi.content.clickTextButtonWithName(documentBlueprintName);
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.clickSaveButtonForContent();
   await umbracoUi.content.clickSaveButton();
@@ -161,7 +161,7 @@ test('can create content using a document blueprint with block list', async ({um
   await umbracoUi.content.clickActionsMenuAtRoot();
   await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
-  await umbracoUi.content.clickModalMenuItemWithName(documentBlueprintName);
+  await umbracoUi.content.clickTextButtonWithName(documentBlueprintName);
   await umbracoUi.content.clickSaveButtonForContent();
 
   // Assert
@@ -187,7 +187,7 @@ test('can create content using a document blueprint with block grid', async ({um
   await umbracoUi.content.clickActionsMenuAtRoot();
   await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
-  await umbracoUi.content.clickModalMenuItemWithName(documentBlueprintName);
+  await umbracoUi.content.clickTextButtonWithName(documentBlueprintName);
   await umbracoUi.content.clickSaveButtonForContent();
 
   // Assert
