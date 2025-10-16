@@ -18,7 +18,7 @@ export interface UmbProvideOptions<BaseType extends UmbContextMinimal, ResultTyp
 }
 
 /**
- * A property decorator that creates a UmbContextProviderController to provide
+ * A property decorator that creates an UmbContextProviderController to provide
  * a context value to child elements via the Umbraco Context API.
  *
  * This decorator supports both modern "standard" decorators (Stage 3 TC39 proposal) and
