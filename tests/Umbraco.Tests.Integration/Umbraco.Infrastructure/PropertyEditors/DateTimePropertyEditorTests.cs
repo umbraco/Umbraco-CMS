@@ -8,7 +8,6 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
-using Umbraco.Cms.Infrastructure.HybridCache;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -127,7 +126,6 @@ public class DateTimePropertyEditorTests : UmbracoIntegrationTest
 
         Assert.IsTrue(publishResult.Success);
 
-        var test = ((DocumentCache)PublishedContentCache).GetAtRoot(false);
         var publishedContent = await PublishedContentCache.GetByIdAsync(createContentResult.Result.Content.Key, false);
         Assert.IsNotNull(publishedContent);
 
