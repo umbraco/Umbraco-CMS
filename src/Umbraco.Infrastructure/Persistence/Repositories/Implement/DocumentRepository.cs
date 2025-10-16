@@ -1378,8 +1378,8 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
 
         entity.ResetDirtyProperties();
 
-        // need to flush the isolated cache by key explicitly here.
-        // the ContentCacheRefresher does the same thing, but by the time it's invoked, custom notification handlers
+        // We need to flush the isolated cache by key explicitly here.
+        // The ContentCacheRefresher does the same thing, but by the time it's invoked, custom notification handlers
         // might have already consumed the cached version (which at this point is the previous version).
         IsolatedCache.ClearByKey(RepositoryCacheKeys.GetKey<IContent, Guid>(entity.Key));
 
