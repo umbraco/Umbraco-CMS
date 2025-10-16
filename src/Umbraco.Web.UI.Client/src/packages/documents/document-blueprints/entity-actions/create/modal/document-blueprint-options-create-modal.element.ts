@@ -8,9 +8,13 @@ import type {
 } from './constants.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { html, customElement, css, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import { type UmbSelectedEvent, UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UmbCreateFolderEntityAction, type UmbTreeElement } from '@umbraco-cms/backoffice/tree';
+import { UmbModalBaseElement, umbOpenModal } from '@umbraco-cms/backoffice/modal';
+import { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UmbCreateFolderEntityAction } from '@umbraco-cms/backoffice/tree';
+import {
+	UMB_DOCUMENT_TYPE_PICKER_MODAL,
+	type UmbDocumentTypeTreeItemModel,
+} from '@umbraco-cms/backoffice/document-type';
 
 @customElement('umb-document-blueprint-options-create-modal')
 export class UmbDocumentBlueprintOptionsCreateModalElement extends UmbModalBaseElement<
@@ -58,40 +62,42 @@ export class UmbDocumentBlueprintOptionsCreateModalElement extends UmbModalBaseE
 			.catch(() => {});
 	}
 
-	#onSelected(event: UmbSelectedEvent) {
+	async #onCreateBlueprintClick(event: PointerEvent) {
 		event.stopPropagation();
-		const element = event.target as UmbTreeElement;
-		this.value = { documentTypeUnique: element.getSelection()[0] };
+		const value = await umbOpenModal(this, UMB_DOCUMENT_TYPE_PICKER_MODAL, {
+			data: {
+				hideTreeRoot: true,
+				pickableFilter: (item: UmbDocumentTypeTreeItemModel) => item.isElement == false,
+			},
+		});
+
+		const selection = value.selection.filter((x) => x !== null);
+		this.value = { documentTypeUnique: selection[0] };
 		this.modalContext?.dispatchEvent(new UmbSelectionChangeEvent());
 		this._submitModal();
 	}
 
 	override render() {
 		return html`
-			<umb-body-layout headline=${this.localize.term('actions_createblueprint')}>
-				<uui-box headline=${this.localize.term('blueprints_createBlueprintFolderUnder', this._parentName)}>
-					<uui-menu-item @click=${this.#onCreateFolderClick} label=${this.localize.term('create_newFolder') + '...'}>
-						<uui-icon slot="icon" name="icon-folder"></uui-icon>
-					</uui-menu-item>
-				</uui-box>
-				<uui-box headline=${this.localize.term('blueprints_createBlueprintItemUnder', this._parentName)}>
-					<umb-localize key="create_createContentBlueprint">
-						Select the Document Type you want to make a Document Blueprint for
-					</umb-localize>
-					<umb-tree
-						alias="Umb.Tree.DocumentType"
-						.props=${{
-							hideTreeRoot: true,
-							selectableFilter: (item: any) => item.isElement == false,
-						}}
-						@selected=${this.#onSelected}></umb-tree>
-				</uui-box>
+			<uui-dialog-layout headline=${this.localize.term('actions_createblueprint')}>
+				<uui-ref-list>
+					<umb-ref-item
+						name="New Document Blueprint for..."
+						icon="icon-blueprint"
+						@open=${this.#onCreateBlueprintClick}></umb-ref-item>
+
+					<umb-ref-item
+						name=${this.localize.term('create_newFolder') + '...'}
+						icon="icon-folder"
+						@open=${this.#onCreateFolderClick}></umb-ref-item>
+				</uui-ref-list>
+
 				<uui-button
 					slot="actions"
 					id="cancel"
 					label=${this.localize.term('buttons_confirmActionCancel')}
 					@click="${this._rejectModal}"></uui-button>
-			</umb-body-layout>
+			</uui-dialog-layout>
 		`;
 	}
 
