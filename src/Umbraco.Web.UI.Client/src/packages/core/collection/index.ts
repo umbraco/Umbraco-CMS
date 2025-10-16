@@ -9,6 +9,7 @@ export * from './conditions/index.js';
 export * from './constants.js';
 export * from './default/collection-default.element.js';
 export * from './global-components.js';
+export * from './menu/index.js';
 export * from './workspace-view/index.js';
 
 export * from './default/collection-default.context.js';

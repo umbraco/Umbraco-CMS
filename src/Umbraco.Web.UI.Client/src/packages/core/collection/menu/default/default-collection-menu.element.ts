@@ -1,7 +1,6 @@
 import type { UmbCollectionItemModel } from '../../item/types.js';
 import type { UmbCollectionSelectionConfiguration } from '../../types.js';
 import type { UmbDefaultCollectionMenuContext } from './default-collection-menu.context.js';
-import { getItemFallbackIcon, getItemFallbackName } from '@umbraco-cms/backoffice/entity-item';
 import {
 	html,
 	customElement,
@@ -13,6 +12,8 @@ import {
 	css,
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+
+import '../menu-item/collection-menu-item.element.js';
 
 @customElement('umb-default-collection-menu')
 export class UmbDefaultCollectionMenuElement extends UmbLitElement {
@@ -115,16 +116,11 @@ export class UmbDefaultCollectionMenuElement extends UmbLitElement {
 
 	#renderItem(item: UmbCollectionItemModel) {
 		return html`
-			<uui-menu-item
-				label=${item.name ?? getItemFallbackName(item)}
-				selectable
-				@selected=${() => this._api?.selection.select(item.unique)}
-				@deselected=${() => this._api?.selection.deselect(item.unique)}
-				?selected=${this._api?.selection.isSelected(item.unique)}>
-				${item.icon
-					? html`<uui-icon slot="icon" name=${item.icon}></uui-icon>`
-					: html`<uui-icon slot="icon" name=${getItemFallbackIcon()}></uui-icon>`}
-			</uui-menu-item>
+			<umb-collection-menu-item
+				entityType=${item.entityType}
+				.props=${{
+					item: item,
+				}}></umb-collection-menu-item>
 		`;
 	}
 

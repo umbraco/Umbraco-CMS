@@ -6,10 +6,16 @@ import type {
 } from '@umbraco-cms/backoffice/picker-data-source';
 import type { UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
 
+interface ExampleCollectionItemModel extends UmbCollectionItemModel {
+	isPickable: boolean;
+}
+
 export class ExampleCustomPickerCollectionPropertyEditorDataSource
 	extends UmbControllerBase
-	implements UmbPickerCollectionDataSource, UmbPickerSearchableDataSource
+	implements UmbPickerCollectionDataSource<ExampleCollectionItemModel>, UmbPickerSearchableDataSource
 {
+	collectionPickableFilter = (item: ExampleCollectionItemModel) => item.isPickable;
+
 	async requestCollection(args: UmbCollectionFilterModel) {
 		// TODO: use args to filter/paginate etc
 		console.log(args);
@@ -41,35 +47,40 @@ export class ExampleCustomPickerCollectionPropertyEditorDataSource
 
 export { ExampleCustomPickerCollectionPropertyEditorDataSource as api };
 
-const customItems: Array<UmbCollectionItemModel> = [
+const customItems: Array<ExampleCollectionItemModel> = [
 	{
 		unique: '1',
 		entityType: 'example',
 		name: 'Example 1',
 		icon: 'icon-shape-triangle',
+		isPickable: true,
 	},
 	{
 		unique: '2',
 		entityType: 'example',
 		name: 'Example 2',
 		icon: 'icon-shape-triangle',
+		isPickable: true,
 	},
 	{
 		unique: '3',
 		entityType: 'example',
 		name: 'Example 3',
 		icon: 'icon-shape-triangle',
+		isPickable: true,
 	},
 	{
 		unique: '4',
 		entityType: 'example',
 		name: 'Example 4',
 		icon: 'icon-shape-triangle',
+		isPickable: false,
 	},
 	{
 		unique: '5',
 		entityType: 'example',
 		name: 'Example 5',
 		icon: 'icon-shape-triangle',
+		isPickable: true,
 	},
 ];

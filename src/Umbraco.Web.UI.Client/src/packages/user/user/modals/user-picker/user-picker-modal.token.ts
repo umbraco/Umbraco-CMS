@@ -1,19 +1,29 @@
 import type { UmbUserDetailModel } from '../../types.js';
-import type { UmbPickerModalData } from '@umbraco-cms/backoffice/modal';
+import { UMB_USER_COLLECTION_MENU_ALIAS } from '../../collection/constants.js';
+import type {
+	UmbCollectionItemPickerModalData,
+	UmbCollectionItemPickerModalValue,
+} from '@umbraco-cms/backoffice/collection';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
-export type UmbUserPickerModalData = UmbPickerModalData<UmbUserDetailModel>;
+export type UmbUserPickerModalData = UmbCollectionItemPickerModalData<UmbUserDetailModel>;
 
-export interface UmbUserPickerModalValue {
-	selection: Array<string | null>;
-}
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface UmbUserPickerModalValue extends UmbCollectionItemPickerModalValue {}
 
 export const UMB_USER_PICKER_MODAL = new UmbModalToken<UmbUserPickerModalData, UmbUserPickerModalValue>(
-	'Umb.Modal.User.Picker',
+	/* TODO: use constant. We had to use the string directly here to avoid a circular dependency.
+	 When we have removed the dataType (dependency on content) from the picker context we update this */
+	'Umb.Modal.CollectionItemPicker',
 	{
 		modal: {
 			type: 'sidebar',
 			size: 'small',
+		},
+		data: {
+			collection: {
+				menuAlias: UMB_USER_COLLECTION_MENU_ALIAS,
+			},
 		},
 	},
 );
