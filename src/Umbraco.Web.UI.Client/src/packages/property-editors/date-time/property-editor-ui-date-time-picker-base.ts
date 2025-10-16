@@ -34,6 +34,7 @@ export abstract class UmbPropertyEditorUiDateTimePickerElementBase
 {
 	private _timeZoneOptions: Array<UmbTimeZonePickerOption> = [];
 	private _clientTimeZone: UmbTimeZone | undefined;
+	private _timeZoneMode: string | undefined;
 
 	@property({ type: Boolean, reflect: true })
 	readonly = false;
@@ -104,6 +105,7 @@ export abstract class UmbPropertyEditorUiDateTimePickerElementBase
 			() => {
 				return (
 					this._displayTimeZone &&
+					this._timeZoneMode !== 'local' &&
 					!!this.value?.timeZone &&
 					!this._timeZoneOptions.some((opt) => opt.value === this.value?.timeZone && !opt.invalid)
 				);
@@ -158,6 +160,7 @@ export abstract class UmbPropertyEditorUiDateTimePickerElementBase
 	#prefillTimeZones(config: UmbTimeZonePickerValue | undefined, selectedDate: DateTime | undefined) {
 		// Retrieve the time zones from the config
 		this._clientTimeZone = getClientTimeZone();
+		this._timeZoneMode = config?.mode;
 
 		// Retrieve the time zones from the config
 		const dateToCalculateOffset = selectedDate ?? DateTime.now();
@@ -319,9 +322,13 @@ export abstract class UmbPropertyEditorUiDateTimePickerElementBase
 		}
 
 		this._selectedDate = newDate;
+
+		const timeZoneToStore = this._selectedTimeZone && this._timeZoneMode !== 'local' ? this._selectedTimeZone : 'UTC';
+		const dateToStore = this._selectedTimeZone !== timeZoneToStore ? newDate.setZone(timeZoneToStore) : newDate;
+
 		this.value = {
-			date: this.#getCurrentDateValue(),
-			timeZone: this._selectedTimeZone,
+			date: this.#formatDateValue(dateToStore),
+			timeZone: timeZoneToStore,
 		};
 
 		if (updateOffsets) {
@@ -334,14 +341,14 @@ export abstract class UmbPropertyEditorUiDateTimePickerElementBase
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	#getCurrentDateValue(): string | undefined {
+	#formatDateValue(date: DateTime): string | undefined {
 		switch (this._dateInputType) {
 			case 'date':
-				return this._selectedDate?.toISODate() ?? undefined;
+				return date.toISODate() ?? undefined;
 			case 'time':
-				return this._selectedDate?.toISOTime({ includeOffset: false }) ?? undefined;
+				return date.toISOTime({ includeOffset: false }) ?? undefined;
 			default:
-				return this._selectedDate?.toISO({ includeOffset: !!this._selectedTimeZone }) ?? undefined;
+				return date.toISO({ includeOffset: !!this._selectedTimeZone }) ?? undefined;
 		}
 	}
 
