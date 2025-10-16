@@ -190,7 +190,7 @@ export class UmbMediaDropzoneManager extends UmbDropzoneManager {
 		const preset: Partial<UmbMediaDetailModel> = {
 			unique: item.unique,
 			mediaType: { unique: mediaTypeUnique, collection: null },
-			variants: [{ culture: null, segment: null, createDate: null, updateDate: null, name }],
+			variants: [{ culture: null, segment: null, createDate: null, updateDate: null, flags: [], name }],
 			values: item.temporaryFile ? [umbracoFile] : undefined,
 		};
 		const { data } = await this.#mediaDetailRepository.createScaffold(preset);

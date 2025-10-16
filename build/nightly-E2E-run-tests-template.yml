@@ -51,7 +51,6 @@ steps:
   # Test
   - pwsh: ${{ parameters.testCommand }}
     displayName: Run Playwright tests
-    continueOnError: true
     workingDirectory: tests/Umbraco.Tests.AcceptanceTest
     env:
       CI: true

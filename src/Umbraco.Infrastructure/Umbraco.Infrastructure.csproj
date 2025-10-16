@@ -64,8 +64,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Take top-level depedendency on System.Text.RegularExpressions, because Dazinator.Extensions.FileProviders and MiniProfiler.AspNetCore.Mvc depends on a vulnerable version -->
+    <!-- Take top-level dependency on System.Text.RegularExpressions, because Dazinator.Extensions.FileProviders and MiniProfiler.AspNetCore.Mvc depends on a vulnerable version -->
     <PackageReference Include="System.Text.RegularExpressions" />
+
+    <!-- Take top-level dependency on these Microsoft.CodeAnalysis.* packages due to conflicts when installing Microsoft.EntityFrameworkCore.Design -->
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" />
   </ItemGroup>
 
   <ItemGroup>

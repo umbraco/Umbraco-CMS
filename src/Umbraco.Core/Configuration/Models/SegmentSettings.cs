@@ -19,5 +19,6 @@ public class SegmentSettings
     /// <summary>
     ///     Gets or sets a value indicating whether the creation of non-existing segments is allowed.
     /// </summary>
+    [Obsolete("This functionality will be moved to a client-side extension. Scheduled for removal in V19.")]
     public bool AllowCreation { get; set; } = StaticAllowCreation;
 }
