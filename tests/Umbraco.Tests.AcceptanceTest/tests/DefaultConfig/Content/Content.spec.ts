@@ -235,7 +235,7 @@ test('can duplicate a content node to other parent', async ({umbracoApi, umbraco
   await umbracoUi.content.isContentInTreeVisible(contentName);
   await umbracoUi.content.isContentInTreeVisible(parentContentName);
   await umbracoUi.content.goToContentWithName(parentContentName);
-  await umbracoUi.content.isChildContentInCollectionVisible(contentName);
+  await umbracoUi.content.isContentWithNameVisibleInList(contentName);
 
   // Clean
   await umbracoApi.document.ensureNameNotExists(parentContentName);
