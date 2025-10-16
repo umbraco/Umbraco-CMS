@@ -47,20 +47,21 @@ export class UmbScriptCreateOptionsModalElement extends UmbModalBaseElement<UmbS
 
 	override render() {
 		return html`
-			<umb-body-layout headline="Create Script">
-				<uui-box>
+			<uui-dialog-layout headline="Create Script">
+				<uui-ref-list>
 					<!-- TODO: construct url -->
-					<uui-menu-item href=${this.#getCreateHref()} label="New Javascript file" @click=${this.#onNavigate}>
-						<uui-icon slot="icon" name="icon-document-js"></uui-icon>}
-					</uui-menu-item>
+					<umb-ref-item
+						name="New Javascript file"
+						icon="icon-document-js"
+						href=${this.#getCreateHref()}
+						@click=${this.#onNavigate}>
+					</umb-ref-item>
 
-					<uui-menu-item @click=${this.#onCreateFolderClick} label="New Folder...">
-						<uui-icon slot="icon" name="icon-folder"></uui-icon>}
-					</uui-menu-item>
-				</uui-box>
+					<umb-ref-item name="New Folder..." icon="icon-folder" @open=${this.#onCreateFolderClick}></umb-ref-item>
+				</uui-ref-list>
 
 				<uui-button slot="actions" id="cancel" label="Cancel" @click="${this._rejectModal}"></uui-button>
-			</umb-body-layout>
+			</uui-dialog-layout>
 		`;
 	}
 }
