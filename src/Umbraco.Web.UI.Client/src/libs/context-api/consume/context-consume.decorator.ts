@@ -39,7 +39,7 @@ export interface UmbConsumeOptions<
 }
 
 /**
- * A property decorator that adds a UmbContextConsumerController to the component
+ * A property decorator that adds an UmbContextConsumerController to the component
  * which will try and retrieve a value for the property via the Umbraco Context API.
  *
  * This decorator supports both modern "standard" decorators (Stage 3 TC39 proposal) and
