@@ -1,6 +1,5 @@
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbCollectionFilterModel, UmbCollectionItemModel } from '@umbraco-cms/backoffice/collection';
-import type { UmbItemModel } from '@umbraco-cms/backoffice/entity-item';
 import type {
 	UmbPickerCollectionDataSource,
 	UmbPickerSearchableDataSource,
