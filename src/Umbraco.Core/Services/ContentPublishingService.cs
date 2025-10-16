@@ -328,7 +328,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
         Guid userKey,
         bool returnContent)
     {
-        // Ensure we have an UmbracoContext when running on a background thread so operations that run in the published notification handlers
+        // Ensure we have an UmbracoContext in case running on a background thread so operations that run in the published notification handlers
         // have access to this (e.g. webhooks).
         using UmbracoContextReference umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext();
 
