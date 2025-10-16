@@ -50,13 +50,13 @@ export interface UmbProvideOptions<BaseType extends UmbContextMinimal, ResultTyp
  * @example
  * ```ts
  * // For dynamic updates, store the state inside the context instance
- * class MyContext implements UmbContextMinimal {
+ * class MyContext extends UmbControllerBase {
  *   someProperty = new UmbStringState('initial value');
  * }
  *
  * class MyElement extends UmbLitElement {
  *   @provideContext({context: MY_CONTEXT})
- *   private _myContext = new MyContext();
+ *   private _myContext = new MyContext(this);
  *
  *   updateValue(newValue: string) {
  *     this._myContext.someProperty.setValue(newValue);
