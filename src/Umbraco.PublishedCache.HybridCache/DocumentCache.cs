@@ -42,6 +42,9 @@ public sealed class DocumentCache : IPublishedContentCache
 
     public IPublishedContent? GetById(Guid contentId) => GetByIdAsync(contentId).GetAwaiter().GetResult();
 
+    [Obsolete("This method is no longer used in Umbraco and is not defined on the interface. " +
+        "Any usage can be replaced with a call to IDocumentNavigationQueryService.TryGetRootKeys to retrieve the document keys, " +
+        "with each key passed to IPublishedContentCache.GetById to retrieve the IPublishedContent instances. Scheduled for removal in Umbraco 19.")]
     public IEnumerable<IPublishedContent> GetAtRoot(bool preview, string? culture = null)
     {
         if (_documentNavigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys) is false)
