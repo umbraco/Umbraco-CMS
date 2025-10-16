@@ -23,7 +23,6 @@ umbExtensionsRegistry.register(manifest);
 
 @customElement('umb-collection-default')
 export class UmbCollectionDefaultElement extends UmbLitElement {
-	//
 	#collectionContext?: UmbDefaultCollectionContext;
 
 	@state()
@@ -31,9 +30,6 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 
 	@state()
 	private _hasItems = false;
-
-	@state()
-	private _isDoneLoading = false;
 
 	@state()
 	private _emptyLabel?: string;
@@ -46,7 +42,6 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 			this.#observeTotalItems();
 			this.#getEmptyStateLabel();
 			this.#collectionContext?.loadCollection();
-			this._isDoneLoading = true;
 		});
 	}
 
@@ -106,8 +101,6 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 	}
 
 	#renderEmptyState() {
-		if (!this._isDoneLoading) return nothing;
-
 		return html`
 			<div id="empty-state" class="uui-text">
 				<h4>${this.localize.string(this._emptyLabel)}</h4>
@@ -138,11 +131,19 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 				height: 80%;
 				align-content: center;
 				text-align: center;
+				opacity: 0;
+				animation: fadeIn 200ms 200ms forwards;
 			}
 
 			router-slot {
 				width: 100%;
 				height: 100%;
+			}
+
+			@keyframes fadeIn {
+				100% {
+					opacity: 100%;
+				}
 			}
 		`,
 	];
