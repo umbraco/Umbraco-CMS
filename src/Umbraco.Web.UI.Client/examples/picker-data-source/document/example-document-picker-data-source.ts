@@ -35,7 +35,6 @@ export class ExampleDocumentPickerPropertyEditorDataSource
 	treePickableFilter: (treeItem: UmbDocumentTreeItemModel) => boolean = (treeItem) => !!treeItem.unique;
 
 	setConfig(config: UmbConfigCollectionModel) {
-		// TODO: add examples for all config options
 		this.#config = config;
 		this.#applyPickableFilterFromConfig();
 	}
