@@ -45,7 +45,7 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 			this.#observeCollectionRoutes();
 			this.#observeTotalItems();
 			this.#getEmptyStateLabel();
-			await this.#collectionContext?.requestCollection();
+			this.#collectionContext?.loadCollection();
 			this._isDoneLoading = true;
 		});
 	}
