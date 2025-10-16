@@ -4,7 +4,6 @@ import { provideContext } from './context-provide.decorator.js';
 import { aTimeout, elementUpdated, expect, fixture } from '@open-wc/testing';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 class UmbTestContextConsumerClass implements UmbContextMinimal {
 	public prop: string;
