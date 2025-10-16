@@ -51,7 +51,7 @@ public abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : BlockVal
               languageService,
               ioHelper,
               attribute,
-              StaticServiceProvider.Instance.GetRequiredService<ILogger>())
+              StaticServiceProvider.Instance.GetRequiredService<ILogger<BlockEditorPropertyValueEditor<TValue, TLayout>>>())
     {
     }
 
