@@ -46,6 +46,7 @@ export interface UmbConsumeOptions<
  * legacy TypeScript experimental decorators for backward compatibility.
  *
  * @param {UmbConsumeOptions} options Configuration object containing context, callback, and subscribe options
+ *
  * @example
  * ```ts
  * import {consumeContext} from '@umbraco-cms/backoffice/context-api';
@@ -62,8 +63,7 @@ export interface UmbConsumeOptions<
  *   currentUser?: UmbUserContext;
  * }
  * ```
- *
- * @returns {ConsumeDecorator} Returns a property decorator function
+ * @returns {ConsumeDecorator<ResultType>} A property decorator function
  */
 export function consumeContext<
 	BaseType extends UmbContextMinimal = UmbContextMinimal,
@@ -73,129 +73,150 @@ export function consumeContext<
 
 	return ((protoOrTarget: any, nameOrContext: PropertyKey | ClassAccessorDecoratorContext<any, ResultType>) => {
 		if (typeof nameOrContext === 'object') {
-			// ===================================================================
-			// STANDARD DECORATORS BRANCH (Stage 3 TC39 Proposal)
-			// ===================================================================
-			// This branch is used when decorating auto-accessors (with 'accessor' keyword).
-			// Example: @consume({context: TOKEN}) accessor myProp?: Type;
-			//
-			// The decorator receives a ClassAccessorDecoratorContext object which provides:
-			// - addInitializer(): Run code during class construction
-			// - Access to getter/setter through the context object
-			//
-			// This is the modern, standardized decorator API.
-			//
-			// Note: Standard decorators currently don't work with @state()/@property()
-			// decorators, which is why we still need the legacy branch.
-			// ===================================================================
-
-			if ('addInitializer' in nameOrContext) {
-				nameOrContext.addInitializer(function () {
-					queueMicrotask(() => {
-						if (subscribe) {
-							// Continuous subscription
-							new UmbContextConsumerController(this, context, (value) => {
-								protoOrTarget.set.call(this, value);
-								callback?.(value);
-							});
-						} else {
-							// One-time consumption using asPromise()
-							const controller = new UmbContextConsumerController(this, context, callback);
-							controller.asPromise().then((value) => {
-								protoOrTarget.set.call(this, value);
-							});
-						}
-					});
-				});
-			} else {
-				console.warn(
-					'@consume decorator: Standard decorator context does not support addInitializer. ' +
-						'This should not happen with modern decorators.',
-				);
-			}
-		} else {
-			// ===================================================================
-			// LEGACY DECORATORS BRANCH (TypeScript Experimental)
-			// ===================================================================
-			// This branch is used when decorating regular properties (WITHOUT 'accessor' keyword).
-			// Example: @consume({context: TOKEN}) @state() myProp?: Type;
-			//
-			// The decorator receives:
-			// - protoOrTarget: The class prototype
-			// - nameOrContext: The property name (string)
-			//
-			// This is the older TypeScript experimental decorator API, still widely used
-			// in Umbraco because it works with @state() and @property() decorators.
-			// The 'accessor' keyword is not compatible with these decorators yet.
-			//
-			// We support three initialization strategies:
-			// 1. addInitializer (if available, e.g., on LitElement classes)
-			// 2. hostConnected wrapper (for UmbController classes)
-			// 3. Warning (if neither is available)
-			// ===================================================================
-
-			const propertyKey = nameOrContext as string;
-			const constructor = protoOrTarget.constructor as any;
-
-			if (constructor.addInitializer) {
-				// Strategy 1: Use addInitializer if available (LitElement classes)
-				constructor.addInitializer((element: any): void => {
-					queueMicrotask(() => {
-						if (subscribe) {
-							// Continuous subscription
-							new UmbContextConsumerController(element, context, (value) => {
-								element[propertyKey] = value;
-								callback?.(value);
-							});
-						} else {
-							// One-time consumption using asPromise()
-							const controller = new UmbContextConsumerController(element, context, callback);
-							controller.asPromise().then((value) => {
-								element[propertyKey] = value;
-							});
-						}
-					});
-				});
-			} else if ('hostConnected' in protoOrTarget && typeof protoOrTarget.hostConnected === 'function') {
-				// Strategy 2: Wrap hostConnected for UmbController classes without addInitializer
-				const originalHostConnected = protoOrTarget.hostConnected;
-
-				protoOrTarget.hostConnected = function (this: any) {
-					// Set up consumer once, using a flag to prevent multiple setups
-					if (!this.__consumeControllers) {
-						this.__consumeControllers = new Map();
-					}
-
-					if (!this.__consumeControllers.has(propertyKey)) {
-						if (subscribe) {
-							// Continuous subscription
-							const controller = new UmbContextConsumerController(this, context, (value) => {
-								this[propertyKey] = value;
-								callback?.(value);
-							});
-							this.__consumeControllers.set(propertyKey, controller);
-						} else {
-							// One-time consumption using asPromise()
-							const controller = new UmbContextConsumerController(this, context, callback);
-							controller.asPromise().then((value) => {
-								this[propertyKey] = value;
-							});
-							// Don't store in map since it cleans itself up
-						}
-					}
-
-					// Call original hostConnected if it exists
-					originalHostConnected?.call(this);
-				};
-			} else {
-				// Strategy 3: No supported initialization method available
-				console.warn(
-					`@consume applied to ${constructor.name}.${String(propertyKey)} but neither addInitializer nor hostConnected is available. ` +
-						`Make sure the class extends UmbLitElement or implements UmbController with hostConnected.`,
-				);
-			}
+			setupStandardDecorator(protoOrTarget, nameOrContext, context, callback, subscribe);
+			return;
 		}
+
+		setupLegacyDecorator(protoOrTarget, nameOrContext as string, context, callback, subscribe);
 	}) as ConsumeDecorator<ResultType>;
+}
+
+/**
+ * Sets up a standard decorator (Stage 3 TC39 proposal) for auto-accessors.
+ * This branch is used when decorating with the 'accessor' keyword.
+ * Example: @consumeContext({context: TOKEN}) accessor myProp?: Type;
+ *
+ * The decorator receives a ClassAccessorDecoratorContext object which provides
+ * addInitializer() to run code during class construction.
+ *
+ * This is the modern, standardized decorator API that will be the standard
+ * when Lit 4.x is released.
+ *
+ * Note: Standard decorators currently don't work with @state()/@property()
+ * decorators, which is why we still need the legacy branch.
+ */
+function setupStandardDecorator<BaseType extends UmbContextMinimal, ResultType extends BaseType>(
+	protoOrTarget: any,
+	decoratorContext: ClassAccessorDecoratorContext<any, ResultType>,
+	context: string | UmbContextToken<BaseType, ResultType>,
+	callback: UmbContextCallback<ResultType> | undefined,
+	subscribe: boolean,
+): void {
+	if (!('addInitializer' in decoratorContext)) {
+		console.warn(
+			'@consumeContext decorator: Standard decorator context does not support addInitializer. ' +
+				'This should not happen with modern decorators.',
+		);
+		return;
+	}
+
+	decoratorContext.addInitializer(function () {
+		queueMicrotask(() => {
+			if (subscribe) {
+				// Continuous subscription - stays active and updates property on context changes
+				new UmbContextConsumerController(this, context, (value) => {
+					protoOrTarget.set.call(this, value);
+					callback?.(value);
+				});
+			} else {
+				// One-time consumption - uses asPromise() to get the value once and then cleans up
+				const controller = new UmbContextConsumerController(this, context, callback);
+				controller.asPromise().then((value) => {
+					protoOrTarget.set.call(this, value);
+				});
+			}
+		});
+	});
+}
+
+/**
+ * Sets up a legacy decorator (TypeScript experimental) for regular properties.
+ * This branch is used when decorating without the 'accessor' keyword.
+ * Example: @consumeContext({context: TOKEN}) @state() myProp?: Type;
+ *
+ * The decorator receives:
+ * - protoOrTarget: The class prototype
+ * - propertyKey: The property name (string)
+ *
+ * This is the older TypeScript experimental decorator API, still widely used
+ * in Umbraco because it works with @state() and @property() decorators.
+ * The 'accessor' keyword is not compatible with these decorators yet.
+ *
+ * We support three initialization strategies:
+ * 1. addInitializer (if available, e.g., on LitElement classes)
+ * 2. hostConnected wrapper (for UmbController classes)
+ * 3. Warning (if neither is available)
+ */
+function setupLegacyDecorator<BaseType extends UmbContextMinimal, ResultType extends BaseType>(
+	protoOrTarget: any,
+	propertyKey: string,
+	context: string | UmbContextToken<BaseType, ResultType>,
+	callback: UmbContextCallback<ResultType> | undefined,
+	subscribe: boolean,
+): void {
+	const constructor = protoOrTarget.constructor as any;
+
+	// Strategy 1: Use addInitializer if available (LitElement classes)
+	if (constructor.addInitializer) {
+		constructor.addInitializer((element: any): void => {
+			queueMicrotask(() => {
+				if (subscribe) {
+					// Continuous subscription
+					new UmbContextConsumerController(element, context, (value) => {
+						element[propertyKey] = value;
+						callback?.(value);
+					});
+				} else {
+					// One-time consumption using asPromise()
+					const controller = new UmbContextConsumerController(element, context, callback);
+					controller.asPromise().then((value) => {
+						element[propertyKey] = value;
+					});
+				}
+			});
+		});
+		return;
+	}
+
+	// Strategy 2: Wrap hostConnected for UmbController classes without addInitializer
+	if ('hostConnected' in protoOrTarget && typeof protoOrTarget.hostConnected === 'function') {
+		const originalHostConnected = protoOrTarget.hostConnected;
+
+		protoOrTarget.hostConnected = function (this: any) {
+			// Set up consumer once, using a flag to prevent multiple setups
+			if (!this.__consumeControllers) {
+				this.__consumeControllers = new Map();
+			}
+
+			if (!this.__consumeControllers.has(propertyKey)) {
+				if (subscribe) {
+					// Continuous subscription
+					const controller = new UmbContextConsumerController(this, context, (value) => {
+						this[propertyKey] = value;
+						callback?.(value);
+					});
+					this.__consumeControllers.set(propertyKey, controller);
+				} else {
+					// One-time consumption using asPromise()
+					const controller = new UmbContextConsumerController(this, context, callback);
+					controller.asPromise().then((value) => {
+						this[propertyKey] = value;
+					});
+					// Don't store in map since it cleans itself up
+				}
+			}
+
+			// Call original hostConnected if it exists
+			originalHostConnected?.call(this);
+		};
+		return;
+	}
+
+	// Strategy 3: No supported initialization method available
+	console.warn(
+		`@consumeContext applied to ${constructor.name}.${propertyKey} but neither addInitializer nor hostConnected is available. ` +
+			`Make sure the class extends UmbLitElement, UmbControllerBase, or implements UmbController with hostConnected.`,
+	);
 }
 
 /**
