@@ -36,12 +36,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 			settings: {
 				properties: [
 					{
-						alias: 'startNode',
-						label: 'Node type',
-						description: '',
-						propertyEditorUiAlias: 'Umb.PropertyEditorUi.ContentPicker.Source',
-					},
-					{
 						alias: 'filter',
 						label: 'Allow items of type',
 						description: 'Select the applicable types',
