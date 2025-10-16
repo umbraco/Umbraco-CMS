@@ -34,15 +34,39 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 	@state()
 	private _emptyLabel?: string;
 
+	@state()
+	private _initialLoadDone = false;
+
 	constructor() {
 		super();
 		this.consumeContext(UMB_COLLECTION_CONTEXT, async (context) => {
 			this.#collectionContext = context;
+			this.#observeIsLoading();
 			this.#observeCollectionRoutes();
 			this.#observeTotalItems();
 			this.#getEmptyStateLabel();
 			this.#collectionContext?.loadCollection();
 		});
+	}
+
+	#observeIsLoading() {
+		if (!this.#collectionContext) return;
+		let hasBeenLoading = false;
+
+		this.observe(
+			this.#collectionContext.loading,
+			(isLoading) => {
+				// We need to know when the initial loading has been done, to not show the empty state before that.
+				// We can't just check if there are items, because there might be none.
+				// So we check if it has been loading, and then when it stops loading we know the initial load is done.
+				if (isLoading) {
+					hasBeenLoading = true;
+				} else if (hasBeenLoading) {
+					this._initialLoadDone = true;
+				}
+			},
+			'umbCollectionIsLoadingObserver',
+		);
 	}
 
 	#observeCollectionRoutes() {
@@ -101,6 +125,8 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 	}
 
 	#renderEmptyState() {
+		if (!this._initialLoadDone) return nothing;
+
 		return html`
 			<div id="empty-state" class="uui-text">
 				<h4>${this.localize.string(this._emptyLabel)}</h4>
