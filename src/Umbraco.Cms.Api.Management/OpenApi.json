@@ -37323,6 +37323,9 @@
                   "$ref": "#/components/schemas/DocumentPropertyValuePermissionPresentationModel"
                 },
                 {
+                  "$ref": "#/components/schemas/DocumentTypePermissionPresentationModel"
+                },
+                {
                   "$ref": "#/components/schemas/UnknownTypePermissionPresentationModel"
                 }
               ]
@@ -37607,6 +37610,9 @@
                 },
                 {
                   "$ref": "#/components/schemas/DocumentPropertyValuePermissionPresentationModel"
+                },
+                {
+                  "$ref": "#/components/schemas/DocumentTypePermissionPresentationModel"
                 },
                 {
                   "$ref": "#/components/schemas/UnknownTypePermissionPresentationModel"
@@ -38444,7 +38450,8 @@
             "type": "boolean"
           },
           "allowNonExistingSegmentsCreation": {
-            "type": "boolean"
+            "type": "boolean",
+            "deprecated": true
           }
         },
         "additionalProperties": false
@@ -39088,6 +39095,36 @@
         },
         "additionalProperties": false
       },
+      "DocumentTypePermissionPresentationModel": {
+        "required": [
+          "$type",
+          "documentTypeAlias",
+          "verbs"
+        ],
+        "type": "object",
+        "properties": {
+          "$type": {
+            "type": "string"
+          },
+          "verbs": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "documentTypeAlias": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "DocumentTypePermissionPresentationModel": "#/components/schemas/DocumentTypePermissionPresentationModel"
+          }
+        }
+      },
       "DocumentTypePropertyTypeContainerResponseModel": {
         "required": [
           "id",
@@ -39683,7 +39720,8 @@
           "NotCreated",
           "Draft",
           "Published",
-          "PublishedPendingChanges"
+          "PublishedPendingChanges",
+          "Trashed"
         ],
         "type": "string"
       },
@@ -40178,7 +40216,7 @@
           },
           "actionParameters": {
             "type": "object",
-            "additionalProperties": { },
+            "additionalProperties": {},
             "nullable": true
           }
         },
@@ -40803,7 +40841,7 @@
           },
           "extensions": {
             "type": "array",
-            "items": { }
+            "items": {}
           }
         },
         "additionalProperties": false
@@ -44640,7 +44678,7 @@
             "nullable": true
           }
         },
-        "additionalProperties": { }
+        "additionalProperties": {}
       },
       "ProblemDetailsBuilderModel": {
         "type": "object",
@@ -47814,6 +47852,9 @@
                   "$ref": "#/components/schemas/DocumentPropertyValuePermissionPresentationModel"
                 },
                 {
+                  "$ref": "#/components/schemas/DocumentTypePermissionPresentationModel"
+                },
+                {
                   "$ref": "#/components/schemas/UnknownTypePermissionPresentationModel"
                 }
               ]
@@ -48249,6 +48290,9 @@
                 },
                 {
                   "$ref": "#/components/schemas/DocumentPropertyValuePermissionPresentationModel"
+                },
+                {
+                  "$ref": "#/components/schemas/DocumentTypePermissionPresentationModel"
                 },
                 {
                   "$ref": "#/components/schemas/UnknownTypePermissionPresentationModel"
