@@ -14,6 +14,7 @@ import type { UmbInputWithAliasElement } from '@umbraco-cms/backoffice/component
 
 import './components/user-group-entity-user-permission-list.element.js';
 import './components/user-group-granular-permission-list.element.js';
+import './components/user-group-extension-permission-list.element.js';
 
 @customElement('umb-user-group-workspace-editor')
 export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
@@ -255,6 +256,11 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 					<uui-box>
 						<div slot="headline"><umb-localize key="user_permissionsGranular"></umb-localize></div>
 						<umb-user-group-granular-permission-list></umb-user-group-granular-permission-list>
+					</uui-box>
+
+					<uui-box>
+						<div slot="headline"><umb-localize key="user_permissionsExtensions"></umb-localize></div>
+						<umb-user-group-extension-permission-list></umb-user-group-extension-permission-list>
 					</uui-box>
 				</umb-stack>
 			</div>
