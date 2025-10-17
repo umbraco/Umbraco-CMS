@@ -9,7 +9,11 @@ import { UMB_MEDIA_COLLECTION_ALIAS } from '../collection/constants.js';
 import type { UmbMediaDetailRepository } from '../repository/index.js';
 import { UMB_MEDIA_WORKSPACE_ALIAS, UMB_MEMBER_DETAIL_MODEL_VARIANT_SCAFFOLD } from './constants.js';
 import { UmbContentDetailWorkspaceContextBase, type UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
-import { UmbEntityTrashedEvent, UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
+import {
+	UmbEntityRestoredFromRecycleBinEvent,
+	UmbEntityTrashedEvent,
+	UmbIsTrashedEntityContext,
+} from '@umbraco-cms/backoffice/recycle-bin';
 import {
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceIsNewRedirectControllerAlias,
@@ -159,17 +163,22 @@ export class UmbMediaWorkspaceContext
 	}
 
 	#addEventListeners() {
-		this.#actionEventContext?.addEventListener(UmbEntityTrashedEvent.TYPE, this.#onTrashedEntityEvent as EventListener);
-	}
-
-	#removeEventListeners() {
-		this.#actionEventContext?.removeEventListener(
-			UmbEntityTrashedEvent.TYPE,
-			this.#onTrashedEntityEvent as EventListener,
+		this.#actionEventContext?.addEventListener(UmbEntityTrashedEvent.TYPE, this.#onRecycleBinEvent as EventListener);
+		this.#actionEventContext?.addEventListener(
+			UmbEntityRestoredFromRecycleBinEvent.TYPE,
+			this.#onRecycleBinEvent as EventListener,
 		);
 	}
 
-	#onTrashedEntityEvent = (event: UmbEntityTrashedEvent) => {
+	#removeEventListeners() {
+		this.#actionEventContext?.removeEventListener(UmbEntityTrashedEvent.TYPE, this.#onRecycleBinEvent as EventListener);
+		this.#actionEventContext?.removeEventListener(
+			UmbEntityRestoredFromRecycleBinEvent.TYPE,
+			this.#onRecycleBinEvent as EventListener,
+		);
+	}
+
+	#onRecycleBinEvent = (event: UmbEntityTrashedEvent | UmbEntityRestoredFromRecycleBinEvent) => {
 		const unique = this.getUnique();
 		const entityType = this.getEntityType();
 		if (event.getUnique() !== unique || event.getEntityType() !== entityType) return;

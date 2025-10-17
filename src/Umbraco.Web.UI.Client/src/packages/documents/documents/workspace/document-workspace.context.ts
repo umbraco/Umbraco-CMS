@@ -24,7 +24,11 @@ import { umbPeekError } from '@umbraco-cms/backoffice/notification';
 import { UmbContentDetailWorkspaceContextBase } from '@umbraco-cms/backoffice/content';
 import { UmbDeprecation, type UmbVariantGuardRule } from '@umbraco-cms/backoffice/utils';
 import { UmbDocumentBlueprintDetailRepository } from '@umbraco-cms/backoffice/document-blueprint';
-import { UmbEntityTrashedEvent, UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
+import {
+	UmbEntityRestoredFromRecycleBinEvent,
+	UmbEntityTrashedEvent,
+	UmbIsTrashedEntityContext,
+} from '@umbraco-cms/backoffice/recycle-bin';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import {
 	UmbWorkspaceIsNewRedirectController,
@@ -403,17 +407,22 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	#addEventListeners() {
-		this.#actionEventContext?.addEventListener(UmbEntityTrashedEvent.TYPE, this.#onTrashedEntityEvent as EventListener);
-	}
-
-	#removeEventListeners() {
-		this.#actionEventContext?.removeEventListener(
-			UmbEntityTrashedEvent.TYPE,
-			this.#onTrashedEntityEvent as EventListener,
+		this.#actionEventContext?.addEventListener(UmbEntityTrashedEvent.TYPE, this.#onRecycleBinEvent as EventListener);
+		this.#actionEventContext?.addEventListener(
+			UmbEntityRestoredFromRecycleBinEvent.TYPE,
+			this.#onRecycleBinEvent as EventListener,
 		);
 	}
 
-	#onTrashedEntityEvent = (event: UmbEntityTrashedEvent) => {
+	#removeEventListeners() {
+		this.#actionEventContext?.removeEventListener(UmbEntityTrashedEvent.TYPE, this.#onRecycleBinEvent as EventListener);
+		this.#actionEventContext?.removeEventListener(
+			UmbEntityRestoredFromRecycleBinEvent.TYPE,
+			this.#onRecycleBinEvent as EventListener,
+		);
+	}
+
+	#onRecycleBinEvent = (event: UmbEntityTrashedEvent | UmbEntityRestoredFromRecycleBinEvent) => {
 		const unique = this.getUnique();
 		const entityType = this.getEntityType();
 		if (event.getUnique() !== unique || event.getEntityType() !== entityType) return;
