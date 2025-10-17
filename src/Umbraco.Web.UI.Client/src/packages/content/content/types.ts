@@ -1,3 +1,4 @@
+import type { UmbEntityFlag } from '@umbraco-cms/backoffice/entity-flag';
 import type { UmbPropertyValueData } from '@umbraco-cms/backoffice/property';
 import type { UmbEntityVariantModel } from '@umbraco-cms/backoffice/variant';
 
@@ -14,7 +15,7 @@ export interface UmbElementValueModel<ValueType = unknown> extends UmbPropertyVa
 	/**
 	 * @deprecated, we do not use entityType on values anymore. To be removed in Umbraco v.18.
 	 * Just remove the property.
-	 **/
+	 */
 	entityType?: string;
 	segment: string | null;
 }
@@ -32,8 +33,9 @@ export interface UmbContentDetailModel<VariantModelType extends UmbEntityVariant
 	unique: string;
 	entityType: string;
 	variants: Array<VariantModelType>;
+	flags: Array<UmbEntityFlag>;
 }
 
 export interface UmbContentLikeDetailModel
 	extends UmbElementDetailModel,
-		Partial<Pick<UmbContentDetailModel, 'variants'>> {}
+		Partial<Pick<UmbContentDetailModel, 'variants' | 'flags'>> {}

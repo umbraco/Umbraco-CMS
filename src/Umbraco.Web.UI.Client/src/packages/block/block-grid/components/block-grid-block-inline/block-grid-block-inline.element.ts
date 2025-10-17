@@ -38,6 +38,9 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 	@property({ type: String, reflect: false })
 	icon?: string;
 
+	@property({ type: Number, attribute: false })
+	index?: number;
+
 	@property({ type: Boolean, reflect: true })
 	unpublished?: boolean;
 
@@ -173,7 +176,7 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 	}
 
 	#renderBlockInfo() {
-		const blockValue = { ...this.content, $settings: this.settings };
+		const blockValue = { ...this.content, $settings: this.settings, $index: this.index };
 		return html`
 			<span id="content">
 				<span id="icon">
