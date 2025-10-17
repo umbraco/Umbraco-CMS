@@ -22,9 +22,9 @@ import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-reg
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { umbPeekError } from '@umbraco-cms/backoffice/notification';
 import { UmbContentDetailWorkspaceContextBase } from '@umbraco-cms/backoffice/content';
-import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
+import { UmbDeprecation, type UmbVariantGuardRule } from '@umbraco-cms/backoffice/utils';
 import { UmbDocumentBlueprintDetailRepository } from '@umbraco-cms/backoffice/document-blueprint';
-import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
+import { UmbEntityTrashedEvent, UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import {
 	UmbWorkspaceIsNewRedirectController,
@@ -35,6 +35,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbVariantPropertyGuardRule } from '@umbraco-cms/backoffice/property';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 
 type ContentModel = UmbDocumentDetailModel;
 type ContentTypeModel = UmbDocumentTypeDetailModel;
@@ -64,6 +65,7 @@ export class UmbDocumentWorkspaceContext
 
 	#isTrashedContext = new UmbIsTrashedEntityContext(this);
 	#documentSegmentRepository = new UmbDocumentSegmentRepository(this);
+	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 
 	constructor(host: UmbControllerHost) {
 		super(host, {
@@ -110,6 +112,12 @@ export class UmbDocumentWorkspaceContext
 			}
 		});
 
+		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (actionEventContext) => {
+			this.#removeEventListeners();
+			this.#actionEventContext = actionEventContext;
+			this.#addEventListeners();
+		});
+
 		this.observe(
 			this.contentTypeUnique,
 			(unique) => {
@@ -138,6 +146,8 @@ export class UmbDocumentWorkspaceContext
 			},
 			null,
 		);
+
+		this.observe(this.isTrashed, (isTrashed) => this.#onTrashStateChange(isTrashed));
 
 		this.routes.setRoutes([
 			{
@@ -209,16 +219,6 @@ export class UmbDocumentWorkspaceContext
 	override resetState(): void {
 		super.resetState();
 		this.#isTrashedContext.setIsTrashed(false);
-	}
-
-	override async load(unique: string) {
-		const response = await super.load(unique);
-
-		if (response?.data) {
-			this.#isTrashedContext.setIsTrashed(response.data.isTrashed);
-		}
-
-		return response;
 	}
 
 	protected override async loadSegments(): Promise<void> {
@@ -400,6 +400,48 @@ export class UmbDocumentWorkspaceContext
 				});
 			},
 		);
+	}
+
+	#addEventListeners() {
+		this.#actionEventContext?.addEventListener(UmbEntityTrashedEvent.TYPE, this.#onTrashedEntityEvent as EventListener);
+	}
+
+	#removeEventListeners() {
+		this.#actionEventContext?.removeEventListener(
+			UmbEntityTrashedEvent.TYPE,
+			this.#onTrashedEntityEvent as EventListener,
+		);
+	}
+
+	#onTrashedEntityEvent = (event: UmbEntityTrashedEvent) => {
+		const unique = this.getUnique();
+		const entityType = this.getEntityType();
+		if (event.getUnique() !== unique || event.getEntityType() !== entityType) return;
+		this.reload();
+	};
+
+	#onTrashStateChange(isTrashed?: boolean) {
+		this.#isTrashedContext.setIsTrashed(isTrashed ?? false);
+
+		const guardUnique = `UMB_PREVENT_EDIT_TRASHED_ITEM`;
+
+		if (!isTrashed) {
+			this.readOnlyGuard.removeRule(guardUnique);
+			return;
+		}
+
+		const rule: UmbVariantGuardRule = {
+			unique: guardUnique,
+			permitted: true,
+		};
+
+		// TODO: Change to use property write guard when it supports making the name read-only.
+		this.readOnlyGuard.addRule(rule);
+	}
+
+	public override destroy(): void {
+		this.#removeEventListeners();
+		super.destroy();
 	}
 }
 
