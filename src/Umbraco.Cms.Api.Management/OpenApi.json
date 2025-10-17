@@ -40166,7 +40166,8 @@
           "NotCreated",
           "Draft",
           "Published",
-          "PublishedPendingChanges"
+          "PublishedPendingChanges",
+          "Trashed"
         ],
         "type": "string"
       },
