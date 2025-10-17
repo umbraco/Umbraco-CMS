@@ -8,7 +8,7 @@
       "alias": "my.blockEditorCustomView.Example",
       "name": "My Example Custom View",
       "element": "/App_Plugins/block-custom-view/block-custom-view.js",
-      "forContentTypeAlias": "heroBanner"
+      "forContentTypeAlias": "elementTypeForCustomBlockView"
     },
     {
       "type": "blockEditorCustomView",
