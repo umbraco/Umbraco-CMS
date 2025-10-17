@@ -86,7 +86,7 @@ public class DateTimeUnspecifiedValueConverterTests
     private static object[] _dateTimeUnspecifiedConvertToObjectCases =
     [
         new object[] { null, null },
-        new object[] { _convertToObjectInputDate, DateTime.Parse("2025-08-20T17:30:00") },
+        new object[] { _convertToObjectInputDate, DateTime.Parse("2025-08-20T16:30:00") },
     ];
 
     [TestCaseSource(nameof(_dateTimeUnspecifiedConvertToObjectCases))]

@@ -30,5 +30,5 @@ public class TimeOnlyValueConverter : DateTimeValueConverterBase
 
     /// <inheritdoc/>
     protected override object ConvertToObject(DateTimeDto dateTimeDto)
-        => TimeOnly.FromDateTime(dateTimeDto.Date.UtcDateTime);
+        => TimeOnly.FromDateTime(dateTimeDto.Date.DateTime);
 }

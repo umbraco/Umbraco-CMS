@@ -86,7 +86,7 @@ public class TimeOnlyValueConverterTests
     private static object[] _timeOnlyConvertToObjectCases =
     [
         new object[] { null, null },
-        new object[] { _convertToObjectInputDate, TimeOnly.Parse("17:30") },
+        new object[] { _convertToObjectInputDate, TimeOnly.Parse("16:30") },
     ];
 
     [TestCaseSource(nameof(_timeOnlyConvertToObjectCases))]
