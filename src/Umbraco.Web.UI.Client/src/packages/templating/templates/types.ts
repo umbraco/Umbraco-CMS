@@ -8,3 +8,8 @@ export interface UmbTemplateDetailModel {
 	content: string | null;
 	masterTemplate: { unique: string } | null;
 }
+
+export interface UmbTemplateForDocumentTypeDetailModel {
+	entityType: UmbTemplateEntityType;
+	documentType: { unique: string };
+}

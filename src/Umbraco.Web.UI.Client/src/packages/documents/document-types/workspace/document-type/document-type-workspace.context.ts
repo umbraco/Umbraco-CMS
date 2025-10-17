@@ -17,7 +17,11 @@ import {
 	UmbWorkspaceIsNewRedirectControllerAlias,
 } from '@umbraco-cms/backoffice/workspace';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import { UMB_TEMPLATE_ROOT_ENTITY_TYPE, UmbTemplateDetailRepository } from '@umbraco-cms/backoffice/template';
+import {
+	UMB_TEMPLATE_ENTITY_TYPE,
+	UMB_TEMPLATE_ROOT_ENTITY_TYPE,
+	UmbTemplateDetailRepository,
+} from '@umbraco-cms/backoffice/template';
 import type { UmbContentTypeSortModel, UmbContentTypeWorkspaceContext } from '@umbraco-cms/backoffice/content-type';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
@@ -167,14 +171,18 @@ export class UmbDocumentTypeWorkspaceContext
 	}
 
 	protected override async _create(currentData: DetailModelType, parent: UmbEntityModel) {
-		// TODO: move this responsibility to the template package
-		if (this.createTemplateMode) {
-			await this.#createAndAssignTemplate();
-		}
-
 		try {
-			super._create(currentData, parent);
-			this.createTemplateMode = false;
+			// First create the document type (without template)
+			await super._create(currentData, parent);
+
+			if (this.createTemplateMode) {
+				// If in create template mode, create a template and assign it to the document type
+				await this.#createAndAssignTemplate();
+				this.createTemplateMode = false;
+
+				// Update the document type, now with the template assigned
+				await super._update();
+			}
 		} catch (error) {
 			console.warn(error);
 		}
@@ -182,13 +190,13 @@ export class UmbDocumentTypeWorkspaceContext
 
 	// TODO: move this responsibility to the template package
 	async #createAndAssignTemplate() {
-		const { data: templateScaffold } = await this.#templateRepository.createScaffold({
-			name: this.getName(),
-			alias: this.getName(), // NOTE: Uses "name" over alias, as the server handle the template filename. [LK]
-		});
+		const documentTypeUnique = this.getUnique();
+		if (!documentTypeUnique) throw new Error('Document type unique is missing');
 
-		if (!templateScaffold) throw new Error('Could not create template scaffold');
-		const { data: template } = await this.#templateRepository.create(templateScaffold, null);
+		const { data: template } = await this.#templateRepository.createForDocumentType({
+			entityType: UMB_TEMPLATE_ENTITY_TYPE,
+			documentType: { unique: documentTypeUnique },
+		});
 		if (!template) throw new Error('Could not create template');
 
 		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
