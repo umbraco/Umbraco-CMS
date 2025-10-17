@@ -4,6 +4,7 @@ import { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection'
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
 import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
 export class UmbDocumentCollectionContext extends UmbDefaultCollectionContext<
 	UmbDocumentCollectionItemModel,
@@ -35,9 +36,25 @@ export class UmbDocumentCollectionContext extends UmbDefaultCollectionContext<
 		);
 	}
 
-	public override async requestCollection() {
+	/**
+	 * Requests the collection from the repository.
+	 * @returns {Promise<void>}
+	 * @deprecated Deprecated since v.17.0.0. Use `loadCollection` instead.
+	 * @memberof UmbDocumentCollectionContext
+	 */
+	public override async requestCollection(): Promise<void> {
+		new UmbDeprecation({
+			removeInVersion: '19.0.0',
+			deprecated: 'requestCollection',
+			solution: 'Use .loadCollection method instead',
+		}).warn();
+
+		return this._requestCollection();
+	}
+
+	protected override async _requestCollection() {
 		await this.observe(this.#displayCultureObservable)?.asPromise();
-		await super.requestCollection();
+		await super._requestCollection();
 	}
 }
 
