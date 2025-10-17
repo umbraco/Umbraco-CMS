@@ -1,9 +1,9 @@
 import { UMB_CONTENT_MENU_ALIAS } from '../../menu/manifests.js';
 import { UMB_DOCUMENT_RECYCLE_BIN_TREE_ALIAS } from '../constants.js';
 import { UMB_DOCUMENT_WORKSPACE_ALIAS } from '../../constants.js';
+import { UMB_DOCUMENT_RECYCLE_BIN_MENU_ITEM_ALIAS } from './constants.js';
 import { UMB_ENTITY_IS_TRASHED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/recycle-bin';
 import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
-import { UMB_DOCUMENT_RECYCLE_BIN_MENU_ITEM_ALIAS } from './constants.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
