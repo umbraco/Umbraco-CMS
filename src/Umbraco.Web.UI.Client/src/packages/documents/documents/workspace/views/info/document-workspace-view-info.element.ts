@@ -245,13 +245,15 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 								href=${ifDefined(
 									this._hasSettingsAccess ? editTemplatePath + 'edit/' + this._templateUnique : undefined,
 								)}
-								?readonly=${!this._hasSettingsAccess}>
+								?readonly=${!this._hasSettingsAccess || this._isTrashed}>
 								<uui-icon slot="icon" name="icon-document-html"></uui-icon>
-								<uui-action-bar slot="actions">
-									<uui-button
-										label=${this.localize.term('general_choose')}
-										@click=${this.#openTemplatePicker}></uui-button>
-								</uui-action-bar>
+								${!this._isTrashed
+									? html` <uui-action-bar slot="actions">
+											<uui-button
+												label=${this.localize.term('general_choose')}
+												@click=${this.#openTemplatePicker}></uui-button>
+										</uui-action-bar>`
+									: nothing}
 							</uui-ref-node>
 						`
 					: html`
