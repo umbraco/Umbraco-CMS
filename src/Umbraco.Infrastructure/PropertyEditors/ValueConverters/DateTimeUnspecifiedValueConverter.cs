@@ -30,5 +30,5 @@ public class DateTimeUnspecifiedValueConverter : DateTimeValueConverterBase
 
     /// <inheritdoc/>
     protected override object ConvertToObject(DateTimeDto dateTimeDto)
-        => DateTime.SpecifyKind(dateTimeDto.Date.Date, DateTimeKind.Unspecified);
+        => DateTime.SpecifyKind(dateTimeDto.Date.DateTime, DateTimeKind.Unspecified);
 }
