@@ -19,8 +19,8 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UUIComboboxElement, UUIComboboxEvent } from '@umbraco-cms/backoffice/external/uui';
 
 interface UmbDateTime {
-	date: string | undefined;
-	timeZone: string | undefined;
+	date: string | null;
+	timeZone: string | null;
 }
 
 interface UmbTimeZonePickerOption extends UmbTimeZone {
@@ -296,7 +296,7 @@ export abstract class UmbPropertyEditorUiDateTimePickerElementBase
 
 		if (!this._selectedTimeZone) {
 			if (this.value?.date) {
-				this.value = { date: this.value.date, timeZone: undefined };
+				this.value = { date: this.value.date, timeZone: null };
 			} else {
 				this.value = undefined;
 			}
@@ -333,12 +333,12 @@ export abstract class UmbPropertyEditorUiDateTimePickerElementBase
 
 		const newValue = {
 			date: this.#formatDateValue(dateToStore),
-			timeZone: this._timeZoneMode ? timeZoneToStore : undefined,
+			timeZone: this._timeZoneMode ? timeZoneToStore : null,
 		};
 
 		// Only update the stored data if it has actually changed to avoid firing unnecessary change events
 		const previousValue = this.value;
-		if (previousValue?.date !== newValue.date || previousValue?.timeZone !== newValue.timeZone) {
+		if (previousValue?.date === newValue.date && previousValue?.timeZone === newValue.timeZone) {
 			return;
 		}
 
@@ -354,15 +354,21 @@ export abstract class UmbPropertyEditorUiDateTimePickerElementBase
 		}
 	}
 
-	#formatDateValue(date: DateTime): string | undefined {
+	#formatDateValue(date: DateTime): string | null {
+		let formattedDate: string | undefined;
 		switch (this._dateInputType) {
 			case 'date':
-				return date.toFormat('yyyy-MM-dd') ?? undefined;
+				formattedDate = date.toFormat('yyyy-MM-dd');
+				break;
 			case 'time':
-				return date.toFormat('HH:mm:ss') ?? undefined;
+				formattedDate = date.toFormat('HH:mm:ss');
+				break;
 			default:
-				return date.toFormat(`yyyy-MM-dd'T'HH:mm:ss${this._timeZoneMode ? 'ZZ' : ''}`) ?? undefined;
+				formattedDate = date.toFormat(`yyyy-MM-dd'T'HH:mm:ss${this._timeZoneMode ? 'ZZ' : ''}`);
+				break;
 		}
+
+		return formattedDate ?? null;
 	}
 
 	#onTimeZoneSearch(event: UUIComboboxEvent) {
