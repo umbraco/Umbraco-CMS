@@ -1,0 +1,12 @@
+{
+  "name": "E2E Test Package",
+  "version": "1.0.0",
+  "extensions": [
+    {
+      "type": "bundle",
+      "alias": "My.PropertyAction.Bundle",
+      "name": "My property action bundle",
+      "js": "/App_Plugins/my-property-action/my-property-action.manifests.js"
+    }
+  ]
+}
