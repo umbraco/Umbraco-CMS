@@ -77,7 +77,6 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 	};
 
 	override render() {
-		console.log(this.data?.showEmptyOption);
 		return html`
 			<umb-body-layout headline=${this.localize.term('defaultdialogs_selectIcon')}>
 				<div id="container">

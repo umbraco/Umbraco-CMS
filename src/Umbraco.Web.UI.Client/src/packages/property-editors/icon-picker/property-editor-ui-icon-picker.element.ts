@@ -32,22 +32,24 @@ export class UmbPropertyEditorUIIconPickerElement
 
 	@property()
 	public override set value(v: string) {
-		this._value = v ?? '';
-		const parts = this._value.split(' ');
+		const val = v ?? '';
+		super.value = val;
+
+		const parts = val.split(' ');
 		if (parts.length === 2) {
 			this._icon = parts[0];
 			this._color = parts[1].replace('color-', '');
 		} else {
-			this._icon = this._value;
+			this._icon = val;
 			this._color = '';
 		}
 		this.requestUpdate();
 	}
 
 	public override get value() {
-		return this._value;
+		console.log('on the getter', super.value);
+		return (super.value as string) ?? '';
 	}
-	private _value = '';
 
 	@state()
 	private _icon = '';
