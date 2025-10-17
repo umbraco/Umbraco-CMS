@@ -128,7 +128,7 @@ export abstract class UmbPropertyEditorUiDateTimePickerElementBase
 
 		// To ensure the expected value matches the prefilled value, we trigger an update.
 		// If the values match, no change event will be fired.
-		this.#updateValue(this._selectedDate?.toISO({ includeOffset: false }) || '');
+		this.#updateValue(this._selectedDate?.toISO({ includeOffset: false }) ?? null);
 	}
 
 	#prefillValue(timeZonePickerConfig: UmbTimeZonePickerValue | undefined) {
@@ -308,15 +308,15 @@ export abstract class UmbPropertyEditorUiDateTimePickerElementBase
 			return;
 		}
 
-		this.#updateValue(this._selectedDate.toISO({ includeOffset: false }) || '');
+		this.#updateValue(this._selectedDate.toISO({ includeOffset: false }));
 	}
 
-	#updateValue(date: string, updateOffsets = false) {
+	#updateValue(date: string | null, updateOffsets = false) {
 		// Try to parse the date with the selected time zone
-		const newDate = DateTime.fromISO(date, { zone: this._selectedTimeZone ?? 'UTC' });
+		const newDate = date ? DateTime.fromISO(date, { zone: this._selectedTimeZone ?? 'UTC' }) : null;
 
 		// If the date is invalid, we reset the value
-		if (!newDate.isValid) {
+		if (!newDate || !newDate.isValid) {
 			if (!this.value) {
 				return; // No change
 			}
