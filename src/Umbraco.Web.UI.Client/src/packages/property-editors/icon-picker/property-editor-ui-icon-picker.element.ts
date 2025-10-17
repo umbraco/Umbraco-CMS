@@ -47,7 +47,6 @@ export class UmbPropertyEditorUIIconPickerElement
 	}
 
 	public override get value() {
-		console.log('on the getter', super.value);
 		return (super.value as string) ?? '';
 	}
 
@@ -64,6 +63,11 @@ export class UmbPropertyEditorUIIconPickerElement
 		if (!config) return;
 		const placeholder = config.getValueByAlias('placeholder');
 		this._placeholderIcon = typeof placeholder === 'string' ? placeholder : '';
+
+		const mandatoryCfg = config.getValueByAlias('mandatory');
+		if (typeof mandatoryCfg === 'boolean') {
+			this.mandatory = mandatoryCfg;
+		}
 	}
 
 	private async _openModal() {
