@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.ContentPublishing;
@@ -165,7 +166,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
                 return Attempt.FailWithStatus(ContentPublishingOperationStatus.CannotPublishInvariantWhenVariant, new ContentPublishingResult());
             }
 
-            IEnumerable<string> validCultures = (await _languageService.GetAllAsync()).Select(x => x.IsoCode);
+            IEnumerable<string> validCultures = await _languageService.GetAllIsoCodesAsync();
             if (validCultures.ContainsAll(cultures) is false)
             {
                 scope.Complete();
@@ -488,7 +489,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
             return Attempt.Fail(ContentPublishingOperationStatus.CannotPublishVariantWhenNotVariant);
         }
 
-        var validCultures = (await _languageService.GetAllAsync()).Select(x => x.IsoCode).ToArray();
+        var validCultures = (await _languageService.GetAllIsoCodesAsync()).ToArray();
 
         foreach (var culture in cultures)
         {

@@ -94,7 +94,7 @@ export const publishingHandlers = [
 			values: document.values,
 			variants: document.variants,
 			template: document.template,
-			signs: document.signs,
+			flags: document.flags,
 		};
 
 		return res(ctx.status(200), ctx.json<GetDocumentByIdPublishedResponse>(responseModel));

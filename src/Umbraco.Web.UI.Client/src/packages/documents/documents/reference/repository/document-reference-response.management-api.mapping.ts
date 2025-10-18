@@ -29,6 +29,7 @@ export class UmbDocumentReferenceResponseManagementApiDataMapping
 					culture: null,
 					name: data.name ?? '',
 					state: data.published ? DocumentVariantStateModel.PUBLISHED : null,
+					flags: [],
 				},
 			],
 			unique: data.id,
