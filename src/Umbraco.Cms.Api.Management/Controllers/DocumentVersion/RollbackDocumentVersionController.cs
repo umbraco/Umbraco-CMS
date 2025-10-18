@@ -36,6 +36,8 @@ public class RollbackDocumentVersionController : DocumentVersionControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [EndpointSummary("Rolls back a document to a specific version")]
+    [EndpointDescription("A document version id is required. This will roll back the document to the specified version.")]
     public async Task<IActionResult> Rollback(CancellationToken cancellationToken, Guid id, string? culture)
     {
         Attempt<IContent?, ContentVersionOperationStatus> getContentAttempt =
