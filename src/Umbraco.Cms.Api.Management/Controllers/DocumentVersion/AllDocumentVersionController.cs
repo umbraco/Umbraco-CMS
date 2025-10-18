@@ -31,6 +31,9 @@ public class AllDocumentVersionController : DocumentVersionControllerBase
     [ProducesResponseType(typeof(PagedViewModel<DocumentVersionItemResponseModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [EndpointSummary("Gets a paged result of all versions for a specific document")]
+    [EndpointDescription("A documentId is required. Culture, skip and take parameters are optional. " +
+        "<br />Returned is data relevant to that document e.g. Document Type, user id, version date, is it the current published / draft version. A useful endpoint when you need to find a document version id for other queries.")]
     public async Task<IActionResult> All(
         CancellationToken cancellationToken,
         [Required] Guid documentId,
