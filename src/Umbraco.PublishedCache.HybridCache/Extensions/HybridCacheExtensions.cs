@@ -43,7 +43,7 @@ internal static class HybridCacheExtensions
             async cancellationToken =>
             {
                 exists = false;
-                return default(T)!;
+                return default(T);
             },
             new HybridCacheEntryOptions(),
             null,
