@@ -236,7 +236,7 @@ export class UmbAuthFlow {
 	 * @returns true if the user is logged in, false otherwise.
 	 */
 	isAuthorized(): boolean {
-		return !!this.#tokenResponse;
+		return !!this.#tokenResponse.getValue();
 	}
 
 	/**

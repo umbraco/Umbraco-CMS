@@ -1,4 +1,4 @@
-import type { UmbContentTypeModel, UmbPropertyTypeContainerModel } from '../../../types.js';
+import type { UmbContentTypeModel, UmbPropertyTypeContainerMergedModel } from '../../../types.js';
 import type { UmbContentTypeContainerStructureHelper } from '../../../structure/index.js';
 import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
@@ -11,16 +11,16 @@ import './content-type-design-editor-properties.element.js';
 @customElement('umb-content-type-design-editor-group')
 export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 	@property({ attribute: false })
-	public set group(value: UmbPropertyTypeContainerModel | undefined) {
+	public set group(value: UmbPropertyTypeContainerMergedModel | undefined) {
 		if (value === this._group) return;
 		this._group = value;
-		this._groupId = value?.id;
+		this._groupId = value?.ownerId ?? value?.ids[0];
 		this.#checkInherited();
 	}
-	public get group(): UmbPropertyTypeContainerModel | undefined {
+	public get group(): UmbPropertyTypeContainerMergedModel | undefined {
 		return this._group;
 	}
-	private _group?: UmbPropertyTypeContainerModel | undefined;
+	private _group?: UmbPropertyTypeContainerMergedModel | undefined;
 
 	@property({ attribute: false })
 	public set groupStructureHelper(value: UmbContentTypeContainerStructureHelper<UmbContentTypeModel> | undefined) {
@@ -42,10 +42,11 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 	@state()
 	private _groupId?: string;
 
-	@state()
+	@property({ type: Boolean, reflect: true, attribute: 'has-owner-container' })
 	private _hasOwnerContainer?: boolean;
 
-	@state()
+	// attrbute is used by Sorter Controller in parent scope.
+	@property({ type: Boolean, reflect: true, attribute: 'inherited' })
 	private _inherited?: boolean;
 
 	@state()
@@ -54,48 +55,46 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 	#checkInherited() {
 		if (this.groupStructureHelper && this.group) {
 			// Check is this container matches with any other group. If so it is inherited aka. merged with others. [NL]
-			if (this.group.name) {
-				// We can first match with something if we have a name [NL]
-				this.observe(
-					this.groupStructureHelper.containersByNameAndType(this.group.name, 'Group'),
-					(containers) => {
-						const ownerContainer = containers.find((con) => this.groupStructureHelper!.isOwnerChildContainer(con.id));
-						const hasAOwnerContainer = !!ownerContainer;
-						const pureOwnerContainer = hasAOwnerContainer && containers.length === 1;
-
-						this._hasOwnerContainer = hasAOwnerContainer;
-						this._inherited = !pureOwnerContainer;
-						this._inheritedFrom = containers
-							.filter((con) => con.id !== ownerContainer?.id)
-							.map((con) => this.groupStructureHelper!.getContentTypeOfContainer(con.id))
-							.filter((contentType) => contentType !== undefined) as Array<UmbContentTypeModel>;
-					},
-					'observeGroupContainers',
-				);
-			} else {
-				// We use name match to determine inheritance, so no name cannot inherit.
-				this._inherited = false;
+			if (this.group.ownerId) {
 				this._hasOwnerContainer = true;
-				this.removeUmbControllerByAlias('observeGroupContainers');
+			}
+
+			const notOwnerContainerIds = this.group.ids.filter((id) => id !== this.group!.ownerId);
+
+			if (notOwnerContainerIds.length > 0) {
+				this._inheritedFrom = notOwnerContainerIds
+					.map((id) => this.groupStructureHelper!.getContentTypeOfContainer(id))
+					.filter((contentType) => contentType !== undefined) as Array<UmbContentTypeModel>;
+				this._inherited = true;
+			} else {
+				this._inheritedFrom = undefined;
+				this._inherited = false;
 			}
 		}
 	}
 
 	#singleValueUpdate(propertyName: string, value: string | number | boolean | null | undefined) {
-		if (!this._groupStructureHelper || !this.group) return;
+		if (!this._groupStructureHelper || !this._group) return;
+
+		const ownerId = this._group.ownerId;
+		if (!ownerId) return;
 
 		const partialObject = {} as any;
 		partialObject[propertyName] = value;
 
-		this._groupStructureHelper.partialUpdateContainer(this.group.id, partialObject);
+		this._groupStructureHelper.partialUpdateContainer(ownerId, partialObject);
 	}
 
 	#renameGroup(e: InputEvent) {
 		if (!this.groupStructureHelper || !this._group) return;
+		const ownerId = this._group.ownerId;
+		if (!ownerId) return;
 		let newName = (e.target as HTMLInputElement).value;
+		// TODO: This does not seem right, the detection of a unique name requires better awareness on the level of the change. [NL]
+		// This seem to use check for root containers.
 		const changedName = this.groupStructureHelper
 			.getStructureManager()!
-			.makeContainerNameUniqueForOwnerContentType(this._group.id, newName, 'Group', this._group.parent?.id ?? null);
+			.makeContainerNameUniqueForOwnerContentType(ownerId, newName);
 		if (changedName) {
 			newName = changedName;
 		}
@@ -105,11 +104,11 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 
 	#blurGroup(e: InputEvent) {
 		if (!this.groupStructureHelper || !this._group) return;
+		const ownerId = this._group.ownerId;
+		if (!ownerId) return;
 		const newName = (e.target as HTMLInputElement).value;
 		if (newName === '') {
-			const changedName = this.groupStructureHelper
-				.getStructureManager()!
-				.makeEmptyContainerName(this._group.id, 'Group', this._group.parent?.id ?? null);
+			const changedName = this.groupStructureHelper.getStructureManager()!.makeEmptyContainerName(ownerId);
 			this.#singleValueUpdate('name', changedName);
 			(e.target as HTMLInputElement).value = changedName;
 		}
@@ -119,21 +118,22 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 		e.preventDefault();
 		e.stopImmediatePropagation();
 		if (!this.groupStructureHelper || !this._group) return;
+		if (this._group.ownerId === undefined) return;
 
 		// TODO: Do proper localization here: [NL]
 		await umbConfirmModal(this, {
 			headline: `${this.localize.term('actions_delete')} group`,
 			content: html`<umb-localize key="contentTypeEditor_confirmDeleteGroupMessage" .args=${[
-				this._group.name ?? this._group.id,
+				this._group.name ?? this._group.ownerId,
 			]}>
-					Are you sure you want to delete the group <strong>${this._group.name ?? this._group.id}</strong>
+					Are you sure you want to delete the group <strong>${this._group.name ?? this._group.ownerId}</strong>
 				</umb-localize>
 				</div>`,
 			confirmLabel: this.localize.term('actions_delete'),
 			color: 'danger',
 		});
 
-		this.groupStructureHelper.removeContainer(this._group.id);
+		this.groupStructureHelper.removeContainer(this._group.ownerId);
 	}
 
 	override render() {
@@ -273,8 +273,11 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 				display: flex;
 				align-items: center;
 				justify-content: space-between;
-				cursor: grab;
 				padding: var(--uui-size-space-4) var(--uui-size-space-5);
+			}
+
+			:host([has-owner-container]) div[slot='header'] {
+				cursor: grab;
 			}
 
 			div[slot='header'] > div {

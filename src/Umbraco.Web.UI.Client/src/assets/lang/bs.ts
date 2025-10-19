@@ -1993,6 +1993,7 @@ export default {
 		openBackofficeSearch: 'Otvorite backoffice pretragu',
 		openCloseBackofficeHelp: 'Otvori/Zatvori pomoć za backoffice',
 		openCloseBackofficeProfileOptions: 'Opcije otvaranja/zatvaranja profila',
+		profileOptions: 'Opcije profila',
 		assignDomainDescription: 'Postavite kulturu i imena hostova za %0%',
 		createDescription: 'Kreirajte novi čvor ispod %0%',
 		protectDescription: 'Postavite ograničenja pristupa uključena %0%',

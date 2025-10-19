@@ -391,7 +391,7 @@ test('can add a variant block element with invariant RTE Tiptap in the content',
   const customRTEDataTypeId = await umbracoApi.dataType.createDefaultTiptapDataType(customRTEDataTypeName);
   const customElementTypeId = await umbracoApi.documentType.createDefaultElementType(customElementTypeName, groupName, customRTEDataTypeName, customRTEDataTypeId);
   const customDataTypeId = await umbracoApi.dataType.createBlockGridWithPermissions(customDataTypeName, customElementTypeId, true, true);
-  const documentTypeId = await umbracoApi.documentType.createVariantDocumentTypeWithInvariantPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId, 'testGroup', true);
+  const documentTypeId = await umbracoApi.documentType.createVariantDocumentTypeWithInvariantPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
   await umbracoApi.document.createDefaultDocumentWithCulture(contentName, documentTypeId, 'en-US');
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);

@@ -32,6 +32,7 @@ internal sealed class ServerEventSender :
     INotificationAsyncHandler<UserSavedNotification>,
     INotificationAsyncHandler<WebhookSavedNotification>,
     INotificationAsyncHandler<ContentDeletedNotification>,
+    INotificationAsyncHandler<ContentDeletedBlueprintNotification>,
     INotificationAsyncHandler<ContentTypeDeletedNotification>,
     INotificationAsyncHandler<MediaDeletedNotification>,
     INotificationAsyncHandler<MediaTypeDeletedNotification>,
@@ -86,14 +87,17 @@ internal sealed class ServerEventSender :
     {
         foreach (T entity in notification.DeletedEntities)
         {
-            await _serverEventRouter.RouteEventAsync(new ServerEvent
-            {
-                EventType = Constants.ServerEvents.EventType.Deleted,
-                EventSource = source,
-                Key = entity.Key,
-            });
+            await RouteDeletedEvent(source, entity);
         }
     }
+
+    private async Task RouteDeletedEvent<T>(string source, T entity) where T : IEntity =>
+        await _serverEventRouter.RouteEventAsync(new ServerEvent
+        {
+            EventType = Constants.ServerEvents.EventType.Deleted,
+            EventSource = source,
+            Key = entity.Key,
+        });
 
     private async Task NotifyTrashedAsync<T>(MovedToRecycleBinNotification<T> notification, string source)
         where T : IEntity
@@ -193,6 +197,14 @@ internal sealed class ServerEventSender :
 
     public async Task HandleAsync(ContentDeletedNotification notification, CancellationToken cancellationToken) =>
         await NotifyDeletedAsync(notification, Constants.ServerEvents.EventSource.Document);
+
+    public async Task HandleAsync(ContentDeletedBlueprintNotification notification, CancellationToken cancellationToken)
+    {
+        foreach (Core.Models.IContent entity in notification.DeletedBlueprints)
+        {
+            await RouteDeletedEvent(Constants.ServerEvents.EventSource.DocumentBlueprint, entity);
+        }
+    }
 
     public async Task HandleAsync(ContentTypeDeletedNotification notification, CancellationToken cancellationToken) =>
         await NotifyDeletedAsync(notification, Constants.ServerEvents.EventSource.DocumentType);

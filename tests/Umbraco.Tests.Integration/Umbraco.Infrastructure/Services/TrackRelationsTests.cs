@@ -3,7 +3,9 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Persistence.Relations;
 using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -29,11 +31,12 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
 
     private IRelationService RelationService => GetRequiredService<IRelationService>();
 
-    // protected override void CustomTestSetup(IUmbracoBuilder builder)
-    // {
-    //     base.CustomTestSetup(builder);
-    //     builder.AddNuCache();
-    // }
+    protected override void CustomTestSetup(IUmbracoBuilder builder)
+    {
+        base.CustomTestSetup(builder);
+        builder
+            .AddNotificationHandler<ContentSavedNotification, ContentRelationsUpdate>();
+    }
 
     [Test]
     [LongRunning]
@@ -89,6 +92,5 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
         Assert.AreEqual(c1.Id, relations[2].ChildId);
         Assert.AreEqual(Constants.Conventions.RelationTypes.RelatedMemberAlias, relations[3].RelationType.Alias);
         Assert.AreEqual(member.Id, relations[3].ChildId);
-
     }
 }

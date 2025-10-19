@@ -1,6 +1,6 @@
 import { UmbTiptapMenuItemActionApi } from '../../../components/menu/tiptap-menu-item-api-base.js';
 import { UMB_TIPTAP_RTE_CONTEXT } from '../../../contexts/tiptap-rte.context-token.js';
-import { UMB_TIPTAP_TABLE_PROPERTIES_MODAL } from '../components/table-properties-modal.token.js';
+import { UMB_TIPTAP_TABLE_PROPERTIES_MODAL } from '../modals/table-properties-modal.token.js';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 

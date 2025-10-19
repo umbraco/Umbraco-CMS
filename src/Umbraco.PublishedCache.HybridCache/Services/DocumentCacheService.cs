@@ -132,10 +132,8 @@ internal sealed class DocumentCacheService : IDocumentCacheService
             GetEntryOptions(key, preview),
             GenerateTags(key));
 
-        // We don't want to cache removed items, this may cause issues if the L2 serializer changes.
         if (contentCacheNode is null)
         {
-            await _hybridCache.RemoveAsync(cacheKey);
             return null;
         }
 
@@ -207,7 +205,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
 
                 var cacheKey = GetCacheKey(key, false);
 
-                var existsInCache = await _hybridCache.ExistsAsync(cacheKey);
+                var existsInCache = await _hybridCache.ExistsAsync<ContentCacheNode>(cacheKey);
                 if (existsInCache is false)
                 {
                     uncachedKeys.Add(key);
@@ -280,7 +278,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
             return false;
         }
 
-        return await _hybridCache.ExistsAsync(GetCacheKey(keyAttempt.Result, preview));
+        return await _hybridCache.ExistsAsync<ContentCacheNode>(GetCacheKey(keyAttempt.Result, preview));
     }
 
     public async Task RefreshContentAsync(IContent content)

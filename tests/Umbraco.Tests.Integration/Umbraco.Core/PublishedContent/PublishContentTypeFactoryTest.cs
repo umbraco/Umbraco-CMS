@@ -81,6 +81,9 @@ internal sealed class PublishContentTypeFactoryTest : UmbracoIntegrationTest
     {
         var dataType = new DataTypeBuilder()
             .WithId(0)
+            .AddEditor()
+            .WithAlias(Constants.PropertyEditors.Aliases.TextBox)
+            .Done()
             .Build();
         dataType.EditorUiAlias = "NotUpdated";
         var dataTypeCreateResult = await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);

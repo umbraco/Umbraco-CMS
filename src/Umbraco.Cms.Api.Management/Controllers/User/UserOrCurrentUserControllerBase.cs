@@ -25,7 +25,7 @@ public abstract class UserOrCurrentUserControllerBase : ManagementApiControllerB
                 .Build()),
             UserOperationStatus.NoUserGroup => BadRequest(problemDetailsBuilder
                 .WithTitle("No User Group Specified")
-                .WithDetail("A user group must be specified to create a user")
+                .WithDetail("A user must be assigned to at least one group")
                 .Build()),
             UserOperationStatus.UserNameIsNotEmail => BadRequest(problemDetailsBuilder
                 .WithTitle("Invalid Username")

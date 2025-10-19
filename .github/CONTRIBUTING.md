@@ -61,7 +61,7 @@ This guide describes each step to make your first contribution:
 ## Further contribution guides
 
 - [Before you start](contributing-before-you-start.md)
-- [Finding your first issue: Up for grabs](contributing-first-issue.md)
+- [Finding your first issue](contributing-first-issue.md)
 - [Contributing to the new backoffice](https://docs.umbraco.com/umbraco-backoffice/)
 - [Unwanted changes](contributing-unwanted-changes.md)
 - [Other ways to contribute](contributing-other-ways-to-contribute.md)

@@ -45,7 +45,7 @@ test('can see root media start node and children', async ({umbracoApi, umbracoUi
 
   // Assert
   await umbracoUi.media.isMediaTreeItemVisible(rootFolderName);
-  await umbracoUi.media.clickCaretButtonForMediaName(rootFolderName);
+  await umbracoUi.media.openMediaCaretButtonForName(rootFolderName);
   await umbracoUi.media.isChildMediaVisible(rootFolderName, childFolderOneName);
   await umbracoUi.media.isChildMediaVisible(rootFolderName, childFolderTwoName);
 });
@@ -63,7 +63,7 @@ test('can see parent of start node but not access it', async ({umbracoApi, umbra
   await umbracoUi.media.isMediaTreeItemVisible(rootFolderName);
   await umbracoUi.media.goToMediaWithName(rootFolderName);
   await umbracoUi.media.doesMediaWorkspaceHaveText('Access denied');
-  await umbracoUi.media.clickCaretButtonForMediaName(rootFolderName);
+  await umbracoUi.media.openMediaCaretButtonForName(rootFolderName);
   await umbracoUi.media.isChildMediaVisible(rootFolderName, childFolderOneName);
   await umbracoUi.media.isChildMediaVisible(rootFolderName, childFolderTwoName, false);
 });

@@ -1,37 +1,39 @@
 import type { UmbContentDetailModel, UmbElementValueModel } from '../types.js';
+import { UmbContentCollectionManager } from '../collection/index.js';
 import { UmbContentWorkspaceDataManager } from '../manager/index.js';
 import { UmbMergeContentVariantDataController } from '../controller/merge-content-variant-data.controller.js';
 import type { UmbContentVariantPickerData, UmbContentVariantPickerValue } from '../variant-picker/index.js';
 import type { UmbContentPropertyDatasetContext } from '../property-dataset-context/index.js';
 import type { UmbContentValidationRepository } from '../repository/content-validation-repository.interface.js';
+import type { UmbContentCollectionWorkspaceContext } from '../collection/content-collection-workspace-context.interface.js';
 import type { UmbContentWorkspaceContext } from './content-workspace-context.interface.js';
 import { UmbContentDetailValidationPathTranslator } from './content-detail-validation-path-translator.js';
 import { UmbContentValidationToHintsManager } from './content-validation-to-hints.manager.js';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbDetailRepository, UmbDetailRepositoryConstructor } from '@umbraco-cms/backoffice/repository';
 import {
-	UmbEntityDetailWorkspaceContextBase,
-	UmbWorkspaceSplitViewManager,
-	type UmbEntityDetailWorkspaceContextArgs,
-	type UmbEntityDetailWorkspaceContextCreateArgs,
-	type UmbSaveableWorkspaceContext,
-} from '@umbraco-cms/backoffice/workspace';
-import {
-	UmbContentTypeStructureManager,
-	type UmbContentTypeModel,
-	type UmbPropertyTypeModel,
-} from '@umbraco-cms/backoffice/content-type';
-import {
-	UmbVariantId,
-	type UmbEntityVariantModel,
-	type UmbEntityVariantOptionModel,
-} from '@umbraco-cms/backoffice/variant';
-import { UmbDeprecation, UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
-import { UmbDataTypeDetailRepository, UmbDataTypeItemRepositoryManager } from '@umbraco-cms/backoffice/data-type';
-import { appendToFrozenArray, mergeObservables, UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
-import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
+	appendToFrozenArray,
+	mergeObservables,
+	observeMultiple,
+	UmbArrayState,
+} from '@umbraco-cms/backoffice/observable-api';
 import { firstValueFrom, map } from '@umbraco-cms/backoffice/external/rxjs';
+import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
+import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
+import { UmbDataTypeDetailRepository, UmbDataTypeItemRepositoryManager } from '@umbraco-cms/backoffice/data-type';
+import { UmbDeprecation, UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
+import { UmbEntityDetailWorkspaceContextBase, UmbWorkspaceSplitViewManager } from '@umbraco-cms/backoffice/workspace';
+import {
+	UmbEntityUpdatedEvent,
+	UmbRequestReloadChildrenOfEntityEvent,
+	UmbRequestReloadStructureForEntityEvent,
+} from '@umbraco-cms/backoffice/entity-action';
+import { UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
+import {
+	UmbPropertyValuePresetVariantBuilderController,
+	UmbVariantPropertyGuardManager,
+} from '@umbraco-cms/backoffice/property';
+import { UmbSegmentCollectionRepository } from '@umbraco-cms/backoffice/segment';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import {
 	UMB_VALIDATION_CONTEXT,
 	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
@@ -39,23 +41,21 @@ import {
 	UmbServerModelValidatorContext,
 	UmbValidationController,
 } from '@umbraco-cms/backoffice/validation';
-import type { UmbModalToken } from '@umbraco-cms/backoffice/modal';
-import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
-import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import {
-	UmbEntityUpdatedEvent,
-	UmbRequestReloadChildrenOfEntityEvent,
-	UmbRequestReloadStructureForEntityEvent,
-} from '@umbraco-cms/backoffice/entity-action';
 import type { ClassConstructor } from '@umbraco-cms/backoffice/extension-api';
-import {
-	UmbPropertyValuePresetVariantBuilderController,
-	UmbVariantPropertyGuardManager,
-	type UmbPropertyTypePresetModel,
-	type UmbPropertyTypePresetModelTypeModel,
-} from '@umbraco-cms/backoffice/property';
-import { UmbSegmentCollectionRepository, type UmbSegmentCollectionItemModel } from '@umbraco-cms/backoffice/segment';
-import { UmbHintContext, type UmbVariantHint } from '@umbraco-cms/backoffice/hint';
+import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
+import type { UmbContentTypeModel, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbDetailRepository, UmbDetailRepositoryConstructor } from '@umbraco-cms/backoffice/repository';
+import type {
+	UmbEntityDetailWorkspaceContextArgs,
+	UmbEntityDetailWorkspaceContextCreateArgs,
+	UmbSaveableWorkspaceContext,
+} from '@umbraco-cms/backoffice/workspace';
+import type { UmbEntityVariantModel, UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
+import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
+import type { UmbPropertyTypePresetModel, UmbPropertyTypePresetModelTypeModel } from '@umbraco-cms/backoffice/property';
+import type { UmbModalToken } from '@umbraco-cms/backoffice/modal';
+import type { UmbSegmentCollectionItemModel } from '@umbraco-cms/backoffice/segment';
 
 export interface UmbContentDetailWorkspaceContextArgs<
 	DetailModelType extends UmbContentDetailModel<VariantModelType>,
@@ -71,6 +71,7 @@ export interface UmbContentDetailWorkspaceContextArgs<
 	ignoreValidationResultOnSubmit?: boolean;
 	contentVariantScaffold: VariantModelType;
 	contentTypePropertyName: string;
+	collectionAlias?: string;
 	saveModalToken?: UmbModalToken<UmbContentVariantPickerData<VariantOptionModelType>, UmbContentVariantPickerValue>;
 }
 
@@ -102,7 +103,8 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	extends UmbEntityDetailWorkspaceContextBase<DetailModelType, DetailRepositoryType, CreateArgsType>
 	implements
 		UmbContentWorkspaceContext<DetailModelType, ContentTypeDetailModelType, VariantModelType>,
-		UmbSaveableWorkspaceContext
+		UmbSaveableWorkspaceContext,
+		UmbContentCollectionWorkspaceContext<ContentTypeDetailModelType>
 {
 	public readonly IS_CONTENT_WORKSPACE_CONTEXT = true as const;
 
@@ -140,8 +142,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	/* Split View */
 	readonly splitView = new UmbWorkspaceSplitViewManager();
 
-	/* Hints */
-	readonly hints = new UmbHintContext<UmbVariantHint>(this);
+	readonly collection: UmbContentCollectionManager;
 
 	/* Variant Options */
 	// TODO: Optimize this so it uses either a App Language Context? [NL]
@@ -210,11 +211,17 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			x ? x.variesByCulture || x.variesBySegment : undefined,
 		);
 
+		this.collection = new UmbContentCollectionManager<ContentTypeDetailModelType>(
+			this,
+			this.structure,
+			args.collectionAlias,
+		);
+
 		new UmbContentValidationToHintsManager<ContentTypeDetailModelType>(
 			this,
 			this.structure,
 			this.validationContext,
-			this.hints,
+			this.view.hints,
 		);
 
 		this.variantOptions = mergeObservables(
@@ -328,6 +335,17 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		);
 
 		this.observe(
+			observeMultiple([this.splitView.activeVariantByIndex(0), this.variants]),
+			([activeVariant, variants]) => {
+				const variantName = variants.find(
+					(v) => v.culture === activeVariant?.culture && v.segment === activeVariant?.segment,
+				)?.name;
+				this.view.setTitle(variantName);
+			},
+			null,
+		);
+
+		this.observe(
 			this.varies,
 			(varies) => {
 				this._data.setVaries(varies);
@@ -374,18 +392,26 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		this.#segments.setValue(data?.items ?? []);
 	}
 
-	protected override async _scaffoldProcessData(data: DetailModelType): Promise<DetailModelType> {
-		// Load the content type structure, usually this comes from the data, but in this case we are making the data, and we need this to be able to complete the data. [NL]
-		await this.structure.loadType((data as any)[this.#contentTypePropertyName].unique);
+	/**
+	 * @deprecated Call `_processIncomingData` instead. `_scaffoldProcessData` will be removed in v.18.
+	 */
+	protected override _scaffoldProcessData(data: DetailModelType): Promise<DetailModelType> {
+		return this._processIncomingData(data);
+	}
 
-		/**
-		 * TODO: Should we also set Preset Values when loading Content, because maybe content contains uncreated Cultures or Segments.
-		 */
+	protected override async _processIncomingData(data: DetailModelType): Promise<DetailModelType> {
+		const contentTypeUnique: string | undefined = (data as any)[this.#contentTypePropertyName].unique;
+		if (!contentTypeUnique) {
+			throw new Error(`Could not find content type unique on property '${this.#contentTypePropertyName}'`);
+		}
+		// Load the content type structure, usually this comes from the data, but in this case we are making the data, and we need this to be able to complete the data. [NL]
+		await this.structure.loadType(contentTypeUnique);
 
 		// Set culture and segment for all values:
 		const cultures = this.#languages.getValue().map((x) => x.unique);
 
 		if (this.structure.variesBySegment) {
+			// TODO: v.17 Engage please note we have not implemented support for segments yet. [NL]
 			console.warn('Segments are not yet implemented for preset');
 		}
 		// TODO: Add Segments for Presets:
@@ -425,7 +451,16 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			controller.setSegments(segments);
 		}
 
-		const presetValues = await controller.create(valueDefinitions);
+		controller.setValues(data.values);
+
+		const processedValues = await controller.create(valueDefinitions, {
+			entityType: this.getEntityType(),
+			entityUnique: data.unique,
+			entityTypeUnique: contentTypeUnique,
+		});
+
+		/*
+		const presetValues = ...
 
 		// Don't just set the values, as we could have some already populated from a blueprint.
 		// If we have a value from both a blueprint and a preset, use the latter as priority.
@@ -442,8 +477,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		}
 
 		data.values = dataValues;
+		*/
 
-		return data;
+		return { ...data, values: processedValues };
 	}
 
 	/**
@@ -645,8 +681,23 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			// TODO: fix type error
 			this._data.updateCurrent({ values });
 
-			// TODO: Ideally we should move this type of logic to the act of saving [NL]
-			this._data.ensureVariantData(variantId);
+			/**
+			 * Handling of Not-Culture but Segment variant properties: [NL]
+			 * We need to ensure variant-entries across all culture variants for the given segment variant, when er property is configured to vary by segment but not culture.
+			 * This is the only different case, in all other cases its fine to just target the given variant.
+			 */
+			if (this.getVariesByCulture() && property.variesByCulture === false && property.variesBySegment === true) {
+				// get all culture options:
+				const cultureOptions = await firstValueFrom(this.variantOptions);
+				for (const cultureOption of cultureOptions) {
+					if (cultureOption.segment === variantId.segment) {
+						this._data.ensureVariantData(UmbVariantId.Create(cultureOption));
+					}
+				}
+			} else {
+				// otherwise we know the property variant-id will be matching with a variant:
+				this._data.ensureVariantData(variantId);
+			}
 		}
 		this.finishPropertyValueChange();
 	}
@@ -794,7 +845,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	 * Request a submit of the workspace, in the case of Document Workspaces the validation does not need to be valid for this to be submitted.
 	 * @returns {Promise<void>} a promise which resolves once it has been completed.
 	 */
-	public override requestSubmit() {
+	public override requestSubmit(): Promise<void> {
 		return this._handleSubmit();
 	}
 
@@ -804,7 +855,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 	/**
 	 * Request a save of the workspace, in the case of Document Workspaces the validation does not need to be valid for this to be saved.
-	 * @returns {Promise<void>} a promise which resolves once it has been completed.
+	 * @returns {Promise<void>} A promise which resolves once it has been completed.
 	 */
 	public requestSave() {
 		return this._handleSave();
@@ -820,11 +871,11 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		return this._data.constructData(variantIds);
 	}
 
-	protected async _handleSubmit() {
+	protected async _handleSubmit(): Promise<void> {
 		await this._handleSave();
 		this._closeModal();
 	}
-	protected async _handleSave() {
+	protected async _handleSave(): Promise<void> {
 		const data = this.getData();
 		if (!data) {
 			throw new Error('Data is missing');
@@ -850,7 +901,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 				value: { selection: selected },
 			}).catch(() => undefined);
 
-			if (!result?.selection.length) return;
+			if (!result?.selection.length) {
+				return Promise.reject('Cannot save without selecting at least one variant.');
+			}
 
 			variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
 		} else {
@@ -870,7 +923,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 				() => false,
 			);
 			if (valid || this.#ignoreValidationResultOnSubmit) {
-				return this.performCreateOrUpdate(variantIds, saveData);
+				await this.performCreateOrUpdate(variantIds, saveData);
+			} else {
+				return Promise.reject('Validation issues prevent saving');
 			}
 		} else {
 			await this.performCreateOrUpdate(variantIds, saveData);
@@ -941,11 +996,20 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		if (!eventContext) {
 			throw new Error('Event context is missing');
 		}
-		const event = new UmbRequestReloadChildrenOfEntityEvent({
+
+		const reloadStructureEvent = new UmbRequestReloadStructureForEntityEvent({
 			entityType: parent.entityType,
 			unique: parent.unique,
 		});
-		eventContext.dispatchEvent(event);
+
+		eventContext.dispatchEvent(reloadStructureEvent);
+
+		const reloadChildrenEvent = new UmbRequestReloadChildrenOfEntityEvent({
+			entityType: parent.entityType,
+			unique: parent.unique,
+		});
+
+		eventContext.dispatchEvent(reloadChildrenEvent);
 	}
 
 	async #update(variantIds: Array<UmbVariantId>, saveData: DetailModelType) {

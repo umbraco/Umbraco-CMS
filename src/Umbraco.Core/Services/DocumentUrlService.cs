@@ -432,7 +432,8 @@ public class DocumentUrlService : IDocumentUrlService
 
         if (draftUrlSegments.Any() is false)
         {
-            _logger.LogWarning("No draft URL segments found for document {DocumentKey} in culture {Culture}", document.Key, culture ?? "{null}");
+            // Log at debug level because this is expected when a document is not published in a given language.
+            _logger.LogDebug("No draft URL segments found for document {DocumentKey} in culture {Culture}", document.Key, culture ?? "{null}");
         }
         else
         {
@@ -856,7 +857,7 @@ public class DocumentUrlService : IDocumentUrlService
             .Concat(_contentService.GetAncestors(documentIdAttempt.Result).Select(x => x.Key).Reverse());
 
         IEnumerable<ILanguage> languages = await _languageService.GetAllAsync();
-        var cultures = languages.ToDictionary(x=>x.IsoCode);
+        var cultures = languages.ToDictionary(x => x.IsoCode);
 
         Guid[] ancestorsOrSelfKeysArray = ancestorsOrSelfKeys as Guid[] ?? ancestorsOrSelfKeys.ToArray();
         Dictionary<Guid, Task<ILookup<string, Domain>>> ancestorOrSelfKeyToDomains = ancestorsOrSelfKeysArray

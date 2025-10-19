@@ -3,13 +3,13 @@ import type {
 	MetaTiptapToolbarMenuItem,
 	UmbTiptapToolbarElementApi,
 } from '../../extensions/index.js';
-import type { UmbCascadingMenuItem } from '../../components/cascading-menu-popover/cascading-menu-popover.element.js';
+import type { UmbCascadingMenuItem } from '../cascading-menu-popover/cascading-menu-popover.element.js';
 import { css, customElement, html, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 import type { ManifestMenu } from '@umbraco-cms/backoffice/menu';
 
-import '../../components/cascading-menu-popover/cascading-menu-popover.element.js';
+import '../cascading-menu-popover/cascading-menu-popover.element.js';
 
 @customElement('umb-tiptap-toolbar-menu')
 export class UmbTiptapToolbarMenuElement extends UmbLitElement {
@@ -118,6 +118,7 @@ export class UmbTiptapToolbarMenuElement extends UmbLitElement {
 
 	override render() {
 		const label = this.localize.string(this.manifest?.meta.label);
+		const disabled = this.api?.isDisabled(this.editor);
 		return html`
 			${when(
 				this.manifest?.meta.look === 'icon',
@@ -127,7 +128,8 @@ export class UmbTiptapToolbarMenuElement extends UmbLitElement {
 						label=${label}
 						look=${this.isActive ? 'outline' : 'default'}
 						title=${label}
-						popovertarget="popover-menu">
+						popovertarget="popover-menu"
+						?disabled=${disabled}>
 						${when(
 							this.manifest?.meta.icon,
 							(icon) => html`<umb-icon name=${icon}></umb-icon>`,
@@ -137,7 +139,12 @@ export class UmbTiptapToolbarMenuElement extends UmbLitElement {
 					</uui-button>
 				`,
 				() => html`
-					<uui-button compact label=${label} look=${this.isActive ? 'outline' : 'default'} popovertarget="popover-menu">
+					<uui-button
+						compact
+						label=${label}
+						look=${this.isActive ? 'outline' : 'default'}
+						popovertarget="popover-menu"
+						?disabled=${disabled}>
 						<span>${label}</span>
 						<uui-symbol-expand slot="extra" open></uui-symbol-expand>
 					</uui-button>

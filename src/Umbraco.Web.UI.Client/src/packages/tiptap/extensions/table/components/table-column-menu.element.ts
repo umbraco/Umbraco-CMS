@@ -2,7 +2,7 @@ import { css, customElement, html, property } from '@umbraco-cms/backoffice/exte
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { Editor, UmbTiptapBubbleMenuElement } from '@umbraco-cms/backoffice/external/tiptap';
 
-/** @deprecated No longer used internally. This will be removed in Umbraco 18. [LK] */
+/** @deprecated No longer used internally. This will be removed in Umbraco 17. [LK] */
 @customElement('umb-tiptap-table-column-menu')
 export class UmbTiptapTableColumnMenuElement extends UmbLitElement implements UmbTiptapBubbleMenuElement {
 	@property({ attribute: false })

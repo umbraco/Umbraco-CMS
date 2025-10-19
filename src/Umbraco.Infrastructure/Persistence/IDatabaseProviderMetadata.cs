@@ -72,6 +72,12 @@ public interface IDatabaseProviderMetadata
     bool SupportsIntegratedAuthentication { get; }
 
     /// <summary>
+    ///     Gets a value indicating whether "Trust the database certificate" is supported (e.g. SQL Server &amp; Oracle).
+    /// </summary>
+    [DataMember(Name = "supportsTrustServerCertificate")]
+    bool SupportsTrustServerCertificate => false;
+
+    /// <summary>
     ///     Gets a value indicating whether the connection should be tested before continuing install process.
     /// </summary>
     [DataMember(Name = "requiresConnectionTest")]

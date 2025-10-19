@@ -1074,8 +1074,6 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             ClearEntityTags(entity, _tagRepository);
         }
 
-        PersistRelations(entity);
-
         entity.ResetDirtyProperties();
 
         // troubleshooting
@@ -1325,12 +1323,15 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
                 ClearEntityTags(entity, _tagRepository);
             }
 
-            PersistRelations(entity);
-
             // TODO: note re. tags: explicitly unpublished entities have cleared tags, but masked or trashed entities *still* have tags in the db - so what?
         }
 
         entity.ResetDirtyProperties();
+
+        // We need to flush the isolated cache by key explicitly here.
+        // The ContentCacheRefresher does the same thing, but by the time it's invoked, custom notification handlers
+        // might have already consumed the cached version (which at this point is the previous version).
+        IsolatedCache.ClearByKey(RepositoryCacheKeys.GetKey<IContent, Guid>(entity.Key));
 
         // troubleshooting
         //if (Database.ExecuteScalar<int>($"SELECT COUNT(*) FROM {Constants.DatabaseSchema.Tables.DocumentVersion} JOIN {Constants.DatabaseSchema.Tables.ContentVersion} ON {Constants.DatabaseSchema.Tables.DocumentVersion}.id={Constants.DatabaseSchema.Tables.ContentVersion}.id WHERE published=1 AND nodeId=" + content.Id) > 1)
@@ -1672,24 +1673,30 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
     }
 
     /// <inheritdoc />
-    public IEnumerable<Guid> GetScheduledContentKeys(Guid[] keys)
+    public IDictionary<int, IEnumerable<ContentSchedule>> GetContentSchedulesByIds(int[] documentIds)
     {
-        var action = ContentScheduleAction.Release.ToString();
-        DateTime now = DateTime.UtcNow;
+        Sql<ISqlContext> sql = Sql()
+            .Select<ContentScheduleDto>()
+            .From<ContentScheduleDto>()
+            .WhereIn<ContentScheduleDto>(contentScheduleDto => contentScheduleDto.NodeId, documentIds);
 
-        Sql<ISqlContext> sql = SqlContext.Sql();
-        sql
-            .Select<NodeDto>(x => x.UniqueId)
-            .From<DocumentDto>()
-            .InnerJoin<ContentDto>().On<DocumentDto, ContentDto>(left => left.NodeId, right => right.NodeId)
-            .InnerJoin<NodeDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-            .WhereIn<NodeDto>(x => x.UniqueId, keys)
-            .WhereIn<NodeDto>(x => x.NodeId, Sql()
-                .Select<ContentScheduleDto>(x => x.NodeId)
-                .From<ContentScheduleDto>()
-                .Where<ContentScheduleDto>(x => x.Action == action && x.Date >= now));
+        List<ContentScheduleDto>? contentScheduleDtos = Database.Fetch<ContentScheduleDto>(sql);
 
-        return Database.Fetch<Guid>(sql);
+        IDictionary<int, IEnumerable<ContentSchedule>> dictionary = contentScheduleDtos
+            .GroupBy(contentSchedule => contentSchedule.NodeId)
+            .ToDictionary(
+                group => group.Key,
+                group => group.Select(scheduleDto => new ContentSchedule(
+                    scheduleDto.Id,
+                    LanguageRepository.GetIsoCodeById(scheduleDto.LanguageId) ?? Constants.System.InvariantCulture,
+                    scheduleDto.Date,
+                    scheduleDto.Action == ContentScheduleAction.Release.ToString()
+                        ? ContentScheduleAction.Release
+                        : ContentScheduleAction.Expire))
+                    .ToList().AsEnumerable()); // We have to materialize it here,
+                                               // to avoid this being used after the scope is disposed.
+
+        return dictionary;
     }
 
     /// <inheritdoc />

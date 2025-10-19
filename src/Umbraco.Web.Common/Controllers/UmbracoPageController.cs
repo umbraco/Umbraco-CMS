@@ -79,7 +79,7 @@ public abstract class UmbracoPageController : UmbracoController
     /// </exception>
     protected virtual IActionResult CurrentTemplate<T>(T model)
     {
-        if (EnsurePhsyicalViewExists(UmbracoRouteValues.TemplateName) == false)
+        if (EnsurePhysicalViewExists(UmbracoRouteValues.TemplateName) == false)
         {
             throw new InvalidOperationException("No physical template file was found for template " +
                                                 UmbracoRouteValues.TemplateName);
@@ -92,7 +92,14 @@ public abstract class UmbracoPageController : UmbracoController
     ///     Ensures that a physical view file exists on disk.
     /// </summary>
     /// <param name="template">The view name.</param>
-    protected bool EnsurePhsyicalViewExists(string? template)
+    [Obsolete("Please use the correctly spelt EnsurePhysicalViewExists method. Scheduled for removal in Umbraco 18.")]
+    protected bool EnsurePhsyicalViewExists(string? template) => EnsurePhysicalViewExists(template);
+
+    /// <summary>
+    ///     Ensures that a physical view file exists on disk.
+    /// </summary>
+    /// <param name="template">The view name.</param>
+    protected bool EnsurePhysicalViewExists(string? template)
     {
         if (string.IsNullOrWhiteSpace(template))
         {

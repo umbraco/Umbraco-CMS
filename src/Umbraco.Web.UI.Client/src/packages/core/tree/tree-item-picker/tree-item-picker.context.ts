@@ -1,10 +1,10 @@
+import { UmbTreeItemPickerExpansionManager } from './tree-item-picker-expansion.manager.js';
 import { UmbPickerContext } from '@umbraco-cms/backoffice/picker';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbTreeItemPickerContext extends UmbPickerContext {
-	constructor(host: UmbControllerHost) {
-		super(host);
-	}
+	public readonly expansion = new UmbTreeItemPickerExpansionManager(this, {
+		interactionMemoryManager: this.interactionMemory,
+	});
 }
 
 export { UmbTreeItemPickerContext as api };

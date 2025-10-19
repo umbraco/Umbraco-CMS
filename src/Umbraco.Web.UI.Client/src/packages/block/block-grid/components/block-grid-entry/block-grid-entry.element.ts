@@ -190,7 +190,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			},
 			null,
 		);
-		// TODO: Implement index.
+		this.observe(this.#context.index, (index) => this.#updateBlockViewProps({ index }), null);
 		this.observe(
 			this.#context.label,
 			(label) => {
@@ -467,12 +467,11 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 						<umb-extension-slot
 							.filter=${this.#extensionSlotFilterMethod}
 							.renderMethod=${this.#extensionSlotRenderMethod}
+							.fallbackRenderMethod=${this.#renderBuiltinBlockView}
 							.props=${this._blockViewProps}
 							default-element=${this._inlineEditingMode ? 'umb-block-grid-block-inline' : 'umb-block-grid-block'}
 							type="blockEditorCustomView"
-							single
-							>${this.#renderBuiltinBlockView()}</umb-extension-slot
-						>
+							single></umb-extension-slot>
 						${this.#renderActionBar()}
 						${!this._showContentEdit && this._contentInvalid
 							? html`<uui-badge attention color="invalid" label="Invalid content">!</uui-badge>`
@@ -494,7 +493,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			: nothing;
 	}
 
-	#renderBuiltinBlockView() {
+	#renderBuiltinBlockView = () => {
 		if (this._unsupported) {
 			return this.#renderUnsupportedBlock();
 		}
@@ -502,7 +501,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			return this.renderInlineBlock();
 		}
 		return this.#renderRefBlock();
-	}
+	};
 
 	#renderUnsupportedBlock() {
 		return html`<umb-block-grid-block-unsupported
@@ -518,6 +517,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			class="umb-block-grid__block--view"
 			.label=${this._label}
 			.icon=${this._icon}
+			.index=${this._blockViewProps.index}
 			.unpublished=${!this._exposed}
 			.config=${this._blockViewProps.config}
 			.content=${this._blockViewProps.content}
@@ -530,6 +530,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			class="umb-block-grid__block--view"
 			.label=${this._label}
 			.icon=${this._icon}
+			.index=${this._blockViewProps.index}
 			.unpublished=${!this._exposed}
 			.config=${this._blockViewProps.config}
 			.content=${this._blockViewProps.content}

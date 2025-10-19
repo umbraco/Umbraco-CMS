@@ -14,7 +14,7 @@ export class UmbEntityActionsTableColumnViewElement extends UmbLitElement {
 			<umb-entity-actions-bundle
 				.entityType=${this.value.entityType}
 				.unique=${this.value.unique}
-				.label=${this.localize.term('actions_viewActionsFor', [(this.value as any).name])}>
+				.label=${this.localize.string((this.value as any).name)}>
 			</umb-entity-actions-bundle>
 		`;
 	}

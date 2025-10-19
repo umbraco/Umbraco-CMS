@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
-using Umbraco.Cms.Api.Management.Services.Signs;
+using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
@@ -19,8 +19,8 @@ public class RootDictionaryTreeController : DictionaryTreeControllerBase
     }
 
     [ActivatorUtilitiesConstructor]
-    public RootDictionaryTreeController(IEntityService entityService, SignProviderCollection signProviders, IDictionaryItemService dictionaryItemService)
-        : base(entityService, signProviders, dictionaryItemService)
+    public RootDictionaryTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IDictionaryItemService dictionaryItemService)
+        : base(entityService, flagProviders, dictionaryItemService)
     {
     }
 

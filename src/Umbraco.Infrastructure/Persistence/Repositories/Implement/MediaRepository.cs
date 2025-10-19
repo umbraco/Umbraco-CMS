@@ -416,8 +416,6 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
         // set tags
         SetEntityTags(entity, _tagRepository, _serializer);
 
-        PersistRelations(entity);
-
         OnUowRefreshedEntity(new MediaRefreshNotification(entity, new EventMessages()));
 
         entity.ResetDirtyProperties();
@@ -477,13 +475,16 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
             ReplacePropertyValues(entity, entity.VersionId, 0, out _, out _);
 
             SetEntityTags(entity, _tagRepository, _serializer);
-
-            PersistRelations(entity);
         }
 
         OnUowRefreshedEntity(new MediaRefreshNotification(entity, new EventMessages()));
 
         entity.ResetDirtyProperties();
+
+        // We need to flush the isolated cache by key explicitly here.
+        // The MediaCacheRefresher does the same thing, but by the time it's invoked, custom notification handlers
+        // might have already consumed the cached version (which at this point is the previous version).
+        IsolatedCache.ClearByKey(RepositoryCacheKeys.GetKey<IMedia, Guid>(entity.Key));
     }
 
     protected override void PersistDeletedItem(IMedia entity)

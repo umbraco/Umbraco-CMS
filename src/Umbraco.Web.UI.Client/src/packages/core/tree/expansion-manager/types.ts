@@ -1,3 +1,3 @@
-import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import type { UmbEntityExpansionModel } from '@umbraco-cms/backoffice/utils';
 
-export type UmbTreeExpansionModel = Array<UmbEntityModel>;
+export type UmbTreeExpansionModel = UmbEntityExpansionModel;

@@ -205,7 +205,7 @@ internal sealed class DatabaseDataCreator
         {
             [Constants.Security.AdminGroupKey] = [ActionNew.ActionLetter, ActionUpdate.ActionLetter, ActionDelete.ActionLetter, ActionMove.ActionLetter, ActionCopy.ActionLetter, ActionSort.ActionLetter, ActionRollback.ActionLetter, ActionProtect.ActionLetter, ActionAssignDomain.ActionLetter, ActionPublish.ActionLetter, ActionRights.ActionLetter, ActionUnpublish.ActionLetter, ActionBrowse.ActionLetter, ActionCreateBlueprintFromContent.ActionLetter, ActionNotify.ActionLetter, ":", "5", "7", "T", ActionDocumentPropertyRead.ActionLetter, ActionDocumentPropertyWrite.ActionLetter],
             [Constants.Security.EditorGroupKey] = [ActionNew.ActionLetter, ActionUpdate.ActionLetter, ActionDelete.ActionLetter, ActionMove.ActionLetter, ActionCopy.ActionLetter, ActionSort.ActionLetter, ActionRollback.ActionLetter, ActionProtect.ActionLetter, ActionPublish.ActionLetter, ActionUnpublish.ActionLetter, ActionBrowse.ActionLetter, ActionCreateBlueprintFromContent.ActionLetter, ActionNotify.ActionLetter, ":", "5", "T", ActionDocumentPropertyRead.ActionLetter, ActionDocumentPropertyWrite.ActionLetter],
-            [Constants.Security.WriterGroupKey] = [ActionNew.ActionLetter, ActionUpdate.ActionLetter, ActionBrowse.ActionLetter, ActionNotify.ActionLetter, ":" , ActionDocumentPropertyRead.ActionLetter, ActionDocumentPropertyWrite.ActionLetter],
+            [Constants.Security.WriterGroupKey] = [ActionNew.ActionLetter, ActionUpdate.ActionLetter, ActionBrowse.ActionLetter, ActionNotify.ActionLetter, ":", ActionDocumentPropertyRead.ActionLetter, ActionDocumentPropertyWrite.ActionLetter],
             [Constants.Security.TranslatorGroupKey] = [ActionUpdate.ActionLetter, ActionBrowse.ActionLetter, ActionDocumentPropertyRead.ActionLetter, ActionDocumentPropertyWrite.ActionLetter],
         };
 
@@ -320,6 +320,10 @@ internal sealed class DatabaseDataCreator
         InsertDataTypeNodeDto(Constants.DataTypes.LabelTime, 38, Constants.DataTypes.Guids.LabelTime, "Label (time)");
         InsertDataTypeNodeDto(Constants.DataTypes.LabelDecimal, 39, Constants.DataTypes.Guids.LabelDecimal,
             "Label (decimal)");
+        InsertDataTypeNodeDto(Constants.DataTypes.LabelBytes, 40, Constants.DataTypes.Guids.LabelBytes,
+            "Label (bytes)");
+        InsertDataTypeNodeDto(Constants.DataTypes.LabelPixels, 41, Constants.DataTypes.Guids.LabelPixels,
+            "Label (pixels)");
 
         ConditionalInsert(
             Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
@@ -1454,7 +1458,7 @@ internal sealed class DatabaseDataCreator
                 {
                     Id = 7,
                     UniqueId = new Guid("A68D453B-1F62-44F4-9F71-0B6BBD43C355"),
-                    DataTypeId = Constants.DataTypes.LabelInt,
+                    DataTypeId = Constants.DataTypes.LabelPixels,
                     ContentTypeId = 1032,
                     PropertyTypeGroupId = 3,
                     Alias = Constants.Conventions.Media.Width,
@@ -1462,7 +1466,7 @@ internal sealed class DatabaseDataCreator
                     SortOrder = 0,
                     Mandatory = false,
                     ValidationRegExp = null,
-                    Description = "in pixels",
+                    Description = null,
                     Variations = (byte)ContentVariation.Nothing,
                 });
             _database.Insert(Constants.DatabaseSchema.Tables.PropertyType, "id", false,
@@ -1470,7 +1474,7 @@ internal sealed class DatabaseDataCreator
                 {
                     Id = 8,
                     UniqueId = new Guid("854087F6-648B-40ED-BC98-B8A9789E80B9"),
-                    DataTypeId = Constants.DataTypes.LabelInt,
+                    DataTypeId = Constants.DataTypes.LabelPixels,
                     ContentTypeId = 1032,
                     PropertyTypeGroupId = 3,
                     Alias = Constants.Conventions.Media.Height,
@@ -1478,7 +1482,7 @@ internal sealed class DatabaseDataCreator
                     SortOrder = 0,
                     Mandatory = false,
                     ValidationRegExp = null,
-                    Description = "in pixels",
+                    Description = null,
                     Variations = (byte)ContentVariation.Nothing,
                 });
             _database.Insert(Constants.DatabaseSchema.Tables.PropertyType, "id", false,
@@ -1486,15 +1490,15 @@ internal sealed class DatabaseDataCreator
                 {
                     Id = 9,
                     UniqueId = new Guid("BD4C5ACE-26E3-4A8B-AF1A-E8206A35FA07"),
-                    DataTypeId = Constants.DataTypes.LabelBigint,
+                    DataTypeId = Constants.DataTypes.LabelBytes,
                     ContentTypeId = 1032,
                     PropertyTypeGroupId = 3,
                     Alias = Constants.Conventions.Media.Bytes,
-                    Name = "Size",
+                    Name = "File size",
                     SortOrder = 0,
                     Mandatory = false,
                     ValidationRegExp = null,
-                    Description = "in bytes",
+                    Description = null,
                     Variations = (byte)ContentVariation.Nothing,
                 });
             _database.Insert(Constants.DatabaseSchema.Tables.PropertyType, "id", false,
@@ -1502,11 +1506,11 @@ internal sealed class DatabaseDataCreator
                 {
                     Id = 10,
                     UniqueId = new Guid("F7786FE8-724A-4ED0-B244-72546DB32A92"),
-                    DataTypeId = -92,
+                    DataTypeId = Constants.DataTypes.LabelString,
                     ContentTypeId = 1032,
                     PropertyTypeGroupId = 3,
                     Alias = Constants.Conventions.Media.Extension,
-                    Name = "Type",
+                    Name = "File extension",
                     SortOrder = 0,
                     Mandatory = false,
                     ValidationRegExp = null,
@@ -1538,11 +1542,11 @@ internal sealed class DatabaseDataCreator
                 {
                     Id = 25,
                     UniqueId = new Guid("3531C0A3-4E0A-4324-A621-B9D3822B071F"),
-                    DataTypeId = -92,
+                    DataTypeId = Constants.DataTypes.LabelString,
                     ContentTypeId = 1033,
                     PropertyTypeGroupId = 4,
                     Alias = Constants.Conventions.Media.Extension,
-                    Name = "Type",
+                    Name = "File extension",
                     SortOrder = 0,
                     Mandatory = false,
                     ValidationRegExp = null,
@@ -1554,15 +1558,15 @@ internal sealed class DatabaseDataCreator
                 {
                     Id = 26,
                     UniqueId = new Guid("F9527050-59BC-43E4-8FA8-1658D1319FF5"),
-                    DataTypeId = Constants.DataTypes.LabelBigint,
+                    DataTypeId = Constants.DataTypes.LabelBytes,
                     ContentTypeId = 1033,
                     PropertyTypeGroupId = 4,
                     Alias = Constants.Conventions.Media.Bytes,
-                    Name = "Size",
+                    Name = "File size",
                     SortOrder = 0,
                     Mandatory = false,
                     ValidationRegExp = null,
-                    Description = "in bytes",
+                    Description = null,
                     Variations = (byte)ContentVariation.Nothing,
                 });
         }
@@ -1590,11 +1594,11 @@ internal sealed class DatabaseDataCreator
                 {
                     Id = 41,
                     UniqueId = new Guid("EDD2B3FD-1E57-4E57-935E-096DEFCCDC9B"),
-                    DataTypeId = -92,
+                    DataTypeId = Constants.DataTypes.LabelString,
                     ContentTypeId = 1034,
                     PropertyTypeGroupId = 52,
                     Alias = Constants.Conventions.Media.Extension,
-                    Name = "Type",
+                    Name = "File extension",
                     SortOrder = 0,
                     Mandatory = false,
                     ValidationRegExp = null,
@@ -1606,15 +1610,15 @@ internal sealed class DatabaseDataCreator
                 {
                     Id = 42,
                     UniqueId = new Guid("180EEECF-1F00-409E-8234-BBA967E08B0A"),
-                    DataTypeId = Constants.DataTypes.LabelBigint,
+                    DataTypeId = Constants.DataTypes.LabelBytes,
                     ContentTypeId = 1034,
                     PropertyTypeGroupId = 52,
                     Alias = Constants.Conventions.Media.Bytes,
-                    Name = "Size",
+                    Name = "File size",
                     SortOrder = 0,
                     Mandatory = false,
                     ValidationRegExp = null,
-                    Description = "in bytes",
+                    Description = null,
                     Variations = (byte)ContentVariation.Nothing,
                 });
         }
@@ -1642,11 +1646,11 @@ internal sealed class DatabaseDataCreator
                 {
                     Id = 44,
                     UniqueId = new Guid("1BEE433F-A21A-4031-8E03-AF01BB8D2DE9"),
-                    DataTypeId = -92,
+                    DataTypeId = Constants.DataTypes.LabelString,
                     ContentTypeId = 1035,
                     PropertyTypeGroupId = 53,
                     Alias = Constants.Conventions.Media.Extension,
-                    Name = "Type",
+                    Name = "File extension",
                     SortOrder = 0,
                     Mandatory = false,
                     ValidationRegExp = null,
@@ -1658,15 +1662,15 @@ internal sealed class DatabaseDataCreator
                 {
                     Id = 45,
                     UniqueId = new Guid("3CBF538A-29AB-4317-A9EB-BBCDF1A54260"),
-                    DataTypeId = Constants.DataTypes.LabelBigint,
+                    DataTypeId = Constants.DataTypes.LabelBytes,
                     ContentTypeId = 1035,
                     PropertyTypeGroupId = 53,
                     Alias = Constants.Conventions.Media.Bytes,
-                    Name = "Size",
+                    Name = "File size",
                     SortOrder = 0,
                     Mandatory = false,
                     ValidationRegExp = null,
-                    Description = "in bytes",
+                    Description = null,
                     Variations = (byte)ContentVariation.Nothing,
                 });
         }
@@ -1694,11 +1698,11 @@ internal sealed class DatabaseDataCreator
                 {
                     Id = 47,
                     UniqueId = new Guid("EF1B4AF7-36DE-45EB-8C18-A2DE07319227"),
-                    DataTypeId = -92,
+                    DataTypeId = Constants.DataTypes.LabelString,
                     ContentTypeId = 1036,
                     PropertyTypeGroupId = 54,
                     Alias = Constants.Conventions.Media.Extension,
-                    Name = "Type",
+                    Name = "File extension",
                     SortOrder = 0,
                     Mandatory = false,
                     ValidationRegExp = null,
@@ -1710,15 +1714,15 @@ internal sealed class DatabaseDataCreator
                 {
                     Id = 48,
                     UniqueId = new Guid("AAB7D00C-7209-4337-BE3F-A4421C8D79A0"),
-                    DataTypeId = Constants.DataTypes.LabelBigint,
+                    DataTypeId = Constants.DataTypes.LabelBytes,
                     ContentTypeId = 1036,
                     PropertyTypeGroupId = 54,
                     Alias = Constants.Conventions.Media.Bytes,
-                    Name = "Size",
+                    Name = "File size",
                     SortOrder = 0,
                     Mandatory = false,
                     ValidationRegExp = null,
-                    Description = "in bytes",
+                    Description = null,
                     Variations = (byte)ContentVariation.Nothing,
                 });
         }
@@ -1746,11 +1750,11 @@ internal sealed class DatabaseDataCreator
                 {
                     Id = 50,
                     UniqueId = new Guid("0F25A89E-2EB7-49BC-A7B4-759A7E4C69F2"),
-                    DataTypeId = -92,
+                    DataTypeId = Constants.DataTypes.LabelString,
                     ContentTypeId = 1037,
                     PropertyTypeGroupId = 55,
                     Alias = Constants.Conventions.Media.Extension,
-                    Name = "Type",
+                    Name = "File extension",
                     SortOrder = 0,
                     Mandatory = false,
                     ValidationRegExp = null,
@@ -1762,15 +1766,15 @@ internal sealed class DatabaseDataCreator
                 {
                     Id = 51,
                     UniqueId = new Guid("09A07AFF-861D-4769-A2B0-C165EBD43D39"),
-                    DataTypeId = Constants.DataTypes.LabelBigint,
+                    DataTypeId = Constants.DataTypes.LabelBytes,
                     ContentTypeId = 1037,
                     PropertyTypeGroupId = 55,
                     Alias = Constants.Conventions.Media.Bytes,
-                    Name = "Size",
+                    Name = "File size",
                     SortOrder = 0,
                     Mandatory = false,
                     ValidationRegExp = null,
-                    Description = "in bytes",
+                    Description = null,
                     Variations = (byte)ContentVariation.Nothing,
                 });
         }
@@ -1943,7 +1947,7 @@ internal sealed class DatabaseDataCreator
                     EditorAlias = Constants.PropertyEditors.Aliases.RichText,
                     EditorUiAlias = "Umb.PropertyEditorUi.Tiptap",
                     DbType = "Ntext",
-                    Configuration = "{\"extensions\": [\"Umb.Tiptap.Embed\", \"Umb.Tiptap.Link\", \"Umb.Tiptap.Figure\", \"Umb.Tiptap.Image\", \"Umb.Tiptap.Subscript\", \"Umb.Tiptap.Superscript\", \"Umb.Tiptap.Table\", \"Umb.Tiptap.Underline\", \"Umb.Tiptap.TextAlign\", \"Umb.Tiptap.MediaUpload\"], \"maxImageSize\": 500, \"overlaySize\": \"medium\", \"toolbar\": [[[\"Umb.Tiptap.Toolbar.SourceEditor\"], [\"Umb.Tiptap.Toolbar.Bold\", \"Umb.Tiptap.Toolbar.Italic\", \"Umb.Tiptap.Toolbar.Underline\"], [\"Umb.Tiptap.Toolbar.TextAlignLeft\", \"Umb.Tiptap.Toolbar.TextAlignCenter\", \"Umb.Tiptap.Toolbar.TextAlignRight\"], [\"Umb.Tiptap.Toolbar.BulletList\", \"Umb.Tiptap.Toolbar.OrderedList\"], [\"Umb.Tiptap.Toolbar.Blockquote\", \"Umb.Tiptap.Toolbar.HorizontalRule\"], [\"Umb.Tiptap.Toolbar.Link\", \"Umb.Tiptap.Toolbar.Unlink\"], [\"Umb.Tiptap.Toolbar.MediaPicker\", \"Umb.Tiptap.Toolbar.EmbeddedMedia\"]]]}",
+                    Configuration = "{\"extensions\": [\"Umb.Tiptap.RichTextEssentials\", \"Umb.Tiptap.Anchor\", \"Umb.Tiptap.Block\", \"Umb.Tiptap.Blockquote\", \"Umb.Tiptap.Bold\", \"Umb.Tiptap.BulletList\", \"Umb.Tiptap.CodeBlock\", \"Umb.Tiptap.Embed\", \"Umb.Tiptap.Figure\", \"Umb.Tiptap.Heading\", \"Umb.Tiptap.HorizontalRule\", \"Umb.Tiptap.HtmlAttributeClass\", \"Umb.Tiptap.HtmlAttributeDataset\", \"Umb.Tiptap.HtmlAttributeId\", \"Umb.Tiptap.HtmlAttributeStyle\", \"Umb.Tiptap.HtmlTagDiv\", \"Umb.Tiptap.HtmlTagSpan\", \"Umb.Tiptap.Image\", \"Umb.Tiptap.Italic\", \"Umb.Tiptap.Link\", \"Umb.Tiptap.MediaUpload\", \"Umb.Tiptap.OrderedList\", \"Umb.Tiptap.Strike\", \"Umb.Tiptap.Subscript\", \"Umb.Tiptap.Superscript\", \"Umb.Tiptap.Table\", \"Umb.Tiptap.TextAlign\", \"Umb.Tiptap.TextDirection\", \"Umb.Tiptap.TextIndent\", \"Umb.Tiptap.TrailingNode\", \"Umb.Tiptap.Underline\"], \"maxImageSize\": 500, \"overlaySize\": \"medium\", \"toolbar\": [[[\"Umb.Tiptap.Toolbar.SourceEditor\"], [\"Umb.Tiptap.Toolbar.Bold\", \"Umb.Tiptap.Toolbar.Italic\", \"Umb.Tiptap.Toolbar.Underline\"], [\"Umb.Tiptap.Toolbar.TextAlignLeft\", \"Umb.Tiptap.Toolbar.TextAlignCenter\", \"Umb.Tiptap.Toolbar.TextAlignRight\"], [\"Umb.Tiptap.Toolbar.BulletList\", \"Umb.Tiptap.Toolbar.OrderedList\"], [\"Umb.Tiptap.Toolbar.Blockquote\", \"Umb.Tiptap.Toolbar.HorizontalRule\"], [\"Umb.Tiptap.Toolbar.Link\", \"Umb.Tiptap.Toolbar.Unlink\"], [\"Umb.Tiptap.Toolbar.MediaPicker\", \"Umb.Tiptap.Toolbar.EmbeddedMedia\"]]]}",
                 });
         }
 
@@ -1995,6 +1999,10 @@ internal sealed class DatabaseDataCreator
             "Umb.PropertyEditorUi.Label", "Decimal", "{\"umbracoDataValueType\":\"DECIMAL\"}");
         InsertDataTypeDto(Constants.DataTypes.LabelTime, Constants.PropertyEditors.Aliases.Label,
             "Umb.PropertyEditorUi.Label", "Date", "{\"umbracoDataValueType\":\"TIME\"}");
+        InsertDataTypeDto(Constants.DataTypes.LabelBytes, Constants.PropertyEditors.Aliases.Label,
+            "Umb.PropertyEditorUi.Label", "Nvarchar", "{\"umbracoDataValueType\":\"BIGINT\", \"labelTemplate\":\"{=value | bytes}\"}");
+        InsertDataTypeDto(Constants.DataTypes.LabelPixels, Constants.PropertyEditors.Aliases.Label,
+            "Umb.PropertyEditorUi.Label", "Integer", "{\"umbracoDataValueType\":\"INT\", \"labelTemplate\":\"{=value}px\"}");
 
         if (_database.Exists<NodeDto>(Constants.DataTypes.DateTime))
         {

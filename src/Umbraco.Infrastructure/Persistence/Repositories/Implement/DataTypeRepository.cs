@@ -29,6 +29,7 @@ internal sealed class DataTypeRepository : EntityRepositoryBase<int, IDataType>,
     private readonly ILogger<IDataType> _dataTypeLogger;
     private readonly PropertyEditorCollection _editors;
     private readonly IConfigurationEditorJsonSerializer _serializer;
+    private readonly IDataValueEditorFactory _dataValueEditorFactory;
 
     public DataTypeRepository(
         IScopeAccessor scopeAccessor,
@@ -36,11 +37,13 @@ internal sealed class DataTypeRepository : EntityRepositoryBase<int, IDataType>,
         PropertyEditorCollection editors,
         ILogger<DataTypeRepository> logger,
         ILoggerFactory loggerFactory,
-        IConfigurationEditorJsonSerializer serializer)
+        IConfigurationEditorJsonSerializer serializer,
+        IDataValueEditorFactory dataValueEditorFactory)
         : base(scopeAccessor, cache, logger)
     {
         _editors = editors;
         _serializer = serializer;
+        _dataValueEditorFactory = dataValueEditorFactory;
         _dataTypeLogger = loggerFactory.CreateLogger<IDataType>();
     }
 
@@ -262,7 +265,12 @@ internal sealed class DataTypeRepository : EntityRepositoryBase<int, IDataType>,
         }
 
         List<DataTypeDto>? dtos = Database.Fetch<DataTypeDto>(dataTypeSql);
-        return dtos.Select(x => DataTypeFactory.BuildEntity(x, _editors, _dataTypeLogger, _serializer)).ToArray();
+        return dtos.Select(x => DataTypeFactory.BuildEntity(
+            x,
+            _editors,
+            _dataTypeLogger,
+            _serializer,
+            _dataValueEditorFactory)).ToArray();
     }
 
     protected override IEnumerable<IDataType> PerformGetByQuery(IQuery<IDataType> query)
@@ -273,7 +281,12 @@ internal sealed class DataTypeRepository : EntityRepositoryBase<int, IDataType>,
 
         List<DataTypeDto>? dtos = Database.Fetch<DataTypeDto>(sql);
 
-        return dtos.Select(x => DataTypeFactory.BuildEntity(x, _editors, _dataTypeLogger, _serializer)).ToArray();
+        return dtos.Select(x => DataTypeFactory.BuildEntity(
+            x,
+            _editors,
+            _dataTypeLogger,
+            _serializer,
+            _dataValueEditorFactory)).ToArray();
     }
 
     #endregion

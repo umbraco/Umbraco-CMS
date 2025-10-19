@@ -1,12 +1,14 @@
 import { UMB_WORKSPACE_VIEW_PATH_PATTERN } from '../../paths.js';
+import type { ManifestWorkspaceView } from '../../types.js';
 import { UmbWorkspaceEditorContext } from './workspace-editor.context.js';
 import type { UmbWorkspaceViewContext } from './workspace-view.context.js';
 import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbRoute, UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '@umbraco-cms/backoffice/router';
+import type { UmbDeepPartialObject } from '@umbraco-cms/backoffice/utils';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbRoute, UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '@umbraco-cms/backoffice/router';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbVariantHint } from '@umbraco-cms/backoffice/hint';
 
@@ -56,6 +58,14 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 	}
 	private _variantId?: UmbVariantId | undefined;
 
+	@property({ attribute: false })
+	public set overrides(value: Array<UmbDeepPartialObject<ManifestWorkspaceView>> | undefined) {
+		this.#navigationContext.setOverrides(value);
+	}
+	public get overrides(): Array<UmbDeepPartialObject<ManifestWorkspaceView>> | undefined {
+		return undefined;
+	}
+
 	@state()
 	private _workspaceViews: Array<UmbWorkspaceViewContext> = [];
 
@@ -103,6 +113,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 		);
 	}
 
+	#currentProvidedView?: UmbWorkspaceViewContext;
 	#createRoutes() {
 		let newRoutes: UmbRoute[] = [];
 
@@ -113,7 +124,11 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 					path: UMB_WORKSPACE_VIEW_PATH_PATTERN.generateLocal({ viewPathname: manifest.meta.pathname }),
 					component: () => createExtensionElement(manifest),
 					setup: (component?: any) => {
+						if (this.#currentProvidedView !== context) {
+							this.#currentProvidedView?.unprovide();
+						}
 						if (component) {
+							this.#currentProvidedView = context;
 							context.provideAt(component);
 							component.manifest = manifest;
 						}
@@ -136,26 +151,26 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	override render() {
-		return this._routes
-			? html`
-					<umb-body-layout main-no-padding .headline=${this.headline} ?loading=${this.loading}>
-						${this.#renderBackButton()}
-						<slot name="header" slot="header"></slot>
-						<slot name="action-menu" slot="action-menu"></slot>
-						${this.#renderViews()} ${this.#renderRoutes()}
-						<slot></slot>
-						${when(
-							!this.enforceNoFooter,
-							() => html`
-								<umb-workspace-footer slot="footer" data-mark="workspace:footer">
-									<slot name="footer-info"></slot>
-									<slot name="actions" slot="actions" data-mark="workspace:footer-actions"></slot>
-								</umb-workspace-footer>
-							`,
-						)}
-					</umb-body-layout>
-				`
-			: nothing;
+		// Notice if no routes then fallback to use a slot.
+		// TODO: Deprecate the slot feature, to rely purely on routes, cause currently bringing an additional route would mean the slotted content would never be shown. [NL]
+		return html`
+			<umb-body-layout main-no-padding .headline=${this.headline} ?loading=${this.loading}>
+				${this.#renderBackButton()}
+				<slot name="header" slot="header"></slot>
+				<slot name="action-menu" slot="action-menu"></slot>
+				${this.#renderViews()} ${this.#renderRoutes()}
+				<slot></slot>
+				${when(
+					!this.enforceNoFooter,
+					() => html`
+						<umb-workspace-footer slot="footer" data-mark="workspace:footer">
+							<slot name="footer-info"></slot>
+							<slot name="actions" slot="actions" data-mark="workspace:footer-actions"></slot>
+						</umb-workspace-footer>
+					`,
+				)}
+			</umb-body-layout>
+		`;
 	}
 
 	#renderViews() {
@@ -181,8 +196,8 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 											data-mark="workspace:view-link:${manifest.alias}">
 											<div slot="icon">
 												<umb-icon name=${manifest.meta.icon}></umb-icon> ${hint && !active
-													? html`<uui-badge .color=${hint.color ?? 'default'} ?attention=${hint.color === 'invalid'}
-															>${hint.text}</uui-badge
+													? html`<umb-badge .color=${hint.color ?? 'default'} ?attention=${hint.color === 'invalid'}
+															>${hint.text}</umb-badge
 														>`
 													: nothing}
 											</div>
@@ -213,7 +228,9 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	#renderRoutes() {
-		if (!this._routes || this._routes.length === 0) return nothing;
+		if (!this._routes || this._routes.length === 0 || !this._workspaceViews || this._workspaceViews.length === 0) {
+			return nothing;
+		}
 		return html`
 			<umb-router-slot
 				inherit-addendum
@@ -261,12 +278,9 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 				position: relative;
 			}
 
-			uui-badge {
-				position: absolute;
+			umb-badge {
 				font-size: var(--uui-type-small-size);
-				top: -0.5em;
-				right: auto;
-				left: calc(50% + 0.8em);
+				right: -1.5em;
 			}
 
 			umb-extension-slot[slot='actions'] {

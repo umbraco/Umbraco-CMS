@@ -198,8 +198,8 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		} else {
 			return html`
 				<div id="header">
-					<b>${this.property.name}</b>
-					<i>${this.property.alias}</i>
+					<p><b>${this.property.name}</b></p>
+					<p><i>${this.property.alias}</i></p>
 					<p>${this.property.description}</p>
 				</div>
 				<div id="editor">
@@ -310,6 +310,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 					${this.#renderVariantTags()}
 					${this.property.appearance?.labelOnTop == true
 						? html`<uui-tag look="default">
+								<uui-icon name="icon-stretch-horizontal"></uui-icon>
 								<span>${this.localize.term('contentTypeEditor_displaySettingsLabelOnTop')}</span>
 							</uui-tag>`
 						: nothing}
@@ -348,7 +349,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		) {
 			return html`
 				<uui-tag look="default">
-					<uui-icon name="icon-shared-value"></uui-icon> ${this.localize.term(
+					<uui-icon name="icon-trending-up-down"></uui-icon> ${this.localize.term(
 						'contentTypeEditor_cultureAndVariantInvariantLabel',
 					)}
 				</uui-tag>
@@ -357,13 +358,17 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 
 		if (this.ownerVariesByCulture && !this.property.variesByCulture) {
 			return html`<uui-tag look="default">
-				<uui-icon name="icon-shuffle"></uui-icon> ${this.localize.term('contentTypeEditor_cultureInvariantLabel')}
+				<uui-icon name="icon-trending-up-down"></uui-icon> ${this.localize.term(
+					'contentTypeEditor_cultureInvariantLabel',
+				)}
 			</uui-tag>`;
 		}
 
 		if (this.ownerVariesBySegment && !this.property.variesBySegment) {
 			return html`<uui-tag look="default">
-				<uui-icon name="icon-shuffle"></uui-icon> ${this.localize.term('contentTypeEditor_segmentInvariantLabel')}
+				<uui-icon name="icon-trending-up-down"></uui-icon> ${this.localize.term(
+					'contentTypeEditor_segmentInvariantLabel',
+				)}
 			</uui-tag>`;
 		}
 
@@ -446,6 +451,12 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 				border-radius: var(--uui-border-radius);
 			}
 
+			:host([_inherited]) {
+				#header {
+					padding: 0 var(--uui-size-3, 9px);
+				}
+			}
+
 			p {
 				margin-bottom: 0;
 			}
@@ -456,10 +467,19 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 				height: min-content;
 			}
 
+			#header i {
+				opacity: 0.55;
+			}
+
 			#editor {
 				position: relative;
 				--uui-button-background-color: var(--uui-color-background);
 				--uui-button-background-color-hover: var(--uui-color-background);
+			}
+			#editor:not(uui-button) {
+				background-color: var(--uui-color-background);
+				border-radius: var(--uui-button-border-radius, var(--uui-border-radius, 3px));
+				min-height: 143px;
 			}
 			#editor uui-action-bar {
 				--uui-button-background-color: var(--uui-color-surface);

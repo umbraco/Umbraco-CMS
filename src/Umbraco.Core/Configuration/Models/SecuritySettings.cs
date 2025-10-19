@@ -34,6 +34,9 @@ public class SecuritySettings
     internal const string StaticAuthorizeCallbackLogoutPathName = "/umbraco/logout";
     internal const string StaticAuthorizeCallbackErrorPathName = "/umbraco/error";
 
+    internal const string StaticPasswordResetEmailExpiry = "01:00:00";
+    internal const string StaticUserInviteEmailExpiry = "3.00:00:00";
+
     /// <summary>
     ///     Gets or sets a value indicating whether to keep the user logged in.
     /// </summary>
@@ -159,4 +162,16 @@ public class SecuritySettings
     /// </summary>
     [DefaultValue(StaticAuthorizeCallbackErrorPathName)]
     public string AuthorizeCallbackErrorPathName { get; set; } = StaticAuthorizeCallbackErrorPathName;
+
+    /// <summary>
+    ///     Gets or sets the expiry time for password reset emails.
+    /// </summary>
+    [DefaultValue(StaticPasswordResetEmailExpiry)]
+    public TimeSpan PasswordResetEmailExpiry { get; set; } = TimeSpan.Parse(StaticPasswordResetEmailExpiry);
+
+    /// <summary>
+    ///     Gets or sets the expiry time for user invite emails.
+    /// </summary>
+    [DefaultValue(StaticUserInviteEmailExpiry)]
+    public TimeSpan UserInviteEmailExpiry { get; set; } = TimeSpan.Parse(StaticUserInviteEmailExpiry);
 }

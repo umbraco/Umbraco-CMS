@@ -2368,6 +2368,7 @@ export default {
 		openBackofficeSearch: 'Abrir pesquisa do backoffice',
 		openCloseBackofficeHelp: 'Abrir/Fechar ajuda do backoffice',
 		openCloseBackofficeProfileOptions: 'Abrir/Fechar as opções do seu perfil',
+		profileOptions: 'Opções perfil',
 		assignDomainDescription: 'Configurar Cultura e Domínios para %0%',
 		createDescription: 'Criar novo nó em %0%',
 		protectDescription: 'Configurar restrições de acesso em %0%',
@@ -2406,6 +2407,7 @@ export default {
 		searchContentTree: 'Pesquisar Árvore de Conteúdo',
 		maxAmount: 'Quantidade máxima',
 		expandChildItems: 'Expandir itens filhos para',
+		collapseChildItems: 'Fechar itens filhos para',
 		openContextNode: 'Abrir nó de contexto para',
 	},
 	references: {
@@ -2829,5 +2831,26 @@ export default {
 		resetUrlHeadline: 'Redefinir URL?',
 		resetUrlMessage: 'Tem a certeza que quer redefinir este URL?',
 		resetUrlLabel: 'Redefinir',
+	},
+	missingEditor: {
+		title: 'Este tipo de propriedade já não se encontra disponível.',
+		description:
+			'Não se preocupe, o seu conteúdo está seguro e a publicação deste documento não o substituirá nem removerá.<br/>Entre em contacto com o administrador do site para resolver o problema.',
+		detailsTitle: 'Detalhes adicionais',
+		detailsDescription:
+			'Para resolver o problema, deverá ou restaurar o editor de propriedades, ou alterar a propriedade para usar um tipo de dados compatível ou remover a propriedade se ela não for mais necessária.',
+		detailsDataType: 'Tipo de dados',
+		detailsPropertyEditor: 'Editor de propriedades',
+		detailsPropertyEditorUi: 'Interface do editor de propriedades',
+		detailsData: 'Dados',
+		detailsHide: 'Esconder detalhes',
+		detailsShow: 'Mostrar detalhes',
+		missingUiTitle: 'A interface do editor de propriedades configurada não foi encontrada.',
+		missingUiDetailsDescription:
+			'Esta interface do editor de propriedades não foi encontrada. Certifique-se de que esta está registada corretamente e que o alias corresponde à sua configuração.<br/>Para detalhes de implementação, consulte a <a href="https://docs.umbraco.com/umbraco-cms/customizing/property-editors/composition/property-editor-ui" target="_blank" rel="noopener">documentação</a>.',
+		dataTypeMissingEditor: 'Editor de propriedades não encontrado',
+		dataTypeMissingEditorMessage: 'Este editor de propriedades não foi encontrado.',
+		dataTypeMissingEditorUi: 'Interface do editor de propriedades não encontrada',
+		dataTypeMissingEditorUiMessage: 'Esta interface do editor de propriedades não foi encontrada.',
 	},
 } as UmbLocalizationDictionary;

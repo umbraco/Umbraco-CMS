@@ -1,11 +1,12 @@
 import { UMB_PARTIAL_VIEW_TREE_ALIAS } from '../tree/index.js';
+import { UMB_PARTIAL_VIEW_MENU_ITEM_ALIAS } from './constants.js';
 import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'menuItem',
 		kind: 'tree',
-		alias: 'Umb.MenuItem.PartialView',
+		alias: UMB_PARTIAL_VIEW_MENU_ITEM_ALIAS,
 		name: 'Partial View Menu Item',
 		weight: 40,
 		meta: {
@@ -16,9 +17,13 @@ export const manifests: Array<UmbExtensionManifest> = [
 	},
 	{
 		type: 'workspaceContext',
+		kind: 'menuStructure',
 		name: 'Partial View Menu Structure Workspace Context',
 		alias: 'Umb.Context.PartialView.Menu.Structure',
 		api: () => import('./partial-view-menu-structure.context.js'),
+		meta: {
+			menuItemAlias: UMB_PARTIAL_VIEW_MENU_ITEM_ALIAS,
+		},
 		conditions: [
 			{
 				alias: UMB_WORKSPACE_CONDITION_ALIAS,

@@ -18,6 +18,7 @@ export default {
 		changeDataType: 'Datentyp ändern',
 		copy: 'Kopieren',
 		create: 'Neu',
+		createFor: (name: string) => (name ? `Neu erstellen für ${name}` : 'Neu'),
 		export: 'Exportieren',
 		createPackage: 'Neues Paket',
 		createGroup: 'Neue Gruppe',
@@ -63,6 +64,7 @@ export default {
 		unlock: 'Freigeben',
 		createblueprint: 'Inhaltsvorlage anlegen',
 		resendInvite: 'Einladung erneut versenden',
+		viewActionsFor: (name: string) => (name ? `Aktionen anzeigen für ${name}` : 'Aktionen anzeigen'),
 	},
 	actionCategories: {
 		content: 'Inhalt',
@@ -770,6 +772,7 @@ export default {
 		design: 'Design',
 		dictionary: 'Wörterbuch',
 		dimensions: 'Abmessungen',
+		dividerPosition: (value: string | number) => `Trenner bei ${value}%`,
 		discard: 'Verwerfen',
 		down: 'nach unten',
 		download: 'Herunterladen',
@@ -1976,6 +1979,7 @@ export default {
 		openBackofficeSearch: 'Back-Office Suche öffnen',
 		openCloseBackofficeHelp: 'Back-Office Hilfe öffnen / schliessen',
 		openCloseBackofficeProfileOptions: 'Ihre Profil-Einstellungen öffnen / schliessen',
+		profileOptions: 'Profil-Einstellungen',
 	},
 	logViewer: {
 		selectAllLogLevelFilters: 'Wählen Sie Alle',
