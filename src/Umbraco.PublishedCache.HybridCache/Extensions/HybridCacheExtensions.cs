@@ -38,13 +38,12 @@ internal static class HybridCacheExtensions
     {
         var exists = true;
 
-        T? result = await cache.GetOrCreateAsync<object, T>(
+        T? result = await cache.GetOrCreateAsync(
             key,
-            null!,
-            (_, _) =>
+            async cancellationToken =>
             {
                 exists = false;
-                return new ValueTask<T>(default(T)!);
+                return default(T)!;
             },
             new HybridCacheEntryOptions(),
             null,
