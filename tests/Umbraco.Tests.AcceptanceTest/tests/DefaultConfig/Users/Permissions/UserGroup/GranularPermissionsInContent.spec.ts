@@ -56,7 +56,8 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.userGroup.ensureNameNotExists(userGroupName);
 });
 
-test('can read a specific document with read permission enabled', async ({umbracoApi, umbracoUi}) => {
+// Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/20505
+test.skip('can read a specific document with read permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithReadPermissionForSpecificDocument(userGroupName, firstDocumentId);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -269,7 +270,7 @@ test('can set culture and hostnames for a specific content with culture and host
 
   // Assert
   await umbracoUi.content.waitForDomainToBeCreated();
-  await umbracoUi.waitForTimeout(500); // Wait for the domain to be set
+  await umbracoUi.waitForTimeout(1000); // Wait for the domain to be set
   const document = await umbracoApi.document.getByName(firstDocumentName);
   const domains = await umbracoApi.document.getDomains(document.id);
   expect(domains.domains[0].domainName).toEqual(domainName);

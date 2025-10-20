@@ -1,4 +1,4 @@
-import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 
 const testUser = ConstantHelper.testUserCredentials;
 let testUserCookieAndToken = {cookie: "", accessToken: "", refreshToken: ""};
@@ -63,6 +63,7 @@ test('can see parent of start node but not access it', async ({umbracoApi, umbra
   // Assert
   await umbracoUi.media.isMediaTreeItemVisible(rootFolderName);
   await umbracoUi.media.goToMediaWithName(rootFolderName);
+  await umbracoUi.waitForTimeout(500); // Wait for workspace to load
   await umbracoUi.media.doesMediaWorkspaceHaveText('Access denied');
   await umbracoUi.media.openMediaCaretButtonForName(rootFolderName);
   await umbracoUi.media.isChildMediaVisible(rootFolderName, childFolderOneName);

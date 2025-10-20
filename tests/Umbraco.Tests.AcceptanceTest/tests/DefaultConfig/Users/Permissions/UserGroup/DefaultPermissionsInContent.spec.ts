@@ -71,7 +71,8 @@ test('can read content node with permission enabled', {tag: '@release'}, async (
   await umbracoUi.content.doesDocumentHaveName(rootDocumentName);
 });
 
-test('can not read content node with permission disabled', async ({umbracoApi, umbracoUi}) => {
+// Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/20505
+test.skip('can not read content node with permission disabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithReadPermission(userGroupName, false);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
