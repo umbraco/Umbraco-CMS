@@ -10,8 +10,8 @@ export class UmbTiptapToolbarGroupConfigurationElement<
 	TiptapToolbarItem extends UmbTiptapToolbarExtension = UmbTiptapToolbarExtension,
 > extends UmbLitElement {
 	#sorter = new UmbSorterController<TiptapToolbarItem, HTMLElement>(this, {
-		getUniqueOfElement: (element) => element.getAttribute('tiptap-toolbar-alias'),
-		getUniqueOfModel: (modelEntry) => modelEntry.alias!,
+		getUniqueOfElement: (element) => element.dataset.mark,
+		getUniqueOfModel: (modelEntry) => `tiptap-toolbar-item:${modelEntry.alias}`,
 		itemSelector: '.draggable',
 		identifier: 'umb-tiptap-toolbar-sorter',
 		containerSelector: '.items',
@@ -85,7 +85,6 @@ export class UmbTiptapToolbarGroupConfigurationElement<
 						look=${forbidden ? 'placeholder' : 'outline'}
 						label=${label}
 						title=${label}
-						tiptap-toolbar-alias=${item.alias}
 						@click=${() => this.#onRequestRemove(item, index)}>
 						<div class="inner">
 							<span>${label}</span>
@@ -117,7 +116,6 @@ export class UmbTiptapToolbarGroupConfigurationElement<
 						look=${forbidden ? 'placeholder' : 'outline'}
 						label=${label}
 						title=${label}
-						tiptap-toolbar-alias=${item.alias}
 						@click=${() => this.#onRequestRemove(item, index)}>
 						<div class="inner">
 							${when(
