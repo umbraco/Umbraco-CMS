@@ -270,7 +270,7 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
             "DELETE FROM " + Constants.DatabaseSchema.Tables.UserGroup2GranularPermission + " WHERE uniqueId IN (SELECT uniqueId FROM umbracoNode WHERE id = @id)",
             "DELETE FROM " + Constants.DatabaseSchema.Tables.UserStartNode + " WHERE startNode = @id",
             "UPDATE " + Constants.DatabaseSchema.Tables.UserGroup +
-            " SET startContentId = NULL WHERE startContentId = @id",
+            " SET startMediaId = NULL WHERE startMediaId = @id",
             "DELETE FROM " + Constants.DatabaseSchema.Tables.Relation + " WHERE parentId = @id",
             "DELETE FROM " + Constants.DatabaseSchema.Tables.Relation + " WHERE childId = @id",
             "DELETE FROM " + Constants.DatabaseSchema.Tables.TagRelationship + " WHERE nodeId = @id",
