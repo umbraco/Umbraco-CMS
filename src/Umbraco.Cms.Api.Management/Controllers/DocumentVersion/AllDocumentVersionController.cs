@@ -32,7 +32,7 @@ public class AllDocumentVersionController : DocumentVersionControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [EndpointSummary("Gets a paginated collection of versions for a specific document.")]
-    [EndpointDescription("A documentId is required. Culture, skip, and take parameters are optional. Returned is data relevant to that document, e.g., document type, user ID, version date, and whether it is the current published or draft version. This is useful when you need to find a document version ID for other queries.")]
+    [EndpointDescription("Gets a paginated collection of versions for a specific document and optional culture. Each result describes the version and includes details of the document type, editor, version date, and published status.")]
     public async Task<IActionResult> All(
         CancellationToken cancellationToken,
         [Required] Guid documentId,
