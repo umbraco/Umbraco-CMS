@@ -89,6 +89,14 @@ export class UmbPartialViewCreateOptionsModalElement extends UmbModalBaseElement
 			</uui-dialog-layout>
 		`;
 	}
+
+	static override styles = [
+		css`
+			uui-dialog-layout {
+				--uui-menu-item-flat-structure: 1;
+			}
+		`,
+	];
 }
 
 export default UmbPartialViewCreateOptionsModalElement;
