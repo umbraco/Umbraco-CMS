@@ -42,7 +42,7 @@ public class HybridCacheExtensionsTests
             .ReturnsAsync(expectedValue);
 
         // Act
-        var exists = await HybridCacheExtensions.ExistsAsync<ContentCacheNode?>(_cacheMock.Object, key);
+        var exists = await HybridCacheExtensions.ExistsAsync<ContentCacheNode?>(_cacheMock.Object, key, CancellationToken.None);
 
         // Assert
         Assert.IsTrue(exists);
@@ -74,7 +74,7 @@ public class HybridCacheExtensionsTests
             });
 
         // Act
-        var exists = await HybridCacheExtensions.ExistsAsync<ContentCacheNode?>(_cacheMock.Object, key);
+        var exists = await HybridCacheExtensions.ExistsAsync<ContentCacheNode?>(_cacheMock.Object, key, CancellationToken.None);
 
         // Assert
         Assert.IsFalse(exists);
@@ -98,7 +98,7 @@ public class HybridCacheExtensionsTests
             .ReturnsAsync(expectedValue);
 
         // Act
-        var (exists, value) = await HybridCacheExtensions.TryGetValueAsync<string>(_cacheMock.Object, key);
+        var (exists, value) = await HybridCacheExtensions.TryGetValueAsync<string>(_cacheMock.Object, key, CancellationToken.None);
 
         // Assert
         Assert.IsTrue(exists);
@@ -123,7 +123,7 @@ public class HybridCacheExtensionsTests
             .ReturnsAsync(expectedValue);
 
         // Act
-        var (exists, value) = await HybridCacheExtensions.TryGetValueAsync<int>(_cacheMock.Object, key);
+        var (exists, value) = await HybridCacheExtensions.TryGetValueAsync<int>(_cacheMock.Object, key, CancellationToken.None);
 
         // Assert
         Assert.IsTrue(exists);
@@ -147,7 +147,7 @@ public class HybridCacheExtensionsTests
             .ReturnsAsync(null!);
 
         // Act
-        var (exists, value) = await HybridCacheExtensions.TryGetValueAsync<int?>(_cacheMock.Object, key);
+        var (exists, value) = await HybridCacheExtensions.TryGetValueAsync<int?>(_cacheMock.Object, key, CancellationToken.None);
 
         // Assert
         Assert.IsTrue(exists);
@@ -179,7 +179,7 @@ public class HybridCacheExtensionsTests
             });
 
         // Act
-        var (exists, value) = await HybridCacheExtensions.TryGetValueAsync<object>(_cacheMock.Object, key);
+        var (exists, value) = await HybridCacheExtensions.TryGetValueAsync<object>(_cacheMock.Object, key, CancellationToken.None);
 
         // Assert
         Assert.IsFalse(exists);
