@@ -255,9 +255,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 	#renderGroup(group?: UmbTiptapToolbarGroupViewModel, rowIndex = 0, groupIndex = 0) {
 		if (!group) return nothing;
 		const showActionBar = this._toolbar[rowIndex].data.length > 1 && group.data.length === 0;
-		const items: UmbTiptapToolbarExtension[] = group!.data
-			.map((alias) => this.#context?.getExtensionByAlias(alias))
-			.filter((item): item is UmbTiptapToolbarExtension => !!item);
+		const items = group!.data.map((alias) => this.#context?.getExtensionByAlias(alias));
 		return html`
 			<div
 				class="group"
