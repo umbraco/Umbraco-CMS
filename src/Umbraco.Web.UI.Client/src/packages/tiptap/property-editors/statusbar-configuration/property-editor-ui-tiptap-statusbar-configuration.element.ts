@@ -161,7 +161,7 @@ export class UmbPropertyEditorUiTiptapStatusbarConfigurationElement
 			<uui-button
 				compact
 				class=${forbidden ? 'forbidden' : ''}
-				data-mark="tiptap-toolbar-item:${item.alias}"
+				data-mark="tiptap-statusbar-item:${item.alias}"
 				draggable="true"
 				label=${label}
 				look=${forbidden ? 'placeholder' : 'outline'}
@@ -212,30 +212,44 @@ export class UmbPropertyEditorUiTiptapStatusbarConfigurationElement
 
 	#renderItem(alias: string, areaIndex = 0, itemIndex = 0) {
 		const item = this.#context?.getExtensionByAlias(alias);
-		if (!item) return nothing;
 
 		const forbidden = !this.#context?.isExtensionEnabled(item.alias);
 		const label = this.localize.string(item.label);
 
-		return html`
-			<uui-button
-				compact
-				class=${forbidden ? 'forbidden' : ''}
-				data-mark="tiptap-toolbar-item:${item.alias}"
-				draggable="true"
-				label=${label}
-				look=${forbidden ? 'placeholder' : 'outline'}
-				title=${label}
-				?disabled=${forbidden}
-				@click=${() => this.#context.removeStatusbarItem([areaIndex, itemIndex])}
-				@dragend=${this.#onDragEnd}
-				@dragstart=${(e: DragEvent) => this.#onDragStart(e, alias, [areaIndex, itemIndex])}>
-				<div class="inner">
-					${when(item.icon, (icon) => html`<umb-icon .name=${icon}></umb-icon>`)}
-					<span>${label}</span>
-				</div>
-			</uui-button>
-		`;
+		switch (item.kind) {
+			case 'unknown':
+				return html`
+					<uui-button
+						compact
+						class="missing"
+						data-mark="tiptap-statusbar-item:${item.alias}"
+						color="danger"
+						look="placeholder"
+						label="Missing extension"
+						title="Missing extension: ${item.alias}"
+						@click=${() => this.#context.removeStatusbarItem([areaIndex, itemIndex])}></uui-button>
+				`;
+
+			default:
+				return html`
+					<uui-button
+						compact
+						class=${forbidden ? 'forbidden' : ''}
+						data-mark="tiptap-statusbar-item:${item.alias}"
+						draggable="true"
+						label=${label}
+						look=${forbidden ? 'placeholder' : 'outline'}
+						title=${label}
+						@click=${() => this.#context.removeStatusbarItem([areaIndex, itemIndex])}
+						@dragend=${this.#onDragEnd}
+						@dragstart=${(e: DragEvent) => this.#onDragStart(e, alias, [areaIndex, itemIndex])}>
+						<div class="inner">
+							${when(item.icon, (icon) => html`<umb-icon .name=${icon}></umb-icon>`)}
+							<span>${label}</span>
+						</div>
+					</uui-button>
+				`;
+		}
 	}
 
 	static override readonly styles = [
@@ -303,8 +317,8 @@ export class UmbPropertyEditorUiTiptapStatusbarConfigurationElement
 						--color-standalone: var(--uui-color-danger-standalone);
 						--color-emphasis: var(--uui-color-danger-emphasis);
 						--color-contrast: var(--uui-color-danger);
-						--uui-button-contrast-disabled: var(--uui-color-danger);
-						--uui-button-border-color-disabled: var(--uui-color-danger);
+						--uui-button-contrast: var(--uui-color-danger);
+						--uui-button-border-color: var(--uui-color-danger);
 					}
 
 					div {
