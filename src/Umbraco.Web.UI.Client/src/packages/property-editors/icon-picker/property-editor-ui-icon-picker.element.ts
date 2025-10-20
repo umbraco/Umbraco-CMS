@@ -19,7 +19,7 @@ export class UmbPropertyEditorUIIconPickerElement
 	extends UmbFormControlMixin<string, typeof UmbLitElement, undefined>(UmbLitElement, undefined)
 	implements UmbPropertyEditorUiElement
 {
-	@property({ type: Boolean, reflect: true })
+	@property({ type: Boolean })
 	mandatory = false;
 
 	protected override firstUpdated(): void {
@@ -63,11 +63,6 @@ export class UmbPropertyEditorUIIconPickerElement
 		if (!config) return;
 		const placeholder = config.getValueByAlias('placeholder');
 		this._placeholderIcon = typeof placeholder === 'string' ? placeholder : '';
-
-		const mandatoryCfg = config.getValueByAlias('mandatory');
-		if (typeof mandatoryCfg === 'boolean') {
-			this.mandatory = mandatoryCfg;
-		}
 	}
 
 	private async _openModal() {
