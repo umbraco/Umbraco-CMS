@@ -10,5 +10,11 @@ public class StyleSheetTreeService : FileSystemTreeServiceBase, IStyleSheetTreeS
 
     public StyleSheetTreeService(FileSystems fileSystems) =>
         _scriptFileSystem = fileSystems.StylesheetsFileSystem ??
-                            throw new ArgumentException("Missing partial views file system", nameof(fileSystems));
+                            throw new ArgumentException("Missing stylesheets file system", nameof(fileSystems));
+
+    public override string[] GetFiles(string path) => FileSystem
+        .GetFiles(path)
+        .Where(file => file.EndsWith(".css"))
+        .OrderBy(file => file)
+        .ToArray();
 }
