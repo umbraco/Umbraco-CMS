@@ -28,7 +28,7 @@ public class UpdatePreventCleanupDocumentVersionController : DocumentVersionCont
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [EndpointSummary("Sets the prevent clean up status for a document version.")]
-    [EndpointDescription("A document version id and prevent cleanup flag are required. This will set or unset the prevent cleanup flag on the specified document version.")]
+    [EndpointDescription("Sets the prevent clean up boolean status for a document version to the provided value. This controls whether the version will be a candidate for removal in content history clean up.")]
     public async Task<IActionResult> Set(CancellationToken cancellationToken, Guid id, bool preventCleanup)
     {
         Attempt<ContentVersionOperationStatus> attempt =
