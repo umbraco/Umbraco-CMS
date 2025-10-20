@@ -91,7 +91,7 @@ export class UmbPreviewContext extends UmbContextBase {
 		});
 	}
 
-	async #getPublishedUrl(): Promise<string | undefined | null> {
+	async #getPublishedUrl(): Promise<string | null> {
 		if (!this.#unique) return null;
 
 		// NOTE: We should be reusing `UmbDocumentUrlRepository` here, but the preview app doesn't register the `itemStore` extensions, so can't resolve/consume `UMB_DOCUMENT_URL_STORE_CONTEXT`. [LK]
@@ -185,7 +185,12 @@ export class UmbPreviewContext extends UmbContextBase {
 			this.#webSocket = undefined;
 		}
 
-		const url = (await this.#getPublishedUrl()) ?? (this.#previewUrl.getValue() as string);
+		let url = await this.#getPublishedUrl();
+
+		if (!url) {
+			url = this.#previewUrl.getValue() as string;
+		}
+
 		window.location.replace(url);
 	}
 
@@ -206,7 +211,12 @@ export class UmbPreviewContext extends UmbContextBase {
 	}
 
 	async openWebsite() {
-		const url = (await this.#getPublishedUrl()) ?? (this.#previewUrl.getValue() as string);
+		let url = await this.#getPublishedUrl();
+
+		if (!url) {
+			url = this.#previewUrl.getValue() as string;
+		}
+
 		window.open(url, '_blank');
 	}
 
