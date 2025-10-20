@@ -214,7 +214,7 @@ export class UmbPropertyEditorUiTiptapStatusbarConfigurationElement
 		const item = this.#context?.getExtensionByAlias(alias);
 
 		const forbidden = !this.#context?.isExtensionEnabled(item.alias);
-		const label = this.localize.string(item.label);
+		const label = this.localize.string(item.label) || item.alias;
 
 		switch (item.kind) {
 			case 'unknown':
