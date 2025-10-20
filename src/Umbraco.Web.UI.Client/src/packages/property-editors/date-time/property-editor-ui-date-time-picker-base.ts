@@ -225,6 +225,9 @@ export abstract class UmbPropertyEditorUiDateTimePickerElementBase
 				this._selectedTimeZone = pickedTimeZone.value;
 				return;
 			}
+		} else if (this.value?.date) {
+			// If there is no time zone in the value, but there is a date, we leave the time zone unselected
+			return;
 		}
 
 		// Check if we can pre-select the client time zone
@@ -305,7 +308,7 @@ export abstract class UmbPropertyEditorUiDateTimePickerElementBase
 
 	#updateValue(date: string | null) {
 		// Try to parse the date with the selected time zone
-		const newDate = date ? DateTime.fromISO(date, { zone: this._selectedTimeZone ?? 'UTC' }) : null;
+		const newDate = date ? DateTime.fromISO(date, { zone: this._selectedTimeZone || 'UTC' }) : null;
 
 		// If the date is invalid, we reset the value
 		if (!newDate || !newDate.isValid) {
@@ -325,10 +328,10 @@ export abstract class UmbPropertyEditorUiDateTimePickerElementBase
 		let timeZoneToStore = null;
 		if (!this._displayTimeZone || !this._timeZoneMode) {
 			timeZoneToStore = null;
-		} else if (this._timeZoneMode === 'local' || !this._selectedTimeZone) {
+		} else if (this._timeZoneMode === 'local') {
 			timeZoneToStore = 'UTC';
 		} else {
-			timeZoneToStore = this._selectedTimeZone;
+			timeZoneToStore = this._selectedTimeZone ?? null;
 		}
 
 		const dateToStore =
