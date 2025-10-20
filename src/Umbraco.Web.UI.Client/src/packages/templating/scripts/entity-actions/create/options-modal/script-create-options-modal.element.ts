@@ -47,17 +47,17 @@ export class UmbScriptCreateOptionsModalElement extends UmbModalBaseElement<UmbS
 
 	override render() {
 		return html`
-			<uui-dialog-layout headline="Create Script">
+			<uui-dialog-layout headline=${this.localize.term('general_create')}>
 				<uui-ref-list>
 					<!-- TODO: construct url -->
 					<umb-ref-item
-						name="New Javascript file"
+						name="Javascript file"
 						icon="icon-document-js"
 						href=${this.#getCreateHref()}
 						@click=${this.#onNavigate}>
 					</umb-ref-item>
 
-					<umb-ref-item name="New Folder..." icon="icon-folder" @open=${this.#onCreateFolderClick}></umb-ref-item>
+					<umb-ref-item name="Folder..." icon="icon-folder" @open=${this.#onCreateFolderClick}></umb-ref-item>
 				</uui-ref-list>
 
 				<uui-button slot="actions" id="cancel" label="Cancel" @click="${this._rejectModal}"></uui-button>

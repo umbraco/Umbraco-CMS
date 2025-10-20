@@ -79,10 +79,10 @@ export class UmbDocumentBlueprintOptionsCreateModalElement extends UmbModalBaseE
 
 	override render() {
 		return html`
-			<uui-dialog-layout headline=${this.localize.term('actions_createblueprint')}>
+			<uui-dialog-layout headline=${this.localize.term('general_create')}>
 				<uui-ref-list>
 					<umb-ref-item
-						name="New Document Blueprint for..."
+						name="Document Blueprint for..."
 						icon="icon-blueprint"
 						@open=${this.#onCreateBlueprintClick}></umb-ref-item>
 
