@@ -35,6 +35,9 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddScoped<IRequestStartItemProvider, RequestStartItemProvider>();
         builder.Services.AddScoped<RequestContextOutputExpansionStrategy>();
         builder.Services.AddScoped<RequestContextOutputExpansionStrategyV2>();
+
+        // Webooks register a more basic implementation, remove it.
+        builder.Services.RemoveAll(descriptor => descriptor.ServiceType == typeof(IOutputExpansionStrategy));
         builder.Services.AddScoped<IOutputExpansionStrategy>(provider =>
         {
             HttpContext? httpContext = provider.GetRequiredService<IHttpContextAccessor>().HttpContext;
@@ -49,14 +52,19 @@ public static class UmbracoBuilderExtensions
                 ? provider.GetRequiredService<RequestContextOutputExpansionStrategy>()
                 : provider.GetRequiredService<RequestContextOutputExpansionStrategyV2>();
         });
+
         builder.Services.AddSingleton<IRequestCultureService, RequestCultureService>();
         builder.Services.AddSingleton<IRequestSegmmentService, RequestSegmentService>();
         builder.Services.AddSingleton<IRequestSegmentService, RequestSegmentService>();
         builder.Services.AddSingleton<IRequestRoutingService, RequestRoutingService>();
         builder.Services.AddSingleton<IRequestRedirectService, RequestRedirectService>();
         builder.Services.AddSingleton<IRequestPreviewService, RequestPreviewService>();
+
+        // Webooks register a more basic implementation, remove it.
+        builder.Services.RemoveAll(descriptor => descriptor.ServiceType == typeof(IOutputExpansionStrategyAccessor));
         builder.Services.AddSingleton<IOutputExpansionStrategyAccessor, RequestContextOutputExpansionStrategyAccessor>();
         builder.Services.AddSingleton<IRequestStartItemProviderAccessor, RequestContextRequestStartItemProviderAccessor>();
+
         builder.Services.AddSingleton<IApiAccessService, ApiAccessService>();
         builder.Services.AddSingleton<IApiContentQueryService, ApiContentQueryService>();
         builder.Services.AddSingleton<IApiContentQueryProvider, ApiContentQueryProvider>();
