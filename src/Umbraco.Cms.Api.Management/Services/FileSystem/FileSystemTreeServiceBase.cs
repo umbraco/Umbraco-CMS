@@ -75,6 +75,7 @@ public abstract class FileSystemTreeServiceBase : IFileSystemTreeService
 
     public string[] GetFiles(string path) => FileSystem
         .GetFiles(path)
+        .Where(file => file.EndsWith(".css"))
         .OrderBy(file => file)
         .ToArray();
 
