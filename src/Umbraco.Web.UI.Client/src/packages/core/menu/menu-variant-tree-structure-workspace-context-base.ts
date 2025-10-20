@@ -7,9 +7,14 @@ import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbAncestorsEntityContext, UmbParentEntityContext, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
-import { UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import {
+	UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT,
+	UMB_VARIANT_WORKSPACE_CONTEXT,
+} from '@umbraco-cms/backoffice/workspace';
 import { linkEntityExpansionEntries } from '@umbraco-cms/backoffice/utils';
 import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 interface UmbMenuVariantTreeStructureWorkspaceContextBaseArgs {
 	treeRepositoryAlias: string;
@@ -31,11 +36,15 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 	 */
 	public readonly parent = this.#parent.asObservable();
 
+	protected _sectionContext?: typeof UMB_SECTION_CONTEXT.TYPE;
+
 	#parentContext = new UmbParentEntityContext(this);
 	#ancestorContext = new UmbAncestorsEntityContext(this);
 	#sectionSidebarMenuContext?: typeof UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT.TYPE;
 	#isModalContext: boolean = false;
 	#isNew: boolean | undefined = undefined;
+	#variantWorkspaceContext?: typeof UMB_VARIANT_WORKSPACE_CONTEXT.TYPE;
+	#workspaceActiveVariantId?: UmbVariantId;
 
 	public readonly IS_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT = true;
 
@@ -47,6 +56,16 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 
 		this.consumeContext(UMB_MODAL_CONTEXT, (modalContext) => {
 			this.#isModalContext = modalContext !== undefined;
+		});
+
+		this.consumeContext(UMB_SECTION_CONTEXT, (instance) => {
+			this._sectionContext = instance;
+		});
+
+		this.consumeContext(UMB_VARIANT_WORKSPACE_CONTEXT, (instance) => {
+			if (!instance) return;
+			this.#variantWorkspaceContext = instance;
+			this.#observeWorkspaceActiveVariant();
 		});
 
 		this.consumeContext(UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT, (instance) => {
@@ -73,6 +92,10 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 				this.#isNew = value;
 			});
 		});
+	}
+
+	getItemHref(structureItem: UmbVariantStructureItemModel): string | undefined {
+		return `section/${this._sectionContext?.getPathname()}/workspace/${structureItem.entityType}/edit/${structureItem.unique}/${this.#workspaceActiveVariantId?.toCultureString()}`;
 	}
 
 	async #requestStructure() {
@@ -189,6 +212,19 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 			};
 		});
 		this.#sectionSidebarMenuContext?.expansion.expandItems(expandableItemsWithMenuItem);
+	}
+
+	#observeWorkspaceActiveVariant() {
+		this.observe(
+			this.#variantWorkspaceContext?.splitView.activeVariantsInfo,
+			(value) => {
+				if (!value) return;
+				if (value?.length === 0) return;
+				this.#workspaceActiveVariantId = UmbVariantId.Create(value[0]);
+			},
+
+			'breadcrumbWorkspaceActiveVariantObserver',
+		);
 	}
 
 	override destroy(): void {
