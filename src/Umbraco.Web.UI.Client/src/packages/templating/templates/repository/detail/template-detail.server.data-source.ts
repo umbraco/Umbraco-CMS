@@ -169,6 +169,9 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 		if (!model) throw new Error('Template is missing');
 
 		const body: CreateTemplateForDocumentTypeRequestModel = {
+			id: model.unique,
+			name: model.name,
+			alias: model.alias,
 			documentType: { id: model.documentType.unique },
 		};
 

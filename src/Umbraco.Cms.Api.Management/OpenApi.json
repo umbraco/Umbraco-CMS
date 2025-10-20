@@ -37297,10 +37297,25 @@
       },
       "CreateTemplateForDocumentTypeRequestModel": {
         "required": [
-          "documentType"
+          "alias",
+          "documentType",
+          "name"
         ],
         "type": "object",
         "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "name": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "alias": {
+            "minLength": 1,
+            "type": "string"
+          },
           "documentType": {
             "oneOf": [
               {

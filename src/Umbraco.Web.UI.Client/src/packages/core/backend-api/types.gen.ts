@@ -382,6 +382,9 @@ export type CreateStylesheetRequestModel = {
 };
 
 export type CreateTemplateForDocumentTypeRequestModel = {
+    id?: string | null;
+    name: string;
+    alias: string;
     documentType: ReferenceByIdModel;
 };
 

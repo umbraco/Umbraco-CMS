@@ -28,11 +28,16 @@ public class CreateTemplateForDocumentTypeController : TemplateControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> CreateForDocumentType(CancellationToken cancellationToken, CreateTemplateForDocumentTypeRequestModel requestModel)
+    public async Task<IActionResult> CreateForDocumentType(
+        CancellationToken cancellationToken,
+        CreateTemplateForDocumentTypeRequestModel requestModel)
     {
         Attempt<ITemplate?, TemplateOperationStatus> result = await _templateService.CreateForContentTypeAsync(
+            requestModel.Name,
+            requestModel.Alias,
             requestModel.DocumentType.Id,
-            CurrentUserKey(_backOfficeSecurityAccessor));
+            CurrentUserKey(_backOfficeSecurityAccessor),
+            requestModel.Id);
 
         return result.Success
             ? CreatedAtId<ByKeyTemplateController>(controller => nameof(controller.ByKey), result.Result!.Key)

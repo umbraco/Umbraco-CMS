@@ -28,6 +28,7 @@ import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbPathPatternTypeAsEncodedParamsType } from '@umbraco-cms/backoffice/router';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import type { UmbRoutableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 
 type DetailModelType = UmbDocumentTypeDetailModel;
 export class UmbDocumentTypeWorkspaceContext
@@ -195,6 +196,9 @@ export class UmbDocumentTypeWorkspaceContext
 
 		const { data: template } = await this.#templateRepository.createForDocumentType({
 			entityType: UMB_TEMPLATE_ENTITY_TYPE,
+			unique: UmbId.new(),
+			name: this.getName() ?? '',
+			alias: this.getName() ?? '', // NOTE: Uses "name" over alias, as the server handle the template filename. [LK]
 			documentType: { unique: documentTypeUnique },
 		});
 		if (!template) throw new Error('Could not create template');
