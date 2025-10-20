@@ -274,16 +274,8 @@ export abstract class UmbPropertyEditorUiDateTimePickerElementBase
 			return;
 		}
 
-		if (!newPickerValue) {
-			this._datePickerValue = '';
-			this.value = undefined;
-			this._selectedDate = undefined;
-			this.dispatchEvent(new UmbChangeEvent());
-			return;
-		}
-
 		this._datePickerValue = newPickerValue;
-		this.#updateValue(value, true);
+		this.#updateValue(value);
 	}
 
 	#onTimeZoneChange(event: UUIComboboxEvent) {
@@ -311,7 +303,7 @@ export abstract class UmbPropertyEditorUiDateTimePickerElementBase
 		this.#updateValue(this._selectedDate.toISO({ includeOffset: false }));
 	}
 
-	#updateValue(date: string | null, updateOffsets = false) {
+	#updateValue(date: string | null) {
 		// Try to parse the date with the selected time zone
 		const newDate = date ? DateTime.fromISO(date, { zone: this._selectedTimeZone ?? 'UTC' }) : null;
 
@@ -323,17 +315,28 @@ export abstract class UmbPropertyEditorUiDateTimePickerElementBase
 			this.value = undefined;
 			this._selectedDate = undefined;
 			this.dispatchEvent(new UmbChangeEvent());
+			this.#updateOffsets(DateTime.now());
 			return;
 		}
 
+		const previousDate = this._selectedDate;
 		this._selectedDate = newDate;
 
-		const timeZoneToStore = this._selectedTimeZone && this._timeZoneMode !== 'local' ? this._selectedTimeZone : 'UTC';
-		const dateToStore = this._selectedTimeZone !== timeZoneToStore ? newDate.setZone(timeZoneToStore) : newDate;
+		let timeZoneToStore = null;
+		if (!this._displayTimeZone || !this._timeZoneMode) {
+			timeZoneToStore = null;
+		} else if (this._timeZoneMode === 'local' || !this._selectedTimeZone) {
+			timeZoneToStore = 'UTC';
+		} else {
+			timeZoneToStore = this._selectedTimeZone;
+		}
+
+		const dateToStore =
+			timeZoneToStore && this._selectedTimeZone !== timeZoneToStore ? newDate.setZone(timeZoneToStore) : newDate;
 
 		const newValue = {
 			date: this.#formatDateValue(dateToStore),
-			timeZone: this._timeZoneMode ? timeZoneToStore : null,
+			timeZone: timeZoneToStore,
 		};
 
 		// Only update the stored data if it has actually changed to avoid firing unnecessary change events
@@ -345,13 +348,19 @@ export abstract class UmbPropertyEditorUiDateTimePickerElementBase
 		this.value = newValue;
 		this.dispatchEvent(new UmbChangeEvent());
 
-		if (updateOffsets) {
-			this._timeZoneOptions.forEach((opt) => {
-				opt.offset = getTimeZoneOffset(opt.value, newDate);
-			});
-			// Update the time zone options (mostly for the offset)
-			this._filteredTimeZoneOptions = this._timeZoneOptions;
+		// Only update offsets if the date timestamp has changed
+		if (previousDate?.toUnixInteger() !== newDate.toUnixInteger()) {
+			this.#updateOffsets(newDate);
 		}
+	}
+
+	#updateOffsets(date: DateTime) {
+		if (!this._displayTimeZone) return;
+		this._timeZoneOptions.forEach((opt) => {
+			opt.offset = getTimeZoneOffset(opt.value, date);
+		});
+		// Update the time zone options (mostly for the offset)
+		this._filteredTimeZoneOptions = this._timeZoneOptions;
 	}
 
 	#formatDateValue(date: DateTime): string | null {
