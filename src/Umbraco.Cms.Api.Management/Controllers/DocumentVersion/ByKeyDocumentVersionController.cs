@@ -29,7 +29,7 @@ public class ByKeyDocumentVersionController : DocumentVersionControllerBase
     [ProducesResponseType(typeof(DocumentVersionResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [EndpointSummary("Gets a specific document version by its unique id")]
+    [EndpointSummary("Gets a specific document version.")]
     [EndpointDescription("A document version ID is required. Returned is data relevant to that document version, e.g., document type, user ID, version date, and whether it is the current published/draft version.")]
     public async Task<IActionResult> ByKey(CancellationToken cancellationToken, Guid id)
     {
