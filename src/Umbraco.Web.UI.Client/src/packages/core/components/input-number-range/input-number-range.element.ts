@@ -34,6 +34,9 @@ export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElemen
 		return this._minValue;
 	}
 
+	@property({ type: Boolean })
+	required = false;
+
 	@state()
 	private _maxValue?: number;
 
@@ -99,6 +102,12 @@ export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElemen
 				return this._minValue !== undefined && this._maxValue !== undefined ? this._minValue > this._maxValue : false;
 			},
 		);
+
+		this.addValidator(
+			'valueMissing',
+			() => '#validation_fieldIsMandatory',
+			() => this.required && (this._minValue == null || this._maxValue == null),
+		);
 	}
 
 	override firstUpdated() {
@@ -129,7 +138,8 @@ export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElemen
 				min=${ifDefined(this.validationRange?.min)}
 				max=${ifDefined(this.validationRange?.max)}
 				placeholder=${this._minPlaceholder}
-				.value=${this._minValue}
+				?required=${this.required}
+				.value=${this._minValue?.toString() ?? ''}
 				@input=${this.#onMinInput}></uui-input>
 			<b>–</b>
 			<uui-input
@@ -138,7 +148,8 @@ export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElemen
 				min=${ifDefined(this.validationRange?.min)}
 				max=${ifDefined(this.validationRange?.max)}
 				placeholder=${this._maxPlaceholder}
-				.value=${this._maxValue}
+				?required=${this.required}
+				.value=${this._maxValue?.toString() ?? ''}
 				@input=${this.#onMaxInput}></uui-input>
 		`;
 	}
