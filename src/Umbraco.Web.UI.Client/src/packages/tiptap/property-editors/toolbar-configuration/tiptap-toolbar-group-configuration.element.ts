@@ -12,7 +12,7 @@ export class UmbTiptapToolbarGroupConfigurationElement<
 	#sorter = new UmbSorterController<TiptapToolbarItem, HTMLElement>(this, {
 		getUniqueOfElement: (element) => element.getAttribute('tiptap-toolbar-alias'),
 		getUniqueOfModel: (modelEntry) => modelEntry.alias!,
-		itemSelector: 'uui-button',
+		itemSelector: '.draggable',
 		identifier: 'umb-tiptap-toolbar-sorter',
 		containerSelector: '.items',
 		resolvePlacement: UmbSorterResolvePlacementAsGrid,
@@ -71,7 +71,7 @@ export class UmbTiptapToolbarGroupConfigurationElement<
 	}
 
 	#renderItem(item: TiptapToolbarItem, index = 0) {
-		const label = this.localize.string(item.label);
+		const label = this.localize.string(item.label) || item.alias;
 		const forbidden = !this.#context?.isExtensionEnabled(item.alias);
 
 		switch (item.kind) {
@@ -80,12 +80,11 @@ export class UmbTiptapToolbarGroupConfigurationElement<
 				return html`
 					<uui-button
 						compact
-						class=${forbidden ? 'forbidden' : ''}
+						class="draggable ${forbidden ? 'forbidden' : ''}"
 						data-mark="tiptap-toolbar-item:${item.alias}"
 						look=${forbidden ? 'placeholder' : 'outline'}
 						label=${label}
 						title=${label}
-						?disabled=${forbidden}
 						tiptap-toolbar-alias=${item.alias}
 						@click=${() => this.#onRequestRemove(item, index)}>
 						<div class="inner">
@@ -95,17 +94,29 @@ export class UmbTiptapToolbarGroupConfigurationElement<
 					</uui-button>
 				`;
 
+			case 'unknown':
+				return html`
+					<uui-button
+						compact
+						data-mark="tiptap-toolbar-item:${item.alias}"
+						color="danger"
+						look="placeholder"
+						label="Missing extension"
+						title="Missing extension: ${item.alias}"
+						@click=${() => this.#onRequestRemove(item, index)}></uui-button>
+				`;
+
 			case 'button':
+			case 'colorPickerButton':
 			default:
 				return html`
 					<uui-button
 						compact
-						class=${forbidden ? 'forbidden' : ''}
+						class="draggable ${forbidden ? 'forbidden' : ''}"
 						data-mark="tiptap-toolbar-item:${item.alias}"
 						look=${forbidden ? 'placeholder' : 'outline'}
 						label=${label}
 						title=${label}
-						?disabled=${forbidden}
 						tiptap-toolbar-alias=${item.alias}
 						@click=${() => this.#onRequestRemove(item, index)}>
 						<div class="inner">
@@ -131,14 +142,9 @@ export class UmbTiptapToolbarGroupConfigurationElement<
 				uui-button {
 					--uui-button-font-weight: normal;
 
-					&[draggable='true'],
-					&[draggable='true'] > .inner {
+					&.draggable,
+					&.draggable > .inner {
 						cursor: move;
-					}
-
-					&[disabled],
-					&[disabled] > .inner {
-						cursor: not-allowed;
 					}
 
 					&.forbidden {
@@ -146,8 +152,8 @@ export class UmbTiptapToolbarGroupConfigurationElement<
 						--color-standalone: var(--uui-color-danger-standalone);
 						--color-emphasis: var(--uui-color-danger-emphasis);
 						--color-contrast: var(--uui-color-danger);
-						--uui-button-contrast-disabled: var(--uui-color-danger);
-						--uui-button-border-color-disabled: var(--uui-color-danger);
+						--uui-button-contrast: var(--uui-color-danger);
+						--uui-button-border-color: var(--uui-color-danger);
 					}
 
 					div {
