@@ -412,7 +412,7 @@ export type CreateUserGroupRequestModel = {
     mediaStartNode?: ReferenceByIdModel | null;
     mediaRootAccess: boolean;
     fallbackPermissions: Array<string>;
-    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
+    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | DocumentTypePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
     id?: string | null;
 };
 
@@ -471,7 +471,7 @@ export type CurrentUserResponseModel = {
     hasAccessToAllLanguages: boolean;
     hasAccessToSensitiveData: boolean;
     fallbackPermissions: Array<string>;
-    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
+    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | DocumentTypePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
     allowedSections: Array<string>;
     isAdmin: boolean;
 };
@@ -659,6 +659,9 @@ export type DocumentConfigurationResponseModel = {
     disableDeleteWhenReferenced: boolean;
     disableUnpublishWhenReferenced: boolean;
     allowEditInvariantFromNonDefault: boolean;
+    /**
+     * @deprecated
+     */
     allowNonExistingSegmentsCreation: boolean;
 };
 
@@ -791,6 +794,12 @@ export type DocumentTypeItemResponseModel = {
     description?: string | null;
 };
 
+export type DocumentTypePermissionPresentationModel = {
+    $type: string;
+    verbs: Array<string>;
+    documentTypeAlias: string;
+};
+
 export type DocumentTypePropertyTypeContainerResponseModel = {
     id: string;
     parent?: ReferenceByIdModel | null;
@@ -920,7 +929,8 @@ export enum DocumentVariantStateModel {
     NOT_CREATED = 'NotCreated',
     DRAFT = 'Draft',
     PUBLISHED = 'Published',
-    PUBLISHED_PENDING_CHANGES = 'PublishedPendingChanges'
+    PUBLISHED_PENDING_CHANGES = 'PublishedPendingChanges',
+    TRASHED = 'Trashed'
 }
 
 export type DocumentVersionItemResponseModel = {
@@ -2822,7 +2832,7 @@ export type UpdateUserGroupRequestModel = {
     mediaStartNode?: ReferenceByIdModel | null;
     mediaRootAccess: boolean;
     fallbackPermissions: Array<string>;
-    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
+    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | DocumentTypePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
 };
 
 export type UpdateUserGroupsOnUserRequestModel = {
@@ -2923,7 +2933,7 @@ export type UserGroupResponseModel = {
     mediaStartNode?: ReferenceByIdModel | null;
     mediaRootAccess: boolean;
     fallbackPermissions: Array<string>;
-    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
+    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | DocumentTypePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
     id: string;
     isDeletable: boolean;
     aliasCanBeChanged: boolean;
