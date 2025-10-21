@@ -293,6 +293,7 @@ export default {
 		titleOptional: 'Title (optional)',
 		altTextOptional: 'Alternative text (optional)',
 		captionTextOptional: 'Caption (optional)',
+		trashed: 'Trashed',
 		type: 'Type',
 		unpublish: 'Unpublish',
 		unpublished: 'Unpublished',
