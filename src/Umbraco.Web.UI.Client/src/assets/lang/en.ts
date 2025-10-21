@@ -2749,6 +2749,8 @@ export default {
 			'You are in Preview Mode, do you want exit in order to view the published version of your website?',
 		viewPublishedContentAcceptButton: 'View published version',
 		viewPublishedContentDeclineButton: 'Stay in preview mode',
+		connectionFailed: 'Could not establish a connection to the server, preview live updates will not work.',
+		connectionLost: 'Connection to the server lost, preview live updates will not work.',
 	},
 	permissions: {
 		FolderCreation: 'Folder creation',

@@ -7,6 +7,9 @@ import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbDocumentPreviewRepository } from '@umbraco-cms/backoffice/document';
 import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { HubConnectionBuilder, type HubConnection } from '@umbraco-cms/backoffice/external/signalr';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 
 const UMB_LOCALSTORAGE_SESSION_KEY = 'umb:previewSessions';
 
@@ -31,7 +34,7 @@ export class UmbPreviewContext extends UmbContextBase {
 	#culture?: string | null;
 	#segment?: string | null;
 	#serverUrl: string = '';
-	#webSocket?: WebSocket;
+	#connection?: HubConnection;
 
 	#iframeReady = new UmbBooleanState(false);
 	public readonly iframeReady = this.#iframeReady.asObservable();
@@ -41,12 +44,13 @@ export class UmbPreviewContext extends UmbContextBase {
 
 	#documentPreviewRepository = new UmbDocumentPreviewRepository(this);
 
+	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
+	#localize = new UmbLocalizationController(this);
+
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_PREVIEW_CONTEXT);
 
 		this.consumeContext(UMB_SERVER_CONTEXT, (instance) => {
-			this.#serverUrl = instance?.getServerUrl() ?? '';
-
 			const params = new URLSearchParams(window.location.search);
 
 			this.#unique = params.get('id');
@@ -58,37 +62,62 @@ export class UmbPreviewContext extends UmbContextBase {
 				return;
 			}
 
-			this.#setPreviewUrl();
+			const serverUrl = instance?.getServerUrl();
+
+			if (!serverUrl) {
+				console.error('No server URL found in context');
+				return;
+			}
+
+			this.#serverUrl = serverUrl;
+
+			this.#setPreviewUrl({ serverUrl });
+
+			this.#initHubConnection(serverUrl);
+		});
+
+		this.consumeContext(UMB_NOTIFICATION_CONTEXT, (instance) => {
+			this.#notificationContext = instance;
 		});
 	}
 
-	#configureWebSocket() {
-		if (this.#webSocket && this.#webSocket.readyState < 2) return;
+	async #initHubConnection(serverUrl: string) {
+		const previewHubUrl = `${serverUrl}/umbraco/PreviewHub`;
 
-		const url = `${this.#serverUrl.replace('https://', 'wss://')}/umbraco/PreviewHub`;
+		// Make sure that no previous connection exists.
+		if (this.#connection) {
+			await this.#connection.stop();
+			this.#connection = undefined;
+		}
 
-		this.#webSocket = new WebSocket(url);
+		this.#connection = new HubConnectionBuilder().withUrl(previewHubUrl).build();
 
-		this.#webSocket.addEventListener('open', () => {
-			// NOTE: SignalR protocol handshake; it requires a terminating control character.
-			const endChar = String.fromCharCode(30);
-			this.#webSocket?.send(`{"protocol":"json","version":1}${endChar}`);
-		});
-
-		this.#webSocket.addEventListener('message', (event: MessageEvent<string>) => {
-			if (!event?.data) return;
-
-			// NOTE: Strip the terminating control character, (from SignalR).
-			const data = event.data.substring(0, event.data.length - 1);
-			const json = JSON.parse(data) as { type: number; target: string; arguments: Array<string> };
-
-			if (json.type === 1 && json.target === 'refreshed') {
-				const pageId = json.arguments?.[0];
-				if (pageId === this.#unique) {
-					this.#setPreviewUrl({ rnd: Math.random() });
-				}
+		this.#connection.on('refreshed', (payload) => {
+			if (payload === this.#unique) {
+				this.#setPreviewUrl({ rnd: Math.random() });
 			}
 		});
+
+		this.#connection.onclose(() => {
+			this.#notificationContext?.peek('warning', {
+				data: {
+					headline: this.#localize.term('general_preview'),
+					message: this.#localize.term('preview_connectionLost'),
+				},
+			});
+		});
+
+		try {
+			await this.#connection.start();
+		} catch (error) {
+			console.error('The SignalR connection could not be established', error);
+			this.#notificationContext?.peek('warning', {
+				data: {
+					headline: this.#localize.term('general_preview'),
+					message: this.#localize.term('preview_connectionFailed'),
+				},
+			});
+		}
 	}
 
 	async #getPublishedUrl(): Promise<string | null> {
@@ -144,7 +173,7 @@ export class UmbPreviewContext extends UmbContextBase {
 			params.delete(segmentParam);
 		}
 
-		const previewUrl = new URL(url.pathname + '?' + params.toString(), host);
+		const previewUrl = new URL(`${url.pathname}?${params.toString()}`, host);
 		const previewUrlString = previewUrl.toString();
 
 		this.#previewUrl.setValue(previewUrlString);
@@ -180,9 +209,9 @@ export class UmbPreviewContext extends UmbContextBase {
 			await this.#documentPreviewRepository.exit();
 		}
 
-		if (this.#webSocket) {
-			this.#webSocket.close();
-			this.#webSocket = undefined;
+		if (this.#connection) {
+			await this.#connection.stop();
+			this.#connection = undefined;
 		}
 
 		let url = await this.#getPublishedUrl();
@@ -202,7 +231,6 @@ export class UmbPreviewContext extends UmbContextBase {
 
 	iframeLoaded(iframe: HTMLIFrameElement) {
 		if (!iframe) return;
-		this.#configureWebSocket();
 		this.#iframeReady.setValue(true);
 	}
 
