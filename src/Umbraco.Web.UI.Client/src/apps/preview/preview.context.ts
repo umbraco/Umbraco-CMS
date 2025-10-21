@@ -204,7 +204,7 @@ export class UmbPreviewContext extends UmbContextBase {
 		}
 
 		if (this.#connection) {
-			this.#connection.stop();
+			await this.#connection.stop();
 			this.#connection = undefined;
 		}
 
