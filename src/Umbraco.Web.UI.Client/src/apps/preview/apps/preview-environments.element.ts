@@ -1,9 +1,9 @@
 import { UMB_PREVIEW_CONTEXT } from '../preview.context.js';
 import { css, customElement, html, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { umbPeekError } from '@umbraco-cms/backoffice/notification';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbDocumentPreviewRepository } from '@umbraco-cms/backoffice/document';
-import { umbPeekError } from '@umbraco-cms/backoffice/notification';
 
 type UmbPreviewEnvironmentItem = {
 	alias: string;

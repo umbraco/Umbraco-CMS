@@ -1,5 +1,7 @@
 import type { ManifestPreviewAppProvider } from '@umbraco-cms/backoffice/extension-registry';
 
+// TODO: [LK] Create a new "preview" package and move these extensions/manifests there.
+
 export const manifests: Array<ManifestPreviewAppProvider> = [
 	{
 		type: 'previewApp',
@@ -13,14 +15,14 @@ export const manifests: Array<ManifestPreviewAppProvider> = [
 		alias: 'Umb.PreviewApps.Culture',
 		name: 'Preview: Culture Switcher',
 		element: () => import('./preview-culture.element.js'),
-		weight: 300,
+		weight: 310,
 	},
 	{
 		type: 'previewApp',
 		alias: 'Umb.PreviewApps.Segment',
 		name: 'Preview: Segment Switcher',
 		element: () => import('./preview-segment.element.js'),
-		weight: 290,
+		weight: 300,
 	},
 	{
 		type: 'previewApp',

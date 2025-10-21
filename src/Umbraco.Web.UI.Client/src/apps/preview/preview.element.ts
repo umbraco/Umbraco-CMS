@@ -89,7 +89,7 @@ export class UmbPreviewElement extends UmbLitElement {
 		if (!this._previewUrl) return nothing;
 		return html`
 			${when(!this._iframeReady, () => html`<div id="loading"><uui-loader-circle></uui-loader-circle></div>`)}
-			<div id="wrapper">
+			<div id="wrapper" class="fullsize">
 				<div id="container">
 					<iframe
 						src=${this._previewUrl}

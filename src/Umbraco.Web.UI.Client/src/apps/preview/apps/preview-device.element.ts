@@ -1,5 +1,5 @@
 import { UMB_PREVIEW_CONTEXT } from '../preview.context.js';
-import { css, customElement, html, ifDefined, property, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, ifDefined, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 export interface UmbPreviewDevice {
@@ -59,26 +59,50 @@ export class UmbPreviewDeviceElement extends UmbLitElement {
 		},
 	];
 
+	#previewContext?: typeof UMB_PREVIEW_CONTEXT.TYPE;
+
 	@property({ attribute: false, type: Object })
 	device = this.#devices[0];
 
-	override connectedCallback() {
-		super.connectedCallback();
-		this.#changeDevice(this.device);
+	@state()
+	private _popoverOpen = false;
+
+	constructor() {
+		super();
+
+		this.consumeContext(UMB_PREVIEW_CONTEXT, (previewContext) => {
+			this.#previewContext = previewContext;
+		});
 	}
 
-	async #changeDevice(device: UmbPreviewDevice) {
+	override connectedCallback() {
+		super.connectedCallback();
+		this.hidden = true;
+		this.#loadDevices();
+	}
+
+	async #loadDevices() {
+		// TODO: [LK] Eventually, load devices from extension points.
+		this.hidden = false;
+	}
+
+	async #onClick(device: UmbPreviewDevice) {
 		if (device === this.device) return;
 
 		this.device = device;
 
-		const previewContext = await this.getContext(UMB_PREVIEW_CONTEXT);
-
-		previewContext?.updateIFrame({
+		this.#previewContext?.updateIFrame({
 			wrapperClass: device.alias,
 			height: device.dimensions.height,
 			width: device.dimensions.width,
 		});
+	}
+
+	#onPopoverToggle(event: ToggleEvent) {
+		// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		this._popoverOpen = event.newState === 'open';
 	}
 
 	override render() {
@@ -88,17 +112,15 @@ export class UmbPreviewDeviceElement extends UmbLitElement {
 					<uui-icon name=${this.device.icon} class=${ifDefined(this.device.iconClass)}></uui-icon>
 					<span>${this.device.label}</span>
 				</div>
+				<uui-symbol-expand slot="extra" id="expand-symbol" .open=${this._popoverOpen}></uui-symbol-expand>
 			</uui-button>
-			<uui-popover-container id="devices-popover" placement="top-end">
+			<uui-popover-container id="devices-popover" placement="top-end" @toggle=${this.#onPopoverToggle}>
 				<umb-popover-layout>
 					${repeat(
 						this.#devices,
 						(item) => item.alias,
 						(item) => html`
-							<uui-menu-item
-								label=${item.label}
-								?active=${item === this.device}
-								@click=${() => this.#changeDevice(item)}>
+							<uui-menu-item label=${item.label} ?active=${item === this.device} @click=${() => this.#onClick(item)}>
 								<uui-icon slot="icon" name=${item.icon} class=${ifDefined(item.iconClass)}></uui-icon>
 							</uui-menu-item>
 						`,
@@ -116,12 +138,26 @@ export class UmbPreviewDeviceElement extends UmbLitElement {
 				--uui-button-font-weight: 400;
 				--uui-button-padding-left-factor: 3;
 				--uui-button-padding-right-factor: 3;
+				--uui-menu-item-flat-structure: 1;
+			}
+
+			:host([hidden]) {
+				display: none;
+			}
+
+			#expand-symbol {
+				transform: rotate(-90deg);
+				margin-left: var(--uui-size-space-3, 9px);
+
+				&[open] {
+					transform: rotate(0deg);
+				}
 			}
 
 			uui-button > div {
 				display: flex;
 				align-items: center;
-				gap: 5px;
+				gap: var(--uui-size-2, 6px);
 			}
 
 			uui-icon.flip {

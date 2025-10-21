@@ -1,15 +1,8 @@
 import { UMB_PREVIEW_CONTEXT } from '../preview.context.js';
-import {
-	css,
-	customElement,
-	html,
-	nothing,
-	repeat,
-	state,
-	type PropertyValues,
-} from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbSegmentCollectionRepository, type UmbSegmentCollectionItemModel } from '@umbraco-cms/backoffice/segment';
+import { UmbSegmentCollectionRepository } from '@umbraco-cms/backoffice/segment';
+import type { UmbSegmentCollectionItemModel } from '@umbraco-cms/backoffice/segment';
 
 @customElement('umb-preview-segment')
 export class UmbPreviewSegmentElement extends UmbLitElement {
@@ -21,8 +14,12 @@ export class UmbPreviewSegmentElement extends UmbLitElement {
 	@state()
 	private _segments: Array<UmbSegmentCollectionItemModel> = [];
 
-	protected override firstUpdated(_changedProperties: PropertyValues): void {
-		super.firstUpdated(_changedProperties);
+	@state()
+	private _popoverOpen = false;
+
+	override connectedCallback() {
+		super.connectedCallback();
+		this.hidden = true;
 		this.#loadSegments();
 	}
 
@@ -36,6 +33,8 @@ export class UmbPreviewSegmentElement extends UmbLitElement {
 		if (segment && segment !== this._segment?.unique) {
 			this._segment = this._segments.find((c) => c.unique === segment);
 		}
+
+		this.hidden = !this._segments.length;
 	}
 
 	async #onClick(segment?: UmbSegmentCollectionItemModel) {
@@ -46,6 +45,13 @@ export class UmbPreviewSegmentElement extends UmbLitElement {
 		previewContext?.updateIFrame({ segment: segment?.unique });
 	}
 
+	#onPopoverToggle(event: ToggleEvent) {
+		// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		this._popoverOpen = event.newState === 'open';
+	}
+
 	override render() {
 		if (!this._segments.length) return nothing;
 		return html`
@@ -54,8 +60,9 @@ export class UmbPreviewSegmentElement extends UmbLitElement {
 					<uui-icon name="icon-filter"></uui-icon>
 					<span>${this._segment?.name ?? 'Segments'}</span>
 				</div>
+				<uui-symbol-expand slot="extra" id="expand-symbol" .open=${this._popoverOpen}></uui-symbol-expand>
 			</uui-button>
-			<uui-popover-container id="segments-popover" placement="top-end">
+			<uui-popover-container id="segments-popover" placement="top-end" @toggle=${this.#onPopoverToggle}>
 				<umb-popover-layout>
 					<uui-menu-item label="Default" ?active=${!this._segment} @click=${() => this.#onClick()}></uui-menu-item>
 					${repeat(
@@ -82,12 +89,26 @@ export class UmbPreviewSegmentElement extends UmbLitElement {
 				--uui-button-font-weight: 400;
 				--uui-button-padding-left-factor: 3;
 				--uui-button-padding-right-factor: 3;
+				--uui-menu-item-flat-structure: 1;
+			}
+
+			:host([hidden]) {
+				display: none;
+			}
+
+			#expand-symbol {
+				transform: rotate(-90deg);
+				margin-left: var(--uui-size-space-3, 9px);
+
+				&[open] {
+					transform: rotate(0deg);
+				}
 			}
 
 			uui-button > div {
 				display: flex;
 				align-items: center;
-				gap: 5px;
+				gap: var(--uui-size-2, 6px);
 			}
 
 			umb-popover-layout {

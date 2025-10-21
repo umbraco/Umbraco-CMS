@@ -14,12 +14,16 @@ export class UmbPreviewCultureElement extends UmbLitElement {
 	@state()
 	private _cultures: Array<UmbLanguageDetailModel> = [];
 
+	@state()
+	private _popoverOpen = false;
+
 	override connectedCallback() {
 		super.connectedCallback();
-		this.#getCultures();
+		this.hidden = true;
+		this.#loadCultures();
 	}
 
-	async #getCultures() {
+	async #loadCultures() {
 		const { data: langauges } = await this.#languageRepository.requestCollection({ skip: 0, take: 100 });
 		this._cultures = langauges?.items ?? [];
 
@@ -29,6 +33,8 @@ export class UmbPreviewCultureElement extends UmbLitElement {
 		if (culture && culture !== this._culture?.unique) {
 			this._culture = this._cultures.find((c) => c.unique === culture);
 		}
+
+		this.hidden = !this._cultures.length;
 	}
 
 	async #onClick(culture: UmbLanguageDetailModel) {
@@ -39,6 +45,13 @@ export class UmbPreviewCultureElement extends UmbLitElement {
 		previewContext?.updateIFrame({ culture: culture.unique });
 	}
 
+	#onPopoverToggle(event: ToggleEvent) {
+		// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		this._popoverOpen = event.newState === 'open';
+	}
+
 	override render() {
 		if (this._cultures.length <= 1) return nothing;
 		return html`
@@ -47,8 +60,9 @@ export class UmbPreviewCultureElement extends UmbLitElement {
 					<uui-icon name="icon-globe"></uui-icon>
 					<span>${this._culture?.name ?? this.localize.term('treeHeaders_languages')}</span>
 				</div>
+				<uui-symbol-expand slot="extra" id="expand-symbol" .open=${this._popoverOpen}></uui-symbol-expand>
 			</uui-button>
-			<uui-popover-container id="cultures-popover" placement="top-end">
+			<uui-popover-container id="cultures-popover" placement="top-end" @toggle=${this.#onPopoverToggle}>
 				<umb-popover-layout>
 					${repeat(
 						this._cultures,
@@ -75,12 +89,26 @@ export class UmbPreviewCultureElement extends UmbLitElement {
 				--uui-button-font-weight: 400;
 				--uui-button-padding-left-factor: 3;
 				--uui-button-padding-right-factor: 3;
+				--uui-menu-item-flat-structure: 1;
+			}
+
+			:host([hidden]) {
+				display: none;
+			}
+
+			#expand-symbol {
+				transform: rotate(-90deg);
+				margin-left: var(--uui-size-space-3, 9px);
+
+				&[open] {
+					transform: rotate(0deg);
+				}
 			}
 
 			uui-button > div {
 				display: flex;
 				align-items: center;
-				gap: 5px;
+				gap: var(--uui-size-2, 6px);
 			}
 
 			umb-popover-layout {

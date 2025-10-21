@@ -33,7 +33,7 @@ export class UmbPreviewOpenWebsiteElement extends UmbLitElement {
 			uui-button > div {
 				display: flex;
 				align-items: center;
-				gap: 5px;
+				gap: var(--uui-size-2, 6px);
 			}
 		`,
 	];

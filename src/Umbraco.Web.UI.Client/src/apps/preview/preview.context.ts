@@ -31,11 +31,14 @@ interface UmbPreviewUrlArgs {
 }
 
 export class UmbPreviewContext extends UmbContextBase {
-	#currentArgs: UmbPreviewIframeArgs = {};
-	#serverUrl: string = '';
 	#connection?: HubConnection;
+	#currentArgs: UmbPreviewIframeArgs = {};
+	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
+	#serverUrl: string = '';
 
 	#documentPreviewRepository = new UmbDocumentPreviewRepository(this);
+
+	#localize = new UmbLocalizationController(this);
 
 	#culture = new UmbStringState(undefined);
 	public readonly culture = this.#culture.asObservable();
@@ -52,13 +55,10 @@ export class UmbPreviewContext extends UmbContextBase {
 	#unique = new UmbStringState(undefined);
 	public readonly unique = this.#unique.asObservable();
 
-	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
-	#localize = new UmbLocalizationController(this);
-
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_PREVIEW_CONTEXT);
 
-		this.consumeContext(UMB_SERVER_CONTEXT, (instance) => {
+		this.consumeContext(UMB_SERVER_CONTEXT, (serverContext) => {
 			const params = new URLSearchParams(window.location.search);
 
 			this.#unique.setValue(params.get('id') ?? undefined);
@@ -78,7 +78,7 @@ export class UmbPreviewContext extends UmbContextBase {
 				this.#currentArgs.segment = this.#segment.getValue();
 			}
 
-			const serverUrl = instance?.getServerUrl();
+			const serverUrl = serverContext?.getServerUrl();
 
 			if (!serverUrl) {
 				console.error('No server URL found in context');
@@ -92,8 +92,8 @@ export class UmbPreviewContext extends UmbContextBase {
 			this.#initHubConnection(serverUrl);
 		});
 
-		this.consumeContext(UMB_NOTIFICATION_CONTEXT, (instance) => {
-			this.#notificationContext = instance;
+		this.consumeContext(UMB_NOTIFICATION_CONTEXT, (notificationContext) => {
+			this.#notificationContext = notificationContext;
 		});
 	}
 
