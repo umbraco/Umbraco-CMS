@@ -260,6 +260,7 @@ test('can set culture and hostnames for a specific content with culture and host
   testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
+  await umbracoApi.document.publish(firstDocumentId);
 
   // Act
   await umbracoUi.content.clickActionsMenuForContent(secondDocumentName);
