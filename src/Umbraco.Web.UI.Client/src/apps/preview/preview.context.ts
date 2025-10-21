@@ -84,6 +84,12 @@ export class UmbPreviewContext extends UmbContextBase {
 	async #initHubConnection(serverUrl: string) {
 		const previewHubUrl = `${serverUrl}/umbraco/PreviewHub`;
 
+		// Make sure that no previous connection exists.
+		if (this.#connection) {
+			await this.#connection.stop();
+			this.#connection = undefined;
+		}
+
 		this.#connection = new HubConnectionBuilder().withUrl(previewHubUrl).build();
 
 		this.#connection.on('refreshed', (payload) => {
