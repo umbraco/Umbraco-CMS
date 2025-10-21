@@ -1,4 +1,4 @@
-import { UMB_PREVIEW_CONTEXT } from '../preview.context.js';
+import { UMB_PREVIEW_CONTEXT } from '../context/preview.context-token.js';
 import { css, customElement, html, ifDefined, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
@@ -12,6 +12,7 @@ export interface UmbPreviewDevice {
 
 @customElement('umb-preview-device')
 export class UmbPreviewDeviceElement extends UmbLitElement {
+	// TODO: [LK] Eventually, convert these devices to be an  extension point.
 	#devices: Array<UmbPreviewDevice> = [
 		{
 			alias: 'fullsize',
@@ -99,7 +100,6 @@ export class UmbPreviewDeviceElement extends UmbLitElement {
 	}
 
 	#onPopoverToggle(event: ToggleEvent) {
-		// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
 		this._popoverOpen = event.newState === 'open';

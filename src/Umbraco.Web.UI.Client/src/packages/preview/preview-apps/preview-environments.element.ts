@@ -1,9 +1,9 @@
-import { UMB_PREVIEW_CONTEXT } from '../preview.context.js';
+import { UmbPreviewRepository } from '../repository/preview.repository.js';
+import { UMB_PREVIEW_CONTEXT } from '../context/preview.context-token.js';
 import { css, customElement, html, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { umbPeekError } from '@umbraco-cms/backoffice/notification';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbDocumentPreviewRepository } from '@umbraco-cms/backoffice/document';
 
 type UmbPreviewEnvironmentItem = {
 	alias: string;
@@ -53,13 +53,12 @@ export class UmbPreviewEnvironmentsElement extends UmbLitElement {
 			(manifests) => {
 				this._items = manifests.map((manifest) => ({
 					alias: manifest.alias,
-					// TODO: [LK] Could do with typecasting to `ManifestWorkspaceActionMenuItemPreviewOptionKind`.
 					label: (manifest.meta as any).label || manifest.name,
 					icon: (manifest.meta as any).icon || this.#fallbackIcon,
 					urlProviderAlias: (manifest.meta as any).urlProviderAlias,
 				}));
 
-				this.hidden = !this._items.length; //this._items.length <= 1;
+				this.hidden = !this._items.length;
 			},
 		);
 	}
@@ -68,7 +67,7 @@ export class UmbPreviewEnvironmentsElement extends UmbLitElement {
 		if (!this._unique) return;
 		if (!item.urlProviderAlias) return;
 
-		const previewRepository = new UmbDocumentPreviewRepository(this);
+		const previewRepository = new UmbPreviewRepository(this);
 
 		const previewUrlData = await previewRepository.getPreviewUrl(
 			this._unique,
@@ -76,12 +75,12 @@ export class UmbPreviewEnvironmentsElement extends UmbLitElement {
 			this._culture,
 			this._segment,
 		);
-		console.log('previewUrlData', previewUrlData);
-		// if (previewUrlData.url) {
-		// 	const previewWindow = window.open(previewUrlData.url, `umbpreview-${this._unique}`);
-		// 	previewWindow?.focus();
-		// 	return;
-		// }
+
+		if (previewUrlData.url) {
+			const previewWindow = window.open(previewUrlData.url, `umbpreview-${this._unique}`);
+			previewWindow?.focus();
+			return;
+		}
 
 		if (previewUrlData.message) {
 			umbPeekError(this, { color: 'danger', headline: 'Preview error', message: previewUrlData.message });
@@ -90,7 +89,6 @@ export class UmbPreviewEnvironmentsElement extends UmbLitElement {
 	}
 
 	#onPopoverToggle(event: ToggleEvent) {
-		// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
 		this._popoverOpen = event.newState === 'open';

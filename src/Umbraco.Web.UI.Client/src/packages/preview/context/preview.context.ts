@@ -1,18 +1,13 @@
-import { tryExecute } from '@umbraco-cms/backoffice/resources';
-import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
-import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbPreviewRepository } from '../repository/preview.repository.js';
+import { UMB_PREVIEW_CONTEXT } from './preview.context-token.js';
 import { HubConnectionBuilder } from '@umbraco-cms/backoffice/external/signalr';
 import { UmbBooleanState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbDocumentPreviewRepository } from '@umbraco-cms/backoffice/document';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 import type { HubConnection } from '@umbraco-cms/backoffice/external/signalr';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-
-const UMB_LOCALSTORAGE_SESSION_KEY = 'umb:previewSessions';
 
 interface UmbPreviewIframeArgs {
 	culture?: string;
@@ -36,7 +31,7 @@ export class UmbPreviewContext extends UmbContextBase {
 	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
 	#serverUrl: string = '';
 
-	#documentPreviewRepository = new UmbDocumentPreviewRepository(this);
+	#previewRepository = new UmbPreviewRepository(this);
 
 	#localize = new UmbLocalizationController(this);
 
@@ -140,20 +135,11 @@ export class UmbPreviewContext extends UmbContextBase {
 		const unique = this.#unique.getValue();
 		if (!unique) return null;
 
-		// NOTE: We should be reusing `UmbDocumentUrlRepository` here, but the preview app doesn't register the `itemStore` extensions, so can't resolve/consume `UMB_DOCUMENT_URL_STORE_CONTEXT`. [LK]
-		const { data } = await tryExecute(this, DocumentService.getDocumentUrls({ query: { id: [unique] } }));
-
-		if (!data?.length) return null;
-		const urlInfo = this.#culture
-			? data[0].urlInfos.find((x) => x.culture === this.#culture.getValue())
-			: data[0].urlInfos[0];
+		const culture = this.#culture.getValue();
+		const urlInfo = await this.#previewRepository.getPublishedUrl(unique, culture);
 
 		if (!urlInfo?.url) return null;
 		return urlInfo.url.startsWith('/') ? `${this.#serverUrl}${urlInfo.url}` : urlInfo.url;
-	}
-
-	#getSessionCount(): number {
-		return Math.max(Number(localStorage.getItem(UMB_LOCALSTORAGE_SESSION_KEY)), 0) || 0;
 	}
 
 	#setPreviewUrl(args?: UmbPreviewUrlArgs) {
@@ -202,35 +188,8 @@ export class UmbPreviewContext extends UmbContextBase {
 		this.#previewUrl.setValue(previewUrlString);
 	}
 
-	#setSessionCount(sessions: number) {
-		localStorage.setItem(UMB_LOCALSTORAGE_SESSION_KEY, sessions.toString());
-	}
-
-	checkSession() {
-		const sessions = this.#getSessionCount();
-		if (sessions > 0) return;
-
-		umbConfirmModal(this._host, {
-			headline: `Preview website?`,
-			content: `You have ended preview mode, do you want to enable it again to view the latest saved version of your website?`,
-			cancelLabel: 'View published version',
-			confirmLabel: 'Preview latest version',
-		})
-			.then(() => {
-				this.restartSession();
-			})
-			.catch(() => {
-				this.exitSession();
-			});
-	}
-
-	async exitPreview(sessions: number = 0) {
-		this.#setSessionCount(sessions);
-
-		// We are good to end preview mode.
-		if (sessions <= 0) {
-			await this.#documentPreviewRepository.exit();
-		}
+	async exitPreview() {
+		await this.#previewRepository.exit();
 
 		if (this.#connection) {
 			await this.#connection.stop();
@@ -244,12 +203,6 @@ export class UmbPreviewContext extends UmbContextBase {
 		}
 
 		window.location.replace(url);
-	}
-
-	async exitSession() {
-		let sessions = this.#getSessionCount();
-		sessions--;
-		this.exitPreview(sessions);
 	}
 
 	iframeLoaded(iframe: HTMLIFrameElement) {
@@ -276,17 +229,6 @@ export class UmbPreviewContext extends UmbContextBase {
 		if (!document) return;
 
 		document.location.reload();
-	}
-
-	async restartSession() {
-		await this.#documentPreviewRepository.enter();
-		this.startSession();
-	}
-
-	startSession() {
-		let sessions = this.#getSessionCount();
-		sessions++;
-		this.#setSessionCount(sessions);
 	}
 
 	async updateIFrame(args?: UmbPreviewIframeArgs) {
@@ -336,5 +278,3 @@ export class UmbPreviewContext extends UmbContextBase {
 		if (mergedArgs.width) wrapper.style.width = mergedArgs.width;
 	}
 }
-
-export const UMB_PREVIEW_CONTEXT = new UmbContextToken<UmbPreviewContext>('UmbPreviewContext');

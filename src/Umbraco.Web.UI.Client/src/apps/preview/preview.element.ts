@@ -1,19 +1,14 @@
-// TODO: [LK] Once we have a separate "preview" package, we can remove this import.
-import { manifests as previewApps } from './apps/manifests.js';
-import { UmbPreviewContext } from './preview.context.js';
 import { css, customElement, html, nothing, state, when } from '@umbraco-cms/backoffice/external/lit';
 import {
 	umbExtensionsRegistry,
 	UmbBackofficeEntryPointExtensionInitializer,
 } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbPreviewContext } from '@umbraco-cms/backoffice/preview';
 import { UmbServerExtensionRegistrator } from '@umbraco-cms/backoffice/extension-api';
 import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 
-const CORE_PACKAGES = [
-	import('../../packages/documents/umbraco-package.js'), // TODO: [LK] Once we have a separate "preview" package, we can remove this extension registration.
-	//import('../../packages/preview/umbraco-package.js'), // TODO: [LK] Once we have a separate "preview" package, we can uncomment this line.
-];
+const CORE_PACKAGES = [import('../../packages/preview/umbraco-package.js')];
 
 /**
  * @element umb-preview
@@ -58,14 +53,9 @@ export class UmbPreviewElement extends UmbLitElement {
 		await this.#extensionsAfterAuth();
 
 		CORE_PACKAGES.forEach(async (packageImport) => {
-			const packageModule = await packageImport;
-			umbExtensionsRegistry.registerMany(packageModule.extensions);
+			const { extensions } = await packageImport;
+			umbExtensionsRegistry.registerMany(extensions);
 		});
-
-		// TODO: [LK] Once we have a separate "preview" package, we can remove this extension registration.
-		if (previewApps?.length) {
-			umbExtensionsRegistry.registerMany(previewApps);
-		}
 	}
 
 	async #extensionsAfterAuth() {
