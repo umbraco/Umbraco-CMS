@@ -129,7 +129,7 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 
 	#renderGeneralSection() {
 		return html`
-			${this.#renderCreateDate()} ${this.#renderUpdateDate()}
+			${this.#renderTrashState()} ${this.#renderCreateDate()} ${this.#renderUpdateDate()}
 			<div class="general-item">
 				<strong><umb-localize key="content_mediaType">Media Type</umb-localize></strong>
 				<uui-ref-node-document-type
@@ -145,6 +145,20 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 			<div class="general-item">
 				<strong><umb-localize key="template_id">Id</umb-localize></strong>
 				<span>${this._mediaUnique}</span>
+			</div>
+		`;
+	}
+
+	#renderTrashState() {
+		if (!this._isTrashed) return nothing;
+
+		return html`
+			<div class="general-item">
+				<span>
+					<uui-tag color="danger" look="primary" label=${this.localize.term('content_trashed')}>
+						${this.localize.term('content_trashed')}
+					</uui-tag>
+				</span>
 			</div>
 		`;
 	}

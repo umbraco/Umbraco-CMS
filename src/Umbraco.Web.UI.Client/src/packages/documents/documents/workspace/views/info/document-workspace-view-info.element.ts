@@ -179,6 +179,12 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 					</uui-tag>
 				`;
 			}
+			case DocumentVariantStateModel.TRASHED:
+				return html`
+					<uui-tag color="danger" look="primary" label=${this.localize.term('content_trashed')}>
+						${this.localize.term('content_trashed')}
+					</uui-tag>
+				`;
 			default:
 				return html`
 					<uui-tag look="primary" label=${this.localize.term('content_notCreated')}>
