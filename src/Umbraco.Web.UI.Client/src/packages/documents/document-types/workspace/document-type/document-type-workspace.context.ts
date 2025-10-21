@@ -21,6 +21,7 @@ import {
 	UMB_TEMPLATE_ENTITY_TYPE,
 	UMB_TEMPLATE_ROOT_ENTITY_TYPE,
 	UmbTemplateDetailRepository,
+	type UmbTemplateDetailModel,
 } from '@umbraco-cms/backoffice/template';
 import type { UmbContentTypeSortModel, UmbContentTypeWorkspaceContext } from '@umbraco-cms/backoffice/content-type';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -177,9 +178,12 @@ export class UmbDocumentTypeWorkspaceContext
 			await super._create(currentData, parent);
 
 			if (this.createTemplateMode) {
-				// If in create template mode, create a template and assign it to the document type
-				await this.#createAndAssignTemplate();
+				// If in create template mode, create a template
+				const template = await this.#createTemplate();
 				this.createTemplateMode = false;
+
+				// Assign the template to the document type
+				this.#assignTemplate(template);
 
 				// Update the document type, now with the template assigned
 				await super._update();
@@ -190,13 +194,12 @@ export class UmbDocumentTypeWorkspaceContext
 	}
 
 	// TODO: move this responsibility to the template package
-	async #createAndAssignTemplate() {
+	async #createTemplate() {
 		const documentTypeUnique = this.getUnique();
 		if (!documentTypeUnique) throw new Error('Document type unique is missing');
 
 		const { data: template } = await this.#templateRepository.createForDocumentType({
 			entityType: UMB_TEMPLATE_ENTITY_TYPE,
-			unique: UmbId.new(),
 			name: this.getName() ?? '',
 			alias: this.getName() ?? '', // NOTE: Uses "name" over alias, as the server handle the template filename. [LK]
 			documentType: { unique: documentTypeUnique },
@@ -213,6 +216,10 @@ export class UmbDocumentTypeWorkspaceContext
 		});
 		eventContext.dispatchEvent(event);
 
+		return template;
+	}
+
+	async #assignTemplate(template: UmbTemplateDetailModel) {
 		const templateEntity = { id: template.unique };
 		const allowedTemplates = this.getAllowedTemplateIds() ?? [];
 		this.setAllowedTemplateIds([templateEntity, ...allowedTemplates]);

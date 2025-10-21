@@ -11,7 +11,7 @@ export interface UmbTemplateDetailModel {
 
 export interface UmbTemplateForDocumentTypeDetailModel {
 	entityType: UmbTemplateEntityType;
-	unique: string;
+	unique?: string;
 	name: string;
 	alias: string;
 	documentType: { unique: string };
