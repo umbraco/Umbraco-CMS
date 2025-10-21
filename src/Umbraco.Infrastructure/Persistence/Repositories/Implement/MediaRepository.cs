@@ -329,7 +329,7 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
                 (SELECT {uniqueId} FROM {umbracoNode} WHERE id = @id)",
             $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.UserStartNode)} WHERE {QuoteColumnName("startNode")} = @id",
             $@"UPDATE {QuoteTableName(Constants.DatabaseSchema.Tables.UserGroup)}
-                SET {QuoteColumnName("startContentId")} = NULL WHERE {QuoteColumnName("startContentId")} = @id",
+                SET {QuoteColumnName("startMediaId")} = NULL WHERE {QuoteColumnName("startMediaId")} = @id",
             $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.Relation)} WHERE {QuoteColumnName("parentId")} = @id",
             $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.Relation)} WHERE {QuoteColumnName("childId")} = @id",
             $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.TagRelationship)} WHERE {nodeId} = @id",
