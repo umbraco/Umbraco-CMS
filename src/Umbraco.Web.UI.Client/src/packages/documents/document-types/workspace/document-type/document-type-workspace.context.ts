@@ -29,7 +29,6 @@ import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbPathPatternTypeAsEncodedParamsType } from '@umbraco-cms/backoffice/router';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import type { UmbRoutableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
-import { UmbId } from '@umbraco-cms/backoffice/id';
 
 type DetailModelType = UmbDocumentTypeDetailModel;
 export class UmbDocumentTypeWorkspaceContext
@@ -219,7 +218,7 @@ export class UmbDocumentTypeWorkspaceContext
 		return template;
 	}
 
-	async #assignTemplate(template: UmbTemplateDetailModel) {
+	#assignTemplate(template: UmbTemplateDetailModel) {
 		const templateEntity = { id: template.unique };
 		const allowedTemplates = this.getAllowedTemplateIds() ?? [];
 		this.setAllowedTemplateIds([templateEntity, ...allowedTemplates]);
