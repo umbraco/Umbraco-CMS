@@ -6,7 +6,6 @@ import {
 	UMB_USER_PERMISSION_DOCUMENT_CREATE,
 	UMB_USER_PERMISSION_DOCUMENT_NOTIFICATIONS,
 	UMB_USER_PERMISSION_DOCUMENT_PUBLISH,
-	UMB_USER_PERMISSION_DOCUMENT_PERMISSIONS,
 	UMB_USER_PERMISSION_DOCUMENT_UNPUBLISH,
 	UMB_USER_PERMISSION_DOCUMENT_UPDATE,
 	UMB_USER_PERMISSION_DOCUMENT_DUPLICATE,
@@ -91,7 +90,7 @@ const permissions: Array<ManifestEntityUserPermission> = [
 			description: '#actionDescriptions_publish',
 		},
 	},
-	{
+	/*{
 		type: 'entityUserPermission',
 		alias: UMB_USER_PERMISSION_DOCUMENT_PERMISSIONS,
 		name: 'Document Permissions User Permission',
@@ -101,7 +100,7 @@ const permissions: Array<ManifestEntityUserPermission> = [
 			label: '#actions_setPermissions',
 			description: '#actionDescriptions_rights',
 		},
-	},
+	},*/
 	{
 		type: 'entityUserPermission',
 		alias: UMB_USER_PERMISSION_DOCUMENT_UNPUBLISH,
@@ -204,11 +203,12 @@ export const granularPermissions: Array<ManifestGranularUserPermission> = [
 		alias: 'Umb.UserGranularPermission.Document',
 		name: 'Document Granular User Permission',
 		weight: 1000,
+		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		element: () =>
 			import('./input-document-granular-user-permission/input-document-granular-user-permission.element.js'),
 		meta: {
 			schemaType: 'DocumentPermissionPresentationModel',
-			label: '#user_granularRightsLabel',
+			label: '#user_permissionsGranular',
 			description: '{#user_granularRightsDescription}',
 		},
 	},

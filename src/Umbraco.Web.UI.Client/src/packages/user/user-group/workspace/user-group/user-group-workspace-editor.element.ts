@@ -12,8 +12,7 @@ import type { UmbInputLanguageElement } from '@umbraco-cms/backoffice/language';
 import { UMB_ICON_PICKER_MODAL } from '@umbraco-cms/backoffice/icon';
 import type { UmbInputWithAliasElement } from '@umbraco-cms/backoffice/components';
 
-import './components/user-group-entity-user-permission-list.element.js';
-import './components/user-group-granular-permission-list.element.js';
+import './components/user-group-entity-type-permission-groups.element.js';
 
 @customElement('umb-user-group-workspace-editor')
 export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
@@ -33,7 +32,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 	private _aliasCanBeChanged?: UmbUserGroupDetailModel['aliasCanBeChanged'] = true;
 
 	@state()
-	private _icon: UmbUserGroupDetailModel['icon'] = null;
+	private _icon?: UmbUserGroupDetailModel['icon'];
 
 	@state()
 	private _sections: UmbUserGroupDetailModel['sections'] = [];
@@ -68,45 +67,44 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	#observeUserGroup() {
-		if (!this.#workspaceContext) return;
-		this.observe(this.#workspaceContext.isNew, (value) => (this._isNew = value), '_observeIsNew');
-		this.observe(this.#workspaceContext.unique, (value) => (this._unique = value ?? undefined), '_observeUnique');
-		this.observe(this.#workspaceContext.name, (value) => (this._name = value), '_observeName');
-		this.observe(this.#workspaceContext.alias, (value) => (this._alias = value), '_observeAlias');
+		this.observe(this.#workspaceContext?.isNew, (value) => (this._isNew = value), '_observeIsNew');
+		this.observe(this.#workspaceContext?.unique, (value) => (this._unique = value ?? undefined), '_observeUnique');
+		this.observe(this.#workspaceContext?.name, (value) => (this._name = value), '_observeName');
+		this.observe(this.#workspaceContext?.alias, (value) => (this._alias = value), '_observeAlias');
 		this.observe(
-			this.#workspaceContext.aliasCanBeChanged,
+			this.#workspaceContext?.aliasCanBeChanged,
 			(value) => (this._aliasCanBeChanged = value),
 			'_observeAliasCanBeChanged',
 		);
-		this.observe(this.#workspaceContext.icon, (value) => (this._icon = value), '_observeIcon');
-		this.observe(this.#workspaceContext.sections, (value) => (this._sections = value), '_observeSections');
-		this.observe(this.#workspaceContext.languages, (value) => (this._languages = value), '_observeLanguages');
+		this.observe(this.#workspaceContext?.icon, (value) => (this._icon = value), '_observeIcon');
+		this.observe(this.#workspaceContext?.sections, (value) => (this._sections = value ?? []), '_observeSections');
+		this.observe(this.#workspaceContext?.languages, (value) => (this._languages = value ?? []), '_observeLanguages');
 		this.observe(
-			this.#workspaceContext.hasAccessToAllLanguages,
-			(value) => (this._hasAccessToAllLanguages = value),
+			this.#workspaceContext?.hasAccessToAllLanguages,
+			(value) => (this._hasAccessToAllLanguages = value ?? false),
 			'_observeHasAccessToAllLanguages',
 		);
 
 		this.observe(
-			this.#workspaceContext.documentRootAccess,
-			(value) => (this._documentRootAccess = value),
+			this.#workspaceContext?.documentRootAccess,
+			(value) => (this._documentRootAccess = value ?? false),
 			'_observeDocumentRootAccess',
 		);
 
 		this.observe(
-			this.#workspaceContext.documentStartNode,
+			this.#workspaceContext?.documentStartNode,
 			(value) => (this._documentStartNode = value),
 			'_observeDocumentStartNode',
 		);
 
 		this.observe(
-			this.#workspaceContext.mediaRootAccess,
-			(value) => (this._mediaRootAccess = value),
+			this.#workspaceContext?.mediaRootAccess,
+			(value) => (this._mediaRootAccess = value ?? false),
 			'_observeMediaRootAccess',
 		);
 
 		this.observe(
-			this.#workspaceContext.mediaStartNode,
+			this.#workspaceContext?.mediaStartNode,
 			(value) => (this._mediaStartNode = value),
 			'_observeMediaStartNode',
 		);
@@ -242,20 +240,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 						${this.#renderLanguageAccess()} ${this.#renderDocumentAccess()} ${this.#renderMediaAccess()}
 					</uui-box>
 
-					<uui-box>
-						<div slot="headline"><umb-localize key="user_permissionsDefault"></umb-localize></div>
-
-						<umb-property-layout
-							label=${this.localize.term('user_entityPermissionsLabel')}
-							description=${this.localize.term('user_entityPermissionsDescription')}>
-							<umb-user-group-entity-user-permission-list slot="editor"></umb-user-group-entity-user-permission-list>
-						</umb-property-layout>
-					</uui-box>
-
-					<uui-box>
-						<div slot="headline"><umb-localize key="user_permissionsGranular"></umb-localize></div>
-						<umb-user-group-granular-permission-list></umb-user-group-granular-permission-list>
-					</uui-box>
+					${this.#renderPermissionGroups()}
 				</umb-stack>
 			</div>
 		`;
@@ -335,6 +320,10 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 					: nothing}
 			</umb-property-layout>
 		`;
+	}
+
+	#renderPermissionGroups() {
+		return html`<umb-user-group-entity-type-permission-groups></umb-user-group-entity-type-permission-groups> `;
 	}
 
 	static override styles = [
