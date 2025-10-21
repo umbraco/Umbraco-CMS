@@ -103,7 +103,8 @@ export class UmbPreviewContext extends UmbContextBase {
 
 		try {
 			await this.#connection.start();
-		} catch {
+		} catch (error) {
+			console.error('The SignalR connection could not be established', error);
 			this.#notificationContext?.peek('warning', {
 				data: {
 					headline: this.#localize.term('general_preview'),
