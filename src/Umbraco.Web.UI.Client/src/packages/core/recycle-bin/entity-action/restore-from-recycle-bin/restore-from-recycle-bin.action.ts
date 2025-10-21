@@ -24,6 +24,7 @@ export class UmbRestoreFromRecycleBinEntityAction extends UmbEntityActionBase<Me
 				entityType: this.args.entityType,
 				recycleBinRepositoryAlias: this.args.meta.recycleBinRepositoryAlias,
 				itemRepositoryAlias: this.args.meta.itemRepositoryAlias,
+				itemDataResolver: this.args.meta.itemDataResolver,
 				pickerModal: this.args.meta.pickerModal,
 			},
 		});
