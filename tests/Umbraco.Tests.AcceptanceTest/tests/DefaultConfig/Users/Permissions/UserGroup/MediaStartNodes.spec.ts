@@ -50,7 +50,8 @@ test('can see root media start node and children', {tag: '@release'}, async ({um
   await umbracoUi.media.isChildMediaVisible(rootFolderName, childFolderTwoName);
 });
 
-test('can see parent of start node but not access it', async ({umbracoApi, umbracoUi}) => {
+// Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/20505
+test.skip('can see parent of start node but not access it', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithMediaStartNode(userGroupName, childFolderOneId);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
