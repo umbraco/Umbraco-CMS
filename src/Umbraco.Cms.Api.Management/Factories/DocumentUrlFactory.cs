@@ -39,7 +39,7 @@ public class DocumentUrlFactory : IDocumentUrlFactory
     {
         ISet<UrlInfo> urlInfos = await _publishedUrlInfoProvider.GetAllAsync(content);
         return urlInfos
-            .Select(urlInfo => CreateDocumentUrlInfo(urlInfo, false))
+            .Select(CreateDocumentUrlInfo)
             .ToArray();
     }
 
@@ -89,18 +89,16 @@ public class DocumentUrlFactory : IDocumentUrlFactory
             }
         }
 
-        return CreateDocumentUrlInfo(previewUrlInfo, previewUrlInfo.IsExternal);
+        return CreateDocumentUrlInfo(previewUrlInfo);
     }
 
-    private DocumentUrlInfo CreateDocumentUrlInfo(UrlInfo urlInfo, bool ensureAbsoluteUrl)
+    private DocumentUrlInfo CreateDocumentUrlInfo(UrlInfo urlInfo)
     {
         var url = urlInfo.Url?.ToString();
         return new DocumentUrlInfo
         {
             Culture = urlInfo.Culture,
-            Url = ensureAbsoluteUrl && url is not null
-                ? _absoluteUrlBuilder.ToAbsoluteUrl(url).ToString()
-                : url,
+            Url = url,
             Message = urlInfo.Message,
             Provider = urlInfo.Provider,
         };
