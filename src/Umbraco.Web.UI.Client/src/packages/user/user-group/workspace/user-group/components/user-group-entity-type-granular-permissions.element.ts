@@ -59,11 +59,22 @@ export class UmbUserGroupGranularPermissionListElement extends UmbLitElement {
 	};
 
 	override render() {
-		if (!this._userGroupPermissions || !this.entityType) return;
+		if (!this._userGroupPermissions) return;
+
+		if (!this.entityType) {
+			return html`
+				<umb-extension-slot
+					type="userGranularPermission"
+					.filter=${(manifest: ManifestGranularUserPermission) =>
+						manifest.forEntityTypes === undefined || manifest.forEntityTypes?.length === 0}
+					.renderMethod=${this.#renderProperty}></umb-extension-slot>
+			`;
+		}
+
 		return html`<umb-extension-slot
 			type="userGranularPermission"
 			.filter=${(manifest: ManifestGranularUserPermission) =>
-				manifest.forEntityTypes.includes(this.entityType!) || manifest.forEntityTypes.length === 0}
+				manifest.forEntityTypes?.includes(this.entityType!) || manifest.forEntityTypes?.length === 0}
 			.renderMethod=${this.#renderProperty}></umb-extension-slot>`;
 	}
 

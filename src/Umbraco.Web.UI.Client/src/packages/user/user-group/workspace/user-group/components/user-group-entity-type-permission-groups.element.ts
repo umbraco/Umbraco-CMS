@@ -1,5 +1,5 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { html, customElement, state, repeat, css } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, state, repeat, css, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -10,6 +10,9 @@ import './user-group-entity-type-granular-permissions.element.js';
 export class UmbUserGroupEntityTypePermissionGroupsElement extends UmbLitElement {
 	@state()
 	private _groups: Array<{ entityType: string; headline: string }> = [];
+
+	@state()
+	private _hasGranularPermissionsWithNoEntityType = false;
 
 	constructor() {
 		super();
@@ -29,6 +32,20 @@ export class UmbUserGroupEntityTypePermissionGroupsElement extends UmbLitElement
 			},
 			'umbUserPermissionsObserver',
 		);
+
+		this.#observeGranularPermissionsWithNoEntityType();
+	}
+
+	#observeGranularPermissionsWithNoEntityType() {
+		this.observe(
+			umbExtensionsRegistry.byTypeAndFilter(
+				'userGranularPermission',
+				(manifest) => manifest.forEntityTypes === undefined || manifest.forEntityTypes.length === 0,
+			),
+			(manifests) => {
+				this._hasGranularPermissionsWithNoEntityType = manifests.length > 0;
+			},
+		);
 	}
 
 	override render() {
@@ -45,7 +62,15 @@ export class UmbUserGroupEntityTypePermissionGroupsElement extends UmbLitElement
 					<umb-user-group-entity-type-granular-permissions
 						.entityType=${group.entityType}></umb-user-group-entity-type-granular-permissions>
 				</uui-box>`,
-		)}`;
+		)}
+		${this.#renderUngroupedGranularPermissions()}`;
+	}
+
+	#renderUngroupedGranularPermissions() {
+		if (!this._hasGranularPermissionsWithNoEntityType) return nothing;
+		return html`<uui-box headline=${this.localize.term('general_rights')}>
+			<umb-user-group-entity-type-granular-permissions></umb-user-group-entity-type-granular-permissions
+		></uui-box>`;
 	}
 
 	static override styles = [

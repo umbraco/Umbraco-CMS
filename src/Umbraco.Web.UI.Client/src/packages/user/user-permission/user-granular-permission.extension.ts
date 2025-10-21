@@ -2,7 +2,7 @@ import type { ManifestElement } from '@umbraco-cms/backoffice/extension-api';
 
 export interface ManifestGranularUserPermission extends ManifestElement {
 	type: 'userGranularPermission';
-	forEntityTypes: Array<string>;
+	forEntityTypes?: Array<string>;
 	meta: MetaGranularUserPermission;
 }
 
