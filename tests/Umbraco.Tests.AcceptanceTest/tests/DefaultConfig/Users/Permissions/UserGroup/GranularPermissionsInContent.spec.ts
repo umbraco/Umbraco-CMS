@@ -324,6 +324,7 @@ test('can rollback a specific content with rollback permission enabled', async (
   await umbracoUi.content.clickRollbackContainerButton();
 
   // Assert
+  await umbracoUi.content.isSuccessNotificationVisible();
   await umbracoUi.content.goToContentWithName(firstDocumentName);
   await umbracoUi.content.doesDocumentPropertyHaveValue(dataTypeName, documentText);
   await umbracoUi.content.isActionsMenuForNameVisible(secondDocumentName, false);
