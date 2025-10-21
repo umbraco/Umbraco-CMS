@@ -148,7 +148,7 @@ test('cannot add number of block element greater than the maximum amount', async
   await umbracoUi.content.enterTextstring(inputText);
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.clickAddBlockElementButton();
-  await umbracoUi.content.clickTextButtonWithName(elementTypeName);
+  await umbracoUi.content.clickBlockElementWithName(elementTypeName);
   await umbracoUi.content.enterTextstring(inputText);
   await umbracoUi.content.clickCreateModalButton();
 
@@ -194,7 +194,7 @@ test('can add settings model for the block in the content', async ({umbracoApi, 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickAddBlockElementButton();
-  await umbracoUi.content.clickTextButtonWithName(elementTypeName);
+  await umbracoUi.content.clickBlockElementWithName(elementTypeName);
   await umbracoUi.content.enterTextstring(contentBlockInputText);
   await umbracoUi.content.clickAddBlockSettingsTabButton();
   await umbracoUi.content.enterTextArea(settingBlockInputText);
@@ -246,7 +246,7 @@ test('can add a block element with inline editing mode enabled', async ({umbraco
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickAddBlockElementButton();
-  await umbracoUi.content.clickTextButtonWithName(elementTypeName);
+  await umbracoUi.content.clickBlockElementWithName(elementTypeName);
   await umbracoUi.content.clickInlineBlockCaretButtonForName(elementTypeName);
   await umbracoUi.content.enterTextstring(inputText);
   await umbracoUi.content.clickSaveAndPublishButton();
@@ -276,7 +276,7 @@ test('can add an invariant block element with invariant RTE Tiptap in the conten
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickAddBlockElementButton();
-  await umbracoUi.content.clickTextButtonWithName(customElementTypeName);
+  await umbracoUi.content.clickBlockElementWithName(customElementTypeName);
   await umbracoUi.content.enterRTETipTapEditor(inputText);
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.clickSaveButton();
@@ -310,7 +310,7 @@ test('can add a variant block element with variant RTE Tiptap in the content', a
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickAddBlockElementButton();
-  await umbracoUi.content.clickTextButtonWithName(customElementTypeName);
+  await umbracoUi.content.clickBlockElementWithName(customElementTypeName);
   await umbracoUi.content.enterRTETipTapEditor(inputText);
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.clickSaveButtonForContent();
@@ -346,7 +346,7 @@ test('can add a variant block element with invariant RTE Tiptap in the content',
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickAddBlockElementButton();
-  await umbracoUi.content.clickTextButtonWithName(customElementTypeName);
+  await umbracoUi.content.clickBlockElementWithName(customElementTypeName);
   await umbracoUi.content.enterRTETipTapEditor(inputText);
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.clickSaveButtonForContent();
