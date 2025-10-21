@@ -1,8 +1,19 @@
+// TODO: [LK] Once we have a separate "preview" package, we can remove this import.
 import { manifests as previewApps } from './apps/manifests.js';
 import { UmbPreviewContext } from './preview.context.js';
 import { css, customElement, html, nothing, state, when } from '@umbraco-cms/backoffice/external/lit';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import {
+	umbExtensionsRegistry,
+	UmbBackofficeEntryPointExtensionInitializer,
+} from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbServerExtensionRegistrator } from '@umbraco-cms/backoffice/extension-api';
+import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
+
+const CORE_PACKAGES = [
+	import('../../packages/documents/umbraco-package.js'), // TODO: [LK] Once we have a separate "preview" package, we can remove this extension registration.
+	//import('../../packages/preview/umbraco-package.js'), // TODO: [LK] Once we have a separate "preview" package, we can uncomment this line.
+];
 
 /**
  * @element umb-preview
@@ -11,12 +22,16 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 export class UmbPreviewElement extends UmbLitElement {
 	#context = new UmbPreviewContext(this);
 
+	@state()
+	private _iframeReady?: boolean;
+
+	@state()
+	private _previewUrl?: string;
+
 	constructor() {
 		super();
 
-		if (previewApps?.length) {
-			umbExtensionsRegistry.registerMany(previewApps);
-		}
+		new UmbBackofficeEntryPointExtensionInitializer(this, umbExtensionsRegistry);
 
 		this.observe(this.#context.iframeReady, (iframeReady) => (this._iframeReady = iframeReady));
 		this.observe(this.#context.previewUrl, (previewUrl) => (this._previewUrl = previewUrl));
@@ -39,18 +54,35 @@ export class UmbPreviewElement extends UmbLitElement {
 		this.#context.exitSession();
 	}
 
-	@state()
-	private _iframeReady?: boolean;
+	override async firstUpdated() {
+		await this.#extensionsAfterAuth();
 
-	@state()
-	private _previewUrl?: string;
+		CORE_PACKAGES.forEach(async (packageImport) => {
+			const packageModule = await packageImport;
+			umbExtensionsRegistry.registerMany(packageModule.extensions);
+		});
 
-	#onIFrameLoad(event: Event & { target: HTMLIFrameElement }) {
-		this.#context.iframeLoaded(event.target);
+		// TODO: [LK] Once we have a separate "preview" package, we can remove this extension registration.
+		if (previewApps?.length) {
+			umbExtensionsRegistry.registerMany(previewApps);
+		}
+	}
+
+	async #extensionsAfterAuth() {
+		const authContext = await this.getContext(UMB_AUTH_CONTEXT, { preventTimeout: true });
+		if (!authContext) {
+			throw new Error('UmbPreviewElement requires the UMB_AUTH_CONTEXT to be set.');
+		}
+		await this.observe(authContext.isAuthorized).asPromise();
+		await new UmbServerExtensionRegistrator(this, umbExtensionsRegistry).registerPrivateExtensions();
 	}
 
 	#onVisibilityChange() {
 		this.#context.checkSession();
+	}
+
+	#onIFrameLoad(event: Event & { target: HTMLIFrameElement }) {
+		this.#context.iframeLoaded(event.target);
 	}
 
 	override render() {
