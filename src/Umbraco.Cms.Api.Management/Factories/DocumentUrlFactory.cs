@@ -16,7 +16,6 @@ public class DocumentUrlFactory : IDocumentUrlFactory
     private readonly UrlProviderCollection _urlProviders;
     private readonly IPreviewService _previewService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
-    private readonly IAbsoluteUrlBuilder _absoluteUrlBuilder;
     private readonly ILogger<DocumentUrlFactory> _logger;
 
     public DocumentUrlFactory(
@@ -24,14 +23,12 @@ public class DocumentUrlFactory : IDocumentUrlFactory
         UrlProviderCollection urlProviders,
         IPreviewService previewService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IAbsoluteUrlBuilder absoluteUrlBuilder,
         ILogger<DocumentUrlFactory> logger)
     {
         _publishedUrlInfoProvider = publishedUrlInfoProvider;
         _urlProviders = urlProviders;
         _previewService = previewService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
-        _absoluteUrlBuilder = absoluteUrlBuilder;
         _logger = logger;
     }
 
