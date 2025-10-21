@@ -33,7 +33,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 	private _aliasCanBeChanged?: UmbUserGroupDetailModel['aliasCanBeChanged'] = true;
 
 	@state()
-	private _icon: UmbUserGroupDetailModel['icon'] = null;
+	private _icon?: UmbUserGroupDetailModel['icon'];
 
 	@state()
 	private _sections: UmbUserGroupDetailModel['sections'] = [];
@@ -68,45 +68,44 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	#observeUserGroup() {
-		if (!this.#workspaceContext) return;
-		this.observe(this.#workspaceContext.isNew, (value) => (this._isNew = value), '_observeIsNew');
-		this.observe(this.#workspaceContext.unique, (value) => (this._unique = value ?? undefined), '_observeUnique');
-		this.observe(this.#workspaceContext.name, (value) => (this._name = value), '_observeName');
-		this.observe(this.#workspaceContext.alias, (value) => (this._alias = value), '_observeAlias');
+		this.observe(this.#workspaceContext?.isNew, (value) => (this._isNew = value), '_observeIsNew');
+		this.observe(this.#workspaceContext?.unique, (value) => (this._unique = value ?? undefined), '_observeUnique');
+		this.observe(this.#workspaceContext?.name, (value) => (this._name = value), '_observeName');
+		this.observe(this.#workspaceContext?.alias, (value) => (this._alias = value), '_observeAlias');
 		this.observe(
-			this.#workspaceContext.aliasCanBeChanged,
+			this.#workspaceContext?.aliasCanBeChanged,
 			(value) => (this._aliasCanBeChanged = value),
 			'_observeAliasCanBeChanged',
 		);
-		this.observe(this.#workspaceContext.icon, (value) => (this._icon = value), '_observeIcon');
-		this.observe(this.#workspaceContext.sections, (value) => (this._sections = value), '_observeSections');
-		this.observe(this.#workspaceContext.languages, (value) => (this._languages = value), '_observeLanguages');
+		this.observe(this.#workspaceContext?.icon, (value) => (this._icon = value), '_observeIcon');
+		this.observe(this.#workspaceContext?.sections, (value) => (this._sections = value ?? []), '_observeSections');
+		this.observe(this.#workspaceContext?.languages, (value) => (this._languages = value ?? []), '_observeLanguages');
 		this.observe(
-			this.#workspaceContext.hasAccessToAllLanguages,
-			(value) => (this._hasAccessToAllLanguages = value),
+			this.#workspaceContext?.hasAccessToAllLanguages,
+			(value) => (this._hasAccessToAllLanguages = value ?? false),
 			'_observeHasAccessToAllLanguages',
 		);
 
 		this.observe(
-			this.#workspaceContext.documentRootAccess,
-			(value) => (this._documentRootAccess = value),
+			this.#workspaceContext?.documentRootAccess,
+			(value) => (this._documentRootAccess = value ?? false),
 			'_observeDocumentRootAccess',
 		);
 
 		this.observe(
-			this.#workspaceContext.documentStartNode,
+			this.#workspaceContext?.documentStartNode,
 			(value) => (this._documentStartNode = value),
 			'_observeDocumentStartNode',
 		);
 
 		this.observe(
-			this.#workspaceContext.mediaRootAccess,
-			(value) => (this._mediaRootAccess = value),
+			this.#workspaceContext?.mediaRootAccess,
+			(value) => (this._mediaRootAccess = value ?? false),
 			'_observeMediaRootAccess',
 		);
 
 		this.observe(
-			this.#workspaceContext.mediaStartNode,
+			this.#workspaceContext?.mediaStartNode,
 			(value) => (this._mediaStartNode = value),
 			'_observeMediaStartNode',
 		);
