@@ -255,14 +255,14 @@ test('can sort children with sort children permission enabled', async ({umbracoA
 test('can set culture and hostnames for a specific content with culture and hostnames permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const domainName = '/domain';
-  userGroupId = await umbracoApi.userGroup.createUserGroupWithCultureAndHostnamesPermissionForSpecificDocument(userGroupName, firstDocumentId);
+  userGroupId = await umbracoApi.userGroup.createUserGroupWithCultureAndHostnamesPermissionForSpecificDocument(userGroupName, secondDocumentId);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
   testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
 
   // Act
-  await umbracoUi.content.clickActionsMenuForContent(firstDocumentName);
+  await umbracoUi.content.clickActionsMenuForContent(secondDocumentName);
   await umbracoUi.content.clickCultureAndHostnamesActionMenuOption();
   await umbracoUi.content.clickAddNewDomainButton();
   await umbracoUi.content.enterDomain(domainName);
@@ -271,11 +271,11 @@ test('can set culture and hostnames for a specific content with culture and host
   // Assert
   await umbracoUi.content.waitForDomainToBeCreated();
   await umbracoUi.waitForTimeout(1000); // Wait for the domain to be set
-  const document = await umbracoApi.document.getByName(firstDocumentName);
+  const document = await umbracoApi.document.getByName(secondDocumentName);
   const domains = await umbracoApi.document.getDomains(document.id);
   expect(domains.domains[0].domainName).toEqual(domainName);
   expect(domains.domains[0].isoCode).toEqual('en-US');
-  await umbracoUi.content.isActionsMenuForNameVisible(secondDocumentName, false);
+  await umbracoUi.content.isActionsMenuForNameVisible(firstDocumentName, false);
 });
 
 test('can set public access for a specific content with public access permission enabled', async ({umbracoApi, umbracoUi}) => {
