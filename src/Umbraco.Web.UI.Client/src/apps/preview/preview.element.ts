@@ -68,9 +68,9 @@ export class UmbPreviewElement extends UmbLitElement {
 			</div>
 			<div id="menu">
 				<h4>Preview Mode</h4>
-				<uui-button-group>
-					<umb-extension-slot id="apps" type="previewApp"></umb-extension-slot>
-				</uui-button-group>
+				<div id="apps">
+					<umb-extension-slot type="previewApp"></umb-extension-slot>
+				</div>
 			</div>
 		`;
 	}
@@ -83,10 +83,7 @@ export class UmbPreviewElement extends UmbLitElement {
 				align-items: center;
 
 				position: absolute;
-				top: 0;
-				left: 0;
-				right: 0;
-				bottom: 0;
+				inset: 0;
 
 				padding-bottom: 40px;
 			}
@@ -103,7 +100,9 @@ export class UmbPreviewElement extends UmbLitElement {
 				bottom: 0;
 
 				font-size: 6rem;
-				backdrop-filter: blur(5px);
+				backdrop-filter: blur(var(--uui-size-1, 3px));
+
+				z-index: 1;
 			}
 
 			#wrapper {
@@ -144,6 +143,8 @@ export class UmbPreviewElement extends UmbLitElement {
 				left: 0;
 				right: 0;
 
+				z-index: 1;
+
 				background-color: var(--uui-color-header-surface);
 				height: 40px;
 
@@ -157,7 +158,9 @@ export class UmbPreviewElement extends UmbLitElement {
 				padding: 0 15px;
 			}
 
-			#menu > uui-button-group {
+			#apps {
+				display: inline-flex;
+				align-items: stretch;
 				height: 100%;
 			}
 
