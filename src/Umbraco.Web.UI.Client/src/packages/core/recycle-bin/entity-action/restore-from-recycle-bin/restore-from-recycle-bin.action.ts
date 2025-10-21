@@ -1,5 +1,6 @@
 import { UMB_RESTORE_FROM_RECYCLE_BIN_MODAL } from './modal/restore-from-recycle-bin-modal.token.js';
 import type { MetaEntityActionRestoreFromRecycleBinKind } from './types.js';
+import { UmbEntityRestoredFromRecycleBinEvent } from './restore-from-recycle-bin.event.js';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import {
 	UmbEntityActionBase,
@@ -44,6 +45,13 @@ export class UmbRestoreFromRecycleBinEntityAction extends UmbEntityActionBase<Me
 		});
 
 		actionEventContext.dispatchEvent(sourceEvent);
+
+		const trashedEvent = new UmbEntityRestoredFromRecycleBinEvent({
+			unique: this.args.unique,
+			entityType: this.args.entityType,
+		});
+
+		actionEventContext.dispatchEvent(trashedEvent);
 
 		const destinationEvent = new UmbRequestReloadChildrenOfEntityEvent({
 			unique: destination.unique,

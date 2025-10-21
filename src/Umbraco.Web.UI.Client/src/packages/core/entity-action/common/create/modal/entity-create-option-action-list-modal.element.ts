@@ -132,7 +132,7 @@ export class UmbEntityCreateOptionActionListModalElement extends UmbModalBaseEle
 
 		return html`
 			<umb-ref-item
-				name=${label}
+				name=${manifest.meta.additionalOptions ? label + '...' : label}
 				detail=${ifDefined(description)}
 				icon=${manifest.meta.icon}
 				href=${ifDefined(href)}
