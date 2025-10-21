@@ -2,7 +2,7 @@ import type { UmbDocumentUserPermissionModel } from '../types.js';
 import { UmbDocumentItemRepository } from '../../../item/index.js';
 import type { UmbDocumentItemModel } from '../../../item/types.js';
 import { UMB_DOCUMENT_PICKER_MODAL } from '../../../constants.js';
-import { css, customElement, html, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
@@ -27,6 +27,7 @@ export class UmbInputDocumentGranularUserPermissionElement extends UUIFormContro
 		this.#observePickedDocuments(uniques);
 	}
 
+	@property({ type: Array, attribute: false })
 	public fallbackPermissions: Array<string> = [];
 
 	@state()
