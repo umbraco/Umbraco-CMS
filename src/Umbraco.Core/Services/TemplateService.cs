@@ -1,6 +1,4 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
@@ -8,7 +6,6 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
-using Umbraco.Cms.Core.Services.ContentTypeEditing;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
@@ -23,31 +20,7 @@ public class TemplateService : RepositoryService, ITemplateService
     private readonly ITemplateContentParserService _templateContentParserService;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly IDefaultViewContentProvider _defaultViewContentProvider;
-    private readonly IContentTypeService _contentTypeService;
 
-    public TemplateService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IShortStringHelper shortStringHelper,
-        ITemplateRepository templateRepository,
-        IAuditRepository auditRepository,
-        ITemplateContentParserService templateContentParserService,
-        IUserIdKeyResolver userIdKeyResolver,
-        IDefaultViewContentProvider defaultViewContentProvider,
-        IContentTypeService contentTypeService)
-        : base(provider, loggerFactory, eventMessagesFactory)
-    {
-        _shortStringHelper = shortStringHelper;
-        _templateRepository = templateRepository;
-        _auditRepository = auditRepository;
-        _templateContentParserService = templateContentParserService;
-        _userIdKeyResolver = userIdKeyResolver;
-        _defaultViewContentProvider = defaultViewContentProvider;
-        _contentTypeService = contentTypeService;
-    }
-
-    [Obsolete("Use the non-obsolete constructor. Scheduled for removal in v18.")]
     public TemplateService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -58,18 +31,14 @@ public class TemplateService : RepositoryService, ITemplateService
         ITemplateContentParserService templateContentParserService,
         IUserIdKeyResolver userIdKeyResolver,
         IDefaultViewContentProvider defaultViewContentProvider)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            shortStringHelper,
-            templateRepository,
-            auditRepository,
-            templateContentParserService,
-            userIdKeyResolver,
-            defaultViewContentProvider,
-            StaticServiceProvider.Instance.GetRequiredService<IContentTypeService>())
+        : base(provider, loggerFactory, eventMessagesFactory)
     {
+        _shortStringHelper = shortStringHelper;
+        _templateRepository = templateRepository;
+        _auditRepository = auditRepository;
+        _templateContentParserService = templateContentParserService;
+        _userIdKeyResolver = userIdKeyResolver;
+        _defaultViewContentProvider = defaultViewContentProvider;
     }
 
     /// <inheritdoc />
@@ -81,7 +50,6 @@ public class TemplateService : RepositoryService, ITemplateService
         ITemplate template = new Template(
             _shortStringHelper,
             contentTypeName,
-
             // NOTE: We are NOT passing in the content type alias here, we want to use it's name since we don't
             // want to save template file names as camelCase, the Template ctor will clean the alias as
             // `alias.ToCleanString(CleanStringType.UnderscoreAlias)` which has been the default.
@@ -97,7 +65,7 @@ public class TemplateService : RepositoryService, ITemplateService
 
         // check that the template hasn't been created on disk before creating the content type
         // if it exists, set the new template content to the existing file content
-        var content = GetViewContent(contentTypeAlias);
+        var content = GetViewContent(template.Alias);
         if (content != null)
         {
             template.Content = content;
@@ -128,23 +96,16 @@ public class TemplateService : RepositoryService, ITemplateService
     public async Task<Attempt<ITemplate?, TemplateOperationStatus>> CreateForContentTypeAsync(
         string name,
         string alias,
-        Guid contentTypeKey,
-        Guid userKey,
-        Guid? templateKey = null)
+        string contentTypeAlias,
+        Guid userKey)
     {
-        IContentType? contentType = await _contentTypeService.GetAsync(contentTypeKey);
-        if (contentType is null)
-        {
-            return Attempt<ITemplate, TemplateOperationStatus>.Fail(TemplateOperationStatus.ContentTypeNotFound);
-        }
-
         ITemplate template =
-            new Template(_shortStringHelper, name, alias) { Key = templateKey ?? Guid.NewGuid() };
+            new Template(_shortStringHelper, name, alias) { Key = Guid.CreateVersion7() };
 
-        Attempt<ITemplate, TemplateOperationStatus> result = await CreateAsync(template, userKey, contentType.Alias);
+        Attempt<ITemplate, TemplateOperationStatus> result = await CreateAsync(template, userKey, contentTypeAlias);
         return result.Success
             ? Attempt.SucceedWithStatus<ITemplate?, TemplateOperationStatus>(result.Status, result.Result)
-            : Attempt.FailWithStatus<ITemplate?, TemplateOperationStatus>(result.Status, result.Result);
+            : Attempt<ITemplate?, TemplateOperationStatus>.Fail(result.Status);
     }
 
     /// <inheritdoc />
@@ -268,11 +229,11 @@ public class TemplateService : RepositoryService, ITemplateService
     }
 
     private async Task<Attempt<ITemplate, TemplateOperationStatus>> SaveAsync(
-        ITemplate template,
-        AuditType auditType,
-        Guid userKey,
-        Func<TemplateOperationStatus>? scopeValidator = null,
-        string? contentTypeAlias = null)
+            ITemplate template,
+            AuditType auditType,
+            Guid userKey,
+            Func<TemplateOperationStatus>? scopeValidator = null,
+            string? contentTypeAlias = null)
     {
         if (IsValidAlias(template.Alias) == false)
         {
@@ -314,7 +275,7 @@ public class TemplateService : RepositoryService, ITemplateService
                 eventMessages,
                 !contentTypeAlias.IsNullOrWhiteSpace(),
                 contentTypeAlias ?? string.Empty);
-            if (scope.Notifications.PublishCancelable(savingNotification))
+            if (await scope.Notifications.PublishCancelableAsync(savingNotification))
             {
                 scope.Complete();
                 return Attempt.FailWithStatus(TemplateOperationStatus.CancelledByNotification, template);

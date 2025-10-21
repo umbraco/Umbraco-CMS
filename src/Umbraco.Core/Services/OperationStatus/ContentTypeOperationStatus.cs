@@ -24,4 +24,5 @@ public enum ContentTypeOperationStatus
     InvalidElementFlagDocumentHasContent,
     InvalidElementFlagElementIsUsedInPropertyEditorConfiguration,
     InvalidElementFlagComparedToParent,
+    Unknown,
 }

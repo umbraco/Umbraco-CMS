@@ -205,6 +205,12 @@ export type CreateDocumentTypeRequestModel = {
     compositions: Array<DocumentTypeCompositionModel>;
 };
 
+export type CreateDocumentTypeTemplateRequestModel = {
+    alias: string;
+    name: string;
+    isDefault: boolean;
+};
+
 export type CreateFolderRequestModel = {
     name: string;
     id?: string | null;
@@ -379,13 +385,6 @@ export type CreateStylesheetRequestModel = {
     name: string;
     parent?: FileSystemFolderModel | null;
     content: string;
-};
-
-export type CreateTemplateForDocumentTypeRequestModel = {
-    id?: string | null;
-    name: string;
-    alias: string;
-    documentType: ReferenceByIdModel;
 };
 
 export type CreateTemplateRequestModel = {
@@ -5241,6 +5240,39 @@ export type PutDocumentTypeByIdMoveResponses = {
      * OK
      */
     200: unknown;
+};
+
+export type PostDocumentTypeByIdTemplateData = {
+    body?: CreateDocumentTypeTemplateRequestModel;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/document-type/{id}/template';
+};
+
+export type PostDocumentTypeByIdTemplateErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type PostDocumentTypeByIdTemplateError = PostDocumentTypeByIdTemplateErrors[keyof PostDocumentTypeByIdTemplateErrors];
+
+export type PostDocumentTypeByIdTemplateResponses = {
+    /**
+     * Created
+     */
+    201: unknown;
 };
 
 export type GetDocumentTypeAllowedAtRootData = {
@@ -14358,37 +14390,6 @@ export type GetTemplateConfigurationResponses = {
 };
 
 export type GetTemplateConfigurationResponse = GetTemplateConfigurationResponses[keyof GetTemplateConfigurationResponses];
-
-export type PostTemplateForDocumentTypeData = {
-    body?: CreateTemplateForDocumentTypeRequestModel;
-    path?: never;
-    query?: never;
-    url: '/umbraco/management/api/v1/template/for-document-type';
-};
-
-export type PostTemplateForDocumentTypeErrors = {
-    /**
-     * Bad Request
-     */
-    400: ProblemDetails;
-    /**
-     * The resource is protected and requires an authentication token
-     */
-    401: unknown;
-    /**
-     * The authenticated user does not have access to this resource
-     */
-    403: unknown;
-};
-
-export type PostTemplateForDocumentTypeError = PostTemplateForDocumentTypeErrors[keyof PostTemplateForDocumentTypeErrors];
-
-export type PostTemplateForDocumentTypeResponses = {
-    /**
-     * Created
-     */
-    201: unknown;
-};
 
 export type PostTemplateQueryExecuteData = {
     body?: TemplateQueryExecuteModel;

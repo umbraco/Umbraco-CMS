@@ -74,22 +74,20 @@ public interface ITemplateService : IService
         Guid userKey);
 
     /// <summary>
-    ///     Creates a template for a content type.
+    ///     Creates a template for a content type
     /// </summary>
     /// <param name="name">Name of the new template</param>
     /// <param name="alias">Alias of the template</param>
-    /// <param name="contentTypeKey">The content type key.</param>
-    /// <param name="userKey">The key of the performing user.</param>
-    /// <param name="templateKey">The template key (optional).</param>
+    /// <param name="contentTypeAlias">The content type alias</param>
+    /// <param name="userKey">Key of the user performing the Create.</param>
     /// <returns>
-    ///     An attempt with the created template.
+    ///     The template created
     /// </returns>
     Task<Attempt<ITemplate?, TemplateOperationStatus>> CreateForContentTypeAsync(
         string name,
         string alias,
-        Guid contentTypeKey,
-        Guid userKey,
-        Guid? templateKey = null) => throw new NotImplementedException();
+        string contentTypeAlias,
+        Guid userKey) => throw new NotImplementedException();
 
     /// <summary>
     ///     Creates a new template

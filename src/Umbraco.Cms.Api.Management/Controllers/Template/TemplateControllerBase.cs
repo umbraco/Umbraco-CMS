@@ -42,10 +42,6 @@ public class TemplateControllerBase : ManagementApiControllerBase
                 .WithTitle("Master template cannot be deleted")
                 .WithDetail("The master templates cannot be deleted. Please ensure the template is not a master template before you delete.")
                 .Build()),
-            TemplateOperationStatus.ContentTypeNotFound => BadRequest(problemDetailsBuilder
-                .WithTitle("Content type not found")
-                .WithDetail("The provided content type was not found.")
-                .Build()),
             _ => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
                 .WithTitle("Unknown template operation status.")
                 .Build()),

@@ -1,9 +1,8 @@
-import type { UmbTemplateDetailModel, UmbTemplateForDocumentTypeDetailModel } from '../../types.js';
+import type { UmbTemplateDetailModel } from '../../types.js';
 import { UMB_TEMPLATE_ENTITY_TYPE } from '../../entity.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import type {
-	CreateTemplateForDocumentTypeRequestModel,
 	CreateTemplateRequestModel,
 	UpdateTemplateRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
@@ -157,35 +156,5 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 				path: { id: unique },
 			}),
 		);
-	}
-
-	/**
-	 * Inserts a new Template on the server
-	 * @param {UmbTemplateDetailModel} model
-	 * @returns {*}
-	 * @memberof UmbTemplateServerDataSource
-	 */
-	async createForDocumentType(model: UmbTemplateForDocumentTypeDetailModel) {
-		if (!model) throw new Error('Template is missing');
-
-		const body: CreateTemplateForDocumentTypeRequestModel = {
-			id: model.unique,
-			name: model.name,
-			alias: model.alias,
-			documentType: { id: model.documentType.unique },
-		};
-
-		const { data, error } = await tryExecute(
-			this.#host,
-			TemplateService.postTemplateForDocumentType({
-				body,
-			}),
-		);
-
-		if (data) {
-			return this.read(data as never);
-		}
-
-		return { error };
 	}
 }
