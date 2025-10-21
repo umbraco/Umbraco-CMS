@@ -50,6 +50,8 @@ test('can see related document in relation type', async ({umbracoApi, umbracoUi}
 
   // Act
   await umbracoUi.relationType.goToRelationTypeWithName('Related Document');
+  // Wait for the relation page to load
+  await umbracoUi.waitForTimeout(700);
 
   // Assert
   await umbracoUi.relationType.isRelationWithParentAndChildVisible(contentName, contentToBePickedName);
@@ -71,6 +73,8 @@ test('can see related media in relation type', async ({umbracoApi, umbracoUi}) =
 
   // Act
   await umbracoUi.relationType.goToRelationTypeWithName('Related Media');
+  // Wait for the relation page to load
+  await umbracoUi.waitForTimeout(700);
 
   // Assert
   await umbracoUi.relationType.isRelationWithParentAndChildVisible(contentName, mediaName);
@@ -97,6 +101,8 @@ test('can see related member in relation type', async ({umbracoApi, umbracoUi}) 
 
   // Act
   await umbracoUi.relationType.goToRelationTypeWithName('Related Member');
+  // Wait for the relation page to load
+  await umbracoUi.waitForTimeout(700);
 
   // Assert
   await umbracoUi.relationType.isRelationWithParentAndChildVisible(contentName, memberName);
@@ -145,6 +151,8 @@ test('can not see relation after media with relation is deleted', async ({umbrac
   await umbracoUi.waitForTimeout(2000);
 
   await umbracoUi.relationType.goToRelationTypeWithName('Related Media');
+  // Wait for the relation page to load
+  await umbracoUi.waitForTimeout(700);
   await umbracoUi.relationType.isRelationWithParentAndChildVisible(contentName, mediaName);
 
   // Act
@@ -173,6 +181,8 @@ test('can not see relation after member with relation is deleted', async ({umbra
   await umbracoUi.waitForTimeout(2000);
 
   await umbracoUi.relationType.goToRelationTypeWithName('Related Member');
+  // Wait for the relation page to load
+  await umbracoUi.waitForTimeout(700);
   await umbracoUi.relationType.isRelationWithParentAndChildVisible(contentName, memberName);
 
   // Act
