@@ -12,8 +12,7 @@ import type { UmbInputLanguageElement } from '@umbraco-cms/backoffice/language';
 import { UMB_ICON_PICKER_MODAL } from '@umbraco-cms/backoffice/icon';
 import type { UmbInputWithAliasElement } from '@umbraco-cms/backoffice/components';
 
-import './components/user-group-entity-user-permission-list.element.js';
-import './components/user-group-granular-permission-list.element.js';
+import './components/user-group-entity-type-permission-groups.element.js';
 
 @customElement('umb-user-group-workspace-editor')
 export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
@@ -241,20 +240,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 						${this.#renderLanguageAccess()} ${this.#renderDocumentAccess()} ${this.#renderMediaAccess()}
 					</uui-box>
 
-					<uui-box>
-						<div slot="headline"><umb-localize key="user_permissionsDefault"></umb-localize></div>
-
-						<umb-property-layout
-							label=${this.localize.term('user_entityPermissionsLabel')}
-							description=${this.localize.term('user_entityPermissionsDescription')}>
-							<umb-user-group-entity-user-permission-list slot="editor"></umb-user-group-entity-user-permission-list>
-						</umb-property-layout>
-					</uui-box>
-
-					<uui-box>
-						<div slot="headline"><umb-localize key="user_permissionsGranular"></umb-localize></div>
-						<umb-user-group-granular-permission-list></umb-user-group-granular-permission-list>
-					</uui-box>
+					${this.#renderPermissionGroups()}
 				</umb-stack>
 			</div>
 		`;
@@ -334,6 +320,10 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 					: nothing}
 			</umb-property-layout>
 		`;
+	}
+
+	#renderPermissionGroups() {
+		return html`<umb-user-group-entity-type-permission-groups></umb-user-group-entity-type-permission-groups> `;
 	}
 
 	static override styles = [
