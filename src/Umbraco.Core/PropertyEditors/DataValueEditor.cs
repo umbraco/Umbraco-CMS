@@ -3,12 +3,14 @@ using System.Globalization;
 using System.Runtime.Serialization;
 using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Cms.Core.PropertyEditors.Validators;
 using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
 
@@ -414,5 +416,65 @@ public class DataValueEditor : IDataValueEditor
         }
 
         return value.TryConvertTo(valueType);
+    }
+
+    /// <summary>
+    /// Retrieves a <see cref="IContent"/> instance by its unique identifier, using the provided request cache to avoid redundant
+    /// lookups within the same request.
+    /// </summary>
+    /// <remarks>
+    /// This method caches content lookups for the duration of the current request to improve performance when the same content
+    /// item may be accessed multiple times. This is particularly useful in scenarios involving multiple languages or blocks.
+    /// </remarks>
+    /// <param name="key">The unique identifier of the content item to retrieve.</param>
+    /// <param name="requestCache">The request-scoped cache used to store and retrieve content items for the duration of the current request.</param>
+    /// <param name="contentService">The content service used to fetch the content item if it is not found in the cache.</param>
+    /// <returns>The <see cref="IContent"/> instance corresponding to the specified key, or null if no such content item exists.</returns>
+    protected static IContent? GetAndCacheContentById(Guid key, IRequestCache requestCache, IContentService contentService)
+    {
+        const string CacheKeyFormat = nameof(DataValueEditor) + "_Content_{0}";
+
+        var cacheKey = string.Format(CacheKeyFormat, key);
+        IContent? content = requestCache.GetCacheItem<IContent?>(cacheKey);
+        if (content is null)
+        {
+            content = contentService.GetById(key);
+            if (content is not null)
+            {
+                requestCache.Set(cacheKey, content);
+            }
+        }
+
+        return content;
+    }
+
+    /// <summary>
+    /// Retrieves a <see cref="IMedia"/> instance by its unique identifier, using the provided request cache to avoid redundant
+    /// lookups within the same request.
+    /// </summary>
+    /// <remarks>
+    /// This method caches media lookups for the duration of the current request to improve performance when the same media
+    /// item may be accessed multiple times. This is particularly useful in scenarios involving multiple languages or blocks.
+    /// </remarks>
+    /// <param name="key">The unique identifier of the media item to retrieve.</param>
+    /// <param name="requestCache">The request-scoped cache used to store and retrieve media items for the duration of the current request.</param>
+    /// <param name="mediaService">The media service used to fetch the media item if it is not found in the cache.</param>
+    /// <returns>The <see cref="IMedia"/> instance corresponding to the specified key, or null if no such media item exists.</returns>
+    protected static IMedia? GetAndCacheMediaById(Guid key, IRequestCache requestCache, IMediaService mediaService)
+    {
+        const string CacheKeyFormat = nameof(DataValueEditor) + "_Media_{0}";
+
+        var cacheKey = string.Format(CacheKeyFormat, key);
+        IMedia? media = requestCache.GetCacheItem<IMedia?>(cacheKey);
+        if (media is null)
+        {
+            media = mediaService.GetById(key);
+            if (media is not null)
+            {
+                requestCache.Set(cacheKey, media);
+            }
+        }
+
+        return media;
     }
 }

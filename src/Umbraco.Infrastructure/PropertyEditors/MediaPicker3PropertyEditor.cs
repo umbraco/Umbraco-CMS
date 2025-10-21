@@ -54,8 +54,6 @@ public class MediaPicker3PropertyEditor : DataEditor
     /// </summary>
     internal sealed class MediaPicker3PropertyValueEditor : DataValueEditor, IDataValueReference
     {
-        private const string MediaCacheKeyFormat = nameof(MediaPicker3PropertyValueEditor) + "_Media_{0}";
-
         private readonly IDataTypeConfigurationCache _dataTypeReadCache;
         private readonly IJsonSerializer _jsonSerializer;
         private readonly IMediaImportService _mediaImportService;
@@ -208,29 +206,11 @@ public class MediaPicker3PropertyEditor : DataEditor
 
             foreach (MediaWithCropsDto mediaWithCropsDto in mediaWithCropsDtos)
             {
-                IMedia? media = GetMediaById(mediaWithCropsDto.MediaKey);
+                IMedia? media = GetAndCacheMediaById(mediaWithCropsDto.MediaKey, _appCaches.RequestCache, _mediaService);
                 mediaWithCropsDto.MediaTypeAlias = media?.ContentType.Alias ?? unknownMediaType;
             }
 
             return mediaWithCropsDtos.Where(m => m.MediaTypeAlias != unknownMediaType).ToList();
-        }
-
-        private IMedia? GetMediaById(Guid key)
-        {
-            // Cache media lookups in case the same media is handled multiple times across a save operation,
-            // which is possible, particularly if we have multiple languages and blocks.
-            var cacheKey = string.Format(MediaCacheKeyFormat, key);
-            IMedia? media = _appCaches.RequestCache.GetCacheItem<IMedia?>(cacheKey);
-            if (media is null)
-            {
-                media = _mediaService.GetById(key);
-                if (media is not null)
-                {
-                    _appCaches.RequestCache.Set(cacheKey, media);
-                }
-            }
-
-            return media;
         }
 
         private List<MediaWithCropsDto> HandleTemporaryMediaUploads(List<MediaWithCropsDto> mediaWithCropsDtos, MediaPicker3Configuration configuration)
@@ -240,7 +220,7 @@ public class MediaPicker3PropertyEditor : DataEditor
             foreach (MediaWithCropsDto mediaWithCropsDto in mediaWithCropsDtos)
             {
                 // if the media already exist, don't bother with it
-                if (GetMediaById(mediaWithCropsDto.MediaKey) != null)
+                if (GetAndCacheMediaById(mediaWithCropsDto.MediaKey, _appCaches.RequestCache, _mediaService) != null)
                 {
                     continue;
                 }

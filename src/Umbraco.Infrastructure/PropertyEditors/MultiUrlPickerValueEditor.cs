@@ -3,7 +3,10 @@
 
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -26,7 +29,9 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
     private readonly IJsonSerializer _jsonSerializer;
     private readonly IContentService _contentService;
     private readonly IMediaService _mediaService;
+    private readonly AppCaches _appCaches;
 
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
     public MultiUrlPickerValueEditor(
         ILogger<MultiUrlPickerValueEditor> logger,
         ILocalizedTextService localizedTextService,
@@ -37,14 +42,40 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
         IIOHelper ioHelper,
         IContentService contentService,
         IMediaService mediaService)
+        : this(
+            logger,
+            localizedTextService,
+            shortStringHelper,
+            attribute,
+            publishedUrlProvider,
+            jsonSerializer,
+            ioHelper,
+            contentService,
+            mediaService,
+            StaticServiceProvider.Instance.GetRequiredService<AppCaches>())
+    {
+    }
+
+    public MultiUrlPickerValueEditor(
+        ILogger<MultiUrlPickerValueEditor> logger,
+        ILocalizedTextService localizedTextService,
+        IShortStringHelper shortStringHelper,
+        DataEditorAttribute attribute,
+        IPublishedUrlProvider publishedUrlProvider,
+        IJsonSerializer jsonSerializer,
+        IIOHelper ioHelper,
+        IContentService contentService,
+        IMediaService mediaService,
+        AppCaches appCaches)
         : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
     {
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _logger = logger;
         _publishedUrlProvider = publishedUrlProvider;
-
         _jsonSerializer = jsonSerializer;
         _contentService = contentService;
         _mediaService = mediaService;
+        _appCaches = appCaches;
+
         Validators.Add(new TypedJsonValidatorRunner<LinkDisplay[], MultiUrlPickerConfiguration>(
             _jsonSerializer,
             new MinMaxValidator(localizedTextService)));
@@ -105,7 +136,7 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
                     if (dto.Udi.EntityType == Constants.UdiEntityType.Document)
                     {
                         url =  _publishedUrlProvider.GetUrl(dto.Udi.Guid, UrlMode.Relative, culture);
-                        IContent? c = _contentService.GetById(dto.Udi.Guid);
+                        IContent? c = GetAndCacheContentById(dto.Udi.Guid, _appCaches.RequestCache, _contentService);
 
                         if (c is not null)
                         {
@@ -119,7 +150,7 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
                     else if (dto.Udi.EntityType == Constants.UdiEntityType.Media)
                     {
                         url = _publishedUrlProvider.GetMediaUrl(dto.Udi.Guid, UrlMode.Relative, culture);
-                        IMedia? m = _mediaService.GetById(dto.Udi.Guid);
+                        IMedia? m = GetAndCacheMediaById(dto.Udi.Guid, _appCaches.RequestCache, _mediaService);
                         if (m is not null)
                         {
                             published = m.Trashed is false;
