@@ -1,12 +1,12 @@
 import { UMB_PREVIEW_CONTEXT } from '../preview.context.js';
-import { css, customElement, html, property, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, ifDefined, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 export interface UmbPreviewDevice {
 	alias: string;
 	label: string;
-	css: string;
 	icon: string;
+	iconClass?: string;
 	dimensions: { height: string; width: string };
 }
 
@@ -16,50 +16,45 @@ export class UmbPreviewDeviceElement extends UmbLitElement {
 		{
 			alias: 'fullsize',
 			label: 'Fit browser',
-			css: 'fullsize',
 			icon: 'icon-application-window-alt',
 			dimensions: { height: '100%', width: '100%' },
 		},
 		{
 			alias: 'desktop',
 			label: 'Desktop',
-			css: 'desktop shadow',
 			icon: 'icon-display',
 			dimensions: { height: '1080px', width: '1920px' },
 		},
 		{
 			alias: 'laptop',
 			label: 'Laptop',
-			css: 'laptop shadow',
 			icon: 'icon-laptop',
 			dimensions: { height: '768px', width: '1366px' },
 		},
 		{
 			alias: 'ipad-portrait',
 			label: 'Tablet portrait',
-			css: 'ipad-portrait shadow',
 			icon: 'icon-ipad',
 			dimensions: { height: '929px', width: '769px' },
 		},
 		{
 			alias: 'ipad-landscape',
 			label: 'Tablet landscape',
-			css: 'ipad-landscape shadow flip',
 			icon: 'icon-ipad',
+			iconClass: 'flip',
 			dimensions: { height: '675px', width: '1024px' },
 		},
 		{
 			alias: 'smartphone-portrait',
 			label: 'Smartphone portrait',
-			css: 'smartphone-portrait shadow',
 			icon: 'icon-iphone',
 			dimensions: { height: '640px', width: '360px' },
 		},
 		{
 			alias: 'smartphone-landscape',
 			label: 'Smartphone landscape',
-			css: 'smartphone-landscape shadow flip',
 			icon: 'icon-iphone',
+			iconClass: 'flip',
 			dimensions: { height: '360px', width: '640px' },
 		},
 	];
@@ -80,7 +75,7 @@ export class UmbPreviewDeviceElement extends UmbLitElement {
 		const previewContext = await this.getContext(UMB_PREVIEW_CONTEXT);
 
 		previewContext?.updateIFrame({
-			className: device.css,
+			wrapperClass: device.alias,
 			height: device.dimensions.height,
 			width: device.dimensions.width,
 		});
@@ -90,7 +85,7 @@ export class UmbPreviewDeviceElement extends UmbLitElement {
 		return html`
 			<uui-button look="primary" popovertarget="devices-popover">
 				<div>
-					<uui-icon name=${this.device.icon} class=${this.device.css.includes('flip') ? 'flip' : ''}></uui-icon>
+					<uui-icon name=${this.device.icon} class=${ifDefined(this.device.iconClass)}></uui-icon>
 					<span>${this.device.label}</span>
 				</div>
 			</uui-button>
@@ -104,7 +99,7 @@ export class UmbPreviewDeviceElement extends UmbLitElement {
 								label=${item.label}
 								?active=${item === this.device}
 								@click=${() => this.#changeDevice(item)}>
-								<uui-icon slot="icon" name=${item.icon} class=${item.css.includes('flip') ? 'flip' : ''}></uui-icon>
+								<uui-icon slot="icon" name=${item.icon} class=${ifDefined(item.iconClass)}></uui-icon>
 							</uui-menu-item>
 						`,
 					)}
@@ -127,6 +122,10 @@ export class UmbPreviewDeviceElement extends UmbLitElement {
 				display: flex;
 				align-items: center;
 				gap: 5px;
+			}
+
+			uui-icon.flip {
+				transform: rotate(90deg);
 			}
 
 			umb-popover-layout {

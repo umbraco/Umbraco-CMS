@@ -118,7 +118,7 @@ export class UmbPreviewElement extends UmbLitElement {
 				overflow: hidden;
 			}
 
-			#wrapper.shadow {
+			#wrapper:not(.fullsize) {
 				margin: 10px auto;
 				background-color: white;
 				border-radius: 3px;

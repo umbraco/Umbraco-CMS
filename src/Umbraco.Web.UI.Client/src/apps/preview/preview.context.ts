@@ -14,11 +14,11 @@ import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-
 const UMB_LOCALSTORAGE_SESSION_KEY = 'umb:previewSessions';
 
 interface UmbPreviewIframeArgs {
-	className?: string;
 	culture?: string;
 	height?: string;
 	segment?: string;
 	width?: string;
+	wrapperClass?: string;
 }
 
 interface UmbPreviewUrlArgs {
@@ -310,7 +310,7 @@ export class UmbPreviewContext extends UmbContextBase {
 
 		this.#setPreviewUrl({ culture: mergedArgs.culture, segment: mergedArgs.segment });
 
-		if (mergedArgs.className) wrapper.className = mergedArgs.className;
+		if (mergedArgs.wrapperClass) wrapper.className = mergedArgs.wrapperClass;
 		if (mergedArgs.height) wrapper.style.height = mergedArgs.height;
 		if (mergedArgs.width) wrapper.style.width = mergedArgs.width;
 	}
