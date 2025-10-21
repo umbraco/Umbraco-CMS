@@ -34,9 +34,7 @@ public abstract class UmbracoIntegrationTestWithContentEditing : UmbracoIntegrat
 
     protected ContentCreateModel Textpage { get; private set; }
 
-    protected ContentScheduleCollection ContentSchedule { get; private set; }
-
-    protected CultureAndScheduleModel CultureAndSchedule { get; private set; }
+    protected ICollection<CulturePublishScheduleModel> CultureAndSchedule { get; private set; }
 
     protected int TextpageId { get; private set; }
 
@@ -91,11 +89,7 @@ public abstract class UmbracoIntegrationTestWithContentEditing : UmbracoIntegrat
         }
 
         // Sets the culture and schedule for the content, in this case, we are publishing immediately for all cultures
-        ContentSchedule = new ContentScheduleCollection();
-        CultureAndSchedule = new CultureAndScheduleModel
-        {
-            CulturesToPublishImmediately = new HashSet<string> { "*" }, Schedules = ContentSchedule,
-        };
+        CultureAndSchedule = [new CulturePublishScheduleModel { Culture = "*", Schedule = null }];
 
         // Create and Save Content "Text Page 1" based on "umbTextpage" -> 1054
         PublishedTextPage = ContentEditingBuilder.CreateSimpleContent(ContentType.Key, "Published Page");
