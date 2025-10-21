@@ -7,7 +7,7 @@ import type { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 @customElement('umb-user-group-entity-type-permissions')
 export class UmbUserGroupEntityTypePermissionsElement extends UmbLitElement {
 	@property()
-	private entityType?: string;
+	public entityType?: string;
 
 	@state()
 	private _fallBackPermissions?: Array<string>;
