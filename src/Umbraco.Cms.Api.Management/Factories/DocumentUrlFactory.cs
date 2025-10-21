@@ -89,7 +89,7 @@ public class DocumentUrlFactory : IDocumentUrlFactory
             }
         }
 
-        return CreateDocumentUrlInfo(previewUrlInfo, previewUrlInfo.IsExternal is false);
+        return CreateDocumentUrlInfo(previewUrlInfo, previewUrlInfo.IsExternal);
     }
 
     private DocumentUrlInfo CreateDocumentUrlInfo(UrlInfo urlInfo, bool ensureAbsoluteUrl)
