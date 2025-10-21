@@ -2737,8 +2737,8 @@ export default {
 			'You can edit and delete Document Blueprints from the "Document Blueprints" tree in the Settings section. Expand the Document Type which the Document Blueprint is based on and click it to edit or delete it.',
 	},
 	preview: {
-		endLabel: 'End',
-		endTitle: 'End preview mode',
+		endLabel: 'Exit',
+		endTitle: 'Exit preview mode',
 		openWebsiteLabel: 'Preview website',
 		openWebsiteTitle: 'Open website in preview mode',
 		returnToPreviewHeadline: 'Preview website?',
