@@ -43,6 +43,7 @@ test.beforeEach(async ({umbracoApi}) => {
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNodeAndDataType(documentTypeName, childDocumentTypeId, dataTypeName, dataTypeId);
   firstDocumentId = await umbracoApi.document.createDocumentWithTextContent(firstDocumentName, documentTypeId, documentText, dataTypeName);
   secondDocumentId = await umbracoApi.document.createDocumentWithTextContent(secondDocumentName, documentTypeId, documentText, dataTypeName);
+  await umbracoApi.language.createDanishLanguage();
 });
 
 test.afterEach(async ({umbracoApi}) => {
@@ -54,6 +55,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(childDocumentTypeName);
   await umbracoApi.documentBlueprint.ensureNameNotExists(documentBlueprintName);
   await umbracoApi.userGroup.ensureNameNotExists(userGroupName);
+  await umbracoApi.language.ensureIsoCodeNotExists('da');
 });
 
 // Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/20505
@@ -255,28 +257,29 @@ test('can sort children with sort children permission enabled', async ({umbracoA
 test('can set culture and hostnames for a specific content with culture and hostnames permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const domainName = '/domain';
-  userGroupId = await umbracoApi.userGroup.createUserGroupWithCultureAndHostnamesPermissionForSpecificDocument(userGroupName, secondDocumentId);
+  const languageName = 'Danish';
+  userGroupId = await umbracoApi.userGroup.createUserGroupWithCultureAndHostnamesPermissionForSpecificDocument(userGroupName, firstDocumentId);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
   testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
-  await umbracoApi.document.publish(firstDocumentId);
 
   // Act
-  await umbracoUi.content.clickActionsMenuForContent(secondDocumentName);
+  await umbracoUi.content.clickActionsMenuForContent(firstDocumentName);
   await umbracoUi.content.clickCultureAndHostnamesActionMenuOption();
   await umbracoUi.content.clickAddNewDomainButton();
-  await umbracoUi.content.enterDomain(domainName);
+  await umbracoUi.content.enterDomain(domainName, 0);
+  await umbracoUi.content.selectDomainLanguageOption(languageName, 0);
   await umbracoUi.content.clickSaveModalButton();
 
   // Assert
   await umbracoUi.content.waitForDomainToBeCreated();
   await umbracoUi.waitForTimeout(1000); // Wait for the domain to be set
-  const document = await umbracoApi.document.getByName(secondDocumentName);
+  const document = await umbracoApi.document.getByName(firstDocumentName);
   const domains = await umbracoApi.document.getDomains(document.id);
   expect(domains.domains[0].domainName).toEqual(domainName);
-  expect(domains.domains[0].isoCode).toEqual('en-US');
-  await umbracoUi.content.isActionsMenuForNameVisible(firstDocumentName, false);
+  expect(domains.domains[0].isoCode).toEqual('da');
+  await umbracoUi.content.isActionsMenuForNameVisible(secondDocumentName, false);
 });
 
 test('can set public access for a specific content with public access permission enabled', async ({umbracoApi, umbracoUi}) => {
