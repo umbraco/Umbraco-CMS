@@ -22,6 +22,9 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 [DataContract]
 public class DataValueEditor : IDataValueEditor
 {
+    private const string ContentCacheKeyFormat = nameof(DataValueEditor) + "_Content_{0}";
+    private const string MediaCacheKeyFormat = nameof(DataValueEditor) + "_Media_{0}";
+
     private readonly IJsonSerializer? _jsonSerializer;
     private readonly IShortStringHelper _shortStringHelper;
 
@@ -432,9 +435,7 @@ public class DataValueEditor : IDataValueEditor
     /// <returns>The <see cref="IContent"/> instance corresponding to the specified key, or null if no such content item exists.</returns>
     protected static IContent? GetAndCacheContentById(Guid key, IRequestCache requestCache, IContentService contentService)
     {
-        const string CacheKeyFormat = nameof(DataValueEditor) + "_Content_{0}";
-
-        var cacheKey = string.Format(CacheKeyFormat, key);
+        var cacheKey = string.Format(ContentCacheKeyFormat, key);
         IContent? content = requestCache.GetCacheItem<IContent?>(cacheKey);
         if (content is null)
         {
@@ -446,6 +447,17 @@ public class DataValueEditor : IDataValueEditor
         }
 
         return content;
+    }
+
+    /// <summary>
+    /// Adds the specified <see cref="IContent"/> item to the request cache using its unique key.
+    /// </summary>
+    /// <param name="content">The content item to cache.</param>
+    /// <param name="requestCache">The request cache in which to store the content item.</param>
+    protected static void CacheContentById(IContent content, IRequestCache requestCache)
+    {
+        var cacheKey = string.Format(ContentCacheKeyFormat, content.Key);
+        requestCache.Set(cacheKey, content);
     }
 
     /// <summary>
@@ -462,9 +474,7 @@ public class DataValueEditor : IDataValueEditor
     /// <returns>The <see cref="IMedia"/> instance corresponding to the specified key, or null if no such media item exists.</returns>
     protected static IMedia? GetAndCacheMediaById(Guid key, IRequestCache requestCache, IMediaService mediaService)
     {
-        const string CacheKeyFormat = nameof(DataValueEditor) + "_Media_{0}";
-
-        var cacheKey = string.Format(CacheKeyFormat, key);
+        var cacheKey = string.Format(MediaCacheKeyFormat, key);
         IMedia? media = requestCache.GetCacheItem<IMedia?>(cacheKey);
         if (media is null)
         {
@@ -476,5 +486,40 @@ public class DataValueEditor : IDataValueEditor
         }
 
         return media;
+    }
+
+    /// <summary>
+    /// Adds the specified <see cref="IMedia"/> item to the request cache using its unique key.
+    /// </summary>
+    /// <param name="media">The media item to cache.</param>
+    /// <param name="requestCache">The request cache in which to store the media item.</param>
+    protected static void CacheMediaById(IMedia media, IRequestCache requestCache)
+    {
+        var cacheKey = string.Format(MediaCacheKeyFormat, media.Key);
+        requestCache.Set(cacheKey, media);
+    }
+
+    /// <summary>
+    /// Determines whether the content item identified by the specified key is present in the request cache.
+    /// </summary>
+    /// <param name="key">The unique identifier for the content item to check for in the cache.</param>
+    /// <param name="requestCache">The request cache in which to look for the content item.</param>
+    /// <returns>true if the content item is already cached in the request cache; otherwise, false.</returns>
+    protected static bool IsContentAlreadyCached(Guid key, IRequestCache requestCache)
+    {
+        var cacheKey = string.Format(ContentCacheKeyFormat, key);
+        return requestCache.GetCacheItem<IContent?>(cacheKey) is not null;
+    }
+
+    /// <summary>
+    /// Determines whether the media item identified by the specified key is present in the request cache.
+    /// </summary>
+    /// <param name="key">The unique identifier for the media item to check for in the cache.</param>
+    /// <param name="requestCache">The request cache in which to look for the media item.</param>
+    /// <returns>true if the media item is already cached in the request cache; otherwise, false.</returns>
+    protected static bool IsMediaAlreadyCached(Guid key, IRequestCache requestCache)
+    {
+        var cacheKey = string.Format(MediaCacheKeyFormat, key);
+        return requestCache.GetCacheItem<IMedia?>(cacheKey) is not null;
     }
 }

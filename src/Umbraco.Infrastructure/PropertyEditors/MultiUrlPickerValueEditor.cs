@@ -22,7 +22,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
-public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
+public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference, ICacheReferencedEntities
 {
     private readonly ILogger<MultiUrlPickerValueEditor> _logger;
     private readonly IPublishedUrlProvider _publishedUrlProvider;
@@ -80,6 +80,63 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
             _jsonSerializer,
             new MinMaxValidator(localizedTextService)));
     }
+
+    /// <inheritdoc/>
+    public void CacheReferencedEntities(IEnumerable<object> values)
+    {
+        var dtos = values
+            .Select(value =>
+            {
+                var asString = value is string str ? str : value.ToString();
+                if (string.IsNullOrEmpty(asString))
+                {
+                    return null;
+                }
+
+                return _jsonSerializer.Deserialize<List<LinkDto>>(asString);
+            })
+            .WhereNotNull()
+            .SelectMany(x => x)
+            .Where(x => x.Type == Constants.UdiEntityType.Document || x.Type == Constants.UdiEntityType.Media)
+            .ToList();
+
+        IList<Guid> contentKeys = GetKeys(Constants.UdiEntityType.Document, dtos);
+        IList<Guid> mediaKeys = GetKeys(Constants.UdiEntityType.Media, dtos);
+
+        if (contentKeys.Count > 0)
+        {
+            IEnumerable<IContent> contentItems = _contentService.GetByIds(contentKeys);
+            foreach (IContent content in contentItems)
+            {
+                CacheContentById(content, _appCaches.RequestCache);
+            }
+        }
+
+        if (mediaKeys.Count > 0)
+        {
+            IEnumerable<IMedia> mediaItems = _mediaService.GetByIds(mediaKeys);
+            foreach (IMedia media in mediaItems)
+            {
+                CacheMediaById(media, _appCaches.RequestCache);
+            }
+        }
+    }
+
+    private IList<Guid> GetKeys(string entityType, IEnumerable<LinkDto> dtos) =>
+        dtos
+            .Where(x => x.Type! == entityType)
+            .Select(x => x.Unique ?? (x.Udi is not null ? x.Udi.Guid : Guid.Empty))
+            .Where(x => x != Guid.Empty)
+            .Distinct()
+            .Where(x => IsAlreadyCached(x, entityType) is false)
+            .ToList();
+
+    private bool IsAlreadyCached(Guid key, string entityType) => entityType switch
+    {
+        Constants.UdiEntityType.Document => IsContentAlreadyCached(key, _appCaches.RequestCache),
+        Constants.UdiEntityType.Media => IsMediaAlreadyCached(key, _appCaches.RequestCache),
+        _ => false,
+    };
 
     public IEnumerable<UmbracoEntityReference> GetReferences(object? value)
     {
@@ -237,6 +294,12 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
 
         [DataMember(Name = "target")]
         public string? Target { get; set; }
+
+        [DataMember(Name = "unique")]
+        public Guid? Unique { get; set; }
+
+        [DataMember(Name = "type")]
+        public string? Type { get; set; }
 
         [DataMember(Name = "udi")]
         public GuidUdi? Udi { get; set; }

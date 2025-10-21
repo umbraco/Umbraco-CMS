@@ -43,6 +43,42 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
         _languageService = languageService;
     }
 
+    /// <summary>
+    /// Caches referenced entities for all property values with supporting property editors within the specified block editor data
+    /// optimising subsequent retrieval of entities when parsing and converting property values.
+    /// </summary>
+    /// <remarks>
+    /// This method iterates through all property values associated with data editors in the provided
+    /// block editor data and invokes caching for referenced entities where supported by the property editor.
+    /// </remarks>
+    /// <param name="blockEditorData">The block editor data containing content and settings property values to analyze for referenced entities.</param>
+    protected void CacheReferencedEntities(BlockEditorData<TValue, TLayout>? blockEditorData)
+    {
+        // Group property values by their associated data editor alias.
+        IEnumerable<IGrouping<string, BlockPropertyValue>> valuesByDataEditors = (blockEditorData?.BlockValue.ContentData ?? []).Union(blockEditorData?.BlockValue.SettingsData ?? [])
+            .SelectMany(x => x.Values)
+            .Where(x => x.EditorAlias is not null && x.Value is not null)
+            .GroupBy(x => x.EditorAlias!);
+
+        // Iterate through each group and cache referenced entities if supported by the data editor.
+        foreach (IGrouping<string, BlockPropertyValue> valueByDataEditor in valuesByDataEditors)
+        {
+            IDataEditor? dataEditor = _propertyEditors[valueByDataEditor.Key];
+            if (dataEditor is null)
+            {
+                continue;
+            }
+
+            IDataValueEditor valueEditor = dataEditor.GetValueEditor();
+
+            if (valueEditor is ICacheReferencedEntities valueEditorWithPrecaching)
+            {
+                valueEditorWithPrecaching.CacheReferencedEntities(valueByDataEditor.Select(x => x.Value!));
+            }
+        }
+    }
+
+
     /// <inheritdoc />
     public abstract IEnumerable<UmbracoEntityReference> GetReferences(object? value);
 

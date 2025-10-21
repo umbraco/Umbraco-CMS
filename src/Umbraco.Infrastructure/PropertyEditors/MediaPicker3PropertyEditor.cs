@@ -52,7 +52,7 @@ public class MediaPicker3PropertyEditor : DataEditor
     /// <summary>
     /// Defines the value editor for the media picker property editor.
     /// </summary>
-    internal sealed class MediaPicker3PropertyValueEditor : DataValueEditor, IDataValueReference
+    internal sealed class MediaPicker3PropertyValueEditor : DataValueEditor, IDataValueReference, ICacheReferencedEntities
     {
         private readonly IDataTypeConfigurationCache _dataTypeReadCache;
         private readonly IJsonSerializer _jsonSerializer;
@@ -103,6 +103,27 @@ public class MediaPicker3PropertyEditor : DataEditor
                 new StartNodeValidator(localizedTextService, mediaNavigationQueryService));
 
             Validators.Add(validators);
+        }
+
+        /// <inheritdoc/>
+        public void CacheReferencedEntities(IEnumerable<object> values)
+        {
+            var mediaKeys = values
+                .SelectMany(value => Deserialize(_jsonSerializer, value))
+                .Select(dto => dto.MediaKey)
+                .Distinct()
+                .Where(x => IsMediaAlreadyCached(x, _appCaches.RequestCache) is false)
+                .ToList();
+            if (mediaKeys.Count == 0)
+            {
+                return;
+            }
+
+            IEnumerable<IMedia> mediaItems = _mediaService.GetByIds(mediaKeys);
+            foreach (IMedia media in mediaItems)
+            {
+                CacheMediaById(media, _appCaches.RequestCache);
+            }
         }
 
         /// <inheritdoc/>

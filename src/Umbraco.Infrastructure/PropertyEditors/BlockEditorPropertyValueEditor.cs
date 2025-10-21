@@ -135,6 +135,8 @@ public abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : BlockVal
         BlockEditorData<TValue, TLayout>? currentBlockEditorData = SafeParseBlockEditorData(currentValue);
         BlockEditorData<TValue, TLayout>? blockEditorData = SafeParseBlockEditorData(editorValue.Value);
 
+        CacheReferencedEntities(blockEditorData);
+
         // We can skip MapBlockValueFromEditor if both editorValue and currentValue values are empty.
         if (IsBlockEditorDataEmpty(currentBlockEditorData) && IsBlockEditorDataEmpty(blockEditorData))
         {
