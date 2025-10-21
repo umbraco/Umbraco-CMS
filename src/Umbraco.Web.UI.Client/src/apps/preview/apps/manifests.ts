@@ -24,6 +24,13 @@ export const manifests: Array<ManifestPreviewAppProvider> = [
 	},
 	{
 		type: 'previewApp',
+		alias: 'Umb.PreviewApps.Environments',
+		name: 'Preview: Environments Menu',
+		element: () => import('./preview-environments.element.js'),
+		weight: 210,
+	},
+	{
+		type: 'previewApp',
 		alias: 'Umb.PreviewApps.OpenWebsite',
 		name: 'Preview: Open Website Button',
 		element: () => import('./preview-open-website.element.js'),

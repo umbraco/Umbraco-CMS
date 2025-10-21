@@ -1,15 +1,16 @@
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
+import { HubConnectionBuilder } from '@umbraco-cms/backoffice/external/signalr';
 import { UmbBooleanState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbDocumentPreviewRepository } from '@umbraco-cms/backoffice/document';
-import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { HubConnectionBuilder, type HubConnection } from '@umbraco-cms/backoffice/external/signalr';
-import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
+import type { HubConnection } from '@umbraco-cms/backoffice/external/signalr';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 const UMB_LOCALSTORAGE_SESSION_KEY = 'umb:previewSessions';
 
@@ -30,11 +31,14 @@ interface UmbPreviewUrlArgs {
 }
 
 export class UmbPreviewContext extends UmbContextBase {
-	#unique?: string | null;
-	#culture?: string | null;
-	#segment?: string | null;
+	#currentArgs: UmbPreviewIframeArgs = {};
 	#serverUrl: string = '';
 	#connection?: HubConnection;
+
+	#documentPreviewRepository = new UmbDocumentPreviewRepository(this);
+
+	#culture = new UmbStringState(undefined);
+	public readonly culture = this.#culture.asObservable();
 
 	#iframeReady = new UmbBooleanState(false);
 	public readonly iframeReady = this.#iframeReady.asObservable();
@@ -42,7 +46,11 @@ export class UmbPreviewContext extends UmbContextBase {
 	#previewUrl = new UmbStringState(undefined);
 	public readonly previewUrl = this.#previewUrl.asObservable();
 
-	#documentPreviewRepository = new UmbDocumentPreviewRepository(this);
+	#segment = new UmbStringState(undefined);
+	public readonly segment = this.#segment.asObservable();
+
+	#unique = new UmbStringState(undefined);
+	public readonly unique = this.#unique.asObservable();
 
 	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
 	#localize = new UmbLocalizationController(this);
@@ -53,13 +61,21 @@ export class UmbPreviewContext extends UmbContextBase {
 		this.consumeContext(UMB_SERVER_CONTEXT, (instance) => {
 			const params = new URLSearchParams(window.location.search);
 
-			this.#unique = params.get('id');
-			this.#culture = params.get('culture');
-			this.#segment = params.get('segment');
+			this.#unique.setValue(params.get('id') ?? undefined);
+			this.#culture.setValue(params.get('culture') ?? undefined);
+			this.#segment.setValue(params.get('segment') ?? undefined);
 
 			if (!this.#unique) {
 				console.error('No unique ID found in query string.');
 				return;
+			}
+
+			if (this.#culture) {
+				this.#currentArgs.culture = this.#culture.getValue();
+			}
+
+			if (this.#segment) {
+				this.#currentArgs.segment = this.#segment.getValue();
 			}
 
 			const serverUrl = instance?.getServerUrl();
@@ -93,7 +109,7 @@ export class UmbPreviewContext extends UmbContextBase {
 		this.#connection = new HubConnectionBuilder().withUrl(previewHubUrl).build();
 
 		this.#connection.on('refreshed', (payload) => {
-			if (payload === this.#unique) {
+			if (payload === this.#unique.getValue()) {
 				this.#setPreviewUrl({ rnd: Math.random() });
 			}
 		});
@@ -121,13 +137,16 @@ export class UmbPreviewContext extends UmbContextBase {
 	}
 
 	async #getPublishedUrl(): Promise<string | null> {
-		if (!this.#unique) return null;
+		const unique = this.#unique.getValue();
+		if (!unique) return null;
 
 		// NOTE: We should be reusing `UmbDocumentUrlRepository` here, but the preview app doesn't register the `itemStore` extensions, so can't resolve/consume `UMB_DOCUMENT_URL_STORE_CONTEXT`. [LK]
-		const { data } = await tryExecute(this, DocumentService.getDocumentUrls({ query: { id: [this.#unique] } }));
+		const { data } = await tryExecute(this, DocumentService.getDocumentUrls({ query: { id: [unique] } }));
 
 		if (!data?.length) return null;
-		const urlInfo = this.#culture ? data[0].urlInfos.find((x) => x.culture === this.#culture) : data[0].urlInfos[0];
+		const urlInfo = this.#culture
+			? data[0].urlInfos.find((x) => x.culture === this.#culture.getValue())
+			: data[0].urlInfos[0];
 
 		if (!urlInfo?.url) return null;
 		return urlInfo.url.startsWith('/') ? `${this.#serverUrl}${urlInfo.url}` : urlInfo.url;
@@ -139,7 +158,7 @@ export class UmbPreviewContext extends UmbContextBase {
 
 	#setPreviewUrl(args?: UmbPreviewUrlArgs) {
 		const host = args?.serverUrl || this.#serverUrl;
-		const unique = args?.unique || this.#unique;
+		const unique = args?.unique || this.#unique.getValue();
 
 		if (!unique) {
 			throw new Error('No unique ID found in query string.');
@@ -148,8 +167,8 @@ export class UmbPreviewContext extends UmbContextBase {
 		const url = new URL(unique, host);
 		const params = new URLSearchParams(url.search);
 
-		const culture = args?.culture || this.#culture;
-		const segment = args?.segment || this.#segment;
+		const culture = args?.culture || this.#culture.getValue();
+		const segment = args?.segment || this.#segment.getValue();
 
 		const cultureParam = 'culture';
 		const rndParam = 'rnd';
@@ -157,8 +176,10 @@ export class UmbPreviewContext extends UmbContextBase {
 
 		if (culture) {
 			params.set(cultureParam, culture);
+			this.#culture.setValue(culture);
 		} else {
 			params.delete(cultureParam);
+			this.#culture.setValue(undefined);
 		}
 
 		if (args?.rnd) {
@@ -169,8 +190,10 @@ export class UmbPreviewContext extends UmbContextBase {
 
 		if (segment) {
 			params.set(segmentParam, segment);
+			this.#segment.setValue(segment);
 		} else {
 			params.delete(segmentParam);
+			this.#segment.setValue(undefined);
 		}
 
 		const previewUrl = new URL(`${url.pathname}?${params.toString()}`, host);
@@ -266,7 +289,6 @@ export class UmbPreviewContext extends UmbContextBase {
 		this.#setSessionCount(sessions);
 	}
 
-	#currentArgs: UmbPreviewIframeArgs = {};
 	async updateIFrame(args?: UmbPreviewIframeArgs) {
 		const mergedArgs = { ...this.#currentArgs, ...args };
 
@@ -282,6 +304,7 @@ export class UmbPreviewContext extends UmbContextBase {
 				const scale = Math.min(wScale, hScale, 1); // get the lowest ratio, but not higher than 1
 				wrapper.style.transform = `scale(${scale})`;
 			}
+			this.#iframeReady.setValue(true);
 		};
 
 		window.addEventListener('resize', scaleIFrame);
@@ -291,16 +314,14 @@ export class UmbPreviewContext extends UmbContextBase {
 
 		const params = new URLSearchParams(window.location.search);
 
+		params.delete('culture');
 		if (mergedArgs.culture) {
 			params.set('culture', mergedArgs.culture);
-		} else {
-			params.delete('culture');
 		}
 
+		params.delete('segment');
 		if (mergedArgs.segment) {
 			params.set('segment', mergedArgs.segment);
-		} else {
-			params.delete('segment');
 		}
 
 		const newRelativePathQuery = window.location.pathname + '?' + params.toString();

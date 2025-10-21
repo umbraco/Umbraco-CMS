@@ -1,5 +1,5 @@
 import { UMB_PREVIEW_CONTEXT } from '../preview.context.js';
-import { css, customElement, html, ifDefined, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, ifDefined, property, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 export interface UmbPreviewDevice {
