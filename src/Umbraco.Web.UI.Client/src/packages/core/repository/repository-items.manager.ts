@@ -7,7 +7,7 @@ import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-ap
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbEntityUpdatedEvent } from '@umbraco-cms/backoffice/entity-action';
-import { UmbDeprecation } from '../utils/deprecation/deprecation.js';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
 const ObserveRepositoryAlias = Symbol();
 
