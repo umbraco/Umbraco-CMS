@@ -42,10 +42,75 @@ const createLabel = (opts: { forId: string; localizeAlias: string; localizeFallb
 	return label;
 };
 
-const createFormLayoutItem = (label: HTMLLabelElement, input: HTMLInputElement) => {
+const createButton = (opts: { id: string; name: string }) => {
+	const button = document.createElement('button');
+	button.id = opts.id;
+	button.ariaLabel = 'Show password';
+	button.name = opts.name;
+	button.type = 'button';
+
+	button.innerHTML = `
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+			<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
+			<circle cx="12" cy="12" r="3"></circle>
+		</svg>
+    `;
+
+	button.onclick = () => {
+		const passwordInput = document.getElementById('password-input') as HTMLInputElement;
+		passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
+		button.ariaLabel = passwordInput.type === 'password' ? 'Show password' : 'Hide password';
+
+		if (passwordInput.type === 'text') {
+			button.innerHTML = `
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+					<path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"></path>
+					<path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"></path>
+					<path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"></path>
+					<line x1="2" x2="22" y1="2" y2="22"></line>
+				</svg>
+            `;
+		} else {
+			button.innerHTML = `
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+					<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
+					<circle cx="12" cy="12" r="3"></circle>
+				</svg>
+            `;
+		}
+
+		passwordInput.focus();
+	};
+
+	return button;
+};
+
+const createShowPasswordToggleItem = (button: HTMLButtonElement) => {
+	const span = document.createElement('span');
+	span.id = 'password-show-toggle-span';
+	span.appendChild(button);
+
+	return span;
+};
+
+const createFormLayoutItem = (
+	label: HTMLLabelElement,
+	input: HTMLInputElement,
+	showPasswordToggle?: HTMLSpanElement
+) => {
 	const formLayoutItem = document.createElement('uui-form-layout-item') as UUIFormLayoutItemElement;
-	formLayoutItem.appendChild(label);
-	formLayoutItem.appendChild(input);
+
+	if (showPasswordToggle) {
+		formLayoutItem.appendChild(label);
+		const span = document.createElement('span');
+		span.id = 'password-input-span';
+		span.appendChild(input);
+		span.appendChild(showPasswordToggle);
+		formLayoutItem.appendChild(span);
+	} else {
+		formLayoutItem.appendChild(label);
+		formLayoutItem.appendChild(input);
+	}
 
 	return formLayoutItem;
 };
@@ -112,6 +177,8 @@ export default class UmbAuthElement extends UmbLitElement {
 	_passwordInput?: HTMLInputElement;
 	_usernameLabel?: HTMLLabelElement;
 	_passwordLabel?: HTMLLabelElement;
+	_passwordShowToggle?: HTMLSpanElement;
+	__passwordShowToggleButton?: HTMLButtonElement;
 
 	#authContext = new UmbAuthContext(this, UMB_AUTH_CONTEXT);
 
@@ -148,6 +215,8 @@ export default class UmbAuthElement extends UmbLitElement {
 		this._usernameInput?.remove();
 		this._passwordLabel?.remove();
 		this._passwordInput?.remove();
+		this._passwordShowToggle?.remove();
+		this.__passwordShowToggleButton?.remove();
 	}
 
 	/**
@@ -173,6 +242,11 @@ export default class UmbAuthElement extends UmbLitElement {
 			autocomplete: 'current-password',
 			inputmode: '',
 		});
+		this.__passwordShowToggleButton = createButton({
+			id: 'password-show-toggle',
+			name: 'password-show-toggle',
+		});
+		this._passwordShowToggle = createShowPasswordToggleItem(this.__passwordShowToggleButton);
 		this._usernameLabel = createLabel({
 			forId: 'username-input',
 			localizeAlias: this.usernameIsEmail ? 'auth_email' : 'auth_username',
@@ -185,7 +259,7 @@ export default class UmbAuthElement extends UmbLitElement {
 		});
 
 		this._usernameLayoutItem = createFormLayoutItem(this._usernameLabel, this._usernameInput);
-		this._passwordLayoutItem = createFormLayoutItem(this._passwordLabel, this._passwordInput);
+		this._passwordLayoutItem = createFormLayoutItem(this._passwordLabel, this._passwordInput, this._passwordShowToggle);
 
 		this._form = createForm([this._usernameLayoutItem, this._passwordLayoutItem]);
 
