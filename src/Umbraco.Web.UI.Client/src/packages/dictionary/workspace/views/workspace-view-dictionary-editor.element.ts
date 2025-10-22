@@ -72,13 +72,11 @@ export class UmbWorkspaceViewDictionaryEditorElement extends UmbLitElement {
 	}
 
 	#onTextareaChange(e: Event) {
-		if (e instanceof UUITextareaEvent) {
-			const target = e.composedPath()[0] as UUITextareaElement;
-			const translation = (target.value as string).toString();
-			const isoCode = target.getAttribute('name')!;
+		const target = e.composedPath()[0] as UUITextareaElement;
+		const translation = (target.value as string).toString();
+		const isoCode = target.getAttribute('name')!;
 
-			this.#workspaceContext?.setPropertyValue(isoCode, translation);
-		}
+		this.#workspaceContext?.setPropertyValue(isoCode, translation);
 	}
 
 	override render() {
@@ -104,7 +102,7 @@ export class UmbWorkspaceViewDictionaryEditorElement extends UmbLitElement {
 				slot="editor"
 				name=${language.unique}
 				label="translation"
-				@change=${this.#onTextareaChange}
+				@input=${this.#onTextareaChange}
 				.value=${translation?.translation ?? ''}
 				?readonly=${this.#isReadOnly(language.unique)}></uui-textarea>
 		</umb-property-layout>`;
