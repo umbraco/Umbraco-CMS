@@ -1,7 +1,6 @@
 import { UMB_DICTIONARY_WORKSPACE_CONTEXT } from '../dictionary-workspace.context-token.js';
 import type { UmbDictionaryDetailModel } from '../../types.js';
 import type { UUITextareaElement } from '@umbraco-cms/backoffice/external/uui';
-import { UUITextareaEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
