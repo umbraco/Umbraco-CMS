@@ -23,6 +23,16 @@ export class UmbInputPropertyEditorDataSourceElement extends UUIFormControlMixin
 		containerSelector: 'uui-ref-list',
 		onChange: ({ model }) => {
 			this.selection = model;
+
+			const statusesClone = this._statuses ? [...this._statuses] : [];
+
+			// reorder statuses to match the new order
+			statusesClone.sort((a, b) => {
+				return model.indexOf(a.unique) - model.indexOf(b.unique);
+			});
+
+			this._statuses = statusesClone;
+
 			this.dispatchEvent(new UmbChangeEvent());
 		},
 	});
