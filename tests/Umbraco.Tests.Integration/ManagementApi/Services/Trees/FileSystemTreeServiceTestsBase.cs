@@ -43,7 +43,7 @@ public abstract class FileSystemTreeServiceTestsBase : UmbracoIntegrationTest
         }
     }
 
-    protected Stream CreateStream(string contents = null)
+    protected static Stream CreateStream(string contents = null)
     {
         if (string.IsNullOrEmpty(contents))
         {
@@ -67,7 +67,7 @@ public abstract class FileSystemTreeServiceTestsBase : UmbracoIntegrationTest
         FileSystems = null;
     }
 
-    public void Purge(IFileSystem fs, string path)
+    private static void Purge(IFileSystem fs, string path)
     {
         var files = fs.GetFiles(path, "*");
         foreach (var file in files)

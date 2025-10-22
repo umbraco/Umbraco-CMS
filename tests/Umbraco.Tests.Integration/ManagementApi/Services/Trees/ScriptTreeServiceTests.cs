@@ -46,7 +46,7 @@ public class ScriptTreeServiceTests : FileSystemTreeServiceTestsBase
     {
         var service = new ScriptTreeService(FileSystems);
 
-        FileSystemTreeItemPresentationModel[] treeModels = service.GetPathViewModels(string.Empty, 0, Int32.MaxValue, out var totalItems);
+        FileSystemTreeItemPresentationModel[] treeModels = service.GetPathViewModels(string.Empty, 0, int.MaxValue, out var totalItems);
 
         Assert.IsNotEmpty(treeModels);
         Assert.AreEqual(treeModels.Length, totalItems);
@@ -62,7 +62,7 @@ public class ScriptTreeServiceTests : FileSystemTreeServiceTestsBase
             TestFileSystem.AddFile($"file{i}.invalid", stream);
         }
 
-        FileSystemTreeItemPresentationModel[] treeModels = service.GetPathViewModels(string.Empty, 0, Int32.MaxValue, out var totalItems);
+        FileSystemTreeItemPresentationModel[] treeModels = service.GetPathViewModels(string.Empty, 0, int.MaxValue, out var totalItems);
 
         Assert.IsEmpty(treeModels.Where(file => file.Name.Contains(".invalid")));
         Assert.AreEqual(treeModels.Length, totalItems);
