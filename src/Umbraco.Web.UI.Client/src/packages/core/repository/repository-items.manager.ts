@@ -7,6 +7,7 @@ import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-ap
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbEntityUpdatedEvent } from '@umbraco-cms/backoffice/entity-action';
+import { UmbDeprecation } from '../utils/deprecation/deprecation.js';
 
 const ObserveRepositoryAlias = Symbol();
 
@@ -57,17 +58,20 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 			(uniques) => {
 				if (uniques.length === 0) {
 					this.#items.setValue([]);
+					this.#statuses.setValue([]);
 					return;
 				}
 
 				// TODO: This could be optimized so we only load the appended items, but this requires that the response checks that an item is still present in uniques. [NL]
-				// Check if we already have the items, and then just sort them:
-				const items = this.#items.getValue();
+				// Check if we already have the statuses, and then just sort them:
+				const statuses = this.#statuses.getValue();
 				if (
-					uniques.length === items.length &&
-					uniques.every((unique) => items.find((item) => item.unique === unique))
+					uniques.length === statuses.length &&
+					uniques.every((unique) => statuses.find((status) => status.unique === unique))
 				) {
+					const items = this.#items.getValue();
 					this.#items.setValue(this.#sortByUniques(items));
+					this.#statuses.setValue(this.#sortByUniques(statuses));
 				} else {
 					// We need to load new items, so ...
 					this.#requestItems();
@@ -135,8 +139,7 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 			deprecated: 'removeStatus',
 			solution: 'Statuses are removed automatically when setting uniques',
 		}).warn();
-		const newStatuses = this.#statuses.getValue().filter((status) => status.unique !== unique);
-		this.#statuses.setValue(newStatuses);
+		this.#statuses.filter((status) => status.unique !== unique);
 	}
 
 	async getItemByUnique(unique: string) {
@@ -154,6 +157,7 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 		const requestedUniques = this.getUniques();
 
 		this.#statuses.setValue(
+			// No need to do sorting here as we just got the unique in the right order above.
 			requestedUniques.map((unique) => ({
 				state: {
 					type: 'loading',
@@ -174,7 +178,7 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 		}
 
 		if (error) {
-			this.#statuses.append(
+			this.#statuses.replace(
 				requestedUniques.map((unique) => ({
 					state: {
 						type: 'error',
@@ -193,7 +197,7 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 			const resolvedUniques = requestedUniques.filter((unique) => !rejectedUniques.includes(unique));
 			this.#items.remove(rejectedUniques);
 
-			this.#statuses.append([
+			this.#statuses.replace([
 				...rejectedUniques.map(
 					(unique) =>
 						({
@@ -236,12 +240,11 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 		const { data, error } = await this.repository.requestItems([unique]);
 
 		if (error) {
-			this.#statuses.appendOne({
+			this.#statuses.updateOne(unique, {
 				state: {
 					type: 'error',
 					error: '#general_notFound',
 				},
-				unique,
 			} as UmbRepositoryItemsStatus);
 		}
 
@@ -254,11 +257,12 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 				const newItems = [...items];
 				newItems[index] = data[0];
 				this.#items.setValue(this.#sortByUniques(newItems));
+				// No need to update statuses here, as the item is the same, just updated.
 			}
 		}
 	}
 
-	#sortByUniques(data?: Array<ItemType>): Array<ItemType> {
+	#sortByUniques<T extends Pick<ItemType, 'unique'>>(data?: Array<T>): Array<T> {
 		if (!data) return [];
 		const uniques = this.getUniques();
 		return [...data].sort((a, b) => {
