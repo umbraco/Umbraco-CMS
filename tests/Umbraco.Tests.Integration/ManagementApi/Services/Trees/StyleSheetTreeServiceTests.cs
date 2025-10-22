@@ -1,11 +1,7 @@
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Services.FileSystem;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
-using Umbraco.Cms.Tests.Common.TestHelpers;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.Services.Trees;
 
@@ -15,33 +11,7 @@ public class StyleSheetTreeServiceTests : FileSystemTreeServiceTestsBase
 
     protected override string FileSystemPath => GlobalSettings.UmbracoCssPath;
 
-    protected FileSystems FileSystems { get; private set; }
-
-    protected IFileSystem TestFileSystem { get; private set; }
-
     protected override IFileSystem? GetStylesheetsFileSystem() => TestFileSystem;
-
-
-    [SetUp]
-    public override void SetUpFileSystem()
-    {
-        TestFileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, LoggerFactory.CreateLogger<PhysicalFileSystem>(), HostingEnvironment.MapPathWebRoot(FileSystemPath), HostingEnvironment.ToAbsolute(FileSystemPath));
-
-        FileSystems = FileSystemsCreator.CreateTestFileSystems(
-            LoggerFactory,
-            IOHelper,
-            GetRequiredService<IOptions<GlobalSettings>>(),
-            HostingEnvironment,
-            GetPartialViewsFileSystem(),
-            GetStylesheetsFileSystem(),
-            GetScriptsFileSystem(),
-            null);
-        for (int i = 0; i < 10; i++)
-        {
-            using var stream = CreateStream(Path.Join("tests"));
-            TestFileSystem.AddFile($"file{i}{FileExtension}", stream);
-        }
-    }
 
     [Test]
     public void Can_Get_Siblings_From_StyleSheet_Tree_Service()
@@ -81,12 +51,5 @@ public class StyleSheetTreeServiceTests : FileSystemTreeServiceTestsBase
 
         Assert.IsNotEmpty(treeModels);
         Assert.AreEqual(treeModels.Length, totalItems);
-    }
-
-    [TearDown]
-    public override void TearDownFileSystem()
-    {
-        Purge(TestFileSystem, string.Empty);
-        FileSystems = null;
     }
 }
