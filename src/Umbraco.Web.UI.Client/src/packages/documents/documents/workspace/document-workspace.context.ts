@@ -41,6 +41,7 @@ import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbVariantPropertyGuardRule } from '@umbraco-cms/backoffice/property';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 
 type ContentModel = UmbDocumentDetailModel;
 type ContentTypeModel = UmbDocumentTypeDetailModel;
@@ -71,6 +72,7 @@ export class UmbDocumentWorkspaceContext
 	#isTrashedContext = new UmbIsTrashedEntityContext(this);
 	#documentSegmentRepository = new UmbDocumentSegmentRepository(this);
 	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
+	#localize = new UmbLocalizationController(this);
 
 	constructor(host: UmbControllerHost) {
 		super(host, {
@@ -360,7 +362,11 @@ export class UmbDocumentWorkspaceContext
 		}
 
 		if (previewUrlData.message) {
-			umbPeekError(this._host, { color: 'danger', headline: 'Preview error', message: previewUrlData.message });
+			umbPeekError(this._host, {
+				color: 'danger',
+				headline: this.#localize.term('general_preview'),
+				message: previewUrlData.message,
+			});
 			throw new Error(previewUrlData.message);
 		}
 	}
