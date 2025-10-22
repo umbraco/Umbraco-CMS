@@ -144,7 +144,7 @@ public class NewDefaultUrlProvider : IUrlProvider
     public Task<UrlInfo?> GetPreviewUrlAsync(IContent content, string? culture, string? segment)
         => Task.FromResult<UrlInfo?>(
             UrlInfo.AsUrl(
-                $"/{Constants.System.UmbracoPathSegment}/preview?id={content.Key}&culture={culture}&segment={segment}",
+                $"preview?id={content.Key}&culture={culture}&segment={segment}",
                 Alias,
                 culture,
                 isExternal: false));
@@ -182,7 +182,7 @@ public class NewDefaultUrlProvider : IUrlProvider
         // We have the published content now, so we can check if the culture is published, and thus avoid the DB hit.
         string route;
         var isDraft = _umbracoContextAccessor.GetRequiredUmbracoContext().InPreviewMode;
-        if(isDraft is false && string.IsNullOrWhiteSpace(culture) is false && content.Cultures.Any() && content.IsInvariantOrHasCulture(culture) is false)
+        if (isDraft is false && string.IsNullOrWhiteSpace(culture) is false && content.Cultures.Any() && content.IsInvariantOrHasCulture(culture) is false)
         {
             route = "#";
         }
