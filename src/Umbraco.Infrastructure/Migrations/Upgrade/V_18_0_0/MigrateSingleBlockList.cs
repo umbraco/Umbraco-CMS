@@ -101,6 +101,8 @@ public class MigrateSingleBlockList : AsyncMigrationBase
             "Found {blockListsConfiguredAsSingleCount} number of blockListConfigurations with UseSingleBlockMode set to true",
             blockListsConfiguredAsSingleCount);
 
+        var updateItemsByPropertyEditorAlias = new Dictionary<string, Dictionary<IPropertyType, List<UpdateItem>>>();
+
         // update all propertyData for each propertyType
         foreach (var propertyEditorAlias in propertyEditorAliases)
         {
@@ -112,7 +114,33 @@ public class MigrateSingleBlockList : AsyncMigrationBase
             _logger.LogInformation(
                 "Migration starting for all properties of type: {propertyEditorAlias}",
                 propertyEditorAlias);
-            if (await ProcessPropertyTypes(propertyTypes, languagesById))
+            Dictionary<IPropertyType, List<UpdateItem>> updateItemsByPropertyType = await ProcessPropertyTypesAsync(propertyTypes, languagesById);
+            if (updateItemsByPropertyType.Count < 1)
+            {
+                _logger.LogInformation(
+                    "No properties have been found to migrate for {propertyEditorAlias}",
+                    propertyEditorAlias);
+                return;
+            }
+
+            updateItemsByPropertyEditorAlias[propertyEditorAlias] = updateItemsByPropertyType;
+        }
+
+        // update the configuration of all propertyTypes
+        var singleBlockListDataTypesIds = _blockListConfigurationCache.CachedDataTypes.ToList().Select(type => type.Id).ToList();
+
+        string updateSql = $@"
+UPDATE umbracoDataType
+SET propertyEditorAlias = '{Constants.PropertyEditors.Aliases.SingleBlock}',
+    propertyEditorUiAlias = 'Umb.PropertyEditorUi.SingleBlock'
+WHERE nodeId IN (@0)";
+        await Database.ExecuteAsync(updateSql, singleBlockListDataTypesIds);
+
+        RebuildCache = true;
+
+        foreach (string propertyEditorAlias in updateItemsByPropertyEditorAlias.Keys)
+        {
+            if (await SavePropertyTypes(updateItemsByPropertyEditorAlias[propertyEditorAlias]))
             {
                 _logger.LogInformation(
                     "Migration succeeded for all properties of type: {propertyEditorAlias}",
@@ -125,22 +153,11 @@ public class MigrateSingleBlockList : AsyncMigrationBase
                     propertyEditorAlias);
             }
         }
-
-        RebuildCache = true;
-
-        // update the configuration of all propertyTypes
-        var singleBlockListDataTypesIds = _blockListConfigurationCache.CachedDataTypes.ToList().Select(type => type.Id).ToList();
-
-        string updateSql = $@"
-UPDATE umbracoDataType
-SET propertyEditorAlias = '{Constants.PropertyEditors.Aliases.SingleBlock}',
-    propertyEditorUiAlias = 'Umb.PropertyEditorUi.SingleBlock'
-WHERE nodeId IN (@0)";
-        await Database.ExecuteAsync(updateSql, singleBlockListDataTypesIds);
     }
 
-    private async Task<bool> ProcessPropertyTypes(IPropertyType[] propertyTypes, IDictionary<int, ILanguage> languagesById)
+    private async Task<Dictionary<IPropertyType, List<UpdateItem>>> ProcessPropertyTypesAsync(IPropertyType[] propertyTypes, IDictionary<int, ILanguage> languagesById)
     {
+        var updateItemsByPropertyType = new Dictionary<IPropertyType, List<UpdateItem>>();
         foreach (IPropertyType propertyType in propertyTypes)
         {
             IDataType dataType = await _dataTypeService.GetAsync(propertyType.DataTypeKey)
@@ -170,6 +187,36 @@ WHERE nodeId IN (@0)";
                 continue;
             }
 
+            var updateItems = new List<UpdateItem>();
+
+            foreach (PropertyDataDto propertyDataDto in propertyDataDtos)
+            {
+                if (ProcessPropertyDataDto(propertyDataDto, propertyType, languagesById, valueEditor, out var updateItem) is false)
+                {
+                    continue;
+                }
+
+                updateItems.Add(updateItem!);
+            }
+            updateItemsByPropertyType[propertyType] = updateItems;
+        }
+
+        return updateItemsByPropertyType;
+    }
+
+    private async Task<bool> SavePropertyTypes(IDictionary<IPropertyType, List<UpdateItem>> propertyTypes)
+    {
+        foreach (IPropertyType propertyType in propertyTypes.Keys)
+        {
+            IDataType dataType = await _dataTypeService.GetAsync(propertyType.DataTypeKey)
+                                 ?? throw new InvalidOperationException("The data type could not be fetched.");
+
+            IDataValueEditor updatedValueEditor = dataType.Editor?.GetValueEditor()
+                                           ?? throw new InvalidOperationException(
+                                               "The data type value editor could not be obtained.");
+
+            var propertyDataDtos = propertyTypes[propertyType].Select(item => item.PropertyDataDto).ToList();
+
             var updateBatch = propertyDataDtos.Select(propertyDataDto =>
                 UpdateBatch.For(propertyDataDto, Database.StartSnapshot(propertyDataDto))).ToList();
 
@@ -190,7 +237,7 @@ WHERE nodeId IN (@0)";
 
                 PropertyDataDto propertyDataDto = update.Poco;
 
-                if (ProcessPropertyDataDto(propertyDataDto, propertyType, languagesById, valueEditor) is false)
+                if (FinalizeUpdateItem(propertyTypes[propertyType].First(item => Equals(item.PropertyDataDto, update.Poco)), updatedValueEditor) is false)
                 {
                     updatesToSkip.Add(update);
                 }
@@ -255,7 +302,7 @@ WHERE nodeId IN (@0)";
     }
 
     private bool ProcessPropertyDataDto(PropertyDataDto propertyDataDto, IPropertyType propertyType,
-        IDictionary<int, ILanguage> languagesById, IDataValueEditor valueEditor)
+        IDictionary<int, ILanguage> languagesById, IDataValueEditor valueEditor, out UpdateItem? updateItem)
     {
         // NOTE: some old property data DTOs can have variance defined, even if the property type no longer varies
         var culture = propertyType.VariesByCulture()
@@ -276,6 +323,7 @@ WHERE nodeId IN (@0)";
                 propertyType.Name,
                 propertyType.Id,
                 propertyType.Alias);
+            updateItem = null;
             return false;
         }
 
@@ -292,26 +340,33 @@ WHERE nodeId IN (@0)";
                 propertyType.Name,
                 propertyType.Id,
                 propertyType.Alias);
+            updateItem = null;
             return false;
         }
 
-        var editorValue = _jsonSerializer.Serialize(updatedValue);
+        updateItem = new UpdateItem(propertyDataDto, propertyType, updatedValue);
+        return true;
+    }
 
-        var dbValue = updatedValue is SingleBlockValue
+    private bool FinalizeUpdateItem(UpdateItem updateItem, IDataValueEditor updatedValueEditor)
+    {
+
+        var editorValue = _jsonSerializer.Serialize(updateItem.UpdatedValue);
+        var dbValue = updateItem.UpdatedValue is SingleBlockValue
             ? _dummySingleBlockValueEditor.FromEditor(new ContentPropertyData(editorValue, null), null)
-            : valueEditor.FromEditor(new ContentPropertyData(editorValue, null), null);
+            : updatedValueEditor.FromEditor(new ContentPropertyData(editorValue, null), null);
         if (dbValue is not string stringValue || stringValue.DetectIsJson() is false)
         {
             _logger.LogWarning(
                 "    - value editor did not yield a valid JSON string as FromEditor value property data with id: {propertyDataId} (property type: {propertyTypeName}, id: {propertyTypeId}, alias: {propertyTypeAlias})",
-                propertyDataDto.Id,
-                propertyType.Name,
-                propertyType.Id,
-                propertyType.Alias);
+                updateItem.PropertyDataDto.Id,
+                updateItem.PropertyType.Name,
+                updateItem.PropertyType.Id,
+                updateItem.PropertyType.Alias);
             return false;
         }
 
-        propertyDataDto.TextValue = stringValue;
+        updateItem.PropertyDataDto.TextValue = stringValue;
         return true;
     }
 
@@ -328,5 +383,20 @@ WHERE nodeId IN (@0)";
 
         value = toEditorValue;
         return hasChanged;
+    }
+
+    private class UpdateItem
+    {
+        public UpdateItem(PropertyDataDto propertyDataDto, IPropertyType propertyType, object? updatedValue)
+        {
+            PropertyDataDto = propertyDataDto;
+            PropertyType = propertyType;
+            UpdatedValue = updatedValue;
+        }
+
+        public object? UpdatedValue { get; set; }
+
+        public PropertyDataDto PropertyDataDto { get; set; }
+        public IPropertyType PropertyType { get; set; }
     }
 }
