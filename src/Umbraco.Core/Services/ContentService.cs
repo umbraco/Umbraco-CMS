@@ -2199,7 +2199,7 @@ public class ContentService : RepositoryService, IContentService
                     variesByCulture ? culturesPublished.IsCollectionEmpty() ? null : culturesPublished : ["*"],
                     null,
                     eventMessages));
-            scope.Notifications.Publish(new ContentPublishedNotification(publishedDocuments, eventMessages).WithState(notificationState));
+            scope.Notifications.Publish(new ContentPublishedNotification(publishedDocuments, eventMessages, true).WithState(notificationState));
 
             scope.Complete();
         }
