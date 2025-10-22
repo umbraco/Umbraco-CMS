@@ -40,7 +40,6 @@ import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/documen
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbVariantPropertyGuardRule } from '@umbraco-cms/backoffice/property';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 
 type ContentModel = UmbDocumentDetailModel;
@@ -347,16 +346,7 @@ export class UmbDocumentWorkspaceContext
 		);
 
 		if (previewUrlData.url) {
-			let previewUrl = previewUrlData.url;
-
-			const serverContext = await this.getContext(UMB_SERVER_CONTEXT);
-			const backofficePath = serverContext?.getBackofficePath() ?? '/';
-
-			if (!previewUrlData.url.startsWith(backofficePath)) {
-				previewUrl = `${backofficePath}${previewUrlData.url}`;
-			}
-
-			const previewWindow = window.open(previewUrl, `umbpreview-${unique}`);
+			const previewWindow = window.open(previewUrlData.url, `umbpreview-${unique}`);
 			previewWindow?.focus();
 			return;
 		}

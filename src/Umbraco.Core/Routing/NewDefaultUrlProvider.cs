@@ -144,7 +144,7 @@ public class NewDefaultUrlProvider : IUrlProvider
     public Task<UrlInfo?> GetPreviewUrlAsync(IContent content, string? culture, string? segment)
         => Task.FromResult<UrlInfo?>(
             UrlInfo.AsUrl(
-                $"/preview?id={content.Key}&culture={culture}&segment={segment}",
+                $"preview?id={content.Key}&culture={culture}&segment={segment}",
                 Alias,
                 culture,
                 isExternal: false));
