@@ -144,7 +144,7 @@ public class MigrateMediaTypeLabelProperties : AsyncMigrationBase
     private bool NodeExists(Guid uniqueId)
     {
         Sql<ISqlContext> sql = Database.SqlContext.Sql()
-            .Select<NodeDto>()
+            .Select<NodeDto>(x => x.NodeId)
             .From<NodeDto>()
             .Where<NodeDto>(x => x.UniqueId == uniqueId);
         return Database.FirstOrDefault<NodeDto>(sql) is not null;
