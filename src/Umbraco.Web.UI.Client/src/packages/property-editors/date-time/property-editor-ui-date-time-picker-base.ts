@@ -19,8 +19,8 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UUIComboboxElement, UUIComboboxEvent } from '@umbraco-cms/backoffice/external/uui';
 
 interface UmbDateTime {
-	date: string | undefined;
-	timeZone: string | undefined;
+	date: string | null;
+	timeZone: string | null;
 }
 
 interface UmbTimeZonePickerOption extends UmbTimeZone {
@@ -34,6 +34,7 @@ export abstract class UmbPropertyEditorUiDateTimePickerElementBase
 {
 	private _timeZoneOptions: Array<UmbTimeZonePickerOption> = [];
 	private _clientTimeZone: UmbTimeZone | undefined;
+	private _timeZoneMode: UmbTimeZonePickerValue['mode'] | undefined;
 
 	@property({ type: Boolean, reflect: true })
 	readonly = false;
@@ -104,6 +105,7 @@ export abstract class UmbPropertyEditorUiDateTimePickerElementBase
 			() => {
 				return (
 					this._displayTimeZone &&
+					this._timeZoneMode !== 'local' &&
 					!!this.value?.timeZone &&
 					!this._timeZoneOptions.some((opt) => opt.value === this.value?.timeZone && !opt.invalid)
 				);
@@ -120,8 +122,13 @@ export abstract class UmbPropertyEditorUiDateTimePickerElementBase
 		if (this._displayTimeZone) {
 			timeZonePickerConfig = config.getValueByAlias<UmbTimeZonePickerValue>('timeZones');
 		}
+
 		this.#setTimeInputStep(timeFormat);
 		this.#prefillValue(timeZonePickerConfig);
+
+		// To ensure the expected value matches the prefilled value, we trigger an update.
+		// If the values match, no change event will be fired.
+		this.#updateValue(this._selectedDate?.toISO({ includeOffset: false }) ?? null);
 	}
 
 	#prefillValue(timeZonePickerConfig: UmbTimeZonePickerValue | undefined) {
@@ -158,8 +165,8 @@ export abstract class UmbPropertyEditorUiDateTimePickerElementBase
 	#prefillTimeZones(config: UmbTimeZonePickerValue | undefined, selectedDate: DateTime | undefined) {
 		// Retrieve the time zones from the config
 		this._clientTimeZone = getClientTimeZone();
+		this._timeZoneMode = config?.mode;
 
-		// Retrieve the time zones from the config
 		const dateToCalculateOffset = selectedDate ?? DateTime.now();
 		switch (config?.mode) {
 			case 'all':
@@ -219,7 +226,8 @@ export abstract class UmbPropertyEditorUiDateTimePickerElementBase
 				return;
 			}
 		} else if (this.value?.date) {
-			return; // If there is a date but no time zone, we don't preselect anything
+			// If there is no time zone in the value, but there is a date, we leave the time zone unselected
+			return;
 		}
 
 		// Check if we can pre-select the client time zone
@@ -269,16 +277,8 @@ export abstract class UmbPropertyEditorUiDateTimePickerElementBase
 			return;
 		}
 
-		if (!newPickerValue) {
-			this._datePickerValue = '';
-			this.value = undefined;
-			this._selectedDate = undefined;
-			this.dispatchEvent(new UmbChangeEvent());
-			return;
-		}
-
 		this._datePickerValue = newPickerValue;
-		this.#updateValue(value, true);
+		this.#updateValue(value);
 	}
 
 	#onTimeZoneChange(event: UUIComboboxEvent) {
@@ -291,7 +291,7 @@ export abstract class UmbPropertyEditorUiDateTimePickerElementBase
 
 		if (!this._selectedTimeZone) {
 			if (this.value?.date) {
-				this.value = { date: this.value.date, timeZone: undefined };
+				this.value = { date: this.value.date, timeZone: null };
 			} else {
 				this.value = undefined;
 			}
@@ -303,46 +303,84 @@ export abstract class UmbPropertyEditorUiDateTimePickerElementBase
 			return;
 		}
 
-		this.#updateValue(this._selectedDate.toISO({ includeOffset: false }) || '');
+		this.#updateValue(this._selectedDate.toISO({ includeOffset: false }));
 	}
 
-	#updateValue(date: string, updateOffsets = false) {
+	#updateValue(date: string | null) {
 		// Try to parse the date with the selected time zone
-		const newDate = DateTime.fromISO(date, { zone: this._selectedTimeZone ?? 'UTC' });
+		const newDate = date ? DateTime.fromISO(date, { zone: this._selectedTimeZone || 'UTC' }) : null;
 
 		// If the date is invalid, we reset the value
-		if (!newDate.isValid) {
+		if (!newDate || !newDate.isValid) {
+			if (!this.value) {
+				return; // No change
+			}
 			this.value = undefined;
 			this._selectedDate = undefined;
 			this.dispatchEvent(new UmbChangeEvent());
+			this.#updateOffsets(DateTime.now());
 			return;
 		}
 
+		const previousDate = this._selectedDate;
 		this._selectedDate = newDate;
-		this.value = {
-			date: this.#getCurrentDateValue(),
-			timeZone: this._selectedTimeZone,
+
+		let timeZoneToStore = null;
+		if (!this._displayTimeZone || !this._timeZoneMode) {
+			timeZoneToStore = null;
+		} else if (this._timeZoneMode === 'local') {
+			timeZoneToStore = 'UTC';
+		} else {
+			timeZoneToStore = this._selectedTimeZone ?? null;
+		}
+
+		const dateToStore =
+			timeZoneToStore && this._selectedTimeZone !== timeZoneToStore ? newDate.setZone(timeZoneToStore) : newDate;
+
+		const newValue = {
+			date: this.#formatDateValue(dateToStore),
+			timeZone: timeZoneToStore,
 		};
 
-		if (updateOffsets) {
-			this._timeZoneOptions.forEach((opt) => {
-				opt.offset = getTimeZoneOffset(opt.value, newDate);
-			});
-			// Update the time zone options (mostly for the offset)
-			this._filteredTimeZoneOptions = this._timeZoneOptions;
+		// Only update the stored data if it has actually changed to avoid firing unnecessary change events
+		const previousValue = this.value;
+		if (previousValue?.date === newValue.date && previousValue?.timeZone === newValue.timeZone) {
+			return;
 		}
+
+		this.value = newValue;
 		this.dispatchEvent(new UmbChangeEvent());
+
+		// Only update offsets if the date timestamp has changed
+		if (previousDate?.toUnixInteger() !== newDate.toUnixInteger()) {
+			this.#updateOffsets(newDate);
+		}
 	}
 
-	#getCurrentDateValue(): string | undefined {
+	#updateOffsets(date: DateTime) {
+		if (!this._displayTimeZone) return;
+		this._timeZoneOptions.forEach((opt) => {
+			opt.offset = getTimeZoneOffset(opt.value, date);
+		});
+		// Update the time zone options (mostly for the offset)
+		this._filteredTimeZoneOptions = this._timeZoneOptions;
+	}
+
+	#formatDateValue(date: DateTime): string | null {
+		let formattedDate: string | undefined;
 		switch (this._dateInputType) {
 			case 'date':
-				return this._selectedDate?.toISODate() ?? undefined;
+				formattedDate = date.toFormat('yyyy-MM-dd');
+				break;
 			case 'time':
-				return this._selectedDate?.toISOTime({ includeOffset: false }) ?? undefined;
+				formattedDate = date.toFormat('HH:mm:ss');
+				break;
 			default:
-				return this._selectedDate?.toISO({ includeOffset: !!this._selectedTimeZone }) ?? undefined;
+				formattedDate = date.toFormat(`yyyy-MM-dd'T'HH:mm:ss${this._timeZoneMode ? 'ZZ' : ''}`);
+				break;
 		}
+
+		return formattedDate ?? null;
 	}
 
 	#onTimeZoneSearch(event: UUIComboboxEvent) {

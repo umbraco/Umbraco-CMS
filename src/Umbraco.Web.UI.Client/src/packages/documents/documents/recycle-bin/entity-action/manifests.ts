@@ -46,6 +46,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
 			itemRepositoryAlias: UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS,
+			itemDataResolver: UmbDocumentItemDataResolver,
 			recycleBinRepositoryAlias: UMB_DOCUMENT_RECYCLE_BIN_REPOSITORY_ALIAS,
 			pickerModal: UMB_DOCUMENT_PICKER_MODAL,
 		},
