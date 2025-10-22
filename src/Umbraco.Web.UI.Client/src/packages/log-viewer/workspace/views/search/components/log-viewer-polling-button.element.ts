@@ -1,12 +1,9 @@
-import type {
-	UmbPoolingConfig,
-	UmbPoolingInterval,
-	UmbLogViewerWorkspaceContext,
-} from '../../../logviewer-workspace.context.js';
+import type { UmbPoolingConfig, UmbPoolingInterval } from '../../../logviewer-workspace.context.js';
 import { UMB_APP_LOG_VIEWER_CONTEXT } from '../../../logviewer-workspace.context-token.js';
 import { css, html, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbDropdownElement } from '@umbraco-cms/backoffice/components';
+import { consumeContext } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-log-viewer-polling-button')
 export class UmbLogViewerPollingButtonElement extends UmbLitElement {
@@ -18,30 +15,29 @@ export class UmbLogViewerPollingButtonElement extends UmbLitElement {
 
 	#pollingIntervals: UmbPoolingInterval[] = [2000, 5000, 10000, 20000, 30000];
 
-	#logViewerContext?: UmbLogViewerWorkspaceContext;
+	#logViewerContext?: typeof UMB_APP_LOG_VIEWER_CONTEXT.TYPE;
 
-	constructor() {
-		super();
-		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT, (instance) => {
-			this.#logViewerContext = instance;
-			this.#observePoolingConfig();
-		});
+	@consumeContext({ context: UMB_APP_LOG_VIEWER_CONTEXT })
+	private set _logViewerContext(value) {
+		this.#logViewerContext = value;
+		this.#observePoolingConfig();
+	}
+	private get _logViewerContext() {
+		return this.#logViewerContext;
 	}
 
 	#observePoolingConfig() {
-		if (!this.#logViewerContext) return;
-
-		this.observe(this.#logViewerContext.polling, (poolingConfig) => {
-			this._poolingConfig = { ...poolingConfig };
+		this.observe(this._logViewerContext?.polling, (poolingConfig) => {
+			this._poolingConfig = poolingConfig ? { ...poolingConfig } : { enabled: false, interval: 0 };
 		});
 	}
 
 	#togglePolling() {
-		this.#logViewerContext?.togglePolling();
+		this._logViewerContext?.togglePolling();
 	}
 
 	#setPolingInterval = (interval: UmbPoolingInterval) => {
-		this.#logViewerContext?.setPollingInterval(interval);
+		this._logViewerContext?.setPollingInterval(interval);
 
 		this.#closePoolingPopover();
 	};

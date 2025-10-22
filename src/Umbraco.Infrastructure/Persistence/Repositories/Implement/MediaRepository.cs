@@ -329,7 +329,7 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
                 (SELECT {uniqueId} FROM {umbracoNode} WHERE id = @id)",
             $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.UserStartNode)} WHERE {QuoteColumnName("startNode")} = @id",
             $@"UPDATE {QuoteTableName(Constants.DatabaseSchema.Tables.UserGroup)}
-                SET {QuoteColumnName("startContentId")} = NULL WHERE {QuoteColumnName("startContentId")} = @id",
+                SET {QuoteColumnName("startMediaId")} = NULL WHERE {QuoteColumnName("startMediaId")} = @id",
             $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.Relation)} WHERE {QuoteColumnName("parentId")} = @id",
             $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.Relation)} WHERE {QuoteColumnName("childId")} = @id",
             $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.TagRelationship)} WHERE {nodeId} = @id",
@@ -541,6 +541,11 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
         OnUowRefreshedEntity(new MediaRefreshNotification(entity, new EventMessages()));
 
         entity.ResetDirtyProperties();
+
+        // We need to flush the isolated cache by key explicitly here.
+        // The MediaCacheRefresher does the same thing, but by the time it's invoked, custom notification handlers
+        // might have already consumed the cached version (which at this point is the previous version).
+        IsolatedCache.ClearByKey(RepositoryCacheKeys.GetKey<IMedia, Guid>(entity.Key));
     }
 
     protected override void PersistDeletedItem(IMedia entity)

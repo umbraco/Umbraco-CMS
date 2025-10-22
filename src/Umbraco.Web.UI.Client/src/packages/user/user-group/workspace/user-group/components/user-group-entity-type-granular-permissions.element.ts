@@ -2,12 +2,15 @@ import { UMB_USER_GROUP_WORKSPACE_CONTEXT } from '../user-group-workspace.contex
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 import type { ManifestGranularUserPermission } from '@umbraco-cms/backoffice/user-permission';
-import { html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, state, nothing, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { filterFrozenArray } from '@umbraco-cms/backoffice/observable-api';
 
-@customElement('umb-user-group-granular-permission-list')
+@customElement('umb-user-group-entity-type-granular-permissions')
 export class UmbUserGroupGranularPermissionListElement extends UmbLitElement {
+	@property()
+	public entityType?: string;
+
 	@state()
 	private _userGroupPermissions?: Array<any>;
 
@@ -57,9 +60,21 @@ export class UmbUserGroupGranularPermissionListElement extends UmbLitElement {
 
 	override render() {
 		if (!this._userGroupPermissions) return;
+
+		if (!this.entityType) {
+			return html`
+				<umb-extension-slot
+					type="userGranularPermission"
+					.filter=${(manifest: ManifestGranularUserPermission) =>
+						manifest.forEntityTypes === undefined || manifest.forEntityTypes?.length === 0}
+					.renderMethod=${this.#renderProperty}></umb-extension-slot>
+			`;
+		}
+
 		return html`<umb-extension-slot
 			type="userGranularPermission"
-			.props=${{ fallbackPermissions: this._userGroupFallbackPermissions }}
+			.filter=${(manifest: ManifestGranularUserPermission) =>
+				manifest.forEntityTypes?.includes(this.entityType!) || manifest.forEntityTypes?.length === 0}
 			.renderMethod=${this.#renderProperty}></umb-extension-slot>`;
 	}
 
@@ -95,6 +110,6 @@ export default UmbUserGroupGranularPermissionListElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-user-group-granular-permission-list': UmbUserGroupGranularPermissionListElement;
+		'umb-user-group-entity-type-granular-permissions': UmbUserGroupGranularPermissionListElement;
 	}
 }

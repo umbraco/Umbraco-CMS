@@ -1,11 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Threading;
 using Microsoft.Extensions.Primitives;
 using NUnit.Framework;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -30,6 +26,17 @@ public class ObjectExtensionsTests
     public void TestTearDown() => Thread.CurrentThread.CurrentCulture = _savedCulture;
 
     private CultureInfo _savedCulture;
+
+    [Test]
+    public void Can_Create_Enumerable_Of_One()
+    {
+        var input = "hello";
+#pragma warning disable CS0618 // Type or member is obsolete
+        var result = input.AsEnumerableOfOne<string>();
+#pragma warning restore CS0618 // Type or member is obsolete
+        Assert.AreEqual(1, result.Count());
+        Assert.AreEqual("hello", result.First());
+    }
 
     [Test]
     public void Can_Convert_List_To_Enumerable()

@@ -389,7 +389,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 								${this.#renderReadOnlyTag(this._activeVariant?.culture)}
 								<uui-symbol-expand .open=${this._variantSelectorOpen}></uui-symbol-expand>
 							</uui-button>
-							${!this._variantSelectorOpen ? this.#renderHintBadge(firstHintOnInactiveVariant) : nothing}
+							${!this._variantSelectorOpen ? this.#renderVariantSelectorHintBadge(firstHintOnInactiveVariant) : nothing}
 							${this._activeVariants.length > 1
 								? html`
 										<uui-button slot="append" compact id="variant-close" @click=${this.#closeSplitView}>
@@ -464,6 +464,13 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 			</div>
 			${isExpanded ? html` ${subVariantOptions.map((option) => this.#renderSegmentVariantOption(option))} ` : nothing}
 		`;
+	}
+
+	#renderVariantSelectorHintBadge(hint?: UmbVariantHint) {
+		if (!hint) return nothing;
+		return html` <umb-badge slot="append" .color=${hint.color ?? 'default'} ?attention=${hint.color === 'invalid'}
+			>${hint.text}</umb-badge
+		>`;
 	}
 
 	#renderSubHintBadge(hint?: UmbVariantHint) {
@@ -781,6 +788,10 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 				background-color: var(--uui-color-surface);
 				font-size: var(--uui-type-small-size);
 				font-weight: 700;
+			}
+
+			umb-badge {
+				z-index: 2;
 			}
 		`,
 	];

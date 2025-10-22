@@ -1933,6 +1933,97 @@ internal partial class BlockListElementLevelVariationTests
         }
     }
 
+    [TestCase(ContentVariation.Culture, false)]
+    [TestCase(ContentVariation.Culture, true)]
+    [TestCase(ContentVariation.Nothing, false)]
+    [TestCase(ContentVariation.Nothing, true)]
+    public async Task Can_Perform_Language_Fallback(ContentVariation elementTypeVariation, bool performFallbackToDefaultLanguage)
+    {
+        var daDkLanguage = await LanguageService.GetAsync("da-DK");
+        Assert.IsNotNull(daDkLanguage);
+        daDkLanguage.FallbackIsoCode = "en-US";
+        var saveLanguageResult = await LanguageService.UpdateAsync(daDkLanguage, Constants.Security.SuperUserKey);
+        Assert.IsTrue(saveLanguageResult.Success);
+
+        daDkLanguage = await LanguageService.GetAsync("da-DK");
+        Assert.AreEqual("en-US", daDkLanguage?.FallbackIsoCode);
+
+        var elementType = CreateElementType(elementTypeVariation);
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType, ContentVariation.Culture);
+
+        var content = CreateContent(
+            contentType,
+            elementType,
+            new []
+            {
+                new BlockProperty(
+                    new List<BlockPropertyValue>
+                    {
+                        new() { Alias = "invariantText", Value = "English invariantText content value" },
+                        new() { Alias = "variantText", Value = "English variantText content value" }
+                    },
+                    new List<BlockPropertyValue>
+                    {
+                        new() { Alias = "invariantText", Value = "English invariantText settings value" },
+                        new() { Alias = "variantText", Value = "English variantText settings value" }
+                    },
+                    "en-US",
+                    null)
+            },
+            true);
+
+        AssertPropertyValuesWithFallback("en-US",
+            "English invariantText content value", "English variantText content value",
+            "English invariantText settings value", "English variantText settings value");
+
+        AssetEmptyPropertyValues("da-DK");
+
+        AssertPropertyValuesWithFallback("da-DK",
+            "English invariantText content value", "English variantText content value",
+            "English invariantText settings value", "English variantText settings value");
+
+        void AssertPropertyValuesWithFallback(string culture,
+            string expectedInvariantContentValue, string expectedVariantContentValue,
+            string expectedInvariantSettingsValue, string expectedVariantSettingsValue)
+        {
+            SetVariationContext(culture, null);
+            var publishedContent = GetPublishedContent(content.Key);
+
+            var fallback = performFallbackToDefaultLanguage ? Fallback.ToDefaultLanguage : Fallback.ToLanguage;
+
+            var publishedValueFallback = GetRequiredService<IPublishedValueFallback>();
+            var value = publishedContent.Value<BlockListModel>(publishedValueFallback, "blocks", fallback: fallback);
+            Assert.IsNotNull(value);
+            Assert.AreEqual(1, value.Count);
+
+            var blockListItem = value.First();
+            Assert.AreEqual(2, blockListItem.Content.Properties.Count());
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(expectedInvariantContentValue, blockListItem.Content.Value<string>("invariantText"));
+                Assert.AreEqual(expectedVariantContentValue, blockListItem.Content.Value<string>("variantText"));
+            });
+
+            Assert.AreEqual(2, blockListItem.Settings.Properties.Count());
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(expectedInvariantSettingsValue, blockListItem.Settings.Value<string>("invariantText"));
+                Assert.AreEqual(expectedVariantSettingsValue, blockListItem.Settings.Value<string>("variantText"));
+            });
+        }
+
+        void AssetEmptyPropertyValues(string culture)
+        {
+            SetVariationContext(culture, null);
+            var publishedContent = GetPublishedContent(content.Key);
+
+            var value = publishedContent.Value<BlockListModel>("blocks");
+            Assert.NotNull(value);
+            Assert.IsEmpty(value);
+        }
+    }
+
     [Test]
     public async Task Missing_Segment_Performs_Fallback_To_Default_Segment()
     {
