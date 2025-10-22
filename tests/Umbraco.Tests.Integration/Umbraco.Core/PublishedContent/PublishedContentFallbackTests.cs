@@ -35,6 +35,8 @@ public class PublishedContentFallbackTests : UmbracoIntegrationTest
 
     private IApiContentBuilder ApiContentBuilder => GetRequiredService<IApiContentBuilder>();
 
+    private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
+
     protected override void CustomTestSetup(IUmbracoBuilder builder)
         => builder
             .AddUmbracoHybridCache()
@@ -98,6 +100,36 @@ public class PublishedContentFallbackTests : UmbracoIntegrationTest
         Assert.AreEqual(invariantTitle, invariantValue);
     }
 
+    [TestCase("Danish title", true)]
+    [TestCase("Danish title", false)]
+    [TestCase(null, true)]
+    [TestCase(null, false)]
+    public async Task Property_Value_Can_Perform_Explicit_Language_Fallback(string? danishTitle, bool performFallbackToDefaultLanguage)
+    {
+        var danishLanguage = new Language("da-DK", "Danish")
+        {
+            FallbackIsoCode = "en-US"
+        };
+        await LanguageService.CreateAsync(danishLanguage, Constants.Security.SuperUserKey);
+
+        UmbracoContextFactory.EnsureUmbracoContext();
+
+        const string englishTitle = "English title";
+        var publishedContent = await SetupCultureVariantContentAsync(englishTitle, danishTitle);
+
+        VariationContextAccessor.VariationContext = new VariationContext(culture: "da-DK", segment: null);
+        var danishValue = publishedContent.Value<string>(PublishedValueFallback, "title");
+        Assert.AreEqual(danishTitle ?? string.Empty, danishValue);
+
+        var fallback = performFallbackToDefaultLanguage ? Fallback.ToDefaultLanguage : Fallback.ToLanguage;
+        var fallbackValue = publishedContent.Value<string>(PublishedValueFallback, "title", fallback: fallback);
+        Assert.AreEqual(danishTitle ?? englishTitle, fallbackValue);
+
+        VariationContextAccessor.VariationContext = new VariationContext(culture: "en-US", segment: null);
+        var englishValue = publishedContent.Value<string>(PublishedValueFallback, "title");
+        Assert.AreEqual(englishTitle, englishValue);
+    }
+
     private async Task<IPublishedContent> SetupSegmentedContentAsync(string? invariantTitle, string? segmentedTitle)
     {
         var contentType = new ContentTypeBuilder()
@@ -124,11 +156,47 @@ public class PublishedContentFallbackTests : UmbracoIntegrationTest
         ContentService.Save(content);
         ContentService.Publish(content, ["*"]);
 
+        return GetPublishedContent(content.Key);
+    }
+
+    private async Task<IPublishedContent> SetupCultureVariantContentAsync(string englishTitle, string? danishTitle)
+    {
+        var contentType = new ContentTypeBuilder()
+            .WithAlias("theContentType")
+            .WithContentVariation(ContentVariation.Culture)
+            .AddPropertyType()
+            .WithAlias("title")
+            .WithName("Title")
+            .WithDataTypeId(Constants.DataTypes.Textbox)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
+            .WithValueStorageType(ValueStorageType.Nvarchar)
+            .WithVariations(ContentVariation.Culture)
+            .Done()
+            .WithAllowAsRoot(true)
+            .Build();
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        var content = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithCultureName("en-US", "EN")
+            .WithCultureName("da-DK", "DA")
+            .WithName("Content")
+            .Build();
+        content.SetValue("title", englishTitle, culture: "en-US");
+        content.SetValue("title", danishTitle, culture: "da-DK");
+        ContentService.Save(content);
+        ContentService.Publish(content, ["en-US", "da-DK"]);
+
+        return GetPublishedContent(content.Key);
+    }
+
+    private IPublishedContent GetPublishedContent(Guid key)
+    {
         ContentCacheRefresher.Refresh([new ContentCacheRefresher.JsonPayload { ChangeTypes = TreeChangeTypes.RefreshAll }]);
 
         UmbracoContextAccessor.Clear();
         var umbracoContext = UmbracoContextFactory.EnsureUmbracoContext().UmbracoContext;
-        var publishedContent = umbracoContext.Content.GetById(content.Key);
+        var publishedContent = umbracoContext.Content.GetById(key);
         Assert.IsNotNull(publishedContent);
 
         return publishedContent;

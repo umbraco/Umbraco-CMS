@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
+using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
@@ -26,9 +27,9 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
 
     private IPublishedContentCache PublishedContentHybridCache => GetRequiredService<IPublishedContentCache>();
 
-    private IContentEditingService ContentEditingService => GetRequiredService<IContentEditingService>();
-
     private IContentPublishingService ContentPublishingService => GetRequiredService<IContentPublishingService>();
+
+    private IDocumentCacheService DocumentCacheService => GetRequiredService<IDocumentCacheService>();
 
     private const string NewName = "New Name";
     private const string NewTitle = "New Title";
@@ -465,6 +466,61 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
 
         // Assert
         Assert.IsNull(textPage);
+    }
+
+    [Test]
+    public async Task Can_Get_Published_Content_By_Id_After_Previous_Check_Where_Not_Found()
+    {
+        // Arrange
+        var testPageKey = Guid.NewGuid();
+
+        // Act & Assert
+        // - assert we cannot get the content that doesn't yet exist from the cache
+        var testPage = await PublishedContentHybridCache.GetByIdAsync(testPageKey);
+        Assert.IsNull(testPage);
+
+        testPage = await PublishedContentHybridCache.GetByIdAsync(testPageKey);
+        Assert.IsNull(testPage);
+
+        // - create and publish the content
+        var testPageContent = ContentEditingBuilder.CreateBasicContent(ContentType.Key, testPageKey);
+        var createResult = await ContentEditingService.CreateAsync(testPageContent, Constants.Security.SuperUserKey);
+        Assert.IsTrue(createResult.Success);
+        var publishResult = await ContentPublishingService.PublishAsync(testPageKey, CultureAndSchedule, Constants.Security.SuperUserKey);
+        Assert.IsTrue(publishResult.Success);
+
+        // - assert we can now get the content from the cache
+        testPage = await PublishedContentHybridCache.GetByIdAsync(testPageKey);
+        Assert.IsNotNull(testPage);
+    }
+
+    [Test]
+    public async Task Can_Get_Published_Content_By_Id_After_Previous_Exists_Check()
+    {
+        // Act
+        var hasContentForTextPageCached = await DocumentCacheService.HasContentByIdAsync(PublishedTextPageId);
+        Assert.IsTrue(hasContentForTextPageCached);
+        var textPage = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPageId);
+
+        // Assert
+        AssertPublishedTextPage(textPage);
+    }
+
+    [Test]
+    public async Task Can_Do_Exists_Check_On_Created_Published_Content()
+    {
+        var testPageKey = Guid.NewGuid();
+        var testPageContent = ContentEditingBuilder.CreateBasicContent(ContentType.Key, testPageKey);
+        var createResult = await ContentEditingService.CreateAsync(testPageContent, Constants.Security.SuperUserKey);
+        Assert.IsTrue(createResult.Success);
+        var publishResult = await ContentPublishingService.PublishAsync(testPageKey, CultureAndSchedule, Constants.Security.SuperUserKey);
+        Assert.IsTrue(publishResult.Success);
+
+        var testPage = await PublishedContentHybridCache.GetByIdAsync(testPageKey);
+        Assert.IsNotNull(testPage);
+
+        var hasContentForTextPageCached = await DocumentCacheService.HasContentByIdAsync(testPage.Id);
+        Assert.IsTrue(hasContentForTextPageCached);
     }
 
     private void AssertTextPage(IPublishedContent textPage)

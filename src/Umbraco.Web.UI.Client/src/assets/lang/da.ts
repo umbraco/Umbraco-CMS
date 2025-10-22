@@ -80,6 +80,7 @@ export default {
 		content: 'Indhold',
 		administration: 'Administration',
 		structure: 'Struktur',
+		general: 'Generelt',
 		other: 'Andet',
 	},
 	actionDescriptions: {
@@ -2082,10 +2083,10 @@ export default {
 		permissionsGranularHelp: 'Sæt rettigheder for specifikke noder',
 		granularRightsLabel: 'Dokumenter',
 		granularRightsDescription: 'Tillad adgang til specifikke dokumenter',
-		permissionsEntityGroup_document: 'Indhold',
-		permissionsEntityGroup_media: 'Medie',
-		permissionsEntityGroup_member: 'Medlemmer',
-		'permissionsEntityGroup_document-property-value': 'Dokumentegenskabsværdi',
+		permissionsEntityGroup_document: 'Indholdsrettigheder',
+		permissionsEntityGroup_media: 'Medierettigheder',
+		permissionsEntityGroup_member: 'Medlemsrettigheder',
+		'permissionsEntityGroup_document-property-value': 'Feltrettigheder',
 		permissionNoVerbs: 'Ingen tilladte rettigheder',
 		profile: 'Profil',
 		searchAllChildren: "Søg alle 'børn'",
@@ -2602,13 +2603,16 @@ export default {
 		returnToPreviewHeadline: 'Forhåndsvisning af indholdet?',
 		returnToPreviewDescription:
 			'Du har afslutet forhåndsvisning, vil du starte forhåndsvisning igen for at\n      se seneste gemte version af indholdet?\n    ',
+		returnToPreviewAcceptButton: 'Start forhåndsvisning igen',
 		returnToPreviewDeclineButton: 'Se udgivet indhold',
 		viewPublishedContentHeadline: 'Se udgivet indhold?',
 		viewPublishedContentDescription:
 			'Du er i forhåndsvisning, vil du afslutte for at se den udgivet\n      version?\n    ',
 		viewPublishedContentAcceptButton: 'Se udgivet version',
 		viewPublishedContentDeclineButton: 'Forbliv i forhåndsvisning',
-		returnToPreviewAcceptButton: 'Preview latest version',
+		connectionFailed:
+			'Kunne ikke etablere forbindelse til serveren, forhåndsvisning af liveopdateringer vil ikke fungere.',
+		connectionLost: 'Forbindelse til serveren mistet, forhåndsvisning af liveopdateringer vil ikke fungere.',
 	},
 	permissions: {
 		FolderCreation: 'Mappeoprettelse',

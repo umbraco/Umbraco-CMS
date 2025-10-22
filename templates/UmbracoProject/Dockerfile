@@ -26,8 +26,5 @@ USER root
 RUN mkdir umbraco
 RUN mkdir umbraco/Logs
 RUN chown $APP_UID umbraco --recursive
-#if (UmbracoRelease = 'LTS')
-RUN chown $APP_UID wwwroot/umbraco --recursive
-#endif
 USER $APP_UID
 ENTRYPOINT ["dotnet", "UmbracoProject.dll"]

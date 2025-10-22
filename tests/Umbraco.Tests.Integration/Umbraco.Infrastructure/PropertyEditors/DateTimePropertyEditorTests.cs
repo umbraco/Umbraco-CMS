@@ -8,7 +8,6 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
-using Umbraco.Cms.Infrastructure.HybridCache;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -39,10 +38,10 @@ public class DateTimePropertyEditorTests : UmbracoIntegrationTest
 
     private static readonly object[] _sourceList1 =
     [
-        new object[] { Constants.PropertyEditors.Aliases.DateOnly, false, new DateOnly(2025, 1, 22) },
+        new object[] { Constants.PropertyEditors.Aliases.DateOnly, false, new DateOnly(2025, 6, 22) },
         new object[] { Constants.PropertyEditors.Aliases.TimeOnly, false, new TimeOnly(18, 33, 1) },
-        new object[] { Constants.PropertyEditors.Aliases.DateTimeUnspecified, false, new DateTime(2025, 1, 22, 18, 33, 1) },
-        new object[] { Constants.PropertyEditors.Aliases.DateTimeWithTimeZone, true, new DateTimeOffset(2025, 1, 22, 18, 33, 1, TimeSpan.Zero) },
+        new object[] { Constants.PropertyEditors.Aliases.DateTimeUnspecified, false, new DateTime(2025, 6, 22, 18, 33, 1) },
+        new object[] { Constants.PropertyEditors.Aliases.DateTimeWithTimeZone, true, new DateTimeOffset(2025, 6, 22, 18, 33, 1, TimeSpan.FromHours(2)) },
     ];
 
     [TestCaseSource(nameof(_sourceList1))]
@@ -106,7 +105,7 @@ public class DateTimePropertyEditorTests : UmbracoIntegrationTest
                 .WithValue(
                     new JsonObject
                     {
-                        ["date"] = "2025-01-22T18:33:01.0000000+00:00",
+                        ["date"] = "2025-06-22T18:33:01.0000000+02:00",
                         ["timeZone"] = "Europe/Copenhagen",
                     })
                 .Done()
@@ -127,7 +126,6 @@ public class DateTimePropertyEditorTests : UmbracoIntegrationTest
 
         Assert.IsTrue(publishResult.Success);
 
-        var test = ((DocumentCache)PublishedContentCache).GetAtRoot(false);
         var publishedContent = await PublishedContentCache.GetByIdAsync(createContentResult.Result.Content.Key, false);
         Assert.IsNotNull(publishedContent);
 

@@ -27,6 +27,15 @@ public static class ObjectExtensions
     private static readonly CustomBooleanTypeConverter _customBooleanTypeConverter = new();
 
     /// <summary>
+    /// Returns an enumerable containing only the input object.
+    /// </summary>
+    /// <param name="input">The input object.</param>
+    /// <typeparam name="T">The type of the enumerable.</typeparam>
+    /// <returns>An enumerable containing only the input object.</returns>
+    [Obsolete("Please replace uses of this extension method with Enumerable.Repeat(input, 1). This extension method is no longer used in Umbraco and is scheduled for removal in Umbraco 19.")]
+    public static IEnumerable<T> AsEnumerableOfOne<T>(this T input) => Enumerable.Repeat(input, 1);
+
+    /// <summary>
     /// Returns an XML serialized safe string representation for the value and type.
     /// </summary>
     /// <typeparam name="T">The type of the value.</typeparam>
