@@ -88,7 +88,7 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 				) {
 					const items = this.#items.getValue();
 					this.#items.setValue(this.#sortByUniques(items));
-					this.#statuses.setValue(this.#sortByUniques(statuses));
+					this.#statuses.setValue(this.#sortStatusByUniques(statuses));
 				} else {
 					// We need to load new items, so ...
 					this.#requestItems();
@@ -260,12 +260,23 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 		}
 	}
 
-	#sortByUniques<T extends Pick<ItemType, 'unique'>>(data?: Array<T>): Array<T> {
+	#sortByUniques(data?: Array<ItemType>): Array<ItemType> {
 		if (!data) return [];
 		const uniques = this.getUniques();
 		return [...data].sort((a, b) => {
 			const aIndex = uniques.indexOf(this.#getUnique(a) ?? '');
 			const bIndex = uniques.indexOf(this.#getUnique(b) ?? '');
+			return aIndex - bIndex;
+		});
+	}
+
+	/** Just needed for the deprecation implementation to work, do not bring this into 17.0 [NL] */
+	#sortStatusByUniques(data?: Array<UmbRepositoryItemsStatus>): Array<UmbRepositoryItemsStatus> {
+		if (!data) return [];
+		const uniques = this.getUniques();
+		return [...data].sort((a, b) => {
+			const aIndex = uniques.indexOf(a.unique ?? '');
+			const bIndex = uniques.indexOf(b.unique ?? '');
 			return aIndex - bIndex;
 		});
 	}
