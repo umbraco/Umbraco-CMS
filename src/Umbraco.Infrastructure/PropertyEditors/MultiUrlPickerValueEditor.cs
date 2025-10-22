@@ -124,7 +124,7 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference, I
 
     private IList<Guid> GetKeys(string entityType, IEnumerable<LinkDto> dtos) =>
         dtos
-            .Where(x => x.Type! == entityType)
+            .Where(x => x.Type == entityType)
             .Select(x => x.Unique ?? (x.Udi is not null ? x.Udi.Guid : Guid.Empty))
             .Where(x => x != Guid.Empty)
             .Distinct()
