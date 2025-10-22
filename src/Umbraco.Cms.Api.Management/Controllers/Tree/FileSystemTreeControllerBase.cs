@@ -5,7 +5,6 @@ using Umbraco.Cms.Api.Management.Extensions;
 using Umbraco.Cms.Api.Management.Services.FileSystem;
 using Umbraco.Cms.Api.Management.ViewModels.FileSystem;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Extensions;
 
@@ -13,7 +12,17 @@ namespace Umbraco.Cms.Api.Management.Controllers.Tree;
 
 public abstract class FileSystemTreeControllerBase : ManagementApiControllerBase
 {
-    private readonly IFileSystemTreeService _fileSystemTreeService;
+    private readonly IFileSystemTreeService _fileSystemTreeService = null!;
+
+    /// <summary>
+    /// Indicates whether to use the IFileSystemTreeService or the legacy implementation.
+    /// </summary>
+    /// <remarks>
+    /// This is retained to ensure that any controllers outside of the CMS that use this base class with the obsolete constructor
+    /// continue to function until they can be updated to use the new service.
+    /// To be removed along with the constructor taking no parameters in Umbraco 18.
+    /// </remarks>
+    private readonly bool _useFileSystemTreeService = true;
 
     [Obsolete("Has been moved to the individual services. Scheduled to be removed in Umbraco 18.")]
     protected abstract IFileSystem FileSystem { get; }
@@ -21,15 +30,12 @@ public abstract class FileSystemTreeControllerBase : ManagementApiControllerBase
     [ActivatorUtilitiesConstructor]
     protected FileSystemTreeControllerBase(IFileSystemTreeService fileSystemTreeService) => _fileSystemTreeService = fileSystemTreeService;
 
-    [Obsolete("Use the other constructor. Scheduled for removal in Umbraco 18.")]
-    protected FileSystemTreeControllerBase()
-        : this(StaticServiceProvider.Instance.GetRequiredService<IScriptTreeService>())
-    {
-    }
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
+    protected FileSystemTreeControllerBase() => _useFileSystemTreeService = false;
 
     protected Task<ActionResult<PagedViewModel<FileSystemTreeItemPresentationModel>>> GetRoot(int skip, int take)
     {
-        FileSystemTreeItemPresentationModel[] viewModels = _fileSystemTreeService.GetPathViewModels(string.Empty, skip, take, out var totalItems);
+        FileSystemTreeItemPresentationModel[] viewModels = GetPathViewModels(string.Empty, skip, take, out var totalItems);
 
         PagedViewModel<FileSystemTreeItemPresentationModel> result = PagedViewModel(viewModels, totalItems);
         return Task.FromResult<ActionResult<PagedViewModel<FileSystemTreeItemPresentationModel>>>(Ok(result));
@@ -37,14 +43,14 @@ public abstract class FileSystemTreeControllerBase : ManagementApiControllerBase
 
     protected Task<ActionResult<PagedViewModel<FileSystemTreeItemPresentationModel>>> GetChildren(string path, int skip, int take)
     {
-        FileSystemTreeItemPresentationModel[] viewModels = _fileSystemTreeService.GetPathViewModels(path, skip, take, out var totalItems);
+        FileSystemTreeItemPresentationModel[] viewModels = GetPathViewModels(path, skip, take, out var totalItems);
 
         PagedViewModel<FileSystemTreeItemPresentationModel> result = PagedViewModel(viewModels, totalItems);
         return Task.FromResult<ActionResult<PagedViewModel<FileSystemTreeItemPresentationModel>>>(Ok(result));
     }
 
     /// <summary>
-    /// Gets the sibling of the targeted item based on its path.
+    /// Gets the siblings of the targeted item based on its path.
     /// </summary>
     /// <param name="path">The path to the item.</param>
     /// <param name="before">The amount of siblings you want to fetch from before the items position in the array.</param>
@@ -61,17 +67,19 @@ public abstract class FileSystemTreeControllerBase : ManagementApiControllerBase
     protected virtual Task<ActionResult<IEnumerable<FileSystemTreeItemPresentationModel>>> GetAncestors(string path, bool includeSelf = true)
     {
         path = path.VirtualPathToSystemPath();
-        FileSystemTreeItemPresentationModel[] models = _fileSystemTreeService.GetAncestorModels(path, includeSelf);
+        FileSystemTreeItemPresentationModel[] models = GetAncestorModels(path, includeSelf);
 
         return Task.FromResult<ActionResult<IEnumerable<FileSystemTreeItemPresentationModel>>>(Ok(models));
     }
 
-    private PagedViewModel<FileSystemTreeItemPresentationModel> PagedViewModel(IEnumerable<FileSystemTreeItemPresentationModel> viewModels, long totalItems)
-        => new() { Total = totalItems, Items = viewModels };
-
     [Obsolete("Has been moved to FileSystemTreeServiceBase. Scheduled for removal in Umbraco 18.")]
     protected virtual FileSystemTreeItemPresentationModel[] GetAncestorModels(string path, bool includeSelf)
     {
+        if (_useFileSystemTreeService)
+        {
+            return _fileSystemTreeService.GetAncestorModels(path, includeSelf);
+        }
+
         var directories = path.Split(Path.DirectorySeparatorChar).Take(Range.EndAt(Index.FromEnd(1))).ToArray();
         var result = directories
             .Select((directory, index) => MapViewModel(string.Join(Path.DirectorySeparatorChar, directories.Take(index + 1)), directory, true))
@@ -106,6 +114,37 @@ public abstract class FileSystemTreeControllerBase : ManagementApiControllerBase
     private string GetFileSystemItemName(bool isFolder, string itemPath) => isFolder
         ? Path.GetFileName(itemPath)
         : FileSystem.GetFileName(itemPath);
+
+    private FileSystemTreeItemPresentationModel[] GetPathViewModels(string path, int skip, int take, out long totalItems)
+    {
+        if (_useFileSystemTreeService)
+        {
+            return _fileSystemTreeService.GetPathViewModels(path, skip, take, out totalItems);
+        }
+
+        path = path.VirtualPathToSystemPath();
+        var allItems = GetDirectories(path)
+            .Select(directory => new { Path = directory, IsFolder = true })
+            .Union(GetFiles(path).Select(file => new { Path = file, IsFolder = false }))
+            .ToArray();
+
+        totalItems = allItems.Length;
+
+        FileSystemTreeItemPresentationModel ViewModel(string itemPath, bool isFolder)
+            => MapViewModel(
+                itemPath,
+                GetFileSystemItemName(isFolder, itemPath),
+                isFolder);
+
+        return allItems
+            .Skip(skip)
+            .Take(take)
+            .Select(item => ViewModel(item.Path, item.IsFolder))
+            .ToArray();
+    }
+
+    private PagedViewModel<FileSystemTreeItemPresentationModel> PagedViewModel(IEnumerable<FileSystemTreeItemPresentationModel> viewModels, long totalItems)
+        => new() { Total = totalItems, Items = viewModels };
 
     [Obsolete("Has been moved to FileSystemTreeServiceBase. Scheduled for removal in Umbraco 18.")]
     private FileSystemTreeItemPresentationModel MapViewModel(string path, string name, bool isFolder)
