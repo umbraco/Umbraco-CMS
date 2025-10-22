@@ -39935,6 +39935,7 @@
       "DocumentUrlInfoModel": {
         "required": [
           "culture",
+          "isExternal",
           "message",
           "provider",
           "url"
@@ -39955,6 +39956,9 @@
           },
           "provider": {
             "type": "string"
+          },
+          "isExternal": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
