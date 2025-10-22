@@ -7,6 +7,7 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.Services.Trees;
 
 public class ScriptTreeServiceTests : FileSystemTreeServiceTestsBase
 {
+    protected override string FileExtension { get; set; }
     protected override string FileSystemPath => GlobalSettings.UmbracoScriptsPath;
 
     protected override IFileSystem? GetScriptsFileSystem() => TestFileSystem;

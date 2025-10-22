@@ -8,6 +8,7 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.Services.Trees;
 
 public class PartialViewTreeServiceTests : FileSystemTreeServiceTestsBase
 {
+    protected override string FileExtension { get; set; }
     protected override string FileSystemPath => Constants.SystemDirectories.PartialViews;
 
     protected override IFileSystem? GetPartialViewsFileSystem() => TestFileSystem;

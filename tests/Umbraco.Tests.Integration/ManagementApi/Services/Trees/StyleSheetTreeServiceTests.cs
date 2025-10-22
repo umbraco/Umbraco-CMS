@@ -11,6 +11,8 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.Services.Trees;
 
 public class StyleSheetTreeServiceTests : FileSystemTreeServiceTestsBase
 {
+    protected override string FileExtension { get; set; } = ".css";
+
     protected override string FileSystemPath => GlobalSettings.UmbracoCssPath;
 
     protected FileSystems FileSystems { get; private set; }
@@ -37,7 +39,7 @@ public class StyleSheetTreeServiceTests : FileSystemTreeServiceTestsBase
         for (int i = 0; i < 10; i++)
         {
             using var stream = CreateStream(Path.Join("tests"));
-            TestFileSystem.AddFile($"file{i}.css", stream);
+            TestFileSystem.AddFile($"file{i}{FileExtension}", stream);
         }
     }
 
@@ -46,12 +48,12 @@ public class StyleSheetTreeServiceTests : FileSystemTreeServiceTestsBase
     {
         var service = new StyleSheetTreeService(FileSystems);
 
-        FileSystemTreeItemPresentationModel[] treeModel = service.GetSiblingsViewModels("file5.css", 1, 1, out long before, out var after);
-        int index = Array.FindIndex(treeModel, item => item.Name == "file5.css");
+        FileSystemTreeItemPresentationModel[] treeModel = service.GetSiblingsViewModels($"file5{FileExtension}", 1, 1, out long before, out var after);
+        int index = Array.FindIndex(treeModel, item => item.Name == $"file5{FileExtension}");
 
-        Assert.AreEqual(treeModel[index].Name, "file5.css");
-        Assert.AreEqual(treeModel[index - 1].Name, "file4.css");
-        Assert.AreEqual(treeModel[index + 1].Name, "file6.css");
+        Assert.AreEqual(treeModel[index].Name, $"file5{FileExtension}");
+        Assert.AreEqual(treeModel[index - 1].Name, $"file4{FileExtension}");
+        Assert.AreEqual(treeModel[index + 1].Name, $"file6{FileExtension}");
         Assert.That(treeModel.Length == 3);
         Assert.AreEqual(after, 3);
         Assert.AreEqual(before, 4);
@@ -62,7 +64,7 @@ public class StyleSheetTreeServiceTests : FileSystemTreeServiceTestsBase
     {
         var service = new StyleSheetTreeService(FileSystems);
 
-        var path = Path.Join("tests", "file5.css");
+        var path = Path.Join("tests", $"file5{FileExtension}");
         FileSystemTreeItemPresentationModel[] treeModel = service.GetAncestorModels(path, true);
 
         Assert.IsNotEmpty(treeModel);

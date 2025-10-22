@@ -16,6 +16,8 @@ public abstract class FileSystemTreeServiceTestsBase : UmbracoIntegrationTest
 
     protected IFileSystem TestFileSystem { get; private set; }
 
+    protected abstract string FileExtension { get; set; }
+
     protected abstract string FileSystemPath { get; }
 
     protected IHostingEnvironment HostingEnvironment => GetRequiredService<IHostingEnvironment>();
@@ -37,11 +39,11 @@ public abstract class FileSystemTreeServiceTestsBase : UmbracoIntegrationTest
         for (int i = 0; i < 10; i++)
         {
             using var stream = CreateStream(Path.Join("tests"));
-            TestFileSystem.AddFile($"file{i}", stream);
+            TestFileSystem.AddFile($"file{i}{FileExtension}", stream);
         }
     }
 
-    public Stream CreateStream(string contents = null)
+    protected Stream CreateStream(string contents = null)
     {
         if (string.IsNullOrEmpty(contents))
         {
