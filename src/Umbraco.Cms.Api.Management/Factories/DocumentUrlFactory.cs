@@ -16,7 +16,6 @@ public class DocumentUrlFactory : IDocumentUrlFactory
     private readonly UrlProviderCollection _urlProviders;
     private readonly IPreviewService _previewService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
-    private readonly IAbsoluteUrlBuilder _absoluteUrlBuilder;
     private readonly ILogger<DocumentUrlFactory> _logger;
 
     public DocumentUrlFactory(
@@ -24,14 +23,12 @@ public class DocumentUrlFactory : IDocumentUrlFactory
         UrlProviderCollection urlProviders,
         IPreviewService previewService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IAbsoluteUrlBuilder absoluteUrlBuilder,
         ILogger<DocumentUrlFactory> logger)
     {
         _publishedUrlInfoProvider = publishedUrlInfoProvider;
         _urlProviders = urlProviders;
         _previewService = previewService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
-        _absoluteUrlBuilder = absoluteUrlBuilder;
         _logger = logger;
     }
 
@@ -39,7 +36,7 @@ public class DocumentUrlFactory : IDocumentUrlFactory
     {
         ISet<UrlInfo> urlInfos = await _publishedUrlInfoProvider.GetAllAsync(content);
         return urlInfos
-            .Select(urlInfo => CreateDocumentUrlInfo(urlInfo, false))
+            .Select(CreateDocumentUrlInfo)
             .ToArray();
     }
 
@@ -89,18 +86,16 @@ public class DocumentUrlFactory : IDocumentUrlFactory
             }
         }
 
-        return CreateDocumentUrlInfo(previewUrlInfo, previewUrlInfo.IsExternal is false);
+        return CreateDocumentUrlInfo(previewUrlInfo);
     }
 
-    private DocumentUrlInfo CreateDocumentUrlInfo(UrlInfo urlInfo, bool ensureAbsoluteUrl)
+    private DocumentUrlInfo CreateDocumentUrlInfo(UrlInfo urlInfo)
     {
         var url = urlInfo.Url?.ToString();
         return new DocumentUrlInfo
         {
             Culture = urlInfo.Culture,
-            Url = ensureAbsoluteUrl && url is not null
-                ? _absoluteUrlBuilder.ToAbsoluteUrl(url).ToString()
-                : url,
+            Url = url,
             Message = urlInfo.Message,
             Provider = urlInfo.Provider,
         };
