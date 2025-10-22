@@ -125,7 +125,16 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 		return this.#items.asObservablePart((items) => items.find((item) => item.unique === unique));
 	}
 
+	/**
+	 * @deprecated - This is resolved by setUniques, no need to update statuses.
+	 * @param unique {string} - The unique identifier of the item to remove the status of.
+	 */
 	removeStatus(unique: string) {
+		new UmbDeprecation({
+			removeInVersion: '18.0.0',
+			deprecated: 'removeStatus',
+			solution: 'Statuses are removed automatically when setting uniques',
+		}).warn();
 		const newStatuses = this.#statuses.getValue().filter((status) => status.unique !== unique);
 		this.#statuses.setValue(newStatuses);
 	}
