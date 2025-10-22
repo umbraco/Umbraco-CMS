@@ -280,7 +280,7 @@ export class UmbArrayState<T, U = unknown> extends UmbDeepState<T[]> {
 	 * 	{ key: 3, value: 'bar2'}
 	 * ];
 	 * myState.replace(updates);
-	 * // Only the existing item gets added:
+	 * // Only the existing item gets replaced:
 	 * myState.getValue(); // -> [{ key: 1, value: 'foo2'}, { key: 2, value: 'bar'}]
 	 */
 	replace(entries: Array<T>): UmbArrayState<T> {
