@@ -6,7 +6,9 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_16_3_0;
 
@@ -69,7 +71,7 @@ public class MigrateMediaTypeLabelProperties : AsyncMigrationBase
 
     private void IfNotExistsCreateBytesLabel()
     {
-        if (Database.Exists<NodeDto>(Constants.DataTypes.LabelBytes))
+        if (NodeExists(_labelBytesDataTypeKey))
         {
             return;
         }
@@ -89,7 +91,7 @@ public class MigrateMediaTypeLabelProperties : AsyncMigrationBase
             CreateDate = DateTime.Now,
         };
 
-        _ = Database.Insert(Constants.DatabaseSchema.Tables.Node, "id", false, nodeDto);
+        Database.Insert(Constants.DatabaseSchema.Tables.Node, "id", false, nodeDto);
 
         var dataTypeDto = new DataTypeDto
         {
@@ -100,12 +102,12 @@ public class MigrateMediaTypeLabelProperties : AsyncMigrationBase
             Configuration = "{\"umbracoDataValueType\":\"BIGINT\", \"labelTemplate\":\"{=value | bytes}\"}",
         };
 
-        _ = Database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, dataTypeDto);
+        Database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, dataTypeDto);
     }
 
     private void IfNotExistsCreatePixelsLabel()
     {
-        if (Database.Exists<NodeDto>(Constants.DataTypes.LabelPixels))
+        if (NodeExists(_labelPixelsDataTypeKey))
         {
             return;
         }
@@ -125,7 +127,7 @@ public class MigrateMediaTypeLabelProperties : AsyncMigrationBase
             CreateDate = DateTime.Now,
         };
 
-        _ = Database.Insert(Constants.DatabaseSchema.Tables.Node, "id", false, nodeDto);
+        Database.Insert(Constants.DatabaseSchema.Tables.Node, "id", false, nodeDto);
 
         var dataTypeDto = new DataTypeDto
         {
@@ -136,7 +138,16 @@ public class MigrateMediaTypeLabelProperties : AsyncMigrationBase
             Configuration = "{\"umbracoDataValueType\":\"INT\", \"labelTemplate\":\"{=value}px\"}",
         };
 
-        _ = Database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, dataTypeDto);
+        Database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, dataTypeDto);
+    }
+
+    private bool NodeExists(Guid uniqueId)
+    {
+        Sql<ISqlContext> sql = Database.SqlContext.Sql()
+            .Select<NodeDto>()
+            .From<NodeDto>()
+            .Where<NodeDto>(x => x.UniqueId == uniqueId);
+        return Database.FirstOrDefault<NodeDto>(sql) is not null;
     }
 
     private async Task MigrateMediaTypeLabels()
