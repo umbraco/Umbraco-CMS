@@ -13,15 +13,14 @@ public class ElementOnlyOutputExpansionStrategy : IOutputExpansionStrategy
 
     private readonly IApiPropertyRenderer _propertyRenderer;
 
-    protected readonly Stack<Node?> ExpandProperties;
-    protected readonly Stack<Node?> IncludeProperties;
+    protected Stack<Node?> ExpandProperties { get; } = new();
+
+    protected Stack<Node?> IncludeProperties { get; } = new();
 
     public ElementOnlyOutputExpansionStrategy(
         IApiPropertyRenderer propertyRenderer)
     {
         _propertyRenderer = propertyRenderer;
-        ExpandProperties = new Stack<Node?>();
-        IncludeProperties = new Stack<Node?>();
     }
 
     public virtual IDictionary<string, object?> MapContentProperties(IPublishedContent content)
@@ -49,7 +48,7 @@ public class ElementOnlyOutputExpansionStrategy : IOutputExpansionStrategy
     public virtual IDictionary<string, object?> MapElementProperties(IPublishedElement element)
         => MapProperties(element.Properties, true);
 
-    protected IDictionary<string, object?> MapProperties(IEnumerable<IPublishedProperty> properties, bool forceExpandProperties = false)
+    private IDictionary<string, object?> MapProperties(IEnumerable<IPublishedProperty> properties, bool forceExpandProperties = false)
     {
         Node? currentExpandProperties = ExpandProperties.Count > 0 ? ExpandProperties.Peek() : null;
         if (ExpandProperties.Count > 1 && currentExpandProperties is null && forceExpandProperties is false)

@@ -36,22 +36,22 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddScoped<RequestContextOutputExpansionStrategy>();
         builder.Services.AddScoped<RequestContextOutputExpansionStrategyV2>();
 
-        // Webooks register a more basic implementation, remove it.
-        builder.Services.RemoveAll(descriptor => descriptor.ServiceType == typeof(IOutputExpansionStrategy));
-        builder.Services.AddScoped<IOutputExpansionStrategy>(provider =>
-        {
-            HttpContext? httpContext = provider.GetRequiredService<IHttpContextAccessor>().HttpContext;
-            ApiVersion? apiVersion = httpContext?.GetRequestedApiVersion();
-            if (apiVersion is null)
+        builder.Services.AddUnique<IOutputExpansionStrategy>(
+            provider =>
             {
-                return provider.GetRequiredService<RequestContextOutputExpansionStrategyV2>();
-            }
+                HttpContext? httpContext = provider.GetRequiredService<IHttpContextAccessor>().HttpContext;
+                ApiVersion? apiVersion = httpContext?.GetRequestedApiVersion();
+                if (apiVersion is null)
+                {
+                    return provider.GetRequiredService<RequestContextOutputExpansionStrategyV2>();
+                }
 
-            // V1 of the Delivery API uses a different expansion strategy than V2+
-            return apiVersion.MajorVersion == 1
-                ? provider.GetRequiredService<RequestContextOutputExpansionStrategy>()
-                : provider.GetRequiredService<RequestContextOutputExpansionStrategyV2>();
-        });
+                // V1 of the Delivery API uses a different expansion strategy than V2+
+                return apiVersion.MajorVersion == 1
+                    ? provider.GetRequiredService<RequestContextOutputExpansionStrategy>()
+                    : provider.GetRequiredService<RequestContextOutputExpansionStrategyV2>();
+            },
+            ServiceLifetime.Scoped);
 
         builder.Services.AddSingleton<IRequestCultureService, RequestCultureService>();
         builder.Services.AddSingleton<IRequestSegmmentService, RequestSegmentService>();
@@ -61,8 +61,7 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IRequestPreviewService, RequestPreviewService>();
 
         // Webooks register a more basic implementation, remove it.
-        builder.Services.RemoveAll(descriptor => descriptor.ServiceType == typeof(IOutputExpansionStrategyAccessor));
-        builder.Services.AddSingleton<IOutputExpansionStrategyAccessor, RequestContextOutputExpansionStrategyAccessor>();
+        builder.Services.AddUnique<IOutputExpansionStrategyAccessor, RequestContextOutputExpansionStrategyAccessor>(ServiceLifetime.Singleton);
         builder.Services.AddSingleton<IRequestStartItemProviderAccessor, RequestContextRequestStartItemProviderAccessor>();
 
         builder.Services.AddSingleton<IApiAccessService, ApiAccessService>();
