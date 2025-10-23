@@ -6,7 +6,7 @@ This package contains the types for the Umbraco Backoffice.
 
 A live preview of the latest backoffice build from the main branch is available at:
 
-**https://backofficepreview.umbraco.com/**
+**[backofficepreview.umbraco.com](https://backofficepreview.umbraco.com/)**
 
 This preview is automatically deployed via GitHub Actions whenever changes are pushed to main or version branches.
 
