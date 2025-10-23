@@ -1,4 +1,4 @@
-import { UmbPreviewRepository } from '../repository/preview.repository.js';
+import { UmbPreviewRepository } from '../repository/index.js';
 import { UMB_PREVIEW_CONTEXT } from './preview.context-token.js';
 import { HubConnectionBuilder } from '@umbraco-cms/backoffice/external/signalr';
 import { UmbBooleanState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
