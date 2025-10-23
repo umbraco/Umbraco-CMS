@@ -22,6 +22,7 @@ export class UmbDocumentWorkspaceSplitViewVariantSelectorElement extends UmbWork
 		// We should also make our own state model for this
 		[DocumentVariantStateModel.PUBLISHED_PENDING_CHANGES]: 'content_published',
 		[DocumentVariantStateModel.NOT_CREATED]: 'content_notCreated',
+		[DocumentVariantStateModel.TRASHED]: 'mediaPicker_trashed',
 	};
 
 	constructor() {

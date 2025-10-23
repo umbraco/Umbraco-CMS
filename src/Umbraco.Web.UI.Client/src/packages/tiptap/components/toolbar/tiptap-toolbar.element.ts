@@ -92,11 +92,11 @@ export class UmbTiptapToolbarElement extends UmbLitElement {
 	}
 
 	#renderActions(aliases: Array<string>) {
-		return repeat(aliases, (alias) => this.#lookup?.get(alias) ?? this.#renderActionPlaceholder());
+		return repeat(aliases, (alias) => this.#lookup?.get(alias) ?? this.#renderActionPlaceholder(alias));
 	}
 
-	#renderActionPlaceholder() {
-		return html`<span class="skeleton" role="none"></span>`;
+	#renderActionPlaceholder(alias: string) {
+		return html`<span class="skeleton" role="none" title="Loading '${alias}'"></span>`;
 	}
 
 	static override readonly styles = css`
