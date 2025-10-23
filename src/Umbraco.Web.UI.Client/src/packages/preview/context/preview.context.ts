@@ -29,6 +29,7 @@ export class UmbPreviewContext extends UmbContextBase {
 	#connection?: HubConnection;
 	#currentArgs: UmbPreviewIframeArgs = {};
 	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
+	#resizeController?: AbortController;
 	#serverUrl: string = '';
 
 	#previewRepository = new UmbPreviewRepository(this);
@@ -90,6 +91,19 @@ export class UmbPreviewContext extends UmbContextBase {
 		this.consumeContext(UMB_NOTIFICATION_CONTEXT, (notificationContext) => {
 			this.#notificationContext = notificationContext;
 		});
+	}
+
+	override hostDisconnected() {
+		super.hostDisconnected();
+
+		// Clean up event listeners
+		this.#resizeController?.abort();
+
+		// Clean up SignalR connection
+		if (this.#connection) {
+			this.#connection.stop();
+			this.#connection = undefined;
+		}
 	}
 
 	async #initHubConnection(serverUrl: string) {
@@ -237,6 +251,11 @@ export class UmbPreviewContext extends UmbContextBase {
 		const wrapper = this.getIFrameWrapper();
 		if (!wrapper) return;
 
+		// Clean up old event listeners before adding new ones
+		this.#resizeController?.abort();
+		this.#resizeController = new AbortController();
+		const signal = this.#resizeController.signal;
+
 		const scaleIFrame = () => {
 			if (wrapper.className === 'fullsize') {
 				wrapper.style.transform = '';
@@ -249,8 +268,9 @@ export class UmbPreviewContext extends UmbContextBase {
 			this.#iframeReady.setValue(true);
 		};
 
-		window.addEventListener('resize', scaleIFrame);
-		wrapper.addEventListener('transitionend', scaleIFrame);
+		// Add listeners with AbortController signal for automatic cleanup
+		window.addEventListener('resize', scaleIFrame, { signal });
+		wrapper.addEventListener('transitionend', scaleIFrame, { signal });
 
 		this.#iframeReady.setValue(false);
 
