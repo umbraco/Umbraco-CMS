@@ -31,6 +31,8 @@ export class UmbPreviewEnvironmentsElement extends UmbLitElement {
 	@state()
 	private _unique?: string;
 
+	#previewRepository = new UmbPreviewRepository(this);
+
 	constructor() {
 		super();
 
@@ -67,9 +69,7 @@ export class UmbPreviewEnvironmentsElement extends UmbLitElement {
 		if (!this._unique) return;
 		if (!item.urlProviderAlias) return;
 
-		const previewRepository = new UmbPreviewRepository(this);
-
-		const previewUrlData = await previewRepository.getPreviewUrl(
+		const previewUrlData = await this.#previewRepository.getPreviewUrl(
 			this._unique,
 			item.urlProviderAlias,
 			this._culture,
