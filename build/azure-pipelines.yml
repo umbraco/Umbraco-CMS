@@ -79,6 +79,7 @@ stages:
     jobs:
       - job: A
         displayName: Build Umbraco CMS
+        dependsOn: B
         pool:
           vmImage: "windows-latest"
         steps:
@@ -86,7 +87,11 @@ stages:
             submodules: false
             lfs: false,
             fetchDepth: 500
-          - template: templates/backoffice-install.yml
+          - task: DownloadPipelineArtifact@2
+            displayName: Download Frontend Assets
+            inputs:
+              artifact: static-assets
+              targetPath: src/Umbraco.Cms.StaticAssets/wwwroot/umbraco
           - task: UseDotNet@2
             displayName: Use .NET SDK from global.json
             inputs:
@@ -125,7 +130,7 @@ stages:
               artifactName: bom
 
       - job: B
-        displayName: Build Bellissima Package
+        displayName: Build and package Frontend
         pool:
           vmImage: "ubuntu-latest"
         steps:
@@ -135,7 +140,7 @@ stages:
             fetchDepth: 500
           - template: templates/backoffice-install.yml
           - script: npm run build:for:npm
-            displayName: Run build:for:npm
+            displayName: Run Bellissima NPM build
             workingDirectory: src/Umbraco.Web.UI.Client
           - bash: |
               echo "##[command]Running npm pack"
@@ -143,21 +148,40 @@ stages:
               mkdir $(Build.ArtifactStagingDirectory)/npm
               npm pack --pack-destination $(Build.ArtifactStagingDirectory)/npm
               mv .npmrc $(Build.ArtifactStagingDirectory)/npm/
-            displayName: Run npm pack
+            displayName: Package Bellissima NPM
             workingDirectory: src/Umbraco.Web.UI.Client
           - task: PublishPipelineArtifact@1
-            displayName: Publish Bellissima npm artifact
+            displayName: Publish Bellissima NPM artifact
             inputs:
               targetPath: $(Build.ArtifactStagingDirectory)/npm
               artifactName: npm
           - script: |
-              npm install --global @cyclonedx/cyclonedx-npm
-              cyclonedx-npm -o $(Build.ArtifactStagingDirectory)/bom/bom-frontend-backoffice.xml --ignore-npm-errors
-            name: Generate_Backoffice_UI_BOM
-            displayName: Generate Backoffice UI BOM
+              rm -rf dist-cms
+              npm run build:for:cms
+            displayName: Run Backoffice CMS build
             workingDirectory: src/Umbraco.Web.UI.Client
+          - script: |
+              npm ci --no-fund --no-audit
+              npm run build
+            displayName: Run Login CMS build
+            workingDirectory: src/Umbraco.Web.UI.Login
+          - script: |
+              mkdir -p $(Build.ArtifactStagingDirectory)/static-assets
+              cp -R ../Umbraco.Cms.StaticAssets/wwwroot/umbraco/backoffice $(Build.ArtifactStagingDirectory)/static-assets/backoffice
+              cp -R ../Umbraco.Cms.StaticAssets/wwwroot/umbraco/login $(Build.ArtifactStagingDirectory)/static-assets/login
+            displayName: Aggregate Frontend Assets
           - task: PublishPipelineArtifact@1
-            displayName: Publish Backoffice UI BOM
+            displayName: Publish Frontend Assets artifact
+            inputs:
+              targetPath: $(Build.ArtifactStagingDirectory)/static-assets
+              artifactName: static-assets
+          - script: |
+              npm install --global @cyclonedx/cyclonedx-npm
+              cyclonedx-npm src/Umbraco.Web.UI.Client/package.json -o $(Build.ArtifactStagingDirectory)/bom/bom-backoffice.xml --ignore-npm-errors
+              cyclonedx-npm src/Umbraco.Web.UI.Login/package.json -o $(Build.ArtifactStagingDirectory)/bom/bom-login.xml --ignore-npm-errors
+            displayName: Generate UI BOMs
+          - task: PublishPipelineArtifact@1
+            displayName: Publish UI BOMs
             inputs:
               targetPath: $(Build.ArtifactStagingDirectory)/bom
               artifactName: bom
