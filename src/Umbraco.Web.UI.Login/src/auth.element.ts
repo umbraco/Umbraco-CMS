@@ -209,11 +209,33 @@ export default class UmbAuthElement extends UmbLitElement {
 		// Register the main package for Umbraco.Auth
 		umbExtensionsRegistry.registerMany(extensions);
 
-		setTimeout(() => {
-			requestAnimationFrame(() => {
-				this.#initializeForm();
-			});
-		}, 100);
+		// Wait for localization to be ready before loading the form
+		await this.#waitForLocalization();
+
+		this.#initializeForm();
+	}
+
+	async #waitForLocalization(): Promise<void> {
+		return new Promise((resolve) => {
+			// Check if localization is already available
+			if (this.localize.term('auth_showPassword') !== 'auth_showPassword') {
+				resolve();
+				return;
+			}
+
+			let retryCount = 0;
+			const maxRetries = 40; //Retries 40 times with a 50ms interval = 2 seconds
+
+			// If not, we check periodically until it it is available or we reach the max retries
+			const checkInterval = setInterval(() => {
+				if (this.localize.term('auth_showPassword') !== 'auth_showPassword' || retryCount >= maxRetries) {
+					clearInterval(checkInterval);
+					console.log('Localization is ready.');
+					resolve();
+				}
+				retryCount++;
+			}, 50);
+		});
 	}
 
 	disconnectedCallback() {
@@ -269,7 +291,11 @@ export default class UmbAuthElement extends UmbLitElement {
 			localizeFallback: 'Password',
 		});
 		this._usernameLayoutItem = createFormLayoutItem(this._usernameLabel, this._usernameInput);
-		this._passwordLayoutItem = createFormLayoutPasswordItem(this._passwordLabel, this._passwordInput, this._passwordShowPassswordToggleItem);
+		this._passwordLayoutItem = createFormLayoutPasswordItem(
+			this._passwordLabel,
+			this._passwordInput,
+			this._passwordShowPassswordToggleItem
+		);
 
 		this._form = createForm([this._usernameLayoutItem, this._passwordLayoutItem]);
 
