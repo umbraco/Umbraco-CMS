@@ -16,12 +16,14 @@ public abstract class FileSystemTreeServiceTestsBase : UmbracoIntegrationTest
 
     protected IFileSystem TestFileSystem { get; private set; }
 
+    protected abstract string FileExtension { get; set; }
+
     protected abstract string FileSystemPath { get; }
 
     protected IHostingEnvironment HostingEnvironment => GetRequiredService<IHostingEnvironment>();
 
     [SetUp]
-    public void SetUpFileSystem()
+    public virtual void SetUpFileSystem()
     {
         TestFileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, LoggerFactory.CreateLogger<PhysicalFileSystem>(), HostingEnvironment.MapPathWebRoot(FileSystemPath), HostingEnvironment.ToAbsolute(FileSystemPath));
 
@@ -37,11 +39,11 @@ public abstract class FileSystemTreeServiceTestsBase : UmbracoIntegrationTest
         for (int i = 0; i < 10; i++)
         {
             using var stream = CreateStream(Path.Join("tests"));
-            TestFileSystem.AddFile($"file{i}", stream);
+            TestFileSystem.AddFile($"file{i}{FileExtension}", stream);
         }
     }
 
-    private static Stream CreateStream(string contents = null)
+    protected static Stream CreateStream(string contents = null)
     {
         if (string.IsNullOrEmpty(contents))
         {
@@ -59,7 +61,7 @@ public abstract class FileSystemTreeServiceTestsBase : UmbracoIntegrationTest
     protected virtual IFileSystem? GetScriptsFileSystem() => null;
 
     [TearDown]
-    public void TearDownFileSystem()
+    public virtual void TearDownFileSystem()
     {
         Purge(TestFileSystem, string.Empty);
         FileSystems = null;
