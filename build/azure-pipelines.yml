@@ -113,6 +113,16 @@ stages:
             inputs:
               targetPath: $(Build.SourcesDirectory)
               artifactName: build_output
+          - script: |
+              dotnet tool install --global CycloneDX
+              dotnet-CycloneDX $(solution) --output $(Build.ArtifactStagingDirectory)/bom --filename bom-backend.xml
+            name: Generate_Backend_BOM
+            displayName: 'Generate Backend BOM'
+          - task: PublishPipelineArtifact@1
+            displayName: Publish Backend UI BOM
+            inputs:
+              targetPath: $(Build.ArtifactStagingDirectory)/bom
+              artifactName: bom-backend
 
       - job: B
         displayName: Build Bellissima Package
@@ -140,6 +150,17 @@ stages:
             inputs:
               targetPath: $(Build.ArtifactStagingDirectory)/npm
               artifactName: npm
+          - script: |
+              npm install --global @cyclonedx/cyclonedx-npm
+              cyclonedx-npm -o $(Build.ArtifactStagingDirectory)/bom/bom-frontend-backoffice.xml --ignore-npm-errors
+            name: Generate_Backoffice_UI_BOM
+            displayName: Generate Backoffice UI BOM
+            workingDirectory: src/Umbraco.Web.UI.Client
+          - task: PublishPipelineArtifact@1
+            displayName: Publish Backoffice UI BOM
+            inputs:
+              targetPath: $(Build.ArtifactStagingDirectory)/bom
+              artifactName: bom-frontend
 
   - stage: Build_Docs
     condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.buildApiDocs}}))
