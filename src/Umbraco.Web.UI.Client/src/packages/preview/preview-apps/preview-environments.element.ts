@@ -83,8 +83,11 @@ export class UmbPreviewEnvironmentsElement extends UmbLitElement {
 		}
 
 		if (previewUrlData.message) {
-			umbPeekError(this, { color: 'danger', headline: 'Preview error', message: previewUrlData.message });
-			throw new Error(previewUrlData.message);
+			umbPeekError(this, {
+				color: 'danger',
+				headline: this.localize.term('general_preview'),
+				message: previewUrlData.message,
+			});
 		}
 	}
 
