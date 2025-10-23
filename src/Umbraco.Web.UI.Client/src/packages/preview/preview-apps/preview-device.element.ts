@@ -60,21 +60,11 @@ export class UmbPreviewDeviceElement extends UmbLitElement {
 		},
 	];
 
-	#previewContext?: typeof UMB_PREVIEW_CONTEXT.TYPE;
-
 	@property({ attribute: false, type: Object })
 	device = this.#devices[0];
 
 	@state()
 	private _popoverOpen = false;
-
-	constructor() {
-		super();
-
-		this.consumeContext(UMB_PREVIEW_CONTEXT, (previewContext) => {
-			this.#previewContext = previewContext;
-		});
-	}
 
 	override connectedCallback() {
 		super.connectedCallback();
@@ -92,7 +82,9 @@ export class UmbPreviewDeviceElement extends UmbLitElement {
 
 		this.device = device;
 
-		this.#previewContext?.updateIFrame({
+		const previewContext = await this.getContext(UMB_PREVIEW_CONTEXT);
+
+		await previewContext?.updateIFrame({
 			wrapperClass: device.alias,
 			height: device.dimensions.height,
 			width: device.dimensions.width,
