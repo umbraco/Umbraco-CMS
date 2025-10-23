@@ -60,6 +60,8 @@ test('can publish content with the image cropper data type', {tag: '@smoke'}, as
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.uploadFile(imageFilePath);
+  // Wait for the upload to complete
+  await umbracoUi.waitForTimeout(1000); 
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert

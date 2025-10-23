@@ -1,17 +1,15 @@
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
-import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
+import { HubConnectionBuilder } from '@umbraco-cms/backoffice/external/signalr';
 import { UmbBooleanState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbDocumentPreviewRepository } from '@umbraco-cms/backoffice/document';
-import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { HubConnectionBuilder, type HubConnection } from '@umbraco-cms/backoffice/external/signalr';
-import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
-
-const UMB_LOCALSTORAGE_SESSION_KEY = 'umb:previewSessions';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
+import type { HubConnection } from '@umbraco-cms/backoffice/external/signalr';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 interface UmbPreviewIframeArgs {
 	className?: string;
@@ -133,10 +131,6 @@ export class UmbPreviewContext extends UmbContextBase {
 		return urlInfo.url.startsWith('/') ? `${this.#serverUrl}${urlInfo.url}` : urlInfo.url;
 	}
 
-	#getSessionCount(): number {
-		return Math.max(Number(localStorage.getItem(UMB_LOCALSTORAGE_SESSION_KEY)), 0) || 0;
-	}
-
 	#setPreviewUrl(args?: UmbPreviewUrlArgs) {
 		const host = args?.serverUrl || this.#serverUrl;
 		const unique = args?.unique || this.#unique;
@@ -179,35 +173,8 @@ export class UmbPreviewContext extends UmbContextBase {
 		this.#previewUrl.setValue(previewUrlString);
 	}
 
-	#setSessionCount(sessions: number) {
-		localStorage.setItem(UMB_LOCALSTORAGE_SESSION_KEY, sessions.toString());
-	}
-
-	checkSession() {
-		const sessions = this.#getSessionCount();
-		if (sessions > 0) return;
-
-		umbConfirmModal(this._host, {
-			headline: `Preview website?`,
-			content: `You have ended preview mode, do you want to enable it again to view the latest saved version of your website?`,
-			cancelLabel: 'View published version',
-			confirmLabel: 'Preview latest version',
-		})
-			.then(() => {
-				this.restartSession();
-			})
-			.catch(() => {
-				this.exitSession();
-			});
-	}
-
-	async exitPreview(sessions: number = 0) {
-		this.#setSessionCount(sessions);
-
-		// We are good to end preview mode.
-		if (sessions <= 0) {
-			await this.#documentPreviewRepository.exit();
-		}
+	async exitPreview() {
+		await this.#documentPreviewRepository.exit();
 
 		if (this.#connection) {
 			await this.#connection.stop();
@@ -221,12 +188,6 @@ export class UmbPreviewContext extends UmbContextBase {
 		}
 
 		window.location.replace(url);
-	}
-
-	async exitSession() {
-		let sessions = this.#getSessionCount();
-		sessions--;
-		this.exitPreview(sessions);
 	}
 
 	iframeLoaded(iframe: HTMLIFrameElement) {
@@ -253,17 +214,6 @@ export class UmbPreviewContext extends UmbContextBase {
 		if (!document) return;
 
 		document.location.reload();
-	}
-
-	async restartSession() {
-		await this.#documentPreviewRepository.enter();
-		this.startSession();
-	}
-
-	startSession() {
-		let sessions = this.#getSessionCount();
-		sessions++;
-		this.#setSessionCount(sessions);
 	}
 
 	#currentArgs: UmbPreviewIframeArgs = {};

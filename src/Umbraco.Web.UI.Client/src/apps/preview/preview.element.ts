@@ -22,23 +22,6 @@ export class UmbPreviewElement extends UmbLitElement {
 		this.observe(this.#context.previewUrl, (previewUrl) => (this._previewUrl = previewUrl));
 	}
 
-	override connectedCallback() {
-		super.connectedCallback();
-		this.addEventListener('visibilitychange', this.#onVisibilityChange);
-		window.addEventListener('beforeunload', () => this.#context.exitSession());
-		this.#context.startSession();
-	}
-
-	override disconnectedCallback() {
-		super.disconnectedCallback();
-		this.removeEventListener('visibilitychange', this.#onVisibilityChange);
-		// NOTE: Unsure how we remove an anonymous function from 'beforeunload' event listener.
-		// The reason for the anonymous function is that if we used a named function,
-		// `this` would be the `window` and would not have context to the class instance. [LK]
-		//window.removeEventListener('beforeunload', () => this.#context.exitSession());
-		this.#context.exitSession();
-	}
-
 	@state()
 	private _iframeReady?: boolean;
 
@@ -47,10 +30,6 @@ export class UmbPreviewElement extends UmbLitElement {
 
 	#onIFrameLoad(event: Event & { target: HTMLIFrameElement }) {
 		this.#context.iframeLoaded(event.target);
-	}
-
-	#onVisibilityChange() {
-		this.#context.checkSession();
 	}
 
 	override render() {
