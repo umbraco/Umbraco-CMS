@@ -43,7 +43,6 @@ export class UmbPropertyEditorUIIconPickerElement
 			this._icon = val;
 			this._color = '';
 		}
-		this.requestUpdate();
 	}
 
 	public override get value() {
