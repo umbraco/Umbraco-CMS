@@ -57,22 +57,17 @@ export class UmbPreviewContext extends UmbContextBase {
 		this.consumeContext(UMB_SERVER_CONTEXT, (serverContext) => {
 			const params = new URLSearchParams(window.location.search);
 
-			this.#unique.setValue(params.get('id') ?? undefined);
-			this.#culture.setValue(params.get('culture') ?? undefined);
-			this.#segment.setValue(params.get('segment') ?? undefined);
-
-			if (!this.#unique) {
+			if (!params.has('id')) {
 				console.error('No unique ID found in query string.');
 				return;
 			}
 
-			if (this.#culture) {
-				this.#currentArgs.culture = this.#culture.getValue();
-			}
+			this.#unique.setValue(params.get('id') ?? undefined);
+			this.#culture.setValue(params.get('culture') ?? undefined);
+			this.#segment.setValue(params.get('segment') ?? undefined);
 
-			if (this.#segment) {
-				this.#currentArgs.segment = this.#segment.getValue();
-			}
+			this.#currentArgs.culture = this.#culture.getValue();
+			this.#currentArgs.segment = this.#segment.getValue();
 
 			const serverUrl = serverContext?.getServerUrl();
 
