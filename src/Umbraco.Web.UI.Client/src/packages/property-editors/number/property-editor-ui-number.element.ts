@@ -1,5 +1,5 @@
 import { css, customElement, html, ifDefined, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type {
@@ -10,7 +10,7 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-property-editor-ui-number')
 export class UmbPropertyEditorUINumberElement
-	extends UmbFormControlMixin<number | undefined, typeof UmbLitElement, undefined>(UmbLitElement)
+	extends UmbFormControlMixin<number, typeof UmbLitElement, undefined>(UmbLitElement, undefined)
 	implements UmbPropertyEditorUiElement
 {
 	/**
@@ -21,6 +21,15 @@ export class UmbPropertyEditorUINumberElement
 	 */
 	@property({ type: Boolean, reflect: true })
 	readonly = false;
+
+	/**
+	 * Sets the input to mandatory, meaning validation will fail if the value is empty.
+	 * @type {boolean}
+	 */
+	@property({ type: Boolean })
+	mandatory?: boolean;
+	@property({ type: String })
+	mandatoryMessage = UMB_VALIDATION_EMPTY_LOCALIZATION_KEY;
 
 	@state()
 	private _label?: string;
@@ -78,6 +87,11 @@ export class UmbPropertyEditorUINumberElement
 				this,
 			);
 		}
+		this.addFormControlElement(this.shadowRoot!.querySelector('uui-input')!);
+	}
+
+	override focus() {
+		return this.shadowRoot?.querySelector('uui-input')?.focus();
 	}
 
 	#parseNumber(input: unknown): number | undefined {
@@ -103,6 +117,8 @@ export class UmbPropertyEditorUINumberElement
 				placeholder=${ifDefined(this._placeholder)}
 				value=${this.value?.toString() ?? ''}
 				@change=${this.#onChange}
+				?required=${this.mandatory}
+				.requiredMessage=${this.mandatoryMessage}
 				?readonly=${this.readonly}>
 			</uui-input>
 		`;
