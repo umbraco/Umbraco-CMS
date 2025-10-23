@@ -3,6 +3,7 @@ import { css, customElement, html, nothing, repeat, state } from '@umbraco-cms/b
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
 import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
+import type { UmbPopoverToggleEvent } from './types.js';
 
 @customElement('umb-preview-culture')
 export class UmbPreviewCultureElement extends UmbLitElement {
@@ -45,9 +46,7 @@ export class UmbPreviewCultureElement extends UmbLitElement {
 		previewContext?.updateIFrame({ culture: culture.unique });
 	}
 
-	#onPopoverToggle(event: ToggleEvent) {
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
+	#onPopoverToggle(event: UmbPopoverToggleEvent) {
 		this._popoverOpen = event.newState === 'open';
 	}
 

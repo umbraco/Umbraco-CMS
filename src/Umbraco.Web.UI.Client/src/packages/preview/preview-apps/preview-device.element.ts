@@ -1,6 +1,7 @@
 import { UMB_PREVIEW_CONTEXT } from '../context/preview.context-token.js';
 import { css, customElement, html, ifDefined, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UmbPopoverToggleEvent } from './types.js';
 
 export interface UmbPreviewDevice {
 	alias: string;
@@ -91,9 +92,7 @@ export class UmbPreviewDeviceElement extends UmbLitElement {
 		});
 	}
 
-	#onPopoverToggle(event: ToggleEvent) {
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
+	#onPopoverToggle(event: UmbPopoverToggleEvent) {
 		this._popoverOpen = event.newState === 'open';
 	}
 

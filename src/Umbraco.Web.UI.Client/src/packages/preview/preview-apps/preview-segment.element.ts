@@ -3,6 +3,7 @@ import { css, customElement, html, nothing, repeat, state } from '@umbraco-cms/b
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSegmentCollectionRepository } from '@umbraco-cms/backoffice/segment';
 import type { UmbSegmentCollectionItemModel } from '@umbraco-cms/backoffice/segment';
+import type { UmbPopoverToggleEvent } from './types.js';
 
 @customElement('umb-preview-segment')
 export class UmbPreviewSegmentElement extends UmbLitElement {
@@ -45,9 +46,7 @@ export class UmbPreviewSegmentElement extends UmbLitElement {
 		previewContext?.updateIFrame({ segment: segment?.unique });
 	}
 
-	#onPopoverToggle(event: ToggleEvent) {
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
+	#onPopoverToggle(event: UmbPopoverToggleEvent) {
 		this._popoverOpen = event.newState === 'open';
 	}
 

@@ -4,6 +4,7 @@ import { css, customElement, html, nothing, repeat, state } from '@umbraco-cms/b
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { umbPeekError } from '@umbraco-cms/backoffice/notification';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UmbPopoverToggleEvent } from './types.js';
 
 type UmbPreviewEnvironmentItem = {
 	alias: string;
@@ -91,9 +92,7 @@ export class UmbPreviewEnvironmentsElement extends UmbLitElement {
 		}
 	}
 
-	#onPopoverToggle(event: ToggleEvent) {
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
+	#onPopoverToggle(event: UmbPopoverToggleEvent) {
 		this._popoverOpen = event.newState === 'open';
 	}
 
