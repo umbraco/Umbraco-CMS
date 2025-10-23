@@ -1,6 +1,9 @@
+using System.Net;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -14,6 +17,8 @@ public abstract class WebhookEventBase<TNotification> : IWebhookEvent, INotifica
     where TNotification : INotification
 {
     private readonly IServerRoleAccessor _serverRoleAccessor;
+
+    private readonly WebhookPayloadProviderCollection _webhookPayloadProviderCollection;
 
     public abstract string Alias { get; }
 
@@ -34,11 +39,25 @@ public abstract class WebhookEventBase<TNotification> : IWebhookEvent, INotifica
         IWebhookService webhookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor)
+        : this(
+            webhookFiringService,
+            webhookService, webhookSettings, serverRoleAccessor,
+            StaticServiceProvider.Instance.GetRequiredService<WebhookPayloadProviderCollection>())
     {
+    }
+    
 
+    protected WebhookEventBase(
+        IWebhookFiringService webhookFiringService,
+        IWebhookService webhookService,
+        IOptionsMonitor<WebhookSettings> webhookSettings,
+        IServerRoleAccessor serverRoleAccessor,
+        WebhookPayloadProviderCollection webhookPayloadProviderCollection)
+    {
         WebhookFiringService = webhookFiringService;
         WebhookService = webhookService;
         _serverRoleAccessor = serverRoleAccessor;
+        _webhookPayloadProviderCollection = webhookPayloadProviderCollection;
 
         // assign properties based on the attribute, if it is found
         WebhookEventAttribute? attribute = GetType().GetCustomAttribute<WebhookEventAttribute>(false);
@@ -62,8 +81,29 @@ public abstract class WebhookEventBase<TNotification> : IWebhookEvent, INotifica
                 continue;
             }
 
-            await WebhookFiringService.FireAsync(webhook, Alias, ConvertNotificationToRequestPayload(notification), cancellationToken);
+            if (!Uri.TryCreate(webhook.Url, UriKind.Absolute, out Uri? endPoint))
+            {
+                continue;
+            }
+            var ctx = new WebhookContext(endPoint, Alias, notification, webhook);
+
+            IWebhookPayloadProvider? provider = GetPayloadProviderProvider(notification, webhook);
+            var payload = provider is null
+                ? ConvertNotificationToRequestPayload(notification)
+                : provider.BuildPayload(ctx);
+
+            await WebhookFiringService.FireAsync(webhook, Alias, payload, cancellationToken);
         }
+    }
+
+    protected IWebhookPayloadProvider? GetPayloadProviderProvider(TNotification notification, IWebhook webhook)
+    {
+        if (!Uri.TryCreate(webhook.Url, UriKind.Absolute, out Uri? endPoint))
+        {
+            return null;
+        }
+        var ctx = new WebhookContext(endPoint, Alias, notification, webhook);
+        return _webhookPayloadProviderCollection.FirstOrDefault(x => x.CanHandle(ctx));
     }
 
     /// <summary>
