@@ -18,7 +18,7 @@
     "@umbraco-cms/backoffice": "16.2.0",
     "msw": "^2.11.3",
     "typescript": "^5.9.3",
-    "vite": "^7.1.9"
+    "vite": "^7.1.11"
   },
   "msw": {
     "workerDirectory": [
