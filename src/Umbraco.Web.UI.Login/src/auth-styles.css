@@ -27,6 +27,7 @@
 #umb-login-form #password-input-span:focus-within button {
 	display: inline-flex;
 }
+
 #umb-login-form #password-input-span button {
 	color: var(--uui-color-default-standalone);
 	display: none;
@@ -42,10 +43,12 @@
 	transition-duration: 0.1s;
 	transition-timing-function: linear;
 }
+
 #umb-login-form #password-input-span button:hover {
 	color: var(--uui-color-default-emphasis);
 	cursor: pointer;
 }
+
 #umb-login-form #password-input-span {
 	display: inline-flex;
 	width: 100%;
@@ -53,8 +56,7 @@
 	flex-wrap: nowrap;
 	position: relative;
 	vertical-align: middle;
-	column-gap: 0px;
-
+	column-gap: 0;
 	height: var(--input-height);
 	box-sizing: border-box;
 	border: 1px solid var(--uui-color-border);
@@ -62,12 +64,13 @@
 	background-color: var(--uui-color-surface);
 	padding: var(--uui-size-1, 3px) var(--uui-size-space-4, 9px);
 }
+
 #umb-login-form #password-input-span input {
-	flex-basis: 0px;
+	flex-basis: 0;
 	flex-shrink: 99;
 	flex-grow: 1;
 	align-self: stretch;
-	min-width: 0px;
+	min-width: 0;
 	display: block;
 	border-style: none;
 	padding: 0;
