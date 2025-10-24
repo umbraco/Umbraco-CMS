@@ -62,7 +62,6 @@ export class UmbTreeItemChildrenManager<
 	#takeSize: number = 50;
 	#takeBeforeTarget?: number;
 	#takeAfterTarget?: number;
-	#resetOffsetWhenTargetChanges: boolean = false;
 
 	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 
@@ -90,10 +89,6 @@ export class UmbTreeItemChildrenManager<
 		this.#takeSize = size;
 		this.offsetPagination.setPageSize(size);
 		this.targetPagination.setTakeSize(size);
-	}
-
-	public resetOffsetWhenTargetChanges(): void {
-		this.#resetOffsetWhenTargetChanges = true;
 	}
 
 	public setTargetTakeSize(before: number | undefined, after: number | undefined): void {
@@ -195,7 +190,7 @@ export class UmbTreeItemChildrenManager<
 	public async loadChildren(): Promise<void> {
 		const target = this.targetPagination.getBaseTarget();
 		/* If a new target is set we only want to reload children if the new target isn’t among the already loaded items. */
-		if (!this.#resetOffsetWhenTargetChanges && target && this.isChildLoaded(target)) {
+		if (target && this.isChildLoaded(target)) {
 			return;
 		}
 
