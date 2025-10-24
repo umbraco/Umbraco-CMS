@@ -53,7 +53,7 @@ async function getUnregisteredIcons(): Promise<IconsResult> {
 			stats: {
 				total: Object.keys(lucideIcons).length,
 				registered: iconDictionary.lucide.filter((icon) => icon.file).length,
-				unregistered: icons.length,
+				unregistered: icons.filter((icon) => !icon.inUse).length,
 			},
 		};
 	} catch (error) {
@@ -118,7 +118,7 @@ export const Docs: StoryObj = {
 					<p style="color: var(--uui-color-text-secondary);">
 						These icons are available in Lucide but not yet registered in the Umbraco CMS icon registry.
 						You can contribute new icon registrations by making a PR to the CMS source code. In the CMS Source Code add the desired icon by adding it to the 'icon-dictionary.json', under 'lucide'. Afterwards run 'npm run generate:icons'.
-						Note you can also add icons of your own interest in your own project, read the docs
+						Note: You can also add icons just in your own project. For more information, see the <a href="https://docs.umbraco.com/umbraco-cms/customizing/extending-overview/extension-types/icons" target="_blank" rel="noopener noreferrer">Umbraco Icons Extension documentation</a>.
 					</p>
 				</div>
 				<div style="display: grid;
