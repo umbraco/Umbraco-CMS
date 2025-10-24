@@ -13,7 +13,7 @@ jobs:
     - checkout: none
 
     - script: |
-        project_id=$(curl -s -H "X-Api-Key: $(DT_API_KEY)" "$(DT_API_URL)/v1/project/lookup?name=${{ parameters.projectName }}&version=${{ parameters.umbracoVersion }}" | jq -r '.uuid')
+        project_id=$(curl -s -D /dev/stderr -H "X-Api-Key: $(DT_API_KEY)" "$(DT_API_URL)/v1/project/lookup?name=${{ parameters.projectName }}&version=${{ parameters.umbracoVersion }}" | jq -r '.uuid')
         if [ "$project_id" != "null" ] && [ -n "$project_id" ]; then
           echo "Project '${{ parameters.projectName }}' with version '${{ parameters.umbracoVersion }}' already exists (ID: $project_id)."
         else
