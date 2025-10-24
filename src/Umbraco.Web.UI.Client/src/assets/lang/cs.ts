@@ -1111,12 +1111,6 @@ export default {
 		statistics: 'Statistiky',
 		help: 'Nápověda',
 	},
-	help: {
-		tours: 'Příručky',
-		theBestUmbracoVideoTutorials: 'Nejlepší videopříručky Umbraco',
-		umbracoForum: 'Navštívit our.umbraco.com',
-		umbracoTv: 'Navštívit umbraco.tv',
-	},
 	settings: {
 		defaulttemplate: 'Výchozí šablona',
 		importDocumentTypeHelp:
@@ -1903,28 +1897,6 @@ export default {
 			'\n                <p> Umbraco aktuálně běží v režimu ladění. To znamená, že můžete použít vestavěný profiler výkonu k vyhodnocení výkonu při vykreslování stránek. </p> <p> Pokud chcete aktivovat profiler pro konkrétní vykreslení stránky, jednoduše při požadavku na stránku jednoduše přidejte <strong>umbDebug=true</strong> do URL.</p> <p> Pokud chcete, aby byl profiler ve výchozím nastavení aktivován pro všechna vykreslení stránky, můžete použít přepínač níže. Ve vašem prohlížeči nastaví soubor cookie, který automaticky aktivuje profiler. Jinými slovy, profiler bude ve výchozím nastavení aktivní pouze ve <em> vašem </em> prohlížeči, ne v ostatních. </p>\n        ',
 		activateByDefault: 'Ve výchozím stavu aktivovat profiler',
 		reminder: 'Přátelské připomenutí',
-	},
-	settingsDashboardVideos: {
-		trainingHeadline: 'Hodiny tréninkových videí Umbraco jsou blíž než si myslíte',
-		trainingDescription:
-			'\n        <p> Chcete ovládnout Umbraco? Stačí strávit pár minut sledování jednoho z těchto videí o používání Umbraco. Nebo navštivte <a href="http://umbraco.tv" target="_blank" rel="noopener">umbraco.tv</a>, kde najdete ještě více videí o Umbraco </p>\n    ',
-		getStarted: 'Chcete-li začít',
-	},
-	settingsDashboard: {
-		start: 'Začněte zde',
-		startDescription:
-			'Tato část obsahuje stavební bloky pro váš web Umbraco. Podle níže uvedených odkazů se dozvíte více o práci s položkami v části Nastavení',
-		more: 'Zjistit více',
-		bulletPointOne:
-			'\n            Další informace o práci s položkami naleznete v části Nastavení <a class="btn-link -underline" href="https://docs.umbraco.com/umbraco-cms/fundamentals/backoffice/sections" target="_blank" rel="noopener">v sekci Dokumentace</a> v Our Umbraco\n        ',
-		bulletPointTwo:
-			'\n            Zeptejte se na <a class="btn-link -underline" href="https://our.umbraco.com/forum" target="_blank" rel="noopener">fóru komunity</a>\n        ',
-		bulletPointThree:
-			'\n            Podívejte se na naše <a class="btn-link -underline" href="https://umbraco.tv" target="_blank" rel="noopener">výuková videa</a> (některá jsou zdarma, jiná vyžadují předplatné)\n        ',
-		bulletPointFour:
-			'\n            Další informace o našich <a class="btn-link -underline" href="https://umbraco.com/products/" target="_blank" rel="noopener">nástrojích zvyšujících produktivitu a komerční podpoře</a>\n        ',
-		bulletPointFive:
-			'\n            Zjistěte více o možnostech <a class="btn-link -underline" href="https://umbraco.com/training" target="_blank" rel="noopener">školení a certifikace</a>\n        ',
 	},
 	startupDashboard: {
 		fallbackHeadline: 'Vítejte v přátelském CMS',

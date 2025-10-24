@@ -931,8 +931,6 @@ export default {
 		databaseHeader: 'تكوين قاعدة البيانات',
 		databaseInstall: 'اضغط على زر <strong>التثبيت</strong> لتثبيت قاعدة بيانات Umbraco %0%',
 		databaseInstallDone: 'تم نسخ Umbraco %0% الآن إلى قاعدة بياناتك. اضغط على <strong>التالي</strong> للمتابعة.',
-		databaseNotFound:
-			'<p>لم يتم العثور على قاعدة البيانات! يرجى التحقق من أن المعلومات في سلسلة الاتصال في ملف "web.config" صحيحة.</p>\n              <p>للمتابعة، يرجى تعديل ملف "web.config" (باستخدام Visual Studio أو محرر النصوص المفضل لديك)، والتمرير إلى الأسفل، وإضافة سلسلة الاتصال لقاعدة البيانات الخاصة بك في المفتاح المسمى "UmbracoDbDSN" وحفظ الملف.</p>\n              <p>اضغط على زر <strong>إعادة المحاولة</strong> عند الانتهاء.<br /><a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">\n\t\t\t              مزيد من المعلومات حول تحرير web.config هنا</a>.</p>',
 		databaseText:
 			'لإكمال هذه الخطوة، يجب أن تكون لديك بعض المعلومات حول خادم قاعدة البيانات الخاص بك ("سلسلة الاتصال").<br />\n        يرجى الاتصال بمزود خدمة الإنترنت الخاص بك إذا لزم الأمر.\n        إذا كنت تقوم بالتثبيت على جهاز محلي أو خادم، قد تحتاج إلى معلومات من مسؤول النظام الخاص بك.',
 		databaseUpgrade:
@@ -1265,14 +1263,6 @@ export default {
 		settings: 'الإعدادات',
 		translation: 'القاموس',
 		users: 'المستخدمون',
-	},
-	help: {
-		tours: 'الجولات',
-		theBestUmbracoVideoTutorials: 'أفضل دروس الفيديو في Umbraco',
-		umbracoForum: 'زيارة our.umbraco.com',
-		umbracoTv: 'زيارة umbraco.tv',
-		umbracoLearningBase: 'شاهد دروس الفيديو المجانية لدينا',
-		umbracoLearningBaseDescription: 'على قاعدة تعلم Umbraco',
 	},
 	settings: {
 		defaulttemplate: 'القالب الافتراضي',
@@ -2255,11 +2245,6 @@ export default {
 			'<p>يجب ألا تدع موقع الإنتاج يعمل في وضع التصحيح. يتم إيقاف وضع التصحيح عن طريق تعيين <strong>Umbraco:CMS:Hosting:Debug</strong> إلى <strong>false</strong> في appsettings.json أو appsettings.{Environment}.json أو عبر متغير بيئة.</p>',
 		profilerEnabledDescription:
 			'<p>Umbraco حاليًا لا يعمل في وضع التصحيح، لذا لا يمكنك استخدام أداة التحليل المدمجة. هذا هو الوضع الصحيح لموقع الإنتاج.</p><p>يتم تشغيل وضع التصحيح عن طريق تعيين <strong>Umbraco:CMS:Hosting:Debug</strong> إلى <strong>true</strong> في appsettings.json أو appsettings.{Environment}.json أو عبر متغير بيئة.</p>',
-	},
-	settingsDashboardVideos: {
-		trainingHeadline: 'ساعات من مقاطع فيديو تدريب Umbraco على بعد نقرة واحدة',
-		trainingDescription:
-			'<p>هل تريد إتقان Umbraco؟ اقض بضع دقائق في تعلم بعض الممارسات الأفضل من خلال مشاهدة واحدة من هذه الفيديوهات حول استخدام Umbraco. وزيارة <a href="https://umbraco.tv" target="_blank" rel="noopener">umbraco.tv</a> لمزيد من مقاطع الفيديو حول Umbraco</p>',
 	},
 	settingsDashboard: {
 		documentationHeader: 'التوثيق',

@@ -1065,8 +1065,6 @@ export default {
 		databaseHeader: 'Database configuration',
 		databaseInstall: 'Press the <strong>install</strong> button to install the Umbraco %0% database',
 		databaseInstallDone: 'Umbraco %0% has now been copied to your database. Press <strong>Next</strong> to proceed.',
-		databaseNotFound:
-			'<p>Database not found! Please check that the information in the "connection string" of the "web.config" file is correct.</p><p>To proceed, please edit the "web.config" file (using Visual Studio or your favourite text editor), scroll to the bottom, add the connection string for your database in the key named "UmbracoDbDSN" and save the file.</p><p>Click the <strong>retry</strong> button when done.<br /><a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">More information on editing web.config here</a>.</p>',
 		databaseText:
 			'To complete this step, you must know some information regarding your database server ("connection string").<br />   Please contact your ISP if necessary.   If you\'re installing on a local machine or server you might need information from your system administrator.',
 		databaseUpgrade:
@@ -1428,14 +1426,6 @@ export default {
 		settings: 'Settings',
 		translation: 'Translation',
 		users: 'Users',
-	},
-	help: {
-		tours: 'Tours',
-		theBestUmbracoVideoTutorials: 'The best Umbraco video tutorials',
-		umbracoForum: 'Visit our.umbraco.com',
-		umbracoTv: 'Visit umbraco.tv',
-		umbracoLearningBase: 'Watch our free tutorial videos',
-		umbracoLearningBaseDescription: 'on the Umbraco Learning Base',
 	},
 	settings: {
 		defaulttemplate: 'Default template',
@@ -2539,14 +2529,6 @@ export default {
 			'<p>You should never let a production site run in debug mode. Debug mode is turned off by setting <strong>Umbraco:CMS:Hosting:Debug</strong> to <strong>false</strong> in appsettings.json, appsettings.{Environment}.json or via an environment variable.</p>',
 		profilerEnabledDescription:
 			"<p>Umbraco currently does not run in debug mode, so you can't use the built-in profiler. This is how it should be for a production site.</p><p>Debug mode is turned on by setting <strong>Umbraco:CMS:Hosting:Debug</strong> to <strong>true</strong> in appsettings.json, appsettings.{Environment}.json or via an environment variable.</p>",
-	},
-	settingsDashboardVideos: {
-		trainingHeadline: 'Hours of Umbraco training videos are only a click away',
-		trainingDescription:
-			'<p>Want to master Umbraco? Spend a couple of minutes learning some best practices by watching one of these videos about using Umbraco. And visit <a href="https://umbraco.tv" target="_blank" rel="noopener">umbraco.tv</a> for even more Umbraco videos</p>',
-		learningBaseDescription:
-			'  <p>Want to master Umbraco? Spend a few minutes learning some best practices by visiting <a class="btn-link -underline" href="https://www.youtube.com/c/UmbracoLearningBase" target="_blank" rel="noopener">the Umbraco Learning Base Youtube channel</a>. Here you can find a bunch of video material covering many aspects of Umbraco.</p> ',
-		getStarted: 'To get you started',
 	},
 	settingsDashboard: {
 		documentationHeader: 'Documentation',

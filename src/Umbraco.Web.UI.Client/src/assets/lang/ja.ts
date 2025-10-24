@@ -699,9 +699,6 @@ export default {
 		help: 'ヘルプ',
 		forms: 'フォーム',
 	},
-	help: {
-		theBestUmbracoVideoTutorials: '動画によるチュートリアル',
-	},
 	settings: {
 		defaulttemplate: '既定のテンプレート',
 		importDocumentTypeHelp:

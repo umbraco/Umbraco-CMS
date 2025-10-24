@@ -1046,8 +1046,6 @@ export default {
 		databaseInstall: 'Pressione o botão <strong>instalar</strong> para instalar a base de dados Umbraco %0%',
 		databaseInstallDone:
 			'O Umbraco %0% foi agora copiado para a sua base de dados. Pressione <strong>Seguinte</strong> para prosseguir.',
-		databaseNotFound:
-			'<p>Base de dados não encontrada! Por favor, verifique se a informação na "connection string" do ficheiro "web.config" está correta.</p><p>Para prosseguir, por favor edite o ficheiro "web.config" (usando o Visual Studio ou o seu editor de texto favorito), desloque-se até ao final, adicione a cadeia de ligação para a sua base de dados na chave chamada "UmbracoDbDSN" e guarde o ficheiro.</p><p>Clique no botão <strong>tentar novamente</strong> quando terminar.<br /><a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">Mais informação sobre como editar o web.config aqui</a>.</p>',
 		databaseText:
 			'Para completar este passo, deve saber alguma informação sobre o seu servidor de base de dados ("connection string").<br />   Por favor, contacte o seu ISP, se necessário.   Se estiver a instalar numa máquina ou servidor local, poderá precisar de informação do seu administrador de sistema.',
 		databaseUpgrade:
@@ -1407,14 +1405,6 @@ export default {
 		settings: 'Definições',
 		translation: 'Tradução',
 		users: 'Utilizadores',
-	},
-	help: {
-		tours: 'Visitas Guiadas',
-		theBestUmbracoVideoTutorials: 'Os melhores tutoriais em vídeo do Umbraco',
-		umbracoForum: 'Visite our.umbraco.com',
-		umbracoTv: 'Visite umbraco.tv',
-		umbracoLearningBase: 'Veja os nossos tutoriais em vídeo gratuitos',
-		umbracoLearningBaseDescription: 'na Base de Aprendizagem Umbraco',
 	},
 	settings: {
 		defaulttemplate: 'Modelo predefinido',
@@ -2526,14 +2516,6 @@ export default {
 			'<p>Nunca deve deixar um site de produção a ser executado em modo de debug. O modo de debug é desativado definindo <strong>Umbraco:CMS:Hosting:Debug</strong> como <strong>false</strong> em appsettings.json, appsettings.{Environment}.json ou através de uma variável de ambiente.</p>',
 		profilerEnabledDescription:
 			'<p>O Umbraco não está atualmente a ser executado em modo de debug, por isso não pode usar o criador de perfil integrado. É assim que deve ser para um site de produção.</p><p>O modo de debug é ativado definindo <strong>Umbraco:CMS:Hosting:Debug</strong> como <strong>true</strong> em appsettings.json, appsettings.{Environment}.json ou através de uma variável de ambiente.</p>',
-	},
-	settingsDashboardVideos: {
-		trainingHeadline: 'Horas de vídeos de formação Umbraco estão apenas a um clique de distância',
-		trainingDescription:
-			'<p>Quer dominar o Umbraco? Gaste alguns minutos a aprender algumas das melhores práticas vendo um destes vídeos sobre como usar o Umbraco. E visite <a href="https://umbraco.tv" target="_blank" rel="noopener">umbraco.tv</a> para ainda mais vídeos Umbraco</p>',
-		learningBaseDescription:
-			'  <p>Quer dominar o Umbraco? Gaste alguns minutos a aprender algumas das melhores práticas visitando <a class="btn-link -underline" href="https://www.youtube.com/c/UmbracoLearningBase" target="_blank" rel="noopener">o canal de Youtube da Base de Aprendizagem Umbraco</a>. Aqui pode encontrar muito material em vídeo cobrindo muitos aspetos do Umbraco.</p> ',
-		getStarted: 'Para começar',
 	},
 	settingsDashboard: {
 		documentationHeader: 'Documentação',
