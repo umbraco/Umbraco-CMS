@@ -1,65 +1,66 @@
-import { UMB_PREVIEW_CONTEXT } from '../preview.context.js';
-import { css, customElement, html, property, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { UMB_PREVIEW_CONTEXT } from '../context/preview.context-token.js';
+import type { UmbPopoverToggleEvent } from './types.js';
+import { css, customElement, html, ifDefined, property, query, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
 
 export interface UmbPreviewDevice {
 	alias: string;
 	label: string;
-	css: string;
 	icon: string;
+	iconClass?: string;
 	dimensions: { height: string; width: string };
 }
 
 @customElement('umb-preview-device')
 export class UmbPreviewDeviceElement extends UmbLitElement {
+	@query('#devices-popover')
+	private _popoverElement?: UUIPopoverContainerElement;
+
+	// TODO: [LK] Eventually, convert these devices to be an  extension point.
 	#devices: Array<UmbPreviewDevice> = [
 		{
 			alias: 'fullsize',
 			label: 'Fit browser',
-			css: 'fullsize',
 			icon: 'icon-application-window-alt',
 			dimensions: { height: '100%', width: '100%' },
 		},
 		{
 			alias: 'desktop',
 			label: 'Desktop',
-			css: 'desktop shadow',
 			icon: 'icon-display',
 			dimensions: { height: '1080px', width: '1920px' },
 		},
 		{
 			alias: 'laptop',
 			label: 'Laptop',
-			css: 'laptop shadow',
 			icon: 'icon-laptop',
 			dimensions: { height: '768px', width: '1366px' },
 		},
 		{
 			alias: 'ipad-portrait',
 			label: 'Tablet portrait',
-			css: 'ipad-portrait shadow',
 			icon: 'icon-ipad',
 			dimensions: { height: '929px', width: '769px' },
 		},
 		{
 			alias: 'ipad-landscape',
 			label: 'Tablet landscape',
-			css: 'ipad-landscape shadow flip',
 			icon: 'icon-ipad',
+			iconClass: 'flip',
 			dimensions: { height: '675px', width: '1024px' },
 		},
 		{
 			alias: 'smartphone-portrait',
 			label: 'Smartphone portrait',
-			css: 'smartphone-portrait shadow',
 			icon: 'icon-iphone',
 			dimensions: { height: '640px', width: '360px' },
 		},
 		{
 			alias: 'smartphone-landscape',
 			label: 'Smartphone landscape',
-			css: 'smartphone-landscape shadow flip',
 			icon: 'icon-iphone',
+			iconClass: 'flip',
 			dimensions: { height: '360px', width: '640px' },
 		},
 	];
@@ -67,44 +68,68 @@ export class UmbPreviewDeviceElement extends UmbLitElement {
 	@property({ attribute: false, type: Object })
 	device = this.#devices[0];
 
-	override connectedCallback() {
-		super.connectedCallback();
-		this.#changeDevice(this.device);
+	@state()
+	private _popoverOpen = false;
+
+	constructor() {
+		super();
+		this.addEventListener('blur', this.#onBlur, true); // Use capture phase to catch blur events
 	}
 
-	async #changeDevice(device: UmbPreviewDevice) {
+	override connectedCallback() {
+		super.connectedCallback();
+		this.hidden = true;
+		this.#loadDevices();
+	}
+
+	async #loadDevices() {
+		// TODO: [LK] Eventually, load devices from extension points.
+		this.hidden = false;
+	}
+
+	async #onClick(device: UmbPreviewDevice) {
 		if (device === this.device) return;
 
 		this.device = device;
 
 		const previewContext = await this.getContext(UMB_PREVIEW_CONTEXT);
 
-		previewContext?.updateIFrame({
-			className: device.css,
+		await previewContext?.updateIFrame({
+			wrapperClass: device.alias,
 			height: device.dimensions.height,
 			width: device.dimensions.width,
 		});
+
+		// Don't close popover for device selector - users often want to quickly test multiple devices
 	}
+
+	#onPopoverToggle(event: UmbPopoverToggleEvent) {
+		this._popoverOpen = event.newState === 'open';
+	}
+
+	#onBlur = () => {
+		if (this._popoverOpen) {
+			this._popoverElement?.hidePopover();
+		}
+	};
 
 	override render() {
 		return html`
 			<uui-button look="primary" popovertarget="devices-popover">
 				<div>
-					<uui-icon name=${this.device.icon} class=${this.device.css.includes('flip') ? 'flip' : ''}></uui-icon>
+					<uui-icon name=${this.device.icon} class=${ifDefined(this.device.iconClass)}></uui-icon>
 					<span>${this.device.label}</span>
 				</div>
+				<uui-symbol-expand slot="extra" id="expand-symbol" .open=${this._popoverOpen}></uui-symbol-expand>
 			</uui-button>
-			<uui-popover-container id="devices-popover" placement="top-end">
+			<uui-popover-container id="devices-popover" placement="top-end" @toggle=${this.#onPopoverToggle}>
 				<umb-popover-layout>
 					${repeat(
 						this.#devices,
 						(item) => item.alias,
 						(item) => html`
-							<uui-menu-item
-								label=${item.label}
-								?active=${item === this.device}
-								@click=${() => this.#changeDevice(item)}>
-								<uui-icon slot="icon" name=${item.icon} class=${item.css.includes('flip') ? 'flip' : ''}></uui-icon>
+							<uui-menu-item label=${item.label} ?active=${item === this.device} @click=${() => this.#onClick(item)}>
+								<uui-icon slot="icon" name=${item.icon} class=${ifDefined(item.iconClass)}></uui-icon>
 							</uui-menu-item>
 						`,
 					)}
@@ -121,12 +146,30 @@ export class UmbPreviewDeviceElement extends UmbLitElement {
 				--uui-button-font-weight: 400;
 				--uui-button-padding-left-factor: 3;
 				--uui-button-padding-right-factor: 3;
+				--uui-menu-item-flat-structure: 1;
+			}
+
+			:host([hidden]) {
+				display: none;
+			}
+
+			#expand-symbol {
+				transform: rotate(-90deg);
+				margin-left: var(--uui-size-space-3, 9px);
+
+				&[open] {
+					transform: rotate(0deg);
+				}
 			}
 
 			uui-button > div {
 				display: flex;
 				align-items: center;
-				gap: 5px;
+				gap: var(--uui-size-2, 6px);
+			}
+
+			uui-icon.flip {
+				transform: rotate(90deg);
 			}
 
 			umb-popover-layout {

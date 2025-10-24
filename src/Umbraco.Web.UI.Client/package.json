@@ -85,6 +85,7 @@
 		"./picker-input": "./dist-cms/packages/core/picker-input/index.js",
 		"./picker-data-source": "./dist-cms/packages/core/picker-data-source/index.js",
 		"./picker": "./dist-cms/packages/core/picker/index.js",
+		"./preview": "./dist-cms/packages/preview/index.js",
 		"./property-action": "./dist-cms/packages/core/property-action/index.js",
 		"./property-editor-data-source": "./dist-cms/packages/core/property-editor-data-source/index.js",
 		"./property-editor": "./dist-cms/packages/core/property-editor/index.js",

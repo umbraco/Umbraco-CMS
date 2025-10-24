@@ -1,10 +1,8 @@
-import { tryExecute } from '@umbraco-cms/backoffice/resources';
-import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbPreviewRepository } from '../repository/index.js';
+import { UMB_PREVIEW_CONTEXT } from './preview.context-token.js';
 import { HubConnectionBuilder } from '@umbraco-cms/backoffice/external/signalr';
 import { UmbBooleanState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbDocumentPreviewRepository } from '@umbraco-cms/backoffice/document';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
@@ -12,11 +10,11 @@ import type { HubConnection } from '@umbraco-cms/backoffice/external/signalr';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 interface UmbPreviewIframeArgs {
-	className?: string;
 	culture?: string;
 	height?: string;
 	segment?: string;
 	width?: string;
+	wrapperClass?: string;
 }
 
 interface UmbPreviewUrlArgs {
@@ -28,11 +26,18 @@ interface UmbPreviewUrlArgs {
 }
 
 export class UmbPreviewContext extends UmbContextBase {
-	#unique?: string | null;
-	#culture?: string | null;
-	#segment?: string | null;
-	#serverUrl: string = '';
 	#connection?: HubConnection;
+	#currentArgs: UmbPreviewIframeArgs = {};
+	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
+	#resizeController?: AbortController;
+	#serverUrl: string = '';
+
+	#previewRepository = new UmbPreviewRepository(this);
+
+	#localize = new UmbLocalizationController(this);
+
+	#culture = new UmbStringState(undefined);
+	public readonly culture = this.#culture.asObservable();
 
 	#iframeReady = new UmbBooleanState(false);
 	public readonly iframeReady = this.#iframeReady.asObservable();
@@ -40,27 +45,31 @@ export class UmbPreviewContext extends UmbContextBase {
 	#previewUrl = new UmbStringState(undefined);
 	public readonly previewUrl = this.#previewUrl.asObservable();
 
-	#documentPreviewRepository = new UmbDocumentPreviewRepository(this);
+	#segment = new UmbStringState(undefined);
+	public readonly segment = this.#segment.asObservable();
 
-	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
-	#localize = new UmbLocalizationController(this);
+	#unique = new UmbStringState(undefined);
+	public readonly unique = this.#unique.asObservable();
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_PREVIEW_CONTEXT);
 
-		this.consumeContext(UMB_SERVER_CONTEXT, (instance) => {
+		this.consumeContext(UMB_SERVER_CONTEXT, (serverContext) => {
 			const params = new URLSearchParams(window.location.search);
 
-			this.#unique = params.get('id');
-			this.#culture = params.get('culture');
-			this.#segment = params.get('segment');
-
-			if (!this.#unique) {
+			if (!params.has('id')) {
 				console.error('No unique ID found in query string.');
 				return;
 			}
 
-			const serverUrl = instance?.getServerUrl();
+			this.#unique.setValue(params.get('id') ?? undefined);
+			this.#culture.setValue(params.get('culture') ?? undefined);
+			this.#segment.setValue(params.get('segment') ?? undefined);
+
+			this.#currentArgs.culture = this.#culture.getValue();
+			this.#currentArgs.segment = this.#segment.getValue();
+
+			const serverUrl = serverContext?.getServerUrl();
 
 			if (!serverUrl) {
 				console.error('No server URL found in context');
@@ -74,9 +83,22 @@ export class UmbPreviewContext extends UmbContextBase {
 			this.#initHubConnection(serverUrl);
 		});
 
-		this.consumeContext(UMB_NOTIFICATION_CONTEXT, (instance) => {
-			this.#notificationContext = instance;
+		this.consumeContext(UMB_NOTIFICATION_CONTEXT, (notificationContext) => {
+			this.#notificationContext = notificationContext;
 		});
+	}
+
+	override hostDisconnected() {
+		super.hostDisconnected();
+
+		// Clean up event listeners
+		this.#resizeController?.abort();
+
+		// Clean up SignalR connection
+		if (this.#connection) {
+			this.#connection.stop();
+			this.#connection = undefined;
+		}
 	}
 
 	async #initHubConnection(serverUrl: string) {
@@ -91,7 +113,7 @@ export class UmbPreviewContext extends UmbContextBase {
 		this.#connection = new HubConnectionBuilder().withUrl(previewHubUrl).build();
 
 		this.#connection.on('refreshed', (payload) => {
-			if (payload === this.#unique) {
+			if (payload === this.#unique.getValue()) {
 				this.#setPreviewUrl({ rnd: Math.random() });
 			}
 		});
@@ -119,13 +141,11 @@ export class UmbPreviewContext extends UmbContextBase {
 	}
 
 	async #getPublishedUrl(): Promise<string | null> {
-		if (!this.#unique) return null;
+		const unique = this.#unique.getValue();
+		if (!unique) return null;
 
-		// NOTE: We should be reusing `UmbDocumentUrlRepository` here, but the preview app doesn't register the `itemStore` extensions, so can't resolve/consume `UMB_DOCUMENT_URL_STORE_CONTEXT`. [LK]
-		const { data } = await tryExecute(this, DocumentService.getDocumentUrls({ query: { id: [this.#unique] } }));
-
-		if (!data?.length) return null;
-		const urlInfo = this.#culture ? data[0].urlInfos.find((x) => x.culture === this.#culture) : data[0].urlInfos[0];
+		const culture = this.#culture.getValue();
+		const urlInfo = await this.#previewRepository.getPublishedUrl(unique, culture);
 
 		if (!urlInfo?.url) return null;
 		return urlInfo.url.startsWith('/') ? `${this.#serverUrl}${urlInfo.url}` : urlInfo.url;
@@ -133,7 +153,7 @@ export class UmbPreviewContext extends UmbContextBase {
 
 	#setPreviewUrl(args?: UmbPreviewUrlArgs) {
 		const host = args?.serverUrl || this.#serverUrl;
-		const unique = args?.unique || this.#unique;
+		const unique = args?.unique || this.#unique.getValue();
 
 		if (!unique) {
 			throw new Error('No unique ID found in query string.');
@@ -142,8 +162,8 @@ export class UmbPreviewContext extends UmbContextBase {
 		const url = new URL(unique, host);
 		const params = new URLSearchParams(url.search);
 
-		const culture = args?.culture || this.#culture;
-		const segment = args?.segment || this.#segment;
+		const culture = args && 'culture' in args ? args.culture : this.#culture.getValue();
+		const segment = args && 'segment' in args ? args.segment : this.#segment.getValue();
 
 		const cultureParam = 'culture';
 		const rndParam = 'rnd';
@@ -151,8 +171,10 @@ export class UmbPreviewContext extends UmbContextBase {
 
 		if (culture) {
 			params.set(cultureParam, culture);
+			this.#culture.setValue(culture);
 		} else {
 			params.delete(cultureParam);
+			this.#culture.setValue(undefined);
 		}
 
 		if (args?.rnd) {
@@ -163,8 +185,10 @@ export class UmbPreviewContext extends UmbContextBase {
 
 		if (segment) {
 			params.set(segmentParam, segment);
+			this.#segment.setValue(segment);
 		} else {
 			params.delete(segmentParam);
+			this.#segment.setValue(undefined);
 		}
 
 		const previewUrl = new URL(`${url.pathname}?${params.toString()}`, host);
@@ -174,7 +198,7 @@ export class UmbPreviewContext extends UmbContextBase {
 	}
 
 	async exitPreview() {
-		await this.#documentPreviewRepository.exit();
+		await this.#previewRepository.exit();
 
 		if (this.#connection) {
 			await this.#connection.stop();
@@ -193,6 +217,35 @@ export class UmbPreviewContext extends UmbContextBase {
 	iframeLoaded(iframe: HTMLIFrameElement) {
 		if (!iframe) return;
 		this.#iframeReady.setValue(true);
+		this.#setupScaling();
+	}
+
+	#setupScaling() {
+		// Clean up old event listeners before adding new ones
+		this.#resizeController?.abort();
+		this.#resizeController = new AbortController();
+		const signal = this.#resizeController.signal;
+
+		const wrapper = this.getIFrameWrapper();
+		if (!wrapper) return;
+
+		const scaleIFrame = () => {
+			if (wrapper.className === 'fullsize') {
+				wrapper.style.transform = '';
+			} else {
+				const wScale = document.body.offsetWidth / (wrapper.offsetWidth + 30);
+				const hScale = document.body.offsetHeight / (wrapper.offsetHeight + 30);
+				const scale = Math.min(wScale, hScale, 1);
+				wrapper.style.transform = `scale(${scale})`;
+			}
+		};
+
+		// Set up listeners once per iframe load
+		window.addEventListener('resize', scaleIFrame, { signal });
+		wrapper.addEventListener('transitionend', scaleIFrame, { signal });
+
+		// Initial scale
+		scaleIFrame();
 	}
 
 	getIFrameWrapper(): HTMLElement | undefined {
@@ -216,41 +269,32 @@ export class UmbPreviewContext extends UmbContextBase {
 		document.location.reload();
 	}
 
-	#currentArgs: UmbPreviewIframeArgs = {};
 	async updateIFrame(args?: UmbPreviewIframeArgs) {
 		const mergedArgs = { ...this.#currentArgs, ...args };
 
 		const wrapper = this.getIFrameWrapper();
 		if (!wrapper) return;
 
-		const scaleIFrame = () => {
-			if (wrapper.className === 'fullsize') {
-				wrapper.style.transform = '';
-			} else {
-				const wScale = document.body.offsetWidth / (wrapper.offsetWidth + 30);
-				const hScale = document.body.offsetHeight / (wrapper.offsetHeight + 30);
-				const scale = Math.min(wScale, hScale, 1); // get the lowest ratio, but not higher than 1
-				wrapper.style.transform = `scale(${scale})`;
-			}
-		};
+		// Check if URL will change (culture or segment changed)
+		const urlWillChange =
+			(args?.culture !== undefined && mergedArgs.culture !== this.#currentArgs.culture) ||
+			(args?.segment !== undefined && mergedArgs.segment !== this.#currentArgs.segment);
 
-		window.addEventListener('resize', scaleIFrame);
-		wrapper.addEventListener('transitionend', scaleIFrame);
-
-		this.#iframeReady.setValue(false);
+		// Only show loading spinner if iframe will reload
+		if (urlWillChange) {
+			this.#iframeReady.setValue(false);
+		}
 
 		const params = new URLSearchParams(window.location.search);
 
+		params.delete('culture');
 		if (mergedArgs.culture) {
 			params.set('culture', mergedArgs.culture);
-		} else {
-			params.delete('culture');
 		}
 
+		params.delete('segment');
 		if (mergedArgs.segment) {
 			params.set('segment', mergedArgs.segment);
-		} else {
-			params.delete('segment');
 		}
 
 		const newRelativePathQuery = window.location.pathname + '?' + params.toString();
@@ -260,10 +304,8 @@ export class UmbPreviewContext extends UmbContextBase {
 
 		this.#setPreviewUrl({ culture: mergedArgs.culture, segment: mergedArgs.segment });
 
-		if (mergedArgs.className) wrapper.className = mergedArgs.className;
+		if (mergedArgs.wrapperClass) wrapper.className = mergedArgs.wrapperClass;
 		if (mergedArgs.height) wrapper.style.height = mergedArgs.height;
 		if (mergedArgs.width) wrapper.style.width = mergedArgs.width;
 	}
 }
-
-export const UMB_PREVIEW_CONTEXT = new UmbContextToken<UmbPreviewContext>('UmbPreviewContext');

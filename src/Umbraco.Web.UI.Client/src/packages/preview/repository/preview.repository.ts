@@ -1,12 +1,10 @@
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { DocumentService, PreviewService } from '@umbraco-cms/backoffice/external/backend-api';
-import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 import type { DocumentUrlInfoModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-/** @deprecated This has been deprecated, please use `UmbPreviewRepository` instead. To be removed in Umbraco 19. [LK] */
-export class UmbDocumentPreviewRepository extends UmbRepositoryBase {
+export class UmbPreviewRepository extends UmbRepositoryBase {
 	constructor(host: UmbControllerHost) {
 		super(host);
 	}
@@ -18,6 +16,7 @@ export class UmbDocumentPreviewRepository extends UmbRepositoryBase {
 	 * @param {string | undefined} culture The culture to preview (undefined means invariant).
 	 * @param {string | undefined} segment The segment to preview (undefined means no specific segment).
 	 * @returns {DocumentUrlInfoModel} The preview URLs of the document.
+	 * @memberof UmbPreviewRepository
 	 */
 	async getPreviewUrl(
 		unique: string,
@@ -25,12 +24,6 @@ export class UmbDocumentPreviewRepository extends UmbRepositoryBase {
 		culture?: string,
 		segment?: string,
 	): Promise<DocumentUrlInfoModel> {
-		new UmbDeprecation({
-			removeInVersion: '19.0.0',
-			deprecated: '`UmbDocumentPreviewRepository.getPreviewUrl()`',
-			solution: 'Use `UmbPreviewRepository.getPreviewUrl()` instead',
-		}).warn();
-
 		const { data, error } = await tryExecute(
 			this,
 			DocumentService.getDocumentByIdPreviewUrl({
@@ -47,34 +40,34 @@ export class UmbDocumentPreviewRepository extends UmbRepositoryBase {
 	}
 
 	/**
-	 * Enters preview mode.
-	 * @returns {Promise<void>}
-	 * @memberof UmbDocumentPreviewRepository
-	 * @deprecated Replaced with the Document Preview URLs feature. This will be removed in v19. [LK]
+	 * Gets the published URL info for a document.
+	 * @param {string} unique The unique identifier of the document.
+	 * @param {string | undefined} culture The culture to preview (undefined means invariant).
+	 * @returns {DocumentUrlInfoModel} The published URL info of the document.
+	 * @memberof UmbPreviewRepository
 	 */
-	async enter(): Promise<void> {
-		new UmbDeprecation({
-			removeInVersion: '19.0.0',
-			deprecated: '`UmbDocumentPreviewRepository.enter()`',
-			solution: 'Use `UmbDocumentPreviewRepository.getPreviewUrl()` instead',
-		}).warn();
+	async getPublishedUrl(unique: string, culture?: string): Promise<DocumentUrlInfoModel | null | undefined> {
+		if (!unique) return null;
 
-		await tryExecute(this, PreviewService.postPreview(), { disableNotifications: true });
-		return;
+		const { data, error } = await tryExecute(this, DocumentService.getDocumentUrls({ query: { id: [unique] } }));
+
+		if (error) {
+			throw new Error(error.message);
+		}
+
+		if (!data?.length) return null;
+
+		// TODO: [LK] Review the logic here, unsure whether this is correct. When will the array have more than one item?
+		const urlInfo = culture ? data[0].urlInfos.find((x) => x.culture === culture) : data[0].urlInfos[0];
+		return urlInfo;
 	}
 
 	/**
 	 * Exits preview mode.
 	 * @returns {Promise<void>}
-	 * @memberof UmbDocumentPreviewRepository
+	 * @memberof UmbPreviewRepository
 	 */
 	async exit(): Promise<void> {
-		new UmbDeprecation({
-			removeInVersion: '19.0.0',
-			deprecated: '`UmbDocumentPreviewRepository.exit()`',
-			solution: 'Use `UmbPreviewRepository.exit()` instead',
-		}).warn();
-
 		await tryExecute(this, PreviewService.deletePreview(), { disableNotifications: true });
 		return;
 	}

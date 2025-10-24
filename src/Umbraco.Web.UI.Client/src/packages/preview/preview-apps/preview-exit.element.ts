@@ -1,4 +1,4 @@
-import { UMB_PREVIEW_CONTEXT } from '../preview.context.js';
+import { UMB_PREVIEW_CONTEXT } from '../context/preview.context-token.js';
 import { css, customElement, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
@@ -33,7 +33,7 @@ export class UmbPreviewExitElement extends UmbLitElement {
 			uui-button > div {
 				display: flex;
 				align-items: center;
-				gap: 5px;
+				gap: var(--uui-size-2, 6px);
 			}
 		`,
 	];
