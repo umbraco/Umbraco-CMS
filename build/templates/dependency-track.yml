@@ -13,11 +13,12 @@ jobs:
     - checkout: none
 
     - script: |
-        project_id=$(curl -s -D /dev/stderr -H "X-Api-Key: $(DT_API_KEY)" "$(DT_API_URL)/v1/project/lookup?name=${{ parameters.projectName }}&version=${{ parameters.umbracoVersion }}" | jq -r '.uuid')
+        exec 3>&1 # Redirect file descriptor #3 to stdout to be used for debug info
+        project_id=$(curl -s --dump-header /dev/fd/3 -H "X-Api-Key: $(DT_API_KEY)" "$(DT_API_URL)/v1/project/lookup?name=${{ parameters.projectName }}&version=${{ parameters.umbracoVersion }}" | jq -r '.uuid')
         if [ "$project_id" != "null" ] && [ -n "$project_id" ]; then
           echo "Project '${{ parameters.projectName }}' with version '${{ parameters.umbracoVersion }}' already exists (ID: $project_id)."
         else
-          create_response=$(curl -s -X PUT -H "X-Api-Key: $(DT_API_KEY)" -H "Content-Type: application/json" \
+          create_response=$(curl -s --dump-header /dev/fd/3 -X PUT -H "X-Api-Key: $(DT_API_KEY)" -H "Content-Type: application/json" \
             -d "{\"name\":\"${{ parameters.projectName }}\",\"version\":\"${{ parameters.umbracoVersion }}\",\"collectionLogic\":\"AGGREGATE_DIRECT_CHILDREN\"}" \
             "$(DT_API_URL)/v1/project")
           project_id=$(echo $create_response | jq -r '.uuid')
@@ -41,7 +42,7 @@ jobs:
         displayName: Download ${{ project.artifact }} artifact
 
       - script: |
-          curl -s --dump-header /dev/stderr --fail-with-body \
+          curl -s --dump-header /dev/fd/3 --fail-with-body \
             -X POST "$(DT_API_URL)/v1/bom" \
             -H "X-Api-Key: $(DT_API_KEY)" \
             -H "Content-Type: multipart/form-data" \
