@@ -119,7 +119,7 @@ stages:
               artifactName: build_output
           - script: |
               dotnet tool install --global CycloneDX
-              dotnet-CycloneDX $(solution) --output $(Build.ArtifactStagingDirectory)/bom --filename bom-backend.xml
+              dotnet-CycloneDX $(solution) --output $(Build.ArtifactStagingDirectory)/bom --filename bom-dotnet.xml
             name: Generate_Backend_BOM
             displayName: 'Generate Backend BOM'
           - publish: $(Build.ArtifactStagingDirectory)/bom
