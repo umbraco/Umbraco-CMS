@@ -9,6 +9,7 @@ export default {
 interface UnregisteredIcon {
 	name: string;
 	svgPath: string;
+	inUse?: boolean;
 }
 
 type LucideIconsData = Record<string, unknown>;
@@ -40,10 +41,10 @@ async function getUnregisteredIcons(): Promise<IconsResult> {
 		const lucideIcons: LucideIconsData = await response.json();
 
 		const icons: UnregisteredIcon[] = Object.keys(lucideIcons)
-			.filter((lucideName) => !registeredFiles.has(lucideName))
 			.map((lucideName) => ({
 				name: lucideName,
 				svgPath: `/lucide-static/icons/${lucideName}.svg`,
+				inUse: registeredFiles.has(lucideName),
 			}))
 			.sort((a, b) => a.name.localeCompare(b.name));
 
@@ -85,7 +86,13 @@ export const Docs: StoryObj = {
 					width: 100%;
 					height: 100%;
 					padding: var(--uui-size-space-3);
-					border: 1px solid var(--uui-color-border);
+					${
+						icon.inUse
+							? `border: 2px solid var(--uui-color-selected);`
+							: `
+						border: 1px solid var(--uui-color-border);
+						`
+					}
 					border-radius: var(--uui-border-radius);
 					background-color: var(--uui-color-surface);">
 					<img
