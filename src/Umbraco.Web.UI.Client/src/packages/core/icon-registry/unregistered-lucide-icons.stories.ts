@@ -31,7 +31,7 @@ async function getUnregisteredIcons(): Promise<IconsResult> {
 	const registeredFiles = new Set(
 		iconDictionary.lucide
 			.filter((icon) => icon.file) // Filter out entries without a file property
-			.map((icon) => icon.file.replace('.svg', '')),
+			.map((icon) => icon.file?.replace('.svg', '')),
 	);
 
 	try {
@@ -91,11 +91,11 @@ export const Docs: StoryObj = {
 					<img
 						src="${icon.svgPath}"
 						alt="${icon.name}"
-						width="30"
-						height="30"
+						width="18"
+						height="18"
 						style="margin-bottom: 9px;"
 						loading="lazy" />
-					<small style="word-break: break-word;">${icon.name}</small>
+					<small style="word-break: break-word; opacity: 0.6;">${icon.name}</small>
 				</div>
 			`,
 			);
@@ -110,7 +110,8 @@ export const Docs: StoryObj = {
 					</p>
 					<p style="color: var(--uui-color-text-secondary);">
 						These icons are available in Lucide but not yet registered in the Umbraco CMS icon registry.
-						They cannot be used in the CMS until they are added to the icon-dictionary.json file.
+						You can contribute new icon registrations by making a PR to the CMS source code. In the CMS Source Code add the desired icon by adding it to the 'icon-dictionary.json', under 'lucide'. Afterwards run 'npm run generate:icons'.
+						Note you can also add icons of your own interest in your own project, read the docs
 					</p>
 				</div>
 				<div style="display: grid;
