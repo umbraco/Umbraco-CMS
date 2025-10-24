@@ -2250,7 +2250,7 @@ export default {
 		documentationHeader: 'التوثيق',
 		documentationDescription: 'اقرأ المزيد عن العمل مع العناصر في الإعدادات في توثيقنا.',
 		communityHeader: 'المجتمع',
-		communityDescription: 'اطرح سؤالا في منتدى مجتمعنا.',
+		communityDescription: 'اطرح سؤالاً في منتدى مجتمعنا.',
 		trainingHeader: 'التدريب',
 		trainingDescription: 'اكتشف فرص التدريب والتأهيل الرسمية',
 		supportHeader: 'الدعم',
