@@ -29,7 +29,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'menuItem',
 		kind: 'link',
 		alias: 'Umb.MenuItem.Help.CommunityForum',
-		name: 'The Community Forumn Help Menu Item',
+		name: 'The Community Forum Help Menu Item',
 		weight: 100,
 		meta: {
 			menus: [UMB_HELP_MENU_ALIAS],
