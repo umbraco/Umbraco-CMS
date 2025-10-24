@@ -2534,7 +2534,7 @@ export default {
 		documentationHeader: 'Documentation',
 		documentationDescription: 'Read more about working with the items in Settings in our Documentation.',
 		communityHeader: 'Community',
-		communityDescription: 'Ask a question in the community forum or our Discord community.',
+		communityDescription: 'Ask a question in the community forum.',
 		trainingHeader: 'Training',
 		trainingDescription: 'Find out about real-life training and certification opportunities',
 		supportHeader: 'Support',
@@ -2554,10 +2554,9 @@ export default {
 			"Thank you for choosing Umbraco - we think this could be the beginning of something beautiful. While it may feel overwhelming at first, we've done a lot to make the learning curve as smooth and fast as possible.",
 	},
 	welcomeDashboard: {
-		ourUmbracoHeadline: 'Our Umbraco - The Friendliest Community',
-		ourUmbracoDescription:
-			"Our Umbraco, the official community site, is your one-stop-shop for everything Umbraco. Whether you need a question answered, cool plugins, or a guide of how to do something in Umbraco, the world's best and friendliest community is just a click away.",
-		ourUmbracoButton: 'Visit Our Umbraco',
+		umbracoForumHeadline: 'The Umbraco community forum',
+		umbracoForumDescription: 'The forum is the central hub for the Umbraco developer community. This is where developers, integrators, and contributors come together to ask questions, share knowledge, and collaborate on all things Umbraco.',
+		umbracoForumButton: 'Visit the Umbraco community forum',
 		documentationHeadline: 'Documentation',
 		documentationDescription: 'Find the answers to all your Umbraco questions',
 		communityHeadline: 'Community',

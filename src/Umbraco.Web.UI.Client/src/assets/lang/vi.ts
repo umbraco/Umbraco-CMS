@@ -2523,7 +2523,7 @@ export default {
 		documentationHeader: 'Tài liệu',
 		documentationDescription: 'Đọc thêm về cách làm việc với các mục trong Cài đặt trong Tài liệu của chúng tôi.',
 		communityHeader: 'Cộng đồng',
-		communityDescription: 'Đặt câu hỏi trong diễn đàn cộng đồng hoặc cộng đồng Discord của chúng tôi.',
+		communityDescription: 'Đặt câu hỏi trong diễn đàn cộng đồng.',
 		trainingHeader: 'Đào tạo',
 		trainingDescription: 'Tìm hiểu về các khóa đào tạo và chứng nhận trong thực tế',
 		supportHeader: 'Hỗ trợ',

@@ -140,9 +140,9 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 				href: 'https://docs.umbraco.com/?utm_source=core&utm_medium=dashboard&utm_campaign=docs',
 			},
 			{
-				name: this.localize.term('welcomeDashboard_communityHeadline'),
-				description: this.localize.term('welcomeDashboard_communityDescription'),
-				href: 'https://our.umbraco.com/?utm_source=core&utm_medium=dashboard&utm_content=text&utm_campaign=our_forum',
+				name: this.localize.term('welcomeDashboard_umbracoForumHeadline'),
+				description: this.localize.term('welcomeDashboard_umbracoForumDescription'),
+				href: 'https://forum.umbraco.com/',
 			},
 			{
 				name: this.localize.term('welcomeDashboard_resourcesHeadline'),
@@ -156,15 +156,15 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 			},
 		];
 		return html`<div id="info-links" class="uui-text">
-			<uui-box id="our-umbraco">
+			<uui-box id="umbraco-forum">
 				<div>
-					<h2 class="uui-h3">${this.localize.term('welcomeDashboard_ourUmbracoHeadline')}</h2>
-					<p>${this.localize.term('welcomeDashboard_ourUmbracoDescription')}</p>
+					<h2 class="uui-h3">${this.localize.term('welcomeDashboard_umbracoForumHeadline')}</h2>
+					<p>${this.localize.term('welcomeDashboard_umbracoForumDescription')}</p>
 					<uui-button
 						look="outline"
 						target="_blank"
-						href="https://our.umbraco.com/?utm_source=core&amp;utm_medium=dashboard&amp;utm_content=image&amp;utm_campaign=our"
-						label=${this.localize.term('welcomeDashboard_ourUmbracoButton')}></uui-button>
+						href="https://forum.umbraco.com/"
+						label=${this.localize.term('welcomeDashboard_umbracoForumButton')}></uui-button>
 				</div>
 			</uui-box>
 			${infoLinks.map(

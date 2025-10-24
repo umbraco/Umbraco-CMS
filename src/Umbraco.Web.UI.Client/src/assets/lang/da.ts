@@ -2709,7 +2709,7 @@ export default {
 		documentationHeader: 'Dokumentation',
 		documentationDescription: 'Læs mere om at arbejde med elementerne i Indstillinger i vores Dokumentation.',
 		communityHeader: 'Community',
-		communityDescription: 'Stil et spørgsmål i community forummet eller i vores Discord community',
+		communityDescription: 'Stil et spørgsmål i community forummet',
 		trainingHeader: 'Træning',
 		trainingDescription: 'Se mulighederne for real-life træning og certificering',
 		supportHeader: 'Support',

@@ -2521,7 +2521,7 @@ export default {
 		documentationHeader: 'Documentação',
 		documentationDescription: 'Leia mais sobre como trabalhar com os itens nas Definições na nossa Documentação.',
 		communityHeader: 'Comunidade',
-		communityDescription: 'Faça uma pergunta no fórum da comunidade ou na nossa comunidade Discord.',
+		communityDescription: 'Faça uma pergunta no fórum da comunidade.',
 		trainingHeader: 'Formação',
 		trainingDescription: 'Descubra oportunidades de formação presencial e certificação',
 		supportHeader: 'Suporte',
