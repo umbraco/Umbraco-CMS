@@ -199,7 +199,7 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 				position: relative;
 			}
 
-			#our-umbraco {
+			#umbraco-forum {
 				grid-column-start: 1;
 				grid-column-end: -1;
 				margin-bottom: var(--uui-size-space-4);
