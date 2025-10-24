@@ -272,7 +272,7 @@ stages:
       - Build
     condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.uploadDependencyTrack}}))
     variables:
-      umbracoVersion: $[ stageDependencies.Build.A.outputs['build.NBGV_Version'] ]
+      umbracoVersion: $[ stageDependencies.Build.A.outputs['build.NBGV_NuGetPackageVersion'] ]
     jobs:
       - template: templates/dependency-track.yml
         parameters:
