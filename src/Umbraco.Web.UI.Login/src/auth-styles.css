@@ -85,3 +85,7 @@
 #umb-login-form #password-input-span:hover:not(:focus-within) {
 	border-color: var(--uui-input-border-color-hover, var(--uui-color-border-standalone, #c2c2c2));
 }
+
+#umb-login-form input::-ms-reveal {
+	display: none;
+}
