@@ -52,5 +52,5 @@ jobs:
             -F "projectVersion=${{ parameters.umbracoVersion }}" \
             -F "parentName=${{ parameters.projectName }}" \
             -F "parentVersion=${{ parameters.umbracoVersion }}" \
-            -F "bom=@./${{ project.artifact }}/${{ project.bomFilePath }}"
+            -F "bom=@$(Pipeline.Workspace)/${{ project.artifact }}/${{ project.bomFilePath }}"
         displayName: Upload ${{ project.name }} BOM to Dependency Track
