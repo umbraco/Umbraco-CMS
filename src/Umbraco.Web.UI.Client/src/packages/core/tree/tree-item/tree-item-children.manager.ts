@@ -255,7 +255,7 @@ export class UmbTreeItemChildrenManager<
 							? this.targetPagination.getNumberOfCurrentItemsBeforeBaseTarget()
 							: this.#takeBeforeTarget !== undefined
 								? this.#takeBeforeTarget
-								: 5,
+								: this.targetPagination.getTakeSize(),
 						takeAfter: reload
 							? this.targetPagination.getNumberOfCurrentItemsAfterBaseTarget()
 							: this.#takeAfterTarget !== undefined
