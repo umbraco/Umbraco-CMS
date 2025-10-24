@@ -266,6 +266,23 @@ stages:
               targetPath: $(Build.ArtifactStagingDirectory)/ui-api-docs.zip
               artifact: ui-api-docs
 
+  - stage: Dependency_Track
+    displayName: Dependency Track
+    dependsOn:
+      - Build
+    condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.uploadDependencyTrack}}))
+    jobs:
+      - template: templates/dependency-track.yml
+        parameters:
+          projectName: "Umbraco-CMS"
+          umbracoVersion: $[ stageDependencies.Build.A.outputs['build.NBGV_VersionMajor'] ]
+          projects:
+            - name: "Backend"
+              artifact: "bom-backend"
+              bomFilePath: "bom-dotnet.xml"
+            - name: "Backoffice"
+              artifact: "bom-frontend"
+              bomFilePath: "bom-backoffice.xml"
   ###############################################
   ## Test
   ###############################################
@@ -895,22 +912,4 @@ stages:
               ContainerName: "$web"
               BlobPrefix: v$(umbracoMajorVersion)/ui-api
               CleanTargetBeforeCopy: true
-
-  - stage: Upload_Dependency_Track
-    displayName: Upload Dependency Track BOMs
-    dependsOn:
-      - Build
-    condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.uploadDependencyTrack}}))
-    jobs:
-      - template: templates/dependency-track.yml
-        parameters:
-          projectName: "Umbraco-CMS"
-          umbracoVersion: $[ stageDependencies.Build.A.outputs['build.NBGV_VersionMajor'] ]
-          projects:
-            - name: "Backend"
-              artifact: "bom-backend"
-              bomFilePath: "bom-dotnet.xml"
-            - name: "Backoffice"
-              artifact: "bom-frontend"
-              bomFilePath: "bom-backoffice.xml"
 
