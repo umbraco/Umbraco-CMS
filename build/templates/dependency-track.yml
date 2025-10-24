@@ -1,0 +1,48 @@
+parameters:
+  - name: projectName
+    type: string
+  - name: umbracoVersion
+    type: string
+  - name: projects
+    type: object
+
+jobs:
+- job:
+  displayName: Upload Dependency Track BOMs
+  steps:
+    - checkout: none
+
+    - script: |
+        project_id=$(curl -s -H "X-Api-Key: $(DT_API_KEY)" "$(DT_API_URL)/v1/project/lookup?name=$(projectName)&version=$(umbracoVersion)" | jq -r '.uuid')
+        if [ "$project_id" != "null" ] && [ -n "$project_id" ]; then
+          echo "Project '$(projectName)' version '$(umbracoVersion)' already exists (ID: $project_id)."
+        else
+          create_response=$(curl -s -X PUT -H "X-Api-Key: $(DT_API_KEY)" -H "Content-Type: application/json" \
+            -d "{\"name\":\"$(projectName)\",\"version\":\"$(umbracoVersion)\",\"collectionLogic\":\"AGGREGATE_DIRECT_CHILDREN\"}" \
+            "$(DT_API_URL)/v1/project")
+          project_id=$(echo $create_response | jq -r '.uuid')
+          if [ -z "$project_id" ] || [ "$project_id" == "null" ]; then
+            echo "Failed to create project '$(projectName)' version '$(umbracoVersion)'."
+            exit 1
+          fi
+          echo "Created project with (ID: $project_id)."
+        fi
+      displayName: Ensure main project exists in Dependency Track
+
+    - ${{ each project in parameters.projects }}:
+      - download: current
+        artifact: ${{ project.artifact }}
+        displayName: Download ${{ project.artifact }} artifact
+
+      - script: |
+          curl -s --dump-header /dev/stderr --fail-with-body \
+            -X POST "$(DT_API_URL)/v1/bom" \
+            -H "X-Api-Key: $(DT_API_KEY)" \
+            -H "Content-Type: multipart/form-data" \
+            -F "autoCreate=true" \
+            -F "projectName=$(projectName)-${{ project.name }}" \
+            -F "projectVersion=$(umbracoVersion)" \
+            -F "parentName=$(projectName)" \
+            -F "parentVersion=$(umbracoVersion)" \
+            -F "bom=@./${{ project.artifact }}/${{ project.bomFilePath }}"
+        displayName: Upload ${{ project.name }} BOM to Dependency Track

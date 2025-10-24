@@ -34,6 +34,10 @@ parameters:
     displayName: Upload API docs
     type: boolean
     default: false
+  - name: uploadDependencyTrack
+    displayName: Upload BOMs to Dependency Track
+    type: boolean
+    default: false
   - name: forceReleaseTestFilter
     displayName: Force to use the release test filters
     type: boolean
@@ -118,11 +122,9 @@ stages:
               dotnet-CycloneDX $(solution) --output $(Build.ArtifactStagingDirectory)/bom --filename bom-backend.xml
             name: Generate_Backend_BOM
             displayName: 'Generate Backend BOM'
-          - task: PublishPipelineArtifact@1
-            displayName: Publish Backend UI BOM
-            inputs:
-              targetPath: $(Build.ArtifactStagingDirectory)/bom
-              artifactName: bom-backend
+          - publish: $(Build.ArtifactStagingDirectory)/bom
+            artifact: bom-backend
+            displayName: 'Publish Backend BOM'
 
       - job: B
         displayName: Build Bellissima Package
@@ -152,15 +154,13 @@ stages:
               artifactName: npm
           - script: |
               npm install --global @cyclonedx/cyclonedx-npm
-              cyclonedx-npm -o $(Build.ArtifactStagingDirectory)/bom/bom-frontend-backoffice.xml --ignore-npm-errors
+              cyclonedx-npm -o $(Build.ArtifactStagingDirectory)/bom/bom-backoffice.xml --ignore-npm-errors
             name: Generate_Backoffice_UI_BOM
             displayName: Generate Backoffice UI BOM
             workingDirectory: src/Umbraco.Web.UI.Client
-          - task: PublishPipelineArtifact@1
-            displayName: Publish Backoffice UI BOM
-            inputs:
-              targetPath: $(Build.ArtifactStagingDirectory)/bom
-              artifactName: bom-frontend
+          - publish: $(Build.ArtifactStagingDirectory)/bom
+            artifact: bom-frontend
+            displayName: 'Publish Frontend BOM'
 
   - stage: Build_Docs
     condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.buildApiDocs}}))
@@ -895,3 +895,22 @@ stages:
               ContainerName: "$web"
               BlobPrefix: v$(umbracoMajorVersion)/ui-api
               CleanTargetBeforeCopy: true
+
+  - stage: Upload_Dependency_Track
+    displayName: Upload Dependency Track BOMs
+    dependsOn:
+      - Build
+    condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.uploadDependencyTrack}}))
+    jobs:
+      - template: templates/dependency-track.yml
+        parameters:
+          projectName: "Umbraco-CMS"
+          umbracoVersion: $[ stageDependencies.Build.A.outputs['build.NBGV_VersionMajor'] ]
+          projects:
+            - name: "Backend"
+              artifact: "bom-backend"
+              bomFilePath: "bom-dotnet.xml"
+            - name: "Backoffice"
+              artifact: "bom-frontend"
+              bomFilePath: "bom-backoffice.xml"
+
