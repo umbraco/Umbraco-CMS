@@ -44,7 +44,7 @@ Want to see the latest backoffice UI in action? Check out our live preview:
 
 **[backofficepreview.umbraco.com](https://backofficepreview.umbraco.com/)**
 
-This preview is automatically deployed from the main branch and showcases the latest backoffice features and improvements.
+This preview is automatically deployed from the main branch and showcases the latest backoffice features and improvements.  It runs from mock data and persistent edits are not supported.
 
 ## Get help
 
