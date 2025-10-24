@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -31,6 +32,8 @@ internal sealed class ElementServiceNotificationWithCacheTests : UmbracoIntegrat
 
     private IElementEditingService ElementEditingService => GetRequiredService<IElementEditingService>();
 
+    private IElementContainerService ElementContainerService => GetRequiredService<IElementContainerService>();
+
     protected override void ConfigureTestServices(IServiceCollection services)
         => services.AddSingleton(AppCaches.Create(Mock.Of<IRequestCache>()));
 
@@ -49,7 +52,9 @@ internal sealed class ElementServiceNotificationWithCacheTests : UmbracoIntegrat
 
     protected override void CustomTestSetup(IUmbracoBuilder builder) => builder
         .AddNotificationHandler<ElementSavingNotification, ElementNotificationHandler>()
-        .AddNotificationHandler<ElementSavedNotification, ElementNotificationHandler>();
+        .AddNotificationHandler<ElementSavedNotification, ElementNotificationHandler>()
+        .AddNotificationHandler<ElementMovingNotification, ElementNotificationHandler>()
+        .AddNotificationHandler<ElementMovedNotification, ElementNotificationHandler>();
 
     [Test]
     public async Task Saving_Saved_Get_Value()
@@ -129,16 +134,118 @@ internal sealed class ElementServiceNotificationWithCacheTests : UmbracoIntegrat
         }
     }
 
+    [Test]
+    public async Task Moving_Moved_Fires_Notifications()
+    {
+        var container = (await ElementContainerService.CreateAsync(null, "Target", null, Constants.Security.SuperUserKey)).Result;
+
+        var element = (await ElementEditingService.CreateAsync(
+            new ElementCreateModel
+            {
+                ContentTypeKey = _contentType.Key,
+                Variants = [
+                    new() { Name = "Name" }
+                ],
+            },
+            Constants.Security.SuperUserKey)).Result.Content!;
+
+        var movingWasCalled = false;
+        var movedWasCalled = false;
+
+        ElementNotificationHandler.MovingElement = _ => movingWasCalled = true;
+        ElementNotificationHandler.MovedElement = _ => movedWasCalled = true;
+
+        try
+        {
+            var moveAttempt = await ElementEditingService.MoveAsync(element.Key, container.Key, Constants.Security.SuperUserKey);
+
+            Assert.Multiple(() =>
+            {
+                Assert.IsTrue(moveAttempt.Success);
+                Assert.AreEqual(moveAttempt.Result, ContentEditingOperationStatus.Success);
+            });
+
+            Assert.IsTrue(movingWasCalled);
+            Assert.IsTrue(movedWasCalled);
+        }
+        finally
+        {
+            ElementNotificationHandler.MovingElement = null;
+            ElementNotificationHandler.MovedElement = null;
+        }
+
+        element = (await ElementEditingService.GetAsync(element.Key))!;
+        Assert.AreEqual(container.Id, element.ParentId);
+    }
+
+    [Test]
+    public async Task Moving_Can_Cancel_Move()
+    {
+        var container = (await ElementContainerService.CreateAsync(null, "Target", null, Constants.Security.SuperUserKey)).Result;
+
+        var element = (await ElementEditingService.CreateAsync(
+            new ElementCreateModel
+            {
+                ContentTypeKey = _contentType.Key,
+                Variants = [
+                    new() { Name = "Name" }
+                ],
+            },
+            Constants.Security.SuperUserKey)).Result.Content!;
+
+        var movingWasCalled = false;
+        var movedWasCalled = false;
+
+        ElementNotificationHandler.MovingElement = notification =>
+        {
+            movingWasCalled = true;
+            notification.Cancel = true;
+        };
+        ElementNotificationHandler.MovedElement = _ => movedWasCalled = true;
+
+        try
+        {
+            var moveAttempt = await ElementEditingService.MoveAsync(element.Key, container.Key, Constants.Security.SuperUserKey);
+
+            Assert.Multiple(() =>
+            {
+                Assert.IsFalse(moveAttempt.Success);
+                Assert.AreEqual(moveAttempt.Result, ContentEditingOperationStatus.CancelledByNotification);
+            });
+
+            Assert.IsTrue(movingWasCalled);
+            Assert.IsFalse(movedWasCalled);
+        }
+        finally
+        {
+            ElementNotificationHandler.MovingElement = null;
+            ElementNotificationHandler.MovedElement = null;
+        }
+
+        element = (await ElementEditingService.GetAsync(element.Key))!;
+        Assert.AreEqual(Constants.System.Root, element.ParentId);
+    }
+
     internal sealed class ElementNotificationHandler :
         INotificationHandler<ElementSavingNotification>,
-        INotificationHandler<ElementSavedNotification>
+        INotificationHandler<ElementSavedNotification>,
+        INotificationHandler<ElementMovingNotification>,
+        INotificationHandler<ElementMovedNotification>
     {
         public static Action<ElementSavingNotification>? SavingElement { get; set; }
 
         public static Action<ElementSavedNotification>? SavedElement { get; set; }
 
+        public static Action<ElementMovingNotification>? MovingElement { get; set; }
+
+        public static Action<ElementMovedNotification>? MovedElement { get; set; }
+
         public void Handle(ElementSavedNotification notification) => SavedElement?.Invoke(notification);
 
         public void Handle(ElementSavingNotification notification) => SavingElement?.Invoke(notification);
+
+        public void Handle(ElementMovingNotification notification) => MovingElement?.Invoke(notification);
+
+        public void Handle(ElementMovedNotification notification) => MovedElement?.Invoke(notification);
     }
 }

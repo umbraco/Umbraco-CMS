@@ -1,8 +1,10 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Filters;
@@ -15,6 +17,7 @@ internal sealed class ElementEditingService
 {
     private readonly ILogger<ElementEditingService> _logger;
     private readonly IElementContainerService _containerService;
+    private readonly IEventMessagesFactory _eventMessagesFactory;
 
     public ElementEditingService(
         IElementService elementService,
@@ -28,7 +31,8 @@ internal sealed class ElementEditingService
         IOptionsMonitor<ContentSettings> optionsMonitor,
         IRelationService relationService,
         IElementContainerService containerService,
-        ContentTypeFilterCollection contentTypeFilters)
+        ContentTypeFilterCollection contentTypeFilters,
+        IEventMessagesFactory eventMessagesFactory)
         : base(
             elementService,
             contentTypeService,
@@ -44,6 +48,7 @@ internal sealed class ElementEditingService
     {
         _logger = logger;
         _containerService = containerService;
+        _eventMessagesFactory = eventMessagesFactory;
     }
 
     public Task<IElement?> GetAsync(Guid key)
@@ -82,7 +87,7 @@ internal sealed class ElementEditingService
         IElement element = result.Result.Content!;
         // IElement element = await EnsureOnlyAllowedFieldsAreUpdated(result.Result.Content!, userKey);
 
-        ContentEditingOperationStatus saveStatus = await Save(element, userKey);
+        ContentEditingOperationStatus saveStatus = await SaveAsync(element, userKey);
         return saveStatus == ContentEditingOperationStatus.Success
             ? Attempt.SucceedWithStatus(validationStatus, new ElementCreateResult { Content = element, ValidationResult = validationResult })
             : Attempt.FailWithStatus(saveStatus, new ElementCreateResult { Content = element });
@@ -115,7 +120,7 @@ internal sealed class ElementEditingService
         // TODO ELEMENTS: we need a fix for this; see ContentEditingService
         // element = await EnsureOnlyAllowedFieldsAreUpdated(element, userKey);
 
-        ContentEditingOperationStatus saveStatus = await Save(element, userKey);
+        ContentEditingOperationStatus saveStatus = await SaveAsync(element, userKey);
         return saveStatus == ContentEditingOperationStatus.Success
             ? Attempt.SucceedWithStatus(validationStatus, new ElementUpdateResult { Content = element, ValidationResult = validationResult })
             : Attempt.FailWithStatus(saveStatus, new ElementUpdateResult { Content = element });
@@ -140,8 +145,55 @@ internal sealed class ElementEditingService
             : (null, ContentEditingOperationStatus.ParentNotFound);
     }
 
-    protected override OperationResult? Move(IElement element, int newParentId, int userId)
-        => throw new NotImplementedException("TODO ELEMENTS: implement move");
+    public async Task<Attempt<ContentEditingOperationStatus>> MoveAsync(Guid key, Guid? containerKey, Guid userKey)
+    {
+        using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
+        IElement? toMove = await GetAsync(key);
+        if (toMove is null)
+        {
+            return Attempt.Fail(ContentEditingOperationStatus.NotFound);
+        }
+
+        var parentId = Constants.System.Root;
+        if (containerKey.HasValue && containerKey.Value != Guid.Empty)
+        {
+            EntityContainer? container = await _containerService.GetAsync(containerKey.Value);
+            if (container is null)
+            {
+                return Attempt.Fail(ContentEditingOperationStatus.ParentNotFound);
+            }
+
+            parentId = container.Id;
+        }
+
+        if (toMove.ParentId == parentId)
+        {
+            return Attempt.Succeed(ContentEditingOperationStatus.Success);
+        }
+
+        EventMessages eventMessages = _eventMessagesFactory.Get();
+
+        var moveEventInfo = new MoveEventInfo<IElement>(toMove, toMove.Path, parentId, containerKey);
+        var movingNotification = new ElementMovingNotification(moveEventInfo, eventMessages);
+        if (await scope.Notifications.PublishCancelableAsync(movingNotification))
+        {
+            scope.Complete();
+            return Attempt.Fail(ContentEditingOperationStatus.CancelledByNotification);
+        }
+
+        // NOTE: as long as the parent ID is correct, the element repo takes care of updating the rest of the
+        //       structural node data like path, level, sort orders etc.
+        toMove.ParentId = parentId;
+
+        await SaveAsync(toMove, userKey);
+
+        scope.Notifications.Publish(
+            new ElementMovedNotification(moveEventInfo, eventMessages).WithStateFrom(movingNotification));
+
+        scope.Complete();
+
+        return Attempt.Succeed(ContentEditingOperationStatus.Success);
+    }
 
     protected override IElement? Copy(IElement element, int newParentId, bool relateToOriginal, bool includeDescendants, int userId)
         => throw new NotImplementedException("TODO ELEMENTS: implement copy");
@@ -152,7 +204,13 @@ internal sealed class ElementEditingService
     protected override OperationResult? Delete(IElement element, int userId)
         => ContentService.Delete(element, userId);
 
-    private async Task<ContentEditingOperationStatus> Save(IElement content, Guid userKey)
+    /// <summary>
+    ///     NB: Some methods from ContentEditingServiceBase are needed, so we need to inherit from it
+    ///     but there are others that are not required to be implemented in the case of blueprints, therefore they throw NotImplementedException as default.
+    /// </summary>
+    protected override OperationResult? Move(IElement element, int newParentId, int userId) => throw new NotImplementedException();
+
+    private async Task<ContentEditingOperationStatus> SaveAsync(IElement content, Guid userKey)
     {
         try
         {

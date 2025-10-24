@@ -99,14 +99,14 @@ public partial class ElementEditingServiceTests : UmbracoIntegrationTest
         return elementType;
     }
 
-    private async Task<IElement> CreateInvariantElement()
+    private async Task<IElement> CreateInvariantElement(Guid? parentKey = null)
     {
         var elementType = await CreateInvariantElementType();
 
         var createModel = new ElementCreateModel
         {
             ContentTypeKey = elementType.Key,
-            ParentKey = Constants.System.RootKey,
+            ParentKey = parentKey,
             Variants =
             [
                 new VariantModel { Name = "Initial Name" }
@@ -123,14 +123,14 @@ public partial class ElementEditingServiceTests : UmbracoIntegrationTest
         return result.Result.Content!;
     }
 
-    private async Task<IElement> CreateCultureVariantElement()
+    private async Task<IElement> CreateCultureVariantElement(Guid? parentKey = null)
     {
         var elementType = await CreateVariantElementType();
 
         var createModel = new ElementCreateModel
         {
             ContentTypeKey = elementType.Key,
-            ParentKey = Constants.System.RootKey,
+            ParentKey = parentKey,
             Properties =
             [
                 new PropertyValueModel { Alias = "invariantTitle", Value = "The initial invariant title" },
@@ -149,14 +149,14 @@ public partial class ElementEditingServiceTests : UmbracoIntegrationTest
         return result.Result.Content!;
     }
 
-    private async Task<IElement> CreateSegmentVariantElement()
+    private async Task<IElement> CreateSegmentVariantElement(Guid? parentKey = null)
     {
         var elementType = await CreateVariantElementType(ContentVariation.Segment);
 
         var createModel = new ElementCreateModel
         {
             ContentTypeKey = elementType.Key,
-            ParentKey = Constants.System.RootKey,
+            ParentKey = parentKey,
             Properties =
             [
                 new PropertyValueModel { Alias = "invariantTitle", Value = "The initial invariant title" },
@@ -177,14 +177,14 @@ public partial class ElementEditingServiceTests : UmbracoIntegrationTest
         return result.Result.Content!;
     }
 
-    private async Task<IElement> CreateCultureAndSegmentVariantElement()
+    private async Task<IElement> CreateCultureAndSegmentVariantElement(Guid? parentKey = null)
     {
         var elementType = await CreateVariantElementType(ContentVariation.CultureAndSegment);
 
         var createModel = new ElementCreateModel
         {
             ContentTypeKey = elementType.Key,
-            ParentKey = Constants.System.RootKey,
+            ParentKey = parentKey,
             Properties =
             [
                 new PropertyValueModel { Alias = "invariantTitle", Value = "The initial invariant title" },

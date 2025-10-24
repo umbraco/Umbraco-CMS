@@ -325,5 +325,8 @@
     <Compile Update="Umbraco.Core\Services\ElementPublishingServiceTests.Unpublish.cs">
       <DependentUpon>ElementPublishingServiceTests.cs</DependentUpon>
     </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ElementEditingServiceTests.Move.cs">
+      <DependentUpon>ElementEditingServiceTests.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>
