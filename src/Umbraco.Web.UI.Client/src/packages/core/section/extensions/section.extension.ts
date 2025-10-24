@@ -12,4 +12,5 @@ export interface ManifestSection
 export interface MetaSection {
 	label: string;
 	pathname: string;
+	useNavigatingState?: boolean;
 }
