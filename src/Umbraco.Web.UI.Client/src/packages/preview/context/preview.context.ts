@@ -162,8 +162,8 @@ export class UmbPreviewContext extends UmbContextBase {
 		const url = new URL(unique, host);
 		const params = new URLSearchParams(url.search);
 
-		const culture = args?.culture || this.#culture.getValue();
-		const segment = args?.segment || this.#segment.getValue();
+		const culture = args && 'culture' in args ? args.culture : this.#culture.getValue();
+		const segment = args && 'segment' in args ? args.segment : this.#segment.getValue();
 
 		const cultureParam = 'culture';
 		const rndParam = 'rnd';
@@ -277,8 +277,8 @@ export class UmbPreviewContext extends UmbContextBase {
 
 		// Check if URL will change (culture or segment changed)
 		const urlWillChange =
-			(mergedArgs.culture !== undefined && mergedArgs.culture !== this.#currentArgs.culture) ||
-			(mergedArgs.segment !== undefined && mergedArgs.segment !== this.#currentArgs.segment);
+			(args?.culture !== undefined && mergedArgs.culture !== this.#currentArgs.culture) ||
+			(args?.segment !== undefined && mergedArgs.segment !== this.#currentArgs.segment);
 
 		// Only show loading spinner if iframe will reload
 		if (urlWillChange) {
