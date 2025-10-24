@@ -217,6 +217,35 @@ export class UmbPreviewContext extends UmbContextBase {
 	iframeLoaded(iframe: HTMLIFrameElement) {
 		if (!iframe) return;
 		this.#iframeReady.setValue(true);
+		this.#setupScaling();
+	}
+
+	#setupScaling() {
+		// Clean up old event listeners before adding new ones
+		this.#resizeController?.abort();
+		this.#resizeController = new AbortController();
+		const signal = this.#resizeController.signal;
+
+		const wrapper = this.getIFrameWrapper();
+		if (!wrapper) return;
+
+		const scaleIFrame = () => {
+			if (wrapper.className === 'fullsize') {
+				wrapper.style.transform = '';
+			} else {
+				const wScale = document.body.offsetWidth / (wrapper.offsetWidth + 30);
+				const hScale = document.body.offsetHeight / (wrapper.offsetHeight + 30);
+				const scale = Math.min(wScale, hScale, 1);
+				wrapper.style.transform = `scale(${scale})`;
+			}
+		};
+
+		// Set up listeners once per iframe load
+		window.addEventListener('resize', scaleIFrame, { signal });
+		wrapper.addEventListener('transitionend', scaleIFrame, { signal });
+
+		// Initial scale
+		scaleIFrame();
 	}
 
 	getIFrameWrapper(): HTMLElement | undefined {
@@ -246,28 +275,15 @@ export class UmbPreviewContext extends UmbContextBase {
 		const wrapper = this.getIFrameWrapper();
 		if (!wrapper) return;
 
-		// Clean up old event listeners before adding new ones
-		this.#resizeController?.abort();
-		this.#resizeController = new AbortController();
-		const signal = this.#resizeController.signal;
+		// Check if URL will change (culture or segment changed)
+		const urlWillChange =
+			(mergedArgs.culture !== undefined && mergedArgs.culture !== this.#currentArgs.culture) ||
+			(mergedArgs.segment !== undefined && mergedArgs.segment !== this.#currentArgs.segment);
 
-		const scaleIFrame = () => {
-			if (wrapper.className === 'fullsize') {
-				wrapper.style.transform = '';
-			} else {
-				const wScale = document.body.offsetWidth / (wrapper.offsetWidth + 30);
-				const hScale = document.body.offsetHeight / (wrapper.offsetHeight + 30);
-				const scale = Math.min(wScale, hScale, 1); // get the lowest ratio, but not higher than 1
-				wrapper.style.transform = `scale(${scale})`;
-			}
-			this.#iframeReady.setValue(true);
-		};
-
-		// Add listeners with AbortController signal for automatic cleanup
-		window.addEventListener('resize', scaleIFrame, { signal });
-		wrapper.addEventListener('transitionend', scaleIFrame, { signal });
-
-		this.#iframeReady.setValue(false);
+		// Only show loading spinner if iframe will reload
+		if (urlWillChange) {
+			this.#iframeReady.setValue(false);
+		}
 
 		const params = new URLSearchParams(window.location.search);
 
