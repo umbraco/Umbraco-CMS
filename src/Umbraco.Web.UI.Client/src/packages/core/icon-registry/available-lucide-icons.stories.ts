@@ -109,10 +109,10 @@ export const Docs: StoryObj = {
 
 			container.innerHTML = `
 				<div style="margin: var(--uui-size-layout-2);">
-					<h2>Unregistered Lucide Icons</h2>
+					<h2>Available Lucide Icons</h2>
 					<p>
 						<strong>Total Lucide Icons:</strong> ${stats.total}<br />
-						<strong>Registered in CMS:</strong> ${stats.registered}<br />
+						<strong>Registered in CMS:</strong> ${stats.registered} (Marked with blue)<br />
 						<strong>Unregistered:</strong> ${stats.unregistered}
 					</p>
 					<p style="color: var(--uui-color-text-secondary);">
