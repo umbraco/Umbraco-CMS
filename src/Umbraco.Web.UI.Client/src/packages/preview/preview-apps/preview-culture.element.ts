@@ -1,13 +1,17 @@
 import { UMB_PREVIEW_CONTEXT } from '../context/preview.context-token.js';
-import { css, customElement, html, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbPopoverToggleEvent } from './types.js';
+import { css, customElement, html, nothing, query, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
 import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
-import type { UmbPopoverToggleEvent } from './types.js';
+import type { UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-preview-culture')
 export class UmbPreviewCultureElement extends UmbLitElement {
 	#languageRepository = new UmbLanguageCollectionRepository(this);
+
+	@query('#cultures-popover')
+	private _popoverElement?: UUIPopoverContainerElement;
 
 	@state()
 	private _culture?: UmbLanguageDetailModel;
@@ -17,6 +21,11 @@ export class UmbPreviewCultureElement extends UmbLitElement {
 
 	@state()
 	private _popoverOpen = false;
+
+	constructor() {
+		super();
+		this.addEventListener('blur', this.#onBlur, true); // Use capture phase to catch blur events
+	}
 
 	override connectedCallback() {
 		super.connectedCallback();
@@ -44,11 +53,19 @@ export class UmbPreviewCultureElement extends UmbLitElement {
 
 		const previewContext = await this.getContext(UMB_PREVIEW_CONTEXT);
 		previewContext?.updateIFrame({ culture: culture.unique });
+
+		this._popoverElement?.hidePopover();
 	}
 
 	#onPopoverToggle(event: UmbPopoverToggleEvent) {
 		this._popoverOpen = event.newState === 'open';
 	}
+
+	#onBlur = () => {
+		if (this._popoverOpen) {
+			this._popoverElement?.hidePopover();
+		}
+	};
 
 	override render() {
 		if (this._cultures.length <= 1) return nothing;

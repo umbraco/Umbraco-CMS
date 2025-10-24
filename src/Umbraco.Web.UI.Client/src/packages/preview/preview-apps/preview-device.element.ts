@@ -1,7 +1,8 @@
 import { UMB_PREVIEW_CONTEXT } from '../context/preview.context-token.js';
-import { css, customElement, html, ifDefined, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbPopoverToggleEvent } from './types.js';
+import { css, customElement, html, ifDefined, property, query, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
 
 export interface UmbPreviewDevice {
 	alias: string;
@@ -13,6 +14,9 @@ export interface UmbPreviewDevice {
 
 @customElement('umb-preview-device')
 export class UmbPreviewDeviceElement extends UmbLitElement {
+	@query('#devices-popover')
+	private _popoverElement?: UUIPopoverContainerElement;
+
 	// TODO: [LK] Eventually, convert these devices to be an  extension point.
 	#devices: Array<UmbPreviewDevice> = [
 		{
@@ -67,6 +71,11 @@ export class UmbPreviewDeviceElement extends UmbLitElement {
 	@state()
 	private _popoverOpen = false;
 
+	constructor() {
+		super();
+		this.addEventListener('blur', this.#onBlur, true); // Use capture phase to catch blur events
+	}
+
 	override connectedCallback() {
 		super.connectedCallback();
 		this.hidden = true;
@@ -90,11 +99,19 @@ export class UmbPreviewDeviceElement extends UmbLitElement {
 			height: device.dimensions.height,
 			width: device.dimensions.width,
 		});
+
+		// Don't close popover for device selector - users often want to quickly test multiple devices
 	}
 
 	#onPopoverToggle(event: UmbPopoverToggleEvent) {
 		this._popoverOpen = event.newState === 'open';
 	}
+
+	#onBlur = () => {
+		if (this._popoverOpen) {
+			this._popoverElement?.hidePopover();
+		}
+	};
 
 	override render() {
 		return html`

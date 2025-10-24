@@ -1,13 +1,17 @@
 import { UMB_PREVIEW_CONTEXT } from '../context/preview.context-token.js';
-import { css, customElement, html, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbPopoverToggleEvent } from './types.js';
+import { css, customElement, html, nothing, query, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSegmentCollectionRepository } from '@umbraco-cms/backoffice/segment';
 import type { UmbSegmentCollectionItemModel } from '@umbraco-cms/backoffice/segment';
-import type { UmbPopoverToggleEvent } from './types.js';
+import type { UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-preview-segment')
 export class UmbPreviewSegmentElement extends UmbLitElement {
 	#segmentRepository = new UmbSegmentCollectionRepository(this);
+
+	@query('#segments-popover')
+	private _popoverElement?: UUIPopoverContainerElement;
 
 	@state()
 	private _segment?: UmbSegmentCollectionItemModel;
@@ -17,6 +21,11 @@ export class UmbPreviewSegmentElement extends UmbLitElement {
 
 	@state()
 	private _popoverOpen = false;
+
+	constructor() {
+		super();
+		this.addEventListener('blur', this.#onBlur, true); // Use capture phase to catch blur events
+	}
 
 	override connectedCallback() {
 		super.connectedCallback();
@@ -44,11 +53,19 @@ export class UmbPreviewSegmentElement extends UmbLitElement {
 
 		const previewContext = await this.getContext(UMB_PREVIEW_CONTEXT);
 		previewContext?.updateIFrame({ segment: segment?.unique });
+
+		this._popoverElement?.hidePopover();
 	}
 
 	#onPopoverToggle(event: UmbPopoverToggleEvent) {
 		this._popoverOpen = event.newState === 'open';
 	}
+
+	#onBlur = () => {
+		if (this._popoverOpen) {
+			this._popoverElement?.hidePopover();
+		}
+	};
 
 	override render() {
 		if (!this._segments.length) return nothing;
