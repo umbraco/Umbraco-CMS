@@ -1,4 +1,3 @@
-using Microsoft.Build.Framework;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
