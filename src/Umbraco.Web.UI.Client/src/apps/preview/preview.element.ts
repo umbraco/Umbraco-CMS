@@ -35,6 +35,7 @@ export class UmbPreviewElement extends UmbLitElement {
 	override async firstUpdated() {
 		await this.#extensionsAfterAuth();
 
+		// Extensions are loaded in parallel and don't need to block the preview frame
 		CORE_PACKAGES.forEach(async (packageImport) => {
 			const { extensions } = await packageImport;
 			umbExtensionsRegistry.registerMany(extensions);
