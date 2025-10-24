@@ -224,13 +224,13 @@ export default class UmbAuthElement extends UmbLitElement {
 			}
 
 			let retryCount = 0;
-			const maxRetries = 40; //Retries 40 times with a 50ms interval = 2 seconds
+			//Retries 40 times with a 50ms interval = 2 seconds
+			const maxRetries = 40;
 
 			// If not, we check periodically until it it is available or we reach the max retries
 			const checkInterval = setInterval(() => {
 				if (this.localize.term('auth_showPassword') !== 'auth_showPassword' || retryCount >= maxRetries) {
 					clearInterval(checkInterval);
-					console.log('Localization is ready.');
 					resolve();
 				}
 				retryCount++;
