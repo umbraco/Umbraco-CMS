@@ -13,19 +13,19 @@ jobs:
     - checkout: none
 
     - script: |
-        project_id=$(curl -s -H "X-Api-Key: $(DT_API_KEY)" "$(DT_API_URL)/v1/project/lookup?name=$(projectName)&version=$(umbracoVersion)" | jq -r '.uuid')
+        project_id=$(curl -s -H "X-Api-Key: $(DT_API_KEY)" "$(DT_API_URL)/v1/project/lookup?name=${{ parameters.projectName }}&version=${{ parameters.umbracoVersion }}" | jq -r '.uuid')
         if [ "$project_id" != "null" ] && [ -n "$project_id" ]; then
-          echo "Project '$(projectName)' with version '$(umbracoVersion)' already exists (ID: $project_id)."
+          echo "Project '${{ parameters.projectName }}' with version '${{ parameters.umbracoVersion }}' already exists (ID: $project_id)."
         else
           create_response=$(curl -s -X PUT -H "X-Api-Key: $(DT_API_KEY)" -H "Content-Type: application/json" \
-            -d "{\"name\":\"$(projectName)\",\"version\":\"$(umbracoVersion)\",\"collectionLogic\":\"AGGREGATE_DIRECT_CHILDREN\"}" \
+            -d "{\"name\":\"${{ parameters.projectName }}\",\"version\":\"${{ parameters.umbracoVersion }}\",\"collectionLogic\":\"AGGREGATE_DIRECT_CHILDREN\"}" \
             "$(DT_API_URL)/v1/project")
           project_id=$(echo $create_response | jq -r '.uuid')
           if [ -z "$project_id" ] || [ "$project_id" == "null" ]; then
-            echo "Failed to create project '$(projectName)' version '$(umbracoVersion)'."
+            echo "Failed to create project '${{ parameters.projectName }}' version '${{ parameters.umbracoVersion }}'."
             exit 1
           fi
-          echo "Created project '$(projectName)' with version '$(umbracoVersion)' (ID: $project_id)."
+          echo "Created project '${{ parameters.projectName }}' with version '${{ parameters.umbracoVersion }}' (ID: $project_id)."
         fi
       displayName: Ensure main project exists in Dependency Track
 
@@ -46,9 +46,9 @@ jobs:
             -H "X-Api-Key: $(DT_API_KEY)" \
             -H "Content-Type: multipart/form-data" \
             -F "autoCreate=true" \
-            -F "projectName=$(projectName)-${{ project.name }}" \
-            -F "projectVersion=$(umbracoVersion)" \
-            -F "parentName=$(projectName)" \
-            -F "parentVersion=$(umbracoVersion)" \
+            -F "projectName=${{ parameters.projectName }}-${{ project.name }}" \
+            -F "projectVersion=${{ parameters.umbracoVersion }}" \
+            -F "parentName=${{ parameters.projectName }}" \
+            -F "parentVersion=${{ parameters.umbracoVersion }}" \
             -F "bom=@./${{ project.artifact }}/${{ project.bomFilePath }}"
         displayName: Upload ${{ project.name }} BOM to Dependency Track
