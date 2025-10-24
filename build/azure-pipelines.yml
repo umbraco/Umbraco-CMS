@@ -136,6 +136,12 @@ stages:
             lfs: false,
             fetchDepth: 500
           - template: templates/backoffice-install.yml
+          - script: |
+              npm install --global @cyclonedx/cyclonedx-npm
+              cyclonedx-npm -o $(Build.ArtifactStagingDirectory)/bom/bom-backoffice.xml --ignore-npm-errors
+            name: Generate_Backoffice_UI_BOM
+            displayName: Generate Backoffice UI BOM
+            workingDirectory: src/Umbraco.Web.UI.Client
           - script: npm run build:for:npm
             displayName: Run build:for:npm
             workingDirectory: src/Umbraco.Web.UI.Client
@@ -152,12 +158,6 @@ stages:
             inputs:
               targetPath: $(Build.ArtifactStagingDirectory)/npm
               artifactName: npm
-          - script: |
-              npm install --global @cyclonedx/cyclonedx-npm
-              cyclonedx-npm -o $(Build.ArtifactStagingDirectory)/bom/bom-backoffice.xml --ignore-npm-errors
-            name: Generate_Backoffice_UI_BOM
-            displayName: Generate Backoffice UI BOM
-            workingDirectory: src/Umbraco.Web.UI.Client
           - publish: $(Build.ArtifactStagingDirectory)/bom
             artifact: bom-frontend
             displayName: 'Publish Frontend BOM'
