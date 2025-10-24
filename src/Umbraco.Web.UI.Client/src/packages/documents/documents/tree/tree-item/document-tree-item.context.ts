@@ -40,8 +40,8 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 				this.hasCollection,
 				(hasCollection) => {
 					if (hasCollection) {
-						this._treeItemChildrenManager.setTargetTakeSize(2, 2);
 						this._treeItemChildrenManager.resetOffsetWhenTargetChanges();
+						this._treeItemChildrenManager.setTargetTakeSize(1, 1);
 
 						this.observe(
 							this.hasActiveDescendant,
