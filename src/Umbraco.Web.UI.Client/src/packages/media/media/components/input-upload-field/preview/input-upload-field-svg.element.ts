@@ -20,6 +20,9 @@ export default class UmbInputUploadFieldSvgElement extends UmbLitElement impleme
 				max-height: 400px;
 				width: fit-content;
 				max-width: 100%;
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
 			}
 
 			img {
