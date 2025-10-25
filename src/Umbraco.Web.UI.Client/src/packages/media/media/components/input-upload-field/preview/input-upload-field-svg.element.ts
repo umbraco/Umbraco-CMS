@@ -16,6 +16,7 @@ export default class UmbInputUploadFieldSvgElement extends UmbLitElement impleme
 	static override readonly styles = [
 		css`
 			:host {
+				min-width: 240px;
 				min-height: 240px;
 				max-height: 400px;
 				width: fit-content;
