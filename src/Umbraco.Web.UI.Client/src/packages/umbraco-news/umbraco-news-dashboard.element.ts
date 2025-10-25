@@ -140,9 +140,9 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 				href: 'https://docs.umbraco.com/?utm_source=core&utm_medium=dashboard&utm_campaign=docs',
 			},
 			{
-				name: this.localize.term('welcomeDashboard_umbracoForumHeadline'),
-				description: this.localize.term('welcomeDashboard_umbracoForumDescription'),
-				href: 'https://forum.umbraco.com/',
+				name: this.localize.term('welcomeDashboard_umbracoCommunityHeadline'),
+				description: this.localize.term('welcomeDashboard_umbracoCommunityDescription'),
+				href: 'https://community.umbraco.com/',
 			},
 			{
 				name: this.localize.term('welcomeDashboard_resourcesHeadline'),
@@ -170,7 +170,7 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 			${infoLinks.map(
 				(link) => html`
 					<a class="info-link" target="_blank" href=${link.href}>
-						<h3 class="uui-h5">${link.name}</h3>
+						<h4>${link.name}</h4>
 						<p>${link.description}</p>
 					</a>
 				`,
