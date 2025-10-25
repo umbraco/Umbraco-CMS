@@ -8,7 +8,7 @@ public class DistributedBackgroundJobModel
     /// <summary>
     /// The id of the job.
     /// </summary>
-    public int? Id { get; set; }
+    public int Id { get; set; }
 
     /// <summary>
     /// Name of job.

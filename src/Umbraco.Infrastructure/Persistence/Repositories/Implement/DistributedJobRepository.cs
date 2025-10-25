@@ -90,7 +90,7 @@ internal class DistributedJobRepository(IScopeAccessor scopeAccessor) : IDistrib
     private DistributedJobDto MapToDto(DistributedBackgroundJobModel model) =>
         new()
         {
-            Id = model.Id ?? 0,
+            Id = model.Id,
             Name = model.Name,
             Period = model.Period.Ticks,
             LastRun = model.LastRun,
