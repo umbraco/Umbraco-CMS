@@ -22,6 +22,9 @@ export class UmbPropertyEditorUIIconPickerElement
 	@property({ type: Boolean })
 	mandatory = false;
 
+	@property({ type: Boolean })
+	hideColors = false;
+
 	protected override firstUpdated(): void {
 		this.addValidator(
 			'valueMissing',
@@ -70,7 +73,7 @@ export class UmbPropertyEditorUIIconPickerElement
 				icon: this._icon,
 				color: this._color,
 			},
-			data: { placeholder: this._placeholderIcon, showEmptyOption: !this.mandatory },
+			data: { placeholder: this._placeholderIcon, showEmptyOption: !this.mandatory, hideColors: this.hideColors },
 		}).catch(() => undefined);
 
 		if (!data) return;
