@@ -91,8 +91,8 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 							this._colorList.map(
 								(color) => html`
 									<uui-color-swatch
-										label=${color.alias}
-										title=${color.alias}
+										label=${color.name ?? color.alias}
+										title=${color.name ?? color.alias}
 										value=${color.alias}
 										style="--uui-swatch-color: var(${color.varName})">
 									</uui-color-swatch>
