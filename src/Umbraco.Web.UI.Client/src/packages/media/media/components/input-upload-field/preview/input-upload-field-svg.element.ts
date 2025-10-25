@@ -19,6 +19,7 @@ export default class UmbInputUploadFieldSvgElement extends UmbLitElement impleme
 				min-width: 240px;
 				min-height: 240px;
 				max-height: 400px;
+				height: 100%;
 				width: fit-content;
 				max-width: 100%;
 				display: flex;
