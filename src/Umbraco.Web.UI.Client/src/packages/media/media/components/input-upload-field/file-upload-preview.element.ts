@@ -50,7 +50,7 @@ export class UmbFileUploadPreviewElement extends UmbLitElement implements UmbFil
 
 		// Check for an exact match
 		const exactMatch = manifests.find((manifest) => {
-			return stringOrStringArrayContains(manifest.forMimeTypes, mimeType);
+			return stringOrStringArrayContains(manifest.forMimeTypes, mimeType!);
 		});
 
 		if (exactMatch) {
@@ -63,8 +63,8 @@ export class UmbFileUploadPreviewElement extends UmbLitElement implements UmbFil
 			const forMimeTypes = Array.isArray(manifest.forMimeTypes) ? manifest.forMimeTypes : [manifest.forMimeTypes];
 			return forMimeTypes.find((type) => {
 				const snippet = type.replace(/\*/g, '');
-				if (mimeType.startsWith(snippet)) return manifest.alias;
-				if (mimeType.endsWith(snippet)) return manifest.alias;
+				if (mimeType!.startsWith(snippet)) return manifest.alias;
+				if (mimeType!.endsWith(snippet)) return manifest.alias;
 				return undefined;
 			});
 		});
