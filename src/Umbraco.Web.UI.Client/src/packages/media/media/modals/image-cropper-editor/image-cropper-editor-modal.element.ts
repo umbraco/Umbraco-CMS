@@ -250,6 +250,12 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 				flex: 1;
 			}
 
+			umb-input-upload-field-svg {
+				max-height: calc(100% - var(--uui-size-10) * 2);
+				padding-block-start: var(--uui-size-10);
+				padding-block-end: var(--uui-size-10);
+			}
+
 			#main {
 				flex: 1;
 				background-color: var(--uui-color-surface);
