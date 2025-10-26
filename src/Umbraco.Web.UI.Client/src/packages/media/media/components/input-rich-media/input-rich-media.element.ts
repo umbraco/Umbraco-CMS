@@ -368,6 +368,19 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		}
 	}
 
+	async #onCopy(item: UmbRichMediaCardModel) {
+		// Copy the media unique identifier to clipboard
+		// This allows users to easily reference media items
+		try {
+			await navigator.clipboard.writeText(item.media);
+			// Show success notification using localized message
+			const message = this.localize.term('general_copied');
+			console.log(`Media ID copied: ${item.media}`);
+		} catch (error) {
+			console.error('Failed to copy media ID:', error);
+		}
+	}
+
 	async #onUploadCompleted(e: UmbDropzoneChangeEvent) {
 		if (this.readonly) return;
 
@@ -448,6 +461,9 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		if (this.readonly) return nothing;
 		return html`
 			<uui-action-bar slot="actions">
+				<uui-button label=${this.localize.term('general_copy')} look="secondary" @click=${() => this.#onCopy(item)}>
+					<uui-icon name="icon-clipboard-copy"></uui-icon>
+				</uui-button>
 				<uui-button label=${this.localize.term('general_remove')} look="secondary" @click=${() => this.#onRemove(item)}>
 					<uui-icon name="icon-trash"></uui-icon>
 				</uui-button>
