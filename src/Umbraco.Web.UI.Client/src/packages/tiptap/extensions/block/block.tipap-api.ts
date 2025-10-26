@@ -3,6 +3,7 @@ import { distinctUntilChanged } from '@umbraco-cms/backoffice/external/rxjs';
 import { Node } from '@umbraco-cms/backoffice/external/tiptap';
 import { UMB_BLOCK_RTE_DATA_CONTENT_KEY } from '@umbraco-cms/backoffice/rte';
 import { UMB_BLOCK_RTE_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/block-rte';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbBlockDataModel } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockRteLayoutModel } from '@umbraco-cms/backoffice/block-rte';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -56,6 +57,35 @@ const umbRteBlock = Node.create({
 				},
 		};
 	},
+
+	onPaste() {
+		// Generate new contentKeys for pasted blocks to avoid duplication
+		return (view: any, event: ClipboardEvent) => {
+			const html = event.clipboardData?.getData('text/html');
+			if (!html) return false;
+
+			// Check if the pasted content contains blocks
+			if (html.includes('umb-rte-block')) {
+				// Replace contentKeys with new unique IDs
+				const modifiedHtml = html.replace(
+					/data-content-key="([^"]*)"/g,
+					() => `data-content-key="${UmbId.new()}"`
+				);
+
+				// Insert the modified content
+				const parser = new DOMParser();
+				const doc = parser.parseFromString(modifiedHtml, 'text/html');
+				const content = Array.from(doc.body.childNodes);
+
+				view.dispatch(view.state.tr.replaceSelectionWith(
+					view.state.schema.nodeFromDOM(doc.body).content
+				));
+
+				return true; // Prevent default paste behavior
+			}
+			return false;
+		};
+	},
 });
 
 const umbRteBlockInline = umbRteBlock.extend({
@@ -82,6 +112,34 @@ const umbRteBlockInline = umbRteBlock.extend({
 						attrs,
 					});
 				},
+		};
+	},
+
+	onPaste() {
+		// Generate new contentKeys for pasted inline blocks to avoid duplication
+		return (view: any, event: ClipboardEvent) => {
+			const html = event.clipboardData?.getData('text/html');
+			if (!html) return false;
+
+			// Check if the pasted content contains inline blocks
+			if (html.includes('umb-rte-block-inline')) {
+				// Replace contentKeys with new unique IDs
+				const modifiedHtml = html.replace(
+					/data-content-key="([^"]*)"/g,
+					() => `data-content-key="${UmbId.new()}"`
+				);
+
+				// Insert the modified content
+				const parser = new DOMParser();
+				const doc = parser.parseFromString(modifiedHtml, 'text/html');
+
+				view.dispatch(view.state.tr.replaceSelectionWith(
+					view.state.schema.nodeFromDOM(doc.body).content
+				));
+
+				return true; // Prevent default paste behavior
+			}
+			return false;
 		};
 	},
 });
