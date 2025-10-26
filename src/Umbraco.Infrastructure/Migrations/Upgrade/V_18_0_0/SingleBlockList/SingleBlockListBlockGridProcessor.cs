@@ -4,8 +4,13 @@ using Umbraco.Cms.Core.Models.Blocks;
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_18_0_0.SingleBlockList;
 
 [Obsolete("Will be removed in V22")] // Available in v17, activated in v18. Migration needs to work on LTS to LTS 17=>21
-public class SingleBlockListBlockGridProcessor : ITypedSingleBlockListProcessor
+public class SingleBlockListBlockGridProcessor : SingleBlockBlockProcessorBase, ITypedSingleBlockListProcessor
 {
+    public SingleBlockListBlockGridProcessor(SingleBlockListConfigurationCache blockListConfigurationCache)
+        : base(blockListConfigurationCache)
+    {
+    }
+
     public Type PropertyEditorValueType => typeof(BlockGridValue);
 
     public IEnumerable<string> PropertyEditorAliases => [Constants.PropertyEditors.Aliases.BlockGrid];
@@ -24,14 +29,19 @@ public class SingleBlockListBlockGridProcessor : ITypedSingleBlockListProcessor
 
         bool hasChanged = false;
 
-        foreach (BlockItemData blockItemData in blockValue.ContentData)
+        foreach (BlockItemData contentData in blockValue.ContentData)
         {
-            foreach (BlockPropertyValue blockPropertyValue in blockItemData.Values)
+            if (ProcessBlockItemDataValues(contentData, processNested, processOuterValue))
             {
-                if (processNested.Invoke(blockPropertyValue.Value))
-                {
-                    hasChanged = true;
-                }
+                hasChanged = true;
+            }
+        }
+
+        foreach (BlockItemData settingsData in blockValue.SettingsData)
+        {
+            if (ProcessBlockItemDataValues(settingsData, processNested, processOuterValue))
+            {
+                hasChanged = true;
             }
         }
 

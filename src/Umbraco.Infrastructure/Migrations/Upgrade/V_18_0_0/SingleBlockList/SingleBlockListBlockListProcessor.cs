@@ -1,22 +1,15 @@
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
-using Umbraco.Cms.Core.Strings;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_18_0_0.SingleBlockList;
 
 [Obsolete("Will be removed in V22")] // Available in v17, activated in v18. Migration needs to work on LTS to LTS 17=>21
-public class SingleBlockListBlockListProcessor : ITypedSingleBlockListProcessor
+public class SingleBlockListBlockListProcessor : SingleBlockBlockProcessorBase, ITypedSingleBlockListProcessor
 {
-    private readonly SingleBlockListConfigurationCache _blockListConfigurationCache;
-    private readonly IShortStringHelper _shortStringHelper;
-
     public SingleBlockListBlockListProcessor(
-        SingleBlockListConfigurationCache blockListConfigurationCache,
-        IShortStringHelper shortStringHelper)
+        SingleBlockListConfigurationCache blockListConfigurationCache)
+        : base(blockListConfigurationCache)
     {
-        _blockListConfigurationCache = blockListConfigurationCache;
-        _shortStringHelper = shortStringHelper;
     }
 
     public Type PropertyEditorValueType => typeof(BlockListValue);
@@ -38,39 +31,20 @@ public class SingleBlockListBlockListProcessor : ITypedSingleBlockListProcessor
         bool hasChanged = false;
 
         // there might be another list inside the single list so more recursion, yeeey!
-        foreach (BlockItemData blockItemData in blockValue.ContentData)
+        foreach (BlockItemData contentData in blockValue.ContentData)
         {
-            foreach (BlockPropertyValue blockPropertyValue in blockItemData.Values)
+            if (ProcessBlockItemDataValues(contentData, processNested, processOuterValue))
             {
-                if (processNested.Invoke(blockPropertyValue.Value))
-                {
-                    hasChanged = true;
-                }
-
-                if (_blockListConfigurationCache.IsPropertyEditorBlockListConfiguredAsSingle(
-                        blockPropertyValue.PropertyType!.DataTypeKey)
-                    && blockPropertyValue.Value is BlockListValue blockListValue)
-                {
-                    blockPropertyValue.Value = processOuterValue.Invoke(blockListValue);
-                    hasChanged = true;
-                }
+                hasChanged = true;
             }
+        }
 
-            blockItemData.Values = blockItemData.Values.Select(blockItemDataValue =>
-                    blockItemDataValue.Value is SingleBlockValue
-                        ? new BlockPropertyValue
-                        {
-                            Alias = blockItemDataValue.Alias,
-                            Value = blockItemDataValue.Value,
-                            Culture = blockItemDataValue.Culture,
-                            Segment = blockItemDataValue.Segment,
-                            PropertyType = new PropertyType(
-                                _shortStringHelper,
-                                Constants.PropertyEditors.Aliases.SingleBlock,
-                                ValueStorageType.Ntext),
-                        }
-                        : blockItemDataValue)
-                .ToList();
+        foreach (BlockItemData settingsData in blockValue.SettingsData)
+        {
+            if (ProcessBlockItemDataValues(settingsData, processNested, processOuterValue))
+            {
+                hasChanged = true;
+            }
         }
 
         return hasChanged;
