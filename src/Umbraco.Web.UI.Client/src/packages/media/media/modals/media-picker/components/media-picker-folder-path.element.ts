@@ -94,10 +94,11 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 		});
 	}
 
-	async #addFolder(e: UUIInputEvent) {
+	async #addFolder(e: UUIInputEvent | KeyboardEvent) {
 		e.stopPropagation();
 
-		const newName = e.target.value as string;
+		const target = e.target as UUIInputElement;
+		const newName = target.value as string;
 		this._typingNewFolder = false;
 		if (!newName) return;
 
@@ -154,6 +155,13 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 						label="enter a name"
 						value="new folder name"
 						@blur=${this.#addFolder}
+						@keydown=${(e: KeyboardEvent) => {
+							if (e.key === 'Enter') {
+								this.#addFolder(e);
+							} else if (e.key === 'Escape') {
+								this._typingNewFolder = false;
+							}
+						}}
 						auto-width></uui-input>`
 				: html`<uui-button label="add folder" compact @click=${this.#focusFolderInput}>+</uui-button>`}
 		</div>`;
