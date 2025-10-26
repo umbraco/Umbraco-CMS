@@ -2,6 +2,8 @@ using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Cache.PropertyEditors;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
@@ -30,6 +32,8 @@ public class MigrateSingleBlockList : AsyncMigrationBase
     private readonly SingleBlockListProcessor _singleBlockListProcessor;
     private readonly IJsonSerializer _jsonSerializer;
     private readonly SingleBlockListConfigurationCache _blockListConfigurationCache;
+    private readonly IBlockEditorElementTypeCache _elementTypeCache;
+    private readonly AppCaches _appCaches;
     private readonly ILogger<MigrateSingleBlockList> _logger;
     private readonly IDataValueEditor _dummySingleBlockValueEditor;
 
@@ -47,8 +51,9 @@ public class MigrateSingleBlockList : AsyncMigrationBase
         SingleBlockListConfigurationCache blockListConfigurationCache,
         IDataValueEditorFactory dataValueEditorFactory,
         IIOHelper ioHelper,
-        IBlockValuePropertyIndexValueFactory blockValuePropertyIndexValueFactory
-        )
+        IBlockValuePropertyIndexValueFactory blockValuePropertyIndexValueFactory,
+        IBlockEditorElementTypeCache elementTypeCache,
+        AppCaches appCaches)
         : base(context)
     {
         _umbracoContextFactory = umbracoContextFactory;
@@ -61,6 +66,8 @@ public class MigrateSingleBlockList : AsyncMigrationBase
         _singleBlockListProcessor = singleBlockListProcessor;
         _jsonSerializer = jsonSerializer;
         _blockListConfigurationCache = blockListConfigurationCache;
+        _elementTypeCache = elementTypeCache;
+        _appCaches = appCaches;
 
         _dummySingleBlockValueEditor = new SingleBlockPropertyEditor(dataValueEditorFactory, jsonSerializer, ioHelper, blockValuePropertyIndexValueFactory).GetValueEditor();
     }
@@ -136,6 +143,11 @@ SET propertyEditorAlias = '{Constants.PropertyEditors.Aliases.SingleBlock}',
 WHERE nodeId IN (@0)";
         await Database.ExecuteAsync(updateSql, singleBlockListDataTypesIds);
 
+        // we need to clear the elementTypeCache so the second part of the migration can work with the update dataTypes
+        // and also the isolated/runtime Caches as that is what its build from in the default implementation
+        _elementTypeCache.ClearAll();
+        _appCaches.IsolatedCaches.ClearAllCaches();
+        _appCaches.RuntimeCache.Clear();
         RebuildCache = true;
 
         foreach (string propertyEditorAlias in updateItemsByPropertyEditorAlias.Keys)
@@ -198,6 +210,7 @@ WHERE nodeId IN (@0)";
 
                 updateItems.Add(updateItem!);
             }
+
             updateItemsByPropertyType[propertyType] = updateItems;
         }
 

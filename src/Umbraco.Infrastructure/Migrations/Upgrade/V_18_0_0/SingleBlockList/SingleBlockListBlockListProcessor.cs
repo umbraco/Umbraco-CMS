@@ -1,5 +1,7 @@
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
+using Umbraco.Cms.Core.Strings;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_18_0_0.SingleBlockList;
 
@@ -7,17 +9,21 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_18_0_0.SingleBlockList
 public class SingleBlockListBlockListProcessor : ITypedSingleBlockListProcessor
 {
     private readonly SingleBlockListConfigurationCache _blockListConfigurationCache;
+    private readonly IShortStringHelper _shortStringHelper;
 
-    public SingleBlockListBlockListProcessor(SingleBlockListConfigurationCache blockListConfigurationCache)
+    public SingleBlockListBlockListProcessor(
+        SingleBlockListConfigurationCache blockListConfigurationCache,
+        IShortStringHelper shortStringHelper)
     {
         _blockListConfigurationCache = blockListConfigurationCache;
+        _shortStringHelper = shortStringHelper;
     }
 
     public Type PropertyEditorValueType => typeof(BlockListValue);
 
     public IEnumerable<string> PropertyEditorAliases => [Constants.PropertyEditors.Aliases.BlockList];
 
-    public Func<object?, Func<object?, bool>, Func<BlockListValue,object>, bool> Process => ProcessBlocks;
+    public Func<object?, Func<object?, bool>, Func<BlockListValue, object>, bool> Process => ProcessBlocks;
 
     private bool ProcessBlocks(
         object? value,
@@ -49,6 +55,22 @@ public class SingleBlockListBlockListProcessor : ITypedSingleBlockListProcessor
                     hasChanged = true;
                 }
             }
+
+            blockItemData.Values = blockItemData.Values.Select(blockItemDataValue =>
+                    blockItemDataValue.Value is SingleBlockValue
+                        ? new BlockPropertyValue
+                        {
+                            Alias = blockItemDataValue.Alias,
+                            Value = blockItemDataValue.Value,
+                            Culture = blockItemDataValue.Culture,
+                            Segment = blockItemDataValue.Segment,
+                            PropertyType = new PropertyType(
+                                _shortStringHelper,
+                                Constants.PropertyEditors.Aliases.SingleBlock,
+                                ValueStorageType.Ntext),
+                        }
+                        : blockItemDataValue)
+                .ToList();
         }
 
         return hasChanged;
