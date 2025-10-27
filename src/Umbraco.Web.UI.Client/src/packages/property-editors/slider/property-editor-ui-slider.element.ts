@@ -10,12 +10,21 @@ import type {
 } from '@umbraco-cms/backoffice/property-editor';
 import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
+/**
+ *
+ * @param value
+ */
 function stringToValueObject(value: string | undefined): Partial<UmbSliderPropertyEditorUiValueObject> {
 	const [from, to] = (value ?? ',').split(',');
 	const fromNumber = makeNumberOrUndefined(from);
 	return { from: fromNumber, to: makeNumberOrUndefined(to, fromNumber) };
 }
 
+/**
+ *
+ * @param value
+ * @param fallback
+ */
 function makeNumberOrUndefined(value: string | undefined, fallback?: undefined | number) {
 	if (value === undefined) {
 		return fallback;
@@ -27,6 +36,11 @@ function makeNumberOrUndefined(value: string | undefined, fallback?: undefined |
 	return n;
 }
 
+/**
+ *
+ * @param value
+ * @param fallback
+ */
 function undefinedFallback(value: number | undefined, fallback: number) {
 	return value === undefined ? fallback : value;
 }

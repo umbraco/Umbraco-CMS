@@ -5,12 +5,21 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UUISliderEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY } from '@umbraco-cms/backoffice/validation';
 
+/**
+ *
+ * @param value
+ */
 function splitString(value: string | undefined): Partial<[number | undefined, number | undefined]> {
 	const [from, to] = (value ?? ',').split(',');
 	const fromNumber = makeNumberOrUndefined(from);
 	return [fromNumber, makeNumberOrUndefined(to, fromNumber)];
 }
 
+/**
+ *
+ * @param value
+ * @param fallback
+ */
 function makeNumberOrUndefined(value: string | undefined, fallback?: undefined | number) {
 	if (value === undefined) {
 		return fallback;
@@ -22,6 +31,11 @@ function makeNumberOrUndefined(value: string | undefined, fallback?: undefined |
 	return n;
 }
 
+/**
+ *
+ * @param value
+ * @param fallback
+ */
 function undefinedFallbackToString(value: number | undefined, fallback: number): string {
 	return (value === undefined ? fallback : value).toString();
 }
@@ -102,7 +116,6 @@ export class UmbInputSliderElement extends UmbFormControlMixin<string, typeof Um
 	constructor() {
 		super();
 
-		//It's not really necessary since the slider passes fallback values ​​from the first render, but if we ever decide to set them to undefined, we already support that.
 		this.addValidator(
 			'valueMissing',
 			() => this.requiredMessage ?? UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
