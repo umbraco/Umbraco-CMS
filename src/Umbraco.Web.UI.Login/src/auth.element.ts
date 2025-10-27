@@ -224,7 +224,7 @@ export default class UmbAuthElement extends UmbLitElement {
 			}
 
 			let retryCount = 0;
-			//Retries 40 times with a 50ms interval = 2 seconds
+			// Retries 40 times with a 50ms interval = 2 seconds
 			const maxRetries = 40;
 
 			// If not, we check periodically until it is available or we reach the max retries
