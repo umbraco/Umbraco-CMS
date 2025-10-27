@@ -108,7 +108,7 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 
 	#onAliasChange() {
 		// TODO: Why can I not get the correct value via event? Is it an issue in uui library too?
-		const alias = generateAlias(this._aliasInput.value.toString());
+		const alias = this._aliasInput.value.toString();
 		this.updateValue({ alias });
 	}
 
