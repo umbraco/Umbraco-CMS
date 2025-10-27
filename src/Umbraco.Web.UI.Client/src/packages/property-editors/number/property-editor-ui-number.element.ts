@@ -90,10 +90,6 @@ export class UmbPropertyEditorUINumberElement
 		this.addFormControlElement(this.shadowRoot!.querySelector('uui-input')!);
 	}
 
-	override focus() {
-		return this.shadowRoot?.querySelector('uui-input')?.focus();
-	}
-
 	#parseNumber(input: unknown): number | undefined {
 		const num = Number(input);
 		return Number.isFinite(num) ? num : undefined;

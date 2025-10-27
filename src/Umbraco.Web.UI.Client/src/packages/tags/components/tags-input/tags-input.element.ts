@@ -23,6 +23,10 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 
 	@property({ type: String })
 	culture?: string | null;
+	@property({ type: Boolean })
+	override required = false;
+	@property({ type: String })
+	override requiredMessage = 'This field is required';
 
 	@property({ type: Array })
 	public set items(newTags: string[]) {
