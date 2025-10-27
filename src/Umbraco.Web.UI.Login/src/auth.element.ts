@@ -186,7 +186,7 @@ export default class UmbAuthElement extends UmbLitElement {
 	_passwordInput?: HTMLInputElement;
 	_usernameLabel?: HTMLLabelElement;
 	_passwordLabel?: HTMLLabelElement;
-	_passwordShowPassswordToggleItem?: HTMLSpanElement;
+	_passwordShowPasswordToggleItem?: HTMLSpanElement;
 	_passwordShowPasswordToggleButton?: HTMLButtonElement;
 
 	#authContext = new UmbAuthContext(this, UMB_AUTH_CONTEXT);
