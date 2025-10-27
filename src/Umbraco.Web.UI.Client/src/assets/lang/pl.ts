@@ -864,9 +864,6 @@ export default {
 		help: 'Pomoc',
 		forms: 'Formularze',
 	},
-	help: {
-		theBestUmbracoVideoTutorials: 'Najlepsze filmy-samouczki Umbraco',
-	},
 	settings: {
 		defaulttemplate: 'Domyślny szablon',
 		importDocumentTypeHelp:
