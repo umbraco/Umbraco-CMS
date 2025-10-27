@@ -10,7 +10,7 @@ const manifest: ManifestPropertyEditorUi = {
 		label: 'Entity Data Picker',
 		icon: 'icon-page-add',
 		group: 'pickers',
-		propertyEditorSchemaAlias: 'Umbraco.Plain.Json',
+		propertyEditorSchemaAlias: 'Umbraco.EntityDataPicker',
 		supportsReadOnly: true,
 		supportsDataSource: {
 			enabled: true,
