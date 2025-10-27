@@ -26,11 +26,6 @@ steps:
       artifact: nupkg
       path: $(Agent.BuildDirectory)/app/nupkg
 
-  - task: NodeTool@0
-    displayName: Use Node.js $(nodeVersion)
-    inputs:
-      versionSpec: $(nodeVersion)
-
   - task: UseDotNet@2
     displayName: Use .NET SDK from global.json
     inputs:
@@ -45,19 +40,10 @@ steps:
     displayName: Generate .env
     workingDirectory: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest
 
-  # Cache and restore NPM packages
-  - task: Cache@2
-    displayName: Cache NPM packages
-    inputs:
-      key: 'npm_e2e | "$(Agent.OS)" | $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/package-lock.json'
-      restoreKeys: |
-        npm_e2e | "$(Agent.OS)"
-        npm_e2e
-      path: ${{ parameters.npm_config_cache }}
-
-  - script: npm ci --no-fund --no-audit --prefer-offline
-    workingDirectory: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest
-    displayName: Restore NPM packages
+  - template: templates/e2e-install.yml
+    parameters:
+      nodeVersion: ${{ parameters.nodeVersion }}
+      npm_config_cache: ${{ parameters.npm_config_cache }}
 
   # Install Template
   - pwsh: |

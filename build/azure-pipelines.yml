@@ -168,6 +168,32 @@ stages:
             artifact: bom-frontend
             displayName: 'Publish Frontend BOM'
 
+  - stage: E2E_BOM
+    displayName: E2E Tests BOM Generation
+    dependsOn: []
+    jobs:
+    - job:
+      displayName: E2E Generate BOM
+      pool:
+        vmImage: "ubuntu-latest"
+      steps:
+        - checkout: self
+          submodules: false
+          lfs: false,
+          fetchDepth: 500
+        - template: templates/e2e-install.yml
+          parameters:
+            nodeVersion: ${{ variables.nodeVersion }}
+            npm_config_cache: ${{ variables.npm_config_cache }}
+        - script: |
+            npm install --global @cyclonedx/cyclonedx-npm
+            cyclonedx-npm -o $(Build.ArtifactStagingDirectory)/bom/bom-e2e.xml --ignore-npm-errors --verbose
+          displayName: Generate E2E Tests BOM
+          workingDirectory: tests/Umbraco.Tests.AcceptanceTest
+        - publish: $(Build.ArtifactStagingDirectory)/bom
+          artifact: bom-e2e
+          displayName: 'Publish E2E BOM'
+
   - stage: Build_Docs
     condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.buildApiDocs}}))
     displayName: Prepare API Documentation
@@ -276,6 +302,7 @@ stages:
     displayName: Dependency Track
     dependsOn:
       - Build
+      - E2E_BOM
     condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.uploadDependencyTrack}}))
     variables:
       umbracoVersion: $[ stageDependencies.Build.A.outputs['build.NBGV_NuGetPackageVersion'] ]
@@ -294,6 +321,9 @@ stages:
             - name: "Backoffice"
               artifact: "bom-frontend"
               bomFilePath: "bom-backoffice.xml"
+            - name: "E2E"
+              artifact: "bom-e2e"
+              bomFilePath: "bom-e2e.xml"
   ###############################################
   ## Test
   ###############################################
