@@ -107,6 +107,16 @@ stages:
               command: build
               projects: $(solution)
               arguments: "--configuration $(buildConfiguration) --no-restore --property:ContinuousIntegrationBuild=true --property:GeneratePackageOnBuild=true --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg"
+          - script: |
+              dotnet tool install --global CycloneDX
+              dotnet-CycloneDX $(solution) --output $(Build.ArtifactStagingDirectory)/bom --filename bom-dotnet.xml
+            displayName: 'Generate Backend BOM'
+          - script: |
+              npm install --global @cyclonedx/cyclonedx-npm
+              cyclonedx-npm -o $(Build.ArtifactStagingDirectory)/bom/bom-login.xml --ignore-npm-errors --verbose
+              ls -la $(Build.ArtifactStagingDirectory)/bom/
+            displayName: Generate Login UI BOM
+            workingDirectory: src/Umbraco.Web.UI.Login
           - task: PublishPipelineArtifact@1
             displayName: Publish nupkg
             inputs:
@@ -117,14 +127,11 @@ stages:
             inputs:
               targetPath: $(Build.SourcesDirectory)
               artifactName: build_output
-          - script: |
-              dotnet tool install --global CycloneDX
-              dotnet-CycloneDX $(solution) --output $(Build.ArtifactStagingDirectory)/bom --filename bom-dotnet.xml
-            name: Generate_Backend_BOM
-            displayName: 'Generate Backend BOM'
-          - publish: $(Build.ArtifactStagingDirectory)/bom
-            artifact: bom-backend
-            displayName: 'Publish Backend BOM'
+          - task: PublishPipelineArtifact@1
+            displayName: Publish Backend BOM
+            inputs:
+              targetPath: $(Build.ArtifactStagingDirectory)/bom
+              artifactName: bom-backend
 
       - job: B
         displayName: Build Bellissima Package
@@ -138,8 +145,7 @@ stages:
           - template: templates/backoffice-install.yml
           - script: |
               npm install --global @cyclonedx/cyclonedx-npm
-              cyclonedx-npm -o $(Build.ArtifactStagingDirectory)/bom/bom-backoffice.xml --ignore-npm-errors
-            name: Generate_Backoffice_UI_BOM
+              cyclonedx-npm -o $(Build.ArtifactStagingDirectory)/bom/bom-backoffice.xml --ignore-npm-errors --verbose
             displayName: Generate Backoffice UI BOM
             workingDirectory: src/Umbraco.Web.UI.Client
           - script: npm run build:for:npm
@@ -282,6 +288,9 @@ stages:
             - name: "Backend"
               artifact: "bom-backend"
               bomFilePath: "bom-dotnet.xml"
+            - name: "Login"
+              artifact: "bom-backend"
+              bomFilePath: "bom-login.xml"
             - name: "Backoffice"
               artifact: "bom-frontend"
               bomFilePath: "bom-backoffice.xml"
