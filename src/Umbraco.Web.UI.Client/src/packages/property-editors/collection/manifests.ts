@@ -1,4 +1,3 @@
-import { manifest as bulkActionPermissions } from './config/bulk-action-permissions/manifests.js';
 import { manifest as columnConfiguration } from './config/column/manifests.js';
 import { manifest as layoutConfiguration } from './config/layout/manifests.js';
 import { manifest as orderBy } from './config/order-by/manifests.js';
@@ -46,6 +45,7 @@ const propertyEditorUiManifest: ManifestPropertyEditorUi = {
 					label: 'Workspace View icon',
 					description: "The icon for the Collection's Workspace View.",
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.IconPicker',
+					config: [{ alias: 'placeholder', value: 'icon-grid' }],
 				},
 				{
 					alias: 'tabName',
@@ -87,7 +87,6 @@ const propertyEditorUiManifest: ManifestPropertyEditorUi = {
 
 export const manifests: Array<UmbExtensionManifest> = [
 	propertyEditorUiManifest,
-	bulkActionPermissions,
 	columnConfiguration,
 	layoutConfiguration,
 	orderBy,

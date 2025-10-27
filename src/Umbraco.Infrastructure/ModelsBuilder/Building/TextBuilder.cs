@@ -384,7 +384,11 @@ public class TextBuilder : Builder
 
         sb.AppendFormat("\t\t[ImplementPropertyType(\"{0}\")]\n", property.Alias);
 
-        sb.Append("\t\tpublic virtual ");
+        sb.Append("\t\tpublic ");
+        if (Config.GenerateVirtualProperties)
+        {
+            sb.Append("virtual ");
+        }
         WriteClrType(sb, property.ClrTypeName);
 
         sb.AppendFormat(
@@ -460,7 +464,11 @@ public class TextBuilder : Builder
 
         if (mixinStatic)
         {
-            sb.Append("\t\tpublic virtual ");
+            sb.Append("\t\tpublic ");
+            if (Config.GenerateVirtualProperties)
+            {
+                sb.Append("virtual ");
+            }
             WriteClrType(sb, property.ClrTypeName);
             sb.AppendFormat(
                 " {0} => {1}(this, _publishedValueFallback);\n",
@@ -468,7 +476,11 @@ public class TextBuilder : Builder
         }
         else
         {
-            sb.Append("\t\tpublic virtual ");
+            sb.Append("\t\tpublic ");
+            if (Config.GenerateVirtualProperties)
+            {
+                sb.Append("virtual ");
+            }
             WriteClrType(sb, property.ClrTypeName);
             sb.AppendFormat(
                 " {0} => this.Value",

@@ -20,6 +20,7 @@ export class UmbDataTypeServerDataSource
 	implements UmbDetailDataSource<UmbDataTypeDetailModel>
 {
 	#detailRequestManager = new UmbManagementApiDataTypeDetailDataRequestManager(this);
+	#editorDataSourceAlias = 'umbEditorDataSource';
 
 	/**
 	 * Creates a new Data Type scaffold
@@ -69,6 +70,17 @@ export class UmbDataTypeServerDataSource
 		if (!model.editorAlias) throw new Error('Property Editor Alias is missing');
 		if (!model.editorUiAlias) throw new Error('Property Editor UI Alias is missing');
 
+		const values = [...model.values];
+
+		if (model.editorDataSourceAlias) {
+			const editorDataSourceValue = {
+				alias: this.#editorDataSourceAlias,
+				value: model.editorDataSourceAlias,
+			};
+
+			values.unshift(editorDataSourceValue);
+		}
+
 		// TODO: make data mapper to prevent errors
 		const body: CreateDataTypeRequestModel = {
 			id: model.unique,
@@ -76,7 +88,7 @@ export class UmbDataTypeServerDataSource
 			name: model.name,
 			editorAlias: model.editorAlias,
 			editorUiAlias: model.editorUiAlias,
-			values: model.values,
+			values,
 		};
 
 		const { data, error } = await this.#detailRequestManager.create(body);
@@ -96,12 +108,23 @@ export class UmbDataTypeServerDataSource
 		if (!model.editorAlias) throw new Error('Property Editor Alias is missing');
 		if (!model.editorUiAlias) throw new Error('Property Editor UI Alias is missing');
 
+		const values = [...model.values];
+
+		if (model.editorDataSourceAlias) {
+			const editorDataSourceValue = {
+				alias: this.#editorDataSourceAlias,
+				value: model.editorDataSourceAlias,
+			};
+
+			values.unshift(editorDataSourceValue);
+		}
+
 		// TODO: make data mapper to prevent errors
 		const body: UpdateDataTypeRequestModel = {
 			name: model.name,
 			editorAlias: model.editorAlias,
 			editorUiAlias: model.editorUiAlias,
-			values: model.values,
+			values,
 		};
 
 		const { data, error } = await this.#detailRequestManager.update(model.unique, body);
@@ -122,13 +145,26 @@ export class UmbDataTypeServerDataSource
 
 	// TODO: change this to a mapper extension when the endpoints returns a $type for DataTypeResponseModel
 	#mapServerResponseModelToEntityDetailModel(data: DataTypeResponseModel): UmbDataTypeDetailModel {
+		let values = data.values as Array<UmbDataTypePropertyValueModel>;
+		const index = values?.findIndex((x) => x.alias === this.#editorDataSourceAlias);
+
+		let editorDataSourceAlias;
+
+		/* Remove the editorDataSourceAlias from the values collection
+		 to prevent it from being treated as a regular config value. */
+		if (index !== -1) {
+			editorDataSourceAlias = values?.[index].value as string | null;
+			values = values?.filter((value) => value.alias !== this.#editorDataSourceAlias) ?? [];
+		}
+
 		return {
 			entityType: UMB_DATA_TYPE_ENTITY_TYPE,
 			unique: data.id,
 			name: data.name,
 			editorAlias: data.editorAlias,
 			editorUiAlias: data.editorUiAlias || null,
-			values: data.values as Array<UmbDataTypePropertyValueModel>,
+			editorDataSourceAlias: editorDataSourceAlias,
+			values,
 		};
 	}
 }

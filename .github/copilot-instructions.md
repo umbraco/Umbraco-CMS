@@ -94,11 +94,18 @@ The solution contains 30 C# projects organized as follows:
 
 ## Common Tasks
 
-### Frontend Development
-For frontend-only changes:
-1. Configure backend for frontend development:
-   ```json
-   <!-- Add to src/Umbraco.Web.UI/appsettings.json under Umbraco:Cms:Security: -->
+### Running Umbraco in Different Modes
+
+**Production Mode (Standard Development)**
+Use this for backend development, testing full builds, or when you don't need hot reloading:
+1. Build frontend assets: `cd src/Umbraco.Web.UI.Client && npm run build:for:cms`
+2. Run backend: `cd src/Umbraco.Web.UI && dotnet run --no-build`
+3. Access backoffice: `https://localhost:44339/umbraco`
+4. Application uses compiled frontend from `wwwroot/umbraco/backoffice/`
+
+**Vite Dev Server Mode (Frontend Development with Hot Reload)**
+Use this for frontend-only development with hot module reloading:
+1. Configure backend for frontend development - Add to `src/Umbraco.Web.UI/appsettings.json` under `Umbraco:CMS:Security`:
    ```json
    "BackOfficeHost": "http://localhost:5173",
    "AuthorizeCallbackPathName": "/oauth_complete",
@@ -107,6 +114,10 @@ For frontend-only changes:
    ```
 2. Run backend: `cd src/Umbraco.Web.UI && dotnet run --no-build`
 3. Run frontend dev server: `cd src/Umbraco.Web.UI.Client && npm run dev:server`
+4. Access backoffice: `http://localhost:5173/` (no `/umbraco` prefix)
+5. Changes to TypeScript/Lit files hot reload automatically
+
+**Important:** Remove the `BackOfficeHost` configuration before committing or switching back to production mode.
 
 ### Backend-Only Development
 For backend-only changes, disable frontend builds:

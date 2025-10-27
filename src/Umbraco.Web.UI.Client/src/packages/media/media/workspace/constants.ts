@@ -10,4 +10,5 @@ export const UMB_MEMBER_DETAIL_MODEL_VARIANT_SCAFFOLD: UmbMediaVariantModel = {
 	name: '',
 	createDate: null,
 	updateDate: null,
+	flags: [],
 } as const;

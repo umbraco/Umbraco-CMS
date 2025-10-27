@@ -5,8 +5,7 @@ import { customElement, html, state } from '@umbraco-cms/backoffice/external/lit
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbWorkspaceSplitViewVariantSelectorElement } from '@umbraco-cms/backoffice/workspace';
 
-const elementName = 'umb-document-workspace-split-view-variant-selector';
-@customElement(elementName)
+@customElement('umb-document-workspace-split-view-variant-selector')
 export class UmbDocumentWorkspaceSplitViewVariantSelectorElement extends UmbWorkspaceSplitViewVariantSelectorElement<UmbDocumentVariantOptionModel> {
 	protected override _variantSorter = sortVariants;
 
@@ -23,6 +22,7 @@ export class UmbDocumentWorkspaceSplitViewVariantSelectorElement extends UmbWork
 		// We should also make our own state model for this
 		[DocumentVariantStateModel.PUBLISHED_PENDING_CHANGES]: 'content_published',
 		[DocumentVariantStateModel.NOT_CREATED]: 'content_notCreated',
+		[DocumentVariantStateModel.TRASHED]: 'mediaPicker_trashed',
 	};
 
 	constructor() {
@@ -68,6 +68,6 @@ export class UmbDocumentWorkspaceSplitViewVariantSelectorElement extends UmbWork
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbDocumentWorkspaceSplitViewVariantSelectorElement;
+		'umb-document-workspace-split-view-variant-selector': UmbDocumentWorkspaceSplitViewVariantSelectorElement;
 	}
 }

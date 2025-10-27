@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -196,9 +197,7 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
         // then nodeName will be matched normally with wildcards
         // the rest will be normal without wildcards
 
-        var allLangs = _languageService.GetAllAsync().GetAwaiter().GetResult()
-            .Select(x => x.IsoCode.ToLowerInvariant())
-            .ToList();
+        var allLangs = _languageService.GetAllIsoCodesAsync().GetAwaiter().GetResult().Select(x => x.ToLowerInvariant()).ToList();
 
         // the chars [*-_] in the query will mess everything up so let's remove those
         // However we cannot just remove - and _  since these signify a space, so we instead replace them with that.

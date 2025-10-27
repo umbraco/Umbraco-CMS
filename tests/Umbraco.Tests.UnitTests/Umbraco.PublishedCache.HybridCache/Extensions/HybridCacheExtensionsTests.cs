@@ -1,6 +1,8 @@
+using System;
 using Microsoft.Extensions.Caching.Hybrid;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Infrastructure.HybridCache;
 using Umbraco.Cms.Infrastructure.HybridCache.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.PublishedCache.HybridCache.Extensions;
@@ -27,20 +29,20 @@ public class HybridCacheExtensionsTests
     {
         // Arrange
         string key = "test-key";
-        var expectedValue = "test-value";
+        var expectedValue = new ContentCacheNode { Id = 1234 };
 
         _cacheMock
             .Setup(cache => cache.GetOrCreateAsync(
                 key,
-                null!,
-                It.IsAny<Func<object, CancellationToken, ValueTask<object>>>(),
+                It.IsAny<Func<CancellationToken, ValueTask<ContentCacheNode?>>>(),
+                It.IsAny<Func<Func<CancellationToken, ValueTask<ContentCacheNode?>>, CancellationToken, ValueTask<ContentCacheNode?>>>(),
                 It.IsAny<HybridCacheEntryOptions>(),
                 null,
                 CancellationToken.None))
             .ReturnsAsync(expectedValue);
 
         // Act
-        var exists = await HybridCacheExtensions.ExistsAsync(_cacheMock.Object, key);
+        var exists = await HybridCacheExtensions.ExistsAsync<ContentCacheNode?>(_cacheMock.Object, key, CancellationToken.None);
 
         // Assert
         Assert.IsTrue(exists);
@@ -55,24 +57,24 @@ public class HybridCacheExtensionsTests
         _cacheMock
             .Setup(cache => cache.GetOrCreateAsync(
                 key,
-                null!,
-                It.IsAny<Func<object, CancellationToken, ValueTask<object>>>(),
+                It.IsAny<Func<CancellationToken, ValueTask<ContentCacheNode?>>>(),
+                It.IsAny<Func<Func<CancellationToken, ValueTask<ContentCacheNode?>>, CancellationToken, ValueTask<ContentCacheNode?>>>(),
                 It.IsAny<HybridCacheEntryOptions>(),
                 null,
                 CancellationToken.None))
             .Returns((
                 string key,
-                object? state,
-                Func<object, CancellationToken, ValueTask<object>> factory,
+                Func<CancellationToken, ValueTask<ContentCacheNode?>> state,
+                Func<Func<CancellationToken, ValueTask<ContentCacheNode?>>, CancellationToken, ValueTask<ContentCacheNode?>> factory,
                 HybridCacheEntryOptions? options,
                 IEnumerable<string>? tags,
                 CancellationToken token) =>
             {
-                return factory(state!, token);
+                return factory(state, token);
             });
 
         // Act
-        var exists = await HybridCacheExtensions.ExistsAsync(_cacheMock.Object, key);
+        var exists = await HybridCacheExtensions.ExistsAsync<ContentCacheNode?>(_cacheMock.Object, key, CancellationToken.None);
 
         // Assert
         Assert.IsFalse(exists);
@@ -88,15 +90,15 @@ public class HybridCacheExtensionsTests
         _cacheMock
             .Setup(cache => cache.GetOrCreateAsync(
                 key,
-                null!,
-                It.IsAny<Func<object, CancellationToken, ValueTask<string>>>(),
+                It.IsAny<Func<CancellationToken, ValueTask<string>>>(),
+                It.IsAny<Func<Func<CancellationToken, ValueTask<string>>, CancellationToken, ValueTask<string>>>(),
                 It.IsAny<HybridCacheEntryOptions>(),
                 null,
                 CancellationToken.None))
             .ReturnsAsync(expectedValue);
 
         // Act
-        var (exists, value) = await HybridCacheExtensions.TryGetValueAsync<string>(_cacheMock.Object, key);
+        var (exists, value) = await HybridCacheExtensions.TryGetValueAsync<string>(_cacheMock.Object, key, CancellationToken.None);
 
         // Assert
         Assert.IsTrue(exists);
@@ -113,15 +115,15 @@ public class HybridCacheExtensionsTests
         _cacheMock
             .Setup(cache => cache.GetOrCreateAsync(
                 key,
-                null!,
-                It.IsAny<Func<object, CancellationToken, ValueTask<int>>>(),
+                It.IsAny<Func<CancellationToken, ValueTask<int>>>(),
+                It.IsAny<Func<Func<CancellationToken, ValueTask<int>>, CancellationToken, ValueTask<int>>>(),
                 It.IsAny<HybridCacheEntryOptions>(),
                 null,
                 CancellationToken.None))
             .ReturnsAsync(expectedValue);
 
         // Act
-        var (exists, value) = await HybridCacheExtensions.TryGetValueAsync<int>(_cacheMock.Object, key);
+        var (exists, value) = await HybridCacheExtensions.TryGetValueAsync<int>(_cacheMock.Object, key, CancellationToken.None);
 
         // Assert
         Assert.IsTrue(exists);
@@ -137,15 +139,15 @@ public class HybridCacheExtensionsTests
         _cacheMock
             .Setup(cache => cache.GetOrCreateAsync(
                 key,
-                null!,
-                It.IsAny<Func<object, CancellationToken, ValueTask<object>>>(),
+                It.IsAny<Func<CancellationToken, ValueTask<object>>>(),
+                It.IsAny<Func<Func<CancellationToken, ValueTask<object>>, CancellationToken, ValueTask<object>>>(),
                 It.IsAny<HybridCacheEntryOptions>(),
                 null,
                 CancellationToken.None))
             .ReturnsAsync(null!);
 
         // Act
-        var (exists, value) = await HybridCacheExtensions.TryGetValueAsync<int?>(_cacheMock.Object, key);
+        var (exists, value) = await HybridCacheExtensions.TryGetValueAsync<int?>(_cacheMock.Object, key, CancellationToken.None);
 
         // Assert
         Assert.IsTrue(exists);
@@ -159,16 +161,16 @@ public class HybridCacheExtensionsTests
         string key = "test-key";
 
         _cacheMock.Setup(cache => cache.GetOrCreateAsync(
-            key,
-            null,
-            It.IsAny<Func<object?, CancellationToken, ValueTask<string>>>(),
-            It.IsAny<HybridCacheEntryOptions>(),
-            null,
-            CancellationToken.None))
+                key,
+                It.IsAny<Func<CancellationToken, ValueTask<object>>>(),
+                It.IsAny<Func<Func<CancellationToken, ValueTask<object>>, CancellationToken, ValueTask<object>>>(),
+                It.IsAny<HybridCacheEntryOptions>(),
+                null,
+                CancellationToken.None))
             .Returns((
                 string key,
-                object? state,
-                Func<object?, CancellationToken, ValueTask<string>> factory,
+                Func<CancellationToken, ValueTask<object>> state,
+                Func<Func<CancellationToken, ValueTask<object>>, CancellationToken, ValueTask<object>> factory,
                 HybridCacheEntryOptions? options,
                 IEnumerable<string>? tags,
                 CancellationToken token) =>
@@ -177,7 +179,7 @@ public class HybridCacheExtensionsTests
             });
 
         // Act
-        var (exists, value) = await HybridCacheExtensions.TryGetValueAsync<string>(_cacheMock.Object, key);
+        var (exists, value) = await HybridCacheExtensions.TryGetValueAsync<object>(_cacheMock.Object, key, CancellationToken.None);
 
         // Assert
         Assert.IsFalse(exists);

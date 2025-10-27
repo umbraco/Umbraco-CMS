@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Infrastructure.BackgroundJobs;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
@@ -863,6 +864,25 @@ internal sealed class DatabaseDataCreator
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
+        ConditionalInsert(
+            Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
+            Constants.DataTypes.Guids.DateTimePickerWithTimeZone,
+            new NodeDto
+            {
+                NodeId = 1055,
+                Trashed = false,
+                ParentId = -1,
+                UserId = -1,
+                Level = 1,
+                Path = "-1,1055",
+                SortOrder = 2,
+                UniqueId = Constants.DataTypes.Guids.DateTimePickerWithTimeZoneGuid,
+                Text = "Date Time Picker (with time zone)",
+                NodeObjectType = Constants.ObjectTypes.DataType,
+                CreateDate = DateTime.UtcNow,
+            },
+            Constants.DatabaseSchema.Tables.Node,
+            "id");
     }
 
     private void CreateNodeDataForMediaTypes()
@@ -1058,6 +1078,8 @@ internal sealed class DatabaseDataCreator
         _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.WebhookLogs, Name = "WebhookLogs" });
         _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.LongRunningOperations, Name = "LongRunningOperations" });
         _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.DocumentUrls, Name = "DocumentUrls" });
+        _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.DistributedJobs, Name = "DistributedJobs" });
+        _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.CacheVersion, Name = "CacheVersion" });
     }
 
     private void CreateContentTypeData()
@@ -2300,6 +2322,22 @@ internal sealed class DatabaseDataCreator
                     DbType = "Ntext",
                     Configuration = "{\"filter\":\"" + ImageMediaTypeKey +
                                     "\", \"multiple\": true}",
+                });
+        }
+
+        if (_database.Exists<NodeDto>(1055))
+        {
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.DataType,
+                "pk",
+                false,
+                new DataTypeDto
+                {
+                    NodeId = 1055,
+                    EditorAlias = Constants.PropertyEditors.Aliases.DateTimeWithTimeZone,
+                    EditorUiAlias = "Umb.PropertyEditorUi.DateTimeWithTimeZonePicker",
+                    DbType = "Ntext",
+                    Configuration = "{\"timeFormat\": \"HH:mm\", \"timeZones\": {\"mode\": \"all\"}}",
                 });
         }
     }

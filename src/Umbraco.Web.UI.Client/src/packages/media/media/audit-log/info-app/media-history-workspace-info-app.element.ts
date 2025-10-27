@@ -173,6 +173,7 @@ export class UmbMediaHistoryWorkspaceInfoAppElement extends UmbLitElement {
 			}
 
 			.log-type uui-tag {
+				justify-self: center;
 				height: fit-content;
 				margin-top: auto;
 				margin-bottom: auto;

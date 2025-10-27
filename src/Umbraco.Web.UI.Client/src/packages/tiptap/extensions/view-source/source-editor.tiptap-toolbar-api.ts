@@ -1,8 +1,8 @@
 import { UmbTiptapToolbarElementApiBase } from '../tiptap-toolbar-element-api-base.js';
-import { UMB_CODE_EDITOR_MODAL } from '@umbraco-cms/backoffice/code-editor';
-import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import type { Editor } from '../../externals.js';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
+import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
+import { UMB_CODE_EDITOR_MODAL } from '@umbraco-cms/backoffice/code-editor';
 
 export default class UmbTiptapToolbarSourceEditorExtensionApi extends UmbTiptapToolbarElementApiBase {
 	#localize = new UmbLocalizationController(this);
@@ -21,6 +21,6 @@ export default class UmbTiptapToolbarSourceEditorExtensionApi extends UmbTiptapT
 
 		if (!data) return;
 
-		editor?.commands.setContent(data.content, true);
+		editor?.commands.setContent(data.content);
 	}
 }

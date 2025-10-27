@@ -57,7 +57,7 @@ export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
 	private _tableItems: Array<UmbTableItem> = [];
 
 	@state()
-	private _selection: Array<string | null> = [];
+	private _selection: Array<string> = [];
 
 	#collectionContext?: UmbUserGroupCollectionContext;
 
@@ -75,7 +75,7 @@ export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
 			this.#collectionContext = instance;
 			this.observe(
 				this.#collectionContext?.selection.selection,
-				(selection) => (this._selection = selection ?? []),
+				(selection) => (this._selection = selection?.filter((x) => x !== undefined && x !== null) ?? []),
 				'umbCollectionSelectionObserver',
 			);
 			this.observe(
@@ -207,8 +207,8 @@ export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
 				.columns=${this._tableColumns}
 				.items=${this._tableItems}
 				.selection=${this._selection}
-				@selected="${this.#onSelected}"
-				@deselected="${this.#onDeselected}"></umb-table>
+				@selected=${this.#onSelected}
+				@deselected=${this.#onDeselected}></umb-table>
 		`;
 	}
 

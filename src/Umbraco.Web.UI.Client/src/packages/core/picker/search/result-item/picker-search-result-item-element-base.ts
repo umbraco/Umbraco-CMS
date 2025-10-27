@@ -1,10 +1,10 @@
 import type { UmbPickerContext } from '../../picker.context.js';
 import { UMB_PICKER_CONTEXT } from '../../picker.context.token.js';
-import type { UmbNamedEntityModel } from '@umbraco-cms/backoffice/entity';
+import { getItemFallbackName, type UmbItemModel } from '@umbraco-cms/backoffice/entity-item';
 import { html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-export abstract class UmbPickerSearchResultItemElementBase<ItemType extends UmbNamedEntityModel> extends UmbLitElement {
+export abstract class UmbPickerSearchResultItemElementBase<ItemType extends UmbItemModel> extends UmbLitElement {
 	#item: ItemType | undefined;
 
 	protected pickerContext?: UmbPickerContext;
@@ -50,7 +50,7 @@ export abstract class UmbPickerSearchResultItemElementBase<ItemType extends UmbN
 		if (!item) return nothing;
 		return html`
 			<umb-ref-item
-				name=${item.name}
+				name="${item.name ?? getItemFallbackName(item)}"
 				select-only
 				?selectable=${!this.disabled}
 				?selected=${this._isSelected}

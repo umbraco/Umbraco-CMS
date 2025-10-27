@@ -133,7 +133,7 @@ internal sealed class MediaCacheService : IMediaCacheService
             return false;
         }
 
-        return await _hybridCache.ExistsAsync($"{keyAttempt.Result}");
+        return await _hybridCache.ExistsAsync<ContentCacheNode?>($"{keyAttempt.Result}", CancellationToken.None);
     }
 
     public async Task RefreshMediaAsync(IMedia media)
@@ -170,7 +170,7 @@ internal sealed class MediaCacheService : IMediaCacheService
 
                 var cacheKey = GetCacheKey(key, false);
 
-                var existsInCache = await _hybridCache.ExistsAsync(cacheKey);
+                var existsInCache = await _hybridCache.ExistsAsync<ContentCacheNode?>(cacheKey, CancellationToken.None);
                 if (existsInCache is false)
                 {
                     uncachedKeys.Add(key);

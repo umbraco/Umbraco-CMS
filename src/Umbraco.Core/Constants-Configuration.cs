@@ -57,6 +57,7 @@ public static partial class Constants
         public const string ConfigUserPassword = ConfigPrefix + "Security:UserPassword";
         public const string ConfigRichTextEditor = ConfigPrefix + "RichTextEditor";
         public const string ConfigPackageMigration = ConfigPrefix + "PackageMigration";
+        [Obsolete("No longer used in Umbraco. Scheduled to be removed in Umbraco 19.")]
         public const string ConfigContentDashboard = ConfigPrefix + "ContentDashboard";
         public const string ConfigHelpPage = ConfigPrefix + "HelpPage";
         public const string ConfigInstallDefaultData = ConfigPrefix + "InstallDefaultData";
@@ -65,6 +66,7 @@ public static partial class Constants
         public const string ConfigWebhook = ConfigPrefix + "Webhook";
         public const string ConfigWebhookPayloadType = ConfigWebhook + ":PayloadType";
         public const string ConfigCache = ConfigPrefix + "Cache";
+        public const string ConfigDistributedJobs = ConfigPrefix + "DistributedJobs";
 
         public static class NamedOptions
         {

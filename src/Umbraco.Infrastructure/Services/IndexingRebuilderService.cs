@@ -42,12 +42,6 @@ public class IndexingRebuilderService : IIndexingRebuilderService
     /// <inheritdoc />
     public async Task<bool> TryRebuildAsync(IIndex index, string indexName)
     {
-        // Remove it in case there's a handler there already
-        index.IndexOperationComplete -= Indexer_IndexOperationComplete;
-
-        // Now add a single handler
-        index.IndexOperationComplete += Indexer_IndexOperationComplete;
-
         try
         {
             Attempt<IndexRebuildResult> attempt = await _indexRebuilder.RebuildIndexAsync(indexName);
@@ -55,8 +49,6 @@ public class IndexingRebuilderService : IIndexingRebuilderService
         }
         catch (Exception exception)
         {
-            // Ensure it's not listening
-            index.IndexOperationComplete -= Indexer_IndexOperationComplete;
             _logger.LogError(exception, "An error occurred rebuilding index");
             return false;
         }
@@ -70,19 +62,4 @@ public class IndexingRebuilderService : IIndexingRebuilderService
     /// <inheritdoc />
     public Task<bool> IsRebuildingAsync(string indexName)
         => _indexRebuilder.IsRebuildingAsync(indexName);
-
-    private void Indexer_IndexOperationComplete(object? sender, EventArgs e)
-    {
-        var indexer = (IIndex?)sender;
-
-        _logger.LogDebug("Logging operation completed for index {IndexName}", indexer?.Name);
-
-        if (indexer is not null)
-        {
-            //ensure it's not listening anymore
-            indexer.IndexOperationComplete -= Indexer_IndexOperationComplete;
-        }
-
-        _logger.LogInformation("Rebuilding index '{IndexerName}' done.", indexer?.Name);
-    }
 }

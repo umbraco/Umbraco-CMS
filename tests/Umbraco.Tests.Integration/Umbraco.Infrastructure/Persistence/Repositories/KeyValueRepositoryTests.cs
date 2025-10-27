@@ -2,7 +2,9 @@
 // See LICENSE for more details.
 
 using Microsoft.Extensions.Logging;
+using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
@@ -64,5 +66,5 @@ internal sealed class KeyValueRepositoryTests : UmbracoIntegrationTest
     }
 
     private IKeyValueRepository CreateRepository(ICoreScopeProvider provider) =>
-        new KeyValueRepository((IScopeAccessor)provider, LoggerFactory.CreateLogger<KeyValueRepository>());
+        new KeyValueRepository((IScopeAccessor)provider, LoggerFactory.CreateLogger<KeyValueRepository>(),  Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
 }

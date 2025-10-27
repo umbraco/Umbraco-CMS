@@ -15,15 +15,15 @@ public sealed class HtmlLocalLinkParser
     // <a type="document" href="/{localLink:eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f}" title="other page">other page</a>
     internal static readonly Regex LocalLinkTagPattern = new(
         @"<a.+?href=['""](?<locallink>\/?{localLink:(?<guid>[a-fA-F0-9-]+)})[^>]*?>",
-        RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline);
+        RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
 
     internal static readonly Regex TypePattern = new(
         """type=['"](?<type>(?:media|document))['"]""",
-        RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+        RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
     internal static readonly Regex LocalLinkPattern = new(
         @"href=['""](?<locallink>\/?(?:\{|\%7B)localLink:(?<guid>[a-zA-Z0-9-://]+)(?:\}|\%7D))",
-        RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+        RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
     private readonly IPublishedUrlProvider _publishedUrlProvider;
 

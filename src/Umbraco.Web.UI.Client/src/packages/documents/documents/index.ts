@@ -13,6 +13,7 @@ export * from './publishing/index.js';
 export * from './recycle-bin/index.js';
 export * from './reference/index.js';
 export * from './repository/index.js';
+export * from './search/index.js';
 export * from './tree/index.js';
 export * from './url/index.js';
 export * from './user-permissions/index.js';
