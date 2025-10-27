@@ -1,3 +1,4 @@
+import { UMB_PICKER_DATA_SOURCE_TYPE } from '@umbraco-cms/backoffice/picker-data-source';
 import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/property-editor';
 
 const manifest: ManifestPropertyEditorUi = {
@@ -13,7 +14,7 @@ const manifest: ManifestPropertyEditorUi = {
 		supportsReadOnly: true,
 		supportsDataSource: {
 			enabled: true,
-			forDataSourceTypes: ['picker'],
+			forDataSourceTypes: [UMB_PICKER_DATA_SOURCE_TYPE],
 		},
 		settings: {
 			properties: [
