@@ -298,32 +298,6 @@ stages:
               targetPath: $(Build.ArtifactStagingDirectory)/ui-api-docs.zip
               artifact: ui-api-docs
 
-  - stage: Dependency_Track
-    displayName: Dependency Track
-    dependsOn:
-      - Build
-      - E2E_BOM
-    condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.uploadDependencyTrack}}))
-    variables:
-      umbracoVersion: $[ stageDependencies.Build.A.outputs['build.NBGV_NuGetPackageVersion'] ]
-    jobs:
-      - template: templates/dependency-track.yml
-        parameters:
-          projectName: "Umbraco-CMS"
-          umbracoVersion: $(umbracoVersion)
-          projects:
-            - name: "Backend"
-              artifact: "bom-backend"
-              bomFilePath: "bom-dotnet.xml"
-            - name: "Login"
-              artifact: "bom-backend"
-              bomFilePath: "bom-login.xml"
-            - name: "Backoffice"
-              artifact: "bom-frontend"
-              bomFilePath: "bom-backoffice.xml"
-            - name: "E2E"
-              artifact: "bom-e2e"
-              bomFilePath: "bom-e2e.xml"
   ###############################################
   ## Test
   ###############################################
@@ -746,6 +720,33 @@ stages:
               testCommand: $(testCommand)
               ASPNETCORE_URLS: ${{ variables.ASPNETCORE_URLS }}
               DatabaseType: ${{ variables.DatabaseType }}
+
+  - stage: Dependency_Track
+    displayName: Dependency Track
+    dependsOn:
+      - Build
+      - E2E_BOM
+    condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.uploadDependencyTrack}}))
+    variables:
+      umbracoVersion: $[ stageDependencies.Build.A.outputs['build.NBGV_NuGetPackageVersion'] ]
+    jobs:
+      - template: templates/dependency-track.yml
+        parameters:
+          projectName: "Umbraco-CMS"
+          umbracoVersion: $(umbracoVersion)
+          projects:
+            - name: "Backend"
+              artifact: "bom-backend"
+              bomFilePath: "bom-dotnet.xml"
+            - name: "Login"
+              artifact: "bom-backend"
+              bomFilePath: "bom-login.xml"
+            - name: "Backoffice"
+              artifact: "bom-frontend"
+              bomFilePath: "bom-backoffice.xml"
+            - name: "E2E"
+              artifact: "bom-e2e"
+              bomFilePath: "bom-e2e.xml"
 
   ###############################################
   ## Release
