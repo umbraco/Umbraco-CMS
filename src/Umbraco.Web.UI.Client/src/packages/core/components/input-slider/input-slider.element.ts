@@ -3,6 +3,7 @@ import { customElement, html, property } from '@umbraco-cms/backoffice/external/
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UUISliderEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY } from '@umbraco-cms/backoffice/validation';
 
 function splitString(value: string | undefined): Partial<[number | undefined, number | undefined]> {
 	const [from, to] = (value ?? ',').split(',');
@@ -48,6 +49,15 @@ export class UmbInputSliderElement extends UmbFormControlMixin<string, typeof Um
 
 	@property({ type: Number })
 	step = 1;
+	/**
+	 * Sets the input to required, meaning validation will fail if the value is empty.
+	 * @type {boolean}
+	 */
+	@property({ type: Boolean })
+	required?: boolean;
+
+	@property({ type: String })
+	requiredMessage?: string;
 
 	@property({ type: Number })
 	public get valueLow(): number | undefined {
@@ -91,6 +101,13 @@ export class UmbInputSliderElement extends UmbFormControlMixin<string, typeof Um
 
 	constructor() {
 		super();
+
+		//It's not really necessary since the slider passes fallback values ​​from the first render, but if we ever decide to set them to undefined, we already support that.
+		this.addValidator(
+			'valueMissing',
+			() => this.requiredMessage ?? UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
+			() => !this.readonly && !!this.required && (this.value === undefined || this.value === null || this.value === ''),
+		);
 
 		this.addValidator(
 			'rangeUnderflow',
