@@ -107,14 +107,13 @@ stages:
               command: build
               projects: $(solution)
               arguments: "--configuration $(buildConfiguration) --no-restore --property:ContinuousIntegrationBuild=true --property:GeneratePackageOnBuild=true --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg"
-          - script: |
+          - powershell: |
               dotnet tool install --global CycloneDX
               dotnet-CycloneDX $(solution) --output $(Build.ArtifactStagingDirectory)/bom --filename bom-dotnet.xml
             displayName: 'Generate Backend BOM'
-          - script: |
+          - powershell: |
               npm install --global @cyclonedx/cyclonedx-npm
-              cyclonedx-npm -o $(Build.ArtifactStagingDirectory)/bom/bom-login.xml --ignore-npm-errors --verbose
-              ls -la $(Build.ArtifactStagingDirectory)/bom/
+              cyclonedx-npm -o $(Build.ArtifactStagingDirectory)\bom\bom-login.xml --ignore-npm-errors --verbose
             displayName: Generate Login UI BOM
             workingDirectory: src/Umbraco.Web.UI.Login
           - task: PublishPipelineArtifact@1
@@ -143,7 +142,7 @@ stages:
             lfs: false,
             fetchDepth: 500
           - template: templates/backoffice-install.yml
-          - script: |
+          - powershell: |
               npm install --global @cyclonedx/cyclonedx-npm
               cyclonedx-npm -o $(Build.ArtifactStagingDirectory)/bom/bom-backoffice.xml --ignore-npm-errors --verbose
             displayName: Generate Backoffice UI BOM
@@ -185,7 +184,7 @@ stages:
           parameters:
             nodeVersion: ${{ variables.nodeVersion }}
             npm_config_cache: ${{ variables.npm_config_cache }}
-        - script: |
+        - powershell: |
             npm install --global @cyclonedx/cyclonedx-npm
             cyclonedx-npm -o $(Build.ArtifactStagingDirectory)/bom/bom-e2e.xml --ignore-npm-errors --verbose
           displayName: Generate E2E Tests BOM

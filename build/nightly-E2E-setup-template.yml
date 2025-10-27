@@ -31,19 +31,13 @@ steps:
     inputs:
       useGlobalJson: true
 
-  - pwsh: |
-      "UMBRACO_USER_LOGIN=${{ parameters.PlaywrightUserEmail }}
-      UMBRACO_USER_PASSWORD=${{ parameters.PlaywrightPassword }}
-      URL=${{ parameters.ASPNETCORE_URLS }}
-      STORAGE_STAGE_PATH=$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/playwright/.auth/user.json
-      CONSOLE_ERRORS_PATH=$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/console-errors.json" | Out-File .env
-    displayName: Generate .env
-    workingDirectory: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest
-
   - template: templates/e2e-install.yml
     parameters:
       nodeVersion: ${{ parameters.nodeVersion }}
       npm_config_cache: ${{ parameters.npm_config_cache }}
+      PlaywrightUserEmail: ${{ parameters.PlaywrightUserEmail }}
+      PlaywrightPassword: ${{ parameters.PlaywrightPassword }}
+      ASPNETCORE_URLS: ${{ parameters.ASPNETCORE_URLS }}
 
   # Install Template
   - pwsh: |
