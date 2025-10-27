@@ -279,7 +279,7 @@ export default class UmbAuthElement extends UmbLitElement {
 			ariaLabelShowPassword: this.localize.term('auth_showPassword'),
 			ariaLabelHidePassword: this.localize.term('auth_hidePassword'),
 		});
-		this._passwordShowPassswordToggleItem = createShowPasswordToggleItem(this._passwordShowPasswordToggleButton);
+		this._passwordShowPasswordToggleItem = createShowPasswordToggleItem(this._passwordShowPasswordToggleButton);
 		this._usernameLabel = createLabel({
 			forId: 'username-input',
 			localizeAlias: this.usernameIsEmail ? 'auth_email' : 'auth_username',
