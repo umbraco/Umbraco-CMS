@@ -246,7 +246,7 @@ export default class UmbAuthElement extends UmbLitElement {
 		this._usernameInput?.remove();
 		this._passwordLabel?.remove();
 		this._passwordInput?.remove();
-		this._passwordShowPassswordToggleItem?.remove();
+		this._passwordShowPasswordToggleItem?.remove();
 		this._passwordShowPasswordToggleButton?.remove();
 	}
 
