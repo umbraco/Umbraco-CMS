@@ -11,17 +11,17 @@ export const umbracoColors = [
 	{ name: 'Brown', alias: 'brown', varName: '--uui-palette-chamoisee' },
 	{ name: 'Grey', alias: 'grey', varName: '--uui-palette-dusty-grey' },
 
-	{ alias: 'black', legacy: true, varName: '--uui-color-text' },
-	{ alias: 'blue-grey', legacy: true, varName: '--uui-palette-dusty-grey' },
-	{ alias: 'indigo', legacy: true, varName: '--uui-palette-malibu' },
-	{ alias: 'purple', legacy: true, varName: '--uui-palette-space-cadet' },
-	{ alias: 'deep-purple', legacy: true, varName: '--uui-palette-space-cadet' },
-	{ alias: 'cyan', legacy: true, varName: '-uui-palette-jungle-green' },
-	{ alias: 'light-green', legacy: true, varName: '-uui-palette-jungle-green' },
-	{ alias: 'lime', legacy: true, varName: '-uui-palette-jungle-green' },
-	{ alias: 'amber', legacy: true, varName: '--uui-palette-chamoisee' },
-	{ alias: 'orange', legacy: true, varName: '--uui-palette-chamoisee' },
-	{ alias: 'deep-orange', legacy: true, varName: '--uui-palette-cocoa-brown' },
+	{ name: 'Black', alias: 'black', legacy: true, varName: '--uui-color-text' },
+	{ name: 'Blue Grey', alias: 'blue-grey', legacy: true, varName: '--uui-palette-dusty-grey' },
+	{ name: 'Indigo', alias: 'indigo', legacy: true, varName: '--uui-palette-malibu' },
+	{ name: 'Purple', alias: 'purple', legacy: true, varName: '--uui-palette-space-cadet' },
+	{ name: 'Deep Purple', alias: 'deep-purple', legacy: true, varName: '--uui-palette-space-cadet' },
+	{ name: 'Cyan', alias: 'cyan', legacy: true, varName: '-uui-palette-jungle-green' },
+	{ name: 'Light Green', alias: 'light-green', legacy: true, varName: '-uui-palette-jungle-green' },
+	{ name: 'Lime', alias: 'lime', legacy: true, varName: '-uui-palette-jungle-green' },
+	{ name: 'Amber', alias: 'amber', legacy: true, varName: '--uui-palette-chamoisee' },
+	{ name: 'Orange', alias: 'orange', legacy: true, varName: '--uui-palette-chamoisee' },
+	{ name: 'Deep Orange', alias: 'deep-orange', legacy: true, varName: '--uui-palette-cocoa-brown' },
 ];
 
 /**
