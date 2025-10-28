@@ -5,11 +5,14 @@ import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 // TODO: Shall we rename to 'umb-input-user'? [LK]
 @customElement('umb-user-input')
-export class UmbUserInputElement extends UUIFormControlMixin(UmbLitElement, '') {
+export class UmbUserInputElement extends UmbFormControlMixin<string, typeof UmbLitElement, undefined>(
+	UmbLitElement,
+	undefined,
+) {
 	#sorter = new UmbSorterController<string>(this, {
 		getUniqueOfElement: (element) => {
 			return element.id;
@@ -25,6 +28,25 @@ export class UmbUserInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 			this.dispatchEvent(new UmbChangeEvent());
 		},
 	});
+
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
+
+	/**
+	 * Sets the input to required, meaning validation will fail if the value is empty.
+	 * @type {boolean}
+	 */
+	@property({ type: Boolean })
+	required?: boolean;
+
+	@property({ type: String })
+	requiredMessage?: string;
 
 	/**
 	 * This is a minimum amount of selected items in this input.
@@ -69,7 +91,7 @@ export class UmbUserInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 	 * @attr
 	 * @default
 	 */
-	@property({ type: String, attribute: 'min-message' })
+	@property({ type: String, attribute: 'max-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
 	@property({ type: Array })
@@ -82,10 +104,10 @@ export class UmbUserInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 	}
 
 	@property()
-	public override set value(uniques: string) {
+	public override set value(uniques: string | undefined) {
 		this.selection = splitStringToArray(uniques);
 	}
-	public override get value(): string {
+	public override get value(): string | undefined {
 		return this.selection.join(',');
 	}
 
@@ -96,6 +118,12 @@ export class UmbUserInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 
 	constructor() {
 		super();
+
+		this.addValidator(
+			'valueMissing',
+			() => this.requiredMessage ?? UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
+			() => !this.readonly && !!this.required && (this.value === undefined || this.value === null || this.value === ''),
+		);
 
 		this.addValidator(
 			'rangeUnderflow',
@@ -118,10 +146,12 @@ export class UmbUserInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 	}
 
 	#openPicker() {
+		if (this.readonly) return;
 		this.#pickerContext.openPicker({});
 	}
 
 	#removeItem(item: UmbUserItemModel) {
+		if (this.readonly) return;
 		this.#pickerContext.requestRemoveItem(item.unique);
 	}
 
