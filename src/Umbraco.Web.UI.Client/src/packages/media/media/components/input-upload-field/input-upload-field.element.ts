@@ -16,7 +16,7 @@ import type {
 } from '@umbraco-cms/backoffice/dropzone';
 import type { UmbTemporaryFileModel } from '@umbraco-cms/backoffice/temporary-file';
 import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-input-upload-field')
 export class UmbInputUploadFieldElement extends UmbFormControlMixin<UmbMediaValueType, typeof UmbLitElement>(
@@ -38,6 +38,15 @@ export class UmbInputUploadFieldElement extends UmbFormControlMixin<UmbMediaValu
 		return undefined;
 	}
 	#src = '';
+
+	/**
+	 * Sets the input to required, meaning validation will fail if the value is empty.
+	 * @type {boolean}
+	 */
+	@property({ type: Boolean })
+	required?: boolean;
+	@property({ type: String })
+	requiredMessage?: string;
 
 	/**
 	 * @description Allowed file extensions. Allow all if empty.
@@ -64,6 +73,14 @@ export class UmbInputUploadFieldElement extends UmbFormControlMixin<UmbMediaValu
 		this.consumeContext(UMB_SERVER_CONTEXT, (context) => {
 			this._serverUrl = context?.getServerUrl() ?? '';
 		});
+
+		this.addValidator(
+			'valueMissing',
+			() => this.requiredMessage ?? UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
+			() => {
+				return !!this.required && !this.value;
+			},
+		);
 	}
 
 	override disconnectedCallback(): void {
