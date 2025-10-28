@@ -38,7 +38,7 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
     /// <inheritdoc/>
     public IPublishedContent? ToIPublishedContent(ContentCacheNode contentCacheNode, bool preview)
     {
-        var cacheKey = $"{nameof(PublishedContentFactory)}DocumentCache_{contentCacheNode.Id}_{preview}";
+        var cacheKey = $"{nameof(PublishedContentFactory)}DocumentCache_{contentCacheNode.Id}_{preview}_{contentCacheNode.Data?.VersionDate.Ticks ?? 0}";
         IPublishedContent? publishedContent = null;
         if (_appCaches.RequestCache.IsAvailable)
         {
