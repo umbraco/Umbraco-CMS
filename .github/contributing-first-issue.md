@@ -79,7 +79,7 @@ You can get in touch with [the core contributors team][core collabs] in multiple
 
 - If there's an existing issue on the issue tracker then that's a good place to leave questions and discuss how to start or move forward.
 - If you want to ask questions on some code you've already written you can create a draft pull request, [detailed in a GitHub blog post][draft prs].
-- Unsure where to start? Did something not work as expected? Try leaving a note in the ["Contributing to Umbraco"][contrib forum] forum. The team monitors that one closely, so one of us will be on hand and ready to point you in the right direction.
+- Unsure where to start? Did something not work as expected? Try leaving a note in the [forum][forum]. The team monitors that one closely, so one of us will be on hand and ready to point you in the right direction.
 
 
   <!-- Local -->
@@ -90,7 +90,7 @@ You can get in touch with [the core contributors team][core collabs] in multiple
 
 [sync fork ext]: http://robots.thoughtbot.com/post/5133345960/keeping-a-git-fork-updated	"Details on keeping a git fork updated"
 [draft prs]: https://github.blog/2019-02-14-introducing-draft-pull-requests/	"Github's blog post providing details on draft pull requests"
-[contrib forum]: https://our.umbraco.com/forum/contributing-to-umbraco-cms/
+[forum]: https://forum.umbraco.com/
 [Umbraco CMS repo]: https://github.com/umbraco/Umbraco-CMS
 [up for grabs issues]: https://github.com/umbraco/Umbraco-CMS/issues?q=is%3Aissue+is%3Aopen+label%3Acommunity%2Fup-for-grabs
 [issue tracker]: https://github.com/umbraco/Umbraco-CMS/issues
