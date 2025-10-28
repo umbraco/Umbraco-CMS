@@ -1,5 +1,4 @@
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Routing;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -63,6 +62,14 @@ public interface IDocumentUrlService
     /// </summary>
     /// <param name="documentKeys">The collection of document keys.</param>
     Task DeleteUrlsFromCacheAsync(IEnumerable<Guid> documentKeys);
+
+    /// <summary>
+    /// Gets a document key by <see cref="Uri" />.
+    /// </summary>
+    /// <param name="uri">The uniform resource identifier.</param>
+    /// <param name="isDraft">Whether to get the url of the draft or published document.</param>
+    /// <returns>The document key, or null if not found.</returns>
+    Guid? GetDocumentKeyByUri(Uri uri, bool isDraft) => throw new NotImplementedException(); // TODO (V19): Remove default implementation.
 
     /// <summary>
     /// Gets a document key by route.
