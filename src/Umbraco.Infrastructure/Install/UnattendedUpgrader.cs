@@ -40,8 +40,7 @@ public class UnattendedUpgrader : INotificationAsyncHandler<RuntimeUnattendedUpg
         DatabaseBuilder databaseBuilder,
         IRuntimeState runtimeState,
         PackageMigrationRunner packageMigrationRunner,
-        IOptions<UnattendedSettings> unattendedSettings,
-        DistributedCache distributedCache)
+        IOptions<UnattendedSettings> unattendedSettings)
         : this(
             profilingLogger,
             umbracoVersion,
@@ -49,7 +48,7 @@ public class UnattendedUpgrader : INotificationAsyncHandler<RuntimeUnattendedUpg
             runtimeState,
             packageMigrationRunner,
             unattendedSettings,
-            distributedCache,
+            StaticServiceProvider.Instance.GetRequiredService<DistributedCache>(),
             StaticServiceProvider.Instance.GetRequiredService<ILogger<UnattendedUpgrader>>())
     {
     }
