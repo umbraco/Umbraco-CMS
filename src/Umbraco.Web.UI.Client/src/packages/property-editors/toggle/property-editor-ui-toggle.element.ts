@@ -59,8 +59,8 @@ export class UmbPropertyEditorUIToggleElement
 	}
 
 	#onChange(event: CustomEvent & { target: UmbInputToggleElement }) {
-		const checked = event.target.checked;
-		this.value = this.mandatory ? (checked ?? null) : checked;
+		//checked is never null/undefined
+		this.value = event.target.checked;
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
