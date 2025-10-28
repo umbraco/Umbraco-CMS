@@ -30,7 +30,7 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 
 	@property({ type: Array })
 	public set items(newTags: string[]) {
-		const newItems = newTags.filter((x) => x !== '');
+		const newItems = newTags?.filter((x) => x !== '') || [];
 		this.#items = newItems;
 		super.value = this.#items.join(',');
 	}
