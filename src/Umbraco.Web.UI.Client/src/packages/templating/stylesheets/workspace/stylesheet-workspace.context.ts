@@ -12,7 +12,6 @@ import {
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router';
-import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UmbServerFileRenameWorkspaceRedirectController } from '@umbraco-cms/backoffice/server-file-system';
 
 export class UmbStylesheetWorkspaceContext
@@ -69,17 +68,6 @@ export class UmbStylesheetWorkspaceContext
 	 */
 	public setContent(value: string) {
 		this._data.updateCurrent({ content: value });
-	}
-
-	/**
-	 * @description Create a new stylesheet
-	 * @deprecated Use `createScaffold` instead. Will be removed in v17.
-	 * @param { UmbEntityModel } parent The parent entity
-	 * @param { string } parent.entityType The entity type of the parent
-	 * @param { UmbEntityUnique } parent.unique The unique identifier of the parent
-	 */
-	async create(parent: UmbEntityModel) {
-		await this.createScaffold({ parent });
 	}
 }
 

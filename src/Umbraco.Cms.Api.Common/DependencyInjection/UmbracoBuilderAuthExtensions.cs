@@ -9,8 +9,8 @@ using Umbraco.Cms.Api.Common.Security;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
-using Umbraco.Extensions;
+using Umbraco.Cms.Infrastructure.BackgroundJobs;
+using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.DistributedJobs;
 
 namespace Umbraco.Cms.Api.Common.DependencyInjection;
 
@@ -139,7 +139,7 @@ public static class UmbracoBuilderAuthExtensions
                 });
             });
 
-        builder.Services.AddRecurringBackgroundJob<OpenIddictCleanupJob>();
+        builder.Services.AddSingleton<IDistributedBackgroundJob, OpenIddictCleanupJob>();
         builder.Services.ConfigureOptions<ConfigureOpenIddict>();
     }
 }

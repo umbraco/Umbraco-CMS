@@ -1,7 +1,7 @@
 import { UmbDocumentTypeDetailRepository } from '../../document-types/repository/detail/document-type-detail.repository.js';
 import { UmbDocumentPropertyDatasetContext } from '../property-dataset-context/document-property-dataset.context.js';
 import type { UmbDocumentDetailRepository } from '../repository/index.js';
-import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
+import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS, UmbDocumentSegmentRepository } from '../repository/index.js';
 import type { UmbDocumentDetailModel, UmbDocumentVariantModel } from '../types.js';
 import {
 	UMB_CREATE_DOCUMENT_WORKSPACE_PATH_PATTERN,
@@ -14,29 +14,33 @@ import {
 	UMB_USER_PERMISSION_DOCUMENT_CREATE,
 	UMB_USER_PERMISSION_DOCUMENT_UPDATE,
 } from '../constants.js';
-import { UmbDocumentPreviewRepository } from '../repository/preview/index.js';
-import { UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT, UmbDocumentPublishingRepository } from '../publishing/index.js';
 import { UmbDocumentValidationRepository } from '../repository/validation/index.js';
 import { UMB_DOCUMENT_CONFIGURATION_CONTEXT } from '../index.js';
 import { UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD, UMB_DOCUMENT_WORKSPACE_ALIAS } from './constants.js';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
-import { ensurePathEndsWithSlash, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import { umbPeekError } from '@umbraco-cms/backoffice/notification';
 import { UmbContentDetailWorkspaceContextBase } from '@umbraco-cms/backoffice/content';
+import { UmbDeprecation, type UmbVariantGuardRule } from '@umbraco-cms/backoffice/utils';
 import { UmbDocumentBlueprintDetailRepository } from '@umbraco-cms/backoffice/document-blueprint';
-import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
+import {
+	UmbEntityRestoredFromRecycleBinEvent,
+	UmbEntityTrashedEvent,
+	UmbIsTrashedEntityContext,
+} from '@umbraco-cms/backoffice/recycle-bin';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import {
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceIsNewRedirectControllerAlias,
 } from '@umbraco-cms/backoffice/workspace';
-import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 import type { UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
-import type { UmbPublishableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import type { UmbVariantPropertyGuardRule } from '@umbraco-cms/backoffice/property';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
+import { UmbPreviewRepository } from '@umbraco-cms/backoffice/preview';
 
 type ContentModel = UmbDocumentDetailModel;
 type ContentTypeModel = UmbDocumentTypeDetailModel;
@@ -47,17 +51,8 @@ export class UmbDocumentWorkspaceContext
 		ContentTypeModel,
 		UmbDocumentVariantModel
 	>
-	implements
-		UmbContentWorkspaceContext<ContentModel, ContentTypeModel, UmbDocumentVariantModel>,
-		UmbPublishableWorkspaceContext
+	implements UmbContentWorkspaceContext<ContentModel, ContentTypeModel, UmbDocumentVariantModel>
 {
-	/**
-	 * The publishing repository for the document workspace.
-	 * @deprecated Will be removed in v17. Use the methods on the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.
-	 * @memberof UmbDocumentWorkspaceContext
-	 */
-	public readonly publishingRepository = new UmbDocumentPublishingRepository(this);
-
 	readonly isTrashed = this._data.createObservablePartOfCurrent((data) => data?.isTrashed);
 
 	readonly contentTypeUnique = this._data.createObservablePartOfCurrent((data) => data?.documentType.unique);
@@ -74,7 +69,9 @@ export class UmbDocumentWorkspaceContext
 	readonly templateId = this._data.createObservablePartOfCurrent((data) => data?.template?.unique || null);
 
 	#isTrashedContext = new UmbIsTrashedEntityContext(this);
-	#publishingContext?: typeof UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT.TYPE;
+	#documentSegmentRepository = new UmbDocumentSegmentRepository(this);
+	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
+	#localize = new UmbLocalizationController(this);
 
 	constructor(host: UmbControllerHost) {
 		super(host, {
@@ -121,6 +118,12 @@ export class UmbDocumentWorkspaceContext
 			}
 		});
 
+		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (actionEventContext) => {
+			this.#removeEventListeners();
+			this.#actionEventContext = actionEventContext;
+			this.#addEventListeners();
+		});
+
 		this.observe(
 			this.contentTypeUnique,
 			(unique) => {
@@ -130,11 +133,6 @@ export class UmbDocumentWorkspaceContext
 			},
 			null,
 		);
-
-		// TODO: Remove this in v17 as we have moved the publishing methods to the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT.
-		this.consumeContext(UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT, (context) => {
-			this.#publishingContext = context;
-		});
 
 		this.observe(
 			this.isNew,
@@ -154,6 +152,8 @@ export class UmbDocumentWorkspaceContext
 			},
 			null,
 		);
+
+		this.observe(this.isTrashed, (isTrashed) => this.#onTrashStateChange(isTrashed));
 
 		this.routes.setRoutes([
 			{
@@ -227,14 +227,22 @@ export class UmbDocumentWorkspaceContext
 		this.#isTrashedContext.setIsTrashed(false);
 	}
 
-	override async load(unique: string) {
-		const response = await super.load(unique);
-
-		if (response?.data) {
-			this.#isTrashedContext.setIsTrashed(response.data.isTrashed);
-		}
-
-		return response;
+	protected override async loadSegments(): Promise<void> {
+		this.observe(
+			this.unique,
+			async (unique) => {
+				if (!unique) {
+					this._segments.setValue([]);
+					return;
+				}
+				const { data } = await this.#documentSegmentRepository.getDocumentByIdSegmentOptions(unique, {
+					skip: 0,
+					take: 9999,
+				});
+				this._segments.setValue(data?.items ?? []);
+			},
+			'_loadSegmentsUnique',
+		);
 	}
 
 	async create(parent: UmbEntityModel, documentTypeUnique: string, blueprintUnique?: string) {
@@ -306,11 +314,13 @@ export class UmbDocumentWorkspaceContext
 		await super._handleSave();
 	}
 
-	public async saveAndPreview(): Promise<void> {
-		return await this.#handleSaveAndPreview();
+	public async saveAndPreview(urlProviderAlias?: string): Promise<void> {
+		return await this.#handleSaveAndPreview(urlProviderAlias ?? 'umbDocumentUrlProvider');
 	}
 
-	async #handleSaveAndPreview() {
+	async #handleSaveAndPreview(urlProviderAlias: string) {
+		if (!urlProviderAlias) throw new Error('Url provider alias is missing');
+
 		const unique = this.getUnique();
 		if (!unique) throw new Error('Unique is missing');
 
@@ -326,94 +336,29 @@ export class UmbDocumentWorkspaceContext
 			await this.performCreateOrUpdate(variantIds, saveData);
 		}
 
-		// Tell the server that we're entering preview mode.
-		await new UmbDocumentPreviewRepository(this).enter();
+		// Get the preview URL from the server.
+		const previewRepository = new UmbPreviewRepository(this);
+		const previewUrlData = await previewRepository.getPreviewUrl(
+			unique,
+			urlProviderAlias,
+			firstVariantId.culture ?? undefined,
+			firstVariantId.segment ?? undefined,
+		);
 
-		const serverContext = await this.getContext(UMB_SERVER_CONTEXT);
-		if (!serverContext) {
-			throw new Error('Server context is missing');
+		if (previewUrlData.url) {
+			const previewWindow = window.open(previewUrlData.url, `umbpreview-${unique}`);
+			previewWindow?.focus();
+			return;
 		}
 
-		const backofficePath = serverContext.getBackofficePath();
-		const previewUrl = new URL(ensurePathEndsWithSlash(backofficePath) + 'preview', window.location.origin);
-		previewUrl.searchParams.set('id', unique);
-
-		if (firstVariantId.culture) {
-			previewUrl.searchParams.set('culture', firstVariantId.culture);
+		if (previewUrlData.message) {
+			umbPeekError(this._host, {
+				color: 'danger',
+				headline: this.#localize.term('general_preview'),
+				message: previewUrlData.message,
+			});
+			throw new Error(previewUrlData.message);
 		}
-
-		if (firstVariantId.segment) {
-			previewUrl.searchParams.set('segment', firstVariantId.segment);
-		}
-
-		const previewWindow = window.open(previewUrl.toString(), `umbpreview-${unique}`);
-		previewWindow?.focus();
-	}
-
-	public async publish() {
-		new UmbDeprecation({
-			deprecated: 'The Publish method on the UMB_DOCUMENT_WORKSPACE_CONTEXT is deprecated.',
-			removeInVersion: '17.0.0',
-			solution: 'Use the Publish method on the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.',
-		}).warn();
-		if (!this.#publishingContext) throw new Error('Publishing context is missing');
-		await this.#publishingContext.publish();
-	}
-
-	/**
-	 * Save the document and publish it.
-	 * @deprecated Will be removed in v17. Use the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.
-	 */
-	public async saveAndPublish(): Promise<void> {
-		new UmbDeprecation({
-			deprecated: 'The SaveAndPublish method on the UMB_DOCUMENT_WORKSPACE_CONTEXT is deprecated.',
-			removeInVersion: '17.0.0',
-			solution: 'Use the SaveAndPublish method on the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.',
-		}).warn();
-		if (!this.#publishingContext) throw new Error('Publishing context is missing');
-		await this.#publishingContext.saveAndPublish();
-	}
-
-	/**
-	 * Schedule the document to be published at a later date.
-	 * @deprecated Will be removed in v17. Use the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.
-	 */
-	public async schedule() {
-		new UmbDeprecation({
-			deprecated: 'The Schedule method on the UMB_DOCUMENT_WORKSPACE_CONTEXT is deprecated.',
-			removeInVersion: '17.0.0',
-			solution: 'Use the Schedule method on the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.',
-		}).warn();
-		if (!this.#publishingContext) throw new Error('Publishing context is missing');
-		await this.#publishingContext.schedule();
-	}
-
-	/**
-	 * Unpublish the document.
-	 * @deprecated Will be removed in v17. Use the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.
-	 */
-	public async unpublish() {
-		new UmbDeprecation({
-			deprecated: 'The Unpublish method on the UMB_DOCUMENT_WORKSPACE_CONTEXT is deprecated.',
-			removeInVersion: '17.0.0',
-			solution: 'Use the Unpublish method on the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.',
-		}).warn();
-		if (!this.#publishingContext) throw new Error('Publishing context is missing');
-		await this.#publishingContext.unpublish();
-	}
-
-	/**
-	 * Publish the document and all its descendants.
-	 * @deprecated Will be removed in v17. Use the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.
-	 */
-	public async publishWithDescendants() {
-		new UmbDeprecation({
-			deprecated: 'The PublishWithDescendants method on the UMB_DOCUMENT_WORKSPACE_CONTEXT is deprecated.',
-			removeInVersion: '17.0.0',
-			solution: 'Use the PublishWithDescendants method on the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.',
-		}).warn();
-		if (!this.#publishingContext) throw new Error('Publishing context is missing');
-		await this.#publishingContext.publishWithDescendants();
 	}
 
 	public createPropertyDatasetContext(
@@ -465,6 +410,53 @@ export class UmbDocumentWorkspaceContext
 				});
 			},
 		);
+	}
+
+	#addEventListeners() {
+		this.#actionEventContext?.addEventListener(UmbEntityTrashedEvent.TYPE, this.#onRecycleBinEvent as EventListener);
+		this.#actionEventContext?.addEventListener(
+			UmbEntityRestoredFromRecycleBinEvent.TYPE,
+			this.#onRecycleBinEvent as EventListener,
+		);
+	}
+
+	#removeEventListeners() {
+		this.#actionEventContext?.removeEventListener(UmbEntityTrashedEvent.TYPE, this.#onRecycleBinEvent as EventListener);
+		this.#actionEventContext?.removeEventListener(
+			UmbEntityRestoredFromRecycleBinEvent.TYPE,
+			this.#onRecycleBinEvent as EventListener,
+		);
+	}
+
+	#onRecycleBinEvent = (event: UmbEntityTrashedEvent | UmbEntityRestoredFromRecycleBinEvent) => {
+		const unique = this.getUnique();
+		const entityType = this.getEntityType();
+		if (event.getUnique() !== unique || event.getEntityType() !== entityType) return;
+		this.reload();
+	};
+
+	#onTrashStateChange(isTrashed?: boolean) {
+		this.#isTrashedContext.setIsTrashed(isTrashed ?? false);
+
+		const guardUnique = `UMB_PREVENT_EDIT_TRASHED_ITEM`;
+
+		if (!isTrashed) {
+			this.readOnlyGuard.removeRule(guardUnique);
+			return;
+		}
+
+		const rule: UmbVariantGuardRule = {
+			unique: guardUnique,
+			permitted: true,
+		};
+
+		// TODO: Change to use property write guard when it supports making the name read-only.
+		this.readOnlyGuard.addRule(rule);
+	}
+
+	public override destroy(): void {
+		this.#removeEventListeners();
+		super.destroy();
 	}
 }
 

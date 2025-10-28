@@ -10,9 +10,7 @@ import { UmbModalBaseElement, umbOpenModal } from '@umbraco-cms/backoffice/modal
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 
-const elementName = 'umb-restore-from-recycle-bin-modal';
-
-@customElement(elementName)
+@customElement('umb-restore-from-recycle-bin-modal')
 export class UmbRestoreFromRecycleBinModalElement extends UmbModalBaseElement<
 	UmbRestoreFromRecycleBinModalData,
 	UmbRestoreFromRecycleBinModalValue
@@ -21,10 +19,13 @@ export class UmbRestoreFromRecycleBinModalElement extends UmbModalBaseElement<
 	private _isAutomaticRestore = false;
 
 	@state()
-	private _restoreItem?: any;
+	private _destinationItem?: any;
 
 	@state()
-	private _destinationItem?: any;
+	private _destinationItemName?: string;
+
+	@state()
+	private _restoreItemName?: string;
 
 	#recycleBinRepository?: UmbRecycleBinRepository;
 
@@ -34,7 +35,16 @@ export class UmbRestoreFromRecycleBinModalElement extends UmbModalBaseElement<
 		super.firstUpdated(_changedProperties);
 		if (!this.data?.unique) throw new Error('Cannot restore an item without a unique identifier.');
 
-		this._restoreItem = await this.#requestItem(this.data.unique);
+		const restoreItem = await this.#requestItem(this.data.unique);
+
+		if (this.data.itemDataResolver) {
+			const resolver = new this.data.itemDataResolver(this);
+			resolver.setData(restoreItem);
+			this._restoreItemName = await resolver.getName();
+		} else {
+			this._restoreItemName = restoreItem.name;
+		}
+
 		const unique = await this.#requestAutomaticRestoreDestination();
 
 		if (unique !== undefined) {
@@ -47,9 +57,7 @@ export class UmbRestoreFromRecycleBinModalElement extends UmbModalBaseElement<
 		// TODO: handle ROOT lookup. Currently, we can't look up the root in the item repository.
 		// This is a temp solution to show something in the UI.
 		if (unique === null) {
-			this._destinationItem = {
-				name: 'ROOT',
-			};
+			this._destinationItemName = 'Root';
 
 			this.#setDestinationValue({
 				unique: null,
@@ -60,6 +68,14 @@ export class UmbRestoreFromRecycleBinModalElement extends UmbModalBaseElement<
 		if (unique) {
 			this._destinationItem = await this.#requestItem(unique);
 			if (!this._destinationItem) throw new Error('Cant find destination item.');
+
+			if (this.data?.itemDataResolver) {
+				const resolver = new this.data.itemDataResolver(this);
+				resolver.setData(this._destinationItem);
+				this._destinationItemName = await resolver.getName();
+			} else {
+				this._destinationItemName = this._destinationItem.name;
+			}
 
 			this.#setDestinationValue({
 				unique: this._destinationItem.unique,
@@ -138,7 +154,7 @@ export class UmbRestoreFromRecycleBinModalElement extends UmbModalBaseElement<
 			<umb-body-layout headline="Restore">
 				<uui-box>
 					${this._isAutomaticRestore
-						? html` Restore ${this._restoreItem?.name} to ${this._destinationItem?.name}`
+						? html` Restore ${this._restoreItemName} to ${this._destinationItemName}`
 						: this.#renderCustomSelectDestination()}
 				</uui-box>
 				${this.#renderActions()}
@@ -151,8 +167,8 @@ export class UmbRestoreFromRecycleBinModalElement extends UmbModalBaseElement<
 			<h4>Cannot automatically restore this item.</h4>
 			<p>There is no location where this item can be automatically restored. You can select a new location below.</p>
 			<h5>Restore to:</h5>
-			${this._destinationItem
-				? html`<uui-ref-node name=${this._destinationItem.name}>
+			${this._destinationItem && this._destinationItemName
+				? html`<uui-ref-node name=${this._destinationItemName}>
 						<uui-action-bar slot="actions">
 							<uui-button @click=${() => (this._destinationItem = undefined)} label="Remove"
 								>${this.localize.term('general_remove')}</uui-button
@@ -186,6 +202,6 @@ export default UmbRestoreFromRecycleBinModalElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbRestoreFromRecycleBinModalElement;
+		['umb-restore-from-recycle-bin-modal']: UmbRestoreFromRecycleBinModalElement;
 	}
 }

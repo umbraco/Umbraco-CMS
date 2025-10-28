@@ -52,7 +52,7 @@ jobs:
               for (const item of items) {
                 const releaseLabels = (item.labels || [])
                   .map(l => (typeof l === "string" ? l : l.name)) // always get the name
-                  .filter(n => typeof n === "string" && n.startsWith("release/"));
+                  .filter(n => typeof n === "string" && n.startsWith("release/") && n !== "release/no-notes");
                 if (releaseLabels.length === 0) continue;
 
                 core.info(`#${item.number}: ${releaseLabels.join(", ")}`);

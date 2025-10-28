@@ -17,43 +17,6 @@ namespace Umbraco.Cms.Core.Routing
     {
         #region Document Culture
 
-        [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-        public static string? GetCultureFromDomains(
-            int contentId,
-            string contentPath,
-            Uri? current,
-            IUmbracoContext umbracoContext,
-            ISiteDomainMapper siteDomainMapper)
-            => GetCultureFromDomains(
-                contentId,
-                contentPath,
-                current,
-                umbracoContext,
-                siteDomainMapper,
-                StaticServiceProvider.Instance.GetRequiredService<IDomainCache>(),
-                StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>(),
-                StaticServiceProvider.Instance.GetRequiredService<IPublishedContentStatusFilteringService>());
-
-        [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-        public static string? GetCultureFromDomains(
-            int contentId,
-            string contentPath,
-            Uri? current,
-            IUmbracoContext umbracoContext,
-            ISiteDomainMapper siteDomainMapper,
-            IDomainCache domainCache,
-            IPublishedCache publishedCache,
-            INavigationQueryService navigationQueryService)
-            => GetCultureFromDomains(
-                contentId,
-                contentPath,
-                current,
-                umbracoContext,
-                siteDomainMapper,
-                domainCache,
-                navigationQueryService,
-                StaticServiceProvider.Instance.GetRequiredService<IPublishedContentStatusFilteringService>());
-
         /// <summary>
         /// Gets the culture assigned to a document by domains, in the context of a current Uri.
         /// </summary>

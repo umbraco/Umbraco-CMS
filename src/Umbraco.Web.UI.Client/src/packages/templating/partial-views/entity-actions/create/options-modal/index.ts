@@ -9,8 +9,7 @@ export const UMB_PARTIAL_VIEW_CREATE_OPTIONS_MODAL = new UmbModalToken<UmbPartia
 	'Umb.Modal.PartialView.CreateOptions',
 	{
 		modal: {
-			type: 'sidebar',
-			size: 'small',
+			type: 'dialog',
 		},
 	},
 );

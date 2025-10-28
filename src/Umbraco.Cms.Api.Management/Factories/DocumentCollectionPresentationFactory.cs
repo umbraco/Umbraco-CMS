@@ -14,15 +14,6 @@ public class DocumentCollectionPresentationFactory : ContentCollectionPresentati
     private readonly IPublicAccessService _publicAccessService;
     private readonly IEntityService _entityService;
 
-    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in V17.")]
-    public DocumentCollectionPresentationFactory(IUmbracoMapper mapper, IPublicAccessService publicAccessService)
-        : this(
-              mapper,
-              publicAccessService,
-              StaticServiceProvider.Instance.GetRequiredService<IEntityService>())
-    {
-    }
-
     [ActivatorUtilitiesConstructor]
     public DocumentCollectionPresentationFactory(IUmbracoMapper mapper, IPublicAccessService publicAccessService, IEntityService entityService)
     : base(mapper)

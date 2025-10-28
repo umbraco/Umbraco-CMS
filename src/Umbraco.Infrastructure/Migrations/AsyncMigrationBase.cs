@@ -53,7 +53,7 @@ public abstract partial class AsyncMigrationBase : IDiscoverable
     /// <summary>
     /// Gets the database type.
     /// </summary>
-    protected DatabaseType DatabaseType => Context.Database.DatabaseType;
+    protected DatabaseType DatabaseType => (DatabaseType)Context.Database.DatabaseType;
 
     /// <summary>
     /// Builds a Create expression.
