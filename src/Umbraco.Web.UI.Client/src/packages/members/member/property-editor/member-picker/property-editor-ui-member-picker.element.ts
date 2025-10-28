@@ -16,13 +16,6 @@ export class UmbPropertyEditorUIMemberPickerElement
 	extends UmbFormControlMixin<string, typeof UmbLitElement, undefined>(UmbLitElement, undefined)
 	implements UmbPropertyEditorUiElement
 {
-	public override set value(v: string | undefined) {
-		super.value = v;
-	}
-	public override get value(): string | undefined {
-		return super.value;
-	}
-
 	@property({ attribute: false })
 	public config?: UmbPropertyEditorConfigCollection;
 

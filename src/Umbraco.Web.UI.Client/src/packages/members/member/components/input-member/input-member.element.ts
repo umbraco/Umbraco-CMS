@@ -50,7 +50,7 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string, typeof Um
 	 * @default
 	 */
 	@property({ type: String, attribute: 'min-message' })
-	minMessage = 'This field need more items';
+	minMessage = 'This field needs more items';
 
 	/**
 	 * This is a maximum amount of selected items in this input.

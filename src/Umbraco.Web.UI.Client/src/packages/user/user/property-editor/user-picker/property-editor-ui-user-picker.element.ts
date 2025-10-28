@@ -16,13 +16,6 @@ export class UmbPropertyEditorUIUserPickerElement
 	extends UmbFormControlMixin<string, typeof UmbLitElement, undefined>(UmbLitElement, undefined)
 	implements UmbPropertyEditorUiElement
 {
-	public override set value(v: string | undefined) {
-		super.value = v;
-	}
-	public override get value(): string | undefined {
-		return super.value;
-	}
-
 	@property({ type: Boolean, reflect: true })
 	readonly = false;
 	@property({ type: Boolean })
