@@ -1,6 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -28,6 +30,29 @@ public class UnattendedUpgrader : INotificationAsyncHandler<RuntimeUnattendedUpg
     private readonly IRuntimeState _runtimeState;
     private readonly IUmbracoVersion _umbracoVersion;
     private readonly UnattendedSettings _unattendedSettings;
+    private readonly DistributedCache _distributedCache;
+    private readonly ILogger<UnattendedUpgrader> _logger;
+
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
+    public UnattendedUpgrader(
+        IProfilingLogger profilingLogger,
+        IUmbracoVersion umbracoVersion,
+        DatabaseBuilder databaseBuilder,
+        IRuntimeState runtimeState,
+        PackageMigrationRunner packageMigrationRunner,
+        IOptions<UnattendedSettings> unattendedSettings,
+        DistributedCache distributedCache)
+        : this(
+            profilingLogger,
+            umbracoVersion,
+            databaseBuilder,
+            runtimeState,
+            packageMigrationRunner,
+            unattendedSettings,
+            distributedCache,
+            StaticServiceProvider.Instance.GetRequiredService<ILogger<UnattendedUpgrader>>())
+    {
+    }
 
     public UnattendedUpgrader(
         IProfilingLogger profilingLogger,
@@ -35,14 +60,18 @@ public class UnattendedUpgrader : INotificationAsyncHandler<RuntimeUnattendedUpg
         DatabaseBuilder databaseBuilder,
         IRuntimeState runtimeState,
         PackageMigrationRunner packageMigrationRunner,
-        IOptions<UnattendedSettings> unattendedSettings)
+        IOptions<UnattendedSettings> unattendedSettings,
+        DistributedCache distributedCache,
+        ILogger<UnattendedUpgrader> logger)
     {
-        _profilingLogger = profilingLogger ?? throw new ArgumentNullException(nameof(profilingLogger));
-        _umbracoVersion = umbracoVersion ?? throw new ArgumentNullException(nameof(umbracoVersion));
-        _databaseBuilder = databaseBuilder ?? throw new ArgumentNullException(nameof(databaseBuilder));
-        _runtimeState = runtimeState ?? throw new ArgumentNullException(nameof(runtimeState));
+        _profilingLogger = profilingLogger;
+        _umbracoVersion = umbracoVersion;
+        _databaseBuilder = databaseBuilder;
+        _runtimeState = runtimeState;
         _packageMigrationRunner = packageMigrationRunner;
         _unattendedSettings = unattendedSettings.Value;
+        _distributedCache = distributedCache;
+        _logger = logger;
     }
 
     public async Task HandleAsync(RuntimeUnattendedUpgradeNotification notification, CancellationToken cancellationToken)
@@ -109,8 +138,13 @@ public class UnattendedUpgrader : INotificationAsyncHandler<RuntimeUnattendedUpg
         try
         {
             await _packageMigrationRunner.RunPackagePlansAsync(pendingMigrations);
-            notification.UnattendedUpgradeResult = RuntimeUnattendedUpgradeNotification.UpgradeResult
-                .PackageMigrationComplete;
+            notification.UnattendedUpgradeResult = RuntimeUnattendedUpgradeNotification.UpgradeResult.PackageMigrationComplete;
+
+            // Migration plans may have changed published content, so refresh the distributed cache to ensure consistency on first request.
+            _distributedCache.RefreshAllPublishedSnapshot();
+            _logger.LogInformation(
+                "Migration plans run: {Plans}. Triggered refresh of distributed published content cache.",
+                string.Join(", ", pendingMigrations));
         }
         catch (Exception ex)
         {
