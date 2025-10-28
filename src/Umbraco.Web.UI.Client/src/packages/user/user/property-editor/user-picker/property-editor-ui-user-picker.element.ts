@@ -43,12 +43,11 @@ export class UmbPropertyEditorUIUserPickerElement
 	}
 
 	override render() {
-		console.log(this.value);
 		return html`
 			<umb-user-input
 				min="0"
 				max="1"
-				.value=${this.value ?? undefined}
+				.value=${this.value}
 				@change=${this.#onChange}
 				?readonly=${this.readonly}
 				?required=${this.mandatory}

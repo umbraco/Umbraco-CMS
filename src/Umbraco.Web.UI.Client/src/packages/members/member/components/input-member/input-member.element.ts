@@ -3,14 +3,15 @@ import { UmbMemberPickerInputContext } from './input-member.context.js';
 import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UMB_MEMBER_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/member-type';
 
 @customElement('umb-input-member')
-export class UmbInputMemberElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
+export class UmbInputMemberElement extends UmbFormControlMixin<string, typeof UmbLitElement, undefined>(
 	UmbLitElement,
+	undefined,
 ) {
 	#sorter = new UmbSorterController<string>(this, {
 		getUniqueOfElement: (element) => {
@@ -118,6 +119,15 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string | undefine
 	}
 	#readonly = false;
 
+	/**
+	 * Sets the input to required, meaning validation will fail if the value is empty.
+	 * @type {boolean}
+	 */
+	@property({ type: Boolean })
+	required?: boolean;
+	@property({ type: String })
+	requiredMessage?: string;
+
 	@state()
 	private _items?: Array<UmbMemberItemModel>;
 
@@ -125,6 +135,12 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string | undefine
 
 	constructor() {
 		super();
+
+		this.addValidator(
+			'valueMissing',
+			() => this.requiredMessage ?? UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
+			() => !this.readonly && !!this.required && (this.value === undefined || this.value === null || this.value === ''),
+		);
 
 		this.addValidator(
 			'rangeUnderflow',
