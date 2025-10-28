@@ -37,19 +37,20 @@ test('can see the custom collection view when choosing layout for new collection
 test('can see the pagination works when using custom collection view in content section', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const pageSize = 5;
+  const totalItems = 7;
   await umbracoUi.goToBackOffice();
   await umbracoUi.dataType.goToSettingsTreeItem('Data Types');
   const dataTypeId = await umbracoApi.dataType.createListViewContentDataTypeWithLayoutAndPageSize(customDataTypeName,layoutCollectionView, layoutName, pageSize);
   const documentTypeChildId = await umbracoApi.documentType.createDefaultDocumentType(documentTypeChildName);
   const documentTypeParentId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNodeAndCollectionId(documentTypeParentName, documentTypeChildId, dataTypeId);
-
-  // Act
   const documentParentId = await umbracoApi.document.createDefaultDocument(parentContentName, documentTypeParentId);
-  for (let i = 1; i <= 7; i++) {
+  for (let i = 1; i <= totalItems; i++) {
     await umbracoApi.document.createDefaultDocumentWithParent('Test child ' + i, documentTypeChildId, documentParentId);
   }
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
   await umbracoUi.content.goToContentWithName(parentContentName);
 
   // Assert
@@ -62,4 +63,9 @@ test('can see the pagination works when using custom collection view in content 
   await umbracoUi.content.doesListViewItemsHaveCount(2);
   await umbracoUi.content.isListViewItemWithNameVisible('Test child 6', 0);
   await umbracoUi.content.isListViewItemWithNameVisible('Test child 7', 1);
+
+  // Clean
+  for(let i = 1; i <= totalItems; i++){
+    await umbracoApi.document.ensureNameNotExists('Test child ' + i);
+  }
 });
