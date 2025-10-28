@@ -52,7 +52,7 @@
 
   <Target Name="RestoreBackoffice" Inputs="$(BackofficeProjectDirectory)package-lock.json" Outputs="$(BackofficeProjectDirectory)node_modules\.package-lock.json">
     <Message Importance="high" Text="Restoring Backoffice NPM packages..." />
-    <Exec Command="npm ci --no-fund --no-audit" WorkingDirectory="$(BackofficeProjectDirectory)" />
+    <Exec Command="npm i --no-fund --no-audit" WorkingDirectory="$(BackofficeProjectDirectory)" />
   </Target>
 
   <Target Name="BuildBackoffice" DependsOnTargets="RestoreBackoffice">
@@ -110,7 +110,7 @@
 
   <Target Name="RestoreLogin" Inputs="$(LoginProjectDirectory)package-lock.json" Outputs="$(LoginProjectDirectory)node_modules/.package-lock.json">
     <Message Importance="high" Text="Restoring Login NPM packages..." />
-    <Exec Command="npm ci --no-fund --no-audit" WorkingDirectory="$(LoginProjectDirectory)" />
+    <Exec Command="npm i --no-fund --no-audit" WorkingDirectory="$(LoginProjectDirectory)" />
   </Target>
 
   <Target Name="BuildLogin" DependsOnTargets="RestoreLogin">
