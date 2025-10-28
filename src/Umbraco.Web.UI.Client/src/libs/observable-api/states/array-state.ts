@@ -1,4 +1,5 @@
 import { partialUpdateFrozenArray } from '../utils/partial-update-frozen-array.function.js';
+import { prependToUniqueArray } from '../utils/prepend-to-unique-array.function.js';
 import { pushAtToUniqueArray } from '../utils/push-at-to-unique-array.function.js';
 import { pushToUniqueArray } from '../utils/push-to-unique-array.function.js';
 import { replaceInUniqueArray } from '../utils/replace-in-unique-array.function.js';
@@ -314,6 +315,36 @@ export class UmbArrayState<T, U = unknown> extends UmbDeepState<T[]> {
 			throw new Error("Can't partial update an ArrayState without a getUnique method provided when constructed.");
 		}
 		this.setValue(partialUpdateFrozenArray(this.getValue(), entry, (x) => unique === this.getUniqueMethod!(x)));
+		return this;
+	}
+
+	/**
+	 * @function prepend
+	 * @param {T[]} entries - A array of new data to be added in this Subject.
+	 * @returns {UmbArrayState<T>} Reference to it self.
+	 * @description - Prepend some new data to this Subject, if it compares to existing data it will replace it.
+	 * @example <caption>Example prepend some data.</caption>
+	 * const data = [
+	 * 	{ key: 1, value: 'foo'},
+	 * 	{ key: 2, value: 'bar'}
+	 * ];
+	 * const myState = new UmbArrayState(data);
+	 * myState.prepend([
+	 * 	{ key: 0, value: 'another-bla'},
+	 * 	{ key: 1, value: 'replaced-foo'},
+	 * ]);
+	 */
+	prepend(entries: T[]) {
+		if (this.getUniqueMethod) {
+			const next = [...this.getValue()];
+			entries.forEach((entry) => {
+				prependToUniqueArray(next, entry, this.getUniqueMethod!);
+			});
+			this.setValue(next);
+		} else {
+			this.setValue([...entries, ...this.getValue()]);
+		}
+
 		return this;
 	}
 

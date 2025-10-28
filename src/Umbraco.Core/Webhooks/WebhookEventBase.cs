@@ -103,6 +103,6 @@ public abstract class WebhookEventBase<TNotification> : IWebhookEvent, INotifica
     /// </summary>
     /// <param name="notification"></param>
     /// <returns></returns>
-    public virtual object? ConvertNotificationToRequestPayload(TNotification notification)
+    public virtual object ConvertNotificationToRequestPayload(TNotification notification)
         => notification;
 }

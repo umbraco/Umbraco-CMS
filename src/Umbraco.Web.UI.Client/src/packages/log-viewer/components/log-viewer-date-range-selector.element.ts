@@ -1,10 +1,11 @@
-import type { UmbLogViewerDateRange, UmbLogViewerWorkspaceContext } from '../workspace/logviewer-workspace.context.js';
+import type { UmbLogViewerDateRange } from '../workspace/logviewer-workspace.context.js';
 import { UMB_APP_LOG_VIEWER_CONTEXT } from '../workspace/logviewer-workspace.context-token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { query as getQuery, path, toQueryString } from '@umbraco-cms/backoffice/router';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import { consumeContext } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-log-viewer-date-range-selector')
 export class UmbLogViewerDateRangeSelectorElement extends UmbLitElement {
@@ -17,20 +18,20 @@ export class UmbLogViewerDateRangeSelectorElement extends UmbLitElement {
 	@property({ type: Boolean, reflect: true })
 	horizontal = false;
 
-	#logViewerContext?: UmbLogViewerWorkspaceContext;
+	#logViewerContext?: typeof UMB_APP_LOG_VIEWER_CONTEXT.TYPE;
 
-	constructor() {
-		super();
-		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT, (instance) => {
-			this.#logViewerContext = instance;
-			this.#observeStuff();
-		});
+	@consumeContext({ context: UMB_APP_LOG_VIEWER_CONTEXT })
+	private set _logViewerContext(value) {
+		this.#logViewerContext = value;
+		this.#observeStuff();
+	}
+	private get _logViewerContext() {
+		return this.#logViewerContext;
 	}
 
 	#observeStuff() {
-		if (!this.#logViewerContext) return;
 		this.observe(
-			this.#logViewerContext.dateRange,
+			this._logViewerContext?.dateRange,
 			(dateRange: UmbLogViewerDateRange) => {
 				this._startDate = dateRange.startDate;
 				this._endDate = dateRange.endDate;
@@ -50,7 +51,7 @@ export class UmbLogViewerDateRangeSelectorElement extends UmbLitElement {
 	}
 
 	#updateFiltered() {
-		this.#logViewerContext?.setDateRange({ startDate: this._startDate, endDate: this._endDate });
+		this._logViewerContext?.setDateRange({ startDate: this._startDate, endDate: this._endDate });
 
 		const query = getQuery();
 		const qs = toQueryString({
@@ -71,7 +72,7 @@ export class UmbLogViewerDateRangeSelectorElement extends UmbLitElement {
 					id="start-date"
 					type="date"
 					label="From"
-					.max=${this.#logViewerContext?.today ?? ''}
+					.max=${this._logViewerContext?.today ?? ''}
 					.value=${this._startDate}></umb-input-date>
 			</div>
 			<div class="input-container">
@@ -82,7 +83,7 @@ export class UmbLogViewerDateRangeSelectorElement extends UmbLitElement {
 					type="date"
 					label="To"
 					.min=${this._startDate}
-					.max=${this.#logViewerContext?.today ?? ''}
+					.max=${this._logViewerContext?.today ?? ''}
 					.value=${this._endDate}></umb-input-date>
 			</div>
 		`;

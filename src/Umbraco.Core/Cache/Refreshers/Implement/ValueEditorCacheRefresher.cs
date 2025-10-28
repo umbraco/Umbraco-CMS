@@ -23,10 +23,11 @@ public sealed class ValueEditorCacheRefresher : PayloadCacheRefresherBase<DataTy
 
     public override string Name => "ValueEditorCacheRefresher";
 
-    public override void Refresh(DataTypeCacheRefresher.JsonPayload[] payloads)
+    public override void RefreshInternal(DataTypeCacheRefresher.JsonPayload[] payloads)
     {
         IEnumerable<int> ids = payloads.Select(x => x.Id);
         _valueEditorCache.ClearCache(ids);
+        base.RefreshInternal(payloads);
     }
 
     // these events should never trigger

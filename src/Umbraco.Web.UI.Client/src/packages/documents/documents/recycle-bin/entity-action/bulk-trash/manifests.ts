@@ -4,7 +4,6 @@ import { UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS } from '../../../item/constants.js';
 import { UMB_DOCUMENT_RECYCLE_BIN_REPOSITORY_ALIAS } from '../../repository/constants.js';
 import { UMB_DOCUMENT_REFERENCE_REPOSITORY_ALIAS } from '../../../reference/constants.js';
 import { UMB_DOCUMENT_COLLECTION_ALIAS } from '../../../collection/constants.js';
-import { manifests as repositoryManifests } from './repository/manifests.js';
 import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
 import { UMB_ENTITY_BULK_ACTION_TRASH_WITH_RELATION_KIND } from '@umbraco-cms/backoffice/relations';
 
@@ -32,5 +31,4 @@ export const manifests: Array<UmbExtensionManifest> = [
 			},
 		],
 	},
-	...repositoryManifests,
 ];

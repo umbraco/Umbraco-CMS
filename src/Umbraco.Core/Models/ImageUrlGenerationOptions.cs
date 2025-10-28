@@ -9,6 +9,8 @@ public class ImageUrlGenerationOptions : IEquatable<ImageUrlGenerationOptions>
 
     public string? ImageUrl { get; }
 
+    public int? SourceWidth { get; set; }
+    public int? SourceHeight { get; set; }
     public int? Width { get; set; }
 
     public int? Height { get; set; }

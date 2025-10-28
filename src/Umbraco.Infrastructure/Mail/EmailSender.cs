@@ -2,13 +2,11 @@
 // See LICENSE for more details.
 
 using MailKit.Net.Smtp;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using MimeKit.IO;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Mail;
 using Umbraco.Cms.Core.Models.Email;
@@ -19,7 +17,7 @@ using Umbraco.Cms.Infrastructure.Mail.Interfaces;
 namespace Umbraco.Cms.Infrastructure.Mail;
 
 /// <summary>
-///     A utility class for sending emails
+///     A utility class for sending emails.
 /// </summary>
 public class EmailSender : IEmailSender
 {
@@ -33,38 +31,6 @@ public class EmailSender : IEmailSender
     /// <summary>
     /// Initializes a new instance of the <see cref="EmailSender"/> class.
     /// </summary>
-    [Obsolete("Please use the non-obsolete constructor. Will be removed in V17.")]
-    public EmailSender(
-        ILogger<EmailSender> logger,
-        IOptionsMonitor<GlobalSettings> globalSettings,
-        IEventAggregator eventAggregator)
-        : this(logger, globalSettings, eventAggregator,null, null)
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="EmailSender"/> class.
-    /// </summary>
-    [Obsolete("Please use the non-obsolete constructor. Will be removed in V17.")]
-    public EmailSender(
-        ILogger<EmailSender> logger,
-        IOptionsMonitor<GlobalSettings> globalSettings,
-        IEventAggregator eventAggregator,
-        INotificationHandler<SendEmailNotification>? handler1,
-        INotificationAsyncHandler<SendEmailNotification>? handler2)
-    {
-        _logger = logger;
-        _eventAggregator = eventAggregator;
-        _globalSettings = globalSettings.CurrentValue;
-        _notificationHandlerRegistered = handler1 is not null || handler2 is not null;
-        _emailSenderClient = StaticServiceProvider.Instance.GetRequiredService<IEmailSenderClient>();
-        globalSettings.OnChange(x => _globalSettings = x);
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="EmailSender"/> class.
-    /// </summary>
-    [ActivatorUtilitiesConstructor]
     public EmailSender(
         ILogger<EmailSender> logger,
         IOptionsMonitor<GlobalSettings> globalSettings,
@@ -96,7 +62,7 @@ public class EmailSender : IEmailSender
     /// <inheritdoc/>
     /// <remarks>
     ///     We assume this is possible if either an event handler is registered or an smtp server is configured
-    ///     or a pickup directory location is configured
+    ///     or a pickup directory location is configured.
     /// </remarks>
     public bool CanSendRequiredEmail() => _globalSettings.IsSmtpServerConfigured
                                           || _globalSettings.IsPickupDirectoryLocationConfigured

@@ -14,7 +14,7 @@
     "releaseTest": "npx playwright test DefaultConfig --grep \"@release\""
   },
   "devDependencies": {
-    "@playwright/test": "^1.50",
+    "@playwright/test": "1.50",
     "@types/node": "^20.9.0",
     "prompt": "^1.2.0",
     "tslib": "^2.4.0",
@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@umbraco/json-models-builders": "^2.0.40",
-    "@umbraco/playwright-testhelpers": "^16.0.55",
+    "@umbraco/playwright-testhelpers": "^17.0.0-beta.7",
     "camelize": "^1.0.0",
     "dotenv": "^16.3.1",
     "node-fetch": "^2.6.7"

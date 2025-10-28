@@ -16,6 +16,7 @@ export class UmbTrashWithRelationEntityAction extends UmbTrashEntityAction<MetaE
 				entityType: item.entityType,
 				itemRepositoryAlias: this.args.meta.itemRepositoryAlias,
 				referenceRepositoryAlias: this.args.meta.referenceRepositoryAlias,
+				itemDataResolver: this.args.meta.itemDataResolver,
 			},
 		});
 	}

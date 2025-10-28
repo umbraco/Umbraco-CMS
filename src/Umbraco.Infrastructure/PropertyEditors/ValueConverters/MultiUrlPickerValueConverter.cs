@@ -60,7 +60,7 @@ public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IDeliver
     public override bool? IsValue(object? value, PropertyValueLevel level) =>
         value is not null && value.ToString() != "[]";
 
-    public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview) => source?.ToString()!;
+    public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview) => source?.ToString();
 
     public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {

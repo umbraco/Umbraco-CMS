@@ -10,4 +10,10 @@ public interface IPayloadCacheRefresher<TPayload> : IJsonCacheRefresher
     /// </summary>
     /// <param name="payloads"></param>
     void Refresh(TPayload[] payloads);
+
+    /// <summary>
+    /// Refreshes internal (isolated) caches by a payload.
+    /// </summary>
+    /// <param name="payloads">The payload.</param>
+    void RefreshInternal(TPayload[] payloads) => Refresh(payloads);
 }
