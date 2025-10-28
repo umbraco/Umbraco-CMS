@@ -727,7 +727,8 @@ stages:
       - E2E_BOM
     condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.uploadDependencyTrack}}))
     variables:
-      umbracoVersion: $[ stageDependencies.Build.A.outputs['build.NBGV_NuGetPackageVersion'] ]
+      # Determine Umbraco version based on whether it's a public release or not. If public release, use major version, else use full NuGet package version.
+      umbracoVersion: $[ iif(eq(stageDependencies.Build.A.outputs['build.NBGV_PublicRelease'], 'True'), stageDependencies.Build.A.outputs['build.NBGV_VersionMajor'], stageDependencies.Build.A.outputs['build.NBGV_NuGetPackageVersion'] ]
     jobs:
       - template: templates/dependency-track.yml
         parameters:
