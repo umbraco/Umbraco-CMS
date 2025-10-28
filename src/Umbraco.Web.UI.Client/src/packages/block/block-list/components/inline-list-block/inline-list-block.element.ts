@@ -292,10 +292,6 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 				padding-left: var(--uui-size-2, 6px);
 			}
 
-			#name {
-				font-weight: 700;
-			}
-
 			uui-tag {
 				margin-left: 0.5em;
 				margin-bottom: -0.3em;
