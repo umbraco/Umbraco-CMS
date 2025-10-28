@@ -46,7 +46,7 @@ export class UmbPropertyEditorUIMemberGroupPickerElement
 	private _min = 0;
 
 	@state()
-	private _max = 1;
+	private _max = Infinity;
 
 	#onChange(event: CustomEvent & { target: UmbInputMemberGroupElement }) {
 		this.value = event.target.value;
