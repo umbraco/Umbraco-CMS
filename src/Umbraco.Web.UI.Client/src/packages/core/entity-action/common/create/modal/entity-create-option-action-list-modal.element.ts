@@ -7,11 +7,13 @@ import type { ManifestEntityCreateOptionAction } from '@umbraco-cms/backoffice/e
 import type { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import {
 	html,
 	customElement,
 	state,
 	repeat,
+	nothing,
 	ifDefined,
 	type PropertyValues,
 	css,
@@ -132,6 +134,7 @@ export class UmbEntityCreateOptionActionListModalElement extends UmbModalBaseEle
 
 		return html`
 			<umb-ref-item
+				${index === 0 ? umbFocus() : nothing}
 				name=${manifest.meta.additionalOptions ? label + '...' : label}
 				detail=${ifDefined(description)}
 				icon=${manifest.meta.icon}

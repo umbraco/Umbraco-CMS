@@ -8,7 +8,7 @@ import type {
 	UmbDocumentCreateOptionsModalData,
 	UmbDocumentCreateOptionsModalValue,
 } from './document-create-options-modal.token.js';
-import { html, customElement, state, repeat, css, when } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, state, repeat, css, when, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import {
@@ -20,6 +20,8 @@ import {
 	type UmbDocumentBlueprintItemBaseModel,
 } from '@umbraco-cms/backoffice/document-blueprint';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
+
+import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-document-create-options-modal')
 export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
@@ -173,13 +175,11 @@ export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
 				repeat(
 					this._allowedDocumentTypes,
 					(documentType) => documentType.unique,
-					(documentType) => html`
+					(documentType, index) => html`
 						<uui-ref-node-document-type
+							${index === 0 ? umbfocus() : nothing}
 							.name=${this.localize.string(documentType.name)}
 							.alias=${this.localize.string(documentType.description ?? '')}
-							select-only
-							selectable
-							@selected=${() => this.#onSelectDocumentType(documentType.unique)}
 							@open=${() => this.#onSelectDocumentType(documentType.unique)}>
 							<umb-icon slot="icon" name=${documentType.icon || 'icon-circle-dotted'}></umb-icon>
 						</uui-ref-node-document-type>
