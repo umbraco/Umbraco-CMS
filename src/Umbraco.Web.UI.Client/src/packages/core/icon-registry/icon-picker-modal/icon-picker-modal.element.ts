@@ -1,6 +1,7 @@
 import type { UmbIconDefinition } from '../types.js';
 import { UMB_ICON_REGISTRY_CONTEXT } from '../icon-registry.context-token.js';
 import type { UmbIconPickerModalData, UmbIconPickerModalValue } from './icon-picker-modal.token.js';
+import { toCamelCase } from '../to-camel-case/index.js';
 import {
 	css,
 	customElement,
@@ -87,12 +88,11 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 						label=${this.localize.term('defaultdialogs_colorSwitcher')}
 						@change=${this.#onColorChange}>
 						${
-							// TODO: Missing localization for the color aliases. [NL]
 							this._colorList.map(
 								(color) => html`
 									<uui-color-swatch
-										label=${color.name ?? color.alias}
-										title=${color.name ?? color.alias}
+										label=${this.localize.term('colors_' + toCamelCase(color.alias))}
+										title=${this.localize.term('colors_' + toCamelCase(color.alias))}
 										value=${color.alias}
 										style="--uui-swatch-color: var(${color.varName})">
 									</uui-color-swatch>

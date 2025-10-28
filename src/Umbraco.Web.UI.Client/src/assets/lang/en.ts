@@ -1013,7 +1013,17 @@ export default {
 		},
 	},
 	colors: {
+		black: 'Black',
 		blue: 'Blue',
+		brown: 'Brown',
+		cyan: 'Cyan',
+		green: 'Green',
+		lightBlue: 'Light Blue',
+		pink: 'Pink',
+		red: 'Red',
+		text: 'Black',
+		yellow: 'Yellow',
+		white: 'White',
 	},
 	shortcuts: {
 		addGroup: 'Add group',
