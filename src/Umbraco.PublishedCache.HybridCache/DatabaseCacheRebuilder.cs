@@ -104,7 +104,7 @@ internal sealed class DatabaseCacheRebuilder : IDatabaseCacheRebuilder
 
         _logger.LogWarning(
             "Database cache was serialized using {CurrentSerializer}. Currently configured cache serializer {Serializer}. Rebuilding database cache.",
-            currentSerializer,
+            currentSerializer == 0 ? "None" : currentSerializer,
             serializer);
 
         using (_profilingLogger.TraceDuration<DatabaseCacheRebuilder>($"Rebuilding database cache with {serializer} serializer"))
