@@ -29,6 +29,8 @@ public class MoveDataTypeController : DataTypeControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Move a data type by its unique Id.")]
+    [EndpointDescription("Moves an existing data type to a different container. The target container Id must be provided.")]
     public async Task<IActionResult> Move(CancellationToken cancellationToken, Guid id, MoveDataTypeRequestModel moveDataTypeRequestModel)
     {
         IDataType? source = await _dataTypeService.GetAsync(id);

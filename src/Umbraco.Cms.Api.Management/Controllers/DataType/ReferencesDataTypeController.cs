@@ -26,6 +26,8 @@ public class ReferencesDataTypeController : DataTypeControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(DataTypeReferenceResponseModel[]), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Get references to a data type by the provided Id.")]
+    [EndpointDescription("Get references to a data type by using the provided Id. The result returns where the data type is used.")]
     public async Task<IActionResult> References(CancellationToken cancellationToken, Guid id)
     {
         Attempt<IReadOnlyDictionary<Udi, IEnumerable<string>>, DataTypeOperationStatus> result = await _dataTypeService.GetReferencesAsync(id);
