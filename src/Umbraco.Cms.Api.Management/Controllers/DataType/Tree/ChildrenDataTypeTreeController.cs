@@ -27,6 +27,8 @@ public class ChildrenDataTypeTreeController : DataTypeTreeControllerBase
     [HttpGet("children")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<DataTypeTreeItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Get data type tree children items by the provided parent Id.")]
+    [EndpointDescription("Get data type tree children items by using the provided parent Id and the result returns the data type tree items' properties.")]
     public async Task<ActionResult<PagedViewModel<DataTypeTreeItemResponseModel>>> Children(CancellationToken cancellationToken, Guid parentId, int skip = 0, int take = 100, bool foldersOnly = false)
     {
         RenderFoldersOnly(foldersOnly);
