@@ -36,6 +36,8 @@ test('can create content with the image cropper data type', async ({umbracoApi, 
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.uploadFile(imageFilePath);
+  // Wait for the upload to complete
+  await umbracoUi.waitForTimeout(1000);
   await umbracoUi.content.clickSaveButton();
 
   // Assert
