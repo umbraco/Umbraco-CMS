@@ -151,13 +151,13 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
-			() => !!this.min && this.selection.length < this.min,
+			() => !this.readonly && !!this.min && this.selection.length < this.min,
 		);
 
 		this.addValidator(
 			'rangeOverflow',
 			() => this.maxMessage,
-			() => !!this.max && this.selection.length > this.max,
+			() => !this.readonly && !!this.max && this.selection.length > this.max,
 		);
 
 		this.observe(
