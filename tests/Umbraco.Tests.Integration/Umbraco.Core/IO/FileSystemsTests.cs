@@ -69,30 +69,52 @@ internal sealed class FileSystemsTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Add_And_Remove_Suffix_To_And_From_Media_Files()
+    public void Can_Add_Suffix_To_Media_Files()
     {
         var mediaFileManager = GetRequiredService<MediaFileManager>();
-        var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes("test"));
-        var virtualPath = mediaFileManager.GetMediaPath("file.txt", Guid.NewGuid(), Guid.NewGuid());
-        mediaFileManager.FileSystem.AddFile(virtualPath, memoryStream);
-
         var hostingEnvironment = GetRequiredService<IHostingEnvironment>();
-        var physPath = hostingEnvironment.MapPathWebRoot(Path.Combine("media", virtualPath));
-        Assert.IsTrue(File.Exists(physPath));
 
-        // Add .deleted suffix.
+        CreateMediaFile(mediaFileManager, hostingEnvironment, out string virtualPath, out string physicalPath);
+        Assert.IsTrue(File.Exists(physicalPath));
+
         mediaFileManager.SuffixMediaFiles([virtualPath], Cms.Core.Constants.Conventions.Media.TrashedMediaSuffix);
-        Assert.IsFalse(File.Exists(physPath));
+        Assert.IsFalse(File.Exists(physicalPath));
 
         var virtualPathWithSuffix = virtualPath.Replace("file.txt", $"file{Cms.Core.Constants.Conventions.Media.TrashedMediaSuffix}.txt");
-        physPath = hostingEnvironment.MapPathWebRoot(Path.Combine("media", virtualPathWithSuffix));
-        Assert.IsTrue(File.Exists(physPath));
+        physicalPath = hostingEnvironment.MapPathWebRoot(Path.Combine("media", virtualPathWithSuffix));
+        Assert.IsTrue(File.Exists(physicalPath));
+    }
 
-        // Remove .deleted suffix.
-        mediaFileManager.RemoveSuffixFromMediaFiles([virtualPathWithSuffix], Cms.Core.Constants.Conventions.Media.TrashedMediaSuffix);
-        Assert.IsFalse(File.Exists(physPath));
-        physPath = hostingEnvironment.MapPathWebRoot(Path.Combine("media", virtualPath));
-        Assert.IsTrue(File.Exists(physPath));
+    [Test]
+    public void Can_Remove_Suffix_From_Media_Files()
+    {
+        var mediaFileManager = GetRequiredService<MediaFileManager>();
+        var hostingEnvironment = GetRequiredService<IHostingEnvironment>();
+
+        CreateMediaFile(mediaFileManager, hostingEnvironment, out string virtualPath, out string physicalPath);
+        mediaFileManager.SuffixMediaFiles([virtualPath], Cms.Core.Constants.Conventions.Media.TrashedMediaSuffix);
+        Assert.IsFalse(File.Exists(physicalPath));
+
+        mediaFileManager.RemoveSuffixFromMediaFiles([virtualPath], Cms.Core.Constants.Conventions.Media.TrashedMediaSuffix);
+        Assert.IsFalse(File.Exists(physicalPath));
+
+        var virtualPathWithSuffix = virtualPath.Replace("file.txt", $"file{Cms.Core.Constants.Conventions.Media.TrashedMediaSuffix}.txt");
+        physicalPath = hostingEnvironment.MapPathWebRoot(Path.Combine("media", virtualPathWithSuffix));
+        Assert.IsTrue(File.Exists(physicalPath));
+    }
+
+    private static void CreateMediaFile(
+        MediaFileManager mediaFileManager,
+        IHostingEnvironment hostingEnvironment,
+        out string virtualPath,
+        out string physicalPath)
+    {
+        virtualPath = mediaFileManager.GetMediaPath("file.txt", Guid.NewGuid(), Guid.NewGuid());
+        physicalPath = hostingEnvironment.MapPathWebRoot(Path.Combine("media", virtualPath));
+
+        var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes("test"));
+        mediaFileManager.FileSystem.AddFile(virtualPath, memoryStream);
+        Assert.IsTrue(File.Exists(physicalPath));
     }
 
     // TODO: don't make sense anymore
