@@ -75,14 +75,14 @@ public class MediaMapDefinition : ContentMapDefinition<IMedia, MediaValueRespons
         // to have the `.deleted` suffix that will have been added to the persisted file.
         if (target.IsTrashed && _imagingSettings.EnableMediaRecycleBinProtection)
         {
-            foreach (MediaValueResponseModel value in target.Values
+            foreach (MediaValueResponseModel valueModel in target.Values
                 .Where(x => x.EditorAlias.Equals(Core.Constants.PropertyEditors.Aliases.ImageCropper)))
             {
-                if (value.Value is not null &&
-                    value.Value is ImageCropperValue imageCropperValue &&
+                if (valueModel.Value is not null &&
+                    valueModel.Value is ImageCropperValue imageCropperValue &&
                     string.IsNullOrWhiteSpace(imageCropperValue.Src) is false)
                 {
-                    value.Value = new ImageCropperValue
+                    valueModel.Value = new ImageCropperValue
                     {
                         Crops = imageCropperValue.Crops,
                         FocalPoint = imageCropperValue.FocalPoint,
