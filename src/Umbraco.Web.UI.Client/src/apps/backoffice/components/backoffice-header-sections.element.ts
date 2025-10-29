@@ -72,7 +72,7 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 		event.preventDefault();
 
 		// useNavigatingState is set false, then the navigation store state is disabled for the current sections
-		if (!(manifest?.meta.useNavigatingState ?? true)) {
+		if (manifest?.meta.preventUrlRetention !== true) {
 			const sectionPath = this.#getSectionPath(manifest);
 			history.pushState(null, '', sectionPath);
 			return;
