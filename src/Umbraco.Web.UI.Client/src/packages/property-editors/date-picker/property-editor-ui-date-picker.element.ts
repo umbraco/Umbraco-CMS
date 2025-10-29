@@ -6,7 +6,7 @@ import { html, customElement, property, state } from '@umbraco-cms/backoffice/ex
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbInputDateElement } from '@umbraco-cms/backoffice/components';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 /**
  * This property editor allows the user to pick a date, datetime-local, or time.
