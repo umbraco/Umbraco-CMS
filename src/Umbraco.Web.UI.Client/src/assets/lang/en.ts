@@ -1024,6 +1024,7 @@ export default {
 		text: 'Black',
 		yellow: 'Yellow',
 		white: 'White',
+		grey: 'Grey',
 	},
 	shortcuts: {
 		addGroup: 'Add group',

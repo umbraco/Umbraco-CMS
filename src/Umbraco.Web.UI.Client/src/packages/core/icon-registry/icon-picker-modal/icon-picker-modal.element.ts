@@ -1,7 +1,6 @@
 import type { UmbIconDefinition } from '../types.js';
 import { UMB_ICON_REGISTRY_CONTEXT } from '../icon-registry.context-token.js';
 import type { UmbIconPickerModalData, UmbIconPickerModalValue } from './icon-picker-modal.token.js';
-import { toCamelCase } from '../to-camel-case/index.js';
 import {
 	css,
 	customElement,
@@ -17,6 +16,7 @@ import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIColorSwatchesEvent } from '@umbraco-cms/backoffice/external/uui';
+import { toCamelCase } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-icon-picker-modal')
 export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPickerModalData, UmbIconPickerModalValue> {

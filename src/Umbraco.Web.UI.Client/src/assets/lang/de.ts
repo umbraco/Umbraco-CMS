@@ -914,6 +914,7 @@ export default {
 		text: 'Schwarz',
 		yellow: 'Gelb',
 		white: 'Weiß',
+		grey: 'Grau',
 	},
 	shortcuts: {
 		addTab: 'Tab hinzufügen',

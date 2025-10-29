@@ -35,6 +35,9 @@ export default {
 		showLabelDescription:
 			'Stores colors as a JSON object containing both the color hex string and label, rather than just the hex string.',
 	},
+	colors: {
+		grey: 'Gray',
+	},
 	create: {
 		folderDescription: 'Used to organize items and other folders. Keep items structured and easy to access.',
 	},

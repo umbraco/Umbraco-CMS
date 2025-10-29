@@ -1017,6 +1017,7 @@ export default {
 		text: 'Sort',
 		yellow: 'Gul',
 		white: 'Hvid',
+		grey: 'Grå',
 	},
 	shortcuts: {
 		addGroup: 'Tilføj fane',
