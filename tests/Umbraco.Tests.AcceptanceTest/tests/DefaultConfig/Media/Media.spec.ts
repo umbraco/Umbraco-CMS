@@ -73,6 +73,7 @@ for (const mediaFileType of mediaFileTypes) {
 
     // Assert
     await umbracoUi.media.waitForMediaItemToBeCreated();
+    await umbracoUi.media.goToSection(ConstantHelper.sections.media);
     const mediaData = await umbracoApi.media.getByName(mediaFileType.fileName);
     const mediaUrl = await umbracoApi.media.getFullMediaUrl(mediaData.id);
     await umbracoUi.media.doesMediaHaveThumbnail(mediaData.id, mediaFileType.thumbnail, mediaUrl);

@@ -51,7 +51,7 @@ test('cannot create child content if allowed child node is disabled', async ({um
 
   // Assert
   await umbracoUi.content.isDocumentTypeNameVisible(documentTypeName, false);
-  await umbracoUi.content.doesModalHaveText(noAllowedDocumentTypeAvailableMessage);
+  await umbracoUi.content.doesDocumentModalHaveText(noAllowedDocumentTypeAvailableMessage);
 });
 
 test('can create multiple child nodes with different document types', async ({umbracoApi, umbracoUi}) => {

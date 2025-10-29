@@ -27,7 +27,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.media.ensureNameNotExists(mediaName);
 });
 
-test('can trigger when content is published', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test('can trigger when content is published', async ({umbracoApi, umbracoUi}) => {
   test.slow();
 
   // Arrange
