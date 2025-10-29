@@ -188,8 +188,7 @@ WHERE nodeId IN (@0)";
                 .LeftJoin<DocumentVersionDto>()
                 .On<ContentVersionDto, DocumentVersionDto>((contentVersion, documentVersion) =>
                     contentVersion.Id == documentVersion.Id)
-                .Where<PropertyDataDto, ContentVersionDto, DocumentVersionDto>((propertyData, contentVersion,
-                        documentVersion) =>
+                .Where<PropertyDataDto, ContentVersionDto, DocumentVersionDto>((propertyData, contentVersion, documentVersion) =>
                     (contentVersion.Current == true || documentVersion.Published == true)
                     && propertyData.PropertyTypeId == propertyType.Id);
 
@@ -203,7 +202,7 @@ WHERE nodeId IN (@0)";
 
             foreach (PropertyDataDto propertyDataDto in propertyDataDtos)
             {
-                if (ProcessPropertyDataDto(propertyDataDto, propertyType, languagesById, valueEditor, out var updateItem) is false)
+                if (ProcessPropertyDataDto(propertyDataDto, propertyType, languagesById, valueEditor, out UpdateItem? updateItem) is false)
                 {
                     continue;
                 }
@@ -244,8 +243,7 @@ WHERE nodeId IN (@0)";
                 progress++;
                 if (progress % 100 == 0)
                 {
-                    _logger.LogInformation("  - finíshed {progress} of {total} properties", progress,
-                        updateBatch.Count);
+                    _logger.LogInformation("  - finíshed {progress} of {total} properties", progress, updateBatch.Count);
                 }
 
                 PropertyDataDto propertyDataDto = update.Poco;
@@ -314,8 +312,12 @@ WHERE nodeId IN (@0)";
         return true;
     }
 
-    private bool ProcessPropertyDataDto(PropertyDataDto propertyDataDto, IPropertyType propertyType,
-        IDictionary<int, ILanguage> languagesById, IDataValueEditor valueEditor, out UpdateItem? updateItem)
+    private bool ProcessPropertyDataDto(
+        PropertyDataDto propertyDataDto,
+        IPropertyType propertyType,
+        IDictionary<int, ILanguage> languagesById,
+        IDataValueEditor valueEditor,
+        out UpdateItem? updateItem)
     {
         // NOTE: some old property data DTOs can have variance defined, even if the property type no longer varies
         var culture = propertyType.VariesByCulture()

@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_18_0_0.SingleBlockList
 public class SingleBlockListConfigurationCache
 {
     private readonly IDataTypeService _dataTypeService;
-    private List<IDataType> _singleBlockListDataTypes = new();
+    private readonly List<IDataType> _singleBlockListDataTypes = new();
 
     public SingleBlockListConfigurationCache(IDataTypeService dataTypeService)
     {

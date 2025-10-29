@@ -7,15 +7,8 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_18_0_0.SingleBlockList
 public class SingleBlockListProcessor
 {
     private readonly IEnumerable<ITypedSingleBlockListProcessor> _processors;
-    private readonly SingleBlockListConfigurationCache _singleBlockListConfigurationCache;
 
-    public SingleBlockListProcessor(
-        IEnumerable<ITypedSingleBlockListProcessor> processors,
-        SingleBlockListConfigurationCache singleBlockListConfigurationCache)
-    {
-        _processors = processors;
-        _singleBlockListConfigurationCache = singleBlockListConfigurationCache;
-    }
+    public SingleBlockListProcessor(IEnumerable<ITypedSingleBlockListProcessor> processors) => _processors = processors;
 
     public IEnumerable<string> GetSupportedPropertyEditorAliases() =>
         _processors.SelectMany(p => p.PropertyEditorAliases);
@@ -32,14 +25,18 @@ public class SingleBlockListProcessor
     {
         IBlockLayoutItem blockListLayoutItem = blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].First();
 
-        var singleBlockLayoutItem = new SingleBlockLayoutItem();
-        singleBlockLayoutItem.ContentKey = blockListLayoutItem.ContentKey;
-        singleBlockLayoutItem.SettingsKey = blockListLayoutItem.SettingsKey;
+        var singleBlockLayoutItem = new SingleBlockLayoutItem
+        {
+            ContentKey = blockListLayoutItem.ContentKey,
+            SettingsKey = blockListLayoutItem.SettingsKey,
+        };
 
-        var singleBlockValue = new SingleBlockValue(singleBlockLayoutItem);
-        singleBlockValue.ContentData = blockListValue.ContentData;
-        singleBlockValue.SettingsData = blockListValue.SettingsData;
-        singleBlockValue.Expose = blockListValue.Expose;
+        var singleBlockValue = new SingleBlockValue(singleBlockLayoutItem)
+        {
+            ContentData = blockListValue.ContentData,
+            SettingsData = blockListValue.SettingsData,
+            Expose = blockListValue.Expose,
+        };
 
         return singleBlockValue;
     }
