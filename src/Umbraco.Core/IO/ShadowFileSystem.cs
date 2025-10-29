@@ -91,7 +91,7 @@ internal sealed partial class ShadowFileSystem : IFileSystem
         var normPath = NormPath(path);
         if (Nodes.TryGetValue(normPath, out ShadowNode? sf) && sf.IsExist && (sf.IsDir || overrideIfExists == false))
         {
-            throw new InvalidOperationException(string.Format("A file at path '{0}' already exists", path));
+            throw new InvalidOperationException($"A file at path '{path}' already exists");
         }
 
         var parts = normPath.Split(Constants.CharArrays.ForwardSlash);
@@ -181,7 +181,7 @@ internal sealed partial class ShadowFileSystem : IFileSystem
 
         if (Nodes.TryGetValue(normTarget, out ShadowNode? tf) && tf.IsExist && (tf.IsDir || overrideIfExists == false))
         {
-            throw new IOException(string.Format("A file at path '{0}' already exists", target));
+            throw new IOException($"A file at path '{target}' already exists");
         }
 
         var parts = normTarget.Split(Constants.CharArrays.ForwardSlash);
@@ -295,7 +295,7 @@ internal sealed partial class ShadowFileSystem : IFileSystem
         var normPath = NormPath(path);
         if (Nodes.TryGetValue(normPath, out ShadowNode? sf) && sf.IsExist && (sf.IsDir || overrideIfExists == false))
         {
-            throw new InvalidOperationException(string.Format("A file at path '{0}' already exists", path));
+            throw new InvalidOperationException($"A file at path '{path}' already exists");
         }
 
         var parts = normPath.Split(Constants.CharArrays.ForwardSlash);
