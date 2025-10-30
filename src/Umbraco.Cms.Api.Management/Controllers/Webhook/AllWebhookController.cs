@@ -25,7 +25,7 @@ public class AllWebhookController : WebhookControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<WebhookResponseModel>), StatusCodes.Status200OK)]
     [EndpointSummary("Gets a paginated collection of webhooks.")]
-    [EndpointDescription("Gets a paginated collection of webhooks with support for skip and take pagination.")]
+    [EndpointDescription("Gets a paginated collection of webhooks.")]
     public async Task<ActionResult<PagedViewModel<WebhookResponseModel>>> All(
         CancellationToken cancellationToken,
         int skip = 0,

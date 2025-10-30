@@ -36,7 +36,7 @@ public class CreateUserController : UserControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [EndpointSummary("Creates a new user.")]
-    [EndpointDescription("Creates a new user with the configuration specified in the request model.")]
+    [EndpointDescription("Creates a new user from the request.")]
     public async Task<IActionResult> Create(CancellationToken cancellationToken, CreateUserRequestModel model)
     {
         UserCreateModel createModel = await _presentationFactory.CreateCreationModelAsync(model);

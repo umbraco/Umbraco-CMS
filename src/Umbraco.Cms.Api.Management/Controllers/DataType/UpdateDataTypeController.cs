@@ -34,7 +34,7 @@ public class UpdateDataTypeController : DataTypeControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [EndpointSummary("Updates a datatype.")]
-    [EndpointDescription("Updates a datatype identified by the provided Id with the details from the request model.")]
+    [EndpointDescription("Updates a datatype identified by the provided Id from the request.")]
     public async Task<IActionResult> Update(CancellationToken cancellationToken, Guid id, UpdateDataTypeRequestModel updateDataTypeViewModel)
     {
         IDataType? current = await _dataTypeService.GetAsync(id);

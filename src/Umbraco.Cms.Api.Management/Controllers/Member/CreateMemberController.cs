@@ -35,7 +35,7 @@ public class CreateMemberController : MemberControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [EndpointSummary("Creates a new member.")]
-    [EndpointDescription("Creates a new member with the configuration specified in the request model.")]
+    [EndpointDescription("Creates a new member from the request.")]
     public async Task<IActionResult> Create(CancellationToken cancellationToken, CreateMemberRequestModel createRequestModel)
     {
         MemberCreateModel model = _memberEditingPresentationFactory.MapCreateModel(createRequestModel);

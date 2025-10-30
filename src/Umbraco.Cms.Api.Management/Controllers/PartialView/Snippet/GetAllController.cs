@@ -26,7 +26,7 @@ public class GetAllController : PartialViewControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<PartialViewSnippetItemResponseModel>), StatusCodes.Status200OK)]
     [EndpointSummary("Gets a paginated collection of partial view snippets.")]
-    [EndpointDescription("Gets a paginated collection of partial view snippets with support for skip and take pagination.")]
+    [EndpointDescription("Gets a paginated collection of partial view snippets.")]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken, int skip = 0, int take = 100)
     {
         PagedModel<PartialViewSnippetSlim> snippets = await _partialViewService.GetSnippetsAsync(skip, take);

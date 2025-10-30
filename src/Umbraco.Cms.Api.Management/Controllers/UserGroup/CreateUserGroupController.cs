@@ -33,7 +33,7 @@ public class CreateUserGroupController : UserGroupControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [EndpointSummary("Creates a new user group.")]
-    [EndpointDescription("Creates a new user group with the configuration specified in the request model.")]
+    [EndpointDescription("Creates a new user group from the request.")]
     public async Task<IActionResult> Create(CancellationToken cancellationToken, CreateUserGroupRequestModel createUserGroupRequestModel)
     {
         Attempt<IUserGroup, UserGroupOperationStatus> userGroupCreationAttempt = await _userGroupPresentationFactory.CreateAsync(createUserGroupRequestModel);

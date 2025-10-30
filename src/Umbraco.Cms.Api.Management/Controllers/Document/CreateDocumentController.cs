@@ -37,7 +37,7 @@ public class CreateDocumentController : CreateDocumentControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [EndpointSummary("Creates a new document.")]
-    [EndpointDescription("Creates a new document with the configuration specified in the request model.")]
+    [EndpointDescription("Creates a new document from the request.")]
     public async Task<IActionResult> Create(
         CancellationToken cancellationToken,
         CreateDocumentRequestModel requestModel)

@@ -36,7 +36,7 @@ public class GetAllUserController : UserControllerBase
     [ProducesResponseType(typeof(PagedViewModel<UserResponseModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [EndpointSummary("Gets a paginated collection of users.")]
-    [EndpointDescription("Gets a paginated collection of all users with support for skip and take pagination.")]
+    [EndpointDescription("Gets a paginated collection of users.")]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken, int skip = 0, int take = 100)
     {
         Attempt<PagedModel<IUser>?, UserOperationStatus> attempt = await _userService.GetAllAsync(CurrentUserKey(_backOfficeSecurityAccessor), skip, take);

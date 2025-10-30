@@ -37,7 +37,7 @@ public class UpdateDocumentController : UpdateDocumentControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [EndpointSummary("Updates a document.")]
-    [EndpointDescription("Updates a document identified by the provided Id with the details from the request model.")]
+    [EndpointDescription("Updates a document identified by the provided Id from the request.")]
     public async Task<IActionResult> Update(
         CancellationToken cancellationToken,
         Guid id,

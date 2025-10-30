@@ -39,7 +39,7 @@ public class CreateCreatedPackageController : CreatedPackageControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [EndpointSummary("Creates a new package.")]
-    [EndpointDescription("Creates a new package with the configuration specified in the request model.")]
+    [EndpointDescription("Creates a new package from the request.")]
     public async Task<IActionResult> Create(
         CancellationToken cancellationToken,
         CreatePackageRequestModel createPackageRequestModel)

@@ -38,7 +38,7 @@ public class CreateMediaTypeController : MediaTypeControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [EndpointSummary("Creates a new media type.")]
-    [EndpointDescription("Creates a new media type with the configuration specified in the request model.")]
+    [EndpointDescription("Creates a new media type from the request.")]
     public async Task<IActionResult> Create(
         CancellationToken cancellationToken,
         CreateMediaTypeRequestModel requestModel)
