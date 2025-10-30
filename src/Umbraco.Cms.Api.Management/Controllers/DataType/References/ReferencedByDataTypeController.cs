@@ -27,7 +27,7 @@ public class ReferencedByDataTypeController : DataTypeControllerBase
     [HttpGet("{id:guid}/referenced-by")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<IReferenceResponseModel>), StatusCodes.Status200OK)]
-    [EndpointSummary("Get a paged list of references for the data type with the provided Id.")]
+    [EndpointSummary("Gets a paged collection of entities that are referenced by a data type.")]
     [EndpointDescription("Gets a paged list of references for the data type with the provided Id, so you can see where it is being used.")]
     public async Task<ActionResult<PagedViewModel<IReferenceResponseModel>>> ReferencedBy(
         CancellationToken cancellationToken,
