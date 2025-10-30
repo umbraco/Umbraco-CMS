@@ -1,6 +1,6 @@
 import { css, customElement, html, ifDefined, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
@@ -36,6 +36,8 @@ export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElemen
 
 	@property({ type: Boolean })
 	required = false;
+	@property({ type: String })
+	requiredMessage = UMB_VALIDATION_EMPTY_LOCALIZATION_KEY;
 
 	@state()
 	private _maxValue?: number;
@@ -94,6 +96,12 @@ export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElemen
 		super();
 
 		this.addValidator(
+			'valueMissing',
+			() => this.requiredMessage,
+			() => this.required && (this._minValue == null || this._maxValue == null),
+		);
+
+		this.addValidator(
 			'patternMismatch',
 			() => {
 				return '#validation_rangeExceeds';
@@ -101,12 +109,6 @@ export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElemen
 			() => {
 				return this._minValue !== undefined && this._maxValue !== undefined ? this._minValue > this._maxValue : false;
 			},
-		);
-
-		this.addValidator(
-			'valueMissing',
-			() => '#validation_fieldIsMandatory',
-			() => this.required && (this._minValue == null || this._maxValue == null),
 		);
 	}
 

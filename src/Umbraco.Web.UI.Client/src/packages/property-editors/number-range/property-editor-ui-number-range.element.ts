@@ -1,6 +1,6 @@
 import type { UmbInputNumberRangeElement } from '@umbraco-cms/backoffice/components';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
@@ -28,6 +28,8 @@ export class UmbPropertyEditorUINumberRangeElement
 
 	@property({ type: Boolean })
 	mandatory = false;
+	@property({ type: String })
+	mandatoryMessage = UMB_VALIDATION_EMPTY_LOCALIZATION_KEY;
 
 	@property({ type: Object })
 	public override set value(value: UmbNumberRangeValueType | undefined) {
@@ -65,6 +67,7 @@ export class UmbPropertyEditorUINumberRangeElement
 				.minValue=${this._minValue}
 				.maxValue=${this._maxValue}
 				?required=${this.mandatory}
+				.requiredMessage=${this.mandatoryMessage}
 				.validationRange=${this._validationRange}
 				@change=${this.#onChange}>
 			</umb-input-number-range>
