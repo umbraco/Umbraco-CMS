@@ -30,7 +30,7 @@ public class DeleteDataTypeController : DataTypeControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [EndpointSummary("Deletes a data type with a matching provided Id.")]
-    [EndpointDescription("Deletes a data type by using the provided Id.")]
+    [EndpointDescription("Deletes a data type identified by the provided Id.")]
     public async Task<IActionResult> Delete(CancellationToken cancellationToken, Guid id)
     {
         Attempt<IDataType?, DataTypeOperationStatus> result = await _dataTypeService.DeleteAsync(id, CurrentUserKey(_backOfficeSecurityAccessor));
