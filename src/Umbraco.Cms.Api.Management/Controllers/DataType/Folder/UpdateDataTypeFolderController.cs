@@ -22,7 +22,7 @@ public class UpdateDataTypeFolderController : DataTypeFolderControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    [EndpointSummary("Updates a data type folder with a matching provided Id.")]
+    [EndpointSummary("Updates a data type folder.")]
     [EndpointDescription("Updates a data type folder by using the provided Id and request model.")]
     public async Task<IActionResult> Update(
         CancellationToken cancellationToken,
