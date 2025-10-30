@@ -27,8 +27,8 @@ public class GetAllUserGroupController : UserGroupControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<UserGroupResponseModel>), StatusCodes.Status200OK)]
-    [EndpointSummary("Gets a paginated collection of usergroups.")]
-    [EndpointDescription("Gets a paginated collection of all usergroups with support for skip and take pagination.")]
+    [EndpointSummary("Gets a paginated collection of user groups.")]
+    [EndpointDescription("Gets a paginated collection of all user groups with support for skip and take pagination.")]
     public async Task<ActionResult<PagedViewModel<UserGroupResponseModel>>> GetAll(
         CancellationToken cancellationToken,
         int skip = 0,
