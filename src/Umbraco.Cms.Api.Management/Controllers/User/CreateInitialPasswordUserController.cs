@@ -4,10 +4,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OpenIddict.Abstractions;
 using Umbraco.Cms.Api.Management.ViewModels.User;
-using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Services.OperationStatus;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Extensions;
 

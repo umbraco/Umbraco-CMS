@@ -1,10 +1,10 @@
+using System.Net;
+using System.Net.Mime;
+using System.Text;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
-using System.Net.Mime;
-using System.Net;
-using System.Text;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;

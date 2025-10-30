@@ -1,31 +1,31 @@
+using System.Security.Claims;
 using Asp.Versioning;
-using IdentitySignInResult = Microsoft.AspNetCore.Identity.SignInResult;
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OpenIddict.Abstractions;
 using OpenIddict.Server.AspNetCore;
-using SignInResult = Microsoft.AspNetCore.Mvc.SignInResult;
-using System.Security.Claims;
 using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Api.Management.Security;
 using Umbraco.Cms.Api.Management.Services;
 using Umbraco.Cms.Api.Management.ViewModels.Security;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
-using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Extensions;
+using IdentitySignInResult = Microsoft.AspNetCore.Identity.SignInResult;
+using SignInResult = Microsoft.AspNetCore.Mvc.SignInResult;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Security;
 
@@ -73,6 +73,8 @@ public class BackOfficeController : SecurityControllerBase
     }
 
     [HttpPost("login")]
+    [MapToApiVersion("1.0")]
+    [Authorize(Policy = AuthorizationPolicies.DenyLocalLoginIfConfigured)]
     [EndpointSummary("Authenticates a user.")]
     [EndpointDescription("Authenticates a user with the provided credentials and returns authentication tokens.")]
     [MapToApiVersion("1.0")]
@@ -142,6 +144,7 @@ public class BackOfficeController : SecurityControllerBase
 
     [AllowAnonymous]
     [HttpPost("verify-2fa")]
+    [MapToApiVersion("1.0")]
     [EndpointSummary("Verifies two-factor authentication.")]
     [EndpointDescription("Verifies the two-factor authentication code for the user.")]
     [MapToApiVersion("1.0")]
@@ -305,6 +308,7 @@ public class BackOfficeController : SecurityControllerBase
     // Creates and retains a short lived secret to use in the link-login
     // endpoint because we can not protect that method with a bearer token for reasons explained there
     [HttpGet("link-login-key")]
+    [MapToApiVersion("1.0")]
     [EndpointSummary("Authenticates a user.")]
     [EndpointDescription("Authenticates a user with the provided credentials and returns authentication tokens.")]
     [MapToApiVersion("1.0")]
@@ -334,6 +338,8 @@ public class BackOfficeController : SecurityControllerBase
     //   can't set a bearer token header.
     // we are forcing form usage here for the whole model so the secret does not end up in url logs.
     [HttpPost("link-login")]
+    [AllowAnonymous]
+    [MapToApiVersion("1.0")]
     [EndpointSummary("Authenticates a user.")]
     [EndpointDescription("Authenticates a user with the provided credentials and returns authentication tokens.")]
     [AllowAnonymous]
@@ -377,6 +383,8 @@ public class BackOfficeController : SecurityControllerBase
     ///     which this is based on
     /// </remarks>
     [HttpGet("ExternalLinkLoginCallback")]
+    [AllowAnonymous]
+    [MapToApiVersion("1.0")]
     [EndpointSummary("Authenticates a user.")]
     [EndpointDescription("Authenticates a user with the provided credentials and returns authentication tokens.")]
     [AllowAnonymous]
@@ -404,6 +412,7 @@ public class BackOfficeController : SecurityControllerBase
     }
 
     [HttpPost("unlink-login")]
+    [MapToApiVersion("1.0")]
     [EndpointSummary("Authenticates a user.")]
     [EndpointDescription("Authenticates a user with the provided credentials and returns authentication tokens.")]
     [MapToApiVersion("1.0")]

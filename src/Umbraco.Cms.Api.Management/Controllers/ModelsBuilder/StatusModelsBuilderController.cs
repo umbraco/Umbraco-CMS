@@ -1,10 +1,10 @@
+using System.Threading.Tasks;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
+using Umbraco.Cms.Infrastructure.ModelsBuilder;
 using Umbraco.Cms.Api.Management.ViewModels.ModelsBuilderDashboard;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Infrastructure.ModelsBuilder;
 
 namespace Umbraco.Cms.Api.Management.Controllers.ModelsBuilder;
 

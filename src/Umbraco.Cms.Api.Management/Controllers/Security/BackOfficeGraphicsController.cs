@@ -8,8 +8,8 @@ using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Management.Routing;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Security;
 
@@ -36,6 +36,8 @@ public class BackOfficeGraphicsController : Controller
     }
 
     [HttpGet("login-background", Name = LoginBackGroundRouteName)]
+    [AllowAnonymous]
+    [MapToApiVersion("1.0")]
     [EndpointSummary("Authenticates a user.")]
     [EndpointDescription("Authenticates a user with the provided credentials and returns authentication tokens.")]
     [AllowAnonymous]
@@ -43,6 +45,8 @@ public class BackOfficeGraphicsController : Controller
     public IActionResult LoginBackground() => HandleFileRequest(_contentSettings.Value.LoginBackgroundImage);
 
     [HttpGet("logo", Name = LogoRouteName)]
+    [AllowAnonymous]
+    [MapToApiVersion("1.0")]
     [EndpointSummary("Gets the login logo image.")]
     [EndpointDescription("Gets the custom login logo image if configured.")]
     [AllowAnonymous]
@@ -50,6 +54,8 @@ public class BackOfficeGraphicsController : Controller
     public IActionResult Logo() => HandleFileRequest(_contentSettings.Value.BackOfficeLogo);
 
     [HttpGet("logo-alternative", Name = LogoAlternativeRouteName)]
+    [AllowAnonymous]
+    [MapToApiVersion("1.0")]
     [EndpointSummary("Gets the login logo image.")]
     [EndpointDescription("Gets the custom login logo image if configured.")]
     [AllowAnonymous]
@@ -57,6 +63,8 @@ public class BackOfficeGraphicsController : Controller
     public IActionResult LogoAlternative() => HandleFileRequest(_contentSettings.Value.BackOfficeLogoAlternative);
 
     [HttpGet("login-logo", Name = LoginLogoRouteName)]
+    [AllowAnonymous]
+    [MapToApiVersion("1.0")]
     [EndpointSummary("Authenticates a user.")]
     [EndpointDescription("Authenticates a user with the provided credentials and returns authentication tokens.")]
     [AllowAnonymous]
@@ -64,6 +72,8 @@ public class BackOfficeGraphicsController : Controller
     public IActionResult LoginLogo() => HandleFileRequest(_contentSettings.Value.LoginLogoImage);
 
     [HttpGet("login-logo-alternative", Name = LoginLogoAlternativeRouteName)]
+    [AllowAnonymous]
+    [MapToApiVersion("1.0")]
     [EndpointSummary("Authenticates a user.")]
     [EndpointDescription("Authenticates a user with the provided credentials and returns authentication tokens.")]
     [AllowAnonymous]

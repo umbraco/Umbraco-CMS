@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Management.ViewModels.DataType;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DataType;
 

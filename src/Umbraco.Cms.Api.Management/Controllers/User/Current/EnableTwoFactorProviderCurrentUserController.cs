@@ -2,10 +2,10 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.User.Current;
-using Umbraco.Cms.Core.Security;
-using Umbraco.Cms.Core.Services.OperationStatus;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.User.Current;
 

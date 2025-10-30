@@ -6,10 +6,10 @@ using OpenIddict.Abstractions;
 using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.Filters;
 using Umbraco.Cms.Api.Management.ViewModels.Security;
-using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Services.OperationStatus;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Extensions;
 
@@ -33,6 +33,7 @@ public class ResetPasswordTokenController : SecurityControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetailsBuilder), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetailsBuilder), StatusCodes.Status404NotFound)]
+    [UserPasswordEnsureMinimumResponseTime]
     [EndpointSummary("Initiates password reset.")]
     [EndpointDescription("Initiates a password reset process for the user with the provided email.")]
     [UserPasswordEnsureMinimumResponseTime]

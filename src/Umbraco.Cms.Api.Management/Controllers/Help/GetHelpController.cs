@@ -3,11 +3,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Api.Common.Builders;
-using Umbraco.Cms.Api.Common.ViewModels.Pagination;
-using Umbraco.Cms.Api.Management.ViewModels.Help;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Api.Common.Builders;
+using Umbraco.Cms.Api.Management.ViewModels.Help;
+using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Help;
 
