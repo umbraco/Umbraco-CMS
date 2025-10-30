@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Models.RedirectUrlManagement;
 using Umbraco.Cms.Core.Security;
+using Microsoft.AspNetCore.Http;
 
 namespace Umbraco.Cms.Api.Management.Controllers.RedirectUrlManagement;
 

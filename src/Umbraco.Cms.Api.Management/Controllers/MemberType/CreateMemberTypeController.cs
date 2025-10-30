@@ -37,8 +37,8 @@ public class CreateMemberTypeController : MemberTypeControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    [EndpointSummary("Creates a new membertype.")]
-    [EndpointDescription("Creates a new membertype with the configuration specified in the request model.")]
+    [EndpointSummary("Creates a new member type.")]
+    [EndpointDescription("Creates a new member type with the configuration specified in the request model.")]
     public async Task<IActionResult> Create(
         CancellationToken cancellationToken,
         CreateMemberTypeRequestModel requestModel)

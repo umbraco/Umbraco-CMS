@@ -194,7 +194,6 @@ public class BackOfficeController : SecurityControllerBase
     [EndpointSummary("Authorizes the current request.")]
     [EndpointDescription("Validates and authorizes the OAuth authorization request.")]
     [MapToApiVersion("1.0")]
-    [MapToApiVersion("1.0")]
     public async Task<IActionResult> Authorize(CancellationToken cancellationToken)
     {
         HttpContext context = _httpContextAccessor.GetRequiredHttpContext();
@@ -227,7 +226,6 @@ public class BackOfficeController : SecurityControllerBase
     [HttpPost("token")]
     [EndpointSummary("Issues access tokens.")]
     [EndpointDescription("Issues or refreshes access tokens for authenticated users.")]
-    [MapToApiVersion("1.0")]
     [MapToApiVersion("1.0")]
     public async Task<IActionResult> Token()
     {
@@ -287,7 +285,6 @@ public class BackOfficeController : SecurityControllerBase
     [HttpGet("signout")]
     [EndpointSummary("Signs out the current user.")]
     [EndpointDescription("Signs out the currently authenticated user and ends their session.")]
-    [MapToApiVersion("1.0")]
     [MapToApiVersion("1.0")]
     public async Task<IActionResult> Signout(CancellationToken cancellationToken)
     {
