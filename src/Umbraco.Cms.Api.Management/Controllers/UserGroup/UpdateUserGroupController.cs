@@ -33,7 +33,7 @@ public class UpdateUserGroupController : UserGroupControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [EndpointSummary("Updates a user group.")]
-    [EndpointDescription("Updates a user group identified by the provided Id from the request.")]
+    [EndpointDescription("Updates a user group identified by the provided Id with the details from the request model.")]
     public async Task<IActionResult> Update(
         CancellationToken cancellationToken,
         Guid id,

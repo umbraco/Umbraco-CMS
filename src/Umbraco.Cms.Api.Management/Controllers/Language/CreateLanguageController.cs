@@ -37,7 +37,7 @@ public class CreateLanguageController : LanguageControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [EndpointSummary("Creates a new language.")]
-    [EndpointDescription("Creates a new language from the request.")]
+    [EndpointDescription("Creates a new language with the configuration specified in the request model.")]
     public async Task<IActionResult> Create(
         CancellationToken cancellationToken,
         CreateLanguageRequestModel createLanguageRequestModel)

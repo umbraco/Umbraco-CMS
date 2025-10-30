@@ -42,7 +42,7 @@ public class CreateDictionaryController : DictionaryControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
     [EndpointSummary("Creates a new dictionary.")]
-    [EndpointDescription("Creates a new dictionary from the request.")]
+    [EndpointDescription("Creates a new dictionary with the configuration specified in the request model.")]
     public async Task<IActionResult> Create(
         CancellationToken cancellationToken,
         CreateDictionaryItemRequestModel createDictionaryItemRequestModel)

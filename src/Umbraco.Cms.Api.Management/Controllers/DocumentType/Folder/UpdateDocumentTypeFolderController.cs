@@ -23,7 +23,7 @@ public class UpdateDocumentTypeFolderController : DocumentTypeFolderControllerBa
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [EndpointSummary("Updates a document type folder.")]
-    [EndpointDescription("Updates a document type folder identified by the provided Id from the request.")]
+    [EndpointDescription("Updates a document type folder identified by the provided Id with the details from the request model.")]
     public async Task<IActionResult> Update(
         CancellationToken cancellationToken,
         Guid id,

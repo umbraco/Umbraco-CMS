@@ -34,7 +34,7 @@ public class UpdateMemberController : MemberControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [EndpointSummary("Updates a member.")]
-    [EndpointDescription("Updates a member identified by the provided Id from the request.")]
+    [EndpointDescription("Updates a member identified by the provided Id with the details from the request model.")]
     public async Task<IActionResult> Update(
         CancellationToken cancellationToken,
         Guid id,
