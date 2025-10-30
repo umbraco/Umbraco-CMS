@@ -21,7 +21,7 @@ public class DeleteDataTypeFolderController : DataTypeFolderControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    [EndpointSummary("Deletes a data type folder with a matching provided Id.")]
+    [EndpointSummary("Deletes a data type folder.")]
     [EndpointDescription("Deletes a data type folder by using the provided Id.")]
     public async Task<IActionResult> Delete(CancellationToken cancellationToken, Guid id) => await DeleteFolderAsync(id);
 }
