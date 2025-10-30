@@ -22,6 +22,6 @@ public class ByKeyDataTypeFolderController : DataTypeFolderControllerBase
     [ProducesResponseType(typeof(FolderResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [EndpointSummary("Gets a data type folder.")]
-    [EndpointDescription("Get a data type folder by using the provided Id and the result returns the folder's properties.")]
+    [EndpointDescription("Gets a data type folder by identified by the provided Id. The result returns the folder's properties.")]
     public async Task<IActionResult> ByKey(CancellationToken cancellationToken, Guid id) => await GetFolderAsync(id);
 }
