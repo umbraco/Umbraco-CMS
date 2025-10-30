@@ -40,6 +40,10 @@ export class UmbPropertyEditorUIEyeDropperElement
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
+	protected override firstUpdated() {
+		this.addFormControlElement(this.shadowRoot!.querySelector('umb-input-eye-dropper')!);
+	}
+
 	override render() {
 		return html`
 			<umb-input-eye-dropper
