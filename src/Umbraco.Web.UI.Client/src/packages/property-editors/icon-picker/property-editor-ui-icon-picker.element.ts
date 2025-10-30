@@ -58,10 +58,14 @@ export class UmbPropertyEditorUIIconPickerElement
 	@state()
 	private _placeholderIcon = '';
 
+	@state()
+	private _hideColors = false;
+
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 		const placeholder = config.getValueByAlias('placeholder');
 		this._placeholderIcon = typeof placeholder === 'string' ? placeholder : '';
+		this._hideColors = config.getValueByAlias('hideColors') as boolean;
 	}
 
 	private async _openModal() {
@@ -70,7 +74,7 @@ export class UmbPropertyEditorUIIconPickerElement
 				icon: this._icon,
 				color: this._color,
 			},
-			data: { placeholder: this._placeholderIcon, showEmptyOption: !this.mandatory },
+			data: { placeholder: this._placeholderIcon, showEmptyOption: !this.mandatory, hideColors: this._hideColors },
 		}).catch(() => undefined);
 
 		if (!data) return;
