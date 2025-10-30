@@ -52,6 +52,9 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
     /// block editor data and invokes caching for referenced entities where supported by the property editor.
     /// </remarks>
     /// <param name="blockEditorData">The block editor data containing content and settings property values to analyze for referenced entities.</param>
+    [Obsolete("This method is available for support of request caching retrieved entities in derived property value editors. " +
+              "The intention is to supersede this with lazy loaded read locks, which will make this unecessary. " +
+              "Scheduled for removal in Umbraco 19.")]
     protected void CacheReferencedEntities(BlockEditorData<TValue, TLayout>? blockEditorData)
     {
         // Group property values by their associated data editor alias.
