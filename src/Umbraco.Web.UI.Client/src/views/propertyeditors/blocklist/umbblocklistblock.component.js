@@ -57,7 +57,7 @@
         var shadowRoot = $element[0].attachShadow({ mode: 'open' });
         shadowRoot.innerHTML = `
                     <style>
-                    @import "${model.stylesheet}"
+                    @import "${model.stylesheet}?umb__rnd=${Umbraco.Sys.ServerVariables.application.cacheBuster}"
                     </style>
                     <div class="umb-block-list__block--view" ng-include="'${model.view}'"></div>
                 `;
