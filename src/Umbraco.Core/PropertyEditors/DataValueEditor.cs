@@ -434,7 +434,7 @@ public class DataValueEditor : IDataValueEditor
     /// <param name="contentService">The content service used to fetch the content item if it is not found in the cache.</param>
     /// <returns>The <see cref="IContent"/> instance corresponding to the specified key, or null if no such content item exists.</returns>
     [Obsolete("This method is available for support of request caching retrieved entities in derived property value editors. " +
-          "The intention is to supersede this with lazy loaded read locks, which will make this unecessary. " +
+          "The intention is to supersede this with lazy loaded read locks, which will make this unnecessary. " +
           "Scheduled for removal in Umbraco 19.")]
     protected static IContent? GetAndCacheContentById(Guid key, IRequestCache requestCache, IContentService contentService)
     {
@@ -458,7 +458,7 @@ public class DataValueEditor : IDataValueEditor
     /// <param name="content">The content item to cache.</param>
     /// <param name="requestCache">The request cache in which to store the content item.</param>
     [Obsolete("This method is available for support of request caching retrieved entities in derived property value editors. " +
-          "The intention is to supersede this with lazy loaded read locks, which will make this unecessary. " +
+          "The intention is to supersede this with lazy loaded read locks, which will make this unnecessary. " +
           "Scheduled for removal in Umbraco 19.")]
     protected static void CacheContentById(IContent content, IRequestCache requestCache)
     {
@@ -479,7 +479,7 @@ public class DataValueEditor : IDataValueEditor
     /// <param name="mediaService">The media service used to fetch the media item if it is not found in the cache.</param>
     /// <returns>The <see cref="IMedia"/> instance corresponding to the specified key, or null if no such media item exists.</returns>
     [Obsolete("This method is available for support of request caching retrieved entities in derived property value editors. " +
-          "The intention is to supersede this with lazy loaded read locks, which will make this unecessary. " +
+          "The intention is to supersede this with lazy loaded read locks, which will make this unnecessary. " +
           "Scheduled for removal in Umbraco 19.")]
     protected static IMedia? GetAndCacheMediaById(Guid key, IRequestCache requestCache, IMediaService mediaService)
     {
@@ -503,7 +503,7 @@ public class DataValueEditor : IDataValueEditor
     /// <param name="media">The media item to cache.</param>
     /// <param name="requestCache">The request cache in which to store the media item.</param>
     [Obsolete("This method is available for support of request caching retrieved entities in derived property value editors. " +
-          "The intention is to supersede this with lazy loaded read locks, which will make this unecessary. " +
+          "The intention is to supersede this with lazy loaded read locks, which will make this unnecessary. " +
           "Scheduled for removal in Umbraco 19.")]
     protected static void CacheMediaById(IMedia media, IRequestCache requestCache)
     {
@@ -518,7 +518,7 @@ public class DataValueEditor : IDataValueEditor
     /// <param name="requestCache">The request cache in which to look for the content item.</param>
     /// <returns>true if the content item is already cached in the request cache; otherwise, false.</returns>
     [Obsolete("This method is available for support of request caching retrieved entities in derived property value editors. " +
-          "The intention is to supersede this with lazy loaded read locks, which will make this unecessary. " +
+          "The intention is to supersede this with lazy loaded read locks, which will make this unnecessary. " +
           "Scheduled for removal in Umbraco 19.")]
     protected static bool IsContentAlreadyCached(Guid key, IRequestCache requestCache)
     {
@@ -533,7 +533,7 @@ public class DataValueEditor : IDataValueEditor
     /// <param name="requestCache">The request cache in which to look for the media item.</param>
     /// <returns>true if the media item is already cached in the request cache; otherwise, false.</returns>
     [Obsolete("This method is available for support of request caching retrieved entities in derived property value editors. " +
-              "The intention is to supersede this with lazy loaded read locks, which will make this unecessary. " +
+              "The intention is to supersede this with lazy loaded read locks, which will make this unnecessary. " +
               "Scheduled for removal in Umbraco 19.")]
     protected static bool IsMediaAlreadyCached(Guid key, IRequestCache requestCache)
     {
