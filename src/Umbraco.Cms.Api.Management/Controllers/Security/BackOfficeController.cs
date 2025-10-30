@@ -73,8 +73,6 @@ public class BackOfficeController : SecurityControllerBase
     }
 
     [HttpPost("login")]
-    [MapToApiVersion("1.0")]
-    [Authorize(Policy = AuthorizationPolicies.DenyLocalLoginIfConfigured)]
     [EndpointSummary("Authenticates a user.")]
     [EndpointDescription("Authenticates a user with the provided credentials and returns authentication tokens.")]
     [MapToApiVersion("1.0")]
@@ -144,7 +142,6 @@ public class BackOfficeController : SecurityControllerBase
 
     [AllowAnonymous]
     [HttpPost("verify-2fa")]
-    [MapToApiVersion("1.0")]
     [EndpointSummary("Verifies two-factor authentication.")]
     [EndpointDescription("Verifies the two-factor authentication code for the user.")]
     [MapToApiVersion("1.0")]
@@ -308,7 +305,6 @@ public class BackOfficeController : SecurityControllerBase
     // Creates and retains a short lived secret to use in the link-login
     // endpoint because we can not protect that method with a bearer token for reasons explained there
     [HttpGet("link-login-key")]
-    [MapToApiVersion("1.0")]
     [EndpointSummary("Authenticates a user.")]
     [EndpointDescription("Authenticates a user with the provided credentials and returns authentication tokens.")]
     [MapToApiVersion("1.0")]
@@ -338,8 +334,6 @@ public class BackOfficeController : SecurityControllerBase
     //   can't set a bearer token header.
     // we are forcing form usage here for the whole model so the secret does not end up in url logs.
     [HttpPost("link-login")]
-    [AllowAnonymous]
-    [MapToApiVersion("1.0")]
     [EndpointSummary("Authenticates a user.")]
     [EndpointDescription("Authenticates a user with the provided credentials and returns authentication tokens.")]
     [AllowAnonymous]
@@ -383,8 +377,6 @@ public class BackOfficeController : SecurityControllerBase
     ///     which this is based on
     /// </remarks>
     [HttpGet("ExternalLinkLoginCallback")]
-    [AllowAnonymous]
-    [MapToApiVersion("1.0")]
     [EndpointSummary("Authenticates a user.")]
     [EndpointDescription("Authenticates a user with the provided credentials and returns authentication tokens.")]
     [AllowAnonymous]
@@ -412,7 +404,6 @@ public class BackOfficeController : SecurityControllerBase
     }
 
     [HttpPost("unlink-login")]
-    [MapToApiVersion("1.0")]
     [EndpointSummary("Authenticates a user.")]
     [EndpointDescription("Authenticates a user with the provided credentials and returns authentication tokens.")]
     [MapToApiVersion("1.0")]
