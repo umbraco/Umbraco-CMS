@@ -37,6 +37,8 @@ public class EmptyDocumentRecycleBinController : DocumentRecycleBinControllerBas
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [EndpointSummary("Empties the document recycle bin.")]
+    [EndpointDescription("Permanently deletes all documents in the recycle bin. This operation cannot be undone.")]
     public async Task<IActionResult> EmptyRecycleBin(CancellationToken cancellationToken)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(

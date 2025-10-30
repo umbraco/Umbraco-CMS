@@ -28,6 +28,8 @@ public class CreateWebhookController : WebhookControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Creates a new webhook.")]
+    [EndpointDescription("Creates a new webhook with the configuration specified in the request model.")]
     public async Task<IActionResult> Create(
         CancellationToken cancellationToken,
         CreateWebhookRequestModel createWebhookRequestModel)

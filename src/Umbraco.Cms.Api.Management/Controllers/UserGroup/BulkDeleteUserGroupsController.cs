@@ -29,6 +29,8 @@ public class BulkDeleteUserGroupsController : UserGroupControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Deletes multiple user groups.")]
+    [EndpointDescription("Deletes multiple user groups identified by the provided Ids. This operation cannot be undone.")]
     public async Task<IActionResult> BulkDelete(CancellationToken cancellationToken, DeleteUserGroupsRequestModel model)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(

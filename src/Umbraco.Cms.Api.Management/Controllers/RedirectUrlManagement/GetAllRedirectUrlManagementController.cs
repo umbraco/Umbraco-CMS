@@ -27,6 +27,8 @@ public class GetAllRedirectUrlManagementController : RedirectUrlManagementContro
     [HttpGet]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(PagedViewModel<RedirectUrlResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a paginated collection of redirect URLs.")]
+    [EndpointDescription("Gets a paginated collection of redirect URLs with support for filtering and sorting.")]
     public Task<ActionResult<PagedViewModel<RedirectUrlResponseModel>>> GetAll(
         CancellationToken cancellationToken,
         string? filter,

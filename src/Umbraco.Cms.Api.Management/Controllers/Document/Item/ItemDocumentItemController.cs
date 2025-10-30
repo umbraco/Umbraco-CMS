@@ -28,6 +28,8 @@ public class ItemDocumentItemController : DocumentItemControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<DocumentItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of document items.")]
+    [EndpointDescription("Gets a collection of document items identified by the provided Ids.")]
     public async Task<IActionResult> Item(
         CancellationToken cancellationToken,
         [FromQuery(Name = "id")] HashSet<Guid> ids)

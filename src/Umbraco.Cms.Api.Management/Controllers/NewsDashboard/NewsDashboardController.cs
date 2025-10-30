@@ -13,6 +13,8 @@ public class NewsDashboardController : NewsDashboardControllerBase
 
     [HttpGet]
     [ProducesResponseType(typeof(NewsDashboardResponseModel), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets news dashboard content.")]
+    [EndpointDescription("Gets the news dashboard content including recent news items and updates for the Umbraco back office.")]
     public async Task<IActionResult> GetDashboard()
     {
         NewsDashboardResponseModel content = await _newsDashboardService.GetItemsAsync();

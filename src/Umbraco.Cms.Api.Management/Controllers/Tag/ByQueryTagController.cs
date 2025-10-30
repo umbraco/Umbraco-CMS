@@ -24,6 +24,8 @@ public class ByQueryTagController : TagControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<TagResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of tags.")]
+    [EndpointDescription("Gets a collection of tags filtered by the provided query string.")]
     public async Task<ActionResult<PagedViewModel<TagResponseModel>>> ByQuery(
         CancellationToken cancellationToken,
         string? query,

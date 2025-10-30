@@ -13,6 +13,8 @@ public class AllTelemetryController : TelemetryControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<TelemetryResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets telemetry data.")]
+    [EndpointDescription("Gets telemetry data and statistics for the Umbraco installation.")]
     public Task<PagedViewModel<TelemetryResponseModel>> GetAll(
         CancellationToken cancellationToken,
         int skip = 0,

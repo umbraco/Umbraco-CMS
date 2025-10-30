@@ -31,6 +31,8 @@ public class AllDocumentVersionController : DocumentVersionControllerBase
     [ProducesResponseType(typeof(PagedViewModel<DocumentVersionItemResponseModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [EndpointSummary("Gets a paginated collection of documentversions.")]
+    [EndpointDescription("Gets a paginated collection of documentversions with support for skip and take pagination.")]
     public async Task<IActionResult> All(
         CancellationToken cancellationToken,
         [Required] Guid documentId,

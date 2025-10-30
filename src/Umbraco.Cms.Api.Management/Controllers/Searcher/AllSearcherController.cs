@@ -22,6 +22,8 @@ public class AllSearcherController : SearcherControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<SearcherResponse>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of searchers.")]
+    [EndpointDescription("Gets a collection of configured searchers in the Umbraco installation.")]
     public Task<ActionResult<PagedViewModel<SearcherResponse>>> All(
         CancellationToken cancellationToken,
         int skip = 0,
