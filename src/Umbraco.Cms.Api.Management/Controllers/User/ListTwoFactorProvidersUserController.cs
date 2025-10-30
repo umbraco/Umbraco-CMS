@@ -31,6 +31,8 @@ public class ListTwoFactorProvidersUserController : UserControllerBase
     [HttpGet("{id:guid}/2fa")]
     [ProducesResponseType(typeof(IEnumerable<UserTwoFactorProviderModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Lists two-factor providers for a user.")]
+    [EndpointDescription("Gets a list of available two-factor authentication providers for the specified user.")]
     public async Task<IActionResult> ListTwoFactorProviders(CancellationToken cancellationToken, Guid id)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(

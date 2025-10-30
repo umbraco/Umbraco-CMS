@@ -22,6 +22,8 @@ public class ConfigurationMemberTypeController : MemberTypeControllerBase
     [HttpGet("configuration")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(MemberTypeConfigurationResponseModel), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets the member type configuration.")]
+    [EndpointDescription("Gets the configuration settings for member types.")]
     public Task<IActionResult> Configuration(CancellationToken cancellationToken)
     {
         MemberTypeConfigurationResponseModel responseModel = _configurationPresentationFactory.CreateMemberTypeConfigurationResponseModel();

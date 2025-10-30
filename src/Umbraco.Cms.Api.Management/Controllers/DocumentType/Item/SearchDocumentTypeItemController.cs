@@ -25,6 +25,8 @@ public class SearchDocumentTypeItemController : DocumentTypeItemControllerBase
     [HttpGet("search")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedModel<DocumentTypeItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Searches document type items.")]
+    [EndpointDescription("Searches document type items by the provided query with pagination support.")]
     public async Task<IActionResult> SearchDocumentType(CancellationToken cancellationToken, string query, bool? isElement = null, int skip = 0, int take = 100)
     {
         PagedModel<IContentType> contentTypes = await _contentTypeSearchService.SearchAsync(query, isElement, cancellationToken, skip, take);

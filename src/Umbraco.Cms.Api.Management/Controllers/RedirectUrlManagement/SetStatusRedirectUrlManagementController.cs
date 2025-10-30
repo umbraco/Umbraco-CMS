@@ -25,6 +25,9 @@ public class SetStatusRedirectUrlManagementController : RedirectUrlManagementCon
     // But maybe there is a valid use case for doing it on the fly.
     [HttpPost("status")]
     [MapToApiVersion("1.0")]
+    [EndpointSummary("Gets URLs for a document.")]
+    [EndpointDescription("Gets the URLs for the document identified by the provided Id.")]
+    [MapToApiVersion("1.0")]
     public async Task<IActionResult> SetStatus(CancellationToken cancellationToken, [FromQuery] RedirectStatus status)
     {
         // TODO: uncomment this when auth is implemented.

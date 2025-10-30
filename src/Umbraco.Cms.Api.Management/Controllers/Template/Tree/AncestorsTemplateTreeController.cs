@@ -26,6 +26,8 @@ public class AncestorsTemplateTreeController : TemplateTreeControllerBase
     [HttpGet("ancestors")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<NamedEntityTreeItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of ancestor template items.")]
+    [EndpointDescription("Gets a collection of template items that are ancestors to the provided Id.")]
     public async Task<ActionResult<IEnumerable<NamedEntityTreeItemResponseModel>>> Ancestors(
         CancellationToken cancellationToken,
         Guid descendantId)

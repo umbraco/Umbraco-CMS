@@ -27,6 +27,8 @@ public class ChildrenMediaTypeTreeController : MediaTypeTreeControllerBase
     [HttpGet("children")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<MediaTypeTreeItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of media type tree child items.")]
+    [EndpointDescription("Gets a paginated collection of media type tree items that are children of the provided parent Id.")]
     public async Task<ActionResult<PagedViewModel<MediaTypeTreeItemResponseModel>>> Children(
         CancellationToken cancellationToken,
         Guid parentId,

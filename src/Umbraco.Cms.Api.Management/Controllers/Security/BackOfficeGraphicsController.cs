@@ -38,9 +38,17 @@ public class BackOfficeGraphicsController : Controller
     [HttpGet("login-background", Name = LoginBackGroundRouteName)]
     [AllowAnonymous]
     [MapToApiVersion("1.0")]
+    [EndpointSummary("Authenticates a user.")]
+    [EndpointDescription("Authenticates a user with the provided credentials and returns authentication tokens.")]
+    [AllowAnonymous]
+    [MapToApiVersion("1.0")]
     public IActionResult LoginBackground() => HandleFileRequest(_contentSettings.Value.LoginBackgroundImage);
 
     [HttpGet("logo", Name = LogoRouteName)]
+    [AllowAnonymous]
+    [MapToApiVersion("1.0")]
+    [EndpointSummary("Gets the login logo image.")]
+    [EndpointDescription("Gets the custom login logo image if configured.")]
     [AllowAnonymous]
     [MapToApiVersion("1.0")]
     public IActionResult Logo() => HandleFileRequest(_contentSettings.Value.BackOfficeLogo);
@@ -48,14 +56,26 @@ public class BackOfficeGraphicsController : Controller
     [HttpGet("logo-alternative", Name = LogoAlternativeRouteName)]
     [AllowAnonymous]
     [MapToApiVersion("1.0")]
+    [EndpointSummary("Gets the login logo image.")]
+    [EndpointDescription("Gets the custom login logo image if configured.")]
+    [AllowAnonymous]
+    [MapToApiVersion("1.0")]
     public IActionResult LogoAlternative() => HandleFileRequest(_contentSettings.Value.BackOfficeLogoAlternative);
 
     [HttpGet("login-logo", Name = LoginLogoRouteName)]
     [AllowAnonymous]
     [MapToApiVersion("1.0")]
+    [EndpointSummary("Authenticates a user.")]
+    [EndpointDescription("Authenticates a user with the provided credentials and returns authentication tokens.")]
+    [AllowAnonymous]
+    [MapToApiVersion("1.0")]
     public IActionResult LoginLogo() => HandleFileRequest(_contentSettings.Value.LoginLogoImage);
 
     [HttpGet("login-logo-alternative", Name = LoginLogoAlternativeRouteName)]
+    [AllowAnonymous]
+    [MapToApiVersion("1.0")]
+    [EndpointSummary("Authenticates a user.")]
+    [EndpointDescription("Authenticates a user with the provided credentials and returns authentication tokens.")]
     [AllowAnonymous]
     [MapToApiVersion("1.0")]
     public IActionResult LoginLogoAlternative() => HandleFileRequest(_contentSettings.Value.LoginLogoImageAlternative);

@@ -28,6 +28,8 @@ public class DocumentPreviewUrlController : DocumentControllerBase
     [ProducesResponseType(typeof(DocumentUrlInfo), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Gets the preview URL for a document.")]
+    [EndpointDescription("Gets the preview URL for the document identified by the provided Id.")]
     public async Task<IActionResult> GetPreviewUrl(Guid id, string providerAlias, string? culture, string? segment)
     {
         IContent? content = _contentService.GetById(id);

@@ -16,6 +16,8 @@ public class ReloadPublishedCacheController : PublishedCacheControllerBase
     [HttpPost("reload")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [EndpointSummary("Reloads the published content cache.")]
+    [EndpointDescription("Reloads the published content cache from the database.")]
     public Task<IActionResult> Reload(CancellationToken cancellationToken)
     {
         _distributedCache.RefreshAllPublishedSnapshot();

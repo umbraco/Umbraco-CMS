@@ -24,6 +24,8 @@ public class ResetPasswordController : SecurityControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [EndpointSummary("Requests a password reset.")]
+    [EndpointDescription("Initiates a password reset process by sending a reset link to the specified email address.")]
     [UserPasswordEnsureMinimumResponseTime]
     public async Task<IActionResult> RequestPasswordReset(CancellationToken cancellationToken, ResetPasswordRequestModel model)
     {

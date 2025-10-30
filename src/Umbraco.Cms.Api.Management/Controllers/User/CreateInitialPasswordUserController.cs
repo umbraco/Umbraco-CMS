@@ -32,6 +32,8 @@ public class CreateInitialPasswordUserController : UserControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [EndpointSummary("Creates an initial password for a user.")]
+    [EndpointDescription("Creates an initial password for a newly invited user using the provided token.")]
     public async Task<IActionResult> CreateInitialPassword(
         CancellationToken cancellationToken,
         CreateInitialPasswordUserRequestModel model)

@@ -33,6 +33,8 @@ public class AreReferencedMediaController : MediaControllerBase
     [HttpGet("are-referenced")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<ReferenceByIdModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of items that reference medias.")]
+    [EndpointDescription("Gets a paginated collection of items that reference the medias identified by the provided Ids.")]
     public async Task<ActionResult<PagedViewModel<ReferenceByIdModel>>> GetPagedReferencedItems(
         CancellationToken cancellationToken,
         [FromQuery(Name="id")] HashSet<Guid> ids,

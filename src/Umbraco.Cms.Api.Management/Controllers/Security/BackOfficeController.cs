@@ -75,6 +75,10 @@ public class BackOfficeController : SecurityControllerBase
     [HttpPost("login")]
     [MapToApiVersion("1.0")]
     [Authorize(Policy = AuthorizationPolicies.DenyLocalLoginIfConfigured)]
+    [EndpointSummary("Authenticates a user.")]
+    [EndpointDescription("Authenticates a user with the provided credentials and returns authentication tokens.")]
+    [MapToApiVersion("1.0")]
+    [Authorize(Policy = AuthorizationPolicies.DenyLocalLoginIfConfigured)]
     public async Task<IActionResult> Login(CancellationToken cancellationToken, LoginRequestModel model)
     {
         // Start a timed scope to ensure failed responses return is a consistent time
@@ -141,6 +145,9 @@ public class BackOfficeController : SecurityControllerBase
     [AllowAnonymous]
     [HttpPost("verify-2fa")]
     [MapToApiVersion("1.0")]
+    [EndpointSummary("Verifies two-factor authentication.")]
+    [EndpointDescription("Verifies the two-factor authentication code for the user.")]
+    [MapToApiVersion("1.0")]
     public async Task<IActionResult> Verify2FACode(CancellationToken cancellationToken, Verify2FACodeModel model)
     {
         if (ModelState.IsValid == false)
@@ -184,6 +191,9 @@ public class BackOfficeController : SecurityControllerBase
 
     [AllowAnonymous]
     [HttpGet("authorize")]
+    [EndpointSummary("Authorizes the current request.")]
+    [EndpointDescription("Validates and authorizes the OAuth authorization request.")]
+    [MapToApiVersion("1.0")]
     [MapToApiVersion("1.0")]
     public async Task<IActionResult> Authorize(CancellationToken cancellationToken)
     {
@@ -215,6 +225,9 @@ public class BackOfficeController : SecurityControllerBase
 
     [AllowAnonymous]
     [HttpPost("token")]
+    [EndpointSummary("Issues access tokens.")]
+    [EndpointDescription("Issues or refreshes access tokens for authenticated users.")]
+    [MapToApiVersion("1.0")]
     [MapToApiVersion("1.0")]
     public async Task<IActionResult> Token()
     {
@@ -272,6 +285,9 @@ public class BackOfficeController : SecurityControllerBase
 
     [AllowAnonymous]
     [HttpGet("signout")]
+    [EndpointSummary("Signs out the current user.")]
+    [EndpointDescription("Signs out the currently authenticated user and ends their session.")]
+    [MapToApiVersion("1.0")]
     [MapToApiVersion("1.0")]
     public async Task<IActionResult> Signout(CancellationToken cancellationToken)
     {
@@ -295,6 +311,9 @@ public class BackOfficeController : SecurityControllerBase
     // Creates and retains a short lived secret to use in the link-login
     // endpoint because we can not protect that method with a bearer token for reasons explained there
     [HttpGet("link-login-key")]
+    [MapToApiVersion("1.0")]
+    [EndpointSummary("Authenticates a user.")]
+    [EndpointDescription("Authenticates a user with the provided credentials and returns authentication tokens.")]
     [MapToApiVersion("1.0")]
     public async Task<IActionResult> LinkLoginKey(string provider)
     {
@@ -322,6 +341,10 @@ public class BackOfficeController : SecurityControllerBase
     //   can't set a bearer token header.
     // we are forcing form usage here for the whole model so the secret does not end up in url logs.
     [HttpPost("link-login")]
+    [AllowAnonymous]
+    [MapToApiVersion("1.0")]
+    [EndpointSummary("Authenticates a user.")]
+    [EndpointDescription("Authenticates a user with the provided credentials and returns authentication tokens.")]
     [AllowAnonymous]
     [MapToApiVersion("1.0")]
     public async Task<IActionResult> LinkLogin([FromForm] LinkLoginRequestModel requestModel)
@@ -365,6 +388,10 @@ public class BackOfficeController : SecurityControllerBase
     [HttpGet("ExternalLinkLoginCallback")]
     [AllowAnonymous]
     [MapToApiVersion("1.0")]
+    [EndpointSummary("Authenticates a user.")]
+    [EndpointDescription("Authenticates a user with the provided credentials and returns authentication tokens.")]
+    [AllowAnonymous]
+    [MapToApiVersion("1.0")]
     public async Task<IActionResult> ExternalLinkLoginCallback()
     {
         Attempt<IEnumerable<IdentityError>, ExternalLoginOperationStatus> handleResult = await _externalLoginService.HandleLoginCallbackAsync(HttpContext);
@@ -388,6 +415,9 @@ public class BackOfficeController : SecurityControllerBase
     }
 
     [HttpPost("unlink-login")]
+    [MapToApiVersion("1.0")]
+    [EndpointSummary("Authenticates a user.")]
+    [EndpointDescription("Authenticates a user with the provided credentials and returns authentication tokens.")]
     [MapToApiVersion("1.0")]
     public async Task<IActionResult> PostUnLinkLogin(UnLinkLoginRequestModel unlinkLoginRequestModel)
     {

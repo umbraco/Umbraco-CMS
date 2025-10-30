@@ -31,6 +31,8 @@ public class SiblingsPartialViewTreeController : PartialViewTreeControllerBase
 
     [HttpGet("siblings")]
     [ProducesResponseType(typeof(SubsetViewModel<FileSystemTreeItemPresentationModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of partial view tree sibling items.")]
+    [EndpointDescription("Gets a collection of partial view tree items that are siblings of the provided Id.")]
     public async Task<ActionResult<SubsetViewModel<FileSystemTreeItemPresentationModel>>> Siblings(
         CancellationToken cancellationToken,
         string path,

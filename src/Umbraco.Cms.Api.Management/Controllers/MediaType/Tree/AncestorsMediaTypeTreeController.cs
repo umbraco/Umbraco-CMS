@@ -26,6 +26,8 @@ public class AncestorsMediaTypeTreeController : MediaTypeTreeControllerBase
     [HttpGet("ancestors")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<MediaTypeTreeItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of ancestor media type items.")]
+    [EndpointDescription("Gets a collection of media type items that are ancestors to the provided Id.")]
     public async Task<ActionResult<IEnumerable<MediaTypeTreeItemResponseModel>>> Ancestors(
         CancellationToken cancellationToken,
         Guid descendantId)

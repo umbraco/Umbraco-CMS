@@ -29,6 +29,8 @@ public class CompositionReferenceMemberTypeController : MemberTypeControllerBase
     [ProducesResponseType(typeof(IEnumerable<MemberTypeCompositionResponseModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Gets composition references.")]
+    [EndpointDescription("Gets a collection of member types that reference the specified member type as a composition.")]
     public async Task<IActionResult> CompositionReferences(CancellationToken cancellationToken, Guid id)
     {
         var memberType = await _memberTypeService.GetAsync(id);

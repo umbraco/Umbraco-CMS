@@ -26,6 +26,8 @@ public class CompositionReferenceMediaTypeController : MediaTypeControllerBase
     [ProducesResponseType(typeof(IEnumerable<MediaTypeCompositionResponseModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Gets composition references.")]
+    [EndpointDescription("Gets a collection of media types that reference the specified media type as a composition.")]
     public async Task<IActionResult> CompositionReferences(CancellationToken cancellationToken, Guid id)
     {
         var mediaType = await _mediaTypeService.GetAsync(id);

@@ -25,6 +25,8 @@ public class ByKeyMediaTypeController : MediaTypeControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(MediaTypeResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Gets a media type.")]
+    [EndpointDescription("Gets a media type identified by the provided Id.")]
     public async Task<IActionResult> ByKey(CancellationToken cancellationToken, Guid id)
     {
         IMediaType? mediaType = await _mediaTypeService.GetAsync(id);

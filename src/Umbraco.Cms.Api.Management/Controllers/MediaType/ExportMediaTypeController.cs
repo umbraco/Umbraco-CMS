@@ -29,6 +29,8 @@ public class ExportMediaTypeController : MediaTypeControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Exports a media type.")]
+    [EndpointDescription("Exports the media type identified by the provided Id to a downloadable format.")]
     public IActionResult Export(
         CancellationToken cancellationToken,
         Guid id)

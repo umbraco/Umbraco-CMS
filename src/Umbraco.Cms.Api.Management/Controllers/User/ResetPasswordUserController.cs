@@ -40,6 +40,8 @@ public class ResetPasswordUserController : UserControllerBase
     [ProducesResponseType(typeof(ResetPasswordUserResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [EndpointSummary("Resets a user's password.")]
+    [EndpointDescription("Resets the password for the user using the provided reset token.")]
     public async Task<IActionResult> ResetPassword(CancellationToken cancellationToken, Guid id)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(

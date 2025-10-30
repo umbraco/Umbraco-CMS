@@ -29,6 +29,8 @@ public class CompositionReferenceDocumentTypeController : DocumentTypeController
     [ProducesResponseType(typeof(IEnumerable<DocumentTypeCompositionResponseModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Gets composition references.")]
+    [EndpointDescription("Gets a collection of document types that reference the specified document type as a composition.")]
     public async Task<IActionResult> CompositionReferences(CancellationToken cancellationToken, Guid id)
     {
         var contentType = await _contentTypeService.GetAsync(id);

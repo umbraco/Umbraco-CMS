@@ -27,6 +27,8 @@ public class DeleteDocumentTypeController : DocumentTypeControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Deletes a document type.")]
+    [EndpointDescription("Deletes a document type identified by the provided Id.")]
     public async Task<IActionResult> Delete(CancellationToken cancellationToken, Guid id)
     {
         ContentTypeOperationStatus status = await _contentTypeService.DeleteAsync(id, CurrentUserKey(_backOfficeSecurityAccessor));

@@ -38,6 +38,8 @@ public class ValidateUpdateDocumentController : UpdateDocumentControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Validates updating a document.")]
+    [EndpointDescription("Validates the request model for updating a document without actually updating it.")]
     public async Task<IActionResult> ValidateV1_1(CancellationToken cancellationToken, Guid id, ValidateUpdateDocumentRequestModel requestModel)
         => await HandleRequest(id, requestModel, async () =>
         {

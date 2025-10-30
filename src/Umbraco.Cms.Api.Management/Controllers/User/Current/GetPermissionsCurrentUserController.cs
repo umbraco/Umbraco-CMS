@@ -32,6 +32,8 @@ public class GetPermissionsCurrentUserController : CurrentUserControllerBase
     [HttpGet("permissions")]
     [ProducesResponseType(typeof(UserPermissionsResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Gets permissions for the current user.")]
+    [EndpointDescription("Gets the permissions for the currently authenticated user.")]
     public async Task<IActionResult> GetPermissions(
         CancellationToken cancellationToken,
         [FromQuery(Name = "id")] HashSet<Guid> ids)
