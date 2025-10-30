@@ -77,4 +77,15 @@ public abstract class RepositoryBase : IRepository
     ///     Creates a new query expression
     /// </summary>
     protected IQuery<T> Query<T>() => SqlContext.Query<T>();
+
+
+    /// <summary>
+    /// Quotes a table name according to the registered SQL syntax provider.
+    /// </summary>
+    protected string QuoteTableName(string? tableName) => SqlSyntax.GetQuotedTableName(tableName);
+
+    /// <summary>
+    /// Quotes a column name according to the registered SQL syntax provider.
+    /// </summary>
+    protected string QuoteColumnName(string? columnName) => SqlSyntax.GetQuotedColumnName(columnName);
 }

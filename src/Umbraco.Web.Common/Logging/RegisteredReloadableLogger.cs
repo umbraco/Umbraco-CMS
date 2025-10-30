@@ -1,6 +1,5 @@
 using Serilog;
 using Serilog.Extensions.Hosting;
-using Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto;
 
 namespace Umbraco.Cms.Web.Common.Logging;
 

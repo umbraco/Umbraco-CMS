@@ -6,7 +6,7 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 
-[TableName(Constants.DatabaseSchema.Tables.KeyValue)]
+[TableName(TableName)]
 [PrimaryKey("key", AutoIncrement = false)]
 [ExplicitColumns]
 internal sealed class KeyValueDto
@@ -23,8 +23,8 @@ internal sealed class KeyValueDto
     [NullSetting(NullSetting = NullSettings.Null)]
     public string? Value { get; set; }
 
-    [Column("updated", ForceToUtc = false)]
-    [Constraint(Default = SystemMethods.CurrentDateTime)]
+    [Column("updated")]
+    [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
     public DateTime UpdateDate { get; set; }
 
     //NOTE that changes to this file needs to be backward compatible. Otherwise our upgrader cannot work, as it uses this to read from the db

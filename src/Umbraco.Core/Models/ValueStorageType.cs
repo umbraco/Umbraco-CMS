@@ -14,13 +14,13 @@ public enum ValueStorageType
     // changing the casing of values.
 
     /// <summary>
-    ///     Store property value as NText.
+    ///     Store property value as NVarchar(max).
     /// </summary>
     [EnumMember]
     Ntext,
 
     /// <summary>
-    ///     Store property value as NVarChar.
+    ///     Store property value as NVarChar(512).
     /// </summary>
     [EnumMember]
     Nvarchar,

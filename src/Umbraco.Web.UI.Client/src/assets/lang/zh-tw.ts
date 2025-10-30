@@ -711,9 +711,6 @@ export default {
 		help: '說明',
 		forms: '表單',
 	},
-	help: {
-		theBestUmbracoVideoTutorials: '最好的Umbraco影片教學',
-	},
 	settings: {
 		defaulttemplate: '預設範本',
 		importDocumentTypeHelp:

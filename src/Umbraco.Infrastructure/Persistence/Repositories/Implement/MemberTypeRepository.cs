@@ -12,6 +12,7 @@ using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
+using static Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
@@ -21,6 +22,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 internal sealed class MemberTypeRepository : ContentTypeRepositoryBase<IMemberType>, IMemberTypeRepository
 {
     private readonly IShortStringHelper _shortStringHelper;
+    private readonly IRepositoryCacheVersionService _repositoryCacheVersionService;
+    private readonly ICacheSyncService _cacheSyncService;
 
     public MemberTypeRepository(
         IScopeAccessor scopeAccessor,
@@ -29,16 +32,31 @@ internal sealed class MemberTypeRepository : ContentTypeRepositoryBase<IMemberTy
         IContentTypeCommonRepository commonRepository,
         ILanguageRepository languageRepository,
         IShortStringHelper shortStringHelper,
-        IIdKeyMap idKeyMap)
-        : base(scopeAccessor, cache, logger, commonRepository, languageRepository, shortStringHelper, idKeyMap)
-         => _shortStringHelper = shortStringHelper;
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        IIdKeyMap idKeyMap,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            cache,
+            logger,
+            commonRepository,
+            languageRepository,
+            shortStringHelper,
+            repositoryCacheVersionService,
+            idKeyMap,
+            cacheSyncService)
+    {
+        _shortStringHelper = shortStringHelper;
+        _repositoryCacheVersionService = repositoryCacheVersionService;
+        _cacheSyncService = cacheSyncService;
+    }
 
     protected override bool SupportsPublishing => MemberType.SupportsPublishingConst;
 
     protected override Guid NodeObjectTypeId => Constants.ObjectTypes.MemberType;
 
     protected override IRepositoryCachePolicy<IMemberType, int> CreateCachePolicy() =>
-        new FullDataSetRepositoryCachePolicy<IMemberType, int>(GlobalIsolatedCache, ScopeAccessor, GetEntityId, /*expires:*/ true);
+        new FullDataSetRepositoryCachePolicy<IMemberType, int>(GlobalIsolatedCache, ScopeAccessor,  _repositoryCacheVersionService, _cacheSyncService, GetEntityId, /*expires:*/ true);
 
     // every GetExists method goes cachePolicy.GetSomething which in turns goes PerformGetAll,
     // since this is a FullDataSet policy - and everything is cached
@@ -108,7 +126,7 @@ internal sealed class MemberTypeRepository : ContentTypeRepositoryBase<IMemberTy
     protected Sql<ISqlContext> GetSubquery()
     {
         Sql<ISqlContext> sql = Sql()
-            .Select("DISTINCT(umbracoNode.id)")
+            .Select($"DISTINCT({QuoteTableName("umbracoNode")}.id)")
             .From<NodeDto>()
             .InnerJoin<ContentTypeDto>().On<ContentTypeDto, NodeDto>(left => left.NodeId, right => right.NodeId)
             .LeftJoin<PropertyTypeDto>().On<PropertyTypeDto, NodeDto>(left => left.ContentTypeId, right => right.NodeId)
@@ -121,14 +139,14 @@ internal sealed class MemberTypeRepository : ContentTypeRepositoryBase<IMemberTy
         return sql;
     }
 
-    protected override string GetBaseWhereClause() => $"{Constants.DatabaseSchema.Tables.Node}.id = @id";
+    protected override string GetBaseWhereClause() => $"{QuoteTableName(Constants.DatabaseSchema.Tables.Node)}.id = @id";
 
     protected override IEnumerable<string> GetDeleteClauses()
     {
         var l = (List<string>)base.GetDeleteClauses(); // we know it's a list
-        l.Add("DELETE FROM cmsMemberType WHERE NodeId = @id");
-        l.Add("DELETE FROM cmsContentType WHERE nodeId = @id");
-        l.Add("DELETE FROM umbracoNode WHERE id = @id");
+        l.Add($"DELETE FROM {QuoteTableName("cmsMemberType")} WHERE NodeId = @id");
+        l.Add($"DELETE FROM {QuoteTableName("cmsContentType")} WHERE nodeId = @id");
+        l.Add($"DELETE FROM {QuoteTableName("umbracoNode")} WHERE id = @id");
         return l;
     }
 
@@ -175,16 +193,18 @@ internal sealed class MemberTypeRepository : ContentTypeRepositoryBase<IMemberTy
         // Updates Modified date
         entity.UpdatingEntity();
 
+        Sql<ISqlContext> sql;
         // Look up parent to get and set the correct Path if ParentId has changed
         if (entity.IsPropertyDirty("ParentId"))
         {
             NodeDto? parent = Database.First<NodeDto>("WHERE id = @ParentId", new { entity.ParentId });
             entity.Path = string.Concat(parent.Path, ",", entity.Id);
             entity.Level = parent.Level + 1;
-            var maxSortOrder =
-                Database.ExecuteScalar<int>(
-                    "SELECT coalesce(max(sortOrder),0) FROM umbracoNode WHERE parentid = @ParentId AND nodeObjectType = @NodeObjectType",
-                    new { entity.ParentId, NodeObjectType = NodeObjectTypeId });
+            sql = Sql()
+                .SelectMax<NodeDto>(c => c.SortOrder, 0)
+                .From<NodeDto>()
+                .Where<NodeDto>(x => x.ParentId == entity.ParentId && x.NodeObjectType == NodeObjectTypeId);
+            var maxSortOrder = Database.ExecuteScalar<int>(sql);
             entity.SortOrder = maxSortOrder + 1;
         }
 
@@ -192,7 +212,8 @@ internal sealed class MemberTypeRepository : ContentTypeRepositoryBase<IMemberTy
         PersistUpdatedBaseContentType(entity);
 
         // remove and insert - handle cmsMemberType table
-        Database.Delete<MemberPropertyTypeDto>("WHERE NodeId = @Id", new { entity.Id });
+        sql = Sql().Delete<MemberPropertyTypeDto>(c => c.NodeId == entity.Id);
+        _ = Database.Execute(sql);
         IEnumerable<MemberPropertyTypeDto> memberTypeDtos = ContentTypeFactory.BuildMemberPropertyTypeDtos(entity);
         foreach (MemberPropertyTypeDto memberTypeDto in memberTypeDtos)
         {

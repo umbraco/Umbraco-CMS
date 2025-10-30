@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
@@ -35,12 +36,12 @@ internal static class DataTypeFactory
         {
             dataType.DisableChangeTracking();
 
-            dataType.CreateDate = dto.NodeDto.CreateDate;
+            dataType.CreateDate = dto.NodeDto.CreateDate.EnsureUtc();
             dataType.DatabaseType = dto.DbType.EnumParse<ValueStorageType>(true);
             dataType.Id = dto.NodeId;
             dataType.Key = dto.NodeDto.UniqueId;
             dataType.Level = dto.NodeDto.Level;
-            dataType.UpdateDate = dto.NodeDto.CreateDate;
+            dataType.UpdateDate = dto.NodeDto.CreateDate.EnsureUtc();
             dataType.Name = dto.NodeDto.Text;
             dataType.ParentId = dto.NodeDto.ParentId;
             dataType.Path = dto.NodeDto.Path;

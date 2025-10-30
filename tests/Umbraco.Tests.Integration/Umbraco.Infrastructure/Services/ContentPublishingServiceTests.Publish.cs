@@ -17,7 +17,7 @@ public partial class ContentPublishingServiceTests
     {
         VerifyIsNotPublished(Textpage.Key);
 
-        var result = await ContentPublishingService.PublishAsync(Textpage.Key, MakeModel(_allCultures), Constants.Security.SuperUserKey);
+        var result = await ContentPublishingService.PublishAsync(Textpage.Key, [new CulturePublishScheduleModel()], Constants.Security.SuperUserKey);
 
         Assert.IsTrue(result.Success);
         Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Status);
@@ -27,7 +27,7 @@ public partial class ContentPublishingServiceTests
     [Test]
     public async Task Publish_Single_Item_Does_Not_Publish_Children()
     {
-        await ContentPublishingService.PublishAsync(Textpage.Key, MakeModel(_allCultures), Constants.Security.SuperUserKey);
+        await ContentPublishingService.PublishAsync(Textpage.Key, [new CulturePublishScheduleModel()], Constants.Security.SuperUserKey);
 
         VerifyIsPublished(Textpage.Key);
         VerifyIsNotPublished(Subpage.Key);
@@ -36,9 +36,9 @@ public partial class ContentPublishingServiceTests
     [Test]
     public async Task Can_Publish_Child_Of_Root()
     {
-        await ContentPublishingService.PublishAsync(Textpage.Key, MakeModel(_allCultures), Constants.Security.SuperUserKey);
+        await ContentPublishingService.PublishAsync(Textpage.Key, [new CulturePublishScheduleModel()], Constants.Security.SuperUserKey);
 
-        var result = await ContentPublishingService.PublishAsync(Subpage.Key, MakeModel(_allCultures), Constants.Security.SuperUserKey);
+        var result = await ContentPublishingService.PublishAsync(Subpage.Key, [new CulturePublishScheduleModel()], Constants.Security.SuperUserKey);
 
         Assert.IsTrue(result.Success);
         Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Status);
@@ -76,7 +76,7 @@ public partial class ContentPublishingServiceTests
     [Test]
     public async Task Can_Publish_Branch_Beneath_Root()
     {
-        await ContentPublishingService.PublishAsync(Textpage.Key, MakeModel(_allCultures), Constants.Security.SuperUserKey);
+        await ContentPublishingService.PublishAsync(Textpage.Key, [new CulturePublishScheduleModel()], Constants.Security.SuperUserKey);
         var subpage2Subpage = ContentBuilder.CreateSimpleContent(ContentType, "Text Page 2-2", Subpage2.Id);
         ContentService.Save(subpage2Subpage, -1);
 
@@ -95,7 +95,7 @@ public partial class ContentPublishingServiceTests
     {
         ContentNotificationHandler.PublishingContent = notification => notification.Cancel = true;
 
-        var result = await ContentPublishingService.PublishAsync(Textpage.Key, MakeModel(_allCultures), Constants.Security.SuperUserKey);
+        var result = await ContentPublishingService.PublishAsync(Textpage.Key, [new CulturePublishScheduleModel()], Constants.Security.SuperUserKey);
 
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentPublishingOperationStatus.CancelledByEvent, result.Status);
@@ -115,7 +115,9 @@ public partial class ContentPublishingServiceTests
         content.SetValue("title", "DA title", culture: langDa.IsoCode);
         ContentService.Save(content);
 
-        var result = await ContentPublishingService.PublishAsync(content.Key, MakeModel(new HashSet<string>() { langEn.IsoCode, langDa.IsoCode }), Constants.Security.SuperUserKey);
+        var result = await ContentPublishingService.PublishAsync(content.Key, [
+            new CulturePublishScheduleModel { Culture = langEn.IsoCode },
+            new CulturePublishScheduleModel { Culture = langDa.IsoCode }], Constants.Security.SuperUserKey);
 
         Assert.IsTrue(result.Success);
         Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Status);
@@ -140,7 +142,9 @@ public partial class ContentPublishingServiceTests
         content.SetValue("title", "DA title", culture: langDa.IsoCode);
         ContentService.Save(content);
 
-        var publishResult = await ContentPublishingService.PublishAsync(content.Key, MakeModel(new HashSet<string>() { langEn.IsoCode, langDa.IsoCode }), Constants.Security.SuperUserKey);
+        var publishResult = await ContentPublishingService.PublishAsync(content.Key, [
+            new CulturePublishScheduleModel { Culture = langEn.IsoCode },
+            new CulturePublishScheduleModel { Culture = langDa.IsoCode }], Constants.Security.SuperUserKey);
 
         Assert.IsTrue(publishResult.Success);
         Assert.AreEqual(ContentPublishingOperationStatus.Success, publishResult.Status);
@@ -158,8 +162,8 @@ public partial class ContentPublishingServiceTests
         content = ContentService.GetById(content.Key)!;
         Assert.AreEqual(0, content.PublishedCultures.Count());
 
-        publishResult = await ContentPublishingService.PublishAsync(content.Key, MakeModel(new HashSet<string>() { langDa.IsoCode }), Constants.Security.SuperUserKey);
-
+        publishResult = await ContentPublishingService.PublishAsync(content.Key, [
+            new CulturePublishScheduleModel { Culture = langDa.IsoCode }], Constants.Security.SuperUserKey);
         Assert.IsTrue(publishResult.Success);
         Assert.AreEqual(ContentPublishingOperationStatus.Success, publishResult.Status);
 
@@ -221,7 +225,8 @@ public partial class ContentPublishingServiceTests
         content.SetValue("title", null, culture: langDa.IsoCode);
         ContentService.Save(content);
 
-        var result = await ContentPublishingService.PublishAsync(content.Key, MakeModel(new HashSet<string>() { langEn.IsoCode }), Constants.Security.SuperUserKey);
+        var result = await ContentPublishingService.PublishAsync(content.Key, [new CulturePublishScheduleModel { Culture = langEn.IsoCode }], Constants.Security.SuperUserKey);
+
         Assert.IsTrue(result.Success);
         Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Status);
 
@@ -320,7 +325,9 @@ public partial class ContentPublishingServiceTests
         content.SetValue("title", "DA title", culture: langDa.IsoCode);
         ContentService.Save(content);
 
-        var result = await ContentPublishingService.PublishAsync(content.Key, MakeModel(new HashSet<string>() { langEn.IsoCode, langDa.IsoCode }), Constants.Security.SuperUserKey);
+        var result = await ContentPublishingService.PublishAsync(content.Key, [
+            new CulturePublishScheduleModel { Culture = langEn.IsoCode },
+            new CulturePublishScheduleModel { Culture = langDa.IsoCode }], Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Status);
 
@@ -355,7 +362,10 @@ public partial class ContentPublishingServiceTests
         content.SetValue("invariantValue", "Invariant value");
         ContentService.Save(content);
 
-        var result = await ContentPublishingService.PublishAsync(content.Key, MakeModel(new HashSet<string> { "en-US", "da-DK" }), Constants.Security.SuperUserKey);
+        var result = await ContentPublishingService.PublishAsync(content.Key, [
+            new CulturePublishScheduleModel { Culture = "en-US" },
+            new CulturePublishScheduleModel { Culture = "da-DK" }], Constants.Security.SuperUserKey);
+
         Assert.IsTrue(result.Success);
 
         content = ContentService.GetById(content.Key)!;
@@ -364,7 +374,7 @@ public partial class ContentPublishingServiceTests
         content.SetValue("invariantValue", null);
         ContentService.Save(content);
 
-        result = await ContentPublishingService.PublishAsync(content.Key, MakeModel(new HashSet<string>(culturesToRepublish)), Constants.Security.SuperUserKey);
+        result = await ContentPublishingService.PublishAsync(content.Key, culturesToRepublish.Select(culture => new CulturePublishScheduleModel { Culture = culture }).ToArray(), Constants.Security.SuperUserKey);
 
         content = ContentService.GetById(content.Key)!;
 
@@ -407,7 +417,7 @@ public partial class ContentPublishingServiceTests
     [Test]
     public async Task Cannot_Publish_Non_Existing_Content()
     {
-        var result = await ContentPublishingService.PublishAsync(Guid.NewGuid(), MakeModel(_allCultures), Constants.Security.SuperUserKey);
+        var result = await ContentPublishingService.PublishAsync(Guid.NewGuid(), _allCultures.Select(culture => new CulturePublishScheduleModel { Culture = culture }).ToArray(), Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentPublishingOperationStatus.ContentNotFound, result.Status);
     }
@@ -426,7 +436,7 @@ public partial class ContentPublishingServiceTests
     {
         var content = await CreateInvalidContent();
 
-        var result = await ContentPublishingService.PublishAsync(content.Key, MakeModel(_allCultures), Constants.Security.SuperUserKey);
+        var result = await ContentPublishingService.PublishAsync(content.Key, _allCultures.Select(culture => new CulturePublishScheduleModel { Culture = culture }).ToArray(), Constants.Security.SuperUserKey);
 
         Assert.IsFalse(result);
         Assert.AreEqual(ContentPublishingOperationStatus.ContentInvalid, result.Status);
@@ -475,7 +485,9 @@ public partial class ContentPublishingServiceTests
         content.SetValue("title", null, culture: langDa.IsoCode);
         ContentService.Save(content);
 
-        var result = await ContentPublishingService.PublishAsync(content.Key, MakeModel(new HashSet<string>() { langEn.IsoCode, langDa.IsoCode }), Constants.Security.SuperUserKey);
+        var result = await ContentPublishingService.PublishAsync(content.Key, [
+            new CulturePublishScheduleModel { Culture = langEn.IsoCode },
+            new CulturePublishScheduleModel { Culture = langDa.IsoCode }], Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentPublishingOperationStatus.ContentInvalid, result.Status);
 
@@ -497,7 +509,9 @@ public partial class ContentPublishingServiceTests
         content.SetValue("title", "DA title", culture: langDa.IsoCode);
         ContentService.Save(content);
 
-        var result = await ContentPublishingService.PublishAsync(content.Key, MakeModel(new HashSet<string>() { langDa.IsoCode }), Constants.Security.SuperUserKey);
+        var result = await ContentPublishingService.PublishAsync(content.Key, [
+            new CulturePublishScheduleModel { Culture = langDa.IsoCode }], Constants.Security.SuperUserKey);
+
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentPublishingOperationStatus.MandatoryCultureMissing, result.Status);
 
@@ -545,7 +559,7 @@ public partial class ContentPublishingServiceTests
     {
         VerifyIsNotPublished(Textpage.Key);
 
-        var result = await ContentPublishingService.PublishAsync(Subpage.Key, MakeModel(_allCultures), Constants.Security.SuperUserKey);
+        var result = await ContentPublishingService.PublishAsync(Subpage.Key, [new CulturePublishScheduleModel()], Constants.Security.SuperUserKey);
 
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentPublishingOperationStatus.PathNotPublished, result.Status);
@@ -558,7 +572,7 @@ public partial class ContentPublishingServiceTests
         ContentService.MoveToRecycleBin(Subpage);
         Assert.IsTrue(ContentService.GetById(Subpage.Key)!.Trashed);
 
-        var result = await ContentPublishingService.PublishAsync(Subpage.Key, MakeModel(_allCultures), Constants.Security.SuperUserKey);
+        var result = await ContentPublishingService.PublishAsync(Subpage.Key, [new CulturePublishScheduleModel()], Constants.Security.SuperUserKey);
 
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentPublishingOperationStatus.InTrash, result.Status);
@@ -572,7 +586,7 @@ public partial class ContentPublishingServiceTests
         Textpage.SetValue("author", "This is not a number");
         ContentService.Save(Textpage);
 
-        var result = await ContentPublishingService.PublishAsync(Textpage.Key, MakeModel(_allCultures), Constants.Security.SuperUserKey);
+        var result = await ContentPublishingService.PublishAsync(Textpage.Key, [new CulturePublishScheduleModel()], Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         VerifyIsPublished(Textpage.Key);
 
@@ -580,7 +594,7 @@ public partial class ContentPublishingServiceTests
         ContentType.PropertyTypes.First(pt => pt.Alias == "author").ValidationRegExp = "^\\d*$";
         await ContentTypeService.SaveAsync(ContentType, Constants.Security.SuperUserKey);
 
-        result = await ContentPublishingService.PublishAsync(Textpage.Key, MakeModel(_allCultures), Constants.Security.SuperUserKey);
+        result = await ContentPublishingService.PublishAsync(Textpage.Key, [new CulturePublishScheduleModel()], Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentPublishingOperationStatus.ContentInvalid, result.Status);
 
@@ -596,7 +610,7 @@ public partial class ContentPublishingServiceTests
     [Test]
     public async Task Cannot_Republish_Content_After_Adding_Mandatory_Property()
     {
-        var result = await ContentPublishingService.PublishAsync(Textpage.Key, MakeModel(_allCultures), Constants.Security.SuperUserKey);
+        var result = await ContentPublishingService.PublishAsync(Textpage.Key, [new CulturePublishScheduleModel()], Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         VerifyIsPublished(Textpage.Key);
 
@@ -607,7 +621,7 @@ public partial class ContentPublishingServiceTests
             });
         await ContentTypeService.SaveAsync(ContentType, Constants.Security.SuperUserKey);
 
-        result = await ContentPublishingService.PublishAsync(Textpage.Key, MakeModel(_allCultures), Constants.Security.SuperUserKey);
+        result = await ContentPublishingService.PublishAsync(Textpage.Key, [new CulturePublishScheduleModel()], Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentPublishingOperationStatus.ContentInvalid, result.Status);
 
@@ -684,7 +698,7 @@ public partial class ContentPublishingServiceTests
         content.SetValue("title", "DA title", culture: langDa.IsoCode);
         ContentService.Save(content);
 
-        var result = await ContentPublishingService.PublishAsync(content.Key, MakeModel(new HashSet<string>() { cultureCode }), Constants.Security.SuperUserKey);
+        var result = await ContentPublishingService.PublishAsync(content.Key, [new CulturePublishScheduleModel { Culture = cultureCode }], Constants.Security.SuperUserKey);
 
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentPublishingOperationStatus.InvalidCulture, result.Status);
@@ -705,7 +719,7 @@ public partial class ContentPublishingServiceTests
         content.SetValue("title", "DA title", culture: langDa.IsoCode);
         ContentService.Save(content);
 
-        var result = await ContentPublishingService.PublishAsync(content.Key, MakeModel(new HashSet<string>() { cultureCode }), Constants.Security.SuperUserKey);
+        var result = await ContentPublishingService.PublishAsync(content.Key, [new CulturePublishScheduleModel { Culture = cultureCode }], Constants.Security.SuperUserKey);
 
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentPublishingOperationStatus.InvalidCulture, result.Status);
@@ -714,21 +728,30 @@ public partial class ContentPublishingServiceTests
     [Test]
     public async Task Can_Publish_Invariant_Content_With_Cultures_Provided_If_The_Default_Culture_Is_Exclusively_Provided()
     {
-        var result = await ContentPublishingService.PublishAsync(Textpage.Key, MakeModel(new HashSet<string>() { "en-US" }), Constants.Security.SuperUserKey);
+        var result = await ContentPublishingService.PublishAsync(Textpage.Key, [new CulturePublishScheduleModel { Culture = "en-US" }], Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
     }
 
     [Test]
     public async Task Can_Publish_Invariant_Content_With_Cultures_Provided_If_The_Default_Culture_Is_Provided_With_Other_Cultures()
     {
-        var result = await ContentPublishingService.PublishAsync(Textpage.Key, MakeModel(new HashSet<string>() { "en-US", "da-DK" }), Constants.Security.SuperUserKey);
+        var result = await ContentPublishingService.PublishAsync(
+            Textpage.Key, [
+            new CulturePublishScheduleModel { Culture = "en-US" },
+            new CulturePublishScheduleModel { Culture = "da-DK" }],
+            Constants.Security.SuperUserKey);
+
         Assert.IsTrue(result.Success);
     }
 
     [Test]
     public async Task Cannot_Publish_Invariant_Content_With_Cultures_Provided_That_Do_Not_Include_The_Default_Culture()
     {
-        var result = await ContentPublishingService.PublishAsync(Textpage.Key, MakeModel(new HashSet<string>() { "da-DK" }), Constants.Security.SuperUserKey);
+        var result = await ContentPublishingService.PublishAsync(
+            Textpage.Key,
+            [new CulturePublishScheduleModel { Culture = "da-DK" }],
+            Constants.Security.SuperUserKey);
+
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentPublishingOperationStatus.InvalidCulture, result.Status);
     }

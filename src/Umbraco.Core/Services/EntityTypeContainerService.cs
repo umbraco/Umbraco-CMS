@@ -14,7 +14,7 @@ internal abstract class EntityTypeContainerService<TTreeEntity, TEntityContainer
     where TEntityContainerRepository : IEntityContainerRepository
 {
     private readonly TEntityContainerRepository _entityContainerRepository;
-    private readonly IAuditRepository _auditRepository;
+    private readonly IAuditService _auditService;
     private readonly IEntityRepository _entityRepository;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
 
@@ -31,13 +31,13 @@ internal abstract class EntityTypeContainerService<TTreeEntity, TEntityContainer
         ILoggerFactory loggerFactory,
         IEventMessagesFactory eventMessagesFactory,
         TEntityContainerRepository entityContainerRepository,
-        IAuditRepository auditRepository,
+        IAuditService auditService,
         IEntityRepository entityRepository,
         IUserIdKeyResolver userIdKeyResolver)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _entityContainerRepository = entityContainerRepository;
-        _auditRepository = auditRepository;
+        _auditService = auditService;
         _entityRepository = entityRepository;
         _userIdKeyResolver = userIdKeyResolver;
     }
@@ -183,8 +183,7 @@ internal abstract class EntityTypeContainerService<TTreeEntity, TEntityContainer
 
         _entityContainerRepository.Delete(container);
 
-        var currentUserId = await _userIdKeyResolver.GetAsync(userKey);
-        Audit(AuditType.Delete, currentUserId, container.Id);
+        await AuditAsync(AuditType.Delete, userKey, container.Id);
         scope.Complete();
 
         scope.Notifications.Publish(new EntityContainerDeletedNotification(container, eventMessages).WithStateFrom(deletingEntityContainerNotification));
@@ -218,8 +217,7 @@ internal abstract class EntityTypeContainerService<TTreeEntity, TEntityContainer
 
         _entityContainerRepository.Save(container);
 
-        var currentUserId = await _userIdKeyResolver.GetAsync(userKey);
-        Audit(auditType, currentUserId, container.Id);
+        await AuditAsync(auditType, userKey, container.Id);
         scope.Complete();
 
         scope.Notifications.Publish(new EntityContainerSavedNotification(container, eventMessages).WithStateFrom(savingEntityContainerNotification));
@@ -239,8 +237,12 @@ internal abstract class EntityTypeContainerService<TTreeEntity, TEntityContainer
         return _entityContainerRepository.Get(treeEntity.ParentId);
     }
 
-    private void Audit(AuditType type, int userId, int objectId)
-        => _auditRepository.Save(new AuditItem(objectId, type, userId, ContainerObjectType.GetName()));
+    private async Task AuditAsync(AuditType type, Guid userKey, int objectId) =>
+        await _auditService.AddAsync(
+            type,
+            userKey,
+            objectId,
+            ContainerObjectType.GetName());
 
     private void ReadLock(ICoreScope scope)
     {

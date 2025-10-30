@@ -18,7 +18,7 @@ public class BackOfficeIdentityUser : UmbracoIdentityUser
     private string[]? _allowedSections;
     private string _culture;
     private IReadOnlyCollection<IReadOnlyUserGroup> _groups = null!;
-    private DateTime? _inviteDateUtc;
+    private DateTime? _inviteDate;
     private int[] _startContentIds;
     private int[] _startMediaIds;
     private UserKind _kind;
@@ -49,10 +49,10 @@ public class BackOfficeIdentityUser : UmbracoIdentityUser
     /// <summary>
     ///     Gets or sets invite date
     /// </summary>
-    public DateTime? InviteDateUtc
+    public DateTime? InviteDate
     {
-        get => _inviteDateUtc;
-        set => BeingDirty.SetPropertyValueAndDetectChanges(value, ref _inviteDateUtc, nameof(InviteDateUtc));
+        get => _inviteDate;
+        set => BeingDirty.SetPropertyValueAndDetectChanges(value, ref _inviteDate, nameof(InviteDate));
     }
 
     /// <summary>

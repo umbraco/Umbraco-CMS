@@ -30,34 +30,6 @@ public abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : BlockVal
     /// <summary>
     /// Initializes a new instance of the <see cref="BlockEditorPropertyValueEditor{TValue, TLayout}"/> class.
     /// </summary>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    protected BlockEditorPropertyValueEditor(
-        PropertyEditorCollection propertyEditors,
-        DataValueReferenceFactoryCollection dataValueReferenceFactories,
-        IDataTypeConfigurationCache dataTypeConfigurationCache,
-        IShortStringHelper shortStringHelper,
-        IJsonSerializer jsonSerializer,
-        BlockEditorVarianceHandler blockEditorVarianceHandler,
-        ILanguageService languageService,
-        IIOHelper ioHelper,
-        DataEditorAttribute attribute)
-        : this(
-              propertyEditors,
-              dataValueReferenceFactories,
-              dataTypeConfigurationCache,
-              shortStringHelper,
-              jsonSerializer,
-              blockEditorVarianceHandler,
-              languageService,
-              ioHelper,
-              attribute,
-              StaticServiceProvider.Instance.GetRequiredService<ILogger<BlockEditorPropertyValueEditor<TValue, TLayout>>>())
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="BlockEditorPropertyValueEditor{TValue, TLayout}"/> class.
-    /// </summary>
     protected BlockEditorPropertyValueEditor(
         PropertyEditorCollection propertyEditors,
         DataValueReferenceFactoryCollection dataValueReferenceFactories,

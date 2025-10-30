@@ -47,7 +47,6 @@ const mapper = (item: DocumentItemResponseModel): UmbDocumentItemModel => {
 		hasChildren: item.hasChildren,
 		isProtected: item.isProtected,
 		isTrashed: item.isTrashed,
-		name: item.variants[0]?.name, // TODO: this is not correct. We need to get it from the variants. This is a temp solution.
 		parent: item.parent ? { unique: item.parent.id } : null,
 		unique: item.id,
 		variants: item.variants.map((variant) => {
@@ -56,6 +55,9 @@ const mapper = (item: DocumentItemResponseModel): UmbDocumentItemModel => {
 				name: variant.name,
 				state: variant.state,
 				flags: variant.flags,
+				// TODO: [v17] Implement dates when available in the API. [LK]
+				//createDate: new Date(variant.createDate),
+				//updateDate: new Date(variant.updateDate),
 			};
 		}),
 		flags: item.flags,
