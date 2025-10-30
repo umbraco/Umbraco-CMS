@@ -23,7 +23,7 @@ public class ItemDatatypeItemController : DatatypeItemControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<DataTypeItemResponseModel>), StatusCodes.Status200OK)]
-    [EndpointSummary("Get data type items by the provided Ids.")]
+    [EndpointSummary("Gets a collection of data type items.")]
     [EndpointDescription("Get data type items by using the provided Ids and the result returns the data types' properties.")]
     public async Task<IActionResult> Item(
         CancellationToken cancellationToken,
