@@ -15,6 +15,7 @@ public class BlockListConfiguration
     public NumberRange ValidationLimit { get; set; } = new();
 
     [ConfigurationField("useSingleBlockMode")]
+    [Obsolete("Use SingleBlockPropertyEditor and its configuration instead")]
     public bool UseSingleBlockMode { get; set; }
 
     public class BlockConfiguration : IBlockConfiguration

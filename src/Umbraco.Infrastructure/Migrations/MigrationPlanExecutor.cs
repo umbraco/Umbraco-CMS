@@ -1,15 +1,11 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using OpenIddict.Abstractions;
-using Org.BouncyCastle.Utilities;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Migrations;
-using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Scoping;
-using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Scoping;
@@ -78,34 +74,6 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
         _distributedCache = distributedCache;
         _logger = _loggerFactory.CreateLogger<MigrationPlanExecutor>();
     }
-
-    [Obsolete("Use the non obsoleted constructor instead. Scheduled for removal in v17")]
-    public MigrationPlanExecutor(
-        ICoreScopeProvider scopeProvider,
-        IScopeAccessor scopeAccessor,
-        ILoggerFactory loggerFactory,
-        IMigrationBuilder migrationBuilder,
-        IUmbracoDatabaseFactory databaseFactory,
-        IDatabaseCacheRebuilder databaseCacheRebuilder,
-        DistributedCache distributedCache,
-        IKeyValueService keyValueService,
-        IServiceScopeFactory serviceScopeFactory)
-    : this(
-        scopeProvider,
-        scopeAccessor,
-        loggerFactory,
-        migrationBuilder,
-        databaseFactory,
-        databaseCacheRebuilder,
-        distributedCache,
-        keyValueService,
-        serviceScopeFactory,
-        StaticServiceProvider.Instance.GetRequiredService<AppCaches>())
-    {
-    }
-
-    [Obsolete("Use ExecutePlan instead. Scheduled for removal in Umbraco 17.")]
-    public string Execute(MigrationPlan plan, string fromState) => ExecutePlan(plan, fromState).FinalState;
 
     /// <inheritdoc/>
     [Obsolete("Use ExecutePlanAsync instead. Scheduled for removal in Umbraco 18.")]

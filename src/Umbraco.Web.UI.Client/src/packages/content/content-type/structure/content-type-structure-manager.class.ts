@@ -447,7 +447,7 @@ export class UmbContentTypeStructureManager<
 				const newName = 'Unnamed';
 				this.#editedTypes.appendOne(contentTypeUnique);
 				this.updateContainer(null, container.id, {
-					name: this.makeContainerNameUniqueForOwnerContentType(container.id, newName, type, parentId) ?? newName,
+					name: this.makeContainerNameUniqueForOwnerContentType(container.id, newName) ?? newName,
 				});
 			}
 		});
@@ -511,32 +511,16 @@ export class UmbContentTypeStructureManager<
 		return newContainer;
 	}
 
-	makeEmptyContainerName(
-		containerId: string,
-		legacyContainerType?: UmbPropertyContainerTypes,
-		legacyParentId?: string | null,
-	): string {
-		return (
-			this.makeContainerNameUniqueForOwnerContentType(containerId, 'Unnamed', legacyContainerType, legacyParentId) ??
-			'Unnamed'
-		);
+	makeEmptyContainerName(containerId: string): string {
+		return this.makeContainerNameUniqueForOwnerContentType(containerId, 'Unnamed') ?? 'Unnamed';
 	}
 	/**
 	 *
 	 * @param {string} containerId - The id of the container to make unique
 	 * @param {string} newName - The new name to make unique
-	 * @param {never} _legacyContainerType - do not use, has no effect. Is deprecated and will be removed in v.17
-	 * @param {never} _legacyParentId - do not use, has no effect. Is deprecated and will be removed in v.17
 	 * @returns
 	 */
-	makeContainerNameUniqueForOwnerContentType(
-		containerId: string,
-		newName: string,
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		_legacyContainerType?: UmbPropertyContainerTypes,
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		_legacyParentId?: string | null,
-	) {
+	makeContainerNameUniqueForOwnerContentType(containerId: string, newName: string) {
 		const container = this.getOwnerContainerById(containerId);
 		if (!container) {
 			console.warn(`Container with id ${containerId} not found in owner content type.`);

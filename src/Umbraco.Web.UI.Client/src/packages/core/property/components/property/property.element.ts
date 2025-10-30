@@ -99,6 +99,18 @@ export class UmbPropertyElement extends UmbLitElement {
 	}
 	private _propertyEditorUiAlias?: string;
 
+	@property({ type: String, attribute: 'property-editor-data-source-alias' })
+	public set propertyEditorDataSourceAlias(value: string | undefined) {
+		this.#propertyContext.setEditorDataSourceAlias(value);
+
+		if (this._element) {
+			this._element.dataSourceAlias = value;
+		}
+	}
+	public get propertyEditorDataSourceAlias(): string | undefined {
+		return this.#propertyContext.getEditorDataSourceAlias();
+	}
+
 	/**
 	 * Config. Configuration to pass to the Property Editor UI. This is also the configuration data stored on the Data Type.
 	 * @public
@@ -328,6 +340,7 @@ export class UmbPropertyElement extends UmbLitElement {
 			this.#validationMessageObserver?.destroy();
 			this.#controlValidator?.destroy();
 			oldElement?.removeEventListener('change', this._onPropertyEditorChange as any as EventListener);
+			/** @deprecated The `UmbPropertyValueChangeEvent` has been deprecated, and will be removed in Umbraco 18. [LK] */
 			oldElement?.removeEventListener('property-value-change', this._onPropertyEditorChange as any as EventListener);
 			oldElement?.destroy?.();
 
@@ -337,11 +350,13 @@ export class UmbPropertyElement extends UmbLitElement {
 
 			if (this._element) {
 				this._element.addEventListener('change', this._onPropertyEditorChange as any as EventListener);
+				/** @deprecated The `UmbPropertyValueChangeEvent` has been deprecated, and will be removed in Umbraco 18. [LK] */
 				this._element.addEventListener('property-value-change', this._onPropertyEditorChange as any as EventListener);
 				// No need to observe mandatory or label, as we already do so and set it on the _element if present: [NL]
 				this._element.manifest = manifest;
 				this._element.mandatory = this._mandatory;
 				this._element.name = this._label;
+				this._element.dataSourceAlias = this.#propertyContext.getEditorDataSourceAlias();
 
 				// No need for a controller alias, as the clean is handled via the observer prop:
 				this.#valueObserver = this.observe(

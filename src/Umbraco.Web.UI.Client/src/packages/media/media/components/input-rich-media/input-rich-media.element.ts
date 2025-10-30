@@ -11,7 +11,6 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbSorterController, UmbSorterResolvePlacementAsGrid } from '@umbraco-cms/backoffice/sorter';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
-import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
@@ -136,24 +135,6 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		return this.#focalPointEnabled;
 	}
 	#focalPointEnabled: boolean = false;
-
-	@property()
-	/** @deprecated will be removed in v17 */
-	public set alias(value: string | undefined) {
-		//this.#modalRouter.setUniquePathValue('propertyAlias', value);
-	}
-	public get alias(): string | undefined {
-		return undefined; //this.#modalRouter.getUniquePathValue('propertyAlias');
-	}
-
-	@property()
-	/** @deprecated will be removed in v17 */
-	public set variantId(value: string | UmbVariantId | undefined) {
-		//this.#modalRouter.setUniquePathValue('variantId', value?.toString());
-	}
-	public get variantId(): string | undefined {
-		return undefined; //this.#modalRouter.getUniquePathValue('variantId');
-	}
 
 	/**
 	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.

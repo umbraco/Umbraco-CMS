@@ -25,24 +25,4 @@ export const manifests: Array<UmbExtensionManifest> = [
 			},
 		],
 	},
-	{
-		type: 'workspaceAction',
-		kind: 'default',
-		alias: 'Umb.WorkspaceAction.Document.SaveAndPreview',
-		name: 'Save And Preview Document Workspace Action',
-		weight: 90,
-		api: () => import('./save-and-preview.action.js'),
-		meta: {
-			label: '#buttons_saveAndPreview',
-		},
-		conditions: [
-			{
-				alias: UMB_WORKSPACE_CONDITION_ALIAS,
-				match: UMB_DOCUMENT_WORKSPACE_ALIAS,
-			},
-			{
-				alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
-			},
-		],
-	},
 ];

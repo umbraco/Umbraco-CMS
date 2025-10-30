@@ -1,9 +1,9 @@
+import type { UmbSectionContext } from '../section.context.js';
 import type { UmbSectionElement } from './section-element.interface.js';
-import type { ManifestElement, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
+import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
 
 export interface ManifestSection
-	// TODO: v17 change to extend Element and Api
-	extends ManifestElement<UmbSectionElement>,
+	extends ManifestElementAndApi<UmbSectionElement, UmbSectionContext>,
 		ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
 	type: 'section';
 	meta: MetaSection;

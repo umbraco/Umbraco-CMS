@@ -1,8 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors.Validators;
 using Umbraco.Cms.Core.Services;
@@ -18,17 +16,6 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 public class EmailAddressPropertyEditor : DataEditor
 {
     private readonly ILocalizedTextService _localizedTextService;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="EmailAddressPropertyEditor"/> class.
-    /// </summary>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 17.")]
-    public EmailAddressPropertyEditor(IDataValueEditorFactory dataValueEditorFactory)
-        : this(
-              dataValueEditorFactory,
-              StaticServiceProvider.Instance.GetRequiredService<ILocalizedTextService>())
-    {
-    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="EmailAddressPropertyEditor"/> class.

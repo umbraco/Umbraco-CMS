@@ -21,6 +21,6 @@ public class ExportedMemberWebhookEvent : WebhookEventBase<ExportedMemberNotific
 
     public override string Alias => Constants.WebhookEvents.Aliases.ExportedMember;
 
-    public override object? ConvertNotificationToRequestPayload(ExportedMemberNotification notification)
+    public override object ConvertNotificationToRequestPayload(ExportedMemberNotification notification)
         => new DefaultPayloadModel { Id = notification.Member.Key };
 }

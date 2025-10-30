@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
@@ -64,7 +65,7 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
             contentCacheNode.Id,
             contentCacheNode.Key,
             contentCacheNode.SortOrder,
-            contentCacheNode.CreateDate,
+            contentCacheNode.CreateDate.EnsureUtc(),
             contentCacheNode.CreatorId,
             contentType,
             preview ? contentCacheNode.Data : null,
@@ -114,7 +115,7 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
             contentCacheNode.Id,
             contentCacheNode.Key,
             contentCacheNode.SortOrder,
-            contentCacheNode.CreateDate,
+            contentCacheNode.CreateDate.EnsureUtc(),
             contentCacheNode.CreatorId,
             contentType,
             null,
@@ -162,7 +163,7 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
             member.Name,
             null,
             0,
-            member.UpdateDate,
+            member.UpdateDate.EnsureUtc(),
             member.CreatorId,
             null,
             true,
@@ -173,7 +174,7 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
             member.Id,
             member.Key,
             member.SortOrder,
-            member.UpdateDate,
+            member.UpdateDate.EnsureUtc(),
             member.CreatorId,
             contentType,
             null,

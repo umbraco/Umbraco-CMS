@@ -3,8 +3,6 @@ import { css, customElement, html } from '@umbraco-cms/backoffice/external/lit';
 import { debounce } from '@umbraco-cms/backoffice/utils';
 import { UmbCollectionDefaultElement } from '@umbraco-cms/backoffice/collection';
 
-import './user-group-collection-header.element.js';
-
 @customElement('umb-user-group-collection')
 export class UmbUserGroupCollectionElement extends UmbCollectionDefaultElement {
 	#collectionContext?: typeof UMB_USER_GROUP_COLLECTION_CONTEXT.TYPE;

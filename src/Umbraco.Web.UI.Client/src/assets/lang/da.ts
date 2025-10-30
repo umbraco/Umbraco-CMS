@@ -74,11 +74,13 @@ export default {
 		readOnly: 'Skrivebeskyttet',
 		trash: 'Papirkurv',
 		loadMore: 'Indlæs flere',
+		showMore: 'Vis flere',
 	},
 	actionCategories: {
 		content: 'Indhold',
 		administration: 'Administration',
 		structure: 'Struktur',
+		general: 'Generelt',
 		other: 'Andet',
 	},
 	actionDescriptions: {
@@ -858,6 +860,7 @@ export default {
 		email: 'E-mail',
 		error: 'Fejl',
 		field: 'Felt',
+		fields: 'Felter',
 		fieldFor: 'Felt for %0%',
 		findDocument: 'Find',
 		first: 'Første',
@@ -1055,8 +1058,6 @@ export default {
 		databaseInstall: '\n      Klik på <strong>installér</strong> knappen for at installere Umbraco %0% databasen\n    ',
 		databaseInstallDone:
 			'Umbraco %0% er nu blevet kopieret til din database. Tryk på <string>Næste</strong> for at fortsætte.',
-		databaseNotFound:
-			'<p>Databasen er ikke fundet. Kontrollér venligst at informationen i database forbindelsesstrengen i "web.config" filen er korrekt.</p>\n<p>For at fortsætte bedes du venligst rette "web.config" filen (ved at bruge Visual Studio eller dit favoritprogram), scroll til bunden, tilføj forbindelsesstrengen til din database i feltet som hedder "umbracoDbDSN" og gem filen.</p><p>Klik på <strong>Forsøg igen</strong> knappen når du er færdig.<br/><a href="https://our.umbraco.com/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank" rel="noopener">Mere information om at redigere web.config her.</a></p>',
 		databaseText:
 			'For at afslutte dette skridt er du nødt til at have nogle informationer om din database parat ("database forbindelsesstrengen").<br/>Kontakt venligst din ISP hvis det er nødvendigt. Hvis du installerer på en lokal maskine eller server kan du muligvis få informationerne fra din systemadministrator.',
 		databaseUpgrade:
@@ -1299,10 +1300,10 @@ export default {
 	},
 	colorPickerConfigurations: {
 		colorsTitle: 'Farver',
-		colorsDescription: 'Tilføj, fjern eller sorter farver',
+		colorsDescription: 'Tilføj, fjern eller sorter farver (og etiketter).',
 		showLabelTitle: 'Inkluder label?',
 		showLabelDescription:
-			'Gemmer farver som et Json-objekt, der både indeholder farvens hex streng og label, i stedet for kun at gemme hex strengen.',
+			'Viser et farvet felt og en etiket for hver farve i farvevælgeren i stedet for blot et farvet felt.',
 	},
 	contentPicker: {
 		allowedItemTypes: 'Du kan kun vælge følgende type(r) dokumenter: %0%',
@@ -1414,14 +1415,6 @@ export default {
 		settings: 'Indstillinger',
 		translation: 'Oversættelse',
 		users: 'Brugere',
-	},
-	help: {
-		tours: 'Tours',
-		theBestUmbracoVideoTutorials: 'De bedste Umbraco video tutorials',
-		umbracoForum: 'Besøg our.umbraco.com',
-		umbracoTv: 'Besøg umbraco.tv',
-		umbracoLearningBase: 'Watch our free tutorial videos',
-		umbracoLearningBaseDescription: 'on the Umbraco Learning Base',
 	},
 	settings: {
 		defaulttemplate: 'Standardskabelon',
@@ -2080,10 +2073,10 @@ export default {
 		permissionsGranularHelp: 'Sæt rettigheder for specifikke noder',
 		granularRightsLabel: 'Dokumenter',
 		granularRightsDescription: 'Tillad adgang til specifikke dokumenter',
-		permissionsEntityGroup_document: 'Indhold',
-		permissionsEntityGroup_media: 'Medie',
-		permissionsEntityGroup_member: 'Medlemmer',
-		'permissionsEntityGroup_document-property-value': 'Dokumentegenskabsværdi',
+		permissionsEntityGroup_document: 'Indholdsrettigheder',
+		permissionsEntityGroup_media: 'Medierettigheder',
+		permissionsEntityGroup_member: 'Medlemsrettigheder',
+		'permissionsEntityGroup_document-property-value': 'Feltrettigheder',
 		permissionNoVerbs: 'Ingen tilladte rettigheder',
 		profile: 'Profil',
 		searchAllChildren: "Søg alle 'børn'",
@@ -2600,13 +2593,16 @@ export default {
 		returnToPreviewHeadline: 'Forhåndsvisning af indholdet?',
 		returnToPreviewDescription:
 			'Du har afslutet forhåndsvisning, vil du starte forhåndsvisning igen for at\n      se seneste gemte version af indholdet?\n    ',
+		returnToPreviewAcceptButton: 'Start forhåndsvisning igen',
 		returnToPreviewDeclineButton: 'Se udgivet indhold',
 		viewPublishedContentHeadline: 'Se udgivet indhold?',
 		viewPublishedContentDescription:
 			'Du er i forhåndsvisning, vil du afslutte for at se den udgivet\n      version?\n    ',
 		viewPublishedContentAcceptButton: 'Se udgivet version',
 		viewPublishedContentDeclineButton: 'Forbliv i forhåndsvisning',
-		returnToPreviewAcceptButton: 'Preview latest version',
+		connectionFailed:
+			'Kunne ikke etablere forbindelse til serveren, forhåndsvisning af liveopdateringer vil ikke fungere.',
+		connectionLost: 'Forbindelse til serveren mistet, forhåndsvisning af liveopdateringer vil ikke fungere.',
 	},
 	permissions: {
 		FolderCreation: 'Mappeoprettelse',
@@ -2709,19 +2705,11 @@ export default {
 		profilerEnabledDescription:
 			"\n            <p>\n                Umbraco currently does not run in debug mode, so you can't use the built-in profiler. This is how it should be for a production site.\n            </p>\n            <p>\n                Debug mode is turned on by setting <strong>Umbraco:CMS:Hosting:Debug</strong> to <strong>true</strong> in appsettings.json, appsettings.{Environment}.json or via an environment variable.\n            </p>\n        ",
 	},
-	settingsDashboardVideos: {
-		trainingHeadline: 'Hours of Umbraco training videos are only a click away',
-		trainingDescription:
-			'\n        <p>Want to master Umbraco? Spend a couple of minutes learning some best practices by watching one of these videos about using Umbraco. And visit <a href="https://umbraco.tv" target="_blank" rel="noopener">umbraco.tv</a> for even more Umbraco videos</p>\n    ',
-		learningBaseDescription:
-			'  <p>Vil du mestre Umbraco? Brug et par minutter på at lære nogle best practices ved at besøge <a class="btn-link -underline" href="https://www.youtube.com/c/UmbracoLearningBase" target="_blank" rel="noopener">Umbraco Learning Base YouTube-kanalen</a>. Her finder du en masse videoer, der dækker mange aspekter af Umbraco.</p> ',
-		getStarted: 'To get you started',
-	},
 	settingsDashboard: {
 		documentationHeader: 'Dokumentation',
 		documentationDescription: 'Læs mere om at arbejde med elementerne i Indstillinger i vores Dokumentation.',
 		communityHeader: 'Community',
-		communityDescription: 'Stil et spørgsmål i community forummet eller i vores Discord community',
+		communityDescription: 'Stil et spørgsmål i community forummet',
 		trainingHeader: 'Træning',
 		trainingDescription: 'Se mulighederne for real-life træning og certificering',
 		supportHeader: 'Support',
