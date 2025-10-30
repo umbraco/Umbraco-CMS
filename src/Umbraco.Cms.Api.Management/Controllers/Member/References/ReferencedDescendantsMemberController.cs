@@ -32,6 +32,8 @@ public class ReferencedDescendantsMemberController : MemberControllerBase
     [HttpGet("{id:guid}/referenced-descendants")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<ReferenceByIdModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a paginated collection of referenced descendant members.")]
+    [EndpointDescription("Gets a paginated collection of descendant members that are referenced in relations for the member identified by the provided Id.")]
     public async Task<ActionResult<PagedViewModel<ReferenceByIdModel>>> ReferencedDescendants(
         CancellationToken cancellationToken,
         Guid id,
