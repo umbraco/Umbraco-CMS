@@ -26,6 +26,8 @@ public class AllManifestController : ManifestControllerBase
     [HttpGet("manifest")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<ManifestResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets all manifests.")]
+    [EndpointDescription("Gets a collection of all package manifests including both public and private manifests.")]
     public async Task<IActionResult> AllManifests(CancellationToken cancellationToken)
     {
         IEnumerable<PackageManifest> packageManifests = await _packageManifestService.GetAllPackageManifestsAsync();
