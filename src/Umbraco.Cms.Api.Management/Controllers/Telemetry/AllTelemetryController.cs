@@ -1,9 +1,9 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.ViewModels.Telemetry;
+using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Telemetry;
 

@@ -6,9 +6,9 @@ using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Filters;
 using Umbraco.Cms.Api.Management.ViewModels.Security;
-using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Security;
 
@@ -30,7 +30,6 @@ public class VerifyResetPasswordTokenController : SecurityControllerBase
     [ProducesResponseType(typeof(VerifyResetPasswordResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetailsBuilder), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetailsBuilder), StatusCodes.Status404NotFound)]
-    [UserPasswordEnsureMinimumResponseTime]
     [EndpointSummary("Initiates password reset.")]
     [EndpointDescription("Initiates a password reset process for the user with the provided email.")]
     [UserPasswordEnsureMinimumResponseTime]

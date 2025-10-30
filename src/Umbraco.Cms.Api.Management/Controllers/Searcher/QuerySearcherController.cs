@@ -1,12 +1,12 @@
 using Asp.Versioning;
-using Examine;
 using Examine.Lucene.Search;
 using Examine.Search;
+using Examine;
 using Lucene.Net.QueryParsers.Classic;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Management.Services;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
+using Umbraco.Cms.Api.Management.Services;
 using Umbraco.Cms.Api.Management.ViewModels.Searcher;
 using Umbraco.Extensions;
 

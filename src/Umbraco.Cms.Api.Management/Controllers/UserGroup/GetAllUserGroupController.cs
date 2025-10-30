@@ -5,8 +5,8 @@ using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.UserGroup;
 using Umbraco.Cms.Core.Models.Membership;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.UserGroup;
 

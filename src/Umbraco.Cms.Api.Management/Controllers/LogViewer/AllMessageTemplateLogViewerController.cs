@@ -4,11 +4,11 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.ViewModels.LogViewer;
 using Umbraco.Cms.Core.Logging.Viewer;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
-using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Api.Management.Controllers.LogViewer;
 

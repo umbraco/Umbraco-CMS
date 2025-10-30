@@ -5,8 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.MemberType;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MemberType;
