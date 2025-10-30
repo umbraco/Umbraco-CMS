@@ -25,7 +25,7 @@ public class SiblingsDataTypeTreeController : DataTypeTreeControllerBase
     [HttpGet("siblings")]
     [ProducesResponseType(typeof(SubsetViewModel<DataTypeTreeItemResponseModel>), StatusCodes.Status200OK)]
     [EndpointSummary("Gets a collection of data type tree sibling items.")]
-    [EndpointDescription("Get sibling data types of the target data type. The result returns a paged list of data types that are siblings to the target data type identified by the provided Id.")]
+    [EndpointDescription("Gets a paged collection of data type tree items that are siblings of the provided parent Id. The collection can be optionally filtered to return only folder, or folders and data types.  The result returns the data type tree items' properties.")]
     public async Task<ActionResult<SubsetViewModel<DataTypeTreeItemResponseModel>>> Siblings(CancellationToken cancellationToken, Guid target, int before, int after, bool foldersOnly = false)
     {
         RenderFoldersOnly(foldersOnly);
