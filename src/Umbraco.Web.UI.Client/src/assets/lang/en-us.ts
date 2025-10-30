@@ -35,6 +35,9 @@ export default {
 		showLabelDescription:
 			'Displays colored field and a label for each color in the color picker, rather than just a colored field.',
 	},
+	colors: {
+		grey: 'Gray',
+	},
 	create: {
 		folderDescription: 'Used to organize items and other folders. Keep items structured and easy to access.',
 	},
