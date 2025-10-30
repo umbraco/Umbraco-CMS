@@ -59,6 +59,13 @@ export class UmbEntityActionListElement extends UmbLitElement {
 		};
 	}
 
+		override focus() {
+			console.log("focusing first menu item");
+				const firstMenuItem = this.renderRoot.querySelector('uui-menu-item');
+				console.log(firstMenuItem);
+				(firstMenuItem?.shadowRoot?.querySelector('#label-button') as any)?.focus();
+	};
+
 	#hasRenderedOnce?: boolean;
 	override render() {
 		return this._filter
