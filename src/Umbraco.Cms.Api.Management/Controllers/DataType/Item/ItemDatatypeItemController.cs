@@ -24,7 +24,7 @@ public class ItemDatatypeItemController : DatatypeItemControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<DataTypeItemResponseModel>), StatusCodes.Status200OK)]
     [EndpointSummary("Gets a collection of data type items.")]
-    [EndpointDescription("Get data type items by using the provided Ids and the result returns the data types' properties.")]
+    [EndpointDescription("Get a collection of data type items identified by the provided Ids. Each result contains the data types' properties.")]
     public async Task<IActionResult> Item(
         CancellationToken cancellationToken,
         [FromQuery(Name = "id")] HashSet<Guid> ids)
