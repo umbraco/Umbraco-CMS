@@ -33,6 +33,8 @@ public class CreateDataTypeController : DataTypeControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Creates a new data type.")]
+    [EndpointDescription("Creates a new data type with the provided configuration.")]
     public async Task<IActionResult> Create(CancellationToken cancellationToken, CreateDataTypeRequestModel createDataTypeRequestModel)
     {
         var attempt = await _dataTypePresentationFactory.CreateAsync(createDataTypeRequestModel);
