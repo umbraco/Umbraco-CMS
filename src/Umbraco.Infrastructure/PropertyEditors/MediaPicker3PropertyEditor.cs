@@ -481,18 +481,7 @@ public class MediaPicker3PropertyEditor : DataEditor
 
                 foreach (var typeAlias in distinctTypeAliases)
                 {
-                    // Cache media type lookups since the same media type is likely to be used multiple times in validation,
-                    // particularly if we have multiple languages and blocks.
-                    var cacheKey = string.Format(MediaTypeCacheKeyFormat, typeAlias);
-                    string? typeKey = _appCaches.RequestCache.GetCacheItem<string?>(cacheKey);
-                    if (typeKey is null)
-                    {
-                        typeKey = _mediaTypeService.Get(typeAlias)?.Key.ToString();
-                        if (typeKey is not null)
-                        {
-                            _appCaches.RequestCache.Set(cacheKey, typeKey);
-                        }
-                    }
+                    string? typeKey = GetMediaTypeKey(typeAlias);
 
                     if (typeKey is null || allowedTypes.Contains(typeKey) is false)
                     {
@@ -506,6 +495,31 @@ public class MediaPicker3PropertyEditor : DataEditor
                 }
 
                 return [];
+            }
+
+            private string? GetMediaTypeKey(string typeAlias)
+            {
+                // Cache media type lookups since the same media type is likely to be used multiple times in validation,
+                // particularly if we have multiple languages and blocks.
+                string? GetMediaTypeKeyFromService(string typeAlias) => _mediaTypeService.Get(typeAlias)?.Key.ToString();
+
+                if (_appCaches.RequestCache.IsAvailable is false)
+                {
+                    return GetMediaTypeKeyFromService(typeAlias);
+                }
+
+                var cacheKey = string.Format(MediaTypeCacheKeyFormat, typeAlias);
+                string? typeKey = _appCaches.RequestCache.GetCacheItem<string?>(cacheKey);
+                if (typeKey is null)
+                {
+                    typeKey = GetMediaTypeKeyFromService(typeAlias);
+                    if (typeKey is not null)
+                    {
+                        _appCaches.RequestCache.Set(cacheKey, typeKey);
+                    }
+                }
+
+                return typeKey;
             }
         }
 

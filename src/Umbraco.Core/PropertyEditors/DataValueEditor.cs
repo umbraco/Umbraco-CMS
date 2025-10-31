@@ -438,6 +438,11 @@ public class DataValueEditor : IDataValueEditor
           "Scheduled for removal in Umbraco 19.")]
     protected static IContent? GetAndCacheContentById(Guid key, IRequestCache requestCache, IContentService contentService)
     {
+        if (requestCache.IsAvailable is false)
+        {
+            return contentService.GetById(key);
+        }
+
         var cacheKey = string.Format(ContentCacheKeyFormat, key);
         IContent? content = requestCache.GetCacheItem<IContent?>(cacheKey);
         if (content is null)
@@ -462,6 +467,11 @@ public class DataValueEditor : IDataValueEditor
           "Scheduled for removal in Umbraco 19.")]
     protected static void CacheContentById(IContent content, IRequestCache requestCache)
     {
+        if (requestCache.IsAvailable is false)
+        {
+            return;
+        }
+
         var cacheKey = string.Format(ContentCacheKeyFormat, content.Key);
         requestCache.Set(cacheKey, content);
     }
@@ -483,8 +493,14 @@ public class DataValueEditor : IDataValueEditor
           "Scheduled for removal in Umbraco 19.")]
     protected static IMedia? GetAndCacheMediaById(Guid key, IRequestCache requestCache, IMediaService mediaService)
     {
+        if (requestCache.IsAvailable is false)
+        {
+            return mediaService.GetById(key);
+        }
+
         var cacheKey = string.Format(MediaCacheKeyFormat, key);
         IMedia? media = requestCache.GetCacheItem<IMedia?>(cacheKey);
+
         if (media is null)
         {
             media = mediaService.GetById(key);
@@ -507,6 +523,11 @@ public class DataValueEditor : IDataValueEditor
           "Scheduled for removal in Umbraco 19.")]
     protected static void CacheMediaById(IMedia media, IRequestCache requestCache)
     {
+        if (requestCache.IsAvailable is false)
+        {
+            return;
+        }
+
         var cacheKey = string.Format(MediaCacheKeyFormat, media.Key);
         requestCache.Set(cacheKey, media);
     }
@@ -522,6 +543,11 @@ public class DataValueEditor : IDataValueEditor
           "Scheduled for removal in Umbraco 19.")]
     protected static bool IsContentAlreadyCached(Guid key, IRequestCache requestCache)
     {
+        if (requestCache.IsAvailable is false)
+        {
+            return false;
+        }
+
         var cacheKey = string.Format(ContentCacheKeyFormat, key);
         return requestCache.GetCacheItem<IContent?>(cacheKey) is not null;
     }
@@ -537,6 +563,11 @@ public class DataValueEditor : IDataValueEditor
               "Scheduled for removal in Umbraco 19.")]
     protected static bool IsMediaAlreadyCached(Guid key, IRequestCache requestCache)
     {
+        if (requestCache.IsAvailable is false)
+        {
+            return false;
+        }
+
         var cacheKey = string.Format(MediaCacheKeyFormat, key);
         return requestCache.GetCacheItem<IMedia?>(cacheKey) is not null;
     }
