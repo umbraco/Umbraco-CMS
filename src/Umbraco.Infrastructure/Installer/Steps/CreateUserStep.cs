@@ -127,6 +127,8 @@ public class CreateUserStep : StepBase, IInstallStep
 
         if (model.User.SubscribeToNewsletter)
         {
+            const string EmailCollectorUrl = "https://emailcollector.umbraco.io/api/EmailProxy";
+
             var emailModel = new EmailModel
             {
                 Name = admin.Name,
@@ -135,10 +137,12 @@ public class CreateUserStep : StepBase, IInstallStep
             };
 
             HttpClient httpClient = _httpClientFactory.CreateClient();
-            var content = new StringContent(_jsonSerializer.Serialize(emailModel), System.Text.Encoding.UTF8, "application/json");
+            using var content = new StringContent(_jsonSerializer.Serialize(emailModel), System.Text.Encoding.UTF8, "application/json");
             try
             {
-                HttpResponseMessage response = await httpClient.PostAsync("https://emailcollector.umbraco.io/api/EmailProxy", content);
+                // Set a reasonable timeout of 5 seconds for web request to save subscriber.
+                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+                HttpResponseMessage response = await httpClient.PostAsync(EmailCollectorUrl, content, cts.Token);
                 if (response.IsSuccessStatusCode)
                 {
                     _logger.LogInformation("Successfully subscribed the user created on installation to the Umbraco newsletter.");
