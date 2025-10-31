@@ -104,6 +104,7 @@ public static class ApplicationBuilderExtensions
             app.UseMiddleware<PreviewAuthenticationMiddleware>();
             app.UseMiddleware<UmbracoRequestMiddleware>();
             app.UseMiddleware<MiniProfilerMiddleware>();
+            app.UseMiddleware<ProtectRecycleBinMediaMiddleware>();
         }
 
         return app;

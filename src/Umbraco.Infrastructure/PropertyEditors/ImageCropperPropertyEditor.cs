@@ -1,9 +1,11 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Media;
@@ -12,6 +14,7 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.PropertyEditors.NotificationHandlers;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
@@ -24,8 +27,12 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     ValueType = ValueTypes.Json,
     ValueEditorIsReusable = true)]
 public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
-    INotificationHandler<ContentCopiedNotification>, INotificationHandler<ContentDeletedNotification>,
-    INotificationHandler<MediaDeletedNotification>, INotificationHandler<MediaSavingNotification>,
+    INotificationHandler<ContentCopiedNotification>,
+    INotificationHandler<ContentDeletedNotification>,
+    INotificationHandler<MediaDeletedNotification>,
+    INotificationHandler<MediaSavingNotification>,
+    INotificationHandler<MediaMovedToRecycleBinNotification>,
+    INotificationHandler<MediaMovedNotification>,
     INotificationHandler<MemberDeletedNotification>
 {
     private readonly UploadAutoFillProperties _autoFillProperties;
@@ -35,6 +42,33 @@ public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
     private readonly MediaFileManager _mediaFileManager;
     private ContentSettings _contentSettings;
     private readonly IJsonSerializer _jsonSerializer;
+    private ImagingSettings _imagingSettings;
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ImageCropperPropertyEditor" /> class.
+    /// </summary>
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
+    public ImageCropperPropertyEditor(
+        IDataValueEditorFactory dataValueEditorFactory,
+        ILoggerFactory loggerFactory,
+        MediaFileManager mediaFileManager,
+        IOptionsMonitor<ContentSettings> contentSettings,
+        IIOHelper ioHelper,
+        UploadAutoFillProperties uploadAutoFillProperties,
+        IContentService contentService,
+        IJsonSerializer jsonSerializer)
+        : this(
+              dataValueEditorFactory,
+              loggerFactory,
+              mediaFileManager,
+              contentSettings,
+              ioHelper,
+              uploadAutoFillProperties,
+              contentService,
+              jsonSerializer,
+              StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<ImagingSettings>>())
+    {
+    }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ImageCropperPropertyEditor" /> class.
@@ -47,7 +81,8 @@ public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
         IIOHelper ioHelper,
         UploadAutoFillProperties uploadAutoFillProperties,
         IContentService contentService,
-        IJsonSerializer jsonSerializer)
+        IJsonSerializer jsonSerializer,
+        IOptionsMonitor<ImagingSettings> imagingSettings)
         : base(dataValueEditorFactory)
     {
         _mediaFileManager = mediaFileManager ?? throw new ArgumentNullException(nameof(mediaFileManager));
@@ -58,8 +93,11 @@ public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
         _contentService = contentService;
         _jsonSerializer = jsonSerializer;
         _logger = loggerFactory.CreateLogger<ImageCropperPropertyEditor>();
+        _imagingSettings = imagingSettings.CurrentValue;
 
         contentSettings.OnChange(x => _contentSettings = x);
+        imagingSettings.OnChange(x => _imagingSettings = x);
+
         SupportsReadOnly = true;
     }
 
@@ -119,10 +157,13 @@ public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
         }
     }
 
+    /// <inheritdoc/>
     public void Handle(ContentDeletedNotification notification) => DeleteContainedFiles(notification.DeletedEntities);
 
+    /// <inheritdoc/>
     public void Handle(MediaDeletedNotification notification) => DeleteContainedFiles(notification.DeletedEntities);
 
+    /// <inheritdoc/>
     public void Handle(MediaSavingNotification notification)
     {
         foreach (IMedia entity in notification.SavedEntities)
@@ -131,6 +172,34 @@ public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
         }
     }
 
+    /// <inheritdoc/>
+    public void Handle(MediaMovedToRecycleBinNotification notification)
+    {
+        if (_imagingSettings.EnableMediaRecycleBinProtection is false)
+        {
+            return;
+        }
+
+        SuffixContainedFiles(
+            notification.MoveInfoCollection
+                .Select(x => x.Entity));
+    }
+
+    /// <inheritdoc/>
+    public void Handle(MediaMovedNotification notification)
+    {
+        if (_imagingSettings.EnableMediaRecycleBinProtection is false)
+        {
+            return;
+        }
+
+        RemoveSuffixFromContainedFiles(
+            notification.MoveInfoCollection
+                .Where(x => x.OriginalPath.StartsWith($"{Constants.System.RootString},{Constants.System.RecycleBinMediaString}"))
+                .Select(x => x.Entity));
+    }
+
+    /// <inheritdoc/>
     public void Handle(MemberDeletedNotification notification) => DeleteContainedFiles(notification.DeletedEntities);
 
     /// <summary>
@@ -233,10 +302,34 @@ public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
         return relative ? _mediaFileManager.FileSystem.GetRelativePath(source) : source;
     }
 
+    /// <summary>
+    /// Deletes all file upload property files contained within a collection of content entities.
+    /// </summary>
+    /// <param name="deletedEntities">Delete media entities.</param>
     private void DeleteContainedFiles(IEnumerable<IContentBase> deletedEntities)
     {
         IEnumerable<string> filePathsToDelete = ContainedFilePaths(deletedEntities);
         _mediaFileManager.DeleteMediaFiles(filePathsToDelete);
+    }
+
+    /// <summary>
+    /// Renames all file upload property files contained within a collection of media entities that have been moved to the recycle bin.
+    /// </summary>
+    /// <param name="trashedMedia">Media entities that have been moved to the recycle bin.</param>
+    private void SuffixContainedFiles(IEnumerable<IMedia> trashedMedia)
+    {
+        IEnumerable<string> filePathsToRename = ContainedFilePaths(trashedMedia);
+        RecycleBinMediaProtectionHelper.SuffixContainedFiles(filePathsToRename, _mediaFileManager);
+    }
+
+    /// <summary>
+    /// Renames all file upload property files contained within a collection of media entities that have been restore from the recycle bin.
+    /// </summary>
+    /// <param name="restoredMedia">Media entities that have been restored from the recycle bin.</param>
+    private void RemoveSuffixFromContainedFiles(IEnumerable<IMedia> restoredMedia)
+    {
+        IEnumerable<string> filePathsToRename = ContainedFilePaths(restoredMedia);
+        RecycleBinMediaProtectionHelper.RemoveSuffixFromContainedFiles(filePathsToRename, _mediaFileManager);
     }
 
     /// <summary>
