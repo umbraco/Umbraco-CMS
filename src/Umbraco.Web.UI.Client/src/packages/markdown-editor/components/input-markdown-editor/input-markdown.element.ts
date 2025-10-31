@@ -21,7 +21,7 @@ import { UMB_MEDIA_PICKER_MODAL, UmbMediaUrlRepository } from '@umbraco-cms/back
 import { UmbCodeEditorLoadedEvent } from '@umbraco-cms/backoffice/code-editor';
 import type { UmbCodeEditorController, UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { sanitizeHTML } from '@umbraco-cms/backoffice/utils';
 
 interface UmbMarkdownEditorAction extends monaco.editor.IActionDescriptor {
@@ -63,6 +63,10 @@ export class UmbInputMarkdownElement extends UmbFormControlMixin<string, typeof 
 		this.#editor?.monacoEditor?.updateOptions({ readOnly: this.#readonly });
 	}
 	#readonly = false;
+	@property({ type: Boolean })
+	required?: boolean;
+	@property({ type: String })
+	requiredMessage?: string;
 
 	#editor?: UmbCodeEditorController;
 
@@ -73,6 +77,16 @@ export class UmbInputMarkdownElement extends UmbFormControlMixin<string, typeof 
 	private _actionExtensions: Array<UmbMarkdownEditorAction> = [];
 
 	#mediaUrlRepository = new UmbMediaUrlRepository(this);
+
+	constructor() {
+		super();
+
+		this.addValidator(
+			'valueMissing',
+			() => this.requiredMessage ?? UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
+			() => !this.readonly && !!this.required && (this.value === undefined || this.value === null || this.value === ''),
+		);
+	}
 
 	#onCodeEditorLoaded(event: UmbCodeEditorLoadedEvent) {
 		if (event.type !== UmbCodeEditorLoadedEvent.TYPE) return;
