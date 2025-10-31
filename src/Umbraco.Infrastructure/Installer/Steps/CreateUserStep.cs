@@ -1,6 +1,5 @@
-﻿using System.Collections.Specialized;
 using System.Data.Common;
-using System.Text;
+using System.Diagnostics;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
@@ -31,7 +30,6 @@ public class CreateUserStep : StepBase, IInstallStep
     private readonly IBackOfficeUserManager _userManager;
     private readonly IDbProviderFactoryCreator _dbProviderFactoryCreator;
     private readonly IMetricsConsentService _metricsConsentService;
-    private readonly IJsonSerializer _jsonSerializer;
 
     public CreateUserStep(
         IUserService userService,
@@ -43,7 +41,7 @@ public class CreateUserStep : StepBase, IInstallStep
         IBackOfficeUserManager userManager,
         IDbProviderFactoryCreator dbProviderFactoryCreator,
         IMetricsConsentService metricsConsentService,
-        IJsonSerializer jsonSerializer)
+        IJsonSerializer jsonSerializer) // TODO (V18): jsonSerializer is not used, so remove.
     {
         _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         _databaseBuilder = databaseBuilder ?? throw new ArgumentNullException(nameof(databaseBuilder));
@@ -54,61 +52,60 @@ public class CreateUserStep : StepBase, IInstallStep
         _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
         _dbProviderFactoryCreator = dbProviderFactoryCreator ?? throw new ArgumentNullException(nameof(dbProviderFactoryCreator));
         _metricsConsentService = metricsConsentService;
-        _jsonSerializer = jsonSerializer;
     }
 
     public async Task<Attempt<InstallationResult>> ExecuteAsync(InstallData model)
     {
-            IUser? admin = _userService.GetAsync(Constants.Security.SuperUserKey).GetAwaiter().GetResult();
-            if (admin is null)
+        IUser? admin = _userService.GetAsync(Constants.Security.SuperUserKey).GetAwaiter().GetResult();
+        if (admin is null)
+        {
+            return FailWithMessage("Could not find the super user");
+        }
+
+        UserInstallData user = model.User;
+        admin.Email = user.Email.Trim();
+        admin.Name = user.Name.Trim();
+        admin.Username = user.Email.Trim();
+
+        _userService.Save(admin);
+
+        BackOfficeIdentityUser? membershipUser = await _userManager.FindByIdAsync(Constants.Security.SuperUserIdAsString);
+        if (membershipUser == null)
+        {
+            return FailWithMessage(
+                $"No user found in membership provider with id of {Constants.Security.SuperUserIdAsString}.");
+        }
+
+        // To change the password here we actually need to reset it since we don't have an old one to use to change
+        var resetToken = await _userManager.GeneratePasswordResetTokenAsync(membershipUser);
+        if (string.IsNullOrWhiteSpace(resetToken))
+        {
+            return FailWithMessage("Could not reset password: unable to generate internal reset token");
+        }
+
+        IdentityResult resetResult = await _userManager.ChangePasswordWithResetAsync(membershipUser.Id, resetToken, user.Password.Trim());
+        if (!resetResult.Succeeded)
+        {
+            return FailWithMessage("Could not reset password: " + string.Join(", ", resetResult.Errors.ToErrorMessage()));
+        }
+
+        await _metricsConsentService.SetConsentLevelAsync(model.TelemetryLevel);
+
+        if (model.User.SubscribeToNewsletter)
+        {
+            var values = new Dictionary<string, string>
             {
-                return FailWithMessage("Could not find the super user");
-            }
+                { "name", admin.Name },
+                { "email", admin.Email },
+            };
 
-            UserInstallData user = model.User;
-            admin.Email = user.Email.Trim();
-            admin.Name = user.Name.Trim();
-            admin.Username = user.Email.Trim();
+            var content = new FormUrlEncodedContent(values);
+            HttpClient httpClient = _httpClientFactory.CreateClient();
+            HttpResponseMessage response = await httpClient.PostAsync("https://shop.umbraco.com/base/Ecom/SubmitEmail/installer.aspx", content);
+            Debug.WriteLine(response.StatusCode);
+        }
 
-            _userService.Save(admin);
-
-            BackOfficeIdentityUser? membershipUser = await _userManager.FindByIdAsync(Constants.Security.SuperUserIdAsString);
-            if (membershipUser == null)
-            {
-                return FailWithMessage(
-                    $"No user found in membership provider with id of {Constants.Security.SuperUserIdAsString}.");
-            }
-
-            // To change the password here we actually need to reset it since we don't have an old one to use to change
-            var resetToken = await _userManager.GeneratePasswordResetTokenAsync(membershipUser);
-            if (string.IsNullOrWhiteSpace(resetToken))
-            {
-                return FailWithMessage("Could not reset password: unable to generate internal reset token");
-            }
-
-            IdentityResult resetResult = await _userManager.ChangePasswordWithResetAsync(membershipUser.Id, resetToken, user.Password.Trim());
-            if (!resetResult.Succeeded)
-            {
-                return FailWithMessage("Could not reset password: " + string.Join(", ", resetResult.Errors.ToErrorMessage()));
-            }
-
-            await _metricsConsentService.SetConsentLevelAsync(model.TelemetryLevel);
-
-            if (model.User.SubscribeToNewsletter)
-            {
-                var values = new NameValueCollection { { "name", admin.Name }, { "email", admin.Email } };
-                var content = new StringContent(_jsonSerializer.Serialize(values), Encoding.UTF8, "application/json");
-
-                HttpClient httpClient = _httpClientFactory.CreateClient();
-
-                try
-                {
-                    HttpResponseMessage response = httpClient.PostAsync("https://shop.umbraco.com/base/Ecom/SubmitEmail/installer.aspx", content).Result;
-                }
-                catch { /* fail in silence */ }
-            }
-
-            return Success();
+        return Success();
     }
 
     /// <inheritdoc/>
