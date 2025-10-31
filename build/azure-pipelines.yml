@@ -160,7 +160,7 @@ stages:
             displayName: Publish Backend BOM
             inputs:
               targetPath: $(Build.ArtifactStagingDirectory)/bom
-              artifactName: bom-backend
+              artifactName: bom-build
 
   - stage: E2E_BOM
     displayName: E2E Tests BOM Generation
@@ -798,13 +798,13 @@ stages:
           umbracoVersion: $(umbracoVersion)
           projects:
             - name: "Backend"
-              artifact: "bom-backend"
+              artifact: "bom-build"
               bomFilePath: "bom-dotnet.xml"
             - name: "Login"
-              artifact: "bom-backend"
+              artifact: "bom-build"
               bomFilePath: "bom-login.xml"
             - name: "Backoffice"
-              artifact: "bom-backend"
+              artifact: "bom-build"
               bomFilePath: "bom-backoffice.xml"
             - name: "E2E"
               artifact: "bom-e2e"
