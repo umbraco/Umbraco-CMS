@@ -1272,14 +1272,6 @@ export default {
 		translation: 'Übersetzung',
 		users: 'Benutzer',
 	},
-	help: {
-		tours: 'Touren',
-		theBestUmbracoVideoTutorials: 'Die besten Umbraco-Video-Tutorials',
-		umbracoForum: 'Besuche our.umbraco.com',
-		umbracoTv: 'Besuche umbraco.tv',
-		umbracoLearningBase: 'Schaue gratis Tutorials',
-		umbracoLearningBaseDescription: 'von Umbraco Learning Base',
-	},
 	settings: {
 		defaulttemplate: 'Standardvorlage',
 		importDocumentTypeHelp:
