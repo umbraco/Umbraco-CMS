@@ -59,12 +59,29 @@ export class UmbEntityActionListElement extends UmbLitElement {
 		};
 	}
 
-		override focus() {
-			console.log("focusing first menu item");
-				const firstMenuItem = this.renderRoot.querySelector('uui-menu-item');
-				console.log(firstMenuItem);
-				(firstMenuItem?.shadowRoot?.querySelector('#label-button') as any)?.focus();
-	};
+
+
+override focus() {
+  const extensionComponent = this.renderRoot.querySelector('umb-extension-with-api-slot');
+  if (!extensionComponent) return;
+
+  // Wait for the slot component to render
+  extensionComponent.updateComplete.then(() => {
+    const firstEntityAction = extensionComponent.shadowRoot?.querySelector('umb-entity-action');
+    if (!firstEntityAction) return;
+
+    firstEntityAction.updateComplete.then(() => {
+      const firstMenuItem = firstEntityAction.shadowRoot?.querySelector('uui-menu-item');
+
+      firstMenuItem?.updateComplete?.then(() => {
+        const labelButton = firstMenuItem.shadowRoot?.querySelector('#label-button') as HTMLElement;
+        labelButton?.focus();
+      });
+    });
+  });
+}
+
+
 
 	#hasRenderedOnce?: boolean;
 	override render() {

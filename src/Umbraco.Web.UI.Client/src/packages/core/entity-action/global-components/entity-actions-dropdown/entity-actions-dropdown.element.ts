@@ -48,14 +48,8 @@ export class UmbEntityActionsDropdownElement extends UmbLitElement {
 	}
 
 	#onDropdownOpened() {
-		if (this.#scrollContainerElement) {
-			this.#entityActionListElement = undefined;
-			this.#scrollContainerElement.remove();
-			this.#scrollContainerElement = undefined;
-		}
-
 		if (this.#entityActionListElement) {
-			this.#entityActionListElement?.focus();
+       this.#entityActionListElement.focus();
 			return;
 		}
 
