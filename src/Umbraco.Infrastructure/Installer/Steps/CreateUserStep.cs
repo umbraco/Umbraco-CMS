@@ -1,9 +1,11 @@
 using System.Data.Common;
-using System.Diagnostics;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Installer;
 using Umbraco.Cms.Core.Models.Installer;
 using Umbraco.Cms.Core.Models.Membership;
@@ -30,6 +32,35 @@ public class CreateUserStep : StepBase, IInstallStep
     private readonly IBackOfficeUserManager _userManager;
     private readonly IDbProviderFactoryCreator _dbProviderFactoryCreator;
     private readonly IMetricsConsentService _metricsConsentService;
+    private readonly IJsonSerializer _jsonSerializer;
+    private readonly ILogger<CreateUserStep> _logger;
+
+    [Obsolete("Please use the constructor that takes all parameters. Scheduled for removal in Umbraco 19.")]
+    public CreateUserStep(
+        IUserService userService,
+        DatabaseBuilder databaseBuilder,
+        IHttpClientFactory httpClientFactory,
+        IOptions<SecuritySettings> securitySettings,
+        IOptionsMonitor<ConnectionStrings> connectionStrings,
+        ICookieManager cookieManager,
+        IBackOfficeUserManager userManager,
+        IDbProviderFactoryCreator dbProviderFactoryCreator,
+        IMetricsConsentService metricsConsentService,
+        IJsonSerializer jsonSerializer)
+        : this(
+            userService,
+            databaseBuilder,
+            httpClientFactory,
+            securitySettings,
+            connectionStrings,
+            cookieManager,
+            userManager,
+            dbProviderFactoryCreator,
+            metricsConsentService,
+            jsonSerializer,
+            StaticServiceProvider.Instance.GetRequiredService<ILogger<CreateUserStep>>())
+    {
+    }
 
     public CreateUserStep(
         IUserService userService,
@@ -41,22 +72,25 @@ public class CreateUserStep : StepBase, IInstallStep
         IBackOfficeUserManager userManager,
         IDbProviderFactoryCreator dbProviderFactoryCreator,
         IMetricsConsentService metricsConsentService,
-        IJsonSerializer jsonSerializer) // TODO (V18): jsonSerializer is not used, so remove.
+        IJsonSerializer jsonSerializer,
+        ILogger<CreateUserStep> logger)
     {
-        _userService = userService ?? throw new ArgumentNullException(nameof(userService));
-        _databaseBuilder = databaseBuilder ?? throw new ArgumentNullException(nameof(databaseBuilder));
+        _userService = userService;
+        _databaseBuilder = databaseBuilder;
         _httpClientFactory = httpClientFactory;
-        _securitySettings = securitySettings.Value ?? throw new ArgumentNullException(nameof(securitySettings));
+        _securitySettings = securitySettings.Value;
         _connectionStrings = connectionStrings;
         _cookieManager = cookieManager;
-        _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
-        _dbProviderFactoryCreator = dbProviderFactoryCreator ?? throw new ArgumentNullException(nameof(dbProviderFactoryCreator));
+        _userManager = userManager;
+        _dbProviderFactoryCreator = dbProviderFactoryCreator;
         _metricsConsentService = metricsConsentService;
+        _jsonSerializer = jsonSerializer;
+        _logger = logger;
     }
 
     public async Task<Attempt<InstallationResult>> ExecuteAsync(InstallData model)
     {
-        IUser? admin = _userService.GetAsync(Constants.Security.SuperUserKey).GetAwaiter().GetResult();
+        IUser? admin = await _userService.GetAsync(Constants.Security.SuperUserKey);
         if (admin is null)
         {
             return FailWithMessage("Could not find the super user");
@@ -93,19 +127,48 @@ public class CreateUserStep : StepBase, IInstallStep
 
         if (model.User.SubscribeToNewsletter)
         {
-            var values = new Dictionary<string, string>
+            var emailModel = new EmailModel
             {
-                { "name", admin.Name },
-                { "email", admin.Email },
+                Name = admin.Name,
+                Email = admin.Email,
+                UserGroup = [Constants.Security.AdminGroupAlias],
             };
 
-            var content = new FormUrlEncodedContent(values);
             HttpClient httpClient = _httpClientFactory.CreateClient();
-            HttpResponseMessage response = await httpClient.PostAsync("https://shop.umbraco.com/base/Ecom/SubmitEmail/installer.aspx", content);
-            Debug.WriteLine(response.StatusCode);
+            var content = new StringContent(_jsonSerializer.Serialize(emailModel), System.Text.Encoding.UTF8, "application/json");
+            try
+            {
+                HttpResponseMessage response = await httpClient.PostAsync("https://emailcollector.umbraco.io/api/EmailProxy", content);
+                if (response.IsSuccessStatusCode)
+                {
+                    _logger.LogInformation("Successfully subscribed the user created on installation to the Umbraco newsletter.");
+                }
+                else
+                {
+                    _logger.LogWarning("Failed to subscribe the user created on installation to the Umbraco newsletter. Status code: {StatusCode}", response.StatusCode);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log and move on if a failure occurs, we don't want to block installation for this.
+                _logger.LogError(ex, "Exception occurred while trying to subscribe the user created on installation to the Umbraco newsletter.");
+            }
+
         }
 
         return Success();
+    }
+
+    /// <summary>
+    /// Model used to subscribe to the newsletter. Aligns with EmailModel defined in Umbraco.EmailMarketing.
+    /// </summary>
+    private class EmailModel
+    {
+        public required string Name { get; init; }
+
+        public required string Email { get; init; }
+
+        public required List<string> UserGroup { get; init; }
     }
 
     /// <inheritdoc/>
