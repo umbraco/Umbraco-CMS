@@ -29,6 +29,8 @@ public class CopyDataTypeController : DataTypeControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Copies a datatype.")]
+    [EndpointDescription("Creates a duplicate of an existing datatype identified by the provided Id.")]
     public async Task<IActionResult> Copy(CancellationToken cancellationToken, Guid id, CopyDataTypeRequestModel copyDataTypeRequestModel)
     {
         IDataType? source = await _dataTypeService.GetAsync(id);

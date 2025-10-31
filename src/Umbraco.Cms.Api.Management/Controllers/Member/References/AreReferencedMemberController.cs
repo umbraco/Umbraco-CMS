@@ -33,6 +33,8 @@ public class AreReferencedMemberController : MemberControllerBase
     [HttpGet("are-referenced")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<ReferenceByIdModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of items that reference members.")]
+    [EndpointDescription("Gets a paginated collection of items that reference the members identified by the provided Ids.")]
     public async Task<ActionResult<PagedViewModel<ReferenceByIdModel>>> GetPagedReferencedItems(
         CancellationToken cancellationToken,
         [FromQuery(Name="id")] HashSet<Guid> ids,

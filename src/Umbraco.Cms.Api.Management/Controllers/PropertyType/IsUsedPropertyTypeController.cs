@@ -22,6 +22,8 @@ public class IsUsedPropertyTypeController : PropertyTypeControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+    [EndpointSummary("Checks if a propertytype is used.")]
+    [EndpointDescription("Checks if the propertytype identified by the provided Id is used in any content, media, or members.")]
     public async Task<IActionResult> Get(CancellationToken cancellationToken, Guid contentTypeId, string propertyAlias)
     {
         Attempt<bool, PropertyTypeOperationStatus> result = await _propertyTypeUsageService.HasSavedPropertyValuesAsync(contentTypeId, propertyAlias);

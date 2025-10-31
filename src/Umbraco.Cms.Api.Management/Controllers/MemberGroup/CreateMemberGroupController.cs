@@ -26,6 +26,8 @@ public class CreateMemberGroupController : MemberGroupControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [EndpointSummary("Creates a new membergroup.")]
+    [EndpointDescription("Creates a new membergroup with the configuration specified in the request model.")]
     public async Task<IActionResult> Create(CancellationToken cancellationToken, CreateMemberGroupRequestModel model)
     {
         IMemberGroup? memberGroup = _mapper.Map<IMemberGroup>(model);

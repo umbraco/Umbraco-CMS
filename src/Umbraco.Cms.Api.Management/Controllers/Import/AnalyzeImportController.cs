@@ -28,6 +28,8 @@ public class AnalyzeImportController : ImportControllerBase
     [ProducesResponseType(typeof(EntityImportAnalysisResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [EndpointSummary("Imports a import.")]
+    [EndpointDescription("Imports a import from the provided file upload.")]
     public async Task<IActionResult> Analyze(CancellationToken cancellationToken, Guid temporaryFileId)
     {
         Attempt<EntityXmlAnalysis?, TemporaryFileXmlImportOperationStatus> analyzeResult = await _temporaryFileToXmlImportService.AnalyzeAsync(temporaryFileId);

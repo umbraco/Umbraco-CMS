@@ -36,6 +36,8 @@ public class UnlockUserController : UserControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [EndpointSummary("Unlocks users.")]
+    [EndpointDescription("Unlocks the user accounts identified by the provided Ids.")]
     public async Task<IActionResult> UnlockUsers(CancellationToken cancellationToken, UnlockUsersRequestModel model)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(

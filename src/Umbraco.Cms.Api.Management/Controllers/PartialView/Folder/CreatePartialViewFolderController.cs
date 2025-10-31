@@ -29,6 +29,8 @@ public class CreatePartialViewFolderController : PartialViewFolderControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Creates a partialview folder.")]
+    [EndpointDescription("Creates a new partialview folder with the provided name and parent location.")]
     public async Task<IActionResult> Create(
         CancellationToken cancellationToken,
         CreatePartialViewFolderRequestModel requestModel)

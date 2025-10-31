@@ -26,6 +26,8 @@ public class UpdateNotificationsController : DocumentControllerBase
     [HttpPut("{id:guid}/notifications")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Updates a document.")]
+    [EndpointDescription("Updates a document identified by the provided Id with the details from the request model.")]
     public async Task<IActionResult> UpdateNotifications(CancellationToken cancellationToken, Guid id, UpdateDocumentNotificationsRequestModel updateModel)
     {
         IContent? content = await _contentEditingService.GetAsync(id);

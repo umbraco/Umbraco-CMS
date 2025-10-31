@@ -57,6 +57,8 @@ public class ByKeyMediaCollectionController : MediaCollectionControllerBase
     [ProducesResponseType(typeof(PagedViewModel<MediaCollectionResponseModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Gets a media.")]
+    [EndpointDescription("Gets a media identified by the provided Id.")]
     public async Task<IActionResult> ByKey(
         CancellationToken cancellationToken,
         Guid? id,

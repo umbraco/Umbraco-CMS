@@ -34,6 +34,8 @@ public class CreatePartialViewController : PartialViewControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Creates a new partialview.")]
+    [EndpointDescription("Creates a new partialview with the configuration specified in the request model.")]
     public async Task<IActionResult> Create(
         CancellationToken cancellationToken,
         CreatePartialViewRequestModel requestModel)

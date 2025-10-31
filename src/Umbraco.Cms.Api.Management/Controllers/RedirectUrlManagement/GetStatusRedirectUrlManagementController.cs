@@ -1,4 +1,5 @@
 ﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.RedirectUrlManagement;
@@ -17,6 +18,8 @@ public class GetStatusRedirectUrlManagementController : RedirectUrlManagementCon
     [MapToApiVersion("1.0")]
     [HttpGet("status")]
     [ProducesResponseType(typeof(RedirectUrlStatusResponseModel), 200)]
+    [EndpointSummary("Gets URLs for a document.")]
+    [EndpointDescription("Gets the URLs for the document identified by the provided Id.")]
     public Task<ActionResult<RedirectUrlStatusResponseModel>> GetStatus(CancellationToken cancellationToken) =>
         Task.FromResult<ActionResult<RedirectUrlStatusResponseModel>>(_redirectUrlStatusPresentationFactory.CreateViewModel());
 }
