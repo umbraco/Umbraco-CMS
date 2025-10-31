@@ -20,6 +20,7 @@ const entityActions: Array<UmbExtensionManifest> = [
 		name: 'Delete Document Entity Action',
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
+			icon: 'icon-trash-empty',
 			itemRepositoryAlias: UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS,
 			detailRepositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 			referenceRepositoryAlias: UMB_DOCUMENT_REFERENCE_REPOSITORY_ALIAS,

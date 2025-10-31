@@ -2209,6 +2209,9 @@ name: "icon-molecular",
 hidden: true,
 path: () => import("./icons/icon-molecular.js"),
 },{
+name: "icon-trash-empty",
+path: () => import("./icons/icon-trash-empty.js"),
+},{
 name: "icon-umbraco",
 path: () => import("./icons/icon-umbraco.js"),
 },{
