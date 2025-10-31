@@ -34,6 +34,8 @@ internal sealed class ElementServiceNotificationWithCacheTests : UmbracoIntegrat
 
     private IElementContainerService ElementContainerService => GetRequiredService<IElementContainerService>();
 
+    private IEntityService EntityService => GetRequiredService<IEntityService>();
+
     protected override void ConfigureTestServices(IServiceCollection services)
         => services.AddSingleton(AppCaches.Create(Mock.Of<IRequestCache>()));
 
@@ -54,7 +56,9 @@ internal sealed class ElementServiceNotificationWithCacheTests : UmbracoIntegrat
         .AddNotificationHandler<ElementSavingNotification, ElementNotificationHandler>()
         .AddNotificationHandler<ElementSavedNotification, ElementNotificationHandler>()
         .AddNotificationHandler<ElementMovingNotification, ElementNotificationHandler>()
-        .AddNotificationHandler<ElementMovedNotification, ElementNotificationHandler>();
+        .AddNotificationHandler<ElementMovedNotification, ElementNotificationHandler>()
+        .AddNotificationHandler<ElementCopyingNotification, ElementNotificationHandler>()
+        .AddNotificationHandler<ElementCopiedNotification, ElementNotificationHandler>();
 
     [Test]
     public async Task Saving_Saved_Get_Value()
@@ -226,11 +230,97 @@ internal sealed class ElementServiceNotificationWithCacheTests : UmbracoIntegrat
         Assert.AreEqual(Constants.System.Root, element.ParentId);
     }
 
+    [Test]
+    public async Task Copying_Copied_Fires_Notifications()
+    {
+        var element = (await ElementEditingService.CreateAsync(
+            new ElementCreateModel
+            {
+                ContentTypeKey = _contentType.Key,
+                Variants = [
+                    new() { Name = "Name" }
+                ],
+            },
+            Constants.Security.SuperUserKey)).Result.Content!;
+
+        var copyingWasCalled = false;
+        var copiedWasCalled = false;
+
+        ElementNotificationHandler.CopyingElement = _ => copyingWasCalled = true;
+        ElementNotificationHandler.CopiedElement = _ => copiedWasCalled = true;
+
+        try
+        {
+            var copyAttempt = await ElementEditingService.CopyAsync(element.Key, null, Constants.Security.SuperUserKey);
+
+            Assert.Multiple(() =>
+            {
+                Assert.IsTrue(copyAttempt.Success);
+                Assert.AreEqual(copyAttempt.Status, ContentEditingOperationStatus.Success);
+            });
+
+            Assert.IsTrue(copyingWasCalled);
+            Assert.IsTrue(copiedWasCalled);
+        }
+        finally
+        {
+            ElementNotificationHandler.CopyingElement = null;
+            ElementNotificationHandler.CopiedElement = null;
+        }
+    }
+
+    [Test]
+    public async Task Copying_Can_Cancel_Copy()
+    {
+        var element = (await ElementEditingService.CreateAsync(
+            new ElementCreateModel
+            {
+                ContentTypeKey = _contentType.Key,
+                Variants = [
+                    new() { Name = "Name" }
+                ],
+            },
+            Constants.Security.SuperUserKey)).Result.Content!;
+
+        var copyingWasCalled = false;
+        var copiedWasCalled = false;
+
+        ElementNotificationHandler.CopyingElement = notification =>
+        {
+            notification.Cancel = true;
+            copyingWasCalled = true;
+        };
+        ElementNotificationHandler.CopiedElement = _ => copiedWasCalled = true;
+
+        try
+        {
+            var copyAttempt = await ElementEditingService.CopyAsync(element.Key, null, Constants.Security.SuperUserKey);
+
+            Assert.Multiple(() =>
+            {
+                Assert.IsFalse(copyAttempt.Success);
+                Assert.AreEqual(copyAttempt.Status, ContentEditingOperationStatus.CancelledByNotification);
+            });
+
+            Assert.IsTrue(copyingWasCalled);
+            Assert.IsFalse(copiedWasCalled);
+        }
+        finally
+        {
+            ElementNotificationHandler.CopyingElement = null;
+            ElementNotificationHandler.CopiedElement = null;
+        }
+
+        Assert.AreEqual(1, EntityService.GetRootEntities(UmbracoObjectTypes.Element).Count());
+    }
+
     internal sealed class ElementNotificationHandler :
         INotificationHandler<ElementSavingNotification>,
         INotificationHandler<ElementSavedNotification>,
         INotificationHandler<ElementMovingNotification>,
-        INotificationHandler<ElementMovedNotification>
+        INotificationHandler<ElementMovedNotification>,
+        INotificationHandler<ElementCopyingNotification>,
+        INotificationHandler<ElementCopiedNotification>
     {
         public static Action<ElementSavingNotification>? SavingElement { get; set; }
 
@@ -240,6 +330,10 @@ internal sealed class ElementServiceNotificationWithCacheTests : UmbracoIntegrat
 
         public static Action<ElementMovedNotification>? MovedElement { get; set; }
 
+        public static Action<ElementCopyingNotification>? CopyingElement { get; set; }
+
+        public static Action<ElementCopiedNotification>? CopiedElement { get; set; }
+
         public void Handle(ElementSavedNotification notification) => SavedElement?.Invoke(notification);
 
         public void Handle(ElementSavingNotification notification) => SavingElement?.Invoke(notification);
@@ -247,5 +341,9 @@ internal sealed class ElementServiceNotificationWithCacheTests : UmbracoIntegrat
         public void Handle(ElementMovingNotification notification) => MovingElement?.Invoke(notification);
 
         public void Handle(ElementMovedNotification notification) => MovedElement?.Invoke(notification);
+
+        public void Handle(ElementCopyingNotification notification) => CopyingElement?.Invoke(notification);
+
+        public void Handle(ElementCopiedNotification notification) => CopiedElement?.Invoke(notification);
     }
 }

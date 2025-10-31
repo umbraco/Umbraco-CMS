@@ -328,5 +328,8 @@
     <Compile Update="Umbraco.Infrastructure\Services\ElementEditingServiceTests.Move.cs">
       <DependentUpon>ElementEditingServiceTests.cs</DependentUpon>
     </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ElementEditingServiceTests.Copy.cs">
+      <DependentUpon>ElementEditingServiceTests.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>

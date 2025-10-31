@@ -129,7 +129,7 @@ internal sealed class ElementEditingService
     public async Task<Attempt<IElement?, ContentEditingOperationStatus>> DeleteAsync(Guid key, Guid userKey)
         => await HandleDeleteAsync(key, userKey, false);
 
-    protected override IElement New(string? name, int parentId, IContentType contentType)
+    protected override IElement New(string? name, int parentId, Guid? parentKey, IContentType contentType)
         => new Element(name, parentId, contentType);
 
     protected override async Task<(int? ParentId, ContentEditingOperationStatus OperationStatus)> TryGetAndValidateParentIdAsync(Guid? parentKey, IContentType contentType)
@@ -148,6 +148,8 @@ internal sealed class ElementEditingService
     public async Task<Attempt<ContentEditingOperationStatus>> MoveAsync(Guid key, Guid? containerKey, Guid userKey)
     {
         using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
+        scope.WriteLock(Constants.Locks.ElementTree);
+
         IElement? toMove = await GetAsync(key);
         if (toMove is null)
         {
@@ -195,8 +197,47 @@ internal sealed class ElementEditingService
         return Attempt.Succeed(ContentEditingOperationStatus.Success);
     }
 
-    protected override IElement? Copy(IElement element, int newParentId, bool relateToOriginal, bool includeDescendants, int userId)
-        => throw new NotImplementedException("TODO ELEMENTS: implement copy");
+    public async Task<Attempt<IElement?, ContentEditingOperationStatus>> CopyAsync(Guid key, Guid? parentKey, Guid userKey)
+        => await HandleCopyAsync(key, parentKey, false, false, userKey);
+
+    protected override IElement? Copy(IElement element, int newParentId, Guid? newParentKey, bool relateToOriginal, bool includeDescendants, int userId)
+    {
+        using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
+        scope.WriteLock(Constants.Locks.ElementTree);
+
+        EventMessages eventMessages = _eventMessagesFactory.Get();
+
+        IElement copy = element.DeepCloneWithResetIdentities();
+        copy.ParentId = newParentId;
+
+        var copyingNotification = new ElementCopyingNotification(element, copy, newParentId, newParentKey, eventMessages);
+        if (scope.Notifications.PublishCancelable(copyingNotification))
+        {
+            scope.Complete();
+            return null;
+        }
+
+        // update published state (copies cannot be published)
+        copy.Published = false;
+
+        // update creator and writer IDs
+        copy.CreatorId = userId;
+        copy.WriterId = userId;
+
+        OperationResult saveResult = ContentService.Save(copy, userId);
+        if (saveResult.Success is false)
+        {
+            return null;
+        }
+
+        scope.Notifications.Publish(
+            new ElementCopiedNotification(element, copy, newParentId, newParentKey, relateToOriginal, eventMessages)
+                .WithStateFrom(copyingNotification));
+
+        scope.Complete();
+
+        return copy;
+    }
 
     protected override OperationResult? MoveToRecycleBin(IElement element, int userId)
         => throw new NotImplementedException("TODO ELEMENTS: implement recycle bin");
@@ -208,7 +249,7 @@ internal sealed class ElementEditingService
     ///     NB: Some methods from ContentEditingServiceBase are needed, so we need to inherit from it
     ///     but there are others that are not required to be implemented in the case of blueprints, therefore they throw NotImplementedException as default.
     /// </summary>
-    protected override OperationResult? Move(IElement element, int newParentId, int userId) => throw new NotImplementedException();
+    protected override OperationResult? Move(IElement element, int newParentId, Guid? newParentKey, int userId) => throw new NotImplementedException();
 
     private async Task<ContentEditingOperationStatus> SaveAsync(IElement content, Guid userKey)
     {
