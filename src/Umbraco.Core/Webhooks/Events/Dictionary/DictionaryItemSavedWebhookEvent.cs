@@ -21,6 +21,6 @@ public class DictionaryItemSavedWebhookEvent : WebhookEventBase<DictionaryItemSa
 
     public override string Alias => Constants.WebhookEvents.Aliases.DictionaryItemSaved;
 
-    public override object? ConvertNotificationToRequestPayload(DictionaryItemSavedNotification notification)
+    public override object ConvertNotificationToRequestPayload(DictionaryItemSavedNotification notification)
         => notification.SavedEntities.Select(entity => new DefaultPayloadModel { Id = entity.Key });
 }

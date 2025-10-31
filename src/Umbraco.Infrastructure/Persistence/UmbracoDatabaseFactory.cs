@@ -9,6 +9,7 @@ using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Extensions;
+using IMapperCollection = Umbraco.Cms.Infrastructure.Persistence.Mappers.IMapperCollection;
 using MapperCollection = NPoco.MapperCollection;
 
 namespace Umbraco.Cms.Infrastructure.Persistence;

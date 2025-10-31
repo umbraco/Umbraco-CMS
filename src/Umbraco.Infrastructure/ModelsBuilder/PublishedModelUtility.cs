@@ -28,7 +28,7 @@ public static class PublishedModelUtility
     // var contentType = PublishedContentType.Get(itemType, alias);
     //    // etc...
     // }
-    public static IPublishedContentType? GetModelContentType(
+    public static IPublishedContentType GetModelContentType(
         IPublishedContentTypeCache contentTypeCache,
         PublishedItemType itemType,
         string alias)

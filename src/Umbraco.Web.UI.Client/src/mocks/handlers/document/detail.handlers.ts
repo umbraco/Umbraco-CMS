@@ -5,6 +5,7 @@ import { UMB_SLUG } from './slug.js';
 import type {
 	CreateDocumentRequestModel,
 	DefaultReferenceResponseModel,
+	GetDocumentByIdAvailableSegmentOptionsResponse,
 	GetDocumentByIdReferencedDescendantsResponse,
 	PagedIReferenceResponseModel,
 	UpdateDocumentRequestModel,
@@ -71,6 +72,43 @@ export const detailHandlers = [
 		};
 
 		return res(ctx.status(200), ctx.json(ReferencedDescendantsResponse));
+	}),
+
+	rest.get(umbracoPath(`${UMB_SLUG}/:id/available-segment-options`), (req, res, ctx) => {
+		const id = req.params.id as string;
+		if (!id) return res(ctx.status(400));
+		const document = umbDocumentMockDb.detail.read(id);
+		if (!document) return res(ctx.status(404));
+
+		const availableSegments = document.variants.filter((v) => !!v.segment).map((v) => v.segment!) ?? [];
+
+		const response: GetDocumentByIdAvailableSegmentOptionsResponse = {
+			total: availableSegments.length,
+			items: availableSegments.map((alias) => {
+				// If the segment is generic (i.e. not tied to any culture) we show the segment on all cultures
+				const isGeneric = alias.includes('generic');
+				const whichCulturesHaveThisSegment: string[] | undefined = isGeneric
+					? undefined
+					: document.variants.filter((v) => v.segment === alias).map((v) => v.culture!);
+
+				let availableSegmentOptions: string[] | null = whichCulturesHaveThisSegment ?? null;
+
+				if (whichCulturesHaveThisSegment) {
+					const hasNull = whichCulturesHaveThisSegment.some((c) => c === null);
+					if (hasNull) {
+						availableSegmentOptions = null;
+					}
+				}
+
+				return {
+					alias,
+					name: `Segment: ${alias}`,
+					cultures: availableSegmentOptions,
+				};
+			}),
+		};
+
+		return res(ctx.status(200), ctx.json(response));
 	}),
 
 	rest.put(umbracoPath(`${UMB_SLUG}/:id/validate`, 'v1.1'), (_req, res, ctx) => {

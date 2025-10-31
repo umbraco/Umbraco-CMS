@@ -52,7 +52,7 @@ public static class ContentRepositoryExtensions
             return;
         }
 
-        content.CultureInfos?.AddOrUpdate(culture!, infos.Name, DateTime.Now);
+        content.CultureInfos?.AddOrUpdate(culture!, infos.Name, DateTime.UtcNow);
     }
 
     /// <summary>

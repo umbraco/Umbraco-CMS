@@ -1,7 +1,7 @@
+import type { Editor, Extension, Mark, Node } from '../externals.js';
 import type { ManifestTiptapExtension } from './tiptap.extension.js';
 import type { ManifestTiptapToolbarExtension } from './tiptap-toolbar.extension.js';
 import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
-import type { Editor, Extension, Mark, Node } from '@umbraco-cms/backoffice/external/tiptap';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 

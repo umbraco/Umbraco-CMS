@@ -1,8 +1,11 @@
 using System.Diagnostics;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Factories;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Serialization;
@@ -21,7 +24,8 @@ public abstract class DatabaseServerMessenger : ServerMessengerBase, IDisposable
     private readonly CancellationTokenSource _cancellationTokenSource = new();
     private readonly IHostingEnvironment _hostingEnvironment;
     private readonly Lazy<SyncBootState?> _initialized;
-    private readonly LastSyncedFileManager _lastSyncedFileManager;
+    private readonly ILastSyncedManager _lastSyncedManager;
+    private readonly IMachineInfoFactory _machineInfoFactory;
 
     private readonly Lock _locko = new();
     /*
@@ -40,6 +44,7 @@ public abstract class DatabaseServerMessenger : ServerMessengerBase, IDisposable
     /// <summary>
     ///     Initializes a new instance of the <see cref="DatabaseServerMessenger" /> class.
     /// </summary>
+    [Obsolete("Use the non-obsolete constructor. Scheduled for removal in V18.")]
     protected DatabaseServerMessenger(
         IMainDom mainDom,
         CacheRefresherCollection cacheRefreshers,
@@ -51,33 +56,20 @@ public abstract class DatabaseServerMessenger : ServerMessengerBase, IDisposable
         IJsonSerializer jsonSerializer,
         LastSyncedFileManager lastSyncedFileManager,
         IOptionsMonitor<GlobalSettings> globalSettings)
-        : base(distributedEnabled, jsonSerializer)
+        : this(
+            mainDom,
+            cacheRefreshers,
+            logger,
+            distributedEnabled,
+            syncBootStateAccessor,
+            hostingEnvironment,
+            cacheInstructionService,
+            jsonSerializer,
+            globalSettings,
+            StaticServiceProvider.Instance.GetRequiredService<ILastSyncedManager>(),
+            StaticServiceProvider.Instance.GetRequiredService<IMachineInfoFactory>()
+            )
     {
-        _cancellationToken = _cancellationTokenSource.Token;
-        _mainDom = mainDom;
-        _cacheRefreshers = cacheRefreshers;
-        _hostingEnvironment = hostingEnvironment;
-        Logger = logger;
-        _syncBootStateAccessor = syncBootStateAccessor;
-        CacheInstructionService = cacheInstructionService;
-        JsonSerializer = jsonSerializer;
-        _lastSyncedFileManager = lastSyncedFileManager;
-        GlobalSettings = globalSettings.CurrentValue;
-        _lastSync = DateTime.UtcNow;
-        _syncIdle = new ManualResetEvent(true);
-
-        globalSettings.OnChange(x => GlobalSettings = x);
-        using (var process = Process.GetCurrentProcess())
-        {
-            // See notes on _localIdentity
-            LocalIdentity = Environment.MachineName // eg DOMAIN\SERVER
-                            + "/" + hostingEnvironment.ApplicationId // eg /LM/S3SVC/11/ROOT
-                            + " [P" + process.Id // eg 1234
-                            + "/D" + AppDomain.CurrentDomain.Id // eg 22
-                            + "] " + Guid.NewGuid().ToString("N").ToUpper(); // make it truly unique
-        }
-
-        _initialized = new Lazy<SyncBootState?>(InitializeWithMainDom);
     }
 
     /// <summary>
@@ -110,6 +102,42 @@ public abstract class DatabaseServerMessenger : ServerMessengerBase, IDisposable
     {
     }
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="DatabaseServerMessenger" /> class.
+    /// </summary>
+    protected DatabaseServerMessenger(
+        IMainDom mainDom,
+        CacheRefresherCollection cacheRefreshers,
+        ILogger<DatabaseServerMessenger> logger,
+        bool distributedEnabled,
+        ISyncBootStateAccessor syncBootStateAccessor,
+        IHostingEnvironment hostingEnvironment,
+        ICacheInstructionService cacheInstructionService,
+        IJsonSerializer jsonSerializer,
+        IOptionsMonitor<GlobalSettings> globalSettings,
+        ILastSyncedManager lastSyncedManager,
+        IMachineInfoFactory machineInfoFactory)
+        : base(distributedEnabled, jsonSerializer)
+    {
+        _cancellationToken = _cancellationTokenSource.Token;
+        _mainDom = mainDom;
+        _cacheRefreshers = cacheRefreshers;
+        _hostingEnvironment = hostingEnvironment;
+        Logger = logger;
+        _syncBootStateAccessor = syncBootStateAccessor;
+        CacheInstructionService = cacheInstructionService;
+        JsonSerializer = jsonSerializer;
+        GlobalSettings = globalSettings.CurrentValue;
+        _lastSync = DateTime.UtcNow;
+        _syncIdle = new ManualResetEvent(true);
+        _lastSyncedManager = lastSyncedManager;
+        _machineInfoFactory = machineInfoFactory;
+
+        globalSettings.OnChange(x => GlobalSettings = x);
+
+        _initialized = new Lazy<SyncBootState?>(InitializeWithMainDom);
+    }
+
     public GlobalSettings GlobalSettings { get; private set; }
 
     protected ILogger<DatabaseServerMessenger> Logger { get; }
@@ -132,7 +160,7 @@ public abstract class DatabaseServerMessenger : ServerMessengerBase, IDisposable
     ///         and debugging purposes.
     ///     </para>
     /// </remarks>
-    protected string LocalIdentity { get; }
+    protected string LocalIdentity => _machineInfoFactory.GetLocalIdentity();
 
     /// <summary>
     ///     Synchronize the server (throttled).
@@ -170,16 +198,10 @@ public abstract class DatabaseServerMessenger : ServerMessengerBase, IDisposable
 
         try
         {
-            ProcessInstructionsResult result = CacheInstructionService.ProcessInstructions(
+            CacheInstructionService.ProcessAllInstructions(
                 _cacheRefreshers,
                 _cancellationToken,
-                LocalIdentity,
-                _lastSyncedFileManager.LastSyncedId);
-
-            if (result.LastId > 0)
-            {
-                _lastSyncedFileManager.SaveLastSyncedId(result.LastId);
-            }
+                LocalIdentity);
         }
         finally
         {
@@ -297,15 +319,16 @@ public abstract class DatabaseServerMessenger : ServerMessengerBase, IDisposable
 
             if (syncState == SyncBootState.ColdBoot)
             {
+                var lastSyncedId = _lastSyncedManager.GetLastSyncedExternalAsync().GetAwaiter().GetResult() ?? -1;
                 // Get the last id in the db and store it.
                 // Note: Do it BEFORE initializing otherwise some instructions might get lost
                 // when doing it before. Some instructions might run twice but this is not an issue.
                 var maxId = CacheInstructionService.GetMaxInstructionId();
 
                 // if there is a max currently, or if we've never synced
-                if (maxId > 0 || _lastSyncedFileManager.LastSyncedId < 0)
+                if (maxId > 0 || lastSyncedId < 0)
                 {
-                    _lastSyncedFileManager.SaveLastSyncedId(maxId);
+                    _lastSyncedManager.SaveLastSyncedExternalAsync(maxId).GetAwaiter().GetResult();
                 }
             }
 

@@ -254,7 +254,7 @@ public class BackOfficeController : SecurityControllerBase
         if (associatedUser is not null)
         {
             // log current datetime as last login (this also ensures that the user is not flagged as inactive)
-            associatedUser.LastLoginDateUtc = DateTime.UtcNow;
+            associatedUser.LastLoginDate = DateTime.UtcNow;
             await _backOfficeUserManager.UpdateAsync(associatedUser);
 
             return await SignInBackOfficeUser(associatedUser, request);

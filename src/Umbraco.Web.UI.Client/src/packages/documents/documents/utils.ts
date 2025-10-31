@@ -8,6 +8,7 @@ const variantStatesOrder = {
 	[DocumentVariantStateModel.PUBLISHED]: 1,
 	[DocumentVariantStateModel.DRAFT]: 2,
 	[DocumentVariantStateModel.NOT_CREATED]: 3,
+	[DocumentVariantStateModel.TRASHED]: 4,
 };
 
 const getVariantStateOrderValue = (variant?: UmbDocumentVariantOptionModel['variant']) => {

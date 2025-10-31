@@ -47,5 +47,7 @@ export default {
     returnToLogin: 'Tilbage til log ind',
     localLoginDisabled: 'Desværre er det ikke muligt at logge ind direkte. Det er blevet deaktiveret af en login-udbyder.',
     friendlyGreeting: 'Hej!',
+    showPassword: 'Vis adgangskode',
+    hidePassword: 'Skjul adgangskode',
   },
 } satisfies UmbLocalizationDictionary;

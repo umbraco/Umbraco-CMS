@@ -80,8 +80,8 @@ export class UmbTiptapToolbarConfigurationContext extends UmbContextBase {
 			.filter((ext) => ext.alias?.toLowerCase().includes(query) || ext.label?.toLowerCase().includes(query));
 	}
 
-	public getExtensionByAlias(alias: string): UmbTiptapToolbarExtension | undefined {
-		return this.#lookup?.get(alias);
+	public getExtensionByAlias(alias: string): UmbTiptapToolbarExtension {
+		return this.#lookup?.get(alias) ?? { label: '', alias, icon: '', kind: 'unknown' };
 	}
 
 	public isExtensionEnabled(alias: string): boolean {

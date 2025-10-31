@@ -10,6 +10,7 @@ import { UMB_DOCUMENT_SCHEDULE_MODAL } from '../schedule-publish/constants.js';
 import { UMB_DOCUMENT_PUBLISH_WITH_DESCENDANTS_MODAL } from '../publish-with-descendants/constants.js';
 import { UMB_DOCUMENT_PUBLISH_MODAL } from '../publish/constants.js';
 import { UmbUnpublishDocumentEntityAction } from '../unpublish/index.js';
+import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_WORKSPACE_ALIAS } from '../../constants.js';
 import { UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT } from './document-publishing.workspace-context.token.js';
 import { UMB_DOCUMENT_PUBLISHING_SHORTCUT_UNIQUE } from './constants.js';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
@@ -27,8 +28,9 @@ import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
+import type { UmbPublishableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 
-export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase {
+export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implements UmbPublishableWorkspaceContext {
 	/**
 	 * Manages the pending changes for the published document.
 	 * @memberof UmbDocumentPublishingWorkspaceContext
@@ -43,6 +45,8 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase {
 	#currentUnique?: UmbEntityUnique;
 	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
 	readonly #localize = new UmbLocalizationController(this);
+
+	workspaceAlias = UMB_DOCUMENT_WORKSPACE_ALIAS;
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT);
@@ -82,6 +86,10 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase {
 		this.consumeContext(UMB_NOTIFICATION_CONTEXT, (context) => {
 			this.#notificationContext = context;
 		});
+	}
+
+	getEntityType() {
+		return UMB_DOCUMENT_ENTITY_TYPE;
 	}
 
 	public async publish() {

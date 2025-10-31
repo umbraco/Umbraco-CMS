@@ -38,8 +38,12 @@ internal sealed class RedirectUrlServiceTests : UmbracoIntegrationTestWithConten
 
         using (var scope = ScopeProvider.CreateScope())
         {
-            var repository = new RedirectUrlRepository((IScopeAccessor)ScopeProvider, AppCaches.Disabled,
-                Mock.Of<ILogger<RedirectUrlRepository>>());
+            var repository = new RedirectUrlRepository(
+                (IScopeAccessor)ScopeProvider,
+                AppCaches.Disabled,
+                Mock.Of<ILogger<RedirectUrlRepository>>(),
+                Mock.Of<IRepositoryCacheVersionService>(),
+                Mock.Of<ICacheSyncService>());
             var rootContent = ContentService.GetRootContent().First();
             var subPages = ContentService.GetPagedChildren(rootContent.Id, 0, 3, out _).ToList();
             _firstSubPage = subPages[0];

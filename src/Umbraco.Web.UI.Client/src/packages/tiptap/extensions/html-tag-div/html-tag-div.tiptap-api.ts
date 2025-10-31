@@ -1,7 +1,6 @@
 import { UmbTiptapExtensionApiBase } from '../tiptap-extension-api-base.js';
-import { Div } from '@umbraco-cms/backoffice/external/tiptap';
+import { Div } from './html-tag-div.tiptap-extension.js';
 
 export default class UmbTiptapHtmlTagDivExtensionApi extends UmbTiptapExtensionApiBase {
-	// eslint-disable-next-line @typescript-eslint/no-deprecated
 	getTiptapExtensions = () => [Div];
 }

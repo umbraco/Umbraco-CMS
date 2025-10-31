@@ -20,7 +20,7 @@ public class LegacyMemberDeletedWebhookEvent : WebhookEventBase<MemberDeletedNot
 
     public override string Alias => Constants.WebhookEvents.Aliases.MemberDeleted;
 
-    public override object? ConvertNotificationToRequestPayload(MemberDeletedNotification notification)
+    public override object ConvertNotificationToRequestPayload(MemberDeletedNotification notification)
     {
         var result = notification.DeletedEntities.Select(entity => new
         {

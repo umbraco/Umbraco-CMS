@@ -57,10 +57,6 @@ internal sealed class DatabaseCacheRebuilder : IDatabaseCacheRebuilder
         => (await _longRunningOperationService.GetByTypeAsync(RebuildOperationName, 0, 0)).Total != 0;
 
     /// <inheritdoc/>
-    [Obsolete("Use the overload with the useBackgroundThread parameter. Scheduled for removal in Umbraco 17.")]
-    public void Rebuild() => Rebuild(false);
-
-    /// <inheritdoc/>
     [Obsolete("Use RebuildAsync instead. Scheduled for removal in Umbraco 18.")]
     public void Rebuild(bool useBackgroundThread) =>
         RebuildAsync(useBackgroundThread).GetAwaiter().GetResult();
@@ -108,7 +104,7 @@ internal sealed class DatabaseCacheRebuilder : IDatabaseCacheRebuilder
 
         _logger.LogWarning(
             "Database cache was serialized using {CurrentSerializer}. Currently configured cache serializer {Serializer}. Rebuilding database cache.",
-            currentSerializer,
+            currentSerializer == 0 ? "None" : currentSerializer,
             serializer);
 
         using (_profilingLogger.TraceDuration<DatabaseCacheRebuilder>($"Rebuilding database cache with {serializer} serializer"))

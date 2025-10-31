@@ -47,7 +47,7 @@ import { manifests as propertyEditorManifests } from '../src/packages/property-e
 import { manifests as publishCacheManifests } from '../src/packages/publish-cache/manifests';
 import { manifests as relationsManifests } from '../src/packages/relations/manifests';
 import { manifests as rteManifests } from '../src/packages/rte/manifests';
-import { manifests as searchManifests } from '../src/packages/search/manifests';
+import { manifests as searchManifests } from '../src/packages/core/search/manifests';
 import { manifests as segmentManifests } from '../src/packages/segment/manifests';
 import { manifests as settingsManifests } from '../src/packages/settings/manifests';
 import { manifests as staticFileManifests } from '../src/packages/static-file/manifests';

@@ -1000,7 +1000,7 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
 
         // Apply a filter that excludes the child at index 1. We'd expect to not get this, but
         // get still get one previous sibling, i.e. the entity at index 0.
-        Guid[] keysToExclude = [children[1].Key];
+        var keysToExclude = new List<Guid> { children[1].Key };
         IQuery<IUmbracoEntity> filter = ScopeProvider.CreateQuery<IUmbracoEntity>().Where(x => !keysToExclude.Contains(x.Key));
 
         var target = children[2];

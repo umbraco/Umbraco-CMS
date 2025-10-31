@@ -80,9 +80,9 @@ public class IdentityMapDefinition : IMapDefinition
         target.CalculatedContentStartNodeIds = source.CalculateContentStartNodeIds(_entityService, _appCaches);
         target.Email = source.Email;
         target.UserName = source.Username;
-        target.LastPasswordChangeDateUtc = source.LastPasswordChangeDate?.ToUniversalTime();
-        target.LastLoginDateUtc = source.LastLoginDate?.ToUniversalTime();
-        target.InviteDateUtc = source.InvitedDate?.ToUniversalTime();
+        target.LastPasswordChangeDate = source.LastPasswordChangeDate?.ToUniversalTime();
+        target.LastLoginDate = source.LastLoginDate?.ToUniversalTime();
+        target.InviteDate = source.InvitedDate?.ToUniversalTime();
         target.EmailConfirmed = source.EmailConfirmedDate.HasValue;
         target.Name = source.Name;
         target.AccessFailedCount = source.FailedPasswordAttempts;
@@ -95,7 +95,7 @@ public class IdentityMapDefinition : IMapDefinition
         target.IsApproved = source.IsApproved;
         target.SecurityStamp = source.SecurityStamp;
         DateTime? lockedOutUntil = source.LastLockoutDate?.AddMinutes(_securitySettings.UserDefaultLockoutTimeInMinutes);
-        target.LockoutEnd = source.IsLockedOut ? lockedOutUntil ?? DateTime.MaxValue : null;
+        target.LockoutEnd = source.IsLockedOut ? (lockedOutUntil ?? DateTime.MaxValue).ToUniversalTime() : null;
         target.Kind = source.Kind;
     }
 
@@ -104,8 +104,8 @@ public class IdentityMapDefinition : IMapDefinition
     {
         target.Email = source.Email;
         target.UserName = source.Username;
-        target.LastPasswordChangeDateUtc = source.LastPasswordChangeDate?.ToUniversalTime();
-        target.LastLoginDateUtc = source.LastLoginDate?.ToUniversalTime();
+        target.LastPasswordChangeDate = source.LastPasswordChangeDate?.ToUniversalTime();
+        target.LastLoginDate = source.LastLoginDate?.ToUniversalTime();
         target.EmailConfirmed = source.EmailConfirmedDate.HasValue;
         target.Name = source.Name;
         target.AccessFailedCount = source.FailedPasswordAttempts;
@@ -114,46 +114,16 @@ public class IdentityMapDefinition : IMapDefinition
         target.IsApproved = source.IsApproved;
         target.SecurityStamp = source.SecurityStamp;
         DateTime? lockedOutUntil = source.LastLockoutDate?.AddMinutes(_securitySettings.MemberDefaultLockoutTimeInMinutes);
-        target.LockoutEnd = GetLockoutEnd(source);
-        target.LastLockoutDateUtc = GetLastLockoutDateUtc(source);
-        target.CreatedDateUtc = EnsureUtcWithServerTime(source.CreateDate);
+        target.LockoutEnd = source.IsLockedOut ? (lockedOutUntil ?? DateTime.MaxValue).ToUniversalTime() : null;
         target.Comments = source.Comments;
+        target.LastLockoutDate = source.LastLockoutDate == DateTime.MinValue
+            ? null
+            : source.LastLockoutDate?.ToUniversalTime();
+        target.CreatedDate = source.CreateDate.ToUniversalTime();
         target.Key = source.Key;
         target.MemberTypeAlias = source.ContentTypeAlias;
         target.TwoFactorEnabled = _twoFactorLoginService.IsTwoFactorEnabledAsync(source.Key).GetAwaiter().GetResult();
 
         // NB: same comments re AutoMapper as per BackOfficeUser
     }
-
-    private DateTimeOffset? GetLockoutEnd(IMember source)
-    {
-        if (source.IsLockedOut is false)
-        {
-            return null;
-        }
-
-        DateTime? lockedOutUntil = source.LastLockoutDate?.AddMinutes(_securitySettings.MemberDefaultLockoutTimeInMinutes);
-        if (lockedOutUntil.HasValue is false)
-        {
-            return DateTime.MaxValue;
-        }
-
-        return EnsureUtcWithServerTime(lockedOutUntil.Value);
-    }
-
-    private static DateTime? GetLastLockoutDateUtc(IMember source)
-    {
-        if (source.LastLockoutDate is null || source.LastLockoutDate == DateTime.MinValue)
-        {
-            return null;
-        }
-
-        return EnsureUtcWithServerTime(source.LastLockoutDate.Value);
-    }
-
-    private static DateTime EnsureUtcWithServerTime(DateTime date) =>
-
-        // We have a server time value here, but the Kind is UTC, so we can't use .ToUniversalTime() to convert to the UTC
-        // value that the LockoutEnd property expects. We need to create a DateTimeOffset with the correct offset.
-        DateTime.SpecifyKind(date, DateTimeKind.Local).ToUniversalTime();
 }

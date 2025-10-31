@@ -25,6 +25,19 @@ export interface MetaPropertyEditorUi {
 	propertyEditorSchemaAlias?: string;
 	settings?: PropertyEditorSettings;
 	supportsReadOnly?: boolean;
+	supportsDataSource?: {
+		/**
+		 * Whether the property editor UI is enabled for use with data sources.
+		 * @type {boolean}
+		 */
+		enabled: boolean;
+		/**
+		 * A list of allowed property editor data source kinds that can be used with this property editor UI.
+		 * If not specified, any data sources can be used.
+		 * @example ["pickerCollection", "pickerTree"]
+		 */
+		forDataSourceTypes: string[];
+	};
 }
 
 // Model
@@ -53,6 +66,7 @@ export interface PropertyEditorSettingsProperty {
 	description?: string;
 	alias: string;
 	propertyEditorUiAlias: string;
+	propertyEditorDataSourceAlias?: string;
 	config?: UmbPropertyEditorConfig;
 	weight?: number;
 }

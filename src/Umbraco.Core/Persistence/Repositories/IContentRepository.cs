@@ -52,7 +52,7 @@ public interface IContentRepository<in TId, TEntity> : IReadWriteQueryRepository
     /// <summary>
     ///     Gets the recycle bin content.
     /// </summary>
-    IEnumerable<TEntity>? GetRecycleBin();
+    IEnumerable<TEntity> GetRecycleBin();
 
     /// <summary>
     ///     Gets the count of content items of a given content type.

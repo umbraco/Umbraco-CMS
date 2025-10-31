@@ -21,12 +21,6 @@ public class ActionSort : IAction
     public string Alias => ActionAlias;
 
     /// <inheritdoc />
-    public string Category => Constants.Conventions.PermissionCategories.StructureCategory;
-
-    /// <inheritdoc />
-    public string Icon => "icon-navigation-vertical";
-
-    /// <inheritdoc />
     public bool ShowInNotifier => true;
 
     /// <inheritdoc />
