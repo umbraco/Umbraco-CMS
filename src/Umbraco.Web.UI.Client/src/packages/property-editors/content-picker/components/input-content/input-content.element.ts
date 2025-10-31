@@ -2,7 +2,7 @@ import type { UmbContentPickerSource } from '../../types.js';
 import { css, customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbInteractionMemoriesChangeEvent } from '@umbraco-cms/backoffice/interaction-memory';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
@@ -75,6 +75,20 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 	 */
 	@property({ type: Boolean, reflect: true })
 	public readonly = false;
+	@property({ type: Boolean })
+	required = false;
+	@property({ type: String })
+	requiredMessage: string = UMB_VALIDATION_EMPTY_LOCALIZATION_KEY;
+
+	constructor() {
+		super();
+
+		this.addValidator(
+			'valueMissing',
+			() => this.requiredMessage,
+			() => !this.readonly && (this.required || this.min > 0) && this.selection.length === 0,
+		);
+	}
 
 	@property({ type: Array, attribute: false })
 	public get interactionMemories(): Array<UmbInteractionMemoryModel> | undefined {

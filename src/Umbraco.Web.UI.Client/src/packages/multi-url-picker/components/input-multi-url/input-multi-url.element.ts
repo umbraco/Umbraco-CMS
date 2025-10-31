@@ -23,9 +23,9 @@ import {
 import { UmbMediaItemRepository, UmbMediaUrlRepository } from '@umbraco-cms/backoffice/media';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 /**
  * @element umb-input-multi-url
@@ -34,7 +34,9 @@ import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
  * @fires focus - when the input gains focus
  */
 @customElement('umb-input-multi-url')
-export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, '') {
+export class UmbInputMultiUrlElement extends UmbFormControlMixin<string, typeof UmbLitElement, undefined>(
+	UmbLitElement,
+) {
 	#sorter = new UmbSorterController<UmbLinkPickerLink>(this, {
 		getUniqueOfElement: (element) => {
 			return element.id;
@@ -88,7 +90,7 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 	 * @attr
 	 * @default
 	 */
-	@property({ type: String, attribute: 'min-message' })
+	@property({ type: String, attribute: 'max-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
 	/**
@@ -150,6 +152,10 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 		}
 	}
 	#readonly = false;
+	@property({ type: Boolean })
+	required = false;
+	@property({ type: String })
+	requiredMessage = UMB_VALIDATION_EMPTY_LOCALIZATION_KEY;
 
 	@state()
 	private _modalRoute?: UmbModalRouteBuilder;
@@ -164,6 +170,12 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 
 	constructor() {
 		super();
+
+		this.addValidator(
+			'valueMissing',
+			() => this.requiredMessage,
+			() => !this.readonly && this.required && (!this.value || this.value === ''),
+		);
 
 		this.addValidator(
 			'rangeUnderflow',

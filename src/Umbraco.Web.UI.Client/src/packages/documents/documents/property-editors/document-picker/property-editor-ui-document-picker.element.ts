@@ -11,12 +11,13 @@ import type {
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-property-editor-ui-document-picker')
-export class UmbPropertyEditorUIDocumentPickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
-	@property()
-	public value?: string;
-
+export class UmbPropertyEditorUIDocumentPickerElement
+	extends UmbFormControlMixin<string, typeof UmbLitElement, undefined>(UmbLitElement)
+	implements UmbPropertyEditorUiElement
+{
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		this.#interactionMemoryManager.setPropertyEditorConfig(config);
 
@@ -39,6 +40,10 @@ export class UmbPropertyEditorUIDocumentPickerElement extends UmbLitElement impl
 	 */
 	@property({ type: Boolean, reflect: true })
 	readonly = false;
+	@property({ type: Boolean })
+	mandatory = false;
+	@property({ type: String })
+	mandatoryMessage = UMB_VALIDATION_EMPTY_LOCALIZATION_KEY;
 
 	@state()
 	private _min = 0;
@@ -64,6 +69,10 @@ export class UmbPropertyEditorUIDocumentPickerElement extends UmbLitElement impl
 		this.observe(this.#interactionMemoryManager.memoriesForPropertyEditor, (interactionMemories) => {
 			this._interactionMemories = interactionMemories ?? [];
 		});
+	}
+
+	override firstUpdated() {
+		this.addFormControlElement(this.shadowRoot!.querySelector('umb-input-document')!);
 	}
 
 	#onChange(event: CustomEvent & { target: UmbInputDocumentElement }) {
@@ -95,6 +104,8 @@ export class UmbPropertyEditorUIDocumentPickerElement extends UmbLitElement impl
 				.value=${this.value}
 				@change=${this.#onChange}
 				?readonly=${this.readonly}
+				?required=${this.mandatory}
+				.requiredMessage=${this.mandatoryMessage}
 				.interactionMemories=${this._interactionMemories}
 				@interaction-memories-change=${this.#onInputInteractionMemoriesChange}>
 			</umb-input-document>
