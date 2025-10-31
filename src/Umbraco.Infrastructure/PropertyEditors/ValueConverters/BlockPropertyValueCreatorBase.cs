@@ -137,7 +137,8 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
                 continue;
             }
 
-            IPublishedElement? element = BlockEditorConverter.ConvertToElement(owner, data, referenceCacheLevel, preview);
+            IEnumerable<BlockItemVariation> variations = converted.BlockValue.Expose.Where(e => e.ContentKey == data.Key);
+            IPublishedElement? element = BlockEditorConverter.ConvertToElement(owner, data, variations, referenceCacheLevel, preview);
             if (element == null)
             {
                 continue;
@@ -154,7 +155,7 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
                 : null;
             if (expose.Any(v =>
                     v.ContentKey == element.Key && v.Culture == expectedBlockVariationCulture &&
-                    v.Segment == expectedBlockVariationSegment) is false)
+                    (v.Segment == expectedBlockVariationSegment || v.Segment is null)) is false)
             {
                 continue;
             }
@@ -172,6 +173,9 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
         var settingsPublishedElements = new Dictionary<Guid, IPublishedElement>();
         var validSettingsElementTypes = blockConfigMap.Values.Select(x => x.SettingsElementTypeKey)
             .Where(x => x.HasValue).Distinct().ToList();
+        var contentSettingsKeyMapping = converted.References
+            .Where(r => r.SettingsKey.HasValue)
+            .ToDictionary(c => c.SettingsKey!.Value, c => c.ContentKey);
         foreach (BlockItemData data in converted.BlockValue.SettingsData)
         {
             if (!validSettingsElementTypes.Contains(data.ContentTypeKey))
@@ -179,7 +183,13 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
                 continue;
             }
 
-            IPublishedElement? element = BlockEditorConverter.ConvertToElement(owner, data, referenceCacheLevel, preview);
+            if (contentSettingsKeyMapping.TryGetValue(data.Key, out Guid contentKey) is false)
+            {
+                continue;
+            }
+
+            IEnumerable<BlockItemVariation> variations = converted.BlockValue.Expose.Where(e => e.ContentKey == contentKey);
+            IPublishedElement? element = BlockEditorConverter.ConvertToElement(owner, data, variations, referenceCacheLevel, preview);
             if (element is null)
             {
                 continue;
