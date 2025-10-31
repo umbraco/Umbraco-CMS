@@ -1,4 +1,3 @@
-import { UMB_DOCUMENT_TYPE_MENU_ITEM_ALIAS } from '../../document-types/constants.js';
 import { UMB_DOCUMENT_BLUEPRINT_FOLDER_WORKSPACE_ALIAS, UMB_DOCUMENT_BLUEPRINT_TREE_ALIAS } from '../tree/constants.js';
 import { UMB_DOCUMENT_BLUEPRINT_WORKSPACE_ALIAS } from '../workspace/constants.js';
 import { UMB_DOCUMENT_BLUEPRINT_MENU_ITEM_ALIAS } from './constants.js';
@@ -8,7 +7,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'menuItem',
 		kind: 'tree',
-		alias: 'Umb.MenuItem.DocumentBlueprints',
+		alias: UMB_DOCUMENT_BLUEPRINT_MENU_ITEM_ALIAS,
 		name: 'Document Blueprints Menu Item',
 		weight: 100,
 		meta: {
@@ -52,7 +51,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		alias: 'Umb.Context.DocumentBlueprintFolder.Menu.Structure',
 		api: () => import('./document-blueprint-menu-structure.context.js'),
 		meta: {
-			menuItemAlias: UMB_DOCUMENT_TYPE_MENU_ITEM_ALIAS,
+			menuItemAlias: UMB_DOCUMENT_BLUEPRINT_MENU_ITEM_ALIAS,
 		},
 		conditions: [
 			{
