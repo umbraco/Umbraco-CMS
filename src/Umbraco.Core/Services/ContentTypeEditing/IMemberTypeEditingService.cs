@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
@@ -14,4 +14,6 @@ public interface IMemberTypeEditingService
         Guid? key,
         IEnumerable<Guid> currentCompositeKeys,
         IEnumerable<string> currentPropertyAliases);
+
+    Task<PagedModel<IMemberType>> GetFolderMemberTypes(int skip, int take);
 }
