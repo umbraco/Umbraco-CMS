@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.Installer;
@@ -17,5 +17,5 @@ public class UserInstallRequestModel
     [PasswordPropertyText]
     public string Password { get; set; } = string.Empty;
 
-    public bool SubscribeToNewsletter { get; }
+    public bool SubscribeToNewsletter { get; set; }
 }
