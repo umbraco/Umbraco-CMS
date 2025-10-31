@@ -59,6 +59,30 @@ export class UmbEntityActionListElement extends UmbLitElement {
 		};
 	}
 
+
+
+override focus() {
+  const extensionComponent = this.renderRoot.querySelector('umb-extension-with-api-slot');
+  if (!extensionComponent) return;
+
+  // Wait for the slot component to render
+  extensionComponent.updateComplete.then(() => {
+    const firstEntityAction = extensionComponent.shadowRoot?.querySelector('umb-entity-action');
+    if (!firstEntityAction) return;
+
+    firstEntityAction.updateComplete.then(() => {
+      const firstMenuItem = firstEntityAction.shadowRoot?.querySelector('uui-menu-item');
+
+      firstMenuItem?.updateComplete?.then(() => {
+        const labelButton = firstMenuItem.shadowRoot?.querySelector('#label-button') as HTMLElement;
+        labelButton?.focus();
+      });
+    });
+  });
+}
+
+
+
 	#hasRenderedOnce?: boolean;
 	override render() {
 		return this._filter
