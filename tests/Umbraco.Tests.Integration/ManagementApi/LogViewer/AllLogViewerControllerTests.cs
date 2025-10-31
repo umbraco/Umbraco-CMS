@@ -12,7 +12,7 @@ public class AllLogViewerControllerTests : ManagementApiUserGroupTestBase<AllLog
     // We get the InternalServerError for the admin because it has access, but there is no log file to view
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.InternalServerError
+        ExpectedStatusCode = HttpStatusCode.OK
     };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
