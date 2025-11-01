@@ -111,7 +111,7 @@ Use this directive to generate a list of content items presented as a flexbox gr
       function link(scope, el, attr, ctrl) {
 
          scope.clickItem = function(item, $event, $index) {
-            if(scope.allowClick !== false && scope.onClick) {
+            if(scope.allowClick !== false && item.bulkActionsAllowed !== false && scope.onClick) {
                scope.onClick(item, $event, $index);
             }
          };
