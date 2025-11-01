@@ -222,6 +222,94 @@ internal sealed class DataTypeRepository : EntityRepositoryBase<int, IDataType>,
         return usages;
     }
 
+    public PagedModel<Guid> GetBlockEditorsReferencingContentType(Guid contentTypeId, int skip, int take)
+    {
+        // List of aliases that use elements, for now this is both block editors and the RTE.
+        var blockEditorAliases = new List<string>()
+        {
+            Constants.PropertyEditors.Aliases.BlockGrid,
+            Constants.PropertyEditors.Aliases.BlockList,
+            Constants.PropertyEditors.Aliases.RichText,
+        };
+        // Get All contentTypes where isContainer (list view enabled) is set to true
+        Sql<ISqlContext> sql = Sql()
+            .Select<DataTypeDto>(r => r.Select(x => x.NodeDto))
+            .From<DataTypeDto>()
+            .InnerJoin<NodeDto>()
+            .On<DataTypeDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+            .WhereIn<DataTypeDto>(n => n.EditorAlias, blockEditorAliases );
+
+        List<DataTypeDto>? dataTypeDtos = Database.Fetch<DataTypeDto>(sql);
+
+        if (dataTypeDtos == null)
+        {
+            return new PagedModel<Guid>();
+        }
+
+        var keys = new HashSet<Guid>();
+
+        foreach (DataTypeDto dataTypeDto in dataTypeDtos)
+        {
+            // Check we have an editor for the data type.
+            if (!_editors.TryGet(dataTypeDto.EditorAlias, out IDataEditor? editor))
+            {
+                continue;
+            }
+
+            IDataType dataType = DataTypeFactory.BuildEntity(
+                dataTypeDto,
+                _editors,
+                _dataTypeLogger,
+                _serializer,
+                _dataValueEditorFactory);
+
+            switch (dataType.EditorAlias)
+            {
+                case Constants.PropertyEditors.Aliases.BlockGrid:
+                    BlockGridConfiguration? blockGridConfigurations = ConfigurationEditor.ConfigurationAs<BlockGridConfiguration>(dataType.ConfigurationObject);
+
+                    if(blockGridConfigurations is null)
+                    {
+                        continue;
+                    }
+
+                    if (blockGridConfigurations.Blocks.Any(configuration => configuration.ContentElementTypeKey == contentTypeId || configuration.SettingsElementTypeKey == contentTypeId))
+                    {
+                        keys.Add(dataType.Key);
+                    }
+                    break;
+                case Constants.PropertyEditors.Aliases.BlockList:
+                    BlockListConfiguration.BlockConfiguration[]? blockListConfigurations = ConfigurationEditor.ConfigurationAs<BlockListConfiguration>(dataType.ConfigurationObject)?.Blocks;
+
+                    if(blockListConfigurations is null)
+                    {
+                        continue;
+                    }
+
+                    if (blockListConfigurations.Any(configuration => configuration.ContentElementTypeKey == contentTypeId || configuration.SettingsElementTypeKey == contentTypeId))
+                    {
+                        keys.Add(dataType.Key);
+                    }
+                    break;
+                case Constants.PropertyEditors.Aliases.RichText:
+                    RichTextConfiguration? rteConfig = ConfigurationEditor.ConfigurationAs<RichTextConfiguration>(dataType.ConfigurationObject);
+
+                    if (rteConfig?.Blocks is null)
+                    {
+                        continue;
+                    }
+
+                    if (rteConfig.Blocks.Any(configuration => configuration.ContentElementTypeKey == contentTypeId || configuration.SettingsElementTypeKey == contentTypeId))
+                    {
+                        keys.Add(dataType.Key);
+                    }
+                    break;
+            }
+        }
+
+        return new PagedModel<Guid>{ Total = keys.Count, Items = keys.Skip(skip).Take(take) };
+    }
+
     #region Overrides of RepositoryBase<int,DataTypeDefinition>
 
     protected override IDataType? PerformGet(int id) => GetMany(id).FirstOrDefault();

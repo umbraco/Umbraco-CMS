@@ -1590,6 +1590,38 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         return cache.GetCacheItem(cacheKey, () => CountChildren(RecycleBinId) > 0);
     }
 
+    public PagedModel<Guid> GetReferencingDocumentsByDocumentTypeKey(Guid documentTypeKey)
+    {
+        Sql<ISqlContext> sqlContentTypeId = Sql()
+            .Select<ContentTypeDto>(x => x.NodeId)
+            .From<ContentTypeDto>()
+            .InnerJoin<NodeDto>()
+            .On<ContentTypeDto, NodeDto>((c, n) => c.NodeId == n.NodeId)
+            .Where<NodeDto>(x => x.UniqueId == documentTypeKey);
+
+        var contentTypeId = Database.FirstOrDefault<int?>(sqlContentTypeId);
+
+        if (contentTypeId is null)
+        {
+            return new PagedModel<Guid>();
+        }
+
+        Sql<ISqlContext> sql = Sql()
+            .Select<NodeDto>(x => x.UniqueId)
+            .From<NodeDto>()
+            .InnerJoin<ContentDto>()
+            .On<ContentDto, NodeDto>((c, n) => c.NodeId == n.NodeId)
+            .Where<ContentDto>(c => c.ContentTypeId == contentTypeId.Value);
+
+        List<Guid>? contentGuids = Database.Fetch<Guid>(sql);
+
+        return new PagedModel<Guid>()
+        {
+            Items = contentGuids,
+            Total = contentGuids.Count
+        };
+    }
+
     #endregion
 
     #region Read Repository implementation for Guid keys
