@@ -81,7 +81,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             _memberTypeService = memberTypeService;
         }
 
-        [Obsolete("Please the constructor with all parameters. Scheduled for removal in Umbraco 19..")]
+        [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
         public PackageDataInstallation(
             IDataValueEditorFactory dataValueEditorFactory,
             ILogger<PackageDataInstallation> logger,
@@ -119,7 +119,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                   StaticServiceProvider.Instance.GetRequiredService<IMemberTypeService>())
         { }
 
-        [Obsolete("Please the constructor with all parameters. Scheduled for removal in Umbraco 19..")]
+        [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
         public PackageDataInstallation(
             IDataValueEditorFactory dataValueEditorFactory,
             ILogger<PackageDataInstallation> logger,
@@ -845,38 +845,23 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         {
             if (typeof(T) == typeof(IContentType))
             {
-                if (parent is null)
-                {
-                    return new ContentType(_shortStringHelper, parentId) { Alias = alias, Key = key } as T;
-                }
-                else
-                {
-                    return new ContentType(_shortStringHelper, (IContentType)parent, alias) { Key = key } as T;
-                }
+                return parent is null
+                    ? new ContentType(_shortStringHelper, parentId) { Alias = alias, Key = key } as T
+                    : new ContentType(_shortStringHelper, (IContentType)parent, alias) { Key = key } as T;
             }
 
             if (typeof(T) == typeof(IMediaType))
             {
-                if (parent is null)
-                {
-                    return new MediaType(_shortStringHelper, parentId) { Alias = alias, Key = key } as T;
-                }
-                else
-                {
-                    return new MediaType(_shortStringHelper, (IMediaType)parent, alias) { Key = key } as T;
-                }
+                return parent is null
+                    ? new MediaType(_shortStringHelper, parentId) { Alias = alias, Key = key } as T
+                    : new MediaType(_shortStringHelper, (IMediaType)parent, alias) { Key = key } as T;
             }
 
             if (typeof(T) == typeof(IMemberType))
             {
-                if (parent is null)
-                {
-                    return new MemberType(_shortStringHelper, parentId) { Alias = alias, Key = key } as T;
-                }
-                else
-                {
-                    return new MemberType(_shortStringHelper, (IMemberType)parent, alias) { Key = key } as T;
-                }
+                return parent is null
+                    ? new MemberType(_shortStringHelper, parentId) { Alias = alias, Key = key } as T
+                    : new MemberType(_shortStringHelper, (IMemberType)parent, alias) { Key = key } as T;
             }
 
             throw new NotSupportedException($"Type {typeof(T)} is not supported");

@@ -63,7 +63,7 @@ export class UmbMemberTypeTreeServerDataSource
 			unique: item.id,
 			parent: {
 				unique: item.parent ? item.parent.id : null,
-				entityType: item.parent ? UMB_MEMBER_TYPE_ENTITY_TYPE : UMB_MEMBER_TYPE_ROOT_ENTITY_TYPE,
+				entityType: item.parent ? UMB_MEMBER_TYPE_FOLDER_ENTITY_TYPE : UMB_MEMBER_TYPE_ROOT_ENTITY_TYPE,
 			},
 			name: item.name,
 			entityType: item.isFolder ? UMB_MEMBER_TYPE_FOLDER_ENTITY_TYPE : UMB_MEMBER_TYPE_ENTITY_TYPE,
