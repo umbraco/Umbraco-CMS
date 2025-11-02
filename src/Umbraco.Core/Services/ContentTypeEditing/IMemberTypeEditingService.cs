@@ -14,6 +14,4 @@ public interface IMemberTypeEditingService
         Guid? key,
         IEnumerable<Guid> currentCompositeKeys,
         IEnumerable<string> currentPropertyAliases);
-
-    Task<PagedModel<IMemberType>> GetFolderMemberTypes(int skip, int take);
 }
