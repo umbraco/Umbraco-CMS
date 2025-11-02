@@ -10,9 +10,10 @@ export class UmbManagementApiDocumentItemDataCacheInvalidationManager extends Um
 	constructor(host: UmbControllerHost) {
 		super(host, {
 			dataCache: documentItemCache,
-			/* The Document item model includes info about the Document Type. 
+			/* The Document item model includes info about the Document Type.
 			We need to invalidate the cache for both Document and DocumentType events. */
 			eventSources: ['Umbraco:CMS:Document', 'Umbraco:CMS:DocumentType'],
+			eventTypes: ['Updated', 'Deleted', 'Trashed'],
 		});
 	}
 

@@ -1,20 +1,20 @@
-import { UMB_PREVIEW_CONTEXT } from '../preview.context.js';
+import { UMB_PREVIEW_CONTEXT } from '../context/preview.context-token.js';
 import { css, customElement, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-@customElement('umb-preview-open-website')
-export class UmbPreviewOpenWebsiteElement extends UmbLitElement {
+@customElement('umb-preview-exit')
+export class UmbPreviewExitElement extends UmbLitElement {
 	async #onClick() {
 		const previewContext = await this.getContext(UMB_PREVIEW_CONTEXT);
-		await previewContext?.openWebsite();
+		await previewContext?.exitPreview();
 	}
 
 	override render() {
 		return html`
 			<uui-button look="primary" @click=${this.#onClick}>
 				<div>
-					<uui-icon name="icon-out"></uui-icon>
-					<span>${this.localize.term('preview_openWebsiteLabel')}</span>
+					<uui-icon name="icon-power"></uui-icon>
+					<span>${this.localize.term('preview_endLabel')}</span>
 				</div>
 			</uui-button>
 		`;
@@ -33,16 +33,16 @@ export class UmbPreviewOpenWebsiteElement extends UmbLitElement {
 			uui-button > div {
 				display: flex;
 				align-items: center;
-				gap: 5px;
+				gap: var(--uui-size-2, 6px);
 			}
 		`,
 	];
 }
 
-export { UmbPreviewOpenWebsiteElement as element };
+export { UmbPreviewExitElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-preview-open-website': UmbPreviewOpenWebsiteElement;
+		'umb-preview-exit': UmbPreviewExitElement;
 	}
 }

@@ -5,6 +5,7 @@ import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 import type { DocumentUrlInfoModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
+/** @deprecated This has been deprecated, please use `UmbPreviewRepository` instead. To be removed in Umbraco 19. [LK] */
 export class UmbDocumentPreviewRepository extends UmbRepositoryBase {
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -24,6 +25,12 @@ export class UmbDocumentPreviewRepository extends UmbRepositoryBase {
 		culture?: string,
 		segment?: string,
 	): Promise<DocumentUrlInfoModel> {
+		new UmbDeprecation({
+			removeInVersion: '19.0.0',
+			deprecated: '`UmbDocumentPreviewRepository.getPreviewUrl()`',
+			solution: 'Use `UmbPreviewRepository.getPreviewUrl()` instead',
+		}).warn();
+
 		const { data, error } = await tryExecute(
 			this,
 			DocumentService.getDocumentByIdPreviewUrl({
@@ -62,6 +69,12 @@ export class UmbDocumentPreviewRepository extends UmbRepositoryBase {
 	 * @memberof UmbDocumentPreviewRepository
 	 */
 	async exit(): Promise<void> {
+		new UmbDeprecation({
+			removeInVersion: '19.0.0',
+			deprecated: '`UmbDocumentPreviewRepository.exit()`',
+			solution: 'Use `UmbPreviewRepository.exit()` instead',
+		}).warn();
+
 		await tryExecute(this, PreviewService.deletePreview(), { disableNotifications: true });
 		return;
 	}

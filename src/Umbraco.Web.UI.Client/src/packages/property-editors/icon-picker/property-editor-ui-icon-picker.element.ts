@@ -9,28 +9,45 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { extractUmbColorVariable } from '@umbraco-cms/backoffice/resources';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+
 /**
  * @element umb-property-editor-ui-icon-picker
  */
 @customElement('umb-property-editor-ui-icon-picker')
-export class UmbPropertyEditorUIIconPickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
-	//
+export class UmbPropertyEditorUIIconPickerElement
+	extends UmbFormControlMixin<string, typeof UmbLitElement, undefined>(UmbLitElement, undefined)
+	implements UmbPropertyEditorUiElement
+{
+	@property({ type: Boolean })
+	mandatory = false;
+
+	protected override firstUpdated(): void {
+		this.addValidator(
+			'valueMissing',
+			() => 'Icon is required',
+			() => this.mandatory && !this._icon,
+		);
+	}
+
 	@property()
-	public set value(v: string) {
-		this._value = v ?? '';
-		const parts = this._value.split(' ');
+	public override set value(v: string) {
+		const val = v ?? '';
+		super.value = val;
+
+		const parts = val.split(' ');
 		if (parts.length === 2) {
 			this._icon = parts[0];
 			this._color = parts[1].replace('color-', '');
 		} else {
-			this._icon = this._value;
+			this._icon = val;
 			this._color = '';
 		}
 	}
-	public get value() {
-		return this._value;
+
+	public override get value() {
+		return (super.value as string) ?? '';
 	}
-	private _value = '';
 
 	@state()
 	private _icon = '';
@@ -53,7 +70,7 @@ export class UmbPropertyEditorUIIconPickerElement extends UmbLitElement implemen
 				icon: this._icon,
 				color: this._color,
 			},
-			data: { placeholder: this._placeholderIcon },
+			data: { placeholder: this._placeholderIcon, showEmptyOption: !this.mandatory },
 		}).catch(() => undefined);
 
 		if (!data) return;

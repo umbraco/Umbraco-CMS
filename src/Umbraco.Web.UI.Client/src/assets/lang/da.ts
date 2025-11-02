@@ -1009,7 +1009,18 @@ export default {
 		document: 'Dokument',
 	},
 	colors: {
+		black: 'Sort',
 		blue: 'Blå',
+		brown: 'Brun',
+		cyan: 'Cyan',
+		green: 'Grøn',
+		lightBlue: 'Lyseblå',
+		pink: 'Lyserød',
+		red: 'Rød',
+		text: 'Sort',
+		yellow: 'Gul',
+		white: 'Hvid',
+		grey: 'Grå',
 	},
 	shortcuts: {
 		addGroup: 'Tilføj fane',

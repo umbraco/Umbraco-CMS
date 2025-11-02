@@ -1,6 +1,4 @@
-import type { ManifestPreviewAppProvider } from '@umbraco-cms/backoffice/extension-registry';
-
-export const manifests: Array<ManifestPreviewAppProvider> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'previewApp',
 		alias: 'Umb.PreviewApps.Device',
@@ -13,14 +11,21 @@ export const manifests: Array<ManifestPreviewAppProvider> = [
 		alias: 'Umb.PreviewApps.Culture',
 		name: 'Preview: Culture Switcher',
 		element: () => import('./preview-culture.element.js'),
-		weight: 300,
+		weight: 310,
 	},
 	{
 		type: 'previewApp',
 		alias: 'Umb.PreviewApps.Segment',
 		name: 'Preview: Segment Switcher',
 		element: () => import('./preview-segment.element.js'),
-		weight: 290,
+		weight: 300,
+	},
+	{
+		type: 'previewApp',
+		alias: 'Umb.PreviewApps.Environments',
+		name: 'Preview: Environments Menu',
+		element: () => import('./preview-environments.element.js'),
+		weight: 210,
 	},
 	{
 		type: 'previewApp',
