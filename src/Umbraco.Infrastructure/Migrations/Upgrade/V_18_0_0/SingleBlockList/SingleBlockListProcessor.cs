@@ -12,7 +12,11 @@ public class SingleBlockListProcessor
 
     public IEnumerable<string> GetSupportedPropertyEditorAliases() =>
         _processors.SelectMany(p => p.PropertyEditorAliases);
-
+    /// <summary>
+    /// The entry point of the recursive conversion
+    /// Find the first processor that can handle the value and call it's Process method
+    /// </summary>
+    /// <returns>Whether the value was changed</returns>
     public bool ProcessToEditorValue(object? editorValue)
     {
         ITypedSingleBlockListProcessor? processor =
@@ -21,6 +25,10 @@ public class SingleBlockListProcessor
         return processor is not null && processor.Process.Invoke(editorValue, ProcessToEditorValue, ConvertBlockListToSingleBlock);
     }
 
+    /// <summary>
+    /// Updates and returns the passed in BlockListValue to a SingleBlockValue
+    /// Should only be called by a core processor once a BlockListValue has been found that is configured in single block mode.
+    /// </summary>
     public BlockValue ConvertBlockListToSingleBlock(BlockListValue blockListValue)
     {
         IBlockLayoutItem blockListLayoutItem = blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].First();

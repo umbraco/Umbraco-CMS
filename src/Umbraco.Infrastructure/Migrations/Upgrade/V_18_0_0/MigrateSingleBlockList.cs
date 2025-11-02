@@ -74,6 +74,7 @@ public class MigrateSingleBlockList : AsyncMigrationBase
 
     protected override async Task MigrateAsync()
     {
+        // gets filled by all registered ITypedSingleBlockListProcessor
         IEnumerable<string> propertyEditorAliases = _singleBlockListProcessor.GetSupportedPropertyEditorAliases();
 
         using UmbracoContextReference umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext();
@@ -95,6 +96,7 @@ public class MigrateSingleBlockList : AsyncMigrationBase
                 .GroupBy(pt => pt.PropertyEditorAlias)
                 .ToDictionary(group => group.Key, group => group.ToArray());
 
+        // populate the cache to limit amount of db locks in recursion logic.
         var blockListsConfiguredAsSingleCount = await _blockListConfigurationCache.Populate();
 
         if (blockListsConfiguredAsSingleCount == 0)
@@ -108,9 +110,11 @@ public class MigrateSingleBlockList : AsyncMigrationBase
             "Found {blockListsConfiguredAsSingleCount} number of blockListConfigurations with UseSingleBlockMode set to true",
             blockListsConfiguredAsSingleCount);
 
+        // we want to batch actual update calls to the database, so we are grouping them by propertyEditorAlias
+        // and again by propertyType(dataType).
         var updateItemsByPropertyEditorAlias = new Dictionary<string, Dictionary<IPropertyType, List<UpdateItem>>>();
 
-        // update all propertyData for each propertyType
+        // For each propertyEditor, collect and process all propertyTypes and their propertyData
         foreach (var propertyEditorAlias in propertyEditorAliases)
         {
             if (relevantPropertyEditors.TryGetValue(propertyEditorAlias, out IPropertyType[]? propertyTypes) is false)
@@ -150,6 +154,7 @@ WHERE nodeId IN (@0)";
         _appCaches.RuntimeCache.Clear();
         RebuildCache = true;
 
+        // now that we have updated the configuration of all propertyTypes, we can save the updated propertyTypes
         foreach (string propertyEditorAlias in updateItemsByPropertyEditorAlias.Keys)
         {
             if (await SavePropertyTypes(updateItemsByPropertyEditorAlias[propertyEditorAlias]))
@@ -172,13 +177,14 @@ WHERE nodeId IN (@0)";
         var updateItemsByPropertyType = new Dictionary<IPropertyType, List<UpdateItem>>();
         foreach (IPropertyType propertyType in propertyTypes)
         {
+            // make sure the passed in data is valid and can be processed
             IDataType dataType = await _dataTypeService.GetAsync(propertyType.DataTypeKey)
                                  ?? throw new InvalidOperationException("The data type could not be fetched.");
-
             IDataValueEditor valueEditor = dataType.Editor?.GetValueEditor()
                                            ?? throw new InvalidOperationException(
                                                "The data type value editor could not be obtained.");
 
+            // fetch all the propertyData for the current propertyType
             Sql<ISqlContext> sql = Sql()
                 .Select<PropertyDataDto>()
                 .From<PropertyDataDto>()
@@ -200,6 +206,8 @@ WHERE nodeId IN (@0)";
 
             var updateItems = new List<UpdateItem>();
 
+            // process all the propertyData
+            // if none of the processors modify the value, the propertyData is skipped from being saved.
             foreach (PropertyDataDto propertyDataDto in propertyDataDtos)
             {
                 if (ProcessPropertyDataDto(propertyDataDto, propertyType, languagesById, valueEditor, out UpdateItem? updateItem) is false)
@@ -220,13 +228,14 @@ WHERE nodeId IN (@0)";
     {
         foreach (IPropertyType propertyType in propertyTypes.Keys)
         {
+            // The dataType and valueEditor should be constructed as we have done this before, but we hate null values.
             IDataType dataType = await _dataTypeService.GetAsync(propertyType.DataTypeKey)
                                  ?? throw new InvalidOperationException("The data type could not be fetched.");
-
             IDataValueEditor updatedValueEditor = dataType.Editor?.GetValueEditor()
                                            ?? throw new InvalidOperationException(
                                                "The data type value editor could not be obtained.");
 
+            // batch by datatype
             var propertyDataDtos = propertyTypes[propertyType].Select(item => item.PropertyDataDto).ToList();
 
             var updateBatch = propertyDataDtos.Select(propertyDataDto =>
@@ -342,6 +351,7 @@ WHERE nodeId IN (@0)";
             return false;
         }
 
+        // create a fake property to be able to get a typed value and run it trough the processors.
         var segment = propertyType.VariesBySegment() ? propertyDataDto.Segment : null;
         var property = new Property(propertyType);
         property.SetValue(propertyDataDto.Value, culture, segment);
@@ -363,9 +373,12 @@ WHERE nodeId IN (@0)";
         return true;
     }
 
+    /// <summary>
+    /// Takes the updated value that was instanced from the db value by the old ValueEditors
+    /// And runs it through the updated ValueEditors and sets it on the PropertyDataDto
+    /// </summary>
     private bool FinalizeUpdateItem(UpdateItem updateItem, IDataValueEditor updatedValueEditor)
     {
-
         var editorValue = _jsonSerializer.Serialize(updateItem.UpdatedValue);
         var dbValue = updateItem.UpdatedValue is SingleBlockValue
             ? _dummySingleBlockValueEditor.FromEditor(new ContentPropertyData(editorValue, null), null)
@@ -385,6 +398,11 @@ WHERE nodeId IN (@0)";
         return true;
     }
 
+    /// <summary>
+    /// If the value is a BlockListValue, and its datatype is configured as single
+    /// We also need to convert the outer BlockListValue to a SingleBlockValue
+    /// Either way, we need to run the value through the processors to possibly update nested values
+    /// </summary>
     private bool TryTransformValue(object? toEditorValue, Property property, out object? value)
     {
         bool hasChanged = _singleBlockListProcessor.ProcessToEditorValue(toEditorValue);
@@ -412,6 +430,7 @@ WHERE nodeId IN (@0)";
         public object? UpdatedValue { get; set; }
 
         public PropertyDataDto PropertyDataDto { get; set; }
+
         public IPropertyType PropertyType { get; set; }
     }
 }
