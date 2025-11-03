@@ -72,6 +72,19 @@ public class RteBlockRenderingValueConverter : SimpleRichTextValueConverter, IDe
         // to be cached at the published snapshot level, because we have no idea what the block renderings may depend on actually.
         PropertyCacheLevel.Snapshot;
 
+    /// <inheritdoc />
+    public override bool? IsValue(object? value, PropertyValueLevel level)
+        => level switch
+        {
+            // we cannot determine if an RTE has a value at source level, because some RTEs might
+            // be saved with an "empty" representation like {"markup":"","blocks":null}.
+            PropertyValueLevel.Source => null,
+            // we assume the RTE has a value if the intermediate value has markup beyond an empty paragraph tag.
+            PropertyValueLevel.Inter => value is IRichTextEditorIntermediateValue { Markup.Length: > 0 } intermediateValue
+                                        && intermediateValue.Markup != "<p></p>",
+            _ => throw new ArgumentOutOfRangeException(nameof(level), level, null)
+        };
+
     // to counterweigh the cache level, we're going to do as much of the heavy lifting as we can while converting source to intermediate
     public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
     {
