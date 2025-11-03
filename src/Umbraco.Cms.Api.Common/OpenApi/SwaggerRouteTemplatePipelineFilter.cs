@@ -23,13 +23,8 @@ public class SwaggerRouteTemplatePipelineFilter : UmbracoPipelineFilter
             return;
         }
 
-        // TODO: Check whether to register the open api generation here or in each specific project
-        // IOptions<SwaggerGenOptions> swaggerGenOptions = applicationBuilder.ApplicationServices.GetRequiredService<IOptions<SwaggerGenOptions>>();
-        //
-        // applicationBuilder.UseSwagger(swaggerOptions =>
-        // {
-        //     swaggerOptions.RouteTemplate = SwaggerRouteTemplate(applicationBuilder);
-        // });
+        // TODO: Check if there is a better way to do this without calling UseEndpoints twice
+        applicationBuilder.UseEndpoints(e => e.MapOpenApi(SwaggerRouteTemplate(applicationBuilder)));
 
         applicationBuilder.UseSwaggerUI(swaggerUiOptions => SwaggerUiConfiguration(swaggerUiOptions, applicationBuilder));
     }

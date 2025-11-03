@@ -22,7 +22,6 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Notifications;
-using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Infrastructure.Security;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
 
@@ -73,7 +72,8 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddTransient<IRequestMemberAccessService, RequestMemberAccessService>();
         builder.Services.AddTransient<ICurrentMemberClaimsProvider, CurrentMemberClaimsProvider>();
 
-        //builder.Services.ConfigureOptions<ConfigureUmbracoDeliveryApiSwaggerGenOptions>();
+        builder.Services.AddOpenApi(DeliveryApiConfiguration.ApiName);
+        builder.Services.ConfigureOptions<ConfigureUmbracoDeliveryApiSwaggerGenOptions>();
         builder.AddUmbracoApiOpenApiUI();
 
         builder
