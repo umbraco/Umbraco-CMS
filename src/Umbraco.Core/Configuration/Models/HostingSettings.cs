@@ -28,7 +28,7 @@ public class HostingSettings
     /// <summary>
     /// Gets or sets a value for the location of temporary file uploads.
     /// </summary>
-    /// <value>/umbraco/Data/TEMP if nothing is specified.</value>
+    /// <value>/umbraco/Data/TEMP/TemporaryFile if nothing is specified.</value>
     public string? TemporaryFileUploadLocation { get; set; }
 
     /// <summary>
