@@ -8,19 +8,11 @@ import type {
 import type { UmbTreeExpansionModel } from '../expansion-manager/types.js';
 import type { UmbTreeViewItemModel } from '../view/types.js';
 import type { UmbDefaultTreeContext } from './default-tree.context.js';
-import {
-	css,
-	customElement,
-	html,
-	ifDefined,
-	nothing,
-	property,
-	repeat,
-	state,
-} from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { getItemFallbackIcon } from '@umbraco-cms/backoffice/entity-item';
+import type { ManifestTreeView } from '../view/extension/tree-view.extension.js';
 
 @customElement('umb-default-tree')
 export class UmbDefaultTreeElement extends UmbLitElement {
@@ -185,6 +177,11 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 
 	override render() {
 		return html` <div>${this._currentView?.unique} ${this.#renderViewsBundle()}</div>
+
+			<umb-extension-slot
+				type="treeView"
+				.filter=${(manifest: ManifestTreeView) => manifest.alias === this._currentView?.unique}></umb-extension-slot>
+
 			${this.#renderTreeRoot()} ${this.#renderRootItems()}`;
 	}
 
