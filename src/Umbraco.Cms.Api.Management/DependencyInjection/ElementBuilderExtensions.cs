@@ -10,6 +10,7 @@ internal static class ElementBuilderExtensions
 {
     internal static IUmbracoBuilder AddElements(this IUmbracoBuilder builder)
     {
+        builder.Services.AddTransient<IElementPresentationFactory, ElementPresentationFactory>();
         builder.Services.AddTransient<IElementEditingPresentationFactory, ElementEditingPresentationFactory>();
 
         builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>()

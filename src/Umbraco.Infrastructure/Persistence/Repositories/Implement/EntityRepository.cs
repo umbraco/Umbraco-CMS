@@ -580,11 +580,17 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
             return entitiesList;
         }
 
+        Func<IEnumerable<int>, Sql<ISqlContext>> getVariantInfos = typeof(TEntity) == typeof(DocumentEntitySlim)
+            ? GetDocumentVariantInfos
+            : typeof(TEntity) == typeof(ElementEntitySlim)
+                ? GetElementVariantInfos
+                : throw new NotSupportedException($"The supplied entity type is not supported: {typeof(TEntity).FullName}");
+
         // fetch all variant info dtos
         IEnumerable<VariantInfoDto> dtos = Database.FetchByGroups<VariantInfoDto, int>(
             v.Select(x => x.Id),
             Constants.Sql.MaxParameterCount,
-            GetVariantInfos);
+            getVariantInfos);
 
         // group by node id (each group contains all languages)
         var xdtos = dtos.GroupBy(x => x.NodeId).ToDictionary(x => x.Key, x => x);
@@ -606,7 +612,7 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
 
     #region Sql
 
-    protected Sql<ISqlContext> GetVariantInfos(IEnumerable<int> ids) =>
+    private Sql<ISqlContext> GetDocumentVariantInfos(IEnumerable<int> ids) =>
         Sql()
             .Select<NodeDto>(x => x.NodeId)
             .AndSelect<LanguageDto>(x => x.IsoCode)
@@ -614,14 +620,14 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
                 "doc",
                 x => Alias(
                     x.Published,
-                    "DocumentPublished"),
-                x => Alias(x.Edited, "DocumentEdited"))
+                    nameof(VariantInfoDto.DocumentPublished)),
+                x => Alias(x.Edited, nameof(VariantInfoDto.DocumentEdited)))
             .AndSelect<DocumentCultureVariationDto>(
                 "dcv",
-                x => Alias(x.Available, "CultureAvailable"),
-                x => Alias(x.Published, "CulturePublished"),
-                x => Alias(x.Edited, "CultureEdited"),
-                x => Alias(x.Name, "Name"))
+                x => Alias(x.Available, nameof(VariantInfoDto.CultureAvailable)),
+                x => Alias(x.Published, nameof(VariantInfoDto.CulturePublished)),
+                x => Alias(x.Edited, nameof(VariantInfoDto.CultureEdited)),
+                x => Alias(x.Name, nameof(VariantInfoDto.Name)))
 
             // from node x language
             .From<NodeDto>()
@@ -634,6 +640,41 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
             // left-join do document variation - matches cultures that are *available* + indicates when *edited*
             .LeftJoin<DocumentCultureVariationDto>("dcv")
             .On<NodeDto, DocumentCultureVariationDto, LanguageDto>(
+                (node, dcv, lang) => node.NodeId == dcv.NodeId && lang.Id == dcv.LanguageId, aliasRight: "dcv")
+
+            // for selected nodes
+            .WhereIn<NodeDto>(x => x.NodeId, ids)
+            .OrderBy<LanguageDto>(x => x.Id);
+
+    // TODO ELEMENTS: this is a copy/paste of GetDocumentVariantInfos, adjusted for elements - can we refactor in any way?
+    private Sql<ISqlContext> GetElementVariantInfos(IEnumerable<int> ids) =>
+        Sql()
+            .Select<NodeDto>(x => x.NodeId)
+            .AndSelect<LanguageDto>(x => x.IsoCode)
+            .AndSelect<ElementDto>(
+                "doc",
+                x => Alias(
+                    x.Published,
+                    nameof(VariantInfoDto.DocumentPublished)),
+                x => Alias(x.Edited, nameof(VariantInfoDto.DocumentEdited)))
+            .AndSelect<ElementCultureVariationDto>(
+                "dcv",
+                x => Alias(x.Available, nameof(VariantInfoDto.CultureAvailable)),
+                x => Alias(x.Published, nameof(VariantInfoDto.CulturePublished)),
+                x => Alias(x.Edited, nameof(VariantInfoDto.CultureEdited)),
+                x => Alias(x.Name, nameof(VariantInfoDto.Name)))
+
+            // from node x language
+            .From<NodeDto>()
+            .CrossJoin<LanguageDto>()
+
+            // join to element - always exists - indicates global element published/edited status
+            .InnerJoin<ElementDto>("doc")
+            .On<NodeDto, ElementDto>((node, doc) => node.NodeId == doc.NodeId, aliasRight: "doc")
+
+            // left-join do element variation - matches cultures that are *available* + indicates when *edited*
+            .LeftJoin<ElementCultureVariationDto>("dcv")
+            .On<NodeDto, ElementCultureVariationDto, LanguageDto>(
                 (node, dcv, lang) => node.NodeId == dcv.NodeId && lang.Id == dcv.LanguageId, aliasRight: "dcv")
 
             // for selected nodes
@@ -1018,7 +1059,7 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
     {
     }
 
-    public class VariantInfoDto
+    private class VariantInfoDto
     {
         public int NodeId { get; set; }
         public string IsoCode { get; set; } = null!;

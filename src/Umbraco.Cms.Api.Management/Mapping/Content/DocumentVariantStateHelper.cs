@@ -27,6 +27,16 @@ internal static class DocumentVariantStateHelper
             content.EditedCultures,
             content.PublishedCultures);
 
+    internal static DocumentVariantState GetState(IElementEntitySlim element, string? culture)
+        => GetState(
+            element,
+            culture,
+            element.Edited,
+            element.Published,
+            element.CultureNames.Keys,
+            element.EditedCultures,
+            element.PublishedCultures);
+
     private static DocumentVariantState GetState(IEntity entity, string? culture, bool edited, bool published, IEnumerable<string> availableCultures, IEnumerable<string> editedCultures, IEnumerable<string> publishedCultures)
     {
         if (entity.Id <= 0 || (culture is not null && availableCultures.Contains(culture) is false))
