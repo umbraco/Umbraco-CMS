@@ -142,7 +142,10 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 				}
 				this.removeUmbController(contentContextConsumer);
 				this.removeUmbController(propContextConsumer);
-				const propertyEditorName = this.#propertyEditorUIs.find((ui) => ui.alias === params.uiAlias)?.name;
+				const propertyEditorUiManifest = this.#propertyEditorUIs.find((ui) => ui.alias === params.uiAlias);
+				const propertyEditorName = this.localize.string(
+					propertyEditorUiManifest?.meta?.label || propertyEditorUiManifest?.name || '#general_notFound',
+				);
 				const dataTypeName = `${contentContext?.getName() ?? ''} - ${propContext.getName() ?? ''} - ${propertyEditorName}`;
 
 				return {
