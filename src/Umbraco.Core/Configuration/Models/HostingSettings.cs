@@ -26,6 +26,12 @@ public class HostingSettings
     public LocalTempStorage LocalTempStorageLocation { get; set; } = Enum.Parse<LocalTempStorage>(StaticLocalTempStorageLocation);
 
     /// <summary>
+    /// Gets or sets a value for the location of temporary file uploads.
+    /// </summary>
+    /// <value>/umbraco/Data/TEMP if nothing is specified.</value>
+    public string? TemporaryFileUploadLocation { get; set; }
+
+    /// <summary>
     ///     Gets or sets a value indicating whether umbraco is running in [debug mode].
     /// </summary>
     /// <value><c>true</c> if [debug mode]; otherwise, <c>false</c>.</value>

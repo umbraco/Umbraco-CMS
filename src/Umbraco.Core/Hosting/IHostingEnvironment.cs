@@ -43,7 +43,12 @@ public interface IHostingEnvironment
     string LocalTempPath { get; }
 
     /// <summary>
-    ///     The web application's hosted path
+    /// Gets the location of temporary file uploads.
+    /// </summary>
+    public string TemporaryFileUploadPath => LocalTempPath;
+
+    /// <summary>
+    ///     The web application's hosted path.
     /// </summary>
     /// <remarks>
     ///     In most cases this will return "/" but if the site is hosted in a virtual directory then this will return the
