@@ -201,27 +201,9 @@ internal sealed class RichTextPropertyEditorTests : UmbracoIntegrationTest
     [TestCase("""{"markup":"<p></p>","blocks":null}""", false)]
     [TestCase("abc", true)]
     [TestCase("""{"markup":"abc","blocks":null}""", true)]
-    public async Task Can_Handle_Empty_Value_Representations(string? rteValue, bool expectedIsValue)
+    public async Task Can_Handle_Empty_Value_Representations_For_Invariant_Content(string? rteValue, bool expectedHasValue)
     {
-        var contentType = new ContentTypeBuilder()
-            .WithAlias("myPage")
-            .WithName("My Page")
-            .AddPropertyGroup()
-            .WithAlias("content")
-            .WithName("Content")
-            .WithSupportsPublishing(true)
-            .AddPropertyType()
-            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.RichText)
-            .WithDataTypeId(Constants.DataTypes.RichtextEditor)
-            .WithValueStorageType(ValueStorageType.Ntext)
-            .WithAlias("rte")
-            .WithName("RTE")
-            .Done()
-            .Done()
-            .Build();
-
-        var contentTypeResult = await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
-        Assert.IsTrue(contentTypeResult.Success);
+        var contentType = await CreateContentTypeForEmptyValueTests();
 
         var content = new ContentBuilder()
             .WithContentType(contentType)
@@ -243,8 +225,72 @@ internal sealed class RichTextPropertyEditorTests : UmbracoIntegrationTest
         Assert.IsNotNull(publishedContent);
 
         var publishedProperty = publishedContent.Properties.First(property => property.Alias == "rte");
-        Assert.AreEqual(expectedIsValue, publishedProperty.HasValue());
+        Assert.AreEqual(expectedHasValue, publishedProperty.HasValue());
 
-        Assert.AreEqual(expectedIsValue, publishedContent.HasValue("rte"));
+        Assert.AreEqual(expectedHasValue, publishedContent.HasValue("rte"));
+    }
+
+    [TestCase(null, false)]
+    [TestCase("", false)]
+    [TestCase("""{"markup":"","blocks":null}""", false)]
+    [TestCase("""{"markup":"<p></p>","blocks":null}""", false)]
+    [TestCase("abc", true)]
+    [TestCase("""{"markup":"abc","blocks":null}""", true)]
+    public async Task Can_Handle_Empty_Value_Representations_For_Variant_Content(string? rteValue, bool expectedHasValue)
+    {
+        var contentType = await CreateContentTypeForEmptyValueTests(ContentVariation.Culture);
+
+        var content = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithName("Page")
+            .WithCultureName("en-US", "Page")
+            .WithPropertyValues(
+                new
+                {
+                    rte = rteValue
+                },
+                "en-US")
+            .Build();
+
+        var contentResult = ContentService.Save(content);
+        Assert.IsTrue(contentResult.Success);
+
+        var publishResult = ContentService.Publish(content, ["en-US"]);
+        Assert.IsTrue(publishResult.Success);
+
+        var publishedContent = await PublishedContentCache.GetByIdAsync(content.Key);
+        Assert.IsNotNull(publishedContent);
+
+        var publishedProperty = publishedContent.Properties.First(property => property.Alias == "rte");
+        Assert.AreEqual(expectedHasValue, publishedProperty.HasValue("en-US"));
+
+        Assert.AreEqual(expectedHasValue, publishedContent.HasValue("rte", "en-US"));
+    }
+
+    private async Task<IContentType> CreateContentTypeForEmptyValueTests(ContentVariation contentVariation = ContentVariation.Nothing)
+    {
+        var contentType = new ContentTypeBuilder()
+            .WithAlias("myPage")
+            .WithName("My Page")
+            .WithContentVariation(contentVariation)
+            .AddPropertyGroup()
+                .WithAlias("content")
+                .WithName("Content")
+                .WithSupportsPublishing(true)
+                .AddPropertyType()
+                    .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.RichText)
+                    .WithDataTypeId(Constants.DataTypes.RichtextEditor)
+                    .WithValueStorageType(ValueStorageType.Ntext)
+                    .WithAlias("rte")
+                    .WithName("RTE")
+                    .WithVariations(contentVariation)
+                    .Done()
+                .Done()
+            .Build();
+
+        var contentTypeResult = await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        Assert.IsTrue(contentTypeResult.Success);
+
+        return contentType;
     }
 }
