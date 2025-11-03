@@ -370,7 +370,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 		return html`
 			<div class="item-content">
 				<umb-icon name=${propertyEditorUI.meta.icon} class="icon"></umb-icon>
-				${propertyEditorUI.meta.label || propertyEditorUI.name}
+				${this.localize.string(propertyEditorUI.meta.label || propertyEditorUI.name)}
 			</div>
 		`;
 	}
