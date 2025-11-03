@@ -45,7 +45,7 @@ public interface IHostingEnvironment
     /// <summary>
     /// Gets the location of temporary file uploads.
     /// </summary>
-    public string TemporaryFileUploadPath => LocalTempPath;
+    public string TemporaryFileUploadPath => Path.Combine(LocalTempPath, "TemporaryFile");
 
     /// <summary>
     ///     The web application's hosted path.
