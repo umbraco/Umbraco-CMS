@@ -83,14 +83,18 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 				'observeUnique',
 			);
 
-			this.observe(this.#workspaceContext?.isNew, (value) => {
-				// Workspace has changed from new to existing
-				if (value === false && this.#isNew === true) {
-					// TODO: We do not need to request here as we already know the structure and unique
-					this.#requestStructure();
-				}
-				this.#isNew = value;
-			});
+			this.observe(
+				this.#workspaceContext?.isNew,
+				(value) => {
+					// Workspace has changed from new to existing
+					if (value === false && this.#isNew === true) {
+						// TODO: We do not need to request here as we already know the structure and unique
+						this.#requestStructure();
+					}
+					this.#isNew = value;
+				},
+				'observeIsNew',
+			);
 		});
 	}
 
