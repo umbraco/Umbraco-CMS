@@ -34,26 +34,33 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddScoped<IRequestStartItemProvider, RequestStartItemProvider>();
         builder.Services.AddScoped<RequestContextOutputExpansionStrategy>();
         builder.Services.AddScoped<RequestContextOutputExpansionStrategyV2>();
-        builder.Services.AddScoped<IOutputExpansionStrategy>(provider =>
-        {
-            HttpContext? httpContext = provider.GetRequiredService<IHttpContextAccessor>().HttpContext;
-            ApiVersion? apiVersion = httpContext?.GetRequestedApiVersion();
-            if (apiVersion is null)
-            {
-                return provider.GetRequiredService<RequestContextOutputExpansionStrategyV2>();
-            }
 
-            // V1 of the Delivery API uses a different expansion strategy than V2+
-            return apiVersion.MajorVersion == 1
-                ? provider.GetRequiredService<RequestContextOutputExpansionStrategy>()
-                : provider.GetRequiredService<RequestContextOutputExpansionStrategyV2>();
-        });
+        builder.Services.AddUnique<IOutputExpansionStrategy>(
+            provider =>
+            {
+                HttpContext? httpContext = provider.GetRequiredService<IHttpContextAccessor>().HttpContext;
+                ApiVersion? apiVersion = httpContext?.GetRequestedApiVersion();
+                if (apiVersion is null)
+                {
+                    return provider.GetRequiredService<RequestContextOutputExpansionStrategyV2>();
+                }
+
+                // V1 of the Delivery API uses a different expansion strategy than V2+
+                return apiVersion.MajorVersion == 1
+                    ? provider.GetRequiredService<RequestContextOutputExpansionStrategy>()
+                    : provider.GetRequiredService<RequestContextOutputExpansionStrategyV2>();
+            },
+            ServiceLifetime.Scoped);
+
         builder.Services.AddSingleton<IRequestCultureService, RequestCultureService>();
         builder.Services.AddSingleton<IRequestRoutingService, RequestRoutingService>();
         builder.Services.AddSingleton<IRequestRedirectService, RequestRedirectService>();
         builder.Services.AddSingleton<IRequestPreviewService, RequestPreviewService>();
-        builder.Services.AddSingleton<IOutputExpansionStrategyAccessor, RequestContextOutputExpansionStrategyAccessor>();
+
+        // Webooks register a more basic implementation, remove it.
+        builder.Services.AddUnique<IOutputExpansionStrategyAccessor, RequestContextOutputExpansionStrategyAccessor>(ServiceLifetime.Singleton);
         builder.Services.AddSingleton<IRequestStartItemProviderAccessor, RequestContextRequestStartItemProviderAccessor>();
+
         builder.Services.AddSingleton<IApiAccessService, ApiAccessService>();
         builder.Services.AddSingleton<IApiContentQueryService, ApiContentQueryService>();
         builder.Services.AddSingleton<IApiContentQueryProvider, ApiContentQueryProvider>();
