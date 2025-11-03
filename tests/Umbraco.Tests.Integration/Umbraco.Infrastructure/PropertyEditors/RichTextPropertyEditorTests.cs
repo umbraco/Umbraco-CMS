@@ -195,10 +195,13 @@ internal sealed class RichTextPropertyEditorTests : UmbracoIntegrationTest
         Assert.IsNotNull(tags.Single(tag => tag.Text == "Tag Three"));
     }
 
-    [TestCase(null)]
-    [TestCase("")]
-    [TestCase("""{"markup":"","blocks":null}""")]
-    public async Task TODO_SOME_NAME(string? rteValue)
+    [TestCase(null, false)]
+    [TestCase("", false)]
+    [TestCase("""{"markup":"","blocks":null}""", false)]
+    [TestCase("""{"markup":"<p></p>","blocks":null}""", false)]
+    [TestCase("abc", true)]
+    [TestCase("""{"markup":"abc","blocks":null}""", true)]
+    public async Task Can_Handle_Empty_Value_Representations(string? rteValue, bool expectedIsValue)
     {
         var contentType = new ContentTypeBuilder()
             .WithAlias("myPage")
@@ -240,8 +243,8 @@ internal sealed class RichTextPropertyEditorTests : UmbracoIntegrationTest
         Assert.IsNotNull(publishedContent);
 
         var publishedProperty = publishedContent.Properties.First(property => property.Alias == "rte");
-        Assert.IsFalse(publishedProperty.HasValue());
+        Assert.AreEqual(expectedIsValue, publishedProperty.HasValue());
 
-        Assert.IsFalse(publishedContent.HasValue("rte"));
+        Assert.AreEqual(expectedIsValue, publishedContent.HasValue("rte"));
     }
 }

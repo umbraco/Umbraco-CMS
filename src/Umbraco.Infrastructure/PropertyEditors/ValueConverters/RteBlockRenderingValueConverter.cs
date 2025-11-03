@@ -78,9 +78,10 @@ public class RteBlockRenderingValueConverter : SimpleRichTextValueConverter, IDe
         {
             // we cannot determine if an RTE has a value at source level, because some RTEs might
             // be saved with an "empty" representation like {"markup":"","blocks":null}.
-            PropertyValueLevel.Source => false,
-            // we assume the RTE has a value if the intermediate value has markup.
-            PropertyValueLevel.Inter => value is IRichTextEditorIntermediateValue { Markup.Length: > 0 },
+            PropertyValueLevel.Source => null,
+            // we assume the RTE has a value if the intermediate value has markup beyond an empty paragraph tag.
+            PropertyValueLevel.Inter => value is IRichTextEditorIntermediateValue { Markup.Length: > 0 } intermediateValue
+                                        && intermediateValue.Markup != "<p></p>",
             _ => throw new ArgumentOutOfRangeException(nameof(level), level, null)
         };
 
