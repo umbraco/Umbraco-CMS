@@ -1,6 +1,6 @@
-namespace Umbraco.Cms.Api.Management.ViewModels.Tree;
+﻿namespace Umbraco.Cms.Api.Management.ViewModels.Tree;
 
-public class MemberTypeTreeItemResponseModel : FolderTreeItemResponseModel
+public class MemberTypeTreeItemResponseModel : NamedEntityTreeItemResponseModel
 {
     public string Icon { get; set; } = string.Empty;
 }
