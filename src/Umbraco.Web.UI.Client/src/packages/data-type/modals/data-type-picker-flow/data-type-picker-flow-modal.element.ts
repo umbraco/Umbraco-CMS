@@ -347,30 +347,27 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 	}
 
 	#renderDataTypeButton(propertyEditorUI: ManifestPropertyEditorUi, createAsNewOnPick?: boolean) {
+		const label = this.localize.string(propertyEditorUI.meta.label || propertyEditorUI.name);
 		if (createAsNewOnPick) {
 			return html`
-				<uui-button
-					label=${propertyEditorUI.meta.label || propertyEditorUI.name}
-					@click=${() => this.#createDataType(propertyEditorUI.alias)}>
-					${this.#renderItemContent(propertyEditorUI)}
+				<uui-button label=${label} @click=${() => this.#createDataType(propertyEditorUI.alias)}>
+					${this.#renderItemContent(label, propertyEditorUI)}
 				</uui-button>
 			`;
 		} else {
 			return html`
-				<uui-button
-					label=${propertyEditorUI.meta.label || propertyEditorUI.name}
-					href=${this._dataTypePickerModalRouteBuilder!({ uiAlias: propertyEditorUI.alias })}>
-					${this.#renderItemContent(propertyEditorUI)}
+				<uui-button label=${label} href=${this._dataTypePickerModalRouteBuilder!({ uiAlias: propertyEditorUI.alias })}>
+					${this.#renderItemContent(label, propertyEditorUI)}
 				</uui-button>
 			`;
 		}
 	}
 
-	#renderItemContent(propertyEditorUI: ManifestPropertyEditorUi) {
+	#renderItemContent(label: string, propertyEditorUI: ManifestPropertyEditorUi) {
 		return html`
 			<div class="item-content">
 				<umb-icon name=${propertyEditorUI.meta.icon} class="icon"></umb-icon>
-				${propertyEditorUI.meta.label || propertyEditorUI.name}
+				${label}
 			</div>
 		`;
 	}
