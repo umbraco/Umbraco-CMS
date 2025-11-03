@@ -1,13 +1,19 @@
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
+using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.PropertyEditors;
 
@@ -22,6 +28,14 @@ internal sealed class RichTextPropertyEditorTests : UmbracoIntegrationTest
     private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
 
     private IJsonSerializer JsonSerializer => GetRequiredService<IJsonSerializer>();
+
+    private IPublishedContentCache PublishedContentCache => GetRequiredService<IPublishedContentCache>();
+
+    protected override void CustomTestSetup(IUmbracoBuilder builder)
+    {
+        builder.AddNotificationHandler<ContentTreeChangeNotification, ContentTreeChangeDistributedCacheNotificationHandler>();
+        builder.Services.AddUnique<IServerMessenger, ContentEventsTests.LocalServerMessenger>();
+    }
 
     [Test]
     public void Can_Use_Markup_String_As_Value()
@@ -179,5 +193,55 @@ internal sealed class RichTextPropertyEditorTests : UmbracoIntegrationTest
         Assert.IsNotNull(tags.Single(tag => tag.Text == "Tag One"));
         Assert.IsNotNull(tags.Single(tag => tag.Text == "Tag Two"));
         Assert.IsNotNull(tags.Single(tag => tag.Text == "Tag Three"));
+    }
+
+    [TestCase(null)]
+    [TestCase("")]
+    [TestCase("""{"markup":"","blocks":null}""")]
+    public async Task TODO_SOME_NAME(string? rteValue)
+    {
+        var contentType = new ContentTypeBuilder()
+            .WithAlias("myPage")
+            .WithName("My Page")
+            .AddPropertyGroup()
+            .WithAlias("content")
+            .WithName("Content")
+            .WithSupportsPublishing(true)
+            .AddPropertyType()
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.RichText)
+            .WithDataTypeId(Constants.DataTypes.RichtextEditor)
+            .WithValueStorageType(ValueStorageType.Ntext)
+            .WithAlias("rte")
+            .WithName("RTE")
+            .Done()
+            .Done()
+            .Build();
+
+        var contentTypeResult = await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        Assert.IsTrue(contentTypeResult.Success);
+
+        var content = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithName("Page")
+            .WithPropertyValues(
+                new
+                {
+                    rte = rteValue
+                })
+            .Build();
+
+        var contentResult = ContentService.Save(content);
+        Assert.IsTrue(contentResult.Success);
+
+        var publishResult = ContentService.Publish(content, []);
+        Assert.IsTrue(publishResult.Success);
+
+        var publishedContent = await PublishedContentCache.GetByIdAsync(content.Key);
+        Assert.IsNotNull(publishedContent);
+
+        var publishedProperty = publishedContent.Properties.First(property => property.Alias == "rte");
+        Assert.IsFalse(publishedProperty.HasValue());
+
+        Assert.IsFalse(publishedContent.HasValue("rte"));
     }
 }
