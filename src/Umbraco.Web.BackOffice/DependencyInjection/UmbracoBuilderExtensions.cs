@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
@@ -21,6 +22,8 @@ using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.Cms.Web.BackOffice.Services;
 using Umbraco.Cms.Web.BackOffice.SignalR;
 using Umbraco.Cms.Web.BackOffice.Trees;
+using Umbraco.Cms.Web.Common.Accessors;
+using Umbraco.Cms.Web.Common.Rendering;
 
 namespace Umbraco.Extensions;
 
@@ -121,6 +124,9 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<UnhandledExceptionLoggerMiddleware>();
         builder.Services.AddTransient<BlockGridSampleHelper>();
         builder.Services.AddUnique<IWebhookPresentationFactory, WebhookPresentationFactory>();
+        // deliveryApi will overwrite these more basic ones.
+        builder.Services.AddScoped<IOutputExpansionStrategy, ElementOnlyOutputExpansionStrategy>();
+        builder.Services.AddSingleton<IOutputExpansionStrategyAccessor, RequestContextOutputExpansionStrategyAccessor>();
 
         return builder;
     }
