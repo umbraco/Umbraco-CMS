@@ -32,7 +32,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 ///     used dynamically.
 /// </summary>
 [DefaultPropertyValueConverter]
-public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, IDeliveryApiPropertyValueConverter
+public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, IDeliveryApiPropertyValueConverter, IDisposable
 {
     private readonly HtmlImageSourceParser _imageSourceParser;
     private readonly HtmlLocalLinkParser _linkParser;
@@ -47,7 +47,9 @@ public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, IDel
     private readonly ILogger<RteMacroRenderingValueConverter> _logger;
     private readonly IApiElementBuilder _apiElementBuilder;
     private readonly RichTextBlockPropertyValueConstructorCache _constructorCache;
+
     private DeliveryApiSettings _deliveryApiSettings;
+    private readonly IDisposable? _deliveryApiSettingsChangeSubscription;
 
     [Obsolete("Please use the constructor that takes all arguments. Will be removed in V14.")]
     public RteMacroRenderingValueConverter(IUmbracoContextAccessor umbracoContextAccessor, IMacroRenderer macroRenderer,
@@ -107,8 +109,9 @@ public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, IDel
         _apiElementBuilder = apiElementBuilder;
         _constructorCache = constructorCache;
         _logger = logger;
+
         _deliveryApiSettings = deliveryApiSettingsMonitor.CurrentValue;
-        deliveryApiSettingsMonitor.OnChange(settings => _deliveryApiSettings = settings);
+        _deliveryApiSettingsChangeSubscription = deliveryApiSettingsMonitor.OnChange(settings => _deliveryApiSettings = settings);
     }
 
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType) =>
@@ -314,4 +317,6 @@ public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, IDel
 
         public required RichTextBlockModel? RichTextBlockModel { get; set; }
     }
+
+    public void Dispose() => _deliveryApiSettingsChangeSubscription?.Dispose();
 }

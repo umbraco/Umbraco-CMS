@@ -6,7 +6,6 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Web.Common.Attributes;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers;
@@ -16,7 +15,8 @@ public class HelpController : UmbracoAuthorizedJsonController
 {
     private static HttpClient? _httpClient;
     private readonly ILogger<HelpController> _logger;
-    private HelpPageSettings? _helpPageSettings;
+
+    private readonly HelpPageSettings? _helpPageSettings;
 
     [ActivatorUtilitiesConstructor]
     public HelpController(
@@ -25,11 +25,8 @@ public class HelpController : UmbracoAuthorizedJsonController
     {
         _logger = logger;
 
-        ResetHelpPageSettings(helpPageSettings.CurrentValue);
-        helpPageSettings.OnChange(ResetHelpPageSettings);
+        _helpPageSettings = helpPageSettings.CurrentValue;
     }
-
-    private void ResetHelpPageSettings(HelpPageSettings settings) => _helpPageSettings = settings;
 
     public async Task<List<HelpPage>> GetContextHelpForPage(string section, string tree,
         string baseUrl = "https://our.umbraco.com")

@@ -16,11 +16,13 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// <summary>
 ///     The value editor for the file upload property editor.
 /// </summary>
-internal class FileUploadPropertyValueEditor : DataValueEditor
+internal class FileUploadPropertyValueEditor : DataValueEditor, IDisposable
 {
     private readonly MediaFileManager _mediaFileManager;
     private readonly IFileStreamSecurityValidator _fileStreamSecurityValidator;
+
     private ContentSettings _contentSettings;
+    private readonly IDisposable? _contentSettingsChangeSubscription;
 
     public FileUploadPropertyValueEditor(
         DataEditorAttribute attribute,
@@ -36,7 +38,7 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
         _mediaFileManager = mediaFileManager ?? throw new ArgumentNullException(nameof(mediaFileManager));
         _fileStreamSecurityValidator = fileStreamSecurityValidator;
         _contentSettings = contentSettings.CurrentValue ?? throw new ArgumentNullException(nameof(contentSettings));
-        contentSettings.OnChange(x => _contentSettings = x);
+        _contentSettingsChangeSubscription = contentSettings.OnChange(x => _contentSettings = x);
     }
 
     /// <summary>
@@ -163,4 +165,6 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
 
         return filepath;
     }
+
+    public void Dispose() => _contentSettingsChangeSubscription?.Dispose();
 }

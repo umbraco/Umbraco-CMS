@@ -33,7 +33,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
     INotificationHandler<ContentCopiedNotification>, INotificationHandler<ContentDeletedNotification>,
     INotificationHandler<MediaDeletedNotification>, INotificationHandler<MediaSavingNotification>,
-    INotificationHandler<MemberDeletedNotification>
+    INotificationHandler<MemberDeletedNotification>, IDisposable
 {
     private readonly UploadAutoFillProperties _autoFillProperties;
     private readonly IContentService _contentService;
@@ -42,7 +42,9 @@ public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
     private readonly IIOHelper _ioHelper;
     private readonly ILogger<ImageCropperPropertyEditor> _logger;
     private readonly MediaFileManager _mediaFileManager;
+
     private ContentSettings _contentSettings;
+    private readonly IDisposable? _contentSettingsChangeSubscription;
 
     // Scheduled for removal in v12
     [Obsolete("Please use constructor that takes an IEditorConfigurationParser instead")]
@@ -93,7 +95,7 @@ public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
         _editorConfigurationParser = editorConfigurationParser;
         _logger = loggerFactory.CreateLogger<ImageCropperPropertyEditor>();
 
-        contentSettings.OnChange(x => _contentSettings = x);
+        _contentSettingsChangeSubscription = contentSettings.OnChange(x => _contentSettings = x);
         SupportsReadOnly = true;
     }
 
@@ -352,4 +354,6 @@ public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
             }
         }
     }
+
+    public void Dispose() => _contentSettingsChangeSubscription?.Dispose();
 }
