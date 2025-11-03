@@ -16,8 +16,8 @@ public static class UmbracoBuilderApiExtensions
             return builder;
         }
 
-        builder.Services.AddSwaggerGen();
-        builder.Services.ConfigureOptions<ConfigureUmbracoSwaggerGenOptions>();
+        //builder.Services.AddSwaggerGen();
+        //builder.Services.ConfigureOptions<ConfigureUmbracoSwaggerGenOptions>();
         builder.Services.AddSingleton<IUmbracoJsonTypeInfoResolver, UmbracoJsonTypeInfoResolver>();
         builder.Services.AddSingleton<IOperationIdSelector, OperationIdSelector>();
         builder.Services.AddSingleton<IOperationIdHandler, OperationIdHandler>();

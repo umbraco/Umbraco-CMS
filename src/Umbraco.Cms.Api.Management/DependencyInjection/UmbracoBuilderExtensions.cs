@@ -84,7 +84,7 @@ public static partial class UmbracoBuilderExtensions
                 .AddJsonOptions(Constants.JsonOptionsNames.BackOffice, _ => { });
 
             services.ConfigureOptions<ConfigureUmbracoBackofficeJsonOptions>();
-            services.ConfigureOptions<ConfigureUmbracoManagementApiSwaggerGenOptions>();
+            //services.ConfigureOptions<ConfigureUmbracoManagementApiSwaggerGenOptions>();
 
             services.Configure<UmbracoPipelineOptions>(options =>
             {
