@@ -11,6 +11,13 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
+/// <summary>
+///     The value editor for file upload property editors.
+/// </summary>
+/// <remarks>
+///     As this class is not registered with DI as a singleton, it must be disposed to release
+///     the settings change subscription and avoid a memory leak.
+/// </remarks>
 internal class UploadFileTypeValidator : IValueValidator, IDisposable
 {
     private readonly ILocalizedTextService _localizedTextService;

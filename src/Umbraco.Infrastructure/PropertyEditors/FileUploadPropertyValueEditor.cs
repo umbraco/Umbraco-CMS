@@ -16,6 +16,10 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// <summary>
 ///     The value editor for the file upload property editor.
 /// </summary>
+/// <remarks>
+///     As this class is not registered with DI as a singleton, it must be disposed to release
+///     the settings change subscription and avoid a memory leak.
+/// </remarks>
 internal class FileUploadPropertyValueEditor : DataValueEditor, IDisposable
 {
     private readonly MediaFileManager _mediaFileManager;
