@@ -6,10 +6,21 @@ import type {
 	UmbTreeStartNode,
 } from '../types.js';
 import type { UmbTreeExpansionModel } from '../expansion-manager/types.js';
+import type { UmbTreeViewItemModel } from '../view/types.js';
 import type { UmbDefaultTreeContext } from './default-tree.context.js';
-import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	customElement,
+	html,
+	ifDefined,
+	nothing,
+	property,
+	repeat,
+	state,
+} from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
+import { getItemFallbackIcon } from '@umbraco-cms/backoffice/entity-item';
 
 @customElement('umb-default-tree')
 export class UmbDefaultTreeElement extends UmbLitElement {
@@ -60,6 +71,12 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	expansion: UmbTreeExpansionModel = [];
 
 	@state()
+	private _views?: Array<UmbTreeViewItemModel>;
+
+	@state()
+	private _currentView?: UmbTreeViewItemModel;
+
+	@state()
 	private _rootItems: UmbTreeItemModel[] = [];
 
 	@state()
@@ -81,6 +98,9 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	private _isLoadingNextChildren = false;
 
 	#observeData() {
+		this.observe(this._api?.views, (views) => (this._views = views));
+		this.observe(this._api?.currentView, (currentView) => (this._currentView = currentView));
+
 		this.observe(this._api?.treeRoot, (treeRoot) => (this._treeRoot = treeRoot));
 		this.observe(this._api?.rootItems, (rootItems) => (this._rootItems = rootItems ?? []));
 		this.observe(this._api?.pagination.currentPage, (value) => (this._currentPage = value ?? 1));
@@ -159,8 +179,40 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 		this._api?.pagination.setCurrentPageNumber(next);
 	}
 
+	#onViewClick(view: UmbTreeViewItemModel) {
+		this._api?.setCurrentView(view.unique);
+	}
+
 	override render() {
-		return html` ${this.#renderTreeRoot()} ${this.#renderRootItems()}`;
+		return html` <div>${this._currentView?.unique} ${this.#renderViewsBundle()}</div>
+			${this.#renderTreeRoot()} ${this.#renderRootItems()}`;
+	}
+
+	#renderViewsBundle() {
+		if (!this._views || this._views.length === 0 || !this._currentView) return nothing;
+
+		return html`<uui-button compact popovertarget="tree-view-popover" label="status">
+				<umb-icon name=${this._currentView.icon ?? getItemFallbackIcon()}></umb-icon>
+			</uui-button>
+			<uui-popover-container id="tree-view-popover" placement="bottom-end">
+				<umb-popover-layout>
+					<div class="filter-dropdown">
+						${repeat(
+							this._views,
+							(view) => view.unique,
+							(view) => this.#renderViewItem(view),
+						)}
+					</div>
+				</umb-popover-layout>
+			</uui-popover-container>`;
+	}
+
+	#renderViewItem(view: UmbTreeViewItemModel) {
+		return html`
+			<uui-menu-item @click-label=${() => this.#onViewClick(view)} ?active=${view.unique === this._currentView?.unique}>
+				<umb-icon slot="icon" name=${view.icon ?? getItemFallbackIcon()}></umb-icon>
+			</uui-menu-item>
+		`;
 	}
 
 	#renderTreeRoot() {

@@ -9,6 +9,7 @@ import type { UmbTreeExpansionModel } from '../expansion-manager/types.js';
 import type { UmbTreeItemModel, UmbTreeRootModel, UmbTreeStartNode } from '../types.js';
 import type { UmbTreeRepository } from '../data/index.js';
 import type { UmbTreeRootItemsRequestArgs } from '../data/types.js';
+import { UmbTreeViewManager } from '../view/tree-view.manager.js';
 import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbDeprecation, UmbSelectionManager, debounce } from '@umbraco-cms/backoffice/utils';
@@ -37,6 +38,10 @@ export class UmbDefaultTreeContext<
 
 	#expandTreeRoot = new UmbBooleanState(undefined);
 	public readonly expandTreeRoot = this.#expandTreeRoot.asObservable();
+
+	#treeViewManager = new UmbTreeViewManager(this);
+	public readonly views = this.#treeViewManager.views;
+	public readonly currentView = this.#treeViewManager.currentView;
 
 	#treeItemChildrenManager = new UmbTreeItemChildrenManager<TreeItemType, TreeRootType, RequestArgsType>(this);
 	public readonly rootItems = this.#treeItemChildrenManager.children;
@@ -186,6 +191,14 @@ export class UmbDefaultTreeContext<
 				}
 			}
 		}
+	}
+
+	setCurrentView(viewUnique: string) {
+		this.#treeViewManager.setCurrentView(viewUnique);
+	}
+
+	getCurrentView() {
+		return this.#treeViewManager.getCurrentView();
 	}
 
 	/**
