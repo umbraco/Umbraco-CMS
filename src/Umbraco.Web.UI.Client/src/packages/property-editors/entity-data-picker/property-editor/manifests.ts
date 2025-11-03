@@ -17,7 +17,47 @@ export const manifests: Array<UmbExtensionManifest> = [
 				enabled: true,
 				forDataSourceTypes: [UMB_PICKER_DATA_SOURCE_TYPE],
 			},
+			settings: {
+				properties: [
+					{
+						alias: 'displayMode',
+						label: 'Display Mode',
+						propertyEditorUiAlias: 'Umb.PropertyEditorUi.EntityDataPicker.DisplayMode',
+						weight: 100,
+					},
+				],
+			},
 		},
 	},
 	...schemaManifests,
+	{
+		type: 'entityDataPickerDisplayMode',
+		alias: 'Umb.EntityDataPickerDisplayMode.MenuItem',
+		name: 'Menu Item Entity Data Picker Display Mode',
+		weight: 900,
+		meta: {
+			label: 'Menu Item',
+			description: 'Description of Menu Item display mode.',
+		},
+	},
+	{
+		type: 'entityDataPickerDisplayMode',
+		alias: 'Umb.EntityDataPickerDisplayMode.RefItem',
+		name: 'Ref Item Entity Data Picker Display Mode',
+		weight: 800,
+		meta: {
+			label: 'Reference Item',
+			description: 'Description of Reference Item display mode.',
+		},
+	},
+	{
+		type: 'entityDataPickerDisplayMode',
+		alias: 'Umb.EntityDataPickerDisplayMode.Card',
+		name: 'Card Entity Data Picker Display Mode',
+		weight: 700,
+		meta: {
+			label: 'Card',
+			description: 'Description of Card display mode.',
+		},
+	},
 ];
