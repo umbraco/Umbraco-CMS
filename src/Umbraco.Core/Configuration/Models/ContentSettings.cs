@@ -30,6 +30,8 @@ public class ContentSettings
     internal const bool StaticAllowEditInvariantFromNonDefault = false;
     internal const bool StaticShowDomainWarnings = true;
     internal const bool StaticShowUnroutableContentWarnings = true;
+
+    // TODO (V18): Consider enabling this by default and documenting as a behavioural breaking change.
     private const bool StaticEnableMediaRecycleBinProtection = false;
 
     /// <summary>
