@@ -78,7 +78,6 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 	}
 
 	async #requestStructure() {
-		debugger;
 		const isNew = this.#workspaceContext?.getIsNew();
 		const uniqueObservable = isNew
 			? this.#workspaceContext?._internal_createUnderParentEntityUnique
