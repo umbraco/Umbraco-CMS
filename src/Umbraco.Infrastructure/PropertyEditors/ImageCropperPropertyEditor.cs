@@ -42,12 +42,10 @@ public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
     private readonly MediaFileManager _mediaFileManager;
     private ContentSettings _contentSettings;
     private readonly IJsonSerializer _jsonSerializer;
-    private ImagingSettings _imagingSettings;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ImageCropperPropertyEditor" /> class.
     /// </summary>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
     public ImageCropperPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
         ILoggerFactory loggerFactory,
@@ -57,32 +55,6 @@ public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
         UploadAutoFillProperties uploadAutoFillProperties,
         IContentService contentService,
         IJsonSerializer jsonSerializer)
-        : this(
-              dataValueEditorFactory,
-              loggerFactory,
-              mediaFileManager,
-              contentSettings,
-              ioHelper,
-              uploadAutoFillProperties,
-              contentService,
-              jsonSerializer,
-              StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<ImagingSettings>>())
-    {
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="ImageCropperPropertyEditor" /> class.
-    /// </summary>
-    public ImageCropperPropertyEditor(
-        IDataValueEditorFactory dataValueEditorFactory,
-        ILoggerFactory loggerFactory,
-        MediaFileManager mediaFileManager,
-        IOptionsMonitor<ContentSettings> contentSettings,
-        IIOHelper ioHelper,
-        UploadAutoFillProperties uploadAutoFillProperties,
-        IContentService contentService,
-        IJsonSerializer jsonSerializer,
-        IOptionsMonitor<ImagingSettings> imagingSettings)
         : base(dataValueEditorFactory)
     {
         _mediaFileManager = mediaFileManager ?? throw new ArgumentNullException(nameof(mediaFileManager));
@@ -93,10 +65,8 @@ public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
         _contentService = contentService;
         _jsonSerializer = jsonSerializer;
         _logger = loggerFactory.CreateLogger<ImageCropperPropertyEditor>();
-        _imagingSettings = imagingSettings.CurrentValue;
 
         contentSettings.OnChange(x => _contentSettings = x);
-        imagingSettings.OnChange(x => _imagingSettings = x);
 
         SupportsReadOnly = true;
     }
@@ -175,7 +145,7 @@ public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
     /// <inheritdoc/>
     public void Handle(MediaMovedToRecycleBinNotification notification)
     {
-        if (_imagingSettings.EnableMediaRecycleBinProtection is false)
+        if (_contentSettings.EnableMediaRecycleBinProtection is false)
         {
             return;
         }
@@ -188,7 +158,7 @@ public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
     /// <inheritdoc/>
     public void Handle(MediaMovedNotification notification)
     {
-        if (_imagingSettings.EnableMediaRecycleBinProtection is false)
+        if (_contentSettings.EnableMediaRecycleBinProtection is false)
         {
             return;
         }

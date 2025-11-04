@@ -13,22 +13,22 @@ namespace Umbraco.Cms.Web.Common.Middleware;
 /// </summary>
 public class ProtectRecycleBinMediaMiddleware : IMiddleware
 {
-    private ImagingSettings _imagingSettings;
+    private ContentSettings _contentSettings;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ProtectRecycleBinMediaMiddleware"/> class.
     /// </summary>
     public ProtectRecycleBinMediaMiddleware(
-        IOptionsMonitor<ImagingSettings> imagingSettings)
+        IOptionsMonitor<ContentSettings> contentSettings)
     {
-        _imagingSettings = imagingSettings.CurrentValue;
-        imagingSettings.OnChange(x => _imagingSettings = x);
+        _contentSettings = contentSettings.CurrentValue;
+        contentSettings.OnChange(x => _contentSettings = x);
     }
 
     /// <inheritdoc/>
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
-        if (_imagingSettings.EnableMediaRecycleBinProtection is false)
+        if (_contentSettings.EnableMediaRecycleBinProtection is false)
         {
             await next(context);
             return;

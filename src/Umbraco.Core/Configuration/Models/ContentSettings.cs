@@ -30,6 +30,7 @@ public class ContentSettings
     internal const bool StaticAllowEditInvariantFromNonDefault = false;
     internal const bool StaticShowDomainWarnings = true;
     internal const bool StaticShowUnroutableContentWarnings = true;
+    private const bool StaticEnableMediaRecycleBinProtection = false;
 
     /// <summary>
     ///     Gets or sets a value for the content notification settings.
@@ -158,4 +159,16 @@ public class ContentSettings
     /// </summary>
     [DefaultValue(StaticShowUnroutableContentWarnings)]
     public bool ShowUnroutableContentWarnings { get; set; } = StaticShowUnroutableContentWarnings;
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to enable or disable the recycle bin protection for media.
+    /// </summary>
+    /// <remarks>
+    /// When set to true, this will:
+    ///  - Rename media moved to the recycle bin to have a .deleted suffice (e.g. image.jpg will be renamed to image.deleted.jpg).
+    ///  - On restore, the media file will be renamed back to its original name.
+    ///  - A middleware component will be enabled to prevent access to media files in the recycle bin unless the user is authenticated with access to the media section.
+    /// </remarks>
+    [DefaultValue(StaticEnableMediaRecycleBinProtection)]
+    public bool EnableMediaRecycleBinProtection { get; set; } = StaticEnableMediaRecycleBinProtection;
 }

@@ -18,18 +18,18 @@ namespace Umbraco.Cms.Api.Management.Mapping.Media;
 public class MediaMapDefinition : ContentMapDefinition<IMedia, MediaValueResponseModel, MediaVariantResponseModel>, IMapDefinition
 {
     private readonly CommonMapper _commonMapper;
-    private ImagingSettings _imagingSettings;
+    private ContentSettings _contentSettings;
 
     public MediaMapDefinition(
         PropertyEditorCollection propertyEditorCollection,
         CommonMapper commonMapper,
         IDataValueEditorFactory dataValueEditorFactory,
-        IOptionsMonitor<ImagingSettings> imagingSettings)
+        IOptionsMonitor<ContentSettings> contentSettings)
         : base(propertyEditorCollection, dataValueEditorFactory)
     {
         _commonMapper = commonMapper;
-        _imagingSettings = imagingSettings.CurrentValue;
-        imagingSettings.OnChange(x => _imagingSettings = x);
+        _contentSettings = contentSettings.CurrentValue;
+        contentSettings.OnChange(x => _contentSettings = x);
     }
 
     [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
@@ -41,7 +41,7 @@ public class MediaMapDefinition : ContentMapDefinition<IMedia, MediaValueRespons
               propertyEditorCollection,
               commonMapper,
               dataValueEditorFactory,
-              StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<ImagingSettings>>())
+              StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<ContentSettings>>())
     {
     }
 
@@ -73,7 +73,7 @@ public class MediaMapDefinition : ContentMapDefinition<IMedia, MediaValueRespons
 
         // If protection for media files in the recycle bin is enabled, and the media item is trashed, amend the value of the file path
         // to have the `.deleted` suffix that will have been added to the persisted file.
-        if (target.IsTrashed && _imagingSettings.EnableMediaRecycleBinProtection)
+        if (target.IsTrashed && _contentSettings.EnableMediaRecycleBinProtection)
         {
             foreach (MediaValueResponseModel valueModel in target.Values
                 .Where(x => x.EditorAlias.Equals(Core.Constants.PropertyEditors.Aliases.ImageCropper)))

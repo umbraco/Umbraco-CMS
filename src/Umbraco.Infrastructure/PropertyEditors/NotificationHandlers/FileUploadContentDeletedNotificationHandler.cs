@@ -29,7 +29,7 @@ internal sealed class FileUploadContentDeletedNotificationHandler : FileUploadNo
 {
     private readonly BlockEditorValues<BlockListValue, BlockListLayoutItem> _blockListEditorValues;
     private readonly BlockEditorValues<BlockGridValue, BlockGridLayoutItem> _blockGridEditorValues;
-    private ImagingSettings _imagingSettings;
+    private ContentSettings _contentSettings;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FileUploadContentDeletedNotificationHandler"/> class.
@@ -39,14 +39,14 @@ internal sealed class FileUploadContentDeletedNotificationHandler : FileUploadNo
         MediaFileManager mediaFileManager,
         IBlockEditorElementTypeCache elementTypeCache,
         ILogger<FileUploadContentDeletedNotificationHandler> logger,
-        IOptionsMonitor<ImagingSettings> imagingSettings)
+        IOptionsMonitor<ContentSettings> contentSettngs)
         : base(jsonSerializer, mediaFileManager, elementTypeCache)
     {
         _blockListEditorValues = new(new BlockListEditorDataConverter(jsonSerializer), elementTypeCache, logger);
         _blockGridEditorValues = new(new BlockGridEditorDataConverter(jsonSerializer), elementTypeCache, logger);
 
-        _imagingSettings = imagingSettings.CurrentValue;
-        imagingSettings.OnChange(x => _imagingSettings = x);
+        _contentSettings = contentSettngs.CurrentValue;
+        contentSettngs.OnChange(x => _contentSettings = x);
     }
 
     /// <inheritdoc/>
@@ -61,7 +61,7 @@ internal sealed class FileUploadContentDeletedNotificationHandler : FileUploadNo
     /// <inheritdoc/>
     public void Handle(MediaMovedToRecycleBinNotification notification)
     {
-        if (_imagingSettings.EnableMediaRecycleBinProtection is false)
+        if (_contentSettings.EnableMediaRecycleBinProtection is false)
         {
             return;
         }
@@ -74,7 +74,7 @@ internal sealed class FileUploadContentDeletedNotificationHandler : FileUploadNo
     /// <inheritdoc/>
     public void Handle(MediaMovedNotification notification)
     {
-        if (_imagingSettings.EnableMediaRecycleBinProtection is false)
+        if (_contentSettings.EnableMediaRecycleBinProtection is false)
         {
             return;
         }
