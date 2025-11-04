@@ -9,8 +9,8 @@ schedules:
     branches:
       include:
         - v15/dev
+        - v16/dev
         - main
-        - v17/dev
 
 parameters:
   - name: skipIntegrationTests
@@ -18,10 +18,10 @@ parameters:
     type: boolean
     default: false
 
-  - name: differentAppSettingsAcceptanceTests
-    displayName: Run acceptance tests with different app settings
+  - name: skipDifferentAppSettingsAcceptanceTests
+    displayName: Skip acceptance tests with different app settings
     type: boolean
-    default: true
+    default: false
 
   - name: skipDefaultConfigAcceptanceTests
     displayName: Skip tests with DefaultConfig
@@ -428,17 +428,17 @@ stages:
         strategy:
           matrix:
             LinuxPart1Of3:
-              testCommand: "npm run test -- --shard=1/3"
+              testCommand: "npm run testLinux -- --shard=1/3"
               testFolder: "DefaultConfig"
               vmImage: "ubuntu-latest"
               CONNECTIONSTRINGS__UMBRACODBDSN: "Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True"
             LinuxPart2Of3:
-              testCommand: "npm run test -- --shard=2/3"
+              testCommand: "npm run testLinux -- --shard=2/3"
               testFolder: "DefaultConfig"
               vmImage: "ubuntu-latest"
               CONNECTIONSTRINGS__UMBRACODBDSN: "Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True"
             LinuxPart3Of3:
-              testCommand: "npm run test -- --shard=3/3"
+              testCommand: "npm run testLinux -- --shard=3/3"
               testFolder: "DefaultConfig"
               vmImage: "ubuntu-latest"
               CONNECTIONSTRINGS__UMBRACODBDSN: "Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True"
@@ -505,7 +505,7 @@ stages:
     jobs:
       - job:
         displayName: E2E Tests with Different App settings (SQL Server)
-        condition: ${{ eq(parameters.differentAppSettingsAcceptanceTests, true) }}
+        condition: ${{ eq(parameters.skipDifferentAppSettingsAcceptanceTests, false) }}
         timeoutInMinutes: 180
         variables:
           SA_PASSWORD: UmbracoAcceptance123!
