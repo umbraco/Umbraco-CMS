@@ -245,7 +245,7 @@ export abstract class UmbTreeItemElementBase<
 
 	#renderSigns() {
 		return this._item
-			? html`<umb-entity-sign-bundle .entityType=${this._item!.entityType} .entityFlags=${this._flags}
+			? html`<umb-entity-sign-bundle tabindex="0" .entityType=${this._item!.entityType} .entityFlags=${this._flags}
 					>${!this._iconSlotHasChildren ? this.#renderIcon() : nothing}</umb-entity-sign-bundle
 				>`
 			: nothing;
