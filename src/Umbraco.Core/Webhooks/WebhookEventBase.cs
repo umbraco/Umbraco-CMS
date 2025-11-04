@@ -80,12 +80,6 @@ public abstract class WebhookEventBase<TNotification> : IWebhookEvent, INotifica
             return;
         }
 
-        if (_serverRoleAccessor.CurrentServerRole is not ServerRole.Single
-            && _serverRoleAccessor.CurrentServerRole is not ServerRole.SchedulingPublisher)
-        {
-            return;
-        }
-
         if (ShouldFireWebhookForNotification(notification) is false)
         {
             return;
