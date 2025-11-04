@@ -50,6 +50,10 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 		super();
 		this.addEventListener('mouseenter', this.#openTooltip);
 		this.addEventListener('mouseleave', this.#cancelOpen);
+
+		this.tabIndex = 0;
+		this.addEventListener('focusin', this.#openTooltip);
+		this.addEventListener('focusout', this.#cancelOpen);
 	}
 
 	#manifestFilter = (manifest: ManifestEntitySign) => {
