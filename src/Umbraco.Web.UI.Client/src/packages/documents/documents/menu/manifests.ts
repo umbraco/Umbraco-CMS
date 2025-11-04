@@ -1,5 +1,7 @@
+import { UMB_DOCUMENT_WORKSPACE_ALIAS } from '../constants.js';
 import { UMB_DOCUMENT_TREE_ALIAS } from '../tree/index.js';
 import { UMB_DOCUMENT_MENU_ITEM_ALIAS } from './constants.js';
+import { UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/recycle-bin';
 import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 
 export const UMB_CONTENT_MENU_ALIAS = 'Umb.Menu.Content';
@@ -35,7 +37,10 @@ export const manifests: Array<UmbExtensionManifest> = [
 		conditions: [
 			{
 				alias: UMB_WORKSPACE_CONDITION_ALIAS,
-				match: 'Umb.Workspace.Document',
+				match: UMB_DOCUMENT_WORKSPACE_ALIAS,
+			},
+			{
+				alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
 			},
 		],
 	},
@@ -47,7 +52,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		conditions: [
 			{
 				alias: UMB_WORKSPACE_CONDITION_ALIAS,
-				match: 'Umb.Workspace.Document',
+				match: UMB_DOCUMENT_WORKSPACE_ALIAS,
 			},
 		],
 	},

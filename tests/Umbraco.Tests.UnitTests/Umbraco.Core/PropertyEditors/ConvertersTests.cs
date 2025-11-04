@@ -188,7 +188,7 @@ public class ConvertersTests
         public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
             => PropertyCacheLevel.Elements;
 
-        public override object ConvertSourceToIntermediate(
+        public override object? ConvertSourceToIntermediate(
             IPublishedElement owner,
             IPublishedPropertyType propertyType,
             object source,

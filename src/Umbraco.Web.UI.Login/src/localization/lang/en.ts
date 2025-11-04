@@ -47,5 +47,7 @@ export default {
     returnToLogin: 'Return to login',
     localLoginDisabled: 'Unfortunately, direct login is not possible. It has been disabled by a provider.',
     friendlyGreeting: 'Hello',
+    showPassword: 'Show password',
+    hidePassword: 'Hide password',
   },
 } satisfies UmbLocalizationDictionary;

@@ -53,6 +53,14 @@ export class UmbContentWorkspaceDataManager<
 		this.updateVariantData(variantId);
 	}
 
+	ensureVariantsData(variantIds: UmbVariantId[]) {
+		this.initiatePropertyValueChange();
+		for (const variantId of variantIds) {
+			this.updateVariantData(variantId);
+		}
+		this.finishPropertyValueChange();
+	}
+
 	updateVariantData(variantId: UmbVariantId, update?: Partial<ModelVariantType>) {
 		if (!this.#variantScaffold) throw new Error('Variant scaffold data is missing');
 

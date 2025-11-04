@@ -1,10 +1,10 @@
+import type { Editor } from '../../externals.js';
 import { UmbTiptapToolbarElementApiBase } from '../tiptap-toolbar-element-api-base.js';
 import { getGuidFromUdi, imageSize } from '@umbraco-cms/backoffice/utils';
 import { ImageCropModeModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbImagingRepository } from '@umbraco-cms/backoffice/imaging';
 import { UMB_MEDIA_CAPTION_ALT_TEXT_MODAL, UMB_MEDIA_PICKER_MODAL } from '@umbraco-cms/backoffice/media';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbMediaCaptionAltTextModalValue } from '@umbraco-cms/backoffice/media';
 

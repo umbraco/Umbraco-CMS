@@ -115,7 +115,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	private _hasRootGroups = false;
 
 	@state()
-	private _routes: UmbRoute[] = [];
+	private _routes?: UmbRoute[];
 
 	@state()
 	private _tabs?: Array<UmbPropertyTypeContainerMergedModel>;
@@ -352,7 +352,6 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		const changedName = this.#workspaceContext.structure.makeContainerNameUniqueForOwnerContentType(
 			tab.ownerId,
 			newName,
-			'Tab',
 		);
 
 		// Check if it collides with another tab name of this same content-type, if so adjust name:
@@ -371,7 +370,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		if (!this.#processingTabId || !tab.ownerId) return;
 		const newName = (event.target as HTMLInputElement | undefined)?.value;
 		if (newName === '') {
-			const changedName = this.#workspaceContext!.structure.makeEmptyContainerName(this.#processingTabId, 'Tab');
+			const changedName = this.#workspaceContext!.structure.makeEmptyContainerName(this.#processingTabId);
 
 			(event.target as HTMLInputElement).value = changedName;
 

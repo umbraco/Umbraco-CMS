@@ -125,7 +125,7 @@ export class UmbManagementApiDetailDataRequestManager<
 	}
 
 	async delete(id: string): Promise<UmbApiWithErrorResponse> {
-		const { error } = await this.#delete(id);
+		const { error } = await tryExecute(this, this.#delete(id));
 
 		// Only update the cache when we are connected to the server events
 		if (this.#isConnectedToServerEvents && !error) {

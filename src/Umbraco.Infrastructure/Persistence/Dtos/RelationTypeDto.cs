@@ -4,11 +4,13 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-[TableName(Constants.DatabaseSchema.Tables.RelationType)]
+[TableName(TableName)]
 [PrimaryKey("id")]
 [ExplicitColumns]
 internal sealed class RelationTypeDto
 {
+    public const string TableName = Constants.DatabaseSchema.Tables.RelationType;
+
     public const int NodeIdSeed = 10;
 
     [Column("id")]

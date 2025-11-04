@@ -8,7 +8,7 @@ export default {
 } as Meta;
 
 const Template: StoryFn = () => {
-	const approvedIcons = icons.filter((x) => x.legacy !== true);
+	const approvedIcons = icons.filter((x) => x.hidden !== true);
 	return html`
 		<div
 			style="display: grid;

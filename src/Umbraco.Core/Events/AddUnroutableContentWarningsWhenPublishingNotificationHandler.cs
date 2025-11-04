@@ -61,71 +61,6 @@ public class AddUnroutableContentWarningsWhenPublishingNotificationHandler : INo
         _contentSettings = contentSettings.Value;
     }
 
-    [Obsolete("Use the non-obsolete constructor. Scheduled for removal in V17.")]
-    public AddUnroutableContentWarningsWhenPublishingNotificationHandler(
-        IPublishedRouter publishedRouter,
-        IUmbracoContextAccessor umbracoContextAccessor,
-        ILanguageService languageService,
-        ILocalizedTextService localizedTextService,
-        IContentService contentService,
-        IVariationContextAccessor variationContextAccessor,
-        ILoggerFactory loggerFactory,
-        UriUtility uriUtility,
-        IPublishedUrlProvider publishedUrlProvider,
-        IPublishedContentCache publishedContentCache,
-        IDocumentNavigationQueryService navigationQueryService,
-        IPublishedContentStatusFilteringService publishedContentStatusFilteringService,
-        IEventMessagesFactory eventMessagesFactory,
-        IOptions<ContentSettings> contentSettings)
-        : this(
-            publishedRouter,
-            umbracoContextAccessor,
-            languageService,
-            localizedTextService,
-            contentService,
-            variationContextAccessor,
-            loggerFactory,
-            uriUtility,
-            publishedUrlProvider,
-            navigationQueryService,
-            publishedContentStatusFilteringService,
-            eventMessagesFactory,
-            contentSettings)
-    {
-    }
-
-    [Obsolete("Use the non-obsolete constructor. Scheduled for removal in V17.")]
-    public AddUnroutableContentWarningsWhenPublishingNotificationHandler(
-        IPublishedRouter publishedRouter,
-        IUmbracoContextAccessor umbracoContextAccessor,
-        ILanguageService languageService,
-        ILocalizedTextService localizedTextService,
-        IContentService contentService,
-        IVariationContextAccessor variationContextAccessor,
-        ILoggerFactory loggerFactory,
-        UriUtility uriUtility,
-        IPublishedUrlProvider publishedUrlProvider,
-        IPublishedContentCache publishedContentCache,
-        IDocumentNavigationQueryService navigationQueryService,
-        IEventMessagesFactory eventMessagesFactory,
-        IOptions<ContentSettings> contentSettings)
-        : this(
-            publishedRouter,
-            umbracoContextAccessor,
-            languageService,
-            localizedTextService,
-            contentService,
-            variationContextAccessor,
-            loggerFactory,
-            uriUtility,
-            publishedUrlProvider,
-            navigationQueryService,
-            StaticServiceProvider.Instance.GetRequiredService<IPublishedContentStatusFilteringService>(),
-            eventMessagesFactory,
-            contentSettings)
-    {
-    }
-
     public async Task HandleAsync(ContentPublishedNotification notification, CancellationToken cancellationToken)
     {
         if (_contentSettings.ShowUnroutableContentWarnings is false)
@@ -173,7 +108,7 @@ public class AddUnroutableContentWarningsWhenPublishingNotificationHandler : INo
             EventMessages eventMessages = _eventMessagesFactory.Get();
             foreach (var culture in successfulCultures)
             {
-                if (urls.Where(u => u.Culture == culture || culture == "*").All(u => u.IsUrl is false))
+                if (urls.Where(u => u.Culture == culture || culture == "*").All(u => u.Url is null))
                 {
                     eventMessages.Add(new EventMessage("Content published", "The document does not have a URL, possibly due to a naming collision with another document. More details can be found under Info.", EventMessageType.Warning));
 

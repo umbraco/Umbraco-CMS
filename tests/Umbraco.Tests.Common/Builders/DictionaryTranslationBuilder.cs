@@ -69,8 +69,8 @@ public class DictionaryTranslationBuilder
 
     public override IDictionaryTranslation Build()
     {
-        var createDate = _createDate ?? DateTime.Now;
-        var updateDate = _updateDate ?? DateTime.Now;
+        var createDate = _createDate ?? DateTime.UtcNow;
+        var updateDate = _updateDate ?? DateTime.UtcNow;
         var deleteDate = _deleteDate;
         var id = _id ?? 1;
         var key = _key ?? Guid.NewGuid();

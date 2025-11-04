@@ -3,11 +3,11 @@ using Examine.Lucene;
 using Examine.Lucene.Directories;
 using Examine.Lucene.Providers;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Infrastructure;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Tests.Common.Attributes;
@@ -80,7 +80,7 @@ internal sealed class PublishedContentQueryTests : ExamineBaseTest
         var variationContext = new VariationContext();
         var variationContextAccessor = Mock.Of<IVariationContextAccessor>(x => x.VariationContext == variationContext);
 
-        return new PublishedContentQuery(variationContextAccessor, examineManager.Object, contentCache.Object, Mock.Of<IPublishedMediaCache>());
+        return new PublishedContentQuery(variationContextAccessor, examineManager.Object, contentCache.Object, Mock.Of<IPublishedMediaCache>(), Mock.Of<IDocumentNavigationQueryService>());
     }
 
     [TestCase("fr-fr", ExpectedResult = "1, 3", Description = "Search Culture: fr-fr. Must return both fr-fr and invariant results")]

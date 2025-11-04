@@ -65,22 +65,6 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
         _flagProviderCollection = flagProviderCollection;
     }
 
-    [Obsolete("Schedule for removal in v17")]
-    public async Task<DocumentResponseModel> CreateResponseModelAsync(IContent content)
-    {
-        DocumentResponseModel responseModel = _umbracoMapper.Map<DocumentResponseModel>(content)!;
-
-        Guid? templateKey = content.TemplateId.HasValue
-            ? _templateService.GetAsync(content.TemplateId.Value).Result?.Key
-            : null;
-
-        responseModel.Template = templateKey.HasValue
-            ? new ReferenceByIdModel { Id = templateKey.Value }
-            : null;
-
-        return responseModel;
-    }
-
     public async Task<PublishedDocumentResponseModel> CreatePublishedResponseModelAsync(IContent content)
     {
         PublishedDocumentResponseModel responseModel = _umbracoMapper.Map<PublishedDocumentResponseModel>(content)!;
@@ -180,68 +164,6 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
 
     public DocumentTypeReferenceResponseModel CreateDocumentTypeReferenceResponseModel(IDocumentEntitySlim entity)
         => _umbracoMapper.Map<DocumentTypeReferenceResponseModel>(entity)!;
-
-    [Obsolete("Use CreateCulturePublishScheduleModels instead. Scheduled for removal in v17")]
-    public Attempt<CultureAndScheduleModel, ContentPublishingOperationStatus> CreateCultureAndScheduleModel(PublishDocumentRequestModel requestModel)
-    {
-        var contentScheduleCollection = new ContentScheduleCollection();
-        var culturesToPublishImmediately = new HashSet<string>();
-        foreach (CultureAndScheduleRequestModel cultureAndScheduleRequestModel in requestModel.PublishSchedules)
-        {
-            if (cultureAndScheduleRequestModel.Schedule is null || (cultureAndScheduleRequestModel.Schedule.PublishTime is null && cultureAndScheduleRequestModel.Schedule.UnpublishTime is null))
-            {
-                culturesToPublishImmediately.Add(cultureAndScheduleRequestModel.Culture ?? Constants.System.InvariantCulture); // API have `null` for invariant, but service layer has "*".
-                continue;
-            }
-
-            if (cultureAndScheduleRequestModel.Schedule.PublishTime is not null)
-            {
-                if (cultureAndScheduleRequestModel.Schedule.PublishTime <= _timeProvider.GetUtcNow())
-                {
-                    return Attempt.FailWithStatus(ContentPublishingOperationStatus.PublishTimeNeedsToBeInFuture, new CultureAndScheduleModel()
-                    {
-                        Schedules = contentScheduleCollection,
-                        CulturesToPublishImmediately = culturesToPublishImmediately,
-                    });
-                }
-
-                contentScheduleCollection.Add(new ContentSchedule(
-                    cultureAndScheduleRequestModel.Culture ?? Constants.System.InvariantCulture,
-                    cultureAndScheduleRequestModel.Schedule.PublishTime.Value.UtcDateTime,
-                    ContentScheduleAction.Release));
-            }
-            if (cultureAndScheduleRequestModel.Schedule.UnpublishTime is not null)
-            {
-                if (cultureAndScheduleRequestModel.Schedule.UnpublishTime <= cultureAndScheduleRequestModel.Schedule.PublishTime)
-                {
-                    return Attempt.FailWithStatus(ContentPublishingOperationStatus.UnpublishTimeNeedsToBeAfterPublishTime, new CultureAndScheduleModel()
-                    {
-                        Schedules = contentScheduleCollection,
-                        CulturesToPublishImmediately = culturesToPublishImmediately,
-                    });
-                }
-
-                if (cultureAndScheduleRequestModel.Schedule.UnpublishTime <= _timeProvider.GetUtcNow())
-                {
-                    return Attempt.FailWithStatus(ContentPublishingOperationStatus.UpublishTimeNeedsToBeInFuture, new CultureAndScheduleModel()
-                    {
-                        Schedules = contentScheduleCollection,
-                        CulturesToPublishImmediately = culturesToPublishImmediately,
-                    });
-                }
-
-                contentScheduleCollection.Add(new ContentSchedule(
-                    cultureAndScheduleRequestModel.Culture ?? Constants.System.InvariantCulture,
-                    cultureAndScheduleRequestModel.Schedule.UnpublishTime.Value.UtcDateTime,
-                    ContentScheduleAction.Expire));
-            }
-        }
-        return Attempt.SucceedWithStatus(ContentPublishingOperationStatus.Success, new CultureAndScheduleModel()
-        {
-            Schedules = contentScheduleCollection,
-            CulturesToPublishImmediately = culturesToPublishImmediately,
-        });
-    }
 
     public Attempt<List<CulturePublishScheduleModel>, ContentPublishingOperationStatus> CreateCulturePublishScheduleModels(PublishDocumentRequestModel requestModel)
     {

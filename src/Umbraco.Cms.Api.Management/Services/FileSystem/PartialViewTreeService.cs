@@ -11,4 +11,6 @@ public class PartialViewTreeService : FileSystemTreeServiceBase, IPartialViewTre
     public PartialViewTreeService(FileSystems fileSystems) =>
         _partialViewFileSystem = fileSystems.PartialViewsFileSystem ??
                                  throw new ArgumentException("Missing partial views file system", nameof(fileSystems));
+
+    protected override bool FilterFile(string file) => file.ToLowerInvariant().EndsWith(".cshtml");
 }

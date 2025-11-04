@@ -2,10 +2,12 @@
 // See LICENSE for more details.
 
 using System.Diagnostics;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Dictionary;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
@@ -679,7 +681,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
 
         // Act
         Thread.Sleep(new TimeSpan(0, 0, 0, 2));
-        var contents = ContentService.GetContentForExpiration(DateTime.Now).ToList();
+        var contents = ContentService.GetContentForExpiration(DateTime.UtcNow).ToList();
 
         // Assert
         Assert.That(contents, Is.Not.Null);
@@ -712,10 +714,10 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
     {
         // Arrange
         // Act
-        var contents = ContentService.GetContentForRelease(DateTime.Now).ToList();
+        var contents = ContentService.GetContentForRelease(DateTime.UtcNow).ToList();
 
         // Assert
-        Assert.That(DateTime.Now.AddMinutes(-5) <= DateTime.Now);
+        Assert.That(DateTime.UtcNow.AddMinutes(-5) <= DateTime.UtcNow);
         Assert.That(contents, Is.Not.Null);
         Assert.That(contents.Any(), Is.True);
         Assert.That(contents.Count(), Is.EqualTo(1));
@@ -1037,7 +1039,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
-    public void Can_Publish_Content_Variation_And_Detect_Changed_Cultures()
+    public async Task Can_Publish_Content_Variation_And_Detect_Changed_Cultures()
     {
         CreateEnglishAndFrenchDocumentType(out var langUk, out var langFr, out var contentType);
 
@@ -1047,7 +1049,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         var published = ContentService.Publish(content, new[] { langFr.IsoCode });
 
         // audit log will only show that french was published
-        var lastLog = AuditService.GetLogs(content.Id).Last();
+        var lastLog = (await AuditService.GetItemsByEntityAsync(content.Id, 0, 1)).Items.First();
         Assert.AreEqual("Published languages: fr-FR", lastLog.Comment);
 
         // re-get
@@ -1057,7 +1059,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         published = ContentService.Publish(content, new[] { langUk.IsoCode });
 
         // audit log will only show that english was published
-        lastLog = AuditService.GetLogs(content.Id).Last();
+        lastLog = (await AuditService.GetItemsByEntityAsync(content.Id, 0, 1)).Items.First();
         Assert.AreEqual("Published languages: en-GB", lastLog.Comment);
     }
 
@@ -1094,7 +1096,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         var unpublished = ContentService.Unpublish(content, langFr.IsoCode);
 
         // audit log will only show that french was unpublished
-        var lastLog = AuditService.GetLogs(content.Id).Last();
+        var lastLog = (await AuditService.GetItemsByEntityAsync(content.Id, 0, 1)).Items.First();
         Assert.AreEqual("Unpublished languages: fr-FR", lastLog.Comment);
 
         // re-get
@@ -1103,7 +1105,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         unpublished = ContentService.Unpublish(content, langGb.IsoCode);
 
         // audit log will only show that english was published
-        var logs = AuditService.GetLogs(content.Id).ToList();
+        var logs = (await AuditService.GetItemsByEntityAsync(content.Id, 0, int.MaxValue, Direction.Ascending)).Items.ToList();
         Assert.AreEqual("Unpublished languages: en-GB", logs[^2].Comment);
         Assert.AreEqual("Unpublished (mandatory language unpublished)", logs[^1].Comment);
     }
@@ -1269,7 +1271,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         Assert.IsFalse(content.HasIdentity);
 
         // content cannot publish values because they are invalid
-        var propertyValidationService = new PropertyValidationService(PropertyEditorCollection, DataTypeService, LocalizedTextService, ValueEditorCache, Mock.Of<ICultureDictionary>());
+        var propertyValidationService = new PropertyValidationService(PropertyEditorCollection, DataTypeService, LocalizedTextService, ValueEditorCache, Mock.Of<ICultureDictionary>(), Mock.Of<ILanguageService>(), Mock.Of<IOptions<ContentSettings>>());
         var isValid = propertyValidationService.IsPropertyDataValid(content, out var invalidProperties,
             CultureImpact.Invariant);
         Assert.IsFalse(isValid);
@@ -1309,7 +1311,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         content.SetCultureName("name-fr", langFr.IsoCode);
         content.SetCultureName("name-da", langDa.IsoCode);
 
-        content.PublishCulture(CultureImpact.Explicit(langFr.IsoCode, langFr.IsDefault), DateTime.Now, PropertyEditorCollection);
+        content.PublishCulture(CultureImpact.Explicit(langFr.IsoCode, langFr.IsDefault), DateTime.UtcNow, PropertyEditorCollection);
         var result = ContentService.CommitDocumentChanges(content);
         Assert.IsTrue(result.Success);
         content = ContentService.GetById(content.Id);
@@ -1317,7 +1319,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         Assert.IsFalse(content.IsCulturePublished(langDa.IsoCode));
 
         content.UnpublishCulture(langFr.IsoCode);
-        content.PublishCulture(CultureImpact.Explicit(langDa.IsoCode, langDa.IsDefault), DateTime.Now, PropertyEditorCollection);
+        content.PublishCulture(CultureImpact.Explicit(langDa.IsoCode, langDa.IsDefault), DateTime.UtcNow, PropertyEditorCollection);
 
         result = ContentService.CommitDocumentChanges(content);
         Assert.IsTrue(result.Success);
@@ -2092,7 +2094,8 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
 
         var user = await UserService.GetAsync(Constants.Security.SuperUserKey);
         var userGroup = await UserGroupService.GetAsync(user.Groups.First().Alias);
-        Assert.IsNotNull(NotificationService.CreateNotification(user, content1, "X"));
+        NotificationService.TryCreateNotification(user, content1, "X", out Notification? notification);
+        Assert.IsNotNull(notification);
 
         ContentService.SetPermission(content1, "A", new[] { userGroup.Id });
         var updateDomainResult = await DomainService.UpdateDomainsAsync(
@@ -2732,6 +2735,9 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         Assert.That(sut.GetValue<string>("multiUrlPicker"),
             Is.EqualTo("[{\"name\":\"https://test.com\",\"url\":\"https://test.com\"}]"));
         Assert.That(sut.GetValue<string>("tags"), Is.EqualTo("this,is,tags"));
+        Assert.That(
+            sut.GetValue<string>("dateTimeWithTimeZone"),
+            Is.EqualTo("{\"date\":\"2025-01-22T18:33:01.0000000+01:00\",\"timeZone\":\"Europe/Copenhagen\"}"));
     }
 
     [Test]

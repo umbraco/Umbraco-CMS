@@ -15,20 +15,6 @@ public class SubTypesSelector : ISubTypesSelector
     private readonly IEnumerable<ISubTypesHandler> _subTypeHandlers;
     private readonly IUmbracoJsonTypeInfoResolver _umbracoJsonTypeInfoResolver;
 
-    [Obsolete("The settings parameter is not required anymore, use the other constructor instead. Scheduled for removal in Umbraco 17.")]
-    public SubTypesSelector(
-        IOptions<GlobalSettings> settings,
-        IHostingEnvironment hostingEnvironment,
-        IHttpContextAccessor httpContextAccessor,
-        IEnumerable<ISubTypesHandler> subTypeHandlers,
-        IUmbracoJsonTypeInfoResolver umbracoJsonTypeInfoResolver)
-    {
-        _hostingEnvironment = hostingEnvironment;
-        _httpContextAccessor = httpContextAccessor;
-        _subTypeHandlers = subTypeHandlers;
-        _umbracoJsonTypeInfoResolver = umbracoJsonTypeInfoResolver;
-    }
-
     public SubTypesSelector(
         IHostingEnvironment hostingEnvironment,
         IHttpContextAccessor httpContextAccessor,

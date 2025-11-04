@@ -173,7 +173,7 @@ test('can remove a header from a webhook', async ({umbracoApi, umbracoUi}) => {
   expect(await umbracoApi.webhook.doesWebhookHaveHeader(webhookName, headerName, headerValue)).toBeFalsy();
 });
 
-test('cannot add both content event and media event for a webhook', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test('cannot add both content event and media event for a webhook', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const event = 'Content Published';
   await umbracoApi.webhook.createDefaultWebhook(webhookName, webhookSiteToken, event);
