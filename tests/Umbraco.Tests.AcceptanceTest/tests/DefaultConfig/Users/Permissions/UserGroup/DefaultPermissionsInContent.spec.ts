@@ -277,8 +277,7 @@ test('can not publish content with publish permission disabled', async ({umbraco
   await umbracoUi.content.isActionsMenuForNameVisible(rootDocumentName, false);
 });
 
-// Remove .skip when the front-end is ready. Currently there is no "Permissions" menu item displays
-// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/19339
+// Skip this as this function is removed from the front-end.
 test.skip('can set permissions with set permissions permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithSetPermissionsPermission(userGroupName);
@@ -295,7 +294,8 @@ test.skip('can set permissions with set permissions permission enabled', async (
   // await umbracoUi.content.doesDocumentPermissionsDialogExist();
 });
 
-test('can not set permissions with set permissions permission disabled', async ({umbracoApi, umbracoUi}) => {
+// Skip this as this function is removed from the front-end.
+test.skip('can not set permissions with set permissions permission disabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithSetPermissionsPermission(userGroupName, false);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);

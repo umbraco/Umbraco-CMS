@@ -47,8 +47,7 @@ test.skip('can create content with the list view data type', async ({umbracoApi,
   expect(await umbracoApi.document.getChildrenAmount(contentData.id)).toEqual(0);
 });
 
-// Remove .skip when the issue is fixed: https://github.com/umbraco/Umbraco-CMS/issues/18615
-test.skip('can publish content with the list view data type', async ({umbracoApi, umbracoUi}) => {
+test('can publish content with the list view data type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Published';
   const childDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(childDocumentTypeName);
@@ -70,8 +69,7 @@ test.skip('can publish content with the list view data type', async ({umbracoApi
   expect(await umbracoApi.document.getChildrenAmount(documentId)).toEqual(0);
 });
 
-// Remove .skip when the issue is fixed: https://github.com/umbraco/Umbraco-CMS/issues/18615
-test.skip('can create content with a child in the list', async ({umbracoApi, umbracoUi}) => {
+test('can create content with a child in the list', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const childDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(childDocumentTypeName);
   await umbracoApi.dataType.createListViewContentDataType(dataTypeName);
