@@ -1,11 +1,11 @@
-import {AliasHelper, ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 const dataTypeName = 'EntityPickerWithCollection';
 
 test.beforeEach(async ({umbracoUi, umbracoApi}) => {
   await umbracoUi.goToBackOffice();
-  await umbracoUi.dataType.goToSettingsTreeItem('Data Types');
+  await umbracoUi.dataType.goToSection(ConstantHelper.sections.settings);
   await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
 });
 
@@ -13,7 +13,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
 });
 
-test('can create entity picker with collection data source', async ({page, umbracoApi, umbracoUi}) => {
+test('can create a entity picker data type with the collection data source', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.dataType.clickActionsMenuForName('Data Types');
   await umbracoUi.dataType.clickCreateActionMenuOption();

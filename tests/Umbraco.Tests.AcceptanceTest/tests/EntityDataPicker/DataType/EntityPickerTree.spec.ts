@@ -1,4 +1,4 @@
-import {AliasHelper, ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 const dataTypeName = 'EntityPickerWithTree';
@@ -13,9 +13,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
 });
 
-test('can create entity picker with tree data source', async ({page, umbracoApi, umbracoUi}) => {
-  // Arrange
-
+test('can create a entity picker data type with tree data source', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.dataType.clickActionsMenuForName('Data Types');
   await umbracoUi.dataType.clickCreateActionMenuOption();

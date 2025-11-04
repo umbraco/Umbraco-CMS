@@ -1,10 +1,10 @@
-import {AliasHelper, ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 const contentName = 'TestContent';
 const documentTypeName = 'TestDocumentTypeForContent';
 const dataTypeName = 'EntityPickerWithTree';
-
+const treeDataSourceAlias = 'My.PickerDataSource.Tree';
 
 test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
@@ -18,12 +18,11 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
 });
 
-test('can create content entity picker with tree data source', async ({page, umbracoApi, umbracoUi}) => {
+test('can create empty content with a entity picker with the tree data source', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Draft';
-  const dataTypeId = await umbracoApi.dataType.createEntityDataPickerDataType(dataTypeName, 'My.PickerDataSource.Tree');
+  const dataTypeId = await umbracoApi.dataType.createEntityDataPickerDataType(dataTypeName, treeDataSourceAlias);
   await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeId);
-
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
@@ -31,7 +30,6 @@ test('can create content entity picker with tree data source', async ({page, umb
   await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
-  await page.pause();
   await umbracoUi.content.clickSaveButton();
 
   // Assert
@@ -40,4 +38,92 @@ test('can create content entity picker with tree data source', async ({page, umb
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
   expect(contentData.values).toEqual([]);
+});
+
+test('can create content with a entity picker with the tree data source that has an item', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const expectedState = 'Draft';
+  const dataTypeId = await umbracoApi.dataType.createEntityDataPickerDataType(dataTypeName, treeDataSourceAlias);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.chooseTreeMenuItemWithName('Example 1');
+  await umbracoUi.content.clickSaveButton();
+
+  // Assert
+  await umbracoUi.content.waitForContentToBeCreated();
+  expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.variants[0].state).toBe(expectedState);
+  expect(contentData.values[0].value.ids[0]).toEqual('1');
+});
+
+test('can create content with a entity picker with the tree data source that has multiple items', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const expectedState = 'Draft';
+  const dataTypeId = await umbracoApi.dataType.createEntityDataPickerDataType(dataTypeName, treeDataSourceAlias);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.chooseTreeMenuItemWithName('Example 1');
+  await umbracoUi.content.chooseTreeMenuItemWithName('Example 3');
+  await umbracoUi.content.chooseTreeMenuItemWithName('Example 5', ['Example Folder 1']);
+  await umbracoUi.content.clickSaveButton();
+
+  // Assert
+  await umbracoUi.content.waitForContentToBeCreated();
+  expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.variants[0].state).toBe(expectedState);
+  expect(contentData.values[0].value.ids[0]).toEqual('1');
+  expect(contentData.values[0].value.ids[1]).toEqual('3');
+  expect(contentData.values[0].value.ids[2]).toEqual('5');
+});
+
+test('can not create content with a entity picker with the tree data source that has more items than max amount', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const dataTypeId = await umbracoApi.dataType.createEntityDataPickerDataTypeMinAndMaxValues(dataTypeName, treeDataSourceAlias, 0, 2);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.chooseTreeMenuItemWithName('Example 1');
+  await umbracoUi.content.isChooseButtonVisible(true);
+  await umbracoUi.content.chooseTreeMenuItemWithName('Example 5', ['Example Folder 1']);
+
+  // Assert
+  // The choose button should be disabled when the max amount is reached
+  await umbracoUi.content.isChooseButtonVisible(false);
+});
+
+test('can not create content with a entity picker with the tree data source that has less items than min amount', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const expectedState = 'Published';
+  const dataTypeId = await umbracoApi.dataType.createEntityDataPickerDataTypeMinAndMaxValues(dataTypeName, treeDataSourceAlias, 2, 5);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.chooseTreeMenuItemWithName('Example 1');
+  await umbracoUi.content.isTextWithExactNameVisible('This field need more items');
+  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
+  await umbracoUi.content.chooseTreeMenuItemWithName('Example 5', ['Example Folder 1']);
+
+  // Assert
+  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.waitForContentToBeCreated();
+  expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.variants[0].state).toBe(expectedState);
 });
