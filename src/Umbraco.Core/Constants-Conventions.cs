@@ -100,6 +100,11 @@ public static partial class Constants
             ///     The default height/width of an image file if the size can't be determined from the metadata
             /// </summary>
             public const int DefaultSize = 200;
+
+            /// <summary>
+            ///     Suffix added to media files when moved to the recycle bin when recycle bin media protection is enabled.
+            /// </summary>
+            public const string TrashedMediaSuffix = ".deleted";
         }
 
         /// <summary>
