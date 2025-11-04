@@ -28,7 +28,7 @@ public class ConfigureUmbracoDeliveryApiSwaggerGenOptions : IConfigureNamedOptio
             {
                 Title = DeliveryApiConfiguration.ApiTitle,
                 Version = "Latest",
-                Description = $"You can find out more about the {DeliveryApiConfiguration.ApiTitle} in [the documentation]({DeliveryApiConfiguration.ApiDocumentationContentArticleLink})."
+                Description = $"You can find out more about the {DeliveryApiConfiguration.ApiTitle} in [the documentation]({DeliveryApiConfiguration.ApiDocumentationContentArticleLink}).",
             };
             return Task.CompletedTask;
         });
