@@ -22,14 +22,21 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// <summary>
 ///     The value editor for the file upload property editor.
 /// </summary>
-internal sealed class FileUploadPropertyValueEditor : DataValueEditor
+/// <remarks>
+///     As this class is not registered with DI as a singleton, it must be disposed to release
+///     the settings change subscription and avoid a memory leak.
+/// </remarks>
+internal sealed class FileUploadPropertyValueEditor : DataValueEditor, IDisposable
 {
     private readonly MediaFileManager _mediaFileManager;
     private readonly ITemporaryFileService _temporaryFileService;
     private readonly IScopeProvider _scopeProvider;
     private readonly IFileStreamSecurityValidator _fileStreamSecurityValidator;
     private readonly FileUploadValueParser _valueParser;
+
     private ContentSettings _contentSettings;
+    private readonly IDisposable? _contentSettingsChangeSubscription;
+
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FileUploadPropertyValueEditor"/> class.
@@ -46,14 +53,14 @@ internal sealed class FileUploadPropertyValueEditor : DataValueEditor
         IFileStreamSecurityValidator fileStreamSecurityValidator)
         : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
     {
-        _mediaFileManager = mediaFileManager ?? throw new ArgumentNullException(nameof(mediaFileManager));
+        _mediaFileManager = mediaFileManager;
         _temporaryFileService = temporaryFileService;
         _scopeProvider = scopeProvider;
         _fileStreamSecurityValidator = fileStreamSecurityValidator;
         _valueParser = new FileUploadValueParser(jsonSerializer);
 
-        _contentSettings = contentSettings.CurrentValue ?? throw new ArgumentNullException(nameof(contentSettings));
-        contentSettings.OnChange(x => _contentSettings = x);
+        _contentSettings = contentSettings.CurrentValue;
+        _contentSettingsChangeSubscription = contentSettings.OnChange(x => _contentSettings = x);
 
         Validators.Add(new TemporaryFileUploadValidator(
             () => _contentSettings,
@@ -216,4 +223,6 @@ internal sealed class FileUploadPropertyValueEditor : DataValueEditor
         // in case we are using the old path scheme, try to re-use numbers (bah...)
         return _mediaFileManager.GetMediaPath(file.FileName, contentKey, propertyTypeKey);
     }
+
+    public void Dispose() => _contentSettingsChangeSubscription?.Dispose();
 }

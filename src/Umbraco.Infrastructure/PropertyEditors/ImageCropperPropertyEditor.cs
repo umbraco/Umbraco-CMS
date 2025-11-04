@@ -19,6 +19,10 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// <summary>
 ///     Represents an image cropper property editor.
 /// </summary>
+/// <remarks>
+///     As this class is not registered with DI as a singleton, it must be disposed to release
+///     the settings change subscription and avoid a memory leak.
+/// </remarks>
 [DataEditor(
     Constants.PropertyEditors.Aliases.ImageCropper,
     ValueType = ValueTypes.Json,
@@ -26,15 +30,17 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
     INotificationHandler<ContentCopiedNotification>, INotificationHandler<ContentDeletedNotification>,
     INotificationHandler<MediaDeletedNotification>, INotificationHandler<MediaSavingNotification>,
-    INotificationHandler<MemberDeletedNotification>
+    INotificationHandler<MemberDeletedNotification>, IDisposable
 {
     private readonly UploadAutoFillProperties _autoFillProperties;
     private readonly IContentService _contentService;
     private readonly IIOHelper _ioHelper;
     private readonly ILogger<ImageCropperPropertyEditor> _logger;
     private readonly MediaFileManager _mediaFileManager;
-    private ContentSettings _contentSettings;
     private readonly IJsonSerializer _jsonSerializer;
+
+    private ContentSettings _contentSettings;
+    private readonly IDisposable? _contentSettingsChangeSubscription;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ImageCropperPropertyEditor" /> class.
@@ -50,16 +56,16 @@ public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
         IJsonSerializer jsonSerializer)
         : base(dataValueEditorFactory)
     {
-        _mediaFileManager = mediaFileManager ?? throw new ArgumentNullException(nameof(mediaFileManager));
-        _contentSettings = contentSettings.CurrentValue ?? throw new ArgumentNullException(nameof(contentSettings));
-        _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
-        _autoFillProperties =
-            uploadAutoFillProperties ?? throw new ArgumentNullException(nameof(uploadAutoFillProperties));
+        _mediaFileManager = mediaFileManager;
+        _ioHelper = ioHelper;
+        _autoFillProperties = uploadAutoFillProperties;
         _contentService = contentService;
         _jsonSerializer = jsonSerializer;
         _logger = loggerFactory.CreateLogger<ImageCropperPropertyEditor>();
 
-        contentSettings.OnChange(x => _contentSettings = x);
+        _contentSettings = contentSettings.CurrentValue;
+        _contentSettingsChangeSubscription = contentSettings.OnChange(x => _contentSettings = x);
+
         SupportsReadOnly = true;
     }
 
@@ -294,4 +300,6 @@ public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
     {
         public string? Src { get; set; } = string.Empty;
     }
+
+    public void Dispose() => _contentSettingsChangeSubscription?.Dispose();
 }
