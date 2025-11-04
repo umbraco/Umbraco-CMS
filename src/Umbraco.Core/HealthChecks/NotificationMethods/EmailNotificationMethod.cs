@@ -74,7 +74,7 @@ public class EmailNotificationMethod : NotificationMethodBase
         var subject = _textService?.Localize("healthcheck", "scheduledHealthCheckEmailSubject", new[] { host });
 
         EmailMessage mailMessage = CreateMailMessage(subject, message);
-        Task? task = _emailSender?.SendAsync(mailMessage, Constants.Web.EmailTypes.HealthCheck);
+        Task? task = _emailSender?.SendAsync(mailMessage, Constants.Web.EmailTypes.HealthCheck, false, null);
         if (task is not null)
         {
             await task;

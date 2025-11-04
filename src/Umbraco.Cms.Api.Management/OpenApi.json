@@ -40574,7 +40574,7 @@
           },
           "actionParameters": {
             "type": "object",
-            "additionalProperties": { },
+            "additionalProperties": {},
             "nullable": true
           }
         },
@@ -41199,7 +41199,7 @@
           },
           "extensions": {
             "type": "array",
-            "items": { }
+            "items": {}
           }
         },
         "additionalProperties": false
@@ -45071,7 +45071,7 @@
             "nullable": true
           }
         },
-        "additionalProperties": { }
+        "additionalProperties": {}
       },
       "ProblemDetailsBuilderModel": {
         "type": "object",

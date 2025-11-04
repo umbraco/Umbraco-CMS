@@ -23,7 +23,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		forEntityTypes: [UMB_LANGUAGE_ROOT_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-add',
-			label: '#actions_create',
+			label: '#actions_createFor',
 			additionalOptions: true,
 		},
 	},

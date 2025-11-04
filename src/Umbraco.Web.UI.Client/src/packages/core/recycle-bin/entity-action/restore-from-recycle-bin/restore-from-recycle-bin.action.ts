@@ -2,7 +2,11 @@ import { UMB_RESTORE_FROM_RECYCLE_BIN_MODAL } from './modal/restore-from-recycle
 import type { MetaEntityActionRestoreFromRecycleBinKind } from './types.js';
 import { UmbEntityRestoredFromRecycleBinEvent } from './restore-from-recycle-bin.event.js';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
-import { UmbEntityActionBase, UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
+import {
+	UmbEntityActionBase,
+	UmbRequestReloadChildrenOfEntityEvent,
+	UmbRequestReloadStructureForEntityEvent,
+} from '@umbraco-cms/backoffice/entity-action';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 
 /**
@@ -35,12 +39,13 @@ export class UmbRestoreFromRecycleBinEntityAction extends UmbEntityActionBase<Me
 		if (!actionEventContext) {
 			throw new Error('Event context not found.');
 		}
-		const event = new UmbRequestReloadStructureForEntityEvent({
+
+		const sourceEvent = new UmbRequestReloadStructureForEntityEvent({
 			unique: this.args.unique,
 			entityType: this.args.entityType,
 		});
 
-		actionEventContext.dispatchEvent(event);
+		actionEventContext.dispatchEvent(sourceEvent);
 
 		const trashedEvent = new UmbEntityRestoredFromRecycleBinEvent({
 			unique: this.args.unique,
@@ -49,8 +54,12 @@ export class UmbRestoreFromRecycleBinEntityAction extends UmbEntityActionBase<Me
 
 		actionEventContext.dispatchEvent(trashedEvent);
 
-		// TODO: reload destination
-		console.log(destination.unique, destination.entityType);
+		const destinationEvent = new UmbRequestReloadChildrenOfEntityEvent({
+			unique: destination.unique,
+			entityType: destination.entityType,
+		});
+
+		actionEventContext.dispatchEvent(destinationEvent);
 	}
 }
 
