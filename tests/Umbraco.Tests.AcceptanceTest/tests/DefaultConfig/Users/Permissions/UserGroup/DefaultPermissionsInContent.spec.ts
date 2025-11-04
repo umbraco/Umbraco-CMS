@@ -162,6 +162,7 @@ test('can empty recycle bin with delete permission enabled', {tag: '@release'}, 
 
   // Act
   await umbracoUi.content.clickRecycleBinButton();
+  await umbracoUi.waitForTimeout(700);
   await umbracoUi.content.clickEmptyRecycleBinButton();
   await umbracoUi.content.clickConfirmEmptyRecycleBinButton();
 
