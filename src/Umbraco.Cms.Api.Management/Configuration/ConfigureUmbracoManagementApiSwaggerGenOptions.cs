@@ -1,13 +1,12 @@
 using Microsoft.AspNetCore.OpenApi;
-using Microsoft.Extensions.Options;
 using Microsoft.OpenApi;
+using Umbraco.Cms.Api.Common.Configuration;
 using Umbraco.Cms.Api.Common.Serialization;
 using Umbraco.Cms.Api.Management.DependencyInjection;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Configuration;
 
-public class ConfigureUmbracoManagementApiSwaggerGenOptions : IConfigureNamedOptions<OpenApiOptions>
+public class ConfigureUmbracoManagementApiSwaggerGenOptions : ConfigureUmbracoOpenApiOptionsBase
 {
     private IUmbracoJsonTypeInfoResolver _umbracoJsonTypeInfoResolver;
 
@@ -16,22 +15,11 @@ public class ConfigureUmbracoManagementApiSwaggerGenOptions : IConfigureNamedOpt
         _umbracoJsonTypeInfoResolver = umbracoJsonTypeInfoResolver;
     }
 
-    /// <inheritdoc />
-    public void Configure(OpenApiOptions options)
-    {
-        // No default configuration
-    }
+    protected override string ApiName => ManagementApiConfiguration.ApiName;
 
-    /// <inheritdoc />
-    public void Configure(string? name, OpenApiOptions options)
+    protected override void ConfigureOpenApi(OpenApiOptions options)
     {
-        if (name != ManagementApiConfiguration.ApiName)
-        {
-            return;
-        }
-
-        options.ConfigureUmbracoDefaultApiOptions(name);
-        options.AddDocumentTransformer((document, context, cancellationToken) =>
+        options.AddDocumentTransformer((document, _, _) =>
         {
             document.Info = new OpenApiInfo
             {

@@ -1,27 +1,17 @@
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi;
+using Umbraco.Cms.Api.Common.Configuration;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Delivery.Configuration;
 
-public class ConfigureUmbracoDeliveryApiSwaggerGenOptions : IConfigureNamedOptions<OpenApiOptions>
+public class ConfigureUmbracoDeliveryApiSwaggerGenOptions : ConfigureUmbracoOpenApiOptionsBase
 {
-    /// <inheritdoc />
-    public void Configure(OpenApiOptions options)
-    {
-        // No default configuration
-    }
+    protected override string ApiName => DeliveryApiConfiguration.ApiName;
 
-    /// <inheritdoc />
-    public void Configure(string? name, OpenApiOptions options)
+    protected override void ConfigureOpenApi(OpenApiOptions options)
     {
-        if (name != DeliveryApiConfiguration.ApiName)
-        {
-            return;
-        }
-
-        options.ConfigureUmbracoDefaultApiOptions(name);
         options.AddDocumentTransformer((document, context, cancellationToken) =>
         {
             document.Info = new OpenApiInfo

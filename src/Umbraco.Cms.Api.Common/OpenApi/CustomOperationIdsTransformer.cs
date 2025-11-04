@@ -1,46 +1,44 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.AspNetCore.OpenApi;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Microsoft.OpenApi;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Common.OpenApi;
 
-// NOTE: Left unsealed on purpose, so it is extendable.
-public class OperationIdHandler : IOperationIdHandler
+/// <summary>
+/// Transforms OpenAPI operation IDs using a custom selector.
+/// </summary>
+public class CustomOperationIdsTransformer : IOpenApiOperationTransformer
 {
-    private readonly ApiVersioningOptions _apiVersioningOptions;
-
-    public OperationIdHandler(IOptions<ApiVersioningOptions> apiVersioningOptions)
-        => _apiVersioningOptions = apiVersioningOptions.Value;
-
-    public bool CanHandle(ApiDescription apiDescription)
+    /// <summary>
+    /// Transforms the specified OpenAPI operation, setting its operation ID using a custom selector.
+    /// </summary>
+    /// <param name="operation">The <see cref="OpenApiOperation"/> to modify.</param>
+    /// <param name="context">The <see cref="OpenApiOperationTransformerContext"/> associated with the <see paramref="operation"/>.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns>The task object representing the asynchronous operation.</returns>
+    public Task TransformAsync(
+        OpenApiOperation operation,
+        OpenApiOperationTransformerContext context,
+        CancellationToken cancellationToken)
     {
-        if (apiDescription.ActionDescriptor is not ControllerActionDescriptor controllerActionDescriptor)
-        {
-            return false;
-        }
-
-        return CanHandle(apiDescription, controllerActionDescriptor);
+        operation.OperationId = GenerateOperationId(context);
+        return Task.CompletedTask;
     }
 
-    protected virtual bool CanHandle(ApiDescription apiDescription, ControllerActionDescriptor controllerActionDescriptor)
-        => controllerActionDescriptor.ControllerTypeInfo.Namespace?.StartsWith("Umbraco.Cms.Api") is true;
-
-    public virtual string Handle(ApiDescription apiDescription)
-        => UmbracoOperationId(apiDescription);
-
-    /// <summary>
-    ///     Generates a unique operation identifier for a given API following Umbraco's operation id naming conventions.
-    /// </summary>
-    protected string UmbracoOperationId(ApiDescription apiDescription)
+    private static string GenerateOperationId(OpenApiOperationTransformerContext context)
     {
+        ApiDescription apiDescription = context.Description;
         if (apiDescription.ActionDescriptor is not ControllerActionDescriptor controllerActionDescriptor)
         {
             throw new ArgumentException($"This handler operates only on {nameof(ControllerActionDescriptor)}.");
         }
 
-        ApiVersion defaultVersion = _apiVersioningOptions.DefaultApiVersion;
+        ApiVersion defaultVersion = context.ApplicationServices.GetRequiredService<IOptions<ApiVersioningOptions>>().Value.DefaultApiVersion;
         var httpMethod = apiDescription.HttpMethod?.ToLower().ToFirstUpper() ?? "Get";
 
         // if the route info "Name" is supplied we'll use this explicitly as the operation ID
