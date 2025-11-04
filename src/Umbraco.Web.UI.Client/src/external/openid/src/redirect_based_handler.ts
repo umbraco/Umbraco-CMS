@@ -78,6 +78,41 @@ export class RedirectRequestHandler extends AuthorizationRequestHandler {
 	}
 
 	/**
+	 * Cleanup all stale authorization requests and configurations from storage.
+	 * This scans localStorage for any keys matching the appauth patterns and removes them,
+	 * including the authorization request handle key.
+	 */
+	protected cleanupStaleAuthorizationData(): Promise<void> {
+		// Check if we're in a browser environment with localStorage
+		if (typeof window === 'undefined' || !window.localStorage) {
+			return Promise.resolve();
+		}
+
+		const keysToRemove: string[] = [];
+
+		// Scan localStorage for all appauth-related keys
+		for (let i = 0; i < window.localStorage.length; i++) {
+			const key = window.localStorage.key(i);
+			if (
+				key &&
+				(key.includes('_appauth_authorization_request') ||
+					key.includes('_appauth_authorization_service_configuration') ||
+					key === AUTHORIZATION_REQUEST_HANDLE_KEY)
+			) {
+				keysToRemove.push(key);
+			}
+		}
+
+		// Remove all found stale keys
+		const removePromises = keysToRemove.map((key) => this.storageBackend.removeItem(key));
+		return Promise.all(removePromises).then(() => {
+			if (keysToRemove.length > 0) {
+				log(`Cleaned up ${keysToRemove.length} stale authorization data entries`);
+			}
+		});
+	}
+
+	/**
 	 * Attempts to introspect the contents of storage backend and completes the
 	 * request.
 	 */
@@ -119,12 +154,8 @@ export class RedirectRequestHandler extends AuthorizationRequestHandler {
 								} else {
 									authorizationResponse = new AuthorizationResponse({ code: code, state: state });
 								}
-								// cleanup state
-								return Promise.all([
-									this.storageBackend.removeItem(AUTHORIZATION_REQUEST_HANDLE_KEY),
-									this.storageBackend.removeItem(authorizationRequestKey(handle)),
-									this.storageBackend.removeItem(authorizationServiceConfigurationKey(handle)),
-								]).then(() => {
+								// cleanup all authorization data including current and stale entries
+								return this.cleanupStaleAuthorizationData().then(() => {
 									log('Delivering authorization response');
 									return {
 										request: request,
@@ -134,7 +165,10 @@ export class RedirectRequestHandler extends AuthorizationRequestHandler {
 								});
 							} else {
 								log('Mismatched request (state and request_uri) dont match.');
-								return Promise.resolve(null);
+								// cleanup all authorization data even on mismatch to prevent stale PKCE data
+								return this.cleanupStaleAuthorizationData().then(() => {
+									return null;
+								});
 							}
 						})
 				);
