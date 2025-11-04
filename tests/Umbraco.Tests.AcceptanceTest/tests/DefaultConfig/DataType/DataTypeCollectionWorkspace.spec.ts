@@ -21,7 +21,7 @@ test('can create a data type using create options', async ({umbracoApi, umbracoU
   await umbracoUi.dataType.clickDataTypesMenu();
 
   // Act
-  await umbracoUi.dataType.clickCreateActionWithOptionName('New Data Type');
+  await umbracoUi.dataType.clickCreateActionWithOptionName('Data Type');
   await umbracoUi.dataType.enterDataTypeName(dataTypeName);
   await umbracoUi.dataType.clickSelectAPropertyEditorButton();
   await umbracoUi.dataType.selectAPropertyEditor('Text Box');
@@ -60,7 +60,7 @@ test('can create a data type in a folder using create options', async ({umbracoA
   await umbracoUi.dataType.goToDataType(dataTypeFolderName);
 
   // Act
-  await umbracoUi.dataType.clickCreateActionWithOptionName('New Data Type');
+  await umbracoUi.dataType.clickCreateActionWithOptionName('Data Type');
   await umbracoUi.dataType.enterDataTypeName(dataTypeName);
   await umbracoUi.dataType.clickSelectAPropertyEditorButton();
   await umbracoUi.dataType.selectAPropertyEditor('Text Box');

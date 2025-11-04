@@ -44,7 +44,7 @@ class UmbLogViewerMessagesData extends UmbMockDBBase<LogMessageResponseModel> {
 	}
 
 	getLevelCount() {
-		const levels = this.data.map((log) => log.level ?? 'unknown');
+		const levels = this.data.map((log) => log.level?.toLowerCase() ?? 'unknown');
 		const counts = {};
 		levels.forEach((level: string) => {
 			//eslint-disable-next-line @typescript-eslint/ban-ts-comment

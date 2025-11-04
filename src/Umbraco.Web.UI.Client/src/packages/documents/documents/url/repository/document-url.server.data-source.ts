@@ -38,4 +38,7 @@ export class UmbDocumentUrlServerDataSource extends UmbItemServerDataSourceBase<
 	}
 }
 
-const mapper = (item: DocumentUrlInfoResponseModel): UmbDocumentUrlsModel => ({ unique: item.id, urls: item.urlInfos });
+const mapper = (item: DocumentUrlInfoResponseModel): UmbDocumentUrlsModel => ({
+	unique: item.id,
+	urls: item.urlInfos.map((urlInfo) => ({ culture: urlInfo.culture, url: urlInfo.url ?? undefined })),
+});

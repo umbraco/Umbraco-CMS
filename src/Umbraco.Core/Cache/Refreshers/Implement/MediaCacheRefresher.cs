@@ -22,31 +22,6 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
     private readonly IMediaCacheService _mediaCacheService;
     private readonly ICacheManager _cacheManager;
 
-    [Obsolete("Use the constructor with ICacheManager instead, scheduled for removal in V17.")]
-    public MediaCacheRefresher(
-        AppCaches appCaches,
-        IJsonSerializer serializer,
-        IIdKeyMap idKeyMap,
-        IEventAggregator eventAggregator,
-        ICacheRefresherNotificationFactory factory,
-        IMediaNavigationQueryService mediaNavigationQueryService,
-        IMediaNavigationManagementService mediaNavigationManagementService,
-        IMediaService mediaService,
-        IMediaCacheService mediaCacheService)
-        : this(
-            appCaches,
-            serializer,
-            idKeyMap,
-            eventAggregator,
-            factory,
-            mediaNavigationQueryService,
-            mediaNavigationManagementService,
-            mediaService,
-            mediaCacheService,
-            StaticServiceProvider.Instance.GetRequiredService<ICacheManager>())
-    {
-    }
-
     public MediaCacheRefresher(
         AppCaches appCaches,
         IJsonSerializer serializer,
@@ -108,13 +83,8 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
 
     #region Refresher
 
-    public override void Refresh(JsonPayload[]? payloads)
+    public override void RefreshInternal(JsonPayload[] payloads)
     {
-        if (payloads == null)
-        {
-            return;
-        }
-
         // actions that always need to happen
         AppCaches.RuntimeCache.ClearByKey(CacheKeys.MediaRecycleBinCacheKey);
         Attempt<IAppPolicyCache?> mediaCache = AppCaches.IsolatedCaches.Get<IMedia>();
@@ -133,22 +103,37 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
                 _idKeyMap.ClearCache(payload.Id);
             }
 
-            if (mediaCache.Success)
+            if (mediaCache.Success is false || mediaCache.Result is null)
             {
-                // repository cache
-                // it *was* done for each pathId but really that does not make sense
-                // only need to do it for the current media
-                mediaCache.Result?.Clear(RepositoryCacheKeys.GetKey<IMedia, int>(payload.Id));
-                mediaCache.Result?.Clear(RepositoryCacheKeys.GetKey<IMedia, Guid?>(payload.Key));
-
-                // remove those that are in the branch
-                if (payload.ChangeTypes.HasTypesAny(TreeChangeTypes.RefreshBranch | TreeChangeTypes.Remove))
-                {
-                    var pathid = "," + payload.Id + ",";
-                    mediaCache.Result?.ClearOfType<IMedia>((_, v) => v.Path?.Contains(pathid) ?? false);
-                }
+                continue;
             }
 
+            // repository cache
+            // it *was* done for each pathId but really that does not make sense
+            // only need to do it for the current media
+            mediaCache.Result.Clear(RepositoryCacheKeys.GetKey<IMedia, int>(payload.Id));
+            mediaCache.Result.Clear(RepositoryCacheKeys.GetKey<IMedia, Guid?>(payload.Key));
+
+            // remove those that are in the branch
+            if (payload.ChangeTypes.HasTypesAny(TreeChangeTypes.RefreshBranch | TreeChangeTypes.Remove))
+            {
+                var pathid = "," + payload.Id + ",";
+                mediaCache.Result.ClearOfType<IMedia>((_, v) => v.Path?.Contains(pathid) ?? false);
+            }
+        }
+
+        base.RefreshInternal(payloads);
+    }
+
+    public override void Refresh(JsonPayload[]? payloads)
+    {
+        if (payloads is null)
+        {
+            return;
+        }
+
+        foreach (JsonPayload payload in payloads)
+        {
             HandleMemoryCache(payload);
             HandleNavigation(payload);
         }

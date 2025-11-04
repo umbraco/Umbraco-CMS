@@ -7,7 +7,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
-public class PublishStatusRepository: IPublishStatusRepository
+public class PublishStatusRepository : IPublishStatusRepository
 {
     private readonly IScopeAccessor _scopeAccessor;
 
@@ -27,22 +27,22 @@ public class PublishStatusRepository: IPublishStatusRepository
         }
     }
 
-    private Sql<ISqlContext>  GetBaseQuery()
+    private Sql<ISqlContext> GetBaseQuery()
     {
+        SqlSyntax.ISqlSyntaxProvider syntax = Database.SqlContext.SqlSyntax;
         Sql<ISqlContext> sql = Database.SqlContext.Sql()
             .Select(
-                $"n.{NodeDto.KeyColumnName}",
-                $"l.{LanguageDto.IsoCodeColumnName}",
-                $"ct.{ContentTypeDto.VariationsColumnName}",
-                $"d.{DocumentDto.PublishedColumnName}",
-                $"COALESCE(dcv.{DocumentCultureVariationDto.PublishedColumnName}, 0) as {PublishStatusDto.DocumentVariantPublishStatusColumnName}")
+                $"n.{syntax.GetQuotedColumnName(NodeDto.KeyColumnName)}",
+                $"l.{syntax.GetQuotedColumnName(LanguageDto.IsoCodeColumnName)}",
+                $"ct.{syntax.GetQuotedColumnName(ContentTypeDto.VariationsColumnName)}",
+                $"d.{syntax.GetQuotedColumnName(DocumentDto.PublishedColumnName)}",
+                $"dcv.{syntax.GetQuotedColumnName(DocumentCultureVariationDto.PublishedColumnName)} as {syntax.GetQuotedColumnName(PublishStatusDto.DocumentVariantPublishStatusColumnName)}") // COALESCE is not necessary as the column is not nullable
             .From<DocumentDto>("d")
             .InnerJoin<ContentDto>("c").On<DocumentDto, ContentDto>((d, c) => d.NodeId == c.NodeId, "c", "d")
             .InnerJoin<ContentTypeDto>("ct").On<ContentDto, ContentTypeDto>((c, ct) => c.ContentTypeId == ct.NodeId, "c", "ct")
             .CrossJoin<LanguageDto>("l")
-            .LeftJoin<DocumentCultureVariationDto>("dcv").On<LanguageDto, DocumentCultureVariationDto, DocumentDto >((l, dcv, d) => l.Id == dcv.LanguageId && d.NodeId == dcv.NodeId , "l", "dcv", "d")
-            .InnerJoin<NodeDto>("n").On<DocumentDto, NodeDto>((d, n) => n.NodeId == d.NodeId, "d", "n")
-            ;
+            .LeftJoin<DocumentCultureVariationDto>("dcv").On<LanguageDto, DocumentCultureVariationDto, DocumentDto>((l, dcv, d) => l.Id == dcv.LanguageId && d.NodeId == dcv.NodeId, "l", "dcv", "d")
+            .InnerJoin<NodeDto>("n").On<DocumentDto, NodeDto>((d, n) => n.NodeId == d.NodeId, "d", "n");
 
         return sql;
     }
@@ -92,8 +92,8 @@ public class PublishStatusRepository: IPublishStatusRepository
         return databaseRecords
             .GroupBy(x => x.Key)
             .ToDictionary(
-                x=>x.Key,
-                x=> (ISet<string>) x.Where(x=> IsPublished(x)).Select(y=>y.IsoCode).ToHashSet());
+                x => x.Key,
+                x => (ISet<string>)x.Where(x => IsPublished(x)).Select(y => y.IsoCode).ToHashSet());
     }
 
     private static bool IsPublished(PublishStatusDto publishStatusDto)
@@ -123,12 +123,12 @@ public class PublishStatusRepository: IPublishStatusRepository
         public string IsoCode { get; set; } = string.Empty;
 
         [Column(ContentTypeDto.VariationsColumnName)]
-        public byte ContentTypeVariation  { get; set; }
+        public byte ContentTypeVariation { get; set; }
 
         [Column(DocumentDto.PublishedColumnName)]
-        public bool DocumentInvariantPublished  { get; set; }
+        public bool DocumentInvariantPublished { get; set; }
 
         [Column(DocumentVariantPublishStatusColumnName)]
-        public bool DocumentVariantPublishStatus  { get; set; }
+        public bool DocumentVariantPublishStatus { get; set; }
     }
 }

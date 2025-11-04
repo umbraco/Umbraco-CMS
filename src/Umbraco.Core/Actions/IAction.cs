@@ -35,23 +35,8 @@ public interface IAction : IDiscoverable
     bool CanBePermissionAssigned { get; }
 
     /// <summary>
-    ///     Gets the icon to display for this action
-    /// </summary>
-    [Obsolete("No longer used. Scheduled for removal in V17.")]
-    string Icon { get; }
-
-    /// <summary>
     ///     Gets the alias for this action (must be unique).
     ///     This is all lower-case because of case sensitive filesystems, see issue: https://github.com/umbraco/Umbraco-CMS/issues/11670.
     /// </summary>
     string Alias { get; }
-
-    /// <summary>
-    ///     Gets the category used for this action
-    /// </summary>
-    /// <remarks>
-    ///     Used in the UI when assigning permissions
-    /// </remarks>
-    [Obsolete("No longer used. Scheduled for removal in V17.")]
-    string? Category { get; }
 }

@@ -34,7 +34,10 @@ internal sealed class DocumentHybridCacheScopeTests : UmbracoIntegrationTestWith
     {
         using (CoreScopeProvider.CreateCoreScope())
         {
-            await ContentPublishingService.PublishAsync(Textpage.Key.Value, CultureAndSchedule, Constants.Security.SuperUserKey);
+            await ContentPublishingService.PublishAsync(
+                Textpage.Key.Value,
+                [new CulturePublishScheduleModel { Culture = "*" }],
+                Constants.Security.SuperUserKey);
         }
 
         // Act
@@ -49,7 +52,9 @@ internal sealed class DocumentHybridCacheScopeTests : UmbracoIntegrationTestWith
     {
         using (CoreScopeProvider.CreateCoreScope())
         {
-            await ContentPublishingService.PublishAsync(Textpage.Key.Value, CultureAndSchedule, Constants.Security.SuperUserKey);
+            await ContentPublishingService.PublishAsync(Textpage.Key.Value,
+                [new CulturePublishScheduleModel { Culture = "*" }],
+                Constants.Security.SuperUserKey);
         }
 
         // Act
@@ -64,7 +69,10 @@ internal sealed class DocumentHybridCacheScopeTests : UmbracoIntegrationTestWith
     {
         using (var scope = CoreScopeProvider.CreateCoreScope())
         {
-            await ContentPublishingService.PublishAsync(Textpage.Key.Value, CultureAndSchedule, Constants.Security.SuperUserKey);
+            await ContentPublishingService.PublishAsync(
+                Textpage.Key.Value,
+                [new CulturePublishScheduleModel { Culture = "*" }],
+                Constants.Security.SuperUserKey);
             scope.Complete();
         }
 
@@ -80,7 +88,10 @@ internal sealed class DocumentHybridCacheScopeTests : UmbracoIntegrationTestWith
     {
         using (var scope = CoreScopeProvider.CreateCoreScope())
         {
-            await ContentPublishingService.PublishAsync(Textpage.Key.Value, CultureAndSchedule, Constants.Security.SuperUserKey);
+            await ContentPublishingService.PublishAsync(
+                Textpage.Key.Value,
+                [new CulturePublishScheduleModel { Culture = "*" }],
+                Constants.Security.SuperUserKey);
             scope.Complete();
         }
 

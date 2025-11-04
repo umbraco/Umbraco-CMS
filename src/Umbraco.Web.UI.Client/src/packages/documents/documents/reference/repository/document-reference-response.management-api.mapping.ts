@@ -1,10 +1,7 @@
 import type { UmbDocumentReferenceModel } from '../types.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
-import {
-	DocumentVariantStateModel,
-	type DocumentReferenceResponseModel,
-} from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import type { DocumentReferenceResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbDataSourceDataMapping } from '@umbraco-cms/backoffice/repository';
 
 export class UmbDocumentReferenceResponseManagementApiDataMapping
@@ -20,18 +17,11 @@ export class UmbDocumentReferenceResponseManagementApiDataMapping
 				unique: data.documentType.id,
 			},
 			entityType: UMB_DOCUMENT_ENTITY_TYPE,
-			id: data.id,
-			name: data.name,
-			published: data.published,
-			// TODO: this is a hardcoded array until the server can return the correct variants array
-			variants: [
-				{
-					culture: null,
-					name: data.name ?? '',
-					state: data.published ? DocumentVariantStateModel.PUBLISHED : null,
-					flags: [],
-				},
-			],
+			variants: data.variants.map((variant) => ({
+				...variant,
+				// TODO: Review if we should make `culture` to allow `undefined`. [LK]
+				culture: variant.culture ?? null,
+			})),
 			unique: data.id,
 		};
 	}

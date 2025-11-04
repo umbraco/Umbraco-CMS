@@ -4,11 +4,13 @@ using Microsoft.Extensions.Options;
 using Moq;
 using NPoco;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Semver;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
+using Umbraco.Cms.DevelopmentMode.Backoffice.InMemoryAuto;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Telemetry.Providers;
 
@@ -90,18 +92,18 @@ public class SystemInformationServiceTests
     }
 
     [Test]
-    [TestCase(ModelsMode.Nothing)]
-    [TestCase(ModelsMode.InMemoryAuto)]
-    [TestCase(ModelsMode.SourceCodeAuto)]
-    [TestCase(ModelsMode.SourceCodeManual)]
-    public void ReportsModelsModeCorrectly(ModelsMode modelsMode)
+    [TestCase(Constants.ModelsBuilder.ModelsModes.Nothing)]
+    [TestCase(ModelsModeConstants.InMemoryAuto)]
+    [TestCase(Constants.ModelsBuilder.ModelsModes.SourceCodeAuto)]
+    [TestCase(Constants.ModelsBuilder.ModelsModes.SourceCodeManual)]
+    public void ReportsModelsModeCorrectly(string modelsMode)
     {
         var userDataService = CreateSystemInformationService(modelsMode: modelsMode);
         var userData = userDataService.GetTroubleshootingInformation().ToArray();
 
         var actual = userData.FirstOrDefault(x => x.Key == "Models Builder Mode");
         Assert.IsNotNull(actual.Value);
-        Assert.AreEqual(modelsMode.ToString(), actual.Value);
+        Assert.AreEqual(modelsMode, actual.Value);
     }
 
     [Test]
@@ -133,7 +135,7 @@ public class SystemInformationServiceTests
 
     private ISystemTroubleshootingInformationService CreateSystemInformationService(
         string culture = "",
-        ModelsMode modelsMode = ModelsMode.InMemoryAuto,
+        string modelsMode = ModelsModeConstants.InMemoryAuto,
         bool isDebug = true,
         RuntimeMode runtimeMode = RuntimeMode.BackofficeDevelopment)
     {

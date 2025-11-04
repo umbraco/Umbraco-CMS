@@ -258,6 +258,8 @@ public static class FriendlyImageCropperTemplateExtensions
     /// furtherOptions: "bgcolor=fff"
     /// ]]></example>
     /// </param>
+    /// <param name="sourceWidth">The width of the source image.</param>
+    /// <param name="sourceHeight">The height of the source image.</param>
     /// <returns>
     ///     The URL of the cropped image.
     /// </returns>
@@ -273,7 +275,9 @@ public static class FriendlyImageCropperTemplateExtensions
         bool preferFocalPoint = false,
         bool useCropDimensions = false,
         string? cacheBusterValue = null,
-        string? furtherOptions = null)
+        string? furtherOptions = null,
+        int? sourceWidth = null,
+        int? sourceHeight = null)
         => imageUrl.GetCropUrl(
             ImageUrlGenerator,
             width,
@@ -286,7 +290,9 @@ public static class FriendlyImageCropperTemplateExtensions
             preferFocalPoint,
             useCropDimensions,
             cacheBusterValue,
-            furtherOptions);
+            furtherOptions,
+            sourceWidth,
+            sourceHeight);
 
     /// <summary>
     ///     Gets the underlying image processing service URL from the image path.
@@ -318,6 +324,8 @@ public static class FriendlyImageCropperTemplateExtensions
     /// furtherOptions: "bgcolor=fff"
     /// ]]></example>
     /// </param>
+    /// <param name="sourceWidth">The width of the source image.</param>
+    /// <param name="sourceHeight">The height of the source image.</param>
     /// <returns>
     ///     The URL of the cropped image.
     /// </returns>
@@ -333,7 +341,9 @@ public static class FriendlyImageCropperTemplateExtensions
         bool preferFocalPoint = false,
         bool useCropDimensions = false,
         string? cacheBusterValue = null,
-        string? furtherOptions = null)
+        string? furtherOptions = null,
+        int? sourceWidth = null,
+        int? sourceHeight = null)
         => imageUrl.GetCropUrl(
             ImageUrlGenerator,
             cropDataSet,
@@ -346,5 +356,7 @@ public static class FriendlyImageCropperTemplateExtensions
             preferFocalPoint,
             useCropDimensions,
             cacheBusterValue,
-            furtherOptions);
+            furtherOptions,
+            sourceWidth,
+            sourceHeight);
 }

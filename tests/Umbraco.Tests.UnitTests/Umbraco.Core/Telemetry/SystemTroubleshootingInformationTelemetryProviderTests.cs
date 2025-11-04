@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
+using Umbraco.Cms.DevelopmentMode.Backoffice.InMemoryAuto;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Telemetry.Providers;
 
@@ -18,18 +19,18 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry;
 public class SystemTroubleshootingInformationTelemetryProviderTests
 {
     [Test]
-    [TestCase(ModelsMode.Nothing)]
-    [TestCase(ModelsMode.InMemoryAuto)]
-    [TestCase(ModelsMode.SourceCodeAuto)]
-    [TestCase(ModelsMode.SourceCodeManual)]
-    public void ReportsModelsModeCorrectly(ModelsMode modelsMode)
+    [TestCase(Constants.ModelsBuilder.ModelsModes.Nothing)]
+    [TestCase(ModelsModeConstants.InMemoryAuto)]
+    [TestCase(Constants.ModelsBuilder.ModelsModes.SourceCodeAuto)]
+    [TestCase(Constants.ModelsBuilder.ModelsModes.SourceCodeManual)]
+    public void ReportsModelsModeCorrectly(string modelsMode)
     {
         var telemetryProvider = CreateProvider(modelsMode);
         var usageInformation = telemetryProvider.GetInformation().ToArray();
 
         var actual = usageInformation.FirstOrDefault(x => x.Name == Constants.Telemetry.ModelsBuilderMode);
         Assert.IsNotNull(actual?.Data);
-        Assert.AreEqual(modelsMode.ToString(), actual.Data);
+        Assert.AreEqual(modelsMode, actual.Data);
     }
 
     [Test]
@@ -93,7 +94,7 @@ public class SystemTroubleshootingInformationTelemetryProviderTests
     }
 
     private SystemTroubleshootingInformationTelemetryProvider CreateProvider(
-        ModelsMode modelsMode = ModelsMode.InMemoryAuto,
+        string modelsMode = ModelsModeConstants.InMemoryAuto,
         bool isDebug = true,
         string environment = "",
         RuntimeMode runtimeMode = RuntimeMode.BackofficeDevelopment)

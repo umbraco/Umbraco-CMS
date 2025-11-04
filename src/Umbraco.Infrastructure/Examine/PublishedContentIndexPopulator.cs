@@ -1,4 +1,6 @@
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence;
 
@@ -15,12 +17,23 @@ namespace Umbraco.Cms.Infrastructure.Examine;
 /// </remarks>
 public class PublishedContentIndexPopulator : ContentIndexPopulator
 {
+    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in V19.")]
     public PublishedContentIndexPopulator(
         ILogger<PublishedContentIndexPopulator> logger,
         IContentService contentService,
         IUmbracoDatabaseFactory umbracoDatabaseFactory,
         IPublishedContentValueSetBuilder contentValueSetBuilder)
         : base(logger, true, null, contentService, umbracoDatabaseFactory, contentValueSetBuilder)
+    {
+    }
+
+    public PublishedContentIndexPopulator(
+        ILogger<PublishedContentIndexPopulator> logger,
+        IContentService contentService,
+        IUmbracoDatabaseFactory umbracoDatabaseFactory,
+        IPublishedContentValueSetBuilder contentValueSetBuilder,
+        IOptionsMonitor<IndexingSettings> indexingSettings)
+        : base(logger, true, null, contentService, umbracoDatabaseFactory, contentValueSetBuilder, indexingSettings)
     {
     }
 }

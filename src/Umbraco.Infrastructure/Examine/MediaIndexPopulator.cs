@@ -1,5 +1,9 @@
 using Examine;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 
@@ -15,23 +19,43 @@ public class MediaIndexPopulator : IndexPopulator<IUmbracoContentIndex>
     private readonly IValueSetBuilder<IMedia> _mediaValueSetBuilder;
     private readonly int? _parentId;
 
+    private IndexingSettings _indexingSettings;
+
+    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in V19.")]
+    public MediaIndexPopulator(ILogger<MediaIndexPopulator> logger, IMediaService mediaService, IValueSetBuilder<IMedia> mediaValueSetBuilder)
+        : this(logger, null, mediaService, mediaValueSetBuilder, StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<IndexingSettings>>())
+    {
+    }
+
     /// <summary>
     ///     Default constructor to lookup all content data
     /// </summary>
-    public MediaIndexPopulator(ILogger<MediaIndexPopulator> logger, IMediaService mediaService, IValueSetBuilder<IMedia> mediaValueSetBuilder)
-        : this(logger, null, mediaService, mediaValueSetBuilder)
+    public MediaIndexPopulator(ILogger<MediaIndexPopulator> logger, IMediaService mediaService, IValueSetBuilder<IMedia> mediaValueSetBuilder, IOptionsMonitor<IndexingSettings> indexingSettings)
+        : this(logger, null, mediaService, mediaValueSetBuilder, indexingSettings)
+    {
+    }
+
+    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in V19.")]
+    public MediaIndexPopulator(ILogger<MediaIndexPopulator> logger, int? parentId, IMediaService mediaService, IValueSetBuilder<IMedia> mediaValueSetBuilder)
+        : this(logger, parentId, mediaService, mediaValueSetBuilder, StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<IndexingSettings>>())
     {
     }
 
     /// <summary>
     ///     Optional constructor allowing specifying custom query parameters
     /// </summary>
-    public MediaIndexPopulator(ILogger<MediaIndexPopulator> logger, int? parentId, IMediaService mediaService, IValueSetBuilder<IMedia> mediaValueSetBuilder)
+    public MediaIndexPopulator(ILogger<MediaIndexPopulator> logger, int? parentId, IMediaService mediaService, IValueSetBuilder<IMedia> mediaValueSetBuilder, IOptionsMonitor<IndexingSettings> indexingSettings)
     {
         _logger = logger;
         _parentId = parentId;
         _mediaService = mediaService;
         _mediaValueSetBuilder = mediaValueSetBuilder;
+        _indexingSettings = indexingSettings.CurrentValue;
+
+        indexingSettings.OnChange(change =>
+        {
+            _indexingSettings = change;
+        });
     }
 
     protected override void PopulateIndexes(IReadOnlyList<IIndex> indexes)
@@ -46,7 +70,6 @@ public class MediaIndexPopulator : IndexPopulator<IUmbracoContentIndex>
             return;
         }
 
-        const int pageSize = 10000;
         var pageIndex = 0;
 
         var mediaParentId = -1;
@@ -60,7 +83,7 @@ public class MediaIndexPopulator : IndexPopulator<IUmbracoContentIndex>
 
         do
         {
-            media = _mediaService.GetPagedDescendants(mediaParentId, pageIndex, pageSize, out _).ToArray();
+            media = _mediaService.GetPagedDescendants(mediaParentId, pageIndex, _indexingSettings.BatchSize, out _).ToArray();
 
             // ReSharper disable once PossibleMultipleEnumeration
             foreach (IIndex index in indexes)
@@ -70,6 +93,6 @@ public class MediaIndexPopulator : IndexPopulator<IUmbracoContentIndex>
 
             pageIndex++;
         }
-        while (media.Length == pageSize);
+        while (media.Length == _indexingSettings.BatchSize);
     }
 }
