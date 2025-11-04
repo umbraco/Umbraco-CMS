@@ -10,7 +10,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Infrastructure.Security;
 
 /// <summary>
-/// Provides OpenIddict server event handlers to expose back-office authentication via a custom authentication scheme.
+/// Provides OpenIddict server event handlers to expose the backoffice authentication token via a custom authentication scheme.
 /// </summary>
 public class ExposeBackOfficeAuthenticationOpenIddictServerEventsHandler : IOpenIddictServerHandler<OpenIddictServerEvents.GenerateTokenContext>,
     IOpenIddictServerHandler<OpenIddictServerEvents.ApplyRevocationResponseContext>

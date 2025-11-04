@@ -80,7 +80,7 @@ public static partial class Constants
         public const string BackOfficeExposedAuthenticationType = "UmbracoBackOfficeExposed";
 
         /// <summary>
-        /// Represents the name of the authentication cookie used to expose the backoffice context out of the backoffice context.
+        /// Represents the name of the authentication cookie used to expose the backoffice authentication token outside of the backoffice context.
         /// </summary>
         public const string BackOfficeExposedCookieName = "UMB_UCONTEXT_EXPOSED";
 
