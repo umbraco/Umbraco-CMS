@@ -9,6 +9,7 @@ schedules:
     branches:
       include:
         - v15/dev
+        - v16/dev
         - main
         - v17/dev
 
