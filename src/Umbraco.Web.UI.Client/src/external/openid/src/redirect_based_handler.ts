@@ -82,7 +82,7 @@ export class RedirectRequestHandler extends AuthorizationRequestHandler {
 	 * This scans localStorage for any keys matching the appauth patterns and removes them,
 	 * including the authorization request handle key.
 	 */
-	protected cleanupStaleAuthorizationData(): Promise<void> {
+	public cleanupStaleAuthorizationData(): Promise<void> {
 		// Check if we're in a browser environment with localStorage
 		if (typeof window === 'undefined' || !window.localStorage) {
 			return Promise.resolve();
