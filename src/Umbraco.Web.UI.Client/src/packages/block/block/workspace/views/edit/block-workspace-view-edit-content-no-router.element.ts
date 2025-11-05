@@ -25,9 +25,6 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 	@state()
 	private _activeTabKey?: string | null | undefined;
 
-	//@state()
-	//private _activeTabName?: string | null | undefined;
-
 	#blockWorkspace?: typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE;
 	#tabsStructureHelper = new UmbContentTypeContainerStructureHelper(this);
 
@@ -70,17 +67,14 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 		// Find the default tab to grab:
 		if (this._activeTabKey === undefined) {
 			if (this._hasRootGroups) {
-				//this._activeTabName = null;
 				this._activeTabKey = null;
 			} else if (this._tabs.length > 0) {
-				//this._activeTabName = this._tabs[0].name;
-				this._activeTabKey = this._tabs[0].key;
+				this._activeTabKey = this._tabs[0].ids[0];
 			}
 		}
 	}
 
-	#setTabName(tabName: string | undefined | null, tabKey: string | null | undefined) {
-		//this._activeTabName = tabName;
+	#setTabKey(tabKey: string | null | undefined) {
 		this._activeTabKey = tabKey;
 	}
 
@@ -90,14 +84,12 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 			${this._tabs.length > 1 || (this._tabs.length === 1 && this._hasRootGroups)
 				? html` <uui-tab-group slot="header">
 						${this._hasRootGroups && this._tabs.length > 0
-							? html`
-									<uui-tab
-										label="Content"
-										.active=${null === this._activeTabKey}
-										@click=${() => this.#setTabName(null, null)}
-										>Content</uui-tab
-									>
-								`
+							? html`<uui-tab
+									label="Content"
+									.active=${this._activeTabKey === null}
+									@click=${() => this.#setTabKey(null)}
+									>Content</uui-tab
+								>`
 							: nothing}
 						${repeat(
 							this._tabs,
@@ -105,8 +97,8 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 							(tab) => {
 								return html`<uui-tab
 									label=${tab.name ?? 'Unnamed'}
-									.active=${tab.key === this._activeTabKey}
-									@click=${() => this.#setTabName(tab.name, tab.key)}
+									.active=${this._activeTabKey === tab.ids[0]}
+									@click=${() => this.#setTabKey(tab.ids[0])}
 									>${tab.name}</uui-tab
 								>`;
 							},
