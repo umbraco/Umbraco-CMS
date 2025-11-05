@@ -1,4 +1,5 @@
 import type { Editor } from '../../externals.js';
+import { NodeSelection } from '../../externals.js';
 import { UmbTiptapToolbarElementApiBase } from '../tiptap-toolbar-element-api-base.js';
 import { getGuidFromUdi, imageSize } from '@umbraco-cms/backoffice/utils';
 import { ImageCropModeModel } from '@umbraco-cms/backoffice/external/backend-api';
@@ -41,7 +42,6 @@ export default class UmbTiptapToolbarMediaPickerToolbarExtensionApi extends UmbT
 
 	override async execute(editor: Editor) {
 		const currentTarget = editor.getAttributes('image');
-		const figure = editor.getAttributes('figure');
 
 		let currentMediaUdi: string | undefined = undefined;
 		if (currentTarget?.['data-udi']) {
@@ -54,17 +54,42 @@ export default class UmbTiptapToolbarMediaPickerToolbarExtensionApi extends UmbT
 		}
 
 		let currentCaption: string | undefined = undefined;
-		if (figure?.figcaption) {
-			currentCaption = figure.figcaption;
+		// Find the figure node and extract the figcaption text
+		const selection = editor.state.selection;
+
+		// Check if the selection is a NodeSelection with a figure node
+		if (selection instanceof NodeSelection) {
+			const selectedNode = selection.node;
+
+			if (selectedNode.type.name === 'figure') {
+				// Extract the figcaption text from the figure node
+				selectedNode.descendants((child) => {
+					if (child.type.name === 'figcaption') {
+						currentCaption = child.textContent || undefined;
+						return false; // Stop searching
+					}
+					return true; // Continue searching
+				});
+			}
 		}
 
-		const selection = await this.#openMediaPicker(currentMediaUdi);
-		if (!selection?.length) return;
+		let mediaGuid: string;
 
-		const mediaGuid = selection[0];
+		if (currentMediaUdi) {
+			// Image already exists, go directly to edit alt text/caption
+			mediaGuid = currentMediaUdi;
+		} else {
+			// No image selected, open media picker
+			const selection = await this.#openMediaPicker();
+			if (!selection?.length) return;
 
-		if (!mediaGuid) {
-			throw new Error('No media selected');
+			const selectedGuid = selection[0];
+
+			if (!selectedGuid) {
+				throw new Error('No media selected');
+			}
+
+			mediaGuid = selectedGuid;
 		}
 
 		const media = await this.#showMediaCaptionAltText(mediaGuid, currentAltText, currentCaption);

@@ -14,6 +14,9 @@ export { HardBreak } from '@tiptap/extension-hard-break';
 export { Paragraph } from '@tiptap/extension-paragraph';
 export { Text } from '@tiptap/extension-text';
 
+// PROSEMIRROR TYPES
+export { NodeSelection } from '@tiptap/pm/state';
+
 // OPTIONAL EXTENSIONS
 export { Blockquote } from '@tiptap/extension-blockquote';
 export { Bold } from '@tiptap/extension-bold';
