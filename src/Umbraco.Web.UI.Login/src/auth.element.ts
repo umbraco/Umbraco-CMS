@@ -1,10 +1,10 @@
-import { html, customElement, property, ifDefined, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { InputType, UUIFormLayoutItemElement } from '@umbraco-cms/backoffice/external/uui';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
-import { UMB_AUTH_CONTEXT, UmbAuthContext } from './contexts';
-import { UmbSlimBackofficeController } from './controllers';
+import { UMB_AUTH_CONTEXT, UmbAuthContext } from './contexts/index.js';
+import { UmbSlimBackofficeController } from './controllers/index.js';
 
 // We import the authStyles here so that we can inline it in the shadow DOM that is created outside of the UmbAuthElement.
 import authStyles from './auth-styles.css?inline';
@@ -50,14 +50,10 @@ const createLabel = (opts: { forId: string; localizeAlias: string; localizeFallb
 	return label;
 };
 
-const createValidationMessage = (errorId: string, localizationKey: string) => {
+const createValidationMessage = (errorId: string) => {
 	const validationElement = document.createElement('div');
 	validationElement.className = 'errormessage';
 	validationElement.id = errorId;
-	const localizeElement = document.createElement('umb-localize');
-	localizeElement.key = localizationKey;
-	validationElement.appendChild(localizeElement);
-
 	return validationElement;
 };
 
@@ -108,7 +104,13 @@ const createFormLayoutItem = (label: HTMLLabelElement, input: HTMLInputElement, 
 
 	formLayoutItem.appendChild(label);
 	formLayoutItem.appendChild(input);
-	formLayoutItem.appendChild(createValidationMessage(errorId, localizationKey));
+
+	const validationMessage = createValidationMessage(errorId);
+	formLayoutItem.appendChild(validationMessage);
+
+	// Bind validation
+	input.oninput = () => validateInput(input, validationMessage, localizationKey);
+	input.onblur = () => validateInput(input, validationMessage, localizationKey);
 
 	return formLayoutItem;
 };
@@ -116,9 +118,11 @@ const createFormLayoutItem = (label: HTMLLabelElement, input: HTMLInputElement, 
 const createFormLayoutPasswordItem = (
 	label: HTMLLabelElement,
 	input: HTMLInputElement,
-	showPasswordToggle: HTMLSpanElement
+	showPasswordToggle: HTMLSpanElement,
+	requiredMessageKey: string
 ) => {
 	const formLayoutItem = document.createElement('uui-form-layout-item') as UUIFormLayoutItemElement;
+	const errorId = input.getAttribute('aria-errormessage') || input.id + '-error';
 
 	formLayoutItem.appendChild(label);
 
@@ -128,9 +132,29 @@ const createFormLayoutPasswordItem = (
 	span.appendChild(showPasswordToggle);
 	formLayoutItem.appendChild(span);
 
-	formLayoutItem.appendChild(createValidationMessage('password-input-error', 'auth_requiredPasswordValidationMessage'));
+	const validationMessage = createValidationMessage(errorId);
+	formLayoutItem.appendChild(validationMessage);
+
+	// Bind validation
+	input.oninput = () => validateInput(input, validationMessage, requiredMessageKey);
+	input.onblur = () => validateInput(input, validationMessage, requiredMessageKey);
 
 	return formLayoutItem;
+};
+
+const validateInput = (input: HTMLInputElement, validationElement: HTMLElement, requiredMessage = '') => {
+	if (input.validity.valid) {
+		input.removeAttribute('aria-invalid');
+		validationElement.innerHTML = '';
+		validationElement.classList.remove('active');
+	} else {
+		input.setAttribute('aria-invalid', 'true');
+		const localizeElement = document.createElement('umb-localize');
+		localizeElement.innerHTML = input.validationMessage;
+		localizeElement.key = requiredMessage;
+		validationElement.appendChild(localizeElement);
+		validationElement.classList.add('active');
+	}
 };
 
 @customElement('umb-auth')
@@ -275,17 +299,23 @@ export default class UmbAuthElement extends UmbLitElement {
 		const passwordLayoutItem = createFormLayoutPasswordItem(
 			passwordLabel,
 			passwordInput,
-			passwordShowPasswordToggleItem
+			passwordShowPasswordToggleItem,
+			'auth_requiredPasswordValidationMessage'
 		);
 		const style = document.createElement('style');
 		style.innerHTML = authStyles;
 		document.head.appendChild(style);
 
-		const elements = [usernameLayoutItem, passwordLayoutItem];
+		const form = document.createElement('form');
+		form.id = 'umb-login-form';
+		form.name = 'login-form';
+		form.spellcheck = false;
+		form.setAttribute('novalidate', '');
 
-		elements.forEach((el) => {
-			this.insertAdjacentElement('beforeend', el);
-		});
+		form.appendChild(usernameLayoutItem);
+		form.appendChild(passwordLayoutItem);
+
+		this.insertAdjacentElement('beforeend', form);
 	}
 
 	render() {
