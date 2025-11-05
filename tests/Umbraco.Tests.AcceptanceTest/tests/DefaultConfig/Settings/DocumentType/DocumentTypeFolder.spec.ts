@@ -25,7 +25,7 @@ test('can create a empty document type folder', {tag: '@smoke'}, async ({umbraco
   await umbracoUi.documentType.waitForDocumentTypeToBeCreated();
   expect(await umbracoApi.documentType.doesNameExist(documentFolderName)).toBeTruthy();
   // Checks if the folder is in the root
-  await umbracoUi.documentType.clickCaretButtonForName('Document Types');
+  await umbracoUi.documentType.openCaretButtonForName('Document Types');
   await umbracoUi.documentType.isDocumentTreeItemVisible(documentFolderName);
 });
 
@@ -61,6 +61,7 @@ test('can rename a document type folder', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   await umbracoUi.documentType.waitForDocumentTypeToBeRenamed();
+  await umbracoUi.waitForTimeout(500); // Wait for the rename to be fully processed
   expect(await umbracoApi.documentType.doesNameExist(oldFolderName)).toBeFalsy();
   expect(await umbracoApi.documentType.doesNameExist(documentFolderName)).toBeTruthy();
   await umbracoUi.documentType.isDocumentTreeItemVisible(oldFolderName, false);
@@ -105,7 +106,7 @@ test('can create a folder in a folder in a folder', {tag: '@smoke'}, async ({umb
   // Act
   await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
   await umbracoUi.documentType.clickRootFolderCaretButton();
-  await umbracoUi.documentType.clickCaretButtonForName(grandParentFolderName);
+  await umbracoUi.documentType.openCaretButtonForName(grandParentFolderName);
   await umbracoUi.documentType.clickActionsMenuForName(parentFolderName);
   await umbracoUi.documentType.clickCreateActionMenuOption();
   await umbracoUi.documentType.clickCreateDocumentFolderButton();

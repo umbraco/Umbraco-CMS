@@ -1,21 +1,7 @@
 import { UmbSectionSidebarMenuElement } from '../section-sidebar-menu/section-sidebar-menu.element.js';
 import type { ManifestSectionSidebarAppMenuWithEntityActionsKind } from '../section-sidebar-menu/types.js';
 import { css, html, customElement, type PropertyValues, state } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbParentEntityContext } from '@umbraco-cms/backoffice/entity';
-
-const manifestWithEntityActions: UmbExtensionManifestKind = {
-	type: 'kind',
-	alias: 'Umb.Kind.SectionSidebarAppMenuWithEntityActions',
-	matchKind: 'menuWithEntityActions',
-	matchType: 'sectionSidebarApp',
-	manifest: {
-		type: 'sectionSidebarApp',
-		elementName: 'umb-section-sidebar-menu-with-entity-actions',
-	},
-};
-umbExtensionsRegistry.register(manifestWithEntityActions);
 
 @customElement('umb-section-sidebar-menu-with-entity-actions')
 export class UmbSectionSidebarMenuWithEntityActionsElement extends UmbSectionSidebarMenuElement<ManifestSectionSidebarAppMenuWithEntityActionsKind> {
@@ -35,14 +21,15 @@ export class UmbSectionSidebarMenuWithEntityActionsElement extends UmbSectionSid
 	}
 
 	override renderHeader() {
+		const label = this.localize.string(this.manifest?.meta?.label ?? '');
 		return html`
 			<div id="header">
-				<h3>${this.localize.string(this.manifest?.meta?.label ?? '')}</h3>
+				<h3>${label}</h3>
 				<umb-entity-actions-bundle
 					slot="actions"
 					.unique=${this._unique}
 					.entityType=${this.manifest?.meta.entityType}
-					.label=${this.localize.term('actions_viewActionsFor', [this.manifest?.meta.label])}>
+					.label=${label}>
 				</umb-entity-actions-bundle>
 			</div>
 		`;

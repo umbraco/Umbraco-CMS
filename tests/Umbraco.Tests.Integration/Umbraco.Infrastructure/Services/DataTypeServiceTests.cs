@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
@@ -486,5 +485,37 @@ internal sealed class DataTypeServiceTests : UmbracoIntegrationTest
         Assert.AreEqual(mediaType.Key, secondResult.ContentTypeKey);
         Assert.AreEqual("bodyText", secondResult.NodeAlias);
         Assert.AreEqual("Body text", secondResult.NodeName);
+    }
+
+    [Test]
+    public async Task Gets_MissingPropertyEditor_When_Editor_NotFound()
+    {
+        // Arrange
+        IDataType? dataType = (await DataTypeService.CreateAsync(
+            new DataType(new TestEditor(DataValueEditorFactory), ConfigurationEditorJsonSerializer)
+            {
+                Name = "Test Missing Editor",
+                DatabaseType = ValueStorageType.Ntext,
+            },
+            Constants.Security.SuperUserKey)).Result;
+
+        Assert.IsNotNull(dataType);
+
+        // Act
+        IDataType? actual = await DataTypeService.GetAsync(dataType.Key);
+
+        // Assert
+        Assert.NotNull(actual);
+        Assert.AreEqual(dataType.Key, actual.Key);
+        Assert.IsAssignableFrom(typeof(MissingPropertyEditor), actual.Editor);
+        Assert.AreEqual("Test Editor", actual.EditorAlias, "The alias should be the same as the original editor");
+        Assert.AreEqual("Umb.PropertyEditorUi.Missing", actual.EditorUiAlias, "The editor UI alias should be the Missing Editor UI");
+    }
+
+    private class TestEditor : DataEditor
+    {
+        public TestEditor(IDataValueEditorFactory dataValueEditorFactory)
+            : base(dataValueEditorFactory) =>
+            Alias = "Test Editor";
     }
 }

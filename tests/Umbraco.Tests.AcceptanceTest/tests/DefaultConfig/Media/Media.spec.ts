@@ -25,7 +25,8 @@ test('can not create a empty media file', {tag: '@release'}, async ({umbracoApi,
   await umbracoUi.media.clickSaveButton();
 
   // Assert
-  await umbracoUi.media.isErrorNotificationVisible();
+  await umbracoUi.media.isFailedStateButtonVisible();
+  await umbracoUi.media.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue);
   await umbracoUi.media.isMediaTreeItemVisible(mediaFileName, false);
   expect(await umbracoApi.media.doesNameExist(mediaFileName)).toBeFalsy();
 });
@@ -72,8 +73,9 @@ for (const mediaFileType of mediaFileTypes) {
 
     // Assert
     await umbracoUi.media.waitForMediaItemToBeCreated();
+    await umbracoUi.media.goToSection(ConstantHelper.sections.media);
     const mediaData = await umbracoApi.media.getByName(mediaFileType.fileName);
-    const mediaUrl = await umbracoApi.media.getMediaUrl(mediaData.id);
+    const mediaUrl = await umbracoApi.media.getFullMediaUrl(mediaData.id);
     await umbracoUi.media.doesMediaHaveThumbnail(mediaData.id, mediaFileType.thumbnail, mediaUrl);
     await umbracoUi.media.isMediaTreeItemVisible(mediaFileType.fileName);
     expect(await umbracoApi.media.doesNameExist(mediaFileType.fileName)).toBeTruthy();
@@ -137,10 +139,8 @@ test('can create a folder in a folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.media.clickSaveButton();
 
   // Assert
-  //await umbracoUi.media.waitForMediaItemToBeCreated(); // This is flaky, and Playwright seems to succeed even with its default timeout
   await umbracoUi.media.isMediaTreeItemVisible(parentFolderName);
-  await umbracoUi.media.isMediaTreeItemVisible(folderName, false);
-  await umbracoUi.media.clickMediaCaretButtonForName(parentFolderName);
+  await umbracoUi.media.openMediaCaretButtonForName(parentFolderName);
   await umbracoUi.media.isMediaTreeItemVisible(folderName, true);
 
   // Clean

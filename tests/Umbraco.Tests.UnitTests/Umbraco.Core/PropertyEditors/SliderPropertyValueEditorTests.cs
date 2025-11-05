@@ -28,14 +28,26 @@ public class SliderPropertyValueEditorTests
         true,
         new object(),
         new List<string> { "some", "values" },
-        Guid.NewGuid(),
-        new GuidUdi(Constants.UdiEntityType.Document, Guid.NewGuid())
     };
 
     [TestCaseSource(nameof(InvalidCaseData))]
     public void Can_Handle_Invalid_Values_From_Editor(object value)
     {
         var fromEditor = FromEditor(value);
+        Assert.IsNull(fromEditor);
+    }
+
+    [Test]
+    public void Can_Handle_Invalid_Values_From_Editor_Guid()
+    {
+        var fromEditor = FromEditor(Guid.NewGuid());
+        Assert.IsNull(fromEditor);
+    }
+
+    [Test]
+    public void Can_Handle_Invalid_Values_From_Editor_Udi()
+    {
+        var fromEditor = FromEditor(new GuidUdi(Constants.UdiEntityType.Document, Guid.NewGuid()));
         Assert.IsNull(fromEditor);
     }
 

@@ -71,7 +71,8 @@ test('can read content node with permission enabled', {tag: '@release'}, async (
   await umbracoUi.content.doesDocumentHaveName(rootDocumentName);
 });
 
-test('can not read content node with permission disabled', async ({umbracoApi, umbracoUi}) => {
+// Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/20505
+test.skip('can not read content node with permission disabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithReadPermission(userGroupName, false);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -161,6 +162,7 @@ test('can empty recycle bin with delete permission enabled', {tag: '@release'}, 
 
   // Act
   await umbracoUi.content.clickRecycleBinButton();
+  await umbracoUi.waitForTimeout(700);
   await umbracoUi.content.clickEmptyRecycleBinButton();
   await umbracoUi.content.clickConfirmEmptyRecycleBinButton();
 
@@ -435,7 +437,7 @@ test.fixme('can move content with move to permission enabled', {tag: '@release'}
   await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
 
   // Act
-  await umbracoUi.content.clickCaretButtonForContentName(rootDocumentName);
+  await umbracoUi.content.openContentCaretButtonForName(rootDocumentName);
   await umbracoUi.content.clickActionsMenuForContent(childDocumentOneName);
   await umbracoUi.content.clickMoveToActionMenuOption();
   await umbracoUi.content.moveToContentWithName([], moveToDocumentName);
@@ -444,7 +446,7 @@ test.fixme('can move content with move to permission enabled', {tag: '@release'}
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.moved);
   await umbracoUi.content.reloadContentTree();
   await umbracoUi.content.isCaretButtonVisibleForContentName(moveToDocumentName, true);
-  await umbracoUi.content.clickCaretButtonForContentName(moveToDocumentName);
+  await umbracoUi.content.openContentCaretButtonForName(moveToDocumentName);
   await umbracoUi.content.isChildContentInTreeVisible(moveToDocumentName, childDocumentOneName, true);
   await umbracoUi.content.isCaretButtonVisibleForContentName(rootDocumentName, false);
   expect(await umbracoApi.document.getChildrenAmount(rootDocumentId)).toEqual(0);
@@ -489,7 +491,7 @@ test.fixme('can sort children with sort children permission enabled', {tag: '@re
 
   // Assert
   // TODO: uncomment when it is not flaky
-  await umbracoUi.content.clickCaretButtonForContentName(rootDocumentName);
+  await umbracoUi.content.openContentCaretButtonForName(rootDocumentName);
   await umbracoUi.content.doesIndexDocumentInTreeContainName(rootDocumentName, childDocumentTwoName, 0);
   await umbracoUi.content.doesIndexDocumentInTreeContainName(rootDocumentName, childDocumentOneName, 1);
 });
@@ -669,4 +671,4 @@ test('can create and update content with permission enabled', {tag: '@release'},
 
   // Cleanup
   await umbracoApi.document.ensureNameNotExists(updatedDocumentName);
-}); 
+});

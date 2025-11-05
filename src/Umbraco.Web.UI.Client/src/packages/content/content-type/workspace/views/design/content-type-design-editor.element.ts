@@ -2,7 +2,7 @@ import { UMB_CONTENT_TYPE_WORKSPACE_CONTEXT } from '../../content-type-workspace
 import type {
 	UmbContentTypeCompositionModel,
 	UmbContentTypeModel,
-	UmbPropertyTypeContainerModel,
+	UmbPropertyTypeContainerMergedModel,
 } from '../../../types.js';
 import {
 	UmbContentTypeContainerStructureHelper,
@@ -33,13 +33,14 @@ import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 
 @customElement('umb-content-type-design-editor')
 export class UmbContentTypeDesignEditorElement extends UmbLitElement implements UmbWorkspaceViewElement {
-	#sorter = new UmbSorterController<UmbPropertyTypeContainerModel, UUITabElement>(this, {
-		getUniqueOfElement: (element) => element.getAttribute('data-umb-tab-id'),
-		getUniqueOfModel: (tab) => tab.id,
+	#sorter = new UmbSorterController<UmbPropertyTypeContainerMergedModel, UUITabElement>(this, {
+		getUniqueOfElement: (element) => element.getAttribute('data-umb-tab-key'),
+		getUniqueOfModel: (tab) => tab.key,
 		identifier: 'content-type-tabs-sorter',
-		itemSelector: 'uui-tab',
+		itemSelector: 'uui-tab:not(#root-tab)',
 		containerSelector: 'uui-tab-group',
 		disabledItemSelector: ':not([sortable])',
+		ignorerSelector: 'uui-input',
 		resolvePlacement: (args) => args.relatedRect.left + args.relatedRect.width * 0.5 > args.pointerX,
 		onChange: ({ model }) => {
 			this._tabs = model;
@@ -51,7 +52,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			 * the overlap if true, which may cause another overlap, so we loop through them till no more overlaps...
 			 */
 			const model = this._tabs ?? [];
-			const newIndex = model.findIndex((entry) => entry.id === item.id);
+			const newIndex = model.findIndex((entry) => entry.key === item.key);
 
 			// Doesn't exist in model
 			if (newIndex === -1) return;
@@ -64,20 +65,32 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 				prevSortOrder = model[newIndex - 1].sortOrder;
 			}
 
+			const ownerId = item.ownerId;
+
+			if (ownerId === undefined) {
+				// This may be possible later, but for now this is not possible. [NL]
+				throw new Error(
+					'OwnerId is not set for the given container, we cannot move containers that are not owned by the current Document.',
+				);
+			}
+
 			// increase the prevSortOrder and use it for the moved item,
-			this.#tabsStructureHelper.partialUpdateContainer(item.id, {
+			this.#tabsStructureHelper.partialUpdateContainer(ownerId, {
 				sortOrder: ++prevSortOrder,
 			});
 
 			// Adjust everyone right after, until there is a gap between the sortOrders: [NL]
 			let i = newIndex + 1;
-			let entry: UmbPropertyTypeContainerModel | undefined;
+			let entry: UmbPropertyTypeContainerMergedModel | undefined;
 			// As long as there is an item with the index & the sortOrder is less or equal to the prevSortOrder, we will update the sortOrder:
 			while ((entry = model[i]) !== undefined && entry.sortOrder <= prevSortOrder) {
-				// Increase the prevSortOrder and use it for the item:
-				this.#tabsStructureHelper.partialUpdateContainer(entry.id, {
-					sortOrder: ++prevSortOrder,
-				});
+				// Only updated owned containers:
+				if (entry.ownerId) {
+					// Increase the prevSortOrder and use it for the item:
+					this.#tabsStructureHelper.partialUpdateContainer(entry.ownerId, {
+						sortOrder: ++prevSortOrder,
+					});
+				}
 
 				i++;
 			}
@@ -102,10 +115,10 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	private _hasRootGroups = false;
 
 	@state()
-	private _routes: UmbRoute[] = [];
+	private _routes?: UmbRoute[];
 
 	@state()
-	private _tabs?: Array<UmbPropertyTypeContainerModel>;
+	private _tabs?: Array<UmbPropertyTypeContainerMergedModel>;
 
 	@state()
 	private _routerPath?: string;
@@ -136,7 +149,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 
 		this.#tabsStructureHelper.setContainerChildType('Tab');
 		this.#tabsStructureHelper.setIsRoot(true);
-		this.observe(this.#tabsStructureHelper.mergedContainers, (tabs) => {
+		this.observe(this.#tabsStructureHelper.childContainers, (tabs) => {
 			this._tabs = tabs;
 			this.#sorter.setModel(tabs);
 			this.#createRoutes();
@@ -180,7 +193,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		if (this._tabs.length > 0) {
 			this._tabs?.forEach((tab) => {
 				const tabName = tab.name && tab.name !== '' ? tab.name : '-';
-				if (tab.id === this.#processingTabId) {
+				if (tab.ownerId && tab.ownerId === this.#processingTabId) {
 					activeTabName = tabName;
 				}
 				routes.push({
@@ -188,7 +201,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 					component: () => import('./content-type-design-editor-tab.element.js'),
 					setup: (component) => {
 						this.#currentTabComponent = component as UmbContentTypeDesignEditorTabElement;
-						this.#currentTabComponent.containerId = tab.id;
+						this.#currentTabComponent.containerId = tab.ownerId ?? tab.ids[0];
 					},
 				});
 			});
@@ -265,8 +278,8 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		}
 	}
 
-	async #requestDeleteTab(tab: UmbPropertyTypeContainerModel | undefined) {
-		if (!tab) return;
+	async #requestDeleteTab(tab: UmbPropertyTypeContainerMergedModel | undefined) {
+		if (!tab || !tab.ownerId) return;
 		// TODO: Localize this:
 		const tabName = tab.name === '' ? 'Unnamed' : tab.name;
 		// TODO: Localize this:
@@ -288,10 +301,9 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 
 		await umbConfirmModal(this, modalData);
 
-		this.#deleteTab(tab?.id);
+		this.#deleteTab(tab.ownerId);
 	}
-	#deleteTab(tabId?: string) {
-		if (!tabId) return;
+	#deleteTab(tabId: string) {
 		this.#workspaceContext?.structure.removeContainer(null, tabId);
 		if (this.#processingTabId === tabId) {
 			this.#processingTabId = undefined;
@@ -332,14 +344,14 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		}, 100);
 	}
 
-	async #tabNameChanged(event: InputEvent, tab: UmbPropertyTypeContainerModel) {
-		this.#processingTabId = tab.id;
+	async #tabNameChanged(event: InputEvent, tab: UmbPropertyTypeContainerMergedModel) {
+		if (!this.#workspaceContext || !tab.ownerId) return;
+		this.#processingTabId = tab.ownerId;
 		let newName = (event.target as HTMLInputElement).value;
 
-		const changedName = this.#workspaceContext?.structure.makeContainerNameUniqueForOwnerContentType(
-			tab.id,
+		const changedName = this.#workspaceContext.structure.makeContainerNameUniqueForOwnerContentType(
+			tab.ownerId,
 			newName,
-			'Tab',
 		);
 
 		// Check if it collides with another tab name of this same content-type, if so adjust name:
@@ -349,20 +361,20 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			(event.target as HTMLInputElement).value = newName;
 		}
 
-		this.#tabsStructureHelper.partialUpdateContainer(tab.id!, {
+		this.#tabsStructureHelper.partialUpdateContainer(tab.ownerId, {
 			name: newName,
 		});
 	}
 
-	async #tabNameBlur(event: FocusEvent, tab: UmbPropertyTypeContainerModel) {
-		if (!this.#processingTabId) return;
+	async #tabNameBlur(event: FocusEvent, tab: UmbPropertyTypeContainerMergedModel) {
+		if (!this.#processingTabId || !tab.ownerId) return;
 		const newName = (event.target as HTMLInputElement | undefined)?.value;
 		if (newName === '') {
-			const changedName = this.#workspaceContext!.structure.makeEmptyContainerName(this.#processingTabId, 'Tab');
+			const changedName = this.#workspaceContext!.structure.makeEmptyContainerName(this.#processingTabId);
 
 			(event.target as HTMLInputElement).value = changedName;
 
-			this.#tabsStructureHelper.partialUpdateContainer(tab.id!, {
+			this.#tabsStructureHelper.partialUpdateContainer(tab.ownerId, {
 				name: changedName,
 			});
 		}
@@ -463,7 +475,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		// TODO: Localize this:
 		if (this._sortModeActive) return;
 		return html`
-			<uui-button id="add-tab" @click="${this.#addTab}" label="Add tab">
+			<uui-button id="add-tab" data-mark="add-tab-button" @click="${this.#addTab}" label="Add tab">
 				<uui-icon name="icon-add"></uui-icon>
 				Add tab
 			</uui-button>
@@ -480,6 +492,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 				${this._compositionRepositoryAlias
 					? html`
 							<uui-button
+								data-mark="edit-compositions"
 								look="outline"
 								label=${this.localize.term('contentTypeEditor_compositions')}
 								compact
@@ -489,7 +502,12 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 							</uui-button>
 						`
 					: ''}
-				<uui-button look="outline" label=${sortButtonText} compact @click=${this.#toggleSortMode}>
+				<uui-button
+					data-mark="toggle-sort-mode"
+					look="outline"
+					label=${sortButtonText}
+					compact
+					@click=${this.#toggleSortMode}>
 					<uui-icon name="icon-height"></uui-icon>
 					${sortButtonText}
 				</uui-button>
@@ -506,7 +524,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 					${this.renderRootTab()}
 					${repeat(
 						this._tabs,
-						(tab) => tab.id,
+						(tab) => tab.ownerId ?? tab.ids[0],
 						(tab) => this.renderTab(tab),
 					)}
 				</uui-tab-group>
@@ -535,16 +553,17 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		`;
 	}
 
-	renderTab(tab: UmbPropertyTypeContainerModel) {
+	renderTab(tab: UmbPropertyTypeContainerMergedModel) {
 		const path = this._routerPath + '/tab/' + encodeFolderName(tab.name && tab.name !== '' ? tab.name : '-');
 		const tabActive = path === this._activePath;
-		const ownedTab = this.#tabsStructureHelper.isOwnerChildContainer(tab.id!) ?? false;
+		const ownedTab = tab.ownerId ? true : false;
 
 		return html`<uui-tab
 			label=${tab.name && tab.name !== '' ? tab.name : 'Unnamed'}
 			.active=${tabActive}
 			href=${path}
-			data-umb-tab-id=${ifDefined(tab.id)}
+			data-umb-tab-id=${ifDefined(tab.ownerId ?? tab.ids[0])}
+			data-umb-tab-key=${ifDefined(tab.key)}
 			data-mark="tab:${tab.name}"
 			?sortable=${ownedTab}
 			@dragover=${(event: DragEvent) => this.#onDragOver(event, path)}>
@@ -552,31 +571,34 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		</uui-tab>`;
 	}
 
-	renderTabInner(tab: UmbPropertyTypeContainerModel, tabActive: boolean, ownedTab: boolean) {
+	renderTabInner(tab: UmbPropertyTypeContainerMergedModel, tabActive: boolean, ownedTab: boolean) {
 		// TODO: Localize this:
 		const hasTabName = tab.name && tab.name !== '';
 		const tabName = hasTabName ? tab.name : 'Unnamed';
+		const tabId = tab.ownerId ?? tab.ids[0];
 		if (this._sortModeActive) {
-			return html`<div class="tab">
+			return html`<div class="tab-inner">
 				${ownedTab
-					? html`<uui-icon name="icon-grip" class="drag-${tab.id}"> </uui-icon>${tabName}
+					? html`<uui-icon name="icon-grip" class="drag-${tabId}"> </uui-icon>${this.localize.string(tabName)}
 							<uui-input
+								data-mark="tab:sort-input"
 								label="sort order"
 								type="number"
 								value=${ifDefined(tab.sortOrder)}
 								style="width:50px"
 								@change=${(e: UUIInputEvent) => this.#changeOrderNumber(tab, e)}></uui-input>`
-					: html`<uui-icon name="icon-merge"></uui-icon>${tab.name!}`}
+					: html`<uui-icon name="icon-merge"></uui-icon>${this.localize.string(tabName)}`}
 			</div>`;
 		}
 
 		if (tabActive && ownedTab) {
-			return html`<div class="tab">
+			return html`<div class="tab-inner">
 				<uui-input
+					data-mark="tab:name-input"
 					id="input"
 					look="placeholder"
 					placeholder="Unnamed"
-					label=${tab.name!}
+					label=${this.localize.term('settings_tabname')}
 					value="${tab.name!}"
 					auto-width
 					minlength="1"
@@ -590,23 +612,25 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 
 		if (ownedTab) {
 			return html`<div class="not-active">
-				<span class=${hasTabName ? '' : 'invaild'}>${hasTabName ? tab.name : 'Unnamed'}</span> ${this.renderDeleteFor(
-					tab,
-				)}
+				<span class=${hasTabName ? '' : 'invalid'}>${hasTabName ? this.localize.string(tabName) : 'Unnamed'}</span>
+				${this.renderDeleteFor(tab)}
 			</div>`;
 		} else {
-			return html`<div class="not-active"><uui-icon name="icon-merge"></uui-icon>${tab.name!}</div>`;
+			return html`<div class="not-active">
+				<uui-icon name="icon-merge"></uui-icon>${this.localize.string(tabName)}
+			</div>`;
 		}
 	}
 
-	#changeOrderNumber(tab: UmbPropertyTypeContainerModel, e: UUIInputEvent) {
-		if (!e.target.value || !tab.id) return;
+	#changeOrderNumber(tab: UmbPropertyTypeContainerMergedModel, e: UUIInputEvent) {
+		if (!e.target.value || !tab.ownerId) return;
 		const sortOrder = Number(e.target.value);
-		this.#tabsStructureHelper.partialUpdateContainer(tab.id, { sortOrder });
+		this.#tabsStructureHelper.partialUpdateContainer(tab.ownerId, { sortOrder });
 	}
 
-	renderDeleteFor(tab: UmbPropertyTypeContainerModel) {
+	renderDeleteFor(tab: UmbPropertyTypeContainerMergedModel) {
 		return html`<uui-button
+			data-mark="tab:delete"
 			label=${this.localize.term('actions_remove')}
 			class="trash"
 			slot="append"
@@ -694,6 +718,18 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 				background-color: var(--uui-color-surface);
 			}
 
+			.tab-inner {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				gap: var(--uui-size-space-2);
+				margin-right: calc(var(--uui-size-space-3) * -1);
+				pointer-events: none;
+			}
+			.tab-inner > uui-input {
+				pointer-events: auto;
+			}
+
 			.not-active uui-button {
 				pointer-events: auto;
 			}
@@ -707,7 +743,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 				gap: var(--uui-size-space-3);
 			}
 
-			.invaild {
+			.invalid {
 				color: var(--uui-color-danger, var(--uui-color-invalid));
 			}
 
@@ -716,7 +752,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 				transition: opacity 100ms;
 			}
 
-			uui-tab:not(:hover, :focus) .trash {
+			uui-tab:not(:hover, :focus, :focus-within) .trash {
 				opacity: 0;
 				transition: opacity 100ms;
 			}

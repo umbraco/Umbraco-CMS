@@ -1,4 +1,4 @@
-import type { MetaMenuItem } from '../../../menu-item.extension.js';
+import type { MetaMenuItem } from '../menu-item.extension.js';
 import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbAction } from '@umbraco-cms/backoffice/action';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';

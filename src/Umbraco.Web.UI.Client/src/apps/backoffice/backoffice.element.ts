@@ -15,6 +15,7 @@ const CORE_PACKAGES = [
 	import('../../packages/block/umbraco-package.js'),
 	import('../../packages/clipboard/umbraco-package.js'),
 	import('../../packages/code-editor/umbraco-package.js'),
+	import('../../packages/content/umbraco-package.js'),
 	import('../../packages/data-type/umbraco-package.js'),
 	import('../../packages/dictionary/umbraco-package.js'),
 	import('../../packages/documents/umbraco-package.js'),
@@ -24,6 +25,7 @@ const CORE_PACKAGES = [
 	import('../../packages/help/umbraco-package.js'),
 	import('../../packages/language/umbraco-package.js'),
 	import('../../packages/log-viewer/umbraco-package.js'),
+	import('../../packages/management-api/umbraco-package.js'),
 	import('../../packages/markdown-editor/umbraco-package.js'),
 	import('../../packages/media/umbraco-package.js'),
 	import('../../packages/members/umbraco-package.js'),
@@ -35,7 +37,6 @@ const CORE_PACKAGES = [
 	import('../../packages/publish-cache/umbraco-package.js'),
 	import('../../packages/relations/umbraco-package.js'),
 	import('../../packages/rte/umbraco-package.js'),
-	import('../../packages/search/umbraco-package.js'),
 	import('../../packages/settings/umbraco-package.js'),
 	import('../../packages/static-file/umbraco-package.js'),
 	import('../../packages/sysinfo/umbraco-package.js'),
@@ -48,7 +49,6 @@ const CORE_PACKAGES = [
 	import('../../packages/umbraco-news/umbraco-package.js'),
 	import('../../packages/user/umbraco-package.js'),
 	import('../../packages/webhook/umbraco-package.js'),
-	import('../../packages/content/umbraco-package.js'),
 ];
 
 @customElement('umb-backoffice')

@@ -1,6 +1,6 @@
-export type UmbSliderPropertyEditorUiValue = { from: number; to: number } | undefined;
+export interface UmbSliderPropertyEditorUiValueObject {
+	from: number;
+	to: number;
+}
 
-/**
- * @deprecated this type will be removed in v.17.0, use `UmbPropertyEditorUISliderValue` instead
- */
-export type UmbSliderValue = UmbSliderPropertyEditorUiValue;
+export type UmbSliderPropertyEditorUiValue = UmbSliderPropertyEditorUiValueObject | undefined;

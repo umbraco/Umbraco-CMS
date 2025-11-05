@@ -1,4 +1,4 @@
-import { UMB_TIPTAP_TABLE_PROPERTIES_MODAL_ALIAS } from './components/constants.js';
+import { UMB_TIPTAP_TABLE_PROPERTIES_MODAL_ALIAS } from './modals/constants.js';
 
 const UMB_MENU_TIPTAP_TABLE_ALIAS = 'Umb.Menu.Tiptap.Table';
 const UMB_MENU_TIPTAP_TABLE_COLUMN_ALIAS = 'Umb.Menu.Tiptap.TableColumn';
@@ -10,7 +10,7 @@ const modals: Array<UmbExtensionManifest> = [
 		type: 'modal',
 		alias: UMB_TIPTAP_TABLE_PROPERTIES_MODAL_ALIAS,
 		name: 'Tiptap Table Properties Modal',
-		element: () => import('./components/table-properties-modal.element.js'),
+		element: () => import('./modals/table-properties-modal.element.js'),
 	},
 ];
 

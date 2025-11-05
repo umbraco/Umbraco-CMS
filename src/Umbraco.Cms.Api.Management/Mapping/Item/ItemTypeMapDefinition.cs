@@ -42,7 +42,7 @@ public class ItemTypeMapDefinition : IMapDefinition
         target.IsoCode = source.IsoCode;
     }
 
-    // Umbraco.Code.MapAll
+    // Umbraco.Code.MapAll -Flags
     private static void Map(IDataType source, DataTypeItemResponseModel target, MapperContext context)
     {
         target.Name = source.Name ?? string.Empty;
@@ -52,14 +52,14 @@ public class ItemTypeMapDefinition : IMapDefinition
         target.IsDeletable = source.IsDeletableDataType();
     }
 
-    // Umbraco.Code.MapAll
+    // Umbraco.Code.MapAll -Flags
     private static void Map(IDictionaryItem source, DictionaryItemItemResponseModel target, MapperContext context)
     {
         target.Name = source.ItemKey;
         target.Id = source.Key;
     }
 
-    // Umbraco.Code.MapAll
+    // Umbraco.Code.MapAll -Flags
     private static void Map(IContentType source, DocumentTypeItemResponseModel target, MapperContext context)
     {
         target.Name = source.Name ?? string.Empty;
@@ -69,7 +69,7 @@ public class ItemTypeMapDefinition : IMapDefinition
         target.Description = source.Description;
     }
 
-    // Umbraco.Code.MapAll
+    // Umbraco.Code.MapAll -Flags
     private static void Map(IMediaType source, MediaTypeItemResponseModel target, MapperContext context)
     {
         target.Name = source.Name ?? string.Empty;
@@ -77,14 +77,14 @@ public class ItemTypeMapDefinition : IMapDefinition
         target.Icon = source.Icon;
     }
 
-    // Umbraco.Code.MapAll
+    // Umbraco.Code.MapAll -Flags
     private static void Map(IEntitySlim source, MemberGroupItemResponseModel target, MapperContext context)
     {
         target.Name = source.Name ?? string.Empty;
         target.Id = source.Key;
     }
 
-    // Umbraco.Code.MapAll
+    // Umbraco.Code.MapAll -Flags
     private static void Map(ITemplate source, TemplateItemResponseModel target, MapperContext context)
     {
         target.Name = source.Name ?? string.Empty;
@@ -92,7 +92,7 @@ public class ItemTypeMapDefinition : IMapDefinition
         target.Alias = source.Alias;
     }
 
-    // Umbraco.Code.MapAll
+    // Umbraco.Code.MapAll -Flags
     private static void Map(IMemberType source, MemberTypeItemResponseModel target, MapperContext context)
     {
         target.Name = source.Name ?? string.Empty;
@@ -100,7 +100,7 @@ public class ItemTypeMapDefinition : IMapDefinition
         target.Icon = source.Icon;
     }
 
-    // Umbraco.Code.MapAll
+    // Umbraco.Code.MapAll -Flags
     private static void Map(IRelationType source, RelationTypeItemResponseModel target, MapperContext context)
     {
         target.Id = source.Key;
@@ -108,7 +108,7 @@ public class ItemTypeMapDefinition : IMapDefinition
         target.IsDeletable = source.IsDeletableRelationType();
     }
 
-    // Umbraco.Code.MapAll
+    // Umbraco.Code.MapAll -Flags
     private static void Map(IUserGroup source, UserGroupItemResponseModel target, MapperContext context)
     {
         target.Id = source.Key;
@@ -117,9 +117,10 @@ public class ItemTypeMapDefinition : IMapDefinition
         target.Alias = source.Alias;
     }
 
-    // Umbraco.Code.MapAll
+    // Umbraco.Code.MapAll -Flags
     private static void Map(IWebhook source, WebhookItemResponseModel target, MapperContext context)
     {
+        target.Id = source.Key;
         target.Name = source.Name ?? source.Url;
         target.Url = source.Url;
         target.Enabled = source.Enabled;

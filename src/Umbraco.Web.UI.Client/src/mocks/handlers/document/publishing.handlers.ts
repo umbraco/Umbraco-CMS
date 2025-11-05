@@ -90,10 +90,10 @@ export const publishingHandlers = [
 			documentType: document.documentType,
 			id: document.id,
 			isTrashed: document.isTrashed,
-			urls: document.urls,
 			values: document.values,
 			variants: document.variants,
 			template: document.template,
+			flags: document.flags,
 		};
 
 		return res(ctx.status(200), ctx.json<GetDocumentByIdPublishedResponse>(responseModel));

@@ -114,6 +114,15 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 	 * @param {string} key - the localization key, the indicator of what localization entry you want to retrieve.
 	 * @param {...any} args - the arguments to parse for this localization entry.
 	 * @returns {string} - the translated term as a string.
+	 * @example
+	 * Retrieving a term without any arguments:
+	 * ```ts
+	 * this.localize.term('area_term');
+	 * ```
+	 * Retrieving a term with arguments:
+	 * ```ts
+	 * this.localize.term('general_greeting', ['John']);
+	 * ```
 	 */
 	term<K extends keyof LocalizationSetType>(key: K, ...args: FunctionParams<LocalizationSetType[K]>): string {
 		if (!this.#usedKeys.includes(key)) {
@@ -241,16 +250,15 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 		return new Intl.ListFormat(this.lang(), options).format(values);
 	}
 
-	// TODO: for V.16 we should set type to be string | undefined. [NL]
 	/**
 	 * Translates a string containing one or more terms. The terms should be prefixed with a `#` character.
 	 * If the term is found in the localization set, it will be replaced with the localized term.
 	 * If the term is not found, the original term will be returned.
-	 * @param {string | null | undefined} text The text to translate.
+	 * @param {string | undefined} text The text to translate.
 	 * @param {...any} args The arguments to parse for this localization entry.
 	 * @returns {string} The translated text.
 	 */
-	string(text: string | null | undefined, ...args: any): string {
+	string(text: string | undefined, ...args: any): string {
 		if (typeof text !== 'string') {
 			return '';
 		}

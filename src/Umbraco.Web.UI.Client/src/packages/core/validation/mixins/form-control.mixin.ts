@@ -124,12 +124,12 @@ export function UmbFormControlMixin<
 		 * @default
 		 */
 		@property({ reflect: false }) // Do not 'reflect' as the attribute value is used as fallback. [NL]
+		set value(newValue: ValueType | DefaultValueType) {
+			this.#value = newValue;
+		}
 		get value(): ValueType | DefaultValueType {
 			// For some reason we need to keep this as setters and getters for inherited classes for work properly when they override these methods. [NL]
 			return this.#value;
-		}
-		set value(newValue: ValueType | DefaultValueType) {
-			this.#value = newValue;
 		}
 
 		// Validation
@@ -263,6 +263,14 @@ export function UmbFormControlMixin<
 		 * @returns {void}
 		 */
 		protected addFormControlElement(element: UmbNativeFormControlElement) {
+			if (!element) {
+				throw new Error('Element is null or undefined');
+			}
+			if (!element.validity) {
+				console.log(element);
+				throw new Error('Element is not a Form Control');
+			}
+			if (this.#formCtrlElements.includes(element)) return;
 			this.#formCtrlElements.push(element);
 			element.addEventListener(UmbValidationInvalidEvent.TYPE, this.#runValidatorsCallback);
 			element.addEventListener(UmbValidationValidEvent.TYPE, this.#runValidatorsCallback);

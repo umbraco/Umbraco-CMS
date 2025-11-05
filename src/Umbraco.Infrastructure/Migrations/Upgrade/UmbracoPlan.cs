@@ -122,6 +122,21 @@ public class UmbracoPlan : MigrationPlan
 
         // To 16.2.0
         To<V_16_2_0.AddLongRunningOperations>("{741C22CF-5FB8-4343-BF79-B97A58C2CCBA}");
-        To<V_16_2_0.AddDocumentUrlLock>("{BE11D4D3-3A1F-4598-90D4-B548BD188C48}");
+        To<NoopMigration>("{BE11D4D3-3A1F-4598-90D4-B548BD188C48}"); // Originally was V_16_2_0.AddDocumentUrlLock, now moved to a pre-migration.
+
+        // To 16.3.0
+        To<V_16_3_0.AddRichTextEditorCapabilities>("{A917FCBC-C378-4A08-A36C-220C581A6581}");
+        To<V_16_3_0.MigrateMediaTypeLabelProperties>("{FB7073AF-DFAF-4AC1-800D-91F9BD5B5238}");
+
+        // To 16.4.0
+        To<V_16_4_0.CreateMissingTabs>("{6A7D3B80-8B64-4E41-A7C0-02EC39336E97}");
+
+        // To 17.0.0
+        To<V_17_0_0.AddGuidsToAuditEntries>("{17D5F6CA-CEB8-462A-AF86-4B9C3BF91CF1}");
+        To<V_17_0_0.MigrateCheckboxListDataTypesAndPropertyData>("{EB1E50B7-CD5E-4B6B-B307-36237DD2C506}");
+        To<V_17_0_0.SetDateDefaultsToUtcNow>("{1847C7FF-B021-44EB-BEB0-A77A4376A6F2}");
+        To<V_17_0_0.MigrateSystemDatesToUtc>("{7208B20D-6BFC-472E-9374-85EEA817B27D}");
+        To<V_17_0_0.AddDistributedJobLock>("{263075BF-F18A-480D-92B4-4947D2EAB772}");
+        To<V_17_0_0.AddLastSyncedTable>("26179D88-58CE-4C92-B4A4-3CBA6E7188AC");
     }
 }

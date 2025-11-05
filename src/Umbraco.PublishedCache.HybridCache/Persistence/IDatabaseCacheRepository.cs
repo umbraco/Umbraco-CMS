@@ -3,6 +3,9 @@ using Umbraco.Cms.Infrastructure.HybridCache.Serialization;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache.Persistence;
 
+/// <summary>
+/// Defines a repository for persisting content cache data.
+/// </summary>
 internal interface IDatabaseCacheRepository
 {
     /// <summary>

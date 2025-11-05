@@ -1,10 +1,13 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Factories;
+using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
@@ -20,16 +23,33 @@ public class ByKeyDocumentCollectionController : DocumentCollectionControllerBas
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IDocumentCollectionPresentationFactory _documentCollectionPresentationFactory;
 
+    [ActivatorUtilitiesConstructor]
+    public ByKeyDocumentCollectionController(
+        IContentListViewService contentListViewService,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        IUmbracoMapper mapper,
+        IDocumentCollectionPresentationFactory documentCollectionPresentationFactory,
+        FlagProviderCollection flagProviders)
+        : base(mapper, flagProviders)
+    {
+        _contentListViewService = contentListViewService;
+        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
+        _documentCollectionPresentationFactory = documentCollectionPresentationFactory;
+    }
+
+    [Obsolete("Please use the constructor with all parameters. Scheduled to be removed in V18")]
     public ByKeyDocumentCollectionController(
         IContentListViewService contentListViewService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IUmbracoMapper mapper,
         IDocumentCollectionPresentationFactory documentCollectionPresentationFactory)
-        : base(mapper)
+        : this(
+            contentListViewService,
+            backOfficeSecurityAccessor,
+            mapper,
+            documentCollectionPresentationFactory,
+            StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>())
     {
-        _contentListViewService = contentListViewService;
-        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
-        _documentCollectionPresentationFactory = documentCollectionPresentationFactory;
     }
 
     [HttpGet("{id:guid}")]

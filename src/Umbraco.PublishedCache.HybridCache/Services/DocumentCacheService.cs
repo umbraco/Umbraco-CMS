@@ -1,6 +1,7 @@
 #if DEBUG
     using System.Diagnostics;
 #endif
+using System.Collections.Concurrent;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -34,6 +35,8 @@ internal sealed class DocumentCacheService : IDocumentCacheService
     private readonly CacheSettings _cacheSettings;
     private readonly ILogger<DocumentCacheService> _logger;
     private HashSet<Guid>? _seedKeys;
+
+    private readonly ConcurrentDictionary<string, IPublishedContent> _publishedContentCache = [];
 
     private HashSet<Guid> SeedKeys
     {
@@ -108,6 +111,11 @@ internal sealed class DocumentCacheService : IDocumentCacheService
     {
         var cacheKey = GetCacheKey(key, preview);
 
+        if (preview is false && _publishedContentCache.TryGetValue(cacheKey, out IPublishedContent? cached))
+        {
+            return cached;
+        }
+
         ContentCacheNode? contentCacheNode = await _hybridCache.GetOrCreateAsync(
             cacheKey,
             async cancel =>
@@ -132,14 +140,18 @@ internal sealed class DocumentCacheService : IDocumentCacheService
             GetEntryOptions(key, preview),
             GenerateTags(key));
 
-        // We don't want to cache removed items, this may cause issues if the L2 serializer changes.
         if (contentCacheNode is null)
         {
-            await _hybridCache.RemoveAsync(cacheKey);
             return null;
         }
 
-        return _publishedContentFactory.ToIPublishedContent(contentCacheNode, preview).CreateModel(_publishedModelFactory);
+        IPublishedContent? result = _publishedContentFactory.ToIPublishedContent(contentCacheNode, preview).CreateModel(_publishedModelFactory);
+        if (result is not null)
+        {
+            _publishedContentCache[cacheKey] = result;
+        }
+
+        return result;
     }
 
     private bool GetPreview() => _previewService.IsInPreview();
@@ -176,7 +188,9 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         ContentCacheNode? publishedNode = await _databaseCacheRepository.GetContentSourceAsync(key, false);
         if (publishedNode is not null && _publishStatusQueryService.HasPublishedAncestorPath(publishedNode.Key))
         {
-            await _hybridCache.SetAsync(GetCacheKey(publishedNode.Key, false), publishedNode, GetEntryOptions(publishedNode.Key, false), GenerateTags(key));
+            var cacheKey = GetCacheKey(publishedNode.Key, false);
+            await _hybridCache.SetAsync(cacheKey, publishedNode, GetEntryOptions(publishedNode.Key, false), GenerateTags(key));
+            _publishedContentCache.Remove(cacheKey, out _);
         }
 
         scope.Complete();
@@ -185,7 +199,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
     public async Task RemoveFromMemoryCacheAsync(Guid key)
     {
         await _hybridCache.RemoveAsync(GetCacheKey(key, true));
-        await _hybridCache.RemoveAsync(GetCacheKey(key, false));
+        await ClearPublishedCacheAsync(key);
     }
 
     public async Task SeedAsync(CancellationToken cancellationToken)
@@ -207,7 +221,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
 
                 var cacheKey = GetCacheKey(key, false);
 
-                var existsInCache = await _hybridCache.ExistsAsync(cacheKey);
+                var existsInCache = await _hybridCache.ExistsAsync<ContentCacheNode?>(cacheKey, cancellationToken).ConfigureAwait(false);
                 if (existsInCache is false)
                 {
                     uncachedKeys.Add(key);
@@ -280,7 +294,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
             return false;
         }
 
-        return await _hybridCache.ExistsAsync(GetCacheKey(keyAttempt.Result, preview));
+        return await _hybridCache.ExistsAsync<ContentCacheNode?>(GetCacheKey(keyAttempt.Result, preview), CancellationToken.None);
     }
 
     public async Task RefreshContentAsync(IContent content)
@@ -302,7 +316,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
 
             if (content.PublishedState == PublishedState.Unpublishing)
             {
-                await _hybridCache.RemoveAsync(GetCacheKey(publishedCacheNode.Key, false));
+                await ClearPublishedCacheAsync(publishedCacheNode.Key);
             }
         }
 
@@ -340,12 +354,19 @@ internal sealed class DocumentCacheService : IDocumentCacheService
 
         foreach (ContentCacheNode content in contentByContentTypeKey)
         {
-            _hybridCache.RemoveAsync(GetCacheKey(content.Key, true)).GetAwaiter().GetResult();
+            await _hybridCache.RemoveAsync(GetCacheKey(content.Key, true));
 
             if (content.IsDraft is false)
             {
-                _hybridCache.RemoveAsync(GetCacheKey(content.Key, false)).GetAwaiter().GetResult();
+                await ClearPublishedCacheAsync(content.Key);
             }
         }
+    }
+
+    private async Task ClearPublishedCacheAsync(Guid key)
+    {
+        var cacheKey = GetCacheKey(key, false);
+        await _hybridCache.RemoveAsync(cacheKey);
+        _publishedContentCache.Remove(cacheKey, out _);
     }
 }

@@ -16,6 +16,9 @@ export class UmbRefRteBlockElement extends UmbLitElement {
 	@property({ type: String })
 	icon?: string;
 
+	@property({ type: Number, attribute: false })
+	index?: number;
+
 	@property({ type: Boolean, reflect: true })
 	unpublished?: boolean;
 
@@ -46,7 +49,7 @@ export class UmbRefRteBlockElement extends UmbLitElement {
 	}
 
 	override render() {
-		const blockValue = { ...this.content, $settings: this.settings };
+		const blockValue = { ...this.content, $settings: this.settings, $index: this.index };
 		return html`
 			<uui-ref-node standalone href=${(this.config?.showContentEdit ? this._workspaceEditPath : undefined) ?? ''}>
 				<div class="selection-background" aria-hidden="true">&emsp;</div>
@@ -84,10 +87,6 @@ export class UmbRefRteBlockElement extends UmbLitElement {
 			umb-icon,
 			umb-ufm-render {
 				z-index: 1;
-
-				&::selection {
-					color: var(--uui-color-default-contrast);
-				}
 			}
 		`,
 	];

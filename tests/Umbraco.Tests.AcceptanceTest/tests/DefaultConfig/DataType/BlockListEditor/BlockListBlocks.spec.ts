@@ -422,11 +422,12 @@ test('can add a thumbnail to a block', {tag: '@release'}, async ({umbracoApi, um
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
   await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListEditorName, contentElementTypeId);
-  const mediaUrl = await umbracoApi.media.getMediaUrl(mediaId);
+  const mediaUrl = await umbracoApi.media.getFullMediaUrl(mediaId);
 
   // Act
   await umbracoUi.dataType.goToDataType(blockListEditorName);
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
+  await umbracoUi.waitForTimeout(500);
   await umbracoUi.dataType.chooseBlockThumbnailWithPath(mediaUrl);
   await umbracoUi.dataType.clickSubmitButton();
   await umbracoUi.dataType.clickSaveButton();

@@ -725,7 +725,7 @@ internal sealed class UserServiceTests : UmbracoIntegrationTest
     public void Count_All_Online_Users()
     {
         var users = UserBuilder.CreateMulipleUsers(10,
-            (i, member) => member.LastLoginDate = DateTime.Now.AddMinutes(i * -2));
+            (i, member) => member.LastLoginDate = DateTime.UtcNow.AddMinutes(i * -2));
         UserService.Save(users);
 
         var customUser = UserBuilder.CreateUser();
@@ -1017,6 +1017,42 @@ internal sealed class UserServiceTests : UmbracoIntegrationTest
         {
             Assert.AreEqual(user.StartContentIds.Length, startContentItems.Length);
         }
+    }
+
+    [Test]
+    public async Task Can_Assign_And_Get_Groups_For_User()
+    {
+        // Arrange
+        var (user, userGroup1) = await CreateTestUserAndGroup();
+        var userGroup2 = await CreateTestUserGroup("testGroup2", "Test Group 2");
+
+        // Act & Assert
+        user = UserService.GetByUsername(user.Username);
+
+        Assert.IsNotNull(user);
+        Assert.AreEqual(1, user.Groups.Count());
+        Assert.AreEqual(userGroup1.Alias, user.Groups.First().Alias);
+
+        // - add second group
+        user.AddGroup(userGroup2);
+        UserService.Save(user);
+        user = UserService.GetByUsername(user.Username);
+        Assert.AreEqual(2, user.Groups.Count());
+
+        // - remove first group
+        user.RemoveGroup(userGroup1.Alias);
+        UserService.Save(user);
+        user = UserService.GetByUsername(user.Username);
+        Assert.AreEqual(1, user.Groups.Count());
+        Assert.AreEqual(userGroup2.Alias, user.Groups.First().Alias);
+
+        // - remove second group and add first
+        user.RemoveGroup(userGroup2.Alias);
+        user.AddGroup(userGroup1.ToReadOnlyGroup());
+        UserService.Save(user);
+        user = UserService.GetByUsername(user.Username);
+        Assert.AreEqual(1, user.Groups.Count());
+        Assert.AreEqual(userGroup1.Alias, user.Groups.First().Alias);
     }
 
     [TestCase(UserKind.Default, UserClientCredentialsOperationStatus.InvalidUser)]

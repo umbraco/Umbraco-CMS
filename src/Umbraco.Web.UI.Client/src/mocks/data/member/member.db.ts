@@ -93,6 +93,7 @@ const createDetailMockMapper = (request: CreateMemberRequestModel): UmbMockMembe
 		},
 		username: request.username,
 		values: request.values as MemberValueResponseModel[],
+		flags: [],
 		variants: request.variants.map((variantRequest) => {
 			return {
 				culture: variantRequest.culture,
@@ -122,6 +123,7 @@ const detailResponseMapper = (item: UmbMockMemberModel): MemberResponseModel => 
 		username: item.username,
 		values: item.values,
 		variants: item.variants,
+		flags: item.flags,
 	};
 };
 
@@ -131,6 +133,7 @@ const itemResponseMapper = (item: UmbMockMemberModel): MemberItemResponseModel =
 		kind: item.kind,
 		memberType: item.memberType,
 		variants: item.variants,
+		flags: item.flags,
 	};
 };
 

@@ -8,5 +8,5 @@ namespace Umbraco.TestData;
 
 public class LoadTestComposer : IComposer
 {
-    public void Compose(IUmbracoBuilder builder) => builder.AddUmbracoTestData();
+    public void Compose(IUmbracoBuilder builder) => builder.AddUmbracoLoadTest();
 }

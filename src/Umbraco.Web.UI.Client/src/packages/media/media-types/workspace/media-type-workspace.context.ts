@@ -79,16 +79,6 @@ export class UmbMediaTypeWorkspaceContext
 		this.structure.updateOwnerContentType({ collection });
 	}
 
-	/**
-	 * @deprecated Use the createScaffold method instead. Will be removed in 17.
-	 * @param {UmbEntityModel} parent
-	 * @memberof UmbMediaTypeWorkspaceContext
-	 */
-	async create(parent: UmbEntityModel) {
-		console.warn('create() is deprecated. Use createScaffold() instead.');
-		this.createScaffold({ parent });
-	}
-
 	async #onScaffoldSetup(parent: UmbEntityModel) {
 		let preset: Partial<DetailModelType> | undefined = undefined;
 

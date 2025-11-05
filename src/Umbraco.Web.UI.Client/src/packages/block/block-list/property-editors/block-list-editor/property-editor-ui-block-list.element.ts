@@ -25,7 +25,7 @@ import {
 	UmbFormControlMixin,
 	UmbValidationContext,
 } from '@umbraco-cms/backoffice/validation';
-import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import { jsonStringComparison, observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
 import { UMB_CONTENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
 
@@ -99,8 +99,6 @@ export class UmbPropertyEditorUIBlockListElement
 		const useInlineEditingAsDefault = config.getValueByAlias<boolean>('useInlineEditingAsDefault');
 		this.#managerContext.setInlineEditingMode(useInlineEditingAsDefault);
 		this.style.maxWidth = config.getValueByAlias<string>('maxPropertyWidth') ?? '';
-		// TODO:
-		//config.useSingleBlockMode, not done jet
 
 		this.#managerContext.setEditorConfiguration(config);
 
@@ -216,6 +214,7 @@ export class UmbPropertyEditorUIBlockListElement
 			this.#gotPropertyContext(context);
 		});
 
+		// TODO: Why is this logic not part of the Block Grid and RTE Editors? [NL]
 		// Observe Blocks and clean up validation messages for content/settings that are not in the block list anymore:
 		this.observe(
 			this.#managerContext.layouts,
@@ -224,6 +223,7 @@ export class UmbPropertyEditorUIBlockListElement
 				const contentKeys = layouts.map((x) => x.contentKey);
 				this.#validationContext.messages.getMessagesOfPathAndDescendant('$.contentData').forEach((message) => {
 					// get the KEY from this string: $.contentData[?(@.key == 'KEY')]
+					// TODO: Investigate if this is missing a part to just get the [] part of the path. Cause couldn't there be a sub path inside of this. [NL]
 					const key = extractJsonQueryProps(message.path).key;
 					if (key && contentKeys.indexOf(key) === -1) {
 						validationMessagesToRemove.push(message.key);
@@ -232,6 +232,7 @@ export class UmbPropertyEditorUIBlockListElement
 
 				const settingsKeys = layouts.map((x) => x.settingsKey).filter((x) => x !== undefined) as string[];
 				this.#validationContext.messages.getMessagesOfPathAndDescendant('$.settingsData').forEach((message) => {
+					// TODO: Investigate if this is missing a part to just get the [] part of the path. Cause couldn't there be a sub path inside of this. [NL]
 					// get the key from this string: $.settingsData[?(@.key == 'KEY')]
 					const key = extractJsonQueryProps(message.path).key;
 					if (key && settingsKeys.indexOf(key) === -1) {
@@ -336,15 +337,22 @@ export class UmbPropertyEditorUIBlockListElement
 			]).pipe(debounceTime(20)),
 			([layouts, contents, settings, exposes]) => {
 				if (layouts.length === 0) {
+					if (this.value === undefined) {
+						return;
+					}
 					super.value = undefined;
 				} else {
-					super.value = {
+					const newValue = {
 						...super.value,
 						layout: { [UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS]: layouts },
 						contentData: contents,
 						settingsData: settings,
 						expose: exposes,
 					};
+					if (jsonStringComparison(this.value, newValue)) {
+						return;
+					}
+					super.value = newValue;
 				}
 
 				// If we don't have a value set from the outside or an internal value, we don't want to set the value.
@@ -370,12 +378,13 @@ export class UmbPropertyEditorUIBlockListElement
 		return html`
 			${repeat(
 				this._layouts,
-				(x) => x.contentKey,
-				(layoutEntry, index) => html`
+				(layout, index) => `${index}_${layout.contentKey}`,
+				(layout, index) => html`
 					${this.#renderInlineCreateButton(index)}
 					<umb-block-list-entry
-						.contentKey=${layoutEntry.contentKey}
-						.layout=${layoutEntry}
+						index=${index}
+						.contentKey=${layout.contentKey}
+						.layout=${layout}
 						${umbDestroyOnDisconnect()}>
 					</umb-block-list-entry>
 				`,
@@ -388,7 +397,7 @@ export class UmbPropertyEditorUIBlockListElement
 		if (this.readonly && this._layouts.length > 0) {
 			return nothing;
 		} else {
-			return html` <uui-button-group> ${this.#renderCreateButton()} ${this.#renderPasteButton()} </uui-button-group> `;
+			return html`<uui-button-group>${this.#renderCreateButton()}${this.#renderPasteButton()}</uui-button-group>`;
 		}
 	}
 

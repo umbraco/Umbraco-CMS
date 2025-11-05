@@ -1,28 +1,21 @@
 import { UMB_STYLESHEET_ENTITY_TYPE, UMB_STYLESHEET_FOLDER_ENTITY_TYPE } from '../../entity.js';
 import type { UmbStylesheetItemModel } from '../../types.js';
+import { UmbManagementApiStylesheetItemDataRequestManager } from './stylesheet-item.server.request-manager.js';
 import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
 import type { UmbItemDataSource } from '@umbraco-cms/backoffice/repository';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecute } from '@umbraco-cms/backoffice/resources';
-import { StylesheetService } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
 /**
  * A data source for stylesheet items that fetches data from the server
  * @class UmbStylesheetItemServerDataSource
  * @implements {UmbItemDataSource}
  */
-export class UmbStylesheetItemServerDataSource implements UmbItemDataSource<UmbStylesheetItemModel> {
-	#host: UmbControllerHost;
+export class UmbStylesheetItemServerDataSource
+	extends UmbControllerBase
+	implements UmbItemDataSource<UmbStylesheetItemModel>
+{
 	#serverFilePathUniqueSerializer = new UmbServerFilePathUniqueSerializer();
-
-	/**
-	 * Creates an instance of UmbStylesheetItemServerDataSource.
-	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
-	 * @memberof UmbStylesheetItemServerDataSource
-	 */
-	constructor(host: UmbControllerHost) {
-		this.#host = host;
-	}
+	#itemRequestManager = new UmbManagementApiStylesheetItemDataRequestManager(this);
 
 	/**
 	 * Fetches the items for the given uniques from the server
@@ -40,12 +33,7 @@ export class UmbStylesheetItemServerDataSource implements UmbItemDataSource<UmbS
 			})
 			.filter((x) => x !== null) as string[];
 
-		const { data, error } = await tryExecute(
-			this.#host,
-			StylesheetService.getItemStylesheet({
-				query: { path: paths },
-			}),
-		);
+		const { data, error } = await this.#itemRequestManager.getItems(paths);
 
 		if (data) {
 			const items: Array<UmbStylesheetItemModel> = data.map((item) => {

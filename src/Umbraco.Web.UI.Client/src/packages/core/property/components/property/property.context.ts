@@ -60,6 +60,9 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase {
 	#editorManifest = new UmbBasicState<ManifestPropertyEditorUi | undefined>(undefined);
 	public readonly editorManifest = this.#editorManifest.asObservable();
 
+	#editorDataSourceAlias = new UmbStringState<string | undefined>(undefined);
+	public readonly editorDataSourceAlias = this.#editorDataSourceAlias.asObservable();
+
 	public readonly readOnlyState = new UmbReadOnlyStateManager(this);
 	public readonly isReadOnly = this.readOnlyState.isReadOnly;
 
@@ -95,6 +98,22 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase {
 		return this.#editorManifest.getValue();
 	}
 
+	/**
+	 * Set the editor data source alias for this property.
+	 * @param {string | undefined} dataSourceAlias The data source alias to set
+	 */
+	setEditorDataSourceAlias(dataSourceAlias: string | undefined) {
+		this.#editorDataSourceAlias.setValue(dataSourceAlias ?? undefined);
+	}
+
+	/**
+	 * Get the editor data source alias for this property.
+	 * @returns {string | undefined} The editor data source alias for this property.
+	 */
+	getEditorDataSourceAlias(): string | undefined {
+		return this.#editorDataSourceAlias.getValue();
+	}
+
 	// property variant ID:
 	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
 	public readonly variantId = this.#variantId.asObservable();
@@ -107,9 +126,9 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase {
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_PROPERTY_CONTEXT);
 
-		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (variantContext) => {
-			this.#datasetContext = variantContext;
-			this.setVariantId(variantContext?.getVariantId?.());
+		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (context) => {
+			this.#datasetContext = context;
+			this.setVariantId(context?.getVariantId?.());
 			this._generateVariantDifferenceString();
 			this._observeProperty();
 		});
@@ -179,13 +198,27 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase {
 
 		let shareMessage;
 		if (contextVariantId && propertyVariantId) {
-			if (contextVariantId.segment !== propertyVariantId.segment) {
-				// TODO: Translate this, ideally the actual culture is mentioned in the message:
-				shareMessage = 'Shared across culture';
+			// If on a Segment viewing a segment-shared property:
+			// TODO: Do not use the content variant id, but know wether the property is configured to vary by segment.
+			// Because we can view a default segment, then we do not know if the property is shared or not. [NL]
+			if (contextVariantId.segment !== null && propertyVariantId.segment === null) {
+				// If the property does not have culture, then we know this also will be shared across cultures.
+				if (propertyVariantId.culture === null) {
+					shareMessage = 'content_sharedAcrossCultures';
+				} else {
+					// If not, then we know it will be only be shared across segments.
+					shareMessage = 'content_sharedAcrossSegments';
+				}
 			}
-			if (contextVariantId.culture !== propertyVariantId.culture) {
-				// TODO: Translate this:
-				shareMessage = 'Shared';
+			// TODO: Do not use the content variant id, but know wether the property is configured to vary by culture. (this is first a problem when we introduce the invariant-variant)
+			if (contextVariantId.culture !== null && propertyVariantId.culture === null) {
+				// If the property does have segment, then we know this will be shared across cultures and not across segments.
+				if (propertyVariantId.segment !== null) {
+					shareMessage = 'content_sharedAcrossCultures';
+				} else {
+					// if not then we know it's shared across everything.
+					shareMessage = 'content_shared';
+				}
 			}
 		}
 		this.#variantDifference.setValue(shareMessage);

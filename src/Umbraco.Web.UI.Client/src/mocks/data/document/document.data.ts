@@ -11,7 +11,6 @@ export type UmbMockDocumentModel = DocumentResponseModel & DocumentTreeItemRespo
 export const data: Array<UmbMockDocumentModel> = [
 	{
 		ancestors: [],
-		urls: [],
 		template: null,
 		id: 'the-simplest-document-id',
 		createDate: '2023-02-06T15:32:05.350038',
@@ -33,6 +32,8 @@ export const data: Array<UmbMockDocumentModel> = [
 				name: 'The Simplest Document',
 				createDate: '2023-02-06T15:32:05.350038',
 				updateDate: '2023-02-06T15:32:24.957009',
+				id: 'the-simplest-document-id',
+				flags: [],
 			},
 		],
 		values: [
@@ -44,15 +45,10 @@ export const data: Array<UmbMockDocumentModel> = [
 				value: 'default value here',
 			},
 		],
+		flags: [],
 	},
 	{
 		ancestors: [],
-		urls: [
-			{
-				culture: 'en-US',
-				url: '/',
-			},
-		],
 		template: null,
 		id: 'all-property-editors-document-id',
 		createDate: '2023-02-06T15:32:05.350038',
@@ -617,6 +613,34 @@ export const data: Array<UmbMockDocumentModel> = [
 				segment: null,
 				value: undefined,
 			},
+			{
+				editorAlias: 'Umbraco.DateOnly',
+				alias: 'dateOnly',
+				culture: null,
+				segment: null,
+				value: { date: '2025-09-19' },
+			},
+			{
+				editorAlias: 'Umbraco.TimeOnly',
+				alias: 'timeOnly',
+				culture: null,
+				segment: null,
+				value: { date: '16:30:00' },
+			},
+			{
+				editorAlias: 'Umbraco.DateTimeUnspecified',
+				alias: 'dateTimeUnspecified',
+				culture: null,
+				segment: null,
+				value: { date: '2025-09-19T16:30:00' },
+			},
+			{
+				editorAlias: 'Umbraco.DateTimeWithTimeZone',
+				alias: 'dateTimeWithTimeZone',
+				culture: null,
+				segment: null,
+				value: { date: '2025-09-19T16:30:00+02:00', timeZone: 'Europe/Copenhagen' },
+			},
 		],
 		variants: [
 			{
@@ -627,6 +651,8 @@ export const data: Array<UmbMockDocumentModel> = [
 				name: 'All properties',
 				createDate: '2023-02-06T15:31:46.876902',
 				updateDate: '2023-02-06T15:31:51.354764',
+				id: 'all-properties',
+				flags: [],
 			},
 			{
 				state: DocumentVariantStateModel.PUBLISHED,
@@ -636,17 +662,14 @@ export const data: Array<UmbMockDocumentModel> = [
 				name: 'Alle redigeringsfelter',
 				createDate: '2023-02-06T15:31:46.876902',
 				updateDate: '2023-02-06T15:31:51.354764',
+				id: 'alle-redigeringsfelter',
+				flags: [],
 			},
 		],
+		flags: [],
 	},
 	{
 		ancestors: [],
-		urls: [
-			{
-				culture: 'en-US',
-				url: '/',
-			},
-		],
 		template: null,
 		id: 'c05da24d-7740-447b-9cdc-bd8ce2172e38',
 		createDate: '2023-02-06T15:32:05.350038',
@@ -740,15 +763,52 @@ export const data: Array<UmbMockDocumentModel> = [
 				name: 'Article in english',
 				createDate: '2023-02-06T15:31:46.876902',
 				updateDate: '2023-02-06T15:31:51.354764',
+				id: 'article-in-english',
+				flags: [],
 			},
 			{
 				state: DocumentVariantStateModel.PUBLISHED,
 				publishDate: '2023-02-06T15:31:51.354764',
-				culture: 'da-dk',
+				culture: 'da',
 				segment: null,
 				name: 'Artikel på Dansk',
 				createDate: '2023-02-06T15:31:46.876902',
 				updateDate: '2023-02-06T15:31:51.354764',
+				id: 'artikel-pa-dansk',
+				flags: [],
+			},
+			{
+				state: DocumentVariantStateModel.PUBLISHED,
+				publishDate: '2023-02-06T15:31:51.354764',
+				culture: 'da',
+				segment: 'vip',
+				name: 'VIP: Artikel på Dansk',
+				createDate: '2023-02-06T15:31:46.876902',
+				updateDate: '2023-02-06T15:31:51.354764',
+				id: 'artikel-pa-dansk-vip',
+				flags: [],
+			},
+			{
+				state: DocumentVariantStateModel.PUBLISHED,
+				publishDate: '2023-02-06T15:31:51.354764',
+				culture: null,
+				segment: 'vip-invariant',
+				name: 'Invariant VIP Segmented Article',
+				createDate: '2023-02-06T15:31:46.876902',
+				updateDate: '2023-02-06T15:31:51.354764',
+				id: 'invariant-vip-segmented-article',
+				flags: [],
+			},
+			{
+				state: DocumentVariantStateModel.PUBLISHED,
+				publishDate: '2023-02-06T15:31:51.354764',
+				culture: null,
+				segment: 'generic',
+				name: 'Generic VIP Segmented Article',
+				createDate: '2023-02-06T15:31:46.876902',
+				updateDate: '2023-02-06T15:31:51.354764',
+				id: 'generic-vip-segmented-article',
+				flags: [],
 			},
 			{
 				state: DocumentVariantStateModel.PUBLISHED,
@@ -758,6 +818,8 @@ export const data: Array<UmbMockDocumentModel> = [
 				name: 'Artikel på Norsk',
 				createDate: '2023-02-06T15:31:46.876902',
 				updateDate: '2023-02-06T15:31:51.354764',
+				id: 'artikel-pa-norsk',
+				flags: [],
 			},
 			{
 				state: DocumentVariantStateModel.PUBLISHED_PENDING_CHANGES,
@@ -767,6 +829,8 @@ export const data: Array<UmbMockDocumentModel> = [
 				name: 'Articulo en ingles',
 				createDate: '2023-02-06T15:31:46.876902',
 				updateDate: '2023-02-06T15:31:51.354764',
+				id: 'articulo-en-ingles',
+				flags: [],
 			},
 			{
 				state: DocumentVariantStateModel.NOT_CREATED,
@@ -776,12 +840,14 @@ export const data: Array<UmbMockDocumentModel> = [
 				name: 'Artykuł w języku polskim',
 				createDate: '2023-02-06T15:31:46.876902',
 				updateDate: '2023-02-06T15:31:51.354764',
+				id: 'artykul-w-jezyku-polskim',
+				flags: [],
 			},
 		],
+		flags: [],
 	},
 	{
 		ancestors: [],
-		urls: [],
 		template: null,
 		id: 'fd56a0b5-01a0-4da2-b428-52773bfa9cc4',
 		createDate: '2023-02-06T15:32:05.350038',
@@ -861,17 +927,14 @@ export const data: Array<UmbMockDocumentModel> = [
 				name: 'Blog post B',
 				createDate: '2023-02-06T15:32:05.350038',
 				updateDate: '2023-02-06T15:32:24.957009',
+				id: 'blog-post-b',
+				flags: [],
 			},
 		],
+		flags: [],
 	},
 	{
 		ancestors: [],
-		urls: [
-			{
-				culture: 'en-US',
-				url: '/',
-			},
-		],
 		template: null,
 		id: 'simple-document-id',
 		createDate: '2023-02-06T15:32:05.350038',
@@ -894,6 +957,8 @@ export const data: Array<UmbMockDocumentModel> = [
 				name: 'Simple Document',
 				createDate: '2023-02-06T15:32:05.350038',
 				updateDate: '2023-02-06T15:32:24.957009',
+				id: 'simple-document',
+				flags: [],
 			},
 		],
 		values: [
@@ -912,15 +977,10 @@ export const data: Array<UmbMockDocumentModel> = [
 				value: undefined,
 			},
 		],
+		flags: [],
 	},
 	{
 		ancestors: [],
-		urls: [
-			{
-				culture: 'en-US',
-				url: '/',
-			},
-		],
 		template: null,
 		id: 'all-rtes-id',
 		createDate: '2023-02-06T15:32:05.350038',
@@ -942,6 +1002,8 @@ export const data: Array<UmbMockDocumentModel> = [
 				name: 'Rich Text Editor',
 				createDate: '2023-02-06T15:32:05.350038',
 				updateDate: '2023-02-06T15:32:24.957009',
+				id: 'rich-text-editor',
+				flags: [],
 			},
 		],
 		values: [
@@ -963,7 +1025,7 @@ export const data: Array<UmbMockDocumentModel> = [
 <p>Some value for the RTE with an <a href="https://google.com">external link</a> and an <a type="document" href="/{localLink:c05da24d-7740-447b-9cdc-bd8ce2172e38}">internal link</a> foo foo</p>
 
 <p>The following tests the embed plugin:</p>
-<p><div class="umb-embed-holder" data-embed-height="240" data-embed-width="360" data-embed-constrain="false" data-embed-url="https://www.youtube.com/watch?v=QRIWz9SotY4"><iframe width="360" height="240" src="https://www.youtube.com/embed/QRIWz9SotY4?feature=oembed" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen="allowfullscreen" title="Deep dive into Rich Text Editor"></iframe></div></p>
+<p><span class="umb-embed-holder" data-embed-height="240" data-embed-width="360" data-embed-constrain="false" data-embed-url="https://www.youtube.com/watch?v=QRIWz9SotY4"><iframe width="360" height="240" src="https://www.youtube.com/embed/QRIWz9SotY4?feature=oembed" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen="allowfullscreen" title="Deep dive into Rich Text Editor"></iframe></span></p>
 
 <p><span id="foo">Some</span> value for the RTE with an <a target="" data-router-slot="disabled" href="https://google.com" type="external">external link</a> and an <a target="" data-router-slot="disabled" href="/{localLink:c05da24d-7740-447b-9cdc-bd8ce2172e38}" type="document">internal link</a>.</p>
 
@@ -979,15 +1041,10 @@ export const data: Array<UmbMockDocumentModel> = [
 				},
 			},
 		],
+		flags: [],
 	},
 	{
 		ancestors: [],
-		urls: [
-			{
-				culture: 'en-US',
-				url: '/',
-			},
-		],
 		template: null,
 		id: 'block-editors-document-id',
 		createDate: '2023-02-06T15:32:05.350038',
@@ -1233,6 +1290,8 @@ export const data: Array<UmbMockDocumentModel> = [
 				name: 'All Block Editors',
 				createDate: '2023-02-06T15:31:46.876902',
 				updateDate: '2023-02-06T15:31:51.354764',
+				id: 'all-block-editors',
+				flags: [],
 			},
 			{
 				state: DocumentVariantStateModel.PUBLISHED,
@@ -1242,12 +1301,14 @@ export const data: Array<UmbMockDocumentModel> = [
 				name: 'Alle blok redigeringer',
 				createDate: '2023-02-06T15:31:46.876902',
 				updateDate: '2023-02-06T15:31:51.354764',
+				id: 'alle-blok-redigeringer',
+				flags: [],
 			},
 		],
+		flags: [],
 	},
 	{
 		ancestors: [],
-		urls: [],
 		template: null,
 		id: 'forbidden',
 		createDate: '2023-02-06T15:32:05.350038',
@@ -1269,6 +1330,8 @@ export const data: Array<UmbMockDocumentModel> = [
 				name: 'A forbidden document',
 				createDate: '2023-02-06T15:32:05.350038',
 				updateDate: '2023-02-06T15:32:24.957009',
+				id: 'a-forbidden-document',
+				flags: [],
 			},
 			{
 				state: DocumentVariantStateModel.PUBLISHED,
@@ -1278,6 +1341,8 @@ export const data: Array<UmbMockDocumentModel> = [
 				name: 'Et utilgængeligt dokument',
 				createDate: '2023-02-06T15:32:05.350038',
 				updateDate: '2023-02-06T15:32:24.957009',
+				id: 'et-utilgaengeligt-dokument',
+				flags: [],
 			},
 		],
 		values: [
@@ -1289,6 +1354,7 @@ export const data: Array<UmbMockDocumentModel> = [
 				value: 'default value here',
 			},
 		],
+		flags: [],
 	},
 	...permissionsTestData,
 ];

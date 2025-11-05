@@ -52,7 +52,7 @@ public class MediaPicker3PropertyEditor : DataEditor
     /// <summary>
     /// Defines the value editor for the media picker property editor.
     /// </summary>
-    internal sealed class MediaPicker3PropertyValueEditor : DataValueEditor, IDataValueReference
+    internal sealed class MediaPicker3PropertyValueEditor : DataValueEditor, IDataValueReference, ICacheReferencedEntities
     {
         private readonly IDataTypeConfigurationCache _dataTypeReadCache;
         private readonly IJsonSerializer _jsonSerializer;
@@ -61,6 +61,7 @@ public class MediaPicker3PropertyEditor : DataEditor
         private readonly ITemporaryFileService _temporaryFileService;
         private readonly IScopeProvider _scopeProvider;
         private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
+        private readonly AppCaches _appCaches;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MediaPicker3PropertyValueEditor"/> class.
@@ -82,7 +83,8 @@ public class MediaPicker3PropertyEditor : DataEditor
             IDataTypeConfigurationCache dataTypeReadCache,
             ILocalizedTextService localizedTextService,
             IMediaTypeService mediaTypeService,
-            IMediaNavigationQueryService mediaNavigationQueryService)
+            IMediaNavigationQueryService mediaNavigationQueryService,
+            AppCaches appCaches)
             : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
         {
             _jsonSerializer = jsonSerializer;
@@ -92,13 +94,36 @@ public class MediaPicker3PropertyEditor : DataEditor
             _scopeProvider = scopeProvider;
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
             _dataTypeReadCache = dataTypeReadCache;
+            _appCaches = appCaches;
+
             var validators = new TypedJsonValidatorRunner<List<MediaWithCropsDto>, MediaPicker3Configuration>(
                 jsonSerializer,
                 new MinMaxValidator(localizedTextService),
-                new AllowedTypeValidator(localizedTextService, mediaTypeService, _mediaService),
+                new AllowedTypeValidator(localizedTextService, mediaTypeService, _mediaService, appCaches),
                 new StartNodeValidator(localizedTextService, mediaNavigationQueryService));
 
             Validators.Add(validators);
+        }
+
+        /// <inheritdoc/>
+        public void CacheReferencedEntities(IEnumerable<object> values)
+        {
+            var mediaKeys = values
+                .SelectMany(value => Deserialize(_jsonSerializer, value))
+                .Select(dto => dto.MediaKey)
+                .Distinct()
+                .Where(x => IsMediaAlreadyCached(x, _appCaches.RequestCache) is false)
+                .ToList();
+            if (mediaKeys.Count == 0)
+            {
+                return;
+            }
+
+            IEnumerable<IMedia> mediaItems = _mediaService.GetByIds(mediaKeys);
+            foreach (IMedia media in mediaItems)
+            {
+                CacheMediaById(media, _appCaches.RequestCache);
+            }
         }
 
         /// <inheritdoc/>
@@ -202,7 +227,7 @@ public class MediaPicker3PropertyEditor : DataEditor
 
             foreach (MediaWithCropsDto mediaWithCropsDto in mediaWithCropsDtos)
             {
-                IMedia? media = _mediaService.GetById(mediaWithCropsDto.MediaKey);
+                IMedia? media = GetAndCacheMediaById(mediaWithCropsDto.MediaKey, _appCaches.RequestCache, _mediaService);
                 mediaWithCropsDto.MediaTypeAlias = media?.ContentType.Alias ?? unknownMediaType;
             }
 
@@ -216,7 +241,7 @@ public class MediaPicker3PropertyEditor : DataEditor
             foreach (MediaWithCropsDto mediaWithCropsDto in mediaWithCropsDtos)
             {
                 // if the media already exist, don't bother with it
-                if (_mediaService.GetById(mediaWithCropsDto.MediaKey) != null)
+                if (GetAndCacheMediaById(mediaWithCropsDto.MediaKey, _appCaches.RequestCache, _mediaService) != null)
                 {
                     continue;
                 }
@@ -401,18 +426,22 @@ public class MediaPicker3PropertyEditor : DataEditor
         /// </summary>
         internal sealed class AllowedTypeValidator : ITypedJsonValidator<List<MediaWithCropsDto>, MediaPicker3Configuration>
         {
+            private const string MediaTypeCacheKeyFormat = nameof(AllowedTypeValidator) + "_MediaTypeKey_{0}";
+
             private readonly ILocalizedTextService _localizedTextService;
             private readonly IMediaTypeService _mediaTypeService;
             private readonly IMediaService _mediaService;
+            private readonly AppCaches _appCaches;
 
             /// <summary>
             /// Initializes a new instance of the <see cref="AllowedTypeValidator"/> class.
             /// </summary>
-            public AllowedTypeValidator(ILocalizedTextService localizedTextService, IMediaTypeService mediaTypeService, IMediaService mediaService)
+            public AllowedTypeValidator(ILocalizedTextService localizedTextService, IMediaTypeService mediaTypeService, IMediaService mediaService, AppCaches appCaches)
             {
                 _localizedTextService = localizedTextService;
                 _mediaTypeService = mediaTypeService;
                 _mediaService = mediaService;
+                _appCaches = appCaches;
             }
 
             /// <inheritdoc/>
@@ -452,9 +481,9 @@ public class MediaPicker3PropertyEditor : DataEditor
 
                 foreach (var typeAlias in distinctTypeAliases)
                 {
-                    IMediaType? type = _mediaTypeService.Get(typeAlias);
+                    string? typeKey = GetMediaTypeKey(typeAlias);
 
-                    if (type is null || allowedTypes.Contains(type.Key.ToString()) is false)
+                    if (typeKey is null || allowedTypes.Contains(typeKey) is false)
                     {
                         return
                         [
@@ -466,6 +495,31 @@ public class MediaPicker3PropertyEditor : DataEditor
                 }
 
                 return [];
+            }
+
+            private string? GetMediaTypeKey(string typeAlias)
+            {
+                // Cache media type lookups since the same media type is likely to be used multiple times in validation,
+                // particularly if we have multiple languages and blocks.
+                string? GetMediaTypeKeyFromService(string typeAlias) => _mediaTypeService.Get(typeAlias)?.Key.ToString();
+
+                if (_appCaches.RequestCache.IsAvailable is false)
+                {
+                    return GetMediaTypeKeyFromService(typeAlias);
+                }
+
+                var cacheKey = string.Format(MediaTypeCacheKeyFormat, typeAlias);
+                string? typeKey = _appCaches.RequestCache.GetCacheItem<string?>(cacheKey);
+                if (typeKey is null)
+                {
+                    typeKey = GetMediaTypeKeyFromService(typeAlias);
+                    if (typeKey is not null)
+                    {
+                        _appCaches.RequestCache.Set(cacheKey, typeKey);
+                    }
+                }
+
+                return typeKey;
             }
         }
 

@@ -14,12 +14,11 @@
     "npm": ">=10.9"
   },
   "devDependencies": {
-    "@hey-api/client-fetch": "^0.10.2",
-    "@hey-api/openapi-ts": "^0.67.6",
-    "@umbraco-cms/backoffice": "16.0.0-rc4",
-    "msw": "^2.7.0",
-    "typescript": "^5.8.3",
-    "vite": "^6.3.5"
+    "@hey-api/openapi-ts": "^0.85.0",
+    "@umbraco-cms/backoffice": "^16.2.0",
+    "msw": "^2.11.3",
+    "typescript": "^5.9.3",
+    "vite": "^7.1.11"
   },
   "msw": {
     "workerDirectory": [

@@ -787,7 +787,7 @@ internal partial class UserService : RepositoryService, IUserService
             throw new PanicException("Was unable to get user after creating it");
         }
 
-        invitedUser.InvitedDate = DateTime.Now;
+        invitedUser.InvitedDate = DateTime.UtcNow;
         invitedUser.ClearGroups();
         foreach(IUserGroup userGroup in userGroups)
         {
@@ -827,7 +827,7 @@ internal partial class UserService : RepositoryService, IUserService
         }
 
         // re-inviting so update invite date
-        invitedUser.InvitedDate = DateTime.Now;
+        invitedUser.InvitedDate = DateTime.UtcNow;
         await userStore.SaveAsync(invitedUser);
 
         Attempt<UserInvitationResult, UserOperationStatus> invitationAttempt = await SendInvitationAsync(performingUser, serviceScope, invitedUser, model.Message);
@@ -883,7 +883,7 @@ internal partial class UserService : RepositoryService, IUserService
             return UserOperationStatus.DuplicateUserName;
         }
 
-        if(model.UserGroupKeys.Count == 0)
+        if (model.UserGroupKeys.Count == 0)
         {
             return UserOperationStatus.NoUserGroup;
         }
@@ -910,6 +910,13 @@ internal partial class UserService : RepositoryService, IUserService
         {
             scope.Complete();
             return Attempt.FailWithStatus<IUser?, UserOperationStatus>(UserOperationStatus.MissingUser, existingUser);
+        }
+
+        // A user must remain assigned to at least one group.
+        if (model.UserGroupKeys.Count == 0)
+        {
+            scope.Complete();
+            return Attempt.FailWithStatus<IUser?, UserOperationStatus>(UserOperationStatus.NoUserGroup, existingUser);
         }
 
         // User names can only contain the configured allowed characters. This is validated by ASP.NET Identity on create

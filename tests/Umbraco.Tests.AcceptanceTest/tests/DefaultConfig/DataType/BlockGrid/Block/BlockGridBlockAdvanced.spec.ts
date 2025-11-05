@@ -240,7 +240,9 @@ test('can remove a icon color from a block', async ({umbracoApi, umbracoUi}) => 
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainIconColor(blockGridEditorName, contentElementTypeId, '')).toBeTruthy();
 });
 
-test('can add a thumbnail to a block', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+// Remove skip when the front-end is ready. Currently it is not possible to add a thumbnail to a block
+// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/20264
+test.skip('can add a thumbnail to a block', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const mediaName = 'TestMedia';
   await umbracoApi.media.ensureNameNotExists(mediaName);
@@ -248,7 +250,7 @@ test('can add a thumbnail to a block', {tag: '@smoke'}, async ({umbracoApi, umbr
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
   await umbracoApi.dataType.createBlockGridWithABlock(blockGridEditorName, contentElementTypeId);
-  const mediaUrl = await umbracoApi.media.getMediaUrl(mediaId);
+  const mediaUrl = await umbracoApi.media.getFullMediaUrl(mediaId);
 
   // Act
   await umbracoUi.dataType.goToDataType(blockGridEditorName);

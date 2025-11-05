@@ -1,6 +1,8 @@
 import { partialUpdateFrozenArray } from '../utils/partial-update-frozen-array.function.js';
+import { prependToUniqueArray } from '../utils/prepend-to-unique-array.function.js';
 import { pushAtToUniqueArray } from '../utils/push-at-to-unique-array.function.js';
 import { pushToUniqueArray } from '../utils/push-to-unique-array.function.js';
+import { replaceInUniqueArray } from '../utils/replace-in-unique-array.function.js';
 import { UmbDeepState } from './deep-state.js';
 
 /**
@@ -48,10 +50,10 @@ export class UmbArrayState<T, U = unknown> extends UmbDeepState<T[]> {
 	 * @param {T} data - The next data for this state to hold.
 	 * @description - Set the data of this state, if sortBy has been defined for this state the data will be sorted before set. If data is different than current this will trigger observations to update.
 	 * @example <caption>Example change the data of a state</caption>
-	 * const myState = new UmbArrayState('Good morning');
-	 * // myState.value is equal 'Good morning'.
-	 * myState.setValue('Goodnight')
-	 * // myState.value is equal 'Goodnight'.
+	 * const myState = new UmbArrayState(['Good morning']);
+	 * // myState.value is equal ['Good morning'].
+	 * myState.setValue(['Goodnight'])
+	 * // myState.value is equal ['Goodnight'].
 	 */
 	override setValue(value: T[]) {
 		if (value && this.#sortMethod) {
@@ -59,6 +61,19 @@ export class UmbArrayState<T, U = unknown> extends UmbDeepState<T[]> {
 		} else {
 			super.setValue(value);
 		}
+	}
+
+	/**
+	 * @function clear
+	 * @description - Set the data of this state to an empty array.
+	 * @example <caption>Example clearing the data of a state</caption>
+	 * const myState = new UmbArrayState(['Good morning']);
+	 * // myState.value is equal ['Good morning'].
+	 * myState.clear()
+	 * // myState.value is equal [].
+	 */
+	clear() {
+		super.setValue([]);
 	}
 
 	/**
@@ -250,6 +265,38 @@ export class UmbArrayState<T, U = unknown> extends UmbDeepState<T[]> {
 	}
 
 	/**
+	 * @function replace
+	 * @param {Partial<T>} entires - data of entries to be replaced.
+	 * @returns {UmbArrayState<T>} Reference to it self.
+	 * @description - Replaces one or more entries, requires the ArrayState to be constructed with a getUnique method.
+	 * @example <caption>Example append some data.</caption>
+	 * const data = [
+	 * 	{ key: 1, value: 'foo'},
+	 * 	{ key: 2, value: 'bar'}
+	 * ];
+	 * const myState = new UmbArrayState(data, (x) => x.key);
+	 * const updates = [
+	 * 	{ key: 1, value: 'foo2'},
+	 * 	{ key: 3, value: 'bar2'}
+	 * ];
+	 * myState.replace(updates);
+	 * // Only the existing item gets replaced:
+	 * myState.getValue(); // -> [{ key: 1, value: 'foo2'}, { key: 2, value: 'bar'}]
+	 */
+	replace(entries: Array<T>): UmbArrayState<T> {
+		if (this.getUniqueMethod) {
+			const next = [...this.getValue()];
+			entries.forEach((entry) => {
+				replaceInUniqueArray(next, entry as T, this.getUniqueMethod!);
+			});
+			this.setValue(next);
+		} else {
+			throw new Error("Can't replace entries of an ArrayState without a getUnique method provided when constructed.");
+		}
+		return this;
+	}
+
+	/**
 	 * @function updateOne
 	 * @param {U} unique - Unique value to find entry to update.
 	 * @param {Partial<T>} entry - new data to be added in this Subject.
@@ -268,6 +315,36 @@ export class UmbArrayState<T, U = unknown> extends UmbDeepState<T[]> {
 			throw new Error("Can't partial update an ArrayState without a getUnique method provided when constructed.");
 		}
 		this.setValue(partialUpdateFrozenArray(this.getValue(), entry, (x) => unique === this.getUniqueMethod!(x)));
+		return this;
+	}
+
+	/**
+	 * @function prepend
+	 * @param {T[]} entries - A array of new data to be added in this Subject.
+	 * @returns {UmbArrayState<T>} Reference to it self.
+	 * @description - Prepend some new data to this Subject, if it compares to existing data it will replace it.
+	 * @example <caption>Example prepend some data.</caption>
+	 * const data = [
+	 * 	{ key: 1, value: 'foo'},
+	 * 	{ key: 2, value: 'bar'}
+	 * ];
+	 * const myState = new UmbArrayState(data);
+	 * myState.prepend([
+	 * 	{ key: 0, value: 'another-bla'},
+	 * 	{ key: 1, value: 'replaced-foo'},
+	 * ]);
+	 */
+	prepend(entries: T[]) {
+		if (this.getUniqueMethod) {
+			const next = [...this.getValue()];
+			entries.forEach((entry) => {
+				prependToUniqueArray(next, entry, this.getUniqueMethod!);
+			});
+			this.setValue(next);
+		} else {
+			this.setValue([...entries, ...this.getValue()]);
+		}
+
 		return this;
 	}
 

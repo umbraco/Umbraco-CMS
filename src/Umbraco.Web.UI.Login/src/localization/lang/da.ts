@@ -12,8 +12,10 @@ export default {
 		required: 'Påkrævet',
 		success: 'Succes',
 		forgottenPassword: 'Glemt adgangskode?',
-    forgottenPasswordInstruction: 'En e-mail vil blive sendt til den angivne adresse med et link til at nulstille din adgangskode',
-    requestPasswordResetConfirmation: 'En e-mail med instruktioner for nulstilling af adgangskoden vil blive sendt til den angivne adresse, hvis det matcher vores optegnelser',
+		forgottenPasswordInstruction:
+			'En e-mail vil blive sendt til den angivne adresse med et link til at nulstille din adgangskode',
+		requestPasswordResetConfirmation:
+			'En e-mail med instruktioner for nulstilling af adgangskoden vil blive sendt til den angivne adresse, hvis det matcher vores optegnelser',
 		setPasswordConfirmation: 'Din adgangskode er blevet opdateret',
 		rememberMe: 'Husk mig',
 		error: 'Fejl',
@@ -26,8 +28,10 @@ export default {
 		userLockedOut: 'Din konto er blevet låst. Prøv igen senere.',
 		receivedErrorFromServer: 'Der skete en fejl på serveren',
 		resetCodeExpired: 'Det link, du har klikket på, er ugyldigt eller udløbet',
-    userInviteWelcomeMessage: 'Hej og velkommen til Umbraco! På bare 1 minut vil du være klar til at komme i gang, vi skal bare have dig til at oprette en adgangskode.',
-    userInviteExpiredMessage: 'Velkommen til Umbraco! Desværre er din invitation udløbet. Kontakt din administrator og bed om at gensende invitationen.',
+		userInviteWelcomeMessage:
+			'Hej og velkommen til Umbraco! På bare 1 minut vil du være klar til at komme i gang, vi skal bare have dig til at oprette en adgangskode.',
+		userInviteExpiredMessage:
+			'Velkommen til Umbraco! Desværre er din invitation udløbet. Kontakt din administrator og bed om at gensende invitationen.',
 		newPassword: 'Ny adgangskode',
 		confirmNewPassword: 'Bekræft adgangskode',
 		greeting0: 'Velkommen',
@@ -45,10 +49,13 @@ export default {
 		mfaInvalidCode: 'Forkert kode indtastet',
 		signInWith: 'Log ind med {0}',
 		returnToLogin: 'Tilbage til log ind',
-    localLoginDisabled: 'Desværre er det ikke muligt at logge ind direkte. Det er blevet deaktiveret af en login-udbyder.',
+		localLoginDisabled:
+			'Desværre er det ikke muligt at logge ind direkte. Det er blevet deaktiveret af en login-udbyder.',
 		friendlyGreeting: 'Hej!',
 		requiredEmailValidationMessage: 'Udfyld venligst en e-mail',
 		requiredUsernameValidationMessage: 'Udfyld venligst et brugernavn',
 		requiredPasswordValidationMessage: 'Udfyld venligst en adgangskode',
+		showPassword: 'Vis adgangskode',
+		hidePassword: 'Skjul adgangskode',
 	},
 } satisfies UmbLocalizationDictionary;

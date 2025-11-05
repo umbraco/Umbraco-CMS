@@ -4,11 +4,13 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-[TableName(Constants.DatabaseSchema.Tables.DocumentType)]
+[TableName(TableName)]
 [PrimaryKey("contentTypeNodeId", AutoIncrement = false)]
 [ExplicitColumns]
 internal sealed class ContentTypeTemplateDto
 {
+    public const string TableName = Constants.DatabaseSchema.Tables.DocumentType;
+
     [Column("contentTypeNodeId")]
     [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_cmsDocumentType", OnColumns = "contentTypeNodeId, templateNodeId")]
     [ForeignKey(typeof(ContentTypeDto), Column = "nodeId")]

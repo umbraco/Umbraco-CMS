@@ -1,6 +1,6 @@
 import type { UmbPropertyEditorRteValueType } from '../types.js';
 import { UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../constants.js';
-import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import { jsonStringComparison, observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbBlockRteEntriesContext, UmbBlockRteManagerContext } from '@umbraco-cms/backoffice/block-rte';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
@@ -34,6 +34,8 @@ export abstract class UmbPropertyEditorUiRteElementBase
 	extends UmbFormControlMixin<UmbPropertyEditorRteValueType | undefined, typeof UmbLitElement, undefined>(UmbLitElement)
 	implements UmbPropertyEditorUiElement
 {
+	public name?: string;
+
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 
@@ -241,9 +243,12 @@ export abstract class UmbPropertyEditorUiRteElementBase
 			([layouts, contents, settings, exposes]) => {
 				if (layouts.length === 0) {
 					if (super.value?.markup === undefined) {
+						if (this.value === undefined) {
+							return;
+						}
 						super.value = undefined;
 					} else {
-						super.value = {
+						const newValue = {
 							...super.value,
 							blocks: {
 								layout: {},
@@ -252,9 +257,13 @@ export abstract class UmbPropertyEditorUiRteElementBase
 								expose: [],
 							},
 						};
+						if (jsonStringComparison(this.value, newValue)) {
+							return;
+						}
+						super.value = newValue;
 					}
 				} else {
-					super.value = {
+					const newValue = {
 						markup: this._markup,
 						blocks: {
 							layout: { [UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS]: layouts },
@@ -263,6 +272,10 @@ export abstract class UmbPropertyEditorUiRteElementBase
 							expose: exposes,
 						},
 					};
+					if (jsonStringComparison(this.value, newValue)) {
+						return;
+					}
+					super.value = newValue;
 				}
 
 				// If we don't have a value set from the outside or an internal value, we don't want to set the value.

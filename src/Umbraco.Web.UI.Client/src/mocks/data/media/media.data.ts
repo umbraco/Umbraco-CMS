@@ -42,7 +42,7 @@ export const data: Array<UmbMockMediaModel> = [
 				updateDate: '2023-02-06T15:31:51.354764',
 			},
 		],
-		urls: [],
+		flags: [],
 	},
 	{
 		hasChildren: false,
@@ -72,7 +72,7 @@ export const data: Array<UmbMockMediaModel> = [
 				updateDate: '2023-02-06T15:31:51.354764',
 			},
 		],
-		urls: [],
+		flags: [],
 	},
 	{
 		hasChildren: true,
@@ -97,7 +97,7 @@ export const data: Array<UmbMockMediaModel> = [
 				updateDate: '2023-02-06T15:31:51.354764',
 			},
 		],
-		urls: [],
+		flags: [],
 	},
 	{
 		hasChildren: true,
@@ -122,7 +122,7 @@ export const data: Array<UmbMockMediaModel> = [
 				updateDate: '2023-02-06T15:31:51.354764',
 			},
 		],
-		urls: [],
+		flags: [],
 	},
 	{
 		hasChildren: false,
@@ -152,7 +152,7 @@ export const data: Array<UmbMockMediaModel> = [
 				updateDate: '2023-02-06T15:31:51.354764',
 			},
 		],
-		urls: [],
+		flags: [],
 	},
 	{
 		hasChildren: false,
@@ -182,7 +182,7 @@ export const data: Array<UmbMockMediaModel> = [
 				updateDate: '2023-02-06T15:31:51.354764',
 			},
 		],
-		urls: [],
+		flags: [],
 	},
 	{
 		hasChildren: false,
@@ -212,7 +212,7 @@ export const data: Array<UmbMockMediaModel> = [
 				updateDate: '2023-02-06T15:31:51.354764',
 			},
 		],
-		urls: [],
+		flags: [],
 	},
 	{
 		hasChildren: false,
@@ -242,7 +242,7 @@ export const data: Array<UmbMockMediaModel> = [
 				updateDate: '2023-02-06T15:31:51.354764',
 			},
 		],
-		urls: [],
+		flags: [],
 	},
 	{
 		hasChildren: false,
@@ -274,6 +274,6 @@ export const data: Array<UmbMockMediaModel> = [
 				updateDate: '2023-02-06T15:31:51.354764',
 			},
 		],
-		urls: [],
+		flags: [],
 	},
 ];

@@ -14,6 +14,9 @@ export class UmbWorkspaceBreadcrumbElement extends UmbLitElement {
 	@state()
 	private _structure: UmbStructureItemModel[] = [];
 
+	@state()
+	private _isNew: boolean = false;
+
 	// TODO: figure out the correct context type
 	#workspaceContext?: any;
 	#sectionContext?: typeof UMB_SECTION_CONTEXT.TYPE;
@@ -28,6 +31,7 @@ export class UmbWorkspaceBreadcrumbElement extends UmbLitElement {
 
 		this.consumeContext(UMB_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance as any;
+			this.#observeIsNew();
 			this.#observeStructure();
 			this.#observeName();
 		});
@@ -38,16 +42,15 @@ export class UmbWorkspaceBreadcrumbElement extends UmbLitElement {
 		});
 	}
 
-	#observeStructure() {
-		if (!this.#structureContext || !this.#workspaceContext) return;
-		const isNew = this.#workspaceContext.getIsNew();
-
+	#observeIsNew() {
 		this.observe(
-			this.#structureContext.structure,
+			this.#workspaceContext?.isNew,
 			(value) => {
-				this._structure = isNew ? value : value.slice(0, -1);
+				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+				// @ts-ignore
+				this._isNew = value || false;
 			},
-			'menuStructureObserver',
+			'breadcrumbWorkspaceIsNewObserver',
 		);
 	}
 
@@ -61,16 +64,36 @@ export class UmbWorkspaceBreadcrumbElement extends UmbLitElement {
 		);
 	}
 
+	#observeStructure() {
+		if (!this.#structureContext || !this.#workspaceContext) return;
+
+		this.observe(
+			this.#structureContext.structure,
+			(value) => {
+				this._structure = value;
+			},
+			'menuStructureObserver',
+		);
+	}
+
 	#getHref(structureItem: UmbStructureItemModel) {
 		if (structureItem.isFolder) return undefined;
-		return `section/${this.#sectionContext?.getPathname()}/workspace/${structureItem.entityType}/edit/${structureItem.unique}`;
+
+		let href = `section/${this.#sectionContext?.getPathname()}`;
+		if (structureItem.unique) {
+			href += `/workspace/${structureItem.entityType}/edit/${structureItem.unique}`;
+		}
+
+		return href;
 	}
 
 	override render() {
+		const structure = this._isNew ? this._structure : this._structure.slice(0, -1);
+
 		return html`
 			<uui-breadcrumbs>
 				${map(
-					this._structure,
+					structure,
 					(structureItem) =>
 						html`<uui-breadcrumb-item href=${ifDefined(this.#getHref(structureItem))}
 							>${this.localize.string(structureItem.name)}</uui-breadcrumb-item

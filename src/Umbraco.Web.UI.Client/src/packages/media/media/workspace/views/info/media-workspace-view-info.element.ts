@@ -10,6 +10,7 @@ import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
 import { UMB_SETTINGS_SECTION_ALIAS } from '@umbraco-cms/backoffice/settings';
+import { UMB_IS_TRASHED_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/recycle-bin';
 
 @customElement('umb-media-workspace-view-info')
 export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
@@ -41,6 +42,9 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 	@state()
 	private _hasSettingsAccess: boolean = false;
 
+	@state()
+	private _isTrashed: boolean = false;
+
 	constructor() {
 		super();
 
@@ -69,6 +73,16 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 			this._mediaTypeUnique = context?.getContentTypeId();
 			this.#getData();
 			this.#observeContent();
+		});
+
+		this.consumeContext(UMB_IS_TRASHED_ENTITY_CONTEXT, (context) => {
+			this.observe(
+				context?.isTrashed,
+				(isTrashed) => {
+					this._isTrashed = isTrashed ?? false;
+				},
+				'_isTrashed',
+			);
 		});
 	}
 
@@ -115,7 +129,7 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 
 	#renderGeneralSection() {
 		return html`
-			${this.#renderCreateDate()} ${this.#renderUpdateDate()}
+			${this.#renderTrashState()} ${this.#renderCreateDate()} ${this.#renderUpdateDate()}
 			<div class="general-item">
 				<strong><umb-localize key="content_mediaType">Media Type</umb-localize></strong>
 				<uui-ref-node-document-type
@@ -123,7 +137,7 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 					href=${ifDefined(
 						this._hasSettingsAccess ? this._editMediaTypePath + 'edit/' + this._mediaTypeUnique : undefined,
 					)}
-					?readonly=${!this._hasSettingsAccess}
+					?readonly=${!this._hasSettingsAccess || this._isTrashed}
 					name=${ifDefined(this._mediaTypeName)}>
 					${this._mediaTypeIcon ? html`<umb-icon slot="icon" name=${this._mediaTypeIcon}></umb-icon>` : nothing}
 				</uui-ref-node-document-type>
@@ -131,6 +145,20 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 			<div class="general-item">
 				<strong><umb-localize key="template_id">Id</umb-localize></strong>
 				<span>${this._mediaUnique}</span>
+			</div>
+		`;
+	}
+
+	#renderTrashState() {
+		if (!this._isTrashed) return nothing;
+
+		return html`
+			<div class="general-item">
+				<span>
+					<uui-tag color="danger" look="primary" label=${this.localize.term('content_trashed')}>
+						${this.localize.term('content_trashed')}
+					</uui-tag>
+				</span>
 			</div>
 		`;
 	}

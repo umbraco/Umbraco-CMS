@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Core.Services;
 internal sealed class DictionaryItemService : RepositoryService, IDictionaryItemService
 {
     private readonly IDictionaryRepository _dictionaryRepository;
-    private readonly IAuditRepository _auditRepository;
+    private readonly IAuditService _auditService;
     private readonly ILanguageService _languageService;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
 
@@ -21,13 +21,13 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
         ILoggerFactory loggerFactory,
         IEventMessagesFactory eventMessagesFactory,
         IDictionaryRepository dictionaryRepository,
-        IAuditRepository auditRepository,
+        IAuditService auditService,
         ILanguageService languageService,
         IUserIdKeyResolver userIdKeyResolver)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _dictionaryRepository = dictionaryRepository;
-        _auditRepository = auditRepository;
+        _auditService = auditService;
         _languageService = languageService;
         _userIdKeyResolver = userIdKeyResolver;
     }
@@ -159,7 +159,27 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
     /// <inheritdoc />
     public async Task<Attempt<IDictionaryItem, DictionaryItemOperationStatus>> UpdateAsync(
         IDictionaryItem dictionaryItem, Guid userKey)
-        => await SaveAsync(
+    {
+        // Create and update dates aren't tracked for dictionary items. They exist on IDictionaryItem due to the
+        // inheritance from IEntity, but we don't store them.
+        // However we have logic in ServerEventSender that will provide SignalR events for created and update operations,
+        // where these dates are used to distinguish between the two (whether or not the entity has an identity cannot
+        // be used here, as these events fire after persistence when the identity is known for both creates and updates).
+        // So ensure we set something that can be distinguished here.
+        if (dictionaryItem.CreateDate == default)
+        {
+            // Set such that it's prior to the update date, but not the default date which will be considered
+            // uninitialized and get reset to the current date at the repository.
+            dictionaryItem.CreateDate = DateTime.MinValue.AddHours(1);
+        }
+
+        if (dictionaryItem.UpdateDate == default)
+        {
+            // TODO (V17): To align with updates of system dates, this needs to change to DateTime.UtcNow.
+            dictionaryItem.UpdateDate = DateTime.UtcNow;
+        }
+
+        return await SaveAsync(
             dictionaryItem,
             () =>
             {
@@ -174,6 +194,7 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
             AuditType.Save,
             "Update DictionaryItem",
             userKey);
+    }
 
     /// <inheritdoc />
     public async Task<Attempt<IDictionaryItem?, DictionaryItemOperationStatus>> DeleteAsync(Guid id, Guid userKey)
@@ -199,8 +220,7 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
                 new DictionaryItemDeletedNotification(dictionaryItem, eventMessages)
                     .WithStateFrom(deletingNotification));
 
-            var currentUserId = await _userIdKeyResolver.GetAsync(userKey);
-            Audit(AuditType.Delete, "Delete DictionaryItem", currentUserId, dictionaryItem.Id, nameof(DictionaryItem));
+            await AuditAsync(AuditType.Delete, "Delete DictionaryItem", userKey, dictionaryItem.Id, nameof(DictionaryItem));
 
             scope.Complete();
             return Attempt.SucceedWithStatus<IDictionaryItem?, DictionaryItemOperationStatus>(DictionaryItemOperationStatus.Success, dictionaryItem);
@@ -261,8 +281,7 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
             scope.Notifications.Publish(
                 new DictionaryItemMovedNotification(moveEventInfo, eventMessages).WithStateFrom(movingNotification));
 
-            var currentUserId = await _userIdKeyResolver.GetAsync(userKey);
-            Audit(AuditType.Move, "Move DictionaryItem", currentUserId, dictionaryItem.Id, nameof(DictionaryItem));
+            await AuditAsync(AuditType.Move, "Move DictionaryItem", userKey, dictionaryItem.Id, nameof(DictionaryItem));
             scope.Complete();
 
             return Attempt.SucceedWithStatus(DictionaryItemOperationStatus.Success, dictionaryItem);
@@ -322,8 +341,7 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
             scope.Notifications.Publish(
                 new DictionaryItemSavedNotification(dictionaryItem, eventMessages).WithStateFrom(savingNotification));
 
-            var currentUserId = await _userIdKeyResolver.GetAsync(userKey);
-            Audit(auditType, auditMessage, currentUserId, dictionaryItem.Id, nameof(DictionaryItem));
+            await AuditAsync(auditType, auditMessage, userKey, dictionaryItem.Id, nameof(DictionaryItem));
             scope.Complete();
 
             return Attempt.SucceedWithStatus(DictionaryItemOperationStatus.Success, dictionaryItem);
@@ -339,8 +357,13 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
         }
     }
 
-    private void Audit(AuditType type, string message, int userId, int objectId, string? entityType) =>
-        _auditRepository.Save(new AuditItem(objectId, type, userId, entityType, message));
+    private async Task AuditAsync(AuditType type, string message, Guid userKey, int objectId, string? entityType) =>
+        await _auditService.AddAsync(
+            type,
+            userKey,
+            objectId,
+            entityType,
+            message);
 
     private bool HasValidParent(IDictionaryItem dictionaryItem)
         => dictionaryItem.ParentId.HasValue == false || _dictionaryRepository.Get(dictionaryItem.ParentId.Value) != null;

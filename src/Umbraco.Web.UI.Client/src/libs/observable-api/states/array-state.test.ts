@@ -5,7 +5,7 @@ describe('ArrayState', () => {
 	type ObjectType = { key: string; another: string };
 	type ArrayType = ObjectType[];
 
-	let subject: UmbArrayState<ObjectType>;
+	let state: UmbArrayState<ObjectType>;
 	let initialData: ArrayType;
 
 	beforeEach(() => {
@@ -14,12 +14,12 @@ describe('ArrayState', () => {
 			{ key: '2', another: 'myValue2' },
 			{ key: '3', another: 'myValue3' },
 		];
-		subject = new UmbArrayState(initialData, (x) => x.key);
+		state = new UmbArrayState(initialData, (x) => x.key);
 	});
 
 	it('replays latests, no matter the amount of subscriptions.', (done) => {
 		let amountOfCallbacks = 0;
-		const observer = subject.asObservable();
+		const observer = state.asObservable();
 		observer.subscribe((value) => {
 			amountOfCallbacks++;
 			expect(value).to.be.equal(initialData);
@@ -36,19 +36,26 @@ describe('ArrayState', () => {
 	it('remove method, removes the one with the key', (done) => {
 		const expectedData = [initialData[0], initialData[2]];
 
-		subject.remove(['2']);
-		const observer = subject.asObservable();
+		state.remove(['2']);
+		const observer = state.asObservable();
 		observer.subscribe((value) => {
 			expect(JSON.stringify(value)).to.be.equal(JSON.stringify(expectedData));
 			done();
 		});
 	});
 
+	it('getHasOne method, return true when key exists', () => {
+		expect(state.getHasOne('2')).to.be.true;
+	});
+	it('getHasOne method, return false when key does not exists', () => {
+		expect(state.getHasOne('1337')).to.be.false;
+	});
+
 	it('filter method, removes anything that is not true of the given predicate method', (done) => {
 		const expectedData = [initialData[0], initialData[2]];
 
-		subject.filter((x) => x.key !== '2');
-		const observer = subject.asObservable();
+		state.filter((x) => x.key !== '2');
+		const observer = state.asObservable();
 		observer.subscribe((value) => {
 			expect(JSON.stringify(value)).to.be.equal(JSON.stringify(expectedData));
 			done();
@@ -57,11 +64,11 @@ describe('ArrayState', () => {
 
 	it('add new item via appendOne method.', (done) => {
 		const newItem = { key: '4', another: 'myValue4' };
-		subject.appendOne(newItem);
+		state.appendOne(newItem);
 
 		const expectedData = [...initialData, newItem];
 
-		const observer = subject.asObservable();
+		const observer = state.asObservable();
 		observer.subscribe((value) => {
 			expect(value.length).to.be.equal(expectedData.length);
 			expect(value[3].another).to.be.equal(expectedData[3].another);
@@ -71,9 +78,25 @@ describe('ArrayState', () => {
 
 	it('partially update an existing item via updateOne method.', (done) => {
 		const newItem = { another: 'myValue2.2' };
-		subject.updateOne('2', newItem);
+		state.updateOne('2', newItem);
 
-		const observer = subject.asObservable();
+		const observer = state.asObservable();
+		observer.subscribe((value) => {
+			expect(value.length).to.be.equal(initialData.length);
+			expect(value[0].another).to.be.equal('myValue1');
+			expect(value[1].another).to.be.equal('myValue2.2');
+			done();
+		});
+	});
+
+	it('replaces only existing items via replace method.', (done) => {
+		const newItems = [
+			{ key: '2', another: 'myValue2.2' },
+			{ key: '4', another: 'myValue4.4' },
+		];
+		state.replace(newItems);
+
+		const observer = state.asObservable();
 		observer.subscribe((value) => {
 			expect(value.length).to.be.equal(initialData.length);
 			expect(value[0].another).to.be.equal('myValue1');
@@ -83,7 +106,7 @@ describe('ArrayState', () => {
 	});
 
 	it('getObservablePart for a specific entry of array', (done) => {
-		const subObserver = subject.asObservablePart((data) => data.find((x) => x.key === '2'));
+		const subObserver = state.asObservablePart((data) => data.find((x) => x.key === '2'));
 		subObserver.subscribe((entry) => {
 			if (entry) {
 				expect(entry.another).to.be.equal(initialData[1].another);
@@ -96,7 +119,7 @@ describe('ArrayState', () => {
 		let amountOfCallbacks = 0;
 		const newItem = { key: '4', another: 'myValue4' };
 
-		const subObserver = subject.asObservablePart((data) => data.find((x) => x.key === newItem.key));
+		const subObserver = state.asObservablePart((data) => data.find((x) => x.key === newItem.key));
 		subObserver.subscribe((entry) => {
 			amountOfCallbacks++;
 			if (amountOfCallbacks === 1) {
@@ -111,16 +134,16 @@ describe('ArrayState', () => {
 			}
 		});
 
-		subject.appendOne(newItem);
+		state.appendOne(newItem);
 	});
 
 	it('asObservable returns the replaced item', (done) => {
 		const newItem = { key: '2', another: 'myValue4' };
-		subject.appendOne(newItem);
+		state.appendOne(newItem);
 
 		const expectedData = [initialData[0], newItem, initialData[2]];
 
-		const observer = subject.asObservable();
+		const observer = state.asObservable();
 		observer.subscribe((value) => {
 			expect(value.length).to.be.equal(expectedData.length);
 			expect(value[1].another).to.be.equal(newItem.another);
@@ -130,9 +153,9 @@ describe('ArrayState', () => {
 
 	it('getObservablePart returns the replaced item', (done) => {
 		const newItem = { key: '2', another: 'myValue4' };
-		subject.appendOne(newItem);
+		state.appendOne(newItem);
 
-		const subObserver = subject.asObservablePart((data) => data.find((x) => x.key === newItem.key));
+		const subObserver = state.asObservablePart((data) => data.find((x) => x.key === newItem.key));
 		subObserver.subscribe((entry) => {
 			expect(entry).to.be.equal(newItem); // Second callback should give us the right data:
 			if (entry) {
@@ -145,7 +168,7 @@ describe('ArrayState', () => {
 	it('getObservablePart replays existing data to any amount of subscribers.', (done) => {
 		let amountOfCallbacks = 0;
 
-		const subObserver = subject.asObservablePart((data) => data.find((x) => x.key === '2'));
+		const subObserver = state.asObservablePart((data) => data.find((x) => x.key === '2'));
 		subObserver.subscribe((entry) => {
 			if (entry) {
 				amountOfCallbacks++;
@@ -166,7 +189,7 @@ describe('ArrayState', () => {
 	it('getObservablePart replays existing data to any amount of subscribers.', (done) => {
 		let amountOfCallbacks = 0;
 
-		const subObserver = subject.asObservablePart((data) => data.find((x) => x.key === '2'));
+		const subObserver = state.asObservablePart((data) => data.find((x) => x.key === '2'));
 		subObserver.subscribe((entry) => {
 			if (entry) {
 				amountOfCallbacks++;
@@ -187,7 +210,7 @@ describe('ArrayState', () => {
 	it('append only updates observable if changes item', (done) => {
 		let count = 0;
 
-		const observer = subject.asObservable();
+		const observer = state.asObservable();
 		observer.subscribe((value) => {
 			count++;
 			if (count === 1) {
@@ -205,12 +228,12 @@ describe('ArrayState', () => {
 
 		Promise.resolve().then(() => {
 			// Despite how many times this happens it should not trigger any change.
-			subject.append(initialData);
-			subject.append(initialData);
-			subject.append(initialData);
+			state.append(initialData);
+			state.append(initialData);
+			state.append(initialData);
 
 			Promise.resolve().then(() => {
-				subject.appendOne({ key: '4', another: 'myValue4' });
+				state.appendOne({ key: '4', another: 'myValue4' });
 			});
 		});
 	});

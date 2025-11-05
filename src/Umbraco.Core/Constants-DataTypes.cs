@@ -13,6 +13,8 @@ public static partial class Constants
         public const int LabelDateTime = -94;
         public const int LabelTime = -98;
         public const int LabelDecimal = -99;
+        public const int LabelBytes = -104;
+        public const int LabelPixels = -105;
 
         public const int Textarea = -89;
         public const int Textbox = -88;
@@ -105,15 +107,14 @@ public static partial class Constants
             public const string ListViewMedia = "3A0156C4-3B8C-4803-BDC1-6871FAA83FFF";
 
             /// <summary>
-            ///     Guid for List View - Members as string
-            /// </summary>
-            [Obsolete("No longer used in Umbraco. Scheduled for removal in Umbraco 17.")]
-            public const string ListViewMembers = "AA2C52A0-CE87-4E65-A47C-7DF09358585D";
-
-            /// <summary>
             ///     Guid for Date Picker with time as string
             /// </summary>
             public const string DatePickerWithTime = "e4d66c0f-b935-4200-81f0-025f7256b89a";
+
+            /// <summary>
+            ///     Guid for Date Time Picker (with Timezone) as string
+            /// </summary>
+            public const string DateTimePickerWithTimeZone = "88E8A052-30EE-4D44-A507-59F2CDFC769C";
 
             /// <summary>
             ///     Guid for Approved Color as string
@@ -226,6 +227,16 @@ public static partial class Constants
             public const string LabelDecimal = "8f1ef1e1-9de4-40d3-a072-6673f631ca64";
 
             /// <summary>
+            ///     Guid for Label as bytes
+            /// </summary>
+            public const string LabelBytes = "ba5bdbe6-ab3e-46a8-82b3-2c45f10bc47f";
+
+            /// <summary>
+            ///     Guid for Label as pixels
+            /// </summary>
+            public const string LabelPixels = "5eb57825-e15e-4fc7-8e37-fca65cdafbde";
+
+            /// <summary>
             ///     Guid for Content Picker
             /// </summary>
             public static readonly Guid ContentPickerGuid = new(ContentPicker);
@@ -289,6 +300,11 @@ public static partial class Constants
             ///     Guid for Date Picker with time
             /// </summary>
             public static readonly Guid DatePickerWithTimeGuid = new(DatePickerWithTime);
+
+            /// <summary>
+            ///     Guid for Date Time Picker (with Timezone).
+            /// </summary>
+            public static readonly Guid DateTimePickerWithTimeZoneGuid = new(DateTimePickerWithTimeZone);
 
             /// <summary>
             ///     Guid for Approved Color

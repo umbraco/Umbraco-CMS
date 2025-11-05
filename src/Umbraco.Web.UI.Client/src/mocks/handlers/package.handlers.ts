@@ -6,8 +6,8 @@ import type {
 	PagedPackageMigrationStatusResponseModel,
 	CreatePackageRequestModel,
 	GetPackageConfigurationResponse,
-	PagedPackageDefinitionResponseModelReadable,
-	PackageDefinitionResponseModelReadable,
+	PagedPackageDefinitionResponseModel,
+	PackageDefinitionResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 
 export const handlers = [
@@ -55,7 +55,7 @@ export const handlers = [
 		// read all
 		return res(
 			ctx.status(200),
-			ctx.json<PagedPackageDefinitionResponseModelReadable>({
+			ctx.json<PagedPackageDefinitionResponseModel>({
 				total: packageArray.length,
 				items: packageArray,
 			}),
@@ -65,9 +65,9 @@ export const handlers = [
 	rest.post(umbracoPath('/package/created'), async (_req, res, ctx) => {
 		//save
 		const data: CreatePackageRequestModel = await _req.json();
-		const newPackage: PackageDefinitionResponseModelReadable = { ...data, id: UmbId.new(), packagePath: '' };
+		const newPackage: PackageDefinitionResponseModel = { ...data, id: UmbId.new(), packagePath: '' };
 		packageArray.push(newPackage);
-		return res(ctx.status(200), ctx.json<PackageDefinitionResponseModelReadable>(newPackage));
+		return res(ctx.status(200), ctx.json<PackageDefinitionResponseModel>(newPackage));
 	}),
 
 	rest.get(umbracoPath('/package/created/:id'), (_req, res, ctx) => {
@@ -76,12 +76,12 @@ export const handlers = [
 		if (!id) return res(ctx.status(404));
 		const found = packageArray.find((p) => p.id == id);
 		if (!found) return res(ctx.status(404));
-		return res(ctx.status(200), ctx.json<PackageDefinitionResponseModelReadable>(found));
+		return res(ctx.status(200), ctx.json<PackageDefinitionResponseModel>(found));
 	}),
 
 	rest.put(umbracoPath('/package/created/:id'), async (_req, res, ctx) => {
 		//update
-		const data: PackageDefinitionResponseModelReadable = await _req.json();
+		const data: PackageDefinitionResponseModel = await _req.json();
 		if (!data.id) return;
 		const index = packageArray.findIndex((x) => x.id === data.id);
 		packageArray[index] = data;
@@ -104,7 +104,7 @@ export const handlers = [
 	}),
 ];
 
-const packageArray: PackageDefinitionResponseModelReadable[] = [
+const packageArray: PackageDefinitionResponseModel[] = [
 	{
 		id: '2a0181ec-244b-4068-a1d7-2f95ed7e6da6',
 		packagePath: '',

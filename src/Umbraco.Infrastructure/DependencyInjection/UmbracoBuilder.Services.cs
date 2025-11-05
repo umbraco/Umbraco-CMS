@@ -44,7 +44,9 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IUserIdKeyResolver, UserIdKeyResolver>();
 
         builder.Services.AddUnique<IAuditService, AuditService>();
+        builder.Services.AddUnique<IAuditEntryService, AuditEntryService>();
         builder.Services.AddUnique<ICacheInstructionService, CacheInstructionService>();
+        builder.Services.AddUnique<ICacheSyncService, CacheSyncService>();
         builder.Services.AddUnique<IBasicAuthService, BasicAuthService>();
         builder.Services.AddUnique<IDataTypeService, DataTypeService>();
         builder.Services.AddUnique<IPackagingService, PackagingService>();
@@ -83,6 +85,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.TryAddTransient<IReservedFieldNamesService, ReservedFieldNamesService>();
         builder.Services.AddUnique<IContentSearchService, ContentSearchService>();
         builder.Services.AddUnique<IMediaSearchService, MediaSearchService>();
+        builder.Services.AddUnique<IDistributedJobService, DistributedJobService>();
 
         return builder;
     }

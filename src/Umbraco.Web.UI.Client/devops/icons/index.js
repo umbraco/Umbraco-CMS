@@ -1,6 +1,7 @@
+/* eslint-disable local-rules/enforce-umbraco-external-imports */
 import { readFileSync, writeFile, mkdir, rmSync } from 'fs';
-import * as globModule from 'tiny-glob';
 import * as pathModule from 'path';
+import * as globModule from 'tiny-glob';
 import { optimize } from 'svgo';
 
 const path = pathModule.default;
@@ -23,7 +24,7 @@ const run = async () => {
 	// Empty output directory:
 	rmSync(iconsOutputDirectory, { recursive: true });
 
-	var icons = await collectDictionaryIcons();
+	let icons = await collectDictionaryIcons();
 	icons = await collectDiskIcons(icons);
 	writeIconsToDisk(icons);
 	generateJS(icons);
@@ -51,7 +52,6 @@ const collectDictionaryIcons = async () => {
 
 				const icon = {
 					name: iconDef.name,
-					legacy: iconDef.legacy, // TODO: Deprecated, remove in v.17.
 					hidden: iconDef.legacy ?? iconDef.internal,
 					fileName: iconFileName,
 					svg,
@@ -59,7 +59,7 @@ const collectDictionaryIcons = async () => {
 				};
 
 				icons.push(icon);
-			} catch (e) {
+			} catch {
 				errors.push(`[Lucide] Could not load file: '${path}'`);
 				console.log(`[Lucide] Could not load file: '${path}'`);
 			}
@@ -91,7 +91,7 @@ const collectDictionaryIcons = async () => {
 				};
 
 				icons.push(icon);
-			} catch (e) {
+			} catch {
 				errors.push(`[SimpleIcons] Could not load file: '${path}'`);
 				console.log(`[SimpleIcons] Could not load file: '${path}'`);
 			}
@@ -117,7 +117,7 @@ const collectDictionaryIcons = async () => {
 				};
 
 				icons.push(icon);
-			} catch (e) {
+			} catch {
 				errors.push(`[Umbraco] Could not load file: '${path}'`);
 				console.log(`[Umbraco] Could not load file: '${path}'`);
 			}
@@ -146,10 +146,8 @@ const collectDiskIcons = async (icons) => {
 
 		// Only append not already defined icons:
 		if (!icons.find((x) => x.name === iconName)) {
-			// remove legacy for v.17 (Deprecated)
 			const icon = {
 				name: iconName,
-				legacy: true,
 				hidden: true,
 				fileName: iconFileName,
 				svg,
@@ -171,11 +169,9 @@ const writeIconsToDisk = (icons) => {
 
 		writeFileWithDir(icon.output, content, (err) => {
 			if (err) {
-				// eslint-disable-next-line no-undef
 				console.log(err);
 			}
 
-			// eslint-disable-next-line no-undef
 			//console.log(`icon: ${icon.name} generated`);
 		});
 	});
@@ -185,25 +181,22 @@ const generateJS = (icons) => {
 	const JSPath = `${moduleDirectory}/icons.ts`;
 
 	const iconDescriptors = icons.map((icon) => {
-		// remove legacy for v.17 (Deprecated)
-		// Notice how legacy also makes an icon hidden. Legacy will be removed in v.17, but still used in the dictionary for legacy icons. But outward they are both hidden. [NL]
 		return `{
 			name: "${icon.name}",
-			${icon.legacy ? 'legacy: true,' : ''}
 			${icon.hidden || icon.legacy ? 'hidden: true,' : ''}
 			path: () => import("./icons/${icon.fileName}.js"),
-		}`.replace(/\t/g, '').replace(/^\s*[\r\n]/gm, ''); // Regex removes white space [NL] // + regex that removes empty lines. [NL]
+		}`
+			.replace(/\t/g, '') // Regex removes white space [NL]
+			.replace(/^\s*[\r\n]/gm, ''); // Regex that removes empty lines. [NL]
 	});
 
 	const content = `export default [${iconDescriptors.join(',')}];`;
 
 	writeFileWithDir(JSPath, content, (err) => {
 		if (err) {
-			// eslint-disable-next-line no-undef
 			console.log(err);
 		}
 
-		// eslint-disable-next-line no-undef
 		console.log('Icons outputted and Icon Manifests generated!');
 	});
 };

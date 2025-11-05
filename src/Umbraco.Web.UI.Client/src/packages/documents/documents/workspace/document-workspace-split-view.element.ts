@@ -1,10 +1,12 @@
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from './document-workspace.context-token.js';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, nothing, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbActiveVariant } from '@umbraco-cms/backoffice/workspace';
+import { css, customElement, html, ifDefined, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { ManifestWorkspaceView, UmbActiveVariant } from '@umbraco-cms/backoffice/workspace';
+import type { UmbDeepPartialObject } from '@umbraco-cms/backoffice/utils';
 
 import './document-workspace-split-view-variant-selector.element.js';
+import { UMB_ROUTE_CONTEXT } from '@umbraco-cms/backoffice/router';
 
 @customElement('umb-document-workspace-split-view')
 export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
@@ -17,6 +19,12 @@ export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
 	@state()
 	private _icon?: string;
 
+	@state()
+	private _overrides?: Array<UmbDeepPartialObject<ManifestWorkspaceView>>;
+
+	@state()
+	private _loading = true;
+
 	constructor() {
 		super();
 
@@ -25,7 +33,21 @@ export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
 			this._workspaceContext = context;
 			this.#observeActiveVariantInfo();
 			this.#observeIcon();
+			this.#observeLoading();
+			this.#observeCollectionOverrides();
 		});
+
+		// TODO: Make sure this works when opening a collection when document is already open.
+		// get current get variables from url, and check if openCollection is set:
+		const urlSearchParams = new URLSearchParams(window.location.search);
+		const openCollection = urlSearchParams.has('openCollection');
+		if (openCollection) {
+			this.getContext(UMB_ROUTE_CONTEXT).then((routeContext) => {
+				if (routeContext) {
+					window.history.replaceState({}, '', routeContext.getActivePath() + '/view/collection');
+				}
+			});
+		}
 	}
 
 	#observeActiveVariantInfo() {
@@ -39,9 +61,33 @@ export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
 	}
 
 	#observeIcon() {
-		this.observe(this._workspaceContext?.contentTypeIcon, (icon) => {
-			this._icon = icon ?? undefined;
-		});
+		this.observe(
+			this._workspaceContext?.contentTypeIcon,
+			(icon) => {
+				this._icon = icon ?? undefined;
+			},
+			'observeIcon',
+		);
+	}
+
+	#observeLoading() {
+		this.observe(
+			this._workspaceContext?.loading.isOn,
+			(loading) => {
+				this._loading = loading ?? false;
+			},
+			'observeIcon',
+		);
+	}
+
+	#observeCollectionOverrides() {
+		this.observe(
+			this._workspaceContext?.collection.manifestOverrides,
+			(overrides) => {
+				this._overrides = overrides ? [overrides] : undefined;
+			},
+			'observeCollectionOverrides',
+		);
 	}
 
 	override render() {
@@ -53,8 +99,10 @@ export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
 								view.index + '_' + (view.culture ?? '') + '_' + (view.segment ?? '') + '_' + this._variants!.length,
 							(view) => html`
 								<umb-workspace-split-view
-									.splitViewIndex=${view.index}
-									.displayNavigation=${view.index === this._variants!.length - 1}>
+									.loading=${this._loading}
+									.displayNavigation=${view.index === this._variants!.length - 1}
+									.overrides=${this._overrides}
+									.splitViewIndex=${view.index}>
 									<umb-icon slot="icon" name=${ifDefined(this._icon)}></umb-icon>
 									<umb-document-workspace-split-view-variant-selector
 										slot="variant-selector"></umb-document-workspace-split-view-variant-selector>
@@ -83,10 +131,6 @@ export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
 				display: flex;
 				width: 100%;
 				height: calc(100% - var(--umb-footer-layout-height));
-			}
-
-			#breadcrumbs {
-				margin: 0 var(--uui-size-layout-1);
 			}
 		`,
 	];

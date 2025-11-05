@@ -1,8 +1,9 @@
 import { UMB_MEDIA_WORKSPACE_CONTEXT } from './media-workspace.context-token.js';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, nothing, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbActiveVariant } from '@umbraco-cms/backoffice/workspace';
+import { css, customElement, html, ifDefined, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { ManifestWorkspaceView, UmbActiveVariant } from '@umbraco-cms/backoffice/workspace';
+import type { UmbDeepPartialObject } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-media-workspace-split-view')
 export class UmbMediaWorkspaceSplitViewElement extends UmbLitElement {
@@ -15,6 +16,9 @@ export class UmbMediaWorkspaceSplitViewElement extends UmbLitElement {
 	@state()
 	private _icon?: string;
 
+	@state()
+	private _overrides?: Array<UmbDeepPartialObject<ManifestWorkspaceView>>;
+
 	constructor() {
 		super();
 
@@ -23,6 +27,7 @@ export class UmbMediaWorkspaceSplitViewElement extends UmbLitElement {
 			this._workspaceContext = context;
 			this.#observeActiveVariantInfo();
 			this.#observeIcon();
+			this.#observeCollectionOverrides();
 		});
 	}
 
@@ -44,6 +49,12 @@ export class UmbMediaWorkspaceSplitViewElement extends UmbLitElement {
 		});
 	}
 
+	#observeCollectionOverrides() {
+		this.observe(this._workspaceContext?.collection.manifestOverrides, (overrides) => {
+			this._overrides = overrides ? [overrides] : undefined;
+		});
+	}
+
 	override render() {
 		return this._variants
 			? html`<div id="splitViews">
@@ -53,8 +64,9 @@ export class UmbMediaWorkspaceSplitViewElement extends UmbLitElement {
 								view.index + '_' + (view.culture ?? '') + '_' + (view.segment ?? '') + '_' + this._variants!.length,
 							(view) => html`
 								<umb-workspace-split-view
-									.splitViewIndex=${view.index}
-									.displayNavigation=${view.index === this._variants!.length - 1}>
+									.displayNavigation=${view.index === this._variants!.length - 1}
+									.overrides=${this._overrides}
+									.splitViewIndex=${view.index}>
 									<umb-icon slot="icon" name=${ifDefined(this._icon)}></umb-icon>
 								</umb-workspace-split-view>
 							`,

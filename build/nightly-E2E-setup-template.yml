@@ -1,0 +1,50 @@
+parameters:
+  - name: nodeVersion
+    type: string
+    default: ''
+
+  - name: PlaywrightUserEmail
+    type: string
+    default: ''
+
+  - name: PlaywrightPassword
+    type: string
+    default: ''
+
+  - name: ASPNETCORE_URLS
+    type: string
+    default: ''
+
+  - name: npm_config_cache
+    type: string
+    default: ''
+
+steps:
+  - task: DownloadPipelineArtifact@2
+    displayName: Download NuGet artifacts
+    inputs:
+      artifact: nupkg
+      path: $(Agent.BuildDirectory)/app/nupkg
+
+  - task: UseDotNet@2
+    displayName: Use .NET SDK from global.json
+    inputs:
+      useGlobalJson: true
+
+  - template: templates/e2e-install.yml
+    parameters:
+      nodeVersion: ${{ parameters.nodeVersion }}
+      npm_config_cache: ${{ parameters.npm_config_cache }}
+      PlaywrightUserEmail: ${{ parameters.PlaywrightUserEmail }}
+      PlaywrightPassword: ${{ parameters.PlaywrightPassword }}
+      ASPNETCORE_URLS: ${{ parameters.ASPNETCORE_URLS }}
+
+  # Install Template
+  - pwsh: |
+      $cmsVersion = "$(Build.BuildNumber)" -replace "\+",".g"
+      dotnet new nugetconfig
+      dotnet nuget add source ./nupkg --name Local
+      dotnet new install Umbraco.Templates::$cmsVersion
+      dotnet new umbraco --name UmbracoProject --version $cmsVersion --exclude-gitignore --no-restore --no-update-check
+    displayName: Install Template
+    workingDirectory: $(Agent.BuildDirectory)/app
