@@ -1,10 +1,6 @@
 import { html, customElement, property, ifDefined, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import {
-	UUIFormValidationMessageElement,
-	type InputType,
-	type UUIFormLayoutItemElement,
-} from '@umbraco-cms/backoffice/external/uui';
+import type { InputType, UUIFormLayoutItemElement } from '@umbraco-cms/backoffice/external/uui';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 import { UMB_AUTH_CONTEXT, UmbAuthContext } from './contexts';
@@ -209,6 +205,8 @@ export default class UmbAuthElement extends UmbLitElement {
 
 		// Wait for localization to be ready before loading the form
 		await this.#waitForLocalization();
+
+		this.#initializeForm();
 	}
 
 	async #waitForLocalization(): Promise<void> {
@@ -300,10 +298,15 @@ export default class UmbAuthElement extends UmbLitElement {
 			this._passwordInput,
 			this._passwordShowPasswordToggleItem
 		);
+		const style = document.createElement('style');
+		style.innerHTML = authStyles;
+		document.head.appendChild(style);
 
-		return [this._usernameLayoutItem, this._passwordLayoutItem];
+		const elements = [this._usernameLayoutItem, this._passwordLayoutItem];
 
-		//this.insertAdjacentElement('beforeend', this._form);
+		elements.forEach((el) => {
+			this.insertAdjacentElement('beforeend', el);
+		});
 	}
 
 	render() {
@@ -360,24 +363,12 @@ export default class UmbAuthElement extends UmbLitElement {
 				return html` <umb-invite-page></umb-invite-page>`;
 
 			default:
-				return this.#renderLoginPage();
+				return html`
+					<umb-login-page ?allow-password-reset=${this.allowPasswordReset} ?username-is-email=${this.usernameIsEmail}>
+						<slot></slot>
+					</umb-login-page>
+				`;
 		}
-	}
-
-	#renderLoginPage() {
-		const elements = this.#initializeForm();
-
-		return html`
-			<style>
-				${authStyles}
-			</style>
-			<umb-login-page
-				id="umb-login-form"
-				?allow-password-reset=${this.allowPasswordReset}
-				?username-is-email=${this.usernameIsEmail}>
-				${elements}
-			</umb-login-page>
-		`;
 	}
 }
 
