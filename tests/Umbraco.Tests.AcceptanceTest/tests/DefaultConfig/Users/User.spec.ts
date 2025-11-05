@@ -595,8 +595,8 @@ test('can order by newest user', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.user.isUserWithNameTheFirstUserInList(nameOfTheUser);
 });
 
-// TODO: Sometimes the frontend does not switch from grid to table, or table to grid.
-test.skip('can change from grid to table view', async ({page, umbracoApi, umbracoUi}) => {
+test.fixme('can change from grid to table view', async ({page, umbracoApi, umbracoUi}) => {
+  // TODO: Implement it later
 });
 
 test('can remove admin user group from a user', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {

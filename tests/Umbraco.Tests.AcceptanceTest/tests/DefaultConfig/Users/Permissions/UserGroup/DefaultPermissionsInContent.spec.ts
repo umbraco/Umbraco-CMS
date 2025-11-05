@@ -219,8 +219,7 @@ test('can not create content with create permission disabled', async ({umbracoAp
   await umbracoUi.content.isActionsMenuForNameVisible(rootDocumentName, false);
 });
 
-// TODO: Setup SMTP server to test notifications, do this when we test appsettings.json
-test.skip('can create notifications with notification permission enabled', async ({umbracoApi, umbracoUi}) => {
+test.fixme('can create notifications with notification permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithNotificationsPermission(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -229,6 +228,8 @@ test.skip('can create notifications with notification permission enabled', async
 
   // Act
   await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
+  // TODO: Implement it later
+  // Setup SMTP server to test notifications, do this when we test appsettings.json
 });
 
 test('can not create notifications with notification permission disabled', async ({umbracoApi, umbracoUi}) => {
@@ -289,8 +290,8 @@ test.skip('can set permissions with set permissions permission enabled', async (
   // Act
   await umbracoUi.content.clickActionsMenuForContent(rootDocumentName);
   // await umbracoUi.content.clickSetPermissionsButton();
-  //
-  // // Assert
+  
+  // Assert
   // await umbracoUi.content.doesDocumentPermissionsDialogExist();
 });
 
