@@ -29,6 +29,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.Linq.Async">
+      <ExcludeAssets>compile</ExcludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Umbraco.PublishedCache.HybridCache\Umbraco.PublishedCache.HybridCache.csproj" />
     <ProjectReference Include="..\Umbraco.Cms.Api.Common\Umbraco.Cms.Api.Common.csproj" />
     <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />

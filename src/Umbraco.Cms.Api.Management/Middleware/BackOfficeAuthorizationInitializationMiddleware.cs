@@ -21,18 +21,6 @@ public class BackOfficeAuthorizationInitializationMiddleware : IMiddleware
     private readonly IRuntimeState _runtimeState;
     private readonly WebRoutingSettings _webRoutingSettings;
 
-    [Obsolete("Use the non-obsolete constructor. This will be removed in Umbraco 17.")]
-    public BackOfficeAuthorizationInitializationMiddleware(
-        UmbracoRequestPaths umbracoRequestPaths,
-        IServiceProvider serviceProvider,
-        IRuntimeState runtimeState,
-        IOptions<GlobalSettings> globalSettings,
-        IOptions<WebRoutingSettings> webRoutingSettings,
-        IHostingEnvironment hostingEnvironment)
-        : this(umbracoRequestPaths, serviceProvider, runtimeState, webRoutingSettings)
-    {
-    }
-
     public BackOfficeAuthorizationInitializationMiddleware(
         UmbracoRequestPaths umbracoRequestPaths,
         IServiceProvider serviceProvider,

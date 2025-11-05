@@ -1,3 +1,4 @@
+using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Metadata.Profiles.Exif;
 using Umbraco.Cms.Core.Media;

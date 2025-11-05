@@ -95,7 +95,7 @@ export class UmbDocumentPropertyValueUserPermissionFlowPropertyTypeModalElement 
 			});
 			this._submitModal();
 		} catch (error) {
-			console.log(error);
+			console.error(error);
 		}
 	}
 

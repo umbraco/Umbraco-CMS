@@ -12,15 +12,12 @@
 @inject IJsonSerializer JsonSerializer
 @inject IProfilerHtml ProfilerHtml
 @inject IOptions<GlobalSettings> GlobalSettings
-
 @{
     bool.TryParse(Context.Request.Query["umbDebug"], out var isDebug);
     var backOfficePath = BackOfficePathGenerator.BackOfficePath;
     var backOfficeAssetsPath = BackOfficePathGenerator.BackOfficeAssetsPath;
     var loginLogoImageAlternative = Url.RouteUrl(BackOfficeGraphicsController.LoginLogoAlternativeRouteName, new {Version= "1"});
-}
-
-<!DOCTYPE html>
+}<!doctype html>
 <html lang="@GlobalSettings.Value.DefaultUILanguage">
 
 <head>

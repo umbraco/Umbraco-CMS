@@ -37,7 +37,7 @@ const root: UmbMediaPathModel = { name: 'Media', unique: null, entityType: UMB_M
 // TODO: investigate how we can reuse the picker-search-field element, picker context etc.
 @customElement('umb-media-picker-modal')
 export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
-	UmbMediaItemModel,
+	UmbMediaTreeItemModel,
 	UmbMediaPickerModalData,
 	UmbMediaPickerModalValue
 > {
@@ -110,6 +110,9 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 	override async connectedCallback(): Promise<void> {
 		super.connectedCallback();
 		if (this.data?.pickableFilter) {
+			// TODO: investigate why we need the ts-ignore here
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
 			this._selectableFilter = this.data?.pickableFilter;
 		}
 	}
@@ -415,8 +418,6 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 	}
 
 	#renderToolbar() {
-		/**<umb-media-picker-create-item .node=${this._currentMediaEntity.unique}></umb-media-picker-create-item>
-		 * We cannot route to a workspace without the media picker modal is a routeable. Using regular upload button for now... */
 		return html`
 			<div id="toolbar">
 				<div id="search">

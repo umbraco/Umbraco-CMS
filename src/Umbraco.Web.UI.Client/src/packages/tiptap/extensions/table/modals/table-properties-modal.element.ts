@@ -2,7 +2,7 @@ import type {
 	UmbTiptapTablePropertiesModalData,
 	UmbTiptapTablePropertiesModalValue,
 } from './table-properties-modal.token.js';
-import { css, customElement, html, repeat, when } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, ifDefined, repeat, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { UmbPropertyDatasetElement, UmbPropertyValueData } from '@umbraco-cms/backoffice/property';
 import type { UmbPropertyEditorConfig } from '@umbraco-cms/backoffice/property-editor';
@@ -13,6 +13,7 @@ type UmbProperty = {
 	description?: string;
 	label: string;
 	propertyEditorUiAlias: string;
+	propertyEditorDataSourceAlias?: string;
 };
 
 @customElement('umb-tiptap-table-properties-modal')
@@ -113,6 +114,7 @@ export class UmbTiptapTablePropertiesModalElement extends UmbModalBaseElement<
 											alias=${property.alias}
 											label=${property.label}
 											property-editor-ui-alias=${property.propertyEditorUiAlias}
+											property-editor-data-source-alias=${ifDefined(property.propertyEditorDataSourceAlias)}
 											.appearance=${this.#appearance}
 											.config=${property.config}>
 										</umb-property>

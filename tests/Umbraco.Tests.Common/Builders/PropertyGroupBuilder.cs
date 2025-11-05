@@ -123,8 +123,8 @@ public class PropertyGroupBuilder<TParent>
     {
         var id = _id ?? 0;
         var key = _key ?? Guid.NewGuid();
-        var createDate = _createDate ?? DateTime.Now;
-        var updateDate = _updateDate ?? DateTime.Now;
+        var createDate = _createDate ?? DateTime.UtcNow;
+        var updateDate = _updateDate ?? DateTime.UtcNow;
         var alias = _alias ?? Guid.NewGuid().ToString();
         var name = _name ?? Guid.NewGuid().ToString();
         var sortOrder = _sortOrder ?? 0;

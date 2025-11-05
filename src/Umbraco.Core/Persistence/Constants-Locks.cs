@@ -90,5 +90,15 @@ public static partial class Constants
         ///     All document URLs.
         /// </summary>
         public const int DocumentUrls = -345;
+
+        /// <summary>
+        ///    The cache version.
+        /// </summary>
+        public const int CacheVersion = -346;
+
+        /// <summary>
+        ///     All distributed jobs.
+        /// </summary>
+        public const int DistributedJobs = -347;
     }
 }

@@ -12,7 +12,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			label: 'Block List',
 			propertyEditorSchemaAlias: UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS,
 			icon: 'icon-thumbnail-list',
-			group: 'lists',
+			group: 'richContent',
 			supportsReadOnly: true,
 			settings: {
 				properties: [
@@ -51,9 +51,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		alias: 'Umb.PropertyValueResolver.BlockList',
 		name: 'Block Value Resolver',
 		api: UmbStandardBlockValueResolver,
-		meta: {
-			editorAlias: UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS,
-		},
+		forEditorAlias: UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS,
 	},
 	blockListSchemaManifest,
 ];
