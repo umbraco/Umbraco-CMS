@@ -1,18 +1,20 @@
 using Microsoft.AspNetCore.OpenApi;
-using Microsoft.Extensions.Options;
 using Microsoft.OpenApi;
 using Umbraco.Cms.Api.Common.Configuration;
-using Umbraco.Extensions;
+using Umbraco.Cms.Api.Common.OpenApi;
+using Umbraco.Cms.Api.Delivery.Filters.OpenApi;
 
 namespace Umbraco.Cms.Api.Delivery.Configuration;
 
 public class ConfigureUmbracoDeliveryApiSwaggerGenOptions : ConfigureUmbracoOpenApiOptionsBase
 {
+    /// <inheritdoc />
     protected override string ApiName => DeliveryApiConfiguration.ApiName;
 
+    /// <inheritdoc />
     protected override void ConfigureOpenApi(OpenApiOptions options)
     {
-        options.AddDocumentTransformer((document, context, cancellationToken) =>
+        options.AddDocumentTransformer((document, _, _) =>
         {
             document.Info = new OpenApiInfo
             {
@@ -23,12 +25,12 @@ public class ConfigureUmbracoDeliveryApiSwaggerGenOptions : ConfigureUmbracoOpen
             return Task.CompletedTask;
         });
 
-        // swaggerGenOptions.DocumentFilter<MimeTypeDocumentFilter>(DeliveryApiConfiguration.ApiName);
-        // swaggerGenOptions.DocumentFilter<RemoveSecuritySchemesDocumentFilter>(DeliveryApiConfiguration.ApiName);
-        //
-        // swaggerGenOptions.OperationFilter<SwaggerContentDocumentationFilter>();
-        // swaggerGenOptions.OperationFilter<SwaggerMediaDocumentationFilter>();
-        // swaggerGenOptions.ParameterFilter<SwaggerContentDocumentationFilter>();
-        // swaggerGenOptions.ParameterFilter<SwaggerMediaDocumentationFilter>();
+        options
+            .AddDocumentTransformer<ApiKeyTransformer>()
+            .AddOperationTransformer<ApiKeyTransformer>();
+        options.AddDocumentTransformer<MimeTypeDocumentTransformer>();
+
+        options.AddOperationTransformer<ContentApiTransformer>();
+        options.AddOperationTransformer<MediaApiTransformer>();
     }
 }

@@ -45,6 +45,7 @@ public abstract class ConfigureUmbracoOpenApiOptionsBase : IConfigureNamedOption
             .AddDocumentTransformer<SortTagsAndPathsTransformer>();
 
         options.AddSchemaTransformer<EnumSchemaTransformer>();
+        options.AddSchemaTransformer<RequireNonNullablePropertiesSchemaTransformer>();
 
         ConfigureOpenApi(options);
 
