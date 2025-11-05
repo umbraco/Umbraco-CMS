@@ -137,7 +137,13 @@ export default class UmbLoginPageElement extends UmbLitElement {
 				<slot name="subheadline"></slot>
 			</header>
 			<uui-form>
-				<form ${ref(this._formRef)} @submit=${this.#handleSubmit} name="login-form" spellcheck="false" novalidate>
+				<form
+					${ref(this._formRef)}
+					id="umb-login-form"
+					name="login-form"
+					@submit=${this.#handleSubmit}
+					spellcheck="false"
+					novalidate>
 					<slot @slotchange=${this.#onSlotChanged}></slot>
 					<div id="secondary-actions">
 						${when(
