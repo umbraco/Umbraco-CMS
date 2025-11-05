@@ -106,7 +106,8 @@ test('can copy and paste a single block into the same document but different gro
   await umbracoUi.content.doesBlockEditorBlockWithNameContainValue(elementGroupName, elementPropertyName, ConstantHelper.inputTypes.tipTap, blockPropertyValue);
 });
 
-test('can copy and paste a single block into another document', async ({umbracoApi, umbracoUi}) => {
+// Remove skip after this issue is resolved: https://github.com/umbraco/Umbraco-CMS/issues/20680
+test.skip('can copy and paste a single block into another document', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.document.ensureNameNotExists(secondContentName);
   await umbracoApi.document.createDefaultDocumentWithABlockListEditorAndBlockWithValue(contentName, documentTypeName, blockListDataTypeName, elementTypeId, AliasHelper.toAlias(elementPropertyName), blockPropertyValue, elementDataTypeUiAlias, groupName);
