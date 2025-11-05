@@ -174,15 +174,6 @@ export default class UmbAuthElement extends UmbLitElement {
 	 */
 	protected flow?: 'mfa' | 'reset-password' | 'invite-user';
 
-	_usernameLayoutItem?: UUIFormLayoutItemElement;
-	_passwordLayoutItem?: UUIFormLayoutItemElement;
-	_usernameInput?: HTMLInputElement;
-	_passwordInput?: HTMLInputElement;
-	_usernameLabel?: HTMLLabelElement;
-	_passwordLabel?: HTMLLabelElement;
-	_passwordShowPasswordToggleItem?: HTMLSpanElement;
-	_passwordShowPasswordToggleButton?: HTMLButtonElement;
-
 	#authContext = new UmbAuthContext(this, UMB_AUTH_CONTEXT);
 
 	constructor() {
@@ -234,18 +225,6 @@ export default class UmbAuthElement extends UmbLitElement {
 		});
 	}
 
-	disconnectedCallback() {
-		super.disconnectedCallback();
-		this._usernameLayoutItem?.remove();
-		this._passwordLayoutItem?.remove();
-		this._usernameLabel?.remove();
-		this._usernameInput?.remove();
-		this._passwordLabel?.remove();
-		this._passwordInput?.remove();
-		this._passwordShowPasswordToggleItem?.remove();
-		this._passwordShowPasswordToggleButton?.remove();
-	}
-
 	/**
 	 * Creates the login form and adds it to the DOM in the default slot.
 	 * This is done to avoid having to deal with the shadow DOM, which is not supported in Google Chrome for autocomplete/autofill.
@@ -254,7 +233,7 @@ export default class UmbAuthElement extends UmbLitElement {
 	 * @private
 	 */
 	#initializeForm() {
-		this._usernameInput = createInput({
+		const usernameInput = createInput({
 			id: 'username-input',
 			type: 'text',
 			name: 'username',
@@ -263,7 +242,7 @@ export default class UmbAuthElement extends UmbLitElement {
 			inputmode: this.usernameIsEmail ? 'email' : '',
 			autofocus: true,
 		});
-		this._passwordInput = createInput({
+		const passwordInput = createInput({
 			id: 'password-input',
 			type: 'password',
 			name: 'password',
@@ -271,38 +250,38 @@ export default class UmbAuthElement extends UmbLitElement {
 			errorId: 'password-input-error',
 			inputmode: '',
 		});
-		this._passwordShowPasswordToggleButton = createShowPasswordToggleButton({
+		const passwordShowPasswordToggleButton = createShowPasswordToggleButton({
 			id: 'password-show-toggle',
 			name: 'password-show-toggle',
 			ariaLabelShowPassword: this.localize.term('auth_showPassword'),
 			ariaLabelHidePassword: this.localize.term('auth_hidePassword'),
 		});
-		this._passwordShowPasswordToggleItem = createShowPasswordToggleItem(this._passwordShowPasswordToggleButton);
-		this._usernameLabel = createLabel({
+		const passwordShowPasswordToggleItem = createShowPasswordToggleItem(passwordShowPasswordToggleButton);
+		const usernameLabel = createLabel({
 			forId: 'username-input',
 			localizeAlias: this.usernameIsEmail ? 'auth_email' : 'auth_username',
 			localizeFallback: this.usernameIsEmail ? 'Email' : 'Username',
 		});
-		this._passwordLabel = createLabel({
+		const passwordLabel = createLabel({
 			forId: 'password-input',
 			localizeAlias: 'auth_password',
 			localizeFallback: 'Password',
 		});
-		this._usernameLayoutItem = createFormLayoutItem(
-			this._usernameLabel,
-			this._usernameInput,
+		const usernameLayoutItem = createFormLayoutItem(
+			usernameLabel,
+			usernameInput,
 			'auth_requiredUsernameValidationMessage'
 		);
-		this._passwordLayoutItem = createFormLayoutPasswordItem(
-			this._passwordLabel,
-			this._passwordInput,
-			this._passwordShowPasswordToggleItem
+		const passwordLayoutItem = createFormLayoutPasswordItem(
+			passwordLabel,
+			passwordInput,
+			passwordShowPasswordToggleItem
 		);
 		const style = document.createElement('style');
 		style.innerHTML = authStyles;
 		document.head.appendChild(style);
 
-		const elements = [this._usernameLayoutItem, this._passwordLayoutItem];
+		const elements = [usernameLayoutItem, passwordLayoutItem];
 
 		elements.forEach((el) => {
 			this.insertAdjacentElement('beforeend', el);
