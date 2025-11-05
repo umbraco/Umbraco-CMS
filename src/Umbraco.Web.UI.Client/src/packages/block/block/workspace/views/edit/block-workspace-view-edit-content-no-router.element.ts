@@ -69,7 +69,7 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 			if (this._hasRootGroups) {
 				this._activeTabKey = null;
 			} else if (this._tabs.length > 0) {
-				this._activeTabKey = this._tabs[0].ids[0];
+				this._activeTabKey = this._tabs[0].ids?.[0];
 			}
 		}
 	}
@@ -82,7 +82,7 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 		if (!this._tabs) return;
 		return html`
 			${this._tabs.length > 1 || (this._tabs.length === 1 && this._hasRootGroups)
-				? html` <uui-tab-group slot="header">
+				? html`<uui-tab-group slot="header">
 						${this._hasRootGroups && this._tabs.length > 0
 							? html`<uui-tab
 									label="Content"
@@ -97,8 +97,8 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 							(tab) => {
 								return html`<uui-tab
 									label=${tab.name ?? 'Unnamed'}
-									.active=${this._activeTabKey === tab.ids[0]}
-									@click=${() => this.#setTabKey(tab.ids[0])}
+									.active=${this._activeTabKey === tab.ids?.[0]}
+									@click=${() => this.#setTabKey(tab.ids?.[0])}
 									>${tab.name}</uui-tab
 								>`;
 							},
