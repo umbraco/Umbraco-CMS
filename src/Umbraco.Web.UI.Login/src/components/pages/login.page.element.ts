@@ -11,7 +11,7 @@ import {
 	state,
 } from '@umbraco-cms/backoffice/external/lit';
 
-import { UMB_AUTH_CONTEXT } from '../../contexts';
+import { UMB_AUTH_CONTEXT } from '../../contexts/index.js';
 
 @customElement('umb-login-page')
 export default class UmbLoginPageElement extends UmbLitElement {
