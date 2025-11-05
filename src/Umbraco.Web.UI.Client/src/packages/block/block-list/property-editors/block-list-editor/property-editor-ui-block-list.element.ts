@@ -396,11 +396,8 @@ export class UmbPropertyEditorUIBlockListElement
 	}
 
 	#renderCreateButtonGroup() {
-		if (this.readonly && this._layouts.length > 0) {
-			return nothing;
-		} else {
-			return html`<uui-button-group>${this.#renderCreateButton()}${this.#renderPasteButton()}</uui-button-group>`;
-		}
+		if (this._layouts.length > 0 && (this._limitMax === 1 || this.readonly)) return nothing;
+		return html`<uui-button-group>${this.#renderCreateButton()}${this.#renderPasteButton()}</uui-button-group>`;
 	}
 
 	#renderInlineCreateButton(index: number) {
