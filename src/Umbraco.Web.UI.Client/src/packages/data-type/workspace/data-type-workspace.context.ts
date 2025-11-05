@@ -208,7 +208,7 @@ export class UmbDataTypeWorkspaceContext
 			umbExtensionsRegistry.byTypeAndAlias('propertyEditorUi', propertyEditorUIAlias),
 			(manifest) => {
 				this.#propertyEditorUiIcon.setValue(manifest?.meta.icon || null);
-				this.#propertyEditorUiName.setValue(manifest?.name || null);
+				this.#propertyEditorUiName.setValue(manifest?.meta?.label || manifest?.name || null);
 
 				// Maps properties to have a weight, so they can be sorted, notice UI properties have a +1000 weight compared to schema properties.
 				this.#propertyEditorUISettingsProperties = (manifest?.meta.settings?.properties ?? []).map((x, i) => ({
