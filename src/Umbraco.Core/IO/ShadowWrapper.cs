@@ -81,6 +81,8 @@ internal sealed class ShadowWrapper : IFileSystem, IFileProviderFactory
 
     public void DeleteFile(string path) => FileSystem.DeleteFile(path);
 
+    public void MoveFile(string source, string target) => FileSystem.MoveFile(source, target);
+
     public bool FileExists(string path) => FileSystem.FileExists(path);
 
     public string GetRelativePath(string fullPathOrUrl) => FileSystem.GetRelativePath(fullPathOrUrl);

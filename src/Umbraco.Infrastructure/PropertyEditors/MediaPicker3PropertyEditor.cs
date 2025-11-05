@@ -52,10 +52,8 @@ public class MediaPicker3PropertyEditor : DataEditor
     /// <summary>
     /// Defines the value editor for the media picker property editor.
     /// </summary>
-    internal sealed class MediaPicker3PropertyValueEditor : DataValueEditor, IDataValueReference
+    internal sealed class MediaPicker3PropertyValueEditor : DataValueEditor, IDataValueReference, ICacheReferencedEntities
     {
-        private const string MediaCacheKeyFormat = nameof(MediaPicker3PropertyValueEditor) + "_Media_{0}";
-
         private readonly IDataTypeConfigurationCache _dataTypeReadCache;
         private readonly IJsonSerializer _jsonSerializer;
         private readonly IMediaImportService _mediaImportService;
@@ -105,6 +103,27 @@ public class MediaPicker3PropertyEditor : DataEditor
                 new StartNodeValidator(localizedTextService, mediaNavigationQueryService));
 
             Validators.Add(validators);
+        }
+
+        /// <inheritdoc/>
+        public void CacheReferencedEntities(IEnumerable<object> values)
+        {
+            var mediaKeys = values
+                .SelectMany(value => Deserialize(_jsonSerializer, value))
+                .Select(dto => dto.MediaKey)
+                .Distinct()
+                .Where(x => IsMediaAlreadyCached(x, _appCaches.RequestCache) is false)
+                .ToList();
+            if (mediaKeys.Count == 0)
+            {
+                return;
+            }
+
+            IEnumerable<IMedia> mediaItems = _mediaService.GetByIds(mediaKeys);
+            foreach (IMedia media in mediaItems)
+            {
+                CacheMediaById(media, _appCaches.RequestCache);
+            }
         }
 
         /// <inheritdoc/>
@@ -208,29 +227,11 @@ public class MediaPicker3PropertyEditor : DataEditor
 
             foreach (MediaWithCropsDto mediaWithCropsDto in mediaWithCropsDtos)
             {
-                IMedia? media = GetMediaById(mediaWithCropsDto.MediaKey);
+                IMedia? media = GetAndCacheMediaById(mediaWithCropsDto.MediaKey, _appCaches.RequestCache, _mediaService);
                 mediaWithCropsDto.MediaTypeAlias = media?.ContentType.Alias ?? unknownMediaType;
             }
 
             return mediaWithCropsDtos.Where(m => m.MediaTypeAlias != unknownMediaType).ToList();
-        }
-
-        private IMedia? GetMediaById(Guid key)
-        {
-            // Cache media lookups in case the same media is handled multiple times across a save operation,
-            // which is possible, particularly if we have multiple languages and blocks.
-            var cacheKey = string.Format(MediaCacheKeyFormat, key);
-            IMedia? media = _appCaches.RequestCache.GetCacheItem<IMedia?>(cacheKey);
-            if (media is null)
-            {
-                media = _mediaService.GetById(key);
-                if (media is not null)
-                {
-                    _appCaches.RequestCache.Set(cacheKey, media);
-                }
-            }
-
-            return media;
         }
 
         private List<MediaWithCropsDto> HandleTemporaryMediaUploads(List<MediaWithCropsDto> mediaWithCropsDtos, MediaPicker3Configuration configuration)
@@ -240,7 +241,7 @@ public class MediaPicker3PropertyEditor : DataEditor
             foreach (MediaWithCropsDto mediaWithCropsDto in mediaWithCropsDtos)
             {
                 // if the media already exist, don't bother with it
-                if (GetMediaById(mediaWithCropsDto.MediaKey) != null)
+                if (GetAndCacheMediaById(mediaWithCropsDto.MediaKey, _appCaches.RequestCache, _mediaService) != null)
                 {
                     continue;
                 }
@@ -480,18 +481,7 @@ public class MediaPicker3PropertyEditor : DataEditor
 
                 foreach (var typeAlias in distinctTypeAliases)
                 {
-                    // Cache media type lookups since the same media type is likely to be used multiple times in validation,
-                    // particularly if we have multiple languages and blocks.
-                    var cacheKey = string.Format(MediaTypeCacheKeyFormat, typeAlias);
-                    string? typeKey = _appCaches.RequestCache.GetCacheItem<string?>(cacheKey);
-                    if (typeKey is null)
-                    {
-                        typeKey = _mediaTypeService.Get(typeAlias)?.Key.ToString();
-                        if (typeKey is not null)
-                        {
-                            _appCaches.RequestCache.Set(cacheKey, typeKey);
-                        }
-                    }
+                    string? typeKey = GetMediaTypeKey(typeAlias);
 
                     if (typeKey is null || allowedTypes.Contains(typeKey) is false)
                     {
@@ -505,6 +495,31 @@ public class MediaPicker3PropertyEditor : DataEditor
                 }
 
                 return [];
+            }
+
+            private string? GetMediaTypeKey(string typeAlias)
+            {
+                // Cache media type lookups since the same media type is likely to be used multiple times in validation,
+                // particularly if we have multiple languages and blocks.
+                string? GetMediaTypeKeyFromService(string typeAlias) => _mediaTypeService.Get(typeAlias)?.Key.ToString();
+
+                if (_appCaches.RequestCache.IsAvailable is false)
+                {
+                    return GetMediaTypeKeyFromService(typeAlias);
+                }
+
+                var cacheKey = string.Format(MediaTypeCacheKeyFormat, typeAlias);
+                string? typeKey = _appCaches.RequestCache.GetCacheItem<string?>(cacheKey);
+                if (typeKey is null)
+                {
+                    typeKey = GetMediaTypeKeyFromService(typeAlias);
+                    if (typeKey is not null)
+                    {
+                        _appCaches.RequestCache.Set(cacheKey, typeKey);
+                    }
+                }
+
+                return typeKey;
             }
         }
 

@@ -6,6 +6,7 @@ import { UMB_DOCUMENT_REFERENCE_REPOSITORY_ALIAS } from '../../../reference/cons
 import { UMB_DOCUMENT_COLLECTION_ALIAS } from '../../../collection/constants.js';
 import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
 import { UMB_ENTITY_BULK_ACTION_TRASH_WITH_RELATION_KIND } from '@umbraco-cms/backoffice/relations';
+import { UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/recycle-bin';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -28,6 +29,9 @@ export const manifests: Array<UmbExtensionManifest> = [
 			{
 				alias: 'Umb.Condition.UserPermission.Document',
 				allOf: [UMB_USER_PERMISSION_DOCUMENT_DELETE],
+			},
+			{
+				alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
 			},
 		],
 	},

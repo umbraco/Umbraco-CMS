@@ -850,7 +850,18 @@ export default {
 		avatar: 'Avatar per',
 	},
 	colors: {
+		black: 'Nero',
 		blue: 'Blu',
+		brown: 'Marrone',
+		cyan: 'Ciano',
+		green: 'Verde',
+		lightBlue: 'Azzurro',
+		pink: 'Rosa',
+		red: 'Rosso',
+		text: 'Nero',
+		yellow: 'Giallo',
+		white: 'Bianco',
+		grey: 'Grigio',
 	},
 	shortcuts: {
 		addGroup: 'Aggiungi gruppo',

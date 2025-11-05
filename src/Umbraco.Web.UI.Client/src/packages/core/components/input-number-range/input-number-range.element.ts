@@ -1,6 +1,6 @@
 import { css, customElement, html, ifDefined, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
@@ -33,6 +33,11 @@ export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElemen
 	public get minValue() {
 		return this._minValue;
 	}
+
+	@property({ type: Boolean })
+	required = false;
+	@property({ type: String })
+	requiredMessage = UMB_VALIDATION_EMPTY_LOCALIZATION_KEY;
 
 	@state()
 	private _maxValue?: number;
@@ -91,6 +96,12 @@ export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElemen
 		super();
 
 		this.addValidator(
+			'valueMissing',
+			() => this.requiredMessage,
+			() => this.required && (this._minValue == null || this._maxValue == null),
+		);
+
+		this.addValidator(
 			'patternMismatch',
 			() => {
 				return '#validation_rangeExceeds';
@@ -129,7 +140,8 @@ export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElemen
 				min=${ifDefined(this.validationRange?.min)}
 				max=${ifDefined(this.validationRange?.max)}
 				placeholder=${this._minPlaceholder}
-				.value=${this._minValue}
+				?required=${this.required}
+				.value=${this._minValue?.toString() ?? ''}
 				@input=${this.#onMinInput}></uui-input>
 			<b>–</b>
 			<uui-input
@@ -138,7 +150,8 @@ export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElemen
 				min=${ifDefined(this.validationRange?.min)}
 				max=${ifDefined(this.validationRange?.max)}
 				placeholder=${this._maxPlaceholder}
-				.value=${this._maxValue}
+				?required=${this.required}
+				.value=${this._maxValue?.toString() ?? ''}
 				@input=${this.#onMaxInput}></uui-input>
 		`;
 	}
