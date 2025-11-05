@@ -14,8 +14,8 @@ import { UmbSlimBackofficeController } from './controllers';
 import authStyles from './auth-styles.css?inline';
 
 // Import the SVG files
-import openEyeSVG from '../public/openEye.svg?raw';
-import closedEyeSVG from '../public/closedEye.svg?raw';
+import openEyeSVG from './assets/openEye.svg?raw';
+import closedEyeSVG from './assets/closedEye.svg?raw';
 
 // Import the main bundle
 import { extensions } from './umbraco-package.js';
