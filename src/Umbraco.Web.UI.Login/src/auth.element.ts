@@ -54,6 +54,7 @@ const createValidationMessage = (errorId: string) => {
 	const validationElement = document.createElement('div');
 	validationElement.className = 'errormessage';
 	validationElement.id = errorId;
+	validationElement.role = 'alert';
 	return validationElement;
 };
 
@@ -147,13 +148,17 @@ const validateInput = (input: HTMLInputElement, validationElement: HTMLElement, 
 		input.removeAttribute('aria-invalid');
 		validationElement.innerHTML = '';
 		validationElement.classList.remove('active');
+		validationElement.ariaLive = 'off';
 	} else {
 		input.setAttribute('aria-invalid', 'true');
+
 		const localizeElement = document.createElement('umb-localize');
 		localizeElement.innerHTML = input.validationMessage;
 		localizeElement.key = requiredMessage;
 		validationElement.appendChild(localizeElement);
+
 		validationElement.classList.add('active');
+		validationElement.ariaLive = 'assertive';
 	}
 };
 
