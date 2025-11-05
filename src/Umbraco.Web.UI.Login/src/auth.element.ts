@@ -1,4 +1,4 @@
-import { html, customElement, property, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, ifDefined, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import {
 	UUIFormValidationMessageElement,
@@ -137,50 +137,6 @@ const createFormLayoutPasswordItem = (
 	return formLayoutItem;
 };
 
-const createForm = (elements: HTMLElement[]) => {
-	const styles = document.createElement('style');
-	styles.innerHTML = authStyles;
-	const form = document.createElement('form');
-	form.id = 'umb-login-form';
-	form.name = 'login-form';
-	form.spellcheck = false;
-	form.noValidate = true;
-
-	elements.push(styles);
-	elements.forEach((element) => form.appendChild(element));
-
-	form.addEventListener('submit', (e) => {
-		e.preventDefault();
-
-		const form = e.target as HTMLFormElement;
-		if (!form) return;
-
-		const formData = new FormData(form);
-
-		const username = formData.get('username') as string;
-		const password = formData.get('password') as string;
-
-		const validationMessages = Array.from(form.querySelectorAll('.input'));
-		validationMessages.forEach((vm) => vm.removeAttribute('aria-invalid'));
-
-		if (!username) {
-			const validationMessage = validationMessages.find(
-				(vm) => vm.getAttribute('id') === 'username-input'
-			) as UUIFormValidationMessageElement;
-			validationMessage?.setAttribute('aria-invalid', 'true');
-		}
-
-		if (!password) {
-			const validationMessage = validationMessages.find(
-				(vm) => vm.getAttribute('id') === 'password-input'
-			) as UUIFormValidationMessageElement;
-			validationMessage?.setAttribute('aria-invalid', 'true');
-		}
-	});
-
-	return form;
-};
-
 @customElement('umb-auth')
 export default class UmbAuthElement extends UmbLitElement {
 	/**
@@ -222,7 +178,6 @@ export default class UmbAuthElement extends UmbLitElement {
 	 */
 	protected flow?: 'mfa' | 'reset-password' | 'invite-user';
 
-	_form?: HTMLFormElement;
 	_usernameLayoutItem?: UUIFormLayoutItemElement;
 	_passwordLayoutItem?: UUIFormLayoutItemElement;
 	_usernameInput?: HTMLInputElement;
@@ -254,8 +209,6 @@ export default class UmbAuthElement extends UmbLitElement {
 
 		// Wait for localization to be ready before loading the form
 		await this.#waitForLocalization();
-
-		this.#initializeForm();
 	}
 
 	async #waitForLocalization(): Promise<void> {
@@ -348,9 +301,9 @@ export default class UmbAuthElement extends UmbLitElement {
 			this._passwordShowPasswordToggleItem
 		);
 
-		this._form = createForm([this._usernameLayoutItem, this._passwordLayoutItem]);
+		return [this._usernameLayoutItem, this._passwordLayoutItem];
 
-		this.insertAdjacentElement('beforeend', this._form);
+		//this.insertAdjacentElement('beforeend', this._form);
 	}
 
 	render() {
@@ -407,13 +360,24 @@ export default class UmbAuthElement extends UmbLitElement {
 				return html` <umb-invite-page></umb-invite-page>`;
 
 			default:
-				return html` <umb-login-page
-					?allow-password-reset=${this.allowPasswordReset}
-					?username-is-email=${this.usernameIsEmail}>
-					<slot></slot>
-					<slot name="subheadline" slot="subheadline"></slot>
-				</umb-login-page>`;
+				return this.#renderLoginPage();
 		}
+	}
+
+	#renderLoginPage() {
+		const elements = this.#initializeForm();
+
+		return html`
+			<style>
+				${authStyles}
+			</style>
+			<umb-login-page
+				id="umb-login-form"
+				?allow-password-reset=${this.allowPasswordReset}
+				?username-is-email=${this.usernameIsEmail}>
+				${elements}
+			</umb-login-page>
+		`;
 	}
 }
 

@@ -2,7 +2,6 @@ import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import {
 	css,
-	type CSSResultGroup,
 	html,
 	nothing,
 	when,
@@ -10,6 +9,8 @@ import {
 	property,
 	queryAssignedElements,
 	state,
+	createRef,
+	ref,
 } from '@umbraco-cms/backoffice/external/lit';
 
 import { UMB_AUTH_CONTEXT } from '../../contexts';
@@ -34,7 +35,7 @@ export default class UmbLoginPageElement extends UmbLitElement {
 	@state()
 	supportPersistLogin = false;
 
-	#formElement?: HTMLFormElement;
+	private _formRef = createRef<HTMLFormElement>();
 
 	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
 
@@ -48,20 +49,18 @@ export default class UmbLoginPageElement extends UmbLitElement {
 	}
 
 	async #onSlotChanged() {
-		this.#formElement = this.slottedElements?.find((el) => el.id === 'umb-login-form');
-
-		if (!this.#formElement) return;
-
 		// We need to listen for the enter key to submit the form, because the uui-button does not support the native input fields submit event
-		this.#formElement.addEventListener('keypress', (e) => {
-			if (e.key === 'Enter') {
-				this.#onSubmitClick();
-			}
+		this.slottedElements?.forEach((input) => {
+			input.addEventListener('keypress', (e) => {
+				if (e.key === 'Enter') {
+					this._formRef.value?.requestSubmit();
+				}
+			});
 		});
-		this.#formElement.onsubmit = this.#handleSubmit;
 	}
 
 	#handleSubmit = async (e: SubmitEvent) => {
+		debugger;
 		e.preventDefault();
 
 		this._loginError = '';
@@ -129,10 +128,6 @@ export default class UmbLoginPageElement extends UmbLitElement {
 		][new Date().getDay()];
 	}
 
-	#onSubmitClick = () => {
-		this.#formElement?.requestSubmit();
-	};
-
 	render() {
 		return html`
 			<header id="header">
@@ -141,34 +136,37 @@ export default class UmbLoginPageElement extends UmbLitElement {
 				</h1>
 				<slot name="subheadline"></slot>
 			</header>
-			<slot @slotchange=${this.#onSlotChanged}></slot>
-			<div id="secondary-actions">
-				${when(
-					this.supportPersistLogin,
-					() => html` <uui-form-layout-item>
-						<uui-checkbox name="persist" .label=${this.localize.term('auth_rememberMe')}>
-							<umb-localize key="auth_rememberMe">Remember me</umb-localize>
-						</uui-checkbox>
-					</uui-form-layout-item>`
-				)}
-				${when(
-					this.allowPasswordReset,
-					() =>
-						html` <button type="button" id="forgot-password" @click=${this.#handleForgottenPassword}>
-							<umb-localize key="auth_forgottenPassword">Forgotten password?</umb-localize>
-						</button>`
-				)}
-			</div>
-			<uui-button
-				type="submit"
-				id="umb-login-button"
-				look="primary"
-				@click=${this.#onSubmitClick}
-				.label=${this.localize.term('auth_login')}
-				color="default"
-				.state=${this._loginState}></uui-button>
+			<uui-form>
+				<form ${ref(this._formRef)} @submit=${this.#handleSubmit} name="login-form" spellcheck="false" novalidate>
+					<slot @slotchange=${this.#onSlotChanged}></slot>
+					<div id="secondary-actions">
+						${when(
+							this.supportPersistLogin,
+							() => html` <uui-form-layout-item>
+								<uui-checkbox name="persist" .label=${this.localize.term('auth_rememberMe')}>
+									<umb-localize key="auth_rememberMe">Remember me</umb-localize>
+								</uui-checkbox>
+							</uui-form-layout-item>`
+						)}
+						${when(
+							this.allowPasswordReset,
+							() =>
+								html` <button type="button" id="forgot-password" @click=${this.#handleForgottenPassword}>
+									<umb-localize key="auth_forgottenPassword">Forgotten password?</umb-localize>
+								</button>`
+						)}
+					</div>
+					<uui-button
+						type="submit"
+						id="umb-login-button"
+						look="primary"
+						.label=${this.localize.term('auth_login')}
+						color="default"
+						.state=${this._loginState}></uui-button>
 
-			${this.#renderErrorMessage()}
+					${this.#renderErrorMessage()}
+				</form>
+			</uui-form>
 		`;
 	}
 
@@ -182,7 +180,7 @@ export default class UmbLoginPageElement extends UmbLitElement {
 		this.dispatchEvent(new CustomEvent('umb-login-flow', { composed: true, detail: { flow: 'reset' } }));
 	}
 
-	static styles: CSSResultGroup = [
+	static readonly styles = [
 		css`
 			:host {
 				display: flex;
