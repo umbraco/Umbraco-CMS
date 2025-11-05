@@ -144,9 +144,9 @@ const createFormLayoutPasswordItem = (
 };
 
 const validateInput = (input: HTMLInputElement, validationElement: HTMLElement, requiredMessage = '') => {
+	validationElement.innerHTML = '';
 	if (input.validity.valid) {
 		input.removeAttribute('aria-invalid');
-		validationElement.innerHTML = '';
 		validationElement.classList.remove('active');
 		validationElement.ariaLive = 'off';
 	} else {
