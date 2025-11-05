@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
+using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.DistributedJobs;
 using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Cms.Tests.UnitTests.AutoFixture;
 
@@ -35,7 +36,7 @@ internal class ContentVersionCleanupTest
         mainDom.Setup(x => x.IsMainDom).Returns(true);
         serverRoleAccessor.Setup(x => x.CurrentServerRole).Returns(ServerRole.SchedulingPublisher);
 
-        await sut.RunJobAsync();
+        await sut.ExecuteAsync();
 
         cleanupService.Verify(x => x.PerformContentVersionCleanup(It.IsAny<DateTime>()), Times.Never);
     }
@@ -59,7 +60,7 @@ internal class ContentVersionCleanupTest
         mainDom.Setup(x => x.IsMainDom).Returns(true);
         serverRoleAccessor.Setup(x => x.CurrentServerRole).Returns(ServerRole.SchedulingPublisher);
 
-        await sut.RunJobAsync();
+        await sut.ExecuteAsync();
 
         cleanupService.Verify(x => x.PerformContentVersionCleanup(It.IsAny<DateTime>()), Times.Once);
     }

@@ -75,8 +75,11 @@ public abstract class FileSystemTreeServiceBase : IFileSystemTreeService
 
     public string[] GetFiles(string path) => FileSystem
         .GetFiles(path)
+        .Where(FilterFile)
         .OrderBy(file => file)
         .ToArray();
+
+    protected virtual bool FilterFile(string file) => true;
 
     public bool DirectoryHasChildren(string path)
         => FileSystem.GetFiles(path).Any() || FileSystem.GetDirectories(path).Any();

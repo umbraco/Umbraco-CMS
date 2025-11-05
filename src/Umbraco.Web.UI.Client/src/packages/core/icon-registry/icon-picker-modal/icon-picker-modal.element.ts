@@ -16,6 +16,7 @@ import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIColorSwatchesEvent } from '@umbraco-cms/backoffice/external/uui';
+import { toCamelCase } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-icon-picker-modal')
 export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPickerModalData, UmbIconPickerModalValue> {
@@ -29,6 +30,9 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 
 	@state()
 	private _colorList = umbracoColors.filter((color) => !color.legacy);
+
+	@state()
+	private _isSearching = false;
 
 	constructor() {
 		super();
@@ -44,8 +48,10 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 		if (!this.#icons) return;
 		const value = this._searchInput?.value;
 		if (value) {
+			this._isSearching = value.length > 0;
 			this._iconsFiltered = this.#icons.filter((icon) => icon.name.toLowerCase().includes(value.toLowerCase()));
 		} else {
+			this._isSearching = false;
 			this._iconsFiltered = this.#icons;
 		}
 	}
@@ -54,8 +60,12 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 		const isActivate = e.type === 'click' || (e.type === 'keyup' && (e as KeyboardEvent).key === 'Enter');
 		if (!isActivate) return;
 
-		const nextIcon = this.value.icon === iconName ? '' : iconName;
-		this.modalContext?.updateValue({ icon: nextIcon });
+		if (this.data?.showEmptyOption) {
+			const nextIcon = this.value.icon === iconName ? '' : iconName;
+			this.modalContext?.updateValue({ icon: nextIcon });
+		} else {
+			this.modalContext?.updateValue({ icon: iconName });
+		}
 	}
 
 	#onColorChange(e: UUIColorSwatchesEvent) {
@@ -78,12 +88,11 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 						label=${this.localize.term('defaultdialogs_colorSwitcher')}
 						@change=${this.#onColorChange}>
 						${
-							// TODO: Missing localization for the color aliases. [NL]
 							this._colorList.map(
 								(color) => html`
 									<uui-color-swatch
-										label=${color.alias}
-										title=${color.alias}
+										label=${this.localize.term('colors_' + toCamelCase(color.alias))}
+										title=${this.localize.term('colors_' + toCamelCase(color.alias))}
 										value=${color.alias}
 										style="--uui-swatch-color: var(${color.varName})">
 									</uui-color-swatch>
@@ -93,16 +102,21 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 					</uui-color-swatches>
 					<hr />
 					<uui-scroll-container id="icons">
-						<uui-button
-							class=${!this.value.icon ? 'selected' : ''}
-							label=${this.localize.term('defaultdialogs_noIcon')}
-							title=${this.localize.term('defaultdialogs_noIcon')}
-							@click=${this.#clearIcon}
-							@keyup=${(e: KeyboardEvent) => {
-								if (e.key === 'Enter' || e.key === ' ') this.#clearIcon();
-							}}>
-							<uui-icon style="opacity:.35" name=${ifDefined(this.data?.placeholder)}></uui-icon> </uui-button
-						>${this.renderIcons()}</uui-scroll-container
+						${this.data?.showEmptyOption && !this._isSearching
+							? html`
+									<uui-button
+										class=${!this.value.icon ? 'selected' : ''}
+										label=${this.localize.term('defaultdialogs_noIcon')}
+										title=${this.localize.term('defaultdialogs_noIcon')}
+										@click=${this.#clearIcon}
+										@keyup=${(e: KeyboardEvent) => {
+											if (e.key === 'Enter' || e.key === ' ') this.#clearIcon();
+										}}>
+										<uui-icon style="opacity:.35" name=${ifDefined(this.data?.placeholder)}></uui-icon>
+									</uui-button>
+								`
+							: nothing}
+						${this.renderIcons()}</uui-scroll-container
 					>
 				</div>
 				<uui-button

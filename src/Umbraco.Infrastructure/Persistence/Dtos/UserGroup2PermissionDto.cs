@@ -1,13 +1,16 @@
-﻿using NPoco;
+using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-[TableName(Constants.DatabaseSchema.Tables.UserGroup2Permission)]
+[TableName(TableName)]
+[PrimaryKey("id", AutoIncrement = true)]
 [ExplicitColumns]
 public class UserGroup2PermissionDto
 {
+    public const string TableName = Constants.DatabaseSchema.Tables.UserGroup2Permission;
+
     [Column("id")]
     [PrimaryKeyColumn(Name = "PK_userGroup2Permission", AutoIncrement = true)]
     public int Id { get; set; }

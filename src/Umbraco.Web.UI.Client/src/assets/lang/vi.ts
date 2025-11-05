@@ -853,6 +853,7 @@ export default {
 		email: 'Email',
 		error: 'Lỗi',
 		field: 'Trường',
+		fields: 'Trường',
 		fieldFor: 'Trường cho %0%',
 		toggleFor: 'Chuyển đổi cho %0%',
 		findDocument: 'Tìm kiếm',
@@ -1050,8 +1051,6 @@ export default {
 		databaseInstall: 'Nhấn nút <strong>cài đặt</strong> để cài đặt cơ sở dữ liệu Umbraco %0%',
 		databaseInstallDone:
 			'Umbraco %0% đã được sao chép vào cơ sở dữ liệu của bạn. Nhấn <strong>Tiếp theo</strong> để tiếp tục.',
-		databaseNotFound:
-			'<p>Không tìm thấy cơ sở dữ liệu! Vui lòng kiểm tra lại thông tin trong "connection string" của tệp "web.config".</p><p>Để tiếp tục, hãy chỉnh sửa tệp "web.config" (sử dụng Visual Studio hoặc trình soạn thảo yêu thích của bạn), cuộn xuống cuối, thêm chuỗi kết nối cho cơ sở dữ liệu của bạn vào khóa có tên "UmbracoDbDSN" và lưu tệp.</p><p>Nhấn nút <strong>thử lại</strong> khi hoàn tất.<br /><a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">Xem thêm thông tin về chỉnh sửa web.config tại đây</a>.</p>',
 		databaseText:
 			'Để hoàn tất bước này, bạn cần biết một số thông tin về máy chủ cơ sở dữ liệu của mình ("connection string").<br />   Vui lòng liên hệ với nhà cung cấp dịch vụ (ISP) nếu cần. Nếu bạn đang cài đặt trên máy tính hoặc máy chủ nội bộ, bạn có thể cần thông tin từ quản trị viên hệ thống.',
 		databaseUpgrade:
@@ -1416,14 +1415,6 @@ export default {
 		settings: 'Cài đặt',
 		translation: 'Dịch thuật',
 		users: 'Người dùng',
-	},
-	help: {
-		tours: 'Hướng dẫn',
-		theBestUmbracoVideoTutorials: 'Các video hướng dẫn Umbraco tốt nhất',
-		umbracoForum: 'Truy cập our.umbraco.com',
-		umbracoTv: 'Truy cập umbraco.tv',
-		umbracoLearningBase: 'Xem các video hướng dẫn miễn phí của chúng tôi',
-		umbracoLearningBaseDescription: 'trên Umbraco Learning Base',
 	},
 	settings: {
 		defaulttemplate: 'Mẫu mặc định',
@@ -2528,19 +2519,11 @@ export default {
 		profilerEnabledDescription:
 			'<p>Umbraco hiện tại không chạy ở chế độ gỡ lỗi, vì vậy bạn không thể sử dụng trình phân tích tích hợp. Đây là cách mà nó nên hoạt động cho một trang web sản xuất.</p><p>Chế độ gỡ lỗi được bật bằng cách đặt <strong>Umbraco:CMS:Hosting:Debug</strong> thành <strong>true</strong> trong appsettings.json, appsettings.{Environment}.json hoặc thông qua một biến môi trường.</p>',
 	},
-	settingsDashboardVideos: {
-		trainingHeadline: 'Hàng giờ video hướng dẫn Umbraco chỉ cách bạn một cú nhấp chuột',
-		trainingDescription:
-			'<p>Bạn muốn làm chủ Umbraco? Hãy dành vài phút để tìm hiểu một số phương pháp hay nhất bằng cách xem một trong những video này về việc sử dụng Umbraco. Và hãy truy cập <a href="https://umbraco.tv" target="_blank" rel="noopener">umbraco.tv</a> để xem thêm nhiều video về Umbraco hơn</p>',
-		learningBaseDescription:
-			'  <p>Bạn muốn làm chủ Umbraco? Hãy dành vài phút để tìm hiểu một số phương pháp hay nhất bằng cách truy cập <a class="btn-link -underline" href="https://www.youtube.com/c/UmbracoLearningBase" target="_blank" rel="noopener">kênh Youtube Umbraco Learning Base</a>. Tại đây, bạn có thể tìm thấy rất nhiều tài liệu video bao quát nhiều khía cạnh của Umbraco.</p> ',
-		getStarted: 'Để giúp bạn bắt đầu',
-	},
 	settingsDashboard: {
 		documentationHeader: 'Tài liệu',
 		documentationDescription: 'Đọc thêm về cách làm việc với các mục trong Cài đặt trong Tài liệu của chúng tôi.',
 		communityHeader: 'Cộng đồng',
-		communityDescription: 'Đặt câu hỏi trong diễn đàn cộng đồng hoặc cộng đồng Discord của chúng tôi.',
+		communityDescription: 'Đặt câu hỏi trong diễn đàn cộng đồng.',
 		trainingHeader: 'Đào tạo',
 		trainingDescription: 'Tìm hiểu về các khóa đào tạo và chứng nhận trong thực tế',
 		supportHeader: 'Hỗ trợ',

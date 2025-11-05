@@ -850,7 +850,18 @@ export default {
 		avatar: 'Avatar per',
 	},
 	colors: {
+		black: 'Nero',
 		blue: 'Blu',
+		brown: 'Marrone',
+		cyan: 'Ciano',
+		green: 'Verde',
+		lightBlue: 'Azzurro',
+		pink: 'Rosa',
+		red: 'Rosso',
+		text: 'Nero',
+		yellow: 'Giallo',
+		white: 'Bianco',
+		grey: 'Grigio',
 	},
 	shortcuts: {
 		addGroup: 'Aggiungi gruppo',
@@ -1230,12 +1241,6 @@ export default {
 		settings: 'Impostazioni',
 		translation: 'Traduzione',
 		users: 'Utenti',
-	},
-	help: {
-		tours: 'Tours',
-		theBestUmbracoVideoTutorials: 'I migliori video tutorial su Umbraco',
-		umbracoForum: 'Visita our.umbraco.com',
-		umbracoTv: 'Visita umbraco.tv',
 	},
 	settings: {
 		defaulttemplate: 'Template di base',
@@ -2203,28 +2208,6 @@ export default {
 			'\n            <p>\n                Non dovresti mai lasciare che un sito di produzione venga eseguito in modalità debug. La modalità di debug viene disattivata impostando <strong>debug="false"</strong> nell\'elemento <strong>&lt;compilation /&gt;</strong> nel file web.config.\n            </p>\n        ',
 		profilerEnabledDescription:
 			'\n            <p>\n                Umbraco attualmente non viene eseguito in modalità debug, quindi non è possibile utilizzare il profiler integrato. Questo è come dovrebbe essere per un sito produttivo.\n            </p>\n            <p>\n                La modalità di debug viene attivata impostando <strong>debug="true"</strong> nell\'elemento <strong>&lt;compilation /&gt;</strong> in web.config.\n            </p>\n        ',
-	},
-	settingsDashboardVideos: {
-		trainingHeadline: 'Ore di videoallenamenti su Umbraco sono a solo un click da te',
-		trainingDescription:
-			'\n        <p>Vuoi padroneggiare Umbraco? Dedica un paio di minuti all\'apprendimento di alcune best practice guardando uno di questi video sull\'utilizzo di Umbraco. Visita <a href="https://umbraco.tv" target="_blank" rel="noopener">umbraco.tv</a> per altri video su Umbraco</p>\n    ',
-		getStarted: 'Per iniziare',
-	},
-	settingsDashboard: {
-		start: 'Inizia da qui!',
-		startDescription:
-			'Questa sezione contiene gli elementi costitutivi del tuo sito Umbraco. Segui i collegamenti sottostanti per saperne di più su come lavorare con gli elementi nella sezione Impostazioni',
-		more: 'Scopri di più',
-		bulletPointOne:
-			'\n            Maggiori informazioni su come lavorare con gli elementi in Impostazioni <a class="btn-link -underline" href="https://docs.umbraco.com/umbraco-cms/fundamentals/backoffice/sections/" target="_blank" rel="noopener">nella documentazione</a> di Our Umbraco\n        ',
-		bulletPointTwo:
-			'\n            Fai una domanda nel <a class="btn-link -underline" href="https://our.umbraco.com/forum" target="_blank" rel="noopener">Community Forum</a>\n        ',
-		bulletPointThree:
-			'\n            Guarda i nostri <a class="btn-link -underline" href="https://umbraco.tv" target="_blank" rel="noopener">video tutorial</a> (alcuni sono gratuiti, altri richiedono un abbonamento)\n        ',
-		bulletPointFour:
-			'\n            Scopri di più sui nostri <a class="btn-link -underline" href="https://umbraco.com/products/" target="_blank" rel="noopener">strumenti per aumentare la produttività e il supporto commerciale</a>\n        ',
-		bulletPointFive:
-			'\n            Scopri di più sulle opportunità di <a class="btn-link -underline" href="https://umbraco.com/training/" target="_blank" rel="noopener">certificazione</a>\n        ',
 	},
 	startupDashboard: {
 		fallbackHeadline: "Benvenuto nell'amichevole CMS",

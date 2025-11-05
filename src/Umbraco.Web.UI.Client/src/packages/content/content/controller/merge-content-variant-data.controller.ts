@@ -122,8 +122,7 @@ export class UmbMergeContentVariantDataController extends UmbControllerBase {
 		// Find the resolver for this editor alias:
 		const manifest = umbExtensionsRegistry.getByTypeAndFilter(
 			'propertyValueResolver',
-			// TODO: Remove depcrated filter in v.17 [NL]
-			(x) => x.forEditorAlias === editorAlias || x.meta?.editorAlias === editorAlias,
+			(x) => x.forEditorAlias === editorAlias,
 		)[0];
 
 		if (!manifest) {
@@ -136,7 +135,7 @@ export class UmbMergeContentVariantDataController extends UmbControllerBase {
 			// If api is not to be found, then we can continue using the draftValue as is.
 			return draftValue;
 		}
-		(api as any).manifest = manifest;
+		api.manifest = manifest;
 
 		let newValue = draftValue;
 

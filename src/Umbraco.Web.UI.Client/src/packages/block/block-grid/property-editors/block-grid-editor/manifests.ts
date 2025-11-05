@@ -73,9 +73,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		alias: 'Umb.PropertyValueResolver.BlockGrid',
 		name: 'Block Value Resolver',
 		api: UmbStandardBlockValueResolver,
-		meta: {
-			editorAlias: UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS,
-		},
+		forEditorAlias: UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS,
 	},
 	blockGridSchemaManifest,
 	...propertyActionManifests,

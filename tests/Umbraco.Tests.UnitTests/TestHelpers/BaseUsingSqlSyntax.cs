@@ -13,6 +13,7 @@ using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Persistence.SqlServer.Services;
 using Umbraco.Extensions;
+using IMapperCollection = Umbraco.Cms.Infrastructure.Persistence.Mappers.IMapperCollection;
 using MapperCollection = NPoco.MapperCollection;
 
 namespace Umbraco.Cms.Tests.UnitTests.TestHelpers;
