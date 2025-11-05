@@ -9,8 +9,6 @@ import {
 	property,
 	queryAssignedElements,
 	state,
-	createRef,
-	ref,
 } from '@umbraco-cms/backoffice/external/lit';
 
 import { UMB_AUTH_CONTEXT } from '../../contexts';
@@ -35,7 +33,7 @@ export default class UmbLoginPageElement extends UmbLitElement {
 	@state()
 	supportPersistLogin = false;
 
-	private _formRef = createRef<HTMLFormElement>();
+	#formElement?: HTMLFormElement;
 
 	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
 
@@ -49,18 +47,20 @@ export default class UmbLoginPageElement extends UmbLitElement {
 	}
 
 	async #onSlotChanged() {
-		// We need to listen for the enter key to submit the form, because the uui-button does not support the native input fields submit event
-		this.slottedElements?.forEach((input) => {
-			input.addEventListener('keypress', (e) => {
-				if (e.key === 'Enter') {
-					this._formRef.value?.requestSubmit();
-				}
-			});
+		this.#formElement = this.slottedElements?.find((el) => el.id === 'umb-login-form');
+
+		if (!this.#formElement) return;
+
+		this.#formElement.addEventListener('keypress', (e) => {
+			if (e.key === 'Enter') {
+				this.#onSubmitClick();
+			}
 		});
+
+		this.#formElement.onsubmit = this.#handleSubmit;
 	}
 
 	#handleSubmit = async (e: SubmitEvent) => {
-		debugger;
 		e.preventDefault();
 
 		this._loginError = '';
@@ -69,6 +69,10 @@ export default class UmbLoginPageElement extends UmbLitElement {
 
 		const form = e.target as HTMLFormElement;
 		if (!form) return;
+
+		if (!form?.checkValidity()) {
+			return;
+		}
 
 		const formData = new FormData(form);
 
@@ -128,6 +132,10 @@ export default class UmbLoginPageElement extends UmbLitElement {
 		][new Date().getDay()];
 	}
 
+	#onSubmitClick = () => {
+		this.#formElement?.requestSubmit();
+	};
+
 	render() {
 		return html`
 			<header id="header">
@@ -136,43 +144,34 @@ export default class UmbLoginPageElement extends UmbLitElement {
 				</h1>
 				<slot name="subheadline"></slot>
 			</header>
-			<uui-form>
-				<form
-					${ref(this._formRef)}
-					id="umb-login-form"
-					name="login-form"
-					@submit=${this.#handleSubmit}
-					spellcheck="false"
-					novalidate>
-					<slot @slotchange=${this.#onSlotChanged}></slot>
-					<div id="secondary-actions">
-						${when(
-							this.supportPersistLogin,
-							() => html` <uui-form-layout-item>
-								<uui-checkbox name="persist" .label=${this.localize.term('auth_rememberMe')}>
-									<umb-localize key="auth_rememberMe">Remember me</umb-localize>
-								</uui-checkbox>
-							</uui-form-layout-item>`
-						)}
-						${when(
-							this.allowPasswordReset,
-							() =>
-								html` <button type="button" id="forgot-password" @click=${this.#handleForgottenPassword}>
-									<umb-localize key="auth_forgottenPassword">Forgotten password?</umb-localize>
-								</button>`
-						)}
-					</div>
-					<uui-button
-						type="submit"
-						id="umb-login-button"
-						look="primary"
-						.label=${this.localize.term('auth_login')}
-						color="default"
-						.state=${this._loginState}></uui-button>
+			<slot @slotchange=${this.#onSlotChanged}></slot>
+			<div id="secondary-actions">
+				${when(
+					this.supportPersistLogin,
+					() => html` <uui-form-layout-item>
+						<uui-checkbox name="persist" .label=${this.localize.term('auth_rememberMe')}>
+							<umb-localize key="auth_rememberMe">Remember me</umb-localize>
+						</uui-checkbox>
+					</uui-form-layout-item>`
+				)}
+				${when(
+					this.allowPasswordReset,
+					() =>
+						html` <button type="button" id="forgot-password" @click=${this.#handleForgottenPassword}>
+							<umb-localize key="auth_forgottenPassword">Forgotten password?</umb-localize>
+						</button>`
+				)}
+			</div>
+			<uui-button
+				@click=${this.#onSubmitClick}
+				type="submit"
+				id="umb-login-button"
+				look="primary"
+				.label=${this.localize.term('auth_login')}
+				color="default"
+				.state=${this._loginState}></uui-button>
 
-					${this.#renderErrorMessage()}
-				</form>
-			</uui-form>
+			${this.#renderErrorMessage()}
 		`;
 	}
 
