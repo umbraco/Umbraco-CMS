@@ -214,7 +214,7 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 	}
 
 	#renderAddButton() {
-		if (this.selection.length >= this.max) return nothing;
+		if (this.selection.length > 0 && this.max === 1) return nothing;
 		if (this.readonly && this.selection.length > 0) {
 			return nothing;
 		} else {
