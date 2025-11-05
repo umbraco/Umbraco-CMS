@@ -1,18 +1,28 @@
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { css, type CSSResultGroup, html, nothing, when, customElement, property, queryAssignedElements, state } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	type CSSResultGroup,
+	html,
+	nothing,
+	when,
+	customElement,
+	property,
+	queryAssignedElements,
+	state,
+} from '@umbraco-cms/backoffice/external/lit';
 
 import { UMB_AUTH_CONTEXT } from '../../contexts';
 
 @customElement('umb-login-page')
 export default class UmbLoginPageElement extends UmbLitElement {
-  @property({type: Boolean, attribute: 'username-is-email'})
+	@property({ type: Boolean, attribute: 'username-is-email' })
 	usernameIsEmail = false;
 
-  @queryAssignedElements({flatten: true})
+	@queryAssignedElements({ flatten: true })
 	protected slottedElements?: HTMLFormElement[];
 
-  @property({type: Boolean, attribute: 'allow-password-reset'})
+	@property({ type: Boolean, attribute: 'allow-password-reset' })
 	allowPasswordReset = false;
 
 	@state()
@@ -92,7 +102,7 @@ export default class UmbLoginPageElement extends UmbLitElement {
 				this.#authContext.mfaProviders = response.twoFactorProviders;
 			}
 
-      this.dispatchEvent(new CustomEvent('umb-login-flow', {composed: true, detail: {flow: 'mfa'}}));
+			this.dispatchEvent(new CustomEvent('umb-login-flow', { composed: true, detail: { flow: 'mfa' } }));
 			return;
 		}
 
@@ -135,11 +145,8 @@ export default class UmbLoginPageElement extends UmbLitElement {
 			<div id="secondary-actions">
 				${when(
 					this.supportPersistLogin,
-          () => html`
-            <uui-form-layout-item>
-              <uui-checkbox
-                name="persist"
-                .label=${this.localize.term('auth_rememberMe')}>
+					() => html` <uui-form-layout-item>
+						<uui-checkbox name="persist" .label=${this.localize.term('auth_rememberMe')}>
 							<umb-localize key="auth_rememberMe">Remember me</umb-localize>
 						</uui-checkbox>
 					</uui-form-layout-item>`
@@ -147,8 +154,7 @@ export default class UmbLoginPageElement extends UmbLitElement {
 				${when(
 					this.allowPasswordReset,
 					() =>
-            html`
-              <button type="button" id="forgot-password" @click=${this.#handleForgottenPassword}>
+						html` <button type="button" id="forgot-password" @click=${this.#handleForgottenPassword}>
 							<umb-localize key="auth_forgottenPassword">Forgotten password?</umb-localize>
 						</button>`
 				)}
@@ -173,7 +179,7 @@ export default class UmbLoginPageElement extends UmbLitElement {
 	}
 
 	#handleForgottenPassword() {
-    this.dispatchEvent(new CustomEvent('umb-login-flow', {composed: true, detail: {flow: 'reset'}}));
+		this.dispatchEvent(new CustomEvent('umb-login-flow', { composed: true, detail: { flow: 'reset' } }));
 	}
 
 	static styles: CSSResultGroup = [
@@ -221,7 +227,7 @@ export default class UmbLoginPageElement extends UmbLitElement {
 				display: inline-flex;
 				line-height: 1;
 				font-size: 14px;
-        font-family: var(--uui-font-family),sans-serif;
+				font-family: var(--uui-font-family), sans-serif;
 				margin-left: auto;
 				margin-bottom: var(--uui-size-space-3);
 			}
