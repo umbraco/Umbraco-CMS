@@ -2,13 +2,13 @@ import type { UmbContentTypePropertyStructureHelper } from '../../../structure/i
 import type { UmbContentTypeModel, UmbPropertyTypeModel, UmbPropertyTypeScaffoldModel } from '../../../types.js';
 import { UmbPropertyTypeContext } from './content-type-design-editor-property.context.js';
 import { css, html, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { generateAlias } from '@umbraco-cms/backoffice/utils';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_EDIT_PROPERTY_TYPE_WORKSPACE_PATH_PATTERN } from '@umbraco-cms/backoffice/property-type';
-import type { UUIInputElement, UUIInputLockElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UmbInputWithAliasElement } from '@umbraco-cms/backoffice/components';
 
 /**
  *  @element umb-content-type-design-editor-property
@@ -20,7 +20,6 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 	#context = new UmbPropertyTypeContext(this);
 	#dataTypeDetailRepository = new UmbDataTypeDetailRepository(this);
 	#dataTypeUnique?: string;
-	#propertyUnique?: string;
 
 	@property({ attribute: false })
 	public set propertyStructureHelper(value: UmbContentTypePropertyStructureHelper<UmbContentTypeModel> | undefined) {
@@ -49,7 +48,6 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		this._property = value;
 		this.#context.setAlias(value?.alias);
 		this.#context.setLabel(value?.name);
-		this.#checkAliasAutoGenerate(this._property?.unique);
 		this.#checkInherited();
 		this.#setDataType(this._property?.dataType?.unique);
 		this.requestUpdate('property', oldValue);
@@ -86,20 +84,6 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 	@state()
 	private _dataTypeName?: string;
 
-	@state()
-	private _aliasLocked = true;
-
-	#autoGenerateAlias = true;
-
-	#checkAliasAutoGenerate(unique: string | undefined) {
-		if (unique === this.#propertyUnique) return;
-		this.#propertyUnique = unique;
-
-		if (this.#context.getAlias()) {
-			this.#autoGenerateAlias = false;
-		}
-	}
-
 	async #checkInherited() {
 		if (this._propertyStructureHelper && this._property) {
 			// We can first match with something if we have a name [NL]
@@ -131,19 +115,6 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		this._propertyStructureHelper.partialUpdateProperty(this._property.unique, partialObject);
 	}
 
-	#onToggleAliasLock(event: CustomEvent) {
-		if (!this.property?.alias && (event.target as UUIInputLockElement).locked) {
-			this.#autoGenerateAlias = true;
-		} else {
-			this.#autoGenerateAlias = false;
-		}
-
-		this._aliasLocked = !this._aliasLocked;
-		if (!this._aliasLocked) {
-			(event.target as UUIInputElement)?.focus();
-		}
-	}
-
 	async #setDataType(dataTypeUnique: string | undefined) {
 		if (!dataTypeUnique) {
 			this._dataTypeName = undefined;
@@ -173,16 +144,11 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		this._propertyStructureHelper?.removeProperty(unique);
 	}
 
-	#onAliasChanged(event: UUIInputEvent) {
-		this.#singleValueUpdate('alias', event.target.value.toString());
-	}
-
-	#onNameChanged(event: UUIInputEvent) {
-		const newName = event.target.value.toString();
-		if (this.#autoGenerateAlias) {
-			this.#singleValueUpdate('alias', generateAlias(newName ?? ''));
-		}
-		this.#singleValueUpdate('name', newName);
+	#onNameAliasChange(e: InputEvent & { target: UmbInputWithAliasElement }) {
+		this.#partialUpdate({
+			name: e.target.value,
+			alias: e.target.alias,
+		} as UmbPropertyTypeModel);
 	}
 
 	override render() {
@@ -228,14 +194,16 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		} else {
 			return html`
 				<div id="header">
-					<uui-input
-						name="label"
-						id="label-input"
+					<umb-input-with-alias
+						name="name"
+						id="name-alias-input"
 						placeholder=${this.localize.term('placeholders_label')}
-						label="label"
+						label=${this.localize.term('placeholders_label')}
+						alias-label=${this.localize.term('placeholders_enterAlias')}
 						.value=${this.property.name}
-						@input=${this.#onNameChanged}></uui-input>
-					${this.renderPropertyAlias()}
+						.alias=${this.property.alias}
+						@change=${this.#onNameAliasChange}></umb-input-with-alias>
+
 					<slot name="action-menu"></slot>
 					<p>
 						<uui-textarea
@@ -284,22 +252,6 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 				label="sort order"
 				@change=${this.#onPropertyOrderChanged}
 				.value=${(this.property.sortOrder ?? 0).toString()}></uui-input>
-		`;
-	}
-
-	renderPropertyAlias() {
-		if (!this.property) return;
-		return html`
-			<uui-input-lock
-				name="alias"
-				id="alias-input"
-				label=${this.localize.term('placeholders_enterAlias')}
-				placeholder=${this.localize.term('placeholders_enterAlias')}
-				.value=${this.property.alias}
-				?locked=${this._aliasLocked}
-				@input=${this.#onAliasChanged}
-				@lock-change=${this.#onToggleAliasLock}>
-			</uui-input-lock>
 		`;
 	}
 
@@ -381,7 +333,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		css`
 			:host(:not([sort-mode-active])) {
 				display: grid;
-				grid-template-columns: 200px auto;
+				grid-template-columns: 300px auto;
 				column-gap: var(--uui-size-layout-2);
 				border-bottom: 1px solid var(--uui-color-divider);
 				padding: var(--uui-size-layout-1) 0;
@@ -485,24 +437,9 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 				--uui-button-background-color: var(--uui-color-surface);
 				--uui-button-background-color-hover: var(--uui-color-surface);
 			}
-			#alias-input,
-			#label-input,
+			#name-alias-input,
 			#description-input {
 				width: 100%;
-			}
-
-			#alias-input {
-				border-color: transparent;
-				background: var(--uui-color-surface);
-			}
-
-			#label-input {
-				font-weight: bold; /* TODO: UUI Input does not support bold text yet */
-				--uui-input-border-color: transparent;
-			}
-			#label-input input {
-				font-weight: bold;
-				--uui-input-border-color: transparent;
 			}
 
 			#description-input {
