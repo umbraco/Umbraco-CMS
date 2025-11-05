@@ -309,7 +309,7 @@ export default class UmbAuthElement extends UmbLitElement {
 		const usernameLayoutItem = createFormLayoutItem(
 			usernameLabel,
 			usernameInput,
-			'auth_requiredUsernameValidationMessage'
+			this.usernameIsEmail ? 'auth_requiredEmailValidationMessage' : 'auth_requiredUsernameValidationMessage'
 		);
 		const passwordLayoutItem = createFormLayoutPasswordItem(
 			passwordLabel,
