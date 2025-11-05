@@ -206,6 +206,16 @@ export default class UmbAuthElement extends UmbLitElement {
 		(this as unknown as EventTarget).addEventListener('umb-login-flow', (e) => {
 			if (e instanceof CustomEvent) {
 				this.flow = e.detail.flow || undefined;
+				if (typeof e.detail.status !== 'undefined') {
+					const searchParams = new URLSearchParams(window.location.search);
+					if (e.detail.status === null) {
+						searchParams.delete('status');
+					} else {
+						searchParams.set('status', e.detail.status);
+					}
+					const newRelativePathQuery = window.location.pathname + '?' + searchParams.toString();
+					window.history.pushState(null, '', newRelativePathQuery);
+				}
 			}
 			this.requestUpdate();
 		});
