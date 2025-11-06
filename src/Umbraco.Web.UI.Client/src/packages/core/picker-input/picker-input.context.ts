@@ -111,13 +111,24 @@ export class UmbPickerInputContext<
 		this.getHostElement().dispatchEvent(new UmbChangeEvent());
 	}
 
+	/**
+	 * Get the display name for an item to show in the remove confirmation dialog.
+	 * Subclasses can override this to provide custom formatting for missing items.
+	 * @param item - The item to get the display name for, or undefined if not found
+	 * @param unique - The unique identifier of the item
+	 * @returns The display name to show in the dialog
+	 */
+	protected getItemDisplayName(item: PickedItemType | undefined, unique: string): string {
+		return item?.name ?? unique;
+	}
+
 	async requestRemoveItem(unique: string) {
 		const item = this.#itemManager.getItems().find((item) => item.unique === unique);
+		const name = this.getItemDisplayName(item, unique);
 
-		const name = item?.name ?? '#general_notFound';
 		await umbConfirmModal(this, {
 			color: 'danger',
-			headline: `#actions_remove ${name}?`,
+			headline: `#actions_remove?`,
 			content: `#defaultdialogs_confirmremove ${name}?`,
 			confirmLabel: '#actions_remove',
 		});
