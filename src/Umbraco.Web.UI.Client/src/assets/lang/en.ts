@@ -1017,6 +1017,7 @@ export default {
 			if (new Date(date).getTime() < new Date(now).getTime()) return `${duration} ago`;
 			return `in ${duration}`;
 		},
+		clipboard: 'Clipboard',
 	},
 	colors: {
 		black: 'Black',
