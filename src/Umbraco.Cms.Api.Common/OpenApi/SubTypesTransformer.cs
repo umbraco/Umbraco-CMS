@@ -20,8 +20,8 @@ public class SubTypesTransformer : IOpenApiSchemaTransformer
     /// <inheritdoc />
     public async Task TransformAsync(OpenApiSchema schema, OpenApiSchemaTransformerContext context, CancellationToken cancellationToken)
     {
-        IUmbracoJsonTypeInfoResolver umbracoJsonTypeInfoResolver = context.ApplicationServices.GetRequiredService<IUmbracoJsonTypeInfoResolver>();
-        var subTypes = umbracoJsonTypeInfoResolver.FindSubTypes(context.JsonTypeInfo.Type).ToList();
+        ISubTypesSelector subTypesSelector = context.ApplicationServices.GetRequiredService<ISubTypesSelector>();
+        var subTypes = subTypesSelector.SubTypes(context.JsonTypeInfo.Type).ToList();
         if (subTypes.Count == 0 || (subTypes.Count == 1 && subTypes[0] == context.JsonTypeInfo.Type))
         {
             // If there are no subtypes, or the only subtype is the base type itself, do nothing
@@ -50,12 +50,20 @@ public class SubTypesTransformer : IOpenApiSchemaTransformer
         schema.Metadata?.Remove(SchemaIdKey); // Removing the schema id will lead to an inline schema
         CleanupSchema(schema); // By cleaning up the base schema, we will only have the oneOf with subtypes and the subtypes themselves will have the full schema
         schema.OneOf ??= new List<IOpenApiSchema>();
+        IUmbracoJsonTypeInfoResolver umbracoJsonTypeInfoResolver = context.ApplicationServices.GetRequiredService<IUmbracoJsonTypeInfoResolver>();
+        schema.Discriminator = new OpenApiDiscriminator
+        {
+            PropertyName = umbracoJsonTypeInfoResolver.GetTypeDiscriminatorValue(context.JsonTypeInfo.Type) is not null ? "$type" : null,
+            Mapping = new Dictionary<string, OpenApiSchemaReference>(),
+        };
+
         foreach (Type subType in subTypes)
         {
             OpenApiSchema subTypeSchema = await context.GetOrCreateSchemaAsync(subType, cancellationToken: cancellationToken);
             var subTypeSchemaId = GetSchemaId(subTypeSchema);
             context.Document?.AddComponent(subTypeSchemaId, subTypeSchema);
             schema.OneOf.Add(new OpenApiSchemaReference(subTypeSchemaId, context.Document));
+            schema.Discriminator.Mapping.Add(subTypeSchemaId, new OpenApiSchemaReference(subTypeSchemaId, context.Document));
         }
     }
 
@@ -71,6 +79,7 @@ public class SubTypesTransformer : IOpenApiSchemaTransformer
 
     private static void CleanupSchema(OpenApiSchema schema)
     {
+        schema.Type = null;
         schema.Properties?.Clear();
         schema.Required?.Clear();
     }

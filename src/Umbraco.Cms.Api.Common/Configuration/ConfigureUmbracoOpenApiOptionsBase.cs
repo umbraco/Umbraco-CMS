@@ -51,9 +51,6 @@ public abstract class ConfigureUmbracoOpenApiOptionsBase : IConfigureNamedOption
         options.AddSchemaTransformer<RequireNonNullablePropertiesSchemaTransformer>();
 
         ConfigureOpenApi(options);
-
-        // swaggerGenOptions.SelectSubTypesUsing(_subTypesSelector.SubTypes);
-        // swaggerGenOptions.SupportNonNullableReferenceTypes();
     }
 
     /// <summary>

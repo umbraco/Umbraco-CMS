@@ -6,6 +6,9 @@ using Umbraco.Cms.Api.Delivery.Filters.OpenApi;
 
 namespace Umbraco.Cms.Api.Delivery.Configuration;
 
+/// <summary>
+/// Configures the OpenAPI options for the Umbraco Delivery API.
+/// </summary>
 public class ConfigureUmbracoDeliveryApiSwaggerGenOptions : ConfigureUmbracoOpenApiOptionsBase
 {
     /// <inheritdoc />
