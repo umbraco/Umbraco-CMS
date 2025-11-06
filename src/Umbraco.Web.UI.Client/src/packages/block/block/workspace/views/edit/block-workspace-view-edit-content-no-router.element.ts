@@ -14,8 +14,6 @@ import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace'
  */
 @customElement('umb-block-workspace-view-edit-content-no-router')
 export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitElement implements UmbWorkspaceViewElement {
-	//private _hasRootProperties = false;
-
 	@state()
 	private _hasRootGroups = false;
 
@@ -37,8 +35,6 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 			this._tabs = tabs;
 			this.#checkDefaultTabName();
 		});
-
-		// _hasRootProperties can be gotten via _tabsStructureHelper.hasProperties. But we do not support root properties currently.
 
 		this.consumeContext(UMB_BLOCK_WORKSPACE_CONTEXT, (context) => {
 			this.#blockWorkspace = context;
@@ -62,15 +58,14 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 	}
 
 	#checkDefaultTabName() {
-		if (!this._tabs || !this.#blockWorkspace) return;
+		if (!this._tabs || !this.#blockWorkspace || this._activeTabKey !== undefined) return;
 
-		// Find the default tab to grab:
-		if (this._activeTabKey === undefined) {
-			if (this._hasRootGroups) {
-				this._activeTabKey = null;
-			} else if (this._tabs.length > 0) {
-				this._activeTabKey = this._tabs[0].ids?.[0];
-			}
+		// Find the default tab to grab
+		if (this._hasRootGroups) {
+			this._activeTabKey = null;
+		} else if (this._tabs.length > 0) {
+			const tab = this._tabs[0];
+			this._activeTabKey = tab.ownerId ?? tab.ids?.[0];
 		}
 	}
 
@@ -80,6 +75,7 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 
 	override render() {
 		if (!this._tabs) return;
+
 		return html`
 			${this._tabs.length > 1 || (this._tabs.length === 1 && this._hasRootGroups)
 				? html`<uui-tab-group slot="header">
@@ -95,10 +91,12 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 							this._tabs,
 							(tab) => tab.name,
 							(tab) => {
+								const tabKey = tab.ownerId ?? tab.ids?.[0];
+
 								return html`<uui-tab
 									label=${tab.name ?? 'Unnamed'}
-									.active=${this._activeTabKey === tab.ids?.[0]}
-									@click=${() => this.#setTabKey(tab.ids?.[0])}
+									.active=${this._activeTabKey === tabKey}
+									@click=${() => this.#setTabKey(tabKey)}
 									>${tab.name}</uui-tab
 								>`;
 							},
