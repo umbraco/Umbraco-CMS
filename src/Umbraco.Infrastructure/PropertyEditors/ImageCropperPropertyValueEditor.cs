@@ -24,7 +24,8 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 ///     The value editor for the image cropper property editor.
 /// </summary>
 /// <remarks>
-///     As this class is not registered with DI as a singleton, it must be disposed to release
+///     As this class is loaded into <see cref="ValueEditorCache"/> which can be cleared, it needs
+///     to be disposable in order to properly clean up resources such as
 ///     the settings change subscription and avoid a memory leak.
 /// </remarks>
 internal class ImageCropperPropertyValueEditor : DataValueEditor, IDisposable
