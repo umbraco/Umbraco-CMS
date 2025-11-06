@@ -1393,6 +1393,7 @@ export default {
 		invalidDate: 'Fecha no válida',
 		invalidNumber: 'No es un número',
 		invalidEmail: 'Email no válido',
+		aliasInvalidFormat: 'No se permiten caracteres especiales en el alias',
 	},
 	healthcheck: {
 		checkSuccessMessage: "El valor fue establecido en el valor recomendado: '%0%'.",

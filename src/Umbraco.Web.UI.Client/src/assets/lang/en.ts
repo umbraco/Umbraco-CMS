@@ -2245,6 +2245,7 @@ export default {
 		rangeExceeds: 'The low value must not exceed the high value.',
 		invalidExtensions: 'One or more of the extensions are invalid.',
 		allowedExtensions: 'Allowed extensions are:',
+		aliasInvalidFormat: 'Special characters are not allowed in alias',
 		disallowedExtensions: 'Disallowed extensions are:',
 	},
 	healthcheck: {
@@ -2567,16 +2568,21 @@ export default {
 	},
 	welcomeDashboard: {
 		umbracoForumHeadline: 'The Umbraco community forum',
-		umbracoForumDescription: 'The forum is the central hub for the Umbraco developer community. This is where developers, integrators, and contributors come together to ask questions, share knowledge, and collaborate on all things Umbraco.',
+		umbracoForumDescription:
+			'The forum is the central hub for the Umbraco developer community. This is where developers, integrators, and contributors come together to ask questions, share knowledge, and collaborate on all things Umbraco.',
 		umbracoForumButton: 'Visit the Umbraco community forum',
 		umbracoCommunityHeadline: 'The Umbraco community site',
-		umbracoCommunityDescription: 'The gathering place for all things Umbraco. Whether you write, teach, test, give feedback, or want to connect with others, there’s a way for you to be part of the Friendly Umbraco community.',
+		umbracoCommunityDescription:
+			'The gathering place for all things Umbraco. Whether you write, teach, test, give feedback, or want to connect with others, there’s a way for you to be part of the Friendly Umbraco community.',
 		documentationHeadline: 'Documentation',
-		documentationDescription: 'Your guide to everything Umbraco. Learn how to get started, explore new features, and discover best practices through clear examples and explanations.',
+		documentationDescription:
+			'Your guide to everything Umbraco. Learn how to get started, explore new features, and discover best practices through clear examples and explanations.',
 		resourcesHeadline: 'Resources',
-		resourcesDescription: 'Explore Umbraco resources to learn, build, and grow your skills. Find blogs, tutorials, demos, documentation, and videos to help you make the most of Umbraco.',
+		resourcesDescription:
+			'Explore Umbraco resources to learn, build, and grow your skills. Find blogs, tutorials, demos, documentation, and videos to help you make the most of Umbraco.',
 		trainingHeadline: 'Training',
-		trainingDescription: 'Master Umbraco with official training. Get practical experience through instructor-led courses and earn certifications that help you grow your skills and career.',
+		trainingDescription:
+			'Master Umbraco with official training. Get practical experience through instructor-led courses and earn certifications that help you grow your skills and career.',
 	},
 	blockEditor: {
 		headlineCreateBlock: 'Pick Element Type',

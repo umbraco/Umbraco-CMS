@@ -6,6 +6,8 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 
+const DEFAULT_ALIAS_PATTERN = '^[A-Za-z][A-Za-z0-9_-]{0,254}$';
+
 @customElement('umb-input-with-alias')
 export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof UmbLitElement, undefined>(
 	UmbLitElement,
@@ -34,11 +36,28 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 	@state()
 	private _aliasLocked = true;
 
+	@property({ type: String, attribute: 'alias-pattern' })
+	aliasPattern: string = DEFAULT_ALIAS_PATTERN;
+
 	protected override firstUpdated(): void {
 		this.addValidator(
 			'valueMissing',
 			() => UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
 			() => this.required && !this.value,
+		);
+
+		this.addValidator(
+			'patternMismatch',
+			() => this.localize.term('validation_aliasInvalidFormat'),
+			() => {
+				if (!this.alias) return false;
+				try {
+					const re = new RegExp(this.aliasPattern);
+					return !re.test(this.alias);
+				} catch {
+					return false;
+				}
+			},
 		);
 
 		this.shadowRoot?.querySelectorAll<UUIInputElement>('uui-input').forEach((x) => this.addFormControlElement(x));
@@ -149,7 +168,6 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 				padding: var(--uui-size-1, 3px) var(--uui-size-space-3, 9px);
 			}
 		}
-
 		:host(:invalid:not([pristine])) {
 			color: var(--uui-color-invalid);
 		}
