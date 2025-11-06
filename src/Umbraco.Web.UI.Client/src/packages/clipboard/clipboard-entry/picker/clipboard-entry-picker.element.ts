@@ -142,7 +142,6 @@ export class UmbClipboardEntryPickerElement extends UmbLitElement {
 			// It did not update/refresh the UI of items/collection after calling delete
 			// Should I dispatch an event to notify this same component to refresh?
 			// Or explictly call request items again which just works
-			this.#requestItems();
 
 			// const event = new UmbRequestReloadStructureForEntityEvent({
 			// 	unique: item.unique,
@@ -151,11 +150,14 @@ export class UmbClipboardEntryPickerElement extends UmbLitElement {
 
 			// this.dispatchEvent(event);
 		}
+
+		// Update the list after clearing out items
+		this.#requestItems();
 	}
 
 	override render() {
 		return html`
-			<uui-box  headline=${this.localize.term('general_clipboard')}>
+			<uui-box headline=${this.localize.term('general_clipboard')}>
 				<span slot="header-actions">
 					${when(
 						this._items.length > 0,
