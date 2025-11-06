@@ -28,22 +28,23 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Bogus" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" />
-    <PackageReference Include="Moq" />
-    <PackageReference Include="NUnit3TestAdapter" PrivateAssets="all" />
+    <PackageReference Include="Bogus"/>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing"/>
+    <PackageReference Include="Microsoft.NET.Test.Sdk"/>
+    <PackageReference Include="Moq"/>
+    <PackageReference Include="NUnit3TestAdapter" PrivateAssets="all"/>
   </ItemGroup>
 
-  <Import Project="..\..\src\Umbraco.Cms.Targets\buildTransitive\Umbraco.Cms.Targets.props" />
-  <Import Project="..\..\src\Umbraco.Cms.Targets\buildTransitive\Umbraco.Cms.Targets.targets" />
+  <Import Project="..\..\src\Umbraco.Cms.Targets\buildTransitive\Umbraco.Cms.Targets.props"/>
+  <Import Project="..\..\src\Umbraco.Cms.Targets\buildTransitive\Umbraco.Cms.Targets.targets"/>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Umbraco.Cms.Api.Management\Umbraco.Cms.Api.Management.csproj" />
-    <ProjectReference Include="..\..\src\Umbraco.Cms.Persistence.EFCore\Umbraco.Cms.Persistence.EFCore.csproj" />
-    <ProjectReference Include="..\..\src\Umbraco.Cms\Umbraco.Cms.csproj" />
-    <ProjectReference Include="..\..\src\Umbraco.PublishedCache.HybridCache\Umbraco.PublishedCache.HybridCache.csproj" />
-    <ProjectReference Include="..\Umbraco.Tests.Common\Umbraco.Tests.Common.csproj" />
+    <ProjectReference Include="..\..\src\Umbraco.Cms.Api.Management\Umbraco.Cms.Api.Management.csproj"/>
+    <ProjectReference Include="..\..\src\Umbraco.Cms.DevelopmentMode.Backoffice\Umbraco.Cms.DevelopmentMode.Backoffice.csproj"/>
+    <ProjectReference Include="..\..\src\Umbraco.Cms.Persistence.EFCore\Umbraco.Cms.Persistence.EFCore.csproj"/>
+    <ProjectReference Include="..\..\src\Umbraco.Cms\Umbraco.Cms.csproj"/>
+    <ProjectReference Include="..\..\src\Umbraco.PublishedCache.HybridCache\Umbraco.PublishedCache.HybridCache.csproj"/>
+    <ProjectReference Include="..\Umbraco.Tests.Common\Umbraco.Tests.Common.csproj"/>
   </ItemGroup>
 
   <ItemGroup>
@@ -57,7 +58,7 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>TestFiles.resx</DependentUpon>
     </Compile>
-    <Content Include="Umbraco.Infrastructure\Services\Importing\*.xml" />
+    <Content Include="Umbraco.Infrastructure\Services\Importing\*.xml"/>
     <EmbeddedResource Update="Umbraco.Infrastructure\Services\Importing\ImportResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <SubType>Designer</SubType>
@@ -68,8 +69,8 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>ImportResources.resx</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="Umbraco.Web.BackOffice\UrlAndDomains\package.xml" />
-    <Content Include="appsettings.Tests.json" CopyToOutputDirectory="PreserveNewest" />
+    <EmbeddedResource Include="Umbraco.Web.BackOffice\UrlAndDomains\package.xml"/>
+    <Content Include="appsettings.Tests.json" CopyToOutputDirectory="PreserveNewest"/>
     <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.Copy.cs">
       <DependentUpon>ContentEditingServiceTests.cs</DependentUpon>
     </Compile>
