@@ -1,5 +1,5 @@
-import { customElement, html, nothing } from "@umbraco-cms/backoffice/external/lit";
-import { UmbPropertyValuePresentationBaseElement } from "../../core/property-value-presentation/index.js";
+import { css, customElement, html, nothing } from "@umbraco-cms/backoffice/external/lit";
+import { UmbPropertyValuePresentationBaseElement, UmbPropertyValuePresentationDisplayOption } from "../../core/property-value-presentation/index.js";
 
 @customElement("umb-color-picker-property-value-presentation")
 export class UmbColorPickerPropertyValuePresentation extends UmbPropertyValuePresentationBaseElement {
@@ -7,8 +7,9 @@ export class UmbColorPickerPropertyValuePresentation extends UmbPropertyValuePre
   override render() {
     const color = this.#getColor();
     const label = this.#getLabel();
+    const size = this.display == UmbPropertyValuePresentationDisplayOption.COLLECTION_CARD ? 10 : 12;
     return color
-      ? html`<uui-color-swatch label="${label}" value="${color}" />`
+      ? html`<uui-color-swatch label="${label}" value="${color}" style="--uui-swatch-size: ${size}px" />`
       : nothing;
   }
 
@@ -35,7 +36,6 @@ export class UmbColorPickerPropertyValuePresentation extends UmbPropertyValuePre
 
     return this.value.label;
   }
-
 }
 
 export default UmbColorPickerPropertyValuePresentation;

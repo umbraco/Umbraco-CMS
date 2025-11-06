@@ -52,5 +52,12 @@ export const manifests: Array<UmbExtensionManifest> = [
 			},
 		},
 	},
+  {
+    type: "propertyValuePresentation",
+    alias: "Umb.PropertyValuePresentation.DateTimeWithTimeZonePicker",
+    name: "Date Time With Time Zone Picker Property Value Presentation",
+    element: () => import("./property-value-presentation-date-time-with-time-zone-picker.js"),
+		propertyEditorAlias: "Umbraco.DateTimeWithTimeZone"
+  },
 	schemaManifest,
 ];

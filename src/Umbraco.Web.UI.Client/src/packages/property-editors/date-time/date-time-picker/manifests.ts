@@ -38,5 +38,12 @@ export const manifests: Array<UmbExtensionManifest> = [
 			},
 		},
 	},
+  {
+    type: "propertyValuePresentation",
+    alias: "Umb.PropertyValuePresentation.DateTimePicker",
+    name: "Date Time Picker Property Value Presentation",
+    element: () => import("./property-value-presentation-date-time-picker.js"),
+		propertyEditorAlias: "Umbraco.DateTimeUnspecified"
+  },
 	schemaManifest,
 ];

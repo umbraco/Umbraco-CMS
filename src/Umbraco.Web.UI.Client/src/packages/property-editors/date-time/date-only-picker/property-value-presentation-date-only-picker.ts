@@ -16,7 +16,7 @@ export class UmbDateOnlyPickerPropertyValuePresentation extends UmbPropertyValue
       return null;
     }
 
-    return this.value.date.toLocaleString();
+    return new Date(this.value.date).toLocaleDateString();
   }
 }
 
