@@ -18,4 +18,3 @@ export class ReadPropertyAction extends UmbPropertyActionBase {
   }
 }
 export { ReadPropertyAction as api };
-
