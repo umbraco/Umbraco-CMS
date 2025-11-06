@@ -221,6 +221,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 						.alias=${this.property.alias}
 						?auto-generate-alias=${this.#autoGenerateAlias}
 						@change=${this.#onNameAliasChange}></umb-input-with-alias>
+					<uui-form-validation-message for="name-alias-input"></uui-form-validation-message>
 
 					<slot name="action-menu"></slot>
 					<p>
