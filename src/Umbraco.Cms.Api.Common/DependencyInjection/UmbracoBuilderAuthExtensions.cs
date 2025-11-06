@@ -9,6 +9,7 @@ using Umbraco.Cms.Api.Common.Security;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
 using Umbraco.Extensions;
 
@@ -174,5 +175,10 @@ public static class UmbracoBuilderAuthExtensions
 
         builder.Services.AddRecurringBackgroundJob<OpenIddictCleanupJob>();
         builder.Services.ConfigureOptions<ConfigureOpenIddict>();
+
+        if (hideBackOfficeTokens)
+        {
+            builder.AddNotificationHandler<UserLogoutSuccessNotification, HideBackOfficeTokensHandler>();
+        }
     }
 }

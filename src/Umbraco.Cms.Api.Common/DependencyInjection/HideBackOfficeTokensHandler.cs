@@ -6,6 +6,8 @@ using OpenIddict.Server;
 using OpenIddict.Validation;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Extensions;
 
@@ -14,7 +16,8 @@ namespace Umbraco.Cms.Api.Common.DependencyInjection;
 internal sealed class HideBackOfficeTokensHandler
     : IOpenIddictServerHandler<OpenIddictServerEvents.ApplyTokenResponseContext>,
         IOpenIddictServerHandler<OpenIddictServerEvents.ExtractTokenRequestContext>,
-        IOpenIddictValidationHandler<OpenIddictValidationEvents.ProcessAuthenticationContext>
+        IOpenIddictValidationHandler<OpenIddictValidationEvents.ProcessAuthenticationContext>,
+        INotificationHandler<UserLogoutSuccessNotification>
 {
     private const string RedactedTokenValue = "[redacted]";
     private const string AccessTokenCookieKey = "umbAccessToken";
@@ -99,6 +102,21 @@ internal sealed class HideBackOfficeTokensHandler
         }
 
         return ValueTask.CompletedTask;
+    }
+
+    public void Handle(UserLogoutSuccessNotification notification)
+    {
+        HttpContext? context = _httpContextAccessor.HttpContext;
+        if (context is null)
+        {
+            // For some reason there is no ambient HTTP context, so we can't clean up the cookies.
+            // This is OK, because the tokens in the cookies have already been revoked at user sign-out,
+            // so the cookie clean-up is mostly cosmetic.
+            return;
+        }
+
+        context.Response.Cookies.Delete(AccessTokenCookieKey);
+        context.Response.Cookies.Delete(RefreshTokenCookieKey);
     }
 
     private HttpContext GetHttpContext()
