@@ -31,8 +31,12 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 ///     A value converter for TinyMCE that will ensure any macro content is rendered properly even when
 ///     used dynamically.
 /// </summary>
+/// <remarks>
+///     As this class is not registered with DI as a singleton, it must be disposed to release
+///     the settings change subscription and avoid a memory leak.
+/// </remarks>
 [DefaultPropertyValueConverter]
-public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, IDeliveryApiPropertyValueConverter
+public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, IDeliveryApiPropertyValueConverter, IDisposable
 {
     private readonly HtmlImageSourceParser _imageSourceParser;
     private readonly HtmlLocalLinkParser _linkParser;
@@ -47,7 +51,9 @@ public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, IDel
     private readonly ILogger<RteMacroRenderingValueConverter> _logger;
     private readonly IApiElementBuilder _apiElementBuilder;
     private readonly RichTextBlockPropertyValueConstructorCache _constructorCache;
+
     private DeliveryApiSettings _deliveryApiSettings;
+    private readonly IDisposable? _deliveryApiSettingsChangeSubscription;
 
     [Obsolete("Please use the constructor that takes all arguments. Will be removed in V14.")]
     public RteMacroRenderingValueConverter(IUmbracoContextAccessor umbracoContextAccessor, IMacroRenderer macroRenderer,
@@ -107,8 +113,9 @@ public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, IDel
         _apiElementBuilder = apiElementBuilder;
         _constructorCache = constructorCache;
         _logger = logger;
+
         _deliveryApiSettings = deliveryApiSettingsMonitor.CurrentValue;
-        deliveryApiSettingsMonitor.OnChange(settings => _deliveryApiSettings = settings);
+        _deliveryApiSettingsChangeSubscription = deliveryApiSettingsMonitor.OnChange(settings => _deliveryApiSettings = settings);
     }
 
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType) =>
@@ -314,4 +321,6 @@ public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, IDel
 
         public required RichTextBlockModel? RichTextBlockModel { get; set; }
     }
+
+    public void Dispose() => _deliveryApiSettingsChangeSubscription?.Dispose();
 }

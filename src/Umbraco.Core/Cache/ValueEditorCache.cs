@@ -51,7 +51,15 @@ public class ValueEditorCache : IValueEditorCache
             {
                 foreach (Dictionary<int, IDataValueEditor> editors in _valueEditorCache.Values)
                 {
-                    editors.Remove(id);
+                    if (editors.TryGetValue(id, out IDataValueEditor? editor))
+                    {
+                        if (editor is IDisposable disposable)
+                        {
+                            disposable.Dispose();
+                        }
+
+                        editors.Remove(id);
+                    }
                 }
             }
         }

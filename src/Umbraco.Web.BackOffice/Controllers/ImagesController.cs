@@ -23,7 +23,7 @@ public class ImagesController : UmbracoAuthorizedApiController
 {
     private readonly MediaFileManager _mediaFileManager;
     private readonly IImageUrlGenerator _imageUrlGenerator;
-    private ContentSettings _contentSettings;
+    private readonly ContentSettings _contentSettings;
 
     [Obsolete("Use non obsolete-constructor. Scheduled for removal in Umbraco 13.")]
     public ImagesController(
@@ -45,8 +45,6 @@ public class ImagesController : UmbracoAuthorizedApiController
         _mediaFileManager = mediaFileManager;
         _imageUrlGenerator = imageUrlGenerator;
         _contentSettings = contentSettingsMonitor.CurrentValue;
-
-        contentSettingsMonitor.OnChange(x => _contentSettings = x);
     }
 
     /// <summary>

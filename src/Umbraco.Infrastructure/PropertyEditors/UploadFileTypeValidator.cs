@@ -11,10 +11,19 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
-internal class UploadFileTypeValidator : IValueValidator
+/// <summary>
+///     The value editor for file upload property editors.
+/// </summary>
+/// <remarks>
+///     As this class is not registered with DI as a singleton, it must be disposed to release
+///     the settings change subscription and avoid a memory leak.
+/// </remarks>
+internal class UploadFileTypeValidator : IValueValidator, IDisposable
 {
     private readonly ILocalizedTextService _localizedTextService;
+
     private ContentSettings _contentSettings;
+    private readonly IDisposable? _contentSettingsChangeSubscription;
 
     public UploadFileTypeValidator(
         ILocalizedTextService localizedTextService,
@@ -23,7 +32,7 @@ internal class UploadFileTypeValidator : IValueValidator
         _localizedTextService = localizedTextService;
         _contentSettings = contentSettings.CurrentValue;
 
-        contentSettings.OnChange(x => _contentSettings = x);
+        _contentSettingsChangeSubscription = contentSettings.OnChange(x => _contentSettings = x);
     }
 
     public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration)
@@ -103,4 +112,6 @@ internal class UploadFileTypeValidator : IValueValidator
         extension = fileName.GetFileExtension().TrimStart(".");
         return true;
     }
+
+    public void Dispose() => _contentSettingsChangeSubscription?.Dispose();
 }

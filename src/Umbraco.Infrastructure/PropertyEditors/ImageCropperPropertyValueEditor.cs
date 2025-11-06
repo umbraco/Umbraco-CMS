@@ -23,13 +23,20 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// <summary>
 ///     The value editor for the image cropper property editor.
 /// </summary>
-internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core vs web?
+/// <remarks>
+///     As this class is loaded into <see cref="ValueEditorCache"/> which can be cleared, it needs
+///     to be disposable in order to properly clean up resources such as
+///     the settings change subscription and avoid a memory leak.
+/// </remarks>
+internal class ImageCropperPropertyValueEditor : DataValueEditor, IDisposable
 {
     private readonly IDataTypeConfigurationCache _dataTypeConfigurationCache;
     private readonly IFileStreamSecurityValidator _fileStreamSecurityValidator;
     private readonly ILogger<ImageCropperPropertyValueEditor> _logger;
     private readonly MediaFileManager _mediaFileManager;
+
     private ContentSettings _contentSettings;
+    private readonly IDisposable? _contentSettingsChangeSubscription;
 
     public ImageCropperPropertyValueEditor(
         DataEditorAttribute attribute,
@@ -49,7 +56,7 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
         _contentSettings = contentSettings.CurrentValue;
         _dataTypeConfigurationCache = dataTypeConfigurationCache;
         _fileStreamSecurityValidator = fileStreamSecurityValidator;
-        contentSettings.OnChange(x => _contentSettings = x);
+        _contentSettingsChangeSubscription = contentSettings.OnChange(x => _contentSettings = x);
     }
 
     /// <summary>
@@ -252,4 +259,6 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
 
         return filepath;
     }
+
+    public void Dispose() => _contentSettingsChangeSubscription?.Dispose();
 }
