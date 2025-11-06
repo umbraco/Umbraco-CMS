@@ -1,6 +1,7 @@
 import { UmbClipboardCollectionRepository } from '../../collection/index.js';
 import type { UmbClipboardEntryDetailModel } from '../types.js';
-import { css, customElement, html, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
+import UmbClipboardEntryDetailRepository from '../detail/clipboard-entry-detail.repository.js';
+import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import {
@@ -10,6 +11,7 @@ import {
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
+import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 
 // TODO: make this into an extension point (Picker) with two kinds of pickers: tree-item-picker and collection-item-picker;
 @customElement('umb-clipboard-entry-picker')
@@ -27,6 +29,8 @@ export class UmbClipboardEntryPickerElement extends UmbLitElement {
 	#selectionManager = new UmbSelectionManager(this);
 	#entityContext = new UmbEntityContext(this);
 	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
+
+	#clipboardDetailRepository = new UmbClipboardEntryDetailRepository(this);
 
 	constructor() {
 		super();
@@ -117,17 +121,66 @@ export class UmbClipboardEntryPickerElement extends UmbLitElement {
 		}
 	};
 
+	async #clearClipboard() {
+		// Prompt the user to confirm clearing the clipboard
+		await umbConfirmModal(this, {
+			headline: '#clipboard_labelForClearClipboard',
+			content: '#clipboard_confirmClearDescription',
+			color: 'danger',
+			confirmLabel: '#general_clear',
+			cancelLabel: '#general_cancel',
+		});
+
+		for (const item of this._items) {
+			// Clipboard items are a collection of items and the UmbClipboardContext
+			// does not expose a method to use the delete from the underlying clipboardDetailRepository
+			const { error } = await this.#clipboardDetailRepository.delete(item.unique);
+			if (error) {
+				console.error(`Unable to delete clipboard item with unique ${item.unique}`, error);
+			}
+
+			// It did not update/refresh the UI of items/collection after calling delete
+			// Should I dispatch an event to notify this same component to refresh?
+			// Or explictly call request items again which just works
+			this.#requestItems();
+
+			// const event = new UmbRequestReloadStructureForEntityEvent({
+			// 	unique: item.unique,
+			// 	entityType: item.entityType,
+			// });
+
+			// this.dispatchEvent(event);
+		}
+	}
+
 	override render() {
-		return when(
-			this._items.length > 0,
-			() =>
-				repeat(
-					this._items,
-					(item) => item.unique,
-					(item) => this.#renderItem(item),
-				),
-			() => html`<p>There are no items in the clipboard.</p>`,
-		);
+		return html`
+			<uui-box  headline=${this.localize.term('general_clipboard')}>
+				<span slot="header-actions">
+					${when(
+						this._items.length > 0,
+						() => html`
+							<uui-button color="default" look="default" @click="${this.#clearClipboard}">
+								<uui-icon name="delete"></uui-icon>
+								<umb-localize key="clipboard_labelForClearClipboard">Clear Clipboard</umb-localize>
+							</uui-button>
+						`,
+						() => nothing,
+					)}
+				</span>
+
+				${when(
+					this._items.length > 0,
+					() =>
+						repeat(
+							this._items,
+							(item) => item.unique,
+							(item) => this.#renderItem(item),
+						),
+					() => html`<p>There are no items in the clipboard.</p>`,
+				)}
+			</uui-box>
+		`;
 	}
 
 	#renderItem(item: UmbClipboardEntryDetailModel) {
