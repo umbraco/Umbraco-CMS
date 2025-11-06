@@ -1,7 +1,7 @@
 import { UMB_USER_GROUP_ENTITY_TYPE } from '../../entity.js';
 import type { UmbUserGroupItemModel } from '../../repository/index.js';
 import { UmbUserGroupPickerInputContext } from './user-group-input.context.js';
-import { css, html, customElement, property, state, ifDefined, nothing, repeat, when } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state, ifDefined, nothing, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
