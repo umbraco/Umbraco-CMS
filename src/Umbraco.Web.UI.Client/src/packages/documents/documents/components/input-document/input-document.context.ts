@@ -20,7 +20,7 @@ export class UmbDocumentPickerInputContext extends UmbPickerInputContext<
 	UmbDocumentPickerModalData,
 	UmbDocumentPickerModalValue
 > {
-	#items: Array<UmbDocumentItemModel> = [];
+	#items: Array<UmbDocumentItemModel & { name: string }> = [];
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS, UMB_DOCUMENT_PICKER_MODAL);
