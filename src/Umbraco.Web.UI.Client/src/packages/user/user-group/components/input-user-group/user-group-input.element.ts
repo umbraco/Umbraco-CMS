@@ -1,12 +1,14 @@
 import { UMB_USER_GROUP_ENTITY_TYPE } from '../../entity.js';
 import type { UmbUserGroupItemModel } from '../../repository/index.js';
 import { UmbUserGroupPickerInputContext } from './user-group-input.context.js';
-import { css, html, customElement, property, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state, ifDefined, nothing, repeat, when } from '@umbraco-cms/backoffice/external/lit';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
+import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
+import '@umbraco-cms/backoffice/entity-item';
 
 @customElement('umb-user-group-input')
 export class UmbUserGroupInputElement extends UUIFormControlMixin(UmbLitElement, '') {
@@ -75,6 +77,9 @@ export class UmbUserGroupInputElement extends UUIFormControlMixin(UmbLitElement,
 	@state()
 	private _items?: Array<UmbUserGroupItemModel>;
 
+	@state()
+	private _statuses?: Array<UmbRepositoryItemsStatus>;
+
 	#pickerContext = new UmbUserGroupPickerInputContext(this);
 
 	@state()
@@ -97,6 +102,7 @@ export class UmbUserGroupInputElement extends UUIFormControlMixin(UmbLitElement,
 
 		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')), '_observeSelection');
 		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems), '_observerItems');
+		this.observe(this.#pickerContext.statuses, (statuses) => (this._statuses = statuses), '_observeStatuses');
 
 		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
 			.addAdditionalPath(UMB_USER_GROUP_ENTITY_TYPE)
@@ -114,7 +120,15 @@ export class UmbUserGroupInputElement extends UUIFormControlMixin(UmbLitElement,
 
 	override render() {
 		return html`
-			<uui-ref-list>${this._items?.map((item) => this._renderItem(item))}</uui-ref-list>
+			<uui-ref-list>
+				${this._statuses
+					? repeat(
+							this._statuses,
+							(status) => status.unique,
+							(status) => this._renderItem(status),
+					  )
+					: nothing}
+			</uui-ref-list>
 			<uui-button
 				id="btn-add"
 				look="placeholder"
@@ -123,15 +137,35 @@ export class UmbUserGroupInputElement extends UUIFormControlMixin(UmbLitElement,
 		`;
 	}
 
-	private _renderItem(item: UmbUserGroupItemModel) {
-		if (!item.unique) return;
-		const href = `${this._editUserGroupPath}edit/${item.unique}`;
+	private _renderItem(status: UmbRepositoryItemsStatus) {
+		const unique = status.unique;
+		const item = this._items?.find((x) => x.unique === unique);
+		const isError = status.state.type === 'error';
+
+		// For error state, use umb-entity-item-ref
+		if (isError) {
+			return html`<umb-entity-item-ref
+				id=${unique}
+				?error=${true}
+				.errorMessage=${status.state.error}
+				.errorDetail=${unique}>
+				<uui-action-bar slot="actions">
+					<uui-button
+						label=${this.localize.term('general_remove')}
+						@click=${() => this.#pickerContext.requestRemoveItem(unique)}></uui-button>
+				</uui-action-bar>
+			</umb-entity-item-ref>`;
+		}
+
+		// For successful items, use umb-user-group-ref
+		if (!item?.unique) return nothing;
+		const href = `${this._editUserGroupPath}edit/${unique}`;
 		return html`
 			<umb-user-group-ref name="${ifDefined(item.name)}" href=${href}>
 				${item.icon ? html`<umb-icon slot="icon" name=${item.icon}></umb-icon>` : nothing}
 				<uui-action-bar slot="actions">
 					<uui-button
-						@click=${() => this.#pickerContext.requestRemoveItem(item.unique)}
+						@click=${() => this.#pickerContext.requestRemoveItem(unique)}
 						label=${this.localize.term('general_remove')}></uui-button>
 				</uui-action-bar>
 			</umb-user-group-ref>

@@ -1,6 +1,6 @@
 import type { UmbMediaTypeItemModel } from '../../types.js';
 import { UmbMediaTypePickerInputContext } from './input-media-type.context.js';
-import { css, html, customElement, property, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state, repeat, nothing, when } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -8,6 +8,8 @@ import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
+import '@umbraco-cms/backoffice/entity-item';
 
 @customElement('umb-input-media-type')
 export class UmbInputMediaTypeElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
@@ -96,6 +98,9 @@ export class UmbInputMediaTypeElement extends UmbFormControlMixin<string | undef
 	private _items?: Array<UmbMediaTypeItemModel>;
 
 	@state()
+	private _statuses?: Array<UmbRepositoryItemsStatus>;
+
+	@state()
 	private _editPath = '';
 
 	#pickerContext = new UmbMediaTypePickerInputContext(this);
@@ -126,6 +131,7 @@ export class UmbInputMediaTypeElement extends UmbFormControlMixin<string | undef
 
 		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')), '_observeSelection');
 		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems), '_observerItems');
+		this.observe(this.#pickerContext.statuses, (statuses) => (this._statuses = statuses), '_observeStatuses');
 	}
 
 	protected override getFormElement() {
@@ -138,8 +144,8 @@ export class UmbInputMediaTypeElement extends UmbFormControlMixin<string | undef
 		});
 	}
 
-	#removeItem(item: UmbMediaTypeItemModel) {
-		this.#pickerContext.requestRemoveItem(item.unique);
+	#removeItem(unique: string) {
+		this.#pickerContext.requestRemoveItem(unique);
 	}
 
 	override render() {
@@ -158,29 +164,49 @@ export class UmbInputMediaTypeElement extends UmbFormControlMixin<string | undef
 	}
 
 	#renderItems() {
-		if (!this._items) return nothing;
+		if (!this._statuses) return nothing;
 		return html`
 			<uui-ref-list>
 				${repeat(
-					this._items,
-					(item) => item.unique,
-					(item) => this.#renderItem(item),
+					this._statuses,
+					(status) => status.unique,
+					(status) => {
+						const unique = status.unique;
+						const item = this._items?.find((x) => x.unique === unique);
+						const isError = status.state.type === 'error';
+
+						// For error state, use umb-entity-item-ref
+						if (isError) {
+							return html`<umb-entity-item-ref
+								id=${unique}
+								.item=${item}
+								?error=${true}
+								.errorMessage=${status.state.error}
+								.errorDetail=${unique}
+								?standalone=${this.max === 1}>
+								<uui-action-bar slot="actions">
+									<uui-button
+										label=${this.localize.term('general_remove')}
+										@click=${() => this.#removeItem(unique)}></uui-button>
+								</uui-action-bar>
+							</umb-entity-item-ref>`;
+						}
+
+						// For successful items, use the media type specific component
+						if (!item) return nothing;
+						const href = `${this._editPath}edit/${unique}`;
+						return html`
+							<uui-ref-node-document-type name=${this.localize.string(item.name)} id=${unique}>
+								${this.#renderIcon(item)}
+								<uui-action-bar slot="actions">
+									<uui-button href=${href} label=${this.localize.term('general_open')}></uui-button>
+									<uui-button @click=${() => this.#removeItem(unique)} label=${this.localize.term('general_remove')}></uui-button>
+								</uui-action-bar>
+							</uui-ref-node-document-type>
+						`;
+					},
 				)}
 			</uui-ref-list>
-		`;
-	}
-
-	#renderItem(item: UmbMediaTypeItemModel) {
-		if (!item.unique) return;
-		const href = `${this._editPath}edit/${item.unique}`;
-		return html`
-			<uui-ref-node-document-type name=${this.localize.string(item.name)} id=${item.unique}>
-				${this.#renderIcon(item)}
-				<uui-action-bar slot="actions">
-					<uui-button href=${href} label=${this.localize.term('general_open')}></uui-button>
-					<uui-button @click=${() => this.#removeItem(item)} label=${this.localize.term('general_remove')}></uui-button>
-				</uui-action-bar>
-			</uui-ref-node-document-type>
 		`;
 	}
 
