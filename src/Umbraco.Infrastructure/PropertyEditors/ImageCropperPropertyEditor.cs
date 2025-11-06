@@ -20,10 +20,6 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// <summary>
 ///     Represents an image cropper property editor.
 /// </summary>
-/// <remarks>
-///     As this class is not registered with DI as a singleton, it must be disposed to release
-///     the settings change subscription and avoid a memory leak.
-/// </remarks>
 [DataEditor(
     Constants.PropertyEditors.Aliases.ImageCropper,
     ValueType = ValueTypes.Json,
@@ -36,8 +32,7 @@ public class ImageCropperPropertyEditor : DataEditor,
     INotificationHandler<MediaSavingNotification>,
     INotificationHandler<MediaMovedToRecycleBinNotification>,
     INotificationHandler<MediaMovedNotification>,
-    INotificationHandler<MemberDeletedNotification>,
-    IDisposable
+    INotificationHandler<MemberDeletedNotification>
 {
     private readonly UploadAutoFillProperties _autoFillProperties;
     private readonly IContentService _contentService;
@@ -47,7 +42,6 @@ public class ImageCropperPropertyEditor : DataEditor,
     private readonly IJsonSerializer _jsonSerializer;
 
     private ContentSettings _contentSettings;
-    private readonly IDisposable? _contentSettingsChangeSubscription;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ImageCropperPropertyEditor" /> class.
@@ -71,7 +65,7 @@ public class ImageCropperPropertyEditor : DataEditor,
         _logger = loggerFactory.CreateLogger<ImageCropperPropertyEditor>();
 
         _contentSettings = contentSettings.CurrentValue;
-        _contentSettingsChangeSubscription = contentSettings.OnChange(x => _contentSettings = x);
+        contentSettings.OnChange(x => _contentSettings = x);
 
         SupportsReadOnly = true;
     }
@@ -362,6 +356,4 @@ public class ImageCropperPropertyEditor : DataEditor,
     {
         public string? Src { get; set; } = string.Empty;
     }
-
-    public void Dispose() => _contentSettingsChangeSubscription?.Dispose();
 }

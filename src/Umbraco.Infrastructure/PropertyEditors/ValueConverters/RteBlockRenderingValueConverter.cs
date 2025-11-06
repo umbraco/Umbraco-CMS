@@ -25,10 +25,6 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 ///     A value converter for TinyMCE that will ensure any blocks content are rendered properly even when
 ///     used dynamically.
 /// </summary>
-/// <remarks>
-///     As this class is not registered with DI as a singleton, it must be disposed to release
-///     the settings change subscription and avoid a memory leak.
-/// </remarks>
 [DefaultPropertyValueConverter]
 public class RteBlockRenderingValueConverter : SimpleRichTextValueConverter, IDeliveryApiPropertyValueConverter, IDisposable
 {
@@ -71,7 +67,6 @@ public class RteBlockRenderingValueConverter : SimpleRichTextValueConverter, IDe
 
         _deliveryApiSettings = deliveryApiSettingsMonitor.CurrentValue;
         _deliveryApiSettingsChangeSubscription = deliveryApiSettingsMonitor.OnChange(settings => _deliveryApiSettings = settings);
-
     }
 
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType) =>

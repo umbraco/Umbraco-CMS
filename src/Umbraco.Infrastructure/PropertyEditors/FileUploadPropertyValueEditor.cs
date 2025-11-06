@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
@@ -23,7 +24,8 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 ///     The value editor for the file upload property editor.
 /// </summary>
 /// <remarks>
-///     As this class is not registered with DI as a singleton, it must be disposed to release
+///     As this class is loaded into <see cref="ValueEditorCache"/> which can be cleared, it needs
+///     to be disposable in order to properly clean up resources such as
 ///     the settings change subscription and avoid a memory leak.
 /// </remarks>
 internal sealed class FileUploadPropertyValueEditor : DataValueEditor, IDisposable
