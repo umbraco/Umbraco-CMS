@@ -20,9 +20,6 @@ export class UmbEntityItemRefElement extends UmbLitElement {
 	private _component?: any; // TODO: Add type
 
 	@property({ type: Object, attribute: false })
-	public get item(): UmbEntityModel | undefined {
-		return this.#item;
-	}
 	public set item(value: UmbEntityModel | undefined) {
 		const oldValue = this.#item;
 		this.#item = value;
@@ -40,6 +37,9 @@ export class UmbEntityItemRefElement extends UmbLitElement {
 
 		// If the component is already created, but the entity type is different, we need to destroy the component.
 		this.#createController(value.entityType);
+	}
+	public get item(): UmbEntityModel | undefined {
+		return this.#item;
 	}
 
 	#readonly = false;
@@ -124,20 +124,23 @@ export class UmbEntityItemRefElement extends UmbLitElement {
 	error?: boolean;
 
 	@property({ type: String, attribute: 'error-message', reflect: false })
-	errorMessage?: string;
+	errorMessage?: string | null;
+
+	@property({ type: String, attribute: 'error-detail', reflect: false })
+	errorDetail?: string | null;
 
 	#pathAddendum = new UmbRoutePathAddendumContext(this);
 
 	#onSelected(event: UmbSelectedEvent) {
 		event.stopPropagation();
-		const unique = this.#item?.unique;
+		const unique = this.item?.unique;
 		if (!unique) throw new Error('No unique id found for item');
 		this.dispatchEvent(new UmbSelectedEvent(unique));
 	}
 
 	#onDeselected(event: UmbDeselectedEvent) {
 		event.stopPropagation();
-		const unique = this.#item?.unique;
+		const unique = this.item?.unique;
 		if (!unique) throw new Error('No unique id found for item');
 		this.dispatchEvent(new UmbDeselectedEvent(unique));
 	}
@@ -163,7 +166,7 @@ export class UmbEntityItemRefElement extends UmbLitElement {
 
 				// TODO: I would say this code can use feature of the UmbExtensionsElementInitializer, to set properties and get a fallback element. [NL]
 				// assign the properties to the component
-				component.item = this.#item;
+				component.item = this.item;
 				component.readonly = this.readonly;
 				component.standalone = this.standalone;
 				component.selectOnly = this.selectOnly;
@@ -197,6 +200,7 @@ export class UmbEntityItemRefElement extends UmbLitElement {
 			return html`<uui-ref-node
 				style="color: var(--uui-color-danger);"
 				.name=${this.localize.string(this.errorMessage ?? '#general_notFound')}
+				.detail=${this.errorDetail ?? ''}
 				.readonly=${this.readonly}
 				.standalone=${this.standalone}
 				.selectOnly=${this.selectOnly}
