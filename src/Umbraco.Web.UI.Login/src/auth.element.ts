@@ -9,6 +9,10 @@ import { UmbSlimBackofficeController } from './controllers';
 // We import the authStyles here so that we can inline it in the shadow DOM that is created outside of the UmbAuthElement.
 import authStyles from './auth-styles.css?inline';
 
+// Import the SVG files
+import openEyeSVG from '../public/openEye.svg?raw';
+import closedEyeSVG from '../public/closedEye.svg?raw';
+
 // Import the main bundle
 import { extensions } from './umbraco-package.js';
 
@@ -42,10 +46,69 @@ const createLabel = (opts: { forId: string; localizeAlias: string; localizeFallb
 	return label;
 };
 
+const createShowPasswordToggleButton = (opts: {
+	id: string;
+	name: string;
+	ariaLabelShowPassword: string;
+	ariaLabelHidePassword: string;
+}) => {
+	const button = document.createElement('button');
+	button.id = opts.id;
+	button.ariaLabel = opts.ariaLabelShowPassword;
+	button.name = opts.name;
+	button.type = 'button';
+
+	button.innerHTML = openEyeSVG;
+
+	button.onclick = () => {
+		const passwordInput = document.getElementById('password-input') as HTMLInputElement;
+
+		if (passwordInput.type === 'password') {
+			passwordInput.type = 'text';
+			button.ariaLabel = opts.ariaLabelHidePassword;
+			button.innerHTML = closedEyeSVG;
+		} else {
+			passwordInput.type = 'password';
+			button.ariaLabel = opts.ariaLabelShowPassword;
+			button.innerHTML = openEyeSVG;
+		}
+
+		passwordInput.focus();
+	};
+
+	return button;
+};
+
+const createShowPasswordToggleItem = (button: HTMLButtonElement) => {
+	const span = document.createElement('span');
+	span.id = 'password-show-toggle-span';
+	span.appendChild(button);
+
+	return span;
+};
+
 const createFormLayoutItem = (label: HTMLLabelElement, input: HTMLInputElement) => {
 	const formLayoutItem = document.createElement('uui-form-layout-item') as UUIFormLayoutItemElement;
+
 	formLayoutItem.appendChild(label);
 	formLayoutItem.appendChild(input);
+
+	return formLayoutItem;
+};
+
+const createFormLayoutPasswordItem = (
+	label: HTMLLabelElement,
+	input: HTMLInputElement,
+	showPasswordToggle: HTMLSpanElement
+) => {
+	const formLayoutItem = document.createElement('uui-form-layout-item') as UUIFormLayoutItemElement;
+
+	formLayoutItem.appendChild(label);
+	const span = document.createElement('span');
+	span.id = 'password-input-span';
+	span.appendChild(input);
+	span.appendChild(showPasswordToggle);
+	formLayoutItem.appendChild(span);
 
 	return formLayoutItem;
 };
@@ -112,6 +175,8 @@ export default class UmbAuthElement extends UmbLitElement {
 	_passwordInput?: HTMLInputElement;
 	_usernameLabel?: HTMLLabelElement;
 	_passwordLabel?: HTMLLabelElement;
+	_passwordShowPasswordToggleItem?: HTMLSpanElement;
+	_passwordShowPasswordToggleButton?: HTMLButtonElement;
 
 	#authContext = new UmbAuthContext(this, UMB_AUTH_CONTEXT);
 
@@ -133,11 +198,35 @@ export default class UmbAuthElement extends UmbLitElement {
 		// Register the main package for Umbraco.Auth
 		umbExtensionsRegistry.registerMany(extensions);
 
-		setTimeout(() => {
-			requestAnimationFrame(() => {
-				this.#initializeForm();
-			});
-		}, 100);
+		// Wait for localization to be ready before loading the form
+		await this.#waitForLocalization();
+
+		this.#initializeForm();
+	}
+
+	async #waitForLocalization(): Promise<void> {
+		return new Promise((resolve, reject) => {
+			let retryCount = 0;
+			// Retries 40 times with a 50ms interval = 2 seconds
+			const maxRetries = 40;
+
+			// We check periodically until it is available or we reach the max retries
+			const checkInterval = setInterval(() => {
+				// If we reach max retries, we give up and reject the promise
+				if (retryCount > maxRetries) {
+					clearInterval(checkInterval);
+					reject('Localization not available');
+					return;
+				}
+				// Check if localization is available
+				if (this.localize.term('auth_showPassword') !== 'auth_showPassword') {
+					clearInterval(checkInterval);
+					resolve();
+					return;
+				}
+				retryCount++;
+			}, 50);
+		});
 	}
 
 	disconnectedCallback() {
@@ -148,6 +237,8 @@ export default class UmbAuthElement extends UmbLitElement {
 		this._usernameInput?.remove();
 		this._passwordLabel?.remove();
 		this._passwordInput?.remove();
+		this._passwordShowPasswordToggleItem?.remove();
+		this._passwordShowPasswordToggleButton?.remove();
 	}
 
 	/**
@@ -173,6 +264,13 @@ export default class UmbAuthElement extends UmbLitElement {
 			autocomplete: 'current-password',
 			inputmode: '',
 		});
+		this._passwordShowPasswordToggleButton = createShowPasswordToggleButton({
+			id: 'password-show-toggle',
+			name: 'password-show-toggle',
+			ariaLabelShowPassword: this.localize.term('auth_showPassword'),
+			ariaLabelHidePassword: this.localize.term('auth_hidePassword'),
+		});
+		this._passwordShowPasswordToggleItem = createShowPasswordToggleItem(this._passwordShowPasswordToggleButton);
 		this._usernameLabel = createLabel({
 			forId: 'username-input',
 			localizeAlias: this.usernameIsEmail ? 'auth_email' : 'auth_username',
@@ -183,9 +281,12 @@ export default class UmbAuthElement extends UmbLitElement {
 			localizeAlias: 'auth_password',
 			localizeFallback: 'Password',
 		});
-
 		this._usernameLayoutItem = createFormLayoutItem(this._usernameLabel, this._usernameInput);
-		this._passwordLayoutItem = createFormLayoutItem(this._passwordLabel, this._passwordInput);
+		this._passwordLayoutItem = createFormLayoutPasswordItem(
+			this._passwordLabel,
+			this._passwordInput,
+			this._passwordShowPasswordToggleItem
+		);
 
 		this._form = createForm([this._usernameLayoutItem, this._passwordLayoutItem]);
 

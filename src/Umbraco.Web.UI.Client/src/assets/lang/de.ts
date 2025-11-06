@@ -903,7 +903,18 @@ export default {
 		newVersionAvailable: 'Neue Version verfügbar',
 	},
 	colors: {
+		black: 'Schwarz',
 		blue: 'Blau',
+		brown: 'Braun',
+		cyan: 'Cyan',
+		green: 'Grün',
+		lightBlue: 'Hellblau',
+		pink: 'Pink',
+		red: 'Rot',
+		text: 'Schwarz',
+		yellow: 'Gelb',
+		white: 'Weiß',
+		grey: 'Grau',
 	},
 	shortcuts: {
 		addTab: 'Tab hinzufügen',
