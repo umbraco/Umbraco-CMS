@@ -1,4 +1,3 @@
-using System.Text.Json.Serialization.Metadata;
 using System.Text.RegularExpressions;
 using Umbraco.Extensions;
 
@@ -12,15 +11,15 @@ public static class UmbracoSchemaIdGenerator
     /// <summary>
     /// Generates a sanitized and consistent schema identifier for a given type following Umbraco's schema id naming conventions.
     /// </summary>
-    /// <param name="jsonTypeInfo">The json type for which to generate the schema identifier.</param>
+    /// <param name="type">The type for which to generate the schema identifier.</param>
     /// <returns>A string representing the schema identifier for the provided type.</returns>
-    public static string Generate(JsonTypeInfo jsonTypeInfo)
+    public static string Generate(Type type)
     {
-        var name = SanitizedTypeName(jsonTypeInfo.Type);
+        var name = SanitizedTypeName(type);
 
-        name = HandleGenerics(name, jsonTypeInfo.Type);
+        name = HandleGenerics(name, type);
 
-        if (name.EndsWith("Model") == false)
+        if (!name.EndsWith("Model"))
         {
             // because some models names clash with common classes in TypeScript (i.e. Document),
             // we need to add a "Model" postfix to all models

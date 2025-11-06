@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization.Metadata;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
@@ -34,7 +35,7 @@ public abstract class ConfigureUmbracoOpenApiOptionsBase : IConfigureNamedOption
         }
 
         options.ShouldInclude = ShouldInclude;
-        options.CreateSchemaReferenceId = type => OpenApiOptions.CreateDefaultSchemaReferenceId(type) is null ? null : UmbracoSchemaIdGenerator.Generate(type);
+        options.CreateSchemaReferenceId = CreateSchemaReferenceId;
 
         options.AddOperationTransformer<CustomOperationIdsTransformer>();
 
@@ -43,6 +44,8 @@ public abstract class ConfigureUmbracoOpenApiOptionsBase : IConfigureNamedOption
             .AddOperationTransformer<TagActionsByGroupNameTransformer>()
             .AddDocumentTransformer<TagActionsByGroupNameTransformer>()
             .AddDocumentTransformer<SortTagsAndPathsTransformer>();
+
+        options.AddSchemaTransformer<SubTypesTransformer>();
 
         options.AddSchemaTransformer<EnumSchemaTransformer>();
         options.AddSchemaTransformer<RequireNonNullablePropertiesSchemaTransformer>();
@@ -58,6 +61,18 @@ public abstract class ConfigureUmbracoOpenApiOptionsBase : IConfigureNamedOption
     /// </summary>
     /// <param name="options">The <see cref="OpenApiOptions"/> instance to configure.</param>
     protected abstract void ConfigureOpenApi(OpenApiOptions options);
+
+    private static string? CreateSchemaReferenceId(JsonTypeInfo jsonTypeInfo)
+    {
+        // Ensure that only types that would normally be included in the schema generation are given a schema reference ID.
+        // Otherwise, we should return null to inline them.
+        if (OpenApiOptions.CreateDefaultSchemaReferenceId(jsonTypeInfo) is null)
+        {
+            return null;
+        }
+
+        return UmbracoSchemaIdGenerator.Generate(jsonTypeInfo.Type);
+    }
 
     private bool ShouldInclude(ApiDescription apiDescription)
     {
