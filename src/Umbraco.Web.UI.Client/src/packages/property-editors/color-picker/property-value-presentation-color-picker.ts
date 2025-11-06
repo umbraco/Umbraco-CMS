@@ -1,8 +1,8 @@
 import { customElement, html, nothing } from "@umbraco-cms/backoffice/external/lit";
-import { UmbPropertyValuePresentationBase } from "../../core/property-value-presentation/property-value-presentation-base.js";
+import { UmbPropertyValuePresentationBaseElement } from "../../core/property-value-presentation/index.js";
 
 @customElement("umb-color-picker-property-value-presentation")
-export class UmbColorPickerPropertyValuePresentation extends UmbPropertyValuePresentationBase {
+export class UmbColorPickerPropertyValuePresentation extends UmbPropertyValuePresentationBaseElement {
 
   override render() {
     const color = this.#getColor();
