@@ -28,6 +28,12 @@ public static class UmbracoBuilderAuthExtensions
 
     private static void ConfigureOpenIddict(IUmbracoBuilder builder)
     {
+        // Optionally hide tokens from the back-office.
+        SecuritySettings securitySettings = builder.Config
+            .GetSection(Constants.Configuration.ConfigSecurity)
+            .Get<SecuritySettings>() ?? new SecuritySettings();
+        var hideBackOfficeTokens = securitySettings.HideBackOfficeTokens;
+
         builder.Services.AddOpenIddict()
             // Register the OpenIddict server components.
             .AddServer(options =>
@@ -114,18 +120,21 @@ public static class UmbracoBuilderAuthExtensions
                     configuration.UseSingletonHandler<ProcessRequestContextHandler>().SetOrder(OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ResolveRequestUri.Descriptor.Order - 1);
                 });
 
-                options.AddEventHandler<OpenIddictServerEvents.ApplyTokenResponseContext>(configuration =>
+                if (hideBackOfficeTokens)
                 {
-                    configuration
-                        .UseSingletonHandler<HideBackOfficeTokensHandler>()
-                        .SetOrder(OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ProcessJsonResponse<OpenIddictServerEvents.ApplyTokenResponseContext>.Descriptor.Order - 1);
-                });
-                options.AddEventHandler<OpenIddictServerEvents.ExtractTokenRequestContext>(configuration =>
-                {
-                    configuration
-                        .UseSingletonHandler<HideBackOfficeTokensHandler>()
-                        .SetOrder(OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ExtractPostRequest<OpenIddictServerEvents.ExtractTokenRequestContext>.Descriptor.Order + 1);
-                });
+                    options.AddEventHandler<OpenIddictServerEvents.ApplyTokenResponseContext>(configuration =>
+                    {
+                        configuration
+                            .UseSingletonHandler<HideBackOfficeTokensHandler>()
+                            .SetOrder(OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ProcessJsonResponse<OpenIddictServerEvents.ApplyTokenResponseContext>.Descriptor.Order - 1);
+                    });
+                    options.AddEventHandler<OpenIddictServerEvents.ExtractTokenRequestContext>(configuration =>
+                    {
+                        configuration
+                            .UseSingletonHandler<HideBackOfficeTokensHandler>()
+                            .SetOrder(OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ExtractPostRequest<OpenIddictServerEvents.ExtractTokenRequestContext>.Descriptor.Order + 1);
+                    });
+                }
             })
 
             // Register the OpenIddict validation components.
@@ -151,13 +160,16 @@ public static class UmbracoBuilderAuthExtensions
                     configuration.UseSingletonHandler<ProcessRequestContextHandler>().SetOrder(OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreHandlers.ResolveRequestUri.Descriptor.Order - 1);
                 });
 
-                options.AddEventHandler<OpenIddictValidationEvents.ProcessAuthenticationContext>(configuration =>
+                if (hideBackOfficeTokens)
                 {
-                    configuration
-                        .UseSingletonHandler<HideBackOfficeTokensHandler>()
-                        // IMPORTANT: the handler must be AFTER the built-in query string handler, because the client-side SignalR library sometimes appends access tokens to the query string.
-                        .SetOrder(OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreHandlers.ExtractAccessTokenFromQueryString.Descriptor.Order + 1);
-                });
+                    options.AddEventHandler<OpenIddictValidationEvents.ProcessAuthenticationContext>(configuration =>
+                    {
+                        configuration
+                            .UseSingletonHandler<HideBackOfficeTokensHandler>()
+                            // IMPORTANT: the handler must be AFTER the built-in query string handler, because the client-side SignalR library sometimes appends access tokens to the query string.
+                            .SetOrder(OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreHandlers.ExtractAccessTokenFromQueryString.Descriptor.Order + 1);
+                    });
+                }
             });
 
         builder.Services.AddRecurringBackgroundJob<OpenIddictCleanupJob>();
