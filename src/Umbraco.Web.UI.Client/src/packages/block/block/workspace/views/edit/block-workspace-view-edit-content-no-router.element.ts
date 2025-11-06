@@ -58,14 +58,16 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 	}
 
 	#checkDefaultTabName() {
-		if (!this._tabs || !this.#blockWorkspace || this._activeTabKey !== undefined) return;
+		if (!this._tabs || !this.#blockWorkspace) return;
 
 		// Find the default tab to grab
-		if (this._hasRootGroups) {
-			this._activeTabKey = null;
-		} else if (this._tabs.length > 0) {
-			const tab = this._tabs[0];
-			this._activeTabKey = tab.ownerId ?? tab.ids?.[0];
+		if (this._activeTabKey === undefined) {
+			if (this._hasRootGroups) {
+				this._activeTabKey = null;
+			} else if (this._tabs.length > 0) {
+				const tab = this._tabs[0];
+				this._activeTabKey = tab.ownerId ?? tab.ids?.[0];
+			}
 		}
 	}
 
