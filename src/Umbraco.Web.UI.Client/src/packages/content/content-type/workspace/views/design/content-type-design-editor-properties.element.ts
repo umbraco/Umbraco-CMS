@@ -238,7 +238,7 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 
 	override disconnectedCallback(): void {
 		super.disconnectedCallback();
-		this.#initReject?.();
+		this.#initReject?.(new Error('Component disconnected'));
 	}
 
 	async #createPropertyTypeWorkspaceRoutes() {
