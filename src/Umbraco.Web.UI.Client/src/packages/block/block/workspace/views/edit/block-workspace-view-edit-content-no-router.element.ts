@@ -14,7 +14,6 @@ import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace'
  */
 @customElement('umb-block-workspace-view-edit-content-no-router')
 export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitElement implements UmbWorkspaceViewElement {
-	// @state()
 	// private _hasRootProperties = false;
 
 	@state()
