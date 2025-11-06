@@ -231,7 +231,7 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 						this.#initResolver = undefined;
 						this.#initReject = undefined;
 					})
-					.catch((error) => {});
+					.catch(() => {});
 			}
 		});
 		this.observe(this.#propertyStructureHelper.propertyStructure, (propertyStructure) => {
