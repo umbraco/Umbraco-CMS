@@ -21,6 +21,10 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// <summary>
 ///     Represents an image cropper property editor.
 /// </summary>
+/// <remarks>
+///     As this class is not registered with DI as a singleton, it must be disposed to release
+///     the settings change subscription and avoid a memory leak.
+/// </remarks>
 [DataEditor(
     Constants.PropertyEditors.Aliases.ImageCropper,
     "Image Cropper",
@@ -42,6 +46,7 @@ public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
     private readonly IIOHelper _ioHelper;
     private readonly ILogger<ImageCropperPropertyEditor> _logger;
     private readonly MediaFileManager _mediaFileManager;
+
     private ContentSettings _contentSettings;
 
     // Scheduled for removal in v12

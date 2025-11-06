@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models.Editors;
@@ -16,11 +17,18 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// <summary>
 ///     The value editor for the file upload property editor.
 /// </summary>
-internal class FileUploadPropertyValueEditor : DataValueEditor
+/// <remarks>
+///     As this class is loaded into <see cref="ValueEditorCache"/> which can be cleared, it needs
+///     to be disposable in order to properly clean up resources such as
+///     the settings change subscription and avoid a memory leak.
+/// </remarks>
+internal class FileUploadPropertyValueEditor : DataValueEditor, IDisposable
 {
     private readonly MediaFileManager _mediaFileManager;
     private readonly IFileStreamSecurityValidator _fileStreamSecurityValidator;
+
     private ContentSettings _contentSettings;
+    private readonly IDisposable? _contentSettingsChangeSubscription;
 
     public FileUploadPropertyValueEditor(
         DataEditorAttribute attribute,
@@ -36,7 +44,7 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
         _mediaFileManager = mediaFileManager ?? throw new ArgumentNullException(nameof(mediaFileManager));
         _fileStreamSecurityValidator = fileStreamSecurityValidator;
         _contentSettings = contentSettings.CurrentValue ?? throw new ArgumentNullException(nameof(contentSettings));
-        contentSettings.OnChange(x => _contentSettings = x);
+        _contentSettingsChangeSubscription = contentSettings.OnChange(x => _contentSettings = x);
     }
 
     /// <summary>
@@ -163,4 +171,6 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
 
         return filepath;
     }
+
+    public void Dispose() => _contentSettingsChangeSubscription?.Dispose();
 }
