@@ -38,7 +38,7 @@ test('can read value from textstring editor using read property action', async (
     await umbracoUi.content.doesSuccessNotificationHaveText(readTextValue);
 });
 
-test('can write value to Textstring editor via Write Property action', async ({umbracoApi, umbracoUi}) => {
+test('can write value to textstring editor using write property action', async ({umbracoApi, umbracoUi}) => {
     // Arrange 
     const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
     const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id, groupName);
