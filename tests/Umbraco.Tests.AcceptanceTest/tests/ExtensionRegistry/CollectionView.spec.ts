@@ -65,7 +65,7 @@ test('can see the pagination works when using custom collection view in content 
   await umbracoUi.content.isListViewItemWithNameVisible('Test child 7', 1);
 
   // Clean
-  for(let i = 1; i <= totalItems; i++){
+  for (let i = 1; i <= totalItems; i++) {
     await umbracoApi.document.ensureNameNotExists('Test child ' + i);
   }
 });
