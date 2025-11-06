@@ -7,6 +7,7 @@ import { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDocumentTypeEntityType } from '@umbraco-cms/backoffice/document-type';
 import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
+import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 
 interface UmbDocumentPickerInputContextOpenArgs {
 	allowedContentTypes?: Array<{ unique: string; entityType: UmbDocumentTypeEntityType }>;
@@ -19,8 +20,15 @@ export class UmbDocumentPickerInputContext extends UmbPickerInputContext<
 	UmbDocumentPickerModalData,
 	UmbDocumentPickerModalValue
 > {
+	#items: Array<UmbDocumentItemModel> = [];
+
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS, UMB_DOCUMENT_PICKER_MODAL);
+
+		// Keep track of items for name lookup
+		this.observe(this.selectedItems, (items) => {
+			this.#items = items;
+		});
 	}
 
 	override async openPicker(
@@ -54,6 +62,22 @@ export class UmbDocumentPickerInputContext extends UmbPickerInputContext<
 		};
 
 		await super.openPicker(combinedPickerData);
+	}
+
+	override async requestRemoveItem(unique: string) {
+		const item = this.#items.find((item) => item.unique === unique);
+
+		// If item doesn't exist, use the GUID as the name
+		const name = item?.name ?? unique;
+
+		await umbConfirmModal(this, {
+			color: 'danger',
+			headline: `#actions_remove?`,
+			content: `#defaultdialogs_confirmremove ${name}?`,
+			confirmLabel: '#actions_remove',
+		});
+
+		this._removeItem(unique);
 	}
 
 	#pickableFilter = (
