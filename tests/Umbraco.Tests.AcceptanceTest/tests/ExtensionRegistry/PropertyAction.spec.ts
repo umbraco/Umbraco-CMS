@@ -21,7 +21,7 @@ test.afterEach(async ({umbracoApi}) => {
 	await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
-test('can read value of Textstring editor via Read Property action', async ({umbracoApi, umbracoUi}) => {
+test('can read value from textstring editor using read property action', async ({umbracoApi, umbracoUi}) => {
     // Arrange 
     const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
     const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id, groupName);
