@@ -239,11 +239,13 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 					(status) => {
 						const unique = status.unique;
 						const item = this._items?.find((x) => x.unique === unique);
+						const isError = status.state.type === 'error';
 						return html`<umb-entity-item-ref
 							id=${unique}
 							.item=${item}
-							?error=${status.state.type === 'error'}
+							?error=${isError}
 							.errorMessage=${status.state.error}
+							.errorDetail=${isError ? unique : undefined}
 							?readonly=${this.readonly}
 							?standalone=${this.max === 1}>
 							${when(
