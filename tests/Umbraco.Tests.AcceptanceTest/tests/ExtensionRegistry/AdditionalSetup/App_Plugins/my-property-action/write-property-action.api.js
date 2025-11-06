@@ -11,4 +11,3 @@ export class WritePropertyAction extends UmbPropertyActionBase {
   }
 }
 export { WritePropertyAction as api };
-
