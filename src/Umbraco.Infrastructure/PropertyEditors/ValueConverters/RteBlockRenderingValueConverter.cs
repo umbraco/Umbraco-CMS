@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 ///     used dynamically.
 /// </summary>
 [DefaultPropertyValueConverter]
-public class RteBlockRenderingValueConverter : SimpleRichTextValueConverter, IDeliveryApiPropertyValueConverter
+public class RteBlockRenderingValueConverter : SimpleRichTextValueConverter, IDeliveryApiPropertyValueConverter, IDisposable
 {
     private readonly HtmlImageSourceParser _imageSourceParser;
     private readonly HtmlLocalLinkParser _linkParser;
@@ -41,7 +41,9 @@ public class RteBlockRenderingValueConverter : SimpleRichTextValueConverter, IDe
     private readonly RichTextBlockPropertyValueConstructorCache _constructorCache;
     private readonly IVariationContextAccessor _variationContextAccessor;
     private readonly BlockEditorVarianceHandler _blockEditorVarianceHandler;
+
     private DeliveryApiSettings _deliveryApiSettings;
+    private readonly IDisposable? _deliveryApiSettingsChangeSubscription;
 
     public RteBlockRenderingValueConverter(HtmlLocalLinkParser linkParser, HtmlUrlParser urlParser, HtmlImageSourceParser imageSourceParser,
         IApiRichTextElementParser apiRichTextElementParser, IApiRichTextMarkupParser apiRichTextMarkupParser,
@@ -62,8 +64,9 @@ public class RteBlockRenderingValueConverter : SimpleRichTextValueConverter, IDe
         _logger = logger;
         _variationContextAccessor = variationContextAccessor;
         _blockEditorVarianceHandler = blockEditorVarianceHandler;
+
         _deliveryApiSettings = deliveryApiSettingsMonitor.CurrentValue;
-        deliveryApiSettingsMonitor.OnChange(settings => _deliveryApiSettings = settings);
+        _deliveryApiSettingsChangeSubscription = deliveryApiSettingsMonitor.OnChange(settings => _deliveryApiSettings = settings);
     }
 
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType) =>
@@ -250,4 +253,6 @@ public class RteBlockRenderingValueConverter : SimpleRichTextValueConverter, IDe
 
         public required RichTextBlockModel? RichTextBlockModel { get; set; }
     }
+
+    public void Dispose() => _deliveryApiSettingsChangeSubscription?.Dispose();
 }
