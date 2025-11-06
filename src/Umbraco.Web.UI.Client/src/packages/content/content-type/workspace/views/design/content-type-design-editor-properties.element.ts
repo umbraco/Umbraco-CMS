@@ -154,7 +154,7 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 
 	#propertyStructureHelper = new UmbContentTypePropertyStructureHelper<UmbContentTypeModel>(this);
 	#initResolver?: () => void;
-	#initReject?: () => void;
+	#initReject?: (reason?: any) => void;
 	#init = new Promise<void>((resolve, reject) => {
 		this.#initResolver = resolve;
 		this.#initReject = reject;
@@ -207,27 +207,31 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 			this._ownerContentTypeUnique = workspaceContext?.structure.getOwnerContentTypeUnique();
 			this.#createPropertyTypeWorkspaceRoutes();
 
-			const varyByCulturePromise = this.observe(
-				workspaceContext?.variesByCulture,
-				(variesByCulture) => {
-					this._ownerContentTypeVariesByCulture = variesByCulture;
-				},
-				'observeOwnerVariesByCulture',
-			)?.asPromise();
-			const varyBySegmentPromise = this.observe(
-				workspaceContext?.variesBySegment,
-				(variesBySegment) => {
-					this._ownerContentTypeVariesBySegment = variesBySegment;
-				},
-				'observeOwnerVariesBySegment',
-			)?.asPromise();
+			const varyByCulturePromise =
+				this.observe(
+					workspaceContext?.variesByCulture,
+					(variesByCulture) => {
+						this._ownerContentTypeVariesByCulture = variesByCulture;
+					},
+					'observeOwnerVariesByCulture',
+				)?.asPromise() ?? Promise.reject();
+			const varyBySegmentPromise =
+				this.observe(
+					workspaceContext?.variesBySegment,
+					(variesBySegment) => {
+						this._ownerContentTypeVariesBySegment = variesBySegment;
+					},
+					'observeOwnerVariesBySegment',
+				)?.asPromise() ?? Promise.reject();
 
 			if (this.#initResolver) {
-				Promise.all([varyByCulturePromise, varyBySegmentPromise]).then(() => {
-					this.#initResolver?.();
-					this.#initResolver = undefined;
-					this.#initReject = undefined;
-				});
+				Promise.all([varyByCulturePromise, varyBySegmentPromise])
+					.then(() => {
+						this.#initResolver?.();
+						this.#initResolver = undefined;
+						this.#initReject = undefined;
+					})
+					.catch((error) => {});
 			}
 		});
 		this.observe(this.#propertyStructureHelper.propertyStructure, (propertyStructure) => {
