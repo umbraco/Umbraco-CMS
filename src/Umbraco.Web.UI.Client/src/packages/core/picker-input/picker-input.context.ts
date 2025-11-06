@@ -122,10 +122,10 @@ export class UmbPickerInputContext<
 			confirmLabel: '#actions_remove',
 		});
 
-		this.#removeItem(unique);
+		this._removeItem(unique);
 	}
 
-	#removeItem(unique: string) {
+	protected _removeItem(unique: string) {
 		const newSelection = this.getSelection().filter((value) => value !== unique);
 		this.setSelection(newSelection);
 		this.getHostElement().dispatchEvent(new UmbChangeEvent());
