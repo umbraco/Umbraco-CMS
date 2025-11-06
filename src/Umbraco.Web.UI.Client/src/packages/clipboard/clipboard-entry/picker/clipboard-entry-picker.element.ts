@@ -123,13 +123,18 @@ export class UmbClipboardEntryPickerElement extends UmbLitElement {
 
 	async #clearClipboard() {
 		// Prompt the user to confirm clearing the clipboard
-		await umbConfirmModal(this, {
-			headline: '#clipboard_labelForClearClipboard',
-			content: '#clipboard_confirmClearDescription',
-			color: 'danger',
-			confirmLabel: '#general_clear',
-			cancelLabel: '#general_cancel',
-		});
+		try {
+			await umbConfirmModal(this, {
+				headline: '#clipboard_labelForClearClipboard',
+				content: '#clipboard_confirmClearDescription',
+				color: 'danger',
+				confirmLabel: '#general_clear',
+				cancelLabel: '#general_cancel',
+			});
+		} catch {
+			// User closed or explictly canceled the modal
+			return;
+		}
 
 		for (const item of this._items) {
 			// Clipboard items are a collection of items and the UmbClipboardContext
