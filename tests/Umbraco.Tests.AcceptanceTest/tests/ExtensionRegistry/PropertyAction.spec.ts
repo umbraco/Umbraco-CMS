@@ -22,38 +22,38 @@ test.afterEach(async ({umbracoApi}) => {
 });
 
 test('can read value from textstring editor using read property action', async ({umbracoApi, umbracoUi}) => {
-    // Arrange 
-    const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-    const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id, groupName);
-    await umbracoApi.document.createDocumentWithTextContent(contentName, documentTypeId, readTextValue, dataTypeName);
-    await umbracoUi.goToBackOffice();
-    await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  // Arrange 
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id, groupName);
+  await umbracoApi.document.createDocumentWithTextContent(contentName, documentTypeId, readTextValue, dataTypeName);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
-    // Act
-    await umbracoUi.content.goToContentWithName(contentName);
-    await umbracoUi.content.clickActionsMenuForProperty(groupName, dataTypeName);
-    await umbracoUi.content.clickPropertyActionWithName(readActionName);
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickActionsMenuForProperty(groupName, dataTypeName);
+  await umbracoUi.content.clickPropertyActionWithName(readActionName);
 
-    // Assert
-    await umbracoUi.content.doesSuccessNotificationHaveText(readTextValue);
+  // Assert
+  await umbracoUi.content.doesSuccessNotificationHaveText(readTextValue);
 });
 
 test('can write value to textstring editor using write property action', async ({umbracoApi, umbracoUi}) => {
-    // Arrange 
-    const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-    const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id, groupName);
-    const contentId = await umbracoApi.document.createDocumentWithTextContent(contentName, documentTypeId, '', dataTypeName);
-    await umbracoUi.goToBackOffice();
-    await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  // Arrange 
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id, groupName);
+  const contentId = await umbracoApi.document.createDocumentWithTextContent(contentName, documentTypeId, '', dataTypeName);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
-    // Act
-    await umbracoUi.content.goToContentWithName(contentName);
-    await umbracoUi.content.clickActionsMenuForProperty(groupName, dataTypeName);
-    await umbracoUi.content.clickPropertyActionWithName(writeActionName);
-    await umbracoUi.content.clickSaveButton();
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickActionsMenuForProperty(groupName, dataTypeName);
+  await umbracoUi.content.clickPropertyActionWithName(writeActionName);
+  await umbracoUi.content.clickSaveButton();
 
-    // Assert
-    await umbracoUi.content.isSuccessStateVisibleForSaveButton();
-    const updatedContentData = await umbracoApi.document.get(contentId);
-    expect(updatedContentData.values[0].value).toBe(writeTextValue);
+  // Assert
+  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
+  const updatedContentData = await umbracoApi.document.get(contentId);
+  expect(updatedContentData.values[0].value).toBe(writeTextValue);
 });
