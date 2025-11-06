@@ -1,16 +1,18 @@
-﻿using Microsoft.VisualBasic;
-using Umbraco.Cms.Core.Models;
+﻿using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_17_0_0;
 
-public class MigrateMediaFolder : AsyncMigrationBase
+/// <summary>
+/// Ensures that the Media Document Type called "Folder" gets a collection added to it.
+/// </summary>
+public class EnsureDefaultMediaFolderHasDefaultCollection : AsyncMigrationBase
 {
     private readonly IMediaTypeService _mediaTypeService;
     private readonly IDataTypeService _dataTypeService;
 
-    public MigrateMediaFolder(
+    public EnsureDefaultMediaFolderHasDefaultCollection(
         IMigrationContext context,
         IMediaTypeService mediaTypeService,
         IDataTypeService dataTypeService)
