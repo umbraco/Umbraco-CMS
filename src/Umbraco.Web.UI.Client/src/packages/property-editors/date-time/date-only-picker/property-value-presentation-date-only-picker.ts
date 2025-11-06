@@ -7,7 +7,7 @@ export class UmbDateOnlyPickerPropertyValuePresentation extends UmbPropertyValue
   override render() {
     const date = this.#getDate();
     return date
-      ? html`<div>${date}</div>`
+      ? html`<span>${date}</span>`
       : nothing;
   }
 

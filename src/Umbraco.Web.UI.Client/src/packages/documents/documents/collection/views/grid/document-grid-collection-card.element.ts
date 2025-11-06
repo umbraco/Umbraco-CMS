@@ -7,6 +7,8 @@ import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
 import { UUICardContentNodeElement } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbCollectionColumnConfiguration } from '@umbraco-cms/backoffice/collection';
 import type { UUIInterfaceColor } from '@umbraco-cms/backoffice/external/uui';
+import { PropertyValuePresentationDisplayOption, type ManifestPropertyValuePresentation } from '../../../../../core/property-value-presentation/property-value-presentation.extension.js';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-document-grid-collection-card')
 export class UmbDocumentGridCollectionCardElement extends UmbElementMixin(UUICardContentNodeElement) {
@@ -69,9 +71,32 @@ export class UmbDocumentGridCollectionCardElement extends UmbElementMixin(UUICar
 			default: {
 				const culture = this.#resolver.getCulture();
 				const prop = this.item.values.find((x) => x.alias === alias && (!x.culture || x.culture === culture));
-				return prop?.value ?? '';
+
+				if (prop) {
+					const value = prop.value ?? '';
+					const propertyValuePresentationManifest = this.#getPropertyValuePresentationManifest(prop.editorAlias);
+					if (propertyValuePresentationManifest.length > 0) {
+						return html`<umb-extension-slot
+							type="propertyValuePresentation"
+							.filter=${(x: ManifestPropertyValuePresentation) => x.propertyEditorAlias === prop.editorAlias}
+							.props=${{ alias: alias, value: value, display: PropertyValuePresentationDisplayOption.COLLECTION_CARD }}
+						>
+						</umb-extension-slot>`;
+					}
+
+					return value;
+				}
+
+				return '';
 			}
 		}
+	}
+
+	#getPropertyValuePresentationManifest(propertyEditorAlias: string) {
+		return umbExtensionsRegistry.getByTypeAndFilter(
+			'propertyValuePresentation',
+			(manifest) => manifest.propertyEditorAlias === propertyEditorAlias,
+		);
 	}
 
 	#getStateTagConfig(): { color: UUIInterfaceColor; label: string } | undefined {

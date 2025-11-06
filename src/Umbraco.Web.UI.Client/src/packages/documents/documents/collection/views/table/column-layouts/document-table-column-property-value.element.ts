@@ -44,6 +44,7 @@ export class UmbDocumentTableColumnPropertyValueElement extends UmbLitElement im
 		this.#resolver.observe(this.#resolver.updateDate, (updateDate) => (this._updateDate = updateDate));
 	}
 
+	// TODO: Reuse across column and card (see document-grid-collection-card.element.ts).
 	#getPropertyValueByAlias() {
 		const alias = this.column.alias;
 		const item = this.value.item;
@@ -74,13 +75,12 @@ export class UmbDocumentTableColumnPropertyValueElement extends UmbLitElement im
 						return html`<umb-extension-slot
 							type="propertyValuePresentation"
 							.filter=${(x: ManifestPropertyValuePresentation) => x.propertyEditorAlias === prop.editorAlias}
-							.props=${{ alias: alias, value: value, display: PropertyValuePresentationDisplayOption.COLLECTION }}
+							.props=${{ alias: alias, value: value, display: PropertyValuePresentationDisplayOption.COLLECTION_COLUMN }}
 						>
 						</umb-extension-slot>`;
 					}
 
 					return value;
-
 				}
 
 				return '';

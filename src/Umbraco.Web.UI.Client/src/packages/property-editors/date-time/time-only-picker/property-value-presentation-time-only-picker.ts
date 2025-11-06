@@ -7,7 +7,7 @@ export class UmbTimeOnlyPickerPropertyValuePresentation extends UmbPropertyValue
   override render() {
     const time = this.#getTime();
     return time
-      ? html`<div>${time}</div>`
+      ? html`<span>${time}</span>`
       : nothing;
   }
 
