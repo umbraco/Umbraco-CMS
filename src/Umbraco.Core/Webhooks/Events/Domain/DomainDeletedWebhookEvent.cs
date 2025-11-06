@@ -21,6 +21,6 @@ public class DomainDeletedWebhookEvent : WebhookEventBase<DomainDeletedNotificat
 
     public override string Alias => Constants.WebhookEvents.Aliases.DomainDeleted;
 
-    public override object? ConvertNotificationToRequestPayload(DomainDeletedNotification notification)
+    public override object ConvertNotificationToRequestPayload(DomainDeletedNotification notification)
         => notification.DeletedEntities.Select(entity => new DefaultPayloadModel { Id = entity.Key });
 }

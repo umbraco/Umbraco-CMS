@@ -1,4 +1,6 @@
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Services;
@@ -45,31 +47,41 @@ public interface ICacheInstructionService
         CacheRefresherCollection cacheRefreshers,
         CancellationToken cancellationToken,
         string localIdentity,
-        int lastId) =>
-        ProcessInstructions(
-            cacheRefreshers,
-            ServerRole.Unknown,
-            cancellationToken,
-            localIdentity,
-            lastPruned: DateTime.UtcNow,
-            lastId);
+        int lastId);
 
     /// <summary>
-    ///     Processes pending database cache instructions.
+    /// Processes all pending database cache instructions using the provided cache refreshers.
     /// </summary>
-    /// <param name="cacheRefreshers">Cache refreshers.</param>
-    /// <param name="serverRole">Server role.</param>
-    /// <param name="cancellationToken">Cancellation token.</param>
-    /// <param name="localIdentity">Local identity of the executing AppDomain.</param>
-    /// <param name="lastPruned">Date of last prune operation.</param>
-    /// <param name="lastId">Id of the latest processed instruction.</param>
-    /// <returns>The processing result.</returns>
-    [Obsolete("Use the non-obsolete overload. Scheduled for removal in V17.")]
-    ProcessInstructionsResult ProcessInstructions(
+    /// <param name="cacheRefreshers">The collection of cache refreshers to use for processing instructions.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="localIdentity">The local identity of the executing AppDomain.</param>
+    /// <returns>The result of processing all instructions.</returns>
+    ProcessInstructionsResult ProcessAllInstructions(
         CacheRefresherCollection cacheRefreshers,
-        ServerRole serverRole,
         CancellationToken cancellationToken,
-        string localIdentity,
-        DateTime lastPruned,
-        int lastId);
+        string localIdentity)
+        => ProcessInstructions(
+            cacheRefreshers,
+            cancellationToken,
+            localIdentity,
+            StaticServiceProvider.Instance.GetRequiredService<ILastSyncedManager>().GetLastSyncedExternalAsync().GetAwaiter().GetResult() ?? 0);
+
+
+    /// <summary>
+    ///     Processes pending cache instructions from the database for the internal (repository) caches.
+    /// </summary>
+    /// <param name="cacheRefreshers">The collection of cache refreshers to use for processing instructions.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="localIdentity">The local identity of the executing AppDomain.</param>
+    /// <param name="lastId">The ID of the latest processed instruction.</param>
+    /// <returns>The result of processing the internal instructions.</returns>
+    ProcessInstructionsResult ProcessInternalInstructions(
+        CacheRefresherCollection cacheRefreshers,
+        CancellationToken cancellationToken,
+        string localIdentity)
+        => ProcessInstructions(
+            cacheRefreshers,
+            cancellationToken,
+            localIdentity,
+            StaticServiceProvider.Instance.GetRequiredService<ILastSyncedManager>().GetLastSyncedExternalAsync().GetAwaiter().GetResult() ?? 0);
 }

@@ -2,7 +2,7 @@ namespace Umbraco.Cms.Core.Models;
 
 public class Notification
 {
-    public Notification(int entityId, int userId, string action, Guid? entityType)
+    public Notification(int entityId, int userId, string action, Guid entityType)
     {
         EntityId = entityId;
         UserId = userId;
@@ -16,5 +16,5 @@ public class Notification
 
     public string Action { get; }
 
-    public Guid? EntityType { get; }
+    public Guid EntityType { get; }
 }

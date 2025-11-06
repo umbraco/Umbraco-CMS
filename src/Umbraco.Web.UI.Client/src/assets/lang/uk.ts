@@ -702,9 +702,6 @@ export default {
 		notificationEmailsCheckErrorMessage:
 			'Адреса для надсилання повідомлень все ще встановлена за замовчуванням <strong>%0%</strong>.',
 	},
-	help: {
-		theBestUmbracoVideoTutorials: 'Найкращі навчальні відео-курси з Umbraco',
-	},
 	imagecropper: {
 		reset: 'Скинути',
 	},

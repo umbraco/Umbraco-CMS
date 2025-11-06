@@ -45,7 +45,7 @@ public static class ValueTypes
     public const string Json = "JSON"; // NText
 
     /// <summary>
-    ///     Text value (maps to text database type).
+    ///     Text value (maps to nvarchar(max) database type).
     /// </summary>
     public const string Text = "TEXT"; // NText
 
@@ -55,7 +55,7 @@ public static class ValueTypes
     public const string Time = "TIME"; // Date
 
     /// <summary>
-    ///     Text value (maps to varchar database type).
+    ///     Text value (maps to nvarchar(512) database type).
     /// </summary>
     public const string String = "STRING"; // NVarchar
 

@@ -21,6 +21,6 @@ public class MediaTypeSavedWebhookEvent : WebhookEventBase<MediaTypeSavedNotific
 
     public override string Alias => Constants.WebhookEvents.Aliases.MediaTypeSaved;
 
-    public override object? ConvertNotificationToRequestPayload(MediaTypeSavedNotification notification)
+    public override object ConvertNotificationToRequestPayload(MediaTypeSavedNotification notification)
         => notification.SavedEntities.Select(entity => new DefaultPayloadModel { Id = entity.Key });
 }

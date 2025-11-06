@@ -11,8 +11,16 @@ internal sealed class DataTypeContainerRepository : EntityContainerRepository, I
     public DataTypeContainerRepository(
         IScopeAccessor scopeAccessor,
         AppCaches cache,
-        ILogger<DataTypeContainerRepository> logger)
-        : base(scopeAccessor, cache, logger, Constants.ObjectTypes.DataTypeContainer)
+        ILogger<DataTypeContainerRepository> logger,
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            cache,
+            logger,
+            Constants.ObjectTypes.DataTypeContainer,
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
     }
 }

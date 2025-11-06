@@ -209,7 +209,7 @@ public abstract class LogViewerServiceBase : ILogViewerService
     {
         if (startDate is null || endDate is null)
         {
-            DateTime now = DateTime.Now;
+            DateTime now = DateTime.UtcNow;
             startDate ??= now.AddDays(-1);
             endDate ??= now;
         }
