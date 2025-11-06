@@ -28,7 +28,7 @@ public class ConfigureUmbracoDeliveryApiSwaggerGenOptions : ConfigureUmbracoOpen
         options
             .AddDocumentTransformer<ApiKeyTransformer>()
             .AddOperationTransformer<ApiKeyTransformer>();
-        options.AddDocumentTransformer<MimeTypeDocumentTransformer>();
+        options.AddDocumentTransformer<MimeTypesTransformer>();
 
         options.AddOperationTransformer<ContentApiTransformer>();
         options.AddOperationTransformer<MediaApiTransformer>();
