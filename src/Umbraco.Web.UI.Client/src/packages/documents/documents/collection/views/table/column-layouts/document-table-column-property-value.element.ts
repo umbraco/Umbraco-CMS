@@ -5,7 +5,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbTableColumn, UmbTableColumnLayoutElement, UmbTableItem } from '@umbraco-cms/backoffice/components';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { PropertyValuePresentationDisplayOption, type ManifestPropertyValuePresentation } from '../../../../../../core/property-value-presentation/property-value-presentation.extension.js';
+import { UmbPropertyValuePresentationDisplayOption, type ManifestPropertyValuePresentation } from '../../../../../../core/property-value-presentation/property-value-presentation.extension.js';
 
 @customElement('umb-document-table-column-property-value')
 export class UmbDocumentTableColumnPropertyValueElement extends UmbLitElement implements UmbTableColumnLayoutElement {
@@ -75,7 +75,7 @@ export class UmbDocumentTableColumnPropertyValueElement extends UmbLitElement im
 						return html`<umb-extension-slot
 							type="propertyValuePresentation"
 							.filter=${(x: ManifestPropertyValuePresentation) => x.propertyEditorAlias === prop.editorAlias}
-							.props=${{ alias: alias, value: value, display: PropertyValuePresentationDisplayOption.COLLECTION_COLUMN }}
+							.props=${{ alias: alias, value: value, display: UmbPropertyValuePresentationDisplayOption.COLLECTION_COLUMN }}
 						>
 						</umb-extension-slot>`;
 					}

@@ -7,7 +7,7 @@ import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
 import { UUICardContentNodeElement } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbCollectionColumnConfiguration } from '@umbraco-cms/backoffice/collection';
 import type { UUIInterfaceColor } from '@umbraco-cms/backoffice/external/uui';
-import { PropertyValuePresentationDisplayOption, type ManifestPropertyValuePresentation } from '../../../../../core/property-value-presentation/property-value-presentation.extension.js';
+import { UmbPropertyValuePresentationDisplayOption, type ManifestPropertyValuePresentation } from '../../../../../core/property-value-presentation/property-value-presentation.extension.js';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-document-grid-collection-card')
@@ -79,7 +79,7 @@ export class UmbDocumentGridCollectionCardElement extends UmbElementMixin(UUICar
 						return html`<umb-extension-slot
 							type="propertyValuePresentation"
 							.filter=${(x: ManifestPropertyValuePresentation) => x.propertyEditorAlias === prop.editorAlias}
-							.props=${{ alias: alias, value: value, display: PropertyValuePresentationDisplayOption.COLLECTION_CARD }}
+							.props=${{ alias: alias, value: value, display: UmbPropertyValuePresentationDisplayOption.COLLECTION_CARD }}
 						>
 						</umb-extension-slot>`;
 					}
