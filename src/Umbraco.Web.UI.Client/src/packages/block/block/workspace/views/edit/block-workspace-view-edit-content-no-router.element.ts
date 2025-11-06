@@ -14,6 +14,9 @@ import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace'
  */
 @customElement('umb-block-workspace-view-edit-content-no-router')
 export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitElement implements UmbWorkspaceViewElement {
+	// @state()
+	// private _hasRootProperties = false;
+
 	@state()
 	private _hasRootGroups = false;
 
@@ -35,6 +38,8 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 			this._tabs = tabs;
 			this.#checkDefaultTabName();
 		});
+
+		// _hasRootProperties can be gotten via _tabsStructureHelper.hasProperties. But we do not support root properties currently.
 
 		this.consumeContext(UMB_BLOCK_WORKSPACE_CONTEXT, (context) => {
 			this.#blockWorkspace = context;
