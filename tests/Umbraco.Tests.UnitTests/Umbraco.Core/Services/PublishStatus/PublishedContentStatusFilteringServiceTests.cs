@@ -1,5 +1,6 @@
-﻿using Moq;
+using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
@@ -44,9 +45,10 @@ public partial class PublishedContentStatusFilteringServiceTests
 
     [TestCase("da-DK", 3)]
     [TestCase("en-US", 4)]
+    [TestCase("*", 5)]
     public void FilterAvailable_Variant_ForNonPreview_YieldsPublishedItemsInCulture(string culture, int expectedNumberOfChildren)
     {
-        var (sut, items) = SetupVariant(false, culture);
+        var (sut, items) = SetupVariant(false, culture == Constants.System.InvariantCulture ? "en-US" : culture);
 
         var children = sut.FilterAvailable(items.Keys, culture).ToArray();
         Assert.AreEqual(expectedNumberOfChildren, children.Length);
@@ -70,16 +72,24 @@ public partial class PublishedContentStatusFilteringServiceTests
         {
             Assert.AreEqual(8, children[2].Id);
         }
+
+        if (culture == Constants.System.InvariantCulture)
+        {
+            Assert.AreEqual(4, children[2].Id);
+            Assert.AreEqual(6, children[3].Id);
+            Assert.AreEqual(8, children[4].Id);
+        }
     }
 
-    [TestCase("da-DK")]
-    [TestCase("en-US")]
-    public void FilterAvailable_Variant_ForPreview_YieldsUnpublishedItemsInCulture(string culture)
+    [TestCase("da-DK", 7)]
+    [TestCase("en-US", 7)]
+    [TestCase("*", 10)]
+    public void FilterAvailable_Variant_ForPreview_YieldsUnpublishedItemsInCulture(string culture, int expectedNumberOfChildren)
     {
-        var (sut, items) = SetupVariant(true, culture);
+        var (sut, items) = SetupVariant(true, culture == Constants.System.InvariantCulture ? "en-US" : culture);
 
         var children = sut.FilterAvailable(items.Keys, culture).ToArray();
-        Assert.AreEqual(7, children.Length);
+        Assert.AreEqual(expectedNumberOfChildren, children.Length);
 
         // IDs 0 through 3 exist in both en-US and da-DK
         Assert.Multiple(() =>
@@ -105,16 +115,27 @@ public partial class PublishedContentStatusFilteringServiceTests
             Assert.AreEqual(8, children[5].Id);
             Assert.AreEqual(9, children[6].Id);
         }
+
+        if (culture == Constants.System.InvariantCulture)
+        {
+            Assert.AreEqual(4, children[4].Id);
+            Assert.AreEqual(5, children[5].Id);
+            Assert.AreEqual(6, children[6].Id);
+            Assert.AreEqual(7, children[7].Id);
+            Assert.AreEqual(8, children[8].Id);
+            Assert.AreEqual(9, children[9].Id);
+        }
     }
 
-    [TestCase("da-DK")]
-    [TestCase("en-US")]
-    public void FilterAvailable_MixedVariance_ForNonPreview_YieldsPublishedItemsInCultureOrInvariant(string culture)
+    [TestCase("da-DK", 4)]
+    [TestCase("en-US", 4)]
+    [TestCase("*", 5)]
+    public void FilterAvailable_MixedVariance_ForNonPreview_YieldsPublishedItemsInCultureOrInvariant(string culture, int expectedNumberOfChildren)
     {
-        var (sut, items) = SetupMixedVariance(false, culture);
+        var (sut, items) = SetupMixedVariance(false, culture == Constants.System.InvariantCulture ? "en-US" : culture);
 
         var children = sut.FilterAvailable(items.Keys, culture).ToArray();
-        Assert.AreEqual(4, children.Length);
+        Assert.AreEqual(expectedNumberOfChildren, children.Length);
 
         // IDs 0 through 2 are invariant - only even IDs are published
         Assert.Multiple(() =>
@@ -140,16 +161,23 @@ public partial class PublishedContentStatusFilteringServiceTests
         {
             Assert.AreEqual(8, children[3].Id);
         }
+
+        if (culture == Constants.System.InvariantCulture)
+        {
+            Assert.AreEqual(6, children[3].Id);
+            Assert.AreEqual(8, children[4].Id);
+        }
     }
 
-    [TestCase("da-DK")]
-    [TestCase("en-US")]
-    public void FilterAvailable_MixedVariance_FoPreview_YieldsPublishedItemsInCultureOrInvariant(string culture)
+    [TestCase("da-DK", 8)]
+    [TestCase("en-US", 8)]
+    [TestCase("*", 10)]
+    public void FilterAvailable_MixedVariance_FoPreview_YieldsPublishedItemsInCultureOrInvariant(string culture, int expectedNumberOfChildren)
     {
-        var (sut, items) = SetupMixedVariance(true, culture);
+        var (sut, items) = SetupMixedVariance(true, culture == Constants.System.InvariantCulture ? "en-US" : culture);
 
         var children = sut.FilterAvailable(items.Keys, culture).ToArray();
-        Assert.AreEqual(8, children.Length);
+        Assert.AreEqual(expectedNumberOfChildren, children.Length);
 
         // IDs 0 through 2 are invariant
         Assert.Multiple(() =>
@@ -179,6 +207,14 @@ public partial class PublishedContentStatusFilteringServiceTests
         {
             Assert.AreEqual(8, children[6].Id);
             Assert.AreEqual(9, children[7].Id);
+        }
+
+        if (culture == Constants.System.InvariantCulture)
+        {
+            Assert.AreEqual(6, children[6].Id);
+            Assert.AreEqual(7, children[7].Id);
+            Assert.AreEqual(8, children[8].Id);
+            Assert.AreEqual(9, children[9].Id);
         }
     }
 
@@ -328,7 +364,7 @@ public partial class PublishedContentStatusFilteringServiceTests
             .Returns((Guid key, string culture) => items
                                                        .TryGetValue(key, out var item)
                                                    && idIsPublished(item.Id)
-                                                   && (item.ContentType.VariesByCulture() is false || item.Cultures.ContainsKey(culture)));
+                                                   && (culture == Constants.System.InvariantCulture || item.ContentType.VariesByCulture() is false || item.Cultures.ContainsKey(culture)));
         publishStatusQueryService
             .Setup(s => s.HasPublishedAncestorPath(It.IsAny<Guid>()))
             .Returns(true);
