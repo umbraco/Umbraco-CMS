@@ -5,13 +5,16 @@ import { fromCamelCase } from '@umbraco-cms/backoffice/utils';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
 import { UUICardContentNodeElement } from '@umbraco-cms/backoffice/external/uui';
-import type { UmbCollectionColumnConfiguration } from '@umbraco-cms/backoffice/collection';
+import { type UmbCollectionColumnConfiguration } from '@umbraco-cms/backoffice/collection';
 import type { UUIInterfaceColor } from '@umbraco-cms/backoffice/external/uui';
-import { UmbPropertyValuePresentationDisplayOption, type ManifestPropertyValuePresentation } from '../../../../../core/property-value-presentation/property-value-presentation.extension.js';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbDocumentCollectionContext } from '../../document-collection.context.js';
+import { UMB_DOCUMENT_COLLECTION_CONTEXT } from '../../document-collection.context-token.js';
 
 @customElement('umb-document-grid-collection-card')
 export class UmbDocumentGridCollectionCardElement extends UmbElementMixin(UUICardContentNodeElement) {
+
+	#collectionContext?: UmbDocumentCollectionContext;
+
 	#resolver = new UmbDocumentItemDataResolver(this);
 
 	@state()
@@ -41,6 +44,10 @@ export class UmbDocumentGridCollectionCardElement extends UmbElementMixin(UUICar
 	constructor() {
 		super();
 
+		this.consumeContext(UMB_DOCUMENT_COLLECTION_CONTEXT, (instance) => {
+			this.#collectionContext = instance;
+		});
+
 		this.#resolver.observe(this.#resolver.name, (name) => (this.name = name || ''));
 		this.#resolver.observe(this.#resolver.state, (state) => (this._state = state || ''));
 		this.#resolver.observe(this.#resolver.createDate, (createDate) => (this._createDate = createDate));
@@ -48,55 +55,19 @@ export class UmbDocumentGridCollectionCardElement extends UmbElementMixin(UUICar
 	}
 
 	#getPropertyValueByAlias(alias: string) {
-		switch (alias) {
-			case 'contentTypeAlias':
-				return this.item.documentType.alias;
-			case 'createDate':
-				return this._createDate?.toLocaleString();
-			case 'creator':
-			case 'owner':
-				return this.item.creator;
-			case 'name':
-				return this.name;
-			case 'state':
-				return this._state ? fromCamelCase(this._state) : '';
-			case 'published':
-				return this._state !== DocumentVariantStateModel.DRAFT ? 'True' : 'False';
-			case 'sortOrder':
-				return this.item.sortOrder;
-			case 'updateDate':
-				return this._updateDate?.toLocaleString();
-			case 'updater':
-				return this.item.updater;
-			default: {
-				const culture = this.#resolver.getCulture();
-				const prop = this.item.values.find((x) => x.alias === alias && (!x.culture || x.culture === culture));
-
-				if (prop) {
-					const value = prop.value ?? '';
-					const propertyValuePresentationManifest = this.#getPropertyValuePresentationManifest(prop.editorAlias);
-					if (propertyValuePresentationManifest.length > 0) {
-						return html`<umb-extension-slot
-							type="propertyValuePresentation"
-							.filter=${(x: ManifestPropertyValuePresentation) => x.propertyEditorAlias === prop.editorAlias}
-							.props=${{ alias: alias, value: value, display: UmbPropertyValuePresentationDisplayOption.COLLECTION_CARD }}
-						>
-						</umb-extension-slot>`;
-					}
-
-					return value;
-				}
-
-				return '';
-			}
-		}
-	}
-
-	#getPropertyValuePresentationManifest(propertyEditorAlias: string) {
-		return umbExtensionsRegistry.getByTypeAndFilter(
-			'propertyValuePresentation',
-			(manifest) => manifest.propertyEditorAlias === propertyEditorAlias,
-		);
+		const args = {
+			alias: alias,
+			documentTypeAlias: this.item.documentType.alias,
+			createDate: this._createDate,
+			updateDate: this._updateDate,
+			state: this._state,
+			culture: this.#resolver.getCulture(),
+			creator: this.item.creator,
+			updater: this.item.updater,
+			sortOrder: this.item.sortOrder,
+			values: this.item.values,
+		};
+		return this.#collectionContext?.getPropertyValueByAlias(args);
 	}
 
 	#getStateTagConfig(): { color: UUIInterfaceColor; label: string } | undefined {
