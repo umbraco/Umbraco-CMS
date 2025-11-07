@@ -125,7 +125,7 @@ export class UmbUserGroupInputElement extends UUIFormControlMixin(UmbLitElement,
 					? repeat(
 							this._statuses,
 							(status) => status.unique,
-							(status) => this._renderItem(status),
+							(status) => this.#renderItem(status),
 					  )
 					: nothing}
 			</uui-ref-list>
@@ -137,7 +137,7 @@ export class UmbUserGroupInputElement extends UUIFormControlMixin(UmbLitElement,
 		`;
 	}
 
-	private _renderItem(status: UmbRepositoryItemsStatus) {
+	#renderItem(status: UmbRepositoryItemsStatus) {
 		const unique = status.unique;
 		const item = this._items?.find((x) => x.unique === unique);
 		const isError = status.state.type === 'error';

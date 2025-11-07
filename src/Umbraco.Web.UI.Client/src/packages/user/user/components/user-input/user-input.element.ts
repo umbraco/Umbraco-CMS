@@ -152,27 +152,29 @@ export class UmbUserInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 				${repeat(
 					this._statuses,
 					(status) => status.unique,
-					(status) => {
-						const unique = status.unique;
-						const item = this._items?.find((x) => x.unique === unique);
-						const isError = status.state.type === 'error';
-						return html`<umb-entity-item-ref
-							id=${unique}
-							.item=${item}
-							?error=${isError}
-							.errorMessage=${status.state.error}
-							.errorDetail=${isError ? unique : undefined}
-							?standalone=${this.max === 1}>
-							<uui-action-bar slot="actions">
-								<uui-button
-									label=${this.localize.term('general_remove')}
-									@click=${() => this.#removeItem(unique)}></uui-button>
-							</uui-action-bar>
-						</umb-entity-item-ref>`;
-					},
+					(status) => this.#renderItem(status),
 				)}
 			</uui-ref-list>
 		`;
+	}
+
+	#renderItem(status: UmbRepositoryItemsStatus) {
+		const unique = status.unique;
+		const item = this._items?.find((x) => x.unique === unique);
+		const isError = status.state.type === 'error';
+		return html`<umb-entity-item-ref
+			id=${unique}
+			.item=${item}
+			?error=${isError}
+			.errorMessage=${status.state.error}
+			.errorDetail=${isError ? unique : undefined}
+			?standalone=${this.max === 1}>
+			<uui-action-bar slot="actions">
+				<uui-button
+					label=${this.localize.term('general_remove')}
+					@click=${() => this.#removeItem(unique)}></uui-button>
+			</uui-action-bar>
+		</umb-entity-item-ref>`;
 	}
 
 	static override styles = [

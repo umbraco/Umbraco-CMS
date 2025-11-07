@@ -117,7 +117,7 @@ export class UmbInputStaticFileElement extends UmbFormControlMixin<string | unde
 				${repeat(
 					this._statuses,
 					(status) => status.unique,
-					(status) => this._renderItem(status),
+					(status) => this.#renderItem(status),
 				)}
 			</uui-ref-list>
 			${this.#renderAddButton()}
@@ -143,7 +143,7 @@ export class UmbInputStaticFileElement extends UmbFormControlMixin<string | unde
 		`;
 	}
 
-	private _renderItem(status: UmbRepositoryItemsStatus) {
+	#renderItem(status: UmbRepositoryItemsStatus) {
 		const unique = status.unique;
 		const item = this._items?.find((x) => x.unique === unique);
 		const isError = status.state.type === 'error';
