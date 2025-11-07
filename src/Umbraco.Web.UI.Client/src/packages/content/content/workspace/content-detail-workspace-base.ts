@@ -523,8 +523,10 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	 * @memberof UmbContentDetailWorkspaceContextBase
 	 */
 	public name(variantId?: UmbVariantId): Observable<string> {
+		// Fallback to invariant variant:
+		variantId ??= UmbVariantId.CreateInvariant();
 		return this._data.createObservablePartOfCurrent(
-			(data) => data?.variants?.find((x) => variantId?.compare(x))?.name ?? '',
+			(data) => data?.variants?.find((x) => variantId.compare(x))?.name ?? '',
 		);
 	}
 
