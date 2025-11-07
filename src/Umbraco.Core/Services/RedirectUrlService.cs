@@ -1,8 +1,11 @@
-using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Scoping;
 
 namespace Umbraco.Cms.Core.Services;
@@ -10,19 +13,50 @@ namespace Umbraco.Cms.Core.Services;
 internal sealed class RedirectUrlService : RepositoryService, IRedirectUrlService
 {
     private readonly IRedirectUrlRepository _redirectUrlRepository;
+    private readonly IPublishedUrlProvider _publishedUrlProvider;
 
     public RedirectUrlService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
         IEventMessagesFactory eventMessagesFactory,
-        IRedirectUrlRepository redirectUrlRepository)
-        : base(provider, loggerFactory, eventMessagesFactory) =>
+        IRedirectUrlRepository redirectUrlRepository,
+        IPublishedUrlProvider publishedUrlProvider)
+        : base(provider, loggerFactory, eventMessagesFactory)
+    {
         _redirectUrlRepository = redirectUrlRepository;
+        _publishedUrlProvider = publishedUrlProvider;
+    }
+
+    [Obsolete("Use the constructor taking all parameters. Scheduled for removal in Umbraco 19")]
+    public RedirectUrlService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IRedirectUrlRepository redirectUrlRepository)
+        : this(provider,
+            loggerFactory,
+            eventMessagesFactory,
+            StaticServiceProvider.Instance.GetRequiredService<IRedirectUrlRepository>(),
+            StaticServiceProvider.Instance.GetRequiredService<IPublishedUrlProvider>())
+    {
+    }
 
     public void Register(string url, Guid contentKey, string? culture = null)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
+            var newUrl = _publishedUrlProvider.GetUrl(contentKey, UrlMode.Relative, culture).TrimEnd('/');
+            IEnumerable<IRedirectUrl> allRedirectUrls = _redirectUrlRepository.GetContentUrls(contentKey);
+
+            // If there's a redirect URL that points to the new URL, delete it.
+            foreach (IRedirectUrl redirectUrl in allRedirectUrls)
+            {
+                if (redirectUrl.Url == newUrl)
+                {
+                    _redirectUrlRepository.Delete(redirectUrl.Key);
+                }
+            }
+
             IRedirectUrl? redir = _redirectUrlRepository.Get(url, contentKey, culture);
             if (redir != null)
             {
