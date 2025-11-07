@@ -23,9 +23,12 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     Constants.PropertyEditors.Aliases.ImageCropper,
     ValueType = ValueTypes.Json,
     ValueEditorIsReusable = true)]
-public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
-    INotificationHandler<ContentCopiedNotification>, INotificationHandler<ContentDeletedNotification>,
-    INotificationHandler<MediaDeletedNotification>, INotificationHandler<MediaSavingNotification>,
+public class ImageCropperPropertyEditor : DataEditor,
+    IMediaUrlGenerator,
+    INotificationHandler<ContentCopiedNotification>,
+    INotificationHandler<ContentDeletedNotification>,
+    INotificationHandler<MediaDeletedNotification>,
+    INotificationHandler<MediaSavingNotification>,
     INotificationHandler<MemberDeletedNotification>
 {
     private readonly UploadAutoFillProperties _autoFillProperties;
@@ -33,8 +36,9 @@ public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
     private readonly IIOHelper _ioHelper;
     private readonly ILogger<ImageCropperPropertyEditor> _logger;
     private readonly MediaFileManager _mediaFileManager;
-    private ContentSettings _contentSettings;
     private readonly IJsonSerializer _jsonSerializer;
+
+    private ContentSettings _contentSettings;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ImageCropperPropertyEditor" /> class.
@@ -50,15 +54,14 @@ public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
         IJsonSerializer jsonSerializer)
         : base(dataValueEditorFactory)
     {
-        _mediaFileManager = mediaFileManager ?? throw new ArgumentNullException(nameof(mediaFileManager));
-        _contentSettings = contentSettings.CurrentValue ?? throw new ArgumentNullException(nameof(contentSettings));
-        _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
-        _autoFillProperties =
-            uploadAutoFillProperties ?? throw new ArgumentNullException(nameof(uploadAutoFillProperties));
+        _mediaFileManager = mediaFileManager;
+        _ioHelper = ioHelper;
+        _autoFillProperties = uploadAutoFillProperties;
         _contentService = contentService;
         _jsonSerializer = jsonSerializer;
         _logger = loggerFactory.CreateLogger<ImageCropperPropertyEditor>();
 
+        _contentSettings = contentSettings.CurrentValue;
         contentSettings.OnChange(x => _contentSettings = x);
         SupportsReadOnly = true;
     }
