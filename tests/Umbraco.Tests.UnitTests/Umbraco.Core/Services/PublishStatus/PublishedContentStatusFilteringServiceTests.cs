@@ -172,7 +172,7 @@ public partial class PublishedContentStatusFilteringServiceTests
     [TestCase("da-DK", 8)]
     [TestCase("en-US", 8)]
     [TestCase("*", 10)]
-    public void FilterAvailable_MixedVariance_FoPreview_YieldsPublishedItemsInCultureOrInvariant(string culture, int expectedNumberOfChildren)
+    public void FilterAvailable_MixedVariance_ForPreview_YieldsPublishedItemsInCultureOrInvariant(string culture, int expectedNumberOfChildren)
     {
         var (sut, items) = SetupMixedVariance(true, culture == Constants.System.InvariantCulture ? "en-US" : culture);
 
