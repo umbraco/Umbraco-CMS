@@ -31,6 +31,8 @@ export class UmbDocumentCollectionContext extends UmbDefaultCollectionContext<
 	#displayCulture = new UmbStringState(undefined);
 	#displayCultureObservable = this.#displayCulture.asObservable();
 
+	#propertyValuePresentationManifests: ManifestPropertyValuePresentation[] = [];
+
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_DOCUMENT_TABLE_COLLECTION_VIEW_ALIAS);
 
@@ -38,6 +40,10 @@ export class UmbDocumentCollectionContext extends UmbDefaultCollectionContext<
 			this.#variantContext = variantContext;
 			this.#observeDisplayCulture();
 		});
+
+		this.#propertyValuePresentationManifests = umbExtensionsRegistry.getByType(
+			'propertyValuePresentation',
+		);
 	}
 
 	#observeDisplayCulture() {
@@ -116,10 +122,7 @@ export class UmbDocumentCollectionContext extends UmbDefaultCollectionContext<
 	}
 
 	#getPropertyValuePresentationManifest(propertyEditorAlias: string) {
-		return umbExtensionsRegistry.getByTypeAndFilter(
-			'propertyValuePresentation',
-			(manifest) => manifest.propertyEditorAlias === propertyEditorAlias,
-		);
+		return this.#propertyValuePresentationManifests.filter((manifest) => manifest.propertyEditorAlias === propertyEditorAlias);
 	}
 }
 
