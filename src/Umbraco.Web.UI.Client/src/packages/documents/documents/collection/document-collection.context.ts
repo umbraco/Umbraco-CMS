@@ -7,7 +7,7 @@ import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { html } from '@umbraco-cms/backoffice/external/lit';
-import { UmbPropertyValuePresentationDisplayOption, type ManifestPropertyValuePresentation } from 'src/packages/core/property-value-presentation/index.js';
+import { UmbPropertyValuePresentationDisplayOption, type ManifestPropertyValuePresentation } from '../../../core/property-value-presentation/index.js';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 export type UmbGetPropertyValueByAliasArgs = {

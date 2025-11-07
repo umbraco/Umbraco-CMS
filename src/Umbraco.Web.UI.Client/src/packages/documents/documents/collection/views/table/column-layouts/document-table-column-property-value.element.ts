@@ -1,10 +1,8 @@
-import type { UmbDocumentCollectionItemModel, UmbEditableDocumentCollectionItemModel } from '../../../types.js';
+import type { UmbEditableDocumentCollectionItemModel } from '../../../types.js';
 import { UmbDocumentItemDataResolver } from '../../../../item/index.js';
 import { customElement, html, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbTableColumn, UmbTableColumnLayoutElement, UmbTableItem } from '@umbraco-cms/backoffice/components';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbPropertyValuePresentationDisplayOption, type ManifestPropertyValuePresentation } from '../../../../../../core/property-value-presentation/property-value-presentation.extension.js';
 import type { UmbDocumentCollectionContext } from '../../../document-collection.context.js';
 import { UMB_DOCUMENT_COLLECTION_CONTEXT } from '../../../document-collection.context-token.js';
 

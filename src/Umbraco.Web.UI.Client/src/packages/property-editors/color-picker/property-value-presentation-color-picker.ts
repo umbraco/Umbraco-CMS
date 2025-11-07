@@ -1,4 +1,4 @@
-import { css, customElement, html, nothing } from "@umbraco-cms/backoffice/external/lit";
+import { customElement, html, nothing } from "@umbraco-cms/backoffice/external/lit";
 import { UmbPropertyValuePresentationBaseElement, UmbPropertyValuePresentationDisplayOption } from "../../core/property-value-presentation/index.js";
 
 @customElement("umb-color-picker-property-value-presentation")
