@@ -64,6 +64,7 @@ public static partial class Constants
         public const string ConfigWebhook = ConfigPrefix + "Webhook";
         public const string ConfigWebhookPayloadType = ConfigWebhook + ":PayloadType";
         public const string ConfigCache = ConfigPrefix + "Cache";
+        public const string ConfigBackOfficeTokenCookie = ConfigSecurity + ":BackOfficeTokenCookie";
 
         public static class NamedOptions
         {

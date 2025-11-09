@@ -25,13 +25,16 @@ internal sealed class HideBackOfficeTokensHandler
 
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IDataProtectionProvider _dataProtectionProvider;
-    private readonly GlobalSettings _globalSettings;
+    private readonly BackOfficeTokenCookieSettings _backOfficeTokenCookieSettings;
 
-    public HideBackOfficeTokensHandler(IHttpContextAccessor httpContextAccessor, IDataProtectionProvider dataProtectionProvider, IOptions<GlobalSettings> globalSettings)
+    public HideBackOfficeTokensHandler(
+        IHttpContextAccessor httpContextAccessor,
+        IDataProtectionProvider dataProtectionProvider,
+        IOptions<BackOfficeTokenCookieSettings> backOfficeTokenCookieSettings)
     {
         _httpContextAccessor = httpContextAccessor;
         _dataProtectionProvider = dataProtectionProvider;
-        _globalSettings = globalSettings.Value;
+        _backOfficeTokenCookieSettings = backOfficeTokenCookieSettings.Value;
     }
 
     /// <summary>
@@ -126,31 +129,29 @@ internal sealed class HideBackOfficeTokensHandler
     {
         var cookieValue = EncryptionHelper.Encrypt(value, _dataProtectionProvider);
 
-        httpContext.Response.Cookies.Delete(key);
-        httpContext.Response.Cookies.Append(
-            key,
-            cookieValue,
-            new CookieOptions
-            {
-                // Prevent the client-side scripts from accessing the cookie.
-                HttpOnly = true,
+        var cookieOptions = new CookieOptions
+        {
+            // Prevent the client-side scripts from accessing the cookie.
+            HttpOnly = true,
 
-                // Strictly only ever pass the cookie to the issuing (back-office) host.
-                SameSite = SameSiteMode.Strict,
+            // Mark the cookie as essential to the application, to enforce it despite any
+            // data collection consent options. This aligns with how ASP.NET Core Identity
+            // does when writing cookies for cookie authentication.
+            IsEssential = true,
 
-                // Use a secure cookie if HTTPS is enforced by the global settings, which
-                // should always be the case for production environments.
-                Secure = _globalSettings.UseHttps,
+            // Cookie path must be root for optimal security.
+            Path = "/",
 
-                // The cookie cannot be scoped to a path, because stand-alone clients may use a
-                // different path to the APIs (e.g. when hosting the back-office on a different host).
-                Path = "/",
+            // Configurable cookie options (see BackOfficeTokenCookieSettings for defaults):
+            // - SameSite
+            // - Secure
+            // - Path
+            SameSite = ParseSameSiteMode(_backOfficeTokenCookieSettings.SameSite),
+            Secure = _backOfficeTokenCookieSettings.Secure,
+        };
 
-                // Mark the cookie as essential to the application, to enforce it despite any
-                // data collection consent options. This aligns with how ASP.NET Core Identity
-                // does when writing cookies for cookie authentication.
-                IsEssential = true,
-            });
+        httpContext.Response.Cookies.Delete(key, cookieOptions);
+        httpContext.Response.Cookies.Append(key, cookieValue, cookieOptions);
     }
 
     private bool TryGetCookie(string key, [NotNullWhen(true)] out string? value)
@@ -164,4 +165,9 @@ internal sealed class HideBackOfficeTokensHandler
         value = null;
         return false;
     }
+
+    private static SameSiteMode ParseSameSiteMode(string sameSiteMode) =>
+        Enum.TryParse(sameSiteMode, ignoreCase: true, out SameSiteMode result)
+            ? result
+            : throw new ArgumentException($"The provided {nameof(sameSiteMode)} value could not be parsed into as SameSiteMode value.", nameof(sameSiteMode));
 }
