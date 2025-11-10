@@ -158,8 +158,8 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 
 	#getPickableFilter() {
 		if (this.documentTypesOnly) {
-			/* TODO: We do not have the same model in the tree and during the search, so theoretically, we cannot use the same filter. 
-			The search item model does not include "isFolder," so it checks for falsy intentionally. 
+			/* TODO: We do not have the same model in the tree and during the search, so theoretically, we cannot use the same filter.
+			The search item model does not include "isFolder," so it checks for falsy intentionally.
 			We need to investigate getting this typed correctly. [MR] */
 			return (x: UmbDocumentTypeTreeItemModel) => !x.isFolder && x.isElement === false;
 		}
@@ -224,25 +224,27 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 
 						// For error state, use umb-entity-item-ref
 						if (isError) {
-							return html`<umb-entity-item-ref
-								id=${unique}
-								.item=${item}
-								?error=${true}
-								.errorMessage=${status.state.error}
-								.errorDetail=${unique}
-								?readonly=${this.readonly}
-								?standalone=${this.max === 1}>
-								${when(
-									!this.readonly,
-									() => html`
-										<uui-action-bar slot="actions">
-											<uui-button
-												label=${this.localize.term('general_remove')}
-												@click=${() => this.#removeItem(unique)}></uui-button>
-										</uui-action-bar>
-									`,
-								)}
-							</umb-entity-item-ref>`;
+							return html`
+								<umb-entity-item-ref
+									id=${unique}
+									.item=${item}
+									?error=${true}
+									.errorMessage=${status.state.error}
+									.errorDetail=${unique}
+									?readonly=${this.readonly}
+									?standalone=${this.max === 1}>
+									${when(
+										!this.readonly,
+										() => html`
+											<uui-action-bar slot="actions">
+												<uui-button
+													label=${this.localize.term('general_remove')}
+													@click=${() => this.#removeItem(unique)}></uui-button>
+											</uui-action-bar>
+										`,
+									)}
+								</umb-entity-item-ref>
+							`;
 						}
 
 						// For successful items, use the document type specific component

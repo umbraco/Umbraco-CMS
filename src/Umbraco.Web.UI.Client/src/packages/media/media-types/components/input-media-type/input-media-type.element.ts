@@ -178,19 +178,21 @@ export class UmbInputMediaTypeElement extends UmbFormControlMixin<string | undef
 
 						// For error state, use umb-entity-item-ref
 						if (isError) {
-							return html`<umb-entity-item-ref
-								id=${unique}
-								.item=${item}
-								?error=${true}
-								.errorMessage=${status.state.error}
-								.errorDetail=${unique}
-								?standalone=${this.max === 1}>
-								<uui-action-bar slot="actions">
-									<uui-button
-										label=${this.localize.term('general_remove')}
-										@click=${() => this.#removeItem(unique)}></uui-button>
-								</uui-action-bar>
-							</umb-entity-item-ref>`;
+							return html`
+								<umb-entity-item-ref
+									id=${unique}
+									.item=${item}
+									?error=${true}
+									.errorMessage=${status.state.error}
+									.errorDetail=${unique}
+									?standalone=${this.max === 1}>
+									<uui-action-bar slot="actions">
+										<uui-button
+											label=${this.localize.term('general_remove')}
+											@click=${() => this.#removeItem(unique)}></uui-button>
+									</uui-action-bar>
+								</umb-entity-item-ref>
+							`;
 						}
 
 						// For successful items, use the media type specific component
@@ -201,7 +203,9 @@ export class UmbInputMediaTypeElement extends UmbFormControlMixin<string | undef
 								${this.#renderIcon(item)}
 								<uui-action-bar slot="actions">
 									<uui-button href=${href} label=${this.localize.term('general_open')}></uui-button>
-									<uui-button @click=${() => this.#removeItem(unique)} label=${this.localize.term('general_remove')}></uui-button>
+									<uui-button
+										label=${this.localize.term('general_remove')}
+										@click=${() => this.#removeItem(unique)}></uui-button>
 								</uui-action-bar>
 							</uui-ref-node-document-type>
 						`;

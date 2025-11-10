@@ -136,7 +136,7 @@ export class UmbUserGroupInputElement extends UUIFormControlMixin(UmbLitElement,
 							this._statuses,
 							(status) => status.unique,
 							(status) => this.#renderItem(status),
-					  )
+						)
 					: nothing}
 			</uui-ref-list>
 			<uui-button
@@ -154,17 +154,15 @@ export class UmbUserGroupInputElement extends UUIFormControlMixin(UmbLitElement,
 
 		// For error state, use umb-entity-item-ref
 		if (isError) {
-			return html`<umb-entity-item-ref
-				id=${unique}
-				?error=${true}
-				.errorMessage=${status.state.error}
-				.errorDetail=${unique}>
-				<uui-action-bar slot="actions">
-					<uui-button
-						label=${this.localize.term('general_remove')}
-						@click=${() => this.#pickerContext.requestRemoveItem(unique)}></uui-button>
-				</uui-action-bar>
-			</umb-entity-item-ref>`;
+			return html`
+				<umb-entity-item-ref id=${unique} ?error=${true} .errorMessage=${status.state.error} .errorDetail=${unique}>
+					<uui-action-bar slot="actions">
+						<uui-button
+							label=${this.localize.term('general_remove')}
+							@click=${() => this.#pickerContext.requestRemoveItem(unique)}></uui-button>
+					</uui-action-bar>
+				</umb-entity-item-ref>
+			`;
 		}
 
 		// For successful items, use umb-user-group-ref

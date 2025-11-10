@@ -148,18 +148,20 @@ export class UmbInputMemberTypeElement extends UmbFormControlMixin<string | unde
 
 		// For error state, use umb-entity-item-ref
 		if (isError) {
-			return html`<umb-entity-item-ref
-				id=${unique}
-				?error=${true}
-				.errorMessage=${status.state.error}
-				.errorDetail=${unique}
-				?standalone=${this.max === 1}>
-				<uui-action-bar slot="actions">
-					<uui-button
-						label=${this.localize.term('general_remove')}
-						@click=${() => this.#pickerContext.requestRemoveItem(unique)}></uui-button>
-				</uui-action-bar>
-			</umb-entity-item-ref>`;
+			return html`
+				<umb-entity-item-ref
+					id=${unique}
+					?error=${true}
+					.errorMessage=${status.state.error}
+					.errorDetail=${unique}
+					?standalone=${this.max === 1}>
+					<uui-action-bar slot="actions">
+						<uui-button
+							label=${this.localize.term('general_remove')}
+							@click=${() => this.#pickerContext.requestRemoveItem(unique)}></uui-button>
+					</uui-action-bar>
+				</umb-entity-item-ref>
+			`;
 		}
 
 		// For successful items, use the member type specific component

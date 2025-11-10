@@ -2,10 +2,11 @@ import type { UmbStaticFileItemModel } from '../../repository/item/types.js';
 import { UmbStaticFilePickerInputContext } from './input-static-file.context.js';
 import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
-import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
+import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
+
 import '@umbraco-cms/backoffice/entity-item';
 
 @customElement('umb-input-static-file')
@@ -148,19 +149,21 @@ export class UmbInputStaticFileElement extends UmbFormControlMixin<string | unde
 		const item = this._items?.find((x) => x.unique === unique);
 		const isError = status.state.type === 'error';
 
-		return html`<umb-entity-item-ref
-			id=${unique}
-			.item=${item}
-			?error=${isError}
-			.errorMessage=${status.state.error}
-			.errorDetail=${isError ? this.#serializer.toServerPath(unique) : undefined}
-			?standalone=${this.max === 1}>
-			<uui-action-bar slot="actions">
-				<uui-button
-					label=${this.localize.term('general_remove')}
-					@click=${() => this.#pickerContext.requestRemoveItem(unique)}></uui-button>
-			</uui-action-bar>
-		</umb-entity-item-ref>`;
+		return html`
+			<umb-entity-item-ref
+				id=${unique}
+				.item=${item}
+				?error=${isError}
+				.errorMessage=${status.state.error}
+				.errorDetail=${isError ? this.#serializer.toServerPath(unique) : undefined}
+				?standalone=${this.max === 1}>
+				<uui-action-bar slot="actions">
+					<uui-button
+						label=${this.localize.term('general_remove')}
+						@click=${() => this.#pickerContext.requestRemoveItem(unique)}></uui-button>
+				</uui-action-bar>
+			</umb-entity-item-ref>
+		`;
 	}
 
 	static override styles = [

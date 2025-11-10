@@ -196,21 +196,25 @@ export class UmbEntityItemRefElement extends UmbLitElement {
 		if (this._component) {
 			return html`${this._component}`;
 		}
+
 		// Error:
 		if (this.error) {
-			return html`<uui-ref-node
-				style="color: var(--uui-color-danger);"
-				.name=${this.localize.string(this.errorMessage ?? '#general_notFound')}
-				.detail=${this.errorDetail ?? ''}
-				.readonly=${this.readonly}
-				.standalone=${this.standalone}
-				.selectOnly=${this.selectOnly}
-				.selected=${this.selected}
-				.disabled=${this.disabled}>
-				<uui-icon slot="icon" name="icon-alert" style="color: var(--uui-color-danger);"></uui-icon>
-				<slot name="actions"></slot>
-			</uui-ref-node>`;
+			return html`
+				<uui-ref-node
+					style="color: var(--uui-color-danger);"
+					.name=${this.localize.string(this.errorMessage ?? '#general_notFound')}
+					.detail=${this.errorDetail ?? ''}
+					.readonly=${this.readonly}
+					.standalone=${this.standalone}
+					.selectOnly=${this.selectOnly}
+					.selected=${this.selected}
+					.disabled=${this.disabled}>
+					<uui-icon slot="icon" name="icon-alert" style="color: var(--uui-color-danger);"></uui-icon>
+					<slot name="actions"></slot>
+				</uui-ref-node>
+			`;
 		}
+
 		// Loading:
 		return html`<uui-loader-bar style="margin-top:10px;"></uui-loader-bar>`;
 	}

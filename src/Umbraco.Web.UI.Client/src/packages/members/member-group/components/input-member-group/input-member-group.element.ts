@@ -193,24 +193,26 @@ export class UmbInputMemberGroupElement extends UmbFormControlMixin<string | und
 
 						// For error state, use umb-entity-item-ref
 						if (isError) {
-							return html`<umb-entity-item-ref
-								id=${unique}
-								?error=${true}
-								.errorMessage=${status.state.error}
-								.errorDetail=${unique}
-								?readonly=${this.readonly}
-								?standalone=${this.max === 1}>
-								${when(
-									!this.readonly,
-									() => html`
-										<uui-action-bar slot="actions">
-											<uui-button
-												label=${this.localize.term('general_remove')}
-												@click=${() => this.#removeItem(unique)}></uui-button>
-										</uui-action-bar>
-									`,
-								)}
-							</umb-entity-item-ref>`;
+							return html`
+								<umb-entity-item-ref
+									id=${unique}
+									?error=${true}
+									.errorMessage=${status.state.error}
+									.errorDetail=${unique}
+									?readonly=${this.readonly}
+									?standalone=${this.max === 1}>
+									${when(
+										!this.readonly,
+										() => html`
+											<uui-action-bar slot="actions">
+												<uui-button
+													label=${this.localize.term('general_remove')}
+													@click=${() => this.#removeItem(unique)}></uui-button>
+											</uui-action-bar>
+										`,
+									)}
+								</umb-entity-item-ref>
+							`;
 						}
 
 						// For successful items, use uui-ref-node
@@ -224,9 +226,10 @@ export class UmbInputMemberGroupElement extends UmbFormControlMixin<string | und
 								<uui-action-bar slot="actions">
 									${when(
 										!this.readonly,
-										() => html`<uui-button
-											@click=${() => this.#removeItem(unique)}
-											label=${this.localize.term('general_remove')}></uui-button>`,
+										() =>
+											html`<uui-button
+												@click=${() => this.#removeItem(unique)}
+												label=${this.localize.term('general_remove')}></uui-button>`,
 									)}
 								</uui-action-bar>
 								<umb-icon slot="icon" name="icon-users"></umb-icon>
