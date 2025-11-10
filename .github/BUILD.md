@@ -73,11 +73,15 @@ Just be careful not to include this change in your PR.
 
 Conversely, if you are working on front-end only, you want to build the back-end once and then run it. Before you do so, update the configuration in `appSettings.json` to add the following under `Umbraco:Cms:Security`:
 
-```
+```json
 "BackOfficeHost": "http://localhost:5173",
 "AuthorizeCallbackPathName": "/oauth_complete",
 "AuthorizeCallbackLogoutPathName": "/logout",
-"AuthorizeCallbackErrorPathName": "/error"
+"AuthorizeCallbackErrorPathName": "/error",
+"BackOfficeTokenCookie": {
+  "Enabled": true,
+  "SameSite": "None"
+}
 ```
 
 Then run Umbraco from the command line.

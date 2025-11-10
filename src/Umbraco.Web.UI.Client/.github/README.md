@@ -38,7 +38,11 @@ Open this file in an editor: `/src/Umbraco.Web.UI/appsettings.Development.json` 
 			"BackOfficeHost": "http://localhost:5173",
 			"AuthorizeCallbackPathName": "/oauth_complete",
 			"AuthorizeCallbackLogoutPathName": "/logout",
-			"AuthorizeCallbackErrorPathName": "/error",
+			"AuthorizeCallbackErrorPathName": "/error",,
+			"BackOfficeTokenCookie": {
+				"Enabled": true,
+				"SameSite": "None"
+			}
 		},
 	},
 }
