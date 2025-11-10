@@ -87,6 +87,14 @@ internal sealed class HideBackOfficeTokensHandler
         {
             context.Request.RefreshToken = refreshToken;
         }
+        else
+        {
+            // If we got here, either the refresh token was not redacted, or nothing was found in the refresh token cookie.
+            // If OpenIddict found a refresh token, it could be an old token that is potentially still valid. For security
+            // reasons, we cannot accept that; at this point, we expect the refresh tokens to be explicitly redacted.
+            context.Request.RefreshToken = null;
+        }
+
 
         return ValueTask.CompletedTask;
     }
