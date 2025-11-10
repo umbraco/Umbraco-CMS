@@ -66,10 +66,12 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 			this.observe(
 				instance?.variesByCulture,
 				(variesByCulture) => (this._contentTypeVariesByCulture = variesByCulture),
+				'observeVariesByCulture',
 			);
 			this.observe(
 				instance?.variesBySegment,
 				(variesBySegment) => (this._contentTypeVariesBySegment = variesBySegment),
+				'observeVariesBySegment',
 			);
 			this._entityType = instance?.getEntityType();
 		}).passContextAliasMatches();
