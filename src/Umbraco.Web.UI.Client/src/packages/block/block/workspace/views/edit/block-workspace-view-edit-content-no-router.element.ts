@@ -87,7 +87,7 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 				? html`<uui-tab-group slot="header">
 						${this._hasRootGroups && this._tabs.length > 0
 							? html`<uui-tab
-									label="Content"
+									label=${this.localize.term('general_generic')}
 									.active=${this._activeTabKey === null}
 									@click=${() => this.#setTabKey(null)}
 									>Content</uui-tab
@@ -100,7 +100,7 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 								const tabKey = tab.ownerId ?? tab.ids?.[0];
 
 								return html`<uui-tab
-									label=${tab.name ?? 'Unnamed'}
+									label=${this.localize.string(tab.name ?? '#general_unnamed')}
 									.active=${this._activeTabKey === tabKey}
 									@click=${() => this.#setTabKey(tabKey)}
 									>${tab.name}</uui-tab
