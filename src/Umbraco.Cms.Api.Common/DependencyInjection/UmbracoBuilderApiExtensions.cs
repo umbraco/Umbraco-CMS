@@ -19,8 +19,6 @@ public static class UmbracoBuilderApiExtensions
         builder.Services.AddOpenApi(DefaultApiConfiguration.ApiName);
         builder.Services.ConfigureOptions<ConfigureDefaultApiOptions>();
         builder.Services.AddSingleton<IUmbracoJsonTypeInfoResolver, UmbracoJsonTypeInfoResolver>();
-        builder.Services.AddSingleton<ISubTypesSelector, SubTypesSelector>();
-        builder.Services.AddSingleton<ISubTypesHandler, SubTypesHandler>();
         builder.Services.Configure<UmbracoPipelineOptions>(options => options.AddFilter(new SwaggerRouteTemplatePipelineFilter("UmbracoApiCommon")));
 
         return builder;

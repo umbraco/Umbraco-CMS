@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.OpenApi;
 using Umbraco.Cms.Api.Common.Configuration;
-using Umbraco.Cms.Api.Common.Serialization;
 using Umbraco.Cms.Api.Management.DependencyInjection;
 using Umbraco.Cms.Api.Management.OpenApi;
 
@@ -12,11 +11,6 @@ namespace Umbraco.Cms.Api.Management.Configuration;
 /// </summary>
 public class ConfigureUmbracoManagementApiSwaggerGenOptions : ConfigureUmbracoOpenApiOptionsBase
 {
-    private IUmbracoJsonTypeInfoResolver _umbracoJsonTypeInfoResolver;
-
-    public ConfigureUmbracoManagementApiSwaggerGenOptions(IUmbracoJsonTypeInfoResolver umbracoJsonTypeInfoResolver) =>
-        _umbracoJsonTypeInfoResolver = umbracoJsonTypeInfoResolver;
-
     /// <inheritdoc />
     protected override string ApiName => ManagementApiConfiguration.ApiName;
 

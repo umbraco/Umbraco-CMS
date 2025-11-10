@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.OpenApi;
+using Umbraco.Cms.Api.Common.OpenApi;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Events;
 
 namespace Umbraco.Cms.Api.Management.OpenApi;
 
@@ -22,21 +24,44 @@ internal sealed class NotificationHeaderTransformer : IOpenApiOperationTransform
             return;
         }
 
-        Type notificationHeaderModelType = typeof(NotificationHeaderModel);
-        OpenApiSchema notificationHeaderSchema = await context.GetOrCreateSchemaAsync(
-            notificationHeaderModelType,
-            cancellationToken: cancellationToken);
-        context.Document?.AddComponent(notificationHeaderModelType.Name, notificationHeaderSchema);
-
         // filter out irrelevant responses (401 will never produce notifications)
-        IEnumerable<OpenApiResponse> relevantResponses = operation
+        List<OpenApiResponse> relevantResponses = operation
                                                              .Responses
                                                              ?.Where(pair =>
                                                                  pair.Key !=
                                                                  StatusCodes.Status401Unauthorized.ToString())
                                                              .Select(pair => pair.Value)
                                                              .OfType<OpenApiResponse>()
+                                                         .ToList()
                                                          ?? [];
+
+        if (!relevantResponses.Any())
+        {
+            return;
+        }
+
+        Type eventMessageType = typeof(EventMessageType);
+        var eventMessageTypeSchemaId = UmbracoSchemaIdGenerator.Generate(eventMessageType);
+        if (context.Document?.Components?.Schemas?.ContainsKey(eventMessageTypeSchemaId) != true)
+        {
+            // Ensure the EventMessageType schema is registered and doesn't get inlined
+            OpenApiSchema eventMessageTypeSchema = await context.GetOrCreateSchemaAsync(
+                eventMessageType,
+                cancellationToken: cancellationToken);
+            context.Document?.AddComponent(eventMessageTypeSchemaId, eventMessageTypeSchema);
+        }
+
+        Type notificationHeaderModelType = typeof(NotificationHeaderModel);
+        var notificationHeaderSchemaId = UmbracoSchemaIdGenerator.Generate(notificationHeaderModelType);
+        if (context.Document?.Components?.Schemas?.ContainsKey(notificationHeaderSchemaId) != true)
+        {
+            OpenApiSchema notificationHeaderSchema = await context.GetOrCreateSchemaAsync(
+                notificationHeaderModelType,
+                cancellationToken: cancellationToken);
+            notificationHeaderSchema.Properties?["type"] = new OpenApiSchemaReference(eventMessageTypeSchemaId, context.Document);
+            context.Document?.AddComponent(notificationHeaderSchemaId, notificationHeaderSchema);
+        }
+
         foreach (OpenApiResponse response in relevantResponses)
         {
             response.Headers ??= new Dictionary<string, IOpenApiHeader>();
@@ -48,8 +73,8 @@ internal sealed class NotificationHeaderTransformer : IOpenApiOperationTransform
                     Schema = new OpenApiSchema
                     {
                         Type = JsonSchemaType.Array | JsonSchemaType.Null,
-                        Items = new OpenApiSchemaReference(notificationHeaderModelType.Name, context.Document)
-                    }
+                        Items = new OpenApiSchemaReference(notificationHeaderSchemaId, context.Document),
+                    },
                 });
         }
     }

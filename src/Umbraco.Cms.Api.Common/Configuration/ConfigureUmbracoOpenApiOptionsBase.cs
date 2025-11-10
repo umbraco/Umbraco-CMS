@@ -45,10 +45,9 @@ public abstract class ConfigureUmbracoOpenApiOptionsBase : IConfigureNamedOption
             .AddDocumentTransformer<TagActionsByGroupNameTransformer>()
             .AddDocumentTransformer<SortTagsAndPathsTransformer>();
 
-        options.AddSchemaTransformer<SubTypesTransformer>();
-
-        options.AddSchemaTransformer<EnumSchemaTransformer>();
         options.AddSchemaTransformer<RequireNonNullablePropertiesSchemaTransformer>();
+
+        options.AddDocumentTransformer<MimeTypesTransformer>();
 
         ConfigureOpenApi(options);
     }
@@ -63,12 +62,15 @@ public abstract class ConfigureUmbracoOpenApiOptionsBase : IConfigureNamedOption
     {
         // Ensure that only types that would normally be included in the schema generation are given a schema reference ID.
         // Otherwise, we should return null to inline them.
-        if (OpenApiOptions.CreateDefaultSchemaReferenceId(jsonTypeInfo) is null)
+        var defaultSchemaReferenceId = OpenApiOptions.CreateDefaultSchemaReferenceId(jsonTypeInfo);
+        if (defaultSchemaReferenceId is null)
         {
             return null;
         }
 
-        return UmbracoSchemaIdGenerator.Generate(jsonTypeInfo.Type);
+        return jsonTypeInfo.Type.Namespace?.StartsWith("Umbraco.Cms") == true
+            ? UmbracoSchemaIdGenerator.Generate(jsonTypeInfo.Type)
+            : defaultSchemaReferenceId;
     }
 
     private bool ShouldInclude(ApiDescription apiDescription)

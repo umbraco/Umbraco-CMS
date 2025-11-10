@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Http.Json;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Common.Configuration;
 using Umbraco.Cms.Api.Common.DependencyInjection;
 using Umbraco.Cms.Api.Management.Configuration;
@@ -83,8 +85,15 @@ public static partial class UmbracoBuilderExtensions
                 })
                 .AddJsonOptions(Constants.JsonOptionsNames.BackOffice, _ => { });
 
-            services.ConfigureOptions<ConfigureUmbracoBackofficeJsonOptions>();
             builder.Services.AddOpenApi(ManagementApiConfiguration.ApiName);
+            builder.Services.ConfigureOptions<ConfigureUmbracoBackofficeJsonOptions>();
+
+            // Configures the JSON options for the Open API schema generation (based on the back-office MVC JSON options)
+            builder.Services.ConfigureOptions<ConfigureUmbracoBackofficeHttpJsonOptions>();
+
+            // Replaces the internal Microsoft OpenApiSchemaService in order to ensure the correct JSON options are used
+            builder.Services.ReplaceOpenApiSchemaService();
+
             services.ConfigureOptions<ConfigureUmbracoManagementApiSwaggerGenOptions>();
 
             services.Configure<UmbracoPipelineOptions>(options =>
@@ -100,5 +109,29 @@ public static partial class UmbracoBuilderExtensions
         builder.AddCollectionBuilders();
 
         return builder;
+    }
+
+    /// <summary>
+    /// Replaces the OpenApiSchemaService to use the Management API JSON serializer options, instead of the default http JSON options.
+    /// </summary>
+    /// <param name="serviceCollection">The <see cref="IServiceCollection"/>.</param>
+    /// <remarks>This is needed because the OpenAPI schema generation relies on the JSON options to determine how to generate the schemas.</remarks>
+    private static void ReplaceOpenApiSchemaService(this IServiceCollection serviceCollection)
+    {
+        ServiceDescriptor serviceDescriptor = serviceCollection
+            .First(x => x.ServiceType.Name == "OpenApiSchemaService" && Equals(x.ServiceKey, ManagementApiConfiguration.ApiName));
+
+        serviceCollection.Remove(serviceDescriptor);
+        serviceCollection.Add(
+            new ServiceDescriptor(
+                serviceDescriptor.ServiceType,
+                serviceDescriptor.ServiceKey,
+                (sp, serviceKey) => sp.CreateInstance(
+                    serviceDescriptor.KeyedImplementationType!,
+                    serviceKey!,
+                    Options.Create(
+                        sp.GetRequiredService<IOptionsMonitor<JsonOptions>>()
+                            .Get(Constants.JsonOptionsNames.BackOffice))),
+                ServiceLifetime.Singleton));
     }
 }

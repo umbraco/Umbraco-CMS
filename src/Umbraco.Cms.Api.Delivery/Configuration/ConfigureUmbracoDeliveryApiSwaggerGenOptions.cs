@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.OpenApi;
 using Umbraco.Cms.Api.Common.Configuration;
-using Umbraco.Cms.Api.Common.OpenApi;
 using Umbraco.Cms.Api.Delivery.Filters.OpenApi;
 
 namespace Umbraco.Cms.Api.Delivery.Configuration;
@@ -28,10 +27,10 @@ public class ConfigureUmbracoDeliveryApiSwaggerGenOptions : ConfigureUmbracoOpen
             return Task.CompletedTask;
         });
 
+        // Add API key security scheme and configure it for all operations
         options
             .AddDocumentTransformer<ApiKeyTransformer>()
             .AddOperationTransformer<ApiKeyTransformer>();
-        options.AddDocumentTransformer<MimeTypesTransformer>();
 
         options.AddOperationTransformer<ContentApiTransformer>();
         options.AddOperationTransformer<MediaApiTransformer>();

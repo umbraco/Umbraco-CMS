@@ -2,9 +2,11 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Umbraco.Cms.Api.Common.DependencyInjection;
 using Umbraco.Cms.Api.Delivery.Accessors;
@@ -74,18 +76,26 @@ public static class UmbracoBuilderExtensions
 
         builder.Services.AddOpenApi(DeliveryApiConfiguration.ApiName);
         builder.Services.ConfigureOptions<ConfigureUmbracoDeliveryApiSwaggerGenOptions>();
+
+        // Replaces the internal Microsoft OpenApiSchemaService in order to ensure the correct JSON options are used
+        builder.Services.ReplaceOpenApiSchemaService();
         builder.AddUmbracoApiOpenApiUI();
 
         builder
             .Services
             .AddControllers()
-            .AddJsonOptions(Constants.JsonOptionsNames.DeliveryApi, options =>
-            {
-                // all Delivery API specific JSON options go here
-                options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-                options.JsonSerializerOptions.TypeInfoResolver = new DeliveryApiJsonTypeResolver();
-                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-            });
+            .AddJsonOptions(
+                Constants.JsonOptionsNames.DeliveryApi,
+                options =>
+                {
+                    // all Delivery API specific JSON options go here
+                    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                    options.JsonSerializerOptions.TypeInfoResolver = new DeliveryApiJsonTypeResolver();
+                    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                });
+
+        // Configures the JSON options for the Open API schema generation (based on the Delivery API MVC JSON options)
+        builder.Services.ConfigureOptions<ConfigureUmbracoDeliveryHttpJsonOptions>();
 
         builder.Services.AddAuthentication();
         builder.AddUmbracoOpenIddict();
@@ -138,5 +148,29 @@ public static class UmbracoBuilderExtensions
 
         builder.Services.Configure<UmbracoPipelineOptions>(options => options.AddFilter(new OutputCachePipelineFilter("UmbracoDeliveryApiOutputCache")));
         return builder;
+    }
+
+    /// <summary>
+    /// Replaces the OpenApiSchemaService to use the Delivery API JSON serializer options, instead of the default http JSON options.
+    /// </summary>
+    /// <param name="serviceCollection">The <see cref="IServiceCollection"/>.</param>
+    /// <remarks>This is needed because the OpenAPI schema generation relies on the JSON options to determine how to generate the schemas.</remarks>
+    private static void ReplaceOpenApiSchemaService(this IServiceCollection serviceCollection)
+    {
+        ServiceDescriptor serviceDescriptor = serviceCollection
+            .First(x => x.ServiceType.Name == "OpenApiSchemaService" && Equals(x.ServiceKey, DeliveryApiConfiguration.ApiName));
+
+        serviceCollection.Remove(serviceDescriptor);
+        serviceCollection.Add(
+            new ServiceDescriptor(
+                serviceDescriptor.ServiceType,
+                serviceDescriptor.ServiceKey,
+                (sp, serviceKey) => sp.CreateInstance(
+                    serviceDescriptor.KeyedImplementationType!,
+                    serviceKey!,
+                    Options.Create(
+                        sp.GetRequiredService<IOptionsMonitor<JsonOptions>>()
+                            .Get(Constants.JsonOptionsNames.DeliveryApi))),
+                ServiceLifetime.Singleton));
     }
 }
