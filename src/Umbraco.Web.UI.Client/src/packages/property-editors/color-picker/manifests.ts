@@ -15,12 +15,12 @@ export const manifests: Array<UmbExtensionManifest> = [
 			supportsReadOnly: true,
 		},
 	},
-  {
-    type: "propertyValuePresentation",
-    alias: "Umb.PropertyValuePresentation.ColorPicker",
-    name: "Color Picker Property Value Presentation",
-    element: () => import("./property-value-presentation-color-picker.js"),
-		propertyEditorAlias: "Umbraco.ColorPicker"
-  },
+	{
+		type: 'propertyValuePresentation',
+		alias: 'Umb.PropertyValuePresentation.ColorPicker',
+		name: 'Color Picker Property Value Presentation',
+		element: () => import('./property-value-presentation-color-picker.js'),
+		propertyEditorAlias: 'Umbraco.ColorPicker',
+	},
 	schemaManifest,
 ];

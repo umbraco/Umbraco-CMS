@@ -2,7 +2,9 @@ import { UmbPropertyValuePresentationBaseElement } from '../../../core/property-
 import { customElement, html, nothing } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-time-only-picker-property-value-presentation')
-export class UmbTimeOnlyPickerPropertyValuePresentation extends UmbPropertyValuePresentationBaseElement {
+export class UmbTimeOnlyPickerPropertyValuePresentation extends UmbPropertyValuePresentationBaseElement<{
+	date: string;
+}> {
 	override render() {
 		const time = this.#getTime();
 		return time ? html`<span>${time}</span>` : nothing;

@@ -14,12 +14,12 @@ export const manifests: Array<UmbExtensionManifest> = [
 			supportsReadOnly: true,
 		},
 	},
-  {
-    type: "propertyValuePresentation",
-    alias: "Umb.PropertyValuePresentation.DateOnlyPicker",
-    name: "Date Only Picker Property Value Presentation",
-    element: () => import("./property-value-presentation-date-only-picker.js"),
-		propertyEditorAlias: "Umbraco.DateOnly"
-  },
+	{
+		type: 'propertyValuePresentation',
+		alias: 'Umb.PropertyValuePresentation.DateOnlyPicker',
+		name: 'Date Only Picker Property Value Presentation',
+		element: () => import('./property-value-presentation-date-only-picker.js'),
+		propertyEditorAlias: 'Umbraco.DateOnly',
+	},
 	schemaManifest,
 ];

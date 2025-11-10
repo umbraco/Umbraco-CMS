@@ -1,14 +1,13 @@
-import type { UmbEditableDocumentCollectionItemModel } from '../../../types.js';
 import { UmbDocumentItemDataResolver } from '../../../../item/index.js';
+import { UMB_DOCUMENT_COLLECTION_CONTEXT } from '../../../document-collection.context-token.js';
+import type { UmbDocumentCollectionContext } from '../../../document-collection.context.js';
+import type { UmbEditableDocumentCollectionItemModel } from '../../../types.js';
 import { customElement, html, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbTableColumn, UmbTableColumnLayoutElement, UmbTableItem } from '@umbraco-cms/backoffice/components';
-import type { UmbDocumentCollectionContext } from '../../../document-collection.context.js';
-import { UMB_DOCUMENT_COLLECTION_CONTEXT } from '../../../document-collection.context-token.js';
 
 @customElement('umb-document-table-column-property-value')
 export class UmbDocumentTableColumnPropertyValueElement extends UmbLitElement implements UmbTableColumnLayoutElement {
-
 	#collectionContext?: UmbDocumentCollectionContext;
 
 	#resolver = new UmbDocumentItemDataResolver(this);

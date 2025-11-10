@@ -2,14 +2,14 @@ import { UmbPropertyValuePresentationDisplayOption } from '../../../core/propert
 import type { ManifestPropertyValuePresentation } from '../../../core/property-value-presentation/index.js';
 import type { UmbDocumentCollectionFilterModel, UmbDocumentCollectionItemModel } from './types.js';
 import { UMB_DOCUMENT_TABLE_COLLECTION_VIEW_ALIAS } from './constants.js';
-import { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
-import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
-import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
+import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export type UmbGetPropertyValueByAliasArgs = {
 	alias: string;

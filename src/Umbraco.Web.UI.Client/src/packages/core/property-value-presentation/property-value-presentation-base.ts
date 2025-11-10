@@ -2,13 +2,13 @@ import type { UmbPropertyValuePresentationDisplayOption } from '../../core/prope
 import { property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-export abstract class UmbPropertyValuePresentationBaseElement extends UmbLitElement {
+export abstract class UmbPropertyValuePresentationBaseElement<TValue = string> extends UmbLitElement {
 	@property()
 	alias: string = '';
 
 	@property()
 	display?: UmbPropertyValuePresentationDisplayOption;
 
-	@property()
-	value: any;
+	@property({ type: Object })
+	value?: TValue;
 }

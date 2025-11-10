@@ -38,12 +38,12 @@ export const manifests: Array<UmbExtensionManifest> = [
 			},
 		},
 	},
-  {
-    type: "propertyValuePresentation",
-    alias: "Umb.PropertyValuePresentation.TimeOnlyPicker",
-    name: "Time Only Picker Property Value Presentation",
-    element: () => import("./property-value-presentation-time-only-picker.js"),
-		propertyEditorAlias: "Umbraco.TimeOnly"
-  },
+	{
+		type: 'propertyValuePresentation',
+		alias: 'Umb.PropertyValuePresentation.TimeOnlyPicker',
+		name: 'Time Only Picker Property Value Presentation',
+		element: () => import('./property-value-presentation-time-only-picker.js'),
+		propertyEditorAlias: 'Umbraco.TimeOnly',
+	},
 	schemaManifest,
 ];

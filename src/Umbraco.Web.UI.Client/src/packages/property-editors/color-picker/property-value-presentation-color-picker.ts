@@ -5,7 +5,9 @@ import {
 import { customElement, html, nothing } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-color-picker-property-value-presentation')
-export class UmbColorPickerPropertyValuePresentation extends UmbPropertyValuePresentationBaseElement {
+export class UmbColorPickerPropertyValuePresentation extends UmbPropertyValuePresentationBaseElement<
+	{ value: string; label: string } | string
+> {
 	override render() {
 		const color = this.#getColor();
 		const label = this.#getLabel();

@@ -1,18 +1,17 @@
 import { UmbDocumentItemDataResolver } from '../../../item/document-item-data-resolver.js';
+import { UMB_DOCUMENT_COLLECTION_CONTEXT } from '../../document-collection.context-token.js';
+import type { UmbDocumentCollectionContext } from '../../document-collection.context.js';
 import type { UmbDocumentCollectionItemModel } from '../../types.js';
 import { css, customElement, html, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { fromCamelCase } from '@umbraco-cms/backoffice/utils';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
 import { UUICardContentNodeElement } from '@umbraco-cms/backoffice/external/uui';
-import { type UmbCollectionColumnConfiguration } from '@umbraco-cms/backoffice/collection';
+import type { UmbCollectionColumnConfiguration } from '@umbraco-cms/backoffice/collection';
 import type { UUIInterfaceColor } from '@umbraco-cms/backoffice/external/uui';
-import type { UmbDocumentCollectionContext } from '../../document-collection.context.js';
-import { UMB_DOCUMENT_COLLECTION_CONTEXT } from '../../document-collection.context-token.js';
 
 @customElement('umb-document-grid-collection-card')
 export class UmbDocumentGridCollectionCardElement extends UmbElementMixin(UUICardContentNodeElement) {
-
 	#collectionContext?: UmbDocumentCollectionContext;
 
 	#resolver = new UmbDocumentItemDataResolver(this);
