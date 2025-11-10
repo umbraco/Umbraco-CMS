@@ -12,9 +12,9 @@ export default {
 		required: 'Required',
 		success: 'Success',
 		forgottenPassword: 'Forgotten password?',
-		forgottenPasswordInstruction: 'An email will be sent to the address specified with a link to reset your password',
+		forgottenPasswordInstruction: 'An email will be sent with a link to reset your password',
 		requestPasswordResetConfirmation:
-			'An email with password reset instructions will be sent to the specified address if it matched our records',
+			'We sent an email with password reset instructions, if the email address matches a registered user.',
 		setPasswordConfirmation: 'Your password has been updated',
 		rememberMe: 'Remember me',
 		error: 'Error',
@@ -29,7 +29,7 @@ export default {
 		receivedErrorFromServer: 'Received an error from the server',
 		resetCodeExpired: 'The link you have clicked on is invalid or has expired',
 		userInviteWelcomeMessage:
-			'Hello there and welcome to Umbraco! In just 1 minute you’ll be good to go, we just need you to setup a password.',
+			"Hello there and welcome to Umbraco! In just 1 minute you'll be good to go, we just need you to setup a password.",
 		userInviteExpiredMessage:
 			'Welcome to Umbraco! Unfortunately your invite has expired. Please contact your administrator and ask them to resend it.',
 		newPassword: 'New password',
