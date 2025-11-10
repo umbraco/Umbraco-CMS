@@ -1,4 +1,4 @@
-import { UmbControllerBase } from "@umbraco-cms/backoffice/class-api";
+import {UmbControllerBase} from "@umbraco-cms/backoffice/class-api";
 
 export class ExampleCustomPickerCollectionPropertyEditorDataSource extends UmbControllerBase {
   collectionPickableFilter = (item) => item.isPickable;
@@ -9,12 +9,12 @@ export class ExampleCustomPickerCollectionPropertyEditorDataSource extends UmbCo
       total: customItems.length,
     };
 
-    return { data };
+    return {data};
   }
 
   async requestItems(uniques) {
     const items = customItems.filter((x) => uniques.includes(x.unique));
-    return { data: items };
+    return {data: items};
   }
 
   async search(args) {
@@ -28,11 +28,11 @@ export class ExampleCustomPickerCollectionPropertyEditorDataSource extends UmbCo
       total,
     };
 
-    return { data };
+    return {data};
   }
 }
 
-export { ExampleCustomPickerCollectionPropertyEditorDataSource as api };
+export {ExampleCustomPickerCollectionPropertyEditorDataSource as api};
 
 const customItems = [
   {

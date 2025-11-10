@@ -1,4 +1,4 @@
-import { UmbControllerBase } from "@umbraco-cms/backoffice/class-api";
+import {UmbControllerBase} from "@umbraco-cms/backoffice/class-api";
 
 export class MyPickerDataSource extends UmbControllerBase {
   treePickableFilter = (treeItem) =>
@@ -17,7 +17,7 @@ export class MyPickerDataSource extends UmbControllerBase {
       isFolder: true,
     };
 
-    return { data: root };
+    return {data: root};
   }
 
   async requestTreeRootItems() {
@@ -28,7 +28,7 @@ export class MyPickerDataSource extends UmbControllerBase {
       total: rootItems.length,
     };
 
-    return { data };
+    return {data};
   }
 
   async requestTreeItemsOf(args) {
@@ -43,17 +43,17 @@ export class MyPickerDataSource extends UmbControllerBase {
       total: items.length,
     };
 
-    return { data };
+    return {data};
   }
 
   async requestTreeItemAncestors() {
     // TODO: implement when needed
-    return { data: [] };
+    return {data: []};
   }
 
   async requestItems(uniques) {
     const items = customItems.filter((x) => uniques.includes(x.unique));
-    return { data: items };
+    return {data: items};
   }
 
   async search(args) {
@@ -66,11 +66,11 @@ export class MyPickerDataSource extends UmbControllerBase {
       total: result.length,
     };
 
-    return { data };
+    return {data};
   }
 }
 
-export { MyPickerDataSource as api };
+export {MyPickerDataSource as api};
 
 const customItems = [
   {
@@ -78,7 +78,7 @@ const customItems = [
     entityType: "example",
     name: "Example 1",
     icon: "icon-shape-triangle",
-    parent: { unique: null, entityType: "example-root" },
+    parent: {unique: null, entityType: "example-root"},
     isFolder: false,
     hasChildren: false,
   },
@@ -87,7 +87,7 @@ const customItems = [
     entityType: "example",
     name: "Example 2",
     icon: "icon-shape-triangle",
-    parent: { unique: null, entityType: "example-root" },
+    parent: {unique: null, entityType: "example-root"},
     isFolder: false,
     hasChildren: false,
   },
@@ -96,7 +96,7 @@ const customItems = [
     entityType: "example",
     name: "Example 3",
     icon: "icon-shape-triangle",
-    parent: { unique: null, entityType: "example-root" },
+    parent: {unique: null, entityType: "example-root"},
     isFolder: false,
     hasChildren: false,
   },
@@ -105,7 +105,7 @@ const customItems = [
     entityType: "example",
     name: "Example 4",
     icon: "icon-shape-triangle",
-    parent: { unique: "6", entityType: "example-folder" },
+    parent: {unique: "6", entityType: "example-folder"},
     isFolder: false,
     hasChildren: false,
   },
@@ -114,7 +114,7 @@ const customItems = [
     entityType: "example",
     name: "Example 5",
     icon: "icon-shape-triangle",
-    parent: { unique: "6", entityType: "example-folder" },
+    parent: {unique: "6", entityType: "example-folder"},
     isFolder: false,
     hasChildren: false,
   },
@@ -122,7 +122,7 @@ const customItems = [
     unique: "6",
     entityType: "example-folder",
     name: "Example Folder 1",
-    parent: { unique: null, entityType: "example-root" },
+    parent: {unique: null, entityType: "example-root"},
     isFolder: true,
     hasChildren: true,
   },
