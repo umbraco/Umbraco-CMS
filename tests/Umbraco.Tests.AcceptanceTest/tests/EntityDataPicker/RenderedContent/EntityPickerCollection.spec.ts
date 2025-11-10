@@ -34,6 +34,7 @@ else
 }
 `
 
+// Ids for Example 4 and Example 2
 const items = {ids: ['4', '2']};
 
 test.beforeEach(async ({umbracoApi, umbracoUi}) => {
