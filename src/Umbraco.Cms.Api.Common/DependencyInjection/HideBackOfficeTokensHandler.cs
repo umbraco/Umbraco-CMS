@@ -26,15 +26,18 @@ internal sealed class HideBackOfficeTokensHandler
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IDataProtectionProvider _dataProtectionProvider;
     private readonly BackOfficeTokenCookieSettings _backOfficeTokenCookieSettings;
+    private readonly GlobalSettings _globalSettings;
 
     public HideBackOfficeTokensHandler(
         IHttpContextAccessor httpContextAccessor,
         IDataProtectionProvider dataProtectionProvider,
-        IOptions<BackOfficeTokenCookieSettings> backOfficeTokenCookieSettings)
+        IOptions<BackOfficeTokenCookieSettings> backOfficeTokenCookieSettings,
+        IOptions<GlobalSettings> globalSettings)
     {
         _httpContextAccessor = httpContextAccessor;
         _dataProtectionProvider = dataProtectionProvider;
         _backOfficeTokenCookieSettings = backOfficeTokenCookieSettings.Value;
+        _globalSettings = globalSettings.Value;
     }
 
     /// <summary>
@@ -142,8 +145,12 @@ internal sealed class HideBackOfficeTokensHandler
             // Cookie path must be root for optimal security.
             Path = "/",
 
-            // Cookie must be secure.
-            Secure = true,
+            // For optimal security, the cooke must be secure. However, Umbraco allows for running development
+            // environments over HTTP, so we need to take that into account here.
+            // Thus, we will make the cookie secure if:
+            // - HTTPS is explicitly enabled by config (default for production environments), or
+            // - The current request is over HTTPS (meaning the environment supports it regardless of config).
+            Secure = _globalSettings.UseHttps || httpContext.Request.IsHttps,
 
             // SameSite is configurable (see BackOfficeTokenCookieSettings for defaults):
             SameSite = ParseSameSiteMode(_backOfficeTokenCookieSettings.SameSite),
