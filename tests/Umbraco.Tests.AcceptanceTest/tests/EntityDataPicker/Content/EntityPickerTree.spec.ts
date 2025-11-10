@@ -88,7 +88,7 @@ test('can create content with a entity picker with the tree data source that has
 
 test('can not create content with a entity picker with the tree data source that has more items than max amount', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const dataTypeId = await umbracoApi.dataType.createEntityDataPickerDataTypeMinAndMaxValues(dataTypeName, treeDataSourceAlias, 0, 2);
+  const dataTypeId = await umbracoApi.dataType.createEntityDataPickerDataTypeWithMinAndMaxValues(dataTypeName, treeDataSourceAlias, 0, 2);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
@@ -107,7 +107,7 @@ test('can not create content with a entity picker with the tree data source that
 test('can not create content with a entity picker with the tree data source that has less items than min amount', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Published';
-  const dataTypeId = await umbracoApi.dataType.createEntityDataPickerDataTypeMinAndMaxValues(dataTypeName, treeDataSourceAlias, 2, 5);
+  const dataTypeId = await umbracoApi.dataType.createEntityDataPickerDataTypeWithMinAndMaxValues(dataTypeName, treeDataSourceAlias, 2, 5);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
