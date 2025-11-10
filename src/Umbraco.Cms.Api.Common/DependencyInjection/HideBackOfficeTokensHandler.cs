@@ -20,8 +20,8 @@ internal sealed class HideBackOfficeTokensHandler
         INotificationHandler<UserLogoutSuccessNotification>
 {
     private const string RedactedTokenValue = "[redacted]";
-    private const string AccessTokenCookieKey = "umbAccessToken";
-    private const string RefreshTokenCookieKey = "umbRefreshToken";
+    private const string AccessTokenCookieKey = "__Host-umbAccessToken";
+    private const string RefreshTokenCookieKey = "__Host-umbRefreshToken";
 
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IDataProtectionProvider _dataProtectionProvider;
