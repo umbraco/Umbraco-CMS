@@ -247,6 +247,10 @@ export class UmbAuthFlow {
 
 		// clear the internal state
 		this.#tokenResponse.setValue(undefined);
+
+		// Also cleanup any OAuth/PKCE artifacts that may still be in localStorage
+		// This is a defense-in-depth measure during logout
+		await this.#authorizationHandler.cleanupStaleAuthorizationData();
 	}
 
 	/**

@@ -14,7 +14,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.webhook.ensureNameNotExists(webhookName);
 });
 
-test('can create a webhook', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test('can create a webhook', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const event = 'Content Deleted';
   const webhookSiteUrl = umbracoApi.webhook.webhookSiteUrl + webhookSiteToken;
@@ -122,7 +122,7 @@ test('can disable a webhook', async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.webhook.isWebhookEnabled(webhookName, false);
 });
 
-test('cannot remove all events from a webhook', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test('cannot remove all events from a webhook', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const event = 'Content Deleted';
   await umbracoApi.webhook.createDefaultWebhook(webhookName, webhookSiteToken, event);
