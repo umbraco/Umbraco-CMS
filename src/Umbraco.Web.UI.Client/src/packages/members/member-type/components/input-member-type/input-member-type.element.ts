@@ -1,10 +1,11 @@
 import { UmbMemberTypePickerInputContext } from './input-member-type.context.js';
-import { css, html, customElement, property, state, repeat, when, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbUniqueItemModel } from '@umbraco-cms/backoffice/models';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
+import type { UmbUniqueItemModel } from '@umbraco-cms/backoffice/models';
+
 import '@umbraco-cms/backoffice/entity-item';
 
 @customElement('umb-input-member-type')

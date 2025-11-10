@@ -1,14 +1,15 @@
 import type { UmbMemberGroupItemModel } from '../../types.js';
 import { UmbMemberGroupPickerInputContext } from './input-member-group.context.js';
-import { css, html, customElement, property, state, repeat, nothing, when } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
-import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
+
 import '@umbraco-cms/backoffice/entity-item';
 
 @customElement('umb-input-member-group')

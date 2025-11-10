@@ -2,14 +2,15 @@ import type { UmbDocumentTypeItemModel, UmbDocumentTypeTreeItemModel } from '../
 import { UMB_DOCUMENT_TYPE_WORKSPACE_MODAL } from '../../constants.js';
 import { UMB_EDIT_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN } from '../../paths.js';
 import { UmbDocumentTypePickerInputContext } from './input-document-type.context.js';
-import { css, html, customElement, property, state, repeat, nothing, when } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
+
 import '@umbraco-cms/backoffice/entity-item';
 
 @customElement('umb-input-document-type')

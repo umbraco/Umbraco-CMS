@@ -1,13 +1,23 @@
 import { UMB_USER_GROUP_ENTITY_TYPE } from '../../entity.js';
 import type { UmbUserGroupItemModel } from '../../repository/index.js';
 import { UmbUserGroupPickerInputContext } from './user-group-input.context.js';
-import { css, html, customElement, property, state, ifDefined, nothing, repeat } from '@umbraco-cms/backoffice/external/lit';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
-import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
+import {
+	css,
+	customElement,
+	html,
+	ifDefined,
+	nothing,
+	property,
+	repeat,
+	state,
+} from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
+import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
+import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
+
 import '@umbraco-cms/backoffice/entity-item';
 
 @customElement('umb-user-group-input')

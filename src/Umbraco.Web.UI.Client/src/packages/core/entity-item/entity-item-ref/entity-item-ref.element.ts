@@ -1,15 +1,16 @@
 import type { ManifestEntityItemRef } from './entity-item-ref.extension.js';
-import { customElement, property, type PropertyValueMap, state, css, html } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbExtensionsElementInitializer } from '@umbraco-cms/backoffice/extension-api';
-import { UMB_MARK_ATTRIBUTE_NAME } from '@umbraco-cms/backoffice/const';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 import { UmbRoutePathAddendumContext } from '@umbraco-cms/backoffice/router';
-import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import { UMB_MARK_ATTRIBUTE_NAME } from '@umbraco-cms/backoffice/const';
 import { UUIBlinkAnimationValue } from '@umbraco-cms/backoffice/external/uui';
+import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 import './default-item-ref.element.js';
-import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-entity-item-ref')
 export class UmbEntityItemRefElement extends UmbLitElement {
