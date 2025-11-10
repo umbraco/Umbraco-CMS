@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 ///     used dynamically.
 /// </summary>
 [DefaultPropertyValueConverter]
-public class RteBlockRenderingValueConverter : SimpleRichTextValueConverter, IDeliveryApiPropertyValueConverter
+public class RteBlockRenderingValueConverter : SimpleRichTextValueConverter, IDeliveryApiPropertyValueConverter, IDisposable
 {
     private readonly HtmlImageSourceParser _imageSourceParser;
     private readonly HtmlLocalLinkParser _linkParser;
@@ -41,7 +41,9 @@ public class RteBlockRenderingValueConverter : SimpleRichTextValueConverter, IDe
     private readonly RichTextBlockPropertyValueConstructorCache _constructorCache;
     private readonly IVariationContextAccessor _variationContextAccessor;
     private readonly BlockEditorVarianceHandler _blockEditorVarianceHandler;
+
     private DeliveryApiSettings _deliveryApiSettings;
+    private readonly IDisposable? _deliveryApiSettingsChangeSubscription;
 
     public RteBlockRenderingValueConverter(HtmlLocalLinkParser linkParser, HtmlUrlParser urlParser, HtmlImageSourceParser imageSourceParser,
         IApiRichTextElementParser apiRichTextElementParser, IApiRichTextMarkupParser apiRichTextMarkupParser,
@@ -62,8 +64,9 @@ public class RteBlockRenderingValueConverter : SimpleRichTextValueConverter, IDe
         _logger = logger;
         _variationContextAccessor = variationContextAccessor;
         _blockEditorVarianceHandler = blockEditorVarianceHandler;
+
         _deliveryApiSettings = deliveryApiSettingsMonitor.CurrentValue;
-        deliveryApiSettingsMonitor.OnChange(settings => _deliveryApiSettings = settings);
+        _deliveryApiSettingsChangeSubscription = deliveryApiSettingsMonitor.OnChange(settings => _deliveryApiSettings = settings);
     }
 
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType) =>
@@ -71,6 +74,19 @@ public class RteBlockRenderingValueConverter : SimpleRichTextValueConverter, IDe
         // because that version of RTE converter parses {locallink} and renders blocks, its value has
         // to be cached at the published snapshot level, because we have no idea what the block renderings may depend on actually.
         PropertyCacheLevel.Snapshot;
+
+    /// <inheritdoc />
+    public override bool? IsValue(object? value, PropertyValueLevel level)
+        => level switch
+        {
+            // we cannot determine if an RTE has a value at source level, because some RTEs might
+            // be saved with an "empty" representation like {"markup":"","blocks":null}.
+            PropertyValueLevel.Source => null,
+            // we assume the RTE has a value if the intermediate value has markup beyond an empty paragraph tag.
+            PropertyValueLevel.Inter => value is IRichTextEditorIntermediateValue { Markup.Length: > 0 } intermediateValue
+                                        && intermediateValue.Markup != "<p></p>",
+            _ => throw new ArgumentOutOfRangeException(nameof(level), level, null)
+        };
 
     // to counterweigh the cache level, we're going to do as much of the heavy lifting as we can while converting source to intermediate
     public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
@@ -237,4 +253,6 @@ public class RteBlockRenderingValueConverter : SimpleRichTextValueConverter, IDe
 
         public required RichTextBlockModel? RichTextBlockModel { get; set; }
     }
+
+    public void Dispose() => _deliveryApiSettingsChangeSubscription?.Dispose();
 }

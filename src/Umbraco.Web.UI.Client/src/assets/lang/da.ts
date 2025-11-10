@@ -1009,7 +1009,18 @@ export default {
 		document: 'Dokument',
 	},
 	colors: {
+		black: 'Sort',
 		blue: 'Blå',
+		brown: 'Brun',
+		cyan: 'Cyan',
+		green: 'Grøn',
+		lightBlue: 'Lyseblå',
+		pink: 'Lyserød',
+		red: 'Rød',
+		text: 'Sort',
+		yellow: 'Gul',
+		white: 'Hvid',
+		grey: 'Grå',
 	},
 	shortcuts: {
 		addGroup: 'Tilføj fane',
@@ -1058,8 +1069,6 @@ export default {
 		databaseInstall: '\n      Klik på <strong>installér</strong> knappen for at installere Umbraco %0% databasen\n    ',
 		databaseInstallDone:
 			'Umbraco %0% er nu blevet kopieret til din database. Tryk på <string>Næste</strong> for at fortsætte.',
-		databaseNotFound:
-			'<p>Databasen er ikke fundet. Kontrollér venligst at informationen i database forbindelsesstrengen i "web.config" filen er korrekt.</p>\n<p>For at fortsætte bedes du venligst rette "web.config" filen (ved at bruge Visual Studio eller dit favoritprogram), scroll til bunden, tilføj forbindelsesstrengen til din database i feltet som hedder "umbracoDbDSN" og gem filen.</p><p>Klik på <strong>Forsøg igen</strong> knappen når du er færdig.<br/><a href="https://our.umbraco.com/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank" rel="noopener">Mere information om at redigere web.config her.</a></p>',
 		databaseText:
 			'For at afslutte dette skridt er du nødt til at have nogle informationer om din database parat ("database forbindelsesstrengen").<br/>Kontakt venligst din ISP hvis det er nødvendigt. Hvis du installerer på en lokal maskine eller server kan du muligvis få informationerne fra din systemadministrator.',
 		databaseUpgrade:
@@ -1417,14 +1426,6 @@ export default {
 		settings: 'Indstillinger',
 		translation: 'Oversættelse',
 		users: 'Brugere',
-	},
-	help: {
-		tours: 'Tours',
-		theBestUmbracoVideoTutorials: 'De bedste Umbraco video tutorials',
-		umbracoForum: 'Besøg our.umbraco.com',
-		umbracoTv: 'Besøg umbraco.tv',
-		umbracoLearningBase: 'Watch our free tutorial videos',
-		umbracoLearningBaseDescription: 'on the Umbraco Learning Base',
 	},
 	settings: {
 		defaulttemplate: 'Standardskabelon',
@@ -2715,19 +2716,11 @@ export default {
 		profilerEnabledDescription:
 			"\n            <p>\n                Umbraco currently does not run in debug mode, so you can't use the built-in profiler. This is how it should be for a production site.\n            </p>\n            <p>\n                Debug mode is turned on by setting <strong>Umbraco:CMS:Hosting:Debug</strong> to <strong>true</strong> in appsettings.json, appsettings.{Environment}.json or via an environment variable.\n            </p>\n        ",
 	},
-	settingsDashboardVideos: {
-		trainingHeadline: 'Hours of Umbraco training videos are only a click away',
-		trainingDescription:
-			'\n        <p>Want to master Umbraco? Spend a couple of minutes learning some best practices by watching one of these videos about using Umbraco. And visit <a href="https://umbraco.tv" target="_blank" rel="noopener">umbraco.tv</a> for even more Umbraco videos</p>\n    ',
-		learningBaseDescription:
-			'  <p>Vil du mestre Umbraco? Brug et par minutter på at lære nogle best practices ved at besøge <a class="btn-link -underline" href="https://www.youtube.com/c/UmbracoLearningBase" target="_blank" rel="noopener">Umbraco Learning Base YouTube-kanalen</a>. Her finder du en masse videoer, der dækker mange aspekter af Umbraco.</p> ',
-		getStarted: 'To get you started',
-	},
 	settingsDashboard: {
 		documentationHeader: 'Dokumentation',
 		documentationDescription: 'Læs mere om at arbejde med elementerne i Indstillinger i vores Dokumentation.',
 		communityHeader: 'Community',
-		communityDescription: 'Stil et spørgsmål i community forummet eller i vores Discord community',
+		communityDescription: 'Stil et spørgsmål i community forummet',
 		trainingHeader: 'Træning',
 		trainingDescription: 'Se mulighederne for real-life træning og certificering',
 		supportHeader: 'Support',

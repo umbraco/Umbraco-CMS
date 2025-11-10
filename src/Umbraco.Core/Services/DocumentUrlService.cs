@@ -2,9 +2,11 @@ using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PublishedCache;
@@ -28,6 +30,7 @@ public class DocumentUrlService : IDocumentUrlService
     private readonly IDocumentRepository _documentRepository;
     private readonly ICoreScopeProvider _coreScopeProvider;
     private readonly GlobalSettings _globalSettings;
+    private readonly WebRoutingSettings _webRoutingSettings;
     private readonly UrlSegmentProviderCollection _urlSegmentProviderCollection;
     private readonly IContentService _contentService;
     private readonly IShortStringHelper _shortStringHelper;
@@ -37,6 +40,7 @@ public class DocumentUrlService : IDocumentUrlService
     private readonly IDocumentNavigationQueryService _documentNavigationQueryService;
     private readonly IPublishStatusQueryService _publishStatusQueryService;
     private readonly IDomainCacheService _domainCacheService;
+    private readonly IDefaultCultureAccessor _defaultCultureAccessor;
 
     private readonly ConcurrentDictionary<string, PublishedDocumentUrlSegments> _cache = new();
     private bool _isInitialized;
@@ -96,6 +100,7 @@ public class DocumentUrlService : IDocumentUrlService
     /// <summary>
     /// Initializes a new instance of the <see cref="DocumentUrlService"/> class.
     /// </summary>
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
     public DocumentUrlService(
         ILogger<DocumentUrlService> logger,
         IDocumentUrlRepository documentUrlRepository,
@@ -111,12 +116,53 @@ public class DocumentUrlService : IDocumentUrlService
         IDocumentNavigationQueryService documentNavigationQueryService,
         IPublishStatusQueryService publishStatusQueryService,
         IDomainCacheService domainCacheService)
+        :this(
+            logger,
+            documentUrlRepository,
+            documentRepository,
+            coreScopeProvider,
+            globalSettings,
+            StaticServiceProvider.Instance.GetRequiredService<IOptions<WebRoutingSettings>>(),
+            urlSegmentProviderCollection,
+            contentService,
+            shortStringHelper,
+            languageService,
+            keyValueService,
+            idKeyMap,
+            documentNavigationQueryService,
+            publishStatusQueryService,
+            domainCacheService,
+            StaticServiceProvider.Instance.GetRequiredService<IDefaultCultureAccessor>())
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DocumentUrlService"/> class.
+    /// </summary>
+    public DocumentUrlService(
+        ILogger<DocumentUrlService> logger,
+        IDocumentUrlRepository documentUrlRepository,
+        IDocumentRepository documentRepository,
+        ICoreScopeProvider coreScopeProvider,
+        IOptions<GlobalSettings> globalSettings,
+        IOptions<WebRoutingSettings> webRoutingSettings,
+        UrlSegmentProviderCollection urlSegmentProviderCollection,
+        IContentService contentService,
+        IShortStringHelper shortStringHelper,
+        ILanguageService languageService,
+        IKeyValueService keyValueService,
+        IIdKeyMap idKeyMap,
+        IDocumentNavigationQueryService documentNavigationQueryService,
+        IPublishStatusQueryService publishStatusQueryService,
+        IDomainCacheService domainCacheService,
+        IDefaultCultureAccessor defaultCultureAccessor)
     {
         _logger = logger;
         _documentUrlRepository = documentUrlRepository;
         _documentRepository = documentRepository;
         _coreScopeProvider = coreScopeProvider;
         _globalSettings = globalSettings.Value;
+        _webRoutingSettings = webRoutingSettings.Value;
         _urlSegmentProviderCollection = urlSegmentProviderCollection;
         _contentService = contentService;
         _shortStringHelper = shortStringHelper;
@@ -126,6 +172,7 @@ public class DocumentUrlService : IDocumentUrlService
         _documentNavigationQueryService = documentNavigationQueryService;
         _publishStatusQueryService = publishStatusQueryService;
         _domainCacheService = domainCacheService;
+        _defaultCultureAccessor = defaultCultureAccessor;
     }
 
     /// <inheritdoc/>
@@ -492,6 +539,37 @@ public class DocumentUrlService : IDocumentUrlService
         }
 
         scope.Complete();
+    }
+
+    /// <inheritdoc/>
+    public Guid? GetDocumentKeyByUri(Uri uri, bool isDraft)
+    {
+        IEnumerable<Domain> domains = _domainCacheService.GetAll(false);
+        DomainAndUri? domain = DomainUtilities.SelectDomain(domains, uri, defaultCulture: _defaultCultureAccessor.DefaultCulture);
+
+        string route;
+        if (domain is not null)
+        {
+            route = domain.ContentId + DomainUtilities.PathRelativeToDomain(domain.Uri, uri.GetAbsolutePathDecoded());
+        }
+        else
+        {
+            // If we have configured strict domain matching, and a domain has not been found for the request configured on an ancestor node,
+            // do not route the content by URL.
+            if (_webRoutingSettings.UseStrictDomainMatching)
+            {
+                return null;
+            }
+
+            // Default behaviour if strict domain matching is not enabled will be to route under the to the first root node found.
+            route = uri.GetAbsolutePathDecoded();
+        }
+
+        return GetDocumentKeyByRoute(
+            domain is null ? route : route[domain.ContentId.ToString().Length..],
+            domain?.Culture,
+            domain?.ContentId,
+            isDraft);
     }
 
     /// <inheritdoc/>

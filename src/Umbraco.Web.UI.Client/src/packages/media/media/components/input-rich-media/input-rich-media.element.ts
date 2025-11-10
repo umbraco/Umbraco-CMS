@@ -388,6 +388,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 
 	#renderAddButton() {
 		if (this.readonly) return nothing;
+		if (this.max === 1 && this._cards.length > 0) return nothing;
 		return html`
 			<uui-button
 				id="btn-add"
