@@ -1,29 +1,26 @@
-import { customElement, html, nothing } from "@umbraco-cms/backoffice/external/lit";
-import { UmbPropertyValuePresentationBaseElement } from "../../../core/property-value-presentation/index.js";
+import { UmbPropertyValuePresentationBaseElement } from '../../../core/property-value-presentation/index.js';
+import { customElement, html, nothing } from '@umbraco-cms/backoffice/external/lit';
 
-@customElement("umb-date-only-picker-property-value-presentation")
+@customElement('umb-date-only-picker-property-value-presentation')
 export class UmbDateOnlyPickerPropertyValuePresentation extends UmbPropertyValuePresentationBaseElement {
+	override render() {
+		const date = this.#getDate();
+		return date ? html`<span>${date}</span>` : nothing;
+	}
 
-  override render() {
-    const date = this.#getDate();
-    return date
-      ? html`<span>${date}</span>`
-      : nothing;
-  }
+	#getDate() {
+		if (!this.value) {
+			return null;
+		}
 
-  #getDate() {
-    if (!this.value) {
-      return null;
-    }
-
-    return new Date(this.value.date).toLocaleDateString();
-  }
+		return new Date(this.value.date).toLocaleDateString();
+	}
 }
 
 export default UmbDateOnlyPickerPropertyValuePresentation;
 
 declare global {
-  interface HTMLElementTagNameMap {
-    ["umb-date-only-picker-property-value-presentation"]: UmbDateOnlyPickerPropertyValuePresentation;
-  }
+	interface HTMLElementTagNameMap {
+		'umb-date-only-picker-property-value-presentation': UmbDateOnlyPickerPropertyValuePresentation;
+	}
 }

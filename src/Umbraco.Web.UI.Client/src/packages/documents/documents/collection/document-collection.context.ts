@@ -1,3 +1,5 @@
+import { UmbPropertyValuePresentationDisplayOption } from '../../../core/property-value-presentation/index.js';
+import type { ManifestPropertyValuePresentation } from '../../../core/property-value-presentation/index.js';
 import type { UmbDocumentCollectionFilterModel, UmbDocumentCollectionItemModel } from './types.js';
 import { UMB_DOCUMENT_TABLE_COLLECTION_VIEW_ALIAS } from './constants.js';
 import { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
@@ -7,7 +9,6 @@ import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { html } from '@umbraco-cms/backoffice/external/lit';
-import { UmbPropertyValuePresentationDisplayOption, type ManifestPropertyValuePresentation } from '../../../core/property-value-presentation/index.js';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 export type UmbGetPropertyValueByAliasArgs = {
@@ -21,7 +22,7 @@ export type UmbGetPropertyValueByAliasArgs = {
 	updater?: string | null | undefined;
 	sortOrder: number;
 	values: Array<{ alias: string; editorAlias: string; culture?: string; segment?: string; value: string }>;
-}
+};
 
 export class UmbDocumentCollectionContext extends UmbDefaultCollectionContext<
 	UmbDocumentCollectionItemModel,
@@ -41,9 +42,7 @@ export class UmbDocumentCollectionContext extends UmbDefaultCollectionContext<
 			this.#observeDisplayCulture();
 		});
 
-		this.#propertyValuePresentationManifests = umbExtensionsRegistry.getByType(
-			'propertyValuePresentation',
-		);
+		this.#propertyValuePresentationManifests = umbExtensionsRegistry.getByType('propertyValuePresentation');
 	}
 
 	#observeDisplayCulture() {
@@ -108,8 +107,11 @@ export class UmbDocumentCollectionContext extends UmbDefaultCollectionContext<
 						return html`<umb-extension-slot
 							type="propertyValuePresentation"
 							.filter=${(x: ManifestPropertyValuePresentation) => x.propertyEditorAlias === prop.editorAlias}
-							.props=${{ alias: alias, value: value, display: UmbPropertyValuePresentationDisplayOption.COLLECTION_COLUMN }}
-						>
+							.props=${{
+								alias: alias,
+								value: value,
+								display: UmbPropertyValuePresentationDisplayOption.COLLECTION_COLUMN,
+							}}>
 						</umb-extension-slot>`;
 					}
 
@@ -122,7 +124,9 @@ export class UmbDocumentCollectionContext extends UmbDefaultCollectionContext<
 	}
 
 	#getPropertyValuePresentationManifest(propertyEditorAlias: string) {
-		return this.#propertyValuePresentationManifests.filter((manifest) => manifest.propertyEditorAlias === propertyEditorAlias);
+		return this.#propertyValuePresentationManifests.filter(
+			(manifest) => manifest.propertyEditorAlias === propertyEditorAlias,
+		);
 	}
 }
 
