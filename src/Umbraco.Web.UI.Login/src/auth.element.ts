@@ -10,8 +10,8 @@ import { UmbSlimBackofficeController } from './controllers/index.js';
 import authStyles from './auth-styles.css?inline';
 
 // Import the SVG files
-import openEyeSVG from './assets/openEye.svg?raw';
-import closedEyeSVG from './assets/closedEye.svg?raw';
+import svgEyeOpen from './assets/eye-open.svg?raw';
+import svgEyeClosed from './assets/eye-closed.svg?raw';
 
 // Import the main bundle
 import { extensions } from './umbraco-package.js';
@@ -70,7 +70,7 @@ const createShowPasswordToggleButton = (opts: {
 	button.name = opts.name;
 	button.type = 'button';
 
-	button.innerHTML = openEyeSVG;
+	button.innerHTML = svgEyeOpen;
 
 	button.onclick = () => {
 		const passwordInput = document.getElementById('password-input') as HTMLInputElement;
@@ -78,11 +78,11 @@ const createShowPasswordToggleButton = (opts: {
 		if (passwordInput.type === 'password') {
 			passwordInput.type = 'text';
 			button.ariaLabel = opts.ariaLabelHidePassword;
-			button.innerHTML = closedEyeSVG;
+			button.innerHTML = svgEyeClosed;
 		} else {
 			passwordInput.type = 'password';
 			button.ariaLabel = opts.ariaLabelShowPassword;
-			button.innerHTML = openEyeSVG;
+			button.innerHTML = svgEyeOpen;
 		}
 
 		passwordInput.focus();
