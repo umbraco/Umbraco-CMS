@@ -1,10 +1,11 @@
-﻿using System.Collections.Specialized;
 using System.Data.Common;
-using System.Text;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Installer;
 using Umbraco.Cms.Core.Models.Installer;
 using Umbraco.Cms.Core.Models.Membership;
@@ -32,7 +33,9 @@ public class CreateUserStep : StepBase, IInstallStep
     private readonly IDbProviderFactoryCreator _dbProviderFactoryCreator;
     private readonly IMetricsConsentService _metricsConsentService;
     private readonly IJsonSerializer _jsonSerializer;
+    private readonly ILogger<CreateUserStep> _logger;
 
+    [Obsolete("Please use the constructor that takes all parameters. Scheduled for removal in Umbraco 19.")]
     public CreateUserStep(
         IUserService userService,
         DatabaseBuilder databaseBuilder,
@@ -44,71 +47,132 @@ public class CreateUserStep : StepBase, IInstallStep
         IDbProviderFactoryCreator dbProviderFactoryCreator,
         IMetricsConsentService metricsConsentService,
         IJsonSerializer jsonSerializer)
+        : this(
+            userService,
+            databaseBuilder,
+            httpClientFactory,
+            securitySettings,
+            connectionStrings,
+            cookieManager,
+            userManager,
+            dbProviderFactoryCreator,
+            metricsConsentService,
+            jsonSerializer,
+            StaticServiceProvider.Instance.GetRequiredService<ILogger<CreateUserStep>>())
     {
-        _userService = userService ?? throw new ArgumentNullException(nameof(userService));
-        _databaseBuilder = databaseBuilder ?? throw new ArgumentNullException(nameof(databaseBuilder));
+    }
+
+    public CreateUserStep(
+        IUserService userService,
+        DatabaseBuilder databaseBuilder,
+        IHttpClientFactory httpClientFactory,
+        IOptions<SecuritySettings> securitySettings,
+        IOptionsMonitor<ConnectionStrings> connectionStrings,
+        ICookieManager cookieManager,
+        IBackOfficeUserManager userManager,
+        IDbProviderFactoryCreator dbProviderFactoryCreator,
+        IMetricsConsentService metricsConsentService,
+        IJsonSerializer jsonSerializer,
+        ILogger<CreateUserStep> logger)
+    {
+        _userService = userService;
+        _databaseBuilder = databaseBuilder;
         _httpClientFactory = httpClientFactory;
-        _securitySettings = securitySettings.Value ?? throw new ArgumentNullException(nameof(securitySettings));
+        _securitySettings = securitySettings.Value;
         _connectionStrings = connectionStrings;
         _cookieManager = cookieManager;
-        _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
-        _dbProviderFactoryCreator = dbProviderFactoryCreator ?? throw new ArgumentNullException(nameof(dbProviderFactoryCreator));
+        _userManager = userManager;
+        _dbProviderFactoryCreator = dbProviderFactoryCreator;
         _metricsConsentService = metricsConsentService;
         _jsonSerializer = jsonSerializer;
+        _logger = logger;
     }
 
     public async Task<Attempt<InstallationResult>> ExecuteAsync(InstallData model)
     {
-            IUser? admin = _userService.GetAsync(Constants.Security.SuperUserKey).GetAwaiter().GetResult();
-            if (admin is null)
+        IUser? admin = await _userService.GetAsync(Constants.Security.SuperUserKey);
+        if (admin is null)
+        {
+            return FailWithMessage("Could not find the super user");
+        }
+
+        UserInstallData user = model.User;
+        admin.Email = user.Email.Trim();
+        admin.Name = user.Name.Trim();
+        admin.Username = user.Email.Trim();
+
+        _userService.Save(admin);
+
+        BackOfficeIdentityUser? membershipUser = await _userManager.FindByIdAsync(Constants.Security.SuperUserIdAsString);
+        if (membershipUser == null)
+        {
+            return FailWithMessage(
+                $"No user found in membership provider with id of {Constants.Security.SuperUserIdAsString}.");
+        }
+
+        // To change the password here we actually need to reset it since we don't have an old one to use to change
+        var resetToken = await _userManager.GeneratePasswordResetTokenAsync(membershipUser);
+        if (string.IsNullOrWhiteSpace(resetToken))
+        {
+            return FailWithMessage("Could not reset password: unable to generate internal reset token");
+        }
+
+        IdentityResult resetResult = await _userManager.ChangePasswordWithResetAsync(membershipUser.Id, resetToken, user.Password.Trim());
+        if (!resetResult.Succeeded)
+        {
+            return FailWithMessage("Could not reset password: " + string.Join(", ", resetResult.Errors.ToErrorMessage()));
+        }
+
+        await _metricsConsentService.SetConsentLevelAsync(model.TelemetryLevel);
+
+        if (model.User.SubscribeToNewsletter)
+        {
+            const string EmailCollectorUrl = "https://emailcollector.umbraco.io/api/EmailProxy";
+
+            var emailModel = new EmailModel
             {
-                return FailWithMessage("Could not find the super user");
-            }
+                Name = admin.Name,
+                Email = admin.Email,
+                UserGroup = [Constants.Security.AdminGroupAlias],
+            };
 
-            UserInstallData user = model.User;
-            admin.Email = user.Email.Trim();
-            admin.Name = user.Name.Trim();
-            admin.Username = user.Email.Trim();
-
-            _userService.Save(admin);
-
-            BackOfficeIdentityUser? membershipUser = await _userManager.FindByIdAsync(Constants.Security.SuperUserIdAsString);
-            if (membershipUser == null)
+            HttpClient httpClient = _httpClientFactory.CreateClient();
+            using var content = new StringContent(_jsonSerializer.Serialize(emailModel), System.Text.Encoding.UTF8, "application/json");
+            try
             {
-                return FailWithMessage(
-                    $"No user found in membership provider with id of {Constants.Security.SuperUserIdAsString}.");
-            }
-
-            // To change the password here we actually need to reset it since we don't have an old one to use to change
-            var resetToken = await _userManager.GeneratePasswordResetTokenAsync(membershipUser);
-            if (string.IsNullOrWhiteSpace(resetToken))
-            {
-                return FailWithMessage("Could not reset password: unable to generate internal reset token");
-            }
-
-            IdentityResult resetResult = await _userManager.ChangePasswordWithResetAsync(membershipUser.Id, resetToken, user.Password.Trim());
-            if (!resetResult.Succeeded)
-            {
-                return FailWithMessage("Could not reset password: " + string.Join(", ", resetResult.Errors.ToErrorMessage()));
-            }
-
-            await _metricsConsentService.SetConsentLevelAsync(model.TelemetryLevel);
-
-            if (model.User.SubscribeToNewsletter)
-            {
-                var values = new NameValueCollection { { "name", admin.Name }, { "email", admin.Email } };
-                var content = new StringContent(_jsonSerializer.Serialize(values), Encoding.UTF8, "application/json");
-
-                HttpClient httpClient = _httpClientFactory.CreateClient();
-
-                try
+                // Set a reasonable timeout of 5 seconds for web request to save subscriber.
+                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+                HttpResponseMessage response = await httpClient.PostAsync(EmailCollectorUrl, content, cts.Token);
+                if (response.IsSuccessStatusCode)
                 {
-                    HttpResponseMessage response = httpClient.PostAsync("https://shop.umbraco.com/base/Ecom/SubmitEmail/installer.aspx", content).Result;
+                    _logger.LogInformation("Successfully subscribed the user created on installation to the Umbraco newsletter.");
                 }
-                catch { /* fail in silence */ }
+                else
+                {
+                    _logger.LogWarning("Failed to subscribe the user created on installation to the Umbraco newsletter. Status code: {StatusCode}", response.StatusCode);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log and move on if a failure occurs, we don't want to block installation for this.
+                _logger.LogError(ex, "Exception occurred while trying to subscribe the user created on installation to the Umbraco newsletter.");
             }
 
-            return Success();
+        }
+
+        return Success();
+    }
+
+    /// <summary>
+    /// Model used to subscribe to the newsletter. Aligns with EmailModel defined in Umbraco.EmailMarketing.
+    /// </summary>
+    private class EmailModel
+    {
+        public required string Name { get; init; }
+
+        public required string Email { get; init; }
+
+        public required List<string> UserGroup { get; init; }
     }
 
     /// <inheritdoc/>
