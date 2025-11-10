@@ -70,7 +70,7 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 				this._activeTabKey = null;
 			} else if (this._tabs.length > 0) {
 				const tab = this._tabs[0];
-				this._activeTabKey = tab.ownerId ?? tab.ids?.[0];
+				this._activeTabKey = tab.ownerId ?? tab.ids[0];
 			}
 		}
 	}
@@ -97,7 +97,7 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 							this._tabs,
 							(tab) => tab.name,
 							(tab) => {
-								const tabKey = tab.ownerId ?? tab.ids?.[0];
+								const tabKey = tab.ownerId ?? tab.ids[0];
 
 								return html`<uui-tab
 									label=${this.localize.string(tab.name ?? '#general_unnamed')}
