@@ -31,6 +31,11 @@ public abstract class ContentJsonTypeResolverBase : DefaultJsonTypeInfoResolver
             return [typeof(ApiContentResponse)];
         }
 
+        if (jsonTypeInfo.Type == typeof(IApiElement))
+        {
+            return [typeof(ApiElement)];
+        }
+
         if (jsonTypeInfo.Type == typeof(IRichTextElement))
         {
             return [typeof(RichTextRootElement), typeof(RichTextGenericElement), typeof(RichTextTextElement)];
