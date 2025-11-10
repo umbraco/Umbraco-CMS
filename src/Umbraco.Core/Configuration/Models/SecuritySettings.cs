@@ -175,11 +175,4 @@ public class SecuritySettings
     /// </summary>
     [DefaultValue(StaticUserInviteEmailExpiry)]
     public TimeSpan UserInviteEmailExpiry { get; set; } = TimeSpan.Parse(StaticUserInviteEmailExpiry);
-
-    /// <summary>
-    ///     Gets or sets a value indicating whether to hide access and refresh tokens from the back-office client.
-    /// </summary>
-    [DefaultValue(StaticHideBackOfficeTokens)]
-    [Obsolete("This is only configurable in Umbraco 16. Scheduled for removal in Umbraco 17.")]
-    public bool HideBackOfficeTokens { get; set; } = StaticHideBackOfficeTokens;
 }

@@ -30,10 +30,9 @@ public static class UmbracoBuilderAuthExtensions
     private static void ConfigureOpenIddict(IUmbracoBuilder builder)
     {
         // Optionally hide tokens from the back-office.
-        SecuritySettings securitySettings = builder.Config
-            .GetSection(Constants.Configuration.ConfigSecurity)
-            .Get<SecuritySettings>() ?? new SecuritySettings();
-        var hideBackOfficeTokens = securitySettings.HideBackOfficeTokens;
+        var hideBackOfficeTokens = (builder.Config
+            .GetSection(Constants.Configuration.ConfigBackOfficeTokenCookie)
+            .Get<BackOfficeTokenCookieSettings>() ?? new BackOfficeTokenCookieSettings()).Enabled;
 
         builder.Services.AddOpenIddict()
             // Register the OpenIddict server components.

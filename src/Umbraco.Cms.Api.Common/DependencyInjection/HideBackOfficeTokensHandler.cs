@@ -142,12 +142,11 @@ internal sealed class HideBackOfficeTokensHandler
             // Cookie path must be root for optimal security.
             Path = "/",
 
-            // Configurable cookie options (see BackOfficeTokenCookieSettings for defaults):
-            // - SameSite
-            // - Secure
-            // - Path
+            // Cookie must be secure.
+            Secure = true,
+
+            // SameSite is configurable (see BackOfficeTokenCookieSettings for defaults):
             SameSite = ParseSameSiteMode(_backOfficeTokenCookieSettings.SameSite),
-            Secure = _backOfficeTokenCookieSettings.Secure,
         };
 
         httpContext.Response.Cookies.Delete(key, cookieOptions);
