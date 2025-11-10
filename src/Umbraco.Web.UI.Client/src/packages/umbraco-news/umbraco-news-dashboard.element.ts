@@ -106,7 +106,7 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 										${i.body ? html`<div class="card-text">${unsafeHTML(i.body)}</div>` : null}
 										${!isLastRow && i.url
 											? html`<div class="card-actions">
-													<uui-button look="outline" href=${i.url} target="_blank">
+													<uui-button look="outline" href=${i.url} target="_blank" label=${i.buttonText || 'Open'}>
 														${i.buttonText || 'Open'}
 													</uui-button>
 												</div>`
