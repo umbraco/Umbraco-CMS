@@ -2,7 +2,7 @@ import type { ManifestElement } from '@umbraco-cms/backoffice/extension-api';
 
 export interface ManifestPropertyValuePresentation extends ManifestElement {
 	type: 'propertyValuePresentation';
-	propertyEditorAlias: string;
+	forPropertyEditorSchemaAlias: string | Array<string>;
 }
 
 declare global {
