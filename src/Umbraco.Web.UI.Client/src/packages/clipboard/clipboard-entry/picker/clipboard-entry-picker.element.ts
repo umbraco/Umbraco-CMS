@@ -122,7 +122,6 @@ export class UmbClipboardEntryPickerElement extends UmbLitElement {
 	};
 
 	async #clearClipboard() {
-		// Prompt the user to confirm clearing the clipboard
 		try {
 			await umbConfirmModal(this, {
 				headline: '#clipboard_labelForClearClipboard',
@@ -132,31 +131,16 @@ export class UmbClipboardEntryPickerElement extends UmbLitElement {
 				cancelLabel: '#general_cancel',
 			});
 		} catch {
-			// User closed or explictly canceled the modal
 			return;
 		}
 
 		for (const item of this._items) {
-			// Clipboard items are a collection of items and the UmbClipboardContext
-			// does not expose a method to use the delete from the underlying clipboardDetailRepository
 			const { error } = await this.#clipboardDetailRepository.delete(item.unique);
 			if (error) {
 				console.error(`Unable to delete clipboard item with unique ${item.unique}`, error);
 			}
-
-			// It did not update/refresh the UI of items/collection after calling delete
-			// Should I dispatch an event to notify this same component to refresh?
-			// Or explictly call request items again which just works
-
-			// const event = new UmbRequestReloadStructureForEntityEvent({
-			// 	unique: item.unique,
-			// 	entityType: item.entityType,
-			// });
-
-			// this.dispatchEvent(event);
 		}
 
-		// Update the list after clearing out items
 		this.#requestItems();
 	}
 
