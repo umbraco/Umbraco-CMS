@@ -2,6 +2,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+/// Defines service methods for querying property type usage.
+/// </summary>
 public interface IPropertyTypeUsageService
 {
     /// <summary>

@@ -29,7 +29,7 @@ export default {
 		receivedErrorFromServer: 'Received an error from the server',
 		resetCodeExpired: 'The link you have clicked on is invalid or has expired',
 		userInviteWelcomeMessage:
-			'Hello there and welcome to Umbraco! In just 1 minute you’ll be good to go, we just need you to setup a password.',
+			"Hello there and welcome to Umbraco! In just 1 minute you'll be good to go, we just need you to setup a password.",
 		userInviteExpiredMessage:
 			'Welcome to Umbraco! Unfortunately your invite has expired. Please contact your administrator and ask them to resend it.',
 		newPassword: 'New password',
@@ -51,6 +51,9 @@ export default {
 		returnToLogin: 'Return to login',
 		localLoginDisabled: 'Unfortunately, direct login is not possible. It has been disabled by a provider.',
 		friendlyGreeting: 'Hello',
+		requiredEmailValidationMessage: 'Please fill in an email',
+		requiredUsernameValidationMessage: 'Please fill in a username',
+		requiredPasswordValidationMessage: 'Please fill in a password',
 		showPassword: 'Show password',
 		hidePassword: 'Hide password',
 	},

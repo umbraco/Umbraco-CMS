@@ -98,7 +98,6 @@ export class UmbInstalledPackagesSectionViewElement extends UmbLitElement implem
 						(item) => item.name,
 						(item) => html`
 							<umb-installed-packages-section-view-item
-								custom-icon="icon-sync"
 								.name=${item.name}
 								.version=${item.version}
 								.hasPendingMigrations=${item.hasPendingMigrations}>
