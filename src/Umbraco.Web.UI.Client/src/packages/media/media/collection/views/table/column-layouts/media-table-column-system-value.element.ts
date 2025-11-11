@@ -4,7 +4,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbTableColumn, UmbTableColumnLayoutElement, UmbTableItem } from '@umbraco-cms/backoffice/components';
 
 @customElement('umb-media-table-column-system-value')
-export class UmbDocumentTableColumnSystemValueElement extends UmbLitElement implements UmbTableColumnLayoutElement {
+export class UmbMediaTableColumnSystemValueElement extends UmbLitElement implements UmbTableColumnLayoutElement {
 	column!: UmbTableColumn;
 	item!: UmbTableItem;
 
@@ -46,10 +46,10 @@ export class UmbDocumentTableColumnSystemValueElement extends UmbLitElement impl
 	}
 }
 
-export default UmbDocumentTableColumnSystemValueElement;
+export default UmbMediaTableColumnSystemValueElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-media-table-column-system-value': UmbDocumentTableColumnSystemValueElement;
+		'umb-media-table-column-system-value': UmbMediaTableColumnSystemValueElement;
 	}
 }
