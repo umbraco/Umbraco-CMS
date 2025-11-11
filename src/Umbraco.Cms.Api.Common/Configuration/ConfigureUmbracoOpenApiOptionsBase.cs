@@ -58,7 +58,19 @@ public abstract class ConfigureUmbracoOpenApiOptionsBase : IConfigureNamedOption
     /// <param name="options">The <see cref="OpenApiOptions"/> instance to configure.</param>
     protected abstract void ConfigureOpenApi(OpenApiOptions options);
 
-    private static string? CreateSchemaReferenceId(JsonTypeInfo jsonTypeInfo)
+    private bool ShouldInclude(ApiDescription apiDescription)
+    {
+        if (apiDescription.ActionDescriptor is ControllerActionDescriptor controllerActionDescriptor && controllerActionDescriptor.HasMapToApiAttribute(ApiName))
+        {
+            return true;
+        }
+
+        ApiVersionMetadata apiVersionMetadata = apiDescription.ActionDescriptor.GetApiVersionMetadata();
+        return apiVersionMetadata.Name == ApiName
+               || (string.IsNullOrEmpty(apiVersionMetadata.Name) && ApiName == DefaultApiConfiguration.ApiName);
+    }
+
+    public static string? CreateSchemaReferenceId(JsonTypeInfo jsonTypeInfo)
     {
         // Ensure that only types that would normally be included in the schema generation are given a schema reference ID.
         // Otherwise, we should return null to inline them.
@@ -71,17 +83,5 @@ public abstract class ConfigureUmbracoOpenApiOptionsBase : IConfigureNamedOption
         return jsonTypeInfo.Type.Namespace?.StartsWith("Umbraco.Cms") == true
             ? UmbracoSchemaIdGenerator.Generate(jsonTypeInfo.Type)
             : defaultSchemaReferenceId;
-    }
-
-    private bool ShouldInclude(ApiDescription apiDescription)
-    {
-        if (apiDescription.ActionDescriptor is ControllerActionDescriptor controllerActionDescriptor && controllerActionDescriptor.HasMapToApiAttribute(ApiName))
-        {
-            return true;
-        }
-
-        ApiVersionMetadata apiVersionMetadata = apiDescription.ActionDescriptor.GetApiVersionMetadata();
-        return apiVersionMetadata.Name == ApiName
-               || (string.IsNullOrEmpty(apiVersionMetadata.Name) && ApiName == DefaultApiConfiguration.ApiName);
     }
 }
