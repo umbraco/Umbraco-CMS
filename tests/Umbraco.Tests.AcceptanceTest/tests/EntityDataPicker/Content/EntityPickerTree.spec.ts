@@ -6,9 +6,7 @@ const documentTypeName = 'TestDocumentTypeForContent';
 const dataTypeName = 'EntityPickerWithTree';
 const treeDataSourceAlias = 'My.PickerDataSource.Tree';
 
-test.beforeEach(async ({umbracoApi, umbracoUi}) => {
-  await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
-  await umbracoApi.document.ensureNameNotExists(contentName);
+test.beforeEach(async ({umbracoUi}) => {
   await umbracoUi.goToBackOffice();
 });
 

@@ -37,10 +37,7 @@ else
 // Ids for Example 4 and Example 2
 const items = {ids: ['4', '2']};
 
-test.beforeEach(async ({umbracoApi, umbracoUi}) => {
-  await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
-  await umbracoApi.document.ensureNameNotExists(contentName);
-  await umbracoApi.template.ensureNameNotExists(templateName);
+test.beforeEach(async ({umbracoUi}) => {
   await umbracoUi.goToBackOffice();
 });
 

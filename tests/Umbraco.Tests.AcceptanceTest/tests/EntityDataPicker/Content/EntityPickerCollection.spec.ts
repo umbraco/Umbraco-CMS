@@ -6,9 +6,7 @@ const documentTypeName = 'TestDocumentTypeForContent';
 const dataTypeName = 'EntityPickerWithCollection';
 const collectionDataSourceAlias = 'My.PickerDataSource.Collection';
 
-test.beforeEach(async ({umbracoApi, umbracoUi}) => {
-  await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
-  await umbracoApi.document.ensureNameNotExists(contentName);
+test.beforeEach(async ({umbracoUi}) => {
   await umbracoUi.goToBackOffice();
 });
 
@@ -18,7 +16,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
 });
 
-test('can create empty with a content entity picker with the collection data source', async ({umbracoApi, umbracoUi}) => {
+test('can create empty content with a entity picker with the collection data source', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Draft';
   const dataTypeId = await umbracoApi.dataType.createEntityDataPickerDataType(dataTypeName, collectionDataSourceAlias);
