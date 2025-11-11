@@ -20,6 +20,7 @@ import './column-layouts/document-entity-actions-table-column-view.element.js';
 import './column-layouts/document-table-column-name.element.js';
 import './column-layouts/document-table-column-property-value.element.js';
 import './column-layouts/document-table-column-state.element.js';
+import './column-layouts/document-table-column-system-value.element.js';
 
 @customElement('umb-document-table-collection-view')
 export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
@@ -106,7 +107,10 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 				return {
 					name: this.localize.string(item.header),
 					alias: item.alias,
-					elementName: item.elementName || 'umb-document-table-column-property-value',
+					elementName:
+						item.elementName || item.isSystem
+							? 'umb-document-table-column-system-value'
+							: 'umb-document-table-column-property-value',
 					labelTemplate: item.nameTemplate,
 					allowSorting: true,
 				};
