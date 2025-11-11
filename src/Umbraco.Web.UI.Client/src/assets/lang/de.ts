@@ -903,7 +903,18 @@ export default {
 		newVersionAvailable: 'Neue Version verfügbar',
 	},
 	colors: {
+		black: 'Schwarz',
 		blue: 'Blau',
+		brown: 'Braun',
+		cyan: 'Cyan',
+		green: 'Grün',
+		lightBlue: 'Hellblau',
+		pink: 'Pink',
+		red: 'Rot',
+		text: 'Schwarz',
+		yellow: 'Gelb',
+		white: 'Weiß',
+		grey: 'Grau',
 	},
 	shortcuts: {
 		addTab: 'Tab hinzufügen',
@@ -1273,14 +1284,6 @@ export default {
 		settings: 'Einstellungen',
 		translation: 'Übersetzung',
 		users: 'Benutzer',
-	},
-	help: {
-		tours: 'Touren',
-		theBestUmbracoVideoTutorials: 'Die besten Umbraco-Video-Tutorials',
-		umbracoForum: 'Besuche our.umbraco.com',
-		umbracoTv: 'Besuche umbraco.tv',
-		umbracoLearningBase: 'Schaue gratis Tutorials',
-		umbracoLearningBaseDescription: 'von Umbraco Learning Base',
 	},
 	settings: {
 		defaulttemplate: 'Standardvorlage',

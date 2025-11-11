@@ -188,6 +188,12 @@ export class UmbTreeItemChildrenManager<
 	 * @memberof UmbTreeItemChildrenManager
 	 */
 	public async loadChildren(): Promise<void> {
+		const target = this.targetPagination.getBaseTarget();
+		/* If a new target is set we only want to reload children if the new target isn’t among the already loaded items. */
+		if (target && this.isChildLoaded(target)) {
+			return;
+		}
+
 		return this.#loadChildren();
 	}
 
@@ -244,7 +250,7 @@ export class UmbTreeItemChildrenManager<
 							? this.targetPagination.getNumberOfCurrentItemsBeforeBaseTarget()
 							: this.#takeBeforeTarget !== undefined
 								? this.#takeBeforeTarget
-								: 5,
+								: this.targetPagination.getTakeSize(),
 						takeAfter: reload
 							? this.targetPagination.getNumberOfCurrentItemsAfterBaseTarget()
 							: this.#takeAfterTarget !== undefined

@@ -901,9 +901,6 @@ export default {
 		help: 'Ayuda',
 		packages: 'Paquetes',
 	},
-	help: {
-		theBestUmbracoVideoTutorials: 'Los mejores tutoriales en video para Umbraco',
-	},
 	settings: {
 		defaulttemplate: 'Plantilla por defecto',
 		importDocumentTypeHelp:
