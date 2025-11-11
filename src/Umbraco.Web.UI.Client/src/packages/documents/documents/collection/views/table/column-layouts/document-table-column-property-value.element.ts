@@ -1,25 +1,14 @@
 import { UmbDocumentItemDataResolver } from '../../../../item/index.js';
-import { UMB_DOCUMENT_COLLECTION_CONTEXT } from '../../../document-collection.context-token.js';
-import type { UmbDocumentCollectionContext } from '../../../document-collection.context.js';
 import type { UmbEditableDocumentCollectionItemModel } from '../../../types.js';
 import { customElement, html, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbTableColumn, UmbTableColumnLayoutElement, UmbTableItem } from '@umbraco-cms/backoffice/components';
+import type { ManifestPropertyValuePresentation } from '@umbraco-cms/backoffice/property-value-presentation';
+import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-document-table-column-property-value')
 export class UmbDocumentTableColumnPropertyValueElement extends UmbLitElement implements UmbTableColumnLayoutElement {
-	#collectionContext?: UmbDocumentCollectionContext;
-
 	#resolver = new UmbDocumentItemDataResolver(this);
-
-	@state()
-	private _createDate?: Date;
-
-	@state()
-	private _state?: string;
-
-	@state()
-	private _updateDate?: Date;
 
 	column!: UmbTableColumn;
 	item!: UmbTableItem;
@@ -37,41 +26,35 @@ export class UmbDocumentTableColumnPropertyValueElement extends UmbLitElement im
 	}
 	#value!: UmbEditableDocumentCollectionItemModel;
 
-	constructor() {
-		super();
-
-		this.consumeContext(UMB_DOCUMENT_COLLECTION_CONTEXT, (instance) => {
-			this.#collectionContext = instance;
-		});
-
-		this.#resolver.observe(this.#resolver.state, (state) => (this._state = state || ''));
-		this.#resolver.observe(this.#resolver.createDate, (createDate) => (this._createDate = createDate));
-		this.#resolver.observe(this.#resolver.updateDate, (updateDate) => (this._updateDate = updateDate));
-	}
-
-	#getPropertyValueByAlias() {
-		const args = {
-			alias: this.column.alias,
-			documentTypeAlias: this.value.item.documentType.alias,
-			createDate: this._createDate,
-			updateDate: this._updateDate,
-			state: this._state,
-			culture: this.#resolver.getCulture(),
-			creator: this.value.item.creator,
-			updater: this.value.item.updater,
-			sortOrder: this.value.item.sortOrder,
-			values: this.value.item.values,
-		};
-		return this.#collectionContext?.getPropertyValueByAlias(args);
+	#getPropertyByAlias() {
+		const alias = this.column.alias;
+		const item = this.value.item;
+		const culture = this.#resolver.getCulture();
+		const prop = item.values.find((x) => x.alias === alias && (!x.culture || x.culture === culture));
+		return prop;
 	}
 
 	override render() {
-		if (!this.value) return nothing;
-		const value = this.#getPropertyValueByAlias();
+		if (!this.value?.item) return nothing;
+		const prop = this.#getPropertyByAlias();
+		const props = { value: prop?.value ?? '' };
+
+		if (this.column.labelTemplate) {
+			return html`<umb-ufm-render inline .markdown=${this.column.labelTemplate} .value=${{ props }}></umb-ufm-render>`;
+		}
+
 		return when(
-			this.column.labelTemplate,
-			() => html`<umb-ufm-render inline .markdown=${this.column.labelTemplate} .value=${{ value }}></umb-ufm-render>`,
-			() => html`${value}`,
+			prop?.editorAlias,
+			(schemaAlias) => html`
+				<umb-extension-slot
+					type="propertyValuePresentation"
+					.filter=${(m: ManifestPropertyValuePresentation) =>
+						stringOrStringArrayContains(m.forPropertyEditorSchemaAlias, schemaAlias)}
+					.props=${props}>
+					${prop?.value ?? nothing}
+				</umb-extension-slot>
+			`,
+			() => (prop?.value ? html`${prop.value}` : nothing),
 		);
 	}
 }
