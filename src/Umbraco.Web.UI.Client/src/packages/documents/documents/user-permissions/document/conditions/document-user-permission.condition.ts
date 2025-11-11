@@ -1,7 +1,8 @@
 import { isDocumentUserPermission } from '../utils.js';
 import type { UmbDocumentUserPermissionConditionConfig } from './types.js';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
-import { UMB_ANCESTORS_ENTITY_CONTEXT, UMB_ENTITY_CONTEXT, type UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
+import { UMB_ANCESTORS_ENTITY_CONTEXT, UMB_ENTITY_CONTEXT, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import { UMB_DOCUMENT_ENTITY_TYPE } from '@umbraco-cms/backoffice/document';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbConditionControllerArguments, UmbExtensionCondition } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -16,7 +17,7 @@ export class UmbDocumentUserPermissionCondition
 	#unique: string | null | undefined;
 	#documentPermissions: Array<DocumentPermissionPresentationModel> = [];
 	#fallbackPermissions: string[] = [];
-	#ancestors: Array<UmbEntityUnique> = [];
+	#ancestors: Array<UmbEntityModel> = [];
 
 	constructor(
 		host: UmbControllerHost,
@@ -57,7 +58,7 @@ export class UmbDocumentUserPermissionCondition
 			this.observe(
 				instance?.ancestors,
 				(ancestors) => {
-					this.#ancestors = ancestors?.map((item) => item.unique) ?? [];
+					this.#ancestors = ancestors ?? [];
 					this.#checkPermissions();
 				},
 				'observeAncestors',
@@ -71,36 +72,41 @@ export class UmbDocumentUserPermissionCondition
 
 		const hasDocumentPermissions = this.#documentPermissions.length > 0;
 
-		// if there is no permissions for any documents we use the fallback permissions
-		if (!hasDocumentPermissions) {
-			this.#check(this.#fallbackPermissions);
-			return;
-		}
-
-		// If there are document permissions, we need to check the full path to see if any permissions are defined for the current document
+		// If there are document permissions, we need to check the full path to see if any permissions are defined for the current entity
 		// If we find multiple permissions in the same path, we will apply the closest one
 		if (hasDocumentPermissions) {
-			// Path including the current document and all ancestors
-			const path = [...this.#ancestors, this.#unique].filter((unique) => unique !== null);
-			// Reverse the path to find the closest document permission quickly
-			const reversedPath = [...path].reverse();
-			const documentPermissionsMap = new Map(this.#documentPermissions.map((p) => [p.document.id, p]));
+			// Path including the current document and all ancestors, reversed to find the closest permission
+			const reversedPath = [
+				...this.#ancestors,
+				{
+					entityType: this.#entityType,
+					unique: this.#unique,
+				},
+			]
+				.filter((m) => m.entityType === UMB_DOCUMENT_ENTITY_TYPE && m.unique !== null)
+				.reverse();
 
-			// Find the closest document permission in the path
-			const closestDocumentPermission = reversedPath.find((id) => documentPermissionsMap.has(id));
+			const documentPermissionsMap: Map<string | null, DocumentPermissionPresentationModel> = new Map(
+				this.#documentPermissions.map((m) => [m.document.id, m]),
+			);
+
+			// Find the closest document with permissions in the path
+			const closestDocumentWithPermission = reversedPath.find((m) => documentPermissionsMap.has(m.unique));
 
 			// Retrieve the corresponding permission data
-			const match = closestDocumentPermission ? documentPermissionsMap.get(closestDocumentPermission) : undefined;
+			const match = closestDocumentWithPermission
+				? documentPermissionsMap.get(closestDocumentWithPermission.unique)
+				: undefined;
 
-			// no permissions for the current document - use the fallback permissions
-			if (!match) {
-				this.#check(this.#fallbackPermissions);
+			if (match) {
+				// we found permissions - check them
+				this.#check(match.verbs);
 				return;
 			}
-
-			// we found permissions - check them
-			this.#check(match.verbs);
 		}
+
+		// if there is no permissions for any documents we use the fallback permissions
+		this.#check(this.#fallbackPermissions);
 	}
 
 	#check(verbs: Array<string>) {
