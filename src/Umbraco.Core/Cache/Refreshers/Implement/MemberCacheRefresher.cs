@@ -71,10 +71,10 @@ public sealed class MemberCacheRefresher : PayloadCacheRefresherBase<MemberCache
 
     public override string Name => "Member Cache Refresher";
 
-    public override void Refresh(JsonPayload[] payloads)
+    public override void RefreshInternal(JsonPayload[] payloads)
     {
         ClearCache(payloads);
-        base.Refresh(payloads);
+        base.RefreshInternal(payloads);
     }
 
     public override void Refresh(int id)

@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
@@ -276,13 +277,14 @@ public interface IContentService : IContentServiceBase<IContent>
     bool HasChildren(int id);
 
     /// <summary>
-    ///     Gets the content keys from the provided collection of keys that are scheduled for publishing.
+    ///     Gets a dictionary of content Ids and their matching content schedules.
     /// </summary>
     /// <param name="keys">The content keys.</param>
     /// <returns>
-    ///     The provided collection of content keys filtered for those that are scheduled for publishing.
+    ///     A dictionary with a nodeId and an IEnumerable of matching ContentSchedules.
     /// </returns>
-    IEnumerable<Guid> GetScheduledContentKeys(IEnumerable<Guid> keys) => [];
+    IDictionary<int, IEnumerable<ContentSchedule>> GetContentSchedulesByIds(Guid[] keys) => ImmutableDictionary<int, IEnumerable<ContentSchedule>>.Empty;
+
 
     #endregion
 
@@ -403,23 +405,6 @@ public interface IContentService : IContentServiceBase<IContent>
     /// <param name="cultures">The cultures to publish.</param>
     /// <param name="userId">The identifier of the user performing the action.</param>
     PublishResult Publish(IContent content, string[] cultures, int userId = Constants.Security.SuperUserId);
-
-    /// <summary>
-    ///     Publishes a document branch.
-    /// </summary>
-    /// <param name="content">The root document.</param>
-    /// <param name="force">A value indicating whether to force-publish documents that are not already published.</param>
-    /// <param name="cultures">The cultures to publish.</param>
-    /// <param name="userId">The identifier of the user performing the operation.</param>
-    /// <remarks>
-    ///     <para>
-    ///         The <paramref name="force" /> parameter determines which documents are published. When <c>false</c>,
-    ///         only those documents that are already published, are republished. When <c>true</c>, all documents are
-    ///         published. The root of the branch is always published, regardless of <paramref name="force" />.
-    ///     </para>
-    /// </remarks>
-    [Obsolete("This method is not longer used as the 'force' parameter has been extended into options for publishing unpublished and re-publishing changed content. Please use the overload containing the parameter for those options instead. Will be removed in V17.")]
-    IEnumerable<PublishResult> PublishBranch(IContent content, bool force, string[] cultures, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Publishes a document branch.

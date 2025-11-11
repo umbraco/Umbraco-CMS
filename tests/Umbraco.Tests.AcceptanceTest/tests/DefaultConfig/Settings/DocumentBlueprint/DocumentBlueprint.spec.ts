@@ -23,7 +23,9 @@ test('can create a document blueprint from the settings menu', {tag: '@smoke'}, 
   // Act
   await umbracoUi.documentBlueprint.clickActionsMenuAtRoot();
   await umbracoUi.documentBlueprint.clickCreateActionMenuOption();
+  await umbracoUi.documentBlueprint.clickCreateNewDocumentBlueprintButton();
   await umbracoUi.documentBlueprint.clickTextButtonWithName(documentTypeName);
+  await umbracoUi.documentBlueprint.clickChooseButton();
   await umbracoUi.documentBlueprint.enterDocumentBlueprintName(documentBlueprintName);
   await umbracoUi.documentBlueprint.clickSaveButton();
 
@@ -108,7 +110,9 @@ test('can create a variant document blueprint', {tag: '@release'}, async ({umbra
   // Act
   await umbracoUi.documentBlueprint.clickActionsMenuAtRoot();
   await umbracoUi.documentBlueprint.clickCreateActionMenuOption();
+  await umbracoUi.documentBlueprint.clickCreateNewDocumentBlueprintButton();
   await umbracoUi.documentBlueprint.clickTextButtonWithName(documentTypeName);
+  await umbracoUi.documentBlueprint.clickChooseButton();
   await umbracoUi.documentBlueprint.enterDocumentBlueprintName(documentBlueprintName);
   await umbracoUi.documentBlueprint.clickSaveButton();
 

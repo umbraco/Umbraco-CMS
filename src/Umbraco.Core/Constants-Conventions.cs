@@ -100,6 +100,11 @@ public static partial class Constants
             ///     The default height/width of an image file if the size can't be determined from the metadata
             /// </summary>
             public const int DefaultSize = 200;
+
+            /// <summary>
+            ///     Suffix added to media files when moved to the recycle bin when recycle bin media protection is enabled.
+            /// </summary>
+            public const string TrashedMediaSuffix = ".deleted";
         }
 
         /// <summary>
@@ -305,12 +310,12 @@ public static partial class Constants
         }
 
         /// <summary>
-        ///     Constants for relating to view model signs.
+        ///     Constants for relating to view model flags.
         /// </summary>
-        public static class Signs
+        public static class Flags
         {
             /// <summary>
-            ///     Prefix for all sign aliases.
+            ///     Prefix for all flag aliases.
             /// </summary>
             public const string Prefix = "Umb.";
         }

@@ -1,14 +1,15 @@
 import { UmbClipboardCollectionRepository } from '../../collection/index.js';
 import type { UmbClipboardEntryDetailModel } from '../types.js';
-import { html, customElement, state, repeat, property } from '@umbraco-cms/backoffice/external/lit';
-import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
-import { UmbEntityContext, type UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
-import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { css, customElement, html, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import {
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 
 // TODO: make this into an extension point (Picker) with two kinds of pickers: tree-item-picker and collection-item-picker;
 @customElement('umb-clipboard-entry-picker')
@@ -117,19 +118,24 @@ export class UmbClipboardEntryPickerElement extends UmbLitElement {
 	};
 
 	override render() {
-		return html`${this._items.length > 0
-			? repeat(
+		return when(
+			this._items.length > 0,
+			() =>
+				repeat(
 					this._items,
 					(item) => item.unique,
 					(item) => this.#renderItem(item),
-				)
-			: html`There are no items in the clipboard`}`;
+				),
+			() => html`<p>There are no items in the clipboard.</p>`,
+		);
 	}
 
 	#renderItem(item: UmbClipboardEntryDetailModel) {
+		const label = item.name ?? item.unique;
 		return html`
 			<uui-menu-item
-				label=${item.name ?? ''}
+				label=${label}
+				title=${label}
 				selectable
 				@selected=${() => this.#selectionManager.select(item.unique)}
 				@deselected=${() => this.#selectionManager.deselect(item.unique)}
@@ -141,7 +147,7 @@ export class UmbClipboardEntryPickerElement extends UmbLitElement {
 
 	#renderItemIcon(item: UmbClipboardEntryDetailModel) {
 		const iconName = item.icon ?? 'icon-clipboard-entry';
-		return html`<uui-icon slot="icon" name=${iconName}></uui-icon>`;
+		return html`<umb-icon slot="icon" name=${iconName}></umb-icon>`;
 	}
 
 	#renderItemActions(item: UmbClipboardEntryDetailModel) {
@@ -150,7 +156,7 @@ export class UmbClipboardEntryPickerElement extends UmbLitElement {
 				slot="actions"
 				.entityType=${item.entityType}
 				.unique=${item.unique}
-				.label=${this.localize.term('actions_viewActionsFor', [item.name])}>
+				.label=${this.localize.string(item.name ?? '')}>
 			</umb-entity-actions-bundle>
 		`;
 	}
@@ -168,6 +174,14 @@ export class UmbClipboardEntryPickerElement extends UmbLitElement {
 
 		super.destroy();
 	}
+
+	static override styles = [
+		css`
+			:host {
+				--uui-menu-item-flat-structure: 1;
+			}
+		`,
+	];
 }
 
 declare global {

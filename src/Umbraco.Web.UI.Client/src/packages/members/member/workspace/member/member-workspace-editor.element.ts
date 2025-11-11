@@ -14,6 +14,8 @@ export class UmbMemberWorkspaceEditorElement extends UmbLitElement {
 
 	#workspaceContext?: typeof UMB_MEMBER_WORKSPACE_CONTEXT.TYPE;
 
+	#workspaceRoute?: string;
+
 	@state()
 	private _isForbidden = false;
 
@@ -34,7 +36,7 @@ export class UmbMemberWorkspaceEditorElement extends UmbLitElement {
 		// TODO: the variantOptions observable is like too broad as this will be triggered then there is any change in the variant options, we need to only update routes when there is a relevant change to them. [NL]
 		this.observe(
 			this.#workspaceContext?.variantOptions,
-			(variants) => this._generateRoutes(variants ?? []),
+			(variants) => this.#generateRoutes(variants ?? []),
 			'_observeVariants',
 		);
 	}
@@ -47,7 +49,7 @@ export class UmbMemberWorkspaceEditorElement extends UmbLitElement {
 		);
 	}
 
-	private async _generateRoutes(variants: Array<UmbMemberVariantOptionModel>) {
+	#generateRoutes(variants: Array<UmbMemberVariantOptionModel>) {
 		// Generate split view routes for all available routes
 		const routes: Array<UmbRoute> = [];
 
@@ -81,11 +83,19 @@ export class UmbMemberWorkspaceEditorElement extends UmbLitElement {
 		});
 
 		if (routes.length !== 0) {
-			// Using first single view as the default route for now (hence the math below):
 			routes.push({
 				path: '',
 				pathMatch: 'full',
-				redirectTo: routes[variants.length * variants.length]?.path,
+				//redirectTo: routes[variants.length * variants.length]?.path,
+				resolve: async () => {
+					if (!this.#workspaceContext) {
+						throw new Error('Workspace context is not available when resolving the default route.');
+					}
+
+					// Using first single view as the default route for now (hence the math below):
+					const path = routes[variants.length * variants.length]?.path;
+					history.replaceState({}, '', `${this.#workspaceRoute}/${path}`);
+				},
 			});
 		}
 
@@ -98,7 +108,8 @@ export class UmbMemberWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	private _gotWorkspaceRoute = (e: UmbRouterSlotInitEvent) => {
-		this.#workspaceContext?.splitView.setWorkspaceRoute(e.target.absoluteRouterPath);
+		this.#workspaceRoute = e.target.absoluteRouterPath;
+		this.#workspaceContext?.splitView.setWorkspaceRoute(this.#workspaceRoute);
 	};
 
 	override render() {

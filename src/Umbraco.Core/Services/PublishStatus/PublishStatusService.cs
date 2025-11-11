@@ -1,6 +1,4 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 
@@ -21,41 +19,6 @@ public class PublishStatusService : IPublishStatusManagementService, IPublishSta
     private readonly IDictionary<Guid, ISet<string>> _publishedCultures = new Dictionary<Guid, ISet<string>>();
 
     private string? DefaultCulture { get; set; }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="PublishStatusService"/> class.
-    /// </summary>
-    [Obsolete("Use non-obsolete constructor. This will be removed in Umbraco 17.")]
-    public PublishStatusService(
-        ILogger<PublishStatusService> logger,
-        IPublishStatusRepository publishStatusRepository,
-        ICoreScopeProvider coreScopeProvider)
-        : this(
-            logger,
-            publishStatusRepository,
-            coreScopeProvider,
-            StaticServiceProvider.Instance.GetRequiredService<ILanguageService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>())
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="PublishStatusService"/> class.
-    /// </summary>
-    [Obsolete("Use non-obsolete constructor. This will be removed in Umbraco 17.")]
-    public PublishStatusService(
-        ILogger<PublishStatusService> logger,
-        IPublishStatusRepository publishStatusRepository,
-        ICoreScopeProvider coreScopeProvider,
-        ILanguageService languageService)
-        : this(
-            logger,
-            publishStatusRepository,
-            coreScopeProvider,
-            languageService,
-            StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>())
-    {
-    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PublishStatusService"/> class.
@@ -106,7 +69,9 @@ public class PublishStatusService : IPublishStatusManagementService, IPublishSta
 
         if (_publishedCultures.TryGetValue(documentKey, out ISet<string>? publishedCultures))
         {
-            return publishedCultures.Contains(culture, StringComparer.InvariantCultureIgnoreCase);
+            // If "*" is provided as the culture, we consider this as "published in any culture". This aligns
+            // with behaviour in Umbraco 13.
+            return culture == Constants.System.InvariantCulture || publishedCultures.Contains(culture, StringComparer.InvariantCultureIgnoreCase);
         }
 
         _logger.LogDebug("Document {DocumentKey} not found in the publish status cache", documentKey);

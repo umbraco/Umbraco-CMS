@@ -14,7 +14,7 @@ interface UmbDocumentPickerInputContextOpenArgs {
 }
 
 export class UmbDocumentPickerInputContext extends UmbPickerInputContext<
-	UmbDocumentItemModel,
+	UmbDocumentItemModel & { name: string }, // HACK: [LK:2025-01-01]
 	UmbDocumentTreeItemModel,
 	UmbDocumentPickerModalData,
 	UmbDocumentPickerModalValue

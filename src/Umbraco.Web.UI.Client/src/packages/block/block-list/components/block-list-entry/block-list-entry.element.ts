@@ -5,42 +5,39 @@ import {
 	UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS,
 	UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS,
 } from '../../constants.js';
+import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement, umbDestroyOnDisconnect } from '@umbraco-cms/backoffice/lit-element';
-import { html, css, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
 import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
-import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
 import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
+import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
+import { UUIBlinkAnimationValue, UUIBlinkKeyframes } from '@umbraco-cms/backoffice/external/uui';
+import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
+import { UMB_CLIPBOARD_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/clipboard';
 import type {
 	ManifestBlockEditorCustomView,
 	UmbBlockEditorCustomViewProperties,
 } from '@umbraco-cms/backoffice/block-custom-view';
 import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
-import { UUIBlinkAnimationValue, UUIBlinkKeyframes } from '@umbraco-cms/backoffice/external/uui';
-import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
-import { UMB_CLIPBOARD_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/clipboard';
+import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
 
 import '../ref-list-block/index.js';
 import '../inline-list-block/index.js';
 import '../unsupported-list-block/index.js';
+
 /**
  * @element umb-block-list-entry
  */
 @customElement('umb-block-list-entry')
 export class UmbBlockListEntryElement extends UmbLitElement implements UmbPropertyEditorUiElement {
-	//
 	@property({ type: Number })
-	public get index(): number | undefined {
-		return this.#context.getIndex();
-	}
 	public set index(value: number | undefined) {
 		this.#context.setIndex(value);
 	}
+	public get index(): number | undefined {
+		return this.#context.getIndex();
+	}
 
 	@property({ attribute: false })
-	public get contentKey(): string | undefined {
-		return this._contentKey;
-	}
 	public set contentKey(value: string | undefined) {
 		if (!value) return;
 		this._contentKey = value;
@@ -55,6 +52,9 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			},
 			'observeMessagesForContent',
 		);
+	}
+	public get contentKey(): string | undefined {
+		return this._contentKey;
 	}
 	private _contentKey?: string | undefined;
 
@@ -146,7 +146,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			},
 			null,
 		);
-		// TODO: Implement index.
+		this.observe(this.#context.index, (index) => this.#updateBlockViewProps({ index }), null);
 		this.observe(
 			this.#context.label,
 			(label) => {
@@ -309,7 +309,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 
 		const workspaceName = propertyDatasetContext?.getName();
 		const propertyLabel = propertyContext?.getLabel();
-		const blockLabel = this._label;
+		const blockLabel = this.#context.getName();
 
 		const entryName = workspaceName
 			? `${workspaceName} - ${propertyLabel} - ${blockLabel}`
@@ -373,6 +373,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		return html`<umb-ref-list-block
 			.label=${this._label}
 			.icon=${this._icon}
+			.index=${this._blockViewProps.index}
 			.unpublished=${!this._exposed}
 			.config=${this._blockViewProps.config}
 			.content=${this._blockViewProps.content}
@@ -384,6 +385,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		return html`<umb-inline-list-block
 			.label=${this._label}
 			.icon=${this._icon}
+			.index=${this._blockViewProps.index}
 			.unpublished=${!this._exposed}
 			.config=${this._blockViewProps.config}
 			.content=${this._blockViewProps.content}

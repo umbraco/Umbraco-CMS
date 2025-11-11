@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache.PropertyEditors;
 using Umbraco.Cms.Core.Models;
@@ -31,8 +32,30 @@ internal static class RichTextEditorValueExtensions
         {
             foreach (BlockPropertyValue item in dataItem.Values)
             {
-                item.PropertyType = elementTypes.FirstOrDefault(x => x.Key == dataItem.ContentTypeKey)?.PropertyTypes.FirstOrDefault(pt => pt.Alias == item.Alias);
+                if (TryResolvePropertyType(elementTypes, dataItem.ContentTypeKey, item.Alias, out IPropertyType? resolvedPropertyType))
+                {
+                    item.PropertyType = resolvedPropertyType;
+                }
             }
         }
+    }
+
+    private static bool TryResolvePropertyType(IEnumerable<IContentType> elementTypes, Guid contentTypeKey, string propertyTypeAlias, [NotNullWhen(true)] out IPropertyType? propertyType)
+    {
+        IContentType? elementType = elementTypes.FirstOrDefault(x => x.Key == contentTypeKey);
+        if (elementType is null)
+        {
+            propertyType = null;
+            return false;
+        }
+
+        propertyType = elementType.PropertyTypes.FirstOrDefault(pt => pt.Alias == propertyTypeAlias);
+        if (propertyType is not null)
+        {
+            return true;
+        }
+
+        propertyType = elementType.CompositionPropertyTypes.FirstOrDefault(x => x.Alias == propertyTypeAlias);
+        return propertyType is not null;
     }
 }

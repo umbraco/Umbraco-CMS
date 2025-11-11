@@ -2,7 +2,11 @@
 // See LICENSE for more details.
 
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
@@ -21,6 +25,8 @@ public abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : BlockVal
     where TValue : BlockValue<TLayout>, new()
     where TLayout : class, IBlockLayoutItem, new()
 {
+    private readonly ILogger _logger;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="BlockEditorPropertyValueEditor{TValue, TLayout}"/> class.
     /// </summary>
@@ -33,9 +39,13 @@ public abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : BlockVal
         BlockEditorVarianceHandler blockEditorVarianceHandler,
         ILanguageService languageService,
         IIOHelper ioHelper,
-        DataEditorAttribute attribute)
-        : base(propertyEditors, dataTypeConfigurationCache, shortStringHelper, jsonSerializer, dataValueReferenceFactories, blockEditorVarianceHandler, languageService, ioHelper, attribute) =>
+        DataEditorAttribute attribute,
+        ILogger logger)
+        : base(propertyEditors, dataTypeConfigurationCache, shortStringHelper, jsonSerializer, dataValueReferenceFactories, blockEditorVarianceHandler, languageService, ioHelper, attribute)
+    {
         JsonSerializer = jsonSerializer;
+        _logger = logger;
+    }
 
     /// <summary>
     /// Gets the <see cref="IJsonSerializer"/>.
@@ -63,7 +73,7 @@ public abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : BlockVal
     private TValue? ParseBlockValue(object? value)
     {
         var rawJson = value == null ? string.Empty : value is string str ? str : value.ToString();
-        return BlockEditorValues.DeserializeAndClean(rawJson)?.BlockValue;
+        return SafeParseBlockEditorData(rawJson)?.BlockValue;
     }
 
     /// <inheritdoc />
@@ -71,16 +81,7 @@ public abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : BlockVal
     {
         var val = property.GetValue(culture, segment);
 
-        BlockEditorData<TValue, TLayout>? blockEditorData;
-        try
-        {
-            blockEditorData = BlockEditorValues.DeserializeAndClean(val);
-        }
-        catch
-        {
-            // if this occurs it means the data is invalid, shouldn't happen but has happened if we change the data format.
-            return string.Empty;
-        }
+        BlockEditorData<TValue, TLayout>? blockEditorData = SafeParseBlockEditorData(val);
 
         if (blockEditorData == null)
         {
@@ -103,8 +104,10 @@ public abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : BlockVal
         // For most of the properties this is fine, but for properties which contain other state it might be critical (e.g. file upload field).
         // So, we must run MapBlockValueFromEditor even if editorValue is null or string.IsNullOrWhiteSpace(editorValue.Value.ToString()) is true.
 
-        BlockEditorData<TValue, TLayout>? currentBlockEditorData = GetBlockEditorData(currentValue);
-        BlockEditorData<TValue, TLayout>? blockEditorData = GetBlockEditorData(editorValue.Value);
+        BlockEditorData<TValue, TLayout>? currentBlockEditorData = SafeParseBlockEditorData(currentValue);
+        BlockEditorData<TValue, TLayout>? blockEditorData = SafeParseBlockEditorData(editorValue.Value);
+
+        CacheReferencedEntities(blockEditorData);
 
         // We can skip MapBlockValueFromEditor if both editorValue and currentValue values are empty.
         if (IsBlockEditorDataEmpty(currentBlockEditorData) && IsBlockEditorDataEmpty(blockEditorData))
@@ -122,11 +125,25 @@ public abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : BlockVal
         return JsonSerializer.Serialize(blockEditorData.BlockValue);
     }
 
-    private BlockEditorData<TValue, TLayout>? GetBlockEditorData(object? value)
+    private static bool IsBlockEditorDataEmpty([NotNullWhen(false)] BlockEditorData<TValue, TLayout>? editorData)
+        => editorData is null || editorData.BlockValue.ContentData.Count == 0;
+
+    // We don't throw on error here because we want to be able to parse what we can, even if some of the data is invalid. In cases where migrating
+    // from nested content to blocks, we don't want to trigger a fatal error for retrieving references, as this isn't vital to the operation.
+    // See: https://github.com/umbraco/Umbraco-CMS/issues/19784 and Umbraco support cases.
+    private BlockEditorData<TValue, TLayout>? SafeParseBlockEditorData(object? value)
     {
         try
         {
             return BlockEditorValues.DeserializeAndClean(value);
+        }
+        catch (JsonException ex)
+        {
+            _logger.LogWarning(
+                "Could not deserialize the provided property value into a block editor value: {PropertyValue}. Error: {ErrorMessage}.",
+                value,
+                ex.Message);
+            return null;
         }
         catch
         {
@@ -134,7 +151,4 @@ public abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : BlockVal
             return null;
         }
     }
-
-    private static bool IsBlockEditorDataEmpty([NotNullWhen(false)] BlockEditorData<TValue, TLayout>? editorData)
-        => editorData is null || editorData.BlockValue.ContentData.Count == 0;
 }

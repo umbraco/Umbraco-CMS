@@ -11,13 +11,17 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbSorterController, UmbSorterResolvePlacementAsGrid } from '@umbraco-cms/backoffice/sorter';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
-import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
 import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/media-type';
 
 import '@umbraco-cms/backoffice/imaging';
+import {
+	UmbInteractionMemoriesChangeEvent,
+	type UmbInteractionMemoryModel,
+} from '@umbraco-cms/backoffice/interaction-memory';
+import { jsonStringComparison } from '@umbraco-cms/backoffice/observable-api';
 
 type UmbRichMediaCardModel = {
 	unique: string;
@@ -102,7 +106,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 	public override set value(value: Array<UmbMediaPickerPropertyValueEntry> | undefined) {
 		super.value = value;
 		this.#sorter.setModel(value);
-		this.#pickerContext.setSelection(value?.map((item) => item.mediaKey) ?? []);
+		this.#pickerInputContext.setSelection(value?.map((item) => item.mediaKey) ?? []);
 		this.#itemManager.setUniques(value?.map((x) => x.mediaKey));
 		// Maybe the new value is using an existing media, and there we need to update the cards despite no repository update.
 		this.#populateCards();
@@ -132,24 +136,6 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 	}
 	#focalPointEnabled: boolean = false;
 
-	@property()
-	/** @deprecated will be removed in v17 */
-	public set alias(value: string | undefined) {
-		//this.#modalRouter.setUniquePathValue('propertyAlias', value);
-	}
-	public get alias(): string | undefined {
-		return undefined; //this.#modalRouter.getUniquePathValue('propertyAlias');
-	}
-
-	@property()
-	/** @deprecated will be removed in v17 */
-	public set variantId(value: string | UmbVariantId | undefined) {
-		//this.#modalRouter.setUniquePathValue('variantId', value?.toString());
-	}
-	public get variantId(): string | undefined {
-		return undefined; //this.#modalRouter.getUniquePathValue('variantId');
-	}
-
 	/**
 	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
 	 * @type {boolean}
@@ -171,6 +157,17 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 	}
 	#readonly = false;
 
+	@property({ type: Array, attribute: false })
+	public get interactionMemories(): Array<UmbInteractionMemoryModel> | undefined {
+		return this.#pickerInputContext.interactionMemory.getAllMemories();
+	}
+	public set interactionMemories(value: Array<UmbInteractionMemoryModel> | undefined) {
+		this.#interactionMemories = value;
+		value?.forEach((memory) => this.#pickerInputContext.interactionMemory.setMemory(memory));
+	}
+
+	#interactionMemories?: Array<UmbInteractionMemoryModel> = [];
+
 	@state()
 	private _cards: Array<UmbRichMediaCardModel> = [];
 
@@ -179,7 +176,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 
 	readonly #itemManager = new UmbRepositoryItemsManager<UmbMediaItemModel>(this, UMB_MEDIA_ITEM_REPOSITORY_ALIAS);
 
-	readonly #pickerContext = new UmbMediaPickerInputContext(this);
+	readonly #pickerInputContext = new UmbMediaPickerInputContext(this);
 
 	constructor() {
 		super();
@@ -234,9 +231,23 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 				this._routeBuilder = routeBuilder;
 			});
 
-		this.observe(this.#pickerContext.selection, (selection) => {
+		this.observe(this.#pickerInputContext.selection, (selection) => {
 			this.#addItems(selection);
 		});
+
+		this.observe(
+			this.#pickerInputContext.interactionMemory.memories,
+			(memories) => {
+				// only dispatch the event if the interaction memories have actually changed
+				const isIdentical = jsonStringComparison(memories, this.#interactionMemories);
+
+				if (!isIdentical) {
+					this.#interactionMemories = memories;
+					this.dispatchEvent(new UmbInteractionMemoriesChangeEvent());
+				}
+			},
+			'_observeMemories',
+		);
 
 		this.addValidator(
 			'valueMissing',
@@ -312,7 +323,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 	}
 
 	#openPicker() {
-		this.#pickerContext.openPicker(
+		this.#pickerInputContext.openPicker(
 			{
 				multiple: this.multiple,
 				startNode: this.startNode,
@@ -330,7 +341,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 
 	async #onRemove(item: UmbRichMediaCardModel) {
 		try {
-			await this.#pickerContext.requestRemoveItem(item.media);
+			await this.#pickerInputContext.requestRemoveItem(item.media);
 			this.value = this.value?.filter((x) => x.key !== item.unique);
 			this.dispatchEvent(new UmbChangeEvent());
 		} catch {
@@ -377,6 +388,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 
 	#renderAddButton() {
 		if (this.readonly) return nothing;
+		if (this.max === 1 && this._cards.length > 0) return nothing;
 		return html`
 			<uui-button
 				id="btn-add"

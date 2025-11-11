@@ -62,6 +62,9 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 	public set overrides(value: Array<UmbDeepPartialObject<ManifestWorkspaceView>> | undefined) {
 		this.#navigationContext.setOverrides(value);
 	}
+	public get overrides(): Array<UmbDeepPartialObject<ManifestWorkspaceView>> | undefined {
+		return undefined;
+	}
 
 	@state()
 	private _workspaceViews: Array<UmbWorkspaceViewContext> = [];
@@ -110,22 +113,29 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 		);
 	}
 
+	#currentProvidedView?: UmbWorkspaceViewContext;
 	#createRoutes() {
-		let newRoutes: UmbRoute[] = [];
+		const newRoutes: UmbRoute[] = [];
 
 		if (this._workspaceViews.length > 0) {
-			newRoutes = this._workspaceViews.map((context) => {
+			this._workspaceViews.forEach((context) => {
 				const manifest = context.manifest;
-				return {
-					path: UMB_WORKSPACE_VIEW_PATH_PATTERN.generateLocal({ viewPathname: manifest.meta.pathname }),
+				const path = UMB_WORKSPACE_VIEW_PATH_PATTERN.generateLocal({ viewPathname: manifest.meta.pathname });
+				newRoutes.push({
+					unique: manifest.alias,
+					path,
 					component: () => createExtensionElement(manifest),
 					setup: (component?: any) => {
+						if (this.#currentProvidedView !== context) {
+							this.#currentProvidedView?.unprovide();
+						}
 						if (component) {
+							this.#currentProvidedView = context;
 							context.provideAt(component);
 							component.manifest = manifest;
 						}
 					},
-				};
+				});
 			});
 
 			// Duplicate first workspace and use it for the empty path scenario. [NL]
@@ -188,8 +198,8 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 											data-mark="workspace:view-link:${manifest.alias}">
 											<div slot="icon">
 												<umb-icon name=${manifest.meta.icon}></umb-icon> ${hint && !active
-													? html`<uui-badge .color=${hint.color ?? 'default'} ?attention=${hint.color === 'invalid'}
-															>${hint.text}</uui-badge
+													? html`<umb-badge .color=${hint.color ?? 'default'} ?attention=${hint.color === 'invalid'}
+															>${hint.text}</umb-badge
 														>`
 													: nothing}
 											</div>
@@ -270,12 +280,9 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 				position: relative;
 			}
 
-			uui-badge {
-				position: absolute;
+			umb-badge {
 				font-size: var(--uui-type-small-size);
-				top: -0.5em;
-				right: auto;
-				left: calc(50% + 0.8em);
+				right: -1.5em;
 			}
 
 			umb-extension-slot[slot='actions'] {

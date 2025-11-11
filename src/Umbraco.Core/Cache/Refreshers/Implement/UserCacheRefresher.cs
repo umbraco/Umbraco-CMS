@@ -32,10 +32,10 @@ public sealed class UserCacheRefresher : PayloadCacheRefresherBase<UserCacheRefr
         base.RefreshAll();
     }
 
-    public override void Refresh(JsonPayload[] payloads)
+    public override void RefreshInternal(JsonPayload[] payloads)
     {
         ClearCache(payloads);
-        base.Refresh(payloads);
+        base.RefreshInternal(payloads);
     }
 
     private void ClearCache(params JsonPayload[] payloads)

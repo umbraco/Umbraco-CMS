@@ -33,7 +33,7 @@ const SORTER_CONFIG: UmbSorterConfig<UmbPropertyTypeModel, UmbContentTypeDesignE
 	},
 	identifier: 'content-type-property-sorter',
 	itemSelector: 'umb-content-type-design-editor-property',
-	//disabledItemSelector: '[inherited]',
+	disabledItemSelector: '[_inherited]',
 	//TODO: Set the property list (sorter wrapper) to inherited, if its inherited
 	// This is because we don't want to move local properties into an inherited group container.
 	// Or maybe we do, but we still need to check if the group exists locally, if not, then it needs to be created before we move a property into it.
@@ -137,7 +137,7 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 	public set containerId(value: string | null | undefined) {
 		if (value === this._containerId) return;
 		this._containerId = value;
-		this.createPropertyTypeWorkspaceRoutes();
+		this.#createPropertyTypeWorkspaceRoutes();
 		this.#propertyStructureHelper.setContainerId(value);
 		this.#addPropertyModal?.setUniquePathValue('container-id', value === null ? 'root' : value);
 		this.#editPropertyModal?.setUniquePathValue('container-id', value === null ? 'root' : value);
@@ -153,6 +153,12 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 	>;
 
 	#propertyStructureHelper = new UmbContentTypePropertyStructureHelper<UmbContentTypeModel>(this);
+	#initResolver?: () => void;
+	#initReject?: (reason?: any) => void;
+	#init = new Promise<void>((resolve, reject) => {
+		this.#initResolver = resolve;
+		this.#initReject = reject;
+	});
 
 	@property({ attribute: false })
 	editContentTypePath?: string;
@@ -188,11 +194,6 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 				context?.isSorting,
 				(isSorting) => {
 					this._sortModeActive = isSorting;
-					if (isSorting) {
-						//this.#sorter.enable();
-					} else {
-						//this.#sorter.disable();
-					}
 				},
 				'_observeIsSorting',
 			);
@@ -204,22 +205,34 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 			}
 
 			this._ownerContentTypeUnique = workspaceContext?.structure.getOwnerContentTypeUnique();
-			this.createPropertyTypeWorkspaceRoutes();
+			this.#createPropertyTypeWorkspaceRoutes();
 
-			this.observe(
-				workspaceContext?.variesByCulture,
-				(variesByCulture) => {
-					this._ownerContentTypeVariesByCulture = variesByCulture;
-				},
-				'observeOwnerVariesByCulture',
-			);
-			this.observe(
-				workspaceContext?.variesBySegment,
-				(variesBySegment) => {
-					this._ownerContentTypeVariesBySegment = variesBySegment;
-				},
-				'observeOwnerVariesBySegment',
-			);
+			const varyByCulturePromise =
+				this.observe(
+					workspaceContext?.variesByCulture,
+					(variesByCulture) => {
+						this._ownerContentTypeVariesByCulture = variesByCulture;
+					},
+					'observeOwnerVariesByCulture',
+				)?.asPromise() ?? Promise.reject();
+			const varyBySegmentPromise =
+				this.observe(
+					workspaceContext?.variesBySegment,
+					(variesBySegment) => {
+						this._ownerContentTypeVariesBySegment = variesBySegment;
+					},
+					'observeOwnerVariesBySegment',
+				)?.asPromise() ?? Promise.reject();
+
+			if (this.#initResolver) {
+				Promise.all([varyByCulturePromise, varyBySegmentPromise])
+					.then(() => {
+						this.#initResolver?.();
+						this.#initResolver = undefined;
+						this.#initReject = undefined;
+					})
+					.catch(() => {});
+			}
 		});
 		this.observe(this.#propertyStructureHelper.propertyStructure, (propertyStructure) => {
 			this._properties = propertyStructure;
@@ -227,7 +240,13 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 		});
 	}
 
-	createPropertyTypeWorkspaceRoutes() {
+	override disconnectedCallback(): void {
+		super.disconnectedCallback();
+		this.#initReject?.(new Error('Component disconnected'));
+	}
+
+	async #createPropertyTypeWorkspaceRoutes() {
+		await this.#init;
 		if (!this._ownerContentTypeUnique || this._containerId === undefined) return;
 
 		// Note: Route for adding a new property
@@ -251,6 +270,12 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 						sortOrderInt = Math.max(...this._properties.map((x) => x.sortOrder), -1) + 1;
 					}
 					preset.sortOrder = sortOrderInt;
+				}
+				if (this._ownerContentTypeVariesByCulture) {
+					preset.variesByCulture = true;
+				}
+				if (this._ownerContentTypeVariesBySegment) {
+					preset.variesBySegment = true;
 				}
 				return { data: { contentTypeUnique: this._ownerContentTypeUnique, preset: preset } };
 			})

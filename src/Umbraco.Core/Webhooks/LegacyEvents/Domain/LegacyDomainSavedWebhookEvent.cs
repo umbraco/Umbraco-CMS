@@ -20,6 +20,6 @@ public class LegacyDomainSavedWebhookEvent : WebhookEventBase<DomainSavedNotific
 
     public override string Alias => Constants.WebhookEvents.Aliases.DomainSaved;
 
-    public override object? ConvertNotificationToRequestPayload(DomainSavedNotification notification)
+    public override object ConvertNotificationToRequestPayload(DomainSavedNotification notification)
         => notification.SavedEntities;
 }

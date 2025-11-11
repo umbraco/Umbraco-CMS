@@ -34,15 +34,6 @@ public class BasicAuthenticationMiddleware : IMiddleware
         _backOfficePath = hostingEnvironment.GetBackOfficePath();
     }
 
-    [Obsolete("The globalSettings parameter is not required anymore, use the other constructor instead. Scheduled for removal in Umbraco 17.")]
-    public BasicAuthenticationMiddleware(
-        IRuntimeState runtimeState,
-        IBasicAuthService basicAuthService,
-        IOptionsMonitor<GlobalSettings> globalSettings,
-        IHostingEnvironment hostingEnvironment)
-        : this(runtimeState, basicAuthService, hostingEnvironment)
-    { }
-
     /// <inheritdoc />
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {

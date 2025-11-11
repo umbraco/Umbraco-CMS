@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services;
@@ -9,6 +10,8 @@ namespace Umbraco.Cms.Core.Routing;
 
 public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
 {
+    private const string UrlProviderAlias = Constants.UrlProviders.Content;
+
     private readonly IPublishedUrlProvider _publishedUrlProvider;
     private readonly ILanguageService _languageService;
     private readonly IPublishedRouter _publishedRouter;
@@ -42,7 +45,7 @@ public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
     public async Task<ISet<UrlInfo>> GetAllAsync(IContent content)
     {
         HashSet<UrlInfo> urlInfos = [];
-        var cultures = (await _languageService.GetAllAsync()).Select(x => x.IsoCode).ToArray();
+        IEnumerable<string> cultures = await _languageService.GetAllIsoCodesAsync();
 
         // First we get the urls of all cultures, using the published router, meaning we respect any extensions.
         foreach (var culture in cultures)
@@ -52,7 +55,7 @@ public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
             // Handle "could not get URL"
             if (url is "#" or "#ex")
             {
-                urlInfos.Add(UrlInfo.Message(_localizedTextService.Localize("content", "getUrlException"), culture));
+                urlInfos.Add(UrlInfo.AsMessage(_localizedTextService.Localize("content", "getUrlException"), UrlProviderAlias, culture));
                 continue;
             }
 
@@ -65,7 +68,7 @@ public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
                 continue;
             }
 
-            urlInfos.Add(UrlInfo.Url(url, culture));
+            urlInfos.Add(UrlInfo.AsUrl(url, UrlProviderAlias, culture));
         }
 
         // If the content is trashed, we can't get the other URLs, as we have no parent structure to navigate through.
@@ -76,7 +79,7 @@ public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
 
         // Then get "other" urls - I.E. Not what you'd get with GetUrl(), this includes all the urls registered using domains.
         // for these 'other' URLs, we don't check whether they are routable, collide, anything - we just report them.
-        foreach (UrlInfo otherUrl in _publishedUrlProvider.GetOtherUrls(content.Id).OrderBy(x => x.Text).ThenBy(x => x.Culture))
+        foreach (UrlInfo otherUrl in _publishedUrlProvider.GetOtherUrls(content.Id).OrderBy(x => x.Message).ThenBy(x => x.Culture))
         {
             urlInfos.Add(otherUrl);
         }
@@ -105,7 +108,7 @@ public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
                 _logger.LogDebug(logMsg, url, uri, culture);
             }
 
-            var urlInfo = UrlInfo.Message(_localizedTextService.Localize("content", "routeErrorCannotRoute"), culture);
+            var urlInfo = UrlInfo.AsMessage(_localizedTextService.Localize("content", "routeErrorCannotRoute"), UrlProviderAlias, culture);
             return Attempt.Succeed(urlInfo);
         }
 
@@ -118,7 +121,7 @@ public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
         {
             var collidingContent = publishedRequest.PublishedContent?.Key.ToString();
 
-            var urlInfo = UrlInfo.Message(_localizedTextService.Localize("content", "routeError", [collidingContent]), culture);
+            var urlInfo = UrlInfo.AsMessage(_localizedTextService.Localize("content", "routeError", [collidingContent]), UrlProviderAlias, culture);
             return Attempt.Succeed(urlInfo);
         }
 

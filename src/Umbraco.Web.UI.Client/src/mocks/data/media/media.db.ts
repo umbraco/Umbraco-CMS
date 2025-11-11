@@ -46,7 +46,7 @@ const treeItemMapper = (model: UmbMockMediaModel): MediaTreeItemResponseModel =>
 		parent: model.parent,
 		variants: model.variants,
 		createDate: model.createDate,
-		signs: model.signs,
+		flags: model.flags,
 	};
 };
 
@@ -80,8 +80,7 @@ const createMockMediaMapper = (request: CreateMediaRequestModel): UmbMockMediaMo
 				publishDate: null,
 			};
 		}),
-		urls: [],
-		signs: [],
+		flags: [],
 	};
 };
 
@@ -90,10 +89,9 @@ const detailResponseMapper = (model: UmbMockMediaModel): MediaResponseModel => {
 		mediaType: model.mediaType,
 		id: model.id,
 		isTrashed: model.isTrashed,
-		urls: model.urls,
 		values: model.values,
 		variants: model.variants,
-		signs: model.signs,
+		flags: model.flags,
 	};
 };
 
@@ -109,7 +107,7 @@ const itemMapper = (model: UmbMockMediaModel): MediaItemResponseModel => {
 		isTrashed: model.isTrashed,
 		parent: model.parent,
 		variants: model.variants,
-		signs: model.signs,
+		flags: model.flags,
 	};
 };
 
@@ -125,7 +123,7 @@ const collectionMapper = (model: UmbMockMediaModel): MediaCollectionResponseMode
 		sortOrder: 0,
 		values: model.values,
 		variants: model.variants,
-		signs: model.signs,
+		flags: model.flags,
 	};
 };
 

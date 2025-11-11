@@ -74,11 +74,13 @@ export default {
 		readOnly: 'Skrivebeskyttet',
 		trash: 'Papirkurv',
 		loadMore: 'Indlæs flere',
+		showMore: 'Vis flere',
 	},
 	actionCategories: {
 		content: 'Indhold',
 		administration: 'Administration',
 		structure: 'Struktur',
+		general: 'Generelt',
 		other: 'Andet',
 	},
 	actionDescriptions: {
@@ -848,6 +850,7 @@ export default {
 		details: 'Detaljer',
 		dictionary: 'Ordbog',
 		dimensions: 'Dimensioner',
+		dividerPosition: (value: string | number) => `Skillevæg ved ${value}%`,
 		discard: 'Kassér',
 		down: 'Ned',
 		download: 'Hent',
@@ -857,6 +860,7 @@ export default {
 		email: 'E-mail',
 		error: 'Fejl',
 		field: 'Felt',
+		fields: 'Felter',
 		fieldFor: 'Felt for %0%',
 		findDocument: 'Find',
 		first: 'Første',
@@ -1005,7 +1009,18 @@ export default {
 		document: 'Dokument',
 	},
 	colors: {
+		black: 'Sort',
 		blue: 'Blå',
+		brown: 'Brun',
+		cyan: 'Cyan',
+		green: 'Grøn',
+		lightBlue: 'Lyseblå',
+		pink: 'Lyserød',
+		red: 'Rød',
+		text: 'Sort',
+		yellow: 'Gul',
+		white: 'Hvid',
+		grey: 'Grå',
 	},
 	shortcuts: {
 		addGroup: 'Tilføj fane',
@@ -1054,8 +1069,6 @@ export default {
 		databaseInstall: '\n      Klik på <strong>installér</strong> knappen for at installere Umbraco %0% databasen\n    ',
 		databaseInstallDone:
 			'Umbraco %0% er nu blevet kopieret til din database. Tryk på <string>Næste</strong> for at fortsætte.',
-		databaseNotFound:
-			'<p>Databasen er ikke fundet. Kontrollér venligst at informationen i database forbindelsesstrengen i "web.config" filen er korrekt.</p>\n<p>For at fortsætte bedes du venligst rette "web.config" filen (ved at bruge Visual Studio eller dit favoritprogram), scroll til bunden, tilføj forbindelsesstrengen til din database i feltet som hedder "umbracoDbDSN" og gem filen.</p><p>Klik på <strong>Forsøg igen</strong> knappen når du er færdig.<br/><a href="https://our.umbraco.com/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank" rel="noopener">Mere information om at redigere web.config her.</a></p>',
 		databaseText:
 			'For at afslutte dette skridt er du nødt til at have nogle informationer om din database parat ("database forbindelsesstrengen").<br/>Kontakt venligst din ISP hvis det er nødvendigt. Hvis du installerer på en lokal maskine eller server kan du muligvis få informationerne fra din systemadministrator.',
 		databaseUpgrade:
@@ -1298,10 +1311,10 @@ export default {
 	},
 	colorPickerConfigurations: {
 		colorsTitle: 'Farver',
-		colorsDescription: 'Tilføj, fjern eller sorter farver',
+		colorsDescription: 'Tilføj, fjern eller sorter farver (og etiketter).',
 		showLabelTitle: 'Inkluder label?',
 		showLabelDescription:
-			'Gemmer farver som et Json-objekt, der både indeholder farvens hex streng og label, i stedet for kun at gemme hex strengen.',
+			'Viser et farvet felt og en etiket for hver farve i farvevælgeren i stedet for blot et farvet felt.',
 	},
 	contentPicker: {
 		allowedItemTypes: 'Du kan kun vælge følgende type(r) dokumenter: %0%',
@@ -1413,14 +1426,6 @@ export default {
 		settings: 'Indstillinger',
 		translation: 'Oversættelse',
 		users: 'Brugere',
-	},
-	help: {
-		tours: 'Tours',
-		theBestUmbracoVideoTutorials: 'De bedste Umbraco video tutorials',
-		umbracoForum: 'Besøg our.umbraco.com',
-		umbracoTv: 'Besøg umbraco.tv',
-		umbracoLearningBase: 'Watch our free tutorial videos',
-		umbracoLearningBaseDescription: 'on the Umbraco Learning Base',
 	},
 	settings: {
 		defaulttemplate: 'Standardskabelon',
@@ -2079,10 +2084,10 @@ export default {
 		permissionsGranularHelp: 'Sæt rettigheder for specifikke noder',
 		granularRightsLabel: 'Dokumenter',
 		granularRightsDescription: 'Tillad adgang til specifikke dokumenter',
-		permissionsEntityGroup_document: 'Indhold',
-		permissionsEntityGroup_media: 'Medie',
-		permissionsEntityGroup_member: 'Medlemmer',
-		'permissionsEntityGroup_document-property-value': 'Dokumentegenskabsværdi',
+		permissionsEntityGroup_document: 'Indholdsrettigheder',
+		permissionsEntityGroup_media: 'Medierettigheder',
+		permissionsEntityGroup_member: 'Medlemsrettigheder',
+		'permissionsEntityGroup_document-property-value': 'Feltrettigheder',
 		permissionNoVerbs: 'Ingen tilladte rettigheder',
 		profile: 'Profil',
 		searchAllChildren: "Søg alle 'børn'",
@@ -2311,6 +2316,7 @@ export default {
 		openBackofficeSearch: 'Åben backoffice søgning',
 		openCloseBackofficeHelp: 'Åben/Luk backoffice hjælp',
 		openCloseBackofficeProfileOptions: 'Åben/Luk dine profil indstillinger',
+		profileOptions: 'Profil indstillinger',
 		assignDomainDescription: 'Tilføj domæne på %0%',
 		createDescription: 'Opret ny node under %0%',
 		protectDescription: 'Opsæt offentlig adgang på %0%',
@@ -2349,6 +2355,7 @@ export default {
 		maxAmount: 'Maximum antal',
 		contextDialogDescription: 'Perform action %0% on the %1% node',
 		expandChildItems: 'Udvid underordnede elementer for',
+		collapseChildItems: 'Skjul underordnede elementer for',
 		openContextNode: 'Åbn kontekstnode for',
 	},
 	references: {
@@ -2451,26 +2458,26 @@ export default {
 		headlineEditorAppearance: 'Redigerings udseende',
 		headlineDataModels: 'Data modeller',
 		headlineCatalogueAppearance: 'Katalog udseende',
-		labelBackgroundColor: 'Baggrunds farve',
-		labelIconColor: 'Ikon farve',
+		labelBackgroundColor: 'Baggrundsfarve',
+		labelIconColor: 'Ikonfarve',
 		labelContentElementType: 'Indholds model',
 		labelLabelTemplate: 'Label',
 		labelCustomView: 'Speciel visning',
 		labelCustomViewInfoTitle: 'Vis speciel visning beskrivelsen',
 		labelCustomViewDescription:
-			'Overskrift hvordan denne block præsenteres i backoffice interfacet. Vælg en\n      .html fil der indeholder din præsensation.\n    ',
+			'Overskrift hvordan denne blok præsenteres i backoffice interfacet. Vælg en\n      .html fil der indeholder din præsensation.\n    ',
 		labelSettingsElementType: 'Indstillings model',
 		labelEditorSize: 'Rederings lagets størrelse',
 		addCustomView: 'Tilføj speciel visning',
-		addSettingsElementType: 'Tilføj instillinger',
+		addSettingsElementType: 'Tilføj indstillinger',
 		confirmDeleteBlockTitle: 'Slet %0',
 		confirmDeleteBlockMessage: 'Er du sikker på at du vil slette indholdet <strong>%0%</strong>?',
+		confirmDeleteBlockTypeTitle: 'Slet konfiguration for blokken?',
 		confirmDeleteBlockTypeMessage: 'Er du sikker på at du vil slette konfigurationen <strong>%0%</strong>?',
 		confirmDeleteBlockTypeNotice:
 			'Indholdet vil stadigt eksistere, men redigering af dette indhold vil ikke\n      være muligt. Indholdet vil blive vist som ikke understøttet indhold.\n    ',
 		confirmDeleteBlockGroupTitle: 'Slet gruppe?',
-		confirmDeleteBlockGroupMessage:
-			'Er du sikker på at du vil slette gruppen <strong>%0%</strong> og blok konfigurationer?',
+		confirmDeleteBlockGroupMessage: 'Er du sikker på at du vil slette gruppen <strong>%0%</strong>?',
 		confirmDeleteBlockGroupNotice:
 			'Indholdet af gruppens blokke vil stadigt eksistere, men redigering af dette indhold vil ikke\n      være muligt. Indholdet vil blive vist som ikke understøttet indhold.\n    ',
 		blockConfigurationOverlayTitle: "Konfiguration af '%0%'",
@@ -2505,7 +2512,7 @@ export default {
 		areaAllowedBlocks: 'Tilladte blok-typer',
 		areaAllowedBlocksHelp:
 			'Vælg de blok-typer, der er tilladt i dette område, og evt. også hvor mange af hver type, redaktørerne skal tilføje til området.',
-		areaAllowedBlocksEmpty: 'Når denne er tom er alle block-typer tilladt for områder tilladt.',
+		areaAllowedBlocksEmpty: 'Når denne er tom er alle blok-typer tilladt for områder tilladt.',
 		confirmDeleteBlockAreaMessage: 'Er du sikker på, at du vil slette dette område?',
 		confirmDeleteBlockAreaNotice: 'Alle blokke, der er oprettet i dette område, vil blive slettet.',
 		layoutOptions: 'Layout-opsætning',
@@ -2538,11 +2545,13 @@ export default {
 		areaCreateLabelTitle: 'Tilføj indhold label',
 		areaCreateLabelHelp: 'Overskriv labellen for tilføj indholds knappen i dette område.',
 		showSizeOptions: 'Tilføj skalerings muligheder',
-		addBlockType: 'Tilføj Blok',
+		addBlockType: 'Tilføj blok',
 		addBlockGroup: 'Tilføj gruppe',
-		pickSpecificAllowance: 'Tilføj gruppe eller Blok',
+		pickSpecificAllowance: 'Tilføj gruppe eller blok',
 		allowanceMinimum: 'Sæt minimum krav',
 		allowanceMaximum: 'Sæt maksimum krav',
+		rangeAllowed: 'Antal blokke',
+		specifiedAllowance: 'Tilladte bloktyper',
 		block: 'Blok',
 		tabBlock: 'Blok',
 		tabBlockTypeSettings: 'Indstillinger',
@@ -2551,11 +2560,11 @@ export default {
 		headlineAllowance: 'Tilladelser',
 		getSampleHeadline: 'Installer demo konfiguration',
 		getSampleDescription:
-			'Dette tilføjer basale og hjælper dig til at komme igang med Block Grid Editor.<br/>Dette indeholder Blokke for Overskrift, Beriget-Tekst, Billede og To-Koloners-Layout.',
+			'Dette tilføjer basale og hjælper dig til at komme igang med Block Grid Editor.<br/>Dette indeholder blokke for Overskrift, Beriget-Tekst, Billede og To-Koloners-Layout.',
 		getSampleButton: 'Installer',
 		actionEnterSortMode: 'Sortings tilstand',
 		actionExitSortMode: 'Afslut sortings tilstand',
-		areaAliasIsNotUnique: 'Dette område alias skal være unikt sammenlignet med andre områder af denne Blok.',
+		areaAliasIsNotUnique: 'Dette område alias skal være unikt sammenlignet med andre områder af denne blok.',
 		configureArea: 'Konfigurer område',
 		deleteArea: 'Slet område',
 		addColumnSpanOption: 'Tilføj mulighed for %0% koloner',
@@ -2563,11 +2572,11 @@ export default {
 		allowBlockInAreasHelp:
 			'Make this block available by default within the areas of other Blocks (unless explicit permissions are set for these areas).',
 		createThisFor: (name: string, variantName: string) =>
-			variantName ? `Opret ${name} for ${variantName}` : `Create ${name}`,
-		insertBlock: 'Indsæt Block',
+			variantName ? `Opret ${name} for ${variantName}` : `Opret ${name}`,
+		insertBlock: 'Indsæt blok',
 		labelInlineMode: 'Indsæt på linje med tekst',
 		notExposedLabel: 'ikke oprettet',
-		notExposedDescription: 'Denne Block er endnu ikke oprettet for denne variant',
+		notExposedDescription: 'Denne blok er endnu ikke oprettet for denne variant',
 		unsupportedBlockName: 'Ugyldigt indhold',
 		unsupportedBlockDescription:
 			'Dette indhold er ikke længere understøttet. Hvis du mangler dette indhold bør du kontakte din administrator. Ellers bør du slette dette indhold.',
@@ -2595,13 +2604,16 @@ export default {
 		returnToPreviewHeadline: 'Forhåndsvisning af indholdet?',
 		returnToPreviewDescription:
 			'Du har afslutet forhåndsvisning, vil du starte forhåndsvisning igen for at\n      se seneste gemte version af indholdet?\n    ',
+		returnToPreviewAcceptButton: 'Start forhåndsvisning igen',
 		returnToPreviewDeclineButton: 'Se udgivet indhold',
 		viewPublishedContentHeadline: 'Se udgivet indhold?',
 		viewPublishedContentDescription:
 			'Du er i forhåndsvisning, vil du afslutte for at se den udgivet\n      version?\n    ',
 		viewPublishedContentAcceptButton: 'Se udgivet version',
 		viewPublishedContentDeclineButton: 'Forbliv i forhåndsvisning',
-		returnToPreviewAcceptButton: 'Preview latest version',
+		connectionFailed:
+			'Kunne ikke etablere forbindelse til serveren, forhåndsvisning af liveopdateringer vil ikke fungere.',
+		connectionLost: 'Forbindelse til serveren mistet, forhåndsvisning af liveopdateringer vil ikke fungere.',
 	},
 	permissions: {
 		FolderCreation: 'Mappeoprettelse',
@@ -2704,19 +2716,11 @@ export default {
 		profilerEnabledDescription:
 			"\n            <p>\n                Umbraco currently does not run in debug mode, so you can't use the built-in profiler. This is how it should be for a production site.\n            </p>\n            <p>\n                Debug mode is turned on by setting <strong>Umbraco:CMS:Hosting:Debug</strong> to <strong>true</strong> in appsettings.json, appsettings.{Environment}.json or via an environment variable.\n            </p>\n        ",
 	},
-	settingsDashboardVideos: {
-		trainingHeadline: 'Hours of Umbraco training videos are only a click away',
-		trainingDescription:
-			'\n        <p>Want to master Umbraco? Spend a couple of minutes learning some best practices by watching one of these videos about using Umbraco. And visit <a href="https://umbraco.tv" target="_blank" rel="noopener">umbraco.tv</a> for even more Umbraco videos</p>\n    ',
-		learningBaseDescription:
-			'  <p>Vil du mestre Umbraco? Brug et par minutter på at lære nogle best practices ved at besøge <a class="btn-link -underline" href="https://www.youtube.com/c/UmbracoLearningBase" target="_blank" rel="noopener">Umbraco Learning Base YouTube-kanalen</a>. Her finder du en masse videoer, der dækker mange aspekter af Umbraco.</p> ',
-		getStarted: 'To get you started',
-	},
 	settingsDashboard: {
 		documentationHeader: 'Dokumentation',
 		documentationDescription: 'Læs mere om at arbejde med elementerne i Indstillinger i vores Dokumentation.',
 		communityHeader: 'Community',
-		communityDescription: 'Stil et spørgsmål i community forummet eller i vores Discord community',
+		communityDescription: 'Stil et spørgsmål i community forummet',
 		trainingHeader: 'Træning',
 		trainingDescription: 'Se mulighederne for real-life træning og certificering',
 		supportHeader: 'Support',

@@ -206,6 +206,7 @@ public abstract class ServerMessengerBase : IServerMessenger
             throw new InvalidOperationException("The cache refresher " + refresher.GetType() + " is not of type " + typeof(IPayloadCacheRefresher<TPayload>));
         }
 
+        payloadRefresher.RefreshInternal(payload);
         payloadRefresher.Refresh(payload);
     }
 
@@ -265,6 +266,7 @@ public abstract class ServerMessengerBase : IServerMessenger
 
                 if (json is not null)
                 {
+                    jsonRefresher.RefreshInternal(json);
                     jsonRefresher.Refresh(json);
                 }
 

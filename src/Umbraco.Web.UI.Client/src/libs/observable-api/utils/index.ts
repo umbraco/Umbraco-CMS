@@ -12,5 +12,6 @@ export * from './observe-multiple.function.js';
 export * from './partial-update-frozen-array.function.js';
 export * from './push-at-to-unique-array.function.js';
 export * from './push-to-unique-array.function.js';
+export * from './replace-in-unique-array.function.js';
 export * from './simple-hash-code.function.js';
 export * from './strict-equality-memoization.function.js';

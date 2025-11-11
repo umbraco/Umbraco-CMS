@@ -66,8 +66,10 @@ export class UmbDocumentSearchServerDataSource
 							culture: variant.culture || null,
 							name: variant.name,
 							state: variant.state,
+							flags: variant.flags,
 						};
 					}),
+					flags: item.flags,
 				};
 			});
 

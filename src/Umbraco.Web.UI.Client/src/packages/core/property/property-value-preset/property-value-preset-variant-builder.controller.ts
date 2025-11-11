@@ -4,6 +4,7 @@ import type {
 	UmbPropertyTypePresetModel,
 	UmbPropertyTypePresetWithSchemaAliasModel,
 	UmbPropertyValuePreset,
+	UmbPropertyValuePresetApiCallArgs,
 } from './types.js';
 import type { UmbElementValueModel } from '@umbraco-cms/backoffice/content';
 
@@ -13,6 +14,8 @@ export class UmbPropertyValuePresetVariantBuilderController extends UmbPropertyV
 	#cultures: Array<null | string> = [];
 	// Always declare the default segment (null)
 	#segments: Array<null | string> = [null];
+
+	// TODO: We properly need to break this, as Engage needs to control which Segments are available for each culture, maybe investigate the option to go about a new option to just parse options.? Break in v.17.0 [NL]
 
 	setCultures(cultures: Array<string>): void {
 		this.#cultures = cultures;
@@ -35,9 +38,11 @@ export class UmbPropertyValuePresetVariantBuilderController extends UmbPropertyV
 
 			for (const culture of this.#cultures) {
 				for (const segment of this.#segments) {
-					const value = await this._generatePropertyValue(apis, propertyType, {
-						variantId: new UmbVariantId(culture, segment),
-					});
+					const value = await this._generatePropertyValue(
+						apis,
+						propertyType,
+						this.#makeArgsFor(propertyType.alias, culture, segment),
+					);
 					if (value) {
 						value.culture = culture;
 						value.segment = segment;
@@ -51,9 +56,11 @@ export class UmbPropertyValuePresetVariantBuilderController extends UmbPropertyV
 			}
 
 			for (const culture of this.#cultures) {
-				const value = await this._generatePropertyValue(apis, propertyType, {
-					variantId: new UmbVariantId(culture),
-				});
+				const value = await this._generatePropertyValue(
+					apis,
+					propertyType,
+					this.#makeArgsFor(propertyType.alias, culture, null),
+				);
 				if (value) {
 					value.culture = culture;
 					value.segment = null;
@@ -62,9 +69,11 @@ export class UmbPropertyValuePresetVariantBuilderController extends UmbPropertyV
 			}
 		} else if (propertyType.typeArgs.variesBySegment) {
 			for (const segment of this.#segments) {
-				const value = await this._generatePropertyValue(apis, propertyType, {
-					variantId: new UmbVariantId(null, segment),
-				});
+				const value = await this._generatePropertyValue(
+					apis,
+					propertyType,
+					this.#makeArgsFor(propertyType.alias, null, segment),
+				);
 				if (value) {
 					// Be aware this maybe should have been the default culture?
 					value.culture = null;
@@ -73,7 +82,11 @@ export class UmbPropertyValuePresetVariantBuilderController extends UmbPropertyV
 				}
 			}
 		} else {
-			const value = await this._generatePropertyValue(apis, propertyType, {});
+			const value = await this._generatePropertyValue(
+				apis,
+				propertyType,
+				this.#makeArgsFor(propertyType.alias, null, null),
+			);
 			if (value) {
 				// Be aware this maybe should have been the default culture?
 				value.culture = null;
@@ -82,5 +95,14 @@ export class UmbPropertyValuePresetVariantBuilderController extends UmbPropertyV
 			}
 		}
 		return values;
+	}
+
+	#makeArgsFor(alias: string, culture: null | string, segment: null | string) {
+		const variantId = new UmbVariantId(culture, segment);
+		const args: Partial<UmbPropertyValuePresetApiCallArgs> = {
+			variantId,
+			value: this._existingValues?.find((x) => x.alias === alias && variantId.compare(x))?.value,
+		};
+		return args;
 	}
 }

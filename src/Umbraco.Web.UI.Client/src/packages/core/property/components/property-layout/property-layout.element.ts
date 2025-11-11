@@ -104,17 +104,13 @@ export class UmbPropertyLayoutElement extends UmbLitElement {
 				display: grid;
 				grid-template-columns: 200px minmax(0, 1fr);
 				column-gap: var(--uui-size-layout-2);
-				border-bottom: 1px solid var(--uui-color-divider);
 				padding: var(--uui-size-layout-1) 0;
-			}
-
-			:host(:last-of-type) {
-				border-bottom: none;
 			}
 
 			:host > div {
 				grid-column: span 2;
 			}
+
 			/*@container (width > 600px) {*/
 			:host(:not([orientation='vertical'])) > div {
 				grid-column: span 1;
@@ -124,11 +120,12 @@ export class UmbPropertyLayoutElement extends UmbLitElement {
 			#headerColumn {
 				position: relative;
 				height: min-content;
+				top: var(--umb-property-layout-header-top);
 			}
 			/*@container (width > 600px) {*/
 			:host(:not([orientation='vertical'])) #headerColumn {
 				position: sticky;
-				top: calc(var(--uui-size-space-2) * -1);
+				top: var(--umb-property-layout-header-top, calc(var(--uui-size-space-2) * -1));
 			}
 			/*}*/
 

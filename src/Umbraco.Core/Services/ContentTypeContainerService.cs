@@ -14,10 +14,10 @@ internal sealed class ContentTypeContainerService : EntityTypeContainerService<I
         ILoggerFactory loggerFactory,
         IEventMessagesFactory eventMessagesFactory,
         IDocumentTypeContainerRepository entityContainerRepository,
-        IAuditRepository auditRepository,
+        IAuditService auditService,
         IEntityRepository entityRepository,
         IUserIdKeyResolver userIdKeyResolver)
-        : base(provider, loggerFactory, eventMessagesFactory, entityContainerRepository, auditRepository, entityRepository, userIdKeyResolver)
+        : base(provider, loggerFactory, eventMessagesFactory, entityContainerRepository, auditService, entityRepository, userIdKeyResolver)
     {
     }
 

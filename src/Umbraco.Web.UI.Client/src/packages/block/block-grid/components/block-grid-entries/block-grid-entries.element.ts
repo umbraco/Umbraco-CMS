@@ -198,6 +198,9 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 	@state()
 	private _isReadOnly: boolean = false;
 
+	@state()
+	private _limitMax?: number;
+
 	constructor() {
 		super();
 
@@ -294,6 +297,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 	}
 
 	async #setupRangeValidation(rangeLimit: UmbNumberRangeValueType | undefined) {
+		this._limitMax = rangeLimit?.max;
 		if (this.#rangeUnderflowValidator) {
 			this.removeValidator(this.#rangeUnderflowValidator);
 			this.#rangeUnderflowValidator = undefined;
@@ -392,13 +396,13 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 			<div class="umb-block-grid__layout-container" data-area-length=${this._layoutEntries.length}>
 				${repeat(
 					this._layoutEntries,
-					(x) => x.contentKey,
-					(layoutEntry, index) =>
+					(layout, index) => `${index}_${layout.contentKey}`,
+					(layout, index) =>
 						html`<umb-block-grid-entry
 							class="umb-block-grid__layout-item"
 							index=${index}
-							.contentKey=${layoutEntry.contentKey}
-							.layout=${layoutEntry}>
+							.contentKey=${layout.contentKey}
+							.layout=${layout}>
 						</umb-block-grid-entry>`,
 				)}
 			</div>
@@ -408,6 +412,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 	}
 
 	#renderCreateButtonGroup() {
+		if (this._limitMax === 1 && this._layoutEntries.length > 0) return nothing;
 		if (this._areaKey === null || this._layoutEntries.length === 0) {
 			return html` <uui-button-group id="createButton">
 				${this.#renderCreateButton()} ${this.#renderPasteButton()}
