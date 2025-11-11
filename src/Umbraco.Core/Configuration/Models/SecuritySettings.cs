@@ -22,7 +22,6 @@ public class SecuritySettings
     internal const string StaticAuthCookieName = "UMB_UCONTEXT";
     internal const bool StaticUsernameIsEmail = true;
     internal const bool StaticMemberRequireUniqueEmail = true;
-    internal const bool StaticHideBackOfficeTokens = false;
 
     internal const string StaticAllowedUserNameCharacters =
         "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+\\";
