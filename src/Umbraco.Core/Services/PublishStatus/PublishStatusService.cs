@@ -69,7 +69,9 @@ public class PublishStatusService : IPublishStatusManagementService, IPublishSta
 
         if (_publishedCultures.TryGetValue(documentKey, out ISet<string>? publishedCultures))
         {
-            return publishedCultures.Contains(culture, StringComparer.InvariantCultureIgnoreCase);
+            // If "*" is provided as the culture, we consider this as "published in any culture". This aligns
+            // with behaviour in Umbraco 13.
+            return culture == Constants.System.InvariantCulture || publishedCultures.Contains(culture, StringComparer.InvariantCultureIgnoreCase);
         }
 
         _logger.LogDebug("Document {DocumentKey} not found in the publish status cache", documentKey);

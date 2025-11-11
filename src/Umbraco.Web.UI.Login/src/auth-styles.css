@@ -1,4 +1,19 @@
-#umb-login-form #username-input {
+.errormessage {
+	color: var(--uui-color-invalid-standalone);
+	display: none;
+	margin-top: var(--uui-size-1);
+}
+
+.errormessage.active {
+	display: block;
+}
+
+uui-form-layout-item {
+	margin-top: var(--uui-size-space-4);
+	margin-bottom: var(--uui-size-space-4);
+}
+
+#username-input {
 	width: 100%;
 	height: var(--input-height);
 	box-sizing: border-box;
@@ -9,21 +24,16 @@
 	padding: var(--uui-size-1, 3px) var(--uui-size-space-4, 9px);
 }
 
-#umb-login-form uui-form-layout-item {
-	margin-top: var(--uui-size-space-4);
-	margin-bottom: var(--uui-size-space-4);
-}
-
-#umb-login-form #username-input:focus-within {
+#username-input:focus-within {
 	border-color: var(--uui-input-border-color-focus, var(--uui-color-border-emphasis, #a1a1a1));
 	outline: calc(2px * var(--uui-show-focus-outline, 1)) solid var(--uui-color-focus);
 }
 
-#umb-login-form #username-input:hover:not(:focus-within) {
+#username-input:hover:not(:focus-within) {
 	border-color: var(--uui-input-border-color-hover, var(--uui-color-border-standalone, #c2c2c2));
 }
 
-#umb-login-form #password-input-span button {
+#password-show-toggle {
 	color: var(--uui-color-default-standalone);
 	display: inline-flex;
 	justify-content: center;
@@ -39,12 +49,12 @@
 	transition-timing-function: linear;
 }
 
-#umb-login-form #password-input-span button:hover {
+#password-show-toggle:hover {
 	color: var(--uui-color-default-emphasis);
 	cursor: pointer;
 }
 
-#umb-login-form #password-input-span {
+#password-input-span {
 	display: inline-flex;
 	width: 100%;
 	align-items: center;
@@ -60,7 +70,7 @@
 	padding: var(--uui-size-1, 3px) var(--uui-size-space-4, 9px);
 }
 
-#umb-login-form #password-input-span input {
+#password-input {
 	flex-grow: 1;
 	align-self: stretch;
 	min-width: 0;
@@ -70,15 +80,15 @@
 	outline-style: none;
 }
 
-#umb-login-form #password-input-span:focus-within {
+#password-input-span:focus-within {
 	border-color: var(--uui-input-border-color-focus, var(--uui-color-border-emphasis, #a1a1a1));
 	outline: calc(2px * var(--uui-show-focus-outline, 1)) solid var(--uui-color-focus);
 }
 
-#umb-login-form #password-input-span:hover:not(:focus-within) {
+#password-input-span:hover:not(:focus-within) {
 	border-color: var(--uui-input-border-color-hover, var(--uui-color-border-standalone, #c2c2c2));
 }
 
-#umb-login-form input::-ms-reveal {
+#password-input::-ms-reveal {
 	display: none;
 }
