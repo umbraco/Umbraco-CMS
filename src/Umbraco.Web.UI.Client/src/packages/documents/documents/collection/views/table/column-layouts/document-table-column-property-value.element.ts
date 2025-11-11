@@ -1,6 +1,6 @@
 import { UmbDocumentItemDataResolver } from '../../../../item/index.js';
 import type { UmbEditableDocumentCollectionItemModel } from '../../../types.js';
-import { customElement, html, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, html, nothing, property, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbTableColumn, UmbTableColumnLayoutElement, UmbTableItem } from '@umbraco-cms/backoffice/components';
 import type { ManifestPropertyValuePresentation } from '@umbraco-cms/backoffice/property-value-presentation';
