@@ -13,7 +13,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
 });
 
-test('can create a entity picker data type with tree data source', async ({umbracoApi, umbracoUi}) => {
+test('can create an entity picker data type with tree data source', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.dataType.clickActionsMenuForName('Data Types');
   await umbracoUi.dataType.clickCreateActionMenuOption();

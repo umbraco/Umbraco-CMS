@@ -21,7 +21,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
 });
 
-test('can render content with a entity picker with the collection data source', async ({umbracoApi, umbracoUi}) => {
+test('can render content with an entity picker using the collection data source', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeId = await umbracoApi.dataType.createEntityDataPickerDataType(dataTypeName, collectionDataSourceAlias);
   const templateId = await umbracoApi.template.createTemplateWithEntityDataPickerValue(templateName, propertyName);
