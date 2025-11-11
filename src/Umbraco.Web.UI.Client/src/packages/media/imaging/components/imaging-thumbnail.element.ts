@@ -57,8 +57,14 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 	@property()
 	loading: (typeof HTMLImageElement)['prototype']['loading'] = 'lazy';
 
+	/**
+	 * External loading state (e.g., when parent is waiting for metadata)
+	 */
+	@property({ type: Boolean })
+	externalLoading = false;
+
 	@state()
-	private _isLoading = true;
+	private _isLoading = false;
 
 	@state()
 	private _thumbnailUrl = '';
@@ -69,7 +75,7 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 
 	override render() {
 		return when(
-			this._isLoading,
+			this.externalLoading || this._isLoading,
 			() => this.#renderLoading(),
 			() => this.#renderThumbnail(),
 		);

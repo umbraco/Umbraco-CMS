@@ -409,18 +409,15 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 	#renderItem(item: UmbRichMediaCardModel) {
 		if (!item.unique) return nothing;
 		const href = this.readonly ? undefined : this._routeBuilder?.({ key: item.unique });
+
 		return html`
 			<uui-card-media id=${item.unique} name=${item.name} .href=${href} ?readonly=${this.readonly}>
-				${when(
-					item.isLoading,
-					() => html`<uui-loader-circle></uui-loader-circle>`,
-					() => html`
-						<umb-imaging-thumbnail
-							unique=${item.media}
-							alt=${item.name}
-							icon=${item.icon ?? 'icon-picture'}></umb-imaging-thumbnail>
-					`,
-				)}
+				<umb-imaging-thumbnail
+					unique=${item.media}
+					alt=${item.name}
+					icon=${item.icon ?? 'icon-picture'}
+					?externalLoading=${item.isLoading}></umb-imaging-thumbnail>
+
 				${this.#renderIsTrashed(item)} ${this.#renderActions(item)}
 			</uui-card-media>
 		`;
