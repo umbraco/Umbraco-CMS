@@ -7,33 +7,6 @@ const dataTypeName = 'EntityPickerWithTree';
 const propertyName = 'TestProperty';
 const treeDataSourceAlias = 'My.PickerDataSource.Tree';
 
-const templateValue = `@using Umbraco.Cms.Core.Models;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage;
-@{
-    Layout = null;
-    var entityDataPickerValue = Model.Value<EntityDataPickerValue>("${AliasHelper.toAlias(propertyName)}");
-}
-
-@if (entityDataPickerValue is null)
-{ }
-else
-{
-    <div data-mark="data-source-render-value">
-        <p>@entityDataPickerValue.DataSource</p>
-    </div>
-
-    <div data-mark="content-render-value">
-        <ul>
-
-        @foreach (var id in @entityDataPickerValue.Ids)
-        {
-            <li>@id</li>
-        }
-        </ul>
-    </div>
-}
-`
-
 // Ids for Example 4 and Example 2
 const items = {ids: ['4', '2']};
 
@@ -51,7 +24,7 @@ test.afterEach(async ({umbracoApi}) => {
 test('can render content with a entity picker with the tree data source', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeId = await umbracoApi.dataType.createEntityDataPickerDataType(dataTypeName, treeDataSourceAlias);
-  const templateId = await umbracoApi.template.createTemplateWithContent(templateName, templateValue);
+  const templateId = await umbracoApi.template.createTemplateWithEntityDataPickerValue(templateName, propertyName);
   const contentKey = await umbracoApi.document.createPublishedDocumentWithValue(contentName, items, dataTypeId, templateId, propertyName, documentTypeName);
   const contentURL = await umbracoApi.document.getDocumentUrl(contentKey);
 
