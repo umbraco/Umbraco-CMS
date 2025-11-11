@@ -108,9 +108,8 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 					name: this.localize.string(item.header),
 					alias: item.alias,
 					elementName:
-						item.elementName || item.isSystem
-							? 'umb-document-table-column-system-value'
-							: 'umb-document-table-column-property-value',
+						item.elementName ||
+						(item.isSystem ? 'umb-document-table-column-system-value' : 'umb-document-table-column-property-value'),
 					labelTemplate: item.nameTemplate,
 					allowSorting: true,
 				};
@@ -121,6 +120,8 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 				...userColumns,
 				{ name: '', alias: 'entityActions', align: 'right' },
 			];
+		} else {
+			this._tableColumns = [...this.#systemColumns, { name: '', alias: 'entityActions', align: 'right' }];
 		}
 	}
 

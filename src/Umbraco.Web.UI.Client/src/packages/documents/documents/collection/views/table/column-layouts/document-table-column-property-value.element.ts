@@ -40,7 +40,7 @@ export class UmbDocumentTableColumnPropertyValueElement extends UmbLitElement im
 		const props = { value: prop?.value ?? '' };
 
 		if (this.column.labelTemplate) {
-			return html`<umb-ufm-render inline .markdown=${this.column.labelTemplate} .value=${{ props }}></umb-ufm-render>`;
+			return html`<umb-ufm-render inline .markdown=${this.column.labelTemplate} .value=${props}></umb-ufm-render>`;
 		}
 
 		return when(

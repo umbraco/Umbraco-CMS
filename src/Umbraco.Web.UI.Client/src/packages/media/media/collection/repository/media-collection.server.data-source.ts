@@ -43,7 +43,7 @@ export class UmbMediaCollectionServerDataSource implements UmbCollectionDataSour
 					updateDate: new Date(variant.updateDate),
 					updater: item.creator, // TODO: Check if the `updater` is available for media items. [LK]
 					values: item.values.map((item) => {
-						return { alias: item.alias, value: item.value as string };
+						return { alias: item.alias, editorAlias: item.editorAlias, value: item.value as string };
 					}),
 					flags: item.flags,
 				};
