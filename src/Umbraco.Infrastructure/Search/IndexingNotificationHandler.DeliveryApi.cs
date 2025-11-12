@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -17,7 +17,7 @@ internal sealed class DeliveryApiContentIndexingNotificationHandler :
 {
     private readonly IDeliveryApiIndexingHandler _deliveryApiIndexingHandler;
     private readonly ILogger<DeliveryApiContentIndexingNotificationHandler> _logger;
-    private DeliveryApiSettings _deliveryApiSettings;
+    private readonly DeliveryApiSettings _deliveryApiSettings;
 
     public DeliveryApiContentIndexingNotificationHandler(
         IDeliveryApiIndexingHandler deliveryApiIndexingHandler,
@@ -27,7 +27,6 @@ internal sealed class DeliveryApiContentIndexingNotificationHandler :
         _deliveryApiIndexingHandler = deliveryApiIndexingHandler;
         _logger = logger;
         _deliveryApiSettings = deliveryApiSettings.CurrentValue;
-        deliveryApiSettings.OnChange(settings => _deliveryApiSettings = settings);
     }
 
     public void Handle(ContentCacheRefresherNotification notification)
