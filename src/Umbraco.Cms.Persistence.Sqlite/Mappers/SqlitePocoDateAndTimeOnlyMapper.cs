@@ -1,8 +1,13 @@
 using NPoco;
 
 namespace Umbraco.Cms.Persistence.Sqlite.Mappers;
+
+/// <summary>
+/// Provides a custom POCO mapper for handling date and time only values when working with SQLite databases.
+/// </summary>
 public class SqlitePocoDateAndTimeOnlyMapper : DefaultMapper
 {
+    /// <inheritdoc/>
     public override Func<object, object?> GetFromDbConverter(Type destType, Type sourceType)
     {
         if (destType == typeof(DateOnly))
@@ -13,9 +18,11 @@ public class SqlitePocoDateAndTimeOnlyMapper : DefaultMapper
                 {
                     return DateOnly.FromDateTime(dateTime);
                 }
+
                 return DateOnly.Parse(value.ToString()!);
             };
         }
+
         if (destType == typeof(DateOnly?))
         {
             return value =>
@@ -24,13 +31,16 @@ public class SqlitePocoDateAndTimeOnlyMapper : DefaultMapper
                 {
                     return default(DateOnly?);
                 }
+
                 if (value is DateTime dateTime)
                 {
                     return DateOnly.FromDateTime(dateTime);
                 }
+
                 return DateOnly.Parse(value.ToString()!);
             };
         }
+
         if (destType == typeof(TimeOnly))
         {
             return value =>
@@ -39,9 +49,11 @@ public class SqlitePocoDateAndTimeOnlyMapper : DefaultMapper
                 {
                     return TimeOnly.FromDateTime(dateTime);
                 }
+
                 return TimeOnly.Parse(value.ToString()!);
             };
         }
+
         if (destType == typeof(TimeOnly?))
         {
             return value =>
@@ -50,13 +62,16 @@ public class SqlitePocoDateAndTimeOnlyMapper : DefaultMapper
                 {
                     return default(TimeOnly?);
                 }
+
                 if (value is DateTime dateTime)
                 {
                     return TimeOnly.FromDateTime(dateTime);
                 }
+
                 return TimeOnly.Parse(value.ToString()!);
             };
         }
+
         return base.GetFromDbConverter(destType, sourceType);
     }
 }
