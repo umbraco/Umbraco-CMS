@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Umbraco.Cms.Core.Models.DeliveryApi;
 
+[JsonDerivedType(typeof(ApiElement))]
 public interface IApiElement
 {
     Guid Id { get; }

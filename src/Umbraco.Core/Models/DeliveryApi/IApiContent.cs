@@ -1,5 +1,8 @@
+using System.Text.Json.Serialization;
+
 namespace Umbraco.Cms.Core.Models.DeliveryApi;
 
+[JsonDerivedType(typeof(ApiContent))]
 public interface IApiContent : IApiElement
 {
     string? Name { get; }
