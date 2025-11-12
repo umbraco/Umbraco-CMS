@@ -1,6 +1,4 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -25,20 +23,6 @@ internal sealed class RedirectUrlService : RepositoryService, IRedirectUrlServic
     {
         _redirectUrlRepository = redirectUrlRepository;
         _publishedUrlProvider = publishedUrlProvider;
-    }
-
-    [Obsolete("Use the constructor taking all parameters. Scheduled for removal in Umbraco 19")]
-    public RedirectUrlService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IRedirectUrlRepository redirectUrlRepository)
-        : this(provider,
-            loggerFactory,
-            eventMessagesFactory,
-            StaticServiceProvider.Instance.GetRequiredService<IRedirectUrlRepository>(),
-            StaticServiceProvider.Instance.GetRequiredService<IPublishedUrlProvider>())
-    {
     }
 
     public void Register(string url, Guid contentKey, string? culture = null)
