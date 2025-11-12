@@ -307,7 +307,7 @@ public interface IRelationService : IService
     /// <param name="directionFilter">Indicates whether to check for relations as parent, child or in either direction.</param>
     /// <param name="includeRelationTypeIds">A collection of relation type Ids to include consideration in the relation checks.</param>
     /// <param name="excludeRelationTypeIds">A collection of relation type Ids to exclude from consideration in the relation checks.</param>
-    /// <remarks>If no relation type aliases are provided in includeRelationTypeAliases or excludeRelationTypeAliases, all relation type aliases are considered.</remarks>
+    /// <remarks>If no relation type Ids are provided in includeRelationTypeIds or excludeRelationTypeIds, all relation type Ids are considered.</remarks>
     /// <returns>Returns <c>True</c> if any relations exists with the given Id, otherwise <c>False</c>.</returns>
     bool IsRelated(int id, RelationDirectionFilter directionFilter, int[]? includeRelationTypeIds = null, int[]? excludeRelationTypeIds = null)
         => IsRelated(id, directionFilter);

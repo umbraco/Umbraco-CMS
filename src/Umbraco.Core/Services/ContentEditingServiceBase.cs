@@ -210,7 +210,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         if (disabledWhenReferenced)
         {
             // When checking if an item is related, we may need to exclude the "relate parent on delete" relation type, as this prevents
-            // deleting from the reycle bin.
+            // deleting from the recycle bin.
             int[]? excludeRelationTypeIds = null;
             if (string.IsNullOrWhiteSpace(RelateParentOnDeleteAlias) is false)
             {
