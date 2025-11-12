@@ -76,8 +76,9 @@ public class DocumentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApi
                     async contentType =>
                     {
                         var schemaId = $"{contentType.SchemaId}ContentResponseModel";
-                        return (schemaId, await CreateContentTypeSchema(schemaId, contentType, context));
-                    });
+                        return (schemaId, await CreateContentTypeSchema(schemaId, contentType, context, cancellationToken));
+                    },
+                    cancellationToken);
                 return;
             case var type when type == typeof(IApiContent):
                 await ApplyPolymorphicContentType(
@@ -87,8 +88,9 @@ public class DocumentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApi
                     async contentType =>
                     {
                         var schemaId = $"{contentType.SchemaId}ContentModel";
-                        return (schemaId, await CreateContentTypeSchema(schemaId, contentType, context));
-                    });
+                        return (schemaId, await CreateContentTypeSchema(schemaId, contentType, context, cancellationToken));
+                    },
+                    cancellationToken);
                 return;
             case var type when type == typeof(IApiElement):
                 await ApplyPolymorphicContentType(
@@ -98,8 +100,9 @@ public class DocumentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApi
                     async contentType =>
                     {
                         var schemaId = $"{contentType.SchemaId}ElementModel";
-                        return (schemaId, await CreateContentTypeSchema(schemaId, contentType, context));
-                    });
+                        return (schemaId, await CreateContentTypeSchema(schemaId, contentType, context, cancellationToken));
+                    },
+                    cancellationToken);
                 return;
         }
     }
@@ -108,7 +111,8 @@ public class DocumentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApi
         OpenApiSchema schema,
         OpenApiSchemaTransformerContext context,
         List<ContentTypeInfo> contentTypes,
-        Func<ContentTypeInfo, Task<(string SchemaId, OpenApiSchema Schema)>> contentTypeSchemaMapper)
+        Func<ContentTypeInfo, Task<(string SchemaId, OpenApiSchema Schema)>> contentTypeSchemaMapper,
+        CancellationToken cancellationToken)
     {
         _handledTypes.Add(context.JsonTypeInfo.Type);
 
@@ -118,6 +122,7 @@ public class DocumentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApi
             IOpenApiSchema derivedTypeSchema = await CreateSchema(
                 GetJsonTypeInfo(derivedType.DerivedType),
                 context,
+                cancellationToken,
                 derivedTypeSchema =>
                 {
                     derivedTypeSchema.Properties?.Remove("properties");
@@ -153,13 +158,14 @@ public class DocumentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApi
     private async Task<IOpenApiSchema> CreateSchema(
         JsonTypeInfo jsonTypeInfo,
         OpenApiSchemaTransformerContext context,
+        CancellationToken cancellationToken,
         Action<OpenApiSchema>? configureSchema = null)
     {
         if (jsonTypeInfo.Type.IsArray || jsonTypeInfo.Kind == JsonTypeInfoKind.Enumerable)
         {
             Type elementType = jsonTypeInfo.ElementType ?? jsonTypeInfo.Type.GetElementType() ?? typeof(object);
             JsonTypeInfo elementJsonTypeInfo = GetJsonTypeInfo(elementType);
-            IOpenApiSchema itemSchema = await CreateSchema(elementJsonTypeInfo, context, configureSchema);
+            IOpenApiSchema itemSchema = await CreateSchema(elementJsonTypeInfo, context, cancellationToken, configureSchema);
             var arraySchema = new OpenApiSchema
             {
                 Type = JsonSchemaType.Array,
@@ -178,7 +184,7 @@ public class DocumentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApi
             return GetPlaceholderSchema(schemaId);
         }
 
-        OpenApiSchema schema = await context.GetOrCreateSchemaAsync(jsonTypeInfo.Type);
+        OpenApiSchema schema = await context.GetOrCreateSchemaAsync(jsonTypeInfo.Type, cancellationToken: cancellationToken);
         configureSchema?.Invoke(schema);
         return schema;
     }
@@ -198,7 +204,8 @@ public class DocumentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApi
     private async Task<OpenApiSchema> CreateContentTypeSchema(
         string schemaId,
         ContentTypeInfo contentType,
-        OpenApiSchemaTransformerContext context) =>
+        OpenApiSchemaTransformerContext context,
+        CancellationToken cancellationToken) =>
         new()
         {
             Type = JsonSchemaType.Object,
@@ -209,7 +216,7 @@ public class DocumentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApi
                 {
                     AllOf =
                     [
-                        await CreatePropertiesSchema(contentType, context),
+                        await CreatePropertiesSchema(contentType, context, cancellationToken),
                         ..contentType.CompositionSchemaIds.Select(compositionSchemaId => new OpenApiSchemaReference($"{compositionSchemaId}PropertiesModel", context.Document))
                     ],
                 },
@@ -220,7 +227,8 @@ public class DocumentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApi
 
     private async Task<IOpenApiSchema> CreatePropertiesSchema(
         ContentTypeInfo contentType,
-        OpenApiSchemaTransformerContext context)
+        OpenApiSchemaTransformerContext context,
+        CancellationToken cancellationToken)
     {
         var schemaId = $"{contentType.SchemaId}PropertiesModel";
         if (context.Document!.Components?.Schemas?.TryGetValue(schemaId, out IOpenApiSchema? existingSchema) == true)
@@ -231,7 +239,7 @@ public class DocumentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApi
         var propertiesSchema = new OpenApiSchema
         {
             Type = JsonSchemaType.Object,
-            Properties = await ContentTypePropertiesMapper(contentType, context),
+            Properties = await ContentTypePropertiesMapper(contentType, context, cancellationToken),
             Metadata = new Dictionary<string, object> { ["x-schema-id"] = schemaId, },
         };
         context.Document.AddComponent(schemaId, propertiesSchema);
@@ -240,12 +248,13 @@ public class DocumentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApi
 
     private async Task<Dictionary<string, IOpenApiSchema>> ContentTypePropertiesMapper(
         ContentTypeInfo contentType,
-        OpenApiSchemaTransformerContext context)
+        OpenApiSchemaTransformerContext context,
+        CancellationToken cancellationToken)
     {
         var properties = new Dictionary<string, IOpenApiSchema>();
         foreach (ContentTypePropertyInfo propertyInfo in contentType.Properties.Where(p => !p.Inherited))
         {
-            IOpenApiSchema schema = await CreateSchema(GetJsonTypeInfo(propertyInfo.Type), context);
+            IOpenApiSchema schema = await CreateSchema(GetJsonTypeInfo(propertyInfo.Type), context, cancellationToken);
             properties[propertyInfo.Alias] = schema;
         }
 
