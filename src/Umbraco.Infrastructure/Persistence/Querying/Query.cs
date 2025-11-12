@@ -50,6 +50,22 @@ public class Query<T> : IQuery<T>
     }
 
     /// <summary>
+    ///     Adds a where-not-in clause to the query.
+    /// </summary>
+    public virtual IQuery<T> WhereNotIn(Expression<Func<T, object>>? fieldSelector, IEnumerable? values)
+    {
+        if (fieldSelector == null)
+        {
+            return this;
+        }
+
+        var expressionHelper = new ModelToSqlExpressionVisitor<T>(_sqlContext.SqlSyntax, _sqlContext.Mappers);
+        var whereExpression = expressionHelper.Visit(fieldSelector);
+        _wheres.Add(new Tuple<string, object[]>(whereExpression + " NOT IN (@values)", new object[] { new { values } }));
+        return this;
+    }
+
+    /// <summary>
     ///     Adds a set of OR-ed where clauses to the query.
     /// </summary>
     public virtual IQuery<T> WhereAny(IEnumerable<Expression<Func<T, bool>>>? predicates)
