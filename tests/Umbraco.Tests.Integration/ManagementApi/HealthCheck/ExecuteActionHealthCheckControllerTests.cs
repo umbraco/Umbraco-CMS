@@ -27,7 +27,7 @@ public class ExecuteActionHealthCheckControllerTests : ManagementApiUserGroupTes
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.InternalServerError
+        ExpectedStatusCode = HttpStatusCode.OK
     };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
@@ -58,7 +58,7 @@ public class ExecuteActionHealthCheckControllerTests : ManagementApiUserGroupTes
     protected override async Task<HttpResponseMessage> ClientRequest()
     {
         HealthCheckActionRequestModel healthCheckActionRequest =
-            new() { HealthCheck = new ReferenceByIdModel(_dataIntegrityHealthCheckId), ValueRequired = false };
+            new() { HealthCheck = new ReferenceByIdModel(_dataIntegrityHealthCheckId), ValueRequired = false, Alias = "fixContentPaths" };
         return await Client.PostAsync(Url, JsonContent.Create(healthCheckActionRequest));
     }
 }
