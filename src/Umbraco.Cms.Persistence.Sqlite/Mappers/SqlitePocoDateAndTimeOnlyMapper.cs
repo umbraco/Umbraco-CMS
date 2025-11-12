@@ -1,8 +1,13 @@
 using NPoco;
 
 namespace Umbraco.Cms.Persistence.Sqlite.Mappers;
+
+/// <summary>
+/// Provides a custom POCO mapper for handling date and time only values when working with SQLite databases.
+/// </summary>
 public class SqlitePocoDateAndTimeOnlyMapper : DefaultMapper
 {
+    /// <inheritdoc/>
     public override Func<object, object?> GetFromDbConverter(Type destType, Type sourceType)
     {
         if (destType == typeof(DateOnly))
