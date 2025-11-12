@@ -1,30 +1,10 @@
-using System.Globalization;
 using NPoco;
 
-namespace Umbraco.Cms.Core.Mapping;
-
-public class UmbracoDefaultMapper : DefaultMapper
+namespace Umbraco.Cms.Persistence.Sqlite.Mappers;
+public class SqlitePocoDateAndTimeOnlyMapper : DefaultMapper
 {
     public override Func<object, object?> GetFromDbConverter(Type destType, Type sourceType)
     {
-        if (destType == typeof(decimal))
-        {
-            return value =>
-            {
-                var result = Convert.ToDecimal(value, CultureInfo.InvariantCulture);
-                return result;
-            };
-        }
-
-        if (destType == typeof(decimal?))
-        {
-            return value =>
-            {
-                var result = Convert.ToDecimal(value, CultureInfo.InvariantCulture);
-                return result;
-            };
-        }
-
         if (destType == typeof(DateOnly))
         {
             return value =>

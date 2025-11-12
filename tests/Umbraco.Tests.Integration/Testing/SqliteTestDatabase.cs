@@ -96,6 +96,8 @@ public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase
 
         database.Mappers.Add(new NullableDateMapper());
         database.Mappers.Add(new SqlitePocoGuidMapper());
+        database.Mappers.Add(new SqlitePocoDecimalMapper());
+        database.Mappers.Add(new SqlitePocoDateAndTimeOnlyMapper());
 
         foreach (var dbCommand in _cachedDatabaseInitCommands)
         {
