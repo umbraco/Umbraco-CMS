@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 using Microsoft.AspNetCore.Http.Json;
@@ -142,9 +143,6 @@ public class DocumentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApi
         // Remove all schema properties that are now handled by the derived types
         schema.Type = null;
         schema.AnyOf = null;
-
-        // Inline the schema
-        schema.Metadata?.Remove("x-schema-id");
     }
 
     /// <summary>
@@ -205,7 +203,15 @@ public class DocumentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApi
             Type = JsonSchemaType.Object,
             Properties = new Dictionary<string, IOpenApiSchema>
             {
-                ["properties"] = await CreatePropertiesSchema(contentType, context),
+                ["contentType"] = new OpenApiSchema { Const = contentType.Alias },
+                ["properties"] = new OpenApiSchema
+                {
+                    AllOf =
+                    [
+                        await CreatePropertiesSchema(contentType, context),
+                        ..contentType.CompositionSchemaIds.Select(compositionSchemaId => new OpenApiSchemaReference($"{compositionSchemaId}PropertiesModel", context.Document))
+                    ],
+                },
             },
             AdditionalPropertiesAllowed = false,
             Metadata = new Dictionary<string, object> { ["x-schema-id"] = schemaId, },
@@ -236,7 +242,7 @@ public class DocumentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApi
         OpenApiSchemaTransformerContext context)
     {
         var properties = new Dictionary<string, IOpenApiSchema>();
-        foreach (ContentTypePropertyInfo propertyInfo in contentType.Properties)
+        foreach (ContentTypePropertyInfo propertyInfo in contentType.Properties.Where(p => !p.Inherited))
         {
             IOpenApiSchema schema = await CreateSchema(GetJsonTypeInfo(propertyInfo.Type), context);
             properties[propertyInfo.Alias] = schema;
@@ -258,11 +264,17 @@ public class DocumentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApi
     /// <param name="schema">The schema to process.</param>
     private static void ReplacePlaceholderSchemas(OpenApiDocument document, IOpenApiSchema schema)
     {
-        if (document.Components?.Schemas is null || schema.Properties is not { Count: > 0 })
+        // Replace in allOf, oneOf, anyOf
+        ReplacePlaceholderSchemas(document, schema.AllOf);
+        ReplacePlaceholderSchemas(document, schema.OneOf);
+        ReplacePlaceholderSchemas(document, schema.AnyOf);
+
+        if (schema.Properties is not { Count: > 0 })
         {
             return;
         }
 
+        // Process properties
         foreach (var propertyKey in schema.Properties.Keys)
         {
             IOpenApiSchema propertySchema = schema.Properties[propertyKey];
@@ -271,31 +283,68 @@ public class DocumentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApi
                 continue;
             }
 
-            // Check if this is a placeholder schema
-            if (innerSchema.Metadata?.TryGetValue(CustomRecursiveRefKey, out var recursiveRefIdObj) == true
-                && recursiveRefIdObj is string recursiveRefId)
+            schema.Properties[propertyKey] = GetActualSchema(document, innerSchema, out var replaced);
+            if (replaced)
             {
-                // Replace the reference with the actual schema
-                schema.Properties[propertyKey] = document.Components.Schemas.TryGetValue(recursiveRefId, out IOpenApiSchema? actualItemSchema)
-                    ? actualItemSchema
-                    : new OpenApiSchema { Type = JsonSchemaType.Object };
+                // If we replaced the schema, we don't need to recurse into it
                 continue;
             }
 
-            // Check if this is an array with a placeholder item schema
-            if (innerSchema.Items is OpenApiSchema itemsSchema
-                && itemsSchema.Metadata?.TryGetValue(CustomRecursiveRefKey, out var itemsRecursiveRefIdObj) == true
-                && itemsRecursiveRefIdObj is string itemsRecursiveRefId)
+            innerSchema.Items = GetActualSchema(document, innerSchema.Items, out replaced);
+            if (replaced)
             {
-                // Replace the reference with the actual schema
-                innerSchema.Items = document.Components.Schemas.TryGetValue(itemsRecursiveRefId, out IOpenApiSchema? actualItemSchema)
-                    ? actualItemSchema
-                    : null;
+                // If we replaced the schema, we don't need to recurse into it
                 continue;
             }
 
             // Recursive call to handle the property schema
             ReplacePlaceholderSchemas(document, innerSchema);
         }
+    }
+
+    private static void ReplacePlaceholderSchemas(OpenApiDocument document, IList<IOpenApiSchema>? schemas)
+    {
+        if (schemas is null || schemas.Count == 0)
+        {
+            return;
+        }
+
+        for (var i = 0; i < schemas.Count; i++)
+        {
+            IOpenApiSchema allOfSchema = schemas[i];
+            schemas[i] = GetActualSchema(document, allOfSchema, out var replaced);
+            if (!replaced)
+            {
+                ReplacePlaceholderSchemas(document, schemas[i]);
+            }
+        }
+    }
+
+    [return: NotNullIfNotNull(nameof(schema))]
+    private static IOpenApiSchema? GetActualSchema(OpenApiDocument document, IOpenApiSchema? schema, out bool replaced)
+    {
+        if (schema is not OpenApiSchema openApiSchema)
+        {
+            replaced = false;
+            return schema;
+        }
+
+        // Check if this is a placeholder schema
+        if (openApiSchema.Metadata?.TryGetValue(CustomRecursiveRefKey, out var recursiveRefIdObj) != true
+            || recursiveRefIdObj is not string recursiveRefId)
+        {
+            replaced = false;
+            return schema;
+        }
+
+        if (document.Components?.Schemas is not { } documentSchemas
+            || !documentSchemas.TryGetValue(recursiveRefId, out IOpenApiSchema? actualSchema))
+        {
+            throw new InvalidOperationException($"Could not find a schema for {recursiveRefId}");
+        }
+
+        // Return the actual schema
+        replaced = true;
+        return actualSchema;
     }
 }
