@@ -38,13 +38,6 @@ export class UmbDocumentGridCollectionCardElement extends UmbElementMixin(UUICar
 		this.#resolver.observe(this.#resolver.state, (state) => (this._state = state || ''));
 	}
 
-	// #getPropertyByAlias(column: UmbCollectionColumnConfiguration) {
-	// 	const alias = column.alias;
-	// 	const culture = this.#resolver.getCulture();
-	// 	const prop = this.item.values.find((x) => x.alias === alias && (!x.culture || x.culture === culture));
-	// 	return prop;
-	// }
-
 	#getStateTagConfig(): { color: UUIInterfaceColor; label: string } | undefined {
 		if (!this._state) return;
 		switch (this._state) {
