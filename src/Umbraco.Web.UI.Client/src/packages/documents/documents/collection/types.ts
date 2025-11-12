@@ -27,8 +27,16 @@ export interface UmbDocumentCollectionItemModel extends UmbEntityWithFlags {
 	sortOrder: number;
 	unique: string;
 	updater?: string | null;
-	values: Array<{ alias: string; editorAlias: string; culture?: string; segment?: string; value: string }>;
+	values: Array<UmbDocumentCollectionItemPropertyValueModel>;
 	variants: Array<UmbDocumentItemVariantModel>;
+}
+
+export interface UmbDocumentCollectionItemPropertyValueModel {
+	alias: string;
+	editorAlias: string;
+	culture?: string;
+	segment?: string;
+	value: string;
 }
 
 export interface UmbEditableDocumentCollectionItemModel {

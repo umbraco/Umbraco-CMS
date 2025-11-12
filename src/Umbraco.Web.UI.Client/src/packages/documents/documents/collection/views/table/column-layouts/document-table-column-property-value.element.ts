@@ -1,4 +1,4 @@
-import { UmbDocumentItemDataResolver } from '../../../../item/index.js';
+import { UmbDocumentCollectionItemDataResolver } from '../../../document-collection-item-data-resolver.js';
 import type { UmbEditableDocumentCollectionItemModel } from '../../../types.js';
 import { customElement, html, nothing, property, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -8,7 +8,7 @@ import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-document-table-column-property-value')
 export class UmbDocumentTableColumnPropertyValueElement extends UmbLitElement implements UmbTableColumnLayoutElement {
-	#resolver = new UmbDocumentItemDataResolver(this);
+	#resolver = new UmbDocumentCollectionItemDataResolver(this);
 
 	column!: UmbTableColumn;
 	item!: UmbTableItem;
@@ -26,17 +26,9 @@ export class UmbDocumentTableColumnPropertyValueElement extends UmbLitElement im
 	}
 	#value!: UmbEditableDocumentCollectionItemModel;
 
-	#getPropertyByAlias() {
-		const alias = this.column.alias;
-		const item = this.value.item;
-		const culture = this.#resolver.getCulture();
-		const prop = item.values.find((x) => x.alias === alias && (!x.culture || x.culture === culture));
-		return prop;
-	}
-
 	override render() {
 		if (!this.value?.item) return nothing;
-		const prop = this.#getPropertyByAlias();
+		const prop = this.#resolver.getPropertyByAlias(this.column.alias);
 		const props = { value: prop?.value ?? '' };
 
 		if (this.column.labelTemplate) {
