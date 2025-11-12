@@ -544,6 +544,28 @@ stages:
               CONNECTIONSTRINGS__UMBRACODBDSN: Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True
               CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
               additionalEnvironmentVariables: false
+            # ExtensionRegistry
+            WindowsInstallCommerce:
+              vmImage: "windows-latest"
+              testFolder: "InstallCommerce"
+              packageName: "Umbraco.Commerce"
+              ## HOW TO WE UPDATE THIS? USE THE SAME AS WE DO IN OUR SETUP TEMPLATE?
+              packageVersion: "16.4.0"
+              port: ''
+              testCommand: "npx playwright test --project=installCommerce"
+              CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=(localdb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Umbraco.mdf;Integrated Security=True
+              CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
+              additionalEnvironmentVariables: false
+            LinuxInstallCommerce:
+              vmImage: "ubuntu-latest"
+              testFolder: "InstallCommerce"
+              packageName: "Umbraco.Commerce"
+              packageVersion: "16.4.0"
+              port: ''
+              testCommand: "npx playwright test --project=installCommerce"
+              CONNECTIONSTRINGS__UMBRACODBDSN: Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True
+              CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
+              additionalEnvironmentVariables: false
         pool:
           vmImage: $(vmImage)
         steps:

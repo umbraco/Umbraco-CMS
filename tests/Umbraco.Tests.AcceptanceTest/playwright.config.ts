@@ -77,6 +77,17 @@ export default defineConfig({
       }
     },
     {
+      name: 'installCommerce',
+      testMatch: 'Packages/InstallCommerce/**',
+      dependencies: ['setup'],
+      use: {
+        ...devices['Desktop Chrome'],
+        // Use prepared auth state.
+        ignoreHTTPSErrors: true,
+        storageState: STORAGE_STATE
+      }
+    },
+    {
       name: 'externalLoginAzureADB2C',
       testMatch: 'ExternalLogin/AzureADB2C/**',
       use: {
