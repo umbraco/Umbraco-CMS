@@ -15,9 +15,11 @@ namespace Umbraco.Cms.Api.Delivery.Filters.OpenApi;
 /// <summary>
 /// Transforms the OpenAPI document to add schemas for the instance's document types.
 /// </summary>
-public class DocumentTypeSchemaTransformer : IOpenApiSchemaTransformer
+public class DocumentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApiDocumentTransformer
 {
+    private const string CustomRecursiveRefKey = "x-recursive-ref";
     private readonly IContentTypeInfoService _contentTypeInfoService;
+    private readonly HashSet<Type> _handledTypes = [];
     private readonly IJsonTypeInfoResolver _jsonTypeInfoResolver;
     private readonly JsonSerializerOptions _serializerOptions;
 
@@ -36,6 +38,25 @@ public class DocumentTypeSchemaTransformer : IOpenApiSchemaTransformer
             .SerializerOptions;
         _jsonTypeInfoResolver = _serializerOptions.TypeInfoResolver
                                 ?? throw new InvalidOperationException("The JSON serializer options must have a TypeInfoResolver configured.");
+    }
+
+    /// <inheritdoc />
+    public Task TransformAsync(
+        OpenApiDocument document,
+        OpenApiDocumentTransformerContext context,
+        CancellationToken cancellationToken)
+    {
+        if (document.Components?.Schemas is not { Count: > 0 })
+        {
+            return Task.CompletedTask;
+        }
+
+        foreach (IOpenApiSchema componentsSchema in document.Components.Schemas.Values)
+        {
+            ReplacePlaceholderSchemas(document, componentsSchema);
+        }
+
+        return Task.CompletedTask;
     }
 
     /// <inheritdoc />
@@ -88,10 +109,8 @@ public class DocumentTypeSchemaTransformer : IOpenApiSchemaTransformer
         List<ContentTypeInfo> contentTypes,
         Func<ContentTypeInfo, Task<(string SchemaId, OpenApiSchema Schema)>> contentTypeSchemaMapper)
     {
-        var schemaId = GetSchemaId(context.JsonTypeInfo) ?? throw new InvalidOperationException("The schema must have an ID to apply polymorphic content types.");
-        context.Document!.AddComponent(schemaId, new OpenApiSchema());
+        _handledTypes.Add(context.JsonTypeInfo.Type);
 
-        // Ensure that the derived types are generated
         List<IOpenApiSchema> derivedTypeSchemas = [];
         foreach (JsonDerivedType derivedType in context.JsonTypeInfo.PolymorphismOptions?.DerivedTypes ?? [])
         {
@@ -105,7 +124,6 @@ public class DocumentTypeSchemaTransformer : IOpenApiSchemaTransformer
             derivedTypeSchemas.Add(derivedTypeSchema);
         }
 
-        // Set up discriminator
         schema.Discriminator = new OpenApiDiscriminator
         {
             PropertyName = "contentType",
@@ -116,17 +134,9 @@ public class DocumentTypeSchemaTransformer : IOpenApiSchemaTransformer
         foreach (ContentTypeInfo contentType in contentTypes)
         {
             (var contentTypeSchemaId, OpenApiSchema contentTypeSchema) = await contentTypeSchemaMapper(contentType);
-            schema.OneOf.Add(new OpenApiSchemaReference(contentTypeSchemaId, context.Document));
-            schema.Discriminator.Mapping[contentType.Alias] = new OpenApiSchemaReference(contentTypeSchemaId, context.Document);
-
-            // Only add the schema if it isn't already present
-            if (context.Document?.Components?.Schemas?.ContainsKey(contentTypeSchemaId) == true)
-            {
-                continue;
-            }
-
             contentTypeSchema.OneOf = derivedTypeSchemas;
-            context.Document?.AddComponent(contentTypeSchemaId, contentTypeSchema);
+            schema.Discriminator.Mapping[contentType.Alias] = new OpenApiSchemaReference(contentTypeSchemaId, context.Document);
+            schema.OneOf.Add(contentTypeSchema);
         }
 
         // Remove all schema properties that are now handled by the derived types
@@ -135,8 +145,6 @@ public class DocumentTypeSchemaTransformer : IOpenApiSchemaTransformer
 
         // Inline the schema
         schema.Metadata?.Remove("x-schema-id");
-
-        context.Document!.Components!.Schemas!.Remove(schemaId);
     }
 
     /// <summary>
@@ -148,45 +156,45 @@ public class DocumentTypeSchemaTransformer : IOpenApiSchemaTransformer
         OpenApiSchemaTransformerContext context,
         Action<OpenApiSchema>? configureSchema = null)
     {
+        if (jsonTypeInfo.Type.IsArray || jsonTypeInfo.Kind == JsonTypeInfoKind.Enumerable)
+        {
+            Type elementType = jsonTypeInfo.ElementType ?? jsonTypeInfo.Type.GetElementType() ?? typeof(object);
+            JsonTypeInfo elementJsonTypeInfo = GetJsonTypeInfo(elementType);
+            IOpenApiSchema itemSchema = await CreateSchema(elementJsonTypeInfo, context, configureSchema);
+            var arraySchema = new OpenApiSchema
+            {
+                Type = JsonSchemaType.Array,
+                Items = itemSchema,
+            };
+            return arraySchema;
+        }
+
         var schemaId = GetSchemaId(jsonTypeInfo);
 
-        // If the schema ID is null, that means the schema should be inlined, so we create and return it directly.
-        if (schemaId is null)
+        // If this is one of the types we handle, and we already started generating it, return a placeholder
+        // to avoid circular reference issues.
+        // In the document transformer, these placeholders will be replaced with the actual schemas.
+        if (schemaId is not null && _handledTypes.Contains(jsonTypeInfo.Type))
         {
-            // For array or enumerable types, we need to create the item schema for the elements and then return the array schema inline.
-            if (jsonTypeInfo.Type.IsArray || jsonTypeInfo.Kind == JsonTypeInfoKind.Enumerable)
-            {
-                Type elementType = jsonTypeInfo.ElementType ?? jsonTypeInfo.Type.GetElementType() ?? typeof(object);
-                JsonTypeInfo elementJsonTypeInfo = GetJsonTypeInfo(elementType);
-                IOpenApiSchema itemSchema = await CreateSchema(elementJsonTypeInfo, context, configureSchema);
-                var arraySchema = new OpenApiSchema
-                {
-                    Type = JsonSchemaType.Array,
-                    Items = itemSchema,
-                };
-                return arraySchema;
-            }
-
-            OpenApiSchema inlineSchema = await context.GetOrCreateSchemaAsync(jsonTypeInfo.Type);
-            configureSchema?.Invoke(inlineSchema);
-            return inlineSchema;
+            return GetPlaceholderSchema(schemaId);
         }
 
-        if (context.Document!.Components?.Schemas?.ContainsKey(schemaId) == true)
-        {
-            return new OpenApiSchemaReference(schemaId, context.Document);
-        }
-
-        // Add an empty placeholder schema to avoid recursion issues
-        //context.Document!.AddComponent(schemaId, new OpenApiSchema());
         OpenApiSchema schema = await context.GetOrCreateSchemaAsync(jsonTypeInfo.Type);
         configureSchema?.Invoke(schema);
-
-        // Remove the placeholder and add the real schema
-        //context.Document!.Components?.Schemas?.Remove(schemaId);
-        context.Document!.AddComponent(schemaId, schema);
-        return new OpenApiSchemaReference(schemaId, context.Document);
+        return schema;
     }
+
+    private static string? GetSchemaId(JsonTypeInfo type)
+        => ConfigureUmbracoOpenApiOptionsBase.CreateSchemaReferenceId(type);
+
+    private static OpenApiSchema GetPlaceholderSchema(string schemaId)
+        => new()
+        {
+            Metadata = new Dictionary<string, object>
+            {
+                [CustomRecursiveRefKey] = schemaId,
+            },
+        };
 
     private async Task<OpenApiSchema> CreateContentTypeSchema(
         string schemaId,
@@ -208,9 +216,9 @@ public class DocumentTypeSchemaTransformer : IOpenApiSchemaTransformer
         OpenApiSchemaTransformerContext context)
     {
         var schemaId = $"{contentType.SchemaId}PropertiesModel";
-        if (context.Document!.Components?.Schemas?.ContainsKey(schemaId) == true)
+        if (context.Document!.Components?.Schemas?.TryGetValue(schemaId, out IOpenApiSchema? existingSchema) == true)
         {
-            return new OpenApiSchemaReference(schemaId, context.Document);
+            return existingSchema;
         }
 
         var propertiesSchema = new OpenApiSchema
@@ -220,7 +228,7 @@ public class DocumentTypeSchemaTransformer : IOpenApiSchemaTransformer
             Metadata = new Dictionary<string, object> { ["x-schema-id"] = schemaId, },
         };
         context.Document.AddComponent(schemaId, propertiesSchema);
-        return new OpenApiSchemaReference(schemaId, context.Document);
+        return propertiesSchema;
     }
 
     private async Task<Dictionary<string, IOpenApiSchema>> ContentTypePropertiesMapper(
@@ -243,6 +251,51 @@ public class DocumentTypeSchemaTransformer : IOpenApiSchemaTransformer
         return jsonTypeInfo ?? throw new InvalidOperationException("Could not get JsonTypeInfo for type " + type.FullName);
     }
 
-    private string? GetSchemaId(JsonTypeInfo type)
-        => ConfigureUmbracoOpenApiOptionsBase.CreateSchemaReferenceId(type);
+    /// <summary>
+    /// Replaces placeholder schemas (that caused circular references) with the actual schemas in the OpenAPI document.
+    /// </summary>
+    /// <param name="document">The OpenAPI document.</param>
+    /// <param name="schema">The schema to process.</param>
+    private static void ReplacePlaceholderSchemas(OpenApiDocument document, IOpenApiSchema schema)
+    {
+        if (document.Components?.Schemas is null || schema.Properties is not { Count: > 0 })
+        {
+            return;
+        }
+
+        foreach (var propertyKey in schema.Properties.Keys)
+        {
+            IOpenApiSchema propertySchema = schema.Properties[propertyKey];
+            if (propertySchema is not OpenApiSchema innerSchema)
+            {
+                continue;
+            }
+
+            // Check if this is a placeholder schema
+            if (innerSchema.Metadata?.TryGetValue(CustomRecursiveRefKey, out var recursiveRefIdObj) == true
+                && recursiveRefIdObj is string recursiveRefId)
+            {
+                // Replace the reference with the actual schema
+                schema.Properties[propertyKey] = document.Components.Schemas.TryGetValue(recursiveRefId, out IOpenApiSchema? actualItemSchema)
+                    ? actualItemSchema
+                    : new OpenApiSchema { Type = JsonSchemaType.Object };
+                continue;
+            }
+
+            // Check if this is an array with a placeholder item schema
+            if (innerSchema.Items is OpenApiSchema itemsSchema
+                && itemsSchema.Metadata?.TryGetValue(CustomRecursiveRefKey, out var itemsRecursiveRefIdObj) == true
+                && itemsRecursiveRefIdObj is string itemsRecursiveRefId)
+            {
+                // Replace the reference with the actual schema
+                innerSchema.Items = document.Components.Schemas.TryGetValue(itemsRecursiveRefId, out IOpenApiSchema? actualItemSchema)
+                    ? actualItemSchema
+                    : null;
+                continue;
+            }
+
+            // Recursive call to handle the property schema
+            ReplacePlaceholderSchemas(document, innerSchema);
+        }
+    }
 }

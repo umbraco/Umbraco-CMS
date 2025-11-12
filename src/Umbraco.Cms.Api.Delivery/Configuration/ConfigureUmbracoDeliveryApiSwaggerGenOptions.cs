@@ -34,6 +34,8 @@ public class ConfigureUmbracoDeliveryApiSwaggerGenOptions : ConfigureUmbracoOpen
 
         options.AddOperationTransformer<ContentApiTransformer>();
         options.AddOperationTransformer<MediaApiTransformer>();
-        options.AddSchemaTransformer<DocumentTypeSchemaTransformer>();
+        options
+            .AddSchemaTransformer<DocumentTypeSchemaTransformer>()
+            .AddDocumentTransformer<DocumentTypeSchemaTransformer>();
     }
 }
