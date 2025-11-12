@@ -1,42 +1,58 @@
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <inheritdoc />
 internal sealed class ContentTypeInfoService : IContentTypeInfoService
 {
     private readonly IContentTypeService _contentTypeService;
-    private readonly IPublishedContentTypeFactory _publishedContentTypeFactory;
+    private readonly IMediaTypeService _mediaTypeService;
+    private readonly IPublishedContentTypeCache _publishedContentTypeCache;
     private readonly IShortStringHelper _shortStringHelper;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ContentTypeInfoService"/> class.
+    /// </summary>
     public ContentTypeInfoService(
         IContentTypeService contentTypeService,
-        IPublishedContentTypeFactory publishedContentTypeFactory,
+        IMediaTypeService mediaTypeService,
+        IPublishedContentTypeCache publishedContentTypeCache,
         IShortStringHelper shortStringHelper)
     {
         _contentTypeService = contentTypeService;
-        _publishedContentTypeFactory = publishedContentTypeFactory;
+        _mediaTypeService = mediaTypeService;
+        _publishedContentTypeCache = publishedContentTypeCache;
         _shortStringHelper = shortStringHelper;
     }
 
+    /// <inheritdoc/>
     public ICollection<ContentTypeInfo> GetContentTypes()
+        => GetContentTypeInfos(PublishedItemType.Content, _contentTypeService.GetAll().Select(x => x.Alias));
+
+    /// <inheritdoc/>
+    public ICollection<ContentTypeInfo> GetMediaTypes()
+        => GetContentTypeInfos(PublishedItemType.Media, _mediaTypeService.GetAll().Select(x => x.Alias));
+
+    private ICollection<ContentTypeInfo> GetContentTypeInfos(PublishedItemType itemType, IEnumerable<string> contentTypeAliases)
     {
         List<ContentTypeInfo> result = [];
         HashSet<string> compositionAliases = [];
 
-        foreach (IContentType contentType in _contentTypeService.GetAll())
+        foreach (var contentTypeAlias in contentTypeAliases)
         {
-            HashSet<string> ownPropertyAliases = [.. contentType.PropertyTypes.Select(p => p.Alias)];
-            IPublishedContentType publishedContentType = _publishedContentTypeFactory.CreateContentType(contentType);
+            IPublishedContentType publishedContentType = _publishedContentTypeCache.Get(itemType, contentTypeAlias);
+            HashSet<string> ownPropertyAliases = [.. publishedContentType.PropertyTypes.Select(p => p.Alias)];
 
             result.Add(
                 new ContentTypeInfo
                 {
-                    Alias = contentType.Alias,
-                    SchemaId = GetContentTypeSchemaId(contentType),
-                    CompositionSchemaIds = [.. contentType.ContentTypeComposition.Select(GetContentTypeSchemaId)],
+                    Alias = contentTypeAlias,
+                    SchemaId = GetContentTypeSchemaId(contentTypeAlias),
+                    CompositionSchemaIds = [.. publishedContentType.CompositionAliases.Select(GetContentTypeSchemaId)],
                     Properties =
                     [
                         .. publishedContentType.PropertyTypes.Select(p => new ContentTypePropertyInfo
@@ -47,11 +63,11 @@ internal sealed class ContentTypeInfoService : IContentTypeInfoService
                             Inherited = !ownPropertyAliases.Contains(p.Alias),
                         })
                     ],
-                    IsElement = contentType.IsElement,
+                    IsElement = publishedContentType.IsElement,
                     IsComposition = false,
                 });
 
-            compositionAliases.UnionWith(contentType.CompositionAliases());
+            compositionAliases.UnionWith(publishedContentType.CompositionAliases);
         }
 
         result.ForEach(c => c.IsComposition = compositionAliases.Contains(c.Alias));
@@ -59,8 +75,6 @@ internal sealed class ContentTypeInfoService : IContentTypeInfoService
         return result;
     }
 
-    private string GetContentTypeSchemaId(IContentTypeBase contentType) =>
-
-        // This is what ModelsBuilder currently also uses
-        contentType.Alias.ToCleanString(_shortStringHelper, CleanStringType.ConvertCase | CleanStringType.PascalCase);
+    private string GetContentTypeSchemaId(string contentTypeAlias) =>
+        contentTypeAlias.ToCleanString(_shortStringHelper, CleanStringType.ConvertCase | CleanStringType.PascalCase);
 }

@@ -9,6 +9,7 @@ using Umbraco.Cms.Api.Common.Configuration;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.DeliveryApi;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Delivery.Filters.OpenApi;
@@ -72,11 +73,12 @@ public class DocumentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApi
                 await ApplyPolymorphicContentType(
                     schema,
                     context,
+                    PublishedItemType.Content,
                     _contentTypeInfoService.GetContentTypes().Where(c => !c.IsElement).ToList(),
                     async contentType =>
                     {
                         var schemaId = $"{contentType.SchemaId}ContentResponseModel";
-                        return (schemaId, await CreateContentTypeSchema(schemaId, contentType, context, cancellationToken));
+                        return (schemaId, await CreateContentTypeSchema(schemaId, PublishedItemType.Content, contentType, context, cancellationToken));
                     },
                     cancellationToken);
                 return;
@@ -84,11 +86,12 @@ public class DocumentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApi
                 await ApplyPolymorphicContentType(
                     schema,
                     context,
+                    PublishedItemType.Content,
                     _contentTypeInfoService.GetContentTypes().Where(c => !c.IsElement).ToList(),
                     async contentType =>
                     {
                         var schemaId = $"{contentType.SchemaId}ContentModel";
-                        return (schemaId, await CreateContentTypeSchema(schemaId, contentType, context, cancellationToken));
+                        return (schemaId, await CreateContentTypeSchema(schemaId, PublishedItemType.Content, contentType, context, cancellationToken));
                     },
                     cancellationToken);
                 return;
@@ -96,11 +99,38 @@ public class DocumentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApi
                 await ApplyPolymorphicContentType(
                     schema,
                     context,
+                    PublishedItemType.Content,
                     _contentTypeInfoService.GetContentTypes().Where(c => c.IsElement).ToList(),
                     async contentType =>
                     {
                         var schemaId = $"{contentType.SchemaId}ElementModel";
-                        return (schemaId, await CreateContentTypeSchema(schemaId, contentType, context, cancellationToken));
+                        return (schemaId, await CreateContentTypeSchema(schemaId, PublishedItemType.Content, contentType, context, cancellationToken));
+                    },
+                    cancellationToken);
+                return;
+            case var type when type == typeof(IApiMediaWithCropsResponse):
+                await ApplyPolymorphicContentType(
+                    schema,
+                    context,
+                    PublishedItemType.Media,
+                    _contentTypeInfoService.GetMediaTypes().ToList(),
+                    async contentType =>
+                    {
+                        var schemaId = $"{contentType.SchemaId}MediaResponseModel";
+                        return (schemaId, await CreateContentTypeSchema(schemaId, PublishedItemType.Media, contentType, context, cancellationToken));
+                    },
+                    cancellationToken);
+                return;
+            case var type when type == typeof(IApiMediaWithCrops):
+                await ApplyPolymorphicContentType(
+                    schema,
+                    context,
+                    PublishedItemType.Media,
+                    _contentTypeInfoService.GetMediaTypes().ToList(),
+                    async contentType =>
+                    {
+                        var schemaId = $"{contentType.SchemaId}MediaModel";
+                        return (schemaId, await CreateContentTypeSchema(schemaId, PublishedItemType.Media, contentType, context, cancellationToken));
                     },
                     cancellationToken);
                 return;
@@ -110,6 +140,7 @@ public class DocumentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApi
     private async Task ApplyPolymorphicContentType(
         OpenApiSchema schema,
         OpenApiSchemaTransformerContext context,
+        PublishedItemType itemType,
         List<ContentTypeInfo> contentTypes,
         Func<ContentTypeInfo, Task<(string SchemaId, OpenApiSchema Schema)>> contentTypeSchemaMapper,
         CancellationToken cancellationToken)
@@ -131,7 +162,7 @@ public class DocumentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApi
 
         schema.Discriminator = new OpenApiDiscriminator
         {
-            PropertyName = "contentType",
+            PropertyName = GetTypePropertyName(itemType),
             Mapping = new Dictionary<string, OpenApiSchemaReference>(),
         };
         schema.OneOf ??= new List<IOpenApiSchema>();
@@ -201,6 +232,7 @@ public class DocumentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApi
 
     private async Task<OpenApiSchema> CreateContentTypeSchema(
         string schemaId,
+        PublishedItemType itemType,
         ContentTypeInfo contentType,
         OpenApiSchemaTransformerContext context,
         CancellationToken cancellationToken) =>
@@ -209,7 +241,7 @@ public class DocumentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApi
             Type = JsonSchemaType.Object,
             Properties = new Dictionary<string, IOpenApiSchema>
             {
-                ["contentType"] = new OpenApiSchema { Const = contentType.Alias },
+                [GetTypePropertyName(itemType)] = new OpenApiSchema { Const = contentType.Alias },
                 ["properties"] = new OpenApiSchema
                 {
                     AllOf =
@@ -239,6 +271,7 @@ public class DocumentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApi
             Type = JsonSchemaType.Object,
             Properties = await ContentTypePropertiesMapper(contentType, context, cancellationToken),
             Metadata = new Dictionary<string, object> { ["x-schema-id"] = schemaId, },
+            AdditionalPropertiesAllowed = false,
         };
         context.Document.AddComponent(schemaId, propertiesSchema);
         return propertiesSchema;
@@ -349,4 +382,12 @@ public class DocumentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApi
         replaced = true;
         return new OpenApiSchemaReference(recursiveRefId, document);
     }
+
+    private string GetTypePropertyName(PublishedItemType itemType)
+        => itemType switch
+        {
+            PublishedItemType.Content => "contentType",
+            PublishedItemType.Media => "mediaType",
+            _ => throw new NotSupportedException($"Unsupported PublishedItemType: {itemType}"),
+        };
 }
