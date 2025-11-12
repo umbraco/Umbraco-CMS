@@ -20,7 +20,7 @@ public class DocumentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApi
 {
     private const string CustomRecursiveRefKey = "x-recursive-ref";
     private readonly IContentTypeInfoService _contentTypeInfoService;
-    private readonly HashSet<Type> _handledTypes = [];
+    private readonly HashSet<string> _handledSchemas = [];
     private readonly IJsonTypeInfoResolver _jsonTypeInfoResolver;
     private readonly JsonSerializerOptions _serializerOptions;
 
@@ -114,8 +114,6 @@ public class DocumentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApi
         Func<ContentTypeInfo, Task<(string SchemaId, OpenApiSchema Schema)>> contentTypeSchemaMapper,
         CancellationToken cancellationToken)
     {
-        _handledTypes.Add(context.JsonTypeInfo.Type);
-
         List<IOpenApiSchema> derivedTypeSchemas = [];
         foreach (JsonDerivedType derivedType in context.JsonTypeInfo.PolymorphismOptions?.DerivedTypes ?? [])
         {
@@ -179,7 +177,7 @@ public class DocumentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApi
         // If this is one of the types we handle, and we already started generating it, return a placeholder
         // to avoid circular reference issues.
         // In the document transformer, these placeholders will be replaced with the actual schemas.
-        if (schemaId is not null && _handledTypes.Contains(jsonTypeInfo.Type))
+        if (schemaId is not null && !_handledSchemas.Add(schemaId))
         {
             return GetPlaceholderSchema(schemaId);
         }
