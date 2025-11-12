@@ -13,9 +13,11 @@ public class SqlitePocoDateAndTimeOnlyMapper : DefaultMapper
                 {
                     return DateOnly.FromDateTime(dateTime);
                 }
+
                 return DateOnly.Parse(value.ToString()!);
             };
         }
+
         if (destType == typeof(DateOnly?))
         {
             return value =>
@@ -24,13 +26,16 @@ public class SqlitePocoDateAndTimeOnlyMapper : DefaultMapper
                 {
                     return default(DateOnly?);
                 }
+
                 if (value is DateTime dateTime)
                 {
                     return DateOnly.FromDateTime(dateTime);
                 }
+
                 return DateOnly.Parse(value.ToString()!);
             };
         }
+
         if (destType == typeof(TimeOnly))
         {
             return value =>
@@ -39,9 +44,11 @@ public class SqlitePocoDateAndTimeOnlyMapper : DefaultMapper
                 {
                     return TimeOnly.FromDateTime(dateTime);
                 }
+
                 return TimeOnly.Parse(value.ToString()!);
             };
         }
+
         if (destType == typeof(TimeOnly?))
         {
             return value =>
@@ -50,13 +57,16 @@ public class SqlitePocoDateAndTimeOnlyMapper : DefaultMapper
                 {
                     return default(TimeOnly?);
                 }
+
                 if (value is DateTime dateTime)
                 {
                     return TimeOnly.FromDateTime(dateTime);
                 }
+
                 return TimeOnly.Parse(value.ToString()!);
             };
         }
+
         return base.GetFromDbConverter(destType, sourceType);
     }
 }
