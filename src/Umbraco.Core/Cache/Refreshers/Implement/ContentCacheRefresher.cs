@@ -181,12 +181,24 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
 
     private static bool ShouldClearPartialViewCache(JsonPayload[] payloads)
     {
-        // Clear partial view cache when there are published content changes (not blueprints)
-        return payloads.Any(x => x.Blueprint is false &&
-            (x.ChangeTypes.HasType(TreeChangeTypes.RefreshAll) ||
-             x.ChangeTypes.HasType(TreeChangeTypes.Remove) ||
-             x.ChangeTypes.HasType(TreeChangeTypes.RefreshNode) ||
-             x.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch)));
+        return payloads.Any(x =>
+        {
+            // Check for relelvant change type
+            var isRelevantChangeType = x.ChangeTypes.HasType(TreeChangeTypes.RefreshAll) ||
+                x.ChangeTypes.HasType(TreeChangeTypes.Remove) ||
+                x.ChangeTypes.HasType(TreeChangeTypes.RefreshNode) ||
+                x.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch);
+
+            // Check for published/unpublished changes
+            var hasChanges = x.PublishedCultures?.Length > 0 ||
+                   x.UnpublishedCultures?.Length > 0;
+
+            // There's no other way to detect trashed content as the change type is only Remove when deleted permanently
+            var isTrashed = x.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch) && x.PublishedCultures is null && x.UnpublishedCultures is null;
+
+            // Skip blueprints and only clear the partial cache for removals or refreshes with changes
+            return x.Blueprint == false && (isTrashed || (isRelevantChangeType && hasChanges));
+        });
     }
 
     private void HandleMemoryCache(JsonPayload payload)
