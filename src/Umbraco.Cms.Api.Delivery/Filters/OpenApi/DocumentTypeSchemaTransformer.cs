@@ -121,6 +121,7 @@ public class DocumentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApi
                 derivedTypeSchema =>
                 {
                     derivedTypeSchema.Properties?.Remove("properties");
+                    derivedTypeSchema.Required?.Remove("properties");
                 });
             derivedTypeSchemas.Add(derivedTypeSchema);
         }
@@ -283,14 +284,14 @@ public class DocumentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApi
                 continue;
             }
 
-            schema.Properties[propertyKey] = GetActualSchema(document, innerSchema, out var replaced);
+            schema.Properties[propertyKey] = GetActualSchemaOrReference(document, innerSchema, out var replaced);
             if (replaced)
             {
                 // If we replaced the schema, we don't need to recurse into it
                 continue;
             }
 
-            innerSchema.Items = GetActualSchema(document, innerSchema.Items, out replaced);
+            innerSchema.Items = GetActualSchemaOrReference(document, innerSchema.Items, out replaced);
             if (replaced)
             {
                 // If we replaced the schema, we don't need to recurse into it
@@ -312,7 +313,7 @@ public class DocumentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApi
         for (var i = 0; i < schemas.Count; i++)
         {
             IOpenApiSchema allOfSchema = schemas[i];
-            schemas[i] = GetActualSchema(document, allOfSchema, out var replaced);
+            schemas[i] = GetActualSchemaOrReference(document, allOfSchema, out var replaced);
             if (!replaced)
             {
                 ReplacePlaceholderSchemas(document, schemas[i]);
@@ -321,7 +322,7 @@ public class DocumentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApi
     }
 
     [return: NotNullIfNotNull(nameof(schema))]
-    private static IOpenApiSchema? GetActualSchema(OpenApiDocument document, IOpenApiSchema? schema, out bool replaced)
+    private static IOpenApiSchema? GetActualSchemaOrReference(OpenApiDocument document, IOpenApiSchema? schema, out bool replaced)
     {
         if (schema is not OpenApiSchema openApiSchema)
         {
@@ -337,14 +338,8 @@ public class DocumentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApi
             return schema;
         }
 
-        if (document.Components?.Schemas is not { } documentSchemas
-            || !documentSchemas.TryGetValue(recursiveRefId, out IOpenApiSchema? actualSchema))
-        {
-            throw new InvalidOperationException($"Could not find a schema for {recursiveRefId}");
-        }
-
         // Return the actual schema
         replaced = true;
-        return actualSchema;
+        return new OpenApiSchemaReference(recursiveRefId, document);
     }
 }
