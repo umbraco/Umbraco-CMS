@@ -182,10 +182,8 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
     private static bool ShouldClearPartialViewCache(JsonPayload[] payloads)
     {
         // Clear partial view cache for RefreshAll or when there are published/unpublished culture changes
-        return payloads.Any(x =>
-            x.ChangeTypes.HasType(TreeChangeTypes.RefreshAll) ||
-            (x.Blueprint == false &&
-             (x.PublishedCultures?.Length > 0 || x.UnpublishedCultures?.Length > 0)));
+        return payloads.Any(x => x.Blueprint is false &&  
+        (x.ChangeTypes.HasType(TreeChangeTypes.RefreshAll) || x.ChangeTypes.HasType(TreeChangeTypes.Remove));
     }
 
     private void HandleMemoryCache(JsonPayload payload)
