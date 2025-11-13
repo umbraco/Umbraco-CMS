@@ -14,7 +14,7 @@ export const UMB_PROPERTY_ACTION_SORT_KIND_MANIFEST: UmbExtensionManifestKind = 
 		element: () => import('./sort-mode-property-action.element.js'),
 		meta: {
 			icon: 'icon-sort',
-			label: 'Sort',
+			label: '#general_sort',
 		},
 	},
 };
