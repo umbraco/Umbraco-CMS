@@ -138,7 +138,7 @@ public class DecimalPropertyEditor : DataEditor
                     return double.TryParse(formattableValue.ToString(null, CultureInfo.InvariantCulture), NumberStyles.Any, CultureInfo.InvariantCulture, out parsedDecimalValue);
                 }
 
-                return double.TryParse(value.ToString(), CultureInfo.CurrentCulture, out parsedDecimalValue);
+                return double.TryParse(value.ToString(), NumberStyles.Any, CultureInfo.CurrentCulture, out parsedDecimalValue);
             }
         }
 

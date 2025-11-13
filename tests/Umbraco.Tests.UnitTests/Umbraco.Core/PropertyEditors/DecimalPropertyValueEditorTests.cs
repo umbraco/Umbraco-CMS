@@ -161,7 +161,7 @@ public class DecimalPropertyValueEditorTests
             Assert.AreEqual(1, result.Count());
 
             var validationResult = result.First();
-            Assert.AreEqual(validationResult.ErrorMessage, "validation_outOfRangeMaximum");
+            Assert.AreEqual("validation_outOfRangeMaximum", validationResult.ErrorMessage);
         }
     }
 
@@ -181,7 +181,7 @@ public class DecimalPropertyValueEditorTests
             Assert.AreEqual(1, result.Count());
 
             var validationResult = result.First();
-            Assert.AreEqual(validationResult.ErrorMessage, "validation_outOfRangeMaximum");
+            Assert.AreEqual("validation_outOfRangeMaximum", validationResult.ErrorMessage);
         }
     }
 
