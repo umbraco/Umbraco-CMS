@@ -216,6 +216,40 @@ namespace Umbraco.Cms
                 }
             }
 
+            public ProcessInstructionsResult ProcessLocalInstructions<TPayload>(
+                CacheRefresherCollection cacheRefreshers,
+                IPayloadCacheRefresher<TPayload> refresher,
+                TPayload[] payload,
+                string localIdentity,
+                CancellationToken cancellationToken)
+            {
+                lock (_syncLock)
+                {
+                    using (!_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<CacheInstructionService>("Syncing all instruction and processing local instruction..."))
+                    using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+                    {
+                        _repositoryCacheVersionService.SetCachesSyncedAsync();
+                        var lastId = _lastSyncedManager.GetLastSyncedExternalAsync().GetAwaiter().GetResult() ?? 0;
+                        var numberOfInstructionsProcessed = ProcessDatabaseInstructions(cacheRefreshers, cancellationToken, localIdentity, ref lastId);
+
+                        if (numberOfInstructionsProcessed > 0)
+                        {
+                            _lastSyncedManager.SaveLastSyncedExternalAsync(lastId).GetAwaiter().GetResult();
+                            _lastSyncedManager.SaveLastSyncedInternalAsync(lastId).GetAwaiter().GetResult();
+                        }
+
+
+                        refresher.RefreshInternal(payload);
+                        refresher.Refresh(payload);
+                        scope.Complete();
+
+                        // It's okay to not update lastId since the localIdentity will be the same on the local instructions, meaning they'll be skipped later.
+                        return ProcessInstructionsResult.AsCompleted(numberOfInstructionsProcessed + payload.Length, lastId);
+                    }
+                }
+            }
+
+
             private CacheInstruction CreateCacheInstruction(IEnumerable<RefreshInstruction> instructions, string localIdentity)
                 => new(
                     0,

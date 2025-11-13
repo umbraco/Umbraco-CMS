@@ -2,6 +2,7 @@ using System.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -253,6 +254,27 @@ public abstract class DatabaseServerMessenger : ServerMessengerBase, IDisposable
             RefreshInstruction.GetInstructions(refresher, JsonSerializer, messageType, idsA, idType, json);
 
         CacheInstructionService.DeliverInstructions(instructions, LocalIdentity);
+    }
+
+    protected override void DeliverLocal<TPayload>(ICacheRefresher refresher, TPayload[] payload)
+    {
+        ArgumentNullException.ThrowIfNull(refresher);
+        if (StaticApplicationLogging.Logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+        {
+            StaticApplicationLogging.Logger.LogDebug("Invoking refresher {RefresherType} on local server for message type RefreshByPayload", refresher.GetType());
+        }
+
+        if (refresher is not IPayloadCacheRefresher<TPayload> payloadRefresher)
+        {
+            throw new InvalidOperationException("The cache refresher " + refresher.GetType() + " is not of type " + typeof(IPayloadCacheRefresher<TPayload>));
+        }
+
+        CacheInstructionService.ProcessLocalInstructions(
+            _cacheRefreshers,
+            payloadRefresher,
+            payload,
+            _machineInfoFactory.GetLocalIdentity(),
+            _cancellationToken);
     }
 
     #endregion

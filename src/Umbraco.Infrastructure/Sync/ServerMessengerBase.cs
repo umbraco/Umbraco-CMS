@@ -193,7 +193,7 @@ public abstract class ServerMessengerBase : IServerMessenger
 
     #region Deliver
 
-    protected void DeliverLocal<TPayload>(ICacheRefresher refresher, TPayload[] payload)
+    protected virtual void DeliverLocal<TPayload>(ICacheRefresher refresher, TPayload[] payload)
     {
         ArgumentNullException.ThrowIfNull(refresher);
         if (StaticApplicationLogging.Logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
@@ -206,6 +206,29 @@ public abstract class ServerMessengerBase : IServerMessenger
             throw new InvalidOperationException("The cache refresher " + refresher.GetType() + " is not of type " + typeof(IPayloadCacheRefresher<TPayload>));
         }
 
+        // We need to ensure internal caches before we process the internal instruction, since we can no longer guarantee a single publisher instance.
+        // For instance:
+        // Server A saves a cache instruction, and delivers local - all good.
+        // Server B saves a cache instruction, and delivers local - No good, we haven't processed server A's instruction yet
+        // Server A processes server B's instruction, all fine
+        // This leaves Server B's repository caches potentially out of sync for a while, but should catch up once instructions are processed.
+        // So this should be fine for external caches, but not internal.
+
+        // This also causes issues in load balanced setups!!!
+        // It's entirely likely for the "normal" cache instructions to start processing while we process the local caches
+        // Which can cause all kinds of mischief.
+        // We could:
+        // Lock the cache refreshing
+        // Refresh internal
+        // Run the payload
+        // Unlock again
+        // This should fix our issues.
+        // Okay, we skip the ones we publish ourselves...
+        // So this is fine if you're not load balancing backoffice, since you won't have to process any cache instructions
+
+        // This used to be fine because the only server which published refresh instructions would be the publisher server
+        // Which means the instructions would be skipped when processed later, which means that you in effect would never have 2 cache refresh operations going on at once
+        // Because all the instruction would be skipped when synced by the DB messenger because the identity would always be the same as the publisher
         payloadRefresher.RefreshInternal(payload);
         payloadRefresher.Refresh(payload);
     }
@@ -308,7 +331,7 @@ public abstract class ServerMessengerBase : IServerMessenger
     /// <remarks>
     /// Since this is only for strongly typed <see cref="ICacheRefresher{T}" />, it will throw for message types that are not by instance.
     /// </remarks>
-    protected void DeliverLocal<T>(ICacheRefresher refresher, MessageType messageType, Func<T, object> getId, IEnumerable<T> instances)
+    protected virtual void DeliverLocal<T>(ICacheRefresher refresher, MessageType messageType, Func<T, object> getId, IEnumerable<T> instances)
     {
         ArgumentNullException.ThrowIfNull(refresher);
 

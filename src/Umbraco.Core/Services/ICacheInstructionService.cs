@@ -84,4 +84,17 @@ public interface ICacheInstructionService
             cancellationToken,
             localIdentity,
             StaticServiceProvider.Instance.GetRequiredService<ILastSyncedManager>().GetLastSyncedExternalAsync().GetAwaiter().GetResult() ?? 0);
+
+
+    /// <summary>
+    /// Processes a local instruction, in the process also processing all instructions
+    /// </summary>
+    /// <returns></returns>
+    ProcessInstructionsResult ProcessLocalInstructions<TPayLoad>(
+        CacheRefresherCollection cacheRefreshers,
+        IPayloadCacheRefresher<TPayLoad> refresher,
+        TPayLoad[] payload,
+        string localIdentity,
+        CancellationToken cancellationToken)
+        => throw new NotImplementedException();
 }
