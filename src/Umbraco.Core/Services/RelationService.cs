@@ -485,11 +485,14 @@ public class RelationService : RepositoryService, IRelationService
         return _relationRepository.Get(query).Any();
     }
 
-    /// <inheritdoc />
-    public bool IsRelated(int id) => IsRelated(id, RelationDirectionFilter.Any);
+    [Obsolete("No longer used in Umbraco, please the overload taking all parameters. Scheduled for removal in Umbraco 19.")]
+    public bool IsRelated(int id) => IsRelated(id, RelationDirectionFilter.Any, null, null);
+
+    [Obsolete("Please the overload taking all parameters. Scheduled for removal in Umbraco 18.")]
+    public bool IsRelated(int id, RelationDirectionFilter directionFilter) => IsRelated(id, directionFilter, null, null);
 
     /// <inheritdoc />
-    public bool IsRelated(int id, RelationDirectionFilter directionFilter)
+    public bool IsRelated(int id, RelationDirectionFilter directionFilter, int[]? includeRelationTypeIds = null, int[]? excludeRelationTypeIds = null)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
         IQuery<IRelation> query = Query<IRelation>();
@@ -501,6 +504,16 @@ public class RelationService : RepositoryService, IRelationService
             RelationDirectionFilter.Any => query.Where(x => x.ParentId == id || x.ChildId == id),
             _ => throw new ArgumentOutOfRangeException(nameof(directionFilter)),
         };
+
+        if (includeRelationTypeIds is not null && includeRelationTypeIds.Length > 0)
+        {
+            query = query.WhereIn(x => x.RelationTypeId, includeRelationTypeIds);
+        }
+
+        if (excludeRelationTypeIds is not null && excludeRelationTypeIds.Length > 0)
+        {
+            query = query.WhereNotIn(x => x.RelationTypeId, excludeRelationTypeIds);
+        }
 
         return _relationRepository.Get(query).Any();
     }
