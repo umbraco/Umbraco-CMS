@@ -12,6 +12,7 @@ import {
 	repeat,
 	state,
 	nothing,
+	type PropertyValues,
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
@@ -84,6 +85,13 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 
 	// Init
 
+	override willUpdate(changedProperties: PropertyValues) {
+		if (changedProperties.has('_domains') && this._domains?.length) {
+			// Update sorter whenever _domains changes
+			this.#sorter.setModel(this._domains);
+		}
+	}
+
 	override firstUpdated() {
 		this.#unique = this.data?.unique;
 		this.#requestLanguages();
@@ -96,8 +104,7 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 
 		if (!data) return;
 		this._defaultIsoCode = data.defaultIsoCode;
-		this._domains = data.domains.map((domain) => ({ ...domain, unique: UmbId.new() })); // Create new object references
-		this.#sorter.setModel(this._domains);
+		this._domains = data.domains.map((domain) => ({ ...domain, unique: UmbId.new() }));
 	}
 
 	async #requestLanguages() {
@@ -107,7 +114,8 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 	}
 
 	async #handleSave() {
-		this.value = { defaultIsoCode: this._defaultIsoCode, domains: this._domains };
+		const cleanDomains = this._domains.map((domain) => ({ domainName: domain.domainName, isoCode: domain.isoCode }));
+		this.value = { defaultIsoCode: this._defaultIsoCode, domains: cleanDomains };
 		const { error } = await this.#documentRepository.updateCultureAndHostnames(this.#unique!, this.value);
 
 		if (!error) {
@@ -133,19 +141,15 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 	#onChangeDomainLanguage(e: UUISelectEvent, index: number) {
 		const isoCode = e.target.value as string;
 		this._domains = this._domains.map((domain, i) => (index === i ? { ...domain, isoCode } : domain));
-		this.#sorter.setModel(this._domains);
 	}
 
 	#onChangeDomainHostname(e: UUIInputEvent, index: number) {
 		const domainName = e.target.value as string;
 		this._domains = this._domains.map((domain, i) => (index === i ? { ...domain, domainName } : domain));
-
-		this.#sorter.setModel(this._domains);
 	}
 
 	async #onRemoveDomain(index: number) {
 		this._domains = this._domains.filter((d, i) => index !== i);
-		this.#sorter.setModel(this._domains);
 	}
 
 	#onAddDomain(useCurrentDomain?: boolean) {
@@ -159,12 +163,10 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 				...this._domains,
 				{ isoCode: defaultModel?.unique ?? '', domainName: window.location.host, unique: UmbId.new() },
 			];
-			this.#sorter.setModel(this._domains);
 
 			this.#focusNewItem();
 		} else {
 			this._domains = [...this._domains, { isoCode: defaultModel?.unique ?? '', domainName: '', unique: UmbId.new() }];
-			this.#sorter.setModel(this._domains);
 
 			this.#focusNewItem();
 		}
@@ -227,20 +229,19 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 	#renderDomainSection() {
 		return html`
 			<uui-box headline=${this.localize.term('assignDomain_setDomains')}>
-				<umb-localize key="assignDomain_domainHelpWithVariants">
-					Valid domain names are: "example.com", "www.example.com", "example.com:8080", or
-					"https://www.example.com/".<br />Furthermore also one-level paths in domains are supported, eg.
-					"example.com/en" or "/en".
-				</umb-localize>
+				<div id="domain-help-text">
+					<umb-localize key="assignDomain_domainHelpWithVariants">
+						Valid domain names are: "example.com", "www.example.com", "example.com:8080", or
+						"https://www.example.com/".<br />Furthermore also one-level paths in domains are supported, eg.
+						"example.com/en" or "/en".
+					</umb-localize>
+				</div>
 				${this.#renderDomains()} ${this.#renderAddNewDomainButton()}
 			</uui-box>
 		`;
 	}
 
 	#renderDomains() {
-		// TODO:
-		// if (!this._domains?.length) return;
-		console.log(this._domains);
 		return html`
 			<div id="sorter-wrapper">
 				${repeat(
@@ -323,6 +324,9 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 			uui-box:first-child {
 				margin-bottom: var(--uui-size-layout-1);
 			}
+			#domain-help-text {
+				margin-bottom: var(--uui-size-2);
+			}
 
 			#dropdown {
 				flex-grow: 0;
@@ -344,7 +348,6 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 			}
 
 			#sorter-wrapper {
-				margin-top: var(--uui-size-layout-1);
 				margin-bottom: var(--uui-size-2);
 				display: flex;
 				flex-direction: column;
