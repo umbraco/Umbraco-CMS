@@ -12,21 +12,21 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 	 * The unique identifier for the media item.
 	 * @description This is also known as the media key and is used to fetch the resource.
 	 */
-	@property()
-	unique = '';
+	@property({ type: String, reflect: false })
+	unique?: string;
 
 	/**
 	 * The width of the thumbnail in pixels.
 	 * @default 300
 	 */
-	@property({ type: Number })
+	@property({ type: Number, reflect: false })
 	width = 300;
 
 	/**
 	 * The height of the thumbnail in pixels.
 	 * @default 300
 	 */
-	@property({ type: Number })
+	@property({ type: Number, reflect: false })
 	height = 300;
 
 	/**
@@ -34,19 +34,19 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 	 * @description The mode determines how the image is cropped.
 	 * @enum {UmbImagingCropMode}
 	 */
-	@property()
+	@property({ type: String, reflect: false })
 	mode: UmbImagingCropMode = UmbImagingCropMode.MIN;
 
 	/**
 	 * The alt text for the thumbnail.
 	 */
-	@property()
+	@property({ type: String, reflect: false })
 	alt = '';
 
 	/**
 	 * The fallback icon for the thumbnail.
 	 */
-	@property()
+	@property({ type: String, reflect: false })
 	icon = 'icon-picture';
 
 	/**
@@ -54,13 +54,13 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 	 * @enum {'lazy' | 'eager'}
 	 * @default 'lazy'
 	 */
-	@property()
+	@property({ type: String, reflect: false })
 	loading: (typeof HTMLImageElement)['prototype']['loading'] = 'lazy';
 
 	/**
 	 * External loading state (e.g., when parent is waiting for metadata)
 	 */
-	@property({ type: Boolean })
+	@property({ type: Boolean, reflect: false, attribute: 'external-loading' })
 	externalLoading = false;
 
 	@state()
@@ -120,7 +120,7 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 	}
 
 	#renderLoading() {
-		return html`<div id="loader"><uui-loader></uui-loader></div>`;
+		return html`<uui-loader-circle id="loader"></uui-loader-circle>`;
 	}
 
 	#renderThumbnail() {
@@ -160,11 +160,8 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 			}
 
 			#loader {
-				display: flex;
-				justify-content: center;
-				align-items: center;
-				height: 100%;
-				width: 100%;
+				font-size: 2em;
+				margin-bottom: 1em;
 			}
 
 			#figure {
