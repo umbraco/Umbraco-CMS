@@ -12,21 +12,21 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 	 * The unique identifier for the media item.
 	 * @description This is also known as the media key and is used to fetch the resource.
 	 */
-	@property({ type: String, reflect: false })
+	@property({ type: String })
 	unique?: string;
 
 	/**
 	 * The width of the thumbnail in pixels.
 	 * @default 300
 	 */
-	@property({ type: Number, reflect: false })
+	@property({ type: Number })
 	width = 300;
 
 	/**
 	 * The height of the thumbnail in pixels.
 	 * @default 300
 	 */
-	@property({ type: Number, reflect: false })
+	@property({ type: Number })
 	height = 300;
 
 	/**
@@ -34,19 +34,19 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 	 * @description The mode determines how the image is cropped.
 	 * @enum {UmbImagingCropMode}
 	 */
-	@property({ type: String, reflect: false })
+	@property({ type: String })
 	mode: UmbImagingCropMode = UmbImagingCropMode.MIN;
 
 	/**
 	 * The alt text for the thumbnail.
 	 */
-	@property({ type: String, reflect: false })
+	@property({ type: String })
 	alt = '';
 
 	/**
 	 * The fallback icon for the thumbnail.
 	 */
-	@property({ type: String, reflect: false })
+	@property({ type: String })
 	icon = 'icon-picture';
 
 	/**
@@ -54,7 +54,7 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 	 * @enum {'lazy' | 'eager'}
 	 * @default 'lazy'
 	 */
-	@property({ type: String, reflect: false })
+	@property({ type: String })
 	loading: (typeof HTMLImageElement)['prototype']['loading'] = 'lazy';
 
 	/**
