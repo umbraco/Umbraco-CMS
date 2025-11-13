@@ -22,67 +22,55 @@ public class UmbracoDefaultMapper : DefaultMapper
             return value => Convert.ToDecimal(value, CultureInfo.InvariantCulture);
         }
 
-        if (destType == typeof(DateOnly))
+        if(IsDateOnlyType(destType))
         {
-            return value =>
-            {
-                if (value is DateTime dateTime)
-                {
-                    return DateOnly.FromDateTime(dateTime);
-                }
-
-                return DateOnly.Parse(value.ToString()!);
-            };
+            return value => ConvertToDateOnly(value, IsNullableType(destType));
         }
 
-        if (destType == typeof(DateOnly?))
+        if (IsTimeOnlyType(destType))
         {
-            return value =>
-            {
-                if (value == null)
-                {
-                    return default(DateOnly?);
-                }
-
-                if (value is DateTime dateTime)
-                {
-                    return DateOnly.FromDateTime(dateTime);
-                }
-
-                return DateOnly.Parse(value.ToString()!);
-            };
-        }
-
-        if (destType == typeof(TimeOnly))
-        {
-            return value =>
-            {
-                if (value is DateTime dateTime)
-                {
-                    return TimeOnly.FromDateTime(dateTime);
-                }
-                return TimeOnly.Parse(value.ToString()!);
-            };
-        }
-
-        if (destType == typeof(TimeOnly?))
-        {
-            return value =>
-            {
-                if (value == null)
-                {
-                    return default(TimeOnly?);
-                }
-
-                if (value is DateTime dateTime)
-                {
-                    return TimeOnly.FromDateTime(dateTime);
-                }
-
-                return TimeOnly.Parse(value.ToString()!);
-            };
+            return value => ConvertToTimeOnly(value, IsNullableType(destType));
         }
 
         return base.GetFromDbConverter(destType, sourceType);
+    }
+
+    private static bool IsDateOnlyType(Type type) =>
+        type == typeof(DateOnly) || type == typeof(DateOnly?);
+
+    private static bool IsTimeOnlyType(Type type) =>
+        type == typeof(TimeOnly) || type == typeof(TimeOnly?);
+
+    private static bool IsNullableType(Type type) =>
+        Nullable.GetUnderlyingType(type) != null;
+
+    private static object? ConvertToDateOnly(object? value, bool isNullable)
+    {
+        if (value is null)
+        {
+            return isNullable ? null : default(DateOnly);
+        }
+
+        if (value is DateTime dt)
+        {
+            return DateOnly.FromDateTime(dt);
+        }
+
+        return DateOnly.Parse(value.ToString()!);
+    }
+
+    private static object? ConvertToTimeOnly(object? value, bool isNullable)
+    {
+        if (value is null)
+        {
+            return isNullable ? null : default(TimeOnly);
+        }
+
+        if (value is DateTime dt)
+        {
+            return TimeOnly.FromDateTime(dt);
+        }
+
+        return TimeOnly.Parse(value.ToString()!);
     }
 }
