@@ -485,10 +485,10 @@ public class RelationService : RepositoryService, IRelationService
         return _relationRepository.Get(query).Any();
     }
 
-    [Obsolete("No longer used in Umbraco, please use one of the overloads. Scheduled for removal in Umbraco 19.")]
-    public bool IsRelated(int id) => IsRelated(id, RelationDirectionFilter.Any);
+    [Obsolete("No longer used in Umbraco, please the overload taking all parameters. Scheduled for removal in Umbraco 19.")]
+    public bool IsRelated(int id) => IsRelated(id, RelationDirectionFilter.Any, null, null);
 
-    /// <inheritdoc />
+    [Obsolete("Please the overload taking all parameters. Scheduled for removal in Umbraco 18.")]
     public bool IsRelated(int id, RelationDirectionFilter directionFilter) => IsRelated(id, directionFilter, null, null);
 
     /// <inheritdoc />

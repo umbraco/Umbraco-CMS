@@ -298,6 +298,7 @@ public interface IRelationService : IService
     /// <param name="id">Id of an object to check relations for</param>
     /// <param name="directionFilter">Indicates whether to check for relations as parent, child or in either direction.</param>
     /// <returns>Returns <c>True</c> if any relations exists with the given Id, otherwise <c>False</c>.</returns>
+    [Obsolete("Please use the overload taking all parameters. Scheduled for removal in Umbraco 18.")]
     bool IsRelated(int id, RelationDirectionFilter directionFilter);
 
     /// <summary>
@@ -310,7 +311,9 @@ public interface IRelationService : IService
     /// <remarks>If no relation type Ids are provided in includeRelationTypeIds or excludeRelationTypeIds, all relation type Ids are considered.</remarks>
     /// <returns>Returns <c>True</c> if any relations exists with the given Id, otherwise <c>False</c>.</returns>
     bool IsRelated(int id, RelationDirectionFilter directionFilter, int[]? includeRelationTypeIds = null, int[]? excludeRelationTypeIds = null)
+#pragma warning disable CS0618 // Type or member is obsolete
         => IsRelated(id, directionFilter);
+#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     ///     Checks whether two items are related
