@@ -1017,6 +1017,7 @@ export default {
 			if (new Date(date).getTime() < new Date(now).getTime()) return `${duration} ago`;
 			return `in ${duration}`;
 		},
+		clipboard: 'Clipboard',
 	},
 	colors: {
 		black: 'Black',
@@ -2508,6 +2509,7 @@ export default {
 		labelForCopyToClipboard: 'Copy to clipboard',
 		confirmDeleteHeadline: 'Delete from clipboard',
 		confirmDeleteDescription: 'Are you sure you want to delete <strong>{0}</strong> from the clipboard?',
+		confirmClearDescription: 'Are you sure you want to clear the clipboard?',
 		copySuccessHeadline: 'Copied to clipboard',
 	},
 	propertyActions: {
