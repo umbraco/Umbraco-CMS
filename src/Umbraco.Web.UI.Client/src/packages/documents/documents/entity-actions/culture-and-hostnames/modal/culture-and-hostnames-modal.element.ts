@@ -3,14 +3,29 @@ import type {
 	UmbCultureAndHostnamesModalData,
 	UmbCultureAndHostnamesModalValue,
 } from './culture-and-hostnames-modal.token.js';
-import { css, customElement, html, query, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	customElement,
+	html,
+	property,
+	query,
+	repeat,
+	state,
+	nothing,
+} from '@umbraco-cms/backoffice/external/lit';
 import { UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { DomainPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import type { UUIInputEvent, UUIPopoverContainerElement, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 
+interface UmbDomainPresentationModel {
+	unique: string;
+	domainName: string;
+	isoCode: string;
+}
 @customElement('umb-culture-and-hostnames-modal')
 export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 	UmbCultureAndHostnamesModalData,
@@ -21,6 +36,40 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 
 	#unique?: string | null;
 
+	#sorter = new UmbSorterController(this, {
+		getUniqueOfElement: (element) => {
+			return element.getAttribute('data-sort-entry-id');
+		},
+		getUniqueOfModel: (modelEntry: UmbDomainPresentationModel) => {
+			return modelEntry.unique;
+		},
+		itemSelector: '#item',
+		containerSelector: '#sorter-wrapper',
+		onChange: ({ model }) => {
+			const oldValue = this._domains;
+			this._domains = model;
+			this.requestUpdate('_domains', oldValue);
+		},
+	});
+
+	/**
+	 * Disables the input
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	disabled = false;
+
+	/**
+	 * Makes the input readonly
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
+
 	@state()
 	private _languageModel: Array<UmbLanguageDetailModel> = [];
 
@@ -28,7 +77,7 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 	private _defaultIsoCode?: string | null;
 
 	@state()
-	private _domains: Array<DomainPresentationModel> = [];
+	private _domains: Array<UmbDomainPresentationModel> = [];
 
 	@query('#more-options')
 	popoverContainerElement?: UUIPopoverContainerElement;
@@ -47,7 +96,8 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 
 		if (!data) return;
 		this._defaultIsoCode = data.defaultIsoCode;
-		this._domains = data.domains;
+		this._domains = data.domains.map((domain) => ({ ...domain, unique: UmbId.new() })); // Create new object references
+		this.#sorter.setModel(this._domains);
 	}
 
 	async #requestLanguages() {
@@ -83,15 +133,19 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 	#onChangeDomainLanguage(e: UUISelectEvent, index: number) {
 		const isoCode = e.target.value as string;
 		this._domains = this._domains.map((domain, i) => (index === i ? { ...domain, isoCode } : domain));
+		this.#sorter.setModel(this._domains);
 	}
 
 	#onChangeDomainHostname(e: UUIInputEvent, index: number) {
 		const domainName = e.target.value as string;
 		this._domains = this._domains.map((domain, i) => (index === i ? { ...domain, domainName } : domain));
+
+		this.#sorter.setModel(this._domains);
 	}
 
 	async #onRemoveDomain(index: number) {
 		this._domains = this._domains.filter((d, i) => index !== i);
+		this.#sorter.setModel(this._domains);
 	}
 
 	#onAddDomain(useCurrentDomain?: boolean) {
@@ -101,10 +155,27 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
 			this.popoverContainerElement?.hidePopover();
-			this._domains = [...this._domains, { isoCode: defaultModel?.unique ?? '', domainName: window.location.host }];
+			this._domains = [
+				...this._domains,
+				{ isoCode: defaultModel?.unique ?? '', domainName: window.location.host, unique: UmbId.new() },
+			];
+			this.#sorter.setModel(this._domains);
+
+			this.#focusNewItem();
 		} else {
-			this._domains = [...this._domains, { isoCode: defaultModel?.unique ?? '', domainName: '' }];
+			this._domains = [...this._domains, { isoCode: defaultModel?.unique ?? '', domainName: '', unique: UmbId.new() }];
+			this.#sorter.setModel(this._domains);
+
+			this.#focusNewItem();
 		}
+	}
+
+	async #focusNewItem() {
+		await this.updateComplete;
+		const items = this.shadowRoot?.querySelectorAll('div.hostname-item') as NodeListOf<HTMLElement>;
+		const newItem = items[items.length - 1];
+		const firstInput = newItem?.querySelector('uui-input') as HTMLElement;
+		firstInput?.focus();
 	}
 
 	// Renders
@@ -131,20 +202,24 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 
 	#renderCultureSection() {
 		return html`
-			<uui-box headline=${this.localize.term('assignDomain_setLanguage')}>
-				<uui-label for="select">${this.localize.term('assignDomain_language')}</uui-label>
-				<uui-combobox
-					id="select"
-					label=${this.localize.term('assignDomain_language')}
-					.value=${(this._defaultIsoCode as string) ?? 'inherit'}
-					@change=${this.#onChangeLanguage}>
-					<uui-combobox-list>
-						<uui-combobox-list-option .value=${'inherit'}>
-							${this.localize.term('assignDomain_inherit')}
-						</uui-combobox-list-option>
-						${this.#renderLanguageModelOptions()}
-					</uui-combobox-list>
-				</uui-combobox>
+			<uui-box>
+				<umb-property-layout label=${this.localize.term('assignDomain_language')} orientation="vertical"
+					><div slot="editor">
+						<uui-combobox
+							id="select"
+							label=${this.localize.term('assignDomain_language')}
+							.value=${(this._defaultIsoCode as string) ?? 'inherit'}
+							@change=${this.#onChangeLanguage}>
+							<uui-combobox-list>
+								<uui-combobox-list-option .value=${'inherit'}>
+									${this.localize.term('assignDomain_inherit')}
+								</uui-combobox-list-option>
+								${this.#renderLanguageModelOptions()}
+							</uui-combobox-list>
+						</uui-combobox>
+					</div>
+				</umb-property-layout>
+				<uui-label for="select"></uui-label>
 			</uui-box>
 		`;
 	}
@@ -163,30 +238,37 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 	}
 
 	#renderDomains() {
-		if (!this._domains?.length) return;
+		// TODO:
+		// if (!this._domains?.length) return;
+		console.log(this._domains);
 		return html`
-			<div id="domains">
+			<div id="sorter-wrapper">
 				${repeat(
 					this._domains,
-					(domain) => domain.isoCode,
+					(domain) => domain.unique,
 					(domain, index) => html`
-						<uui-input
-							label=${this.localize.term('assignDomain_domain')}
-							.value=${domain.domainName}
-							@change=${(e: UUIInputEvent) => this.#onChangeDomainHostname(e, index)}></uui-input>
-						<uui-combobox
-							.value=${domain.isoCode as string}
-							label=${this.localize.term('assignDomain_language')}
-							@change=${(e: UUISelectEvent) => this.#onChangeDomainLanguage(e, index)}>
-							<uui-combobox-list> ${this.#renderLanguageModelOptions()} </uui-combobox-list>
-						</uui-combobox>
-						<uui-button
-							look="outline"
-							color="danger"
-							label=${this.localize.term('assignDomain_remove')}
-							@click=${() => this.#onRemoveDomain(index)}>
-							<uui-icon name="icon-trash"></uui-icon>
-						</uui-button>
+						<div class="hostname-item" id="item" data-sort-entry-id=${domain.unique}>
+							${this.disabled || this.readonly ? nothing : html`<uui-icon name="icon-grip" class="handle"></uui-icon>`}
+							<div class="hostname-wrapper">
+								<uui-input
+									label=${this.localize.term('assignDomain_domain')}
+									.value=${domain.domainName}
+									@change=${(e: UUIInputEvent) => this.#onChangeDomainHostname(e, index)}></uui-input>
+								<uui-combobox
+									.value=${domain.isoCode as string}
+									label=${this.localize.term('assignDomain_language')}
+									@change=${(e: UUISelectEvent) => this.#onChangeDomainLanguage(e, index)}>
+									<uui-combobox-list> ${this.#renderLanguageModelOptions()} </uui-combobox-list>
+								</uui-combobox>
+								<uui-button
+									look="outline"
+									color="danger"
+									label=${this.localize.term('assignDomain_remove')}
+									@click=${() => this.#onRemoveDomain(index)}>
+									<uui-icon name="icon-trash"></uui-icon>
+								</uui-button>
+							</div>
+						</div>
 					`,
 				)}
 			</div>
@@ -229,6 +311,11 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 	static override styles = [
 		UmbTextStyles,
 		css`
+			umb-property-layout {
+				padding-top: 0;
+				padding-bottom: 0;
+			}
+
 			uui-button-group {
 				width: 100%;
 			}
@@ -241,12 +328,50 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 				flex-grow: 0;
 			}
 
-			#domains {
-				margin-top: var(--uui-size-layout-1);
-				margin-bottom: var(--uui-size-2);
+			#item {
+				position: relative;
+				display: flex;
+				gap: var(--uui-size-1);
+				align-items: center;
+			}
+
+			.hostname-wrapper {
+				position: relative;
+				flex: 1;
 				display: grid;
 				grid-template-columns: 1fr 1fr auto;
 				grid-gap: var(--uui-size-1);
+			}
+
+			#sorter-wrapper {
+				margin-top: var(--uui-size-layout-1);
+				margin-bottom: var(--uui-size-2);
+				display: flex;
+				flex-direction: column;
+				grid-gap: var(--uui-size-1);
+			}
+
+			.handle {
+				cursor: grab;
+			}
+
+			.handle:active {
+				cursor: grabbing;
+			}
+			#action {
+				display: block;
+			}
+
+			.--umb-sorter-placeholder {
+				position: relative;
+				visibility: hidden;
+			}
+			.--umb-sorter-placeholder::after {
+				content: '';
+				position: absolute;
+				inset: 0px;
+				border-radius: var(--uui-border-radius);
+				border: 1px dashed var(--uui-color-divider-emphasis);
 			}
 		`,
 	];
