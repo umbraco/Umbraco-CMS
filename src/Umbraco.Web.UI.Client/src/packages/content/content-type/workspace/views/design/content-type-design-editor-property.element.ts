@@ -154,14 +154,14 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 
 	override render() {
 		// TODO: Only show alias on label if user has access to DocumentType within settings: [NL]
-		return this._inherited ? this.renderInheritedProperty() : this.renderEditableProperty();
+		return this._inherited ? this.#renderInheritedProperty() : this.#renderEditableProperty();
 	}
 
-	renderInheritedProperty() {
+	#renderInheritedProperty() {
 		if (!this.property) return;
 
 		if (this.sortModeActive) {
-			return this.renderSortableProperty();
+			return this.#renderSortableProperty();
 		} else {
 			return html`
 				<div id="header">
@@ -170,7 +170,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 					<p>${this.property.description}</p>
 				</div>
 				<div id="editor">
-					${this.renderPropertyTags()}
+					${this.#renderPropertyName()} ${this.#renderPropertyTags()}
 					${this._inherited
 						? html`<uui-tag look="default" class="inherited">
 								<uui-icon name="icon-merge"></uui-icon>
@@ -187,11 +187,11 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		}
 	}
 
-	renderEditableProperty() {
+	#renderEditableProperty() {
 		if (!this.property || !this.editPropertyTypePath) return;
 
 		if (this.sortModeActive) {
-			return this.renderSortableProperty();
+			return this.#renderSortableProperty();
 		} else {
 			return html`
 				<div id="header">
@@ -228,7 +228,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 					label=${this.localize.term('contentTypeEditor_editorSettings')}
 					href=${this.editPropertyTypePath +
 					UMB_EDIT_PROPERTY_TYPE_WORKSPACE_PATH_PATTERN.generateLocal({ unique: this.property.unique })}>
-					${this.renderPropertyTags()}
+					${this.#renderPropertyName()} ${this.#renderPropertyTags()}
 					<uui-action-bar>
 						<uui-button label="${this.localize.term('actions_delete')}" @click="${this.#requestRemove}">
 							<uui-icon name="delete"></uui-icon>
@@ -242,7 +242,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 	#onPropertyOrderChanged = (e: UUIInputEvent) =>
 		this.#partialUpdate({ sortOrder: parseInt(e.target.value as string) ?? 0 } as UmbPropertyTypeModel);
 
-	renderSortableProperty() {
+	#renderSortableProperty() {
 		if (!this.property) return;
 		return html`
 			<div class="sortable">
@@ -259,38 +259,41 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		`;
 	}
 
-	renderPropertyTags() {
+	#renderPropertyName() {
+		return this.property?.dataType?.unique ? html`<div id="editor-name">${this._dataTypeName}</div>` : nothing;
+	}
+
+	#renderPropertyTags() {
 		return this.property
-			? html` ${this.property.dataType?.unique ? html`<div id="editor-name">${this._dataTypeName}</div>` : nothing}
-					<div class="types">
-						${this.#renderVariantTags()}
-						${this.property.appearance?.labelOnTop == true
-							? html`<uui-tag look="default">
-									<uui-icon name="icon-stretch-horizontal"></uui-icon>
-									<span>${this.localize.term('contentTypeEditor_displaySettingsLabelOnTop')}</span>
-								</uui-tag>`
-							: nothing}
-						${this.property.validation.mandatory === true
-							? html`<uui-tag look="default">
-									<span>* ${this.localize.term('general_mandatory')}</span>
-								</uui-tag>`
-							: nothing}
-						${this.property.visibility?.memberCanView === true
-							? html`<uui-tag look="default">
-									<uui-icon name="icon-eye"></uui-icon> ${this.localize.term('contentTypeEditor_showOnMemberProfile')}
-								</uui-tag>`
-							: nothing}
-						${this.property.visibility?.memberCanEdit === true
-							? html`<uui-tag look="default">
-									<uui-icon name="icon-edit"></uui-icon> ${this.localize.term('contentTypeEditor_memberCanEdit')}
-								</uui-tag>`
-							: nothing}
-						${this.property.isSensitive === true
-							? html`<uui-tag look="default">
-									<uui-icon name="icon-lock"></uui-icon> ${this.localize.term('contentTypeEditor_isSensitiveData')}
-								</uui-tag>`
-							: nothing}
-					</div>`
+			? html`<div class="types">
+					${this.#renderVariantTags()}
+					${this.property.appearance?.labelOnTop == true
+						? html`<uui-tag look="default">
+								<uui-icon name="icon-stretch-horizontal"></uui-icon>
+								<span>${this.localize.term('contentTypeEditor_displaySettingsLabelOnTop')}</span>
+							</uui-tag>`
+						: nothing}
+					${this.property.validation.mandatory === true
+						? html`<uui-tag look="default">
+								<span>* ${this.localize.term('general_mandatory')}</span>
+							</uui-tag>`
+						: nothing}
+					${this.property.visibility?.memberCanView === true
+						? html`<uui-tag look="default">
+								<uui-icon name="icon-eye"></uui-icon> ${this.localize.term('contentTypeEditor_showOnMemberProfile')}
+							</uui-tag>`
+						: nothing}
+					${this.property.visibility?.memberCanEdit === true
+						? html`<uui-tag look="default">
+								<uui-icon name="icon-edit"></uui-icon> ${this.localize.term('contentTypeEditor_memberCanEdit')}
+							</uui-tag>`
+						: nothing}
+					${this.property.isSensitive === true
+						? html`<uui-tag look="default">
+								<uui-icon name="icon-lock"></uui-icon> ${this.localize.term('contentTypeEditor_isSensitiveData')}
+							</uui-tag>`
+						: nothing}
+				</div>`
 			: nothing;
 	}
 
@@ -448,7 +451,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 			#editor:not(uui-button) {
 				background-color: var(--uui-color-background);
 				border-radius: var(--uui-button-border-radius, var(--uui-border-radius, 3px));
-				min-height: 143px;
+				min-height: 92px;
 			}
 			#editor uui-action-bar {
 				--uui-button-background-color: var(--uui-color-surface);
