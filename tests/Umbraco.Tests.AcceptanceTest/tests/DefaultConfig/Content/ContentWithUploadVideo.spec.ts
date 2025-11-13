@@ -77,7 +77,9 @@ for (const uploadVideo of uploadVideos) {
     // Act
     await umbracoUi.content.goToContentWithName(contentName);
     await umbracoUi.content.uploadFile(uploadVideoPath + uploadVideo.fileName);
-    await umbracoUi.waitForTimeout(500);
+    // Wait for the upload to complete
+    await umbracoUi.content.isInputDropzoneVisible(false);
+    await umbracoUi.content.isInputUploadFieldVisible();
     await umbracoUi.content.clickSaveButton();
 
     // Assert
