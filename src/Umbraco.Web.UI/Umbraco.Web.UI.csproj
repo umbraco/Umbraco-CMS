@@ -58,7 +58,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Hide the content files that come from the Microsoft.CodeAnalysis.Workspaces.Common package. -->
+    <!-- Hide the content files that come from the Microsoft.CodeAnalysis.Workspaces.MSBuild package. -->
     <Content Update="$(NuGetPackageRoot)\microsoft.codeanalysis.workspaces.msbuild\**\**" Visible="false" />
   </ItemGroup>
 
