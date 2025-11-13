@@ -185,7 +185,35 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 	override render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('actions_assigndomain')}>
-				${this.#renderCultureSection()} ${this.#renderDomainSection()}
+				<uui-box>
+					<umb-property-layout
+						label=${this.localize.term('assignDomain_language')}
+						description=${this.localize.term('assignDomain_setLanguageHelp')}
+						orientation="vertical"
+						><div slot="editor">
+							<uui-combobox
+								id="select"
+								label=${this.localize.term('assignDomain_language')}
+								.value=${(this._defaultIsoCode as string) ?? 'inherit'}
+								@change=${this.#onChangeLanguage}>
+								<uui-combobox-list>
+									<uui-combobox-list-option .value=${'inherit'}>
+										${this.localize.term('assignDomain_inherit')}
+									</uui-combobox-list-option>
+									${this.#renderLanguageModelOptions()}
+								</uui-combobox-list>
+							</uui-combobox>
+						</div>
+					</umb-property-layout>
+				</uui-box>
+				<uui-box>
+					<umb-property-layout
+						label=${this.localize.term('assignDomain_setDomains')}
+						description=${this.localize.term('assignDomain_domainHelpWithVariants')}
+						orientation="vertical"
+						><div slot="editor">${this.#renderDomains()} ${this.#renderAddNewDomainButton()}</div></umb-property-layout
+					>
+				</uui-box>
 				<uui-button
 					slot="actions"
 					id="close"
@@ -199,45 +227,6 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 					label=${this.localize.term('buttons_save')}
 					@click=${this.#handleSave}></uui-button>
 			</umb-body-layout>
-		`;
-	}
-
-	#renderCultureSection() {
-		return html`
-			<uui-box>
-				<umb-property-layout label=${this.localize.term('assignDomain_language')} orientation="vertical"
-					><div slot="editor">
-						<uui-combobox
-							id="select"
-							label=${this.localize.term('assignDomain_language')}
-							.value=${(this._defaultIsoCode as string) ?? 'inherit'}
-							@change=${this.#onChangeLanguage}>
-							<uui-combobox-list>
-								<uui-combobox-list-option .value=${'inherit'}>
-									${this.localize.term('assignDomain_inherit')}
-								</uui-combobox-list-option>
-								${this.#renderLanguageModelOptions()}
-							</uui-combobox-list>
-						</uui-combobox>
-					</div>
-				</umb-property-layout>
-				<uui-label for="select"></uui-label>
-			</uui-box>
-		`;
-	}
-
-	#renderDomainSection() {
-		return html`
-			<uui-box headline=${this.localize.term('assignDomain_setDomains')}>
-				<div id="domain-help-text">
-					<umb-localize key="assignDomain_domainHelpWithVariants">
-						Valid domain names are: "example.com", "www.example.com", "example.com:8080", or
-						"https://www.example.com/".<br />Furthermore also one-level paths in domains are supported, eg.
-						"example.com/en" or "/en".
-					</umb-localize>
-				</div>
-				${this.#renderDomains()} ${this.#renderAddNewDomainButton()}
-			</uui-box>
 		`;
 	}
 
@@ -312,20 +301,15 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 	static override styles = [
 		UmbTextStyles,
 		css`
-			umb-property-layout {
-				padding-top: 0;
-				padding-bottom: 0;
+			umb-property-layout[orientation='vertical'] {
+				padding: 0;
 			}
-
 			uui-button-group {
 				width: 100%;
 			}
 
 			uui-box:first-child {
 				margin-bottom: var(--uui-size-layout-1);
-			}
-			#domain-help-text {
-				margin-bottom: var(--uui-size-2);
 			}
 
 			#dropdown {
