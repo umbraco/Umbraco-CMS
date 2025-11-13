@@ -21,7 +21,6 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 	#context = new UmbPropertyTypeContext(this);
 	#dataTypeDetailRepository = new UmbDataTypeDetailRepository(this);
 	#dataTypeUnique?: string;
-	#propertyUnique?: string;
 
 	@property({ attribute: false })
 	public set propertyStructureHelper(value: UmbContentTypePropertyStructureHelper<UmbContentTypeModel> | undefined) {
@@ -50,7 +49,6 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		this._property = value;
 		this.#context.setAlias(value?.alias);
 		this.#context.setLabel(value?.name);
-		this.#checkAliasAutoGenerate(this._property?.unique);
 		this.#checkInherited();
 		this.#setDataType(this._property?.dataType?.unique);
 		this.requestUpdate('property', oldValue);
@@ -86,17 +84,6 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 
 	@state()
 	private _dataTypeName?: string;
-
-	#autoGenerateAlias = true;
-
-	#checkAliasAutoGenerate(unique: string | undefined) {
-		if (unique === this.#propertyUnique) return;
-		this.#propertyUnique = unique;
-
-		if (this.#context.getAlias()) {
-			this.#autoGenerateAlias = false;
-		}
-	}
 
 	async #checkInherited() {
 		if (this._propertyStructureHelper && this._property) {
@@ -159,10 +146,6 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 	}
 
 	#onNameAliasChange(e: InputEvent & { target: UmbInputWithAliasElement }) {
-		if (e.target.alias !== e.target.value && e.target.alias) {
-			this.#autoGenerateAlias = false;
-		}
-
 		this.#partialUpdate({
 			name: e.target.value,
 			alias: e.target.alias,
@@ -221,7 +204,6 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 						.aliasLabel=${this.localize.term('placeholders_enterAlias')}
 						.value=${this.property.name}
 						.alias=${this.property.alias}
-						?auto-generate-alias=${this.#autoGenerateAlias}
 						@change=${this.#onNameAliasChange}
 						${umbBindToValidation(this)}></umb-input-with-alias>
 					<umb-form-validation-message for="name-alias-input"></umb-form-validation-message>
