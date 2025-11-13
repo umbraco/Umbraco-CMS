@@ -207,24 +207,22 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 			this._ownerContentTypeUnique = workspaceContext?.structure.getOwnerContentTypeUnique();
 			this.#createPropertyTypeWorkspaceRoutes();
 
-			const varyByCulturePromise =
-				this.observe(
-					workspaceContext?.variesByCulture,
-					(variesByCulture) => {
-						this._ownerContentTypeVariesByCulture = variesByCulture;
-					},
-					'observeOwnerVariesByCulture',
-				)?.asPromise() ?? Promise.reject();
-			const varyBySegmentPromise =
-				this.observe(
-					workspaceContext?.variesBySegment,
-					(variesBySegment) => {
-						this._ownerContentTypeVariesBySegment = variesBySegment;
-					},
-					'observeOwnerVariesBySegment',
-				)?.asPromise() ?? Promise.reject();
+			const varyByCulturePromise = this.observe(
+				workspaceContext?.variesByCulture,
+				(variesByCulture) => {
+					this._ownerContentTypeVariesByCulture = variesByCulture;
+				},
+				'observeOwnerVariesByCulture',
+			)?.asPromise();
+			const varyBySegmentPromise = this.observe(
+				workspaceContext?.variesBySegment,
+				(variesBySegment) => {
+					this._ownerContentTypeVariesBySegment = variesBySegment;
+				},
+				'observeOwnerVariesBySegment',
+			)?.asPromise();
 
-			if (this.#initResolver) {
+			if (varyByCulturePromise && varyBySegmentPromise && this.#initResolver) {
 				Promise.all([varyByCulturePromise, varyBySegmentPromise])
 					.then(() => {
 						this.#initResolver?.();
