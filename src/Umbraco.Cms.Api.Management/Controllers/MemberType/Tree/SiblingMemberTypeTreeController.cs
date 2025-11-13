@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Services.Flags;
@@ -23,6 +23,7 @@ public class SiblingMemberTypeTreeController : MemberTypeTreeControllerBase
         CancellationToken cancellationToken,
         Guid target,
         int before,
-        int after)
+        int after,
+        bool foldersOnly = false)
         => await GetSiblings(target, before, after);
 }
