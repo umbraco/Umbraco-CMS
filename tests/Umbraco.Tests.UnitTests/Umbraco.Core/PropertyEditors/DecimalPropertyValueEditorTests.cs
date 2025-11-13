@@ -165,6 +165,26 @@ public class DecimalPropertyValueEditorTests
         }
     }
 
+    [TestCase(1.8, true)]
+    [TestCase(2.2, false)]
+    [SetCulture("it-IT")] // Uses "," as the decimal separator.
+    public void Validates_Is_Less_Than_Or_Equal_To_Configured_Max_With_Comma_Decimal_Separator(object value, bool expectedSuccess)
+    {
+        var editor = CreateValueEditor(min: 1, max: 2);
+        var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
+        if (expectedSuccess)
+        {
+            Assert.IsEmpty(result);
+        }
+        else
+        {
+            Assert.AreEqual(1, result.Count());
+
+            var validationResult = result.First();
+            Assert.AreEqual(validationResult.ErrorMessage, "validation_outOfRangeMaximum");
+        }
+    }
+
     [TestCase(0.2, 1.4, false)]
     [TestCase(0.2, 1.5, true)]
     [TestCase(0.0, 1.4, true)] // A step of zero would trigger a divide by zero error in evaluating. So we always pass validation for zero, as effectively any step value is valid.
