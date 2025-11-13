@@ -9,7 +9,6 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
-using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Tests.Common.Attributes;
@@ -88,8 +87,6 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         ContentVariation changedContentTypeVariation,
         bool shouldUrlRedirectsBeCleared)
     {
-        var umbracoContextFactory = GetRequiredService<IUmbracoContextFactory>();
-
         var contentType = ContentTypeBuilder.CreateBasicContentType();
         contentType.Variations = startingContentTypeVariation;
         ContentTypeService.Save(contentType);
@@ -109,11 +106,8 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         IContent doc2 = ContentBuilder.CreateBasicContent(contentType2);
         ContentService.Save(doc2);
 
-        using (umbracoContextFactory.EnsureUmbracoContext())
-        {
-            RedirectUrlService.Register("hello/world", doc.Key);
-            RedirectUrlService.Register("hello2/world2", doc2.Key);
-        }
+        RedirectUrlService.Register("hello/world", doc.Key);
+        RedirectUrlService.Register("hello2/world2", doc2.Key);
 
         // These 2 assertions should probably be moved to a test for the Register() method?
         Assert.AreEqual(1, RedirectUrlService.GetContentRedirectUrls(doc.Key).Count());

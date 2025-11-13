@@ -11,36 +11,19 @@ namespace Umbraco.Cms.Core.Services;
 internal sealed class RedirectUrlService : RepositoryService, IRedirectUrlService
 {
     private readonly IRedirectUrlRepository _redirectUrlRepository;
-    private readonly IPublishedUrlProvider _publishedUrlProvider;
 
     public RedirectUrlService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
         IEventMessagesFactory eventMessagesFactory,
-        IRedirectUrlRepository redirectUrlRepository,
-        IPublishedUrlProvider publishedUrlProvider)
-        : base(provider, loggerFactory, eventMessagesFactory)
-    {
+        IRedirectUrlRepository redirectUrlRepository)
+        : base(provider, loggerFactory, eventMessagesFactory) =>
         _redirectUrlRepository = redirectUrlRepository;
-        _publishedUrlProvider = publishedUrlProvider;
-    }
 
     public void Register(string url, Guid contentKey, string? culture = null)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
-            var newUrl = _publishedUrlProvider.GetUrl(contentKey, UrlMode.Relative, culture).TrimEnd('/');
-            IEnumerable<IRedirectUrl> allRedirectUrls = _redirectUrlRepository.GetContentUrls(contentKey);
-
-            // If there's a redirect URL that points to the new URL, delete it.
-            foreach (IRedirectUrl redirectUrl in allRedirectUrls)
-            {
-                if (redirectUrl.Url == newUrl)
-                {
-                    _redirectUrlRepository.Delete(redirectUrl.Key);
-                }
-            }
-
             IRedirectUrl? redir = _redirectUrlRepository.Get(url, contentKey, culture);
             if (redir != null)
             {
