@@ -60,7 +60,7 @@ internal abstract class DeliveryApiTransformerBase : IOpenApiOperationTransforme
                 Schema = new OpenApiSchema { Type = JsonSchemaType.String },
                 Examples = new Dictionary<string, IOpenApiExample>
                 {
-                    { "Expand none", new OpenApiExample { Value = JsonValue.Create(string.Empty) } },
+                    { "Expand none", new OpenApiExample { Value = null } },
                     { "Expand all properties", new OpenApiExample { Value = JsonValue.Create("properties[$all]") } },
                     { "Expand specific property", new OpenApiExample { Value = JsonValue.Create("properties[alias1]") } },
                     { "Expand specific properties", new OpenApiExample { Value = JsonValue.Create("properties[alias1,alias2]") } },

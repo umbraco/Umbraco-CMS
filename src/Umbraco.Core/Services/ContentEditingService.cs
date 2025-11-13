@@ -62,6 +62,9 @@ internal sealed class ContentEditingService
         _languageService = languageService;
     }
 
+    /// <inheritdoc/>
+    protected override string? RelateParentOnDeleteAlias => Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias;
+
     public Task<IContent?> GetAsync(Guid key)
     {
         IContent? content = ContentService.GetById(key);
