@@ -1973,6 +1973,10 @@
 			"file": "cloud-snow.svg"
 		},
 		{
+			"name": "icon-sort",
+			"file": "arrow-down-up.svg"
+		},
+		{
 			"name": "icon-sound-low",
 			"file": "volume-1.svg"
 		},
