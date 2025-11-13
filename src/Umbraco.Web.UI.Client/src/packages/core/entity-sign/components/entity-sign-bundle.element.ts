@@ -50,8 +50,6 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 		super();
 		this.addEventListener('mouseenter', this.#openTooltip);
 		this.addEventListener('mouseleave', this.#cancelOpen);
-		this.addEventListener('keydown', this.#handleKeydown);
-		this.addEventListener('focusout', this.#cancelOpen);
 	}
 
 	#manifestFilter = (manifest: ManifestEntitySign) => {
@@ -124,19 +122,6 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 		} else if (this._hoverTimer) {
 			clearTimeout(this._hoverTimer);
 			this._hoverTimer = undefined;
-		}
-	};
-
-	#handleKeydown = (event: KeyboardEvent) => {
-		if (event.code === 'Enter' || event.code === 'Space') {
-			event.preventDefault();
-			if (!this._open) {
-				this._open = true;
-				this.requestUpdate('_open', false);
-			} else {
-				this._open = false;
-				this.requestUpdate('_open', true);
-			}
 		}
 	};
 
