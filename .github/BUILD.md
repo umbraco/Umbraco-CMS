@@ -79,13 +79,12 @@ Conversely, if you are working on front-end only, you want to build the back-end
 "AuthorizeCallbackLogoutPathName": "/logout",
 "AuthorizeCallbackErrorPathName": "/error",
 "BackOfficeTokenCookie": {
-  "Enabled": true,
   "SameSite": "None"
 }
 ```
 
 > [!NOTE]
-> If you get stuck in a login loop, try clearing your browser cookies for localhost, and make sure that the `BackOfficeTokenCookie` settings are correct. Namely, that `SameSite` should be set to `None` when running the front-end server separately.
+> If you get stuck in a login loop, try clearing your browser cookies for localhost, and make sure that the `Umbraco:Cms:Security:BackOfficeTokenCookie:SameSite` setting is set to `None`.
 
 Then run Umbraco from the command line.
 

@@ -31,6 +31,8 @@ Bootstrap, build, and test the repository:
   - `cd src/Umbraco.Web.UI`
   - `dotnet run --no-build` -- Application runs on https://localhost:44339 and http://localhost:11000
 
+Check out [BUILD.md](./BUILD.md) for more detailed instructions.
+
 ## Validation
 
 - ALWAYS run through at least one complete end-to-end scenario after making changes.
@@ -105,7 +107,6 @@ For frontend-only changes:
    "AuthorizeCallbackLogoutPathName": "/logout",
    "AuthorizeCallbackErrorPathName": "/error",
    "BackOfficeTokenCookie": {
-     "Enabled": true,
      "SameSite": "None"
    }
    ```
