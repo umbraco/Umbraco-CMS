@@ -100,6 +100,10 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
 
     public string TimeColumnDefinition { get; protected set; } = "DATETIME";
 
+    public string DateOnlyColumnDefinition { get; protected set; } = "DATE";
+
+    public string TimeOnlyColumnDefinition { get; protected set; } = "TIME";
+
     protected IList<Func<ColumnDefinition, string>> ClauseOrder { get; }
 
     protected DbTypes DbTypeMap => _dbTypes.Value;
@@ -531,6 +535,10 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
         dbTypeMap.Set<TimeSpan?>(DbType.Time, TimeColumnDefinition);
         dbTypeMap.Set<DateTimeOffset>(DbType.DateTimeOffset, DateTimeOffsetColumnDefinition);
         dbTypeMap.Set<DateTimeOffset?>(DbType.DateTimeOffset, DateTimeOffsetColumnDefinition);
+        dbTypeMap.Set<DateOnly>(DbType.Date, DateOnlyColumnDefinition);
+        dbTypeMap.Set<DateOnly?>(DbType.Date, DateOnlyColumnDefinition);
+        dbTypeMap.Set<TimeOnly>(DbType.Time, TimeOnlyColumnDefinition);
+        dbTypeMap.Set<TimeOnly?>(DbType.Time, TimeOnlyColumnDefinition);
 
         dbTypeMap.Set<byte>(DbType.Byte, IntColumnDefinition);
         dbTypeMap.Set<byte?>(DbType.Byte, IntColumnDefinition);
