@@ -38,6 +38,7 @@ const CORE_PACKAGES = [
 	import('../../packages/relations/umbraco-package.js'),
 	import('../../packages/rte/umbraco-package.js'),
 	import('../../packages/settings/umbraco-package.js'),
+	import('../../packages/sort/umbraco-package.js'),
 	import('../../packages/static-file/umbraco-package.js'),
 	import('../../packages/sysinfo/umbraco-package.js'),
 	import('../../packages/tags/umbraco-package.js'),
