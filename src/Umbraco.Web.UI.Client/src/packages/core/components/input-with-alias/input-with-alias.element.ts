@@ -33,11 +33,11 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 	@property({ type: Boolean, attribute: 'auto-generate-alias' })
 	autoGenerateAlias?: boolean;
 
-	@state()
-	private _aliasLocked = true;
-
 	@property({ type: String, attribute: 'alias-pattern' })
 	aliasPattern: string = DEFAULT_ALIAS_PATTERN;
+
+	@state()
+	private _aliasLocked = true;
 
 	protected override firstUpdated(): void {
 		this.addValidator(
@@ -100,6 +100,7 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 			this.alias = generateAlias(this.value ?? '');
 			this.dispatchEvent(new UmbChangeEvent());
 		}
+		this._aliasLocked = true;
 	}
 
 	#onToggleAliasLock(event: CustomEvent) {
@@ -140,7 +141,7 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 								.value=${this.alias}
 								?auto-width=${!!this.value}
 								?locked=${this._aliasLocked && !this.aliasReadonly}
-								?readonly=${this.aliasReadonly}
+								?readonly=${this._aliasLocked || this.aliasReadonly}
 								?required=${this.required}
 								@input=${this.#onAliasChange}
 								@blur=${this.#onAliasBlur}
@@ -163,16 +164,22 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 		}
 
 		#alias {
+			transition: opacity 80ms;
 			&.muted {
 				opacity: 0.55;
 				padding: var(--uui-size-1, 3px) var(--uui-size-space-3, 9px);
 			}
 		}
+
 		:host(:invalid:not([pristine])) {
 			color: var(--uui-color-invalid);
 		}
 		:host(:invalid:not([pristine])) > uui-input {
 			border-color: var(--uui-color-invalid);
+		}
+		:host(:not(invalid):not(:hover):not(:focus-within)) #alias {
+			--uui-button-contrast: transparent;
+			--uui-input-background-color-readonly: transparent;
 		}
 	`;
 }

@@ -429,6 +429,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 			}
 
 			p {
+				margin-top: 0;
 				margin-bottom: 0;
 			}
 
@@ -440,6 +441,10 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 
 			#header i {
 				opacity: 0.55;
+			}
+
+			#header umb-input-with-alias {
+				--uui-input-border-color: transparent;
 			}
 
 			#editor {
@@ -461,9 +466,8 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 				width: 100%;
 			}
 
-			#description-input {
+			#description-input:not(:hover):not(:focus) {
 				--uui-textarea-border-color: transparent;
-				font-weight: 0.5rem; /* TODO: Cant change font size of UUI textarea yet */
 			}
 
 			.types > div uui-icon,
