@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Api.Delivery.Filters.OpenApi;
 /// <summary>
 /// Transforms the OpenAPI document to add schemas for the instance's document types.
 /// </summary>
-public class DocumentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApiDocumentTransformer
+public class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApiDocumentTransformer
 {
     private const string CustomRecursiveRefKey = "x-recursive-ref";
     private readonly IContentTypeInfoService _contentTypeInfoService;
@@ -26,11 +26,11 @@ public class DocumentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApi
     private readonly JsonSerializerOptions _serializerOptions;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="DocumentTypeSchemaTransformer"/> class.
+    /// Initializes a new instance of the <see cref="ContentTypeSchemaTransformer"/> class.
     /// </summary>
     /// <param name="contentTypeInfoService">The content type info service.</param>
     /// <param name="jsonOptionsMonitor">The JSON options monitor.</param>
-    public DocumentTypeSchemaTransformer(
+    public ContentTypeSchemaTransformer(
         IContentTypeInfoService contentTypeInfoService,
         IOptionsMonitor<JsonOptions> jsonOptionsMonitor)
     {
@@ -151,12 +151,7 @@ public class DocumentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApi
             IOpenApiSchema derivedTypeSchema = await CreateSchema(
                 GetJsonTypeInfo(derivedType.DerivedType),
                 context,
-                cancellationToken,
-                derivedTypeSchema =>
-                {
-                    derivedTypeSchema.Properties?.Remove("properties");
-                    derivedTypeSchema.Required?.Remove("properties");
-                });
+                cancellationToken);
             derivedTypeSchemas.Add(derivedTypeSchema);
         }
 
@@ -170,7 +165,7 @@ public class DocumentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApi
         foreach (ContentTypeInfo contentType in contentTypes)
         {
             (var contentTypeSchemaId, OpenApiSchema contentTypeSchema) = await contentTypeSchemaMapper(contentType);
-            contentTypeSchema.OneOf = derivedTypeSchemas;
+            contentTypeSchema.AllOf = derivedTypeSchemas;
             schema.Discriminator.Mapping[contentType.Alias] = new OpenApiSchemaReference(contentTypeSchemaId, context.Document);
             schema.OneOf.Add(contentTypeSchema);
         }
@@ -235,25 +230,22 @@ public class DocumentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApi
         PublishedItemType itemType,
         ContentTypeInfo contentType,
         OpenApiSchemaTransformerContext context,
-        CancellationToken cancellationToken) =>
-        new()
+        CancellationToken cancellationToken)
+    {
+        var typePropertyName = GetTypePropertyName(itemType);
+        return new OpenApiSchema
         {
             Type = JsonSchemaType.Object,
             Properties = new Dictionary<string, IOpenApiSchema>
             {
-                [GetTypePropertyName(itemType)] = new OpenApiSchema { Const = contentType.Alias },
-                ["properties"] = new OpenApiSchema
-                {
-                    AllOf =
-                    [
-                        await CreatePropertiesSchema(contentType, context, cancellationToken),
-                        ..contentType.CompositionSchemaIds.Select(compositionSchemaId => new OpenApiSchemaReference($"{compositionSchemaId}PropertiesModel", context.Document))
-                    ],
-                },
+                [typePropertyName] = new OpenApiSchema { Const = contentType.Alias },
+                ["properties"] = await CreatePropertiesSchema(contentType, context, cancellationToken),
             },
+            Required = new HashSet<string> { typePropertyName },
             AdditionalPropertiesAllowed = false,
             Metadata = new Dictionary<string, object> { ["x-schema-id"] = schemaId, },
         };
+    }
 
     private async Task<IOpenApiSchema> CreatePropertiesSchema(
         ContentTypeInfo contentType,
@@ -261,19 +253,15 @@ public class DocumentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApi
         CancellationToken cancellationToken)
     {
         var schemaId = $"{contentType.SchemaId}PropertiesModel";
-        if (context.Document!.Components?.Schemas?.TryGetValue(schemaId, out IOpenApiSchema? existingSchema) == true)
-        {
-            return existingSchema;
-        }
 
         var propertiesSchema = new OpenApiSchema
         {
             Type = JsonSchemaType.Object,
+            AllOf = [..contentType.CompositionSchemaIds.Select(compositionSchemaId => GetPlaceholderSchema($"{compositionSchemaId}PropertiesModel"))],
             Properties = await ContentTypePropertiesMapper(contentType, context, cancellationToken),
             Metadata = new Dictionary<string, object> { ["x-schema-id"] = schemaId, },
             AdditionalPropertiesAllowed = false,
         };
-        context.Document.AddComponent(schemaId, propertiesSchema);
         return propertiesSchema;
     }
 
@@ -285,7 +273,7 @@ public class DocumentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApi
         var properties = new Dictionary<string, IOpenApiSchema>();
         foreach (ContentTypePropertyInfo propertyInfo in contentType.Properties.Where(p => !p.Inherited))
         {
-            IOpenApiSchema schema = await CreateSchema(GetJsonTypeInfo(propertyInfo.Type), context, cancellationToken);
+            IOpenApiSchema schema = await CreateSchema(GetJsonTypeInfo(propertyInfo.DeliveryApiType), context, cancellationToken);
             properties[propertyInfo.Alias] = schema;
         }
 

@@ -31,27 +31,28 @@ internal sealed class ContentTypeInfoService : IContentTypeInfoService
 
     /// <inheritdoc/>
     public ICollection<ContentTypeInfo> GetContentTypes()
-        => GetContentTypeInfos(PublishedItemType.Content, _contentTypeService.GetAll().Select(x => x.Alias));
+        => GetContentTypeInfos(PublishedItemType.Content, _contentTypeService.GetAll());
 
     /// <inheritdoc/>
     public ICollection<ContentTypeInfo> GetMediaTypes()
-        => GetContentTypeInfos(PublishedItemType.Media, _mediaTypeService.GetAll().Select(x => x.Alias));
+        => GetContentTypeInfos(PublishedItemType.Media, _mediaTypeService.GetAll());
 
-    private ICollection<ContentTypeInfo> GetContentTypeInfos(PublishedItemType itemType, IEnumerable<string> contentTypeAliases)
+    private ICollection<ContentTypeInfo> GetContentTypeInfos(
+        PublishedItemType itemType,
+        IEnumerable<IContentTypeComposition> contentTypes)
     {
         List<ContentTypeInfo> result = [];
-        HashSet<string> compositionAliases = [];
 
-        foreach (var contentTypeAlias in contentTypeAliases)
+        foreach (IContentTypeComposition contentType in contentTypes)
         {
-            IPublishedContentType publishedContentType = _publishedContentTypeCache.Get(itemType, contentTypeAlias);
-            HashSet<string> ownPropertyAliases = [.. publishedContentType.PropertyTypes.Select(p => p.Alias)];
+            IPublishedContentType publishedContentType = _publishedContentTypeCache.Get(itemType, contentType.Alias);
+            HashSet<string> ownPropertyAliases = [.. contentType.PropertyTypes.Select(p => p.Alias)];
 
             result.Add(
                 new ContentTypeInfo
                 {
-                    Alias = contentTypeAlias,
-                    SchemaId = GetContentTypeSchemaId(contentTypeAlias),
+                    Alias = contentType.Alias,
+                    SchemaId = GetContentTypeSchemaId(contentType.Alias),
                     CompositionSchemaIds = [.. publishedContentType.CompositionAliases.Select(GetContentTypeSchemaId)],
                     Properties =
                     [
@@ -59,18 +60,13 @@ internal sealed class ContentTypeInfoService : IContentTypeInfoService
                         {
                             Alias = p.Alias,
                             EditorAlias = p.EditorAlias,
-                            Type = p.DeliveryApiModelClrType,
+                            DeliveryApiType = p.DeliveryApiModelClrType,
                             Inherited = !ownPropertyAliases.Contains(p.Alias),
                         })
                     ],
                     IsElement = publishedContentType.IsElement,
-                    IsComposition = false,
                 });
-
-            compositionAliases.UnionWith(publishedContentType.CompositionAliases);
         }
-
-        result.ForEach(c => c.IsComposition = compositionAliases.Contains(c.Alias));
 
         return result;
     }

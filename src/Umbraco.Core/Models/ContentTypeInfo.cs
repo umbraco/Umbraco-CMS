@@ -29,9 +29,4 @@ public class ContentTypeInfo
     /// Gets or sets a value indicating whether the content type is an element type.
     /// </summary>
     public bool IsElement { get; set; }
-
-    /// <summary>
-    /// Gets or sets a value indicating whether the content type is used as a composition.
-    /// </summary>
-    public bool IsComposition { get; set; }
 }

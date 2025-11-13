@@ -18,7 +18,7 @@ public class ContentTypePropertyInfo
     /// <summary>
     /// Property delivery api type.
     /// </summary>
-    public required Type Type { get; set; }
+    public required Type DeliveryApiType { get; set; }
 
     /// <summary>
     /// Whether this property is inherited from a composition.
