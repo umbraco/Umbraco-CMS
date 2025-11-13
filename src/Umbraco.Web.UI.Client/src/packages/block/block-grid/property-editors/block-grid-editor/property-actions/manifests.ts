@@ -11,10 +11,6 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		name: 'Block Grid Paste From Clipboard Property Action',
 		api: () => import('./block-grid-paste-from-clipboard.js'),
 		forPropertyEditorUis: [UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS],
-		conditions: [
-			{
-				alias: UMB_WRITABLE_PROPERTY_CONDITION_ALIAS,
-			},
-		],
+		conditions: [{ alias: UMB_WRITABLE_PROPERTY_CONDITION_ALIAS }],
 	},
 ];

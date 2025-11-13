@@ -1,35 +1,27 @@
-import { UmbBlockGridManagerContext } from '../../block-grid-manager/index.js';
 import type { UmbBlockGridTypeModel, UmbBlockGridValueModel } from '../../types.js';
+import { UmbBlockGridManagerContext } from '../../block-grid-manager/index.js';
 import { UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS } from './constants.js';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { css, customElement, html, nothing, property, ref, state } from '@umbraco-cms/backoffice/external/lit';
+import { debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
+import { jsonStringComparison, observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import {
-	html,
-	customElement,
-	property,
-	state,
-	css,
-	type PropertyValueMap,
-	ref,
-	nothing,
-} from '@umbraco-cms/backoffice/external/lit';
+	UmbFormControlMixin,
+	UmbValidationContext,
+	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
+} from '@umbraco-cms/backoffice/validation';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UMB_CONTENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
+import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
+import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbBlockTypeGroup } from '@umbraco-cms/backoffice/block-type';
 import type {
 	UmbPropertyEditorUiElement,
 	UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
-import { jsonStringComparison, observeMultiple } from '@umbraco-cms/backoffice/observable-api';
-import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
-import {
-	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
-	UmbFormControlMixin,
-	UmbValidationContext,
-} from '@umbraco-cms/backoffice/validation';
-import type { UmbBlockTypeGroup } from '@umbraco-cms/backoffice/block-type';
-import { debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
 
 // TODO: consider moving the components to the property editor folder as they are only used here
 import '../../local-components.js';
-import { UMB_CONTENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
 
 /**
  * @element umb-property-editor-ui-block-grid
@@ -39,11 +31,15 @@ export class UmbPropertyEditorUIBlockGridElement
 	extends UmbFormControlMixin<UmbBlockGridValueModel, typeof UmbLitElement>(UmbLitElement)
 	implements UmbPropertyEditorUiElement
 {
-	#validationContext = new UmbValidationContext(this);
-	#managerContext = new UmbBlockGridManagerContext(this);
-	//
-
 	#lastValue: UmbBlockGridValueModel | undefined = undefined;
+	#managerContext = new UmbBlockGridManagerContext(this);
+	#validationContext = new UmbValidationContext(this);
+
+	@state()
+	private _layoutColumns?: number;
+
+	@state()
+	private _notSupportedVariantSetting?: boolean;
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
@@ -81,13 +77,12 @@ export class UmbPropertyEditorUIBlockGridElement
 		return this.#readonly;
 	}
 	#readonly = false;
+
 	@property({ type: Boolean })
 	mandatory?: boolean;
+
 	@property({ type: String })
 	mandatoryMessage = UMB_VALIDATION_EMPTY_LOCALIZATION_KEY;
-
-	@state()
-	private _layoutColumns?: number;
 
 	@property({ attribute: false })
 	public override set value(value: UmbBlockGridValueModel | undefined) {
@@ -113,9 +108,6 @@ export class UmbPropertyEditorUIBlockGridElement
 	public override get value(): UmbBlockGridValueModel | undefined {
 		return super.value;
 	}
-
-	@state()
-	private _notSupportedVariantSetting?: boolean;
 
 	constructor() {
 		super();
@@ -266,13 +258,14 @@ export class UmbPropertyEditorUIBlockGridElement
 	}
 
 	override render() {
-		if (this._notSupportedVariantSetting) {
-			return nothing;
-		}
-		return html` <umb-block-grid-entries
-			${ref(this.#gotRootEntriesElement)}
-			.areaKey=${null}
-			.layoutColumns=${this._layoutColumns}></umb-block-grid-entries>`;
+		if (this._notSupportedVariantSetting) return nothing;
+		return html`
+			<umb-block-grid-entries
+				${ref(this.#gotRootEntriesElement)}
+				.areaKey=${null}
+				.layoutColumns=${this._layoutColumns}>
+			</umb-block-grid-entries>
+		`;
 	}
 
 	static override styles = [
