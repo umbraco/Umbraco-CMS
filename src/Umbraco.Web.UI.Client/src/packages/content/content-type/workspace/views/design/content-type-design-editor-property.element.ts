@@ -9,6 +9,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_EDIT_PROPERTY_TYPE_WORKSPACE_PATH_PATTERN } from '@umbraco-cms/backoffice/property-type';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbInputWithAliasElement } from '@umbraco-cms/backoffice/components';
+import { umbBindToValidation } from '@umbraco-cms/backoffice/validation';
 
 /**
  *  @element umb-content-type-design-editor-property
@@ -214,14 +215,16 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 					<umb-input-with-alias
 						name="name"
 						id="name-alias-input"
-						placeholder=${this.localize.term('placeholders_label')}
-						label=${this.localize.term('placeholders_label')}
-						alias-label=${this.localize.term('placeholders_enterAlias')}
+						required
+						.placeholder=${this.localize.term('placeholders_label')}
+						.label=${this.localize.term('placeholders_label')}
+						.aliasLabel=${this.localize.term('placeholders_enterAlias')}
 						.value=${this.property.name}
 						.alias=${this.property.alias}
 						?auto-generate-alias=${this.#autoGenerateAlias}
-						@change=${this.#onNameAliasChange}></umb-input-with-alias>
-					<uui-form-validation-message for="name-alias-input"></uui-form-validation-message>
+						@change=${this.#onNameAliasChange}
+						${umbBindToValidation(this)}></umb-input-with-alias>
+					<umb-form-validation-message for="name-alias-input"></umb-form-validation-message>
 
 					<slot name="action-menu"></slot>
 					<p>
@@ -276,36 +279,36 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 
 	renderPropertyTags() {
 		return this.property
-			? html`<div class="types">
-					${this.property.dataType?.unique ? html`<uui-tag look="default">${this._dataTypeName}</uui-tag>` : nothing}
-					${this.#renderVariantTags()}
-					${this.property.appearance?.labelOnTop == true
-						? html`<uui-tag look="default">
-								<uui-icon name="icon-stretch-horizontal"></uui-icon>
-								<span>${this.localize.term('contentTypeEditor_displaySettingsLabelOnTop')}</span>
-							</uui-tag>`
-						: nothing}
-					${this.property.validation.mandatory === true
-						? html`<uui-tag look="default">
-								<span>* ${this.localize.term('general_mandatory')}</span>
-							</uui-tag>`
-						: nothing}
-					${this.property.visibility?.memberCanView === true
-						? html`<uui-tag look="default">
-								<uui-icon name="icon-eye"></uui-icon> ${this.localize.term('contentTypeEditor_showOnMemberProfile')}
-							</uui-tag>`
-						: nothing}
-					${this.property.visibility?.memberCanEdit === true
-						? html`<uui-tag look="default">
-								<uui-icon name="icon-edit"></uui-icon> ${this.localize.term('contentTypeEditor_memberCanEdit')}
-							</uui-tag>`
-						: nothing}
-					${this.property.isSensitive === true
-						? html`<uui-tag look="default">
-								<uui-icon name="icon-lock"></uui-icon> ${this.localize.term('contentTypeEditor_isSensitiveData')}
-							</uui-tag>`
-						: nothing}
-				</div>`
+			? html` ${this.property.dataType?.unique ? html`<div id="editor-name">${this._dataTypeName}</div>` : nothing}
+					<div class="types">
+						${this.#renderVariantTags()}
+						${this.property.appearance?.labelOnTop == true
+							? html`<uui-tag look="default">
+									<uui-icon name="icon-stretch-horizontal"></uui-icon>
+									<span>${this.localize.term('contentTypeEditor_displaySettingsLabelOnTop')}</span>
+								</uui-tag>`
+							: nothing}
+						${this.property.validation.mandatory === true
+							? html`<uui-tag look="default">
+									<span>* ${this.localize.term('general_mandatory')}</span>
+								</uui-tag>`
+							: nothing}
+						${this.property.visibility?.memberCanView === true
+							? html`<uui-tag look="default">
+									<uui-icon name="icon-eye"></uui-icon> ${this.localize.term('contentTypeEditor_showOnMemberProfile')}
+								</uui-tag>`
+							: nothing}
+						${this.property.visibility?.memberCanEdit === true
+							? html`<uui-tag look="default">
+									<uui-icon name="icon-edit"></uui-icon> ${this.localize.term('contentTypeEditor_memberCanEdit')}
+								</uui-tag>`
+							: nothing}
+						${this.property.isSensitive === true
+							? html`<uui-tag look="default">
+									<uui-icon name="icon-lock"></uui-icon> ${this.localize.term('contentTypeEditor_isSensitiveData')}
+								</uui-tag>`
+							: nothing}
+					</div>`
 			: nothing;
 	}
 
@@ -446,6 +449,14 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 			#header umb-input-with-alias {
 				--uui-input-border-color: transparent;
 			}
+			#name-alias-input,
+			#description-input {
+				width: 100%;
+			}
+
+			#description-input:not(:hover):not(:focus) {
+				--uui-textarea-border-color: transparent;
+			}
 
 			#editor {
 				position: relative;
@@ -461,13 +472,12 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 				--uui-button-background-color: var(--uui-color-surface);
 				--uui-button-background-color-hover: var(--uui-color-surface);
 			}
-			#name-alias-input,
-			#description-input {
-				width: 100%;
-			}
-
-			#description-input:not(:hover):not(:focus) {
-				--uui-textarea-border-color: transparent;
+			#editor-name {
+				position: absolute;
+				top: var(--uui-size-space-4);
+				left: var(--uui-size-space-4);
+				font-size: var(--uui-type-small-size);
+				font-weight: 400;
 			}
 
 			.types > div uui-icon,
@@ -484,7 +494,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 
 			.types {
 				position: absolute;
-				top: var(--uui-size-space-2);
+				bottom: var(--uui-size-space-2);
 				left: var(--uui-size-space-2);
 				display: flex;
 				flex-flow: wrap;
