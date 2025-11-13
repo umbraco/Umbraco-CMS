@@ -14,7 +14,7 @@ import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace'
  */
 @customElement('umb-block-workspace-view-edit-content-no-router')
 export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitElement implements UmbWorkspaceViewElement {
-	//private _hasRootProperties = false;
+	// private _hasRootProperties = false;
 
 	@state()
 	private _hasRootGroups = false;
@@ -24,9 +24,6 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 
 	@state()
 	private _activeTabKey?: string | null | undefined;
-
-	//@state()
-	//private _activeTabName?: string | null | undefined;
 
 	#blockWorkspace?: typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE;
 	#tabsStructureHelper = new UmbContentTypeContainerStructureHelper(this);
@@ -67,46 +64,45 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 	#checkDefaultTabName() {
 		if (!this._tabs || !this.#blockWorkspace) return;
 
-		// Find the default tab to grab:
+		// Find the default tab to grab
 		if (this._activeTabKey === undefined) {
 			if (this._hasRootGroups) {
-				//this._activeTabName = null;
 				this._activeTabKey = null;
 			} else if (this._tabs.length > 0) {
-				//this._activeTabName = this._tabs[0].name;
-				this._activeTabKey = this._tabs[0].key;
+				const tab = this._tabs[0];
+				this._activeTabKey = tab.ownerId ?? tab.ids[0];
 			}
 		}
 	}
 
-	#setTabName(tabName: string | undefined | null, tabKey: string | null | undefined) {
-		//this._activeTabName = tabName;
+	#setTabKey(tabKey: string | null | undefined) {
 		this._activeTabKey = tabKey;
 	}
 
 	override render() {
 		if (!this._tabs) return;
+
 		return html`
 			${this._tabs.length > 1 || (this._tabs.length === 1 && this._hasRootGroups)
-				? html` <uui-tab-group slot="header">
+				? html`<uui-tab-group slot="header">
 						${this._hasRootGroups && this._tabs.length > 0
-							? html`
-									<uui-tab
-										label="Content"
-										.active=${null === this._activeTabKey}
-										@click=${() => this.#setTabName(null, null)}
-										>Content</uui-tab
-									>
-								`
+							? html`<uui-tab
+									label=${this.localize.term('general_generic')}
+									.active=${this._activeTabKey === null}
+									@click=${() => this.#setTabKey(null)}
+									>Content</uui-tab
+								>`
 							: nothing}
 						${repeat(
 							this._tabs,
 							(tab) => tab.name,
 							(tab) => {
+								const tabKey = tab.ownerId ?? tab.ids[0];
+
 								return html`<uui-tab
-									label=${tab.name ?? 'Unnamed'}
-									.active=${tab.key === this._activeTabKey}
-									@click=${() => this.#setTabName(tab.name, tab.key)}
+									label=${this.localize.string(tab.name ?? '#general_unnamed')}
+									.active=${this._activeTabKey === tabKey}
+									@click=${() => this.#setTabKey(tabKey)}
 									>${tab.name}</uui-tab
 								>`;
 							},

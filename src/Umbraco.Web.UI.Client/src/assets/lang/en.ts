@@ -1017,9 +1017,21 @@ export default {
 			if (new Date(date).getTime() < new Date(now).getTime()) return `${duration} ago`;
 			return `in ${duration}`;
 		},
+		clipboard: 'Clipboard',
 	},
 	colors: {
+		black: 'Black',
 		blue: 'Blue',
+		brown: 'Brown',
+		cyan: 'Cyan',
+		green: 'Green',
+		lightBlue: 'Light Blue',
+		pink: 'Pink',
+		red: 'Red',
+		text: 'Black',
+		yellow: 'Yellow',
+		white: 'White',
+		grey: 'Grey',
 	},
 	shortcuts: {
 		addGroup: 'Add group',
@@ -2497,6 +2509,7 @@ export default {
 		labelForCopyToClipboard: 'Copy to clipboard',
 		confirmDeleteHeadline: 'Delete from clipboard',
 		confirmDeleteDescription: 'Are you sure you want to delete <strong>{0}</strong> from the clipboard?',
+		confirmClearDescription: 'Are you sure you want to clear the clipboard?',
 		copySuccessHeadline: 'Copied to clipboard',
 	},
 	propertyActions: {
@@ -2556,16 +2569,21 @@ export default {
 	},
 	welcomeDashboard: {
 		umbracoForumHeadline: 'The Umbraco community forum',
-		umbracoForumDescription: 'The forum is the central hub for the Umbraco developer community. This is where developers, integrators, and contributors come together to ask questions, share knowledge, and collaborate on all things Umbraco.',
+		umbracoForumDescription:
+			'The forum is the central hub for the Umbraco developer community. This is where developers, integrators, and contributors come together to ask questions, share knowledge, and collaborate on all things Umbraco.',
 		umbracoForumButton: 'Visit the Umbraco community forum',
 		umbracoCommunityHeadline: 'The Umbraco community site',
-		umbracoCommunityDescription: 'The gathering place for all things Umbraco. Whether you write, teach, test, give feedback, or want to connect with others, there’s a way for you to be part of the Friendly Umbraco community.',
+		umbracoCommunityDescription:
+			'The gathering place for all things Umbraco. Whether you write, teach, test, give feedback, or want to connect with others, there’s a way for you to be part of the Friendly Umbraco community.',
 		documentationHeadline: 'Documentation',
-		documentationDescription: 'Your guide to everything Umbraco. Learn how to get started, explore new features, and discover best practices through clear examples and explanations.',
+		documentationDescription:
+			'Your guide to everything Umbraco. Learn how to get started, explore new features, and discover best practices through clear examples and explanations.',
 		resourcesHeadline: 'Resources',
-		resourcesDescription: 'Explore Umbraco resources to learn, build, and grow your skills. Find blogs, tutorials, demos, documentation, and videos to help you make the most of Umbraco.',
+		resourcesDescription:
+			'Explore Umbraco resources to learn, build, and grow your skills. Find blogs, tutorials, demos, documentation, and videos to help you make the most of Umbraco.',
 		trainingHeadline: 'Training',
-		trainingDescription: 'Master Umbraco with official training. Get practical experience through instructor-led courses and earn certifications that help you grow your skills and career.',
+		trainingDescription:
+			'Master Umbraco with official training. Get practical experience through instructor-led courses and earn certifications that help you grow your skills and career.',
 	},
 	blockEditor: {
 		headlineCreateBlock: 'Pick Element Type',
