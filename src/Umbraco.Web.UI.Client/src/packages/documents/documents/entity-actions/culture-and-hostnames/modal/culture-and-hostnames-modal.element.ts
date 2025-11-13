@@ -86,7 +86,7 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 	// Init
 
 	override willUpdate(changedProperties: PropertyValues) {
-		if (changedProperties.has('_domains') && this._domains?.length) {
+		if (changedProperties.has('_domains')) {
 			// Update sorter whenever _domains changes
 			this.#sorter.setModel(this._domains);
 		}
