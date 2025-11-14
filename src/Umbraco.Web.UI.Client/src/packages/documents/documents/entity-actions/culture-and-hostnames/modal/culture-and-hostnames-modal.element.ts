@@ -7,11 +7,9 @@ import {
 	css,
 	customElement,
 	html,
-	property,
 	query,
 	repeat,
 	state,
-	nothing,
 	type PropertyValues,
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
@@ -32,11 +30,6 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 	UmbCultureAndHostnamesModalData,
 	UmbCultureAndHostnamesModalValue
 > {
-	#documentRepository = new UmbDocumentCultureAndHostnamesRepository(this);
-	#languageCollectionRepository = new UmbLanguageCollectionRepository(this);
-
-	#unique?: string | null;
-
 	#sorter = new UmbSorterController(this, {
 		getUniqueOfElement: (element) => {
 			return element.getAttribute('data-sort-entry-id');
@@ -53,23 +46,10 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 		},
 	});
 
-	/**
-	 * Disables the input
-	 * @type {boolean}
-	 * @attr
-	 * @default false
-	 */
-	@property({ type: Boolean, reflect: true })
-	disabled = false;
+	#documentRepository = new UmbDocumentCultureAndHostnamesRepository(this);
+	#languageCollectionRepository = new UmbLanguageCollectionRepository(this);
 
-	/**
-	 * Makes the input readonly
-	 * @type {boolean}
-	 * @attr
-	 * @default false
-	 */
-	@property({ type: Boolean, reflect: true })
-	readonly = false;
+	#unique?: string | null;
 
 	@state()
 	private _languageModel: Array<UmbLanguageDetailModel> = [];
@@ -238,7 +218,7 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 					(domain) => domain.unique,
 					(domain, index) => html`
 						<div class="hostname-item" id="item" data-sort-entry-id=${domain.unique}>
-							${this.disabled || this.readonly ? nothing : html`<uui-icon name="icon-grip" class="handle"></uui-icon>`}
+							<uui-icon name="icon-grip" class="handle"></uui-icon>
 							<div class="hostname-wrapper">
 								<uui-input
 									label=${this.localize.term('assignDomain_domain')}
