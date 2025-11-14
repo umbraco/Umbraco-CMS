@@ -28,30 +28,16 @@ export class UmbRefRteBlockElement extends UmbLitElement {
 	@property({ attribute: false })
 	settings?: UmbBlockDataType;
 
-	@state()
-	private _workspaceEditPath?: string;
-
 	@property({ attribute: false })
 	config?: UmbBlockEditorCustomViewConfiguration;
-
-	constructor() {
-		super();
-
-		this.consumeContext(UMB_BLOCK_ENTRY_CONTEXT, (context) => {
-			this.observe(
-				context?.workspaceEditContentPath,
-				(workspaceEditPath) => {
-					this._workspaceEditPath = workspaceEditPath;
-				},
-				'observeWorkspaceEditPath',
-			);
-		});
-	}
 
 	override render() {
 		const blockValue = { ...this.content, $settings: this.settings, $index: this.index };
 		return html`
-			<uui-ref-node standalone href=${(this.config?.showContentEdit ? this._workspaceEditPath : undefined) ?? ''}>
+			<uui-ref-node
+				standalone
+				.readonly=${!this.config?.showContentEdit ?? false}
+				.href=${this.config?.showContentEdit ? this.config?.editContentPath : undefined}>
 				<div class="selection-background" aria-hidden="true">&emsp;</div>
 				<umb-icon slot="icon" .name=${this.icon}></umb-icon>
 				<umb-ufm-render slot="name" inline .markdown=${this.label} .value=${blockValue}></umb-ufm-render>
@@ -82,6 +68,10 @@ export class UmbRefRteBlockElement extends UmbLitElement {
 				inset: 0;
 				overflow: hidden;
 				z-index: 0;
+			}
+
+			umb-ufm-render {
+				user-select: none;
 			}
 
 			umb-icon,
