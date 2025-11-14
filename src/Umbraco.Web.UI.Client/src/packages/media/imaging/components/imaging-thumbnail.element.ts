@@ -12,8 +12,8 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 	 * The unique identifier for the media item.
 	 * @description This is also known as the media key and is used to fetch the resource.
 	 */
-	@property()
-	unique = '';
+	@property({ type: String })
+	unique?: string;
 
 	/**
 	 * The width of the thumbnail in pixels.
@@ -34,19 +34,19 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 	 * @description The mode determines how the image is cropped.
 	 * @enum {UmbImagingCropMode}
 	 */
-	@property()
+	@property({ type: String })
 	mode: UmbImagingCropMode = UmbImagingCropMode.MIN;
 
 	/**
 	 * The alt text for the thumbnail.
 	 */
-	@property()
+	@property({ type: String })
 	alt = '';
 
 	/**
 	 * The fallback icon for the thumbnail.
 	 */
-	@property()
+	@property({ type: String })
 	icon = 'icon-picture';
 
 	/**
@@ -54,11 +54,17 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 	 * @enum {'lazy' | 'eager'}
 	 * @default 'lazy'
 	 */
-	@property()
+	@property({ type: String })
 	loading: (typeof HTMLImageElement)['prototype']['loading'] = 'lazy';
 
+	/**
+	 * External loading state (e.g., when parent is waiting for metadata)
+	 */
+	@property({ type: Boolean, reflect: false, attribute: 'external-loading' })
+	externalLoading = false;
+
 	@state()
-	private _isLoading = true;
+	private _isLoading = false;
 
 	@state()
 	private _thumbnailUrl = '';
@@ -69,7 +75,7 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 
 	override render() {
 		return when(
-			this._isLoading,
+			this.externalLoading || this._isLoading,
 			() => this.#renderLoading(),
 			() => this.#renderThumbnail(),
 		);
@@ -114,7 +120,7 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 	}
 
 	#renderLoading() {
-		return html`<div id="loader"><uui-loader></uui-loader></div>`;
+		return html`<uui-loader-circle id="loader"></uui-loader-circle>`;
 	}
 
 	#renderThumbnail() {
@@ -154,11 +160,8 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 			}
 
 			#loader {
-				display: flex;
-				justify-content: center;
-				align-items: center;
-				height: 100%;
-				width: 100%;
+				font-size: 2em;
+				margin-bottom: 1em;
 			}
 
 			#figure {

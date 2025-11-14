@@ -1,4 +1,5 @@
 const { rest } = window.MockServiceWorker;
+import type { UmbMockDocumentModel } from '../../data/document/document.data.js';
 import { umbDocumentMockDb } from '../../data/document/document.db.js';
 import { items as referenceData } from '../../data/tracked-reference.data.js';
 import { UMB_SLUG } from './slug.js';
@@ -77,8 +78,14 @@ export const detailHandlers = [
 	rest.get(umbracoPath(`${UMB_SLUG}/:id/available-segment-options`), (req, res, ctx) => {
 		const id = req.params.id as string;
 		if (!id) return res(ctx.status(400));
-		const document = umbDocumentMockDb.detail.read(id);
-		if (!document) return res(ctx.status(404));
+
+		let document: UmbMockDocumentModel | null = null;
+
+		try {
+			document = umbDocumentMockDb.detail.read(id);
+		} catch {
+			return res(ctx.status(404));
+		}
 
 		const availableSegments = document.variants.filter((v) => !!v.segment).map((v) => v.segment!) ?? [];
 
