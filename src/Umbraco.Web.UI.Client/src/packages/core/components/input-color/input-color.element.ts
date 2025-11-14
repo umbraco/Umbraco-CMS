@@ -11,13 +11,6 @@ import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umb
  */
 @customElement('umb-input-color')
 export class UmbInputColorElement extends UmbFormControlMixin<string, typeof UmbLitElement, undefined>(UmbLitElement) {
-	@property({ attribute: false })
-	public override set value(v: string | undefined) {
-		super.value = v;
-	}
-	public override get value(): string | undefined {
-		return super.value as string | undefined;
-	}
 	protected override getFormElement() {
 		return undefined;
 	}

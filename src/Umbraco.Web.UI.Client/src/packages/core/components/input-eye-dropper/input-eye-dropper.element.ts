@@ -8,13 +8,6 @@ import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umb
 export class UmbInputEyeDropperElement extends UmbFormControlMixin<string, typeof UmbLitElement, undefined>(
 	UmbLitElement,
 ) {
-	@property({ attribute: false })
-	public override set value(v: string | undefined) {
-		super.value = v;
-	}
-	public override get value(): string | undefined {
-		return super.value;
-	}
 	protected override getFormElement() {
 		return undefined;
 	}
