@@ -1017,6 +1017,7 @@ export default {
 			if (new Date(date).getTime() < new Date(now).getTime()) return `${duration} ago`;
 			return `in ${duration}`;
 		},
+		clipboard: 'Clipboard',
 	},
 	colors: {
 		black: 'Black',
@@ -2245,6 +2246,7 @@ export default {
 		rangeExceeds: 'The low value must not exceed the high value.',
 		invalidExtensions: 'One or more of the extensions are invalid.',
 		allowedExtensions: 'Allowed extensions are:',
+		aliasInvalidFormat: 'Special characters are not allowed in alias',
 		disallowedExtensions: 'Disallowed extensions are:',
 	},
 	healthcheck: {
@@ -2508,6 +2510,7 @@ export default {
 		labelForCopyToClipboard: 'Copy to clipboard',
 		confirmDeleteHeadline: 'Delete from clipboard',
 		confirmDeleteDescription: 'Are you sure you want to delete <strong>{0}</strong> from the clipboard?',
+		confirmClearDescription: 'Are you sure you want to clear the clipboard?',
 		copySuccessHeadline: 'Copied to clipboard',
 	},
 	propertyActions: {
