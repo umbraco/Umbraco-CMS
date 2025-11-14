@@ -26,8 +26,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ClientAssetsInputs Include="Client\**" Exclude="$(DefaultItemExcludes)" />
-
     <!-- Dont include the client folder as part of packaging nuget build -->
     <Content Remove="Client\**" />
 
