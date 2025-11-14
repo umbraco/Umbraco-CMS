@@ -43,6 +43,15 @@ export class UmbPropertyEditorUIDatePickerElement
 	@property({ type: Boolean })
 	mandatory = false;
 
+	@property({ type: String })
+	override get value(): string | undefined {
+		return super.value;
+	}
+	override set value(value: string | undefined) {
+		super.value = value;
+		this.#formatValue(value ?? '');
+	}
+
 	@state()
 	private _inputType: UmbInputDateElement['type'] = 'datetime-local';
 
