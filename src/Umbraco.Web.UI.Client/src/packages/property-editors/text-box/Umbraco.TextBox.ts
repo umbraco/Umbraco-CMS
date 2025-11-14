@@ -13,7 +13,7 @@ export const manifest: ManifestPropertyEditorSchema = {
 					label: 'Maximum allowed characters',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Integer',
 					config: [
-						{ alias: 'min', value: 0 },
+						{ alias: 'min', value: 1 },
 						{ alias: 'max', value: 512 },
 						{ alias: 'placeholder', value: '512' },
 					],
