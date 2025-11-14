@@ -161,7 +161,7 @@ export class UmbPropertyLayoutElement extends UmbLitElement {
 			#editorColumn {
 				margin-top: var(--uui-size-space-3);
 			}
-			@container (width > var(--uui-size-72)00px) {
+			@container (width > 700px) {
 				:host(:not([orientation='vertical'])) #editorColumn {
 					margin-top: 0;
 				}
