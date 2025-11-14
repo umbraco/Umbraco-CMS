@@ -46,7 +46,7 @@ public class NewsDashboardService : INewsDashboardService
     /// <inheritdoc />
     public async Task<NewsDashboardResponseModel> GetItemsAsync()
     {
-        const string BaseUrl = "https://umbraco-dashboard-news.euwest01.umbraco.io";
+        const string BaseUrl = "https://news-dashboard.umbraco.com";
         const string Path = "/api/News";
 
         var version = _umbracoVersion.SemanticVersion.ToSemanticStringWithoutBuild();
