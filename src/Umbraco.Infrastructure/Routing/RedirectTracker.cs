@@ -102,7 +102,6 @@ namespace Umbraco.Cms.Infrastructure.Routing
             {
                 try
                 {
-                    IEnumerable<IRedirectUrl> allRedirectUrls = _redirectUrlService.GetContentRedirectUrls(contentKey);
                     var newRoute = _publishedUrlProvider.GetUrl(contentKey, UrlMode.Relative, culture).TrimEnd(Constants.CharArrays.ForwardSlash);
 
                     if (!IsValidRoute(newRoute) || oldRoute == newRoute)
@@ -110,6 +109,7 @@ namespace Umbraco.Cms.Infrastructure.Routing
                         continue;
                     }
 
+                    IEnumerable<IRedirectUrl> allRedirectUrls = _redirectUrlService.GetContentRedirectUrls(contentKey);
                     foreach (IRedirectUrl redirectUrl in allRedirectUrls)
                     {
                         if (redirectUrl.Url == newRoute)
