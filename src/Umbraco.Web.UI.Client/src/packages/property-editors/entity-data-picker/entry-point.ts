@@ -1,5 +1,6 @@
 import { manifests as entityDataPickerManifests } from './manifests.js';
 import type { UmbEntryPointOnInit } from '@umbraco-cms/backoffice/extension-api';
+import { UMB_PICKER_DATA_SOURCE_TYPE } from '@umbraco-cms/backoffice/picker-data-source';
 import type { ManifestPropertyEditorDataSource } from '@umbraco-cms/backoffice/property-editor-data-source';
 
 export const onInit: UmbEntryPointOnInit = (host, extensionRegistry) => {
@@ -11,7 +12,7 @@ export const onInit: UmbEntryPointOnInit = (host, extensionRegistry) => {
 	extensionRegistry
 		.byTypeAndFilter<'propertyEditorDataSource', ManifestPropertyEditorDataSource>(
 			'propertyEditorDataSource',
-			(manifest) => manifest.dataSourceType === 'picker',
+			(manifest) => manifest.dataSourceType === UMB_PICKER_DATA_SOURCE_TYPE,
 		)
 		.subscribe((pickerPropertyEditorDataSource) => {
 			if (pickerPropertyEditorDataSource.length > 0 && !initialized) {

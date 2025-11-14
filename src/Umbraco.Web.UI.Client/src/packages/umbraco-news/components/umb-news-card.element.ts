@@ -36,9 +36,12 @@ export class UmbNewsCardElement extends UmbLitElement {
 				${this.item.body ? html`<div class="card-text">${unsafeHTML(this.item.body)}</div>` : nothing}
 				${!isLastRow && this.item.url
 					? html`<div class="card-actions">
-							<uui-button look="outline" href=${this.item.url} target="_blank" rel="noopener">
-								${this.item.buttonText || 'Open'}
-							</uui-button>
+							<uui-button
+								look="outline"
+								href=${this.item.url}
+								target="_blank"
+								rel="noopener"
+								label=${this.item.buttonText || 'Open'}></uui-button>
 						</div>`
 					: nothing}
 			</div>

@@ -22,6 +22,7 @@ export class UmbDocumentPermissionServerDataSource {
 			this.#host,
 			fetch(`/umbraco/management/api/v1/document/${id}/permissions`, {
 				method: 'GET',
+				credentials: 'include',
 				headers: {
 					'Content-Type': 'application/json',
 				},

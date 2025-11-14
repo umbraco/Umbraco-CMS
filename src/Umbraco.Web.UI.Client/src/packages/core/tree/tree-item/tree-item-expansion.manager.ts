@@ -94,12 +94,6 @@ export class UmbTreeItemTargetExpansionManager<
 					return;
 				}
 
-				/* If a new target is set we only want to reload children if the new target isn’t among the already loaded items. */
-				const targetIsLoaded = this.#childrenManager.isChildLoaded(target);
-				if (target && targetIsLoaded) {
-					return;
-				}
-
 				// If we already have children and the target didn't change then we don't have to load new children
 				const isNewTarget = target !== currentBaseTarget;
 				if (isExpanded && this.#childrenManager.hasLoadedChildren() && !isNewTarget) {
