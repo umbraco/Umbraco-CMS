@@ -42,7 +42,6 @@ export class UmbPropertyEditorUIMemberPickerElement
 	}
 
 	override render() {
-		console.log(this.value);
 		return html`<umb-input-member
 			min="0"
 			max="1"
