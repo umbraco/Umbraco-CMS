@@ -430,7 +430,16 @@ export class UmbBlockGridEntriesContext
 	}
 
 	getPathForCreateBlock(index: number) {
-		return this._catalogueRouteBuilderState.getValue()?.({ view: 'create', index: index });
+		const pathBuilder = this._catalogueRouteBuilderState.getValue();
+		if (!pathBuilder) return undefined;
+
+		const allowedBlockTypes = this.#allowedBlockTypes.getValue();
+		if (allowedBlockTypes?.length === 1) {
+			const elementKey = allowedBlockTypes[0].contentElementTypeKey;
+			return pathBuilder({ view: 'create', index: index }) + 'modal/umb-modal-workspace/create/' + elementKey;
+		}
+
+		return pathBuilder({ view: 'create', index: index });
 	}
 
 	getPathForClipboard(index: number) {
