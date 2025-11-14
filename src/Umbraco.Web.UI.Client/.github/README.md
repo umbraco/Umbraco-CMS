@@ -26,6 +26,7 @@ If you have an existing Vite server running, you can run the task **Backoffice A
 ### Run a Front-end server against a local Umbraco instance
 
 #### 1. Configure Umbraco instance
+
 Enable the front-end server communicating with the Backend server(Umbraco instance) you need need to correct the `appsettings.json` of your project.
 
 For code contributions use the backend project of `/src/Umbraco.Web.UI`.
@@ -38,7 +39,11 @@ Open this file in an editor: `/src/Umbraco.Web.UI/appsettings.Development.json` 
 			"BackOfficeHost": "http://localhost:5173",
 			"AuthorizeCallbackPathName": "/oauth_complete",
 			"AuthorizeCallbackLogoutPathName": "/logout",
-			"AuthorizeCallbackErrorPathName": "/error",
+			"AuthorizeCallbackErrorPathName": "/error",,
+			"BackOfficeTokenCookie": {
+				"Enabled": true,
+				"SameSite": "None"
+			}
 		},
 	},
 }
@@ -46,10 +51,15 @@ Open this file in an editor: `/src/Umbraco.Web.UI/appsettings.Development.json` 
 
 This will override the backoffice host URL, enabling the Client to run from a different origin.
 
+> [!NOTE]
+> If you get stuck in a login loop, try clearing your browser cookies for localhost, and make sure that the `BackOfficeTokenCookie` settings are correct. Namely, that `SameSite` should be set to `None` when running the front-end server separately.
+
 #### 2. Start Umbraco
+
 Then start the backend server by running the command: `dotnet run` in the `/src/Umbraco.Web.UI` folder.
 
 #### 3. Start Frontend server
+
 Now start the frontend server by running the command: `npm run dev:server` in the `/src/Umbraco.Web.UI.Client` folder.
 
 Finally open `http://localhost:5173` in your browser.

@@ -44,6 +44,7 @@ function createXhrRequest<T>(options: XhrRequestOptions): UmbCancelablePromise<T
 	return new UmbCancelablePromise<T>(async (resolve, reject, onCancel) => {
 		const xhr = new XMLHttpRequest();
 		xhr.open(options.method, `${baseUrl}${options.url}`, true);
+		xhr.withCredentials = options.withCredentials ?? true;
 
 		// Set default headers
 		if (options.token) {

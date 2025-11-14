@@ -91,6 +91,11 @@ public static partial class Constants
             public const string DateOnly = "Umbraco.DateOnly";
 
             /// <summary>
+            ///     Entity Data Picker
+            /// </summary>
+            public const string EntityDataPicker = "Umbraco.EntityDataPicker";
+
+            /// <summary>
             ///     Time Only.
             /// </summary>
             public const string TimeOnly = "Umbraco.TimeOnly";

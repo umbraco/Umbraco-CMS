@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Core.Configuration.Models;
 [UmbracoOptions(Constants.Configuration.ConfigDistributedJobs)]
 public class DistributedJobSettings
 {
-    internal const string StaticPeriod = "00:00:10";
+    internal const string StaticPeriod = "00:00:05";
     internal const string StaticDelay = "00:01:00";
 
     /// <summary>
