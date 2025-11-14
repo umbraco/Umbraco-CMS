@@ -23,7 +23,7 @@ public interface IRepositoryCacheVersionAccessor
     Task<RepositoryCacheVersion?> GetAsync(string cacheKey);
 
     /// <summary>
-    /// Notifies of a version change on a given cache key
+    /// Notifies of a version change on a given cache key.
     /// </summary>
     /// <param name="cacheKey">Key of the changed version.</param>
     void VersionChanged(string cacheKey)
