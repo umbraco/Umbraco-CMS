@@ -2246,6 +2246,7 @@ export default {
 		rangeExceeds: 'The low value must not exceed the high value.',
 		invalidExtensions: 'One or more of the extensions are invalid.',
 		allowedExtensions: 'Allowed extensions are:',
+		aliasInvalidFormat: 'Special characters are not allowed in alias',
 		disallowedExtensions: 'Disallowed extensions are:',
 	},
 	healthcheck: {

@@ -332,7 +332,14 @@ export class UmbDocumentWorkspaceContext
 			firstVariantId = UmbVariantId.FromString(selected[0]);
 			const variantIds = [firstVariantId];
 			const saveData = await this._data.constructData(variantIds);
-			await this.runMandatoryValidationForSaveData(saveData);
+
+			// Run mandatory validation (checks for name, etc.)
+			await this.runMandatoryValidationForSaveData(saveData, variantIds);
+
+			// Ask server to validate and show validation tooltips (like the Save action does)
+			await this.askServerToValidate(saveData, variantIds);
+
+			// Perform save
 			await this.performCreateOrUpdate(variantIds, saveData);
 		}
 

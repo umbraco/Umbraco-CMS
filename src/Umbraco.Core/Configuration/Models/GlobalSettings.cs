@@ -19,7 +19,7 @@ public class GlobalSettings
     internal const string StaticTimeOut = "00:20:00";
     internal const string StaticDefaultUILanguage = "en-US";
     internal const bool StaticHideTopLevelNodeFromPath = true;
-    internal const bool StaticUseHttps = false;
+    internal const bool StaticUseHttps = true;
     internal const int StaticVersionCheckPeriod = 7;
     internal const string StaticIconsPath = "umbraco/assets/icons";
     internal const string StaticUmbracoCssPath = "~/css";
