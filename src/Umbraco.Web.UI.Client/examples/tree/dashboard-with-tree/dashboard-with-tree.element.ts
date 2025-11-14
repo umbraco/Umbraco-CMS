@@ -5,7 +5,7 @@ import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
 @customElement('example-dashboard-with-tree')
 export class ExampleDashboardWithTree extends UmbElementMixin(LitElement) {
 	override render() {
-		return html`<uui-box><umb-tree alias=${EXAMPLE_TREE_ALIAS}></umb-tree></uui-box>`;
+		return html`<uui-box><umb-tree alias=${EXAMPLE_TREE_ALIAS} .props=${{ hideTreeRoot: true }}></umb-tree></uui-box>`;
 	}
 
 	static override styles = [

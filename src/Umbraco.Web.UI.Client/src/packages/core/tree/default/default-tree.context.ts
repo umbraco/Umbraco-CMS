@@ -10,7 +10,7 @@ import type { UmbTreeItemModel, UmbTreeRootModel, UmbTreeStartNode } from '../ty
 import type { UmbTreeRepository } from '../data/index.js';
 import type { UmbTreeRootItemsRequestArgs } from '../data/types.js';
 import { UmbTreeViewManager } from '../view/tree-view.manager.js';
-import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbBooleanState, UmbObjectState, UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbDeprecation, UmbSelectionManager, debounce } from '@umbraco-cms/backoffice/utils';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
@@ -60,6 +60,9 @@ export class UmbDefaultTreeContext<
 	});
 
 	readonly activeManager = new UmbTreeItemActiveManager(this);
+
+	#items = new UmbArrayState<TreeItemType | TreeRootType>([], (x) => x.unique);
+	public readonly items = this.#items.asObservable();
 
 	#manifest?: ManifestTree;
 	#repository?: UmbTreeRepository<TreeItemType, TreeRootType>;
@@ -181,6 +184,7 @@ export class UmbDefaultTreeContext<
 
 		if (data) {
 			this.#treeRoot.setValue(data);
+			this.#items.setValue([data]);
 			this.#treeItemChildrenManager.setTreeItem(data);
 			this.#treeItemExpansionManager.setTreeItem(data);
 			this.pagination.setTotalItems(1);
@@ -211,6 +215,12 @@ export class UmbDefaultTreeContext<
 		// we need to reset the tree if this config changes
 		this.#clearTree();
 		this.loadTree();
+
+		if (hideTreeRoot) {
+			this.observe(this.#treeItemChildrenManager.children, (children) => {
+				this.#items.setValue(children);
+			});
+		}
 	}
 
 	/**

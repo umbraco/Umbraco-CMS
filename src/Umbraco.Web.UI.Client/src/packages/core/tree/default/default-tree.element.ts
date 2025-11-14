@@ -7,12 +7,12 @@ import type {
 } from '../types.js';
 import type { UmbTreeExpansionModel } from '../expansion-manager/types.js';
 import type { UmbTreeViewItemModel } from '../view/types.js';
+import type { ManifestTreeView } from '../view/extension/tree-view.extension.js';
 import type { UmbDefaultTreeContext } from './default-tree.context.js';
-import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { getItemFallbackIcon } from '@umbraco-cms/backoffice/entity-item';
-import type { ManifestTreeView } from '../view/extension/tree-view.extension.js';
 
 @customElement('umb-default-tree')
 export class UmbDefaultTreeElement extends UmbLitElement {
@@ -68,45 +68,9 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	@state()
 	private _currentView?: UmbTreeViewItemModel;
 
-	@state()
-	private _rootItems: UmbTreeItemModel[] = [];
-
-	@state()
-	private _treeRoot?: UmbTreeRootModel;
-
-	@state()
-	private _currentPage = 1;
-
-	@state()
-	private _hasPreviousItems = false;
-
-	@state()
-	private _hasNextItems = false;
-
-	@state()
-	private _isLoadingPrevChildren = false;
-
-	@state()
-	private _isLoadingNextChildren = false;
-
 	#observeData() {
 		this.observe(this._api?.views, (views) => (this._views = views));
 		this.observe(this._api?.currentView, (currentView) => (this._currentView = currentView));
-
-		this.observe(this._api?.treeRoot, (treeRoot) => (this._treeRoot = treeRoot));
-		this.observe(this._api?.rootItems, (rootItems) => (this._rootItems = rootItems ?? []));
-		this.observe(this._api?.pagination.currentPage, (value) => (this._currentPage = value ?? 1));
-		this.observe(this._api?.isLoadingPrevChildren, (value) => (this._isLoadingPrevChildren = value ?? false));
-		this.observe(this._api?.isLoadingNextChildren, (value) => (this._isLoadingNextChildren = value ?? false));
-
-		this.observe(
-			this._api?.targetPagination?.totalPrevItems,
-			(value) => (this._hasPreviousItems = value ? value > 0 : false),
-		);
-		this.observe(
-			this._api?.targetPagination?.totalNextItems,
-			(value) => (this._hasNextItems = value ? value > 0 : false),
-		);
 	}
 
 	protected override async updated(
@@ -160,29 +124,18 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 		return this._api?.expansion.getExpansion();
 	}
 
-	#onLoadPrev(event: any) {
-		event.stopPropagation();
-		this._api?.loadPrevItems?.();
-	}
-
-	#onLoadNext(event: any) {
-		event.stopPropagation();
-		const next = (this._currentPage = this._currentPage + 1);
-		this._api?.pagination.setCurrentPageNumber(next);
-	}
-
 	#onViewClick(view: UmbTreeViewItemModel) {
 		this._api?.setCurrentView(view.unique);
 	}
 
 	override render() {
-		return html` <div>${this._currentView?.unique} ${this.#renderViewsBundle()}</div>
+		return html`
+			<div>${this.#renderViewsBundle()}</div>
 
 			<umb-extension-slot
 				type="treeView"
 				.filter=${(manifest: ManifestTreeView) => manifest.alias === this._currentView?.unique}></umb-extension-slot>
-
-			${this.#renderTreeRoot()} ${this.#renderRootItems()}`;
+		`;
 	}
 
 	#renderViewsBundle() {
@@ -211,60 +164,6 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 			</uui-menu-item>
 		`;
 	}
-
-	#renderTreeRoot() {
-		if (this.hideTreeRoot || this._treeRoot === undefined) return nothing;
-		return html`
-			<umb-tree-item
-				.entityType=${this._treeRoot.entityType}
-				.props=${{
-					hideActions: this.hideTreeItemActions,
-					item: this._treeRoot,
-					isMenu: this.isMenu,
-				}}></umb-tree-item>
-		`;
-	}
-
-	#renderRootItems() {
-		// only show the root items directly if the tree root is hidden
-		if (this.hideTreeRoot === true) {
-			return html`
-				${this.#renderLoadPrevButton()}
-				${repeat(
-					this._rootItems,
-					(item, index) => item.name + '___' + index,
-					(item) => html`
-						<umb-tree-item
-							.entityType=${item.entityType}
-							.props=${{ hideActions: this.hideTreeItemActions, item, isMenu: this.isMenu }}></umb-tree-item>
-					`,
-				)}
-				${this.#renderLoadNextButton()}
-			`;
-		} else {
-			return nothing;
-		}
-	}
-
-	#renderLoadPrevButton() {
-		if (!this._hasPreviousItems) return nothing;
-		return html`<umb-tree-load-prev-button
-			@click=${this.#onLoadPrev}
-			.loading=${this._isLoadingPrevChildren}></umb-tree-load-prev-button>`;
-	}
-
-	#renderLoadNextButton() {
-		if (!this._hasNextItems) return nothing;
-		return html`<umb-tree-load-more-button
-			@click=${this.#onLoadNext}
-			.loading=${this._isLoadingNextChildren}></umb-tree-load-more-button> `;
-	}
-
-	static override styles = css`
-		#load-more {
-			width: 100%;
-		}
-	`;
 }
 
 export default UmbDefaultTreeElement;
