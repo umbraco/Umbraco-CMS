@@ -170,9 +170,9 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 
 			.infobox {
 				position: absolute;
-				top: 100%;
+				top: 0;
 				margin-top: calc(-12px + var(--offset-h));
-				left: 100%;
+				left: 19px;
 				margin-left: -6px;
 				background-color: transparent;
 				padding: var(--uui-size-2);

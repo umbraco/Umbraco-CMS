@@ -221,6 +221,7 @@ export class UmbInputMultipleTextStringElement extends UmbFormControlMixin<undef
 
 	#renderAddButton() {
 		if (this.disabled || this.readonly) return nothing;
+		if (this.max === 1 && this._items.length > 0) return nothing;
 		return html`
 			<uui-button
 				color="default"

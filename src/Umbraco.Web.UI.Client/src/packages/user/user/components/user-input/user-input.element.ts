@@ -6,6 +6,7 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
 
 // TODO: Shall we rename to 'umb-input-user'? [LK]
 @customElement('umb-user-input')
@@ -114,6 +115,9 @@ export class UmbUserInputElement extends UmbFormControlMixin<string, typeof UmbL
 	@state()
 	private _items?: Array<UmbUserItemModel>;
 
+	@state()
+	private _statuses?: Array<UmbRepositoryItemsStatus>;
+
 	#pickerContext = new UmbUserPickerInputContext(this);
 
 	constructor() {
@@ -139,6 +143,7 @@ export class UmbUserInputElement extends UmbFormControlMixin<string, typeof UmbL
 
 		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')), '_observeSelection');
 		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems), '_observerItems');
+		this.observe(this.#pickerContext.statuses, (statuses) => (this._statuses = statuses), '_observeStatuses');
 	}
 
 	protected override getFormElement() {
@@ -149,8 +154,8 @@ export class UmbUserInputElement extends UmbFormControlMixin<string, typeof UmbL
 		this.#pickerContext.openPicker({});
 	}
 
-	#removeItem(item: UmbUserItemModel) {
-		this.#pickerContext.requestRemoveItem(item.unique);
+	#removeItem(unique: string) {
+		this.#pickerContext.requestRemoveItem(unique);
 	}
 
 	override render() {
@@ -170,31 +175,37 @@ export class UmbUserInputElement extends UmbFormControlMixin<string, typeof UmbL
 	}
 
 	#renderItems() {
-		if (!this._items) return nothing;
+		if (!this._statuses) return nothing;
 		return html`
 			<uui-ref-list>
 				${repeat(
-					this._items,
-					(item) => item.unique,
-					(item) => this.#renderItem(item),
+					this._statuses,
+					(status) => status.unique,
+					(status) => this.#renderItem(status),
 				)}
 			</uui-ref-list>
 		`;
 	}
 
-	#renderItem(item: UmbUserItemModel) {
-		if (!item.unique) return nothing;
+	#renderItem(status: UmbRepositoryItemsStatus) {
+		const unique = status.unique;
+		const item = this._items?.find((x) => x.unique === unique);
+		const isError = status.state.type === 'error';
 		return html`
-			<umb-entity-item-ref .item=${item} id=${item.unique} ?standalone=${this.max === 1} ?readonly=${this.readonly}>
-				<uui-action-bar slot="actions"> ${this.#renderRemoveButton(item)} </uui-action-bar>
-			</umb-entity-item-ref>
-		`;
-	}
-
-	#renderRemoveButton(item: UmbUserItemModel) {
-		if (this.readonly) return nothing;
-		return html`
-			<uui-button label=${this.localize.term('general_remove')} @click=${() => this.#removeItem(item)}></uui-button>
+        <umb-entity-item-ref
+              id=${unique}
+              .item=${item}
+              ?error=${isError}
+              .errorMessage=${status.state.error}
+              .errorDetail=${isError ? unique : undefined}
+              ?standalone=${this.max === 1}
+              ?readonly=${this.readonly}>
+              <uui-action-bar slot="actions">
+                <uui-button
+                  label=${this.localize.term('general_remove')}
+                  @click=${() => this.#removeItem(unique)}></uui-button>
+              </uui-action-bar>
+            </umb-entity-item-ref>
 		`;
 	}
 

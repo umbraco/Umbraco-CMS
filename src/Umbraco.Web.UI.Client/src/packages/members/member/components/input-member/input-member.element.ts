@@ -1,12 +1,13 @@
 import type { UmbMemberItemModel } from '../../item/types.js';
 import { UmbMemberPickerInputContext } from './input-member.context.js';
-import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UMB_MEMBER_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/member-type';
+import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
 
 @customElement('umb-input-member')
 export class UmbInputMemberElement extends UmbFormControlMixin<string, typeof UmbLitElement, undefined>(
@@ -131,6 +132,9 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string, typeof Um
 	@state()
 	private _items?: Array<UmbMemberItemModel>;
 
+	@state()
+	private _statuses?: Array<UmbRepositoryItemsStatus>;
+
 	#pickerContext = new UmbMemberPickerInputContext(this);
 
 	constructor() {
@@ -156,6 +160,7 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string, typeof Um
 
 		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')), '_observeSelection');
 		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems), '_observeItems');
+		this.observe(this.#pickerContext.statuses, (statuses) => (this._statuses = statuses), '_observeStatuses');
 	}
 
 	#openPicker() {
@@ -172,8 +177,8 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string, typeof Um
 		);
 	}
 
-	#onRemove(item: UmbMemberItemModel) {
-		this.#pickerContext.requestRemoveItem(item.unique);
+	#onRemove(unique: string) {
+		this.#pickerContext.requestRemoveItem(unique);
 	}
 
 	override render() {
@@ -181,24 +186,40 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string, typeof Um
 	}
 
 	#renderItems() {
-		if (!this._items) return nothing;
+		if (!this._statuses) return nothing;
 		return html`
 			<uui-ref-list>
 				${repeat(
-					this._items,
-					(item) => item.unique,
-					(item) => this.#renderItem(item),
+					this._statuses,
+					(status) => status.unique,
+					(status) => {
+						const unique = status.unique;
+						const item = this._items?.find((x) => x.unique === unique);
+						const isError = status.state.type === 'error';
+						return html`
+							<umb-entity-item-ref
+								id=${unique}
+								.item=${item}
+								?error=${isError}
+								.errorMessage=${status.state.error}
+								.errorDetail=${isError ? unique : undefined}
+								?readonly=${this.readonly}
+								?standalone=${this.max === 1}>
+								${when(
+									!this.readonly,
+									() => html`
+										<uui-action-bar slot="actions">
+											<uui-button
+												label=${this.localize.term('general_remove')}
+												@click=${() => this.#onRemove(unique)}></uui-button>
+										</uui-action-bar>
+									`,
+								)}
+							</umb-entity-item-ref>
+						`;
+					},
 				)}
 			</uui-ref-list>
-		`;
-	}
-
-	#renderItem(item: UmbMemberItemModel) {
-		if (!item.unique) return nothing;
-		return html`
-			<umb-entity-item-ref id=${item.unique} .item=${item} ?readonly=${this.readonly} ?standalone=${this.max === 1}>
-				<uui-action-bar slot="actions">${this.#renderRemoveButton(item)} </uui-action-bar>
-			</umb-entity-item-ref>
 		`;
 	}
 
@@ -216,13 +237,6 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string, typeof Um
 					?disabled=${this.readonly}></uui-button>
 			`;
 		}
-	}
-
-	#renderRemoveButton(item: UmbMemberItemModel) {
-		if (this.readonly) return nothing;
-		return html`
-			<uui-button @click=${() => this.#onRemove(item)} label=${this.localize.term('general_remove')}></uui-button>
-		`;
 	}
 
 	static override styles = [
