@@ -328,14 +328,14 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 				flex: 1;
 				display: grid;
 				grid-template-columns: 1fr 1fr auto;
-				grid-gap: var(--uui-size-1);
+				gap: var(--uui-size-1);
 			}
 
 			#sorter-wrapper {
 				margin-bottom: var(--uui-size-2);
 				display: flex;
 				flex-direction: column;
-				grid-gap: var(--uui-size-1);
+				gap: var(--uui-size-1);
 			}
 
 			.handle {
