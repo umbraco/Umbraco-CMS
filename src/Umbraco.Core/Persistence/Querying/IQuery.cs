@@ -31,6 +31,14 @@ public interface IQuery<T>
     IQuery<T> WhereIn(Expression<Func<T, object>> fieldSelector, IEnumerable? values);
 
     /// <summary>
+    ///     Adds a where-not-in clause to the query
+    /// </summary>
+    /// <param name="fieldSelector"></param>
+    /// <param name="values"></param>
+    /// <returns>This instance so calls to this method are chainable</returns>
+    IQuery<T> WhereNotIn(Expression<Func<T, object>> fieldSelector, IEnumerable? values) => throw new NotImplementedException(); // TODO (V18): Remove default implementation.
+
+    /// <summary>
     ///     Adds a set of OR-ed where clauses to the query.
     /// </summary>
     /// <param name="predicates"></param>

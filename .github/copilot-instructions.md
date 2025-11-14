@@ -110,7 +110,11 @@ Use this for frontend-only development with hot module reloading:
    "BackOfficeHost": "http://localhost:5173",
    "AuthorizeCallbackPathName": "/oauth_complete",
    "AuthorizeCallbackLogoutPathName": "/logout",
-   "AuthorizeCallbackErrorPathName": "/error"
+   "AuthorizeCallbackErrorPathName": "/error",
+   "BackOfficeTokenCookie": {
+     "Enabled": true,
+     "SameSite": "None"
+   }
    ```
 2. Run backend: `cd src/Umbraco.Web.UI && dotnet run --no-build`
 3. Run frontend dev server: `cd src/Umbraco.Web.UI.Client && npm run dev:server`
