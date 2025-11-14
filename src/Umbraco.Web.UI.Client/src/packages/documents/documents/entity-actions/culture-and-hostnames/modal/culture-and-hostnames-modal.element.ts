@@ -37,7 +37,7 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 		getUniqueOfModel: (modelEntry: UmbDomainPresentationModel) => {
 			return modelEntry.unique;
 		},
-		itemSelector: '#item',
+		itemSelector: '.hostname-item',
 		containerSelector: '#sorter-wrapper',
 		onChange: ({ model }) => {
 			const oldValue = this._domains;
@@ -217,7 +217,7 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 					this._domains,
 					(domain) => domain.unique,
 					(domain, index) => html`
-						<div class="hostname-item" id="item" data-sort-entry-id=${domain.unique}>
+						<div class="hostname-item" data-sort-entry-id=${domain.unique}>
 							<uui-icon name="icon-grip" class="handle"></uui-icon>
 							<div class="hostname-wrapper">
 								<uui-input
@@ -296,7 +296,7 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 				flex-grow: 0;
 			}
 
-			#item {
+			.hostname-item {
 				position: relative;
 				display: flex;
 				gap: var(--uui-size-1);
