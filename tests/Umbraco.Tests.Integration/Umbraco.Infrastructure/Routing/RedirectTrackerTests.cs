@@ -1,9 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
@@ -22,8 +20,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Routing;
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
 public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
 {
-    private IRedirectTracker RedirectTracker => GetRequiredService<IRedirectTracker>();
-
     private IRedirectUrlService redirectUrlService => GetRequiredService<IRedirectUrlService>();
 
     private IContent _subPage;
@@ -45,6 +41,23 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
 
             scope.Complete();
         }
+    }
+
+    [Test]
+    public void Can_Store_Old_Route()
+    {
+        Dictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)> dict =
+            new Dictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)>
+            {
+                [(_subPage.Id, "en")] = (_subPage.Key, "/old-route"),
+            };
+
+        var redirectTracker = mockRedirectTracker();
+
+        redirectTracker.StoreOldRoute(_subPage, dict);
+
+        Assert.That(dict.Count, Is.EqualTo(1));
+        Assert.AreEqual(dict.Values.First().OldRoute, Url);
     }
 
     [Test]
@@ -98,15 +111,39 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
 
     private IRedirectTracker mockRedirectTracker()
     {
+        var contentType = new Mock<IPublishedContentType>();
+        contentType.SetupGet(c => c.Variations).Returns(ContentVariation.Nothing);
+
+        var dict = new Dictionary<string, PublishedCultureInfo>
+        {
+            { "en", new PublishedCultureInfo("en", "english", "/en/", DateTime.Now) },
+        };
+
+        var content = new Mock<IPublishedContent>();
+
+        content.SetupGet(c => c.Key).Returns(_subPage.Key);
+        content.SetupGet(c => c.ContentType).Returns(contentType.Object);
+        content.SetupGet(c => c.Cultures).Returns(dict);
+        content.SetupGet(c => c.Id).Returns(_subPage.Id);
+
+        IPublishedContentCache contentCache = Mock.Of<IPublishedContentCache>();
+        Mock.Get(contentCache)
+            .Setup(x => x.GetById(_subPage.Id))
+            .Returns(content.Object);
+
         IPublishedUrlProvider publishedUrlProvider = Mock.Of<IPublishedUrlProvider>();
         Mock.Get(publishedUrlProvider)
             .Setup(x => x.GetUrl(_subPage.Key, UrlMode.Relative, "en", null))
             .Returns(Url);
 
+        Mock.Get(publishedUrlProvider)
+            .Setup(x => x.GetUrl(_subPage.Id, UrlMode.Relative, "en", null))
+            .Returns(Url);
+
         return new RedirectTracker(
             GetRequiredService<ILocalizationService>(),
             redirectUrlService,
-            GetRequiredService<IPublishedContentCache>(),
+            contentCache,
             GetRequiredService<IDocumentNavigationQueryService>(),
             GetRequiredService<ILogger<RedirectTracker>>(),
             publishedUrlProvider,
