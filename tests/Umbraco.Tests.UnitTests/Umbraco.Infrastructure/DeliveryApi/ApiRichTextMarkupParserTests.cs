@@ -36,7 +36,7 @@ public class ApiRichTextMarkupParserTests
             "<p><a href=\"/{localLink:umb://document/a1c5d649977f4ea59b1cb26055f3eed3}\" title=\"Inline\">link </a>to another page</p>";
 
         var expectedOutput =
-            "<p><a href=\"/inline/\" title=\"Inline\" data-start-item-path=\"inline\" data-start-item-id=\"a1c5d649-977f-4ea5-9b1c-b26055f3eed3\">link </a>to another page</p>";
+            $"<p><a href=\"/inline/\" title=\"Inline\" data-content-id=\"{key1:D}\" data-start-item-path=\"inline\" data-start-item-id=\"a1c5d649-977f-4ea5-9b1c-b26055f3eed3\" data-content-type=\"document\">link </a>to another page</p>";
 
         var parsedHtml = parser.Parse(legacyHtml);
 
@@ -71,8 +71,8 @@ public class ApiRichTextMarkupParserTests
 <p>and to the <a type=""document"" href=""/{localLink:cc143afe-4cbf-46e5-b399-c9f451384373}"" title=""other page"">other page</a></p>";
 
         var expectedOutput =
-            @"<p>Rich text outside of the blocks with a link to <a href=""/self/"" title=""itself"" data-start-item-path=""self"" data-start-item-id=""eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f"">itself</a><br><br></p>
-<p>and to the <a href=""/other/"" title=""other page"" data-start-item-path=""other"" data-start-item-id=""cc143afe-4cbf-46e5-b399-c9f451384373"">other page</a></p>";
+            $@"<p>Rich text outside of the blocks with a link to <a href=""/self/"" title=""itself"" data-content-id=""{key1:D}"" data-start-item-path=""self"" data-start-item-id=""eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f"" data-content-type=""document"">itself</a><br><br></p>
+<p>and to the <a href=""/other/"" title=""other page"" data-content-id=""{key2:D}"" data-start-item-path=""other"" data-start-item-id=""cc143afe-4cbf-46e5-b399-c9f451384373"" data-content-type=""document"">other page</a></p>";
 
         var parsedHtml = parser.Parse(html);
 
@@ -110,8 +110,8 @@ public class ApiRichTextMarkupParserTests
 <p>and to the <a type=""document"" href=""/{{localLink:cc143afe-4cbf-46e5-b399-c9f451384373}}{postfix}"" title=""other page"">other page</a></p>";
 
         var expectedOutput =
-            $@"<p>Rich text outside of the blocks with a link to <a href=""/self/{postfix}"" title=""itself"" data-start-item-path=""self"" data-start-item-id=""eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f"">itself</a><br><br></p>
-<p>and to the <a href=""/other/{postfix}"" title=""other page"" data-start-item-path=""other"" data-start-item-id=""cc143afe-4cbf-46e5-b399-c9f451384373"">other page</a></p>";
+            $@"<p>Rich text outside of the blocks with a link to <a href=""/self/{postfix}"" title=""itself"" data-content-id=""{key1:D}"" data-start-item-path=""self"" data-start-item-id=""eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f"" data-content-type=""document"">itself</a><br><br></p>
+<p>and to the <a href=""/other/{postfix}"" title=""other page"" data-content-id=""{key2:D}"" data-start-item-path=""other"" data-start-item-id=""cc143afe-4cbf-46e5-b399-c9f451384373"" data-content-type=""document"">other page</a></p>";
 
         var parsedHtml = parser.Parse(html);
 

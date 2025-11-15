@@ -143,8 +143,9 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
             mediaCache,
             href,
             type,
-            route =>
+            (route, contentId) =>
             {
+                attributes["content-id"] = contentId;
                 attributes["route"] = route;
                 attributes.Remove("href");
             },

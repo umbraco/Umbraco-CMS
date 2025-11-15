@@ -21,7 +21,7 @@ internal abstract partial class ApiRichTextParserBase
         _apiMediaUrlProvider = apiMediaUrlProvider;
     }
 
-    protected void ReplaceLocalLinks(IPublishedContentCache contentCache, IPublishedMediaCache mediaCache, string href, string type, Action<IApiContentRoute> handleContentRoute, Action<string> handleMediaUrl, Action handleInvalidLink)
+    protected void ReplaceLocalLinks(IPublishedContentCache contentCache, IPublishedMediaCache mediaCache, string href, string type, Action<IApiContentRoute, Guid> handleContentRoute, Action<string> handleMediaUrl, Action handleInvalidLink)
     {
         ReplaceStatus replaceAttempt = ReplaceLocalLink(contentCache, mediaCache, href, type, handleContentRoute, handleMediaUrl);
         if (replaceAttempt == ReplaceStatus.Success)
@@ -35,7 +35,7 @@ internal abstract partial class ApiRichTextParserBase
         }
     }
 
-    private ReplaceStatus ReplaceLocalLink(IPublishedContentCache contentCache, IPublishedMediaCache mediaCache, string href, string type, Action<IApiContentRoute> handleContentRoute, Action<string> handleMediaUrl)
+    private ReplaceStatus ReplaceLocalLink(IPublishedContentCache contentCache, IPublishedMediaCache mediaCache, string href, string type, Action<IApiContentRoute, Guid> handleContentRoute, Action<string> handleMediaUrl)
     {
         Match match = LocalLinkRegex().Match(href);
         if (match.Success is false)
@@ -60,7 +60,7 @@ internal abstract partial class ApiRichTextParserBase
                 if (route != null)
                 {
                     route.QueryString = match.Groups["query"].Value.NullOrWhiteSpaceAsNull();
-                    handleContentRoute(route);
+                    handleContentRoute(route, guid);
                     return ReplaceStatus.Success;
                 }
 
@@ -79,7 +79,7 @@ internal abstract partial class ApiRichTextParserBase
         return ReplaceStatus.InvalidEntityType;
     }
 
-    private ReplaceStatus ReplaceLegacyLocalLink(IPublishedContentCache contentCache, IPublishedMediaCache mediaCache, string href, Action<IApiContentRoute> handleContentRoute, Action<string> handleMediaUrl)
+    private ReplaceStatus ReplaceLegacyLocalLink(IPublishedContentCache contentCache, IPublishedMediaCache mediaCache, string href, Action<IApiContentRoute, Guid> handleContentRoute, Action<string> handleMediaUrl)
     {
         Match match = LegacyLocalLinkRegex().Match(href);
         if (match.Success is false)
@@ -108,7 +108,7 @@ internal abstract partial class ApiRichTextParserBase
                 if (route != null)
                 {
                     route.QueryString = match.Groups["query"].Value.NullOrWhiteSpaceAsNull();
-                    handleContentRoute(route);
+                    handleContentRoute(route, guidUdi.Guid);
                     return ReplaceStatus.Success;
                 }
 
