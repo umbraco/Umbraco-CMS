@@ -31,14 +31,18 @@ public sealed class IntegerValidator : IValueValidator
     /// <inheritdoc />
     public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration, PropertyValidationContext validationContext)
     {
-        if (value != null && value.ToString() != string.Empty)
+        if (value == null || value.ToString() == string.Empty)
         {
-            Attempt<int> result = value.TryConvertTo<int>();
-            if (result.Success == false)
-            {
-                yield return new ValidationResult("The value " + value + " is not a valid integer", ["value"]);
-            }
+            yield break;
+        }
 
+        Attempt<int> result = value.TryConvertTo<int>();
+        if (result.Success == false)
+        {
+            yield return new ValidationResult("The value " + value + " is not a valid integer", ["value"]);
+        }
+        else
+        {
             if (_minValue.HasValue && result.Result < _minValue.Value)
             {
                 yield return new ValidationResult("The value " + value + " is less than the minimum allowed value of " + _minValue.Value, ["value"]);
