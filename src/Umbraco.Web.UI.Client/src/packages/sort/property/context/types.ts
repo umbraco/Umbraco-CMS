@@ -1,16 +1,15 @@
 import type { ManifestPropertyContext, MetaPropertyContext } from '@umbraco-cms/backoffice/property';
 
-export interface ManifestPropertyContextClipboardKind
-	extends ManifestPropertyContext<MetaPropertyContextClipboardKind> {
+export interface ManifestPropertyContextSortKind extends ManifestPropertyContext<MetaPropertyContextSortKind> {
 	type: 'propertyContext';
-	kind: 'clipboard';
+	kind: 'sort';
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface MetaPropertyContextClipboardKind extends MetaPropertyContext {}
+export interface MetaPropertyContextSortKind extends MetaPropertyContext {}
 
 declare global {
 	interface UmbExtensionManifestMap {
-		umbManifestPropertyContextClipboardKind: ManifestPropertyContextClipboardKind;
+		umbManifestPropertyContextSortKind: ManifestPropertyContextSortKind;
 	}
 }
