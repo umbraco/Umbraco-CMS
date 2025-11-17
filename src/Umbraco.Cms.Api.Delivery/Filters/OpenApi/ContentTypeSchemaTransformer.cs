@@ -116,7 +116,7 @@ public class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApiD
                     _contentTypeInfoService.GetMediaTypes().ToList(),
                     async contentType =>
                     {
-                        var schemaId = $"{contentType.SchemaId}MediaResponseModel";
+                        var schemaId = $"{contentType.SchemaId}MediaWithCropsResponseModel";
                         return (schemaId, await CreateContentTypeSchema(schemaId, PublishedItemType.Media, contentType, context, cancellationToken));
                     },
                     cancellationToken);
@@ -129,7 +129,7 @@ public class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApiD
                     _contentTypeInfoService.GetMediaTypes().ToList(),
                     async contentType =>
                     {
-                        var schemaId = $"{contentType.SchemaId}MediaModel";
+                        var schemaId = $"{contentType.SchemaId}MediaWithCropsModel";
                         return (schemaId, await CreateContentTypeSchema(schemaId, PublishedItemType.Media, contentType, context, cancellationToken));
                     },
                     cancellationToken);
