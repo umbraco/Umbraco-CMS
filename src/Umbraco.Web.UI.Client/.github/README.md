@@ -41,7 +41,6 @@ Open this file in an editor: `/src/Umbraco.Web.UI/appsettings.Development.json` 
 			"AuthorizeCallbackLogoutPathName": "/logout",
 			"AuthorizeCallbackErrorPathName": "/error",,
 			"BackOfficeTokenCookie": {
-				"Enabled": true,
 				"SameSite": "None"
 			}
 		},
@@ -52,7 +51,7 @@ Open this file in an editor: `/src/Umbraco.Web.UI/appsettings.Development.json` 
 This will override the backoffice host URL, enabling the Client to run from a different origin.
 
 > [!NOTE]
-> If you get stuck in a login loop, try clearing your browser cookies for localhost, and make sure that the `BackOfficeTokenCookie` settings are correct. Namely, that `SameSite` should be set to `None` when running the front-end server separately.
+> If you get stuck in a login loop, try clearing your browser cookies for localhost, and make sure that the `Umbraco:Cms:Security:BackOfficeTokenCookie:SameSite` setting is set to `None`.
 
 #### 2. Start Umbraco
 
