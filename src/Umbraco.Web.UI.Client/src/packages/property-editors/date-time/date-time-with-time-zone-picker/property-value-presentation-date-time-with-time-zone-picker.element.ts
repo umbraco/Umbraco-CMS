@@ -13,8 +13,9 @@ export class UmbDateTimePickerWithTimeZonePropertyValuePresentationElement exten
 
 	#renderDate() {
 		if (!this.value?.date) return nothing;
-		const date = new Date(this.value.date).toLocaleString();
-		return html`${date}`;
+		const date = new Date(this.value.date);
+		if (isNaN(date.getTime())) return nothing;
+		return html`${date.toLocaleString()}`;
 	}
 
 	#renderTimeZone() {

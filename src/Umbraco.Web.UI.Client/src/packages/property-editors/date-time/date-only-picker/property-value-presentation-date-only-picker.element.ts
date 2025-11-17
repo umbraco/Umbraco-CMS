@@ -7,8 +7,9 @@ export class UmbDateOnlyPickerPropertyValuePresentationElement extends UmbProper
 }> {
 	override render() {
 		if (!this.value || !this.value.date) return nothing;
-		const date = new Date(this.value.date).toLocaleDateString();
-		return date ? html`<span>${date}</span>` : nothing;
+		const date = new Date(this.value.date);
+		if (isNaN(date.getTime())) return nothing;
+		return html`<span>${date.toLocaleDateString()}</span>`;
 	}
 }
 
