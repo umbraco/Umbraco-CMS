@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Api.Common.OpenApi;
 /// <summary>
 /// This filter explicitly removes all other mime types than application/json from a named OpenAPI document when application/json is accepted.
 /// </summary>
-public class MimeTypesTransformer : IOpenApiDocumentTransformer
+internal class MimeTypesTransformer : IOpenApiDocumentTransformer
 {
     /// <summary>
     /// Transforms the specified OpenAPI document by removing all other mime types than application/json from request and response bodies when application/json is accepted.

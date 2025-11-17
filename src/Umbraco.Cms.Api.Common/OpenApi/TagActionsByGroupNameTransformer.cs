@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Api.Common.OpenApi;
 /// <summary>
 /// Transformer that tags operations based on their group name.
 /// </summary>
-public class TagActionsByGroupNameTransformer : IOpenApiOperationTransformer, IOpenApiDocumentTransformer
+internal class TagActionsByGroupNameTransformer : IOpenApiOperationTransformer, IOpenApiDocumentTransformer
 {
     /// <summary>
     /// Transforms the specified OpenAPI operation in order to tag it by its group name.

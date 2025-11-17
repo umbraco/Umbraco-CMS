@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Api.Common.OpenApi;
 /// <summary>
 /// Ensures that all non-nullable properties are marked as required in the OpenAPI schema.
 /// </summary>
-public class RequireNonNullablePropertiesSchemaTransformer : IOpenApiSchemaTransformer
+internal class RequireNonNullablePropertiesSchemaTransformer : IOpenApiSchemaTransformer
 {
     /// <inheritdoc />
     public Task TransformAsync(OpenApiSchema schema, OpenApiSchemaTransformerContext context, CancellationToken cancellationToken)

@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Api.Common.OpenApi;
 /// <summary>
 /// Transforms OpenAPI operation IDs using a custom selector.
 /// </summary>
-public class CustomOperationIdsTransformer : IOpenApiOperationTransformer
+internal class CustomOperationIdsTransformer : IOpenApiOperationTransformer
 {
     /// <summary>
     /// Transforms the specified OpenAPI operation, setting its operation ID using a custom selector.
