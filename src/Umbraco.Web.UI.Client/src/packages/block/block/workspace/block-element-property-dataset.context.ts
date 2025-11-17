@@ -24,15 +24,5 @@ export class UmbBlockElementPropertyDatasetContext
 		this.getName = elementManager.getName;
 		this.culture = createObservablePart(elementManager.variantId, (v) => v?.culture);
 		this.segment = createObservablePart(elementManager.variantId, (v) => v?.segment);
-
-		this.consumeContext(UMB_BLOCK_WORKSPACE_CONTEXT, (workspace) => {
-			this.observe(
-				workspace?.readOnlyGuard.isPermittedForVariant(elementManager.getVariantId()),
-				(isReadOnly) => {
-					this._readOnly.setValue(isReadOnly ?? false);
-				},
-				'umbObserveReadOnlyStates',
-			);
-		});
 	}
 }
