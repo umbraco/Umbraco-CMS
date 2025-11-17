@@ -4,28 +4,24 @@ import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbSortPropertyContext extends UmbContextBase {
-	#enabled = new UmbBooleanState(false);
-	readonly enabled = this.#enabled.asObservable();
+	#sortingMode = new UmbBooleanState(false);
+	readonly sortingMode = this.#sortingMode.asObservable();
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_SORT_PROPERTY_CONTEXT);
 	}
 
-	enable() {
-		this.#enabled.setValue(true);
+	getSortingMode(): boolean | undefined {
+		return this.#sortingMode.getValue();
 	}
 
-	disable() {
-		this.#enabled.setValue(false);
+	setSortingMode(sortingMode: boolean) {
+		this.#sortingMode.setValue(sortingMode);
 	}
 
-	toggle() {
-		const enabled = this.#enabled.getValue();
-		if (enabled) {
-			this.disable();
-		} else {
-			this.enable();
-		}
+	toggleSortingMode() {
+		const enabled = this.getSortingMode();
+		this.setSortingMode(!enabled);
 	}
 }
 
