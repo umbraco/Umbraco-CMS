@@ -222,12 +222,6 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 		}
 	}
 
-	override destroy(): void {
-		super.destroy();
-		this.#blockContext?.destroy();
-		this.#workspaceContext?.destroy();
-	}
-
 	static override styles = [
 		UmbTextStyles,
 		css`

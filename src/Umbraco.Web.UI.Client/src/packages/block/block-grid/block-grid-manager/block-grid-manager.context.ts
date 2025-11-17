@@ -42,7 +42,6 @@ export class UmbBlockGridManagerContext<
 		this.#sortPropertyContext?.setSortingMode(sortingMode);
 	}
 	getSortingMode(): boolean | undefined {
-		//return this.#sortingMode.getValue();
 		return this.#sortPropertyContext?.getSortingMode();
 	}
 
