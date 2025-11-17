@@ -121,6 +121,12 @@ public static class UmbracoBuilderAuthExtensions
                         .UseSingletonHandler<HideBackOfficeTokensHandler>()
                         .SetOrder(OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ProcessJsonResponse<OpenIddictServerEvents.ApplyTokenResponseContext>.Descriptor.Order - 1);
                 });
+                options.AddEventHandler<OpenIddictServerEvents.ApplyAuthorizationResponseContext>(configuration =>
+                {
+                    configuration
+                        .UseSingletonHandler<HideBackOfficeTokensHandler>()
+                        .SetOrder(OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.Authentication.ProcessQueryResponse.Descriptor.Order - 1);
+                });
                 options.AddEventHandler<OpenIddictServerEvents.ExtractTokenRequestContext>(configuration =>
                 {
                     configuration
