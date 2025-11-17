@@ -401,6 +401,7 @@ export class UmbBlockGridEntriesContext
 		this.#allowedBlockTypes.setValue(this.#retrieveAllowedElementTypes());
 		this.#setupAllowedBlockTypesLimits();
 	}
+
 	#setupRangeLimits() {
 		if (!this._manager) return;
 		//const range = this.#retrieveRangeLimits();

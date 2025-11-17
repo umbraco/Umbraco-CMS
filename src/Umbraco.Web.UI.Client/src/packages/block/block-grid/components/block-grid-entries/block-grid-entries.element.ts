@@ -1,7 +1,7 @@
 import type { UmbBlockGridEntryElement } from '../block-grid-entry/block-grid-entry.element.js';
 import type { UmbBlockGridLayoutModel } from '../../types.js';
 import { UmbBlockGridEntriesContext } from './block-grid-entries.context.js';
-import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import {
 	getAccumulatedValueOfIndex,
 	getInterpolatedIndexOfPositionInWeightMap,
@@ -11,7 +11,6 @@ import { UmbFormControlMixin, UmbFormControlValidator } from '@umbraco-cms/backo
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_SORT_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/sort';
 import type { UmbFormControlValidatorConfig } from '@umbraco-cms/backoffice/validation';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type { UmbSorterConfig, UmbSorterResolvePlacementArgs } from '@umbraco-cms/backoffice/sorter';
@@ -168,9 +167,6 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 	private _limitMax?: number;
 
 	@state()
-	private _sortModeEnabled = false;
-
-	@state()
 	private _styleElement?: HTMLLinkElement;
 
 	@property({ type: String, attribute: 'area-key', reflect: true })
@@ -291,10 +287,6 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 		});
 
 		new UmbFormControlValidator(this, this /*, this.#dataPath*/);
-
-		this.consumeContext(UMB_SORT_PROPERTY_CONTEXT, (sortPropertyContext) => {
-			this.observe(sortPropertyContext?.enabled, (enabled) => (this._sortModeEnabled = enabled ?? false));
-		});
 	}
 
 	async #setupRangeValidation(rangeLimit: UmbNumberRangeValueType | undefined) {
@@ -394,24 +386,22 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 	override render() {
 		return html`
 			${this._styleElement}
-
-			<h3>Sort mode: ${this._sortModeEnabled ? '👍' : '👎'}</h3>
-
 			<div class="umb-block-grid__layout-container" data-area-length=${this._layoutEntries.length}>
 				${repeat(
 					this._layoutEntries,
 					(layout, index) => `${index}_${layout.contentKey}`,
-					(layout, index) =>
-						html`<umb-block-grid-entry
+					(layout, index) => html`
+						<umb-block-grid-entry
 							class="umb-block-grid__layout-item"
 							index=${index}
 							.contentKey=${layout.contentKey}
 							.layout=${layout}>
-						</umb-block-grid-entry>`,
+						</umb-block-grid-entry>
+					`,
 				)}
 			</div>
-			${this._canCreate ? this.#renderCreateButtonGroup() : nothing}
-			${this._areaKey ? html` <uui-form-validation-message .for=${this}></uui-form-validation-message>` : nothing}
+			${when(this._canCreate, () => this.#renderCreateButtonGroup())}
+			${when(this._areaKey, () => html`<uui-form-validation-message .for=${this}></uui-form-validation-message>`)}
 		`;
 	}
 

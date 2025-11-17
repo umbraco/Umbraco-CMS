@@ -41,6 +41,9 @@ export class UmbPropertyEditorUIBlockGridElement
 	@state()
 	private _notSupportedVariantSetting?: boolean;
 
+	@state()
+	private _sortingMode = false;
+
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 
@@ -232,6 +235,8 @@ export class UmbPropertyEditorUIBlockGridElement
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (context) => {
 			this.#managerContext.setVariantId(context?.getVariantId());
 		});
+
+		this.observe(this.#managerContext.sortingMode, (sortingMode) => (this._sortingMode = sortingMode ?? false));
 	}
 
 	protected override firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
@@ -260,6 +265,7 @@ export class UmbPropertyEditorUIBlockGridElement
 	override render() {
 		if (this._notSupportedVariantSetting) return nothing;
 		return html`
+			${this.#renderSortingMode()}
 			<umb-block-grid-entries
 				${ref(this.#gotRootEntriesElement)}
 				.areaKey=${null}
@@ -268,23 +274,18 @@ export class UmbPropertyEditorUIBlockGridElement
 		`;
 	}
 
+	#renderSortingMode() {
+		if (!this._sortingMode) return nothing;
+		return html` <umb-sort-mode-toolbar></umb-sort-mode-toolbar> `;
+	}
+
 	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {
-				display: grid;
-				gap: 1px;
-			}
-			> div {
 				display: flex;
 				flex-direction: column;
-				align-items: stretch;
-			}
-
-			uui-button-group {
-				padding-top: 1px;
-				display: grid;
-				grid-template-columns: 1fr auto;
+				gap: var(--uui-size-1);
 			}
 		`,
 	];

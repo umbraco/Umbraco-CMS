@@ -9,12 +9,13 @@ import {
 } from '@umbraco-cms/backoffice/observable-api';
 import { transformServerPathToClientPath } from '@umbraco-cms/backoffice/utils';
 import { UmbBlockManagerContext } from '@umbraco-cms/backoffice/block';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
+import { UMB_SORT_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/sort';
 import type { UmbBlockDataModel } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockTypeGroup } from '@umbraco-cms/backoffice/block-type';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 
 /**
  * A implementation of the Block Manager specifically for the Block Grid Editor.
@@ -31,6 +32,18 @@ export class UmbBlockGridManagerContext<
 	}
 	getInlineEditingMode(): boolean | undefined {
 		return this.#inlineEditingMode.getValue();
+	}
+
+	#sortPropertyContext?: typeof UMB_SORT_PROPERTY_CONTEXT.TYPE;
+	#sortingMode = new UmbBooleanState(undefined);
+	readonly sortingMode = this.#sortingMode.asObservable();
+
+	setSortingMode(sortingMode: boolean) {
+		this.#sortPropertyContext?.setSortingMode(sortingMode);
+	}
+	getSortingMode(): boolean | undefined {
+		//return this.#sortingMode.getValue();
+		return this.#sortPropertyContext?.getSortingMode();
 	}
 
 	#initAppUrl: Promise<unknown>;
@@ -90,7 +103,15 @@ export class UmbBlockGridManagerContext<
 		this.#initAppUrl = this.consumeContext(UMB_SERVER_CONTEXT, (instance) => {
 			this.#serverUrl = instance?.getServerUrl();
 		}).asPromise({ preventTimeout: true });
+
+		this.consumeContext(UMB_SORT_PROPERTY_CONTEXT, (sortPropertyContext) => {
+			this.#sortPropertyContext = sortPropertyContext;
+			this.observe(this.#sortPropertyContext?.sortingMode, (sortingMode) => {
+				this.#sortingMode.setValue(sortingMode);
+			});
+		});
 	}
+
 	/**
 	 * @param contentElementTypeKey
 	 * @param partialLayoutEntry
