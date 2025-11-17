@@ -1,4 +1,4 @@
-{
+﻿{
   "$schema": "../../umbraco-package-schema.json",
   "name": "My Collection View",
   "version": "0.1.0",
