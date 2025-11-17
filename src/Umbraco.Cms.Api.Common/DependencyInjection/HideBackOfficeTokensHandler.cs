@@ -73,7 +73,7 @@ internal sealed class HideBackOfficeTokensHandler
     }
 
     /// <summary>
-    /// This is invoked when a PKCE code is issued to the client. For the back-office client,we will intercept the
+    /// This is invoked when a PKCE code is issued to the client. For the back-office client, we will intercept the
     /// response, write the PKCE code from the response into a HTTP-only cookie, and redact the code from the response,
     /// so it's not exposed to the client.
     /// </summary>
