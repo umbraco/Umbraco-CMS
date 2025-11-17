@@ -441,6 +441,7 @@ export class UmbPropertyEditorUIBlockListElement
 		css`
 			:host {
 				display: grid;
+				align-content: start;
 				gap: 1px;
 			}
 			> div {
