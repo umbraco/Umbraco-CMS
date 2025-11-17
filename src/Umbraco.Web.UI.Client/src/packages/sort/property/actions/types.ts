@@ -1,1 +1,1 @@
-export type * from './sort/types.js';
+export type * from './sort-mode/types.js';

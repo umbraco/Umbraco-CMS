@@ -1,1 +1,1 @@
-export * from './sort/index.js';
+export * from './sort-mode/index.js';

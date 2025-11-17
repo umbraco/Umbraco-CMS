@@ -1,1 +1,1 @@
-export * from './sort/constants.js';
+export * from './sort-mode/constants.js';
