@@ -1,6 +1,6 @@
+import { UMB_SORT_PROPERTY_CONTEXT } from '../../property/context/sort.property-context-token.js';
 import { css, customElement, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_SORT_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/sorter';
 
 @customElement('umb-sort-mode-toolbar')
 export class UmbSortModeToolbarElement extends UmbLitElement {
