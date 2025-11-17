@@ -22,16 +22,23 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// <summary>
 ///     The value editor for the image cropper property editor.
 /// </summary>
-internal sealed class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core vs web?
+/// <remarks>
+///     As this class is loaded into <see cref="ValueEditorCache"/> which can be cleared, it needs
+///     to be disposable in order to properly clean up resources such as
+///     the settings change subscription and avoid a memory leak.
+/// </remarks>
+internal sealed class ImageCropperPropertyValueEditor : DataValueEditor, IDisposable
 {
     private readonly IDataTypeConfigurationCache _dataTypeConfigurationCache;
     private readonly IFileStreamSecurityValidator _fileStreamSecurityValidator;
     private readonly ILogger<ImageCropperPropertyValueEditor> _logger;
     private readonly MediaFileManager _mediaFileManager;
     private readonly IJsonSerializer _jsonSerializer;
-    private ContentSettings _contentSettings;
     private readonly ITemporaryFileService _temporaryFileService;
     private readonly IScopeProvider _scopeProvider;
+
+    private ContentSettings _contentSettings;
+    private readonly IDisposable? _contentSettingsChangeSubscription;
 
     public ImageCropperPropertyValueEditor(
         DataEditorAttribute attribute,
@@ -50,12 +57,13 @@ internal sealed class ImageCropperPropertyValueEditor : DataValueEditor // TODO:
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _mediaFileManager = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
         _jsonSerializer = jsonSerializer;
-        _contentSettings = contentSettings.CurrentValue;
         _temporaryFileService = temporaryFileService;
         _scopeProvider = scopeProvider;
         _fileStreamSecurityValidator = fileStreamSecurityValidator;
         _dataTypeConfigurationCache = dataTypeConfigurationCache;
-        contentSettings.OnChange(x => _contentSettings = x);
+
+        _contentSettings = contentSettings.CurrentValue;
+        _contentSettingsChangeSubscription = contentSettings.OnChange(x => _contentSettings = x);
 
         Validators.Add(new TemporaryFileUploadValidator(() => _contentSettings, TryParseTemporaryFileKey, TryGetTemporaryFile));
     }
@@ -267,4 +275,6 @@ internal sealed class ImageCropperPropertyValueEditor : DataValueEditor // TODO:
 
         return filepath;
     }
+
+    public void Dispose() => _contentSettingsChangeSubscription?.Dispose();
 }

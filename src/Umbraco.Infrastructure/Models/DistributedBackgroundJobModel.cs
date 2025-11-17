@@ -6,6 +6,11 @@
 public class DistributedBackgroundJobModel
 {
     /// <summary>
+    /// The id of the job.
+    /// </summary>
+    public int Id { get; set; }
+
+    /// <summary>
     /// Name of job.
     /// </summary>
     public required string Name { get; init; }

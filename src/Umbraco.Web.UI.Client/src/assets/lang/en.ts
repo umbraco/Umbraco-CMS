@@ -1017,9 +1017,21 @@ export default {
 			if (new Date(date).getTime() < new Date(now).getTime()) return `${duration} ago`;
 			return `in ${duration}`;
 		},
+		clipboard: 'Clipboard',
 	},
 	colors: {
+		black: 'Black',
 		blue: 'Blue',
+		brown: 'Brown',
+		cyan: 'Cyan',
+		green: 'Green',
+		lightBlue: 'Light Blue',
+		pink: 'Pink',
+		red: 'Red',
+		text: 'Black',
+		yellow: 'Yellow',
+		white: 'White',
+		grey: 'Grey',
 	},
 	shortcuts: {
 		addGroup: 'Add group',
@@ -1066,8 +1078,6 @@ export default {
 		databaseHeader: 'Database configuration',
 		databaseInstall: 'Press the <strong>install</strong> button to install the Umbraco %0% database',
 		databaseInstallDone: 'Umbraco %0% has now been copied to your database. Press <strong>Next</strong> to proceed.',
-		databaseNotFound:
-			'<p>Database not found! Please check that the information in the "connection string" of the "web.config" file is correct.</p><p>To proceed, please edit the "web.config" file (using Visual Studio or your favourite text editor), scroll to the bottom, add the connection string for your database in the key named "UmbracoDbDSN" and save the file.</p><p>Click the <strong>retry</strong> button when done.<br /><a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">More information on editing web.config here</a>.</p>',
 		databaseText:
 			'To complete this step, you must know some information regarding your database server ("connection string").<br />   Please contact your ISP if necessary.   If you\'re installing on a local machine or server you might need information from your system administrator.',
 		databaseUpgrade:
@@ -1429,14 +1439,6 @@ export default {
 		settings: 'Settings',
 		translation: 'Translation',
 		users: 'Users',
-	},
-	help: {
-		tours: 'Tours',
-		theBestUmbracoVideoTutorials: 'The best Umbraco video tutorials',
-		umbracoForum: 'Visit our.umbraco.com',
-		umbracoTv: 'Visit umbraco.tv',
-		umbracoLearningBase: 'Watch our free tutorial videos',
-		umbracoLearningBaseDescription: 'on the Umbraco Learning Base',
 	},
 	settings: {
 		defaulttemplate: 'Default template',
@@ -2244,6 +2246,7 @@ export default {
 		rangeExceeds: 'The low value must not exceed the high value.',
 		invalidExtensions: 'One or more of the extensions are invalid.',
 		allowedExtensions: 'Allowed extensions are:',
+		aliasInvalidFormat: 'Special characters are not allowed in alias',
 		disallowedExtensions: 'Disallowed extensions are:',
 	},
 	healthcheck: {
@@ -2507,6 +2510,7 @@ export default {
 		labelForCopyToClipboard: 'Copy to clipboard',
 		confirmDeleteHeadline: 'Delete from clipboard',
 		confirmDeleteDescription: 'Are you sure you want to delete <strong>{0}</strong> from the clipboard?',
+		confirmClearDescription: 'Are you sure you want to clear the clipboard?',
 		copySuccessHeadline: 'Copied to clipboard',
 	},
 	propertyActions: {
@@ -2541,19 +2545,11 @@ export default {
 		profilerEnabledDescription:
 			"<p>Umbraco currently does not run in debug mode, so you can't use the built-in profiler. This is how it should be for a production site.</p><p>Debug mode is turned on by setting <strong>Umbraco:CMS:Hosting:Debug</strong> to <strong>true</strong> in appsettings.json, appsettings.{Environment}.json or via an environment variable.</p>",
 	},
-	settingsDashboardVideos: {
-		trainingHeadline: 'Hours of Umbraco training videos are only a click away',
-		trainingDescription:
-			'<p>Want to master Umbraco? Spend a couple of minutes learning some best practices by watching one of these videos about using Umbraco. And visit <a href="https://umbraco.tv" target="_blank" rel="noopener">umbraco.tv</a> for even more Umbraco videos</p>',
-		learningBaseDescription:
-			'  <p>Want to master Umbraco? Spend a few minutes learning some best practices by visiting <a class="btn-link -underline" href="https://www.youtube.com/c/UmbracoLearningBase" target="_blank" rel="noopener">the Umbraco Learning Base Youtube channel</a>. Here you can find a bunch of video material covering many aspects of Umbraco.</p> ',
-		getStarted: 'To get you started',
-	},
 	settingsDashboard: {
 		documentationHeader: 'Documentation',
 		documentationDescription: 'Read more about working with the items in Settings in our Documentation.',
 		communityHeader: 'Community',
-		communityDescription: 'Ask a question in the community forum or our Discord community.',
+		communityDescription: 'Ask a question in the community forum.',
 		trainingHeader: 'Training',
 		trainingDescription: 'Find out about real-life training and certification opportunities',
 		supportHeader: 'Support',
@@ -2573,18 +2569,22 @@ export default {
 			"Thank you for choosing Umbraco - we think this could be the beginning of something beautiful. While it may feel overwhelming at first, we've done a lot to make the learning curve as smooth and fast as possible.",
 	},
 	welcomeDashboard: {
-		ourUmbracoHeadline: 'Our Umbraco - The Friendliest Community',
-		ourUmbracoDescription:
-			"Our Umbraco, the official community site, is your one-stop-shop for everything Umbraco. Whether you need a question answered, cool plugins, or a guide of how to do something in Umbraco, the world's best and friendliest community is just a click away.",
-		ourUmbracoButton: 'Visit Our Umbraco',
+		umbracoForumHeadline: 'The Umbraco community forum',
+		umbracoForumDescription:
+			'The forum is the central hub for the Umbraco developer community. This is where developers, integrators, and contributors come together to ask questions, share knowledge, and collaborate on all things Umbraco.',
+		umbracoForumButton: 'Visit the Umbraco community forum',
+		umbracoCommunityHeadline: 'The Umbraco community site',
+		umbracoCommunityDescription:
+			'The gathering place for all things Umbraco. Whether you write, teach, test, give feedback, or want to connect with others, there’s a way for you to be part of the Friendly Umbraco community.',
 		documentationHeadline: 'Documentation',
-		documentationDescription: 'Find the answers to all your Umbraco questions',
-		communityHeadline: 'Community',
-		communityDescription: 'Get support and inspiration from driven Umbraco experts',
+		documentationDescription:
+			'Your guide to everything Umbraco. Learn how to get started, explore new features, and discover best practices through clear examples and explanations.',
 		resourcesHeadline: 'Resources',
-		resourcesDescription: 'Free video tutorials to jumpstart your journey with the CMS',
+		resourcesDescription:
+			'Explore Umbraco resources to learn, build, and grow your skills. Find blogs, tutorials, demos, documentation, and videos to help you make the most of Umbraco.',
 		trainingHeadline: 'Training',
-		trainingDescription: 'Real-life training and official Umbraco certifications',
+		trainingDescription:
+			'Master Umbraco with official training. Get practical experience through instructor-led courses and earn certifications that help you grow your skills and career.',
 	},
 	blockEditor: {
 		headlineCreateBlock: 'Pick Element Type',
@@ -2737,8 +2737,8 @@ export default {
 			'You can edit and delete Document Blueprints from the "Document Blueprints" tree in the Settings section. Expand the Document Type which the Document Blueprint is based on and click it to edit or delete it.',
 	},
 	preview: {
-		endLabel: 'End',
-		endTitle: 'End preview mode',
+		endLabel: 'Exit',
+		endTitle: 'Exit preview mode',
 		openWebsiteLabel: 'Preview website',
 		openWebsiteTitle: 'Open website in preview mode',
 		returnToPreviewHeadline: 'Preview website?',

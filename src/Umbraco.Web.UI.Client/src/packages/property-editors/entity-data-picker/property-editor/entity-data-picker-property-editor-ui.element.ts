@@ -128,7 +128,7 @@ export class UmbEntityDataPickerPropertyEditorUIElement
 
 		// Ensure the value is of the correct type before setting it.
 		if (Array.isArray(selection)) {
-			this.value = selection;
+			this.value = { ids: selection };
 			this.dispatchEvent(new UmbChangeEvent());
 		} else {
 			throw new Error('Selection is not of type array. Cannot set property value.');
@@ -137,7 +137,7 @@ export class UmbEntityDataPickerPropertyEditorUIElement
 
 	override render() {
 		return html`<umb-input-entity-data
-			.selection=${this.value ?? []}
+			.selection=${this.value?.ids ?? []}
 			.dataSourceAlias="${this._dataSourceAlias}"
 			.dataSourceConfig=${this._dataSourceConfig}
 			.min=${this._min}

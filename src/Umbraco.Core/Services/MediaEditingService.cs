@@ -43,6 +43,9 @@ internal sealed class MediaEditingService
             contentTypeFilters)
         => _logger = logger;
 
+    /// <inheritdoc/>
+    protected override string? RelateParentOnDeleteAlias => Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias;
+
     public Task<IMedia?> GetAsync(Guid key)
     {
         IMedia? media = ContentService.GetById(key);
