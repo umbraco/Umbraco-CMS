@@ -29,10 +29,10 @@ public class ConfigureUmbracoManagementApiSwaggerGenOptions : ConfigureUmbracoOp
             return Task.CompletedTask;
         });
 
-        options.AddOperationTransformer<ResponseHeaderTransformer>();
-        options.AddOperationTransformer<NotificationHeaderTransformer>();
-
         // Sets Security requirement on backoffice apis
         options.AddBackofficeSecurityRequirements();
+
+        options.AddOperationTransformer<ResponseHeaderTransformer>();
+        options.AddOperationTransformer<NotificationHeaderTransformer>();
     }
 }
