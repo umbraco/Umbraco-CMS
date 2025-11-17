@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi;
-using Umbraco.Cms.Api.Management.OpenApi;
+using Umbraco.Cms.Api.Management.Extensions;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
 
@@ -39,10 +39,7 @@ public class UmbracoExtensionApiComposer : IComposer
                 });
 
                 // Enable Umbraco authentication for the "Example" Swagger document
-                // PR: https://github.com/umbraco/Umbraco-CMS/pull/15699
-                options
-                    .AddOperationTransformer<BackOfficeSecurityRequirementsTransformer>()
-                    .AddDocumentTransformer<BackOfficeSecurityRequirementsTransformer>();
+                options.AddBackofficeSecurityRequirements();
 
                 // This is used to generate nice operation IDs in our swagger json file
                 // So that the generated TypeScript client has nice method names and not too verbose

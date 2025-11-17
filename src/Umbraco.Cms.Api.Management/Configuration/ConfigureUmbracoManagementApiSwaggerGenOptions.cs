@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.OpenApi;
 using Microsoft.OpenApi;
 using Umbraco.Cms.Api.Common.Configuration;
 using Umbraco.Cms.Api.Management.DependencyInjection;
+using Umbraco.Cms.Api.Management.Extensions;
 using Umbraco.Cms.Api.Management.OpenApi;
 
 namespace Umbraco.Cms.Api.Management.Configuration;
@@ -32,8 +33,6 @@ public class ConfigureUmbracoManagementApiSwaggerGenOptions : ConfigureUmbracoOp
         options.AddOperationTransformer<NotificationHeaderTransformer>();
 
         // Sets Security requirement on backoffice apis
-        options
-            .AddOperationTransformer<BackOfficeSecurityRequirementsTransformer>()
-            .AddDocumentTransformer<BackOfficeSecurityRequirementsTransformer>();
+        options.AddBackofficeSecurityRequirements();
     }
 }
