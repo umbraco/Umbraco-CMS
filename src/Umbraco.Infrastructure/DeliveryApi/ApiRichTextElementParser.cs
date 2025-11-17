@@ -179,7 +179,7 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
             return;
         }
 
-        attributes["destination-id"] = key;
+        attributes["content-id"] = key;
         attributes.Remove(BlockContentKeyAttribute);
     }
 

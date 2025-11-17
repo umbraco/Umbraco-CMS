@@ -124,7 +124,7 @@ internal sealed class ApiRichTextMarkupParser : ApiRichTextParserBase, IApiRichT
 
             // swap the content UDI for the content ID
             block.Attributes.Remove(BlockContentKeyAttribute);
-            block.SetAttributeValue("data-destination-id", key.ToString("D"));
+            block.SetAttributeValue("data-content-id", key.ToString("D"));
 
             // remove the inner comment placed by the RTE
             block.RemoveAllChildren();

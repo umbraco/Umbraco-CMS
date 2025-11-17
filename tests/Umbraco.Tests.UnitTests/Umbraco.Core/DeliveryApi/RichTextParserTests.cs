@@ -292,8 +292,8 @@ public class RichTextParserTests : PropertyValueConverterTests
         Assert.IsNotNull(block);
         Assert.AreEqual(tagName, block.Tag);
         Assert.AreEqual(1, block.Attributes.Count);
-        Assert.IsTrue(block.Attributes.ContainsKey("destination-id"));
-        Assert.AreEqual(id, block.Attributes["destination-id"]);
+        Assert.IsTrue(block.Attributes.ContainsKey("content-id"));
+        Assert.AreEqual(id, block.Attributes["content-id"]);
         Assert.IsEmpty(block.Elements);
     }
 
@@ -330,12 +330,12 @@ public class RichTextParserTests : PropertyValueConverterTests
         var block1Element = paragraph.Elements.First() as RichTextGenericElement;
         Assert.IsNotNull(block1Element);
         Assert.AreEqual(tagName, block1Element.Tag);
-        Assert.AreEqual(block1ContentId, block1Element.Attributes["destination-id"]);
+        Assert.AreEqual(block1ContentId, block1Element.Attributes["content-id"]);
 
         var block2Element = paragraph.Elements.Last() as RichTextGenericElement;
         Assert.IsNotNull(block2Element);
         Assert.AreEqual(tagName, block2Element.Tag);
-        Assert.AreEqual(block2ContentId, block2Element.Attributes["destination-id"]);
+        Assert.AreEqual(block2ContentId, block2Element.Attributes["content-id"]);
 
         Assert.AreEqual(2, element.Blocks.Count());
 
@@ -369,16 +369,16 @@ public class RichTextParserTests : PropertyValueConverterTests
         Assert.IsNotNull(inlineBlock);
         Assert.AreEqual("umb-rte-block-inline", inlineBlock.Tag);
         Assert.AreEqual(1, inlineBlock.Attributes.Count);
-        Assert.IsTrue(inlineBlock.Attributes.ContainsKey("destination-id"));
-        Assert.AreEqual(id1, inlineBlock.Attributes["destination-id"]);
+        Assert.IsTrue(inlineBlock.Attributes.ContainsKey("content-id"));
+        Assert.AreEqual(id1, inlineBlock.Attributes["content-id"]);
         Assert.IsEmpty(inlineBlock.Elements);
 
         var blockLevelBlock = element.Elements.Last() as RichTextGenericElement;
         Assert.IsNotNull(blockLevelBlock);
         Assert.AreEqual("umb-rte-block", blockLevelBlock.Tag);
         Assert.AreEqual(1, blockLevelBlock.Attributes.Count);
-        Assert.IsTrue(blockLevelBlock.Attributes.ContainsKey("destination-id"));
-        Assert.AreEqual(id2, blockLevelBlock.Attributes["destination-id"]);
+        Assert.IsTrue(blockLevelBlock.Attributes.ContainsKey("content-id"));
+        Assert.AreEqual(id2, blockLevelBlock.Attributes["content-id"]);
         Assert.IsEmpty(blockLevelBlock.Elements);
     }
 
@@ -609,7 +609,7 @@ public class RichTextParserTests : PropertyValueConverterTests
 
         var tagName = $"umb-rte-block{(inlineBlock ? "-inline" : string.Empty)}";
         var result = parser.Parse($"<p><{tagName} data-content-key=\"{id:N}\"><!--Umbraco-Block--></{tagName}></p>");
-        Assert.AreEqual($"<p><{tagName} data-destination-id=\"{id:D}\"></{tagName}></p>", result);
+        Assert.AreEqual($"<p><{tagName} data-content-id=\"{id:D}\"></{tagName}></p>", result);
     }
 
     [Test]
@@ -620,7 +620,7 @@ public class RichTextParserTests : PropertyValueConverterTests
         var id2 = Guid.NewGuid();
 
         var result = parser.Parse($"<p><umb-rte-block-inline data-content-key=\"{id1:D}\"><!--Umbraco-Block--></umb-rte-block-inline></p><umb-rte-block data-content-key=\"{id2:D}\"><!--Umbraco-Block--></umb-rte-block>");
-        Assert.AreEqual($"<p><umb-rte-block-inline data-destination-id=\"{id1:D}\"></umb-rte-block-inline></p><umb-rte-block data-destination-id=\"{id2:D}\"></umb-rte-block>", result);
+        Assert.AreEqual($"<p><umb-rte-block-inline data-content-id=\"{id1:D}\"></umb-rte-block-inline></p><umb-rte-block data-content-id=\"{id2:D}\"></umb-rte-block>", result);
     }
 
     private ApiRichTextElementParser CreateRichTextElementParser()
