@@ -2,8 +2,6 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Management.Controllers.MediaType;
-using Umbraco.Cms.Api.Management.ViewModels.MediaType;
 using Umbraco.Cms.Api.Management.ViewModels.MemberType;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
@@ -30,9 +28,9 @@ public class CopyMemberTypeController : MemberTypeControllerBase
     public async Task<IActionResult> Copy(
         CancellationToken cancellationToken,
         Guid id,
-        CopyMemberTypeRequestModel copyMemberTypeRequestModel)
+        CopyMemberTypeRequestModel? copyMemberTypeRequestModel)
     {
-        Attempt<IMemberType?, ContentTypeStructureOperationStatus> result = await _memberTypeService.CopyAsync(id, copyMemberTypeRequestModel.Target?.Id);
+        Attempt<IMemberType?, ContentTypeStructureOperationStatus> result = await _memberTypeService.CopyAsync(id, copyMemberTypeRequestModel?.Target?.Id);
 
         return result.Success
             ? CreatedAtId<ByKeyMemberTypeController>(controller => nameof(controller.ByKey), result.Result!.Key)

@@ -2937,7 +2937,7 @@ export type UserInstallRequestModel = {
     name: string;
     email: string;
     password: string;
-    readonly subscribeToNewsletter: boolean;
+    subscribeToNewsletter: boolean;
 };
 
 export type UserItemResponseModel = {
@@ -3170,12 +3170,6 @@ export type UpgradeSettingsResponseModelWritable = {
     newState: string;
     newVersion: string;
     oldVersion: string;
-};
-
-export type UserInstallRequestModelWritable = {
-    name: string;
-    email: string;
-    password: string;
 };
 
 export type GetCultureData = {

@@ -41342,7 +41342,7 @@
           },
           "actionParameters": {
             "type": "object",
-            "additionalProperties": {},
+            "additionalProperties": { },
             "nullable": true
           }
         },
@@ -41983,7 +41983,7 @@
           },
           "extensions": {
             "type": "array",
-            "items": {}
+            "items": { }
           }
         },
         "additionalProperties": false
@@ -45873,7 +45873,7 @@
             "nullable": true
           }
         },
-        "additionalProperties": {}
+        "additionalProperties": { }
       },
       "ProblemDetailsBuilderModel": {
         "type": "object",
@@ -49520,8 +49520,7 @@
             "type": "string"
           },
           "subscribeToNewsletter": {
-            "type": "boolean",
-            "readOnly": true
+            "type": "boolean"
           }
         },
         "additionalProperties": false
