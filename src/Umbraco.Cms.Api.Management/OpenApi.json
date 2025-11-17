@@ -163,7 +163,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -313,7 +327,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -421,7 +449,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -522,7 +564,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -660,7 +716,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -865,7 +935,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -1015,7 +1099,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -1123,7 +1221,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -1724,7 +1836,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -1874,7 +2000,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -1982,7 +2122,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -2152,7 +2306,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -2266,7 +2434,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -2574,7 +2756,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -2805,7 +3001,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -2955,7 +3165,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -3063,7 +3287,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -3309,7 +3547,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -3493,7 +3745,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -3579,7 +3845,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -3679,7 +3959,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -3818,7 +4112,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -4002,7 +4310,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -4076,7 +4398,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -4210,7 +4546,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -4320,7 +4670,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -4434,7 +4798,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -4787,7 +5165,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -4979,7 +5371,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -5125,7 +5531,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -5330,7 +5750,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -5430,7 +5864,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -5602,7 +6050,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -6177,7 +6639,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -6327,7 +6803,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -6435,7 +6925,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -6521,7 +7025,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -6687,7 +7205,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -6837,7 +7369,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -6945,7 +7491,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -7035,7 +7595,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -7428,7 +8002,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -7554,7 +8142,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -7662,7 +8264,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -8000,7 +8616,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -8162,7 +8792,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -8272,7 +8916,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -8381,7 +9039,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -8526,7 +9198,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -8676,7 +9362,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -8784,7 +9484,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -8898,7 +9612,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -9495,7 +10223,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -9602,7 +10344,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -9657,7 +10413,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -9872,7 +10642,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -9951,7 +10735,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -10766,7 +11564,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -10911,7 +11723,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -11018,7 +11844,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -11435,7 +12275,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -11559,7 +12413,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -12068,7 +12936,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -12218,7 +13100,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -12326,7 +13222,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -12487,7 +13397,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -12587,7 +13511,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -12817,7 +13755,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -13009,7 +13961,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -13155,7 +14121,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -13220,7 +14200,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -13320,7 +14314,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -13492,7 +14500,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -14269,7 +15291,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -14395,7 +15431,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -14503,7 +15553,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -14771,7 +15835,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -14933,7 +16011,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -15043,7 +16135,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -15152,7 +16258,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -15297,7 +16417,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -15447,7 +16581,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -15555,7 +16703,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -15669,7 +16831,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -16240,7 +17416,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -16390,7 +17580,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -16498,7 +17702,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -16728,7 +17946,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -16920,7 +18152,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -17103,7 +18349,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -17249,7 +18509,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -17357,7 +18631,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -17621,7 +18909,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -17747,7 +19049,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -17855,7 +19171,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -18035,7 +19365,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -18093,7 +19437,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -18238,7 +19596,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -18388,7 +19760,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -18496,7 +19882,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -18685,7 +20085,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -18979,7 +20393,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -19173,7 +20601,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -19299,7 +20741,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -19383,7 +20839,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -19643,7 +21113,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -19791,7 +21275,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -19898,7 +21396,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -20022,7 +21534,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -20136,7 +21662,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -20284,7 +21824,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -20740,7 +22294,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -21080,7 +22648,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -21159,7 +22741,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -21533,7 +23129,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -21681,7 +23291,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -21788,7 +23412,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -21912,7 +23550,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -22026,7 +23678,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -22174,7 +23840,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -22609,7 +24289,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -22708,7 +24402,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -23338,7 +25046,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -23486,7 +25208,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -23593,7 +25329,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -23717,7 +25467,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -23831,7 +25595,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -23979,7 +25757,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -24411,7 +26203,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -24624,7 +26430,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -24774,7 +26594,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -24882,7 +26716,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -24968,7 +26816,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -25577,7 +27439,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -25851,7 +27727,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -25963,7 +27853,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -26172,7 +28076,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -26280,7 +28198,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -26443,7 +28375,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -26605,7 +28551,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -26691,7 +28651,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -26818,7 +28792,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -26922,7 +28910,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -27022,7 +29024,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -27130,7 +29146,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -27948,7 +29978,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -28047,7 +30091,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -28161,7 +30219,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -28348,7 +30420,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -28491,7 +30577,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -28566,7 +30666,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -29175,7 +31289,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -29263,7 +31391,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -29438,7 +31580,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -29522,7 +31678,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -29611,7 +31781,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -29698,7 +31882,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -29905,7 +32103,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -30055,7 +32267,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -30163,7 +32389,21 @@
             "description": "The resource is protected and requires an authentication token"
           },
           "403": {
-            "description": "The authenticated user does not have access to this resource"
+            "description": "The authenticated user does not have access to this resource",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -30631,9 +32871,6 @@
         }
       },
       "CopyDataTypeRequestModel": {
-        "required": [
-          "target"
-        ],
         "type": "object",
         "properties": {
           "target": {
@@ -30650,7 +32887,6 @@
       },
       "CopyDocumentRequestModel": {
         "required": [
-          "target",
           "relateToOriginal",
           "includeDescendants"
         ],
@@ -30675,9 +32911,6 @@
         }
       },
       "CopyDocumentTypeRequestModel": {
-        "required": [
-          "target"
-        ],
         "type": "object",
         "properties": {
           "target": {
@@ -30693,9 +32926,6 @@
         }
       },
       "CopyMediaTypeRequestModel": {
-        "required": [
-          "target"
-        ],
         "type": "object",
         "properties": {
           "target": {
@@ -30714,7 +32944,6 @@
         "required": [
           "name",
           "editorAlias",
-          "parent",
           "editorUiAlias",
           "values"
         ],
@@ -30757,7 +32986,6 @@
       "CreateDictionaryItemRequestModel": {
         "required": [
           "name",
-          "parent",
           "translations"
         ],
         "type": "object",
@@ -30793,8 +33021,7 @@
       "CreateDocumentBlueprintFromDocumentRequestModel": {
         "required": [
           "document",
-          "name",
-          "parent"
+          "name"
         ],
         "type": "object",
         "properties": {
@@ -30826,7 +33053,6 @@
       "CreateDocumentBlueprintRequestModel": {
         "required": [
           "documentType",
-          "parent",
           "values",
           "variants"
         ],
@@ -30870,7 +33096,6 @@
         "required": [
           "template",
           "documentType",
-          "parent",
           "values",
           "variants"
         ],
@@ -30924,7 +33149,6 @@
         "required": [
           "type",
           "id",
-          "parent",
           "sortOrder"
         ],
         "type": "object",
@@ -30963,7 +33187,6 @@
           "alias",
           "name",
           "id",
-          "container",
           "sortOrder",
           "dataType",
           "variesByCulture",
@@ -31027,15 +33250,12 @@
           "icon",
           "properties",
           "allowedTemplates",
-          "defaultTemplate",
           "cleanup",
           "allowedDocumentTypes",
           "compositions",
-          "parent",
           "allowedAsRoot",
           "variesByCulture",
           "variesBySegment",
-          "collection",
           "isElement",
           "containers"
         ],
@@ -31142,8 +33362,7 @@
       },
       "CreateFolderRequestModel": {
         "required": [
-          "name",
-          "parent"
+          "name"
         ],
         "type": "object",
         "properties": {
@@ -31220,7 +33439,6 @@
       "CreateMediaRequestModel": {
         "required": [
           "mediaType",
-          "parent",
           "values",
           "variants"
         ],
@@ -31264,7 +33482,6 @@
         "required": [
           "type",
           "id",
-          "parent",
           "sortOrder"
         ],
         "type": "object",
@@ -31303,7 +33520,6 @@
           "alias",
           "name",
           "id",
-          "container",
           "sortOrder",
           "dataType",
           "variesByCulture",
@@ -31368,8 +33584,6 @@
           "properties",
           "allowedMediaTypes",
           "compositions",
-          "collection",
-          "parent",
           "allowedAsRoot",
           "variesByCulture",
           "variesBySegment",
@@ -31538,7 +33752,6 @@
         "required": [
           "type",
           "id",
-          "parent",
           "sortOrder"
         ],
         "type": "object",
@@ -31579,7 +33792,6 @@
           "isSensitive",
           "visibility",
           "id",
-          "container",
           "sortOrder",
           "dataType",
           "variesByCulture",
@@ -31652,7 +33864,6 @@
           "allowedAsRoot",
           "variesByCulture",
           "variesBySegment",
-          "collection",
           "isElement",
           "containers"
         ],
@@ -31827,8 +34038,7 @@
       },
       "CreatePartialViewFolderRequestModel": {
         "required": [
-          "name",
-          "parent"
+          "name"
         ],
         "type": "object",
         "properties": {
@@ -31850,8 +34060,7 @@
       "CreatePartialViewRequestModel": {
         "required": [
           "content",
-          "name",
-          "parent"
+          "name"
         ],
         "type": "object",
         "properties": {
@@ -31875,8 +34084,7 @@
       },
       "CreateScriptFolderRequestModel": {
         "required": [
-          "name",
-          "parent"
+          "name"
         ],
         "type": "object",
         "properties": {
@@ -31898,8 +34106,7 @@
       "CreateScriptRequestModel": {
         "required": [
           "content",
-          "name",
-          "parent"
+          "name"
         ],
         "type": "object",
         "properties": {
@@ -31923,8 +34130,7 @@
       },
       "CreateStylesheetFolderRequestModel": {
         "required": [
-          "name",
-          "parent"
+          "name"
         ],
         "type": "object",
         "properties": {
@@ -31946,8 +34152,7 @@
       "CreateStylesheetRequestModel": {
         "required": [
           "content",
-          "name",
-          "parent"
+          "name"
         ],
         "type": "object",
         "properties": {
@@ -32047,9 +34252,7 @@
           "hasAccessToAllLanguages",
           "fallbackPermissions",
           "permissions",
-          "documentStartNode",
           "documentRootAccess",
-          "mediaStartNode",
           "mediaRootAccess"
         ],
         "type": "object",
@@ -32222,9 +34425,6 @@
         }
       },
       "CultureAndScheduleRequestModel": {
-        "required": [
-          "schedule"
-        ],
         "type": "object",
         "properties": {
           "culture": {
@@ -32626,7 +34826,6 @@
           "isFolder",
           "name",
           "id",
-          "parent",
           "flags",
           "hasChildren"
         ],
@@ -32764,7 +34963,6 @@
       "DictionaryOverviewResponseModel": {
         "required": [
           "id",
-          "parent",
           "translatedIsoCodes"
         ],
         "type": "object",
@@ -32884,11 +35082,9 @@
       },
       "DocumentBlueprintTreeItemResponseModel": {
         "required": [
-          "documentType",
           "isFolder",
           "name",
           "id",
-          "parent",
           "flags",
           "hasChildren"
         ],
@@ -33031,7 +35227,6 @@
         "required": [
           "isTrashed",
           "isProtected",
-          "parent",
           "hasChildren",
           "documentType",
           "variants",
@@ -33105,8 +35300,7 @@
           "hasChildren",
           "documentType",
           "variants",
-          "createDate",
-          "parent"
+          "createDate"
         ],
         "type": "object",
         "properties": {
@@ -33144,7 +35338,6 @@
       },
       "DocumentResponseModel": {
         "required": [
-          "template",
           "isTrashed",
           "documentType",
           "id",
@@ -33204,7 +35397,6 @@
           "isTrashed",
           "createDate",
           "id",
-          "parent",
           "flags",
           "hasChildren"
         ],
@@ -33315,8 +35507,7 @@
         "required": [
           "id",
           "alias",
-          "icon",
-          "collection"
+          "icon"
         ],
         "type": "object",
         "properties": {
@@ -33479,7 +35670,6 @@
         "required": [
           "type",
           "id",
-          "parent",
           "sortOrder"
         ],
         "type": "object",
@@ -33518,7 +35708,6 @@
           "alias",
           "name",
           "id",
-          "container",
           "sortOrder",
           "dataType",
           "variesByCulture",
@@ -33578,8 +35767,7 @@
       "DocumentTypeReferenceResponseModel": {
         "required": [
           "id",
-          "icon",
-          "collection"
+          "icon"
         ],
         "type": "object",
         "properties": {
@@ -33609,7 +35797,6 @@
           "icon",
           "properties",
           "allowedTemplates",
-          "defaultTemplate",
           "cleanup",
           "allowedDocumentTypes",
           "compositions",
@@ -33617,7 +35804,6 @@
           "allowedAsRoot",
           "variesByCulture",
           "variesBySegment",
-          "collection",
           "isElement",
           "containers"
         ],
@@ -33732,7 +35918,6 @@
           "isFolder",
           "name",
           "id",
-          "parent",
           "flags",
           "hasChildren"
         ],
@@ -34056,7 +36241,6 @@
       },
       "DocumentVersionResponseModel": {
         "required": [
-          "document",
           "documentType",
           "id",
           "flags",
@@ -34350,7 +36534,8 @@
       "FileContentResult": {
         "required": [
           "fileContents",
-          "entityTag",
+          "contentType",
+          "fileDownloadName",
           "enableRangeProcessing"
         ],
         "type": "object",
@@ -34408,7 +36593,6 @@
         "required": [
           "name",
           "path",
-          "parent",
           "isFolder",
           "hasChildren"
         ],
@@ -34709,8 +36893,7 @@
       },
       "ImportDictionaryRequestModel": {
         "required": [
-          "temporaryFile",
-          "parent"
+          "temporaryFile"
         ],
         "type": "object",
         "properties": {
@@ -35572,7 +37755,6 @@
       "MediaItemResponseModel": {
         "required": [
           "isTrashed",
-          "parent",
           "hasChildren",
           "mediaType",
           "variants",
@@ -35624,8 +37806,7 @@
           "hasChildren",
           "mediaType",
           "variants",
-          "createDate",
-          "parent"
+          "createDate"
         ],
         "type": "object",
         "properties": {
@@ -35710,7 +37891,6 @@
           "isTrashed",
           "createDate",
           "id",
-          "parent",
           "flags",
           "hasChildren"
         ],
@@ -35764,8 +37944,7 @@
         "required": [
           "id",
           "alias",
-          "icon",
-          "collection"
+          "icon"
         ],
         "type": "object",
         "properties": {
@@ -35902,7 +38081,6 @@
         "required": [
           "type",
           "id",
-          "parent",
           "sortOrder"
         ],
         "type": "object",
@@ -35941,7 +38119,6 @@
           "alias",
           "name",
           "id",
-          "container",
           "sortOrder",
           "dataType",
           "variesByCulture",
@@ -36001,8 +38178,7 @@
       "MediaTypeReferenceResponseModel": {
         "required": [
           "id",
-          "icon",
-          "collection"
+          "icon"
         ],
         "type": "object",
         "properties": {
@@ -36039,7 +38215,6 @@
           "allowedAsRoot",
           "variesByCulture",
           "variesBySegment",
-          "collection",
           "isElement",
           "containers"
         ],
@@ -36141,7 +38316,6 @@
           "isFolder",
           "name",
           "id",
-          "parent",
           "flags",
           "hasChildren"
         ],
@@ -36620,7 +38794,6 @@
         "required": [
           "type",
           "id",
-          "parent",
           "sortOrder"
         ],
         "type": "object",
@@ -36661,7 +38834,6 @@
           "isSensitive",
           "visibility",
           "id",
-          "container",
           "sortOrder",
           "dataType",
           "variesByCulture",
@@ -36742,8 +38914,7 @@
       "MemberTypeReferenceResponseModel": {
         "required": [
           "id",
-          "icon",
-          "collection"
+          "icon"
         ],
         "type": "object",
         "properties": {
@@ -36777,7 +38948,6 @@
           "allowedAsRoot",
           "variesByCulture",
           "variesBySegment",
-          "collection",
           "isElement",
           "containers"
         ],
@@ -36849,7 +39019,6 @@
           "icon",
           "name",
           "id",
-          "parent",
           "flags",
           "hasChildren"
         ],
@@ -37036,9 +39205,6 @@
         }
       },
       "MoveDataTypeRequestModel": {
-        "required": [
-          "target"
-        ],
         "type": "object",
         "properties": {
           "target": {
@@ -37054,9 +39220,6 @@
         }
       },
       "MoveDictionaryRequestModel": {
-        "required": [
-          "target"
-        ],
         "type": "object",
         "properties": {
           "target": {
@@ -37072,9 +39235,6 @@
         }
       },
       "MoveDocumentBlueprintRequestModel": {
-        "required": [
-          "target"
-        ],
         "type": "object",
         "properties": {
           "target": {
@@ -37090,9 +39250,6 @@
         }
       },
       "MoveDocumentRequestModel": {
-        "required": [
-          "target"
-        ],
         "type": "object",
         "properties": {
           "target": {
@@ -37108,9 +39265,6 @@
         }
       },
       "MoveDocumentTypeRequestModel": {
-        "required": [
-          "target"
-        ],
         "type": "object",
         "properties": {
           "target": {
@@ -37126,9 +39280,6 @@
         }
       },
       "MoveMediaRequestModel": {
-        "required": [
-          "target"
-        ],
         "type": "object",
         "properties": {
           "target": {
@@ -37144,9 +39295,6 @@
         }
       },
       "MoveMediaTypeRequestModel": {
-        "required": [
-          "target"
-        ],
         "type": "object",
         "properties": {
           "target": {
@@ -37165,7 +39313,6 @@
         "required": [
           "name",
           "id",
-          "parent",
           "flags",
           "hasChildren"
         ],
@@ -38610,8 +40757,7 @@
       "PartialViewFolderResponseModel": {
         "required": [
           "name",
-          "path",
-          "parent"
+          "path"
         ],
         "type": "object",
         "properties": {
@@ -38637,8 +40783,7 @@
         "required": [
           "isFolder",
           "name",
-          "path",
-          "parent"
+          "path"
         ],
         "type": "object",
         "properties": {
@@ -38667,8 +40812,7 @@
         "required": [
           "content",
           "name",
-          "path",
-          "parent"
+          "path"
         ],
         "type": "object",
         "properties": {
@@ -38948,7 +41092,6 @@
       },
       "PublishedDocumentResponseModel": {
         "required": [
-          "template",
           "isTrashed",
           "documentType",
           "id",
@@ -39177,8 +41320,6 @@
         "required": [
           "name",
           "id",
-          "parentObject",
-          "childObject",
           "isBidirectional",
           "isDependency"
         ],
@@ -39385,8 +41526,7 @@
       "ScriptFolderResponseModel": {
         "required": [
           "name",
-          "path",
-          "parent"
+          "path"
         ],
         "type": "object",
         "properties": {
@@ -39412,8 +41552,7 @@
         "required": [
           "isFolder",
           "name",
-          "path",
-          "parent"
+          "path"
         ],
         "type": "object",
         "properties": {
@@ -39442,8 +41581,7 @@
         "required": [
           "content",
           "name",
-          "path",
-          "parent"
+          "path"
         ],
         "type": "object",
         "properties": {
@@ -39638,8 +41776,7 @@
       },
       "SortingRequestModel": {
         "required": [
-          "sorting",
-          "parent"
+          "sorting"
         ],
         "type": "object",
         "properties": {
@@ -39665,8 +41802,7 @@
         "required": [
           "isFolder",
           "name",
-          "path",
-          "parent"
+          "path"
         ],
         "type": "object",
         "properties": {
@@ -39735,8 +41871,7 @@
       "StylesheetFolderResponseModel": {
         "required": [
           "name",
-          "path",
-          "parent"
+          "path"
         ],
         "type": "object",
         "properties": {
@@ -39762,8 +41897,7 @@
         "required": [
           "isFolder",
           "name",
-          "path",
-          "parent"
+          "path"
         ],
         "type": "object",
         "properties": {
@@ -39792,8 +41926,7 @@
         "required": [
           "content",
           "name",
-          "path",
-          "parent"
+          "path"
         ],
         "type": "object",
         "properties": {
@@ -40199,8 +42332,6 @@
       },
       "TemplateQueryExecuteModel": {
         "required": [
-          "rootDocument",
-          "sort",
           "take"
         ],
         "type": "object",
@@ -40378,8 +42509,7 @@
         "required": [
           "name",
           "alias",
-          "id",
-          "masterTemplate"
+          "id"
         ],
         "type": "object",
         "properties": {
@@ -40668,7 +42798,6 @@
       },
       "UpdateDocumentRequestModel": {
         "required": [
-          "template",
           "values",
           "variants"
         ],
@@ -40702,7 +42831,6 @@
         "required": [
           "type",
           "id",
-          "parent",
           "sortOrder"
         ],
         "type": "object",
@@ -40741,7 +42869,6 @@
           "alias",
           "name",
           "id",
-          "container",
           "sortOrder",
           "dataType",
           "variesByCulture",
@@ -40805,14 +42932,12 @@
           "icon",
           "properties",
           "allowedTemplates",
-          "defaultTemplate",
           "cleanup",
           "allowedDocumentTypes",
           "compositions",
           "allowedAsRoot",
           "variesByCulture",
           "variesBySegment",
-          "collection",
           "isElement",
           "containers"
         ],
@@ -40981,7 +43106,6 @@
         "required": [
           "type",
           "id",
-          "parent",
           "sortOrder"
         ],
         "type": "object",
@@ -41020,7 +43144,6 @@
           "alias",
           "name",
           "id",
-          "container",
           "sortOrder",
           "dataType",
           "variesByCulture",
@@ -41088,7 +43211,6 @@
           "allowedAsRoot",
           "variesByCulture",
           "variesBySegment",
-          "collection",
           "isElement",
           "containers"
         ],
@@ -41235,7 +43357,6 @@
         "required": [
           "type",
           "id",
-          "parent",
           "sortOrder"
         ],
         "type": "object",
@@ -41276,7 +43397,6 @@
           "isSensitive",
           "visibility",
           "id",
-          "container",
           "sortOrder",
           "dataType",
           "variesByCulture",
@@ -41349,7 +43469,6 @@
           "allowedAsRoot",
           "variesByCulture",
           "variesBySegment",
-          "collection",
           "isElement",
           "containers"
         ],
@@ -41599,9 +43718,7 @@
           "hasAccessToAllLanguages",
           "fallbackPermissions",
           "permissions",
-          "documentStartNode",
           "documentRootAccess",
-          "mediaStartNode",
           "mediaRootAccess"
         ],
         "type": "object",
@@ -41819,7 +43936,8 @@
           "currentState",
           "newState",
           "newVersion",
-          "oldVersion"
+          "oldVersion",
+          "reportUrl"
         ],
         "type": "object",
         "properties": {
@@ -41994,9 +44112,7 @@
           "permissions",
           "isDeletable",
           "aliasCanBeChanged",
-          "documentStartNode",
           "documentRootAccess",
-          "mediaStartNode",
           "mediaRootAccess"
         ],
         "type": "object",
@@ -42356,7 +44472,6 @@
       },
       "ValidateUpdateDocumentRequestModel": {
         "required": [
-          "template",
           "values",
           "variants"
         ],
