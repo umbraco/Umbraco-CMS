@@ -3,6 +3,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -143,8 +144,8 @@ public class RichTextParserTests : PropertyValueConverterTests
         Assert.AreEqual("a", link.Tag);
         Assert.AreEqual(2, link.Attributes.Count);
         Assert.IsNotNull(link.Attributes["route"]);
-        Assert.IsNotNull(link.Attributes["content-id"]);
-        var id = (Guid)link.Attributes["content-id"];
+        Assert.IsNotNull(link.Attributes["destination-id"]);
+        var id = (Guid)link.Attributes["destination-id"];
         Assert.AreEqual(_contentKey, id);
         var route = link.Attributes["route"] as IApiContentRoute;
         Assert.IsNotNull(route);
@@ -291,8 +292,8 @@ public class RichTextParserTests : PropertyValueConverterTests
         Assert.IsNotNull(block);
         Assert.AreEqual(tagName, block.Tag);
         Assert.AreEqual(1, block.Attributes.Count);
-        Assert.IsTrue(block.Attributes.ContainsKey("content-id"));
-        Assert.AreEqual(id, block.Attributes["content-id"]);
+        Assert.IsTrue(block.Attributes.ContainsKey("destination-id"));
+        Assert.AreEqual(id, block.Attributes["destination-id"]);
         Assert.IsEmpty(block.Elements);
     }
 
@@ -329,12 +330,12 @@ public class RichTextParserTests : PropertyValueConverterTests
         var block1Element = paragraph.Elements.First() as RichTextGenericElement;
         Assert.IsNotNull(block1Element);
         Assert.AreEqual(tagName, block1Element.Tag);
-        Assert.AreEqual(block1ContentId, block1Element.Attributes["content-id"]);
+        Assert.AreEqual(block1ContentId, block1Element.Attributes["destination-id"]);
 
         var block2Element = paragraph.Elements.Last() as RichTextGenericElement;
         Assert.IsNotNull(block2Element);
         Assert.AreEqual(tagName, block2Element.Tag);
-        Assert.AreEqual(block2ContentId, block2Element.Attributes["content-id"]);
+        Assert.AreEqual(block2ContentId, block2Element.Attributes["destination-id"]);
 
         Assert.AreEqual(2, element.Blocks.Count());
 
@@ -368,16 +369,16 @@ public class RichTextParserTests : PropertyValueConverterTests
         Assert.IsNotNull(inlineBlock);
         Assert.AreEqual("umb-rte-block-inline", inlineBlock.Tag);
         Assert.AreEqual(1, inlineBlock.Attributes.Count);
-        Assert.IsTrue(inlineBlock.Attributes.ContainsKey("content-id"));
-        Assert.AreEqual(id1, inlineBlock.Attributes["content-id"]);
+        Assert.IsTrue(inlineBlock.Attributes.ContainsKey("destination-id"));
+        Assert.AreEqual(id1, inlineBlock.Attributes["destination-id"]);
         Assert.IsEmpty(inlineBlock.Elements);
 
         var blockLevelBlock = element.Elements.Last() as RichTextGenericElement;
         Assert.IsNotNull(blockLevelBlock);
         Assert.AreEqual("umb-rte-block", blockLevelBlock.Tag);
         Assert.AreEqual(1, blockLevelBlock.Attributes.Count);
-        Assert.IsTrue(blockLevelBlock.Attributes.ContainsKey("content-id"));
-        Assert.AreEqual(id2, blockLevelBlock.Attributes["content-id"]);
+        Assert.IsTrue(blockLevelBlock.Attributes.ContainsKey("destination-id"));
+        Assert.AreEqual(id2, blockLevelBlock.Attributes["destination-id"]);
         Assert.IsEmpty(blockLevelBlock.Elements);
     }
 
@@ -485,10 +486,10 @@ public class RichTextParserTests : PropertyValueConverterTests
 
         var result = parser.Parse($"<p><a href=\"/{{localLink:{_contentKey:N}}}\" type=\"document\"></a></p>");
         Assert.IsTrue(result.Contains("href=\"/some-content-path\""));
-        Assert.IsTrue(result.Contains($"data-content-id=\"{_contentKey:D}\""));
+        Assert.IsTrue(result.Contains($"data-destination-id=\"{_contentKey:D}\""));
         Assert.IsTrue(result.Contains("data-start-item-path=\"the-root-path\""));
         Assert.IsTrue(result.Contains($"data-start-item-id=\"{_contentRootKey:D}\""));
-        Assert.IsTrue(result.Contains("data-content-type=\"document\""));
+        Assert.IsTrue(result.Contains($"data-link-type=\"{LinkType.Content}\""));
     }
 
     [Test]
@@ -498,10 +499,10 @@ public class RichTextParserTests : PropertyValueConverterTests
 
         var result = parser.Parse($"<p><a href=\"/{{localLink:umb://document/{_contentKey:N}}}\"></a></p>");
         Assert.IsTrue(result.Contains("href=\"/some-content-path\""));
-        Assert.IsTrue(result.Contains($"data-content-id=\"{_contentKey:D}\""));
+        Assert.IsTrue(result.Contains($"data-destination-id=\"{_contentKey:D}\""));
         Assert.IsTrue(result.Contains("data-start-item-path=\"the-root-path\""));
         Assert.IsTrue(result.Contains($"data-start-item-id=\"{_contentRootKey:D}\""));
-        Assert.IsTrue(result.Contains("data-content-type=\"document\""));
+        Assert.IsTrue(result.Contains($"data-link-type=\"{LinkType.Content}\""));
     }
 
     [TestCase("#some-anchor")]
@@ -514,10 +515,10 @@ public class RichTextParserTests : PropertyValueConverterTests
 
         var result = parser.Parse($"<p><a href=\"/{{localLink:{_contentKey:N}}}{postfix}\" type=\"document\"></a></p>");
         Assert.IsTrue(result.Contains($"href=\"/some-content-path{postfix}\""));
-        Assert.IsTrue(result.Contains($"data-content-id=\"{_contentKey:D}\""));
+        Assert.IsTrue(result.Contains($"data-destination-id=\"{_contentKey:D}\""));
         Assert.IsTrue(result.Contains("data-start-item-path=\"the-root-path\""));
         Assert.IsTrue(result.Contains($"data-start-item-id=\"{_contentRootKey:D}\""));
-        Assert.IsTrue(result.Contains("data-content-type=\"document\""));
+        Assert.IsTrue(result.Contains($"data-link-type=\"{LinkType.Content}\""));
     }
 
     [TestCase("#some-anchor")]
@@ -530,10 +531,10 @@ public class RichTextParserTests : PropertyValueConverterTests
 
         var result = parser.Parse($"<p><a href=\"/{{localLink:umb://document/{_contentKey:N}}}{postfix}\"></a></p>");
         Assert.IsTrue(result.Contains($"href=\"/some-content-path{postfix}\""));
-        Assert.IsTrue(result.Contains($"data-content-id=\"{_contentKey:D}\""));
+        Assert.IsTrue(result.Contains($"data-destination-id=\"{_contentKey:D}\""));
         Assert.IsTrue(result.Contains("data-start-item-path=\"the-root-path\""));
         Assert.IsTrue(result.Contains($"data-start-item-id=\"{_contentRootKey:D}\""));
-        Assert.IsTrue(result.Contains("data-content-type=\"document\""));
+        Assert.IsTrue(result.Contains($"data-link-type=\"{LinkType.Content}\""));
     }
 
     [Test]
@@ -543,7 +544,7 @@ public class RichTextParserTests : PropertyValueConverterTests
 
         var result = parser.Parse($"<p><a href=\"/{{localLink:umb://media/{_mediaKey:N}}}\"></a></p>");
         Assert.IsTrue(result.Contains("href=\"/some-media-url\""));
-        Assert.IsTrue(result.Contains("data-content-type=\"media\""));
+        Assert.IsTrue(result.Contains($"data-link-type=\"{LinkType.Media}\""));
 
     }
 
@@ -608,7 +609,7 @@ public class RichTextParserTests : PropertyValueConverterTests
 
         var tagName = $"umb-rte-block{(inlineBlock ? "-inline" : string.Empty)}";
         var result = parser.Parse($"<p><{tagName} data-content-key=\"{id:N}\"><!--Umbraco-Block--></{tagName}></p>");
-        Assert.AreEqual($"<p><{tagName} data-content-id=\"{id:D}\"></{tagName}></p>", result);
+        Assert.AreEqual($"<p><{tagName} data-destination-id=\"{id:D}\"></{tagName}></p>", result);
     }
 
     [Test]
@@ -619,7 +620,7 @@ public class RichTextParserTests : PropertyValueConverterTests
         var id2 = Guid.NewGuid();
 
         var result = parser.Parse($"<p><umb-rte-block-inline data-content-key=\"{id1:D}\"><!--Umbraco-Block--></umb-rte-block-inline></p><umb-rte-block data-content-key=\"{id2:D}\"><!--Umbraco-Block--></umb-rte-block>");
-        Assert.AreEqual($"<p><umb-rte-block-inline data-content-id=\"{id1:D}\"></umb-rte-block-inline></p><umb-rte-block data-content-id=\"{id2:D}\"></umb-rte-block>", result);
+        Assert.AreEqual($"<p><umb-rte-block-inline data-destination-id=\"{id1:D}\"></umb-rte-block-inline></p><umb-rte-block data-destination-id=\"{id2:D}\"></umb-rte-block>", result);
     }
 
     private ApiRichTextElementParser CreateRichTextElementParser()

@@ -145,7 +145,7 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
             type,
             (route, contentId) =>
             {
-                attributes["content-id"] = contentId;
+                attributes["destination-id"] = contentId;
                 attributes["route"] = route;
                 attributes.Remove("href");
             },
@@ -179,7 +179,7 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
             return;
         }
 
-        attributes["content-id"] = key;
+        attributes["destination-id"] = key;
         attributes.Remove(BlockContentKeyAttribute);
     }
 

@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Extensions;
 
@@ -61,17 +62,17 @@ internal sealed class ApiRichTextMarkupParser : ApiRichTextParserBase, IApiRichT
                 (route, contentId) =>
                 {
                     link.SetAttributeValue("href", $"{route.Path}{route.QueryString}");
-                    link.SetAttributeValue("data-content-id", contentId.ToString("D"));
+                    link.SetAttributeValue("data-destination-id", contentId.ToString("D"));
                     link.SetAttributeValue("data-start-item-path", route.StartItem.Path);
                     link.SetAttributeValue("data-start-item-id", route.StartItem.Id.ToString("D"));
                     link.Attributes["type"]?.Remove();
-                    link.SetAttributeValue("data-content-type", Constants.UdiEntityType.Document);
+                    link.SetAttributeValue("data-link-type", nameof(LinkType.Content));
                 },
                 url =>
                 {
                     link.SetAttributeValue("href", url);
                     link.Attributes["type"]?.Remove();
-                    link.SetAttributeValue("data-content-type", Constants.UdiEntityType.Media);
+                    link.SetAttributeValue("data-link-type", nameof(LinkType.Media));
                 },
                 () =>
                 {
@@ -123,7 +124,7 @@ internal sealed class ApiRichTextMarkupParser : ApiRichTextParserBase, IApiRichT
 
             // swap the content UDI for the content ID
             block.Attributes.Remove(BlockContentKeyAttribute);
-            block.SetAttributeValue("data-content-id", key.ToString("D"));
+            block.SetAttributeValue("data-destination-id", key.ToString("D"));
 
             // remove the inner comment placed by the RTE
             block.RemoveAllChildren();
