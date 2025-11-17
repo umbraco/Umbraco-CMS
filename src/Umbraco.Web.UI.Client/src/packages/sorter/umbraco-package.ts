@@ -1,8 +1,8 @@
-export const name = 'Umbraco.Sort';
+export const name = 'Umbraco.Sorter';
 export const extensions = [
 	{
-		name: 'Sort Bundle',
-		alias: 'Umb.Bundle.Sort',
+		name: 'Sorter Bundle',
+		alias: 'Umb.Bundle.Sorter',
 		type: 'bundle',
 		js: () => import('./manifests.js'),
 	},

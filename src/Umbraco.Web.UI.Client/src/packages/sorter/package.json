@@ -1,5 +1,5 @@
 {
-	"name": "@umbraco-backoffice/sort",
+	"name": "@umbraco-backoffice/sorter",
 	"private": true,
 	"type": "module",
 	"scripts": {
