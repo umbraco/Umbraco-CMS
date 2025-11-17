@@ -497,6 +497,7 @@ TODO: [NL] This must return path segments for a query to work
 - Deterministic OpenAPI spec for client generation
 - Faster startup (no runtime generation)
 - Easier versioning (commit changes to spec)
+- Added `OpenAPIContractTest` to test that all operations are exported
 
 ### External Integrations
 None directly in this project. All integrations handled by:
