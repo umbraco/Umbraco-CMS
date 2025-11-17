@@ -82,6 +82,12 @@ export class UmbPickerInputContext<
 	getSelection() {
 		return this.#itemManager.getUniques();
 	}
+	getSelectedItems() {
+		return this.#itemManager.getItems();
+	}
+	getSelectedItemByUnique(unique: string) {
+		return this.#itemManager.getItems().find((item) => item.unique === unique);
+	}
 
 	setSelection(selection: Array<string | null>) {
 		// Note: Currently we do not support picking root item. So we filter out null values:
@@ -111,10 +117,12 @@ export class UmbPickerInputContext<
 		this.getHostElement().dispatchEvent(new UmbChangeEvent());
 	}
 
-	async requestRemoveItem(unique: string) {
-		const item = this.#itemManager.getItems().find((item) => item.unique === unique);
+	protected async _requestItemName(unique: string) {
+		return this.getSelectedItemByUnique(unique)?.name ?? '#general_notFound';
+	}
 
-		const name = item?.name ?? '#general_notFound';
+	async requestRemoveItem(unique: string) {
+		const name = await this._requestItemName(unique);
 		await umbConfirmModal(this, {
 			color: 'danger',
 			headline: `#actions_remove ${name}?`,
