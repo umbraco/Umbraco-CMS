@@ -17,9 +17,18 @@ import type { UmbItemDataResolver } from '@umbraco-cms/backoffice/entity-item';
 
 type UmbDocumentItemDataResolverModel = Omit<UmbDocumentItemModel, 'parent' | 'hasChildren'>;
 
+/**
+ *
+ * @param variants
+ */
 function isVariantsInvariant(variants: Array<{ culture: string | null }>): boolean {
 	return variants?.[0]?.culture === null;
 }
+/**
+ *
+ * @param variants
+ * @param culture
+ */
 function findVariant<T extends { culture: string | null }>(variants: Array<T>, culture: string): T | undefined {
 	return variants.find((x) => x.culture === culture);
 }
