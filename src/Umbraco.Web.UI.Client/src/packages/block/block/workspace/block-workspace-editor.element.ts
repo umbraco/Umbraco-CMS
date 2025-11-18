@@ -2,7 +2,6 @@ import { UMB_BLOCK_WORKSPACE_CONTEXT } from './index.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { customElement, css, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 
 @customElement('umb-block-workspace-editor')
 export class UmbBlockWorkspaceEditorElement extends UmbLitElement {
@@ -11,10 +10,9 @@ export class UmbBlockWorkspaceEditorElement extends UmbLitElement {
 		this.consumeContext(UMB_BLOCK_WORKSPACE_CONTEXT, (context) => {
 			if (context) {
 				this.observe(
-					observeMultiple([context.isNew, context.name]),
-					([isNew, name]) => {
-						this._headline =
-							this.localize.term(isNew ? 'general_add' : 'general_edit') + ' ' + this.localize.string(name);
+					context.name,
+					(name) => {
+						this._headline = this.localize.string(name);
 					},
 					'observeOwnerContentElementTypeName',
 				);

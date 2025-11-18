@@ -269,9 +269,11 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 		// Await one animation frame:
 		await new Promise((resolve) => requestAnimationFrame(() => resolve(true)));
-		const result = this.#labelRender.toString();
-		this.#name.setValue(result);
-		this.view.setTitle(result);
+		const prefix = this.getIsNew() === true ? '#general_add' : '#general_edit';
+		const label = this.#labelRender.toString();
+		const title = `${prefix} ${label}`;
+		this.#name.setValue(title);
+		this.view.setTitle(title);
 	}
 
 	#allowNavigateAway = false;
