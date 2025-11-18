@@ -1,6 +1,5 @@
 import { UMB_BLOCK_WORKSPACE_CONTEXT } from './index.js';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { customElement, css, html, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-block-workspace-editor')
@@ -26,11 +25,10 @@ export class UmbBlockWorkspaceEditorElement extends UmbLitElement {
 	private _headline: string = '';
 
 	override render() {
-		return html`<umb-workspace-editor headline=${this._headline}> </umb-workspace-editor> `;
+		return html`<umb-workspace-editor headline=${this._headline}></umb-workspace-editor>`;
 	}
 
 	static override readonly styles = [
-		UmbTextStyles,
 		css`
 			:host {
 				display: block;
