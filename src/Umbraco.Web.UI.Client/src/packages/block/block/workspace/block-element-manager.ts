@@ -8,7 +8,6 @@ import {
 	UmbClassState,
 	appendToFrozenArray,
 	mergeObservables,
-	observeMultiple,
 } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { type UmbClassInterface, UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
@@ -22,9 +21,8 @@ import {
 } from '@umbraco-cms/backoffice/content';
 import { UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
 import { UmbDataTypeItemRepositoryManager } from '@umbraco-cms/backoffice/data-type';
-import { UmbVariantPropertyGuardManager, type UmbVariantPropertyGuardRule } from '@umbraco-cms/backoffice/property';
+import { UmbVariantPropertyGuardManager } from '@umbraco-cms/backoffice/property';
 import { UmbHintContext, type UmbVariantHint } from '@umbraco-cms/backoffice/hint';
-import { UMB_DOCUMENT_CONFIGURATION_CONTEXT, UMB_DOCUMENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/document';
 
 export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel>
 	extends UmbControllerBase
@@ -114,15 +112,6 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 			},
 			null,
 		);
-
-		this.consumeContext(UMB_DOCUMENT_CONFIGURATION_CONTEXT, async (context) => {
-			const config = await context?.getDocumentConfiguration();
-			const allowEditInvariantFromNonDefault = config?.allowEditInvariantFromNonDefault ?? true;
-
-			if (allowEditInvariantFromNonDefault === false) {
-				this.#preventEditInvariantFromNonDefault();
-			}
-		});
 	}
 
 	public isLoaded() {
@@ -281,43 +270,6 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 	public override destroy(): void {
 		this.structure.destroy();
 		super.destroy();
-	}
-
-	async #preventEditInvariantFromNonDefault() {
-		const documentWorkspaceContext = await this.getContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, {
-			passContextAliasMatches: true,
-		});
-
-		if (!documentWorkspaceContext) {
-			throw new Error('Missing Document Workspace Context');
-		}
-
-		this.observe(
-			observeMultiple([this.structure.contentTypeProperties, documentWorkspaceContext.variantOptions]),
-			([properties, variantOptions]) => {
-				if (properties.length === 0) return;
-				if (variantOptions.length === 0) return;
-
-				variantOptions.forEach((variantOption) => {
-					// Do not add a rule for the default language. It is always permitted to edit.
-					if (variantOption.language.isDefault) return;
-
-					const datasetVariantId = UmbVariantId.CreateFromPartial(variantOption);
-					const invariantVariantId = UmbVariantId.CreateInvariant();
-					const unique = `UMB_PREVENT_EDIT_INVARIANT_FROM_NON_DEFAULT_DATASET=${datasetVariantId.toString()}_PROPERTY_${invariantVariantId.toString()}`;
-
-					const rule: UmbVariantPropertyGuardRule = {
-						unique,
-						message: 'Shared properties can only be edited in the default language',
-						variantId: invariantVariantId,
-						datasetVariantId,
-						permitted: false,
-					};
-
-					this.propertyWriteGuard.addRule(rule);
-				});
-			},
-		);
 	}
 }
 
