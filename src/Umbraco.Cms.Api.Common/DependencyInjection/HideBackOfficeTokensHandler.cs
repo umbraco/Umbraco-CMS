@@ -15,6 +15,7 @@ namespace Umbraco.Cms.Api.Common.DependencyInjection;
 
 internal sealed class HideBackOfficeTokensHandler
     : IOpenIddictServerHandler<OpenIddictServerEvents.ApplyTokenResponseContext>,
+        IOpenIddictServerHandler<OpenIddictServerEvents.ApplyAuthorizationResponseContext>,
         IOpenIddictServerHandler<OpenIddictServerEvents.ExtractTokenRequestContext>,
         IOpenIddictValidationHandler<OpenIddictValidationEvents.ProcessAuthenticationContext>,
         INotificationHandler<UserLogoutSuccessNotification>
@@ -22,6 +23,7 @@ internal sealed class HideBackOfficeTokensHandler
     private const string RedactedTokenValue = "[redacted]";
     private const string AccessTokenCookieKey = "__Host-umbAccessToken";
     private const string RefreshTokenCookieKey = "__Host-umbRefreshToken";
+    private const string PkceCodeCookieKey = "__Host-umbPkceCode";
 
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IDataProtectionProvider _dataProtectionProvider;
@@ -71,6 +73,28 @@ internal sealed class HideBackOfficeTokensHandler
     }
 
     /// <summary>
+    /// This is invoked when a PKCE code is issued to the client. For the back-office client, we will intercept the
+    /// response, write the PKCE code from the response into a HTTP-only cookie, and redact the code from the response,
+    /// so it's not exposed to the client.
+    /// </summary>
+    public ValueTask HandleAsync(OpenIddictServerEvents.ApplyAuthorizationResponseContext context)
+    {
+        if (context.Request?.ClientId is not Constants.OAuthClientIds.BackOffice)
+        {
+            // Only ever handle the back-office client.
+            return ValueTask.CompletedTask;
+        }
+
+        if (context.Response.Code is not null)
+        {
+            SetCookie(GetHttpContext(), PkceCodeCookieKey, context.Response.Code);
+            context.Response.Code = RedactedTokenValue;
+        }
+
+        return ValueTask.CompletedTask;
+    }
+
+    /// <summary>
     /// This is invoked when requesting new tokens.
     /// </summary>
     public ValueTask HandleAsync(OpenIddictServerEvents.ExtractTokenRequestContext context)
@@ -81,7 +105,23 @@ internal sealed class HideBackOfficeTokensHandler
             return ValueTask.CompletedTask;
         }
 
-        // For the back-office client, this only happens when a refresh token is being exchanged for a new access token.
+        // Handle when the PKCE code is being exchanged for an access token.
+        if (context.Request.Code == RedactedTokenValue
+            && TryGetCookie(PkceCodeCookieKey, out var code))
+        {
+            context.Request.Code = code;
+
+            // We won't need the PKCE cookie after this, let's remove it.
+            RemoveCookie(GetHttpContext(), PkceCodeCookieKey);
+        }
+        else
+        {
+            // PCKE codes should always be redacted. If we got here, someone might be trying to pass another PKCE
+            // code. For security reasons, explicitly discard the code (if any) to be on the safe side.
+            context.Request.Code = null;
+        }
+
+        // Handle when a refresh token is being exchanged for a new access token.
         if (context.Request.RefreshToken == RedactedTokenValue
             && TryGetCookie(RefreshTokenCookieKey, out var refreshToken))
         {
@@ -94,7 +134,6 @@ internal sealed class HideBackOfficeTokensHandler
             // reasons, we cannot accept that; at this point, we expect the refresh tokens to be explicitly redacted.
             context.Request.RefreshToken = null;
         }
-
 
         return ValueTask.CompletedTask;
     }
@@ -140,7 +179,15 @@ internal sealed class HideBackOfficeTokensHandler
     {
         var cookieValue = EncryptionHelper.Encrypt(value, _dataProtectionProvider);
 
-        var cookieOptions = new CookieOptions
+        RemoveCookie(httpContext, key);
+        httpContext.Response.Cookies.Append(key, cookieValue, GetCookieOptions(httpContext));
+    }
+
+    private void RemoveCookie(HttpContext httpContext, string key)
+        => httpContext.Response.Cookies.Delete(key, GetCookieOptions(httpContext));
+
+    private CookieOptions GetCookieOptions(HttpContext httpContext) =>
+        new()
         {
             // Prevent the client-side scripts from accessing the cookie.
             HttpOnly = true,
@@ -163,10 +210,6 @@ internal sealed class HideBackOfficeTokensHandler
             // SameSite is configurable (see BackOfficeTokenCookieSettings for defaults):
             SameSite = ParseSameSiteMode(_backOfficeTokenCookieSettings.SameSite),
         };
-
-        httpContext.Response.Cookies.Delete(key, cookieOptions);
-        httpContext.Response.Cookies.Append(key, cookieValue, cookieOptions);
-    }
 
     private bool TryGetCookie(string key, [NotNullWhen(true)] out string? value)
     {

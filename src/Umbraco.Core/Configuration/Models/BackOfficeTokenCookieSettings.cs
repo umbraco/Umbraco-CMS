@@ -9,16 +9,7 @@ namespace Umbraco.Cms.Core.Configuration.Models;
 [Obsolete("This will be replaced with a different authentication scheme. Scheduled for removal in Umbraco 18.")]
 public class BackOfficeTokenCookieSettings
 {
-    private const bool StaticEnabled = false;
-
     private const string StaticSameSite = "Strict";
-
-    /// <summary>
-    ///     Gets or sets a value indicating whether to enable access and refresh tokens in cookies.
-    /// </summary>
-    [DefaultValue(StaticEnabled)]
-    [Obsolete("This is only configurable in Umbraco 16. Scheduled for removal in Umbraco 17.")]
-    public bool Enabled { get; set; } = StaticEnabled;
 
     /// <summary>
     ///     Gets or sets a value indicating whether the cookie SameSite configuration.
