@@ -273,7 +273,11 @@ export class UmbBlockGridEntryContext
 			'observeRowSpanValidation',
 		);
 
-		this.observe(this._manager.sortingMode, (sortingMode) => this.#sortingMode.setValue(sortingMode ?? false));
+		this.observe(
+			this._manager.sortingMode,
+			(sortingMode) => this.#sortingMode.setValue(sortingMode ?? false),
+			'observeSortingMode',
+		);
 	}
 
 	protected override _gotContentType() {}

@@ -1,5 +1,6 @@
-import type { UmbBlockGridValueModel } from '../../../types.js';
-import type { UmbBlockGridPropertyEditorConfig } from '../types.js';
+import { UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../property-editors/block-grid-editor/constants.js';
+import type { UmbBlockGridValueModel } from '../types.js';
+import type { UmbBlockGridPropertyEditorConfig } from '../property-editors/block-grid-editor/types.js';
 import { UmbPasteFromClipboardPropertyAction } from '@umbraco-cms/backoffice/clipboard';
 
 /**
@@ -36,7 +37,8 @@ export class UmbBlockGridPasteFromClipboardPropertyAction extends UmbPasteFromCl
 				})
 				.filter((contentTypeKey) => contentTypeKey !== undefined) ?? [];
 
-		const rootContentKeys = propertyValue.layout['Umbraco.BlockGrid']?.map((block) => block.contentKey) ?? [];
+		const rootContentKeys =
+			propertyValue.layout[UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS]?.map((block) => block.contentKey) ?? [];
 		const rootContentTypeKeys = propertyValue.contentData
 			.filter((content) => rootContentKeys.includes(content.key))
 			.map((content) => content.contentTypeKey);
