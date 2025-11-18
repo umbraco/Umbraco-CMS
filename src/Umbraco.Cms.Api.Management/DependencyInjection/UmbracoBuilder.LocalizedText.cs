@@ -14,7 +14,7 @@ namespace Umbraco.Extensions
     {
 
         /// <summary>
-        /// Adds the supplementary localized texxt file sources from the various physical and virtual locations supported.
+        /// Adds the supplementary localized text file sources from the various physical and virtual locations supported.
         /// </summary>
         private static IUmbracoBuilder AddSupplemenataryLocalizedTextFileSources(this IUmbracoBuilder builder)
         {
