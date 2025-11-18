@@ -85,7 +85,7 @@ public static partial class UmbracoBuilderExtensions
                 })
                 .AddJsonOptions(Constants.JsonOptionsNames.BackOffice, _ => { });
 
-            builder.Services.AddOpenApi(ManagementApiConfiguration.ApiName);
+            builder.Services.AddUmbracoApi<ConfigureUmbracoManagementApiSwaggerGenOptions>(ManagementApiConfiguration.ApiName, ManagementApiConfiguration.ApiTitle);
             builder.Services.ConfigureOptions<ConfigureUmbracoBackofficeJsonOptions>();
 
             // Configures the JSON options for the Open API schema generation (based on the back-office MVC JSON options)
@@ -93,8 +93,6 @@ public static partial class UmbracoBuilderExtensions
 
             // Replaces the internal Microsoft OpenApiSchemaService in order to ensure the correct JSON options are used
             builder.Services.ReplaceOpenApiSchemaService();
-
-            services.ConfigureOptions<ConfigureUmbracoManagementApiSwaggerGenOptions>();
 
             services.Configure<UmbracoPipelineOptions>(options =>
             {

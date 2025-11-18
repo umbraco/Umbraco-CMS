@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi;
+using Swashbuckle.AspNetCore.SwaggerUI;
 using Umbraco.Cms.Api.Management.Extensions;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -8,7 +10,8 @@ namespace Umbraco.Extension.Composers;
 
 public class UmbracoExtensionApiComposer : IComposer
 {
-    public void Compose(IUmbracoBuilder builder) =>
+    public void Compose(IUmbracoBuilder builder)
+    {
         builder.Services.AddOpenApi(
             Constants.ApiName,
             options =>
@@ -27,7 +30,7 @@ public class UmbracoExtensionApiComposer : IComposer
                     document.Info = new OpenApiInfo
                     {
                         Title = "Umbraco ExtensionBackoffice API",
-                        Version = "1.0"
+                        Version = "1.0",
                         // Contact = new OpenApiContact
                         // {
                         //     Name = "Some Developer",
@@ -50,4 +53,9 @@ public class UmbracoExtensionApiComposer : IComposer
                     return Task.CompletedTask;
                 });
             });
+        builder.Services.Configure<SwaggerUIOptions>(options =>
+        {
+            options.SwaggerEndpoint($"/umbraco/swagger/{Constants.ApiName}/swagger.json", "Umbraco Extension Backoffice API");
+        });
+    }
 }

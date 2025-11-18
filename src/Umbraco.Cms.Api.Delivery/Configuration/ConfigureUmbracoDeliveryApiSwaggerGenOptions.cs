@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.OpenApi;
-using Microsoft.OpenApi;
 using Umbraco.Cms.Api.Common.Configuration;
 using Umbraco.Cms.Api.Delivery.Filters.OpenApi;
 
@@ -14,18 +13,19 @@ public class ConfigureUmbracoDeliveryApiSwaggerGenOptions : ConfigureUmbracoOpen
     protected override string ApiName => DeliveryApiConfiguration.ApiName;
 
     /// <inheritdoc />
+    protected override string ApiTitle => DeliveryApiConfiguration.ApiTitle;
+
+    /// <inheritdoc />
+    protected override string ApiVersion => "Latest";
+
+    /// <inheritdoc />
+    protected override string ApiDescription =>
+        $"You can find out more about the {DeliveryApiConfiguration.ApiTitle} in [the documentation]({DeliveryApiConfiguration.ApiDocumentationContentArticleLink}).";
+
+    /// <inheritdoc />
     protected override void ConfigureOpenApi(OpenApiOptions options)
     {
-        options.AddDocumentTransformer((document, _, _) =>
-        {
-            document.Info = new OpenApiInfo
-            {
-                Title = DeliveryApiConfiguration.ApiTitle,
-                Version = "Latest",
-                Description = $"You can find out more about the {DeliveryApiConfiguration.ApiTitle} in [the documentation]({DeliveryApiConfiguration.ApiDocumentationContentArticleLink}).",
-            };
-            return Task.CompletedTask;
-        });
+        base.ConfigureOpenApi(options);
 
         // Add API key security scheme and configure it for all operations
         options
