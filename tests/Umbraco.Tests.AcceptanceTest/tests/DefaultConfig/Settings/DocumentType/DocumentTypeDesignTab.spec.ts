@@ -307,7 +307,7 @@ test('can reorder properties in a document type', async ({umbracoApi, umbracoUi}
   expect(documentTypeData.properties[1].name).toBe(dataTypeName);
 });
 
-test('can reorder tabs in a document type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test('can reorder tabs in a document type', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const secondTabName = 'SecondTab';
