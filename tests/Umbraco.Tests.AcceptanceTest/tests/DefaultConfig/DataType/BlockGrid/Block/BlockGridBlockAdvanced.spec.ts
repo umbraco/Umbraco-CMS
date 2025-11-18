@@ -243,7 +243,7 @@ test('can remove a icon color from a block', async ({umbracoApi, umbracoUi}) => 
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainIconColor(blockGridEditorName, contentElementTypeId, '')).toBeTruthy();
 });
 
-test('can add a thumbnail to a block', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test('can add a thumbnail to a block', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const mediaName = 'TestMedia';
   await umbracoApi.media.ensureNameNotExists(mediaName);
