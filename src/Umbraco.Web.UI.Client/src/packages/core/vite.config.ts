@@ -61,6 +61,7 @@ export default defineConfig({
 			'server/index': './server/index.ts',
 			'search/index': './search/index.ts',
 			'shortcut/index': './shortcut/index.ts',
+			'sorter/index': './sorter/index.ts',
 			'store/index': './store/index.ts',
 			'style/index': './style/index.ts',
 			'temporary-file/index': './temporary-file/index.ts',

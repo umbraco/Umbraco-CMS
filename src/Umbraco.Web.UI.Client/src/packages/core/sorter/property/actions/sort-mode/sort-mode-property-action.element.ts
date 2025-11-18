@@ -1,8 +1,8 @@
+import { UMB_SORT_PROPERTY_CONTEXT } from '../../context/sort.property-context-token.js';
 import type { ManifestPropertyActionSortModeKind } from './types.js';
 import { customElement, html, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_SORT_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/sorter';
 import type { UmbPropertyAction } from '@umbraco-cms/backoffice/property-action';
 import type { UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';
 
