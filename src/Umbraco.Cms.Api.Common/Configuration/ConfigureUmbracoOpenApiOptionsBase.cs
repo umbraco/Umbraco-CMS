@@ -47,8 +47,6 @@ public abstract class ConfigureUmbracoOpenApiOptionsBase : IConfigureNamedOption
 
         options.AddSchemaTransformer<RequireNonNullablePropertiesSchemaTransformer>();
 
-        options.AddDocumentTransformer<MimeTypesTransformer>();
-
         ConfigureOpenApi(options);
     }
 
