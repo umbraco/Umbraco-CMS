@@ -54,6 +54,7 @@ public static class UmbracoBuilderApiExtensions
 
                 var openApiRoute = swaggerPipelineFilter.SwaggerRouteTemplate(sp).Replace("{documentName}", apiName).EnsureStartsWith("/");
                 swaggerUiOptions.SwaggerEndpoint(openApiRoute, apiTitle);
+                swaggerUiOptions.ConfigObject.Urls = swaggerUiOptions.ConfigObject.Urls.OrderBy(x => x.Name);
             });
 
         return services;
