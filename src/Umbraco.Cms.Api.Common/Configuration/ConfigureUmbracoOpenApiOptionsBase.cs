@@ -67,6 +67,7 @@ public abstract class ConfigureUmbracoOpenApiOptionsBase : IConfigureNamedOption
                 Version = ApiVersion,
                 Description = ApiDescription,
             };
+            document.Servers?.Clear();
             return Task.CompletedTask;
         });
 

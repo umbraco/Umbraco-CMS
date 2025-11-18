@@ -5,11 +5,6 @@
     "description": "This shows all APIs available in this version of Umbraco - including all the legacy apis that are available for backward compatibility",
     "version": "Latest"
   },
-  "servers": [
-    {
-      "url": "https://localhost:44339/"
-    }
-  ],
   "paths": {
     "/umbraco/management/api/v1/culture": {
       "get": {
