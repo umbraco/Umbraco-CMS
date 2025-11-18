@@ -2,13 +2,12 @@ import { UMB_DOCUMENT_CONFIGURATION_CONTEXT } from '../global-contexts/index.js'
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../constants.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { observeMultiple, type Observable } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbVariantPropertyGuardRule } from '@umbraco-cms/backoffice/property';
+import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import { UMB_PROPERTY_DATASET_CONTEXT, type UmbVariantPropertyGuardRule } from '@umbraco-cms/backoffice/property';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UMB_BLOCK_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/block';
-import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 
-export class UmbAllowEditInvariantFromNonDefaultController extends UmbControllerBase {
+export class UmbDocumentBlockAllowEditInvariantFromNonDefaultController extends UmbControllerBase {
 	constructor(host: UmbControllerHost) {
 		super(host);
 
@@ -32,21 +31,16 @@ export class UmbAllowEditInvariantFromNonDefaultController extends UmbController
 		}
 
 		const blockWorkspaceContext = await this.getContext(UMB_BLOCK_WORKSPACE_CONTEXT);
-		let contentTypeProperties: Observable<Array<UmbPropertyTypeModel>>;
 
-		// The controller runs on both the Document and Block workspace, but the properties are stored in different places.
-		if (blockWorkspaceContext) {
-			contentTypeProperties = blockWorkspaceContext.content.structure.contentTypeProperties;
-		} else {
-			contentTypeProperties = documentWorkspaceContext.structure.contentTypeProperties;
+		if (!blockWorkspaceContext) {
+			throw new Error('Missing Block Workspace Context');
 		}
 
-		// find the property writeguard based in the workspace context
-		const propertyWriteGuard =
-			blockWorkspaceContext?.content.propertyWriteGuard ?? documentWorkspaceContext.propertyWriteGuard;
-
 		this.observe(
-			observeMultiple([contentTypeProperties, documentWorkspaceContext.variantOptions]),
+			observeMultiple([
+				blockWorkspaceContext.content.structure.contentTypeProperties,
+				documentWorkspaceContext.variantOptions,
+			]),
 			([properties, variantOptions]) => {
 				if (properties.length === 0) return;
 				if (variantOptions.length === 0) return;
@@ -67,11 +61,11 @@ export class UmbAllowEditInvariantFromNonDefaultController extends UmbController
 						permitted: false,
 					};
 
-					propertyWriteGuard.addRule(rule);
+					blockWorkspaceContext?.content.propertyWriteGuard.addRule(rule);
 				});
 			},
 		);
 	}
 }
 
-export { UmbAllowEditInvariantFromNonDefaultController as api };
+export { UmbDocumentBlockAllowEditInvariantFromNonDefaultController as api };

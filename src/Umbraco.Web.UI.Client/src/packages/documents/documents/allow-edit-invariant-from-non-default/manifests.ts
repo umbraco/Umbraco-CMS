@@ -7,7 +7,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'workspaceContext',
 		alias: 'Umb.WorkspaceContext.Document.AllowEditInvariantFromNonDefault',
 		name: 'Allow Edit Invariant From NonDefault Document Controller',
-		api: () => import('./allow-edit-invariant-from-non-default.controller.js'),
+		api: () => import('./document-allow-edit-invariant-from-non-default.controller.js'),
 		conditions: [
 			{
 				alias: UMB_WORKSPACE_CONDITION_ALIAS,
@@ -17,9 +17,9 @@ export const manifests: Array<UmbExtensionManifest> = [
 	},
 	{
 		type: 'workspaceContext',
-		alias: 'Umb.WorkspaceContext.Block.AllowEditInvariantFromNonDefault',
-		name: 'Allow Edit Invariant From NonDefault Block Controller',
-		api: () => import('./allow-edit-invariant-from-non-default.controller.js'),
+		alias: 'Umb.WorkspaceContext.DocumentBlock.AllowEditInvariantFromNonDefault',
+		name: 'Allow Edit Invariant From NonDefault Document Block Controller',
+		api: () => import('./document-block-allow-edit-invariant-from-non-default.controller.js'),
 		conditions: [
 			{
 				alias: UMB_WORKSPACE_CONDITION_ALIAS,
