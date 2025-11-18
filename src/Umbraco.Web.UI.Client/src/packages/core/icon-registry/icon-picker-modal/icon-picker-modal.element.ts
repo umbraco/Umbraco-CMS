@@ -40,12 +40,7 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 			this.observe(context?.approvedIcons, (icons) => {
 				this.#icons = icons;
 				if (this.data?.filter) {
-					this.#icons = this.#icons.filter((icon) => {
-						if (Array.isArray(this.data.filter)) {
-							return this.data.filter.some((f) => icon.name.toLowerCase().startsWith(f.toLowerCase()));
-						}
-						return icon.name.match(new RegExp(this.data.filter, "i"));
-					});
+					this.#icons = this.#icons.filter(this.data?.filter);
 				}
 				this.#filterIcons();
 			});
