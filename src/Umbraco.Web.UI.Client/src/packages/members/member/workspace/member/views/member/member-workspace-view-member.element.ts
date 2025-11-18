@@ -65,7 +65,7 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 		)?.value;
 
 		if (newPassword !== confirmPassword) {
-			this._newPasswordError = 'Passwords do not match';
+			this._newPasswordError = this.localize.term('user_passwordMismatch');
 			return;
 		}
 

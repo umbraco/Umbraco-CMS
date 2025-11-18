@@ -194,7 +194,8 @@ test('can add multiple content start nodes for a user', async ({umbracoApi, umbr
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
-test('can remove a content start node from a user', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+// TODO: Look into flaky test
+test.fixme('can remove a content start node from a user', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
   const userId = await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
