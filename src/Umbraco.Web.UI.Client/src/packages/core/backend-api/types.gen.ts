@@ -3994,8 +3994,10 @@ export type GetDictionaryByIdExportResponses = {
     /**
      * OK
      */
-    200: unknown;
+    200: Blob | File;
 };
+
+export type GetDictionaryByIdExportResponse = GetDictionaryByIdExportResponses[keyof GetDictionaryByIdExportResponses];
 
 export type PutDictionaryByIdMoveData = {
     body: MoveDictionaryRequestModel;
@@ -6624,8 +6626,10 @@ export type GetDocumentTypeByIdExportResponses = {
     /**
      * OK
      */
-    200: unknown;
+    200: Blob | File;
 };
+
+export type GetDocumentTypeByIdExportResponse = GetDocumentTypeByIdExportResponses[keyof GetDocumentTypeByIdExportResponses];
 
 export type PutDocumentTypeByIdImportData = {
     body: ImportDocumentTypeRequestModel;
@@ -9729,8 +9733,10 @@ export type GetMediaTypeByIdExportResponses = {
     /**
      * OK
      */
-    200: unknown;
+    200: Blob | File;
 };
+
+export type GetMediaTypeByIdExportResponse = GetMediaTypeByIdExportResponses[keyof GetMediaTypeByIdExportResponses];
 
 export type PutMediaTypeByIdImportData = {
     body: ImportMediaTypeRequestModel;
@@ -11804,8 +11810,10 @@ export type GetPackageCreatedByIdDownloadResponses = {
     /**
      * OK
      */
-    200: unknown;
+    200: Blob | File;
 };
+
+export type GetPackageCreatedByIdDownloadResponse = GetPackageCreatedByIdDownloadResponses[keyof GetPackageCreatedByIdDownloadResponses];
 
 export type GetPackageMigrationStatusData = {
     body?: never;
@@ -13387,8 +13395,10 @@ export type PostSecurityForgotPasswordResetResponses = {
     /**
      * No Content
      */
-    204: unknown;
+    204: void;
 };
+
+export type PostSecurityForgotPasswordResetResponse = PostSecurityForgotPasswordResetResponses[keyof PostSecurityForgotPasswordResetResponses];
 
 export type PostSecurityForgotPasswordVerifyData = {
     body: VerifyResetPasswordTokenRequestModel;
