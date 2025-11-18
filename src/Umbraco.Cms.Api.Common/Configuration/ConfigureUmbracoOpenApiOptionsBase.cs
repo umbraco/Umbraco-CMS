@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.Extensions.Options;
+using Microsoft.OpenApi;
 using Umbraco.Cms.Api.Common.OpenApi;
 using Umbraco.Extensions;
 
@@ -20,6 +21,21 @@ public abstract class ConfigureUmbracoOpenApiOptionsBase : IConfigureNamedOption
     /// </summary>
     protected abstract string ApiName { get; }
 
+    /// <summary>
+    ///  Gets the name/identifier of the API to configure.
+    /// </summary>
+    protected abstract string ApiTitle { get; }
+
+    /// <summary>
+    ///  Gets the version of the API to configure.
+    /// </summary>
+    protected abstract string ApiVersion { get; }
+
+    /// <summary>
+    ///  Gets the description of the API to configure.
+    /// </summary>
+    protected abstract string ApiDescription { get; }
+
     /// <inheritdoc />
     public void Configure(OpenApiOptions options)
     {
@@ -34,6 +50,27 @@ public abstract class ConfigureUmbracoOpenApiOptionsBase : IConfigureNamedOption
             return;
         }
 
+        ConfigureOpenApi(options);
+    }
+
+    /// <summary>
+    /// Configure the OpenAPI options for the specified API.
+    /// </summary>
+    /// <param name="options">The <see cref="OpenApiOptions"/> instance to configure.</param>
+    protected virtual void ConfigureOpenApi(OpenApiOptions options)
+    {
+        options.AddDocumentTransformer((document, _, _) =>
+        {
+            document.Info = new OpenApiInfo
+            {
+                Title = ApiTitle,
+                Version = ApiVersion,
+                Description = ApiDescription,
+            };
+            document.Servers?.Clear();
+            return Task.CompletedTask;
+        });
+
         options.ShouldInclude = ShouldInclude;
         options.CreateSchemaReferenceId = CreateSchemaReferenceId;
 
@@ -46,17 +83,8 @@ public abstract class ConfigureUmbracoOpenApiOptionsBase : IConfigureNamedOption
             .AddDocumentTransformer<SortTagsAndPathsTransformer>();
 
         options.AddSchemaTransformer<RequireNonNullablePropertiesSchemaTransformer>();
-
-        options.AddDocumentTransformer<MimeTypesTransformer>();
-
-        ConfigureOpenApi(options);
+        options.AddSchemaTransformer<FixFileReturnTypesTransformer>();
     }
-
-    /// <summary>
-    /// Configure the OpenAPI options for the specified API.
-    /// </summary>
-    /// <param name="options">The <see cref="OpenApiOptions"/> instance to configure.</param>
-    protected abstract void ConfigureOpenApi(OpenApiOptions options);
 
     private bool ShouldInclude(ApiDescription apiDescription)
     {

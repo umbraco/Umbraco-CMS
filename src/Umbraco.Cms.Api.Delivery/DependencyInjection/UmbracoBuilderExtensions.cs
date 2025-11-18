@@ -74,8 +74,7 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddTransient<IRequestMemberAccessService, RequestMemberAccessService>();
         builder.Services.AddTransient<ICurrentMemberClaimsProvider, CurrentMemberClaimsProvider>();
 
-        builder.Services.AddOpenApi(DeliveryApiConfiguration.ApiName);
-        builder.Services.ConfigureOptions<ConfigureUmbracoDeliveryApiSwaggerGenOptions>();
+        builder.Services.AddUmbracoApi<ConfigureUmbracoDeliveryApiSwaggerGenOptions>(DeliveryApiConfiguration.ApiName, DeliveryApiConfiguration.ApiTitle);
 
         // Replaces the internal Microsoft OpenApiSchemaService in order to ensure the correct JSON options are used
         builder.Services.ReplaceOpenApiSchemaService();

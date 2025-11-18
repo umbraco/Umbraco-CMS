@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Api.Common.OpenApi;
 /// <summary>
 /// Transforms the OpenAPI document to sort tags and paths alphabetically.
 /// </summary>
-public class SortTagsAndPathsTransformer : IOpenApiDocumentTransformer
+internal class SortTagsAndPathsTransformer : IOpenApiDocumentTransformer
 {
     /// <summary>
     /// Transforms the specified OpenAPI document to sort its tags and paths alphabetically.

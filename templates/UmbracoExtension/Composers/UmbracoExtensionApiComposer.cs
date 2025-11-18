@@ -1,6 +1,8 @@
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi;
-using Umbraco.Cms.Api.Management.OpenApi;
+using Swashbuckle.AspNetCore.SwaggerUI;
+using Umbraco.Cms.Api.Management.Extensions;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
 
@@ -8,7 +10,8 @@ namespace Umbraco.Extension.Composers;
 
 public class UmbracoExtensionApiComposer : IComposer
 {
-    public void Compose(IUmbracoBuilder builder) =>
+    public void Compose(IUmbracoBuilder builder)
+    {
         builder.Services.AddOpenApi(
             Constants.ApiName,
             options =>
@@ -27,7 +30,7 @@ public class UmbracoExtensionApiComposer : IComposer
                     document.Info = new OpenApiInfo
                     {
                         Title = "Umbraco ExtensionBackoffice API",
-                        Version = "1.0"
+                        Version = "1.0",
                         // Contact = new OpenApiContact
                         // {
                         //     Name = "Some Developer",
@@ -39,10 +42,7 @@ public class UmbracoExtensionApiComposer : IComposer
                 });
 
                 // Enable Umbraco authentication for the "Example" Swagger document
-                // PR: https://github.com/umbraco/Umbraco-CMS/pull/15699
-                options
-                    .AddOperationTransformer<BackOfficeSecurityRequirementsTransformer>()
-                    .AddDocumentTransformer<BackOfficeSecurityRequirementsTransformer>();
+                options.AddBackofficeSecurityRequirements();
 
                 // This is used to generate nice operation IDs in our swagger json file
                 // So that the generated TypeScript client has nice method names and not too verbose
@@ -53,4 +53,9 @@ public class UmbracoExtensionApiComposer : IComposer
                     return Task.CompletedTask;
                 });
             });
+        builder.Services.Configure<SwaggerUIOptions>(options =>
+        {
+            options.SwaggerEndpoint($"/umbraco/swagger/{Constants.ApiName}/swagger.json", "Umbraco Extension Backoffice API");
+        });
+    }
 }

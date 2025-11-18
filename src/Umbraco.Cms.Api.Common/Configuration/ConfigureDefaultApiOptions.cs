@@ -1,6 +1,3 @@
-using Microsoft.AspNetCore.OpenApi;
-using Microsoft.OpenApi;
-
 namespace Umbraco.Cms.Api.Common.Configuration;
 
 /// <summary>
@@ -8,19 +5,15 @@ namespace Umbraco.Cms.Api.Common.Configuration;
 /// </summary>
 public class ConfigureDefaultApiOptions : ConfigureUmbracoOpenApiOptionsBase
 {
+    /// <inheritdoc />
     protected override string ApiName => DefaultApiConfiguration.ApiName;
 
-    protected override void ConfigureOpenApi(OpenApiOptions options)
-    {
-        options.AddDocumentTransformer((document, _, _) =>
-        {
-            document.Info = new OpenApiInfo
-            {
-                Title = "Default API",
-                Version = "Latest",
-                Description = "All endpoints not defined under specific APIs",
-            };
-            return Task.CompletedTask;
-        });
-    }
+    /// <inheritdoc />
+    protected override string ApiTitle => "Default API";
+
+    /// <inheritdoc />
+    protected override string ApiVersion => "Latest";
+
+    /// <inheritdoc />
+    protected override string ApiDescription => "All endpoints not defined under specific APIs";
 }

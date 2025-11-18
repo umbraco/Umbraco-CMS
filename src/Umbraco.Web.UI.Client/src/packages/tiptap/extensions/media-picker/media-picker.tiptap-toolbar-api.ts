@@ -2,7 +2,7 @@ import type { Editor, ProseMirrorNode } from '../../externals.js';
 import { NodeSelection } from '../../externals.js';
 import { UmbTiptapToolbarElementApiBase } from '../tiptap-toolbar-element-api-base.js';
 import { getGuidFromUdi, imageSize } from '@umbraco-cms/backoffice/utils';
-import { ImageCropModeModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { ImageCropMode } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbImagingRepository } from '@umbraco-cms/backoffice/imaging';
 import { UMB_MEDIA_CAPTION_ALT_TEXT_MODAL, UMB_MEDIA_PICKER_MODAL } from '@umbraco-cms/backoffice/media';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
@@ -145,7 +145,7 @@ export default class UmbTiptapToolbarMediaPickerToolbarExtensionApi extends UmbT
 		const { data } = await this.#imagingRepository.requestResizedItems([mediaUnique], {
 			width: maxImageSize,
 			height: maxImageSize,
-			mode: ImageCropModeModel.MAX,
+			mode: ImageCropMode.MAX,
 		});
 
 		if (!data?.length || !data[0]?.url) {
