@@ -943,11 +943,6 @@ export type EntityImportAnalysisResponseModel = {
     key?: null | string;
 };
 
-export type EntityTagHeaderValue = {
-    tag: StringSegment;
-    isWeak: boolean;
-};
-
 export enum EventMessageTypeModel {
     DEFAULT = 'Default',
     INFO = 'Info',
@@ -959,15 +954,6 @@ export enum EventMessageTypeModel {
 export type FieldPresentationModel = {
     name: string;
     values: Array<string>;
-};
-
-export type FileContentResult = {
-    fileContents: string;
-    contentType: null | string;
-    fileDownloadName: null | string;
-    lastModified?: null | string;
-    entityTag?: null | EntityTagHeaderValue;
-    enableRangeProcessing: boolean;
 };
 
 export type FileSystemFolderModel = {
@@ -1054,8 +1040,6 @@ export type HelpPageResponseModel = {
     url?: null | string;
     type?: null | string;
 };
-
-export type IFormFile = Blob | File;
 
 export enum ImageCropMode {
     CROP = 'Crop',
@@ -2383,14 +2367,6 @@ export enum StatusResultTypeModel {
     ERROR = 'Error',
     INFO = 'Info'
 }
-
-export type StringSegment = {
-    buffer?: null | string;
-    offset: number;
-    length: number;
-    value?: null | string;
-    hasValue: boolean;
-};
 
 export type StylesheetFolderResponseModel = {
     name: string;
@@ -4018,10 +3994,8 @@ export type GetDictionaryByIdExportResponses = {
     /**
      * OK
      */
-    200: FileContentResult;
+    200: unknown;
 };
-
-export type GetDictionaryByIdExportResponse = GetDictionaryByIdExportResponses[keyof GetDictionaryByIdExportResponses];
 
 export type PutDictionaryByIdMoveData = {
     body: MoveDictionaryRequestModel;
@@ -6650,10 +6624,8 @@ export type GetDocumentTypeByIdExportResponses = {
     /**
      * OK
      */
-    200: FileContentResult;
+    200: unknown;
 };
-
-export type GetDocumentTypeByIdExportResponse = GetDocumentTypeByIdExportResponses[keyof GetDocumentTypeByIdExportResponses];
 
 export type PutDocumentTypeByIdImportData = {
     body: ImportDocumentTypeRequestModel;
@@ -9757,10 +9729,8 @@ export type GetMediaTypeByIdExportResponses = {
     /**
      * OK
      */
-    200: FileContentResult;
+    200: unknown;
 };
-
-export type GetMediaTypeByIdExportResponse = GetMediaTypeByIdExportResponses[keyof GetMediaTypeByIdExportResponses];
 
 export type PutMediaTypeByIdImportData = {
     body: ImportMediaTypeRequestModel;
@@ -11834,10 +11804,8 @@ export type GetPackageCreatedByIdDownloadResponses = {
     /**
      * OK
      */
-    200: FileContentResult;
+    200: unknown;
 };
-
-export type GetPackageCreatedByIdDownloadResponse = GetPackageCreatedByIdDownloadResponses[keyof GetPackageCreatedByIdDownloadResponses];
 
 export type GetPackageMigrationStatusData = {
     body?: never;
@@ -14652,7 +14620,7 @@ export type GetTreeTemplateSiblingsResponse = GetTreeTemplateSiblingsResponses[k
 export type PostTemporaryFileData = {
     body: {
         Id?: string;
-        File?: IFormFile;
+        File?: Blob | File;
     };
     path?: never;
     query?: never;

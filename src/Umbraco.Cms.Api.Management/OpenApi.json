@@ -71,6 +71,16 @@
               "schema": {
                 "$ref": "#/components/schemas/CreateDataTypeRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDataTypeRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDataTypeRequestModel"
+              }
             }
           },
           "required": true
@@ -372,6 +382,16 @@
               "schema": {
                 "$ref": "#/components/schemas/UpdateDataTypeRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDataTypeRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDataTypeRequestModel"
+              }
             }
           },
           "required": true
@@ -493,6 +513,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CopyDataTypeRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CopyDataTypeRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/CopyDataTypeRequestModel"
               }
@@ -660,6 +690,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MoveDataTypeRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MoveDataTypeRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/MoveDataTypeRequestModel"
               }
@@ -840,6 +880,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateFolderRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateFolderRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/CreateFolderRequestModel"
               }
@@ -1141,6 +1191,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateFolderResponseModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateFolderResponseModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/UpdateFolderResponseModel"
               }
@@ -1720,6 +1780,16 @@
               "schema": {
                 "$ref": "#/components/schemas/CreateDictionaryItemRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDictionaryItemRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDictionaryItemRequestModel"
+              }
             }
           },
           "required": true
@@ -2045,6 +2115,16 @@
               "schema": {
                 "$ref": "#/components/schemas/UpdateDictionaryItemRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDictionaryItemRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDictionaryItemRequestModel"
+              }
             }
           },
           "required": true
@@ -2175,11 +2255,13 @@
           "200": {
             "description": "OK",
             "content": {
-              "application/json": {
+              "application/octet-stream": {
                 "schema": {
-                  "$ref": "#/components/schemas/FileContentResult"
+                  "type": "string",
+                  "format": "binary"
                 }
-              }
+              },
+              "application/json": { }
             }
           },
           "404": {
@@ -2226,6 +2308,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MoveDictionaryRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MoveDictionaryRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/MoveDictionaryRequestModel"
               }
@@ -2339,6 +2431,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImportDictionaryRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImportDictionaryRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/ImportDictionaryRequestModel"
               }
@@ -2679,6 +2781,16 @@
               "schema": {
                 "$ref": "#/components/schemas/ValidateUpdateDocumentRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValidateUpdateDocumentRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValidateUpdateDocumentRequestModel"
+              }
             }
           },
           "required": true
@@ -2906,6 +3018,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDocumentRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDocumentRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/CreateDocumentRequestModel"
               }
@@ -3210,6 +3332,16 @@
               "schema": {
                 "$ref": "#/components/schemas/UpdateDocumentRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDocumentRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDocumentRequestModel"
+              }
             }
           },
           "required": true
@@ -3479,6 +3611,16 @@
               "schema": {
                 "$ref": "#/components/schemas/CopyDocumentRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CopyDocumentRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CopyDocumentRequestModel"
+              }
             }
           },
           "required": true
@@ -3644,6 +3786,16 @@
               "schema": {
                 "$ref": "#/components/schemas/UpdateDomainsRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDomainsRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDomainsRequestModel"
+              }
             }
           },
           "required": true
@@ -3789,6 +3941,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MoveDocumentRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MoveDocumentRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/MoveDocumentRequestModel"
               }
@@ -4059,6 +4221,16 @@
               "schema": {
                 "$ref": "#/components/schemas/UpdateDocumentNotificationsRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDocumentNotificationsRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDocumentNotificationsRequestModel"
+              }
             }
           },
           "required": true
@@ -4239,6 +4411,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublicAccessRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublicAccessRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/PublicAccessRequestModel"
               }
@@ -4493,6 +4675,16 @@
               "schema": {
                 "$ref": "#/components/schemas/PublicAccessRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublicAccessRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublicAccessRequestModel"
+              }
             }
           },
           "required": true
@@ -4590,6 +4782,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublishDocumentRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublishDocumentRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/PublishDocumentRequestModel"
               }
@@ -4714,6 +4916,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublishDocumentWithDescendantsRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublishDocumentWithDescendantsRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/PublishDocumentWithDescendantsRequestModel"
               }
@@ -5088,6 +5300,16 @@
               "schema": {
                 "$ref": "#/components/schemas/UnpublishDocumentRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UnpublishDocumentRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UnpublishDocumentRequestModel"
+              }
             }
           },
           "required": true
@@ -5294,6 +5516,16 @@
               "schema": {
                 "$ref": "#/components/schemas/SortingRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SortingRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SortingRequestModel"
+              }
             }
           },
           "required": true
@@ -5451,6 +5683,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDocumentRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDocumentRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/CreateDocumentRequestModel"
               }
@@ -5970,6 +6212,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MoveMediaRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MoveMediaRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/MoveMediaRequestModel"
               }
@@ -6547,6 +6799,16 @@
               "schema": {
                 "$ref": "#/components/schemas/CreateDocumentBlueprintRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDocumentBlueprintRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDocumentBlueprintRequestModel"
+              }
             }
           },
           "required": true
@@ -6848,6 +7110,16 @@
               "schema": {
                 "$ref": "#/components/schemas/UpdateDocumentBlueprintRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDocumentBlueprintRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDocumentBlueprintRequestModel"
+              }
             }
           },
           "required": true
@@ -6969,6 +7241,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MoveDocumentBlueprintRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MoveDocumentBlueprintRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/MoveDocumentBlueprintRequestModel"
               }
@@ -7110,6 +7392,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateFolderRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateFolderRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/CreateFolderRequestModel"
               }
@@ -7414,6 +7706,16 @@
               "schema": {
                 "$ref": "#/components/schemas/UpdateFolderResponseModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateFolderResponseModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateFolderResponseModel"
+              }
             }
           },
           "required": true
@@ -7524,6 +7826,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDocumentBlueprintFromDocumentRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDocumentBlueprintFromDocumentRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/CreateDocumentBlueprintFromDocumentRequestModel"
               }
@@ -7910,6 +8222,16 @@
               "schema": {
                 "$ref": "#/components/schemas/CreateDocumentTypeRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDocumentTypeRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDocumentTypeRequestModel"
+              }
             }
           },
           "required": true
@@ -8184,6 +8506,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDocumentTypeRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDocumentTypeRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/UpdateDocumentTypeRequestModel"
               }
@@ -8524,6 +8856,16 @@
               "schema": {
                 "$ref": "#/components/schemas/CopyDocumentTypeRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CopyDocumentTypeRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CopyDocumentTypeRequestModel"
+              }
             }
           },
           "required": true
@@ -8661,11 +9003,13 @@
           "200": {
             "description": "OK",
             "content": {
-              "application/json": {
+              "application/octet-stream": {
                 "schema": {
-                  "$ref": "#/components/schemas/FileContentResult"
+                  "type": "string",
+                  "format": "binary"
                 }
-              }
+              },
+              "application/json": { }
             }
           },
           "404": {
@@ -8712,6 +9056,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImportDocumentTypeRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImportDocumentTypeRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/ImportDocumentTypeRequestModel"
               }
@@ -8836,6 +9190,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MoveDocumentTypeRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MoveDocumentTypeRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/MoveDocumentTypeRequestModel"
               }
@@ -9003,6 +9367,16 @@
               "schema": {
                 "$ref": "#/components/schemas/DocumentTypeCompositionRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DocumentTypeCompositionRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/DocumentTypeCompositionRequestModel"
+              }
             }
           },
           "required": true
@@ -9103,6 +9477,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateFolderRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateFolderRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/CreateFolderRequestModel"
               }
@@ -9407,6 +9791,16 @@
               "schema": {
                 "$ref": "#/components/schemas/UpdateFolderResponseModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateFolderResponseModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateFolderResponseModel"
+              }
             }
           },
           "required": true
@@ -9517,6 +9911,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImportDocumentTypeRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImportDocumentTypeRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/ImportDocumentTypeRequestModel"
               }
@@ -10380,6 +10784,16 @@
               "schema": {
                 "$ref": "#/components/schemas/DynamicRootRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DynamicRootRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/DynamicRootRequestModel"
+              }
             }
           },
           "required": true
@@ -10675,6 +11089,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HealthCheckActionRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HealthCheckActionRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/HealthCheckActionRequestModel"
               }
@@ -11227,6 +11651,16 @@
               "schema": {
                 "$ref": "#/components/schemas/InstallRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InstallRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/InstallRequestModel"
+              }
             }
           },
           "required": true
@@ -11288,6 +11722,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DatabaseInstallRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DatabaseInstallRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/DatabaseInstallRequestModel"
               }
@@ -11469,6 +11913,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateLanguageRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateLanguageRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/CreateLanguageRequestModel"
               }
@@ -11764,6 +12218,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateLanguageRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateLanguageRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/UpdateLanguageRequestModel"
               }
@@ -12204,6 +12668,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SavedLogSearchRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SavedLogSearchRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/SavedLogSearchRequestModel"
               }
@@ -12844,6 +13318,16 @@
               "schema": {
                 "$ref": "#/components/schemas/CreateMediaRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMediaRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMediaRequestModel"
+              }
             }
           },
           "required": true
@@ -13145,6 +13629,16 @@
               "schema": {
                 "$ref": "#/components/schemas/UpdateMediaRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMediaRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMediaRequestModel"
+              }
             }
           },
           "required": true
@@ -13341,6 +13835,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MoveMediaRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MoveMediaRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/MoveMediaRequestModel"
               }
@@ -13678,6 +14182,16 @@
               "schema": {
                 "$ref": "#/components/schemas/UpdateMediaRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMediaRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMediaRequestModel"
+              }
             }
           },
           "required": true
@@ -13884,6 +14398,16 @@
               "schema": {
                 "$ref": "#/components/schemas/SortingRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SortingRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SortingRequestModel"
+              }
             }
           },
           "required": true
@@ -14041,6 +14565,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMediaRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMediaRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/CreateMediaRequestModel"
               }
@@ -14420,6 +14954,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MoveMediaRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MoveMediaRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/MoveMediaRequestModel"
               }
@@ -15199,6 +15743,16 @@
               "schema": {
                 "$ref": "#/components/schemas/CreateMediaTypeRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMediaTypeRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMediaTypeRequestModel"
+              }
             }
           },
           "required": true
@@ -15476,6 +16030,16 @@
               "schema": {
                 "$ref": "#/components/schemas/UpdateMediaTypeRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMediaTypeRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMediaTypeRequestModel"
+              }
             }
           },
           "required": true
@@ -15743,6 +16307,16 @@
               "schema": {
                 "$ref": "#/components/schemas/CopyMediaTypeRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CopyMediaTypeRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CopyMediaTypeRequestModel"
+              }
             }
           },
           "required": true
@@ -15880,11 +16454,13 @@
           "200": {
             "description": "OK",
             "content": {
-              "application/json": {
+              "application/octet-stream": {
                 "schema": {
-                  "$ref": "#/components/schemas/FileContentResult"
+                  "type": "string",
+                  "format": "binary"
                 }
-              }
+              },
+              "application/json": { }
             }
           },
           "404": {
@@ -15931,6 +16507,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImportMediaTypeRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImportMediaTypeRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/ImportMediaTypeRequestModel"
               }
@@ -16055,6 +16641,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MoveMediaTypeRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MoveMediaTypeRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/MoveMediaTypeRequestModel"
               }
@@ -16222,6 +16818,16 @@
               "schema": {
                 "$ref": "#/components/schemas/MediaTypeCompositionRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MediaTypeCompositionRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/MediaTypeCompositionRequestModel"
+              }
             }
           },
           "required": true
@@ -16322,6 +16928,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateFolderRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateFolderRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/CreateFolderRequestModel"
               }
@@ -16626,6 +17242,16 @@
               "schema": {
                 "$ref": "#/components/schemas/UpdateFolderResponseModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateFolderResponseModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateFolderResponseModel"
+              }
             }
           },
           "required": true
@@ -16736,6 +17362,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImportMediaTypeRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImportMediaTypeRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/ImportMediaTypeRequestModel"
               }
@@ -17324,6 +17960,16 @@
               "schema": {
                 "$ref": "#/components/schemas/CreateMemberRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMemberRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMemberRequestModel"
+              }
             }
           },
           "required": true
@@ -17625,6 +18271,16 @@
               "schema": {
                 "$ref": "#/components/schemas/UpdateMemberRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMemberRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMemberRequestModel"
+              }
             }
           },
           "required": true
@@ -17869,6 +18525,16 @@
               "schema": {
                 "$ref": "#/components/schemas/UpdateMemberRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMemberRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMemberRequestModel"
+              }
             }
           },
           "required": true
@@ -18075,6 +18741,16 @@
               "schema": {
                 "$ref": "#/components/schemas/CreateMemberRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMemberRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMemberRequestModel"
+              }
             }
           },
           "required": true
@@ -18278,6 +18954,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMemberGroupRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMemberGroupRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/CreateMemberGroupRequestModel"
               }
@@ -18554,6 +19240,16 @@
               "schema": {
                 "$ref": "#/components/schemas/UpdateMemberGroupRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMemberGroupRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMemberGroupRequestModel"
+              }
             }
           },
           "required": true
@@ -18814,6 +19510,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMemberTypeRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMemberTypeRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/CreateMemberTypeRequestModel"
               }
@@ -19091,6 +19797,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMemberTypeRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMemberTypeRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/UpdateMemberTypeRequestModel"
               }
@@ -19401,6 +20117,16 @@
               "schema": {
                 "$ref": "#/components/schemas/MemberTypeCompositionRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MemberTypeCompositionRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/MemberTypeCompositionRequestModel"
+              }
             }
           },
           "required": true
@@ -19501,6 +20227,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateFolderRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateFolderRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/CreateFolderRequestModel"
               }
@@ -19802,6 +20538,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateFolderResponseModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateFolderResponseModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/UpdateFolderResponseModel"
               }
@@ -20509,6 +21255,16 @@
               "schema": {
                 "$ref": "#/components/schemas/CreatePackageRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePackageRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePackageRequestModel"
+              }
             }
           },
           "required": true
@@ -20786,6 +21542,16 @@
               "schema": {
                 "$ref": "#/components/schemas/UpdatePackageRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePackageRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePackageRequestModel"
+              }
             }
           },
           "required": true
@@ -20894,11 +21660,19 @@
           "200": {
             "description": "OK",
             "content": {
-              "application/json": {
+              "text/xml": {
                 "schema": {
-                  "$ref": "#/components/schemas/FileContentResult"
+                  "type": "string",
+                  "format": "binary"
                 }
-              }
+              },
+              "application/zip": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "application/json": { }
             }
           },
           "401": {
@@ -21018,6 +21792,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePartialViewRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePartialViewRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/CreatePartialViewRequestModel"
               }
@@ -21319,6 +22103,16 @@
               "schema": {
                 "$ref": "#/components/schemas/UpdatePartialViewRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePartialViewRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePartialViewRequestModel"
+              }
             }
           },
           "required": true
@@ -21439,6 +22233,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RenamePartialViewRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RenamePartialViewRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/RenamePartialViewRequestModel"
               }
@@ -21567,6 +22371,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePartialViewFolderRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePartialViewFolderRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/CreatePartialViewFolderRequestModel"
               }
@@ -22262,6 +23076,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProfilingStatusRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProfilingStatusRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/ProfilingStatusRequestModel"
               }
@@ -23037,6 +23861,16 @@
               "schema": {
                 "$ref": "#/components/schemas/CreateScriptRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateScriptRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateScriptRequestModel"
+              }
             }
           },
           "required": true
@@ -23335,6 +24169,16 @@
               "schema": {
                 "$ref": "#/components/schemas/UpdateScriptRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateScriptRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateScriptRequestModel"
+              }
             }
           },
           "required": true
@@ -23455,6 +24299,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RenameScriptRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RenameScriptRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/RenameScriptRequestModel"
               }
@@ -23583,6 +24437,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateScriptFolderRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateScriptFolderRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/CreateScriptFolderRequestModel"
               }
@@ -24236,6 +25100,16 @@
               "schema": {
                 "$ref": "#/components/schemas/ResetPasswordRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordRequestModel"
+              }
             }
           },
           "required": true
@@ -24322,6 +25196,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordTokenRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordTokenRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/ResetPasswordTokenRequestModel"
               }
@@ -24435,6 +25319,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyResetPasswordTokenRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyResetPasswordTokenRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/VerifyResetPasswordTokenRequestModel"
               }
@@ -24954,6 +25848,16 @@
               "schema": {
                 "$ref": "#/components/schemas/CreateStylesheetRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateStylesheetRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateStylesheetRequestModel"
+              }
             }
           },
           "required": true
@@ -25252,6 +26156,16 @@
               "schema": {
                 "$ref": "#/components/schemas/UpdateStylesheetRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateStylesheetRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateStylesheetRequestModel"
+              }
             }
           },
           "required": true
@@ -25372,6 +26286,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RenameStylesheetRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RenameStylesheetRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/RenameStylesheetRequestModel"
               }
@@ -25500,6 +26424,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateStylesheetFolderRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateStylesheetFolderRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/CreateStylesheetFolderRequestModel"
               }
@@ -26150,6 +27084,16 @@
               "schema": {
                 "$ref": "#/components/schemas/TelemetryRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TelemetryRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/TelemetryRequestModel"
+              }
             }
           },
           "required": true
@@ -26335,6 +27279,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTemplateRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTemplateRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/CreateTemplateRequestModel"
               }
@@ -26639,6 +27593,16 @@
               "schema": {
                 "$ref": "#/components/schemas/UpdateTemplateRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTemplateRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTemplateRequestModel"
+              }
             }
           },
           "required": true
@@ -26780,6 +27744,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TemplateQueryExecuteModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TemplateQueryExecuteModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/TemplateQueryExecuteModel"
               }
@@ -27099,7 +28073,8 @@
                     "format": "uuid"
                   },
                   "File": {
-                    "$ref": "#/components/schemas/IFormFile"
+                    "type": "string",
+                    "format": "binary"
                   }
                 }
               }
@@ -27674,6 +28649,16 @@
               "schema": {
                 "$ref": "#/components/schemas/DeleteUsersRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteUsersRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteUsersRequestModel"
+              }
             }
           },
           "required": true
@@ -27758,6 +28743,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/CreateUserRequestModel"
               }
@@ -28121,6 +29116,16 @@
               "schema": {
                 "$ref": "#/components/schemas/UpdateUserRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserRequestModel"
+              }
             }
           },
           "required": true
@@ -28474,6 +29479,16 @@
               "schema": {
                 "$ref": "#/components/schemas/ChangePasswordUserRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordUserRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordUserRequestModel"
+              }
             }
           },
           "required": true
@@ -28595,6 +29610,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserClientCredentialsRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserClientCredentialsRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/CreateUserClientCredentialsRequestModel"
               }
@@ -29069,6 +30094,16 @@
               "schema": {
                 "$ref": "#/components/schemas/SetAvatarRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetAvatarRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetAvatarRequestModel"
+              }
             }
           },
           "required": true
@@ -29383,6 +30418,16 @@
               "schema": {
                 "$ref": "#/components/schemas/EnableTwoFactorRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnableTwoFactorRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnableTwoFactorRequestModel"
+              }
             }
           },
           "required": true
@@ -29539,6 +30584,16 @@
               "schema": {
                 "$ref": "#/components/schemas/SetAvatarRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetAvatarRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetAvatarRequestModel"
+              }
             }
           },
           "required": true
@@ -29608,6 +30663,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordCurrentUserRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordCurrentUserRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/ChangePasswordCurrentUserRequestModel"
               }
@@ -29901,6 +30966,16 @@
               "schema": {
                 "$ref": "#/components/schemas/DisableUserRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DisableUserRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/DisableUserRequestModel"
+              }
             }
           },
           "required": true
@@ -30014,6 +31089,16 @@
               "schema": {
                 "$ref": "#/components/schemas/EnableUserRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnableUserRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnableUserRequestModel"
+              }
             }
           },
           "required": true
@@ -30124,6 +31209,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InviteUserRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InviteUserRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/InviteUserRequestModel"
               }
@@ -30255,6 +31350,16 @@
               "schema": {
                 "$ref": "#/components/schemas/CreateInitialPasswordUserRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateInitialPasswordUserRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateInitialPasswordUserRequestModel"
+              }
             }
           },
           "required": true
@@ -30340,6 +31445,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResendInviteUserRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResendInviteUserRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/ResendInviteUserRequestModel"
               }
@@ -30456,6 +31571,16 @@
               "schema": {
                 "$ref": "#/components/schemas/VerifyInviteUserRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyInviteUserRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyInviteUserRequestModel"
+              }
             }
           },
           "required": true
@@ -30548,6 +31673,16 @@
               "schema": {
                 "$ref": "#/components/schemas/UpdateUserGroupsOnUserRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserGroupsOnUserRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserGroupsOnUserRequestModel"
+              }
             }
           },
           "required": true
@@ -30610,6 +31745,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UnlockUsersRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UnlockUsersRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/UnlockUsersRequestModel"
               }
@@ -30699,6 +31844,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserDataRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserDataRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/CreateUserDataRequestModel"
               }
@@ -30874,6 +32029,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserDataRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserDataRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/UpdateUserDataRequestModel"
               }
@@ -31236,6 +32401,16 @@
               "schema": {
                 "$ref": "#/components/schemas/DeleteUserGroupsRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteUserGroupsRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteUserGroupsRequestModel"
+              }
             }
           },
           "required": true
@@ -31320,6 +32495,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserGroupRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserGroupRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/CreateUserGroupRequestModel"
               }
@@ -31625,6 +32810,16 @@
               "schema": {
                 "$ref": "#/components/schemas/UpdateUserGroupRequestModel"
               }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserGroupRequestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserGroupRequestModel"
+              }
             }
           },
           "required": true
@@ -31728,6 +32923,22 @@
                   "$ref": "#/components/schemas/ReferenceByIdModel"
                 }
               }
+            },
+            "text/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              }
             }
           },
           "required": true
@@ -31823,6 +33034,22 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "type": "array",
                 "items": {
@@ -32008,6 +33235,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateWebhookRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateWebhookRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/CreateWebhookRequestModel"
               }
@@ -32309,6 +33546,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateWebhookRequestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateWebhookRequestModel"
+              }
+            },
+            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/UpdateWebhookRequestModel"
               }
@@ -36489,21 +37736,6 @@
           }
         }
       },
-      "EntityTagHeaderValue": {
-        "required": [
-          "tag",
-          "isWeak"
-        ],
-        "type": "object",
-        "properties": {
-          "tag": {
-            "$ref": "#/components/schemas/StringSegment"
-          },
-          "isWeak": {
-            "type": "boolean"
-          }
-        }
-      },
       "EventMessageTypeModel": {
         "enum": [
           "Default",
@@ -36528,53 +37760,6 @@
             "items": {
               "type": "string"
             }
-          }
-        }
-      },
-      "FileContentResult": {
-        "required": [
-          "fileContents",
-          "contentType",
-          "fileDownloadName",
-          "enableRangeProcessing"
-        ],
-        "type": "object",
-        "properties": {
-          "fileContents": {
-            "type": "string",
-            "format": "byte"
-          },
-          "contentType": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "fileDownloadName": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "lastModified": {
-            "type": [
-              "null",
-              "string"
-            ],
-            "format": "date-time"
-          },
-          "entityTag": {
-            "oneOf": [
-              {
-                "type": "null"
-              },
-              {
-                "$ref": "#/components/schemas/EntityTagHeaderValue"
-              }
-            ]
-          },
-          "enableRangeProcessing": {
-            "type": "boolean"
           }
         }
       },
@@ -36875,10 +38060,6 @@
             ]
           }
         }
-      },
-      "IFormFile": {
-        "type": "string",
-        "format": "binary"
       },
       "ImageCropMode": {
         "enum": [
@@ -41834,39 +43015,6 @@
           "Error",
           "Info"
         ]
-      },
-      "StringSegment": {
-        "required": [
-          "offset",
-          "length",
-          "hasValue"
-        ],
-        "type": "object",
-        "properties": {
-          "buffer": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "offset": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "length": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "value": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "hasValue": {
-            "type": "boolean"
-          }
-        }
       },
       "StylesheetFolderResponseModel": {
         "required": [
