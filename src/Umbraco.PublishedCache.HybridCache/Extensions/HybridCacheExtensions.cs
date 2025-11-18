@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using AsyncKeyedLock;
 using Microsoft.Extensions.Caching.Hybrid;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache.Extensions;
@@ -10,7 +11,7 @@ internal static class HybridCacheExtensions
 {
     // Per-key semaphores to ensure the GetOrCreateAsync + RemoveAsync sequence
     // executes atomically for a given cache key.
-    private static readonly ConcurrentDictionary<string, SemaphoreSlim> _keyLocks = new();
+    private static readonly AsyncKeyedLocker<string> _keyLocks = new();
 
     /// <summary>
     /// Returns true if the cache contains an item with a matching key.
@@ -45,13 +46,7 @@ internal static class HybridCacheExtensions
     {
         var exists = true;
 
-        // Acquire a per-key semaphore so that GetOrCreateAsync and the possible RemoveAsync
-        // complete without another thread retrieving/creating the same key in-between.
-        SemaphoreSlim sem = _keyLocks.GetOrAdd(key, _ => new SemaphoreSlim(1, 1));
-
-        await sem.WaitAsync().ConfigureAwait(false);
-
-        try
+        using (await _keyLocks.LockAsync(key, token))
         {
             T? result = await cache.GetOrCreateAsync<T?>(
                 key,
@@ -73,17 +68,6 @@ internal static class HybridCacheExtensions
             }
 
             return (exists, result);
-        }
-        finally
-        {
-            sem.Release();
-
-            // Only remove the semaphore mapping if it still points to the same instance we used.
-            // This avoids removing another thread's semaphore or corrupting the map.
-            if (_keyLocks.TryGetValue(key, out SemaphoreSlim? current) && ReferenceEquals(current, sem))
-            {
-                _keyLocks.TryRemove(key, out _);
-            }
         }
     }
 }
