@@ -34,7 +34,7 @@ export class WorkspaceContextNameManipulation extends UmbContextBase {
 // Declare a api export, so Extension Registry can initialize this class:
 export const api = WorkspaceContextNameManipulation;
 
-// Declare a Context Token that other elements can use to request the WorkspaceContextCounter:
+// Declare a Context Token that other elements can use to request the WorkspaceContextNameManipulation:
 export const MANIPULATE_NAME_WORKSPACE_CONTEXT = new UmbContextToken<WorkspaceContextNameManipulation>(
 	'UmbWorkspaceContext',
 	'example.workspaceContext.initialName',
