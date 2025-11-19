@@ -22,13 +22,7 @@ export class UmbDropzoneMediaElement extends UmbInputDropzoneElement {
 	@property({ attribute: 'parent-unique' })
 	parentUnique: string | null = null;
 
-	/**
-	 * Gets the current value of the uploaded items.
-	 * @returns {Array<UmbUploadableItem>} An array of uploadable items.
-	 */
-	public getItems(): Array<UmbUploadableItem> {
-		return this._progressItems;
-	}
+	#dragCounter = 0;
 
 	protected override _manager = new UmbMediaDropzoneManager(this);
 	public progressItems = () => this._manager.progressItems;
@@ -37,12 +31,12 @@ export class UmbDropzoneMediaElement extends UmbInputDropzoneElement {
 	constructor() {
 		super();
 
+		// Safari requires dragover to allow drops
 		document.addEventListener('dragenter', this.#handleDragEnter.bind(this));
 		document.addEventListener('dragleave', this.#handleDragLeave.bind(this));
+		document.addEventListener('dragover', this.#handleDragOver.bind(this));
 		document.addEventListener('drop', this.#handleDrop.bind(this));
 
-		// TODO: Revisit this. I am not sure why it is needed to call these methods here when they are already called in the constructor of the parent class.
-		// If we do not call them here, the observer will use the wrong instance of the dropzone manager (UmbDropZoneManager instead of UmbMediaDropzoneManager).
 		this._observeProgress();
 		this._observeProgressItems();
 	}
@@ -65,6 +59,7 @@ export class UmbDropzoneMediaElement extends UmbInputDropzoneElement {
 		super.disconnectedCallback();
 		document.removeEventListener('dragenter', this.#handleDragEnter.bind(this));
 		document.removeEventListener('dragleave', this.#handleDragLeave.bind(this));
+		document.removeEventListener('dragover', this.#handleDragOver.bind(this));
 		document.removeEventListener('drop', this.#handleDrop.bind(this));
 	}
 
@@ -78,34 +73,45 @@ export class UmbDropzoneMediaElement extends UmbInputDropzoneElement {
 
 	#handleDragEnter(e: DragEvent) {
 		if (this.disabled) return;
-		// Avoid collision with UmbSorterController
-		const types = e.dataTransfer?.types;
-		if (!types?.length || !types?.includes('Files')) return;
 
+		// Normalize types for Safari
+		const types = Array.from(e.dataTransfer?.types || []).map(t => t.toLowerCase());
+		if (!types.includes('files')) return;
+
+		this.#dragCounter++;
 		this.toggleAttribute('dragging', true);
+		e.preventDefault();
 	}
 
-	#handleDragLeave() {
+	#handleDragOver(e: DragEvent) {
+		e.preventDefault();
+	}
+
+	#handleDragLeave(e: DragEvent) {
 		if (this.disabled) return;
-		this.toggleAttribute('dragging', false);
+
+		this.#dragCounter--;
+		if (this.#dragCounter <= 0) {
+			this.toggleAttribute('dragging', false);
+			this.#dragCounter = 0;
+		}
 	}
 
 	#handleDrop(event: DragEvent) {
 		event.preventDefault();
 		if (this.disabled) return;
+
+		this.#dragCounter = 0;
 		this.toggleAttribute('dragging', false);
 	}
 
 	static override styles = [
 		...UmbInputDropzoneElement.styles,
 		css`
-			:host(:not([disabled])[dragging]) #dropzone {
+				:host(:not([disabled])[dragging]) #dropzone {
 				opacity: 1;
 				pointer-events: all;
-			}
 
-			[dropzone] {
-				opacity: 0;
 			}
 
 			#dropzone {
