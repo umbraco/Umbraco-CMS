@@ -36,35 +36,67 @@ export class UmbDocumentBlockAllowEditInvariantFromNonDefaultController extends 
 			throw new Error('Missing Block Workspace Context');
 		}
 
-		this.observe(
-			observeMultiple([
-				blockWorkspaceContext.content.structure.contentTypeProperties,
-				documentWorkspaceContext.variantOptions,
-			]),
-			([properties, variantOptions]) => {
-				if (properties.length === 0) return;
-				if (variantOptions.length === 0) return;
+		const blockOwnerContentType = blockWorkspaceContext.content.structure.getOwnerContentType();
+		const blockVariesByCulture = blockOwnerContentType?.variesByCulture;
 
-				variantOptions.forEach((variantOption) => {
-					// Do not add a rule for the default language. It is always permitted to edit.
-					if (variantOption.language.isDefault) return;
+		const propertyDatasetContext = await this.getContext(UMB_PROPERTY_DATASET_CONTEXT);
 
-					const datasetVariantId = UmbVariantId.CreateFromPartial(variantOption);
-					const invariantVariantId = UmbVariantId.CreateInvariant();
-					const unique = `UMB_PREVENT_EDIT_INVARIANT_FROM_NON_DEFAULT_DATASET=${datasetVariantId.toString()}_PROPERTY_${invariantVariantId.toString()}`;
+		if (!blockWorkspaceContext) {
+			throw new Error('Missing Property Dataset Context');
+		}
 
-					const rule: UmbVariantPropertyGuardRule = {
-						unique,
-						message: 'Shared properties can only be edited in the default language',
-						variantId: invariantVariantId,
-						datasetVariantId,
-						permitted: false,
-					};
+		const datasetVariantId = propertyDatasetContext?.getVariantId();
+		const variantOptions = await this.observe(documentWorkspaceContext.variantOptions).asPromise();
+		const datasetVariantOption = variantOptions.filter((variantOption) => datasetVariantId?.compare(variantOption));
+		const isDatasetDefaultLanguage =
+			datasetVariantOption?.length > 0 ? datasetVariantOption[0].language.isDefault : false;
 
-					blockWorkspaceContext?.content.propertyWriteGuard.addRule(rule);
-				});
-			},
-		);
+		// Prevent editing invariant blocks when editing from the non default language
+		if (blockVariesByCulture === false && isDatasetDefaultLanguage === false) {
+			const datasetVariantId = UmbVariantId.CreateInvariant();
+			const propertyVariantId = UmbVariantId.CreateInvariant();
+			const unique = `UMB_PREVENT_EDIT_INVARIANT_FROM_NON_DEFAULT_DATASET=${datasetVariantId.toString()}_PROPERTY_${propertyVariantId.toString()}`;
+
+			const rule: UmbVariantPropertyGuardRule = {
+				unique,
+				message: 'Shared properties can only be edited in the default language',
+				variantId: propertyVariantId,
+				datasetVariantId,
+				permitted: false,
+			};
+
+			blockWorkspaceContext?.content.propertyWriteGuard.addRule(rule);
+		} else {
+			this.observe(
+				observeMultiple([
+					blockWorkspaceContext.content.structure.contentTypeProperties,
+					documentWorkspaceContext.variantOptions,
+				]),
+				([properties, variantOptions]) => {
+					if (properties.length === 0) return;
+					if (variantOptions.length === 0) return;
+
+					variantOptions.forEach((variantOption) => {
+						// Do not add a rule for the default language. It is always permitted to edit.
+						if (variantOption.language.isDefault) return;
+
+						const datasetVariantId = UmbVariantId.CreateFromPartial(variantOption);
+						const propertyVariantId = UmbVariantId.CreateInvariant();
+						const unique = `UMB_PREVENT_EDIT_INVARIANT_FROM_NON_DEFAULT_DATASET=${datasetVariantId.toString()}_PROPERTY_${propertyVariantId.toString()}`;
+
+						const rule: UmbVariantPropertyGuardRule = {
+							unique,
+							message: 'Shared properties can only be edited in the default language',
+							variantId: propertyVariantId,
+							datasetVariantId,
+							permitted: false,
+						};
+
+						blockWorkspaceContext?.content.propertyWriteGuard.addRule(rule);
+					});
+				},
+			);
+		}
 	}
 }
 
