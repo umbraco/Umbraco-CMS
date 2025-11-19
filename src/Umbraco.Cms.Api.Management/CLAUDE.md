@@ -334,11 +334,6 @@ if (requestModel.Parent == null)
     return BadRequest(new ProblemDetailsBuilder()...);
 ```
 
-### Data Access Security
-**SQL Injection Prevention**:
-- All data access via EF Core (parameterized queries)
-- No raw SQL in this project
-
 ### API Security
 **CORS** - Configured in Umbraco.Web.UI (not this project)
 
@@ -505,7 +500,7 @@ None directly in this project. All integrations handled by:
 
 ### Known Limitations
 
-1. **API Versioning**: Currently only v1.0
+1. **API Versioning**: Currently v1.0 and v1.1
    - Future versions will require new controller classes or action methods
 
 2. **Batch Operations**: Limited batch endpoint support

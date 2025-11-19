@@ -1,6 +1,6 @@
 # Umbraco CMS - Multi-Project Repository
 
-Enterprise-grade headless CMS built on .NET 10.0. This repository contains 21 production projects organized in a layered architecture with clear separation of concerns.
+Enterprise-grade CMS built on .NET 10.0. This repository contains 21 production projects organized in a layered architecture with clear separation of concerns.
 
 **Repository**: https://github.com/umbraco/Umbraco-CMS
 **License**: MIT
@@ -143,8 +143,6 @@ Web.UI → Web.Common → Infrastructure → Core
 
 - **Main branch**: `main` (protected)
 - **Branch naming**:
-  - Features: `feature/description` or `contrib/username/description`
-  - Bug fixes: `bugfix/description` or `fix/issue-number`
   - See `.github/CONTRIBUTING.md` for full guidelines
 
 ### Pull Request Process
@@ -241,20 +239,23 @@ Project ownership is distributed across teams. Check individual project director
 - `.editorconfig` - Code style rules
 - `.globalconfig` - Roslyn analyzer rules
 
-### Migration from Legacy to EF Core
+### Persistence Layer - NPoco and EF Core
 
-The repository contains BOTH:
-- **Legacy**: NPoco-based persistence (`Umbraco.Cms.Persistence.Sqlite`, `Umbraco.Cms.Persistence.SqlServer`)
-- **Modern**: EF Core-based persistence (`Umbraco.Cms.Persistence.EFCore.*`)
+The repository contains BOTH (actively supported):
+- **Current**: NPoco-based persistence (`Umbraco.Cms.Persistence.Sqlite`, `Umbraco.Cms.Persistence.SqlServer`) - widely used and fully supported
+- **Future**: EF Core-based persistence (`Umbraco.Cms.Persistence.EFCore.*`) - migration in progress
 
-**Recommendation**: New development should use EF Core projects.
+**Note**: The codebase is actively migrating to EF Core, but NPoco remains the primary persistence layer and is not deprecated. Both are fully supported.
 
 ### Authentication: OpenIddict
 
 All APIs use **OpenIddict** (OAuth 2.0/OpenID Connect):
 - Reference tokens (not JWT) for better security
+- **Secure cookie-based token storage** (v17+) - tokens stored in HTTP-only cookies with `__Host-` prefix
+- Tokens are redacted from client-side responses and passed via secure cookies only
 - ASP.NET Core Data Protection for token encryption
 - Configured in `Umbraco.Cms.Api.Common`
+- API requests must include credentials (`credentials: include` for fetch)
 
 **Load Balancing Requirement**: All servers must share the same Data Protection key ring.
 
@@ -276,7 +277,7 @@ APIs use `Asp.Versioning.Mvc`:
 
 1. **Circular Dependencies**: Avoided via `Lazy<T>` or event notifications
 2. **Multi-Server**: Requires shared Data Protection key ring and synchronized clocks (NTP)
-3. **Database Support**: SQL Server, SQLite (MySQL/PostgreSQL via community packages)
+3. **Database Support**: SQL Server, SQLite
 
 ---
 
@@ -332,7 +333,7 @@ For detailed information about individual projects, see their CLAUDE.md files:
 - **Official Docs**: https://docs.umbraco.com/
 - **Contributing Guide**: `.github/CONTRIBUTING.md`
 - **Issues**: https://github.com/umbraco/Umbraco-CMS/issues
-- **Community**: https://our.umbraco.com/
+- **Community**: https://forum.umbraco.com/
 
 ---
 
