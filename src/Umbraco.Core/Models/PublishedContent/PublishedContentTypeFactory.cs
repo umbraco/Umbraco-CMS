@@ -66,6 +66,22 @@ public class PublishedContentTypeFactory : IPublishedContentTypeFactory
     }
 
     /// <inheritdoc />
+    public void ClearDataTypeCache()
+    {
+        if (_publishedDataTypes is null)
+        {
+            // Not initialized yet, so skip and avoid lock
+            return;
+        }
+
+        lock (_publishedDataTypesLocker)
+        {
+            // Clear cache (and let it lazy initialize again later)
+            _publishedDataTypes = null;
+        }
+    }
+
+    /// <inheritdoc />
     public void NotifyDataTypeChanges(params int[] ids)
     {
         if (_publishedDataTypes is null)

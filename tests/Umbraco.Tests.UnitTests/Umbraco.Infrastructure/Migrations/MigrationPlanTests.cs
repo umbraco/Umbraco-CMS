@@ -12,6 +12,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
@@ -85,7 +86,8 @@ public class MigrationPlanTests
             distributedCache,
             Mock.Of<IKeyValueService>(),
             Mock.Of<IServiceScopeFactory>(),
-            appCaches);
+            appCaches,
+            Mock.Of<IPublishedContentTypeFactory>());
 
         var plan = new MigrationPlan("default")
             .From(string.Empty)
