@@ -16,9 +16,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Extensions;
 public class UdiGetterExtensionsTests
 {
     [TestCase(Constants.ObjectTypes.Strings.DataType, "6ad82c70-685c-4e04-9b36-d81bd779d16f", "umb://data-type-container/6ad82c70685c4e049b36d81bd779d16f")]
+    [TestCase(Constants.ObjectTypes.Strings.DocumentBlueprint, "6ad82c70-685c-4e04-9b36-d81bd779d16f", "umb://document-blueprint-container/6ad82c70685c4e049b36d81bd779d16f")]
     [TestCase(Constants.ObjectTypes.Strings.DocumentType, "6ad82c70-685c-4e04-9b36-d81bd779d16f", "umb://document-type-container/6ad82c70685c4e049b36d81bd779d16f")]
     [TestCase(Constants.ObjectTypes.Strings.MediaType, "6ad82c70-685c-4e04-9b36-d81bd779d16f", "umb://media-type-container/6ad82c70685c4e049b36d81bd779d16f")]
-    [TestCase(Constants.ObjectTypes.Strings.DocumentBlueprint, "6ad82c70-685c-4e04-9b36-d81bd779d16f", "umb://document-blueprint-container/6ad82c70685c4e049b36d81bd779d16f")]
+    [TestCase(Constants.ObjectTypes.Strings.MemberType, "6ad82c70-685c-4e04-9b36-d81bd779d16f", "umb://member-type-container/6ad82c70685c4e049b36d81bd779d16f")]
     public void GetUdiForEntityContainer(Guid containedObjectType, Guid key, string expected)
     {
         EntityContainer entity = new EntityContainer(containedObjectType)
