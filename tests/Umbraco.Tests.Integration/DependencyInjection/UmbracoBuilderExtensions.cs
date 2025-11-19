@@ -125,17 +125,10 @@ public static class UmbracoBuilderExtensions
 
                 if (!currFolder.Exists)
                 {
-                    currFolder = new DirectoryInfo(Path.GetTempPath());
+                    var tempPath = Path.GetTempPath();
+                    currFolder = new DirectoryInfo(Path.GetFullPath("Umbraco.Integration.Tests.Fake.SrcRoot", tempPath));
+                    currFolder.Create();
                 }
-
-                var uiProject = currFolder.GetDirectories("Umbraco.Web.UI", SearchOption.TopDirectoryOnly).FirstOrDefault();
-                if (uiProject == null)
-                {
-                    uiProject = new DirectoryInfo(Path.Combine(Path.GetTempPath(), "Umbraco.Web.UI"));
-                    uiProject.Create();
-                }
-
-                var mainLangFolder = new DirectoryInfo(Path.Combine(uiProject.FullName, Constants.System.DefaultUmbracoPath.TrimStart(Constants.CharArrays.TildeForwardSlash), "config", "lang"));
 
                 return new LocalizedTextServiceFileSources(
                     loggerFactory.CreateLogger<LocalizedTextServiceFileSources>(),
