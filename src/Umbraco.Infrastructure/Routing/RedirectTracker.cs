@@ -65,8 +65,8 @@ internal sealed class RedirectTracker : IRedirectTracker
             .FirstOrDefault(a => a.Cultures.Any())?.Cultures.Keys.ToArray() ?? []);
 
         // Get the domains assigned to the content item again by looking up the tree (default to null).
-        var domainRootId = new Lazy<int?>(() => entityContent.AncestorsOrSelf(_navigationQueryService, _publishedContentStatusFilteringService)
-            .FirstOrDefault(a => _domainCache.HasAssigned(a.Id, includeWildcards: true))?.Id);
+        var domainRootId = new Lazy<int>(() => entityContent.Path.Split(',').Select(int.Parse).Reverse()
+            .FirstOrDefault(x => _domainCache.HasAssigned(x, includeWildcards: true)));
 
         // Get all language ISO codes (in case we're dealing with invariant content with variant ancestors)
         var languageIsoCodes = new Lazy<string[]>(() => [.. _languageService.GetAllIsoCodesAsync().GetAwaiter().GetResult()]);
@@ -114,10 +114,10 @@ internal sealed class RedirectTracker : IRedirectTracker
         IPublishedContent publishedContent,
         string culture,
         string route,
-        int? domainRootId)
+        int domainRootId)
     {
         // Prepend the Id of the node with the associated domain to the route if there is one assigned.
-        if (domainRootId.HasValue)
+        if (domainRootId > 0)
         {
             route = domainRootId + route;
         }
