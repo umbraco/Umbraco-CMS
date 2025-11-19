@@ -129,17 +129,22 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
         rootContent.SetupGet(c => c.Id).Returns(_rootPage.Id);
         rootContent.SetupGet(c => c.Key).Returns(_rootPage.Key);
         rootContent.SetupGet(c => c.Name).Returns(_rootPage.Name);
+        rootContent.SetupGet(c => c.Path).Returns(_rootPage.Path);
 
         var content = new Mock<IPublishedContent>();
         content.SetupGet(c => c.Id).Returns(_testPage.Id);
         content.SetupGet(c => c.Key).Returns(_testPage.Key);
+        content.SetupGet(c => c.Name).Returns(_testPage.Name);
+        content.SetupGet(c => c.Path).Returns(_testPage.Path);
         content.SetupGet(c => c.ContentType).Returns(contentType.Object);
         content.SetupGet(c => c.Cultures).Returns(cultures);
-        content.SetupGet(c => c.Name).Returns(_testPage.Name);
 
         IPublishedContentCache contentCache = Mock.Of<IPublishedContentCache>();
         Mock.Get(contentCache)
             .Setup(x => x.GetById(_testPage.Id))
+            .Returns(content.Object);
+        Mock.Get(contentCache)
+            .Setup(x => x.GetById(_testPage.Key))
             .Returns(content.Object);
 
         IPublishedUrlProvider publishedUrlProvider = Mock.Of<IPublishedUrlProvider>();
