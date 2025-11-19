@@ -64,7 +64,7 @@ internal sealed class RedirectTracker : IRedirectTracker
         var defaultCultures = new Lazy<string[]>(() => entityContent.AncestorsOrSelf(_navigationQueryService, _publishedContentStatusFilteringService)
             .FirstOrDefault(a => a.Cultures.Any())?.Cultures.Keys.ToArray() ?? []);
 
-        // Get the domains assigned to the content item again by looking up the tree (default to null).
+        // Get the domains assigned to the content item again by looking up the tree (default to 0).
         var domainRootId = new Lazy<int>(() => entityContent.Path.Split(',').Select(int.Parse).Reverse()
             .FirstOrDefault(x => _domainCache.HasAssigned(x, includeWildcards: true)));
 
