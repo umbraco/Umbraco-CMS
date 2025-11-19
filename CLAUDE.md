@@ -334,6 +334,7 @@ For detailed information about individual projects, see their CLAUDE.md files:
 - **Contributing Guide**: `.github/CONTRIBUTING.md`
 - **Issues**: https://github.com/umbraco/Umbraco-CMS/issues
 - **Community**: https://forum.umbraco.com/
+- **Releases**: https://releases.umbraco.com/
 
 ---
 

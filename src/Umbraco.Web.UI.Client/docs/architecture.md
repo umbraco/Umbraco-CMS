@@ -20,7 +20,7 @@
 
 ### Application Type
 
-Single-page web application (SPA) packaged as an npm library. Provides:
+Single-page web application (SPA) packaged as an npm library called `@umbraco-cms/backoffice` for typings and built as a bundle, which is copied over to `src/Umbraco.Cms.StaticAssets/wwwroot/umbraco/backoffice` for the CMS. Provides:
 - Extensible Web Components for CMS backoffice UI
 - API libraries for extension development
 - TypeScript type definitions
