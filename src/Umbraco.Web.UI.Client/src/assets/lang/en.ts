@@ -2248,7 +2248,6 @@ export default {
 		allowedExtensions: 'Allowed extensions are:',
 		aliasInvalidFormat: 'Special characters are not allowed in alias',
 		disallowedExtensions: 'Disallowed extensions are:',
-		maxlength: 'Maximum %0% characters, %1% too many.',
 	},
 	healthcheck: {
 		checkSuccessMessage: "Value is set to the recommended value: '%0%'.",
