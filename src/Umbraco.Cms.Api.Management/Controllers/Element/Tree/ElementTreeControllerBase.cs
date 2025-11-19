@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Controllers.Tree;
+using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
@@ -17,10 +18,14 @@ namespace Umbraco.Cms.Api.Management.Controllers.Element.Tree;
 public class ElementTreeControllerBase : FolderTreeControllerBase<ElementTreeItemResponseModel>
 {
     private readonly IUmbracoMapper _umbracoMapper;
+    private readonly IElementPresentationFactory _elementPresentationFactory;
 
-    public ElementTreeControllerBase(IEntityService entityService, IUmbracoMapper umbracoMapper)
+    public ElementTreeControllerBase(IEntityService entityService, IUmbracoMapper umbracoMapper, IElementPresentationFactory elementPresentationFactory)
         : base(entityService)
-        => _umbracoMapper = umbracoMapper;
+    {
+        _umbracoMapper = umbracoMapper;
+        _elementPresentationFactory = elementPresentationFactory;
+    }
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.Element;
 
@@ -41,10 +46,11 @@ public class ElementTreeControllerBase : FolderTreeControllerBase<ElementTreeIte
         => entities.Select(entity =>
         {
             ElementTreeItemResponseModel responseModel = MapTreeItemViewModel(parentKey, entity);
-            if (entity is IContentEntitySlim contentEntitySlim)
+            if (entity is IElementEntitySlim elementEntitySlim)
             {
-                responseModel.HasChildren = entity.HasChildren;
-                responseModel.ElementType = _umbracoMapper.Map<DocumentTypeReferenceResponseModel>(contentEntitySlim)!;
+                responseModel.HasChildren = false;
+                responseModel.ElementType = _umbracoMapper.Map<DocumentTypeReferenceResponseModel>(elementEntitySlim)!;
+                responseModel.Variants = _elementPresentationFactory.CreateVariantsItemResponseModels(elementEntitySlim);
             }
 
             return responseModel;

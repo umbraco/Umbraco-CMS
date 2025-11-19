@@ -106,6 +106,7 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         EntitySlim[] entities = dtos.Select(BuildEntity).ToArray();
 
         BuildVariants(entities.OfType<DocumentEntitySlim>());
+        BuildVariants(entities.OfType<ElementEntitySlim>());
 
         return entities;
     }
@@ -1016,7 +1017,7 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
     /// <summary>
     ///     The DTO used to fetch results for a generic content item which could be either a document, media or a member
     /// </summary>
-    private sealed class GenericContentEntityDto : DocumentEntityDto
+    private sealed class GenericContentEntityDto : PublishableEntityDto
     {
         public string? MediaPath { get; set; }
     }
@@ -1024,24 +1025,15 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
     /// <summary>
     ///     The DTO used to fetch results for a document item with its variation info
     /// </summary>
-    private class DocumentEntityDto : BaseDto
+    private class DocumentEntityDto : PublishableEntityDto
     {
-        public ContentVariation Variations { get; set; }
-
-        public bool Published { get; set; }
-        public bool Edited { get; set; }
     }
 
     /// <summary>
     ///     The DTO used to fetch results for an element item with its variation info
     /// </summary>
-    private class ElementEntityDto : BaseDto
+    private class ElementEntityDto : PublishableEntityDto
     {
-        public ContentVariation Variations { get; set; }
-
-        public bool Published { get; set; }
-
-        public bool Edited { get; set; }
     }
 
     /// <summary>
@@ -1057,6 +1049,15 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
     /// </summary>
     private sealed class MemberEntityDto : BaseDto
     {
+    }
+
+    private abstract class PublishableEntityDto : BaseDto
+    {
+        public ContentVariation Variations { get; set; }
+
+        public bool Published { get; set; }
+
+        public bool Edited { get; set; }
     }
 
     private class VariantInfoDto
@@ -1129,6 +1130,11 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
             return BuildMemberEntity(dto);
         }
 
+        if (dto.NodeObjectType == Constants.ObjectTypes.Element)
+        {
+            return BuildElementEntity(dto);
+        }
+
         // EntitySlim does not track changes
         var entity = new EntitySlim();
         BuildEntity(entity, dto);
@@ -1188,7 +1194,7 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         var entity = new DocumentEntitySlim();
         BuildContentEntity(entity, dto);
 
-        if (dto is DocumentEntityDto contentDto)
+        if (dto is PublishableEntityDto contentDto)
         {
             // fill in the invariant info
             entity.Edited = contentDto.Edited;
@@ -1205,7 +1211,7 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         var entity = new ElementEntitySlim();
         BuildContentEntity(entity, dto);
 
-        if (dto is ElementEntityDto contentDto)
+        if (dto is PublishableEntityDto contentDto)
         {
             // fill in the invariant info
             entity.Edited = contentDto.Edited;
