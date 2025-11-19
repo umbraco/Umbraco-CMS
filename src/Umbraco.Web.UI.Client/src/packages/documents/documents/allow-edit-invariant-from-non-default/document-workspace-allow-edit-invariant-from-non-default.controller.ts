@@ -28,16 +28,7 @@ export class UmbDocumentWorkspaceAllowEditInvariantFromNonDefaultController exte
 					if (variantOption.language.isDefault) return;
 
 					const datasetVariantId = UmbVariantId.CreateFromPartial(variantOption);
-					const invariantVariantId = UmbVariantId.CreateInvariant();
-					const unique = `UMB_PREVENT_EDIT_INVARIANT_FROM_NON_DEFAULT_DATASET=${datasetVariantId.toString()}_PROPERTY_${invariantVariantId.toString()}`;
-
-					const rule: UmbVariantPropertyGuardRule = {
-						unique,
-						message: 'Shared properties can only be edited in the default language',
-						variantId: invariantVariantId,
-						datasetVariantId,
-						permitted: false,
-					};
+					const rule: UmbVariantPropertyGuardRule = this._createRule({ datasetVariantId });
 
 					documentWorkspaceContext.propertyWriteGuard.addRule(rule);
 				});
