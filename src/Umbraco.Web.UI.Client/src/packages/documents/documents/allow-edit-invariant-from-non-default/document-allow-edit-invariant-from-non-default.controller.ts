@@ -2,11 +2,9 @@ import { UMB_DOCUMENT_CONFIGURATION_CONTEXT } from '../global-contexts/index.js'
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../constants.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { observeMultiple, type Observable } from '@umbraco-cms/backoffice/observable-api';
+import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbVariantPropertyGuardRule } from '@umbraco-cms/backoffice/property';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import { UMB_BLOCK_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/block';
-import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 
 export class UmbDocumentAllowEditInvariantFromNonDefaultController extends UmbControllerBase {
 	constructor(host: UmbControllerHost) {
