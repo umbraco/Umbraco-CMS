@@ -17,7 +17,7 @@ export class WorkspaceContextNameManipulation extends UmbContextBase {
 				const isNew = workspace?.getIsNew() ?? false;
 				if (isNew) {
 					// Set the name if it's already empty (We do not want to overwrite if it's a Blueprint)
-					// Notice we can but a ! on the workspace, if the Document is new, then we also know we have a workspace.
+					// Notice we can put a ! on the workspace, if the Document is new, then we also know we have a workspace.
 					// Notice we need to provide a Variant-ID to getName, as Document names are variant specific. Here we get the Invariant name — this will need to be extended if you are looking to support multiple variants.
 					const variantId = UmbVariantId.CreateInvariant();
 					const name = workspace!.getName(variantId);
