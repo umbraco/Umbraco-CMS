@@ -72,8 +72,8 @@ public class RteBlockRenderingValueConverter : SimpleRichTextValueConverter, IDe
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType) =>
 
         // because that version of RTE converter parses {locallink} and renders blocks, its value has
-        // to be cached at the published snapshot level, because we have no idea what the block renderings may depend on actually.
-        PropertyCacheLevel.Snapshot;
+        // to be re-rendered at request time, because we have no idea what the block renderings may depend on actually.
+        PropertyCacheLevel.None;
 
     /// <inheritdoc />
     public override bool? IsValue(object? value, PropertyValueLevel level)
@@ -118,7 +118,7 @@ public class RteBlockRenderingValueConverter : SimpleRichTextValueConverter, IDe
 
     public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => PropertyCacheLevel.Elements;
 
-    public PropertyCacheLevel GetDeliveryApiPropertyCacheLevelForExpansion(IPublishedPropertyType propertyType) => PropertyCacheLevel.Snapshot;
+    public PropertyCacheLevel GetDeliveryApiPropertyCacheLevelForExpansion(IPublishedPropertyType propertyType) => PropertyCacheLevel.None;
 
     public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType)
         => _deliveryApiSettings.RichTextOutputAsJson
