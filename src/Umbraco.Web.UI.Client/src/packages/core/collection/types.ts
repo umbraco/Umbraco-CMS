@@ -20,6 +20,7 @@ export interface UmbCollectionConfiguration {
 	pageSize?: number;
 	noItemsLabel?: string;
 	userDefinedProperties?: Array<UmbCollectionColumnConfiguration>;
+	selectionConfiguration?: UmbCollectionSelectionConfiguration;
 }
 
 export interface UmbCollectionColumnConfiguration {

@@ -102,10 +102,14 @@ export class UmbCollectionItemPickerModalElement extends UmbModalBaseElement<
 
 	override render() {
 		return html`
-			<umb-body-layout headline=${this.localize.term('general_choose')}>
-				<uui-box> ${this.#renderSearch()} ${this.#renderCollection()}</uui-box>
-				${this.#renderActions()}
-			</umb-body-layout>
+			${this.data?.collection.alias
+				? html` <umb-body-layout headline=${this.localize.term('general_choose')} main-no-padding>
+						${this.#renderCollection()} ${this.#renderActions()}
+					</umb-body-layout>`
+				: html` <umb-body-layout headline=${this.localize.term('general_choose')}>
+						<uui-box> ${this.#renderSearch()} ${this.#renderCollectionMenu()}</uui-box>
+						${this.#renderActions()}
+					</umb-body-layout>`}
 		`;
 	}
 
@@ -120,6 +124,18 @@ export class UmbCollectionItemPickerModalElement extends UmbModalBaseElement<
 	}
 
 	#renderCollection() {
+		return html`
+			<umb-collection
+				alias=${this.data?.collection.alias}
+				.config=${{
+					selectionConfiguration: this._selectionConfiguration,
+				}}
+				@selected=${this.#onItemSelected}
+				@deselected=${this.#onItemDeselected}></umb-collection>
+		`;
+	}
+
+	#renderCollectionMenu() {
 		if (this._searchQuery) {
 			return nothing;
 		}
