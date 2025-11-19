@@ -25,6 +25,7 @@ internal sealed class RedirectTracker : IRedirectTracker
     private readonly ILogger<RedirectTracker> _logger;
     private readonly IPublishedUrlProvider _publishedUrlProvider;
     private readonly IPublishedContentStatusFilteringService _publishedContentStatusFilteringService;
+    private readonly IDomainCache _domainCache;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RedirectTracker"/> class.
@@ -36,7 +37,8 @@ internal sealed class RedirectTracker : IRedirectTracker
         IDocumentNavigationQueryService navigationQueryService,
         ILogger<RedirectTracker> logger,
         IPublishedUrlProvider publishedUrlProvider,
-        IPublishedContentStatusFilteringService publishedContentStatusFilteringService)
+        IPublishedContentStatusFilteringService publishedContentStatusFilteringService,
+        IDomainCache domainCache)
     {
         _languageService = languageService;
         _redirectUrlService = redirectUrlService;
@@ -45,6 +47,7 @@ internal sealed class RedirectTracker : IRedirectTracker
         _logger = logger;
         _publishedUrlProvider = publishedUrlProvider;
         _publishedContentStatusFilteringService = publishedContentStatusFilteringService;
+        _domainCache = domainCache;
     }
 
     /// <inheritdoc/>
@@ -56,11 +59,16 @@ internal sealed class RedirectTracker : IRedirectTracker
             return;
         }
 
-        // Get the default affected cultures by going up the tree until we find the first culture variant entity (default to no cultures)
-        var defaultCultures = new Lazy<string[]>(() => entityContent.AncestorsOrSelf(_navigationQueryService, _publishedContentStatusFilteringService).FirstOrDefault(a => a.Cultures.Any())?.Cultures.Keys.ToArray() ?? Array.Empty<string>());
+        // Get the default affected cultures by going up the tree until we find the first culture variant entity (default to no cultures).
+        var defaultCultures = new Lazy<string[]>(() => entityContent.AncestorsOrSelf(_navigationQueryService, _publishedContentStatusFilteringService)
+            .FirstOrDefault(a => a.Cultures.Any())?.Cultures.Keys.ToArray() ?? []);
+
+        // Get the domains assigned to the content item again by looking up the tree (default to null).
+        var domainRootId = new Lazy<int?>(() => entityContent.AncestorsOrSelf(_navigationQueryService, _publishedContentStatusFilteringService)
+            .FirstOrDefault(a => _domainCache.HasAssigned(a.Id, includeWildcards: true))?.Id);
 
         // Get all language ISO codes (in case we're dealing with invariant content with variant ancestors)
-        var languageIsoCodes = new Lazy<string[]>(() => _languageService.GetAllIsoCodesAsync().GetAwaiter().GetResult().ToArray());
+        var languageIsoCodes = new Lazy<string[]>(() => [.. _languageService.GetAllIsoCodesAsync().GetAwaiter().GetResult()]);
 
         foreach (IPublishedContent publishedContent in entityContent.DescendantsOrSelf(_navigationQueryService, _publishedContentStatusFilteringService))
         {
@@ -71,21 +79,20 @@ internal sealed class RedirectTracker : IRedirectTracker
             {
                 try
                 {
-                    var route = _publishedUrlProvider.GetUrl(publishedContent.Id, UrlMode.Relative, culture).TrimEnd(Constants.CharArrays.ForwardSlash);
-
+                    var route = _publishedUrlProvider.GetUrl(publishedContent.Key, UrlMode.Relative, culture).TrimEnd(Constants.CharArrays.ForwardSlash);
                     if (IsValidRoute(route))
                     {
-                        oldRoutes[(publishedContent.Id, culture)] = (publishedContent.Key, route);
+                        StoreRoute(oldRoutes, publishedContent, culture, route, domainRootId.Value);
                     }
                     else if (string.IsNullOrEmpty(culture))
                     {
                         // Retry using all languages, if this is invariant but has a variant ancestor.
                         foreach (string languageIsoCode in languageIsoCodes.Value)
                         {
-                            route = _publishedUrlProvider.GetUrl(publishedContent.Id, UrlMode.Relative, languageIsoCode).TrimEnd(Constants.CharArrays.ForwardSlash);
+                            route = _publishedUrlProvider.GetUrl(publishedContent.Key, UrlMode.Relative, languageIsoCode).TrimEnd(Constants.CharArrays.ForwardSlash);
                             if (IsValidRoute(route))
                             {
-                                oldRoutes[(publishedContent.Id, languageIsoCode)] = (publishedContent.Key, route);
+                                StoreRoute(oldRoutes, publishedContent, languageIsoCode, route, domainRootId.Value);
                             }
                         }
                     }
@@ -96,6 +103,22 @@ internal sealed class RedirectTracker : IRedirectTracker
                 }
             }
         }
+    }
+
+    private static void StoreRoute(
+        Dictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)> oldRoutes,
+        IPublishedContent publishedContent,
+        string culture,
+        string route,
+        int? domainRootId)
+    {
+        // Prepend the Id of the node with the associated domain to the route if there is one assigned.
+        if (domainRootId.HasValue)
+        {
+            route = domainRootId + route;
+        }
+
+        oldRoutes[(publishedContent.Id, culture)] = (publishedContent.Key, route);
     }
 
     /// <inheritdoc/>
