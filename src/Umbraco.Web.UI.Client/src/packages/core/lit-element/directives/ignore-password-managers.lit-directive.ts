@@ -3,10 +3,10 @@ import type { ElementPart } from '@umbraco-cms/backoffice/external/lit';
 
 class UmbIgnorePasswordManagersDirective extends AsyncDirective {
 	#attributes = [
-		{ name: 'data-1p-ignore', value: '' },
-		{ name: 'data-bwignore', value: '' },
-		{ name: 'data-form-type', value: 'other' },
-		{ name: 'data-lpignore', value: 'true' },
+		{ name: 'data-1p-ignore', value: '' }, // 1Password
+		{ name: 'data-bwignore', value: '' }, // Bitwarden
+		{ name: 'data-form-type', value: 'other' }, // Dashlane
+		{ name: 'data-lpignore', value: 'true' }, // LastPass
 	];
 
 	override render() {
