@@ -125,6 +125,10 @@ public static class UmbracoBuilderExtensions
 
                 if (!currFolder.Exists)
                 {
+                    // When Umbraco.Integration.Tests is installed in a "consumer" Umbraco site, the src/tests path might not be there.
+                    // This replaces the folder reference with an empty folder under temp
+                    // such that the LocalizedTextServiceFileSources don't blow up from directory not found,
+                    // or reading random xml files from the base temp folder.
                     var tempPath = Path.GetTempPath();
                     currFolder = new DirectoryInfo(Path.GetFullPath("Umbraco.Integration.Tests.Fake.SrcRoot", tempPath));
                     currFolder.Create();
