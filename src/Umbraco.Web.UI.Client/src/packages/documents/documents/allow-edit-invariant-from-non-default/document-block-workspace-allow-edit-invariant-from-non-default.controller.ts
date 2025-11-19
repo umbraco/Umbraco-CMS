@@ -20,23 +20,11 @@ export class UmbDocumentBlockWorkspaceAllowEditInvariantFromNonDefaultController
 			throw new Error('Missing Block Workspace Context');
 		}
 
-		const blockOwnerContentType = blockWorkspaceContext.content.structure.getOwnerContentType();
-		const blockVariesByCulture = blockOwnerContentType?.variesByCulture;
-
-		const propertyDatasetContext = await this.getContext(UMB_PROPERTY_DATASET_CONTEXT);
-
-		if (!blockWorkspaceContext) {
-			throw new Error('Missing Property Dataset Context');
-		}
-
-		const datasetVariantId = propertyDatasetContext?.getVariantId();
-		const variantOptions = await this.observe(documentWorkspaceContext.variantOptions).asPromise();
-		const datasetVariantOption = variantOptions.filter((variantOption) => datasetVariantId?.compare(variantOption));
-		const isDatasetDefaultLanguage =
-			datasetVariantOption?.length > 0 ? datasetVariantOption[0].language.isDefault : false;
+		const isInvariantBlock = await this.#isInvariantBlock({ blockWorkspaceContext });
+		const isDefaultLanguageDataset = await this.#isDefaultLanguageDataset({ documentWorkspaceContext });
 
 		// Prevent editing invariant blocks when editing from the non default language
-		if (blockVariesByCulture === false && isDatasetDefaultLanguage === false) {
+		if (isInvariantBlock === true && isDefaultLanguageDataset === false) {
 			const datasetVariantId = UmbVariantId.CreateInvariant();
 			const rule: UmbVariantPropertyGuardRule = this._createRule({ datasetVariantId });
 
@@ -48,6 +36,27 @@ export class UmbDocumentBlockWorkspaceAllowEditInvariantFromNonDefaultController
 				propertyWriteGuard: blockWorkspaceContext?.content.propertyWriteGuard,
 			});
 		}
+	}
+
+	async #isInvariantBlock(args: { blockWorkspaceContext: typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE }) {
+		const blockVariesByCulture =
+			args.blockWorkspaceContext.content.structure.getOwnerContentType()?.variesByCulture || false;
+		return blockVariesByCulture === false;
+	}
+
+	async #isDefaultLanguageDataset(args: {
+		documentWorkspaceContext: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
+	}): Promise<boolean> {
+		const propertyDatasetContext = await this.getContext(UMB_PROPERTY_DATASET_CONTEXT);
+
+		if (!propertyDatasetContext) {
+			throw new Error('Missing Property Dataset Context');
+		}
+
+		const datasetVariantId = propertyDatasetContext?.getVariantId();
+		const variantOptions = await this.observe(args.documentWorkspaceContext.variantOptions).asPromise();
+		const datasetVariantOption = variantOptions.filter((variantOption) => datasetVariantId?.compare(variantOption));
+		return datasetVariantOption?.length > 0 ? datasetVariantOption[0].language.isDefault : false;
 	}
 }
 
