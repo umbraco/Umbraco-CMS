@@ -65,8 +65,7 @@ internal sealed class RedirectTracker : IRedirectTracker
             .FirstOrDefault(a => a.Cultures.Any())?.Cultures.Keys.ToArray() ?? []);
 
         // Get the domains assigned to the content item again by looking up the tree (default to 0).
-        var domainRootId = new Lazy<int>(() => entityContent.Path.Split(',').Select(int.Parse).Reverse()
-            .FirstOrDefault(x => _domainCache.HasAssigned(x, includeWildcards: true)));
+        var domainRootId = new Lazy<int>(() => GetNodeIdWithAssignedDomain(entityContent));
 
         // Get all language ISO codes (in case we're dealing with invariant content with variant ancestors)
         var languageIsoCodes = new Lazy<string[]>(() => [.. _languageService.GetAllIsoCodesAsync().GetAwaiter().GetResult()]);
@@ -105,6 +104,16 @@ internal sealed class RedirectTracker : IRedirectTracker
             }
         }
     }
+
+    private bool TryGetNodeIdWithAssignedDomain(IPublishedContent entityContent, out int domainRootId)
+    {
+        domainRootId = GetNodeIdWithAssignedDomain(entityContent);
+        return domainRootId > 0;
+    }
+
+    private int GetNodeIdWithAssignedDomain(IPublishedContent entityContent) =>
+        entityContent.Path.Split(',').Select(int.Parse).Reverse()
+            .FirstOrDefault(x => _domainCache.HasAssigned(x, includeWildcards: true));
 
     private string GetUrl(Guid contentKey, string languageIsoCode) =>
         _publishedUrlProvider.GetUrl(contentKey, UrlMode.Relative, languageIsoCode).TrimEnd(Constants.CharArrays.ForwardSlash);
@@ -146,14 +155,9 @@ internal sealed class RedirectTracker : IRedirectTracker
                 var newRoute = GetUrl(contentKey, culture);
 
                 // Prepend the Id of the node with the associated domain to the route if there is one assigned.
-                var path = entityContent.Path.Split(',').Select(int.Parse).Reverse().ToArray();
-                foreach (var id in path)
+                if (TryGetNodeIdWithAssignedDomain(entityContent, out int domainRootId))
                 {
-                    if (_domainCache.HasAssigned(id, includeWildcards: true))
-                    {
-                        newRoute = id + newRoute;
-                        break;
-                    }
+                    newRoute = domainRootId + newRoute;
                 }
 
                 if (!IsValidRoute(newRoute) || oldRoute == newRoute)
