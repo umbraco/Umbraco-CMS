@@ -13,6 +13,8 @@ import {
 	type UmbPickerModalValue,
 } from '@umbraco-cms/backoffice/modal';
 import type { UmbItemModel } from '@umbraco-cms/backoffice/entity-item';
+import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
+import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbPickerInputContext<
 	PickedItemType extends UmbItemModel = UmbItemModel,
@@ -29,6 +31,9 @@ export class UmbPickerInputContext<
 	public readonly selectedItems;
 	public readonly statuses;
 	public readonly interactionMemory = new UmbInteractionMemoryManager(this);
+
+	#modalRoute = new UmbStringState<string | undefined>(undefined);
+	public readonly modalRoute = this.#modalRoute.asObservable();
 
 	/**
 	 * Define a maximum amount of selected items in this input, for this input to be valid.
@@ -70,6 +75,8 @@ export class UmbPickerInputContext<
 
 		if (modalAlias) {
 			this.modalAlias = modalAlias;
+			this.#createPickerModalRoute();
+			debugger;
 		}
 
 		this.#itemManager = new UmbRepositoryItemsManager<PickedItemType>(this, repositoryAlias);
@@ -111,10 +118,7 @@ export class UmbPickerInputContext<
 			} as PickerModalValueType,
 		}).catch(() => undefined);
 
-		if (!modalValue) return;
-
-		this.setSelection(modalValue.selection);
-		this.getHostElement().dispatchEvent(new UmbChangeEvent());
+		this.#applyModalValue(modalValue);
 	}
 
 	protected async _requestItemName(unique: string) {
@@ -136,6 +140,31 @@ export class UmbPickerInputContext<
 	protected _removeItem(unique: string) {
 		const newSelection = this.getSelection().filter((value) => value !== unique);
 		this.setSelection(newSelection);
+		this.getHostElement().dispatchEvent(new UmbChangeEvent());
+	}
+
+	#controller?: UmbModalRouteRegistrationController;
+
+	#createPickerModalRoute() {
+		if (!this.modalAlias) {
+			this.#controller?.destroy();
+			return;
+		}
+
+		this.#controller = new UmbModalRouteRegistrationController(this, this.modalAlias)
+			.addUniquePaths(['picker'])
+			.onSubmit((value) => {
+				this.#applyModalValue(value);
+			})
+			.observeRouteBuilder((routeBuilder) => {
+				const path = routeBuilder({});
+				this.#modalRoute.setValue(path);
+			});
+	}
+
+	#applyModalValue(value: PickerModalValueType | undefined) {
+		if (!value) return;
+		this.setSelection(value.selection);
 		this.getHostElement().dispatchEvent(new UmbChangeEvent());
 	}
 }
