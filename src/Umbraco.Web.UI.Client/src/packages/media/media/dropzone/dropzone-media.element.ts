@@ -22,6 +22,14 @@ export class UmbDropzoneMediaElement extends UmbInputDropzoneElement {
 	@property({ attribute: 'parent-unique' })
 	parentUnique: string | null = null;
 
+	/**
+	 * Gets the current value of the uploaded items.
+	 * @returns {Array<UmbUploadableItem>} An array of uploadable items.
+	 */
+	public getItems(): Array<UmbUploadableItem> {
+		return this._progressItems;
+	}
+
 	#dragCounter = 0;
 
 	protected override _manager = new UmbMediaDropzoneManager(this);
@@ -31,7 +39,6 @@ export class UmbDropzoneMediaElement extends UmbInputDropzoneElement {
 	constructor() {
 		super();
 
-		// Safari requires dragover to allow drops
 		document.addEventListener('dragenter', this.#handleDragEnter.bind(this));
 		document.addEventListener('dragleave', this.#handleDragLeave.bind(this));
 		document.addEventListener('dragover', this.#handleDragOver.bind(this));
@@ -108,10 +115,13 @@ export class UmbDropzoneMediaElement extends UmbInputDropzoneElement {
 	static override styles = [
 		...UmbInputDropzoneElement.styles,
 		css`
-				:host(:not([disabled])[dragging]) #dropzone {
+			:host(:not([disabled])[dragging]) #dropzone {
 				opacity: 1;
 				pointer-events: all;
+			}
 
+			[dropzone] {
+				opacity: 0;
 			}
 
 			#dropzone {
