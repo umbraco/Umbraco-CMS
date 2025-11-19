@@ -319,10 +319,10 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 				data = { ...data, ...this.modalContext.data.preset };
 			}
 
-			this.setIsNew(true);
 			this.#entityContext.setUnique(data.unique);
 			this._data.setPersisted(data);
 			this._data.setCurrent(data);
+			this.setIsNew(true);
 		}
 
 		this.loading.removeState(LOADING_STATE_UNIQUE);
