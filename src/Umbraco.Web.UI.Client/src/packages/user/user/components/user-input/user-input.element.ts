@@ -96,6 +96,9 @@ export class UmbUserInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 	@state()
 	private _statuses?: Array<UmbRepositoryItemsStatus>;
 
+	@state()
+	private _modalRoute?: string;
+
 	#pickerContext = new UmbUserPickerInputContext(this);
 
 	constructor() {
@@ -116,6 +119,10 @@ export class UmbUserInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')), '_observeSelection');
 		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems), '_observerItems');
 		this.observe(this.#pickerContext.statuses, (statuses) => (this._statuses = statuses), '_observeStatuses');
+
+		this.observe(this.#pickerContext.modalRoute, (modalRoute) => {
+			this._modalRoute = modalRoute;
+		});
 	}
 
 	protected override getFormElement() {
@@ -140,8 +147,8 @@ export class UmbUserInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 			<uui-button
 				id="btn-add"
 				look="placeholder"
-				label=${this.localize.term('general_choose')}
-				@click=${this.#openPicker}></uui-button>
+				href=${this._modalRoute}
+				label=${this.localize.term('general_choose')}></uui-button>
 		`;
 	}
 
