@@ -16,7 +16,7 @@ import {
 import { loadManifestApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { umbIgnorePasswordManagers, UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
@@ -204,7 +204,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 		return html`
 			${when(loading, () => html`<div id="loader"><uui-loader></uui-loader></div>`)}
 			${when(!loading, () => html`${this.#renderStyles()}${this.#renderToolbar()}`)}
-			<div id="editor" data-mark="input:tiptap-rte" ?data-loaded=${!loading}></div>
+			<div id="editor" data-mark="input:tiptap-rte" ?data-loaded=${!loading} ${umbIgnorePasswordManagers()}></div>
 			${when(!loading, () => this.#renderStatusbar())}
 		`;
 	}
