@@ -22,7 +22,7 @@ export class WorkspaceContextNameManipulation extends UmbContextBase {
 					const variantId = UmbVariantId.CreateInvariant();
 					const name = workspace!.getName(variantId);
 					if (name === undefined) {
-						const manipulatedName = `New Document - ${new Date().toLocaleDateString('en-Gb')}`;
+						const manipulatedName = `New Document - ${new Date().toLocaleDateString('en-GB')}`;
 						workspace!.setName(manipulatedName, variantId);
 					}
 				}
