@@ -83,6 +83,11 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 		this.#persist('');
 	}
 
+	#refreshSearch() {
+		// Force immediate search, bypassing debounce
+		this._logViewerContext?.getLogs();
+	}
+
 	#saveSearch(savedSearch: SavedLogSearchResponseModel) {
 		this._logViewerContext?.saveSearch(savedSearch);
 	}
@@ -126,7 +131,9 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 								? html`<uui-button compact slot="append" label="Save search" @click=${this.#openSaveSearchDialog}
 										><uui-icon name="icon-favorite"></uui-icon
 									></uui-button>`
-								: ''}<uui-button compact slot="append" label="Clear" @click=${this.#clearQuery}
+								: ''}<uui-button compact slot="append" label="Refresh search" @click=${this.#refreshSearch}
+								><uui-icon name="icon-refresh"></uui-icon></uui-button
+							><uui-button compact slot="append" label="Clear" @click=${this.#clearQuery}
 								><uui-icon name="icon-delete"></uui-icon
 							></uui-button>`
 					: html``}
