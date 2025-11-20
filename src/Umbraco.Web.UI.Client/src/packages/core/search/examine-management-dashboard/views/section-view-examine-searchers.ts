@@ -99,7 +99,7 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 	private _updateFieldFilter() {
 		const documentFields: ExposedSearchResultField[] = [];
 
-		this._searchResults?.map((doc) => {
+		this._searchResults?.forEach((doc) => {
 			const document = doc.fields?.filter((field) => {
 				return field.name?.toUpperCase() !== 'NODENAME';
 			});
@@ -289,7 +289,7 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 	renderBodyCells(cellData: UmbSearchFieldPresentationModel[]) {
 		return html`${this._exposedFields?.map((slot) => {
 			if (slot.exposed) {
-				const field = cellData.find((field) => field.name == slot.name);
+				const field = cellData.find((field) => field.name === slot.name);
 				if (field) {
 					return html`<uui-table-cell clip-text>${field.values}</uui-table-cell>`;
 				}
