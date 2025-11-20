@@ -9,6 +9,8 @@ import type { SavedLogSearchResponseModel } from '@umbraco-cms/backoffice/extern
 import type { UmbDropdownElement } from '@umbraco-cms/backoffice/components';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { consumeContext } from '@umbraco-cms/backoffice/context-api';
+import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+import { debounceTime, skip } from '@umbraco-cms/backoffice/external/rxjs';
 
 import './log-viewer-search-input-modal.element.js';
 
@@ -26,6 +28,9 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 	@state()
 	private _isQuerySaved = false;
 
+	// Local state for debouncing user input before updating context
+	#localQueryState = new UmbStringState('');
+
 	#logViewerContext?: typeof UMB_APP_LOG_VIEWER_CONTEXT.TYPE;
 
 	@consumeContext({ context: UMB_APP_LOG_VIEWER_CONTEXT })
@@ -40,6 +45,18 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 
 	constructor() {
 		super();
+
+		// Debounce local input and update context
+		this.observe(
+			this.#localQueryState.asObservable().pipe(
+				skip(1), // Skip initial value
+				debounceTime(250),
+			),
+			(query) => {
+				this._logViewerContext?.setFilterExpression(query);
+				this.#persist(query);
+			},
+		);
 	}
 
 	#observeStuff() {
@@ -57,8 +74,8 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 	#setQuery(event: Event) {
 		const target = event.target as UUIInputElement;
 		const query = target.value as string;
-		this._logViewerContext?.setFilterExpression(query);
-		this.#persist(query);
+		// Update local state which will debounce before updating context
+		this.#localQueryState.setValue(query);
 	}
 
 	#setQueryFromSavedSearch(query: string) {
