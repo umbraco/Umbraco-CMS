@@ -31,21 +31,30 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 		});
 	}
 
+	#handleSubmit(event: SubmitEvent) {
+		event.preventDefault();
+		// Trigger search immediately to allow re-running the same query (bypasses debounce)
+		this._logViewerContext?.getLogs();
+	}
+
 	override render() {
 		return html`
 			<umb-body-layout header-transparent header-fit-height>
-				<div id="header" slot="header">
-					<div id="levels-container">
-						<umb-log-viewer-log-level-filter-menu></umb-log-viewer-log-level-filter-menu>
-						<div id="dates-polling-container">
-							<umb-log-viewer-date-range-selector horizontal></umb-log-viewer-date-range-selector>
-							<umb-log-viewer-polling-button> </umb-log-viewer-polling-button>
+				<uui-form id="header" slot="header" @submit=${this.#handleSubmit} role="search" aria-label="Filter logs">
+					<form>
+						<div id="levels-container">
+							<umb-log-viewer-log-level-filter-menu></umb-log-viewer-log-level-filter-menu>
+							<div id="dates-polling-container">
+								<umb-log-viewer-date-range-selector horizontal></umb-log-viewer-date-range-selector>
+								<umb-log-viewer-polling-button> </umb-log-viewer-polling-button>
+							</div>
 						</div>
-					</div>
-					<div id="input-container">
-						<umb-log-viewer-search-input></umb-log-viewer-search-input>
-					</div>
-				</div>
+						<div id="input-container">
+							<umb-log-viewer-search-input></umb-log-viewer-search-input>
+							<button type="submit" aria-label="Apply filters" class="visually-hidden">Search</button>
+						</div>
+					</form>
+				</uui-form>
 
 				${this._canShowLogs
 					? html`<umb-log-viewer-messages-list></umb-log-viewer-messages-list>`
@@ -63,6 +72,18 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 
 			uui-box {
 				--uui-box-default-padding: 0;
+			}
+
+			.visually-hidden {
+				position: absolute;
+				width: 1px;
+				height: 1px;
+				padding: 0;
+				margin: -1px;
+				overflow: hidden;
+				clip: rect(0, 0, 0, 0);
+				white-space: nowrap;
+				border: 0;
 			}
 
 			#header {

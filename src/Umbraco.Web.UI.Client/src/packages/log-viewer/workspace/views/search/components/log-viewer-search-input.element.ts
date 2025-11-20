@@ -3,16 +3,14 @@ import { UMB_LOG_VIEWER_SAVE_SEARCH_MODAL } from './log-viewer-search-input-moda
 import { css, html, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { escapeHTML } from '@umbraco-cms/backoffice/utils';
 import { query as getQuery, path, toQueryString } from '@umbraco-cms/backoffice/router';
-import { debounceTime, skip, tap } from '@umbraco-cms/backoffice/external/rxjs';
-import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { umbConfirmModal, umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { SavedLogSearchResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbDropdownElement } from '@umbraco-cms/backoffice/components';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
+import { consumeContext } from '@umbraco-cms/backoffice/context-api';
 
 import './log-viewer-search-input-modal.element.js';
-import { consumeContext } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-log-viewer-search-input')
 export class UmbLogViewerSearchInputElement extends UmbLitElement {
@@ -26,12 +24,7 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 	private _inputQuery = '';
 
 	@state()
-	private _showLoader = false;
-
-	@state()
 	private _isQuerySaved = false;
-
-	#inputQueryState = new UmbStringState('');
 
 	#logViewerContext?: typeof UMB_APP_LOG_VIEWER_CONTEXT.TYPE;
 
@@ -47,20 +40,6 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 
 	constructor() {
 		super();
-
-		this.observe(
-			this.#inputQueryState.asObservable().pipe(
-				skip(1), // Skip initial value to avoid overwriting URL query params
-				tap(() => (this._showLoader = true)),
-				debounceTime(250),
-			),
-			(query) => {
-				this._logViewerContext?.setFilterExpression(query);
-				this.#persist(query);
-				this._isQuerySaved = this._savedSearches.some((search) => search.query === query);
-				this._showLoader = false;
-			},
-		);
 	}
 
 	#observeStuff() {
@@ -77,11 +56,14 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 
 	#setQuery(event: Event) {
 		const target = event.target as UUIInputElement;
-		this.#inputQueryState.setValue(target.value as string);
+		const query = target.value as string;
+		this._logViewerContext?.setFilterExpression(query);
+		this.#persist(query);
 	}
 
 	#setQueryFromSavedSearch(query: string) {
-		this.#inputQueryState.setValue(query);
+		this._logViewerContext?.setFilterExpression(query);
+		this.#persist(query);
 		this._searchDropdownElement.open = false;
 	}
 
@@ -97,8 +79,8 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 	}
 
 	#clearQuery() {
-		this.#inputQueryState.setValue('');
 		this._logViewerContext?.setFilterExpression('');
+		this.#persist('');
 	}
 
 	#saveSearch(savedSearch: SavedLogSearchResponseModel) {
@@ -139,11 +121,6 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 				slot="trigger"
 				@input=${this.#setQuery}
 				.value=${this._inputQuery}>
-				${this._showLoader
-					? html`<div id="loader-container" slot="append">
-							<uui-loader-circle></uui-loader-circle>
-						</div>`
-					: ''}
 				${this._inputQuery
 					? html`${!this._isQuerySaved
 								? html`<uui-button compact slot="append" label="Save search" @click=${this.#openSaveSearchDialog}
@@ -198,13 +175,6 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 
 			#saved-searches-popover {
 				flex: 1;
-			}
-
-			#loader-container {
-				display: flex;
-				justify-content: center;
-				align-items: center;
-				margin: 0 var(--uui-size-space-4);
 			}
 
 			.saved-search-item {
