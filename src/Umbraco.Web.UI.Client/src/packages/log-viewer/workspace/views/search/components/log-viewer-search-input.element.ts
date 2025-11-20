@@ -98,6 +98,7 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 	#clearQuery() {
 		this._logViewerContext?.setFilterExpression('');
 		this.#persist('');
+		this.#localQueryState.setValue('');
 	}
 
 	#refreshSearch() {
