@@ -25,8 +25,8 @@ public class SiblingsDocumentBlueprintTreeController : DocumentBlueprintTreeCont
 
     [HttpGet("siblings")]
     [ProducesResponseType(typeof(SubsetViewModel<DocumentBlueprintTreeItemResponseModel>), StatusCodes.Status200OK)]
-    [EndpointSummary("Gets a collection of document blueprint tree sibling items.")]
-    [EndpointDescription("Gets a collection of document blueprint tree items that are siblings of the provided Id.")]
+    [EndpointSummary("Gets a collection of Document Blueprint tree sibling items.")]
+    [EndpointDescription("Gets a collection of Document Blueprint tree items that are siblings of the provided Id.")]
     public async Task<ActionResult<SubsetViewModel<DocumentBlueprintTreeItemResponseModel>>> Siblings(
         CancellationToken cancellationToken,
         Guid target,
