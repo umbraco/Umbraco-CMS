@@ -38,10 +38,9 @@ test('can create content with the image cropper data type', async ({umbracoApi, 
   await umbracoUi.content.uploadFile(imageFilePath);
   // Wait for the upload to complete
   await umbracoUi.waitForTimeout(1000);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -63,7 +62,7 @@ test('can publish content with the image cropper data type', {tag: '@smoke'}, as
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.uploadFile(imageFilePath);
   // Wait for the upload to complete
-  await umbracoUi.waitForTimeout(1000); 
+  await umbracoUi.waitForTimeout(1000);
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert

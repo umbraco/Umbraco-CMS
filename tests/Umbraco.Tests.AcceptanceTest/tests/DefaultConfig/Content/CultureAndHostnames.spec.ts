@@ -37,10 +37,9 @@ test('can add a culture', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickCultureAndHostnamesActionMenuOption();
   await umbracoUi.content.selectCultureLanguageOption(languageName);
-  await umbracoUi.content.clickSaveModalButton();
+  await umbracoUi.content.clickSaveModalButtonAndWaitForContentToBeCreated();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeCreated();
   const domainsData = await umbracoApi.document.getDomains(contentId);
   expect(domainsData.defaultIsoCode).toEqual(isoCode);
 });

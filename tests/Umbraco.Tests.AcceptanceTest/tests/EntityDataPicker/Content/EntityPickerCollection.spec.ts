@@ -28,10 +28,9 @@ test('can create empty content with an entity picker using the collection data s
   await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -49,10 +48,9 @@ test('can create content with an entity picker using the collection data source 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.chooseCollectionMenuItemWithName('Example 1');
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -72,10 +70,9 @@ test('can create content with an entity picker using the collection data source 
   await umbracoUi.content.chooseCollectionMenuItemWithName('Example 1');
   await umbracoUi.content.chooseCollectionMenuItemWithName('Example 3');
   await umbracoUi.content.chooseCollectionMenuItemWithName('Example 5');
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -119,8 +116,7 @@ test('can not create content with an entity picker using the collection data sou
   await umbracoUi.content.chooseCollectionMenuItemWithName('Example 3');
 
   // Assert
-  await umbracoUi.content.clickSaveAndPublishButton();
-  await umbracoUi.content.waitForContentToBeCreated();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);

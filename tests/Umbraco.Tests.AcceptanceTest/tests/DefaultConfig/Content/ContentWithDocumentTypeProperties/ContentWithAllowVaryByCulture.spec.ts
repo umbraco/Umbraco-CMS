@@ -30,10 +30,9 @@ test('can create content with allow vary by culture enabled', async ({umbracoApi
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.clickSaveButtonForContent();
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveModalButtonAndWaitForContentToBeCreated();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
 });
 
@@ -54,7 +53,7 @@ test('can create content with names that vary by culture', async ({umbracoApi, u
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeCreated();
+  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesNameExist(danishContentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(danishContentName);
   expect(contentData.variants.length).toBe(2);
@@ -82,7 +81,7 @@ test('can create content with names that vary by culture and content that is inv
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeCreated();
+  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesNameExist(danishContentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(danishContentName);
   expect(contentData.variants.length).toBe(2);
@@ -114,7 +113,7 @@ test('can create content with names and content that vary by culture', async ({u
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeCreated();
+  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesNameExist(danishContentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(danishContentName);
   expect(contentData.variants.length).toBe(2);

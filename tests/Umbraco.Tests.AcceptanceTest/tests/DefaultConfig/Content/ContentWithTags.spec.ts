@@ -31,10 +31,9 @@ test('can create content with one tag', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.clickPlusIconButton();
   await umbracoUi.content.enterTag(tagsName[0]);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);

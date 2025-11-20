@@ -36,10 +36,9 @@ test('can create content with the media picker data type', {tag: '@smoke'}, asyn
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.clickChooseButtonAndSelectMediaWithName(mediaFileName);
   await umbracoUi.content.clickChooseModalButton();
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -65,10 +64,9 @@ test('can publish content with the media picker data type', async ({umbracoApi, 
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.clickChooseButtonAndSelectMediaWithName(mediaFileName);
   await umbracoUi.content.clickChooseModalButton();
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeCreated();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);

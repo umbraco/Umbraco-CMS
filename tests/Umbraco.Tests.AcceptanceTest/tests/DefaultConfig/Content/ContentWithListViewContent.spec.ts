@@ -36,10 +36,9 @@ test('can create content with the list view data type', async ({umbracoApi, umbr
   await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -84,7 +83,7 @@ test('can create content with a child in the list', async ({umbracoApi, umbracoU
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeCreated();
+  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   expect(await umbracoApi.document.getChildrenAmount(documentId)).toEqual(1);
 });
@@ -212,7 +211,7 @@ test('can publish child content from list', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.clickConfirmToPublishButton();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeCreated();
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
   expect(await umbracoApi.document.getChildrenAmount(documentId)).toEqual(1);
   const childContentData = await umbracoApi.document.getByName(childContentName);
   expect(childContentData.variants[0].state).toBe(expectedState);

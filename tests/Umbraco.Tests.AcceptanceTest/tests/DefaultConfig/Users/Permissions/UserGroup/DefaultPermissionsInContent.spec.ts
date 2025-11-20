@@ -199,10 +199,9 @@ test('can create content with create permission enabled', {tag: '@release'}, asy
   await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(rootDocumentTypeName);
   await umbracoUi.content.enterContentName(testDocumentName);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(testDocumentName)).toBeTruthy();
   await umbracoUi.content.isDocumentReadOnly(true);
 });
@@ -292,7 +291,7 @@ test.skip('can set permissions with set permissions permission enabled', async (
   // Act
   await umbracoUi.content.clickActionsMenuForContent(rootDocumentName);
   // await umbracoUi.content.clickSetPermissionsButton();
-  
+
   // Assert
   // await umbracoUi.content.doesDocumentPermissionsDialogExist();
 });
@@ -656,10 +655,9 @@ test('can create and update content with permission enabled', {tag: '@release'},
   await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(rootDocumentTypeName);
   await umbracoUi.content.enterContentName(testDocumentName);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(testDocumentName)).toBeTruthy();
   // Update the content
   await umbracoUi.content.goToContentWithName(testDocumentName);

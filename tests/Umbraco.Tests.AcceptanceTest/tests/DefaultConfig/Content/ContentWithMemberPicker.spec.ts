@@ -41,10 +41,9 @@ test('can create content with the member picker data type', {tag: '@smoke'}, asy
   await umbracoUi.content.clickChooseMemberPickerButton();
   await umbracoUi.content.selectMemberByName(memberName);
   await umbracoUi.content.clickChooseModalButton();
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
