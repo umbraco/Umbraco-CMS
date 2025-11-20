@@ -9,5 +9,5 @@ public abstract class ElementResponseModelBase<TValueResponseModelBase, TVariant
     where TValueResponseModelBase : ValueModelBase
     where TVariantResponseModel : VariantResponseModelBase
 {
-    public DocumentTypeReferenceResponseModel ElementType { get; set; } = new();
+    public DocumentTypeReferenceResponseModel DocumentType { get; set; } = new();
 }

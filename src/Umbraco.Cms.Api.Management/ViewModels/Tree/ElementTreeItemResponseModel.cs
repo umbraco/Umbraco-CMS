@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Api.Management.ViewModels.Tree;
 
 public class ElementTreeItemResponseModel : FolderTreeItemResponseModel
 {
-    public DocumentTypeReferenceResponseModel? ElementType { get; set; }
+    public DocumentTypeReferenceResponseModel? DocumentType { get; set; }
 
     public IEnumerable<ElementVariantItemResponseModel> Variants { get; set; } = [];
 }

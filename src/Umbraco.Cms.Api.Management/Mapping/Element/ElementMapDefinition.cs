@@ -24,7 +24,7 @@ public class ElementMapDefinition : ContentMapDefinition<IElement, ElementValueR
     private void Map(IElement source, ElementResponseModel target, MapperContext context)
     {
         target.Id = source.Key;
-        target.ElementType = context.Map<DocumentTypeReferenceResponseModel>(source.ContentType)!;
+        target.DocumentType = context.Map<DocumentTypeReferenceResponseModel>(source.ContentType)!;
         target.Values = MapValueViewModels(source.Properties);
         target.Variants = MapVariantViewModels(
             source,

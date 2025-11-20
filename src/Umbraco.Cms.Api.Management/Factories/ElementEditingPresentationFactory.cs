@@ -9,7 +9,7 @@ internal sealed class ElementEditingPresentationFactory : ContentEditingPresenta
     {
         ElementCreateModel model = MapContentEditingModel<ElementCreateModel>(requestModel);
         model.Key = requestModel.Id;
-        model.ContentTypeKey = requestModel.ElementType.Id;
+        model.ContentTypeKey = requestModel.DocumentType.Id;
         model.ParentKey = requestModel.Parent?.Id;
 
         return model;
