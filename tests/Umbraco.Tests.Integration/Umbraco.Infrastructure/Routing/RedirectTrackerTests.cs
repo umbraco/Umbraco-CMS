@@ -2,9 +2,11 @@
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
@@ -106,17 +108,29 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
         content.SetupGet(c => c.ContentType).Returns(contentType.Object);
         content.SetupGet(c => c.Cultures).Returns(cultures);
 
-        IPublishedUrlProvider publishedUrlProvider = Mock.Of<IPublishedUrlProvider>();
-        Mock.Get(publishedUrlProvider)
-            .Setup(x => x.GetUrl(_testPage.Key, UrlMode.Relative, "en", null))
+        IPublishedContentCache contentCache = Mock.Of<IPublishedContentCache>();
+        Mock.Get(contentCache)
+            .Setup(x => x.GetRouteById(_testPage.Id, "en"))
             .Returns("/new-route");
 
+        IUmbracoContext context = Mock.Of<IUmbracoContext>();
+
+        UmbracoContextReference contextReference = new UmbracoContextReference(context, false, Mock.Of<IUmbracoContextAccessor>());
+        Mock.Get(contextReference.UmbracoContext)
+            .Setup(x => x.Content)
+            .Returns(contentCache);
+
+        IUmbracoContextFactory contextFactory = Mock.Of<IUmbracoContextFactory>();
+        Mock.Get(contextFactory)
+            .Setup(x => x.EnsureUmbracoContext())
+            .Returns(contextReference);
+
         return new RedirectTracker(
-            GetRequiredService<IUmbracoContextFactory>(),
+            contextFactory,
             GetRequiredService<IVariationContextAccessor>(),
             GetRequiredService<ILocalizationService>(),
             RedirectUrlService,
-            publishedUrlProvider,
+            Mock.Of<IPublishedUrlProvider>(),
             GetRequiredService<ILogger<RedirectTracker>>());
     }
 

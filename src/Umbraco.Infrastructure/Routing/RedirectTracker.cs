@@ -96,11 +96,20 @@ namespace Umbraco.Cms.Infrastructure.Routing
                 return;
             }
 
+            using UmbracoContextReference reference = _umbracoContextFactory.EnsureUmbracoContext();
+            IPublishedContentCache? contentCache = reference.UmbracoContext.Content;
+
+            if (contentCache == null)
+            {
+                _logger.LogWarning("Could not track redirects because there is no published content cache available on the current published snapshot.");
+                return;
+            }
+
             foreach (((int contentId, string culture), (Guid contentKey, string oldRoute)) in oldRoutes)
             {
                 try
                 {
-                    var newRoute = _publishedUrlProvider.GetUrl(contentKey, UrlMode.Relative, culture).TrimEnd(Constants.CharArrays.ForwardSlash);
+                    var newRoute = contentCache.GetRouteById(contentId, culture);
 
                     if (!IsValidRoute(newRoute) || oldRoute == newRoute)
                     {
