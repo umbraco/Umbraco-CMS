@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -146,5 +145,5 @@ internal class RedirectUrlService : RepositoryService, IRedirectUrlService
         {
             return await _redirectUrlRepository.GetMostRecentUrlAsync(url, culture);
         }
-    }	
+    }
 }
