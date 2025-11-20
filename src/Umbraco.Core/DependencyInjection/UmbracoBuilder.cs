@@ -430,6 +430,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<ITemporaryFileToXmlImportService, TemporaryFileToXmlImportService>();
             Services.AddUnique<IContentTypeImportService, ContentTypeImportService>();
             Services.AddUnique<IMediaTypeImportService, MediaTypeImportService>();
+            Services.AddUnique<IMemberTypeImportService, MemberTypeImportService>();
 
             // add validation services
             Services.AddUnique<IElementSwitchValidator, ElementSwitchValidator>();
