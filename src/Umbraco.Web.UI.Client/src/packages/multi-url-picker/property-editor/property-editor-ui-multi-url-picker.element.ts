@@ -11,7 +11,7 @@ import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 
 import '../components/input-multi-url/index.js';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 /**
  * @element umb-property-editor-ui-multi-url-picker
@@ -38,6 +38,10 @@ export class UmbPropertyEditorUIMultiUrlPickerElement
 	 */
 	@property({ type: Boolean, reflect: true })
 	readonly = false;
+	@property({ type: Boolean })
+	mandatory = false;
+	@property({ type: String })
+	mandatoryMessage = UMB_VALIDATION_EMPTY_LOCALIZATION_KEY;
 
 	#parseInt(value: unknown, fallback: number): number {
 		const num = Number(value);
@@ -101,6 +105,8 @@ export class UmbPropertyEditorUIMultiUrlPickerElement
 				.variantId=${this._variantId}
 				?hide-anchor=${this._hideAnchor}
 				?readonly=${this.readonly}
+				?required=${this.mandatory}
+				.requiredMessage=${this.mandatoryMessage}
 				@change=${this.#onChange}>
 			</umb-input-multi-url>
 		`;
