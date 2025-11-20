@@ -54,7 +54,6 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 
 		// Observe filter expression changes to trigger search
 		// Only observes when this component is mounted (when logs are visible)
-		// Debouncing is now handled by the search input component
 		this.observe(
 			this._logViewerContext?.filterExpression.pipe(
 				skip(1), // Skip initial value to avoid duplicate search on page load
