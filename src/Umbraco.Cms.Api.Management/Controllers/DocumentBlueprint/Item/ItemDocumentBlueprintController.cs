@@ -25,6 +25,8 @@ public class ItemDocumentBlueprintController : DocumentBlueprintItemControllerBa
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<DocumentBlueprintItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of document blueprint items.")]
+    [EndpointDescription("Gets a collection of document blueprint items identified by the provided Ids.")]
     public Task<IActionResult> Item(
         CancellationToken cancellationToken,
         [FromQuery(Name = "id")] HashSet<Guid> ids)

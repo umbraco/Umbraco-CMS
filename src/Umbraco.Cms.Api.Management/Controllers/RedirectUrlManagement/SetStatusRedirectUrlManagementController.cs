@@ -1,4 +1,5 @@
 ﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Models.RedirectUrlManagement;
@@ -24,6 +25,8 @@ public class SetStatusRedirectUrlManagementController : RedirectUrlManagementCon
     // We generally don't want to edit the appsettings from our code.
     // But maybe there is a valid use case for doing it on the fly.
     [HttpPost("status")]
+    [EndpointSummary("Gets URLs for a document.")]
+    [EndpointDescription("Gets the URLs for the document identified by the provided Id.")]
     [MapToApiVersion("1.0")]
     public async Task<IActionResult> SetStatus(CancellationToken cancellationToken, [FromQuery] RedirectStatus status)
     {

@@ -32,6 +32,8 @@ public class ReferencedDescendantsMediaController : MediaControllerBase
     [HttpGet("{id:guid}/referenced-descendants")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<ReferenceByIdModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets media descendants that are referenced.")]
+    [EndpointDescription("Gets a paginated collection of descendant media items that are referenced by other content.")]
     public async Task<ActionResult<PagedViewModel<ReferenceByIdModel>>> ReferencedDescendants(
         CancellationToken cancellationToken,
         Guid id,

@@ -22,6 +22,8 @@ public class CreateMemberTypeFolderController : MemberTypeFolderControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Creates a member type folder.")]
+    [EndpointDescription("Creates a new member type folder with the provided name and parent location.")]
     public async Task<IActionResult> Create(
         CancellationToken cancellationToken,
         CreateFolderRequestModel createFolderRequestModel)

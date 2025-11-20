@@ -35,6 +35,8 @@ public class DisableUserController : UserControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Disables users.")]
+    [EndpointDescription("Disables the user accounts identified by the provided Ids.")]
     public async Task<IActionResult> DisableUsers(CancellationToken cancellationToken, DisableUserRequestModel model)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(

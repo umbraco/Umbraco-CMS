@@ -17,6 +17,8 @@ public class SetTelemetryController : TelemetryControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [EndpointSummary("Sets telemetry consent level.")]
+    [EndpointDescription("Sets the telemetry consent level for anonymous usage data collection.")]
     public async Task<IActionResult> SetConsentLevel(
         CancellationToken cancellationToken,
         TelemetryRequestModel telemetryRepresentationBase)

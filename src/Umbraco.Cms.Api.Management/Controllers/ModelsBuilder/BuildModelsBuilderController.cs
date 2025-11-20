@@ -29,6 +29,8 @@ public class BuildModelsBuilderController : ModelsBuilderControllerBase
     [HttpPost("build")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status428PreconditionRequired)]
+    [EndpointSummary("Builds models.")]
+    [EndpointDescription("Triggers the models builder to generate strongly-typed models for content types.")]
     [MapToApiVersion("1.0")]
     public Task<IActionResult> BuildModels(CancellationToken cancellationToken)
     {

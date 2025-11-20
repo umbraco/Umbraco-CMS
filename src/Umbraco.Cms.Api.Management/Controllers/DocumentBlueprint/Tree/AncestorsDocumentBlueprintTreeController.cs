@@ -27,6 +27,8 @@ public class AncestorsDocumentBlueprintTreeController : DocumentBlueprintTreeCon
     [HttpGet("ancestors")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<DocumentBlueprintTreeItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of ancestor document blueprint items.")]
+    [EndpointDescription("Gets a collection of document blueprint items that are ancestors to the provided Id.")]
     public async Task<ActionResult<IEnumerable<DocumentBlueprintTreeItemResponseModel>>> Ancestors(CancellationToken cancellationToken, Guid descendantId)
         => await GetAncestors(descendantId);
 }

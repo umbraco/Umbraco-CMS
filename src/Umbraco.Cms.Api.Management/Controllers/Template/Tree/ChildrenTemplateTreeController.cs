@@ -27,6 +27,8 @@ public class ChildrenTemplateTreeController : TemplateTreeControllerBase
     [HttpGet("children")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<NamedEntityTreeItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of template tree child items.")]
+    [EndpointDescription("Gets a paginated collection of template tree items that are children of the provided parent Id.")]
     public async Task<ActionResult<PagedViewModel<NamedEntityTreeItemResponseModel>>> Children(
         CancellationToken cancellationToken,
         Guid parentId,

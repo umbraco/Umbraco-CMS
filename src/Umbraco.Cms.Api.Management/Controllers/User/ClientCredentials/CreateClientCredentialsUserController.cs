@@ -29,6 +29,8 @@ public class CreateClientCredentialsUserController : ClientCredentialsUserContro
     [HttpPost("{id:guid}/client-credentials")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [EndpointSummary("Creates client credentials for a user.")]
+    [EndpointDescription("Creates OAuth client credentials for the user identified by the provided Id.")]
     public async Task<IActionResult> Create(CancellationToken cancellationToken, Guid id, CreateUserClientCredentialsRequestModel model)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(

@@ -37,6 +37,8 @@ public class CopyDocumentController : DocumentControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Copies a document.")]
+    [EndpointDescription("Creates a duplicate of an existing document identified by the provided Id.")]
     public async Task<IActionResult> Copy(
         CancellationToken cancellationToken,
         Guid id,

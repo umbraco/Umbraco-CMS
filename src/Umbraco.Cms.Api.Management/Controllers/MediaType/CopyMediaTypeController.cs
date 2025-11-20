@@ -25,6 +25,8 @@ public class CopyMediaTypeController : MediaTypeControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Copies a media type.")]
+    [EndpointDescription("Creates a duplicate of an existing media type identified by the provided Id.")]
     public async Task<IActionResult> Copy(
         CancellationToken cancellationToken,
         Guid id,

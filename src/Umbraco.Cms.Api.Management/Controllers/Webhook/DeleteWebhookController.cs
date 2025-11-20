@@ -26,6 +26,8 @@ public class DeleteWebhookController : WebhookControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [EndpointSummary("Deletes a webhook.")]
+    [EndpointDescription("Deletes a webhook identified by the provided Id.")]
     public async Task<IActionResult> Delete(CancellationToken cancellationToken, Guid id)
     {
         Attempt<IWebhook?, WebhookOperationStatus> result = await _webhookService.DeleteAsync(id);

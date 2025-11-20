@@ -28,6 +28,8 @@ public class ValidateDatabaseInstallController : InstallControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [EndpointSummary("Validates database connection.")]
+    [EndpointDescription("Validates the database connection settings provided during installation.")]
     public async Task<IActionResult> ValidateDatabase(
         CancellationToken cancellationToken,
         DatabaseInstallRequestModel viewModel)

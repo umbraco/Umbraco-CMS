@@ -27,6 +27,8 @@ public class AllowedChildrenMediaTypeController : MediaTypeControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<AllowedMediaType>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Gets allowed child media types.")]
+    [EndpointDescription("Gets a collection of media types that are allowed as children of the specified parent media type.")]
     public async Task<IActionResult> AllowedChildrenByKey(
         CancellationToken cancellationToken,
         Guid id,

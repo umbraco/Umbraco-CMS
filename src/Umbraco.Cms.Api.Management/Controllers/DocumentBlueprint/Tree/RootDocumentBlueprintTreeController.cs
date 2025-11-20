@@ -28,6 +28,8 @@ public class RootDocumentBlueprintTreeController : DocumentBlueprintTreeControll
     [HttpGet("root")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<DocumentBlueprintTreeItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of document blueprint items from the root of the tree.")]
+    [EndpointDescription("Gets a paginated collection of document blueprint items from the root of the tree with optional filtering.")]
     public async Task<ActionResult<PagedViewModel<DocumentBlueprintTreeItemResponseModel>>> Root(
         CancellationToken cancellationToken,
         int skip = 0,

@@ -29,6 +29,8 @@ public class DeleteDocumentBlueprintController : DocumentBlueprintControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Deletes a document blueprint.")]
+    [EndpointDescription("Deletes a document blueprint identified by the provided Id.")]
     public async Task<IActionResult> Delete(CancellationToken cancellationToken, Guid id)
     {
         Attempt<IContent?, ContentEditingOperationStatus> result = await _contentBlueprintEditingService.DeleteAsync(id, CurrentUserKey(_backOfficeSecurityAccessor));

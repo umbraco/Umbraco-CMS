@@ -33,6 +33,8 @@ public class ByKeyDocumentController : DocumentControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(DocumentResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Gets a document.")]
+    [EndpointDescription("Gets a document identified by the provided Id.")]
     public async Task<IActionResult> ByKey(CancellationToken cancellationToken, Guid id)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(

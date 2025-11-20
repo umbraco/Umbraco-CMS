@@ -27,6 +27,8 @@ public class RootDocumentTypeTreeController : DocumentTypeTreeControllerBase
     [HttpGet("root")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<DocumentTypeTreeItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of document type items from the root of the tree.")]
+    [EndpointDescription("Gets a paginated collection of document type items from the root of the tree with optional filtering.")]
     public async Task<ActionResult<PagedViewModel<DocumentTypeTreeItemResponseModel>>> Root(
         CancellationToken cancellationToken,
         int skip = 0,

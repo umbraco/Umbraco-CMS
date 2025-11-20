@@ -26,6 +26,8 @@ public class SettingsUpgradeController : UpgradeControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(UpgradeSettingsResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status428PreconditionRequired)]
+    [EndpointSummary("Gets upgrade settings.")]
+    [EndpointDescription("Gets the current upgrade settings and status for the Umbraco installation.")]
     public Task<ActionResult<UpgradeSettingsResponseModel>> Settings(CancellationToken cancellationToken)
     {
         // TODO: Async - We need to figure out what we want to do with async endpoints that doesn't do anything async

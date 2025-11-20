@@ -27,6 +27,8 @@ public class ByKeyTemporaryFileController : TemporaryFileControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(TemporaryFileResponseModel), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a temporary file.")]
+    [EndpointDescription("Gets a temporary file identified by the provided Id.")]
     public async Task<IActionResult> ByKey(CancellationToken cancellationToken, Guid id)
     {
         TemporaryFileModel? model = await _temporaryFileService.GetAsync(id);

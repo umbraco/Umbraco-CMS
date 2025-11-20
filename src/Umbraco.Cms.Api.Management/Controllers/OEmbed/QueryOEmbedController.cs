@@ -24,6 +24,8 @@ public class QueryOEmbedController : OEmbedControllerBase
     [HttpGet("query")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(OEmbedResponseModel), StatusCodes.Status200OK)]
+    [EndpointSummary("Queries OEmbed information.")]
+    [EndpointDescription("Queries OEmbed information for the specified URL.")]
     public async Task<IActionResult> Query(CancellationToken cancellationToken, Uri url, int? maxWidth = null, int? maxHeight = null)
     {
         Attempt<string, OEmbedOperationStatus> result = await _oEmbedService.GetMarkupAsync(url, maxWidth, maxHeight, cancellationToken);

@@ -25,6 +25,8 @@ public class ItemMemberItemController : MemberItemControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<MemberItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of member items.")]
+    [EndpointDescription("Gets a collection of member items identified by the provided Ids.")]
     public Task<IActionResult> Item(
         CancellationToken cancellationToken,
         [FromQuery(Name = "id")] HashSet<Guid> ids)

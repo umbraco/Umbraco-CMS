@@ -29,6 +29,8 @@ public class DeleteLanguageController : LanguageControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [EndpointSummary("Deletes a language.")]
+    [EndpointDescription("Deletes a language identified by the provided Id.")]
     public async Task<IActionResult> Delete(CancellationToken cancellationToken, string isoCode)
     {
         Attempt<ILanguage?, LanguageOperationStatus> result = await _languageService.DeleteAsync(isoCode, CurrentUserKey(_backOfficeSecurityAccessor));

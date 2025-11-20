@@ -24,6 +24,8 @@ public class ByKeyRelationTypeController : RelationTypeControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(RelationTypeResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Gets a relation type.")]
+    [EndpointDescription("Gets a relation type identified by the provided Id.")]
     public Task<IActionResult> ByKey(CancellationToken cancellationToken, Guid id)
     {
         IRelationType? relationType = _relationService.GetRelationTypeById(id);

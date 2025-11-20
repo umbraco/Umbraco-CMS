@@ -39,6 +39,8 @@ public class AddUsersToUserGroupController : UserGroupControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Adds users to a user group.")]
+    [EndpointDescription("Adds the specified users to the user group identified by the provided Id.")]
     public async Task<IActionResult> Update(CancellationToken cancellationToken, Guid id, ReferenceByIdModel[] userIds)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(

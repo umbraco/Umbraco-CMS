@@ -30,6 +30,8 @@ public class DeleteStylesheetController : StylesheetControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Deletes a stylesheet.")]
+    [EndpointDescription("Deletes a stylesheet identified by the provided Id.")]
     public async Task<IActionResult> Delete(CancellationToken cancellationToken, string path)
     {
         path = DecodePath(path).VirtualPathToSystemPath();

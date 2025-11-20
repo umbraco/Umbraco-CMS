@@ -27,6 +27,8 @@ public class UpgradeCheckServerController : ServerControllerBase
     [HttpGet("upgrade-check")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(UpgradeCheckResponseModel), StatusCodes.Status200OK)]
+    [EndpointSummary("Checks for available upgrades.")]
+    [EndpointDescription("Checks if there are any available upgrades for the Umbraco installation.")]
     public async Task<IActionResult> UpgradeCheck(CancellationToken cancellationToken)
     {
         UpgradeResult upgradeResult = await _upgradeService.CheckUpgrade(_umbracoVersion.SemanticVersion);

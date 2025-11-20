@@ -23,6 +23,8 @@ public class ItemTemplateItemController : TemplateItemControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<TemplateItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of template items.")]
+    [EndpointDescription("Gets a collection of template items identified by the provided Ids.")]
     public async Task<IActionResult> Item(
         CancellationToken cancellationToken,
         [FromQuery(Name = "id")] HashSet<Guid> ids)

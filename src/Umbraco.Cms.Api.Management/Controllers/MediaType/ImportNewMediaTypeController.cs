@@ -32,6 +32,8 @@ public class ImportNewMediaTypeController : MediaTypeControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [EndpointSummary("Imports a media type.")]
+    [EndpointDescription("Imports a media type from the provided file upload.")]
     public async Task<IActionResult> Import(
         CancellationToken cancellationToken,
         ImportMediaTypeRequestModel model)

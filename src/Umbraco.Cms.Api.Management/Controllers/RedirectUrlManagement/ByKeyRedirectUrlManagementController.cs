@@ -26,6 +26,8 @@ public class ByKeyRedirectUrlManagementController : RedirectUrlManagementControl
     [MapToApiVersion("1.0")]
     [HttpGet("{id:guid}")]
     [ProducesResponseType(typeof(PagedViewModel<RedirectUrlResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a redirect URL.")]
+    [EndpointDescription("Gets a redirect URL identified by the provided Id.")]
     public Task<ActionResult<PagedViewModel<RedirectUrlResponseModel>>> ByKey(
         CancellationToken cancellationToken,
         Guid id,

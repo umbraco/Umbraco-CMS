@@ -25,6 +25,8 @@ public class MediaUrlController : MediaControllerBase
     [MapToApiVersion("1.0")]
     [HttpGet("urls")]
     [ProducesResponseType(typeof(IEnumerable<MediaUrlInfoResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets URLs for a document.")]
+    [EndpointDescription("Gets the URLs for the document identified by the provided Id.")]
     public Task<IActionResult> GetUrls([FromQuery(Name = "id")] HashSet<Guid> ids)
     {
         IEnumerable<IMedia> items = _mediaService.GetByIds(ids);

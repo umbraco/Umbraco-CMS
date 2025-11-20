@@ -23,6 +23,8 @@ public class ItemUserGroupItemController : UserGroupItemControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<UserGroupItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of user group items.")]
+    [EndpointDescription("Gets a collection of user group items identified by the provided Ids.")]
     public async Task<IActionResult> Item(
         CancellationToken cancellationToken,
         [FromQuery(Name = "id")] HashSet<Guid> ids)

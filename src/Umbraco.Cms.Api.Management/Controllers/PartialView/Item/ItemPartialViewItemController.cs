@@ -18,6 +18,8 @@ public class ItemPartialViewItemController : PartialViewItemControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<PartialViewItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of partialview items.")]
+    [EndpointDescription("Gets a collection of partialview items identified by the provided Ids.")]
     public Task<IActionResult> Item(
         CancellationToken cancellationToken,
         [FromQuery(Name = "path")] HashSet<string> paths)

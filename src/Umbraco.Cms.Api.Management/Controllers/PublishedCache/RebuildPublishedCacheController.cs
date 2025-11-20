@@ -17,6 +17,8 @@ public class RebuildPublishedCacheController : PublishedCacheControllerBase
     [HttpPost("rebuild")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [EndpointSummary("Rebuilds the published content cache.")]
+    [EndpointDescription("Rebuilds the entire published content cache from scratch.")]
     public async Task<IActionResult> Rebuild(CancellationToken cancellationToken)
     {
         Attempt<DatabaseCacheRebuildResult> attempt = await _databaseCacheRebuilder.RebuildAsync(true);

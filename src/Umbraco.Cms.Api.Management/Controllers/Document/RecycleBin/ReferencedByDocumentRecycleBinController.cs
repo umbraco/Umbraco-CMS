@@ -32,6 +32,8 @@ public class ReferencedByDocumentRecycleBinController : DocumentRecycleBinContro
     [HttpGet("referenced-by")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<IReferenceResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets items referencing a document in the recycle bin.")]
+    [EndpointDescription("Gets a paginated collection of items that reference the document in the recycle bin.")]
     public async Task<ActionResult<PagedViewModel<IReferenceResponseModel>>> ReferencedBy(
         CancellationToken cancellationToken,
         int skip = 0,

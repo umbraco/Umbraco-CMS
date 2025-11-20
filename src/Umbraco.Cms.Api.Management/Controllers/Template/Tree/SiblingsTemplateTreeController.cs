@@ -25,6 +25,8 @@ public class SiblingsTemplateTreeController : TemplateTreeControllerBase
 
     [HttpGet("siblings")]
     [ProducesResponseType(typeof(SubsetViewModel<NamedEntityTreeItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of template tree sibling items.")]
+    [EndpointDescription("Gets a collection of template tree items that are siblings of the provided Id.")]
     public async Task<ActionResult<SubsetViewModel<NamedEntityTreeItemResponseModel>>> Siblings(
         CancellationToken cancellationToken,
         Guid target,

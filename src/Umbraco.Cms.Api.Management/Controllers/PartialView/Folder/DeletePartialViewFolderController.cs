@@ -20,6 +20,8 @@ public class DeletePartialViewFolderController : PartialViewFolderControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Deletes a partial view folder.")]
+    [EndpointDescription("Deletes a partial view folder identified by the provided Id.")]
     public async Task<IActionResult> Delete(
         CancellationToken cancellationToken,
         string path)
