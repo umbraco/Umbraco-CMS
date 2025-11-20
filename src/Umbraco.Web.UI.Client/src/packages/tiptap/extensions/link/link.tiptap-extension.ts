@@ -54,6 +54,15 @@ export const UmbLink = Link.extend({
 			},
 		};
 	},
+
+	addPasteRules() {
+		if (!this.options.linkOnPaste) return [];
+
+		// TODO: [v17] Remove the `@ts-expect-error` once Tiptap has resolved the TypeScript definitions. [LK:2025-10-01]
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-expect-error
+		return this.parent?.() || [];
+	},
 });
 
 declare module '@tiptap/core' {
