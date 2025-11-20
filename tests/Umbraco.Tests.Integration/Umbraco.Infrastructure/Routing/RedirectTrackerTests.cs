@@ -130,7 +130,6 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
             GetRequiredService<IVariationContextAccessor>(),
             GetRequiredService<ILocalizationService>(),
             RedirectUrlService,
-            Mock.Of<IPublishedUrlProvider>(),
             GetRequiredService<ILogger<RedirectTracker>>());
     }
 

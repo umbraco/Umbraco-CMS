@@ -17,7 +17,6 @@ namespace Umbraco.Cms.Infrastructure.Routing
         private readonly IVariationContextAccessor _variationContextAccessor;
         private readonly ILocalizationService _localizationService;
         private readonly IRedirectUrlService _redirectUrlService;
-        private readonly IPublishedUrlProvider _publishedUrlProvider;
         private readonly ILogger<RedirectTracker> _logger;
 
         public RedirectTracker(
@@ -25,14 +24,12 @@ namespace Umbraco.Cms.Infrastructure.Routing
             IVariationContextAccessor variationContextAccessor,
             ILocalizationService localizationService,
             IRedirectUrlService redirectUrlService,
-            IPublishedUrlProvider publishedUrlProvider,
             ILogger<RedirectTracker> logger)
         {
             _umbracoContextFactory = umbracoContextFactory;
             _variationContextAccessor = variationContextAccessor;
             _localizationService = localizationService;
             _redirectUrlService = redirectUrlService;
-            _publishedUrlProvider = publishedUrlProvider;
             _logger = logger;
         }
 
