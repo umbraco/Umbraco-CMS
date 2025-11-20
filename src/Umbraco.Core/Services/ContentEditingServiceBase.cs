@@ -75,6 +75,11 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
 
     protected TContentTypeService ContentTypeService { get; }
 
+    /// <summary>
+    /// Gets the alias used to relate the parent entity when handling content (document or media) delete operations.
+    /// </summary>
+    protected virtual string? RelateParentOnDeleteAlias => null;
+
     protected async Task<Attempt<TContentCreateResult, ContentEditingOperationStatus>> MapCreate<TContentCreateResult>(ContentCreationModelBase contentCreationModelBase)
         where TContentCreateResult : ContentCreateResultBase<TContent>, new()
     {
@@ -202,9 +207,27 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
             return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(status, content);
         }
 
-        if (disabledWhenReferenced && _relationService.IsRelated(content.Id, RelationDirectionFilter.Child))
+        if (disabledWhenReferenced)
         {
-            return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(referenceFailStatus, content);
+            // When checking if an item is related, we may need to exclude the "relate parent on delete" relation type, as this prevents
+            // deleting from the recycle bin.
+            int[]? excludeRelationTypeIds = null;
+            if (string.IsNullOrWhiteSpace(RelateParentOnDeleteAlias) is false)
+            {
+                IRelationType? relateParentOnDeleteRelationType = _relationService.GetRelationTypeByAlias(RelateParentOnDeleteAlias);
+                if (relateParentOnDeleteRelationType is not null)
+                {
+                    excludeRelationTypeIds = [relateParentOnDeleteRelationType.Id];
+                }
+            }
+
+            if (_relationService.IsRelated(
+                content.Id,
+                RelationDirectionFilter.Child,
+                excludeRelationTypeIds: excludeRelationTypeIds))
+            {
+                return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(referenceFailStatus, content);
+            }
         }
 
         var userId = await GetUserIdAsync(userKey);

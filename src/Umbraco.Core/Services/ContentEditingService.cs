@@ -62,15 +62,14 @@ internal sealed class ContentEditingService
         _languageService = languageService;
     }
 
+    /// <inheritdoc/>
+    protected override string? RelateParentOnDeleteAlias => Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias;
+
     public Task<IContent?> GetAsync(Guid key)
     {
         IContent? content = ContentService.GetById(key);
         return Task.FromResult(content);
     }
-
-    [Obsolete("Please use the validate update method that is not obsoleted. Scheduled for removal in V17.")]
-    public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(Guid key, ValidateContentUpdateModel updateModel)
-        => await ValidateUpdateAsync(key, updateModel, Guid.Empty);
 
     public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(Guid key, ValidateContentUpdateModel updateModel, Guid userKey)
     {
@@ -79,10 +78,6 @@ internal sealed class ContentEditingService
             ? await ValidateCulturesAndPropertiesAsync(updateModel, content.ContentType.Key, await GetCulturesToValidate(updateModel.Cultures, userKey))
             : Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, new ContentValidationResult());
     }
-
-    [Obsolete("Please use the validate create method that is not obsoleted. Scheduled for removal in V17.")]
-    public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCreateAsync(ContentCreateModel createModel)
-        => await ValidateCreateAsync(createModel, Guid.Empty);
 
     public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCreateAsync(ContentCreateModel createModel, Guid userKey)
         => await ValidateCulturesAndPropertiesAsync(createModel, createModel.ContentTypeKey, await GetCulturesToValidate(createModel.Variants.Select(variant => variant.Culture), userKey));

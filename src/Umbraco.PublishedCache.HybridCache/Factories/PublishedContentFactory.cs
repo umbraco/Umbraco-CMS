@@ -1,9 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache.Factories;
 
@@ -15,8 +13,6 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
     private readonly IElementsCache _elementsCache;
     private readonly IVariationContextAccessor _variationContextAccessor;
     private readonly IPublishedContentTypeCache _publishedContentTypeCache;
-    private readonly ILogger<PublishedContentFactory> _logger;
-    private readonly AppCaches _appCaches;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PublishedContentFactory"/> class.
@@ -24,52 +20,23 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
     public PublishedContentFactory(
         IElementsCache elementsCache,
         IVariationContextAccessor variationContextAccessor,
-        IPublishedContentTypeCache publishedContentTypeCache,
-        ILogger<PublishedContentFactory> logger,
-        AppCaches appCaches)
+        IPublishedContentTypeCache publishedContentTypeCache)
     {
         _elementsCache = elementsCache;
         _variationContextAccessor = variationContextAccessor;
         _publishedContentTypeCache = publishedContentTypeCache;
-        _logger = logger;
-        _appCaches = appCaches;
     }
 
     /// <inheritdoc/>
     public IPublishedContent? ToIPublishedContent(ContentCacheNode contentCacheNode, bool preview)
     {
-        var cacheKey = $"{nameof(PublishedContentFactory)}DocumentCache_{contentCacheNode.Id}_{preview}";
-        IPublishedContent? publishedContent = null;
-        if (_appCaches.RequestCache.IsAvailable)
-        {
-            publishedContent = _appCaches.RequestCache.GetCacheItem<IPublishedContent?>(cacheKey);
-            if (publishedContent is not null)
-            {
-                _logger.LogDebug(
-                    "Using cached IPublishedContent for document {ContentCacheNodeName} ({ContentCacheNodeId}).",
-                    contentCacheNode.Data?.Name ?? "No Name",
-                    contentCacheNode.Id);
-                return publishedContent;
-            }
-        }
-
-        _logger.LogDebug(
-            "Creating IPublishedContent for document {ContentCacheNodeName} ({ContentCacheNodeId}).",
-            contentCacheNode.Data?.Name ?? "No Name",
-            contentCacheNode.Id);
-
         ContentNode contentNode = CreateContentNode(contentCacheNode, preview);
 
-        publishedContent = GetModel(contentNode, preview);
+        IPublishedContent? publishedContent = GetModel(contentNode, preview);
 
         if (preview)
         {
             publishedContent ??= GetPublishedContentAsDraft(publishedContent);
-        }
-
-        if (_appCaches.RequestCache.IsAvailable && publishedContent is not null)
-        {
-            _appCaches.RequestCache.Set(cacheKey, publishedContent);
         }
 
         return publishedContent;
@@ -118,72 +85,24 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
     /// <inheritdoc/>
     public IPublishedContent? ToIPublishedMedia(ContentCacheNode contentCacheNode)
     {
-        var cacheKey = $"{nameof(PublishedContentFactory)}MediaCache_{contentCacheNode.Id}";
-        IPublishedContent? publishedContent = null;
-        if (_appCaches.RequestCache.IsAvailable)
-        {
-            publishedContent = _appCaches.RequestCache.GetCacheItem<IPublishedContent?>(cacheKey);
-            if (publishedContent is not null)
-            {
-                _logger.LogDebug(
-                    "Using cached IPublishedContent for media {ContentCacheNodeName} ({ContentCacheNodeId}).",
-                    contentCacheNode.Data?.Name ?? "No Name",
-                    contentCacheNode.Id);
-                return publishedContent;
-            }
-        }
-
-        _logger.LogDebug(
-            "Creating IPublishedContent for media {ContentCacheNodeName} ({ContentCacheNodeId}).",
-            contentCacheNode.Data?.Name ?? "No Name",
-            contentCacheNode.Id);
-
         IPublishedContentType contentType =
             _publishedContentTypeCache.Get(PublishedItemType.Media, contentCacheNode.ContentTypeId);
         var contentNode = new ContentNode(
             contentCacheNode.Id,
             contentCacheNode.Key,
             contentCacheNode.SortOrder,
-            contentCacheNode.CreateDate,
+            contentCacheNode.CreateDate.EnsureUtc(),
             contentCacheNode.CreatorId,
             contentType,
             null,
             contentCacheNode.Data);
 
-        publishedContent = GetModel(contentNode, false);
-
-        if (_appCaches.RequestCache.IsAvailable && publishedContent is not null)
-        {
-            _appCaches.RequestCache.Set(cacheKey, publishedContent);
-        }
-
-        return publishedContent;
+        return GetModel(contentNode, false);
     }
 
     /// <inheritdoc/>
     public IPublishedMember ToPublishedMember(IMember member)
     {
-        string cacheKey = $"{nameof(PublishedContentFactory)}MemberCache_{member.Id}";
-        IPublishedMember? publishedMember = null;
-        if (_appCaches.RequestCache.IsAvailable)
-        {
-            publishedMember = _appCaches.RequestCache.GetCacheItem<IPublishedMember?>(cacheKey);
-            if (publishedMember is not null)
-            {
-                _logger.LogDebug(
-                    "Using cached IPublishedMember for member {MemberName} ({MemberId}).",
-                    member.Username,
-                    member.Id);
-
-                return publishedMember;
-            }
-        }
-
-        _logger.LogDebug(
-            "Creating IPublishedMember for member {MemberName} ({MemberId}).",
-            member.Username,
-            member.Id);
-
         IPublishedContentType contentType =
             _publishedContentTypeCache.Get(PublishedItemType.Member, member.ContentTypeId);
 
@@ -192,7 +111,7 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
             member.Name,
             null,
             0,
-            member.UpdateDate,
+            member.UpdateDate.EnsureUtc(),
             member.CreatorId,
             null,
             true,
@@ -203,19 +122,12 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
             member.Id,
             member.Key,
             member.SortOrder,
-            member.UpdateDate,
+            member.UpdateDate.EnsureUtc(),
             member.CreatorId,
             contentType,
             null,
             contentData);
-        publishedMember = new PublishedMember(member, contentNode, _elementsCache, _variationContextAccessor);
-
-        if (_appCaches.RequestCache.IsAvailable)
-        {
-            _appCaches.RequestCache.Set(cacheKey, publishedMember);
-        }
-
-        return publishedMember;
+        return new PublishedMember(member, contentNode, _elementsCache, _variationContextAccessor);
     }
 
     private ContentNode CreateContentNode(ContentCacheNode contentCacheNode, bool preview)

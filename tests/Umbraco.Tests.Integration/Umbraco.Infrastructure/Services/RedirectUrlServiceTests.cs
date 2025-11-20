@@ -1,8 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Linq;
-using System.Threading;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
@@ -38,8 +36,12 @@ internal sealed class RedirectUrlServiceTests : UmbracoIntegrationTestWithConten
 
         using (var scope = ScopeProvider.CreateScope())
         {
-            var repository = new RedirectUrlRepository((IScopeAccessor)ScopeProvider, AppCaches.Disabled,
-                Mock.Of<ILogger<RedirectUrlRepository>>());
+            var repository = new RedirectUrlRepository(
+                (IScopeAccessor)ScopeProvider,
+                AppCaches.Disabled,
+                Mock.Of<ILogger<RedirectUrlRepository>>(),
+                Mock.Of<IRepositoryCacheVersionService>(),
+                Mock.Of<ICacheSyncService>());
             var rootContent = ContentService.GetRootContent().First();
             var subPages = ContentService.GetPagedChildren(rootContent.Id, 0, 3, out _).ToList();
             _firstSubPage = subPages[0];
@@ -80,5 +82,17 @@ internal sealed class RedirectUrlServiceTests : UmbracoIntegrationTestWithConten
     {
         var redirect = RedirectUrlService.GetMostRecentRedirectUrl(UrlAlt, UnusedCulture);
         Assert.AreEqual(redirect.ContentId, _thirdSubPage.Id);
+    }
+
+    [Test]
+    public void Can_Register_Redirect()
+    {
+        const string TestUrl = "testUrl";
+
+        RedirectUrlService.Register(TestUrl, _firstSubPage.Key);
+
+        var redirect = RedirectUrlService.GetMostRecentRedirectUrl(TestUrl, CultureEnglish);
+
+        Assert.AreEqual(redirect.ContentId, _firstSubPage.Id);
     }
 }

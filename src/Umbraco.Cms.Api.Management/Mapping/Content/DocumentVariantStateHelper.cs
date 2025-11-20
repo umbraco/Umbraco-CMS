@@ -13,6 +13,7 @@ internal static class DocumentVariantStateHelper
             culture,
             content.Edited,
             content.Published,
+            content.Trashed,
             content.AvailableCultures,
             content.EditedCultures ?? Enumerable.Empty<string>(),
             content.PublishedCultures);
@@ -23,6 +24,7 @@ internal static class DocumentVariantStateHelper
             culture,
             content.Edited,
             content.Published,
+            content.Trashed,
             content.CultureNames.Keys,
             content.EditedCultures,
             content.PublishedCultures);
@@ -33,15 +35,21 @@ internal static class DocumentVariantStateHelper
             culture,
             element.Edited,
             element.Published,
+            element.Trashed,
             element.CultureNames.Keys,
             element.EditedCultures,
             element.PublishedCultures);
 
-    private static DocumentVariantState GetState(IEntity entity, string? culture, bool edited, bool published, IEnumerable<string> availableCultures, IEnumerable<string> editedCultures, IEnumerable<string> publishedCultures)
+    private static DocumentVariantState GetState(IEntity entity, string? culture, bool edited, bool published, bool trashed, IEnumerable<string> availableCultures, IEnumerable<string> editedCultures, IEnumerable<string> publishedCultures)
     {
         if (entity.Id <= 0 || (culture is not null && availableCultures.Contains(culture) is false))
         {
             return DocumentVariantState.NotCreated;
+        }
+
+        if (trashed)
+        {
+            return DocumentVariantState.Trashed;
         }
 
         var isDraft = published is false ||

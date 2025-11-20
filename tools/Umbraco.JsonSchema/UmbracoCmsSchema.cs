@@ -75,6 +75,8 @@ internal sealed class UmbracoCmsSchema
         public required WebhookSettings Webhook { get; set; }
 
         public required CacheSettings Cache { get; set; }
+
+        public required DistributedJobSettings DistributedJobSettings { get; set; }
     }
 
     public class InstallDefaultDataNamedOptions

@@ -20,7 +20,7 @@ public abstract class MigrationExpressionBase : IMigrationExpression
     protected MigrationExpressionBase(IMigrationContext context) =>
         Context = context ?? throw new ArgumentNullException(nameof(context));
 
-    public DatabaseType DatabaseType => Context.Database.DatabaseType;
+    public IDatabaseType DatabaseType => Context.Database.DatabaseType;
 
     protected IMigrationContext Context { get; }
 

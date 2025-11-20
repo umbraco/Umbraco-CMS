@@ -43,6 +43,7 @@ test('can rename a data type folder', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   await umbracoUi.dataType.waitForDataTypeToBeRenamed();
+  await umbracoUi.waitForTimeout(500); // Wait for the rename to be fully processed
   expect(await umbracoApi.dataType.doesNameExist(dataTypeFolderName)).toBeTruthy();
   expect(await umbracoApi.dataType.doesNameExist(wrongDataTypeFolderName)).toBeFalsy();
 });
@@ -99,6 +100,7 @@ test('can create a folder in a folder', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   await umbracoUi.dataType.waitForDataTypeToBeCreated();
+  await umbracoUi.waitForTimeout(500); // Wait for folder to be created
   expect(await umbracoApi.dataType.doesNameExist(childFolderName)).toBeTruthy();
   const dataTypeChildren = await umbracoApi.dataType.getChildren(dataTypeFolderId);
   expect(dataTypeChildren[0].name).toBe(childFolderName);
@@ -120,6 +122,7 @@ test('can create a folder in a folder in a folder', async ({umbracoApi, umbracoU
 
   // Assert
   await umbracoUi.dataType.waitForDataTypeToBeCreated();
+  await umbracoUi.waitForTimeout(500); // Wait for folder to be created
   expect(await umbracoApi.dataType.doesNameExist(childOfChildFolderName)).toBeTruthy();
   const childrenFolderData = await umbracoApi.dataType.getChildren(childFolderId);
   expect(childrenFolderData[0].name).toBe(childOfChildFolderName);

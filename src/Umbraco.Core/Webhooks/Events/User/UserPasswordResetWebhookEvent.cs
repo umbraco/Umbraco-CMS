@@ -20,7 +20,7 @@ public class UserPasswordResetWebhookEvent : WebhookEventBase<UserPasswordResetN
 
     public override string Alias => Constants.WebhookEvents.Aliases.UserPasswordReset;
 
-    public override object? ConvertNotificationToRequestPayload(UserPasswordResetNotification notification)
+    public override object ConvertNotificationToRequestPayload(UserPasswordResetNotification notification)
         => new
         {
             Id = notification.AffectedUserId is not null &&

@@ -1,5 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -26,39 +24,6 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
     private readonly ICacheManager _cacheManager;
     private readonly IPublishStatusManagementService _publishStatusManagementService;
     private readonly IIdKeyMap _idKeyMap;
-
-    [Obsolete("Use the constructor with ICacheManager instead, scheduled for removal in V17.")]
-    public ContentCacheRefresher(
-        AppCaches appCaches,
-        IJsonSerializer serializer,
-        IIdKeyMap idKeyMap,
-        IDomainService domainService,
-        IEventAggregator eventAggregator,
-        ICacheRefresherNotificationFactory factory,
-        IDocumentUrlService documentUrlService,
-        IDomainCacheService domainCacheService,
-        IDocumentNavigationQueryService documentNavigationQueryService,
-        IDocumentNavigationManagementService documentNavigationManagementService,
-        IContentService contentService,
-        IPublishStatusManagementService publishStatusManagementService,
-        IDocumentCacheService documentCacheService)
-        : this(
-            appCaches,
-            serializer,
-            idKeyMap,
-            domainService,
-            eventAggregator,
-            factory,
-            documentUrlService,
-            domainCacheService,
-            documentNavigationQueryService,
-            documentNavigationManagementService,
-            contentService,
-            publishStatusManagementService,
-            documentCacheService,
-            StaticServiceProvider.Instance.GetRequiredService<ICacheManager>())
-    {
-    }
 
     public ContentCacheRefresher(
         AppCaches appCaches,
@@ -120,7 +85,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
 
     #region Refresher
 
-    public override void Refresh(JsonPayload[] payloads)
+    public override void RefreshInternal(JsonPayload[] payloads)
     {
         AppCaches.RuntimeCache.ClearOfType<PublicAccessEntry>();
         AppCaches.RuntimeCache.ClearByKey(CacheKeys.ContentRecycleBinCacheKey);
@@ -132,7 +97,6 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         // If published elements become their own entities with relations, instead of just property data, we can revisit this.
         _cacheManager.ElementsCache.Clear();
 
-        var idsRemoved = new HashSet<int>();
         IAppPolicyCache isolatedCache = AppCaches.IsolatedCaches.GetOrCreate<IContent>();
 
         foreach (JsonPayload payload in payloads)
@@ -152,13 +116,22 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
                 var pathid = "," + payload.Id + ",";
                 isolatedCache.ClearOfType<IContent>((k, v) => v.Path?.Contains(pathid) ?? false);
             }
+        }
 
+        base.RefreshInternal(payloads);
+    }
+
+    public override void Refresh(JsonPayload[] payloads)
+    {
+        var idsRemoved = new HashSet<int>();
+
+        foreach (JsonPayload payload in payloads)
+        {
             // if the item is not a blueprint and is being completely removed, we need to refresh the domains cache if any domain was assigned to the content
             if (payload.Blueprint is false && payload.ChangeTypes.HasTypesAny(TreeChangeTypes.Remove))
             {
                 idsRemoved.Add(payload.Id);
             }
-
 
             HandleMemoryCache(payload);
             HandleRouting(payload);
@@ -174,6 +147,12 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
                 _idKeyMap.ClearCache(payload.Key.Value);
             }
 
+        }
+
+        // Clear partial view cache when published content changes
+        if (ShouldClearPartialViewCache(payloads))
+        {
+            AppCaches.ClearPartialViewCache();
         }
 
         if (idsRemoved.Count > 0)
@@ -198,6 +177,28 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         }
 
         base.Refresh(payloads);
+    }
+
+    private static bool ShouldClearPartialViewCache(JsonPayload[] payloads)
+    {
+        return payloads.Any(x =>
+        {
+            // Check for relelvant change type
+            var isRelevantChangeType = x.ChangeTypes.HasType(TreeChangeTypes.RefreshAll) ||
+                x.ChangeTypes.HasType(TreeChangeTypes.Remove) ||
+                x.ChangeTypes.HasType(TreeChangeTypes.RefreshNode) ||
+                x.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch);
+
+            // Check for published/unpublished changes
+            var hasChanges = x.PublishedCultures?.Length > 0 ||
+                   x.UnpublishedCultures?.Length > 0;
+
+            // There's no other way to detect trashed content as the change type is only Remove when deleted permanently
+            var isTrashed = x.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch) && x.PublishedCultures is null && x.UnpublishedCultures is null;
+
+            // Skip blueprints and only clear the partial cache for removals or refreshes with changes
+            return x.Blueprint == false && (isTrashed || (isRelevantChangeType && hasChanges));
+        });
     }
 
     private void HandleMemoryCache(JsonPayload payload)
@@ -390,7 +391,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
     }
     private void HandleRouting(JsonPayload payload)
     {
-        if(payload.ChangeTypes.HasType(TreeChangeTypes.Remove))
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.Remove))
         {
             var key = payload.Key ?? _idKeyMap.GetKeyForId(payload.Id, UmbracoObjectTypes.Document).Result;
 
@@ -399,24 +400,24 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
             {
                 _documentUrlService.DeleteUrlsFromCacheAsync(descendantsOrSelfKeys).GetAwaiter().GetResult();
             }
-            else if(_documentNavigationQueryService.TryGetDescendantsKeysOrSelfKeysInBin(key, out var descendantsOrSelfKeysInBin))
+            else if (_documentNavigationQueryService.TryGetDescendantsKeysOrSelfKeysInBin(key, out var descendantsOrSelfKeysInBin))
             {
                 _documentUrlService.DeleteUrlsFromCacheAsync(descendantsOrSelfKeysInBin).GetAwaiter().GetResult();
             }
 
         }
-        if(payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
         {
             _documentUrlService.InitAsync(false, CancellationToken.None).GetAwaiter().GetResult(); //TODO make async
         }
 
-        if(payload.ChangeTypes.HasType(TreeChangeTypes.RefreshNode))
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshNode))
         {
             var key = payload.Key ?? _idKeyMap.GetKeyForId(payload.Id, UmbracoObjectTypes.Document).Result;
             _documentUrlService.CreateOrUpdateUrlSegmentsAsync(key).GetAwaiter().GetResult();
         }
 
-        if(payload.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch))
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch))
         {
             var key = payload.Key ?? _idKeyMap.GetKeyForId(payload.Id, UmbracoObjectTypes.Document).Result;
             _documentUrlService.CreateOrUpdateUrlSegmentsWithDescendantsAsync(key).GetAwaiter().GetResult();

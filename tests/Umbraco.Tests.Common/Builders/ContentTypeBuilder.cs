@@ -547,6 +547,14 @@ public class ContentTypeBuilder
             .WithValueStorageType(ValueStorageType.Ntext)
             .WithSortOrder(20)
             .Done()
+            .AddPropertyType()
+            .WithAlias("dateTimeWithTimeZone")
+            .WithName("Date Time (with time zone)")
+            .WithDataTypeId(1055)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.DateTimeWithTimeZone)
+            .WithValueStorageType(ValueStorageType.Ntext)
+            .WithSortOrder(21)
+            .Done()
             .Done()
             .Build();
     }

@@ -14,8 +14,18 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
 internal sealed class LogViewerQueryRepository : EntityRepositoryBase<int, ILogViewerQuery>, ILogViewerQueryRepository
 {
-    public LogViewerQueryRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<LogViewerQueryRepository> logger)
-        : base(scopeAccessor, cache, logger)
+    public LogViewerQueryRepository(
+        IScopeAccessor scopeAccessor,
+        AppCaches cache,
+        ILogger<LogViewerQueryRepository> logger,
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            cache,
+            logger,
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
     }
 
@@ -25,14 +35,14 @@ internal sealed class LogViewerQueryRepository : EntityRepositoryBase<int, ILogV
         GetMany().FirstOrDefault(x => x.Name == name);
 
     protected override IRepositoryCachePolicy<ILogViewerQuery, int> CreateCachePolicy() =>
-        new FullDataSetRepositoryCachePolicy<ILogViewerQuery, int>(GlobalIsolatedCache, ScopeAccessor, GetEntityId, /*expires:*/ false);
+        new FullDataSetRepositoryCachePolicy<ILogViewerQuery, int>(GlobalIsolatedCache, ScopeAccessor,  RepositoryCacheVersionService, CacheSyncService, GetEntityId, /*expires:*/ false);
 
     protected override IEnumerable<ILogViewerQuery> PerformGetAll(params int[]? ids)
     {
-        Sql<ISqlContext>? sql = GetBaseQuery(false).Where($"{Constants.DatabaseSchema.Tables.LogViewerQuery}.id > 0");
-        if (ids?.Any() ?? false)
+        Sql<ISqlContext>? sql = GetBaseQuery(false).Where<LogViewerQueryDto>(c => c.Id > 0);
+        if (ids?.Length > 0)
         {
-            sql.Where($"{Constants.DatabaseSchema.Tables.LogViewerQuery}.id in (@ids)", new { ids });
+            sql.WhereIn<LogViewerQueryDto>(c => c.Id, ids);
         }
 
         return Database.Fetch<LogViewerQueryDto>(sql).Select(ConvertFromDto);
@@ -49,19 +59,21 @@ internal sealed class LogViewerQueryRepository : EntityRepositoryBase<int, ILogV
         return sql;
     }
 
-    protected override string GetBaseWhereClause() => $"{Constants.DatabaseSchema.Tables.LogViewerQuery}.id = @id";
+    protected override string GetBaseWhereClause() => $"{QuoteTableName(Constants.DatabaseSchema.Tables.LogViewerQuery)}.id = @id";
 
     protected override IEnumerable<string> GetDeleteClauses()
     {
-        var list = new List<string> { $"DELETE FROM {Constants.DatabaseSchema.Tables.LogViewerQuery} WHERE id = @id" };
+        var list = new List<string> { $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.LogViewerQuery)} WHERE id = @id" };
         return list;
     }
 
     protected override void PersistNewItem(ILogViewerQuery entity)
     {
-        var exists = Database.ExecuteScalar<int>(
-            $"SELECT COUNT(*) FROM {Constants.DatabaseSchema.Tables.LogViewerQuery} WHERE name = @name",
-            new { name = entity.Name });
+        Sql<ISqlContext> sql = Sql()
+            .SelectCount()
+            .From<LogViewerQueryDto>()
+            .Where<LogViewerQueryDto>(x => x.Name == entity.Name);
+        var exists = Database.ExecuteScalar<int>(sql);
         if (exists > 0)
         {
             throw new DuplicateNameException($"The log query name '{entity.Name}' is already used");
@@ -79,10 +91,11 @@ internal sealed class LogViewerQueryRepository : EntityRepositoryBase<int, ILogV
     protected override void PersistUpdatedItem(ILogViewerQuery entity)
     {
         entity.UpdatingEntity();
-
-        var exists = Database.ExecuteScalar<int>(
-            $"SELECT COUNT(*) FROM {Constants.DatabaseSchema.Tables.LogViewerQuery} WHERE name = @name AND id <> @id",
-            new { name = entity.Name, id = entity.Id });
+        Sql<ISqlContext> sql = Sql()
+            .SelectCount()
+            .From<LogViewerQueryDto>()
+            .Where<LogViewerQueryDto>(x => x.Name == entity.Name && x.Id != entity.Id);
+        var exists = Database.ExecuteScalar<int>(sql);
 
         // ensure there is no other log query with the same name on another entity
         if (exists > 0)

@@ -1,4 +1,3 @@
-﻿
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -75,7 +74,7 @@ public static class UmbracoBuilderExtensions
         builder.AddNotificationAsyncHandler<ContentTypeDeletedNotification, CacheRefreshingNotificationHandler>();
         builder.AddNotificationAsyncHandler<MediaTypeRefreshedNotification, CacheRefreshingNotificationHandler>();
         builder.AddNotificationAsyncHandler<MediaTypeDeletedNotification, CacheRefreshingNotificationHandler>();
-        builder.AddNotificationAsyncHandler<UmbracoApplicationStartedNotification, SeedingNotificationHandler>();
+        builder.AddNotificationAsyncHandler<UmbracoApplicationStartingNotification, SeedingNotificationHandler>();
         builder.AddCacheSeeding();
         return builder;
     }

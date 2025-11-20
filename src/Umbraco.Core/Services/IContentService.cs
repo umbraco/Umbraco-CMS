@@ -401,23 +401,6 @@ public interface IContentService : IPublishableContentService<IContent>
     ///     Publishes a document branch.
     /// </summary>
     /// <param name="content">The root document.</param>
-    /// <param name="force">A value indicating whether to force-publish documents that are not already published.</param>
-    /// <param name="cultures">The cultures to publish.</param>
-    /// <param name="userId">The identifier of the user performing the operation.</param>
-    /// <remarks>
-    ///     <para>
-    ///         The <paramref name="force" /> parameter determines which documents are published. When <c>false</c>,
-    ///         only those documents that are already published, are republished. When <c>true</c>, all documents are
-    ///         published. The root of the branch is always published, regardless of <paramref name="force" />.
-    ///     </para>
-    /// </remarks>
-    [Obsolete("This method is not longer used as the 'force' parameter has been extended into options for publishing unpublished and re-publishing changed content. Please use the overload containing the parameter for those options instead. Will be removed in V17.")]
-    IEnumerable<PublishResult> PublishBranch(IContent content, bool force, string[] cultures, int userId = Constants.Security.SuperUserId);
-
-    /// <summary>
-    ///     Publishes a document branch.
-    /// </summary>
-    /// <param name="content">The root document.</param>
     /// <param name="publishBranchFilter">A value indicating options for force publishing unpublished or re-publishing unchanged content.</param>
     /// <param name="cultures">The cultures to publish.</param>
     /// <param name="userId">The identifier of the user performing the operation.</param>

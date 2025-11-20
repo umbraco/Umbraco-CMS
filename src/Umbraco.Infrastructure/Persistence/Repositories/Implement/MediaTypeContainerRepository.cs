@@ -8,8 +8,19 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
 internal sealed class MediaTypeContainerRepository : EntityContainerRepository, IMediaTypeContainerRepository
 {
-    public MediaTypeContainerRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<MediaTypeContainerRepository> logger)
-        : base(scopeAccessor, cache, logger, Constants.ObjectTypes.MediaTypeContainer)
+    public MediaTypeContainerRepository(
+        IScopeAccessor scopeAccessor,
+        AppCaches cache,
+        ILogger<MediaTypeContainerRepository> logger,
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            cache,
+            logger,
+            Constants.ObjectTypes.MediaTypeContainer,
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
     }
 }

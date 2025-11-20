@@ -1,7 +1,20 @@
 export * from './tiptap-extension-api-base.js';
 export * from './tiptap-toolbar-element-api-base.js';
 export * from './anchor/index.js';
+export * from './bubble-menu/index.js';
 export * from './character-map/index.js';
+export * from './embedded-media/index.js';
+export * from './figure/index.js';
+export * from './html-attr-class/index.js';
+export * from './html-attr-dataset/index.js';
+export * from './html-attr-id/index.js';
+export * from './html-attr-style/index.js';
+export * from './html-tag-div/index.js';
+export * from './html-tag-span/index.js';
+export * from './image/index.js';
+export * from './link/index.js';
 export * from './table/index.js';
+export * from './text-direction/index.js';
+export * from './text-indent/index.js';
 
 export type * from './types.js';

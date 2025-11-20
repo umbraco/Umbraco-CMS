@@ -22,24 +22,6 @@ public class PropertyValidationService : IPropertyValidationService
     private readonly ILanguageService _languageService;
     private readonly ContentSettings _contentSettings;
 
-    [Obsolete("Use the non-obsolete constructor. Will be removed in V17.")]
-    public PropertyValidationService(
-        PropertyEditorCollection propertyEditors,
-        IDataTypeService dataTypeService,
-        ILocalizedTextService textService,
-        IValueEditorCache valueEditorCache,
-        ICultureDictionary cultureDictionary)
-        : this(
-            propertyEditors,
-            dataTypeService,
-            textService,
-            valueEditorCache,
-            cultureDictionary,
-            StaticServiceProvider.Instance.GetRequiredService<ILanguageService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IOptions<ContentSettings>>())
-    {
-    }
-
     public PropertyValidationService(
         PropertyEditorCollection propertyEditors,
         IDataTypeService dataTypeService,

@@ -183,7 +183,7 @@ public class HtmlLocalLinkParserTests
                 It.IsAny<UrlMode>(),
                 It.IsAny<string>(),
                 It.IsAny<Uri>()))
-            .Returns(UrlInfo.Url("/my-test-url"));
+            .Returns(UrlInfo.AsUrl("/my-test-url", "Test Provider"));
         var contentType = new PublishedContentType(
             Guid.NewGuid(),
             666,
@@ -213,7 +213,7 @@ public class HtmlLocalLinkParserTests
                 It.IsAny<UrlMode>(),
                 It.IsAny<string>(),
                 It.IsAny<Uri>()))
-            .Returns(UrlInfo.Url("/media/1001/my-image.jpg"));
+            .Returns(UrlInfo.AsUrl("/media/1001/my-image.jpg", "Test Provider"));
 
         var umbracoContextAccessor = new TestUmbracoContextAccessor();
 
@@ -257,14 +257,14 @@ public class HtmlLocalLinkParserTests
                 UrlMode.Relative,
                 It.IsAny<string>(),
                 It.IsAny<Uri>()))
-            .Returns(UrlInfo.Url("/relative-url"));
+            .Returns(UrlInfo.AsUrl("/relative-url", "Test Provider"));
         contentUrlProvider
             .Setup(x => x.GetUrl(
                 It.IsAny<IPublishedContent>(),
                 UrlMode.Absolute,
                 It.IsAny<string>(),
                 It.IsAny<Uri>()))
-            .Returns(UrlInfo.Url("http://example.com/absolute-url"));
+            .Returns(UrlInfo.AsUrl("http://example.com/absolute-url", "Test Provider"));
 
         var contentType = new PublishedContentType(
             Guid.NewGuid(),
@@ -328,28 +328,28 @@ public class HtmlLocalLinkParserTests
                 UrlMode.Default,
                 It.IsAny<string>(),
                 It.IsAny<Uri>()))
-            .Returns(UrlInfo.Url("/relative-url"));
+            .Returns(UrlInfo.AsUrl("/relative-url", "Test Provider"));
         contentUrlProvider
             .Setup(x => x.GetUrl(
                 It.IsAny<IPublishedContent>(),
                 UrlMode.Relative,
                 It.IsAny<string>(),
                 It.IsAny<Uri>()))
-            .Returns(UrlInfo.Url("/relative-url"));
+            .Returns(UrlInfo.AsUrl("/relative-url", "Test Provider"));
         contentUrlProvider
             .Setup(x => x.GetUrl(
                 It.IsAny<IPublishedContent>(),
                 UrlMode.Absolute,
                 It.IsAny<string>(),
                 It.IsAny<Uri>()))
-            .Returns(UrlInfo.Url("https://example.com/absolute-url"));
+            .Returns(UrlInfo.AsUrl("https://example.com/absolute-url", "Test Provider"));
         contentUrlProvider
             .Setup(x => x.GetUrl(
                 It.IsAny<IPublishedContent>(),
                 UrlMode.Auto,
                 It.IsAny<string>(),
                 It.IsAny<Uri>()))
-            .Returns(UrlInfo.Url("/relative-url"));
+            .Returns(UrlInfo.AsUrl("/relative-url", "Test Provider"));
 
         var contentType = new PublishedContentType(
             Guid.NewGuid(),
@@ -371,28 +371,28 @@ public class HtmlLocalLinkParserTests
                 UrlMode.Default,
                 It.IsAny<string>(),
                 It.IsAny<Uri>()))
-            .Returns(UrlInfo.Url("/media/relative/image.jpg"));
+            .Returns(UrlInfo.AsUrl("/media/relative/image.jpg", "Test Provider"));
         mediaUrlProvider.Setup(x => x.GetMediaUrl(
                 It.IsAny<IPublishedContent>(),
                 It.IsAny<string>(),
                 UrlMode.Relative,
                 It.IsAny<string>(),
                 It.IsAny<Uri>()))
-            .Returns(UrlInfo.Url("/media/relative/image.jpg"));
+            .Returns(UrlInfo.AsUrl("/media/relative/image.jpg", "Test Provider"));
         mediaUrlProvider.Setup(x => x.GetMediaUrl(
                 It.IsAny<IPublishedContent>(),
                 It.IsAny<string>(),
                 UrlMode.Absolute,
                 It.IsAny<string>(),
                 It.IsAny<Uri>()))
-            .Returns(UrlInfo.Url("https://example.com/media/absolute/image.jpg"));
+            .Returns(UrlInfo.AsUrl("https://example.com/media/absolute/image.jpg", "Test Provider"));
         mediaUrlProvider.Setup(x => x.GetMediaUrl(
                 It.IsAny<IPublishedContent>(),
                 It.IsAny<string>(),
                 UrlMode.Auto,
                 It.IsAny<string>(),
                 It.IsAny<Uri>()))
-            .Returns(UrlInfo.Url("/media/relative/image.jpg"));
+            .Returns(UrlInfo.AsUrl("/media/relative/image.jpg", "Test Provider"));
 
         var mediaType = new PublishedContentType(
             Guid.NewGuid(),

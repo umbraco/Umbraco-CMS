@@ -27,6 +27,8 @@ namespace Umbraco.Cms.Core.Services;
 /// </summary>
 public class ContentService : PublishableContentServiceBase<IContent>, IContentService
 {
+    private readonly IAuditService _auditService;
+    private readonly IContentTypeRepository _contentTypeRepository;
     private readonly IDocumentBlueprintRepository _documentBlueprintRepository;
     private readonly IDocumentRepository _documentRepository;
     private readonly IEntityRepository _entityRepository;
@@ -50,7 +52,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
         IEventMessagesFactory eventMessagesFactory,
         IDocumentRepository documentRepository,
         IEntityRepository entityRepository,
-        IAuditRepository auditRepository,
+        IAuditService auditService,
         IContentTypeRepository contentTypeRepository,
         IDocumentBlueprintRepository documentBlueprintRepository,
         ILanguageRepository languageRepository,
@@ -77,6 +79,8 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
     {
         _documentRepository = documentRepository;
         _entityRepository = entityRepository;
+        _auditService = auditService;
+        _contentTypeRepository = contentTypeRepository;
         _documentBlueprintRepository = documentBlueprintRepository;
         _languageRepository = languageRepository;
         _propertyValidationService = propertyValidationService;
@@ -94,8 +98,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
         _logger = loggerFactory.CreateLogger<ContentService>();
     }
 
-    [Obsolete("Use non-obsolete constructor. Scheduled for removal in V17.")]
-
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
     public ContentService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -111,14 +114,16 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
         ICultureImpactFactory cultureImpactFactory,
         IUserIdKeyResolver userIdKeyResolver,
         PropertyEditorCollection propertyEditorCollection,
-        IIdKeyMap idKeyMap)
+        IIdKeyMap idKeyMap,
+        IOptionsMonitor<ContentSettings> optionsMonitor,
+        IRelationService relationService)
         : this(
             provider,
             loggerFactory,
             eventMessagesFactory,
             documentRepository,
             entityRepository,
-            auditRepository,
+            StaticServiceProvider.Instance.GetRequiredService<IAuditService>(),
             contentTypeRepository,
             documentBlueprintRepository,
             languageRepository,
@@ -128,11 +133,12 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
             userIdKeyResolver,
             propertyEditorCollection,
             idKeyMap,
-            StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<ContentSettings>>(),
-            StaticServiceProvider.Instance.GetRequiredService<IRelationService>())
+            optionsMonitor,
+            relationService)
     {
     }
-    [Obsolete("Use non-obsolete constructor. Scheduled for removal in V17.")]
+
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
     public ContentService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -140,6 +146,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
         IDocumentRepository documentRepository,
         IEntityRepository entityRepository,
         IAuditRepository auditRepository,
+        IAuditService auditService,
         IContentTypeRepository contentTypeRepository,
         IDocumentBlueprintRepository documentBlueprintRepository,
         ILanguageRepository languageRepository,
@@ -147,14 +154,17 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
         IShortStringHelper shortStringHelper,
         ICultureImpactFactory cultureImpactFactory,
         IUserIdKeyResolver userIdKeyResolver,
-        PropertyEditorCollection propertyEditorCollection)
+        PropertyEditorCollection propertyEditorCollection,
+        IIdKeyMap idKeyMap,
+        IOptionsMonitor<ContentSettings> optionsMonitor,
+        IRelationService relationService)
         : this(
             provider,
             loggerFactory,
             eventMessagesFactory,
             documentRepository,
             entityRepository,
-            auditRepository,
+            auditService,
             contentTypeRepository,
             documentBlueprintRepository,
             languageRepository,
@@ -163,7 +173,9 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
             cultureImpactFactory,
             userIdKeyResolver,
             propertyEditorCollection,
-            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>())
+            idKeyMap,
+            optionsMonitor,
+            relationService)
     {
     }
 
@@ -803,7 +815,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
         // variant content type - publish specified cultures
         // invariant content type - publish only the invariant culture
 
-        var publishTime = DateTime.Now;
+        var publishTime = DateTime.UtcNow;
         if (content.ContentType.VariesByCulture())
         {
             return culturesToPublish.All(culture =>
@@ -845,11 +857,6 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
         cultures.Add(c); // <culture> means 'publish this culture'
         return cultures;
     }
-
-    /// <inheritdoc />
-    [Obsolete("This method is not longer used as the 'force' parameter has been split into publishing unpublished and force re-published. Please use the overload containing parameters for those options instead. Scheduled for removal in V17")]
-    public IEnumerable<PublishResult> PublishBranch(IContent content, bool force, string[] cultures, int userId = Constants.Security.SuperUserId)
-        => PublishBranch(content, force ? PublishBranchFilter.IncludeUnpublished : PublishBranchFilter.Default, cultures, userId);
 
     /// <inheritdoc />
     public IEnumerable<PublishResult> PublishBranch(IContent content, PublishBranchFilter publishBranchFilter, string[] cultures, int userId = Constants.Security.SuperUserId)
@@ -1026,7 +1033,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
                     variesByCulture ? culturesPublished.IsCollectionEmpty() ? null : culturesPublished : ["*"],
                     null,
                     eventMessages));
-            scope.Notifications.Publish(new ContentPublishedNotification(publishedDocuments, eventMessages).WithState(notificationState));
+            scope.Notifications.Publish(new ContentPublishedNotification(publishedDocuments, eventMessages, true).WithState(notificationState));
 
             scope.Complete();
         }
@@ -1973,7 +1980,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
             scope.Complete();
         }
 
-        DateTime now = DateTime.Now;
+        DateTime now = DateTime.UtcNow;
         foreach (var culture in cultures)
         {
             foreach (IProperty property in blueprint.Properties)
@@ -2003,7 +2010,10 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
             IQuery<IContent> query = Query<IContent>();
             if (contentTypeId.Length > 0)
             {
-                query.Where(x => contentTypeId.Contains(x.ContentTypeId));
+                // Need to use a List here because the expression tree cannot convert the array when used in Contains.
+                // See ExpressionTests.Sql_In().
+                List<int> contentTypeIdsAsList = [.. contentTypeId];
+                query.Where(x => contentTypeIdsAsList.Contains(x.ContentTypeId));
             }
 
             return _documentBlueprintRepository.Get(query).Select(x =>
@@ -2022,11 +2032,14 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
         {
             scope.WriteLock(Constants.Locks.ContentTree);
 
-            var contentTypeIdsA = contentTypeIds.ToArray();
+            // Need to use a List here because the expression tree cannot convert an array when used in Contains.
+            // See ExpressionTests.Sql_In().
+            var contentTypeIdsAsList = contentTypeIds.ToList();
+
             IQuery<IContent> query = Query<IContent>();
-            if (contentTypeIdsA.Length > 0)
+            if (contentTypeIdsAsList.Count > 0)
             {
-                query.Where(x => contentTypeIdsA.Contains(x.ContentTypeId));
+                query.Where(x => contentTypeIdsAsList.Contains(x.ContentTypeId));
             }
 
             IContent[]? blueprints = _documentBlueprintRepository.Get(query)?.Select(x =>

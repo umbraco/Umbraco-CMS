@@ -102,7 +102,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	#resetMasterTemplate() {
-		this.#templateWorkspaceContext?.setMasterTemplate(null);
+		this.#templateWorkspaceContext?.setMasterTemplate(null, true);
 	}
 
 	#openMasterTemplatePicker() {
@@ -121,7 +121,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 			?.onSubmit()
 			.then((value) => {
 				if (!value?.selection) return;
-				this.#templateWorkspaceContext?.setMasterTemplate(value.selection[0] ?? null);
+				this.#templateWorkspaceContext?.setMasterTemplate(value.selection[0] ?? null, true);
 			})
 			.catch(() => undefined);
 	}

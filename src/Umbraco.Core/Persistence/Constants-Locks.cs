@@ -92,8 +92,18 @@ public static partial class Constants
         public const int DocumentUrls = -345;
 
         /// <summary>
+        ///    The cache version.
+        /// </summary>
+        public const int CacheVersion = -346;
+
+        /// <summary>
+        ///     All distributed jobs.
+        /// </summary>
+        public const int DistributedJobs = -347;
+
+        /// <summary>
         ///     The entire element tree, i.e. all element items.
         /// </summary>
-        public const int ElementTree = -346;
+        public const int ElementTree = -348;
     }
 }

@@ -24,6 +24,7 @@ public sealed class ContentPublishedNotification : EnumerableObjectNotification<
 
     public ContentPublishedNotification(IEnumerable<IContent> target, EventMessages messages, bool includeDescendants)
         : base(target, messages) => IncludeDescendants = includeDescendants;
+
     /// <summary>
     /// Gets a enumeration of <see cref="IContent"/> which are being published.
     /// </summary>
