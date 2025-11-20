@@ -17,7 +17,7 @@ public class ExternalSignInAutoLinkOptions
     ///     Initializes a new instance of the <see cref="ExternalSignInAutoLinkOptions" /> class.
     /// </summary>
     /// <param name="autoLinkExternalAccount"></param>
-    /// <param name="defaultUserGroups">If null, the default will be the 'editor' group</param>
+    /// <param name="defaultUserGroups">If null, the default will be no groups.</param>
     /// <param name="defaultCulture"></param>
     /// <param name="allowManualLinking"></param>
     public ExternalSignInAutoLinkOptions(
@@ -26,7 +26,7 @@ public class ExternalSignInAutoLinkOptions
         string? defaultCulture = null,
         bool allowManualLinking = true)
     {
-        DefaultUserGroups = defaultUserGroups ?? new[] { SecurityConstants.EditorGroupAlias };
+        DefaultUserGroups = defaultUserGroups ?? [];
         AutoLinkExternalAccount = autoLinkExternalAccount;
         AllowManualLinking = allowManualLinking;
         _defaultCulture = defaultCulture;

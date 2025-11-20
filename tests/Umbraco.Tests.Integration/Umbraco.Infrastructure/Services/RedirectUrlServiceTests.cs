@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class RedirectUrlServiceTests : UmbracoIntegrationTestWithContent
+internal sealed class RedirectUrlServiceTests : UmbracoIntegrationTestWithContent
 {
     private IContent _firstSubPage;
     private IContent _secondSubPage;
@@ -38,8 +38,12 @@ public class RedirectUrlServiceTests : UmbracoIntegrationTestWithContent
 
         using (var scope = ScopeProvider.CreateScope())
         {
-            var repository = new RedirectUrlRepository((IScopeAccessor)ScopeProvider, AppCaches.Disabled,
-                Mock.Of<ILogger<RedirectUrlRepository>>());
+            var repository = new RedirectUrlRepository(
+                (IScopeAccessor)ScopeProvider,
+                AppCaches.Disabled,
+                Mock.Of<ILogger<RedirectUrlRepository>>(),
+                Mock.Of<IRepositoryCacheVersionService>(),
+                Mock.Of<ICacheSyncService>());
             var rootContent = ContentService.GetRootContent().First();
             var subPages = ContentService.GetPagedChildren(rootContent.Id, 0, 3, out _).ToList();
             _firstSubPage = subPages[0];

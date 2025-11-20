@@ -23,19 +23,12 @@ public class AllowedChildrenDocumentTypeController : DocumentTypeControllerBase
         _umbracoMapper = umbracoMapper;
     }
 
-    [NonAction]
-    [Obsolete("Use the non obsoleted method instead. Scheduled to be removed in v16")]
-    public async Task<IActionResult> AllowedChildrenByKey(
-        CancellationToken cancellationToken,
-        Guid id,
-        int skip = 0,
-        int take = 100)
-        => await AllowedChildrenByKey(cancellationToken, id, null, skip, take);
-
     [HttpGet("{id:guid}/allowed-children")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<AllowedDocumentType>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Gets allowed child document types.")]
+    [EndpointDescription("Gets a collection of document types that are allowed as children of the specified parent document type.")]
     public async Task<IActionResult> AllowedChildrenByKey(
         CancellationToken cancellationToken,
         Guid id,

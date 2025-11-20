@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
@@ -24,6 +25,6 @@ public class ContentMovedWebhookEvent : WebhookEventBase<ContentMovedNotificatio
 
     public override string Alias => Constants.WebhookEvents.Aliases.ContentMoved;
 
-    public override object? ConvertNotificationToRequestPayload(ContentMovedNotification notification)
-        => notification.MoveInfoCollection;
+    public override object ConvertNotificationToRequestPayload(ContentMovedNotification notification)
+        => notification.MoveInfoCollection.Select(moveInfo => new DefaultPayloadModel { Id = moveInfo.Entity.Key });
 }

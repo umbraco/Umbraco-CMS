@@ -38,12 +38,9 @@ fetch(swaggerUrl).then(async (response) => {
       ...defaultPlugins,
       '@hey-api/client-fetch',
       {
-        name: '@hey-api/typescript',
-        enums: 'typescript'
-      },
-      {
         name: '@hey-api/sdk',
-        asClass: true
+        asClass: true,
+        classNameBuilder: '{{name}}Service',
       }
     ],
   });

@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, PublishedRepositoryEvents = true)]
-public class ContentTypeServiceTests : UmbracoIntegrationTest
+internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
 {
     private IFileService FileService => GetRequiredService<IFileService>();
 
@@ -1971,6 +1971,65 @@ public class ContentTypeServiceTests : UmbracoIntegrationTest
                 .Variations);
     }
 
+    [Test]
+    public void Can_Create_Property_Type_Based_On_DataTypeKey()
+    {
+        // Arrange
+        var cts = ContentTypeService;
+        var dtdYesNo = DataTypeService.GetDataType(-49);
+        IContentType ctBase = new ContentType(ShortStringHelper, -1)
+        {
+            Name = "Base",
+            Alias = "Base",
+            Icon = "folder.gif",
+            Thumbnail = "folder.png"
+        };
+        ctBase.AddPropertyType(new PropertyType(ShortStringHelper, "ShouldNotMatter", ValueStorageType.Nvarchar)
+        {
+            Name = "Hide From Navigation",
+            Alias = Constants.Conventions.Content.NaviHide,
+            DataTypeKey = dtdYesNo.Key
+        });
+        cts.Save(ctBase);
+
+        // Assert
+        ctBase = cts.Get(ctBase.Key);
+        Assert.That(ctBase, Is.Not.Null);
+        Assert.That(ctBase.HasIdentity, Is.True);
+        Assert.That(ctBase.PropertyTypes.Count(), Is.EqualTo(1));
+        Assert.That(ctBase.PropertyTypes.First().DataTypeId, Is.EqualTo(dtdYesNo.Id));
+        Assert.That(ctBase.PropertyTypes.First().PropertyEditorAlias, Is.EqualTo(dtdYesNo.EditorAlias));
+    }
+
+    [Test]
+    public void Can_Create_Property_Type_Based_On_PropertyEditorAlias()
+    {
+        // Arrange
+        var cts = ContentTypeService;
+        var dtdYesNo = DataTypeService.GetDataType(-49);
+        IContentType ctBase = new ContentType(ShortStringHelper, -1)
+        {
+            Name = "Base",
+            Alias = "Base",
+            Icon = "folder.gif",
+            Thumbnail = "folder.png"
+        };
+        ctBase.AddPropertyType(new PropertyType(ShortStringHelper, "Umbraco.TrueFalse", ValueStorageType.Nvarchar)
+        {
+            Name = "Hide From Navigation",
+            Alias = Constants.Conventions.Content.NaviHide,
+        });
+        cts.Save(ctBase);
+
+        // Assert
+        ctBase = cts.Get(ctBase.Key);
+        Assert.That(ctBase, Is.Not.Null);
+        Assert.That(ctBase.HasIdentity, Is.True);
+        Assert.That(ctBase.PropertyTypes.Count(), Is.EqualTo(1));
+        Assert.That(ctBase.PropertyTypes.First().DataTypeId, Is.EqualTo(dtdYesNo.Id));
+        Assert.That(ctBase.PropertyTypes.First().PropertyEditorAlias, Is.EqualTo(dtdYesNo.EditorAlias));
+    }
+
     private ContentType CreateComponent()
     {
         var component = new ContentType(ShortStringHelper, -1)
@@ -2101,7 +2160,7 @@ public class ContentTypeServiceTests : UmbracoIntegrationTest
         return list.ToArray();
     }
 
-    public class ContentNotificationHandler : INotificationHandler<ContentMovedToRecycleBinNotification>
+    internal sealed class ContentNotificationHandler : INotificationHandler<ContentMovedToRecycleBinNotification>
     {
         public static Action<ContentMovedToRecycleBinNotification> MovedContentToRecycleBin { get; set; }
 
@@ -2109,7 +2168,7 @@ public class ContentTypeServiceTests : UmbracoIntegrationTest
             MovedContentToRecycleBin?.Invoke(notification);
     }
 
-    public class ContentTypeNotificationHandler : INotificationHandler<ContentTypeDeletedNotification>
+    internal sealed class ContentTypeNotificationHandler : INotificationHandler<ContentTypeDeletedNotification>
     {
         public static Action<ContentTypeDeletedNotification> Deleted { get; set; }
         public void Handle(ContentTypeDeletedNotification notification) => Deleted?.Invoke(notification);

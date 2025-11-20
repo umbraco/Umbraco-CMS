@@ -1,8 +1,11 @@
-﻿using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Logging.Viewer;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+/// Represents a repository for viewing logs in Umbraco.
+/// </summary>
 public interface ILogViewerRepository
 {
     /// <summary>

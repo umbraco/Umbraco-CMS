@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.NPoco
 // TODO: npoco - is this still appropriate?
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class NPocoBulkInsertTests : UmbracoIntegrationTest
+internal sealed class NPocoBulkInsertTests : UmbracoIntegrationTest
 {
     private readonly TestHelper _testHelper = new();
 
@@ -61,9 +61,9 @@ public class NPocoBulkInsertTests : UmbracoIntegrationTest
                 {
                     ServerAddress = "address" + i,
                     ServerIdentity = "computer" + i,
-                    DateRegistered = DateTime.Now,
+                    DateRegistered = DateTime.UtcNow,
                     IsActive = true,
-                    DateAccessed = DateTime.Now
+                    DateAccessed = DateTime.UtcNow
                 });
             }
 
@@ -88,9 +88,9 @@ public class NPocoBulkInsertTests : UmbracoIntegrationTest
             {
                 ServerAddress = "address" + i,
                 ServerIdentity = "computer" + i,
-                DateRegistered = DateTime.Now,
+                DateRegistered = DateTime.UtcNow,
                 IsActive = true,
-                DateAccessed = DateTime.Now
+                DateAccessed = DateTime.UtcNow
             });
         }
 
@@ -121,9 +121,9 @@ public class NPocoBulkInsertTests : UmbracoIntegrationTest
             {
                 ServerAddress = "address" + i,
                 ServerIdentity = "computer" + i,
-                DateRegistered = DateTime.Now,
+                DateRegistered = DateTime.UtcNow,
                 IsActive = true,
-                DateAccessed = DateTime.Now
+                DateAccessed = DateTime.UtcNow
             });
         }
 
@@ -155,9 +155,9 @@ public class NPocoBulkInsertTests : UmbracoIntegrationTest
             {
                 ServerAddress = "address" + i,
                 ServerIdentity = "computer" + i,
-                DateRegistered = DateTime.Now,
+                DateRegistered = DateTime.UtcNow,
                 IsActive = true,
-                DateAccessed = DateTime.Now
+                DateAccessed = DateTime.UtcNow
             });
         }
 
@@ -185,9 +185,9 @@ public class NPocoBulkInsertTests : UmbracoIntegrationTest
             {
                 ServerAddress = "address" + i,
                 ServerIdentity = "computer" + i,
-                DateRegistered = DateTime.Now,
+                DateRegistered = DateTime.UtcNow,
                 IsActive = true,
-                DateAccessed = DateTime.Now,
+                DateAccessed = DateTime.UtcNow,
                 IsSchedulingPublisher = true
             });
         }

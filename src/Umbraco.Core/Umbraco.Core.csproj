@@ -16,7 +16,7 @@
       [CS0618]/[CS0672]/[SYSLIB0051]/[SYSLIB0044]/[SYSLIB0023]/[SYSLIB0003]/[SYSLIB0045] adjust obsolete references
       [CS0067] unused event
       [SA1405] debug provide message text
-      [CS0168]/[CS0169] unused fields/variables
+      [CS0168] and [CS0169] unused fields/variables
       [CS0183] always of type
       [SA1111] adjust parenthesis
       [CA2017] match parameters number

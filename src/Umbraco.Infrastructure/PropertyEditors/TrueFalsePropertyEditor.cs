@@ -33,7 +33,7 @@ public class TrueFalsePropertyEditor : DataEditor
     /// <summary>
     /// Defines the value editor for the true/false (toggle) property editor.
     /// </summary>
-    internal class TrueFalsePropertyValueEditor : DataValueEditor
+    internal sealed class TrueFalsePropertyValueEditor : DataValueEditor
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="TrueFalsePropertyValueEditor"/> class.
@@ -61,7 +61,7 @@ public class TrueFalsePropertyEditor : DataEditor
         public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
             => ParsePropertyValue(editorValue.Value) ? 1 : 0;
 
-        private bool ParsePropertyValue(object? value)
+        private static bool ParsePropertyValue(object? value)
             => value switch
             {
                 bool booleanValue => booleanValue,

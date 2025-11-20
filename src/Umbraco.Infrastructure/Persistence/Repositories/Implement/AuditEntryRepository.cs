@@ -1,3 +1,5 @@
+using System.Data.Common;
+using System.Linq.Expressions;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core;
@@ -5,6 +7,7 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
@@ -16,14 +19,27 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// <summary>
 ///     Represents the NPoco implementation of <see cref="IAuditEntryRepository" />.
 /// </summary>
-internal class AuditEntryRepository : EntityRepositoryBase<int, IAuditEntry>, IAuditEntryRepository
+internal sealed class AuditEntryRepository : EntityRepositoryBase<int, IAuditEntry>, IAuditEntryRepository
 {
+    private readonly IRuntimeState _runtimeState;
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="AuditEntryRepository" /> class.
     /// </summary>
-    public AuditEntryRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<AuditEntryRepository> logger)
-        : base(scopeAccessor, cache, logger)
+    public AuditEntryRepository(
+        IRuntimeState runtimeState,IScopeAccessor scopeAccessor,
+        AppCaches cache,
+        ILogger<AuditEntryRepository> logger,
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            cache,
+            logger,
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
+        _runtimeState = runtimeState;
     }
 
     /// <inheritdoc />
@@ -32,18 +48,11 @@ internal class AuditEntryRepository : EntityRepositoryBase<int, IAuditEntry>, IA
         Sql<ISqlContext> sql = Sql()
             .Select<AuditEntryDto>()
             .From<AuditEntryDto>()
-            .OrderByDescending<AuditEntryDto>(x => x.EventDateUtc);
+            .OrderByDescending<AuditEntryDto>(x => x.EventDate);
 
         Page<AuditEntryDto> page = Database.Page<AuditEntryDto>(pageIndex + 1, pageCount, sql);
         records = page.TotalItems;
         return page.Items.Select(AuditEntryFactory.BuildEntity);
-    }
-
-    /// <inheritdoc />
-    public bool IsAvailable()
-    {
-        var tables = SqlSyntax.GetTablesInSchema(Database).ToArray();
-        return tables.InvariantContains(Constants.DatabaseSchema.Tables.AuditEntry);
     }
 
     /// <inheritdoc />
@@ -54,7 +63,7 @@ internal class AuditEntryRepository : EntityRepositoryBase<int, IAuditEntry>, IA
             .From<AuditEntryDto>()
             .Where<AuditEntryDto>(x => x.Id == id);
 
-        AuditEntryDto dto = Database.FirstOrDefault<AuditEntryDto>(sql);
+        AuditEntryDto? dto = Database.FirstOrDefault<AuditEntryDto>(sql);
         return dto == null ? null : AuditEntryFactory.BuildEntity(dto);
     }
 
@@ -104,7 +113,7 @@ internal class AuditEntryRepository : EntityRepositoryBase<int, IAuditEntry>, IA
     }
 
     /// <inheritdoc />
-    protected override string GetBaseWhereClause() => $"{Constants.DatabaseSchema.Tables.AuditEntry}.id = @id";
+    protected override string GetBaseWhereClause() => $"{QuoteTableName(AuditEntryDto.TableName)}.id = @id";
 
     /// <inheritdoc />
     protected override IEnumerable<string> GetDeleteClauses() =>
@@ -116,7 +125,55 @@ internal class AuditEntryRepository : EntityRepositoryBase<int, IAuditEntry>, IA
         entity.AddingEntity();
 
         AuditEntryDto dto = AuditEntryFactory.BuildDto(entity);
-        Database.Insert(dto);
+        try
+        {
+            Database.Insert(dto);
+        }
+        catch (DbException) when (_runtimeState.Level == RuntimeLevel.Upgrade)
+        {
+            // This can happen when in upgrade state, before the migration to add user keys runs.
+            // In this case, we will try to insert the audit entry without the user keys.
+            // TODO (V22): Remove this catch clause when 'V_17_0_0.AddGuidsToAuditEntries' is removed.
+            Expression<Func<AuditEntryDto, object?>>[] fields =
+            [
+                x => x.PerformingUserId,
+                x => x.PerformingDetails,
+                x => x.PerformingIp,
+                x => x.EventDate,
+                x => x.AffectedUserId,
+                x => x.AffectedDetails,
+                x => x.EventType,
+                x => x.EventDetails
+            ];
+
+            var cols = Sql().ColumnsForInsert(fields);
+            IEnumerable<object?> values = fields.Select(f => f.Compile().Invoke(dto));
+
+            Sql<ISqlContext> sqlValues = Sql();
+            foreach (var (value, index) in values.Select((v, i) => (v, i)))
+            {
+                switch (value)
+                {
+                    case null:
+                        sqlValues.Append((index == 0 ? string.Empty : ",") + "NULL");
+                        break;
+                    case "":
+                        sqlValues.Append((index == 0 ? string.Empty : ",") + "''");
+                        break;
+                    default:
+                        sqlValues.Append((index == 0 ? string.Empty : ",") + "@0", value);
+                        break;
+                }
+            }
+
+            Sql<ISqlContext> sqlInsert = Sql($"INSERT INTO {QuoteTableName(AuditEntryDto.TableName)} ({cols})")
+                .Append("VALUES (")
+                .Append(sqlValues)
+                .Append(")");
+
+            Database.Execute(sqlInsert);
+        }
+
         entity.Id = dto.Id;
         entity.ResetDirtyProperties();
     }

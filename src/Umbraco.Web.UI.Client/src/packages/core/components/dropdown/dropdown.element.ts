@@ -5,20 +5,31 @@ import type {
 	UUIPopoverContainerElement,
 } from '@umbraco-cms/backoffice/external/uui';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { css, html, customElement, property, query, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbClosedEvent, UmbOpenedEvent } from '@umbraco-cms/backoffice/event';
 
 // TODO: maybe move this to UI Library.
 @customElement('umb-dropdown')
 export class UmbDropdownElement extends UmbLitElement {
-	@query('#dropdown-popover')
-	popoverContainerElement?: UUIPopoverContainerElement;
+	#open = false;
+
 	@property({ type: Boolean, reflect: true })
-	open = false;
+	public get open() {
+		return this.#open;
+	}
+	public set open(value) {
+		this.#open = value;
+
+		if (value === true && this.popoverContainerElement) {
+			this.openDropdown();
+		} else {
+			this.closeDropdown();
+		}
+	}
 
 	@property()
-	label = '';
+	label?: string;
 
 	@property()
 	look: UUIInterfaceLook = 'default';
@@ -35,21 +46,23 @@ export class UmbDropdownElement extends UmbLitElement {
 	@property({ type: Boolean, attribute: 'hide-expand' })
 	hideExpand = false;
 
-	protected override updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
-		super.updated(_changedProperties);
-		if (_changedProperties.has('open') && this.popoverContainerElement) {
-			if (this.open) {
-				// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
-				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-				// @ts-ignore
-				this.popoverContainerElement.showPopover();
-			} else {
-				// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
-				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-				// @ts-ignore
-				this.popoverContainerElement.hidePopover();
-			}
-		}
+	@query('#dropdown-popover')
+	popoverContainerElement?: UUIPopoverContainerElement;
+
+	openDropdown() {
+		// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		this.popoverContainerElement?.showPopover();
+		this.#open = true;
+	}
+
+	closeDropdown() {
+		// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		this.popoverContainerElement?.hidePopover();
+		this.#open = false;
 	}
 
 	#onToggle(event: ToggleEvent) {
@@ -57,6 +70,12 @@ export class UmbDropdownElement extends UmbLitElement {
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
 		this.open = event.newState === 'open';
+
+		if (this.open) {
+			this.dispatchEvent(new UmbOpenedEvent());
+		} else {
+			this.dispatchEvent(new UmbClosedEvent());
+		}
 	}
 
 	override render() {
@@ -64,14 +83,15 @@ export class UmbDropdownElement extends UmbLitElement {
 			<uui-button
 				id="dropdown-button"
 				popovertarget="dropdown-popover"
+				data-mark="open-dropdown"
 				.look=${this.look}
 				.color=${this.color}
-				.label=${this.label}
+				.label=${this.label ?? ''}
 				.compact=${this.compact}>
 				<slot name="label"></slot>
 				${when(
 					!this.hideExpand,
-					() => html`<uui-symbol-expand id="symbol-expand" .open=${this.open}></uui-symbol-expand>`,
+					() => html`<uui-symbol-expand id="symbol-expand" .open=${this.#open}></uui-symbol-expand>`,
 				)}
 			</uui-button>
 			<uui-popover-container id="dropdown-popover" .placement=${this.placement} @toggle=${this.#onToggle}>
@@ -87,6 +107,7 @@ export class UmbDropdownElement extends UmbLitElement {
 		css`
 			#dropdown-button {
 				min-width: max-content;
+				height: 100%;
 			}
 			:host(:not([hide-expand]):not([compact])) #dropdown-button {
 				--uui-button-padding-right-factor: 2;

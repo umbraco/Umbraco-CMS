@@ -50,6 +50,8 @@ export class UmbPropertyValueCloneController extends UmbControllerBase {
 			return incomingProperty;
 		}
 
+		(api as any).manifest = manifest;
+
 		let clonedProperty = incomingProperty;
 
 		if (api.cloneValue) {
@@ -73,8 +75,7 @@ export class UmbPropertyValueCloneController extends UmbControllerBase {
 		// Find the resolver for this editor alias:
 		const manifest = umbExtensionsRegistry.getByTypeAndFilter(
 			'propertyValueResolver',
-			// TODO: Remove depcrated filter option in v.17 [NL]
-			(x) => x.forEditorAlias === editorAlias || x.meta?.editorAlias === editorAlias,
+			(x) => x.forEditorAlias === editorAlias,
 		)[0];
 
 		if (!manifest) {
@@ -85,6 +86,8 @@ export class UmbPropertyValueCloneController extends UmbControllerBase {
 		if (!api) {
 			return incomingProperty;
 		}
+
+		(api as any).manifest = manifest;
 
 		if (api.processValues) {
 			return (

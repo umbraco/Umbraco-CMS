@@ -22,7 +22,7 @@ public class RenderRazorViewEngineOptionsSetup : IConfigureOptions<RazorViewEngi
     /// <summary>
     ///     Expands the default view locations
     /// </summary>
-    private class ViewLocationExpander : IViewLocationExpander
+    private sealed class ViewLocationExpander : IViewLocationExpander
     {
         public IEnumerable<string> ExpandViewLocations(
             ViewLocationExpanderContext context, IEnumerable<string> viewLocations)

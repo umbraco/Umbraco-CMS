@@ -8,7 +8,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 	...repositoryManifests,
 	{
 		type: 'entityAction',
-		kind: 'sortChildrenOf',
+		kind: 'sortChildrenOfContent',
 		alias: 'Umb.EntityAction.Media.SortChildrenOf',
 		name: 'Sort Children Of Media Entity Action',
 		forEntityTypes: [UMB_MEDIA_ROOT_ENTITY_TYPE, UMB_MEDIA_ENTITY_TYPE],

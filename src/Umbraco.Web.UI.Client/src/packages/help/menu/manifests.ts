@@ -28,14 +28,14 @@ export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'menuItem',
 		kind: 'link',
-		alias: 'Umb.MenuItem.Help.CommunityWebsite',
-		name: 'Community Website Help Menu Item',
+		alias: 'Umb.MenuItem.Help.CommunityForum',
+		name: 'The Community Forum Help Menu Item',
 		weight: 100,
 		meta: {
 			menus: [UMB_HELP_MENU_ALIAS],
-			label: 'Community Website',
+			label: 'Community Forum',
 			icon: 'icon-hearts',
-			href: 'https://our.umbraco.com?utm_source=core&amp;utm_medium=help&amp;utm_content=link&amp;utm_campaign=our',
+			href: 'https://forum.umbraco.com/',
 		},
 		conditions: [
 			{

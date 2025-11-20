@@ -27,13 +27,11 @@ public class BasicAuthenticationMiddleware : IMiddleware
     public BasicAuthenticationMiddleware(
         IRuntimeState runtimeState,
         IBasicAuthService basicAuthService,
-        IOptionsMonitor<GlobalSettings> globalSettings,
         IHostingEnvironment hostingEnvironment)
     {
         _runtimeState = runtimeState;
         _basicAuthService = basicAuthService;
-
-        _backOfficePath = globalSettings.CurrentValue.GetBackOfficePath(hostingEnvironment);
+        _backOfficePath = hostingEnvironment.GetBackOfficePath();
     }
 
     /// <inheritdoc />

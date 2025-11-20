@@ -1,5 +1,3 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 
@@ -11,20 +9,12 @@ namespace Umbraco.Cms.Core.Routing;
 public class DefaultMediaUrlProvider : IMediaUrlProvider
 {
     private readonly MediaUrlGeneratorCollection _mediaPathGenerators;
-    private readonly UriUtility _uriUtility;
     private readonly IUrlAssembler _urlAssembler;
 
-    public DefaultMediaUrlProvider(MediaUrlGeneratorCollection mediaPathGenerators, UriUtility uriUtility, IUrlAssembler urlAssembler)
+    public DefaultMediaUrlProvider(MediaUrlGeneratorCollection mediaPathGenerators, IUrlAssembler urlAssembler)
     {
-        _mediaPathGenerators = mediaPathGenerators ?? throw new ArgumentNullException(nameof(mediaPathGenerators));
-        _uriUtility = uriUtility;
+        _mediaPathGenerators = mediaPathGenerators;
         _urlAssembler = urlAssembler;
-    }
-
-    [Obsolete("Use the constructor that has the IUrlAssembler instead. Scheduled to be removed in v15")]
-    public DefaultMediaUrlProvider(MediaUrlGeneratorCollection mediaPathGenerators, UriUtility uriUtility)
-        : this(mediaPathGenerators, uriUtility, StaticServiceProvider.Instance.GetRequiredService<IUrlAssembler>())
-    {
     }
 
     /// <inheritdoc />
@@ -49,7 +39,7 @@ public class DefaultMediaUrlProvider : IMediaUrlProvider
         if (_mediaPathGenerators.TryGetMediaPath(propType?.EditorAlias, value, out var path))
         {
             Uri url = _urlAssembler.AssembleUrl(path!, current, mode);
-            return UrlInfo.Url(url.ToString(), culture);
+            return UrlInfo.FromUri(url, Constants.UrlProviders.Media, culture);
         }
 
         return null;

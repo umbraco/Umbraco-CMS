@@ -10,6 +10,14 @@ namespace Umbraco.Cms.Core.Notifications;
 /// </summary>
 public sealed class MemberSavedNotification : SavedNotification<IMember>
 {
+    /// <summary>
+    /// Defines the notification state key for tracking the previous username of a saved member.
+    /// </summary>
+    internal const string PreviousUsernameStateKey = "PreviousUsername";
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MemberSavedNotification"/> class.
+    /// </summary>
     public MemberSavedNotification(IMember target, EventMessages messages)
         : base(target, messages)
     {

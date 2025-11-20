@@ -137,13 +137,13 @@ public static class UserExtensions
             throw new ArgumentNullException("user");
         }
 
-        return user.Groups != null && user.Groups.Any(x => x.Alias == Constants.Security.SensitiveDataGroupAlias);
+        return user.Groups != null && user.Groups.Any(x => x.Key == Constants.Security.SensitiveDataGroupKey);
     }
 
     /// <summary>
     ///     Calculate start nodes, combining groups' and user's, and excluding what's in the bin
     /// </summary>
-    public static int[]? CalculateAllowedLanguageIds(this IUser user, ILocalizationService localizationService)
+    public static int[] CalculateAllowedLanguageIds(this IUser user, ILocalizationService localizationService)
     {
         var hasAccessToAllLanguages = user.Groups.Any(x => x.HasAccessToAllLanguages);
 

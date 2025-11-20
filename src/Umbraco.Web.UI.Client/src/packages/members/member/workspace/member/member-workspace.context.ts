@@ -1,11 +1,14 @@
-import type { UmbMemberDetailRepository } from '../../repository/index.js';
+import { UmbMemberValidationRepository, type UmbMemberDetailRepository } from '../../repository/index.js';
 import type { UmbMemberDetailModel, UmbMemberVariantModel } from '../../types.js';
 import { UmbMemberPropertyDatasetContext } from '../../property-dataset-context/member-property-dataset.context.js';
 import { UMB_MEMBER_ENTITY_TYPE, UMB_MEMBER_ROOT_ENTITY_TYPE } from '../../entity.js';
 import { UMB_MEMBER_DETAIL_REPOSITORY_ALIAS } from '../../repository/detail/manifests.js';
-import { UMB_MEMBER_WORKSPACE_ALIAS } from './manifests.js';
-import { UmbMemberWorkspaceEditorElement } from './member-workspace-editor.element.js';
-import { UMB_MEMBER_DETAIL_MODEL_VARIANT_SCAFFOLD } from './constants.js';
+import { UMB_CREATE_MEMBER_WORKSPACE_PATH_PATTERN, UMB_EDIT_MEMBER_WORKSPACE_PATH_PATTERN } from '../../paths.js';
+import {
+	UMB_MEMBER_WORKSPACE_ALIAS,
+	UMB_MEMBER_WORKSPACE_VIEW_MEMBER_ALIAS,
+	UMB_MEMBER_DETAIL_MODEL_VARIANT_SCAFFOLD,
+} from './constants.js';
 import { UmbMemberTypeDetailRepository, type UmbMemberTypeDetailModel } from '@umbraco-cms/backoffice/member-type';
 import {
 	UmbWorkspaceIsNewRedirectController,
@@ -14,6 +17,9 @@ import {
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContentDetailWorkspaceContextBase, type UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
+import { ensurePathEndsWithSlash } from '@umbraco-cms/backoffice/utils';
+import { UmbValueValidator } from '@umbraco-cms/backoffice/validation';
+import type { UmbValueValidatorArgs } from '@umbraco-cms/backoffice/validation';
 
 type ContentModel = UmbMemberDetailModel;
 type ContentTypeModel = UmbMemberTypeDetailModel;
@@ -28,6 +34,7 @@ export class UmbMemberWorkspaceContext
 	implements UmbContentWorkspaceContext<ContentModel, ContentTypeModel, UmbMemberVariantModel>
 {
 	readonly contentTypeUnique = this._data.createObservablePartOfCurrent((data) => data?.memberType.unique);
+	readonly contentTypeIcon = this._data.createObservablePartOfCurrent((data) => data?.memberType.icon);
 	readonly kind = this._data.createObservablePartOfCurrent((data) => data?.kind);
 	readonly createDate = this._data.createObservablePartOfCurrent((data) => data?.variants[0].createDate);
 	readonly updateDate = this._data.createObservablePartOfCurrent((data) => data?.variants[0].updateDate);
@@ -38,18 +45,28 @@ export class UmbMemberWorkspaceContext
 			workspaceAlias: UMB_MEMBER_WORKSPACE_ALIAS,
 			detailRepositoryAlias: UMB_MEMBER_DETAIL_REPOSITORY_ALIAS,
 			contentTypeDetailRepository: UmbMemberTypeDetailRepository,
-			// TODO: Enable Validation Repository when we have UI for showing validation issues on other tabs. [NL]
-			//contentValidationRepository: UmbMemberValidationRepository,
+			contentValidationRepository: UmbMemberValidationRepository,
 			contentVariantScaffold: UMB_MEMBER_DETAIL_MODEL_VARIANT_SCAFFOLD,
 			contentTypePropertyName: 'memberType',
 		});
 
-		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique), null);
+		this.observe(
+			this.contentTypeUnique,
+			(unique) => {
+				if (unique) {
+					this.structure.loadType(unique);
+				}
+			},
+			null,
+		);
+
+		this.propertyViewGuard.fallbackToPermitted();
+		this.propertyWriteGuard.fallbackToPermitted();
 
 		this.routes.setRoutes([
 			{
-				path: 'create/:memberTypeUnique',
-				component: () => new UmbMemberWorkspaceEditorElement(),
+				path: UMB_CREATE_MEMBER_WORKSPACE_PATH_PATTERN.toString(),
+				component: () => import('./member-workspace-editor.element.js'),
 				setup: async (_component, info) => {
 					const memberTypeUnique = info.match.params.memberTypeUnique;
 					await this.create(memberTypeUnique);
@@ -62,15 +79,93 @@ export class UmbMemberWorkspaceContext
 				},
 			},
 			{
-				path: 'edit/:unique',
-				component: () => new UmbMemberWorkspaceEditorElement(),
-				setup: (_component, info) => {
+				path: UMB_EDIT_MEMBER_WORKSPACE_PATH_PATTERN.toString(),
+				component: () => import('./member-workspace-editor.element.js'),
+				setup: async (_component, info) => {
 					this.removeUmbControllerByAlias(UmbWorkspaceIsNewRedirectControllerAlias);
 					const unique = info.match.params.unique;
-					this.load(unique);
+					await this.load(unique);
 				},
 			},
 		]);
+
+		this.#setupValidationCheckForRootProperty('username');
+		this.#setupValidationCheckForRootProperty('email');
+		const passwordValidator = this.#setupValidationCheckForRootProperty(
+			'newPassword',
+			(value: string | null | undefined) => {
+				// Only when in create mode.
+				return this.getIsNew() === true && (value === undefined || value === null || value === '');
+			},
+		);
+
+		this.observe(
+			this.isNew,
+			() => {
+				passwordValidator.runCheck();
+			},
+			null,
+		);
+	}
+
+	#hintedMsgs: Set<string> = new Set();
+
+	// A simple observation function to check for validation issues of a root property and map the validation message to a hint.
+	#setupValidationCheckForRootProperty<ValueType = unknown>(
+		propertyName: string,
+		checkMethod?: UmbValueValidatorArgs<ValueType>['check'],
+	) {
+		const dataPath = `$.${propertyName}`;
+		const validator = new UmbValueValidator<ValueType>(this, {
+			dataPath,
+			navigateToError: () => {
+				const router = this.getHostElement().shadowRoot!.querySelector('umb-router-slot')!;
+				const routerPath = router.absoluteActiveViewPath;
+				if (routerPath) {
+					const newPath: string = ensurePathEndsWithSlash(routerPath) + 'invariant/view/info';
+					// Check that we are still part of the DOM and thereby relevant:
+					window.history.replaceState(null, '', newPath);
+				}
+			},
+			check: checkMethod,
+		});
+		this.observe(
+			this._data.createObservablePartOfCurrent((data) => {
+				return data?.[propertyName as unknown as keyof ContentModel] as ValueType;
+			}),
+			(value) => {
+				validator.value = value;
+			},
+			`validateObserverFor_${propertyName}`,
+		);
+
+		// Observe Validation and turn it into hint:
+		this.observe(
+			this.validationContext.messages.messagesOfPathAndDescendant(dataPath),
+			(messages) => {
+				messages.forEach((message) => {
+					if (this.#hintedMsgs.has(message.key)) return;
+
+					this.view.hints.addOne({
+						unique: message.key,
+						path: [UMB_MEMBER_WORKSPACE_VIEW_MEMBER_ALIAS],
+						text: '!',
+						color: 'invalid',
+						weight: 1000,
+					});
+					this.#hintedMsgs.add(message.key);
+				});
+				this.#hintedMsgs.forEach((key) => {
+					if (!messages.some((msg) => msg.key === key)) {
+						this.#hintedMsgs.delete(key);
+						this.view.hints.removeOne(key);
+					}
+				});
+			},
+			`messageObserverFor_${propertyName}`,
+		);
+
+		return validator;
 	}
 
 	async create(memberTypeUnique: string) {
@@ -131,6 +226,10 @@ export class UmbMemberWorkspaceContext
 
 	get username(): string {
 		return this.#get('username') || '';
+	}
+
+	get newPassword(): string {
+		return this.#get('newPassword') || '';
 	}
 
 	get isLockedOut(): boolean {

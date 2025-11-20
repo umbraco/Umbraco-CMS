@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Factories;
+using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Media.Collection;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -22,30 +23,33 @@ public class ByKeyMediaCollectionController : MediaCollectionControllerBase
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IMediaCollectionPresentationFactory _mediaCollectionPresentationFactory;
 
-    [Obsolete("Please use the constructor taking all parameters.")]
-    public ByKeyMediaCollectionController(
-        IMediaListViewService mediaListViewService,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IUmbracoMapper mapper)
-        : this(
-              mediaListViewService,
-              backOfficeSecurityAccessor,
-              mapper,
-              StaticServiceProvider.Instance.GetRequiredService<IMediaCollectionPresentationFactory>())
-    {
-    }
-
     [ActivatorUtilitiesConstructor]
     public ByKeyMediaCollectionController(
         IMediaListViewService mediaListViewService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IUmbracoMapper mapper,
-        IMediaCollectionPresentationFactory mediaCollectionPresentationFactory)
-        : base(mapper)
+        IMediaCollectionPresentationFactory mediaCollectionPresentationFactory,
+        FlagProviderCollection flagProviders)
+        : base(mapper, flagProviders)
     {
         _mediaListViewService = mediaListViewService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
         _mediaCollectionPresentationFactory = mediaCollectionPresentationFactory;
+    }
+
+    [Obsolete("Please use the constructor with all parameters. Scheduled to be removed in Umbraco 18")]
+    public ByKeyMediaCollectionController(
+        IMediaListViewService mediaListViewService,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        IUmbracoMapper mapper,
+        IMediaCollectionPresentationFactory mediaCollectionPresentationFactory)
+        : this(
+            mediaListViewService,
+            backOfficeSecurityAccessor,
+            mapper,
+            mediaCollectionPresentationFactory,
+            StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>())
+    {
     }
 
     [HttpGet]
@@ -53,6 +57,8 @@ public class ByKeyMediaCollectionController : MediaCollectionControllerBase
     [ProducesResponseType(typeof(PagedViewModel<MediaCollectionResponseModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Gets a media.")]
+    [EndpointDescription("Gets a media identified by the provided Id.")]
     public async Task<IActionResult> ByKey(
         CancellationToken cancellationToken,
         Guid? id,

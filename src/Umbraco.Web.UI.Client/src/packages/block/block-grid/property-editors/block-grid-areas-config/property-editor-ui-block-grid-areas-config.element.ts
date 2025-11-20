@@ -1,17 +1,21 @@
 import { UMB_BLOCK_GRID_DEFAULT_LAYOUT_STYLESHEET, type UmbBlockGridTypeAreaType } from '../../index.js';
 import { UMB_BLOCK_GRID_AREA_TYPE_WORKSPACE_MODAL } from '../../components/block-grid-area-config-entry/constants.js';
+import type { UmbBlockGridAreaConfigEntryElement } from '../../../block-grid/components/block-grid-area-config-entry/block-grid-area-config-entry.element.js';
 import { UmbBlockGridAreaTypeEntriesContext } from './block-grid-area-type-entries.context.js';
+import { css, customElement, html, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { incrementString } from '@umbraco-cms/backoffice/utils';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
+import { UmbSorterController, UmbSorterResolvePlacementAsGrid } from '@umbraco-cms/backoffice/sorter';
+import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type {
 	UmbPropertyEditorUiElement,
 	UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
-import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
-import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
-import { incrementString } from '@umbraco-cms/backoffice/utils';
 
-import '../../components/block-grid-area-config-entry/index.js';
+import '../../components/block-grid-area-config-entry/block-grid-area-config-entry.element.js';
+
 @customElement('umb-property-editor-ui-block-grid-areas-config')
 export class UmbPropertyEditorUIBlockGridAreasConfigElement
 	extends UmbLitElement
@@ -23,9 +27,28 @@ export class UmbPropertyEditorUIBlockGridAreasConfigElement
 	#defaultAreaGridColumns: number = 12;
 	#valueOfAreaGridColumns?: number | null;
 
+	#sorter = new UmbSorterController<UmbBlockGridTypeAreaType, UmbBlockGridAreaConfigEntryElement>(this, {
+		itemSelector: 'umb-block-area-config-entry',
+		containerSelector: '.umb-block-grid__area-container',
+		resolvePlacement: UmbSorterResolvePlacementAsGrid,
+		getUniqueOfElement: (element) => {
+			return element.key;
+		},
+		getUniqueOfModel: (modelEntry) => {
+			return modelEntry.key;
+		},
+		onChange: ({ model }) => {
+			const oldValue = this._value;
+			this._value = model;
+			this.requestUpdate('_value', oldValue);
+			this.dispatchEvent(new UmbChangeEvent());
+		},
+	});
+
 	@property({ type: Array })
 	public set value(value: Array<UmbBlockGridTypeAreaType>) {
 		this._value = value ?? [];
+		this.#sorter.setModel(this._value);
 	}
 	public get value(): Array<UmbBlockGridTypeAreaType> {
 		return this._value;
@@ -77,7 +100,7 @@ export class UmbPropertyEditorUIBlockGridAreasConfigElement
 
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, async (context) => {
 			this.observe(
-				await context.propertyValueByAlias<number | undefined>('areaGridColumns'),
+				await context?.propertyValueByAlias<number | undefined>('areaGridColumns'),
 				(value) => {
 					// Value can be undefined, but 'undefined > 0' is still valid JS and will return false. [NL]
 					this.#valueOfAreaGridColumns = (value as number) > 0 ? value : null;
@@ -87,7 +110,7 @@ export class UmbPropertyEditorUIBlockGridAreasConfigElement
 			);
 
 			this.observe(
-				await context.propertyValueByAlias<string | undefined>('layoutStylesheet'),
+				await context?.propertyValueByAlias<string | undefined>('layoutStylesheet'),
 				(stylesheet) => {
 					if (this._styleElement && this._styleElement.href === stylesheet) return;
 					this._styleElement = document.createElement('link');
@@ -133,6 +156,20 @@ export class UmbPropertyEditorUIBlockGridAreasConfigElement
 					<uui-button look="placeholder" label=${'Add area'} href=${this._workspacePath + 'create'}></uui-button>`
 			: '';
 	}
+
+	static override styles = [
+		css`
+			:host {
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-2);
+			}
+
+			.umb-block-grid__area {
+				cursor: move;
+			}
+		`,
+	];
 }
 
 export default UmbPropertyEditorUIBlockGridAreasConfigElement;

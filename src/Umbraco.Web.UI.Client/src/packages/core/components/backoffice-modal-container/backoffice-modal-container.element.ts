@@ -11,7 +11,7 @@ export class UmbBackofficeModalContainerElement extends UmbLitElement {
 	private _modalElementMap: Map<string, UmbModalElement> = new Map();
 
 	@state()
-	_modals: Array<UmbModalContext> = [];
+	private _modals: Array<UmbModalContext> = [];
 
 	@property({ type: Boolean, reflect: true, attribute: 'fill-background' })
 	fillBackground = false;
@@ -49,8 +49,11 @@ export class UmbBackofficeModalContainerElement extends UmbLitElement {
 
 		oldModals.forEach((modal) => {
 			// TODO: I would not think this works as expected, the callback method has to be the exact same instance as the one added: [NL]
-			this._modalElementMap.get(modal.key)?.removeEventListener('close-end', this.#onCloseEnd.bind(this, modal.key));
+			const modalElement = this._modalElementMap.get(modal.key);
+			modalElement?.removeEventListener('close-end', this.#onCloseEnd.bind(this, modal.key));
+			modalElement?.destroy();
 			this._modalElementMap.delete(modal.key);
+			modal.destroy();
 		});
 
 		if (this._modals.length === 0) {

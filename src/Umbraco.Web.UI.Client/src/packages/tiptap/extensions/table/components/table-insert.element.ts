@@ -1,7 +1,7 @@
+import type { Editor } from '../../../externals.js';
 import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { TemplateResult } from '@umbraco-cms/backoffice/external/lit';
-import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 
 @customElement('umb-tiptap-table-insert')
 export class UmbTiptapTableInsertElement extends UmbLitElement {
@@ -17,7 +17,7 @@ export class UmbTiptapTableInsertElement extends UmbLitElement {
 		this._selectedColumn = column;
 		this._selectedRow = row;
 
-		this.editor?.chain().focus().insertTable({ rows: row, cols: column }).run();
+		this.editor?.chain().focus().insertTable({ rows: row, cols: column, withHeaderRow: false }).run();
 	}
 
 	#onMouseover(column: number, row: number) {

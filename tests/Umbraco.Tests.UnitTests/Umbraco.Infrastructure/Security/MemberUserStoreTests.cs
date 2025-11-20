@@ -149,8 +149,8 @@ public class MemberUserStoreTests
             Email = "fakeemail@umbraco.com",
             UserName = "fakeUsername",
             Comments = "hello",
-            LastLoginDateUtc = DateTime.UtcNow,
-            LastPasswordChangeDateUtc = DateTime.UtcNow,
+            LastLoginDate = DateTime.UtcNow,
+            LastPasswordChangeDate = DateTime.UtcNow,
             EmailConfirmed = true,
             AccessFailedCount = 3,
             LockoutEnd = DateTime.UtcNow.AddDays(10),
@@ -192,8 +192,8 @@ public class MemberUserStoreTests
         Assert.AreEqual(fakeUser.Email, mockMember.Email);
         Assert.AreEqual(fakeUser.UserName, mockMember.Username);
         Assert.AreEqual(fakeUser.Comments, mockMember.Comments);
-        Assert.AreEqual(fakeUser.LastPasswordChangeDateUtc.Value.ToLocalTime(), mockMember.LastPasswordChangeDate);
-        Assert.AreEqual(fakeUser.LastLoginDateUtc.Value.ToLocalTime(), mockMember.LastLoginDate);
+        Assert.AreEqual(fakeUser.LastPasswordChangeDate, mockMember.LastPasswordChangeDate);
+        Assert.AreEqual(fakeUser.LastLoginDate, mockMember.LastLoginDate);
         Assert.AreEqual(fakeUser.AccessFailedCount, mockMember.FailedPasswordAttempts);
         Assert.AreEqual(fakeUser.IsLockedOut, mockMember.IsLockedOut);
         Assert.AreEqual(fakeUser.IsApproved, mockMember.IsApproved);
@@ -204,6 +204,64 @@ public class MemberUserStoreTests
         _mockMemberService.Verify(x => x.Save(mockMember, Constants.Security.SuperUserId));
         _mockMemberService.Verify(x => x.GetById(123));
         _mockMemberService.Verify(x => x.ReplaceRoles(new[] { 123 }, new[] { "role1", "role2" }));
+    }
+
+    [Test]
+    public async Task GivenIUpdateAUsersLoginPropertiesOnly_ThenIShouldGetASuccessResultAsync()
+    {
+        // arrange
+        var sut = CreateSut();
+        var fakeUser = new MemberIdentityUser
+        {
+            Id = "123",
+            Name = "a",
+            Email = "a@b.com",
+            UserName = "c",
+            Comments = "e",
+            LastLoginDate = DateTime.UtcNow,
+            SecurityStamp = "abc",
+        };
+
+        IMemberType fakeMemberType = new MemberType(new MockShortStringHelper(), 77);
+        var mockMember = Mock.Of<IMember>(m =>
+            m.Id == 123 &&
+            m.Name == "a" &&
+            m.Email == "a@b.com" &&
+            m.Username == "c" &&
+            m.Comments == "e" &&
+            m.ContentTypeAlias == fakeMemberType.Alias &&
+            m.HasIdentity == true &&
+            m.EmailConfirmedDate == DateTime.MinValue &&
+            m.FailedPasswordAttempts == 0 &&
+            m.LastLockoutDate == DateTime.MinValue &&
+            m.IsApproved == false &&
+            m.RawPasswordValue == "xyz" &&
+            m.SecurityStamp == "xyz");
+
+        _mockMemberService.Setup(x => x.UpdateLoginPropertiesAsync(mockMember));
+        _mockMemberService.Setup(x => x.GetById(123)).Returns(mockMember);
+
+        // act
+        var identityResult = await sut.UpdateAsync(fakeUser, CancellationToken.None);
+
+        // assert
+        Assert.IsTrue(identityResult.Succeeded);
+        Assert.IsTrue(!identityResult.Errors.Any());
+
+        Assert.AreEqual(fakeUser.Name, mockMember.Name);
+        Assert.AreEqual(fakeUser.Email, mockMember.Email);
+        Assert.AreEqual(fakeUser.UserName, mockMember.Username);
+        Assert.AreEqual(fakeUser.Comments, mockMember.Comments);
+        Assert.IsFalse(fakeUser.LastPasswordChangeDate.HasValue);
+        Assert.AreEqual(fakeUser.LastLoginDate.Value, mockMember.LastLoginDate);
+        Assert.AreEqual(fakeUser.AccessFailedCount, mockMember.FailedPasswordAttempts);
+        Assert.AreEqual(fakeUser.IsLockedOut, mockMember.IsLockedOut);
+        Assert.AreEqual(fakeUser.IsApproved, mockMember.IsApproved);
+        Assert.AreEqual(fakeUser.SecurityStamp, mockMember.SecurityStamp);
+
+        _mockMemberService.Verify(x => x.Save(mockMember, Constants.Security.SuperUserId), Times.Never);
+        _mockMemberService.Verify(x => x.UpdateLoginPropertiesAsync(mockMember));
+        _mockMemberService.Verify(x => x.GetById(123));
     }
 
     [Test]
@@ -243,7 +301,7 @@ public class MemberUserStoreTests
         };
 
         _mockMemberService.Setup(x => x.GetById(mockMember.Id)).Returns(mockMember);
-        _mockMemberService.Setup(x => x.GetByKey(mockMember.Key)).Returns(mockMember);
+        _mockMemberService.Setup(x => x.GetById(mockMember.Key)).Returns(mockMember);
         _mockMemberService.Setup(x => x.Delete(mockMember, Constants.Security.SuperUserId));
 
         // act
@@ -252,7 +310,7 @@ public class MemberUserStoreTests
         // assert
         Assert.IsTrue(identityResult.Succeeded);
         Assert.IsTrue(!identityResult.Errors.Any());
-        _mockMemberService.Verify(x => x.GetByKey(mockMember.Key));
+        _mockMemberService.Verify(x => x.GetById(mockMember.Key));
         _mockMemberService.Verify(x => x.Delete(mockMember, Constants.Security.SuperUserId));
         _mockMemberService.VerifyNoOtherCalls();
     }

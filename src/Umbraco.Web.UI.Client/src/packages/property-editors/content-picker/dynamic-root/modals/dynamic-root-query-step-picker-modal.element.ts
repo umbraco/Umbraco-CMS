@@ -1,10 +1,9 @@
-import type { UmbContentPickerDynamicRootQueryStep } from '../../types.js';
 import type { ManifestDynamicRootQueryStep } from '../dynamic-root.extension.js';
 import type { UmbContentPickerDocumentRootQueryStepModalData } from './index.js';
+import { customElement, html, ifDefined, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbDocumentTypePickerInputContext } from '@umbraco-cms/backoffice/document-type';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import { html, customElement, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-dynamic-root-query-step-picker-modal')
 export class UmbDynamicRootQueryStepPickerModalModalElement extends UmbModalBaseElement<UmbContentPickerDocumentRootQueryStepModalData> {
@@ -21,15 +20,7 @@ export class UmbDynamicRootQueryStepPickerModalModalElement extends UmbModalBase
 		}
 	}
 
-	#choose(item: ManifestDynamicRootQueryStep) {
-		this.#openDocumentTypePicker(item.meta.queryStepAlias);
-	}
-
-	#close() {
-		this.modalContext?.reject();
-	}
-
-	async #openDocumentTypePicker(alias: string) {
+	async #choose(item: ManifestDynamicRootQueryStep) {
 		await this.#documentTypePickerContext.openPicker({
 			hideTreeRoot: true,
 			pickableFilter: (x) => x.isElement === false,
@@ -37,16 +28,17 @@ export class UmbDynamicRootQueryStepPickerModalModalElement extends UmbModalBase
 
 		const selectedItems = this.#documentTypePickerContext.getSelection();
 
-		this.#submit({
+		this.modalContext?.setValue({
 			unique: UmbId.new(),
-			alias: alias,
+			alias: item.meta.queryStepAlias,
 			anyOfDocTypeKeys: selectedItems,
 		});
+
+		this.modalContext?.submit();
 	}
 
-	#submit(value: UmbContentPickerDynamicRootQueryStep) {
-		this.modalContext?.setValue(value);
-		this.modalContext?.submit();
+	#close() {
+		this.modalContext?.reject();
 	}
 
 	override render() {
@@ -63,14 +55,15 @@ export class UmbDynamicRootQueryStepPickerModalModalElement extends UmbModalBase
 										name=${ifDefined(item.meta.label)}
 										detail=${ifDefined(item.meta.description)}
 										icon=${ifDefined(item.meta.icon)}
-										@open=${() => this.#choose(item)}></umb-ref-item>
+										@open=${() => this.#choose(item)}>
+									</umb-ref-item>
 								`,
 							)}
 						</uui-ref-list>
 					</uui-box>
 				</div>
 				<div slot="actions">
-					<uui-button @click=${this.#close} look="default" label="${this.localize.term('general_close')}"></uui-button>
+					<uui-button look="default" label=${this.localize.term('general_close')} @click=${this.#close}></uui-button>
 				</div>
 			</umb-body-layout>
 		`;

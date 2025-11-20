@@ -17,17 +17,27 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// <summary>
 ///     Represents a repository for doing CRUD operations for <see cref="RelationType" />
 /// </summary>
-internal class RelationTypeRepository : EntityRepositoryBase<int, IRelationType>, IRelationTypeRepository
+internal sealed class RelationTypeRepository : EntityRepositoryBase<int, IRelationType>, IRelationTypeRepository
 {
-    public RelationTypeRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<RelationTypeRepository> logger)
-        : base(scopeAccessor, cache, logger)
+    public RelationTypeRepository(
+        IScopeAccessor scopeAccessor,
+        AppCaches cache,
+        ILogger<RelationTypeRepository> logger,
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            cache,
+            logger,
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
     }
 
     protected override IRepositoryCachePolicy<IRelationType, int> CreateCachePolicy() =>
-        new FullDataSetRepositoryCachePolicy<IRelationType, int>(GlobalIsolatedCache, ScopeAccessor, GetEntityId, /*expires:*/ true);
+        new FullDataSetRepositoryCachePolicy<IRelationType, int>(GlobalIsolatedCache, ScopeAccessor,  RepositoryCacheVersionService, CacheSyncService, GetEntityId, /*expires:*/ true);
 
-    private void CheckNullObjectTypeValues(IRelationType entity)
+    private static void CheckNullObjectTypeValues(IRelationType entity)
     {
         if (entity.ParentObjectType.HasValue && entity.ParentObjectType == Guid.Empty)
         {
@@ -66,12 +76,12 @@ internal class RelationTypeRepository : EntityRepositoryBase<int, IRelationType>
     public IEnumerable<IRelationType> GetMany(params Guid[]? ids)
     {
         // should not happen due to the cache policy
-        if (ids?.Any() ?? false)
+        if (ids is { Length: not 0 })
         {
             throw new NotImplementedException();
         }
 
-        return GetMany(new int[0]);
+        return GetMany(Array.Empty<int>());
     }
 
     protected override IEnumerable<IRelationType> PerformGetByQuery(IQuery<IRelationType> query)
@@ -113,13 +123,14 @@ internal class RelationTypeRepository : EntityRepositoryBase<int, IRelationType>
         return sql;
     }
 
-    protected override string GetBaseWhereClause() => $"{Constants.DatabaseSchema.Tables.RelationType}.id = @id";
+    protected override string GetBaseWhereClause() => $"{QuoteTableName(Constants.DatabaseSchema.Tables.RelationType)}.id = @id";
 
     protected override IEnumerable<string> GetDeleteClauses()
     {
         var list = new List<string>
         {
-            "DELETE FROM umbracoRelation WHERE relType = @id", "DELETE FROM umbracoRelationType WHERE id = @id",
+            $"DELETE FROM {QuoteTableName("umbracoRelation")} WHERE {QuoteColumnName("relType")} = @id",
+            $"DELETE FROM {QuoteTableName("umbracoRelationType")} WHERE id = @id",
         };
         return list;
     }

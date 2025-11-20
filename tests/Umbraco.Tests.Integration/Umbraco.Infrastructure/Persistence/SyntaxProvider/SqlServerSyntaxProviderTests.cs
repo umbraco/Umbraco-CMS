@@ -22,7 +22,7 @@ using Umbraco.Cms.Tests.Integration.Testing;
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.SyntaxProvider;
 
 [TestFixture]
-public class SqlServerSyntaxProviderTests : UmbracoIntegrationTest
+internal sealed class SqlServerSyntaxProviderTests : UmbracoIntegrationTest
 {
     private ISqlContext SqlContext => GetRequiredService<IUmbracoDatabaseFactory>().SqlContext;
     private SqlServerSyntaxProvider GetSqlSyntax() => new(Options.Create(new GlobalSettings()));
@@ -48,7 +48,7 @@ public class SqlServerSyntaxProviderTests : UmbracoIntegrationTest
     {
         var mediaObjectType = Constants.ObjectTypes.Media;
         var subQuery = SqlContext.Sql()
-            .Select("DISTINCT cmsContentNu.nodeId")
+            .SelectDistinct<ContentNuDto>(c => c.NodeId)
             .From<ContentNuDto>()
             .InnerJoin<NodeDto>()
             .On<ContentNuDto, NodeDto>(left => left.NodeId, right => right.NodeId)
@@ -66,11 +66,16 @@ public class SqlServerSyntaxProviderTests : UmbracoIntegrationTest
             return SqlContext.SqlSyntax.GetQuotedColumnName(x);
         }
 
-        Assert.AreEqual(
-            @$"DELETE FROM {t("cmsContentNu")} WHERE {c("nodeId")} IN (SELECT {c("nodeId")} FROM (SELECT DISTINCT cmsContentNu.nodeId FROM {t("cmsContentNu")} INNER JOIN {t("umbracoNode")} ON {t("cmsContentNu")}.{c("nodeId")} = {t("umbracoNode")}.{c("id")} WHERE (({t("umbracoNode")}.{c("nodeObjectType")} = @0))) x)".Replace(Environment.NewLine, " ")
-                .Replace("\n", " ").Replace("\r", " "),
-            sqlOutput.SQL.Replace(Environment.NewLine, " ").Replace("\n", " ").Replace("\r", " "));
+        string n(string x)
+        {
+            return SqlContext.SqlSyntax.GetQuotedName(x);
+        }
 
+        var expectedSql = @$"DELETE FROM {t("cmsContentNu")} WHERE {c("nodeId")} IN (SELECT {c("nodeId")} FROM (SELECT DISTINCT {t("cmsContentNu")}.{c("nodeId")} AS {n("NodeId")} FROM {t("cmsContentNu")} INNER JOIN {t("umbracoNode")} ON {t("cmsContentNu")}.{c("nodeId")} = {t("umbracoNode")}.{c("id")} WHERE (({t("umbracoNode")}.{c("nodeObjectType")} = @0))) x)".Replace(Environment.NewLine, " ")
+                .Replace("\n", " ").Replace("\r", " ");
+        var sqlOutputSql = sqlOutput.SQL.Replace(Environment.NewLine, " ").Replace("\n", " ").Replace("\r", " ");
+
+        Assert.AreEqual(expectedSql, sqlOutputSql);
         Assert.AreEqual(1, sqlOutput.Arguments.Length);
         Assert.AreEqual(mediaObjectType, sqlOutput.Arguments[0]);
     }

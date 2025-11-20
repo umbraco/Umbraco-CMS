@@ -10,6 +10,9 @@ export class UmbDocumentTypeImportRepository extends UmbRepositoryBase {
 
 		if (!error) {
 			const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+			if (!notificationContext) {
+				throw new Error('Notification context not found');
+			}
 			const notification = { data: { message: `Imported` } };
 			notificationContext.peek('positive', notification);
 		}

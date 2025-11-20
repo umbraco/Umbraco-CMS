@@ -1,11 +1,11 @@
 import type { UmbPropertyLayoutElement } from './property-layout.element.js';
-import type { Meta, StoryObj } from '@storybook/web-components';
+import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import './property-layout.element.js';
 
 const meta: Meta<UmbPropertyLayoutElement> = {
-	title: 'Workspaces/Property Layout',
+	title: 'Generic Components/Property Layout',
 	id: 'umb-property-layout',
 	component: 'umb-property-layout',
 	args: {
@@ -49,7 +49,7 @@ const meta: Meta<UmbPropertyLayoutElement> = {
 export default meta;
 type Story = StoryObj<UmbPropertyLayoutElement>;
 
-export const Overview: Story = {};
+export const Docs: Story = {};
 
 export const Vertical: Story = {
 	args: {

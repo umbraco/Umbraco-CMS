@@ -6,9 +6,12 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { UMB_ANCESTORS_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '@umbraco-cms/backoffice/document';
 import { UMB_MEDIA_ENTITY_TYPE } from '@umbraco-cms/backoffice/media';
 import { UMB_MEMBER_ENTITY_TYPE } from '@umbraco-cms/backoffice/member';
+import { UmbPropertyEditorUiInteractionMemoryManager } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
@@ -28,15 +31,6 @@ export class UmbPropertyEditorUIContentPickerElement
 	extends UmbFormControlMixin<UmbContentPickerValueType | undefined, typeof UmbLitElement>(UmbLitElement, undefined)
 	implements UmbPropertyEditorUiElement
 {
-	@property({ type: Array })
-	public override set value(value: UmbContentPickerValueType | undefined) {
-		this.#value = value;
-	}
-	public override get value(): UmbContentPickerValueType | undefined {
-		return this.#value;
-	}
-	#value?: UmbContentPickerValueType = [];
-
 	/**
 	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
 	 * @type {boolean}
@@ -73,6 +67,9 @@ export class UmbPropertyEditorUIContentPickerElement
 	@state()
 	private _invalidData?: UmbContentPickerValueType;
 
+	@state()
+	private _interactionMemories: Array<UmbInteractionMemoryModel> = [];
+
 	#dynamicRoot?: UmbContentPickerSource['dynamicRoot'];
 	#dynamicRootRepository = new UmbContentPickerDynamicRootRepository(this);
 
@@ -82,7 +79,21 @@ export class UmbPropertyEditorUIContentPickerElement
 		member: UMB_MEMBER_ENTITY_TYPE,
 	};
 
+	#interactionMemoryManager = new UmbPropertyEditorUiInteractionMemoryManager(this, {
+		memoryUniquePrefix: 'UmbContentPicker',
+	});
+
+	constructor() {
+		super();
+
+		this.observe(this.#interactionMemoryManager.memoriesForPropertyEditor, (interactionMemories) => {
+			this._interactionMemories = interactionMemories ?? [];
+		});
+	}
+
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
+		this.#interactionMemoryManager.setPropertyEditorConfig(config);
+
 		if (!config) return;
 
 		const startNode = config.getValueByAlias<UmbContentPickerSource>('startNode');
@@ -93,7 +104,7 @@ export class UmbPropertyEditorUIContentPickerElement
 			this.#dynamicRoot = startNode.dynamicRoot;
 
 			// NOTE: Filter out any items that do not match the entity type. [LK]
-			this._invalidData = this.#value?.filter((x) => x.type !== this._rootEntityType);
+			this._invalidData = this.value?.filter((x) => x.type !== this._rootEntityType);
 			if (this._invalidData?.length) {
 				this.readonly = true;
 			}
@@ -118,7 +129,8 @@ export class UmbPropertyEditorUIContentPickerElement
 		return !isNaN(num) && num > 0 ? num : fallback;
 	}
 
-	override firstUpdated() {
+	override firstUpdated(changedProperties: Map<string | number | symbol, unknown>) {
+		super.firstUpdated(changedProperties);
 		this.addFormControlElement(this.shadowRoot!.querySelector('umb-input-content')!);
 		this.#setPickerRootUnique();
 
@@ -139,11 +151,9 @@ export class UmbPropertyEditorUIContentPickerElement
 		if (this._rootUnique) return;
 		if (!this.#dynamicRoot) return;
 
-		const menuStructureWorkspaceContext = (await this.getContext('UmbMenuStructureWorkspaceContext')) as any;
-		const structure = (await this.observe(menuStructureWorkspaceContext.structure, () => {})?.asPromise()) as any[];
-		const [parentUnique, unique] = structure?.slice(-2).map((x) => x.unique) ?? [];
-
-		if (!unique) return;
+		const ancestorsContext = await this.getContext(UMB_ANCESTORS_ENTITY_CONTEXT);
+		const ancestors = ancestorsContext?.getAncestors();
+		const [parentUnique, unique] = ancestors?.slice(-2).map((x) => x.unique) ?? [];
 
 		const result = await this.#dynamicRootRepository.requestRoot(this.#dynamicRoot, unique, parentUnique);
 		if (result && result.length > 0) {
@@ -169,6 +179,17 @@ export class UmbPropertyEditorUIContentPickerElement
 		this.readonly = false;
 	}
 
+	async #onInputInteractionMemoriesChange(event: UmbChangeEvent) {
+		const target = event.target as UmbInputContentElement;
+		const interactionMemories = target.interactionMemories;
+
+		if (interactionMemories && interactionMemories.length > 0) {
+			await this.#interactionMemoryManager.saveMemoriesForPropertyEditor(interactionMemories);
+		} else {
+			await this.#interactionMemoryManager.deleteMemoriesForPropertyEditor();
+		}
+	}
+
 	override render() {
 		const startNode: UmbTreeStartNode | undefined =
 			this._rootUnique && this._rootEntityType
@@ -186,7 +207,9 @@ export class UmbPropertyEditorUIContentPickerElement
 				.startNode=${startNode}
 				.allowedContentTypeIds=${this._allowedContentTypeUniques ?? ''}
 				?readonly=${this.readonly}
-				@change=${this.#onChange}>
+				@change=${this.#onChange}
+				.interactionMemories=${this._interactionMemories}
+				@interaction-memories-change=${this.#onInputInteractionMemoriesChange}>
 			</umb-input-content>
 			${this.#renderInvalidData()}
 		`;

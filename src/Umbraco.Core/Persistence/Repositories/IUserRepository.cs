@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
 
@@ -160,4 +160,10 @@ public interface IUserRepository : IReadWriteQueryRepository<Guid, IUser>
     bool RemoveClientId(int id, string clientId);
 
     IUser? GetByClientId(string clientId);
+
+    /// <summary>
+    ///     Invalidates sessions for users that aren't associated with the current collection of providers.
+    /// </summary>
+    /// <param name="currentLoginProviders">The names of the currently configured providers.</param>
+    void InvalidateSessionsForRemovedProviders(IEnumerable<string> currentLoginProviders) { }
 }

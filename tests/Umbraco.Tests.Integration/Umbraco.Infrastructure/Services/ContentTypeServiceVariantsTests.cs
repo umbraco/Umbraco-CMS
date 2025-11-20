@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, PublishedRepositoryEvents = true)]
-public class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
+internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
 {
     private ISqlContext SqlContext => GetRequiredService<ISqlContext>();
 

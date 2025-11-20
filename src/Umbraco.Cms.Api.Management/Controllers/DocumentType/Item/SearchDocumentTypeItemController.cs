@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,38 +16,17 @@ public class SearchDocumentTypeItemController : DocumentTypeItemControllerBase
     private readonly IUmbracoMapper _mapper;
     private readonly IContentTypeSearchService _contentTypeSearchService;
 
-    [Obsolete("Please use ctor that only accepts IUmbracoMapper & IContentTypeSearchService, scheduled for removal in v17")]
-    public SearchDocumentTypeItemController(IEntitySearchService entitySearchService, IContentTypeService contentTypeService, IUmbracoMapper mapper)
-    : this(mapper, StaticServiceProvider.Instance.GetRequiredService<IContentTypeSearchService>())
-    {
-    }
-
-    [Obsolete("Please use ctor that only accepts IUmbracoMapper & IContentTypeSearchService, scheduled for removal in v17")]
-    // We need to have this constructor, or else we get ambiguous constructor error
-    public SearchDocumentTypeItemController(
-        IEntitySearchService entitySearchService,
-        IContentTypeService contentTypeService,
-        IUmbracoMapper mapper,
-        IContentTypeSearchService contentTypeSearchService)
-        : this(mapper, contentTypeSearchService)
-    {
-    }
-
-    [ActivatorUtilitiesConstructor]
     public SearchDocumentTypeItemController(IUmbracoMapper mapper, IContentTypeSearchService contentTypeSearchService)
     {
         _mapper = mapper;
         _contentTypeSearchService = contentTypeSearchService;
     }
 
-    [NonAction]
-    [Obsolete("Scheduled to be removed in v16, use the non obsoleted method instead")]
-    public async Task<IActionResult> Search(CancellationToken cancellationToken, string query, int skip = 0, int take = 100)
-        => await SearchDocumentType(cancellationToken, query, null, skip, take);
-
     [HttpGet("search")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedModel<DocumentTypeItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Searches document type items.")]
+    [EndpointDescription("Searches document type items by the provided query with pagination support.")]
     public async Task<IActionResult> SearchDocumentType(CancellationToken cancellationToken, string query, bool? isElement = null, int skip = 0, int take = 100)
     {
         PagedModel<IContentType> contentTypes = await _contentTypeSearchService.SearchAsync(query, isElement, cancellationToken, skip, take);

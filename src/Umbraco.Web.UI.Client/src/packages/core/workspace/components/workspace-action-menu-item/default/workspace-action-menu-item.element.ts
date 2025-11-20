@@ -1,11 +1,11 @@
 import type { UmbWorkspaceActionMenuItem } from '../types.js';
-import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
-import { html, customElement, property, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type {
 	ManifestWorkspaceActionMenuItemDefaultKind,
 	MetaWorkspaceActionMenuItemDefaultKind,
-} from '@umbraco-cms/backoffice/workspace';
+} from '../../../extensions/types.js';
+import { customElement, html, ifDefined, property, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-workspace-action-menu-item')
@@ -16,7 +16,7 @@ export class UmbWorkspaceActionMenuItemElement<
 	#api?: ApiType;
 
 	@state()
-	_href?: string;
+	private _href?: string;
 
 	@property({ attribute: false })
 	public manifest?: ManifestWorkspaceActionMenuItemDefaultKind<MetaType>;
@@ -34,7 +34,7 @@ export class UmbWorkspaceActionMenuItemElement<
 	async #onClickLabel(event: UUIMenuItemEvent) {
 		if (!this._href) {
 			event.stopPropagation();
-			await this.#api?.execute();
+			await this.#api?.execute().catch(() => {});
 		}
 		this.dispatchEvent(new UmbActionExecutedEvent());
 	}
@@ -48,15 +48,11 @@ export class UmbWorkspaceActionMenuItemElement<
 	override render() {
 		return html`
 			<uui-menu-item
-				label=${ifDefined(
-					this.manifest?.meta.label ? this.localize.string(this.manifest.meta.label) : this.manifest?.name,
-				)}
+				label=${ifDefined(this.localize.string(this.manifest?.meta.label ?? this.manifest?.name))}
 				href=${ifDefined(this._href)}
-				@click-label=${this.#onClickLabel}
-				@click=${this.#onClick}>
-				${this.manifest?.meta.icon
-					? html`<umb-icon slot="icon" name="${this.manifest?.meta.icon}"></umb-icon>`
-					: nothing}
+				@click=${this.#onClick}
+				@click-label=${this.#onClickLabel}>
+				${when(this.manifest?.meta.icon, (icon) => html`<umb-icon slot="icon" name=${icon}></umb-icon>`)}
 			</uui-menu-item>
 		`;
 	}

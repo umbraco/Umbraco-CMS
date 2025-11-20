@@ -1,24 +1,16 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.HealthChecks;
 using Umbraco.Cms.Core.HealthChecks.NotificationMethods;
 using Umbraco.Cms.Core.Logging;
-using Umbraco.Cms.Core.Runtime;
-using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Sync;
-using Umbraco.Cms.Infrastructure.BackgroundJobs;
-using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
+using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.DistributedJobs;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common;
 
@@ -37,7 +29,7 @@ public class HealthCheckNotifierJobTests
     public async Task Does_Not_Execute_When_Not_Enabled()
     {
         var sut = CreateHealthCheckNotifier(false);
-        await sut.RunJobAsync();
+        await sut.ExecuteAsync();
         VerifyNotificationsNotSent();
     }
 
@@ -45,7 +37,7 @@ public class HealthCheckNotifierJobTests
     public async Task Does_Not_Execute_With_No_Enabled_Notification_Methods()
     {
         var sut = CreateHealthCheckNotifier(notificationEnabled: false);
-        await sut.RunJobAsync();
+        await sut.ExecuteAsync();
         VerifyNotificationsNotSent();
     }
 
@@ -53,7 +45,7 @@ public class HealthCheckNotifierJobTests
     public async Task Executes_With_Enabled_Notification_Methods()
     {
         var sut = CreateHealthCheckNotifier();
-        await sut.RunJobAsync();
+        await sut.ExecuteAsync();
         VerifyNotificationsSent();
     }
 
@@ -61,7 +53,7 @@ public class HealthCheckNotifierJobTests
     public async Task Executes_Only_Enabled_Checks()
     {
         var sut = CreateHealthCheckNotifier();
-        await sut.RunJobAsync();
+        await sut.ExecuteAsync();
         _mockNotificationMethod.Verify(
             x => x.SendAsync(
                 It.Is<HealthCheckResults>(y =>
@@ -96,7 +88,6 @@ public class HealthCheckNotifierJobTests
 
 
         var mockScopeProvider = new Mock<IScopeProvider>();
-        var mockLogger = new Mock<ILogger<HealthCheckNotifierJob>>();
         var mockProfilingLogger = new Mock<IProfilingLogger>();
 
         return new HealthCheckNotifierJob(
@@ -104,9 +95,7 @@ public class HealthCheckNotifierJobTests
             checks,
             notifications,
             mockScopeProvider.Object,
-            mockLogger.Object,
             mockProfilingLogger.Object,
-            Mock.Of<ICronTabParser>(),
             Mock.Of<IEventAggregator>());
     }
 
@@ -136,6 +125,6 @@ public class HealthCheckNotifierJobTests
     {
         public override HealthCheckStatus ExecuteAction(HealthCheckAction action) => new("Check message");
 
-        public override async Task<IEnumerable<HealthCheckStatus>> GetStatusAsync() => Enumerable.Empty<HealthCheckStatus>();
+        public override Task<IEnumerable<HealthCheckStatus>> GetStatusAsync() => Task.FromResult(Enumerable.Empty<HealthCheckStatus>());
     }
 }

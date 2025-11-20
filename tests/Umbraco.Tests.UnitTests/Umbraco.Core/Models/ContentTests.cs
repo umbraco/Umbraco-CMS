@@ -29,8 +29,9 @@ public class ContentTests
 
     private readonly PropertyEditorCollection _propertyEditorCollection = new (new DataEditorCollection(() => []));
 
-    [Test]
-    public void Variant_Culture_Names_Track_Dirty_Changes()
+    [TestCase("name-fr", false)]
+    [TestCase("name-fr-updated", true)]
+    public void Variant_Culture_Names_Track_Dirty_Changes(string newName, bool expectedDirty)
     {
         var contentType = new ContentTypeBuilder()
             .WithAlias("contentType")
@@ -58,14 +59,17 @@ public class ContentTests
         Assert.IsTrue(frCultureName.IsPropertyDirty("Date"));
 
         content.ResetDirtyProperties();
+        frCultureName.ResetDirtyProperties();
 
         Assert.IsFalse(content.IsPropertyDirty("CultureInfos")); // it's been reset
         Assert.IsTrue(content.WasPropertyDirty("CultureInfos"));
 
         Thread.Sleep(500); // The "Date" wont be dirty if the test runs too fast since it will be the same date
-        content.SetCultureName("name-fr", langFr);
-        Assert.IsTrue(frCultureName.IsPropertyDirty("Date"));
-        Assert.IsTrue(content.IsPropertyDirty("CultureInfos")); // it's true now since we've updated a name
+        content.SetCultureName(newName, langFr);
+
+        // dirty is only true if we updated the name
+        Assert.AreEqual(expectedDirty, frCultureName.IsPropertyDirty("Date"));
+        Assert.AreEqual(expectedDirty, content.IsPropertyDirty("CultureInfos"));
     }
 
     [Test]
@@ -90,20 +94,21 @@ public class ContentTests
 
         Thread.Sleep(500); // The "Date" wont be dirty if the test runs too fast since it will be the same date
         content.SetCultureName("name-fr", langFr);
-        content.PublishCulture(CultureImpact.Explicit(langFr, false), DateTime.Now, _propertyEditorCollection); // we've set the name, now we're publishing it
+        content.PublishCulture(CultureImpact.Explicit(langFr, false), DateTime.UtcNow, _propertyEditorCollection); // we've set the name, now we're publishing it
         Assert.IsTrue(
             content.IsPropertyDirty("PublishCultureInfos")); // now it will be changed since the collection has changed
         var frCultureName = content.PublishCultureInfos[langFr];
         Assert.IsTrue(frCultureName.IsPropertyDirty("Date"));
 
         content.ResetDirtyProperties();
+        frCultureName.ResetDirtyProperties();
 
         Assert.IsFalse(content.IsPropertyDirty("PublishCultureInfos")); // it's been reset
         Assert.IsTrue(content.WasPropertyDirty("PublishCultureInfos"));
 
         Thread.Sleep(500); // The "Date" wont be dirty if the test runs too fast since it will be the same date
         content.SetCultureName("name-fr", langFr);
-        content.PublishCulture(CultureImpact.Explicit(langFr, false), DateTime.Now, _propertyEditorCollection); // we've set the name, now we're publishing it
+        content.PublishCulture(CultureImpact.Explicit(langFr, false), DateTime.UtcNow, _propertyEditorCollection); // we've set the name, now we're publishing it
         Assert.IsTrue(frCultureName.IsPropertyDirty("Date"));
         Assert.IsTrue(content.IsPropertyDirty("PublishCultureInfos")); // it's true now since we've updated a name
     }
@@ -256,7 +261,7 @@ public class ContentTests
         }
 
         content.Id = 10;
-        content.CreateDate = DateTime.Now;
+        content.CreateDate = DateTime.UtcNow;
         content.CreatorId = 22;
         content.Key = Guid.NewGuid();
         content.Level = 3;
@@ -264,7 +269,7 @@ public class ContentTests
         content.SortOrder = 5;
         content.TemplateId = 88;
         content.Trashed = false;
-        content.UpdateDate = DateTime.Now;
+        content.UpdateDate = DateTime.UtcNow;
         content.WriterId = 23;
 
         var runtimeCache = new ObjectCacheAppCache();
@@ -303,7 +308,7 @@ public class ContentTests
 
         content.SetCultureName("Hello", "en-US");
         content.SetCultureName("World", "es-ES");
-        content.PublishCulture(CultureImpact.All, DateTime.Now, _propertyEditorCollection);
+        content.PublishCulture(CultureImpact.All, DateTime.UtcNow, _propertyEditorCollection);
 
         // should not try to clone something that's not Published or Unpublished
         // (and in fact it will not work)
@@ -318,7 +323,7 @@ public class ContentTests
         }
 
         content.Id = 10;
-        content.CreateDate = DateTime.Now;
+        content.CreateDate = DateTime.UtcNow;
         content.CreatorId = 22;
         content.Key = Guid.NewGuid();
         content.Level = 3;
@@ -326,7 +331,7 @@ public class ContentTests
         content.SortOrder = 5;
         content.TemplateId = 88;
         content.Trashed = false;
-        content.UpdateDate = DateTime.Now;
+        content.UpdateDate = DateTime.UtcNow;
         content.WriterId = 23;
 
         // Act
@@ -416,7 +421,7 @@ public class ContentTests
 
         content.SetCultureName("Hello", "en-US");
         content.SetCultureName("World", "es-ES");
-        content.PublishCulture(CultureImpact.All, DateTime.Now, _propertyEditorCollection);
+        content.PublishCulture(CultureImpact.All, DateTime.UtcNow, _propertyEditorCollection);
 
         var i = 200;
         foreach (var property in content.Properties)
@@ -425,7 +430,7 @@ public class ContentTests
         }
 
         content.Id = 10;
-        content.CreateDate = DateTime.Now;
+        content.CreateDate = DateTime.UtcNow;
         content.CreatorId = 22;
         content.Key = Guid.NewGuid();
         content.Level = 3;
@@ -433,7 +438,7 @@ public class ContentTests
         content.SortOrder = 5;
         content.TemplateId = 88;
         content.Trashed = true;
-        content.UpdateDate = DateTime.Now;
+        content.UpdateDate = DateTime.UtcNow;
         content.WriterId = 23;
 
         // Act
@@ -492,7 +497,7 @@ public class ContentTests
         }
 
         content.Id = 10;
-        content.CreateDate = DateTime.Now;
+        content.CreateDate = DateTime.UtcNow;
         content.CreatorId = 22;
         content.Key = Guid.NewGuid();
         content.Level = 3;
@@ -500,33 +505,12 @@ public class ContentTests
         content.SortOrder = 5;
         content.TemplateId = 88;
         content.Trashed = false;
-        content.UpdateDate = DateTime.Now;
+        content.UpdateDate = DateTime.UtcNow;
         content.WriterId = 23;
 
         var json = JsonSerializer.Serialize(content);
         Debug.Print(json);
     }
-
-    /*[Test]
-    public void Cannot_Change_Property_With_Invalid_Value()
-    {
-        // Arrange
-        var contentType = ContentTypeBuilder.CreateTextpageContentType();
-        var content = ContentBuilder.CreateTextpageContent(contentType);
-
-        // Act
-        var model = new TestEditorModel
-                        {
-                            TestDateTime = DateTime.Now,
-                            TestDouble = 1.2,
-                            TestInt = 2,
-                            TestReadOnly = "Read-only string",
-                            TestString = "This is a test string"
-                        };
-
-        // Assert
-        Assert.Throws<Exception>(() => content.Properties["title"].Value = model);
-    }*/
 
     [Test]
     public void Can_Change_Property_Value_Through_Anonymous_Object()

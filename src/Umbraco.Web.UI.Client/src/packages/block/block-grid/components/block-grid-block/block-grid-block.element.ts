@@ -1,11 +1,9 @@
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { css, customElement, html, nothing, property } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, property, when } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbBlockDataType } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockEditorCustomViewConfiguration } from '@umbraco-cms/backoffice/block-custom-view';
 
 import '@umbraco-cms/backoffice/ufm';
-import '../block-grid-areas-container/index.js';
-import '../ref-grid-block/index.js';
 
 @customElement('umb-block-grid-block')
 export class UmbBlockGridBlockElement extends UmbLitElement {
@@ -16,6 +14,9 @@ export class UmbBlockGridBlockElement extends UmbLitElement {
 	@property({ type: String, reflect: false })
 	icon?: string;
 
+	@property({ type: Number, attribute: false })
+	index?: number;
+
 	@property({ attribute: false })
 	config?: UmbBlockEditorCustomViewConfiguration;
 
@@ -25,19 +26,27 @@ export class UmbBlockGridBlockElement extends UmbLitElement {
 	@property({ attribute: false })
 	content?: UmbBlockDataType;
 
+	@property({ attribute: false })
+	settings?: UmbBlockDataType;
+
 	override render() {
-		return html`<umb-ref-grid-block
-			standalone
-			href=${(this.config?.showContentEdit ? this.config?.editContentPath : undefined) ?? ''}>
-			<umb-icon slot="icon" .name=${this.icon}></umb-icon>
-			<umb-ufm-render slot="name" inline .markdown=${this.label} .value=${this.content}></umb-ufm-render>
-			${this.unpublished
-				? html`<uui-tag slot="name" look="secondary" title=${this.localize.term('blockEditor_notExposedDescription')}
-						><umb-localize key="blockEditor_notExposedLabel"></umb-localize
-					></uui-tag>`
-				: nothing}
-			<umb-block-grid-areas-container slot="areas" draggable="false"></umb-block-grid-areas-container>
-		</umb-ref-grid-block>`;
+		const blockValue = { ...this.content, $settings: this.settings, $index: this.index };
+		return html`
+			<umb-ref-grid-block
+				standalone
+				href=${(this.config?.showContentEdit ? this.config?.editContentPath : undefined) ?? ''}>
+				<umb-icon slot="icon" .name=${this.icon}></umb-icon>
+				<umb-ufm-render slot="name" inline .markdown=${this.label} .value=${blockValue}></umb-ufm-render>
+				${when(
+					this.unpublished,
+					() =>
+						html`<uui-tag slot="name" look="secondary" title=${this.localize.term('blockEditor_notExposedDescription')}
+							><umb-localize key="blockEditor_notExposedLabel"></umb-localize
+						></uui-tag>`,
+				)}
+				<umb-block-grid-areas-container slot="areas" draggable="false"></umb-block-grid-areas-container>
+			</umb-ref-grid-block>
+		`;
 	}
 
 	static override styles = [

@@ -8,7 +8,7 @@ using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
-internal class BlockValuePropertyIndexValueFactory :
+internal sealed class BlockValuePropertyIndexValueFactory :
     BlockValuePropertyIndexValueFactoryBase<BlockValuePropertyIndexValueFactory.IndexValueFactoryBlockValue>,
     IBlockValuePropertyIndexValueFactory
 {
@@ -24,7 +24,7 @@ internal class BlockValuePropertyIndexValueFactory :
         => GetDataItems(input.ContentData, input.Expose, published);
 
     // we only care about the content data when extracting values for indexing - not the layouts nor the settings
-    internal class IndexValueFactoryBlockValue
+    internal sealed class IndexValueFactoryBlockValue
     {
         public List<BlockItemData> ContentData { get; set; } = new();
 

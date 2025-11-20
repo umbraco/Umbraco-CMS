@@ -162,6 +162,8 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
 
     public override string ConvertDateToOrderableString => "{0}";
 
+    public override string ConvertUniqueIdentifierToString => "{0}";
+
     public override string RenameTable => "ALTER TABLE {0} RENAME TO {1}";
 
     /// <inheritdoc />
@@ -203,13 +205,14 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
     /// <inheritdoc />
     protected override string? FormatSystemMethods(SystemMethods systemMethod)
     {
-        // TODO: SQLite
         switch (systemMethod)
         {
             case SystemMethods.NewGuid:
-                return "NEWID()"; // No NEWID() in SQLite perhaps try RANDOM()
+                return null; // Not available in SQLite.
             case SystemMethods.CurrentDateTime:
-                return "DATE()"; // No GETDATE() trying DATE()
+                return null; // Not available in SQLite.
+            case SystemMethods.CurrentUTCDateTime:
+                return "CURRENT_TIMESTAMP";
         }
 
         return null;

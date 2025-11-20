@@ -1,21 +1,4 @@
-import { UmbDeprecation } from '../utils/index.js';
 import type { UmbObjectWithVariantProperties } from './types.js';
-
-/**
- *
- * @param {UmbObjectWithVariantProperties} variant - An object with variant specifying properties to convert to a string.
- * @returns {string} A string representation of the variant properties.
- * @deprecated Use UmbVariantId to make this conversion. Will ve removed in v.17
- */
-export function variantPropertiesObjectToString(variant: UmbObjectWithVariantProperties): string {
-	new UmbDeprecation({
-		deprecated: 'Method `variantPropertiesObjectToString` is deprecated',
-		removeInVersion: '17',
-		solution: 'Use UmbVariantId to make this conversion',
-	}).warn();
-	// Currently a direct copy of the toString method of variantId.
-	return (variant.culture || UMB_INVARIANT_CULTURE) + (variant.segment ? `_${variant.segment}` : '');
-}
 
 export const UMB_INVARIANT_CULTURE = 'invariant';
 
@@ -37,9 +20,12 @@ export class UmbVariantId {
 	}
 
 	public static FromString(str: string): UmbVariantId {
-		const split = str.split('_');
-		const culture = split[0] === UMB_INVARIANT_CULTURE ? null : split[0];
-		const segment = split[1] ?? null;
+		const firstUnderscoreIndex = str.indexOf('_');
+		let culture: string | null = firstUnderscoreIndex === -1 ? str : str.substring(0, firstUnderscoreIndex);
+		culture = culture === UMB_INVARIANT_CULTURE ? null : culture;
+
+		const segment = firstUnderscoreIndex === -1 ? null : str.substring(firstUnderscoreIndex + 1) || null;
+
 		return Object.freeze(new UmbVariantId(culture, segment));
 	}
 

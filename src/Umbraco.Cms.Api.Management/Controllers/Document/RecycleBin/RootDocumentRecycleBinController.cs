@@ -19,6 +19,8 @@ public class RootDocumentRecycleBinController : DocumentRecycleBinControllerBase
     [HttpGet("root")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<DocumentRecycleBinItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets documents at the root of the recycle bin.")]
+    [EndpointDescription("Gets a paginated collection of documents at the root level of the recycle bin.")]
     public async Task<ActionResult<PagedViewModel<DocumentRecycleBinItemResponseModel>>> Root(
         CancellationToken cancellationToken,
         int skip = 0,

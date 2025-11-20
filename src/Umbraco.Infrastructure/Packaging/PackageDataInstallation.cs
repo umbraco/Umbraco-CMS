@@ -78,42 +78,6 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             _templateService = templateService;
         }
 
-        [Obsolete("Please use new constructor, scheduled for removal in v15")]
-        public PackageDataInstallation(
-            IDataValueEditorFactory dataValueEditorFactory,
-            ILogger<PackageDataInstallation> logger,
-            IFileService fileService,
-            ILocalizationService localizationService,
-            IDataTypeService dataTypeService,
-            IEntityService entityService,
-            IContentTypeService contentTypeService,
-            IContentService contentService,
-            PropertyEditorCollection propertyEditors,
-            IScopeProvider scopeProvider,
-            IShortStringHelper shortStringHelper,
-            IConfigurationEditorJsonSerializer serializer,
-            IMediaService mediaService,
-            IMediaTypeService mediaTypeService)
-            : this(
-                dataValueEditorFactory,
-                logger,
-                fileService,
-                localizationService,
-                dataTypeService,
-                entityService,
-                contentTypeService,
-                contentService,
-                propertyEditors,
-                scopeProvider,
-                shortStringHelper,
-                serializer,
-                mediaService,
-                mediaTypeService,
-                StaticServiceProvider.Instance.GetRequiredService<ITemplateContentParserService>(),
-                StaticServiceProvider.Instance.GetRequiredService<ITemplateService>())
-        {
-        }
-
         // Also remove factory service registration when this constructor is removed
         [Obsolete("Use the constructor with Infrastructure.IScopeProvider and without global settings and hosting environment instead.")]
         public PackageDataInstallation(
@@ -166,7 +130,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                             out IEnumerable<EntityContainer> dataTypeEntityContainersInstalled),
                     LanguagesInstalled = ImportLanguages(compiledPackage.Languages, userId),
                     DictionaryItemsInstalled = ImportDictionaryItems(compiledPackage.DictionaryItems, userId),
-                    TemplatesInstalled = ImportTemplates(compiledPackage.Templates.ToList(), userId),
+                    TemplatesInstalled = ImportTemplatesAsync(compiledPackage.Templates.ToList(), userId).GetAwaiter().GetResult(),
                     DocumentTypesInstalled =
                         ImportDocumentTypes(compiledPackage.DocumentTypes, userId,
                             out IEnumerable<EntityContainer> documentTypeEntityContainersInstalled),
@@ -1709,17 +1673,8 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
         #region Templates
 
-        [Obsolete("Use Async version instead, Scheduled to be removed in v17")]
-        public IEnumerable<ITemplate> ImportTemplate(XElement templateElement, int userId)
-            => ImportTemplates(new[] { templateElement }, userId);
-
         public async Task<IEnumerable<ITemplate>> ImportTemplateAsync(XElement templateElement, int userId)
             => ImportTemplatesAsync(new[] {templateElement}, userId).GetAwaiter().GetResult();
-
-
-        [Obsolete("Use Async version instead, Scheduled to be removed in v17")]
-        public IReadOnlyList<ITemplate> ImportTemplates(IReadOnlyCollection<XElement> templateElements, int userId)
-            => ImportTemplatesAsync(templateElements, userId).GetAwaiter().GetResult();
 
         /// <summary>
         /// Imports and saves package xml as <see cref="ITemplate"/>

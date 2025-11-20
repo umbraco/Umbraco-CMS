@@ -14,7 +14,6 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { UmbInputManifestElement } from '@umbraco-cms/backoffice/components';
 import type {
 	UmbPropertyEditorConfigCollection,
@@ -113,9 +112,9 @@ export class UmbPropertyEditorUICollectionLayoutConfigurationElement
 	}
 
 	async #onIconChange(icon: typeof UMB_ICON_PICKER_MODAL.VALUE, index: number) {
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const modal = modalManager.open(this, UMB_ICON_PICKER_MODAL, { value: icon });
-		const picked = await modal?.onSubmit();
+		const picked = await (await import('@umbraco-cms/backoffice/modal'))
+			.umbOpenModal(this, UMB_ICON_PICKER_MODAL, { value: icon })
+			.catch(() => undefined);
 		if (!picked) return;
 
 		const values = [...(this.value ?? [])];
@@ -158,7 +157,7 @@ export class UmbPropertyEditorUICollectionLayoutConfigurationElement
 		const varName = icon.color ? extractUmbColorVariable(icon.color) : undefined;
 		return html`
 			<div class="layout-item" id=${this.#getUnique(layout)}>
-				<uui-icon class="drag-handle" name="icon-grib"></uui-icon>
+				<uui-icon class="drag-handle" name="icon-grip"></uui-icon>
 
 				<uui-button compact look="outline" label="pick icon" @click=${() => this.#onIconChange(icon, index)}>
 					${when(

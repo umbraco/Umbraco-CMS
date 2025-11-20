@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OpenIddict.Abstractions;
@@ -13,7 +12,6 @@ using OpenIddict.Server.AspNetCore;
 using Umbraco.Cms.Api.Delivery.Routing;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Extensions;
@@ -33,31 +31,6 @@ public class MemberController : DeliveryApiControllerBase
     private readonly DeliveryApiSettings _deliveryApiSettings;
     private readonly ILogger<MemberController> _logger;
 
-
-    [Obsolete("Please use the non-obsolete constructor. Will be removed in V16.")]
-    public MemberController(
-        IHttpContextAccessor httpContextAccessor,
-        IMemberSignInManager memberSignInManager,
-        IMemberManager memberManager,
-        IOptions<DeliveryApiSettings> deliveryApiSettings,
-        ILogger<MemberController> logger)
-        : this(memberSignInManager, memberManager, StaticServiceProvider.Instance.GetRequiredService<IMemberClientCredentialsManager>(), deliveryApiSettings, logger)
-    {
-    }
-
-    [Obsolete("Please use the non-obsolete constructor. Will be removed in V16.")]
-    public MemberController(
-        IHttpContextAccessor httpContextAccessor,
-        IMemberSignInManager memberSignInManager,
-        IMemberManager memberManager,
-        IMemberClientCredentialsManager memberClientCredentialsManager,
-        IOptions<DeliveryApiSettings> deliveryApiSettings,
-        ILogger<MemberController> logger)
-        : this(memberSignInManager, memberManager, memberClientCredentialsManager, deliveryApiSettings, logger)
-    {
-    }
-
-    [ActivatorUtilitiesConstructor]
     public MemberController(
         IMemberSignInManager memberSignInManager,
         IMemberManager memberManager,

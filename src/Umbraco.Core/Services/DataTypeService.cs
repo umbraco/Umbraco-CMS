@@ -21,12 +21,12 @@ namespace Umbraco.Cms.Core.Services.Implement
     /// </summary>
     public class DataTypeService : RepositoryService, IDataTypeService
     {
-        private readonly IDataValueEditorFactory _dataValueEditorFactory;
         private readonly IDataTypeRepository _dataTypeRepository;
         private readonly IDataTypeContainerRepository _dataTypeContainerRepository;
         private readonly IContentTypeRepository _contentTypeRepository;
-        private readonly IAuditRepository _auditRepository;
-        private readonly IIOHelper _ioHelper;
+        private readonly IMediaTypeRepository _mediaTypeRepository;
+        private readonly IMemberTypeRepository _memberTypeRepository;
+        private readonly IAuditService _auditService;
         private readonly IDataTypeContainerService _dataTypeContainerService;
         private readonly IUserIdKeyResolver _userIdKeyResolver;
         private readonly Lazy<IIdKeyMap> _idKeyMap;
@@ -36,18 +36,18 @@ namespace Umbraco.Cms.Core.Services.Implement
             ILoggerFactory loggerFactory,
             IEventMessagesFactory eventMessagesFactory,
             IDataTypeRepository dataTypeRepository,
-            IDataValueEditorFactory dataValueEditorFactory,
-            IAuditRepository auditRepository,
+            IAuditService auditService,
             IContentTypeRepository contentTypeRepository,
-            IIOHelper ioHelper,
+            IMediaTypeRepository mediaTypeRepository,
+            IMemberTypeRepository memberTypeRepository,
             Lazy<IIdKeyMap> idKeyMap)
             : base(provider, loggerFactory, eventMessagesFactory)
         {
-            _dataValueEditorFactory = dataValueEditorFactory;
             _dataTypeRepository = dataTypeRepository;
-            _auditRepository = auditRepository;
+            _auditService = auditService;
             _contentTypeRepository = contentTypeRepository;
-            _ioHelper = ioHelper;
+            _mediaTypeRepository = mediaTypeRepository;
+            _memberTypeRepository = memberTypeRepository;
             _idKeyMap = idKeyMap;
 
             // resolve dependencies for obsolete methods through the static service provider, so they don't pollute the constructor signature
@@ -56,13 +56,90 @@ namespace Umbraco.Cms.Core.Services.Implement
             _userIdKeyResolver = StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>();
         }
 
+        [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v18.")]
+        public DataTypeService(
+            ICoreScopeProvider provider,
+            ILoggerFactory loggerFactory,
+            IEventMessagesFactory eventMessagesFactory,
+            IDataTypeRepository dataTypeRepository,
+            IAuditRepository auditRepository,
+            IContentTypeRepository contentTypeRepository,
+            IMediaTypeRepository mediaTypeRepository,
+            IMemberTypeRepository memberTypeRepository,
+            Lazy<IIdKeyMap> idKeyMap)
+            : this(
+                provider,
+                loggerFactory,
+                eventMessagesFactory,
+                dataTypeRepository,
+                StaticServiceProvider.Instance.GetRequiredService<IAuditService>(),
+                contentTypeRepository,
+                mediaTypeRepository,
+                memberTypeRepository,
+                idKeyMap)
+        {
+        }
+
+        [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v18.")]
+        public DataTypeService(
+            ICoreScopeProvider provider,
+            ILoggerFactory loggerFactory,
+            IEventMessagesFactory eventMessagesFactory,
+            IDataTypeRepository dataTypeRepository,
+            IDataValueEditorFactory dataValueEditorFactory,
+            IAuditRepository auditRepository,
+            IContentTypeRepository contentTypeRepository,
+            IMediaTypeRepository mediaTypeRepository,
+            IMemberTypeRepository memberTypeRepository,
+            IIOHelper ioHelper,
+            Lazy<IIdKeyMap> idKeyMap)
+            : this(
+                provider,
+                loggerFactory,
+                eventMessagesFactory,
+                dataTypeRepository,
+                StaticServiceProvider.Instance.GetRequiredService<IAuditService>(),
+                contentTypeRepository,
+                mediaTypeRepository,
+                memberTypeRepository,
+                idKeyMap)
+        {
+        }
+
+        [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v18.")]
+        public DataTypeService(
+            ICoreScopeProvider provider,
+            ILoggerFactory loggerFactory,
+            IEventMessagesFactory eventMessagesFactory,
+            IDataTypeRepository dataTypeRepository,
+            IDataValueEditorFactory dataValueEditorFactory,
+            IAuditRepository auditRepository,
+            IAuditService auditService,
+            IContentTypeRepository contentTypeRepository,
+            IMediaTypeRepository mediaTypeRepository,
+            IMemberTypeRepository memberTypeRepository,
+            IIOHelper ioHelper,
+            Lazy<IIdKeyMap> idKeyMap)
+            : this(
+                provider,
+                loggerFactory,
+                eventMessagesFactory,
+                dataTypeRepository,
+                auditService,
+                contentTypeRepository,
+                mediaTypeRepository,
+                memberTypeRepository,
+                idKeyMap)
+        {
+        }
+
         #region Containers
 
         [Obsolete($"Please use {nameof(IDataTypeContainerService)} for all data type container operations. Will be removed in V15.")]
         public Attempt<OperationResult<OperationResultType, EntityContainer>?> CreateContainer(int parentId, Guid key, string name, int userId = Constants.Security.SuperUserId)
         {
             EventMessages evtMsgs = EventMessagesFactory.Get();
-            using (ScopeProvider.CreateCoreScope(autoComplete:true))
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 try
                 {
@@ -129,7 +206,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         public Attempt<OperationResult?> SaveContainer(EntityContainer container, int userId = Constants.Security.SuperUserId)
         {
             EventMessages evtMsgs = EventMessagesFactory.Get();
-            using (ScopeProvider.CreateCoreScope(autoComplete:true))
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 var isNew = container.Id == 0;
                 Guid? parentKey = isNew && container.ParentId > 0 ? _dataTypeContainerRepository.Get(container.ParentId)?.Key : null;
@@ -155,7 +232,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         public Attempt<OperationResult?> DeleteContainer(int containerId, int userId = Constants.Security.SuperUserId)
         {
             EventMessages evtMsgs = EventMessagesFactory.Get();
-            using (ScopeProvider.CreateCoreScope(autoComplete:true))
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 EntityContainer? container = _dataTypeContainerRepository.Get(containerId);
                 if (container == null)
@@ -180,7 +257,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         public Attempt<OperationResult<OperationResultType, EntityContainer>?> RenameContainer(int id, string name, int userId = Constants.Security.SuperUserId)
         {
             EventMessages evtMsgs = EventMessagesFactory.Get();
-            using (ScopeProvider.CreateCoreScope(autoComplete:true))
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 try
                 {
@@ -226,7 +303,6 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             IDataType? dataType = _dataTypeRepository.Get(Query<IDataType>().Where(x => x.Name == name))?.FirstOrDefault();
-            ConvertMissingEditorOfDataTypeToLabel(dataType);
 
             return Task.FromResult(dataType);
         }
@@ -239,11 +315,13 @@ namespace Umbraco.Cms.Core.Services.Implement
             IQuery<IDataType> query = Query<IDataType>();
             if (keys.Length > 0)
             {
-                query = query.Where(x => keys.Contains(x.Key));
+                // Need to use a List here because the expression tree cannot convert the array when used in Contains.
+                // See ExpressionTests.Sql_In().
+                List<Guid> keysAsList = [.. keys];
+                query = query.Where(x => keysAsList.Contains(x.Key));
             }
 
             IDataType[] dataTypes = _dataTypeRepository.Get(query).ToArray();
-            ConvertMissingEditorsOfDataTypesToLabels(dataTypes);
 
             return Task.FromResult<IEnumerable<IDataType>>(dataTypes);
         }
@@ -287,7 +365,6 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             IDataType? dataType = _dataTypeRepository.Get(id);
-            ConvertMissingEditorOfDataTypeToLabel(dataType);
 
             return dataType;
         }
@@ -297,7 +374,6 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             IDataType? dataType = GetDataTypeFromRepository(id);
-            ConvertMissingEditorOfDataTypeToLabel(dataType);
 
             return Task.FromResult(dataType);
         }
@@ -317,19 +393,22 @@ namespace Umbraco.Cms.Core.Services.Implement
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             IQuery<IDataType> query = Query<IDataType>().Where(x => x.EditorAlias == propertyEditorAlias);
             IEnumerable<IDataType> dataTypes = _dataTypeRepository.Get(query).ToArray();
-            ConvertMissingEditorsOfDataTypesToLabels(dataTypes);
 
             return Task.FromResult(dataTypes);
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<IDataType>> GetByEditorAliasAsync(string[] propertyEditorAlias)
+        public Task<IEnumerable<IDataType>> GetByEditorAliasAsync(string[] propertyEditorAlias)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-            IQuery<IDataType> query = Query<IDataType>().Where(x => propertyEditorAlias.Contains(x.EditorAlias));
+
+            // Need to use a List here because the expression tree cannot convert the array when used in Contains.
+            // See ExpressionTests.Sql_In().
+            List<string> propertyEditorAliasesAsList = [.. propertyEditorAlias];
+            IQuery<IDataType> query = Query<IDataType>().Where(x => propertyEditorAliasesAsList.Contains(x.EditorAlias));
+
             IEnumerable<IDataType> dataTypes = _dataTypeRepository.Get(query).ToArray();
-            ConvertMissingEditorsOfDataTypesToLabels(dataTypes);
-            return await Task.FromResult(dataTypes);
+            return Task.FromResult(dataTypes);
         }
 
         /// <inheritdoc />
@@ -338,7 +417,6 @@ namespace Umbraco.Cms.Core.Services.Implement
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             IQuery<IDataType> query = Query<IDataType>().Where(x => x.EditorUiAlias == editorUiAlias);
             IEnumerable<IDataType> dataTypes = _dataTypeRepository.Get(query).ToArray();
-            ConvertMissingEditorsOfDataTypesToLabels(dataTypes);
 
             return Task.FromResult(dataTypes);
         }
@@ -352,30 +430,8 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             IEnumerable<IDataType> dataTypes = _dataTypeRepository.GetMany(ids).ToArray();
-            ConvertMissingEditorsOfDataTypesToLabels(dataTypes);
 
             return dataTypes;
-        }
-
-        private void ConvertMissingEditorOfDataTypeToLabel(IDataType? dataType)
-        {
-            if (dataType == null)
-            {
-                return;
-            }
-
-            ConvertMissingEditorsOfDataTypesToLabels(new[] { dataType });
-        }
-
-        private void ConvertMissingEditorsOfDataTypesToLabels(IEnumerable<IDataType> dataTypes)
-        {
-            // Any data types that don't have an associated editor are created of a specific type.
-            // We convert them to labels to make clear to the user why the data type cannot be used.
-            IEnumerable<IDataType> dataTypesWithMissingEditors = dataTypes.Where(x => x.Editor is MissingPropertyEditor);
-            foreach (IDataType dataType in dataTypesWithMissingEditors)
-            {
-                dataType.Editor = new LabelPropertyEditor(_dataValueEditorFactory, _ioHelper);
-            }
         }
 
         public Attempt<OperationResult<MoveOperationStatusType>?> Move(IDataType toMove, int parentId)
@@ -442,8 +498,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 scope.Notifications.Publish(new DataTypeMovedNotification(moveEventInfo, eventMessages).WithStateFrom(movingDataTypeNotification));
 
-                var currentUserId = await _userIdKeyResolver.GetAsync(userKey);
-                Audit(AuditType.Move, currentUserId, toMove.Id);
+                await AuditAsync(AuditType.Move, userKey, toMove.Id);
                 scope.Complete();
             }
 
@@ -479,7 +534,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 DataTypeOperationStatus.Success => OperationResult.Attempt.Succeed(MoveOperationStatusType.Success, evtMsgs, result.Result),
                 DataTypeOperationStatus.CancelledByNotification => OperationResult.Attempt.Fail(MoveOperationStatusType.FailedCancelledByEvent, evtMsgs, result.Result),
                 DataTypeOperationStatus.ParentNotFound => OperationResult.Attempt.Fail(MoveOperationStatusType.FailedParentNotFound, evtMsgs, result.Result),
-                _ =>  OperationResult.Attempt.Fail(MoveOperationStatusType.FailedNotAllowedByPath, evtMsgs, result.Result, new InvalidOperationException($"Invalid operation status: {result.Status}")),
+                _ => OperationResult.Attempt.Fail(MoveOperationStatusType.FailedNotAllowedByPath, evtMsgs, result.Result, new InvalidOperationException($"Invalid operation status: {result.Status}")),
             };
         }
 
@@ -565,7 +620,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                         : DataTypeOperationStatus.Success;
                 },
                 userKey,
-                AuditType.New);
+                AuditType.Save);
 
         /// <summary>
         /// Saves a collection of <see cref="IDataType"/>
@@ -673,8 +728,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             scope.Notifications.Publish(new DataTypeDeletedNotification(dataType, eventMessages).WithStateFrom(deletingDataTypeNotification));
 
-            var currentUserId = await _userIdKeyResolver.GetAsync(userKey);
-            Audit(AuditType.Delete, currentUserId, dataType.Id);
+            await AuditAsync(AuditType.Delete, userKey, dataType.Id);
 
             scope.Complete();
 
@@ -682,31 +736,109 @@ namespace Umbraco.Cms.Core.Services.Implement
         }
 
         /// <inheritdoc />
-        [Obsolete("Please use GetReferencesAsync. Will be deleted in V15.")]
-        public IReadOnlyDictionary<Udi, IEnumerable<string>> GetReferences(int id)
+        public Task<PagedModel<RelationItemModel>> GetPagedRelationsAsync(Guid key, int skip, int take)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-            return _dataTypeRepository.FindUsages(id);
-        }
 
-        /// <inheritdoc />
-        public async Task<Attempt<IReadOnlyDictionary<Udi, IEnumerable<string>>, DataTypeOperationStatus>> GetReferencesAsync(Guid id)
-        {
-            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete:true);
-            IDataType? dataType = GetDataTypeFromRepository(id);
+            IDataType? dataType = GetDataTypeFromRepository(key);
             if (dataType == null)
             {
-                return Attempt.FailWithStatus<IReadOnlyDictionary<Udi, IEnumerable<string>>, DataTypeOperationStatus>(DataTypeOperationStatus.NotFound, new Dictionary<Udi, IEnumerable<string>>());
+                // Is an unexpected response, but returning an empty collection aligns with how we handle retrieval of concrete Umbraco
+                // relations based on documents, media and members.
+                return Task.FromResult(new PagedModel<RelationItemModel>());
             }
 
+            // We don't really need true paging here, as the number of data type relations will be small compared to what there could
+            // potentially by for concrete Umbraco relations based on documents, media and members.
+            // So we'll retrieve all usages for the data type and construct a paged response.
+            // This allows us to re-use the existing repository methods used for FindUsages and FindListViewUsages.
             IReadOnlyDictionary<Udi, IEnumerable<string>> usages = _dataTypeRepository.FindUsages(dataType.Id);
-            return await Task.FromResult(Attempt.SucceedWithStatus(DataTypeOperationStatus.Success, usages));
+            IReadOnlyDictionary<Udi, IEnumerable<string>> listViewUsages = _dataTypeRepository.FindListViewUsages(dataType.Id);
+
+            // Combine the property and list view usages into a single collection of property aliases and content type UDIs.
+            IList<(string PropertyAlias, Udi Udi)> combinedUsages = usages
+                .SelectMany(kvp => kvp.Value.Select(value => (value, kvp.Key)))
+                .Concat(listViewUsages.SelectMany(kvp => kvp.Value.Select(value => (value, kvp.Key))))
+                .ToList();
+
+            var totalItems = combinedUsages.Count;
+
+            // Create the page of items.
+            List<(string PropertyAlias, Udi Udi)> pagedUsages = combinedUsages
+                .OrderBy(x => x.Udi.EntityType) // Document types first, then media types, then member types.
+                .ThenBy(x => x.PropertyAlias)
+                .Skip(skip)
+                .Take(take)
+                .ToList();
+
+            // Get the content types for the UDIs referenced in the page of items to construct the response from.
+            // They could be document, media or member types.
+            List<IContentTypeComposition> contentTypes = GetReferencedContentTypes(pagedUsages);
+
+            IEnumerable<RelationItemModel> relations = pagedUsages
+                .Select(x =>
+                {
+                    // Get the matching content type so we can populate the content type and property details.
+                    IContentTypeComposition contentType = contentTypes.Single(y => y.Key == ((GuidUdi)x.Udi).Guid);
+
+                    string nodeType = x.Udi.EntityType switch
+                    {
+                        Constants.UdiEntityType.DocumentType => Constants.ReferenceType.DocumentTypePropertyType,
+                        Constants.UdiEntityType.MediaType => Constants.ReferenceType.MediaTypePropertyType,
+                        Constants.UdiEntityType.MemberType => Constants.ReferenceType.MemberTypePropertyType,
+                        _ => throw new ArgumentOutOfRangeException(nameof(x.Udi.EntityType)),
+                    };
+
+                    // Look-up the property details from the property alias. This will be null for a list view reference.
+                    IPropertyType? propertyType = contentType.PropertyTypes.SingleOrDefault(y => y.Alias == x.PropertyAlias);
+                    return new RelationItemModel
+                    {
+                        ContentTypeKey = contentType.Key,
+                        ContentTypeAlias = contentType.Alias,
+                        ContentTypeIcon = contentType.Icon,
+                        ContentTypeName = contentType.Name,
+                        NodeType = nodeType,
+                        NodeName = propertyType?.Name ?? x.PropertyAlias,
+                        NodeAlias = x.PropertyAlias,
+                        NodeKey = propertyType?.Key ?? Guid.Empty,
+                    };
+                });
+
+            var pagedModel = new PagedModel<RelationItemModel>(totalItems, relations);
+            return Task.FromResult(pagedModel);
         }
 
-        public IReadOnlyDictionary<Udi, IEnumerable<string>> GetListViewReferences(int id)
+        private List<IContentTypeComposition> GetReferencedContentTypes(List<(string PropertyAlias, Udi Udi)> pagedUsages)
         {
-            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-            return _dataTypeRepository.FindListViewUsages(id);
+            IEnumerable<IContentTypeComposition> documentTypes = GetContentTypes(
+                pagedUsages,
+                Constants.UdiEntityType.DocumentType,
+                _contentTypeRepository);
+            IEnumerable<IContentTypeComposition> mediaTypes = GetContentTypes(
+                pagedUsages,
+                Constants.UdiEntityType.MediaType,
+                _mediaTypeRepository);
+            IEnumerable<IContentTypeComposition> memberTypes = GetContentTypes(
+                pagedUsages,
+                Constants.UdiEntityType.MemberType,
+                _memberTypeRepository);
+            return documentTypes.Concat(mediaTypes).Concat(memberTypes).ToList();
+        }
+
+        private static IEnumerable<T> GetContentTypes<T>(
+            IEnumerable<(string PropertyAlias, Udi Udi)> dataTypeUsages,
+            string entityType,
+            IContentTypeRepositoryBase<T> repository)
+            where T : IContentTypeComposition
+        {
+            Guid[] contentTypeKeys = dataTypeUsages
+                .Where(x => x.Udi is GuidUdi && x.Udi.EntityType == entityType)
+                .Select(x => ((GuidUdi)x.Udi).Guid)
+                .Distinct()
+                .ToArray();
+            return contentTypeKeys.Length > 0
+                ? repository.GetMany(contentTypeKeys)
+                : [];
         }
 
         /// <inheritdoc />
@@ -714,10 +846,10 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             IConfigurationEditor? configurationEditor = dataType.Editor?.GetConfigurationEditor();
             return configurationEditor == null
-                ? new[]
-                {
+                ?
+                [
                     new ValidationResult($"Data type with editor alias {dataType.EditorAlias} does not have a configuration editor")
-                }
+                ]
                 : configurationEditor.Validate(dataType.ConfigurationData);
         }
 
@@ -771,7 +903,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             scope.Notifications.Publish(new DataTypeSavedNotification(dataType, eventMessages).WithStateFrom(savingDataTypeNotification));
 
-            Audit(auditType, currentUserId, dataType.Id);
+            await AuditAsync(auditType, userKey, dataType.Id);
             scope.Complete();
 
             return Attempt.SucceedWithStatus(DataTypeOperationStatus.Success, dataType);
@@ -784,7 +916,20 @@ namespace Umbraco.Cms.Core.Services.Implement
             { Result: var intId } => _dataTypeRepository.Get(intId),
         };
 
-        private void Audit(AuditType type, int userId, int objectId)
-            => _auditRepository.Save(new AuditItem(objectId, type, userId, ObjectTypes.GetName(UmbracoObjectTypes.DataType)));
+        private void Audit(AuditType type, int userId, int objectId) =>
+            AuditAsync(type, userId, objectId).GetAwaiter().GetResult();
+
+        private async Task AuditAsync(AuditType type, int userId, int objectId)
+        {
+            Guid userKey = await _userIdKeyResolver.GetAsync(userId);
+            await AuditAsync(type, userKey, objectId);
+        }
+
+        private async Task AuditAsync(AuditType type, Guid userKey, int objectId) =>
+            await _auditService.AddAsync(
+                type,
+                userKey,
+                objectId,
+                UmbracoObjectTypes.DataType.GetName());
     }
 }

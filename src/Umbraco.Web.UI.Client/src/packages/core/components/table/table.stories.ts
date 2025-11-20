@@ -1,11 +1,11 @@
 import type { UmbTableElement, UmbTableColumn, UmbTableItem } from './table.element.js';
-import type { Meta, StoryObj } from '@storybook/web-components';
+import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 
 import './table.element.js';
 
 const meta: Meta<UmbTableElement> = {
-	title: 'Components/Table',
+	title: 'Generic Components/Table',
 	component: 'umb-table',
 };
 
@@ -70,7 +70,7 @@ const items: Array<UmbTableItem> = [
 	},
 ];
 
-export const Overview: Story = {
+export const Docs: Story = {
 	args: {
 		items: items,
 		columns: columns,

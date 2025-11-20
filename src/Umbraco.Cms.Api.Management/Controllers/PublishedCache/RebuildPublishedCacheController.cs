@@ -1,6 +1,8 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PublishedCache;
 
 namespace Umbraco.Cms.Api.Management.Controllers.PublishedCache;
@@ -15,22 +17,23 @@ public class RebuildPublishedCacheController : PublishedCacheControllerBase
     [HttpPost("rebuild")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [EndpointSummary("Rebuilds the published content cache.")]
+    [EndpointDescription("Rebuilds the entire published content cache from scratch.")]
     public async Task<IActionResult> Rebuild(CancellationToken cancellationToken)
     {
-        if (_databaseCacheRebuilder.IsRebuilding())
+        Attempt<DatabaseCacheRebuildResult> attempt = await _databaseCacheRebuilder.RebuildAsync(true);
+        if (attempt is { Success: false, Result: DatabaseCacheRebuildResult.AlreadyRunning })
         {
             var problemDetails = new ProblemDetails
             {
-                Title = "Database cache can not be rebuilt",
-                Detail = $"The database cache is in the process of rebuilding.",
+                Title = "Database cache cannot be rebuilt",
+                Detail = "The database cache is in the process of rebuilding.",
                 Status = StatusCodes.Status400BadRequest,
                 Type = "Error",
             };
-
-            return await Task.FromResult(Conflict(problemDetails));
+            return Conflict(problemDetails);
         }
 
-        _databaseCacheRebuilder.Rebuild(true);
-        return await Task.FromResult(Ok());
+        return Ok();
     }
 }

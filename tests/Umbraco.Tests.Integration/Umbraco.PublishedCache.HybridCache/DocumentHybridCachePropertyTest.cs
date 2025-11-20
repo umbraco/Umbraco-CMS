@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.PublishedCache.HybridCache;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class DocumentHybridCachePropertyTest : UmbracoIntegrationTest
+internal sealed class DocumentHybridCachePropertyTest : UmbracoIntegrationTest
 {
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
@@ -76,12 +76,12 @@ public class DocumentHybridCachePropertyTest : UmbracoIntegrationTest
         // Update content
         var updateModel = new ContentUpdateModel
         {
-            InvariantName = "Root Create",
-            InvariantProperties = new[]
-            {
+            Variants = [new() { Name = "Root Create" }],
+            Properties =
+            [
                 new PropertyValueModel { Alias = "title", Value = "Updated title" },
                 new PropertyValueModel { Alias = "bodyText", Value = "The body text" }
-            },
+            ],
         };
 
         var updateResult = await ContentEditingService.UpdateAsync(textPage.Key, updateModel, Constants.Security.SuperUserKey);
@@ -89,11 +89,7 @@ public class DocumentHybridCachePropertyTest : UmbracoIntegrationTest
 
         var publishResult = await ContentPublishingService.PublishAsync(
             updateResult.Result.Content!.Key,
-            new CultureAndScheduleModel()
-            {
-                CulturesToPublishImmediately = new HashSet<string> { "*" },
-                Schedules = new ContentScheduleCollection(),
-            },
+            [new CulturePublishScheduleModel { Culture = "*" }],
             Constants.Security.SuperUserKey);
 
         Assert.IsTrue(publishResult);
@@ -123,11 +119,7 @@ public class DocumentHybridCachePropertyTest : UmbracoIntegrationTest
 
         var publishResult = await ContentPublishingService.PublishAsync(
             result.Result.Content!.Key,
-            new CultureAndScheduleModel()
-            {
-                CulturesToPublishImmediately = new HashSet<string> { "*" },
-                Schedules = new ContentScheduleCollection(),
-            },
+            [new CulturePublishScheduleModel { Culture = "*" }],
             Constants.Security.SuperUserKey);
 
         Assert.IsTrue(publishResult.Success);
@@ -148,11 +140,7 @@ public class DocumentHybridCachePropertyTest : UmbracoIntegrationTest
 
         var publishResult = await ContentPublishingService.PublishAsync(
             createResult.Result.Content!.Key,
-            new CultureAndScheduleModel()
-            {
-                CulturesToPublishImmediately = new HashSet<string> { "*" },
-                Schedules = new ContentScheduleCollection(),
-            },
+            [new CulturePublishScheduleModel { Culture = "*" }],
             Constants.Security.SuperUserKey);
 
         Assert.IsTrue(publishResult.Success);

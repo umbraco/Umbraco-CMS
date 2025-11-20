@@ -1,3 +1,5 @@
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -18,6 +20,7 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
     private readonly IMediaNavigationManagementService _mediaNavigationManagementService;
     private readonly IMediaService _mediaService;
     private readonly IMediaCacheService _mediaCacheService;
+    private readonly ICacheManager _cacheManager;
 
     public MediaCacheRefresher(
         AppCaches appCaches,
@@ -28,7 +31,8 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
         IMediaNavigationQueryService mediaNavigationQueryService,
         IMediaNavigationManagementService mediaNavigationManagementService,
         IMediaService mediaService,
-        IMediaCacheService mediaCacheService)
+        IMediaCacheService mediaCacheService,
+        ICacheManager cacheManager)
         : base(appCaches, serializer, eventAggregator, factory)
     {
         _idKeyMap = idKeyMap;
@@ -36,6 +40,9 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
         _mediaNavigationManagementService = mediaNavigationManagementService;
         _mediaService = mediaService;
         _mediaCacheService = mediaCacheService;
+
+        // TODO: Use IElementsCache instead of ICacheManager, see ContentCacheRefresher for more information.
+        _cacheManager = cacheManager;
     }
 
     #region Indirect
@@ -76,16 +83,18 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
 
     #region Refresher
 
-    public override void Refresh(JsonPayload[]? payloads)
+    public override void RefreshInternal(JsonPayload[] payloads)
     {
-        if (payloads == null)
-        {
-            return;
-        }
-
         // actions that always need to happen
         AppCaches.RuntimeCache.ClearByKey(CacheKeys.MediaRecycleBinCacheKey);
         Attempt<IAppPolicyCache?> mediaCache = AppCaches.IsolatedCaches.Get<IMedia>();
+
+        // Ideally, we'd like to not have to clear the entire cache here. However, this was the existing behavior in NuCache.
+        // The reason for this is that we have no way to know which elements are affected by the changes or what their keys are.
+        // This is because currently published elements live exclusively in a JSON blob in the umbracoPropertyData table.
+        // This means that the only way to resolve these keys is to actually parse this data with a specific value converter, and for all cultures, which is not possible.
+        // If published elements become their own entities with relations, instead of just property data, we can revisit this.
+        _cacheManager.ElementsCache.Clear();
 
         foreach (JsonPayload payload in payloads)
         {
@@ -94,22 +103,37 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
                 _idKeyMap.ClearCache(payload.Id);
             }
 
-            if (mediaCache.Success)
+            if (mediaCache.Success is false || mediaCache.Result is null)
             {
-                // repository cache
-                // it *was* done for each pathId but really that does not make sense
-                // only need to do it for the current media
-                mediaCache.Result?.Clear(RepositoryCacheKeys.GetKey<IMedia, int>(payload.Id));
-                mediaCache.Result?.Clear(RepositoryCacheKeys.GetKey<IMedia, Guid?>(payload.Key));
-
-                // remove those that are in the branch
-                if (payload.ChangeTypes.HasTypesAny(TreeChangeTypes.RefreshBranch | TreeChangeTypes.Remove))
-                {
-                    var pathid = "," + payload.Id + ",";
-                    mediaCache.Result?.ClearOfType<IMedia>((_, v) => v.Path?.Contains(pathid) ?? false);
-                }
+                continue;
             }
 
+            // repository cache
+            // it *was* done for each pathId but really that does not make sense
+            // only need to do it for the current media
+            mediaCache.Result.Clear(RepositoryCacheKeys.GetKey<IMedia, int>(payload.Id));
+            mediaCache.Result.Clear(RepositoryCacheKeys.GetKey<IMedia, Guid?>(payload.Key));
+
+            // remove those that are in the branch
+            if (payload.ChangeTypes.HasTypesAny(TreeChangeTypes.RefreshBranch | TreeChangeTypes.Remove))
+            {
+                var pathid = "," + payload.Id + ",";
+                mediaCache.Result.ClearOfType<IMedia>((_, v) => v.Path?.Contains(pathid) ?? false);
+            }
+        }
+
+        base.RefreshInternal(payloads);
+    }
+
+    public override void Refresh(JsonPayload[]? payloads)
+    {
+        if (payloads is null)
+        {
+            return;
+        }
+
+        foreach (JsonPayload payload in payloads)
+        {
             HandleMemoryCache(payload);
             HandleNavigation(payload);
         }

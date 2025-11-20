@@ -2,14 +2,27 @@ import { UmbDocumentVariantState } from '../types.js';
 import type { UmbDocumentItemModel } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbEntityFlag } from '@umbraco-cms/backoffice/entity-flag';
 import type { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
-import type { UmbAppLanguageContext } from '@umbraco-cms/backoffice/language';
-import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
-import { UmbBooleanState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
-import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
-import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import {
+	UmbArrayState,
+	UmbBasicState,
+	UmbBooleanState,
+	UmbObjectState,
+	UmbStringState,
+	type Observable,
+} from '@umbraco-cms/backoffice/observable-api';
+import { type UmbVariantContext, UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
+import type { UmbItemDataResolver } from '@umbraco-cms/backoffice/entity-item';
 
 type UmbDocumentItemDataResolverModel = Omit<UmbDocumentItemModel, 'parent' | 'hasChildren'>;
+
+function isVariantsInvariant(variants: Array<{ culture: string | null }>): boolean {
+	return variants?.[0]?.culture === null;
+}
+function findVariant<T extends { culture: string | null }>(variants: Array<T>, culture: string): T | undefined {
+	return variants.find((x) => x.culture === culture);
+}
 
 /**
  * A controller for resolving data for a document item
@@ -17,86 +30,107 @@ type UmbDocumentItemDataResolverModel = Omit<UmbDocumentItemModel, 'parent' | 'h
  * @class UmbDocumentItemDataResolver
  * @augments {UmbControllerBase}
  */
-export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataResolverModel> extends UmbControllerBase {
-	#defaultCulture?: string;
-	#appCulture?: string;
-	#propertyDataSetCulture?: UmbVariantId;
-	#data?: DataType | undefined;
+export class UmbDocumentItemDataResolver<DocumentItemModel extends UmbDocumentItemDataResolverModel>
+	extends UmbControllerBase
+	implements UmbItemDataResolver
+{
+	#data = new UmbObjectState<DocumentItemModel | undefined>(undefined);
 
-	#init: Promise<[UmbAppLanguageContext]>;
-
-	#unique = new UmbStringState(undefined);
-	public readonly unique = this.#unique.asObservable();
+	public readonly entityType = this.#data.asObservablePart((x) => x?.entityType);
+	public readonly unique = this.#data.asObservablePart((x) => x?.unique);
+	public readonly icon = this.#data.asObservablePart((x) => x?.documentType.icon);
+	public readonly typeUnique = this.#data.asObservablePart((x) => x?.documentType.unique);
+	public readonly isTrashed = this.#data.asObservablePart((x) => x?.isTrashed);
+	public readonly hasCollection = this.#data.asObservablePart((x) => !!x?.documentType.collection);
 
 	#name = new UmbStringState(undefined);
 	public readonly name = this.#name.asObservable();
 
-	#icon = new UmbStringState(undefined);
-	public readonly icon = this.#icon.asObservable();
-
-	#state = new UmbStringState(undefined);
-	public readonly state = this.#state.asObservable();
-
-	#isTrashed = new UmbBooleanState(undefined);
-	public readonly isTrashed = this.#isTrashed.asObservable();
+	#state = new UmbStringState<DocumentVariantStateModel | null | undefined>(undefined);
+	public readonly state = this.#state.asObservable() as Observable<DocumentVariantStateModel | null | undefined>;
 
 	#isDraft = new UmbBooleanState(undefined);
 	public readonly isDraft = this.#isDraft.asObservable();
 
+	#createDate = new UmbBasicState<Date | undefined>(undefined);
+	public readonly createDate = this.#createDate.asObservable();
+
+	#updateDate = new UmbBasicState<Date | undefined>(undefined);
+	public readonly updateDate = this.#updateDate.asObservable();
+
+	#flags = new UmbArrayState<UmbEntityFlag>([], (data) => data.alias);
+	public readonly flags = this.#flags.asObservable();
+
+	#variantContext?: UmbVariantContext;
+	#fallbackCulture?: string | null;
+	#displayCulture?: string | null;
+
 	constructor(host: UmbControllerHost) {
 		super(host);
 
-		// We do not depend on this context because we know is it only available in some cases
-		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (context) => {
-			this.#propertyDataSetCulture = context.getVariantId();
-			this.#setVariantAwareValues();
+		this.consumeContext(UMB_VARIANT_CONTEXT, (context) => {
+			this.#variantContext = context;
+			this.#observeVariantContext();
 		});
+	}
 
-		this.#init = Promise.all([
-			this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (context) => {
-				this.observe(context.appLanguageCulture, (culture) => {
-					this.#appCulture = culture;
-					this.#setVariantAwareValues();
-				});
+	#observeVariantContext() {
+		this.observe(
+			this.#variantContext?.displayCulture,
+			(displayCulture) => {
+				if (displayCulture === undefined) return;
+				this.#displayCulture = displayCulture;
+				this.#setVariantAwareValues();
+			},
+			'umbObserveVariantId',
+		);
 
-				this.observe(context.appDefaultLanguage, (value) => {
-					this.#defaultCulture = value?.unique;
-					this.#setVariantAwareValues();
-				});
-			}).asPromise(),
-		]);
+		this.observe(
+			this.#variantContext?.fallbackCulture,
+			(fallbackCulture) => {
+				if (fallbackCulture === undefined) return;
+				this.#fallbackCulture = fallbackCulture;
+				this.#setVariantAwareValues();
+			},
+			'umbObserveFallbackCulture',
+		);
+	}
+
+	/**
+	 * Get the display culture or fallback culture
+	 * @returns {string | null | undefined} The display culture or fallback culture
+	 * @memberof UmbDocumentItemDataResolver
+	 */
+	getCulture(): string | null | undefined {
+		return this.#displayCulture || this.#fallbackCulture;
 	}
 
 	/**
 	 * Get the current item
-	 * @returns {DataType | undefined} The current item
+	 * @returns {DocumentItemModel | undefined} The current item
 	 * @memberof UmbDocumentItemDataResolver
 	 */
-	getData(): DataType | undefined {
-		return this.#data;
+	getData(): DocumentItemModel | undefined {
+		return this.#data.getValue();
 	}
 
 	/**
 	 * Set the current item
-	 * @param {DataType | undefined} data The current item
+	 * @param {DocumentItemModel | undefined} data The current item
 	 * @memberof UmbDocumentItemDataResolver
 	 */
-	setData(data: DataType | undefined) {
-		this.#data = data;
-
-		if (!this.#data) {
-			this.#unique.setValue(undefined);
-			this.#name.setValue(undefined);
-			this.#icon.setValue(undefined);
-			this.#isTrashed.setValue(undefined);
-			this.#isDraft.setValue(undefined);
-			return;
-		}
-
-		this.#unique.setValue(this.#data.unique);
-		this.#icon.setValue(this.#data.documentType.icon);
-		this.#isTrashed.setValue(this.#data.isTrashed);
+	setData(data: DocumentItemModel | undefined) {
+		this.#data.setValue(data);
 		this.#setVariantAwareValues();
+	}
+
+	/**
+	 * Get the entity type of the item
+	 * @returns {Promise<string | undefined>} The entity type of the item
+	 * @memberof UmbDocumentItemDataResolver
+	 */
+	async getEntityType(): Promise<string | undefined> {
+		return await this.observe(this.entityType).asPromise();
 	}
 
 	/**
@@ -105,8 +139,7 @@ export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataRes
 	 * @memberof UmbDocumentItemDataResolver
 	 */
 	async getUnique(): Promise<string | undefined> {
-		await this.#init;
-		return this.#unique.getValue();
+		return await this.observe(this.unique).asPromise();
 	}
 
 	/**
@@ -115,8 +148,7 @@ export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataRes
 	 * @memberof UmbDocumentItemDataResolver
 	 */
 	async getName(): Promise<string> {
-		await this.#init;
-		return this.#name.getValue() || '';
+		return (await this.observe(this.name).asPromise()) || '';
 	}
 
 	/**
@@ -125,8 +157,7 @@ export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataRes
 	 * @memberof UmbDocumentItemDataResolver
 	 */
 	async getIcon(): Promise<string | undefined> {
-		await this.#init;
-		return this.#data?.documentType.icon;
+		return await this.observe(this.icon).asPromise();
 	}
 
 	/**
@@ -135,8 +166,7 @@ export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataRes
 	 * @memberof UmbDocumentItemDataResolver
 	 */
 	async getState(): Promise<DocumentVariantStateModel | null | undefined> {
-		await this.#init;
-		return this.#getCurrentVariant()?.state;
+		return await this.observe(this.state).asPromise();
 	}
 
 	/**
@@ -145,8 +175,7 @@ export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataRes
 	 * @memberof UmbDocumentItemDataResolver
 	 */
 	async getIsDraft(): Promise<boolean> {
-		await this.#init;
-		return this.#isDraft.getValue() ?? false;
+		return (await this.observe(this.isDraft).asPromise()) ?? false;
 	}
 
 	/**
@@ -155,21 +184,63 @@ export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataRes
 	 * @memberof UmbDocumentItemDataResolver
 	 */
 	async getIsTrashed(): Promise<boolean> {
-		await this.#init;
-		return this.#data?.isTrashed ?? false;
+		return (await this.observe(this.isTrashed).asPromise()) ?? false;
+	}
+
+	/**
+	 * Get the create date of the item
+	 * @returns {Promise<Date>} The create date of the item
+	 * @memberof UmbDocumentItemDataResolver
+	 */
+	async getCreateDate(): Promise<Date> {
+		return (await this.observe(this.createDate).asPromise()) || undefined;
+	}
+
+	/**
+	 * Get the update date of the item
+	 * @returns {Promise<Date>} The update date of the item
+	 * @memberof UmbDocumentItemDataResolver
+	 */
+	async getUpdateDate(): Promise<Date> {
+		return (await this.observe(this.updateDate).asPromise()) || undefined;
+	}
+
+	/**
+	 * Test if the item has a collection
+	 * @returns {boolean} Boolean of whether the item has a collection.
+	 * @memberof UmbDocumentItemDataResolver
+	 */
+	getHasCollection(): boolean {
+		return this.getData()?.documentType.collection != undefined;
 	}
 
 	#setVariantAwareValues() {
+		if (!this.#variantContext) return;
+		if (!this.#displayCulture) return;
+		if (!this.#fallbackCulture) return;
+		if (!this.#data) return;
 		this.#setName();
 		this.#setIsDraft();
 		this.#setState();
+		this.#setCreateDate();
+		this.#setUpdateDate();
+		this.#setFlags();
 	}
 
 	#setName() {
 		const variant = this.#getCurrentVariant();
-		const fallbackName = this.#findVariant(this.#defaultCulture)?.name;
-		const name = variant?.name ?? `(${fallbackName})`;
-		this.#name.setValue(name);
+		if (variant) {
+			this.#name.setValue(variant.name);
+			return;
+		}
+
+		const variants = this.getData()?.variants;
+		if (variants) {
+			const fallbackName = findVariant(variants, this.#fallbackCulture!)?.name;
+			this.#name.setValue(`(${fallbackName})`);
+		} else {
+			this.#name.setValue(undefined);
+		}
 	}
 
 	#setIsDraft() {
@@ -184,20 +255,58 @@ export class UmbDocumentItemDataResolver<DataType extends UmbDocumentItemDataRes
 		this.#state.setValue(state);
 	}
 
-	#findVariant(culture: string | undefined) {
-		return this.#data?.variants.find((x) => x.culture === culture);
+	async #setCreateDate() {
+		const variant = await this.#getCurrentVariant();
+		if (variant) {
+			this.#createDate.setValue(variant.createDate);
+			return;
+		}
+
+		const variants = this.getData()?.variants;
+		if (variants) {
+			const fallbackCreateDate = findVariant(variants, this.#fallbackCulture!)?.createDate;
+			this.#createDate.setValue(fallbackCreateDate);
+		} else {
+			this.#createDate.setValue(undefined);
+		}
+	}
+
+	async #setUpdateDate() {
+		const variant = await this.#getCurrentVariant();
+		if (variant) {
+			this.#updateDate.setValue(variant.updateDate);
+			return;
+		}
+
+		const variants = this.getData()?.variants;
+		if (variants) {
+			const fallbackUpdateDate = findVariant(variants, this.#fallbackCulture!)?.updateDate;
+			this.#updateDate.setValue(fallbackUpdateDate);
+		} else {
+			this.#updateDate.setValue(undefined);
+		}
+	}
+
+	#setFlags() {
+		const data = this.getData();
+		if (!data) {
+			this.#flags.setValue([]);
+			return;
+		}
+
+		const flags = data.flags ?? [];
+		const variantFlags = this.#getCurrentVariant()?.flags ?? [];
+		this.#flags.setValue([...flags, ...variantFlags]);
 	}
 
 	#getCurrentVariant() {
-		if (this.#isInvariant()) {
-			return this.#data?.variants?.[0];
+		const variants = this.getData()?.variants;
+		if (!variants) return undefined;
+
+		if (isVariantsInvariant(variants)) {
+			return variants[0];
 		}
 
-		const culture = this.#propertyDataSetCulture?.culture || this.#appCulture;
-		return this.#findVariant(culture);
-	}
-
-	#isInvariant() {
-		return this.#data?.variants?.[0]?.culture === null;
+		return findVariant(variants, this.#displayCulture!);
 	}
 }

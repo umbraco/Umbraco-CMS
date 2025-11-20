@@ -20,7 +20,7 @@ export class UmbUserWorkspaceAccessElement extends UmbLitElement {
 		this.consumeContext(UMB_USER_WORKSPACE_CONTEXT, (instance) => {
 			this.#userWorkspaceContext = instance;
 			this.observe(
-				this.#userWorkspaceContext.calculatedStartNodes,
+				this.#userWorkspaceContext?.calculatedStartNodes,
 				(calculatedStartNodes) => (this._calculatedStartNodes = calculatedStartNodes),
 				'umbUserObserver',
 			);

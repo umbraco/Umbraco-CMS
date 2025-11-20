@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging;
 public interface IImportPackageBuilder : IFluentBuilder
 {
     IExecutableBuilder FromEmbeddedResource<TPackageMigration>()
-        where TPackageMigration : PackageMigrationBase;
+        where TPackageMigration : AsyncPackageMigrationBase;
 
     IExecutableBuilder FromEmbeddedResource(Type packageMigrationType);
 

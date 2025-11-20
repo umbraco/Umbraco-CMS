@@ -56,16 +56,17 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 		this._languageModel = data.items;
 	}
 
-	// Modal
-
 	async #handleSave() {
 		this.value = { defaultIsoCode: this._defaultIsoCode, domains: this._domains };
-		await this.#documentRepository.updateCultureAndHostnames(this.#unique!, this.value);
-		this.modalContext?.submit();
+		const { error } = await this.#documentRepository.updateCultureAndHostnames(this.#unique!, this.value);
+
+		if (!error) {
+			this._submitModal();
+		}
 	}
 
 	#handleCancel() {
-		this.modalContext?.reject();
+		this._rejectModal();
 	}
 
 	// Events

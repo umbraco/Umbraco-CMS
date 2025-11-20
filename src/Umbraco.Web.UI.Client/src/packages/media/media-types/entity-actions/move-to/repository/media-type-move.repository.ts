@@ -11,6 +11,9 @@ export class UmbMoveMediaTypeRepository extends UmbRepositoryBase implements Umb
 
 		if (!error) {
 			const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+			if (!notificationContext) {
+				throw new Error(`Failed to load notification context`);
+			}
 			const notification = { data: { message: `Moved` } };
 			notificationContext.peek('positive', notification);
 		}

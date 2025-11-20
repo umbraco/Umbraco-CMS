@@ -1,23 +1,34 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
+using Umbraco.Cms.Api.Management.Services.Flags;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MemberGroup.Tree;
 
 [ApiVersion("1.0")]
 public class RootMemberGroupTreeController : MemberGroupTreeControllerBase
 {
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
     public RootMemberGroupTreeController(IEntityService entityService)
         : base(entityService)
+    {
+    }
+
+    [ActivatorUtilitiesConstructor]
+    public RootMemberGroupTreeController(IEntityService entityService, FlagProviderCollection flagProviders)
+        : base(entityService, flagProviders)
     {
     }
 
     [HttpGet("root")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<NamedEntityTreeItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of member group items from the root of the tree.")]
+    [EndpointDescription("Gets a paginated collection of member group items from the root of the tree with optional filtering.")]
     public async Task<ActionResult<PagedViewModel<NamedEntityTreeItemResponseModel>>> Root(
         CancellationToken cancellationToken,
         int skip = 0,

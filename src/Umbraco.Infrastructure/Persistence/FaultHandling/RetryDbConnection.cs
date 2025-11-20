@@ -87,7 +87,7 @@ public class RetryDbConnection : DbConnection
         OnStateChange(stateChangeEventArguments);
 }
 
-internal class FaultHandlingDbCommand : DbCommand
+internal sealed class FaultHandlingDbCommand : DbCommand
 {
     private readonly RetryPolicy _cmdRetryPolicy;
     private RetryDbConnection _connection;

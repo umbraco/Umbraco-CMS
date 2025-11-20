@@ -13,10 +13,11 @@ internal static class UserGroupsBuilderExtensions
         builder.Services.AddTransient<IUserGroupPresentationFactory, UserGroupPresentationFactory>();
         builder.Services.AddSingleton<IPermissionPresentationFactory, PermissionPresentationFactory>();
 
+        builder.Services.AddSingleton<IPermissionMapper, DocumentPermissionMapper>();
+        builder.Services.AddSingleton<IPermissionPresentationMapper, DocumentPermissionMapper>();
 
-        builder.Services.AddSingleton<DocumentPermissionMapper>();
-        builder.Services.AddSingleton<IPermissionMapper>(x=>x.GetRequiredService<DocumentPermissionMapper>());
-        builder.Services.AddSingleton<IPermissionPresentationMapper>(x=>x.GetRequiredService<DocumentPermissionMapper>());
+        builder.Services.AddSingleton<IPermissionMapper, DocumentPropertyValuePermissionMapper>();
+        builder.Services.AddSingleton<IPermissionPresentationMapper, DocumentPropertyValuePermissionMapper>();
 
         return builder;
     }

@@ -1,29 +1,34 @@
 import { UmbMediaItemRepository } from '../../repository/index.js';
 import { UmbMediaTreeRepository } from '../../tree/media-tree.repository.js';
 import { UMB_MEDIA_ROOT_ENTITY_TYPE } from '../../entity.js';
-import type { UmbDropzoneElement } from '../../dropzone/dropzone.element.js';
-import type { UmbMediaTreeItemModel, UmbMediaSearchItemModel, UmbMediaItemModel } from '../../types.js';
 import { UmbMediaSearchProvider } from '../../search/index.js';
+import type { UmbDropzoneMediaElement } from '../../dropzone/index.js';
+import type { UmbMediaTreeItemModel, UmbMediaSearchItemModel, UmbMediaItemModel } from '../../types.js';
+import { UmbMediaPickerContext } from './media-picker.context.js';
 import type { UmbMediaPathModel } from './types.js';
 import type { UmbMediaPickerFolderPathElement } from './components/media-picker-folder-path.element.js';
 import type { UmbMediaPickerModalData, UmbMediaPickerModalValue } from './media-picker-modal.token.js';
 import {
 	css,
-	html,
 	customElement,
-	state,
-	repeat,
+	html,
 	ifDefined,
-	query,
-	type PropertyValues,
 	nothing,
+	query,
+	repeat,
+	state,
 } from '@umbraco-cms/backoffice/external/lit';
 import { debounce, UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
-import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import { UMB_CONTENT_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/content';
-import type { UUIInputEvent, UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 import { isUmbracoFolder } from '@umbraco-cms/backoffice/media-type';
+import { UmbPickerModalBaseElement } from '@umbraco-cms/backoffice/picker';
+import { UMB_PROPERTY_TYPE_BASED_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/content';
+import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
+import type { PropertyValues } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbDropzoneChangeEvent, UmbUploadableItem } from '@umbraco-cms/backoffice/dropzone';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
+import type { UmbPickerContext } from '@umbraco-cms/backoffice/picker';
+import type { UUIInputEvent, UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 
 import '@umbraco-cms/backoffice/imaging';
 
@@ -31,10 +36,18 @@ const root: UmbMediaPathModel = { name: 'Media', unique: null, entityType: UMB_M
 
 // TODO: investigate how we can reuse the picker-search-field element, picker context etc.
 @customElement('umb-media-picker-modal')
-export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPickerModalData, UmbMediaPickerModalValue> {
+export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
+	UmbMediaTreeItemModel,
+	UmbMediaPickerModalData,
+	UmbMediaPickerModalValue
+> {
 	#mediaTreeRepository = new UmbMediaTreeRepository(this);
 	#mediaItemRepository = new UmbMediaItemRepository(this);
 	#mediaSearchProvider = new UmbMediaSearchProvider(this);
+
+	/* TODO: We currently only rely on the interactionMemory manager in the picker interface which is correctly implemented in the Media Picker
+	Remove this type cast when MediaPicker has implemented the full PickerContext interface */
+	protected override _pickerContext = new UmbMediaPickerContext(this) as unknown as UmbPickerContext;
 
 	#dataType?: { unique: string };
 
@@ -69,19 +82,27 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 	private _startNode: UmbMediaItemModel | undefined;
 
 	@state()
-	_searching: boolean = false;
+	private _searching: boolean = false;
 
 	@query('#dropzone')
-	private _dropzone!: UmbDropzoneElement;
+	private _dropzone!: UmbDropzoneMediaElement;
 
 	#pagingMap = new Map<string, UmbPaginationManager>();
+	#contextCulture?: string | null;
+	#locationInteractionMemoryUnique: string = 'UmbMediaItemPickerLocation';
 
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_CONTENT_PROPERTY_CONTEXT, (context) => {
-			this.observe(context.dataType, (dataType) => {
+		this.consumeContext(UMB_PROPERTY_TYPE_BASED_PROPERTY_CONTEXT, (context) => {
+			this.observe(context?.dataType, (dataType) => {
 				this.#dataType = dataType;
+			});
+		});
+
+		this.consumeContext(UMB_VARIANT_CONTEXT, (context) => {
+			this.observe(context?.culture, (culture) => {
+				this.#contextCulture = culture;
 			});
 		});
 	}
@@ -89,6 +110,9 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 	override async connectedCallback(): Promise<void> {
 		super.connectedCallback();
 		if (this.data?.pickableFilter) {
+			// TODO: investigate why we need the ts-ignore here
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
 			this._selectableFilter = this.data?.pickableFilter;
 		}
 	}
@@ -97,26 +121,37 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 		super.firstUpdated(_changedProperties);
 
 		const startNode = this.data?.startNode;
+		const locationFromMemory = this.#getLocationFromInteractionMemory();
 
-		if (startNode) {
-			const { data } = await this.#mediaItemRepository.requestItems([startNode.unique]);
-			this._startNode = data?.[0];
+		const uniquesToRequest = [startNode?.unique, locationFromMemory?.entity.unique].filter(
+			(x) => x !== null && x !== undefined,
+		);
 
-			if (this._startNode) {
+		if (uniquesToRequest.length > 0) {
+			const { data } = await this.#mediaItemRepository.requestItems(uniquesToRequest);
+
+			this._startNode = data?.find((x) => x.unique === startNode?.unique);
+			const locationMemoryItem = data?.find((x) => x.unique === locationFromMemory?.entity.unique);
+
+			// TODO: We probably need to check if the location item is within the start node. If not then fall back to start node.
+			const source = locationMemoryItem || this._startNode;
+
+			if (source) {
 				this._currentMediaEntity = {
-					name: this._startNode.name,
-					unique: this._startNode.unique,
-					entityType: this._startNode.entityType,
+					name: source.name,
+					unique: source.unique,
+					entityType: source.entityType,
 				};
 
-				this._searchFrom = { unique: this._startNode.unique, entityType: this._startNode.entityType };
+				this._searchFrom = { unique: source.unique, entityType: source.entityType };
 			}
 		}
 
 		this.#loadChildrenOfCurrentMediaItem();
 	}
 
-	async #loadChildrenOfCurrentMediaItem() {
+	// TODO: move to location manager in context
+	async #loadChildrenOfCurrentMediaItem(selectedItems?: Array<UmbUploadableItem>) {
 		const key = this._currentMediaEntity.entityType + this._currentMediaEntity.unique;
 		let paginationManager = this.#pagingMap.get(key);
 
@@ -143,15 +178,28 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 		paginationManager.setTotalItems(data?.total ?? 0);
 		this._currentPage = paginationManager.getCurrentPageNumber();
 		this._currentTotalPages = paginationManager.getTotalPages();
+
+		if (selectedItems?.length) {
+			const selectedItem = this._currentChildren.find((x) => x.unique == selectedItems[0].unique);
+			if (selectedItem) {
+				this.#onSelected(selectedItem);
+			}
+		}
 	}
 
+	#onDropzoneChange(evt: UmbDropzoneChangeEvent) {
+		const target = evt.target as UmbDropzoneMediaElement;
+		this.#loadChildrenOfCurrentMediaItem(target.value);
+	}
+
+	// TODO: move to location manager in context
 	#onOpen(item: UmbMediaTreeItemModel | UmbMediaSearchItemModel) {
 		this.#clearSearch();
 
 		this._currentMediaEntity = {
 			name: item.name,
 			unique: item.unique,
-			entityType: UMB_MEDIA_ROOT_ENTITY_TYPE,
+			entityType: item.entityType,
 		};
 
 		// If the user has navigated into an item, we default to search only within that item.
@@ -160,6 +208,8 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 			: undefined;
 
 		this.#loadChildrenOfCurrentMediaItem();
+
+		this.#setLocationInInteractionMemory();
 	}
 
 	#onSelected(item: UmbMediaTreeItemModel | UmbMediaSearchItemModel) {
@@ -174,11 +224,13 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 		this.modalContext?.setValue({ selection });
 	}
 
+	// TODO: move to search manager in context
 	#clearSearch() {
 		this._searchQuery = '';
 		this._searchResult = [];
 	}
 
+	// TODO: move to search manager in context
 	async #searchMedia() {
 		if (!this._searchQuery) {
 			this.#clearSearch();
@@ -189,7 +241,10 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 		const query = this._searchQuery;
 		const { data } = await this.#mediaSearchProvider.search({
 			query,
+			includeTrashed: false,
 			searchFrom: this._searchFrom,
+			culture: this.#contextCulture,
+			dataTypeUnique: this.#dataType?.unique,
 			...this.data?.search?.queryParams,
 		});
 
@@ -205,10 +260,12 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 		this._searching = false;
 	}
 
+	// TODO: move to search manager in context
 	#debouncedSearch = debounce(() => {
 		this.#searchMedia();
 	}, 500);
 
+	// TODO: move to search manager in context
 	#onSearch(e: UUIInputEvent) {
 		this._searchQuery = (e.target.value as string).toLocaleLowerCase();
 		this._searching = true;
@@ -236,6 +293,8 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 			this._searchFrom = undefined;
 		}
 
+		this.#setLocationInInteractionMemory();
+
 		this.#loadChildrenOfCurrentMediaItem();
 	}
 
@@ -259,6 +318,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 		return isUmbracoFolder(item.mediaType.unique) || item.hasChildren;
 	}
 
+	// TODO: move to search manager in context
 	#onSearchFromChange(e: CustomEvent) {
 		const checked = (e.target as HTMLInputElement).checked;
 
@@ -267,6 +327,30 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 		} else {
 			this._searchFrom = undefined;
 		}
+	}
+
+	// TODO: move to location manager in context
+	#setLocationInInteractionMemory() {
+		// Add a memory entry with the latest location
+		const memory: UmbInteractionMemoryModel = {
+			unique: this.#locationInteractionMemoryUnique,
+			value: {
+				location: {
+					entity: {
+						entityType: this._currentMediaEntity.entityType,
+						unique: this._currentMediaEntity.unique,
+					},
+				},
+			},
+		};
+
+		this._pickerContext?.interactionMemory.setMemory(memory);
+	}
+
+	// TODO: move to location manager in context
+	#getLocationFromInteractionMemory(): { entity: UmbEntityModel } | undefined {
+		const memory = this._pickerContext.interactionMemory.getMemory(this.#locationInteractionMemoryUnique);
+		return memory?.value?.location;
 	}
 
 	override render() {
@@ -287,11 +371,11 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 
 	#renderBody() {
 		return html`${this.#renderToolbar()}
-			<umb-dropzone
+			<umb-dropzone-media
 				id="dropzone"
 				multiple
-				@complete=${() => this.#loadChildrenOfCurrentMediaItem()}
-				.parentUnique=${this._currentMediaEntity.unique}></umb-dropzone>
+				@change=${this.#onDropzoneChange}
+				.parentUnique=${this._currentMediaEntity.unique}></umb-dropzone-media>
 			${this._searchQuery ? this.#renderSearchResult() : this.#renderCurrentChildren()} `;
 	}
 
@@ -324,14 +408,16 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 							? html`<uui-pagination
 									.current=${this._currentPage}
 									.total=${this._currentTotalPages}
+									firstlabel=${this.localize.term('general_first')}
+									previouslabel=${this.localize.term('general_previous')}
+									nextlabel=${this.localize.term('general_next')}
+									lastlabel=${this.localize.term('general_last')}
 									@change=${this.#onPageChange}></uui-pagination>`
 							: nothing}`}
 		`;
 	}
 
 	#renderToolbar() {
-		/**<umb-media-picker-create-item .node=${this._currentMediaEntity.unique}></umb-media-picker-create-item>
-		 * We cannot route to a workspace without the media picker modal is a routeable. Using regular upload button for now... */
 		return html`
 			<div id="toolbar">
 				<div id="search">
@@ -436,15 +522,10 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 
 			#media-grid {
 				display: grid;
-				grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-				grid-auto-rows: 150px;
 				gap: var(--uui-size-space-5);
+				grid-template-columns: repeat(auto-fill, minmax(var(--umb-card-medium-min-width), 1fr));
+				grid-auto-rows: var(--umb-card-medium-min-width);
 				padding-bottom: 5px; /** The modal is a bit jumpy due to the img card focus/hover border. This fixes the issue. */
-			}
-
-			/** TODO: Remove this fix when UUI gets upgrade to 1.3 */
-			umb-imaging-thumbnail {
-				pointer-events: none;
 			}
 
 			umb-icon {

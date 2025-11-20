@@ -1,6 +1,6 @@
+import type { ManifestWorkspaceActionMenuItem } from '../../extensions/types.js';
 import { css, html, customElement, property, state, nothing, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { ManifestWorkspaceActionMenuItem } from '@umbraco-cms/backoffice/workspace';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UUIInterfaceColor, UUIInterfaceLook } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbExtensionElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
@@ -17,7 +17,7 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 	items: Array<UmbExtensionElementAndApiInitializer<ManifestWorkspaceActionMenuItem>> = [];
 
 	@state()
-	_popoverOpen = false;
+	private _popoverOpen = false;
 
 	#onPopoverToggle(event: ToggleEvent) {
 		// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
@@ -29,7 +29,8 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 	override render() {
 		if (!this.items?.length) return nothing;
 
-		return html`<uui-button
+		return html`
+			<uui-button
 				id="popover-trigger"
 				popovertarget="workspace-action-popover"
 				look="${this.look}"
@@ -43,7 +44,7 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 				margin="6"
 				placement="top-end"
 				@toggle=${this.#onPopoverToggle}>
-				<umb-popover-layout>
+				<umb-popover-layout id="workspace-action-popover-layout">
 					<uui-scroll-container>
 						${repeat(
 							this.items,
@@ -52,7 +53,8 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 						)}
 					</uui-scroll-container>
 				</umb-popover-layout>
-			</uui-popover-container>`;
+			</uui-popover-container>
+		`;
 	}
 
 	static override styles = [
@@ -78,6 +80,10 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 			#popover-trigger {
 				--uui-button-padding-top-factor: 0;
 				--uui-button-padding-bottom-factor: 0.125;
+			}
+
+			#workspace-action-popover-layout {
+				overflow: visible;
 			}
 		`,
 	];

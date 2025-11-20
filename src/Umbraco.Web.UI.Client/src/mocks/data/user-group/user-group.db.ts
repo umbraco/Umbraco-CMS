@@ -93,6 +93,7 @@ const itemMapper = (item: UmbMockUserGroupModel): UserGroupItemResponseModel => 
 		id: item.id,
 		name: item.name,
 		icon: item.icon,
+		flags: item.flags,
 	};
 };
 
@@ -113,6 +114,7 @@ const createMockMapper = (item: CreateUserGroupRequestModel): UmbMockUserGroupMo
 		sections: item.sections,
 		aliasCanBeChanged: true,
 		isDeletable: true,
+		flags: [],
 	};
 };
 

@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Mapping;
@@ -25,6 +25,8 @@ public class AllDictionaryController : DictionaryControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<DictionaryOverviewResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a paginated collection of dictionary items.")]
+    [EndpointDescription("Gets a paginated collection of dictionary items with optional filtering by name.")]
     public async Task<ActionResult<PagedViewModel<DictionaryOverviewResponseModel>>> All(
         CancellationToken cancellationToken,
         string? filter = null,
@@ -38,6 +40,6 @@ public class AllDictionaryController : DictionaryControllerBase
             Total = items.Length,
             Items = _umbracoMapper.MapEnumerable<IDictionaryItem, DictionaryOverviewResponseModel>(items.Skip(skip).Take(take))
         };
-        return await Task.FromResult(model);
+        return model;
     }
 }

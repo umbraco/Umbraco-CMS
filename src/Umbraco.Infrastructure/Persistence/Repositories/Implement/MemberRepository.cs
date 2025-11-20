@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -5,6 +6,7 @@ using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
@@ -39,7 +41,6 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
     private readonly ITagRepository _tagRepository;
     private bool _passwordConfigInitialized;
     private string? _passwordConfigJson;
-    private const string UsernameCacheKey = "uRepo_userNameKey+";
 
     public MemberRepository(
         IScopeAccessor scopeAccessor,
@@ -57,9 +58,22 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
         IDataTypeService dataTypeService,
         IJsonSerializer serializer,
         IEventAggregator eventAggregator,
-        IOptions<MemberPasswordConfigurationSettings> passwordConfiguration)
-        : base(scopeAccessor, cache, logger, languageRepository, relationRepository, relationTypeRepository,
-            propertyEditors, dataValueReferenceFactories, dataTypeService, eventAggregator)
+        IOptions<MemberPasswordConfigurationSettings> passwordConfiguration,
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            cache,
+            logger,
+            languageRepository,
+            relationRepository,
+            relationTypeRepository,
+            propertyEditors,
+            dataValueReferenceFactories,
+            dataTypeService,
+            eventAggregator,
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
         _memberTypeRepository =
             memberTypeRepository ?? throw new ArgumentNullException(nameof(memberTypeRepository));
@@ -69,7 +83,47 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
         _memberGroupRepository = memberGroupRepository;
         _passwordConfiguration = passwordConfiguration.Value;
         _memberByUsernameCachePolicy =
-            new MemberRepositoryUsernameCachePolicy(GlobalIsolatedCache, ScopeAccessor, DefaultOptions);
+            new MemberRepositoryUsernameCachePolicy(GlobalIsolatedCache, ScopeAccessor, DefaultOptions, repositoryCacheVersionService, cacheSyncService);
+    }
+
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
+    public MemberRepository(
+        IScopeAccessor scopeAccessor,
+        AppCaches cache,
+        ILogger<MemberRepository> logger,
+        IMemberTypeRepository memberTypeRepository,
+        IMemberGroupRepository memberGroupRepository,
+        ITagRepository tagRepository,
+        ILanguageRepository languageRepository,
+        IRelationRepository relationRepository,
+        IRelationTypeRepository relationTypeRepository,
+        IPasswordHasher passwordHasher,
+        PropertyEditorCollection propertyEditors,
+        DataValueReferenceFactoryCollection dataValueReferenceFactories,
+        IDataTypeService dataTypeService,
+        IJsonSerializer serializer,
+        IEventAggregator eventAggregator,
+        IOptions<MemberPasswordConfigurationSettings> passwordConfiguration)
+        : this(
+            scopeAccessor,
+            cache,
+            logger,
+            memberTypeRepository,
+            memberGroupRepository,
+            tagRepository,
+            languageRepository,
+            relationRepository,
+            relationTypeRepository,
+            passwordHasher,
+            propertyEditors,
+            dataValueReferenceFactories,
+            dataTypeService,
+            serializer,
+            eventAggregator,
+            passwordConfiguration,
+            StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>(),
+            StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>())
+    {
     }
 
     /// <summary>
@@ -327,7 +381,7 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
     }
 
     public IMember? GetByUsername(string? username) =>
-        _memberByUsernameCachePolicy.GetByUserName(UsernameCacheKey, username, PerformGetByUsername, PerformGetAllByUsername);
+        _memberByUsernameCachePolicy.GetByUserName(CacheKeys.MemberUserNameCachePrefix, username, PerformGetByUsername, PerformGetAllByUsername);
 
     public int[] GetMemberIds(string[] usernames)
     {
@@ -505,10 +559,9 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
     protected override IMember? PerformGet(int id)
     {
         Sql<ISqlContext> sql = GetBaseQuery(QueryType.Single)
-            .Where<NodeDto>(x => x.NodeId == id)
-            .SelectTop(1);
+            .Where<NodeDto>(x => x.NodeId == id);
 
-        MemberDto? dto = Database.Fetch<MemberDto>(sql).FirstOrDefault();
+        MemberDto? dto = Database.FirstOrDefault<MemberDto>(sql);
         return dto == null
             ? null
             : MapDtoToContent(dto);
@@ -609,7 +662,7 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
 
     protected override void PersistDeletedItem(IMember entity)
     {
-        _memberByUsernameCachePolicy.DeleteByUserName(UsernameCacheKey, entity.Username);
+        _memberByUsernameCachePolicy.DeleteByUserName(CacheKeys.MemberUserNameCachePrefix, entity.Username);
         base.PersistDeletedItem(entity);
     }
 
@@ -618,12 +671,12 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
         GetBaseQuery(isCount ? QueryType.Count : QueryType.Single);
 
     protected override string GetBaseWhereClause() // TODO: can we kill / refactor this?
-        => "umbracoNode.id = @id";
+        => $"{QuoteTableName("umbracoNode")}.id = @id";
 
     // TODO: document/understand that one
     protected Sql<ISqlContext> GetNodeIdQueryWithPropertyData() =>
         Sql()
-            .Select("DISTINCT(umbracoNode.id)")
+            .SelectDistinct<NodeDto>(c => c.NodeId)
             .From<NodeDto>()
             .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId)
             .InnerJoin<ContentTypeDto>()
@@ -642,27 +695,29 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
 
     protected override IEnumerable<string> GetDeleteClauses()
     {
-        var list = new List<string>
-        {
-            "DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @id",
+        var inClause = $"IN (SELECT {QuoteTableName("umbracoUserGroup")}.{QuoteColumnName("key")} FROM {QuoteTableName("umbracoUserGroup")} WHERE id = @id)";
 
-            "DELETE FROM umbracoUserGroup2Permission WHERE userGroupKey IN (SELECT [umbracoUserGroup].[Key] FROM umbracoUserGroup WHERE Id = @id)",
-            "DELETE FROM umbracoUserGroup2GranularPermission WHERE userGroupKey IN (SELECT [umbracoUserGroup].[Key] FROM umbracoUserGroup WHERE Id = @id)",
-            "DELETE FROM umbracoRelation WHERE parentId = @id",
-            "DELETE FROM umbracoRelation WHERE childId = @id",
-            "DELETE FROM cmsTagRelationship WHERE nodeId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyData +
-            " WHERE versionId IN (SELECT id FROM " + Constants.DatabaseSchema.Tables.ContentVersion +
-            " WHERE nodeId = @id)",
-            $"DELETE FROM {Constants.DatabaseSchema.Tables.ExternalLoginToken} WHERE externalLoginId = (SELECT id FROM {Constants.DatabaseSchema.Tables.ExternalLogin} WHERE userOrMemberKey = (SELECT uniqueId from {Constants.DatabaseSchema.Tables.Node} where id = @id))",
-            $"DELETE FROM {Constants.DatabaseSchema.Tables.ExternalLogin} WHERE userOrMemberKey = (SELECT uniqueId from {Constants.DatabaseSchema.Tables.Node} where id = @id)",
-            "DELETE FROM cmsMember2MemberGroup WHERE Member = @id",
-            "DELETE FROM cmsMember WHERE nodeId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.Content + " WHERE nodeId = @id",
-            "DELETE FROM umbracoNode WHERE id = @id"
+        return new List<string>
+        {
+            $"DELETE FROM {QuoteTableName(User2NodeNotifyDto.TableName)} WHERE {QuoteColumnName("nodeId")} = @id",
+            $"DELETE FROM {QuoteTableName("umbracoUserGroup2Permission")} WHERE {QuoteColumnName("userGroupKey")} {inClause}",
+            $"DELETE FROM {QuoteTableName("umbracoUserGroup2GranularPermission")} WHERE {QuoteColumnName("userGroupKey")} {inClause}",
+            $"DELETE FROM {QuoteTableName("umbracoRelation")} WHERE {QuoteColumnName("parentId")} = @id",
+            $"DELETE FROM {QuoteTableName("umbracoRelation")} WHERE {QuoteColumnName("childId")} = @id",
+            $"DELETE FROM {QuoteTableName("cmsTagRelationship")} WHERE {QuoteColumnName("nodeId")} = @id",
+            $"DELETE FROM {QuoteTableName(PropertyDataDto.TableName)} WHERE {QuoteColumnName("versionId")}" +
+                $" IN (SELECT id FROM {QuoteTableName(ContentVersionDto.TableName)} WHERE {QuoteColumnName("nodeId")} = @id)",
+            $"DELETE FROM {QuoteTableName(ExternalLoginToken.TableName)} WHERE {QuoteColumnName("externalLoginId")} =" +
+                $" (SELECT id FROM {QuoteTableName(ExternalLoginDto.TableName)} WHERE {QuoteColumnName("userOrMemberKey")} =" +
+                $" (SELECT {QuoteColumnName("uniqueId")} from {QuoteTableName(NodeDto.TableName)} where id = @id))",
+            $"DELETE FROM {QuoteTableName(ExternalLoginDto.TableName)} WHERE {QuoteColumnName("userOrMemberKey")} =" +
+                $" (SELECT {QuoteColumnName("uniqueId")} from {QuoteTableName(NodeDto.TableName)} where id = @id)",
+            $"DELETE FROM {QuoteTableName("cmsMember2MemberGroup")} WHERE {QuoteColumnName("Member")} = @id",
+            $"DELETE FROM {QuoteTableName("cmsMember")} WHERE {QuoteColumnName("nodeId")} = @id",
+            $"DELETE FROM {QuoteTableName(ContentVersionDto.TableName)} WHERE {QuoteColumnName("nodeId")} = @id",
+            $"DELETE FROM {QuoteTableName(ContentDto.TableName)} WHERE {QuoteColumnName("nodeId")} = @id",
+            $"DELETE FROM {QuoteTableName("umbracoNode")} WHERE id = @id"
         };
-        return list;
     }
 
     #endregion
@@ -788,8 +843,6 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
         InsertPropertyValues(entity, 0, out _, out _);
 
         SetEntityTags(entity, _tagRepository, _jsonSerializer);
-
-        PersistRelations(entity);
 
         OnUowRefreshedEntity(new MemberRefreshNotification(entity, new EventMessages()));
 
@@ -939,13 +992,56 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
 
         SetEntityTags(entity, _tagRepository, _jsonSerializer);
 
-        PersistRelations(entity);
-
         OnUowRefreshedEntity(new MemberRefreshNotification(entity, new EventMessages()));
 
-        _memberByUsernameCachePolicy.DeleteByUserName(UsernameCacheKey, entity.Username);
+        _memberByUsernameCachePolicy.DeleteByUserName(CacheKeys.MemberUserNameCachePrefix, entity.Username);
 
         entity.ResetDirtyProperties();
+    }
+
+    /// <inheritdoc/>
+    public async Task UpdateLoginPropertiesAsync(IMember member)
+    {
+        var updatedLastLoginDate = member.IsPropertyDirty(nameof(member.LastLoginDate));
+        var updatedSecurityStamp = member.IsPropertyDirty(nameof(member.SecurityStamp));
+        if (updatedLastLoginDate is false && updatedSecurityStamp is false)
+        {
+            return;
+        }
+
+        NPocoSqlExtensions.SqlUpd<MemberDto> GetMemberSetExpression(IMember member, NPocoSqlExtensions.SqlUpd<MemberDto> m)
+        {
+            var setExpression = new NPocoSqlExtensions.SqlUpd<MemberDto>(SqlContext);
+            if (updatedLastLoginDate)
+            {
+                setExpression.Set(x => x.LastLoginDate, member.LastLoginDate);
+            }
+
+            if (updatedSecurityStamp)
+            {
+                setExpression.Set(x => x.SecurityStampToken, member.SecurityStamp);
+            }
+
+            return setExpression;
+        }
+
+        member.UpdatingEntity();
+
+        Sql<ISqlContext> updateMemberQuery = Sql()
+            .Update<MemberDto>(m => GetMemberSetExpression(member, m))
+            .Where<MemberDto>(m => m.NodeId == member.Id);
+        await Database.ExecuteAsync(updateMemberQuery);
+
+        Sql<ISqlContext> updateContentVersionQuery = Sql()
+            .Update<ContentVersionDto>(m => m.Set(x => x.VersionDate, member.UpdateDate))
+            .Where<ContentVersionDto>(m => m.NodeId == member.Id && m.Current == true);
+        await Database.ExecuteAsync(updateContentVersionQuery);
+
+        OnUowRefreshedEntity(new MemberRefreshNotification(member, new EventMessages()));
+
+        _memberByUsernameCachePolicy.DeleteByUserName(CacheKeys.MemberUserNameCachePrefix, member.Username);
+
+        member.ResetDirtyProperties();
     }
 
     #endregion

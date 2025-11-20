@@ -33,6 +33,8 @@ public class CreateUserDataController : UserDataControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(UserDataOperationStatus), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(UserDataOperationStatus), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Creates user data.")]
+    [EndpointDescription("Creates user-specific data for the current authenticated user with the provided key and value.")]
     public async Task<IActionResult> Create(CancellationToken cancellationToken, CreateUserDataRequestModel model)
     {
         Guid currentUserKey = CurrentUserKey(_backOfficeSecurityAccessor);

@@ -7,9 +7,9 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
  * Clipboard context for managing clipboard entries
  * @export
  * @class UmbClipboardContext
- * @augments {UmbContextBase<UmbClipboardContext>}
+ * @augments {UmbContextBase}
  */
-export class UmbClipboardContext extends UmbContextBase<UmbClipboardContext> {
+export class UmbClipboardContext extends UmbContextBase {
 	#clipboardDetailRepository = new UmbClipboardEntryDetailRepository(this);
 
 	constructor(host: UmbControllerHost) {

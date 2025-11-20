@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Services;
 namespace Umbraco.Cms.Api.Management.Controllers.Preview;
 
 [ApiVersion("1.0")]
+[Obsolete("Do not use this. Preview state is initiated implicitly by the preview URL generation. Scheduled for removal in V18.")]
 public class EnterPreviewController : PreviewControllerBase
 {
     private readonly IPreviewService _previewService;
@@ -21,6 +22,8 @@ public class EnterPreviewController : PreviewControllerBase
     [HttpPost]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [EndpointSummary("Enters preview mode.")]
+    [EndpointDescription("Enters preview mode for the specified document, allowing viewing of unpublished content.")]
     public async Task<IActionResult> Enter(CancellationToken cancellationToken)
     {
         return await _previewService.TryEnterPreviewAsync(CurrentUser(_backOfficeSecurityAccessor))

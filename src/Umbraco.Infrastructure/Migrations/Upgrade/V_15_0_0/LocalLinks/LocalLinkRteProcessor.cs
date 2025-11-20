@@ -11,7 +11,7 @@ public class LocalLinkRteProcessor : ITypedLocalLinkProcessor
 
     public IEnumerable<string> PropertyEditorAliases =>
     [
-        Constants.PropertyEditors.Aliases.TinyMce, Constants.PropertyEditors.Aliases.RichText
+        "Umbraco.TinyMCE", Constants.PropertyEditors.Aliases.RichText
     ];
 
     public Func<object?, Func<object?, bool>, Func<string, string>, bool> Process => ProcessRichText;

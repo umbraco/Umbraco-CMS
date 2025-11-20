@@ -1,21 +1,24 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Infrastructure.Migrations.Install;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
-public partial class UserServiceCrudTests
+internal sealed partial class UserServiceCrudTests
 {
-    [Test]
-    [TestCase(UserState.Disabled)]
-    [TestCase(UserState.All)]
-    public async Task Cannot_Request_Disabled_If_Hidden(UserState includeState)
+    [TestCase(null, 1)]                     // Requesting no filter, will just get the admin user but not the created and disabled one.
+                                            //  - verifies fix for https://github.com/umbraco/Umbraco-CMS/issues/18812
+    [TestCase(UserState.Inactive, 1)]       // Requesting inactive, will just get the admin user but not the created and disabled one.
+    [TestCase(UserState.Disabled, 0)]       // Requesting disabled, won't get any as admin user isn't disabled and, whilst the created one is, disabled users are hidden.
+    [TestCase(UserState.All, 1)]            // Requesting all, will just get the admin user but not the created and disabled one.
+    public async Task Cannot_Request_Disabled_If_Hidden(UserState? includeState, int expectedCount)
     {
-        var userService = CreateUserService(new SecuritySettings {HideDisabledUsersInBackOffice = true});
+        var userService = CreateUserService(new SecuritySettings { HideDisabledUsersInBackOffice = true });
         var editorGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupKey);
 
         var createModel = new UserCreateModel
@@ -23,21 +26,25 @@ public partial class UserServiceCrudTests
             UserName = "editor@mail.com",
             Email = "editor@mail.com",
             Name = "Editor",
-            UserGroupKeys = new HashSet<Guid> { editorGroup.Key }
+            UserGroupKeys = new HashSet<Guid> { editorGroup.Key },
         };
 
         var createAttempt = await userService.CreateAsync(Constants.Security.SuperUserKey, createModel, true);
         Assert.IsTrue(createAttempt.Success);
 
         var disableStatus =
-            await userService.DisableAsync(Constants.Security.SuperUserKey, new HashSet<Guid>{ createAttempt.Result.CreatedUser!.Key });
+            await userService.DisableAsync(Constants.Security.SuperUserKey, new HashSet<Guid> { createAttempt.Result.CreatedUser!.Key });
         Assert.AreEqual(UserOperationStatus.Success, disableStatus);
 
-        var filter = new UserFilter {IncludeUserStates = new HashSet<UserState> {includeState}};
+        var filter = new UserFilter();
+        if (includeState.HasValue)
+        {
+            filter.IncludeUserStates = new HashSet<UserState> { includeState.Value };
+        }
 
         var filterAttempt = await userService.FilterAsync(Constants.Security.SuperUserKey, filter, 0, 1000);
         Assert.IsTrue(filterAttempt.Success);
-        Assert.AreEqual(0, filterAttempt.Result.Items.Count());
+        Assert.AreEqual(expectedCount, filterAttempt.Result.Items.Count());
     }
 
     [Test]
@@ -242,7 +249,7 @@ public partial class UserServiceCrudTests
         var userService = CreateUserService();
         await CreateTestUsers(userService);
 
-        var writerGroup = await UserGroupService.GetAsync(Constants.Security.WriterGroupAlias);
+        var writerGroup = await UserGroupService.GetAsync(DatabaseDataCreator.WriterGroupAlias);
         var filter = new UserFilter
         {
             IncludedUserGroups = new HashSet<Guid> { writerGroup!.Key }

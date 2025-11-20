@@ -66,7 +66,7 @@ internal sealed class ApiMediaQueryService : IApiMediaQueryService
     private IPublishedContent? TryGetByPath(string path, IPublishedMediaCache mediaCache)
     {
         var segments = path.Split(Constants.CharArrays.ForwardSlash, StringSplitOptions.RemoveEmptyEntries);
-        IEnumerable<IPublishedContent> currentChildren = mediaCache.GetAtRoot();
+        IEnumerable<IPublishedContent> currentChildren = GetRootContent(mediaCache);
         IPublishedContent? resolvedMedia = null;
 
         foreach (var segment in segments)
@@ -103,7 +103,7 @@ internal sealed class ApiMediaQueryService : IApiMediaQueryService
         IPublishedMediaCache mediaCache = GetRequiredPublishedMediaCache();
         if (childrenOf.Trim(Constants.CharArrays.ForwardSlash).Length == 0)
         {
-            return mediaCache.GetAtRoot();
+            return GetRootContent(mediaCache);
         }
 
         IPublishedContent? parent = Guid.TryParse(childrenOf, out Guid parentKey)
@@ -185,7 +185,7 @@ internal sealed class ApiMediaQueryService : IApiMediaQueryService
     }
 
 
-    private Attempt<PagedModel<Guid>, ApiMediaQueryOperationStatus> PagedResult(IEnumerable<IPublishedContent> children, int skip, int take)
+    private static Attempt<PagedModel<Guid>, ApiMediaQueryOperationStatus> PagedResult(IEnumerable<IPublishedContent> children, int skip, int take)
     {
         IPublishedContent[] childrenAsArray = children as IPublishedContent[] ?? children.ToArray();
         var result = new PagedModel<Guid>
@@ -196,4 +196,8 @@ internal sealed class ApiMediaQueryService : IApiMediaQueryService
 
         return Attempt.SucceedWithStatus(ApiMediaQueryOperationStatus.Success, result);
     }
+
+    private IEnumerable<IPublishedContent> GetRootContent(IPublishedMediaCache mediaCache)
+        => _mediaNavigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys) is false ? []
+            : rootKeys.Select(x => mediaCache.GetById(false, x)).WhereNotNull();
 }

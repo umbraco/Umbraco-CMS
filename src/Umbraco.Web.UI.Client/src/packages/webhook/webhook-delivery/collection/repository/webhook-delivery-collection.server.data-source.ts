@@ -3,12 +3,12 @@ import { UMB_WEBHOOK_DELIVERY_ENTITY_TYPE } from '../../../entity.js';
 import type { UmbWebhookDeliveryDetailModel } from '../../types.js';
 import { WebhookService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source that fetches the webhook delivery collection data from the server.
  * @class UmbWebhookDeliveryCollectionServerDataSource
- * @implements {UmbCollectionDataSource}
+ * @implements {UmbWebhookDeliveryCollectionServerDataSource}
  */
 export class UmbWebhookDeliveryCollectionServerDataSource implements UmbWebhookDeliveryCollectionServerDataSource {
 	#host: UmbControllerHost;
@@ -30,12 +30,11 @@ export class UmbWebhookDeliveryCollectionServerDataSource implements UmbWebhookD
 	 * @memberof UmbWebhookDeliveryCollectionServerDataSource
 	 */
 	async getCollection(filter: UmbWebhookDeliveryCollectionFilterModel) {
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this.#host,
 			WebhookService.getWebhookByIdLogs({
-				id: filter.webhook.unique,
-				skip: filter.skip,
-				take: filter.take,
+				path: { id: filter.webhook.unique },
+				query: { skip: filter.skip, take: filter.take },
 			}),
 		);
 

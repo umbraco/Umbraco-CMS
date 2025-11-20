@@ -28,6 +28,8 @@ public class SetupInstallController : InstallControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status428PreconditionRequired)]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [EndpointSummary("Performs installation setup.")]
+    [EndpointDescription("Performs the initial setup and installation of Umbraco.")]
     public async Task<IActionResult> Setup(CancellationToken cancellationToken, InstallRequestModel installData)
     {
         InstallData data = _mapper.Map<InstallData>(installData)!;

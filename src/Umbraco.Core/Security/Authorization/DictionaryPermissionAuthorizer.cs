@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Services.AuthorizationStatus;
 
 namespace Umbraco.Cms.Core.Security.Authorization;
 
-internal class DictionaryPermissionAuthorizer : IDictionaryPermissionAuthorizer
+internal sealed class DictionaryPermissionAuthorizer : IDictionaryPermissionAuthorizer
 {
     private readonly IDictionaryPermissionService _dictionaryPermissionService;
 

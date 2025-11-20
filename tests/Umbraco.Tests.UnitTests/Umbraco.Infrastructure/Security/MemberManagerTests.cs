@@ -113,7 +113,7 @@ public class MemberManagerTests
     }
 
     [Test]
-    public async Task GivenICreateUser_AndTheUserIsNull_ThenIShouldGetAFailedResultAsync()
+    public Task GivenICreateUser_AndTheUserIsNull_ThenIShouldGetAFailedResultAsync()
     {
         // arrange
         var sut = CreateSut();
@@ -124,6 +124,7 @@ public class MemberManagerTests
 
         // act
         Assert.ThrowsAsync<ArgumentNullException>(async () => await sut.CreateAsync(null));
+        return Task.CompletedTask;
     }
 
     [Test]

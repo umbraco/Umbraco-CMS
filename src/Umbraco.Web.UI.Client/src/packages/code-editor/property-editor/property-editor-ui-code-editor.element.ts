@@ -38,7 +38,9 @@ export class UmbPropertyEditorUICodeEditorElement extends UmbLitElement implemen
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 
-		this._language = config?.getValueByAlias<CodeEditorLanguage>('language') ?? this.#defaultLanguage;
+		const language = config?.getValueByAlias<Array<CodeEditorLanguage> | CodeEditorLanguage | undefined>('language');
+		this._language = Array.isArray(language) ? language[0] : language;
+
 		this._height = Number(config?.getValueByAlias('height')) || 400;
 		this._lineNumbers = config?.getValueByAlias('lineNumbers') ?? false;
 		this._minimap = config?.getValueByAlias('minimap') ?? false;

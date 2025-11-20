@@ -9,10 +9,11 @@ import {
 	UmbFormControlValidator,
 	UmbObserveValidationStateController,
 } from '@umbraco-cms/backoffice/validation';
-import type {
-	ManifestPropertyEditorUi,
-	UmbPropertyEditorConfigCollection,
-	UmbPropertyEditorConfig,
+import {
+	type ManifestPropertyEditorUi,
+	type UmbPropertyEditorConfigCollection,
+	type UmbPropertyEditorConfig,
+	UMB_MISSING_PROPERTY_EDITOR_UI_UI_ALIAS,
 } from '@umbraco-cms/backoffice/property-editor';
 import type {
 	UmbPropertyTypeAppearanceModel,
@@ -98,6 +99,18 @@ export class UmbPropertyElement extends UmbLitElement {
 	}
 	private _propertyEditorUiAlias?: string;
 
+	@property({ type: String, attribute: 'property-editor-data-source-alias' })
+	public set propertyEditorDataSourceAlias(value: string | undefined) {
+		this.#propertyContext.setEditorDataSourceAlias(value);
+
+		if (this._element) {
+			this._element.dataSourceAlias = value;
+		}
+	}
+	public get propertyEditorDataSourceAlias(): string | undefined {
+		return this.#propertyContext.getEditorDataSourceAlias();
+	}
+
 	/**
 	 * Config. Configuration to pass to the Property Editor UI. This is also the configuration data stored on the Data Type.
 	 * @public
@@ -140,8 +153,32 @@ export class UmbPropertyElement extends UmbLitElement {
 		return this.#propertyContext.getDataPath();
 	}
 
+	/**
+	 * Sets the property to readonly, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @default false
+	 */
+	private _readonly: boolean = false;
+	@property({ type: Boolean, reflect: true })
+	public set readonly(value: boolean) {
+		this._readonly = value;
+
+		const unique = 'UMB_ELEMENT';
+
+		if (this._readonly) {
+			this.#propertyContext.readOnlyState.addState({
+				unique,
+			});
+		} else {
+			this.#propertyContext.readOnlyState.removeState(unique);
+		}
+	}
+	public get readonly(): boolean {
+		return this._readonly;
+	}
+
 	@state()
-	private _variantDifference?: string;
+	private _variantDifferenceTerm?: string;
 
 	@state()
 	private _element?: ManifestPropertyEditorUi['ELEMENT_TYPE'];
@@ -214,7 +251,7 @@ export class UmbPropertyElement extends UmbLitElement {
 		this.observe(
 			this.#propertyContext.variantDifference,
 			(variantDifference) => {
-				this._variantDifference = variantDifference;
+				this._variantDifferenceTerm = variantDifference;
 			},
 			null,
 		);
@@ -242,7 +279,10 @@ export class UmbPropertyElement extends UmbLitElement {
 			this.#propertyContext.isReadOnly,
 			(value) => {
 				this._isReadOnly = value;
-				this._element?.toggleAttribute('readonly', value);
+				if (this._element) {
+					this._element.readonly = value;
+					this._element.toggleAttribute('readonly', value);
+				}
 			},
 			null,
 		);
@@ -267,6 +307,11 @@ export class UmbPropertyElement extends UmbLitElement {
 			this.observe(
 				umbExtensionsRegistry.byTypeAndAlias('propertyEditorUi', this._propertyEditorUiAlias),
 				(manifest) => {
+					if (!manifest && this._propertyEditorUiAlias !== UMB_MISSING_PROPERTY_EDITOR_UI_UI_ALIAS) {
+						this._propertyEditorUiAlias = UMB_MISSING_PROPERTY_EDITOR_UI_UI_ALIAS;
+						this._observePropertyEditorUI();
+						return;
+					}
 					this._gotEditorUI(manifest);
 				},
 				'_observePropertyEditorUI',
@@ -280,7 +325,6 @@ export class UmbPropertyElement extends UmbLitElement {
 		this.#propertyContext.setEditorManifest(manifest ?? undefined);
 
 		if (!manifest) {
-			// TODO: if propertyEditorUiAlias didn't exist in store, we should do some nice fail UI.
 			return;
 		}
 
@@ -296,6 +340,7 @@ export class UmbPropertyElement extends UmbLitElement {
 			this.#validationMessageObserver?.destroy();
 			this.#controlValidator?.destroy();
 			oldElement?.removeEventListener('change', this._onPropertyEditorChange as any as EventListener);
+			/** @deprecated The `UmbPropertyValueChangeEvent` has been deprecated, and will be removed in Umbraco 18. [LK] */
 			oldElement?.removeEventListener('property-value-change', this._onPropertyEditorChange as any as EventListener);
 			oldElement?.destroy?.();
 
@@ -305,10 +350,13 @@ export class UmbPropertyElement extends UmbLitElement {
 
 			if (this._element) {
 				this._element.addEventListener('change', this._onPropertyEditorChange as any as EventListener);
+				/** @deprecated The `UmbPropertyValueChangeEvent` has been deprecated, and will be removed in Umbraco 18. [LK] */
 				this._element.addEventListener('property-value-change', this._onPropertyEditorChange as any as EventListener);
 				// No need to observe mandatory or label, as we already do so and set it on the _element if present: [NL]
+				this._element.manifest = manifest;
 				this._element.mandatory = this._mandatory;
 				this._element.name = this._label;
+				this._element.dataSourceAlias = this.#propertyContext.getEditorDataSourceAlias();
 
 				// No need for a controller alias, as the clean is handled via the observer prop:
 				this.#valueObserver = this.observe(
@@ -355,7 +403,9 @@ export class UmbPropertyElement extends UmbLitElement {
 					}
 				}
 
+				this._element.readonly = this._isReadOnly;
 				this._element.toggleAttribute('readonly', this._isReadOnly);
+
 				this.#createController(manifest);
 			}
 
@@ -388,9 +438,9 @@ export class UmbPropertyElement extends UmbLitElement {
 				?mandatory=${this._mandatory}
 				?invalid=${this._invalid}>
 				${this.#renderPropertyActionMenu()}
-				${this._variantDifference
+				${this._variantDifferenceTerm
 					? html`<div id="variant-info" slot="description">
-							<uui-tag look="secondary">${this._variantDifference}</uui-tag>
+							<uui-tag look="secondary">${this.localize.term(this._variantDifferenceTerm)}</uui-tag>
 						</div> `
 					: ''}
 				${this.#renderPropertyEditor()}

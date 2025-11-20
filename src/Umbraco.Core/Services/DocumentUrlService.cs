@@ -2,9 +2,11 @@ using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PublishedCache;
@@ -28,6 +30,7 @@ public class DocumentUrlService : IDocumentUrlService
     private readonly IDocumentRepository _documentRepository;
     private readonly ICoreScopeProvider _coreScopeProvider;
     private readonly GlobalSettings _globalSettings;
+    private readonly WebRoutingSettings _webRoutingSettings;
     private readonly UrlSegmentProviderCollection _urlSegmentProviderCollection;
     private readonly IContentService _contentService;
     private readonly IShortStringHelper _shortStringHelper;
@@ -37,6 +40,7 @@ public class DocumentUrlService : IDocumentUrlService
     private readonly IDocumentNavigationQueryService _documentNavigationQueryService;
     private readonly IPublishStatusQueryService _publishStatusQueryService;
     private readonly IDomainCacheService _domainCacheService;
+    private readonly IDefaultCultureAccessor _defaultCultureAccessor;
 
     private readonly ConcurrentDictionary<string, PublishedDocumentUrlSegments> _cache = new();
     private bool _isInitialized;
@@ -44,26 +48,51 @@ public class DocumentUrlService : IDocumentUrlService
     /// <summary>
     /// Model used to cache a single published document along with all it's URL segments.
     /// </summary>
-    private class PublishedDocumentUrlSegments
+    /// <remarks>Internal for the purpose of unit and benchmark testing.</remarks>
+    internal sealed class PublishedDocumentUrlSegments
     {
+        /// <summary>
+        /// Gets or sets the document key.
+        /// </summary>
         public required Guid DocumentKey { get; set; }
 
+        /// <summary>
+        /// Gets or sets the language Id.
+        /// </summary>
         public required int LanguageId { get; set; }
 
+        /// <summary>
+        /// Gets or sets the collection of <see cref="UrlSegment"/> for the document, language and state.
+        /// </summary>
         public required IList<UrlSegment> UrlSegments { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether the document is a draft version or not.
+        /// </summary>
         public required bool IsDraft { get; set; }
 
+        /// <summary>
+        /// Model used to represent a URL segment for a document in the cache.
+        /// </summary>
         public class UrlSegment
         {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="UrlSegment"/> class.
+            /// </summary>
             public UrlSegment(string segment, bool isPrimary)
             {
                 Segment = segment;
                 IsPrimary = isPrimary;
             }
 
+            /// <summary>
+            /// Gets the URL segment string.
+            /// </summary>
             public string Segment { get; }
 
+            /// <summary>
+            /// Gets a value indicating whether this URL segment is the primary one for the document, language and state.
+            /// </summary>
             public bool IsPrimary { get; }
         }
     }
@@ -71,6 +100,7 @@ public class DocumentUrlService : IDocumentUrlService
     /// <summary>
     /// Initializes a new instance of the <see cref="DocumentUrlService"/> class.
     /// </summary>
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
     public DocumentUrlService(
         ILogger<DocumentUrlService> logger,
         IDocumentUrlRepository documentUrlRepository,
@@ -86,12 +116,53 @@ public class DocumentUrlService : IDocumentUrlService
         IDocumentNavigationQueryService documentNavigationQueryService,
         IPublishStatusQueryService publishStatusQueryService,
         IDomainCacheService domainCacheService)
+        :this(
+            logger,
+            documentUrlRepository,
+            documentRepository,
+            coreScopeProvider,
+            globalSettings,
+            StaticServiceProvider.Instance.GetRequiredService<IOptions<WebRoutingSettings>>(),
+            urlSegmentProviderCollection,
+            contentService,
+            shortStringHelper,
+            languageService,
+            keyValueService,
+            idKeyMap,
+            documentNavigationQueryService,
+            publishStatusQueryService,
+            domainCacheService,
+            StaticServiceProvider.Instance.GetRequiredService<IDefaultCultureAccessor>())
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DocumentUrlService"/> class.
+    /// </summary>
+    public DocumentUrlService(
+        ILogger<DocumentUrlService> logger,
+        IDocumentUrlRepository documentUrlRepository,
+        IDocumentRepository documentRepository,
+        ICoreScopeProvider coreScopeProvider,
+        IOptions<GlobalSettings> globalSettings,
+        IOptions<WebRoutingSettings> webRoutingSettings,
+        UrlSegmentProviderCollection urlSegmentProviderCollection,
+        IContentService contentService,
+        IShortStringHelper shortStringHelper,
+        ILanguageService languageService,
+        IKeyValueService keyValueService,
+        IIdKeyMap idKeyMap,
+        IDocumentNavigationQueryService documentNavigationQueryService,
+        IPublishStatusQueryService publishStatusQueryService,
+        IDomainCacheService domainCacheService,
+        IDefaultCultureAccessor defaultCultureAccessor)
     {
         _logger = logger;
         _documentUrlRepository = documentUrlRepository;
         _documentRepository = documentRepository;
         _coreScopeProvider = coreScopeProvider;
         _globalSettings = globalSettings.Value;
+        _webRoutingSettings = webRoutingSettings.Value;
         _urlSegmentProviderCollection = urlSegmentProviderCollection;
         _contentService = contentService;
         _shortStringHelper = shortStringHelper;
@@ -101,6 +172,7 @@ public class DocumentUrlService : IDocumentUrlService
         _documentNavigationQueryService = documentNavigationQueryService;
         _publishStatusQueryService = publishStatusQueryService;
         _domainCacheService = domainCacheService;
+        _defaultCultureAccessor = defaultCultureAccessor;
     }
 
     /// <inheritdoc/>
@@ -116,14 +188,18 @@ public class DocumentUrlService : IDocumentUrlService
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         if (ShouldRebuildUrls())
         {
-            _logger.LogInformation("Rebuilding all URLs.");
+            _logger.LogInformation("Rebuilding all document URLs.");
             await RebuildAllUrlsAsync();
         }
+
+        _logger.LogInformation("Caching document URLs.");
 
         IEnumerable<PublishedDocumentUrlSegment> publishedDocumentUrlSegments = _documentUrlRepository.GetAll();
 
         IEnumerable<ILanguage> languages = await _languageService.GetAllAsync();
         var languageIdToIsoCode = languages.ToDictionary(x => x.Id, x => x.IsoCode);
+
+        int numberOfCachedUrls = 0;
         foreach (PublishedDocumentUrlSegments publishedDocumentUrlSegment in ConvertToCacheModel(publishedDocumentUrlSegments))
         {
             if (cancellationToken.IsCancellationRequested)
@@ -134,8 +210,11 @@ public class DocumentUrlService : IDocumentUrlService
             if (languageIdToIsoCode.TryGetValue(publishedDocumentUrlSegment.LanguageId, out var isoCode))
             {
                 UpdateCache(_coreScopeProvider.Context!, publishedDocumentUrlSegment, isoCode);
+                numberOfCachedUrls++;
             }
         }
+
+        _logger.LogInformation("Cached {NumberOfUrls} document URLs.", numberOfCachedUrls);
 
         _isInitialized = true;
         scope.Complete();
@@ -168,45 +247,40 @@ public class DocumentUrlService : IDocumentUrlService
         scope.Complete();
     }
 
-    private static IEnumerable<PublishedDocumentUrlSegments> ConvertToCacheModel(IEnumerable<PublishedDocumentUrlSegment> publishedDocumentUrlSegments)
+    /// <summary>
+    /// Converts a collection of <see cref="PublishedDocumentUrlSegment"/> to a collection of <see cref="PublishedDocumentUrlSegments"/> for caching purposes.
+    /// </summary>
+    /// <param name="publishedDocumentUrlSegments">The collection of <see cref="PublishedDocumentUrlSegment"/> retrieved from the database on startup.</param>
+    /// <returns>The collection of cache models.</returns>
+    /// <remarks>Internal for the purpose of unit and benchmark testing.</remarks>
+    internal static IEnumerable<PublishedDocumentUrlSegments> ConvertToCacheModel(IEnumerable<PublishedDocumentUrlSegment> publishedDocumentUrlSegments)
     {
-        var cacheModels = new List<PublishedDocumentUrlSegments>();
+        var cacheModels = new Dictionary<(Guid DocumentKey, int LanguageId, bool IsDraft), PublishedDocumentUrlSegments>();
+
         foreach (PublishedDocumentUrlSegment model in publishedDocumentUrlSegments)
         {
-            PublishedDocumentUrlSegments? existingCacheModel = GetModelFromCache(cacheModels, model);
-            if (existingCacheModel is null)
+            (Guid DocumentKey, int LanguageId, bool IsDraft) key = (model.DocumentKey, model.LanguageId, model.IsDraft);
+
+            if (!cacheModels.TryGetValue(key, out PublishedDocumentUrlSegments? existingCacheModel))
             {
-                cacheModels.Add(new PublishedDocumentUrlSegments
+                cacheModels[key] = new PublishedDocumentUrlSegments
                 {
                     DocumentKey = model.DocumentKey,
                     LanguageId = model.LanguageId,
                     UrlSegments = [new PublishedDocumentUrlSegments.UrlSegment(model.UrlSegment, model.IsPrimary)],
                     IsDraft = model.IsDraft,
-                });
+                };
             }
             else
             {
-                existingCacheModel.UrlSegments = GetUpdatedUrlSegments(existingCacheModel.UrlSegments, model.UrlSegment, model.IsPrimary);
+                if (existingCacheModel.UrlSegments.Any(x => x.Segment == model.UrlSegment) is false)
+                {
+                    existingCacheModel.UrlSegments.Add(new PublishedDocumentUrlSegments.UrlSegment(model.UrlSegment, model.IsPrimary));
+                }
             }
         }
 
-        return cacheModels;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static PublishedDocumentUrlSegments? GetModelFromCache(List<PublishedDocumentUrlSegments> cacheModels, PublishedDocumentUrlSegment model)
-        => cacheModels
-            .SingleOrDefault(x => x.DocumentKey == model.DocumentKey && x.LanguageId == model.LanguageId && x.IsDraft == model.IsDraft);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static IList<PublishedDocumentUrlSegments.UrlSegment> GetUpdatedUrlSegments(IList<PublishedDocumentUrlSegments.UrlSegment> urlSegments, string segment, bool isPrimary)
-    {
-        if (urlSegments.FirstOrDefault(x => x.Segment == segment) is null)
-        {
-            urlSegments.Add(new PublishedDocumentUrlSegments.UrlSegment(segment, isPrimary));
-        }
-
-        return urlSegments;
+        return cacheModels.Values;
     }
 
     private void RemoveFromCache(IScopeContext scopeContext, Guid documentKey, string isoCode, bool isDraft)
@@ -342,6 +416,7 @@ public class DocumentUrlService : IDocumentUrlService
 
         if (toSave.Count > 0)
         {
+            scope.WriteLock(Constants.Locks.DocumentUrls);
             _documentUrlRepository.Save(toSave);
         }
 
@@ -404,7 +479,8 @@ public class DocumentUrlService : IDocumentUrlService
 
         if (draftUrlSegments.Any() is false)
         {
-            _logger.LogWarning("No draft URL segments found for document {DocumentKey} in culture {Culture}", document.Key, culture ?? "{null}");
+            // Log at debug level because this is expected when a document is not published in a given language.
+            _logger.LogDebug("No draft URL segments found for document {DocumentKey} in culture {Culture}", document.Key, culture ?? "{null}");
         }
         else
         {
@@ -429,7 +505,7 @@ public class DocumentUrlService : IDocumentUrlService
     private static bool IsVariantAndPublishedForCulture(IContent document, string? culture) =>
         document.PublishCultureInfos?.Values.Any(x => x.Culture == culture) ?? false;
 
-    private IEnumerable<PublishedDocumentUrlSegment> ConvertToPersistedModel(PublishedDocumentUrlSegments model)
+    private static IEnumerable<PublishedDocumentUrlSegment> ConvertToPersistedModel(PublishedDocumentUrlSegments model)
     {
         foreach (PublishedDocumentUrlSegments.UrlSegment urlSegment in model.UrlSegments)
         {
@@ -463,6 +539,37 @@ public class DocumentUrlService : IDocumentUrlService
         }
 
         scope.Complete();
+    }
+
+    /// <inheritdoc/>
+    public Guid? GetDocumentKeyByUri(Uri uri, bool isDraft)
+    {
+        IEnumerable<Domain> domains = _domainCacheService.GetAll(false);
+        DomainAndUri? domain = DomainUtilities.SelectDomain(domains, uri, defaultCulture: _defaultCultureAccessor.DefaultCulture);
+
+        string route;
+        if (domain is not null)
+        {
+            route = domain.ContentId + DomainUtilities.PathRelativeToDomain(domain.Uri, uri.GetAbsolutePathDecoded());
+        }
+        else
+        {
+            // If we have configured strict domain matching, and a domain has not been found for the request configured on an ancestor node,
+            // do not route the content by URL.
+            if (_webRoutingSettings.UseStrictDomainMatching)
+            {
+                return null;
+            }
+
+            // Default behaviour if strict domain matching is not enabled will be to route under the to the first root node found.
+            route = uri.GetAbsolutePathDecoded();
+        }
+
+        return GetDocumentKeyByRoute(
+            domain is null ? route : route[domain.ContentId.ToString().Length..],
+            domain?.Culture,
+            domain?.ContentId,
+            isDraft);
     }
 
     /// <inheritdoc/>
@@ -789,7 +896,7 @@ public class DocumentUrlService : IDocumentUrlService
         return '/' + string.Join('/', urlSegments);
     }
 
-    private bool HideTopLevel(bool hideTopLevelNodeFromPath, bool isRootFirstItem, List<string> urlSegments)
+    private static bool HideTopLevel(bool hideTopLevelNodeFromPath, bool isRootFirstItem, List<string> urlSegments)
     {
         if (hideTopLevelNodeFromPath is false)
         {
@@ -809,143 +916,6 @@ public class DocumentUrlService : IDocumentUrlService
     {
         ThrowIfNotInitialized();
         return _cache.Any();
-    }
-
-    /// <inheritdoc/>
-    [Obsolete("This method is obsolete and will be removed in future versions. Use IPublishedUrlInfoProvider.GetAllAsync instead.")]
-    public async Task<IEnumerable<UrlInfo>> ListUrlsAsync(Guid contentKey)
-    {
-        var result = new List<UrlInfo>();
-
-        Attempt<int> documentIdAttempt = _idKeyMap.GetIdForKey(contentKey, UmbracoObjectTypes.Document);
-
-        if (documentIdAttempt.Success is false)
-        {
-            return result;
-        }
-
-        IEnumerable<Guid> ancestorsOrSelfKeys = contentKey.Yield()
-            .Concat(_contentService.GetAncestors(documentIdAttempt.Result).Select(x => x.Key).Reverse());
-
-        IEnumerable<ILanguage> languages = await _languageService.GetAllAsync();
-        var cultures = languages.ToDictionary(x=>x.IsoCode);
-
-        Guid[] ancestorsOrSelfKeysArray = ancestorsOrSelfKeys as Guid[] ?? ancestorsOrSelfKeys.ToArray();
-        Dictionary<Guid, Task<ILookup<string, Domain>>> ancestorOrSelfKeyToDomains = ancestorsOrSelfKeysArray
-            .ToDictionary(
-                x => x,
-                ancestorKey =>
-                {
-                    Attempt<int> idAttempt = _idKeyMap.GetIdForKey(ancestorKey, UmbracoObjectTypes.Document);
-
-                    if (idAttempt.Success is false)
-                    {
-                        return Task.FromResult((ILookup<string, Domain>)null!);
-                    }
-
-                    IEnumerable<Domain> domains = _domainCacheService.GetAssigned(idAttempt.Result, false);
-                    return Task.FromResult(domains.ToLookup(x => x.Culture!));
-                })!;
-
-        foreach ((string culture, ILanguage language) in cultures)
-        {
-            var urlSegments = new List<string>();
-            var foundDomains = new List<Domain?>();
-
-            var hasUrlInCulture = true;
-            foreach (Guid ancestorOrSelfKey in ancestorsOrSelfKeysArray)
-            {
-                ILookup<string, Domain> domainLookup = await ancestorOrSelfKeyToDomains[ancestorOrSelfKey];
-                if (domainLookup.Any())
-                {
-                    IEnumerable<Domain> domains = domainLookup[culture];
-                    foreach (Domain domain in domains)
-                    {
-                        Attempt<Guid> domainKeyAttempt =
-                            _idKeyMap.GetKeyForId(domain.ContentId, UmbracoObjectTypes.Document);
-                        if (domainKeyAttempt.Success)
-                        {
-                            if (_publishStatusQueryService.IsDocumentPublished(domainKeyAttempt.Result, culture))
-                            {
-                                foundDomains.Add(domain);
-                            }
-                        }
-                    }
-
-                    if (foundDomains.Any())
-                    {
-                        break;
-                    }
-                }
-
-                if (TryGetPrimaryUrlSegment(ancestorOrSelfKey, culture, false, out string? segment))
-                {
-                    urlSegments.Add(segment);
-                }
-                else
-                {
-                    hasUrlInCulture = false;
-                }
-            }
-
-            // If we did not find a domain and this is not the default language, then the content is not routable
-            if (foundDomains.Any() is false && language.IsDefault is false)
-            {
-                continue;
-            }
-
-
-            var isRootFirstItem = GetTopMostRootKey(false, culture) == ancestorsOrSelfKeysArray.Last();
-
-            var leftToRight = _globalSettings.ForceCombineUrlPathLeftToRight
-                              || CultureInfo.GetCultureInfo(culture).TextInfo.IsRightToLeft is false;
-            if (leftToRight)
-            {
-                urlSegments.Reverse();
-            }
-
-            // If no domain was found, we need to add a null domain to the list to make sure we check for no domains.
-            if (foundDomains.Any() is false)
-            {
-                foundDomains.Add(null);
-            }
-
-            foreach (Domain? foundDomain in foundDomains)
-            {
-                var foundUrl = GetFullUrl(isRootFirstItem, urlSegments, foundDomain, leftToRight);
-
-                if (foundDomain is not null)
-                {
-                    // if we found a domain, it should be safe to show url
-                    result.Add(new UrlInfo(
-                        text: foundUrl,
-                        isUrl: hasUrlInCulture,
-                        culture: culture));
-                }
-                else
-                {
-                    // otherwise we need to ensure that no other page has the same url
-                    // e.g. a site with two roots that both have a child with the same name
-                    Guid? documentKeyByRoute = GetDocumentKeyByRoute(foundUrl, culture, foundDomain?.ContentId, false);
-                    if (contentKey.Equals(documentKeyByRoute))
-                    {
-                        result.Add(new UrlInfo(
-                            text: foundUrl,
-                            isUrl: hasUrlInCulture,
-                            culture: culture));
-                    }
-                    else
-                    {
-                        result.Add(new UrlInfo(
-                            text: "Conflict: Other page has the same url",
-                            isUrl: false,
-                            culture: culture));
-                    }
-                }
-            }
-        }
-
-        return result;
     }
 
     private bool TryGetPrimaryUrlSegment(Guid documentKey, string culture, bool isDraft, [NotNullWhen(true)] out string? segment)

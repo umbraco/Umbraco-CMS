@@ -24,6 +24,8 @@ public class DomainsController : DocumentControllerBase
     [HttpGet("{id:guid}/domains")]
     [ProducesResponseType(typeof(DomainsResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Gets domains for a document.")]
+    [EndpointDescription("Gets the domains and culture settings assigned to the document identified by the provided Id.")]
     public async Task<IActionResult> Domains(CancellationToken cancellationToken, Guid id)
     {
         IDomain[] assignedDomains = (await _domainService.GetAssignedDomainsAsync(id, true))

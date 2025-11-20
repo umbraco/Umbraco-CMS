@@ -18,6 +18,8 @@ public class GetStatusProfilingController : ProfilingControllerBase
     [HttpGet("status")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProfilingStatusResponseModel), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets profiling status.")]
+    [EndpointDescription("Gets the current status of the MiniProfiler profiling tool.")]
     public async Task<IActionResult> Status(CancellationToken cancellationToken)
     {
         Attempt<bool, WebProfilerOperationStatus> result = await _webProfilerService.GetStatus();

@@ -1,6 +1,6 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbEntityReferenceDataSource, UmbReferenceItemModel } from '@umbraco-cms/backoffice/relations';
@@ -27,9 +27,9 @@ export class UmbDocumentReferenceServerDataSource extends UmbControllerBase impl
 		skip = 0,
 		take = 20,
 	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbReferenceItemModel>>> {
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this,
-			DocumentService.getDocumentByIdReferencedBy({ id: unique, skip, take }),
+			DocumentService.getDocumentByIdReferencedBy({ path: { id: unique }, query: { skip, take } }),
 		);
 
 		if (data) {
@@ -68,9 +68,9 @@ export class UmbDocumentReferenceServerDataSource extends UmbControllerBase impl
 		skip: number = 0,
 		take: number = 20,
 	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbEntityModel>>> {
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this,
-			DocumentService.getDocumentAreReferenced({ id: uniques, skip, take }),
+			DocumentService.getDocumentAreReferenced({ query: { id: uniques, skip, take } }),
 		);
 
 		if (data) {
@@ -100,9 +100,9 @@ export class UmbDocumentReferenceServerDataSource extends UmbControllerBase impl
 		skip: number = 0,
 		take: number = 20,
 	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbEntityModel>>> {
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this,
-			DocumentService.getDocumentByIdReferencedDescendants({ id: unique, skip, take }),
+			DocumentService.getDocumentByIdReferencedDescendants({ path: { id: unique }, query: { skip, take } }),
 		);
 
 		if (data) {

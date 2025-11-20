@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using HtmlAgilityPack;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.PropertyEditors;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-internal class RichTextEditorPastedImagesTests : UmbracoIntegrationTest
+internal sealed class RichTextEditorPastedImagesTests : UmbracoIntegrationTest
 {
     private static readonly Guid GifFileKey = Guid.Parse("E625C7FA-6CA7-4A01-92CD-FB5C6F89973D");
 

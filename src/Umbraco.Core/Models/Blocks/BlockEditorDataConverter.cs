@@ -2,8 +2,6 @@
 // See LICENSE for more details.
 
 using System.Diagnostics.CodeAnalysis;
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.Models.Blocks;
@@ -16,18 +14,6 @@ public abstract class BlockEditorDataConverter<TValue, TLayout>
     where TLayout : IBlockLayoutItem
 {
     private readonly IJsonSerializer _jsonSerializer;
-
-    [Obsolete("Use the non-obsolete constructor. Will be removed in V15.")]
-    protected BlockEditorDataConverter(string propertyEditorAlias)
-        : this(propertyEditorAlias, StaticServiceProvider.Instance.GetRequiredService<IJsonSerializer>())
-    {
-    }
-
-    [Obsolete("Use the non-obsolete constructor. Will be removed in V15.")]
-    protected BlockEditorDataConverter(string propertyEditorAlias, IJsonSerializer jsonSerializer)
-        : this(jsonSerializer)
-    {
-    }
 
     protected BlockEditorDataConverter(IJsonSerializer jsonSerializer)
         => _jsonSerializer = jsonSerializer;
@@ -85,12 +71,12 @@ public abstract class BlockEditorDataConverter<TValue, TLayout>
 
     // this method is only meant to have any effect when migrating block editor values
     // from the original format to the new, variant enabled format
-    private void AmendExpose(TValue value)
-        => value.Expose = value.ContentData.Select(cd => new BlockItemVariation(cd.Key, null, null)).ToList();
+    private static void AmendExpose(TValue value)
+        => value.Expose = value.ContentData.ConvertAll(cd => new BlockItemVariation(cd.Key, null, null));
 
     // this method is only meant to have any effect when migrating block editor values
     // from the original format to the new, variant enabled format
-    private bool ConvertOriginalBlockFormat(List<BlockItemData> blockItemDatas)
+    private static bool ConvertOriginalBlockFormat(List<BlockItemData> blockItemDatas)
     {
         var converted = false;
         foreach (BlockItemData blockItemData in blockItemDatas)

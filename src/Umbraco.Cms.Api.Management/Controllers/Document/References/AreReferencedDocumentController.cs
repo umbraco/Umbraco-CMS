@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
@@ -32,6 +32,8 @@ public class AreReferencedDocumentController : DocumentControllerBase
     [HttpGet("are-referenced")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<ReferenceByIdModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of items that reference documents.")]
+    [EndpointDescription("Gets a paginated collection of items that reference the documents identified by the provided Ids.")]
     public async Task<ActionResult<PagedViewModel<ReferenceByIdModel>>> GetPagedReferencedItems(
         CancellationToken cancellationToken,
         [FromQuery(Name="id")]HashSet<Guid> ids,
@@ -45,6 +47,6 @@ public class AreReferencedDocumentController : DocumentControllerBase
             Items = _umbracoMapper.MapEnumerable<Guid, ReferenceByIdModel>(distinctByKeyItemsWithReferencedRelations.Items),
         };
 
-        return await Task.FromResult(pagedViewModel);
+        return pagedViewModel;
     }
 }

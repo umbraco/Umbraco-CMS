@@ -1,3 +1,5 @@
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -21,6 +23,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
     private readonly IDocumentNavigationManagementService _documentNavigationManagementService;
     private readonly IContentService _contentService;
     private readonly IDocumentCacheService _documentCacheService;
+    private readonly ICacheManager _cacheManager;
     private readonly IPublishStatusManagementService _publishStatusManagementService;
     private readonly IIdKeyMap _idKeyMap;
 
@@ -37,7 +40,8 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         IDocumentNavigationManagementService documentNavigationManagementService,
         IContentService contentService,
         IPublishStatusManagementService publishStatusManagementService,
-        IDocumentCacheService documentCacheService)
+        IDocumentCacheService documentCacheService,
+        ICacheManager cacheManager)
         : base(appCaches, serializer, eventAggregator, factory)
     {
         _idKeyMap = idKeyMap;
@@ -49,6 +53,11 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         _contentService = contentService;
         _documentCacheService = documentCacheService;
         _publishStatusManagementService = publishStatusManagementService;
+
+        // TODO: Ideally we should inject IElementsCache
+        // this interface is in infrastructure, and changing this is very breaking
+        // so as long as we have the cache manager, which casts the IElementsCache to a simple AppCache we might as well use that.
+        _cacheManager = cacheManager;
     }
 
     #region Indirect
@@ -78,12 +87,18 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
 
     #region Refresher
 
-    public override void Refresh(JsonPayload[] payloads)
+    public override void RefreshInternal(JsonPayload[] payloads)
     {
         AppCaches.RuntimeCache.ClearOfType<PublicAccessEntry>();
         AppCaches.RuntimeCache.ClearByKey(CacheKeys.ContentRecycleBinCacheKey);
 
-        var idsRemoved = new HashSet<int>();
+        // Ideally, we'd like to not have to clear the entire cache here. However, this was the existing behavior in NuCache.
+        // The reason for this is that we have no way to know which elements are affected by the changes or what their keys are.
+        // This is because currently published elements live exclusively in a JSON blob in the umbracoPropertyData table.
+        // This means that the only way to resolve these keys is to actually parse this data with a specific value converter, and for all cultures, which is not possible.
+        // If published elements become their own entities with relations, instead of just property data, we can revisit this.
+        _cacheManager.ElementsCache.Clear();
+
         IAppPolicyCache isolatedCache = AppCaches.IsolatedCaches.GetOrCreate<IContent>();
 
         foreach (JsonPayload payload in payloads)
@@ -103,13 +118,22 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
                 var pathid = "," + payload.Id + ",";
                 isolatedCache.ClearOfType<IContent>((k, v) => v.Path?.Contains(pathid) ?? false);
             }
+        }
 
+        base.RefreshInternal(payloads);
+    }
+
+    public override void Refresh(JsonPayload[] payloads)
+    {
+        var idsRemoved = new HashSet<int>();
+
+        foreach (JsonPayload payload in payloads)
+        {
             // if the item is not a blueprint and is being completely removed, we need to refresh the domains cache if any domain was assigned to the content
             if (payload.Blueprint is false && payload.ChangeTypes.HasTypesAny(TreeChangeTypes.Remove))
             {
                 idsRemoved.Add(payload.Id);
             }
-
 
             HandleMemoryCache(payload);
             HandleRouting(payload);

@@ -185,10 +185,7 @@ public class ContentBuilder
     {
         if (string.IsNullOrWhiteSpace(name))
         {
-            if (_cultureNames.TryGetValue(culture, out _))
-            {
-                _cultureNames.Remove(culture);
-            }
+            _cultureNames.Remove(culture);
         }
         else
         {
@@ -229,8 +226,8 @@ public class ContentBuilder
         var key = _key ?? Guid.NewGuid();
         var parentId = _parentId ?? -1;
         var parent = _parent;
-        var createDate = _createDate ?? DateTime.Now;
-        var updateDate = _updateDate ?? DateTime.Now;
+        var createDate = _createDate ?? DateTime.UtcNow;
+        var updateDate = _updateDate ?? DateTime.UtcNow;
         var name = _name ?? Guid.NewGuid().ToString();
         var creatorId = _creatorId ?? 0;
         var level = _level ?? 1;
@@ -467,6 +464,7 @@ public class ContentBuilder
         content.SetValue("memberPicker", Udi.Create(Constants.UdiEntityType.Member, new Guid("9A50A448-59C0-4D42-8F93-4F1D55B0F47D")).ToString());
         content.SetValue("multiUrlPicker", "[{\"name\":\"https://test.com\",\"url\":\"https://test.com\"}]");
         content.SetValue("tags", "this,is,tags");
+        content.SetValue("dateTimeWithTimeZone", "{\"date\":\"2025-01-22T18:33:01.0000000+01:00\",\"timeZone\":\"Europe/Copenhagen\"}");
 
         return content;
     }

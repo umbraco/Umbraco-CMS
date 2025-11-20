@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DeliveryApi;
@@ -29,7 +29,7 @@ internal sealed class ApiAccessService : RequestHeaderHandler, IApiAccessService
     private bool IfEnabled(Func<bool> condition) => _deliveryApiSettings.Enabled && condition();
 
     private bool HasValidApiKey() => _deliveryApiSettings.ApiKey.IsNullOrWhiteSpace() == false
-                                     && _deliveryApiSettings.ApiKey.Equals(GetHeaderValue("Api-Key"));
+                                     && _deliveryApiSettings.ApiKey.Equals(GetHeaderValue(Core.Constants.DeliveryApi.HeaderNames.ApiKey));
 
     private bool IfMediaEnabled(Func<bool> condition) => _deliveryApiSettings is { Enabled: true, Media.Enabled: true } && condition();
 }

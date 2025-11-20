@@ -1,4 +1,4 @@
-import type { LogMessagesDataSource, LogSearchDataSource } from './index.js';
+import type { UmbLogMessagesDataSource, UmbLogSearchDataSource } from './index.js';
 import type {
 	DirectionModel,
 	LogLevelModel,
@@ -6,14 +6,14 @@ import type {
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { LogViewerService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the log saved searches
  * @class UmbLogSearchesServerDataSource
  * @implements {TemplateDetailDataSource}
  */
-export class UmbLogSearchesServerDataSource implements LogSearchDataSource {
+export class UmbLogSearchesServerDataSource implements UmbLogSearchDataSource {
 	#host: UmbControllerHost;
 
 	/**
@@ -32,7 +32,7 @@ export class UmbLogSearchesServerDataSource implements LogSearchDataSource {
 	 * @memberof UmbLogSearchesServerDataSource
 	 */
 	async getAllSavedSearches({ skip = 0, take = 100 }: { skip?: number; take?: number }) {
-		return await tryExecuteAndNotify(this.#host, LogViewerService.getLogViewerSavedSearch({ skip, take }));
+		return await tryExecute(this.#host, LogViewerService.getLogViewerSavedSearch({ query: { skip, take } }));
 	}
 	/**
 	 * Get a log viewer saved search by name from the server
@@ -41,20 +41,17 @@ export class UmbLogSearchesServerDataSource implements LogSearchDataSource {
 	 * @memberof UmbLogSearchesServerDataSource
 	 */
 	async getSavedSearchByName({ name }: { name: string }) {
-		return await tryExecuteAndNotify(this.#host, LogViewerService.getLogViewerSavedSearchByName({ name }));
+		return await tryExecute(this.#host, LogViewerService.getLogViewerSavedSearchByName({ path: { name } }));
 	}
 
 	/**
 	 *	Post a new log viewer saved search to the server
-	 * @param {{ requestBody?: SavedLogSearch }} { requestBody }
+	 * @param {{ body?: SavedLogSearch }} { body }
 	 * @returns {*}
 	 * @memberof UmbLogSearchesServerDataSource
 	 */
 	async postLogViewerSavedSearch({ name, query }: SavedLogSearchResponseModel) {
-		return await tryExecuteAndNotify(
-			this.#host,
-			LogViewerService.postLogViewerSavedSearch({ requestBody: { name, query } }),
-		);
+		return await tryExecute(this.#host, LogViewerService.postLogViewerSavedSearch({ body: { name, query } }));
 	}
 	/**
 	 * Remove a log viewer saved search by name from the server
@@ -63,15 +60,15 @@ export class UmbLogSearchesServerDataSource implements LogSearchDataSource {
 	 * @memberof UmbLogSearchesServerDataSource
 	 */
 	async deleteSavedSearchByName({ name }: { name: string }) {
-		return await tryExecuteAndNotify(this.#host, LogViewerService.deleteLogViewerSavedSearchByName({ name }));
+		return await tryExecute(this.#host, LogViewerService.deleteLogViewerSavedSearchByName({ path: { name } }));
 	}
 }
 /**
  * A data source for the log messages and levels
  * @class UmbLogMessagesServerDataSource
- * @implements {LogMessagesDataSource}
+ * @implements {UmbLogMessagesDataSource}
  */
-export class UmbLogMessagesServerDataSource implements LogMessagesDataSource {
+export class UmbLogMessagesServerDataSource implements UmbLogMessagesDataSource {
 	#host: UmbControllerHost;
 
 	/**
@@ -90,7 +87,7 @@ export class UmbLogMessagesServerDataSource implements LogMessagesDataSource {
 	 * @memberof UmbLogMessagesServerDataSource
 	 */
 	async getLogViewerLevel({ skip = 0, take = 100 }: { skip?: number; take?: number }) {
-		return await tryExecuteAndNotify(this.#host, LogViewerService.getLogViewerLevel({ skip, take }));
+		return await tryExecute(this.#host, LogViewerService.getLogViewerLevel({ query: { skip, take } }));
 	}
 
 	/**
@@ -100,11 +97,10 @@ export class UmbLogMessagesServerDataSource implements LogMessagesDataSource {
 	 * @memberof UmbLogMessagesServerDataSource
 	 */
 	async getLogViewerLevelCount({ startDate, endDate }: { startDate?: string; endDate?: string }) {
-		return await tryExecuteAndNotify(
+		return await tryExecute(
 			this.#host,
 			LogViewerService.getLogViewerLevelCount({
-				startDate,
-				endDate,
+				query: { startDate, endDate },
 			}),
 		);
 	}
@@ -147,16 +143,18 @@ export class UmbLogMessagesServerDataSource implements LogMessagesDataSource {
 		startDate?: string;
 		endDate?: string;
 	}) {
-		return await tryExecuteAndNotify(
+		return await tryExecute(
 			this.#host,
 			LogViewerService.getLogViewerLog({
-				skip,
-				take,
-				orderDirection,
-				filterExpression,
-				logLevel,
-				startDate,
-				endDate,
+				query: {
+					skip,
+					take,
+					orderDirection,
+					filterExpression,
+					logLevel: logLevel?.length ? logLevel : undefined,
+					startDate,
+					endDate,
+				},
 			}),
 		);
 	}
@@ -187,23 +185,19 @@ export class UmbLogMessagesServerDataSource implements LogMessagesDataSource {
 		startDate?: string;
 		endDate?: string;
 	}) {
-		return await tryExecuteAndNotify(
+		return await tryExecute(
 			this.#host,
 			LogViewerService.getLogViewerMessageTemplate({
-				skip,
-				take,
-				startDate,
-				endDate,
+				query: { skip, take, startDate, endDate },
 			}),
 		);
 	}
 
 	async getLogViewerValidateLogsSize({ startDate, endDate }: { startDate?: string; endDate?: string }) {
-		return await tryExecuteAndNotify(
+		return await tryExecute(
 			this.#host,
 			LogViewerService.getLogViewerValidateLogsSize({
-				startDate,
-				endDate,
+				query: { startDate, endDate },
 			}),
 		);
 	}

@@ -37,7 +37,7 @@ public class LabelPropertyEditor : DataEditor
         new LabelConfigurationEditor(_ioHelper);
 
     // provides the property value editor
-    internal class LabelPropertyValueEditor : DataValueEditor
+    internal sealed class LabelPropertyValueEditor : DataValueEditor
     {
         public LabelPropertyValueEditor(
             IShortStringHelper shortStringHelper,

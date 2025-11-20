@@ -8,7 +8,7 @@ public sealed class PropertyValidationContext
 
     public required IEnumerable<string> CulturesBeingValidated { get; init; }
 
-    public required IEnumerable<string> SegmentsBeingValidated { get; init; }
+    public required IEnumerable<string?> SegmentsBeingValidated { get; init; }
 
     public static PropertyValidationContext Empty() => new()
     {

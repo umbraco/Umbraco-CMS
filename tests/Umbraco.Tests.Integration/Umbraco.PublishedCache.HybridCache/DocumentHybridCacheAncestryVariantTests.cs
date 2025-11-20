@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.PublishedCache.HybridCache;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class DocumentHybridCacheAncestryVariantTests : UmbracoIntegrationTest
+internal sealed class DocumentHybridCacheAncestryVariantTests : UmbracoIntegrationTest
 {
     private string _englishIsoCode = "en-US";
     private string _danishIsoCode = "da-DK";
@@ -57,7 +57,7 @@ public class DocumentHybridCacheAncestryVariantTests : UmbracoIntegrationTest
     public async Task AllCulturesUnpublished(bool preview)
     {
         // Publish branch in all cultures
-        var publishAttempt = await ContentPublishingService.PublishBranchAsync(rootContent.Key, [_englishIsoCode, _danishIsoCode], true, Constants.Security.SuperUserKey);
+        var publishAttempt = await ContentPublishingService.PublishBranchAsync(rootContent.Key, [_englishIsoCode, _danishIsoCode], PublishBranchFilter.IncludeUnpublished, Constants.Security.SuperUserKey, false);
         Assert.IsTrue(publishAttempt.Success);
         Assert.That(publishAttempt.Result.SucceededItems.Count(), Is.EqualTo(3));
 
@@ -80,7 +80,7 @@ public class DocumentHybridCacheAncestryVariantTests : UmbracoIntegrationTest
     [Test]
     public async Task SingleCultureUnpublished()
     {
-        var publishAttempt = await ContentPublishingService.PublishBranchAsync(rootContent.Key, [_englishIsoCode, _danishIsoCode], true, Constants.Security.SuperUserKey);
+        var publishAttempt = await ContentPublishingService.PublishBranchAsync(rootContent.Key, [_englishIsoCode, _danishIsoCode], PublishBranchFilter.All, Constants.Security.SuperUserKey, false);
         Assert.IsTrue(publishAttempt.Success);
         Assert.That(publishAttempt.Result.SucceededItems.Count(), Is.EqualTo(3));
 

@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 [Category("Slow")]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, PublishedRepositoryEvents = true,
     WithApplication = true)]
-public class MemberServiceTests : UmbracoIntegrationTest
+internal sealed class MemberServiceTests : UmbracoIntegrationTest
 {
     private IMemberTypeService MemberTypeService => GetRequiredService<IMemberTypeService>();
 
@@ -68,7 +68,7 @@ public class MemberServiceTests : UmbracoIntegrationTest
     [Test]
     public void Can_Set_Last_Login_Date()
     {
-        var now = DateTime.Now;
+        var now = DateTime.UtcNow;
         var memberType = MemberTypeService.Get("member");
         IMember member = new Member("xname", "xemail", "xusername", "xrawpassword", memberType, true)
         {
@@ -142,7 +142,7 @@ public class MemberServiceTests : UmbracoIntegrationTest
     [Test]
     public void Can_Set_Last_Lockout_Date()
     {
-        var now = DateTime.Now;
+        var now = DateTime.UtcNow;
         var memberType = MemberTypeService.Get("member");
         IMember member =
             new Member("xname", "xemail", "xusername", "xrawpassword", memberType, true) { LastLockoutDate = now };
@@ -161,7 +161,7 @@ public class MemberServiceTests : UmbracoIntegrationTest
     [Test]
     public void Can_set_Last_Login_Date()
     {
-        var now = DateTime.Now;
+        var now = DateTime.UtcNow;
         var memberType = MemberTypeService.Get("member");
         IMember member =
             new Member("xname", "xemail", "xusername", "xrawpassword", memberType, true) { LastLoginDate = now };
@@ -180,7 +180,7 @@ public class MemberServiceTests : UmbracoIntegrationTest
     [Test]
     public void Can_Set_Last_Password_Change_Date()
     {
-        var now = DateTime.Now;
+        var now = DateTime.UtcNow;
         var memberType = MemberTypeService.Get("member");
         IMember member = new Member("xname", "xemail", "xusername", "xrawpassword", memberType, true)
         {

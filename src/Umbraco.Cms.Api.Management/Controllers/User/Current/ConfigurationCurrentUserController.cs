@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -18,10 +18,12 @@ public class ConfigurationCurrentUserController : CurrentUserControllerBase
 
     [MapToApiVersion("1.0")]
     [HttpGet("configuration")]
-    [ProducesResponseType(typeof(CurrenUserConfigurationResponseModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(CurrentUserConfigurationResponseModel), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets the user configuration.")]
+    [EndpointDescription("Gets the configuration settings for users.")]
     public async Task<IActionResult> Configuration(CancellationToken cancellationToken)
     {
-        CurrenUserConfigurationResponseModel model = await _userPresentationFactory.CreateCurrentUserConfigurationModelAsync();
+        CurrentUserConfigurationResponseModel model = await _userPresentationFactory.CreateCurrentUserConfigurationModelAsync();
         return Ok(model);
     }
 }

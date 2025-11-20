@@ -1,30 +1,24 @@
 import type { ManifestCollection } from './extensions/types.js';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
+import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import type { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 
 export type * from './action/create/types.js';
-export type * from './extensions/types.js';
 export type * from './conditions/types.js';
+export type * from './extensions/types.js';
+export type * from './item/types.js';
+export type * from './menu/types.js';
 export type * from './workspace-view/types.js';
-
-/** @deprecated No longer used internally. This will be removed in Umbraco 17. [LK] */
-export interface UmbCollectionBulkActionPermissions {
-	allowBulkCopy: boolean;
-	allowBulkDelete: boolean;
-	allowBulkMove: boolean;
-	allowBulkPublish: boolean;
-	allowBulkUnpublish: boolean;
-}
+export type * from './collection-item-picker-modal/types.js';
 
 export interface UmbCollectionConfiguration {
-	unique?: string;
+	unique?: UmbEntityUnique;
 	dataTypeId?: string;
-	/** @deprecated No longer used internally. This will be removed in Umbraco 17. [LK] */
-	allowedEntityBulkActions?: UmbCollectionBulkActionPermissions;
 	layouts?: Array<UmbCollectionLayoutConfiguration>;
 	orderBy?: string;
 	orderDirection?: string;
 	pageSize?: number;
+	noItemsLabel?: string;
 	userDefinedProperties?: Array<UmbCollectionColumnConfiguration>;
 }
 
@@ -41,6 +35,12 @@ export interface UmbCollectionLayoutConfiguration {
 	name: string;
 	collectionView: string;
 }
+
+export type UmbCollectionSelectionConfiguration = {
+	multiple?: boolean;
+	selectable?: boolean;
+	selection?: Array<string | null>;
+};
 
 export interface UmbCollectionContext {
 	setConfig(config: UmbCollectionConfiguration): void;

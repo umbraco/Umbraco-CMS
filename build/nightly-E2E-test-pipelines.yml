@@ -8,8 +8,25 @@ schedules:
     displayName: Daily midnight build
     branches:
       include:
-        - v14/dev
         - v15/dev
+        - main
+        - v17/dev
+
+parameters:
+  - name: skipIntegrationTests
+    displayName: Skip integration tests
+    type: boolean
+    default: false
+
+  - name: differentAppSettingsAcceptanceTests
+    displayName: Run acceptance tests with different app settings
+    type: boolean
+    default: true
+
+  - name: skipDefaultConfigAcceptanceTests
+    displayName: Skip tests with DefaultConfig
+    type: boolean
+    default: false
 
 variables:
   nodeVersion: 20
@@ -32,25 +49,17 @@ stages:
       - job: A
         displayName: Build Umbraco CMS
         pool:
-          vmImage: 'ubuntu-latest'
+          vmImage: "windows-latest"
         steps:
           - checkout: self
-            fetchDepth: 0
-            submodules: true
+            submodules: false
+            lfs: false,
+            fetchDepth: 500
+          - template: templates/backoffice-install.yml
           - task: UseDotNet@2
             displayName: Use .NET SDK from global.json
             inputs:
               useGlobalJson: true
-          - template: templates/backoffice-install.yml
-          - script: npm run build:for:cms
-            displayName: Run build (Bellissima)
-            workingDirectory: src/Umbraco.Web.UI.Client
-          - script: npm ci --no-fund --no-audit --prefer-offline
-            displayName: Run npm ci (Login)
-            workingDirectory: src/Umbraco.Web.UI.Login
-          - script: npm run build
-            displayName: Run npm build (Login)
-            workingDirectory: src/Umbraco.Web.UI.Login
           - task: DotNetCoreCLI@2
             displayName: Run dotnet restore
             inputs:
@@ -62,7 +71,7 @@ stages:
             inputs:
               command: build
               projects: $(solution)
-              arguments: '--configuration $(buildConfiguration) --no-restore --property:ContinuousIntegrationBuild=true --property:GeneratePackageOnBuild=true --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg'
+              arguments: "--configuration $(buildConfiguration) --no-restore --property:ContinuousIntegrationBuild=true --property:GeneratePackageOnBuild=true --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg"
           - task: PublishPipelineArtifact@1
             displayName: Publish nupkg
             inputs:
@@ -74,8 +83,238 @@ stages:
               targetPath: $(Build.SourcesDirectory)
               artifactName: build_output
 
-  - stage: E2E
-    displayName: E2E Tests
+      - job: B
+        displayName: Build Bellissima Package
+        pool:
+          vmImage: "ubuntu-latest"
+        steps:
+          - checkout: self
+            submodules: false
+            lfs: false,
+            fetchDepth: 500
+          - template: templates/backoffice-install.yml
+          - script: npm run build:for:npm
+            displayName: Run build:for:npm
+            workingDirectory: src/Umbraco.Web.UI.Client
+          - bash: |
+              echo "##[command]Running npm pack"
+              echo "##[debug]Output directory: $(Build.ArtifactStagingDirectory)"
+              mkdir $(Build.ArtifactStagingDirectory)/npm
+              npm pack --pack-destination $(Build.ArtifactStagingDirectory)/npm
+              mv .npmrc $(Build.ArtifactStagingDirectory)/npm/
+            displayName: Run npm pack
+            workingDirectory: src/Umbraco.Web.UI.Client
+          - task: PublishPipelineArtifact@1
+            displayName: Publish Bellissima npm artifact
+            inputs:
+              targetPath: $(Build.ArtifactStagingDirectory)/npm
+              artifactName: npm
+
+  - stage: Integration
+    displayName: Integration Tests
+    dependsOn: Build
+    condition: ${{ eq(parameters.skipIntegrationTests, false) }}
+    jobs:
+      # Integration Tests (SQLite)
+      - job:
+        timeoutInMinutes: 180
+        displayName: Integration Tests (SQLite)
+        strategy:
+          matrix:
+            #            Windows:
+            #              vmImage: 'windows-latest'
+            # We split the tests into 4 parts for each OS to reduce the time it takes to run them on the pipeline
+            LinuxPart1Of4:
+              vmImage: "ubuntu-latest"
+              # Filter tests that are part of the Umbraco.Infrastructure namespace but not part of the Umbraco.Infrastructure.Service namespace
+              testFilter: "(FullyQualifiedName~Umbraco.Infrastructure) & (FullyQualifiedName!~Umbraco.Infrastructure.Service)"
+            LinuxPart2Of4:
+              vmImage: "ubuntu-latest"
+              # Filter tests that are part of the Umbraco.Infrastructure.Service namespace
+              testFilter: "(FullyQualifiedName~Umbraco.Infrastructure.Service)"
+            LinuxPart3Of4:
+              vmImage: "ubuntu-latest"
+              # Filter tests that are not part of the Umbraco.Infrastructure and ManagementApi namespace. So this will run all tests that are not part of the Umbraco.Infrastructure namespace
+              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~ManagementApi)"
+            LinuxPart4Of4:
+              vmImage: "ubuntu-latest"
+              # Filter tests that are part of the ManagementApi namespace
+              testFilter: "(FullyQualifiedName~ManagementApi)"
+            macOSPart1Of4:
+              vmImage: "macOS-latest"
+              # Filter tests that are part of the Umbraco.Infrastructure namespace but not part of the Umbraco.Infrastructure.Service namespace
+              testFilter: "(FullyQualifiedName~Umbraco.Infrastructure) & (FullyQualifiedName!~Umbraco.Infrastructure.Service)"
+            macOSPart2Of4:
+              vmImage: "macOS-latest"
+              # Filter tests that are part of the Umbraco.Infrastructure.Service namespace
+              testFilter: "(FullyQualifiedName~Umbraco.Infrastructure.Service)"
+            macOSPart3Of4:
+              vmImage: "macOS-latest"
+              # Filter tests that are not part of the Umbraco.Infrastructure and ManagementApi namespace.
+              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~ManagementApi)"
+            macOSPart4Of4:
+              vmImage: "macOS-latest"
+              # Filter tests that are part of the ManagementApi namespace.
+              testFilter: "(FullyQualifiedName~ManagementApi)"
+        pool:
+          vmImage: $(vmImage)
+        variables:
+          Tests__Database__DatabaseType: "Sqlite"
+        steps:
+          - checkout: self
+            submodules: false
+            lfs: false,
+            fetchDepth: 1
+            fetchFilter: tree:0
+          # Setup test environment
+          - task: DownloadPipelineArtifact@2
+            displayName: Download build artifacts
+            inputs:
+              artifact: build_output
+              path: $(Build.SourcesDirectory)
+
+          - task: UseDotNet@2
+            displayName: Use .NET SDK from global.json
+            inputs:
+              useGlobalJson: true
+
+          # Test
+          - task: DotNetCoreCLI@2
+            displayName: Run dotnet test
+            inputs:
+              command: test
+              projects: "tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj"
+              testRunTitle: Integration Tests SQLite - $(Agent.OS)
+              arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build'
+
+      # Integration Tests (SQL Server)
+      - job:
+        timeoutInMinutes: 180
+        displayName: Integration Tests (SQL Server)
+        variables:
+          SA_PASSWORD: UmbracoAcceptance123!
+        strategy:
+          matrix:
+            # We split the tests into 4 parts for each OS to reduce the time it takes to run them on the pipeline
+            WindowsPart1Of4:
+              vmImage: "windows-latest"
+              Tests__Database__DatabaseType: LocalDb
+              Tests__Database__SQLServerMasterConnectionString: N/A
+              # Filter tests that are part of the Umbraco.Infrastructure namespace but not part of the Umbraco.Infrastructure.Service namespace
+              testFilter: "(FullyQualifiedName~Umbraco.Infrastructure) & (FullyQualifiedName!~Umbraco.Infrastructure.Service)"
+            WindowsPart2Of4:
+              vmImage: "windows-latest"
+              Tests__Database__DatabaseType: LocalDb
+              Tests__Database__SQLServerMasterConnectionString: N/A
+              # Filter tests that are part of the Umbraco.Infrastructure.Service namespace
+              testFilter: "(FullyQualifiedName~Umbraco.Infrastructure.Service)"
+            WindowsPart3Of4:
+              vmImage: "windows-latest"
+              Tests__Database__DatabaseType: LocalDb
+              Tests__Database__SQLServerMasterConnectionString: N/A
+              # Filter tests that are not part of the Umbraco.Infrastructure and ManagementApi namespace.
+              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~ManagementApi)"
+            WindowsPart4Of4:
+              vmImage: "windows-latest"
+              Tests__Database__DatabaseType: LocalDb
+              Tests__Database__SQLServerMasterConnectionString: N/A
+              # Filter tests that are part of the ManagementApi namespace.
+              testFilter: "(FullyQualifiedName~ManagementApi)"
+            LinuxPart1Of4:
+              vmImage: "ubuntu-latest"
+              Tests__Database__DatabaseType: SqlServer
+              Tests__Database__SQLServerMasterConnectionString: "Server=(local);User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True"
+              # Filter tests that are part of the Umbraco.Infrastructure namespace but not part of the Umbraco.Infrastructure.Service namespace
+              testFilter: "(FullyQualifiedName~Umbraco.Infrastructure) & (FullyQualifiedName!~Umbraco.Infrastructure.Service)"
+            LinuxPart2Of4:
+              vmImage: "ubuntu-latest"
+              Tests__Database__DatabaseType: SqlServer
+              Tests__Database__SQLServerMasterConnectionString: "Server=(local);User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True"
+              # Filter tests that are part of the Umbraco.Infrastructure.Service namespace
+              testFilter: "(FullyQualifiedName~Umbraco.Infrastructure.Service)"
+            LinuxPart3Of4:
+              vmImage: "ubuntu-latest"
+              Tests__Database__DatabaseType: SqlServer
+              Tests__Database__SQLServerMasterConnectionString: "Server=(local);User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True"
+              # Filter tests that are not part of the Umbraco.Infrastructure and ManagementApi namespace.
+              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~ManagementApi)"
+            LinuxPart4Of4:
+              vmImage: "ubuntu-latest"
+              Tests__Database__DatabaseType: SqlServer
+              Tests__Database__SQLServerMasterConnectionString: "Server=(local);User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True"
+              # Filter tests that are part of the ManagementApi namespace.
+              testFilter: "(FullyQualifiedName~ManagementApi)"
+        pool:
+          vmImage: $(vmImage)
+        steps:
+          # Setup test environment
+          - task: DownloadPipelineArtifact@2
+            displayName: Download build artifacts
+            inputs:
+              artifact: build_output
+              path: $(Build.SourcesDirectory)
+
+          - task: UseDotNet@2
+            displayName: Use .NET SDK from global.json
+            inputs:
+              useGlobalJson: true
+
+          # Start SQL Server
+          - powershell: docker run --name mssql -d -p 1433:1433 -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=$(SA_PASSWORD)" mcr.microsoft.com/mssql/server:2022-latest
+            displayName: Start SQL Server Docker image (Linux)
+            condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
+
+          - powershell: |
+              $maxAttempts = 12
+              $attempt = 0
+              $status = ""
+
+              while (($status -ne 'running') -and ($attempt -lt $maxAttempts)) {
+                Start-Sleep -Seconds 5
+                # We use the docker inspect command to check the status of the container. If the container is not running, we wait 5 seconds and try again. And if reaches 12 attempts, we fail the build.
+                $status = docker inspect -f '{{.State.Status}}' mssql
+
+                if ($status -ne 'running') {
+                  Write-Host "Waiting for SQL Server to be ready... Attempt $($attempt + 1)"
+                  $attempt++
+                }
+              }
+
+              if ($status -eq 'running') {
+                Write-Host "SQL Server container is running"
+                docker ps -a
+              } else {
+                Write-Host "SQL Server did not become ready in time. Last known status: $status"
+                docker logs mssql
+                exit 1
+              }
+            displayName: Wait for SQL Server to be ready (Linux)
+            condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
+
+          - pwsh: SqlLocalDB start MSSQLLocalDB
+            displayName: Start SQL Server LocalDB (Windows)
+            condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
+
+          # Test
+          - task: DotNetCoreCLI@2
+            displayName: Run dotnet test
+            inputs:
+              command: test
+              projects: "tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj"
+              testRunTitle: Integration Tests SQL Server - $(Agent.OS)
+              arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build'
+
+          # Stop SQL Server
+          - pwsh: docker stop mssql
+            displayName: Stop SQL Server Docker image (Linux)
+            condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
+
+          - pwsh: SqlLocalDB stop MSSQLLocalDB
+            displayName: Stop SQL Server LocalDB (Windows)
+            condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
+
+  - stage: DefaultConfigE2E
+    displayName: Default Config E2E Tests
     dependsOn: Build
     variables:
       npm_config_cache: $(Pipeline.Workspace)/.npm_e2e
@@ -103,338 +342,357 @@ stages:
       - job:
         displayName: E2E Tests (SQLite)
         timeoutInMinutes: 180
+        condition: ${{ eq(parameters.skipDefaultConfigAcceptanceTests, false) }}
         variables:
           # Connection string
           CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=Umbraco;Mode=Memory;Cache=Shared;Foreign Keys=True;Pooling=True
           CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.Sqlite
+          DatabaseType: SQLite
+          additionalEnvironmentVariables: false
         strategy:
           matrix:
             LinuxPart1Of3:
               vmImage: "ubuntu-latest"
-              testCommand: "npm run test -- --shard=1/3"
+              testFolder: "DefaultConfig"
+              testCommand: "npm run testSqlite -- --shard=1/3"
             LinuxPart2Of3:
               vmImage: "ubuntu-latest"
-              testCommand: "npm run test -- --shard=2/3"
+              testFolder: "DefaultConfig"
+              testCommand: "npm run testSqlite -- --shard=2/3"
             LinuxPart3Of3:
               vmImage: "ubuntu-latest"
-              testCommand: "npm run test -- --shard=3/3"
+              testFolder: "DefaultConfig"
+              testCommand: "npm run testSqlite -- --shard=3/3"
             WindowsPart1Of3:
               vmImage: "windows-latest"
-              testCommand: "npm run test -- --shard=1/3"
+              testFolder: "DefaultConfig"
+              testCommand: "npm run testSqlite -- --shard=1/3"
             WindowsPart2Of3:
               vmImage: "windows-latest"
-              testCommand: "npm run test -- --shard=2/3"
+              testFolder: "DefaultConfig"
+              testCommand: "npm run testSqlite -- --shard=2/3"
             WindowsPart3Of3:
               vmImage: "windows-latest"
-              testCommand: "npm run test -- --shard=3/3"
+              testFolder: "DefaultConfig"
+              testCommand: "npm run testSqlite -- --shard=3/3"
         pool:
           vmImage: $(vmImage)
         steps:
-          # Setup test environment
-          - task: DownloadPipelineArtifact@2
-            displayName: Download NuGet artifacts
-            inputs:
-              artifact: nupkg
-              path: $(Agent.BuildDirectory)/app/nupkg
-
-          - task: NodeTool@0
-            displayName: Use Node.js $(nodeVersion)
-            retryCountOnTaskFailure: 3
-            inputs:
-              versionSpec: $(nodeVersion)
-
-          - task: UseDotNet@2
-            displayName: Use .NET SDK from global.json
-            inputs:
-              useGlobalJson: true
+          # Setup test environment Template
+          - template: nightly-E2E-setup-template.yml
+            parameters:
+              nodeVersion: ${{ variables.nodeVersion }}
+              PlaywrightUserEmail: ${{ variables.UMBRACO__CMS__UNATTENDED__UNATTENDEDUSEREMAIL }}
+              PlaywrightPassword: ${{ variables.UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD }}
+              ASPNETCORE_URLS: ${{ variables.ASPNETCORE_URLS }}
+              npm_config_cache: ${{ variables.npm_config_cache }}
 
           - pwsh: |
-              "UMBRACO_USER_LOGIN=$(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSEREMAIL)
-              UMBRACO_USER_PASSWORD=$(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
-              URL=$(ASPNETCORE_URLS)
-              STORAGE_STAGE_PATH=$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/playwright/.auth/user.json" | Out-File .env
-            displayName: Generate .env
-            workingDirectory: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest
-
-          # Cache and restore NPM packages
-          - task: Cache@2
-            displayName: Cache NPM packages
-            inputs:
-              key: 'npm_e2e | "$(Agent.OS)" | $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/package-lock.json'
-              restoreKeys: |
-                npm_e2e | "$(Agent.OS)"
-                npm_e2e
-              path: $(npm_config_cache)
-
-          - script: npm ci --no-fund --no-audit --prefer-offline
-            workingDirectory: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest
-            displayName: Restore NPM packages
-
-          # Build application
-          - pwsh: |
-              $cmsVersion = "$(Build.BuildNumber)" -replace "\+",".g"
-              dotnet new nugetconfig
-              dotnet nuget add source ./nupkg --name Local
-              dotnet new install Umbraco.Templates::$cmsVersion
-              dotnet new umbraco --name UmbracoProject --version $cmsVersion --exclude-gitignore --no-restore --no-update-check
               dotnet restore UmbracoProject
               cp $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest.UmbracoProject/*.cs UmbracoProject
-              dotnet build UmbracoProject --configuration $(buildConfiguration) --no-restore
+            displayName: Restore project
+            workingDirectory: $(Agent.BuildDirectory)/app
+
+          - pwsh: |
+              dotnet build UmbracoProject --configuration ${{ variables.buildConfiguration }} --no-restore
               dotnet dev-certs https
             displayName: Build application
             workingDirectory: $(Agent.BuildDirectory)/app
+            condition: succeeded()
 
-          # Run application
-          - bash: |
-              nohup dotnet run --project UmbracoProject --configuration $(buildConfiguration) --no-build --no-launch-profile > $(Build.ArtifactStagingDirectory)/playwright.log 2>&1 &
-              echo "##vso[task.setvariable variable=AcceptanceTestProcessId]$!"
-            displayName: Run application (Linux)
-            condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
-            workingDirectory: $(Agent.BuildDirectory)/app
+          # Run application Template
+          - template: nightly-E2E-run-application-template.yml
+            parameters:
+              DatabaseType: ${{ variables.DatabaseType }}
+              buildConfiguration: ${{ variables.buildConfiguration }}
+              additionalEnvironmentVariables: ${{ variables.additionalEnvironmentVariables }}
 
-          - pwsh: |
-              $process = Start-Process dotnet "run --project UmbracoProject --configuration $(buildConfiguration) --no-build --no-launch-profile 2>&1" -PassThru -NoNewWindow -RedirectStandardOutput $(Build.ArtifactStagingDirectory)/playwright.log
-              Write-Host "##vso[task.setvariable variable=AcceptanceTestProcessId]$($process.Id)"
-            displayName: Run application (Windows)
-            condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
-            workingDirectory: $(Agent.BuildDirectory)/app
-
-          # Ensures we have the package wait-on installed
-          - pwsh: npm install wait-on
-            displayName: Install wait-on package
-
-          # Wait for application to start responding to requests
-          - pwsh: npx wait-on -v --interval 1000 --timeout 120000 $(ASPNETCORE_URLS)
-            displayName: Wait for application
-            workingDirectory: tests/Umbraco.Tests.AcceptanceTest
-
-          # Install Playwright and dependencies
-          - pwsh: npx playwright install --with-deps
-            displayName: Install Playwright
-            workingDirectory: tests/Umbraco.Tests.AcceptanceTest
-
-          # Test
-          - pwsh: $(testCommand)
-            displayName: Run Playwright tests
-            continueOnError: true
-            workingDirectory: tests/Umbraco.Tests.AcceptanceTest
-            env:
-              CI: true
-              CommitId: $(Build.SourceVersion)
-              AgentOs: $(Agent.OS)
-
-          # Stop application
-          - bash: kill -15 $(AcceptanceTestProcessId)
-            displayName: Stop application (Linux)
-            condition: and(succeeded(), ne(variables.AcceptanceTestProcessId, ''), eq(variables['Agent.OS'], 'Linux'))
-
-          - pwsh: Stop-Process -Id $(AcceptanceTestProcessId)
-            displayName: Stop application (Windows)
-            condition: and(succeeded(), ne(variables.AcceptanceTestProcessId, ''), eq(variables['Agent.OS'], 'Windows_NT'))
-
-          # Copy artifacts
-          - pwsh: |
-              if (Test-Path tests/Umbraco.Tests.AcceptanceTest/results/*) {
-                Copy-Item tests/Umbraco.Tests.AcceptanceTest/results/* $(Build.ArtifactStagingDirectory) -Recurse
-              }
-            displayName: Copy Playwright results
-            condition: succeededOrFailed()
-
-          # Publish
-          - task: PublishPipelineArtifact@1
-            displayName: Publish test artifacts
-            condition: succeededOrFailed()
-            inputs:
-              targetPath: $(Build.ArtifactStagingDirectory)
-              artifact: "Acceptance Test Results - $(Agent.JobName) - Attempt #$(System.JobAttempt)"
-
-          # Publish test results
-          - task: PublishTestResults@2
-            displayName: "Publish test results"
-            condition: succeededOrFailed()
-            inputs:
-              testResultsFormat: 'JUnit'
-              testResultsFiles: '*.xml'
-              searchFolder: "tests/Umbraco.Tests.AcceptanceTest/results"
-              testRunTitle: "$(Agent.JobName)"
+          # Run tests Template
+          - template: nightly-E2E-run-tests-template.yml
+            parameters:
+              testCommand: $(testCommand)
+              ASPNETCORE_URLS: ${{ variables.ASPNETCORE_URLS }}
+              DatabaseType: ${{ variables.DatabaseType }}
 
       - job:
         displayName: E2E Tests (SQL Server)
         timeoutInMinutes: 180
+        condition: ${{ eq(parameters.skipDefaultConfigAcceptanceTests, false) }}
         variables:
           # Connection string
           CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=(localdb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Umbraco.mdf;Integrated Security=True
           CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
+          DatabaseType: SQLServer
+          SA_PASSWORD: UmbracoAcceptance123!
+          additionalEnvironmentVariables: false
         strategy:
           matrix:
             LinuxPart1Of3:
-              testCommand: "npm run testSqlite -- --shard=1/3"
+              testCommand: "npm run test -- --shard=1/3"
+              testFolder: "DefaultConfig"
               vmImage: "ubuntu-latest"
-              SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
-              CONNECTIONSTRINGS__UMBRACODBDSN: "Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
+              CONNECTIONSTRINGS__UMBRACODBDSN: "Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True"
             LinuxPart2Of3:
-              testCommand: "npm run testSqlite -- --shard=2/3"
+              testCommand: "npm run test -- --shard=2/3"
+              testFolder: "DefaultConfig"
               vmImage: "ubuntu-latest"
-              SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
-              CONNECTIONSTRINGS__UMBRACODBDSN: "Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
+              CONNECTIONSTRINGS__UMBRACODBDSN: "Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True"
             LinuxPart3Of3:
-              testCommand: "npm run testSqlite -- --shard=3/3"
+              testCommand: "npm run test -- --shard=3/3"
+              testFolder: "DefaultConfig"
               vmImage: "ubuntu-latest"
-              SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
-              CONNECTIONSTRINGS__UMBRACODBDSN: "Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
+              CONNECTIONSTRINGS__UMBRACODBDSN: "Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True"
             WindowsPart1Of3:
+              testCommand: "npm run test -- --shard=1/3"
+              testFolder: "DefaultConfig"
               vmImage: "windows-latest"
-              testCommand: "npm run testSqlite -- --shard=1/3"
             WindowsPart2Of3:
+              testCommand: "npm run test -- --shard=2/3"
+              testFolder: "DefaultConfig"
               vmImage: "windows-latest"
-              testCommand: "npm run testSqlite -- --shard=2/3"
             WindowsPart3Of3:
+              testCommand: "npm run test -- --shard=3/3"
+              testFolder: "DefaultConfig"
               vmImage: "windows-latest"
-              testCommand: "npm run testSqlite -- --shard=3/3"
         pool:
           vmImage: $(vmImage)
         steps:
-          # Setup test environment
-          - task: DownloadPipelineArtifact@2
-            displayName: Download NuGet artifacts
-            inputs:
-              artifact: nupkg
-              path: $(Agent.BuildDirectory)/app/nupkg
-
-          - task: NodeTool@0
-            displayName: Use Node.js $(nodeVersion)
-            inputs:
-              versionSpec: $(nodeVersion)
-
-          - task: UseDotNet@2
-            displayName: Use .NET SDK from global.json
-            inputs:
-              useGlobalJson: true
+          # Setup test environment Template
+          - template: nightly-E2E-setup-template.yml
+            parameters:
+              nodeVersion: ${{ variables.nodeVersion }}
+              PlaywrightUserEmail: ${{ variables.UMBRACO__CMS__UNATTENDED__UNATTENDEDUSEREMAIL }}
+              PlaywrightPassword: ${{ variables.UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD }}
+              ASPNETCORE_URLS: ${{ variables.ASPNETCORE_URLS }}
+              npm_config_cache: ${{ variables.npm_config_cache }}
 
           - pwsh: |
-              "UMBRACO_USER_LOGIN=$(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSEREMAIL)
-              UMBRACO_USER_PASSWORD=$(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
-              URL=$(ASPNETCORE_URLS)
-              STORAGE_STAGE_PATH=$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/playwright/.auth/user.json" | Out-File .env
-            displayName: Generate .env
-            workingDirectory: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest
-
-          # Cache and restore NPM packages
-          - task: Cache@2
-            displayName: Cache NPM packages
-            inputs:
-              key: 'npm_e2e | "$(Agent.OS)" | $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/package-lock.json'
-              restoreKeys: |
-                npm_e2e | "$(Agent.OS)"
-                npm_e2e
-              path: $(npm_config_cache)
-
-          - script: npm ci --no-fund --no-audit --prefer-offline
-            workingDirectory: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest
-            displayName: Restore NPM packages
-
-          # Build application
-          - pwsh: |
-              $cmsVersion = "$(Build.BuildNumber)" -replace "\+",".g"
-              dotnet new nugetconfig
-              dotnet nuget add source ./nupkg --name Local
-              dotnet new install Umbraco.Templates::$cmsVersion
-              dotnet new umbraco --name UmbracoProject --version $cmsVersion --exclude-gitignore --no-restore --no-update-check
               dotnet restore UmbracoProject
               cp $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest.UmbracoProject/*.cs UmbracoProject
-              dotnet build UmbracoProject --configuration $(buildConfiguration) --no-restore
+            displayName: Restore project
+            workingDirectory: $(Agent.BuildDirectory)/app
+
+          - pwsh: |
+              dotnet build UmbracoProject --configuration ${{ variables.buildConfiguration }} --no-restore
               dotnet dev-certs https
             displayName: Build application
             workingDirectory: $(Agent.BuildDirectory)/app
+            condition: succeeded()
 
-          # Start SQL Server
-          - powershell: docker run --name mssql -d -p 1433:1433 -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=$(SA_PASSWORD)" mcr.microsoft.com/mssql/server:2022-latest
-            displayName: Start SQL Server Docker image (Linux)
-            condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
+          # Run application Template
+          - template: nightly-E2E-run-application-template.yml
+            parameters:
+              SA_PASSWORD: ${{ variables.SA_PASSWORD }}
+              buildConfiguration: ${{ variables.buildConfiguration }}
+              DatabaseType: ${{ variables.DatabaseType }}
+              additionalEnvironmentVariables: ${{ variables.additionalEnvironmentVariables }}
 
-          - pwsh: SqlLocalDB start MSSQLLocalDB
-            displayName: Start SQL Server LocalDB (Windows)
-            condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
+          # Run tests Template
+          - template: nightly-E2E-run-tests-template.yml
+            parameters:
+              testCommand: $(testCommand)
+              ASPNETCORE_URLS: ${{ variables.ASPNETCORE_URLS }}
+              DatabaseType: ${{ variables.DatabaseType }}
 
-          # Run application
+  - stage: AdditionalConfigE2E
+    displayName: Additional Config E2E Tests
+    dependsOn: Build
+    variables:
+      npm_config_cache: $(Pipeline.Workspace)/.npm_e2e
+      ASPNETCORE_URLS: https://localhost:44331
+      PlaywrightPassword: UmbracoAcceptance123!
+      PlaywrightUserEmail: playwright@umbraco.com
+    jobs:
+      - job:
+        displayName: E2E Tests with Different App settings (SQL Server)
+        condition: ${{ eq(parameters.differentAppSettingsAcceptanceTests, true) }}
+        timeoutInMinutes: 180
+        variables:
+          SA_PASSWORD: UmbracoAcceptance123!
+          DatabaseType: SQLServer
+        strategy:
+          matrix:
+            # UnattendedInstallConfig
+            WindowsUnattendedInstallConfig:
+              vmImage: "windows-latest"
+              testFolder: "UnattendedInstallConfig"
+              testCommand: "npx playwright test --project=unattendedInstallConfig --grep=InstallSQLServer"
+              port: 44331
+              additionalEnvironmentVariables: false
+            # DeliveryApiConfig
+            WindowsDeliveryApiConfig:
+              vmImage: "windows-latest"
+              testFolder: "DeliveryApi"
+              port: ''
+              testCommand: "npx playwright test --project=deliveryApi"
+              CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=(localdb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Umbraco.mdf;Integrated Security=True
+              CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
+              additionalEnvironmentVariables: false
+            LinuxDeliveryApiConfig:
+              vmImage: "ubuntu-latest"
+              testFolder: "DeliveryApi"
+              port: ''
+              testCommand: "npx playwright test --project=deliveryApi"
+              CONNECTIONSTRINGS__UMBRACODBDSN: Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True
+              CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
+              additionalEnvironmentVariables: false
+            # ExternalLogin AzureADB2C
+            WindowsExternalLoginAzureADB2C:
+              vmImage: "windows-latest"
+              testFolder: "ExternalLogin\\AzureADB2C"
+              testCommand: "npx playwright test --project=externalLoginAzureADB2C"
+              port: 44331
+              packageName: "Microsoft.AspNetCore.Authentication.OpenIdConnect"
+              packageVersion: "9.0.8"
+              CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=(localdb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Umbraco.mdf;Integrated Security=True
+              CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
+              additionalEnvironmentVariables: true
+            # ExtensionRegistry
+            WindowsExtensionRegistry:
+              vmImage: "windows-latest"
+              testFolder: "ExtensionRegistry"
+              port: ''
+              testCommand: "npx playwright test --project=extensionRegistry"
+              CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=(localdb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Umbraco.mdf;Integrated Security=True
+              CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
+              additionalEnvironmentVariables: false
+            LinuxExtensionRegistry:
+              vmImage: "ubuntu-latest"
+              testFolder: "ExtensionRegistry"
+              port: ''
+              testCommand: "npx playwright test --project=extensionRegistry"
+              CONNECTIONSTRINGS__UMBRACODBDSN: Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True
+              CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
+              additionalEnvironmentVariables: false
+        pool:
+          vmImage: $(vmImage)
+        steps:
+          # Setup test environment Template
+          - template: nightly-E2E-setup-template.yml
+            parameters:
+              nodeVersion: ${{ variables.nodeVersion }}
+              PlaywrightUserEmail: ${{ variables.PlaywrightUserEmail }}
+              PlaywrightPassword: ${{ variables.PlaywrightPassword }}
+              ASPNETCORE_URLS: ${{ variables.ASPNETCORE_URLS }}
+              npm_config_cache: ${{ variables.npm_config_cache }}
+
+          # Install NuGet package if specified in the matrix
+          - pwsh: |
+              Write-Host "Installing package $(packageName) version $(packageVersion)"
+              dotnet add package $(packageName) --version $(packageVersion)
+            displayName: "Install NuGet package: $(packageName)"
+            workingDirectory: $(Agent.BuildDirectory)/app/UmbracoProject
+            condition: and(succeeded(), ne(variables['packageName'], ''), ne(variables['packageVersion'], ''))
+
+          # Build application Template
+          - template: nightly-E2E-build-template.yml
+            parameters:
+              testFolder: $(testFolder)
+              buildConfiguration: ${{ variables.buildConfiguration }}
+              additionalEnvironmentVariables: $(additionalEnvironmentVariables)
+
+          # Build application for AzureADB2C
+          - pwsh: |
+              dotnet build UmbracoProject --configuration ${{ variables.buildConfiguration }} --no-restore
+              dotnet dev-certs https
+            displayName: Build application for AzureADB2C
+            workingDirectory: $(Agent.BuildDirectory)/app
+            env:
+              AZUREADB2CDOMAIN: $(AZUREB2CDOMAIN)
+              AZUREADB2CTENANT: $(AZUREB2CTENANT)
+              AZUREADB2CPOLICY: $(AZUREB2CPOLICY)
+              AZUREADB2CCLIENTID: $(AZUREB2CCLIENTID)
+              AZUREADB2CCLIENTSECRET: $(AZUREB2CCLIENTSECRET)
+            condition: and(succeeded(), eq(variables['testFolder'], 'ExternalLogin\AzureADB2C'))
+
+          # Run application Template
+          - template: nightly-E2E-run-application-template.yml
+            parameters:
+              SA_PASSWORD: ${{ variables.SA_PASSWORD }}
+              additionalEnvironmentVariables: $(additionalEnvironmentVariables)
+              buildConfiguration: ${{ variables.buildConfiguration }}
+              DatabaseType: ${{ variables.DatabaseType }}
+
+          # Run application for Linux with additional Environment Variables for Azure AD
           - bash: |
-              nohup dotnet run --project UmbracoProject --configuration $(buildConfiguration) --no-build --no-launch-profile > $(Build.ArtifactStagingDirectory)/playwright.log 2>&1 &
+              nohup dotnet run --project UmbracoProject --configuration ${{ variables.buildConfiguration }} --no-build --no-launch-profile > $(Build.ArtifactStagingDirectory)/playwright.log 2>&1 &
               echo "##vso[task.setvariable variable=AcceptanceTestProcessId]$!"
             displayName: Run application (Linux)
-            condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
+            condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'), eq(variables['testFolder'], 'ExternalLogin\AzureADB2C'))
             workingDirectory: $(Agent.BuildDirectory)/app
+            env:
+              AZUREADB2CDOMAIN: $(AZUREB2CDOMAIN)
+              AZUREADB2CTENANT: $(AZUREB2CTENANT)
+              AZUREADB2CPOLICY: $(AZUREB2CPOLICY)
+              AZUREADB2CCLIENTID: $(AZUREB2CCLIENTID)
+              AZUREADB2CCLIENTSECRET: $(AZUREB2CCLIENTSECRET)
 
+          # Run application for Windows with additional Environment Variables for Azure AD
           - pwsh: |
-              $process = Start-Process dotnet "run --project UmbracoProject --configuration $(buildConfiguration) --no-build --no-launch-profile 2>&1" -PassThru -NoNewWindow -RedirectStandardOutput $(Build.ArtifactStagingDirectory)/playwright.log
+              $process = Start-Process dotnet "run --project UmbracoProject --configuration ${{ variables.buildConfiguration }} --no-build --no-launch-profile 2>&1" -PassThru -NoNewWindow -RedirectStandardOutput $(Build.ArtifactStagingDirectory)/playwright.log
               Write-Host "##vso[task.setvariable variable=AcceptanceTestProcessId]$($process.Id)"
             displayName: Run application (Windows)
-            condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
+            condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'), eq(variables['testFolder'], 'ExternalLogin\AzureADB2C'))
             workingDirectory: $(Agent.BuildDirectory)/app
-
-          # Ensures we have the package wait-on installed
-          - pwsh: npm install wait-on
-            displayName: Install wait-on package
-
-          # Wait for application to start responding to requests
-          - pwsh: npx wait-on -v --interval 1000 --timeout 120000 $(ASPNETCORE_URLS)
-            displayName: Wait for application
-            workingDirectory: tests/Umbraco.Tests.AcceptanceTest
-
-          # Install Playwright and dependencies
-          - pwsh: npx playwright install --with-deps
-            displayName: Install Playwright
-            workingDirectory: tests/Umbraco.Tests.AcceptanceTest
-
-          # Test
-          - pwsh: $(testCommand)
-            displayName: Run Playwright tests
-            continueOnError: true
-            workingDirectory: tests/Umbraco.Tests.AcceptanceTest
             env:
-              CI: true
-              CommitId: $(Build.SourceVersion)
-              AgentOs: $(Agent.OS)
+              AZUREADB2CDOMAIN: $(AZUREB2CDOMAIN)
+              AZUREADB2CTENANT: $(AZUREB2CTENANT)
+              AZUREADB2CPOLICY: $(AZUREB2CPOLICY)
+              AZUREADB2CCLIENTID: $(AZUREB2CCLIENTID)
+              AZUREADB2CCLIENTSECRET: $(AZUREB2CCLIENTSECRET)
 
-          # Stop application
-          - bash: kill -15 $(AcceptanceTestProcessId)
-            displayName: Stop application (Linux)
-            condition: and(succeeded(), ne(variables.AcceptanceTestProcessId, ''), eq(variables['Agent.OS'], 'Linux'))
+          # Run tests Template
+          - template: nightly-E2E-run-tests-template.yml
+            parameters:
+              testCommand: $(testCommand)
+              ASPNETCORE_URLS: ${{ variables.ASPNETCORE_URLS }}
+              port: $(port)
+              AZUREB2CTESTUSEREMAIL: $(AZUREB2CTESTUSEREMAIL)
+              AZUREB2CTESTUSERPASSWORD: $(AZUREB2CTESTUSERPASSWORD)
+              DatabaseType: ${{ variables.DatabaseType }}
 
-          - pwsh: Stop-Process -Id $(AcceptanceTestProcessId)
-            displayName: Stop application (Windows)
-            condition: and(succeeded(), ne(variables.AcceptanceTestProcessId, ''), eq(variables['Agent.OS'], 'Windows_NT'))
+  - stage: NotifySlackBot
+    displayName: Notify Slack on Failure
+    dependsOn: DefaultConfigE2E
+    # This stage will only run if the E2E tests fail or succeed with issues
+    condition: or(eq(dependencies.DefaultConfigE2E.result, 'failed'), eq(dependencies.DefaultConfigE2E.result, 'succeededWithIssues'))
+    jobs:
+      - job: PostToSlack
+        displayName: Send Slack Notification
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          # We send a payload to the Slack webhook URL, which will post a message to a specific channel
+          - bash: |
+              PROJECT_NAME_ENCODED=$(echo -n "$SYSTEM_TEAMPROJECT" | jq -s -R -r @uri)
+              PIPELINE_URL="${SYSTEM_TEAMFOUNDATIONCOLLECTIONURI}${PROJECT_NAME_ENCODED}/_build/results?buildId=${BUILD_BUILDID}&view=ms.vss-test-web.build-test-results-tab"
 
-          # Stop SQL Server
-          - pwsh: docker stop mssql
-            displayName: Stop SQL Server Docker image (Linux)
-            condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
+              PAYLOAD="{
+                \"attachments\": [
+                  {
+                    \"color\": \"#ff0000\",
+                    \"pretext\": \"Nightly E2E pipeline *${BUILD_DEFINITIONNAME}* (#${BUILD_BUILDNUMBER}) failed!\",
+                    \"title\": \"View Failed E2E Test Results\",
+                    \"title_link\": \"$PIPELINE_URL\",
+                    \"fields\": [
+                      {
+                        \"title\": \"Pipeline\",
+                        \"value\": \"${BUILD_DEFINITIONNAME}\",
+                        \"short\": true
+                      },
+                      {
+                        \"title\": \"Build ID\",
+                        \"value\": \"${BUILD_BUILDID}\",
+                        \"short\": true
+                      }
+                    ]
+                  }
+                ]
+              }"
 
-          - pwsh: SqlLocalDB stop MSSQLLocalDB
-            displayName: Stop SQL Server LocalDB (Windows)
-            condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
-
-          # Copy artifacts
-          - pwsh: |
-              if (Test-Path tests/Umbraco.Tests.AcceptanceTest/results/*) {
-                Copy-Item tests/Umbraco.Tests.AcceptanceTest/results/* $(Build.ArtifactStagingDirectory) -Recurse
-              }
-            displayName: Copy Playwright results
-            condition: succeededOrFailed()
-
-          # Publish
-          - task: PublishPipelineArtifact@1
-            displayName: Publish test artifacts
-            condition: succeededOrFailed()
-            inputs:
-              targetPath: $(Build.ArtifactStagingDirectory)
-              artifact: "Acceptance Test Results - $(Agent.JobName) - Attempt #$(System.JobAttempt)"
-          
-          # Publish test results
-          - task: PublishTestResults@2
-            displayName: "Publish test results"
-            condition: succeededOrFailed()
-            inputs:
-              testResultsFormat: 'JUnit'
-              testResultsFiles: '*.xml'
-              searchFolder: "tests/Umbraco.Tests.AcceptanceTest/results"
-              testRunTitle: "$(Agent.JobName)"
+              echo "Sending Slack message to: $PIPELINE_URL"
+              curl -X POST -H 'Content-type: application/json' \
+                --data "$PAYLOAD" \
+                "$SLACK_WEBHOOK_URL"
+            env:
+              SLACK_WEBHOOK_URL: $(E2ESLACKWEBHOOKURL)

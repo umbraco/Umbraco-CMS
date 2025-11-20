@@ -25,6 +25,8 @@ public class MoveDocumentTypeController : DocumentTypeControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Moves a document type.")]
+    [EndpointDescription("Moves a document type identified by the provided Id to a different location.")]
     public async Task<IActionResult> Move(
         CancellationToken cancellationToken,
         Guid id,

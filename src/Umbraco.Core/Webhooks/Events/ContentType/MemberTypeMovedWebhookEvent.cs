@@ -20,6 +20,10 @@ public class MemberTypeMovedWebhookEvent : WebhookEventBase<MemberTypeMovedNotif
 
     public override string Alias => Constants.WebhookEvents.Aliases.MemberTypeMoved;
 
-    public override object? ConvertNotificationToRequestPayload(MemberTypeMovedNotification notification)
-        => notification.MoveInfoCollection;
+    public override object ConvertNotificationToRequestPayload(MemberTypeMovedNotification notification)
+        => notification.MoveInfoCollection.Select(moveEvent => new
+        {
+            Id = moveEvent.Entity.Key,
+            NewParentId = moveEvent.NewParentKey,
+        });
 }

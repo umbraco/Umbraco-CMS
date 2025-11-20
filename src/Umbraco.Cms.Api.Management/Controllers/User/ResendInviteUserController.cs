@@ -31,6 +31,8 @@ public class ResendInviteUserController : UserControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Resends a user invitation.")]
+    [EndpointDescription("Resends the invitation email for the users identified by the provided Ids.")]
     public async Task<IActionResult> ResendInvite(
         CancellationToken cancellationToken,
         ResendInviteUserRequestModel model)

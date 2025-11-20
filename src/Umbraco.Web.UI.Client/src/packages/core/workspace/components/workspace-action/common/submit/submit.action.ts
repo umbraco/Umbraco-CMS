@@ -51,8 +51,3 @@ export class UmbSubmitWorkspaceAction<
 		return await this._workspaceContext!.requestSubmit();
 	}
 }
-
-/*
- * @deprecated Use UmbSubmitWorkspaceAction instead
- */
-export { UmbSubmitWorkspaceAction as UmbSaveWorkspaceAction };

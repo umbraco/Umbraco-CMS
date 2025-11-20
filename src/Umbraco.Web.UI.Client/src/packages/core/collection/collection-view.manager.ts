@@ -94,18 +94,19 @@ export class UmbCollectionViewManager extends UmbControllerBase {
 
 			if (routes.length > 0) {
 				routes.push({
+					unique: fallbackView.alias,
 					path: '',
 					component: () => createExtensionElement(fallbackView),
 					setup: () => {
 						this.setCurrentView(fallbackView);
 					},
 				});
-			}
 
-			routes.push({
-				path: `**`,
-				component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
-			});
+				routes.push({
+					path: `**`,
+					component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
+				});
+			}
 		}
 
 		this.#routes.setValue(routes);

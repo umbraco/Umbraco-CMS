@@ -101,8 +101,15 @@ public sealed class JsonObjectConverter : JsonConverter<object>
             JsonTokenType.Number when reader.TryGetInt32(out int i) => i,
             JsonTokenType.Number when reader.TryGetInt64(out long l) => l,
             JsonTokenType.Number => reader.GetDouble(),
-            JsonTokenType.String when reader.TryGetDateTimeOffset(out DateTimeOffset datetime) => datetime,
-            JsonTokenType.String when reader.TryGetDateTime(out DateTime datetime) => datetime,
+
+            // DateTime and DateTimeOffset are not handled here, as in doing so we would convert strings that look like dates into dates,
+            // which, if coming fron a content property based on a text string property editor, isn't what we want.
+            // The date picker property editors work with strings, so this is fine.
+            // Testing also suggests other dates like for content content schedules aren't affected.
+            // See:
+            // - https://github.com/umbraco/Umbraco-CMS/issues/19360
+            // - https://github.com/umbraco/Umbraco-CMS/pull/19807
+
             JsonTokenType.String => reader.GetString(),
             _ => JsonDocument.ParseValue(ref reader).RootElement.Clone()
         };

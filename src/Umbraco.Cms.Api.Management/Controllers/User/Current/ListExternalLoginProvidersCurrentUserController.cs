@@ -31,6 +31,8 @@ public class ListExternalLoginProvidersCurrentUserController : CurrentUserContro
     [MapToApiVersion("1.0")]
     [HttpGet("login-providers")]
     [ProducesResponseType(typeof(IEnumerable<UserExternalLoginProviderModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Lists external login providers.")]
+    [EndpointDescription("Gets a list of configured external login providers for authentication.")]
     public async Task<IActionResult> ListTwoFactorProvidersForCurrentUser(CancellationToken cancellationToken)
     {
         Guid userKey = CurrentUserKey(_backOfficeSecurityAccessor);

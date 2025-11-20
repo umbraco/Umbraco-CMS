@@ -33,7 +33,7 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 	private _isDraggingGridHandle = false;
 
 	@state()
-	private coords = { x: 0, y: 0 };
+	private _coords = { x: 0, y: 0 };
 
 	@property({ attribute: false })
 	set focalPoint(value) {
@@ -107,18 +107,9 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 		}
 	}
 
-	#coordsToFactor(x: number, y: number) {
-		const top = (y / 100 / y) * 50;
-		const left = (x / 100 / x) * 50;
-
-		return { top, left };
-	}
-
 	#setFocalPoint(x: number, y: number, width: number, height: number) {
 		const left = clamp(x / width, 0, 1);
 		const top = clamp(y / height, 0, 1);
-
-		this.#coordsToFactor(x, y);
 
 		const focalPoint = { left, top } as UmbFocalPointModel;
 
@@ -142,8 +133,8 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 		if (!this.imageElement) return;
 
 		// Init x and y coords from half of rendered image size, which is equavalient to focal point { left: 0.5, top: 0.5 }.
-		this.coords.x = this.imageElement?.clientWidth / 2;
-		this.coords.y = this.imageElement.clientHeight / 2;
+		this._coords.x = this.imageElement?.clientWidth / 2;
+		this._coords.y = this.imageElement.clientHeight / 2;
 	}
 
 	#handleGridDrag(event: PointerEvent) {
@@ -171,8 +162,8 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 				// check if coordinates are not NaN (can happen when dragging outside of the grid)
 				if (isNaN(x) || isNaN(y)) return;
 
-				this.coords.x = x;
-				this.coords.y = y;
+				this._coords.x = x;
+				this._coords.y = y;
 
 				this.#setFocalPoint(x, y, width, height);
 			},
@@ -218,26 +209,26 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 
 		if (event.key === 'ArrowLeft') {
 			event.preventDefault();
-			this.coords.x = clamp(this.coords.x - increment, 0, width);
-			this.#setFocalPoint(this.coords.x, this.coords.y, width, height);
+			this._coords.x = clamp(this._coords.x - increment, 0, width);
+			this.#setFocalPoint(this._coords.x, this._coords.y, width, height);
 		}
 
 		if (event.key === 'ArrowRight') {
 			event.preventDefault();
-			this.coords.x = clamp(this.coords.x + increment, 0, width);
-			this.#setFocalPoint(this.coords.x, this.coords.y, width, height);
+			this._coords.x = clamp(this._coords.x + increment, 0, width);
+			this.#setFocalPoint(this._coords.x, this._coords.y, width, height);
 		}
 
 		if (event.key === 'ArrowUp') {
 			event.preventDefault();
-			this.coords.y = clamp(this.coords.y - increment, 0, height);
-			this.#setFocalPoint(this.coords.x, this.coords.y, width, height);
+			this._coords.y = clamp(this._coords.y - increment, 0, height);
+			this.#setFocalPoint(this._coords.x, this._coords.y, width, height);
 		}
 
 		if (event.key === 'ArrowDown') {
 			event.preventDefault();
-			this.coords.y = clamp(this.coords.y + increment, 0, height);
-			this.#setFocalPoint(this.coords.x, this.coords.y, width, height);
+			this._coords.y = clamp(this._coords.y + increment, 0, height);
+			this.#setFocalPoint(this._coords.x, this._coords.y, width, height);
 		}
 	}
 
@@ -252,12 +243,9 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 				<img id="image" @keydown=${() => nothing} src=${this.src} alt="" />
 				<span
 					id="focal-point"
-					class=${classMap({
-						'focal-point--dragging': this._isDraggingGridHandle,
-						hidden: this.hideFocalPoint,
-					})}
+					class=${classMap({ 'focal-point--dragging': this._isDraggingGridHandle, hidden: this.hideFocalPoint })}
 					tabindex=${ifDefined(this.disabled ? undefined : '0')}
-					aria-label="${this.localize.term('general_focalPoint')}"
+					aria-label=${this.localize.term('general_focalPoint')}
 					@keydown=${this.#handleGridKeyDown}>
 				</span>
 			</div>
@@ -298,11 +286,12 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 			width: calc(2 * var(--dot-radius));
 			height: calc(2 * var(--dot-radius));
 			top: 0;
-			box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);
+			box-shadow:
+				rgba(0, 0, 0, 0.25) 0px 0px 0px 1px,
+				inset rgba(0, 0, 0, 0.25) 0px 0px 0px 1px;
 			border: solid 2px white;
 			border-radius: 50%;
 			pointer-events: none;
-			background-color: var(--uui-palette-spanish-pink-light);
 			transition: 150ms transform;
 			box-sizing: inherit;
 		}

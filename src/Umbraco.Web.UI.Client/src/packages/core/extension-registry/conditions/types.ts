@@ -3,11 +3,6 @@ import type { UmbConditionConfigBase } from '@umbraco-cms/backoffice/extension-a
 
 export type UmbCoreConditionConfigs = SwitchConditionConfig | UmbConditionConfigBase;
 
-/**
- * @deprecated instead use global UmbExtensionConditionConfig
- */
-export type ConditionTypes = UmbCoreConditionConfigs;
-
 type UnionOfProperties<T> = T extends object ? T[keyof T] : never;
 
 declare global {

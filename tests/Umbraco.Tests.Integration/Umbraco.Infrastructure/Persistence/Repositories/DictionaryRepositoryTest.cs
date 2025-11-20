@@ -1,13 +1,16 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
-using System.Linq;
+using Microsoft.Extensions.Logging;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
@@ -15,12 +18,24 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class DictionaryRepositoryTest : UmbracoIntegrationTest
+internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
 {
     [SetUp]
     public async Task SetUp() => await CreateTestData();
 
     private IDictionaryRepository CreateRepository() => GetRequiredService<IDictionaryRepository>();
+
+    private IDictionaryRepository CreateRepositoryWithCache(AppCaches cache) =>
+
+        // Create a repository with a real runtime cache.
+        new DictionaryRepository(
+            GetRequiredService<IScopeAccessor>(),
+            cache,
+            GetRequiredService<ILogger<DictionaryRepository>>(),
+            GetRequiredService<ILoggerFactory>(),
+            GetRequiredService<ILanguageRepository>(),
+            GetRequiredService<IRepositoryCacheVersionService>(),
+            GetRequiredService<ICacheSyncService>());
 
     [Test]
     public async Task Can_Perform_Get_By_Key_On_DictionaryRepository()
@@ -393,6 +408,134 @@ public class DictionaryRepositoryTest : UmbracoIntegrationTest
         foreach (var kvp in keyMap)
         {
             Console.WriteLine("{0}: {1}", kvp.Key, kvp.Value);
+        }
+    }
+
+    [Test]
+    public void Can_Perform_Cached_Request_For_Existing_Value_By_Key_On_DictionaryRepository_With_Cache()
+    {
+        var cache = AppCaches.Create(Mock.Of<IRequestCache>());
+        var repository = CreateRepositoryWithCache(cache);
+
+        using (ScopeProvider.CreateScope())
+        {
+            var dictionaryItem = repository.Get("Read More");
+
+            Assert.AreEqual("Read More", dictionaryItem.Translations.Single(x => x.LanguageIsoCode == "en-US").Value);
+        }
+
+        // Modify the value directly in the database. This won't be reflected in the repository cache and hence if the cache
+        // is working as expected we should get the same value as above.
+        using (var scope = ScopeProvider.CreateScope())
+        {
+            scope.Database.Execute("UPDATE cmsLanguageText SET value = 'Read More (updated)' WHERE value = 'Read More' and LanguageId = 1");
+            scope.Complete();
+        }
+
+        using (ScopeProvider.CreateScope())
+        {
+            var dictionaryItem = repository.Get("Read More");
+
+            Assert.AreEqual("Read More", dictionaryItem.Translations.Single(x => x.LanguageIsoCode == "en-US").Value);
+        }
+
+        cache.IsolatedCaches.ClearCache<IDictionaryItem>();
+        using (ScopeProvider.CreateScope())
+        {
+            var dictionaryItem = repository.Get("Read More");
+
+            Assert.AreEqual("Read More (updated)", dictionaryItem.Translations.Single(x => x.LanguageIsoCode == "en-US").Value);
+        }
+    }
+
+    [Test]
+    public void Can_Perform_Cached_Request_For_NonExisting_Value_By_Key_On_DictionaryRepository_With_Cache()
+    {
+        var cache = AppCaches.Create(Mock.Of<IRequestCache>());
+        var repository = CreateRepositoryWithCache(cache);
+
+        using (ScopeProvider.CreateScope())
+        {
+            var dictionaryItem = repository.Get("Read More Updated");
+
+            Assert.IsNull(dictionaryItem);
+        }
+
+        // Modify the value directly in the database such that it now exists. This won't be reflected in the repository cache and hence if the cache
+        // is working as expected we should get the same null value as above.
+        using (var scope = ScopeProvider.CreateScope())
+        {
+            scope.Database.Execute("UPDATE cmsDictionary SET [key] = 'Read More Updated' WHERE [key] = 'Read More'");
+            scope.Complete();
+        }
+
+        using (ScopeProvider.CreateScope())
+        {
+            var dictionaryItem = repository.Get("Read More Updated");
+
+            Assert.IsNull(dictionaryItem);
+        }
+
+        cache.IsolatedCaches.ClearCache<IDictionaryItem>();
+        using (ScopeProvider.CreateScope())
+        {
+            var dictionaryItem = repository.Get("Read More Updated");
+
+            Assert.IsNotNull(dictionaryItem);
+        }
+    }
+
+    [Test]
+    public void Cannot_Perform_Cached_Request_For_Existing_Value_By_Key_On_DictionaryRepository_Without_Cache()
+    {
+        var repository = CreateRepository();
+
+        using (ScopeProvider.CreateScope())
+        {
+            var dictionaryItem = repository.Get("Read More");
+
+            Assert.AreEqual("Read More", dictionaryItem.Translations.Single(x => x.LanguageIsoCode == "en-US").Value);
+        }
+
+        // Modify the value directly in the database. As we don't have caching enabled on the repository we should get the new value.
+        using (var scope = ScopeProvider.CreateScope())
+        {
+            scope.Database.Execute("UPDATE cmsLanguageText SET value = 'Read More (updated)' WHERE value = 'Read More' and LanguageId = 1");
+            scope.Complete();
+        }
+
+        using (ScopeProvider.CreateScope())
+        {
+            var dictionaryItem = repository.Get("Read More");
+
+            Assert.AreEqual("Read More (updated)", dictionaryItem.Translations.Single(x => x.LanguageIsoCode == "en-US").Value);
+        }
+    }
+
+    [Test]
+    public void Cannot_Perform_Cached_Request_For_NonExisting_Value_By_Key_On_DictionaryRepository_Without_Cache()
+    {
+        var repository = CreateRepository();
+
+        using (ScopeProvider.CreateScope())
+        {
+            var dictionaryItem = repository.Get("Read More Updated");
+
+            Assert.IsNull(dictionaryItem);
+        }
+
+        // Modify the value directly in the database such that it now exists. As we don't have caching enabled on the repository we should get the new value.
+        using (var scope = ScopeProvider.CreateScope())
+        {
+            scope.Database.Execute("UPDATE cmsDictionary SET [key] = 'Read More Updated' WHERE [key] = 'Read More'");
+            scope.Complete();
+        }
+
+        using (ScopeProvider.CreateScope())
+        {
+            var dictionaryItem = repository.Get("Read More Updated");
+
+            Assert.IsNotNull(dictionaryItem);
         }
     }
 

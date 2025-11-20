@@ -31,6 +31,8 @@ public class AllCreatedPackageController : CreatedPackageControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<PackageDefinitionResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a paginated collection of packages.")]
+    [EndpointDescription("Gets a paginated collection of packages.")]
     public async Task<ActionResult<PagedViewModel<PackageDefinitionResponseModel>>> All(
         CancellationToken cancellationToken,
         int skip = 0,
@@ -44,6 +46,6 @@ public class AllCreatedPackageController : CreatedPackageControllerBase
             Items = _umbracoMapper.MapEnumerable<PackageDefinition, PackageDefinitionResponseModel>(createdPackages.Items)
         };
 
-        return await Task.FromResult(Ok(viewModel));
+        return Ok(viewModel);
     }
 }

@@ -1,52 +1,37 @@
-import type { UmbTreeItemContext } from '../tree-item-context.interface.js';
-import { UMB_TREE_CONTEXT, type UmbDefaultTreeContext } from '../../default/index.js';
-import type { UmbTreeItemModel, UmbTreeRootModel } from '../../types.js';
-import { UmbRequestReloadTreeItemChildrenEvent } from '../../entity-actions/reload-tree-item-children/index.js';
 import type { ManifestTreeItem } from '../../extensions/types.js';
+import type { UmbTreeItemContext } from '../tree-item-context.interface.js';
+import type { UmbTreeItemModel, UmbTreeRootModel } from '../../types.js';
+import { UmbTreeItemChildrenManager } from '../tree-item-children.manager.js';
+import { UmbTreeItemEntityActionManager } from '../tree-item-entity-action.manager.js';
+import { UmbTreeItemTargetExpansionManager } from '../tree-item-expansion.manager.js';
+import { UMB_TREE_CONTEXT } from '../../tree.context.token.js';
+import { UMB_TREE_ITEM_CONTEXT } from '../tree-item.context.token.js';
+import { ensureSlash } from '@umbraco-cms/backoffice/router';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
-import { UmbArrayState, UmbBooleanState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBooleanState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UMB_SECTION_CONTEXT, UMB_SECTION_SIDEBAR_CONTEXT } from '@umbraco-cms/backoffice/section';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import {
-	UmbHasChildrenEntityContext,
-	UmbRequestReloadChildrenOfEntityEvent,
-	UmbRequestReloadStructureForEntityEvent,
-} from '@umbraco-cms/backoffice/entity-action';
-import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
-import { UmbPaginationManager, debounce } from '@umbraco-cms/backoffice/utils';
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UmbDeprecation, debounce } from '@umbraco-cms/backoffice/utils';
+import { UmbParentEntityContext } from '@umbraco-cms/backoffice/entity';
+import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbEntityModel, UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 
 export abstract class UmbTreeItemContextBase<
 		TreeItemType extends UmbTreeItemModel,
 		TreeRootType extends UmbTreeRootModel,
 		ManifestType extends ManifestTreeItem = ManifestTreeItem,
 	>
-	extends UmbContextBase<UmbTreeItemContext<TreeItemType>>
+	extends UmbContextBase
 	implements UmbTreeItemContext<TreeItemType>
 {
-	public unique?: string | null;
+	#gotTreeContext!: Promise<unknown>;
+	public unique?: UmbEntityUnique;
 	public entityType?: string;
-	public readonly pagination = new UmbPaginationManager();
 
 	#manifest?: ManifestType;
 
 	protected readonly _treeItem = new UmbObjectState<TreeItemType | undefined>(undefined);
 	readonly treeItem = this._treeItem.asObservable();
-
-	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-	// @ts-ignore
-	#childItems = new UmbArrayState<TreeItemType>([], (x) => x.unique);
-	readonly childItems = this.#childItems.asObservable();
-
-	#hasChildren = new UmbBooleanState(false);
-	readonly hasChildren = this.#hasChildren.asObservable();
-
-	#isLoading = new UmbBooleanState(false);
-	readonly isLoading = this.#isLoading.asObservable();
 
 	#isSelectable = new UmbBooleanState(false);
 	readonly isSelectable = this.#isSelectable.asObservable();
@@ -60,38 +45,50 @@ export abstract class UmbTreeItemContextBase<
 	#isActive = new UmbBooleanState(false);
 	readonly isActive = this.#isActive.asObservable();
 
-	#hasActions = new UmbBooleanState(false);
-	readonly hasActions = this.#hasActions.asObservable();
-
 	#path = new UmbStringState('');
 	readonly path = this.#path.asObservable();
 
-	#foldersOnly = new UmbBooleanState(false);
-	readonly foldersOnly = this.#foldersOnly.asObservable();
+	protected readonly _treeItemChildrenManager = new UmbTreeItemChildrenManager<TreeItemType, TreeRootType>(this);
+	public readonly childItems = this._treeItemChildrenManager.children;
+	public readonly hasChildren = this._treeItemChildrenManager.hasChildren;
+	public readonly foldersOnly = this._treeItemChildrenManager.foldersOnly;
+	public readonly pagination = this._treeItemChildrenManager.offsetPagination;
+	public readonly targetPagination = this._treeItemChildrenManager.targetPagination;
+	public readonly isLoading = this._treeItemChildrenManager.isLoading;
+	public readonly isLoadingPrevChildren = this._treeItemChildrenManager.isLoadingPrevChildren;
+	public readonly isLoadingNextChildren = this._treeItemChildrenManager.isLoadingNextChildren;
 
-	public treeContext?: UmbDefaultTreeContext<TreeItemType, TreeRootType>;
-	public parentTreeItemContext?: UmbTreeItemContext<TreeItemType>;
+	#treeItemExpansionManager = new UmbTreeItemTargetExpansionManager<TreeItemType, TreeRootType>(this, {
+		childrenManager: this._treeItemChildrenManager,
+		targetPaginationManager: this.targetPagination,
+	});
+	isOpen = this.#treeItemExpansionManager.isExpanded;
+
+	#treeItemEntityActionManager = new UmbTreeItemEntityActionManager(this);
+	public readonly hasActions = this.#treeItemEntityActionManager.hasActions;
+
+	public treeContext?: typeof UMB_TREE_CONTEXT.TYPE;
 
 	#sectionContext?: typeof UMB_SECTION_CONTEXT.TYPE;
-	#sectionSidebarContext?: typeof UMB_SECTION_SIDEBAR_CONTEXT.TYPE;
-	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 
-	#hasChildrenContext = new UmbHasChildrenEntityContext(this);
+	#parentContext = new UmbParentEntityContext(this);
 
-	// TODO: get this from the tree context
-	#paging = {
-		skip: 0,
-		take: 50,
-	};
+	#hasActiveDescendant = new UmbBooleanState(undefined);
+	public readonly hasActiveDescendant = this.#hasActiveDescendant.asObservable();
+
+	#isMenu = false;
+	setIsMenu(isMenu: boolean) {
+		this.#isMenu = isMenu;
+	}
+	getIsMenu() {
+		return this.#isMenu;
+	}
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_TREE_ITEM_CONTEXT);
-		this.pagination.setPageSize(this.#paging.take);
+		// TODO: Get take size from Tree context
+		this._treeItemChildrenManager.setTakeSize(50);
 		this.#consumeContexts();
-
-		// listen for page changes on the pagination manager
-		this.pagination.addEventListener(UmbChangeEvent.TYPE, this.#onPageChange);
-
 		window.addEventListener('navigationend', this.#debouncedCheckIsActive);
 	}
 
@@ -108,13 +105,37 @@ export abstract class UmbTreeItemContextBase<
 		return this.#manifest;
 	}
 
-	// TODO: Be aware that this method, could be removed and we can use the getter method instead [NL]
+	/**
+	 * Returns the current path value
+	 * @returns {string}
+	 * @memberof UmbTreeItemContextBase
+	 */
+	public getPath() {
+		return this.#path.getValue();
+	}
+
+	/**
+	 * Returns the ascending items of this tree item
+	 * @returns {Array<UmbEntityModel>}
+	 * @memberof UmbTreeItemContextBase
+	 */
+	public getAscending(): Array<UmbEntityModel> | undefined {
+		// This should be supported for all trees.
+		return (this._treeItem.getValue() as any)?.ancestors;
+	}
+
 	/**
 	 * Returns the manifest.
 	 * @returns {ManifestCollection}
-	 * @memberof UmbCollectionContext
+	 * @memberof UmbTreeItemContextBase
+	 * @deprecated Use the `.manifest` property instead.
 	 */
 	public getManifest() {
+		new UmbDeprecation({
+			removeInVersion: '18.0.0',
+			deprecated: 'getManifest',
+			solution: 'Use .manifest property instead',
+		}).warn();
 		return this.#manifest;
 	}
 
@@ -131,14 +152,20 @@ export abstract class UmbTreeItemContextBase<
 		if (!treeItem.entityType) throw new Error('Could not create tree item context, tree item type is missing');
 		this.entityType = treeItem.entityType;
 
-		const hasChildren = treeItem.hasChildren || false;
-		this.#hasChildren.setValue(hasChildren);
-		this.#hasChildrenContext.setHasChildren(hasChildren);
+		this._treeItemChildrenManager.setTreeItem(treeItem);
+		this.#treeItemExpansionManager.setTreeItem(treeItem);
+		this.#treeItemEntityActionManager.setTreeItem(treeItem);
 
+		const parentEntity: UmbEntityModel | undefined = treeItem.parent
+			? {
+					entityType: treeItem.parent.entityType,
+					unique: treeItem.parent.unique,
+				}
+			: undefined;
+		this.#parentContext.setParent(parentEntity);
 		this._treeItem.setValue(treeItem);
 
 		// Update observers:
-		this.#observeActions();
 		this.#observeIsSelectable();
 		this.#observeIsSelected();
 		this.#observeSectionPath();
@@ -147,79 +174,83 @@ export abstract class UmbTreeItemContextBase<
 	/**
 	 * Load children of the tree item
 	 * @memberof UmbTreeItemContextBase
+	 * @returns {Promise<void>}
 	 */
-	public loadChildren = () => this.#loadChildren();
+	public loadChildren = (): Promise<void> => this._treeItemChildrenManager.loadChildren();
+
+	public reloadChildren = (): Promise<void> => this._treeItemChildrenManager.reloadChildren();
 
 	/**
 	 * Load more children of the tree item
+	 * @deprecated Use `loadNextItems` instead. Will be removed in v18.0.0.
 	 * @memberof UmbTreeItemContextBase
+	 * @returns {Promise<void>}
 	 */
-	public loadMore = () => this.#loadChildren(true);
+	public loadMore = (): Promise<void> => this._treeItemChildrenManager.loadNextChildren();
 
-	async #loadChildren(loadMore = false) {
-		if (this.unique === undefined) throw new Error('Could not request children, unique key is missing');
-		if (this.entityType === undefined) throw new Error('Could not request children, entity type is missing');
+	/**
+	 * Load previous items of the tree item
+	 * @memberof UmbTreeItemContextBase
+	 * @returns {Promise<void>}
+	 */
+	public loadPrevItems = (): Promise<void> => this._treeItemChildrenManager.loadPrevChildren();
 
-		// TODO: wait for tree context to be ready
-		const repository = this.treeContext?.getRepository();
-		if (!repository) throw new Error('Could not request children, repository is missing');
+	/**
+	 * Load next items of the tree item
+	 * @memberof UmbTreeItemContextBase
+	 * @returns {Promise<void>}
+	 */
+	public loadNextItems = (): Promise<void> => this._treeItemChildrenManager.loadNextChildren();
 
-		this.#isLoading.setValue(true);
-
-		const skip = loadMore ? this.#paging.skip : 0;
-		const take = loadMore ? this.#paging.take : this.pagination.getCurrentPageNumber() * this.#paging.take;
-		const foldersOnly = this.#foldersOnly.getValue();
-		const additionalArgs = this.treeContext?.getAdditionalRequestArgs();
-
-		const { data } = await repository.requestTreeItemsOf({
-			parent: {
-				unique: this.unique,
-				entityType: this.entityType,
-			},
-			foldersOnly,
-			skip,
-			take,
-			...additionalArgs,
-		});
-
-		if (data) {
-			if (loadMore) {
-				const currentItems = this.#childItems.getValue();
-				this.#childItems.setValue([...currentItems, ...data.items]);
-			} else {
-				this.#childItems.setValue(data.items);
-			}
-
-			const hasChildren = data.total > 0;
-			this.#hasChildren.setValue(hasChildren);
-			this.#hasChildrenContext.setHasChildren(hasChildren);
-
-			this.pagination.setTotalItems(data.total);
-		}
-
-		this.#isLoading.setValue(false);
-	}
-
-	public toggleContextMenu() {
-		if (!this.getTreeItem() || !this.entityType || this.unique === undefined) {
-			throw new Error('Could not request children, tree item is not set');
-		}
-
-		this.#sectionSidebarContext?.toggleContextMenu(this.getHostElement(), {
-			entityType: this.entityType,
-			unique: this.unique,
-			headline: this.getTreeItem()?.name || '',
-		});
-	}
-
+	/**
+	 * Selects the tree item
+	 * @memberof UmbTreeItemContextBase
+	 * @returns {void}
+	 */
 	public select() {
 		if (this.unique === undefined) throw new Error('Could not select. Unique is missing');
 		this.treeContext?.selection.select(this.unique);
 	}
 
+	/**
+	 * Deselects the tree item
+	 * @memberof UmbTreeItemContextBase
+	 * @returns {void}
+	 */
 	public deselect() {
 		if (this.unique === undefined) throw new Error('Could not deselect. Unique is missing');
 		this.treeContext?.selection.deselect(this.unique);
+	}
+
+	public showChildren() {
+		const entityType = this.entityType;
+		const unique = this.unique;
+
+		if (!entityType) {
+			throw new Error('Could not show children, entity type is missing');
+		}
+
+		if (unique === undefined) {
+			throw new Error('Could not show children, unique is missing');
+		}
+
+		// It is the tree that keeps track of the open children. We tell the tree to open this child
+		this.treeContext?.expansion.expandItem({ entityType, unique });
+	}
+
+	public hideChildren() {
+		const entityType = this.entityType;
+		const unique = this.unique;
+
+		if (!entityType) {
+			throw new Error('Could not show children, entity type is missing');
+		}
+
+		if (unique === undefined) {
+			throw new Error('Could not show children, unique is missing');
+		}
+
+		this.treeContext?.expansion.collapseItem({ entityType, unique });
 	}
 
 	async #consumeContexts() {
@@ -228,42 +259,13 @@ export abstract class UmbTreeItemContextBase<
 			this.#observeSectionPath();
 		});
 
-		this.consumeContext(UMB_SECTION_SIDEBAR_CONTEXT, (instance) => {
-			this.#sectionSidebarContext = instance;
-		});
-
-		this.consumeContext(UMB_TREE_CONTEXT, (treeContext) => {
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-ignore
+		this.#gotTreeContext = this.consumeContext(UMB_TREE_CONTEXT, (treeContext) => {
 			this.treeContext = treeContext;
 			this.#observeIsSelectable();
 			this.#observeIsSelected();
 			this.#observeFoldersOnly();
-		});
-
-		this.consumeContext(UMB_TREE_ITEM_CONTEXT, (instance) => {
-			this.parentTreeItemContext = instance;
-		}).skipHost();
-
-		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (instance) => {
-			this.#removeEventListeners();
-			this.#actionEventContext = instance;
-
-			this.#actionEventContext.addEventListener(
-				UmbRequestReloadTreeItemChildrenEvent.TYPE,
-				this.#onReloadRequest as EventListener,
-			);
-
-			this.#actionEventContext.addEventListener(
-				UmbRequestReloadChildrenOfEntityEvent.TYPE,
-				this.#onReloadRequest as EventListener,
-			);
-
-			this.#actionEventContext.addEventListener(
-				UmbRequestReloadStructureForEntityEvent.TYPE,
-				this.#onReloadStructureRequest as unknown as EventListener,
-			);
-		});
+			this.#observeActive();
+		}).asPromise();
 	}
 
 	getTreeItem() {
@@ -301,22 +303,37 @@ export abstract class UmbTreeItemContextBase<
 	}
 
 	#observeFoldersOnly() {
-		if (!this.treeContext || this.unique === undefined) return;
+		if (this.unique === undefined) return;
 
 		this.observe(
-			this.treeContext.foldersOnly,
+			this.treeContext?.foldersOnly,
 			(foldersOnly) => {
-				this.#foldersOnly.setValue(foldersOnly);
+				this._treeItemChildrenManager.setFoldersOnly(foldersOnly ?? false);
 			},
 			'observeFoldersOnly',
 		);
 	}
 
-	#observeSectionPath() {
-		if (!this.#sectionContext) return;
+	#observeActive() {
+		if (this.unique === undefined || this.entityType === undefined) return;
 
+		const entity = { entityType: this.entityType, unique: this.unique };
 		this.observe(
-			this.#sectionContext.pathname,
+			this.treeContext?.activeManager.hasActiveDescendants(entity),
+			(hasActiveDescendant) => {
+				if (this.#hasActiveDescendant.getValue() === undefined && hasActiveDescendant === false) {
+					return;
+				}
+
+				this.#hasActiveDescendant.setValue(hasActiveDescendant);
+			},
+			'observeActiveDescendant',
+		);
+	}
+
+	#observeSectionPath() {
+		this.observe(
+			this.#sectionContext?.pathname,
 			(pathname) => {
 				if (!pathname || !this.entityType || this.unique === undefined) return;
 				const path = this.constructPath(pathname, this.entityType, this.unique);
@@ -327,45 +344,7 @@ export abstract class UmbTreeItemContextBase<
 		);
 	}
 
-	#observeActions() {
-		this.observe(
-			umbExtensionsRegistry
-				.byType('entityAction')
-				.pipe(map((actions) => actions.filter((action) => action.forEntityTypes.includes(this.entityType!)))),
-			(actions) => {
-				this.#hasActions.setValue(actions.length > 0);
-			},
-			'observeActions',
-		);
-	}
-
-	#onReloadRequest = (event: UmbEntityActionEvent) => {
-		if (event.getUnique() !== this.unique) return;
-		if (event.getEntityType() !== this.entityType) return;
-		this.loadChildren();
-	};
-
-	#onReloadStructureRequest = async (event: UmbRequestReloadStructureForEntityEvent) => {
-		if (!this.unique) return;
-		if (event.getUnique() !== this.unique) return;
-		if (event.getEntityType() !== this.entityType) return;
-
-		if (this.parentTreeItemContext) {
-			this.parentTreeItemContext.loadChildren();
-		} else {
-			this.treeContext?.loadTree();
-		}
-	};
-
-	#onPageChange = (event: UmbChangeEvent) => {
-		const target = event.target as UmbPaginationManager;
-		this.#paging.skip = target.getSkip();
-		this.loadMore();
-	};
-
-	#debouncedCheckIsActive = debounce(() => this.#checkIsActive(), 100);
-
-	#checkIsActive() {
+	#checkIsActive = async () => {
 		// don't set the active state if the item is selectable
 		const isSelectable = this.#isSelectable.getValue();
 
@@ -374,11 +353,39 @@ export abstract class UmbTreeItemContextBase<
 			return;
 		}
 
-		const path = this.#path.getValue();
-		const location = window.location.pathname;
-		const isActive = location.includes(path);
+		/* Check if the current location includes the path of this tree item.
+		We ensure that the paths ends with a slash to avoid collisions with paths like /path-1 and /path-1-2 where /path-1 is in both.
+		Instead we compare /path-1/ with /path-1-2/ which wont collide.*/
+		const location = ensureSlash(window.location.pathname);
+		const comparePath = ensureSlash(this.#path.getValue());
+		const isActive = location.includes(comparePath);
+
+		if (this.#isActive.getValue() === isActive) return;
+		if (!this.entityType || this.unique === undefined) {
+			throw new Error('Could not check active state, entity type or unique is missing');
+		}
+
+		const ascending = this.getAscending();
+		// Only if this type of item has ancestors...
+		if (ascending) {
+			const path = [...ascending, { entityType: this.entityType, unique: this.unique }];
+
+			await this.#gotTreeContext;
+
+			if (isActive) {
+				this.treeContext?.activeManager.setActive(path);
+			} else {
+				// If this is the current, then remove it:
+				// This is a hack, where we are assuming that another active item would have made its entrance and replaced the 'active' within 2 second. [NL]
+				// The problem is that it may take some time before an item appears in the tree and communicates that its active.
+				// And in the meantime the removal of this would have resulted in the parent closing. And since we don't use Active state to open the tree, then we have a problem.
+				debounce(() => this.treeContext?.activeManager.removeActiveIfMatch(path), 1000);
+			}
+		}
 		this.#isActive.setValue(isActive);
-	}
+	};
+
+	#debouncedCheckIsActive = debounce(this.#checkIsActive, 100);
 
 	// TODO: use router context
 	constructPath(pathname: string, entityType: string, unique: string | null) {
@@ -386,28 +393,8 @@ export abstract class UmbTreeItemContextBase<
 		return `section/${pathname}/workspace/${entityType}/edit/${unique}`;
 	}
 
-	#removeEventListeners = () => {
-		this.#actionEventContext?.removeEventListener(
-			UmbRequestReloadTreeItemChildrenEvent.TYPE,
-			this.#onReloadRequest as EventListener,
-		);
-
-		this.#actionEventContext?.removeEventListener(
-			UmbRequestReloadChildrenOfEntityEvent.TYPE,
-			this.#onReloadRequest as EventListener,
-		);
-
-		this.#actionEventContext?.removeEventListener(
-			UmbRequestReloadStructureForEntityEvent.TYPE,
-			this.#onReloadStructureRequest as unknown as EventListener,
-		);
-	};
-
 	override destroy(): void {
-		this.#removeEventListeners();
 		window.removeEventListener('navigationend', this.#debouncedCheckIsActive);
 		super.destroy();
 	}
 }
-
-export const UMB_TREE_ITEM_CONTEXT = new UmbContextToken<UmbTreeItemContext<any>>('UmbTreeItemContext');

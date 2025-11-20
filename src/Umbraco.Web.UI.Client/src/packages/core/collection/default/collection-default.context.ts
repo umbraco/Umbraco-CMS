@@ -15,7 +15,7 @@ import { UmbArrayState, UmbBasicState, UmbNumberState, UmbObjectState } from '@u
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
-import { UmbSelectionManager, UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
+import { UmbSelectionManager, UmbPaginationManager, UmbDeprecation, debounce } from '@umbraco-cms/backoffice/utils';
 import type { ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -25,7 +25,7 @@ import {
 } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbActionEventContext } from '@umbraco-cms/backoffice/action';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
+import { UMB_ENTITY_CONTEXT, UmbParentEntityContext, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { UmbModalRouteRegistrationController, type UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 
@@ -35,7 +35,7 @@ export class UmbDefaultCollectionContext<
 		CollectionItemType extends { entityType: string; unique: string } = any,
 		FilterModelType extends UmbCollectionFilterModel = UmbCollectionFilterModel,
 	>
-	extends UmbContextBase<UmbDefaultCollectionContext>
+	extends UmbContextBase
 	implements UmbCollectionContext, UmbApi
 {
 	#config?: UmbCollectionConfiguration = { pageSize: 50 };
@@ -83,6 +83,7 @@ export class UmbDefaultCollectionContext<
 	});
 
 	#actionEventContext: UmbActionEventContext | undefined;
+	#parentEntityContext = new UmbParentEntityContext(this);
 
 	constructor(host: UmbControllerHost, defaultViewAlias: string, defaultFilter: Partial<FilterModelType> = {}) {
 		super(host, UMB_COLLECTION_CONTEXT);
@@ -92,9 +93,27 @@ export class UmbDefaultCollectionContext<
 
 		this.pagination.addEventListener(UmbChangeEvent.TYPE, this.#onPageChange);
 		this.#listenToEntityEvents();
+
+		// The parent entity context is used to get the parent entity for the collection items
+		// All items in the collection are children of the current entity context
+		this.consumeContext(UMB_ENTITY_CONTEXT, (context) => {
+			const currentEntityUnique = context?.getUnique();
+			const currentEntityType = context?.getEntityType();
+
+			const parent: UmbEntityModel | undefined =
+				currentEntityUnique && currentEntityType
+					? {
+							unique: currentEntityUnique,
+							entityType: currentEntityType,
+						}
+					: undefined;
+
+			this.#parentEntityContext?.setParent(parent);
+		});
 	}
 
 	setupView(viewElement: UmbControllerHost) {
+		// TODO: Consider to remove this one as well:
 		new UmbModalRouteRegistrationController(viewElement, UMB_WORKSPACE_MODAL)
 			.addAdditionalPath('entity/:entityType')
 			.onSetup((params) => {
@@ -102,11 +121,11 @@ export class UmbDefaultCollectionContext<
 			})
 			.onReject(() => {
 				// TODO: Maybe this can be removed?
-				this.requestCollection();
+				this._requestCollection();
 			})
 			.onSubmit(() => {
 				// TODO: Maybe this can be removed?
-				this.requestCollection();
+				this._requestCollection();
 			})
 			.observeRouteBuilder((routeBuilder) => {
 				this.#workspacePathBuilder.setValue(routeBuilder);
@@ -225,16 +244,34 @@ export class UmbDefaultCollectionContext<
 		return this._manifest;
 	}
 
+	public getEmptyLabel(): string {
+		return this.manifest?.meta.noItemsLabel ?? this.#config?.noItemsLabel ?? '#collection_noItemsTitle';
+	}
+
+	/* debouncing the load collection method because multiple filters can be set at the same time
+	that will trigger multiple load calls with different filter arguments */
+	public loadCollection = debounce(() => this._requestCollection(), 100);
+
 	/**
 	 * Requests the collection from the repository.
-	 * @returns {*}
+	 * @returns {Promise<void>}
+	 * @deprecated Deprecated since v.17.0.0. Use `loadCollection` instead.
 	 * @memberof UmbCollectionContext
 	 */
 	public async requestCollection() {
+		new UmbDeprecation({
+			removeInVersion: '19.0.0',
+			deprecated: 'requestCollection',
+			solution: 'Use .loadCollection method instead',
+		}).warn();
+
+		return this._requestCollection();
+	}
+
+	protected async _requestCollection() {
 		await this._init;
 
 		if (!this._configured) this._configure();
-
 		if (!this._repository) throw new Error(`Missing repository for ${this._manifest}`);
 
 		this._loading.setValue(true);
@@ -258,7 +295,11 @@ export class UmbDefaultCollectionContext<
 	 */
 	public setFilter(filter: Partial<FilterModelType>) {
 		this._filter.setValue({ ...this._filter.getValue(), ...filter });
-		this.requestCollection();
+		this.loadCollection();
+	}
+
+	public updateFilter(filter: Partial<FilterModelType>) {
+		this._filter.setValue({ ...this._filter.getValue(), ...filter });
 	}
 
 	public getLastSelectedView(unique: string | undefined): string | undefined {
@@ -285,18 +326,19 @@ export class UmbDefaultCollectionContext<
 		const items = this._items.getValue();
 		const hasItem = items.some((item) => item.unique === event.getUnique());
 		if (hasItem) {
-			this.requestCollection();
+			this._requestCollection();
 		}
 	};
 
 	#onReloadChildrenRequest = async (event: UmbRequestReloadChildrenOfEntityEvent) => {
 		// check if the collection is in the same context as the entity from the event
 		const entityContext = await this.getContext(UMB_ENTITY_CONTEXT);
+		if (!entityContext) return;
 		const unique = entityContext.getUnique();
 		const entityType = entityContext.getEntityType();
 
 		if (unique === event.getUnique() && entityType === event.getEntityType()) {
-			this.requestCollection();
+			this._requestCollection();
 		}
 	};
 
@@ -332,9 +374,14 @@ export class UmbDefaultCollectionContext<
 	 * Returns the manifest for the collection.
 	 * @returns {ManifestCollection}
 	 * @memberof UmbCollectionContext
-	 * @deprecated Use get the `.manifest` property instead.
+	 * @deprecated Use the `.manifest` property instead.
 	 */
 	public getManifest() {
+		new UmbDeprecation({
+			removeInVersion: '18.0.0',
+			deprecated: 'getManifest',
+			solution: 'Use .manifest property instead',
+		}).warn();
 		return this._manifest;
 	}
 

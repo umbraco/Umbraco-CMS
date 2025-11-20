@@ -27,6 +27,8 @@ public class ByKeyDocumentBlueprintController : DocumentBlueprintControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(DocumentBlueprintResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Gets a document blueprint.")]
+    [EndpointDescription("Gets a document blueprint identified by the provided Id.")]
     public async Task<IActionResult> ByKey(CancellationToken cancellationToken, Guid id)
     {
         IContent? blueprint = await _contentBlueprintEditingService.GetAsync(id);

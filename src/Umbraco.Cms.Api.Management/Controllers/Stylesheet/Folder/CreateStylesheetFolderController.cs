@@ -29,6 +29,8 @@ public class CreateStylesheetFolderController : StylesheetFolderControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Creates a stylesheet folder.")]
+    [EndpointDescription("Creates a new stylesheet folder with the provided name and parent location.")]
     public async Task<IActionResult> Create(
         CancellationToken cancellationToken,
         CreateStylesheetFolderRequestModel requestModel)

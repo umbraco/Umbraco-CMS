@@ -102,18 +102,18 @@ export class UmbBodyLayoutElement extends LitElement {
 						this.#setSlotVisibility(e.target as HTMLElement, this._headerSlotHasChildren);
 					}}></slot>
 				<slot
-					id="navigation-slot"
-					name="navigation"
-					@slotchange=${(e: Event) => {
-						this._navigationSlotHasChildren = this.#hasNodes(e);
-						this.#setSlotVisibility(e.target as HTMLElement, this._navigationSlotHasChildren);
-					}}></slot>
-				<slot
 					id="action-menu-slot"
 					name="action-menu"
 					@slotchange=${(e: Event) => {
 						this._actionsMenuSlotHasChildren = this.#hasNodes(e);
 						this.#setSlotVisibility(e.target as HTMLElement, this._actionsMenuSlotHasChildren);
+					}}></slot>
+				<slot
+					id="navigation-slot"
+					name="navigation"
+					@slotchange=${(e: Event) => {
+						this._navigationSlotHasChildren = this.#hasNodes(e);
+						this.#setSlotVisibility(e.target as HTMLElement, this._navigationSlotHasChildren);
 					}}></slot>
 			</div>
 
@@ -189,7 +189,7 @@ export class UmbBodyLayoutElement extends LitElement {
 			:host([header-transparent]:not([main-no-padding])) #main:not(*[style='display: none'] + *) {
 				/* The following styling is only applied if the clear-header IS present,
 				the main-no-padding attribute is NOT present, and the header is NOT hidden */
-				padding-top: var(--uui-size-space-1);
+				padding-top: var(--uui-size-space-2);
 			}
 			:host([main-no-padding]) #main {
 				padding: 0;
@@ -204,7 +204,6 @@ export class UmbBodyLayoutElement extends LitElement {
 				box-sizing: border-box;
 				min-width: 0;
 			}
-
 			#navigation-slot {
 				margin-left: auto;
 			}

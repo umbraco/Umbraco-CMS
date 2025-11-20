@@ -22,6 +22,8 @@ public class InformationServerController : ServerControllerBase
     [HttpGet("information")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ServerInformationResponseModel), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets server information.")]
+    [EndpointDescription("Gets detailed information about the server environment and configuration.")]
     public Task<IActionResult> Information(CancellationToken cancellationToken)
     {
         ServerInformationResponseModel responseModel = _umbracoMapper.Map<ServerInformationResponseModel>(_serverInformationService.GetServerInformation())!;

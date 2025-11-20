@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Factories;
+using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -22,30 +23,33 @@ public class ByKeyDocumentCollectionController : DocumentCollectionControllerBas
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IDocumentCollectionPresentationFactory _documentCollectionPresentationFactory;
 
-    [Obsolete("Please use the constructor taking all parameters.")]
-    public ByKeyDocumentCollectionController(
-        IContentListViewService contentListViewService,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IUmbracoMapper mapper)
-        : this(
-              contentListViewService,
-              backOfficeSecurityAccessor,
-              mapper,
-              StaticServiceProvider.Instance.GetRequiredService<IDocumentCollectionPresentationFactory>())
-    {
-    }
-
     [ActivatorUtilitiesConstructor]
     public ByKeyDocumentCollectionController(
         IContentListViewService contentListViewService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IUmbracoMapper mapper,
-        IDocumentCollectionPresentationFactory documentCollectionPresentationFactory)
-        : base(mapper)
+        IDocumentCollectionPresentationFactory documentCollectionPresentationFactory,
+        FlagProviderCollection flagProviders)
+        : base(mapper, flagProviders)
     {
         _contentListViewService = contentListViewService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
         _documentCollectionPresentationFactory = documentCollectionPresentationFactory;
+    }
+
+    [Obsolete("Please use the constructor with all parameters. Scheduled to be removed in V18")]
+    public ByKeyDocumentCollectionController(
+        IContentListViewService contentListViewService,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        IUmbracoMapper mapper,
+        IDocumentCollectionPresentationFactory documentCollectionPresentationFactory)
+        : this(
+            contentListViewService,
+            backOfficeSecurityAccessor,
+            mapper,
+            documentCollectionPresentationFactory,
+            StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>())
+    {
     }
 
     [HttpGet("{id:guid}")]
@@ -53,6 +57,8 @@ public class ByKeyDocumentCollectionController : DocumentCollectionControllerBas
     [ProducesResponseType(typeof(PagedViewModel<DocumentCollectionResponseModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Gets a document collection.")]
+    [EndpointDescription("Gets a document collection identified by the provided Id.")]
     public async Task<IActionResult> ByKey(
         CancellationToken cancellationToken,
         Guid id,

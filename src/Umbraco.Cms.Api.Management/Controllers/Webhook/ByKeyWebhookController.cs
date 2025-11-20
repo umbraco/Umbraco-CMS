@@ -25,6 +25,8 @@ public class ByKeyWebhookController : WebhookControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(WebhookResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Gets a webhook.")]
+    [EndpointDescription("Gets a webhook identified by the provided Id.")]
     public async Task<IActionResult> ByKey(CancellationToken cancellationToken, Guid id)
     {
         IWebhook? webhook = await _webhookService.GetAsync(id);

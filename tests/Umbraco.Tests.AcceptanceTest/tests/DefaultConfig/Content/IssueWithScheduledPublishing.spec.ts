@@ -18,8 +18,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.language.ensureNameNotExists(languageName);
 });
 
-// https://github.com/umbraco/Umbraco-CMS/issues/18555
-test.skip('Can schedule publish after unselecting all languages', async ({umbracoUi}) => {
+test('can schedule publish after unselecting all languages', async ({umbracoUi}) => {
   // Arrange
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
@@ -30,13 +29,14 @@ test.skip('Can schedule publish after unselecting all languages', async ({umbrac
   await umbracoUi.content.goToContentWithName('(' + contentName + ')');
   await umbracoUi.content.enterContentName('Tester');
   await umbracoUi.content.clickViewMoreOptionsButton();
-  await umbracoUi.content.clickScheduleButton();
+  await umbracoUi.content.clickSchedulePublishButton();
   await umbracoUi.waitForTimeout(500);
   await umbracoUi.content.clickSelectAllCheckbox();
   await umbracoUi.waitForTimeout(500);
   await umbracoUi.content.clickSelectAllCheckbox();
-  await umbracoUi.content.clickButtonWithName(contentName);
+  await umbracoUi.content.clickSchedulePublishLanguageButton(languageName);
 
   // Assert
   await umbracoUi.content.doesSchedulePublishModalButtonContainDisabledTag(false);
+  await umbracoUi.content.clickSchedulePublishModalButton();
 });

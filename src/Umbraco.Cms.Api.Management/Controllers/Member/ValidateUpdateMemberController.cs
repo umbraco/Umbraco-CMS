@@ -29,6 +29,8 @@ public class ValidateUpdateMemberController : MemberControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Validates updating a member.")]
+    [EndpointDescription("Validates the request model for updating a member without actually updating it.")]
     public async Task<IActionResult> Validate(
         CancellationToken cancellationToken,
         Guid id,

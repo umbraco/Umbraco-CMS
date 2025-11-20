@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
@@ -21,6 +22,8 @@ public class PropertyValueConverterTests : DeliveryApiTests
     protected IPublishedContent PublishedContent { get; private set; }
 
     protected IPublishedContent PublishedMedia { get; private set; }
+
+    protected IPublishedContent DraftContent { get; private set; }
 
     protected IPublishedContentType PublishedContentType { get; private set; }
 
@@ -58,10 +61,21 @@ public class PropertyValueConverterTests : DeliveryApiTests
         var publishedMedia = SetupPublishedContent("The media", mediaKey, PublishedItemType.Media, publishedMediaType.Object);
         PublishedMedia = publishedMedia.Object;
 
+        var draftContentKey = Guid.NewGuid();
+        var draftContent = SetupPublishedContent("The page (draft)", draftContentKey, PublishedItemType.Content, publishedContentType.Object);
+        DraftContent = draftContent.Object;
+
         PublishedContentCacheMock = new Mock<IPublishedContentCache>();
         PublishedContentCacheMock
             .Setup(pcc => pcc.GetById(contentKey))
             .Returns(publishedContent.Object);
+        PublishedContentCacheMock
+            .Setup(pcc => pcc.GetById(false, contentKey))
+            .Returns(publishedContent.Object);
+        PublishedContentCacheMock
+            .Setup(pcc => pcc.GetById(true, draftContentKey))
+            .Returns(draftContent.Object);
+
         PublishedMediaCacheMock = new Mock<IPublishedMediaCache>();
         PublishedMediaCacheMock
             .Setup(pcc => pcc.GetById(mediaKey))
@@ -76,6 +90,9 @@ public class PropertyValueConverterTests : DeliveryApiTests
         PublishedUrlProviderMock
             .Setup(p => p.GetUrl(publishedContent.Object, It.IsAny<UrlMode>(), It.IsAny<string?>(), It.IsAny<Uri?>()))
             .Returns("the-page-url");
+        PublishedUrlProviderMock
+            .Setup(p => p.GetUrl(draftContent.Object, It.IsAny<UrlMode>(), It.IsAny<string?>(), It.IsAny<Uri?>()))
+            .Returns("the-draft-page-url");
         PublishedUrlProviderMock
             .Setup(p => p.GetMediaUrl(publishedMedia.Object, It.IsAny<UrlMode>(), It.IsAny<string?>(), It.IsAny<string?>(), It.IsAny<Uri?>()))
             .Returns("the-media-url");
@@ -96,14 +113,20 @@ public class PropertyValueConverterTests : DeliveryApiTests
         return content;
     }
 
-    protected void RegisterContentWithProviders(IPublishedContent content)
+    protected void RegisterContentWithProviders(IPublishedContent content, bool preview)
     {
         PublishedUrlProviderMock
             .Setup(p => p.GetUrl(content, It.IsAny<UrlMode>(), It.IsAny<string?>(), It.IsAny<Uri?>()))
             .Returns(content.UrlSegment);
         PublishedContentCacheMock
-            .Setup(pcc => pcc.GetById(content.Key))
+            .Setup(pcc => pcc.GetById(preview, content.Key))
             .Returns(content);
+        if (preview is false)
+        {
+            PublishedContentCacheMock
+                .Setup(pcc => pcc.GetById(content.Key))
+                .Returns(content);
+        }
     }
 
     protected void RegisterMediaWithProviders(IPublishedContent media)
@@ -127,7 +150,8 @@ public class PropertyValueConverterTests : DeliveryApiTests
         IOptionsMonitor<RequestHandlerSettings>? requestHandlerSettingsMonitor = null,
         IPublishedContentCache? contentCache = null,
         IDocumentNavigationQueryService? navigationQueryService = null,
-        IPublishStatusQueryService? publishStatusQueryService = null)
+        IPublishStatusQueryService? publishStatusQueryService = null,
+        IDocumentUrlService? documentUrlService = null)
     {
         contentCache ??= PublishedContentCacheMock.Object;
         navigationQueryService ??= DocumentNavigationQueryServiceMock.Object;
@@ -140,6 +164,7 @@ public class PropertyValueConverterTests : DeliveryApiTests
             requestHandlerSettingsMonitor,
             contentCache,
             navigationQueryService,
-            publishStatusQueryService);
+            publishStatusQueryService,
+            documentUrlService);
     }
 }

@@ -6,35 +6,37 @@ import type { UmbTableColumn, UmbTableColumnLayoutElement, UmbTableItem } from '
 
 @customElement('umb-document-table-column-name')
 export class UmbDocumentTableColumnNameElement extends UmbLitElement implements UmbTableColumnLayoutElement {
+	#resolver = new UmbDocumentItemDataResolver(this);
+
+	@state()
+	private _name = '';
+
 	column!: UmbTableColumn;
 	item!: UmbTableItem;
 
-	#value!: UmbEditableDocumentCollectionItemModel;
 	@property({ attribute: false })
-	public get value(): UmbEditableDocumentCollectionItemModel {
-		return this.#value;
-	}
 	public set value(value: UmbEditableDocumentCollectionItemModel) {
 		this.#value = value;
 
 		if (value.item) {
-			this.#item.setData(value.item);
+			this.#resolver.setData(value.item);
 		}
 	}
-
-	@state()
-	_name = '';
-
-	#item = new UmbDocumentItemDataResolver(this);
+	public get value(): UmbEditableDocumentCollectionItemModel {
+		return this.#value;
+	}
+	#value!: UmbEditableDocumentCollectionItemModel;
 
 	constructor() {
 		super();
-		this.#item.observe(this.#item.name, (name) => (this._name = name || ''));
+		this.#resolver.observe(this.#resolver.name, (name) => (this._name = name || ''));
 	}
 
 	override render() {
 		if (!this.value) return nothing;
-		return html` <uui-button compact href=${this.value.editPath} label=${this._name}></uui-button> `;
+		if (!this.value.editPath) return nothing;
+		if (!this._name) return nothing;
+		return html`<uui-button compact href=${this.value.editPath} label=${this._name}></uui-button>`;
 	}
 
 	static override styles = [

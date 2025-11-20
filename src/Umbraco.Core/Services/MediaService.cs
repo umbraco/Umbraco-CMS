@@ -12,7 +12,6 @@ using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Changes;
-using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
 
@@ -25,7 +24,7 @@ namespace Umbraco.Cms.Core.Services
     {
         private readonly IMediaRepository _mediaRepository;
         private readonly IMediaTypeRepository _mediaTypeRepository;
-        private readonly IAuditRepository _auditRepository;
+        private readonly IAuditService _auditService;
         private readonly IEntityRepository _entityRepository;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly IUserIdKeyResolver _userIdKeyResolver;
@@ -40,7 +39,7 @@ namespace Umbraco.Cms.Core.Services
             ILoggerFactory loggerFactory,
             IEventMessagesFactory eventMessagesFactory,
             IMediaRepository mediaRepository,
-            IAuditRepository auditRepository,
+            IAuditService auditService,
             IMediaTypeRepository mediaTypeRepository,
             IEntityRepository entityRepository,
             IShortStringHelper shortStringHelper,
@@ -49,13 +48,14 @@ namespace Umbraco.Cms.Core.Services
         {
             _mediaFileManager = mediaFileManager;
             _mediaRepository = mediaRepository;
-            _auditRepository = auditRepository;
+            _auditService = auditService;
             _mediaTypeRepository = mediaTypeRepository;
             _entityRepository = entityRepository;
             _shortStringHelper = shortStringHelper;
             _userIdKeyResolver = userIdKeyResolver;
         }
-        [Obsolete("Use constructor that takes IUserIdKeyResolver as a parameter, scheduled for removal in V15")]
+
+        [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
         public MediaService(
             ICoreScopeProvider provider,
             MediaFileManager mediaFileManager,
@@ -65,18 +65,46 @@ namespace Umbraco.Cms.Core.Services
             IAuditRepository auditRepository,
             IMediaTypeRepository mediaTypeRepository,
             IEntityRepository entityRepository,
-            IShortStringHelper shortStringHelper)
+            IShortStringHelper shortStringHelper,
+            IUserIdKeyResolver userIdKeyResolver)
             : this(
                 provider,
                 mediaFileManager,
                 loggerFactory,
                 eventMessagesFactory,
                 mediaRepository,
-                auditRepository,
+                StaticServiceProvider.Instance.GetRequiredService<IAuditService>(),
                 mediaTypeRepository,
                 entityRepository,
                 shortStringHelper,
-                StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>())
+                userIdKeyResolver)
+        {
+        }
+
+        [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+        public MediaService(
+            ICoreScopeProvider provider,
+            MediaFileManager mediaFileManager,
+            ILoggerFactory loggerFactory,
+            IEventMessagesFactory eventMessagesFactory,
+            IMediaRepository mediaRepository,
+            IAuditService auditService,
+            IAuditRepository auditRepository,
+            IMediaTypeRepository mediaTypeRepository,
+            IEntityRepository entityRepository,
+            IShortStringHelper shortStringHelper,
+            IUserIdKeyResolver userIdKeyResolver)
+            : this(
+                provider,
+                mediaFileManager,
+                loggerFactory,
+                eventMessagesFactory,
+                mediaRepository,
+                auditService,
+                mediaTypeRepository,
+                entityRepository,
+                shortStringHelper,
+                userIdKeyResolver)
         {
         }
 
@@ -448,7 +476,7 @@ namespace Umbraco.Cms.Core.Services
             }
 
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-            scope.ReadLock(Constants.Locks.ContentTree);
+            scope.ReadLock(Constants.Locks.MediaTree);
             return _mediaRepository.GetPage(Query<IMedia>()?.Where(x => x.ContentTypeId == contentTypeId), pageIndex, pageSize, out totalRecords, filter, ordering);
         }
 
@@ -470,10 +498,15 @@ namespace Umbraco.Cms.Core.Services
                 ordering = Ordering.By("sortOrder");
             }
 
+            // Need to use a List here because the expression tree cannot convert the array when used in Contains.
+            // See ExpressionTests.Sql_In().
+            List<int> contentTypeIdsAsList = [.. contentTypeIds];
+
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-            scope.ReadLock(Constants.Locks.ContentTree);
+            scope.ReadLock(Constants.Locks.MediaTree);
+
             return _mediaRepository.GetPage(
-                Query<IMedia>()?.Where(x => contentTypeIds.Contains(x.ContentTypeId)), pageIndex, pageSize, out totalRecords, filter, ordering);
+                Query<IMedia>()?.Where(x => contentTypeIdsAsList.Contains(x.ContentTypeId)), pageIndex, pageSize, out totalRecords, filter, ordering);
         }
 
         /// <summary>
@@ -482,7 +515,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="level">The level to retrieve Media from</param>
         /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
         /// <remarks>Contrary to most methods, this method filters out trashed media items.</remarks>
-        public IEnumerable<IMedia>? GetByLevel(int level)
+        public IEnumerable<IMedia> GetByLevel(int level)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             scope.ReadLock(Constants.Locks.MediaTree);
@@ -815,7 +848,7 @@ namespace Umbraco.Cms.Core.Services
                 scope.Notifications.Publish(new MediaSavedNotification(mediasA, messages).WithStateFrom(savingNotification));
                 // TODO: See note about suppressing events in content service
                 scope.Notifications.Publish(new MediaTreeChangeNotification(treeChanges, messages));
-                Audit(AuditType.Save, userId == -1 ? 0 : userId, Constants.System.Root, "Bulk save media");
+                Audit(AuditType.Save, userId, Constants.System.Root, "Bulk save media");
 
                 scope.Complete();
             }
@@ -1262,9 +1295,20 @@ namespace Umbraco.Cms.Core.Services
 
         #region Private Methods
 
-        private void Audit(AuditType type, int userId, int objectId, string? message = null)
+        private void Audit(AuditType type, int userId, int objectId, string? message = null) =>
+            AuditAsync(type, userId, objectId, message).GetAwaiter().GetResult();
+
+        private async Task AuditAsync(AuditType type, int userId, int objectId, string? message = null, string? parameters = null)
         {
-            _auditRepository.Save(new AuditItem(objectId, type, userId, ObjectTypes.GetName(UmbracoObjectTypes.Media), message));
+            Guid userKey = await _userIdKeyResolver.GetAsync(userId);
+
+            await _auditService.AddAsync(
+                type,
+                userKey,
+                objectId,
+                UmbracoObjectTypes.Media.GetName(),
+                message,
+                parameters);
         }
 
         #endregion

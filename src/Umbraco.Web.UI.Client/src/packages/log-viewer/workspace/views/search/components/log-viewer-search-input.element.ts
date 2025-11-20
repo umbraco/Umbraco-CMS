@@ -1,16 +1,17 @@
-import type { UmbLogViewerWorkspaceContext } from '../../../logviewer-workspace.context.js';
 import { UMB_APP_LOG_VIEWER_CONTEXT } from '../../../logviewer-workspace.context-token.js';
 import { UMB_LOG_VIEWER_SAVE_SEARCH_MODAL } from './log-viewer-search-input-modal.modal-token.js';
-import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
-import { Subject, debounceTime, tap } from '@umbraco-cms/backoffice/external/rxjs';
-import type { SavedLogSearchResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { escapeHTML } from '@umbraco-cms/backoffice/utils';
 import { query as getQuery, path, toQueryString } from '@umbraco-cms/backoffice/router';
-import { UMB_MODAL_MANAGER_CONTEXT, umbConfirmModal } from '@umbraco-cms/backoffice/modal';
+import { Subject, debounceTime, tap } from '@umbraco-cms/backoffice/external/rxjs';
+import { umbConfirmModal, umbOpenModal } from '@umbraco-cms/backoffice/modal';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { SavedLogSearchResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbDropdownElement } from '@umbraco-cms/backoffice/components';
+import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 
 import './log-viewer-search-input-modal.element.js';
-import type { UmbDropdownElement } from '@umbraco-cms/backoffice/components';
+import { consumeContext } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-log-viewer-search-input')
 export class UmbLogViewerSearchInputElement extends UmbLitElement {
@@ -30,25 +31,30 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 	private _isQuerySaved = false;
 
 	// TODO: Revisit this code, to not use RxJS directly:
-	private inputQuery$ = new Subject<string>();
+	#inputQuery$ = new Subject<string>();
 
-	#logViewerContext?: UmbLogViewerWorkspaceContext;
+	#logViewerContext?: typeof UMB_APP_LOG_VIEWER_CONTEXT.TYPE;
+
+	@consumeContext({ context: UMB_APP_LOG_VIEWER_CONTEXT })
+	private set _logViewerContext(value) {
+		this.#logViewerContext = value;
+		this.#observeStuff();
+		this.#logViewerContext?.getSavedSearches();
+	}
+	private get _logViewerContext() {
+		return this.#logViewerContext;
+	}
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT, (instance) => {
-			this.#logViewerContext = instance;
-			this.#observeStuff();
-			this.#logViewerContext?.getSavedSearches();
-		});
 
-		this.inputQuery$
+		this.#inputQuery$
 			.pipe(
 				tap(() => (this._showLoader = true)),
 				debounceTime(250),
 			)
 			.subscribe((query) => {
-				this.#logViewerContext?.setFilterExpression(query);
+				this._logViewerContext?.setFilterExpression(query);
 				this.#persist(query);
 				this._isQuerySaved = this._savedSearches.some((search) => search.query === query);
 				this._showLoader = false;
@@ -56,25 +62,24 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 	}
 
 	#observeStuff() {
-		if (!this.#logViewerContext) return;
-		this.observe(this.#logViewerContext.savedSearches, (savedSearches) => {
+		this.observe(this._logViewerContext?.savedSearches, (savedSearches) => {
 			this._savedSearches = savedSearches?.items ?? [];
 			this._isQuerySaved = this._savedSearches.some((search) => search.query === this._inputQuery);
 		});
 
-		this.observe(this.#logViewerContext.filterExpression, (query) => {
-			this._inputQuery = query;
-			this._isQuerySaved = this._savedSearches.some((search) => search.query === query);
+		this.observe(this._logViewerContext?.filterExpression, (query) => {
+			this._inputQuery = query ?? '';
+			this._isQuerySaved = this._savedSearches.some((search) => search.query === this._inputQuery);
 		});
 	}
 
 	#setQuery(event: Event) {
 		const target = event.target as UUIInputElement;
-		this.inputQuery$.next(target.value as string);
+		this.#inputQuery$.next(target.value as string);
 	}
 
 	#setQueryFromSavedSearch(query: string) {
-		this.inputQuery$.next(query);
+		this.#inputQuery$.next(query);
 		this._searchDropdownElement.open = false;
 	}
 
@@ -90,37 +95,37 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 	}
 
 	#clearQuery() {
-		this.inputQuery$.next('');
-		this.#logViewerContext?.setFilterExpression('');
+		this.#inputQuery$.next('');
+		this._logViewerContext?.setFilterExpression('');
 	}
 
 	#saveSearch(savedSearch: SavedLogSearchResponseModel) {
-		this.#logViewerContext?.saveSearch(savedSearch);
+		this._logViewerContext?.saveSearch(savedSearch);
 	}
 
 	async #removeSearch(name: string) {
 		await umbConfirmModal(this, {
 			headline: this.localize.term('logViewer_deleteSavedSearch'),
-			content: `${this.localize.term('defaultdialogs_confirmdelete')} ${name}?`,
+			content: this.localize.term('defaultdialogs_confirmdelete', escapeHTML(name)),
 			color: 'danger',
 			confirmLabel: 'Delete',
 		});
 
-		this.#logViewerContext?.removeSearch({ name });
+		this._logViewerContext?.removeSearch({ name });
 		//this.dispatchEvent(new UmbDeleteEvent());
 	}
 
 	async #openSaveSearchDialog() {
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const modal = modalManager.open(this, UMB_LOG_VIEWER_SAVE_SEARCH_MODAL, {
+		umbOpenModal(this, UMB_LOG_VIEWER_SAVE_SEARCH_MODAL, {
 			data: { query: this._inputQuery },
-		});
-		modal?.onSubmit().then((savedSearch) => {
-			if (savedSearch) {
-				this.#saveSearch(savedSearch);
-				this._isQuerySaved = true;
-			}
-		});
+		})
+			.then((savedSearch) => {
+				if (savedSearch) {
+					this.#saveSearch(savedSearch);
+					this._isQuerySaved = true;
+				}
+			})
+			.catch(() => {});
 	}
 
 	override render() {

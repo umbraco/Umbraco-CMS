@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(TableName)]
 [PrimaryKey("nodeId", AutoIncrement = false)]
 [ExplicitColumns]
-internal class TagRelationshipDto
+internal sealed class TagRelationshipDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.TagRelationship;
 

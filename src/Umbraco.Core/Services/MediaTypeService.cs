@@ -21,7 +21,7 @@ public class MediaTypeService : ContentTypeServiceBase<IMediaTypeRepository, IMe
         IEventMessagesFactory eventMessagesFactory,
         IMediaService mediaService,
         IMediaTypeRepository mediaTypeRepository,
-        IAuditRepository auditRepository,
+        IAuditService auditService,
         IMediaTypeContainerRepository entityContainerRepository,
         IEntityRepository entityRepository,
         IEventAggregator eventAggregator,
@@ -32,39 +32,17 @@ public class MediaTypeService : ContentTypeServiceBase<IMediaTypeRepository, IMe
             loggerFactory,
             eventMessagesFactory,
             mediaTypeRepository,
-            auditRepository,
+            auditService,
             entityContainerRepository,
             entityRepository,
             eventAggregator,
             userIdKeyResolver,
-            contentTypeFilters) => MediaService = mediaService;
-
-    [Obsolete("Use the constructor with all dependencies instead")]
-    public MediaTypeService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IMediaService mediaService,
-        IMediaTypeRepository mediaTypeRepository,
-        IAuditRepository auditRepository,
-        IMediaTypeContainerRepository entityContainerRepository,
-        IEntityRepository entityRepository,
-        IEventAggregator eventAggregator)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            mediaService,
-            mediaTypeRepository,
-            auditRepository,
-            entityContainerRepository,
-            entityRepository,
-            eventAggregator,
-            StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>())
+            contentTypeFilters)
     {
+        MediaService = mediaService;
     }
 
-    [Obsolete("Use the constructor with all dependencies instead")]
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
     public MediaTypeService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -75,19 +53,49 @@ public class MediaTypeService : ContentTypeServiceBase<IMediaTypeRepository, IMe
         IMediaTypeContainerRepository entityContainerRepository,
         IEntityRepository entityRepository,
         IEventAggregator eventAggregator,
-        IUserIdKeyResolver userIdKeyResolver)
+        IUserIdKeyResolver userIdKeyResolver,
+        ContentTypeFilterCollection contentTypeFilters)
         : this(
             provider,
             loggerFactory,
             eventMessagesFactory,
             mediaService,
             mediaTypeRepository,
-            auditRepository,
+            StaticServiceProvider.Instance.GetRequiredService<IAuditService>(),
             entityContainerRepository,
             entityRepository,
             eventAggregator,
             userIdKeyResolver,
-            StaticServiceProvider.Instance.GetRequiredService<ContentTypeFilterCollection>())
+            contentTypeFilters)
+    {
+    }
+
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+    public MediaTypeService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IMediaService mediaService,
+        IMediaTypeRepository mediaTypeRepository,
+        IAuditService auditService,
+        IAuditRepository auditRepository,
+        IMediaTypeContainerRepository entityContainerRepository,
+        IEntityRepository entityRepository,
+        IEventAggregator eventAggregator,
+        IUserIdKeyResolver userIdKeyResolver,
+        ContentTypeFilterCollection contentTypeFilters)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            mediaService,
+            mediaTypeRepository,
+            auditService,
+            entityContainerRepository,
+            entityRepository,
+            eventAggregator,
+            userIdKeyResolver,
+            contentTypeFilters)
     {
     }
 

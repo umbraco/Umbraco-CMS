@@ -72,6 +72,8 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 				//Getting not published mandatory options — the options that are mandatory and not currently published.
 				const missingMandatoryOptions = this._options.filter(isNotPublishedMandatory);
 				this._hasNotSelectedMandatory = missingMandatoryOptions.some((option) => !selection.includes(option.unique));
+
+				this.requestUpdate();
 			},
 			'_selection',
 		);
@@ -157,21 +159,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 	}
 
 	override render() {
-		return html`<umb-body-layout headline=${this.localize.term('general_scheduledPublishing')}>
-			<p id="subtitle">
-				${when(
-					this._options.length > 1,
-					() => html`
-						<umb-localize key="content_languagesToSchedule">Which languages would you like to schedule?</umb-localize>
-					`,
-					() => html`
-						<umb-localize key="content_schedulePublishHelp">
-							Select the date and time to publish and/or unpublish the content item.
-						</umb-localize>
-					`,
-				)}
-			</p>
-
+		return html`<uui-dialog-layout headline=${this.localize.term('general_scheduledPublishing')}>
 			${this.#renderOptions()}
 
 			<div slot="actions">
@@ -184,7 +172,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 					?disabled=${!this._selection.length || this._hasNotSelectedMandatory}
 					@click=${this.#submit}></uui-button>
 			</div>
-		</umb-body-layout> `;
+		</uui-dialog-layout> `;
 	}
 
 	#renderOptions() {

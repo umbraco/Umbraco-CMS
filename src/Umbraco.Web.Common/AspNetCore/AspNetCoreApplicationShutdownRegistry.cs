@@ -38,7 +38,7 @@ public class AspNetCoreApplicationShutdownRegistry : IApplicationShutdownRegistr
         }
     }
 
-    private class RegisteredObjectWrapper
+    private sealed class RegisteredObjectWrapper
     {
         private readonly IRegisteredObject _inner;
 

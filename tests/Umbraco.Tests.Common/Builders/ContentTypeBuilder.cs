@@ -1,8 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
-using System.Linq;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -125,6 +123,7 @@ public class ContentTypeBuilder
         contentType.Trashed = GetTrashed();
         contentType.ListView = GetListView();
         contentType.IsElement = _isElement ?? false;
+        contentType.AllowedAsRoot = GetAllowedAtRoot();
         contentType.HistoryCleanup = new HistoryCleanup();
 
         contentType.Variations = contentVariation;
@@ -531,6 +530,14 @@ public class ContentTypeBuilder
             .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.Tags)
             .WithValueStorageType(ValueStorageType.Ntext)
             .WithSortOrder(20)
+            .Done()
+            .AddPropertyType()
+            .WithAlias("dateTimeWithTimeZone")
+            .WithName("Date Time (with time zone)")
+            .WithDataTypeId(1055)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.DateTimeWithTimeZone)
+            .WithValueStorageType(ValueStorageType.Ntext)
+            .WithSortOrder(21)
             .Done()
             .Done()
             .Build();

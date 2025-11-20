@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.Security;
 
 namespace Umbraco.Cms.Api.Delivery.Handlers;
@@ -18,18 +19,24 @@ internal sealed class InitializeMemberApplicationNotificationHandler : INotifica
     private readonly DeliveryApiSettings _deliveryApiSettings;
     private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly IMemberClientCredentialsManager _memberClientCredentialsManager;
+    private readonly IServerRoleAccessor _serverRoleAccessor;
+
+    private static readonly SemaphoreSlim _locker = new(1);
+    private static bool _isInitialized = false;
 
     public InitializeMemberApplicationNotificationHandler(
         IRuntimeState runtimeState,
         IOptions<DeliveryApiSettings> deliveryApiSettings,
         ILogger<InitializeMemberApplicationNotificationHandler> logger,
         IServiceScopeFactory serviceScopeFactory,
-        IMemberClientCredentialsManager memberClientCredentialsManager)
+        IMemberClientCredentialsManager memberClientCredentialsManager,
+        IServerRoleAccessor serverRoleAccessor)
     {
         _runtimeState = runtimeState;
         _logger = logger;
         _serviceScopeFactory = serviceScopeFactory;
         _memberClientCredentialsManager = memberClientCredentialsManager;
+        _serverRoleAccessor = serverRoleAccessor;
         _deliveryApiSettings = deliveryApiSettings.Value;
     }
 
@@ -40,13 +47,34 @@ internal sealed class InitializeMemberApplicationNotificationHandler : INotifica
             return;
         }
 
-        // we cannot inject the IMemberApplicationManager because it ultimately takes a dependency on the DbContext ... and during
-        // install that is not allowed (no connection string means no DbContext)
-        using IServiceScope scope = _serviceScopeFactory.CreateScope();
-        IMemberApplicationManager memberApplicationManager = scope.ServiceProvider.GetRequiredService<IMemberApplicationManager>();
+        if (_serverRoleAccessor.CurrentServerRole is ServerRole.Subscriber)
+        {
+            // subscriber instances should not alter the member application
+            return;
+        }
 
-        await HandleMemberApplication(memberApplicationManager, cancellationToken);
-        await HandleMemberClientCredentialsApplication(memberApplicationManager, cancellationToken);
+        try
+        {
+            await _locker.WaitAsync(cancellationToken);
+            if (_isInitialized)
+            {
+                return;
+            }
+
+            // we cannot inject the IMemberApplicationManager because it ultimately takes a dependency on the DbContext ... and during
+            // install that is not allowed (no connection string means no DbContext)
+            using IServiceScope scope = _serviceScopeFactory.CreateScope();
+            IMemberApplicationManager memberApplicationManager = scope.ServiceProvider.GetRequiredService<IMemberApplicationManager>();
+
+            await HandleMemberApplication(memberApplicationManager, cancellationToken);
+            await HandleMemberClientCredentialsApplication(memberApplicationManager, cancellationToken);
+
+            _isInitialized = true;
+        }
+        finally
+        {
+            _locker.Release();
+        }
     }
 
     private async Task HandleMemberApplication(IMemberApplicationManager memberApplicationManager, CancellationToken cancellationToken)
@@ -91,7 +119,7 @@ internal sealed class InitializeMemberApplicationNotificationHandler : INotifica
         }
     }
 
-    private bool ValidateRedirectUrls(Uri[] redirectUrls)
+    private bool ValidateRedirectUrls(IEnumerable<Uri> redirectUrls)
     {
         if (redirectUrls.Any() is false)
         {

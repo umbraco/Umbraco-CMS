@@ -42,12 +42,7 @@ export const data: Array<UmbMockMediaModel> = [
 				updateDate: '2023-02-06T15:31:51.354764',
 			},
 		],
-		urls: [
-			{
-				culture: null,
-				url: '/umbraco/backoffice/assets/installer-illustration.svg',
-			},
-		],
+		flags: [],
 	},
 	{
 		hasChildren: false,
@@ -77,7 +72,7 @@ export const data: Array<UmbMockMediaModel> = [
 				updateDate: '2023-02-06T15:31:51.354764',
 			},
 		],
-		urls: [],
+		flags: [],
 	},
 	{
 		hasChildren: true,
@@ -102,7 +97,7 @@ export const data: Array<UmbMockMediaModel> = [
 				updateDate: '2023-02-06T15:31:51.354764',
 			},
 		],
-		urls: [],
+		flags: [],
 	},
 	{
 		hasChildren: true,
@@ -127,7 +122,7 @@ export const data: Array<UmbMockMediaModel> = [
 				updateDate: '2023-02-06T15:31:51.354764',
 			},
 		],
-		urls: [],
+		flags: [],
 	},
 	{
 		hasChildren: false,
@@ -157,7 +152,7 @@ export const data: Array<UmbMockMediaModel> = [
 				updateDate: '2023-02-06T15:31:51.354764',
 			},
 		],
-		urls: [],
+		flags: [],
 	},
 	{
 		hasChildren: false,
@@ -187,7 +182,7 @@ export const data: Array<UmbMockMediaModel> = [
 				updateDate: '2023-02-06T15:31:51.354764',
 			},
 		],
-		urls: [],
+		flags: [],
 	},
 	{
 		hasChildren: false,
@@ -217,7 +212,7 @@ export const data: Array<UmbMockMediaModel> = [
 				updateDate: '2023-02-06T15:31:51.354764',
 			},
 		],
-		urls: [],
+		flags: [],
 	},
 	{
 		hasChildren: false,
@@ -247,6 +242,38 @@ export const data: Array<UmbMockMediaModel> = [
 				updateDate: '2023-02-06T15:31:51.354764',
 			},
 		],
-		urls: [],
+		flags: [],
+	},
+	{
+		hasChildren: false,
+		id: 'forbidden',
+		createDate: '2023-02-06T15:32:05.350038',
+		parent: null,
+		noAccess: false,
+		isTrashed: false,
+		mediaType: {
+			id: 'media-type-1-id',
+			icon: 'icon-picture',
+		},
+		values: [
+			{
+				editorAlias: 'Umbraco.UploadField',
+				alias: 'mediaPicker',
+				value: {
+					src: '/umbraco/backoffice/assets/installer-illustration.svg',
+				},
+			},
+		],
+		variants: [
+			{
+				publishDate: '2023-02-06T15:31:51.354764',
+				culture: null,
+				segment: null,
+				name: 'Forbidden Media',
+				createDate: '2023-02-06T15:31:46.876902',
+				updateDate: '2023-02-06T15:31:51.354764',
+			},
+		],
+		flags: [],
 	},
 ];

@@ -1,10 +1,11 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services.Filters;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
@@ -25,7 +26,8 @@ internal sealed class MediaEditingService
         ITreeEntitySortingService treeEntitySortingService,
         IMediaValidationService mediaValidationService,
         IOptionsMonitor<ContentSettings> optionsMonitor,
-        IRelationService relationService)
+        IRelationService relationService,
+        ContentTypeFilterCollection contentTypeFilters)
         : base(
             contentService,
             contentTypeService,
@@ -37,13 +39,14 @@ internal sealed class MediaEditingService
             mediaValidationService,
             treeEntitySortingService,
             optionsMonitor,
-            relationService)
+            relationService,
+            contentTypeFilters)
         => _logger = logger;
 
-    public async Task<IMedia?> GetAsync(Guid key)
+    public Task<IMedia?> GetAsync(Guid key)
     {
         IMedia? media = ContentService.GetById(key);
-        return await Task.FromResult(media);
+        return Task.FromResult(media);
     }
 
     public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(Guid key, MediaUpdateModel updateModel)

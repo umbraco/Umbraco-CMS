@@ -1,10 +1,13 @@
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Mapping.Content;
+using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Item;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentBlueprint.Item;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentPublishing;
@@ -23,7 +26,9 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
     private readonly IPublicAccessService _publicAccessService;
     private readonly TimeProvider _timeProvider;
     private readonly IIdKeyMap _idKeyMap;
+    private readonly FlagProviderCollection _flagProviderCollection;
 
+    [Obsolete("Please use the controller with all parameters. Scheduled for removal in Umbraco 18")]
     public DocumentPresentationFactory(
         IUmbracoMapper umbracoMapper,
         IDocumentUrlFactory documentUrlFactory,
@@ -31,6 +36,25 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
         IPublicAccessService publicAccessService,
         TimeProvider timeProvider,
         IIdKeyMap idKeyMap)
+        : this(
+            umbracoMapper,
+            documentUrlFactory,
+            templateService,
+            publicAccessService,
+            timeProvider,
+            idKeyMap,
+            StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>())
+    {
+    }
+
+    public DocumentPresentationFactory(
+        IUmbracoMapper umbracoMapper,
+        IDocumentUrlFactory documentUrlFactory,
+        ITemplateService templateService,
+        IPublicAccessService publicAccessService,
+        TimeProvider timeProvider,
+        IIdKeyMap idKeyMap,
+        FlagProviderCollection flagProviderCollection)
     {
         _umbracoMapper = umbracoMapper;
         _documentUrlFactory = documentUrlFactory;
@@ -38,31 +62,12 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
         _publicAccessService = publicAccessService;
         _timeProvider = timeProvider;
         _idKeyMap = idKeyMap;
-    }
-
-    [Obsolete("Schedule for removal in v17")]
-    public async Task<DocumentResponseModel> CreateResponseModelAsync(IContent content)
-    {
-        DocumentResponseModel responseModel = _umbracoMapper.Map<DocumentResponseModel>(content)!;
-
-        responseModel.Urls = await _documentUrlFactory.CreateUrlsAsync(content);
-
-        Guid? templateKey = content.TemplateId.HasValue
-            ? _templateService.GetAsync(content.TemplateId.Value).Result?.Key
-            : null;
-
-        responseModel.Template = templateKey.HasValue
-            ? new ReferenceByIdModel { Id = templateKey.Value }
-            : null;
-
-        return responseModel;
+        _flagProviderCollection = flagProviderCollection;
     }
 
     public async Task<PublishedDocumentResponseModel> CreatePublishedResponseModelAsync(IContent content)
     {
         PublishedDocumentResponseModel responseModel = _umbracoMapper.Map<PublishedDocumentResponseModel>(content)!;
-
-        responseModel.Urls = await _documentUrlFactory.CreateUrlsAsync(content);
 
         Guid? templateKey = content.PublishTemplateId.HasValue
             ? _templateService.GetAsync(content.PublishTemplateId.Value).Result?.Key
@@ -79,8 +84,6 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
     {
         DocumentResponseModel responseModel = _umbracoMapper.Map<DocumentResponseModel>(content)!;
         _umbracoMapper.Map(schedule, responseModel);
-
-        responseModel.Urls = await _documentUrlFactory.CreateUrlsAsync(content);
 
         Guid? templateKey = content.TemplateId.HasValue
             ? _templateService.GetAsync(content.TemplateId.Value).Result?.Key
@@ -111,6 +114,8 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
 
         responseModel.Variants = CreateVariantsItemResponseModels(entity);
 
+        PopulateFlagsOnDocuments(responseModel);
+
         return responseModel;
     }
 
@@ -131,90 +136,34 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
     {
         if (entity.Variations.VariesByCulture() is false)
         {
-            yield return new()
+            var model = new DocumentVariantItemResponseModel()
             {
                 Name = entity.Name ?? string.Empty,
                 State = DocumentVariantStateHelper.GetState(entity, null),
                 Culture = null,
             };
+
+            PopulateFlagsOnVariants(model);
+            yield return model;
             yield break;
         }
 
         foreach (KeyValuePair<string, string> cultureNamePair in entity.CultureNames)
         {
-            yield return new()
+            var model = new DocumentVariantItemResponseModel()
             {
                 Name = cultureNamePair.Value,
                 Culture = cultureNamePair.Key,
                 State = DocumentVariantStateHelper.GetState(entity, cultureNamePair.Key)
             };
+
+            PopulateFlagsOnVariants(model);
+            yield return model;
         }
     }
 
     public DocumentTypeReferenceResponseModel CreateDocumentTypeReferenceResponseModel(IDocumentEntitySlim entity)
         => _umbracoMapper.Map<DocumentTypeReferenceResponseModel>(entity)!;
-
-    [Obsolete("Use CreateCulturePublishScheduleModels instead. Scheduled for removal in v17")]
-    public Attempt<CultureAndScheduleModel, ContentPublishingOperationStatus> CreateCultureAndScheduleModel(PublishDocumentRequestModel requestModel)
-    {
-        var contentScheduleCollection = new ContentScheduleCollection();
-        var culturesToPublishImmediately = new HashSet<string>();
-        foreach (CultureAndScheduleRequestModel cultureAndScheduleRequestModel in requestModel.PublishSchedules)
-        {
-            if (cultureAndScheduleRequestModel.Schedule is null || (cultureAndScheduleRequestModel.Schedule.PublishTime is null && cultureAndScheduleRequestModel.Schedule.UnpublishTime is null))
-            {
-                culturesToPublishImmediately.Add(cultureAndScheduleRequestModel.Culture ?? Constants.System.InvariantCulture); // API have `null` for invariant, but service layer has "*".
-                continue;
-            }
-
-            if (cultureAndScheduleRequestModel.Schedule.PublishTime is not null)
-            {
-                if (cultureAndScheduleRequestModel.Schedule.PublishTime <= _timeProvider.GetUtcNow())
-                {
-                    return Attempt.FailWithStatus(ContentPublishingOperationStatus.PublishTimeNeedsToBeInFuture, new CultureAndScheduleModel()
-                    {
-                        Schedules = contentScheduleCollection,
-                        CulturesToPublishImmediately = culturesToPublishImmediately,
-                    });
-                }
-
-                contentScheduleCollection.Add(new ContentSchedule(
-                    cultureAndScheduleRequestModel.Culture ?? Constants.System.InvariantCulture,
-                    cultureAndScheduleRequestModel.Schedule.PublishTime.Value.UtcDateTime,
-                    ContentScheduleAction.Release));
-            }
-            if (cultureAndScheduleRequestModel.Schedule.UnpublishTime is not null)
-            {
-                if (cultureAndScheduleRequestModel.Schedule.UnpublishTime <= cultureAndScheduleRequestModel.Schedule.PublishTime)
-                {
-                    return Attempt.FailWithStatus(ContentPublishingOperationStatus.UnpublishTimeNeedsToBeAfterPublishTime, new CultureAndScheduleModel()
-                    {
-                        Schedules = contentScheduleCollection,
-                        CulturesToPublishImmediately = culturesToPublishImmediately,
-                    });
-                }
-
-                if (cultureAndScheduleRequestModel.Schedule.UnpublishTime <= _timeProvider.GetUtcNow())
-                {
-                    return Attempt.FailWithStatus(ContentPublishingOperationStatus.UpublishTimeNeedsToBeInFuture, new CultureAndScheduleModel()
-                    {
-                        Schedules = contentScheduleCollection,
-                        CulturesToPublishImmediately = culturesToPublishImmediately,
-                    });
-                }
-
-                contentScheduleCollection.Add(new ContentSchedule(
-                    cultureAndScheduleRequestModel.Culture ?? Constants.System.InvariantCulture,
-                    cultureAndScheduleRequestModel.Schedule.UnpublishTime.Value.UtcDateTime,
-                    ContentScheduleAction.Expire));
-            }
-        }
-        return Attempt.SucceedWithStatus(ContentPublishingOperationStatus.Success, new CultureAndScheduleModel()
-        {
-            Schedules = contentScheduleCollection,
-            CulturesToPublishImmediately = culturesToPublishImmediately,
-        });
-    }
 
     public Attempt<List<CulturePublishScheduleModel>, ContentPublishingOperationStatus> CreateCulturePublishScheduleModels(PublishDocumentRequestModel requestModel)
     {
@@ -261,5 +210,21 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
         }
 
         return Attempt.SucceedWithStatus(ContentPublishingOperationStatus.Success, model);
+    }
+
+    private void PopulateFlagsOnDocuments(DocumentItemResponseModel model)
+    {
+        foreach (IFlagProvider signProvider in _flagProviderCollection.Where(x => x.CanProvideFlags<DocumentItemResponseModel>()))
+        {
+            signProvider.PopulateFlagsAsync([model]).GetAwaiter().GetResult();
+        }
+    }
+
+    private void PopulateFlagsOnVariants(DocumentVariantItemResponseModel model)
+    {
+        foreach (IFlagProvider signProvider in _flagProviderCollection.Where(x => x.CanProvideFlags<DocumentVariantItemResponseModel>()))
+        {
+            signProvider.PopulateFlagsAsync([model]).GetAwaiter().GetResult();
+        }
     }
 }

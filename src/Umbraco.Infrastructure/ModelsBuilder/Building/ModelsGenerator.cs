@@ -1,11 +1,8 @@
 using System.Text;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Extensions;
-using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building;
 
@@ -15,30 +12,6 @@ public class ModelsGenerator : IModelsGenerator
     private readonly IHostEnvironment _hostEnvironment;
     private readonly UmbracoServices _umbracoService;
     private ModelsBuilderSettings _config;
-
-    [Obsolete("Use a not obsoleted constructor instead. Scheduled for removal in v16")]
-    public ModelsGenerator(UmbracoServices umbracoService, IOptionsMonitor<ModelsBuilderSettings> config,
-        OutOfDateModelsStatus outOfDateModels, IHostingEnvironment hostingEnvironment)
-    {
-        _umbracoService = umbracoService;
-        _config = config.CurrentValue;
-        _outOfDateModels = outOfDateModels;
-        config.OnChange(x => _config = x);
-
-        _hostEnvironment = StaticServiceProvider.Instance.GetRequiredService<IHostEnvironment>();
-    }
-
-    [Obsolete("Use a not obsoleted constructor instead. Scheduled for removal in v16")]
-    public ModelsGenerator(UmbracoServices umbracoService, IOptionsMonitor<ModelsBuilderSettings> config,
-        OutOfDateModelsStatus outOfDateModels, IHostingEnvironment hostingEnvironment, IHostEnvironment hostEnvironment)
-    {
-        _umbracoService = umbracoService;
-        _config = config.CurrentValue;
-        _outOfDateModels = outOfDateModels;
-        config.OnChange(x => _config = x);
-
-        _hostEnvironment = hostEnvironment;
-    }
 
     public ModelsGenerator(UmbracoServices umbracoService, IOptionsMonitor<ModelsBuilderSettings> config,
         OutOfDateModelsStatus outOfDateModels, IHostEnvironment hostEnvironment)
@@ -58,21 +31,37 @@ public class ModelsGenerator : IModelsGenerator
             Directory.CreateDirectory(modelsDirectory);
         }
 
-        foreach (var file in Directory.GetFiles(modelsDirectory, "*.generated.cs"))
-        {
-            File.Delete(file);
-        }
-
         IList<TypeModel> typeModels = _umbracoService.GetAllTypes();
 
         var builder = new TextBuilder(_config, typeModels);
 
+        var generatedFiles = new List<string>();
         foreach (TypeModel typeModel in builder.GetModelsToGenerate())
         {
             var sb = new StringBuilder();
             builder.Generate(sb, typeModel);
             var filename = Path.Combine(modelsDirectory, typeModel.ClrName + ".generated.cs");
-            File.WriteAllText(filename, sb.ToString());
+            generatedFiles.Add(filename);
+
+            var code = sb.ToString();
+
+            // leave the file alone if its contents is identical to the generated model
+            if (File.Exists(filename) && File.ReadAllText(filename).Equals(code))
+            {
+                continue;
+            }
+
+            // overwrite the file
+            File.WriteAllText(filename, code);
+        }
+
+        // clean up old/leftover generated files
+        foreach (var file in Directory.GetFiles(modelsDirectory, "*.generated.cs"))
+        {
+            if (generatedFiles.InvariantContains(file) is false)
+            {
+                File.Delete(file);
+            }
         }
 
         // the idea was to calculate the current hash and to add it as an extra file to the compilation,

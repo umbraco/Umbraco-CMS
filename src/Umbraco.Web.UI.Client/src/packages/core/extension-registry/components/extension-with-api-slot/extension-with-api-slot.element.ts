@@ -143,6 +143,15 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 		index: number,
 	) => TemplateResult | TemplateResult<1> | HTMLElement | null | undefined | typeof nothing;
 
+	@property({ attribute: false })
+	public fallbackRenderMethod?: () =>
+		| TemplateResult
+		| TemplateResult<1>
+		| HTMLElement
+		| null
+		| undefined
+		| typeof nothing;
+
 	override connectedCallback(): void {
 		super.connectedCallback();
 		this.#attached = true;
@@ -185,8 +194,12 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 		return this._permitted
 			? this._permitted.length > 0
 				? repeat(this._permitted, (ext) => ext.alias, this.#renderExtension)
-				: html`<slot></slot>`
+				: this.#renderNoting()
 			: nothing;
+	}
+
+	#renderNoting() {
+		return this.fallbackRenderMethod ? this.fallbackRenderMethod() : html`<slot></slot>`;
 	}
 
 	#renderExtension = (ext: UmbExtensionElementAndApiInitializer, i: number) => {

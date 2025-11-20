@@ -13,10 +13,10 @@ import { UmbUserItemRepository } from '@umbraco-cms/backoffice/user';
 @customElement('umb-media-history-workspace-info-app')
 export class UmbMediaHistoryWorkspaceInfoAppElement extends UmbLitElement {
 	@state()
-	_currentPageNumber = 1;
+	private _currentPageNumber = 1;
 
 	@state()
-	_totalPages = 1;
+	private _totalPages = 1;
 
 	@state()
 	private _items: Array<UmbMediaAuditLogModel> = [];
@@ -42,7 +42,9 @@ export class UmbMediaHistoryWorkspaceInfoAppElement extends UmbLitElement {
 	}
 
 	async #requestAuditLogs() {
-		const unique = this.#workspaceContext?.getUnique();
+		if (!this.#workspaceContext) return;
+
+		const unique = this.#workspaceContext.getUnique();
 		if (!unique) throw new Error('Media unique is required');
 
 		const { data } = await this.#auditLogRepository.requestAuditLog({
@@ -141,6 +143,10 @@ export class UmbMediaHistoryWorkspaceInfoAppElement extends UmbLitElement {
 							class="pagination"
 							.current=${this._currentPageNumber}
 							.total=${this._totalPages}
+							firstlabel=${this.localize.term('general_first')}
+							previouslabel=${this.localize.term('general_previous')}
+							nextlabel=${this.localize.term('general_next')}
+							lastlabel=${this.localize.term('general_last')}
 							@change=${this.#onPageChange}></uui-pagination>
 					`
 				: nothing}
@@ -167,6 +173,7 @@ export class UmbMediaHistoryWorkspaceInfoAppElement extends UmbLitElement {
 			}
 
 			.log-type uui-tag {
+				justify-self: center;
 				height: fit-content;
 				margin-top: auto;
 				margin-bottom: auto;

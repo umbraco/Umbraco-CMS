@@ -2,7 +2,6 @@ using Microsoft.Extensions.Hosting;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Extensions;
-using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Extensions;
 
@@ -18,22 +17,6 @@ public static class ModelsBuilderConfigExtensions
         {
             var modelsDirectory = modelsBuilderConfig.ModelsDirectory;
             var root = hostEnvironment.MapPathContentRoot("~/");
-
-            _modelsDirectoryAbsolute = GetModelsDirectory(root, modelsDirectory, modelsBuilderConfig.AcceptUnsafeModelsDirectory);
-        }
-
-        return _modelsDirectoryAbsolute;
-    }
-
-    [Obsolete("Use the non obsoleted equivalent instead. Scheduled for removal in v16")]
-    public static string ModelsDirectoryAbsolute(
-        this ModelsBuilderSettings modelsBuilderConfig,
-        IHostingEnvironment hostingEnvironment)
-    {
-        if (_modelsDirectoryAbsolute is null)
-        {
-            var modelsDirectory = modelsBuilderConfig.ModelsDirectory;
-            var root = hostingEnvironment.MapPathContentRoot("~/");
 
             _modelsDirectoryAbsolute = GetModelsDirectory(root, modelsDirectory, modelsBuilderConfig.AcceptUnsafeModelsDirectory);
         }

@@ -1,9 +1,13 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Infrastructure.PropertyEditors;
 using Umbraco.Cms.Infrastructure.Serialization;
+using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Builders.Interfaces;
 
 namespace Umbraco.Cms.Tests.Common.Builders;
@@ -126,8 +130,8 @@ public class DataTypeBuilder
         var parentId = _parentId ?? -1;
         var id = _id ?? 1;
         var key = _key ?? Guid.NewGuid();
-        var createDate = _createDate ?? DateTime.Now;
-        var updateDate = _updateDate ?? DateTime.Now;
+        var createDate = _createDate ?? DateTime.UtcNow;
+        var updateDate = _updateDate ?? DateTime.UtcNow;
         var deleteDate = _deleteDate;
         var name = _name ?? Guid.NewGuid().ToString();
         var level = _level ?? 0;
@@ -135,7 +139,7 @@ public class DataTypeBuilder
         var creatorId = _creatorId ?? 1;
         var databaseType = _databaseType ?? ValueStorageType.Ntext;
         var sortOrder = _sortOrder ?? 0;
-        var serializer = new SystemTextConfigurationEditorJsonSerializer();
+        var serializer = new SystemTextConfigurationEditorJsonSerializer(new DefaultJsonSerializerEncoderFactory());
 
         var dataType = new DataType(editor, serializer, parentId)
         {
@@ -154,5 +158,104 @@ public class DataTypeBuilder
         };
 
         return dataType;
+    }
+
+    public static DataType CreateSimpleElementDataType(
+        IIOHelper ioHelper,
+        string editorAlias,
+        Guid elementKey,
+        Guid? elementSettingKey)
+    {
+        Dictionary<string, object> configuration = editorAlias switch
+        {
+            Constants.PropertyEditors.Aliases.BlockGrid => GetBlockGridBaseConfiguration(),
+            Constants.PropertyEditors.Aliases.RichText => GetRteBaseConfiguration(),
+            _ => [],
+        };
+
+        SetBlockConfiguration(
+            configuration,
+            elementKey,
+            elementSettingKey,
+            editorAlias == Constants.PropertyEditors.Aliases.BlockGrid ? true : null);
+
+        var dataTypeBuilder = new DataTypeBuilder()
+            .WithId(0)
+            .WithDatabaseType(ValueStorageType.Ntext)
+            .AddEditor()
+            .WithAlias(editorAlias);
+
+        switch (editorAlias)
+        {
+            case Constants.PropertyEditors.Aliases.BlockGrid:
+                dataTypeBuilder.WithConfigurationEditor(
+                    new BlockGridConfigurationEditor(ioHelper) { DefaultConfiguration = configuration });
+                break;
+            case Constants.PropertyEditors.Aliases.BlockList:
+                dataTypeBuilder.WithConfigurationEditor(
+                    new BlockListConfigurationEditor(ioHelper) { DefaultConfiguration = configuration });
+                break;
+            case Constants.PropertyEditors.Aliases.SingleBlock:
+                dataTypeBuilder.WithConfigurationEditor(
+                    new SingleBlockConfigurationEditor(ioHelper) { DefaultConfiguration = configuration });
+                break;
+            case Constants.PropertyEditors.Aliases.RichText:
+                dataTypeBuilder.WithConfigurationEditor(
+                    new RichTextConfigurationEditor(ioHelper) { DefaultConfiguration = configuration });
+                break;
+        }
+
+        return dataTypeBuilder.Done().Build();
+    }
+
+    private static void SetBlockConfiguration(
+        Dictionary<string, object> dictionary,
+        Guid? elementKey,
+        Guid? elementSettingKey,
+        bool? allowAtRoot)
+    {
+        if (elementKey is null)
+        {
+            return;
+        }
+
+        dictionary["blocks"] = new[] { BuildBlockConfiguration(elementKey.Value, elementSettingKey, allowAtRoot) };
+    }
+
+    private static Dictionary<string, object> GetBlockGridBaseConfiguration() => new() { ["gridColumns"] = 12 };
+
+    private static Dictionary<string, object> GetRteBaseConfiguration()
+    {
+        var dictionary = new Dictionary<string, object>
+        {
+            ["maxImageSize"] = 500,
+            ["mode"] = "Classic",
+            ["toolbar"] = new[]
+            {
+                "styles", "bold", "italic", "alignleft", "aligncenter", "alignright", "bullist", "numlist", "outdent",
+                "indent", "sourcecode", "link", "umbmediapicker", "umbembeddialog"
+            },
+        };
+        return dictionary;
+    }
+
+    private static Dictionary<string, object> BuildBlockConfiguration(
+        Guid? elementKey,
+        Guid? elementSettingKey,
+        bool? allowAtRoot)
+    {
+        var dictionary = new Dictionary<string, object>();
+        if (allowAtRoot is not null)
+        {
+            dictionary.Add("allowAtRoot", allowAtRoot.Value);
+        }
+
+        dictionary.Add("contentElementTypeKey", elementKey.ToString());
+        if (elementSettingKey is not null)
+        {
+            dictionary.Add("settingsElementTypeKey", elementSettingKey.ToString());
+        }
+
+        return dictionary;
     }
 }

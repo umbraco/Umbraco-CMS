@@ -23,7 +23,7 @@ public class ContentVersionDto
     public int NodeId { get; set; }
 
     [Column("versionDate")] // TODO: db rename to 'updateDate'
-    [Constraint(Default = SystemMethods.CurrentDateTime)]
+    [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
     public DateTime VersionDate { get; set; }
 
     [Column("userId")] // TODO: db rename to 'updateUserId'

@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
@@ -65,7 +65,7 @@ internal class MultiUrlPickerValueEditorValidationTests
             Mock.Of<IShortStringHelper>(),
             new DataEditorAttribute("alias"),
             Mock.Of<IPublishedUrlProvider>(),
-            new SystemTextJsonSerializer(),
+            new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()),
             Mock.Of<IIOHelper>(),
             Mock.Of<IContentService>(),
             Mock.Of<IMediaService>())

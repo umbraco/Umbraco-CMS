@@ -74,6 +74,9 @@ path: () => import("./icons/icon-axis-rotation.js"),
 name: "icon-backspace",
 path: () => import("./icons/icon-backspace.js"),
 },{
+name: "icon-badge",
+path: () => import("./icons/icon-badge.js"),
+},{
 name: "icon-badge-add",
 path: () => import("./icons/icon-badge-add.js"),
 },{
@@ -81,7 +84,6 @@ name: "icon-badge-remove",
 path: () => import("./icons/icon-badge-remove.js"),
 },{
 name: "icon-badge-restricted",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-badge-restricted.js"),
 },{
@@ -116,7 +118,6 @@ name: "icon-binarycode",
 path: () => import("./icons/icon-binarycode.js"),
 },{
 name: "icon-binoculars",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-binoculars.js"),
 },{
@@ -211,7 +212,6 @@ name: "icon-calendar",
 path: () => import("./icons/icon-calendar.js"),
 },{
 name: "icon-camcorder",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-camcorder.js"),
 },{
@@ -240,7 +240,6 @@ name: "icon-chart",
 path: () => import("./icons/icon-chart.js"),
 },{
 name: "icon-chat-active",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-chat-active.js"),
 },{
@@ -254,7 +253,6 @@ name: "icon-checkbox-dotted",
 path: () => import("./icons/icon-checkbox-dotted.js"),
 },{
 name: "icon-checkbox-empty",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-checkbox-empty.js"),
 },{
@@ -262,7 +260,6 @@ name: "icon-checkbox",
 path: () => import("./icons/icon-checkbox.js"),
 },{
 name: "icon-chip-alt",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-chip-alt.js"),
 },{
@@ -285,7 +282,6 @@ name: "icon-clear-formatting",
 path: () => import("./icons/icon-clear-formatting.js"),
 },{
 name: "icon-client",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-client.js"),
 },{
@@ -341,7 +337,6 @@ name: "icon-coin-yen",
 path: () => import("./icons/icon-coin-yen.js"),
 },{
 name: "icon-coins-alt",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-coins-alt.js"),
 },{
@@ -356,6 +351,30 @@ path: () => import("./icons/icon-colorpicker.js"),
 },{
 name: "icon-columns",
 path: () => import("./icons/icon-columns.js"),
+},{
+name: "icon-columns-2",
+path: () => import("./icons/icon-columns-2.js"),
+},{
+name: "icon-columns-3",
+path: () => import("./icons/icon-columns-3.js"),
+},{
+name: "icon-columns-4",
+path: () => import("./icons/icon-columns-4.js"),
+},{
+name: "icon-rows-2",
+path: () => import("./icons/icon-rows-2.js"),
+},{
+name: "icon-rows-3",
+path: () => import("./icons/icon-rows-3.js"),
+},{
+name: "icon-rows-4",
+path: () => import("./icons/icon-rows-4.js"),
+},{
+name: "icon-grid-2",
+path: () => import("./icons/icon-grid-2.js"),
+},{
+name: "icon-grid-3",
+path: () => import("./icons/icon-grid-3.js"),
 },{
 name: "icon-combination-lock-open",
 path: () => import("./icons/icon-combination-lock-open.js"),
@@ -385,7 +404,6 @@ name: "icon-conversation-alt",
 path: () => import("./icons/icon-conversation-alt.js"),
 },{
 name: "icon-conversation",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-conversation.js"),
 },{
@@ -393,7 +411,6 @@ name: "icon-coverflow",
 path: () => import("./icons/icon-coverflow.js"),
 },{
 name: "icon-credit-card-alt",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-credit-card-alt.js"),
 },{
@@ -407,7 +424,6 @@ name: "icon-crosshair",
 path: () => import("./icons/icon-crosshair.js"),
 },{
 name: "icon-crown-alt",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-crown-alt.js"),
 },{
@@ -415,7 +431,6 @@ name: "icon-crown",
 path: () => import("./icons/icon-crown.js"),
 },{
 name: "icon-cupcake",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-cupcake.js"),
 },{
@@ -441,7 +456,6 @@ name: "icon-departure",
 path: () => import("./icons/icon-departure.js"),
 },{
 name: "icon-desktop",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-desktop.js"),
 },{
@@ -464,7 +478,6 @@ name: "icon-dice",
 path: () => import("./icons/icon-dice.js"),
 },{
 name: "icon-diploma-alt",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-diploma-alt.js"),
 },{
@@ -493,7 +506,6 @@ name: "icon-dock-connector",
 path: () => import("./icons/icon-dock-connector.js"),
 },{
 name: "icon-document-dashed-line",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-document-dashed-line.js"),
 },{
@@ -504,12 +516,10 @@ name: "icon-documents",
 path: () => import("./icons/icon-documents.js"),
 },{
 name: "icon-donate",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-donate.js"),
 },{
 name: "icon-door-open-alt",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-door-open-alt.js"),
 },{
@@ -529,7 +539,6 @@ name: "icon-eco",
 path: () => import("./icons/icon-eco.js"),
 },{
 name: "icon-economy",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-economy.js"),
 },{
@@ -540,7 +549,6 @@ name: "icon-embed",
 path: () => import("./icons/icon-embed.js"),
 },{
 name: "icon-employee",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-employee.js"),
 },{
@@ -593,7 +601,6 @@ name: "icon-fire",
 path: () => import("./icons/icon-fire.js"),
 },{
 name: "icon-firewire",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-firewire.js"),
 },{
@@ -631,7 +638,6 @@ name: "icon-forking",
 path: () => import("./icons/icon-forking.js"),
 },{
 name: "icon-frame-alt",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-frame-alt.js"),
 },{
@@ -648,7 +654,6 @@ name: "icon-game",
 path: () => import("./icons/icon-game.js"),
 },{
 name: "icon-geometry",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-geometry.js"),
 },{
@@ -662,27 +667,22 @@ name: "icon-globe-alt",
 path: () => import("./icons/icon-globe-alt.js"),
 },{
 name: "icon-globe-asia",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-globe-asia.js"),
 },{
 name: "icon-globe-europe-africa",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-globe-europe-africa.js"),
 },{
 name: "icon-globe-inverted-america",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-globe-inverted-america.js"),
 },{
 name: "icon-globe-inverted-asia",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-globe-inverted-asia.js"),
 },{
 name: "icon-globe-inverted-europe-africa",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-globe-inverted-europe-africa.js"),
 },{
@@ -698,15 +698,14 @@ path: () => import("./icons/icon-graduate.js"),
 name: "icon-grid",
 path: () => import("./icons/icon-grid.js"),
 },{
-name: "icon-drag",
+name: "icon-grip",
 hidden: true,
-path: () => import("./icons/icon-drag.js"),
+path: () => import("./icons/icon-grip.js"),
 },{
 name: "icon-hammer",
 path: () => import("./icons/icon-hammer.js"),
 },{
 name: "icon-hand-active-alt",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-hand-active-alt.js"),
 },{
@@ -714,7 +713,6 @@ name: "icon-hand-active",
 path: () => import("./icons/icon-hand-active.js"),
 },{
 name: "icon-hand-pointer-alt",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-hand-pointer-alt.js"),
 },{
@@ -725,7 +723,6 @@ name: "icon-handshake",
 path: () => import("./icons/icon-handshake.js"),
 },{
 name: "icon-handtool-alt",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-handtool-alt.js"),
 },{
@@ -733,14 +730,15 @@ name: "icon-handtool",
 path: () => import("./icons/icon-handtool.js"),
 },{
 name: "icon-hard-drive-alt",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-hard-drive-alt.js"),
 },{
 name: "icon-hard-drive",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-hard-drive.js"),
+},{
+name: "icon-heading",
+path: () => import("./icons/icon-heading.js"),
 },{
 name: "icon-heading-1",
 path: () => import("./icons/icon-heading-1.js"),
@@ -751,11 +749,19 @@ path: () => import("./icons/icon-heading-2.js"),
 name: "icon-heading-3",
 path: () => import("./icons/icon-heading-3.js"),
 },{
+name: "icon-heading-4",
+path: () => import("./icons/icon-heading-4.js"),
+},{
+name: "icon-heading-5",
+path: () => import("./icons/icon-heading-5.js"),
+},{
+name: "icon-heading-6",
+path: () => import("./icons/icon-heading-6.js"),
+},{
 name: "icon-headphones",
 path: () => import("./icons/icon-headphones.js"),
 },{
 name: "icon-headset",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-headset.js"),
 },{
@@ -784,7 +790,6 @@ name: "icon-hourglass",
 path: () => import("./icons/icon-hourglass.js"),
 },{
 name: "icon-imac",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-imac.js"),
 },{
@@ -792,7 +797,6 @@ name: "icon-image-up",
 path: () => import("./icons/icon-image-up.js"),
 },{
 name: "icon-inbox-full",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-inbox-full.js"),
 },{
@@ -809,17 +813,14 @@ name: "icon-info",
 path: () => import("./icons/icon-info.js"),
 },{
 name: "icon-invoice",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-invoice.js"),
 },{
 name: "icon-ipad",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-ipad.js"),
 },{
 name: "icon-iphone",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-iphone.js"),
 },{
@@ -827,7 +828,6 @@ name: "icon-italic",
 path: () => import("./icons/icon-italic.js"),
 },{
 name: "icon-item-arrangement",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-item-arrangement.js"),
 },{
@@ -847,7 +847,6 @@ name: "icon-laptop",
 path: () => import("./icons/icon-laptop.js"),
 },{
 name: "icon-layers-alt",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-layers-alt.js"),
 },{
@@ -864,7 +863,6 @@ name: "icon-legal",
 path: () => import("./icons/icon-legal.js"),
 },{
 name: "icon-lense",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-lense.js"),
 },{
@@ -881,7 +879,6 @@ name: "icon-lightbulb-active",
 path: () => import("./icons/icon-lightbulb-active.js"),
 },{
 name: "icon-lightbulb",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-lightbulb.js"),
 },{
@@ -895,12 +892,10 @@ name: "icon-list",
 path: () => import("./icons/icon-list.js"),
 },{
 name: "icon-load",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-load.js"),
 },{
 name: "icon-loading",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-loading.js"),
 },{
@@ -908,7 +903,6 @@ name: "icon-locate",
 path: () => import("./icons/icon-locate.js"),
 },{
 name: "icon-location-near-me",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-location-near-me.js"),
 },{
@@ -922,12 +916,10 @@ name: "icon-log-out",
 path: () => import("./icons/icon-log-out.js"),
 },{
 name: "icon-logout",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-logout.js"),
 },{
 name: "icon-loupe",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-loupe.js"),
 },{
@@ -941,7 +933,6 @@ name: "icon-map-alt",
 path: () => import("./icons/icon-map-alt.js"),
 },{
 name: "icon-map-location",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-map-location.js"),
 },{
@@ -961,7 +952,6 @@ name: "icon-medicine",
 path: () => import("./icons/icon-medicine.js"),
 },{
 name: "icon-meeting",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-meeting.js"),
 },{
@@ -975,7 +965,6 @@ name: "icon-message-open",
 path: () => import("./icons/icon-message-open.js"),
 },{
 name: "icon-message-unopened",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-message-unopened.js"),
 },{
@@ -986,7 +975,6 @@ name: "icon-microscope",
 path: () => import("./icons/icon-microscope.js"),
 },{
 name: "icon-mindmap",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-mindmap.js"),
 },{
@@ -1018,67 +1006,54 @@ name: "icon-music",
 path: () => import("./icons/icon-music.js"),
 },{
 name: "icon-name-badge",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-name-badge.js"),
 },{
 name: "icon-navigation-bottom",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-navigation-bottom.js"),
 },{
 name: "icon-navigation-down",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-navigation-down.js"),
 },{
 name: "icon-navigation-first",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-navigation-first.js"),
 },{
 name: "icon-navigation-horizontal",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-navigation-horizontal.js"),
 },{
 name: "icon-navigation-last",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-navigation-last.js"),
 },{
 name: "icon-navigation-left",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-navigation-left.js"),
 },{
 name: "icon-navigation-right",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-navigation-right.js"),
 },{
 name: "icon-navigation-road",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-navigation-road.js"),
 },{
 name: "icon-navigation-top",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-navigation-top.js"),
 },{
 name: "icon-navigation-up",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-navigation-up.js"),
 },{
 name: "icon-navigation-vertical",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-navigation-vertical.js"),
 },{
 name: "icon-navigation",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-navigation.js"),
 },{
@@ -1089,7 +1064,6 @@ name: "icon-network-alt",
 path: () => import("./icons/icon-network-alt.js"),
 },{
 name: "icon-newspaper-alt",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-newspaper-alt.js"),
 },{
@@ -1097,22 +1071,17 @@ name: "icon-newspaper",
 path: () => import("./icons/icon-newspaper.js"),
 },{
 name: "icon-next-media",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-next-media.js"),
 },{
 name: "icon-next",
-legacy: true,
-hidden: true,
 path: () => import("./icons/icon-next.js"),
 },{
 name: "icon-nodes",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-nodes.js"),
 },{
 name: "icon-notepad-alt",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-notepad-alt.js"),
 },{
@@ -1123,7 +1092,6 @@ name: "icon-old-key",
 path: () => import("./icons/icon-old-key.js"),
 },{
 name: "icon-old-phone",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-old-phone.js"),
 },{
@@ -1143,7 +1111,6 @@ name: "icon-out",
 path: () => import("./icons/icon-out.js"),
 },{
 name: "icon-outbox",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-outbox.js"),
 },{
@@ -1166,7 +1133,6 @@ name: "icon-page-up",
 path: () => import("./icons/icon-page-up.js"),
 },{
 name: "icon-paint-roller",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-paint-roller.js"),
 },{
@@ -1180,7 +1146,6 @@ name: "icon-pannel-close",
 path: () => import("./icons/icon-pannel-close.js"),
 },{
 name: "icon-paper-bag",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-paper-bag.js"),
 },{
@@ -1193,8 +1158,10 @@ path: () => import("./icons/icon-paper-plane.js"),
 name: "icon-partly-cloudy",
 path: () => import("./icons/icon-partly-cloudy.js"),
 },{
+name: "icon-paragraph",
+path: () => import("./icons/icon-paragraph.js"),
+},{
 name: "icon-paste-in",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-paste-in.js"),
 },{
@@ -1202,22 +1169,18 @@ name: "icon-pause",
 path: () => import("./icons/icon-pause.js"),
 },{
 name: "icon-pc",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-pc.js"),
 },{
 name: "icon-people-alt-2",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-people-alt-2.js"),
 },{
 name: "icon-people-alt",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-people-alt.js"),
 },{
 name: "icon-people-female",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-people-female.js"),
 },{
@@ -1240,7 +1203,6 @@ name: "icon-pictures-alt-2",
 path: () => import("./icons/icon-pictures-alt-2.js"),
 },{
 name: "icon-pictures-alt",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-pictures-alt.js"),
 },{
@@ -1260,7 +1222,6 @@ name: "icon-plane",
 path: () => import("./icons/icon-plane.js"),
 },{
 name: "icon-planet",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-planet.js"),
 },{
@@ -1268,7 +1229,6 @@ name: "icon-play",
 path: () => import("./icons/icon-play.js"),
 },{
 name: "icon-playing-cards",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-playing-cards.js"),
 },{
@@ -1282,7 +1242,6 @@ name: "icon-podcast",
 path: () => import("./icons/icon-podcast.js"),
 },{
 name: "icon-poll",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-poll.js"),
 },{
@@ -1290,7 +1249,6 @@ name: "icon-post-it",
 path: () => import("./icons/icon-post-it.js"),
 },{
 name: "icon-power-outlet",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-power-outlet.js"),
 },{
@@ -1307,22 +1265,18 @@ name: "icon-previous",
 path: () => import("./icons/icon-previous.js"),
 },{
 name: "icon-price-dollar",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-price-dollar.js"),
 },{
 name: "icon-price-euro",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-price-euro.js"),
 },{
 name: "icon-price-pound",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-price-pound.js"),
 },{
 name: "icon-price-yen",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-price-yen.js"),
 },{
@@ -1330,7 +1284,6 @@ name: "icon-print",
 path: () => import("./icons/icon-print.js"),
 },{
 name: "icon-printer-alt",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-printer-alt.js"),
 },{
@@ -1362,7 +1315,6 @@ name: "icon-rain",
 path: () => import("./icons/icon-rain.js"),
 },{
 name: "icon-rate",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-rate.js"),
 },{
@@ -1379,7 +1331,6 @@ name: "icon-reception",
 path: () => import("./icons/icon-reception.js"),
 },{
 name: "icon-record",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-record.js"),
 },{
@@ -1393,7 +1344,6 @@ name: "icon-refresh",
 path: () => import("./icons/icon-refresh.js"),
 },{
 name: "icon-remote",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-remote.js"),
 },{
@@ -1413,17 +1363,14 @@ name: "icon-resize",
 path: () => import("./icons/icon-resize.js"),
 },{
 name: "icon-return-to-top",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-return-to-top.js"),
 },{
 name: "icon-right-double-arrow",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-right-double-arrow.js"),
 },{
 name: "icon-roadsign",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-roadsign.js"),
 },{
@@ -1455,7 +1402,6 @@ name: "icon-screensharing",
 path: () => import("./icons/icon-screensharing.js"),
 },{
 name: "icon-script-alt",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-script-alt.js"),
 },{
@@ -1472,7 +1418,6 @@ name: "icon-sensor",
 path: () => import("./icons/icon-sensor.js"),
 },{
 name: "icon-server-alt",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-server-alt.js"),
 },{
@@ -1480,7 +1425,6 @@ name: "icon-server",
 path: () => import("./icons/icon-server.js"),
 },{
 name: "icon-settings-alt",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-settings-alt.js"),
 },{
@@ -1509,12 +1453,10 @@ name: "icon-shipping",
 path: () => import("./icons/icon-shipping.js"),
 },{
 name: "icon-shoe",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-shoe.js"),
 },{
 name: "icon-shopping-basket-alt-2",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-shopping-basket-alt-2.js"),
 },{
@@ -1528,7 +1470,6 @@ name: "icon-shuffle",
 path: () => import("./icons/icon-shuffle.js"),
 },{
 name: "icon-sience",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-sience.js"),
 },{
@@ -1539,7 +1480,6 @@ name: "icon-single-note",
 path: () => import("./icons/icon-single-note.js"),
 },{
 name: "icon-sitemap",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-sitemap.js"),
 },{
@@ -1547,12 +1487,10 @@ name: "icon-sleep",
 path: () => import("./icons/icon-sleep.js"),
 },{
 name: "icon-slideshow",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-slideshow.js"),
 },{
 name: "icon-smiley-inverted",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-smiley-inverted.js"),
 },{
@@ -1566,7 +1504,6 @@ name: "icon-sound-low",
 path: () => import("./icons/icon-sound-low.js"),
 },{
 name: "icon-sound-medium",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-sound-medium.js"),
 },{
@@ -1598,22 +1535,18 @@ name: "icon-sprout",
 path: () => import("./icons/icon-sprout.js"),
 },{
 name: "icon-squiggly-line",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-squiggly-line.js"),
 },{
 name: "icon-ssd",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-ssd.js"),
 },{
 name: "icon-stacked-disks",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-stacked-disks.js"),
 },{
 name: "icon-stamp",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-stamp.js"),
 },{
@@ -1621,7 +1554,6 @@ name: "icon-stop-alt",
 path: () => import("./icons/icon-stop-alt.js"),
 },{
 name: "icon-stop-hand",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-stop-hand.js"),
 },{
@@ -1632,7 +1564,6 @@ name: "icon-store",
 path: () => import("./icons/icon-store.js"),
 },{
 name: "icon-stream",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-stream.js"),
 },{
@@ -1649,7 +1580,6 @@ name: "icon-sunny",
 path: () => import("./icons/icon-sunny.js"),
 },{
 name: "icon-sweatshirt",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-sweatshirt.js"),
 },{
@@ -1672,7 +1602,6 @@ name: "icon-tags",
 path: () => import("./icons/icon-tags.js"),
 },{
 name: "icon-takeaway-cup",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-takeaway-cup.js"),
 },{
@@ -1734,17 +1663,14 @@ name: "icon-timer",
 path: () => import("./icons/icon-timer.js"),
 },{
 name: "icon-tools",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-tools.js"),
 },{
 name: "icon-top",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-top.js"),
 },{
 name: "icon-traffic-alt",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-traffic-alt.js"),
 },{
@@ -1755,12 +1681,10 @@ name: "icon-train",
 path: () => import("./icons/icon-train.js"),
 },{
 name: "icon-trash-alt-2",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-trash-alt-2.js"),
 },{
 name: "icon-trash-alt",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-trash-alt.js"),
 },{
@@ -1769,6 +1693,9 @@ path: () => import("./icons/icon-trash.js"),
 },{
 name: "icon-tree",
 path: () => import("./icons/icon-tree.js"),
+},{
+name: "icon-trending-up-down",
+path: () => import("./icons/icon-trending-up-down.js"),
 },{
 name: "icon-trophy",
 path: () => import("./icons/icon-trophy.js"),
@@ -1783,27 +1710,22 @@ name: "icon-tv",
 path: () => import("./icons/icon-tv.js"),
 },{
 name: "icon-umb-content",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-umb-content.js"),
 },{
 name: "icon-umb-developer",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-umb-developer.js"),
 },{
 name: "icon-umb-media",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-umb-media.js"),
 },{
 name: "icon-umb-settings",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-umb-settings.js"),
 },{
 name: "icon-umb-users",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-umb-users.js"),
 },{
@@ -1826,12 +1748,10 @@ name: "icon-unplug",
 path: () => import("./icons/icon-unplug.js"),
 },{
 name: "icon-untitled",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-untitled.js"),
 },{
 name: "icon-usb-connector",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-usb-connector.js"),
 },{
@@ -1839,22 +1759,18 @@ name: "icon-usb",
 path: () => import("./icons/icon-usb.js"),
 },{
 name: "icon-user-female",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-user-female.js"),
 },{
 name: "icon-user-females-alt",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-user-females-alt.js"),
 },{
 name: "icon-user-females",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-user-females.js"),
 },{
 name: "icon-user-glasses",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-user-glasses.js"),
 },{
@@ -1862,7 +1778,6 @@ name: "icon-user",
 path: () => import("./icons/icon-user.js"),
 },{
 name: "icon-users-alt",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-users-alt.js"),
 },{
@@ -1924,7 +1839,6 @@ name: "icon-zip",
 path: () => import("./icons/icon-zip.js"),
 },{
 name: "icon-zom-out",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-zom-out.js"),
 },{
@@ -1936,6 +1850,9 @@ path: () => import("./icons/icon-zoom-out.js"),
 },{
 name: "icon-star",
 path: () => import("./icons/icon-star.js"),
+},{
+name: "icon-stretch-horizontal",
+path: () => import("./icons/icon-stretch-horizontal.js"),
 },{
 name: "icon-database",
 path: () => import("./icons/icon-database.js"),
@@ -1998,6 +1915,63 @@ path: () => import("./icons/icon-document-play.js"),
 name: "icon-document-play",
 path: () => import("./icons/icon-document-play.js"),
 },{
+name: "icon-shared-value",
+path: () => import("./icons/icon-shared-value.js"),
+},{
+name: "icon-layout-masonry",
+path: () => import("./icons/icon-layout-masonry.js"),
+},{
+name: "icon-layout-grid",
+path: () => import("./icons/icon-layout-grid.js"),
+},{
+name: "icon-layout-list",
+path: () => import("./icons/icon-layout-list.js"),
+},{
+name: "icon-layout-panel-left",
+path: () => import("./icons/icon-layout-panel-left.js"),
+},{
+name: "icon-spray-can",
+path: () => import("./icons/icon-spray-can.js"),
+},{
+name: "icon-swatch-book",
+path: () => import("./icons/icon-swatch-book.js"),
+},{
+name: "icon-shape-cylinder",
+path: () => import("./icons/icon-shape-cylinder.js"),
+},{
+name: "icon-shape-triangle-right",
+path: () => import("./icons/icon-shape-triangle-right.js"),
+},{
+name: "icon-shape-triangle",
+path: () => import("./icons/icon-shape-triangle.js"),
+},{
+name: "icon-shape-circle",
+path: () => import("./icons/icon-shape-circle.js"),
+},{
+name: "icon-shape-square",
+path: () => import("./icons/icon-shape-square.js"),
+},{
+name: "icon-shape-hexagon",
+path: () => import("./icons/icon-shape-hexagon.js"),
+},{
+name: "icon-shape-rectangle-horizontal",
+path: () => import("./icons/icon-shape-rectangle-horizontal.js"),
+},{
+name: "icon-shape-rectangle-vertical",
+path: () => import("./icons/icon-shape-rectangle-vertical.js"),
+},{
+name: "icon-shapes",
+path: () => import("./icons/icon-shapes.js"),
+},{
+name: "icon-layout-dislocated",
+path: () => import("./icons/icon-layout-dislocated.js"),
+},{
+name: "icon-blend",
+path: () => import("./icons/icon-blend.js"),
+},{
+name: "icon-land-plot",
+path: () => import("./icons/icon-land-plot.js"),
+},{
 name: "icon-facebook",
 path: () => import("./icons/icon-facebook.js"),
 },{
@@ -2020,396 +1994,361 @@ name: "icon-twitter-x",
 path: () => import("./icons/icon-twitter-x.js"),
 },{
 name: "icon-art-easel",
-legacy: true,
+hidden: true,
 path: () => import("./icons/icon-art-easel.js"),
 },{
 name: "icon-article",
-legacy: true,
+hidden: true,
 path: () => import("./icons/icon-article.js"),
 },{
 name: "icon-auction-hammer",
-legacy: true,
+hidden: true,
 path: () => import("./icons/icon-auction-hammer.js"),
 },{
 name: "icon-badge-count",
-legacy: true,
+hidden: true,
 path: () => import("./icons/icon-badge-count.js"),
 },{
 name: "icon-band-aid",
-legacy: true,
+hidden: true,
 path: () => import("./icons/icon-band-aid.js"),
 },{
 name: "icon-baby-stroller",
-legacy: true,
+hidden: true,
 path: () => import("./icons/icon-baby-stroller.js"),
 },{
 name: "icon-bill-dollar",
-legacy: true,
+hidden: true,
 path: () => import("./icons/icon-bill-dollar.js"),
 },{
 name: "icon-bill-euro",
-legacy: true,
+hidden: true,
 path: () => import("./icons/icon-bill-euro.js"),
 },{
 name: "icon-bill-pound",
-legacy: true,
+hidden: true,
 path: () => import("./icons/icon-bill-pound.js"),
 },{
 name: "icon-bill-yen",
-legacy: true,
+hidden: true,
 path: () => import("./icons/icon-bill-yen.js"),
 },{
 name: "icon-bill",
-legacy: true,
+hidden: true,
 path: () => import("./icons/icon-bill.js"),
 },{
 name: "icon-billboard",
-legacy: true,
+hidden: true,
 path: () => import("./icons/icon-billboard.js"),
 },{
 name: "icon-bills-dollar",
-legacy: true,
+hidden: true,
 path: () => import("./icons/icon-bills-dollar.js"),
 },{
 name: "icon-bills-euro",
-legacy: true,
+hidden: true,
 path: () => import("./icons/icon-bills-euro.js"),
 },{
 name: "icon-bills-pound",
-legacy: true,
+hidden: true,
 path: () => import("./icons/icon-bills-pound.js"),
 },{
 name: "icon-bills-yen",
-legacy: true,
+hidden: true,
 path: () => import("./icons/icon-bills-yen.js"),
 },{
 name: "icon-bills",
-legacy: true,
+hidden: true,
 path: () => import("./icons/icon-bills.js"),
 },{
 name: "icon-blueprint",
-legacy: true,
+hidden: true,
 path: () => import("./icons/icon-blueprint.js"),
 },{
 name: "icon-bomb",
-legacy: true,
+hidden: true,
 path: () => import("./icons/icon-bomb.js"),
 },{
 name: "icon-cash-register",
-legacy: true,
+hidden: true,
 path: () => import("./icons/icon-cash-register.js"),
 },{
 name: "icon-checkbox-dotted-active",
-legacy: true,
+hidden: true,
 path: () => import("./icons/icon-checkbox-dotted-active.js"),
 },{
 name: "icon-chess",
-legacy: true,
+hidden: true,
 path: () => import("./icons/icon-chess.js"),
 },{
 name: "icon-circus",
-legacy: true,
+hidden: true,
 path: () => import("./icons/icon-circus.js"),
 },{
 name: "icon-clothes-hanger",
-legacy: true,
+hidden: true,
 path: () => import("./icons/icon-clothes-hanger.js"),
 },{
 name: "icon-coin",
-legacy: true,
+hidden: true,
 path: () => import("./icons/icon-coin.js"),
 },{
 name: "icon-coins-dollar-alt",
-legacy: true,
+hidden: true,
 path: () => import("./icons/icon-coins-dollar-alt.js"),
 },{
 name: "icon-coins-dollar",
-legacy: true,
+hidden: true,
 path: () => import("./icons/icon-coins-dollar.js"),
 },{
 name: "icon-coins-euro-alt",
-legacy: true,
+hidden: true,
 path: () => import("./icons/icon-coins-euro-alt.js"),
 },{
 name: "icon-coins-euro",
-legacy: true,
+hidden: true,
 path: () => import("./icons/icon-coins-euro.js"),
 },{
 name: "icon-coins-pound-alt",
-legacy: true,
+hidden: true,
 path: () => import("./icons/icon-coins-pound-alt.js"),
 },{
 name: "icon-coins-pound",
-legacy: true,
+hidden: true,
 path: () => import("./icons/icon-coins-pound.js"),
 },{
 name: "icon-coins-yen-alt",
-legacy: true,
+hidden: true,
 path: () => import("./icons/icon-coins-yen-alt.js"),
 },{
 name: "icon-coins-yen",
-legacy: true,
+hidden: true,
 path: () => import("./icons/icon-coins-yen.js"),
 },{
 name: "icon-comb",
-legacy: true,
+hidden: true,
 path: () => import("./icons/icon-comb.js"),
 },{
 name: "icon-desk",
-legacy: true,
+hidden: true,
 path: () => import("./icons/icon-desk.js"),
 },{
 name: "icon-dollar-bag",
-legacy: true,
+hidden: true,
 path: () => import("./icons/icon-dollar-bag.js"),
 },{
 name: "icon-eject",
-legacy: true,
+hidden: true,
 path: () => import("./icons/icon-eject.js"),
 },{
 name: "icon-euro-bag",
-legacy: true,
+hidden: true,
 path: () => import("./icons/icon-euro-bag.js"),
 },{
 name: "icon-female-symbol",
-legacy: true,
+hidden: true,
 path: () => import("./icons/icon-female-symbol.js"),
 },{
 name: "icon-firewall",
-legacy: true,
+hidden: true,
 path: () => import("./icons/icon-firewall.js"),
 },{
 name: "icon-folder-open",
-legacy: true,
+hidden: true,
 path: () => import("./icons/icon-folder-open.js"),
 },{
 name: "icon-folder-outline",
-legacy: true,
+hidden: true,
 path: () => import("./icons/icon-folder-outline.js"),
 },{
 name: "icon-handprint",
-legacy: true,
+hidden: true,
 path: () => import("./icons/icon-handprint.js"),
 },{
 name: "icon-hat",
-legacy: true,
+hidden: true,
 path: () => import("./icons/icon-hat.js"),
 },{
 name: "icon-hd",
-legacy: true,
+hidden: true,
 path: () => import("./icons/icon-hd.js"),
 },{
 name: "icon-inactive-line",
-legacy: true,
+hidden: true,
 path: () => import("./icons/icon-inactive-line.js"),
 },{
 name: "icon-keychain",
-legacy: true,
+hidden: true,
 path: () => import("./icons/icon-keychain.js"),
 },{
 name: "icon-keyhole",
-legacy: true,
+hidden: true,
 path: () => import("./icons/icon-keyhole.js"),
 },{
 name: "icon-linkedin",
-legacy: true,
+hidden: true,
 path: () => import("./icons/icon-linkedin.js"),
 },{
 name: "icon-linux-tux",
-legacy: true,
+hidden: true,
 path: () => import("./icons/icon-linux-tux.js"),
 },{
 name: "icon-male-and-female",
-legacy: true,
+hidden: true,
 path: () => import("./icons/icon-male-and-female.js"),
 },{
 name: "icon-male-symbol",
-legacy: true,
+hidden: true,
 path: () => import("./icons/icon-male-symbol.js"),
 },{
 name: "icon-molecular-network",
-legacy: true,
+hidden: true,
 path: () => import("./icons/icon-molecular-network.js"),
 },{
 name: "icon-molecular",
-legacy: true,
+hidden: true,
 path: () => import("./icons/icon-molecular.js"),
 },{
 name: "icon-umbraco",
 path: () => import("./icons/icon-umbraco.js"),
 },{
 name: "icon-azure",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-azure.js"),
 },{
 name: "icon-microsoft",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-microsoft.js"),
 },{
 name: "icon-os-x",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-os-x.js"),
 },{
 name: "icon-pants",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-pants.js"),
 },{
 name: "icon-parachute-drop",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-parachute-drop.js"),
 },{
 name: "icon-parental-control",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-parental-control.js"),
 },{
 name: "icon-path",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-path.js"),
 },{
 name: "icon-piracy",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-piracy.js"),
 },{
 name: "icon-poker-chip",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-poker-chip.js"),
 },{
 name: "icon-pound-bag",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-pound-bag.js"),
 },{
 name: "icon-receipt-dollar",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-receipt-dollar.js"),
 },{
 name: "icon-receipt-euro",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-receipt-euro.js"),
 },{
 name: "icon-receipt-pound",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-receipt-pound.js"),
 },{
 name: "icon-receipt-yen",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-receipt-yen.js"),
 },{
 name: "icon-road",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-road.js"),
 },{
 name: "icon-safe",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-safe.js"),
 },{
 name: "icon-safedial",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-safedial.js"),
 },{
 name: "icon-sandbox-toys",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-sandbox-toys.js"),
 },{
 name: "icon-security-camera",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-security-camera.js"),
 },{
 name: "icon-settings-alt-2",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-settings-alt-2.js"),
 },{
 name: "icon-share-alt-2",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-share-alt-2.js"),
 },{
 name: "icon-shorts",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-shorts.js"),
 },{
 name: "icon-simcard",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-simcard.js"),
 },{
 name: "icon-tab",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-tab.js"),
 },{
 name: "icon-tactics",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-tactics.js"),
 },{
 name: "icon-theif",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-theif.js"),
 },{
 name: "icon-thought-bubble",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-thought-bubble.js"),
 },{
 name: "icon-twitter",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-twitter.js"),
 },{
 name: "icon-umb-contour",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-umb-contour.js"),
 },{
 name: "icon-umb-deploy",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-umb-deploy.js"),
 },{
 name: "icon-umb-members",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-umb-members.js"),
 },{
 name: "icon-universal",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-universal.js"),
 },{
 name: "icon-war",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-war.js"),
 },{
 name: "icon-windows",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-windows.js"),
 },{
 name: "icon-yen-bag",
-legacy: true,
 hidden: true,
 path: () => import("./icons/icon-yen-bag.js"),
 }];

@@ -100,6 +100,7 @@ export class UmbLanguageTableCollectionViewElement extends UmbLitElement {
 							.value=${{
 								entityType: language.entityType,
 								unique: language.unique,
+								name: language.name,
 							}}></umb-entity-actions-table-column-view>`,
 					},
 				],

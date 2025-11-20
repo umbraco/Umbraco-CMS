@@ -1,24 +1,22 @@
 import { UMB_SORT_CHILDREN_OF_MODAL } from './modal/index.js';
 import type { MetaEntityActionSortChildrenOfKind } from './types.js';
 import { UmbEntityActionBase, UmbRequestReloadChildrenOfEntityEvent } from '@umbraco-cms/backoffice/entity-action';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 
 export class UmbSortChildrenOfEntityAction extends UmbEntityActionBase<MetaEntityActionSortChildrenOfKind> {
 	override async execute() {
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const modal = modalManager.open(this._host, UMB_SORT_CHILDREN_OF_MODAL, {
+		await umbOpenModal(this, this._getModalToken(), {
 			data: {
 				unique: this.args.unique,
 				entityType: this.args.entityType,
 				sortChildrenOfRepositoryAlias: this.args.meta.sortChildrenOfRepositoryAlias,
 				treeRepositoryAlias: this.args.meta.treeRepositoryAlias,
 			},
-		});
-
-		await modal.onSubmit().catch(() => undefined);
+		}).catch(() => undefined);
 
 		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+		if (!eventContext) throw new Error('Event context is not available');
 
 		eventContext.dispatchEvent(
 			new UmbRequestReloadChildrenOfEntityEvent({
@@ -26,6 +24,10 @@ export class UmbSortChildrenOfEntityAction extends UmbEntityActionBase<MetaEntit
 				entityType: this.args.entityType,
 			}),
 		);
+	}
+
+	protected _getModalToken() {
+		return UMB_SORT_CHILDREN_OF_MODAL;
 	}
 }
 

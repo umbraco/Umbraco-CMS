@@ -1,32 +1,31 @@
+import { UMB_VARIANT_WORKSPACE_CONTEXT } from '../../../contexts/index.js';
+import type { UmbVariantDatasetWorkspaceContext } from '../../../contexts/index.js';
 import { css, customElement, html, ifDefined, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
-import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
-import { UMB_VARIANT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import { UMB_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/menu';
 import type { UmbAppLanguageContext } from '@umbraco-cms/backoffice/language';
-import type { UmbVariantDatasetWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import type { UmbVariantStructureItemModel } from '@umbraco-cms/backoffice/menu';
 
 @customElement('umb-workspace-variant-menu-breadcrumb')
 export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 	@state()
-	_name: string = '';
+	private _name: string = '';
 
 	@state()
-	_structure: Array<UmbVariantStructureItemModel> = [];
+	private _structure: Array<UmbVariantStructureItemModel> = [];
 
 	@state()
-	_workspaceActiveVariantId?: UmbVariantId;
+	private _workspaceActiveVariantId?: UmbVariantId;
 
 	@state()
-	_appDefaultCulture?: string;
+	private _appDefaultCulture?: string;
 
-	#sectionContext?: typeof UMB_SECTION_CONTEXT.TYPE;
 	#workspaceContext?: UmbVariantDatasetWorkspaceContext;
 	#appLanguageContext?: UmbAppLanguageContext;
-	#structureContext?: any;
+	#menuStructureContext?: typeof UMB_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT.TYPE;
 
 	constructor() {
 		super();
@@ -36,10 +35,6 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 			this.#observeDefaultCulture();
 		});
 
-		this.consumeContext(UMB_SECTION_CONTEXT, (instance) => {
-			this.#sectionContext = instance;
-		});
-
 		this.consumeContext(UMB_VARIANT_WORKSPACE_CONTEXT, (instance) => {
 			if (!instance) return;
 			this.#workspaceContext = instance;
@@ -47,27 +42,26 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 			this.#observeStructure();
 		});
 
-		// TODO: set up context token
-		this.consumeContext('UmbMenuStructureWorkspaceContext', (instance) => {
+		this.consumeContext(UMB_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT, (instance) => {
 			if (!instance) return;
-			this.#structureContext = instance;
+			this.#menuStructureContext = instance;
 			this.#observeStructure();
 		});
 	}
 
 	#observeStructure() {
-		if (!this.#structureContext || !this.#workspaceContext) return;
-		const isNew = this.#workspaceContext.getIsNew();
+		if (!this.#menuStructureContext || !this.#workspaceContext) return;
 
-		this.observe(this.#structureContext.structure, (value) => {
-			// TODO: get the type from the context
-			const structure = value as Array<UmbVariantStructureItemModel>;
-			this._structure = isNew ? structure : structure.slice(0, -1);
+		this.observe(this.#menuStructureContext.structure, (value) => {
+			if (!this.#workspaceContext) return;
+			const unique = this.#workspaceContext.getUnique();
+			// exclude the current unique from the structure. We append this with an observer of the name
+			this._structure = value.filter((structureItem) => structureItem.unique !== unique);
 		});
 	}
 
 	#observeDefaultCulture() {
-		this.observe(this.#appLanguageContext!.appDefaultLanguage, (value) => {
+		this.observe(this.#appLanguageContext?.appDefaultLanguage, (value) => {
 			this._appDefaultCulture = value?.unique;
 		});
 	}
@@ -95,19 +89,26 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 
 	// TODO: we should move the fallback name logic to a helper class. It will be used in multiple places
 	#getItemVariantName(structureItem: UmbVariantStructureItemModel) {
-		const fallbackName =
-			structureItem.variants.find((variant) => variant.culture === this._appDefaultCulture)?.name ??
-			structureItem.variants[0].name ??
-			'Unknown';
-		const name = structureItem.variants.find((variant) => this._workspaceActiveVariantId?.compare(variant))?.name;
-		return name ?? `(${fallbackName})`;
+		// If the active workspace is a variant, we will try to find the matching variant name.
+		if (!this._workspaceActiveVariantId?.isInvariant()) {
+			const variant = structureItem.variants.find((variantId) => this._workspaceActiveVariantId?.compare(variantId));
+			if (variant) {
+				return variant.name;
+			}
+		}
+
+		// If the active workspace is invariant, we will try to find the variant that matches the app default culture.
+		const variant = structureItem.variants.find((variant) => variant.culture === this._appDefaultCulture);
+		if (variant) {
+			return `(${variant.name})`;
+		}
+
+		// If an active variant can not be found, then we fallback to the first variant name or a generic "unknown" label.
+		return structureItem.variants?.[0]?.name ?? '(#general_unknown)';
 	}
 
-	#getHref(structureItem: any) {
-		const workspaceBasePath = `section/${this.#sectionContext?.getPathname()}/workspace/${structureItem.entityType}/edit`;
-		return structureItem.isFolder
-			? undefined
-			: `${workspaceBasePath}/${structureItem.unique}/${this._workspaceActiveVariantId?.culture}`;
+	#getHref(structureItem: UmbVariantStructureItemModel) {
+		return this.#menuStructureContext?.getItemHref(structureItem);
 	}
 
 	override render() {
@@ -115,11 +116,11 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 			<uui-breadcrumbs>
 				${this._structure.map(
 					(structureItem) =>
-						html`<uui-breadcrumb-item href="${ifDefined(this.#getHref(structureItem))}"
+						html`<uui-breadcrumb-item href=${ifDefined(this.#getHref(structureItem))}
 							>${this.localize.string(this.#getItemVariantName(structureItem))}</uui-breadcrumb-item
 						>`,
 				)}
-				<uui-breadcrumb-item>${this._name}</uui-breadcrumb-item>
+				<uui-breadcrumb-item last-item>${this._name}</uui-breadcrumb-item>
 			</uui-breadcrumbs>
 		`;
 	}

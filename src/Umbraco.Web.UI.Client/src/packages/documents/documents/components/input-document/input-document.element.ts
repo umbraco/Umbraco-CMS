@@ -1,13 +1,17 @@
+import type { UmbDocumentItemModel } from '../../item/types.js';
 import { UmbDocumentPickerInputContext } from './input-document.context.js';
 import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { jsonStringComparison } from '@umbraco-cms/backoffice/observable-api';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { UmbInteractionMemoriesChangeEvent } from '@umbraco-cms/backoffice/interaction-memory';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import type { UmbDocumentItemModel } from '@umbraco-cms/backoffice/document';
-import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/document-type';
+import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
+import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
+import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
 
 @customElement('umb-input-document')
 export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
@@ -37,10 +41,10 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 	 */
 	@property({ type: Number })
 	public set min(value: number) {
-		this.#pickerContext.min = value;
+		this.#pickerInputContext.min = value;
 	}
 	public get min(): number {
-		return this.#pickerContext.min;
+		return this.#pickerInputContext.min;
 	}
 
 	/**
@@ -60,10 +64,10 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 	 */
 	@property({ type: Number })
 	public set max(value: number) {
-		this.#pickerContext.max = value;
+		this.#pickerInputContext.max = value;
 	}
 	public get max(): number {
-		return this.#pickerContext.max;
+		return this.#pickerInputContext.max;
 	}
 
 	/**
@@ -76,11 +80,11 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 	maxMessage = 'This field exceeds the allowed amount of items';
 
 	public set selection(ids: Array<string>) {
-		this.#pickerContext.setSelection(ids);
+		this.#pickerInputContext.setSelection(ids);
 		this.#sorter.setModel(ids);
 	}
 	public get selection(): Array<string> {
-		return this.#pickerContext.getSelection();
+		return this.#pickerInputContext.getSelection();
 	}
 
 	@property({ type: Object, attribute: false })
@@ -89,9 +93,13 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 	@property({ type: Array })
 	allowedContentTypeIds?: string[] | undefined;
 
+	@property({ type: Boolean, attribute: 'include-trashed' })
+	includeTrashed = false;
+
 	@property({ type: String })
 	public override set value(selectionString: string | undefined) {
 		this.selection = splitStringToArray(selectionString);
+		super.value = selectionString; // Call the parent setter to ensure the value change is triggered in the FormControlMixin. [NL]
 	}
 	public override get value(): string | undefined {
 		return this.selection.length > 0 ? this.selection.join(',') : undefined;
@@ -118,10 +126,24 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 	}
 	#readonly = false;
 
+	@property({ type: Array, attribute: false })
+	public get interactionMemories(): Array<UmbInteractionMemoryModel> | undefined {
+		return this.#pickerInputContext.interactionMemory.getAllMemories();
+	}
+	public set interactionMemories(value: Array<UmbInteractionMemoryModel> | undefined) {
+		this.#interactionMemories = value;
+		value?.forEach((memory) => this.#pickerInputContext.interactionMemory.setMemory(memory));
+	}
+
+	#interactionMemories?: Array<UmbInteractionMemoryModel> = [];
+
 	@state()
 	private _items?: Array<UmbDocumentItemModel>;
 
-	#pickerContext = new UmbDocumentPickerInputContext(this);
+	@state()
+	private _statuses?: Array<UmbRepositoryItemsStatus>;
+
+	#pickerInputContext = new UmbDocumentPickerInputContext(this);
 
 	constructor() {
 		super();
@@ -138,12 +160,37 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 			() => !!this.max && this.selection.length > this.max,
 		);
 
-		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')), '_observeSelection');
-		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems), '_observerItems');
+		this.observe(
+			this.#pickerInputContext.selection,
+			(selection) => (this.value = selection.join(',')),
+			'_observeSelection',
+		);
+
+		this.observe(
+			this.#pickerInputContext.selectedItems,
+			(selectedItems) => (this._items = selectedItems),
+			'_observerItems',
+		);
+
+		this.observe(this.#pickerInputContext.statuses, (statuses) => (this._statuses = statuses), '_observerStatuses');
+
+		this.observe(
+			this.#pickerInputContext.interactionMemory.memories,
+			(memories) => {
+				// only dispatch the event if the interaction memories have actually changed
+				const isIdentical = jsonStringComparison(memories, this.#interactionMemories);
+
+				if (!isIdentical) {
+					this.#interactionMemories = memories;
+					this.dispatchEvent(new UmbInteractionMemoriesChangeEvent());
+				}
+			},
+			'_observeMemories',
+		);
 	}
 
 	#openPicker() {
-		this.#pickerContext.openPicker(
+		this.#pickerInputContext.openPicker(
 			{
 				hideTreeRoot: true,
 				startNode: this.startNode,
@@ -153,12 +200,13 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 					unique: id,
 					entityType: UMB_DOCUMENT_TYPE_ENTITY_TYPE,
 				})),
+				includeTrashed: this.includeTrashed,
 			},
 		);
 	}
 
-	#onRemove(item: UmbDocumentItemModel) {
-		this.#pickerContext.requestRemoveItem(item.unique);
+	#onRemove(unique: string) {
+		this.#pickerInputContext.requestRemoveItem(unique);
 	}
 
 	override render() {
@@ -182,16 +230,20 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 	}
 
 	#renderItems() {
-		if (!this._items) return;
+		if (!this._statuses) return;
 		return html`
 			<uui-ref-list>
 				${repeat(
-					this._items,
-					(item) => item.unique,
-					(item) =>
-						html`<umb-entity-item-ref
-							id=${item.unique}
+					this._statuses,
+					(status) => status.unique,
+					(status) => {
+						const unique = status.unique;
+						const item = this._items?.find((x) => x.unique === unique);
+						return html`<umb-entity-item-ref
+							id=${unique}
 							.item=${item}
+							?error=${status.state.type === 'error'}
+							.errorMessage=${status.state.error}
 							?readonly=${this.readonly}
 							?standalone=${this.max === 1}>
 							${when(
@@ -200,11 +252,12 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 									<uui-action-bar slot="actions">
 										<uui-button
 											label=${this.localize.term('general_remove')}
-											@click=${() => this.#onRemove(item)}></uui-button>
+											@click=${() => this.#onRemove(unique)}></uui-button>
 									</uui-action-bar>
 								`,
 							)}
-						</umb-entity-item-ref>`,
+						</umb-entity-item-ref>`;
+					},
 				)}
 			</uui-ref-list>
 		`;
@@ -214,10 +267,6 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 		css`
 			#btn-add {
 				display: block;
-			}
-
-			umb-entity-item-ref[drag-placeholder] {
-				opacity: 0.2;
 			}
 		`,
 	];

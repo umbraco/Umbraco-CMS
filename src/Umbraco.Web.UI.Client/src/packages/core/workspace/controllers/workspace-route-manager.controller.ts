@@ -20,13 +20,14 @@ export class UmbWorkspaceRouteManager extends UmbControllerBase {
 	 * @memberof UmbWorkspaceRouteManager
 	 */
 	setRoutes(routes: Array<UmbRoute>) {
-		const allRoutes = [
-			...routes,
-			{
+		const allRoutes = [...routes] as Array<IComponentRoute>;
+
+		if (routes.length > 0) {
+			allRoutes.push({
 				path: `**`,
 				component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
-			},
-		] as Array<IComponentRoute>;
+			});
+		}
 
 		const mappedRoutes = allRoutes.map((route) => {
 			// override the setup method to set the active local path

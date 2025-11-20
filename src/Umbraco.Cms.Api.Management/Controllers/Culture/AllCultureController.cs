@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -22,15 +22,15 @@ public class AllCultureController : CultureControllerBase
     }
 
     /// <summary>
-    ///     Retrieve a paginated list of supported cultures for creating languages
+    ///     Returns all cultures available for creating languages.
     /// </summary>
     /// <returns></returns>
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<CultureReponseModel>), StatusCodes.Status200OK)]
-    [EndpointSummary("Retrieve a paginated list of supported cultures for creating languages")]
-    [EndpointDescription("Returns a paginated collection of supported culture information available in Umbraco. Use the `skip` and `take` parameters to control pagination. Each item includes culture-specific data such as name, display name, and locale identifiers.")]
-    public async Task<PagedViewModel<CultureReponseModel>> GetAll(CancellationToken cancellationToken, int skip = 0, int take = 100)
+    [EndpointSummary("Gets a paginated collection of cultures available for creating languages.")]
+    [EndpointDescription("Gets a paginated collection containing the English and localized names of all available cultures.")]
+    public Task<PagedViewModel<CultureReponseModel>> GetAll(CancellationToken cancellationToken, int skip = 0, int take = 100)
     {
         CultureInfo[] all = _cultureService.GetValidCultureInfos();
 
@@ -40,6 +40,6 @@ public class AllCultureController : CultureControllerBase
             Total = all.Length
         };
 
-        return await Task.FromResult(viewModel);
+        return Task.FromResult(viewModel);
     }
 }

@@ -14,28 +14,28 @@ import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 @customElement('umb-relation-type-detail-workspace-view')
 export class UmbRelationTypeDetailWorkspaceViewElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	@state()
-	_relations: Array<UmbRelationDetailModel> = [];
+	private _relations: Array<UmbRelationDetailModel> = [];
 
 	@state()
-	_parent?: UmbRelationTypeDetailModel['parent'];
+	private _parent?: UmbRelationTypeDetailModel['parent'];
 
 	@state()
-	_child?: UmbRelationTypeDetailModel['child'];
+	private _child?: UmbRelationTypeDetailModel['child'];
 
 	@state()
-	_isBidirectional?: UmbRelationTypeDetailModel['isBidirectional'];
+	private _isBidirectional?: UmbRelationTypeDetailModel['isBidirectional'];
 
 	@state()
-	_isDependency?: UmbRelationTypeDetailModel['isDependency'];
+	private _isDependency?: UmbRelationTypeDetailModel['isDependency'];
 
 	@state()
-	_currentPageNumber = 1;
+	private _currentPageNumber = 1;
 
 	@state()
-	_totalPages = 1;
+	private _totalPages = 1;
 
 	@state()
-	_loading = false;
+	private _loading = false;
 
 	#workspaceContext?: typeof UMB_RELATION_TYPE_WORKSPACE_CONTEXT.TYPE;
 	#relationCollectionRepository = new UmbRelationCollectionRepository(this);
@@ -180,6 +180,10 @@ export class UmbRelationTypeDetailWorkspaceViewElement extends UmbLitElement imp
 							<uui-pagination
 								.current=${this._currentPageNumber}
 								.total=${this._totalPages}
+								firstlabel=${this.localize.term('general_first')}
+								previouslabel=${this.localize.term('general_previous')}
+								nextlabel=${this.localize.term('general_next')}
+								lastlabel=${this.localize.term('general_last')}
 								@change=${this.#onPageChange}></uui-pagination>
 						`
 					: nothing}

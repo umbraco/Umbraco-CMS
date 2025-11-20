@@ -2,10 +2,12 @@
 // See LICENSE for more details.
 
 using System.Diagnostics;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Dictionary;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
@@ -35,7 +37,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
     Database = UmbracoTestOptions.Database.NewSchemaPerTest,
     PublishedRepositoryEvents = true,
     WithApplication = true)]
-public class ContentServiceTests : UmbracoIntegrationTestWithContent
+internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
 {
     [SetUp]
     public void Setup() => ContentRepositoryBase.ThrowOnWarning = true;
@@ -58,8 +60,6 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     private IUserGroupService UserGroupService => GetRequiredService<IUserGroupService>();
 
     private IRelationService RelationService => GetRequiredService<IRelationService>();
-
-    private ILocalizedTextService TextService => GetRequiredService<ILocalizedTextService>();
 
     private ITagService TagService => GetRequiredService<ITagService>();
 
@@ -98,7 +98,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         blueprint.SetValue("keywords", "blueprint 3");
         blueprint.SetValue("description", "blueprint 4");
 
-        ContentService.SaveBlueprint(blueprint);
+        ContentService.SaveBlueprint(blueprint, null);
 
         var found = ContentService.GetBlueprintsForContentTypes().ToArray();
         Assert.AreEqual(1, found.Length);
@@ -123,7 +123,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         blueprint.SetValue("keywords", "blueprint 3");
         blueprint.SetValue("description", "blueprint 4");
 
-        ContentService.SaveBlueprint(blueprint);
+        ContentService.SaveBlueprint(blueprint, null);
 
         ContentService.DeleteBlueprint(blueprint);
 
@@ -132,7 +132,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
-    public void Create_Content_From_Blueprint()
+    public void Create_Blueprint_From_Content()
     {
         using (var scope = ScopeProvider.CreateScope(autoComplete: true))
         {
@@ -142,22 +142,21 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
             var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
             ContentTypeService.Save(contentType);
 
-            var blueprint = ContentBuilder.CreateTextpageContent(contentType, "hello", Constants.System.Root);
-            blueprint.SetValue("title", "blueprint 1");
-            blueprint.SetValue("bodyText", "blueprint 2");
-            blueprint.SetValue("keywords", "blueprint 3");
-            blueprint.SetValue("description", "blueprint 4");
+            var originalPage = ContentBuilder.CreateTextpageContent(contentType, "hello", Constants.System.Root);
+            originalPage.SetValue("title", "blueprint 1");
+            originalPage.SetValue("bodyText", "blueprint 2");
+            originalPage.SetValue("keywords", "blueprint 3");
+            originalPage.SetValue("description", "blueprint 4");
+            ContentService.Save(originalPage);
 
-            ContentService.SaveBlueprint(blueprint);
+            var fromContent = ContentService.CreateBlueprintFromContent(originalPage, "hello world");
+            ContentService.SaveBlueprint(fromContent, originalPage);
 
-            var fromBlueprint = ContentService.CreateContentFromBlueprint(blueprint, "hello world");
-            ContentService.Save(fromBlueprint);
-
-            Assert.IsTrue(fromBlueprint.HasIdentity);
-            Assert.AreEqual("blueprint 1", fromBlueprint.Properties["title"].GetValue());
-            Assert.AreEqual("blueprint 2", fromBlueprint.Properties["bodyText"].GetValue());
-            Assert.AreEqual("blueprint 3", fromBlueprint.Properties["keywords"].GetValue());
-            Assert.AreEqual("blueprint 4", fromBlueprint.Properties["description"].GetValue());
+            Assert.IsTrue(fromContent.HasIdentity);
+            Assert.AreEqual("blueprint 1", fromContent.Properties["title"]?.GetValue());
+            Assert.AreEqual("blueprint 2", fromContent.Properties["bodyText"]?.GetValue());
+            Assert.AreEqual("blueprint 3", fromContent.Properties["keywords"]?.GetValue());
+            Assert.AreEqual("blueprint 4", fromContent.Properties["description"]?.GetValue());
         }
     }
 
@@ -179,7 +178,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         {
             var blueprint =
                 ContentBuilder.CreateTextpageContent(i % 2 == 0 ? ct1 : ct2, "hello" + i, Constants.System.Root);
-            ContentService.SaveBlueprint(blueprint);
+            ContentService.SaveBlueprint(blueprint, null);
         }
 
         var found = ContentService.GetBlueprintsForContentTypes().ToArray();
@@ -214,7 +213,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         ctVariant.Variations = ContentVariation.Culture;
         ContentTypeService.Save(ctVariant);
 
-        var now = DateTime.Now;
+        var now = DateTime.UtcNow;
 
         // 10x invariant content, half is scheduled to be published in 5 seconds, the other half is scheduled to be unpublished in 5 seconds
         var invariant = new List<IContent>();
@@ -321,7 +320,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         // Act
         var content = ContentService.CreateAndSave("Test", Constants.System.Root, "umbTextpage");
 
-        var contentSchedule = ContentScheduleCollection.CreateWithEntry(null, DateTime.Now.AddHours(2));
+        var contentSchedule = ContentScheduleCollection.CreateWithEntry(null, DateTime.UtcNow.AddHours(2));
         ContentService.Save(content, Constants.Security.SuperUserId, contentSchedule);
         Assert.AreEqual(1, contentSchedule.FullSchedule.Count);
 
@@ -676,13 +675,13 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         var root = ContentService.GetById(Textpage.Id);
         ContentService.Publish(root!, root!.AvailableCultures.ToArray());
         var content = ContentService.GetById(Subpage.Id);
-        var contentSchedule = ContentScheduleCollection.CreateWithEntry(null, DateTime.Now.AddSeconds(1));
+        var contentSchedule = ContentScheduleCollection.CreateWithEntry(null, DateTime.UtcNow.AddSeconds(1));
         ContentService.PersistContentSchedule(content!, contentSchedule);
         ContentService.Publish(content, content.AvailableCultures.ToArray());
 
         // Act
         Thread.Sleep(new TimeSpan(0, 0, 0, 2));
-        var contents = ContentService.GetContentForExpiration(DateTime.Now).ToList();
+        var contents = ContentService.GetContentForExpiration(DateTime.UtcNow).ToList();
 
         // Assert
         Assert.That(contents, Is.Not.Null);
@@ -691,14 +690,34 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
+    public void Can_Get_Content_Schedules_By_Keys()
+    {
+        // Arrange
+        var root = ContentService.GetById(Textpage.Id);
+        ContentService.Publish(root!, root!.AvailableCultures.ToArray());
+        var content = ContentService.GetById(Subpage.Id);
+        var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddDays(1), null);
+        ContentService.PersistContentSchedule(content!, contentSchedule);
+        ContentService.Publish(content, content.AvailableCultures.ToArray());
+
+        // Act
+        var keys = ContentService.GetContentSchedulesByIds([Textpage.Key, Subpage.Key, Subpage2.Key]).ToList();
+
+        // Assert
+        Assert.AreEqual(1, keys.Count);
+        Assert.AreEqual(keys[0].Key, Subpage.Id);
+        Assert.AreEqual(keys[0].Value.First().Id, contentSchedule.FullSchedule.First().Id);
+    }
+
+    [Test]
     public void Can_Get_Content_For_Release()
     {
         // Arrange
         // Act
-        var contents = ContentService.GetContentForRelease(DateTime.Now).ToList();
+        var contents = ContentService.GetContentForRelease(DateTime.UtcNow).ToList();
 
         // Assert
-        Assert.That(DateTime.Now.AddMinutes(-5) <= DateTime.Now);
+        Assert.That(DateTime.UtcNow.AddMinutes(-5) <= DateTime.UtcNow);
         Assert.That(contents, Is.Not.Null);
         Assert.That(contents.Any(), Is.True);
         Assert.That(contents.Count(), Is.EqualTo(1));
@@ -738,8 +757,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     [Test]
     public void Can_Unpublish_Content_Variation()
     {
-        var content = CreateEnglishAndFrenchDocument(out var langUk, out var langFr,
-            out var contentType);
+        var content = CreateEnglishAndFrenchDocument(out var langUk, out var langFr, out var contentType);
 
         var saved = ContentService.Save(content);
         var published = ContentService.Publish(content, new[] { langFr.IsoCode, langUk.IsoCode });
@@ -1021,7 +1039,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
-    public void Can_Publish_Content_Variation_And_Detect_Changed_Cultures()
+    public async Task Can_Publish_Content_Variation_And_Detect_Changed_Cultures()
     {
         CreateEnglishAndFrenchDocumentType(out var langUk, out var langFr, out var contentType);
 
@@ -1031,8 +1049,8 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         var published = ContentService.Publish(content, new[] { langFr.IsoCode });
 
         // audit log will only show that french was published
-        var lastLog = AuditService.GetLogs(content.Id).Last();
-        Assert.AreEqual("Published languages: French (France)", lastLog.Comment);
+        var lastLog = (await AuditService.GetItemsByEntityAsync(content.Id, 0, 1)).Items.First();
+        Assert.AreEqual("Published languages: fr-FR", lastLog.Comment);
 
         // re-get
         content = ContentService.GetById(content.Id);
@@ -1041,8 +1059,8 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         published = ContentService.Publish(content, new[] { langUk.IsoCode });
 
         // audit log will only show that english was published
-        lastLog = AuditService.GetLogs(content.Id).Last();
-        Assert.AreEqual("Published languages: English (United Kingdom)", lastLog.Comment);
+        lastLog = (await AuditService.GetItemsByEntityAsync(content.Id, 0, 1)).Items.First();
+        Assert.AreEqual("Published languages: en-GB", lastLog.Comment);
     }
 
     [Test]
@@ -1078,8 +1096,8 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         var unpublished = ContentService.Unpublish(content, langFr.IsoCode);
 
         // audit log will only show that french was unpublished
-        var lastLog = AuditService.GetLogs(content.Id).Last();
-        Assert.AreEqual("Unpublished languages: French (France)", lastLog.Comment);
+        var lastLog = (await AuditService.GetItemsByEntityAsync(content.Id, 0, 1)).Items.First();
+        Assert.AreEqual("Unpublished languages: fr-FR", lastLog.Comment);
 
         // re-get
         content = ContentService.GetById(content.Id);
@@ -1087,8 +1105,8 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         unpublished = ContentService.Unpublish(content, langGb.IsoCode);
 
         // audit log will only show that english was published
-        var logs = AuditService.GetLogs(content.Id).ToList();
-        Assert.AreEqual("Unpublished languages: English (United Kingdom)", logs[^2].Comment);
+        var logs = (await AuditService.GetItemsByEntityAsync(content.Id, 0, int.MaxValue, Direction.Ascending)).Items.ToList();
+        Assert.AreEqual("Unpublished languages: en-GB", logs[^2].Comment);
         Assert.AreEqual("Unpublished (mandatory language unpublished)", logs[^1].Comment);
     }
 
@@ -1253,7 +1271,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         Assert.IsFalse(content.HasIdentity);
 
         // content cannot publish values because they are invalid
-        var propertyValidationService = new PropertyValidationService(PropertyEditorCollection, DataTypeService, LocalizedTextService, ValueEditorCache, Mock.Of<ICultureDictionary>());
+        var propertyValidationService = new PropertyValidationService(PropertyEditorCollection, DataTypeService, LocalizedTextService, ValueEditorCache, Mock.Of<ICultureDictionary>(), Mock.Of<ILanguageService>(), Mock.Of<IOptions<ContentSettings>>());
         var isValid = propertyValidationService.IsPropertyDataValid(content, out var invalidProperties,
             CultureImpact.Invariant);
         Assert.IsFalse(isValid);
@@ -1293,7 +1311,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         content.SetCultureName("name-fr", langFr.IsoCode);
         content.SetCultureName("name-da", langDa.IsoCode);
 
-        content.PublishCulture(CultureImpact.Explicit(langFr.IsoCode, langFr.IsDefault), DateTime.Now, PropertyEditorCollection);
+        content.PublishCulture(CultureImpact.Explicit(langFr.IsoCode, langFr.IsDefault), DateTime.UtcNow, PropertyEditorCollection);
         var result = ContentService.CommitDocumentChanges(content);
         Assert.IsTrue(result.Success);
         content = ContentService.GetById(content.Id);
@@ -1301,7 +1319,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         Assert.IsFalse(content.IsCulturePublished(langDa.IsoCode));
 
         content.UnpublishCulture(langFr.IsoCode);
-        content.PublishCulture(CultureImpact.Explicit(langDa.IsoCode, langDa.IsDefault), DateTime.Now, PropertyEditorCollection);
+        content.PublishCulture(CultureImpact.Explicit(langDa.IsoCode, langDa.IsDefault), DateTime.UtcNow, PropertyEditorCollection);
 
         result = ContentService.CommitDocumentChanges(content);
         Assert.IsTrue(result.Success);
@@ -1386,7 +1404,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     {
         // Arrange
         var content = ContentService.GetById(Subpage.Id); // This Content expired 5min ago
-        var contentSchedule = ContentScheduleCollection.CreateWithEntry(null, DateTime.Now.AddMinutes(-5));
+        var contentSchedule = ContentScheduleCollection.CreateWithEntry(null, DateTime.UtcNow.AddMinutes(-5));
         ContentService.Save(content, contentSchedule: contentSchedule);
 
         var parent = ContentService.GetById(Textpage.Id);
@@ -1416,7 +1434,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
 
         var content = ContentBuilder.CreateBasicContent(contentType);
         content.SetCultureName("Hello", "en-US");
-        var contentSchedule = ContentScheduleCollection.CreateWithEntry("en-US", null, DateTime.Now.AddMinutes(-5));
+        var contentSchedule = ContentScheduleCollection.CreateWithEntry("en-US", null, DateTime.UtcNow.AddMinutes(-5));
         ContentService.Save(content, contentSchedule: contentSchedule);
 
         var published = ContentService.Publish(content, new[] { "en-US" });
@@ -1431,7 +1449,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     {
         // Arrange
         var content = ContentService.GetById(Subpage.Id);
-        var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.Now.AddHours(2), null);
+        var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddHours(2), null);
         ContentService.Save(content, Constants.Security.SuperUserId, contentSchedule);
 
         var parent = ContentService.GetById(Textpage.Id);
@@ -1488,7 +1506,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         content.Properties[0].SetValue("Foo", string.Empty);
         contentService.Save(content);
         contentService.PersistContentSchedule(content,
-            ContentScheduleCollection.CreateWithEntry(DateTime.Now.AddHours(2), null));
+            ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddHours(2), null));
 
         // Act
         var result = contentService.Publish(content, Array.Empty<string>(), userId: Constants.Security.SuperUserId);
@@ -1540,7 +1558,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         contentService.Publish(content, Array.Empty<string>());
 
         contentService.PersistContentSchedule(content,
-            ContentScheduleCollection.CreateWithEntry(DateTime.Now.AddHours(2), null));
+            ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddHours(2), null));
         contentService.Save(content);
 
         // Act
@@ -1568,7 +1586,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
 
         var content = ContentBuilder.CreateBasicContent(contentType);
         content.SetCultureName("Hello", "en-US");
-        var contentSchedule = ContentScheduleCollection.CreateWithEntry("en-US", DateTime.Now.AddHours(2), null);
+        var contentSchedule = ContentScheduleCollection.CreateWithEntry("en-US", DateTime.UtcNow.AddHours(2), null);
         ContentService.Save(content, contentSchedule: contentSchedule);
 
         var published = ContentService.Publish(content, new[] { "en-US" });
@@ -1913,11 +1931,11 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
 
     [Test]
     [LongRunning]
-    public void Ensures_Permissions_Are_Retained_For_Copied_Descendants_With_Explicit_Permissions()
+    public async Task Ensures_Permissions_Are_Retained_For_Copied_Descendants_With_Explicit_Permissions()
     {
         // Arrange
         var userGroup = UserGroupBuilder.CreateUserGroup("1");
-        UserService.Save(userGroup);
+        await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserKey);
 
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
@@ -1954,11 +1972,11 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
 
     [Test]
     [LongRunning]
-    public void Ensures_Permissions_Are_Inherited_For_Copied_Descendants()
+    public async Task Ensures_Permissions_Are_Inherited_For_Copied_Descendants()
     {
         // Arrange
         var userGroup = UserGroupBuilder.CreateUserGroup("1");
-        UserService.Save(userGroup);
+        await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserKey);
 
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
@@ -1969,7 +1987,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         {
             new(contentType.Key, 0, contentType.Alias)
         };
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
 
         var parentPage = ContentBuilder.CreateSimpleContent(contentType);
         ContentService.Save(parentPage);
@@ -2060,7 +2078,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
 
         var editorGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupKey);
         editorGroup.StartContentId = content1.Id;
-        UserService.Save(editorGroup);
+        await UserGroupService.UpdateAsync(editorGroup, Constants.Security.SuperUserKey);
 
         var admin = await UserService.GetAsync(Constants.Security.SuperUserKey);
         admin.StartContentIds = new[] { content1.Id };
@@ -2075,8 +2093,9 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         Assert.IsTrue(PublicAccessService.AddRule(content1, "test2", "test2").Success);
 
         var user = await UserService.GetAsync(Constants.Security.SuperUserKey);
-        var userGroup = UserService.GetUserGroupByAlias(user.Groups.First().Alias);
-        Assert.IsNotNull(NotificationService.CreateNotification(user, content1, "X"));
+        var userGroup = await UserGroupService.GetAsync(user.Groups.First().Alias);
+        NotificationService.TryCreateNotification(user, content1, "X", out Notification? notification);
+        Assert.IsNotNull(notification);
 
         ContentService.SetPermission(content1, "A", new[] { userGroup.Id });
         var updateDomainResult = await DomainService.UpdateDomainsAsync(
@@ -2716,6 +2735,9 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         Assert.That(sut.GetValue<string>("multiUrlPicker"),
             Is.EqualTo("[{\"name\":\"https://test.com\",\"url\":\"https://test.com\"}]"));
         Assert.That(sut.GetValue<string>("tags"), Is.EqualTo("this,is,tags"));
+        Assert.That(
+            sut.GetValue<string>("dateTimeWithTimeZone"),
+            Is.EqualTo("{\"date\":\"2025-01-22T18:33:01.0000000+01:00\",\"timeZone\":\"Europe/Copenhagen\"}"));
     }
 
     [Test]

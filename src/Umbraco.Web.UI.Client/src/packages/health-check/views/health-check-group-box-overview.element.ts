@@ -46,11 +46,11 @@ export class UmbHealthCheckGroupBoxOverviewElement extends UmbLitElement {
 
 	override render() {
 		return html`<a href="${ensureSlash(path()) + this.manifest?.meta.label}">
-			<uui-box class="group-box"> ${this.manifest?.meta.label} ${this._renderStatus()} </uui-box>
+			<uui-box class="group-box"> ${this.manifest?.meta.label} ${this.#renderStatus()} </uui-box>
 		</a>`;
 	}
 
-	_renderStatus() {
+	#renderStatus() {
 		const res: StatusResultTypeModel[] = [];
 		this._keyResults?.checks?.forEach((item) => {
 			item?.results?.forEach((result) => {
@@ -58,10 +58,10 @@ export class UmbHealthCheckGroupBoxOverviewElement extends UmbLitElement {
 			});
 		});
 		this._tagResults = res;
-		return html`<div>${this._renderCheckResults(this.filterResults(this._tagResults))}</div>`;
+		return html`<div>${this.#renderCheckResults(this.filterResults(this._tagResults))}</div>`;
 	}
 
-	_renderCheckResults(resultObject: any) {
+	#renderCheckResults(resultObject: any) {
 		return html`${resultObject.success > 0
 			? html`<uui-tag look="secondary" color="positive">
 					<uui-icon name="check"></uui-icon>

@@ -48,7 +48,7 @@ public class RadioButtonsPropertyEditor : DataEditor
     /// <summary>
     /// Defines the value editor for the radio buttons property editor.
     /// </summary>
-    internal class RadioButtonsPropertyValueEditor : DataValueEditor
+    internal sealed class RadioButtonsPropertyValueEditor : DataValueEditor
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="RadioButtonsPropertyValueEditor"/> class.
@@ -66,7 +66,7 @@ public class RadioButtonsPropertyEditor : DataEditor
     /// <summary>
     /// Validates the prevalue configuration for the radio buttons property editor.
     /// </summary>
-    internal class RadioButtonValueValidator : IValueValidator
+    internal sealed class RadioButtonValueValidator : IValueValidator
     {
         private readonly ILocalizedTextService _localizedTextService;
 

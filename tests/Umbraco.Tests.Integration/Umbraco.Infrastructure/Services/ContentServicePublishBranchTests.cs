@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, PublishedRepositoryEvents = true,
     WithApplication = true)]
-public class ContentServicePublishBranchTests : UmbracoIntegrationTest
+internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
 {
     private IContentService ContentService => GetRequiredService<IContentService>();
 

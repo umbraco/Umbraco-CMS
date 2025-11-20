@@ -7,7 +7,7 @@ internal sealed class UserConnectionManager : IUserConnectionManager
 {
     // We use a normal dictionary instead of ConcurrentDictionary, since we need to lock the set anyways.
     private readonly Dictionary<Guid, HashSet<string>> _connections = new();
-    private readonly object _lock = new();
+    private readonly Lock _lock = new();
 
     /// <inheritdoc/>
     public ISet<string> GetConnections(Guid userKey)

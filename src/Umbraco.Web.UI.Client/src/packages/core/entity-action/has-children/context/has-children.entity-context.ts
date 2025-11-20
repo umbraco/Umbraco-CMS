@@ -3,7 +3,7 @@ import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
-export class UmbHasChildrenEntityContext extends UmbContextBase<UmbHasChildrenEntityContext> {
+export class UmbHasChildrenEntityContext extends UmbContextBase {
 	#hasChildren = new UmbBooleanState(undefined);
 	public readonly hasChildren = this.#hasChildren.asObservable();
 

@@ -1,5 +1,8 @@
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
@@ -9,11 +12,14 @@ namespace Umbraco.Cms.Api.Management.Factories;
 public class DocumentCollectionPresentationFactory : ContentCollectionPresentationFactory<IContent, DocumentCollectionResponseModel, DocumentValueResponseModel, DocumentVariantResponseModel>, IDocumentCollectionPresentationFactory
 {
     private readonly IPublicAccessService _publicAccessService;
+    private readonly IEntityService _entityService;
 
-    public DocumentCollectionPresentationFactory(IUmbracoMapper mapper, IPublicAccessService publicAccessService)
-        : base(mapper)
+    [ActivatorUtilitiesConstructor]
+    public DocumentCollectionPresentationFactory(IUmbracoMapper mapper, IPublicAccessService publicAccessService, IEntityService entityService)
+    : base(mapper)
     {
         _publicAccessService = publicAccessService;
+        _entityService = entityService;
     }
 
     protected override Task SetUnmappedProperties(ListViewPagedModel<IContent> contentCollection, List<DocumentCollectionResponseModel> collectionResponseModels)
@@ -27,6 +33,8 @@ public class DocumentCollectionPresentationFactory : ContentCollectionPresentati
             }
 
             item.IsProtected = _publicAccessService.IsProtected(matchingContentItem).Success;
+            item.Ancestors = _entityService.GetPathKeys(matchingContentItem, omitSelf: true)
+                .Select(x => new ReferenceByIdModel(x));
         }
 
         return Task.CompletedTask;

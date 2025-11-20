@@ -78,7 +78,7 @@ const danishRegional: UmbLocalizationSet = {
 };
 //#endregion
 
-describe('UmbLocalizeController', () => {
+describe('UmbLocalizationController', () => {
 	let controller: UmbLocalizationController;
 
 	beforeEach(async () => {
@@ -173,12 +173,6 @@ describe('UmbLocalizeController', () => {
 		it('should return a term with no tokens even though they are provided', async () => {
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			expect((controller.term as any)('logout', 'Hello', 'World')).to.equal('Log out');
-		});
-
-		it('should encode HTML entities', () => {
-			expect(controller.term('withInlineToken', 'Hello', '<script>alert("XSS")</script>'), 'XSS detected').to.equal(
-				'Hello &lt;script&gt;alert(&#34;XSS&#34;)&lt;/script&gt;',
-			);
 		});
 
 		it('only reacts to changes of its own localization-keys', async () => {
@@ -309,31 +303,8 @@ describe('UmbLocalizeController', () => {
 			expect(controller.duration(inTenSeconds, now)).to.equal('10 seconds');
 		});
 
-		it('should compare between two dates', () => {
-			const twoDaysAgo = new Date();
-			twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
-			const inTwoDays = new Date();
-			inTwoDays.setDate(inTwoDays.getDate() + 2);
-
-			expect(controller.duration(inTwoDays, twoDaysAgo)).to.equal('4 days');
-		});
-
 		it('should return a negative duration', () => {
 			expect(controller.duration('2020-01-01', '2019-12-30')).to.equal('2 days');
-		});
-
-		it('should update the relative compounded time when the language changes', async () => {
-			const now = new Date();
-			const inTwoDays = new Date();
-			inTwoDays.setDate(inTwoDays.getDate() + 2);
-
-			expect(controller.duration(inTwoDays, now)).to.equal('2 days');
-
-			// Switch browser to Danish
-			document.documentElement.lang = danishRegional.$code;
-			await aTimeout(0);
-
-			expect(controller.duration(inTwoDays, now)).to.equal('2 dage');
 		});
 	});
 

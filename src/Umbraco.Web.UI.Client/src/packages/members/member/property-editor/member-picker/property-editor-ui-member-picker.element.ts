@@ -1,10 +1,10 @@
+import type { UmbInputMemberElement } from '../../components/index.js';
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
-import type { UmbInputMemberElement } from '@umbraco-cms/backoffice/member';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 /**

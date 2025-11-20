@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Extensions;
@@ -121,7 +122,17 @@ public class JsonBlockValueConverter : JsonConverter<BlockValue>
     }
 
     private List<BlockItemData> DeserializeBlockItemData(ref Utf8JsonReader reader, JsonSerializerOptions options, Type typeToConvert, string propertyName)
-        => DeserializeListOf<BlockItemData>(ref reader, options, typeToConvert, propertyName);
+    {
+        try
+        {
+            return DeserializeListOf<BlockItemData>(ref reader, options, typeToConvert, propertyName);
+        }
+        catch (JsonException ex) when (ex.Path?.EndsWith(".values") is true)
+        {
+            // If we hit a JsonException due to the "values" property conflict, attempt the fallback deserialization
+            return FallbackBlockItemDataDeserialization(ref reader, options);
+        }
+    }
 
     private List<BlockItemVariation> DeserializeBlockVariation(ref Utf8JsonReader reader, JsonSerializerOptions options, Type typeToConvert, string propertyName)
         => DeserializeListOf<BlockItemVariation>(ref reader, options, typeToConvert, propertyName);
@@ -189,13 +200,73 @@ public class JsonBlockValueConverter : JsonConverter<BlockValue>
                 else
                 {
                     // ignore this layout - forward the reader to the end of the array and look for the next one
-                    while (reader.TokenType is not JsonTokenType.EndArray)
+
+                    // Read past the current StartArray token before we start counting
+                    _ = reader.Read();
+
+                    // Keep track of the number of open arrays to ensure we find the correct EndArray token
+                    var openCount = 0;
+                    while (true)
                     {
-                        reader.Read();
+                        if (reader.TokenType is JsonTokenType.EndArray && openCount == 0)
+                        {
+                            break;
+                        }
+
+                        if (reader.TokenType is JsonTokenType.StartArray)
+                        {
+                            openCount++;
+                        }
+                        else if (reader.TokenType is JsonTokenType.EndArray)
+                        {
+                            openCount--;
+                            if (openCount < 0)
+                            {
+                                throw new JsonException($"Malformed JSON: Encountered more closing array tokens than opening ones while processing block editor alias: {blockEditorAlias}.");
+                            }
+                        }
+
+                        if (!reader.Read())
+                        {
+                            throw new JsonException($"Unexpected end of JSON while looking for the end of the layout items array for block editor alias: {blockEditorAlias}.");
+                        }
                     }
                 }
             }
         }
     }
-}
 
+    [Obsolete("Only needed to support the old data schema. Remove in V18.")]
+    private static List<BlockItemData> FallbackBlockItemDataDeserialization(ref Utf8JsonReader reader, JsonSerializerOptions options)
+    {
+        JsonArray? arrayElement = JsonSerializer.Deserialize<JsonArray>(ref reader, options);
+
+        return arrayElement?
+            .Select(itemElement => DeserializeBlockItemData(itemElement, options))
+            .OfType<BlockItemData>()
+            .ToList() ?? [];
+    }
+
+    [Obsolete("Only needed to support the old data schema. Remove in V18.")]
+    private static BlockItemData? DeserializeBlockItemData(JsonNode? jsonNode, JsonSerializerOptions options)
+    {
+        if (jsonNode is not JsonObject jsonObject || jsonObject.ContainsKey("values") is false)
+        {
+            // Nothing to be done, just deserialize as usual
+            return jsonNode.Deserialize<BlockItemData>(options);
+        }
+
+        // Handle the "values" property conflict by extracting the "values" property first and adding it to the
+        // RawPropertyValues dictionary after deserialization
+        JsonNode? values = jsonObject["values"];
+        jsonObject.Remove("values");
+
+        BlockItemData? blockItemData = jsonObject.Deserialize<BlockItemData>(options);
+        if (blockItemData is not null)
+        {
+            blockItemData.RawPropertyValues["values"] = values.Deserialize<object?>(options);
+        }
+
+        return blockItemData;
+    }
+}

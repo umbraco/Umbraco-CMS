@@ -10,7 +10,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'fileUploadPreview',
 		alias: 'Umb.FileUploadPreview.File',
-		name: 'File File Upload Preview',
+		name: 'General File Upload Preview',
 		weight: 100,
 		element: () => import('./input-upload-field-file.element.js'),
 		forMimeTypes: ['*/*'],
@@ -26,7 +26,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'fileUploadPreview',
 		alias: 'Umb.FileUploadPreview.Svg',
-		name: 'Svg File Upload Preview',
+		name: 'SVG File Upload Preview',
 		weight: 100,
 		element: () => import('./input-upload-field-svg.element.js'),
 		forMimeTypes: ['image/svg+xml'],

@@ -10,22 +10,20 @@ namespace Umbraco.Cms.Core.Services;
 public interface IDataTypeService : IService
 {
     /// <summary>
-    ///     Returns a dictionary of content type <see cref="Udi" />s and the property type aliases that use a
-    ///     <see cref="IDataType" />
+    ///     Gets a paged result of items which are in relation with the current data type.
     /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
-    [Obsolete("Please use GetReferencesAsync. Will be deleted in V15.")]
-    IReadOnlyDictionary<Udi, IEnumerable<string>> GetReferences(int id);
-
-    IReadOnlyDictionary<Udi, IEnumerable<string>> GetListViewReferences(int id) => throw new NotImplementedException();
-
-    /// <summary>
-    ///     Returns a dictionary of content type <see cref="Udi" />s and the property type aliases that use a <see cref="IDataType" />
-    /// </summary>
-    /// <param name="id">The guid Id of the <see cref="IDataType" /></param>
-    /// <returns></returns>
-    Task<Attempt<IReadOnlyDictionary<Udi, IEnumerable<string>>, DataTypeOperationStatus>> GetReferencesAsync(Guid id);
+    /// <param name="key">The identifier of the data type to retrieve relations for.</param>
+    /// <param name="skip">The amount of items to skip</param>
+    /// <param name="take">The amount of items to take.</param>
+    /// <returns>A paged result of <see cref="RelationItemModel" /> objects.</returns>
+    /// <remarks>
+    /// Note that the model and method signature here aligns with with how we handle retrieval of concrete Umbraco
+    /// relations based on documents, media and members in <see cref="ITrackedReferencesService"/>.
+    /// The intention is that we align data type relations with these so they can be handled polymorphically at the management API
+    /// and backoffice UI level.
+    /// </remarks>
+    Task<PagedModel<RelationItemModel>> GetPagedRelationsAsync(Guid key, int skip, int take)
+        => Task.FromResult(new PagedModel<RelationItemModel>());
 
     [Obsolete("Please use IDataTypeContainerService for all data type container operations. Will be removed in V15.")]
     Attempt<OperationResult<OperationResultType, EntityContainer>?> CreateContainer(int parentId, Guid key, string name,

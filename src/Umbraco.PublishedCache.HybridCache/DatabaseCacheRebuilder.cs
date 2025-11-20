@@ -1,12 +1,13 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Infrastructure.HostedServices;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Infrastructure.HybridCache.Persistence;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache;
@@ -14,10 +15,10 @@ namespace Umbraco.Cms.Infrastructure.HybridCache;
 /// <summary>
 /// Rebuilds the published content cache in the database.
 /// </summary>
-internal class DatabaseCacheRebuilder : IDatabaseCacheRebuilder
+internal sealed class DatabaseCacheRebuilder : IDatabaseCacheRebuilder
 {
     private const string NuCacheSerializerKey = "Umbraco.Web.PublishedCache.NuCache.Serializer";
-    private const string IsRebuildingDatabaseCacheRuntimeCacheKey = "temp_database_cache_rebuild_op";
+    private const string RebuildOperationName = "DatabaseCacheRebuild";
 
     private readonly IDatabaseCacheRepository _databaseCacheRepository;
     private readonly ICoreScopeProvider _coreScopeProvider;
@@ -25,8 +26,7 @@ internal class DatabaseCacheRebuilder : IDatabaseCacheRebuilder
     private readonly IKeyValueService _keyValueService;
     private readonly ILogger<DatabaseCacheRebuilder> _logger;
     private readonly IProfilingLogger _profilingLogger;
-    private readonly IBackgroundTaskQueue _backgroundTaskQueue;
-    private readonly IAppPolicyCache _runtimeCache;
+    private readonly ILongRunningOperationService _longRunningOperationService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DatabaseCacheRebuilder"/> class.
@@ -38,8 +38,7 @@ internal class DatabaseCacheRebuilder : IDatabaseCacheRebuilder
         IKeyValueService keyValueService,
         ILogger<DatabaseCacheRebuilder> logger,
         IProfilingLogger profilingLogger,
-        IBackgroundTaskQueue backgroundTaskQueue,
-        IAppPolicyCache runtimeCache)
+        ILongRunningOperationService longRunningOperationService)
     {
         _databaseCacheRepository = databaseCacheRepository;
         _coreScopeProvider = coreScopeProvider;
@@ -47,65 +46,56 @@ internal class DatabaseCacheRebuilder : IDatabaseCacheRebuilder
         _keyValueService = keyValueService;
         _logger = logger;
         _profilingLogger = profilingLogger;
-        _backgroundTaskQueue = backgroundTaskQueue;
-        _runtimeCache = runtimeCache;
+        _longRunningOperationService = longRunningOperationService;
     }
 
     /// <inheritdoc/>
-    public bool IsRebuilding() => _runtimeCache.Get(IsRebuildingDatabaseCacheRuntimeCacheKey) is not null;
+    public bool IsRebuilding() => IsRebuildingAsync().GetAwaiter().GetResult();
 
     /// <inheritdoc/>
-    public void Rebuild() => Rebuild(false);
+    public async Task<bool> IsRebuildingAsync()
+        => (await _longRunningOperationService.GetByTypeAsync(RebuildOperationName, 0, 0)).Total != 0;
 
     /// <inheritdoc/>
-    public void Rebuild(bool useBackgroundThread)
+    [Obsolete("Use RebuildAsync instead. Scheduled for removal in Umbraco 18.")]
+    public void Rebuild(bool useBackgroundThread) =>
+        RebuildAsync(useBackgroundThread).GetAwaiter().GetResult();
+
+    /// <inheritdoc/>
+    public async Task<Attempt<DatabaseCacheRebuildResult>> RebuildAsync(bool useBackgroundThread)
     {
-        if (useBackgroundThread)
-        {
-            _logger.LogInformation("Starting async background thread for rebuilding database cache.");
+        Attempt<Guid, LongRunningOperationEnqueueStatus> attempt = await _longRunningOperationService.RunAsync(
+                RebuildOperationName,
+                _ => PerformRebuild(),
+                allowConcurrentExecution: false,
+                runInBackground: useBackgroundThread);
 
-            _backgroundTaskQueue.QueueBackgroundWorkItem(
-                cancellationToken =>
-                {
-                    using (ExecutionContext.SuppressFlow())
-                    {
-                        Task.Run(() => PerformRebuild());
-                        return Task.CompletedTask;
-                    }
-                });
-        }
-        else
+        if (attempt.Success)
         {
-            PerformRebuild();
+            return Attempt.Succeed(DatabaseCacheRebuildResult.Success);
         }
+
+        return attempt.Status switch
+        {
+            LongRunningOperationEnqueueStatus.AlreadyRunning => Attempt.Fail(DatabaseCacheRebuildResult.AlreadyRunning),
+            _ => throw new InvalidOperationException(
+                $"Unexpected status {attempt.Status} when trying to enqueue the database cache rebuild operation."),
+        };
     }
 
-    private void PerformRebuild()
-    {
-        try
-        {
-            SetIsRebuilding();
-
-            using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
-            _databaseCacheRepository.Rebuild();
-            scope.Complete();
-        }
-        finally
-        {
-            ClearIsRebuilding();
-        }
-    }
-
-    private void SetIsRebuilding() => _runtimeCache.Insert(IsRebuildingDatabaseCacheRuntimeCacheKey, () => "tempValue", TimeSpan.FromMinutes(10));
-
-    private void ClearIsRebuilding() => _runtimeCache.Clear(IsRebuildingDatabaseCacheRuntimeCacheKey);
+    /// <inheritdoc/>
+    public void RebuildDatabaseCacheIfSerializerChanged() =>
+        RebuildDatabaseCacheIfSerializerChangedAsync().GetAwaiter().GetResult();
 
     /// <inheritdoc/>
-    public void RebuildDatabaseCacheIfSerializerChanged()
+    public async Task RebuildDatabaseCacheIfSerializerChangedAsync()
     {
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         NuCacheSerializerType serializer = _nucacheSettings.Value.NuCacheSerializerType;
-        var currentSerializerValue = _keyValueService.GetValue(NuCacheSerializerKey);
+        string? currentSerializerValue;
+        using (ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            currentSerializerValue = _keyValueService.GetValue(NuCacheSerializerKey);
+        }
 
         if (Enum.TryParse(currentSerializerValue, out NuCacheSerializerType currentSerializer) && serializer == currentSerializer)
         {
@@ -114,15 +104,29 @@ internal class DatabaseCacheRebuilder : IDatabaseCacheRebuilder
 
         _logger.LogWarning(
             "Database cache was serialized using {CurrentSerializer}. Currently configured cache serializer {Serializer}. Rebuilding database cache.",
-            currentSerializer,
+            currentSerializer == 0 ? "None" : currentSerializer,
             serializer);
 
         using (_profilingLogger.TraceDuration<DatabaseCacheRebuilder>($"Rebuilding database cache with {serializer} serializer"))
         {
-            Rebuild(false);
-            _keyValueService.SetValue(NuCacheSerializerKey, serializer.ToString());
+            await RebuildAsync(false);
+        }
+    }
+
+    private Task PerformRebuild()
+    {
+        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        _databaseCacheRepository.Rebuild([], [], []);
+
+        // If the serializer type has changed, we also need to update it in the key value store.
+        var currentSerializerValue = _keyValueService.GetValue(NuCacheSerializerKey);
+        if (!Enum.TryParse(currentSerializerValue, out NuCacheSerializerType currentSerializer) ||
+            _nucacheSettings.Value.NuCacheSerializerType != currentSerializer)
+        {
+            _keyValueService.SetValue(NuCacheSerializerKey, _nucacheSettings.Value.NuCacheSerializerType.ToString());
         }
 
         scope.Complete();
+        return Task.CompletedTask;
     }
 }

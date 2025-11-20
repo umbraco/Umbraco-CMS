@@ -414,7 +414,7 @@ public abstract class QueuingEventDispatcherBase : IEventDispatcher
         }
     }
 
-    private class EventDefinitionInfos
+    private sealed class EventDefinitionInfos
     {
         public IEventDefinition? EventDefinition { get; set; }
 

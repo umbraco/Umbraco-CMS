@@ -11,7 +11,7 @@ export const handlers = [
 		const height = heightParam ? parseInt(heightParam) : 240;
 
 		const response: OEmbedResponseModel = {
-			markup: `<iframe width="${width}" height="${height}" src="https://www.youtube.com/embed/wJNbtYdr-Hg?feature=oembed" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen title="Sleep Token - The Summoning"></iframe>`,
+			markup: `<iframe width="${width}" height="${height}" src="https://www.youtube.com/embed/QRIWz9SotY4?feature=oembed" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen title="Deep dive into Rich Text Editor"></iframe>`,
 		};
 
 		return res(ctx.status(200), ctx.json(response));

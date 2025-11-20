@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using Microsoft.Extensions.Logging;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -20,7 +21,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class DomainRepositoryTest : UmbracoIntegrationTest
+internal sealed class DomainRepositoryTest : UmbracoIntegrationTest
 {
     private ILanguageRepository LanguageRepository => GetRequiredService<ILanguageRepository>();
 
@@ -32,7 +33,7 @@ public class DomainRepositoryTest : UmbracoIntegrationTest
     {
         var accessor = (IScopeAccessor)provider;
         var domainRepository =
-            new DomainRepository(accessor, AppCaches.NoCache, LoggerFactory.CreateLogger<DomainRepository>());
+            new DomainRepository(accessor, AppCaches.NoCache, LoggerFactory.CreateLogger<DomainRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
         return domainRepository;
     }
 

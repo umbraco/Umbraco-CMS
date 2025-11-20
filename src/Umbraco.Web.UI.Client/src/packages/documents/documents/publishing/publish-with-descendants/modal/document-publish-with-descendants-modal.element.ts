@@ -20,10 +20,10 @@ export class UmbDocumentPublishWithDescendantsModalElement extends UmbModalBaseE
 	#includeUnpublishedDescendants = false;
 
 	@state()
-	_options: Array<UmbDocumentVariantOptionModel> = [];
+	private _options: Array<UmbDocumentVariantOptionModel> = [];
 
 	@state()
-	_hasNotSelectedMandatory?: boolean;
+	private _hasNotSelectedMandatory?: boolean;
 
 	#pickableFilter = (option: UmbDocumentVariantOptionModel) => {
 		if (!option.variant) {
@@ -84,7 +84,6 @@ export class UmbDocumentPublishWithDescendantsModalElement extends UmbModalBaseE
 	}
 
 	async #submit() {
-
 		this.value = {
 			selection: this.#selectionManager.getSelection(),
 			includeUnpublishedDescendants: this.#includeUnpublishedDescendants,
@@ -97,7 +96,7 @@ export class UmbDocumentPublishWithDescendantsModalElement extends UmbModalBaseE
 	}
 
 	override render() {
-		return html`<umb-body-layout headline=${this.localize.term('buttons_publishDescendants')}>
+		return html`<uui-dialog-layout headline=${this.localize.term('buttons_publishDescendants')}>
 			<p id="subtitle">
 				${this._options.length === 1
 					? html`<umb-localize
@@ -137,7 +136,7 @@ export class UmbDocumentPublishWithDescendantsModalElement extends UmbModalBaseE
 					?disabled=${this._hasNotSelectedMandatory}
 					@click=${this.#submit}></uui-button>
 			</div>
-		</umb-body-layout> `;
+		</uui-dialog-layout> `;
 	}
 
 	static override styles = [

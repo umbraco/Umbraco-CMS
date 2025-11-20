@@ -35,8 +35,8 @@ public class ExcessiveHeadersCheck : HealthCheck
     /// <summary>
     ///     Get the status for this health check
     /// </summary>
-    public override async Task<IEnumerable<HealthCheckStatus>> GetStatusAsync() =>
-        await Task.WhenAll(CheckForHeaders());
+    public override async Task<IEnumerable<HealthCheckStatus>> GetStatusAsync()
+        => [await CheckForHeaders()];
 
     /// <summary>
     ///     Executes the action and returns it's status

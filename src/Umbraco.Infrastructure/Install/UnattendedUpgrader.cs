@@ -1,6 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -28,7 +30,10 @@ public class UnattendedUpgrader : INotificationAsyncHandler<RuntimeUnattendedUpg
     private readonly IRuntimeState _runtimeState;
     private readonly IUmbracoVersion _umbracoVersion;
     private readonly UnattendedSettings _unattendedSettings;
+    private readonly DistributedCache _distributedCache;
+    private readonly ILogger<UnattendedUpgrader> _logger;
 
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
     public UnattendedUpgrader(
         IProfilingLogger profilingLogger,
         IUmbracoVersion umbracoVersion,
@@ -36,33 +41,39 @@ public class UnattendedUpgrader : INotificationAsyncHandler<RuntimeUnattendedUpg
         IRuntimeState runtimeState,
         PackageMigrationRunner packageMigrationRunner,
         IOptions<UnattendedSettings> unattendedSettings)
+        : this(
+            profilingLogger,
+            umbracoVersion,
+            databaseBuilder,
+            runtimeState,
+            packageMigrationRunner,
+            unattendedSettings,
+            StaticServiceProvider.Instance.GetRequiredService<DistributedCache>(),
+            StaticServiceProvider.Instance.GetRequiredService<ILogger<UnattendedUpgrader>>())
     {
-        _profilingLogger = profilingLogger ?? throw new ArgumentNullException(nameof(profilingLogger));
-        _umbracoVersion = umbracoVersion ?? throw new ArgumentNullException(nameof(umbracoVersion));
-        _databaseBuilder = databaseBuilder ?? throw new ArgumentNullException(nameof(databaseBuilder));
-        _runtimeState = runtimeState ?? throw new ArgumentNullException(nameof(runtimeState));
-        _packageMigrationRunner = packageMigrationRunner;
-        _unattendedSettings = unattendedSettings.Value;
     }
 
-    [Obsolete("Use constructor that takes IOptions<UnattendedSettings>, this will be removed in V16")]
     public UnattendedUpgrader(
         IProfilingLogger profilingLogger,
         IUmbracoVersion umbracoVersion,
         DatabaseBuilder databaseBuilder,
         IRuntimeState runtimeState,
-        PackageMigrationRunner packageMigrationRunner)
-    : this(
-        profilingLogger,
-        umbracoVersion,
-        databaseBuilder,
-        runtimeState,
-        packageMigrationRunner,
-        StaticServiceProvider.Instance.GetRequiredService<IOptions<UnattendedSettings>>())
+        PackageMigrationRunner packageMigrationRunner,
+        IOptions<UnattendedSettings> unattendedSettings,
+        DistributedCache distributedCache,
+        ILogger<UnattendedUpgrader> logger)
     {
+        _profilingLogger = profilingLogger;
+        _umbracoVersion = umbracoVersion;
+        _databaseBuilder = databaseBuilder;
+        _runtimeState = runtimeState;
+        _packageMigrationRunner = packageMigrationRunner;
+        _unattendedSettings = unattendedSettings.Value;
+        _distributedCache = distributedCache;
+        _logger = logger;
     }
 
-    public Task HandleAsync(RuntimeUnattendedUpgradeNotification notification, CancellationToken cancellationToken)
+    public async Task HandleAsync(RuntimeUnattendedUpgradeNotification notification, CancellationToken cancellationToken)
     {
         if (_runtimeState.RunUnattendedBootLogic())
         {
@@ -70,26 +81,26 @@ public class UnattendedUpgrader : INotificationAsyncHandler<RuntimeUnattendedUpg
             {
                 case RuntimeLevelReason.UpgradeMigrations:
                 {
-                    RunUpgrade(notification);
+                    await RunUpgradeAsync(notification);
 
                     // If we errored out when upgrading don't do anything.
                     if (notification.UnattendedUpgradeResult is RuntimeUnattendedUpgradeNotification.UpgradeResult.HasErrors)
                     {
-                        return Task.CompletedTask;
+                        return;
                     }
 
                     // It's entirely possible that there's both a core upgrade and package migrations to run, so try and run package migrations too.
                     // but only if upgrade unattended is enabled.
                     if (_unattendedSettings.PackageMigrationsUnattended)
                     {
-                        RunPackageMigrations(notification);
+                        await RunPackageMigrationsAsync(notification);
                     }
                 }
 
                 break;
                 case RuntimeLevelReason.UpgradePackageMigrations:
                 {
-                    RunPackageMigrations(notification);
+                    await RunPackageMigrationsAsync(notification);
                 }
 
                 break;
@@ -97,11 +108,9 @@ public class UnattendedUpgrader : INotificationAsyncHandler<RuntimeUnattendedUpg
                 throw new InvalidOperationException("Invalid reason " + _runtimeState.Reason);
             }
         }
-
-        return Task.CompletedTask;
     }
 
-    private void RunPackageMigrations(RuntimeUnattendedUpgradeNotification notification)
+    private async Task RunPackageMigrationsAsync(RuntimeUnattendedUpgradeNotification notification)
     {
         if (_runtimeState.StartupState.TryGetValue(
                 RuntimeState.PendingPackageMigrationsStateKey,
@@ -127,9 +136,14 @@ public class UnattendedUpgrader : INotificationAsyncHandler<RuntimeUnattendedUpg
 
         try
         {
-            _packageMigrationRunner.RunPackagePlans(pendingMigrations);
-            notification.UnattendedUpgradeResult = RuntimeUnattendedUpgradeNotification.UpgradeResult
-                .PackageMigrationComplete;
+            await _packageMigrationRunner.RunPackagePlansAsync(pendingMigrations);
+            notification.UnattendedUpgradeResult = RuntimeUnattendedUpgradeNotification.UpgradeResult.PackageMigrationComplete;
+
+            // Migration plans may have changed published content, so refresh the distributed cache to ensure consistency on first request.
+            _distributedCache.RefreshAllPublishedSnapshot();
+            _logger.LogInformation(
+                "Migration plans run: {Plans}. Triggered refresh of distributed published content cache.",
+                string.Join(", ", pendingMigrations));
         }
         catch (Exception ex)
         {
@@ -139,14 +153,14 @@ public class UnattendedUpgrader : INotificationAsyncHandler<RuntimeUnattendedUpg
         }
     }
 
-    private void RunUpgrade(RuntimeUnattendedUpgradeNotification notification)
+    private async Task RunUpgradeAsync(RuntimeUnattendedUpgradeNotification notification)
     {
         var plan = new UmbracoPlan(_umbracoVersion);
         using (!_profilingLogger.IsEnabled(Core.Logging.LogLevel.Verbose) ? null : _profilingLogger.TraceDuration<UnattendedUpgrader>(
                    "Starting unattended upgrade.",
                    "Unattended upgrade completed."))
         {
-            DatabaseBuilder.Result? result = _databaseBuilder.UpgradeSchemaAndData(plan);
+            DatabaseBuilder.Result? result = await _databaseBuilder.UpgradeSchemaAndDataAsync(plan);
             if (result?.Success == false)
             {
                 var innerException = new UnattendedInstallException(

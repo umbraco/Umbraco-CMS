@@ -8,21 +8,21 @@ import type {
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { MemberTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { UmbPropertyContainerTypes } from '@umbraco-cms/backoffice/content-type';
 
 /**
  * A data source for the Member Type that fetches data from the server
- * @class UmbMemberTypeServerDataSource
- * @implements {RepositoryDetailDataSource}
+ * @class UmbMemberTypeDetailServerDataSource
+ * @implements {UmbDetailDataSource<UmbMemberTypeDetailModel>}
  */
-export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMemberTypeDetailModel> {
+export class UmbMemberTypeDetailServerDataSource implements UmbDetailDataSource<UmbMemberTypeDetailModel> {
 	#host: UmbControllerHost;
 
 	/**
-	 * Creates an instance of UmbMemberTypeServerDataSource.
+	 * Creates an instance of UmbMemberTypeDetailServerDataSource.
 	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
-	 * @memberof UmbMemberTypeServerDataSource
+	 * @memberof UmbMemberTypeDetailServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
 		this.#host = host;
@@ -30,9 +30,9 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 
 	/**
 	 * Creates a new Member Type scaffold
-	 * @param {Partial<UmbMemberTypeDetailModel>} [preset]
+	 * @param {Partial<UmbMemberTypeDetailModel>} [preset] - Optional preset data to merge with the scaffold
 	 * @returns { CreateMemberTypeRequestModel }
-	 * @memberof UmbMemberTypeServerDataSource
+	 * @memberof UmbMemberTypeDetailServerDataSource
 	 */
 	async createScaffold(preset: Partial<UmbMemberTypeDetailModel> = {}) {
 		const data: UmbMemberTypeDetailModel = {
@@ -59,14 +59,14 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 
 	/**
 	 * Fetches a Member Type with the given id from the server
-	 * @param {string} unique
+	 * @param {string} unique - The unique identifier of the Member Type to fetch
 	 * @returns {*}
-	 * @memberof UmbMemberTypeServerDataSource
+	 * @memberof UmbMemberTypeDetailServerDataSource
 	 */
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecuteAndNotify(this.#host, MemberTypeService.getMemberTypeById({ id: unique }));
+		const { data, error } = await tryExecute(this.#host, MemberTypeService.getMemberTypeById({ path: { id: unique } }));
 
 		if (error || !data) {
 			return { error };
@@ -87,6 +87,7 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 			properties: data.properties.map((property) => {
 				return {
 					id: property.id,
+					unique: property.id,
 					container: property.container ? { id: property.container.id } : null,
 					sortOrder: property.sortOrder,
 					alias: property.alias,
@@ -125,15 +126,15 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 
 	/**
 	 * Inserts a new Member Type on the server
-	 * @param {UmbMemberTypeDetailModel} model
+	 * @param {UmbMemberTypeDetailModel} model - Member Type Model
 	 * @returns {*}
-	 * @memberof UmbMemberTypeServerDataSource
+	 * @memberof UmbMemberTypeDetailServerDataSource
 	 */
 	async create(model: UmbMemberTypeDetailModel) {
 		if (!model) throw new Error('Member Type is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: CreateMemberTypeRequestModel = {
+		const body: CreateMemberTypeRequestModel = {
 			alias: model.alias,
 			name: model.name,
 			description: model.description,
@@ -144,7 +145,7 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 			isElement: model.isElement,
 			properties: model.properties.map((property) => {
 				return {
-					id: property.id,
+					id: property.unique,
 					container: property.container ? { id: property.container.id } : null,
 					sortOrder: property.sortOrder,
 					alias: property.alias,
@@ -169,14 +170,14 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 			}),
 		};
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this.#host,
 			MemberTypeService.postMemberType({
-				requestBody,
+				body,
 			}),
 		);
 
-		if (data) {
+		if (data && typeof data === 'string') {
 			return this.read(data);
 		}
 
@@ -185,16 +186,15 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 
 	/**
 	 * Updates a MemberType on the server
-	 * @param {UmbMemberTypeDetailModel} MemberType
-	 * @param model
+	 * @param { UmbMemberTypeDetailModel } model - Member Type Model
 	 * @returns {*}
-	 * @memberof UmbMemberTypeServerDataSource
+	 * @memberof UmbMemberTypeDetailServerDataSource
 	 */
 	async update(model: UmbMemberTypeDetailModel) {
 		if (!model.unique) throw new Error('Unique is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: UpdateMemberTypeRequestModel = {
+		const body: UpdateMemberTypeRequestModel = {
 			alias: model.alias,
 			name: model.name,
 			description: model.description,
@@ -205,7 +205,7 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 			isElement: model.isElement,
 			properties: model.properties.map((property) => {
 				return {
-					id: property.id,
+					id: property.unique,
 					container: property.container ? { id: property.container.id } : null,
 					sortOrder: property.sortOrder,
 					isSensitive: property.isSensitive ?? false,
@@ -229,11 +229,11 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 			}),
 		};
 
-		const { error } = await tryExecuteAndNotify(
+		const { error } = await tryExecute(
 			this.#host,
 			MemberTypeService.putMemberTypeById({
-				id: model.unique,
-				requestBody,
+				path: { id: model.unique },
+				body,
 			}),
 		);
 
@@ -246,17 +246,17 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 
 	/**
 	 * Deletes a Member Type on the server
-	 * @param {string} unique
+	 * @param {string} unique - The unique identifier of the Member Type to delete
 	 * @returns {*}
-	 * @memberof UmbMemberTypeServerDataSource
+	 * @memberof UmbMemberTypeDetailServerDataSource
 	 */
 	async delete(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		return tryExecuteAndNotify(
+		return tryExecute(
 			this.#host,
 			MemberTypeService.deleteMemberTypeById({
-				id: unique,
+				path: { id: unique },
 			}),
 		);
 	}

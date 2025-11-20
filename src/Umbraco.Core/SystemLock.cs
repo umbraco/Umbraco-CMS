@@ -89,7 +89,7 @@ public class SystemLock
 
     // note - before making those classes some structs, read
     // about "impure methods" and mutating readonly structs...
-    private class NamedSemaphoreReleaser : CriticalFinalizerObject, IDisposable
+    private sealed class NamedSemaphoreReleaser : CriticalFinalizerObject, IDisposable
     {
         private readonly Semaphore? _semaphore;
 
@@ -156,7 +156,7 @@ public class SystemLock
         }
     }
 
-    private class SemaphoreSlimReleaser : IDisposable
+    private sealed class SemaphoreSlimReleaser : IDisposable
     {
         private readonly SemaphoreSlim _semaphore;
 

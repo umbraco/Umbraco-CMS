@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Text.RegularExpressions;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Serialization;
@@ -8,7 +9,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
-internal class RichTextPropertyIndexValueFactory : BlockValuePropertyIndexValueFactoryBase<RichTextEditorValue>, IRichTextPropertyIndexValueFactory
+internal sealed class RichTextPropertyIndexValueFactory : BlockValuePropertyIndexValueFactoryBase<RichTextEditorValue>, IRichTextPropertyIndexValueFactory
 {
     private readonly IJsonSerializer _jsonSerializer;
     private readonly ILogger<RichTextPropertyIndexValueFactory> _logger;
@@ -50,7 +51,7 @@ internal class RichTextPropertyIndexValueFactory : BlockValuePropertyIndexValueF
         };
 
         // the actual content (RTE content without markup, i.e. the actual words) must be indexed under the property alias
-        var richTextWithoutMarkup = richTextEditorValue.Markup.StripHtml();
+        var richTextWithoutMarkup = StripHtmlForIndexing(richTextEditorValue.Markup);
         if (richTextEditorValue.Blocks?.ContentData.Any() is not true)
         {
             // no blocks; index the content for the culture and be done with it
@@ -132,4 +133,27 @@ internal class RichTextPropertyIndexValueFactory : BlockValuePropertyIndexValueF
 
     protected override IEnumerable<RawDataItem> GetDataItems(RichTextEditorValue input, bool published)
         => GetDataItems(input.Blocks?.ContentData ?? [], input.Blocks?.Expose ?? [], published);
+
+    /// <summary>
+    /// Strips HTML tags from content while preserving whitespace from line breaks.
+    /// This addresses the issue where &lt;br&gt; tags don't create word boundaries when HTML is stripped.
+    /// </summary>
+    /// <param name="html">The HTML content to strip</param>
+    /// <returns>Plain text with proper word boundaries</returns>
+    private static string StripHtmlForIndexing(string html)
+    {
+        if (string.IsNullOrWhiteSpace(html))
+        {
+            return string.Empty;
+        }
+
+        // Replace <br> and <br/> tags (with any amount of whitespace and attributes) with spaces
+        // This regex matches:
+        // - <br> (with / without spaces or attributes)
+        // - <br /> (with / without spaces or attributes)
+        html = Regex.Replace(html, @"<br\b[^>]*/?>\s*", " ", RegexOptions.IgnoreCase);
+
+        // Use the existing Microsoft StripHtml function for everything else
+        return html.StripHtml();
+    }
 }

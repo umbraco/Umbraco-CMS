@@ -1,7 +1,6 @@
+using System.Collections.Immutable;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.Core.Events;
-
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
@@ -49,7 +48,16 @@ public interface IContentService : IContentServiceBase<IContent>
     /// <summary>
     ///     Saves a blueprint.
     /// </summary>
+    [Obsolete("Please use the method taking all parameters. Scheduled for removal in Umbraco 18.")]
     void SaveBlueprint(IContent content, int userId = Constants.Security.SuperUserId);
+
+    /// <summary>
+    ///     Saves a blueprint.
+    /// </summary>
+    void SaveBlueprint(IContent content, IContent? createdFromContent, int userId = Constants.Security.SuperUserId)
+#pragma warning disable CS0618 // Type or member is obsolete
+        => SaveBlueprint(content, userId);
+#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     ///     Deletes a blueprint.
@@ -57,8 +65,18 @@ public interface IContentService : IContentServiceBase<IContent>
     void DeleteBlueprint(IContent content, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
-    ///     Creates a new content item from a blueprint.
+    ///     Creates a blueprint from a content item.
     /// </summary>
+    // TODO: Remove the default implementation when CreateContentFromBlueprint is removed.
+    IContent CreateBlueprintFromContent(IContent blueprint, string name, int userId = Constants.Security.SuperUserId)
+        => throw new NotImplementedException();
+
+    /// <summary>
+    ///     (Deprecated) Creates a new content item from a blueprint.
+    /// </summary>
+    /// <remarks>If creating content from a blueprint, use <see cref="IContentBlueprintEditingService.GetScaffoldedAsync"/>
+    /// instead. If creating a blueprint from content use <see cref="CreateBlueprintFromContent"/> instead.</remarks>
+    [Obsolete("Use IContentBlueprintEditingService.GetScaffoldedAsync() instead. Scheduled for removal in V18.")]
     IContent CreateContentFromBlueprint(IContent blueprint, string name, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
@@ -258,6 +276,16 @@ public interface IContentService : IContentServiceBase<IContent>
     /// </summary>
     bool HasChildren(int id);
 
+    /// <summary>
+    ///     Gets a dictionary of content Ids and their matching content schedules.
+    /// </summary>
+    /// <param name="keys">The content keys.</param>
+    /// <returns>
+    ///     A dictionary with a nodeId and an IEnumerable of matching ContentSchedules.
+    /// </returns>
+    IDictionary<int, IEnumerable<ContentSchedule>> GetContentSchedulesByIds(Guid[] keys) => ImmutableDictionary<int, IEnumerable<ContentSchedule>>.Empty;
+
+
     #endregion
 
     #region Save, Delete Document
@@ -320,21 +348,6 @@ public interface IContentService : IContentServiceBase<IContent>
     OperationResult Move(IContent content, int parentId, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
-    /// Attempts to move the <see cref="IContent"/> <paramref name="content"/> to under the node with id <paramref name="parentId"/>.
-    /// </summary>
-    /// <param name="content">The <see cref="IContent"/> that shall be moved.</param>
-    /// <param name="parentId">The id of the new parent node.</param>
-    /// <param name="userId">Id of the user attempting to move <paramref name="content"/>.</param>
-    /// <returns>Success if moving succeeded, otherwise Failed.</returns>
-    [Obsolete("Adds return type to Move method. Will be removed in V14, as the original method will be adjusted.")]
-    OperationResult
-        AttemptMove(IContent content, int parentId, int userId = Constants.Security.SuperUserId)
-    {
-        Move(content, parentId, userId);
-        return OperationResult.Succeed(new EventMessages());
-    }
-
-    /// <summary>
     ///     Copies a document.
     /// </summary>
     /// <remarks>
@@ -380,12 +393,6 @@ public interface IContentService : IContentServiceBase<IContent>
 
     #region Publish Document
 
-    [Obsolete($"This method no longer saves content, only publishes it. Please use {nameof(Publish)} instead. Will be removed in V16")]
-    PublishResult SaveAndPublish(IContent content, string culture = "*", int userId = Constants.Security.SuperUserId);
-
-    [Obsolete($"This method no longer saves content, only publishes it. Please use {nameof(Publish)} instead. Will be removed in V16")]
-    PublishResult SaveAndPublish(IContent content, string[] cultures, int userId = Constants.Security.SuperUserId);
-
     /// <summary>
     ///     Publishes a document.
     /// </summary>
@@ -399,29 +406,6 @@ public interface IContentService : IContentServiceBase<IContent>
     /// <param name="userId">The identifier of the user performing the action.</param>
     PublishResult Publish(IContent content, string[] cultures, int userId = Constants.Security.SuperUserId);
 
-    [Obsolete($"This method no longer saves content, only publishes it. Please use {nameof(PublishBranch)} instead. Will be removed in V16")]
-    IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, string culture = "*", int userId = Constants.Security.SuperUserId);
-
-    [Obsolete($"This method no longer saves content, only publishes it. Please use {nameof(PublishBranch)} instead. Will be removed in V16")]
-    IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, string[] cultures, int userId = Constants.Security.SuperUserId);
-
-    /// <summary>
-    ///     Publishes a document branch.
-    /// </summary>
-    /// <param name="content">The root document.</param>
-    /// <param name="force">A value indicating whether to force-publish documents that are not already published.</param>
-    /// <param name="cultures">The cultures to publish.</param>
-    /// <param name="userId">The identifier of the user performing the operation.</param>
-    /// <remarks>
-    ///     <para>
-    ///         The <paramref name="force" /> parameter determines which documents are published. When <c>false</c>,
-    ///         only those documents that are already published, are republished. When <c>true</c>, all documents are
-    ///         published. The root of the branch is always published, regardless of <paramref name="force" />.
-    ///     </para>
-    /// </remarks>
-    [Obsolete("This method is not longer used as the 'force' parameter has been extended into options for publishing unpublished and re-publishing changed content. Please use the overload containing the parameter for those options instead. Will be removed in V17.")]
-    IEnumerable<PublishResult> PublishBranch(IContent content, bool force, string[] cultures, int userId = Constants.Security.SuperUserId);
-
     /// <summary>
     ///     Publishes a document branch.
     /// </summary>
@@ -434,10 +418,7 @@ public interface IContentService : IContentServiceBase<IContent>
     ///         The root of the branch is always published, regardless of <paramref name="publishBranchFilter" />.
     ///     </para>
     /// </remarks>
-    IEnumerable<PublishResult> PublishBranch(IContent content, PublishBranchFilter publishBranchFilter, string[] cultures, int userId = Constants.Security.SuperUserId)
-#pragma warning disable CS0618 // Type or member is obsolete
-        => SaveAndPublishBranch(content, publishBranchFilter.HasFlag(PublishBranchFilter.IncludeUnpublished), cultures, userId);
-#pragma warning restore CS0618 // Type or member is obsolete
+    IEnumerable<PublishResult> PublishBranch(IContent content, PublishBranchFilter publishBranchFilter, string[] cultures, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Unpublishes a document.

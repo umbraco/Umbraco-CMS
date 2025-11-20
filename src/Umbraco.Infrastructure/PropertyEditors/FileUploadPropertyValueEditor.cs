@@ -12,6 +12,8 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.PropertyEditors;
+using Umbraco.Cms.Infrastructure.PropertyEditors.Validators;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
@@ -20,19 +22,21 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// <summary>
 ///     The value editor for the file upload property editor.
 /// </summary>
-internal class FileUploadPropertyValueEditor : DataValueEditor
+internal sealed class FileUploadPropertyValueEditor : DataValueEditor
 {
     private readonly MediaFileManager _mediaFileManager;
-    private readonly IJsonSerializer _jsonSerializer;
     private readonly ITemporaryFileService _temporaryFileService;
     private readonly IScopeProvider _scopeProvider;
     private readonly IFileStreamSecurityValidator _fileStreamSecurityValidator;
+    private readonly FileUploadValueParser _valueParser;
     private ContentSettings _contentSettings;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="FileUploadPropertyValueEditor"/> class.
+    /// </summary>
     public FileUploadPropertyValueEditor(
         DataEditorAttribute attribute,
         MediaFileManager mediaFileManager,
-        ILocalizedTextService localizedTextService,
         IShortStringHelper shortStringHelper,
         IOptionsMonitor<ContentSettings> contentSettings,
         IJsonSerializer jsonSerializer,
@@ -40,13 +44,14 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
         ITemporaryFileService temporaryFileService,
         IScopeProvider scopeProvider,
         IFileStreamSecurityValidator fileStreamSecurityValidator)
-        : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
+        : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
     {
         _mediaFileManager = mediaFileManager ?? throw new ArgumentNullException(nameof(mediaFileManager));
-        _jsonSerializer = jsonSerializer;
         _temporaryFileService = temporaryFileService;
         _scopeProvider = scopeProvider;
         _fileStreamSecurityValidator = fileStreamSecurityValidator;
+        _valueParser = new FileUploadValueParser(jsonSerializer);
+
         _contentSettings = contentSettings.CurrentValue ?? throw new ArgumentNullException(nameof(contentSettings));
         contentSettings.OnChange(x => _contentSettings = x);
 
@@ -57,6 +62,10 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
             IsAllowedInDataTypeConfiguration));
     }
 
+    /// <inheritdoc/>
+    public override IValueRequiredValidator RequiredValidator => new FileUploadValueRequiredValidator();
+
+    /// <inheritdoc/>
     public override object? ToEditor(IProperty property, string? culture = null, string? segment = null)
     {
         // the stored property value (if any) is the path to the file; convert it to the client model (FileUploadValue)
@@ -64,11 +73,12 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
         return propertyValue is string stringValue
             ? new FileUploadValue
             {
-                Src = stringValue
+                Src = stringValue,
             }
             : null;
     }
 
+    /// <inheritdoc/>
     /// <summary>
     ///     Converts the client model (FileUploadValue) into the value can be stored in the database (the file path).
     /// </summary>
@@ -84,12 +94,12 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
     /// </remarks>
     public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
     {
-        FileUploadValue? editorModelValue = ParseFileUploadValue(editorValue.Value);
+        FileUploadValue? editorModelValue = _valueParser.Parse(editorValue.Value);
 
-        // no change?
+        // No change or created from blueprint.
         if (editorModelValue?.TemporaryFileId.HasValue is not true && string.IsNullOrEmpty(editorModelValue?.Src) is false)
         {
-            return currentValue;
+            return editorModelValue.Src;
         }
 
         // the current editor value (if any) is the path to the file
@@ -147,33 +157,13 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
         return filepath is null ? null : _mediaFileManager.FileSystem.GetUrl(filepath);
     }
 
-    private FileUploadValue? ParseFileUploadValue(object? editorValue)
-    {
-        if (editorValue is null)
-        {
-            return null;
-        }
-
-        if (editorValue is string sourceString && sourceString.DetectIsJson() is false)
-        {
-            return new FileUploadValue()
-            {
-                Src = sourceString
-            };
-        }
-
-        return _jsonSerializer.TryDeserialize(editorValue, out FileUploadValue? modelValue)
-            ? modelValue
-            : throw new ArgumentException($"Could not parse editor value to a {nameof(FileUploadValue)} object.");
-    }
-
     private Guid? TryParseTemporaryFileKey(object? editorValue)
-        => ParseFileUploadValue(editorValue)?.TemporaryFileId;
+        => _valueParser.Parse(editorValue)?.TemporaryFileId;
 
     private TemporaryFileModel? TryGetTemporaryFile(Guid temporaryFileKey)
         => _temporaryFileService.GetAsync(temporaryFileKey).GetAwaiter().GetResult();
 
-    private bool IsAllowedInDataTypeConfiguration(string extension, object? dataTypeConfiguration)
+    private static bool IsAllowedInDataTypeConfiguration(string extension, object? dataTypeConfiguration)
     {
         if (dataTypeConfiguration is FileUploadConfiguration fileUploadConfiguration)
         {
@@ -200,8 +190,7 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
         }
 
         // get the filepath
-        // in case we are using the old path scheme, try to re-use numbers (bah...)
-        var filepath = _mediaFileManager.GetMediaPath(file.FileName, contentKey, propertyTypeKey); // fs-relative path
+        string filepath = GetMediaPath(file, dataTypeConfiguration, contentKey, propertyTypeKey);
 
         using (Stream filestream = file.OpenReadStream())
         {
@@ -212,9 +201,19 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
 
             // TODO: Here it would make sense to do the auto-fill properties stuff but the API doesn't allow us to do that right
             // since we'd need to be able to return values for other properties from these methods
-            _mediaFileManager.FileSystem.AddFile(filepath, filestream, true); // must overwrite!
+            _mediaFileManager.FileSystem.AddFile(filepath, filestream, overrideIfExists: true); // must overwrite!
         }
 
         return filepath;
+    }
+
+    /// <summary>
+    /// Provides media path.
+    /// </summary>
+    /// <returns>File system relative path</returns>
+    private string GetMediaPath(TemporaryFileModel file, object? dataTypeConfiguration, Guid contentKey, Guid propertyTypeKey)
+    {
+        // in case we are using the old path scheme, try to re-use numbers (bah...)
+        return _mediaFileManager.GetMediaPath(file.FileName, contentKey, propertyTypeKey);
     }
 }

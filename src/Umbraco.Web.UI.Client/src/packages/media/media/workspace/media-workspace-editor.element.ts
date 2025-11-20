@@ -5,16 +5,19 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { customElement, state, css, html } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbRoute, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
+
 @customElement('umb-media-workspace-editor')
 export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 	//
 	// TODO: Refactor: when having a split view/variants context token, we can rename the split view/variants component to a generic and make this component generic as well. [NL]
-	private splitViewElement = new UmbMediaWorkspaceSplitViewElement();
-
-	@state()
-	_routes?: Array<UmbRoute>;
+	private _splitViewElement = new UmbMediaWorkspaceSplitViewElement();
 
 	#workspaceContext?: typeof UMB_MEDIA_WORKSPACE_CONTEXT.TYPE;
+	#variants?: Array<UmbMediaVariantOptionModel>;
+	#isForbidden = false;
+
+	@state()
+	private _routes?: Array<UmbRoute>;
 
 	constructor() {
 		super();
@@ -22,70 +25,80 @@ export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 		this.consumeContext(UMB_MEDIA_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
 			this.#observeVariants();
+			this.#observeForbidden();
 		});
 	}
 
 	#observeVariants() {
-		if (!this.#workspaceContext) return;
-		this.observe(this.#workspaceContext.variantOptions, (options) => this._generateRoutes(options), '_observeVariants');
+		this.observe(
+			this.#workspaceContext?.variantOptions,
+			(options) => {
+				this.#variants = options;
+				this._generateRoutes();
+			},
+			'_observeVariants',
+		);
 	}
 
-	private _handleVariantFolderPart(index: number, folderPart: string) {
-		const variantSplit = folderPart.split('_');
-		const culture = variantSplit[0];
-		const segment = variantSplit[1];
-		this.#workspaceContext?.splitView.setActiveVariant(index, culture, segment);
+	#observeForbidden() {
+		this.observe(
+			this.#workspaceContext?.forbidden.isOn,
+			(forbidden) => {
+				this.#isForbidden = forbidden ?? false;
+				this._generateRoutes();
+			},
+			'_observeForbidden',
+		);
 	}
 
-	private async _generateRoutes(variants: Array<UmbMediaVariantOptionModel>) {
-		if (!variants || variants.length === 0) return;
-
+	private async _generateRoutes() {
 		// Generate split view routes for all available routes
 		const routes: Array<UmbRoute> = [];
 
 		// Split view routes:
-		variants.forEach((variantA) => {
-			variants.forEach((variantB) => {
+		this.#variants?.forEach((variantA) => {
+			this.#variants?.forEach((variantB) => {
 				routes.push({
 					// TODO: When implementing Segments, be aware if using the unique is URL Safe... [NL]
 					path: variantA.unique + '_&_' + variantB.unique,
-					component: this.splitViewElement,
+					component: this._splitViewElement,
 					setup: (_component, info) => {
 						// Set split view/active info..
-						const variantSplit = info.match.fragments.consumed.split('_&_');
-						variantSplit.forEach((part, index) => {
-							this._handleVariantFolderPart(index, part);
-						});
+						this.#workspaceContext?.splitView.setVariantParts(info.match.fragments.consumed);
 					},
 				});
 			});
 		});
 
 		// Single view:
-		variants.forEach((variant) => {
+		this.#variants?.forEach((variant) => {
 			routes.push({
 				// TODO: When implementing Segments, be aware if using the unique is URL Safe... [NL]
 				path: variant.unique,
-				component: this.splitViewElement,
+				component: this._splitViewElement,
 				setup: (_component, info) => {
 					// cause we might come from a split-view, we need to reset index 1.
 					this.#workspaceContext?.splitView.removeActiveVariant(1);
-					this._handleVariantFolderPart(0, info.match.fragments.consumed);
+					this.#workspaceContext?.splitView.handleVariantFolderPart(0, info.match.fragments.consumed);
 				},
 			});
 		});
 
-		if (routes.length !== 0) {
+		if (routes.length !== 0 && this.#variants?.length) {
 			// Using first single view as the default route for now (hence the math below):
 			routes.push({
 				path: '',
-				redirectTo: routes[variants.length * variants.length]?.path,
+				pathMatch: 'full',
+				redirectTo: routes[this.#variants.length * this.#variants.length]?.path,
 			});
 		}
 
 		routes.push({
 			path: `**`,
-			component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
+			component: async () => {
+				const router = await import('@umbraco-cms/backoffice/router');
+				return this.#isForbidden ? router.UmbRouteForbiddenElement : router.UmbRouteNotFoundElement;
+			},
 		});
 
 		this._routes = routes;

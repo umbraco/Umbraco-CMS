@@ -25,7 +25,9 @@ public class MediaMovedWebhookEvent : WebhookEventContentBase<MediaMovedNotifica
 
     public override string Alias => Constants.WebhookEvents.Aliases.MediaMoved;
 
-    protected override IEnumerable<IMedia> GetEntitiesFromNotification(MediaMovedNotification notification) => notification.MoveInfoCollection.Select(x => x.Entity);
+    protected override IEnumerable<IMedia> GetEntitiesFromNotification(MediaMovedNotification notification)
+        => notification.MoveInfoCollection.Select(x => x.Entity);
 
-    protected override object ConvertEntityToRequestPayload(IMedia entity) => new DefaultPayloadModel { Id = entity.Key };
+    protected override object ConvertEntityToRequestPayload(IMedia entity)
+        => new DefaultPayloadModel { Id = entity.Key };
 }

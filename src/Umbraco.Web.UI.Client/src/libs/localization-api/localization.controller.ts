@@ -20,19 +20,18 @@ import type {
 import { umbLocalizationManager } from './localization.manager.js';
 import type { LitElement } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbController, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { escapeHTML } from '@umbraco-cms/backoffice/utils';
 
 const LocalizationControllerAlias = Symbol();
 /**
- * The UmbLocalizeController enables localization for your element.
+ * The UmbLocalizationController enables localization for your element.
  * @see UmbLocalizeElement
  * @example
  * ```ts
- * import { UmbLocalizeController } from '@umbraco-cms/backoffice/localization-api';
+ * import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
  *
  * \@customElement('my-element')
  * export class MyElement extends LitElement {
- *   private localize = new UmbLocalizeController(this);
+ *   private localize = new UmbLocalizationController(this);
  *
  *   render() {
  *     return html`<p>${this.localize.term('general_close')}</p>`;
@@ -98,7 +97,7 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 		return `${this.#hostEl?.lang || umbLocalizationManager.documentLanguage}`.toLowerCase();
 	}
 
-	private getLocalizationData(lang: string) {
+	#getLocalizationData(lang: string) {
 		const locale = new Intl.Locale(lang);
 		const language = locale?.language.toLowerCase();
 		const region = locale?.region?.toLowerCase() ?? '';
@@ -115,13 +114,22 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 	 * @param {string} key - the localization key, the indicator of what localization entry you want to retrieve.
 	 * @param {...any} args - the arguments to parse for this localization entry.
 	 * @returns {string} - the translated term as a string.
+	 * @example
+	 * Retrieving a term without any arguments:
+	 * ```ts
+	 * this.localize.term('area_term');
+	 * ```
+	 * Retrieving a term with arguments:
+	 * ```ts
+	 * this.localize.term('general_greeting', ['John']);
+	 * ```
 	 */
 	term<K extends keyof LocalizationSetType>(key: K, ...args: FunctionParams<LocalizationSetType[K]>): string {
 		if (!this.#usedKeys.includes(key)) {
 			this.#usedKeys.push(key);
 		}
 
-		const { primary, secondary } = this.getLocalizationData(this.lang());
+		const { primary, secondary } = this.#getLocalizationData(this.lang());
 
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		let term: any;
@@ -137,20 +145,16 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 			return String(key);
 		}
 
-		// As translated texts can contain HTML, we will need to render with unsafeHTML.
-		// But arguments can come from user input, so they should be escaped.
-		const sanitizedArgs = args.map((a) => escapeHTML(a));
-
 		if (typeof term === 'function') {
-			return term(...sanitizedArgs) as string;
+			return term(...args) as string;
 		}
 
 		if (typeof term === 'string') {
-			if (sanitizedArgs.length) {
+			if (args.length) {
 				// Replace placeholders of format "%index%" and "{index}" with provided values
 				term = term.replace(/(%(\d+)%|\{(\d+)\})/g, (match, _p1, p2, p3): string => {
 					const index = p2 || p3;
-					return typeof sanitizedArgs[index] !== 'undefined' ? String(sanitizedArgs[index]) : match;
+					return typeof args[index] !== 'undefined' ? String(args[index]) : match;
 				});
 			}
 		}
@@ -246,16 +250,15 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 		return new Intl.ListFormat(this.lang(), options).format(values);
 	}
 
-	// TODO: for V.16 we should set type to be string | undefined. [NL]
 	/**
 	 * Translates a string containing one or more terms. The terms should be prefixed with a `#` character.
 	 * If the term is found in the localization set, it will be replaced with the localized term.
 	 * If the term is not found, the original term will be returned.
-	 * @param {string | null | undefined} text The text to translate.
+	 * @param {string | undefined} text The text to translate.
 	 * @param {...any} args The arguments to parse for this localization entry.
 	 * @returns {string} The translated text.
 	 */
-	string(text: string | null | undefined, ...args: any): string {
+	string(text: string | undefined, ...args: any): string {
 		if (typeof text !== 'string') {
 			return '';
 		}

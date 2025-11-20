@@ -1,4 +1,4 @@
-﻿using Castle.Components.DictionaryAdapter.Xml;
+using Castle.Components.DictionaryAdapter.Xml;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class RelationServiceTests : UmbracoIntegrationTest
+internal sealed class RelationServiceTests : UmbracoIntegrationTest
 {
     private IRelationService RelationService => GetRequiredService<IRelationService>();
 

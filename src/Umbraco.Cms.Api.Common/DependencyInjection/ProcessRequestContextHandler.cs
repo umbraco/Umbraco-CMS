@@ -18,7 +18,7 @@ public class ProcessRequestContextHandler
         var backOfficePathSegment = Constants.System.DefaultUmbracoPath.TrimStart(Constants.CharArrays.Tilde)
             .EnsureStartsWith('/')
             .EnsureEndsWith('/');
-        _pathsToHandle = [backOfficePathSegment, "/.well-known/openid-configuration"];
+        _pathsToHandle = [backOfficePathSegment, "/.well-known/openid-configuration", "/.well-known/jwks"];
     }
 
     public ValueTask HandleAsync(OpenIddictServerEvents.ProcessRequestContext context)

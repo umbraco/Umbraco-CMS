@@ -37,7 +37,8 @@ public class RecurringBackgroundJobHostedServiceRunner : IHostedService
                 _logger.LogDebug("Creating background hosted service for {job}", jobName);
                 IHostedService hostedService = _jobFactory(job);
 
-                _logger.LogInformation("Starting background hosted service for {job}", jobName);
+                _logger.LogInformation("Starting a background hosted service for {job} with a delay of {delay}, running every {period}", jobName, job.Delay, job.Period);
+
                 await hostedService.StartAsync(cancellationToken).ConfigureAwait(false);
 
                 _hostedServices.Add(new NamedServiceJob(jobName, hostedService));
@@ -71,7 +72,7 @@ public class RecurringBackgroundJobHostedServiceRunner : IHostedService
         _logger.LogInformation("Completed stopping recurring background jobs hosted services");
     }
 
-    private class NamedServiceJob
+    private sealed class NamedServiceJob
     {
         public NamedServiceJob(string name, IHostedService hostedService)
         {

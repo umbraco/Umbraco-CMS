@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
@@ -15,7 +15,9 @@ public class GetModelsBuilderController : ModelsBuilderControllerBase
 
     [HttpGet("dashboard")]
     [ProducesResponseType(typeof(ModelsBuilderResponseModel), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets models builder dashboard data.")]
+    [EndpointDescription("Gets the dashboard data and current state of the models builder.")]
     [MapToApiVersion("1.0")]
-    public async Task<ActionResult<ModelsBuilderResponseModel>> GetDashboard(CancellationToken cancellationToken)
-        => await Task.FromResult(Ok(_modelsBuilderPresentationFactory.Create()));
+    public Task<ActionResult<ModelsBuilderResponseModel>> GetDashboard(CancellationToken cancellationToken)
+        => Task.FromResult<ActionResult<ModelsBuilderResponseModel>>(Ok(_modelsBuilderPresentationFactory.Create()));
 }

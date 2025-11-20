@@ -30,27 +30,36 @@ export interface ManifestTiptapToolbarExtensionColorPickerButtonKind<
 	kind: 'colorPickerButton';
 }
 
-export interface MetaTiptapToolbarMenuItem {
-	data?: unknown;
+export interface MetaTiptapToolbarMenuItem<ItemDataType = unknown> {
+	appearance?: { icon?: string; style?: string };
+	data?: ItemDataType;
 	element?: ElementLoaderProperty<HTMLElement>;
 	elementName?: string;
-	icon?: string;
-	items?: Array<MetaTiptapToolbarMenuItem>;
+	items?: Array<MetaTiptapToolbarMenuItem<ItemDataType>>;
 	label: string;
+	menu?: string;
 	separatorAfter?: boolean;
-	style?: string;
 }
 
 export interface MetaTiptapToolbarMenuExtension extends MetaTiptapToolbarExtension {
 	look?: 'icon' | 'text';
-	items: Array<MetaTiptapToolbarMenuItem>;
 }
 
-export interface ManifestTiptapToolbarExtensionMenuKind<
-	MetaType extends MetaTiptapToolbarMenuExtension = MetaTiptapToolbarMenuExtension,
-> extends ManifestTiptapToolbarExtension<MetaType> {
+export interface ManifestTiptapToolbarExtensionMenuKind
+	extends ManifestTiptapToolbarExtension<MetaTiptapToolbarMenuExtension> {
 	type: 'tiptapToolbarExtension';
 	kind: 'menu';
+	items?: Array<MetaTiptapToolbarMenuItem>;
+	menu?: string;
+}
+
+export type MetaTiptapToolbarStyleMenuItem = MetaTiptapToolbarMenuItem<{ tag?: string; class?: string; id?: string }>;
+
+export interface ManifestTiptapToolbarExtensionStyleMenuKind
+	extends ManifestTiptapToolbarExtension<MetaTiptapToolbarMenuExtension> {
+	type: 'tiptapToolbarExtension';
+	kind: 'styleMenu';
+	items: Array<MetaTiptapToolbarStyleMenuItem>;
 }
 
 declare global {
@@ -59,6 +68,7 @@ declare global {
 			| ManifestTiptapToolbarExtension
 			| ManifestTiptapToolbarExtensionButtonKind
 			| ManifestTiptapToolbarExtensionColorPickerButtonKind
-			| ManifestTiptapToolbarExtensionMenuKind;
+			| ManifestTiptapToolbarExtensionMenuKind
+			| ManifestTiptapToolbarExtensionStyleMenuKind;
 	}
 }

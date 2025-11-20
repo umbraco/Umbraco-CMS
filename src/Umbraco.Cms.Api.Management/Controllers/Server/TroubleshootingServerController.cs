@@ -22,6 +22,8 @@ public class TroubleshootingServerController : ServerControllerBase
     [HttpGet("troubleshooting")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ServerTroubleshootingResponseModel), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets server troubleshooting information.")]
+    [EndpointDescription("Gets troubleshooting information and diagnostics for the server.")]
     public Task<IActionResult> GetTroubleshooting(CancellationToken cancellationToken)
     {
         ServerTroubleshootingResponseModel responseModel = _mapper.Map<ServerTroubleshootingResponseModel>(_systemTroubleshootingInformationService.GetTroubleshootingInformation())!;

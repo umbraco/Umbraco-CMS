@@ -1,4 +1,5 @@
 import type { UmbMediaTypeEntityType } from './entity.js';
+import type { UmbAllowedMediaTypeModel } from './repository/types.js';
 import type {
 	UmbContentTypeAvailableCompositionRequestModel,
 	UmbContentTypeCompositionCompatibleModel,
@@ -23,3 +24,13 @@ export interface UmbMediaTypeCompositionCompatibleModel extends UmbContentTypeCo
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbMediaTypeCompositionReferenceModel extends UmbContentTypeCompositionReferenceModel {}
+
+export interface UmbAllowedMediaTypesOfExtension {
+	extension: string | null; // Null is considered a folder.
+	availableMediaTypes: Array<UmbAllowedMediaTypeModel>;
+}
+
+export interface UmbAllowedChildrenOfMediaType {
+	mediaTypeUnique: string | null;
+	allowedChildren: Array<UmbAllowedMediaTypeModel>;
+}

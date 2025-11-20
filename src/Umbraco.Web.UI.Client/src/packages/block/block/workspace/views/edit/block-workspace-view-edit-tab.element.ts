@@ -1,7 +1,7 @@
 import { UMB_BLOCK_WORKSPACE_CONTEXT } from '../../block-workspace.context-token.js';
 import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbContentTypeModel, UmbPropertyTypeContainerModel } from '@umbraco-cms/backoffice/content-type';
+import type { UmbContentTypeModel, UmbPropertyTypeContainerMergedModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
@@ -42,10 +42,10 @@ export class UmbBlockWorkspaceViewEditTabElement extends UmbLitElement {
 	hideSingleGroup = false;
 
 	@state()
-	_groups: Array<UmbPropertyTypeContainerModel> = [];
+	private _groups: Array<UmbPropertyTypeContainerMergedModel> = [];
 
 	@state()
-	_hasProperties = false;
+	private _hasProperties = false;
 
 	constructor() {
 		super();
@@ -60,7 +60,7 @@ export class UmbBlockWorkspaceViewEditTabElement extends UmbLitElement {
 		if (!this.#blockWorkspace || !this.#managerName) return;
 		this.#groupStructureHelper.setStructureManager(this.#blockWorkspace[this.#managerName].structure);
 		this.observe(
-			this.#groupStructureHelper.mergedContainers,
+			this.#groupStructureHelper.childContainers,
 			(groups) => {
 				this._groups = groups;
 			},
@@ -79,28 +79,28 @@ export class UmbBlockWorkspaceViewEditTabElement extends UmbLitElement {
 		return html`
 			${this._hasProperties
 				? html`<uui-box>
-								<umb-block-workspace-view-edit-properties
-								.managerName=${this.#managerName}
-								data-mark="property-group:root"
-								.containerId=${this._containerId}></umb-block-workspace-view-edit-properties>
-							</uui-box>`
+						<umb-block-workspace-view-edit-properties
+							.managerName=${this.#managerName}
+							data-mark="property-group:root"
+							.containerId=${this._containerId}></umb-block-workspace-view-edit-properties>
+					</uui-box>`
 				: ''}
 			${this.hideSingleGroup && this._groups.length === 1
 				? this.renderGroup(this._groups[0])
 				: repeat(
 						this._groups,
-						(group) => group.id,
+						(group) => group.key,
 						(group) => html` <uui-box .headline=${group.name}>${this.renderGroup(group)}</uui-box>`,
 					)}
 		`;
 	}
 
-	renderGroup(group: UmbPropertyTypeContainerModel) {
+	renderGroup(group: UmbPropertyTypeContainerMergedModel) {
 		return html`
 			<umb-block-workspace-view-edit-properties
 				.managerName=${this.#managerName}
 				data-mark="property-group:${group.name}"
-				.containerId=${group.id}></umb-block-workspace-view-edit-properties>
+				.containerId=${group.ids[0]}></umb-block-workspace-view-edit-properties>
 		`;
 	}
 

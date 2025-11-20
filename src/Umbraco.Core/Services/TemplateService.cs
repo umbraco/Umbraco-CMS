@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
@@ -16,11 +18,26 @@ public class TemplateService : RepositoryService, ITemplateService
 {
     private readonly IShortStringHelper _shortStringHelper;
     private readonly ITemplateRepository _templateRepository;
-    private readonly IAuditRepository _auditRepository;
+    private readonly IAuditService _auditService;
     private readonly ITemplateContentParserService _templateContentParserService;
-    private readonly IUserIdKeyResolver _userIdKeyResolver;
-    private readonly IDefaultViewContentProvider _defaultViewContentProvider;
 
+    public TemplateService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IShortStringHelper shortStringHelper,
+        ITemplateRepository templateRepository,
+        IAuditService auditService,
+        ITemplateContentParserService templateContentParserService)
+        : base(provider, loggerFactory, eventMessagesFactory)
+    {
+        _shortStringHelper = shortStringHelper;
+        _templateRepository = templateRepository;
+        _auditService = auditService;
+        _templateContentParserService = templateContentParserService;
+    }
+
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
     public TemplateService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -31,14 +48,38 @@ public class TemplateService : RepositoryService, ITemplateService
         ITemplateContentParserService templateContentParserService,
         IUserIdKeyResolver userIdKeyResolver,
         IDefaultViewContentProvider defaultViewContentProvider)
-        : base(provider, loggerFactory, eventMessagesFactory)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            shortStringHelper,
+            templateRepository,
+            StaticServiceProvider.Instance.GetRequiredService<IAuditService>(),
+            templateContentParserService)
     {
-        _shortStringHelper = shortStringHelper;
-        _templateRepository = templateRepository;
-        _auditRepository = auditRepository;
-        _templateContentParserService = templateContentParserService;
-        _userIdKeyResolver = userIdKeyResolver;
-        _defaultViewContentProvider = defaultViewContentProvider;
+    }
+
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+    public TemplateService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IShortStringHelper shortStringHelper,
+        ITemplateRepository templateRepository,
+        IAuditService auditService,
+        IAuditRepository auditRepository,
+        ITemplateContentParserService templateContentParserService,
+        IUserIdKeyResolver userIdKeyResolver,
+        IDefaultViewContentProvider defaultViewContentProvider)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            shortStringHelper,
+            templateRepository,
+            auditService,
+            templateContentParserService)
+    {
     }
 
     /// <inheritdoc />
@@ -81,12 +122,11 @@ public class TemplateService : RepositoryService, ITemplateService
             scope.Notifications.Publish(
                 new TemplateSavedNotification(template, eventMessages).WithStateFrom(savingEvent));
 
-            var currentUserId = await _userIdKeyResolver.GetAsync(userKey);
-            Audit(AuditType.New, currentUserId, template.Id, UmbracoObjectTypes.Template.GetName());
+            await Audit(AuditType.New, userKey, template.Id, UmbracoObjectTypes.Template.GetName());
             scope.Complete();
         }
 
-        return await Task.FromResult(Attempt.SucceedWithStatus(TemplateOperationStatus.Success, template));
+        return Attempt.SucceedWithStatus(TemplateOperationStatus.Success, template);
     }
 
     /// <inheritdoc />
@@ -126,11 +166,11 @@ public class TemplateService : RepositoryService, ITemplateService
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<ITemplate>> GetAllAsync(params string[] aliases)
+    public Task<IEnumerable<ITemplate>> GetAllAsync(params string[] aliases)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            return await Task.FromResult(_templateRepository.GetAll(aliases).OrderBy(x => x.Name));
+            return Task.FromResult<IEnumerable<ITemplate>>(_templateRepository.GetAll(aliases).OrderBy(x => x.Name));
         }
     }
 
@@ -142,7 +182,8 @@ public class TemplateService : RepositoryService, ITemplateService
         IQuery<ITemplate> query = Query<ITemplate>();
         if (keys.Any())
         {
-            query = query.Where(x => keys.Contains(x.Key));
+            var keysList = keys.ToList();
+            query = query.Where(x => keysList.Contains(x.Key));
         }
 
         IEnumerable<ITemplate> templates = _templateRepository.Get(query).OrderBy(x => x.Name);
@@ -151,48 +192,48 @@ public class TemplateService : RepositoryService, ITemplateService
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<ITemplate>> GetChildrenAsync(int masterTemplateId)
+    public Task<IEnumerable<ITemplate>> GetChildrenAsync(int masterTemplateId)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            return await Task.FromResult(_templateRepository.GetChildren(masterTemplateId).OrderBy(x => x.Name));
+            return Task.FromResult<IEnumerable<ITemplate>>(_templateRepository.GetChildren(masterTemplateId).OrderBy(x => x.Name));
         }
     }
 
     /// <inheritdoc />
-    public async Task<ITemplate?> GetAsync(string? alias)
+    public Task<ITemplate?> GetAsync(string? alias)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            return await Task.FromResult(_templateRepository.Get(alias));
+            return Task.FromResult(_templateRepository.Get(alias));
         }
     }
 
     /// <inheritdoc />
-    public async Task<ITemplate?> GetAsync(int id)
+    public Task<ITemplate?> GetAsync(int id)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            return await Task.FromResult(_templateRepository.Get(id));
+            return Task.FromResult(_templateRepository.Get(id));
         }
     }
 
     /// <inheritdoc />
-    public async Task<ITemplate?> GetAsync(Guid id)
+    public Task<ITemplate?> GetAsync(Guid id)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             IQuery<ITemplate>? query = Query<ITemplate>().Where(x => x.Key == id);
-            return await Task.FromResult(_templateRepository.Get(query)?.SingleOrDefault());
+            return Task.FromResult(_templateRepository.Get(query)?.SingleOrDefault());
         }
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<ITemplate>> GetDescendantsAsync(int masterTemplateId)
+    public Task<IEnumerable<ITemplate>> GetDescendantsAsync(int masterTemplateId)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            return await Task.FromResult(_templateRepository.GetDescendants(masterTemplateId));
+            return Task.FromResult(_templateRepository.GetDescendants(masterTemplateId));
         }
     }
 
@@ -270,8 +311,7 @@ public class TemplateService : RepositoryService, ITemplateService
             scope.Notifications.Publish(
                 new TemplateSavedNotification(template, eventMessages).WithStateFrom(savingNotification));
 
-            var currentUserId = await _userIdKeyResolver.GetAsync(userKey);
-            Audit(auditType, currentUserId, template.Id, UmbracoObjectTypes.Template.GetName());
+            await Audit(auditType, userKey, template.Id, UmbracoObjectTypes.Template.GetName());
             scope.Complete();
             return Attempt.SucceedWithStatus(TemplateOperationStatus.Success, template);
         }
@@ -286,31 +326,32 @@ public class TemplateService : RepositoryService, ITemplateService
         => await DeleteAsync(async () => await GetAsync(key), userKey);
 
     /// <inheritdoc />
-    public async Task<Stream> GetFileContentStreamAsync(string filepath)
+    public Task<Stream> GetFileContentStreamAsync(string filepath)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            return await Task.FromResult(_templateRepository.GetFileContentStream(filepath));
+            return Task.FromResult(_templateRepository.GetFileContentStream(filepath));
         }
     }
 
     /// <inheritdoc />
-    public async Task SetFileContentAsync(string filepath, Stream content)
+    public Task SetFileContentAsync(string filepath, Stream content)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             _templateRepository.SetFileContent(filepath, content);
             scope.Complete();
-            await Task.CompletedTask;
         }
+
+        return Task.CompletedTask;
     }
 
     /// <inheritdoc />
-    public async Task<long> GetFileSizeAsync(string filepath)
+    public Task<long> GetFileSizeAsync(string filepath)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            return await Task.FromResult(_templateRepository.GetFileSize(filepath));
+            return Task.FromResult(_templateRepository.GetFileSize(filepath));
         }
     }
 
@@ -390,8 +431,8 @@ public class TemplateService : RepositoryService, ITemplateService
         }
     }
 
-    private void Audit(AuditType type, int userId, int objectId, string? entityType) =>
-        _auditRepository.Save(new AuditItem(objectId, type, userId, entityType));
+    private Task Audit(AuditType type, Guid userKey, int objectId, string? entityType) =>
+        _auditService.AddAsync(type, userKey, objectId, entityType);
 
     private async Task<Attempt<ITemplate?, TemplateOperationStatus>> DeleteAsync(Func<Task<ITemplate?>> getTemplate, Guid userKey)
     {
@@ -423,8 +464,7 @@ public class TemplateService : RepositoryService, ITemplateService
             scope.Notifications.Publish(
                 new TemplateDeletedNotification(template, eventMessages).WithStateFrom(deletingNotification));
 
-            var currentUserId = await _userIdKeyResolver.GetAsync(userKey);
-            Audit(AuditType.Delete, currentUserId, template.Id, UmbracoObjectTypes.Template.GetName());
+            await Audit(AuditType.Delete, userKey, template.Id, UmbracoObjectTypes.Template.GetName());
             scope.Complete();
             return Attempt.SucceedWithStatus<ITemplate?, TemplateOperationStatus>(TemplateOperationStatus.Success, template);
         }

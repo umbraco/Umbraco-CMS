@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class ExternalLoginServiceTests : UmbracoIntegrationTest
+internal sealed class ExternalLoginServiceTests : UmbracoIntegrationTest
 {
     private IUserService UserService => GetRequiredService<IUserService>();
 
@@ -29,8 +29,8 @@ public class ExternalLoginServiceTests : UmbracoIntegrationTest
         UserService.Save(user);
 
         var providerKey = Guid.NewGuid().ToString("N");
-        var latest = DateTime.Now.AddDays(-1);
-        var oldest = DateTime.Now.AddDays(-10);
+        var latest = DateTime.UtcNow.AddDays(-1);
+        var oldest = DateTime.UtcNow.AddDays(-10);
 
         using (var scope = ScopeProvider.CreateScope())
         {

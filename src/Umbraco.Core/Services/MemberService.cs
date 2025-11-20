@@ -1,4 +1,6 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
@@ -19,9 +21,10 @@ namespace Umbraco.Cms.Core.Services
         private readonly IMemberRepository _memberRepository;
         private readonly IMemberTypeRepository _memberTypeRepository;
         private readonly IMemberGroupRepository _memberGroupRepository;
-        private readonly IAuditRepository _auditRepository;
+        private readonly IAuditService _auditService;
         private readonly IMemberGroupService _memberGroupService;
         private readonly Lazy<IIdKeyMap> _idKeyMap;
+        private readonly IUserIdKeyResolver _userIdKeyResolver;
 
         #region Constructor
 
@@ -33,16 +36,70 @@ namespace Umbraco.Cms.Core.Services
             IMemberRepository memberRepository,
             IMemberTypeRepository memberTypeRepository,
             IMemberGroupRepository memberGroupRepository,
-            IAuditRepository auditRepository,
-            Lazy<IIdKeyMap> idKeyMap)
+            IAuditService auditService,
+            Lazy<IIdKeyMap> idKeyMap,
+            IUserIdKeyResolver userIdKeyResolver)
             : base(provider, loggerFactory, eventMessagesFactory)
         {
             _memberRepository = memberRepository;
             _memberTypeRepository = memberTypeRepository;
             _memberGroupRepository = memberGroupRepository;
-            _auditRepository = auditRepository;
+            _auditService = auditService;
             _idKeyMap = idKeyMap;
+            _userIdKeyResolver = userIdKeyResolver;
             _memberGroupService = memberGroupService ?? throw new ArgumentNullException(nameof(memberGroupService));
+        }
+
+        [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+        public MemberService(
+            ICoreScopeProvider provider,
+            ILoggerFactory loggerFactory,
+            IEventMessagesFactory eventMessagesFactory,
+            IMemberGroupService memberGroupService,
+            IMemberRepository memberRepository,
+            IMemberTypeRepository memberTypeRepository,
+            IMemberGroupRepository memberGroupRepository,
+            IAuditRepository auditRepository,
+            Lazy<IIdKeyMap> idKeyMap)
+            : this(
+                provider,
+                loggerFactory,
+                eventMessagesFactory,
+                memberGroupService,
+                memberRepository,
+                memberTypeRepository,
+                memberGroupRepository,
+                StaticServiceProvider.Instance.GetRequiredService<IAuditService>(),
+                idKeyMap,
+                StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>())
+        {
+        }
+
+        [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+        public MemberService(
+            ICoreScopeProvider provider,
+            ILoggerFactory loggerFactory,
+            IEventMessagesFactory eventMessagesFactory,
+            IMemberGroupService memberGroupService,
+            IMemberRepository memberRepository,
+            IMemberTypeRepository memberTypeRepository,
+            IMemberGroupRepository memberGroupRepository,
+            IAuditService auditService,
+            IAuditRepository auditRepository,
+            Lazy<IIdKeyMap> idKeyMap,
+            IUserIdKeyResolver userIdKeyResolver)
+            : this(
+                provider,
+                loggerFactory,
+                eventMessagesFactory,
+                memberGroupService,
+                memberRepository,
+                memberTypeRepository,
+                memberGroupRepository,
+                auditService,
+                idKeyMap,
+                userIdKeyResolver)
+        {
         }
 
         #endregion
@@ -338,10 +395,6 @@ namespace Umbraco.Cms.Core.Services
             return GetMemberFromRepository(id);
         }
 
-        [Obsolete($"Use {nameof(GetById)}. Will be removed in V15.")]
-        public IMember? GetByKey(Guid id)
-            => GetById(id);
-
         /// <summary>
         /// Gets a list of paged <see cref="IMember"/> objects
         /// </summary>
@@ -357,14 +410,14 @@ namespace Umbraco.Cms.Core.Services
         }
 
         public IEnumerable<IMember> GetAll(
-            long pageIndex,
-            int pageSize,
+            int skip,
+            int take,
             out long totalRecords,
             string orderBy,
             Direction orderDirection,
             string? memberTypeAlias = null,
             string filter = "") =>
-            GetAll(pageIndex, pageSize, out totalRecords, orderBy, orderDirection, true, memberTypeAlias, filter);
+            GetAll(skip, take, out totalRecords, orderBy, orderDirection, true, memberTypeAlias, filter);
 
         public IEnumerable<IMember> GetAll(
             long pageIndex,
@@ -395,7 +448,7 @@ namespace Umbraco.Cms.Core.Services
             Attempt<Guid> asGuid = id.TryConvertTo<Guid>();
             if (asGuid.Success)
             {
-                return GetByKey(asGuid.Result);
+                return GetById(asGuid.Result);
             }
 
             Attempt<int> asInt = id.TryConvertTo<int>();
@@ -616,14 +669,9 @@ namespace Umbraco.Cms.Core.Services
             return _memberRepository.GetPage(query, pageIndex, pageSize, out totalRecords, null, Ordering.By("LoginName"));
         }
 
-        /// <summary>
-        /// Gets a list of Members based on a property search
-        /// </summary>
-        /// <param name="propertyTypeAlias">Alias of the PropertyType to search for</param>
-        /// <param name="value"><see cref="string"/> Value to match</param>
-        /// <param name="matchType">The type of match to make as <see cref="StringPropertyMatchType"/>. Default is <see cref="StringPropertyMatchType.Exact"/></param>
-        /// <returns><see cref="IEnumerable{IMember}"/></returns>
-        public IEnumerable<IMember>? GetMembersByPropertyValue(string propertyTypeAlias, string value, StringPropertyMatchType matchType = StringPropertyMatchType.Exact)
+        /// <inheritdoc />
+        [Obsolete("Please use Search (Examine) instead, scheduled for removal in Umbraco 18.")]
+        public IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, string value, StringPropertyMatchType matchType = StringPropertyMatchType.Exact)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             scope.ReadLock(Constants.Locks.MemberTree);
@@ -650,14 +698,9 @@ namespace Umbraco.Cms.Core.Services
             return _memberRepository.Get(query);
         }
 
-        /// <summary>
-        /// Gets a list of Members based on a property search
-        /// </summary>
-        /// <param name="propertyTypeAlias">Alias of the PropertyType to search for</param>
-        /// <param name="value"><see cref="int"/> Value to match</param>
-        /// <param name="matchType">The type of match to make as <see cref="StringPropertyMatchType"/>. Default is <see cref="StringPropertyMatchType.Exact"/></param>
-        /// <returns><see cref="IEnumerable{IMember}"/></returns>
-        public IEnumerable<IMember>? GetMembersByPropertyValue(string propertyTypeAlias, int value, ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact)
+        /// <inheritdoc />
+        [Obsolete("Please use Search (Examine) instead, scheduled for removal in Umbraco 18.")]
+        public IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, int value, ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             scope.ReadLock(Constants.Locks.MemberTree);
@@ -687,13 +730,9 @@ namespace Umbraco.Cms.Core.Services
             return _memberRepository.Get(query);
         }
 
-        /// <summary>
-        /// Gets a list of Members based on a property search
-        /// </summary>
-        /// <param name="propertyTypeAlias">Alias of the PropertyType to search for</param>
-        /// <param name="value"><see cref="bool"/> Value to match</param>
-        /// <returns><see cref="IEnumerable{IMember}"/></returns>
-        public IEnumerable<IMember>? GetMembersByPropertyValue(string propertyTypeAlias, bool value)
+        /// <inheritdoc />
+        [Obsolete("Please use Search (Examine) instead, scheduled for removal in Umbraco 18.")]
+        public IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, bool value)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             scope.ReadLock(Constants.Locks.MemberTree);
@@ -702,14 +741,9 @@ namespace Umbraco.Cms.Core.Services
             return _memberRepository.Get(query);
         }
 
-        /// <summary>
-        /// Gets a list of Members based on a property search
-        /// </summary>
-        /// <param name="propertyTypeAlias">Alias of the PropertyType to search for</param>
-        /// <param name="value"><see cref="System.DateTime"/> Value to match</param>
-        /// <param name="matchType">The type of match to make as <see cref="StringPropertyMatchType"/>. Default is <see cref="StringPropertyMatchType.Exact"/></param>
-        /// <returns><see cref="IEnumerable{IMember}"/></returns>
-        public IEnumerable<IMember>? GetMembersByPropertyValue(string propertyTypeAlias, DateTime value, ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact)
+        /// <inheritdoc />
+        [Obsolete("Please use Search (Examine) instead, scheduled for removal in Umbraco 18.")]
+        public IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, DateTime value, ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             scope.ReadLock(Constants.Locks.MemberTree);
@@ -799,16 +833,29 @@ namespace Umbraco.Cms.Core.Services
                 throw new ArgumentException("Cannot save member with empty name.");
             }
 
+            var previousUsername = _memberRepository.Get(member.Id)?.Username;
+
             scope.WriteLock(Constants.Locks.MemberTree);
 
             _memberRepository.Save(member);
 
             if (publishNotificationSaveOptions.HasFlag(PublishNotificationSaveOptions.Saved))
             {
-                scope.Notifications.Publish(
-                    savingNotification is null
+                MemberSavedNotification memberSavedNotification = savingNotification is null
                     ? new MemberSavedNotification(member, evtMsgs)
-                    : new MemberSavedNotification(member, evtMsgs).WithStateFrom(savingNotification));
+                    : new MemberSavedNotification(member, evtMsgs).WithStateFrom(savingNotification);
+
+                // If the user name has changed, populate the previous user name in the notification state, so the cache refreshers
+                // have it available to clear the cache by the old name as well as the new.
+                if (string.IsNullOrWhiteSpace(previousUsername) is false &&
+                    string.Equals(previousUsername, member.Username, StringComparison.OrdinalIgnoreCase) is false)
+                {
+                    memberSavedNotification.State.Add(
+                        MemberSavedNotification.PreviousUsernameStateKey,
+                        new Dictionary<Guid, string> { { member.Key, previousUsername } });
+                }
+
+                scope.Notifications.Publish(memberSavedNotification);
             }
 
             Audit(AuditType.Save, userId, member.Id);
@@ -854,9 +901,51 @@ namespace Umbraco.Cms.Core.Services
             return OperationResult.Attempt.Succeed(evtMsgs);
         }
 
-        [Obsolete($"Use the {nameof(Save)} method that yields an Attempt. Will be removed in V15.")]
+        /// <inheritdoc />
         public void Save(IEnumerable<IMember> members)
             => Save(members, Constants.Security.SuperUserId);
+
+        /// <inheritdoc/>
+        /// <remarks>
+        /// <para>
+        ///     Note that in this optimized member save operation for use in the login process, where we only handle login related
+        ///     properties, we aren't taking any locks. If we were updating "content" properties, that could have relations between each
+        ///     other, we should following what we do for documents and lock.
+        ///     But here we are just updating these system fields, and it's fine if they work in a "last one wins" fashion without locking.
+        /// </para>
+        /// <para>
+        ///      Note also that we aren't calling "Audit" here (as well as to optimize performance, this is deliberate, because this is not
+        ///      a full save operation on the member that we'd want to audit who made the changes via the backoffice or API; rather it's
+        ///      just the member logging in as themselves).
+        /// </para>
+        /// <para>
+        ///      We are though publishing notifications, to maintain backwards compatibility for any solutions using these for
+        ///      processing following a member login.
+        /// </para>
+        /// <para>
+        ///      These notification handlers will ensure that the records to umbracoLog are also added in the same way as they
+        ///      are for a full save operation.
+        /// </para>
+        /// </remarks>
+        public async Task UpdateLoginPropertiesAsync(IMember member)
+        {
+            EventMessages evtMsgs = EventMessagesFactory.Get();
+
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
+            var savingNotification = new MemberSavingNotification(member, evtMsgs);
+            savingNotification.State.Add("LoginPropertiesOnly", true);
+            if (scope.Notifications.PublishCancelable(savingNotification))
+            {
+                scope.Complete();
+                return;
+            }
+
+            await _memberRepository.UpdateLoginPropertiesAsync(member);
+
+            scope.Notifications.Publish(new MemberSavedNotification(member, evtMsgs).WithStateFrom(savingNotification));
+
+            scope.Complete();
+        }
 
         #endregion
 
@@ -1088,7 +1177,21 @@ namespace Umbraco.Cms.Core.Services
 
         #region Private Methods
 
-        private void Audit(AuditType type, int userId, int objectId, string? message = null) => _auditRepository.Save(new AuditItem(objectId, type, userId, ObjectTypes.GetName(UmbracoObjectTypes.Member), message));
+        private void Audit(AuditType type, int userId, int objectId, string? message = null) =>
+            AuditAsync(type, userId, objectId, message).GetAwaiter().GetResult();
+
+        private async Task AuditAsync(AuditType type, int userId, int objectId, string? message = null, string? parameters = null)
+        {
+            Guid userKey = await _userIdKeyResolver.GetAsync(userId);
+
+            await _auditService.AddAsync(
+                type,
+                userKey,
+                objectId,
+                UmbracoObjectTypes.Member.GetName(),
+                message,
+                parameters);
+        }
 
         private IMember? GetMemberFromRepository(Guid id)
             => _idKeyMap.Value.GetIdForKey(id, UmbracoObjectTypes.Member) switch

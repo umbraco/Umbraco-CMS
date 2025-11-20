@@ -63,12 +63,51 @@ describe('UmbPropertyValuePresetVariantBuilderController', () => {
 				},
 			];
 
-			const result = await ctrl.create(propertyTypes);
+			const result = await ctrl.create(propertyTypes, {
+				entityType: 'test',
+				entityUnique: 'some-unique',
+			});
 
 			expect(result.length).to.be.equal(2);
 			expect(result[0]?.value).to.be.equal('value for culture cultureA');
 			expect(result[0]?.culture).to.be.equal('cultureA');
 			expect(result[1]?.value).to.be.equal('value for culture cultureB');
+			expect(result[1]?.culture).to.be.equal('cultureB');
+		});
+
+		it('uses the preset value when creating a culture variant values', async () => {
+			const ctrlHost = new UmbTestControllerHostElement();
+			const ctrl = new UmbPropertyValuePresetVariantBuilderController(ctrlHost);
+			ctrl.setCultures(['cultureA', 'cultureB']);
+			ctrl.setValues([
+				{
+					alias: 'test',
+					value: 'blueprint value for cultureB',
+					culture: 'cultureB',
+					segment: null,
+					editorAlias: 'test-editor-schema',
+				},
+			]);
+
+			const propertyTypes: Array<UmbPropertyTypePresetModel | UmbPropertyTypePresetWithSchemaAliasModel> = [
+				{
+					alias: 'test',
+					propertyEditorUiAlias: 'test-editor-ui',
+					propertyEditorSchemaAlias: 'test-editor-schema',
+					config: [],
+					typeArgs: { variesByCulture: true },
+				},
+			];
+
+			const result = await ctrl.create(propertyTypes, {
+				entityType: 'test',
+				entityUnique: 'some-unique',
+			});
+
+			expect(result.length).to.be.equal(2);
+			expect(result[0]?.value).to.be.equal('value for culture cultureA');
+			expect(result[0]?.culture).to.be.equal('cultureA');
+			expect(result[1]?.value).to.be.equal('blueprint value for cultureB');
 			expect(result[1]?.culture).to.be.equal('cultureB');
 		});
 
@@ -86,7 +125,10 @@ describe('UmbPropertyValuePresetVariantBuilderController', () => {
 			];
 
 			try {
-				await ctrl.create(propertyTypes);
+				await ctrl.create(propertyTypes, {
+					entityType: 'test',
+					entityUnique: 'some-unique',
+				});
 				expect.fail('Expected to fail');
 			} catch (e) {}
 		});
@@ -105,7 +147,10 @@ describe('UmbPropertyValuePresetVariantBuilderController', () => {
 				},
 			];
 
-			const result = await ctrl.create(propertyTypes);
+			const result = await ctrl.create(propertyTypes, {
+				entityType: 'test',
+				entityUnique: 'some-unique',
+			});
 
 			expect(result.length).to.be.equal(3);
 			expect(result[0]?.value).to.be.equal('value for culture invariant');
@@ -132,7 +177,10 @@ describe('UmbPropertyValuePresetVariantBuilderController', () => {
 				},
 			];
 
-			const result = await ctrl.create(propertyTypes);
+			const result = await ctrl.create(propertyTypes, {
+				entityType: 'test',
+				entityUnique: 'some-unique',
+			});
 
 			expect(result.length).to.be.equal(1);
 			expect(result[0]?.value).to.be.equal('value for culture invariant');
@@ -155,7 +203,10 @@ describe('UmbPropertyValuePresetVariantBuilderController', () => {
 				},
 			];
 
-			const result = await ctrl.create(propertyTypes);
+			const result = await ctrl.create(propertyTypes, {
+				entityType: 'test',
+				entityUnique: 'some-unique',
+			});
 
 			expect(result.length).to.be.equal(6);
 

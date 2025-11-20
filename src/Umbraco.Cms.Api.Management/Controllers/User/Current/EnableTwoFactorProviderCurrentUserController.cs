@@ -28,6 +28,8 @@ public class EnableTwoFactorProviderCurrentUserController : CurrentUserControlle
     [ProducesResponseType(typeof(ISetupTwoFactorModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Enables two-factor authentication for the current user.")]
+    [EndpointDescription("Enables the specified two-factor authentication provider for the currently authenticated user.")]
     public async Task<IActionResult> EnableTwoFactorProvider(
         CancellationToken cancellationToken,
         string providerName,

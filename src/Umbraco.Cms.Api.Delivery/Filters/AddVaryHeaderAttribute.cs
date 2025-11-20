@@ -4,7 +4,7 @@ namespace Umbraco.Cms.Api.Delivery.Filters;
 
 public sealed class AddVaryHeaderAttribute : ActionFilterAttribute
 {
-    private const string Vary = "Accept-Language, Preview, Start-Item";
+    private const string Vary = "Accept-Language, Accept-Segment, Preview, Start-Item";
 
     public override void OnResultExecuting(ResultExecutingContext context)
         => context.HttpContext.Response.Headers.Vary = context.HttpContext.Response.Headers.Vary.Count > 0

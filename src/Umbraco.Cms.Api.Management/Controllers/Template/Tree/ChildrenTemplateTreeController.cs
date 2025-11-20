@@ -1,23 +1,34 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Core.Services;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
+using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
+using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Template.Tree;
 
 [ApiVersion("1.0")]
 public class ChildrenTemplateTreeController : TemplateTreeControllerBase
 {
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
     public ChildrenTemplateTreeController(IEntityService entityService)
         : base(entityService)
+    {
+    }
+
+    [ActivatorUtilitiesConstructor]
+    public ChildrenTemplateTreeController(IEntityService entityService, FlagProviderCollection flagProviders)
+        : base(entityService, flagProviders)
     {
     }
 
     [HttpGet("children")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<NamedEntityTreeItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of template tree child items.")]
+    [EndpointDescription("Gets a paginated collection of template tree items that are children of the provided parent Id.")]
     public async Task<ActionResult<PagedViewModel<NamedEntityTreeItemResponseModel>>> Children(
         CancellationToken cancellationToken,
         Guid parentId,

@@ -1,9 +1,8 @@
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
-import { css, html, customElement, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import type { ManifestHeaderAppButtonKind, UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import { css, customElement, html, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { ManifestHeaderAppButtonKind, UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 const manifest: UmbExtensionManifestKind = {
 	type: 'kind',
@@ -26,15 +25,15 @@ export class UmbHeaderAppButtonElement extends UmbLitElement {
 		return html`
 			<uui-button
 				look="primary"
-				label="${ifDefined(this.manifest?.meta.label)}"
-				href="${ifDefined(this.manifest?.meta.href)}"
+				label=${ifDefined(this.manifest?.meta.label)}
+				href=${ifDefined(this.manifest?.meta.href)}
 				compact>
-				<umb-icon name="${ifDefined(this.manifest?.meta.icon)}"></umb-icon>
+				<umb-icon name=${ifDefined(this.manifest?.meta.icon)}></umb-icon>
 			</uui-button>
 		`;
 	}
 
-	static override styles: CSSResultGroup = [
+	static override readonly styles = [
 		UmbTextStyles,
 		css`
 			uui-button {

@@ -27,6 +27,10 @@ public abstract class ContentControllerBase : ManagementApiControllerBase
                 .WithTitle("Content type culture variance mismatch")
                 .WithDetail("The content type variance did not match that of the passed content data.")
                 .Build()),
+            ContentEditingOperationStatus.ContentTypeSegmentVarianceMismatch => BadRequest(problemDetailsBuilder
+                .WithTitle("Content type segment variance mismatch")
+                .WithDetail("The content type variance did not match that of the passed content data.")
+                .Build()),
             ContentEditingOperationStatus.NotFound => NotFound(problemDetailsBuilder
                 .WithTitle("The content could not be found")
                 .Build()),

@@ -1,7 +1,7 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 import type { UmbDocumentItemModel } from './types.js';
+import { UmbManagementApiDocumentItemDataRequestManager } from './document-item.server.request-manager.js';
 import type { DocumentItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
 
@@ -14,6 +14,8 @@ export class UmbDocumentItemServerDataSource extends UmbItemServerDataSourceBase
 	DocumentItemResponseModel,
 	UmbDocumentItemModel
 > {
+	#itemRequestManager = new UmbManagementApiDocumentItemDataRequestManager(this);
+
 	/**
 	 * Creates an instance of UmbDocumentItemServerDataSource.
 	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
@@ -21,14 +23,18 @@ export class UmbDocumentItemServerDataSource extends UmbItemServerDataSourceBase
 	 */
 	constructor(host: UmbControllerHost) {
 		super(host, {
-			getItems,
 			mapper,
 		});
 	}
-}
 
-/* eslint-disable local-rules/no-direct-api-import */
-const getItems = (uniques: Array<string>) => DocumentService.getItemDocument({ id: uniques });
+	override async getItems(uniques: Array<string>) {
+		if (!uniques) throw new Error('Uniques are missing');
+
+		const { data, error } = await this.#itemRequestManager.getItems(uniques);
+
+		return { data: this._getMappedItems(data), error };
+	}
+}
 
 const mapper = (item: DocumentItemResponseModel): UmbDocumentItemModel => {
 	return {
@@ -41,7 +47,6 @@ const mapper = (item: DocumentItemResponseModel): UmbDocumentItemModel => {
 		hasChildren: item.hasChildren,
 		isProtected: item.isProtected,
 		isTrashed: item.isTrashed,
-		name: item.variants[0]?.name, // TODO: this is not correct. We need to get it from the variants. This is a temp solution.
 		parent: item.parent ? { unique: item.parent.id } : null,
 		unique: item.id,
 		variants: item.variants.map((variant) => {
@@ -49,7 +54,12 @@ const mapper = (item: DocumentItemResponseModel): UmbDocumentItemModel => {
 				culture: variant.culture || null,
 				name: variant.name,
 				state: variant.state,
+				flags: variant.flags,
+				// TODO: [v17] Implement dates when available in the API. [LK]
+				//createDate: new Date(variant.createDate),
+				//updateDate: new Date(variant.updateDate),
 			};
 		}),
+		flags: item.flags,
 	};
 };

@@ -18,6 +18,8 @@ public class ConfigurationDataTypeController : DataTypeControllerBase
     [HttpGet("configuration")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(DatatypeConfigurationResponseModel), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets the datatype configuration.")]
+    [EndpointDescription("Gets the configuration settings for datatypes.")]
     public Task<IActionResult> Configuration(CancellationToken cancellationToken)
     {
         var responseModel = new DatatypeConfigurationResponseModel

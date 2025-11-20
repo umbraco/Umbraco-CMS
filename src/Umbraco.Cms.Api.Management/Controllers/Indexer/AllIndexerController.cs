@@ -30,6 +30,8 @@ public class AllIndexerController : IndexerControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<IndexResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of indexers.")]
+    [EndpointDescription("Gets a collection of configured search indexers in the Umbraco installation.")]
     public Task<PagedViewModel<IndexResponseModel>> All(
         CancellationToken cancellationToken,
         int skip = 0,

@@ -31,7 +31,7 @@ public partial class ConvertRichTextEditorProperties : ConvertBlockEditorPropert
     }
 
     protected override IEnumerable<string> PropertyEditorAliases
-        => new[] { Constants.PropertyEditors.Aliases.TinyMce, Constants.PropertyEditors.Aliases.RichText };
+        => new[] { "Umbraco.TinyMCE", Constants.PropertyEditors.Aliases.RichText };
 
     protected override EditorValueHandling DetermineEditorValueHandling(object editorValue)
         => editorValue is RichTextEditorValue richTextEditorValue

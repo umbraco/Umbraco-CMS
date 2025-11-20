@@ -22,7 +22,7 @@ public class MemberTypeService : ContentTypeServiceBase<IMemberTypeRepository, I
         IEventMessagesFactory eventMessagesFactory,
         IMemberService memberService,
         IMemberTypeRepository memberTypeRepository,
-        IAuditRepository auditRepository,
+        IAuditService auditService,
         IMemberTypeContainerRepository entityContainerRepository,
         IEntityRepository entityRepository,
         IEventAggregator eventAggregator,
@@ -33,7 +33,7 @@ public class MemberTypeService : ContentTypeServiceBase<IMemberTypeRepository, I
             loggerFactory,
             eventMessagesFactory,
             memberTypeRepository,
-            auditRepository,
+            auditService,
             entityContainerRepository,
             entityRepository,
             eventAggregator,
@@ -44,32 +44,7 @@ public class MemberTypeService : ContentTypeServiceBase<IMemberTypeRepository, I
         _memberTypeRepository = memberTypeRepository;
     }
 
-    [Obsolete("Please use the constructor taking all parameters. This constructor will be removed in V16.")]
-    public MemberTypeService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IMemberService memberService,
-        IMemberTypeRepository memberTypeRepository,
-        IAuditRepository auditRepository,
-        IMemberTypeContainerRepository entityContainerRepository,
-        IEntityRepository entityRepository,
-        IEventAggregator eventAggregator)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            memberService,
-            memberTypeRepository,
-            auditRepository,
-            entityContainerRepository,
-            entityRepository,
-            eventAggregator,
-            StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>())
-    {
-    }
-
-    [Obsolete("Please use the constructor taking all parameters. This constructor will be removed in V16.")]
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
     public MemberTypeService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -80,19 +55,49 @@ public class MemberTypeService : ContentTypeServiceBase<IMemberTypeRepository, I
         IMemberTypeContainerRepository entityContainerRepository,
         IEntityRepository entityRepository,
         IEventAggregator eventAggregator,
-        IUserIdKeyResolver userIdKeyResolver)
+        IUserIdKeyResolver userIdKeyResolver,
+        ContentTypeFilterCollection contentTypeFilters)
         : this(
             provider,
             loggerFactory,
             eventMessagesFactory,
             memberService,
             memberTypeRepository,
-            auditRepository,
+            StaticServiceProvider.Instance.GetRequiredService<IAuditService>(),
             entityContainerRepository,
             entityRepository,
             eventAggregator,
             userIdKeyResolver,
-            StaticServiceProvider.Instance.GetRequiredService<ContentTypeFilterCollection>())
+            contentTypeFilters)
+    {
+    }
+
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+    public MemberTypeService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IMemberService memberService,
+        IMemberTypeRepository memberTypeRepository,
+        IAuditService auditService,
+        IAuditRepository auditRepository,
+        IMemberTypeContainerRepository entityContainerRepository,
+        IEntityRepository entityRepository,
+        IEventAggregator eventAggregator,
+        IUserIdKeyResolver userIdKeyResolver,
+        ContentTypeFilterCollection contentTypeFilters)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            memberService,
+            memberTypeRepository,
+            auditService,
+            entityContainerRepository,
+            entityRepository,
+            eventAggregator,
+            userIdKeyResolver,
+            contentTypeFilters)
     {
     }
 

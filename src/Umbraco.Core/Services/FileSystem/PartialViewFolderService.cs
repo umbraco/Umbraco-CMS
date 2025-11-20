@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services.FileSystem;
 
-internal class PartialViewFolderService : FolderServiceOperationBase<IPartialViewRepository, PartialViewFolderModel, PartialViewFolderOperationStatus>, IPartialViewFolderService
+internal sealed class PartialViewFolderService : FolderServiceOperationBase<IPartialViewRepository, PartialViewFolderModel, PartialViewFolderOperationStatus>, IPartialViewFolderService
 {
     public PartialViewFolderService(IPartialViewRepository repository, ICoreScopeProvider scopeProvider)
         : base(repository, scopeProvider)

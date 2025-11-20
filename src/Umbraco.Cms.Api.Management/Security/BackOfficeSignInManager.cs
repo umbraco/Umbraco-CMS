@@ -2,12 +2,10 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Security;
@@ -48,37 +46,6 @@ public class BackOfficeSignInManager : UmbracoSignInManager<BackOfficeIdentityUs
         _eventAggregator = eventAggregator;
         _backOfficeAuthenticationTypeSettings = backOfficeAuthenticationTypeSettings;
         _globalSettings = globalSettings.Value;
-    }
-
-    [Obsolete("Use non-obsolete constructor. This is scheduled for removal in V15.")]
-    public BackOfficeSignInManager(
-        BackOfficeUserManager userManager,
-        IHttpContextAccessor contextAccessor,
-        IBackOfficeExternalLoginProviders externalLogins,
-        IUserClaimsPrincipalFactory<BackOfficeIdentityUser> claimsFactory,
-        IOptions<IdentityOptions> optionsAccessor,
-        IOptions<GlobalSettings> globalSettings,
-        ILogger<SignInManager<BackOfficeIdentityUser>> logger,
-        IAuthenticationSchemeProvider schemes,
-        IUserConfirmation<BackOfficeIdentityUser> confirmation,
-        IEventAggregator eventAggregator,
-        IOptions<SecuritySettings> securitySettings)
-        : this(
-            userManager,
-            contextAccessor,
-            externalLogins,
-            claimsFactory,
-            optionsAccessor,
-            globalSettings,
-            logger,
-            schemes,
-            confirmation,
-            eventAggregator,
-            securitySettings,
-            StaticServiceProvider.Instance.GetRequiredService<IOptions<BackOfficeAuthenticationTypeSettings>>(),
-            StaticServiceProvider.Instance.GetRequiredService<IRequestCache>()
-        )
-    {
     }
 
     protected override string AuthenticationType => _backOfficeAuthenticationTypeSettings.Value.AuthenticationType;

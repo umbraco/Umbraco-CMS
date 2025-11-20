@@ -22,6 +22,11 @@ public sealed class UserGroupWithUsersSavedDistributedCacheNotificationHandler :
         => notification.SavedEntities.Select(x => x.UserGroup);
 
     /// <inheritdoc />
+    [Obsolete("Scheduled for removal in Umbraco 18.")]
     protected override void Handle(IEnumerable<IUserGroup> entities)
+        => Handle(entities, new Dictionary<string, object?>());
+
+    /// <inheritdoc />
+    protected override void Handle(IEnumerable<IUserGroup> entities, IDictionary<string, object?> state)
         => _distributedCache.RefreshUserGroupCache(entities);
 }

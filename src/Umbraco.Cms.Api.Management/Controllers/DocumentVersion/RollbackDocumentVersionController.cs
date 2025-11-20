@@ -2,10 +2,8 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Security.Authorization;
@@ -23,7 +21,6 @@ public class RollbackDocumentVersionController : DocumentVersionControllerBase
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IAuthorizationService _authorizationService;
 
-    [ActivatorUtilitiesConstructor]
     public RollbackDocumentVersionController(
         IContentVersionService contentVersionService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
@@ -34,23 +31,13 @@ public class RollbackDocumentVersionController : DocumentVersionControllerBase
         _authorizationService = authorizationService;
     }
 
-    // TODO (V16): Remove this constructor.
-    [Obsolete("Please use the constructor taking all parameters. This constructor will be removed in V16.")]
-    public RollbackDocumentVersionController(
-        IContentVersionService contentVersionService,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
-        : this(
-              contentVersionService,
-              backOfficeSecurityAccessor,
-              StaticServiceProvider.Instance.GetRequiredService<IAuthorizationService>())
-    {
-    }
-
     [MapToApiVersion("1.0")]
     [HttpPost("{id:guid}/rollback")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [EndpointSummary("Rolls back a document to a previous version.")]
+    [EndpointDescription("Rolls back a document to the version identified by the provided Id.")]
     public async Task<IActionResult> Rollback(CancellationToken cancellationToken, Guid id, string? culture)
     {
         Attempt<IContent?, ContentVersionOperationStatus> getContentAttempt =

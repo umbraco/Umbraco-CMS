@@ -3,7 +3,7 @@ import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbUfmRenderContext extends UmbContextBase<UmbUfmRenderContext> {
+export class UmbUfmRenderContext extends UmbContextBase {
 	#value = new UmbObjectState<unknown>(undefined);
 	readonly value = this.#value.asObservable();
 

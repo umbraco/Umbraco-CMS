@@ -29,30 +29,6 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
     // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs
     protected const string UmbracoSignInMgrXsrfKey = "XsrfId";
 
-
-    [Obsolete("Use non-obsolete constructor. This is scheduled for removal in V15.")]
-    public UmbracoSignInManager(
-        UserManager<TUser> userManager,
-        IHttpContextAccessor contextAccessor,
-        IUserClaimsPrincipalFactory<TUser> claimsFactory,
-        IOptions<IdentityOptions> optionsAccessor,
-        ILogger<SignInManager<TUser>> logger,
-        IAuthenticationSchemeProvider schemes,
-        IUserConfirmation<TUser> confirmation,
-        IOptions<SecuritySettings> securitySettingsOptions)
-        : this(
-            userManager,
-            contextAccessor,
-            claimsFactory,
-            optionsAccessor,
-            logger,
-            schemes,
-            confirmation,
-            securitySettingsOptions,
-            StaticServiceProvider.Instance.GetRequiredService<IRequestCache>())
-    {
-    }
-
     public UmbracoSignInManager(
         UserManager<TUser> userManager,
         IHttpContextAccessor contextAccessor,
@@ -375,7 +351,7 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
         if (result.Succeeded)
         {
             // track the last login date
-            user!.LastLoginDateUtc = DateTime.UtcNow;
+            user!.LastLoginDate = DateTime.UtcNow;
             if (user.AccessFailedCount > 0)
             {
                 // we have successfully logged in, reset the AccessFailedCount
@@ -541,7 +517,7 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
     }
 
     // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs#L891
-    private class TwoFactorAuthenticationInfo
+    private sealed class TwoFactorAuthenticationInfo
     {
         public string? UserId { get; set; }
 

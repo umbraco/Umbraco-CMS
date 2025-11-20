@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models.Membership;
@@ -34,7 +34,7 @@ public class PreviewService : IPreviewService
 
         if (attempt.Success)
         {
-            _cookieManager.SetCookieValue(Constants.Web.PreviewCookieName, attempt.Result!, true);
+            _cookieManager.SetCookieValue(Constants.Web.PreviewCookieName, attempt.Result!, true, true, "None");
         }
 
         return attempt.Success;

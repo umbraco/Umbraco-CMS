@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 // Used internally for representing the data needed for constructing the in-memory navigation structure.
 [TableName(NodeDto.TableName)]
-internal class NavigationDto : INavigationModel
+internal sealed class NavigationDto : INavigationModel
 {
     // Public constants to bind properties between DTOs
     public const string ContentTypeKeyColumnName = "contentTypeKey";

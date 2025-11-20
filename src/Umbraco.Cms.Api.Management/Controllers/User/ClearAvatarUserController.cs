@@ -28,6 +28,8 @@ public class ClearAvatarUserController : UserControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [EndpointSummary("Clears a user's avatar.")]
+    [EndpointDescription("Removes the avatar image for the user identified by the provided Id.")]
     public async Task<IActionResult> ClearAvatar(CancellationToken cancellationToken, Guid id)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(

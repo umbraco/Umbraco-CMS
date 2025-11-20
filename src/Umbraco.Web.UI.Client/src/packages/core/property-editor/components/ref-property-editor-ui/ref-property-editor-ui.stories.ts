@@ -1,18 +1,18 @@
+import { UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT } from '../../constants.js';
 import type { UmbRefPropertyEditorUIElement } from './ref-property-editor-ui.element.js';
-import type { Meta, StoryObj } from '@storybook/web-components';
+import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { html } from '@umbraco-cms/backoffice/external/lit';
-import { UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT } from '@umbraco-cms/backoffice/property-editor';
 import './ref-property-editor-ui.element.js';
 
 const meta: Meta<UmbRefPropertyEditorUIElement> = {
-	title: 'Components/Ref Property Editor UI',
+	title: 'Extension Type/Property Editor UI/Components/Ref Property Editor UI',
 	component: 'umb-ref-property-editor-ui',
 };
 
 export default meta;
 type Story = StoryObj<UmbRefPropertyEditorUIElement>;
 
-export const Overview: Story = {
+export const Docs: Story = {
 	args: {
 		name: 'Custom Property Editor UI',
 		alias: 'Umb.PropertyEditorUi.CustomUI',

@@ -15,7 +15,7 @@ export class UmbAllowMediaRecycleBinCurrentUserCondition
 		super(host, args);
 
 		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
-			this.observe(context.hasMediaRootAccess, (hasAccess) => {
+			this.observe(context?.hasMediaRootAccess, (hasAccess) => {
 				this.permitted = hasAccess === true;
 			});
 		});

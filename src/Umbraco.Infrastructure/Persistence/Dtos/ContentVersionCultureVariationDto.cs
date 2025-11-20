@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(TableName)]
 [PrimaryKey("id")]
 [ExplicitColumns]
-internal class ContentVersionCultureVariationDto
+internal sealed class ContentVersionCultureVariationDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.ContentVersionCultureVariation;
     private int? _updateUserId;

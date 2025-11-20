@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 [TestFixture]
 [Category("Slow")]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class MemberEditingServiceTests : UmbracoIntegrationTest
+internal sealed class MemberEditingServiceTests : UmbracoIntegrationTest
 {
     private IMemberEditingService MemberEditingService => GetRequiredService<IMemberEditingService>();
 
@@ -77,12 +77,12 @@ public class MemberEditingServiceTests : UmbracoIntegrationTest
             Email = "test-updated@test.com",
             Username = "test-updated",
             IsApproved = false,
-            InvariantName = "T. Est Updated",
-            InvariantProperties = new[]
-            {
+            Variants = [new VariantModel { Name = "T. Est Updated" }],
+            Properties =
+            [
                 new PropertyValueModel { Alias = "title", Value = "The updated title value" },
                 new PropertyValueModel { Alias = "author", Value = "The updated author value" }
-            }
+            ]
         };
 
         var result = await MemberEditingService.UpdateAsync(member.Key, updateModel, SuperUser());
@@ -112,7 +112,7 @@ public class MemberEditingServiceTests : UmbracoIntegrationTest
             Email = member.Email,
             Username = member.Username,
             IsApproved = true,
-            InvariantName = member.Name,
+            Variants = [new VariantModel { Name = member.Name }],
             NewPassword = "NewSuperSecret123"
         };
 
@@ -140,7 +140,7 @@ public class MemberEditingServiceTests : UmbracoIntegrationTest
             Email = member.Email,
             Username = member.Username,
             IsApproved = true,
-            InvariantName = member.Name,
+            Variants = [new VariantModel { Name = member.Name }],
             Roles = groups.Select(x => x.Key),
         };
 
@@ -193,12 +193,12 @@ public class MemberEditingServiceTests : UmbracoIntegrationTest
             Password = "SuperSecret123",
             IsApproved = true,
             ContentTypeKey = memberType.Key,
-            InvariantName = "T. Est",
-            InvariantProperties = new[]
-            {
+            Variants = [new VariantModel { Name = "T. Est" }],
+            Properties =
+            [
                 new PropertyValueModel { Alias = "title", Value = titleValue },
                 new PropertyValueModel { Alias = "author", Value = authorValue }
-            }
+            ]
         };
 
         var result = await MemberEditingService.CreateAsync(createModel, SuperUser());
@@ -240,12 +240,12 @@ public class MemberEditingServiceTests : UmbracoIntegrationTest
             Email = member.Email,
             Username = member.Username,
             IsApproved = true,
-            InvariantName = member.Name,
-            InvariantProperties = new[]
-            {
+            Variants = [new VariantModel { Name = member.Name }],
+            Properties =
+            [
                 new PropertyValueModel { Alias = "title", Value = titleValue },
                 new PropertyValueModel { Alias = "author", Value = authorValue }
-            }
+            ]
         };
 
         var result = await MemberEditingService.UpdateAsync(member.Key, updateModel, SuperUser());
@@ -283,12 +283,12 @@ public class MemberEditingServiceTests : UmbracoIntegrationTest
             Email = "test-updated@test.com",
             Username = "test-updated",
             IsApproved = member.IsApproved,
-            InvariantName = "T. Est Updated",
-            InvariantProperties = new[]
-            {
+            Variants = [new VariantModel { Name = "T. Est Updated" }],
+            Properties =
+            [
                 new PropertyValueModel { Alias = "title", Value = "The updated title value" },
                 new PropertyValueModel { Alias = "author", Value = "The updated author value" }
-            }
+            ]
         };
 
         var result = await MemberEditingService.UpdateAsync(member.Key, updateModel, useSuperUser ? SuperUser() : user);
@@ -341,12 +341,11 @@ public class MemberEditingServiceTests : UmbracoIntegrationTest
         {
             Email = "test-updated@test.com",
             Username = "test-updated",
-            IsApproved = member.IsApproved,
-            InvariantName = "T. Est Updated",
-            InvariantProperties = new[]
-            {
+            Variants = [new VariantModel { Name = "T. Est Updated" }],
+            Properties =
+            [
                 new PropertyValueModel { Alias = "author", Value = "The updated author value" }
-            }
+            ]
         };
 
         var result = await MemberEditingService.UpdateAsync(member.Key, updateModel, user);
@@ -363,67 +362,9 @@ public class MemberEditingServiceTests : UmbracoIntegrationTest
         Assert.AreEqual("test-updated@test.com", member.Email);
         Assert.AreEqual("test-updated", member.Username);
         Assert.AreEqual("T. Est Updated", member.Name);
-    }
 
-    [Test]
-    public async Task Cannot_Change_IsApproved_Without_Access()
-    {
-        // this user does NOT have access to sensitive data
-        var user = UserBuilder.CreateUser();
-        UserService.Save(user);
-
-        var member = await CreateMemberAsync();
-
-        var updateModel = new MemberUpdateModel
-        {
-            Email = member.Email,
-            Username = member.Username,
-            IsApproved = false,
-            InvariantName = member.Name,
-            InvariantProperties = member.Properties.Select(property => new PropertyValueModel
-            {
-                Alias = property.Alias,
-                Value = property.GetValue()
-            })
-        };
-
-        var result = await MemberEditingService.UpdateAsync(member.Key, updateModel, user);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.NotAllowed, result.Status.ContentEditingOperationStatus);
-
-        member = await MemberEditingService.GetAsync(member.Key);
-        Assert.IsNotNull(member);
+        // IsApproved and IsLockedOut are always sensitive properties.
         Assert.IsTrue(member.IsApproved);
-    }
-
-    [Test]
-    public async Task Cannot_Change_IsLockedOut_Without_Access()
-    {
-        // this user does NOT have access to sensitive data
-        var user = UserBuilder.CreateUser();
-        UserService.Save(user);
-
-        var member = await CreateMemberAsync();
-
-        var updateModel = new MemberUpdateModel
-        {
-            Email = member.Email,
-            Username = member.Username,
-            IsLockedOut = true,
-            InvariantName = member.Name,
-            InvariantProperties = member.Properties.Select(property => new PropertyValueModel
-            {
-                Alias = property.Alias,
-                Value = property.GetValue()
-            })
-        };
-
-        var result = await MemberEditingService.UpdateAsync(member.Key, updateModel, user);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.NotAllowed, result.Status.ContentEditingOperationStatus);
-
-        member = await MemberEditingService.GetAsync(member.Key);
-        Assert.IsNotNull(member);
         Assert.IsFalse(member.IsLockedOut);
     }
 
@@ -446,12 +387,12 @@ public class MemberEditingServiceTests : UmbracoIntegrationTest
             IsApproved = true,
             ContentTypeKey = memberType.Key,
             Roles = new [] { group.Key },
-            InvariantName = "T. Est",
-            InvariantProperties = new[]
-            {
+            Variants = [new VariantModel { Name = "T. Est" }],
+            Properties =
+            [
                 new PropertyValueModel { Alias = "title", Value = "The title value" },
                 new PropertyValueModel { Alias = "author", Value = "The author value" }
-            }
+            ]
         };
 
         var result = await MemberEditingService.CreateAsync(createModel, SuperUser());

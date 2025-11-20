@@ -25,6 +25,8 @@ public class MoveMediaTypeController : MediaTypeControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Moves a media type.")]
+    [EndpointDescription("Moves a media type identified by the provided Id to a different location.")]
     public async Task<IActionResult> Move(
         CancellationToken cancellationToken,
         Guid id,

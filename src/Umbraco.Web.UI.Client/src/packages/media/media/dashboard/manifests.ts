@@ -1,3 +1,5 @@
+import { UMB_SECTION_ALIAS_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
+
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'dashboard',
@@ -11,7 +13,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.SectionAlias',
+				alias: UMB_SECTION_ALIAS_CONDITION_ALIAS,
 				match: 'Umb.Section.Media',
 			},
 		],

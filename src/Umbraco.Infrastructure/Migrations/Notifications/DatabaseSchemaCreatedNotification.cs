@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Notifications;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Notifications;
 
-internal class DatabaseSchemaCreatedNotification : StatefulNotification
+internal sealed class DatabaseSchemaCreatedNotification : StatefulNotification
 {
     public DatabaseSchemaCreatedNotification(EventMessages eventMessages) => EventMessages = eventMessages;
 

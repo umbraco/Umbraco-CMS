@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
@@ -25,10 +25,12 @@ public class MediaUrlController : MediaControllerBase
     [MapToApiVersion("1.0")]
     [HttpGet("urls")]
     [ProducesResponseType(typeof(IEnumerable<MediaUrlInfoResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetUrls([FromQuery(Name = "id")] HashSet<Guid> ids)
+    [EndpointSummary("Gets URLs for a document.")]
+    [EndpointDescription("Gets the URLs for the document identified by the provided Id.")]
+    public Task<IActionResult> GetUrls([FromQuery(Name = "id")] HashSet<Guid> ids)
     {
         IEnumerable<IMedia> items = _mediaService.GetByIds(ids);
 
-        return await Task.FromResult(Ok(_mediaUrlFactory.CreateUrlSets(items)));
+        return Task.FromResult<IActionResult>(Ok(_mediaUrlFactory.CreateUrlSets(items)));
     }
 }

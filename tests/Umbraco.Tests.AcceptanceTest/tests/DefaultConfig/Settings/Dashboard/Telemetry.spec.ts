@@ -16,7 +16,9 @@ test('can change telemetry level', async ({page, umbracoApi, umbracoUi}) => {
   const expectedLevel = "Minimal";
   const levelValue = "1";
   await umbracoUi.telemetryData.clickTelemetryDataTab();
+  await umbracoUi.waitForTimeout(500);
   await umbracoUi.telemetryData.changeTelemetryDataLevelValue(levelValue);
+  await umbracoUi.waitForTimeout(500);
 
   // We wait until we are sure that the Telemetry level has been saved before we continue.
   await Promise.all([
@@ -27,8 +29,7 @@ test('can change telemetry level', async ({page, umbracoApi, umbracoUi}) => {
   // Assert
   // UI
   await umbracoUi.reloadPage();
-  await expect(page.locator('[name="telemetryLevel"] >> input[id=input]')).toHaveValue(levelValue, {timeout: 20000});
-  // await umbracoUi.telemetryData.doesTelemetryDataLevelHaveValue(levelValue);
+  await umbracoUi.telemetryData.doesTelemetryDataLevelHaveValue(levelValue);
 
   // API
   expect(await umbracoApi.telemetry.getLevel() == expectedLevel).toBeTruthy();

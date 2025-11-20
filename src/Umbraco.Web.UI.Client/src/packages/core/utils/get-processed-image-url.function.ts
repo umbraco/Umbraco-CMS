@@ -6,7 +6,10 @@ import type { GetImagingResizeUrlsData } from '@umbraco-cms/backoffice/external/
  * @param {GetImagingResizeUrlsData} options The options for resizing the image.
  * @returns {Promise<string>} The URL of the processed image.
  */
-export async function getProcessedImageUrl(imagePath: string, options: GetImagingResizeUrlsData): Promise<string> {
+export async function getProcessedImageUrl(
+	imagePath: string,
+	options: GetImagingResizeUrlsData['query'],
+): Promise<string> {
 	if (!options) {
 		return imagePath;
 	}

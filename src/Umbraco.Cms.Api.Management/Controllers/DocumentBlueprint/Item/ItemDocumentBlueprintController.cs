@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
@@ -25,13 +25,15 @@ public class ItemDocumentBlueprintController : DocumentBlueprintItemControllerBa
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<DocumentBlueprintItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Item(
+    [EndpointSummary("Gets a collection of document blueprint items.")]
+    [EndpointDescription("Gets a collection of document blueprint items identified by the provided Ids.")]
+    public Task<IActionResult> Item(
         CancellationToken cancellationToken,
         [FromQuery(Name = "id")] HashSet<Guid> ids)
     {
         if (ids.Count is 0)
         {
-            return Ok(Enumerable.Empty<DocumentBlueprintItemResponseModel>());
+            return Task.FromResult<IActionResult>(Ok(Enumerable.Empty<DocumentBlueprintItemResponseModel>()));
         }
 
         IEnumerable<IDocumentEntitySlim> documents = _entityService
@@ -39,6 +41,6 @@ public class ItemDocumentBlueprintController : DocumentBlueprintItemControllerBa
             .Select(x => x as IDocumentEntitySlim)
             .WhereNotNull();
         IEnumerable<DocumentBlueprintItemResponseModel> responseModels = documents.Select(x => _documentPresentationFactory.CreateBlueprintItemResponseModel(x));
-        return await Task.FromResult(Ok(responseModels));
+        return Task.FromResult<IActionResult>(Ok(responseModels));
     }
 }

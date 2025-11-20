@@ -1,4 +1,4 @@
-import {
+import type {
   UmbEntryPointOnInit,
   UmbEntryPointOnUnload,
 } from "@umbraco-cms/backoffice/extension-api";
@@ -15,12 +15,12 @@ export const onInit: UmbEntryPointOnInit = (_host, _extensionRegistry) => {
   // Do the OAuth token handshake stuff
   _host.consumeContext(UMB_AUTH_CONTEXT, async (authContext) => {
     // Get the token info from Umbraco
-    const config = authContext.getOpenApiConfiguration();
+    const config = authContext?.getOpenApiConfiguration();
 
     client.setConfig({
-      auth: config.token,
-      baseUrl: config.base,
-      credentials: config.credentials,
+      auth: config?.token ?? undefined,
+      baseUrl: config?.base ?? "",
+      credentials: config?.credentials ?? "same-origin",
     });
   });
   //#endif

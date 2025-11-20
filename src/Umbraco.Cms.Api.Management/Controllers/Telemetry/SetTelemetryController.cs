@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Services;
@@ -17,6 +17,8 @@ public class SetTelemetryController : TelemetryControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [EndpointSummary("Sets telemetry consent level.")]
+    [EndpointDescription("Sets the telemetry consent level for anonymous usage data collection.")]
     public async Task<IActionResult> SetConsentLevel(
         CancellationToken cancellationToken,
         TelemetryRequestModel telemetryRepresentationBase)
@@ -34,6 +36,6 @@ public class SetTelemetryController : TelemetryControllerBase
         }
 
         await _metricsConsentService.SetConsentLevelAsync(telemetryRepresentationBase.TelemetryLevel);
-        return await Task.FromResult(Ok());
+        return Ok();
     }
 }

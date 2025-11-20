@@ -1,5 +1,5 @@
 import {expect} from '@playwright/test';
-import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 
 const dataTypeName = 'List View - Media';
 let dataTypeDefaultData = null;
@@ -96,7 +96,7 @@ test('can disable one view in the media section', async ({umbracoApi, umbracoUi}
   await umbracoUi.media.isMediaGridViewVisible(false);
 });
 
-test('can allow bulk trash in the media section', async ({umbracoApi, umbracoUi}) => {
+test('can allow bulk trash in the media section', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.media.goToSection(ConstantHelper.sections.media);
   await umbracoUi.media.selectMediaWithName(firstMediaFileName);
@@ -105,7 +105,7 @@ test('can allow bulk trash in the media section', async ({umbracoApi, umbracoUi}
   await umbracoUi.media.clickConfirmTrashButton();
 
   // Assert
-  await umbracoUi.media.isSuccessNotificationVisible();
+  await umbracoUi.media.waitForMediaToBeTrashed();
   expect(await umbracoApi.media.doesNameExist(firstMediaFileName)).toBeFalsy();
   expect(await umbracoApi.media.doesNameExist(secondMediaFileName)).toBeFalsy();
   expect(await umbracoApi.media.doesMediaItemExistInRecycleBin(firstMediaFileName)).toBeTruthy();
@@ -114,8 +114,7 @@ test('can allow bulk trash in the media section', async ({umbracoApi, umbracoUi}
   await umbracoUi.media.isItemVisibleInRecycleBin(secondMediaFileName, true, false);
 });
 
-// TODO: Remove fixme when update code to select media successfully.
-test.fixme('can allow bulk move in the media section', async ({umbracoApi, umbracoUi}) => {
+test('can allow bulk move in the media section', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const mediaFolderName = 'Test Folder Name';
   await umbracoApi.media.ensureNameNotExists(mediaFolderName);
@@ -125,13 +124,15 @@ test.fixme('can allow bulk move in the media section', async ({umbracoApi, umbra
   await umbracoUi.media.goToSection(ConstantHelper.sections.media);
   await umbracoUi.media.selectMediaWithName(firstMediaFileName);
   await umbracoUi.media.selectMediaWithName(secondMediaFileName);
+  await umbracoUi.waitForTimeout(200);
   await umbracoUi.media.clickBulkMoveToButton();
-  await umbracoUi.media.clickCaretButtonForName('Media');
+  await umbracoUi.media.openCaretButtonForName('Media');
   await umbracoUi.media.clickModalTextByName(mediaFolderName);
   await umbracoUi.media.clickChooseModalButton();
+  await umbracoUi.waitForTimeout(500);
 
   // Assert
-  await umbracoUi.media.isSuccessNotificationVisible();
+  await umbracoUi.media.waitForMediaToBeMoved();
   expect(await umbracoApi.media.doesMediaItemHaveChildName(mediaFolderId, firstMediaFileName)).toBeTruthy();
   expect(await umbracoApi.media.doesMediaItemHaveChildName(mediaFolderId, secondMediaFileName)).toBeTruthy();
 

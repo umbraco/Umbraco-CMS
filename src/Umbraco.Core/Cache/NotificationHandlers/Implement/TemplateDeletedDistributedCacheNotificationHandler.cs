@@ -17,6 +17,11 @@ public sealed class TemplateDeletedDistributedCacheNotificationHandler : Deleted
         => _distributedCache = distributedCache;
 
     /// <inheritdoc />
+    [Obsolete("Scheduled for removal in Umbraco 18.")]
     protected override void Handle(IEnumerable<ITemplate> entities)
+        => Handle(entities, new Dictionary<string, object?>());
+
+    /// <inheritdoc />
+    protected override void Handle(IEnumerable<ITemplate> entities, IDictionary<string, object?> state)
         => _distributedCache.RemoveTemplateCache(entities);
 }

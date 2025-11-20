@@ -1,3 +1,4 @@
+
 using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core;
@@ -7,7 +8,6 @@ using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
@@ -21,23 +21,34 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// <summary>
 ///     Represents a repository for doing CRUD operations for <see cref="Relation" />
 /// </summary>
-internal class RelationRepository : EntityRepositoryBase<int, IRelation>, IRelationRepository
+internal sealed class RelationRepository : EntityRepositoryBase<int, IRelation>, IRelationRepository
 {
     private readonly IEntityRepositoryExtended _entityRepository;
     private readonly IRelationTypeRepository _relationTypeRepository;
 
-    public RelationRepository(IScopeAccessor scopeAccessor, ILogger<RelationRepository> logger, IRelationTypeRepository relationTypeRepository, IEntityRepositoryExtended entityRepository)
-        : base(scopeAccessor, AppCaches.NoCache, logger)
+    public RelationRepository(
+        IScopeAccessor scopeAccessor,
+        ILogger<RelationRepository> logger,
+        IRelationTypeRepository relationTypeRepository,
+        IEntityRepositoryExtended entityRepository,
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            AppCaches.NoCache,
+            logger,
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
         _relationTypeRepository = relationTypeRepository;
         _entityRepository = entityRepository;
     }
 
     public IEnumerable<IUmbracoEntity> GetPagedParentEntitiesByChildId(int childId, long pageIndex, int pageSize, out long totalRecords, params Guid[] entityTypes)
-        => GetPagedParentEntitiesByChildId(childId, pageIndex, pageSize, out totalRecords, new int[0], entityTypes);
+        => GetPagedParentEntitiesByChildId(childId, pageIndex, pageSize, out totalRecords, [], entityTypes);
 
     public IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int parentId, long pageIndex, int pageSize, out long totalRecords, params Guid[] entityTypes)
-        => GetPagedChildEntitiesByParentId(parentId, pageIndex, pageSize, out totalRecords, new int[0], entityTypes);
+        => GetPagedChildEntitiesByParentId(parentId, pageIndex, pageSize, out totalRecords, [], entityTypes);
 
     public Task<PagedModel<IRelation>> GetPagedByChildKeyAsync(Guid childKey, int skip, int take, string? relationTypeAlias)
     {
@@ -173,9 +184,9 @@ internal class RelationRepository : EntityRepositoryBase<int, IRelation>, IRelat
     public void DeleteByParent(int parentId, params string[] relationTypeAliases)
     {
         // HACK: SQLite - hard to replace this without provider specific repositories/another ORM.
-        if (Database.DatabaseType.IsSqlite())
+        if (Database.DatabaseType.IsSqlServer() is false)
         {
-            Sql<ISqlContext>? query = Sql().Append(@"delete from umbracoRelation");
+            Sql<ISqlContext>? query = Sql().Append($"DELETE FROM {QuoteTableName("umbracoRelation")}");
 
             Sql<ISqlContext> subQuery = Sql().Select<RelationDto>(x => x.Id)
                 .From<RelationDto>()
@@ -198,10 +209,10 @@ internal class RelationRepository : EntityRepositoryBase<int, IRelation>, IRelat
                 SqlTemplate template = SqlContext.Templates.Get(
                     Constants.SqlTemplates.RelationRepository.DeleteByParentIn,
                     tsql => Sql().Delete<RelationDto>()
-                        .From<RelationDto>()
-                        .InnerJoin<RelationTypeDto>().On<RelationDto, RelationTypeDto>(x => x.RelationType, x => x.Id)
-                        .Where<RelationDto>(x => x.ParentId == SqlTemplate.Arg<int>("parentId"))
-                        .WhereIn<RelationTypeDto>(x => x.Alias, SqlTemplate.ArgIn<string>("relationTypeAliases")));
+                            .From<RelationDto>()
+                            .InnerJoin<RelationTypeDto>().On<RelationDto, RelationTypeDto>(x => x.RelationType, x => x.Id)
+                            .Where<RelationDto>(x => x.ParentId == SqlTemplate.Arg<int>("parentId"))
+                            .WhereIn<RelationTypeDto>(x => x.Alias, SqlTemplate.ArgIn<string>("relationTypeAliases")));
 
                 Sql<ISqlContext> sql = template.Sql(parentId, relationTypeAliases);
 
@@ -212,9 +223,9 @@ internal class RelationRepository : EntityRepositoryBase<int, IRelation>, IRelat
                 SqlTemplate template = SqlContext.Templates.Get(
                     Constants.SqlTemplates.RelationRepository.DeleteByParentAll,
                     tsql => Sql().Delete<RelationDto>()
-                        .From<RelationDto>()
-                        .InnerJoin<RelationTypeDto>().On<RelationDto, RelationTypeDto>(x => x.RelationType, x => x.Id)
-                        .Where<RelationDto>(x => x.ParentId == SqlTemplate.Arg<int>("parentId")));
+                            .From<RelationDto>()
+                            .InnerJoin<RelationTypeDto>().On<RelationDto, RelationTypeDto>(x => x.RelationType, x => x.Id)
+                            .Where<RelationDto>(x => x.ParentId == SqlTemplate.Arg<int>("parentId")));
 
                 Sql<ISqlContext> sql = template.Sql(parentId);
 
@@ -227,7 +238,7 @@ internal class RelationRepository : EntityRepositoryBase<int, IRelation>, IRelat
     ///     Used for joining the entity query with relations for the paging methods
     /// </summary>
     /// <param name="sql"></param>
-    private void SqlJoinRelations(Sql<ISqlContext> sql)
+    private static void SqlJoinRelations(Sql<ISqlContext> sql)
     {
         // add left joins for relation tables (this joins on both child or parent, so beware that this will normally return entities for
         // both sides of the relation type unless the IUmbracoEntity query passed in filters one side out).
@@ -304,7 +315,7 @@ internal class RelationRepository : EntityRepositoryBase<int, IRelation>, IRelat
         }
     }
 
-    private void ApplyOrdering(ref Sql<ISqlContext> sql, Ordering ordering)
+    private static void ApplyOrdering(ref Sql<ISqlContext> sql, Ordering ordering)
     {
         if (sql == null)
         {
@@ -336,7 +347,7 @@ internal class RelationRepository : EntityRepositoryBase<int, IRelation>, IRelat
         Sql<ISqlContext> sql = GetBaseQuery(false);
         sql.Where(GetBaseWhereClause(), new { id });
 
-        RelationDto? dto = Database.Fetch<RelationDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
+        RelationDto? dto = Database.FirstOrDefault<RelationDto>(sql);
         if (dto == null)
         {
             return null;
@@ -417,11 +428,13 @@ internal class RelationRepository : EntityRepositoryBase<int, IRelation>, IRelat
         return sql;
     }
 
-    protected override string GetBaseWhereClause() => $"{Constants.DatabaseSchema.Tables.Relation}.id = @id";
+    protected override string GetBaseWhereClause() => $"{QuoteTableName(Constants.DatabaseSchema.Tables.Relation)}.id = @id";
 
     protected override IEnumerable<string> GetDeleteClauses()
     {
-        var list = new List<string> { "DELETE FROM umbracoRelation WHERE id = @id" };
+        var list = new List<string> {
+            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.Relation)} WHERE id = @id"
+        };
         return list;
     }
 
@@ -458,7 +471,7 @@ internal class RelationRepository : EntityRepositoryBase<int, IRelation>, IRelat
     #endregion
 }
 
-internal class RelationItemDto
+internal sealed class RelationItemDto
 {
     [Column(Name = "nodeId")]
     public int ChildNodeId { get; set; }
@@ -474,6 +487,9 @@ internal class RelationItemDto
 
     [Column(Name = "nodeObjectType")]
     public Guid ChildNodeObjectType { get; set; }
+
+    [Column(Name = "contentTypeKey")]
+    public Guid ChildContentTypeKey { get; set; }
 
     [Column(Name = "contentTypeIcon")]
     public string? ChildContentTypeIcon { get; set; }

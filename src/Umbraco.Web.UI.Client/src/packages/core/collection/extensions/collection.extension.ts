@@ -9,6 +9,7 @@ export interface ManifestCollection
 
 export interface MetaCollection {
 	repositoryAlias: string;
+	noItemsLabel?: string;
 }
 
 declare global {

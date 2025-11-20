@@ -11,11 +11,11 @@ export interface UmbMemberItemModel {
 		icon: string;
 		collection: UmbReferenceByUnique | null;
 	};
-	variants: Array<UmbMemberVariantItemModel>;
+	variants: Array<UmbMemberItemVariantModel>;
 	kind: UmbMemberKindType;
 }
 
-export interface UmbMemberVariantItemModel {
+export interface UmbMemberItemVariantModel {
 	name: string;
 	culture: string | null;
 }

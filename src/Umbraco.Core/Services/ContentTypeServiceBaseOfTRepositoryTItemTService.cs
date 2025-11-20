@@ -22,7 +22,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     where TRepository : IContentTypeRepositoryBase<TItem>
     where TItem : class, IContentTypeComposition
 {
-    private readonly IAuditRepository _auditRepository;
+    private readonly IAuditService _auditService;
     private readonly IEntityContainerRepository _containerRepository;
     private readonly IEntityRepository _entityRepository;
     private readonly IEventAggregator _eventAggregator;
@@ -34,7 +34,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         ILoggerFactory loggerFactory,
         IEventMessagesFactory eventMessagesFactory,
         TRepository repository,
-        IAuditRepository auditRepository,
+        IAuditService auditService,
         IEntityContainerRepository containerRepository,
         IEntityRepository entityRepository,
         IEventAggregator eventAggregator,
@@ -43,7 +43,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         Repository = repository;
-        _auditRepository = auditRepository;
+        _auditService = auditService;
         _containerRepository = containerRepository;
         _entityRepository = entityRepository;
         _eventAggregator = eventAggregator;
@@ -51,30 +51,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         _contentTypeFilters = contentTypeFilters;
     }
 
-    [Obsolete("Use the ctor specifying all dependencies instead")]
-    protected ContentTypeServiceBase(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        TRepository repository,
-        IAuditRepository auditRepository,
-        IEntityContainerRepository containerRepository,
-        IEntityRepository entityRepository,
-        IEventAggregator eventAggregator)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            repository,
-            auditRepository,
-            containerRepository,
-            entityRepository,
-            eventAggregator,
-            StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>())
-    {
-    }
-
-    [Obsolete("Use the ctor specifying all dependencies instead")]
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
     protected ContentTypeServiceBase(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -84,18 +61,19 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         IEntityContainerRepository containerRepository,
         IEntityRepository entityRepository,
         IEventAggregator eventAggregator,
-        IUserIdKeyResolver userIdKeyResolver)
+        IUserIdKeyResolver userIdKeyResolver,
+        ContentTypeFilterCollection contentTypeFilters)
         : this(
             provider,
             loggerFactory,
             eventMessagesFactory,
             repository,
-            auditRepository,
+            StaticServiceProvider.Instance.GetRequiredService<IAuditService>(),
             containerRepository,
             entityRepository,
             eventAggregator,
             userIdKeyResolver,
-            StaticServiceProvider.Instance.GetRequiredService<ContentTypeFilterCollection>())
+            contentTypeFilters)
     {
     }
 
@@ -978,17 +956,8 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
                 //var copyingb = (ContentTypeCompositionBase) copying;
                 // but we *know* it has to be a ContentTypeCompositionBase anyways
 
-                // TODO: Fix back to only calling the copyingb.DeepCloneWithResetIdentities when
-                // when ContentTypeBase.DeepCloneWithResetIdentities is overrideable.
-                if (copying is IMediaType mediaTypeToCope)
-                {
-                    copy = (TItem)mediaTypeToCope.DeepCloneWithResetIdentities(alias);
-                }
-                else
-                {
-                    var copyingb = (ContentTypeCompositionBase) (object)copying;
-                    copy = (TItem) (object) copyingb.DeepCloneWithResetIdentities(alias);
-                }
+                var copyingb = copying;
+                copy = (TItem)copyingb.DeepCloneWithResetIdentities(alias);
 
                 copy.Name = copy.Name + " (copy)"; // might not be unique
 
@@ -1457,9 +1426,18 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
     #region Audit
 
-    private void Audit(AuditType type, int userId, int objectId)
+    private void Audit(AuditType type, int userId, int objectId) =>
+        AuditAsync(type, userId, objectId).GetAwaiter().GetResult();
+
+    private async Task AuditAsync(AuditType type, int userId, int objectId)
     {
-        _auditRepository.Save(new AuditItem(objectId, type, userId, ObjectTypes.GetUmbracoObjectType(ContainedObjectType).GetName()));
+        Guid userKey = await _userIdKeyResolver.GetAsync(userId);
+
+        await _auditService.AddAsync(
+            type,
+            userKey,
+            objectId,
+            ObjectTypes.GetUmbracoObjectType(ContainedObjectType).GetName());
     }
 
     #endregion

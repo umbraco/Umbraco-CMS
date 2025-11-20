@@ -1,8 +1,10 @@
+import { UMB_WEBHOOK_ENTITY_TYPE } from '../../../entity.js';
 import type { UmbWebhookItemModel } from './types.js';
 import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
 import type { WebhookItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { WebhookService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbItemDataApiGetRequestController } from '@umbraco-cms/backoffice/entity-item';
 
 /**
  * A server data source for Webhook items
@@ -20,18 +22,29 @@ export class UmbWebhookItemServerDataSource extends UmbItemServerDataSourceBase<
 	 */
 	constructor(host: UmbControllerHost) {
 		super(host, {
-			getItems,
 			mapper,
 		});
 	}
-}
 
-/* eslint-disable local-rules/no-direct-api-import */
-const getItems = (uniques: Array<string>) => WebhookService.getItemWebhook({ id: uniques });
+	override async getItems(uniques: Array<string>) {
+		if (!uniques) throw new Error('Uniques are missing');
+
+		const itemRequestManager = new UmbItemDataApiGetRequestController(this, {
+			// eslint-disable-next-line local-rules/no-direct-api-import
+			api: (args) => WebhookService.getItemWebhook({ query: { id: args.uniques } }),
+			uniques,
+		});
+
+		const { data, error } = await itemRequestManager.request();
+
+		return { data: this._getMappedItems(data), error };
+	}
+}
 
 const mapper = (item: WebhookItemResponseModel): UmbWebhookItemModel => {
 	return {
-		unique: item.name,
+		unique: item.id,
 		name: item.name,
+		entityType: UMB_WEBHOOK_ENTITY_TYPE,
 	};
 };

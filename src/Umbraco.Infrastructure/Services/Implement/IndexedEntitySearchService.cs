@@ -42,34 +42,13 @@ internal sealed class IndexedEntitySearchService : IIndexedEntitySearchService
         _memberTypeService = memberTypeService;
     }
 
-    public PagedModel<IEntitySlim> Search(UmbracoObjectTypes objectType, string query, int skip = 0, int take = 100, bool ignoreUserStartNodes = false)
-        => Search(objectType, query, null, skip, take, ignoreUserStartNodes);
-
-    public PagedModel<IEntitySlim> Search(
-        UmbracoObjectTypes objectType,
-        string query,
-        Guid? parentId,
-        int skip = 0,
-        int take = 100,
-        bool ignoreUserStartNodes = false)
-        => Search(objectType, query, parentId, null, null, skip, take, ignoreUserStartNodes);
-
-    public PagedModel<IEntitySlim> Search(
-        UmbracoObjectTypes objectType,
-        string query,
-        Guid? parentId,
-        IEnumerable<Guid>? contentTypeIds,
-        int skip = 0,
-        int take = 100,
-        bool ignoreUserStartNodes = false)
-        => Search(objectType, query, parentId, contentTypeIds, null, skip, take, ignoreUserStartNodes);
-
-    public PagedModel<IEntitySlim> Search(
+    public Task<PagedModel<IEntitySlim>> SearchAsync(
         UmbracoObjectTypes objectType,
         string query,
         Guid? parentId,
         IEnumerable<Guid>? contentTypeIds,
         bool? trashed,
+        string? culture = null,
         int skip = 0,
         int take = 100,
         bool ignoreUserStartNodes = false)
@@ -115,12 +94,12 @@ internal sealed class IndexedEntitySearchService : IIndexedEntitySearchService
             .Where(key => key != Guid.Empty)
             .ToArray();
 
-        return new PagedModel<IEntitySlim>
+        return Task.FromResult(new PagedModel<IEntitySlim>
         {
             Items = keys.Any()
                 ? _entityService.GetAll(objectType, keys)
                 : Enumerable.Empty<IEntitySlim>(),
             Total = totalFound
-        };
+        });
     }
 }

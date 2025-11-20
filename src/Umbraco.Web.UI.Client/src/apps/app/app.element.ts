@@ -1,18 +1,17 @@
 import { onInit } from '../../packages/core/entry-point.js';
 import type { UmbAppErrorElement } from './app-error.element.js';
-import { UmbAppContext } from './app.context.js';
-import { UmbServerConnection } from './server-connection.js';
 import { UmbAppAuthController } from './app-auth.controller.js';
-import { UmbApiInterceptorController } from './api-interceptor.controller.js';
 import type { UmbAppOauthElement } from './app-oauth.element.js';
+import { UmbNetworkConnectionStatusManager } from './network-connection-status.manager.js';
 import type { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UmbAuthContext } from '@umbraco-cms/backoffice/auth';
+import { UmbServerConnection, UmbServerContext } from '@umbraco-cms/backoffice/server';
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UUIIconRegistryEssential } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { Guard, UmbRoute } from '@umbraco-cms/backoffice/router';
 import { pathWithoutBasePath } from '@umbraco-cms/backoffice/router';
-import { OpenAPI, RuntimeLevelModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { RuntimeLevelModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbContextDebugController } from '@umbraco-cms/backoffice/debug';
 import { UmbBundleExtensionInitializer, UmbServerExtensionRegistrator } from '@umbraco-cms/backoffice/extension-api';
 import {
@@ -20,8 +19,12 @@ import {
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
 import { filter, first, firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
-import { hasOwnOpener, retrieveStoredPath } from '@umbraco-cms/backoffice/utils';
+import { hasOwnOpener, redirectToStoredPath } from '@umbraco-cms/backoffice/utils';
+import { UmbApiInterceptorController } from '@umbraco-cms/backoffice/resources';
+import { umbHttpClient } from '@umbraco-cms/backoffice/http-client';
+import { UmbViewContext } from '@umbraco-cms/backoffice/view';
 
+import './app-logo.element.js';
 import './app-oauth.element.js';
 
 @customElement('umb-app')
@@ -31,25 +34,20 @@ export class UmbAppElement extends UmbLitElement {
 	 * @attr
 	 * @remarks This is the base URL of the Umbraco server, not the base URL of the backoffice.
 	 */
-	@property({ type: String })
-	set serverUrl(url: string) {
-		OpenAPI.BASE = url;
-	}
-	get serverUrl() {
-		return OpenAPI.BASE;
-	}
+	@property({ type: String, attribute: 'server-url' })
+	serverUrl = window.location.origin;
 
 	/**
 	 * The base path of the backoffice.
 	 * @attr
 	 */
-	@property({ type: String })
+	@property({ type: String, attribute: 'backoffice-path' })
 	backofficePath = '/umbraco';
 
 	/**
 	 * Bypass authentication.
 	 */
-	@property({ type: Boolean })
+	@property({ type: Boolean, attribute: 'bypass-auth' })
 	bypassAuth = false;
 
 	private _routes: UmbRoute[] = [
@@ -64,7 +62,7 @@ export class UmbAppElement extends UmbLitElement {
 		{
 			path: 'oauth_complete',
 			component: () => import('./app-oauth.element.js'),
-			setup: (component) => {
+			setup: async (component) => {
 				if (!this.#authContext) {
 					(component as UmbAppOauthElement).failure = true;
 					console.error('[Fatal] Auth context is not available');
@@ -79,26 +77,37 @@ export class UmbAppElement extends UmbLitElement {
 					return;
 				}
 
-				// If we are in the main window (i.e. no opener), we should redirect to the root after the authorization request is completed.
-				// The authorization request will be completed in the active window (main or popup) and the authorization signal will be sent.
-				// If we are in a popup window, the storage event in UmbAuthContext will catch the signal and close the window.
-				// If we are in the main window, the signal will be caught right here and the user will be redirected to the root.
-				if (!hasOwnOpener(this.backofficePath)) {
-					this.observe(this.#authContext.authorizationSignal, () => {
-						// Redirect to the saved state or root
-						const url = retrieveStoredPath();
-						const isBackofficePath = url?.pathname.startsWith(this.backofficePath) ?? true;
-
-						if (isBackofficePath) {
-							history.replaceState(null, '', url?.toString() ?? '');
-						} else {
-							window.location.href = url?.toString() ?? this.backofficePath;
-						}
-					});
+				// Check that we are not already authorized
+				if (this.#authContext.getIsAuthorized()) {
+					redirectToStoredPath(this.backofficePath, true);
+					return;
 				}
 
 				// Complete the authorization request, which will send the authorization signal
-				this.#authContext.completeAuthorizationRequest().catch(() => undefined);
+				try {
+					const result = await this.#authContext.completeAuthorizationRequest();
+
+					if (result === null) {
+						// If the result is null, it could mean that no new token was required, so we can redirect the user
+						// This could happen if the user is already authorized or accidentally enters the oauth_complete url
+						redirectToStoredPath(this.backofficePath, true);
+						return;
+					}
+
+					// If we are in the main window (i.e. no opener), we should redirect to the root after the authorization request is completed.
+					// The authorization request will be completed in the active window (main or popup) and the authorization signal will be sent.
+					// If we are in a popup window, the storage event in UmbAuthContext will catch the signal and close the window.
+					// If we are in the main window, the signal will be caught right here and the user will be redirected to their previous path (or root).
+					if (hasOwnOpener(this.backofficePath)) return;
+
+					// Listen for the first authorization signal after the initial authorization request
+					await firstValueFrom(this.#authContext.authorizationSignal);
+					// When it hits, we should redirect the user to the backoffice
+					redirectToStoredPath(this.backofficePath);
+				} catch {
+					(component as UmbAppOauthElement).failure = true;
+					console.error('[Fatal] Authorization request failed');
+				}
 			},
 		},
 		{
@@ -139,19 +148,20 @@ export class UmbAppElement extends UmbLitElement {
 	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
 	#serverConnection?: UmbServerConnection;
 	#authController = new UmbAppAuthController(this);
+	#apiInterceptorController = new UmbApiInterceptorController(this);
 
 	constructor() {
 		super();
-
-		OpenAPI.BASE = window.location.origin;
-
-		new UmbApiInterceptorController(this);
 
 		new UmbBundleExtensionInitializer(this, umbExtensionsRegistry);
 
 		new UUIIconRegistryEssential().attach(this);
 
 		new UmbContextDebugController(this);
+
+		new UmbNetworkConnectionStatusManager(this);
+
+		new UmbViewContext(this, null);
 	}
 
 	override connectedCallback(): void {
@@ -160,10 +170,15 @@ export class UmbAppElement extends UmbLitElement {
 	}
 
 	async #setup() {
-		this.#serverConnection = await new UmbServerConnection(this.serverUrl).connect();
+		umbHttpClient.setConfig({
+			baseUrl: this.serverUrl,
+		});
+
+		this.#apiInterceptorController.bindDefaultInterceptors(umbHttpClient);
+		this.#serverConnection = await new UmbServerConnection(this, this.serverUrl).connect();
 
 		this.#authContext = new UmbAuthContext(this, this.serverUrl, this.backofficePath, this.bypassAuth);
-		new UmbAppContext(this, {
+		new UmbServerContext(this, {
 			backofficePath: this.backofficePath,
 			serverUrl: this.serverUrl,
 			serverConnection: this.#serverConnection,
@@ -227,9 +242,11 @@ export class UmbAppElement extends UmbLitElement {
 		await this.#authContext?.setInitialState();
 
 		// Instruct all requests to use the auth flow to get and use the access_token for all subsequent requests
-		OpenAPI.TOKEN = () => this.#authContext!.getLatestToken();
-		OpenAPI.WITH_CREDENTIALS = true;
-		OpenAPI.ENCODE_PATH = (path: string) => path;
+		umbHttpClient.setConfig({
+			baseUrl: this.serverUrl,
+			credentials: 'include',
+			auth: () => this.#authContext!.getLatestToken(),
+		});
 	}
 
 	#redirect() {

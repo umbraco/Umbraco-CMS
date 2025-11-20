@@ -1,3 +1,4 @@
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Models.Membership.Permissions;
@@ -39,15 +40,16 @@ internal static class UserFactory
             user.Language = dto.UserLanguage;
             user.SecurityStamp = dto.SecurityStampToken;
             user.FailedPasswordAttempts = dto.FailedLoginAttempts ?? 0;
-            user.LastLockoutDate = dto.LastLockoutDate;
-            user.LastLoginDate = dto.LastLoginDate;
-            user.LastPasswordChangeDate = dto.LastPasswordChangeDate;
-            user.CreateDate = dto.CreateDate;
-            user.UpdateDate = dto.UpdateDate;
             user.Avatar = dto.Avatar;
-            user.EmailConfirmedDate = dto.EmailConfirmedDate;
-            user.InvitedDate = dto.InvitedDate;
+            user.EmailConfirmedDate = dto.EmailConfirmedDate?.EnsureUtc();
+            user.InvitedDate = dto.InvitedDate?.EnsureUtc();
             user.Kind = (UserKind)dto.Kind;
+
+            user.LastLockoutDate = dto.LastLockoutDate?.EnsureUtc();
+            user.LastLoginDate = dto.LastLoginDate?.EnsureUtc();
+            user.LastPasswordChangeDate = dto.LastPasswordChangeDate?.EnsureUtc();
+            user.CreateDate = dto.CreateDate.EnsureUtc();
+            user.UpdateDate = dto.UpdateDate.EnsureUtc();
 
             // reset dirty initial properties (U4-1946)
             user.ResetDirtyProperties(false);
@@ -114,7 +116,7 @@ internal static class UserFactory
 
         if (entity.HasIdentity)
         {
-            dto.Id = entity.Id.SafeCast<int>();
+            dto.Id = entity.Id;
         }
 
         return dto;

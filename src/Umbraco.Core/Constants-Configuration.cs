@@ -28,6 +28,7 @@ public static partial class Constants
         public const string ConfigActiveDirectory = ConfigPrefix + "ActiveDirectory";
         public const string ConfigMarketplace = ConfigPrefix + "Marketplace";
         public const string ConfigLegacyPasswordMigration = ConfigPrefix + "LegacyPasswordMigration";
+        public const string ConfigSystemDateMigration = ConfigPrefix + "SystemDateMigration";
         public const string ConfigContent = ConfigPrefix + "Content";
         public const string ConfigDeliveryApi = ConfigPrefix + "DeliveryApi";
         public const string ConfigCoreDebug = ConfigCorePrefix + "Debug";
@@ -40,6 +41,7 @@ public static partial class Constants
         public const string ConfigExamine = ConfigPrefix + "Examine";
         public const string ConfigIndexing = ConfigPrefix + "Indexing";
         public const string ConfigLogging = ConfigPrefix + "Logging";
+        public const string ConfigLongRunningOperations = ConfigPrefix + "LongRunningOperations";
         public const string ConfigMemberPassword = ConfigPrefix + "Security:MemberPassword";
         public const string ConfigModelsBuilder = ConfigPrefix + "ModelsBuilder";
         public const string ConfigModelsMode = ConfigModelsBuilder + ":ModelsMode";
@@ -48,10 +50,6 @@ public static partial class Constants
         public const string ConfigRequestHandler = ConfigPrefix + "RequestHandler";
         public const string ConfigRuntime = ConfigPrefix + "Runtime";
         public const string ConfigRuntimeMode = ConfigRuntime + ":Mode";
-        [Obsolete("Runtime minification is no longer supported. Will be removed entirely in V16.")]
-        public const string ConfigRuntimeMinification = ConfigPrefix + "RuntimeMinification";
-        [Obsolete("Runtime minification is no longer supported. Will be removed entirely in V16.")]
-        public const string ConfigRuntimeMinificationVersion = ConfigRuntimeMinification + ":Version";
         public const string ConfigSecurity = ConfigPrefix + "Security";
         public const string ConfigBasicAuth = ConfigPrefix + "BasicAuth";
         public const string ConfigTypeFinder = ConfigPrefix + "TypeFinder";
@@ -59,13 +57,16 @@ public static partial class Constants
         public const string ConfigUserPassword = ConfigPrefix + "Security:UserPassword";
         public const string ConfigRichTextEditor = ConfigPrefix + "RichTextEditor";
         public const string ConfigPackageMigration = ConfigPrefix + "PackageMigration";
+        [Obsolete("No longer used in Umbraco. Scheduled to be removed in Umbraco 19.")]
         public const string ConfigContentDashboard = ConfigPrefix + "ContentDashboard";
         public const string ConfigHelpPage = ConfigPrefix + "HelpPage";
         public const string ConfigInstallDefaultData = ConfigPrefix + "InstallDefaultData";
         public const string ConfigDataTypes = ConfigPrefix + "DataTypes";
         public const string ConfigPackageManifests = ConfigPrefix + "PackageManifests";
         public const string ConfigWebhook = ConfigPrefix + "Webhook";
+        public const string ConfigWebhookPayloadType = ConfigWebhook + ":PayloadType";
         public const string ConfigCache = ConfigPrefix + "Cache";
+        public const string ConfigDistributedJobs = ConfigPrefix + "DistributedJobs";
 
         public static class NamedOptions
         {

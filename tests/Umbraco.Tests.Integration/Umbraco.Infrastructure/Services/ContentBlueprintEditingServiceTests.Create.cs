@@ -17,7 +17,7 @@ public partial class ContentBlueprintEditingServiceTests
         var createModel = new ContentBlueprintCreateModel
         {
             ContentTypeKey = contentType.Key,
-            InvariantName = "Test Create Blueprint",
+            Variants = [new VariantModel { Name = "Test Create Blueprint" }],
         };
 
         var result = await ContentBlueprintEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
@@ -57,11 +57,11 @@ public partial class ContentBlueprintEditingServiceTests
         {
             ContentTypeKey = contentType.Key,
             ParentKey = Constants.System.RootKey,
-            InvariantName = "Test Create Blueprint",
-            InvariantProperties = new[]
-            {
-                new PropertyValueModel { Alias = "title", Value = "The title value" },
-            },
+            Variants = [new VariantModel { Name = "Test Create Blueprint" }],
+            Properties =
+            [
+                new PropertyValueModel { Alias = "title", Value = "The title value" }
+            ],
         };
 
         var result = await ContentBlueprintEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
@@ -104,11 +104,11 @@ public partial class ContentBlueprintEditingServiceTests
             Key = key,
             ContentTypeKey = contentType.Key,
             ParentKey = Constants.System.RootKey,
-            InvariantName = "Test Create Blueprint",
-            InvariantProperties = new[]
-            {
-                new PropertyValueModel { Alias = "title", Value = "The title value" },
-            },
+            Variants = [new VariantModel { Name = "Test Create Blueprint" }],
+            Properties =
+            [
+                new PropertyValueModel { Alias = "title", Value = "The title value" }
+            ],
         };
 
         var result = await ContentBlueprintEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
@@ -141,11 +141,11 @@ public partial class ContentBlueprintEditingServiceTests
         {
             ContentTypeKey = contentType.Key,
             ParentKey = Constants.System.RootKey,
-            InvariantName = "Test Create Blueprint",
-            InvariantProperties = new[]
-            {
-                new PropertyValueModel { Alias = "title", Value = "The title value" },
-            },
+            Variants = [new VariantModel { Name = "Test Create Blueprint" }],
+            Properties =
+            [
+                new PropertyValueModel { Alias = "title", Value = "The title value" }
+            ],
         };
 
         var result1 = await ContentBlueprintEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
@@ -178,11 +178,11 @@ public partial class ContentBlueprintEditingServiceTests
         {
             ContentTypeKey = contentType.Key,
             ParentKey = Constants.System.RootKey,
-            InvariantName = "Test Create Blueprint 1",
-            InvariantProperties = new[]
-            {
-                new PropertyValueModel { Alias = "title", Value = "The title value" },
-            },
+            Variants = [new VariantModel { Name = "Test Create Blueprint 1" }],
+            Properties =
+            [
+                new PropertyValueModel { Alias = "title", Value = "The title value" }
+            ],
         };
 
         var result1 = await ContentBlueprintEditingService.CreateAsync(createModel1, Constants.Security.SuperUserKey);
@@ -197,11 +197,11 @@ public partial class ContentBlueprintEditingServiceTests
         {
             ContentTypeKey = contentType.Key,
             ParentKey = Constants.System.RootKey,
-            InvariantName = "Test Create Blueprint 2",
-            InvariantProperties = new[]
-            {
-                new PropertyValueModel { Alias = "title", Value = "The title value" },
-            },
+            Variants = [new VariantModel { Name = "Test Create Blueprint 2" }],
+            Properties =
+            [
+                new PropertyValueModel { Alias = "title", Value = "The title value" }
+            ],
         };
 
         // create another blueprint
@@ -226,11 +226,11 @@ public partial class ContentBlueprintEditingServiceTests
         {
             ContentTypeKey = contentType1.Key,
             ParentKey = Constants.System.RootKey,
-            InvariantName = "Test Create Blueprint",
-            InvariantProperties = new[]
-            {
-                new PropertyValueModel { Alias = "title", Value = "The title value" },
-            },
+            Variants = [new VariantModel { Name = "Test Create Blueprint" }],
+            Properties =
+            [
+                new PropertyValueModel { Alias = "title", Value = "The title value" }
+            ],
         };
 
         var result1 = await ContentBlueprintEditingService.CreateAsync(createModel1, Constants.Security.SuperUserKey);
@@ -247,11 +247,11 @@ public partial class ContentBlueprintEditingServiceTests
         {
             ContentTypeKey = contentType2.Key,
             ParentKey = Constants.System.RootKey,
-            InvariantName = "Test Create Blueprint",
-            InvariantProperties = new[]
-            {
-                new PropertyValueModel { Alias = "title", Value = "The title value" },
-            },
+            Variants = [new VariantModel { Name = "Test Create Blueprint" }],
+            Properties =
+            [
+                new PropertyValueModel { Alias = "title", Value = "The title value" }
+            ],
         };
 
         // create another blueprint
@@ -271,7 +271,7 @@ public partial class ContentBlueprintEditingServiceTests
         {
             ContentTypeKey = Guid.NewGuid(),
             ParentKey = Constants.System.RootKey,
-            InvariantName = "Test Create Blueprint",
+            Variants = [new VariantModel { Name = "Test Create Blueprint" }],
         };
 
         var result = await ContentBlueprintEditingService.CreateAsync(createModel1, Constants.Security.SuperUserKey);
@@ -307,6 +307,101 @@ public partial class ContentBlueprintEditingServiceTests
         {
             Assert.AreEqual(1, result.Length);
             Assert.AreEqual(blueprintKey, result.First().Key);
+        });
+    }
+
+    [Test]
+    public async Task Can_Create_Variant()
+    {
+        var contentType = await CreateVariantContentType();
+
+        var createModel = new ContentBlueprintCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            ParentKey = Constants.System.RootKey,
+            Variants =
+            [
+                new VariantModel { Name = "English Blueprint", Culture = "en-US" },
+                new VariantModel { Name = "Danish Blueprint", Culture = "da-DK" }
+            ],
+            Properties =
+            [
+                new PropertyValueModel { Alias = "invariantTitle", Value = "The invariant title value" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The English title value", Culture = "en-US" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The Danish title value", Culture = "da-DK" },
+            ],
+        };
+
+        var result = await ContentBlueprintEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+        });
+        VerifyCreate(result.Result.Content);
+
+        // re-get and re-test
+        VerifyCreate(await ContentBlueprintEditingService.GetAsync(result.Result.Content!.Key));
+
+        void VerifyCreate(IContent? createdBlueprint)
+        {
+            Assert.IsNotNull(createdBlueprint);
+            Assert.Multiple(() =>
+            {
+                Assert.AreNotEqual(Guid.Empty, createdBlueprint.Key);
+                Assert.IsTrue(createdBlueprint.HasIdentity);
+                Assert.AreEqual("English Blueprint", createdBlueprint.GetCultureName("en-US"));
+                Assert.AreEqual("Danish Blueprint", createdBlueprint.GetCultureName("da-DK"));
+                Assert.AreEqual("The invariant title value", createdBlueprint.GetValue<string>("invariantTitle"));
+                Assert.AreEqual("The English title value", createdBlueprint.GetValue<string>("variantTitle", culture: "en-US"));
+                Assert.AreEqual("The Danish title value", createdBlueprint.GetValue<string>("variantTitle", culture: "da-DK"));
+            });
+        }
+
+        // ensures it's not found by normal content
+        var contentFound = await ContentEditingService.GetAsync(result.Result.Content!.Key);
+        Assert.IsNull(contentFound);
+    }
+
+    [TestCase("English Blueprint", "Unique Danish Name")]
+    [TestCase("Unique English Name", "Danish Blueprint")]
+    [TestCase("English Blueprint", "Danish Blueprint")]
+    public async Task Cannot_Create_With_Duplicate_Name_For_The_Same_Content_Type_Variant(string secondBlueprintNameInEnglish, string secondBlueprintNameInDanish)
+    {
+        var contentType = await CreateVariantContentType();
+
+        var createModel = new ContentBlueprintCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            ParentKey = Constants.System.RootKey,
+            Variants =
+            [
+                new VariantModel { Name = "English Blueprint", Culture = "en-US" },
+                new VariantModel { Name = "Danish Blueprint", Culture = "da-DK" }
+            ],
+            Properties = []
+        };
+
+        Assert.IsTrue((await ContentBlueprintEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Success);
+
+        createModel = new ContentBlueprintCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            ParentKey = Constants.System.RootKey,
+            Variants =
+            [
+                new VariantModel { Name = secondBlueprintNameInEnglish, Culture = "en-US" },
+                new VariantModel { Name = secondBlueprintNameInDanish, Culture = "da-DK" }
+            ],
+            Properties = []
+        };
+        var result = await ContentBlueprintEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(result.Success);
+            Assert.AreEqual(ContentEditingOperationStatus.DuplicateName, result.Status);
         });
     }
 }

@@ -6,7 +6,7 @@ const templateName = 'TestTemplateForContent';
 const propertyName = 'Test Date Picker';
 
 test.afterEach(async ({umbracoApi}) => {
-  await umbracoApi.document.ensureNameNotExists(contentName); 
+  await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.template.ensureNameNotExists(templateName);
 });
@@ -20,11 +20,10 @@ const dateTimes = [
 
 for (const dateTime of dateTimes) {
   test(`can render content with a date ${dateTime.type}`, async ({umbracoApi, umbracoUi}) => {
-    const dataTypeData = await umbracoApi.dataType.getByName(dateTime.dataTypeName); 
+    const dataTypeData = await umbracoApi.dataType.getByName(dateTime.dataTypeName);
     const templateId = await umbracoApi.template.createTemplateWithDisplayingStringValue(templateName, AliasHelper.toAlias(propertyName));
-    await umbracoApi.document.createPublishedDocumentWithValue(contentName, dateTime.value, dataTypeData.id, templateId, propertyName, documentTypeName);
-    const contentData = await umbracoApi.document.getByName(contentName);
-    const contentURL = contentData.urls[0].url;
+    const contentKey = await umbracoApi.document.createPublishedDocumentWithValue(contentName, dateTime.value, dataTypeData.id, templateId, propertyName, documentTypeName);
+    const contentURL= await umbracoApi.document.getDocumentUrl(contentKey);
 
     // Act
     await umbracoUi.contentRender.navigateToRenderedContentPage(contentURL);

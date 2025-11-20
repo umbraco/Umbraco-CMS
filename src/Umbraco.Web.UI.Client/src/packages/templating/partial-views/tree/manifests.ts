@@ -7,6 +7,9 @@ import { manifests as folderManifests } from './folder/manifests.js';
 import { manifests as reloadTreeItemChildrenManifest } from './reload-tree-item-children/manifests.js';
 
 export const UMB_PARTIAL_VIEW_TREE_REPOSITORY_ALIAS = 'Umb.Repository.PartialView.Tree';
+/**
+ * @deprecated Use {@link UMB_PARTIAL_VIEW_TREE_REPOSITORY_ALIAS} instead. This will be removed in Umbraco 18.
+ */
 export const UMB_PARTIAL_VIEW_TREE_STORE_ALIAS = 'Umb.Store.PartialView.Tree';
 export const UMB_PARTIAL_VIEW_TREE_ALIAS = 'Umb.Tree.PartialView';
 

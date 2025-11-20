@@ -21,15 +21,15 @@ namespace Umbraco.Cms.Core.Cache;
 ///         keep as a whole in memory.
 ///     </para>
 /// </remarks>
-internal class FullDataSetRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyBase<TEntity, TId>
+internal sealed class FullDataSetRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyBase<TEntity, TId>
     where TEntity : class, IEntity
 {
     protected static readonly TId[] EmptyIds = new TId[0]; // const
     private readonly Func<TEntity, TId> _entityGetId;
     private readonly bool _expires;
 
-    public FullDataSetRepositoryCachePolicy(IAppPolicyCache cache, IScopeAccessor scopeAccessor, Func<TEntity, TId> entityGetId, bool expires)
-        : base(cache, scopeAccessor)
+    public FullDataSetRepositoryCachePolicy(IAppPolicyCache cache, IScopeAccessor scopeAccessor, IRepositoryCacheVersionService repositoryCacheVersionService, ICacheSyncService cacheSyncService, Func<TEntity, TId> entityGetId, bool expires)
+        : base(cache, scopeAccessor, repositoryCacheVersionService, cacheSyncService)
     {
         _entityGetId = entityGetId;
         _expires = expires;
@@ -100,6 +100,10 @@ internal class FullDataSetRepositoryCachePolicy<TEntity, TId> : RepositoryCacheP
         {
             ClearAll();
         }
+
+        // We've changed the entity, register cache change for other servers.
+        // We assume that if something goes wrong, we'll roll back, so don't need to register the change.
+        RegisterCacheChange();
     }
 
     /// <inheritdoc />
@@ -118,11 +122,17 @@ internal class FullDataSetRepositoryCachePolicy<TEntity, TId> : RepositoryCacheP
         {
             ClearAll();
         }
+
+        // We've changed the entity, register cache change for other servers.
+        // We assume that if something goes wrong, we'll roll back, so don't need to register the change.
+        RegisterCacheChange();
     }
 
     /// <inheritdoc />
     public override TEntity? Get(TId? id, Func<TId?, TEntity?> performGet, Func<TId[]?, IEnumerable<TEntity>?> performGetAll)
     {
+        EnsureCacheIsSynced();
+
         // get all from the cache, then look for the entity
         IEnumerable<TEntity> all = GetAllCached(performGetAll);
         TEntity? entity = all.FirstOrDefault(x => _entityGetId(x)?.Equals(id) ?? false);
@@ -135,6 +145,8 @@ internal class FullDataSetRepositoryCachePolicy<TEntity, TId> : RepositoryCacheP
     /// <inheritdoc />
     public override TEntity? GetCached(TId id)
     {
+        EnsureCacheIsSynced();
+
         // get all from the cache -- and only the cache, then look for the entity
         DeepCloneableList<TEntity>? all = Cache.GetCacheItem<DeepCloneableList<TEntity>>(GetEntityTypeCacheKey());
         TEntity? entity = all?.FirstOrDefault(x => _entityGetId(x)?.Equals(id) ?? false);
@@ -147,6 +159,8 @@ internal class FullDataSetRepositoryCachePolicy<TEntity, TId> : RepositoryCacheP
     /// <inheritdoc />
     public override bool Exists(TId id, Func<TId, bool> performExits, Func<TId[], IEnumerable<TEntity>?> performGetAll)
     {
+        EnsureCacheIsSynced();
+
         // get all as one set, then look for the entity
         IEnumerable<TEntity> all = GetAllCached(performGetAll);
         return all.Any(x => _entityGetId(x)?.Equals(id) ?? false);
@@ -155,6 +169,8 @@ internal class FullDataSetRepositoryCachePolicy<TEntity, TId> : RepositoryCacheP
     /// <inheritdoc />
     public override TEntity[] GetAll(TId[]? ids, Func<TId[], IEnumerable<TEntity>?> performGetAll)
     {
+        EnsureCacheIsSynced();
+
         // get all as one set, from cache if possible, else repo
         IEnumerable<TEntity> all = GetAllCached(performGetAll);
 

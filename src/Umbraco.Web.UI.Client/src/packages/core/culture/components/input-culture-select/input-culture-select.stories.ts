@@ -1,16 +1,16 @@
-import type { Meta, StoryObj } from '@storybook/web-components';
+import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import './input-culture-select.element.js';
 import type { UmbInputCultureSelectElement } from './input-culture-select.element.js';
 
 const meta: Meta<UmbInputCultureSelectElement> = {
-	title: 'Components/Inputs/Culture Select',
+	title: 'Generic Components/Inputs/Culture Select',
 	component: 'umb-input-culture-select',
 };
 
 export default meta;
 type Story = StoryObj<UmbInputCultureSelectElement>;
 
-export const Overview: Story = {
+export const Docs: Story = {
 	args: {
 		readonly: false,
 		disabled: false,

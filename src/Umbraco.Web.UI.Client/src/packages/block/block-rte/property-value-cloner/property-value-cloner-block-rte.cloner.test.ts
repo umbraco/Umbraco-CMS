@@ -71,8 +71,8 @@ describe('UmbBlockRtePropertyValueCloner', () => {
 
 			const result = (await ctrl.clone(value)) as { value: UmbPropertyEditorRteValueType | undefined };
 
-			const newContentKey = result.value?.blocks.layout[UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS]?.[0].contentKey;
-			const newSettingsKey = result.value?.blocks.layout[UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS]?.[0].settingsKey;
+			const newContentKey = result.value?.blocks?.layout[UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS]?.[0].contentKey;
+			const newSettingsKey = result.value?.blocks?.layout[UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS]?.[0].settingsKey;
 
 			if (newContentKey === undefined) {
 				throw new Error('newContentKey is undefined');
@@ -80,20 +80,20 @@ describe('UmbBlockRtePropertyValueCloner', () => {
 
 			expect(result.value?.markup.indexOf(newContentKey) !== 0).to.be.true;
 
-			expect(result.value?.blocks.layout[UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS]?.[0].contentKey).to.not.be.equal(
+			expect(result.value?.blocks?.layout[UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS]?.[0].contentKey).to.not.be.equal(
 				'content-1',
 			);
-			expect(result.value?.blocks.layout[UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS]?.[0].settingsKey).to.not.be.equal(
+			expect(result.value?.blocks?.layout[UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS]?.[0].settingsKey).to.not.be.equal(
 				'settings-1',
 			);
-			expect(result.value?.blocks.layout[UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS]?.[0].contentKey).to.be.equal(
+			expect(result.value?.blocks?.layout[UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS]?.[0].contentKey).to.be.equal(
 				newContentKey,
 			);
 
-			expect(result.value?.blocks.contentData[0].key).to.not.be.equal('content-1');
-			expect(result.value?.blocks.contentData[0].key).to.be.equal(newContentKey);
-			expect(result.value?.blocks.settingsData[0].key).to.not.be.equal('settings-1');
-			expect(result.value?.blocks.settingsData[0].key).to.be.equal(newSettingsKey);
+			expect(result.value?.blocks?.contentData[0].key).to.not.be.equal('content-1');
+			expect(result.value?.blocks?.contentData[0].key).to.be.equal(newContentKey);
+			expect(result.value?.blocks?.settingsData[0].key).to.not.be.equal('settings-1');
+			expect(result.value?.blocks?.settingsData[0].key).to.be.equal(newSettingsKey);
 		});
 	});
 });

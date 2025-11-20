@@ -2,7 +2,7 @@ import type { UmbBlockListLayoutModel, UmbBlockListTypeModel } from '../types.js
 import type { UmbBlockListWorkspaceOriginData } from '../index.js';
 import type { UmbBlockDataModel } from '../../block/types.js';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbBlockManagerContext, type UmbBlockDataObjectModel } from '@umbraco-cms/backoffice/block';
+import { UmbBlockManagerContext } from '@umbraco-cms/backoffice/block';
 
 /**
  * A implementation of the Block Manager specifically for the Block List Editor.
@@ -22,20 +22,10 @@ export class UmbBlockListManagerContext<
 	}
 
 	/**
-	 * @deprecated Use createWithPresets instead. Will be removed in v.17.
+	 * @param contentElementTypeKey
+	 * @param partialLayoutEntry
+	 * @param _originData
 	 */
-	create(
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		contentElementTypeKey: string,
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey'>,
-		// This property is used by some implementations, but not used in this. Do not remove. [NL]
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		_originData?: UmbBlockListWorkspaceOriginData,
-	) {
-		throw new Error('Method deparecated use createWithPresets');
-		return {} as UmbBlockDataObjectModel<BlockLayoutType>;
-	}
 	async createWithPresets(
 		contentElementTypeKey: string,
 		partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey'>,

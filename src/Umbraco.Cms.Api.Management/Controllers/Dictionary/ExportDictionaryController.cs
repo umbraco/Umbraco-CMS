@@ -26,6 +26,8 @@ public class ExportDictionaryController : DictionaryControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Exports a dictionary.")]
+    [EndpointDescription("Exports the dictionary identified by the provided Id to a downloadable format.")]
     public async Task<IActionResult> Export(CancellationToken cancellationToken, Guid id, bool includeChildren = false)
     {
         IDictionaryItem? dictionaryItem = await _dictionaryItemService.GetAsync(id);

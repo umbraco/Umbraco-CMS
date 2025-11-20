@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.UrlAndDomains;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Mapper = true, WithApplication = true, Logger = UmbracoTestOptions.Logger.Console)]
-public class DomainAndUrlsTests : UmbracoIntegrationTest
+internal sealed class DomainAndUrlsTests : UmbracoIntegrationTest
 {
     [SetUp]
     public void Setup()
@@ -233,8 +233,8 @@ public class DomainAndUrlsTests : UmbracoIntegrationTest
             foreach (var culture in Cultures)
             {
                 var domain = GetDomainUrlFromCultureCode(culture);
-                Assert.IsTrue(rootUrls.Any(x => x.Text == domain));
-                Assert.IsTrue(rootUrls.Any(x => x.Text == "https://localhost" + domain));
+                Assert.IsTrue(rootUrls.Any(x => x.Url?.ToString() == domain && x.Message == null));
+                Assert.IsTrue(rootUrls.Any(x => x.Url?.ToString() == "https://localhost" + domain && x.Message == null));
             }
         });
     }
@@ -263,14 +263,14 @@ public class DomainAndUrlsTests : UmbracoIntegrationTest
             Assert.AreEqual(4, rootUrls.Count());
 
             //We expect two for the domain that is setup
-            Assert.IsTrue(rootUrls.Any(x => x.IsUrl && x.Text == domain && x.Culture == culture));
-            Assert.IsTrue(rootUrls.Any(x => x.IsUrl && x.Text == "https://localhost" + domain && x.Culture == culture));
+            Assert.IsTrue(rootUrls.Any(x => x.Url?.ToString() == domain && x.Culture == culture && x.Message == null));
+            Assert.IsTrue(rootUrls.Any(x => x.Url?.ToString() == "https://localhost" + domain && x.Culture == culture && x.Message == null));
 
             //We expect the default language to be routable on the default path "/"
-            Assert.IsTrue(rootUrls.Any(x => x.IsUrl && x.Text == "/" && x.Culture == Cultures[0]));
+            Assert.IsTrue(rootUrls.Any(x => x.Url?.ToString() == "/" && x.Culture == Cultures[0] && x.Message == null));
 
             //We dont expect non-default languages without a domain to be routable
-            Assert.IsTrue(rootUrls.Any(x => x.IsUrl == false && x.Culture == Cultures[2]));
+            Assert.IsTrue(rootUrls.Any(x => x.Url == null && x.Culture == Cultures[2]));
         });
     }
 

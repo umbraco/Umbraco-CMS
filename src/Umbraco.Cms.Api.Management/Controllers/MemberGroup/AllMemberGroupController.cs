@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
@@ -24,6 +24,8 @@ public class AllMemberGroupController : MemberGroupControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<MemberGroupResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a paginated collection of member groups.")]
+    [EndpointDescription("Gets a paginated collection of member groups.")]
     public async Task<ActionResult<PagedViewModel<MemberGroupResponseModel>>> All(
         CancellationToken cancellationToken,
         int skip = 0,
@@ -36,6 +38,6 @@ public class AllMemberGroupController : MemberGroupControllerBase
             Items = _mapper.MapEnumerable<IMemberGroup, MemberGroupResponseModel>(memberGroups.Skip(skip).Take(take)),
         };
 
-        return await Task.FromResult(Ok(viewModel));
+        return Ok(viewModel);
     }
 }

@@ -12,8 +12,8 @@ export const handlers = [
 				currentState: '2b20c6e7',
 				newState: '2b20c6e8',
 				oldVersion: '13.0.0',
-				newVersion: '13.1.0',
-				reportUrl: 'https://our.umbraco.com/download/releases/1000',
+				newVersion: '17.0.0',
+				reportUrl: 'https://our.umbraco.com/download/releases/1700',
 			}),
 		);
 	}),

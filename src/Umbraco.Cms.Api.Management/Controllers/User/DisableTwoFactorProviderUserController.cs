@@ -31,6 +31,8 @@ public class DisableTwoFactorProviderUserController : UserControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [EndpointSummary("Disables two-factor authentication for a user.")]
+    [EndpointDescription("Disables the specified two-factor authentication provider for a user.")]
     public async Task<IActionResult> DisableTwoFactorProvider(
         CancellationToken cancellationToken,
         Guid id,

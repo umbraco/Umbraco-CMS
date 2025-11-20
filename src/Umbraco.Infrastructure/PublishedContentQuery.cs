@@ -2,9 +2,12 @@ using System.Collections;
 using System.Globalization;
 using Examine;
 using Examine.Search;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Extensions;
 
@@ -20,6 +23,7 @@ public class PublishedContentQuery : IPublishedContentQuery
     private readonly IPublishedContentCache _publishedContent;
     private readonly IPublishedMediaCache _publishedMediaCache;
     private readonly IVariationContextAccessor _variationContextAccessor;
+    private readonly IDocumentNavigationQueryService _documentNavigationQueryService;
     private static readonly HashSet<string> _returnedQueryFields =
         new() { ExamineFieldNames.ItemIdFieldName, ExamineFieldNames.CategoryFieldName };
 
@@ -30,13 +34,33 @@ public class PublishedContentQuery : IPublishedContentQuery
         IVariationContextAccessor variationContextAccessor,
         IExamineManager examineManager,
         IPublishedContentCache publishedContent,
-        IPublishedMediaCache publishedMediaCache)
+        IPublishedMediaCache publishedMediaCache,
+        IDocumentNavigationQueryService documentNavigationQueryService)
     {
         _variationContextAccessor = variationContextAccessor ??
                                     throw new ArgumentNullException(nameof(variationContextAccessor));
         _examineManager = examineManager ?? throw new ArgumentNullException(nameof(examineManager));
         _publishedContent = publishedContent;
         _publishedMediaCache = publishedMediaCache;
+        _documentNavigationQueryService = documentNavigationQueryService;
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="PublishedContentQuery" /> class.
+    /// </summary>
+    [Obsolete("Scheduled for removal in Umbraco 18")]
+    public PublishedContentQuery(
+        IVariationContextAccessor variationContextAccessor,
+        IExamineManager examineManager,
+        IPublishedContentCache publishedContent,
+        IPublishedMediaCache publishedMediaCache)
+    : this(
+        variationContextAccessor,
+        examineManager,
+        publishedContent,
+        publishedMediaCache,
+        StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>())
+    {
     }
 
     #region Convert Helpers
@@ -212,8 +236,9 @@ public class PublishedContentQuery : IPublishedContentQuery
     private IEnumerable<IPublishedContent> ItemsByIds(IPublishedCache? cache, IEnumerable<Guid> ids)
         => ids.Select(eachId => ItemById(eachId, cache)).WhereNotNull();
 
-    private static IEnumerable<IPublishedContent> ItemsAtRoot(IPublishedCache? cache)
-        => cache?.GetAtRoot() ?? Array.Empty<IPublishedContent>();
+    private IEnumerable<IPublishedContent> ItemsAtRoot(IPublishedCache? cache)
+        => _documentNavigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys) is false ? []
+            : rootKeys.Select(x => cache?.GetById(false, x)).WhereNotNull();
 
     #endregion
 
@@ -330,7 +355,7 @@ public class PublishedContentQuery : IPublishedContentQuery
     ///     This is used to contextualize the values in the search results when enumerating over them, so that the correct
     ///     culture values are used.
     /// </summary>
-    private class CultureContextualSearchResults : IEnumerable<PublishedSearchResult>
+    private sealed class CultureContextualSearchResults : IEnumerable<PublishedSearchResult>
     {
         private readonly string _culture;
         private readonly IVariationContextAccessor _variationContextAccessor;
@@ -365,7 +390,7 @@ public class PublishedContentQuery : IPublishedContentQuery
         /// <summary>
         ///     Resets the variation context when this is disposed.
         /// </summary>
-        private class CultureContextualSearchResultsEnumerator : IEnumerator<PublishedSearchResult>
+        private sealed class CultureContextualSearchResultsEnumerator : IEnumerator<PublishedSearchResult>
         {
             private readonly VariationContext? _originalContext;
             private readonly IVariationContextAccessor _variationContextAccessor;

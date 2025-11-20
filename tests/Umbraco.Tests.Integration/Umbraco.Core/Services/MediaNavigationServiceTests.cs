@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Scoping;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
-public partial class MediaNavigationServiceTests : MediaNavigationServiceTestsBase
+internal sealed partial class MediaNavigationServiceTests : MediaNavigationServiceTestsBase
 {
     [SetUp]
     public async Task Setup()

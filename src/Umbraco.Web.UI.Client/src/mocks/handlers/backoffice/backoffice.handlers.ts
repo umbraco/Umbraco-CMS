@@ -1,11 +1,11 @@
 const { rest } = window.MockServiceWorker;
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
-const logoUrl = './src/mocks/handlers/backoffice/assets/logo.svg';
-const logoAlternativeUrl = './src/mocks/handlers/backoffice/assets/logo_blue.svg';
-const loginLogoUrl = './src/mocks/handlers/backoffice/assets/logo_light.svg';
-const loginLogoAlternativeUrl = './src/mocks/handlers/backoffice/assets/logo_dark.svg';
-const loginBackgroundUrl = './src/mocks/handlers/backoffice/assets/login.jpg';
+const logoUrl = './umbraco/backoffice/assets/logo.svg';
+const logoAlternativeUrl = './umbraco/backoffice/assets/logo_blue.svg';
+const loginLogoUrl = './umbraco/backoffice/assets/logo_light.svg';
+const loginLogoAlternativeUrl = './umbraco/backoffice/assets/logo_dark.svg';
+const loginBackgroundUrl = './umbraco/backoffice/assets/login.jpg';
 
 export const handlers = [
 	rest.get(umbracoPath('/security/back-office/graphics/logo'), async (req, res, ctx) => {

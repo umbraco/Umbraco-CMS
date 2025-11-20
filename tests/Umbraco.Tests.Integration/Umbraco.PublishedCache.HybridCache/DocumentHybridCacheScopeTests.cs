@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models.ContentPublishing;
@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.PublishedCache.HybridCache;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class DocumentHybridCacheScopeTests : UmbracoIntegrationTestWithContentEditing
+internal sealed class DocumentHybridCacheScopeTests : UmbracoIntegrationTestWithContentEditing
 {
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
@@ -34,7 +34,10 @@ public class DocumentHybridCacheScopeTests : UmbracoIntegrationTestWithContentEd
     {
         using (CoreScopeProvider.CreateCoreScope())
         {
-            await ContentPublishingService.PublishAsync(Textpage.Key.Value, CultureAndSchedule, Constants.Security.SuperUserKey);
+            await ContentPublishingService.PublishAsync(
+                Textpage.Key.Value,
+                [new CulturePublishScheduleModel { Culture = "*" }],
+                Constants.Security.SuperUserKey);
         }
 
         // Act
@@ -49,7 +52,9 @@ public class DocumentHybridCacheScopeTests : UmbracoIntegrationTestWithContentEd
     {
         using (CoreScopeProvider.CreateCoreScope())
         {
-            await ContentPublishingService.PublishAsync(Textpage.Key.Value, CultureAndSchedule, Constants.Security.SuperUserKey);
+            await ContentPublishingService.PublishAsync(Textpage.Key.Value,
+                [new CulturePublishScheduleModel { Culture = "*" }],
+                Constants.Security.SuperUserKey);
         }
 
         // Act
@@ -64,7 +69,10 @@ public class DocumentHybridCacheScopeTests : UmbracoIntegrationTestWithContentEd
     {
         using (var scope = CoreScopeProvider.CreateCoreScope())
         {
-            await ContentPublishingService.PublishAsync(Textpage.Key.Value, CultureAndSchedule, Constants.Security.SuperUserKey);
+            await ContentPublishingService.PublishAsync(
+                Textpage.Key.Value,
+                [new CulturePublishScheduleModel { Culture = "*" }],
+                Constants.Security.SuperUserKey);
             scope.Complete();
         }
 
@@ -80,7 +88,10 @@ public class DocumentHybridCacheScopeTests : UmbracoIntegrationTestWithContentEd
     {
         using (var scope = CoreScopeProvider.CreateCoreScope())
         {
-            await ContentPublishingService.PublishAsync(Textpage.Key.Value, CultureAndSchedule, Constants.Security.SuperUserKey);
+            await ContentPublishingService.PublishAsync(
+                Textpage.Key.Value,
+                [new CulturePublishScheduleModel { Culture = "*" }],
+                Constants.Security.SuperUserKey);
             scope.Complete();
         }
 

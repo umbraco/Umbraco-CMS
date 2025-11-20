@@ -26,7 +26,7 @@ export class UmbBlockListEntryContext extends UmbBlockEntryContext<
 		super(host, UMB_BLOCK_LIST_MANAGER_CONTEXT, UMB_BLOCK_LIST_ENTRIES_CONTEXT);
 	}
 
-	_gotManager() {
+	protected override _gotManager() {
 		this.observe(
 			this._manager?.inlineEditingMode,
 			(inlineEditingMode) => {
@@ -36,7 +36,7 @@ export class UmbBlockListEntryContext extends UmbBlockEntryContext<
 		);
 	}
 
-	_gotEntries() {}
+	protected override _gotEntries() {}
 
-	_gotContentType() {}
+	protected override _gotContentType() {}
 }

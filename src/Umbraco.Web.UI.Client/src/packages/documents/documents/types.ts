@@ -14,9 +14,13 @@ export type * from './collection/types.js';
 export type * from './entity.js';
 export type * from './item/types.js';
 export type * from './modals/types.js';
+export type * from './preview/types.js';
 export type * from './publishing/types.js';
 export type * from './recycle-bin/types.js';
+export type * from './search/types.js';
+export type * from './repository/types.js';
 export type * from './tree/types.js';
+export type * from './url/types.js';
 export type * from './user-permissions/types.js';
 export type * from './workspace/types.js';
 
@@ -29,7 +33,6 @@ export interface UmbDocumentDetailModel extends UmbContentDetailModel {
 	entityType: UmbDocumentEntityType;
 	isTrashed: boolean;
 	template: { unique: string } | null;
-	urls: Array<UmbDocumentUrlInfoModel>;
 	values: Array<UmbDocumentValueModel>;
 	variants: Array<UmbDocumentVariantModel>;
 }

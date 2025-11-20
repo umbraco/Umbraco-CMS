@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Examine;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -22,7 +22,9 @@ public class AllSearcherController : SearcherControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<SearcherResponse>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<SearcherResponse>>> All(
+    [EndpointSummary("Gets a collection of searchers.")]
+    [EndpointDescription("Gets a collection of configured searchers in the Umbraco installation.")]
+    public Task<ActionResult<PagedViewModel<SearcherResponse>>> All(
         CancellationToken cancellationToken,
         int skip = 0,
         int take = 100)
@@ -37,6 +39,6 @@ public class AllSearcherController : SearcherControllerBase
             Total = searchers.Count,
         };
 
-        return await Task.FromResult(Ok(viewModel));
+        return Task.FromResult<ActionResult<PagedViewModel<SearcherResponse>>>(Ok(viewModel));
     }
 }

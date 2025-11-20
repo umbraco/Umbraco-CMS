@@ -18,7 +18,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
-test('can save content with a image media picker', async ({umbracoApi, umbracoUi}) => {
+test('can create content with a image media picker', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Draft';
   const dataType = await umbracoApi.dataType.getByName(dataTypeName);
@@ -28,13 +28,13 @@ test('can save content with a image media picker', async ({umbracoApi, umbracoUi
 
   // Act
   await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -54,13 +54,13 @@ test('can publish content with a image media picker', async ({umbracoApi, umbrac
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationsHaveCount(2);
+  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
 });
 
-test('can add an image to the image media picker', async ({umbracoApi, umbracoUi}) => {
+test('can add an image to the image media picker', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataType = await umbracoApi.dataType.getByName(dataTypeName);
   await umbracoApi.media.ensureNameNotExists(mediaName);
@@ -77,7 +77,7 @@ test('can add an image to the image media picker', async ({umbracoApi, umbracoUi
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesImageMediaPickerContainImage(contentName, AliasHelper.toAlias(dataTypeName), imageId)).toBeTruthy();
 
   // Clean
@@ -101,7 +101,7 @@ test('can remove an image from the image media picker', async ({umbracoApi, umbr
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesImageMediaPickerContainImage(contentName, AliasHelper.toAlias(dataTypeName), imageId)).toBeFalsy();
 
   // Clean
@@ -123,6 +123,7 @@ test.skip('image count can not be less than min amount set in image media picker
   await umbracoUi.content.clickSaveButton();
 
   // Assert
+  await umbracoUi.content.isSuccessStateVisibleForSaveButton(false);
   await umbracoUi.content.isErrorNotificationVisible();
 
   // Clean
@@ -141,11 +142,13 @@ test.skip('image count can not be more than max amount set in image media picker
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.clickChooseButtonAndSelectMediaWithName(mediaName);
+  await umbracoUi.content.clickChooseButton();
+  await umbracoUi.content.clickMediaWithName(mediaName);
   await umbracoUi.content.clickSubmitButton();
   await umbracoUi.content.clickSaveButton();
 
   // Assert
+  await umbracoUi.content.isSuccessStateVisibleForSaveButton(false);
   await umbracoUi.content.isErrorNotificationVisible();
 
   // Clean
@@ -172,7 +175,7 @@ test('can add an image from the image media picker with a start node', async ({u
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesImageMediaPickerContainImage(contentName, AliasHelper.toAlias(customDataTypeName), imageId)).toBeTruthy();
 
   // Clean
@@ -202,7 +205,7 @@ test('can add an image from the image media picker with focal point enabled', as
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesImageMediaPickerContainImageWithFocalPoint(contentName, AliasHelper.toAlias(customDataTypeName), imageId, {left: 0.4, top: 0.2})).toBeTruthy();
 
   // Clean
@@ -229,7 +232,7 @@ test('can reset focal point in a image from the image media picker', async ({umb
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesImageMediaPickerContainImageWithFocalPoint(contentName, AliasHelper.toAlias(customDataTypeName), imageId, {left: 0, top: 0})).toBeTruthy();
 
   // Clean

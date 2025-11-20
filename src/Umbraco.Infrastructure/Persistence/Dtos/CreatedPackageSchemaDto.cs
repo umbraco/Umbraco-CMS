@@ -28,7 +28,7 @@ public class CreatedPackageSchemaDto
     public string Value { get; set; } = null!;
 
     [Column("updateDate")]
-    [Constraint(Default = SystemMethods.CurrentDateTime)]
+    [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
     public DateTime UpdateDate { get; set; }
 
     [Column("packageId")]

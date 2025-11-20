@@ -26,6 +26,8 @@ public class SearchTemplateItemController : TemplateItemControllerBase
     [HttpGet("search")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedModel<TemplateItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Searches template items.")]
+    [EndpointDescription("Searches template items by the provided query with pagination support.")]
     public async Task<IActionResult> Search(CancellationToken cancellationToken, string query, int skip = 0, int take = 100)
     {
         PagedModel<IEntitySlim> searchResult = _entitySearchService.Search(UmbracoObjectTypes.Template, query, skip, take);

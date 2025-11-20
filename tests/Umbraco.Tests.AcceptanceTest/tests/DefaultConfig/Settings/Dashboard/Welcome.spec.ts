@@ -5,11 +5,10 @@ test.beforeEach(async ({umbracoUi}) => {
   await umbracoUi.welcomeDashboard.goToSection(ConstantHelper.sections.settings);
 });
 
-test('can click on buttons', async ({umbracoUi}) => {
+test('can click on buttons', {tag: '@release'}, async ({umbracoUi}) => {
   // Arrange
   const getTheHelpYouNeedDocumentationUrl = 'https://docs.umbraco.com/umbraco-cms';
-  const goToTheForumUrl = 'https://our.umbraco.com/forum/';
-  const chatWithTheCommunityUrl = 'https://discord.umbraco.com';
+  const goToTheForumUrl = 'https://forum.umbraco.com/';
   const getCertifiedUrl = 'https://umbraco.com/training/';
   const getTheHelpYouNeedSupportUrl = 'https://umbraco.com/support/';
   const watchTheVideosUrl = 'https://www.youtube.com/c/UmbracoLearningBase';
@@ -20,7 +19,6 @@ test('can click on buttons', async ({umbracoUi}) => {
   // Assert
   await umbracoUi.welcomeDashboard.doesButtonWithLabelInBoxHaveLink('Get the help you need', 'Documentation', getTheHelpYouNeedDocumentationUrl);
   await umbracoUi.welcomeDashboard.doesButtonWithLabelInBoxHaveLink('Go to the forum', 'Community', goToTheForumUrl);
-  await umbracoUi.welcomeDashboard.doesButtonWithLabelInBoxHaveLink('Chat with the community', 'Community', chatWithTheCommunityUrl);
   await umbracoUi.welcomeDashboard.doesButtonWithLabelInBoxHaveLink('Get Certified', 'Training', getCertifiedUrl);
   await umbracoUi.welcomeDashboard.doesButtonWithLabelInBoxHaveLink('Get the help you need', 'Support', getTheHelpYouNeedSupportUrl);
   await umbracoUi.welcomeDashboard.doesButtonWithLabelInBoxHaveLink('Watch the videos', 'Videos', watchTheVideosUrl);

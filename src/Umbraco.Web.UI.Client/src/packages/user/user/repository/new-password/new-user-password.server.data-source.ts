@@ -1,6 +1,6 @@
 import { UserService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A server data source for generating and assigning a new password for a user
@@ -27,10 +27,10 @@ export class UmbNewUserPasswordServerDataSource {
 	async newPassword(unique: string) {
 		if (!unique) throw new Error('User unique is missing');
 
-		return tryExecuteAndNotify(
+		return tryExecute(
 			this.#host,
 			UserService.postUserByIdResetPassword({
-				id: unique,
+				path: { id: unique },
 			}),
 		);
 	}

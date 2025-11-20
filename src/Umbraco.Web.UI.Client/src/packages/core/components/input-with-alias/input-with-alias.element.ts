@@ -1,4 +1,4 @@
-import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, ifDefined, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
@@ -12,6 +12,9 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 ) {
 	@property({ type: String })
 	label: string = '';
+
+	@property({ type: String })
+	placeholder?: string;
 
 	@property({ type: String, reflect: false })
 	alias = '';
@@ -101,7 +104,7 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 		return html`
 			<uui-input
 				id="name"
-				placeholder=${nameLabel}
+				placeholder=${ifDefined(this.placeholder)}
 				label=${nameLabel}
 				.value=${this.value}
 				@input=${this.#onNameChange}
@@ -131,6 +134,9 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 	}
 
 	static override readonly styles = css`
+		:host {
+			display: contents;
+		}
 		#name {
 			width: 100%;
 			flex: 1 1 auto;
@@ -138,8 +144,6 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 		}
 
 		#alias {
-			max-width: 50%;
-
 			&.muted {
 				opacity: 0.55;
 				padding: var(--uui-size-1, 3px) var(--uui-size-space-3, 9px);
@@ -147,10 +151,10 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 		}
 
 		:host(:invalid:not([pristine])) {
-			color: var(--uui-color-danger);
+			color: var(--uui-color-invalid);
 		}
 		:host(:invalid:not([pristine])) > uui-input {
-			border-color: var(--uui-color-danger);
+			border-color: var(--uui-color-invalid);
 		}
 	`;
 }

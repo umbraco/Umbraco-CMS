@@ -16,12 +16,15 @@ public class RebuildPublishedCacheStatusController : PublishedCacheControllerBas
     [HttpGet("rebuild/status")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(RebuildStatusModel), StatusCodes.Status200OK)]
-    public Task<IActionResult> Status(CancellationToken cancellationToken)
+    [EndpointSummary("Gets the rebuild cache status.")]
+    [EndpointDescription("Gets the current status of the published content cache rebuild operation.")]
+    public async Task<IActionResult> Status(CancellationToken cancellationToken)
     {
-        var isRebuilding = _databaseCacheRebuilder.IsRebuilding();
-        return Task.FromResult((IActionResult)Ok(new RebuildStatusModel
-        {
-            IsRebuilding = isRebuilding
-        }));
+        var isRebuilding = await _databaseCacheRebuilder.IsRebuildingAsync();
+        return Ok(
+            new RebuildStatusModel
+            {
+                IsRebuilding = isRebuilding,
+            });
     }
 }

@@ -33,7 +33,7 @@ public class UpgradeCheckRepository : IUpgradeCheckRepository
         }
     }
 
-    private class CheckUpgradeDto
+    private sealed class CheckUpgradeDto
     {
         public CheckUpgradeDto(SemVersion version)
         {

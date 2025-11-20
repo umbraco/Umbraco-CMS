@@ -2,9 +2,10 @@ import {
 	UMB_MEDIA_ITEM_REPOSITORY_ALIAS,
 	UMB_MEDIA_TREE_PICKER_MODAL,
 	UMB_MEDIA_ENTITY_TYPE,
+	UMB_MEDIA_RECYCLE_BIN_REPOSITORY_ALIAS,
 } from '../../constants.js';
-import { UMB_MEDIA_RECYCLE_BIN_ROOT_ENTITY_TYPE, UMB_MEDIA_RECYCLE_BIN_REPOSITORY_ALIAS } from '../constants.js';
 import { UMB_MEDIA_REFERENCE_REPOSITORY_ALIAS } from '../../reference/constants.js';
+import { UMB_MEDIA_RECYCLE_BIN_ROOT_ENTITY_TYPE } from '../root/entity.js';
 import { manifests as bulkTrashManifests } from './bulk-trash/manifests.js';
 import { UMB_ENTITY_HAS_CHILDREN_CONDITION_ALIAS } from '@umbraco-cms/backoffice/entity-action';
 import {

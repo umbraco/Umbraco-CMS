@@ -3,7 +3,7 @@ using System.Globalization;
 
 namespace Umbraco.Cms.Core.Models.PublishedContent;
 
-internal class PublishedContentTypeConverter : TypeConverter
+internal sealed class PublishedContentTypeConverter : TypeConverter
 {
     private static readonly Type[] ConvertingTypes = { typeof(int) };
 

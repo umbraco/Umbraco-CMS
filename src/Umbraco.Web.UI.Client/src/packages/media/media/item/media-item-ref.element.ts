@@ -28,10 +28,10 @@ export class UmbMediaItemRefElement extends UmbLitElement {
 	standalone = false;
 
 	@state()
-	_editPath = '';
+	private _editPath = '';
 
 	@state()
-	_userHasSectionAccess = false;
+	private _userHasSectionAccess = false;
 
 	constructor() {
 		super();

@@ -5,7 +5,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbBasicState } from '@umbraco-cms/backoffice/observable-api';
 
-export class UmbNotificationContext extends UmbContextBase<UmbNotificationContext> {
+export class UmbNotificationContext extends UmbContextBase {
 	// Notice this cannot use UniqueBehaviorSubject as it holds a HTML Element. which cannot be Serialized to JSON (it has some circular references)
 	private _notifications = new UmbBasicState(<Array<UmbNotificationHandler>>[]);
 	public readonly notifications = this._notifications.asObservable();

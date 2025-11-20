@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -37,17 +37,23 @@ public class CopyDocumentController : DocumentControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Copies a document.")]
+    [EndpointDescription("Creates a duplicate of an existing document identified by the provided Id.")]
     public async Task<IActionResult> Copy(
         CancellationToken cancellationToken,
         Guid id,
         CopyDocumentRequestModel copyDocumentRequestModel)
     {
-        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
+        AuthorizationResult sourceAuthorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
-            ContentPermissionResource.WithKeys(ActionCopy.ActionLetter, new[] { copyDocumentRequestModel.Target?.Id, id }),
+            ContentPermissionResource.WithKeys(ActionCopy.ActionLetter, [id]),
+            AuthorizationPolicies.ContentPermissionByResource);
+        AuthorizationResult destinationAuthorizationResult = await _authorizationService.AuthorizeResourceAsync(
+            User,
+            ContentPermissionResource.WithKeys(ActionNew.ActionLetter, [copyDocumentRequestModel.Target?.Id]),
             AuthorizationPolicies.ContentPermissionByResource);
 
-        if (!authorizationResult.Succeeded)
+        if (sourceAuthorizationResult.Succeeded is false || destinationAuthorizationResult.Succeeded is false)
         {
             return Forbidden();
         }

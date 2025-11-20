@@ -15,7 +15,7 @@ export class UmbDocumentIsTrashedWorkspaceCondition
 		super(host, args);
 
 		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (context) => {
-			this.observe(context.isTrashed, (isTrashed) => {
+			this.observe(context?.isTrashed, (isTrashed) => {
 				this.permitted = isTrashed === true;
 			});
 		});

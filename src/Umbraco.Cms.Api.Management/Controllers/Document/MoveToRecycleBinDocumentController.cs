@@ -37,6 +37,8 @@ public class MoveToRecycleBinDocumentController : DocumentControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Moves a document to the recycle bin.")]
+    [EndpointDescription("Moves a document identified by the provided Id to the recycle bin.")]
     public async Task<IActionResult> MoveToRecycleBin(CancellationToken cancellationToken, Guid id)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(

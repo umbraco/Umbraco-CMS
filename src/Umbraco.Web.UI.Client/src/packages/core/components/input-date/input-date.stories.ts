@@ -1,16 +1,18 @@
 import type { UmbInputDateElement } from './input-date.element.js';
-import type { Meta, StoryObj } from '@storybook/web-components';
+import type { Meta, StoryObj } from '@storybook/web-components-vite';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 import './input-date.element.js';
 
 const meta: Meta<UmbInputDateElement> = {
-	title: 'Components/Inputs/Date',
+	title: 'Generic Components/Inputs/Date',
 	component: 'umb-input-date',
+	render: (args) => html`<umb-input-date type=${args.type} value=${args.value}></umb-input-date>`,
 };
 
 export default meta;
 type Story = StoryObj<UmbInputDateElement>;
 
-export const Overview: Story = {
+export const Docs: Story = {
 	args: {
 		type: 'datetime-local',
 		value: '2023-04-01T10:00:00Z',

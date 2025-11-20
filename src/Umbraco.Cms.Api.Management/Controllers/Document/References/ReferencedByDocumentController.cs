@@ -31,6 +31,8 @@ public class ReferencedByDocumentController : DocumentControllerBase
     [HttpGet("{id:guid}/referenced-by")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<IReferenceResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of items that reference documents.")]
+    [EndpointDescription("Gets a paginated collection of items that reference the documents identified by the provided Ids.")]
     public async Task<ActionResult<PagedViewModel<IReferenceResponseModel>>> ReferencedBy(
         CancellationToken cancellationToken,
         Guid id,
@@ -45,6 +47,6 @@ public class ReferencedByDocumentController : DocumentControllerBase
             Items = await _relationTypePresentationFactory.CreateReferenceResponseModelsAsync(relationItems.Items),
         };
 
-        return await Task.FromResult(pagedViewModel);
+        return pagedViewModel;
     }
 }

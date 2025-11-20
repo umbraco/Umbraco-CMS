@@ -1,8 +1,8 @@
-﻿using Examine;
+using Examine;
+using Umbraco.Cms.Core.HostedServices;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
-using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Examine.Deferred;
@@ -59,7 +59,19 @@ internal sealed class DeliveryApiContentIndexHandleContentChanges : DeliveryApiC
                 RemoveFromIndex(pendingRemovals, index);
                 pendingRemovals.Clear();
 
-                Reindex(content, index);
+                ReIndexResult reIndexResult = Reindex(content, index);
+
+
+                // When we get to this point, we are dealing with either
+                // a refresh node or a refresh branch (see reindex =...).
+                // A refresh branch can be many things, the Reindex function takes care of most scenarios.
+                // But it only reindexes descendants if the base node has any changed cultures (see comments in that function)
+                // So by checking what kind of operation it did when the initial indexrequest is for a refresh branch,
+                // we can support reindexing a branch while the base node was unchanged.
+                if (reIndexResult == ReIndexResult.Updated && changeTypes.HasType(TreeChangeTypes.RefreshBranch))
+                {
+                    ReindexDescendants(content, index);
+                }
             }
         }
 
@@ -68,7 +80,7 @@ internal sealed class DeliveryApiContentIndexHandleContentChanges : DeliveryApiC
         return Task.CompletedTask;
     });
 
-    private void Reindex(IContent content, IIndex index)
+    private ReIndexResult Reindex(IContent content, IIndex index)
     {
         // get the currently indexed cultures for the content
         CulturePublishStatus[] existingCultures = index
@@ -95,16 +107,19 @@ internal sealed class DeliveryApiContentIndexHandleContentChanges : DeliveryApiC
             // we likely got here because a removal triggered a "refresh branch" notification, now we
             // need to delete every last culture of this content and all descendants
             RemoveFromIndex(content.Id, index);
-            return;
+            return ReIndexResult.Removed;
         }
 
-        // if the published state changed of any culture, chances are there are similar changes ot the content descendants
+        // if the published state changed of any culture, chances are there are similar changes at the content descendants
         // that need to be reflected in the index, so we'll reindex all descendants
         var changedCulturePublishStatus = indexedCultures.Intersect(existingCultures).Count() != existingCultures.Length;
         if (changedCulturePublishStatus)
         {
             ReindexDescendants(content, index);
+            return ReIndexResult.UpdatedWithDescendants;
         }
+
+        return ReIndexResult.Updated;
     }
 
     private CulturePublishStatus[] UpdateIndex(IContent content, IIndex index)
@@ -136,7 +151,7 @@ internal sealed class DeliveryApiContentIndexHandleContentChanges : DeliveryApiC
                 }
             });
 
-    private class CulturePublishStatus : IEquatable<CulturePublishStatus>
+    private sealed class CulturePublishStatus : IEquatable<CulturePublishStatus>
     {
         public required string Culture { get; set; }
 
@@ -178,5 +193,12 @@ internal sealed class DeliveryApiContentIndexHandleContentChanges : DeliveryApiC
         }
 
         public override int GetHashCode() => HashCode.Combine(Culture, Published);
+    }
+
+    private enum ReIndexResult
+    {
+        Updated,
+        UpdatedWithDescendants,
+        Removed,
     }
 }

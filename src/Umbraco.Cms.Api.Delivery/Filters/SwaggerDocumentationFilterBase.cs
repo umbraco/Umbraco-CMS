@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -63,7 +63,7 @@ internal abstract class SwaggerDocumentationFilterBase<TBaseController>
     protected void AddApiKey(OpenApiOperation operation) =>
         operation.Parameters.Add(new OpenApiParameter
         {
-            Name = "Api-Key",
+            Name = Core.Constants.DeliveryApi.HeaderNames.ApiKey,
             In = ParameterLocation.Header,
             Required = false,
             Description = "API key specified through configuration to authorize access to the API.",

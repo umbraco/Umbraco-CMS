@@ -129,4 +129,12 @@ export const data: Array<UmbMockScriptModel> = [
 		hasChildren: false,
 		content: `alert('hello file with dash');`,
 	},
+	{
+		name: 'Forbidden',
+		path: '/forbidden',
+		parent: null,
+		isFolder: false,
+		hasChildren: false,
+		content: `console.log('You are not allowed to see this script!');`,
+	},
 ];

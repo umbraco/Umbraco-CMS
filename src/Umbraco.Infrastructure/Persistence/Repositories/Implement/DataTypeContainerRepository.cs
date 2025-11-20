@@ -6,14 +6,21 @@ using Umbraco.Cms.Infrastructure.Scoping;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
-internal class DataTypeContainerRepository : EntityContainerRepository, IDataTypeContainerRepository
+internal sealed class DataTypeContainerRepository : EntityContainerRepository, IDataTypeContainerRepository
 {
     public DataTypeContainerRepository(
         IScopeAccessor scopeAccessor,
         AppCaches cache,
-        ILogger<DataTypeContainerRepository> logger)
-        : base(scopeAccessor, cache, logger, Constants.ObjectTypes.DataTypeContainer)
+        ILogger<DataTypeContainerRepository> logger,
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            cache,
+            logger,
+            Constants.ObjectTypes.DataTypeContainer,
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
     }
-
 }

@@ -13,7 +13,7 @@
 // [TestFixture]
 // [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, PublishedRepositoryEvents = true,
 //     WithApplication = true)]
-// public class NuCacheRebuildTests : UmbracoIntegrationTest
+// internal sealed class NuCacheRebuildTests : UmbracoIntegrationTest
 // {
 //     private IFileService FileService => GetRequiredService<IFileService>();
 //

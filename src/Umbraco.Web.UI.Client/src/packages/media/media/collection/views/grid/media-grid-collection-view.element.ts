@@ -2,20 +2,16 @@ import { UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN } from '../../../paths.js';
 import type { UmbMediaCollectionItemModel } from '../../types.js';
 import type { UmbMediaCollectionContext } from '../../media-collection.context.js';
 import { UMB_MEDIA_COLLECTION_CONTEXT } from '../../media-collection.context-token.js';
-import { UmbFileDropzoneItemStatus } from '../../../dropzone/types.js';
 import { UMB_MEDIA_PLACEHOLDER_ENTITY_TYPE } from '../../../entity.js';
 import { css, customElement, html, ifDefined, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone';
 
 import '@umbraco-cms/backoffice/imaging';
-import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 
 @customElement('umb-media-grid-collection-view')
 export class UmbMediaGridCollectionViewElement extends UmbLitElement {
-	@state()
-	private _workspacePathBuilder?: UmbModalRouteBuilder;
-
 	@state()
 	private _items: Array<UmbMediaCollectionItemModel> = [];
 
@@ -28,14 +24,7 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 		super();
 		this.consumeContext(UMB_MEDIA_COLLECTION_CONTEXT, (collectionContext) => {
 			this.#collectionContext = collectionContext;
-			collectionContext.setupView(this);
-			this.observe(
-				collectionContext.workspacePathBuilder,
-				(builder) => {
-					this._workspacePathBuilder = builder;
-				},
-				'observePath',
-			);
+			collectionContext?.setupView(this);
 			this.#observeCollectionContext();
 		});
 	}
@@ -69,12 +58,7 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 	}
 
 	#getEditUrl(item: UmbMediaCollectionItemModel) {
-		return item.unique && this._workspacePathBuilder
-			? this._workspacePathBuilder({ entityType: item.entityType }) +
-					UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN.generateLocal({
-						unique: item.unique,
-					})
-			: '';
+		return UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: item.unique });
 	}
 
 	override render() {
@@ -104,7 +88,7 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 				@selected=${() => this.#onSelect(item)}
 				@deselected=${() => this.#onDeselect(item)}>
 				<umb-imaging-thumbnail
-					unique=${item.unique}
+					.unique=${item.unique}
 					alt=${ifDefined(item.name)}
 					icon=${ifDefined(item.icon)}></umb-imaging-thumbnail>
 			</uui-card-media>
@@ -134,11 +118,6 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 				display: flex;
 				justify-content: center;
 				align-items: center;
-			}
-
-			/** TODO: Remove this fix when UUI gets upgrade to 1.3 */
-			umb-imaging-thumbnail {
-				pointer-events: none;
 			}
 
 			#media-grid {

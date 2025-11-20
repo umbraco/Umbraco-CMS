@@ -1,16 +1,15 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Serialization;
-using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Core.PropertyEditors.Validators;
 
-internal class RichTextRequiredValidator : RequiredValidator, IRichTextRequiredValidator
+internal sealed class RichTextRequiredValidator : RequiredValidator, IRichTextRequiredValidator
 {
     private readonly IJsonSerializer _jsonSerializer;
     private readonly ILogger<RichTextRequiredValidator> _logger;
 
-    public RichTextRequiredValidator(ILocalizedTextService textService, IJsonSerializer jsonSerializer, ILogger<RichTextRequiredValidator> logger) : base(textService)
+    public RichTextRequiredValidator(IJsonSerializer jsonSerializer, ILogger<RichTextRequiredValidator> logger) : base()
     {
         _jsonSerializer = jsonSerializer;
         _logger = logger;

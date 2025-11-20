@@ -13,13 +13,15 @@ public class AllTelemetryController : TelemetryControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<TelemetryResponseModel>), StatusCodes.Status200OK)]
-    public async Task<PagedViewModel<TelemetryResponseModel>> GetAll(
+    [EndpointSummary("Gets telemetry data.")]
+    [EndpointDescription("Gets telemetry data and statistics for the Umbraco installation.")]
+    public Task<PagedViewModel<TelemetryResponseModel>> GetAll(
         CancellationToken cancellationToken,
         int skip = 0,
         int take = 100)
     {
         TelemetryLevel[] levels = Enum.GetValues<TelemetryLevel>();
-        return await Task.FromResult(new PagedViewModel<TelemetryResponseModel>
+        return Task.FromResult(new PagedViewModel<TelemetryResponseModel>
         {
             Total = levels.Length,
             Items = levels.Skip(skip).Take(take).Select(level => new TelemetryResponseModel { TelemetryLevel = level }),

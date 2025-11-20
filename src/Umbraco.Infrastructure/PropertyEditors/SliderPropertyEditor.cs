@@ -48,7 +48,7 @@ public class SliderPropertyEditor : DataEditor
     /// <summary>
     /// Defines the value editor for the slider property editor.
     /// </summary>
-    internal class SliderPropertyValueEditor : DataValueEditor
+    internal sealed class SliderPropertyValueEditor : DataValueEditor
     {
         private readonly IJsonSerializer _jsonSerializer;
 
@@ -99,7 +99,7 @@ public class SliderPropertyEditor : DataEditor
         /// <summary>
         /// Represents a slider value.
         /// </summary>
-        internal class SliderRange
+        internal sealed class SliderRange
         {
             /// <summary>
             /// Gets or sets the slider range from value.
@@ -156,7 +156,7 @@ public class SliderPropertyEditor : DataEditor
             /// <summary>
             /// Parses a <see cref="SliderRange"/> from the provided value.
             /// </summary>
-            protected bool TryParsePropertyValue(object? value, [NotNullWhen(true)] out SliderRange? parsedValue)
+            protected static bool TryParsePropertyValue(object? value, [NotNullWhen(true)] out SliderRange? parsedValue)
             {
                 if (value is null || value is not JsonObject valueAsJsonObject)
                 {
@@ -188,7 +188,7 @@ public class SliderPropertyEditor : DataEditor
         /// <summary>
         /// Validates the range configuration for the slider property editor.
         /// </summary>
-        internal class RangeValidator : SliderPropertyConfigurationValidatorBase, IValueValidator
+        internal sealed class RangeValidator : SliderPropertyConfigurationValidatorBase, IValueValidator
         {
             /// <summary>
             /// Initializes a new instance of the <see cref="MinMaxValidator"/> class.
@@ -230,7 +230,7 @@ public class SliderPropertyEditor : DataEditor
         /// <summary>
         /// Validates the min/max configuration for the slider property editor.
         /// </summary>
-        internal class MinMaxValidator : SliderPropertyConfigurationValidatorBase, IValueValidator
+        internal sealed class MinMaxValidator : SliderPropertyConfigurationValidatorBase, IValueValidator
         {
             /// <summary>
             /// Initializes a new instance of the <see cref="MinMaxValidator"/> class.
@@ -272,7 +272,7 @@ public class SliderPropertyEditor : DataEditor
         /// <summary>
         /// Validates the step configuration for the slider property editor.
         /// </summary>
-        internal class StepValidator : SliderPropertyConfigurationValidatorBase, IValueValidator
+        internal sealed class StepValidator : SliderPropertyConfigurationValidatorBase, IValueValidator
         {
             /// <summary>
             /// Initializes a new instance of the <see cref="StepValidator"/> class.

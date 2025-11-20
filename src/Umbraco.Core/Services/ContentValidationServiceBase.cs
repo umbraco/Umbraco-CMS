@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.ContentEditing.Validation;
@@ -31,9 +32,17 @@ internal abstract class ContentValidationServiceBase<TContentType>
 
         IPropertyType[] contentTypePropertyTypes = contentType.CompositionPropertyTypes.ToArray();
         IPropertyType[] invariantPropertyTypes = contentTypePropertyTypes
-            .Where(propertyType => propertyType.VariesByNothing())
+            .Where(propertyType => propertyType.Variations == ContentVariation.Nothing)
             .ToArray();
-        IPropertyType[] variantPropertyTypes = contentTypePropertyTypes.Except(invariantPropertyTypes).ToArray();
+        IPropertyType[] cultureVariantPropertyTypes = contentTypePropertyTypes
+            .Where(propertyType => propertyType.Variations == ContentVariation.Culture)
+            .ToArray();
+        IPropertyType[] segmentVariantPropertyTypes = contentTypePropertyTypes
+            .Where(propertyType => propertyType.Variations == ContentVariation.Segment)
+            .ToArray();
+        IPropertyType[] cultureAndSegmentVariantPropertyTypes = contentTypePropertyTypes
+            .Where(propertyType => propertyType.Variations == ContentVariation.CultureAndSegment)
+            .ToArray();
 
         var cultures = culturesToValidate?.WhereNotNull().Except(["*"]).ToArray();
         if (cultures?.Any() is not true)
@@ -42,11 +51,14 @@ internal abstract class ContentValidationServiceBase<TContentType>
         }
 
         // we don't have any managed segments, so we have to make do with the ones passed in the model
-        var segments = contentEditingModelBase.Variants
-            .Where(variant => variant.Culture is null || cultures.Contains(variant.Culture))
-            .DistinctBy(variant => variant.Segment).Select(variant => variant.Segment)
-            .WhereNotNull()
-            .ToArray();
+        var segments =
+            new string?[] { null }
+                .Union(contentEditingModelBase.Variants
+                    .Where(variant => variant.Culture is null || cultures.Contains(variant.Culture))
+                    .DistinctBy(variant => variant.Segment).Select(variant => variant.Segment)
+                    .WhereNotNull()
+                )
+                .ToArray();
 
         foreach (IPropertyType propertyType in invariantPropertyTypes)
         {
@@ -55,16 +67,45 @@ internal abstract class ContentValidationServiceBase<TContentType>
                 Culture = null, Segment = null, CulturesBeingValidated = cultures, SegmentsBeingValidated = segments
             };
 
-            PropertyValueModel? propertyValueModel = contentEditingModelBase.InvariantProperties.FirstOrDefault(propertyValue => propertyValue.Alias == propertyType.Alias);
+            PropertyValueModel? propertyValueModel = contentEditingModelBase
+                .Properties
+                .FirstOrDefault(propertyValue => propertyValue.Alias == propertyType.Alias && propertyValue.Culture is null && propertyValue.Segment is null);
             validationErrors.AddRange(ValidateProperty(propertyType, propertyValueModel, validationContext));
         }
 
-        if (variantPropertyTypes.Any() is false)
+        foreach (IPropertyType propertyType in cultureVariantPropertyTypes)
         {
-            return new ContentValidationResult { ValidationErrors = validationErrors };
+            foreach (var culture in cultures)
+            {
+                var validationContext = new PropertyValidationContext
+                {
+                    Culture = culture, Segment = null, CulturesBeingValidated = cultures, SegmentsBeingValidated = segments
+                };
+
+                PropertyValueModel? propertyValueModel = contentEditingModelBase
+                    .Properties
+                    .FirstOrDefault(propertyValue => propertyValue.Alias == propertyType.Alias && propertyValue.Culture.InvariantEquals(culture) && propertyValue.Segment is null);
+                validationErrors.AddRange(ValidateProperty(propertyType, propertyValueModel, validationContext));
+            }
         }
 
-        foreach (IPropertyType propertyType in variantPropertyTypes)
+        foreach (IPropertyType propertyType in segmentVariantPropertyTypes)
+        {
+            foreach (var segment in segments)
+            {
+                var validationContext = new PropertyValidationContext
+                {
+                    Culture = null, Segment = segment, CulturesBeingValidated = cultures, SegmentsBeingValidated = segments
+                };
+
+                PropertyValueModel? propertyValueModel = contentEditingModelBase
+                    .Properties
+                    .FirstOrDefault(propertyValue => propertyValue.Alias == propertyType.Alias && propertyValue.Culture is null && propertyValue.Segment.InvariantEquals(segment));
+                validationErrors.AddRange(ValidateProperty(propertyType, propertyValueModel, validationContext));
+            }
+        }
+
+        foreach (IPropertyType propertyType in cultureAndSegmentVariantPropertyTypes)
         {
             foreach (var culture in cultures)
             {
@@ -76,10 +117,8 @@ internal abstract class ContentValidationServiceBase<TContentType>
                     };
 
                     PropertyValueModel? propertyValueModel = contentEditingModelBase
-                        .Variants
-                        .FirstOrDefault(variant => string.Equals(variant.Culture, culture, StringComparison.InvariantCultureIgnoreCase) && string.Equals(segment, variant.Segment, StringComparison.InvariantCultureIgnoreCase))?
                         .Properties
-                        .FirstOrDefault(propertyValue => propertyValue.Alias == propertyType.Alias);
+                        .FirstOrDefault(propertyValue => propertyValue.Alias == propertyType.Alias && propertyValue.Culture.InvariantEquals(culture) && propertyValue.Segment.InvariantEquals(segment));
                     validationErrors.AddRange(ValidateProperty(propertyType, propertyValueModel, validationContext));
                 }
             }
@@ -99,7 +138,7 @@ internal abstract class ContentValidationServiceBase<TContentType>
         return invalidCultures.IsCollectionEmpty();
     }
 
-    private async Task<string[]> GetCultureCodes() => (await _languageService.GetAllAsync()).Select(language => language.IsoCode).ToArray();
+    private async Task<string[]> GetCultureCodes() => (await _languageService.GetAllIsoCodesAsync()).ToArray();
 
     private IEnumerable<PropertyValidationError> ValidateProperty(IPropertyType propertyType, PropertyValueModel? propertyValueModel, PropertyValidationContext validationContext)
     {

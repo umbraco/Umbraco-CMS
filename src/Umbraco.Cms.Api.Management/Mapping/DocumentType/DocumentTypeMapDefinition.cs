@@ -41,7 +41,7 @@ public class DocumentTypeMapDefinition : ContentTypeMapDefinition<IContentType, 
                 new DocumentTypeSort { DocumentType = new ReferenceByIdModel(ct.Key), SortOrder = ct.SortOrder })
             .OrderBy(ct => ct.SortOrder)
             .ToArray() ?? Enumerable.Empty<DocumentTypeSort>();
-        target.Compositions = MapNestedCompositions(
+        target.Compositions = MapCompositions(
             source.ContentTypeComposition,
             source.ParentId,
             (referenceByIdModel, compositionType) => new DocumentTypeComposition
@@ -115,9 +115,10 @@ public class DocumentTypeMapDefinition : ContentTypeMapDefinition<IContentType, 
         target.Id = source.Key;
         target.Alias = source.Alias;
         target.Icon = source.Icon ?? string.Empty;
+        target.Collection = ReferenceByIdModel.ReferenceOrNull(source.ListView);
     }
 
-    // Umbraco.Code.MapAll
+    // Umbraco.Code.MapAll -Flags
     private void Map(IContent source, DocumentTypeBlueprintItemResponseModel target, MapperContext context)
     {
         target.Id = source.Key;

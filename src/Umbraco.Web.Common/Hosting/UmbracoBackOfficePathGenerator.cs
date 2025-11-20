@@ -1,6 +1,4 @@
-using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Extensions;
 
@@ -12,12 +10,9 @@ public class UmbracoBackOfficePathGenerator : IBackOfficePathGenerator
     private string? _backofficeAssetsPath;
     private string? _backOfficeVirtualDirectory;
 
-    public UmbracoBackOfficePathGenerator(
-        IHostingEnvironment hostingEnvironment,
-        IUmbracoVersion umbracoVersion,
-        IOptions<GlobalSettings> globalSettings)
+    public UmbracoBackOfficePathGenerator(IHostingEnvironment hostingEnvironment, IUmbracoVersion umbracoVersion)
     {
-        BackOfficePath = globalSettings.Value.GetBackOfficePath(hostingEnvironment);
+        BackOfficePath = hostingEnvironment.GetBackOfficePath();
         BackOfficeCacheBustHash = UrlHelperExtensions.GetCacheBustHash(hostingEnvironment, umbracoVersion);
     }
 

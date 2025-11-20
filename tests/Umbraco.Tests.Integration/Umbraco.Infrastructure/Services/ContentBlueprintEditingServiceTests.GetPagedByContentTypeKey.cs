@@ -17,7 +17,7 @@ public partial class ContentBlueprintEditingServiceTests
             var createModel = new ContentBlueprintCreateModel
             {
                 ContentTypeKey = contentType.Key,
-                InvariantName = $"Blueprint {i}",
+                Variants = [new VariantModel { Name = $"Blueprint {i}" }],
             };
 
             await ContentBlueprintEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);

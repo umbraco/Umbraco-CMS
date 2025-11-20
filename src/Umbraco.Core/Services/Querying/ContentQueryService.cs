@@ -23,23 +23,23 @@ public class ContentQueryService : IContentQueryService
         _coreScopeProvider = coreScopeProvider;
     }
 
-    public async Task<Attempt<ContentScheduleQueryResult?, ContentQueryOperationStatus>> GetWithSchedulesAsync(Guid id)
+    public Task<Attempt<ContentScheduleQueryResult?, ContentQueryOperationStatus>> GetWithSchedulesAsync(Guid id)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
 
-        IContent? content = await Task.FromResult(_contentService.GetById(id));
+        IContent? content = _contentService.GetById(id);
 
         if (content == null)
         {
-            return Attempt<ContentScheduleQueryResult, ContentQueryOperationStatus>.Fail(ContentQueryOperationStatus
-                .ContentNotFound);
+            return Task.FromResult(Attempt<ContentScheduleQueryResult, ContentQueryOperationStatus>.Fail(ContentQueryOperationStatus
+                .ContentNotFound));
         }
 
         ContentScheduleCollection schedules = _contentService.GetContentScheduleByContentId(id);
 
-        return Attempt<ContentScheduleQueryResult?, ContentQueryOperationStatus>
+        return Task.FromResult(Attempt<ContentScheduleQueryResult?, ContentQueryOperationStatus>
             .Succeed(
                 ContentQueryOperationStatus.Success,
-                new ContentScheduleQueryResult(content, schedules));
+                new ContentScheduleQueryResult(content, schedules)));
     }
 }

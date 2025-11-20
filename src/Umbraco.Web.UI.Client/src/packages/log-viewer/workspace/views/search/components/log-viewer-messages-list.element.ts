@@ -1,10 +1,10 @@
-import type { UmbLogViewerWorkspaceContext } from '../../../logviewer-workspace.context.js';
 import { UMB_APP_LOG_VIEWER_CONTEXT } from '../../../logviewer-workspace.context-token.js';
 import type { UUIScrollContainerElement, UUIPaginationElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { LogMessageResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { DirectionModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { consumeContext } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-log-viewer-messages-list')
 export class UmbLogViewerMessagesListElement extends UmbLitElement {
@@ -23,46 +23,45 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 	@state()
 	private _isLoading = true;
 
-	#logViewerContext?: UmbLogViewerWorkspaceContext;
+	#logViewerContext?: typeof UMB_APP_LOG_VIEWER_CONTEXT.TYPE;
 
-	constructor() {
-		super();
-		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT, (instance) => {
-			this.#logViewerContext = instance;
-			this.#observeLogs();
-		});
+	@consumeContext({ context: UMB_APP_LOG_VIEWER_CONTEXT })
+	private set _logViewerContext(value) {
+		this.#logViewerContext = value;
+		this.#observeLogs();
+	}
+	private get _logViewerContext() {
+		return this.#logViewerContext;
 	}
 
 	#observeLogs() {
-		if (!this.#logViewerContext) return;
-
-		this.observe(this.#logViewerContext.logs, (logs) => {
+		this.observe(this._logViewerContext?.logs, (logs) => {
 			this._logs = logs ?? [];
 		});
 
-		this.observe(this.#logViewerContext.isLoadingLogs, (isLoading) => {
-			this._isLoading = isLoading === null ? this._isLoading : isLoading;
+		this.observe(this._logViewerContext?.isLoadingLogs, (isLoading) => {
+			this._isLoading = isLoading ?? this._isLoading;
 		});
 
-		this.observe(this.#logViewerContext.logsTotal, (total) => {
+		this.observe(this._logViewerContext?.logsTotal, (total) => {
 			this._logsTotal = total ?? 0;
 		});
 
-		this.observe(this.#logViewerContext.sortingDirection, (direction) => {
-			this._sortingDirection = direction;
+		this.observe(this._logViewerContext?.sortingDirection, (direction) => {
+			this._sortingDirection = direction ?? this._sortingDirection;
 		});
 	}
 
 	#sortLogs() {
-		this.#logViewerContext?.toggleSortOrder();
-		this.#logViewerContext?.setCurrentPage(1);
-		this.#logViewerContext?.getLogs();
+		this._logViewerContext?.toggleSortOrder();
+		this._logViewerContext?.setCurrentPage(1);
+		this._logViewerContext?.getLogs();
 	}
 
-	_onPageChange(event: Event): void {
+	#onPageChange(event: Event): void {
 		const current = (event.target as UUIPaginationElement).current;
-		this.#logViewerContext?.setCurrentPage(current);
-		this.#logViewerContext?.getLogs();
+		this._logViewerContext?.setCurrentPage(current);
+		this._logViewerContext?.getLogs();
 		this._logsScrollContainer.scrollTop = 0;
 	}
 
@@ -74,7 +73,13 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 		if (totalPages <= 1) return '';
 
 		return html`<div id="pagination">
-			<uui-pagination .total=${totalPages} @change="${this._onPageChange}"></uui-pagination>
+			<uui-pagination
+				.total=${totalPages}
+				firstlabel=${this.localize.term('general_first')}
+				previouslabel=${this.localize.term('general_previous')}
+				nextlabel=${this.localize.term('general_next')}
+				lastlabel=${this.localize.term('general_last')}
+				@change="${this.#onPageChange}"></uui-pagination>
 		</div>`;
 	}
 

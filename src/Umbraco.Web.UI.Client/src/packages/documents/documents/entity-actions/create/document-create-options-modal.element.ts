@@ -1,4 +1,9 @@
 import { UmbDocumentItemRepository } from '../../item/index.js';
+import {
+	UMB_CREATE_DOCUMENT_WORKSPACE_PATH_PATTERN,
+	UMB_CREATE_FROM_BLUEPRINT_DOCUMENT_WORKSPACE_PATH_PATTERN,
+} from '../../paths.js';
+import type { UmbDocumentEntityTypeUnion } from '../../entity.js';
 import type {
 	UmbDocumentCreateOptionsModalData,
 	UmbDocumentCreateOptionsModalValue,
@@ -14,11 +19,6 @@ import {
 	UmbDocumentBlueprintItemRepository,
 	type UmbDocumentBlueprintItemBaseModel,
 } from '@umbraco-cms/backoffice/document-blueprint';
-import {
-	UMB_CREATE_DOCUMENT_WORKSPACE_PATH_PATTERN,
-	UMB_CREATE_FROM_BLUEPRINT_DOCUMENT_WORKSPACE_PATH_PATTERN,
-	type UmbDocumentEntityTypeUnion,
-} from '@umbraco-cms/backoffice/document';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 
 @customElement('umb-document-create-options-modal')
@@ -120,10 +120,12 @@ export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
 	}
 
 	override render() {
+		const renderBlueprint = this._availableBlueprints.length && this.#documentTypeUnique;
+		const headline = renderBlueprint ? this.localize.term('blueprints_selectBlueprint') : this._headline;
 		return html`
-			<umb-body-layout headline=${this.localize.term('actions_create')}>
+			<uui-dialog-layout headline=${headline}>
 				${when(
-					this._availableBlueprints.length && this.#documentTypeUnique,
+					renderBlueprint,
 					() => this.#renderBlueprints(),
 					() => this.#renderDocumentTypes(),
 				)}
@@ -132,7 +134,7 @@ export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
 					id="cancel"
 					label=${this.localize.term('general_cancel')}
 					@click="${this._rejectModal}"></uui-button>
-			</umb-body-layout>
+			</uui-dialog-layout>
 		`;
 	}
 
@@ -164,52 +166,46 @@ export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
 	}
 
 	#renderDocumentTypes() {
-		return html`
-			<uui-box .headline=${this._headline}>
-				${when(
-					this._allowedDocumentTypes.length === 0,
-					() => this.#renderNoDocumentTypes(),
-					() =>
-						repeat(
-							this._allowedDocumentTypes,
-							(documentType) => documentType.unique,
-							(documentType) => html`
-								<uui-ref-node-document-type
-									.name=${this.localize.string(documentType.name)}
-									.alias=${this.localize.string(documentType.description ?? '')}
-									select-only
-									selectable
-									@selected=${() => this.#onSelectDocumentType(documentType.unique)}
-									@open=${() => this.#onSelectDocumentType(documentType.unique)}>
-									<umb-icon slot="icon" name=${documentType.icon || 'icon-circle-dotted'}></umb-icon>
-								</uui-ref-node-document-type>
-							`,
-						),
-				)}
-			</uui-box>
-		`;
+		return when(
+			this._allowedDocumentTypes.length === 0,
+			() => this.#renderNoDocumentTypes(),
+			() =>
+				repeat(
+					this._allowedDocumentTypes,
+					(documentType) => documentType.unique,
+					(documentType) => html`
+						<uui-ref-node-document-type
+							.name=${this.localize.string(documentType.name)}
+							.alias=${this.localize.string(documentType.description ?? '')}
+							select-only
+							selectable
+							@selected=${() => this.#onSelectDocumentType(documentType.unique)}
+							@open=${() => this.#onSelectDocumentType(documentType.unique)}>
+							<umb-icon slot="icon" name=${documentType.icon || 'icon-circle-dotted'}></umb-icon>
+						</uui-ref-node-document-type>
+					`,
+				),
+		);
 	}
 
 	#renderBlueprints() {
 		return html`
-			<uui-box headline=${this.localize.term('blueprints_selectBlueprint')}>
-				<uui-menu-item
-					id="blank"
-					label=${this.localize.term('blueprints_blankBlueprint')}
-					@click=${() => this.#onNavigate(this.#documentTypeUnique)}>
-					<umb-icon slot="icon" name=${this.#documentTypeIcon}></umb-icon>
-				</uui-menu-item>
-				${repeat(
-					this._availableBlueprints,
-					(blueprint) => blueprint.unique,
-					(blueprint) =>
-						html`<uui-menu-item
-							label=${blueprint.name}
-							@click=${() => this.#onNavigate(this.#documentTypeUnique, blueprint.unique)}>
-							<umb-icon slot="icon" name="icon-blueprint"></umb-icon>
-						</uui-menu-item>`,
-				)}
-			</uui-box>
+			<uui-menu-item
+				id="blank"
+				label=${this.localize.term('blueprints_blankBlueprint')}
+				@click=${() => this.#onNavigate(this.#documentTypeUnique)}>
+				<umb-icon slot="icon" name=${this.#documentTypeIcon}></umb-icon>
+			</uui-menu-item>
+			${repeat(
+				this._availableBlueprints,
+				(blueprint) => blueprint.unique,
+				(blueprint) =>
+					html`<uui-menu-item
+						label=${blueprint.name}
+						@click=${() => this.#onNavigate(this.#documentTypeUnique, blueprint.unique)}>
+						<umb-icon slot="icon" name="icon-blueprint"></umb-icon>
+					</uui-menu-item>`,
+			)}
 		`;
 	}
 

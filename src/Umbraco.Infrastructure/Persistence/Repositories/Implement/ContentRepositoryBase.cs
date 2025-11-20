@@ -1,12 +1,13 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Querying;
@@ -38,21 +39,36 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         private readonly DataValueReferenceFactoryCollection _dataValueReferenceFactories;
         private readonly IEventAggregator _eventAggregator;
 
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="scopeAccessor"></param>
-        /// <param name="cache"></param>
-        /// <param name="logger"></param>
-        /// <param name="languageRepository"></param>
-        /// <param name="relationRepository"></param>
-        /// <param name="relationTypeRepository"></param>
-        /// <param name="dataValueReferenceFactories"></param>
-        /// <param name="dataTypeService"></param>
-        /// <param name="eventAggregator"></param>
-        /// <param name="propertyEditors">
-        ///     Lazy property value collection - must be lazy because we have a circular dependency since some property editors require services, yet these services require property editors
-        /// </param>
+        protected ContentRepositoryBase(
+            IScopeAccessor scopeAccessor,
+            AppCaches cache,
+            ILogger<EntityRepositoryBase<TId, TEntity>> logger,
+            ILanguageRepository languageRepository,
+            IRelationRepository relationRepository,
+            IRelationTypeRepository relationTypeRepository,
+            PropertyEditorCollection propertyEditors,
+            DataValueReferenceFactoryCollection dataValueReferenceFactories,
+            IDataTypeService dataTypeService,
+            IEventAggregator eventAggregator,
+            IRepositoryCacheVersionService repositoryCacheVersionService,
+            ICacheSyncService cacheSyncService)
+            : base(
+                scopeAccessor,
+                cache,
+                logger,
+                repositoryCacheVersionService,
+                cacheSyncService)
+        {
+            DataTypeService = dataTypeService;
+            LanguageRepository = languageRepository;
+            RelationRepository = relationRepository;
+            RelationTypeRepository = relationTypeRepository;
+            PropertyEditors = propertyEditors;
+            _dataValueReferenceFactories = dataValueReferenceFactories;
+            _eventAggregator = eventAggregator;
+        }
+
+        [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
         protected ContentRepositoryBase(
             IScopeAccessor scopeAccessor,
             AppCaches cache,
@@ -64,16 +80,22 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             DataValueReferenceFactoryCollection dataValueReferenceFactories,
             IDataTypeService dataTypeService,
             IEventAggregator eventAggregator)
-            : base(scopeAccessor, cache, logger)
+            : this(
+                scopeAccessor,
+                cache,
+                logger,
+                languageRepository,
+                relationRepository,
+                relationTypeRepository,
+                propertyEditors,
+                dataValueReferenceFactories,
+                dataTypeService,
+                eventAggregator,
+                StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>(),
+                StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>())
         {
-            DataTypeService = dataTypeService;
-            LanguageRepository = languageRepository;
-            RelationRepository = relationRepository;
-            RelationTypeRepository = relationTypeRepository;
-            PropertyEditors = propertyEditors;
-            _dataValueReferenceFactories = dataValueReferenceFactories;
-            _eventAggregator = eventAggregator;
         }
+
 
         protected abstract TRepository This { get; }
 
@@ -530,12 +552,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             // needs to be an outer join since there's no guarantee that any of the nodes have values for this property
             Sql<ISqlContext> innerSql = Sql().Select($@"CASE
-                            WHEN intValue IS NOT NULL THEN {sortedInt}
-                            WHEN decimalValue IS NOT NULL THEN {sortedDecimal}
-                            WHEN dateValue IS NOT NULL THEN {sortedDate}
+                            WHEN {QuoteColumnName("intValue")} IS NOT NULL THEN {sortedInt}
+                            WHEN {QuoteColumnName("decimalValue")} IS NOT NULL THEN {sortedDecimal}
+                            WHEN {QuoteColumnName("dateValue")} IS NOT NULL THEN {sortedDate}
                             ELSE {sortedString}
-                        END AS customPropVal,
-                        cver.nodeId AS customPropNodeId")
+                        END AS {SqlSyntax.GetQuotedName("customPropVal")},
+                        cver.{QuoteColumnName("nodeId")} AS {SqlSyntax.GetQuotedName("customPropNodeId")}")
                 .From<ContentVersionDto>("cver")
                 .InnerJoin<PropertyDataDto>("opdata")
                     .On<ContentVersionDto, PropertyDataDto>((version, pdata) => version.Id == pdata.VersionId, "cver", "opdata")
@@ -550,14 +572,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             var innerSqlString = ParameterHelper.ProcessParams(innerSql.SQL, innerSql.Arguments, argsList);
 
             // create the outer join complete sql fragment
-            var outerJoinTempTable = $@"LEFT OUTER JOIN ({innerSqlString}) AS customPropData
-                ON customPropData.customPropNodeId = {Constants.DatabaseSchema.Tables.Node}.id "; // trailing space is important!
+            var outerJoinTempTable = $@"LEFT OUTER JOIN ({innerSqlString}) AS {SqlSyntax.GetQuotedName("customPropData")}
+                ON {SqlSyntax.GetQuotedName("customPropData")}.{QuoteColumnName("customPropNodeId")} = {QuoteTableName(NodeDto.TableName)}.id "; // trailing space is important!
 
             // insert this just above the first WHERE
             var newSql = InsertBefore(sql.SQL, "WHERE", outerJoinTempTable);
 
             // see notes in ApplyOrdering: the field MUST be selected + aliased
-            newSql = InsertBefore(newSql, "FROM", ", customPropData.customPropVal AS ordering "); // trailing space is important!
+            newSql = InsertBefore(newSql, "FROM", $", {SqlSyntax.GetQuotedName("customPropData")}.{QuoteColumnName("customPropVal")} AS ordering "); // trailing space is important!
 
             // create the new sql
             sql = Sql(newSql, argsList.ToArray());
@@ -907,7 +929,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         protected string GetQuotedFieldName(string tableName, string fieldName)
         {
-            return SqlContext.SqlSyntax.GetQuotedTableName(tableName) + "." + SqlContext.SqlSyntax.GetQuotedColumnName(fieldName);
+            return QuoteTableName(tableName) + "." + QuoteColumnName(fieldName);
         }
 
         #region UnitOfWork Notification
@@ -1016,7 +1038,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         protected virtual bool SortorderExists(int parentId, int sortOrder)
         {
             SqlTemplate? template = SqlContext.Templates.Get(Constants.SqlTemplates.VersionableRepository.SortOrderExists, tsql => tsql
-                .Select("sortOrder")
+                .Select<NodeDto>(c => c.SortOrder)
                 .From<NodeDto>()
                 .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType") &&
                 x.ParentId == SqlTemplate.Arg<int>("parentId") &&
@@ -1031,7 +1053,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         protected virtual int GetNewChildSortOrder(int parentId, int first)
         {
             SqlTemplate? template = SqlContext.Templates.Get(Constants.SqlTemplates.VersionableRepository.GetSortOrder, tsql => tsql
-                .Select("MAX(sortOrder)")
+                .SelectMax<NodeDto>(c => c.SortOrder)
                 .From<NodeDto>()
                 .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType") && x.ParentId == SqlTemplate.Arg<int>("parentId")));
 
@@ -1073,88 +1095,16 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         public abstract int RecycleBinId { get; }
 
-        public virtual IEnumerable<TEntity>? GetRecycleBin()
+        public virtual IEnumerable<TEntity> GetRecycleBin()
         {
             return Get(Query<TEntity>().Where(entity => entity.Trashed));
         }
 
         #endregion
 
+        [Obsolete("This method is no longer used as the persistance of relations has been moved to the ContentRelationsUpdate notification handler. Scheduled for removal in Umbraco 18.")]
         protected void PersistRelations(TEntity entity)
-        {
-            // Get all references and automatic relation type aliases
-            ISet<UmbracoEntityReference> references = _dataValueReferenceFactories.GetAllReferences(entity.Properties, PropertyEditors);
-            ISet<string> automaticRelationTypeAliases = _dataValueReferenceFactories.GetAllAutomaticRelationTypesAliases(PropertyEditors);
-
-            if (references.Count == 0)
-            {
-                // Delete all relations using the automatic relation type aliases
-                 RelationRepository.DeleteByParent(entity.Id, automaticRelationTypeAliases.ToArray());
-
-                // No need to add new references/relations
-                return;
-            }
-
-            // Lookup all relation type IDs
-            var relationTypeLookup = RelationTypeRepository.GetMany(Array.Empty<int>())
-                .Where(x => automaticRelationTypeAliases.Contains(x.Alias))
-                .ToDictionary(x => x.Alias, x => x.Id);
-
-            // Lookup node IDs for all GUID based UDIs
-            IEnumerable<Guid> keys = references.Select(x => x.Udi).OfType<GuidUdi>().Select(x => x.Guid);
-            var keysLookup = Database.FetchByGroups<NodeIdKey, Guid>(keys, Constants.Sql.MaxParameterCount, guids =>
-            {
-                return Sql()
-                    .Select<NodeDto>(x => x.NodeId, x => x.UniqueId)
-                    .From<NodeDto>()
-                    .WhereIn<NodeDto>(x => x.UniqueId, guids);
-            }).ToDictionary(x => x.UniqueId, x => x.NodeId);
-
-            // Get all valid relations
-            var relations = new List<(int ChildId, int RelationTypeId)>(references.Count);
-            foreach (UmbracoEntityReference reference in references)
-            {
-                if (string.IsNullOrEmpty(reference.RelationTypeAlias))
-                {
-                    // Reference does not specify a relation type alias, so skip adding a relation
-                    Logger.LogDebug("The reference to {Udi} does not specify a relation type alias, so it will not be saved as relation.", reference.Udi);
-                }
-                else if (!automaticRelationTypeAliases.Contains(reference.RelationTypeAlias))
-            {
-                    // Returning a reference that doesn't use an automatic relation type is an issue that should be fixed in code
-                    Logger.LogError("The reference to {Udi} uses a relation type {RelationTypeAlias} that is not an automatic relation type.", reference.Udi, reference.RelationTypeAlias);
-                }
-                else if (!relationTypeLookup.TryGetValue(reference.RelationTypeAlias, out int relationTypeId))
-                {
-                    // A non-existent relation type could be caused by an environment issue (e.g. it was manually removed)
-                    Logger.LogWarning("The reference to {Udi} uses a relation type {RelationTypeAlias} that does not exist.", reference.Udi, reference.RelationTypeAlias);
-                }
-                else if (reference.Udi is not GuidUdi udi || !keysLookup.TryGetValue(udi.Guid, out var id))
-                {
-                    // Relations only support references to items that are stored in the NodeDto table (because of foreign key constraints)
-                    Logger.LogInformation("The reference to {Udi} can not be saved as relation, because doesn't have a node ID.", reference.Udi);
-                }
-                else
-                {
-                    relations.Add((id, relationTypeId));
-                }
-            }
-
-            // Get all existing relations (optimize for adding new and keeping existing relations)
-            var query = Query<IRelation>().Where(x => x.ParentId == entity.Id).WhereIn(x => x.RelationTypeId, relationTypeLookup.Values);
-            var existingRelations = RelationRepository.GetPagedRelationsByQuery(query, 0, int.MaxValue, out _, null)
-                .ToDictionary(x => (x.ChildId, x.RelationTypeId)); // Relations are unique by parent ID, child ID and relation type ID
-
-            // Add relations that don't exist yet
-            var relationsToAdd = relations.Except(existingRelations.Keys).Select(x => new ReadOnlyRelation(entity.Id, x.ChildId, x.RelationTypeId));
-            RelationRepository.SaveBulk(relationsToAdd);
-
-            // Delete relations that don't exist anymore
-            foreach (IRelation relation in existingRelations.Where(x => !relations.Contains(x.Key)).Select(x => x.Value))
-            {
-                RelationRepository.Delete(relation);
-            }
-        }
+            => Logger.LogWarning("ContentRepositoryBase.PersistRelations was called but this is now an obsolete, no-op method that is unused in Umbraco. No relations were persisted. Relations persistence has moved to the ContentRelationsUpdate notification handler.");
 
         /// <summary>
         /// Inserts property values for the content entity
@@ -1205,23 +1155,36 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             IEnumerable<PropertyDataDto> propertyDataDtos = PropertyFactory.BuildDtos(entity.ContentType.Variations, entity.VersionId, publishedVersionId, entity.Properties, LanguageRepository, out edited, out editedCultures);
 
+            var toUpdate = new List<PropertyDataDto>();
+            var toInsert = new List<PropertyDataDto>();
             foreach (PropertyDataDto propertyDataDto in propertyDataDtos)
             {
                 // Check if this already exists and update, else insert a new one
                 if (propertyTypeToPropertyData.TryGetValue((propertyDataDto.PropertyTypeId, propertyDataDto.VersionId, propertyDataDto.LanguageId, propertyDataDto.Segment), out PropertyDataDto? propData))
                 {
                     propertyDataDto.Id = propData.Id;
-                    Database.Update(propertyDataDto);
+                    toUpdate.Add(propertyDataDto);
                 }
                 else
                 {
-                    // TODO: we can speed this up: Use BulkInsert and then do one SELECT to re-retrieve the property data inserted with assigned IDs.
-                    // This is a perfect thing to benchmark with Benchmark.NET to compare perf between Nuget releases.
-                    Database.Insert(propertyDataDto);
+                    toInsert.Add(propertyDataDto);
                 }
 
                 // track which ones have been processed
                 existingPropDataIds.Remove(propertyDataDto.Id);
+            }
+
+            if (toUpdate.Count > 0)
+            {
+                var updateBatch = toUpdate
+                    .Select(x => UpdateBatch.For(x))
+                    .ToList();
+                Database.UpdateBatch(updateBatch, new BatchOptions { BatchSize = 100 });
+            }
+
+            if (toInsert.Count > 0)
+            {
+                Database.InsertBulk(toInsert);
             }
 
             // For any remaining that haven't been processed they need to be deleted
@@ -1229,15 +1192,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             {
                 Database.Execute(SqlContext.Sql().Delete<PropertyDataDto>().WhereIn<PropertyDataDto>(x => x.Id, existingPropDataIds));
             }
-        }
-
-        private class NodeIdKey
-        {
-            [Column("id")]
-            public int NodeId { get; set; }
-
-            [Column("uniqueId")]
-            public Guid UniqueId { get; set; }
         }
     }
 }

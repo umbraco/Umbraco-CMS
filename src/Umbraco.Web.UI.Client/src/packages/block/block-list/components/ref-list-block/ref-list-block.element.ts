@@ -1,4 +1,4 @@
-import { css, customElement, html, nothing, property } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, property, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbBlockDataType } from '@umbraco-cms/backoffice/block';
 
@@ -14,6 +14,9 @@ export class UmbRefListBlockElement extends UmbLitElement {
 	@property({ type: String, reflect: false })
 	icon?: string;
 
+	@property({ type: Number, attribute: false })
+	index?: number;
+
 	@property({ type: Boolean, reflect: true })
 	unpublished?: boolean;
 
@@ -21,18 +24,24 @@ export class UmbRefListBlockElement extends UmbLitElement {
 	content?: UmbBlockDataType;
 
 	@property({ attribute: false })
+	settings?: UmbBlockDataType;
+
+	@property({ attribute: false })
 	config?: UmbBlockEditorCustomViewConfiguration;
 
 	override render() {
+		const blockValue = { ...this.content, $settings: this.settings, $index: this.index };
 		return html`
 			<uui-ref-node standalone href=${(this.config?.showContentEdit ? this.config?.editContentPath : undefined) ?? ''}>
 				<umb-icon slot="icon" .name=${this.icon}></umb-icon>
-				<umb-ufm-render slot="name" inline .markdown=${this.label} .value=${this.content}></umb-ufm-render>
-				${this.unpublished
-					? html`<uui-tag slot="name" look="secondary" title=${this.localize.term('blockEditor_notExposedDescription')}
+				<umb-ufm-render slot="name" inline .markdown=${this.label} .value=${blockValue}></umb-ufm-render>
+				${when(
+					this.unpublished,
+					() =>
+						html`<uui-tag slot="name" look="secondary" title=${this.localize.term('blockEditor_notExposedDescription')}
 							><umb-localize key="blockEditor_notExposedLabel"></umb-localize
-						></uui-tag>`
-					: nothing}
+						></uui-tag>`,
+				)}
 			</uui-ref-node>
 		`;
 	}

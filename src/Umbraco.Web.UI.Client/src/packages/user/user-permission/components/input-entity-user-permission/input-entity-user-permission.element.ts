@@ -1,7 +1,7 @@
 import type { ManifestEntityUserPermission } from '../../entity-user-permission.extension.js';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { html, customElement, property, state, nothing, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state, ifDefined, css, repeat } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbUserPermissionVerbElement } from '@umbraco-cms/backoffice/user';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -24,7 +24,7 @@ export class UmbInputEntityUserPermissionElement extends UmbFormControlMixin(Umb
 	allowedVerbs: Array<string> = [];
 
 	@state()
-	private _manifests: Array<ManifestEntityUserPermission> = [];
+	private _groupedPermissions: Array<[string, ManifestEntityUserPermission[]]> = [];
 
 	#manifestObserver?: UmbObserverController<Array<ManifestEntityUserPermission>>;
 
@@ -40,11 +40,18 @@ export class UmbInputEntityUserPermissionElement extends UmbFormControlMixin(Umb
 		this.#manifestObserver?.destroy();
 
 		this.#manifestObserver = this.observe(
-			umbExtensionsRegistry.byType('entityUserPermission'),
-			(userPermissionManifests) => {
-				this._manifests = userPermissionManifests.filter((manifest) =>
-					manifest.forEntityTypes.includes(this.entityType),
-				);
+			umbExtensionsRegistry.byTypeAndFilter('entityUserPermission', (manifest) =>
+				manifest.forEntityTypes.includes(this.entityType),
+			),
+			(manifests) => {
+				// TODO: groupBy is not known by TS yet
+				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+				// @ts-expect-error
+				const groupedPermissions = Object.groupBy(
+					manifests,
+					(manifest: ManifestEntityUserPermission) => manifest.meta.group,
+				) as Record<string, Array<ManifestEntityUserPermission>>;
+				this._groupedPermissions = Object.entries(groupedPermissions);
 			},
 			'umbUserPermissionManifestsObserver',
 		);
@@ -73,27 +80,14 @@ export class UmbInputEntityUserPermissionElement extends UmbFormControlMixin(Umb
 	}
 
 	override render() {
-		return html`${this.#renderGroupedPermissions(this._manifests)} `;
-	}
-
-	#renderGroupedPermissions(permissionManifests: Array<ManifestEntityUserPermission>) {
-		// TODO: groupBy is not known by TS yet
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-expect-error
-		const groupedPermissions = Object.groupBy(
-			permissionManifests,
-			(manifest: ManifestEntityUserPermission) => manifest.meta.group,
-		) as Record<string, Array<ManifestEntityUserPermission>>;
-		return html`
-			${Object.entries(groupedPermissions).map(
-				([group, manifests]) => html`
-					${group !== 'undefined'
-						? html` <h5><umb-localize .key=${`actionCategories_${group}`}>${group}</umb-localize></h5> `
-						: nothing}
-					${manifests.map((manifest) => html` ${this.#renderPermission(manifest)} `)}
-				`,
-			)}
-		`;
+		return repeat(this._groupedPermissions, ([group, manifests]) => {
+			const headline = group !== 'undefined' ? `#actionCategories_${group}` : `#actionCategories_general`;
+			return html`
+				<umb-property-layout label=${headline}>
+					<div slot="editor">${repeat(manifests, (manifest) => html` ${this.#renderPermission(manifest)} `)}</div>
+				</umb-property-layout>
+			`;
+		});
 	}
 
 	#renderPermission(manifest: ManifestEntityUserPermission) {
@@ -109,6 +103,12 @@ export class UmbInputEntityUserPermissionElement extends UmbFormControlMixin(Umb
 		super.disconnectedCallback();
 		this.#manifestObserver?.destroy();
 	}
+
+	static override styles = css`
+		umb-input-user-permission-verb:not(:last-of-type) {
+			border-bottom: 1px solid var(--uui-color-divider);
+		}
+	`;
 }
 
 export default UmbInputEntityUserPermissionElement;

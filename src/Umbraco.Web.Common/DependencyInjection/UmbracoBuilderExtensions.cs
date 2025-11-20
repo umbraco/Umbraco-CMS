@@ -1,13 +1,10 @@
 using System.Data.Common;
 using System.Net.Http.Headers;
 using System.Reflection;
-using System.Runtime.CompilerServices;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -36,6 +33,7 @@ using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.BackgroundJobs;
 using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
+using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.DistributedJobs;
 using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.ServerRegistration;
 using Umbraco.Cms.Infrastructure.DependencyInjection;
 using Umbraco.Cms.Infrastructure.HostedServices;
@@ -46,6 +44,7 @@ using Umbraco.Cms.Web.Common;
 using Umbraco.Cms.Web.Common.ApplicationModels;
 using Umbraco.Cms.Web.Common.AspNetCore;
 using Umbraco.Cms.Web.Common.Blocks;
+using Umbraco.Cms.Web.Common.Cache;
 using Umbraco.Cms.Web.Common.Configuration;
 using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Common.DependencyInjection;
@@ -104,6 +103,7 @@ public static partial class UmbracoBuilderExtensions
         // is just based on AsyncLocal, see https://github.com/dotnet/aspnetcore/blob/main/src/Http/Http/src/HttpContextAccessor.cs
         IHttpContextAccessor httpContextAccessor = new HttpContextAccessor();
         services.AddSingleton(httpContextAccessor);
+        services.AddUnique<IRepositoryCacheVersionAccessor, RepositoryCacheVersionAccessor>();
 
         var requestCache = new HttpContextRequestAppCache(httpContextAccessor);
         var appCaches = AppCaches.Create(requestCache);
@@ -119,8 +119,7 @@ public static partial class UmbracoBuilderExtensions
 
         TypeLoader typeLoader = services.AddTypeLoader(Assembly.GetEntryAssembly(), loggerFactory, config);
 
-        IHostingEnvironment tempHostingEnvironment = GetTemporaryHostingEnvironment(webHostEnvironment, config);
-        return new UmbracoBuilder(services, config, typeLoader, loggerFactory, profiler, appCaches, tempHostingEnvironment);
+        return new UmbracoBuilder(services, config, typeLoader, loggerFactory, profiler, appCaches);
     }
 
     /// <summary>
@@ -174,34 +173,6 @@ public static partial class UmbracoBuilderExtensions
     }
 
     /// <summary>
-    ///     Add Umbraco recurring background jobs
-    /// </summary>
-    public static IUmbracoBuilder AddRecurringBackgroundJobs(this IUmbracoBuilder builder)
-    {
-        // Add background jobs
-        builder.Services.AddRecurringBackgroundJob<HealthCheckNotifierJob>();
-        builder.Services.AddRecurringBackgroundJob<LogScrubberJob>();
-        builder.Services.AddRecurringBackgroundJob<ContentVersionCleanupJob>();
-        builder.Services.AddRecurringBackgroundJob<ScheduledPublishingJob>();
-        builder.Services.AddRecurringBackgroundJob<TempFileCleanupJob>();
-        builder.Services.AddRecurringBackgroundJob<TemporaryFileCleanupJob>();
-        builder.Services.AddRecurringBackgroundJob<InstructionProcessJob>();
-        builder.Services.AddRecurringBackgroundJob<TouchServerJob>();
-        builder.Services.AddRecurringBackgroundJob<WebhookFiring>();
-        builder.Services.AddRecurringBackgroundJob<WebhookLoggingCleanup>();
-        builder.Services.AddRecurringBackgroundJob<ReportSiteJob>();
-
-
-        builder.Services.AddSingleton(RecurringBackgroundJobHostedService.CreateHostedServiceFactory);
-        builder.Services.AddHostedService<RecurringBackgroundJobHostedServiceRunner>();
-        builder.Services.AddHostedService<QueuedHostedService>();
-        builder.AddNotificationAsyncHandler<PostRuntimePremigrationsUpgradeNotification, NavigationInitializationNotificationHandler>();
-        builder.AddNotificationAsyncHandler<PostRuntimePremigrationsUpgradeNotification, PublishStatusInitializationNotificationHandler>();
-
-        return builder;
-    }
-
-    /// <summary>
     ///     Adds the Umbraco request profiler
     /// </summary>
     public static IUmbracoBuilder AddUmbracoProfiler(this IUmbracoBuilder builder)
@@ -239,11 +210,6 @@ public static partial class UmbracoBuilderExtensions
         // TODO: We need to figure out if we can work around this because calling AddControllersWithViews modifies the global app and order is very important
         // this will directly affect developers who need to call that themselves.
         IMvcBuilder mvcBuilder = builder.Services.AddControllersWithViews();
-
-        if (builder.Config.GetRuntimeMode() != RuntimeMode.Production)
-        {
-            mvcBuilder.AddRazorRuntimeCompilation();
-        }
 
         mvcBuilding?.Invoke(mvcBuilder);
 
@@ -326,40 +292,6 @@ public static partial class UmbracoBuilderExtensions
 
         return builder;
     }
-
-    [Obsolete("This is not necessary any more. This will be removed in v16")]
-    public static IUmbracoBuilder AddWebServer(this IUmbracoBuilder builder)
-    {
-        builder.Services.Configure<KestrelServerOptions>(options =>
-        {
-            options.AllowSynchronousIO = true;
-        });
-
-        try
-        {
-            // See https://github.com/umbraco/Umbraco-CMS/pull/17886. This is a workaround for non-windows machines
-            // they won't have IIS available and trying to set this option will throw an exception.
-            //
-            // We're deferring this call to a method because if we just try to set the options here, we still get a
-            // TypeLoadException on non-windows machines.
-            // This workaround came from this comment: https://stackoverflow.com/a/3346975
-            AllowSynchronousIOForIIS(builder);
-        }
-        catch (TypeLoadException)
-        {
-            // Ignoring this exception because it's expected on non-windows machines
-        }
-        return builder;
-    }
-
-    // Prevents the compiler from inlining the method
-    [MethodImpl(MethodImplOptions.NoInlining)]
-    private static void AllowSynchronousIOForIIS(IUmbracoBuilder builder) =>
-        builder.Services.Configure<IISServerOptions>(
-            options =>
-            {
-                options.AllowSynchronousIO = true;
-            });
 
     private static IProfiler GetWebProfiler(IConfiguration config, IHttpContextAccessor httpContextAccessor)
     {

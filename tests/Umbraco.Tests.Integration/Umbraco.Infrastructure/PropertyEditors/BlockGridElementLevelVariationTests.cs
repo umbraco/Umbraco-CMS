@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.PropertyEditors;
 // NOTE: These tests are in place to ensure that element level variation works for Block Grid. Element level variation
 //       is tested more in-depth for Block List (see BlockListElementLevelVariationTests), but since the actual
 //       implementation is shared between Block List and Block Grid, we won't repeat all those tests here.
-internal class BlockGridElementLevelVariationTests : BlockEditorElementVariationTestBase
+internal sealed class BlockGridElementLevelVariationTests : BlockEditorElementVariationTestBase
 {
     private IJsonSerializer JsonSerializer => GetRequiredService<IJsonSerializer>();
 

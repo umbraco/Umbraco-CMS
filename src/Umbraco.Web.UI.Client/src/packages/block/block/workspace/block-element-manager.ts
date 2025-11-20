@@ -1,5 +1,4 @@
 import type { UmbBlockDataModel, UmbBlockDataValueModel, UmbBlockLayoutBaseModel } from '../types.js';
-import { UmbBlockElementValuesDataValidationPathTranslator } from '../validation/block-element-values-validation-path-translator.controller.js';
 import { UmbBlockElementPropertyDatasetContext } from './block-element-property-dataset.context.js';
 import type { UmbBlockWorkspaceContext } from './block-workspace.context.js';
 import type { UmbContentTypeModel, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
@@ -15,10 +14,16 @@ import { type UmbClassInterface, UmbControllerBase } from '@umbraco-cms/backoffi
 import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbValidationController } from '@umbraco-cms/backoffice/validation';
-import { UmbElementWorkspaceDataManager, type UmbElementPropertyDataOwner } from '@umbraco-cms/backoffice/content';
-import { UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
+import {
+	UmbContentValidationToHintsManager,
+	UmbElementWorkspaceDataManager,
+	type UmbElementPropertyDataOwner,
+} from '@umbraco-cms/backoffice/content';
+import { UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
 
 import { UmbDataTypeItemRepositoryManager } from '@umbraco-cms/backoffice/data-type';
+import { UmbVariantPropertyGuardManager } from '@umbraco-cms/backoffice/property';
+import { UmbHintContext, type UmbVariantHint } from '@umbraco-cms/backoffice/hint';
 
 export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel>
 	extends UmbControllerBase
@@ -34,7 +39,8 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 	});
 	#getDataResolver!: () => void;
 
-	public readonly readOnlyState = new UmbReadOnlyVariantStateManager(this);
+	// TODO: who is controlling this? We need to be aware about seperation of concerns. [NL]
+	public readonly readOnlyGuard = new UmbReadOnlyVariantGuardManager(this);
 
 	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
 	readonly variantId = this.#variantId.asObservable();
@@ -50,23 +56,50 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 	}
 
 	readonly #dataTypeItemManager = new UmbDataTypeItemRepositoryManager(this);
-	#dataTypeSchemaAliasMap = new Map<string, string>();
 
 	readonly structure = new UmbContentTypeStructureManager<UmbContentTypeModel>(
 		this,
 		new UmbDocumentTypeDetailRepository(this),
 	);
 
+	public readonly propertyViewGuard = new UmbVariantPropertyGuardManager(this);
+	public readonly propertyWriteGuard = new UmbVariantPropertyGuardManager(this);
+
 	readonly validation = new UmbValidationController(this);
 
-	constructor(host: UmbBlockWorkspaceContext<LayoutDataType>, dataPathPropertyName: string) {
+	readonly hints;
+
+	constructor(
+		host: UmbBlockWorkspaceContext<LayoutDataType>,
+		dataPathPropertyName: string,
+		workspaceViewAlias: string,
+	) {
 		super(host);
+
+		this.hints = new UmbHintContext<UmbVariantHint>(this, { viewAlias: workspaceViewAlias });
+		this.hints.inherit();
+		new UmbContentValidationToHintsManager<UmbContentTypeModel>(this, this.structure, this.validation, this.hints, [
+			workspaceViewAlias,
+		]);
 
 		// Ugly, but we just inherit these from the workspace context: [NL]
 		this.name = host.name;
-		this.getName = host.getName;
 
-		this.observe(this.contentTypeId, (id) => this.structure.loadType(id));
+		this.getName = () => {
+			const contentTypeLabel = this.structure.getOwnerContentType()?.name;
+			const blockLabel = host.getName();
+			return contentTypeLabel ? `${contentTypeLabel} ${blockLabel}` : blockLabel;
+		};
+
+		this.propertyViewGuard.fallbackToPermitted();
+		this.propertyWriteGuard.fallbackToPermitted();
+
+		this.observe(this.contentTypeId, (id) => {
+			if (id) {
+				this.structure.loadType(id);
+			}
+		});
+
 		this.observe(this.unique, (key) => {
 			if (key) {
 				this.validation.setDataPath('$.' + dataPathPropertyName + `[?(@.key == '${key}')]`);
@@ -80,18 +113,6 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 			},
 			null,
 		);
-		this.observe(
-			this.#dataTypeItemManager.items,
-			(dataTypes) => {
-				// Make a map of the data type unique and editorAlias:
-				this.#dataTypeSchemaAliasMap = new Map(
-					dataTypes.map((dataType) => {
-						return [dataType.unique, dataType.propertyEditorSchemaAlias];
-					}),
-				);
-			},
-			null,
-		);
 	}
 
 	public isLoaded() {
@@ -100,6 +121,11 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 
 	resetState() {
 		this.#data.clear();
+		this.propertyViewGuard.clearRules();
+		this.propertyWriteGuard.clearRules();
+		// default:
+		this.propertyViewGuard.fallbackToPermitted();
+		this.propertyWriteGuard.fallbackToPermitted();
 	}
 
 	setVariantId(variantId: UmbVariantId | undefined) {
@@ -118,6 +144,18 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 
 	getData() {
 		return this.#data.getCurrent();
+	}
+
+	setPersistedData(data: UmbBlockDataModel | undefined) {
+		this.#data.setPersisted(data);
+	}
+
+	/**
+	 * Check if there are unpersisted changes.
+	 * @returns { boolean } true if there are unpersisted changes.
+	 */
+	public getHasUnpersistedChanges(): boolean {
+		return this.#data.getHasUnpersistedChanges();
 	}
 
 	getUnique() {
@@ -189,8 +227,9 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 			throw new Error(`Property alias "${alias}" not found.`);
 		}
 
-		// TODO: I think we should await this in the same way as we do for Content Detail Workspace Context. [NL]
-		const editorAlias = this.#dataTypeSchemaAliasMap.get(property.dataType.unique);
+		const dataTypeItem = await this.#dataTypeItemManager.getItemByUnique(property.dataType.unique);
+		const editorAlias = dataTypeItem?.propertyEditorSchemaAlias;
+
 		if (!editorAlias) {
 			throw new Error(`Editor Alias of "${property.dataType.unique}" not found.`);
 		}
@@ -226,8 +265,7 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 		// Provide Validation Context for this view:
 		this.validation.provideAt(host);
 
-		// TODO: Implement ctrl alias.
-		new UmbBlockElementValuesDataValidationPathTranslator(host);
+		this.hints.provideAt(host);
 	}
 
 	public override destroy(): void {

@@ -21,6 +21,10 @@ public abstract class SecurityControllerBase : ManagementApiControllerBase
                 .WithTitle("The password reset token was invalid")
                 .WithDetail("The specified password reset token was either used already or wrong.")
                 .Build()),
+            UserOperationStatus.CancelledByNotification => BadRequest(problemDetailsBuilder
+                .WithTitle("Cancelled by notification")
+                .WithDetail("A notification handler prevented the user operation.")
+                .Build()),
             UserOperationStatus.UnknownFailure => BadRequest(problemDetailsBuilder
                 .WithTitle("Unknown failure")
                 .WithDetail(errorMessageResult?.Error?.ErrorMessage ?? "The error was unknown")

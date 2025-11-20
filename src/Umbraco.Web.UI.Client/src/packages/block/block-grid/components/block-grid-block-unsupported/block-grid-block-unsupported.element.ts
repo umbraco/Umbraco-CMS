@@ -2,9 +2,6 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { css, customElement, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
-import '../block-grid-areas-container/index.js';
-import '../ref-grid-block/index.js';
-
 @customElement('umb-block-grid-block-unsupported')
 export class UmbBlockGridBlockUnsupportedElement extends UmbLitElement {
 	override render() {

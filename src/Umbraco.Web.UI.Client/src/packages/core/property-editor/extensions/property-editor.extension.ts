@@ -25,6 +25,19 @@ export interface MetaPropertyEditorUi {
 	propertyEditorSchemaAlias?: string;
 	settings?: PropertyEditorSettings;
 	supportsReadOnly?: boolean;
+	supportsDataSource?: {
+		/**
+		 * Whether the property editor UI is enabled for use with data sources.
+		 * @type {boolean}
+		 */
+		enabled: boolean;
+		/**
+		 * A list of allowed property editor data source kinds that can be used with this property editor UI.
+		 * If not specified, any data sources can be used.
+		 * @example ["pickerCollection", "pickerTree"]
+		 */
+		forDataSourceTypes: string[];
+	};
 }
 
 // Model
@@ -39,6 +52,7 @@ export interface MetaPropertyEditorSchema {
 }
 
 // Config
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export interface PropertyEditorSettings {
 	properties: PropertyEditorSettingsProperty[];
 	// default data is kept separate from the properties, to give the ability for Property Editor UI to overwrite default values for the property editor settings.
@@ -46,15 +60,18 @@ export interface PropertyEditorSettings {
 	defaultData?: PropertyEditorSettingsDefaultData[];
 }
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export interface PropertyEditorSettingsProperty {
 	label: string;
 	description?: string;
 	alias: string;
 	propertyEditorUiAlias: string;
+	propertyEditorDataSourceAlias?: string;
 	config?: UmbPropertyEditorConfig;
 	weight?: number;
 }
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export interface PropertyEditorSettingsDefaultData {
 	alias: string;
 	value: unknown;

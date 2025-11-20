@@ -17,7 +17,7 @@ import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
-import { UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
+import { UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
 import {
 	UmbPropertyValuePresetVariantBuilderController,
 	type UmbPropertyTypePresetModel,
@@ -35,7 +35,7 @@ export abstract class UmbBlockManagerContext<
 	BlockType extends UmbBlockTypeBaseModel = UmbBlockTypeBaseModel,
 	BlockLayoutType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel,
 	BlockOriginDataType extends UmbBlockWorkspaceOriginData = UmbBlockWorkspaceOriginData,
-> extends UmbContextBase<UmbBlockManagerContext> {
+> extends UmbContextBase {
 	get contentTypesLoaded() {
 		return Promise.all(this.#contentTypeRequests);
 	}
@@ -77,7 +77,8 @@ export abstract class UmbBlockManagerContext<
 	readonly #settings = new UmbArrayState(<Array<UmbBlockDataModel>>[], (x) => x.key);
 	public readonly settings = this.#settings.asObservable();
 
-	public readonly readOnlyState = new UmbReadOnlyVariantStateManager(this);
+	// TODO: This is a bad seperation of concerns, this should be self initializing, not defined from the outside. [NL]
+	public readonly readOnlyState = new UmbReadOnlyVariantGuardManager(this);
 
 	readonly #exposes = new UmbArrayState(
 		<Array<UmbBlockExposeModel>>[],
@@ -324,18 +325,6 @@ export abstract class UmbBlockManagerContext<
 		);
 	}
 
-	/**
-	 * @deprecated Use `createWithPresets` instead. Which is Async. Will be removed in v.17
-	 * @param contentElementTypeKey
-	 * @param partialLayoutEntry
-	 * @param originData
-	 */
-	abstract create(
-		contentElementTypeKey: string,
-		partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey'>,
-		originData?: BlockOriginDataType,
-	): UmbBlockDataObjectModel<BlockLayoutType> | undefined;
-
 	abstract createWithPresets(
 		contentElementTypeKey: string,
 		partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey'>,
@@ -363,6 +352,9 @@ export abstract class UmbBlockManagerContext<
 	protected async _createBlockElementData(key: string, contentTypeKey: string) {
 		//
 		const appLanguage = await this.getContext(UMB_APP_LANGUAGE_CONTEXT);
+		if (!appLanguage) {
+			throw new Error('Could not retrieve app language context.');
+		}
 
 		const contentStructure = this.getStructure(contentTypeKey);
 		if (!contentStructure) {
@@ -410,7 +402,11 @@ export abstract class UmbBlockManagerContext<
 		if (segments) {
 			controller.setSegments(segments);
 		}
-		const values = await controller.create(valueDefinitions);
+		const values = await controller.create(valueDefinitions, {
+			entityType: 'block',
+			entityUnique: key,
+			entityTypeUnique: contentTypeKey,
+		});
 
 		// Set culture and segment for all values:
 
@@ -501,6 +497,9 @@ export abstract class UmbBlockManagerContext<
 		if (varyByCulture) {
 			// get all mandatory cultures:
 			const appLanguageContext = await this.getContext(UMB_APP_LANGUAGE_CONTEXT);
+			if (!appLanguageContext) {
+				throw new Error('Could not retrieve app language context.');
+			}
 			const mandatoryLanguages = await appLanguageContext.getMandatoryLanguages();
 			mandatoryLanguages.forEach((x) => {
 				// No need to insert the same expose twice:

@@ -23,6 +23,8 @@ public class AvailableCompositionMediaTypeController : MediaTypeControllerBase
     [HttpPost("available-compositions")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<AvailableMediaTypeCompositionResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets available compositions.")]
+    [EndpointDescription("Gets a collection of media types that are available to use as compositions for the specified media type.")]
     public async Task<IActionResult> AvailableCompositions(
         CancellationToken cancellationToken,
         MediaTypeCompositionRequestModel compositionModel)

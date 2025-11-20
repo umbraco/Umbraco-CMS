@@ -106,8 +106,8 @@ public class LanguageBuilder<TParent>
         var cultureInfo = _cultureInfo ?? CultureInfo.GetCultureInfo("en-US");
         var cultureName = _cultureName ?? cultureInfo.EnglishName;
         var key = _key ?? Guid.NewGuid();
-        var createDate = _createDate ?? DateTime.Now;
-        var updateDate = _updateDate ?? DateTime.Now;
+        var createDate = _createDate ?? DateTime.UtcNow;
+        var updateDate = _updateDate ?? DateTime.UtcNow;
         var deleteDate = _deleteDate;
         var fallbackLanguageIsoCode = _fallbackLanguageIsoCode;
         var isDefault = _isDefault ?? false;

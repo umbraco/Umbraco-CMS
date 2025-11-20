@@ -19,6 +19,10 @@ export class UmbManifestViewerModalElement extends UmbModalBaseElement<
 				value = JSON.stringify(value);
 			} else if (typeof value === 'object') {
 				value = this.#stringify(value);
+			} else if (typeof value === 'number') {
+				value = `${value}`;
+			} else if (typeof value === 'boolean') {
+				value = `${value}`;
 			} else {
 				value = `"${value}"`;
 			}

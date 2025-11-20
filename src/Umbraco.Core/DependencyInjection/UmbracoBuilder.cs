@@ -8,13 +8,16 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Cache.PartialViewCacheInvalidators;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Diagnostics;
 using Umbraco.Cms.Core.Dictionary;
+using Umbraco.Cms.Core.DynamicRoot;
 using Umbraco.Cms.Core.Editors;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Factories;
 using Umbraco.Cms.Core.Features;
 using Umbraco.Cms.Core.Handlers;
 using Umbraco.Cms.Core.Hosting;
@@ -32,7 +35,7 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.ContentTypeEditing;
-using Umbraco.Cms.Core.DynamicRoot;
+using Umbraco.Cms.Core.HostedServices;
 using Umbraco.Cms.Core.Preview;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.PublishedCache.Internal;
@@ -48,7 +51,6 @@ using Umbraco.Cms.Core.Telemetry;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
-using Umbraco.Cms.Core.Services.Filters;
 
 namespace Umbraco.Cms.Core.DependencyInjection
 {
@@ -65,10 +67,6 @@ namespace Umbraco.Cms.Core.DependencyInjection
         /// <inheritdoc />
         public ILoggerFactory BuilderLoggerFactory { get; }
 
-        /// <inheritdoc />
-        [Obsolete("Only here to comply with obsolete implementation. Scheduled for removal in v16")]
-        public IHostingEnvironment? BuilderHostingEnvironment { get; }
-
         public IProfiler Profiler { get; }
 
         public AppCaches AppCaches { get; }
@@ -77,32 +75,8 @@ namespace Umbraco.Cms.Core.DependencyInjection
         /// Initializes a new instance of the <see cref="UmbracoBuilder"/> class primarily for testing.
         /// </summary>
         public UmbracoBuilder(IServiceCollection services, IConfiguration config, TypeLoader typeLoader)
-            : this(services, config, typeLoader, NullLoggerFactory.Instance, new NoopProfiler(), AppCaches.Disabled, null)
+            : this(services, config, typeLoader, NullLoggerFactory.Instance, new NoopProfiler(), AppCaches.Disabled)
         { }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="UmbracoBuilder"/> class.
-        /// </summary>
-        [Obsolete("Use a non obsolete constructor instead. Scheduled for removal in v16")]
-        public UmbracoBuilder(
-            IServiceCollection services,
-            IConfiguration config,
-            TypeLoader typeLoader,
-            ILoggerFactory loggerFactory,
-            IProfiler profiler,
-            AppCaches appCaches,
-            IHostingEnvironment? hostingEnvironment)
-        {
-            Services = services;
-            Config = config;
-            BuilderLoggerFactory = loggerFactory;
-            BuilderHostingEnvironment = hostingEnvironment;
-            Profiler = profiler;
-            AppCaches = appCaches;
-            TypeLoader = typeLoader;
-
-            AddCoreServices();
-        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoBuilder"/> class.
@@ -356,6 +330,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IMemberTypeService, MemberTypeService>();
             Services.AddUnique<IMemberContentEditingService, MemberContentEditingService>();
             Services.AddUnique<IMemberTypeEditingService, MemberTypeEditingService>();
+            Services.AddUnique<IMemberTypeContainerService, MemberTypeContainerService>();
             Services.AddUnique<INotificationService, NotificationService>();
             Services.AddUnique<ITrackedReferencesService, TrackedReferencesService>();
             Services.AddUnique<ITreeEntitySortingService, TreeEntitySortingService>();
@@ -363,12 +338,18 @@ namespace Umbraco.Cms.Core.DependencyInjection
                 factory.GetRequiredService<ICoreScopeProvider>(),
                 factory.GetRequiredService<ILoggerFactory>(),
                 factory.GetRequiredService<IEventMessagesFactory>(),
-                factory.GetRequiredService<IExternalLoginWithKeyRepository>()));
+                factory.GetRequiredService<IExternalLoginWithKeyRepository>(),
+                factory.GetRequiredService<IUserRepository>()));
             Services.AddUnique<ILogViewerService, LogViewerService>();
             Services.AddUnique<IExternalLoginWithKeyService>(factory => factory.GetRequiredService<ExternalLoginService>());
             Services.AddUnique<ILocalizedTextService>(factory => new LocalizedTextService(
                 factory.GetRequiredService<Lazy<LocalizedTextServiceFileSources>>(),
                 factory.GetRequiredService<ILogger<LocalizedTextService>>()));
+            // Default to a NOOP repository cache version service
+            Services.AddUnique<IRepositoryCacheVersionService, SingleServerCacheVersionService>();
+            Services.AddUnique<ILongRunningOperationService, LongRunningOperationService>();
+            Services.AddUnique<ILastSyncedManager, LastSyncedManager>();
+            Services.AddUnique<IMachineInfoFactory, MachineInfoFactory>();
 
             Services.AddUnique<IEntityXmlSerializer, EntityXmlSerializer>();
 
@@ -399,7 +380,6 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             Services.AddUnique<ICultureImpactFactory>(provider => new CultureImpactFactory(provider.GetRequiredService<IOptionsMonitor<ContentSettings>>()));
             Services.AddUnique<IDictionaryService, DictionaryService>();
-            Services.AddUnique<ITemporaryMediaService, TemporaryMediaService>();
             Services.AddUnique<IMediaImportService, MediaImportService>();
 
             // Register filestream security analyzers
@@ -419,9 +399,15 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IDataTypeConfigurationCache, DataTypeConfigurationCache>();
             Services.AddNotificationHandler<DataTypeCacheRefresherNotification, DataTypeConfigurationCacheRefresher>();
 
+            // Partial view cache invalidators (no-op, shipped implementation is added in Umbraco.Web.Website, but we
+            // need this to ensure we have a service registered for this interface even in headless setups).
+            // See: https://github.com/umbraco/Umbraco-CMS/issues/19661
+            Services.AddUnique<IMemberPartialViewCacheInvalidator, NoopMemberPartialViewCacheInvalidator>();
+
             // Two factor providers
             Services.AddUnique<ITwoFactorLoginService, TwoFactorLoginService>();
             Services.AddUnique<IUserTwoFactorLoginService, UserTwoFactorLoginService>();
+            Services.AddUnique<IMemberTwoFactorLoginService, MemberTwoFactorLoginService>();
 
             // Add Query services
             Services.AddUnique<IDocumentRecycleBinQueryService, DocumentRecycleBinQueryService>();

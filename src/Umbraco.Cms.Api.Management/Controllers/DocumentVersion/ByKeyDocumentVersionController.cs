@@ -29,6 +29,8 @@ public class ByKeyDocumentVersionController : DocumentVersionControllerBase
     [ProducesResponseType(typeof(DocumentVersionResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [EndpointSummary("Gets a document version.")]
+    [EndpointDescription("Gets a document version identified by the provided Id.")]
     public async Task<IActionResult> ByKey(CancellationToken cancellationToken, Guid id)
     {
         Attempt<IContent?, ContentVersionOperationStatus> attempt =

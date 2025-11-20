@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(TableName)]
 [PrimaryKey("id")]
 [ExplicitColumns]
-internal class DomainDto
+internal sealed class DomainDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.Domain;
 

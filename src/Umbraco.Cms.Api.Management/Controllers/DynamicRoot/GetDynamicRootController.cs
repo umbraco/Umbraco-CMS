@@ -28,6 +28,8 @@ public class GetRootsController : DynamicRootControllerBase
     [HttpPost("query")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(DynamicRootResponseModel), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets dynamic roots.")]
+    [EndpointDescription("Gets a collection of dynamic root items based on the provided query configuration.")]
     public async Task<IActionResult> GetRoots(CancellationToken cancellationToken, DynamicRootRequestModel model)
     {
         _backOfficeVariationContextAccessor.VariationContext = new BackOfficeVariationContext(model.Context.Culture, model.Context.Segment);

@@ -1,12 +1,13 @@
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Tests.Common.Builders;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
-public class PublishedUrlInfoProvider_hidetoplevel_false : PublishedUrlInfoProviderTestsBase
+internal sealed class PublishedUrlInfoProvider_hidetoplevel_false : PublishedUrlInfoProviderTestsBase
 {
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
@@ -19,7 +20,7 @@ public class PublishedUrlInfoProvider_hidetoplevel_false : PublishedUrlInfoProvi
     {
         // Create a second root
         var secondRoot = ContentBuilder.CreateSimpleContent(ContentType, "Second Root", null);
-        var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.Now.AddMinutes(-5), null);
+        var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddMinutes(-5), null);
         ContentService.Save(secondRoot, -1, contentSchedule);
 
         // Create a child of second root
@@ -35,11 +36,13 @@ public class PublishedUrlInfoProvider_hidetoplevel_false : PublishedUrlInfoProvi
         var childOfSecondRootUrls = await PublishedUrlInfoProvider.GetAllAsync(childOfSecondRoot);
 
         Assert.AreEqual(1, subPageUrls.Count);
-        Assert.IsTrue(subPageUrls.First().IsUrl);
-        Assert.AreEqual("/textpage/text-page-1/", subPageUrls.First().Text);
+        Assert.IsNotNull(subPageUrls.First().Url);
+        Assert.AreEqual("/textpage/text-page-1/", subPageUrls.First().Url!.ToString());
+        Assert.AreEqual(Constants.UrlProviders.Content, subPageUrls.First().Provider);
 
         Assert.AreEqual(1, childOfSecondRootUrls.Count);
-        Assert.IsTrue(childOfSecondRootUrls.First().IsUrl);
-        Assert.AreEqual("/second-root/text-page-1/", childOfSecondRootUrls.First().Text);
+        Assert.IsNotNull(childOfSecondRootUrls.First().Url);
+        Assert.AreEqual("/second-root/text-page-1/", childOfSecondRootUrls.First().Url!.ToString());
+        Assert.AreEqual(Constants.UrlProviders.Content, childOfSecondRootUrls.First().Provider);
     }
 }
