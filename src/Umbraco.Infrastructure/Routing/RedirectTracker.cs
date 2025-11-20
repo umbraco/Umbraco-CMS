@@ -17,6 +17,7 @@ namespace Umbraco.Cms.Infrastructure.Routing
         private readonly IVariationContextAccessor _variationContextAccessor;
         private readonly ILocalizationService _localizationService;
         private readonly IRedirectUrlService _redirectUrlService;
+        private readonly IPublishedUrlProvider _publishedUrlProvider;
         private readonly ILogger<RedirectTracker> _logger;
 
         public RedirectTracker(
@@ -24,12 +25,14 @@ namespace Umbraco.Cms.Infrastructure.Routing
             IVariationContextAccessor variationContextAccessor,
             ILocalizationService localizationService,
             IRedirectUrlService redirectUrlService,
+            IPublishedUrlProvider publishedUrlProvider,
             ILogger<RedirectTracker> logger)
         {
             _umbracoContextFactory = umbracoContextFactory;
             _variationContextAccessor = variationContextAccessor;
             _localizationService = localizationService;
             _redirectUrlService = redirectUrlService;
+            _publishedUrlProvider = publishedUrlProvider;
             _logger = logger;
         }
 
@@ -93,23 +96,20 @@ namespace Umbraco.Cms.Infrastructure.Routing
                 return;
             }
 
-            using UmbracoContextReference reference = _umbracoContextFactory.EnsureUmbracoContext();
-            IPublishedContentCache? contentCache = reference.UmbracoContext.Content;
-            if (contentCache == null)
-            {
-                _logger.LogWarning("Could not track redirects because there is no published content cache available on the current published snapshot.");
-                return;
-            }
-
             foreach (((int contentId, string culture), (Guid contentKey, string oldRoute)) in oldRoutes)
             {
                 try
                 {
-                    var newRoute = contentCache.GetRouteById(contentId, culture);
+                    var newRoute = _publishedUrlProvider.GetUrl(contentKey, UrlMode.Relative, culture).TrimEnd(Constants.CharArrays.ForwardSlash);
+
                     if (!IsValidRoute(newRoute) || oldRoute == newRoute)
                     {
                         continue;
                     }
+
+                    // Ensure we don't create a self-referencing redirect. This can occur if a document is renamed and then the name is reverted back
+                    // to the original. We resolve this by removing any existing redirect that points to the new route.
+                    RemoveSelfReferencingRedirect(contentKey, newRoute);
 
                     _redirectUrlService.Register(oldRoute, contentKey, culture);
                 }
@@ -121,5 +121,17 @@ namespace Umbraco.Cms.Infrastructure.Routing
         }
 
         private static bool IsValidRoute([NotNullWhen(true)] string? route) => route is not null && !route.StartsWith("err/");
+
+        private void RemoveSelfReferencingRedirect(Guid contentKey, string route)
+        {
+            IEnumerable<IRedirectUrl> allRedirectUrls = _redirectUrlService.GetContentRedirectUrls(contentKey);
+            foreach (IRedirectUrl redirectUrl in allRedirectUrls)
+            {
+                if (redirectUrl.Url == route)
+                {
+                    _redirectUrlService.Delete(redirectUrl.Key);
+                }
+            }
+        }
     }
 }
