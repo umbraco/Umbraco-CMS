@@ -3,7 +3,8 @@ import { UMB_LOG_VIEWER_SAVE_SEARCH_MODAL } from './log-viewer-search-input-moda
 import { css, html, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { escapeHTML } from '@umbraco-cms/backoffice/utils';
 import { query as getQuery, path, toQueryString } from '@umbraco-cms/backoffice/router';
-import { Subject, debounceTime, tap } from '@umbraco-cms/backoffice/external/rxjs';
+import { debounceTime, skip, tap } from '@umbraco-cms/backoffice/external/rxjs';
+import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { umbConfirmModal, umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { SavedLogSearchResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
@@ -30,8 +31,7 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 	@state()
 	private _isQuerySaved = false;
 
-	// TODO: Revisit this code, to not use RxJS directly:
-	#inputQuery$ = new Subject<string>();
+	#inputQueryState = new UmbStringState('');
 
 	#logViewerContext?: typeof UMB_APP_LOG_VIEWER_CONTEXT.TYPE;
 
@@ -48,17 +48,19 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.#inputQuery$
-			.pipe(
+		this.observe(
+			this.#inputQueryState.asObservable().pipe(
+				skip(1), // Skip initial value to avoid overwriting URL query params
 				tap(() => (this._showLoader = true)),
 				debounceTime(250),
-			)
-			.subscribe((query) => {
+			),
+			(query) => {
 				this._logViewerContext?.setFilterExpression(query);
 				this.#persist(query);
 				this._isQuerySaved = this._savedSearches.some((search) => search.query === query);
 				this._showLoader = false;
-			});
+			},
+		);
 	}
 
 	#observeStuff() {
@@ -75,11 +77,11 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 
 	#setQuery(event: Event) {
 		const target = event.target as UUIInputElement;
-		this.#inputQuery$.next(target.value as string);
+		this.#inputQueryState.setValue(target.value as string);
 	}
 
 	#setQueryFromSavedSearch(query: string) {
-		this.#inputQuery$.next(query);
+		this.#inputQueryState.setValue(query);
 		this._searchDropdownElement.open = false;
 	}
 
@@ -95,7 +97,7 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 	}
 
 	#clearQuery() {
-		this.#inputQuery$.next('');
+		this.#inputQueryState.setValue('');
 		this._logViewerContext?.setFilterExpression('');
 	}
 
