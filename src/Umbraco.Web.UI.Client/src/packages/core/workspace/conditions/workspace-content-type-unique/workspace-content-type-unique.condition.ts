@@ -1,8 +1,8 @@
+import { UMB_CONTENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
 import type { UmbWorkspaceContentTypeUniqueConditionConfig } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbConditionControllerArguments, UmbExtensionCondition } from '@umbraco-cms/backoffice/extension-api';
 import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
-import { UMB_CONTENT_WORKSPACE_CONTEXT } from 'src/packages/content/content/workspace/constants.js';
 
 const ObserveSymbol = Symbol();
 
