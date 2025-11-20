@@ -22,8 +22,8 @@ public class UpdateDocumentBlueprintFolderController : DocumentBlueprintFolderCo
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    [EndpointSummary("Updates a document blueprint folder.")]
-    [EndpointDescription("Updates a document blueprint folder identified by the provided Id with the details from the request model.")]
+    [EndpointSummary("Updates a Document Blueprint folder.")]
+    [EndpointDescription("Updates a Document Blueprint folder identified by the provided Id with the details from the request model.")]
     public async Task<IActionResult> Update(CancellationToken cancellationToken, Guid id, UpdateFolderResponseModel updateFolderResponseModel)
         => await UpdateFolderAsync(id, updateFolderResponseModel);
 }

@@ -21,7 +21,7 @@ public class DeleteDocumentBlueprintFolderController : DocumentBlueprintFolderCo
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    [EndpointSummary("Deletes a document blueprint folder.")]
-    [EndpointDescription("Deletes a document blueprint folder identified by the provided Id.")]
+    [EndpointSummary("Deletes a Document Blueprint folder.")]
+    [EndpointDescription("Deletes a Document Blueprint folder identified by the provided Id.")]
     public async Task<IActionResult> Delete(CancellationToken cancellationToken, Guid id) => await DeleteFolderAsync(id);
 }
