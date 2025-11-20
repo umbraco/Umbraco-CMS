@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
@@ -84,7 +84,7 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
             AppCaches.Disabled,
             new NullLogger<RedirectUrlRepository>());
 
-    private IRedirectTracker CreateRedirectTracker(bool assignDomain = false)
+    private IRedirectTracker CreateRedirectTracker()
     {
         var contentType = new Mock<IPublishedContentType>();
         contentType.SetupGet(c => c.Variations).Returns(ContentVariation.Nothing);
@@ -113,9 +113,7 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
             .Setup(x => x.GetRouteById(_testPage.Id, "en"))
             .Returns("/new-route");
 
-        IUmbracoContext context = Mock.Of<IUmbracoContext>();
-
-        UmbracoContextReference contextReference = new UmbracoContextReference(context, false, Mock.Of<IUmbracoContextAccessor>());
+        UmbracoContextReference contextReference = new UmbracoContextReference(Mock.Of<IUmbracoContext>(), false, Mock.Of<IUmbracoContextAccessor>());
         Mock.Get(contextReference.UmbracoContext)
             .Setup(x => x.Content)
             .Returns(contentCache);
