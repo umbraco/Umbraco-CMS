@@ -141,6 +141,13 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 				justify-content: space-between;
 			}
 
+			@media (min-width: 768px) {
+				#log-types-container {
+					flex-direction: row;
+					align-items: flex-start;
+				}
+			}
+
 			button {
 				all: unset;
 				display: flex;
