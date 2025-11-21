@@ -1,5 +1,5 @@
 import { UMB_APP_LOG_VIEWER_CONTEXT } from '../../../logviewer-workspace.context-token.js';
-import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { LogLevelCountsReponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { consumeContext } from '@umbraco-cms/backoffice/context-api';
@@ -27,8 +27,11 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 	@state()
 	private _logLevelCountFilter: string[] = [];
 
+	@state()
+	private _logLevelKeys: string[] = [];
+
 	protected override willUpdate(_changedProperties: Map<PropertyKey, unknown>): void {
-		if (_changedProperties.has('_logLevelCountFilter')) {
+		if (_changedProperties.has('_logLevelCountFilter') || _changedProperties.has('_logLevelCountResponse')) {
 			this.setLogLevelCount();
 		}
 	}
@@ -43,9 +46,15 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 	}
 
 	setLogLevelCount() {
-		this._logLevelCount = this._logLevelCountResponse
-			? Object.entries(this._logLevelCountResponse).filter(([level]) => !this._logLevelCountFilter.includes(level))
-			: [];
+		if (this._logLevelCountResponse) {
+			this._logLevelKeys = Object.keys(this._logLevelCountResponse);
+			this._logLevelCount = Object.entries(this._logLevelCountResponse).filter(
+				([level]) => !this._logLevelCountFilter.includes(level),
+			);
+		} else {
+			this._logLevelKeys = [];
+			this._logLevelCount = [];
+		}
 	}
 
 	#observeStuff() {
@@ -55,43 +64,42 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 		});
 	}
 
-	// TODO: Stop using this complex code in render methods, instead changes to _logLevelCount should trigger a state prop containing the keys. And then try to make use of the repeat LIT method:
 	override render() {
 		return html`
 			<uui-box id="types" headline="Log types">
 				<div id="log-types-container">
 					<div id="legend">
 						<ul>
-							${this._logLevelCountResponse
-								? Object.keys(this._logLevelCountResponse).map(
-										(level) =>
-											html`<li>
-												<button
-													@click=${(e: Event) => {
-														(e.target as HTMLElement)?.classList.toggle('active');
-														this.#setCountFilter(level);
-													}}>
-													<uui-icon
-														name="icon-record"
-														style="color: var(--umb-log-viewer-${level.toLowerCase()}-color);"></uui-icon
-													>${level}
-												</button>
-											</li>`,
-									)
-								: ''}
+							${repeat(
+								this._logLevelKeys,
+								(level) => level,
+								(level) =>
+									html`<li>
+										<button
+											@click=${(e: Event) => {
+												(e.target as HTMLElement)?.classList.toggle('active');
+												this.#setCountFilter(level);
+											}}>
+											<uui-icon
+												name="icon-record"
+												style="color: var(--umb-log-viewer-${level.toLowerCase()}-color);"></uui-icon
+											>${level}
+										</button>
+									</li>`,
+							)}
 						</ul>
 					</div>
-					<umb-donut-chart .description=${'In chosen date range you have this number of log message of type:'}>
-						${this._logLevelCountResponse
-							? this._logLevelCount.map(
-									([level, number]) =>
-										html`<umb-donut-slice
-											.name=${level}
-											.amount=${number}
-											.kind=${'messages'}
-											.color="${`var(--umb-log-viewer-${level.toLowerCase()}-color)`}"></umb-donut-slice> `,
-								)
-							: ''}
+					<umb-donut-chart .description=${'In chosen date range you have this number of log message of type:'} show-inline-numbers>
+						${repeat(
+							this._logLevelCount,
+							([level]) => level,
+							([level, number]) =>
+								html`<umb-donut-slice
+									.name=${level}
+									.amount=${number}
+									.kind=${'messages'}
+									.color="${`var(--umb-log-viewer-${level.toLowerCase()}-color)`}"></umb-donut-slice>`,
+						)}
 					</umb-donut-chart>
 				</div>
 			</uui-box>
