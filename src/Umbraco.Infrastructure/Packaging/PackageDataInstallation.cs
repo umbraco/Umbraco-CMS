@@ -41,6 +41,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         private readonly IEntityService _entityService;
         private readonly IContentTypeService _contentTypeService;
         private readonly IContentService _contentService;
+        private readonly IMemberTypeService _memberTypeService;
 
         public PackageDataInstallation(
             IDataValueEditorFactory dataValueEditorFactory,
@@ -58,7 +59,8 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             IMediaService mediaService,
             IMediaTypeService mediaTypeService,
             ITemplateContentParserService templateContentParserService,
-            ITemplateService templateService)
+            ITemplateService templateService,
+            IMemberTypeService memberTypeService)
         {
             _dataValueEditorFactory = dataValueEditorFactory;
             _logger = logger;
@@ -76,10 +78,48 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             _mediaTypeService = mediaTypeService;
             _templateContentParserService = templateContentParserService;
             _templateService = templateService;
+            _memberTypeService = memberTypeService;
         }
 
-        // Also remove factory service registration when this constructor is removed
-        [Obsolete("Use the constructor with Infrastructure.IScopeProvider and without global settings and hosting environment instead.")]
+        [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
+        public PackageDataInstallation(
+            IDataValueEditorFactory dataValueEditorFactory,
+            ILogger<PackageDataInstallation> logger,
+            IFileService fileService,
+            ILocalizationService localizationService,
+            IDataTypeService dataTypeService,
+            IEntityService entityService,
+            IContentTypeService contentTypeService,
+            IContentService contentService,
+            PropertyEditorCollection propertyEditors,
+            IScopeProvider scopeProvider,
+            IShortStringHelper shortStringHelper,
+            IConfigurationEditorJsonSerializer serializer,
+            IMediaService mediaService,
+            IMediaTypeService mediaTypeService,
+            ITemplateContentParserService templateContentParserService,
+            ITemplateService templateService)
+            : this(
+                  dataValueEditorFactory,
+                  logger,
+                  fileService,
+                  localizationService,
+                  dataTypeService,
+                  entityService,
+                  contentTypeService,
+                  contentService,
+                  propertyEditors,
+                  scopeProvider,
+                  shortStringHelper,
+                  serializer,
+                  mediaService,
+                  mediaTypeService,
+                  templateContentParserService,
+                  templateService,
+                  StaticServiceProvider.Instance.GetRequiredService<IMemberTypeService>())
+        { }
+
+        [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
         public PackageDataInstallation(
             IDataValueEditorFactory dataValueEditorFactory,
             ILogger<PackageDataInstallation> logger,
@@ -107,7 +147,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                   contentTypeService,
                   contentService,
                   propertyEditors,
-                  (Umbraco.Cms.Infrastructure.Scoping.IScopeProvider)scopeProvider,
+                  (IScopeProvider)scopeProvider,
                   shortStringHelper,
                   serializer,
                   mediaService,
@@ -163,25 +203,25 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             }
         }
 
-        /// <summary>
-        /// Imports and saves package xml as <see cref="IContentType"/>
-        /// </summary>
-        /// <param name="docTypeElements">Xml to import</param>
-        /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin).</param>
-        /// <returns>An enumerable list of generated ContentTypes</returns>
+        /// <inheritdoc/>
         public IReadOnlyList<IMediaType> ImportMediaTypes(IEnumerable<XElement> docTypeElements, int userId)
+#pragma warning disable CS0618 // Type or member is obsolete
             => ImportMediaTypes(docTypeElements, userId, out _);
+#pragma warning restore CS0618 // Type or member is obsolete
 
-        /// <summary>
-        /// Imports and saves package xml as <see cref="IContentType"/>
-        /// </summary>
-        /// <param name="docTypeElements">Xml to import</param>
-        /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin).</param>
-        /// <param name="entityContainersInstalled">Collection of entity containers installed by the package to be populated with those created in installing data types.</param>
-        /// <returns>An enumerable list of generated ContentTypes</returns>
+        [Obsolete("This method is not used in Umbraco outside of this class so will be made private in Umbraco 19.")]
         public IReadOnlyList<IMediaType> ImportMediaTypes(IEnumerable<XElement> docTypeElements, int userId,
             out IEnumerable<EntityContainer> entityContainersInstalled)
             => ImportDocumentTypes(docTypeElements.ToList(), true, userId, _mediaTypeService,
+                out entityContainersInstalled);
+
+        /// <inheritdoc/>
+        public IReadOnlyList<IMemberType> ImportMemberTypes(IEnumerable<XElement> docTypeElements, int userId)
+            => ImportMemberTypes(docTypeElements, userId, out _);
+
+        private IReadOnlyList<IMemberType> ImportMemberTypes(IEnumerable<XElement> docTypeElements, int userId,
+            out IEnumerable<EntityContainer> entityContainersInstalled)
+            => ImportDocumentTypes(docTypeElements.ToList(), true, userId, _memberTypeService,
                 out entityContainersInstalled);
 
         #endregion
@@ -805,26 +845,23 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         {
             if (typeof(T) == typeof(IContentType))
             {
-                if (parent is null)
-                {
-                    return new ContentType(_shortStringHelper, parentId) { Alias = alias, Key = key } as T;
-                }
-                else
-                {
-                    return new ContentType(_shortStringHelper, (IContentType)parent, alias) { Key = key } as T;
-                }
+                return parent is null
+                    ? new ContentType(_shortStringHelper, parentId) { Alias = alias, Key = key } as T
+                    : new ContentType(_shortStringHelper, (IContentType)parent, alias) { Key = key } as T;
             }
 
             if (typeof(T) == typeof(IMediaType))
             {
-                if (parent is null)
-                {
-                    return new MediaType(_shortStringHelper, parentId) { Alias = alias, Key = key } as T;
-                }
-                else
-                {
-                    return new MediaType(_shortStringHelper, (IMediaType)parent, alias) { Key = key } as T;
-                }
+                return parent is null
+                    ? new MediaType(_shortStringHelper, parentId) { Alias = alias, Key = key } as T
+                    : new MediaType(_shortStringHelper, (IMediaType)parent, alias) { Key = key } as T;
+            }
+
+            if (typeof(T) == typeof(IMemberType))
+            {
+                return parent is null
+                    ? new MemberType(_shortStringHelper, parentId) { Alias = alias, Key = key } as T
+                    : new MemberType(_shortStringHelper, (IMemberType)parent, alias) { Key = key } as T;
             }
 
             throw new NotSupportedException($"Type {typeof(T)} is not supported");
