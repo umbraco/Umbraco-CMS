@@ -72,6 +72,13 @@ export class UmbDonutChartElement extends LitElement {
 	@property({ type: Boolean })
 	hideDetailBox = false;
 
+	/**
+	 * Shows numbers inside each slice of the donut chart
+	 * @memberof UmbDonutChartElement
+	 */
+	@property({ type: Boolean, attribute: 'show-inline-numbers' })
+	showInlineNumbers = false;
+
 	@queryAssignedElements({ selector: 'umb-donut-slice' })
 	private _slices!: UmbDonutSliceElement[];
 
@@ -180,11 +187,28 @@ export class UmbDonutChartElement extends LitElement {
 		return [coordX, coordY].join(' ');
 	}
 
+	#getTextPosition(circle: CircleWithCommands): { x: number; y: number } {
+		// Calculate the middle angle of the slice
+		const startAngle = -circle.offset;
+		const sliceDegrees = UmbDonutChartElement.percentToDegrees(circle.percent);
+		const middleAngle = startAngle + sliceDegrees / 2;
+
+		// Position the text at the middle of the donut ring
+		const textRadius = this.radius - this.borderSize / 2;
+		const angleRad = (middleAngle * Math.PI) / 180;
+		const x = Math.cos(angleRad) * textRadius + this.svgSize / 2;
+		const y = -Math.sin(angleRad) * textRadius + this.svgSize / 2;
+
+		return { x, y };
+	}
+
 	#calculateDetailsBoxPosition = (event: MouseEvent) => {
+		// Recalculate bounds on each mouse move to handle window resize
+		this.#containerBounds = this._container.getBoundingClientRect();
 		const x = this.#containerBounds ? event.clientX - this.#containerBounds?.left : 0;
 		const y = this.#containerBounds ? event.clientY - this.#containerBounds?.top : 0;
-		this._posX = x - 10;
-		this._posY = y - 70;
+		this._posX = x + 10;
+		this._posY = y + 10;
 	};
 
 	#setDetailsBoxData(event: MouseEvent) {
@@ -251,7 +275,21 @@ export class UmbDonutChartElement extends LitElement {
 									role="listitem"
 									d="${circle.commands}"
 									transform="rotate(${circle.offset} ${this._viewBox / 2} ${this._viewBox / 2})">
-								</path>`,
+								</path>
+								${
+									this.showInlineNumbers
+										? svg`<text
+											class="slice-number"
+											x="${this.#getTextPosition(circle).x}"
+											y="${this.#getTextPosition(circle).y}"
+											text-anchor="middle"
+											dominant-baseline="middle"
+											fill="white"
+											font-weight="bold"
+											font-size="${this.borderSize * 0.6}px"
+											pointer-events="none">${circle.number}</text>`
+										: ''
+								}`,
 					)}
 
         `;
@@ -311,6 +349,7 @@ export class UmbDonutChartElement extends LitElement {
 				transform: translate3d(var(--pos-x), var(--pos-y), 0);
 				transition: transform 0.2s cubic-bezier(0.02, 1.23, 0.79, 1.08);
 				transition: opacity 150ms linear;
+				pointer-events: none;
 			}
 
 			#details-box.show {
@@ -327,6 +366,10 @@ export class UmbDonutChartElement extends LitElement {
 				font-weight: bold;
 				display: flex;
 				align-items: center;
+			}
+
+			.slice-number {
+				user-select: none;
 			}
 		`,
 	];
