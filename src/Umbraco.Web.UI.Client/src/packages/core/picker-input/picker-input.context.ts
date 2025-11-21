@@ -82,6 +82,12 @@ export class UmbPickerInputContext<
 	getSelection() {
 		return this.#itemManager.getUniques();
 	}
+	getSelectedItems() {
+		return this.#itemManager.getItems();
+	}
+	getSelectedItemByUnique(unique: string) {
+		return this.#itemManager.getItems().find((item) => item.unique === unique);
+	}
 
 	setSelection(selection: Array<string | null>) {
 		// Note: Currently we do not support picking root item. So we filter out null values:
@@ -111,21 +117,12 @@ export class UmbPickerInputContext<
 		this.getHostElement().dispatchEvent(new UmbChangeEvent());
 	}
 
-	/**
-	 * Get the display name for an item to show in the remove confirmation dialog.
-	 * Subclasses can override this to provide custom formatting for missing items.
-	 * @param item - The item to get the display name for, or undefined if not found
-	 * @param unique - The unique identifier of the item
-	 * @returns The display name to show in the dialog
-	 */
-	protected getItemDisplayName(item: PickedItemType | undefined, unique: string): string {
-		return item?.name ?? unique;
+	protected async _requestItemName(unique: string) {
+		return this.getSelectedItemByUnique(unique)?.name ?? '#general_notFound';
 	}
 
 	async requestRemoveItem(unique: string) {
-		const item = this.#itemManager.getItems().find((item) => item.unique === unique);
-		const name = this.getItemDisplayName(item, unique);
-
+		const name = await this._requestItemName(unique);
 		await umbConfirmModal(this, {
 			color: 'danger',
 			headline: `#actions_remove?`,

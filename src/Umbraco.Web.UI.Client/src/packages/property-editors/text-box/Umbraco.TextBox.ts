@@ -11,8 +11,12 @@ export const manifest: ManifestPropertyEditorSchema = {
 				{
 					alias: 'maxChars',
 					label: 'Maximum allowed characters',
-					description: 'If empty, 512 character limit',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Integer',
+					config: [
+						{ alias: 'min', value: 1 },
+						{ alias: 'max', value: 512 },
+						{ alias: 'placeholder', value: '512' },
+					],
 				},
 			],
 			defaultData: [

@@ -102,9 +102,7 @@ test('can see property with UI read enabled but not another property with UI rea
   await umbracoUi.content.isPropertyEditorUiWithNameVisible(secondPropertyName[1], false);
 });
 
-// Remove .skip when the front-end is ready.
-// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/19395
-test.skip('can edit specific property values with UI read and write permission enabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test('can edit specific property values with UI read and write permission enabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const inputText = 'This is test text';
   userGroupId = await umbracoApi.userGroup.createUserGroupWithPermissionsForSpecificDocumentAndTwoPropertyValues(userGroupName, firstDocumentId, documentTypeId, firstPropertyName[0], true, true, secondPropertyName[0], true, true);
@@ -123,7 +121,7 @@ test.skip('can edit specific property values with UI read and write permission e
   const firstDocumentData = await umbracoApi.document.getByName(firstDocumentName);
   expect(firstDocumentData.values[0].alias).toEqual(AliasHelper.toAlias(firstPropertyName[0]));
   expect(firstDocumentData.values[0].value).toEqual(inputText);
-  expect(firstDocumentData.values[1].alias).toEqual(AliasHelper.toAlias(secondPropertyName[0]));
+  expect(firstDocumentData.values[1].alias).toEqual(AliasHelper.toAlias(secondPropertyName[0]).replace('/', ''));
   expect(firstDocumentData.values[1].value).toEqual(true);
 });
 

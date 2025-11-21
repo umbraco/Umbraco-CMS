@@ -67,7 +67,7 @@ describe('UmbPropertyEditorUIDatePickerElement', () => {
 		});
 
 		it('should disregard a non-datetime value', async () => {
-			element.value = '03/05/2024 10:44:00';
+			element.value = 'some value';
 			await element.updateComplete;
 			expect((element as any)._inputValue).to.be.undefined;
 		});

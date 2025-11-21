@@ -339,8 +339,7 @@ test('can reorder properties in a media type', async ({umbracoApi, umbracoUi}) =
   expect(mediaTypeData.properties[0].name).toBe(dataTypeNameTwo);
 });
 
-// TODO: Remove skip when the frontend is ready. Currently it is impossible to reorder tab by drag and drop
-test.skip('can reorder tabs in a media type', async ({umbracoApi, umbracoUi}) => {
+test('can reorder tabs in a media type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const secondTabName = 'SecondTab';
