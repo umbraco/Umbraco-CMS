@@ -221,8 +221,9 @@ test('can not create content with create permission disabled', async ({umbracoAp
   await umbracoUi.content.isActionsMenuForNameVisible(rootDocumentName, false);
 });
 
-test.fixme('can create notifications with notification permission enabled', async ({umbracoApi, umbracoUi}) => {
+test('can set up notifications with notification permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
+  const notificationActionIds = ['Umb.Document.Delete', 'Umb.Document.Publish'];
   userGroupId = await umbracoApi.userGroup.createUserGroupWithNotificationsPermission(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
   testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
@@ -230,11 +231,19 @@ test.fixme('can create notifications with notification permission enabled', asyn
 
   // Act
   await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
-  // TODO: Implement it later
-  // Setup SMTP server to test notifications, do this when we test appsettings.json
+  await umbracoUi.content.clickActionsMenuForContent(rootDocumentName);
+  await umbracoUi.content.clickNotificationsActionMenuOption();
+  await umbracoUi.content.clickDocumentNotificationOptionWithName(notificationActionIds[0]);
+  await umbracoUi.content.clickDocumentNotificationOptionWithName(notificationActionIds[1]);
+  await umbracoUi.content.clickSaveModalButton();
+
+  // Assert
+  await umbracoUi.content.isSuccessNotificationVisible();
+  expect(await umbracoApi.document.doesNotificationExist(rootDocumentId, notificationActionIds[0])).toBeTruthy();
+  expect(await umbracoApi.document.doesNotificationExist(rootDocumentId, notificationActionIds[1])).toBeTruthy();
 });
 
-test('can not create notifications with notification permission disabled', async ({umbracoApi, umbracoUi}) => {
+test('can not set up notifications with notification permission disabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithNotificationsPermission(userGroupName, false);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
