@@ -72,6 +72,9 @@ test(`can upload a file with the svg extension in the content`, {tag: '@release'
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.uploadFile(uploadVectorGraphicsPath + vectorGraphicsName);
+  // Wait for the upload to complete
+  await umbracoUi.content.isInputDropzoneVisible(false);
+  await umbracoUi.content.isInputUploadFieldVisible();
   await umbracoUi.content.clickSaveButton();
 
   // Assert

@@ -220,7 +220,7 @@ test.fixme('can move a block from a group to another group in a block grid edito
   // Drag and Drop
   const dragFromLocator = await umbracoUi.dataType.getLinkWithName(elementTypeName);
   const dragToLocator = await umbracoUi.dataType.getAddButtonInGroupWithName(secondGroupName);
-  // This needs to be fixed
+  // TODO: This needs to be fixed
   await umbracoUi.dataType.dragAndDrop(dragFromLocator, dragToLocator, -10, 0, 10);
   await umbracoUi.dataType.clickSaveButton();
 
