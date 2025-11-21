@@ -147,13 +147,9 @@ test('cannot add number of block element greater than the maximum amount', async
   await umbracoUi.content.clickBlockElementWithName(elementTypeName);
   await umbracoUi.content.enterTextstring(inputText);
   await umbracoUi.content.clickCreateModalButton();
-  await umbracoUi.content.clickAddBlockElementButton();
-  await umbracoUi.content.clickTextButtonWithName(elementTypeName);
-  await umbracoUi.content.enterTextstring(inputText);
-  await umbracoUi.content.clickCreateModalButton();
 
   // Assert
-  await umbracoUi.content.doesFormValidationMessageContainText('Maximum 1 entries, you have entered 1 too many.');
+  await umbracoUi.content.isAddBlockElementButtonVisible(false);
 });
 
 test('can set the label of block element in the content', async ({umbracoApi, umbracoUi}) => {

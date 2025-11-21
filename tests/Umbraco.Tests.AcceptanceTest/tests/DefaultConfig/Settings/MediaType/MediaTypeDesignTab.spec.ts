@@ -137,7 +137,7 @@ test('can set up validation for a property in a media type', {tag: '@release'}, 
   // Act
   await umbracoUi.mediaType.goToMediaType(mediaTypeName);
   await umbracoUi.mediaType.clickEditorSettingsButton();
-  await umbracoUi.mediaType.selectValidationOption('');
+  await umbracoUi.mediaType.selectValidationOption('.+');
   await umbracoUi.mediaType.enterRegEx(regex);
   await umbracoUi.mediaType.enterRegExMessage(regexMessage);
   await umbracoUi.mediaType.clickSubmitButton();
