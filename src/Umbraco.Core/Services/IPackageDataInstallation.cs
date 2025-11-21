@@ -10,12 +10,20 @@ public interface IPackageDataInstallation
     InstallationSummary InstallPackageData(CompiledPackage compiledPackage, int userId);
 
     /// <summary>
-    /// Imports and saves package xml as <see cref="IContentType"/>
+    /// Imports and saves package xml as <see cref="IMediaType"/>.
     /// </summary>
     /// <param name="docTypeElements">Xml to import</param>
     /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin).</param>
-    /// <returns>An enumerable list of generated ContentTypes</returns>
+    /// <returns>An enumerable list of generated <see cref="IMediaType"/>s.</returns>
     IReadOnlyList<IMediaType> ImportMediaTypes(IEnumerable<XElement> docTypeElements, int userId);
+
+    /// <summary>
+    /// Imports and saves package xml as <see cref="IMemberType"/>.
+    /// </summary>
+    /// <param name="docTypeElements">Xml to import</param>
+    /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin).</param>
+    /// <returns>An enumerable list of generated <see cref="IMemberType"/>s.</returns>
+    IReadOnlyList<IMemberType> ImportMemberTypes(IEnumerable<XElement> docTypeElements, int userId) => throw new NotImplementedException();
 
     IReadOnlyList<TContentBase> ImportContentBase<TContentBase, TContentTypeComposition>(
         IEnumerable<CompiledPackageContentBase> docs,
