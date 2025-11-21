@@ -1,11 +1,12 @@
+import { UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS, UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS } from './constants.js';
 import type { ManifestPropertyEditorSchema } from '@umbraco-cms/backoffice/property-editor';
 
 export const manifest: ManifestPropertyEditorSchema = {
 	type: 'propertyEditorSchema',
 	name: 'Block Grid',
-	alias: 'Umbraco.BlockGrid',
+	alias: UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS,
 	meta: {
-		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.BlockGrid',
+		defaultPropertyEditorUiAlias: UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS,
 		settings: {
 			properties: [
 				{
