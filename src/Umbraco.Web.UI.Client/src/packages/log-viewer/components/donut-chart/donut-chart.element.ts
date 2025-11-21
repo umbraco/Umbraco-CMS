@@ -264,9 +264,8 @@ export class UmbDonutChartElement extends LitElement {
 					<feDropShadow stdDeviation="1 1" in="merge1" dx="0" dy="0" flood-color="#000" flood-opacity="0.8" x="0%" y="0%" width="100%" height="100%" result="dropShadow1"/>
 				</filter>
 				<desc>${this.description}</desc>
-					${this._circles.map(
-						(circle, i) => {
-							const content = svg`
+					${this._circles.map((circle, i) => {
+						const content = svg`
 								<path
 								class="circle"
 								data-index="${i}"
@@ -300,11 +299,8 @@ export class UmbDonutChartElement extends LitElement {
 										: ''
 								}`;
 
-							return circle.href
-								? svg`<a href="${circle.href}">${content}</a>`
-								: content;
-						},
-					)}
+						return circle.href ? svg`<a href="${circle.href}">${content}</a>` : content;
+					})}
 
         `;
 	}
@@ -387,12 +383,12 @@ export class UmbDonutChartElement extends LitElement {
 				user-select: none;
 			}
 
-		.description {
-			text-align: center;
-			font-size: var(--uui-type-small-size);
-			color: var(--uui-color-text-alt);
-			margin: var(--uui-size-space-2) 0 0 0;
-		}
+			.description {
+				text-align: center;
+				font-size: var(--uui-type-small-size);
+				color: var(--uui-color-text-alt);
+				margin: var(--uui-size-space-2) 0 0 0;
+			}
 		`,
 	];
 }
