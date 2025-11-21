@@ -149,13 +149,13 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string, typeof Um
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
-			() => !!this.min && this.selection.length < this.min,
+			() => !this.readonly && !!this.min && this.selection.length < this.min,
 		);
 
 		this.addValidator(
 			'rangeOverflow',
 			() => this.maxMessage,
-			() => !!this.max && this.selection.length > this.max,
+			() => !this.readonly && !!this.max && this.selection.length > this.max,
 		);
 
 		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')), '_observeSelection');
