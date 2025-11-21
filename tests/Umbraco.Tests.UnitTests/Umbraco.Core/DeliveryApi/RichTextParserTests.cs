@@ -3,6 +3,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -141,9 +142,12 @@ public class RichTextParserTests : PropertyValueConverterTests
         var link = element.Elements.OfType<RichTextGenericElement>().Single().Elements.Single() as RichTextGenericElement;
         Assert.IsNotNull(link);
         Assert.AreEqual("a", link.Tag);
-        Assert.AreEqual(1, link.Attributes.Count);
-        Assert.AreEqual("route", link.Attributes.First().Key);
-        var route = link.Attributes.First().Value as IApiContentRoute;
+        Assert.AreEqual(2, link.Attributes.Count);
+        Assert.IsNotNull(link.Attributes["route"]);
+        Assert.IsNotNull(link.Attributes["destination-id"]);
+        var id = (Guid)link.Attributes["destination-id"];
+        Assert.AreEqual(_contentKey, id);
+        var route = link.Attributes["route"] as IApiContentRoute;
         Assert.IsNotNull(route);
         Assert.AreEqual("/some-content-path", route.Path);
         Assert.AreEqual(postfix.NullOrWhiteSpaceAsNull(), route.QueryString);
@@ -482,8 +486,10 @@ public class RichTextParserTests : PropertyValueConverterTests
 
         var result = parser.Parse($"<p><a href=\"/{{localLink:{_contentKey:N}}}\" type=\"document\"></a></p>");
         Assert.IsTrue(result.Contains("href=\"/some-content-path\""));
+        Assert.IsTrue(result.Contains($"data-destination-id=\"{_contentKey:D}\""));
         Assert.IsTrue(result.Contains("data-start-item-path=\"the-root-path\""));
         Assert.IsTrue(result.Contains($"data-start-item-id=\"{_contentRootKey:D}\""));
+        Assert.IsTrue(result.Contains($"data-link-type=\"{LinkType.Content}\""));
     }
 
     [Test]
@@ -493,8 +499,10 @@ public class RichTextParserTests : PropertyValueConverterTests
 
         var result = parser.Parse($"<p><a href=\"/{{localLink:umb://document/{_contentKey:N}}}\"></a></p>");
         Assert.IsTrue(result.Contains("href=\"/some-content-path\""));
+        Assert.IsTrue(result.Contains($"data-destination-id=\"{_contentKey:D}\""));
         Assert.IsTrue(result.Contains("data-start-item-path=\"the-root-path\""));
         Assert.IsTrue(result.Contains($"data-start-item-id=\"{_contentRootKey:D}\""));
+        Assert.IsTrue(result.Contains($"data-link-type=\"{LinkType.Content}\""));
     }
 
     [TestCase("#some-anchor")]
@@ -507,8 +515,10 @@ public class RichTextParserTests : PropertyValueConverterTests
 
         var result = parser.Parse($"<p><a href=\"/{{localLink:{_contentKey:N}}}{postfix}\" type=\"document\"></a></p>");
         Assert.IsTrue(result.Contains($"href=\"/some-content-path{postfix}\""));
+        Assert.IsTrue(result.Contains($"data-destination-id=\"{_contentKey:D}\""));
         Assert.IsTrue(result.Contains("data-start-item-path=\"the-root-path\""));
         Assert.IsTrue(result.Contains($"data-start-item-id=\"{_contentRootKey:D}\""));
+        Assert.IsTrue(result.Contains($"data-link-type=\"{LinkType.Content}\""));
     }
 
     [TestCase("#some-anchor")]
@@ -521,8 +531,10 @@ public class RichTextParserTests : PropertyValueConverterTests
 
         var result = parser.Parse($"<p><a href=\"/{{localLink:umb://document/{_contentKey:N}}}{postfix}\"></a></p>");
         Assert.IsTrue(result.Contains($"href=\"/some-content-path{postfix}\""));
+        Assert.IsTrue(result.Contains($"data-destination-id=\"{_contentKey:D}\""));
         Assert.IsTrue(result.Contains("data-start-item-path=\"the-root-path\""));
         Assert.IsTrue(result.Contains($"data-start-item-id=\"{_contentRootKey:D}\""));
+        Assert.IsTrue(result.Contains($"data-link-type=\"{LinkType.Content}\""));
     }
 
     [Test]
@@ -532,6 +544,8 @@ public class RichTextParserTests : PropertyValueConverterTests
 
         var result = parser.Parse($"<p><a href=\"/{{localLink:umb://media/{_mediaKey:N}}}\"></a></p>");
         Assert.IsTrue(result.Contains("href=\"/some-media-url\""));
+        Assert.IsTrue(result.Contains($"data-link-type=\"{LinkType.Media}\""));
+
     }
 
     [TestCase("{localLink:umb://document/fe5bf80d37db4373adb9b206896b4a3b}")]
