@@ -1,8 +1,8 @@
 import { customElement, html, nothing, when } from '@umbraco-cms/backoffice/external/lit';
-import { UmbPropertyValuePresentationBaseElement } from '@umbraco-cms/backoffice/property-value-presentation';
+import { UmbPropertyValuePresentationElementBase } from '@umbraco-cms/backoffice/property-value-presentation';
 
 @customElement('umb-color-picker-property-value-presentation')
-export class UmbColorPickerPropertyValuePresentationElement extends UmbPropertyValuePresentationBaseElement<
+export class UmbColorPickerPropertyValuePresentationElement extends UmbPropertyValuePresentationElementBase<
 	{ value: string; label: string } | string
 > {
 	override render() {

@@ -1,2 +1,2 @@
-export { UmbPropertyValuePresentationBaseElement } from './property-value-presentation-base.element.js';
+export { UmbPropertyValuePresentationElementBase } from './property-value-presentation-element-base.js';
 export type * from './types.js';

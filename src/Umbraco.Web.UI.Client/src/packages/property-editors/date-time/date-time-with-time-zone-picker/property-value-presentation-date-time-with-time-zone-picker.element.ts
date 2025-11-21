@@ -1,8 +1,8 @@
 import { customElement, html, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { UmbPropertyValuePresentationBaseElement } from '@umbraco-cms/backoffice/property-value-presentation';
+import { UmbPropertyValuePresentationElementBase } from '@umbraco-cms/backoffice/property-value-presentation';
 
 @customElement('umb-date-time-with-time-zone-picker-property-value-presentation')
-export class UmbDateTimePickerWithTimeZonePropertyValuePresentationElement extends UmbPropertyValuePresentationBaseElement<{
+export class UmbDateTimePickerWithTimeZonePropertyValuePresentationElement extends UmbPropertyValuePresentationElementBase<{
 	date: string;
 	timeZone: string;
 }> {
