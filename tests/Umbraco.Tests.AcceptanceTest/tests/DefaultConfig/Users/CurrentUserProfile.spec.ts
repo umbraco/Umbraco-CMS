@@ -21,7 +21,7 @@ for (const userGroup of userGroups) {
     await umbracoApi.user.updatePassword(userId, userPassword);
     testUserCookieAndToken = await umbracoApi.user.loginToUser(userName, userEmail, userPassword);
     await umbracoUi.goToBackOffice();
-    await umbracoUi.currentUserProfile.goToSection(ConstantHelper.sections.users);
+    await umbracoUi.currentUserProfile.isBackOfficeMainVisible();
 
     // Act
     await umbracoUi.currentUserProfile.clickCurrentUserAvatarButton();
