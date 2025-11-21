@@ -104,7 +104,11 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 
 		const lookup = items.reduce(
 			(acc, item) => {
-				acc[item.unique] = item;
+				acc[item.unique] = {
+					...item,
+					name: this.localize.string(item.name),
+					description: this.localize.string(item.description),
+				};
 				return acc;
 			},
 			{} as { [key: string]: UmbDocumentTypeItemModel },
@@ -244,8 +248,8 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 		return html`
 			<uui-card-block-type
 				href=${ifDefined(href)}
-				name=${this.localize.string(block.name)}
-				description=${this.localize.string(block.description)}
+				name=${block.name}
+				description=${ifDefined(block.description)}
 				.background=${block.backgroundColor}
 				@open=${() => this.#chooseBlock(block.contentElementTypeKey)}>
 				${when(
