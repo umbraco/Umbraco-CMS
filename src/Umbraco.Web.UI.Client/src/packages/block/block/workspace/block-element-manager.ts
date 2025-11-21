@@ -20,7 +20,6 @@ import {
 	type UmbElementPropertyDataOwner,
 } from '@umbraco-cms/backoffice/content';
 import { UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
-
 import { UmbDataTypeItemRepositoryManager } from '@umbraco-cms/backoffice/data-type';
 import { UmbVariantPropertyGuardManager } from '@umbraco-cms/backoffice/property';
 import { UmbHintContext, type UmbVariantHint } from '@umbraco-cms/backoffice/hint';
