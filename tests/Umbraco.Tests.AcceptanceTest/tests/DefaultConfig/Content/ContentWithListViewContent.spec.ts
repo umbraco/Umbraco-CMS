@@ -22,8 +22,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(childDocumentTypeName);
 });
 
-// Remove .skip when the issue is fixed: https://github.com/umbraco/Umbraco-CMS/issues/18615
-test.skip('can create content with the list view data type', async ({umbracoApi, umbracoUi}) => {
+test('can create content with the list view data type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Draft';
   const defaultListViewDataTypeName = 'List View - Content';
@@ -47,8 +46,7 @@ test.skip('can create content with the list view data type', async ({umbracoApi,
   expect(await umbracoApi.document.getChildrenAmount(contentData.id)).toEqual(0);
 });
 
-// Remove .skip when the issue is fixed: https://github.com/umbraco/Umbraco-CMS/issues/18615
-test.skip('can publish content with the list view data type', async ({umbracoApi, umbracoUi}) => {
+test('can publish content with the list view data type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Published';
   const childDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(childDocumentTypeName);
@@ -70,8 +68,7 @@ test.skip('can publish content with the list view data type', async ({umbracoApi
   expect(await umbracoApi.document.getChildrenAmount(documentId)).toEqual(0);
 });
 
-// Remove .skip when the issue is fixed: https://github.com/umbraco/Umbraco-CMS/issues/18615
-test.skip('can create content with a child in the list', async ({umbracoApi, umbracoUi}) => {
+test('can create content with a child in the list', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const childDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(childDocumentTypeName);
   await umbracoApi.dataType.createListViewContentDataType(dataTypeName);
@@ -83,8 +80,8 @@ test.skip('can create content with a child in the list', async ({umbracoApi, umb
 
   // Act
   await umbracoUi.content.clickCreateContentWithName(childDocumentTypeName);
-  await umbracoUi.content.enterNameInContainer(childContentName);
-  await umbracoUi.content.clickSaveModalButton();
+  await umbracoUi.content.enterContentName(childContentName);
+  await umbracoUi.content.clickSaveButton();
 
   // Assert
   await umbracoUi.content.waitForContentToBeCreated();
@@ -92,8 +89,7 @@ test.skip('can create content with a child in the list', async ({umbracoApi, umb
   expect(await umbracoApi.document.getChildrenAmount(documentId)).toEqual(1);
 });
 
-// Remove .skip when the issue is fixed: https://github.com/umbraco/Umbraco-CMS/issues/18615
-test.skip('can publish content with a child in the list', async ({umbracoApi, umbracoUi}) => {
+test('can publish content with a child in the list', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Published';
   const childDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(childDocumentTypeName);
@@ -111,7 +107,7 @@ test.skip('can publish content with a child in the list', async ({umbracoApi, um
   await umbracoUi.content.clickSaveAndPublishButton();
   await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   await umbracoUi.content.goToContentInListViewWithName(childContentName);
-  await umbracoUi.content.clickContainerSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
@@ -123,8 +119,7 @@ test.skip('can publish content with a child in the list', async ({umbracoApi, um
   expect(childContentData.variants[0].state).toBe(expectedState);
 });
 
-// Remove .skip when the issue is fixed: https://github.com/umbraco/Umbraco-CMS/issues/18615
-test.skip('can not publish child in a list when parent is not published', async ({umbracoApi, umbracoUi}) => {
+test('can not publish child in a list when parent is not published', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Draft';
   const childDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(childDocumentTypeName);
@@ -138,7 +133,7 @@ test.skip('can not publish child in a list when parent is not published', async 
 
   // Act
   await umbracoUi.content.goToContentInListViewWithName(childContentName);
-  await umbracoUi.content.clickContainerSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
   // Content created, but not published
@@ -151,8 +146,7 @@ test.skip('can not publish child in a list when parent is not published', async 
   expect(childContentData.variants[0].state).toBe(expectedState);
 });
 
-// Remove .skip when the issue is fixed: https://github.com/umbraco/Umbraco-CMS/issues/18615
-test.skip('child is removed from list after child content is deleted', async ({umbracoApi, umbracoUi}) => {
+test('child is removed from list after child content is deleted', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const childDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(childDocumentTypeName);
   await umbracoApi.dataType.createListViewContentDataType(dataTypeName);
@@ -176,8 +170,7 @@ test.skip('child is removed from list after child content is deleted', async ({u
   expect(await umbracoApi.document.doesNameExist(childContentName)).toBeFalsy();
 });
 
-// Remove .skip when the issue is fixed: https://github.com/umbraco/Umbraco-CMS/issues/18615
-test.skip('can sort list by name', async ({umbracoApi, umbracoUi}) => {
+test('can sort list by name', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const childDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(childDocumentTypeName);
   const secondChildContentName = 'ASecondChildContent';
@@ -200,8 +193,7 @@ test.skip('can sort list by name', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.doesFirstItemInListViewHaveName(secondChildContentName);
 });
 
-// Remove .skip when the issue is fixed: https://github.com/umbraco/Umbraco-CMS/issues/18615
-test.skip('can publish child content from list', async ({umbracoApi, umbracoUi}) => {
+test('can publish child content from list', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Published';
   const childDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(childDocumentTypeName);
@@ -217,6 +209,7 @@ test.skip('can publish child content from list', async ({umbracoApi, umbracoUi})
   // Act
   await umbracoUi.content.selectContentWithNameInListView(childContentName);
   await umbracoUi.content.clickPublishSelectedListItems();
+  await umbracoUi.content.clickConfirmToPublishButton();
 
   // Assert
   await umbracoUi.content.waitForContentToBeCreated();
@@ -241,6 +234,7 @@ test.skip('can not publish child content from list when parent is not published'
   // Act
   await umbracoUi.content.selectContentWithNameInListView(childContentName);
   await umbracoUi.content.clickPublishSelectedListItems();
+  await umbracoUi.content.clickConfirmToPublishButton();
 
   // Assert
   await umbracoUi.content.isErrorNotificationVisible();
@@ -248,8 +242,7 @@ test.skip('can not publish child content from list when parent is not published'
   expect(childContentData.variants[0].state).toBe(expectedState);
 });
 
-// Remove .skip when the issue is fixed: https://github.com/umbraco/Umbraco-CMS/issues/18615
-test.skip('can unpublish child content from list', async ({umbracoApi, umbracoUi}) => {
+test('can unpublish child content from list', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Draft';
   const childDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(childDocumentTypeName);
@@ -276,8 +269,7 @@ test.skip('can unpublish child content from list', async ({umbracoApi, umbracoUi
   expect(childContentData.variants[0].state).toBe(expectedState);
 });
 
-// Remove .skip when the issue is fixed: https://github.com/umbraco/Umbraco-CMS/issues/18615
-test.skip('can duplicate child content in list', async ({umbracoApi, umbracoUi}) => {
+test('can duplicate child content in list', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const secondDocumentName = 'SecondDocument';
   await umbracoApi.document.ensureNameNotExists(secondDocumentName);
@@ -294,7 +286,9 @@ test.skip('can duplicate child content in list', async ({umbracoApi, umbracoUi})
   // Act
   await umbracoUi.content.selectContentWithNameInListView(childContentName);
   await umbracoUi.content.clickDuplicateToSelectedListItems();
-  await umbracoUi.content.selectDocumentWithNameAtRoot(secondDocumentName);
+  await umbracoUi.content.openCaretButtonForName('Content');
+  await umbracoUi.content.clickModalMenuItemWithName(secondDocumentName);
+  await umbracoUi.content.clickChooseModalButton();
 
   // Assert
   await umbracoUi.content.isSuccessNotificationVisible();
@@ -308,8 +302,7 @@ test.skip('can duplicate child content in list', async ({umbracoApi, umbracoUi})
   expect(await umbracoApi.document.getChildrenAmount(secondDocumentId)).toEqual(1);
 });
 
-// Remove .skip when the issue is fixed: https://github.com/umbraco/Umbraco-CMS/issues/18615
-test.skip('can move child content in list', async ({umbracoApi, umbracoUi}) => {
+test('can move child content in list', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const secondDocumentName = 'SecondDocument';
   await umbracoApi.document.ensureNameNotExists(secondDocumentName);
@@ -326,7 +319,9 @@ test.skip('can move child content in list', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.content.selectContentWithNameInListView(childContentName);
   await umbracoUi.content.clickMoveToSelectedListItems();
-  await umbracoUi.content.selectDocumentWithNameAtRoot(secondDocumentName);
+  await umbracoUi.content.openCaretButtonForName('Content');
+  await umbracoUi.content.clickModalMenuItemWithName(secondDocumentName);
+  await umbracoUi.content.clickChooseModalButton();
 
   // Assert
   await umbracoUi.content.isSuccessNotificationVisible();
@@ -340,8 +335,7 @@ test.skip('can move child content in list', async ({umbracoApi, umbracoUi}) => {
   expect(await umbracoApi.document.getChildrenAmount(secondDocumentId)).toEqual(1);
 });
 
-// Remove .skip when the issue is fixed: https://github.com/umbraco/Umbraco-CMS/issues/18615
-test.skip('can trash child content in list', async ({umbracoApi, umbracoUi}) => {
+test('can trash child content in list', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const childDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(childDocumentTypeName);
   await umbracoApi.dataType.createListViewContentDataTypeWithAllPermissions(dataTypeName);
@@ -364,8 +358,7 @@ test.skip('can trash child content in list', async ({umbracoApi, umbracoUi}) => 
   await umbracoUi.content.isItemVisibleInRecycleBin(childContentName);
 });
 
-// Remove .skip when the issue is fixed: https://github.com/umbraco/Umbraco-CMS/issues/18615
-test.skip('can search for child content in list', async ({umbracoApi, umbracoUi}) => {
+test('can search for child content in list', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const secondChildName = 'SecondChildDocument';
   await umbracoApi.document.ensureNameNotExists(secondChildName);
@@ -388,8 +381,7 @@ test.skip('can search for child content in list', async ({umbracoApi, umbracoUi}
   await umbracoUi.content.doesFirstItemInListViewHaveName(childContentName);
 });
 
-// Remove .skip when the issue is fixed: https://github.com/umbraco/Umbraco-CMS/issues/18615
-test.skip('can change from list view to grid view in list', async ({umbracoApi, umbracoUi}) => {
+test('can change from list view to grid view in list', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const childDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(childDocumentTypeName);
   await umbracoApi.dataType.createListViewContentDataTypeWithAllPermissions(dataTypeName);

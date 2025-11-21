@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.ContentTypeEditing;
 
-namespace Umbraco.Cms.Tests.Integration.ManagementApi.DocumentType.Root;
+namespace Umbraco.Cms.Tests.Integration.ManagementApi.DocumentType.Tree;
 
 public class ChildrenDocumentTypeTreeControllerTests : ManagementApiUserGroupTestBase<ChildrenDocumentTypeTreeController>
 {
