@@ -21,7 +21,7 @@ export interface UmbMediaCollectionItemModel extends UmbEntityWithFlags {
 	sortOrder?: number;
 	updateDate: Date;
 	updater?: string | null;
-	values?: Array<{ alias: string; value: string }>;
+	values?: Array<{ alias: string; editorAlias: string; value: string }>;
 	url?: string;
 	status?: UmbFileDropzoneItemStatus;
 	/**
