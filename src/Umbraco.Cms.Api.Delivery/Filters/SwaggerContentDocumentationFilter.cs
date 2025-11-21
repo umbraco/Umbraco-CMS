@@ -92,7 +92,7 @@ internal sealed class SwaggerContentDocumentationFilter : SwaggerDocumentationFi
         }
     }
 
-    private Dictionary<string, OpenApiExample> FetchQueryParameterExamples() =>
+    private Dictionary<string, IOpenApiExample> FetchQueryParameterExamples() =>
         new()
         {
             { "Select all", new OpenApiExample { Value = string.Empty } },
@@ -104,7 +104,7 @@ internal sealed class SwaggerContentDocumentationFilter : SwaggerDocumentationFi
             { "Select all descendants of a node by path", new OpenApiExample { Value = "descendants:path" } },
         };
 
-    private Dictionary<string, OpenApiExample> FilterQueryParameterExamples() =>
+    private Dictionary<string, IOpenApiExample> FilterQueryParameterExamples() =>
         new()
         {
             { "Default filter", new OpenApiExample { Value = string.Empty } },
@@ -114,7 +114,7 @@ internal sealed class SwaggerContentDocumentationFilter : SwaggerDocumentationFi
             { "Filter by update date (greater than or equal)", new OpenApiExample { Value = new JsonArray { "updateDate>:2023-01-01" } } },
         };
 
-    private Dictionary<string, OpenApiExample> SortQueryParameterExamples() =>
+    private Dictionary<string, IOpenApiExample> SortQueryParameterExamples() =>
         new()
         {
             { "Default sort", new OpenApiExample { Value = string.Empty } },

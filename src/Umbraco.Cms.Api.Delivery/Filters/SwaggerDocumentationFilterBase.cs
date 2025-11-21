@@ -31,10 +31,10 @@ internal abstract class SwaggerDocumentationFilterBase<TBaseController>
 
     protected abstract void ApplyParameter(OpenApiParameter parameter, ParameterFilterContext context);
 
-    protected void AddQueryParameterDocumentation(OpenApiParameter parameter, Dictionary<string, OpenApiExample> examples, string description)
+    protected void AddQueryParameterDocumentation(OpenApiParameter parameter, Dictionary<string, IOpenApiExample> examples, string description)
     {
         parameter.Description = QueryParameterDescription(description);
-        parameter.Examples = examples.ToDictionary(kv => kv.Key, kv => (IOpenApiExample)kv.Value);
+        parameter.Examples = examples;
     }
 
     protected void AddExpand(OpenApiOperation operation, OperationFilterContext context)

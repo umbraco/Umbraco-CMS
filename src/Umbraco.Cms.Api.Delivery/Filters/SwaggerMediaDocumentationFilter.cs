@@ -45,7 +45,7 @@ internal sealed class SwaggerMediaDocumentationFilter : SwaggerDocumentationFilt
         }
     }
 
-    private Dictionary<string, OpenApiExample> FetchQueryParameterExamples() =>
+    private Dictionary<string, IOpenApiExample> FetchQueryParameterExamples() =>
         new()
         {
             { "Select all children at root level", new OpenApiExample { Value = "children:/" } },
@@ -53,7 +53,7 @@ internal sealed class SwaggerMediaDocumentationFilter : SwaggerDocumentationFilt
             { "Select all children of a media item by path", new OpenApiExample { Value = "children:path" } },
         };
 
-    private Dictionary<string, OpenApiExample> FilterQueryParameterExamples() =>
+    private Dictionary<string, IOpenApiExample> FilterQueryParameterExamples() =>
         new()
         {
             { "Default filter", new OpenApiExample { Value = string.Empty } },
@@ -61,7 +61,7 @@ internal sealed class SwaggerMediaDocumentationFilter : SwaggerDocumentationFilt
             { "Filter by name", new OpenApiExample { Value = new JsonArray { "name:nodeName" } } },
         };
 
-    private Dictionary<string, OpenApiExample> SortQueryParameterExamples() =>
+    private Dictionary<string, IOpenApiExample> SortQueryParameterExamples() =>
         new()
         {
             { "Default sort", new OpenApiExample { Value = string.Empty } },
