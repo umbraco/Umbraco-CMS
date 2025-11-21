@@ -66,22 +66,22 @@ export class UmbLogViewerDateRangeSelectorElement extends UmbLitElement {
 	override render() {
 		return html`
 			<div class="input-container">
-				<uui-label for="start-date">From:</uui-label>
+				<uui-label for="start-date"><umb-localize key="logViewer_from">From</umb-localize>:</uui-label>
 				<umb-input-date
 					@change=${this.#setStartDate}
 					id="start-date"
 					type="date"
-					label="From"
+					label=${this.localize.term('logViewer_from')}
 					.max=${this._logViewerContext?.today ?? ''}
 					.value=${this._startDate}></umb-input-date>
 			</div>
 			<div class="input-container">
-				<uui-label for="end-date">To: </uui-label>
+				<uui-label for="end-date"><umb-localize key="logViewer_to">To</umb-localize>: </uui-label>
 				<umb-input-date
 					@change=${this.#setEndDate}
 					id="end-date"
 					type="date"
-					label="To"
+					label=${this.localize.term('logViewer_to')}
 					.min=${this._startDate}
 					.max=${this._logViewerContext?.today ?? ''}
 					.value=${this._endDate}></umb-input-date>

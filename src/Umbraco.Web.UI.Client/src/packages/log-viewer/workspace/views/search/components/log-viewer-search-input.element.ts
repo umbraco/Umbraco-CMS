@@ -108,7 +108,7 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 			headline: this.localize.term('logViewer_deleteSavedSearch'),
 			content: this.localize.term('defaultdialogs_confirmdelete', escapeHTML(name)),
 			color: 'danger',
-			confirmLabel: 'Delete',
+			confirmLabel: this.localize.term('actions_delete'),
 		});
 
 		this._logViewerContext?.removeSearch({ name });
@@ -132,8 +132,8 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 		return html`
 			<uui-input
 				id="search-input"
-				label="Search logs"
-				.placeholder=${'Search logs...'}
+				label=${this.localize.term('logViewer_searchLogs')}
+				.placeholder=${this.localize.term('logViewer_searchLogsPlaceholder')}
 				slot="trigger"
 				@input=${this.#setQuery}
 				.value=${this._inputQuery}>
@@ -144,10 +144,18 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 					: ''}
 				${this._inputQuery
 					? html`${!this._isQuerySaved
-								? html`<uui-button compact slot="append" label="Save search" @click=${this.#openSaveSearchDialog}
+								? html`<uui-button
+										compact
+										slot="append"
+										label=${this.localize.term('logViewer_saveSearch')}
+										@click=${this.#openSaveSearchDialog}
 										><uui-icon name="icon-favorite"></uui-icon
 									></uui-button>`
-								: ''}<uui-button compact slot="append" label="Clear" @click=${this.#clearQuery}
+								: ''}<uui-button
+								compact
+								slot="append"
+								label=${this.localize.term('general_clear')}
+								@click=${this.#clearQuery}
 								><uui-icon name="icon-delete"></uui-icon
 							></uui-button>`
 					: html``}
@@ -158,13 +166,13 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 							(search) =>
 								html`<li class="saved-search-item">
 									<button
-										label="Search for ${search.name}"
+										label=${this.localize.term('logViewer_searchFor', search.name ?? '')}
 										class="saved-search-item-button"
 										@click=${() => this.#setQueryFromSavedSearch(search.query ?? '')}>
 										<span class="saved-search-item-name">${search.name}</span>
 										<span class="saved-search-item-query">${search.query}</span></button
 									><uui-button
-										label="Remove saved search"
+										label=${this.localize.term('logViewer_deleteThisSearch')}
 										color="danger"
 										@click=${() => this.#removeSearch(search.name ?? '')}
 										><uui-icon name="icon-trash"></uui-icon
