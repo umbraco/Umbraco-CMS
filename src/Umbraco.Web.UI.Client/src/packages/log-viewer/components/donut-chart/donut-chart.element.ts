@@ -19,6 +19,7 @@ interface Circle {
 	percent: number;
 	kind: string;
 	number: number;
+	href: string;
 }
 
 interface CircleWithCommands extends Circle {
@@ -78,6 +79,13 @@ export class UmbDonutChartElement extends LitElement {
 	 */
 	@property({ type: Boolean, attribute: 'show-inline-numbers' })
 	showInlineNumbers = false;
+
+	/**
+	 * Shows the description text below the chart
+	 * @memberof UmbDonutChartElement
+	 */
+	@property({ type: Boolean, attribute: 'show-description' })
+	showDescription = false;
 
 	@queryAssignedElements({ selector: 'umb-donut-slice' })
 	private _slices!: UmbDonutSliceElement[];
@@ -148,6 +156,7 @@ export class UmbDonutChartElement extends LitElement {
 					color: slice.color,
 					name: slice.name,
 					kind: slice.kind,
+					href: slice.href,
 				};
 			}),
 		);
@@ -256,10 +265,10 @@ export class UmbDonutChartElement extends LitElement {
 				</filter>
 				<desc>${this.description}</desc>
 					${this._circles.map(
-						(circle, i) => svg`
+						(circle, i) => {
+							const content = svg`
 								<path
 								class="circle"
-
 								data-index="${i}"
 									fill="${circle.color}"
 									role="listitem"
@@ -289,7 +298,12 @@ export class UmbDonutChartElement extends LitElement {
 											font-size="${this.borderSize * 0.6}px"
 											pointer-events="none">${circle.number}</text>`
 										: ''
-								}`,
+								}`;
+
+							return circle.href
+								? svg`<a href="${circle.href}">${content}</a>`
+								: content;
+						},
 					)}
 
         `;
@@ -305,6 +319,7 @@ export class UmbDonutChartElement extends LitElement {
 					<span>${this._detailAmount} ${this._detailKind}</span>
 				</div>
 			</div>
+			${this.showDescription && this.description ? html`<p class="description">${this.description}</p>` : ''}
 			<slot @slotchange=${this.#printCircles} @slice-update=${this.#printCircles}></slot>`;
 	}
 
@@ -371,6 +386,13 @@ export class UmbDonutChartElement extends LitElement {
 			.slice-number {
 				user-select: none;
 			}
+
+		.description {
+			text-align: center;
+			font-size: var(--uui-type-small-size);
+			color: var(--uui-color-text-alt);
+			margin: var(--uui-size-space-2) 0 0 0;
+		}
 		`,
 	];
 }

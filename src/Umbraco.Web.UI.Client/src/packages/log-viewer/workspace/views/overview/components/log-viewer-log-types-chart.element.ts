@@ -19,6 +19,9 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 	}
 
 	@state()
+	private _dateRange = { startDate: '', endDate: '' };
+
+	@state()
 	private _logLevelCountResponse: LogLevelCountsReponseModel | null = null;
 
 	@state()
@@ -62,6 +65,24 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 			this._logLevelCountResponse = logLevel ?? null;
 			this.setLogLevelCount();
 		});
+
+		this.observe(this._logViewerContext?.dateRange, (dateRange) => {
+			if (dateRange) {
+				this._dateRange = dateRange;
+			}
+		});
+	}
+
+	#buildSearchUrl(level: string): string {
+		const params = new URLSearchParams();
+		params.set('loglevels', level);
+		if (this._dateRange.startDate) {
+			params.set('startDate', this._dateRange.startDate);
+		}
+		if (this._dateRange.endDate) {
+			params.set('endDate', this._dateRange.endDate);
+		}
+		return `view/search/?${params.toString()}`;
 	}
 
 	override render() {
@@ -89,7 +110,10 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 							)}
 						</ul>
 					</div>
-					<umb-donut-chart .description=${'In chosen date range you have this number of log message of type:'} show-inline-numbers>
+					<umb-donut-chart
+						.description=${'In chosen date range you have this number of log message of type:'}
+						show-inline-numbers
+						show-description>
 						${repeat(
 							this._logLevelCount,
 							([level]) => level,
@@ -98,6 +122,7 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 									.name=${level}
 									.amount=${number}
 									.kind=${'messages'}
+									.href=${this.#buildSearchUrl(level)}
 									.color="${`var(--umb-log-viewer-${level.toLowerCase()}-color)`}"></umb-donut-slice>`,
 						)}
 					</umb-donut-chart>
