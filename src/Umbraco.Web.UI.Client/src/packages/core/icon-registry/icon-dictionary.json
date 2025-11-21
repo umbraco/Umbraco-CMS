@@ -2895,6 +2895,11 @@
 			"legacy": true
 		},
 		{
+			"name": "icon-trash-empty",
+			"file": "icon-trash-empty.svg",
+			"internal": true
+		},
+		{
 			"name": "icon-umbraco",
 			"file": "icon-umbraco.svg"
 		}

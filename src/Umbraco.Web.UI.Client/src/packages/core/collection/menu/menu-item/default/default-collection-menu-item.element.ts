@@ -61,9 +61,7 @@ export class UmbDefaultCollectionMenuItemElement extends UmbLitElement {
 				?selected=${this._isSelected}
 				@selected=${() => this.#api?.select()}
 				@deselected=${() => this.#api?.deselect()}>
-				${item.icon
-					? html`<uui-icon slot="icon" name=${item.icon}></uui-icon>`
-					: html`<uui-icon slot="icon" name=${getItemFallbackIcon()}></uui-icon>`}
+				<umb-icon slot="icon" name=${item.icon ?? getItemFallbackIcon()}></umb-icon>
 			</uui-menu-item>
 		`;
 	}

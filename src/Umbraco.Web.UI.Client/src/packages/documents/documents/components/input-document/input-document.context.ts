@@ -7,6 +7,7 @@ import { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDocumentTypeEntityType } from '@umbraco-cms/backoffice/document-type';
 import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
+import { UmbDocumentItemDataResolver } from '../../item/index.js';
 
 interface UmbDocumentPickerInputContextOpenArgs {
 	allowedContentTypes?: Array<{ unique: string; entityType: UmbDocumentTypeEntityType }>;
@@ -54,6 +55,15 @@ export class UmbDocumentPickerInputContext extends UmbPickerInputContext<
 		};
 
 		await super.openPicker(combinedPickerData);
+	}
+
+	protected override async _requestItemName(unique: string): Promise<string> {
+		const item = this.getSelectedItemByUnique(unique);
+		const resolver = new UmbDocumentItemDataResolver(this);
+		resolver.setData(item);
+		const name = await resolver.getName();
+		this.removeUmbController(resolver);
+		return name ?? '#general_notFound';
 	}
 
 	#pickableFilter = (

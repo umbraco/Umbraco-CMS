@@ -3,7 +3,7 @@ using System.Net;
 using Umbraco.Cms.Api.Management.Controllers.DocumentType.Tree;
 
 
-namespace Umbraco.Cms.Tests.Integration.ManagementApi.DocumentType.Root;
+namespace Umbraco.Cms.Tests.Integration.ManagementApi.DocumentType.Tree;
 
 public class RootDocumentTypeTreeControllerTests : ManagementApiUserGroupTestBase<RootDocumentTypeTreeController>
 {
