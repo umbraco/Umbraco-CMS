@@ -1,4 +1,4 @@
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Umbraco.Cms.Api.Management.OpenApi;
@@ -8,14 +8,17 @@ public class RequireNonNullablePropertiesSchemaFilter : ISchemaFilter
     /// <summary>
     /// Add to model.Required all properties where Nullable is false.
     /// </summary>
-    public void Apply(OpenApiSchema model, SchemaFilterContext context)
+    public void Apply(IOpenApiSchema model, SchemaFilterContext context)
     {
-        var additionalRequiredProps = model.Properties
-            .Where(x => !x.Value.Nullable && !model.Required.Contains(x.Key))
+        var additionalRequiredProps = model.Properties?
+            .Where(x => !model.Required?.Contains(x.Key) == true)
             .Select(x => x.Key);
-        foreach (var propKey in additionalRequiredProps)
+        if (additionalRequiredProps != null)
         {
-            model.Required.Add(propKey);
+            foreach (var propKey in additionalRequiredProps)
+            {
+                model.Required?.Add(propKey);
+            }
         }
     }
 }

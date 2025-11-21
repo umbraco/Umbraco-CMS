@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Umbraco.Cms.Api.Delivery.Filters;
@@ -17,7 +16,7 @@ internal abstract class SwaggerDocumentationFilterBase<TBaseController>
         }
     }
 
-    public void Apply(OpenApiParameter parameter, ParameterFilterContext context)
+    public void Apply(IOpenApiParameter parameter, ParameterFilterContext context)
     {
         if (CanApply(context))
         {
@@ -29,12 +28,17 @@ internal abstract class SwaggerDocumentationFilterBase<TBaseController>
 
     protected abstract void ApplyOperation(OpenApiOperation operation, OperationFilterContext context);
 
-    protected abstract void ApplyParameter(OpenApiParameter parameter, ParameterFilterContext context);
+    protected abstract void ApplyParameter(IOpenApiParameter parameter, ParameterFilterContext context);
 
-    protected void AddQueryParameterDocumentation(OpenApiParameter parameter, Dictionary<string, OpenApiExample> examples, string description)
+    protected void AddQueryParameterDocumentation(IOpenApiParameter parameter, Dictionary<string, IOpenApiExample> examples, string description)
     {
-        parameter.Description = QueryParameterDescription(description);
-        parameter.Examples = examples;
+        if (parameter is not OpenApiParameter apiParameter)
+        {
+            return;
+        }
+        apiParameter.Description = QueryParameterDescription(description);
+
+        apiParameter.Examples = examples;
     }
 
     protected void AddExpand(OpenApiOperation operation, OperationFilterContext context)
@@ -61,13 +65,13 @@ internal abstract class SwaggerDocumentationFilterBase<TBaseController>
     }
 
     protected void AddApiKey(OpenApiOperation operation) =>
-        operation.Parameters.Add(new OpenApiParameter
+        operation.Parameters?.Add(new OpenApiParameter
         {
             Name = Core.Constants.DeliveryApi.HeaderNames.ApiKey,
             In = ParameterLocation.Header,
             Required = false,
             Description = "API key specified through configuration to authorize access to the API.",
-            Schema = new OpenApiSchema { Type = "string" }
+            Schema = new OpenApiSchema { Type = JsonSchemaType.String }
         });
 
     protected string PaginationDescription(bool skip, string itemType)
@@ -82,78 +86,79 @@ internal abstract class SwaggerDocumentationFilterBase<TBaseController>
 
     // FIXME: remove this when Delivery API V1 has been removed (expectedly in V15)
     private void AddExpandV1(OpenApiOperation operation)
-        => operation.Parameters.Add(new OpenApiParameter
+        => operation.Parameters?.Add(new OpenApiParameter
         {
             Name = "expand",
             In = ParameterLocation.Query,
             Required = false,
             Description = QueryParameterDescription("Defines the properties that should be expanded in the response"),
-            Schema = new OpenApiSchema { Type = "string" },
-            Examples = new Dictionary<string, OpenApiExample>
+            Schema = new OpenApiSchema { Type =JsonSchemaType.String  },
+            Examples = new Dictionary<string, IOpenApiExample>
             {
-                { "Expand none", new OpenApiExample { Value = new OpenApiString(string.Empty) } },
-                { "Expand all", new OpenApiExample { Value = new OpenApiString("all") } },
+                { "Expand none", new OpenApiExample { Value = string.Empty } },
+                { "Expand all", new OpenApiExample { Value = "all" } },
                 {
                     "Expand specific property",
-                    new OpenApiExample { Value = new OpenApiString("property:alias1") }
+                    new OpenApiExample { Value = "property:alias1" }
                 },
                 {
                     "Expand specific properties",
-                    new OpenApiExample { Value = new OpenApiString("property:alias1,alias2") }
+                    new OpenApiExample { Value = "property:alias1,alias2" }
                 }
             }
         });
 
     private void AddExpand(OpenApiOperation operation)
-        => operation.Parameters.Add(new OpenApiParameter
+        => operation.Parameters?.Add(new OpenApiParameter
         {
             Name = "expand",
             In = ParameterLocation.Query,
             Required = false,
             Description = QueryParameterDescription("Defines the properties that should be expanded in the response"),
-            Schema = new OpenApiSchema { Type = "string" },
-            Examples = new Dictionary<string, OpenApiExample>
+            Schema = new OpenApiSchema { Type = JsonSchemaType.String },
+            Examples = new Dictionary<string, IOpenApiExample>
             {
-                { "Expand none", new OpenApiExample { Value = new OpenApiString(string.Empty) } },
-                { "Expand all properties", new OpenApiExample { Value = new OpenApiString("properties[$all]") } },
+                { "Expand none", new OpenApiExample { Value = string.Empty } },
+                { "Expand all properties", new OpenApiExample { Value = "properties[$all]" } },
                 {
                     "Expand specific property",
-                    new OpenApiExample { Value = new OpenApiString("properties[alias1]") }
+                    new OpenApiExample { Value = "properties[alias1]" }
                 },
                 {
                     "Expand specific properties",
-                    new OpenApiExample { Value = new OpenApiString("properties[alias1,alias2]") }
+                    new OpenApiExample { Value = "properties[alias1,alias2]" }
                 },
                 {
                     "Expand nested properties",
-                    new OpenApiExample { Value = new OpenApiString("properties[alias1[properties[nestedAlias1,nestedAlias2]]]") }
+                    new OpenApiExample { Value = "properties[alias1[properties[nestedAlias1,nestedAlias2]]]" }
                 }
             }
         });
 
     private void AddFields(OpenApiOperation operation)
-        => operation.Parameters.Add(new OpenApiParameter
+        => operation.Parameters?.Add(new OpenApiParameter
         {
             Name = "fields",
             In = ParameterLocation.Query,
             Required = false,
             Description = QueryParameterDescription("Explicitly defines which properties should be included in the response (by default all properties are included)"),
-            Schema = new OpenApiSchema { Type = "string" },
-            Examples = new Dictionary<string, OpenApiExample>
+            Schema = new OpenApiSchema { Type = JsonSchemaType.String },
+            Examples = new Dictionary<string, IOpenApiExample>
             {
-                { "Include all properties", new OpenApiExample { Value = new OpenApiString("properties[$all]") } },
+                { "Include all properties", new OpenApiExample { Value = "properties[$all]" } },
                 {
                     "Include only specific property",
-                    new OpenApiExample { Value = new OpenApiString("properties[alias1]") }
+                    new OpenApiExample { Value = "properties[alias1]" }
                 },
                 {
                     "Include only specific properties",
-                    new OpenApiExample { Value = new OpenApiString("properties[alias1,alias2]") }
+                    new OpenApiExample { Value = "properties[alias1,alias2]" }
                 },
                 {
                     "Include only specific nested properties",
-                    new OpenApiExample { Value = new OpenApiString("properties[alias1[properties[nestedAlias1,nestedAlias2]]]") }
+                    new OpenApiExample { Value = "properties[alias1[properties[nestedAlias1,nestedAlias2]]]" }
                 }
             }
         });
+
 }

@@ -1,4 +1,4 @@
-﻿using Microsoft.OpenApi.Models;
+﻿using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Umbraco.Extensions;
 
@@ -21,26 +21,32 @@ public class MimeTypeDocumentFilter : IDocumentFilter
         }
 
         OpenApiOperation[] operations = swaggerDoc.Paths
-            .SelectMany(path => path.Value.Operations.Values)
+            .SelectMany(path => path.Value.Operations?.Values ?? Enumerable.Empty<OpenApiOperation>())
             .ToArray();
 
-        void RemoveUnwantedMimeTypes(IDictionary<string, OpenApiMediaType> content)
+        void RemoveUnwantedMimeTypes(IDictionary<string, OpenApiMediaType>? content)
         {
+            if (content == null)
+            {
+                return;
+            }
+
             if (content.ContainsKey("application/json"))
             {
                 content.RemoveAll(r => r.Key != "application/json");
             }
-
         }
 
-        OpenApiRequestBody[] requestBodies = operations.Select(operation => operation.RequestBody).WhereNotNull().ToArray();
+        IOpenApiRequestBody[] requestBodies =
+            operations.Select(operation => operation.RequestBody).WhereNotNull().ToArray();
         foreach (OpenApiRequestBody requestBody in requestBodies)
         {
             RemoveUnwantedMimeTypes(requestBody.Content);
         }
 
-        OpenApiResponse[] responses = operations.SelectMany(operation => operation.Responses.Values).WhereNotNull().ToArray();
-        foreach (OpenApiResponse response in responses)
+        IOpenApiResponse[] responses =
+            operations.SelectMany(operation => operation.Responses?.Values  ?? Enumerable.Empty<IOpenApiResponse>() ).WhereNotNull().ToArray();
+        foreach (IOpenApiResponse response in responses)
         {
             RemoveUnwantedMimeTypes(response.Content);
         }

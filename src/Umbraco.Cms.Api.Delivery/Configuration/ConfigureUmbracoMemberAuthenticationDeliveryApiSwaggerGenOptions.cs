@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Umbraco.Cms.Api.Common.Security;
 using Umbraco.Cms.Api.Delivery.Controllers.Content;
@@ -40,13 +40,9 @@ public class ConfigureUmbracoMemberAuthenticationDeliveryApiSwaggerGenOptions : 
                 new OpenApiSecurityRequirement
                 {
                     {
-                        new OpenApiSecurityScheme
+                        new OpenApiSecuritySchemeReference(AuthSchemeName)
                         {
-                            Reference = new OpenApiReference
-                            {
-                                Type = ReferenceType.SecurityScheme,
-                                Id = AuthSchemeName,
-                            }
+
                         },
                         []
                     }
@@ -61,7 +57,7 @@ public class ConfigureUmbracoMemberAuthenticationDeliveryApiSwaggerGenOptions : 
                 return;
             }
 
-            swaggerDoc.Components.SecuritySchemes.Add(
+            swaggerDoc.Components?.SecuritySchemes?.Add(
                 AuthSchemeName,
                 new OpenApiSecurityScheme
                 {

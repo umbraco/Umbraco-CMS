@@ -1,5 +1,5 @@
-using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Models;
+using System.Text.Json.Nodes;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Umbraco.Cms.Api.Delivery.Configuration;
 using Umbraco.Cms.Api.Delivery.Controllers;
@@ -13,7 +13,7 @@ internal sealed class SwaggerContentDocumentationFilter : SwaggerDocumentationFi
 
     protected override void ApplyOperation(OpenApiOperation operation, OperationFilterContext context)
     {
-        operation.Parameters ??= new List<OpenApiParameter>();
+        operation.Parameters ??= new List<IOpenApiParameter>();
 
         AddExpand(operation, context);
 
@@ -25,11 +25,11 @@ internal sealed class SwaggerContentDocumentationFilter : SwaggerDocumentationFi
             In = ParameterLocation.Header,
             Required = false,
             Description = "Defines the language to return. Use this when querying language variant content items.",
-            Schema = new OpenApiSchema { Type = "string" },
-            Examples = new Dictionary<string, OpenApiExample>
+            Schema = new OpenApiSchema { Type = JsonSchemaType.String },
+            Examples = new Dictionary<string, IOpenApiExample>
             {
-                { "Default", new OpenApiExample { Value = new OpenApiString(string.Empty) } },
-                { "English culture", new OpenApiExample { Value = new OpenApiString("en-us") } }
+                { "Default", new OpenApiExample { Value = string.Empty } },
+                { "English culture", new OpenApiExample { Value = "en-us" } }
             }
         });
 
@@ -39,11 +39,11 @@ internal sealed class SwaggerContentDocumentationFilter : SwaggerDocumentationFi
             In = ParameterLocation.Header,
             Required = false,
             Description = "Defines the segment to return. Use this when querying segment variant content items.",
-            Schema = new OpenApiSchema { Type = "string" },
-            Examples = new Dictionary<string, OpenApiExample>
+            Schema = new OpenApiSchema { Type = JsonSchemaType.String },
+            Examples = new Dictionary<string, IOpenApiExample>
             {
-                { "Default", new OpenApiExample { Value = new OpenApiString(string.Empty) } },
-                { "Segment One", new OpenApiExample { Value = new OpenApiString("segment-one") } }
+                { "Default", new OpenApiExample { Value = string.Empty } },
+                { "Segment One", new OpenApiExample { Value = "segment-one" } }
             }
         });
 
@@ -55,7 +55,7 @@ internal sealed class SwaggerContentDocumentationFilter : SwaggerDocumentationFi
             In = ParameterLocation.Header,
             Required = false,
             Description = "Whether to request draft content.",
-            Schema = new OpenApiSchema { Type = "boolean" }
+            Schema = new OpenApiSchema { Type = JsonSchemaType.Boolean }
         });
 
         operation.Parameters.Add(new OpenApiParameter
@@ -64,22 +64,25 @@ internal sealed class SwaggerContentDocumentationFilter : SwaggerDocumentationFi
             In = ParameterLocation.Header,
             Required = false,
             Description = "URL segment or GUID of a root content item.",
-            Schema = new OpenApiSchema { Type = "string" }
+            Schema = new OpenApiSchema { Type = JsonSchemaType.String }
         });
     }
 
-    protected override void ApplyParameter(OpenApiParameter parameter, ParameterFilterContext context)
+    protected override void ApplyParameter(IOpenApiParameter parameter, ParameterFilterContext context)
     {
         switch (parameter.Name)
         {
             case "fetch":
-                AddQueryParameterDocumentation(parameter, FetchQueryParameterExamples(), "Specifies the content items to fetch");
+                AddQueryParameterDocumentation(parameter, FetchQueryParameterExamples(),
+                    "Specifies the content items to fetch");
                 break;
             case "filter":
-                AddQueryParameterDocumentation(parameter, FilterQueryParameterExamples(), "Defines how to filter the fetched content items");
+                AddQueryParameterDocumentation(parameter, FilterQueryParameterExamples(),
+                    "Defines how to filter the fetched content items");
                 break;
             case "sort":
-                AddQueryParameterDocumentation(parameter, SortQueryParameterExamples(), "Defines how to sort the found content items");
+                AddQueryParameterDocumentation(parameter, SortQueryParameterExamples(),
+                    "Defines how to sort the found content items");
                 break;
             case "skip":
                 parameter.Description = PaginationDescription(true, "content");
@@ -92,105 +95,57 @@ internal sealed class SwaggerContentDocumentationFilter : SwaggerDocumentationFi
         }
     }
 
-    private Dictionary<string, OpenApiExample> FetchQueryParameterExamples() =>
+    private Dictionary<string, IOpenApiExample> FetchQueryParameterExamples() =>
         new()
         {
-            { "Select all", new OpenApiExample { Value = new OpenApiString(string.Empty) } },
-            {
-                "Select all ancestors of a node by id",
-                new OpenApiExample { Value = new OpenApiString("ancestors:id") }
-            },
-            {
-                "Select all ancestors of a node by path",
-                new OpenApiExample { Value = new OpenApiString("ancestors:path") }
-            },
-            {
-                "Select all children of a node by id",
-                new OpenApiExample { Value = new OpenApiString("children:id") }
-            },
-            {
-                "Select all children of a node by path",
-                new OpenApiExample { Value = new OpenApiString("children:path") }
-            },
-            {
-                "Select all descendants of a node by id",
-                new OpenApiExample { Value = new OpenApiString("descendants:id") }
-            },
-            {
-                "Select all descendants of a node by path",
-                new OpenApiExample { Value = new OpenApiString("descendants:path") }
-            }
+            { "Select all", new OpenApiExample { Value = string.Empty } },
+            { "Select all ancestors of a node by id", new OpenApiExample { Value = "ancestors:id" } },
+            { "Select all ancestors of a node by path", new OpenApiExample { Value = "ancestors:path" } },
+            { "Select all children of a node by id", new OpenApiExample { Value = "children:id" } },
+            { "Select all children of a node by path", new OpenApiExample { Value = "children:path" } },
+            { "Select all descendants of a node by id", new OpenApiExample { Value = "descendants:id" } },
+            { "Select all descendants of a node by path", new OpenApiExample { Value = "descendants:path" } }
         };
 
-    private Dictionary<string, OpenApiExample> FilterQueryParameterExamples() =>
+    private Dictionary<string, IOpenApiExample> FilterQueryParameterExamples() =>
         new()
         {
-            { "Default filter", new OpenApiExample { Value = new OpenApiString(string.Empty) } },
+            { "Default filter", new OpenApiExample { Value = string.Empty } },
             {
                 "Filter by content type (equals)",
-                new OpenApiExample { Value = new OpenApiArray { new OpenApiString("contentType:alias1") } }
+                new OpenApiExample
+                {
+                    Value = new JsonArray() { "contentType:alias1"  }
+                }
             },
-            {
-                "Filter by name (contains)",
-                new OpenApiExample { Value = new OpenApiArray { new OpenApiString("name:nodeName") } }
-            },
+            { "Filter by name (contains)", new OpenApiExample { Value = new JsonArray() { "name:nodeName" } } },
             {
                 "Filter by creation date (less than)",
-                new OpenApiExample { Value = new OpenApiArray { new OpenApiString("createDate<2024-01-01") } }
+                new OpenApiExample { Value = new JsonArray() { "createDate<2024-01-01" } }
             },
             {
                 "Filter by update date (greater than or equal)",
-                new OpenApiExample { Value = new OpenApiArray { new OpenApiString("updateDate>:2023-01-01") } }
+                new OpenApiExample { Value = new JsonArray() { "updateDate>:2023-01-01" } }
             }
         };
 
-    private Dictionary<string, OpenApiExample> SortQueryParameterExamples() =>
+    private Dictionary<string, IOpenApiExample> SortQueryParameterExamples() =>
         new()
         {
-            { "Default sort", new OpenApiExample { Value = new OpenApiString(string.Empty) } },
+            { "Default sort", new OpenApiExample { Value = string.Empty } },
             {
                 "Sort by create date",
-                new OpenApiExample
-                {
-                    Value = new OpenApiArray
-                    {
-                        new OpenApiString("createDate:asc"), new OpenApiString("createDate:desc")
-                    }
-                }
+                new OpenApiExample { Value = new JsonArray() { "createDate:asc", "createDate:desc" } }
             },
-            {
-                "Sort by level",
-                new OpenApiExample
-                {
-                    Value = new OpenApiArray { new OpenApiString("level:asc"), new OpenApiString("level:desc") }
-                }
-            },
-            {
-                "Sort by name",
-                new OpenApiExample
-                {
-                    Value = new OpenApiArray { new OpenApiString("name:asc"), new OpenApiString("name:desc") }
-                }
-            },
+            { "Sort by level", new OpenApiExample { Value = new JsonArray() { "level:asc", "level:desc" } } },
+            { "Sort by name", new OpenApiExample { Value = new JsonArray() { "name:asc", "name:desc" } } },
             {
                 "Sort by sort order",
-                new OpenApiExample
-                {
-                    Value = new OpenApiArray
-                    {
-                        new OpenApiString("sortOrder:asc"), new OpenApiString("sortOrder:desc")
-                    }
-                }
+                new OpenApiExample { Value = new JsonArray() { "sortOrder:asc", "sortOrder:desc" } }
             },
             {
                 "Sort by update date",
-                new OpenApiExample
-                {
-                    Value = new OpenApiArray
-                    {
-                        new OpenApiString("updateDate:asc"), new OpenApiString("updateDate:desc")
-                    }
-                }
+                new OpenApiExample { Value = new JsonArray() { "updateDate:asc", "updateDate:desc" } }
             }
         };
 }

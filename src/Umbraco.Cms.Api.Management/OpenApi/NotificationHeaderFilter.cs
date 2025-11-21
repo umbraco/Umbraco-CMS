@@ -1,8 +1,9 @@
 using Microsoft.AspNetCore.Http;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Core;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.OpenApi;
 
@@ -24,26 +25,18 @@ internal sealed class NotificationHeaderFilter : IOperationFilter
 
         // filter out irrelevant responses (401 will never produce notifications)
         IEnumerable<OpenApiResponse> relevantResponses = operation
-            .Responses
-            .Where(pair => pair.Key != StatusCodes.Status401Unauthorized.ToString())
-            .Select(pair => pair.Value);
+            .Responses?
+            .Where(pair => pair.Key != StatusCodes.Status401Unauthorized.ToString())?
+            .Select(pair => pair.Value as OpenApiResponse).WhereNotNull() ?? [];
         foreach (OpenApiResponse response in relevantResponses)
         {
-            response.Headers.TryAdd(Constants.Headers.Notifications, new OpenApiHeader
+            response.Headers?.TryAdd(Constants.Headers.Notifications, new OpenApiHeader
             {
                 Description = "The list of notifications produced during the request.",
                 Schema = new OpenApiSchema
                 {
-                    Type = "array",
-                    Nullable = true,
-                    Items = new OpenApiSchema()
-                    {
-                        Reference = new OpenApiReference()
-                        {
-                            Type = ReferenceType.Schema,
-                            Id = notificationModelType.Name
-                        },
-                    }
+                    Type = JsonSchemaType.Array,
+                    Items = new OpenApiSchemaReference(notificationModelType.Name)
                 }
             });
         }

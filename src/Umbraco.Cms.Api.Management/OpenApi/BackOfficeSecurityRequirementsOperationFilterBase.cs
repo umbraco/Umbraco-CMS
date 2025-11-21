@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Umbraco.Cms.Api.Management.DependencyInjection;
 using Umbraco.Extensions;
@@ -21,7 +21,7 @@ public abstract class BackOfficeSecurityRequirementsOperationFilterBase : IOpera
         if (!context.MethodInfo.GetCustomAttributes(true).Any(x => x is AllowAnonymousAttribute) &&
             !(context.MethodInfo.DeclaringType?.GetCustomAttributes(true).Any(x => x is AllowAnonymousAttribute) ?? false))
         {
-            operation.Responses.Add(StatusCodes.Status401Unauthorized.ToString(), new OpenApiResponse
+            operation.Responses?.Add(StatusCodes.Status401Unauthorized.ToString(), new OpenApiResponse
             {
                 Description = "The resource is protected and requires an authentication token"
             });
@@ -31,14 +31,7 @@ public abstract class BackOfficeSecurityRequirementsOperationFilterBase : IOpera
                 new OpenApiSecurityRequirement
                 {
                     {
-                        new OpenApiSecurityScheme
-                        {
-                            Reference = new OpenApiReference
-                            {
-                                Type = ReferenceType.SecurityScheme,
-                                Id = ManagementApiConfiguration.ApiSecurityName
-                            }
-                        }, []
+                        new OpenApiSecuritySchemeReference(ManagementApiConfiguration.ApiSecurityName), []
                     }
                 }
             };
@@ -57,7 +50,7 @@ public abstract class BackOfficeSecurityRequirementsOperationFilterBase : IOpera
 
         if (numberOfAuthorizeAttributes > 2 || hasConstructorInjectingIAuthorizationService)
         {
-            operation.Responses.Add(StatusCodes.Status403Forbidden.ToString(), new OpenApiResponse()
+            operation.Responses?.Add(StatusCodes.Status403Forbidden.ToString(), new OpenApiResponse()
             {
                 Description = "The authenticated user does not have access to this resource"
             });
