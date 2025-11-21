@@ -63,6 +63,15 @@ test('can see notification when content is published', async ({umbracoUi, umbrac
 
   // Assert
   await umbracoUi.content.isSuccessNotificationVisible();
+  const expectedSubject = `Notification about ${actionName} performed on ${contentName}`;
+  const startTime = Date.now();
+  while (Date.now() - startTime < 20000) {
+    const email = await umbracoApi.smtp.findEmailBySubject(expectedSubject);
+    if (email) {
+      return;
+    }
+    await new Promise(resolve => setTimeout(resolve, 500));
+  }
   expect(await umbracoApi.smtp.doesNotificationEmailWithSubjectExist(actionName, contentName)).toBeTruthy();
 });
 
