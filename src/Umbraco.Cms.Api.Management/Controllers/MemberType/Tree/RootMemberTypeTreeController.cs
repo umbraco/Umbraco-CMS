@@ -32,5 +32,8 @@ public class RootMemberTypeTreeController : MemberTypeTreeControllerBase
         int skip = 0,
         int take = 100,
         bool foldersOnly = false)
-        => await GetRoot(skip, take);
+    {
+        RenderFoldersOnly(foldersOnly);
+        return await GetRoot(skip, take);
+    }
 }
