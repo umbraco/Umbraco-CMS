@@ -58,7 +58,7 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 	// TODO: Stop using this complex code in render methods, instead changes to _logLevelCount should trigger a state prop containing the keys. And then try to make use of the repeat LIT method:
 	override render() {
 		return html`
-			<uui-box id="types" headline="Log types">
+			<uui-box id="types" headline=${this.localize.term('logViewer_logTypes')}>
 				<div id="log-types-container">
 					<div id="legend">
 						<ul>
@@ -81,7 +81,7 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 								: ''}
 						</ul>
 					</div>
-					<umb-donut-chart .description=${'In chosen date range you have this number of log message of type:'}>
+					<umb-donut-chart .description=${this.localize.term('logViewer_logTypesChartDescription')}>
 						${this._logLevelCountResponse
 							? this._logLevelCount.map(
 									([level, number]) =>

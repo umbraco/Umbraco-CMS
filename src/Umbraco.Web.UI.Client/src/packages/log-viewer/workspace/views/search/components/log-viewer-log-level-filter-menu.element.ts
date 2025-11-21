@@ -76,22 +76,27 @@ export class UmbLogViewerLogLevelFilterMenuElement extends UmbLitElement {
 				<uui-button
 					class="log-level-menu-item"
 					@click=${this.#selectAllLogLevels}
-					label=${this.localize.term('general_selectAll')}></uui-button>
-				<uui-button class="log-level-menu-item" @click=${this.#deselectAllLogLevels} label="Deselect all"
-					>Deselect all</uui-button
-				>
+					label=${this.localize.term('logViewer_selectAllLogLevelFilters')}>
+					<umb-localize key="logViewer_selectAllLogLevelFilters">Select all</umb-localize>
+				</uui-button>
+				<uui-button
+					class="log-level-menu-item"
+					@click=${this.#deselectAllLogLevels}
+					label=${this.localize.term('logViewer_deselectAllLogLevelFilters')}>
+					<umb-localize key="logViewer_deselectAllLogLevelFilters">Deselect all</umb-localize>
+				</uui-button>
 			</div>
 		`;
 	}
 
 	override render() {
 		return html`
-			<umb-dropdown label="Select log levels">
+			<umb-dropdown label=${this.localize.term('logViewer_selectLogLevels')}>
 				<span slot="label">
-					Log Level:
+					<umb-localize key="logViewer_logLevels">Log Levels</umb-localize>:
 					${this._logLevelFilter.length > 0
 						? this._logLevelFilter.map((level) => html`<span class="log-level-button-indicator">${level}</span>`)
-						: 'All'}
+						: html`<umb-localize key="logViewer_all">All</umb-localize>`}
 				</span>
 				${this.#renderLogLevelSelector()}
 			</umb-dropdown>

@@ -60,9 +60,10 @@ export class UmbLogViewerSavedSearchesOverviewElement extends UmbLitElement {
 	};
 
 	override render() {
-		return html` <uui-box id="saved-searches" headline="Saved searches">
+		return html` <uui-box id="saved-searches" headline=${this.localize.term('logViewer_savedSearches')}>
 			<ul>
-				${this.#renderSearchItem({ name: 'All logs', query: '' })} ${this._savedSearches.map(this.#renderSearchItem)}
+				${this.#renderSearchItem({ name: this.localize.term('logViewer_allLogs'), query: '' })}
+				${this._savedSearches.map(this.#renderSearchItem)}
 			</ul>
 			${this._total > this.#itemsPerPage
 				? html`<uui-pagination
