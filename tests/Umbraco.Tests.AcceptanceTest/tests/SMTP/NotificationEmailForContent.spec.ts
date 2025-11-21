@@ -82,9 +82,16 @@ test('can see notification when content is updated', async ({umbracoUi, umbracoA
 
   // Assert
   await umbracoUi.content.isSuccessStateVisibleForSaveButton();
-  await new Promise(f => setTimeout(f, 2000)); // Wait for email to be sent
-  const notifications = await umbracoApi.smtp.getAllEmails();
-  console.log('Notifications:', notifications);
+  let emails;
+  for (let attempt = 0; attempt < 20; attempt++) {
+      emails = await umbracoApi.smtp.getAllEmails();
+      if (emails.length > 0) break;
+      await umbracoUi.waitForTimeout(1000);
+  }
+  if (emails.length === 0) {
+      throw new Error('No emails received in SMTP4dev!');
+  }
+  console.log('Emails:', emails);
   expect(await umbracoApi.smtp.doesNotificationEmailWithSubjectExist(actionName, contentName)).toBeTruthy();
 });
 
