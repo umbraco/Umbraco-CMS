@@ -1,7 +1,12 @@
 import { UmbUfmElementBase } from '../ufm-element-base.js';
 import { UMB_UFM_RENDER_CONTEXT } from '../ufm-render/ufm-render.context.js';
 import { customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { UmbDocumentItemRepository, UMB_DOCUMENT_ENTITY_TYPE } from '@umbraco-cms/backoffice/document';
+import {
+	UmbDocumentItemRepository,
+	UMB_DOCUMENT_ENTITY_TYPE,
+	UmbDocumentItemDataResolver,
+	type UmbDocumentItemModel,
+} from '@umbraco-cms/backoffice/document';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbMediaItemRepository, UMB_MEDIA_ENTITY_TYPE } from '@umbraco-cms/backoffice/media';
 import { UmbMemberItemRepository, UMB_MEMBER_ENTITY_TYPE } from '@umbraco-cms/backoffice/member';
@@ -64,8 +69,18 @@ export class UmbUfmContentNameElement extends UmbUfmElementBase {
 				const { data } = await repository.requestItems(uniques);
 
 				if (Array.isArray(data) && data.length > 0) {
-					// TODO: [v17] Review usage of `item.variants[0].name` as this needs to be implemented properly! [LK]
-					return data.map((item) => item.variants[0].name).join(', ');
+					if (entityType === UMB_DOCUMENT_ENTITY_TYPE) {
+						const namePromises = data.map(async (item) => {
+							const resolver = new UmbDocumentItemDataResolver(this);
+							resolver.setData(item as UmbDocumentItemModel);
+							return await resolver.getName();
+						});
+						const names = await Promise.all(namePromises);
+						return names.join(', ');
+					} else {
+						// TODO: Review usage of `item.variants[0].name` as this needs to be implemented properly for media/member items [LK]
+						return data.map((item) => item.variants[0].name).join(', ');
+					}
 				}
 			}
 		}
