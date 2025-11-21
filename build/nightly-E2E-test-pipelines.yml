@@ -581,6 +581,23 @@ stages:
               CONNECTIONSTRINGS__UMBRACODBDSN: Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True
               CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
               additionalEnvironmentVariables: false
+            # SMTP
+            WindowsSMTP:
+              vmImage: "windows-latest"
+              testFolder: "SMTP"
+              port: ''
+              testCommand: "npx playwright test --project=smtp"
+              CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=(localdb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Umbraco.mdf;Integrated Security=True
+              CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
+              additionalEnvironmentVariables: false
+            LinuxSMTP:
+              vmImage: "ubuntu-latest"
+              testFolder: "SMTP"
+              port: ''
+              testCommand: "npx playwright test --project=smtp"
+              CONNECTIONSTRINGS__UMBRACODBDSN: Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True
+              CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
+              additionalEnvironmentVariables: false
         pool:
           vmImage: $(vmImage)
         steps:
@@ -657,6 +674,42 @@ stages:
               AZUREADB2CPOLICY: $(AZUREB2CPOLICY)
               AZUREADB2CCLIENTID: $(AZUREB2CCLIENTID)
               AZUREADB2CCLIENTSECRET: $(AZUREB2CCLIENTSECRET)
+
+          # Start SMTP4dev via Docker for SMTP tests
+          - bash: |
+              docker run -d --name smtp4dev -p 5000:25 rnwood/smtp4dev:latest
+              echo "Waiting for SMTP4dev to be ready..."
+              for i in {1..30}; do
+                if curl -s http://localhost:5000 > /dev/null; then
+                  echo "SMTP4dev is ready"
+                  break
+                fi
+                echo "Attempt $i: Waiting for SMTP4dev..."
+                sleep 2
+              done
+            displayName: Start SMTP4dev Docker container (Linux)
+            condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'), contains(variables['testFolder'], 'SMTP'))
+
+          - pwsh: |
+              docker run -d --name smtp4dev -p 5000:25 rnwood/smtp4dev:latest
+              Write-Host "Waiting for SMTP4dev to be ready..."
+              $maxAttempts = 30
+              $attempt = 0
+              while ($attempt -lt $maxAttempts) {
+                try {
+                  $response = Invoke-WebRequest -Uri "http://localhost:5000" -UseBasicParsing -ErrorAction Stop
+                  if ($response.StatusCode -eq 200) {
+                    Write-Host "SMTP4dev is ready"
+                    break
+                  }
+                } catch {
+                  Write-Host "Attempt $($attempt + 1): Waiting for SMTP4dev..."
+                  Start-Sleep -Seconds 2
+                }
+                $attempt++
+              }
+            displayName: Start SMTP4dev Docker container (Windows)
+            condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'), contains(variables['testFolder'], 'SMTP'))
 
           # Run tests Template
           - template: nightly-E2E-run-tests-template.yml
