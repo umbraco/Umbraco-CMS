@@ -1,4 +1,4 @@
-﻿using Microsoft.OpenApi.Models;
+﻿using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Umbraco.Cms.Api.Common.OpenApi;
@@ -20,6 +20,6 @@ public class RemoveSecuritySchemesDocumentFilter : IDocumentFilter
             return;
         }
 
-        swaggerDoc.Components.SecuritySchemes.Clear();
+        swaggerDoc.Components?.SecuritySchemes?.Clear();
     }
 }
