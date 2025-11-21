@@ -1,6 +1,7 @@
 export * from 'lit';
 export * from 'lit/decorators.js';
-export { directive, AsyncDirective, type PartInfo } from 'lit/async-directive.js';
+export { directive, AsyncDirective, Directive, PartType } from 'lit/async-directive.js';
+export type { PartInfo } from 'lit/async-directive.js';
 export * from 'lit/directives/class-map.js';
 export * from 'lit/directives/if-defined.js';
 export * from 'lit/directives/map.js';
