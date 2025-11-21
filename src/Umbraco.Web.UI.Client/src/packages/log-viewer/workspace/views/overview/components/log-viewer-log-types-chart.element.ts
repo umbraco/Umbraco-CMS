@@ -88,7 +88,21 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 	override render() {
 		return html`
 			<uui-box id="types" headline="Log types">
+				<p id="description">In the chosen date range you have this number of log message of type:</p>
 				<div id="log-types-container">
+					<umb-donut-chart show-inline-numbers>
+						${repeat(
+							this._logLevelCount,
+							([level]) => level,
+							([level, number]) =>
+								html`<umb-donut-slice
+									.name=${level}
+									.amount=${number}
+									.kind=${'messages'}
+									.href=${this.#buildSearchUrl(level)}
+									.color="${`var(--umb-log-viewer-${level.toLowerCase()}-color)`}"></umb-donut-slice>`,
+						)}
+					</umb-donut-chart>
 					<div id="legend">
 						<ul>
 							${repeat(
@@ -110,22 +124,6 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 							)}
 						</ul>
 					</div>
-					<umb-donut-chart
-						.description=${'In chosen date range you have this number of log message of type:'}
-						show-inline-numbers
-						show-description>
-						${repeat(
-							this._logLevelCount,
-							([level]) => level,
-							([level, number]) =>
-								html`<umb-donut-slice
-									.name=${level}
-									.amount=${number}
-									.kind=${'messages'}
-									.href=${this.#buildSearchUrl(level)}
-									.color="${`var(--umb-log-viewer-${level.toLowerCase()}-color)`}"></umb-donut-slice>`,
-						)}
-					</umb-donut-chart>
 				</div>
 			</uui-box>
 		`;
@@ -133,18 +131,48 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 
 	static override styles = [
 		css`
-			#log-types-container {
-				display: flex;
-				gap: var(--uui-size-space-4);
-				flex-direction: column-reverse;
-				align-items: center;
-				justify-content: space-between;
+			uui-box {
+				container-type: inline-size;
 			}
 
-			@media (min-width: 768px) {
+			#description {
+				text-align: center;
+				font-size: var(--uui-type-small-size);
+				color: var(--uui-color-text-alt);
+				margin: 0 0 var(--uui-size-space-4) 0;
+			}
+
+			#log-types-container {
+				display: grid;
+				gap: var(--uui-size-space-4);
+				grid-template-columns: 1fr;
+				place-items: center;
+			}
+
+			umb-donut-chart {
+				width: 100%;
+				max-width: 200px;
+			}
+
+			#legend {
+				width: 100%;
+				display: flex;
+				justify-content: center;
+			}
+
+			@container (min-width: 312px) {
 				#log-types-container {
-					flex-direction: row;
-					align-items: flex-start;
+					grid-template-columns: auto 1fr;
+					place-items: start;
+				}
+
+				umb-donut-chart {
+					max-width: 200px;
+				}
+
+				#legend {
+					width: auto;
+					justify-content: flex-start;
 				}
 			}
 

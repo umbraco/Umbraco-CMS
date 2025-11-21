@@ -307,7 +307,9 @@ export class UmbDonutChartElement extends LitElement {
 
 	override render() {
 		return html` <div id="container" @mousemove=${this.#calculateDetailsBoxPosition}>
-				<svg viewBox="0 0 ${this._viewBox} ${this._viewBox}" role="list">${this.#renderCircles()}</svg>
+				<svg width="100%" height="100%" viewBox="0 0 ${this._viewBox} ${this._viewBox}" role="list">
+					${this.#renderCircles()}
+				</svg>
 				<div
 					id="details-box"
 					style="--pos-y: ${this._posY}px; --pos-x: ${this._posX}px; --umb-donut-detail-color: ${this._detailColor}">
@@ -341,7 +343,9 @@ export class UmbDonutChartElement extends LitElement {
 
 			#container {
 				position: relative;
-				width: 200px;
+				width: 100%;
+				max-width: 200px;
+				aspect-ratio: 1;
 			}
 
 			#details-box {
