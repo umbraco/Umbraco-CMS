@@ -1,6 +1,5 @@
-import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_BLOCK_ENTRY_CONTEXT } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockDataType } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockEditorCustomViewConfiguration } from '@umbraco-cms/backoffice/block-custom-view';
 
@@ -36,7 +35,7 @@ export class UmbRefRteBlockElement extends UmbLitElement {
 		return html`
 			<uui-ref-node
 				standalone
-				.readonly=${!this.config?.showContentEdit ?? false}
+				.readonly=${!(this.config?.showContentEdit ?? false)}
 				.href=${this.config?.showContentEdit ? this.config?.editContentPath : undefined}>
 				<div class="selection-background" aria-hidden="true">&emsp;</div>
 				<umb-icon slot="icon" .name=${this.icon}></umb-icon>
