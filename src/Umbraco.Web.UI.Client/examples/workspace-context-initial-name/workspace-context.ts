@@ -8,8 +8,6 @@ export class ExampleWorkspaceContextNameManipulation extends UmbControllerBase {
 	constructor(host: UmbControllerHost) {
 		super(host);
 
-		console.log('Hello');
-
 		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (workspace) => {
 			this.observe(workspace?.loading.isOn, (isLoading) => {
 				// Only manipulate the name when we are not loading:
