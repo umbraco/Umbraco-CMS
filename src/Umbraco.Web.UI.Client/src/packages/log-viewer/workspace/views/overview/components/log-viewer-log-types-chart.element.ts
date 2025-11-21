@@ -82,7 +82,7 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 		if (this._dateRange.endDate) {
 			params.set('endDate', this._dateRange.endDate);
 		}
-		return `view/search/?${params.toString()}`;
+		return `section/settings/workspace/logviewer/view/search/?${params.toString()}`;
 	}
 
 	override render() {
