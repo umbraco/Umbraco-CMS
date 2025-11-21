@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
@@ -9,10 +10,14 @@ namespace Umbraco.Cms.Api.Management.Controllers.MemberType.Tree;
 
 public class SiblingMemberTypeTreeController : MemberTypeTreeControllerBase
 {
-    public SiblingMemberTypeTreeController(
-        IEntityService entityService,
-        FlagProviderCollection flagProviders,
-        IMemberTypeService memberTypeService)
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
+    public SiblingMemberTypeTreeController(IEntityService entityService, IMemberTypeService memberTypeService)
+        : base(entityService, memberTypeService)
+    {
+    }
+
+    [ActivatorUtilitiesConstructor]
+    public SiblingMemberTypeTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IMemberTypeService memberTypeService)
         : base(entityService, flagProviders, memberTypeService)
     {
     }
@@ -25,5 +30,8 @@ public class SiblingMemberTypeTreeController : MemberTypeTreeControllerBase
         int before,
         int after,
         bool foldersOnly = false)
-        => await GetSiblings(target, before, after);
+    {
+        RenderFoldersOnly(foldersOnly);
+        return await GetSiblings(target, before, after);
+    }
 }

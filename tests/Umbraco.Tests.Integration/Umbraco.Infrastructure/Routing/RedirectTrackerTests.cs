@@ -23,40 +23,47 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
 {
     private IRedirectUrlService RedirectUrlService => GetRequiredService<IRedirectUrlService>();
 
+    private IContent _rootPage;
     private IContent _testPage;
-
-    private const string Url = "RedirectUrl";
 
     public override void CreateTestData()
     {
         base.CreateTestData();
 
-        using var scope = ScopeProvider.CreateScope();
-        var repository = CreateRedirectUrlRepository();
         var rootContent = ContentService.GetRootContent().First();
+        _rootPage = rootContent;
         var subPages = ContentService.GetPagedChildren(rootContent.Id, 0, 3, out _).ToList();
         _testPage = subPages[0];
-
-        repository.Save(new RedirectUrl { ContentKey = _testPage.Key, Url = Url, Culture = "en" });
-
-        scope.Complete();
     }
 
     [Test]
     public void Can_Store_Old_Route()
     {
-        Dictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)> dict =
-            new Dictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)>
-            {
-                [(_testPage.Id, "en")] = (_testPage.Key, "/old-route"),
-            };
+        Dictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)> dict = [];
 
         var redirectTracker = CreateRedirectTracker();
 
         redirectTracker.StoreOldRoute(_testPage, dict);
 
-        Assert.That(dict.Count, Is.EqualTo(1));
-        Assert.AreEqual(dict.Values.First().OldRoute, Url);
+        Assert.AreEqual(1, dict.Count);
+        var key = dict.Keys.First();
+        Assert.AreEqual(_testPage.Key, dict[key].ContentKey);
+        Assert.AreEqual("/new-route", dict[key].OldRoute);
+    }
+
+    [Test]
+    public void Can_Store_Old_Route_With_Domain_Root_Prefix()
+    {
+        Dictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)> dict = [];
+
+        var redirectTracker = CreateRedirectTracker(assignDomain: true);
+
+        redirectTracker.StoreOldRoute(_testPage, dict);
+
+        Assert.AreEqual(1, dict.Count);
+        var key = dict.Keys.First();
+        Assert.AreEqual(_testPage.Key, dict[key].ContentKey);
+        Assert.AreEqual($"{_rootPage.Id}/new-route", dict[key].OldRoute);
     }
 
     [Test]
@@ -72,30 +79,32 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
         redirectTracker.CreateRedirects(dict);
 
         var redirects = RedirectUrlService.GetContentRedirectUrls(_testPage.Key);
-
-        Assert.IsTrue(redirects.Any(x => x.Url == "/old-route"));
+        Assert.AreEqual(1, redirects.Count());
+        var redirect = redirects.First();
+        Assert.AreEqual("/old-route", redirect.Url);
     }
 
     [Test]
-    public void Removes_Self_Referncing_Redirects()
+    public void Will_Remove_Self_Referencing_Redirects()
     {
-        const string newUrl = "newUrl";
+        CreateExistingRedirect();
 
         var redirects = RedirectUrlService.GetContentRedirectUrls(_testPage.Key);
-        Assert.IsTrue(redirects.Any(x => x.Url == Url)); // Ensure self referencing redirect exists.
+        Assert.IsTrue(redirects.Any(x => x.Url == "/new-route")); // Ensure self referencing redirect exists.
 
         IDictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)> dict =
             new Dictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)>
             {
-                [(_testPage.Id, "en")] = (_testPage.Key, newUrl),
+                [(_testPage.Id, "en")] = (_testPage.Key, "/old-route"),
             };
 
         var redirectTracker = CreateRedirectTracker();
         redirectTracker.CreateRedirects(dict);
-        redirects = RedirectUrlService.GetContentRedirectUrls(_testPage.Key);
 
-        Assert.IsFalse(redirects.Any(x => x.Url == Url));
-        Assert.IsTrue(redirects.Any(x => x.Url == newUrl));
+        redirects = RedirectUrlService.GetContentRedirectUrls(_testPage.Key);
+        Assert.AreEqual(1, redirects.Count());
+        var redirect = redirects.First();
+        Assert.AreEqual("/old-route", redirect.Url);
     }
 
     private RedirectUrlRepository CreateRedirectUrlRepository() =>
@@ -106,7 +115,7 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
             Mock.Of<IRepositoryCacheVersionService>(),
             Mock.Of<ICacheSyncService>());
 
-    private IRedirectTracker CreateRedirectTracker()
+    private IRedirectTracker CreateRedirectTracker(bool assignDomain = false)
     {
         var contentType = new Mock<IPublishedContentType>();
         contentType.SetupGet(c => c.Variations).Returns(ContentVariation.Nothing);
@@ -116,34 +125,68 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
             { "en", new PublishedCultureInfo("en", "english", "/en/", DateTime.UtcNow) },
         };
 
-        var content = new Mock<IPublishedContent>();
+        var rootContent = new Mock<IPublishedContent>();
+        rootContent.SetupGet(c => c.Id).Returns(_rootPage.Id);
+        rootContent.SetupGet(c => c.Key).Returns(_rootPage.Key);
+        rootContent.SetupGet(c => c.Name).Returns(_rootPage.Name);
+        rootContent.SetupGet(c => c.Path).Returns(_rootPage.Path);
 
+        var content = new Mock<IPublishedContent>();
+        content.SetupGet(c => c.Id).Returns(_testPage.Id);
         content.SetupGet(c => c.Key).Returns(_testPage.Key);
+        content.SetupGet(c => c.Name).Returns(_testPage.Name);
+        content.SetupGet(c => c.Path).Returns(_testPage.Path);
         content.SetupGet(c => c.ContentType).Returns(contentType.Object);
         content.SetupGet(c => c.Cultures).Returns(cultures);
-        content.SetupGet(c => c.Id).Returns(_testPage.Id);
 
         IPublishedContentCache contentCache = Mock.Of<IPublishedContentCache>();
         Mock.Get(contentCache)
             .Setup(x => x.GetById(_testPage.Id))
             .Returns(content.Object);
+        Mock.Get(contentCache)
+            .Setup(x => x.GetById(_testPage.Key))
+            .Returns(content.Object);
 
         IPublishedUrlProvider publishedUrlProvider = Mock.Of<IPublishedUrlProvider>();
         Mock.Get(publishedUrlProvider)
             .Setup(x => x.GetUrl(_testPage.Key, UrlMode.Relative, "en", null))
-            .Returns(Url);
+            .Returns("/new-route");
 
-        Mock.Get(publishedUrlProvider)
-            .Setup(x => x.GetUrl(_testPage.Id, UrlMode.Relative, "en", null))
-            .Returns(Url);
+        IDocumentNavigationQueryService documentNavigationQueryService = Mock.Of<IDocumentNavigationQueryService>();
+        IEnumerable<Guid> ancestorKeys = [_rootPage.Key];
+        Mock.Get(documentNavigationQueryService)
+            .Setup(x => x.TryGetAncestorsKeys(_testPage.Key, out ancestorKeys))
+            .Returns(true);
+
+        IPublishedContentStatusFilteringService publishedContentStatusFilteringService = Mock.Of<IPublishedContentStatusFilteringService>();
+        Mock.Get(publishedContentStatusFilteringService)
+            .Setup(x => x.FilterAvailable(It.IsAny<IEnumerable<Guid>>(), It.IsAny<string?>()))
+            .Returns([rootContent.Object]);
+
+        IDomainCache domainCache = Mock.Of<IDomainCache>();
+        Mock.Get(domainCache)
+            .Setup(x => x.HasAssigned(_testPage.Id, It.IsAny<bool>()))
+            .Returns(false);
+        Mock.Get(domainCache)
+            .Setup(x => x.HasAssigned(_rootPage.Id, It.IsAny<bool>()))
+            .Returns(assignDomain);
 
         return new RedirectTracker(
             GetRequiredService<ILanguageService>(),
             RedirectUrlService,
             contentCache,
-            GetRequiredService<IDocumentNavigationQueryService>(),
+            documentNavigationQueryService,
             GetRequiredService<ILogger<RedirectTracker>>(),
             publishedUrlProvider,
-            GetRequiredService<IPublishedContentStatusFilteringService>());
+            publishedContentStatusFilteringService,
+            domainCache);
+    }
+
+    private void CreateExistingRedirect()
+    {
+        using var scope = ScopeProvider.CreateScope();
+        var repository = CreateRedirectUrlRepository();
+        repository.Save(new RedirectUrl { ContentKey = _testPage.Key, Url = "/new-route", Culture = "en" });
+        scope.Complete();
     }
 }
