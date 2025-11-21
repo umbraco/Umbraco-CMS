@@ -670,11 +670,11 @@ stages:
           # Start SMTP4dev via Docker for SMTP tests
           - bash: |
               echo "Starting SMTP4dev container..."
-              docker run -d --name smtp4dev -p 5000:80 -p 2525:25 -p 110:110 rnwood/smtp4dev
+              docker run -d --name smtp4dev -p 5000:80 -p 2525:25 rnwood/smtp4dev
 
               echo "Waiting for SMTP4dev to be ready..."
               for i in {1..30}; do
-                if curl -s http://localhost:5000 > /dev/null; then
+                if curl -s http://localhost:5000/api/messages > /dev/null; then
                   echo "SMTP4dev is ready"
                   break
                 fi
@@ -693,6 +693,13 @@ stages:
               AZUREB2CTESTUSEREMAIL: $(AZUREB2CTESTUSEREMAIL)
               AZUREB2CTESTUSERPASSWORD: $(AZUREB2CTESTUSERPASSWORD)
               DatabaseType: ${{ variables.DatabaseType }}
+          # Stop SMTP4dev container
+          - bash: |
+              echo "Stopping SMTP4dev container..."
+              docker stop smtp4dev
+              docker rm smtp4dev
+            displayName: Stop SMTP4dev Docker container
+            condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'), contains(variables['testFolder'], 'SMTP'))
 
   - stage: NotifySlackBot
     displayName: Notify Slack on Failure
