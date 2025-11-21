@@ -1,4 +1,3 @@
-import type { UmbLogViewerDateRange } from '../workspace/logviewer-workspace.context.js';
 import { UMB_APP_LOG_VIEWER_CONTEXT } from '../workspace/logviewer-workspace.context-token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
@@ -32,9 +31,9 @@ export class UmbLogViewerDateRangeSelectorElement extends UmbLitElement {
 	#observeStuff() {
 		this.observe(
 			this._logViewerContext?.dateRange,
-			(dateRange: UmbLogViewerDateRange) => {
-				this._startDate = dateRange.startDate;
-				this._endDate = dateRange.endDate;
+			(dateRange) => {
+				this._startDate = dateRange?.startDate ?? '';
+				this._endDate = dateRange?.endDate ?? '';
 			},
 			'_observeDateRange',
 		);
