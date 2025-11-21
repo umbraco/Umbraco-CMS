@@ -139,7 +139,11 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		const validator = new UmbLinkPickerValueValidator(this, '$.type');
 
 		this.observe(this.modalContext?.value, (value) => {
-			validator.setValue(value?.link.type);
+			const { type, queryString: anchor, url } = value?.link ?? {};
+			const hasContent = anchor || url;
+			const validatorValue = type === 'external' ? (hasContent ? type : null) : type ? type : anchor ? anchor : null;
+
+			validator.setValue(validatorValue);
 		});
 	}
 
@@ -353,7 +357,6 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 			<umb-property-layout
 				orientation=${this.#propertyLayoutOrientation}
 				label=${this.localize.term('linkPicker_modalSource')}
-				mandatory
 				?invalid=${this._missingLinkUrl}>
 				<div slot="editor">
 					${this.#renderLinkTypeSelection()} ${this.#renderDocumentPicker()} ${this.#renderMediaPicker()}
@@ -417,7 +420,6 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 				placeholder=${this.localize.term('placeholders_enterUrl')}
 				.value=${this.value.link.url ?? ''}
 				?disabled=${!!this.value.link.unique}
-				required
 				@input=${this.#onLinkUrlInput}
 				${umbBindToValidation(this)}
 				${umbFocus()}>
@@ -449,6 +451,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		return html`
 			<umb-property-layout
 				orientation=${this.#propertyLayoutOrientation}
+				?invalid=${this._missingLinkUrl}
 				label=${this.localize.term('defaultdialogs_anchorLinkPicker')}>
 				<uui-input
 					data-mark="input:anchor"
@@ -456,7 +459,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 					label=${this.localize.term('placeholders_anchor')}
 					placeholder=${this.localize.term('placeholders_anchor')}
 					.value=${this.value.link.queryString ?? ''}
-					@change=${this.#onLinkAnchorInput}></uui-input>
+					@input=${this.#onLinkAnchorInput}></uui-input>
 			</umb-property-layout>
 		`;
 	}
