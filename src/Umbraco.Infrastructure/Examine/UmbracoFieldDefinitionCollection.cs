@@ -35,6 +35,15 @@ public class UmbracoFieldDefinitionCollection : FieldDefinitionCollection
     {
     }
 
+    public UmbracoFieldDefinitionCollection(FieldDefinitionCollection definitions)
+        : base(UmbracoIndexFieldDefinitions)
+    {
+        foreach (var definition in definitions)
+        {
+            AddOrUpdate(definition);
+        }
+    }
+
     /// <summary>
     ///     Overridden to dynamically add field definitions for culture variations
     /// </summary>
