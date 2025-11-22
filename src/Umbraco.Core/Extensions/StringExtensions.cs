@@ -51,16 +51,23 @@ public static class StringExtensions
     }
 
     /// <summary>
-    ///     Convert a path to node ids in the order from right to left (deepest to shallowest)
+    ///     Convert a path to node ids in the order from right to left (deepest to shallowest).
     /// </summary>
-    /// <param name="path"></param>
-    /// <returns></returns>
+    /// <param name="path">The path string expected as a comma delimited collection of integers.</param>
+    /// <returns>An array of integers matching the provided path.</returns>
     public static int[] GetIdsFromPathReversed(this string path)
     {
         ReadOnlySpan<char> pathSpan = path.AsSpan();
+
+        // Using the explicit enumerator (while/MoveNext) over the SpanSplitEnumerator in a foreach loop to avoid any compiler
+        // boxing of the ref struct enumerator.
+        // This prevents potential InvalidProgramException across compilers/JITs ("Cannot create boxed ByRef-like values.").
+        MemoryExtensions.SpanSplitEnumerator<char> pathSegmentsEnumerator = pathSpan.Split(Constants.CharArrays.Comma);
+
         List<int> nodeIds = [];
-        foreach (Range rangeOfPathSegment in pathSpan.Split(Constants.CharArrays.Comma))
+        while (pathSegmentsEnumerator.MoveNext())
         {
+            Range rangeOfPathSegment = pathSegmentsEnumerator.Current;
             if (int.TryParse(pathSpan[rangeOfPathSegment], NumberStyles.Integer, CultureInfo.InvariantCulture, out int pathSegment))
             {
                 nodeIds.Add(pathSegment);
