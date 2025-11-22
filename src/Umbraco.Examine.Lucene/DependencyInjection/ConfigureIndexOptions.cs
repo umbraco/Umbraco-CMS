@@ -48,7 +48,7 @@ public sealed class ConfigureIndexOptions : IConfigureNamedOptions<LuceneDirecto
                 options.Analyzer = new CultureInvariantWhitespaceAnalyzer();
                 options.Validator = _umbracoIndexConfig.GetMemberValueSetValidator();
                 // NOTE: we don't want to overwrite any already registered field definitions
-                options.FieldDefinitions = new UmbracoFieldDefinitionCollection(options.FieldDefinitions;
+                options.FieldDefinitions = new UmbracoFieldDefinitionCollection(options.FieldDefinitions);
                 break;
             case Constants.UmbracoIndexes.DeliveryApiContentIndexName:
                 options.Analyzer = new StandardAnalyzer(LuceneInfo.CurrentVersion);
