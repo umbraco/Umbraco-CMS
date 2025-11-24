@@ -136,7 +136,7 @@ export class UmbMyElement extends UmbElementMixin(LitElement) {
 ```typescript
 // 6. Connect user interactions to logic
 @customElement('umb-my-element')
-export class UmbMyElement extends UmbElementMixin(LitElement) {
+export class UmbMyElement extends UmbLitElement {
 	async #handleClick() {
 		const { data, error } = await this.#context?.load();
 		if (error) {
