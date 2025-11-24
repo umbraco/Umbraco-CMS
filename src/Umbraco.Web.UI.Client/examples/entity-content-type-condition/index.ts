@@ -22,7 +22,7 @@ const workspaceViewAlias: UmbExtensionManifest = {
 
 const workspaceViewUnique: UmbExtensionManifest = {
 	type: 'workspaceView',
-	alias: 'Example.WorkspaceView.EntityContentTypeConditionUnique',
+	alias: 'Example.WorkspaceView.EntityContentTypeUniqueCondition',
 	name: 'Example Workspace View With Content Type Unique Condition',
 	element: () => import('./workspace-view-unique.element.js'),
 	meta: {
