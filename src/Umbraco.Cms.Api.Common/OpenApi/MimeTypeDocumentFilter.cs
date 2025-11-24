@@ -26,7 +26,7 @@ public class MimeTypeDocumentFilter : IDocumentFilter
 
         void RemoveUnwantedMimeTypes(IDictionary<string, OpenApiMediaType>? content)
         {
-            if (content is null || content.ContainsKey("application/json") == false)
+            if (content is null || content.ContainsKey("application/json") is false)
             {
                 return;
             }

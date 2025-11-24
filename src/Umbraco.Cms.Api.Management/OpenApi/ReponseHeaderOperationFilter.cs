@@ -11,7 +11,7 @@ internal sealed class ResponseHeaderOperationFilter : IOperationFilter
 {
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
-        if (!context.MethodInfo.HasMapToApiAttribute(ManagementApiConfiguration.ApiName) || operation.Responses is null)
+        if (context.MethodInfo.HasMapToApiAttribute(ManagementApiConfiguration.ApiName) is false || operation.Responses is null)
         {
             return;
         }

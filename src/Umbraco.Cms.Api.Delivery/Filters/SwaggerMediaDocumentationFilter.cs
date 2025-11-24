@@ -66,7 +66,7 @@ internal sealed class SwaggerMediaDocumentationFilter : SwaggerDocumentationFilt
         {
             { "Default sort", new OpenApiExample { Value = string.Empty } },
             { "Sort by create date", new OpenApiExample { Value = new JsonArray { "createDate:asc", "createDate:desc" } } },
-            { "Sort by name", new OpenApiExample { Value = new JsonArray { "name:asc", "name:desc" }} },
+            { "Sort by name", new OpenApiExample { Value = new JsonArray { "name:asc", "name:desc" } }, },
             { "Sort by sort order", new OpenApiExample { Value = new JsonArray { "sortOrder:asc", "sortOrder:desc" } } },
             { "Sort by update date", new OpenApiExample { Value = new JsonArray { "updateDate:asc", "updateDate:desc" } } },
         };

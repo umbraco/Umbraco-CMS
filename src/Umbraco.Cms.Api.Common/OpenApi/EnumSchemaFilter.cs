@@ -10,7 +10,7 @@ public class EnumSchemaFilter : ISchemaFilter
 {
     public void Apply(IOpenApiSchema model, SchemaFilterContext context)
     {
-        if (model is not OpenApiSchema schema || context.Type.IsEnum == false)
+        if (model is not OpenApiSchema schema || context.Type.IsEnum is false)
         {
             return;
         }
