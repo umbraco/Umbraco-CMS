@@ -642,7 +642,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
             // publish the culture(s)
             // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
-            var publishTime = DateTime.Now;
+            var publishTime = DateTime.UtcNow;
             foreach (CultureImpact? impact in impacts)
             {
                 content.PublishCulture(impact, publishTime, _propertyEditorCollection);
@@ -1402,7 +1402,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             if (deletePriorVersions)
             {
                 TContent? content = GetVersion(versionId);
-                DeleteVersions(id, content?.UpdateDate ?? DateTime.Now, userId);
+                DeleteVersions(id, content?.UpdateDate ?? DateTime.UtcNow, userId);
             }
 
             scope.WriteLock(WriteLockIds);
@@ -1576,7 +1576,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                     .ToArray();
 
         // publish the culture(s)
-        var publishTime = DateTime.Now;
+        var publishTime = DateTime.UtcNow;
         if (!impactsToPublish.All(impact => content.PublishCulture(impact, publishTime, _propertyEditorCollection)))
         {
             return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content);
@@ -1844,7 +1844,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         // otherwise it would remain released == published
         ContentScheduleCollection contentSchedule = _documentRepository.GetContentSchedule(content.Id);
         IReadOnlyList<ContentSchedule> pastReleases =
-            contentSchedule.GetPending(ContentScheduleAction.Expire, DateTime.Now);
+            contentSchedule.GetPending(ContentScheduleAction.Expire, DateTime.UtcNow);
         foreach (ContentSchedule p in pastReleases)
         {
             contentSchedule.Remove(p);
