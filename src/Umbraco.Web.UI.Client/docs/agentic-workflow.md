@@ -114,8 +114,8 @@ export class UmbMyContext extends UmbControllerBase {
 ```typescript
 // 5. UI component
 @customElement('umb-my-element')
-export class UmbMyElement extends UmbElementMixin(LitElement) {
-	#context?: UmbMyContext;
+export class UmbMyElement extends UmbLitElement {
+	#context?: typeof UMB_MY_CONTEXT.TYPE;
 
 	constructor() {
 		super();
@@ -211,6 +211,63 @@ async #handleClick() {
 }
 ```
 
+**Step 9: Add localization**
+```typescript
+// 10. Add to src/Umbraco.Web.UI.Client/src/assets/lang/en.ts and other appropriate files
+{
+  actions: {
+    load: 'Load'
+  }
+}
+
+// 11. Use the localize helper (`this.localize.term()`) in the element
+render() {
+  return html`
+	<uui-button @click=${this.#handleClick} label=${this.localize.term('actions_load')></uui-button>
+		${this._data ? html`<p>${this._data.name}</p>` : ''}
+	`;
+}
+
+async #handleClick() {
+	try {
+		this._loading = true;
+		const { data, error } = await this.#context?.load();
+		if (error) {
+			this._error = this.localize.term('errors_receivedErrorFromServer');
+			return;
+		}
+		this._data = data;
+	} catch (error) {
+		this._error = this.localize.term('errors_defaultError');
+		console.error('Load failed:', error);
+	} finally {
+		this._loading = false;
+	}
+}
+
+// 12. Outside elements (such as controllers), use the Localization Controller
+export class UmbMyController extends UmbControllerBase {
+  #localize = new UmbLocalizationController(this);
+  #notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
+
+  constructor(host: UmbControllerHost) {
+    super(host);
+
+    this.consumeContext(UMB_NOTIFICATION_CONTEXT, (notificationContext) => {
+      this.#notificationContext = notificationContext;
+    });
+  }
+
+  fetchData() {
+    // Show error
+    this.#notificationContext?.peek('positive', {
+      data: {
+        headline: this.#localize.term('speechBubbles_onlineHeadline'),
+        message: this.#localize.term('speechBubbles_onlineMessage'),
+      },
+    });
+  }
+}   
 **Verify**: Errors are handled, UI shows error state
 
 **After Each Step**:
