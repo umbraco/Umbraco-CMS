@@ -74,9 +74,7 @@ export class UmbPickerInputContext<
 		super(host, UMB_PICKER_INPUT_CONTEXT);
 
 		if (modalAlias) {
-			this.modalAlias = modalAlias;
-			this.#createPickerModalRoute();
-			debugger;
+			this.setModalAlias(modalAlias);
 		}
 
 		this.#itemManager = new UmbRepositoryItemsManager<PickedItemType>(this, repositoryAlias);
@@ -99,6 +97,25 @@ export class UmbPickerInputContext<
 	setSelection(selection: Array<string | null>) {
 		// Note: Currently we do not support picking root item. So we filter out null values:
 		this.#itemManager.setUniques(selection.filter((value) => value !== null) as Array<string>);
+	}
+
+	/**
+	 * Sets the modal alias/token to use for the picker modal.
+	 * @param {string | UmbModalToken} modalAlias The modal alias or token.
+	 * @memberof UmbPickerInputContext
+	 */
+	setModalAlias(modalAlias: string | UmbModalToken<UmbPickerModalData<PickerItemType>, PickerModalValueType>) {
+		this.modalAlias = modalAlias;
+		this.#createPickerModalRoute();
+	}
+
+	/**
+	 * Gets the modal alias/token used for the picker modal.
+	 * @returns {string | UmbModalToken<UmbPickerModalData<PickerItemType>, PickerModalValueType>} The modal alias or token.
+	 * @memberof UmbPickerInputContext
+	 */
+	getModalAlias(): string | UmbModalToken<UmbPickerModalData<PickerItemType>, PickerModalValueType> | undefined {
+		return this.modalAlias;
 	}
 
 	async openPicker(pickerData?: Partial<PickerModalConfigType>) {
