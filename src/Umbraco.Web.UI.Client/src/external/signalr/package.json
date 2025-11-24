@@ -6,6 +6,6 @@
 		"build": "vite build"
 	},
 	"dependencies": {
-		"@microsoft/signalr": "9.0.6"
+		"@microsoft/signalr": "^10.0.0"
 	}
 }
