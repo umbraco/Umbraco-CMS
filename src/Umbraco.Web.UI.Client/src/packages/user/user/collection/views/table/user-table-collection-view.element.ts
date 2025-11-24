@@ -81,6 +81,13 @@ export class UmbUserTableCollectionViewElement extends UmbLitElement {
 				(selection) => (this._selection = selection ?? []),
 				'umbCollectionSelectionObserver',
 			);
+
+			this.observe(
+				this.#collectionContext?.selection.selectOnly,
+				(selectOnly) => (this._tableConfig.selectOnly = selectOnly ?? false),
+				'umbCollectionSelectOnlyObserver',
+			);
+
 			this.observe(
 				this.#collectionContext?.items,
 				(items) => {

@@ -15,6 +15,7 @@ export class UmbCollectionItemPickerModalElement extends UmbModalBaseElement<
 	private _selectionConfiguration: UmbCollectionSelectionConfiguration = {
 		multiple: false,
 		selectable: true,
+		selectOnly: true,
 		selection: [],
 	};
 

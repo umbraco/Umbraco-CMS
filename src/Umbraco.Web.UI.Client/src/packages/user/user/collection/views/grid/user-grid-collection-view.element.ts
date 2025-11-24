@@ -31,6 +31,9 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 	@state()
 	private _loading = false;
 
+	@state()
+	private _selectOnly: boolean | undefined;
+
 	#userGroups: Array<UmbUserGroupDetailModel> = [];
 
 	#collectionContext?: UmbUserCollectionContext;
@@ -48,6 +51,12 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 				this.#collectionContext?.selection.selection,
 				(selection) => (this._selection = selection ?? []),
 				'umbCollectionSelectionObserver',
+			);
+
+			this.observe(
+				this.#collectionContext?.selection.selectOnly,
+				(selectOnly) => (this._selectOnly = selectOnly ?? undefined),
+				'umbCollectionSelectOnlyObserver',
 			);
 
 			this.observe(
@@ -97,7 +106,7 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 				.name=${user.name ?? this.localize.term('general_unnamed')}
 				href="${UMB_USER_WORKSPACE_PATH}/edit/${user.unique}"
 				selectable
-				?select-only=${this._selection.length > 0}
+				?select-only=${this._selection.length > 0 || this._selectOnly}
 				?selected=${this.#collectionContext?.selection.isSelected(user.unique)}
 				@selected=${() => this.#onSelect(user)}
 				@deselected=${() => this.#onDeselect(user)}>

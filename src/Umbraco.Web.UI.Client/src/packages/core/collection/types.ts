@@ -40,6 +40,7 @@ export interface UmbCollectionLayoutConfiguration {
 export type UmbCollectionSelectionConfiguration = {
 	multiple?: boolean;
 	selectable?: boolean;
+	selectOnly?: boolean;
 	selection?: Array<string | null>;
 };
 

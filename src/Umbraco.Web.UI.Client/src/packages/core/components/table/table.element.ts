@@ -43,6 +43,7 @@ export interface UmbTableColumnLayoutElement extends HTMLElement {
 
 export interface UmbTableConfig {
 	allowSelection: boolean;
+	selectOnly?: boolean;
 	hideIcon?: boolean;
 }
 
@@ -118,6 +119,7 @@ export class UmbTableElement extends UmbLitElement {
 	@property({ type: Object, attribute: false })
 	public config: UmbTableConfig = {
 		allowSelection: false,
+		selectOnly: false,
 		hideIcon: false,
 	};
 
@@ -292,7 +294,7 @@ export class UmbTableElement extends UmbLitElement {
 			<uui-table-row
 				data-sortable-id=${item.id}
 				?selectable="${this.config.allowSelection && !this._sortable}"
-				?select-only=${this._selectionMode}
+				?select-only=${this._selectionMode || this.config.selectOnly}
 				?selected=${this._isSelected(item.id)}
 				@selected=${() => this._selectRow(item.id)}
 				@deselected=${() => this._deselectRow(item.id)}>

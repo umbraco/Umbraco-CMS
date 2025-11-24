@@ -164,6 +164,7 @@ export class UmbDefaultCollectionContext<
 		if (!this.#config) return;
 
 		this.selection.setMultiple(this.#config.selectionConfiguration?.multiple ?? true);
+		this.selection.setSelectOnly(this.#config.selectionConfiguration?.selectOnly ?? false);
 		this.selection.setSelection(this.#config.selectionConfiguration?.selection ?? []);
 
 		if (this.#config.pageSize) {
