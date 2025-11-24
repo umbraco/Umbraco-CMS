@@ -137,6 +137,9 @@ export class UmbMyElement extends UmbElementMixin(LitElement) {
 // 6. Connect user interactions to logic
 @customElement('umb-my-element')
 export class UmbMyElement extends UmbLitElement {
+    @state()
+    private _data?: UmbMyModel;
+
 	async #handleClick() {
 		const { data, error } = await this.#context?.load();
 		if (error) {
@@ -148,8 +151,8 @@ export class UmbMyElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<button @click=${this.#handleClick}>Load</button>
-			${this._data ? html`<p>${this._data.name}</p>` : ''}
+			<uui-button @click=${this.#handleClick} label="Load"></uui-button>
+			${this._data ? html`<p>${this._data.name}</p>` : nothing}
 		`;
 	}
 }
