@@ -1,7 +1,7 @@
 import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-@customElement('umb-example-entity-content-type-condition-unique')
+@customElement('umb-example-entity-content-type-unique-condition')
 export class UmbWorkspaceExampleViewUniqueElement extends UmbLitElement {
 	override render() {
 		return html`<uui-box>
