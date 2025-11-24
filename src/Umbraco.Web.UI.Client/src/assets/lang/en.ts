@@ -2903,7 +2903,7 @@ export default {
 		'hr-hr': 'Hrvatski (Hrvatska)',
 		it: 'Italiano',
 		'it-it': 'Italiano (Italia)',
-		'it-ch': 'Italiano (Svizerra)',
+		'it-ch': 'Italiano (Svizzera)',
 		ja: '日本語',
 		'ja-jp': '日本語 (日本)',
 		ko: '한국어',
