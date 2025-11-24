@@ -351,7 +351,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 				grid-column: span 2;
 			}
 
-			@container (width > 600px) {
+			@container (width > 700px) {
 				:host(:not([orientation='vertical'])) > div {
 					grid-column: span 1;
 				}

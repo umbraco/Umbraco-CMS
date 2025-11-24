@@ -68,7 +68,13 @@ for (const mediaFileType of mediaFileTypes) {
     await umbracoUi.media.clickCreateMediaWithType(mediaFileType.fileName);
     await umbracoUi.media.enterMediaItemName(mediaFileType.fileName);
     await umbracoUi.media.uploadFile('./fixtures/mediaLibrary/' + mediaFileType.filePath);
-    await umbracoUi.waitForTimeout(500); // Wait for the file to be uploaded
+    // Wait for the upload to complete
+    await umbracoUi.media.isInputDropzoneVisible(false);
+    if (mediaFileType.fileName === 'Image') { 
+      await umbracoUi.media.isImageCropperFieldVisible();
+    } else {
+      await umbracoUi.media.isInputUploadFieldVisible();
+    }
     await umbracoUi.media.clickSaveButton();
 
     // Assert
