@@ -11,7 +11,7 @@ export class UmbWorkspaceExampleViewUniqueElement extends UmbLitElement {
 	}
 }
 
-export default UmbWorkspaceExampleViewUniqueElement;
+export { UmbWorkspaceExampleViewUniqueElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
