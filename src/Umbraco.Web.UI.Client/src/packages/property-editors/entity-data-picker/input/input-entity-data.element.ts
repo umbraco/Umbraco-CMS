@@ -133,6 +133,9 @@ export class UmbInputEntityDataElement extends UmbFormControlMixin<string | unde
 	@state()
 	private _statuses?: Array<UmbRepositoryItemsStatus>;
 
+	@state()
+	private _modalRoute?: string;
+
 	#pickerInputContext = new UmbEntityDataPickerInputContext(this);
 
 	constructor() {
@@ -163,6 +166,10 @@ export class UmbInputEntityDataElement extends UmbFormControlMixin<string | unde
 		);
 
 		this.observe(this.#pickerInputContext.statuses, (statuses) => (this._statuses = statuses), '_observerStatuses');
+
+		this.observe(this.#pickerInputContext.modalRoute, (modalRoute) => {
+			this._modalRoute = modalRoute;
+		});
 	}
 
 	protected override getFormElement() {
@@ -184,7 +191,7 @@ export class UmbInputEntityDataElement extends UmbFormControlMixin<string | unde
 			<uui-button
 				id="btn-add"
 				look="placeholder"
-				@click=${() => this.#pickerInputContext.openPicker()}
+				href=${this._modalRoute}
 				label="${this.localize.term('general_choose')}"
 				?disabled=${this.readonly}></uui-button>
 		`;
