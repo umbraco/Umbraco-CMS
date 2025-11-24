@@ -28,7 +28,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.smtp.deleteAllEmails();
 });
 
-test.skip('can set up notification for a content item', async ({umbracoUi, umbracoApi}) => {
+test('can set up notification for a content item', async ({umbracoUi, umbracoApi}) => {
   // Arrange
   const notificationActionIds = ['Umb.Document.Delete', 'Umb.Document.Publish'];
   await umbracoUi.goToBackOffice();
@@ -47,7 +47,7 @@ test.skip('can set up notification for a content item', async ({umbracoUi, umbra
   expect(await umbracoApi.document.doesNotificationExist(contentId, notificationActionIds[1])).toBeTruthy();
 });
 
-test.skip('can see notification when content is published', async ({umbracoUi, umbracoApi}) => {
+test('can see notification when content is published', async ({umbracoUi, umbracoApi}) => {
   // Arrange
   const notificationActionIds = ['Umb.Document.Publish'];
   const actionName = 'Publish';
@@ -82,20 +82,10 @@ test('can see notification when content is updated', async ({umbracoUi, umbracoA
 
   // Assert
   await umbracoUi.content.isSuccessStateVisibleForSaveButton();
-  let emails;
-  for (let attempt = 0; attempt < 20; attempt++) {
-      emails = await umbracoApi.smtp.getAllEmails();
-      if (emails.length > 0) break;
-      await umbracoUi.waitForTimeout(1000);
-  }
-  if (emails.length === 0) {
-      throw new Error('No emails received in SMTP4dev!');
-  }
-  console.log('Emails:', emails);
   expect(await umbracoApi.smtp.doesNotificationEmailWithSubjectExist(actionName, contentName)).toBeTruthy();
 });
 
-test.skip('can see notification when content is trashed', async ({umbracoUi, umbracoApi}) => {
+test('can see notification when content is trashed', async ({umbracoUi, umbracoApi}) => {
   // Arrange
   const notificationActionIds = ['Umb.Document.Delete'];
   const actionName = 'Delete';
@@ -114,7 +104,7 @@ test.skip('can see notification when content is trashed', async ({umbracoUi, umb
   expect(await umbracoApi.smtp.doesNotificationEmailWithSubjectExist(actionName, contentName)).toBeTruthy();
 });
 
-test.skip('can see notification when child content is created', async ({umbracoUi, umbracoApi}) => {
+test('can see notification when child content is created', async ({umbracoUi, umbracoApi}) => {
   // Arrange
   const notificationActionIds = ['Umb.Document.Create'];
   const actionName = 'Create';
@@ -142,7 +132,7 @@ test.skip('can see notification when child content is created', async ({umbracoU
   await umbracoApi.documentType.ensureNameNotExists(childDocumentTypeName);
 });
 
-test.skip('can see notification when content is restored', async ({umbracoUi, umbracoApi}) => {
+test('can see notification when content is restored', async ({umbracoUi, umbracoApi}) => {
   // Arrange
   const notificationActionIds = ['Umb.DocumentRecycleBin.Restore'];
   const actionName = 'Restore';
@@ -163,7 +153,7 @@ test.skip('can see notification when content is restored', async ({umbracoUi, um
   expect(await umbracoApi.smtp.doesNotificationEmailWithSubjectExist(actionName, contentName)).toBeTruthy();
 });
 
-test.skip('can see notification when content is duplicated', async ({umbracoUi, umbracoApi}) => {
+test('can see notification when content is duplicated', async ({umbracoUi, umbracoApi}) => {
   // Arrange
   const notificationActionIds = ['Umb.Document.Duplicate'];
   const actionName = 'Copy';
