@@ -12,11 +12,12 @@ const documentTypeName = 'TestDocumentTypeForContent';
 const childDocumentTypeName = 'ChildDocumentType';
 // Data Type
 const textStringDataTypeName = 'Textstring';
+let textStringDataType: any;
 
 test.beforeEach(async ({umbracoApi}) => {
   // Delete all emails from smtp4dev
   await umbracoApi.smtp.deleteAllEmails();
-  const textStringDataType = await umbracoApi.dataType.getByName(textStringDataTypeName);
+  textStringDataType = await umbracoApi.dataType.getByName(textStringDataTypeName);
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, textStringDataTypeName, textStringDataType.id);
   contentId = await umbracoApi.document.createDocumentWithTextContent(contentName, documentTypeId, contentText, textStringDataTypeName);
 });
@@ -176,4 +177,99 @@ test('can see notification when content is duplicated', async ({umbracoUi, umbra
   await umbracoApi.document.ensureNameNotExists(contentName + ' (1)');
 });
 
+test('can see notification when content is rollbacked', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const notificationActionIds = ['Umb.Document.Rollback'];
+  const actionName = 'Rollback';
+  await umbracoApi.document.updatetNotifications(contentId, notificationActionIds);
+  expect(await umbracoApi.document.doesNotificationExist(contentId, notificationActionIds[0])).toBeTruthy();
+  await umbracoApi.document.publish(contentId);
+  const updatedContentText = 'This is an updated content text';
+  const contentData = await umbracoApi.document.get(contentId);
+  contentData.values[0].value = updatedContentText;
+  await umbracoApi.document.update(contentId, contentData);
+  await umbracoApi.document.publish(contentId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.doesDocumentPropertyHaveValue(textStringDataTypeName, updatedContentText);
+  await umbracoUi.content.clickInfoTab();
+  await umbracoUi.content.clickRollbackButton();
+  await umbracoUi.waitForTimeout(700); // Wait for the rollback items to load
+  await umbracoUi.content.clickLatestRollBackItem();
+  await umbracoUi.content.clickRollbackContainerButton();
+
+  // Assert
+  await umbracoUi.content.clickContentTab();
+  await umbracoUi.content.doesDocumentPropertyHaveValue(textStringDataTypeName, contentText);
+  expect(await umbracoApi.smtp.doesNotificationEmailWithSubjectExist(actionName, contentName)).toBeTruthy();
+});
+
+test('can see notification when content is sorted', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const notificationActionIds = ['Umb.Document.Sort'];
+  const actionName = 'Sort';
+  // Create content with children to sort
+  const rootDocumentTypeName = 'RootDocumentType';
+  const childDocumentTypeName = 'ChildDocumentTypeOne';
+  const rootDocumentName = 'RootDocument';
+  const childDocumentOneName = 'FirstChildDocument';
+  const childDocumentTwoName = 'SecondChildDocument';
+  const childDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(childDocumentTypeName);
+  const rootDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNodeAndDataType(rootDocumentTypeName, childDocumentTypeId, textStringDataTypeName, textStringDataType.id);
+  const rootDocumentId = await umbracoApi.document.createDocumentWithTextContent(rootDocumentName, rootDocumentTypeId, contentText, textStringDataTypeName);
+  await umbracoApi.document.createDefaultDocumentWithParent(childDocumentOneName, childDocumentTypeId, rootDocumentId);
+  await umbracoApi.document.createDefaultDocumentWithParent(childDocumentTwoName, childDocumentTypeId, rootDocumentId);
+  // Set notification on the root document
+  await umbracoApi.document.updatetNotifications(rootDocumentId, notificationActionIds);
+  expect(await umbracoApi.document.doesNotificationExist(rootDocumentId, notificationActionIds[0])).toBeTruthy();
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.clickActionsMenuForContent(rootDocumentName);
+  await umbracoUi.content.clickSortChildrenActionMenuOption();
+  const firstDocumentLocator = umbracoUi.content.getTextLocatorWithName(childDocumentOneName);
+  const secondDocumentLocator = umbracoUi.content.getTextLocatorWithName(childDocumentTwoName);
+  await umbracoUi.content.dragAndDrop(secondDocumentLocator, firstDocumentLocator);
+  await umbracoUi.content.clickSortButton();
+
+  // Assert
+  await umbracoUi.content.openContentCaretButtonForName(rootDocumentName);
+  await umbracoUi.content.doesIndexDocumentInTreeContainName(rootDocumentName, childDocumentTwoName, 0);
+  await umbracoUi.content.doesIndexDocumentInTreeContainName(rootDocumentName, childDocumentOneName, 1);
+  expect(await umbracoApi.smtp.doesNotificationEmailWithSubjectExist(actionName, rootDocumentName)).toBeTruthy();
+
+  // Clean
+  await umbracoApi.document.ensureNameNotExists(rootDocumentName);
+  await umbracoApi.documentType.ensureNameNotExists(rootDocumentTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(childDocumentTypeName); 
+});
+
+test('can see notification when content is set public access', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const notificationActionIds = ['Umb.Document.PublicAccess'];
+  const actionName = 'Restrict Public Access';
+  await umbracoApi.document.updatetNotifications(contentId, notificationActionIds);
+  expect(await umbracoApi.document.doesNotificationExist(contentId, notificationActionIds[0])).toBeTruthy();
+  const testMemberGroup = 'TestMemberGroup';
+  await umbracoApi.memberGroup.ensureNameNotExists(testMemberGroup);
+  await umbracoApi.memberGroup.create(testMemberGroup);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.clickActionsMenuForContent(contentName);
+  await umbracoUi.content.clickPublicAccessActionMenuOption();
+  await umbracoUi.content.addGroupBasedPublicAccess(testMemberGroup, contentName);
+
+  // Assert
+  await umbracoUi.content.isSuccessNotificationVisible();
+  expect(await umbracoApi.smtp.doesNotificationEmailWithSubjectExist(actionName, contentName)).toBeTruthy();
+
+  // Clean
+  await umbracoApi.memberGroup.ensureNameNotExists(testMemberGroup);
+});
 
