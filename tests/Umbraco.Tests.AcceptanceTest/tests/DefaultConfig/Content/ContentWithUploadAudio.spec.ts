@@ -78,6 +78,9 @@ for (const uploadFile of uploadFiles) {
     // Act
     await umbracoUi.content.goToContentWithName(contentName);
     await umbracoUi.content.uploadFile(uploadFilePath + uploadFile.fileName);
+    // Wait for the upload to complete
+    await umbracoUi.content.isInputDropzoneVisible(false);
+    await umbracoUi.content.isInputUploadFieldVisible();
     await umbracoUi.content.clickSaveButton();
 
     // Assert
