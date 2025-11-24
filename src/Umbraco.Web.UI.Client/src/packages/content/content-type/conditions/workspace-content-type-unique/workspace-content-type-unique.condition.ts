@@ -2,7 +2,7 @@ import type { UmbWorkspaceContentTypeUniqueConditionConfig } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbConditionControllerArguments, UmbExtensionCondition } from '@umbraco-cms/backoffice/extension-api';
 import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
-import { UMB_PROPERTY_STRUCTURE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content-type';
+import { UMB_PROPERTY_STRUCTURE_WORKSPACE_CONTEXT } from '../../contexts/property-structure-workspace.context-token.js';
 
 const ObserveSymbol = Symbol();
 
