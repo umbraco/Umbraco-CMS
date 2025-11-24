@@ -1905,6 +1905,9 @@ export class HealthCheckService {
 }
 
 export class HelpService {
+    /**
+     * @deprecated
+     */
     public static getHelp<ThrowOnError extends boolean = true>(options?: Options<GetHelpData, ThrowOnError>) {
         return (options?.client ?? client).get<GetHelpResponses, GetHelpErrors, ThrowOnError>({
             security: [
