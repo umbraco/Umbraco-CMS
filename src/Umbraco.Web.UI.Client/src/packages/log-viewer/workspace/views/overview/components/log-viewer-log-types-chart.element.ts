@@ -88,7 +88,11 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 	override render() {
 		return html`
 			<uui-box id="types" headline="Log types">
-				<p id="description">In the chosen date range you have this number of log message of type:</p>
+				<p id="description">
+					<umb-localize key="logViewer_logTypesChartDescription">
+						In the chosen date range, you have this number of log messages grouped by type:
+					</umb-localize>
+				</p>
 				<div id="log-types-container">
 					<umb-donut-chart show-inline-numbers>
 						${repeat(

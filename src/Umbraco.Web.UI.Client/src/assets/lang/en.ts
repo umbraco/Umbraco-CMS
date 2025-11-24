@@ -2500,6 +2500,7 @@ export default {
 		pollingEvery10: 'Polling every 10s',
 		pollingEvery20: 'Polling every 20s',
 		pollingEvery30: 'Polling every 30s',
+		logTypesChartDescription: 'In the chosen date range, you have this number of log messages grouped by type:',
 	},
 	clipboard: {
 		labelForCopyAllEntries: 'Copy %0%',
