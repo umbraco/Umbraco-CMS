@@ -24,8 +24,8 @@ export const manifest: ManifestPropertyEditorSchema = {
 				},
 			],
 			defaultData: [
-				{ alias: 'minVal', value: 0 },
-				{ alias: 'maxVal', value: 100 },
+				{ alias: 'minVal', value: 0.0 },
+				{ alias: 'maxVal', value: 100.0 },
 			],
 		},
 	},
