@@ -393,8 +393,7 @@ test('can not update content with update permission disabled', async ({umbracoAp
   await umbracoUi.content.isDocumentReadOnly(true);
 });
 
-// Needs create permission to be enabled to duplicate content
-test.fixme('can duplicate content with duplicate permission enabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test('can duplicate content with duplicate permission enabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const duplicatedContentName = rootDocumentName + ' (1)';
   userGroupId = await umbracoApi.userGroup.createUserGroupWithDuplicatePermission(userGroupName);
@@ -435,8 +434,7 @@ test('can not duplicate content with duplicate permission disabled', async ({umb
   await umbracoUi.content.isActionsMenuForNameVisible(rootDocumentName, false);
 });
 
-// Needs create permission to be enabled to move content
-test.fixme('can move content with move to permission enabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test('can move content with move to permission enabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const moveToDocumentName = 'SecondRootDocument';
   const moveToDocumentId = await umbracoApi.document.createDocumentWithTextContent(moveToDocumentName, rootDocumentTypeId, documentText, dataTypeName);
@@ -454,7 +452,8 @@ test.fixme('can move content with move to permission enabled', {tag: '@release'}
 
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.moved);
-  await umbracoUi.content.reloadContentTree();
+  await umbracoUi.content.clickActionsMenuForContent(moveToDocumentName);
+  await umbracoUi.content.clickReloadChildrenActionMenuOption();
   await umbracoUi.content.isCaretButtonVisibleForContentName(moveToDocumentName, true);
   await umbracoUi.content.openContentCaretButtonForName(moveToDocumentName);
   await umbracoUi.content.isChildContentInTreeVisible(moveToDocumentName, childDocumentOneName, true);
@@ -480,7 +479,7 @@ test('can not move content with move to permission disabled', async ({umbracoApi
 });
 
 // Needs a better way to assert
-test.fixme('can sort children with sort children permission enabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test('can sort children with sort children permission enabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.document.createDefaultDocumentWithParent(childDocumentTwoName, childDocumentTypeId, rootDocumentId);
   userGroupId = await umbracoApi.userGroup.createUserGroupWithSortChildrenPermission(userGroupName);
@@ -492,15 +491,12 @@ test.fixme('can sort children with sort children permission enabled', {tag: '@re
   // Act
   await umbracoUi.content.clickActionsMenuForContent(rootDocumentName);
   await umbracoUi.content.clickSortChildrenActionMenuOption();
-
-  // TODO: uncomment when it is not flaky
-  // const childDocumentOneLocator = await umbracoUi.content.getButtonWithName(childDocumentOneName);
-  // const childDocumentTwoLocator = await umbracoUi.content.getButtonWithName(childDocumentTwoName)
-  // await umbracoUi.content.sortChildrenDragAndDrop(childDocumentOneLocator, childDocumentTwoLocator, 10, 0, 10);
+  const childDocumentOneLocator = umbracoUi.content.getTextLocatorWithName(childDocumentOneName);
+  const childDocumentTwoLocator = umbracoUi.content.getTextLocatorWithName(childDocumentTwoName)
+  await umbracoUi.content.dragAndDrop(childDocumentTwoLocator, childDocumentOneLocator);
   await umbracoUi.content.clickSortButton();
 
   // Assert
-  // TODO: uncomment when it is not flaky
   await umbracoUi.content.openContentCaretButtonForName(rootDocumentName);
   await umbracoUi.content.doesIndexDocumentInTreeContainName(rootDocumentName, childDocumentTwoName, 0);
   await umbracoUi.content.doesIndexDocumentInTreeContainName(rootDocumentName, childDocumentOneName, 1);
