@@ -44,39 +44,14 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
 
     public IPublishedElement? ToIPublishedElement(ContentCacheNode contentCacheNode, bool preview)
     {
-        var cacheKey = $"{nameof(PublishedContentFactory)}ElementCache_{contentCacheNode.Id}_{preview}";
-        IPublishedElement? publishedElement = null;
-        if (_appCaches.RequestCache.IsAvailable)
-        {
-            publishedElement = _appCaches.RequestCache.GetCacheItem<IPublishedElement?>(cacheKey);
-            if (publishedElement is not null)
-            {
-                _logger.LogDebug(
-                    "Using cached IPublishedElement for document {ContentCacheNodeName} ({ContentCacheNodeId}).",
-                    contentCacheNode.Data?.Name ?? "No Name",
-                    contentCacheNode.Id);
-                return publishedElement;
-            }
-        }
-
-        _logger.LogDebug(
-            "Creating IPublishedElement for document {ContentCacheNodeName} ({ContentCacheNodeId}).",
-            contentCacheNode.Data?.Name ?? "No Name",
-            contentCacheNode.Id);
-
         ContentNode contentNode = CreateContentNode(contentCacheNode, preview);
 
-        publishedElement = GetPublishedElement(contentNode, preview);
+        IPublishedElement? publishedElement = GetPublishedElement(contentNode, preview);
 
         if (preview)
         {
             // TODO ELEMENTS: what is the element equivalent of this?
             // return model ?? GetPublishedContentAsDraft(model);
-        }
-
-        if (_appCaches.RequestCache.IsAvailable && publishedElement is not null)
-        {
-            _appCaches.RequestCache.Set(cacheKey, publishedElement);
         }
 
         return publishedElement;

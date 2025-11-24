@@ -20,7 +20,7 @@ public class ElementMapDefinition : ContentMapDefinition<IElement, ElementValueR
         mapper.Define<ContentScheduleCollection, ElementResponseModel>(Map);
     }
 
-    // Umbraco.Code.MapAll
+    // Umbraco.Code.MapAll -Flags
     private void Map(IElement source, ElementResponseModel target, MapperContext context)
     {
         target.Id = source.Key;

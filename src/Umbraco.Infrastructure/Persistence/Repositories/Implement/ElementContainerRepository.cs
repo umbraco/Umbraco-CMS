@@ -11,8 +11,16 @@ internal sealed class ElementContainerRepository : EntityContainerRepository, IE
     public ElementContainerRepository(
         IScopeAccessor scopeAccessor,
         AppCaches cache,
-        ILogger<ElementContainerRepository> logger)
-        : base(scopeAccessor, cache, logger, Constants.ObjectTypes.ElementContainer)
+        ILogger<ElementContainerRepository> logger,
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            cache,
+            logger,
+            Constants.ObjectTypes.ElementContainer,
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
     }
 }
