@@ -5,6 +5,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { LogMessageResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { DirectionModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { consumeContext } from '@umbraco-cms/backoffice/context-api';
+import { skip } from '@umbraco-cms/backoffice/external/rxjs';
 
 @customElement('umb-log-viewer-messages-list')
 export class UmbLogViewerMessagesListElement extends UmbLitElement {
@@ -50,6 +51,17 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 		this.observe(this._logViewerContext?.sortingDirection, (direction) => {
 			this._sortingDirection = direction ?? this._sortingDirection;
 		});
+
+		// Observe filter expression changes to trigger search
+		// Only observes when this component is mounted (when logs are visible)
+		this.observe(
+			this._logViewerContext?.filterExpression.pipe(
+				skip(1), // Skip initial value to avoid duplicate search on page load
+			),
+			() => {
+				this._logViewerContext?.getLogs();
+			},
+		);
 	}
 
 	#sortLogs() {

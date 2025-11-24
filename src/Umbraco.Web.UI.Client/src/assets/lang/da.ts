@@ -2392,6 +2392,7 @@ export default {
 		deselectAllLogLevelFilters: 'Fravælg alle',
 		savedSearches: 'Gemte søgninger',
 		saveSearch: 'Gem søgning',
+		refreshSearch: 'Søg igen',
 		saveSearchDescription: 'Indtast et navn for din søgebetingelse',
 		timestamp: 'Dato',
 		level: 'Type',

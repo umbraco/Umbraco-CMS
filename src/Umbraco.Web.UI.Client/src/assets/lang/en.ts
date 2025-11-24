@@ -2463,6 +2463,7 @@ export default {
 		deselectAllLogLevelFilters: 'Deselect all',
 		savedSearches: 'Saved Searches',
 		saveSearch: 'Save Search',
+		refreshSearch: 'Refresh Search',
 		saveSearchDescription: 'Enter a friendly name for your search query',
 		timestamp: 'Timestamp',
 		level: 'Level',

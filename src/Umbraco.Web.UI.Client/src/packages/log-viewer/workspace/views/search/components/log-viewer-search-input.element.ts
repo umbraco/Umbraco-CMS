@@ -3,15 +3,16 @@ import { UMB_LOG_VIEWER_SAVE_SEARCH_MODAL } from './log-viewer-search-input-moda
 import { css, html, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { escapeHTML } from '@umbraco-cms/backoffice/utils';
 import { query as getQuery, path, toQueryString } from '@umbraco-cms/backoffice/router';
-import { Subject, debounceTime, tap } from '@umbraco-cms/backoffice/external/rxjs';
 import { umbConfirmModal, umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { SavedLogSearchResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbDropdownElement } from '@umbraco-cms/backoffice/components';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
+import { consumeContext } from '@umbraco-cms/backoffice/context-api';
+import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+import { debounceTime, skip } from '@umbraco-cms/backoffice/external/rxjs';
 
 import './log-viewer-search-input-modal.element.js';
-import { consumeContext } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-log-viewer-search-input')
 export class UmbLogViewerSearchInputElement extends UmbLitElement {
@@ -25,13 +26,10 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 	private _inputQuery = '';
 
 	@state()
-	private _showLoader = false;
-
-	@state()
 	private _isQuerySaved = false;
 
-	// TODO: Revisit this code, to not use RxJS directly:
-	#inputQuery$ = new Subject<string>();
+	// Local state for debouncing user input before updating context
+	#localQueryState = new UmbStringState('');
 
 	#logViewerContext?: typeof UMB_APP_LOG_VIEWER_CONTEXT.TYPE;
 
@@ -48,17 +46,17 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.#inputQuery$
-			.pipe(
-				tap(() => (this._showLoader = true)),
+		// Debounce local input and update context
+		this.observe(
+			this.#localQueryState.asObservable().pipe(
+				skip(1), // Skip initial value
 				debounceTime(250),
-			)
-			.subscribe((query) => {
+			),
+			(query) => {
 				this._logViewerContext?.setFilterExpression(query);
 				this.#persist(query);
-				this._isQuerySaved = this._savedSearches.some((search) => search.query === query);
-				this._showLoader = false;
-			});
+			},
+		);
 	}
 
 	#observeStuff() {
@@ -75,11 +73,14 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 
 	#setQuery(event: Event) {
 		const target = event.target as UUIInputElement;
-		this.#inputQuery$.next(target.value as string);
+		const query = target.value as string;
+		// Update local state which will debounce before updating context
+		this.#localQueryState.setValue(query);
 	}
 
 	#setQueryFromSavedSearch(query: string) {
-		this.#inputQuery$.next(query);
+		this._logViewerContext?.setFilterExpression(query);
+		this.#persist(query);
 		this._searchDropdownElement.open = false;
 	}
 
@@ -95,8 +96,14 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 	}
 
 	#clearQuery() {
-		this.#inputQuery$.next('');
 		this._logViewerContext?.setFilterExpression('');
+		this.#persist('');
+		this.#localQueryState.setValue('');
+	}
+
+	#refreshSearch() {
+		// Force immediate search, bypassing debounce
+		this._logViewerContext?.getLogs();
 	}
 
 	#saveSearch(savedSearch: SavedLogSearchResponseModel) {
@@ -137,27 +144,30 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 				slot="trigger"
 				@input=${this.#setQuery}
 				.value=${this._inputQuery}>
-				${this._showLoader
-					? html`<div id="loader-container" slot="append">
-							<uui-loader-circle></uui-loader-circle>
-						</div>`
-					: ''}
 				${this._inputQuery
 					? html`${!this._isQuerySaved
 								? html`<uui-button
 										compact
 										slot="append"
 										label=${this.localize.term('logViewer_saveSearch')}
-										@click=${this.#openSaveSearchDialog}
-										><uui-icon name="icon-favorite"></uui-icon
-									></uui-button>`
+										@click=${this.#openSaveSearchDialog}>
+										<uui-icon name="icon-favorite"></uui-icon>
+									</uui-button>`
 								: ''}<uui-button
 								compact
 								slot="append"
 								label=${this.localize.term('general_clear')}
-								@click=${this.#clearQuery}
-								><uui-icon name="icon-delete"></uui-icon
-							></uui-button>`
+								@click=${this.#clearQuery}></uui-button>
+							<uui-button
+								compact
+								slot="append"
+								label=${this.localize.term('logViewer_refreshSearch')}
+								@click=${this.#refreshSearch}>
+								<uui-icon name="icon-refresh"></uui-icon>
+							</uui-button>
+							<uui-button compact slot="append" label=${this.localize.term('general_clear')} @click=${this.#clearQuery}>
+								<uui-icon name="icon-delete"></uui-icon>
+							</uui-button>`
 					: html``}
 				<umb-dropdown id="search-dropdown" slot="append" label=${this.localize.term('logViewer_savedSearches')}>
 					<span slot="label"><umb-localize key="logViewer_savedSearches">Saved searches</umb-localize></span>
@@ -204,13 +214,6 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 
 			#saved-searches-popover {
 				flex: 1;
-			}
-
-			#loader-container {
-				display: flex;
-				justify-content: center;
-				align-items: center;
-				margin: 0 var(--uui-size-space-4);
 			}
 
 			.saved-search-item {
