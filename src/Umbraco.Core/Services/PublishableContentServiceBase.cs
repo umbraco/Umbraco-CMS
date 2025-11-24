@@ -22,12 +22,13 @@ namespace Umbraco.Cms.Core.Services;
 public abstract class PublishableContentServiceBase<TContent> : RepositoryService
     where TContent : class, IPublishableContentBase
 {
-    private readonly IAuditRepository _auditRepository;
+    private readonly IAuditService _auditService;
     private readonly IContentTypeRepository _contentTypeRepository;
     private readonly IPublishableContentRepository<TContent> _documentRepository;
     private readonly ILanguageRepository _languageRepository;
     private readonly Lazy<IPropertyValidationService> _propertyValidationService;
     private readonly ICultureImpactFactory _cultureImpactFactory;
+    private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly PropertyEditorCollection _propertyEditorCollection;
     private readonly IIdKeyMap _idKeyMap;
 
@@ -35,22 +36,24 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
         IEventMessagesFactory eventMessagesFactory,
-        IAuditRepository auditRepository,
+        IAuditService auditService,
         IContentTypeRepository contentTypeRepository,
         IPublishableContentRepository<TContent> contentRepository,
         ILanguageRepository languageRepository,
         Lazy<IPropertyValidationService> propertyValidationService,
         ICultureImpactFactory cultureImpactFactory,
+        IUserIdKeyResolver userIdKeyResolver,
         PropertyEditorCollection propertyEditorCollection,
         IIdKeyMap idKeyMap)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
-        _auditRepository = auditRepository;
+        _auditService = auditService;
         _contentTypeRepository = contentTypeRepository;
         _documentRepository = contentRepository;
         _languageRepository = languageRepository;
         _propertyValidationService = propertyValidationService;
         _cultureImpactFactory = cultureImpactFactory;
+        _userIdKeyResolver = userIdKeyResolver;
         _propertyEditorCollection = propertyEditorCollection;
         _idKeyMap = idKeyMap;
     }
@@ -1463,8 +1466,20 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
     #region Auditing
 
     protected void Audit(AuditType type, int userId, int objectId, string? message = null, string? parameters = null) =>
-        _auditRepository.Save(new AuditItem(objectId, type, userId, UmbracoObjectTypes.Document.GetName(), message, parameters));
+        AuditAsync(type, userId, objectId, message, parameters).GetAwaiter().GetResult();
 
+    protected async Task AuditAsync(AuditType type, int userId, int objectId, string? message = null, string? parameters = null)
+    {
+        Guid userKey = await _userIdKeyResolver.GetAsync(userId);
+
+        await _auditService.AddAsync(
+            type,
+            userKey,
+            objectId,
+            ContentObjectType.GetName(),
+            message,
+            parameters);
+    }
 
     protected string GetLanguageDetailsForAuditEntry(IEnumerable<string> affectedCultures)
         => GetLanguageDetailsForAuditEntry(_languageRepository.GetMany(), affectedCultures);

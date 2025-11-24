@@ -27,8 +27,6 @@ namespace Umbraco.Cms.Core.Services;
 /// </summary>
 public class ContentService : PublishableContentServiceBase<IContent>, IContentService
 {
-    private readonly IAuditService _auditService;
-    private readonly IContentTypeRepository _contentTypeRepository;
     private readonly IDocumentBlueprintRepository _documentBlueprintRepository;
     private readonly IDocumentRepository _documentRepository;
     private readonly IEntityRepository _entityRepository;
@@ -68,19 +66,18 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
             provider,
             loggerFactory,
             eventMessagesFactory,
-            auditRepository,
+            auditService,
             contentTypeRepository,
             documentRepository,
             languageRepository,
             propertyValidationService,
             cultureImpactFactory,
+            userIdKeyResolver,
             propertyEditorCollection,
             idKeyMap)
     {
         _documentRepository = documentRepository;
         _entityRepository = entityRepository;
-        _auditService = auditService;
-        _contentTypeRepository = contentTypeRepository;
         _documentBlueprintRepository = documentBlueprintRepository;
         _languageRepository = languageRepository;
         _propertyValidationService = propertyValidationService;
