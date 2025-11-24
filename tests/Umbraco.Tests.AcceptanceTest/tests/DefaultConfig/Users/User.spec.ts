@@ -633,7 +633,7 @@ test('cannot remove all user group from a user', {tag: '@release'}, async ({umbr
   // Act
   await umbracoUi.user.clickUserWithName(nameOfTheUser);
   await umbracoUi.user.clickRemoveButtonForUserGroupWithName(defaultUserGroupName);
-  await umbracoUi.user.clickConfirmRemoveButton();;
+  await umbracoUi.user.clickConfirmRemoveButton();
   await umbracoUi.user.clickSaveButton();
 
   // Assert
