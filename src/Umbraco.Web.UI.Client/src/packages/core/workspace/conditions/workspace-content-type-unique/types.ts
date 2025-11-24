@@ -1,8 +1,8 @@
-import type { UMB_WORKSPACE_CONTENT_TYPE_UNIQUE_CONDITION_ALIAS } from './constants.js';
+import type { UMB_WORKSPACE_CONTENT_TYPE_UNIQUE_CONDITION } from './constants.js';
 import type { UmbConditionConfigBase } from '@umbraco-cms/backoffice/extension-api';
 
 export type UmbWorkspaceContentTypeUniqueConditionConfig = UmbConditionConfigBase<
-	typeof UMB_WORKSPACE_CONTENT_TYPE_UNIQUE_CONDITION_ALIAS
+	typeof UMB_WORKSPACE_CONTENT_TYPE_UNIQUE_CONDITION
 > & {
 	/**
 	 * Define a content type unique (GUID) in which workspace this extension should be available

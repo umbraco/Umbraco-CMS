@@ -45,10 +45,3 @@ export class UmbWorkspaceContentTypeUniqueCondition
 		}
 	}
 }
-
-export const manifest: UmbExtensionManifest = {
-	type: 'condition',
-	name: 'Workspace Content Type Unique Condition',
-	alias: 'Umb.Condition.WorkspaceContentTypeUnique',
-	api: UmbWorkspaceContentTypeUniqueCondition,
-};

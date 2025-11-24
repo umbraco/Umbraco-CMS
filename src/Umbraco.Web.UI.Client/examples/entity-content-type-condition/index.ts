@@ -1,5 +1,5 @@
 import { UMB_WORKSPACE_CONTENT_TYPE_ALIAS_CONDITION_ALIAS } from '@umbraco-cms/backoffice/content-type';
-import { UMB_WORKSPACE_CONTENT_TYPE_UNIQUE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
+import { UMB_WORKSPACE_CONTENT_TYPE_UNIQUE_CONDITION } from '@umbraco-cms/backoffice/workspace';
 
 const workspaceViewAlias: UmbExtensionManifest = {
 	type: 'workspaceView',
@@ -32,7 +32,7 @@ const workspaceViewUnique: UmbExtensionManifest = {
 	},
 	conditions: [
 		{
-			alias: UMB_WORKSPACE_CONTENT_TYPE_UNIQUE_CONDITION_ALIAS,
+			alias: UMB_WORKSPACE_CONTENT_TYPE_UNIQUE_CONDITION,
 			oneOf: ['852d35f1-cf37-49b3-bb5b-f7e578219643', '721e85d3-0a2d-4f99-be55-61a5c5ed5c14'], // Example GUID
 		},
 	],
