@@ -51,7 +51,7 @@ export class UmbUfmContentNameElement extends UmbUfmElementBase {
 			if (item.mediaKey) return UMB_MEDIA_ENTITY_TYPE;
 		}
 
-		return null;
+		return UMB_DOCUMENT_ENTITY_TYPE;
 	}
 
 	#getUniques(value: unknown) {
