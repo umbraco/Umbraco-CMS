@@ -2623,9 +2623,6 @@ export default {
 		checkErrorMessageDifferentExpectedValue:
 			"Expected value '%1%' for '%2%' in configuration file '%3%', but\n      found '%0%'.\n    ",
 		checkErrorMessageUnexpectedValue: "Found unexpected value '%0%' for '%2%' in configuration file '%3%'.\n    ",
-		macroErrorModeCheckSuccessMessage: "MacroErrors are set to '%0%'.",
-		macroErrorModeCheckErrorMessage:
-			"MacroErrors are set to '%0%' which will prevent some or all pages in\n      your site from loading completely if there are any errors in macros. Rectifying this will set the value to '%1%'.\n    ",
 		httpsCheckValidCertificate: "Your website's certificate is valid.",
 		httpsCheckInvalidCertificate: "Certificate validation error: '%0%'",
 		httpsCheckExpiredCertificate: "Your website's SSL certificate has expired.",

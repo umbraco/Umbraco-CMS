@@ -1695,9 +1695,6 @@ export default {
 		checkErrorMessageDifferentExpectedValue:
 			"Očekávaná hodnota '%1%' pro '%2%' v konfiguračním souboru '%3%', ale nalezeno '%0%'.",
 		checkErrorMessageUnexpectedValue: "Nalezena neočekávaná hodnota '%0%' pro '%2%' v konfiguračním souboru '%3%'.",
-		macroErrorModeCheckSuccessMessage: "MacroErrors jsou nastaveny na '%0%'.",
-		macroErrorModeCheckErrorMessage:
-			"MakroErrors jsou nastaveny na '%0%', což zabrání úplnému načtení některých nebo všech stránek na vašem webu, pokud dojde k chybám v makrech. Náprava nastaví hodnotu na '%1%'.",
 		httpsCheckValidCertificate: 'Certifikát vašeho webu je platný.',
 		httpsCheckInvalidCertificate: "Chyba ověření certifikátu: '%0%'",
 		httpsCheckExpiredCertificate: 'Platnost SSL certifikátu vašeho webu vypršela.',

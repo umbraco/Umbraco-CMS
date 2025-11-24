@@ -1854,9 +1854,6 @@ export default {
 		checkErrorMessageDifferentExpectedValue:
 			"Erwartete Wert '%1%' für '%2%' in der Konfigurationsdatei '%3%', '%0%' wurde jedoch gefunden.",
 		checkErrorMessageUnexpectedValue: "Unerwarteten Wert '%0%' für '%2%' in der Konfigurationsdatei '%3%' gefunden.",
-		macroErrorModeCheckSuccessMessage: '"MacroErrors" auf \'%0%\' gesetzt.',
-		macroErrorModeCheckErrorMessage:
-			'\n      "MacroErrors" sind auf \'%0%\' gesetzt,\n      was verhindert, dass einige oder alle Seiten Ihrer Website vollständig geladen werden, falls Fehler in Makros auftreten. Schaltfläche "Beheben" setzt den Wert auf \'%1%\'.\n    ',
 		httpsCheckValidCertificate: 'Ihr Website-Zertifikat (SSL) ist gültig.',
 		httpsCheckInvalidCertificate: "(SSL-)Zertifikat-Validierungsfehler: '%0%'",
 		httpsCheckExpiredCertificate: 'Ihr Website-Zertifikat (SSL) ist abgelaufen.',

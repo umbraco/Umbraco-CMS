@@ -2228,9 +2228,6 @@ export default {
 		checkErrorMessageDifferentExpectedValue:
 			"Giá trị mong đợi '%1%' cho '%2%' trong tệp cấu hình '%3%', nhưng tìm thấy '%0%'.",
 		checkErrorMessageUnexpectedValue: "Tìm thấy giá trị không mong đợi '%0%' cho '%2%' trong tệp cấu hình '%3%'.",
-		macroErrorModeCheckSuccessMessage: "MacroErrors được đặt thành '%0%'.",
-		macroErrorModeCheckErrorMessage:
-			"MacroErrors được đặt thành '%0%' sẽ ngăn một hoặc tất cả các trang trên trang web của bạn tải hoàn toàn nếu có bất kỳ lỗi nào trong các macro. Việc khắc phục điều này sẽ đặt giá trị thành '%1%'.",
 		httpsCheckValidCertificate: 'Chứng chỉ của trang web của bạn là hợp lệ.',
 		httpsCheckInvalidCertificate: "Lỗi xác thực chứng chỉ: '%0%'",
 		httpsCheckExpiredCertificate: 'Chứng chỉ SSL của trang web của bạn đã hết hạn.',

@@ -1868,10 +1868,6 @@ export default {
 		customErrorsCheckErrorMessage:
 			"Gli errori personalizzati al momento sono impostati a '%0%'. È raccomandato impostarli a '%1%' prima di andare live.",
 		customErrorsCheckRectifySuccessMessage: "Errori personalizzati impostati correttamente a '%0%'.",
-		macroErrorModeCheckSuccessMessage: "I MacroErrors sono impostati a '%0%'.",
-		macroErrorModeCheckErrorMessage:
-			"I MacroErrors sono impostati a '%0%' che impediranno il caricamento di qualche pagina nel sito se c'è anche solo un errore nella macro. Rettificando questa impostazione verrà impostato il valore '%1%'.",
-		macroErrorModeCheckRectifySuccessMessage: "I MacroErrors sono ora impostati a '%0%'.",
 		trySkipIisCustomErrorsCheckSuccessMessage:
 			"Prova a saltare gli errori personalizzati di IIS è impostato a '%0%' e stai usando la versione '%1%' di IIS.",
 		trySkipIisCustomErrorsCheckErrorMessage:

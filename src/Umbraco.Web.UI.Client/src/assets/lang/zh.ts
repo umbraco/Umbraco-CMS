@@ -1026,9 +1026,6 @@ export default {
 		checkErrorMessageDifferentExpectedValue:
 			"Expected value '%1%' for '%2%' in configuration file '%3%', but found '%0%'.",
 		checkErrorMessageUnexpectedValue: "Found unexpected value '%0%' for '%2%' in configuration file '%3%'.",
-		macroErrorModeCheckSuccessMessage: "MacroErrors are set to '%0%'.",
-		macroErrorModeCheckErrorMessage:
-			"MacroErrors are set to '%0%' which will prevent some or all pages in your site from loading completely if there are any errors in macros. Rectifying this will set the value to '%1%'.",
 		httpsCheckValidCertificate: 'Your site certificate was marked as valid.',
 		httpsCheckInvalidCertificate: "Certificate validation error: '%0%'",
 		healthCheckInvalidUrl: "Error pinging the URL %0% - '%1%'",

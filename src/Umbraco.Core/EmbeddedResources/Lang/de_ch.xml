@@ -2269,11 +2269,6 @@
 		<key alias="checkSuccessMessage">Wert wurde auf den empfohlenen Wert gesetzt: '%0%'.</key>
 		<key alias="checkErrorMessageDifferentExpectedValue">Erwartete Wert '%1%' für '%2%' in der Konfigurationsdatei '%3%', '%0%' wurde jedoch gefunden.</key>
 		<key alias="checkErrorMessageUnexpectedValue">Unerwarteten Wert '%0%' für '%2%' in der Konfigurationsdatei '%3%' gefunden.</key>
-		<key alias="macroErrorModeCheckSuccessMessage">"MacroErrors" auf '%0%' gesetzt.</key>
-		<key alias="macroErrorModeCheckErrorMessage">
-			"MacroErrors" sind auf '%0%' gesetzt,
-			was verhindert, dass einige oder alle Seiten Ihrer Website vollständig geladen werden, falls Fehler in Makros auftreten. Schaltfläche "Beheben" setzt den Wert auf '%1%'.
-		</key>
 		<key alias="httpsCheckValidCertificate">Ihr Website-Zertifikat (SSL) ist gültig.</key>
 		<key alias="httpsCheckInvalidCertificate">(SSL-)Zertifikat-Validierungsfehler: '%0%'</key>
 		<key alias="httpsCheckExpiredCertificate">Ihr Website-Zertifikat (SSL) ist abgelaufen.</key>

@@ -2532,11 +2532,6 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
 			<![CDATA[Gli errori personalizzati al momento sono impostati a '%0%'. È raccomandato impostarli a '%1%' prima di andare live.]]>
 		</key>
 		<key alias="customErrorsCheckRectifySuccessMessage">Errori personalizzati impostati correttamente a '%0%'.</key>
-		<key alias="macroErrorModeCheckSuccessMessage">I MacroErrors sono impostati a '%0%'.</key>
-		<key alias="macroErrorModeCheckErrorMessage">
-			<![CDATA[I MacroErrors sono impostati a '%0%' che impediranno il caricamento di qualche pagina nel sito se c'è anche solo un errore nella macro. Rettificando questa impostazione verrà impostato il valore '%1%'.]]>
-		</key>
-		<key alias="macroErrorModeCheckRectifySuccessMessage">I MacroErrors sono ora impostati a '%0%'.</key>
 		<!-- The following keys get these tokens passed in:
    0: Current value
    1: Recommended value

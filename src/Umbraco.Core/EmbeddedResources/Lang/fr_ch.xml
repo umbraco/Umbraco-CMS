@@ -2070,12 +2070,6 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
 		<!-- The following keys get these tokens passed in:
 	     0: Current value
 		   1: Recommended value
-	  -->
-		<key alias="macroErrorModeCheckSuccessMessage">MacroErrors est fixé à la valeur '%0%'.</key>
-		<key alias="macroErrorModeCheckErrorMessage">MacroErrors est fixé à la valeur '%0%', ce qui empêchera certaines ou même toutes les pages de votre site de se charger complètement en cas d'erreur dans les macros. La rectification de ceci fixera la valeur à '%1%'.</key>
-		<!-- The following keys get these tokens passed in:
-	     0: Current value
-		   1: Recommended value
 		   2: Server version
 	  -->
 		<!-- The following keys get predefined tokens passed in that are not all the same, like above -->

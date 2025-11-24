@@ -1968,9 +1968,6 @@ export default {
 		checkErrorMessageDifferentExpectedValue:
 			"القيمة المتوقعة '%1%' لـ '%2%' في ملف التكوين '%3%'، ولكن تم العثور على '%0%'.\n    ",
 		checkErrorMessageUnexpectedValue: "تم العثور على قيمة غير متوقعة '%0%' لـ '%2%' في ملف التكوين '%3%'.\n    ",
-		macroErrorModeCheckSuccessMessage: "MacroErrors تم تعيينها إلى '%0%'.",
-		macroErrorModeCheckErrorMessage:
-			"MacroErrors تم تعيينها إلى '%0%' مما سيمنع بعض أو جميع الصفحات في\n      موقعك من التحميل بالكامل إذا كانت هناك أي أخطاء في الماكرو. تصحيح ذلك سيجعل القيمة تُعيّن إلى '%1%'.\n    ",
 		httpsCheckValidCertificate: 'شهادة موقعك صالحة.',
 		httpsCheckInvalidCertificate: "خطأ في التحقق من الشهادة: '%0%'",
 		httpsCheckExpiredCertificate: 'شهادة SSL لموقعك قد انتهت صلاحيتها.',

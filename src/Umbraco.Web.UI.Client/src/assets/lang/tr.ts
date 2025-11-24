@@ -1700,9 +1700,6 @@ export default {
 		checkErrorMessageDifferentExpectedValue:
 			"'%3%' yapılandırma dosyasında '%2%' için '%1%' değeri bekleniyordu, ancak '%0%' bulundu.",
 		checkErrorMessageUnexpectedValue: "'%3%' yapılandırma dosyasında '%2%' için beklenmeyen '%0%' değeri bulundu.",
-		macroErrorModeCheckSuccessMessage: "Makro Hatalar '%0%' olarak ayarlandı.",
-		macroErrorModeCheckErrorMessage:
-			'MacroErrors, makrolarda herhangi bir hata olması durumunda sitenizdeki bazı veya tüm sayfaların tamamen yüklenmesini önleyecek olan \'%0%\' olarak ayarlanmıştır. Bunu düzeltmek, değeri "%1%" olarak ayarlayacaktır.',
 		httpsCheckValidCertificate: 'Web sitenizin sertifikası geçerlidir.',
 		httpsCheckInvalidCertificate: "Sertifika doğrulama hatası: '%0%'",
 		httpsCheckExpiredCertificate: 'Web sitenizin SSL sertifikasının süresi doldu.',

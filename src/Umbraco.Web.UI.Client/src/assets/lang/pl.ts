@@ -1252,9 +1252,6 @@ export default {
 		checkErrorMessageDifferentExpectedValue:
 			"Oczekiwana jest wartość '%1%' dla '%2%' w pliku konfiguracyjnym '%3%', ale znaleziono '%0%'.",
 		checkErrorMessageUnexpectedValue: "Znaleziono nieoczekiwaną wartość '%0%' dla '%2%' w pliku konfiguracyjnym '%3%'.",
-		macroErrorModeCheckSuccessMessage: "MacroErrors są ustawione na '%0%'.",
-		macroErrorModeCheckErrorMessage:
-			"MacroErrors są ustawione na '%0%' co uniemożliwi częściowe lub całkowite załadowanie stron w Twojej witrynie jeśli wystąpią jakiekolwiek błędy w makro. Korekta ustawi wartość na '%1%'.",
 		httpsCheckValidCertificate: 'Certifikat Twojej strony jest poprawny.',
 		httpsCheckInvalidCertificate: "Błąd walidacji certyfikatu: '%0%'",
 		httpsCheckExpiredCertificate: 'Certyfikat SSL Twojej strony wygasł.',
