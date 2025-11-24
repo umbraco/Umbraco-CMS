@@ -139,12 +139,20 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		const validator = new UmbLinkPickerValueValidator(this, '$.type');
 
 		this.observe(this.modalContext?.value, (value) => {
-			const { type, queryString: anchor, url } = value?.link ?? {};
-			const hasContent = anchor || url;
-			const validatorValue = type === 'external' ? (hasContent ? type : null) : type ? type : anchor ? anchor : null;
+			const validatorValue = this.#getValidatorValue(value);
 
 			validator.setValue(validatorValue);
 		});
+	}
+
+	#getValidatorValue(value: UmbLinkPickerModalValue | undefined) {
+		const { type, queryString: anchor, url } = value?.link ?? {};
+		const hasContent = anchor || url;
+
+		if (type === 'external') {
+			return hasContent ? type : null;
+		}
+		return type || anchor || null;
 	}
 
 	async #getMediaTypes() {
