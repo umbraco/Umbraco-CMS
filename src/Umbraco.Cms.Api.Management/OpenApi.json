@@ -11898,6 +11898,95 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/help": {
+      "get": {
+        "tags": [
+          "Help"
+        ],
+        "operationId": "GetHelp",
+        "parameters": [
+          {
+            "name": "section",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tree",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          },
+          {
+            "name": "baseUrl",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "https://our.umbraco.com"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProblemDetails"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/PagedHelpPageResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "deprecated": true,
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/imaging/resize/urls": {
       "get": {
         "tags": [
@@ -20712,6 +20801,14 @@
               "format": "int32",
               "default": 100
             }
+          },
+          {
+            "name": "foldersOnly",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
           }
         ],
         "responses": {
@@ -20772,6 +20869,14 @@
             "schema": {
               "type": "integer",
               "format": "int32"
+            }
+          },
+          {
+            "name": "foldersOnly",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
             }
           }
         ],
@@ -37754,9 +37859,6 @@
                   "$ref": "#/components/schemas/DocumentPropertyValuePermissionPresentationModel"
                 },
                 {
-                  "$ref": "#/components/schemas/DocumentTypePermissionPresentationModel"
-                },
-                {
                   "$ref": "#/components/schemas/UnknownTypePermissionPresentationModel"
                 }
               ]
@@ -38041,9 +38143,6 @@
                 },
                 {
                   "$ref": "#/components/schemas/DocumentPropertyValuePermissionPresentationModel"
-                },
-                {
-                  "$ref": "#/components/schemas/DocumentTypePermissionPresentationModel"
                 },
                 {
                   "$ref": "#/components/schemas/UnknownTypePermissionPresentationModel"
@@ -39442,36 +39541,6 @@
           }
         },
         "additionalProperties": false
-      },
-      "DocumentTypePermissionPresentationModel": {
-        "required": [
-          "$type",
-          "documentTypeAlias",
-          "verbs"
-        ],
-        "type": "object",
-        "properties": {
-          "$type": {
-            "type": "string"
-          },
-          "verbs": {
-            "uniqueItems": true,
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "documentTypeAlias": {
-            "type": "string"
-          }
-        },
-        "additionalProperties": false,
-        "discriminator": {
-          "propertyName": "$type",
-          "mapping": {
-            "DocumentTypePermissionPresentationModel": "#/components/schemas/DocumentTypePermissionPresentationModel"
-          }
-        }
       },
       "DocumentTypePropertyTypeContainerResponseModel": {
         "required": [
@@ -48233,9 +48302,6 @@
                   "$ref": "#/components/schemas/DocumentPropertyValuePermissionPresentationModel"
                 },
                 {
-                  "$ref": "#/components/schemas/DocumentTypePermissionPresentationModel"
-                },
-                {
                   "$ref": "#/components/schemas/UnknownTypePermissionPresentationModel"
                 }
               ]
@@ -48671,9 +48737,6 @@
                 },
                 {
                   "$ref": "#/components/schemas/DocumentPropertyValuePermissionPresentationModel"
-                },
-                {
-                  "$ref": "#/components/schemas/DocumentTypePermissionPresentationModel"
                 },
                 {
                   "$ref": "#/components/schemas/UnknownTypePermissionPresentationModel"
@@ -49356,5 +49419,160 @@
         }
       }
     }
-  }
+  },
+  "tags": [
+    {
+      "name": "Culture"
+    },
+    {
+      "name": "Data Type"
+    },
+    {
+      "name": "Dictionary"
+    },
+    {
+      "name": "Document Blueprint"
+    },
+    {
+      "name": "Document Type"
+    },
+    {
+      "name": "Document Version"
+    },
+    {
+      "name": "Document"
+    },
+    {
+      "name": "Dynamic Root"
+    },
+    {
+      "name": "Health Check"
+    },
+    {
+      "name": "Help"
+    },
+    {
+      "name": "Imaging"
+    },
+    {
+      "name": "Import"
+    },
+    {
+      "name": "Indexer"
+    },
+    {
+      "name": "Install"
+    },
+    {
+      "name": "Language"
+    },
+    {
+      "name": "Log Viewer"
+    },
+    {
+      "name": "Manifest"
+    },
+    {
+      "name": "Media Type"
+    },
+    {
+      "name": "Media"
+    },
+    {
+      "name": "Member Group"
+    },
+    {
+      "name": "Member Type"
+    },
+    {
+      "name": "Member"
+    },
+    {
+      "name": "Models Builder"
+    },
+    {
+      "name": "News Dashboard"
+    },
+    {
+      "name": "Object Types"
+    },
+    {
+      "name": "oEmbed"
+    },
+    {
+      "name": "Package"
+    },
+    {
+      "name": "Partial View"
+    },
+    {
+      "name": "Preview"
+    },
+    {
+      "name": "Profiling"
+    },
+    {
+      "name": "Property Type"
+    },
+    {
+      "name": "Published Cache"
+    },
+    {
+      "name": "Redirect Management"
+    },
+    {
+      "name": "Relation Type"
+    },
+    {
+      "name": "Relation"
+    },
+    {
+      "name": "Script"
+    },
+    {
+      "name": "Searcher"
+    },
+    {
+      "name": "Security"
+    },
+    {
+      "name": "Segment"
+    },
+    {
+      "name": "Server"
+    },
+    {
+      "name": "Static File"
+    },
+    {
+      "name": "Stylesheet"
+    },
+    {
+      "name": "Tag"
+    },
+    {
+      "name": "Telemetry"
+    },
+    {
+      "name": "Template"
+    },
+    {
+      "name": "Temporary File"
+    },
+    {
+      "name": "Upgrade"
+    },
+    {
+      "name": "User Data"
+    },
+    {
+      "name": "User Group"
+    },
+    {
+      "name": "User"
+    },
+    {
+      "name": "Webhook"
+    }
+  ]
 }
