@@ -33,7 +33,7 @@ const workspaceViewUnique: UmbExtensionManifest = {
 	conditions: [
 		{
 			alias: UMB_WORKSPACE_CONTENT_TYPE_UNIQUE_CONDITION,
-			oneOf: ['852d35f1-cf37-49b3-bb5b-f7e578219643', '721e85d3-0a2d-4f99-be55-61a5c5ed5c14'], // Example GUID
+			oneOf: ['721e85d3-0a2d-4f99-be55-61a5c5ed5c14', '1b88975d-60d0-4b84-809a-4a4deff38a66'], // Example GUID
 		},
 	],
 };
