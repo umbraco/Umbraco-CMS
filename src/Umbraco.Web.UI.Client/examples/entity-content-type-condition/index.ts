@@ -1,10 +1,10 @@
 import { UMB_WORKSPACE_CONTENT_TYPE_ALIAS_CONDITION_ALIAS } from '@umbraco-cms/backoffice/content-type';
-import { UMB_WORKSPACE_CONTENT_TYPE_UNIQUE_CONDITION_ALIAS } from 'src/packages/core/workspace/conditions/workspace-content-type-unique/constants.js';
+import { UMB_WORKSPACE_CONTENT_TYPE_UNIQUE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 
 const workspaceViewAlias: UmbExtensionManifest = {
 	type: 'workspaceView',
-	alias: 'Example.WorkspaceView.EntityContentTypeCondition',
-	name: 'Example Workspace View With Entity Content Type Condition',
+	alias: 'Example.WorkspaceView.EntityContentTypeAliasCondition',
+	name: 'Example Workspace View With Entity Content Type Alias Condition',
 	element: () => import('./workspace-view.element.js'),
 	meta: {
 		icon: 'icon-bus',
@@ -33,7 +33,7 @@ const workspaceViewUnique: UmbExtensionManifest = {
 	conditions: [
 		{
 			alias: UMB_WORKSPACE_CONTENT_TYPE_UNIQUE_CONDITION_ALIAS,
-			oneOf: ['9cf7f9ba-6bad-469a-8d8a-524546bb6c82'], // Example GUID
+			oneOf: ['852d35f1-cf37-49b3-bb5b-f7e578219643', '721e85d3-0a2d-4f99-be55-61a5c5ed5c14'], // Example GUID
 		},
 	],
 };
