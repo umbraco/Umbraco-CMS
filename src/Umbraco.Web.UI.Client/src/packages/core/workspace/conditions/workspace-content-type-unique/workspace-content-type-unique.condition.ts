@@ -1,8 +1,8 @@
-import { UMB_CONTENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
 import type { UmbWorkspaceContentTypeUniqueConditionConfig } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbConditionControllerArguments, UmbExtensionCondition } from '@umbraco-cms/backoffice/extension-api';
 import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_PROPERTY_STRUCTURE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content-type';
 
 const ObserveSymbol = Symbol();
 
@@ -28,7 +28,7 @@ export class UmbWorkspaceContentTypeUniqueCondition
 		}
 
 		if (permissionCheck !== undefined) {
-			this.consumeContext(UMB_CONTENT_WORKSPACE_CONTEXT, (context) => {
+			this.consumeContext(UMB_PROPERTY_STRUCTURE_WORKSPACE_CONTEXT, (context) => {
 				this.observe(
 					context?.structure.contentTypeUniques,
 					(contentTypeUniques) => {
