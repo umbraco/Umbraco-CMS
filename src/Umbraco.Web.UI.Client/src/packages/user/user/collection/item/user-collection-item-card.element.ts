@@ -76,7 +76,7 @@ export class UmbUserCollectionItemCardElement extends UmbLitElement {
 			<uui-card-user
 				.name=${this.item.name ?? this.localize.term('general_unnamed')}
 				href="${UMB_USER_WORKSPACE_PATH}/edit/${this.item.unique}"
-				selectable
+				?selectable=${this.selectable}
 				?select-only=${this.selectOnly}
 				?selected=${this.selected}
 				@selected=${this.#onSelected}
