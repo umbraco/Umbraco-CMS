@@ -107,6 +107,19 @@ export class UmbEntityCollectionItemCardElement extends UmbLitElement {
 		}
 	}
 
+	#detailProperties?: Array<UmbCollectionItemDetailPropertyConfigModel>;
+	@property({ type: Array, attribute: false })
+	public get detailProperties() {
+		return this.#detailProperties;
+	}
+	public set detailProperties(value) {
+		this.#detailProperties = value;
+
+		if (this._component) {
+			this._component.detailProperties = this.#detailProperties;
+		}
+	}
+
 	#pathAddendum = new UmbRoutePathAddendumContext(this);
 
 	#onSelected(event: UmbSelectedEvent) {
@@ -151,6 +164,7 @@ export class UmbEntityCollectionItemCardElement extends UmbLitElement {
 				component.selected = this.selected;
 				component.disabled = this.disabled;
 				component.href = this.href;
+				component.detailProperties = this.detailProperties;
 
 				component.addEventListener(UmbSelectedEvent.TYPE, this.#onSelected.bind(this));
 				component.addEventListener(UmbDeselectedEvent.TYPE, this.#onDeselected.bind(this));

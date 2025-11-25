@@ -6,3 +6,9 @@ export interface UmbCollectionItemModel extends UmbEntityModel {
 	name?: string;
 	icon?: string;
 }
+
+export interface UmbCollectionItemDetailPropertyConfig {
+	alias: string;
+	name: string;
+	isSystem: boolean;
+}

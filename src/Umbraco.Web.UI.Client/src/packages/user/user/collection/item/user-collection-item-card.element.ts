@@ -1,4 +1,3 @@
-import { UMB_USER_WORKSPACE_PATH } from '../../paths.js';
 import { getDisplayStateFromUserStatus, TimeFormatOptions } from '../../utils.js';
 import { UmbUserKind } from '../../utils/user-kind.js';
 import type { UmbUserCollectionItemModel } from './types.js';
