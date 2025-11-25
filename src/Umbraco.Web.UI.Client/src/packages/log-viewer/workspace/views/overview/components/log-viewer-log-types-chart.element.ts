@@ -121,8 +121,8 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 											}}>
 											<uui-icon
 												name="icon-record"
-												style="color: var(--umb-log-viewer-${level.toLowerCase()}-color);"></uui-icon
-											>${level}
+												style="color: var(--umb-log-viewer-${level.toLowerCase()}-color);"></uui-icon>
+											${level}
 										</button>
 									</li>`,
 							)}
