@@ -34,7 +34,7 @@ export class UmbLocalizeElement extends UmbLitElement {
 	debug = false;
 
 	@state()
-	protected get _text(): string | null {
+	protected get text(): string | null {
 		// As translated texts can contain HTML, we will need to render with unsafeHTML.
 		// But arguments can come from user input, so they should be escaped.
 		const escapedArgs = (this.args ?? []).map((a) => escapeHTML(a));
@@ -53,8 +53,8 @@ export class UmbLocalizeElement extends UmbLitElement {
 	}
 
 	override render() {
-		return this._text !== null
-			? unsafeHTML(this._text)
+		return this.text !== null
+			? unsafeHTML(this.text)
 			: this.debug
 				? html`<span style="color:red">${this.key}</span>`
 				: html`<slot></slot>`;
