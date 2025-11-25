@@ -66,64 +66,62 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 
 	override render() {
 		return html`
-			<div id="outer-layout">
-				<div id="layout">
+			<div id="layout">
+				<img
+					id="logo-on-background"
+					src="${this._serverUrl}/umbraco/management/api/v1/security/back-office/graphics/login-logo-alternative"
+					alt="Logo"
+					aria-hidden="true"
+					part="auth-logo-background" />
+				<div id="graphic" aria-hidden="true">
 					<img
-						id="logo-on-background"
-						src="${this._serverUrl}/umbraco/management/api/v1/security/back-office/graphics/login-logo-alternative"
-						alt="Logo"
-						aria-hidden="true"
-						part="auth-logo-background" />
-					<div id="graphic" aria-hidden="true">
-						<img
-							part="auth-logo"
-							id="logo-on-image"
-							src="${this._serverUrl}/umbraco/management/api/v1/security/back-office/graphics/login-logo"
-							alt="Logo" />
-						<svg
-							id="curve-top"
-							width="1746"
-							height="1374"
-							viewBox="0 0 1746 1374"
-							fill="none"
-							xmlns="http://www.w3.org/2000/svg">
-							<path d="M8 1C61.5 722.5 206.5 1366.5 1745.5 1366.5" stroke="currentColor" stroke-width="15"></path>
-						</svg>
-						<svg
-							id="curve-bottom"
-							width="1364"
-							height="552"
-							viewBox="0 0 1364 552"
-							fill="none"
-							xmlns="http://www.w3.org/2000/svg">
-							<path d="M1 8C387 24 1109 11 1357 548" stroke="currentColor" stroke-width="15"></path>
-						</svg>
-					</div>
-					<div id="content-container">
-						<div id="content">
-							<header id="header">
-								<h1 id="greeting">${this.headline}</h1>
-							</header>
-							${this._error ? html`<p style="margin-top:0;color:red">${this._error}</p>` : ''}
-							${this.data?.userLoginState === 'timedOut'
-								? html`<p style="margin-top:0">${this.localize.term('login_timeout')}</p>`
-								: ''}
-							${when(
-								this._loading,
-								() => html`
-									<div id="loader">
-										<uui-loader></uui-loader>
-									</div>
-								`,
-								() =>
-									html` <umb-extension-slot
-										id="providers"
-										type="authProvider"
-										default-element="umb-auth-provider-default"
-										.props=${this.props}
-										.filter=${this.#filterProvider}></umb-extension-slot>`,
-							)}
-						</div>
+						part="auth-logo"
+						id="logo-on-image"
+						src="${this._serverUrl}/umbraco/management/api/v1/security/back-office/graphics/login-logo"
+						alt="Logo" />
+					<svg
+						id="curve-top"
+						width="1746"
+						height="1374"
+						viewBox="0 0 1746 1374"
+						fill="none"
+						xmlns="http://www.w3.org/2000/svg">
+						<path d="M8 1C61.5 722.5 206.5 1366.5 1745.5 1366.5" stroke="currentColor" stroke-width="15"></path>
+					</svg>
+					<svg
+						id="curve-bottom"
+						width="1364"
+						height="552"
+						viewBox="0 0 1364 552"
+						fill="none"
+						xmlns="http://www.w3.org/2000/svg">
+						<path d="M1 8C387 24 1109 11 1357 548" stroke="currentColor" stroke-width="15"></path>
+					</svg>
+				</div>
+				<div id="content-container">
+					<div id="content">
+						<header id="header">
+							<h1 id="greeting">${this.headline}</h1>
+						</header>
+						${this._error ? html`<p style="margin-top:0;color:red">${this._error}</p>` : ''}
+						${this.data?.userLoginState === 'timedOut'
+							? html`<p style="margin-top:0">${this.localize.term('login_timeout')}</p>`
+							: ''}
+						${when(
+							this._loading,
+							() => html`
+								<div id="loader">
+									<uui-loader></uui-loader>
+								</div>
+							`,
+							() =>
+								html` <umb-extension-slot
+									id="providers"
+									type="authProvider"
+									default-element="umb-auth-provider-default"
+									.props=${this.props}
+									.filter=${this.#filterProvider}></umb-extension-slot>`,
+						)}
 					</div>
 				</div>
 			</div>
@@ -171,18 +169,14 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 		UmbTextStyles,
 		css`
 			:host {
-				display: block;
+				display: flex;
+				justify-content: center;
+				width: 100vw;
+
 				background: var(--uui-color-background, #f4f4f4);
 
 				--curves-color: var(--umb-login-curves-color, #f5c1bc);
 				--curves-display: var(--umb-login-curves-display, inline);
-			}
-
-			#outer-layout {
-				display: flex;
-				justify-content: center;
-				width: 100vw;
-				height: 100vh;
 			}
 
 			#layout {
