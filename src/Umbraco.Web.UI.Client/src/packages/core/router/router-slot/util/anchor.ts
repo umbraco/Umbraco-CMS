@@ -53,7 +53,10 @@ export function ensureAnchorHistory() {
 		// Prevent the default behavior
 		e.preventDefault();
 
+		// Remove the origin from the start of the HREF to get the path
+		const path = fullUrl.pathname + fullUrl.search + fullUrl.hash;
+
 		// Change the history!
-		history.pushState(null, '', fullUrl);
+		history.pushState(null, '', path);
 	});
 }
