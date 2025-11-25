@@ -1,6 +1,6 @@
 import { UMB_APP_LOG_VIEWER_CONTEXT } from '../../../logviewer-workspace.context-token.js';
 import { UMB_LOG_VIEWER_SAVE_SEARCH_MODAL } from './log-viewer-search-input-modal.modal-token.js';
-import { css, html, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, query, state, when, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { escapeHTML } from '@umbraco-cms/backoffice/utils';
 import { query as getQuery, path, toQueryString } from '@umbraco-cms/backoffice/router';
 import { umbConfirmModal, umbOpenModal } from '@umbraco-cms/backoffice/modal';
@@ -144,20 +144,21 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 				slot="trigger"
 				@input=${this.#setQuery}
 				.value=${this._inputQuery}>
-				${this._inputQuery
-					? html`${!this._isQuerySaved
-								? html`<uui-button
+				${when(
+					this._inputQuery !== '',
+					() =>
+						html`${when(
+								this._isQuerySaved,
+								() => nothing,
+								() =>
+									html`<uui-button
 										compact
 										slot="append"
 										label=${this.localize.term('logViewer_saveSearch')}
 										@click=${this.#openSaveSearchDialog}>
 										<uui-icon name="icon-favorite"></uui-icon>
-									</uui-button>`
-								: ''}<uui-button
-								compact
-								slot="append"
-								label=${this.localize.term('general_clear')}
-								@click=${this.#clearQuery}></uui-button>
+									</uui-button>`,
+							)}
 							<uui-button
 								compact
 								slot="append"
@@ -167,8 +168,9 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 							</uui-button>
 							<uui-button compact slot="append" label=${this.localize.term('general_clear')} @click=${this.#clearQuery}>
 								<uui-icon name="icon-delete"></uui-icon>
-							</uui-button>`
-					: html``}
+							</uui-button>`,
+					() => nothing,
+				)}
 				<umb-dropdown id="search-dropdown" slot="append" label=${this.localize.term('logViewer_savedSearches')}>
 					<span slot="label"><umb-localize key="logViewer_savedSearches">Saved searches</umb-localize></span>
 					<uui-scroll-container id="saved-searches-container" role="list">
