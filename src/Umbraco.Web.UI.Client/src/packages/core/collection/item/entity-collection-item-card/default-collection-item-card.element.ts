@@ -1,6 +1,6 @@
 import type { UmbCollectionItemModel } from '../types.js';
 import { getItemFallbackName, getItemFallbackIcon } from '@umbraco-cms/backoffice/entity-item';
-import { UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
+import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 import { customElement, html, nothing, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
@@ -12,6 +12,12 @@ export class UmbDefaultCollectionItemCardElement extends UmbLitElement {
 	@property({ type: Boolean })
 	selectable = false;
 
+	@property({ type: Boolean })
+	selected = false;
+
+	@property({ type: Boolean })
+	selectOnly = false;
+
 	#onSelected(event: CustomEvent) {
 		if (!this.item) return;
 		event.stopPropagation();
@@ -21,7 +27,7 @@ export class UmbDefaultCollectionItemCardElement extends UmbLitElement {
 	#onDeselected(event: CustomEvent) {
 		if (!this.item) return;
 		event.stopPropagation();
-		this.dispatchEvent(new UmbSelectedEvent(this.item.unique));
+		this.dispatchEvent(new UmbDeselectedEvent(this.item.unique));
 	}
 
 	override render() {
@@ -31,6 +37,8 @@ export class UmbDefaultCollectionItemCardElement extends UmbLitElement {
 			<uui-card-content-node
 				name=${this.item.name ?? `${getItemFallbackName(this.item)}`}
 				?selectable=${this.selectable}
+				?select-only=${this.selectOnly}
+				?selected=${this.selected}
 				@selected=${this.#onSelected}
 				@deselected=${this.#onDeselected}>
 				<slot name="actions" slot="actions"></slot>
