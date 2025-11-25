@@ -1,8 +1,8 @@
 import { UmbLogViewerRepository } from '../repository/log-viewer.repository.js';
+import type { UmbLogLevelCounts } from '../types.js';
 import { UMB_APP_LOG_VIEWER_CONTEXT } from './logviewer-workspace.context-token.js';
 import { UmbBasicState, UmbArrayState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import type {
-	LogLevelCountsReponseModel,
 	PagedLoggerResponseModel,
 	PagedLogMessageResponseModel,
 	PagedLogTemplateResponseModel,
@@ -64,7 +64,7 @@ export class UmbLogViewerWorkspaceContext extends UmbContextBase implements UmbW
 	#savedSearches = new UmbObjectState<PagedSavedLogSearchResponseModel | undefined>(undefined);
 	savedSearches = this.#savedSearches.asObservablePart((data) => data);
 
-	#logCount = new UmbObjectState<LogLevelCountsReponseModel | null>(null);
+	#logCount = new UmbObjectState<UmbLogLevelCounts | null>(null);
 	logCount = this.#logCount.asObservable();
 
 	#dateRange = new UmbObjectState<UmbLogViewerDateRange>(this.defaultDateRange);
@@ -232,10 +232,7 @@ export class UmbLogViewerWorkspaceContext extends UmbContextBase implements UmbW
 
 	async getLogCount() {
 		const { data } = await this.#repository.getLogCount({ ...this.#dateRange.getValue() });
-
-		if (data) {
-			this.#logCount.setValue(data);
-		}
+		this.#logCount.setValue(data ?? null);
 	}
 
 	async getMessageTemplates(skip: number, take: number) {

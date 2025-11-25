@@ -1,12 +1,14 @@
 import type { UmbLogMessagesDataSource, UmbLogSearchDataSource } from './index.js';
-import type {
-	DirectionModel,
+import {
 	LogLevelModel,
-	SavedLogSearchResponseModel,
+	type DirectionModel,
+	type SavedLogSearchResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { LogViewerService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
+import type { UmbLogLevelCounts } from '../../types.js';
 
 /**
  * A data source for the log saved searches
@@ -87,7 +89,7 @@ export class UmbLogMessagesServerDataSource implements UmbLogMessagesDataSource 
 	 * @memberof UmbLogMessagesServerDataSource
 	 */
 	async getLogViewerLevel({ skip = 0, take = 100 }: { skip?: number; take?: number }) {
-		return await tryExecute(this.#host, LogViewerService.getLogViewerLevel({ query: { skip, take } }));
+		return tryExecute(this.#host, LogViewerService.getLogViewerLevel({ query: { skip, take } }));
 	}
 
 	/**
@@ -96,13 +98,39 @@ export class UmbLogMessagesServerDataSource implements UmbLogMessagesDataSource 
 	 * @returns {*}
 	 * @memberof UmbLogMessagesServerDataSource
 	 */
-	async getLogViewerLevelCount({ startDate, endDate }: { startDate?: string; endDate?: string }) {
-		return await tryExecute(
+	async getLogViewerLevelCount({
+		startDate,
+		endDate,
+	}: {
+		startDate?: string;
+		endDate?: string;
+	}): Promise<UmbDataSourceResponse<UmbLogLevelCounts>> {
+		const data = await tryExecute(
 			this.#host,
 			LogViewerService.getLogViewerLevelCount({
 				query: { startDate, endDate },
 			}),
 		);
+
+		if (data?.data) {
+			const normalizedData: UmbLogLevelCounts = {
+				[LogLevelModel.VERBOSE]: 0,
+				[LogLevelModel.DEBUG]: 0,
+				[LogLevelModel.INFORMATION]: 0,
+				[LogLevelModel.WARNING]: 0,
+				[LogLevelModel.ERROR]: 0,
+				[LogLevelModel.FATAL]: 0,
+			};
+
+			// Normalize keys to match LogLevelModel
+			for (const [level, count] of Object.entries(data.data)) {
+				normalizedData[(level.charAt(0).toUpperCase() + level.slice(1)) as LogLevelModel] = count;
+			}
+
+			return { data: normalizedData };
+		}
+
+		return {};
 	}
 	/**
 	 *	Grabs all the log messages from the server
@@ -143,7 +171,7 @@ export class UmbLogMessagesServerDataSource implements UmbLogMessagesDataSource 
 		startDate?: string;
 		endDate?: string;
 	}) {
-		return await tryExecute(
+		return tryExecute(
 			this.#host,
 			LogViewerService.getLogViewerLog({
 				query: {
@@ -185,7 +213,7 @@ export class UmbLogMessagesServerDataSource implements UmbLogMessagesDataSource 
 		startDate?: string;
 		endDate?: string;
 	}) {
-		return await tryExecute(
+		return tryExecute(
 			this.#host,
 			LogViewerService.getLogViewerMessageTemplate({
 				query: { skip, take, startDate, endDate },
@@ -194,7 +222,7 @@ export class UmbLogMessagesServerDataSource implements UmbLogMessagesDataSource 
 	}
 
 	async getLogViewerValidateLogsSize({ startDate, endDate }: { startDate?: string; endDate?: string }) {
-		return await tryExecute(
+		return tryExecute(
 			this.#host,
 			LogViewerService.getLogViewerValidateLogsSize({
 				query: { startDate, endDate },

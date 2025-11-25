@@ -1,7 +1,7 @@
+import type { UmbLogLevelCounts } from '../../../../../log-viewer/types.js';
 import { UMB_APP_LOG_VIEWER_CONTEXT } from '../../../logviewer-workspace.context-token.js';
 import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { LogLevelCountsReponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { consumeContext } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-log-viewer-log-types-chart')
@@ -22,7 +22,7 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 	private _dateRange = { startDate: '', endDate: '' };
 
 	@state()
-	private _logLevelCountResponse: LogLevelCountsReponseModel | null = null;
+	private _logLevelCounts: UmbLogLevelCounts | null = null;
 
 	@state()
 	private _logLevelCount: [string, number][] = [];
@@ -49,8 +49,8 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 	}
 
 	setLogLevelCount() {
-		if (this._logLevelCountResponse) {
-			const nonZeroEntries = Object.entries(this._logLevelCountResponse).filter(([, count]) => count > 0);
+		if (this._logLevelCounts) {
+			const nonZeroEntries = Object.entries(this._logLevelCounts).filter(([, count]) => count > 0);
 			this._logLevelKeys = nonZeroEntries;
 			this._logLevelCount = nonZeroEntries.filter(([level]) => !this._logLevelCountFilter.includes(level));
 		} else {
@@ -61,7 +61,7 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 
 	#observeStuff() {
 		this.observe(this._logViewerContext?.logCount, (logLevel) => {
-			this._logLevelCountResponse = logLevel ?? null;
+			this._logLevelCounts = logLevel ?? null;
 			this.setLogLevelCount();
 		});
 
