@@ -8,7 +8,6 @@ import { css, customElement, html, nothing, query, state, when } from '@umbraco-
 import { isUmbracoFolder, UmbMediaTypeStructureRepository } from '@umbraco-cms/backoffice/media-type';
 import {
 	UMB_VALIDATION_CONTEXT,
-	umbBindToValidation,
 	UmbObserveValidationStateController,
 	UmbValidationContext,
 	type UmbValidator,
@@ -42,7 +41,6 @@ class UmbLinkPickerValueValidator extends UmbControllerBase implements UmbValida
 
 	setValue(value: unknown) {
 		this.#value = value;
-		this.validate();
 	}
 
 	getValue(): unknown {
@@ -195,6 +193,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		const query = (event.target.value as string) ?? '';
 		if (query.startsWith('#') || query.startsWith('?')) {
 			this.#partialUpdateLink({ queryString: query });
+			this.#validationContext.messages.removeMessageByKey('UmbLinkPickerValueValidator');
 			return;
 		}
 
@@ -205,6 +204,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		} else {
 			this.#partialUpdateLink({ queryString: '' });
 		}
+		this.#validationContext.messages.removeMessageByKey('UmbLinkPickerValueValidator');
 	}
 
 	#onLinkTitleInput(event: UUIInputEvent) {
@@ -235,6 +235,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 			type: 'external',
 			url,
 		});
+		this.#validationContext.messages.removeMessageByKey('UmbLinkPickerValueValidator');
 	}
 
 	async #onPickerSelection(event: UmbInputPickerEvent, type: 'document' | 'media') {
@@ -284,8 +285,9 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		};
 
 		this.#partialUpdateLink(link);
-
-		await this.#validationContext.validate();
+		if (unique) {
+			this.#validationContext.messages.removeMessageByKey('UmbLinkPickerValueValidator');
+		}
 	}
 
 	async #getUrlForDocument(unique: string) {
@@ -429,7 +431,6 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 				.value=${this.value.link.url ?? ''}
 				?disabled=${!!this.value.link.unique}
 				@input=${this.#onLinkUrlInput}
-				${umbBindToValidation(this)}
 				${umbFocus()}>
 				${when(
 					!this.value.link.unique,
