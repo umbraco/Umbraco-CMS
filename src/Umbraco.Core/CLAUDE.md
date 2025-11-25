@@ -99,7 +99,7 @@ public interface IContentService
 - Interfaces in Umbraco.Core, implementations in Umbraco.Infrastructure
 - Use `Attempt<TResult, TStatus>` for operations that can fail with specific reasons
 - OperationStatus enums provide detailed failure reasons
-- Services are registered in Composers via DI
+- Services are registered via DI in builder extensions
 
 ### 2. Notification System (Event Handling)
 
@@ -121,7 +121,7 @@ public class MyNotificationHandler : INotificationHandler<ContentSavedNotificati
     }
 }
 
-// 3. Register in composer
+// 3. Add to appropriate builder extensions
 builder.AddNotificationHandler<ContentSavedNotification, MyNotificationHandler>();
 ```
 
@@ -135,7 +135,8 @@ builder.AddNotificationHandler<ContentSavedNotification, MyNotificationHandler>(
 
 ### 3. Composer Pattern (DI Registration)
 
-Composers register services and configure the application:
+Composers register services and configure the application, this is to make the system easily extendible by package developers and implementors.
+Internally we only use this for temporary service registration for use in short lived code, for example migrations:
 
 ```csharp
 public class MyComposer : IComposer

@@ -77,6 +77,8 @@ src/Umbraco.Cms.Api.Management/
 1. **Controller-per-Operation** - Each endpoint is a separate controller class
    - Example: `CreateDocumentController`, `UpdateDocumentController`, `DeleteDocumentController`
    - Enables fine-grained authorization and operation-specific logic
+   - **Responsibilities**: entrypoint/routing, authorization and mapping
+   - **avoid**: business logic directly in controllers (there are a few known violations)
 
 2. **Presentation Factory Pattern** - Factories convert domain models to ViewModels
    - Example: `IDocumentEditingPresentationFactory` (src/Umbraco.Cms.Api.Management/Factories/)
@@ -257,11 +259,6 @@ All errors return RFC 7807 ProblemDetails via helper methods in base controllers
 - Better performance (no reflection overhead)
 - See `Factories/` directory (92 factory classes)
 
-**Why JsonPatch.Net?**
-- RFC 6902 compliant JSON Patch support
-- Used for partial updates (PATCH operations)
-- See `ViewModels/JsonPatch/JsonPatchViewModel.cs`
-
 ### Project-Specific Architectural Decisions
 
 **Embedded OpenAPI Spec** (OpenApi.json - 1.3MB):
@@ -296,6 +293,12 @@ All errors return RFC 7807 ProblemDetails via helper methods in base controllers
 - ASP.NET Core Data Protection for token encryption
 
 **Authorization**:
+- Basic authorization is done trough policies and the `AuthorizeAttribute`
+```csharp
+// Example from DocumentTreeControllerBase.cs, the user needs at least access to a section that uses trees
+[Authorize(Policy = AuthorizationPolicies.SectionAccessForContentTree)]
+```
+- Authorization that needs (parts of) the payload are done manually trough the IAuthorizationService
 ```csharp
 // Example from CreateDocumentController.cs:22
 private readonly IAuthorizationService _authorizationService;

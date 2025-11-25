@@ -190,18 +190,13 @@ Project ownership is distributed across teams. Check individual project director
    - Enables testing, polymorphism, extensibility
 
 3. **Notification Pattern** (not C# events)
-   - `*SavingNotification` (before, cancellable)
-   - `*SavedNotification` (after, for reactions)
-   - Registered via Composers
+   - See `/src/Umbraco.Core/CLAUDE.md` → "2. Notification System (Event Handling)"
 
 4. **Composer Pattern** (DI registration)
-   - Automatic discovery via reflection
-   - Ordered execution with `[ComposeBefore]`, `[ComposeAfter]`, `[Weight]`
+   - See `/src/Umbraco.Core/CLAUDE.md` → "3. Composer Pattern (DI Registration)"
 
 5. **Scoping Pattern** (Unit of Work)
-   - `ICoreScopeProvider.CreateCoreScope()`
-   - Must call `scope.Complete()` to commit
-   - Manages transactions and cache lifetime
+   - See `/src/Umbraco.Core/CLAUDE.md` → "5. Scoping Pattern (Unit of Work)"
 
 6. **Attempt Pattern** (operation results)
    - `Attempt<TResult, TStatus>` instead of exceptions
