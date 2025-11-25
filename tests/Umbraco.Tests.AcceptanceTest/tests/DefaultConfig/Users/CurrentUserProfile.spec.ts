@@ -1,4 +1,4 @@
-import {NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
 
 const userPassword = '0123456789';
 let testUserCookieAndToken = {cookie: "", accessToken: "", refreshToken: ""};
@@ -21,7 +21,7 @@ for (const userGroup of userGroups) {
     await umbracoApi.user.updatePassword(userId, userPassword);
     testUserCookieAndToken = await umbracoApi.user.loginToUser(userName, userEmail, userPassword);
     await umbracoUi.goToBackOffice();
-    await umbracoUi.currentUserProfile.waitForNetworkToBeIdle();
+    await umbracoUi.currentUserProfile.isBackOfficeMainVisible();
 
     // Act
     await umbracoUi.currentUserProfile.clickCurrentUserAvatarButton();
