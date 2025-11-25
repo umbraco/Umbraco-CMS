@@ -1,0 +1,52 @@
+import type { UmbCollectionItemModel } from '../types.js';
+import { getItemFallbackName, getItemFallbackIcon } from '@umbraco-cms/backoffice/entity-item';
+import { UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
+import { customElement, html, nothing, property } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+
+@customElement('umb-default-collection-item-card')
+export class UmbDefaultCollectionItemCardElement extends UmbLitElement {
+	@property({ type: Object })
+	item?: UmbCollectionItemModel;
+
+	@property({ type: Boolean })
+	selectable = false;
+
+	#onSelected(event: CustomEvent) {
+		if (!this.item) return;
+		event.stopPropagation();
+		this.dispatchEvent(new UmbSelectedEvent(this.item.unique));
+	}
+
+	#onDeselected(event: CustomEvent) {
+		if (!this.item) return;
+		event.stopPropagation();
+		this.dispatchEvent(new UmbSelectedEvent(this.item.unique));
+	}
+
+	override render() {
+		if (!this.item) return nothing;
+
+		return html`
+			<uui-card-content-node
+				name=${this.item.name ?? `${getItemFallbackName(this.item)}`}
+				?selectable=${this.selectable}
+				@selected=${this.#onSelected}
+				@deselected=${this.#onDeselected}>
+				<slot name="actions" slot="actions"></slot>
+				${this.#renderIcon(this.item)}
+			</uui-card-content-node>
+		`;
+	}
+
+	#renderIcon(item: UmbCollectionItemModel) {
+		const icon = item.icon || getItemFallbackIcon();
+		return html`<umb-icon slot="icon" name=${icon}></umb-icon>`;
+	}
+}
+
+declare global {
+	interface HTMLElementTagNameMap {
+		'umb-default-collection-item-card': UmbDefaultCollectionItemCardElement;
+	}
+}
