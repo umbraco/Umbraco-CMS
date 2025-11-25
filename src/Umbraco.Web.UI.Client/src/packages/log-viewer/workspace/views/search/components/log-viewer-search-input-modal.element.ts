@@ -36,28 +36,30 @@ export default class UmbLogViewerSaveSearchModalElement extends UmbModalBaseElem
 	override render() {
 		return html`
 			<uui-dialog-layout headline=${this.localize.term('logViewer_saveSearch')}>
-				<span>${this.localize.term('logViewer_saveSearchDescription')}</span>
+				<umb-localize key="logViewer_saveSearchDescription"> Enter a friendly name for your search query </umb-localize>
 				<uui-form-layout-item>
 					<uui-label slot="label"><umb-localize key="logViewer_query">Query</umb-localize>:</uui-label>
 					<span>${this.data?.query}</span>
 				</uui-form-layout-item>
 				<uui-form-layout-item>
 					<uui-label slot="label" for="input"><umb-localize key="general_name">Name</umb-localize>:</uui-label>
-					<uui-input label=${this.localize.term('logViewer_searchName')} id="input" @input=${this.#validate}></uui-input>
+					<uui-input
+						label=${this.localize.term('logViewer_searchName')}
+						id="input"
+						@input=${this.#validate}></uui-input>
 				</uui-form-layout-item>
 
-				<uui-button slot="actions" @click="${this._handleClose}" label=${this.localize.term('general_close')}>
-					<umb-localize key="general_close">Close</umb-localize>
-				</uui-button>
+				<uui-button
+					slot="actions"
+					@click="${this._handleClose}"
+					label=${this.localize.term('general_close')}></uui-button>
 				<uui-button
 					.disabled=${!this._hasValue}
 					slot="actions"
 					look="primary"
 					color="positive"
-					label=${this.localize.term('general_save')}
-					@click="${this._handleSubmit}">
-					<umb-localize key="general_save">Save</umb-localize>
-				</uui-button>
+					label=${this.localize.term('logViewer_saveSearch')}
+					@click="${this._handleSubmit}"></uui-button>
 			</uui-dialog-layout>
 		`;
 	}
