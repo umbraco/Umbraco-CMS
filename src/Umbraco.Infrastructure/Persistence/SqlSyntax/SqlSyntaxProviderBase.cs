@@ -11,6 +11,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
@@ -99,6 +100,10 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
 
     public string TimeColumnDefinition { get; protected set; } = "DATETIME";
 
+    public string DateOnlyColumnDefinition { get; protected set; } = "DATE";
+
+    public string TimeOnlyColumnDefinition { get; protected set; } = "TIME";
+
     protected IList<Func<ColumnDefinition, string>> ClauseOrder { get; }
 
     protected DbTypes DbTypeMap => _dbTypes.Value;
@@ -111,6 +116,21 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
     public Regex AliasRegex { get; }
 
     public string GetWildcardPlaceholder() => "%";
+
+    public virtual string GetWildcardConcat(string concatDefault = "")
+    {
+        if (string.IsNullOrEmpty(concatDefault))
+        {
+            return $"'{GetWildcardPlaceholder()}'";
+        }
+
+        if (!concatDefault.StartsWith('\'') || !concatDefault.EndsWith('\''))
+        {
+            return $"'{concatDefault.Trim()}'";
+        }
+
+        return concatDefault;
+    }
 
     public virtual DatabaseType GetUpdatedDatabaseType(DatabaseType current, string? connectionString) => current;
 
@@ -126,11 +146,13 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
         //use the 'upper' method to always ensure strings are matched without case sensitivity no matter what the db setting.
         $"upper({column}) LIKE upper(@{paramIndex})";
 
-    public virtual string GetConcat(params string[] args) => "concat(" + string.Join(",", args) + ")";
+    public virtual string GetConcat(params string[] args) => "CONCAT(" + string.Join(",", args) + ")";
 
     public virtual string GetQuotedTableName(string? tableName) => $"\"{tableName}\"";
 
     public virtual string GetQuotedColumnName(string? columnName) => $"\"{columnName}\"";
+
+    public virtual string OrderByGuid(string tableName, string columnName) => $"UPPER({this.GetQuotedColumn(tableName, columnName)})";
 
     public virtual string GetQuotedName(string? name) => $"\"{name}\"";
 
@@ -177,7 +199,7 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
         return "NVARCHAR";
     }
 
-    public virtual string GetColumn(DatabaseType dbType, string tableName, string columnName, string columnAlias, string? referenceName = null, bool forInsert = false)
+    public virtual string GetColumn(DatabaseType dbType, string tableName, string columnName, string? columnAlias, string? referenceName = null, bool forInsert = false)
     {
         tableName = GetQuotedTableName(tableName);
         columnName = GetQuotedColumnName(columnName);
@@ -414,6 +436,29 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
     public virtual string FormatTableRename(string? oldName, string? newName) =>
         string.Format(RenameTable, GetQuotedTableName(oldName), GetQuotedTableName(newName));
 
+    public virtual string ColumnWithAlias(string tableNameOrAlias, string columnName, string columnAlias = "")
+    {
+        var quotedColumnName = GetQuotedColumnName(columnName);
+        var columnPrefix = GetColumnPrefix(tableNameOrAlias);
+        var asAppendix = string.IsNullOrEmpty(columnAlias)
+            ? string.Empty
+            : $" AS {GetQuotedName(columnAlias)}";
+
+        return $"{columnPrefix}{quotedColumnName}{asAppendix}";
+    }
+
+    private string GetColumnPrefix(string? tableNameOrAlias)
+    {
+        if (string.IsNullOrEmpty(tableNameOrAlias))
+        {
+            return string.Empty;
+        }
+
+        // Always quote the identifier to avoid ambiguity between table names and aliases.
+        var quoted = GetQuotedTableName(tableNameOrAlias.Trim());
+        return $"{quoted}.";
+    }
+
     public abstract Sql<ISqlContext> SelectTop(Sql<ISqlContext> sql, int top);
 
     public abstract void HandleCreateTable(
@@ -471,6 +516,8 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
 
     public virtual string ConvertUniqueIdentifierToString => "CONVERT(nvarchar(36), {0})";
 
+    public virtual string ConvertIntegerToBoolean(int value) => value == 0 ? "0" : "1";
+
     private DbTypes InitColumnTypeMap()
     {
         var dbTypeMap = new DbTypesFactory();
@@ -488,6 +535,10 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
         dbTypeMap.Set<TimeSpan?>(DbType.Time, TimeColumnDefinition);
         dbTypeMap.Set<DateTimeOffset>(DbType.DateTimeOffset, DateTimeOffsetColumnDefinition);
         dbTypeMap.Set<DateTimeOffset?>(DbType.DateTimeOffset, DateTimeOffsetColumnDefinition);
+        dbTypeMap.Set<DateOnly>(DbType.Date, DateOnlyColumnDefinition);
+        dbTypeMap.Set<DateOnly?>(DbType.Date, DateOnlyColumnDefinition);
+        dbTypeMap.Set<TimeOnly>(DbType.Time, TimeOnlyColumnDefinition);
+        dbTypeMap.Set<TimeOnly?>(DbType.Time, TimeOnlyColumnDefinition);
 
         dbTypeMap.Set<byte>(DbType.Byte, IntColumnDefinition);
         dbTypeMap.Set<byte?>(DbType.Byte, IntColumnDefinition);
@@ -612,6 +663,10 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
         if (string.Equals(column.DefaultValue.ToString(), "GETDATE()", StringComparison.OrdinalIgnoreCase))
         {
             column.DefaultValue = SystemMethods.CurrentDateTime;
+        }
+        else if (string.Equals(column.DefaultValue.ToString(), "GETUTCDATE()", StringComparison.OrdinalIgnoreCase))
+        {
+            column.DefaultValue = SystemMethods.CurrentUTCDateTime;
         }
 
         // see if this is for a system method

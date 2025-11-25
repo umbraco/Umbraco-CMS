@@ -130,5 +130,19 @@ public class UmbracoPlan : MigrationPlan
 
         // To 16.4.0
         To<V_16_4_0.CreateMissingTabs>("{6A7D3B80-8B64-4E41-A7C0-02EC39336E97}");
+
+        // To 17.0.0
+        To<V_17_0_0.AddGuidsToAuditEntries>("{17D5F6CA-CEB8-462A-AF86-4B9C3BF91CF1}");
+        To<V_17_0_0.MigrateCheckboxListDataTypesAndPropertyData>("{EB1E50B7-CD5E-4B6B-B307-36237DD2C506}");
+        To<V_17_0_0.SetDateDefaultsToUtcNow>("{1847C7FF-B021-44EB-BEB0-A77A4376A6F2}");
+        To<V_17_0_0.MigrateSystemDatesToUtc>("{7208B20D-6BFC-472E-9374-85EEA817B27D}");
+        To<V_17_0_0.AddDistributedJobLock>("{263075BF-F18A-480D-92B4-4947D2EAB772}");
+        To<V_17_0_0.AddLastSyncedTable>("26179D88-58CE-4C92-B4A4-3CBA6E7188AC");
+        To<V_17_0_0.EnsureDefaultMediaFolderHasDefaultCollection>("{8B2C830A-4FFB-4433-8337-8649B0BF52C8}");
+        To<V_17_0_0.InvalidateBackofficeUserAccess>("{1C38D589-26BB-4A46-9ABE-E4A0DF548A87}");
+
+        // To 18.0.0
+        // TODO (V18): Enable on 18 branch
+        //// To<V_18_0_0.MigrateSingleBlockList>("{74332C49-B279-4945-8943-F8F00B1F5949}");
     }
 }

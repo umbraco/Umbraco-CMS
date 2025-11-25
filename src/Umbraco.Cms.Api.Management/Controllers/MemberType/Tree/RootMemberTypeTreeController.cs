@@ -30,6 +30,10 @@ public class RootMemberTypeTreeController : MemberTypeTreeControllerBase
     public async Task<ActionResult<PagedViewModel<MemberTypeTreeItemResponseModel>>> Root(
         CancellationToken cancellationToken,
         int skip = 0,
-        int take = 100)
-        => await GetRoot(skip, take);
+        int take = 100,
+        bool foldersOnly = false)
+    {
+        RenderFoldersOnly(foldersOnly);
+        return await GetRoot(skip, take);
+    }
 }

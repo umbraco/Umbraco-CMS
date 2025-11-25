@@ -115,13 +115,15 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 
 	#currentProvidedView?: UmbWorkspaceViewContext;
 	#createRoutes() {
-		let newRoutes: UmbRoute[] = [];
+		const newRoutes: UmbRoute[] = [];
 
 		if (this._workspaceViews.length > 0) {
-			newRoutes = this._workspaceViews.map((context) => {
+			this._workspaceViews.forEach((context) => {
 				const manifest = context.manifest;
-				return {
-					path: UMB_WORKSPACE_VIEW_PATH_PATTERN.generateLocal({ viewPathname: manifest.meta.pathname }),
+				const path = UMB_WORKSPACE_VIEW_PATH_PATTERN.generateLocal({ viewPathname: manifest.meta.pathname });
+				newRoutes.push({
+					unique: manifest.alias,
+					path,
 					component: () => createExtensionElement(manifest),
 					setup: (component?: any) => {
 						if (this.#currentProvidedView !== context) {
@@ -133,7 +135,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 							component.manifest = manifest;
 						}
 					},
-				};
+				});
 			});
 
 			// Duplicate first workspace and use it for the empty path scenario. [NL]

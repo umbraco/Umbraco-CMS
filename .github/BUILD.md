@@ -9,7 +9,7 @@ In order to use Umbraco as a CMS and build your website with it, you should not 
 -   Are you about to [create a pull request for Umbraco][contribution guidelines]?
 -   Are you trying to get to the bottom of a problem in your existing Umbraco installation?
 
-If the answer is yes, please read on. Otherwise, make sure to head on over [to the download page](https://our.umbraco.com/download) and start using Umbraco CMS as intended.
+If the answer is yes, please read on. Otherwise, make sure to head on over [to the releases page](https://releases.umbraco.com) and start using Umbraco CMS as intended.
 
 ## Table of contents
 
@@ -79,13 +79,12 @@ Conversely, if you are working on front-end only, you want to build the back-end
 "AuthorizeCallbackLogoutPathName": "/logout",
 "AuthorizeCallbackErrorPathName": "/error",
 "BackOfficeTokenCookie": {
-  "Enabled": true,
   "SameSite": "None"
 }
 ```
 
 > [!NOTE]
-> If you get stuck in a login loop, try clearing your browser cookies for localhost, and make sure that the `BackOfficeTokenCookie` settings are correct. Namely, that `SameSite` should be set to `None` when running the front-end server separately.
+> If you get stuck in a login loop, try clearing your browser cookies for localhost, and make sure that the `Umbraco:Cms:Security:BackOfficeTokenCookie:SameSite` setting is set to `None`.
 
 Then run Umbraco from the command line.
 

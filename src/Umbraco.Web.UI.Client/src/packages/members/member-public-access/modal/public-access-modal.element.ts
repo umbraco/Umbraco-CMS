@@ -88,7 +88,7 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 	async #handleSave() {
 		if (!this._loginDocumentId || !this._errorDocumentId || !this.#unique) return;
 
-		// TODO: [v15] Currently the Management API doesn't support passing the member/group ids, only the userNames/names.
+		// TODO: [v15] Currently the Management API doesn't support passing the member/group ids, only the userNames/names. [MR]
 		// This is a temporary solution where we have to look them up until the API is updated to support this.
 		const body: PublicAccessRequestModel = {
 			memberGroupNames: [],

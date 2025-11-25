@@ -1,3 +1,4 @@
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
@@ -18,7 +19,7 @@ internal static class ConsentFactory
             {
                 Id = dto.Id,
                 Current = dto.Current,
-                CreateDate = dto.CreateDate,
+                CreateDate = dto.CreateDate.EnsureUtc(),
                 Source = dto.Source,
                 Context = dto.Context,
                 Action = dto.Action,

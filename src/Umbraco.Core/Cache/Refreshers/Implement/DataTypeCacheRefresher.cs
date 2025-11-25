@@ -72,7 +72,7 @@ public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeC
 
     #region Refresher
 
-    public override void Refresh(JsonPayload[] payloads)
+    public override void RefreshInternal(JsonPayload[] payloads)
     {
         // we need to clear the ContentType runtime cache since that is what caches the
         // db data type to store the value against and anytime a datatype changes, this also might change
@@ -86,7 +86,6 @@ public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeC
 
         Attempt<IAppPolicyCache?> dataTypeCache = AppCaches.IsolatedCaches.Get<IDataType>();
 
-        List<IPublishedContentType> removedContentTypes = new();
         foreach (JsonPayload payload in payloads)
         {
             _idKeyMap.ClearCache(payload.Id);
@@ -95,7 +94,16 @@ public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeC
             {
                 dataTypeCache.Result?.Clear(RepositoryCacheKeys.GetKey<IDataType, int>(payload.Id));
             }
+        }
 
+        base.RefreshInternal(payloads);
+    }
+
+    public override void Refresh(JsonPayload[] payloads)
+    {
+        List<IPublishedContentType> removedContentTypes = new();
+        foreach (JsonPayload payload in payloads)
+        {
             removedContentTypes.AddRange(_publishedContentTypeCache.ClearByDataTypeId(payload.Id));
         }
 

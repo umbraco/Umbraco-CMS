@@ -17,9 +17,13 @@ import type {
 	UmbPropertyEditorUiElement,
 	UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
-import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import { jsonStringComparison, observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
-import { UmbFormControlMixin, UmbValidationContext } from '@umbraco-cms/backoffice/validation';
+import {
+	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
+	UmbFormControlMixin,
+	UmbValidationContext,
+} from '@umbraco-cms/backoffice/validation';
 import type { UmbBlockTypeGroup } from '@umbraco-cms/backoffice/block-type';
 import { debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
 
@@ -77,6 +81,10 @@ export class UmbPropertyEditorUIBlockGridElement
 		return this.#readonly;
 	}
 	#readonly = false;
+	@property({ type: Boolean })
+	mandatory?: boolean;
+	@property({ type: String })
+	mandatoryMessage = UMB_VALIDATION_EMPTY_LOCALIZATION_KEY;
 
 	@state()
 	private _layoutColumns?: number;
@@ -111,6 +119,16 @@ export class UmbPropertyEditorUIBlockGridElement
 
 	constructor() {
 		super();
+
+		this.addValidator(
+			'valueMissing',
+			() => this.mandatoryMessage,
+			() => {
+				if (!this.mandatory || this.readonly) return false;
+				const count = this.value?.layout?.[UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS]?.length ?? 0;
+				return count === 0;
+			},
+		);
 
 		this.consumeContext(UMB_CONTENT_WORKSPACE_CONTEXT, (context) => {
 			if (context) {
@@ -181,15 +199,22 @@ export class UmbPropertyEditorUIBlockGridElement
 				]).pipe(debounceTime(20)),
 				([layouts, contents, settings, exposes]) => {
 					if (layouts.length === 0) {
+						if (this.value === undefined) {
+							return;
+						}
 						super.value = undefined;
 					} else {
-						super.value = {
+						const newValue = {
 							...super.value,
 							layout: { [UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS]: layouts },
 							contentData: contents,
 							settingsData: settings,
 							expose: exposes,
 						};
+						if (jsonStringComparison(this.value, newValue)) {
+							return;
+						}
+						super.value = newValue;
 					}
 
 					// If we don't have a value set from the outside or an internal value, we don't want to set the value.

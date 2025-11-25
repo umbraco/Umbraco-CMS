@@ -59,7 +59,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 		this.#legacyMergedChildContainers.sortBy((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
 	}
 
-	// TODO: Implement UmbDeprecated and Obsolete this from v.17 [NL]
+	// TODO: Implement UmbDeprecation and Obsolete this from v.17 [NL]
 	#legacyMergeLogic = false;
 	#startLegacy() {
 		if (this.#legacyMergeLogic) return;

@@ -87,6 +87,8 @@ public static partial class UmbracoBuilderExtensions
             .AddUmbracoOptions<DataTypesSettings>()
             .AddUmbracoOptions<WebhookSettings>()
             .AddUmbracoOptions<CacheSettings>()
+            .AddUmbracoOptions<SystemDateMigrationSettings>()
+            .AddUmbracoOptions<DistributedJobSettings>()
             .AddUmbracoOptions<BackOfficeTokenCookieSettings>();
 
         // Configure connection string and ensure it's updated when the configuration changes

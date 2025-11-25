@@ -1,5 +1,4 @@
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Routing;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -65,6 +64,14 @@ public interface IDocumentUrlService
     Task DeleteUrlsFromCacheAsync(IEnumerable<Guid> documentKeys);
 
     /// <summary>
+    /// Gets a document key by <see cref="Uri" />.
+    /// </summary>
+    /// <param name="uri">The uniform resource identifier.</param>
+    /// <param name="isDraft">Whether to get the url of the draft or published document.</param>
+    /// <returns>The document key, or null if not found.</returns>
+    Guid? GetDocumentKeyByUri(Uri uri, bool isDraft) => throw new NotImplementedException(); // TODO (V19): Remove default implementation.
+
+    /// <summary>
     /// Gets a document key by route.
     /// </summary>
     /// <param name="route">The route.</param>
@@ -73,13 +80,6 @@ public interface IDocumentUrlService
     /// <param name="isDraft">Whether to get the url of the draft or published document.</param>
     /// <returns>The document key, or null if not found.</returns>
     Guid? GetDocumentKeyByRoute(string route, string? culture, int? documentStartNodeId, bool isDraft);
-
-    /// <summary>
-    /// Gets all the URLs for a given content key.
-    /// </summary>
-    /// <param name="contentKey">The content key.</param>
-    [Obsolete("This method is obsolete and will be removed in future versions. Use IPublishedUrlInfoProvider.GetAllAsync instead. Scheduled for removal in Umbraco 17.")]
-    Task<IEnumerable<UrlInfo>> ListUrlsAsync(Guid contentKey);
 
     /// <summary>
     /// Gets the legacy route format for a document key and culture.

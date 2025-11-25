@@ -29,7 +29,7 @@ internal sealed class MemberTypeEditingService : ContentTypeEditingServiceBase<I
 
     public async Task<Attempt<IMemberType?, ContentTypeOperationStatus>> CreateAsync(MemberTypeCreateModel model, Guid userKey)
     {
-        Attempt<IMemberType?, ContentTypeOperationStatus> result = await ValidateAndMapForCreationAsync(model, model.Key, containerKey: null);
+        Attempt<IMemberType?, ContentTypeOperationStatus> result = await ValidateAndMapForCreationAsync(model, model.Key, model.ContainerKey);
         if (result.Success is false)
         {
             return result;
@@ -80,7 +80,7 @@ internal sealed class MemberTypeEditingService : ContentTypeEditingServiceBase<I
 
     protected override UmbracoObjectTypes ContentTypeObjectType => UmbracoObjectTypes.MemberType;
 
-    protected override UmbracoObjectTypes ContainerObjectType => throw new NotSupportedException("Member type tree does not support containers");
+    protected override UmbracoObjectTypes ContainerObjectType => UmbracoObjectTypes.MemberTypeContainer;
 
     protected override ISet<string> GetReservedFieldNames() => _reservedFieldNamesService.GetMemberReservedFieldNames();
 

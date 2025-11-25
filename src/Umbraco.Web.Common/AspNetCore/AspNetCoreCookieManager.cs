@@ -42,11 +42,6 @@ public class AspNetCoreCookieManager : ICookieManager
     public string? GetCookieValue(string cookieName) => _httpContextAccessor.HttpContext?.Request.Cookies[cookieName];
 
     /// <inheritdoc/>
-    [Obsolete("Use overload with the secure and sameSiteMode parameters instead. Scheduled for removal in V17.")]
-    public void SetCookieValue(string cookieName, string value, bool httpOnly) =>
-        SetCookieValue(cookieName, value, httpOnly, false, SameSiteMode.Unspecified.ToString());
-
-    /// <inheritdoc/>
     public void SetCookieValue(string cookieName, string value, bool httpOnly, bool secure, string sameSiteMode)
     {
         SameSiteMode sameSiteModeValue = ParseSameSiteMode(sameSiteMode);

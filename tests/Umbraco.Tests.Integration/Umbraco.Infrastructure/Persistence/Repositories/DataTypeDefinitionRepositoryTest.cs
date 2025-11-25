@@ -250,7 +250,7 @@ internal sealed class DataTypeDefinitionRepositoryTest : UmbracoIntegrationTest
             Assert.That(dataTypeDefinitions, Is.Not.Null);
             Assert.That(dataTypeDefinitions.Any(), Is.True);
             Assert.That(dataTypeDefinitions.Any(x => x == null), Is.False);
-            Assert.That(dataTypeDefinitions.Length, Is.EqualTo(36));
+            Assert.That(dataTypeDefinitions.Length, Is.EqualTo(37));
         }
     }
 
@@ -297,7 +297,7 @@ internal sealed class DataTypeDefinitionRepositoryTest : UmbracoIntegrationTest
             var count = DataTypeRepository.Count(query);
 
             // Assert
-            Assert.That(count, Is.EqualTo(4));
+            Assert.That(count, Is.EqualTo(5));
         }
     }
 

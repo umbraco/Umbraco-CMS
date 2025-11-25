@@ -1129,9 +1129,6 @@ export default {
 		translation: 'Traduction',
 		users: 'Utilisateurs',
 	},
-	help: {
-		theBestUmbracoVideoTutorials: 'Les meilleurs tutoriels vidéo Umbraco',
-	},
 	settings: {
 		defaulttemplate: 'Modèle par défaut',
 		importDocumentTypeHelp:
@@ -1890,13 +1887,10 @@ export default {
 		selectAllLogLevelFilters: 'Tout sélectionner',
 		deselectAllLogLevelFilters: 'Tout déselectionner',
 		savedSearches: 'Recherches sauvegardées',
-		totalItems: "Nombre total d'éléments",
 		timestamp: 'Date',
 		level: 'Niveau',
 		machine: 'Machine',
 		message: 'Message',
-		exception: 'Exception',
-		properties: 'Propriétés',
 		searchWithGoogle: 'Chercher avec Google',
 		searchThisMessageWithGoogle: 'Chercher ce message avec Google',
 		searchWithBing: 'Chercher avec Bing',
@@ -1910,10 +1904,6 @@ export default {
 		searchUmbracoIssues: 'Chercher dans les Umbraco Issues',
 		searchUmbracoIssuesOnGithub: 'Chercher dans les Umbraco Issues sur Github',
 		deleteThisSearch: 'Supprimer cette recherche',
-		findLogsWithRequestId: 'Trouver les Logs avec la Request ID',
-		findLogsWithNamespace: 'Trouver les Logs avec le Namespace',
-		findLogsWithMachineName: 'Trouver les logs avec le Nom de Machine',
-		open: 'Ouvrir',
 	},
 	clipboard: {
 		labelForCopyAllEntries: 'Copier %0%',
@@ -1946,28 +1936,6 @@ export default {
 			"\n                <p>\n\t\t\t\t   Umbraco est actuellement exécuté en mode debug. Cela signifie que vous pouvez utiliser le profileur de performances intégré pour évaluer les performance lors du rendu des pages.\n                </p>\n                <p>\n                    Si vous souhaitez activer le profileur pour le rendu d'une page spécifique, ajoutez simplement <strong>umbDebug=true</strong> au querystring lorsque vous demandez la page.\n                </p>\n                <p>\n                    Si vous souhaitez que le profileur soit activé par défaut pour tous les rendus de pages, vous pouvez utiliser le bouton bascule ci-dessous.\n\t\t\t\t\tCela créera un cookie dans votre browser, qui activera alors le profileur automatiquement.\n                    En d'autres termes, le profileur ne sera activé par défaut que dans <em>votre</em> browser - pas celui des autres.\n                </p>\n        ",
 		activateByDefault: 'Activer le profileur par défaut',
 		reminder: 'Rappel amical',
-	},
-	settingsDashboardVideos: {
-		trainingHeadline: "Des heures de vidéos de formation Umbraco ne sont qu'à un clic d'ici",
-		trainingDescription:
-			'\n        <p>Vous voulez maîtriser Umbraco? Passez quelques minutes à apprendre certaines des meilleures pratiques en regardant une de ces vidéos à propos de l\'utilisation d\'Umbraco. Et visitez <a href="http://umbraco.tv" target="_blank" rel="noopener">umbraco.tv</a> pour encore plus de vidéos Umbraco</p>\n    ',
-		getStarted: 'Pour démarrer',
-	},
-	settingsDashboard: {
-		start: 'Commencer ici',
-		startDescription:
-			"Cette section contient les blocs fondamentaux pour votre site Umbraco. Suivez les liens ci-dessous pour en apprendre d'avantage sur la façon de travailler avec les éléments de la section Settings",
-		more: 'En savoir plus',
-		bulletPointOne:
-			'\n            Lisez-en plus sur la façon de travailler avec les éléments dans la section Settings <a class="btn-link -underline" href="https://docs.umbraco.com/umbraco-cms/fundamentals/backoffice/sections/" target="_blank" rel="noopener">dans la section Documentation</a> de Our Umbraco\n        ',
-		bulletPointTwo:
-			'\n            Posez une question dans le <a class="btn-link -underline" href="https://our.umbraco.com/forum" target="_blank" rel="noopener">Community Forum</a>\n        ',
-		bulletPointThree:
-			'\n            Regardez nos <a class="btn-link -underline" href="https://umbraco.tv" target="_blank" rel="noopener">tutoriels vidéos</a> (certains sont gratuits, certains nécessitent un abonnement)\n        ',
-		bulletPointFour:
-			'\n            Découvrez nos <a class="btn-link -underline" href="https://umbraco.com/products/" target="_blank" rel="noopener">outils d\'amélioration de productivité et notre support commercial</a>\n        ',
-		bulletPointFive:
-			'\n            Découvrez nos possibilités de <a class="btn-link -underline" href="https://umbraco.com/training/" target="_blank" rel="noopener">formations et certifications</a>\n        ',
 	},
 	treeSearch: {
 		searchResult: 'élément retrouvé',

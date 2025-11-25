@@ -1,6 +1,15 @@
 import type { UmbTreeItemContext } from '../index.js';
 import type { UmbTreeItemModel } from '../../types.js';
-import { html, ifDefined, nothing, state, repeat, property, css } from '@umbraco-cms/backoffice/external/lit';
+import {
+	html,
+	ifDefined,
+	nothing,
+	state,
+	repeat,
+	property,
+	css,
+	type TemplateResult,
+} from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -40,11 +49,18 @@ export abstract class UmbTreeItemElementBase<
 	@state()
 	private _label?: string;
 
+	@state()
+	private _isLoadingPrevChildren = false;
+
+	@state()
+	private _isLoadingNextChildren = false;
+
 	@property({ type: Object, attribute: false })
 	public set api(value: TreeItemContextType | undefined) {
 		this.#api = value;
 
 		if (this.#api) {
+			this.#api?.setIsMenu(this._isMenu);
 			this.observe(this.#api.childItems, (value) => (this._childItems = value));
 			this.observe(this.#api.hasChildren, (value) => (this._hasChildren = value));
 			this.observe(this.#api.isActive, (value) => (this._isActive = value));
@@ -56,6 +72,18 @@ export abstract class UmbTreeItemElementBase<
 			this.observe(this.#api.path, (value) => (this._href = value));
 			this.observe(this.#api.pagination.currentPage, (value) => (this._currentPage = value));
 			this.observe(this.#api.pagination.totalPages, (value) => (this._totalPages = value));
+			this.observe(this.#api.isLoadingPrevChildren, (value) => (this._isLoadingPrevChildren = value ?? false));
+			this.observe(this.#api.isLoadingNextChildren, (value) => (this._isLoadingNextChildren = value ?? false));
+
+			this.observe(
+				this.#api.targetPagination?.totalPrevItems,
+				(value) => (this._hasPreviousItems = value !== undefined ? value > 0 : false),
+			);
+			this.observe(
+				this.#api.targetPagination?.totalNextItems,
+				(value) => (this._hasNextItems = value !== undefined ? value > 0 : false),
+			);
+
 			this.#initTreeItem();
 		}
 	}
@@ -92,6 +120,9 @@ export abstract class UmbTreeItemElementBase<
 	private _hasChildren = false;
 
 	@state()
+	protected _forceShowExpand = false;
+
+	@state()
 	private _isOpen = false;
 
 	@state()
@@ -102,6 +133,23 @@ export abstract class UmbTreeItemElementBase<
 
 	@state()
 	private _currentPage = 1;
+
+	@state()
+	private _hasPreviousItems = false;
+
+	@state()
+	private _hasNextItems = false;
+
+	@state()
+	protected _isMenu = false;
+
+	set isMenu(value: boolean) {
+		this._isMenu = value;
+		this.#api?.setIsMenu(value);
+	}
+	get isMenu(): boolean {
+		return this._isMenu;
+	}
 
 	#initTreeItem() {
 		if (!this.#api) return;
@@ -121,19 +169,28 @@ export abstract class UmbTreeItemElementBase<
 
 	private _onShowChildren(event: UUIMenuItemEvent) {
 		event.stopPropagation();
+		// Prevent default cause we will now control the show-children state ourself.
+		event.preventDefault();
 		this.#api?.showChildren();
 	}
 
 	private _onHideChildren(event: UUIMenuItemEvent) {
 		event.stopPropagation();
+		// Prevent default cause we will now control the show-children state ourself.
+		event.preventDefault();
 		this.#api?.hideChildren();
 	}
 
-	#onLoadMoreClick = (event: any) => {
+	#onLoadPrev(event: any) {
+		event.stopPropagation();
+		this.#api?.loadPrevItems?.();
+	}
+
+	#onLoadNext(event: any) {
 		event.stopPropagation();
 		const next = (this._currentPage = this._currentPage + 1);
 		this.#api?.pagination.setCurrentPageNumber(next);
-	};
+	}
 
 	// Note: Currently we want to prevent opening when the item is in a selectable context, but this might change in the future.
 	// If we like to be able to open items in selectable context, then we might want to make it as a menu item action, so you have to click ... and chose an action called 'Edit'
@@ -152,14 +209,16 @@ export abstract class UmbTreeItemElementBase<
 				?selectable=${this._isSelectable}
 				?selected=${this._isSelected}
 				.loading=${this._isLoading}
-				.hasChildren=${this._hasChildren}
+				.hasChildren=${this._forceShowExpand || this._hasChildren}
 				.showChildren=${this._isOpen}
 				.caretLabel=${this.localize.term(caretLabelKey) + ' ' + this._label}
 				label=${ifDefined(this._label)}
-				href=${ifDefined(this._isSelectableContext ? undefined : this._href)}>
-				${this.renderIconContainer()} ${this.renderLabel()} ${this.#renderActions()} ${this.#renderChildItems()}
+				href=${ifDefined(this._isSelectableContext ? undefined : this._href)}
+				.renderExpandSymbol=${this._renderExpandSymbol}>
+				${this.#renderLoadPrevButton()} ${this.renderIconContainer()} ${this.renderLabel()} ${this.#renderActions()}
+				${this.#renderChildItems()}
 				<slot></slot>
-				${this.#renderPaging()}
+				${this.#renderLoadNextButton()}
 			</uui-menu-item>
 		`;
 	}
@@ -180,6 +239,9 @@ export abstract class UmbTreeItemElementBase<
 			</div>
 		`;
 	}
+
+	// eslint-disable-next-line @typescript-eslint/naming-convention
+	_renderExpandSymbol?: () => HTMLElement | TemplateResult<1> | undefined;
 
 	#renderSigns() {
 		return this._item
@@ -239,19 +301,27 @@ export abstract class UmbTreeItemElementBase<
 						(item) => html`
 							<umb-tree-item
 								.entityType=${item.entityType}
-								.props=${{ hideActions: this.hideActions, item }}></umb-tree-item>
+								.props=${{ hideActions: this.hideActions, item, isMenu: this.isMenu }}></umb-tree-item>
 						`,
 					)
 				: ''}
 		`;
 	}
 
-	#renderPaging() {
-		if (this._totalPages <= 1 || this._currentPage === this._totalPages) {
-			return nothing;
-		}
+	#renderLoadPrevButton() {
+		if (!this._hasPreviousItems) return nothing;
+		return html` <umb-tree-load-prev-button
+			@click=${this.#onLoadPrev}
+			.loading=${this._isLoadingPrevChildren}></umb-tree-load-prev-button>`;
+	}
 
-		return html` <umb-tree-load-more-button @click=${this.#onLoadMoreClick}></umb-tree-load-more-button> `;
+	#renderLoadNextButton() {
+		if (!this._hasNextItems) return nothing;
+		return html`
+			<umb-tree-load-more-button
+				@click=${this.#onLoadNext}
+				.loading=${this._isLoadingNextChildren}></umb-tree-load-more-button>
+		`;
 	}
 
 	static override styles = [

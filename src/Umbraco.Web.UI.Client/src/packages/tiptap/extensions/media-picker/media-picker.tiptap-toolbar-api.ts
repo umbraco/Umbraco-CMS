@@ -1,10 +1,11 @@
+import type { Editor, ProseMirrorNode } from '../../externals.js';
+import { NodeSelection } from '../../externals.js';
 import { UmbTiptapToolbarElementApiBase } from '../tiptap-toolbar-element-api-base.js';
 import { getGuidFromUdi, imageSize } from '@umbraco-cms/backoffice/utils';
 import { ImageCropModeModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbImagingRepository } from '@umbraco-cms/backoffice/imaging';
 import { UMB_MEDIA_CAPTION_ALT_TEXT_MODAL, UMB_MEDIA_PICKER_MODAL } from '@umbraco-cms/backoffice/media';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbMediaCaptionAltTextModalValue } from '@umbraco-cms/backoffice/media';
 
@@ -41,36 +42,67 @@ export default class UmbTiptapToolbarMediaPickerToolbarExtensionApi extends UmbT
 
 	override async execute(editor: Editor) {
 		const currentTarget = editor.getAttributes('image');
-		const figure = editor.getAttributes('figure');
+		const currentMediaUdi = this.#extractMediaUdi(currentTarget);
+		const currentAltText = currentTarget?.alt;
+		const currentCaption = this.#extractCaption(editor.state.selection);
 
-		let currentMediaUdi: string | undefined = undefined;
-		if (currentTarget?.['data-udi']) {
-			currentMediaUdi = getGuidFromUdi(currentTarget['data-udi']);
-		}
+		await this.#updateImageWithMetadata(editor, currentMediaUdi, currentAltText, currentCaption);
+	}
 
-		let currentAltText: string | undefined = undefined;
-		if (currentTarget?.alt) {
-			currentAltText = currentTarget.alt;
-		}
-
-		let currentCaption: string | undefined = undefined;
-		if (figure?.figcaption) {
-			currentCaption = figure.figcaption;
-		}
-
-		const selection = await this.#openMediaPicker(currentMediaUdi);
-		if (!selection?.length) return;
-
-		const mediaGuid = selection[0];
-
-		if (!mediaGuid) {
-			throw new Error('No media selected');
-		}
+	async #updateImageWithMetadata(
+		editor: Editor,
+		currentMediaUdi: string | undefined,
+		currentAltText: string | undefined,
+		currentCaption: string | undefined,
+	) {
+		const mediaGuid = await this.#getMediaGuid(currentMediaUdi);
+		if (!mediaGuid) return;
 
 		const media = await this.#showMediaCaptionAltText(mediaGuid, currentAltText, currentCaption);
 		if (!media) return;
 
 		this.#insertInEditor(editor, mediaGuid, media);
+	}
+
+	#extractMediaUdi(imageAttributes: Record<string, unknown>): string | undefined {
+		return imageAttributes?.['data-udi'] ? getGuidFromUdi(imageAttributes['data-udi'] as string) : undefined;
+	}
+
+	#extractCaption(selection: unknown): string | undefined {
+		if (!(selection instanceof NodeSelection)) return undefined;
+		if (selection.node.type.name !== 'figure') return undefined;
+
+		return this.#findFigcaptionText(selection.node);
+	}
+
+	#findFigcaptionText(figureNode: ProseMirrorNode): string | undefined {
+		let caption: string | undefined;
+		figureNode.descendants((child) => {
+			if (child.type.name === 'figcaption') {
+				caption = child.textContent || undefined;
+				return false; // Stop searching
+			}
+			return true; // Continue searching
+		});
+		return caption;
+	}
+
+	async #getMediaGuid(currentMediaUdi?: string): Promise<string | undefined> {
+		if (currentMediaUdi) {
+			// Image already exists, go directly to edit alt text/caption
+			return currentMediaUdi;
+		}
+
+		// No image selected, open media picker
+		const selection = await this.#openMediaPicker();
+		if (!selection?.length) return undefined;
+
+		const selectedGuid = selection[0];
+		if (!selectedGuid) {
+			throw new Error('No media selected');
+		}
+
+		return selectedGuid;
 	}
 
 	async #openMediaPicker(currentMediaUdi?: string) {

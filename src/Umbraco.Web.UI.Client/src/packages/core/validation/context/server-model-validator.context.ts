@@ -66,15 +66,10 @@ export class UmbServerModelValidatorContext extends UmbContextBase implements Um
 		}
 
 		this.#isValid = error ? false : true;
-		if (this.#isValid) {
-			// Send data to context for translation:
-			this.#context?.setTranslationData(undefined);
-		} else {
+		if (!this.#isValid) {
 			if (!this.#context) {
 				throw new Error('No context available for translation.');
 			}
-			// Send data to context for translation:
-			this.#context.setTranslationData(data);
 
 			let messages: Array<UmbValidationMessage> = [];
 

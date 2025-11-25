@@ -13,7 +13,10 @@ public static class ServiceCollectionExtensions
     /// <remarks>
     ///     Removes all previous registrations for the type <typeparamref name="TService" />.
     /// </remarks>
-    public static void AddUnique<TService, TImplementing>(
+    /// <returns>
+    ///     A reference to this instance after the operation has completed.
+    /// </returns>
+    public static IServiceCollection AddUnique<TService, TImplementing>(
         this IServiceCollection services)
         where TService : class
         where TImplementing : class, TService =>
@@ -26,7 +29,10 @@ public static class ServiceCollectionExtensions
     /// <remarks>
     ///     Removes all previous registrations for the type <typeparamref name="TService" />.
     /// </remarks>
-    public static void AddUnique<TService, TImplementing>(
+    /// <returns>
+    ///     A reference to this instance after the operation has completed.
+    /// </returns>
+    public static IServiceCollection AddUnique<TService, TImplementing>(
         this IServiceCollection services,
         ServiceLifetime lifetime)
         where TService : class
@@ -34,6 +40,7 @@ public static class ServiceCollectionExtensions
     {
         services.RemoveAll<TService>();
         services.Add(ServiceDescriptor.Describe(typeof(TService), typeof(TImplementing), lifetime));
+        return services;
     }
 
     /// <summary>
@@ -44,7 +51,10 @@ public static class ServiceCollectionExtensions
     ///     Removes all previous registrations for the types <typeparamref name="TService1" /> &amp;
     ///     <typeparamref name="TService2" />.
     /// </remarks>
-    public static void AddMultipleUnique<TService1, TService2, TImplementing>(
+    /// <returns>
+    ///     A reference to this instance after the operation has completed.
+    /// </returns>
+    public static IServiceCollection AddMultipleUnique<TService1, TService2, TImplementing>(
         this IServiceCollection services)
         where TService1 : class
         where TService2 : class
@@ -57,7 +67,10 @@ public static class ServiceCollectionExtensions
     /// <remarks>
     /// Removes all previous registrations for the types <typeparamref name="TService1"/> &amp; <typeparamref name="TService2"/>.
     /// </remarks>
-    public static void AddMultipleUnique<TService1, TService2, TImplementing>(
+    /// <returns>
+    ///     A reference to this instance after the operation has completed.
+    /// </returns>
+    public static IServiceCollection AddMultipleUnique<TService1, TService2, TImplementing>(
         this IServiceCollection services,
         ServiceLifetime lifetime)
         where TService1 : class
@@ -66,16 +79,20 @@ public static class ServiceCollectionExtensions
     {
         services.AddUnique<TService1, TImplementing>(lifetime);
         services.AddUnique<TService2>(factory => (TImplementing)factory.GetRequiredService<TService1>(), lifetime);
+        return services;
     }
 
-        /// <summary>
+    /// <summary>
     ///     Adds a service of type <typeparamref name="TService" /> with an implementation factory method to the specified
     ///     <see cref="IServiceCollection" />.
     /// </summary>
     /// <remarks>
     ///     Removes all previous registrations for the type <typeparamref name="TService" />.
     /// </remarks>
-    public static void AddUnique<TService>(
+    /// <returns>
+    ///     A reference to this instance after the operation has completed.
+    /// </returns>
+    public static IServiceCollection AddUnique<TService>(
         this IServiceCollection services,
         Func<IServiceProvider, TService> factory)
         where TService : class
@@ -87,7 +104,10 @@ public static class ServiceCollectionExtensions
     /// <remarks>
     /// Removes all previous registrations for the type <typeparamref name="TService"/>.
     /// </remarks>
-    public static void AddUnique<TService>(
+    /// <returns>
+    ///     A reference to this instance after the operation has completed.
+    /// </returns>
+    public static IServiceCollection AddUnique<TService>(
         this IServiceCollection services,
         Func<IServiceProvider, TService> factory,
         ServiceLifetime lifetime)
@@ -95,6 +115,7 @@ public static class ServiceCollectionExtensions
     {
         services.RemoveAll<TService>();
         services.Add(ServiceDescriptor.Describe(typeof(TService), factory, lifetime));
+        return services;
     }
 
     /// <summary>
@@ -104,10 +125,14 @@ public static class ServiceCollectionExtensions
     /// <remarks>
     ///     Removes all previous registrations for the type specified by <paramref name="serviceType" />.
     /// </remarks>
-    public static void AddUnique(this IServiceCollection services, Type serviceType, object instance)
+    /// <returns>
+    ///     A reference to this instance after the operation has completed.
+    /// </returns>
+    public static IServiceCollection AddUnique(this IServiceCollection services, Type serviceType, object instance)
     {
         services.RemoveAll(serviceType);
         services.AddSingleton(serviceType, instance);
+        return services;
     }
 
     /// <summary>
@@ -117,11 +142,15 @@ public static class ServiceCollectionExtensions
     /// <remarks>
     ///     Removes all previous registrations for the type type <typeparamref name="TService" />.
     /// </remarks>
-    public static void AddUnique<TService>(this IServiceCollection services, TService instance)
+    /// <returns>
+    ///     A reference to this instance after the operation has completed.
+    /// </returns>
+    public static IServiceCollection AddUnique<TService>(this IServiceCollection services, TService instance)
         where TService : class
     {
         services.RemoveAll<TService>();
         services.AddSingleton(instance);
+        return services;
     }
 
     internal static IServiceCollection AddLazySupport(this IServiceCollection services)

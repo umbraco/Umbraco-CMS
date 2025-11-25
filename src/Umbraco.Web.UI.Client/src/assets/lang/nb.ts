@@ -479,6 +479,7 @@ export default {
 		error: 'Feil',
 		excludeFromSubFolders: 'Søk bare i denne mappen',
 		field: 'Felt',
+		fields: 'Felter',
 		fieldFor: 'Felt for %0%',
 		findDocument: 'Finn',
 		first: 'Første',
@@ -845,9 +846,6 @@ export default {
 		users: 'Brukere',
 		help: 'Hjelp',
 		forms: 'Skjemaer',
-	},
-	help: {
-		theBestUmbracoVideoTutorials: 'De beste Umbraco opplæringsvideoer',
 	},
 	settings: {
 		defaulttemplate: 'Standardmal',

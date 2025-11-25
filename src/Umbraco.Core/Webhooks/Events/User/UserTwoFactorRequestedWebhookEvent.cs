@@ -21,6 +21,6 @@ public class UserTwoFactorRequestedWebhookEvent : WebhookEventBase<UserTwoFactor
 
     public override string Alias => Constants.WebhookEvents.Aliases.UserTwoFactorRequested;
 
-    public override object? ConvertNotificationToRequestPayload(UserTwoFactorRequestedNotification notification)
+    public override object ConvertNotificationToRequestPayload(UserTwoFactorRequestedNotification notification)
         => new DefaultPayloadModel { Id = notification.UserKey };
 }
