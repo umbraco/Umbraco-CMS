@@ -191,9 +191,9 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 	 * This method follows the same resolution order as term() (primary → secondary → fallback),
 	 * but returns the provided defaultValue instead of the key when no translation is found.
 	 * @param {string} key - the localization key, the indicator of what localization entry you want to retrieve.
-	 * @param {string} defaultValue - the value to return if the key is not found in any localization set.
+	 * @param {string | null} defaultValue - the value to return if the key is not found in any localization set.
 	 * @param {unknown[]} args - the arguments to parse for this localization entry.
-	 * @returns {string} - the translated term or the default value as a string.
+	 * @returns {string | null} - the translated term or the default value.
 	 * @example
 	 * Retrieving a term with fallback:
 	 * ```ts
@@ -203,12 +203,16 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 	 * ```ts
 	 * this.localize.termOrDefault('general_greeting', 'Hello!', userName);
 	 * ```
+	 * Retrieving a term with null as fallback:
+	 * ```ts
+	 * this.localize.termOrDefault('general_close', null);
+	 * ```
 	 */
-	termOrDefault<K extends keyof LocalizationSetType>(
+	termOrDefault<K extends keyof LocalizationSetType, D extends string | null>(
 		key: K,
-		defaultValue: string,
+		defaultValue: D,
 		...args: FunctionParams<LocalizationSetType[K]>
-	): string {
+	): string | D {
 		const term = this.#lookupTerm(key);
 
 		if (term === null) {
