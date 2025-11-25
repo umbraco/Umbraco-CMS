@@ -344,14 +344,14 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
 
     };
 
-    $scope.remove = function (udi) {
+    $scope.remove = function (id) {
         if (!$scope.allowRemove) return;
 
         var currUdis = $scope.model.value ? $scope.model.value.split(',') : [];
         if (currUdis.length > 0) {
 
             // Remove the node with the provided UDI.
-            var index = currUdis.indexOf(udi.toString());  // toString for tests, which use integer IDs
+            var index = currUdis.indexOf(id.toString());  // id may be an integer ID or a UDI string, split() always returns strings.
             if (index >= 0) {
                 currUdis.splice(index, 1);
                 setDirty();
