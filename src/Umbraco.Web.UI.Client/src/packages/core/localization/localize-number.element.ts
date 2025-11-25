@@ -26,7 +26,7 @@ export class UmbLocalizeNumberElement extends UmbLitElement {
 
 	@state()
 	protected get text(): string | null {
-		return this.number ? this.localize.number(this.number, this.options) : null;
+		return this.localize.number(this.number, this.options);
 	}
 
 	override render() {

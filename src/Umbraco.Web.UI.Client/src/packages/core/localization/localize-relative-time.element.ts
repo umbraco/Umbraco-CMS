@@ -34,7 +34,7 @@ export class UmbLocalizeRelativeTimeElement extends UmbLitElement {
 
 	@state()
 	protected get text(): string | null {
-		return this.time ? this.localize.relativeTime(this.time, this.unit, this.options) : null;
+		return this.localize.relativeTime(this.time, this.unit, this.options);
 	}
 
 	override render() {

@@ -158,7 +158,7 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 			}
 		}
 
-		return term;
+		return String(term);
 	}
 
 	/**
