@@ -38,10 +38,6 @@ export class UmbLogViewerWorkspaceContext extends UmbContextBase implements UmbW
 		return 'log-viewer';
 	}
 
-	getEntityName() {
-		return 'Log Viewer';
-	}
-
 	get today() {
 		const today = new Date();
 		const dd = String(today.getDate()).padStart(2, '0');
