@@ -44,7 +44,7 @@ class UmbLogViewerMessagesData extends UmbMockDBBase<LogMessageResponseModel> {
 	}
 
 	getLevelCount(): Record<string, number> {
-		return this.data.reduce(
+		const levels = this.data.reduce(
 			(counts, log) => {
 				const level = log.level ?? 'unknown';
 				counts[level] = (counts[level] || 0) + 1;
@@ -52,6 +52,14 @@ class UmbLogViewerMessagesData extends UmbMockDBBase<LogMessageResponseModel> {
 			},
 			{} as Record<string, number>,
 		);
+
+		// Test 1k logs for the first level
+		levels[Object.keys(levels)[0]] += 1000;
+
+		// Test 1m logs for the second level
+		levels[Object.keys(levels)[1]] += 1000000;
+
+		return levels;
 	}
 }
 
