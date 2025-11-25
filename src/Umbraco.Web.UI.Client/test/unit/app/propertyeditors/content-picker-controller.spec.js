@@ -81,7 +81,7 @@ describe('Content picker controller tests', function () {
         });
 
         it("Removing an item should update renderModel, ids and model.value", function(){
-            scope.remove(1);
+            scope.remove(1231);
             scope.$apply();
             expect(scope.renderModel.length).toBe(2);
             expect(scope.model.value).toBe("1233,23121");

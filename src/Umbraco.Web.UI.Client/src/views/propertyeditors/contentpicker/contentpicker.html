@@ -14,7 +14,7 @@
                               sortable="!sortableOptions.disabled"
                               allow-remove="allowRemove"
                               allow-open="model.config.showOpenButton && allowOpen && !dialogEditor"
-                              on-remove="remove($index)"
+                              on-remove="remove(model.config.idType === 'udi' ? node.udi : node.id)"
                               on-open="openEditor(node)">
             </umb-node-preview>
         </div>
