@@ -847,9 +847,6 @@ export default {
 		help: 'Hjelp',
 		forms: 'Skjemaer',
 	},
-	help: {
-		theBestUmbracoVideoTutorials: 'De beste Umbraco opplæringsvideoer',
-	},
 	settings: {
 		defaulttemplate: 'Standardmal',
 		importDocumentTypeHelp:

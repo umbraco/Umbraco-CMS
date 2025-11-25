@@ -21,9 +21,7 @@ export class UmbOpenModalController extends UmbControllerBase {
 
 		const modalContext = modalManagerContext.open(this, modalAlias, args);
 
-		return await modalContext.onSubmit().finally(() => {
-			this.destroy();
-		});
+		return await modalContext.onSubmit();
 	}
 }
 

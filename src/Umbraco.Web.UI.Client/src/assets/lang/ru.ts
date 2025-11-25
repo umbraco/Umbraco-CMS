@@ -704,9 +704,6 @@ export default {
 		notificationEmailsCheckErrorMessage:
 			'Адрес для отправки уведомлений все еще установлен в значение по-умолчанию <strong>%0%</strong>.',
 	},
-	help: {
-		theBestUmbracoVideoTutorials: 'Лучшие обучающие видео-курсы по Umbraco',
-	},
 	imagecropper: {
 		reset: 'Сбросить',
 	},

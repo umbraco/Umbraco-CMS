@@ -38,6 +38,14 @@ Some important documentation links to get you started:
 - [Getting to know Umbraco](https://docs.umbraco.com/umbraco-cms/fundamentals/get-to-know-umbraco)
 - [Tutorials for creating a basic website and customizing the editing experience](https://docs.umbraco.com/umbraco-cms/tutorials/overview)
 
+## Backoffice Preview
+
+Want to see the latest backoffice UI in action? Check out our live preview:
+
+**[backofficepreview.umbraco.com](https://backofficepreview.umbraco.com/)**
+
+This preview is automatically deployed from the main branch and showcases the latest backoffice features and improvements.  It runs from mock data and persistent edits are not supported.
+
 ## Get help
 
 If you need a bit of feedback while building your Umbraco projects, we are [chatty on Discord](https://discord.umbraco.com). Our Discord server serves as a social space for all Umbracians. If you have any questions or need some help with a problem, head over to our [dedicated forum](https://forum.umbraco.com/) where the Umbraco Community will be happy to help. 

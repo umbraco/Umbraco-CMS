@@ -1,13 +1,16 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Management.Mapping.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Media;
 using Umbraco.Cms.Api.Management.ViewModels.Media.Collection;
 using Umbraco.Cms.Api.Management.ViewModels.MediaType;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Mapping;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Mapping.Media;
@@ -15,13 +18,32 @@ namespace Umbraco.Cms.Api.Management.Mapping.Media;
 public class MediaMapDefinition : ContentMapDefinition<IMedia, MediaValueResponseModel, MediaVariantResponseModel>, IMapDefinition
 {
     private readonly CommonMapper _commonMapper;
+    private ContentSettings _contentSettings;
 
     public MediaMapDefinition(
         PropertyEditorCollection propertyEditorCollection,
         CommonMapper commonMapper,
-        IDataValueEditorFactory dataValueEditorFactory)
+        IDataValueEditorFactory dataValueEditorFactory,
+        IOptionsMonitor<ContentSettings> contentSettings)
         : base(propertyEditorCollection, dataValueEditorFactory)
-        => _commonMapper = commonMapper;
+    {
+        _commonMapper = commonMapper;
+        _contentSettings = contentSettings.CurrentValue;
+        contentSettings.OnChange(x => _contentSettings = x);
+    }
+
+    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
+    public MediaMapDefinition(
+        PropertyEditorCollection propertyEditorCollection,
+        CommonMapper commonMapper,
+        IDataValueEditorFactory dataValueEditorFactory)
+        : this(
+              propertyEditorCollection,
+              commonMapper,
+              dataValueEditorFactory,
+              StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<ContentSettings>>())
+    {
+    }
 
     [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
     public MediaMapDefinition(
@@ -48,6 +70,39 @@ public class MediaMapDefinition : ContentMapDefinition<IMedia, MediaValueRespons
         target.Values = MapValueViewModels(source.Properties);
         target.Variants = MapVariantViewModels(source);
         target.IsTrashed = source.Trashed;
+
+        // If protection for media files in the recycle bin is enabled, and the media item is trashed, amend the value of the file path
+        // to have the `.deleted` suffix that will have been added to the persisted file.
+        if (target.IsTrashed && _contentSettings.EnableMediaRecycleBinProtection)
+        {
+            foreach (MediaValueResponseModel valueModel in target.Values
+                .Where(x => x.EditorAlias.Equals(Core.Constants.PropertyEditors.Aliases.ImageCropper)))
+            {
+                if (valueModel.Value is not null &&
+                    valueModel.Value is ImageCropperValue imageCropperValue &&
+                    string.IsNullOrWhiteSpace(imageCropperValue.Src) is false)
+                {
+                    valueModel.Value = new ImageCropperValue
+                    {
+                        Crops = imageCropperValue.Crops,
+                        FocalPoint = imageCropperValue.FocalPoint,
+                        TemporaryFileId = imageCropperValue.TemporaryFileId,
+                        Src = SuffixMediaPath(imageCropperValue.Src, Core.Constants.Conventions.Media.TrashedMediaSuffix),
+                    };
+                }
+            }
+        }
+    }
+
+    private static string SuffixMediaPath(string filePath, string suffix)
+    {
+        int lastDotIndex = filePath.LastIndexOf('.');
+        if (lastDotIndex == -1)
+        {
+            return filePath + suffix;
+        }
+
+        return filePath[..lastDotIndex] + suffix + filePath[lastDotIndex..];
     }
 
     // Umbraco.Code.MapAll -Flags

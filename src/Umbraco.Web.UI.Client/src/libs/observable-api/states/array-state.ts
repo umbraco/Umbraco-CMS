@@ -2,6 +2,7 @@ import { partialUpdateFrozenArray } from '../utils/partial-update-frozen-array.f
 import { prependToUniqueArray } from '../utils/prepend-to-unique-array.function.js';
 import { pushAtToUniqueArray } from '../utils/push-at-to-unique-array.function.js';
 import { pushToUniqueArray } from '../utils/push-to-unique-array.function.js';
+import { replaceInUniqueArray } from '../utils/replace-in-unique-array.function.js';
 import { UmbDeepState } from './deep-state.js';
 
 /**
@@ -259,6 +260,38 @@ export class UmbArrayState<T, U = unknown> extends UmbDeepState<T[]> {
 			this.setValue(next);
 		} else {
 			this.setValue([...this.getValue(), ...entries]);
+		}
+		return this;
+	}
+
+	/**
+	 * @function replace
+	 * @param {Partial<T>} entires - data of entries to be replaced.
+	 * @returns {UmbArrayState<T>} Reference to it self.
+	 * @description - Replaces one or more entries, requires the ArrayState to be constructed with a getUnique method.
+	 * @example <caption>Example append some data.</caption>
+	 * const data = [
+	 * 	{ key: 1, value: 'foo'},
+	 * 	{ key: 2, value: 'bar'}
+	 * ];
+	 * const myState = new UmbArrayState(data, (x) => x.key);
+	 * const updates = [
+	 * 	{ key: 1, value: 'foo2'},
+	 * 	{ key: 3, value: 'bar2'}
+	 * ];
+	 * myState.replace(updates);
+	 * // Only the existing item gets replaced:
+	 * myState.getValue(); // -> [{ key: 1, value: 'foo2'}, { key: 2, value: 'bar'}]
+	 */
+	replace(entries: Array<T>): UmbArrayState<T> {
+		if (this.getUniqueMethod) {
+			const next = [...this.getValue()];
+			entries.forEach((entry) => {
+				replaceInUniqueArray(next, entry as T, this.getUniqueMethod!);
+			});
+			this.setValue(next);
+		} else {
+			throw new Error("Can't replace entries of an ArrayState without a getUnique method provided when constructed.");
 		}
 		return this;
 	}

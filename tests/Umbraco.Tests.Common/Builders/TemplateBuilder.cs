@@ -129,9 +129,9 @@ public class TemplateBuilder
         return template;
     }
 
-    public static Template CreateTextPageTemplate(string alias = "textPage") =>
+    public static Template CreateTextPageTemplate(string alias = "textPage", string name = "Text page") =>
         (Template)new TemplateBuilder()
             .WithAlias(alias)
-            .WithName("Text page")
+            .WithName(name)
             .Build();
 }

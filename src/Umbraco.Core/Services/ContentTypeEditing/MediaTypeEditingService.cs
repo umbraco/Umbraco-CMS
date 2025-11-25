@@ -175,7 +175,7 @@ internal sealed class MediaTypeEditingService : ContentTypeEditingServiceBase<IM
                 continue;
             }
 
-            allowedFileExtensionsByMediaType[mediaType] = fileUploadConfiguration.FileExtensions;
+            allowedFileExtensionsByMediaType[mediaType] = fileUploadConfiguration.FileExtensions ?? []; // Although we never expect null here, legacy data type configuration did allow it.
         }
 
         return allowedFileExtensionsByMediaType;

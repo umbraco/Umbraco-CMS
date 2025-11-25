@@ -1123,12 +1123,6 @@ export default {
 		translation: 'Çeviri',
 		users: 'Kullanıcılar',
 	},
-	help: {
-		tours: 'Turlar',
-		theBestUmbracoVideoTutorials: 'En iyi Umbraco video eğitimleri',
-		umbracoForum: 'our.umbraco.com adresini ziyaret edin',
-		umbracoTv: "umbraco.tv'yi ziyaret edin",
-	},
 	settings: {
 		defaulttemplate: 'Varsayılan şablon',
 		importDocumentTypeHelp:
@@ -1864,14 +1858,10 @@ export default {
 		savedSearches: 'Kaydedilmiş Aramalar',
 		saveSearch: 'Aramayı Kaydet',
 		saveSearchDescription: 'Arama sorgunuz için kolay bir ad girin',
-		filterSearch: 'Aramayı Filtrele',
-		totalItems: 'Toplam Öğeler',
 		timestamp: 'Zaman damgası',
 		level: 'Seviye',
 		machine: 'Makine',
 		message: 'Mesaj',
-		exception: 'İstisna',
-		properties: 'Özellikler',
 		searchWithGoogle: 'Google ile Ara',
 		searchThisMessageWithGoogle: 'Bu mesajı Google ile ara',
 		searchWithBing: 'Bing ile Ara',
@@ -1885,10 +1875,6 @@ export default {
 		searchUmbracoIssues: 'Umbraco Sorunlarını Ara',
 		searchUmbracoIssuesOnGithub: "Github'da Umbraco Sorunlarını Ara",
 		deleteThisSearch: 'Bu aramayı sil',
-		findLogsWithRequestId: 'İstek Kimliği Olan Günlükleri Bul',
-		findLogsWithNamespace: 'Ad Alanına Sahip Günlükleri Bul',
-		findLogsWithMachineName: 'Makine Adına Sahip Günlükleri Bul',
-		open: 'Aç',
 	},
 	clipboard: {
 		labelForCopyAllEntries: '%0% Kopyala',
@@ -1923,28 +1909,6 @@ export default {
 			'\n            <p>\n                Umbraco şu anda hata ayıklama modunda çalışıyor. Bu, sayfaları işlerken performansı değerlendirmek için yerleşik performans profilleyicisini kullanabileceğiniz anlamına gelir.\n            </p>\n            <p>\n                Profil oluşturucuyu belirli bir sayfa oluşturma için etkinleştirmek istiyorsanız, sayfayı talep ederken sorgu dizesine <strong> umbDebug=true </strong> eklemeniz yeterlidir.\n            </p>\n            <p>\n                Profilcinin tüm sayfa görüntülemeleri için varsayılan olarak etkinleştirilmesini istiyorsanız, aşağıdaki geçişi kullanabilirsiniz.\n                Tarayıcınızda, profil oluşturucuyu otomatik olarak etkinleştiren bir çerez ayarlayacaktır.\n                Başka bir deyişle, profil oluşturucu yalnızca <em>tarayıcınızda</em> varsayılan olarak etkin olacaktır - diğer herkesin değil.\n            </p>\n    ',
 		activateByDefault: 'Profil oluşturucuyu varsayılan olarak etkinleştirin',
 		reminder: 'Kolay hatırlatma',
-	},
-	settingsDashboardVideos: {
-		trainingHeadline: 'Umbraco eğitim videolarının saatleri yalnızca bir tıklama uzaklıkta',
-		trainingDescription:
-			'\n            <p> Umbraco\'da ustalaşmak mı istiyorsunuz? Umbraco\'nun kullanımıyla ilgili bu videolardan birini izleyerek en iyi uygulamaları öğrenmek için birkaç dakikanızı ayırın. Daha da fazla Umbraco videosu için <a href="http://umbraco.tv" target="_blank" rel="noopener">umbraco.tv </a> adresini ziyaret edin </p>\n        ',
-		getStarted: 'Başlamak için',
-	},
-	settingsDashboard: {
-		start: 'Buradan başlayın',
-		startDescription:
-			'Bu bölüm, Umbraco siteniz için yapı taşlarını içerir. Ayarlar bölümündeki öğelerle çalışma hakkında daha fazla bilgi edinmek için aşağıdaki bağlantıları izleyin',
-		more: 'Daha fazla bilgi edinin',
-		bulletPointOne:
-			'\n        Ayarlar <a class="btn-link -underline" href="https://docs.umbraco.com/umbraco-cms/fundamentals/backoffice/sections/" target="_blank" rel="noopener">öğelerle çalışma hakkında daha fazla bilgi edinin Our Umbraco\'nun Dokümantasyon bölümünde </a>\n    ',
-		bulletPointTwo:
-			'\n        <a class="btn-link -underline" href="https://our.umbraco.com/forum" target="_blank" rel="noopener">Topluluk Forumu</a>\'nda bir soru sorun\n    ',
-		bulletPointThree:
-			'\n        <a class="btn-link -underline" href="https://umbraco.tv" target="_blank" rel="noopener">Eğitici videolarımızı</a> izleyin (bazıları ücretsiz, bazıları abonelik gerektirir)\n    ',
-		bulletPointFour:
-			'\n        <a class="btn-link -underline" href="https://umbraco.com/products/" target="_blank" rel="noopener">Üretkenliği artıran araçlarımız ve ticari desteğimiz </a> hakkında bilgi edinin\n    ',
-		bulletPointFive:
-			'\n        Gerçek hayattaki <a class="btn-link -underline" href="https://umbraco.com/training/" target="_blank" rel="noopener">eğitim ve sertifika </a> fırsatları hakkında bilgi edinin\n    ',
 	},
 	startupDashboard: {
 		fallbackHeadline: "Dost Canlısı CMS'e Hoş Geldiniz",

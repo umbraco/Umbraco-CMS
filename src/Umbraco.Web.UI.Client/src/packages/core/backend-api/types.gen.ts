@@ -122,6 +122,10 @@ export type CopyMediaTypeRequestModel = {
     target?: ReferenceByIdModel | null;
 };
 
+export type CopyMemberTypeRequestModel = {
+    target?: ReferenceByIdModel | null;
+};
+
 export type CreateDataTypeRequestModel = {
     name: string;
     editorAlias: string;
@@ -333,6 +337,7 @@ export type CreateMemberTypeRequestModel = {
     properties: Array<CreateMemberTypePropertyTypeRequestModel>;
     containers: Array<CreateMemberTypePropertyTypeContainerRequestModel>;
     id?: string | null;
+    parent?: ReferenceByIdModel | null;
     compositions: Array<MemberTypeCompositionModel>;
 };
 
@@ -418,7 +423,7 @@ export type CreateUserGroupRequestModel = {
     mediaStartNode?: ReferenceByIdModel | null;
     mediaRootAccess: boolean;
     fallbackPermissions: Array<string>;
-    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | DocumentTypePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
+    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
     id?: string | null;
 };
 
@@ -477,7 +482,7 @@ export type CurrentUserResponseModel = {
     hasAccessToAllLanguages: boolean;
     hasAccessToSensitiveData: boolean;
     fallbackPermissions: Array<string>;
-    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | DocumentTypePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
+    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
     allowedSections: Array<string>;
     isAdmin: boolean;
 };
@@ -777,12 +782,6 @@ export type DocumentTypeItemResponseModel = {
     isElement: boolean;
     icon?: string | null;
     description?: string | null;
-};
-
-export type DocumentTypePermissionPresentationModel = {
-    $type: string;
-    verbs: Array<string>;
-    documentTypeAlias: string;
 };
 
 export type DocumentTypePropertyTypeContainerResponseModel = {
@@ -1113,6 +1112,10 @@ export type ImportDocumentTypeRequestModel = {
 };
 
 export type ImportMediaTypeRequestModel = {
+    file: ReferenceByIdModel;
+};
+
+export type ImportMemberTypeRequestModel = {
     file: ReferenceByIdModel;
 };
 
@@ -1572,6 +1575,7 @@ export type MemberTypeTreeItemResponseModel = {
     parent?: ReferenceByIdModel | null;
     flags: Array<FlagModel>;
     name: string;
+    isFolder: boolean;
     icon: string;
 };
 
@@ -1639,6 +1643,10 @@ export type MoveMediaRequestModel = {
 };
 
 export type MoveMediaTypeRequestModel = {
+    target?: ReferenceByIdModel | null;
+};
+
+export type MoveMemberTypeRequestModel = {
     target?: ReferenceByIdModel | null;
 };
 
@@ -2818,7 +2826,7 @@ export type UpdateUserGroupRequestModel = {
     mediaStartNode?: ReferenceByIdModel | null;
     mediaRootAccess: boolean;
     fallbackPermissions: Array<string>;
-    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | DocumentTypePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
+    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
 };
 
 export type UpdateUserGroupsOnUserRequestModel = {
@@ -2919,7 +2927,7 @@ export type UserGroupResponseModel = {
     mediaStartNode?: ReferenceByIdModel | null;
     mediaRootAccess: boolean;
     fallbackPermissions: Array<string>;
-    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | DocumentTypePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
+    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
     id: string;
     isDeletable: boolean;
     aliasCanBeChanged: boolean;
@@ -2929,7 +2937,7 @@ export type UserInstallRequestModel = {
     name: string;
     email: string;
     password: string;
-    readonly subscribeToNewsletter: boolean;
+    subscribeToNewsletter: boolean;
 };
 
 export type UserItemResponseModel = {
@@ -3162,12 +3170,6 @@ export type UpgradeSettingsResponseModelWritable = {
     newState: string;
     newVersion: string;
     oldVersion: string;
-};
-
-export type UserInstallRequestModelWritable = {
-    name: string;
-    email: string;
-    password: string;
 };
 
 export type GetCultureData = {
@@ -10757,7 +10759,7 @@ export type GetMemberTypeByIdCompositionReferencesResponses = {
 export type GetMemberTypeByIdCompositionReferencesResponse = GetMemberTypeByIdCompositionReferencesResponses[keyof GetMemberTypeByIdCompositionReferencesResponses];
 
 export type PostMemberTypeByIdCopyData = {
-    body?: never;
+    body?: CopyMemberTypeRequestModel;
     path: {
         id: string;
     };
@@ -10791,6 +10793,115 @@ export type PostMemberTypeByIdCopyResponses = {
      * Created
      */
     201: unknown;
+};
+
+export type GetMemberTypeByIdExportData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/member-type/{id}/export';
+};
+
+export type GetMemberTypeByIdExportErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type GetMemberTypeByIdExportError = GetMemberTypeByIdExportErrors[keyof GetMemberTypeByIdExportErrors];
+
+export type GetMemberTypeByIdExportResponses = {
+    /**
+     * OK
+     */
+    200: Blob | File;
+};
+
+export type GetMemberTypeByIdExportResponse = GetMemberTypeByIdExportResponses[keyof GetMemberTypeByIdExportResponses];
+
+export type PutMemberTypeByIdImportData = {
+    body?: ImportMemberTypeRequestModel;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/member-type/{id}/import';
+};
+
+export type PutMemberTypeByIdImportErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PutMemberTypeByIdImportError = PutMemberTypeByIdImportErrors[keyof PutMemberTypeByIdImportErrors];
+
+export type PutMemberTypeByIdImportResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type PutMemberTypeByIdMoveData = {
+    body?: MoveMemberTypeRequestModel;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/member-type/{id}/move';
+};
+
+export type PutMemberTypeByIdMoveErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PutMemberTypeByIdMoveError = PutMemberTypeByIdMoveErrors[keyof PutMemberTypeByIdMoveErrors];
+
+export type PutMemberTypeByIdMoveResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
 };
 
 export type PostMemberTypeAvailableCompositionsData = {
@@ -10991,12 +11102,109 @@ export type PutMemberTypeFolderByIdResponses = {
     200: unknown;
 };
 
+export type PostMemberTypeImportData = {
+    body?: ImportMemberTypeRequestModel;
+    path?: never;
+    query?: never;
+    url: '/umbraco/management/api/v1/member-type/import';
+};
+
+export type PostMemberTypeImportErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PostMemberTypeImportError = PostMemberTypeImportErrors[keyof PostMemberTypeImportErrors];
+
+export type PostMemberTypeImportResponses = {
+    /**
+     * Created
+     */
+    201: unknown;
+};
+
+export type GetTreeMemberTypeAncestorsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        descendantId?: string;
+    };
+    url: '/umbraco/management/api/v1/tree/member-type/ancestors';
+};
+
+export type GetTreeMemberTypeAncestorsErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetTreeMemberTypeAncestorsResponses = {
+    /**
+     * OK
+     */
+    200: Array<MemberTypeTreeItemResponseModel>;
+};
+
+export type GetTreeMemberTypeAncestorsResponse = GetTreeMemberTypeAncestorsResponses[keyof GetTreeMemberTypeAncestorsResponses];
+
+export type GetTreeMemberTypeChildrenData = {
+    body?: never;
+    path?: never;
+    query?: {
+        parentId?: string;
+        skip?: number;
+        take?: number;
+        foldersOnly?: boolean;
+    };
+    url: '/umbraco/management/api/v1/tree/member-type/children';
+};
+
+export type GetTreeMemberTypeChildrenErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetTreeMemberTypeChildrenResponses = {
+    /**
+     * OK
+     */
+    200: PagedMemberTypeTreeItemResponseModel;
+};
+
+export type GetTreeMemberTypeChildrenResponse = GetTreeMemberTypeChildrenResponses[keyof GetTreeMemberTypeChildrenResponses];
+
 export type GetTreeMemberTypeRootData = {
     body?: never;
     path?: never;
     query?: {
         skip?: number;
         take?: number;
+        foldersOnly?: boolean;
     };
     url: '/umbraco/management/api/v1/tree/member-type/root';
 };
@@ -11028,6 +11236,7 @@ export type GetTreeMemberTypeSiblingsData = {
         target?: string;
         before?: number;
         after?: number;
+        foldersOnly?: boolean;
     };
     url: '/umbraco/management/api/v1/tree/member-type/siblings';
 };
