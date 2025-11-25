@@ -39,6 +39,9 @@ export class UmbUserCollectionItemCardElement extends UmbLitElement {
 	@property({ type: Boolean })
 	selectOnly = false;
 
+	@property({ type: String })
+	href?: string;
+
 	@state()
 	private _userGroupItems: Array<UmbUserGroupItemModel> = [];
 
@@ -75,7 +78,7 @@ export class UmbUserCollectionItemCardElement extends UmbLitElement {
 		return html`
 			<uui-card-user
 				.name=${this.item.name ?? this.localize.term('general_unnamed')}
-				href="${UMB_USER_WORKSPACE_PATH}/edit/${this.item.unique}"
+				href=${this.href}
 				?selectable=${this.selectable}
 				?select-only=${this.selectOnly}
 				?selected=${this.selected}

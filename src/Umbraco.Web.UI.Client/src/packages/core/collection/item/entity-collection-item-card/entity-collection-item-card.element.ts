@@ -7,7 +7,6 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 import { UmbRoutePathAddendumContext } from '@umbraco-cms/backoffice/router';
 import { UMB_MARK_ATTRIBUTE_NAME } from '@umbraco-cms/backoffice/const';
-import { UUIBlinkAnimationValue } from '@umbraco-cms/backoffice/external/uui';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 
 import './default-collection-item-card.element.js';
@@ -95,6 +94,19 @@ export class UmbEntityCollectionItemCardElement extends UmbLitElement {
 		}
 	}
 
+	#href?: string;
+	@property({ type: String, reflect: true })
+	public get href() {
+		return this.#href;
+	}
+	public set href(value) {
+		this.#href = value;
+
+		if (this._component) {
+			this._component.href = this.#href;
+		}
+	}
+
 	#pathAddendum = new UmbRoutePathAddendumContext(this);
 
 	#onSelected(event: UmbSelectedEvent) {
@@ -138,6 +150,7 @@ export class UmbEntityCollectionItemCardElement extends UmbLitElement {
 				component.selectOnly = this.selectOnly;
 				component.selected = this.selected;
 				component.disabled = this.disabled;
+				component.href = this.href;
 
 				component.addEventListener(UmbSelectedEvent.TYPE, this.#onSelected.bind(this));
 				component.addEventListener(UmbDeselectedEvent.TYPE, this.#onDeselected.bind(this));

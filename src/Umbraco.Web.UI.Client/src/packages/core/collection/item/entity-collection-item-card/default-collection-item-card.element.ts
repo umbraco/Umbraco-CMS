@@ -18,6 +18,9 @@ export class UmbDefaultCollectionItemCardElement extends UmbLitElement {
 	@property({ type: Boolean })
 	selectOnly = false;
 
+	@property({ type: String })
+	href?: string;
+
 	#onSelected(event: CustomEvent) {
 		if (!this.item) return;
 		event.stopPropagation();
@@ -36,6 +39,7 @@ export class UmbDefaultCollectionItemCardElement extends UmbLitElement {
 		return html`
 			<uui-card-content-node
 				name=${this.item.name ?? `${getItemFallbackName(this.item)}`}
+				href=${this.href}
 				?selectable=${this.selectable}
 				?select-only=${this.selectOnly}
 				?selected=${this.selected}
