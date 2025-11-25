@@ -3,7 +3,6 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
 	css,
 	html,
-	LitElement,
 	svg,
 	customElement,
 	property,
@@ -12,11 +11,13 @@ import {
 	state,
 } from '@umbraco-cms/backoffice/external/lit';
 import { clamp } from '@umbraco-cms/backoffice/utils';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 interface Circle {
 	color: string;
 	name: string;
 	percent: number;
+	visualPercent: number;
 	kind: string;
 	number: number;
 	href: string;
@@ -33,10 +34,16 @@ interface CircleWithCommands extends Circle {
  * @augments {LitElement}
  */
 @customElement('umb-donut-chart')
-export class UmbDonutChartElement extends LitElement {
+export class UmbDonutChartElement extends UmbLitElement {
 	static percentToDegrees(percent: number): number {
 		return percent * 3.6;
 	}
+
+	/**
+	 * Minimum visual percentage for rendering a slice.
+	 * Slices below this percentage will be visually expanded to this size to remain visible.
+	 */
+	static MIN_SLICE_PERCENT = 5;
 
 	/**
 	 * Circle radius in pixels
@@ -74,13 +81,6 @@ export class UmbDonutChartElement extends LitElement {
 	hideDetailBox = false;
 
 	/**
-	 * Shows numbers inside each slice of the donut chart
-	 * @memberof UmbDonutChartElement
-	 */
-	@property({ type: Boolean, attribute: 'show-inline-numbers' })
-	showInlineNumbers = false;
-
-	/**
 	 * Shows the description text below the chart
 	 * @memberof UmbDonutChartElement
 	 */
@@ -112,7 +112,7 @@ export class UmbDonutChartElement extends LitElement {
 	private _detailName = '';
 
 	@state()
-	private _detailAmount = 0;
+	private _detailAmount = '0';
 
 	@state()
 	private _detailColor = 'black';
@@ -141,25 +141,49 @@ export class UmbDonutChartElement extends LitElement {
 
 	#calculatePercentage(partialValue: number) {
 		if (this._totalAmount === 0) return 0;
-		const percent = Math.round((100 * partialValue) / this._totalAmount);
+		const percent = (100 * partialValue) / this._totalAmount;
 		return clamp(percent, 0, 99);
 	}
 
 	#printCircles(event: Event | null = null) {
 		this._totalAmount = this._slices.reduce((acc, slice) => acc + slice.amount, 0);
 		event?.stopPropagation();
-		this._circles = this.#addCommands(
-			this._slices.map((slice) => {
-				return {
-					percent: this.#calculatePercentage(slice.amount),
-					number: slice.amount,
-					color: slice.color,
-					name: slice.name,
-					kind: slice.kind,
-					href: slice.href,
-				};
-			}),
-		);
+
+		// First pass: calculate actual percentages
+		const circles = this._slices.map((slice) => {
+			const percent = this.#calculatePercentage(slice.amount);
+			return {
+				percent,
+				visualPercent: percent,
+				number: slice.amount,
+				color: slice.color,
+				name: slice.name,
+				kind: slice.kind,
+				href: slice.href,
+			};
+		});
+
+		// Second pass: apply minimum visual percentage and normalize to 100%
+		const totalActualPercent = circles.reduce((acc, c) => acc + c.percent, 0);
+		if (totalActualPercent > 0) {
+			const smallSlices = circles.filter((c) => c.percent > 0 && c.percent < UmbDonutChartElement.MIN_SLICE_PERCENT);
+
+			// Expand small slices to minimum
+			smallSlices.forEach((c) => {
+				c.visualPercent = UmbDonutChartElement.MIN_SLICE_PERCENT;
+			});
+
+			// Calculate total and normalize to 100%
+			const totalVisualPercent = circles.reduce((acc, c) => acc + c.visualPercent, 0);
+			if (totalVisualPercent > 0 && totalVisualPercent !== 100) {
+				const scale = 100 / totalVisualPercent;
+				circles.forEach((c) => {
+					c.visualPercent = c.visualPercent * scale;
+				});
+			}
+		}
+
+		this._circles = this.#addCommands(circles);
 	}
 
 	#addCommands(Circles: Circle[]): CircleWithCommands[] {
@@ -170,13 +194,13 @@ export class UmbDonutChartElement extends LitElement {
 				commands: this.#getSliceCommands(slice, this.radius, this.svgSize, this.borderSize),
 				offset: previousPercent * 3.6 * -1,
 			};
-			previousPercent += slice.percent;
+			previousPercent += slice.visualPercent;
 			return sliceWithCommands;
 		});
 	}
 
 	#getSliceCommands(Circle: Circle, radius: number, svgSize: number, borderSize: number): string {
-		const degrees = UmbDonutChartElement.percentToDegrees(Circle.percent);
+		const degrees = UmbDonutChartElement.percentToDegrees(Circle.visualPercent);
 		const longPathFlag = degrees > 180 ? 1 : 0;
 		const innerRadius = radius - borderSize;
 
@@ -196,21 +220,6 @@ export class UmbDonutChartElement extends LitElement {
 		return [coordX, coordY].join(' ');
 	}
 
-	#getTextPosition(circle: CircleWithCommands): { x: number; y: number } {
-		// Calculate the middle angle of the slice
-		const startAngle = -circle.offset;
-		const sliceDegrees = UmbDonutChartElement.percentToDegrees(circle.percent);
-		const middleAngle = startAngle + sliceDegrees / 2;
-
-		// Position the text at the middle of the donut ring
-		const textRadius = this.radius - this.borderSize / 2;
-		const angleRad = (middleAngle * Math.PI) / 180;
-		const x = Math.cos(angleRad) * textRadius + this.svgSize / 2;
-		const y = -Math.sin(angleRad) * textRadius + this.svgSize / 2;
-
-		return { x, y };
-	}
-
 	#calculateDetailsBoxPosition = (event: MouseEvent) => {
 		// Recalculate bounds on each mouse move to handle window resize
 		this.#containerBounds = this._container.getBoundingClientRect();
@@ -225,7 +234,7 @@ export class UmbDonutChartElement extends LitElement {
 		const index = target.dataset.index as unknown as number;
 		const circle = this._circles[index];
 		this._detailName = circle.name;
-		this._detailAmount = circle.number;
+		this._detailAmount = this.localize.number(circle.number);
 		this._detailColor = circle.color;
 		this._detailKind = circle.kind;
 	}
@@ -283,21 +292,7 @@ export class UmbDonutChartElement extends LitElement {
 									role="listitem"
 									d="${circle.commands}"
 									transform="rotate(${circle.offset} ${this._viewBox / 2} ${this._viewBox / 2})">
-								</path>
-								${
-									this.showInlineNumbers
-										? svg`<text
-											class="slice-number"
-											x="${this.#getTextPosition(circle).x}"
-											y="${this.#getTextPosition(circle).y}"
-											text-anchor="middle"
-											dominant-baseline="middle"
-											fill="white"
-											font-weight="bold"
-											font-size="${this.borderSize * 0.6}px"
-											pointer-events="none">${circle.number}</text>`
-										: ''
-								}`;
+								</path>`;
 
 						return circle.href ? svg`<a href="${circle.href}">${content}</a>` : content;
 					})}

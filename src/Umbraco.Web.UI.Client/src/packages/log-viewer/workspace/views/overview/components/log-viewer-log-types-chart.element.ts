@@ -31,7 +31,7 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 	private _logLevelCountFilter: string[] = [];
 
 	@state()
-	private _logLevelKeys: string[] = [];
+	private _logLevelKeys: [string, number][] = [];
 
 	protected override willUpdate(_changedProperties: Map<PropertyKey, unknown>): void {
 		if (_changedProperties.has('_logLevelCountFilter') || _changedProperties.has('_logLevelCountResponse')) {
@@ -50,10 +50,9 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 
 	setLogLevelCount() {
 		if (this._logLevelCountResponse) {
-			this._logLevelKeys = Object.keys(this._logLevelCountResponse);
-			this._logLevelCount = Object.entries(this._logLevelCountResponse).filter(
-				([level]) => !this._logLevelCountFilter.includes(level),
-			);
+			const nonZeroEntries = Object.entries(this._logLevelCountResponse).filter(([, count]) => count > 0);
+			this._logLevelKeys = nonZeroEntries;
+			this._logLevelCount = nonZeroEntries.filter(([level]) => !this._logLevelCountFilter.includes(level));
 		} else {
 			this._logLevelKeys = [];
 			this._logLevelCount = [];
@@ -94,7 +93,7 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 					</umb-localize>
 				</p>
 				<div id="log-types-container">
-					<umb-donut-chart show-inline-numbers>
+					<umb-donut-chart>
 						${repeat(
 							this._logLevelCount,
 							([level]) => level,
@@ -111,8 +110,8 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 						<ul>
 							${repeat(
 								this._logLevelKeys,
-								(level) => level,
-								(level) =>
+								([level]) => level,
+								([level, count]) =>
 									html`<li>
 										<button
 											@click=${(e: Event) => {
@@ -123,6 +122,13 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 												name="icon-record"
 												style="color: var(--umb-log-viewer-${level.toLowerCase()}-color);"></uui-icon>
 											${level}
+											<span class="count">
+												(${this.localize.number(count, {
+													notation: 'compact',
+													minimumFractionDigits: count > 1000 ? 1 : 0,
+													maximumFractionDigits: 2,
+												})})
+											</span>
 										</button>
 									</li>`,
 							)}
@@ -229,6 +235,11 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 
 			li uui-icon {
 				margin-right: 1em;
+			}
+
+			.count {
+				margin-left: 0.3em;
+				color: var(--uui-color-text-alt);
 			}
 		`,
 	];
