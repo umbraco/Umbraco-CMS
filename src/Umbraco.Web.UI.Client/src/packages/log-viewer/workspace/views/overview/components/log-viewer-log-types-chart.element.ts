@@ -101,7 +101,7 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 								html`<umb-donut-slice
 									.name=${level}
 									.amount=${number}
-									.kind=${'messages'}
+									.kind=${this.localize.term('logViewer_messagesCount')}
 									.href=${this.#buildSearchUrl(level)}
 									.color="${`var(--umb-log-viewer-${level.toLowerCase()}-color)`}"></umb-donut-slice>`,
 						)}

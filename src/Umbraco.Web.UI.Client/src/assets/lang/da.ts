@@ -2398,6 +2398,7 @@ export default {
 		level: 'Type',
 		machine: 'Maskine',
 		message: 'Besked',
+		messagesCount: 'logbeskeder',
 		searchWithGoogle: 'Søg med Google',
 		searchThisMessageWithGoogle: 'Søg efter denne besked på Google',
 		searchWithBing: 'Søg med Bing',

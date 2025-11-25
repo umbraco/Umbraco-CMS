@@ -2469,6 +2469,7 @@ export default {
 		level: 'Level',
 		machine: 'Machine',
 		message: 'Message',
+		messagesCount: 'log messages',
 		searchWithGoogle: 'Search With Google',
 		searchThisMessageWithGoogle: 'Search this message with Google',
 		searchWithBing: 'Search With Bing',
