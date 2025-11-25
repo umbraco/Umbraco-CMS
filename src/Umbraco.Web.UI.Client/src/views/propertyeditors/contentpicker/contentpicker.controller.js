@@ -1,4 +1,3 @@
-
 /**
  * The controller that is used for a couple different Property Editors: Multi Node Tree Picker, Content Picker,
  * since this is used by MNTP and it supports content, media and members, there is code to deal with all 3 of those types
@@ -345,17 +344,24 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
 
     };
 
-    $scope.remove = function (index) {
+    $scope.remove = function (udi) {
         if (!$scope.allowRemove) return;
 
-        var currIds = $scope.model.value ? $scope.model.value.split(',') : [];
-        if (currIds.length > 0) {
-            currIds.splice(index, 1);
-            setDirty();
-            $scope.model.value = currIds.join();
+        var currUdis = $scope.model.value ? $scope.model.value.split(',') : [];
+        if (currUdis.length > 0) {
+
+            // Remove the node with the provided UDI.
+            var index = currUdis.indexOf(udi.toString());  // toString for tests, which use integer IDs
+            if (index >= 0) {
+                currUdis.splice(index, 1);
+                setDirty();
+
+                // If no ids left, set value to null to match `clear()` behavior.
+                $scope.model.value = currUdis.length > 0 ? currUdis.join() : null;
+            }
         }
 
-        removeAllEntriesAction.isDisabled = currIds.length === 0;
+        removeAllEntriesAction.isDisabled = currUdis.length === 0;
     };
 
     $scope.showNode = function (index) {
