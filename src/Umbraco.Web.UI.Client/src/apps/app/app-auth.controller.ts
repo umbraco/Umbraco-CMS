@@ -134,7 +134,7 @@ export class UmbAppAuthController extends UmbControllerBase {
 				},
 				modal: {
 					key: authModalKey,
-					backdropBackground: 'var(--umb-auth-backdrop, rgb(244, 244, 244))',
+					backdropBackground: 'var(--umb-auth-backdrop, var(--uui-color-surface))',
 				},
 			})
 			.onSubmit()
