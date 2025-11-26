@@ -21,7 +21,7 @@ public class ByKeyDocumentTypeFolderController : DocumentTypeFolderControllerBas
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(FolderResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    [EndpointSummary("Gets a document type folder.")]
-    [EndpointDescription("Gets a document type folder identified by the provided Id.")]
+    [EndpointSummary("Gets a Document Type folder.")]
+    [EndpointDescription("Gets a Document Type folder identified by the provided Id.")]
     public async Task<IActionResult> ByKey(CancellationToken cancellationToken, Guid id) => await GetFolderAsync(id);
 }

@@ -32,8 +32,8 @@ public class UpdateDomainsController : DocumentControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
-    [EndpointSummary("Updates a document.")]
-    [EndpointDescription("Updates a document identified by the provided Id with the details from the request model.")]
+    [EndpointSummary("Updates the domains for a document.")]
+    [EndpointDescription("Updates the domains for the document identified by the provided Id with the details from the request model.")]
     public async Task<IActionResult> Update(
         CancellationToken cancellationToken,
         Guid id,

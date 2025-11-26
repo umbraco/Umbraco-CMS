@@ -13,6 +13,6 @@ public abstract class DocumentBlueprintControllerBase : ContentControllerBase
     protected IActionResult DocumentBlueprintNotFound()
         => OperationStatusResult(ContentEditingOperationStatus.NotFound, problemDetailsBuilder
             => NotFound(problemDetailsBuilder
-                .WithTitle("The document blueprint could not be found")
+                .WithTitle("The Document Blueprint could not be found")
                 .Build()));
 }
