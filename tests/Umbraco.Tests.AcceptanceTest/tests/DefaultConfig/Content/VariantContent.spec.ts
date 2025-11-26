@@ -1,5 +1,5 @@
 ﻿import {ConstantHelper, test, AliasHelper} from '@umbraco/playwright-testhelpers';
-import {expect} from "@playwright/test";
+import {expect} from '@playwright/test';
 
 // Content
 const englishContentName = 'English Content';
@@ -24,13 +24,14 @@ test.beforeEach(async ({umbracoApi}) => {
 });
 
 test.afterEach(async ({umbracoApi}) => {
-  // await umbracoApi.document.ensureNameNotExists(contentName);
-  // await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
-  // await umbracoApi.language.ensureIsoCodeNotExists(secondCulture);
+  await umbracoApi.document.ensureNameNotExists(englishContentName);
+  await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
+  await umbracoApi.language.ensureIsoCodeNotExists(secondCulture);
 });
 
-// This is a test for the regression issue #20250
-test('cannot edit non-variant property editor value in other languages than default one', async ({umbracoApi, umbracoUi}) => {
+// TODO: Remove .skip when issue #20633 is resolved
+// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/20633
+test.skip('allow edit invariant property editor value in other languages than default one', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringDataType = await umbracoApi.dataType.getByName(textStringDataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, textStringDataTypeName, textStringDataType.id, 'TestGroup', true, false);
@@ -40,8 +41,17 @@ test('cannot edit non-variant property editor value in other languages than defa
 
   // Act
   await umbracoUi.content.goToContentWithName(englishContentName);
+  await umbracoUi.content.switchLanguage(secondCulture);
+  await umbracoUi.content.enterTextstring(contentText);
+  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickContainerSaveAndPublishButton();
+  await umbracoUi.content.isSuccessNotificationVisible();
 
   // Assert
-
-
+  await umbracoUi.content.doesPropertyContainValue(AliasHelper.toAlias(textStringDataTypeName), contentText);
+  const contentData = await umbracoApi.document.getByName(englishContentName);
+  expect(contentData.variants.length).toBe(2);
+  expect(contentData.values.length).toBe(1);
+  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(textStringDataTypeName));
+  expect(contentData.values[0].value).toEqual(contentText);
 });
