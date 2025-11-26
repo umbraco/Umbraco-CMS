@@ -122,9 +122,15 @@ export class UmbLogMessagesServerDataSource implements UmbLogMessagesDataSource 
 				[LogLevelModel.FATAL]: 0,
 			};
 
+			// Helper to normalize log level keys to PascalCase
+			const normalizeLogLevel = (level: string): LogLevelModel => {
+				const normalized = level.charAt(0).toUpperCase() + level.slice(1).toLowerCase();
+				return normalized as LogLevelModel;
+			};
+
 			// Normalize keys to match LogLevelModel
 			for (const [level, count] of Object.entries(data.data)) {
-				normalizedData[(level.charAt(0).toUpperCase() + level.slice(1)) as LogLevelModel] = count;
+				normalizedData[normalizeLogLevel(level)] = count;
 			}
 
 			return { data: normalizedData };

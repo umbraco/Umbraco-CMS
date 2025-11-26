@@ -34,7 +34,7 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 	private _logLevelKeys: [string, number][] = [];
 
 	protected override willUpdate(_changedProperties: Map<PropertyKey, unknown>): void {
-		if (_changedProperties.has('_logLevelCountFilter') || _changedProperties.has('_logLevelCountResponse')) {
+		if (_changedProperties.has('_logLevelCountFilter') || _changedProperties.has('_logLevelCounts')) {
 			this.setLogLevelCount();
 		}
 	}
@@ -86,7 +86,7 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 
 	override render() {
 		return html`
-			<uui-box id="types" headline="Log types">
+			<uui-box id="types" headline=${this.localize.term('logViewer_logTypes')}>
 				<p id="description">
 					<umb-localize key="logViewer_logTypesChartDescription">
 						In the chosen date range, you have this number of log messages grouped by type:
