@@ -1,6 +1,8 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
+
 namespace Umbraco.Cms.Core.PropertyEditors;
 
 /// <summary>
@@ -17,19 +19,39 @@ public class BlockGridConfiguration
     [ConfigurationField("gridColumns")]
     public int? GridColumns { get; set; }
 
-    public class BlockGridBlockConfiguration : IBlockConfiguration
+    public class BlockGridBlockConfiguration : IBlockGridConfiguration
     {
-        public int? AreaGridColumns { get; set; }
-
         public BlockGridAreaConfiguration[] Areas { get; set; } = Array.Empty<BlockGridAreaConfiguration>();
 
         public Guid ContentElementTypeKey { get; set; }
 
         public Guid? SettingsElementTypeKey { get; set; }
 
-        public bool AllowAtRoot { get; set; }
+        public string? Label { get; set; }
 
-        public bool AllowInAreas { get; set; }
+        public string? EditorSize { get; set; }
+
+        public string? IconColor { get; set; }
+
+        public string? BackgroundColor { get; set; }
+
+        public string? Thumbnail { get; set; }
+
+        public bool? ForceHideContentEditorInOverlay { get; set; }
+
+        public bool? DisplayInline { get; set; }
+
+        public bool? AllowAtRoot { get; set; }
+
+        public bool? AllowInAreas { get; set; }
+
+        public bool? HideContentEditor { get; set; }
+
+        public int? RowMinSpan { get; set; }
+
+        public int? RowMaxSpan { get; set; }
+
+        public int? AreaGridColumns { get; set; }
     }
 
     public class NumberRange
@@ -52,5 +74,18 @@ public class BlockGridConfiguration
         public int? MinAllowed { get; set; }
 
         public int? MaxAllowed { get; set; }
+
+        public SpecifiedAllowanceConfiguration[] SpecifiedAllowance { get; set; } = Array.Empty<SpecifiedAllowanceConfiguration>();
+
+        public string? CreateLabel { get; set; }
+    }
+
+    public class SpecifiedAllowanceConfiguration
+    {
+        public int? MinAllowed { get; set; }
+
+        public int? MaxAllowed { get; set; }
+
+        public Guid? ElementTypeKey { get; set; }
     }
 }
