@@ -43,15 +43,23 @@ class UmbLogViewerMessagesData extends UmbMockDBBase<LogMessageResponseModel> {
 		return this.data.slice(skip, take);
 	}
 
-	getLevelCount() {
-		const levels = this.data.map((log) => log.level?.toLowerCase() ?? 'unknown');
-		const counts = {};
-		levels.forEach((level: string) => {
-			//eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			//@ts-ignore
-			counts[level ?? 'unknown'] = (counts[level] || 0) + 1;
-		});
-		return counts;
+	getLevelCount(): Record<string, number> {
+		const levels = this.data.reduce(
+			(counts, log) => {
+				const level = log.level?.toLocaleLowerCase() ?? 'unknown';
+				counts[level] = (counts[level] || 0) + 1;
+				return counts;
+			},
+			{} as Record<string, number>,
+		);
+
+		// Test 1k logs for the first level
+		levels[Object.keys(levels)[0]] += 1000;
+
+		// Test 1m logs for the second level
+		levels[Object.keys(levels)[1]] += 1000000;
+
+		return levels;
 	}
 }
 

@@ -416,3 +416,22 @@ test('can add a variant block element with invariant RTE Tiptap in the content',
   await umbracoApi.documentType.ensureNameNotExists(customElementTypeName);
   await umbracoApi.language.ensureNameNotExists('Danish');
 });
+
+// Tests regression issue: https://github.com/umbraco/Umbraco-CMS/issues/20680
+test('can move away from a content node with a block grid after making no changes without seeing discard unsaved changes', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const customDataTypeId = await umbracoApi.dataType.createBlockGridWithPermissions(customDataTypeName, elementTypeId, true, true);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+
+  // Act
+  await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
+
+  // Assert
+  // We do this to make sure that there is no discard changes button visible, if the discard changes was visible, we would not be able to go to the document type
+  await umbracoUi.documentType.goToDocumentType(documentTypeName);
+});
+

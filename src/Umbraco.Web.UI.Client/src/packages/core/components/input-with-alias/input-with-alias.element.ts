@@ -113,7 +113,11 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 		}
 
 		if (!this._aliasLocked) {
-			(event.target as UUIInputElement)?.focus();
+			const input = event.target as UUIInputElement;
+			input?.focus();
+			requestAnimationFrame(() => {
+				input?.select();
+			});
 		}
 	}
 
@@ -126,7 +130,7 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 				id="name"
 				placeholder=${ifDefined(this.placeholder)}
 				label=${nameLabel}
-				.value=${this.value}
+				.value=${this.value ?? ''}
 				@input=${this.#onNameChange}
 				?required=${this.required}
 				?readonly=${this.readonly}>
