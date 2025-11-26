@@ -2,12 +2,15 @@ import type { UmbDocumentCollectionItemModel } from './types.js';
 import { css, customElement, html, nothing, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
-import type { UmbCollectionItemDetailPropertyConfig } from '@umbraco-cms/backoffice/collection';
+import type {
+	UmbCollectionItemDetailPropertyConfig,
+	UmbEntityCollectionItemElement,
+} from '@umbraco-cms/backoffice/collection';
 
 import './document-grid-collection-card.element.js';
 
 @customElement('umb-document-collection-item-card')
-export class UmbDocumentCollectionItemCardElement extends UmbLitElement {
+export class UmbDocumentCollectionItemCardElement extends UmbLitElement implements UmbEntityCollectionItemElement {
 	#item?: UmbDocumentCollectionItemModel | undefined;
 
 	@property({ type: Object })

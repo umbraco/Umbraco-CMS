@@ -15,9 +15,10 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbUserGroupItemRepository, type UmbUserGroupItemModel } from '@umbraco-cms/backoffice/user-group';
 import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 import { UserStateModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbEntityCollectionItemElement } from '@umbraco-cms/backoffice/collection';
 
 @customElement('umb-user-collection-item-card')
-export class UmbUserCollectionItemCardElement extends UmbLitElement {
+export class UmbUserCollectionItemCardElement extends UmbLitElement implements UmbEntityCollectionItemElement {
 	#item?: UmbUserCollectionItemModel | undefined;
 
 	@property({ type: Object })
