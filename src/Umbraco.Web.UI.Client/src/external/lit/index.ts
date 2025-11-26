@@ -10,3 +10,4 @@ export * from 'lit/directives/style-map.js';
 export * from 'lit/directives/unsafe-html.js';
 export * from 'lit/directives/until.js';
 export * from 'lit/directives/when.js';
+export * from 'lit/directives/choose.js';
