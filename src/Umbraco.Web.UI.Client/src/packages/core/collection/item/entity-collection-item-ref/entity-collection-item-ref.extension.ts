@@ -1,8 +1,9 @@
+import type { UmbEntityCollectionItemElement } from '../entity-collection-item-element.interface.js';
 import type { ManifestElement, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
 
 export interface ManifestEntityCollectionItemRef<
 	MetaType extends MetaEntityCollectionItemRef = MetaEntityCollectionItemRef,
-> extends ManifestElement<any>,
+> extends ManifestElement<UmbEntityCollectionItemElement>,
 		ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
 	type: 'entityCollectionItemRef';
 	meta: MetaType;

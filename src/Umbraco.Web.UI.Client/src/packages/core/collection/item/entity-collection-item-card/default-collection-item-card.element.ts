@@ -1,11 +1,12 @@
 import type { UmbCollectionItemModel } from '../types.js';
+import type { UmbEntityCollectionItemElement } from '../entity-collection-item-element.interface.js';
 import { getItemFallbackName, getItemFallbackIcon } from '@umbraco-cms/backoffice/entity-item';
 import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 import { customElement, html, nothing, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-default-collection-item-card')
-export class UmbDefaultCollectionItemCardElement extends UmbLitElement {
+export class UmbDefaultCollectionItemCardElement extends UmbLitElement implements UmbEntityCollectionItemElement {
 	@property({ type: Object })
 	item?: UmbCollectionItemModel;
 
