@@ -3,8 +3,8 @@ import { html, customElement, state, css } from '@umbraco-cms/backoffice/externa
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
-@customElement('umb-example-entity-content-type-unique-condition')
-export class UmbWorkspaceExampleViewUniqueElement extends UmbLitElement {
+@customElement('example-content-type-unique-condition-workspace-view')
+export class ExampleContentTypeUniqueConditionWorkspaceViewElement extends UmbLitElement {
 	@state()
 	private _contentTypeUniques: string[] = [];
 
@@ -17,12 +17,17 @@ export class UmbWorkspaceExampleViewUniqueElement extends UmbLitElement {
 			});
 		});
 	}
+
 	override render() {
 		return html`<uui-box>
-			<h3>Content Type Unique Condition Test</h3>
-			<p>It appears only on documents with GUID: <strong>${this._contentTypeUniques}</strong></p>
+			<h3>Content Type Unique Condition Example</h3>
+			<p>
+				Content Type ${this._contentTypeUniques.length > 1 ? 'ids' : 'id'}:
+				<strong>${this._contentTypeUniques}</strong>
+			</p>
 		</uui-box>`;
 	}
+
 	static override styles = [
 		UmbTextStyles,
 		css`
@@ -34,10 +39,10 @@ export class UmbWorkspaceExampleViewUniqueElement extends UmbLitElement {
 	];
 }
 
-export { UmbWorkspaceExampleViewUniqueElement as element };
+export { ExampleContentTypeUniqueConditionWorkspaceViewElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-example-entity-content-type-condition-unique': UmbWorkspaceExampleViewUniqueElement;
+		'example-content-type-unique-condition-workspace-view': ExampleContentTypeUniqueConditionWorkspaceViewElement;
 	}
 }
