@@ -2469,6 +2469,7 @@ export default {
 		level: 'Level',
 		machine: 'Machine',
 		message: 'Message',
+		messagesCount: 'log messages',
 		searchWithGoogle: 'Search With Google',
 		searchThisMessageWithGoogle: 'Search this message with Google',
 		searchWithBing: 'Search With Bing',
@@ -2511,7 +2512,8 @@ export default {
 		commonLogMessages: 'Common Log Messages',
 		totalUniqueMessageTypes: 'Total Unique Message types: %0%',
 		logTypes: 'Log types',
-		logTypesChartDescription: 'In chosen date range you have this number of log message of type:',
+		logTypesChartDescription: 'In the chosen date range, you have this number of log messages grouped by type:',
+		viewLogsLabel: 'View %0% logs',
 	},
 	clipboard: {
 		labelForCopyAllEntries: 'Copy %0%',
