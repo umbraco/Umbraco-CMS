@@ -7,7 +7,6 @@ import type { UmbDefaultCollectionContext, UmbCollectionColumnConfiguration } fr
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 import '@umbraco-cms/backoffice/ufm';
-import './document-grid-collection-card.element.js';
 
 @customElement('umb-document-grid-collection-view')
 export class UmbDocumentGridCollectionViewElement extends UmbLitElement {

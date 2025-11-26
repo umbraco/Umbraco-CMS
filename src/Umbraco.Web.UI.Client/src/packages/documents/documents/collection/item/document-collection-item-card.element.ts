@@ -4,6 +4,8 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbCollectionItemDetailPropertyConfig } from '@umbraco-cms/backoffice/collection';
 
+import './document-grid-collection-card.element.js';
+
 @customElement('umb-document-collection-item-card')
 export class UmbDocumentCollectionItemCardElement extends UmbLitElement {
 	#item?: UmbDocumentCollectionItemModel | undefined;
