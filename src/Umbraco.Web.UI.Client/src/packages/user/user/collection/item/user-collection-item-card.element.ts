@@ -38,6 +38,9 @@ export class UmbUserCollectionItemCardElement extends UmbLitElement {
 	@property({ type: Boolean })
 	selectOnly = false;
 
+	@property({ type: Boolean })
+	disabled = false;
+
 	@property({ type: String })
 	href?: string;
 
@@ -81,6 +84,7 @@ export class UmbUserCollectionItemCardElement extends UmbLitElement {
 				?selectable=${this.selectable}
 				?select-only=${this.selectOnly}
 				?selected=${this.selected}
+				?disabled=${this.disabled}
 				@selected=${this.#onSelected}
 				@deselected=${this.#onDeselected}>
 				${this.#renderUserTag()} ${this.#renderUserGroupNames()} ${this.#renderUserLoginDate()}

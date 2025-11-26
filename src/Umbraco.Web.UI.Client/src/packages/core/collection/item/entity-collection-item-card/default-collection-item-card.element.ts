@@ -18,6 +18,9 @@ export class UmbDefaultCollectionItemCardElement extends UmbLitElement {
 	@property({ type: Boolean })
 	selectOnly = false;
 
+	@property({ type: Boolean })
+	disabled = false;
+
 	@property({ type: String })
 	href?: string;
 
@@ -43,6 +46,7 @@ export class UmbDefaultCollectionItemCardElement extends UmbLitElement {
 				?selectable=${this.selectable}
 				?select-only=${this.selectOnly}
 				?selected=${this.selected}
+				?disabled=${this.disabled}
 				@selected=${this.#onSelected}
 				@deselected=${this.#onDeselected}>
 				<slot name="actions" slot="actions"></slot>
