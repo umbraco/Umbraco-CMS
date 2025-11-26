@@ -2513,6 +2513,7 @@ export default {
 		totalUniqueMessageTypes: 'Total Unique Message types: %0%',
 		logTypes: 'Log types',
 		logTypesChartDescription: 'In the chosen date range, you have this number of log messages grouped by type:',
+		viewLogsLabel: 'View %0% logs',
 	},
 	clipboard: {
 		labelForCopyAllEntries: 'Copy %0%',

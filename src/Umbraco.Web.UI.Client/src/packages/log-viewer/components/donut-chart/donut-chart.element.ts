@@ -294,7 +294,9 @@ export class UmbDonutChartElement extends UmbLitElement {
 									transform="rotate(${circle.offset} ${this._viewBox / 2} ${this._viewBox / 2})">
 								</path>`;
 
-						return circle.href ? svg`<a href="${circle.href}" aria-label="View ${circle.name} logs">${content}</a>` : content;
+						return circle.href
+							? svg`<a href="${circle.href}" aria-label=${this.localize.term('logViewer_viewLogsLabel', circle.name)}>${content}</a>`
+							: content;
 					})}
 
         `;

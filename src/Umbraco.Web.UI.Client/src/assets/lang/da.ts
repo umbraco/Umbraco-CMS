@@ -2442,6 +2442,7 @@ export default {
 		totalUniqueMessageTypes: 'Samlet antal unikke beskedtyper: %0%',
 		logTypes: 'Log typer',
 		logTypesChartDescription: 'I det valgte datointerval har du dette antal logbeskeder af typen:',
+		viewLogsLabel: 'Vis %0% logs',
 	},
 	clipboard: {
 		labelForCopyAllEntries: 'Kopier %0%',
