@@ -1,1 +1,1 @@
-import './entity-collection-item-card.element.js';
+import './entity-collection-item-ref.element.js';
