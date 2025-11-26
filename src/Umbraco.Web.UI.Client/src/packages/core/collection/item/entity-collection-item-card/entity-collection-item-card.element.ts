@@ -1,4 +1,4 @@
-import type { UmbCollectionItemModel } from '../types.js';
+import type { UmbCollectionItemDetailPropertyConfig, UmbCollectionItemModel } from '../types.js';
 import type { ManifestEntityCollectionItemCard } from './entity-collection-item-card.extension.js';
 import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -107,7 +107,7 @@ export class UmbEntityCollectionItemCardElement extends UmbLitElement {
 		}
 	}
 
-	#detailProperties?: Array<UmbCollectionItemDetailPropertyConfigModel>;
+	#detailProperties?: Array<UmbCollectionItemDetailPropertyConfig>;
 	@property({ type: Array, attribute: false })
 	public get detailProperties() {
 		return this.#detailProperties;
