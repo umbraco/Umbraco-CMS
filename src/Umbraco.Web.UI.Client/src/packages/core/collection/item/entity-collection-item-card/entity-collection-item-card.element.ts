@@ -141,6 +141,9 @@ export class UmbEntityCollectionItemCardElement extends UmbLitElement {
 		this.setAttribute(UMB_MARK_ATTRIBUTE_NAME, 'entity-collection-item-card');
 	}
 
+	#boundOnSelected = this.#onSelected.bind(this);
+	#boundOnDeselected = this.#onDeselected.bind(this);
+
 	#createController(entityType: string) {
 		if (this.#extensionsController) {
 			this.#extensionsController.destroy();
@@ -166,8 +169,8 @@ export class UmbEntityCollectionItemCardElement extends UmbLitElement {
 				component.href = this.href;
 				component.detailProperties = this.detailProperties;
 
-				component.addEventListener(UmbSelectedEvent.TYPE, this.#onSelected.bind(this));
-				component.addEventListener(UmbDeselectedEvent.TYPE, this.#onDeselected.bind(this));
+				component.addEventListener(UmbSelectedEvent.TYPE, this.#boundOnSelected);
+				component.addEventListener(UmbDeselectedEvent.TYPE, this.#boundOnDeselected);
 
 				// Proxy the actions slot to the component
 				const slotElement = document.createElement('slot');
@@ -188,8 +191,8 @@ export class UmbEntityCollectionItemCardElement extends UmbLitElement {
 	}
 
 	override destroy(): void {
-		this._component?.removeEventListener(UmbSelectedEvent.TYPE, this.#onSelected.bind(this));
-		this._component?.removeEventListener(UmbDeselectedEvent.TYPE, this.#onDeselected.bind(this));
+		this._component?.removeEventListener(UmbSelectedEvent.TYPE, this.#boundOnSelected);
+		this._component?.removeEventListener(UmbDeselectedEvent.TYPE, this.#boundOnDeselected);
 		super.destroy();
 	}
 
