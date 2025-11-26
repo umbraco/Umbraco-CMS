@@ -177,7 +177,7 @@ export class UmbEntityCollectionItemCardElement extends UmbLitElement {
 
 				this._component = component;
 			},
-			undefined, // We can leave the alias to undefined, as we destroy this our selfs.
+			undefined, // We can leave the alias to undefined, as we destroy this ourselves.
 			undefined,
 			{ single: true },
 		);
