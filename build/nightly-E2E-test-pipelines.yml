@@ -693,6 +693,7 @@ stages:
               AZUREB2CTESTUSEREMAIL: $(AZUREB2CTESTUSEREMAIL)
               AZUREB2CTESTUSERPASSWORD: $(AZUREB2CTESTUSERPASSWORD)
               DatabaseType: ${{ variables.DatabaseType }}
+          
           # Stop SMTP4dev container
           - bash: |
               echo "Stopping SMTP4dev container..."
