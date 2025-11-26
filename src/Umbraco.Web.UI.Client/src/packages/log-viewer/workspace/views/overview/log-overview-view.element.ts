@@ -29,7 +29,7 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 
 	#observeErrorCount() {
 		this.observe(this._logViewerContext?.logCount, (logLevelCount) => {
-			this._errorCount = logLevelCount?.error;
+			this._errorCount = logLevelCount?.Error;
 		});
 	}
 
