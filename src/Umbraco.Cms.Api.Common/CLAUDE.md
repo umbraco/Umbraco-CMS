@@ -23,7 +23,7 @@ Shared infrastructure for Umbraco CMS REST APIs (Management and Delivery).
 - `Umbraco.Core` - Domain models and service contracts
 - `Umbraco.Web.Common` - Web functionality
 
-### Project Structure (45 files)
+### Project Structure (46 files)
 
 ```
 Umbraco.Cms.Api.Common/
@@ -55,20 +55,7 @@ Umbraco.Cms.Api.Common/
 
 ## 2. Commands
 
-```bash
-# Build
-dotnet build src/Umbraco.Cms.Api.Common/Umbraco.Cms.Api.Common.csproj
-
-# Pack for NuGet
-dotnet pack src/Umbraco.Cms.Api.Common/Umbraco.Cms.Api.Common.csproj -c Release
-
-# Run tests (integration tests in consuming APIs)
-dotnet test tests/Umbraco.Tests.Integration/
-
-# Check for outdated/vulnerable packages
-dotnet list src/Umbraco.Cms.Api.Common/Umbraco.Cms.Api.Common.csproj package --outdated
-dotnet list src/Umbraco.Cms.Api.Common/Umbraco.Cms.Api.Common.csproj package --vulnerable
-```
+See "Quick Reference" section at bottom for common commands.
 
 ---
 
@@ -89,20 +76,22 @@ public class SchemaIdHandler : ISchemaIdHandler
 
 **Why**: Management and Delivery APIs can customize schema/operation ID generation.
 
-### Schema ID Sanitization (OpenApi/SchemaIdHandler.cs:32)
+### Schema ID Sanitization (OpenApi/SchemaIdHandler.cs:24-29, 32)
 
 ```csharp
-// Remove invalid characters to prevent OpenAPI generation errors
-return Regex.Replace(name, @"[^\w]", string.Empty);
-
-// Add "Model" suffix to avoid TypeScript name clashes (line 24)
+// Add "Model" suffix to avoid TypeScript name clashes (lines 24-29)
 if (name.EndsWith("Model") == false)
 {
+    // because some models names clash with common classes in TypeScript (i.e. Document),
+    // we need to add a "Model" postfix to all models
     name = $"{name}Model";
 }
+
+// Remove invalid characters to prevent OpenAPI generation errors (line 32)
+return Regex.Replace(name, @"[^\w]", string.Empty);
 ```
 
-### Polymorphic Deserialization (Serialization/UmbracoJsonTypeInfoResolver.cs:31-34)
+### Polymorphic Deserialization (Serialization/UmbracoJsonTypeInfoResolver.cs:29-35)
 
 ```csharp
 // IMPORTANT: do NOT return an empty enumerable here. it will cause nullability to fail on reference
@@ -144,8 +133,10 @@ dotnet test tests/Umbraco.Tests.Integration/
 
 ### Key Configuration (DependencyInjection/UmbracoBuilderAuthExtensions.cs)
 
-**Reference Tokens over JWT** (line 73-74):
+**Reference Tokens over JWT** (line 76-80):
 ```csharp
+// Enable reference tokens
+// - see https://documentation.openiddict.com/configuration/token-storage.html
 options
     .UseReferenceAccessTokens()
     .UseReferenceRefreshTokens();
@@ -153,23 +144,44 @@ options
 
 **Why**: More secure (revocable), better for load balancing, uses ASP.NET Core Data Protection.
 
-**Token Lifetime** (line 84-85):
+**Token Lifetime** (line 88-91):
 ```csharp
-// Access token: 25% of refresh token lifetime
+// Make the access token lifetime 25% of the refresh token lifetime
 options.SetAccessTokenLifetime(new TimeSpan(timeOut.Ticks / 4));
 options.SetRefreshTokenLifetime(timeOut);
 ```
 
-**PKCE Required** (line 54-56):
+**PKCE Required** (line 59-63):
 ```csharp
+// Enable authorization code flow with PKCE
 options
     .AllowAuthorizationCodeFlow()
-    .RequireProofKeyForCodeExchange();
+    .RequireProofKeyForCodeExchange()
+    .AllowRefreshTokenFlow();
 ```
 
-**Endpoints**:
-- Backoffice: `/umbraco/management/api/v1/security/*`
-- Member: `/umbraco/member/api/v1/security/*`
+**Endpoints**: Backoffice `/umbraco/management/api/v1/security/*`, Member `/umbraco/member/api/v1/security/*`
+
+### Secure Cookie-Based Token Storage (v17+)
+
+**Implementation** (DependencyInjection/HideBackOfficeTokensHandler.cs):
+
+Back-office tokens are hidden from client-side JavaScript via HTTP-only cookies:
+
+```csharp
+private const string AccessTokenCookieKey = "__Host-umbAccessToken";
+private const string RefreshTokenCookieKey = "__Host-umbRefreshToken";
+
+// Tokens are encrypted via Data Protection and stored in cookies
+SetCookie(httpContext, AccessTokenCookieKey, context.Response.AccessToken);
+context.Response.AccessToken = "[redacted]";  // Client sees redacted value
+```
+
+**Key Security Features** (lines 143-165): `HttpOnly`, `IsEssential`, `Path="/"`, `Secure` (HTTPS), `__Host-` prefix
+
+**Configuration**: `BackOfficeTokenCookieSettings.Enabled` (default: true in v17+)
+
+**Implications**: Client-side cannot access tokens; encrypted with Data Protection; load balancing needs shared key ring; API requests need `credentials: include`
 
 ---
 
@@ -183,10 +195,9 @@ options
 ```csharp
 catch (NotSupportedException exception)
 {
-    // This happens when trying to deserialize to an interface,
-    // without sending the $type as part of the request
-    context.ModelState.TryAddModelException(string.Empty,
-        new InputFormatterException(exception.Message, exception));
+    // This happens when trying to deserialize to an interface, without sending the $type as part of the request
+    context.ModelState.TryAddModelException(string.Empty, new InputFormatterException(exception.Message, exception));
+    return await InputFormatterResult.FailureAsync();
 }
 ```
 
@@ -196,23 +207,23 @@ catch (NotSupportedException exception)
 
 **Issue**: Type names like `Document` clash with TypeScript built-ins.
 
-**Solution** (OpenApi/SchemaIdHandler.cs:24-29):
-```csharp
-if (name.EndsWith("Model") == false)
-{
-    // Add "Model" postfix to all models
-    name = $"{name}Model";
-}
-```
+**Solution**: Add "Model" suffix (OpenApi/SchemaIdHandler.cs:24-29)
 
 ### Generic Type Handling
 
 **Issue**: `PagedViewModel<T>` needs flattened schema name.
 
-**Solution** (OpenApi/SchemaIdHandler.cs:41-49):
+**Solution** (OpenApi/SchemaIdHandler.cs:41-50):
 ```csharp
-// Turns "PagedViewModel<RelationItemViewModel>" into "PagedRelationItemModel"
-return $"{name}{string.Join(string.Empty, type.GenericTypeArguments.Select(SanitizedTypeName))}";
+private string HandleGenerics(string name, Type type)
+{
+    if (!type.IsGenericType)
+        return name;
+
+    // use attribute custom name or append the generic type names
+    // turns "PagedViewModel<RelationItemViewModel>" into "PagedRelationItem"
+    return $"{name}{string.Join(string.Empty, type.GenericTypeArguments.Select(SanitizedTypeName))}";
+}
 ```
 
 ---
@@ -258,16 +269,6 @@ return BadRequest(problemDetails);
 
 ## 8. Project-Specific Notes
 
-### Why Reference Tokens Instead of JWT?
-
-**Decision**: Use `UseReferenceAccessTokens()` and ASP.NET Core Data Protection.
-
-**Tradeoffs**:
-- ✅ **Pros**: Revocable, simpler key management, better security
-- ❌ **Cons**: Requires database lookup (slower than JWT), needs shared Data Protection key ring
-
-**Load Balancing Requirement**: All servers must share the same Data Protection key ring and application name.
-
 ### Why Virtual Handlers?
 
 **Decision**: Make `SchemaIdHandler`, `OperationIdHandler`, etc. virtual.
@@ -278,12 +279,7 @@ return BadRequest(problemDetails);
 
 ### Performance: Subtype Caching
 
-**Implementation** (Serialization/UmbracoJsonTypeInfoResolver.cs:14):
-```csharp
-private readonly ConcurrentDictionary<Type, ISet<Type>> _subTypesCache = new();
-```
-
-**Why**: Reflection is expensive. Cache discovered subtypes to avoid repeated `ITypeFinder.FindClassesOfType()` calls.
+**Why**: Cache discovered subtypes (UmbracoJsonTypeInfoResolver.cs:14) to avoid expensive reflection calls
 
 ### Known Limitations
 
@@ -318,23 +314,11 @@ private readonly ConcurrentDictionary<Type, ISet<Type>> _subTypesCache = new();
 
 ### Configuration
 
-**HTTPS** (Configuration/ConfigureOpenIddict.cs:14):
-```csharp
-// Disable transport security requirement for local development
-options.DisableTransportSecurityRequirement = _globalSettings.Value.UseHttps is false;
-```
+**HTTPS**: `DisableTransportSecurityRequirement` for local dev only (ConfigureOpenIddict.cs:14). **Warning**: Never disable in production.
 
-**⚠️ Warning**: Never disable HTTPS in production.
+### Usage Pattern
 
-### Usage by Consuming APIs
-
-**Registration Pattern**:
-```csharp
-// In Umbraco.Cms.Api.Management or Umbraco.Cms.Api.Delivery
-builder
-    .AddUmbracoApiOpenApiUI()    // Swagger + custom handlers
-    .AddUmbracoOpenIddict();      // OAuth 2.0 authentication
-```
+Consuming APIs call `builder.AddUmbracoApiOpenApiUI().AddUmbracoOpenIddict()`
 
 ---
 
@@ -343,7 +327,7 @@ builder
 ### Essential Commands
 
 ```bash
-# Build
+# Build project
 dotnet build src/Umbraco.Cms.Api.Common/Umbraco.Cms.Api.Common.csproj
 
 # Pack for NuGet
@@ -351,6 +335,10 @@ dotnet pack src/Umbraco.Cms.Api.Common/Umbraco.Cms.Api.Common.csproj -c Release
 
 # Test via integration tests
 dotnet test tests/Umbraco.Tests.Integration/
+
+# Check packages
+dotnet list src/Umbraco.Cms.Api.Common/Umbraco.Cms.Api.Common.csproj package --outdated
+dotnet list src/Umbraco.Cms.Api.Common/Umbraco.Cms.Api.Common.csproj package --vulnerable
 ```
 
 ### Key Classes
@@ -361,13 +349,14 @@ dotnet test tests/Umbraco.Tests.Integration/
 | `SchemaIdHandler` | Generate OpenAPI schema IDs | OpenApi/SchemaIdHandler.cs |
 | `UmbracoJsonTypeInfoResolver` | Polymorphic JSON serialization | Serialization/UmbracoJsonTypeInfoResolver.cs |
 | `UmbracoBuilderAuthExtensions` | Configure OpenIddict | DependencyInjection/UmbracoBuilderAuthExtensions.cs |
+| `HideBackOfficeTokensHandler` | Secure cookie-based token storage | DependencyInjection/HideBackOfficeTokensHandler.cs |
 | `PagedViewModel<T>` | Generic pagination model | ViewModels/Pagination/PagedViewModel.cs |
 
 ### Important Files
 
 - `Umbraco.Cms.Api.Common.csproj` - Project dependencies
-- `DependencyInjection/UmbracoBuilderApiExtensions.cs` - OpenAPI registration (line 12-30)
-- `DependencyInjection/UmbracoBuilderAuthExtensions.cs` - OpenIddict setup (line 19-144)
+- `DependencyInjection/UmbracoBuilderApiExtensions.cs` - OpenAPI registration (line 12-31)
+- `DependencyInjection/UmbracoBuilderAuthExtensions.cs` - OpenIddict setup (line 20-183)
 - `Security/Paths.cs` - API endpoint path constants
 
 ### Getting Help
