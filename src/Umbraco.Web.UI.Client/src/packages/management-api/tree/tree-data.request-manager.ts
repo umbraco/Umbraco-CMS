@@ -244,9 +244,9 @@ export class UmbManagementApiTreeDataRequestManager<
 		let error = undefined;
 
 		if (responseData) {
-			// Ensure items is defined before proceeding
+			// Ensure items is defined before proceeding - this can happen when the target item was deleted
 			if (!Array.isArray(responseData.items)) {
-				return { data: undefined, error: new UmbError('Target was not found within parent') };
+				return { data: undefined, error: new UmbError('Invalid response: items array not found') };
 			}
 
 			// The siblings endpoint doesn't know about the parent context, so it will return items that may not have the correct parent
