@@ -107,7 +107,10 @@ export default defineConfig({
       name: 'contentSettingConfig',
       testMatch: 'ContentSettingConfig/**',
       use: {
-        ...devices['Desktop Chrome']
+        ...devices['Desktop Chrome'],
+        // Use prepared auth state.
+        ignoreHTTPSErrors: true,
+        storageState: STORAGE_STATE
       }
     },
     {
