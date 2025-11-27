@@ -68,6 +68,7 @@ public interface ITemplateService : IService
     /// <returns>
     ///     The template created
     /// </returns>
+    [Obsolete("Use the overload that includes name and alias parameters instead. Scheduled for removal in v19.")]
     Task<Attempt<ITemplate, TemplateOperationStatus>> CreateForContentTypeAsync(
         string contentTypeAlias,
         string? contentTypeName,
@@ -89,7 +90,7 @@ public interface ITemplateService : IService
         string contentTypeAlias,
         Guid userKey)
     {
-        // TODO: Remove default implementation in v18
+        // TODO (V18): Remove default implementation
         Attempt<ITemplate, TemplateOperationStatus> result = await CreateForContentTypeAsync(contentTypeAlias, name, userKey);
         return result.Success
             ? Attempt<ITemplate?, TemplateOperationStatus>.Succeed(result.Status, result.Result)

@@ -83,6 +83,7 @@ public class TemplateService : RepositoryService, ITemplateService
     }
 
     /// <inheritdoc />
+    [Obsolete("Use the overload that includes name and alias parameters instead. Scheduled for removal in v19.")]
     public async Task<Attempt<ITemplate, TemplateOperationStatus>> CreateForContentTypeAsync(
         string contentTypeAlias,
         string? contentTypeName,
