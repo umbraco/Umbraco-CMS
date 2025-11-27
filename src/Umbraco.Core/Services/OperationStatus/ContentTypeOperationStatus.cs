@@ -25,4 +25,5 @@ public enum ContentTypeOperationStatus
     InvalidElementFlagElementIsUsedInPropertyEditorConfiguration,
     InvalidElementFlagComparedToParent,
     Unknown,
+    InvalidTemplateAlias,
 }

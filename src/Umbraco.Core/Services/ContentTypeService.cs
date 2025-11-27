@@ -257,7 +257,7 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
                 {
                     TemplateOperationStatus.CancelledByNotification => ContentTypeOperationStatus
                         .CancelledByNotification,
-                    TemplateOperationStatus.InvalidAlias => ContentTypeOperationStatus.InvalidAlias,
+                    TemplateOperationStatus.InvalidAlias => ContentTypeOperationStatus.InvalidTemplateAlias,
                     _ => ContentTypeOperationStatus.Unknown,
                 });
         }
