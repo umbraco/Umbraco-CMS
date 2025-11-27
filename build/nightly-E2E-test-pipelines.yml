@@ -592,7 +592,7 @@ stages:
               additionalEnvironmentVariables: false
             LinuxContentSettingsConfig:
               vmImage: "ubuntu-latest"
-              testFolder: "EntityDataPicker"
+              testFolder: "ContentSettingConfig"
               port: ''
               testCommand: "npx playwright test --project=contentSettingConfig"
             # SMTP
