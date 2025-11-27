@@ -30,7 +30,7 @@ test.afterEach(async ({umbracoApi}) => {
 });
 
 // This is a test for the regression issue #20250
-test('cannot edit invariant property editor value in other languages than default one if AllowEditInvariantFromNonDefault = false', async ({umbracoApi, umbracoUi}) => {
+test('cannot edit invariant property editor value in other languages than default one if AllowEditInvariantFromNonDefault is false', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringDataType = await umbracoApi.dataType.getByName(textStringDataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, textStringDataTypeName, textStringDataType.id, 'TestGroup', true, false);
