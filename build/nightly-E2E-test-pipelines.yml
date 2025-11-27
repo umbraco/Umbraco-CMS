@@ -595,7 +595,7 @@ stages:
               testFolder: "ContentSettingConfig"
               port: ''
               testCommand: "npx playwright test --project=contentSettingConfig"
-              CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=(localdb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Umbraco.mdf;Integrated Security=True
+              CONNECTIONSTRINGS__UMBRACODBDSN: Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True
               CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
               additionalEnvironmentVariables: false
             # SMTP
