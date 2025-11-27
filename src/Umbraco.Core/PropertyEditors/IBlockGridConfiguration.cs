@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
+﻿namespace Umbraco.Cms.Core.PropertyEditors;
 
 public interface IBlockGridConfiguration : IBlockConfiguration
 {
