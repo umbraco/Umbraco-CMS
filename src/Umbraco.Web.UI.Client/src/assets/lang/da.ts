@@ -2398,6 +2398,7 @@ export default {
 		level: 'Type',
 		machine: 'Maskine',
 		message: 'Besked',
+		messagesCount: 'logbeskeder',
 		searchWithGoogle: 'Søg med Google',
 		searchThisMessageWithGoogle: 'Søg efter denne besked på Google',
 		searchWithBing: 'Søg med Bing',
@@ -2441,6 +2442,7 @@ export default {
 		totalUniqueMessageTypes: 'Samlet antal unikke beskedtyper: %0%',
 		logTypes: 'Log typer',
 		logTypesChartDescription: 'I det valgte datointerval har du dette antal logbeskeder af typen:',
+		viewLogsLabel: 'Vis %0% logs',
 	},
 	clipboard: {
 		labelForCopyAllEntries: 'Kopier %0%',
