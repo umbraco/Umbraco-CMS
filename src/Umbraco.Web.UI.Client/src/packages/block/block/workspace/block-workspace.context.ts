@@ -113,8 +113,8 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 		this.observe(
 			observeMultiple([this.content.values, this.settings.values]),
-			async ([contentValues]) => {
-				this.#renderLabel(contentValues);
+			async ([contentValues, settingsValues]) => {
+				this.#renderLabel(contentValues, settingsValues);
 			},
 			'observeContentForLabelRender',
 		);
@@ -243,11 +243,14 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	#gotLabel(label: string | undefined) {
 		if (label) {
 			this.#labelRender.markdown = label;
-			this.#renderLabel(this.content.getValues());
+			this.#renderLabel(this.content.getValues(), this.settings.getValues());
 		}
 	}
 
-	async #renderLabel(contentValues: Array<UmbBlockDataValueModel> | undefined) {
+	async #renderLabel(
+		contentValues: Array<UmbBlockDataValueModel> | undefined,
+		settingsValues: Array<UmbBlockDataValueModel> | undefined,
+	) {
 		const valueObject = {} as Record<string, unknown>;
 		if (contentValues) {
 			for (const property of contentValues) {
@@ -255,12 +258,22 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			}
 		}
 
+		if (settingsValues) {
+			valueObject['$settings'] = settingsValues;
+		}
+
+		// TODO: Look to add support for `$index`, requires wiring up the block-entry with the workspace. [LK]
+		//valueObject['$index'] = 0;
+
 		this.#labelRender.value = valueObject;
+
 		// Await one animation frame:
 		await new Promise((resolve) => requestAnimationFrame(() => resolve(true)));
-		const result = this.#labelRender.toString();
-		this.#name.setValue(result);
-		this.view.setTitle(result);
+		const prefix = this.getIsNew() === true ? '#general_add' : '#general_edit';
+		const label = this.#labelRender.toString();
+		const title = `${prefix} ${label}`;
+		this.#name.setValue(title);
+		this.view.setTitle(title);
 	}
 
 	#allowNavigateAway = false;
