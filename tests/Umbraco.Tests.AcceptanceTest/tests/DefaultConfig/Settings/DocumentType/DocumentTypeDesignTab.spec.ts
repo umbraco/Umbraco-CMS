@@ -381,7 +381,7 @@ test('can enable validation for a property in a document type', {tag: '@release'
   // Act
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
   await umbracoUi.documentType.clickEditorSettingsButton();
-  await umbracoUi.documentType.selectValidationOption('');
+  await umbracoUi.documentType.selectValidationOption('.+');
   await umbracoUi.documentType.enterRegEx(regex);
   await umbracoUi.documentType.enterRegExMessage(regexMessage);
   await umbracoUi.documentType.clickSubmitButton();
