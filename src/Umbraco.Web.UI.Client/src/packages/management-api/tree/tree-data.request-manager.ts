@@ -244,8 +244,13 @@ export class UmbManagementApiTreeDataRequestManager<
 		let error = undefined;
 
 		if (responseData) {
+			// Ensure items is defined before proceeding
+			if (!Array.isArray(responseData.items)) {
+				return { data: undefined, error: new UmbError('Target was not found within parent') };
+			}
+
 			// The siblings endpoint doesn't know about the parent context, so it will return items that may not have the correct parent
-			const hasValidParents = this.#getTargetResultHasValidParents(responseData?.items, parentUnique);
+			const hasValidParents = this.#getTargetResultHasValidParents(responseData.items, parentUnique);
 			// IF all parents match the request args we return the data
 			if (hasValidParents) {
 				data = {
