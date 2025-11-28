@@ -6,7 +6,6 @@ public class PhysicalFileSystemTreeService : FileSystemTreeServiceBase, IPhysica
 {
     private static readonly string[] _allowedRootFolders = { $"{Path.DirectorySeparatorChar}App_Plugins", $"{Path.DirectorySeparatorChar}wwwroot" };
 
-
     private readonly IFileSystem _physicalFileSystem;
 
     protected override IFileSystem FileSystem => _physicalFileSystem;
