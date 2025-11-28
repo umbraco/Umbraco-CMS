@@ -51,12 +51,13 @@ public class PhysicalFileSystemTreeServiceTests : FileSystemTreeServiceTestsBase
     {
         var service = CreateService();
 
-        var path = Path.Join("tests", $"file5{FileExtension}");
-        FileSystemTreeItemPresentationModel[] treeModels = service.GetAncestorModels(path, true);
+        FileSystemTreeItemPresentationModel[] treeModels = service.GetAncestorModels(Path.Join("wwwroot", "css", "test.css"), true);
 
         Assert.IsNotEmpty(treeModels);
-        Assert.AreEqual(treeModels.Length, 2);
-        Assert.AreEqual(treeModels[0].Name, "tests");
+        Assert.AreEqual(treeModels.Length, 3);
+        Assert.AreEqual(treeModels[0].Name, "wwwroot");
+        Assert.AreEqual(treeModels[1].Name, "css");
+        Assert.AreEqual(treeModels[2].Name, "test.css");
     }
 
     [Test]
