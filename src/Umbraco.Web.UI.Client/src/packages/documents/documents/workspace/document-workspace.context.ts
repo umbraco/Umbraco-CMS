@@ -72,6 +72,7 @@ export class UmbDocumentWorkspaceContext
 	#documentSegmentRepository = new UmbDocumentSegmentRepository(this);
 	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 	#localize = new UmbLocalizationController(this);
+	#previewWindow: WindowProxy | null = null;
 
 	constructor(host: UmbControllerHost) {
 		super(host, {
@@ -343,7 +344,13 @@ export class UmbDocumentWorkspaceContext
 			await this.performCreateOrUpdate(variantIds, saveData);
 		}
 
-		// Get the preview URL from the server.
+		// Check if preview window is still open - if so, just focus it and let SignalR handle the refresh
+		if (this.#previewWindow && !this.#previewWindow.closed) {
+			this.#previewWindow.focus();
+			return;
+		}
+
+		// Preview not open, create new preview session and open window
 		const previewRepository = new UmbPreviewRepository(this);
 		const previewUrlData = await previewRepository.getPreviewUrl(
 			unique,
@@ -356,8 +363,8 @@ export class UmbDocumentWorkspaceContext
 			// Add cache-busting parameter to ensure the preview tab reloads with the new preview session
 			const previewUrl = new URL(previewUrlData.url, window.location.origin);
 			previewUrl.searchParams.set('rnd', Date.now().toString());
-			const previewWindow = window.open(previewUrl.toString(), `umbpreview-${unique}`);
-			previewWindow?.focus();
+			this.#previewWindow = window.open(previewUrl.toString(), `umbpreview-${unique}`);
+			this.#previewWindow?.focus();
 			return;
 		}
 
