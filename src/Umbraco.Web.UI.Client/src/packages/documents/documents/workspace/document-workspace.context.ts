@@ -369,7 +369,7 @@ export class UmbDocumentWorkspaceContext
 
 		if (previewUrlData.url) {
 			// Add cache-busting parameter to ensure the preview tab reloads with the new preview session
-			const previewUrl = new URL(previewUrlData.url, window.location.origin);
+			const previewUrl = new URL(previewUrlData.url, window.document.baseURI);
 			previewUrl.searchParams.set('rnd', Date.now().toString());
 			this.#previewWindow = window.open(previewUrl.toString(), `umbpreview-${unique}`);
 			this.#previewWindowDocumentId = unique;
