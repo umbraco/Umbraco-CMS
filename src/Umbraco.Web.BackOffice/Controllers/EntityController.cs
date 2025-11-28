@@ -879,12 +879,13 @@ public class EntityController : UmbracoAuthorizedJsonController
                 startNodeIds.Contains(Constants.System.Root) == false &&
                 ignoreUserStartNodes == false)
             {
-                entities = _entityService.GetAll(objectType.Value, startNodeIds)
+                var entitiesList = _entityService.GetAll(objectType.Value, startNodeIds).ToList();
+                var pagedEntities = entitiesList
                     .Skip((pageNumber - 1) * pageSize)
                     .Take(pageSize);
-                return new PagedResult<EntityBasic>(startNodeIds.Length, pageNumber, pageSize)
+                return new PagedResult<EntityBasic>(entitiesList.Count, pageNumber, pageSize)
                 {
-                    Items = entities
+                    Items = pagedEntities
                         .Select(source => MapEntityBasic(source, culture))
                         .WhereNotNull(),
                 };
