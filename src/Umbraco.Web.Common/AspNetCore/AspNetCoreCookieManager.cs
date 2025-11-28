@@ -18,7 +18,6 @@ public class AspNetCoreCookieManager : ICookieManager
         _httpContextAccessor = httpContextAccessor;
 
     /// <inheritdoc/>
-    [Obsolete("Please use the overload that accepts httpOnly, secure and sameSiteMode parameters. This will be removed in Umbraco 19.")]
     public void ExpireCookie(string cookieName)
     {
         HttpContext? httpContext = _httpContextAccessor.HttpContext;
@@ -28,20 +27,8 @@ public class AspNetCoreCookieManager : ICookieManager
             return;
         }
 
-        var cookieValue = httpContext.Request.Cookies[cookieName];
-
-        httpContext.Response.Cookies.Append(
-            cookieName,
-            cookieValue ?? string.Empty,
-            new CookieOptions
-            {
-                Expires = DateTime.Now.AddYears(-1),
-            });
+        httpContext.Response.Cookies.Delete(cookieName);
     }
-
-    /// <inheritdoc/>
-    public void ExpireCookie(string cookieName, bool httpOnly, bool secure, string sameSiteMode)
-        => SetCookieValue(cookieName, string.Empty, httpOnly, secure, sameSiteMode, DateTimeOffset.Now.AddYears(-1));
 
     /// <inheritdoc/>
     public string? GetCookieValue(string cookieName) => _httpContextAccessor.HttpContext?.Request.Cookies[cookieName];

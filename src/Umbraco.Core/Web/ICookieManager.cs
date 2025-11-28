@@ -9,23 +9,7 @@ public interface ICookieManager
     /// Expires the cookie with the specified name.
     /// </summary>
     /// <param name="cookieName">The cookie name.</param>
-    [Obsolete("Please use the overload that accepts httpOnly, secure and sameSiteMode parameters. This will be removed in Umbraco 19.")]
     void ExpireCookie(string cookieName);
-
-    /// <summary>
-    /// Expires the cookie with the specified name and security attributes.
-    /// </summary>
-    /// <param name="cookieName">The cookie name.</param>
-    /// <param name="httpOnly">Indicates whether the cookie should be marked as HTTP only.</param>
-    /// <param name="secure">Indicates whether the cookie should be marked as secure.</param>
-    /// <param name="sameSiteMode">Indicates the cookie's same site status.</param>
-    /// <remarks>
-    /// The value provided by <paramref name="sameSiteMode"/> should match the enum values available from
-    /// Microsoft.AspNetCore.Http.SameSiteMode.
-    /// This hasn't been used as the parameter directly to avoid a dependency on Microsoft.AspNetCore.Http in
-    /// the core project.
-    /// </remarks>
-    void ExpireCookie(string cookieName, bool httpOnly, bool secure, string sameSiteMode);
 
     /// <summary>
     /// Gets the value of the cookie with the specified name.

@@ -45,13 +45,7 @@ public class PreviewService : IPreviewService
 
     public Task EndPreviewAsync()
     {
-         // Expire the cookie with the same attributes used when creating it
-         // This ensures the browser properly removes the cookie
-         _cookieManager.ExpireCookie(
-             Constants.Web.PreviewCookieName,
-             httpOnly: true,
-             secure: true,
-             sameSiteMode: "None");
+         _cookieManager.ExpireCookie(Constants.Web.PreviewCookieName);
          return Task.CompletedTask;
     }
 
