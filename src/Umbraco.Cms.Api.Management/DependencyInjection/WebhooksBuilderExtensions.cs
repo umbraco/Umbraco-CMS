@@ -17,7 +17,7 @@ internal static class WebhooksBuilderExtensions
         builder.AddMapDefinition<WebhookEventMapDefinition>();
 
         // We have to use TryAdd here, as if they are registered by the delivery API, we don't want to register them
-        // Delivery api will also overwrite these IF it is enabled.
+        // Delivery API will also overwrite these IF it is enabled.
         builder.Services.TryAddScoped<IOutputExpansionStrategy, ElementOnlyOutputExpansionStrategy>();
         builder.Services.TryAddSingleton<IOutputExpansionStrategyAccessor, RequestContextOutputExpansionStrategyAccessor>();
 
