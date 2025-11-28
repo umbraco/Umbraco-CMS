@@ -596,7 +596,9 @@ angular.module("umbraco")
             function syncPagination(opts, data) {
                 var d = data || {};
                 opts.pageNumber = d.pageNumber;
-                opts.pageSize   = d.pageSize;
+                if (d.pageSize > 0) {
+                    opts.pageSize = d.pageSize;
+                }
                 opts.totalItems = d.totalItems;
                 opts.totalPages = d.totalPages;
             }
