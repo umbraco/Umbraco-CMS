@@ -1,7 +1,6 @@
 import { UmbEntityCollectionItemElementBase } from '../umb-entity-collection-item-element-base.element.js';
+import { UmbDefaultCollectionItemRefElement } from './default-collection-item-ref.element.js';
 import { css, customElement, html } from '@umbraco-cms/backoffice/external/lit';
-
-import './default-collection-item-ref.element.js';
 
 @customElement('umb-entity-collection-item-ref')
 export class UmbEntityCollectionItemRefElement extends UmbEntityCollectionItemElementBase {
@@ -10,7 +9,7 @@ export class UmbEntityCollectionItemRefElement extends UmbEntityCollectionItemEl
 	}
 
 	protected createFallbackElement(): HTMLElement {
-		return document.createElement('umb-default-collection-item-ref');
+		return new UmbDefaultCollectionItemRefElement();
 	}
 
 	protected getPathAddendum(entityType: string, unique: string): string {
