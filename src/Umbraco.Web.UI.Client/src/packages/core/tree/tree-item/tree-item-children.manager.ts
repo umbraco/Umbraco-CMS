@@ -528,10 +528,14 @@ export class UmbTreeItemChildrenManager<
 	 * - Use target pagination
 	 * - Retry with new targets
 	 * - Call #resetChildren (preventing recursion)
+	 * - Throw errors (fails gracefully)
 	 */
 	async #loadChildrenWithOffsetPagination(): Promise<void> {
 		const repository = this.#treeContext?.getRepository();
-		if (!repository) throw new Error('Could not request children, repository is missing');
+		if (!repository) {
+			// Terminal fallback - fail silently rather than throwing
+			return;
+		}
 
 		this.#isLoading.setValue(true);
 
@@ -566,8 +570,6 @@ export class UmbTreeItemChildrenManager<
 			this.#children.setValue(items);
 			this.setHasChildren(data.total > 0);
 			this.offsetPagination.setTotalItems(data.total);
-			this.targetPagination.setCurrentItems(items);
-			this.targetPagination.setTotalItems(data.total);
 		}
 		// Note: On error, we simply don't update state - UI shows stale data
 		// This is the terminal fallback, no further recovery
