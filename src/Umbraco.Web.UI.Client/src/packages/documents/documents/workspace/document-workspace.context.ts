@@ -72,7 +72,8 @@ export class UmbDocumentWorkspaceContext
 	#documentSegmentRepository = new UmbDocumentSegmentRepository(this);
 	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 	#localize = new UmbLocalizationController(this);
-	#previewWindow: WindowProxy | null = null;
+	#previewWindow?: WindowProxy | null = null;
+	#previewWindowDocumentId?: string | null = null;
 
 	constructor(host: UmbControllerHost) {
 		super(host, {
@@ -344,15 +345,17 @@ export class UmbDocumentWorkspaceContext
 			await this.performCreateOrUpdate(variantIds, saveData);
 		}
 
-		// Check if preview window is still open - if so, just focus it and let SignalR handle the refresh
+		// Check if preview window is still open and showing the same document
+		// If so, just focus it and let SignalR handle the refresh
 		try {
-			if (this.#previewWindow && !this.#previewWindow.closed) {
+			if (this.#previewWindow && !this.#previewWindow.closed && this.#previewWindowDocumentId === unique) {
 				this.#previewWindow.focus();
 				return;
 			}
 		} catch {
 			// Window reference is stale, continue to create new preview session
 			this.#previewWindow = null;
+			this.#previewWindowDocumentId = null;
 		}
 
 		// Preview not open, create new preview session and open window
@@ -369,6 +372,7 @@ export class UmbDocumentWorkspaceContext
 			const previewUrl = new URL(previewUrlData.url, window.location.origin);
 			previewUrl.searchParams.set('rnd', Date.now().toString());
 			this.#previewWindow = window.open(previewUrl.toString(), `umbpreview-${unique}`);
+			this.#previewWindowDocumentId = unique;
 			this.#previewWindow?.focus();
 			return;
 		}
