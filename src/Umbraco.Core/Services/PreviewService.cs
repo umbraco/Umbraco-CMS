@@ -34,7 +34,10 @@ public class PreviewService : IPreviewService
 
         if (attempt.Success)
         {
-            _cookieManager.SetCookieValue(Constants.Web.PreviewCookieName, attempt.Result!, true, true, "None");
+            // Preview cookies must use SameSite=None and Secure=true to support cross-site scenarios
+            // (e.g., when the backoffice is on a different domain/port than the frontend during development).
+            // SameSite=None requires Secure=true per browser specifications.
+            _cookieManager.SetCookieValue(Constants.Web.PreviewCookieName, attempt.Result!, httpOnly: true, secure: true, sameSiteMode: "None", expires: null);
         }
 
         return attempt.Success;
@@ -42,7 +45,13 @@ public class PreviewService : IPreviewService
 
     public Task EndPreviewAsync()
     {
-         _cookieManager.ExpireCookie(Constants.Web.PreviewCookieName);
+         // Expire the cookie with the same attributes used when creating it
+         // This ensures the browser properly removes the cookie
+         _cookieManager.ExpireCookie(
+             Constants.Web.PreviewCookieName,
+             httpOnly: true,
+             secure: true,
+             sameSiteMode: "None");
          return Task.CompletedTask;
     }
 

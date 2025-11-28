@@ -345,9 +345,14 @@ export class UmbDocumentWorkspaceContext
 		}
 
 		// Check if preview window is still open - if so, just focus it and let SignalR handle the refresh
-		if (this.#previewWindow && !this.#previewWindow.closed) {
-			this.#previewWindow.focus();
-			return;
+		try {
+			if (this.#previewWindow && !this.#previewWindow.closed) {
+				this.#previewWindow.focus();
+				return;
+			}
+		} catch {
+			// Window reference is stale, continue to create new preview session
+			this.#previewWindow = null;
 		}
 
 		// Preview not open, create new preview session and open window

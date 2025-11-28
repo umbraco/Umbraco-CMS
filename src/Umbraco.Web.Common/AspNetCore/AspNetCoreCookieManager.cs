@@ -18,6 +18,7 @@ public class AspNetCoreCookieManager : ICookieManager
         _httpContextAccessor = httpContextAccessor;
 
     /// <inheritdoc/>
+    [Obsolete("Please use the overload that accepts httpOnly, secure and sameSiteMode parameters. This will be removed in Umbraco 19.")]
     public void ExpireCookie(string cookieName)
     {
         HttpContext? httpContext = _httpContextAccessor.HttpContext;
@@ -39,21 +40,34 @@ public class AspNetCoreCookieManager : ICookieManager
     }
 
     /// <inheritdoc/>
+    public void ExpireCookie(string cookieName, bool httpOnly, bool secure, string sameSiteMode)
+        => SetCookieValue(cookieName, string.Empty, httpOnly, secure, sameSiteMode, DateTimeOffset.Now.AddYears(-1));
+
+    /// <inheritdoc/>
     public string? GetCookieValue(string cookieName) => _httpContextAccessor.HttpContext?.Request.Cookies[cookieName];
 
     /// <inheritdoc/>
+    [Obsolete("Please use the overload that accepts an expires parameter. This will be removed in Umbraco 19.")]
     public void SetCookieValue(string cookieName, string value, bool httpOnly, bool secure, string sameSiteMode)
+        => SetCookieValue(cookieName, value, httpOnly, secure, sameSiteMode, null);
+
+    /// <inheritdoc/>
+    public void SetCookieValue(string cookieName, string value, bool httpOnly, bool secure, string sameSiteMode, DateTimeOffset? expires)
     {
         SameSiteMode sameSiteModeValue = ParseSameSiteMode(sameSiteMode);
-        _httpContextAccessor.HttpContext?.Response.Cookies.Append(
-            cookieName,
-            value,
-            new CookieOptions
-            {
-                HttpOnly = httpOnly,
-                SameSite = sameSiteModeValue,
-                Secure = secure,
-            });
+        var options = new CookieOptions
+        {
+            HttpOnly = httpOnly,
+            SameSite = sameSiteModeValue,
+            Secure = secure,
+        };
+
+        if (expires.HasValue)
+        {
+            options.Expires = expires.Value;
+        }
+
+        _httpContextAccessor.HttpContext?.Response.Cookies.Append(cookieName, value, options);
     }
 
     private static SameSiteMode ParseSameSiteMode(string sameSiteMode) =>
