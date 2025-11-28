@@ -37,7 +37,7 @@ public class PreviewService : IPreviewService
             // Preview cookies must use SameSite=None and Secure=true to support cross-site scenarios
             // (e.g., when the backoffice is on a different domain/port than the frontend during development).
             // SameSite=None requires Secure=true per browser specifications.
-            _cookieManager.SetCookieValue(Constants.Web.PreviewCookieName, attempt.Result!, httpOnly: true, secure: true, sameSiteMode: "None", expires: null);
+            _cookieManager.SetCookieValue(Constants.Web.PreviewCookieName, attempt.Result!, httpOnly: true, secure: true, sameSiteMode: "None");
         }
 
         return attempt.Success;
