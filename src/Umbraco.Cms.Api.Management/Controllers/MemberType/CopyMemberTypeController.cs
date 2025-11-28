@@ -20,6 +20,12 @@ public class CopyMemberTypeController : MemberTypeControllerBase
     public CopyMemberTypeController(IMemberTypeService memberTypeService)
         => _memberTypeService = memberTypeService;
 
+    [Obsolete("Please use the overload that includes all parameters. Scheduled for removal in Umbraco 19.")]
+    [NonAction]
+    public async Task<IActionResult> Copy(
+        CancellationToken cancellationToken,
+        Guid id) => await Copy(cancellationToken, id, null);
+
     [HttpPost("{id:guid}/copy")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status201Created)]
