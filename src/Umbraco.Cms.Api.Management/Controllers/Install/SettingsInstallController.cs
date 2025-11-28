@@ -12,16 +12,23 @@ namespace Umbraco.Cms.Api.Management.Controllers.Install;
 [ApiVersion("1.0")]
 public class SettingsInstallController : InstallControllerBase
 {
-    private readonly InstallHelper _installHelper;
     private readonly IInstallSettingsFactory _installSettingsFactory;
     private readonly IUmbracoMapper _mapper;
 
+    [Obsolete("Please use the constructor without the InstallHelper parameter. This will be removed in Umbraco 19.")]
     public SettingsInstallController(
         InstallHelper installHelper,
         IInstallSettingsFactory installSettingsFactory,
         IUmbracoMapper mapper)
     {
-        _installHelper = installHelper;
+        _installSettingsFactory = installSettingsFactory;
+        _mapper = mapper;
+    }
+
+    public SettingsInstallController(
+        IInstallSettingsFactory installSettingsFactory,
+        IUmbracoMapper mapper)
+    {
         _installSettingsFactory = installSettingsFactory;
         _mapper = mapper;
     }
@@ -32,9 +39,6 @@ public class SettingsInstallController : InstallControllerBase
     [ProducesResponseType(typeof(InstallSettingsResponseModel), StatusCodes.Status200OK)]
     public async Task<IActionResult> Settings(CancellationToken cancellationToken)
     {
-        // Register that the install has started
-        await _installHelper.SetInstallStatusAsync(false, string.Empty);
-
         InstallSettingsModel installSettings = _installSettingsFactory.GetInstallSettings();
         InstallSettingsResponseModel responseModel = _mapper.Map<InstallSettingsResponseModel>(installSettings)!;
 
