@@ -128,7 +128,7 @@ const collectDictionaryIcons = async () => {
 };
 
 const collectDiskIcons = async (icons) => {
-	const iconPaths = await glob(`${umbracoSvgDirectory}/icon-*.svg`);
+	const iconPaths = await glob(`${umbracoSvgDirectory}/legacy/icon-*.svg`);
 
 	iconPaths.forEach((path) => {
 		const rawData = readFileSync(path);
