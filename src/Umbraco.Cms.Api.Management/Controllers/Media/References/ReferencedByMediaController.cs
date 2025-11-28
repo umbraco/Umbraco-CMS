@@ -1,10 +1,14 @@
 using Asp.Versioning;
+using Lucene.Net.Search;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.TrackedReferences;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Media.References;
@@ -14,11 +18,28 @@ public class ReferencedByMediaController : MediaControllerBase
 {
     private readonly ITrackedReferencesService _trackedReferencesService;
     private readonly IRelationTypePresentationFactory _relationTypePresentationFactory;
+    private readonly IEntityService _entityService;
 
-    public ReferencedByMediaController(ITrackedReferencesService trackedReferencesService, IRelationTypePresentationFactory relationTypePresentationFactory)
+    [Obsolete("Please use the constructor will all parameters. Scheduled for removal in Umbraco 19.")]
+    public ReferencedByMediaController(
+        ITrackedReferencesService trackedReferencesService,
+        IRelationTypePresentationFactory relationTypePresentationFactory)
+        : this(
+              trackedReferencesService,
+              relationTypePresentationFactory,
+              StaticServiceProvider.Instance.GetRequiredService<IEntityService>())
+    {
+    }
+
+    [ActivatorUtilitiesConstructor]
+    public ReferencedByMediaController(
+        ITrackedReferencesService trackedReferencesService,
+        IRelationTypePresentationFactory relationTypePresentationFactory,
+        IEntityService entityService)
     {
         _trackedReferencesService = trackedReferencesService;
         _relationTypePresentationFactory = relationTypePresentationFactory;
+        _entityService = entityService;
     }
 
     /// <summary>
@@ -37,6 +58,12 @@ public class ReferencedByMediaController : MediaControllerBase
         int skip = 0,
         int take = 20)
     {
+        IEntitySlim? entity = _entityService.Get(id, UmbracoObjectTypes.Media);
+        if (entity is null)
+        {
+            return NotFound();
+        }
+
         PagedModel<RelationItemModel> relationItems = await _trackedReferencesService.GetPagedRelationsForItemAsync(id, skip, take, true);
 
         var pagedViewModel = new PagedViewModel<IReferenceResponseModel>
