@@ -1,6 +1,7 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Infrastructure.Install;
 using Umbraco.Cms.Api.Management.ViewModels.Installer;
@@ -20,11 +21,11 @@ public class SettingsInstallController : InstallControllerBase
         InstallHelper installHelper,
         IInstallSettingsFactory installSettingsFactory,
         IUmbracoMapper mapper)
+        : this(installSettingsFactory, mapper)
     {
-        _installSettingsFactory = installSettingsFactory;
-        _mapper = mapper;
     }
 
+    [ActivatorUtilitiesConstructor]
     public SettingsInstallController(
         IInstallSettingsFactory installSettingsFactory,
         IUmbracoMapper mapper)
