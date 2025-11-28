@@ -160,11 +160,11 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 		return this._permitted
 			? this._permitted.length > 0
 				? repeat(this._permitted, (ext) => ext.alias, this.#renderExtension)
-				: this.#renderNoting()
+				: this.#renderNothing()
 			: nothing;
 	}
 
-	#renderNoting() {
+	#renderNothing() {
 		return this.fallbackRenderMethod ? this.fallbackRenderMethod() : html`<slot></slot>`;
 	}
 
