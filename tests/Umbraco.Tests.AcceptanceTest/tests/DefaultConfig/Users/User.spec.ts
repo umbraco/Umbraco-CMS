@@ -555,7 +555,7 @@ test('can filter by user groups', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.user.doesUserSectionContainUserWithText(defaultUserGroupName);
 });
 
-test('can order by newest user', async ({page, umbracoApi, umbracoUi}) => {
+test('can order by newest user', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
   await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
