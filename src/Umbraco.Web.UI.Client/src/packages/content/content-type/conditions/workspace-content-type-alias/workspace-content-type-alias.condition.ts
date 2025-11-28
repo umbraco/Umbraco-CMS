@@ -1,8 +1,8 @@
-import { UMB_PROPERTY_STRUCTURE_WORKSPACE_CONTEXT } from '../contexts/index.js';
 import type { UmbWorkspaceContentTypeAliasConditionConfig } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbConditionControllerArguments, UmbExtensionCondition } from '@umbraco-cms/backoffice/extension-api';
 import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_PROPERTY_STRUCTURE_WORKSPACE_CONTEXT } from '../../contexts/property-structure-workspace.context-token.js';
 
 const ObserveSymbol = Symbol();
 
@@ -44,10 +44,3 @@ export class UmbWorkspaceContentTypeAliasCondition
 		}
 	}
 }
-
-export const manifest: UmbExtensionManifest = {
-	type: 'condition',
-	name: 'Workspace Content Type Alias Condition',
-	alias: 'Umb.Condition.WorkspaceContentTypeAlias',
-	api: UmbWorkspaceContentTypeAliasCondition,
-};
