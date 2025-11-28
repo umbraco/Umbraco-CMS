@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.Services.Trees;
 
 public class PhysicalFileSystemTreeServiceTests : FileSystemTreeServiceTestsBase
 {
-    protected override string FileExtension { get; set; } = "{FileExtension}";
+    protected override string FileExtension { get; set; } = string.Empty;
 
     protected override string FileSystemPath => "/";
 

@@ -23,12 +23,12 @@ public class PhysicalFileSystemTreeService : FileSystemTreeServiceBase, IPhysica
 
     /// <inheritdoc/>
     public override string[] GetFiles(string path)
-        => IsTreeRootPath(path) || IsAllowedPath(path) == false
-            ? Array.Empty<string>()
+        => IsTreeRootPath(path) || IsAllowedPath(path) is false
+            ? []
             : base.GetFiles(path);
 
-    private bool IsTreeRootPath(string path) => path == Path.DirectorySeparatorChar.ToString();
+    private static bool IsTreeRootPath(string path) => path == Path.DirectorySeparatorChar.ToString();
 
-    private bool IsAllowedPath(string path) => _allowedRootFolders.Contains(path) || _allowedRootFolders.Any(folder => path.StartsWith($"{folder}{Path.DirectorySeparatorChar}"));
+    private static bool IsAllowedPath(string path) => _allowedRootFolders.Contains(path) || _allowedRootFolders.Any(folder => path.StartsWith($"{folder}{Path.DirectorySeparatorChar}"));
 
 }
