@@ -353,7 +353,10 @@ export class UmbDocumentWorkspaceContext
 		);
 
 		if (previewUrlData.url) {
-			const previewWindow = window.open(previewUrlData.url, `umbpreview-${unique}`);
+			// Add cache-busting parameter to ensure the preview tab reloads with the new preview session
+			const previewUrl = new URL(previewUrlData.url, window.location.origin);
+			previewUrl.searchParams.set('rnd', Date.now().toString());
+			const previewWindow = window.open(previewUrl.toString(), `umbpreview-${unique}`);
 			previewWindow?.focus();
 			return;
 		}
