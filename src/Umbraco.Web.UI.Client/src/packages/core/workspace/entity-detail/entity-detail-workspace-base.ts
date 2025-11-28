@@ -380,7 +380,10 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 * @returns { boolean} true if the workspace is navigating away.
 	 * @memberof UmbEntityWorkspaceContextBase
 	 */
-	protected _checkWillNavigateAway(newUrl: string): boolean {
+	protected _checkWillNavigateAway(newUrl: string | URL): boolean {
+		if (newUrl instanceof URL) {
+			newUrl = newUrl.href;
+		}
 		return !newUrl.includes(this.routes.getActiveLocalPath());
 	}
 
