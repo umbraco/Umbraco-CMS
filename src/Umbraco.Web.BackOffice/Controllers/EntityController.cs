@@ -847,6 +847,21 @@ public class EntityController : UmbracoAuthorizedJsonController
             return NotFound();
         }
 
+        EntityBasic? MapEntityBasic(IEntitySlim source, string? culture)
+        {
+            EntityBasic? target = _umbracoMapper.Map<IEntitySlim, EntityBasic>(source, context =>
+            {
+                context.SetCulture(culture);
+            });
+
+            if (target is not null)
+            {
+                target.AdditionalData["hasChildren"] = source.HasChildren;
+            }
+
+            return target;
+        }
+
         UmbracoObjectTypes? objectType = ConvertToObjectType(type);
         if (objectType.HasValue)
         {
@@ -857,12 +872,25 @@ public class EntityController : UmbracoAuthorizedJsonController
 
             var ignoreUserStartNodes = IsDataTypeIgnoringUserStartNodes(dataTypeKey);
 
+            var culture = ClientCulture();
+
             // root is special: we reduce it to start nodes if the user's start node is not the default, then we need to return their start nodes
             if (id == Constants.System.Root && startNodeIds.Length > 0 &&
-                startNodeIds.Contains(Constants.System.Root) == false && !ignoreUserStartNodes)
+                startNodeIds.Contains(Constants.System.Root) == false &&
+                ignoreUserStartNodes == false)
             {
-                return new PagedResult<EntityBasic>(0, 0, 0);
+                var startNodeEntities = _entityService.GetAll(objectType.Value, startNodeIds).ToList();
+                IEnumerable<IEntitySlim> pagedStartNodeEntities = startNodeEntities
+                    .Skip((pageNumber - 1) * pageSize)
+                    .Take(pageSize);
+                return new PagedResult<EntityBasic>(startNodeEntities.Count, pageNumber, pageSize)
+                {
+                    Items = pagedStartNodeEntities
+                        .Select(source => MapEntityBasic(source, culture))
+                        .WhereNotNull(),
+                };
             }
+
             //adding multiple conditions ,considering id,key & name as filter param
             //for id as int
             int.TryParse(filter, out int filterAsIntId);
@@ -882,13 +910,11 @@ public class EntityController : UmbracoAuthorizedJsonController
                       || x.Key == filterAsGuid),
                 Ordering.By(orderBy, orderDirection));
 
-
             if (totalRecords == 0)
             {
                 return new PagedResult<EntityBasic>(0, 0, 0);
             }
 
-            var culture = ClientCulture();
             var pagedResult = new PagedResult<EntityBasic>(totalRecords, pageNumber, pageSize)
             {
                 Items = entities
@@ -898,22 +924,8 @@ public class EntityController : UmbracoAuthorizedJsonController
                                      (objectType == UmbracoObjectTypes.Document || objectType == UmbracoObjectTypes.Media) is false ||
                                      (ContentPermissions.IsInBranchOfStartNode(entity.Path, startNodeIds, startNodePaths, out var hasPathAccess) &&
                                      hasPathAccess))
-                    .Select(source =>
-                    {
-                        EntityBasic? target = _umbracoMapper.Map<IEntitySlim, EntityBasic>(source, context =>
-                        {
-                            context.SetCulture(culture);
-                            context.SetCulture(culture);
-                        });
-
-                        if (target is not null)
-                        {
-                            //TODO: Why is this here and not in the mapping?
-                            target.AdditionalData["hasChildren"] = source.HasChildren;
-                        }
-
-                        return target;
-                    }).WhereNotNull()
+                    .Select(source => MapEntityBasic(source, culture))
+                    .WhereNotNull(),
             };
 
             return pagedResult;
