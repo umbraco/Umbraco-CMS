@@ -36,21 +36,23 @@ public abstract class FileSystemTreeServiceTestsBase : UmbracoIntegrationTest
             GetStylesheetsFileSystem(),
             GetScriptsFileSystem(),
             null);
+
+        CreateFiles();
+    }
+
+    protected virtual void CreateFiles()
+    {
         for (int i = 0; i < 10; i++)
         {
-            using var stream = CreateStream(Path.Join("tests"));
+            using var stream = CreateStream();
             TestFileSystem.AddFile($"file{i}{FileExtension}", stream);
         }
     }
 
-    protected static Stream CreateStream(string contents = null)
+    protected static Stream CreateStream()
     {
-        if (string.IsNullOrEmpty(contents))
-        {
-            contents = "/* test */";
-        }
-
-        var bytes = Encoding.UTF8.GetBytes(contents);
+        const string FileContent = "/* test */";
+        var bytes = Encoding.UTF8.GetBytes(FileContent);
         return new MemoryStream(bytes);
     }
 
