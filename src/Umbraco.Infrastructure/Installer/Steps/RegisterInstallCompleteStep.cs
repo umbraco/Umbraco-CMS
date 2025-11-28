@@ -9,6 +9,7 @@ public class RegisterInstallCompleteStep : StepBase, IInstallStep, IUpgradeStep
 {
     [Obsolete("Please use the constructor without parameters. This will be removed in Umbraco 19.")]
     public RegisterInstallCompleteStep(InstallHelper installHelper)
+        : this()
     {
     }
 
