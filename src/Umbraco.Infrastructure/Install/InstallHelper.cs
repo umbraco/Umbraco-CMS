@@ -32,9 +32,6 @@ namespace Umbraco.Cms.Infrastructure.Install
         /// <summary>
         ///     This method used to send installer telemetry to Our.Umbraco.com but no longer does anything and will be removed in Umbraco 19.
         /// </summary>
-        /// <param name="isCompleted"></param>
-        /// <param name="errorMsg"></param>
-        /// <returns></returns>
         [Obsolete("SetInstallStatusAsync no longer has any function and will be removed in Umbraco 19.")]
         public Task SetInstallStatusAsync(bool isCompleted, string errorMsg) => Task.CompletedTask;
     }
