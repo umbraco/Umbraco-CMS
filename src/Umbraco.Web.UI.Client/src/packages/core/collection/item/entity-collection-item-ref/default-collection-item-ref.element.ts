@@ -40,7 +40,23 @@ export class UmbDefaultCollectionItemRefElement extends UmbLitElement implements
 	override render() {
 		if (!this.item) return nothing;
 
-		return html`<div>MY COLLECTION ITEM REF ELEMENT</div>`;
+		return html` <uui-ref-node
+			name=${this.item.name ?? `${getItemFallbackName(this.item)}`}
+			@selected=${this.#onSelected}
+			@deselected=${this.#onDeselected}
+			?selectable=${this.selectable}
+			?select-only=${this.selectOnly}
+			?selected=${this.selected}
+			?disabled=${this.disabled}
+			href=${this.href}>
+			<slot name="actions" slot="actions"></slot>
+			${this.#renderIcon(this.item)}
+		</uui-ref-node>`;
+	}
+
+	#renderIcon(item: UmbCollectionItemModel) {
+		const icon = item.icon || getItemFallbackIcon();
+		return html`<umb-icon slot="icon" name=${icon}></umb-icon>`;
 	}
 }
 
