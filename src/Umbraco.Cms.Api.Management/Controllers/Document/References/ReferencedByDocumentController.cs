@@ -19,7 +19,7 @@ public class ReferencedByDocumentController : DocumentControllerBase
     private readonly IRelationTypePresentationFactory _relationTypePresentationFactory;
     private readonly IEntityService _entityService;
 
-    [Obsolete("Please use the constructor will all parameters. Scheduled for removal in Umbraco 19.")]
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
     public ReferencedByDocumentController(
         ITrackedReferencesService trackedReferencesService,
         IRelationTypePresentationFactory relationTypePresentationFactory)

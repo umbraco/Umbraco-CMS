@@ -20,7 +20,7 @@ public class ReferencedDescendantsMediaController : MediaControllerBase
     private readonly IUmbracoMapper _umbracoMapper;
     private readonly IEntityService _entityService;
 
-    [Obsolete("Please use the constructor will all parameters. Scheduled for removal in Umbraco 19.")]
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
     public ReferencedDescendantsMediaController(
         ITrackedReferencesService trackedReferencesSkipTakeService,
         IUmbracoMapper umbracoMapper)
@@ -35,7 +35,7 @@ public class ReferencedDescendantsMediaController : MediaControllerBase
     public ReferencedDescendantsMediaController(
         ITrackedReferencesService trackedReferencesSkipTakeService,
         IUmbracoMapper umbracoMapper,
-        IEntityService entityService )
+        IEntityService entityService)
     {
         _trackedReferencesSkipTakeService = trackedReferencesSkipTakeService;
         _umbracoMapper = umbracoMapper;

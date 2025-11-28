@@ -1,5 +1,4 @@
 using Asp.Versioning;
-using Lucene.Net.Search;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,7 +19,7 @@ public class ReferencedByMediaController : MediaControllerBase
     private readonly IRelationTypePresentationFactory _relationTypePresentationFactory;
     private readonly IEntityService _entityService;
 
-    [Obsolete("Please use the constructor will all parameters. Scheduled for removal in Umbraco 19.")]
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
     public ReferencedByMediaController(
         ITrackedReferencesService trackedReferencesService,
         IRelationTypePresentationFactory relationTypePresentationFactory)
