@@ -21,7 +21,7 @@ public class RegisterInstallCompleteStep : StepBase, IInstallStep, IUpgradeStep
 
     public Task<Attempt<InstallationResult>> ExecuteAsync() => Execute();
 
-    private async Task<Attempt<InstallationResult>> Execute() => Success();
+    private Task<Attempt<InstallationResult>> Execute() => Task.FromResult(Success());
 
     public Task<bool> RequiresExecutionAsync(InstallData _) => ShouldExecute();
 
