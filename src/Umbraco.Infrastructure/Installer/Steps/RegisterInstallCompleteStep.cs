@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Infrastructure.Installer.Steps;
 
 public class RegisterInstallCompleteStep : StepBase, IInstallStep, IUpgradeStep
 {
-    [Obsolete("Please use the constructor without parameters. This will be removed in Umbraco 19.")]
+    [Obsolete("Please use the constructor without parameters. Scheduled for removal in Umbraco 19.")]
     public RegisterInstallCompleteStep(InstallHelper installHelper)
         : this()
     {

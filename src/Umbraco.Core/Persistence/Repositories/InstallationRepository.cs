@@ -13,7 +13,5 @@ public class InstallationRepository : IInstallationRepository
     }
 
     [Obsolete("This method no longer has any function and will be removed in Umbraco 19.")]
-    public async Task SaveInstallLogAsync(InstallLog installLog)
-    {
-    }
+    public Task SaveInstallLogAsync(InstallLog installLog) => Task.CompletedTask;
 }

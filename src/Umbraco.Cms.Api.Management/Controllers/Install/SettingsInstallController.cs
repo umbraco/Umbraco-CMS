@@ -16,7 +16,7 @@ public class SettingsInstallController : InstallControllerBase
     private readonly IInstallSettingsFactory _installSettingsFactory;
     private readonly IUmbracoMapper _mapper;
 
-    [Obsolete("Please use the constructor without the InstallHelper parameter. This will be removed in Umbraco 19.")]
+    [Obsolete("Please use the constructor without the InstallHelper parameter. Scheduled for removal in Umbraco 19.")]
     public SettingsInstallController(
         InstallHelper installHelper,
         IInstallSettingsFactory installSettingsFactory,
