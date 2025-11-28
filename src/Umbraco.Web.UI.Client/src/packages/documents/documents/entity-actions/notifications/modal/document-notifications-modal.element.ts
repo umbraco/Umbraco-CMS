@@ -82,11 +82,7 @@ export class UmbDocumentNotificationsModalElement extends UmbModalBaseElement<
 						(setting) => setting.actionId,
 						(setting) => {
 							const localizationKey = `actions_${setting.alias}`;
-							let localization = this.localize.term(localizationKey);
-							if (localization === localizationKey) {
-								// Fallback to alias if no localization is found
-								localization = setting.alias;
-							}
+							const localization = this.localize.termOrDefault(localizationKey, setting.alias);
 							return html`<uui-toggle
 								id=${setting.actionId}
 								@change=${() => this.#updateSubscription(setting.actionId)}
