@@ -282,8 +282,8 @@
                 $timeout(function () {
 
                   // Readonly mode - ensure observe of readonly attribute has triggered, see https://github.com/umbraco/Umbraco-CMS/issues/20952
-                  options.toolbar = vm.readonly ? false : baseLineConfigObj.toolbar;
-                  options.readonly = vm.readonly ? true : baseLineConfigObj.readonly;
+                  options.toolbar = vm.readonly ? false : options.toolbar;
+                  options.readonly = vm.readonly ? true : options.readonly;
 
                   tinymce.init(options);
                 }, 50);
