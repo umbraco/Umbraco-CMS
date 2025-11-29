@@ -286,15 +286,9 @@ public class ConvertLocalLinks : MigrationBase
 
     private Sql<ISqlContext> BuildPropertyDataSql(IPropertyType propertyType, bool isCount = false)
     {
-        Sql<ISqlContext> sql = Sql();
-        if (isCount)
-        {
-            sql = sql.SelectCount();
-        }
-        else
-        {
-            sql = sql.Select<PropertyDataDto>();
-        }
+        Sql<ISqlContext> sql = isCount
+            ? Sql().SelectCount()
+            : Sql().Select<PropertyDataDto>();
 
         sql = sql.From<PropertyDataDto>()
             .InnerJoin<ContentVersionDto>()
@@ -305,12 +299,11 @@ public class ConvertLocalLinks : MigrationBase
                 contentVersion.Id == documentVersion.Id)
             .Where<PropertyDataDto, ContentVersionDto, DocumentVersionDto>(
                 (propertyData, contentVersion, documentVersion) =>
-                    (contentVersion.Current == true || documentVersion.Published == true)
+                    (contentVersion.Current || documentVersion.Published)
                     && propertyData.PropertyTypeId == propertyType.Id);
 
         return sql;
     }
-
 
     private bool ProcessPropertyDataDto(
         PropertyDataDto propertyDataDto,
