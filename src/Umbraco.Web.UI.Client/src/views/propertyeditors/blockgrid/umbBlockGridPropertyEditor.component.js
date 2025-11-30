@@ -1370,8 +1370,9 @@
             if (copyAllBlocksAction) {
                 copyAllBlocksAction.isDisabled = vm.layout.length === 0;
             }
+
             if (deleteAllBlocksAction) {
-                deleteAllBlocksAction.isDisabled = vm.layout.length === 0;
+                deleteAllBlocksAction.isDisabled = vm.layout.length === 0 || vm.readonly;
             }
 
             // validate limits:
