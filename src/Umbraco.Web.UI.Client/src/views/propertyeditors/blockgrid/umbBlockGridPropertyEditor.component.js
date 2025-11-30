@@ -96,6 +96,11 @@
             if (deleteAllBlocksAction) {
                 deleteAllBlocksAction.isDisabled = vm.readonly;
             }
+
+            if (enterSortModeAction) {
+                enterSortModeAction.isDisabled = vm.readonly;
+            }
+
         });
 
         vm.loading = true;
