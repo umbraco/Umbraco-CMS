@@ -83,7 +83,6 @@
         var shadowRoot;
         var firstLayoutContainer;
 
-
         var vm = this;
 
         vm.readonly = false;
@@ -100,7 +99,6 @@
             if (enterSortModeAction) {
                 enterSortModeAction.isDisabled = vm.readonly;
             }
-
         });
 
         vm.loading = true;
