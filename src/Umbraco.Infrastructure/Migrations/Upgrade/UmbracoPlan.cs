@@ -140,5 +140,8 @@ public class UmbracoPlan : MigrationPlan
         To<V_17_0_0.AddLastSyncedTable>("26179D88-58CE-4C92-B4A4-3CBA6E7188AC");
         To<V_17_0_0.EnsureDefaultMediaFolderHasDefaultCollection>("{8B2C830A-4FFB-4433-8337-8649B0BF52C8}");
         To<V_17_0_0.InvalidateBackofficeUserAccess>("{1C38D589-26BB-4A46-9ABE-E4A0DF548A87}");
+
+        // To 17.0.1
+        To<V_17_0_1.EnsureUmbracoPropertyDataColumnCasing>("{BE5CA411-E12D-4455-A59E-F12A669E5363}");
     }
 }
