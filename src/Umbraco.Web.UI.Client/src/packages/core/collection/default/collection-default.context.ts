@@ -1,5 +1,5 @@
-import { UmbCollectionViewManager } from '../collection-view.manager.js';
-import type { UmbCollectionViewManagerConfig } from '../collection-view.manager.js';
+import { UmbCollectionViewManager } from '../view/collection-view.manager.js';
+import type { UmbCollectionViewManagerConfig } from '../view/collection-view.manager.js';
 import type {
 	UmbCollectionColumnConfiguration,
 	UmbCollectionConfiguration,
