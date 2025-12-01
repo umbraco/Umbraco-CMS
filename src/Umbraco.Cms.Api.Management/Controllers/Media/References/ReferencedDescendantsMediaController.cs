@@ -24,6 +24,24 @@ public class ReferencedDescendantsMediaController : MediaControllerBase
         _umbracoMapper = umbracoMapper;
     }
 
+    [Obsolete("Use the ReferencedDescendants2 action method instead. Scheduled for removal in Umbraco 19, when ReferencedDescendants2 will be renamed back to ReferencedDescendants.")]
+    [NonAction]
+    public async Task<ActionResult<PagedViewModel<ReferenceByIdModel>>> ReferencedDescendants(
+    CancellationToken cancellationToken,
+    Guid id,
+    int skip = 0,
+    int take = 20)
+    {
+        PagedModel<RelationItemModel> relationItems = await _trackedReferencesSkipTakeService.GetPagedDescendantsInReferencesAsync(id, skip, take, true);
+        var pagedViewModel = new PagedViewModel<ReferenceByIdModel>
+        {
+            Total = relationItems.Total,
+            Items = _umbracoMapper.MapEnumerable<RelationItemModel, ReferenceByIdModel>(relationItems.Items),
+        };
+
+        return pagedViewModel;
+    }
+
     /// <summary>
     ///     Gets a page list of the child nodes of the current item used in any kind of relation.
     /// </summary>
@@ -36,7 +54,7 @@ public class ReferencedDescendantsMediaController : MediaControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<ReferenceByIdModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> ReferencedDescendants(
+    public async Task<IActionResult> ReferencedDescendants2(
         CancellationToken cancellationToken,
         Guid id,
         int skip = 0,
