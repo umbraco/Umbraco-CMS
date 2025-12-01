@@ -99,7 +99,22 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 	}
 
 	getItemHref(structureItem: UmbVariantStructureItemModel): string | undefined {
-		return `section/${this._sectionContext?.getPathname()}/workspace/${structureItem.entityType}/edit/${structureItem.unique}/${this.#workspaceActiveVariantId?.toCultureString()}`;
+		// TODO: Should be replaced by Path Consts. [NL]
+		// TODO: Cannot assume that the current active variant id is available for the referenced item. What if it is invariant? [NL]
+		const path = `section/${this._sectionContext?.getPathname()}/workspace/${structureItem.entityType}/edit/${structureItem.unique}`;
+		// find related variant id from structure item instead?
+		const itemVariantFit = structureItem.variants.find((variant) => {
+			return (
+				variant.culture === this.#workspaceActiveVariantId?.culture &&
+				variant.segment === this.#workspaceActiveVariantId?.segment
+			);
+		});
+		if (itemVariantFit) {
+			const variantId = UmbVariantId.CreateFromPartial(itemVariantFit);
+			return `${path}/${variantId.toString()}`;
+		}
+
+		return path;
 	}
 
 	async #requestStructure() {
