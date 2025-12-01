@@ -69,7 +69,7 @@ public class ConvertLocalLinks : MigrationBase
     /// <summary>
     /// Initializes a new instance of the <see cref="ConvertLocalLinks"/> class.
     /// </summary>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal along with all other migrations to 17 in Umbraco 18.")]
     public ConvertLocalLinks(
         IMigrationContext context,
         IUmbracoContextFactory umbracoContextFactory,
