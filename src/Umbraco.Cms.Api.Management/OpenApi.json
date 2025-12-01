@@ -27854,6 +27854,7 @@
             "description": "The authenticated user does not have access to this resource"
           }
         },
+        "deprecated": true,
         "security": [
           {
             "Backoffice-User": [ ]
