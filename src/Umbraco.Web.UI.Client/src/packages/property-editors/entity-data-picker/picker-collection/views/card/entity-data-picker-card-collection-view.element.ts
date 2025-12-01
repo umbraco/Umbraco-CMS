@@ -67,7 +67,13 @@ export class UmbEntityDataPickerCardCollectionViewElement extends UmbLitElement 
 	}
 
 	#renderItem(item: UmbCollectionItemModel) {
-		return html` <div>Card here: ${item.name}</div>`;
+		return html` <umb-entity-collection-item-card
+			.item=${item}
+			selectable
+			?select-only=${this._selection.length > 0 || this._selectOnly}
+			?selected=${this.#collectionContext?.selection.isSelected(item.unique)}
+			@selected=${() => this.#onSelect(item)}
+			@deselected=${() => this.#onDeselect(item)}></umb-entity-collection-item-card>`;
 	}
 
 	static override styles = [
