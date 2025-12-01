@@ -1,14 +1,13 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.TrackedReferences;
-using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document.References;
 
@@ -17,28 +16,13 @@ public class ReferencedByDocumentController : DocumentControllerBase
 {
     private readonly ITrackedReferencesService _trackedReferencesService;
     private readonly IRelationTypePresentationFactory _relationTypePresentationFactory;
-    private readonly IEntityService _entityService;
 
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
     public ReferencedByDocumentController(
         ITrackedReferencesService trackedReferencesService,
         IRelationTypePresentationFactory relationTypePresentationFactory)
-        : this(
-              trackedReferencesService,
-              relationTypePresentationFactory,
-              StaticServiceProvider.Instance.GetRequiredService<IEntityService>())
-    {
-    }
-
-    [ActivatorUtilitiesConstructor]
-    public ReferencedByDocumentController(
-        ITrackedReferencesService trackedReferencesService,
-        IRelationTypePresentationFactory relationTypePresentationFactory,
-        IEntityService entityService)
     {
         _trackedReferencesService = trackedReferencesService;
         _relationTypePresentationFactory = relationTypePresentationFactory;
-        _entityService = entityService;
     }
 
     /// <summary>
@@ -52,26 +36,25 @@ public class ReferencedByDocumentController : DocumentControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<IReferenceResponseModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<PagedViewModel<IReferenceResponseModel>>> ReferencedBy(
+    public async Task<IActionResult> ReferencedBy(
         CancellationToken cancellationToken,
         Guid id,
         int skip = 0,
         int take = 20)
     {
-        IEntitySlim? entity = _entityService.Get(id, UmbracoObjectTypes.Document);
-        if (entity is null)
-        {
-            return NotFound();
-        }
+        Attempt<PagedModel<RelationItemModel>, GetReferencesOperationStatus> relationItemsAttempt = await _trackedReferencesService.GetPagedRelationsForItemAsync(id, UmbracoObjectTypes.Document, skip, take, true);
 
-        PagedModel<RelationItemModel> relationItems = await _trackedReferencesService.GetPagedRelationsForItemAsync(id, skip, take, true);
+        if (relationItemsAttempt.Success is false)
+        {
+            return GetReferencesOperationStatusResult(relationItemsAttempt.Status);
+        }
 
         var pagedViewModel = new PagedViewModel<IReferenceResponseModel>
         {
-            Total = relationItems.Total,
-            Items = await _relationTypePresentationFactory.CreateReferenceResponseModelsAsync(relationItems.Items),
+            Total = relationItemsAttempt.Result.Total,
+            Items = await _relationTypePresentationFactory.CreateReferenceResponseModelsAsync(relationItemsAttempt.Result.Items),
         };
 
-        return pagedViewModel;
+        return Ok(pagedViewModel);
     }
 }

@@ -1,14 +1,13 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.ViewModels;
-using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Member.References;
 
@@ -17,28 +16,13 @@ public class ReferencedDescendantsMemberController : MemberControllerBase
 {
     private readonly ITrackedReferencesService _trackedReferencesSkipTakeService;
     private readonly IUmbracoMapper _umbracoMapper;
-    private readonly IEntityService _entityService;
 
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
     public ReferencedDescendantsMemberController(
         ITrackedReferencesService trackedReferencesSkipTakeService,
         IUmbracoMapper umbracoMapper)
-        : this(
-              trackedReferencesSkipTakeService,
-              umbracoMapper,
-              StaticServiceProvider.Instance.GetRequiredService<IEntityService>())
-    {
-    }
-
-    [ActivatorUtilitiesConstructor]
-    public ReferencedDescendantsMemberController(
-        ITrackedReferencesService trackedReferencesSkipTakeService,
-        IUmbracoMapper umbracoMapper,
-        IEntityService entityService)
     {
         _trackedReferencesSkipTakeService = trackedReferencesSkipTakeService;
         _umbracoMapper = umbracoMapper;
-        _entityService = entityService;
     }
 
     /// <summary>
@@ -53,25 +37,25 @@ public class ReferencedDescendantsMemberController : MemberControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<ReferenceByIdModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<PagedViewModel<ReferenceByIdModel>>> ReferencedDescendants(
+    public async Task<IActionResult> ReferencedDescendants(
         CancellationToken cancellationToken,
         Guid id,
         int skip = 0,
         int take = 20)
     {
-        IEntitySlim? entity = _entityService.Get(id, UmbracoObjectTypes.Member);
-        if (entity is null)
+        Attempt<PagedModel<RelationItemModel>, GetReferencesOperationStatus> relationItemsAttempt = await _trackedReferencesSkipTakeService.GetPagedDescendantsInReferencesAsync(id, UmbracoObjectTypes.Member, skip, take, true);
+
+        if (relationItemsAttempt.Success is false)
         {
-            return NotFound();
+            return GetReferencesOperationStatusResult(relationItemsAttempt.Status);
         }
 
-        PagedModel<RelationItemModel> relationItems = await _trackedReferencesSkipTakeService.GetPagedDescendantsInReferencesAsync(id, skip, take, true);
         var pagedViewModel = new PagedViewModel<ReferenceByIdModel>
         {
-            Total = relationItems.Total,
-            Items = _umbracoMapper.MapEnumerable<RelationItemModel, ReferenceByIdModel>(relationItems.Items),
+            Total = relationItemsAttempt.Result.Total,
+            Items = _umbracoMapper.MapEnumerable<RelationItemModel, ReferenceByIdModel>(relationItemsAttempt.Result.Items),
         };
 
-        return pagedViewModel;
+        return Ok(pagedViewModel);
     }
 }
