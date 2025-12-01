@@ -47,9 +47,7 @@ public class ConfigureUmbracoMemberAuthenticationDeliveryApiSwaggerGenOptions : 
                 return;
             }
 
-            swaggerDoc.Components ??= new OpenApiComponents();
-            swaggerDoc.Components.SecuritySchemes ??= new Dictionary<string, IOpenApiSecurityScheme>();
-            swaggerDoc.Components.SecuritySchemes.Add(
+            swaggerDoc.AddComponent(
                 AuthSchemeName,
                 new OpenApiSecurityScheme
                 {
