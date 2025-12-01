@@ -10,6 +10,7 @@ import { UmbAncestorsEntityContext, UmbParentEntityContext, type UmbEntityModel 
 import {
 	UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT,
 	UMB_VARIANT_WORKSPACE_CONTEXT,
+	UMB_WORKSPACE_PATH_PATTERN,
 } from '@umbraco-cms/backoffice/workspace';
 import { linkEntityExpansionEntries } from '@umbraco-cms/backoffice/utils';
 import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
@@ -99,10 +100,17 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 	}
 
 	getItemHref(structureItem: UmbVariantStructureItemModel): string | undefined {
-		// TODO: Should be replaced by Path Consts. [NL]
-		// TODO: Cannot assume that the current active variant id is available for the referenced item. What if it is invariant? [NL]
-		const path = `section/${this._sectionContext?.getPathname()}/workspace/${structureItem.entityType}/edit/${structureItem.unique}`;
-		// find related variant id from structure item instead?
+		const sectionName = this._sectionContext?.getPathname();
+		if (!sectionName) {
+			return undefined;
+		}
+		UMB_WORKSPACE_PATH_PATTERN.generateAbsolute({
+			sectionName,
+			entityType: structureItem.entityType,
+		});
+		const path = `section/${this._sectionContext!.getPathname()}/workspace/${structureItem.entityType}/edit/${structureItem.unique}`;
+
+		// find related variant id from structure item:
 		const itemVariantFit = structureItem.variants.find((variant) => {
 			return (
 				variant.culture === this.#workspaceActiveVariantId?.culture &&
@@ -114,6 +122,7 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 			return `${path}/${variantId.toString()}`;
 		}
 
+		// If no related variantID, then lets the redirect go to the main-variant:
 		return path;
 	}
 
