@@ -390,8 +390,10 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 	/**
 	 * @deprecated Call `_loadSegmentsFor` instead. `loadSegments` will be removed in v.18.
+	 * (note this was introduced in v.17, and deprecated in v.17.0.1)
 	 */
 	protected async loadSegments() {
+		console.warn('Stop using loadSegments, call _loadSegmentsFor instead. loadSegments will be removed in v.18.');
 		const unique = await firstValueFrom(this.unique);
 		if (!unique) {
 			this._segments.setValue([]);
