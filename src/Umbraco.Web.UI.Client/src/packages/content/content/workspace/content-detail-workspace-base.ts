@@ -415,13 +415,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		this._segments.setValue([]);
 	}
 
-	/**
-	 * @deprecated Call `_processIncomingData` instead. `_scaffoldProcessData` will be removed in v.18.
-	 */
-	protected override _scaffoldProcessData(data: DetailModelType): Promise<DetailModelType> {
-		return this._processIncomingData(data);
-	}
-
 	protected override async _processIncomingData(data: DetailModelType): Promise<DetailModelType> {
 		const contentTypeUnique: string | undefined = (data as any)[this.#contentTypePropertyName].unique;
 		if (!contentTypeUnique) {
@@ -443,7 +436,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		let segments: Array<string> | undefined;
 		if (this.#variesBySegment) {
 			segments = this._segments.getValue().map((s) => s.alias);
-			console.log('segments', segments, cultures);
 		}
 
 		const repo = new UmbDataTypeDetailRepository(this);
@@ -453,7 +445,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		const contentTypeVariesBySegment = this.structure.getVariesBySegment();
 		const valueDefinitions = await Promise.all(
 			propertyTypes.map(async (property) => {
-				// TODO: Implement caching for data-type requests. [NL]
 				const dataType = (await repo.requestByUnique(property.dataType.unique)).data;
 				// This means if its not loaded this will never resolve and the error below will never happen.
 				if (!dataType) {
