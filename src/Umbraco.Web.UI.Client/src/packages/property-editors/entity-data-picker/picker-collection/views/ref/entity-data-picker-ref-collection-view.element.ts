@@ -67,13 +67,13 @@ export class UmbEntityDataPickerRefCollectionViewElement extends UmbLitElement {
 	}
 
 	#renderItem(item: UmbCollectionItemModel) {
-		return html`<umb-entity-item-ref
+		return html`<umb-entity-collection-item-ref
 			.item=${item}
-			select-only=${this._selectOnly}
 			selectable
+			?select-only=${this._selection.length > 0 || this._selectOnly}
 			?selected=${this.#collectionContext?.selection.isSelected(item.unique)}
-			@deselected=${this.#onDeselect}
-			@selected=${this.#onSelect}></umb-entity-item-ref>`;
+			@selected=${() => this.#onSelect(item)}
+			@deselected=${() => this.#onDeselect(item)}></umb-entity-collection-item-ref>`;
 	}
 
 	static override styles = [
