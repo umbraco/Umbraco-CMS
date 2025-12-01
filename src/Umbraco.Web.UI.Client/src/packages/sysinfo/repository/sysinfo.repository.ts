@@ -4,7 +4,6 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { ServerService } from '@umbraco-cms/backoffice/external/backend-api';
-import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 
 export class UmbSysinfoRepository extends UmbRepositoryBase {
 	constructor(host: UmbControllerHost) {
@@ -37,12 +36,8 @@ export class UmbSysinfoRepository extends UmbRepositoryBase {
 	 * @returns {Promise<UmbServerUpgradeCheck | null>} The server upgrade check result or null if the check is not allowed or if the check failed.
 	 * @deprecated This method is deprecated and will be removed in Umbraco 19. It is no longer possible to check for updates from the backoffice.
 	 */
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	async serverUpgradeCheck(_currentVersion: string): Promise<UmbServerUpgradeCheck | null> {
-		return Promise.resolve({
-			comment: '',
-			type: '',
-			url: '',
-			expires: '',
-		} satisfies UmbServerUpgradeCheck);
+		return null;
 	}
 }
