@@ -17,7 +17,6 @@ public class ReferencedByMediaController : MediaControllerBase
     private readonly ITrackedReferencesService _trackedReferencesService;
     private readonly IRelationTypePresentationFactory _relationTypePresentationFactory;
 
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
     public ReferencedByMediaController(
         ITrackedReferencesService trackedReferencesService,
         IRelationTypePresentationFactory relationTypePresentationFactory)
@@ -36,6 +35,7 @@ public class ReferencedByMediaController : MediaControllerBase
     [HttpGet("{id:guid}/referenced-by")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<IReferenceResponseModel>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ReferencedBy(
         CancellationToken cancellationToken,
         Guid id,
