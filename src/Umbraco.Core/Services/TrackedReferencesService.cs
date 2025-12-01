@@ -22,7 +22,7 @@ public class TrackedReferencesService : ITrackedReferencesService
         _entityService = entityService;
     }
 
-    [Obsolete("Use AttemptGetPagedDescendantsInReferencesAsync which returns an Attempt with operation status. Scheduled for removal in Umbraco 19.")]
+    [Obsolete("Use the GetPagedRelationsForItemAsync overload which returns an Attempt with operation status. Scheduled for removal in Umbraco 19.")]
     public Task<PagedModel<RelationItemModel>> GetPagedRelationsForItemAsync(Guid key, long skip, long take, bool filterMustBeIsDependency)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
@@ -62,7 +62,7 @@ public class TrackedReferencesService : ITrackedReferencesService
         return Task.FromResult(pagedModel);
     }
 
-    [Obsolete("Use AttemptGetPagedDescendantsInReferencesAsync which returns an Attempt with operation status. Scheduled for removal in Umbraco 19.")]
+    [Obsolete("Use GetPagedDescendantsInReferencesAsync which returns an Attempt with operation status. Scheduled for removal in Umbraco 19.")]
     public Task<PagedModel<RelationItemModel>> GetPagedDescendantsInReferencesAsync(Guid parentKey, long skip, long take, bool filterMustBeIsDependency)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
