@@ -83,7 +83,6 @@
         var shadowRoot;
         var firstLayoutContainer;
 
-
         var vm = this;
 
         vm.readonly = false;
@@ -95,6 +94,10 @@
 
             if (deleteAllBlocksAction) {
                 deleteAllBlocksAction.isDisabled = vm.readonly;
+            }
+
+            if (enterSortModeAction) {
+                enterSortModeAction.isDisabled = vm.readonly;
             }
         });
 
@@ -1367,8 +1370,9 @@
             if (copyAllBlocksAction) {
                 copyAllBlocksAction.isDisabled = vm.layout.length === 0;
             }
+
             if (deleteAllBlocksAction) {
-                deleteAllBlocksAction.isDisabled = vm.layout.length === 0;
+                deleteAllBlocksAction.isDisabled = vm.layout.length === 0 || vm.readonly;
             }
 
             // validate limits:
