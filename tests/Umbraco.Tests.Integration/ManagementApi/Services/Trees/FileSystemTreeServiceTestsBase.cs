@@ -49,10 +49,10 @@ public abstract class FileSystemTreeServiceTestsBase : UmbracoIntegrationTest
         }
     }
 
-    protected static Stream CreateStream()
+    protected static Stream CreateStream(string contents = null)
     {
-        const string FileContent = "/* test */";
-        var bytes = Encoding.UTF8.GetBytes(FileContent);
+        const string DefaultFileContent = "/* test */";
+        var bytes = Encoding.UTF8.GetBytes(contents ?? DefaultFileContent);
         return new MemoryStream(bytes);
     }
 
