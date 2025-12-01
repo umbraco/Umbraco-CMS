@@ -36,19 +36,20 @@ public class EnsureUmbracoPropertyDataColumnCasing : AsyncMigrationBase
             return Task.CompletedTask;
         }
 
-        const string ColumnName = "propertyTypeId";
+        const string oldColumnName = "propertytypeid";
+        const string newColumnName = "propertyTypeId";
         ColumnInfo[] columns = [.. SqlSyntax.GetColumnsInSchema(Context.Database)];
         ColumnInfo? targetColumn = columns
-            .FirstOrDefault(x => x.TableName == DatabaseSchema.Tables.PropertyData && string.Equals(x.ColumnName, ColumnName.ToLower(), StringComparison.InvariantCulture));
+            .FirstOrDefault(x => x.TableName == DatabaseSchema.Tables.PropertyData && string.Equals(x.ColumnName, oldColumnName, StringComparison.InvariantCulture));
         if (targetColumn is not null)
         {
             // The column exists with incorrect casing, we need to rename it.
-            Rename.Column(ColumnName.ToLower())
+            Rename.Column(oldColumnName)
                 .OnTable(DatabaseSchema.Tables.PropertyData)
-                .To(ColumnName)
+                .To(newColumnName)
                 .Do();
 
-            _logger.LogInformation("Renamed column {OldColumnName} to {NewColumnName} on table {TableName}", ColumnName.ToLower(), ColumnName, DatabaseSchema.Tables.PropertyData);
+            _logger.LogInformation("Renamed column {OldColumnName} to {NewColumnName} on table {TableName}", oldColumnName, newColumnName, DatabaseSchema.Tables.PropertyData);
         }
 
         return Task.CompletedTask;
