@@ -29,9 +29,8 @@ export class UmbSysinfoRepository extends UmbRepositoryBase {
 	}
 
 	/**
-	 * Check if the server has an upgrade available and return the result.
-	 * If the server has an upgrade available, the result will be stored in local storage.
-	 * If the server does not have an upgrade available, the result will be stored in local storage as well.
+	 * This method used to check for server upgrades by comparing the current version with the latest available version.
+	 * However, the upgrade check functionality is now defunct and this method will always return null.
 	 * @param {string} _currentVersion The current version of the server.
 	 * @returns {Promise<UmbServerUpgradeCheck | null>} The server upgrade check result or null if the check is not allowed or if the check failed.
 	 * @deprecated This method is deprecated and will be removed in Umbraco 19. It is no longer possible to check for updates from the backoffice.
