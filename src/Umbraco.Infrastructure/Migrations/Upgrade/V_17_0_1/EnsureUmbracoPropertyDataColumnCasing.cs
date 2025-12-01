@@ -1,18 +1,15 @@
 using Microsoft.Extensions.Logging;
 using NPoco;
-using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Models.Membership;
-using Umbraco.Cms.Infrastructure.Persistence;
 using static Umbraco.Cms.Core.Constants;
 using ColumnInfo = Umbraco.Cms.Infrastructure.Persistence.SqlSyntax.ColumnInfo;
 
-namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_17_1_0;
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_17_0_1;
 
 /// <summary>
 /// Ensures the propertyTypeId column in umbracoPropertyData has correct camel case naming.
 /// </summary>
 /// <remarks>
-/// SQL Server is case sensitive for columns used in a SQL Bulk insert statement(which is used in publishing
+/// SQL Server is case sensitive for columns used in a SQL Bulk insert statement (which is used in publishing
 /// operations on umbracoPropertyData).
 /// Earlier versions of Umbraco used all lower case for the propertyTypeId column name (propertytypeid), whereas newer versions
 /// use camel case (propertyTypeId).
