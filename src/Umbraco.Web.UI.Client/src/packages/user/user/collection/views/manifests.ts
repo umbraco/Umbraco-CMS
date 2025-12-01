@@ -21,15 +21,9 @@ export const manifests: Array<UmbExtensionManifest> = [
 	},
 	{
 		type: 'collectionView',
+		kind: 'card',
 		alias: UMB_COLLECTION_VIEW_USER_GRID,
 		name: 'User Grid Collection View',
-		element: () => import('./grid/user-grid-collection-view.element.js'),
-		weight: 200,
-		meta: {
-			label: 'Grid',
-			icon: 'icon-grid',
-			pathName: 'grid',
-		},
 		conditions: [
 			{
 				alias: UMB_COLLECTION_ALIAS_CONDITION,
