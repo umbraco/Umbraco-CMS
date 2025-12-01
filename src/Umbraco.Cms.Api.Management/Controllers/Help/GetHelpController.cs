@@ -17,7 +17,7 @@ public class GetHelpController : HelpControllerBase
 {
     private readonly ILogger<GetHelpController> _logger;
     private readonly IJsonSerializer _jsonSerializer;
-    private HelpPageSettings _helpPageSettings;
+    private readonly HelpPageSettings _helpPageSettings;
 
     public GetHelpController(
         IOptionsMonitor<HelpPageSettings> helpPageSettings,
@@ -27,10 +27,7 @@ public class GetHelpController : HelpControllerBase
         _logger = logger;
         _jsonSerializer = jsonSerializer;
         _helpPageSettings = helpPageSettings.CurrentValue;
-        helpPageSettings.OnChange(UpdateHelpPageSettings);
     }
-
-    private void UpdateHelpPageSettings(HelpPageSettings settings) => _helpPageSettings = settings;
 
     [HttpGet]
     [MapToApiVersion("1.0")]

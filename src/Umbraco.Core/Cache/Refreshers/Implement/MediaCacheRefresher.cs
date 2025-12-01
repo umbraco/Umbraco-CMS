@@ -194,8 +194,8 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
 
         if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
         {
-            _mediaNavigationManagementService.RebuildAsync();
-            _mediaNavigationManagementService.RebuildBinAsync();
+            _mediaNavigationManagementService.RebuildAsync().GetAwaiter().GetResult();
+            _mediaNavigationManagementService.RebuildBinAsync().GetAwaiter().GetResult();
         }
 
         if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshNode))

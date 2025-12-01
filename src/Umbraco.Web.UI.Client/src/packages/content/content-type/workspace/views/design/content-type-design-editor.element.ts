@@ -207,15 +207,16 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			});
 		}
 
+		routes.push({
+			path: 'root',
+			component: () => import('./content-type-design-editor-tab.element.js'),
+			setup: (component) => {
+				this.#currentTabComponent = component as UmbContentTypeDesignEditorTabElement;
+				this.#currentTabComponent.containerId = null;
+			},
+		});
+
 		if (this._hasRootGroups || this._tabs.length === 0) {
-			routes.push({
-				path: 'root',
-				component: () => import('./content-type-design-editor-tab.element.js'),
-				setup: (component) => {
-					this.#currentTabComponent = component as UmbContentTypeDesignEditorTabElement;
-					this.#currentTabComponent.containerId = null;
-				},
-			});
 			routes.push({
 				path: '',
 				pathMatch: 'full',
@@ -603,7 +604,6 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 					auto-width
 					minlength="1"
 					@change=${(e: InputEvent) => this.#tabNameChanged(e, tab)}
-					@input=${(e: InputEvent) => this.#tabNameChanged(e, tab)}
 					@blur=${(e: FocusEvent) => this.#tabNameBlur(e, tab)}>
 					${this.renderDeleteFor(tab)}
 				</uui-input>

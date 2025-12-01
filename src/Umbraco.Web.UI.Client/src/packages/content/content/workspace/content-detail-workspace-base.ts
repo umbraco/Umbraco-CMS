@@ -428,6 +428,8 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		const repo = new UmbDataTypeDetailRepository(this);
 
 		const propertyTypes = await this.structure.getContentTypeProperties();
+		const contentTypeVariesByCulture = this.structure.getVariesByCulture();
+		const contentTypeVariesBySegment = this.structure.getVariesByCulture();
 		const valueDefinitions = await Promise.all(
 			propertyTypes.map(async (property) => {
 				// TODO: Implement caching for data-type requests. [NL]
@@ -446,8 +448,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 					propertyEditorSchemaAlias: dataType.editorAlias,
 					config: dataType.values,
 					typeArgs: {
-						variesByCulture: property.variesByCulture,
-						variesBySegment: property.variesBySegment,
+						// Only vary if the content type varies:
+						variesByCulture: contentTypeVariesByCulture ? property.variesByCulture : false,
+						variesBySegment: contentTypeVariesBySegment ? property.variesBySegment : false,
 					} as UmbPropertyTypePresetModelTypeModel,
 				} as UmbPropertyTypePresetModel;
 			}),
@@ -665,9 +668,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		// Notice the order of the properties is important for our JSON String Compare function. [NL]
 		const entry: UmbElementValueModel = {
 			editorAlias,
-			// Be aware that this solution is a bit magical, and based on a naming convention.
-			// We might want to make this more flexible at some point and get the entityType from somewhere instead of constructing it here.
-			entityType: `${this.getEntityType()}-property-value`,
 			...variantId.toObject(),
 			alias,
 			value,
