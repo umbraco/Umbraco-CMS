@@ -392,4 +392,14 @@ export class UmbDefaultCollectionContext<
 	public getItems() {
 		return this._items.getValue();
 	}
+
+	/**
+	 * Returns the href for a specific collection item.
+	 * Override this method in specialized collection contexts to provide item-specific hrefs.
+	 * @param {CollectionItemType} item - The collection item to get the href for.
+	 * @returns {Promise<string | undefined>} - The href for the item, or undefined if not available.
+	 */
+	public async requestItemHref(item: CollectionItemType): Promise<string | undefined> {
+		return undefined;
+	}
 }
