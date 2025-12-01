@@ -155,6 +155,13 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	 */
 	public readonly languages = this.#languages.asObservable();
 
+	protected readonly _segmentsLoaded: Promise<void> = new Promise((resolve, reject) => {
+		this._segmentsLoadedResolver = resolve;
+		this._segmentsLoadedRejector = reject;
+	});
+	protected _segmentsLoadedResolver!: () => void;
+	protected _segmentsLoadedRejector!: () => void;
+
 	protected readonly _segments = new UmbArrayState<UmbSegmentModel>([], (x) => x.alias);
 
 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -368,11 +375,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			(varies) => {
 				this._data.setVariesBySegment(varies);
 				this.#variesBySegment = varies;
-				if (varies) {
-					this.loadSegments();
-				} else {
-					this._segments.setValue([]);
-				}
 			},
 			null,
 		);
@@ -393,7 +395,20 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		this.#languages.setValue(data?.items ?? []);
 	}
 
+	/**
+	 * @deprecated Call `_loadSegmentsFor` instead. `loadSegments` will be removed in v.18.
+	 */
 	protected async loadSegments() {
+		const unique = await firstValueFrom(this.unique);
+		if (!unique) {
+			this._segments.setValue([]);
+			return;
+		}
+		this._loadSegmentsFor(unique);
+	}
+
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	protected async _loadSegmentsFor(unique: string): Promise<void> {
 		console.warn(
 			`UmbContentDetailWorkspaceContextBase: Segments are not implemented in the workspace context for "${this.getEntityType()}" types.`,
 		);
@@ -415,21 +430,27 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		// Load the content type structure, usually this comes from the data, but in this case we are making the data, and we need this to be able to complete the data. [NL]
 		await this.structure.loadType(contentTypeUnique);
 
+		// Load segments if varying by segment, or reset to empty array:
+		if (this.#variesBySegment) {
+			await this._loadSegmentsFor(contentTypeUnique);
+		} else {
+			this._segments.setValue([]);
+		}
+
 		// Set culture and segment for all values:
 		const cultures = this.#languages.getValue().map((x) => x.unique);
 
-		if (this.structure.variesBySegment) {
-			// TODO: v.17 Engage please note we have not implemented support for segments yet. [NL]
-			console.warn('Segments are not yet implemented for preset');
+		let segments: Array<string> | undefined;
+		if (this.#variesBySegment) {
+			segments = this._segments.getValue().map((s) => s.alias);
+			console.log('segments', segments, cultures);
 		}
-		// TODO: Add Segments for Presets:
-		const segments: Array<string> | undefined = this.structure.variesBySegment ? [] : undefined;
 
 		const repo = new UmbDataTypeDetailRepository(this);
 
 		const propertyTypes = await this.structure.getContentTypeProperties();
 		const contentTypeVariesByCulture = this.structure.getVariesByCulture();
-		const contentTypeVariesBySegment = this.structure.getVariesByCulture();
+		const contentTypeVariesBySegment = this.structure.getVariesBySegment();
 		const valueDefinitions = await Promise.all(
 			propertyTypes.map(async (property) => {
 				// TODO: Implement caching for data-type requests. [NL]
