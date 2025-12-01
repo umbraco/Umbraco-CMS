@@ -155,13 +155,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	 */
 	public readonly languages = this.#languages.asObservable();
 
-	protected readonly _segmentsLoaded: Promise<void> = new Promise((resolve, reject) => {
-		this._segmentsLoadedResolver = resolve;
-		this._segmentsLoadedRejector = reject;
-	});
-	protected _segmentsLoadedResolver!: () => void;
-	protected _segmentsLoadedRejector!: () => void;
-
 	protected readonly _segments = new UmbArrayState<UmbSegmentModel>([], (x) => x.alias);
 
 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
