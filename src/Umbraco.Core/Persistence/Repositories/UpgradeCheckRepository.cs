@@ -12,5 +12,5 @@ public class UpgradeCheckRepository : IUpgradeCheckRepository
     }
 
     [Obsolete("This method no longer has any function and will be removed in Umbraco 19.")]
-    public async Task<UpgradeResult> CheckUpgradeAsync(SemVersion version) => new("None", string.Empty, string.Empty);
+    public Task<UpgradeResult> CheckUpgradeAsync(SemVersion version) => Task.FromResult(new UpgradeResult("None", string.Empty, string.Empty));
 }
