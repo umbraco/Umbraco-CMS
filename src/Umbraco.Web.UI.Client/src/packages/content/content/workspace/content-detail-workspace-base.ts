@@ -418,7 +418,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 		// Load segments if varying by segment, or reset to empty array:
 		if (this.#variesBySegment) {
-			await this._loadSegmentsFor(contentTypeUnique);
+			await this._loadSegmentsFor(data.unique);
 		} else {
 			this._segments.setValue([]);
 		}
