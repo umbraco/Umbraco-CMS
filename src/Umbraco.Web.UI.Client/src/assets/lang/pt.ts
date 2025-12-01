@@ -990,7 +990,6 @@ export default {
 		media: 'Multimédia',
 		revert: 'Reverter',
 		validate: 'Validar',
-		newVersionAvailable: 'Nova versão disponível',
 		duration: (duration: string, date: Date | string, now: Date | string) => {
 			if (new Date(date).getTime() < new Date(now).getTime()) return `${duration} atrás`;
 			return `em ${duration}`;
