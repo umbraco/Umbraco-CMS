@@ -177,7 +177,7 @@ export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<
 			{
 				modal: {
 					type: 'sidebar',
-					size: 'small',
+					size: 'medium',
 				},
 				data: {
 					collection: {
