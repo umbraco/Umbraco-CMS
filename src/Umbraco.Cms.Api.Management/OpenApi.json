@@ -9628,6 +9628,9 @@
               }
             }
           },
+          "404": {
+            "description": "Not Found"
+          },
           "401": {
             "description": "The resource is protected and requires an authentication token"
           },
@@ -9691,6 +9694,9 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "Not Found"
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
@@ -17412,6 +17418,9 @@
               }
             }
           },
+          "404": {
+            "description": "Not Found"
+          },
           "401": {
             "description": "The resource is protected and requires an authentication token"
           },
@@ -22294,6 +22303,9 @@
               }
             }
           },
+          "404": {
+            "description": "Not Found"
+          },
           "401": {
             "description": "The resource is protected and requires an authentication token"
           },
@@ -22357,6 +22369,9 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "Not Found"
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
