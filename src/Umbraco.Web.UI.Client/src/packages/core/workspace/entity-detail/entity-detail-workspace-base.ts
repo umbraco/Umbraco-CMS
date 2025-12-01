@@ -376,8 +376,8 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	/**
 	 * Check if the workspace is about to navigate away.
 	 * @protected
-	 * @param {string} newUrl The new url that the workspace is navigating to.
-	 * @returns { boolean} true if the workspace is navigating away.
+	 * @param {string | URL} newUrl The new url that the workspace is navigating to.
+	 * @returns {boolean} true if the workspace is navigating away.
 	 * @memberof UmbEntityWorkspaceContextBase
 	 */
 	protected _checkWillNavigateAway(newUrl: string | URL): boolean {
