@@ -1,3 +1,5 @@
+using Umbraco.Cms.Api.Common.OpenApi;
+
 namespace Umbraco.Cms.Api.Common.Configuration;
 
 /// <summary>
@@ -5,6 +7,15 @@ namespace Umbraco.Cms.Api.Common.Configuration;
 /// </summary>
 public class ConfigureDefaultApiOptions : ConfigureUmbracoOpenApiOptionsBase
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ConfigureDefaultApiOptions"/> class.
+    /// </summary>
+    /// <param name="schemaIdSelector">The schema ID selector.</param>
+    public ConfigureDefaultApiOptions(ISchemaIdSelector schemaIdSelector)
+        : base(schemaIdSelector)
+    {
+    }
+
     /// <inheritdoc />
     protected override string ApiName => DefaultApiConfiguration.ApiName;
 

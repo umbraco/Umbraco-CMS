@@ -1046,7 +1046,7 @@ export type HelpPageResponseModel = {
     type?: null | string;
 };
 
-export enum ImageCropMode {
+export enum ImageCropModeModel {
     CROP = 'Crop',
     MAX = 'Max',
     STRETCH = 'Stretch',
@@ -7559,7 +7559,7 @@ export type GetImagingResizeUrlsData = {
         id?: Array<string>;
         height?: number;
         width?: number;
-        mode?: ImageCropMode;
+        mode?: ImageCropModeModel;
     };
     url: '/umbraco/management/api/v1/imaging/resize/urls';
 };

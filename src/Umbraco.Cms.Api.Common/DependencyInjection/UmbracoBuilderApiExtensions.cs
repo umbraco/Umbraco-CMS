@@ -23,6 +23,8 @@ public static class UmbracoBuilderApiExtensions
         builder.Services.AddUmbracoApi<ConfigureDefaultApiOptions>(DefaultApiConfiguration.ApiName, "Default API");
         builder.Services.AddSingleton<IUmbracoJsonTypeInfoResolver, UmbracoJsonTypeInfoResolver>();
         builder.Services.Configure<UmbracoPipelineOptions>(options => options.AddFilter(new SwaggerRouteTemplatePipelineFilter("UmbracoApiCommon")));
+        builder.Services.AddSingleton<ISchemaIdSelector, SchemaIdSelector>();
+        builder.Services.AddSingleton<ISchemaIdHandler, SchemaIdHandler>();
 
         return builder;
     }

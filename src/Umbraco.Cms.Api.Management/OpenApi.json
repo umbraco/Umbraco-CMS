@@ -13370,7 +13370,7 @@
             "name": "mode",
             "in": "query",
             "schema": {
-              "$ref": "#/components/schemas/ImageCropMode"
+              "$ref": "#/components/schemas/ImageCropModeModel"
             }
           }
         ],
@@ -45132,7 +45132,7 @@
           }
         }
       },
-      "ImageCropMode": {
+      "ImageCropModeModel": {
         "enum": [
           "Crop",
           "Max",

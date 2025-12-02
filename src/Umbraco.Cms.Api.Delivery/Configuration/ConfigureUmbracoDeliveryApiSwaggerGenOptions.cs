@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.OpenApi;
 using Umbraco.Cms.Api.Common.Configuration;
+using Umbraco.Cms.Api.Common.OpenApi;
 using Umbraco.Cms.Api.Delivery.Filters.OpenApi;
 
 namespace Umbraco.Cms.Api.Delivery.Configuration;
@@ -9,6 +10,15 @@ namespace Umbraco.Cms.Api.Delivery.Configuration;
 /// </summary>
 public class ConfigureUmbracoDeliveryApiSwaggerGenOptions : ConfigureUmbracoOpenApiOptionsBase
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ConfigureUmbracoDeliveryApiSwaggerGenOptions"/> class.
+    /// </summary>
+    /// <param name="schemaIdSelector">The schema ID selector.</param>
+    public ConfigureUmbracoDeliveryApiSwaggerGenOptions(ISchemaIdSelector schemaIdSelector)
+        : base(schemaIdSelector)
+    {
+    }
+
     /// <inheritdoc />
     protected override string ApiName => DeliveryApiConfiguration.ApiName;
 
