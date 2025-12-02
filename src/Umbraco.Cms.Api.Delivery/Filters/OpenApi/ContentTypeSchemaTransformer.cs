@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Api.Delivery.Filters.OpenApi;
 public class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApiDocumentTransformer
 {
     private const string CustomRecursiveRefKey = "x-recursive-ref";
-    private readonly IContentTypeInfoService _contentTypeInfoService;
+    private readonly IContentTypeSchemaService _contentTypeSchemaService;
     private readonly HashSet<string> _handledSchemas = [];
     private readonly IJsonTypeInfoResolver _jsonTypeInfoResolver;
     private readonly JsonSerializerOptions _serializerOptions;
@@ -28,13 +28,13 @@ public class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApiD
     /// <summary>
     /// Initializes a new instance of the <see cref="ContentTypeSchemaTransformer"/> class.
     /// </summary>
-    /// <param name="contentTypeInfoService">The content type info service.</param>
+    /// <param name="contentTypeSchemaService">The content type info service.</param>
     /// <param name="jsonOptionsMonitor">The JSON options monitor.</param>
     public ContentTypeSchemaTransformer(
-        IContentTypeInfoService contentTypeInfoService,
+        IContentTypeSchemaService contentTypeSchemaService,
         IOptionsMonitor<JsonOptions> jsonOptionsMonitor)
     {
-        _contentTypeInfoService = contentTypeInfoService;
+        _contentTypeSchemaService = contentTypeSchemaService;
         _serializerOptions = jsonOptionsMonitor
             .Get(Constants.JsonOptionsNames.DeliveryApi)
             .SerializerOptions;
@@ -74,7 +74,7 @@ public class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApiD
                     schema,
                     context,
                     PublishedItemType.Content,
-                    _contentTypeInfoService.GetContentTypes().Where(c => !c.IsElement).ToList(),
+                    _contentTypeSchemaService.GetDocumentTypes().Where(c => !c.IsElement).ToList(),
                     async contentType =>
                     {
                         var schemaId = $"{contentType.SchemaId}ContentResponseModel";
@@ -87,7 +87,7 @@ public class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApiD
                     schema,
                     context,
                     PublishedItemType.Content,
-                    _contentTypeInfoService.GetContentTypes().Where(c => !c.IsElement).ToList(),
+                    _contentTypeSchemaService.GetDocumentTypes().Where(c => !c.IsElement).ToList(),
                     async contentType =>
                     {
                         var schemaId = $"{contentType.SchemaId}ContentModel";
@@ -100,7 +100,7 @@ public class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApiD
                     schema,
                     context,
                     PublishedItemType.Content,
-                    _contentTypeInfoService.GetContentTypes().Where(c => c.IsElement).ToList(),
+                    _contentTypeSchemaService.GetDocumentTypes().Where(c => c.IsElement).ToList(),
                     async contentType =>
                     {
                         var schemaId = $"{contentType.SchemaId}ElementModel";
@@ -113,7 +113,7 @@ public class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApiD
                     schema,
                     context,
                     PublishedItemType.Media,
-                    _contentTypeInfoService.GetMediaTypes().ToList(),
+                    _contentTypeSchemaService.GetMediaTypes().ToList(),
                     async contentType =>
                     {
                         var schemaId = $"{contentType.SchemaId}MediaWithCropsResponseModel";
@@ -126,7 +126,7 @@ public class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApiD
                     schema,
                     context,
                     PublishedItemType.Media,
-                    _contentTypeInfoService.GetMediaTypes().ToList(),
+                    _contentTypeSchemaService.GetMediaTypes().ToList(),
                     async contentType =>
                     {
                         var schemaId = $"{contentType.SchemaId}MediaWithCropsModel";
@@ -141,8 +141,8 @@ public class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApiD
         OpenApiSchema schema,
         OpenApiSchemaTransformerContext context,
         PublishedItemType itemType,
-        List<ContentTypeInfo> contentTypes,
-        Func<ContentTypeInfo, Task<(string SchemaId, OpenApiSchema Schema)>> contentTypeSchemaMapper,
+        List<ContentTypeSchemaInfo> contentTypes,
+        Func<ContentTypeSchemaInfo, Task<(string SchemaId, OpenApiSchema Schema)>> contentTypeSchemaMapper,
         CancellationToken cancellationToken)
     {
         List<IOpenApiSchema> derivedTypeSchemas = [];
@@ -162,7 +162,7 @@ public class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApiD
         };
         schema.OneOf ??= new List<IOpenApiSchema>();
 
-        foreach (ContentTypeInfo contentType in contentTypes)
+        foreach (ContentTypeSchemaInfo contentType in contentTypes)
         {
             (var contentTypeSchemaId, OpenApiSchema contentTypeSchema) = await contentTypeSchemaMapper(contentType);
             contentTypeSchema.AllOf = derivedTypeSchemas;
@@ -228,7 +228,7 @@ public class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApiD
     private async Task<OpenApiSchema> CreateContentTypeSchema(
         string schemaId,
         PublishedItemType itemType,
-        ContentTypeInfo contentType,
+        ContentTypeSchemaInfo contentType,
         OpenApiSchemaTransformerContext context,
         CancellationToken cancellationToken)
     {
@@ -248,7 +248,7 @@ public class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApiD
     }
 
     private async Task<IOpenApiSchema> CreatePropertiesSchema(
-        ContentTypeInfo contentType,
+        ContentTypeSchemaInfo contentType,
         OpenApiSchemaTransformerContext context,
         CancellationToken cancellationToken)
     {
@@ -266,14 +266,14 @@ public class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApiD
     }
 
     private async Task<Dictionary<string, IOpenApiSchema>> ContentTypePropertiesMapper(
-        ContentTypeInfo contentType,
+        ContentTypeSchemaInfo contentType,
         OpenApiSchemaTransformerContext context,
         CancellationToken cancellationToken)
     {
         var properties = new Dictionary<string, IOpenApiSchema>();
-        foreach (ContentTypePropertyInfo propertyInfo in contentType.Properties.Where(p => !p.Inherited))
+        foreach (ContentTypePropertySchemaInfo propertyInfo in contentType.Properties.Where(p => !p.Inherited))
         {
-            IOpenApiSchema schema = await CreateSchema(GetJsonTypeInfo(propertyInfo.DeliveryApiType), context, cancellationToken);
+            IOpenApiSchema schema = await CreateSchema(GetJsonTypeInfo(propertyInfo.DeliveryApiClrType), context, cancellationToken);
             properties[propertyInfo.Alias] = schema;
         }
 
