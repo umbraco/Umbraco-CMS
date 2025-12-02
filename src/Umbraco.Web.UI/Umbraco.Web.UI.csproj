@@ -21,6 +21,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Cms.DevelopmentMode.Backoffice\Umbraco.Cms.DevelopmentMode.Backoffice.csproj" />
     <ProjectReference Include="..\Umbraco.Cms\Umbraco.Cms.csproj" />
+    <ProjectReference Include="..\Umbraco.POC.JsonSchemaGeneration\Umbraco.POC.JsonSchemaGeneration.csproj" />
   </ItemGroup>
 
   <ItemGroup>

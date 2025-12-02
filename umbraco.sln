@@ -190,6 +190,7 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.PublishedCache.HybridCache", "src\Umbraco.PublishedCache.HybridCache\Umbraco.PublishedCache.HybridCache.csproj", "{CB0B9817-EDBC-4D6D-B4D2-969019C4606D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Cms.DevelopmentMode.Backoffice", "src\Umbraco.Cms.DevelopmentMode.Backoffice\Umbraco.Cms.DevelopmentMode.Backoffice.csproj", "{411D1547-C84C-4F0F-A207-A189B59F9486}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nightly-e2e-templates", "nightly-e2e-templates", "{E90531F6-E32D-40DA-BCB2-55FA94D5AB19}"
 	ProjectSection(SolutionItems) = preProject
 		build\nightly-E2E-build-template.yml = build\nightly-E2E-build-template.yml
@@ -197,6 +198,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nightly-e2e-templates", "ni
 		build\nightly-E2E-run-tests-template.yml = build\nightly-E2E-run-tests-template.yml
 		build\nightly-E2E-setup-template.yml = build\nightly-E2E-setup-template.yml
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.POC.JsonSchemaGeneration", "src\Umbraco.POC.JsonSchemaGeneration\Umbraco.POC.JsonSchemaGeneration.csproj", "{737AE4DF-A4B5-406A-8E45-CF9CE38308B9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -378,6 +381,12 @@ Global
 		{411D1547-C84C-4F0F-A207-A189B59F9486}.Release|Any CPU.Build.0 = Release|Any CPU
 		{411D1547-C84C-4F0F-A207-A189B59F9486}.SkipTests|Any CPU.ActiveCfg = Debug|Any CPU
 		{411D1547-C84C-4F0F-A207-A189B59F9486}.SkipTests|Any CPU.Build.0 = Debug|Any CPU
+		{737AE4DF-A4B5-406A-8E45-CF9CE38308B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{737AE4DF-A4B5-406A-8E45-CF9CE38308B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{737AE4DF-A4B5-406A-8E45-CF9CE38308B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{737AE4DF-A4B5-406A-8E45-CF9CE38308B9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{737AE4DF-A4B5-406A-8E45-CF9CE38308B9}.SkipTests|Any CPU.ActiveCfg = Debug|Any CPU
+		{737AE4DF-A4B5-406A-8E45-CF9CE38308B9}.SkipTests|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
