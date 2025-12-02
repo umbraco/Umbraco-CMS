@@ -90,9 +90,9 @@ export class UmbEntityReferencesWorkspaceInfoAppElement extends UmbLitElement {
 		const submittableWorkspaceContext = this.#workspaceContext as UmbSubmittableWorkspaceContext | undefined;
 		const isNew = submittableWorkspaceContext?.getIsNew() ?? false;
 		if (isNew) {
-				this._total = 0;
-				this._items = [];
-				return;
+			this._total = 0;
+			this._items = [];
+			return;
 		}
 
 		const { data } = await this.#referenceRepository.requestReferencedBy(
