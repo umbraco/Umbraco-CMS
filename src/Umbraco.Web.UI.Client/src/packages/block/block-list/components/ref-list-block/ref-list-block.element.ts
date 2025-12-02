@@ -35,8 +35,7 @@ export class UmbRefListBlockElement extends UmbLitElement {
 			<uui-ref-node
 				standalone
 				.readonly=${!(this.config?.showContentEdit ?? false)}
-				.href=${this.config?.showContentEdit ? this.config?.editContentPath : undefined}
-				>>
+				.href=${this.config?.showContentEdit ? this.config?.editContentPath : undefined}>
 				<umb-icon slot="icon" .name=${this.icon}></umb-icon>
 				<umb-ufm-render slot="name" inline .markdown=${this.label} .value=${blockValue}></umb-ufm-render>
 				${when(
