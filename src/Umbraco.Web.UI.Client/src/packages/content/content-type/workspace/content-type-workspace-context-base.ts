@@ -92,7 +92,6 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 		let { data } = await request;
 
 		if (data) {
-			data = await this._processIncomingData(data);
 			data = await this._scaffoldProcessData(data);
 
 			if (this.modalContext) {
