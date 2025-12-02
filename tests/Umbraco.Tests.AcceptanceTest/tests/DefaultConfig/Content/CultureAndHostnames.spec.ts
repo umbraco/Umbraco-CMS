@@ -36,6 +36,7 @@ test('can add a culture', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickCultureAndHostnamesActionMenuOption();
+  await umbracoUi.content.clickAddNewHostnameButton();
   await umbracoUi.content.selectCultureLanguageOption(languageName);
   await umbracoUi.content.clickSaveModalButton();
 
@@ -45,8 +46,7 @@ test('can add a culture', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   expect(domainsData.defaultIsoCode).toEqual(isoCode);
 });
 
-// Really flaky tests, only occurs on pipeline
-test.skip('can add a domain', async ({umbracoApi, umbracoUi}) => {
+test('can add a domain', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickCultureAndHostnamesActionMenuOption();

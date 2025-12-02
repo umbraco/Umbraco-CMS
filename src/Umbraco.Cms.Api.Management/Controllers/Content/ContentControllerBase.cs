@@ -1,7 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Management.ViewModels.Content;
-using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.ContentEditing.Validation;
 using Umbraco.Cms.Core.PropertyEditors.Validation;
@@ -12,7 +10,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.Content;
 
 public abstract class ContentControllerBase : ManagementApiControllerBase
 {
-
     protected IActionResult ContentEditingOperationStatusResult(ContentEditingOperationStatus status)
         => OperationStatusResult(status, problemDetailsBuilder => status switch
         {
@@ -95,6 +92,17 @@ public abstract class ContentControllerBase : ManagementApiControllerBase
                     .Build()),
             _ => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
                 .WithTitle("Unknown content operation status.")
+                .Build()),
+        });
+
+    protected IActionResult GetReferencesOperationStatusResult(GetReferencesOperationStatus status)
+        => OperationStatusResult(status, problemDetailsBuilder => status switch
+        {
+            GetReferencesOperationStatus.ContentNotFound => NotFound(problemDetailsBuilder
+                .WithTitle("The requested content could not be found")
+                .Build()),
+            _ => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
+                .WithTitle("Unknown get references operation status.")
                 .Build()),
         });
 

@@ -120,7 +120,7 @@ public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeC
             IEnumerable<int> mediaTypeIds = removedContentTypes
                 .Where(x => x.ItemType == PublishedItemType.Media)
                 .Select(x => x.Id);
-            _mediaCacheService.RebuildMemoryCacheByContentTypeAsync(mediaTypeIds);
+            _mediaCacheService.RebuildMemoryCacheByContentTypeAsync(mediaTypeIds).GetAwaiter().GetResult();
         });
         base.Refresh(payloads);
     }

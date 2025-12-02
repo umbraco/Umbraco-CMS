@@ -1,6 +1,6 @@
+import type { UmbLogLevelCounts } from '../../types.js';
 import type {
 	DirectionModel,
-	LogLevelCountsReponseModel,
 	LogLevelModel,
 	PagedLoggerResponseModel,
 	PagedLogMessageResponseModel,
@@ -37,7 +37,7 @@ export interface UmbLogMessagesDataSource {
 	}: {
 		startDate?: string;
 		endDate?: string;
-	}): Promise<UmbDataSourceResponse<LogLevelCountsReponseModel>>;
+	}): Promise<UmbDataSourceResponse<UmbLogLevelCounts>>;
 	getLogViewerLogs({
 		skip,
 		take,

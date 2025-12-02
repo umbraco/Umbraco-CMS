@@ -374,7 +374,11 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
         return xml;
     }
 
-    public XElement Serialize(IMediaType mediaType)
+    public XElement Serialize(IMediaType mediaType) => SerializeMediaOrMemberType(mediaType, IEntityXmlSerializer.MediaTypeElementName);
+
+    public XElement Serialize(IMemberType memberType) => SerializeMediaOrMemberType(memberType, IEntityXmlSerializer.MemberTypeElementName);
+
+    private XElement SerializeMediaOrMemberType(IContentTypeComposition mediaType, string elementName)
     {
         var info = new XElement(
             "Info",
@@ -410,7 +414,7 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
             SerializePropertyGroups(mediaType.PropertyGroups)); // TODO Rename to PropertyGroups
 
         var xml = new XElement(
-            IEntityXmlSerializer.MediaTypeElementName,
+            elementName,
             info,
             structure,
             genericProperties,

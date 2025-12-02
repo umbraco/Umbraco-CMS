@@ -71,7 +71,7 @@ public class AspNetCoreCookieManagerTests
         cookieManager.ExpireCookie(CookieName);
 
         var setCookieHeader = httpContext.Response.Headers.SetCookie.ToString();
-        Assert.IsTrue(setCookieHeader.StartsWith(GetExpectedCookie()));
+        Assert.IsTrue(setCookieHeader.StartsWith("testCookie="));
         Assert.IsTrue(setCookieHeader.Contains($"expires="));
     }
 

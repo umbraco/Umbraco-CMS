@@ -88,6 +88,7 @@ internal class RepositoryCacheVersionService : IRepositoryCacheVersionService
         _logger.LogDebug("Setting cache for {EntityType} to version {Version}", typeof(TEntity).Name, newVersion);
         await _repositoryCacheVersionRepository.SaveAsync(new RepositoryCacheVersion { Identifier = cacheKey, Version = newVersion.ToString() });
         _cacheVersions[cacheKey] = newVersion;
+        _repositoryCacheVersionAccessor.VersionChanged(cacheKey);
 
         scope.Complete();
     }
