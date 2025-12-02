@@ -2,7 +2,7 @@ import type { UmbCollectionItemModel } from '../types.js';
 import type { UmbEntityCollectionItemElement } from '../entity-collection-item-element.interface.js';
 import { getItemFallbackName, getItemFallbackIcon } from '@umbraco-cms/backoffice/entity-item';
 import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
-import { customElement, html, nothing, property } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, html, ifDefined, nothing, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-default-collection-item-ref')
@@ -48,7 +48,7 @@ export class UmbDefaultCollectionItemRefElement extends UmbLitElement implements
 			?select-only=${this.selectOnly}
 			?selected=${this.selected}
 			?disabled=${this.disabled}
-			href=${this.href}>
+			href=${ifDefined(this.href)}>
 			<slot name="actions" slot="actions"></slot>
 			${this.#renderIcon(this.item)}
 		</uui-ref-node>`;

@@ -1,5 +1,5 @@
 import type { UmbDocumentCollectionItemModel } from './types.js';
-import { css, customElement, html, nothing, property } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, ifDefined, nothing, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 import type {
@@ -55,7 +55,7 @@ export class UmbDocumentCollectionItemCardElement extends UmbLitElement implemen
 		if (!this.item) return nothing;
 		return html`
 			<umb-document-grid-collection-card
-				href=${this.href}
+				href=${ifDefined(this.href)}
 				.item=${this.item}
 				.columns=${this.detailProperties}
 				?selectable=${this.selectable}
