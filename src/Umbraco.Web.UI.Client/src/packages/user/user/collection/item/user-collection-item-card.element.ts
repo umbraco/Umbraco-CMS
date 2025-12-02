@@ -51,7 +51,7 @@ export class UmbUserCollectionItemCardElement extends UmbLitElement implements U
 	#userGroupItemRepository = new UmbUserGroupItemRepository(this);
 
 	async #loadUserGroups() {
-		if (!this.item || this.item?.userGroupUniques.length === 0) {
+		if (!this.item || !this.item.userGroupUniques || this.item.userGroupUniques.length === 0) {
 			this._userGroupItems = [];
 			return;
 		}
