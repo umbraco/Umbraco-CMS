@@ -2550,7 +2550,7 @@ export default {
 	profiling: {
 		performanceProfiling: 'Performance profiling',
 		performanceProfilingDescription:
-			"<p>Umbraco currently runs in debug mode. This means you can use the built-in performance profiler to assess the performance when rendering pages.</p><p>If you want to activate the profiler for a specific page rendering, simply add <strong>umbDebug=true</strong> to the querystring when requesting the page.</p><p>If you want the profiler to be activated by default for all page renderings, you can use the toggle below. It will set a cookie in your browser, which then activates the profiler automatically. In other words, the profiler will only be active by default in <em>your</em> browser - not everyone else's.</p>",
+			"<p>Umbraco currently runs in debug mode. This means you can use the built-in performance profiler to assess the performance when rendering pages.</p><p>If you want to activate the profiler for a specific page rendering, simply add <strong>umbDebug=true</strong> to the querystring when requesting the page.</p><p>If you want the profiler to be activated by default for all page renderings, you can use the toggle below. It will set a cookie in your browser, which then activates the profiler automatically. In other words, the profiler will only be active by default in <em>your</em> browser - not everyone else's.</p><p><strong>Note:</strong> This will only work if the Backoffice is currently located on the same URL as the front-end website.</p>",
 		activateByDefault: 'Activate the profiler by default',
 		reminder: 'Friendly reminder',
 		reminderDescription:
