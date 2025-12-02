@@ -236,7 +236,6 @@ public partial class ContentEditingServiceTests
                     }));
     }
 
-
     [Test]
     public async Task Will_Succeed_For_Invalid_Variant_Content_Without_Access_To_Edited_Culture()
     {
