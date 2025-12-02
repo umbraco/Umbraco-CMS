@@ -97,12 +97,6 @@ export class UmbBackofficeNotificationContainerElement extends UmbLitElement {
 		return notificationText;
 	}
 
-	/**
-	 * Announces a message to screen readers by creating a new alert element.
-	 * Using role="alert" with a fresh element for each announcement is the most
-	 * reliable method across browsers, especially for Chrome + VoiceOver.
-	 * @see https://tetralogical.com/blog/2024/05/01/why-are-my-live-regions-not-working/
-	 */
 	private _announce(message: string) {
 		if (!this.#srContainer || !message) return;
 
