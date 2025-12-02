@@ -1,27 +1,23 @@
-import type { ManifestEntityItemRef } from './entity-item-ref.extension.js';
-import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbCollectionItemDetailPropertyConfig, UmbCollectionItemModel } from './types.js';
+import type { ManifestEntityCollectionItemBase } from './entity-collection-item.extension.js';
+import { property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbExtensionsElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 import { UmbRoutePathAddendumContext } from '@umbraco-cms/backoffice/router';
 import { UMB_MARK_ATTRIBUTE_NAME } from '@umbraco-cms/backoffice/const';
-import { UUIBlinkAnimationValue } from '@umbraco-cms/backoffice/external/uui';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
-import './default-item-ref.element.js';
-
-@customElement('umb-entity-item-ref')
-export class UmbEntityItemRefElement extends UmbLitElement {
+export abstract class UmbEntityCollectionItemElementBase extends UmbLitElement {
 	#extensionsController?: UmbExtensionsElementInitializer<any>;
-	#item?: UmbEntityModel;
+	#item?: UmbCollectionItemModel;
 
 	@state()
-	private _component?: any; // TODO: Add type
+	protected _component?: any; // TODO: Add type
 
 	@property({ type: Object, attribute: false })
-	public set item(value: UmbEntityModel | undefined) {
+	public set item(value: UmbCollectionItemModel | undefined) {
 		const oldValue = this.#item;
 		this.#item = value;
 
@@ -34,38 +30,25 @@ export class UmbEntityItemRefElement extends UmbLitElement {
 			return;
 		}
 
-		this.#pathAddendum.setAddendum('ref/' + value.entityType + '/' + value.unique);
+		this.#pathAddendum.setAddendum(this.getPathAddendum(value.entityType, value.unique));
 
 		// If the component is already created, but the entity type is different, we need to destroy the component.
 		this.#createController(value.entityType);
 	}
-	public get item(): UmbEntityModel | undefined {
+	public get item(): UmbCollectionItemModel | undefined {
 		return this.#item;
 	}
 
-	#readonly = false;
+	#selectable = false;
 	@property({ type: Boolean, reflect: true })
-	public get readonly() {
-		return this.#readonly;
+	public get selectable() {
+		return this.#selectable;
 	}
-	public set readonly(value) {
-		this.#readonly = value;
+	public set selectable(value) {
+		this.#selectable = value;
 
 		if (this._component) {
-			this._component.readonly = this.#readonly;
-		}
-	}
-
-	#standalone = false;
-	@property({ type: Boolean, reflect: true })
-	public get standalone() {
-		return this.#standalone;
-	}
-	public set standalone(value) {
-		this.#standalone = value;
-
-		if (this._component) {
-			this._component.standalone = this.#standalone;
+			this._component.selectable = this.#selectable;
 		}
 	}
 
@@ -79,19 +62,6 @@ export class UmbEntityItemRefElement extends UmbLitElement {
 
 		if (this._component) {
 			this._component.selectOnly = this.#selectOnly;
-		}
-	}
-
-	#selectable = false;
-	@property({ type: Boolean, reflect: true })
-	public get selectable() {
-		return this.#selectable;
-	}
-	public set selectable(value) {
-		this.#selectable = value;
-
-		if (this._component) {
-			this._component.selectable = this.#selectable;
 		}
 	}
 
@@ -121,14 +91,31 @@ export class UmbEntityItemRefElement extends UmbLitElement {
 		}
 	}
 
-	@property({ type: Boolean })
-	error?: boolean;
+	#href?: string;
+	@property({ type: String, reflect: true })
+	public get href() {
+		return this.#href;
+	}
+	public set href(value) {
+		this.#href = value;
 
-	@property({ type: String, attribute: 'error-message', reflect: false })
-	errorMessage?: string | null;
+		if (this._component) {
+			this._component.href = this.#href;
+		}
+	}
 
-	@property({ type: String, attribute: 'error-detail', reflect: false })
-	errorDetail?: string | null;
+	#detailProperties?: Array<UmbCollectionItemDetailPropertyConfig>;
+	@property({ type: Array, attribute: false })
+	public get detailProperties() {
+		return this.#detailProperties;
+	}
+	public set detailProperties(value) {
+		this.#detailProperties = value;
+
+		if (this._component) {
+			this._component.detailProperties = this.#detailProperties;
+		}
+	}
 
 	#pathAddendum = new UmbRoutePathAddendumContext(this);
 
@@ -148,7 +135,7 @@ export class UmbEntityItemRefElement extends UmbLitElement {
 
 	protected override firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.firstUpdated(_changedProperties);
-		this.setAttribute(UMB_MARK_ATTRIBUTE_NAME, 'entity-item-ref');
+		this.setAttribute(UMB_MARK_ATTRIBUTE_NAME, this.getMarkAttributeName());
 	}
 
 	#boundOnSelected = this.#onSelected.bind(this);
@@ -162,21 +149,21 @@ export class UmbEntityItemRefElement extends UmbLitElement {
 		this.#extensionsController = new UmbExtensionsElementInitializer(
 			this,
 			umbExtensionsRegistry,
-			'entityItemRef',
-			(manifest: ManifestEntityItemRef) => manifest.forEntityTypes.includes(entityType),
+			this.getExtensionType(),
+			(manifest: ManifestEntityCollectionItemBase) => manifest.forEntityTypes.includes(entityType),
 			(extensionControllers) => {
 				this._component?.remove();
-				const component = extensionControllers[0]?.component || document.createElement('umb-default-item-ref');
+				const component = extensionControllers[0]?.component || this.createFallbackElement();
 
 				// TODO: I would say this code can use feature of the UmbExtensionsElementInitializer, to set properties and get a fallback element. [NL]
 				// assign the properties to the component
 				component.item = this.item;
-				component.readonly = this.readonly;
-				component.standalone = this.standalone;
-				component.selectOnly = this.selectOnly;
 				component.selectable = this.selectable;
+				component.selectOnly = this.selectOnly;
 				component.selected = this.selected;
 				component.disabled = this.disabled;
+				component.href = this.href;
+				component.detailProperties = this.detailProperties;
 
 				component.addEventListener(UmbSelectedEvent.TYPE, this.#boundOnSelected);
 				component.addEventListener(UmbDeselectedEvent.TYPE, this.#boundOnDeselected);
@@ -189,37 +176,10 @@ export class UmbEntityItemRefElement extends UmbLitElement {
 
 				this._component = component;
 			},
-			undefined, // We can leave the alias to undefined, as we destroy this our selfs.
+			undefined, // We can leave the alias to undefined, as we destroy this ourselves.
 			undefined,
 			{ single: true },
 		);
-	}
-
-	override render() {
-		if (this._component) {
-			return html`${this._component}`;
-		}
-
-		// Error:
-		if (this.error) {
-			return html`
-				<uui-ref-node
-					style="color: var(--uui-color-danger);"
-					.name=${this.localize.string(this.errorMessage ?? '#general_notFound')}
-					.detail=${this.errorDetail ?? ''}
-					.readonly=${this.readonly}
-					.standalone=${this.standalone}
-					.selectOnly=${this.selectOnly}
-					.selected=${this.selected}
-					.disabled=${this.disabled}>
-					<uui-icon slot="icon" name="icon-alert" style="color: var(--uui-color-danger);"></uui-icon>
-					<slot name="actions"></slot>
-				</uui-ref-node>
-			`;
-		}
-
-		// Loading:
-		return html`<uui-loader-bar style="margin-top:10px;"></uui-loader-bar>`;
 	}
 
 	override destroy(): void {
@@ -228,56 +188,11 @@ export class UmbEntityItemRefElement extends UmbLitElement {
 		super.destroy();
 	}
 
-	static override styles = [
-		css`
-			:host {
-				display: block;
-				position: relative;
-			}
-
-			:host::after {
-				content: '';
-				position: absolute;
-				z-index: 1;
-				pointer-events: none;
-				inset: 0;
-				border: 1px solid transparent;
-				border-radius: var(--uui-border-radius);
-
-				transition: border-color 240ms ease-in;
-			}
-
-			:host([drag-placeholder]) {
-				--uui-color-focus: transparent;
-			}
-
-			:host([drag-placeholder])::after {
-				display: block;
-				border-width: 2px;
-				border-color: var(--uui-color-interactive-emphasis);
-				animation: ${UUIBlinkAnimationValue};
-			}
-			:host([drag-placeholder])::before {
-				content: '';
-				position: absolute;
-				pointer-events: none;
-				inset: 0;
-				border-radius: var(--uui-border-radius);
-				background-color: var(--uui-color-interactive-emphasis);
-				opacity: 0.12;
-			}
-			:host([drag-placeholder]) > * {
-				transition: opacity 50ms 16ms;
-				opacity: 0;
-			}
-		`,
-	];
-}
-
-export { UmbEntityItemRefElement as element };
-
-declare global {
-	interface HTMLElementTagNameMap {
-		'umb-entity-item-ref': UmbEntityItemRefElement;
-	}
+	/**
+	 * Abstract methods that subclasses must implement
+	 */
+	protected abstract getExtensionType(): string;
+	protected abstract createFallbackElement(): HTMLElement;
+	protected abstract getPathAddendum(entityType: string, unique: string): string;
+	protected abstract getMarkAttributeName(): string;
 }
