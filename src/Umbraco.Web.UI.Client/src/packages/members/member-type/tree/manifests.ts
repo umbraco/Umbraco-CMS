@@ -1,13 +1,11 @@
-import { UMB_MEMBER_TYPE_ROOT_WORKSPACE_ALIAS } from '../constants.js';
 import { UMB_MEMBER_TYPE_ENTITY_TYPE, UMB_MEMBER_TYPE_ROOT_ENTITY_TYPE } from '../entity.js';
 import {
 	UMB_MEMBER_TYPE_TREE_ALIAS,
-	UMB_MEMBER_TYPE_TREE_ITEM_CHILDREN_COLLECTION_ALIAS,
 	UMB_MEMBER_TYPE_TREE_REPOSITORY_ALIAS,
 	UMB_MEMBER_TYPE_TREE_STORE_ALIAS,
 } from './constants.js';
-import { manifests as treeItemChildrenManifest } from './tree-item-children/manifests.js';
-import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
+import { manifests as folderManifests } from './folder/manifests.js';
+import { manifests as treeItemChildrenManifests } from './tree-item-children/manifests.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -38,23 +36,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Member Type Tree Item',
 		forEntityTypes: [UMB_MEMBER_TYPE_ROOT_ENTITY_TYPE, UMB_MEMBER_TYPE_ENTITY_TYPE],
 	},
-	{
-		type: 'workspaceView',
-		kind: 'collection',
-		alias: 'Umb.WorkspaceView.MemberType.TreeItemChildrenCollection',
-		name: 'Member Type Tree Item Children Collection Workspace View',
-		meta: {
-			label: '#general_design',
-			pathname: 'design',
-			icon: 'icon-member-dashed-line',
-			collectionAlias: UMB_MEMBER_TYPE_TREE_ITEM_CHILDREN_COLLECTION_ALIAS,
-		},
-		conditions: [
-			{
-				alias: UMB_WORKSPACE_CONDITION_ALIAS,
-				oneOf: [UMB_MEMBER_TYPE_ROOT_WORKSPACE_ALIAS],
-			},
-		],
-	},
-	...treeItemChildrenManifest,
+	...folderManifests,
+	...treeItemChildrenManifests,
 ];

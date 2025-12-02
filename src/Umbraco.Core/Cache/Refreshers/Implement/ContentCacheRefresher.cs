@@ -265,8 +265,8 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
 
         if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
         {
-            _documentNavigationManagementService.RebuildAsync();
-            _documentNavigationManagementService.RebuildBinAsync();
+            _documentNavigationManagementService.RebuildAsync().GetAwaiter().GetResult();
+            _documentNavigationManagementService.RebuildBinAsync().GetAwaiter().GetResult();
         }
 
         if (payload.Key is null)

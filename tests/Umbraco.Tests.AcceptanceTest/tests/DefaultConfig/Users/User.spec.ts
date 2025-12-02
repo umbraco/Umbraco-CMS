@@ -194,8 +194,7 @@ test('can add multiple content start nodes for a user', async ({umbracoApi, umbr
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
-// TODO: Look into flaky test
-test.fixme('can remove a content start node from a user', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test('can remove a content start node from a user', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
   const userId = await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
@@ -596,13 +595,11 @@ test('can order by newest user', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.user.isUserWithNameTheFirstUserInList(nameOfTheUser);
 });
 
-// TODO: Sometimes the frontend does not switch from grid to table, or table to grid.
-test.skip('can change from grid to table view', async ({page, umbracoApi, umbracoUi}) => {
+test.fixme('can change from grid to table view', async ({page, umbracoApi, umbracoUi}) => {
+  // TODO: Implement it later
 });
 
-// This test is skipped because currently it is impossible to remove the admin user group from a user
-// Related issue: https://github.com/umbraco/Umbraco-CMS/issues/19917
-test.skip('can remove admin user group from a user', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test('can remove admin user group from a user', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const adminUserGroupName = 'Administrators';
   const editorUserGroupName = 'Editors';
@@ -627,9 +624,7 @@ test.skip('can remove admin user group from a user', {tag: '@release'}, async ({
   expect(await umbracoApi.user.doesUserContainUserGroupIds(nameOfTheUser, [editorUserGroupData.id])).toBeTruthy();
 });
 
-// This test is skipped because currently it is possible to remove all user groups from a user
-// Related issue: https://github.com/umbraco/Umbraco-CMS/issues/19992
-test.skip('cannot remove all user group from a user', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test('cannot remove all user group from a user', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
   await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);

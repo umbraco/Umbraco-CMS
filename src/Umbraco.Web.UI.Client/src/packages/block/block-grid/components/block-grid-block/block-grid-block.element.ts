@@ -34,7 +34,8 @@ export class UmbBlockGridBlockElement extends UmbLitElement {
 		return html`
 			<umb-ref-grid-block
 				standalone
-				href=${(this.config?.showContentEdit ? this.config?.editContentPath : undefined) ?? ''}>
+				.readonly=${!(this.config?.showContentEdit ?? false)}
+				.href=${this.config?.showContentEdit ? this.config?.editContentPath : undefined}>
 				<umb-icon slot="icon" .name=${this.icon}></umb-icon>
 				<umb-ufm-render slot="name" inline .markdown=${this.label} .value=${blockValue}></umb-ufm-render>
 				${when(
@@ -54,6 +55,10 @@ export class UmbBlockGridBlockElement extends UmbLitElement {
 		css`
 			umb-block-grid-areas-container::part(area) {
 				margin: var(--uui-size-2);
+			}
+
+			umb-ufm-render {
+				user-select: none;
 			}
 
 			uui-tag {

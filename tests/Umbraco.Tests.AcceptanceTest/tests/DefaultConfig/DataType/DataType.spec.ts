@@ -1,4 +1,4 @@
-﻿import {test} from '@umbraco/playwright-testhelpers';
+import {test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 const dataTypeName = 'TestDataType';
@@ -68,7 +68,7 @@ test('can change property editor in a data type', {tag: '@smoke'}, async ({umbra
   const updatedEditorName = 'Text Area';
   const updatedEditorAlias = 'Umbraco.TextArea';
   const updatedEditorUiAlias = 'Umb.PropertyEditorUi.TextArea';
-  const maxChars = 999;
+  const maxChars = 500;
 
   await umbracoApi.dataType.createTextstringDataType(dataTypeName, maxChars);
   expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeTruthy();
