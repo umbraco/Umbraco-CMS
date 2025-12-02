@@ -368,11 +368,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			(varies) => {
 				this._data.setVariesBySegment(varies);
 				this.#variesBySegment = varies;
-				if (varies) {
-					this.loadSegments();
-				} else {
-					this._segments.setValue([]);
-				}
 			},
 			null,
 		);
@@ -393,18 +388,26 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		this.#languages.setValue(data?.items ?? []);
 	}
 
+	/**
+	 * @deprecated Call `_loadSegmentsFor` instead. `loadSegments` will be removed in v.18.
+	 * (note this was introduced in v.17, and deprecated in v.17.0.1)
+	 */
 	protected async loadSegments() {
+		console.warn('Stop using loadSegments, call _loadSegmentsFor instead. loadSegments will be removed in v.18.');
+		const unique = await firstValueFrom(this.unique);
+		if (!unique) {
+			this._segments.setValue([]);
+			return;
+		}
+		this._loadSegmentsFor(unique);
+	}
+
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	protected async _loadSegmentsFor(unique: string): Promise<void> {
 		console.warn(
 			`UmbContentDetailWorkspaceContextBase: Segments are not implemented in the workspace context for "${this.getEntityType()}" types.`,
 		);
 		this._segments.setValue([]);
-	}
-
-	/**
-	 * @deprecated Call `_processIncomingData` instead. `_scaffoldProcessData` will be removed in v.18.
-	 */
-	protected override _scaffoldProcessData(data: DetailModelType): Promise<DetailModelType> {
-		return this._processIncomingData(data);
 	}
 
 	protected override async _processIncomingData(data: DetailModelType): Promise<DetailModelType> {
@@ -415,22 +418,28 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		// Load the content type structure, usually this comes from the data, but in this case we are making the data, and we need this to be able to complete the data. [NL]
 		await this.structure.loadType(contentTypeUnique);
 
+		// Load segments if varying by segment, or reset to empty array:
+		if (this.#variesBySegment) {
+			await this._loadSegmentsFor(data.unique);
+		} else {
+			this._segments.setValue([]);
+		}
+
 		// Set culture and segment for all values:
 		const cultures = this.#languages.getValue().map((x) => x.unique);
 
-		if (this.structure.variesBySegment) {
-			// TODO: v.17 Engage please note we have not implemented support for segments yet. [NL]
-			console.warn('Segments are not yet implemented for preset');
+		let segments: Array<string> | undefined;
+		if (this.#variesBySegment) {
+			segments = this._segments.getValue().map((s) => s.alias);
 		}
-		// TODO: Add Segments for Presets:
-		const segments: Array<string> | undefined = this.structure.variesBySegment ? [] : undefined;
 
 		const repo = new UmbDataTypeDetailRepository(this);
 
 		const propertyTypes = await this.structure.getContentTypeProperties();
+		const contentTypeVariesByCulture = this.structure.getVariesByCulture();
+		const contentTypeVariesBySegment = this.structure.getVariesBySegment();
 		const valueDefinitions = await Promise.all(
 			propertyTypes.map(async (property) => {
-				// TODO: Implement caching for data-type requests. [NL]
 				const dataType = (await repo.requestByUnique(property.dataType.unique)).data;
 				// This means if its not loaded this will never resolve and the error below will never happen.
 				if (!dataType) {
@@ -446,8 +455,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 					propertyEditorSchemaAlias: dataType.editorAlias,
 					config: dataType.values,
 					typeArgs: {
-						variesByCulture: property.variesByCulture,
-						variesBySegment: property.variesBySegment,
+						// Only vary if the content type varies:
+						variesByCulture: contentTypeVariesByCulture ? property.variesByCulture : false,
+						variesBySegment: contentTypeVariesBySegment ? property.variesBySegment : false,
 					} as UmbPropertyTypePresetModelTypeModel,
 				} as UmbPropertyTypePresetModel;
 			}),
@@ -665,9 +675,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		// Notice the order of the properties is important for our JSON String Compare function. [NL]
 		const entry: UmbElementValueModel = {
 			editorAlias,
-			// Be aware that this solution is a bit magical, and based on a naming convention.
-			// We might want to make this more flexible at some point and get the entityType from somewhere instead of constructing it here.
-			entityType: `${this.getEntityType()}-property-value`,
 			...variantId.toObject(),
 			alias,
 			value,

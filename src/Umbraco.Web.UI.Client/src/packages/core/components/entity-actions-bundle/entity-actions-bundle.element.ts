@@ -29,7 +29,7 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 	@state()
 	private _firstActionHref?: string;
 
-	// TODO: provide the entity context on a higher level, like the root element of this entity, tree-item/workspace/... [NL]
+	// TODO: Ideally this is provided on a higher level, as in the Tree-item, Workspace, Collection-Row, etc [NL]
 	#entityContext = new UmbEntityContext(this);
 	#inViewport = false;
 	#observingEntityActions = false;

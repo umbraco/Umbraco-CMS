@@ -6,6 +6,8 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 
+const DEFAULT_ALIAS_PATTERN = '^[A-Za-z][A-Za-z0-9_-]{0,254}$';
+
 @customElement('umb-input-with-alias')
 export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof UmbLitElement, undefined>(
 	UmbLitElement,
@@ -31,6 +33,9 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 	@property({ type: Boolean, attribute: 'auto-generate-alias' })
 	autoGenerateAlias?: boolean;
 
+	@property({ type: String, attribute: 'alias-pattern' })
+	aliasPattern: string = DEFAULT_ALIAS_PATTERN;
+
 	@state()
 	private _aliasLocked = true;
 
@@ -39,6 +44,20 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 			'valueMissing',
 			() => UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
 			() => this.required && !this.value,
+		);
+
+		this.addValidator(
+			'patternMismatch',
+			() => this.localize.term('validation_aliasInvalidFormat'),
+			() => {
+				if (!this.alias) return false;
+				try {
+					const re = new RegExp(this.aliasPattern);
+					return !re.test(this.alias);
+				} catch {
+					return false;
+				}
+			},
 		);
 
 		this.shadowRoot?.querySelectorAll<UUIInputElement>('uui-input').forEach((x) => this.addFormControlElement(x));
@@ -81,6 +100,7 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 			this.alias = generateAlias(this.value ?? '');
 			this.dispatchEvent(new UmbChangeEvent());
 		}
+		this._aliasLocked = true;
 	}
 
 	#onToggleAliasLock(event: CustomEvent) {
@@ -93,7 +113,11 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 		}
 
 		if (!this._aliasLocked) {
-			(event.target as UUIInputElement)?.focus();
+			const input = event.target as UUIInputElement;
+			input?.focus();
+			requestAnimationFrame(() => {
+				input?.select();
+			});
 		}
 	}
 
@@ -106,7 +130,7 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 				id="name"
 				placeholder=${ifDefined(this.placeholder)}
 				label=${nameLabel}
-				.value=${this.value}
+				.value=${this.value ?? ''}
 				@input=${this.#onNameChange}
 				?required=${this.required}
 				?readonly=${this.readonly}>
@@ -121,7 +145,7 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 								.value=${this.alias}
 								?auto-width=${!!this.value}
 								?locked=${this._aliasLocked && !this.aliasReadonly}
-								?readonly=${this.aliasReadonly}
+								?readonly=${this._aliasLocked || this.aliasReadonly}
 								?required=${this.required}
 								@input=${this.#onAliasChange}
 								@blur=${this.#onAliasBlur}
@@ -144,6 +168,7 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 		}
 
 		#alias {
+			transition: opacity 80ms;
 			&.muted {
 				opacity: 0.55;
 				padding: var(--uui-size-1, 3px) var(--uui-size-space-3, 9px);
@@ -155,6 +180,10 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 		}
 		:host(:invalid:not([pristine])) > uui-input {
 			border-color: var(--uui-color-invalid);
+		}
+		:host(:not(invalid):not(:hover):not(:focus-within)) #alias {
+			--uui-button-contrast: transparent;
+			--uui-input-background-color-readonly: transparent;
 		}
 	`;
 }
