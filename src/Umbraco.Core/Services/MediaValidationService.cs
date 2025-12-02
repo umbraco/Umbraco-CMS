@@ -5,8 +5,8 @@ namespace Umbraco.Cms.Core.Services;
 
 internal sealed class MediaValidationService : ContentValidationServiceBase<IMediaType>, IMediaValidationService
 {
-    public MediaValidationService(IPropertyValidationService propertyValidationService, ILanguageService languageService)
-        : base(propertyValidationService, languageService)
+    public MediaValidationService(IPropertyValidationService propertyValidationService, ILanguageService languageService, ISegmentService segmentService)
+        : base(propertyValidationService, languageService, segmentService)
     {
     }
 

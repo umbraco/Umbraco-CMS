@@ -5,8 +5,8 @@ namespace Umbraco.Cms.Core.Services;
 
 internal sealed class ContentValidationService : ContentValidationServiceBase<IContentType>, IContentValidationService
 {
-    public ContentValidationService(IPropertyValidationService propertyValidationService, ILanguageService languageService)
-        : base(propertyValidationService, languageService)
+    public ContentValidationService(IPropertyValidationService propertyValidationService, ILanguageService languageService, ISegmentService segmentService)
+        : base(propertyValidationService, languageService, segmentService)
     {
     }
 

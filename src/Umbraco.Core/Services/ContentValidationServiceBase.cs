@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.ContentEditing.Validation;
 using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Cms.Core.PropertyEditors.Validation;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
@@ -14,13 +15,16 @@ internal abstract class ContentValidationServiceBase<TContentType>
 {
     private readonly ILanguageService _languageService;
     private readonly IPropertyValidationService _propertyValidationService;
+    private readonly ISegmentService _segmentService;
 
     protected ContentValidationServiceBase(
         IPropertyValidationService propertyValidationService,
-        ILanguageService languageService)
+        ILanguageService languageService,
+        ISegmentService segmentService)
     {
         _propertyValidationService = propertyValidationService;
         _languageService = languageService;
+        _segmentService = segmentService;
     }
 
     protected async Task<ContentValidationResult> HandlePropertiesValidationAsync(
@@ -49,6 +53,12 @@ internal abstract class ContentValidationServiceBase<TContentType>
         {
             cultures = await GetCultureCodes();
         }
+
+        // Fetch defined segments for culture filtering (we only want to validate segments defined for any culture or the specific
+        // culture being validated).
+        Dictionary<string, Segment> definedSegments = cultureAndSegmentVariantPropertyTypes.Length > 0
+            ? await GetDefinedSegments()
+            : new(StringComparer.InvariantCultureIgnoreCase);
 
         // we don't have any managed segments, so we have to make do with the ones passed in the model
         var segments =
@@ -111,6 +121,12 @@ internal abstract class ContentValidationServiceBase<TContentType>
             {
                 foreach (var segment in segments.DefaultIfEmpty(null))
                 {
+                    // Skip validation if the segment has cultures defined and the current culture is not included.
+                    if (IsSegmentDefinedForCulture(culture, segment, definedSegments) is false)
+                    {
+                        continue;
+                    }
+
                     var validationContext = new PropertyValidationContext
                     {
                         Culture = culture, Segment = segment, CulturesBeingValidated = cultures, SegmentsBeingValidated = segments
@@ -125,6 +141,29 @@ internal abstract class ContentValidationServiceBase<TContentType>
         }
 
         return new ContentValidationResult { ValidationErrors = validationErrors };
+    }
+
+    private async Task<Dictionary<string, Segment>> GetDefinedSegments()
+    {
+        Attempt<PagedModel<Segment>?, SegmentOperationStatus> segmentsResult = await _segmentService.GetPagedSegmentsAsync(0, int.MaxValue);
+        return segmentsResult.Success && segmentsResult.Result?.Items is not null
+            ? segmentsResult.Result.Items.ToDictionary(s => s.Alias, StringComparer.InvariantCultureIgnoreCase)
+            : new(StringComparer.InvariantCultureIgnoreCase);
+    }
+
+    private static bool IsSegmentDefinedForCulture(string culture, string? segmentAlias, Dictionary<string, Segment> definedSegments)
+    {
+        if (string.IsNullOrWhiteSpace(segmentAlias))
+        {
+            return true;
+        }
+
+        if (definedSegments.TryGetValue(segmentAlias, out Segment? segment))
+        {
+            return segment.Cultures is null || segment.Cultures.Contains(culture, StringComparer.InvariantCultureIgnoreCase);
+        }
+
+        return true; // The segment from the incoming model is not defined, so we consider it should be validated for all cultures.
     }
 
     public async Task<bool> ValidateCulturesAsync(ContentEditingModelBase contentEditingModelBase)
