@@ -1,6 +1,6 @@
 # Workspace Context Communication Across Extensions Example
 
-The Workspace Context serves as the central communication hub for all workspace extensions. In this example, the context manages a counter that can be manipulated and displayed by different extension types, showcasing the power of shared state management in workspace extensions.
+The Workspace Context serves as the central communication hub for all Workspace extensions. In this example, the Context manages a counter that can be manipulated and displayed by different Extension Types, showcasing the power of shared state management in Workspace extensions.
 
 ## Extension types included
 

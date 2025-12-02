@@ -4687,6 +4687,9 @@ export class ServerService {
         });
     }
     
+    /**
+     * @deprecated
+     */
     public static getServerUpgradeCheck<ThrowOnError extends boolean = true>(options?: Options<GetServerUpgradeCheckData, ThrowOnError>) {
         return (options?.client ?? client).get<GetServerUpgradeCheckResponses, GetServerUpgradeCheckErrors, ThrowOnError>({
             security: [

@@ -1,8 +1,10 @@
 import type { UmbDocumentEntityType } from '../entity.js';
 import type { UmbDocumentItemVariantModel } from '../item/types.js';
+import type { UmbCollectionFilterModel } from '@umbraco-cms/backoffice/collection';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbEntityWithFlags } from '@umbraco-cms/backoffice/entity-flag';
-import type { UmbCollectionFilterModel } from '@umbraco-cms/backoffice/collection';
+
+export type * from './item/types.js';
 
 export interface UmbDocumentCollectionFilterModel extends UmbCollectionFilterModel {
 	unique: string;

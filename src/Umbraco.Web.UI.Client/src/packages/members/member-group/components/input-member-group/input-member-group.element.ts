@@ -3,18 +3,18 @@ import { UmbMemberGroupPickerInputContext } from './input-member-group.context.j
 import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
-
 import '@umbraco-cms/backoffice/entity-item';
 
 @customElement('umb-input-member-group')
-export class UmbInputMemberGroupElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
+export class UmbInputMemberGroupElement extends UmbFormControlMixin<string, typeof UmbLitElement>(
 	UmbLitElement,
+	undefined,
 ) {
 	#sorter = new UmbSorterController<string>(this, {
 		getUniqueOfElement: (element) => {
@@ -53,7 +53,7 @@ export class UmbInputMemberGroupElement extends UmbFormControlMixin<string | und
 	 * @default
 	 */
 	@property({ type: String, attribute: 'min-message' })
-	minMessage = 'This field need more items';
+	minMessage = 'This field needs more items';
 
 	/**
 	 * This is a maximum amount of selected items in this input.
@@ -75,7 +75,7 @@ export class UmbInputMemberGroupElement extends UmbFormControlMixin<string | und
 	 * @attr
 	 * @default
 	 */
-	@property({ type: String, attribute: 'min-message' })
+	@property({ type: String, attribute: 'max-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
 	public set selection(ids: Array<string>) {
@@ -92,6 +92,7 @@ export class UmbInputMemberGroupElement extends UmbFormControlMixin<string | und
 	@property({ type: String })
 	public override set value(selectionString: string | undefined) {
 		this.selection = splitStringToArray(selectionString);
+		super.value = selectionString;
 	}
 	public override get value(): string | undefined {
 		return this.selection.length > 0 ? this.selection.join(',') : undefined;
@@ -121,6 +122,15 @@ export class UmbInputMemberGroupElement extends UmbFormControlMixin<string | und
 	}
 	#readonly = false;
 
+	/**
+	 * Sets the input to required, meaning validation will fail if the value is empty.
+	 * @type {boolean}
+	 */
+	@property({ type: Boolean })
+	required?: boolean;
+	@property({ type: String })
+	requiredMessage?: string;
+
 	@state()
 	private _editMemberGroupPath = '';
 
@@ -143,6 +153,12 @@ export class UmbInputMemberGroupElement extends UmbFormControlMixin<string | und
 			.observeRouteBuilder((routeBuilder) => {
 				this._editMemberGroupPath = routeBuilder({});
 			});
+
+		this.addValidator(
+			'valueMissing',
+			() => this.requiredMessage ?? UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
+			() => !this.readonly && !!this.required && (this.value === undefined || this.value === null || this.value === ''),
+		);
 
 		this.addValidator(
 			'rangeUnderflow',

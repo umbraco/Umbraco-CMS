@@ -1,5 +1,5 @@
-import { UmbDocumentCollectionItemDataResolver } from '../../document-collection-item-data-resolver.js';
-import type { UmbDocumentCollectionItemModel } from '../../types.js';
+import { UmbDocumentCollectionItemDataResolver } from '../document-collection-item-data-resolver.js';
+import type { UmbDocumentCollectionItemModel } from '../types.js';
 import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { fromCamelCase, stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';

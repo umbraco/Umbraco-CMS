@@ -9628,6 +9628,20 @@
               }
             }
           },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProblemDetails"
+                    }
+                  ]
+                }
+              }
+            }
+          },
           "401": {
             "description": "The resource is protected and requires an authentication token"
           },
@@ -9686,6 +9700,20 @@
                   "oneOf": [
                     {
                       "$ref": "#/components/schemas/PagedReferenceByIdModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProblemDetails"
                     }
                   ]
                 }
@@ -17348,6 +17376,20 @@
               }
             }
           },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProblemDetails"
+                    }
+                  ]
+                }
+              }
+            }
+          },
           "401": {
             "description": "The resource is protected and requires an authentication token"
           },
@@ -17406,6 +17448,20 @@
                   "oneOf": [
                     {
                       "$ref": "#/components/schemas/PagedReferenceByIdModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProblemDetails"
                     }
                   ]
                 }
@@ -22294,6 +22350,20 @@
               }
             }
           },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProblemDetails"
+                    }
+                  ]
+                }
+              }
+            }
+          },
           "401": {
             "description": "The resource is protected and requires an authentication token"
           },
@@ -22352,6 +22422,20 @@
                   "oneOf": [
                     {
                       "$ref": "#/components/schemas/PagedReferenceByIdModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProblemDetails"
                     }
                   ]
                 }
@@ -27854,6 +27938,7 @@
             "description": "The authenticated user does not have access to this resource"
           }
         },
+        "deprecated": true,
         "security": [
           {
             "Backoffice-User": [ ]
@@ -38522,9 +38607,6 @@
                   "$ref": "#/components/schemas/DocumentPropertyValuePermissionPresentationModel"
                 },
                 {
-                  "$ref": "#/components/schemas/DocumentTypePermissionPresentationModel"
-                },
-                {
                   "$ref": "#/components/schemas/UnknownTypePermissionPresentationModel"
                 }
               ]
@@ -38809,9 +38891,6 @@
                 },
                 {
                   "$ref": "#/components/schemas/DocumentPropertyValuePermissionPresentationModel"
-                },
-                {
-                  "$ref": "#/components/schemas/DocumentTypePermissionPresentationModel"
                 },
                 {
                   "$ref": "#/components/schemas/UnknownTypePermissionPresentationModel"
@@ -40210,36 +40289,6 @@
           }
         },
         "additionalProperties": false
-      },
-      "DocumentTypePermissionPresentationModel": {
-        "required": [
-          "$type",
-          "documentTypeAlias",
-          "verbs"
-        ],
-        "type": "object",
-        "properties": {
-          "$type": {
-            "type": "string"
-          },
-          "verbs": {
-            "uniqueItems": true,
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "documentTypeAlias": {
-            "type": "string"
-          }
-        },
-        "additionalProperties": false,
-        "discriminator": {
-          "propertyName": "$type",
-          "mapping": {
-            "DocumentTypePermissionPresentationModel": "#/components/schemas/DocumentTypePermissionPresentationModel"
-          }
-        }
       },
       "DocumentTypePropertyTypeContainerResponseModel": {
         "required": [
@@ -49035,9 +49084,6 @@
                   "$ref": "#/components/schemas/DocumentPropertyValuePermissionPresentationModel"
                 },
                 {
-                  "$ref": "#/components/schemas/DocumentTypePermissionPresentationModel"
-                },
-                {
                   "$ref": "#/components/schemas/UnknownTypePermissionPresentationModel"
                 }
               ]
@@ -49473,9 +49519,6 @@
                 },
                 {
                   "$ref": "#/components/schemas/DocumentPropertyValuePermissionPresentationModel"
-                },
-                {
-                  "$ref": "#/components/schemas/DocumentTypePermissionPresentationModel"
                 },
                 {
                   "$ref": "#/components/schemas/UnknownTypePermissionPresentationModel"
@@ -50157,5 +50200,160 @@
         }
       }
     }
-  }
+  },
+  "tags": [
+    {
+      "name": "Culture"
+    },
+    {
+      "name": "Data Type"
+    },
+    {
+      "name": "Dictionary"
+    },
+    {
+      "name": "Document Blueprint"
+    },
+    {
+      "name": "Document Type"
+    },
+    {
+      "name": "Document Version"
+    },
+    {
+      "name": "Document"
+    },
+    {
+      "name": "Dynamic Root"
+    },
+    {
+      "name": "Health Check"
+    },
+    {
+      "name": "Help"
+    },
+    {
+      "name": "Imaging"
+    },
+    {
+      "name": "Import"
+    },
+    {
+      "name": "Indexer"
+    },
+    {
+      "name": "Install"
+    },
+    {
+      "name": "Language"
+    },
+    {
+      "name": "Log Viewer"
+    },
+    {
+      "name": "Manifest"
+    },
+    {
+      "name": "Media Type"
+    },
+    {
+      "name": "Media"
+    },
+    {
+      "name": "Member Group"
+    },
+    {
+      "name": "Member Type"
+    },
+    {
+      "name": "Member"
+    },
+    {
+      "name": "Models Builder"
+    },
+    {
+      "name": "News Dashboard"
+    },
+    {
+      "name": "Object Types"
+    },
+    {
+      "name": "oEmbed"
+    },
+    {
+      "name": "Package"
+    },
+    {
+      "name": "Partial View"
+    },
+    {
+      "name": "Preview"
+    },
+    {
+      "name": "Profiling"
+    },
+    {
+      "name": "Property Type"
+    },
+    {
+      "name": "Published Cache"
+    },
+    {
+      "name": "Redirect Management"
+    },
+    {
+      "name": "Relation Type"
+    },
+    {
+      "name": "Relation"
+    },
+    {
+      "name": "Script"
+    },
+    {
+      "name": "Searcher"
+    },
+    {
+      "name": "Security"
+    },
+    {
+      "name": "Segment"
+    },
+    {
+      "name": "Server"
+    },
+    {
+      "name": "Static File"
+    },
+    {
+      "name": "Stylesheet"
+    },
+    {
+      "name": "Tag"
+    },
+    {
+      "name": "Telemetry"
+    },
+    {
+      "name": "Template"
+    },
+    {
+      "name": "Temporary File"
+    },
+    {
+      "name": "Upgrade"
+    },
+    {
+      "name": "User Data"
+    },
+    {
+      "name": "User Group"
+    },
+    {
+      "name": "User"
+    },
+    {
+      "name": "Webhook"
+    }
+  ]
 }

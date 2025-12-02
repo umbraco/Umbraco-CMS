@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Api.Management.Extensions;
+using Umbraco.Cms.Api.Management.Extensions;
 using Umbraco.Cms.Api.Management.ViewModels.FileSystem;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core.IO;
@@ -68,12 +68,12 @@ public abstract class FileSystemTreeServiceBase : IFileSystemTreeService
             .ToArray();
     }
 
-    public string[] GetDirectories(string path) => FileSystem
+    public virtual string[] GetDirectories(string path) => FileSystem
         .GetDirectories(path)
         .OrderBy(directory => directory)
         .ToArray();
 
-    public string[] GetFiles(string path) => FileSystem
+    public virtual string[] GetFiles(string path) => FileSystem
         .GetFiles(path)
         .Where(FilterFile)
         .OrderBy(file => file)
