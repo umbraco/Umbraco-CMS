@@ -15,6 +15,7 @@ const iconMapJson = `${moduleDirectory}/icon-dictionary.json`;
 
 const lucideSvgDirectory = 'node_modules/lucide-static/icons';
 const simpleIconsSvgDirectory = 'node_modules/simple-icons/icons';
+const customSvgDirectory = `${moduleDirectory}/svgs/custom`;
 
 const IS_GITHUB_ACTIONS = process.env.GITHUB_ACTIONS === 'true';
 
@@ -124,11 +125,39 @@ const collectDictionaryIcons = async () => {
 		}
 	});
 
+	// Custom:
+	if (fileJSON['custom']) {
+		fileJSON['custom'].forEach((iconDef) => {
+			if (iconDef.file && iconDef.name) {
+				const path = customSvgDirectory + '/' + iconDef.file;
+
+				try {
+					const rawData = readFileSync(path);
+					const svg = rawData.toString();
+					const iconFileName = iconDef.name;
+
+					const icon = {
+						name: iconDef.name,
+						legacy: iconDef.legacy,
+						fileName: iconFileName,
+						svg,
+						output: `${iconsOutputDirectory}/${iconFileName}.ts`,
+					};
+
+					icons.push(icon);
+				} catch {
+					errors.push(`[Custom] Could not load file: '${path}'`);
+					console.log(`[Custom] Could not load file: '${path}'`);
+				}
+			}
+		});
+	}
+
 	return icons;
 };
 
 const collectDiskIcons = async (icons) => {
-	const iconPaths = await glob(`${umbracoSvgDirectory}/icon-*.svg`);
+	const iconPaths = await glob(`${umbracoSvgDirectory}/legacy/icon-*.svg`);
 
 	iconPaths.forEach((path) => {
 		const rawData = readFileSync(path);
