@@ -10,8 +10,8 @@ export const UMB_PROPERTY_ACTION_SORT_MODE_KIND_MANIFEST: UmbExtensionManifestKi
 		...UMB_PROPERTY_ACTION_DEFAULT_KIND_MANIFEST.manifest,
 		type: 'propertyAction',
 		kind: 'sortMode',
-		api: () => import('./sort-mode.property-action.js'),
-		element: () => import('./sort-mode-property-action.element.js'),
+		api: () => import('./property-sort-mode.action.js'),
+		element: () => import('./property-sort-mode-action.element.js'),
 		meta: {
 			icon: 'icon-sort',
 			label: '#general_sort',

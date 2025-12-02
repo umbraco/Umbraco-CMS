@@ -106,6 +106,7 @@
 		"./settings": "./dist-cms/packages/settings/index.js",
 		"./shortcut": "./dist-cms/packages/core/shortcut/index.js",
 		"./sorter": "./dist-cms/packages/core/sorter/index.js",
+		"./property-sort-mode": "./dist-cms/packages/core/property-sort-mode/index.js",
 		"./static-file": "./dist-cms/packages/static-file/index.js",
 		"./store": "./dist-cms/packages/core/store/index.js",
 		"./style": "./dist-cms/packages/core/style/index.js",

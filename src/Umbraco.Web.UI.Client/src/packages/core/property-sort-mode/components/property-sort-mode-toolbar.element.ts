@@ -1,11 +1,11 @@
-import { UMB_SORT_PROPERTY_CONTEXT } from '../../property/context/sort.property-context-token.js';
+import { UMB_PROPERTY_SORT_MODE_CONTEXT } from '../context/property-sort-mode.context-token.js';
 import { css, customElement, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-@customElement('umb-sort-mode-toolbar')
-export class UmbSortModeToolbarElement extends UmbLitElement {
+@customElement('umb-property-sort-mode-toolbar')
+export class UmbPropertySortModeToolbarElement extends UmbLitElement {
 	#onSortModeExit = async () => {
-		const context = await this.getContext(UMB_SORT_PROPERTY_CONTEXT);
+		const context = await this.getContext(UMB_PROPERTY_SORT_MODE_CONTEXT);
 		context?.setSortingMode(false);
 	};
 
@@ -38,10 +38,10 @@ export class UmbSortModeToolbarElement extends UmbLitElement {
 	];
 }
 
-export { UmbSortModeToolbarElement as element };
+export { UmbPropertySortModeToolbarElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-sort-mode-toolbar': UmbSortModeToolbarElement;
+		'umb-property-sort-mode-toolbar': UmbPropertySortModeToolbarElement;
 	}
 }

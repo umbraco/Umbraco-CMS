@@ -74,11 +74,11 @@ const propertyValueResolver: UmbExtensionManifest = {
 	forEditorAlias: UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS,
 };
 
-const sortPropertyContext: UmbExtensionManifest = {
+const sortModePropertyContext: UmbExtensionManifest = {
 	type: 'propertyContext',
-	kind: 'sort',
-	alias: 'Umb.PropertyContext.BlockGrid.Sort',
-	name: 'Block Grid Sort Property Context',
+	kind: 'sortMode',
+	alias: 'Umb.PropertyContext.BlockGrid.SortMode',
+	name: 'Block Grid Sort Mode Property Context',
 	forPropertyEditorUis: [UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS],
 };
 
@@ -86,5 +86,5 @@ export const manifests: Array<UmbExtensionManifest> = [
 	propertyEditorSchema,
 	propertyEditorUi,
 	propertyValueResolver,
-	sortPropertyContext,
+	sortModePropertyContext,
 ];
