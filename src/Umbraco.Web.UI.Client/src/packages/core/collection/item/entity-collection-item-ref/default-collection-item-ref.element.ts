@@ -5,8 +5,8 @@ import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/ev
 import { customElement, html, ifDefined, nothing, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-@customElement('umb-default-collection-item-card')
-export class UmbDefaultCollectionItemCardElement extends UmbLitElement implements UmbEntityCollectionItemElement {
+@customElement('umb-default-collection-item-ref')
+export class UmbDefaultCollectionItemRefElement extends UmbLitElement implements UmbEntityCollectionItemElement {
 	@property({ type: Object })
 	item?: UmbCollectionItemModel;
 
@@ -40,20 +40,18 @@ export class UmbDefaultCollectionItemCardElement extends UmbLitElement implement
 	override render() {
 		if (!this.item) return nothing;
 
-		return html`
-			<uui-card-content-node
-				name=${this.item.name ?? `${getItemFallbackName(this.item)}`}
-				href=${ifDefined(this.href)}
-				?selectable=${this.selectable}
-				?select-only=${this.selectOnly}
-				?selected=${this.selected}
-				?disabled=${this.disabled}
-				@selected=${this.#onSelected}
-				@deselected=${this.#onDeselected}>
-				<slot name="actions" slot="actions"></slot>
-				${this.#renderIcon(this.item)}
-			</uui-card-content-node>
-		`;
+		return html` <uui-ref-node
+			name=${this.item.name ?? `${getItemFallbackName(this.item)}`}
+			@selected=${this.#onSelected}
+			@deselected=${this.#onDeselected}
+			?selectable=${this.selectable}
+			?select-only=${this.selectOnly}
+			?selected=${this.selected}
+			?disabled=${this.disabled}
+			href=${ifDefined(this.href)}>
+			<slot name="actions" slot="actions"></slot>
+			${this.#renderIcon(this.item)}
+		</uui-ref-node>`;
 	}
 
 	#renderIcon(item: UmbCollectionItemModel) {
@@ -64,6 +62,6 @@ export class UmbDefaultCollectionItemCardElement extends UmbLitElement implement
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-default-collection-item-card': UmbDefaultCollectionItemCardElement;
+		'umb-default-collection-item-ref': UmbDefaultCollectionItemRefElement;
 	}
 }
