@@ -27,6 +27,12 @@ public class UdtFileContentFactory : IUdtFileContentFactory
         return XmlTofile(mediaType, xml);
     }
 
+    public FileContentResult Create(IMemberType memberType)
+    {
+        XElement xml = _entityXmlSerializer.Serialize(memberType);
+        return XmlTofile(memberType, xml);
+    }
+
     private static FileContentResult XmlTofile(IContentTypeBase contentTypeBase, XElement xml) =>
         new(Encoding.UTF8.GetBytes(xml.ToDataString()), MediaTypeNames.Application.Octet)
         {

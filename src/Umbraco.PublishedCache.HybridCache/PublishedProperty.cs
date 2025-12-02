@@ -187,10 +187,10 @@ internal sealed class PublishedProperty : PublishedPropertyBase
         switch (cacheLevel)
         {
             case PropertyCacheLevel.None:
+            case PropertyCacheLevel.Snapshot: // Snapshot is obsolete, so for now treat as None
                 // never cache anything
                 cacheValues = new CacheValues();
                 break;
-            case PropertyCacheLevel.Snapshot: // Snapshot is obsolete, so for now treat as element
             case PropertyCacheLevel.Element:
                 // cache within the property object itself, ie within the content object
                 cacheValues = _cacheValues ??= new CacheValues();

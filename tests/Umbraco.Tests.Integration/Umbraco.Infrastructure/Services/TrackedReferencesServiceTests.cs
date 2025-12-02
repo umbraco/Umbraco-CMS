@@ -5,6 +5,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Infrastructure.Persistence.Relations;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
@@ -77,14 +78,43 @@ internal class TrackedReferencesServiceTests : UmbracoIntegrationTest
     {
         var sut = GetRequiredService<ITrackedReferencesService>();
 
-        var actual = await sut.GetPagedRelationsForItemAsync(Root1.Key, 0, 10, true);
+        var actual = await sut.GetPagedRelationsForItemAsync(Root1.Key, UmbracoObjectTypes.Document, 0, 10, true);
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(1, actual.Total);
-            var item = actual.Items.FirstOrDefault();
+            Assert.IsTrue(actual.Success);
+            Assert.AreEqual(1, actual.Result.Total);
+            var item = actual.Result.Items.FirstOrDefault();
             Assert.AreEqual(Root2.ContentType.Alias, item?.ContentTypeAlias);
             Assert.AreEqual(Root2.Key, item?.NodeKey);
+        });
+    }
+
+    [Test]
+    public async Task Get_Relations_For_Non_Existing_Page_Returns_Not_Found()
+    {
+        var sut = GetRequiredService<ITrackedReferencesService>();
+
+        var actual = await sut.GetPagedRelationsForItemAsync(Guid.NewGuid(), UmbracoObjectTypes.Document, 0, 10, true);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(actual.Success);
+            Assert.AreEqual(GetReferencesOperationStatus.ContentNotFound, actual.Status);
+        });
+    }
+
+    [Test]
+    public async Task Get_Descendants_In_References_For_Non_Existing_Page_Returns_Not_Found()
+    {
+        var sut = GetRequiredService<ITrackedReferencesService>();
+
+        var actual = await sut.GetPagedDescendantsInReferencesAsync(Guid.NewGuid(), UmbracoObjectTypes.Document, 0, 10, true);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(actual.Success);
+            Assert.AreEqual(GetReferencesOperationStatus.ContentNotFound, actual.Status);
         });
     }
 
@@ -93,9 +123,10 @@ internal class TrackedReferencesServiceTests : UmbracoIntegrationTest
     {
         var sut = GetRequiredService<ITrackedReferencesService>();
 
-        var actual = await sut.GetPagedRelationsForItemAsync(Root2.Key, 0, 10, true);
+        var actual = await sut.GetPagedRelationsForItemAsync(Root2.Key, UmbracoObjectTypes.Document, 0, 10, true);
 
-        Assert.AreEqual(0, actual.Total);
+        Assert.IsTrue(actual.Success);
+        Assert.AreEqual(0, actual.Result.Total);
     }
 
     [Test]

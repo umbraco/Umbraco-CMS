@@ -54,6 +54,12 @@ public interface IPublishedContentTypeFactory
     PublishedDataType GetDataType(int id);
 
     /// <summary>
+    ///     Clears the internal data type cache.
+    /// </summary>
+    void ClearDataTypeCache()
+    { }
+
+    /// <summary>
     ///     Notifies the factory of datatype changes.
     /// </summary>
     /// <remarks>

@@ -10,6 +10,7 @@ public interface IEntityXmlSerializer
 {
     internal const string DocumentTypeElementName = "DocumentType";
     internal const string MediaTypeElementName = "MediaType";
+    internal const string MemberTypeElementName = "MemberType";
 
     /// <summary>
     ///     Exports an IContent item as an XElement.
@@ -79,6 +80,8 @@ public interface IEntityXmlSerializer
     XElement Serialize(IEnumerable<ITemplate> templates);
 
     XElement Serialize(IMediaType mediaType);
+
+    XElement Serialize(IMemberType memberType) => throw new NotImplementedException();
 
     XElement Serialize(IContentType contentType);
 }
