@@ -11,7 +11,7 @@ using Umbraco.Cms.Infrastructure.Models;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
 
-internal class ExamineIndexRebuilder : IIndexRebuilder
+public class ExamineIndexRebuilder : IIndexRebuilder
 {
     private const string RebuildAllOperationTypeName = "RebuildAllExamineIndexes";
 
