@@ -2023,4 +2023,132 @@ internal partial class BlockListElementLevelVariationTests
             Assert.IsEmpty(value);
         }
     }
+
+    [Test]
+    public async Task Missing_Segment_Performs_Fallback_To_Default_Segment()
+    {
+        var elementType = CreateElementType(ContentVariation.Segment);
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = CreateContentType(ContentVariation.Segment, blockListDataType);
+
+        var content = CreateContent(
+            contentType,
+            elementType,
+            new List<BlockPropertyValue>
+            {
+                new() { Alias = "invariantText", Value = "The invariant content value" },
+                new() { Alias = "variantText", Value = "The variant content value (Default)" },
+                new() { Alias = "variantText", Value = "The variant content value (Segment 2)", Segment = "s2" }
+            },
+            [],
+            true);
+
+        AssertPropertyValues(null, "The invariant content value", "The variant content value (Default)");
+
+        AssertPropertyValues("s1", "The invariant content value", "The variant content value (Default)");
+
+        AssertPropertyValues("s2", "The invariant content value", "The variant content value (Segment 2)");
+
+        var blockListValue = JsonSerializer.Deserialize<BlockListValue>((string)content.Properties["blocks"]!.GetValue()!);
+        blockListValue.ContentData[0].Values.Add(new BlockPropertyValue { Alias = "variantText", Value = "The variant content value (Segment 1)", Segment = "s1" });
+
+        blockListValue.Expose =
+        [
+            new() { ContentKey = blockListValue.ContentData[0].Key },
+            new() { ContentKey = blockListValue.ContentData[0].Key, Segment = "s1" },
+            new() { ContentKey = blockListValue.ContentData[0].Key, Segment = "s2" },
+        ];
+
+        content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
+        ContentService.Save(content);
+        PublishContent(content, contentType);
+
+        AssertPropertyValues(null, "The invariant content value", "The variant content value (Default)");
+
+        AssertPropertyValues("s1", "The invariant content value", "The variant content value (Segment 1)");
+
+        AssertPropertyValues("s2", "The invariant content value", "The variant content value (Segment 2)");
+
+        void AssertPropertyValues(string? segment, string expectedInvariantContentValue, string expectedVariantContentValue)
+        {
+            SetVariationContext(null, segment);
+            var publishedContent = GetPublishedContent(content.Key);
+
+            var value = publishedContent.Value<BlockListModel>("blocks");
+            Assert.IsNotNull(value);
+            Assert.AreEqual(1, value.Count);
+
+            var blockListItem = value.First();
+            Assert.AreEqual(2, blockListItem.Content.Properties.Count());
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(expectedInvariantContentValue, blockListItem.Content.Value<string>("invariantText"));
+                Assert.AreEqual(expectedVariantContentValue, blockListItem.Content.Value<string>("variantText"));
+            });
+        }
+    }
+
+    [Test]
+    public async Task Missing_Property_Value_For_Existing_Segment_Does_Not_Perform_Fallback_To_Default_Segment()
+    {
+        var elementType = CreateElementType(ContentVariation.Segment);
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = CreateContentType(ContentVariation.Segment, blockListDataType);
+
+        var content = CreateContent(contentType, elementType, [], false);
+        var blockListValue = BlockListPropertyValue(
+            elementType,
+            [
+                (
+                    Guid.NewGuid(),
+                    Guid.NewGuid(),
+                    new BlockProperty(
+                        new List<BlockPropertyValue>
+                        {
+                            new() { Alias = "invariantText", Value = "The invariant content value" },
+                            new() { Alias = "variantText", Value = "The variant content value (Default)" },
+                            new() { Alias = "variantText", Value = "The variant content value (Segment 2)", Segment = "s2"}
+                        },
+                        [],
+                        null,
+                        null)
+                )
+            ]);
+
+        blockListValue.Expose =
+        [
+            new() { ContentKey = blockListValue.ContentData[0].Key },
+            new() { ContentKey = blockListValue.ContentData[0].Key, Segment = "s1" },
+            new() { ContentKey = blockListValue.ContentData[0].Key, Segment = "s2" },
+        ];
+
+        content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
+        ContentService.Save(content);
+        PublishContent(content, contentType);
+
+        AssertPropertyValues(null, "The invariant content value", "The variant content value (Default)");
+
+        AssertPropertyValues("s1", "The invariant content value", string.Empty);
+
+        AssertPropertyValues("s2", "The invariant content value", "The variant content value (Segment 2)");
+
+
+        void AssertPropertyValues(string? segment, string expectedInvariantContentValue, string expectedVariantContentValue)
+        {
+            SetVariationContext(null, segment);
+            var publishedContent = GetPublishedContent(content.Key);
+
+            var value = publishedContent.Value<BlockListModel>("blocks");
+            Assert.IsNotNull(value);
+            Assert.AreEqual(1, value.Count);
+
+            var blockListItem = value.First();
+            Assert.AreEqual(2, blockListItem.Content.Properties.Count());
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(expectedInvariantContentValue, blockListItem.Content.Value<string>("invariantText"));
+                Assert.AreEqual(expectedVariantContentValue, blockListItem.Content.Value<string>("variantText"));
+            });
+        }
+    }
 }
