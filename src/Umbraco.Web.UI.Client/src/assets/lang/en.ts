@@ -1012,7 +1012,6 @@ export default {
 		media: 'Media',
 		revert: 'Revert',
 		validate: 'Validate',
-		newVersionAvailable: 'New version available',
 		duration: (duration: string, date: Date | string, now: Date | string) => {
 			if (new Date(date).getTime() < new Date(now).getTime()) return `${duration} ago`;
 			return `in ${duration}`;

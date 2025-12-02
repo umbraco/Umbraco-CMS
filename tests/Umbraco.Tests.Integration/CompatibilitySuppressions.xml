@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <!-- https://learn.microsoft.com/dotnet/fundamentals/package-validation/diagnostic-ids -->
 <Suppressions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <Suppression>
@@ -11,6 +11,69 @@
   <Suppression>
     <DiagnosticId>CP0001</DiagnosticId>
     <Target>T:Umbraco.Cms.Tests.Integration.ManagementApi.DocumentType.Root.RootDocumentTypeTreeControllerTests</Target>
+    <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.ManagementApi.Services.Trees.PartialViewTreeServiceTests.Can_Get_Ancestors_From_StyleSheet_Tree_Service</Target>
+    <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.ManagementApi.Services.Trees.PartialViewTreeServiceTests.Can_Get_PathViewModels_From_StyleSheet_Tree_Service</Target>
+    <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.ManagementApi.Services.Trees.PartialViewTreeServiceTests.Can_Get_Siblings_From_PartialView_Tree_Service</Target>
+    <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.ManagementApi.Services.Trees.ScriptTreeServiceTests.Can_Get_Ancestors_From_StyleSheet_Tree_Service</Target>
+    <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.ManagementApi.Services.Trees.ScriptTreeServiceTests.Can_Get_PathViewModels_From_StyleSheet_Tree_Service</Target>
+    <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.ManagementApi.Services.Trees.ScriptTreeServiceTests.Can_Get_Siblings_From_Script_Tree_Service</Target>
+    <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.ManagementApi.Services.Trees.StyleSheetTreeServiceTests.Can_Get_Ancestors_From_StyleSheet_Tree_Service</Target>
+    <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.ManagementApi.Services.Trees.StyleSheetTreeServiceTests.Can_Get_PathViewModels_From_StyleSheet_Tree_Service</Target>
+    <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.ManagementApi.Services.Trees.StyleSheetTreeServiceTests.Can_Get_Siblings_From_StyleSheet_Tree_Service</Target>
     <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
     <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>

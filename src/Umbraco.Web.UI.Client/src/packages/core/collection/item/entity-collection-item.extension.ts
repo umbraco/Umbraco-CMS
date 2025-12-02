@@ -16,5 +16,5 @@ export interface ManifestEntityCollectionItemBase<MetaType = object>
 	/**
 	 * Additional metadata for the collection item.
 	 */
-	meta: MetaType;
+	meta?: MetaType;
 }

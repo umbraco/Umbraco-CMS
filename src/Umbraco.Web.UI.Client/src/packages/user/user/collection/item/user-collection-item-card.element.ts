@@ -51,7 +51,7 @@ export class UmbUserCollectionItemCardElement extends UmbLitElement implements U
 	#userGroupItemRepository = new UmbUserGroupItemRepository(this);
 
 	async #loadUserGroups() {
-		if (!this.item || this.item?.userGroupUniques.length === 0) {
+		if (!this.item || !this.item.userGroupUniques || this.item.userGroupUniques.length === 0) {
 			this._userGroupItems = [];
 			return;
 		}
@@ -81,7 +81,7 @@ export class UmbUserCollectionItemCardElement extends UmbLitElement implements U
 		return html`
 			<uui-card-user
 				.name=${this.item.name ?? this.localize.term('general_unnamed')}
-				href=${this.href}
+				href=${ifDefined(this.href)}
 				?selectable=${this.selectable}
 				?select-only=${this.selectOnly}
 				?selected=${this.selected}
