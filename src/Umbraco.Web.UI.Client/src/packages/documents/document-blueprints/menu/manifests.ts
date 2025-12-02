@@ -1,10 +1,11 @@
 import { UMB_DOCUMENT_BLUEPRINT_TREE_ALIAS } from '../tree/constants.js';
+import { UMB_DOCUMENT_BLUEPRINT_MENU_ITEM_ALIAS } from './constants.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'menuItem',
 		kind: 'tree',
-		alias: 'Umb.MenuItem.DocumentBlueprints',
+		alias: UMB_DOCUMENT_BLUEPRINT_MENU_ITEM_ALIAS,
 		name: 'Document Blueprints Menu Item',
 		weight: 100,
 		meta: {
