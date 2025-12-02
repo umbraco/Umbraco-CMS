@@ -58,13 +58,7 @@ public class ConfigureUmbracoMemberAuthenticationDeliveryApiSwaggerGenOptions : 
                 },
             };
 
-            document.Components ??= new OpenApiComponents();
-            document.Components.SecuritySchemes ??= new Dictionary<string, IOpenApiSecurityScheme>();
-            document.Components.SecuritySchemes[AuthSchemeName] = apiKeyScheme;
-
-            var schemaRef = new OpenApiSecuritySchemeReference(AuthSchemeName, document);
-            document.Security ??= new List<OpenApiSecurityRequirement>();
-            document.Security.Add(new OpenApiSecurityRequirement { [schemaRef] = [] });
+            document.AddComponent(AuthSchemeName, apiKeyScheme);
 
             return Task.CompletedTask;
         }

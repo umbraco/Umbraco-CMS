@@ -3,7 +3,6 @@ import { version } from '../../../package.json';
 import {
 	RuntimeLevelModel,
 	RuntimeModeModel,
-	type GetServerUpgradeCheckResponse,
 	type GetServerTroubleshootingResponse,
 	type GetServerInformationResponse,
 	type GetServerConfigurationResponse,
@@ -50,17 +49,6 @@ export const serverInformationHandlers = [
 				allowPasswordReset: true,
 				versionCheckPeriod: 7, // days
 				allowLocalLogin: true,
-			}),
-		);
-	}),
-	rest.get(umbracoPath('/server/upgrade-check'), (_req, res, ctx) => {
-		return res(
-			// Respond with a 200 status code
-			ctx.status(200),
-			ctx.json<GetServerUpgradeCheckResponse>({
-				type: 'Minor',
-				comment: "15.2.0 is released. Upgrade today - it's free!",
-				url: 'https://our.umbraco.com/download/releases/1520',
 			}),
 		);
 	}),

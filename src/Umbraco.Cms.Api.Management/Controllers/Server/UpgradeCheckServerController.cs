@@ -13,6 +13,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Server;
 
 [ApiVersion("1.0")]
 [Authorize(Policy = AuthorizationPolicies.RequireAdminAccess)]
+[Obsolete("Upgrade checks are no longer supported and this controller will be removed in Umbraco 19.")]
 public class UpgradeCheckServerController : ServerControllerBase
 {
     private readonly IUpgradeService _upgradeService;
@@ -27,6 +28,7 @@ public class UpgradeCheckServerController : ServerControllerBase
     [HttpGet("upgrade-check")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(UpgradeCheckResponseModel), StatusCodes.Status200OK)]
+    [Obsolete("Upgrade checks are no longer supported and this endpoint will be removed in Umbraco 19.")]
     public async Task<IActionResult> UpgradeCheck(CancellationToken cancellationToken)
     {
         UpgradeResult upgradeResult = await _upgradeService.CheckUpgrade(_umbracoVersion.SemanticVersion);

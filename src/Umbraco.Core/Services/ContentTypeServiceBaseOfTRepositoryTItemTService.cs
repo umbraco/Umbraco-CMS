@@ -1053,9 +1053,9 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     public Attempt<OperationResult<MoveOperationStatusType>?> Move(TItem moving, int containerId)
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
-        if(moving.ParentId == containerId)
+        if (moving.ParentId == containerId)
         {
-            return OperationResult.Attempt.Fail(MoveOperationStatusType.FailedNotAllowedByPath, eventMessages);
+            return OperationResult.Attempt.Succeed(MoveOperationStatusType.Success, eventMessages);
         }
 
         var moveInfo = new List<MoveEventInfo<TItem>>();
