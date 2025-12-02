@@ -995,7 +995,6 @@ export default {
 		lastUpdated: 'Sidst opdateret',
 		skipToMenu: 'Spring til menu',
 		skipToContent: 'Spring til indhold',
-		newVersionAvailable: 'Ny version tilgængelig',
 		duration: (duration: string, date: Date | string, now: Date | string) => {
 			if (new Date(date).getTime() < new Date(now).getTime()) return `for ${duration} siden`;
 			return `om ${duration}`;

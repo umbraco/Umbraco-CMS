@@ -69,6 +69,10 @@ export interface PropertyEditorSettingsProperty {
 	propertyEditorDataSourceAlias?: string;
 	config?: UmbPropertyEditorConfig;
 	weight?: number;
+	validation?: {
+		mandatory: boolean;
+		mandatoryMessage?: string | null;
+	};
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
