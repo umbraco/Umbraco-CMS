@@ -73,13 +73,13 @@ export class UmbRefCollectionViewElement extends UmbLitElement {
 	override render() {
 		if (this._loading) return nothing;
 		return html`
-			<div id="card-grid">
+			<uui-box>
 				${repeat(
 					this._items,
 					(item) => item.unique,
 					(item) => this.#renderItem(item),
 				)}
-			</div>
+			</uui-box>
 		`;
 	}
 
