@@ -229,7 +229,10 @@ export class UmbManagementApiTreeDataRequestManager<
 		return args.take !== undefined ? args.take : this.#defaultTakeSize;
 	}
 
-	#getTargetResultHasValidParents(data: Array<TreeItemType>, parentUnique: string | null): boolean {
+	#getTargetResultHasValidParents(data: Array<TreeItemType> | undefined, parentUnique: string | null): boolean {
+		if (!data) {
+			return false;
+		}
 		return data.every((item) => {
 			if (item.parent) {
 				return item.parent.id === parentUnique;

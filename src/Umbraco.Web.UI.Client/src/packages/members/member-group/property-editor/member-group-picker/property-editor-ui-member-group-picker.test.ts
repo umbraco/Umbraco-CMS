@@ -2,6 +2,9 @@ import { UmbPropertyEditorUIMemberGroupPickerElement } from './property-editor-u
 import { expect, fixture, html } from '@open-wc/testing';
 import { type UmbTestRunnerWindow, defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
+// TODO: figure out why this is not imported by the tests as it should be globally available.
+import '../../components/input-member-group/input-member-group.element.js';
+
 describe('UmbPropertyEditorUIMemberGroupPickerElement', () => {
 	let element: UmbPropertyEditorUIMemberGroupPickerElement;
 
