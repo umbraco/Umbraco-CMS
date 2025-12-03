@@ -61,7 +61,7 @@ export class UmbInputToggleElement extends UmbFormControlMixin(UmbLitElement, ''
 		return html`
 			<uui-toggle
 				.checked=${this.#checked}
-				.label=${this.ariaLabel ?? label}
+				.label=${this.ariaLabel ?? label ?? ''}
 				.requiredMessage=${this.requiredMessage}
 				?readonly=${this.readonly}
 				?required=${this.required}
