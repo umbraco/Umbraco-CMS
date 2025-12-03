@@ -105,7 +105,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	private _inlineEditingMode?: boolean;
 
 	@state()
-	private _sortingMode?: boolean;
+	private _isSortMode?: boolean;
 
 	@state()
 	private _canScale?: boolean;
@@ -217,7 +217,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		);
 		this.observe(this.#context.actionsVisibility, (showActions) => (this._showActions = showActions), null);
 		this.observe(this.#context.inlineEditingMode, (mode) => (this._inlineEditingMode = mode), null);
-		this.observe(this.#context.sortingMode, (mode) => (this._sortingMode = mode), null);
+		this.observe(this.#context.isSortMode, (isSortMode) => (this._isSortMode = isSortMode), null);
 
 		// Data:
 		this.observe(
@@ -448,7 +448,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 				${this.#renderCreateBeforeInlineButton()}
 				<div class="umb-block-grid__block" part="umb-block-grid__block">
 					${when(
-						this._sortingMode,
+						this._isSortMode,
 						() => this.#renderRefBlock(),
 						() => html`
 							<umb-extension-slot
@@ -530,7 +530,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	#renderRefBlock() {
 		return html`
 			<umb-block-grid-block
-				class="umb-block-grid__block--view ${this._sortingMode ? 'sortable' : ''}"
+				class="umb-block-grid__block--view ${this._isSortMode ? 'sortable' : ''}"
 				.label=${this._label}
 				.icon=${this._icon}
 				.index=${this._blockViewProps.index}
@@ -571,7 +571,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	}
 
 	#renderActionBar() {
-		if (this._sortingMode) return nothing;
+		if (this._isSortMode) return nothing;
 		if (!this._showActions) return nothing;
 		return html`
 			<uui-action-bar>

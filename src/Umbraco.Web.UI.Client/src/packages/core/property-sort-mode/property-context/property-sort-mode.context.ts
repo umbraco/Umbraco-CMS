@@ -33,10 +33,10 @@ export class UmbPropertySortModeContext extends UmbContextBase {
 
 	/**
 	 * Sets the sort mode state.
-	 * @param {boolean} sortingMode - Whether sort mode should be enabled.
+	 * @param {boolean} isSortMode - Whether sort mode should be enabled.
 	 */
-	setIsSortMode(sortingMode: boolean) {
-		this.#isSortMode.setValue(sortingMode);
+	setIsSortMode(isSortMode: boolean) {
+		this.#isSortMode.setValue(isSortMode);
 	}
 
 	/**

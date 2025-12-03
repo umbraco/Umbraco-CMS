@@ -77,8 +77,8 @@ export class UmbBlockGridEntryContext
 		([a, b]) => a === true && b === false,
 	);
 
-	#sortingMode = new UmbBooleanState(undefined);
-	readonly sortingMode = this.#sortingMode.asObservable();
+	#isSortMode = new UmbBooleanState(undefined);
+	readonly isSortMode = this.#isSortMode.asObservable();
 
 	readonly scaleManager = new UmbBlockGridScaleManager(this);
 
@@ -277,9 +277,9 @@ export class UmbBlockGridEntryContext
 		);
 
 		this.observe(
-			this._manager.sortingMode,
-			(sortingMode) => this.#sortingMode.setValue(sortingMode ?? false),
-			'observeSortingMode',
+			this._manager.isSortMode,
+			(isSortMode) => this.#isSortMode.setValue(isSortMode ?? false),
+			'observeIsSortMode',
 		);
 	}
 

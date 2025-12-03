@@ -42,7 +42,7 @@ export class UmbPropertyEditorUIBlockGridElement
 	private _notSupportedVariantSetting?: boolean;
 
 	@state()
-	private _sortingMode = false;
+	private _isSortMode = false;
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
@@ -236,7 +236,7 @@ export class UmbPropertyEditorUIBlockGridElement
 			this.#managerContext.setVariantId(context?.getVariantId());
 		});
 
-		this.observe(this.#managerContext.sortingMode, (sortingMode) => (this._sortingMode = sortingMode ?? false));
+		this.observe(this.#managerContext.isSortMode, (isSortMode) => (this._isSortMode = isSortMode ?? false));
 	}
 
 	protected override firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
@@ -265,7 +265,7 @@ export class UmbPropertyEditorUIBlockGridElement
 	override render() {
 		if (this._notSupportedVariantSetting) return nothing;
 		return html`
-			${this.#renderSortingMode()}
+			${this.#renderSortModeToolbar()}
 			<umb-block-grid-entries
 				${ref(this.#gotRootEntriesElement)}
 				.areaKey=${null}
@@ -274,8 +274,8 @@ export class UmbPropertyEditorUIBlockGridElement
 		`;
 	}
 
-	#renderSortingMode() {
-		if (!this._sortingMode) return nothing;
+	#renderSortModeToolbar() {
+		if (!this._isSortMode) return nothing;
 		return html`<umb-property-sort-mode-toolbar></umb-property-sort-mode-toolbar>`;
 	}
 

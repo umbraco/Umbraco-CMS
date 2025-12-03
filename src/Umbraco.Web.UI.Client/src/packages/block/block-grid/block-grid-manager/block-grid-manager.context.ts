@@ -35,13 +35,13 @@ export class UmbBlockGridManagerContext<
 	}
 
 	#sortPropertyContext?: typeof UMB_PROPERTY_SORT_MODE_CONTEXT.TYPE;
-	#sortingMode = new UmbBooleanState(undefined);
-	readonly sortingMode = this.#sortingMode.asObservable();
+	#isSortMode = new UmbBooleanState(undefined);
+	readonly isSortMode = this.#isSortMode.asObservable();
 
-	setSortingMode(sortingMode: boolean) {
-		this.#sortPropertyContext?.setIsSortMode(sortingMode);
+	setIsSortMode(isSortMode: boolean) {
+		this.#sortPropertyContext?.setIsSortMode(isSortMode);
 	}
-	getSortingMode(): boolean | undefined {
+	getIsSortMode(): boolean | undefined {
 		return this.#sortPropertyContext?.getIsSortMode();
 	}
 
@@ -105,8 +105,8 @@ export class UmbBlockGridManagerContext<
 
 		this.consumeContext(UMB_PROPERTY_SORT_MODE_CONTEXT, (sortPropertyContext) => {
 			this.#sortPropertyContext = sortPropertyContext;
-			this.observe(this.#sortPropertyContext?.isSortMode, (sortingMode) => {
-				this.#sortingMode.setValue(sortingMode);
+			this.observe(this.#sortPropertyContext?.isSortMode, (isSortMode) => {
+				this.#isSortMode.setValue(isSortMode);
 			});
 		});
 	}
