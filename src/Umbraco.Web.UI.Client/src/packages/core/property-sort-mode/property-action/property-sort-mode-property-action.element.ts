@@ -21,7 +21,7 @@ export class UmbPropertySortModePropertyActionElement extends UmbLitElement {
 		super();
 
 		this.consumeContext(UMB_PROPERTY_SORT_MODE_CONTEXT, (context) => {
-			this.observe(context?.sortingMode, (enabled) => (this._sortModeEnabled = enabled ?? false));
+			this.observe(context?.isSortMode, (enabled) => (this._sortModeEnabled = enabled ?? false));
 		});
 	}
 

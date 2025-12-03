@@ -4,7 +4,7 @@ import { UmbPropertyActionBase } from '@umbraco-cms/backoffice/property-action';
 export class UmbPropertySortModePropertyAction extends UmbPropertyActionBase {
 	override async execute() {
 		const sortContext = await this.getContext(UMB_PROPERTY_SORT_MODE_CONTEXT);
-		sortContext?.toggleSortingMode();
+		sortContext?.toggleIsSortMode();
 	}
 }
 

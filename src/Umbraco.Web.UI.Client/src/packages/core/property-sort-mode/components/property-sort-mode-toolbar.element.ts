@@ -6,7 +6,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 export class UmbPropertySortModeToolbarElement extends UmbLitElement {
 	#onSortModeExit = async () => {
 		const context = await this.getContext(UMB_PROPERTY_SORT_MODE_CONTEXT);
-		context?.setSortingMode(false);
+		context?.setIsSortMode(false);
 	};
 
 	override render() {

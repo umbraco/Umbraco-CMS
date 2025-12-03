@@ -39,10 +39,10 @@ export class UmbBlockGridManagerContext<
 	readonly sortingMode = this.#sortingMode.asObservable();
 
 	setSortingMode(sortingMode: boolean) {
-		this.#sortPropertyContext?.setSortingMode(sortingMode);
+		this.#sortPropertyContext?.setIsSortMode(sortingMode);
 	}
 	getSortingMode(): boolean | undefined {
-		return this.#sortPropertyContext?.getSortingMode();
+		return this.#sortPropertyContext?.getIsSortMode();
 	}
 
 	#initAppUrl: Promise<unknown>;
@@ -105,7 +105,7 @@ export class UmbBlockGridManagerContext<
 
 		this.consumeContext(UMB_PROPERTY_SORT_MODE_CONTEXT, (sortPropertyContext) => {
 			this.#sortPropertyContext = sortPropertyContext;
-			this.observe(this.#sortPropertyContext?.sortingMode, (sortingMode) => {
+			this.observe(this.#sortPropertyContext?.isSortMode, (sortingMode) => {
 				this.#sortingMode.setValue(sortingMode);
 			});
 		});
