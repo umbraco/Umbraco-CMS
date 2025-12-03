@@ -12,6 +12,8 @@ namespace Umbraco.Cms.Api.Common.OpenApi;
 /// Non-nullable reference types were not taken into account.</remarks>
 internal class RequireNonNullablePropertiesSchemaTransformer : IOpenApiSchemaTransformer
 {
+    private static readonly NullabilityInfoContext _nullabilityContext = new();
+
     /// <inheritdoc />
     public Task TransformAsync(OpenApiSchema schema, OpenApiSchemaTransformerContext context, CancellationToken cancellationToken)
     {
@@ -34,7 +36,8 @@ internal class RequireNonNullablePropertiesSchemaTransformer : IOpenApiSchemaTra
         if (jsonTypeInfo.Properties.FirstOrDefault(p => p.Name == propertyName) is not { } property)
         {
             // If we can't find the property in the type (e.g. discriminator )'$type', use the schema type information
-            return schema.Properties?[propertyName].Type is { } propertyType && (propertyType & JsonSchemaType.Null) == 0;
+            IOpenApiSchema? schemaProperty = schema.Properties?[propertyName];
+            return schemaProperty?.Type is { } propertyType && propertyType.HasFlag(JsonSchemaType.Null) is false;
         }
 
         if (property.AttributeProvider is not PropertyInfo propInfo)
@@ -42,9 +45,7 @@ internal class RequireNonNullablePropertiesSchemaTransformer : IOpenApiSchemaTra
             return false;
         }
 
-        // Use NullabilityInfoContext to check nullable annotations
-        var context = new NullabilityInfoContext();
-        NullabilityInfo nullability = context.Create(propInfo);
+        NullabilityInfo nullability = _nullabilityContext.Create(propInfo);
         return nullability.ReadState == NullabilityState.NotNull;
     }
 }
