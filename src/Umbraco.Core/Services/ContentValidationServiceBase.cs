@@ -109,7 +109,7 @@ internal abstract class ContentValidationServiceBase<TContentType>
         {
             // Get a mapping of segments to their associated cultures based on the variants and properties provided in the model.
             // Without managed segments again we need to rely on the model data.
-            Dictionary<string, HashSet<string>> segmentCultures = contentEditingModelBase.GetPopulatedSegmentCultures(cultures);
+            Dictionary<string, HashSet<string>> segmentCultures = GetPopulatedSegmentCultures(contentEditingModelBase, cultures);
 
             foreach (IPropertyType propertyType in cultureAndSegmentVariantPropertyTypes)
             {
@@ -157,6 +157,31 @@ internal abstract class ContentValidationServiceBase<TContentType>
     }
 
     private async Task<string[]> GetCultureCodes() => (await _languageService.GetAllIsoCodesAsync()).ToArray();
+
+    /// <summary>
+    /// Gets a dictionary of segments along with the cultures they are associated with.
+    /// </summary>
+    /// <param name="contentEditingModel">The content editing model.</param>
+    /// <param name="cultures">The cultures to consider when finding associated cultures for each segment.</param>
+    /// <returns>
+    /// A dictionary where the key is a unique segment from <see cref="ContentEditingModelBase.Variants"/> and the value is
+    /// the set of cultures that have at least one property defined for that segment in <see cref="ContentEditingModelBase.Properties"/>.
+    /// </returns>
+    /// <remarks>
+    /// Internal to support unit testing.
+    /// </remarks>
+    internal static Dictionary<string, HashSet<string>> GetPopulatedSegmentCultures(ContentEditingModelBase contentEditingModel, string[] cultures)
+    {
+        IEnumerable<string> uniqueSegments = contentEditingModel.Variants.Select(variant => variant.Segment).WhereNotNull().Distinct();
+
+        return uniqueSegments.ToDictionary(
+            segment => segment,
+            segment => contentEditingModel.Properties
+                .Where(property => property.Segment.InvariantEquals(segment))
+                .Where(property => property.Culture is not null && cultures.Contains(property.Culture))
+                .Select(property => property.Culture!)
+                .ToHashSet());
+    }
 
     private IEnumerable<PropertyValidationError> ValidateProperty(IPropertyType propertyType, PropertyValueModel? propertyValueModel, PropertyValidationContext validationContext)
     {

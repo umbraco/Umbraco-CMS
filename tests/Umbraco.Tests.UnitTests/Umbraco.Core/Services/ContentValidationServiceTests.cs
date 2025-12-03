@@ -3,11 +3,12 @@
 
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models.ContentEditing;
 
 [TestFixture]
-public class ContentEditingModelBaseTests
+public class ContentValidationServiceTests
 {
     // Concrete implementation for testing the abstract base class.
     private class TestContentEditingModel : ContentEditingModelBase
@@ -30,7 +31,7 @@ public class ContentEditingModelBaseTests
             ],
         };
 
-        var result = model.GetPopulatedSegmentCultures(["en-US", "da-DK"]);
+        var result = ContentValidationService.GetPopulatedSegmentCultures(model, ["en-US", "da-DK"]);
 
         Assert.That(result, Is.Empty);
     }
@@ -54,7 +55,7 @@ public class ContentEditingModelBaseTests
             ],
         };
 
-        var result = model.GetPopulatedSegmentCultures(["en-US", "da-DK"]);
+        var result = ContentValidationService.GetPopulatedSegmentCultures(model, ["en-US", "da-DK"]);
 
         Assert.That(result, Has.Count.EqualTo(1));
         Assert.That(result.ContainsKey("segment-1"), Is.True);
@@ -79,7 +80,7 @@ public class ContentEditingModelBaseTests
             ],
         };
 
-        var result = model.GetPopulatedSegmentCultures(["en-US", "da-DK"]);
+        var result = ContentValidationService.GetPopulatedSegmentCultures(model, ["en-US", "da-DK"]);
 
         Assert.That(result, Has.Count.EqualTo(1));
         Assert.That(result.ContainsKey("segment-1"), Is.True);
@@ -107,7 +108,7 @@ public class ContentEditingModelBaseTests
         };
 
         // Only validating en-US and da-DK, not de-DE
-        var result = model.GetPopulatedSegmentCultures(["en-US", "da-DK"]);
+        var result = ContentValidationService.GetPopulatedSegmentCultures(model, ["en-US", "da-DK"]);
 
         Assert.That(result, Has.Count.EqualTo(1));
         Assert.That(result["segment-1"], Does.Contain("en-US"));
@@ -134,7 +135,7 @@ public class ContentEditingModelBaseTests
             ],
         };
 
-        var result = model.GetPopulatedSegmentCultures(["en-US", "da-DK"]);
+        var result = ContentValidationService.GetPopulatedSegmentCultures(model, ["en-US", "da-DK"]);
 
         Assert.That(result, Has.Count.EqualTo(2));
         Assert.That(result.ContainsKey("segment-1"), Is.True);
