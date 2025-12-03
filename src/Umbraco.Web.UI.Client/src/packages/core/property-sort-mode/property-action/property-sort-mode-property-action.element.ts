@@ -6,8 +6,8 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbPropertyAction } from '@umbraco-cms/backoffice/property-action';
 import type { UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';
 
-@customElement('umb-property-sort-mode-action')
-export class UmbPropertySortModeActionElement extends UmbLitElement {
+@customElement('umb-property-sort-mode-property-action')
+export class UmbPropertySortModePropertyActionElement extends UmbLitElement {
 	@state()
 	private _sortModeEnabled = false;
 
@@ -47,12 +47,10 @@ export class UmbPropertySortModeActionElement extends UmbLitElement {
 	}
 }
 
-export { UmbPropertySortModeActionElement as element };
-
-export default UmbPropertySortModeActionElement;
+export { UmbPropertySortModePropertyActionElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-property-sort-mode-action': UmbPropertySortModeActionElement;
+		'umb-property-sort-mode-property-action': UmbPropertySortModePropertyActionElement;
 	}
 }
