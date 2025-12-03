@@ -64,7 +64,7 @@ export class UmbPropertyEditorUITextBoxElement
 		this._type = config.getValueByAlias<UUIInputType>('inputType') ?? this.#defaultType;
 		this._inputMode = config.getValueByAlias<UUIInputMode>('inputMode') || this.#defaultInputMode;
 		this._maxChars = this.#parseNumber(config.getValueByAlias('maxChars'));
-		this._placeholder = this.localize.string(config.getValueByAlias<string>('placeholder'));
+		this._placeholder = this.localize.string(config.getValueByAlias<string>('placeholder') ?? '');
 	}
 
 	protected override firstUpdated(): void {
