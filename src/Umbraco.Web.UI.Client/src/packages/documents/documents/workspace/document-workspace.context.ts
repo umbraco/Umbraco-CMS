@@ -229,22 +229,16 @@ export class UmbDocumentWorkspaceContext
 		this.#isTrashedContext.setIsTrashed(false);
 	}
 
-	protected override async loadSegments(): Promise<void> {
-		this.observe(
-			this.unique,
-			async (unique) => {
-				if (!unique) {
-					this._segments.setValue([]);
-					return;
-				}
-				const { data } = await this.#documentSegmentRepository.getDocumentByIdSegmentOptions(unique, {
-					skip: 0,
-					take: 9999,
-				});
-				this._segments.setValue(data?.items ?? []);
-			},
-			'_loadSegmentsUnique',
-		);
+	protected override async _loadSegmentsFor(unique: string): Promise<void> {
+		if (!unique) {
+			this._segments.setValue([]);
+			return;
+		}
+		const { data } = await this.#documentSegmentRepository.getDocumentByIdSegmentOptions(unique, {
+			skip: 0,
+			take: 9999,
+		});
+		this._segments.setValue(data?.items ?? []);
 	}
 
 	async create(parent: UmbEntityModel, documentTypeUnique: string, blueprintUnique?: string) {
