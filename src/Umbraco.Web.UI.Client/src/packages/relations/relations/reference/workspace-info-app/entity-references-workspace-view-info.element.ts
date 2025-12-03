@@ -5,7 +5,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
-import { UMB_ENTITY_WORKSPACE_CONTEXT, type UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-entity-references-workspace-info-app')
@@ -40,11 +40,12 @@ export class UmbEntityReferencesWorkspaceInfoAppElement extends UmbLitElement {
 		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (context) => {
 			this.#workspaceContext = context;
 			this.#observeUnique();
+			this.#init();
 		});
 	}
 
 	async #init() {
-		if (!this._manifest) return;
+		if (!this._manifest || !this.#workspaceContext) return;
 		const referenceRepositoryAlias = this._manifest.meta.referenceRepositoryAlias;
 
 		if (!referenceRepositoryAlias) {
@@ -83,17 +84,6 @@ export class UmbEntityReferencesWorkspaceInfoAppElement extends UmbLitElement {
 	async #getReferences() {
 		if (!this.#unique) return;
 		if (!this.#referenceRepository) return;
-
-		// Avoid calling requestReferencedBy for entities that have not been persisted yet.
-		// Submittable workspaces expose isNew, so we can short-circuit this call and avoid
-		// a 404 response from the API.
-		const submittableWorkspaceContext = this.#workspaceContext as UmbSubmittableWorkspaceContext | undefined;
-		const isNew = submittableWorkspaceContext?.getIsNew() ?? false;
-		if (isNew) {
-			this._total = 0;
-			this._items = [];
-			return;
-		}
 
 		const { data } = await this.#referenceRepository.requestReferencedBy(
 			this.#unique,
