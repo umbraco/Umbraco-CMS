@@ -1,4 +1,4 @@
-import { UMB_PROPERTY_SORT_MODE_CONTEXT } from '../context/property-sort-mode.context-token.js';
+import { UMB_PROPERTY_SORT_MODE_CONTEXT } from '../property-context/property-sort-mode.context-token.js';
 import { UmbPropertyActionBase } from '@umbraco-cms/backoffice/property-action';
 
 export class UmbPropertySortModePropertyAction extends UmbPropertyActionBase {

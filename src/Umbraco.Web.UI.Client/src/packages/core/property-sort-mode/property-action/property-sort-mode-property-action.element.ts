@@ -1,4 +1,4 @@
-import { UMB_PROPERTY_SORT_MODE_CONTEXT } from '../context/property-sort-mode.context-token.js';
+import { UMB_PROPERTY_SORT_MODE_CONTEXT } from '../property-context/property-sort-mode.context-token.js';
 import type { ManifestPropertyActionSortModeKind } from './types.js';
 import { customElement, html, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
