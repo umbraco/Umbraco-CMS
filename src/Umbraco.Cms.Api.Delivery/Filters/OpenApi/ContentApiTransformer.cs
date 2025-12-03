@@ -39,8 +39,8 @@ internal sealed class ContentApiTransformer : DeliveryApiTransformerBase
                 Schema = new OpenApiSchema { Type = JsonSchemaType.String },
                 Examples = new Dictionary<string, IOpenApiExample>
                 {
-                    { "Default", new OpenApiExample { Value = JsonValue.Create(string.Empty) } },
-                    { "English culture", new OpenApiExample { Value = JsonValue.Create("en-us") } },
+                    { "Default", new OpenApiExample { Value = string.Empty } },
+                    { "English culture", new OpenApiExample { Value = "en-us" } },
                 },
             });
 
@@ -54,8 +54,8 @@ internal sealed class ContentApiTransformer : DeliveryApiTransformerBase
                 Schema = new OpenApiSchema { Type = JsonSchemaType.String },
                 Examples = new Dictionary<string, IOpenApiExample>
                 {
-                    { "Default", new OpenApiExample { Value = JsonValue.Create(string.Empty) } },
-                    { "Segment One", new OpenApiExample { Value = JsonValue.Create("segment-one") } },
+                    { "Default", new OpenApiExample { Value = string.Empty } },
+                    { "Segment One", new OpenApiExample { Value = "segment-one" } },
                 },
             });
 
@@ -115,32 +115,32 @@ internal sealed class ContentApiTransformer : DeliveryApiTransformerBase
         new()
         {
             { "Select all", new OpenApiExample { Value = null } },
-            { "Select all ancestors of a node by id", new OpenApiExample { Value = JsonValue.Create("ancestors:id") } },
-            { "Select all ancestors of a node by path", new OpenApiExample { Value = JsonValue.Create("ancestors:path") } },
-            { "Select all children of a node by id", new OpenApiExample { Value = JsonValue.Create("children:id") } },
-            { "Select all children of a node by path", new OpenApiExample { Value = JsonValue.Create("children:path") } },
-            { "Select all descendants of a node by id", new OpenApiExample { Value = JsonValue.Create("descendants:id") } },
-            { "Select all descendants of a node by path", new OpenApiExample { Value = JsonValue.Create("descendants:path") } },
+            { "Select all ancestors of a node by id", new OpenApiExample { Value = "ancestors:id" } },
+            { "Select all ancestors of a node by path", new OpenApiExample { Value = "ancestors:path" } },
+            { "Select all children of a node by id", new OpenApiExample { Value = "children:id" } },
+            { "Select all children of a node by path", new OpenApiExample { Value = "children:path" } },
+            { "Select all descendants of a node by id", new OpenApiExample { Value = "descendants:id" } },
+            { "Select all descendants of a node by path", new OpenApiExample { Value = "descendants:path" } },
         };
 
     private Dictionary<string, IOpenApiExample> FilterQueryParameterExamples() =>
         new()
         {
             { "Default filter", new OpenApiExample { Value = new JsonArray() } },
-            { "Filter by content type (equals)", new OpenApiExample { Value = new JsonArray { JsonValue.Create("contentType:alias1") } } },
-            { "Filter by name (contains)", new OpenApiExample { Value = new JsonArray { JsonValue.Create("name:nodeName") } } },
-            { "Filter by creation date (less than)", new OpenApiExample { Value = new JsonArray { JsonValue.Create("createDate<2024-01-01") } } },
-            { "Filter by update date (greater than or equal)", new OpenApiExample { Value = new JsonArray { JsonValue.Create("updateDate>:2023-01-01") } } },
+            { "Filter by content type (equals)", new OpenApiExample { Value = new JsonArray("contentType:alias1") } },
+            { "Filter by name (contains)", new OpenApiExample { Value = new JsonArray("name:nodeName") } },
+            { "Filter by creation date (less than)", new OpenApiExample { Value = new JsonArray("createDate<2024-01-01") } },
+            { "Filter by update date (greater than or equal)", new OpenApiExample { Value = new JsonArray("updateDate>:2023-01-01") } },
         };
 
     private Dictionary<string, IOpenApiExample> SortQueryParameterExamples() =>
         new()
         {
             { "Default sort", new OpenApiExample { Value = new JsonArray() } },
-            { "Sort by create date", new OpenApiExample { Value = new JsonArray { JsonValue.Create("createDate:asc"), JsonValue.Create("createDate:desc") } } },
-            { "Sort by level", new OpenApiExample { Value = new JsonArray { JsonValue.Create("level:asc"), JsonValue.Create("level:desc") } } },
-            { "Sort by name", new OpenApiExample { Value = new JsonArray { JsonValue.Create("name:asc"), JsonValue.Create("name:desc") } } },
-            { "Sort by sort order", new OpenApiExample { Value = new JsonArray { JsonValue.Create("sortOrder:asc"), JsonValue.Create("sortOrder:desc") } } },
-            { "Sort by update date", new OpenApiExample { Value = new JsonArray { JsonValue.Create("updateDate:asc"), JsonValue.Create("updateDate:desc") } } },
+            { "Sort by create date", new OpenApiExample { Value = new JsonArray("createDate:asc", "createDate:desc") } },
+            { "Sort by level", new OpenApiExample { Value = new JsonArray("level:asc", "level:desc") } },
+            { "Sort by name", new OpenApiExample { Value = new JsonArray("name:asc", "name:desc") } },
+            { "Sort by sort order", new OpenApiExample { Value = new JsonArray("sortOrder:asc", "sortOrder:desc") } },
+            { "Sort by update date", new OpenApiExample { Value = new JsonArray("updateDate:asc", "updateDate:desc") } },
         };
 }

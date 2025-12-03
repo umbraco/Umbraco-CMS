@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Nodes;
+using System.Text.Json.Nodes;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.OpenApi;
@@ -62,26 +62,26 @@ internal sealed class MediaApiTransformer : DeliveryApiTransformerBase
     private Dictionary<string, IOpenApiExample> FetchQueryParameterExamples() =>
         new()
         {
-            { "Select all children at root level", new OpenApiExample { Value = JsonValue.Create("children:/") } },
-            { "Select all children of a media item by id", new OpenApiExample { Value = JsonValue.Create("children:id") } },
-            { "Select all children of a media item by path", new OpenApiExample { Value = JsonValue.Create("children:path") } },
+            { "Select all children at root level", new OpenApiExample { Value = "children:/" } },
+            { "Select all children of a media item by id", new OpenApiExample { Value = "children:id" } },
+            { "Select all children of a media item by path", new OpenApiExample { Value = "children:path" } },
         };
 
     private Dictionary<string, IOpenApiExample> FilterQueryParameterExamples() =>
         new()
         {
             { "Default filter", new OpenApiExample { Value = new JsonArray() } },
-            { "Filter by media type", new OpenApiExample { Value = new JsonArray { JsonValue.Create("mediaType:alias1") } } },
-            { "Filter by name", new OpenApiExample { Value = new JsonArray { JsonValue.Create("name:nodeName") } } },
+            { "Filter by media type", new OpenApiExample { Value = new JsonArray("mediaType:alias1") } },
+            { "Filter by name", new OpenApiExample { Value = new JsonArray("name:nodeName") } },
         };
 
     private Dictionary<string, IOpenApiExample> SortQueryParameterExamples() =>
         new()
         {
             { "Default sort", new OpenApiExample { Value = new JsonArray() } },
-            { "Sort by create date", new OpenApiExample { Value = new JsonArray { JsonValue.Create("createDate:asc"), JsonValue.Create("createDate:desc") } } },
-            { "Sort by name", new OpenApiExample { Value = new JsonArray { JsonValue.Create("name:asc"), JsonValue.Create("name:desc") } } },
-            { "Sort by sort order", new OpenApiExample { Value = new JsonArray { JsonValue.Create("sortOrder:asc"), JsonValue.Create("sortOrder:desc") } } },
-            { "Sort by update date", new OpenApiExample { Value = new JsonArray { JsonValue.Create("updateDate:asc"), JsonValue.Create("updateDate:desc") } } },
+            { "Sort by create date", new OpenApiExample { Value = new JsonArray("createDate:asc", "createDate:desc") } },
+            { "Sort by name", new OpenApiExample { Value = new JsonArray("name:asc", "name:desc") } },
+            { "Sort by sort order", new OpenApiExample { Value = new JsonArray("sortOrder:asc", "sortOrder:desc") } },
+            { "Sort by update date", new OpenApiExample { Value = new JsonArray("updateDate:asc", "updateDate:desc") } },
         };
 }

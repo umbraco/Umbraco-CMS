@@ -1,4 +1,3 @@
-using System.Text.Json.Nodes;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.OpenApi;
 
@@ -61,10 +60,10 @@ internal abstract class DeliveryApiTransformerBase : IOpenApiOperationTransforme
                 Examples = new Dictionary<string, IOpenApiExample>
                 {
                     { "Expand none", new OpenApiExample { Value = null } },
-                    { "Expand all properties", new OpenApiExample { Value = JsonValue.Create("properties[$all]") } },
-                    { "Expand specific property", new OpenApiExample { Value = JsonValue.Create("properties[alias1]") } },
-                    { "Expand specific properties", new OpenApiExample { Value = JsonValue.Create("properties[alias1,alias2]") } },
-                    { "Expand nested properties", new OpenApiExample { Value = JsonValue.Create("properties[alias1[properties[nestedAlias1,nestedAlias2]]]") } },
+                    { "Expand all properties", new OpenApiExample { Value = "properties[$all]" } },
+                    { "Expand specific property", new OpenApiExample { Value = "properties[alias1]" } },
+                    { "Expand specific properties", new OpenApiExample { Value = "properties[alias1,alias2]" } },
+                    { "Expand nested properties", new OpenApiExample { Value = "properties[alias1[properties[nestedAlias1,nestedAlias2]]]" } },
                 },
             });
     }
@@ -83,10 +82,10 @@ internal abstract class DeliveryApiTransformerBase : IOpenApiOperationTransforme
                 Schema = new OpenApiSchema { Type = JsonSchemaType.String },
                 Examples = new Dictionary<string, IOpenApiExample>
                 {
-                    { "Include all properties", new OpenApiExample { Value = JsonValue.Create("properties[$all]") } },
-                    { "Include only specific property", new OpenApiExample { Value = JsonValue.Create("properties[alias1]") } },
-                    { "Include only specific properties", new OpenApiExample { Value = JsonValue.Create("properties[alias1,alias2]") } },
-                    { "Include only specific nested properties", new OpenApiExample { Value = JsonValue.Create("properties[alias1[properties[nestedAlias1,nestedAlias2]]]") } },
+                    { "Include all properties", new OpenApiExample { Value = "properties[$all]" } },
+                    { "Include only specific property", new OpenApiExample { Value = "properties[alias1]" } },
+                    { "Include only specific properties", new OpenApiExample { Value = "properties[alias1,alias2]" } },
+                    { "Include only specific nested properties", new OpenApiExample { Value = "properties[alias1[properties[nestedAlias1,nestedAlias2]]]" } },
                 },
             });
     }
