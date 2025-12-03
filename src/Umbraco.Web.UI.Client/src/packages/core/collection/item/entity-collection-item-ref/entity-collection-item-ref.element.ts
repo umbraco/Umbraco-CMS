@@ -1,23 +1,23 @@
 import { UmbEntityCollectionItemElementBase } from '../umb-entity-collection-item-element-base.element.js';
-import { UmbDefaultCollectionItemCardElement } from './default-collection-item-card.element.js';
+import { UmbDefaultCollectionItemRefElement } from './default-collection-item-ref.element.js';
 import { css, customElement, html } from '@umbraco-cms/backoffice/external/lit';
 
-@customElement('umb-entity-collection-item-card')
-export class UmbEntityCollectionItemCardElement extends UmbEntityCollectionItemElementBase {
+@customElement('umb-entity-collection-item-ref')
+export class UmbEntityCollectionItemRefElement extends UmbEntityCollectionItemElementBase {
 	protected getExtensionType(): string {
-		return 'entityCollectionItemCard';
+		return 'entityCollectionItemRef';
 	}
 
 	protected createFallbackElement(): HTMLElement {
-		return new UmbDefaultCollectionItemCardElement();
+		return new UmbDefaultCollectionItemRefElement();
 	}
 
 	protected getPathAddendum(entityType: string, unique: string): string {
-		return 'collection-item-card/' + entityType + '/' + unique;
+		return 'collection-item-ref/' + entityType + '/' + unique;
 	}
 
 	protected getMarkAttributeName(): string {
-		return 'entity-collection-item-card';
+		return 'entity-collection-item-ref';
 	}
 
 	override render() {
@@ -36,6 +36,6 @@ export class UmbEntityCollectionItemCardElement extends UmbEntityCollectionItemE
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-entity-collection-item-card': UmbEntityCollectionItemCardElement;
+		'umb-entity-collection-item-ref': UmbEntityCollectionItemRefElement;
 	}
 }
