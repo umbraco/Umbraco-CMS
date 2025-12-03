@@ -178,64 +178,6 @@ public partial class ContentEditingServiceTests
         Assert.AreEqual("#validation_invalidNull", result.Result.ValidationErrors.Single(x => x.Alias == "variantTitle" && x.Culture == "da-DK" && x.Segment == "seg-2").ErrorMessages[0]);
     }
 
-    /// <summary>
-    /// Test case for https://github.com/umbraco/Umbraco-CMS/issues/21029 - ensures that validation succeeds when a mandatory segment value
-    /// is missing for a segment not defined for the culture.
-    /// </summary>
-    [Test]
-    [ConfigureBuilder(ActionName = nameof(ConfigureSegmentServiceWithCultureSpecificSegments))]
-    public async Task Can_Validate_Valid_Culture_And_Segment_Variant_Content_Where_Mandatory_Segment_Value_Is_Missing_For_Segment_Not_Defined_For_Culture()
-    {
-        var content = await CreateCultureAndSegmentVariantContent(ContentVariation.Culture);
-
-        var validateContentUpdateModel = new ValidateContentUpdateModel
-        {
-            Properties =
-            [
-                new PropertyValueModel { Alias = "invariantTitle", Value = "The updated invariant title" },
-                new PropertyValueModel { Alias = "variantTitle", Value = "The updated English default segment title", Culture = "en-US" },
-                new PropertyValueModel { Alias = "variantTitle", Value = "The updated Danish default segment title", Culture = "da-DK" },
-                new PropertyValueModel { Alias = "variantTitle", Value = "The updated English segment 1 title", Culture = "en-US", Segment = "seg-1" },
-                new PropertyValueModel { Alias = "variantTitle", Value = "The updated Danish segment 1 title", Culture = "da-DK", Segment = "seg-1" },
-                new PropertyValueModel { Alias = "variantTitle", Value = "The updated English segment 2 title", Culture = "en-US", Segment = "seg-2" },
-                new PropertyValueModel { Alias = "variantTitle", Value = null, Culture = "da-DK", Segment = "seg-2" }
-            ],
-            Variants =
-            [
-                new VariantModel { Culture = "en-US", Segment = "seg-1", Name = "Updated English segment 1 Name" },
-                new VariantModel { Culture = "da-DK", Segment = "seg-1", Name = "Updated Danish segment 1 Name" },
-                new VariantModel { Culture = "en-US", Segment = "seg-2", Name = "Updated English segment 2 Name" },
-                new VariantModel { Culture = "da-DK", Segment = "seg-2", Name = "Updated Danish segment 2 Name" }
-            ],
-        };
-
-        Attempt<ContentValidationResult, ContentEditingOperationStatus> result = await ContentEditingService.ValidateUpdateAsync(content.Key, validateContentUpdateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
-    }
-
-    public static void ConfigureSegmentServiceWithCultureSpecificSegments(IUmbracoBuilder builder) =>
-        builder.Services.AddUnique<ISegmentService, CultureSpecificSegmentService>();
-
-    internal class CultureSpecificSegmentService : ISegmentService
-    {
-        private readonly Segment[] _segments =
-        [
-            new () { Alias = "seg-1", Name = "Segment 1", Cultures = [ "en-US", "da-DK" ] },
-            new () { Alias = "seg-2", Name = "Segment 2", Cultures = [ "en-US" ] } // 'da-DK' is not defined for 'seg-2'
-        ];
-
-        public Task<Attempt<PagedModel<Segment>?, SegmentOperationStatus>> GetPagedSegmentsAsync(int skip = 0, int take = 100)
-            => Task.FromResult(
-                Attempt.SucceedWithStatus<PagedModel<Segment>?, SegmentOperationStatus>(
-                    SegmentOperationStatus.Success,
-                    new PagedModel<Segment>
-                    {
-                        Total = _segments.Length,
-                        Items = _segments.Skip(skip).Take(take)
-                    }));
-    }
-
     [Test]
     public async Task Will_Succeed_For_Invalid_Variant_Content_Without_Access_To_Edited_Culture()
     {
