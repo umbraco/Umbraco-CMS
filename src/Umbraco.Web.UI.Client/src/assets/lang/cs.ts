@@ -130,7 +130,6 @@ export default {
 		linkLocal: 'Vložit místní odkaz (kotvu)',
 		listBullet: 'Neuspořádaný seznam',
 		listNumeric: 'Číslovaný seznam',
-		macroInsert: 'Vložit makro',
 		pictureInsert: 'Vložit obrázek',
 		publishAndClose: 'Publikovat a zavřít',
 		publishDescendants: 'Publikovat s potomky',
@@ -353,10 +352,7 @@ export default {
 		newDataType: 'Nový datový typ',
 		newJavascriptFile: 'Nový skript JavaScript',
 		newEmptyPartialView: 'Nová prázdná částečná šablona',
-		newPartialViewMacro: 'Nové makro pro částečnou šablonu',
 		newPartialViewFromSnippet: 'Nová částečná šablona ze snippetu',
-		newPartialViewMacroFromSnippet: 'Nové makro částečné šablony ze snippetu',
-		newPartialViewMacroNoMacro: 'Nové makro pro částečnou šablonu (bez makra)',
 		newStyleSheetFile: 'Nový soubor stylů - stylopis',
 	},
 	dashboard: {
@@ -421,7 +417,6 @@ export default {
 		insertgraphicheadline: 'Vložit grafický titulek',
 		insertimage: 'Vložit obrázek',
 		insertlink: 'Vložit odkaz',
-		insertMacro: 'Kliknout pro přidání makra',
 		inserttable: 'Vložit tabulku',
 		languagedeletewarning: 'Tím se odstraní jazyk',
 		languageChangeWarning:
@@ -431,7 +426,6 @@ export default {
 		linkinternal: 'Místní odkaz',
 		linklocaltip: 'Při používání místních odkazů vložte znak "#" před odkaz',
 		linknewwindow: 'Otevřít v novém okně?',
-		macroDoesNotHaveProperties: 'Toto makro nemá žádné vlastnosti, které by bylo možno editovat',
 		paste: 'Vložit',
 		permissionsEdit: 'Editovat oprávnění pro',
 		permissionsSet: 'Nastavit oprávnění pro',
@@ -444,7 +438,6 @@ export default {
 			"Webová služba<a target='_blank' rel='noopener' href='http://regexlib.com'>regexlib.com</a> má v tuto chvíli nějaké problémy, které jsou mimo naší kontrolu. Omlouváme se za vzniklé nepříjemnosti.",
 		regexSearchHelp:
 			"Vyhledat regulární výraz pro přidání validace formulářového prvku. Například: 'email, 'PSČ' 'URL'",
-		removeMacro: 'Odstranit makro',
 		requiredField: 'Pole je vyžadování',
 		sitereindexed: 'Web je přeindexován',
 		siterepublished:
@@ -468,7 +461,6 @@ export default {
 		selectIcon: 'Vybrat ikonu',
 		selectItem: 'Vybrat položku',
 		selectLink: 'Vybrat odkaz',
-		selectMacro: 'Vybrat makro',
 		selectContent: 'Vybrat obsah',
 		selectContentType: 'Vybrat typ obsahu',
 		selectMediaStartNode: 'Vybrat počáteční uzel média',
@@ -479,8 +471,6 @@ export default {
 		selectSections: 'Vybrat sekce',
 		selectUsers: 'Vybrat uživatele',
 		noIconsFound: 'Nebyly nalezeny žádné ikony',
-		noMacroParams: 'Pro toto makro neexistují žádné parametry',
-		noMacros: 'K dispozici nejsou žádná makra',
 		externalLoginProviders: 'Externí poskytovatelé přihlášení',
 		exceptionDetail: 'Podrobnosti o výjimce',
 		stacktrace: 'Stacktrace',
@@ -601,7 +591,6 @@ export default {
 			'UPOZORNĚNÍ! I když CodeMirror je dle konfigurace povolený, je zakázaný v Internet Exploreru, protože není dost stabilní.',
 		contentTypeAliasAndNameNotNull: 'Vyplňte, prosím, alias i název nového typu vlastností!',
 		filePermissionsError: 'Vyskytl se problém při čtení/zápisu do určeného souboru nebo adresáře',
-		macroErrorLoadingPartialView: 'Chyba při načítání skriptu částečné šablony (soubor: %0%)',
 		missingTitle: 'Uveďte, prosím, titulek',
 		missingType: 'Vyberte, prosím, typ',
 		pictureResizeBiggerThanOrg:
@@ -686,7 +675,6 @@ export default {
 		login: 'Přihlášení',
 		logoff: 'Odhlášení',
 		logout: 'Odhlášení',
-		macro: 'Makro',
 		mandatory: 'Povinné',
 		message: 'Zpráva',
 		move: 'Přesunout',
@@ -1262,9 +1250,6 @@ export default {
 		insertDictionaryItem: 'Vložit položku slovníku',
 		insertDictionaryItemDesc:
 			'Položka slovníku je zástupný symbol pro překladatelný text, což usnadňuje vytváření návrhů pro vícejazyčné webové stránky.',
-		insertMacro: 'Vložit makro',
-		insertMacroDesc:
-			'\n      Makro je konfigurovatelná součást, která je skvělá pro opakovaně použitelné části návrhu, kde potřebujete předat parametry, jako jsou galerie, formuláře a seznamy.\n    ',
 		insertPageField: 'Vložit pole stránky Umbraco',
 		insertPageFieldDesc:
 			'Zobrazuje hodnotu pojmenovaného pole z aktuální stránky s možnostmi upravit hodnotu nebo alternativní hodnoty.',
@@ -1321,7 +1306,6 @@ export default {
 	},
 	grid: {
 		media: 'Obrázek',
-		macro: 'Makro',
 		insertControl: 'Vybrat typ obsahu',
 		chooseLayout: 'Vybrat rozvržení',
 		addRows: 'Přidat řádek',
@@ -1439,14 +1423,6 @@ export default {
 		fallbackLanguage: 'Nahrazujicí jazyk',
 		none: 'žádný',
 	},
-	macro: {
-		addParameter: 'Přidat parametr',
-		editParameter: 'Upravit parametr',
-		enterMacroName: 'Zadejte název makra',
-		parameters: 'Parametry',
-		parametersDescription: 'Definujte parametry, které by měly být k dispozici při použití tohoto makra.',
-		selectViewFile: 'Vyberte soubor makra pro částečnou šablonu',
-	},
 	modelsBuilder: {
 		buildingModels: 'Stavební modely',
 		waitingMessage: 'to může chvíli trvat, nebojte se',
@@ -1521,7 +1497,6 @@ export default {
 		installStarterKit: 'Instalovat startovní sadu',
 		languages: 'Jazyky',
 		localPackage: 'Instalovat místní balíček',
-		macros: 'Makra',
 		mediaTypes: 'Typy medií',
 		member: 'Členové',
 		memberGroups: 'Skupiny členů',
@@ -1532,7 +1507,6 @@ export default {
 		packager: 'Balíčky',
 		packages: 'Balíčky',
 		partialViews: 'Částečné šablony',
-		partialViewMacros: 'Makra částečných šablon',
 		repositories: 'Instalovat z úložiště',
 		runway: 'Instalovat Runway',
 		runwayModules: 'Moduly Runway',
@@ -1811,7 +1785,6 @@ export default {
 		switchLanguage: 'Přepnout jazyk na',
 		createNewFolder: 'Vytvořit novou složku',
 		newPartialView: 'Částečná šablona',
-		newPartialViewMacro: 'Makro částečné šablony',
 		newMember: 'Člen',
 		newDataType: 'Datový typ',
 		redirectDashboardSearchLabel: 'Prohledat přesměrování',

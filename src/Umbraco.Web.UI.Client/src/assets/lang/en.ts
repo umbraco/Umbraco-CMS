@@ -152,7 +152,6 @@ export default {
 		linkLocal: 'Insert local link (anchor)',
 		listBullet: 'Bullet List',
 		listNumeric: 'Numeric List',
-		macroInsert: 'Insert macro',
 		pictureInsert: 'Insert picture',
 		publishAndClose: 'Publish and close',
 		publishDescendants: 'Publish with descendants',
@@ -478,10 +477,7 @@ export default {
 		newDataTypeDescription: 'Used to define a configuration for a Property Type on a Content Type.',
 		newJavascriptFile: 'JavaScript file',
 		newEmptyPartialView: 'Empty partial view',
-		newPartialViewMacro: 'Partial view macro',
 		newPartialViewFromSnippet: 'Partial view from snippet',
-		newPartialViewMacroFromSnippet: 'Partial view macro from snippet',
-		newPartialViewMacroNoMacro: 'Partial view macro (without macro)',
 		newStyleSheetFile: 'Stylesheet file',
 	},
 	dashboard: {
@@ -557,7 +553,6 @@ export default {
 		insertgraphicheadline: 'Insert graphic headline',
 		insertimage: 'Insert picture',
 		insertlink: 'Insert link',
-		insertMacro: 'Click to add a Macro',
 		inserttable: 'Insert table',
 		languagedeletewarning: 'This will delete the language and all content related to the language',
 		languageChangeWarning:
@@ -567,7 +562,6 @@ export default {
 		linkinternal: 'Internal link',
 		linklocaltip: 'When using local links, insert "#" in front of link',
 		linknewwindow: 'Open in new window?',
-		macroDoesNotHaveProperties: 'This macro does not contain any properties you can edit',
 		paste: 'Paste',
 		permissionsEdit: 'Edit permissions for',
 		permissionsSet: 'Set permissions for',
@@ -581,7 +575,6 @@ export default {
 			"<a target='_blank' rel='noopener' href='http://regexlib.com'>regexlib.com</a>'s webservice is currently experiencing some problems, which we have no control over. We are very sorry for this inconvenience.",
 		regexSearchHelp:
 			"Search for a regular expression to add validation to a form field. Example: 'email, 'zip-code', 'URL'.",
-		removeMacro: 'Remove Macro',
 		requiredField: 'Required Field',
 		sitereindexed: 'Site is reindexed',
 		siterepublished:
@@ -610,7 +603,6 @@ export default {
 		selectLink: 'Configure link',
 		addLink: 'Add Link',
 		updateLink: 'Update Link',
-		selectMacro: 'Select macro',
 		selectContent: 'Select content',
 		selectContentType: 'Select content type',
 		selectMediaStartNode: 'Select media start node',
@@ -627,8 +619,6 @@ export default {
 		chooseUsers: 'Choose users',
 		noIcon: 'No icon',
 		noIconsFound: 'No icons were found',
-		noMacroParams: 'There are no parameters for this macro',
-		noMacros: 'There are no macros available to insert',
 		externalLoginProviders: 'External logins',
 		exceptionDetail: 'Exception Details',
 		stacktrace: 'Stacktrace',
@@ -787,7 +777,6 @@ export default {
 			"NOTE! Even though CodeMirror is enabled by configuration, it is disabled in Internet Explorer because it's not stable enough.",
 		contentTypeAliasAndNameNotNull: 'Please fill both alias and name on the new property type!',
 		filePermissionsError: 'There is a problem with read/write access to a specific file or folder',
-		macroErrorLoadingPartialView: 'Error loading Partial View script (file: %0%)',
 		missingTitle: 'Please enter a title',
 		missingType: 'Please choose a type',
 		pictureResizeBiggerThanOrg:
@@ -900,7 +889,6 @@ export default {
 		login: 'Login',
 		logoff: 'Log off',
 		logout: 'Logout',
-		macro: 'Macro',
 		mandatory: 'Mandatory',
 		manifest: 'Manifest',
 		message: 'Message',
@@ -1608,9 +1596,6 @@ export default {
 		insertDictionaryItem: 'Dictionary item',
 		insertDictionaryItemDesc:
 			'A dictionary item is a placeholder for a translatable piece of text, which makes it easy to create designs for multilingual websites.',
-		insertMacro: 'Macro',
-		insertMacroDesc:
-			'A Macro is a configurable component which is great for reusable parts of your design, where you need the option to provide parameters, such as galleries, forms and lists.',
 		insertPageField: 'Value',
 		insertPageFieldDesc:
 			'Displays the value of a named field from the current page, with options to modify the value or fallback to alternative values.',
@@ -1668,7 +1653,6 @@ export default {
 	},
 	grid: {
 		media: 'Image',
-		macro: 'Macro',
 		insertControl: 'Choose type of content',
 		chooseLayout: 'Choose a layout',
 		addRows: 'Add a row',
@@ -1679,7 +1663,6 @@ export default {
 		contentAllowed: 'This content is allowed here',
 		clickToEmbed: 'Click to embed',
 		clickToInsertImage: 'Click to insert image',
-		clickToInsertMacro: 'Click to insert macro',
 		placeholderWriteHere: 'Write here...',
 		gridLayouts: 'Grid Layouts',
 		gridLayoutsDetail:
@@ -1879,14 +1862,6 @@ export default {
 		invariantLanguageProperty: 'Shared: Languages',
 		invariantSegmentProperty: 'Shared: Segments',
 	},
-	macro: {
-		addParameter: 'Add parameter',
-		editParameter: 'Edit parameter',
-		enterMacroName: 'Enter macro name',
-		parameters: 'Parameters',
-		parametersDescription: 'Define the parameters that should be available when using this macro.',
-		selectViewFile: 'Select partial view macro file',
-	},
 	modelsBuilder: {
 		buildingModels: 'Building models',
 		waitingMessage: "this can take a bit of time, don't worry",
@@ -1961,7 +1936,6 @@ export default {
 		installStarterKit: 'Install starter kit',
 		languages: 'Languages',
 		localPackage: 'Install local package',
-		macros: 'Macros',
 		mediaTypes: 'Media Types',
 		member: 'Members',
 		memberGroups: 'Member Groups',
@@ -1972,7 +1946,6 @@ export default {
 		packager: 'Packages',
 		packages: 'Packages',
 		partialViews: 'Partial Views',
-		partialViewMacros: 'Partial View Macro Files',
 		repositories: 'Install from repository',
 		relations: 'Relations',
 		runway: 'Install Runway',
@@ -2383,7 +2356,6 @@ export default {
 		switchLanguage: 'Switch language to',
 		createNewFolder: 'Create new folder',
 		newPartialView: 'Partial View',
-		newPartialViewMacro: 'Partial View Macro',
 		newMember: 'Member',
 		newDataType: 'Data Type',
 		redirectDashboardSearchLabel: 'Search the redirect dashboard',

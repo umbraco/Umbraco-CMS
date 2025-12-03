@@ -118,7 +118,6 @@ export default {
 		linkLocal: 'Wstaw link wewnętrzny',
 		listBullet: 'Wypunktowanie',
 		listNumeric: 'Numerowanie',
-		macroInsert: 'Wstawianie makra',
 		pictureInsert: 'Wstawianie obrazka',
 		relations: 'Edycja relacji',
 		returnToList: 'Powrót do listy',
@@ -236,10 +235,7 @@ export default {
 		newDataType: 'Nowy typ danych',
 		newJavascriptFile: 'Nowy plik javascript',
 		newEmptyPartialView: 'Nowy pusty Częściowy Widok',
-		newPartialViewMacro: 'Nowy Częściowy Widok makro',
 		newPartialViewFromSnippet: 'Nowy Częściowy Widok ze snippeta',
-		newPartialViewMacroFromSnippet: 'Nowy Częściowy Widok makro ze snippeta',
-		newPartialViewMacroNoMacro: 'Nowy Częściowy Widok makro (bez makro)',
 	},
 	dashboard: {
 		browser: 'Przeglądaj swoją stronę',
@@ -298,14 +294,12 @@ export default {
 		insertgraphicheadline: 'Wstaw graficzny nagłówek',
 		insertimage: 'Wstaw zdjęcie',
 		insertlink: 'Wstaw link',
-		insertMacro: 'Wstaw makro',
 		inserttable: 'Wstaw tabelę',
 		lastEdited: 'Ostatnio edytowane',
 		link: 'Link',
 		linkinternal: 'Link wewnętrzny',
 		linklocaltip: 'Kiedy używasz odnośników lokalnych, wstaw znak "#" na początku linku',
 		linknewwindow: 'Otworzyć w nowym oknie?',
-		macroDoesNotHaveProperties: 'To makro nie posiada żadnych właściwości, które można edytować',
 		paste: 'Wklej',
 		permissionsEdit: 'Edytuj Uprawnienia dla',
 		permissionsSet: 'Ustaw uprawnienia dla',
@@ -319,7 +313,6 @@ export default {
 			"Serwis <a target='_blank' rel='noopener' href='http://regexlib.com'>regexlib.com</a> aktualnie nie jest dostępny, na co nie mamy wpływu. Bardzo przepraszamy za te utrudnienia.",
 		regexSearchHelp:
 			"Przeszukaj dla wyrażeń regularnych, aby dodać regułę sprawdzającą do formularza. Np. 'email' 'URL'",
-		removeMacro: 'Usuń Makro',
 		requiredField: 'Pole wymagane',
 		sitereindexed: 'Strona została przeindeksowana',
 		siterepublished:
@@ -342,7 +335,6 @@ export default {
 		selectIcon: 'Wybierz ikonę',
 		selectItem: 'Wybierz element',
 		selectLink: 'Wybierz link',
-		selectMacro: 'Wybierz makro',
 		selectContent: 'Wybierz zawartość',
 		selectMediaStartNode: 'Wybierz węzeł początkowy mediów',
 		selectMember: 'Wybierz członka',
@@ -351,8 +343,6 @@ export default {
 		selectSections: 'Wybierz sekcje',
 		selectUsers: 'Wybierz użytkowników',
 		noIconsFound: 'Nie znaleziono ikon',
-		noMacroParams: 'Te makro nie ma żadnych właściwości',
-		noMacros: 'Brak dostępnych makro do wstawienia',
 		externalLoginProviders: 'Zewnętrzni dostawcy logowania',
 		exceptionDetail: 'Sczegóły Wyjątku',
 		stacktrace: 'Stacktrace',
@@ -427,7 +417,6 @@ export default {
 			'Pomimo tego, że CodeMirror jest włączony w konfiguracji, jest on wyłączony w Internet Explorerze ze względu na swoją niestabilność.',
 		contentTypeAliasAndNameNotNull: 'Proszę uzupełnij zarówno alias, jak i nazwę dla nowego typu właściwości',
 		filePermissionsError: 'Wystąpił problem podczas zapisu/odczytu wymaganego pliku lub folderu',
-		macroErrorLoadingPartialView: 'Wystąpił błąd podczas ładowania skryptu Częściowego Widoku (plik: %0%)',
 		missingTitle: 'Proszę podać tytuł',
 		missingType: 'Proszę wybrać typ',
 		pictureResizeBiggerThanOrg:
@@ -496,7 +485,6 @@ export default {
 		login: 'Zaloguj',
 		logoff: 'Wyloguj',
 		logout: 'Wyloguj',
-		macro: 'Makro',
 		mandatory: 'Obowiązkowy',
 		move: 'Przenieś',
 		name: 'Nazwa',
@@ -962,9 +950,6 @@ export default {
 		insertDictionaryItem: 'Wstaw element słownika',
 		insertDictionaryItemDesc:
 			'Element słownika to miejsce, gdzie można wstawić przetłumaczony tekst, co ułatwia tworzenie projektów dla wielojęzycznych stron.',
-		insertMacro: 'Makro',
-		insertMacroDesc:
-			'\n      Makro to konfigurowalny komponent, który sprawdzi się\n      przy wielokrotnie używanych częściach Twojego projektu, kiedy potrzebujesz opcji dostarczenia parametrów,\n      takich jak galerie, formularze, czy listy.\n    ',
 		insertPageField: 'Wartość',
 		insertPageFieldDesc:
 			'Wyświetla wartość danego pola z bieżącej strony z opcjami modyfikacji wartości lub powrotu do alernatywnych wartości.',
@@ -1020,7 +1005,6 @@ export default {
 	},
 	grid: {
 		media: 'Image',
-		macro: 'Macro',
 		insertControl: 'Wybierz typ treści',
 		chooseLayout: 'Wybierz układ',
 		addRows: 'Dodaj wiersz',
@@ -1161,7 +1145,6 @@ export default {
 		installStarterKit: 'Zainstaluj Starter Kit',
 		languages: 'Języki',
 		localPackage: 'Zainstaluj pakiet lokalny',
-		macros: 'Makra',
 		mediaTypes: 'Typy mediów',
 		member: 'Członkowie',
 		memberGroups: 'Grupy członków',
@@ -1179,7 +1162,6 @@ export default {
 		stylesheets: 'Arkusze stylów',
 		templates: 'Szablony',
 		partialViews: 'Częściowe Widoki',
-		partialViewMacros: 'Pliki Makro Częściowych Widoków',
 	},
 	update: {
 		updateAvailable: 'Aktualizacja jest gotowa',

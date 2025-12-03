@@ -127,7 +127,6 @@
 		<key alias="linkLocal">Insérer un lien local (ancre)</key>
 		<key alias="listBullet">Liste à puces</key>
 		<key alias="listNumeric">Liste numérique</key>
-		<key alias="macroInsert">Insérer une macro</key>
 		<key alias="pictureInsert">Insérer une image</key>
 		<key alias="publishAndClose">Publier et fermer</key>
 		<key alias="publishDescendants">Publier avec les descendants</key>
@@ -344,10 +343,7 @@
 		<key alias="newDataType">Nouveau type de données</key>
 		<key alias="newJavascriptFile">Nouveau fichier javascript</key>
 		<key alias="newEmptyPartialView">Nouvelle vue partielle vide</key>
-		<key alias="newPartialViewMacro">Nouvelle macro pour vue partielle</key>
 		<key alias="newPartialViewFromSnippet">Nouvelle vue partielle à partir d'un snippet</key>
-		<key alias="newPartialViewMacroFromSnippet">Nouvelle macro pour vue partielle à partir d'un snippet</key>
-		<key alias="newPartialViewMacroNoMacro">Nouvelle macro pour vue partielle (sans macro)</key>
 		<key alias="newStyleSheetFile">Nouveau fichier de feuille de style</key>
 		<key alias="newRteStyleSheetFile">Nouveau fichier de feuille de style pour l'éditeur de texte</key>
 	</area>
@@ -413,7 +409,6 @@
 		<key alias="insertgraphicheadline">Insérer un entête graphique</key>
 		<key alias="insertimage">Insérer une image</key>
 		<key alias="insertlink">Insérer un lien</key>
-		<key alias="insertMacro">Insérer une macro</key>
 		<key alias="inserttable">Insérer un tableau</key>
 		<key alias="languagedeletewarning">Ceci supprimera la langue</key>
 		<key alias="languageChangeWarning">Modifier la culture d'une langue peut être une opération lourde qui aura pour conséquence la réinitialisation de la cache de contenu et des index</key>
@@ -422,7 +417,6 @@
 		<key alias="linkinternal">Lien interne :</key>
 		<key alias="linklocaltip">Si vous utilisez des ancres, insérez # au début du lien</key>
 		<key alias="linknewwindow">Ouvrir dans une nouvelle fenêtre?</key>
-		<key alias="macroDoesNotHaveProperties">Cette macro ne contient aucune propriété éditable</key>
 		<key alias="paste">Coller</key>
 		<key alias="permissionsEdit">Editer les permissions pour</key>
 		<key alias="permissionsSet">Définir les permissions pour</key>
@@ -433,7 +427,6 @@
 		<key alias="recycleBinWarning">Les éléments supprimés de la corbeille seront supprimés définitivement</key>
 		<key alias="regexSearchError"><![CDATA[Le webservice <a target='_blank' rel='noopener' href='http://regexlib.com'>regexlib.com</a> rencontre actuellement des problèmes sur lesquels nous n'avons aucun contrôle. Nous sommes sincèrement désolés pour le désagrément.]]></key>
 		<key alias="regexSearchHelp">Rechercher une expression régulière à ajouter pour la validation d'un champ de formulaire. Exemple: 'email, 'zip-code', 'URL'.</key>
-		<key alias="removeMacro">Supprimer la macro</key>
 		<key alias="requiredField">Champ obligatoire</key>
 		<key alias="sitereindexed">Le site a été réindéxé</key>
 		<key alias="siterepublished">Le cache du site a été mis à jour. Tous les contenus publiés sont maintenant à jour. Et tous les contenus dépubliés sont restés invisibles.</key>
@@ -455,7 +448,6 @@
 		<key alias="selectIcon">Sélectionner l'icône</key>
 		<key alias="selectItem">Sélectionner l'élément</key>
 		<key alias="selectLink">Sélectionner le lien</key>
-		<key alias="selectMacro">Sélectionner la macro</key>
 		<key alias="selectContent">Sélectionner le contenu</key>
 		<key alias="selectContentType">Sélectionner le type de contenu</key>
 		<key alias="selectMediaStartNode">Sélectionner le noeud de base des media</key>
@@ -466,8 +458,6 @@
 		<key alias="selectSections">Sélectionner les sections</key>
 		<key alias="selectUsers">Sélectionner les utilisateurs</key>
 		<key alias="noIconsFound">Aucune icone n'a été trouvée</key>
-		<key alias="noMacroParams">Il n'y a pas de paramètres pour cette macro</key>
-		<key alias="noMacros">Il n'y a pas de macro disponible à insérer</key>
 		<key alias="externalLoginProviders">Fournisseurs externes d'identification</key>
 		<key alias="exceptionDetail">Détails de l'exception</key>
 		<key alias="stacktrace">Trace d'exécution</key>
@@ -602,7 +592,6 @@
 		<key alias="codemirroriewarning">NOTE ! Même si CodeMirror est activé dans la configuration, il est désactivé dans Internet Explorer car il n'est pas suffisamment stable dans ce navigateur.</key>
 		<key alias="contentTypeAliasAndNameNotNull">Veuillez remplir l'alias et le nom de la nouvelle propriété!</key>
 		<key alias="filePermissionsError">Il y a un problème de droits en lecture/écriture sur un fichier ou dossier spécifique</key>
-		<key alias="macroErrorLoadingPartialView">Erreur de chargement du script d'une Partial View (fichier : %0%)</key>
 		<key alias="missingTitle">Veuillez entrer un titre</key>
 		<key alias="missingType">Veuillez choisir un type</key>
 		<key alias="pictureResizeBiggerThanOrg">Vous allez définir une taille d'image supérieure à sa taille d'origine. Êtes-vous certain(e) de vouloir continuer?</key>
@@ -686,7 +675,6 @@
 		<key alias="login">Connexion</key>
 		<key alias="logoff">Déconnexion</key>
 		<key alias="logout">Déconnexion</key>
-		<key alias="macro">Macro</key>
 		<key alias="mandatory">Obligatoire</key>
 		<key alias="message">Message</key>
 		<key alias="move">Déplacer</key>
@@ -1508,12 +1496,6 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
 		<key alias="insertDesc">Choisissez l'élément à insérer dans votre modèle</key>
 		<key alias="insertDictionaryItem">Elément de dictionnaire</key>
 		<key alias="insertDictionaryItemDesc">Un élément de dictionnaire est un espace pour un morceau de texte traduisible, ce qui facilite la création de designs pour des sites web multilangues.</key>
-		<key alias="insertMacro">Macro</key>
-		<key alias="insertMacroDesc">
-			Une Macro est un composant configurable, ce qui est génial pour les parties réutilisables de votre
-			design où vous devez pouvoir fournir des paramètres,
-			comme les galeries, les formulaires et les listes.
-		</key>
 		<key alias="insertPageField">Valeur</key>
 		<key alias="insertPageFieldDesc">Affiche la valeur d'un des champs de la page en cours, avec des options pour modifier la valeur ou spécifier des valeurs alternatives.</key>
 		<key alias="insertPartialView">Vue partielle</key>
@@ -1586,7 +1568,6 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
 	</area>
 	<area alias="grid">
 		<key alias="media">Image</key>
-		<key alias="macro">Macro</key>
 		<key alias="insertControl">Choisissez le type de contenu</key>
 		<key alias="chooseLayout">Choisissez une mise en page</key>
 		<key alias="addRows">Ajouter une ligne</key>
@@ -1597,7 +1578,6 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
 		<key alias="contentAllowed">Ce contenu est autorisé ici</key>
 		<key alias="clickToEmbed">Cliquez pour intégrer</key>
 		<key alias="clickToInsertImage">Cliquez pour insérer une image</key>
-		<key alias="clickToInsertMacro">Cliquez pour insérer une macro</key>
 		<key alias="placeholderWriteHere">Ecrivez ici...</key>
 		<key alias="gridLayouts">Mises en pages de la Grid</key>
 		<key alias="gridLayoutsDetail">Les mises en pages représentent la surface de travail globale pour l'éditeur de grille, en général, vous n'avez seulement besoin que d'une ou deux mises en pages différentes</key>
@@ -1707,14 +1687,6 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
 		<key alias="fallbackLanguage">Langue alternative</key>
 		<key alias="none">aucune</key>
 	</area>
-	<area alias="macro">
-		<key alias="addParameter">Ajouter un paramètre</key>
-		<key alias="editParameter">Modifier le paramètre</key>
-		<key alias="enterMacroName">Introduire le nom de la macro</key>
-		<key alias="parameters">Paramètres</key>
-		<key alias="parametersDescription">Définir les paramètres qui devraient être disponibles lorsque l'on utilise cette macro.</key>
-		<key alias="selectViewFile">Sélectionner le fichier de vue partielle de la macro</key>
-	</area>
 	<area alias="modelsBuilder">
 		<key alias="buildingModels">Fabrication des modèles</key>
 		<key alias="waitingMessage">ceci peut prendre un peu de temps, ne vous inquiétez pas</key>
@@ -1802,7 +1774,6 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
 		<key alias="installStarterKit">Installer un starter kit</key>
 		<key alias="languages">Langues</key>
 		<key alias="localPackage">Installer un package local</key>
-		<key alias="macros">Macros</key>
 		<key alias="mediaTypes">Types de média</key>
 		<key alias="member">Membres</key>
 		<key alias="memberGroups">Groupes de membres</key>
@@ -1813,7 +1784,6 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
 		<key alias="packager">Packages</key>
 		<key alias="packages">Packages</key>
 		<key alias="partialViews">Vues Partielles</key>
-		<key alias="partialViewMacros">Vues Partielles pour les Fichiers Macro</key>
 		<key alias="repositories">Installer depuis le repository</key>
 		<key alias="runway">Installer Runway</key>
 		<key alias="runwayModules">Modules Runway</key>
@@ -2198,7 +2168,6 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
 		<key alias="switchLanguage">Changer la langue vers</key>
 		<key alias="createNewFolder">Créer un nouveau dossier</key>
 		<key alias="newPartialView">Partial View</key>
-		<key alias="newPartialViewMacro">Macro de Partial View</key>
 		<key alias="newMember">Membre</key>
 		<key alias="searchContentTree">Chercher dans l'arborescence de contenu</key>
 		<key alias="maxAmount">Quantité maximum</key>

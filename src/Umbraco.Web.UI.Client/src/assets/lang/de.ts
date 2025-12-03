@@ -137,7 +137,6 @@ export default {
 		linkLocal: 'Anker einfügen',
 		listBullet: 'Aufzählung',
 		listNumeric: 'Nummerierung',
-		macroInsert: 'Makro einfügen',
 		pictureInsert: 'Abbildung einfügen',
 		publishAndClose: 'Veröffentlichen und schliessen',
 		publishDescendants: 'Veröffentlichen mit Unterknoten',
@@ -440,10 +439,7 @@ export default {
 		newDataType: 'Neuer Datentyp',
 		newJavascriptFile: 'Neue JavaScript-Datei',
 		newEmptyPartialView: 'Neue leere Partial-View',
-		newPartialViewMacro: 'Neues Partial-View-Makro',
 		newPartialViewFromSnippet: 'Neue Partial-View nach Vorlage',
-		newPartialViewMacroFromSnippet: 'Neues Partial-View-Makro nach Vorlage',
-		newPartialViewMacroNoMacro: 'Neues Partial-View-Makro (ohne Makro)',
 		newStyleSheetFile: 'Neue Style-Sheet-Datei',
 	},
 	dashboard: {
@@ -513,7 +509,6 @@ export default {
 		insertgraphicheadline: 'Grafische Überschrift einfügen',
 		insertimage: 'Abbildung einfügen',
 		insertlink: 'Link einfügen',
-		insertMacro: 'klicken um Macro hinzuzufügen',
 		inserttable: 'Tabelle einfügen',
 		languagedeletewarning: 'Dies entfernt die Sprache',
 		languageChangeWarning:
@@ -523,7 +518,6 @@ export default {
 		linkinternal: 'Internen Link',
 		linklocaltip: 'Wenn lokale Links verwendet werden, füge ein "#" vor den Link ein',
 		linknewwindow: 'In einem neuen Fenster öffnen?',
-		macroDoesNotHaveProperties: 'Dieses Makro enthält keine einstellbaren Eigenschaften.',
 		paste: 'Einfügen',
 		permissionsEdit: 'Berechtigungen bearbeiten für',
 		permissionsSet: 'Berechtigungen vergeben für',
@@ -538,7 +532,6 @@ export default {
 			"\n      Der Webservice von <a target='_blank' rel='noopener' href='http://regexlib.com'>regexlib.com</a> ist zur Zeit nicht erreichbar. Bitte versuchen Sie es später erneut.",
 		regexSearchHelp:
 			"\n      Finden Sie einen vorbereiteten regulären Ausdruck zur Validierung der Werte, die in dieses Feld eingegeben werden - zum Beispiel 'email, 'plz', 'URL' oder ähnlich.\n    ",
-		removeMacro: 'Macro entfernen',
 		requiredField: 'Pflichtfeld',
 		sitereindexed: 'Die Website-Index wurd neu erstellt',
 		siterepublished:
@@ -562,7 +555,6 @@ export default {
 		selectIcon: 'Bildzeichen wählen',
 		selectItem: 'Element wählen',
 		selectLink: 'Link wählen',
-		selectMacro: 'Makro wählen',
 		selectContent: 'Inhalt wählen',
 		selectContentType: 'Inhaltstyp wählen',
 		selectMediaStartNode: 'Medien-Startknoten wählen',
@@ -575,8 +567,6 @@ export default {
 		selectUser: 'Benutzer wählen',
 		selectUsers: 'Benutzer wählen',
 		noIconsFound: 'Keine Bildzeichen gefunden',
-		noMacroParams: 'Für dieses Makro gibt es keine Parameter',
-		noMacros: 'Es gibt keine Makros zum Einfügen',
 		externalLoginProviders: 'Externe Login-Anbieter',
 		exceptionDetail: 'Ausnahmedetails',
 		stacktrace: 'Stacktrace',
@@ -720,7 +710,6 @@ export default {
 			'ACHTUNG! Obwohl CodeMirror in den Einstellungen aktiviert ist,\n      bleibt das Modul wegen mangelnder Stabilität in Internet Explorer deaktiviert.\n    ',
 		contentTypeAliasAndNameNotNull: 'Bitte geben Sie die Bezeichnung und den Alias des neuen Dokumenttyps ein.',
 		filePermissionsError: 'Es besteht ein Problem mit den Lese-/Schreibrechten auf eine Datei oder einen Ordner',
-		macroErrorLoadingPartialView: 'Fehler beim Laden einer "Partial View Kodedatei" (Datei: %0%)',
 		missingTitle: 'Bitte geben Sie einen Titel ein',
 		missingType: 'Bitte wählen Sie einen Typ',
 		pictureResizeBiggerThanOrg:
@@ -810,7 +799,6 @@ export default {
 		login: 'Anmelden',
 		logoff: 'Abmelden',
 		logout: 'Abmelden',
-		macro: 'Makro',
 		mandatory: 'Pflichtfeld',
 		media: 'Medien',
 		message: 'Nachricht',
@@ -1418,9 +1406,6 @@ export default {
 		insertDictionaryItem: 'Wörterbucheintrag einfügen',
 		insertDictionaryItemDesc:
 			'Ein Wörterbuchelement ist ein Platzhalter für lokalisierbaren Text. Das macht es einfach mehrsprachige Websites zu gestalten.',
-		insertMacro: 'Makro',
-		insertMacroDesc:
-			'\n       Ein Makro ist eine konfigurierbare Komponente, die großartig\n       für wiederverwendbare Teile Ihres Entwurfes sind,\n      für welche Sie optionale Parameter benötigen, wie z. B. Galerien, Formulare oder Listen.\n    ',
 		insertPageField: 'Umbraco-Feld',
 		insertPageFieldDesc:
 			'\n      Zeigt den Wert eines benannten Feldes der aktuellen Seite an, mit der Möglichkeit den Wert zu verändern\n      oder einen alternativen Ersatzwert zu wählen.\n    ',
@@ -1476,7 +1461,6 @@ export default {
 	},
 	grid: {
 		media: 'Image',
-		macro: 'Macro',
 		insertControl: 'Neues Element',
 		chooseLayout: 'Layout auswählen',
 		addRows: 'Neue Zeile',
@@ -1601,13 +1585,6 @@ export default {
 		invariantLanguageProperty: 'Geteilt: Sprachen',
 		invariantSegmentProperty: 'Geteilt: Segmente',
 	},
-	macro: {
-		addParameter: 'Parameter hinzufügen',
-		editParameter: 'Parameter bearbeiten',
-		enterMacroName: 'Makroname vergeben',
-		parameters: 'Parameter',
-		parametersDescription: 'Definiere die Parameter, die verfügbar sein sollen, wenn dieses Makro verwendet wird.',
-	},
 	modelsBuilder: {
 		buildingModels: 'Datenmodel erzeugen',
 		waitingMessage: 'Keine Sorge, das kann eine Weile dauern',
@@ -1681,7 +1658,6 @@ export default {
 		installStarterKit: 'Starter-Kit installieren',
 		languages: 'Sprachen',
 		localPackage: 'Lokales Paket hochladen und installieren',
-		macros: 'Makros',
 		mediaTypes: 'Medientypen',
 		member: 'Mitglieder',
 		memberGroups: 'Mitgliedergruppen',
@@ -1692,7 +1668,6 @@ export default {
 		packager: 'Pakete',
 		packages: 'Pakete',
 		partialViews: 'Teilansicht (Partial View)',
-		partialViewMacros: 'Makro-Teilansicht(Partial View Macro Files)',
 		repositories: 'Paket-Repositories',
 		runway: "'Runway' installieren",
 		runwayModules: 'Runway-Module',

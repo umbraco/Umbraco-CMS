@@ -135,7 +135,6 @@ export default {
 		linkLocal: 'Umetni lokalni link (sidro)',
 		listBullet: 'Obična lista',
 		listNumeric: 'Numerička lista',
-		macroInsert: 'Umetni makro',
 		pictureInsert: 'Umetni sliku',
 		publishAndClose: 'Objavi i zatvori',
 		publishDescendants: 'Objavi sa potomcima',
@@ -402,10 +401,7 @@ export default {
 		newDataType: 'Nova vrsta podatka',
 		newJavascriptFile: 'Nova JavaScript datoteka',
 		newEmptyPartialView: 'Novi prazan djelomični prikaz',
-		newPartialViewMacro: 'Novi djelomični prikaz za makro',
 		newPartialViewFromSnippet: 'Novi djelomični prikaz iz isječka',
-		newPartialViewMacroFromSnippet: 'Novi djelomični prikaz za makro iz isječka',
-		newPartialViewMacroNoMacro: 'Novi djelomični prikaz za makro (bez makroa)',
 		newStyleSheetFile: 'Nova CSS datoteka',
 	},
 	dashboard: {
@@ -476,7 +472,6 @@ export default {
 		insertgraphicheadline: 'Umetni grafički naslov',
 		insertimage: 'Umetni sliku',
 		insertlink: 'Umetni link',
-		insertMacro: 'Klikni za dodavanje makro',
 		inserttable: 'Umetni tablicu',
 		languagedeletewarning: 'Ovo će izbrisati jezik i sav sadržaj povezan s jezikom',
 		languageChangeWarning:
@@ -486,7 +481,6 @@ export default {
 		linkinternal: 'Interni link',
 		linklocaltip: 'Kada koristite lokalni linkovi, umetnite "#" ispred linka',
 		linknewwindow: 'Otvoriti u novom prozoru?',
-		macroDoesNotHaveProperties: 'Ovaj makro ne sadrži svojstva koja možete uređivati',
 		paste: 'Zalijepi',
 		permissionsEdit: 'Uredi dozvole za',
 		permissionsSet: 'Postavi dozvole za',
@@ -500,7 +494,6 @@ export default {
 			"<a target='_blank' rel='noopener' href='http://regexlib.com'>regexlib.com</a> web servis trenutno ima probleme u komunikaciji na koje ne možemo utjecati. Žao nam je zbog nastalih smetnji.",
 		regexSearchHelp:
 			"Traži regular expression kako bi njime validirali polje unosa. Primjer: 'e-pošta,\n       'poštanski broj', 'URL'.\n    ",
-		removeMacro: 'Ukloni makro',
 		requiredField: 'Obavezno polje',
 		sitereindexed: 'Stranica je ponovo indeksirana',
 		siterepublished:
@@ -524,7 +517,6 @@ export default {
 		selectIcon: 'Odaberi ikonu',
 		selectItem: 'Odaberi stavku',
 		selectLink: 'Odaberi vezu',
-		selectMacro: 'Odaberi makro',
 		selectContent: 'Odaberi sadržaj',
 		selectContentType: 'Odaberi vrstu sadržaja',
 		selectMediaStartNode: 'Odaberi početni čvor medija',
@@ -537,8 +529,6 @@ export default {
 		selectUser: 'Odaberi korisnika',
 		selectUsers: 'Odaberi korisnike',
 		noIconsFound: 'Nema pronađenih ikona',
-		noMacroParams: 'Nema parametara za ovaj makro',
-		noMacros: 'Nema dostupnih makroa za umetanje',
 		externalLoginProviders: 'Vanjski provajderi prijave',
 		exceptionDetail: 'Detalji iznimaka',
 		stacktrace: 'Zapisnik',
@@ -673,7 +663,6 @@ export default {
 			'NAPOMENA! Iako je CodeMirror omogućen konfiguracijom, on je onemogućen u\n       Internet Explorer-u jer nije dovoljno stabilan.\n    ',
 		contentTypeAliasAndNameNotNull: 'Unesite i alias i ime na novu vrstu svojstva!',
 		filePermissionsError: 'Postoji problem sa pristupom za čitanje/pisanje određenoj datoteci ili mapi',
-		macroErrorLoadingPartialView: 'Greška pri učitavanju skripte parcijalnog prikaza (datoteka: %0%)',
 		missingTitle: 'Unesite naslov',
 		missingType: 'Molimo odaberite vrstu',
 		pictureResizeBiggerThanOrg:
@@ -760,7 +749,6 @@ export default {
 		login: 'Prijava',
 		logoff: 'Odjava',
 		logout: 'Odjava',
-		macro: 'Makro',
 		mandatory: 'Obavezno',
 		message: 'Poruka',
 		move: 'Pomakni',
@@ -1405,9 +1393,6 @@ export default {
 		insertDictionaryItem: 'Stavka iz rječnika',
 		insertDictionaryItemDesc:
 			'Stavka rječnika je čuvar mjesta za prevodljiv dio teksta, koji\n       olakšava kreiranje dizajna za višejezične web stranice.\n    ',
-		insertMacro: 'Makro',
-		insertMacroDesc:
-			'\n       Makro je komponenta koja se može konfigurirati i odlična je za\n       višenamjenske dijelove vašeg dizajna, gdje vam je potrebna opcija za pružanje parametara,\n       kao što su galerije, obrasci i liste.\n    ',
 		insertPageField: 'Vrijednost',
 		insertPageFieldDesc:
 			'Prikazuje vrijednost polja sa trenutne stranice po aliasu s opcijama za izmjenu vrijednosti ili povratak na alternativne vrijednosti.',
@@ -1463,7 +1448,6 @@ export default {
 	},
 	grid: {
 		media: 'Slika',
-		macro: 'Makro',
 		insertControl: 'Odaberite vrstu sadržaja',
 		chooseLayout: 'Odaberite izgled',
 		addRows: 'Dodaj redak',
@@ -1474,7 +1458,6 @@ export default {
 		contentAllowed: 'Ovaj sadržaj je ovdje dozvoljen',
 		clickToEmbed: 'Kliknite za ugradnju',
 		clickToInsertImage: 'Kliknite da umetnete sliku',
-		clickToInsertMacro: 'Kliknite da umetnete makro',
 		placeholderWriteHere: 'Pišite ovdje...',
 		gridLayouts: 'Raspored mreže',
 		gridLayoutsDetail:
@@ -1634,14 +1617,6 @@ export default {
 		fallbackLanguage: 'Zamjenski jezik',
 		none: 'niti jedan',
 	},
-	macro: {
-		addParameter: 'Dodaj parameter',
-		editParameter: 'Uredi parameter',
-		enterMacroName: 'Unesite naziv makroa',
-		parameters: 'Parametri',
-		parametersDescription: 'Definirajte parametre koji bi trebali biti dostupni kada koristite ovaj makro.',
-		selectViewFile: 'Odaberite parcijalni prikaz makro datoteke',
-	},
 	modelsBuilder: {
 		buildingModels: 'Kreiranje modela',
 		waitingMessage: 'ovo može potrajati, ne brinite',
@@ -1715,7 +1690,6 @@ export default {
 		installStarterKit: 'Instaliraj starter kit',
 		languages: 'Jezici',
 		localPackage: 'Instaliraj lokalni paket',
-		macros: 'Makroi',
 		mediaTypes: 'Vrste medija',
 		member: 'Članovi',
 		memberGroups: 'Grupe članova',
@@ -1726,7 +1700,6 @@ export default {
 		packager: 'Paketi',
 		packages: 'Paketi',
 		partialViews: 'Parcijalni prikazi',
-		partialViewMacros: 'Parcijalni prikazi makro datoteka',
 		repositories: 'Instaliraj iz repozitorija',
 		runway: 'Instaliraj Runway',
 		runwayModules: 'Runway moduli',
@@ -1910,9 +1883,6 @@ export default {
 			"Očekivana vrijednost '%1%' za '%2%' u konfiguracijskoj datoteci '%3%', ali je pronađeno '%0%'.",
 		checkErrorMessageUnexpectedValue:
 			"Pronađena neočekivana vrijednost '%0%' za '%2%' u konfiguracijskoj datoteci '%3%'.\n    ",
-		macroErrorModeCheckSuccessMessage: "Makro greške su postavljene na '%0%'.",
-		macroErrorModeCheckErrorMessage:
-			"Greške makroa su postavljene na '%0%' što će spriječiti potpuno učitavanje nekih ili svih stranica\n\t  na vašem sajtu ako postoje greške u makroima. Ako ovo ispravite, vrijednost će biti postavljena na '%1%'.\n    ",
 		httpsCheckValidCertificate: 'Certifikat Vaše web stranice je važeći.',
 		httpsCheckInvalidCertificate: "Greška u validaciji certifikata: '%0%'",
 		httpsCheckExpiredCertificate: 'SSL certifikat vaše web stranice je istekao.',
@@ -2056,7 +2026,6 @@ export default {
 		switchLanguage: 'Prebaci jezik na',
 		createNewFolder: 'Kreirajte novi folder',
 		newPartialView: 'Parcijalni prikaz',
-		newPartialViewMacro: 'Makro za pracijalni prikaz',
 		newMember: 'Član',
 		newDataType: 'Vrsta podatka',
 		redirectDashboardSearchLabel: 'Pretražite kontrolnu ploču za preusmjeravanje',

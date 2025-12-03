@@ -138,7 +138,6 @@ export default {
 		linkLocal: 'Mewnosod dolen leol (angor)',
 		listBullet: 'Rhestr Bwled',
 		listNumeric: 'Rhestr rhifol',
-		macroInsert: 'Mewnosod macro',
 		pictureInsert: 'Mewnosod llun',
 		publishAndClose: 'Chyhoeddi a cau',
 		publishDescendants: 'Cyhoeddi efo disgynnydd',
@@ -422,10 +421,7 @@ export default {
 		newDataType: 'Math o ddata newydd',
 		newJavascriptFile: 'Ffeil JavaScript newydd',
 		newEmptyPartialView: 'Rhan-wedd wag newydd',
-		newPartialViewMacro: 'Macro rhan-wedd newydd',
 		newPartialViewFromSnippet: 'Rhan-wedd newydd o damaid',
-		newPartialViewMacroFromSnippet: 'Macro rhan-wedd wag newydd o damaid',
-		newPartialViewMacroNoMacro: 'Macro rhan-wedd newydd (heb macro)',
 		newStyleSheetFile: 'Ffeil ddalen arddull newydd',
 	},
 	dashboard: {
@@ -496,7 +492,6 @@ export default {
 		insertgraphicheadline: 'Mewnosod pennawd graffig',
 		insertimage: 'Mewnosod llun',
 		insertlink: 'Mewnosod dolen',
-		insertMacro: 'Cliciwch i ychwanegu Macro',
 		inserttable: 'Mewnosod tabl',
 		languagedeletewarning: "Bydd hyn yn dileu'r iaith",
 		languageChangeWarning:
@@ -506,7 +501,6 @@ export default {
 		linkinternal: 'Dolen fewnol',
 		linklocaltip: 'Wrth ddefnyddio dolenni leol, defnyddiwch "#" o flaen y ddolen',
 		linknewwindow: 'Agor mewn ffenestr newydd?',
-		macroDoesNotHaveProperties: "Nid yw'r macro yma yn cynnwys unrhyw briodweddau gallwch chi olygu",
 		paste: 'Gludo',
 		permissionsEdit: 'Golygu hawliau ar gyfer',
 		permissionsSet: 'Gosod hawliau ar gyfer',
@@ -520,7 +514,6 @@ export default {
 			"Mae problem gyda gwasanaeth gwe <a target='_blank' rel='noopener' href='http://regexlib.com'>regexlib.com</a> ar hyn o bryd, nid oes gennym reolaeth dros hyn. Mae'n ddrwg iawn gennym ni am yr anghyfleustra.",
 		regexSearchHelp:
 			"Chwiliwch am fynegiad cyson er mwyn ychwanegu dilysiad i faes ffurflen. Enghraifft: 'email, 'zip-code' 'url'",
-		removeMacro: 'Dileu Macro',
 		requiredField: 'Maes Gofynnol',
 		sitereindexed: "Safle wedi'i ail-fynegi",
 		siterepublished:
@@ -545,7 +538,6 @@ export default {
 		selectIcon: 'Dewis eicon',
 		selectItem: 'Dewis eitem',
 		selectLink: 'Dewis dolen',
-		selectMacro: 'Dewis macro',
 		selectContent: 'Dewis cynnwys',
 		selectContentType: 'Dewiswch y math o gynnwys',
 		selectMediaStartNode: 'Dewis nod cychwyn cyfrwng',
@@ -557,8 +549,6 @@ export default {
 		selectUser: 'Dewis defnyddiwr',
 		selectUsers: 'Dewis defnyddwyr',
 		noIconsFound: "Dim eiconau wedi'u darganfod",
-		noMacroParams: 'Does dim paramedrau ar gyfer y macro yma',
-		noMacros: 'Does dim macro ar gael i fewnosod',
 		externalLoginProviders: 'Darparwyr mewngofnodi allanol',
 		exceptionDetail: 'Manylion Eithriad',
 		stacktrace: 'Trywydd stac',
@@ -704,7 +694,6 @@ export default {
 			"NODYN! Er bod CodeMirror wedi'i alluogi gan y ffurfwedd, mae o wedi'i analluogi mewn Internet Explorer gan nad yw'n ddigon cadarn.",
 		contentTypeAliasAndNameNotNull: 'Darparwch yr enw ac yr enw arall ar y math o briodwedd newydd!',
 		filePermissionsError: 'Mae yna broblem gyda hawliau darllen/ysgrifennu i ffeil neu ffolder penodol',
-		macroErrorLoadingPartialView: 'Gwall yn llwytho sgript Rhan-Wedd (ffeil: %0%)',
 		missingTitle: 'Darparwch deitl',
 		missingType: 'Dewiswch fath',
 		pictureResizeBiggerThanOrg:
@@ -796,7 +785,6 @@ export default {
 		login: 'Mewngofnodi',
 		logoff: 'Allgofnodi',
 		logout: 'Allgofnodi',
-		macro: 'Macro',
 		mandatory: 'Gofynnol',
 		message: 'Neges',
 		move: 'Symud',
@@ -1474,9 +1462,6 @@ export default {
 		insertDictionaryItem: 'Eitem geiriadaur',
 		insertDictionaryItemDesc:
 			"Mae eitem geiriadur yn ddalfan ar gyfer darn o destun y gall gael ei gyfieithu, sy'n ei wneud yn hawdd i greu dyluniadau ar gyfer gwefannau aml-ieithog.",
-		insertMacro: 'Macro',
-		insertMacroDesc:
-			"\n      Mae Macro yn gydran ffurfweddol sy'n wych ar gyfer\n      darnau o'ch dyluniad sy'n cael eu ail-ddefnyddio, ble mae angen y dewis i ddarparu paramedrau,\n      er enghraifft orielau, ffurflenni a rhestri.\n    ",
 		insertPageField: 'Gwerth',
 		insertPageFieldDesc:
 			"Yn dangos gwerth maes penodol o'r dudalen bresennol, gyda'r dewisiadau i newid y gwerth neu syrthio'n ôl at werthoedd eraill.",
@@ -1533,7 +1518,6 @@ export default {
 	},
 	grid: {
 		media: 'Llun',
-		macro: 'Macro',
 		insertControl: 'Dewis math o gynnwys',
 		chooseLayout: 'Dewis cynllun',
 		addRows: 'Ychwanegu rhes',
@@ -1544,7 +1528,6 @@ export default {
 		contentAllowed: 'Caniateir y cynnwys yma',
 		clickToEmbed: 'Cliciwch i fewnblannu',
 		clickToInsertImage: 'Cliciwch i fewnosod llun',
-		clickToInsertMacro: 'Cliciwch i fewnosod macro',
 		placeholderWriteHere: 'Ysgrifennwch yma...',
 		gridLayouts: 'Cynlluniau Grid',
 		gridLayoutsDetail:
@@ -1732,14 +1715,6 @@ export default {
 		invariantLanguageProperty: "Wedi'i rannu: Ieithoedd",
 		invariantSegmentProperty: "Wedi'i rannu: Segments",
 	},
-	macro: {
-		addParameter: 'Ychwanegu paramedr',
-		editParameter: 'Golygu paramedr',
-		enterMacroName: 'Rhowch enw macro',
-		parameters: 'Paramedrau',
-		parametersDescription: "Diffiniwch y paramedrau a ddylai fod ar gael wrth ddefnyddio'r macro hwn.",
-		selectViewFile: 'Dewiswch ffeil macro golwg rhannol',
-	},
 	modelsBuilder: {
 		buildingModels: 'Adeiladu modelau',
 		waitingMessage: 'gall hyn gymryd amser, peidiwch â phoeni',
@@ -1814,7 +1789,6 @@ export default {
 		installStarterKit: 'Gosod cit gychwynol',
 		languages: 'Ieithoedd',
 		localPackage: 'Gosod pecyn leol',
-		macros: 'Macros',
 		mediaTypes: 'Mathau o Gyfrwng',
 		member: 'Aelodau',
 		memberGroups: 'Grwpiau Aelodau',
@@ -1825,7 +1799,6 @@ export default {
 		packager: 'Pecynnydd',
 		packages: 'Pecynnau',
 		partialViews: 'Rhan-weddi',
-		partialViewMacros: 'Ffeiliau Rhan-wedd Macro',
 		repositories: 'Gosod o ystorfa',
 		runway: 'Gosod Runway',
 		runwayModules: 'Modylau Runway',
@@ -2029,9 +2002,6 @@ export default {
 			"Yn disgwyl y gwerth '%1%' ar gyfer '%2%' yn y ffeil ffurfweddu '%3%', ond darganfyddwyd '%0%'.",
 		checkErrorMessageUnexpectedValue:
 			"Darganfyddwyd gwerth annisgwyl '%0%' ar gyfer '%2%' yn y ffeil ffurfweddu '%3%'.",
-		macroErrorModeCheckSuccessMessage: "Gwallau Macro wedi gosod at '%0%'.",
-		macroErrorModeCheckErrorMessage:
-			"Gwallau Macro wedi gosod at '%0%' a fydd yn atal rhai neu holl dudalennau yn eich safle rhag llwytho'n gyfan gwbl os oes unrhyw wallau o fewn macros. Bydd cywiro hyn yn gosod y gwerth at '%1%'.",
 		httpsCheckValidCertificate: 'Mae tystysgrif eich gwefan yn ddilys.',
 		httpsCheckInvalidCertificate: "Gwall dilysu tystysgrif: '%0%'",
 		httpsCheckExpiredCertificate: 'Mae tystysgrif SSL eich gwefan wedi terfynu.',
@@ -2174,7 +2144,6 @@ export default {
 		switchLanguage: 'Newid iaith i',
 		createNewFolder: 'Creu ffolder newydd',
 		newPartialView: 'Golwg Rhannol',
-		newPartialViewMacro: 'Macro Golwg Rhannol',
 		newMember: 'Aelod',
 		newDataType: 'Math o ddata',
 		redirectDashboardSearchLabel: "Chwilio'r dangosfwrdd ailgyfeirio",

@@ -132,7 +132,6 @@
 		<key alias="linkLocal">Inserisci local link (ancora)</key>
 		<key alias="listBullet">Elenco puntato</key>
 		<key alias="listNumeric">Elenco numerato</key>
-		<key alias="macroInsert">Inserisci macro</key>
 		<key alias="pictureInsert">Inserisci immagine</key>
 		<key alias="publishAndClose">Pubblica e chiudi</key>
 		<key alias="publishDescendants">Pubblica con discendenti</key>
@@ -460,10 +459,7 @@
 		<key alias="newDataType">Nuovo tipo di dato</key>
 		<key alias="newJavascriptFile">Nuovo file JavaScript</key>
 		<key alias="newEmptyPartialView">Nuova partial view vuota</key>
-		<key alias="newPartialViewMacro">Nuova partial view macro</key>
 		<key alias="newPartialViewFromSnippet">Nuova partial view da snippet</key>
-		<key alias="newPartialViewMacroFromSnippet">Nuova partial view macro da snippet</key>
-		<key alias="newPartialViewMacroNoMacro">Nuova partial view macro (senza macro)</key>
 		<key alias="newStyleSheetFile">Nuovo foglio di stile</key>
 		<key alias="newRteStyleSheetFile">Nuovo foglio di stile per Rich Text Editor</key>
 	</area>
@@ -540,7 +536,6 @@
 		<key alias="insertgraphicheadline">Inserisci intestazione grafica</key>
 		<key alias="insertimage">Inserisci immagine</key>
 		<key alias="insertlink">Inserisci link</key>
-		<key alias="insertMacro">Inserisci macro</key>
 		<key alias="inserttable">Inserisci tabella</key>
 		<key alias="languagedeletewarning"><![CDATA[Questo eliminerà la lingua]]></key>
 		<key alias="languageChangeWarning">
@@ -551,8 +546,6 @@
 		<key alias="linkinternal"><![CDATA[Link interno:]]></key>
 		<key alias="linklocaltip"><![CDATA[Quando usi il link locale, inserisci # prima del link]]></key>
 		<key alias="linknewwindow"><![CDATA[Apri in nuova finestra?]]></key>
-		<key alias="macroContainerSettings">Impostazioni della macro</key>
-		<key alias="macroDoesNotHaveProperties"><![CDATA[Questa macro non contiene proprietà editabili]]></key>
 		<key alias="paste">Incolla</key>
 		<key alias="permissionsEdit">Modifica i permessi per</key>
 		<key alias="permissionsSet">Imposta i permessi per</key>
@@ -569,7 +562,6 @@
 		<key alias="regexSearchHelp">
 			<![CDATA[Ricerca un'espressione regolare da aggiungere al campo della form per poter validare il contenuto. Esempio: 'email, 'zip-code', 'URL'.]]>
 		</key>
-		<key alias="removeMacro">Elimina Macro</key>
 		<key alias="requiredField">Campo obbligatorio</key>
 		<key alias="sitereindexed"><![CDATA[Il sito è stato reindicizzato]]></key>
 		<key alias="siterepublished"><![CDATA[Il sito è stato ripubblicato]]></key>
@@ -593,7 +585,6 @@
 		<key alias="selectIcon">Seleziona icona</key>
 		<key alias="selectItem">Seleziona oggetto</key>
 		<key alias="selectLink">Seleziona link</key>
-		<key alias="selectMacro">Seleziona macro</key>
 		<key alias="selectContent">Seleziona contenuto</key>
 		<key alias="selectContentType">Seleziona tipo di contenuto</key>
 		<key alias="selectMediaStartNode">Seleziona il nodo di inizio per i media</key>
@@ -605,8 +596,6 @@
 		<key alias="selectUser">Seleziona utente</key>
 		<key alias="selectUsers">Seleziona utenti</key>
 		<key alias="noIconsFound">Non sono state trovate icone</key>
-		<key alias="noMacroParams">Non ci sono parametri per questa macro</key>
-		<key alias="noMacros">Non ci sono macro disponibili da inserire</key>
 		<key alias="externalLoginProviders">Provider di accesso esterni</key>
 		<key alias="exceptionDetail">Exception Details</key>
 		<key alias="stacktrace">Stacktrace</key>
@@ -767,7 +756,6 @@
 		<key alias="filePermissionsError">
 			<![CDATA[Si è verificato un problema nella lettura/scrittura di un file o di una cartella]]>
 		</key>
-		<key alias="macroErrorLoadingPartialView">Errore durante il caricamento di una Partial View script (file: %0%)</key>
 		<key alias="missingTitle"><![CDATA[Per favore inserisci un titolo]]></key>
 		<key alias="missingType"><![CDATA[Per favore scegli un tipo]]></key>
 		<key alias="pictureResizeBiggerThanOrg">
@@ -864,7 +852,6 @@
 		<key alias="login">Login</key>
 		<key alias="logoff">Log off</key>
 		<key alias="logout">Logout</key>
-		<key alias="macro">Macro</key>
 		<key alias="mandatory">Obbligatorio</key>
 		<key alias="message">Messaggio</key>
 		<key alias="move">Sposta</key>
@@ -1834,13 +1821,6 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
 		<key alias="insertDictionaryItemDesc">
 			<![CDATA[Un elemento del dizionario è un segnaposto per un pezzo di testo traducibile, che facilita il design di siti web multi lingua.]]>
 		</key>
-		<key alias="insertMacro">Macro</key>
-		<key alias="insertMacroDesc">
-			<![CDATA[
-            Una macro è un componente configurabile, ottimo per
-            parti riusabili del tuo design, dove hai bisogno di impostare parametri diversi,
-            come galleries, forms e liste.]]>
-		</key>
 		<key alias="insertPageField">Valore</key>
 		<key alias="insertPageFieldDesc">
 			Visualizza il valore di un campo nominato dalla pagina corrente, con delle opzioni
@@ -1918,7 +1898,6 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
 	</area>
 	<area alias="grid">
 		<key alias="media">Immagine</key>
-		<key alias="macro">Macro</key>
 		<key alias="insertControl">Seleziona il tipo di contenuto</key>
 		<key alias="chooseLayout">Seleziona un layout</key>
 		<key alias="addRows">Aggiungi una riga</key>
@@ -1929,7 +1908,6 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
 		<key alias="contentAllowed"><![CDATA[Questo contenuto è consentito qui]]></key>
 		<key alias="clickToEmbed">Clicca per incorporare</key>
 		<key alias="clickToInsertImage">Clicca per inserire un immagine</key>
-		<key alias="clickToInsertMacro">Clicca per inserire una macro</key>
 		<key alias="placeholderImageCaption">Didascalia dell'immagine...</key>
 		<key alias="placeholderWriteHere">Scrivi qui...</key>
 		<key alias="gridLayouts">I Grid Layout</key>
@@ -2108,16 +2086,6 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
 		<key alias="fallbackLanguage">Lingua alternativa</key>
 		<key alias="none">nessuna</key>
 	</area>
-	<area alias="macro">
-		<key alias="addParameter">Aggiungi parametro</key>
-		<key alias="editParameter">Modifica parametro</key>
-		<key alias="enterMacroName">Inserisci il nome della macro</key>
-		<key alias="parameters">Parametri</key>
-		<key alias="parametersDescription">
-			Definisci i parametri che dovranno essere disponibili utilizzando questa macro.
-		</key>
-		<key alias="selectViewFile">Seleziona il file partial view per la macro</key>
-	</area>
 	<area alias="modelsBuilder">
 		<key alias="buildingModels">Compilazione modelli in corso...</key>
 		<key alias="waitingMessage"><![CDATA[questo potrà impiegare un po' di tempo, non preoccuparti]]></key>
@@ -2220,7 +2188,6 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
 		<key alias="installStarterKit">Installare starter kit</key>
 		<key alias="languages">Lingue</key>
 		<key alias="localPackage">Installa un pacchetto locale</key>
-		<key alias="macros">Macros</key>
 		<key alias="mediaTypes">Tipi di media</key>
 		<key alias="member">Membri</key>
 		<key alias="memberGroups">Gruppi di Membri</key>
@@ -2231,7 +2198,6 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
 		<key alias="packager">Pacchetti</key>
 		<key alias="packages">Pacchetti</key>
 		<key alias="partialViews">Partial Views</key>
-		<key alias="partialViewMacros">Macro Partial Views</key>
 		<key alias="repositories">Installa dal repository</key>
 		<key alias="runway">Installa Runway</key>
 		<key alias="runwayModules">Moduli Runway</key>
@@ -2831,7 +2797,6 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
 		<key alias="switchLanguage">Cambia lingua in</key>
 		<key alias="createNewFolder">Crea nuova cartella</key>
 		<key alias="newPartialView">Partial View</key>
-		<key alias="newPartialViewMacro">Partial View Macro</key>
 		<key alias="newMember">Membro</key>
 		<key alias="newDataType">Tipo di dato</key>
 		<key alias="redirectDashboardSearchLabel">Cerca nella dashboard di reindirizzamento</key>

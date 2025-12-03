@@ -149,7 +149,6 @@ export default {
 		linkLocal: 'Inserir link local (âncora)',
 		listBullet: 'Lista com Marcas',
 		listNumeric: 'Lista Numérica',
-		macroInsert: 'Inserir macro',
 		pictureInsert: 'Inserir imagem',
 		publishAndClose: 'Publicar e fechar',
 		publishDescendants: 'Publicar com descendentes',
@@ -460,10 +459,7 @@ export default {
 		newDataTypeDescription: 'Usado para definir uma configuração para um Tipo de Propriedade num Tipo de Conteúdo.',
 		newJavascriptFile: 'Novo ficheiro JavaScript',
 		newEmptyPartialView: 'Nova Vista Parcial Vazia',
-		newPartialViewMacro: 'Nova Macro de Vista Parcial',
 		newPartialViewFromSnippet: 'Nova vista parcial a partir de fragmento',
-		newPartialViewMacroFromSnippet: 'Nova macro de vista parcial a partir de fragmento',
-		newPartialViewMacroNoMacro: 'Nova macro de vista parcial (sem macro)',
 		newStyleSheetFile: 'Nova Stylesheet',
 	},
 	dashboard: {
@@ -540,7 +536,6 @@ export default {
 		insertgraphicheadline: 'Inserir título gráfico',
 		insertimage: 'Inserir imagem',
 		insertlink: 'Inserir link',
-		insertMacro: 'Clique para adicionar uma Macro',
 		inserttable: 'Inserir tabela',
 		languagedeletewarning: 'Isto eliminará o idioma e todo o conteúdo relacionado com o idioma',
 		languageChangeWarning:
@@ -550,7 +545,6 @@ export default {
 		linkinternal: 'Link interno',
 		linklocaltip: 'Ao usar links locais, insira "#" à frente do link',
 		linknewwindow: 'Abrir numa nova janela?',
-		macroDoesNotHaveProperties: 'Esta macro não contém quaisquer propriedades que possa editar',
 		paste: 'Colar',
 		permissionsEdit: 'Editar permissões para',
 		permissionsSet: 'Definir permissões para',
@@ -564,7 +558,6 @@ export default {
 			"O serviço web de <a target='_blank' rel='noopener' href='http://regexlib.com'>regexlib.com</a> está atualmente com alguns problemas, sobre os quais não temos controlo. Lamentamos muito este inconveniente.",
 		regexSearchHelp:
 			"Procure uma expressão regular para adicionar validação a um campo de formulário. Exemplo: 'email, 'código postal', 'URL'.",
-		removeMacro: 'Remover Macro',
 		requiredField: 'Campo Obrigatório',
 		sitereindexed: 'O site foi reindexado',
 		siterepublished:
@@ -593,7 +586,6 @@ export default {
 		selectLink: 'Configurar link',
 		addLink: 'Adicionar Link',
 		updateLink: 'Atualizar Link',
-		selectMacro: 'Selecionar macro',
 		selectContent: 'Selecionar conteúdo',
 		selectContentType: 'Selecionar tipo de conteúdo',
 		selectMediaStartNode: 'Selecionar nó de início de multimédia',
@@ -609,8 +601,6 @@ export default {
 		selectUsers: 'Selecionar utilizadores',
 		chooseUsers: 'Escolher utilizadores',
 		noIconsFound: 'Nenhum ícone foi encontrado',
-		noMacroParams: 'Não existem parâmetros para esta macro',
-		noMacros: 'Não existem macros disponíveis para inserir',
 		externalLoginProviders: 'Logins externos',
 		exceptionDetail: 'Detalhes da Exceção',
 		stacktrace: 'Rastreio da Pilha',
@@ -769,7 +759,6 @@ export default {
 			'NOTA! Embora o CodeMirror esteja ativado por configuração, está desativado no Internet Explorer porque não é suficientemente estável.',
 		contentTypeAliasAndNameNotNull: 'Por favor, preencha o alias e o nome no novo tipo de propriedade!',
 		filePermissionsError: 'Existe um problema com o acesso de leitura/escrita a um ficheiro ou pasta específica',
-		macroErrorLoadingPartialView: 'Erro ao carregar o script da Vista Parcial (ficheiro: %0%)',
 		missingTitle: 'Por favor, introduza um título',
 		missingType: 'Por favor, escolha um tipo',
 		pictureResizeBiggerThanOrg:
@@ -880,7 +869,6 @@ export default {
 		login: 'Login',
 		logoff: 'Terminar sessão',
 		logout: 'Terminar sessão',
-		macro: 'Macro',
 		mandatory: 'Obrigatório',
 		manifest: 'Manifesto',
 		message: 'Mensagem',
@@ -1589,9 +1577,6 @@ export default {
 		insertDictionaryItem: 'Item do dicionário',
 		insertDictionaryItemDesc:
 			'Um item do dicionário é um marcador de posição para um pedaço de texto traduzível, o que facilita a criação de designs para websites multilingues.',
-		insertMacro: 'Macro',
-		insertMacroDesc:
-			'Uma Macro é um componente configurável que é ótimo para partes reutilizáveis do seu design, onde precisa da opção de fornecer parâmetros, como galerias, formulários e listas.',
 		insertPageField: 'Valor',
 		insertPageFieldDesc:
 			'Exibe o valor de um campo nomeado da página atual, com opções para modificar o valor ou recorrer a valores alternativos.',
@@ -1650,7 +1635,6 @@ export default {
 	},
 	grid: {
 		media: 'Imagem',
-		macro: 'Macro',
 		insertControl: 'Escolha o tipo de conteúdo',
 		chooseLayout: 'Escolha um layout',
 		addRows: 'Adicionar uma linha',
@@ -1661,7 +1645,6 @@ export default {
 		contentAllowed: 'Este conteúdo é permitido aqui',
 		clickToEmbed: 'Clique para incorporar',
 		clickToInsertImage: 'Clique para inserir imagem',
-		clickToInsertMacro: 'Clique para inserir macro',
 		placeholderWriteHere: 'Escreva aqui...',
 		gridLayouts: 'Layouts de Grelha',
 		gridLayoutsDetail:
@@ -1862,14 +1845,6 @@ export default {
 		invariantLanguageProperty: 'Partilhado: Idiomas',
 		invariantSegmentProperty: 'Partilhado: Segmentos',
 	},
-	macro: {
-		addParameter: 'Adicionar parâmetro',
-		editParameter: 'Editar parâmetro',
-		enterMacroName: 'Introduza o nome da macro',
-		parameters: 'Parâmetros',
-		parametersDescription: 'Defina os parâmetros que devem estar disponíveis ao usar esta macro.',
-		selectViewFile: 'Selecionar Ficheiro de Macro de Vista Parcial',
-	},
 	modelsBuilder: {
 		buildingModels: 'A Construir Modelos',
 		waitingMessage: 'isto pode demorar um pouco, não se preocupe',
@@ -1944,7 +1919,6 @@ export default {
 		installStarterKit: 'Instalar kit inicial',
 		languages: 'Idiomas',
 		localPackage: 'Instalar pacote local',
-		macros: 'Macros',
 		mediaTypes: 'Tipos de Multimédia',
 		member: 'Membros',
 		memberGroups: 'Grupos de Membros',
@@ -1955,7 +1929,6 @@ export default {
 		packager: 'Pacotes',
 		packages: 'Pacotes',
 		partialViews: 'Vistas Parciais',
-		partialViewMacros: 'Ficheiros de Macro de Vista Parcial',
 		repositories: 'Instalar do repositório',
 		relations: 'Relações',
 		runway: 'Instalar Runway',
@@ -2368,7 +2341,6 @@ export default {
 		switchLanguage: 'Mudar idioma para',
 		createNewFolder: 'Criar nova pasta',
 		newPartialView: 'Vista Parcial',
-		newPartialViewMacro: 'Macro de Vista Parcial',
 		newMember: 'Membro',
 		newDataType: 'Tipo de Dados',
 		redirectDashboardSearchLabel: 'Pesquisar no painel de controlo de redirecionamentos',

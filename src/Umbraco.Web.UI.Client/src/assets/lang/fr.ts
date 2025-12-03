@@ -129,7 +129,6 @@ export default {
 		linkLocal: 'Insérer un lien local (ancre)',
 		listBullet: 'Liste à puces',
 		listNumeric: 'Liste numérique',
-		macroInsert: 'Insérer une macro',
 		pictureInsert: 'Insérer une image',
 		publishAndClose: 'Publier et fermer',
 		publishDescendants: 'Publier avec les descendants',
@@ -363,10 +362,7 @@ export default {
 		newDataType: 'Nouveau type de données',
 		newJavascriptFile: 'Nouveau fichier javascript',
 		newEmptyPartialView: 'Nouvelle vue partielle vide',
-		newPartialViewMacro: 'Nouvelle macro pour vue partielle',
 		newPartialViewFromSnippet: "Nouvelle vue partielle à partir d'un snippet",
-		newPartialViewMacroFromSnippet: "Nouvelle macro pour vue partielle à partir d'un snippet",
-		newPartialViewMacroNoMacro: 'Nouvelle macro pour vue partielle (sans macro)',
 		newStyleSheetFile: 'Nouveau fichier de feuille de style',
 	},
 	dashboard: {
@@ -434,7 +430,6 @@ export default {
 		insertgraphicheadline: 'Insérer un entête graphique',
 		insertimage: 'Insérer une image',
 		insertlink: 'Insérer un lien',
-		insertMacro: 'Insérer une macro',
 		inserttable: 'Insérer un tableau',
 		languagedeletewarning: 'Ceci supprimera la langue',
 		languageChangeWarning:
@@ -444,7 +439,6 @@ export default {
 		linkinternal: 'Lien interne',
 		linklocaltip: 'Si vous utilisez des ancres, insérez # au début du lien',
 		linknewwindow: 'Ouvrir dans une nouvelle fenêtre?',
-		macroDoesNotHaveProperties: 'Cette macro ne contient aucune propriété éditable',
 		paste: 'Coller',
 		permissionsEdit: 'Editer les permissions pour',
 		permissionsSet: 'Définir les permissions pour',
@@ -458,7 +452,6 @@ export default {
 			"Le webservice <a target='_blank' rel='noopener' href='http://regexlib.com'>regexlib.com</a> rencontre actuellement des problèmes sur lesquels nous n'avons aucun contrôle. Nous sommes sincèrement désolés pour le désagrément.",
 		regexSearchHelp:
 			"Rechercher une expression régulière à ajouter pour la validation d'un champ de formulaire. Exemple: 'email, 'zip-code', 'URL'.",
-		removeMacro: 'Supprimer la macro',
 		requiredField: 'Champ obligatoire',
 		sitereindexed: 'Le site a été réindéxé',
 		siterepublished:
@@ -482,7 +475,6 @@ export default {
 		selectIcon: "Sélectionner l'icône",
 		selectItem: "Sélectionner l'élément",
 		selectLink: 'Sélectionner le lien',
-		selectMacro: 'Sélectionner la macro',
 		selectContent: 'Sélectionner le contenu',
 		selectContentType: 'Sélectionner le type de contenu',
 		selectMediaStartNode: 'Sélectionner le noeud de base des media',
@@ -493,8 +485,6 @@ export default {
 		selectSections: 'Sélectionner les sections',
 		selectUsers: 'Sélectionner les utilisateurs',
 		noIconsFound: "Aucune icone n'a été trouvée",
-		noMacroParams: "Il n'y a pas de paramètres pour cette macro",
-		noMacros: "Il n'y a pas de macro disponible à insérer",
 		externalLoginProviders: "Fournisseurs externes d'identification",
 		exceptionDetail: "Détails de l'exception",
 		stacktrace: "Trace d'exécution",
@@ -625,7 +615,6 @@ export default {
 			"NOTE ! Même si CodeMirror est activé dans la configuration, il est désactivé dans Internet Explorer car il n'est pas suffisamment stable dans ce navigateur.",
 		contentTypeAliasAndNameNotNull: "Veuillez remplir l'alias et le nom de la nouvelle propriété!",
 		filePermissionsError: 'Il y a un problème de droits en lecture/écriture sur un fichier ou dossier spécifique',
-		macroErrorLoadingPartialView: "Erreur de chargement du script d'une Partial View (fichier : %0%)",
 		missingTitle: 'Veuillez entrer un titre',
 		missingType: 'Veuillez choisir un type',
 		pictureResizeBiggerThanOrg:
@@ -711,7 +700,6 @@ export default {
 		login: 'Connexion',
 		logoff: 'Déconnexion',
 		logout: 'Déconnexion',
-		macro: 'Macro',
 		mandatory: 'Obligatoire',
 		message: 'Message',
 		move: 'Déplacer',
@@ -1282,9 +1270,6 @@ export default {
 		insertDictionaryItem: 'Elément de dictionnaire',
 		insertDictionaryItemDesc:
 			'Un élément de dictionnaire est un espace pour un morceau de texte traduisible, ce qui facilite la création de designs pour des sites web multilangues.',
-		insertMacro: 'Macro',
-		insertMacroDesc:
-			'\n      Une Macro est un composant configurable, ce qui est génial pour les parties réutilisables de votre\n\t  design où vous devez pouvoir fournir des paramètres,\n      comme les galeries, les formulaires et les listes.\n    ',
 		insertPageField: 'Valeur',
 		insertPageFieldDesc:
 			"Affiche la valeur d'un des champs de la page en cours, avec des options pour modifier la valeur ou spécifier des valeurs alternatives.",
@@ -1340,7 +1325,6 @@ export default {
 	},
 	grid: {
 		media: 'Image',
-		macro: 'Macro',
 		insertControl: 'Choisissez le type de contenu',
 		chooseLayout: 'Choisissez une mise en page',
 		addRows: 'Ajouter une ligne',
@@ -1351,7 +1335,6 @@ export default {
 		contentAllowed: 'Ce contenu est autorisé ici',
 		clickToEmbed: 'Cliquez pour intégrer',
 		clickToInsertImage: 'Cliquez pour insérer une image',
-		clickToInsertMacro: 'Cliquez pour insérer une macro',
 		placeholderWriteHere: 'Ecrivez ici...',
 		gridLayouts: 'Mises en pages de la Grid',
 		gridLayoutsDetail:
@@ -1482,14 +1465,6 @@ export default {
 		fallbackLanguage: 'Langue alternative',
 		none: 'aucune',
 	},
-	macro: {
-		addParameter: 'Ajouter un paramètre',
-		editParameter: 'Modifier le paramètre',
-		enterMacroName: 'Introduire le nom de la macro',
-		parameters: 'Paramètres',
-		parametersDescription: "Définir les paramètres qui devraient être disponibles lorsque l'on utilise cette macro.",
-		selectViewFile: 'Sélectionner le fichier de vue partielle de la macro',
-	},
 	modelsBuilder: {
 		buildingModels: 'Fabrication des modèles',
 		waitingMessage: 'ceci peut prendre un peu de temps, ne vous inquiétez pas',
@@ -1564,7 +1539,6 @@ export default {
 		installStarterKit: 'Installer un starter kit',
 		languages: 'Langues',
 		localPackage: 'Installer un package local',
-		macros: 'Macros',
 		mediaTypes: 'Types de média',
 		member: 'Membres',
 		memberGroups: 'Groupes de membres',
@@ -1575,7 +1549,6 @@ export default {
 		packager: 'Packages',
 		packages: 'Packages',
 		partialViews: 'Vues Partielles',
-		partialViewMacros: 'Vues Partielles pour les Fichiers Macro',
 		repositories: 'Installer depuis le repository',
 		runway: 'Installer Runway',
 		runwayModules: 'Modules Runway',
@@ -1863,7 +1836,6 @@ export default {
 		switchLanguage: 'Changer la langue vers',
 		createNewFolder: 'Créer un nouveau dossier',
 		newPartialView: 'Partial View',
-		newPartialViewMacro: 'Macro de Partial View',
 		newMember: 'Membre',
 		searchContentTree: "Chercher dans l'arborescence de contenu",
 		maxAmount: 'Quantité maximum',

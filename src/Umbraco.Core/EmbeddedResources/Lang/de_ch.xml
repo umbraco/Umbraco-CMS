@@ -135,7 +135,6 @@
 		<key alias="linkLocal">Anker einfügen</key>
 		<key alias="listBullet">Aufzählung</key>
 		<key alias="listNumeric">Nummerierung</key>
-		<key alias="macroInsert">Makro einfügen</key>
 		<key alias="pictureInsert">Abbildung einfügen</key>
 		<key alias="publishAndClose">Veröffentlichen und schliessen</key>
 		<key alias="publishDescendants">Veröffentlichen mit Unterknoten</key>
@@ -458,10 +457,7 @@
 		<key alias="newDataType">Neuer Datentyp</key>
 		<key alias="newJavascriptFile">Neue JavaScript-Datei</key>
 		<key alias="newEmptyPartialView">Neue leere Partial-View</key>
-		<key alias="newPartialViewMacro">Neues Partial-View-Makro</key>
 		<key alias="newPartialViewFromSnippet">Neue Partial-View nach Vorlage</key>
-		<key alias="newPartialViewMacroFromSnippet">Neues Partial-View-Makro nach Vorlage</key>
-		<key alias="newPartialViewMacroNoMacro">Neues Partial-View-Makro (ohne Makro)</key>
 		<key alias="newStyleSheetFile">Neue Style-Sheet-Datei</key>
 		<key alias="newRteStyleSheetFile">Neue Rich-Text-Editor Style-Sheet-Datei</key>
 	</area>
@@ -538,7 +534,6 @@
 		<key alias="insertgraphicheadline">Grafische Überschrift einfügen</key>
 		<key alias="insertimage">Abbildung einfügen</key>
 		<key alias="insertlink">Link einfügen</key>
-		<key alias="insertMacro">klicken um Macro hinzuzufügen</key>
 		<key alias="inserttable">Tabelle einfügen</key>
 		<key alias="languagedeletewarning">Dies entfernt die Sprache</key>
 		<key alias="languageChangeWarning">
@@ -549,7 +544,6 @@
 		<key alias="linkinternal">Anker:</key>
 		<key alias="linklocaltip">Wenn lokale Links verwendet werden, füge ein "#" vor den Link ein</key>
 		<key alias="linknewwindow">In einem neuen Fenster öffnen?</key>
-		<key alias="macroDoesNotHaveProperties">Dieses Makro enthält keine einstellbaren Eigenschaften.</key>
 		<key alias="paste">Einfügen</key>
 		<key alias="permissionsEdit">Berechtigungen bearbeiten für</key>
 		<key alias="permissionsSet">Berechtigungen vergeben für</key>
@@ -567,7 +561,6 @@
 		<key alias="regexSearchHelp">
 			Finden Sie einen vorbereiteten regulären Ausdruck zur Validierung der Werte, die in dieses Feld eingegeben werden - zum Beispiel 'email, 'plz', 'URL' oder ähnlich.
 		</key>
-		<key alias="removeMacro">Macro entfernen</key>
 		<key alias="requiredField">Pflichtfeld</key>
 		<key alias="sitereindexed">Die Website-Index wurd neu erstellt</key>
 		<key alias="siterepublished">
@@ -595,7 +588,6 @@
 		<key alias="selectIcon">Bildzeichen wählen</key>
 		<key alias="selectItem">Element wählen</key>
 		<key alias="selectLink">Link wählen</key>
-		<key alias="selectMacro">Makro wählen</key>
 		<key alias="selectContent">Inhalt wählen</key>
 		<key alias="selectContentType">Inhaltstyp wählen</key>
 		<key alias="selectMediaStartNode">Medien-Startknoten wählen</key>
@@ -608,8 +600,6 @@
 		<key alias="selectUser">Benutzer wählen</key>
 		<key alias="selectUsers">Benutzer wählen</key>
 		<key alias="noIconsFound">Keine Bildzeichen gefunden</key>
-		<key alias="noMacroParams">Für dieses Makro gibt es keine Parameter</key>
-		<key alias="noMacros">Es gibt keine Makros zum Einfügen</key>
 		<key alias="externalLoginProviders">Externe Login-Anbieter</key>
 		<key alias="exceptionDetail">Ausnahmedetails</key>
 		<key alias="stacktrace">Stacktrace</key>
@@ -784,7 +774,6 @@
 		</key>
 		<key alias="contentTypeAliasAndNameNotNull">Bitte geben Sie die Bezeichnung und den Alias des neuen Dokumenttyps ein.</key>
 		<key alias="filePermissionsError">Es besteht ein Problem mit den Lese-/Schreibrechten auf eine Datei oder einen Ordner</key>
-		<key alias="macroErrorLoadingPartialView">Fehler beim Laden einer "Partial View Kodedatei" (Datei: %0%)</key>
 		<key alias="missingTitle">Bitte geben Sie einen Titel ein</key>
 		<key alias="missingType">Bitte wählen Sie einen Typ</key>
 		<key alias="pictureResizeBiggerThanOrg">
@@ -876,7 +865,6 @@
 		<key alias="login">Anmelden</key>
 		<key alias="logoff">Abmelden</key>
 		<key alias="logout">Abmelden</key>
-		<key alias="macro">Makro</key>
 		<key alias="mandatory">Pflichtfeld</key>
 		<key alias="media">Medien</key>
 		<key alias="message">Nachricht</key>
@@ -1700,12 +1688,6 @@
 		<key alias="insertDesc">Wählen Sie, was in die Vorlage eingefügt werden soll</key>
 		<key alias="insertDictionaryItem">Wörterbucheintrag einfügen</key>
 		<key alias="insertDictionaryItemDesc">Ein Wörterbuchelement ist ein Platzhalter für lokalisierbaren Text. Das macht es einfach mehrsprachige Websites zu gestalten.</key>
-		<key alias="insertMacro">Makro</key>
-		<key alias="insertMacroDesc">
-			Ein Makro ist eine konfigurierbare Komponente, die großartig
-			für wiederverwendbare Teile Ihres Entwurfes sind,
-			für welche Sie optionale Parameter benötigen, wie z. B. Galerien, Formulare oder Listen.
-		</key>
 		<key alias="insertPageField">Umbraco-Feld</key>
 		<key alias="insertPageFieldDesc">
 			Zeigt den Wert eines benannten Feldes der aktuellen Seite an, mit der Möglichkeit den Wert zu verändern
@@ -1782,7 +1764,6 @@
 	</area>
 	<area alias="grid">
 		<key alias="media">Image</key>
-		<key alias="macro">Macro</key>
 		<key alias="insertControl">Neues Element</key>
 		<key alias="chooseLayout">Layout auswählen</key>
 		<key alias="addRows">Neue Zeile</key>
@@ -1912,13 +1893,6 @@
 		<key alias="invariantLanguageProperty">Geteilt: Sprachen</key>
 		<key alias="invariantSegmentProperty">Geteilt: Segmente</key>
 	</area>
-	<area alias="macro">
-		<key alias="addParameter">Parameter hinzufügen</key>
-		<key alias="editParameter">Parameter bearbeiten</key>
-		<key alias="enterMacroName">Makroname vergeben</key>
-		<key alias="parameters">Parameter</key>
-		<key alias="parametersDescription">Definiere die Parameter, die verfügbar sein sollen, wenn dieses Makro verwendet wird.</key>
-	</area>
 	<area alias="modelsBuilder">
 		<key alias="buildingModels">Datenmodel erzeugen</key>
 		<key alias="waitingMessage">Keine Sorge, das kann eine Weile dauern</key>
@@ -2003,7 +1977,6 @@
 		<key alias="installStarterKit">Starter-Kit installieren</key>
 		<key alias="languages">Sprachen</key>
 		<key alias="localPackage">Lokales Paket hochladen und installieren</key>
-		<key alias="macros">Makros</key>
 		<key alias="mediaTypes">Medientypen</key>
 		<key alias="member">Mitglieder</key>
 		<key alias="memberGroups">Mitgliedergruppen</key>
@@ -2014,7 +1987,6 @@
 		<key alias="packager">Pakete</key>
 		<key alias="packages">Pakete</key>
 		<key alias="partialViews">Teilansicht (Partial View)</key>
-		<key alias="partialViewMacros">Makro-Teilansicht(Partial View Macro Files)</key>
 		<key alias="repositories">Paket-Repositories</key>
 		<key alias="runway">'Runway' installieren</key>
 		<key alias="runwayModules">Runway-Module</key>

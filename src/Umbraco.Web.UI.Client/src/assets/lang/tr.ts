@@ -132,7 +132,6 @@ export default {
 		linkLocal: 'Yerel bağlantı ekle (bağlantı)',
 		listBullet: 'Madde İşareti Listesi',
 		listNumeric: 'Sayısal Liste',
-		macroInsert: 'Makro ekle',
 		pictureInsert: 'Resim ekle',
 		publishAndClose: 'Yayınlayın ve kapatın',
 		publishDescendants: 'Nesillerle yayınlayın',
@@ -357,10 +356,7 @@ export default {
 		newDataType: 'Yeni veri türü',
 		newJavascriptFile: 'Yeni JavaScript dosyası',
 		newEmptyPartialView: 'Yeni boş kısmi görünüm',
-		newPartialViewMacro: 'Yeni kısmi görünüm makrosu',
 		newPartialViewFromSnippet: 'Ön bilgiden yeni kısmi görünüm',
-		newPartialViewMacroFromSnippet: "Snippet'ten yeni kısmi görünüm makrosu",
-		newPartialViewMacroNoMacro: 'Yeni kısmi görünüm makrosu (makrosuz)',
 		newStyleSheetFile: 'Yeni stil sayfası dosyası',
 	},
 	dashboard: {
@@ -429,7 +425,6 @@ export default {
 		insertgraphicheadline: 'Grafik başlığı ekle',
 		insertimage: 'Resim ekle',
 		insertlink: 'Link ekle',
-		insertMacro: 'Makro eklemek için tıklayın',
 		inserttable: 'Tablo ekle',
 		languagedeletewarning: 'Bu, dili silecek',
 		languageChangeWarning:
@@ -439,7 +434,6 @@ export default {
 		linkinternal: 'Dahili bağlantı',
 		linklocaltip: 'Yerel bağlantıları kullanırken, bağlantının önüne "#" ekleyin',
 		linknewwindow: 'Yeni pencerede açılsın mı?',
-		macroDoesNotHaveProperties: 'Bu makro düzenleyebileceğiniz herhangi bir özellik içermiyor',
 		paste: 'Yapıştır',
 		permissionsEdit: 'için izinleri düzenle',
 		permissionsSet: 'için izinleri ayarlayın',
@@ -453,7 +447,6 @@ export default {
 		regexSearchError:
 			"<a target='_ blank' href='http: //regexlib.com'> regexlib.com </a> 'un web hizmeti şu anda bazı sorunlar yaşıyor ve biz üzerinde kontrol yok. Bu rahatsızlıktan dolayı çok üzgünüz.",
 		regexSearchHelp: "Bir form alanına doğrulama eklemek için normal ifade arayın. Örnek: 'e-posta,'posta kodu','URL'",
-		removeMacro: 'Makroyu Kaldır',
 		requiredField: 'Gerekli Alan',
 		sitereindexed: 'Site yeniden dizine eklendi',
 		siterepublished:
@@ -477,7 +470,6 @@ export default {
 		selectIcon: 'Simge seçin',
 		selectItem: 'Öğeyi seçin',
 		selectLink: 'Bağlantı seçin',
-		selectMacro: 'Makro seçin',
 		selectContent: 'İçerik seçin',
 		selectContentType: 'İçerik türünü seçin',
 		selectMediaStartNode: 'Medya başlangıç ​​düğümünü seçin',
@@ -489,8 +481,6 @@ export default {
 		selectUser: 'Kullanıcı seçin',
 		selectUsers: 'Kullanıcıları seçin',
 		noIconsFound: '​​Simge bulunamadı',
-		noMacroParams: 'Bu makro için parametre yok',
-		noMacros: 'Eklenecek makro yok',
 		externalLoginProviders: 'Harici giriş sağlayıcıları',
 		exceptionDetail: 'İstisna Ayrıntıları',
 		stacktrace: 'Yığın İzleme',
@@ -615,7 +605,6 @@ export default {
 			"NOT! CodeMirror yapılandırma ile etkinleştirilmiş olsa da, yeterince kararlı olmadığı için Internet Explorer'da devre dışı bırakılmıştır.",
 		contentTypeAliasAndNameNotNull: 'Lütfen yeni özellik türünde hem takma adı hem de adı girin!',
 		filePermissionsError: 'Belirli bir dosya veya klasöre okuma/yazma erişiminde sorun var',
-		macroErrorLoadingPartialView: 'Kısmi Görünüm komut dosyası yüklenirken hata oluştu (dosya: %0%)',
 		missingTitle: 'Lütfen bir başlık girin',
 		missingType: 'Lütfen bir tür seçin',
 		pictureResizeBiggerThanOrg:
@@ -704,7 +693,6 @@ export default {
 		login: 'Giriş',
 		logoff: 'Oturumu kapat',
 		logout: 'Çıkış',
-		macro: 'Makro',
 		mandatory: 'Zorunlu',
 		message: 'Mesaj',
 		move: 'Taşı',
@@ -1254,9 +1242,6 @@ export default {
 		insertDictionaryItem: 'Sözlük öğesi',
 		insertDictionaryItemDesc:
 			'Sözlük öğesi, çevrilebilir bir metin parçası için yer tutucudur ve çok dilli web siteleri için tasarımlar oluşturmayı kolaylaştırır.',
-		insertMacro: 'Makro',
-		insertMacroDesc:
-			'\n      Makro, yapılandırılabilir bir bileşendir ve aşağıdakiler için idealdir:\n      parametreler sağlama seçeneğine ihtiyaç duyduğunuz tasarımınızın yeniden kullanılabilir parçaları,\n      galeriler, formlar ve listeler gibi.\n    ',
 		insertPageField: 'Değer',
 		insertPageFieldDesc:
 			'Geçerli sayfadaki adlandırılmış bir alanın değerini, değeri değiştirme veya alternatif değerlere geri dönüş seçenekleri ile birlikte görüntüler.',
@@ -1312,7 +1297,6 @@ export default {
 	},
 	grid: {
 		media: 'Resim',
-		macro: 'Makro',
 		insertControl: 'İçerik türünü seçin',
 		chooseLayout: 'Bir düzen seçin',
 		addRows: 'Satır ekle',
@@ -1441,14 +1425,6 @@ export default {
 		fallbackLanguage: 'Geri dönüş dili',
 		none: 'yok',
 	},
-	macro: {
-		addParameter: 'Parametre ekle',
-		editParameter: 'Parametreyi düzenle',
-		enterMacroName: 'Makro adını girin',
-		parameters: 'Parametreler',
-		parametersDescription: 'Bu makroyu kullanırken mevcut olması gereken parametreleri tanımlayın.',
-		selectViewFile: 'Kısmi görünüm makro dosyasını seçin',
-	},
 	modelsBuilder: {
 		buildingModels: 'Model oluşturma',
 		waitingMessage: 'bu biraz zaman alabilir, endişelenmeyin',
@@ -1523,7 +1499,6 @@ export default {
 		installStarterKit: 'Başlangıç ​​kitini yükleyin',
 		languages: 'Diller',
 		localPackage: 'Yerel paketi yükle',
-		macros: 'Makrolar',
 		mediaTypes: 'Medya Türleri',
 		member: 'Üyeler',
 		memberGroups: 'Üye Grupları',
@@ -1534,7 +1509,6 @@ export default {
 		packager: 'Paketler',
 		packages: 'Paketler',
 		partialViews: 'Kısmi Görünümler',
-		partialViewMacros: 'Makro Dosyalarını Kısmi Görüntüle',
 		repositories: 'Depodan yükle',
 		runway: "Runway'i Kur",
 		runwayModules: 'Runway modülleri',
@@ -1820,7 +1794,6 @@ export default {
 		switchLanguage: 'Dili değiştir',
 		createNewFolder: 'Yeni klasör oluştur',
 		newPartialView: 'Kısmi Görünüm',
-		newPartialViewMacro: 'Kısmi Görünüm Makrosu',
 		newMember: 'Üye',
 		newDataType: 'Veri türü',
 		redirectDashboardSearchLabel: 'Yönlendirme kontrol panelinde ara',

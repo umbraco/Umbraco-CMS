@@ -172,7 +172,6 @@ export default {
 		linkLocal: 'Lokale link invoegen (anker)',
 		listBullet: 'Opsomming',
 		listNumeric: 'Nummering',
-		macroInsert: 'Macro invoegen',
 		pictureInsert: 'Afbeelding invoegen',
 		publishAndClose: 'Publiceren en sluiten',
 		publishDescendants: 'Publiceren met onderliggende nodes',
@@ -373,10 +372,7 @@ export default {
 		newDataType: 'Nieuw datatype',
 		newJavascriptFile: 'Nieuw JavaScript bestand',
 		newEmptyPartialView: 'Nieuwe lege partial view',
-		newPartialViewMacro: 'Nieuwe partial view macro',
 		newPartialViewFromSnippet: 'Nieuwe partial view van fragment',
-		newPartialViewMacroFromSnippet: 'Nieuwe partial view macro van fragment',
-		newPartialViewMacroNoMacro: 'Nieuwe partial view macro (zonder macro)',
 		newStyleSheetFile: 'Nieuw style sheet bestand',
 	},
 	dashboard: {
@@ -444,7 +440,6 @@ export default {
 		insertgraphicheadline: 'Voeg grafische titel in',
 		insertimage: 'Afbeelding invoegen',
 		insertlink: 'Link invoegen',
-		insertMacro: 'Klik om een Macro toe te voegen',
 		inserttable: 'Tabel invoegen',
 		languagedeletewarning: 'Dit zal de taal verwijderen',
 		languageChangeWarning:
@@ -454,7 +449,6 @@ export default {
 		linkinternal: 'Interne link',
 		linklocaltip: 'Plaats een hekje (“#”) voor voor interne links.',
 		linknewwindow: 'In nieuw venster openen?',
-		macroDoesNotHaveProperties: 'Deze macro heeft geen eigenschappen die u kunt bewerken',
 		paste: 'Plakken',
 		permissionsEdit: 'Bewerk rechten voor',
 		permissionsSet: 'Rechten instellen voor',
@@ -468,7 +462,6 @@ export default {
 			"De webservice van <a target='_blank' rel='noopener' href='https://regexlib.com'>regexlib.com</a> ondervindt momenteel problemen waarover we geen controle hebben. Onze excuses voor het ongemak.",
 		regexSearchHelp:
 			"Zoek naar een reguliere expressie om validatie aan een formulierveld toe te voegen.\n      Voorbeeld: 'email', 'postcode', 'URL'.\n    ",
-		removeMacro: 'Verwijder Macro',
 		requiredField: 'Verplicht veld',
 		sitereindexed: 'Site is opnieuw geïndexeerd',
 		siterepublished: 'De site is opnieuw gepubliceerd',
@@ -491,7 +484,6 @@ export default {
 		selectIcon: 'Selecteer icoon',
 		selectItem: 'Selecteer item',
 		selectLink: 'Selecteer link',
-		selectMacro: 'Selecteer macro',
 		selectContent: 'Selecteer content',
 		selectContentType: 'Selecteer content type',
 		selectMediaStartNode: 'Selecteer media start node',
@@ -504,8 +496,6 @@ export default {
 		selectUser: 'Selecteer gebruiker',
 		selectUsers: 'Selecteer gebruikers',
 		noIconsFound: 'Geen iconen gevonden',
-		noMacroParams: 'Er zijn geen parameters voor deze macro',
-		noMacros: "Er zijn geen macro's beschikbaar om in te voegen",
 		externalLoginProviders: 'Externe login providers',
 		exceptionDetail: 'Error details',
 		stacktrace: 'Stacktrace',
@@ -638,7 +628,6 @@ export default {
 		contentTypeAliasAndNameNotNull:
 			'Zowel de alias als de naam van het nieuwe eigenschappentype moeten\n      worden ingevuld!\n    ',
 		filePermissionsError: 'Er is een probleem met de lees/schrijfrechten op een bestand of map',
-		macroErrorLoadingPartialView: 'Error bij het laden van Partial View script (file: %0%)',
 		missingTitle: 'Vul een titel in',
 		missingType: 'Selecteer een type',
 		pictureResizeBiggerThanOrg:
@@ -728,7 +717,6 @@ export default {
 		login: 'Inloggen',
 		logoff: 'Uitloggen',
 		logout: 'Uitloggen',
-		macro: 'Macro',
 		mandatory: 'Verplicht',
 		message: 'Bericht',
 		move: 'Verplaats',
@@ -1326,9 +1314,6 @@ export default {
 		insertDictionaryItem: 'Woordenboek item invoegen',
 		insertDictionaryItemDesc:
 			'Een woordenboekitem is een tijdelijke aanduiding voor een vertaalbaar stuk\n      tekst, waardoor het gemakkelijk is om ontwerpen voor meertalige websites te maken.\n    ',
-		insertMacro: 'Macro invoegen',
-		insertMacroDesc:
-			'\n      Een Macro is een configureerbaar component die gebruikt kan worden voor\n      herbruikbare delen van je ontwerp, waar je de optie nodig hebt om parameters op te geven,\n      zoals bij gallerijen, formulieren en lijsten.\n    ',
 		insertPageField: 'Umbraco pagina veld invoegen',
 		insertPageFieldDesc:
 			'Toont de waarde van een benoemd veld van de huidige pagina, met opties om de waarde\n      te wijzigen of terug te vallen op alternatieve waarden.\n    ',
@@ -1384,7 +1369,6 @@ export default {
 	},
 	grid: {
 		media: 'Afbeelding',
-		macro: 'Macro',
 		insertControl: 'Item toevoegen',
 		chooseLayout: 'Kies de indeling',
 		addRows: 'Kies een indeling voor deze pagina om content toe te kunnen voegen',
@@ -1542,15 +1526,6 @@ export default {
 		fallbackLanguage: 'Terugvaltaal',
 		none: 'Geen',
 	},
-	macro: {
-		addParameter: 'Parameter toevoegen',
-		editParameter: 'Parameter bewerken',
-		enterMacroName: 'Macro naam invoeren',
-		parameters: 'Parameters',
-		parametersDescription:
-			'Definieer de parameters die beschikbaar moeten zijn bij het gebruik van deze\n      macro.\n    ',
-		selectViewFile: 'Selecteer een partial view macro bestand',
-	},
 	modelsBuilder: {
 		buildingModels: 'Models aan het gereneren',
 		waitingMessage: 'dit kan enige tijd duren, geduld aub',
@@ -1625,7 +1600,6 @@ export default {
 		installStarterKit: 'Installeer starter kit',
 		languages: 'Talen',
 		localPackage: 'Installeer een lokale package',
-		macros: "Macro's",
 		mediaTypes: 'Mediatypes',
 		member: 'Leden',
 		memberGroups: 'Ledengroepen',
@@ -1636,7 +1610,6 @@ export default {
 		packager: 'Packages',
 		packages: 'Packages',
 		partialViews: 'Partial Views',
-		partialViewMacros: 'Partial View Macro Bestanden',
 		repositories: 'Installeer vanuit repository',
 		runway: 'Installeer Runway',
 		runwayModules: 'Runway modules',
@@ -1811,9 +1784,6 @@ export default {
 			"De verwachte waarde voor '%2%' is '%1%' in configuratiebestand\n      '%3%', maar is '%0%'.\n    ",
 		checkErrorMessageUnexpectedValue:
 			"Onverwachte waarde '%0%' gevonden voor '%2%' in configuratiebestand\n      '%3%'.\n    ",
-		macroErrorModeCheckSuccessMessage: "Macro foutmeldingen zijn ingesteld op'%0%'.",
-		macroErrorModeCheckErrorMessage:
-			"Macro foutmeldingen zijn ingesteld op '%0%'. Dit zal er voor zorgen dat\n      bepaalde, of alle, pagina's van de website niet geladen kunnen worden als er errors in een Macro zitten.\n      Corrigeren zal deze waarde aanpassen naar '%1%'.\n    ",
 		httpsCheckValidCertificate: 'Het cerficaat van de website is ongeldig.',
 		httpsCheckInvalidCertificate: "Cerficaat validatie foutmelding: '%0%'",
 		httpsCheckExpiredCertificate: 'Het SSL certificaat van de website is vervallen.',
@@ -1942,7 +1912,6 @@ export default {
 		switchLanguage: 'Taal wijzigen naar',
 		createNewFolder: 'Map aanmaken',
 		newPartialView: 'Partial View',
-		newPartialViewMacro: 'Partial View Macro',
 		newMember: 'Lid',
 		newDataType: 'Datatype',
 		redirectDashboardSearchLabel: 'Zoeken in het redirect dashboard',
