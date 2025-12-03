@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
@@ -13,28 +15,29 @@ internal sealed class WebProfilerRepository : IWebProfilerRepository
 
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly ICookieManager _cookieManager;
+    private readonly GlobalSettings _globalSettings;
 
-    public WebProfilerRepository(IHttpContextAccessor httpContextAccessor, ICookieManager cookieManager)
+    public WebProfilerRepository(IHttpContextAccessor httpContextAccessor, ICookieManager cookieManager, IOptions<GlobalSettings> globalSettings)
     {
         _httpContextAccessor = httpContextAccessor;
         _cookieManager = cookieManager;
+        _globalSettings = globalSettings.Value;
     }
 
     public void SetStatus(int userId, bool status)
     {
         if (status)
         {
-            // This cookie does not need to be secure as it is only used for local debugging purposes.
-            // It is also marked as SameSite=Strict to avoid being sent in cross-site requests, which means
-            // it will not be sent when the BackOffice is hosted on a different domain/port than the frontend.
-            // The intention is to force debug profiling on without any code snippets, but as it can only be activated from
-            // the local BackOffice, it will unfortunately only work in same-site scenarios.
-            // If the user wants to debug profile cross-site, they can use the query string or header options.
+            // This cookie enables debug profiling on the front-end without needing query strings or headers.
+            // It uses SameSite=Strict, so it only works when the BackOffice and front-end share the same domain.
+            // It's marked httpOnly to prevent JavaScript access (the server reads it, not client-side code).
+            // No expiration is set, so it's a session cookie and will be deleted when the browser closes.
+            // For cross-site setups, use the query string (?umbDebug=true) or header (X-UMB-DEBUG) instead.
             _cookieManager.SetCookieValue(
                 CookieName,
                 "1",
                 httpOnly: true,
-                secure: false,
+                secure: _globalSettings.UseHttps,
                 sameSiteMode: "Strict");
         }
         else
