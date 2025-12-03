@@ -51,7 +51,7 @@ export class UmbPropertyEditorUINumberElement
 		this._min = this.#parseNumber(config.getValueByAlias('min'));
 		this._max = this.#parseNumber(config.getValueByAlias('max'));
 		this._step = this.#parseNumber(config.getValueByAlias('step'));
-		this._placeholder = this.localize.string(config.getValueByAlias<string>('placeholder') || undefined);
+		this._placeholder = this.localize.string(config.getValueByAlias<string>('placeholder') ?? '');
 	}
 
 	constructor() {
