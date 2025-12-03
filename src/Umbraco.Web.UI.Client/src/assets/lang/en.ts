@@ -2447,7 +2447,7 @@ export default {
 			'This item or its descendants is being used. Unpublishing can lead to broken links on your website. Please take the appropriate actions.',
 		deleteDisabledWarning: 'This item or its descendants is being used. Therefore, deletion has been disabled.',
 		listViewDialogWarning: 'The following items you are trying to %0% are used by other content.',
-		labelUsedByItems: 'Referenced by the following items',
+		labelUsedByItems: 'Referenced by',
 		labelDependsOnThis: 'The following items depend on this',
 		labelDependentDescendants: 'The following descending items have dependencies',
 		labelMoreReferences: (count: number) => {
