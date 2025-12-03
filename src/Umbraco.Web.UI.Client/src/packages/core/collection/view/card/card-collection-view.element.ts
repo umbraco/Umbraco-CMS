@@ -92,7 +92,12 @@ export class UmbCardCollectionViewElement extends UmbLitElement {
 			?select-only=${this._selection.length > 0 || this._selectOnly}
 			?selected=${this.#collectionContext?.selection.isSelected(item.unique)}
 			@selected=${() => this.#onSelect(item)}
-			@deselected=${() => this.#onDeselect(item)}></umb-entity-collection-item-card>`;
+			@deselected=${() => this.#onDeselect(item)}>
+			<umb-entity-actions-bundle
+				slot="actions"
+				.entityType=${item.entityType}
+				.unique=${item.unique}></umb-entity-actions-bundle>
+		</umb-entity-collection-item-card>`;
 	}
 
 	static override styles = [
