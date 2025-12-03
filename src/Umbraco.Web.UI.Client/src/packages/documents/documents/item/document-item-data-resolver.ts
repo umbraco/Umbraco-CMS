@@ -246,7 +246,7 @@ export class UmbDocumentItemDataResolver<DocumentItemModel extends UmbDocumentIt
 			}
 		}
 
-		this.#name.setValue(undefined);
+		this.#name.setValue('(Untitled)');
 	}
 
 	#setIsDraft() {
