@@ -70,8 +70,8 @@ export class UmbPropertyEditorUIToggleElement
 				.ariaLabel=${this._ariaLabel
 					? this.localize.string(this._ariaLabel)
 					: this.localize.term('general_toggleFor', [this.name])}
-				.labelOn=${this._labelOn}
-				.labelOff=${this._labelOff}
+				.labelOn=${this.localize.string(this._labelOn)}
+				.labelOff=${this.localize.string(this._labelOff)}
 				?checked=${this.value}
 				?showLabels=${this._showLabels}
 				?required=${this.mandatory}
