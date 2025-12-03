@@ -652,25 +652,8 @@ public class FileService : RepositoryService, IFileService
         string? partialViewContent = null;
         if (snippetName.IsNullOrWhiteSpace() == false)
         {
-            // create the file
-            Attempt<string> snippetPathAttempt = TryGetSnippetPath(snippetName);
-            if (snippetPathAttempt.Success == false)
-            {
-                throw new InvalidOperationException("Could not load snippet with name " + snippetName);
-            }
-
-            using (var snippetFile = new StreamReader(File.OpenRead(snippetPathAttempt.Result!)))
-            {
-                var snippetContent = snippetFile.ReadToEnd().Trim();
-
-                // strip the @inherits if it's there
-                snippetContent = StripPartialViewHeader(snippetContent);
-
-                // Update Model.Content. to be Model. when used as PartialView
-                snippetContent = snippetContent.Replace("Model.Content.", "Model.");
-
-                partialViewContent = $"{PartialViewHeader}{Environment.NewLine}{snippetContent}";
-            }
+            // Creating partial views from snippets is not supported anymore
+            throw new InvalidOperationException("Could not load snippet with name " + snippetName);
         }
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -773,21 +756,6 @@ public class FileService : RepositoryService, IFileService
     {
         var headerMatch = new Regex("^@inherits\\s+?.*$", RegexOptions.Multiline);
         return headerMatch.Replace(contents, string.Empty);
-    }
-
-    internal Attempt<string> TryGetSnippetPath(string? fileName)
-    {
-        if (fileName?.EndsWith(".cshtml") == false)
-        {
-            fileName += ".cshtml";
-        }
-
-        var snippetPath =
-            _hostingEnvironment.MapPathContentRoot(
-                $"{Constants.SystemDirectories.Umbraco}/PartialViewMacros/Templates/{fileName}");
-        return File.Exists(snippetPath)
-            ? Attempt<string>.Succeed(snippetPath)
-            : Attempt<string>.Fail();
     }
 
     /// <inheritdoc />
