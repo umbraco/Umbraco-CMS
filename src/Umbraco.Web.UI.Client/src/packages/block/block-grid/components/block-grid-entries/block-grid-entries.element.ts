@@ -145,30 +145,6 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 	#rangeUnderflowValidator?: UmbFormControlValidatorConfig;
 	#rangeOverflowValidator?: UmbFormControlValidatorConfig;
 
-	@state()
-	private _areaKey?: string | null;
-
-	@state()
-	private _canCreate?: boolean;
-
-	@state()
-	private _configCreateLabel?: string;
-
-	@state()
-	private _createLabel?: string;
-
-	@state()
-	private _isReadOnly: boolean = false;
-
-	@state()
-	private _layoutEntries: Array<UmbBlockGridLayoutModel> = [];
-
-	@state()
-	private _limitMax?: number;
-
-	@state()
-	private _styleElement?: HTMLLinkElement;
-
 	@property({ type: String, attribute: 'area-key', reflect: true })
 	public set areaKey(value: string | null | undefined) {
 		this._areaKey = value;
@@ -193,6 +169,30 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 	public get layoutColumns(): number | undefined {
 		return this.#context.getLayoutColumns();
 	}
+
+	@state()
+	private _areaKey?: string | null;
+
+	@state()
+	private _canCreate?: boolean;
+
+	@state()
+	private _configCreateLabel?: string;
+
+	@state()
+	private _createLabel?: string;
+
+	@state()
+	private _isReadOnly: boolean = false;
+
+	@state()
+	private _layoutEntries: Array<UmbBlockGridLayoutModel> = [];
+
+	@state()
+	private _limitMax?: number;
+
+	@state()
+	private _styleElement?: HTMLLinkElement;
 
 	constructor() {
 		super();
