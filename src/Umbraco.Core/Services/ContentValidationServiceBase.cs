@@ -109,7 +109,7 @@ internal abstract class ContentValidationServiceBase<TContentType>
         {
             // Get a mapping of segments to their associated cultures based on the variants and properties provided in the model.
             // Without managed segments again we need to rely on the model data.
-            Dictionary<string, HashSet<string?>> segmentCultures = contentEditingModelBase.GetPopulatedSegmentCultures(cultures);
+            Dictionary<string, HashSet<string>> segmentCultures = contentEditingModelBase.GetPopulatedSegmentCultures(cultures);
 
             foreach (IPropertyType propertyType in cultureAndSegmentVariantPropertyTypes)
             {
@@ -119,7 +119,7 @@ internal abstract class ContentValidationServiceBase<TContentType>
                     {
                         // Skip validation if the segment has cultures defined and the current culture is not included.
                         if (segment is not null &&
-                            segmentCultures.TryGetValue(segment, out HashSet<string?>? associatedCultures) &&
+                            segmentCultures.TryGetValue(segment, out HashSet<string>? associatedCultures) &&
                             associatedCultures.Contains(culture) is false)
                         {
                             continue;
@@ -130,7 +130,7 @@ internal abstract class ContentValidationServiceBase<TContentType>
                             Culture = culture,
                             Segment = segment,
                             CulturesBeingValidated = cultures,
-                            SegmentsBeingValidated = segments
+                            SegmentsBeingValidated = segments,
                         };
 
                         PropertyValueModel? propertyValueModel = contentEditingModelBase
