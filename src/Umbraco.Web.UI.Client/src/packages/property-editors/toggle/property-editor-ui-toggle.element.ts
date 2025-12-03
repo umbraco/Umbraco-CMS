@@ -50,8 +50,8 @@ export class UmbPropertyEditorUIToggleElement
 		if (!config) return;
 
 		this._showLabels = Boolean(config.getValueByAlias('showLabels'));
-		this._labelOn = this.localize.string(config.getValueByAlias<string>('labelOn'));
-		this._labelOff = this.localize.string(config.getValueByAlias<string>('labelOff'));
+		this._labelOn = this.localize.string(config.getValueByAlias<string>('labelOn') ?? '');
+		this._labelOff = this.localize.string(config.getValueByAlias<string>('labelOff') ?? '');
 
 		this._ariaLabel =
 			this.localize.string(config.getValueByAlias<string>('ariaLabel')) ||
