@@ -709,11 +709,13 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
         }
     }
 
+    /// <summary>
+    /// We have two properties containing configuration data:
+    /// 1. ConfigurationData - a dictionary that contains all the configuration data stored as key/value pairs.
+    /// 2. ConfigurationObject - a strongly typed object that represents the configuration data known to the server.
+    /// To fully be able to restore the package, we need to serialize the full ConfigurationData dictionary, not
+    /// just the configuration properties known to the server.
+    /// </summary>
     private string SerializeDataTypeConfiguration(IDataType dataType) =>
-        // We have two properties containing configuration data:
-        // 1. ConfigurationData - a dictionary that contains all the configuration data stored as key/value pairs.
-        // 2. ConfigurationObject - a strongly typed object that represents the configuration data known to the server.
-        // To fully be able to restore the package, we need to serialize the full ConfigurationData dictionary, not
-        // just the configuration properties known to the server.
         _configurationEditorJsonSerializer.Serialize(dataType.ConfigurationData);
 }
