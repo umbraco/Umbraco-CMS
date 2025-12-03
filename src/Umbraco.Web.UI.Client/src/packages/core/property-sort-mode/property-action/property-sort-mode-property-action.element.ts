@@ -9,7 +9,7 @@ import type { UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';
 @customElement('umb-property-sort-mode-property-action')
 export class UmbPropertySortModePropertyActionElement extends UmbLitElement {
 	@state()
-	private _sortModeEnabled = false;
+	private _isSortMode = false;
 
 	@property({ attribute: false })
 	public manifest?: ManifestPropertyActionSortModeKind;
@@ -21,7 +21,7 @@ export class UmbPropertySortModePropertyActionElement extends UmbLitElement {
 		super();
 
 		this.consumeContext(UMB_PROPERTY_SORT_MODE_CONTEXT, (context) => {
-			this.observe(context?.isSortMode, (enabled) => (this._sortModeEnabled = enabled ?? false));
+			this.observe(context?.isSortMode, (isSortMode) => (this._isSortMode = isSortMode ?? false));
 		});
 	}
 
@@ -38,7 +38,7 @@ export class UmbPropertySortModePropertyActionElement extends UmbLitElement {
 	}
 
 	override render() {
-		const label = this._sortModeEnabled ? 'blockEditor_actionExitSortMode' : 'blockEditor_actionEnterSortMode';
+		const label = this._isSortMode ? 'blockEditor_actionExitSortMode' : 'blockEditor_actionEnterSortMode';
 		return html`
 			<uui-menu-item label=${this.localize.term(label)} @click-label=${this.#onClickLabel} @click=${this.#onClick}>
 				${when(this.manifest?.meta.icon, (icon) => html`<umb-icon slot="icon" name=${icon}></umb-icon>`)}
