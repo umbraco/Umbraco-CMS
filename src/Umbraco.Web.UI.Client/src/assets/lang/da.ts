@@ -2356,7 +2356,7 @@ export default {
 		labelUsedByDocuments: 'Brugt i Dokumenter',
 		labelUsedByMembers: 'Brugt i Medlemmer',
 		labelUsedByMedia: 'Brugt i Medier',
-		itemHasNoReferences: 'Dette Har ingen referencer.',
+		itemHasNoReferences: 'Ingen referencer',
 		labelUsedByDocumentTypes: 'Refereret af følgende Dokument Typer',
 		labelUsedByItems: 'Refereret af',
 		labelDependsOnThis: 'Følgende elementer er afhængige af dette',
