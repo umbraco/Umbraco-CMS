@@ -16,7 +16,7 @@ public abstract class ContentEditingModelBase
     /// A dictionary where the key is a unique segment from <see cref="Variants"/> and the value is
     /// the set of cultures that have at least one property defined for that segment in <see cref="Properties"/>.
     /// </returns>
-    public Dictionary<string, HashSet<string?>> GetPopulatedSegmentCultures(string[] cultures)
+    public Dictionary<string, HashSet<string>> GetPopulatedSegmentCultures(string[] cultures)
     {
         IEnumerable<string> uniqueSegments = Variants
             .Where(variant => variant.Segment is not null)
@@ -27,8 +27,8 @@ public abstract class ContentEditingModelBase
             segment => segment,
             segment => Properties
                 .Where(property => property.Segment.InvariantEquals(segment))
-                .Where(property => property.Culture is null || cultures.Contains(property.Culture))
-                .Select(property => property.Culture)
+                .Where(property => property.Culture is not null && cultures.Contains(property.Culture))
+                .Select(property => property.Culture!)
                 .ToHashSet());
     }
 }

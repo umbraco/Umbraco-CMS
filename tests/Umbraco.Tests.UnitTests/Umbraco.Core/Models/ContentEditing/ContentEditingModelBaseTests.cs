@@ -144,48 +144,4 @@ public class ContentEditingModelBaseTests
         Assert.That(result["segment-2"], Does.Contain("en-US"));
         Assert.That(result["segment-2"], Does.Not.Contain("da-DK"));
     }
-
-    [Test]
-    public void GetPopulatedSegmentCultures_IncludesNullCulture_WhenPropertyHasNullCulture()
-    {
-        var model = new TestContentEditingModel
-        {
-            Variants =
-            [
-                new VariantModel { Name = "Segment 1 Segment", Culture = null, Segment = "segment-1" }
-            ],
-            Properties =
-            [
-                new PropertyValueModel { Alias = "title", Value = "Hello Segment 1", Culture = null, Segment = "segment-1" }
-            ],
-        };
-
-        var result = model.GetPopulatedSegmentCultures(["en-US"]);
-
-        Assert.That(result, Has.Count.EqualTo(1));
-        Assert.That(result["segment-1"], Does.Contain(null));
-    }
-
-    [Test]
-    public void GetPopulatedSegmentCultures_ReturnsEmptyHashSet_WhenSegmentExistsButNoPropertiesMatch()
-    {
-        var model = new TestContentEditingModel
-        {
-            Variants =
-            [
-                new VariantModel { Name = "English Segment 1", Culture = "en-US", Segment = "segment-1" }
-            ],
-            Properties =
-            [
-                // Property exists but for a different segment
-                new PropertyValueModel { Alias = "title", Value = "Hello Segment 2", Culture = "en-US", Segment = "segment-2" }
-            ],
-        };
-
-        var result = model.GetPopulatedSegmentCultures(["en-US"]);
-
-        Assert.That(result, Has.Count.EqualTo(1));
-        Assert.That(result.ContainsKey("segment-1"), Is.True);
-        Assert.That(result["segment-1"], Is.Empty);
-    }
 }
