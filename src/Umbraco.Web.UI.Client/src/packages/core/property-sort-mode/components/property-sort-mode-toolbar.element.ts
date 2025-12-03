@@ -38,8 +38,6 @@ export class UmbPropertySortModeToolbarElement extends UmbLitElement {
 	];
 }
 
-export { UmbPropertySortModeToolbarElement as element };
-
 declare global {
 	interface HTMLElementTagNameMap {
 		'umb-property-sort-mode-toolbar': UmbPropertySortModeToolbarElement;
