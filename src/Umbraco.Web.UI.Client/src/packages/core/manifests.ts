@@ -15,12 +15,12 @@ import { manifests as pickerManifests } from './picker/manifests.js';
 import { manifests as propertyActionManifests } from './property-action/manifests.js';
 import { manifests as propertyEditorDataSourceManifests } from './property-editor-data-source/manifests.js';
 import { manifests as propertyEditorManifests } from './property-editor/manifests.js';
+import { manifests as propertySortModeManifests } from './property-sort-mode/manifests.js';
 import { manifests as propertyManifests } from './property/manifests.js';
 import { manifests as recycleBinManifests } from './recycle-bin/manifests.js';
 import { manifests as searchManifests } from './search/manifests.js';
 import { manifests as sectionManifests } from './section/manifests.js';
 import { manifests as serverFileSystemManifests } from './server-file-system/manifests.js';
-import { manifests as propertySortModeManifests } from './property-sort-mode/manifests.js';
 import { manifests as temporaryFileManifests } from './temporary-file/manifests.js';
 import { manifests as themeManifests } from './themes/manifests.js';
 import { manifests as treeManifests } from './tree/manifests.js';
@@ -46,12 +46,12 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 	...propertyActionManifests,
 	...propertyEditorDataSourceManifests,
 	...propertyEditorManifests,
+	...propertySortModeManifests,
 	...propertyManifests,
 	...recycleBinManifests,
 	...searchManifests,
 	...sectionManifests,
 	...serverFileSystemManifests,
-	...propertySortModeManifests,
 	...temporaryFileManifests,
 	...themeManifests,
 	...treeManifests,
