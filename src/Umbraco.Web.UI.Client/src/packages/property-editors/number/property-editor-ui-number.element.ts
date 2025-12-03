@@ -103,6 +103,7 @@ export class UmbPropertyEditorUINumberElement
 	}
 
 	override render() {
+		const placeholder = typeof this._placeholder === 'string' ? this.localize.string(this._placeholder) : undefined;
 		return html`
 			<uui-input
 				type="number"
@@ -110,7 +111,7 @@ export class UmbPropertyEditorUINumberElement
 				min=${ifDefined(this._min)}
 				max=${ifDefined(this._max)}
 				step=${ifDefined(this._step)}
-				placeholder=${ifDefined(this._placeholder)}
+				placeholder=${ifDefined(placeholder)}
 				value=${this.value?.toString() ?? ''}
 				@change=${this.#onChange}
 				?required=${this.mandatory}

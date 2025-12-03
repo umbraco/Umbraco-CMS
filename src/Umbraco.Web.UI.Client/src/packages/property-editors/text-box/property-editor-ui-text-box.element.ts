@@ -78,11 +78,12 @@ export class UmbPropertyEditorUITextBoxElement
 	}
 
 	override render() {
+		const placeholder = typeof this._placeholder === 'string' ? this.localize.string(this._placeholder) : undefined;
 		return html`<uui-input
 			.label=${this.localize.term('general_fieldFor', [this.name])}
 			.value=${this.value ?? ''}
 			.type=${this._type}
-			placeholder=${ifDefined(this._placeholder)}
+			placeholder=${ifDefined(placeholder)}
 			inputMode=${ifDefined(this._inputMode)}
 			maxlength=${ifDefined(this._maxChars)}
 			@input=${this.#onInput}
