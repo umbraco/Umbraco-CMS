@@ -45,7 +45,17 @@ internal sealed class ContentTypeSchemaService : IContentTypeSchemaService
 
         foreach (IContentTypeComposition contentType in contentTypes)
         {
-            IPublishedContentType publishedContentType = _publishedContentTypeCache.Get(itemType, contentType.Alias);
+            IPublishedContentType publishedContentType;
+            try
+            {
+                publishedContentType = _publishedContentTypeCache.Get(itemType, contentType.Alias);
+            }
+            catch
+            {
+                // Skip content types that fail to load from cache
+                continue;
+            }
+
             HashSet<string> ownPropertyAliases = [.. contentType.PropertyTypes.Select(p => p.Alias)];
 
             result.Add(
