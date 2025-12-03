@@ -110,8 +110,8 @@ export class UmbPropertyEditorUINumberElement
 				min=${ifDefined(this._min)}
 				max=${ifDefined(this._max)}
 				step=${ifDefined(this._step)}
-				placeholder=${ifDefined(this._placeholder)}
 				value=${this.value?.toString() ?? ''}
+				.placeholder=${this._placeholder ?? ''}
 				.requiredMessage=${this.mandatoryMessage}
 				?required=${this.mandatory}
 				?readonly=${this.readonly}
