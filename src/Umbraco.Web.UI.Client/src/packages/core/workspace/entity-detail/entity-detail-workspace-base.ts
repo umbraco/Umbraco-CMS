@@ -253,7 +253,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 				}
 			}
 		} else if (data) {
-			const processedData = await this._processIncomingData(data);
+			const processedData = await this._scaffoldProcessData(data);
 
 			this._data.setPersisted(processedData);
 			this._data.setCurrent(processedData);
@@ -311,7 +311,6 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		let { data } = await request;
 
 		if (data) {
-			data = await this._processIncomingData(data);
 			data = await this._scaffoldProcessData(data);
 
 			if (this.modalContext) {
@@ -336,7 +335,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 * @returns {Promise<DetailModelType>} The processed data.
 	 */
 	protected async _scaffoldProcessData(data: DetailModelType): Promise<DetailModelType> {
-		return data;
+		return await this._processIncomingData(data);
 	}
 	protected async _processIncomingData(data: DetailModelType): Promise<DetailModelType> {
 		return data;
