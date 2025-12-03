@@ -276,7 +276,7 @@ export class UmbPropertyEditorUIBlockGridElement
 
 	#renderSortingMode() {
 		if (!this._sortingMode) return nothing;
-		return html`<umb-sort-mode-toolbar></umb-sort-mode-toolbar>`;
+		return html`<umb-property-sort-mode-toolbar></umb-property-sort-mode-toolbar>`;
 	}
 
 	static override styles = [

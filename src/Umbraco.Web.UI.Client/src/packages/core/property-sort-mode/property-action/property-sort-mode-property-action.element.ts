@@ -1,4 +1,4 @@
-import { UMB_SORT_PROPERTY_CONTEXT } from '../../context/sort.property-context-token.js';
+import { UMB_PROPERTY_SORT_MODE_CONTEXT } from '../property-context/property-sort-mode.context-token.js';
 import type { ManifestPropertyActionSortModeKind } from './types.js';
 import { customElement, html, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
@@ -6,8 +6,8 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbPropertyAction } from '@umbraco-cms/backoffice/property-action';
 import type { UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';
 
-@customElement('umb-sort-mode-property-action')
-export class UmbSortModePropertyActionElement extends UmbLitElement {
+@customElement('umb-property-sort-mode-property-action')
+export class UmbPropertySortModePropertyActionElement extends UmbLitElement {
 	@state()
 	private _sortModeEnabled = false;
 
@@ -20,8 +20,8 @@ export class UmbSortModePropertyActionElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_SORT_PROPERTY_CONTEXT, (context) => {
-			this.observe(context?.sortingMode, (enabled) => (this._sortModeEnabled = enabled ?? false));
+		this.consumeContext(UMB_PROPERTY_SORT_MODE_CONTEXT, (context) => {
+			this.observe(context?.isSortMode, (enabled) => (this._sortModeEnabled = enabled ?? false));
 		});
 	}
 
@@ -47,12 +47,10 @@ export class UmbSortModePropertyActionElement extends UmbLitElement {
 	}
 }
 
-export { UmbSortModePropertyActionElement as element };
-
-export default UmbSortModePropertyActionElement;
+export { UmbPropertySortModePropertyActionElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-sort-mode-property-action': UmbSortModePropertyActionElement;
+		'umb-property-sort-mode-property-action': UmbPropertySortModePropertyActionElement;
 	}
 }

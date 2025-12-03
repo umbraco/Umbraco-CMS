@@ -20,7 +20,7 @@ import { manifests as recycleBinManifests } from './recycle-bin/manifests.js';
 import { manifests as searchManifests } from './search/manifests.js';
 import { manifests as sectionManifests } from './section/manifests.js';
 import { manifests as serverFileSystemManifests } from './server-file-system/manifests.js';
-import { manifests as sorterManifests } from './sorter/manifests.js';
+import { manifests as propertySortModeManifests } from './property-sort-mode/manifests.js';
 import { manifests as temporaryFileManifests } from './temporary-file/manifests.js';
 import { manifests as themeManifests } from './themes/manifests.js';
 import { manifests as treeManifests } from './tree/manifests.js';
@@ -51,7 +51,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 	...searchManifests,
 	...sectionManifests,
 	...serverFileSystemManifests,
-	...sorterManifests,
+	...propertySortModeManifests,
 	...temporaryFileManifests,
 	...themeManifests,
 	...treeManifests,
