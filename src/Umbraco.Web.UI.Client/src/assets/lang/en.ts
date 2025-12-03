@@ -2557,6 +2557,12 @@ export default {
 			'<p>You should never let a production site run in debug mode. Debug mode is turned off by setting <strong>Umbraco:CMS:Hosting:Debug</strong> to <strong>false</strong> in appsettings.json, appsettings.{Environment}.json or via an environment variable.</p>',
 		profilerEnabledDescription:
 			"<p>Umbraco currently does not run in debug mode, so you can't use the built-in profiler. This is how it should be for a production site.</p><p>Debug mode is turned on by setting <strong>Umbraco:CMS:Hosting:Debug</strong> to <strong>true</strong> in appsettings.json, appsettings.{Environment}.json or via an environment variable.</p>",
+		errorEnablingProfilerTitle: 'Error enabling profiler',
+		errorEnablingProfilerDescription:
+			'It was not possible to enable the profiler. Check that you are accessing the backoffice on the same URL as the front-end website, and try again. If the problem persists, please check the log for more details.',
+		errorDisablingProfilerTitle: 'Error disabling profiler',
+		errorDisablingProfilerDescription:
+			'It was not possible to disable the profiler. Try again, and if the problem persists, please check the log for more details.',
 	},
 	settingsDashboard: {
 		documentationHeader: 'Documentation',
