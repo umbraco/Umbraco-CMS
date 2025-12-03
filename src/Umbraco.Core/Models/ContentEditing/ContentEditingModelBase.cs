@@ -18,10 +18,7 @@ public abstract class ContentEditingModelBase
     /// </returns>
     public Dictionary<string, HashSet<string>> GetPopulatedSegmentCultures(string[] cultures)
     {
-        IEnumerable<string> uniqueSegments = Variants
-            .Where(variant => variant.Segment is not null)
-            .Select(variant => variant.Segment!)
-            .Distinct();
+        IEnumerable<string> uniqueSegments = Variants.Select(variant => variant.Segment).WhereNotNull().Distinct();
 
         return uniqueSegments.ToDictionary(
             segment => segment,
