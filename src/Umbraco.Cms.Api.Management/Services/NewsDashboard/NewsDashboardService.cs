@@ -24,6 +24,8 @@ public class NewsDashboardService : INewsDashboardService
 
     private static readonly HttpClient _httpClient = new();
 
+    protected virtual TimeSpan CacheDuration => TimeSpan.FromMinutes(30);
+
     /// <summary>
     /// Initializes a new instance of the <see cref="NewsDashboardService"/> class.
     /// </summary>
@@ -69,7 +71,7 @@ public class NewsDashboardService : INewsDashboardService
 
             if (TryMapModel(json, out NewsDashboardResponseModel? model))
             {
-                _appCaches.RuntimeCache.InsertCacheItem(CacheKey, () => model, new TimeSpan(0, 30, 0));
+                _appCaches.RuntimeCache.InsertCacheItem(CacheKey, () => model, CacheDuration);
                 content = model;
             }
         }
