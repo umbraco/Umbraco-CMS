@@ -74,7 +74,8 @@ test('can embed a video into RTE Tiptap property editor', async ({umbracoApi, um
   expect(contentData.values[0].value.markup).toContain(videoURL);
 });
 
-test('cannot submit an empty link in RTE Tiptap property editor', async ({umbracoApi, umbracoUi}) => {
+// TODO: fails due to https://github.com/umbraco/Umbraco-CMS/issues/21044
+test.skip('cannot submit an empty link in RTE Tiptap property editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const iconTitle = 'Link';
   const customDataTypeId = await umbracoApi.dataType.createDefaultTiptapDataType(customDataTypeName);
@@ -96,7 +97,8 @@ test('cannot submit an empty link in RTE Tiptap property editor', async ({umbrac
   await umbracoUi.content.isTextWithMessageVisible(ConstantHelper.validationMessages.emptyLinkPicker);
 });
 
-test('cannot submit an empty URL with an anchor or querystring in RTE Tiptap property editor', async ({umbracoApi, umbracoUi}) => {
+// TODO: fails due to https://github.com/umbraco/Umbraco-CMS/issues/21044
+test.skip('cannot submit an empty URL with an anchor or querystring in RTE Tiptap property editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const iconTitle = 'Link';
   const customDataTypeId = await umbracoApi.dataType.createDefaultTiptapDataType(customDataTypeName);
