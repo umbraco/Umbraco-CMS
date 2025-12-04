@@ -10,6 +10,9 @@ export class UmbRefCollectionViewElement extends UmbLitElement {
 	private _items: Array<UmbCollectionItemModel> = [];
 
 	@state()
+	private _selectable = false;
+
+	@state()
 	private _selection: Array<string | null> = [];
 
 	@state()
@@ -17,9 +20,6 @@ export class UmbRefCollectionViewElement extends UmbLitElement {
 
 	@state()
 	private _itemHrefs: Map<string, string> = new Map();
-
-	@state()
-	private _hasBulkActions = false;
 
 	#collectionContext?: typeof UMB_COLLECTION_CONTEXT.TYPE;
 
@@ -30,17 +30,15 @@ export class UmbRefCollectionViewElement extends UmbLitElement {
 			this.#collectionContext = instance;
 
 			this.observe(
-				this.#collectionContext?.selection.selection,
-				(selection) => (this._selection = selection ?? []),
-				'umbCollectionSelectionObserver',
+				this.#collectionContext?.selection.selectable,
+				(selectable) => (this._selectable = selectable ?? false),
+				'umbCollectionSelectableObserver',
 			);
 
 			this.observe(
-				this.#collectionContext?.bulkAction.hasBulkActions,
-				(hasBulkActions) => {
-					this._hasBulkActions = hasBulkActions ?? false;
-				},
-				'umbCollectionHasBulkActionsObserver',
+				this.#collectionContext?.selection.selection,
+				(selection) => (this._selection = selection ?? []),
+				'umbCollectionSelectionObserver',
 			);
 
 			this.observe(
@@ -91,7 +89,7 @@ export class UmbRefCollectionViewElement extends UmbLitElement {
 		return html`<umb-entity-collection-item-ref
 			.item=${item}
 			href=${href ?? nothing}
-			?selectable=${this._hasBulkActions}
+			?selectable=${this._selectable}
 			?select-only=${this._selection.length > 0}
 			?selected=${this.#collectionContext?.selection.isSelected(item.unique)}
 			@selected=${() => this.#onSelect(item)}

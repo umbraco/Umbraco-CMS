@@ -93,6 +93,19 @@ export class UmbDefaultCollectionContext<
 		this.#defaultViewAlias = defaultViewAlias;
 		this.#defaultFilter = defaultFilter;
 
+		this.selection.setSelectable(false);
+
+		this.observe(
+			this.bulkAction.hasBulkActions,
+			(hasBulkActions) => {
+				// Allow selection if there are bulk actions available
+				if (hasBulkActions) {
+					this.selection.setSelectable(true);
+				}
+			},
+			'umbCollectionHasBulkActionsObserver',
+		);
+
 		this.pagination.addEventListener(UmbChangeEvent.TYPE, this.#onPageChange);
 		this.#listenToEntityEvents();
 

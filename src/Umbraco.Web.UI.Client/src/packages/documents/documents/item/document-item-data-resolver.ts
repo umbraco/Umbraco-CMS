@@ -229,18 +229,24 @@ export class UmbDocumentItemDataResolver<DocumentItemModel extends UmbDocumentIt
 
 	#setName() {
 		const variant = this.#getCurrentVariant();
-		if (variant) {
+		if (variant?.name) {
 			this.#name.setValue(variant.name);
 			return;
 		}
 
 		const variants = this.getData()?.variants;
 		if (variants) {
-			const fallbackName = findVariant(variants, this.#fallbackCulture!)?.name;
-			this.#name.setValue(`(${fallbackName})`);
-		} else {
-			this.#name.setValue(undefined);
+			// Try fallback culture first, then first variant with any name
+			const fallbackName =
+				findVariant(variants, this.#fallbackCulture!)?.name ?? variants.find((x) => x.name)?.name;
+
+			if (fallbackName) {
+				this.#name.setValue(`(${fallbackName})`);
+				return;
+			}
 		}
+
+		this.#name.setValue('(Untitled)');
 	}
 
 	#setIsDraft() {

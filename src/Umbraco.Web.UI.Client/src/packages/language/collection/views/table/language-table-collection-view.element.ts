@@ -57,23 +57,25 @@ export class UmbLanguageTableCollectionViewElement extends UmbLitElement {
 		this.consumeContext(UMB_COLLECTION_CONTEXT, (instance) => {
 			this.#collectionContext = instance;
 			this.#observeCollectionItems();
-			this.#observeHasBulkActions();
+			this.#observeIsSelectable();
 		});
 	}
 
 	#observeCollectionItems() {
-		if (!this.#collectionContext) return;
-		this.observe(this.#collectionContext.items, (items) => this.#createTableItems(items), 'umbCollectionItemsObserver');
+		this.observe(
+			this.#collectionContext?.items,
+			(items) => this.#createTableItems(items || []),
+			'umbCollectionItemsObserver',
+		);
 	}
 
-	#observeHasBulkActions() {
-		if (!this.#collectionContext) return;
+	#observeIsSelectable() {
 		this.observe(
-			this.#collectionContext.bulkAction.hasBulkActions,
-			(hasBulkActions) => {
+			this.#collectionContext?.selection.selectable,
+			(isSelectable) => {
 				this._tableConfig = {
 					...this._tableConfig,
-					allowSelection: hasBulkActions ?? false,
+					allowSelection: isSelectable ?? false,
 				};
 			},
 			'umbCollectionHasBulkActionsObserver',
