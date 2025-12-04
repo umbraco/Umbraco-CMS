@@ -201,4 +201,45 @@ internal sealed class UserGroupServiceValidationTests : UmbracoIntegrationTest
         Assert.IsTrue(result.Success);
         Assert.AreEqual(result.Result,UserGroupOperationStatus.Success);
     }
+
+    [Test]
+    public async Task Can_Create_UserGroup_With_Description()
+    {
+        var description = "This is a test user group description";
+        var userGroup = new UserGroup(ShortStringHelper)
+        {
+            Name = "Some Name",
+            Alias = "someAlias",
+            Description = description
+        };
+
+        var result = await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserKey);
+
+        Assert.IsTrue(result.Success);
+        Assert.IsNotNull(result.Result);
+        Assert.AreEqual(description, result.Result.Description);
+    }
+
+    [Test]
+    public async Task Can_Update_UserGroup_Description()
+    {
+        var initialDescription = "Initial description";
+        var userGroup = new UserGroup(ShortStringHelper)
+        {
+            Name = "Some Name",
+            Alias = "someAlias",
+            Description = initialDescription
+        };
+
+        var createResult = await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserKey);
+        Assert.IsTrue(createResult.Success);
+
+        var updatedDescription = "Updated description";
+        var createdUserGroup = createResult.Result;
+        createdUserGroup!.Description = updatedDescription;
+
+        var updateResult = await UserGroupService.UpdateAsync(createdUserGroup, Constants.Security.SuperUserKey);
+        Assert.IsTrue(updateResult.Success);
+        Assert.AreEqual(updatedDescription, updateResult.Result!.Description);
+    }
 }

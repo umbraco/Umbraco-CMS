@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.UserGroup.Permissions;
+using Umbraco.Cms.Api.Management.ViewModels.UserGroup.Permissions;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.UserGroup;
 
@@ -79,4 +79,9 @@ public class UserGroupBase
     /// </summary>
     public required ISet<string> FallbackPermissions { get; init; }
     public required ISet<IPermissionPresentationModel> Permissions { get; init; }
+
+    /// <summary>
+    /// The description of the user group
+    /// </summary>
+    public string? Description { get; set; }
 }

@@ -36,4 +36,6 @@ public interface IReadOnlyUserGroup
     IEnumerable<int> AllowedLanguages => Enumerable.Empty<int>();
 
     public bool HasAccessToLanguage( int languageId) => HasAccessToAllLanguages || AllowedLanguages.Contains(languageId);
-}
+
+    string? Description { get; }
+    }

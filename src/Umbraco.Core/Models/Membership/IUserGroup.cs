@@ -23,6 +23,11 @@ public interface IUserGroup : IEntity, IRememberBeingDirty
     string? Name { get; set; }
 
     /// <summary>
+    ///    The description
+    /// </summary>
+    string? Description { get; set; }
+
+    /// <summary>
     ///     If this property is true it will give the group access to all languages
     /// </summary>
     /// This is set to return true as default to avoid breaking changes
