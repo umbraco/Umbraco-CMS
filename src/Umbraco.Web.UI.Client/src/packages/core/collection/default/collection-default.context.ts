@@ -9,6 +9,7 @@ import type {
 import type { UmbCollectionFilterModel } from '../collection-filter-model.interface.js';
 import type { UmbCollectionRepository } from '../repository/collection-repository.interface.js';
 import type { ManifestCollection } from '../extensions/types.js';
+import { UmbCollectionBulkActionManager } from '../bulk-action/collection-bulk-action.manager.js';
 import { UMB_COLLECTION_CONTEXT } from './collection-default.context-token.js';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbArrayState, UmbBasicState, UmbNumberState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
@@ -67,6 +68,7 @@ export class UmbDefaultCollectionContext<
 	public readonly pagination = new UmbPaginationManager();
 	public readonly selection = new UmbSelectionManager(this);
 	public readonly view = new UmbCollectionViewManager(this);
+	public readonly bulkAction = new UmbCollectionBulkActionManager(this);
 
 	#defaultViewAlias: string;
 	#defaultFilter: Partial<FilterModelType>;
@@ -378,7 +380,7 @@ export class UmbDefaultCollectionContext<
 	 * @memberof UmbCollectionContext
 	 * @deprecated Use the `.manifest` property instead.
 	 */
-	public getManifest() {
+	public getManifest(): ManifestCollection | undefined {
 		new UmbDeprecation({
 			removeInVersion: '18.0.0',
 			deprecated: 'getManifest',
@@ -391,17 +393,17 @@ export class UmbDefaultCollectionContext<
 	 * Returns the items in the collection.
 	 * @returns {Array<CollectionItemType>} - The items in the collection.
 	 */
-	public getItems() {
+	public getItems(): Array<CollectionItemType> {
 		return this._items.getValue();
 	}
 
 	/**
 	 * Returns the href for a specific collection item.
 	 * Override this method in specialized collection contexts to provide item-specific hrefs.
-	 * @param {CollectionItemType} item - The collection item to get the href for.
-	 * @returns {Promise<string | undefined>} - The href for the item, or undefined if not available.
+	 * @param {CollectionItemType} _item  - The collection item to get the href for.
+	 * @returns {Promise<string | undefined>} - Undefined. The collection item do not link to anything by default.
 	 */
-	public async requestItemHref(item: CollectionItemType): Promise<string | undefined> {
+	public async requestItemHref(_item: CollectionItemType): Promise<string | undefined> {
 		return undefined;
 	}
 }

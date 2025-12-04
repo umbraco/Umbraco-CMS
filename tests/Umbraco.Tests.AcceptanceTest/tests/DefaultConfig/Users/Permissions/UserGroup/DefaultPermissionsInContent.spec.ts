@@ -301,7 +301,7 @@ test.skip('can set permissions with set permissions permission enabled', async (
   // Act
   await umbracoUi.content.clickActionsMenuForContent(rootDocumentName);
   // await umbracoUi.content.clickSetPermissionsButton();
-  
+
   // Assert
   // await umbracoUi.content.doesDocumentPermissionsDialogExist();
 });
@@ -529,7 +529,7 @@ test('can set culture and hostnames with culture and hostnames permission enable
   // Act
   await umbracoUi.content.clickActionsMenuForContent(rootDocumentName);
   await umbracoUi.content.clickCultureAndHostnamesActionMenuOption();
-  await umbracoUi.content.clickAddNewDomainButton();
+  await umbracoUi.content.clickAddNewHostnameButton();
   await umbracoUi.content.enterDomain(domainName);
   await umbracoUi.content.clickSaveModalButton();
 

@@ -1,4 +1,5 @@
-import { UMB_COLLECTION_CONTEXT, type UmbCollectionItemModel } from '@umbraco-cms/backoffice/collection';
+import { UMB_COLLECTION_CONTEXT } from '../../default/index.js';
+import type { UmbCollectionItemModel } from '../../types.js';
 import { css, customElement, html, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -15,10 +16,10 @@ export class UmbRefCollectionViewElement extends UmbLitElement {
 	private _loading = false;
 
 	@state()
-	private _selectOnly: boolean | undefined;
+	private _itemHrefs: Map<string, string> = new Map();
 
 	@state()
-	private _itemHrefs: Map<string, string> = new Map();
+	private _hasBulkActions = false;
 
 	#collectionContext?: typeof UMB_COLLECTION_CONTEXT.TYPE;
 
@@ -35,9 +36,11 @@ export class UmbRefCollectionViewElement extends UmbLitElement {
 			);
 
 			this.observe(
-				this.#collectionContext?.selection.selectOnly,
-				(selectOnly) => (this._selectOnly = selectOnly ?? undefined),
-				'umbCollectionSelectOnlyObserver',
+				this.#collectionContext?.bulkAction.hasBulkActions,
+				(hasBulkActions) => {
+					this._hasBulkActions = hasBulkActions ?? false;
+				},
+				'umbCollectionHasBulkActionsObserver',
 			);
 
 			this.observe(
@@ -88,11 +91,16 @@ export class UmbRefCollectionViewElement extends UmbLitElement {
 		return html`<umb-entity-collection-item-ref
 			.item=${item}
 			href=${href ?? nothing}
-			selectable
-			?select-only=${this._selection.length > 0 || this._selectOnly}
+			?selectable=${this._hasBulkActions}
+			?select-only=${this._selection.length > 0}
 			?selected=${this.#collectionContext?.selection.isSelected(item.unique)}
 			@selected=${() => this.#onSelect(item)}
-			@deselected=${() => this.#onDeselect(item)}></umb-entity-collection-item-ref>`;
+			@deselected=${() => this.#onDeselect(item)}>
+			<umb-entity-actions-bundle
+				slot="actions"
+				.entityType=${item.entityType}
+				.unique=${item.unique}></umb-entity-actions-bundle>
+		</umb-entity-collection-item-ref>`;
 	}
 
 	static override styles = [
