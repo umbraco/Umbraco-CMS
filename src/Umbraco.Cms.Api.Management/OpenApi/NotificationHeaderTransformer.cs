@@ -66,7 +66,8 @@ internal sealed class NotificationHeaderTransformer : IOpenApiOperationTransform
             OpenApiSchema notificationHeaderSchema = await context.GetOrCreateSchemaAsync(
                 notificationHeaderModelType,
                 cancellationToken: cancellationToken);
-            notificationHeaderSchema.Properties?["type"] = new OpenApiSchemaReference(eventMessageTypeSchemaId, context.Document);
+            notificationHeaderSchema.Properties ??= new Dictionary<string, IOpenApiSchema>();
+            notificationHeaderSchema.Properties["type"] = new OpenApiSchemaReference(eventMessageTypeSchemaId, context.Document);
             context.Document?.AddComponent(notificationHeaderSchemaId, notificationHeaderSchema);
         }
 
