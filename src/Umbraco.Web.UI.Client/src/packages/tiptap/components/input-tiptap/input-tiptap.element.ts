@@ -101,7 +101,8 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	}
 
 	protected override async firstUpdated() {
-		await Promise.all([await this.#loadExtensions(), await this.#loadEditor()]);
+		await this.#loadExtensions();
+		await this.#loadEditor();
 	}
 
 	/**
