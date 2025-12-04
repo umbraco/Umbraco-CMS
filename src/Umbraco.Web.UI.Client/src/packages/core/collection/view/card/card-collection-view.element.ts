@@ -1,4 +1,5 @@
-import { UMB_COLLECTION_CONTEXT, type UmbCollectionItemModel } from '@umbraco-cms/backoffice/collection';
+import { UMB_COLLECTION_CONTEXT } from '../../default/index.js';
+import type { UmbCollectionItemModel } from '../../types.js';
 import { css, customElement, html, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
