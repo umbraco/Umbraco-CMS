@@ -127,7 +127,7 @@ export class UmbUserCollectionContext extends UmbDefaultCollectionContext<
 	 * @param {UmbUserDetailModel} item - The user item to get the href for.
 	 * @returns {Promise<string | undefined>} - The edit workspace href for the user.
 	 */
-	override async requestItemEditPath(item: UmbUserDetailModel): Promise<string | undefined> {
+	override async requestItemHref(item: UmbUserDetailModel): Promise<string | undefined> {
 		return `${UMB_EDIT_USER_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: item.unique })}`;
 	}
 }

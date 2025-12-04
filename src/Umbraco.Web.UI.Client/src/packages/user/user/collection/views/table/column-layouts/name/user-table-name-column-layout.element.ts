@@ -13,7 +13,7 @@ export class UmbUserTableNameColumnLayoutElement extends LitElement {
 		unique: string;
 		kind: string;
 		avatarUrls: Record<string, string>;
-		editPath?: string;
+		href?: string;
 	};
 
 	override render() {
@@ -23,7 +23,7 @@ export class UmbUserTableNameColumnLayoutElement extends LitElement {
 				name=${this.value.name}
 				kind=${this.value.kind}
 				.imgUrls=${this.value.avatarUrls}></umb-user-avatar>
-			<a style="font-weight: bold;" href="${this.value.editPath}">${this.value.name}</a>
+			<a style="font-weight: bold;" href="${this.value.href}">${this.value.name}</a>
 		</div>`;
 	}
 	static override styles = [UmbTextStyles];

@@ -70,7 +70,7 @@ export class UmbUserTableCollectionViewElement extends UmbLitElement {
 	private _selection: Array<string | null> = [];
 
 	@state()
-	private _itemEditPaths: Map<string, string> = new Map();
+	private _itemHrefs: Map<string, string> = new Map();
 
 	#collectionContext?: UmbUserCollectionContext;
 
@@ -88,7 +88,7 @@ export class UmbUserTableCollectionViewElement extends UmbLitElement {
 				this.#collectionContext?.items,
 				async (items) => {
 					this._users = items ?? [];
-					await this.#updateItemEditPaths();
+					await this.#updateItemHrefs();
 					this.#observeUserGroups();
 				},
 				'umbCollectionItemsObserver',
@@ -120,15 +120,15 @@ export class UmbUserTableCollectionViewElement extends UmbLitElement {
 			.join(', ');
 	}
 
-	async #updateItemEditPaths() {
-		const editPaths = new Map<string, string>();
+	async #updateItemHrefs() {
+		const hrefs = new Map<string, string>();
 		for (const user of this._users) {
-			const href = await this.#collectionContext?.requestItemEditPath?.(user);
+			const href = await this.#collectionContext?.requestItemHref?.(user);
 			if (href && user.unique) {
-				editPaths.set(user.unique, href);
+				hrefs.set(user.unique, href);
 			}
 		}
-		this._itemEditPaths = editPaths;
+		this._itemHrefs = hrefs;
 	}
 
 	#createTableItems() {
@@ -144,7 +144,7 @@ export class UmbUserTableCollectionViewElement extends UmbLitElement {
 							name: user.name,
 							avatarUrls: user.avatarUrls,
 							kind: user.kind,
-							editPath: user.unique ? this._itemEditPaths.get(user.unique) : undefined,
+							href: user.unique ? this._itemHrefs.get(user.unique) : undefined,
 						},
 					},
 					{

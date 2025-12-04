@@ -18,7 +18,7 @@ export class UmbCardCollectionViewElement extends UmbLitElement {
 	private _selectOnly: boolean | undefined;
 
 	@state()
-	private _itemEditPaths: Map<string, string> = new Map();
+	private _itemHrefs: Map<string, string> = new Map();
 
 	#collectionContext?: typeof UMB_COLLECTION_CONTEXT.TYPE;
 
@@ -44,7 +44,7 @@ export class UmbCardCollectionViewElement extends UmbLitElement {
 				this.#collectionContext?.items,
 				async (items) => {
 					this._items = items ?? [];
-					await this.#updateItemEditPaths();
+					await this.#updateItemHrefs();
 				},
 				'umbCollectionItemsObserver',
 			);
@@ -59,15 +59,15 @@ export class UmbCardCollectionViewElement extends UmbLitElement {
 		this.#collectionContext?.selection.deselect(item.unique ?? '');
 	}
 
-	async #updateItemEditPaths() {
-		const editPaths = new Map<string, string>();
+	async #updateItemHrefs() {
+		const hrefs = new Map<string, string>();
 		for (const item of this._items) {
-			const editPath = await this.#collectionContext?.requestItemEditPath?.(item);
-			if (editPath && item.unique) {
-				editPaths.set(item.unique, editPath);
+			const href = await this.#collectionContext?.requestItemHref?.(item);
+			if (href && item.unique) {
+				hrefs.set(item.unique, href);
 			}
 		}
-		this._itemEditPaths = editPaths;
+		this._itemHrefs = hrefs;
 	}
 
 	override render() {
@@ -84,10 +84,10 @@ export class UmbCardCollectionViewElement extends UmbLitElement {
 	}
 
 	#renderItem(item: UmbCollectionItemModel) {
-		const editPath = item.unique ? this._itemEditPaths.get(item.unique) : undefined;
+		const href = item.unique ? this._itemHrefs.get(item.unique) : undefined;
 		return html` <umb-entity-collection-item-card
 			.item=${item}
-			href=${editPath ?? nothing}
+			href=${href ?? nothing}
 			selectable
 			?select-only=${this._selection.length > 0 || this._selectOnly}
 			?selected=${this.#collectionContext?.selection.isSelected(item.unique)}
