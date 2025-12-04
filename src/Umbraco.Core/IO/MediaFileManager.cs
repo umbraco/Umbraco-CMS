@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
@@ -16,6 +17,22 @@ public sealed class MediaFileManager
     private readonly Lazy<ICoreScopeProvider> _coreScopeProvider;
     private readonly IShortStringHelper _shortStringHelper;
     private MediaUrlGeneratorCollection? _mediaUrlGenerators;
+
+    [Obsolete("Please use the constructor taking all arguments")]
+    public MediaFileManager(
+        IFileSystem fileSystem,
+        IMediaPathScheme mediaPathScheme,
+        ILogger<MediaFileManager> logger,
+        IShortStringHelper shortStringHelper,
+        IServiceProvider serviceProvider)
+        : this(fileSystem,
+            mediaPathScheme,
+            logger,
+            shortStringHelper,
+            serviceProvider,
+            StaticServiceProvider.Instance.GetRequiredService<Lazy<ICoreScopeProvider>>())
+    {
+    }
 
     public MediaFileManager(
         IFileSystem fileSystem,
