@@ -376,7 +376,7 @@ export class UmbDefaultCollectionContext<
 	 * @memberof UmbCollectionContext
 	 * @deprecated Use the `.manifest` property instead.
 	 */
-	public getManifest() {
+	public getManifest(): ManifestCollection | undefined {
 		new UmbDeprecation({
 			removeInVersion: '18.0.0',
 			deprecated: 'getManifest',
@@ -389,16 +389,17 @@ export class UmbDefaultCollectionContext<
 	 * Returns the items in the collection.
 	 * @returns {Array<CollectionItemType>} - The items in the collection.
 	 */
-	public getItems() {
+	public getItems(): Array<CollectionItemType> {
 		return this._items.getValue();
 	}
 
 	/**
 	 * Returns the href for a specific collection item.
 	 * Override this method in specialized collection contexts to provide item-specific hrefs.
-	 * @returns {Promise<undefined>} - Undefined. The collection item do not link to anything by default.
+	 * @param {CollectionItemType} _item  - The collection item to get the href for.
+	 * @returns {Promise<string | undefined>} - Undefined. The collection item do not link to anything by default.
 	 */
-	public async requestItemHref(): Promise<undefined> {
+	public async requestItemHref(_item: CollectionItemType): Promise<string | undefined> {
 		return undefined;
 	}
 }
