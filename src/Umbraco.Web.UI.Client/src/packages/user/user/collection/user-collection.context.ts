@@ -1,5 +1,5 @@
 import type { UmbUserDetailModel } from '../types.js';
-import { UMB_USER_WORKSPACE_PATH } from '../paths.js';
+import { UMB_EDIT_USER_WORKSPACE_PATH_PATTERN } from '../paths.js';
 import { UMB_COLLECTION_VIEW_USER_GRID } from './views/index.js';
 import type { UmbUserCollectionFilterModel, UmbUserOrderByOption } from './types.js';
 import type { UmbUserOrderByType, UmbUserStateFilterType } from './utils/index.js';
@@ -128,7 +128,7 @@ export class UmbUserCollectionContext extends UmbDefaultCollectionContext<
 	 * @returns {Promise<string | undefined>} - The edit workspace href for the user.
 	 */
 	override async requestItemHref(item: UmbUserDetailModel): Promise<string | undefined> {
-		return `${UMB_USER_WORKSPACE_PATH}/edit/${item.unique}`;
+		return `${UMB_EDIT_USER_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: item.unique })}`;
 	}
 }
 
