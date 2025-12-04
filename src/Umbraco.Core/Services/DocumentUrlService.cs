@@ -226,12 +226,10 @@ public class DocumentUrlService : IDocumentUrlService
 
         IEnumerable<PublishedDocumentUrlSegment> publishedDocumentUrlSegments = _documentUrlRepository.GetAll();
 
-        // Populate culture-to-languageId lookup for efficient cache key creation
         IEnumerable<ILanguage> languages = await _languageService.GetAllAsync();
-        foreach (ILanguage language in languages)
-        {
-            _cultureToLanguageIdMap[language.IsoCode] = language.Id;
-        }
+
+        // Populate culture-to-languageId lookup for efficient cache key creation.
+        PopulateCultureToLanguageIdMap(languages);
 
         int numberOfCachedUrls = 0;
         foreach ((UrlCacheKey cacheKey, UrlSegmentCache cache) in ConvertToCacheModel(publishedDocumentUrlSegments))
@@ -509,6 +507,10 @@ public class DocumentUrlService : IDocumentUrlService
         var toSave = new List<PublishedDocumentUrlSegment>();
 
         IEnumerable<ILanguage> languages = await _languageService.GetAllAsync();
+
+        // Update culture-to-languageId map with any new languages created after InitAsync
+        PopulateCultureToLanguageIdMap(languages);
+
         var languageDictionary = languages.ToDictionary(x => x.IsoCode);
 
         foreach (IContent document in documents)
@@ -531,6 +533,14 @@ public class DocumentUrlService : IDocumentUrlService
         }
 
         scope.Complete();
+    }
+
+    private void PopulateCultureToLanguageIdMap(IEnumerable<ILanguage> languages)
+    {
+        foreach (ILanguage language in languages)
+        {
+            _cultureToLanguageIdMap[language.IsoCode] = language.Id;
+        }
     }
 
     private void HandleCaching(IScopeContext scopeContext, IContent document, string? culture, ILanguage language, List<PublishedDocumentUrlSegment> toSave)
