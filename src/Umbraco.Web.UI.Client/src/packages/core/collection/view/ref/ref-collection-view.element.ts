@@ -62,7 +62,7 @@ export class UmbRefCollectionViewElement extends UmbLitElement {
 	async #updateItemHrefs() {
 		const hrefs = new Map<string, string>();
 		for (const item of this._items) {
-			const href = await this.#collectionContext?.requestItemHref?.(item);
+			const href = await this.#collectionContext?.requestItemEditPath?.(item);
 			if (href && item.unique) {
 				hrefs.set(item.unique, href);
 			}

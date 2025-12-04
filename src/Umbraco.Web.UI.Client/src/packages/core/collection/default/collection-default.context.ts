@@ -399,7 +399,7 @@ export class UmbDefaultCollectionContext<
 	 * @param {CollectionItemType} item - The collection item to get the href for.
 	 * @returns {Promise<string | undefined>} - The href for the item, or undefined if not available.
 	 */
-	public async requestItemHref(item: CollectionItemType): Promise<string | undefined> {
+	public async requestItemEditPath(item: CollectionItemType): Promise<string | undefined> {
 		return undefined;
 	}
 }

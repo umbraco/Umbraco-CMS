@@ -50,7 +50,7 @@ export interface UmbCollectionContext {
 	setManifest(manifest: ManifestCollection): void;
 	getManifest(): ManifestCollection | undefined;
 	requestCollection(): Promise<void>;
-	requestItemHref?(item: UmbCollectionItemModel): Promise<string | undefined>;
+	requestItemEditPath?(item: UmbCollectionItemModel): Promise<string | undefined>;
 	pagination: UmbPaginationManager;
 	items: Observable<any[]>;
 	totalItems: Observable<number>;
