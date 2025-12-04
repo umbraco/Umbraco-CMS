@@ -124,7 +124,7 @@ public class DocumentUrlServiceTests
 
         // Benchmarking (for NumberOfSegments = 50000):
         //  - Initial implementation (15.4): ~28s
-        //  - Second implementation (up to 17.0): ~75ms
-        //  - Current implementation: ~75ms
+        //  - Previous implementation (versions 15.5 through 17.0, optimized algorithm): ~75ms
+        //  - Current implementation (17.1+, refactored for memory optimization, same performance as previous): ~75ms
     }
 }
