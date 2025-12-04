@@ -78,7 +78,7 @@ export class UmbLanguageTableCollectionViewElement extends UmbLitElement {
 					allowSelection: isSelectable ?? false,
 				};
 			},
-			'umbCollectionHasBulkActionsObserver',
+			'umbCollectionIsSelectableObserver',
 		);
 	}
 
