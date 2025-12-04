@@ -13,7 +13,7 @@ using Umbraco.Cms.Tests.Integration.Testing;
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.IO;
 
 [TestFixture]
-[UmbracoTest]
+[UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
 internal sealed class FileSystemsTests : UmbracoIntegrationTest
 {
     [Test]
@@ -51,12 +51,6 @@ internal sealed class FileSystemsTests : UmbracoIntegrationTest
 
         var scheme = GetRequiredService<IMediaPathScheme>();
         if (scheme is UniqueMediaPathScheme)
-        {
-            // ~/media/1234 is *not* gone
-            physPath = Path.GetDirectoryName(physPath);
-            Assert.IsTrue(Directory.Exists(physPath));
-        }
-        else
         {
             // ~/media/1234 is gone
             physPath = Path.GetDirectoryName(physPath);
