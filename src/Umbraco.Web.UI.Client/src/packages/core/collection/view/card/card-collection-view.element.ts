@@ -17,6 +17,9 @@ export class UmbCardCollectionViewElement extends UmbLitElement {
 	@state()
 	private _itemHrefs: Map<string, string> = new Map();
 
+	@state()
+	private _hasBulkActions = false;
+
 	#collectionContext?: typeof UMB_COLLECTION_CONTEXT.TYPE;
 
 	constructor() {
@@ -29,6 +32,14 @@ export class UmbCardCollectionViewElement extends UmbLitElement {
 				this.#collectionContext?.selection.selection,
 				(selection) => (this._selection = selection ?? []),
 				'umbCollectionSelectionObserver',
+			);
+
+			this.observe(
+				this.#collectionContext?.bulkAction.hasBulkActions,
+				(hasBulkActions) => {
+					this._hasBulkActions = hasBulkActions ?? false;
+				},
+				'umbCollectionHasBulkActionsObserver',
 			);
 
 			this.observe(
@@ -79,7 +90,7 @@ export class UmbCardCollectionViewElement extends UmbLitElement {
 		return html` <umb-entity-collection-item-card
 			.item=${item}
 			href=${href ?? nothing}
-			selectable
+			?selectable=${this._hasBulkActions}
 			?select-only=${this._selection.length > 0}
 			?selected=${this.#collectionContext?.selection.isSelected(item.unique)}
 			@selected=${() => this.#onSelect(item)}

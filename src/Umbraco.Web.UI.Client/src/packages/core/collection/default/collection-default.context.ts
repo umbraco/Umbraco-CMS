@@ -9,6 +9,7 @@ import type {
 import type { UmbCollectionFilterModel } from '../collection-filter-model.interface.js';
 import type { UmbCollectionRepository } from '../repository/collection-repository.interface.js';
 import type { ManifestCollection } from '../extensions/types.js';
+import { UmbCollectionBulkActionManager } from '../bulk-action/collection-bulk-action.manager.js';
 import { UMB_COLLECTION_CONTEXT } from './collection-default.context-token.js';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbArrayState, UmbBasicState, UmbNumberState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
@@ -67,6 +68,7 @@ export class UmbDefaultCollectionContext<
 	public readonly pagination = new UmbPaginationManager();
 	public readonly selection = new UmbSelectionManager(this);
 	public readonly view = new UmbCollectionViewManager(this);
+	public readonly bulkAction = new UmbCollectionBulkActionManager(this);
 
 	#defaultViewAlias: string;
 	#defaultFilter: Partial<FilterModelType>;
