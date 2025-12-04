@@ -48,7 +48,7 @@ public class OEmbedService : IOEmbedService
         catch (Exception e)
         {
             _logger.LogError(e, "Unexpected exception happened while trying to get oEmbed markup. Provider: {Provider}", matchedProvider.GetType().Name);
-            Attempt.FailWithStatus(OEmbedOperationStatus.UnexpectedException, string.Empty, e);
+            return Attempt.FailWithStatus(OEmbedOperationStatus.UnexpectedException, string.Empty, e);
         }
 
         return Attempt.FailWithStatus(OEmbedOperationStatus.ProviderReturnedInvalidResult, string.Empty);

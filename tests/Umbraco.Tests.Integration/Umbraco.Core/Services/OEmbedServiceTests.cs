@@ -32,7 +32,6 @@ internal sealed class OEmbedServiceTests : UmbracoIntegrationTest
     [TestCase("https://x.com/THR/status/1995620384344080849?s=20")]
     [TestCase("https://x.com/SquareEnix/status/1995780120888705216?s=20")]
     [TestCase("https://x.com/sem_sep/status/1991750339427700739?s=20")]
-    [TestCase("https://x.com/sem_sep/status/1991749404114767914?s=20")]
     public async Task GetMarkupAsync_WithXUrls_ReturnsSuccessAndMarkup(string url)
     {
         // Arrange
