@@ -10,13 +10,13 @@ namespace Umbraco.Cms.Api.Management.Configuration;
 /// <summary>
 /// Configures the OpenAPI options for the Umbraco Management API.
 /// </summary>
-public class ConfigureUmbracoManagementApiSwaggerGenOptions : ConfigureUmbracoOpenApiOptionsBase
+public class ConfigureUmbracoManagementApiOpenApiOptions : ConfigureUmbracoOpenApiOptionsBase
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="ConfigureUmbracoManagementApiSwaggerGenOptions"/> class.
+    /// Initializes a new instance of the <see cref="ConfigureUmbracoManagementApiOpenApiOptions"/> class.
     /// </summary>
     /// <param name="schemaIdSelector">The schema ID selector.</param>
-    public ConfigureUmbracoManagementApiSwaggerGenOptions(ISchemaIdSelector schemaIdSelector)
+    public ConfigureUmbracoManagementApiOpenApiOptions(ISchemaIdSelector schemaIdSelector)
         : base(schemaIdSelector)
     {
     }

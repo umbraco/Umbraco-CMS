@@ -10,9 +10,9 @@ using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.Api.Common.OpenApi;
 
-public class SwaggerRouteTemplatePipelineFilter : UmbracoPipelineFilter
+public class OpenApiRouteTemplatePipelineFilter : UmbracoPipelineFilter
 {
-    public SwaggerRouteTemplatePipelineFilter(string name)
+    public OpenApiRouteTemplatePipelineFilter(string name)
         : base(name)
         => PostPipeline = PostPipelineAction;
 

@@ -8,13 +8,13 @@ namespace Umbraco.Cms.Api.Delivery.Configuration;
 /// <summary>
 /// Configures the OpenAPI options for the Umbraco Delivery API.
 /// </summary>
-public class ConfigureUmbracoDeliveryApiSwaggerGenOptions : ConfigureUmbracoOpenApiOptionsBase
+public class ConfigureUmbracoDeliveryApiOpenApiOptions : ConfigureUmbracoOpenApiOptionsBase
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="ConfigureUmbracoDeliveryApiSwaggerGenOptions"/> class.
+    /// Initializes a new instance of the <see cref="ConfigureUmbracoDeliveryApiOpenApiOptions"/> class.
     /// </summary>
     /// <param name="schemaIdSelector">The schema ID selector.</param>
-    public ConfigureUmbracoDeliveryApiSwaggerGenOptions(ISchemaIdSelector schemaIdSelector)
+    public ConfigureUmbracoDeliveryApiOpenApiOptions(ISchemaIdSelector schemaIdSelector)
         : base(schemaIdSelector)
     {
     }

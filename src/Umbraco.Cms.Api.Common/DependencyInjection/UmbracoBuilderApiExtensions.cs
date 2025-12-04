@@ -22,7 +22,7 @@ public static class UmbracoBuilderApiExtensions
 
         builder.Services.AddUmbracoApi<ConfigureDefaultApiOptions>(DefaultApiConfiguration.ApiName, "Default API");
         builder.Services.AddSingleton<IUmbracoJsonTypeInfoResolver, UmbracoJsonTypeInfoResolver>();
-        builder.Services.Configure<UmbracoPipelineOptions>(options => options.AddFilter(new SwaggerRouteTemplatePipelineFilter("UmbracoApiCommon")));
+        builder.Services.Configure<UmbracoPipelineOptions>(options => options.AddFilter(new OpenApiRouteTemplatePipelineFilter("UmbracoApiCommon")));
         builder.Services.AddSingleton<ISchemaIdSelector, SchemaIdSelector>();
         builder.Services.AddSingleton<ISchemaIdHandler, SchemaIdHandler>();
 
@@ -48,7 +48,7 @@ public static class UmbracoBuilderApiExtensions
         services.AddOptions<SwaggerUIOptions>()
             .Configure<IServiceProvider>((swaggerUiOptions, sp) =>
             {
-                SwaggerRouteTemplatePipelineFilter? swaggerPipelineFilter = sp.GetRequiredService<IOptions<UmbracoPipelineOptions>>().Value.PipelineFilters.OfType<SwaggerRouteTemplatePipelineFilter>().FirstOrDefault();
+                OpenApiRouteTemplatePipelineFilter? swaggerPipelineFilter = sp.GetRequiredService<IOptions<UmbracoPipelineOptions>>().Value.PipelineFilters.OfType<OpenApiRouteTemplatePipelineFilter>().FirstOrDefault();
                 if (swaggerPipelineFilter is null)
                 {
                     return;
