@@ -86,7 +86,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	private readonly _extensions: Array<UmbTiptapExtensionApi> = [];
 
 	@state()
-	private _styles: Array<CSSResultGroup> = [];
+	private _extensionStyles?: CSSResultGroup;
 
 	@state()
 	private _toolbar: UmbTiptapToolbarValue = [[[]]];
@@ -159,6 +159,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 		}
 
 		const tiptapExtensions: Extensions = [];
+		const collectedStyles: Array<CSSResultGroup> = [];
 
 		this._extensions.forEach((ext) => {
 			const tiptapExt = ext.getTiptapExtensions({ configuration: this.configuration });
@@ -168,10 +169,13 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 
 			const styles = ext.getStyles();
 			if (styles) {
-				this._styles.push(styles);
+				collectedStyles.push(styles);
 			}
 		});
 
+		if (collectedStyles.length) {
+			this._extensionStyles = unsafeCSS(collectedStyles.map((s) => s.toString()).join(''));
+		}
 
 		this._toolbar = this.configuration?.getValueByAlias<UmbTiptapToolbarValue>('toolbar') ?? [[[]]];
 		this._statusbar = this.configuration?.getValueByAlias<UmbTiptapStatusbarValue>('statusbar') ?? [];
@@ -218,7 +222,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	}
 
 	#renderStyles() {
-		if (!this._styles?.length) return;
+		if (!this._extensionStyles) return;
 		return html`
 			${repeat(
 				this.#stylesheets,
@@ -226,7 +230,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 				(stylesheet) => html`<link rel="stylesheet" href=${stylesheet} />`,
 			)}
 			<style>
-				${this._styles.map((style) => unsafeCSS(style))}
+				${this._extensionStyles}
 			</style>
 		`;
 	}
