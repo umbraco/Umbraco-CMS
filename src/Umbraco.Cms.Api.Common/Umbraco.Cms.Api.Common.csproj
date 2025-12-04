@@ -21,4 +21,10 @@
     <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj" />
     <ProjectReference Include="..\Umbraco.Web.Common\Umbraco.Web.Common.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>Umbraco.Tests.UnitTests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
 </Project>
