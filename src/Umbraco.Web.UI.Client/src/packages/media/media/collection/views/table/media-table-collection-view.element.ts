@@ -15,7 +15,10 @@ import type {
 	UmbTableSelectedEvent,
 } from '@umbraco-cms/backoffice/components';
 
+import './column-layouts/media-entity-actions-table-column-view.element.js';
 import './column-layouts/media-table-column-name.element.js';
+import './column-layouts/media-table-column-property-value.element.js';
+import './column-layouts/media-table-column-system-value.element.js';
 
 @customElement('umb-media-table-collection-view')
 export class UmbMediaTableCollectionViewElement extends UmbLitElement {
@@ -95,7 +98,9 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 				return {
 					name: this.localize.string(item.header),
 					alias: item.alias,
-					elementName: item.elementName,
+					elementName:
+						item.elementName ||
+						(item.isSystem ? 'umb-media-table-column-system-value' : 'umb-media-table-column-property-value'),
 					labelTemplate: item.nameTemplate,
 					allowSorting: true,
 				};
@@ -128,12 +133,8 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 					if (column.alias === 'entityActions') {
 						return {
 							columnAlias: 'entityActions',
-							value: html`<umb-entity-actions-table-column-view
-								.value=${{
-									entityType: item.entityType,
-									unique: item.unique,
-									name: item.name,
-								}}></umb-entity-actions-table-column-view>`,
+							value: html`<umb-media-entity-actions-table-column-view
+								.value=${item}></umb-media-entity-actions-table-column-view>`,
 						};
 					}
 
@@ -143,7 +144,7 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 
 					return {
 						columnAlias: column.alias,
-						value: column.elementName ? { item, editPath } : this.#getPropertyValueByAlias(item, column.alias),
+						value: { item, editPath },
 					};
 				}) ?? [];
 
@@ -154,28 +155,6 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 				data: data,
 			};
 		});
-	}
-
-	#getPropertyValueByAlias(item: UmbMediaCollectionItemModel, alias: string) {
-		switch (alias) {
-			case 'contentTypeAlias':
-				return item.contentTypeAlias;
-			case 'createDate':
-				return item.createDate.toLocaleString();
-			case 'name':
-				return item.name;
-			case 'creator':
-			case 'owner':
-				return item.creator;
-			case 'sortOrder':
-				return item.sortOrder;
-			case 'updateDate':
-				return item.updateDate.toLocaleString();
-			case 'updater':
-				return item.updater;
-			default:
-				return item.values?.find((value) => value.alias === alias)?.value ?? '';
-		}
 	}
 
 	#handleSelect(event: UmbTableSelectedEvent) {

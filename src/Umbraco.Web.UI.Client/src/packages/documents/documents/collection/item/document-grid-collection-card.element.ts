@@ -1,25 +1,20 @@
-import { UmbDocumentItemDataResolver } from '../../item/document-item-data-resolver.js';
+import { UmbDocumentCollectionItemDataResolver } from '../document-collection-item-data-resolver.js';
 import type { UmbDocumentCollectionItemModel } from '../types.js';
-import { css, customElement, html, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
-import { fromCamelCase } from '@umbraco-cms/backoffice/utils';
+import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { fromCamelCase, stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
 import { UUICardContentNodeElement } from '@umbraco-cms/backoffice/external/uui';
+import type { ManifestPropertyValuePresentation } from '@umbraco-cms/backoffice/property-value-presentation';
 import type { UmbCollectionColumnConfiguration } from '@umbraco-cms/backoffice/collection';
 import type { UUIInterfaceColor } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-document-grid-collection-card')
 export class UmbDocumentGridCollectionCardElement extends UmbElementMixin(UUICardContentNodeElement) {
-	#resolver = new UmbDocumentItemDataResolver(this);
-
-	@state()
-	private _createDate?: Date;
+	#resolver = new UmbDocumentCollectionItemDataResolver(this);
 
 	@state()
 	private _state?: string;
-
-	@state()
-	private _updateDate?: Date;
 
 	@property({ attribute: false })
 	columns?: Array<UmbCollectionColumnConfiguration>;
@@ -41,37 +36,6 @@ export class UmbDocumentGridCollectionCardElement extends UmbElementMixin(UUICar
 
 		this.#resolver.observe(this.#resolver.name, (name) => (this.name = name || ''));
 		this.#resolver.observe(this.#resolver.state, (state) => (this._state = state || ''));
-		this.#resolver.observe(this.#resolver.createDate, (createDate) => (this._createDate = createDate));
-		this.#resolver.observe(this.#resolver.updateDate, (updateDate) => (this._updateDate = updateDate));
-	}
-
-	#getPropertyValueByAlias(alias: string) {
-		switch (alias) {
-			case 'contentTypeAlias':
-				return this.item.documentType.alias;
-			case 'createDate':
-				return this._createDate?.toLocaleString();
-			case 'creator':
-			case 'owner':
-				return this.item.creator;
-			case 'name':
-				return this.name;
-			case 'state':
-				return this._state ? fromCamelCase(this._state) : '';
-			case 'published':
-				return this._state !== DocumentVariantStateModel.DRAFT ? 'True' : 'False';
-			case 'sortOrder':
-				return this.item.sortOrder;
-			case 'updateDate':
-				return this._updateDate?.toLocaleString();
-			case 'updater':
-				return this.item.updater;
-			default: {
-				const culture = this.#resolver.getCulture();
-				const prop = this.item.values.find((x) => x.alias === alias && (!x.culture || x.culture === culture));
-				return prop?.value ?? '';
-			}
-		}
 	}
 
 	#getStateTagConfig(): { color: UUIInterfaceColor; label: string } | undefined {
@@ -121,14 +85,37 @@ export class UmbDocumentGridCollectionCardElement extends UmbElementMixin(UUICar
 	}
 
 	#renderProperty(column: UmbCollectionColumnConfiguration) {
-		const value = this.#getPropertyValueByAlias(column.alias);
+		let value: string | number | null | undefined;
+		let editorAlias: string | null | undefined;
+
+		if (column.isSystem) {
+			value = this.#resolver.getSystemValue(column.alias);
+		} else {
+			const prop = this.#resolver.getPropertyByAlias(column.alias);
+			editorAlias = prop?.editorAlias;
+			value = prop?.value;
+		}
+
 		return html`
 			<li>
 				<span>${this.localize.string(column.header)}:</span>
 				${when(
 					column.nameTemplate,
 					() => html`<umb-ufm-render inline .markdown=${column.nameTemplate} .value=${{ value }}></umb-ufm-render>`,
-					() => html`${value}`,
+					() =>
+						when(
+							editorAlias,
+							(schemaAlias) => html`
+								<umb-extension-slot
+									type="propertyValuePresentation"
+									.filter=${(m: ManifestPropertyValuePresentation) =>
+										stringOrStringArrayContains(m.forPropertyEditorSchemaAlias, schemaAlias)}
+									.props=${{ value }}>
+									${value ?? nothing}
+								</umb-extension-slot>
+							`,
+							() => (value ? html`${value}` : nothing),
+						),
 				)}
 			</li>
 		`;
