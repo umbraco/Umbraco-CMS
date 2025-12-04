@@ -1,5 +1,5 @@
 import {expect} from "@playwright/test";
-import {AliasHelper, ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {AliasHelper, ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 
 const mediaTypeName = 'TestMediaType';
 
@@ -55,6 +55,7 @@ test('can update the alias for a media type', async ({umbracoApi, umbracoUi}) =>
 
   // Act
   await umbracoUi.mediaType.goToMediaType(mediaTypeName);
+  await umbracoUi.waitForTimeout(500);
   await umbracoUi.mediaType.enterAliasName(updatedAlias);
   await umbracoUi.mediaType.clickSaveButton();
 
