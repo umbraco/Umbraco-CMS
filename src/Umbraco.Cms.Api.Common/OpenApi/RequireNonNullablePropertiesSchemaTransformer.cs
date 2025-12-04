@@ -12,8 +12,6 @@ namespace Umbraco.Cms.Api.Common.OpenApi;
 /// Non-nullable reference types were not taken into account.</remarks>
 internal class RequireNonNullablePropertiesSchemaTransformer : IOpenApiSchemaTransformer
 {
-    private static readonly NullabilityInfoContext _nullabilityContext = new();
-
     /// <inheritdoc />
     public Task TransformAsync(OpenApiSchema schema, OpenApiSchemaTransformerContext context, CancellationToken cancellationToken)
     {
