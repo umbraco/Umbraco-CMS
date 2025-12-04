@@ -53,7 +53,7 @@ public class ContentTypeSchemaServiceTests
         // Assert
         Assert.That(result, Has.Count.EqualTo(1));
         Assert.That(result.First().Alias, Is.EqualTo("cachedType"));
-        Assert.That(result.First().SchemaId, Is.EqualTo("SAFE-ALIAS::cachedType"));
+        Assert.That(result.First().SchemaId, Is.EqualTo("CLEAN-STRING-A::cachedType"));
     }
 
     [Test]
@@ -103,10 +103,10 @@ public class ContentTypeSchemaServiceTests
         // Act
         var result = _sut.GetDocumentTypes();
 
-        // Assert - MockShortStringHelper prefixes with "SAFE-ALIAS::"
+        // Assert - MockShortStringHelper prefixes with "CLEAN-STRING-A::"
         var schema = result.First();
-        Assert.That(schema.SchemaId, Is.EqualTo("SAFE-ALIAS::articlePage"));
-        Assert.That(schema.CompositionSchemaIds, Is.EquivalentTo(new[] { "SAFE-ALIAS::basePage", "SAFE-ALIAS::seoComposition" }));
+        Assert.That(schema.SchemaId, Is.EqualTo("CLEAN-STRING-A::articlePage"));
+        Assert.That(schema.CompositionSchemaIds, Is.EquivalentTo(new[] { "CLEAN-STRING-A::basePage", "CLEAN-STRING-A::seoComposition" }));
     }
 
     [Test]
@@ -175,6 +175,6 @@ public class ContentTypeSchemaServiceTests
         // Assert
         Assert.That(result, Has.Count.EqualTo(1));
         Assert.That(result.First().Alias, Is.EqualTo("cachedType"));
-        Assert.That(result.First().SchemaId, Is.EqualTo("SAFE-ALIAS::cachedType"));
+        Assert.That(result.First().SchemaId, Is.EqualTo("CLEAN-STRING-A::cachedType"));
     }
 }
