@@ -40,12 +40,6 @@ internal class RequireNonNullablePropertiesSchemaTransformer : IOpenApiSchemaTra
             return schemaProperty?.Type is { } propertyType && propertyType.HasFlag(JsonSchemaType.Null) is false;
         }
 
-        if (property.AttributeProvider is not PropertyInfo propInfo)
-        {
-            return false;
-        }
-
-        NullabilityInfo nullability = _nullabilityContext.Create(propInfo);
-        return nullability.ReadState == NullabilityState.NotNull;
+        return property.IsGetNullable is false;
     }
 }
