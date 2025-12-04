@@ -193,7 +193,6 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		const query = (event.target.value as string) ?? '';
 		if (query.startsWith('#') || query.startsWith('?')) {
 			this.#partialUpdateLink({ queryString: query });
-			this.#validationContext.messages.removeMessageByKey('UmbLinkPickerValueValidator');
 			return;
 		}
 
@@ -204,7 +203,6 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		} else {
 			this.#partialUpdateLink({ queryString: '' });
 		}
-		this.#validationContext.messages.removeMessageByKey('UmbLinkPickerValueValidator');
 	}
 
 	#onLinkTitleInput(event: UUIInputEvent) {
@@ -235,7 +233,6 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 			type: 'external',
 			url,
 		});
-		this.#validationContext.messages.removeMessageByKey('UmbLinkPickerValueValidator');
 	}
 
 	async #onPickerSelection(event: UmbInputPickerEvent, type: 'document' | 'media') {
