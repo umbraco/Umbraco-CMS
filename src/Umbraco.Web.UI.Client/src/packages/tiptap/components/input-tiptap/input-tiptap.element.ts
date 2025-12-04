@@ -1,6 +1,6 @@
 import { Editor } from '../../externals.js';
 import { UmbTiptapRteContext } from '../../contexts/tiptap-rte.context.js';
-import type { Extensions } from '../../externals.js';
+import type { AnyExtension } from '../../externals.js';
 import type { UmbTiptapExtensionApi } from '../../extensions/types.js';
 import type { UmbTiptapStatusbarValue, UmbTiptapToolbarValue } from '../types.js';
 import {
@@ -156,12 +156,16 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 		this._toolbar = this.configuration?.getValueByAlias<UmbTiptapToolbarValue>('toolbar') ?? [[[]]];
 		this._statusbar = this.configuration?.getValueByAlias<UmbTiptapStatusbarValue>('statusbar') ?? [];
 
-		const tiptapExtensions: Extensions = [];
+		const tiptapExtensions = new Map<string, AnyExtension>();
 
 		this._extensions.forEach((ext) => {
 			const tiptapExt = ext.getTiptapExtensions({ configuration: this.configuration });
 			if (tiptapExt?.length) {
-				tiptapExtensions.push(...tiptapExt);
+				tiptapExt.forEach((extension) => {
+					if (!tiptapExtensions.has(extension.name)) {
+						tiptapExtensions.set(extension.name, extension);
+					}
+				});
 			}
 
 			const styles = ext.getStyles();
@@ -179,7 +183,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 					'aria-required': this.required ? 'true' : 'false',
 				},
 			},
-			extensions: tiptapExtensions,
+			extensions: Array.from(tiptapExtensions.values()),
 			content: this.#value,
 			injectCSS: false, // Prevents injecting CSS into `window.document`, as it never applies to the shadow DOM. [LK]
 			//enableContentCheck: true,
