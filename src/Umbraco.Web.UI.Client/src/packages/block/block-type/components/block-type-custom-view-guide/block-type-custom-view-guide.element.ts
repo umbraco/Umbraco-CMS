@@ -37,9 +37,8 @@ export class UmbBlockTypeCustomViewGuideElement extends UmbLitElement {
 				await context?.propertyValueByAlias<string | undefined>('contentElementTypeKey'),
 				async (value) => {
 					if (!value) return;
-					const { asObservable } = await this.#repository.requestByUnique(value);
 					this.observe(
-						asObservable(),
+						(await this.#repository.requestByUnique(value)).asObservable?.(),
 						(model) => {
 							this.#contentTypeName = model?.name;
 							this.#contentTypeAlias = model?.alias;

@@ -110,15 +110,6 @@ export type UmbSorterResolvePlacementArgs<T, ElementType extends HTMLElement = H
 	pointerY: number;
 };
 
-/**
- * @deprecated will be removed in v.17, use `UmbSorterResolvePlacementArgs`
- */
-// eslint-disable-next-line @typescript-eslint/naming-convention
-export type resolvePlacementArgs<T, ElementType extends HTMLElement = HTMLElement> = UmbSorterResolvePlacementArgs<
-	T,
-	ElementType
->;
-
 type UniqueType = string | symbol | number;
 
 /**
@@ -247,7 +238,6 @@ export type UmbSorterConfig<T, ElementType extends HTMLElement = HTMLElement> = 
 	Partial<Pick<INTERNAL_UmbSorterConfig<T, ElementType>, 'ignorerSelector' | 'containerSelector' | 'identifier'>>;
 
 /**
- 
  * @class UmbSorterController
  * @implements {UmbControllerInterface}
  * @description This controller can make user able to sort items.

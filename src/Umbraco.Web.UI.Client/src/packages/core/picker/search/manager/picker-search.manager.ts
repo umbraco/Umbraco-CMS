@@ -1,10 +1,9 @@
 import type { UmbPickerSearchManagerConfig } from './types.js';
-import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbArrayState, UmbBooleanState, UmbNumberState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbSearchProvider, UmbSearchRequestArgs, UmbSearchResultItemModel } from '@umbraco-cms/backoffice/search';
 import { debounce } from '@umbraco-cms/backoffice/utils';
+import { UmbArrayState, UmbBooleanState, UmbNumberState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import type { UmbSearchProvider, UmbSearchRequestArgs, UmbSearchResultItemModel } from '@umbraco-cms/backoffice/search';
 
 /**
  * A manager for searching items in a picker.
@@ -35,15 +34,6 @@ export class UmbPickerSearchManager<
 
 	#config?: UmbPickerSearchManagerConfig;
 	#searchProvider?: UmbSearchProvider<UmbSearchResultItemModel, SearchRequestArgsType>;
-
-	/**
-	 * Creates an instance of UmbPickerSearchManager.
-	 * @param {UmbControllerHost} host The controller host for the search manager.
-	 * @memberof UmbPickerSearchManager
-	 */
-	constructor(host: UmbControllerHost) {
-		super(host);
-	}
 
 	/**
 	 * Set the configuration for the search manager.
@@ -187,6 +177,7 @@ export class UmbPickerSearchManager<
 			// ensure that config params are always included
 			...this.#config?.queryParams,
 			searchFrom: this.#config?.searchFrom,
+			// TODO: Move this implementation to another place. The generic picker search manager shouldn't be aware of data types.
 			dataTypeUnique: this.#config?.dataTypeUnique,
 		};
 

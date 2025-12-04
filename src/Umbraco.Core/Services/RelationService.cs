@@ -1,4 +1,6 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -13,7 +15,7 @@ namespace Umbraco.Cms.Core.Services;
 
 public class RelationService : RepositoryService, IRelationService
 {
-    private readonly IAuditRepository _auditRepository;
+    private readonly IAuditService _auditService;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly IEntityService _entityService;
     private readonly IRelationRepository _relationRepository;
@@ -26,15 +28,60 @@ public class RelationService : RepositoryService, IRelationService
         IEntityService entityService,
         IRelationRepository relationRepository,
         IRelationTypeRepository relationTypeRepository,
-        IAuditRepository auditRepository,
+        IAuditService auditService,
         IUserIdKeyResolver userIdKeyResolver)
         : base(uowProvider, loggerFactory, eventMessagesFactory)
     {
         _relationRepository = relationRepository;
         _relationTypeRepository = relationTypeRepository;
-        _auditRepository = auditRepository;
+        _auditService = auditService;
         _userIdKeyResolver = userIdKeyResolver;
         _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
+    }
+
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+    public RelationService(
+        ICoreScopeProvider uowProvider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IEntityService entityService,
+        IRelationRepository relationRepository,
+        IRelationTypeRepository relationTypeRepository,
+        IAuditRepository auditRepository,
+        IUserIdKeyResolver userIdKeyResolver)
+        : this(
+            uowProvider,
+            loggerFactory,
+            eventMessagesFactory,
+            entityService,
+            relationRepository,
+            relationTypeRepository,
+            StaticServiceProvider.Instance.GetRequiredService<IAuditService>(),
+            userIdKeyResolver)
+    {
+    }
+
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+    public RelationService(
+        ICoreScopeProvider uowProvider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IEntityService entityService,
+        IRelationRepository relationRepository,
+        IRelationTypeRepository relationTypeRepository,
+        IAuditService auditService,
+        IAuditRepository auditRepository,
+        IUserIdKeyResolver userIdKeyResolver)
+        : this(
+            uowProvider,
+            loggerFactory,
+            eventMessagesFactory,
+            entityService,
+            relationRepository,
+            relationTypeRepository,
+            auditService,
+            userIdKeyResolver)
+    {
     }
 
     /// <inheritdoc />
@@ -438,11 +485,14 @@ public class RelationService : RepositoryService, IRelationService
         return _relationRepository.Get(query).Any();
     }
 
-    /// <inheritdoc />
-    public bool IsRelated(int id) => IsRelated(id, RelationDirectionFilter.Any);
+    [Obsolete("No longer used in Umbraco, please the overload taking all parameters. Scheduled for removal in Umbraco 19.")]
+    public bool IsRelated(int id) => IsRelated(id, RelationDirectionFilter.Any, null, null);
+
+    [Obsolete("Please the overload taking all parameters. Scheduled for removal in Umbraco 18.")]
+    public bool IsRelated(int id, RelationDirectionFilter directionFilter) => IsRelated(id, directionFilter, null, null);
 
     /// <inheritdoc />
-    public bool IsRelated(int id, RelationDirectionFilter directionFilter)
+    public bool IsRelated(int id, RelationDirectionFilter directionFilter, int[]? includeRelationTypeIds = null, int[]? excludeRelationTypeIds = null)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
         IQuery<IRelation> query = Query<IRelation>();
@@ -454,6 +504,16 @@ public class RelationService : RepositoryService, IRelationService
             RelationDirectionFilter.Any => query.Where(x => x.ParentId == id || x.ChildId == id),
             _ => throw new ArgumentOutOfRangeException(nameof(directionFilter)),
         };
+
+        if (includeRelationTypeIds is not null && includeRelationTypeIds.Length > 0)
+        {
+            query = query.WhereIn(x => x.RelationTypeId, includeRelationTypeIds);
+        }
+
+        if (excludeRelationTypeIds is not null && excludeRelationTypeIds.Length > 0)
+        {
+            query = query.WhereNotIn(x => x.RelationTypeId, excludeRelationTypeIds);
+        }
 
         return _relationRepository.Get(query).Any();
     }
@@ -601,8 +661,7 @@ public class RelationService : RepositoryService, IRelationService
             }
 
             _relationTypeRepository.Save(relationType);
-            var currentUser = await _userIdKeyResolver.GetAsync(userKey);
-            Audit(auditType, currentUser, relationType.Id, auditMessage);
+            await AuditAsync(auditType, userKey, relationType.Id, auditMessage);
             scope.Complete();
             scope.Notifications.Publish(
                 new RelationTypeSavedNotification(relationType, eventMessages).WithStateFrom(savingNotification));
@@ -666,8 +725,7 @@ public class RelationService : RepositoryService, IRelationService
         }
 
         _relationTypeRepository.Delete(relationType);
-        var currentUser = await _userIdKeyResolver.GetAsync(userKey);
-        Audit(AuditType.Delete, currentUser, relationType.Id, "Deleted relation type");
+        await AuditAsync(AuditType.Delete, userKey, relationType.Id, "Deleted relation type");
         scope.Notifications.Publish(new RelationTypeDeletedNotification(relationType, eventMessages).WithStateFrom(deletingNotification));
         scope.Complete();
         return Attempt.SucceedWithStatus<IRelationType?, RelationTypeOperationStatus>(RelationTypeOperationStatus.Success, relationType);
@@ -744,7 +802,23 @@ public class RelationService : RepositoryService, IRelationService
     }
 
     private void Audit(AuditType type, int userId, int objectId, string? message = null) =>
-        _auditRepository.Save(new AuditItem(objectId, type, userId, UmbracoObjectTypes.RelationType.GetName(), message));
+        AuditAsync(type, userId, objectId, message).GetAwaiter().GetResult();
+
+    private async Task AuditAsync(AuditType type, int userId, int objectId, string? message = null, string? parameters = null)
+    {
+        Guid userKey = await _userIdKeyResolver.GetAsync(userId);
+
+        await AuditAsync(type, userKey, objectId, message, parameters);
+    }
+
+    private async Task AuditAsync(AuditType type, Guid userKey, int objectId, string? message = null, string? parameters = null) =>
+        await _auditService.AddAsync(
+            type,
+            userKey,
+            objectId,
+            UmbracoObjectTypes.RelationType.GetName(),
+            message,
+            parameters);
 
     #endregion
 }

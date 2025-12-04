@@ -1,9 +1,8 @@
 import { UmbTiptapExtensionApiBase } from '../tiptap-extension-api-base.js';
+import { Anchor } from './anchor.tiptap-extension.js';
 import { css } from '@umbraco-cms/backoffice/external/lit';
-import { Anchor } from '@umbraco-cms/backoffice/external/tiptap';
 
 export default class UmbTiptapAnchorExtensionApi extends UmbTiptapExtensionApiBase {
-	// eslint-disable-next-line @typescript-eslint/no-deprecated
 	getTiptapExtensions = () => [Anchor];
 
 	override getStyles = () => css`

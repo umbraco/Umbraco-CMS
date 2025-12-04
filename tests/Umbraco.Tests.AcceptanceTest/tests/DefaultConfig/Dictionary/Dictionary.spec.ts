@@ -46,12 +46,12 @@ test('can delete a dictionary item', async ({umbracoApi, umbracoUi}) => {
   // Assert
   await umbracoUi.dictionary.waitForDictionaryToBeDeleted();
   await umbracoUi.dictionary.isErrorNotificationVisible(false);
-  expect(await umbracoApi.dictionary.doesNameExist(dictionaryName)).toBeFalsy();
   // Verify the dictionary item does not display in the tree
   await umbracoUi.dictionary.isDictionaryTreeItemVisible(dictionaryName, false);
   // Verify the dictionary item does not display in the list
   await umbracoUi.reloadPage();
   await umbracoUi.dictionary.doesDictionaryCollectionContainText('No items');
+  expect(await umbracoApi.dictionary.doesNameExist(dictionaryName)).toBeFalsy();
 });
 
 test('can create a dictionary item in a dictionary', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {

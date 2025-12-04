@@ -1,15 +1,12 @@
 import type { UmbValidator } from '../interfaces/validator.interface.js';
 import type { UmbValidationMessageTranslator } from '../translators/index.js';
-import { GetValueByJsonPath } from '../utils/json-path.function.js';
 import { UMB_VALIDATION_CONTEXT } from '../context/validation.context-token.js';
 import { type UmbValidationMessage, UmbValidationMessagesManager } from '../context/validation-messages.manager.js';
 import { ReplaceStartOfPath } from '../utils/replace-start-of-path.function.js';
 import type { UmbVariantId } from '../../variant/variant-id.class.js';
-import { UmbDeprecation } from '../../utils/deprecation/deprecation.js';
 import type { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 import { type UmbClassInterface, UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 
 const Regex = /@\.culture == ('[^']*'|null) *&& *@\.segment == ('[^']*'|null)/g;
 
@@ -26,38 +23,6 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 		UmbValidationController
 	>;
 	#inUnprovidingState: boolean = false;
-
-	// @deprecated - Will be removed in v.17
-	// Local version of the data send to the server, only use-case is for translation.
-	#translationData = new UmbObjectState<any>(undefined);
-	/**
-	 * @param path
-	 * @deprecated Use extension type 'propertyValidationPathTranslator' instead. Will be removed in v.17
-	 * @returns {any} - Returns the translation data for the given path.
-	 */
-	translationDataOf(path: string): any {
-		return this.#translationData.asObservablePart((data) => GetValueByJsonPath(data, path));
-	}
-	/**
-	 * @param {any} data - The translation data to set.
-	 * @deprecated Use extension type 'propertyValidationPathTranslator' instead. Will be removed in v.17
-	 */
-	setTranslationData(data: any): void {
-		this.#translationData.setValue(data);
-	}
-	/**
-	 * @deprecated Use extension type 'propertyValidationPathTranslator' instead. Will be removed in v.17
-	 * @returns {any} - Returns the translation data for the given path.
-	 */
-	getTranslationData(): any {
-		new UmbDeprecation({
-			removeInVersion: '17',
-			deprecated: 'getTranslationData',
-			solution: 'getTranslationData is deprecated.',
-		}).warn();
-
-		return this.#translationData.getValue();
-	}
 
 	#validators: Array<UmbValidator> = [];
 	#validationMode: boolean = false;
@@ -203,15 +168,6 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 		this.#baseDataPath = dataPath;
 		this.#readyToSync();
 
-		// @deprecated - Will be removed in v.17
-		this.observe(
-			parent?.translationDataOf(dataPath),
-			(data) => {
-				this.setTranslationData(data);
-			},
-			'observeTranslationData',
-		);
-
 		this.observe(
 			parent?.messages.messagesOfPathAndDescendant(dataPath),
 			(msgs) => {
@@ -257,7 +213,6 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 		}
 		this.messages.clear();
 		this.#localMessages = undefined;
-		this.setTranslationData(undefined);
 	}
 
 	#readyToSync() {
@@ -355,7 +310,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 		this.#validators.push(validator);
 		//validator.addEventListener('change', this.#onValidatorChange);
 		if (this.#validationMode) {
-			this.validate();
+			this.validate().catch(() => undefined);
 		}
 	}
 
@@ -413,7 +368,9 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 			if (hasMessages === false && resultsStatus === false) {
 				const notValidValidators = this.#validators.filter((v) => v.isValid === false);
 				console.warn(
-					'Missing validation messages to represent why a child validation context is invalid. These Validators was not valid, one of these did not set a message to represent their state:',
+					`Missing validation messages to represent why a child validation context is invalid.
+					This could be because the Validator does not have a 'data-path' and therefore not able to set a message to the Validation Context.
+					These Validators was not valid, one of these did not set a message to represent their state:`,
 					notValidValidators,
 				);
 			}

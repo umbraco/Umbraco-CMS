@@ -14,6 +14,9 @@ export class UmbRefListBlockElement extends UmbLitElement {
 	@property({ type: String, reflect: false })
 	icon?: string;
 
+	@property({ type: Number, attribute: false })
+	index?: number;
+
 	@property({ type: Boolean, reflect: true })
 	unpublished?: boolean;
 
@@ -27,9 +30,12 @@ export class UmbRefListBlockElement extends UmbLitElement {
 	config?: UmbBlockEditorCustomViewConfiguration;
 
 	override render() {
-		const blockValue = { ...this.content, $settings: this.settings };
+		const blockValue = { ...this.content, $settings: this.settings, $index: this.index };
 		return html`
-			<uui-ref-node standalone href=${(this.config?.showContentEdit ? this.config?.editContentPath : undefined) ?? ''}>
+			<uui-ref-node
+				standalone
+				.readonly=${!(this.config?.showContentEdit ?? false)}
+				.href=${this.config?.showContentEdit ? this.config?.editContentPath : undefined}>
 				<umb-icon slot="icon" .name=${this.icon}></umb-icon>
 				<umb-ufm-render slot="name" inline .markdown=${this.label} .value=${blockValue}></umb-ufm-render>
 				${when(
@@ -54,6 +60,11 @@ export class UmbRefListBlockElement extends UmbLitElement {
 				margin-top: -0.3em;
 				vertical-align: text-top;
 			}
+
+			umb-ufm-render {
+				user-select: none;
+			}
+
 			:host([unpublished]) umb-icon,
 			:host([unpublished]) umb-ufm-render {
 				opacity: 0.6;

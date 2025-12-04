@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
 
 namespace Umbraco.Cms.Core.Templates;
@@ -14,15 +15,15 @@ public sealed class HtmlLocalLinkParser
     // <a type="document" href="/{localLink:eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f}" title="other page">other page</a>
     internal static readonly Regex LocalLinkTagPattern = new(
         @"<a.+?href=['""](?<locallink>\/?{localLink:(?<guid>[a-fA-F0-9-]+)})[^>]*?>",
-        RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline);
+        RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
 
     internal static readonly Regex TypePattern = new(
         """type=['"](?<type>(?:media|document))['"]""",
-        RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+        RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
     internal static readonly Regex LocalLinkPattern = new(
         @"href=['""](?<locallink>\/?(?:\{|\%7B)localLink:(?<guid>[a-zA-Z0-9-://]+)(?:\}|\%7D))",
-        RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+        RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
     private readonly IPublishedUrlProvider _publishedUrlProvider;
 
@@ -45,17 +46,18 @@ public sealed class HtmlLocalLinkParser
     /// <summary>
     ///     Parses the string looking for the {localLink} syntax and updates them to their correct links.
     /// </summary>
-    /// <param name="text"></param>
-    /// <param name="preview"></param>
-    /// <returns></returns>
+    [Obsolete("This method overload is no longer used in Umbraco and delegates to the overload without the preview parameter. Scheduled for removal in Umbraco 18.")]
     public string EnsureInternalLinks(string text, bool preview) => EnsureInternalLinks(text);
 
     /// <summary>
     ///     Parses the string looking for the {localLink} syntax and updates them to their correct links.
     /// </summary>
-    /// <param name="text"></param>
-    /// <returns></returns>
-    public string EnsureInternalLinks(string text)
+    public string EnsureInternalLinks(string text) => EnsureInternalLinks(text, UrlMode.Default);
+
+    /// <summary>
+    ///     Parses the string looking for the {localLink} syntax and updates them to their correct links.
+    /// </summary>
+    public string EnsureInternalLinks(string text, UrlMode urlMode)
     {
         foreach (LocalLinkTag tagData in FindLocalLinkIds(text))
         {
@@ -63,8 +65,8 @@ public sealed class HtmlLocalLinkParser
             {
                 var newLink = tagData.Udi?.EntityType switch
                 {
-                    Constants.UdiEntityType.Document => _publishedUrlProvider.GetUrl(tagData.Udi.Guid),
-                    Constants.UdiEntityType.Media => _publishedUrlProvider.GetMediaUrl(tagData.Udi.Guid),
+                    Constants.UdiEntityType.Document => _publishedUrlProvider.GetUrl(tagData.Udi.Guid, urlMode),
+                    Constants.UdiEntityType.Media => _publishedUrlProvider.GetMediaUrl(tagData.Udi.Guid, urlMode),
                     _ => string.Empty,
                 };
 
@@ -73,7 +75,7 @@ public sealed class HtmlLocalLinkParser
             }
             else if (tagData.IntId.HasValue)
             {
-                var newLink = _publishedUrlProvider.GetUrl(tagData.IntId.Value);
+                var newLink = _publishedUrlProvider.GetUrl(tagData.IntId.Value, urlMode);
                 text = text.Replace(tagData.TagHref, newLink);
             }
         }
@@ -117,7 +119,7 @@ public sealed class HtmlLocalLinkParser
         }
     }
 
-    [Obsolete("This is a temporary method to support legacy formats until we are sure all data has been migration. Scheduled for removal in v17")]
+    [Obsolete("This is a temporary method to support legacy formats until we are sure all data has been migration. Scheduled for removal in v18")]
     public IEnumerable<LocalLinkTag> FindLegacyLocalLinkIds(string text)
     {
         // Parse internal links
@@ -147,7 +149,7 @@ public sealed class HtmlLocalLinkParser
         }
     }
 
-    [Obsolete("This is a temporary method to support legacy formats until we are sure all data has been migration. Scheduled for removal in v17")]
+    [Obsolete("This is a temporary method to support legacy formats until we are sure all data has been migration. Scheduled for removal in v18")]
     public class LocalLinkTag
     {
         public LocalLinkTag(int? intId, GuidUdi? udi, string tagHref)

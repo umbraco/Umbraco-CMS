@@ -25,7 +25,7 @@ import {
 	UmbFormControlMixin,
 	UmbValidationContext,
 } from '@umbraco-cms/backoffice/validation';
-import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import { jsonStringComparison, observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
 import { UMB_CONTENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
 
@@ -99,8 +99,6 @@ export class UmbPropertyEditorUIBlockListElement
 		const useInlineEditingAsDefault = config.getValueByAlias<boolean>('useInlineEditingAsDefault');
 		this.#managerContext.setInlineEditingMode(useInlineEditingAsDefault);
 		this.style.maxWidth = config.getValueByAlias<string>('maxPropertyWidth') ?? '';
-		// TODO:
-		//config.useSingleBlockMode, not done jet
 
 		this.#managerContext.setEditorConfiguration(config);
 
@@ -339,15 +337,22 @@ export class UmbPropertyEditorUIBlockListElement
 			]).pipe(debounceTime(20)),
 			([layouts, contents, settings, exposes]) => {
 				if (layouts.length === 0) {
+					if (this.value === undefined) {
+						return;
+					}
 					super.value = undefined;
 				} else {
-					super.value = {
+					const newValue = {
 						...super.value,
 						layout: { [UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS]: layouts },
 						contentData: contents,
 						settingsData: settings,
 						expose: exposes,
 					};
+					if (jsonStringComparison(this.value, newValue)) {
+						return;
+					}
+					super.value = newValue;
 				}
 
 				// If we don't have a value set from the outside or an internal value, we don't want to set the value.
@@ -373,12 +378,13 @@ export class UmbPropertyEditorUIBlockListElement
 		return html`
 			${repeat(
 				this._layouts,
-				(x) => x.contentKey,
-				(layoutEntry, index) => html`
+				(layout, index) => `${index}_${layout.contentKey}`,
+				(layout, index) => html`
 					${this.#renderInlineCreateButton(index)}
 					<umb-block-list-entry
-						.contentKey=${layoutEntry.contentKey}
-						.layout=${layoutEntry}
+						index=${index}
+						.contentKey=${layout.contentKey}
+						.layout=${layout}
 						${umbDestroyOnDisconnect()}>
 					</umb-block-list-entry>
 				`,
@@ -388,11 +394,8 @@ export class UmbPropertyEditorUIBlockListElement
 	}
 
 	#renderCreateButtonGroup() {
-		if (this.readonly && this._layouts.length > 0) {
-			return nothing;
-		} else {
-			return html` <uui-button-group> ${this.#renderCreateButton()} ${this.#renderPasteButton()} </uui-button-group> `;
-		}
+		if (this._layouts.length > 0 && (this._limitMax === 1 || this.readonly)) return nothing;
+		return html`<uui-button-group>${this.#renderCreateButton()}${this.#renderPasteButton()}</uui-button-group>`;
 	}
 
 	#renderInlineCreateButton(index: number) {
@@ -438,6 +441,7 @@ export class UmbPropertyEditorUIBlockListElement
 		css`
 			:host {
 				display: grid;
+				align-content: start;
 				gap: 1px;
 			}
 			> div {

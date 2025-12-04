@@ -891,8 +891,6 @@ export default {
 		databaseInstall: '\n      Pritisnite <strong>Instaliraj</strong> za instalaciju Umbraco %0% baze podataka\n    ',
 		databaseInstallDone:
 			'Umbraco %0% je sada kopiran u vašu bazu podataka. Pritisnite <strong>Dalje</strong> da nastavite.',
-		databaseNotFound:
-			'<p>Baza podataka nije pronađena! Provjerite jesu li informacije u "konekcijskom string" u "web.config" datoteci ispravne.</p>\n              <p>Da nastavite, uredite "web.config" datoteku. (koristeći Visual Studio ili vaš omiljeni uređivač teksta), skorlajte do dna, dodajte konekcijski string za vašu bazu podataka u svojstvo nazvan "UmbracoDbDSN" i spremite datoteku. </p>\n              <p>\n              Kliknite na gumb <strong>pokušaj ponovo</strong> kada završite.<br />\n\t\t\t  <a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">\n\t\t\t              Više informacija o uređivanju web.config datoteke možete pronaći ovdje</a>.</p>',
 		databaseText:
 			'Da bi dovršili ovaj korak, morate znati neke informacije o vašem poslužitelju baze podataka ("konekcijski string").<br />\n        Molimo kontaktirajte svog ISP-a ako je potrebno.\n        Ako instalirate na lokalnoj mašini ili serveru, možda će vam trebati informacije od administratora sistema.',
 		databaseUpgrade:
@@ -1259,14 +1257,6 @@ export default {
 		statistics: 'Statistika',
 		translation: 'Prijevodi',
 		users: 'Korisnici',
-	},
-	help: {
-		tours: 'Ture',
-		theBestUmbracoVideoTutorials: 'Najbolji Umbraco video tutorijali',
-		umbracoForum: 'Posjetite our.umbraco.com',
-		umbracoTv: 'Posjetite umbraco.tv',
-		umbracoLearningBase: 'Pogledajte naše besplatne video tutorijale',
-		umbracoLearningBaseDescription: 'na Umbraco Learning Base',
 	},
 	settings: {
 		defaulttemplate: 'Zadani predložak',
@@ -2054,6 +2044,7 @@ export default {
 		openBackofficeSearch: 'Otvorite backoffice pretragu',
 		openCloseBackofficeHelp: 'Otvori/Zatvori pomoć za backoffice',
 		openCloseBackofficeProfileOptions: 'Opcije otvaranja/zatvaranja profila',
+		profileOptions: 'Opcije profila',
 		assignDomainDescription: 'Postavite kulturu i imena hostova za %0%',
 		createDescription: 'Kreirajte novi čvor ispod %0%',
 		protectDescription: 'Postavite ograničenja pristupa uključena %0%',
@@ -2117,14 +2108,10 @@ export default {
 		savedSearches: 'Spremljene pretrage',
 		saveSearch: 'Spremi pretragu',
 		saveSearchDescription: 'Unesite prijateljski naziv za vaš upit za pretragu',
-		filterSearch: 'Filtriraj pretragu',
-		totalItems: 'Ukupno',
 		timestamp: 'Vrijeme',
 		level: 'Razina',
 		machine: 'Uređaj',
 		message: 'Poruka',
-		exception: 'Izuzetak',
-		properties: 'Svojstva',
 		searchWithGoogle: 'Pretraži pomoću Google-a',
 		searchThisMessageWithGoogle: 'Pretraži ovu poruku pomoću Google-a',
 		searchWithBing: 'Pretraži pomoću Bing-a',
@@ -2138,21 +2125,9 @@ export default {
 		searchUmbracoIssues: 'Pretraži Umbraco Issues',
 		searchUmbracoIssuesOnGithub: 'Pretraži Umbraco Issues na Github-u',
 		deleteThisSearch: 'Obriši ovu pretragu',
-		findLogsWithRequestId: 'Pronađi logove sa ID-om zatjeva',
-		findLogsWithNamespace: 'Pronađi logove sa namespace-om',
-		findLogsWithMachineName: 'Pronađi logove sa nazivom uređaja',
-		open: 'Otvori',
 		polling: 'Provjera',
-		every2: 'Svakih 2 sekunde',
-		every5: 'Svakih 5 sekundi',
-		every10: 'Svakih 10 sekundi',
-		every20: 'Svakih 20 sekundi',
-		every30: 'Svakih 30 sekundi',
-		pollingEvery2: 'Provjera svakih 2s',
-		pollingEvery5: 'Provjera svakih 5s',
-		pollingEvery10: 'Provjera svakih 10s',
-		pollingEvery20: 'Provjera svakih 20s',
-		pollingEvery30: 'Provjera svakih 30s',
+		pollingInterval: (seconds: number) => `Svakih ${seconds} sekundi`,
+		pollingActive: (seconds: number) => `Provjera svakih ${seconds}s`,
 	},
 	clipboard: {
 		labelForCopyAllEntries: 'Kopiraj %0%',
@@ -2192,30 +2167,6 @@ export default {
 			'\n        <p>\n            Nikada ne bi trebali dozvoliti da produkcijska lokacija radi u načinu za otklanjanje grešaka. Režim za otklanjanje grešaka se isključuje podešavanjem <strong>Umbraco:CMS:Hosting:Debug</strong> na <strong>false</strong> u appsettings.json, appsettings.{Environment}.json ili preko varijable okruženja.\n        </p>\n    ',
 		profilerEnabledDescription:
 			'\n        <p>\n            Umbraco trenutno ne radi u načinu za otklanjanje grešaka, tako da ne možete koristiti ugrađeni profiler. Ovako bi trebalo da bude za proizvodnu lokaciju.\n        </p>\n        <p>\n            Režim za otklanjanje grešaka se uključuje podešavanjem <strong>Umbraco:CMS:Hosting:Debug</strong> na <strong>true</strong> u appsettings.json, appsettings.{Environment}.json ili preko varijable okruženja.\n        </p>\n    ',
-	},
-	settingsDashboardVideos: {
-		trainingHeadline: 'Sati Umbraco trening videa udaljeni su samo jedan klik',
-		trainingDescription:
-			'\n            <p>Želite naučiti Umbraco? Provedite nekoliko minuta učeći najbolje prakse gledajući jedan od ovih videozapisa o korištenju Umbraco-a. I posjetite <a href="https://umbraco.tv" target="_blank" rel="noopener">umbraco.tv</a> za još više Umbraco videa</p>\n        ',
-		learningBaseDescription:
-			'\n        <p>Želite savladati Umbraco? Provedite nekoliko minuta učeći najbolje prakse gledajući jedan od ovih videozapisa o korištenju Umbraco-a <a class="btn-link -underline" href="https://www.youtube.com/c/UmbracoLearningBase" target="_blank" rel="noopener"> Umbraco Learning Base Youtube kanal</a>. Ovdje možete pronaći gomilu video materijala koji pokriva mnoge aspekte Umbraco-a.</p>\n      ',
-		getStarted: 'Za početak',
-	},
-	settingsDashboard: {
-		start: 'Krenite ovdje',
-		startDescription:
-			'Ovaj odjeljak sadrži blokove za izgradnju vaše Umbraco stranice. Slijedite dolje\n      navedene veze linkova kako biste saznali više o radu sa stavkama u odjeljku Postavke\n    ',
-		more: 'Saznajte više',
-		bulletPointOne:
-			'\n        Pročitajte više o radu sa stavkama u Postavkama <a class="btn-link -underline" href="https://docs.umbraco.com/umbraco-cms/fundamentals/backoffice/sections/" target="_blank" rel="noopener">u odjeljku Dokumentacija</a> na Our Umbraco\n    ',
-		bulletPointTwo:
-			'\n        Postavite pitanje na <a class="btn-link -underline" href="https://our.umbraco.com/forum" target="_blank" rel="noopener">Forumu zajednice</a>\n    ',
-		bulletPointTutorials:
-			'\n        Gledajte besplatno <a class="btn-link -underline" href="https://umbra.co/ulb" target="_blank" rel="noopener">video tutorijale na Umbraco Learning Base</a>\n    ',
-		bulletPointFour:
-			'\n        Saznajte više o našim <a class="btn-link -underline" href="https://umbraco.com/products/" target="_blank" rel="noopener">alatima za povećanje produktivnosti i komercijalna podrška</a>\n    ',
-		bulletPointFive:
-			'\n        Saznajte nešto o mogućnosti stvarne <a class="btn-link -underline" href="https://umbraco.com/training/" target="_blank" rel="noopener">obuke i certifikacije</a>\n    ',
 	},
 	startupDashboard: {
 		fallbackHeadline: 'Dobrodošli u The Friendly CMS',

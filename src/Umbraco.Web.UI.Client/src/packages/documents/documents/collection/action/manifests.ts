@@ -1,4 +1,5 @@
 import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
+import { UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/recycle-bin';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -15,6 +16,9 @@ export const manifests: Array<UmbExtensionManifest> = [
 			{
 				alias: UMB_COLLECTION_ALIAS_CONDITION,
 				match: 'Umb.Collection.Document',
+			},
+			{
+				alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
 			},
 		],
 	},

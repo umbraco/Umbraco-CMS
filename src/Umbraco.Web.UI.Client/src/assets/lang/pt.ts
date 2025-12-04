@@ -847,6 +847,7 @@ export default {
 		email: 'Email',
 		error: 'Erro',
 		field: 'Campo',
+		fields: 'Campos',
 		fieldFor: 'Campo para %0%',
 		toggleFor: 'Alternar para %0%',
 		findDocument: 'Encontrar',
@@ -989,7 +990,6 @@ export default {
 		media: 'Multimédia',
 		revert: 'Reverter',
 		validate: 'Validar',
-		newVersionAvailable: 'Nova versão disponível',
 		duration: (duration: string, date: Date | string, now: Date | string) => {
 			if (new Date(date).getTime() < new Date(now).getTime()) return `${duration} atrás`;
 			return `em ${duration}`;
@@ -1045,8 +1045,6 @@ export default {
 		databaseInstall: 'Pressione o botão <strong>instalar</strong> para instalar a base de dados Umbraco %0%',
 		databaseInstallDone:
 			'O Umbraco %0% foi agora copiado para a sua base de dados. Pressione <strong>Seguinte</strong> para prosseguir.',
-		databaseNotFound:
-			'<p>Base de dados não encontrada! Por favor, verifique se a informação na "connection string" do ficheiro "web.config" está correta.</p><p>Para prosseguir, por favor edite o ficheiro "web.config" (usando o Visual Studio ou o seu editor de texto favorito), desloque-se até ao final, adicione a cadeia de ligação para a sua base de dados na chave chamada "UmbracoDbDSN" e guarde o ficheiro.</p><p>Clique no botão <strong>tentar novamente</strong> quando terminar.<br /><a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">Mais informação sobre como editar o web.config aqui</a>.</p>',
 		databaseText:
 			'Para completar este passo, deve saber alguma informação sobre o seu servidor de base de dados ("connection string").<br />   Por favor, contacte o seu ISP, se necessário.   Se estiver a instalar numa máquina ou servidor local, poderá precisar de informação do seu administrador de sistema.',
 		databaseUpgrade:
@@ -1406,14 +1404,6 @@ export default {
 		settings: 'Definições',
 		translation: 'Tradução',
 		users: 'Utilizadores',
-	},
-	help: {
-		tours: 'Visitas Guiadas',
-		theBestUmbracoVideoTutorials: 'Os melhores tutoriais em vídeo do Umbraco',
-		umbracoForum: 'Visite our.umbraco.com',
-		umbracoTv: 'Visite umbraco.tv',
-		umbracoLearningBase: 'Veja os nossos tutoriais em vídeo gratuitos',
-		umbracoLearningBaseDescription: 'na Base de Aprendizagem Umbraco',
 	},
 	settings: {
 		defaulttemplate: 'Modelo predefinido',
@@ -2368,6 +2358,7 @@ export default {
 		openBackofficeSearch: 'Abrir pesquisa do backoffice',
 		openCloseBackofficeHelp: 'Abrir/Fechar ajuda do backoffice',
 		openCloseBackofficeProfileOptions: 'Abrir/Fechar as opções do seu perfil',
+		profileOptions: 'Opções perfil',
 		assignDomainDescription: 'Configurar Cultura e Domínios para %0%',
 		createDescription: 'Criar novo nó em %0%',
 		protectDescription: 'Configurar restrições de acesso em %0%',
@@ -2406,6 +2397,7 @@ export default {
 		searchContentTree: 'Pesquisar Árvore de Conteúdo',
 		maxAmount: 'Quantidade máxima',
 		expandChildItems: 'Expandir itens filhos para',
+		collapseChildItems: 'Fechar itens filhos para',
 		openContextNode: 'Abrir nó de contexto para',
 	},
 	references: {
@@ -2444,14 +2436,10 @@ export default {
 		savedSearches: 'Pesquisas Guardadas',
 		saveSearch: 'Guardar Pesquisa',
 		saveSearchDescription: 'Introduza um nome amigável para a sua consulta de pesquisa',
-		filterSearch: 'Filtrar Pesquisa',
-		totalItems: 'Total de Itens',
 		timestamp: 'Timestamp',
 		level: 'Nível',
 		machine: 'Máquina',
 		message: 'Mensagem',
-		exception: 'Exceção',
-		properties: 'Propriedades',
 		searchWithGoogle: 'Pesquisar Com Google',
 		searchThisMessageWithGoogle: 'Pesquisar esta mensagem com Google',
 		searchWithBing: 'Pesquisar Com Bing',
@@ -2465,21 +2453,9 @@ export default {
 		searchUmbracoIssues: 'Pesquisar Problemas Umbraco',
 		searchUmbracoIssuesOnGithub: 'Pesquisar Problemas Umbraco no GitHub',
 		deleteThisSearch: 'Eliminar esta pesquisa',
-		findLogsWithRequestId: 'Encontrar Logs com ID de Pedido',
-		findLogsWithNamespace: 'Encontrar Logs com Namespace',
-		findLogsWithMachineName: 'Encontrar Logs com Nome da Máquina',
-		open: 'Abrir',
 		polling: 'Polling',
-		every2: 'A cada 2 segundos',
-		every5: 'A cada 5 segundos',
-		every10: 'A cada 10 segundos',
-		every20: 'A cada 20 segundos',
-		every30: 'A cada 30 segundos',
-		pollingEvery2: 'Polling a cada 2s',
-		pollingEvery5: 'Polling a cada 5s',
-		pollingEvery10: 'Polling a cada 10s',
-		pollingEvery20: 'Polling a cada 20s',
-		pollingEvery30: 'Polling a cada 30s',
+		pollingInterval: (seconds: number) => `A cada ${seconds} segundos`,
+		pollingActive: (seconds: number) => `Polling a cada ${seconds}s`,
 	},
 	clipboard: {
 		labelForCopyAllEntries: 'Copiar %0%',
@@ -2524,19 +2500,11 @@ export default {
 		profilerEnabledDescription:
 			'<p>O Umbraco não está atualmente a ser executado em modo de debug, por isso não pode usar o criador de perfil integrado. É assim que deve ser para um site de produção.</p><p>O modo de debug é ativado definindo <strong>Umbraco:CMS:Hosting:Debug</strong> como <strong>true</strong> em appsettings.json, appsettings.{Environment}.json ou através de uma variável de ambiente.</p>',
 	},
-	settingsDashboardVideos: {
-		trainingHeadline: 'Horas de vídeos de formação Umbraco estão apenas a um clique de distância',
-		trainingDescription:
-			'<p>Quer dominar o Umbraco? Gaste alguns minutos a aprender algumas das melhores práticas vendo um destes vídeos sobre como usar o Umbraco. E visite <a href="https://umbraco.tv" target="_blank" rel="noopener">umbraco.tv</a> para ainda mais vídeos Umbraco</p>',
-		learningBaseDescription:
-			'  <p>Quer dominar o Umbraco? Gaste alguns minutos a aprender algumas das melhores práticas visitando <a class="btn-link -underline" href="https://www.youtube.com/c/UmbracoLearningBase" target="_blank" rel="noopener">o canal de Youtube da Base de Aprendizagem Umbraco</a>. Aqui pode encontrar muito material em vídeo cobrindo muitos aspetos do Umbraco.</p> ',
-		getStarted: 'Para começar',
-	},
 	settingsDashboard: {
 		documentationHeader: 'Documentação',
 		documentationDescription: 'Leia mais sobre como trabalhar com os itens nas Definições na nossa Documentação.',
 		communityHeader: 'Comunidade',
-		communityDescription: 'Faça uma pergunta no fórum da comunidade ou na nossa comunidade Discord.',
+		communityDescription: 'Faça uma pergunta no fórum da comunidade.',
 		trainingHeader: 'Formação',
 		trainingDescription: 'Descubra oportunidades de formação presencial e certificação',
 		supportHeader: 'Suporte',
@@ -2829,5 +2797,44 @@ export default {
 		resetUrlHeadline: 'Redefinir URL?',
 		resetUrlMessage: 'Tem a certeza que quer redefinir este URL?',
 		resetUrlLabel: 'Redefinir',
+	},
+	missingEditor: {
+		title: 'Este tipo de propriedade já não se encontra disponível.',
+		description:
+			'Não se preocupe, o seu conteúdo está seguro e a publicação deste documento não o substituirá nem removerá.<br/>Entre em contacto com o administrador do site para resolver o problema.',
+		detailsTitle: 'Detalhes adicionais',
+		detailsDescription:
+			'Para resolver o problema, deverá ou restaurar o editor de propriedades, ou alterar a propriedade para usar um tipo de dados compatível ou remover a propriedade se ela não for mais necessária.',
+		detailsDataType: 'Tipo de dados',
+		detailsPropertyEditor: 'Editor de propriedades',
+		detailsPropertyEditorUi: 'Interface do editor de propriedades',
+		detailsData: 'Dados',
+		detailsHide: 'Esconder detalhes',
+		detailsShow: 'Mostrar detalhes',
+		missingUiTitle: 'A interface do editor de propriedades configurada não foi encontrada.',
+		missingUiDetailsDescription:
+			'Esta interface do editor de propriedades não foi encontrada. Certifique-se de que esta está registada corretamente e que o alias corresponde à sua configuração.<br/>Para detalhes de implementação, consulte a <a href="https://docs.umbraco.com/umbraco-cms/customizing/property-editors/composition/property-editor-ui" target="_blank" rel="noopener">documentação</a>.',
+		dataTypeMissingEditor: 'Editor de propriedades não encontrado',
+		dataTypeMissingEditorMessage: 'Este editor de propriedades não foi encontrado.',
+		dataTypeMissingEditorUi: 'Interface do editor de propriedades não encontrada',
+		dataTypeMissingEditorUiMessage: 'Esta interface do editor de propriedades não foi encontrada.',
+	},
+	dateTimePicker: {
+		local: 'Local',
+		differentTimeZoneLabel: (offset: string, localDate: string) =>
+			`A hora selecionada (${offset}) é equivalente a ${localDate} no fuso horário local.`,
+		config_format: 'Formato',
+		config_format_datetime: 'Data e hora',
+		config_format_dateOnly: 'Apenas data',
+		config_format_timeOnly: 'Apenas hora',
+		config_timeFormat: 'Formato da hora',
+		config_timeZones: 'Fusos horários',
+		config_timeZones_description: 'Selecione os fusos horários que o editor deve poder escolher.',
+		config_timeZones_all: 'Todos - Mostrar todos os fusos horários disponíveis',
+		config_timeZones_local: 'Local - Mostrar apenas o fuso horário local',
+		config_timeZones_custom: 'Personalizado - Mostrar uma lista pré-definida de fusos horários',
+		emptyDate: 'Por favor, selecione uma data',
+		emptyTimeZone: 'Por favor, selecione um fuso horário',
+		invalidTimeZone: 'O fuso horário selecionado não é válido',
 	},
 } as UmbLocalizationDictionary;

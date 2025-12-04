@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.IO;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -80,6 +79,24 @@ public class PhysicalFileSystemTests : AbstractFileSystemTests
             using var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo"));
             _fileSystem.AddFile(path + "f3.txt", ms);
         });
+    }
+
+    [Test]
+    public void MoveFileTest()
+    {
+        var basePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FileSysTests");
+
+        using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
+        {
+            _fileSystem.AddFile("sub/f3.txt", ms);
+        }
+
+        Assert.IsTrue(File.Exists(Path.Combine(basePath, "sub/f3.txt")));
+
+        _fileSystem.MoveFile("sub/f3.txt", "sub2/f4.txt");
+
+        Assert.IsFalse(File.Exists(Path.Combine(basePath, "sub/f3.txt")));
+        Assert.IsTrue(File.Exists(Path.Combine(basePath, "sub2/f4.txt")));
     }
 
     [Test]

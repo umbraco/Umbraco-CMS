@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Factories;
-using Umbraco.Cms.Api.Management.Services.Signs;
+using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core.Services;
 
@@ -18,8 +18,8 @@ public class SiblingsDocumentBlueprintTreeController : DocumentBlueprintTreeCont
     }
 
     [ActivatorUtilitiesConstructor]
-    public SiblingsDocumentBlueprintTreeController(IEntityService entityService, SignProviderCollection signProviders, IDocumentPresentationFactory documentPresentationFactory)
-        : base(entityService, signProviders, documentPresentationFactory)
+    public SiblingsDocumentBlueprintTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IDocumentPresentationFactory documentPresentationFactory)
+        : base(entityService, flagProviders, documentPresentationFactory)
     {
     }
 

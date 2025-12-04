@@ -1,6 +1,6 @@
+import { Heading } from '../../externals.js';
 import { UmbTiptapExtensionApiBase } from '../tiptap-extension-api-base.js';
 import { css } from '@umbraco-cms/backoffice/external/lit';
-import { Heading } from '@umbraco-cms/backoffice/external/tiptap';
 
 export default class UmbTiptapHeadingExtensionApi extends UmbTiptapExtensionApiBase {
 	getTiptapExtensions = () => [Heading];
@@ -13,7 +13,11 @@ export default class UmbTiptapHeadingExtensionApi extends UmbTiptapExtensionApiB
 		h5,
 		h6 {
 			margin-top: 0;
-			margin-bottom: 0.5em;
+			margin-bottom: 1rem;
+
+			&:first-child {
+				margin-top: 0.25rem;
+			}
 		}
 	`;
 }

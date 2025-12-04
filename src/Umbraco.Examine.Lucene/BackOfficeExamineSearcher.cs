@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -47,70 +48,6 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
         _treeSearcherFields = treeSearcherFields;
         _appCaches = appCaches;
     }
-
-    [Obsolete("Please use the non-obsolete constructor. Will be removed in V18.")]
-    public BackOfficeExamineSearcher(
-        IExamineManager examineManager,
-        ILocalizationService languageService,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IEntityService entityService,
-        IUmbracoTreeSearcherFields treeSearcherFields,
-        AppCaches appCaches,
-        IUmbracoMapper umbracoMapper,
-        IPublishedUrlProvider publishedUrlProvider)
-        : this(
-            examineManager,
-            StaticServiceProvider.Instance.GetRequiredService<ILanguageService>(),
-            backOfficeSecurityAccessor,
-            entityService,
-            treeSearcherFields,
-            appCaches)
-    {
-    }
-
-    [Obsolete("Please use the non-obsolete constructor. Will be removed in V18.")]
-    public BackOfficeExamineSearcher(
-        IExamineManager examineManager,
-        ILocalizationService localizationService,
-        ILanguageService languageService,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IEntityService entityService,
-        IUmbracoTreeSearcherFields treeSearcherFields,
-        AppCaches appCaches,
-        IUmbracoMapper umbracoMapper,
-        IPublishedUrlProvider publishedUrlProvider)
-        : this(
-            examineManager,
-            languageService,
-            backOfficeSecurityAccessor,
-            entityService,
-            treeSearcherFields,
-            appCaches)
-    {
-    }
-
-    [Obsolete("Please use the method that accepts all parameters. Will be removed in V17.")]
-    public IEnumerable<ISearchResult> Search(
-        string query,
-        UmbracoEntityTypes entityType,
-        int pageSize,
-        long pageIndex,
-        out long totalFound,
-        string? searchFrom = null,
-        bool ignoreUserStartNodes = false)
-        => Search(query, entityType, pageSize, pageIndex, out totalFound, null, null, searchFrom, ignoreUserStartNodes);
-
-    [Obsolete("Please use the method that accepts all parameters. Will be removed in V17.")]
-    public IEnumerable<ISearchResult> Search(
-        string query,
-        UmbracoEntityTypes entityType,
-        int pageSize,
-        long pageIndex,
-        out long totalFound,
-        string[]? contentTypeAliases,
-        string? searchFrom = null,
-        bool ignoreUserStartNodes = false)
-        => Search(query, entityType, pageSize, pageIndex, out totalFound, contentTypeAliases, null, searchFrom, ignoreUserStartNodes);
 
     public IEnumerable<ISearchResult> Search(
         string query,
@@ -260,9 +197,7 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
         // then nodeName will be matched normally with wildcards
         // the rest will be normal without wildcards
 
-        var allLangs = _languageService.GetAllAsync().GetAwaiter().GetResult()
-            .Select(x => x.IsoCode.ToLowerInvariant())
-            .ToList();
+        var allLangs = _languageService.GetAllIsoCodesAsync().GetAwaiter().GetResult().Select(x => x.ToLowerInvariant()).ToList();
 
         // the chars [*-_] in the query will mess everything up so let's remove those
         // However we cannot just remove - and _  since these signify a space, so we instead replace them with that.

@@ -1,8 +1,8 @@
 import { UmbLogViewerRepository } from '../repository/log-viewer.repository.js';
+import type { UmbLogLevelCounts } from '../types.js';
 import { UMB_APP_LOG_VIEWER_CONTEXT } from './logviewer-workspace.context-token.js';
 import { UmbBasicState, UmbArrayState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import type {
-	LogLevelCountsReponseModel,
 	PagedLoggerResponseModel,
 	PagedLogMessageResponseModel,
 	PagedLogTemplateResponseModel,
@@ -15,6 +15,7 @@ import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { query } from '@umbraco-cms/backoffice/router';
 import type { UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import { UmbViewContext } from '@umbraco-cms/backoffice/view';
 
 export type UmbPoolingInterval = 0 | 2000 | 5000 | 10000 | 20000 | 30000;
 export interface UmbPoolingConfig {
@@ -31,12 +32,10 @@ export class UmbLogViewerWorkspaceContext extends UmbContextBase implements UmbW
 	public readonly workspaceAlias: string = 'Umb.Workspace.LogViewer';
 	#repository: UmbLogViewerRepository;
 
+	public readonly view = new UmbViewContext(this, null);
+
 	getEntityType() {
 		return 'log-viewer';
-	}
-
-	getEntityName() {
-		return 'Log Viewer';
 	}
 
 	get today() {
@@ -65,7 +64,7 @@ export class UmbLogViewerWorkspaceContext extends UmbContextBase implements UmbW
 	#savedSearches = new UmbObjectState<PagedSavedLogSearchResponseModel | undefined>(undefined);
 	savedSearches = this.#savedSearches.asObservablePart((data) => data);
 
-	#logCount = new UmbObjectState<LogLevelCountsReponseModel | null>(null);
+	#logCount = new UmbObjectState<UmbLogLevelCounts | null>(null);
 	logCount = this.#logCount.asObservable();
 
 	#dateRange = new UmbObjectState<UmbLogViewerDateRange>(this.defaultDateRange);
@@ -108,6 +107,8 @@ export class UmbLogViewerWorkspaceContext extends UmbContextBase implements UmbW
 		// TODO: Revisit usage of workspace for this case... currently no other workspace context provides them self with their own token, we need to update UMB_APP_LOG_VIEWER_CONTEXT to become a workspace context. [NL]
 		this.provideContext(UMB_WORKSPACE_CONTEXT, this);
 		this.#repository = new UmbLogViewerRepository(host);
+
+		this.view.setTitle('#treeHeaders_logViewer');
 	}
 
 	override hostConnected() {
@@ -119,6 +120,7 @@ export class UmbLogViewerWorkspaceContext extends UmbContextBase implements UmbW
 	override hostDisconnected(): void {
 		super.hostDisconnected();
 		window.removeEventListener('changestate', this.onChangeState);
+		this.stopPolling();
 	}
 
 	onChangeState = () => {
@@ -230,10 +232,7 @@ export class UmbLogViewerWorkspaceContext extends UmbContextBase implements UmbW
 
 	async getLogCount() {
 		const { data } = await this.#repository.getLogCount({ ...this.#dateRange.getValue() });
-
-		if (data) {
-			this.#logCount.setValue(data);
-		}
+		this.#logCount.setValue(data ?? null);
 	}
 
 	async getMessageTemplates(skip: number, take: number) {
@@ -315,7 +314,7 @@ export class UmbLogViewerWorkspaceContext extends UmbContextBase implements UmbW
 			return;
 		}
 
-		clearInterval(this.#intervalID as number);
+		this.stopPolling();
 	}
 
 	setPollingInterval(interval: UmbPoolingInterval) {
@@ -326,6 +325,13 @@ export class UmbLogViewerWorkspaceContext extends UmbContextBase implements UmbW
 		const direction = this.#sortingDirection.getValue();
 		const newDirection = direction === DirectionModel.ASCENDING ? DirectionModel.DESCENDING : DirectionModel.ASCENDING;
 		this.#sortingDirection.setValue(newDirection);
+	}
+
+	stopPolling() {
+		if (this.#intervalID) {
+			clearInterval(this.#intervalID);
+			this.#intervalID = null;
+		}
 	}
 }
 

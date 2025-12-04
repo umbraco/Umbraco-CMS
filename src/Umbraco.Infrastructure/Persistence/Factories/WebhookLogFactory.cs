@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Webhooks;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Factories;
@@ -28,7 +28,7 @@ internal static class WebhookLogFactory
     public static WebhookLog DtoToEntity(WebhookLogDto dto) =>
         new()
         {
-            Date = dto.Date,
+            Date = dto.Date.EnsureUtc(),
             EventAlias = dto.EventAlias,
             RequestBody = dto.RequestBody,
             ResponseBody = dto.ResponseBody,

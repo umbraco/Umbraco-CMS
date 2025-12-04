@@ -937,8 +937,6 @@ export default {
 		databaseInstall: '\n      Gwasgwch y botwm <strong>gosod</strong> i osod y gronfa ddata %0% Umbraco\n    ',
 		databaseInstallDone:
 			"Mae Umbraco %0% yn awr wedi copïo i'ch gronfa ddata. Gwasgwch <strong>Nesaf</strong> i fwrw ymlaen.",
-		databaseNotFound:
-			'<p>Cronfa ddata heb ei ganfod! Gwiriwch fod y gwybodaeth yn y "llinyn gyswllt" o\'r ffeil "web.config" yn gywir.</p>\n              <p>Er mwyn parhau, newidiwch y ffeil "web.config" (gan ddefnyddio Visual Studio neu eich hoff olygydd testun), rholiwch at y gwaelod, ychwanegwch y llinyn gyswllt ar gyfer eich cronfa ddata yn yr allwedd o\'r enw "UmbracoDbDSN" ac achub y ffeil. </p>\n              <p>\n              Cliciwch y botwm <strong>ceisio eto</strong> pan rydych wedi\n              gorffen.<br /><a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">\n\t\t\t              Mwy o wybodaeth am newid y ffeil web.config yma</a>.</p>',
 		databaseText:
 			"Er mwyn cwblhau'r cam yma, rhaid i chi berchen gwybodaeth am eich gweinydd gronfa ddata (\"llinyn gyswllt\").<br />\n        Cysylltwch â'ch darparwr gwe (ISP) os oes angen.\n        Os ydych chi'n gosod ar beiriant leol neu weinydd, efallai bydd angen gwybodaeth o'ch gweinyddwr system arnoch.",
 		databaseUpgrade:
@@ -1308,14 +1306,6 @@ export default {
 		translation: 'Cyfieithiad',
 		users: 'Defnyddwyr',
 		marketplace: 'Marchnad',
-	},
-	help: {
-		tours: 'Teithiau',
-		theBestUmbracoVideoTutorials: 'Y fideos tiwtorial Umbraco gorau',
-		umbracoForum: 'Ymweld â our.umbraco.com',
-		umbracoTv: 'Ymweld â umbraco.tv',
-		umbracoLearningBase: 'Gwyliwch ein fideos tiwtorial am ddim',
-		umbracoLearningBaseDescription: 'ar Ganolfan Ddysgu Umbraco',
 	},
 	settings: {
 		defaulttemplate: 'Templed diofyn',
@@ -2172,6 +2162,7 @@ export default {
 		openBackofficeSearch: 'Agor chwiliad swyddfa gefn',
 		openCloseBackofficeHelp: 'Agor/Cau cymorth swyddfa gefn',
 		openCloseBackofficeProfileOptions: 'Agor/Cau eich opsiynau proffil',
+		profileOptions: 'Opsiynau proffil',
 		assignDomainDescription: 'Sefydli Diwylliannau ac Enwau Gwesteia am %0%',
 		createDescription: 'Creu nod newydd o dan %0%',
 		protectDescription: 'Sefydli Mynediad Cyhoeddus ar %0%',
@@ -2210,6 +2201,7 @@ export default {
 		searchContentTree: "Chwilio'r coeden cynnwys",
 		maxAmount: 'Uchafswm',
 		expandChildItems: 'Ehangu eitemau plentyn ar gyfer',
+		collapseChildItems: 'Cuddio eitemau plant ar gyfer',
 		openContextNode: 'Agor nod cyd-destun ar gyfer',
 	},
 	references: {
@@ -2241,14 +2233,10 @@ export default {
 		savedSearches: 'Chwiliadau Cadwedig',
 		saveSearch: 'Arbed Chwiliad',
 		saveSearchDescription: 'Rhoi enw cyfeillgar am eich ymholiad chwilio',
-		filterSearch: 'Hidlo Chwiliad',
-		totalItems: 'Cyfanswm o Eitemau',
 		timestamp: 'Stamp Amser',
 		level: 'Lefel',
 		machine: 'Peiriant',
 		message: 'Neges',
-		exception: 'Eithriad',
-		properties: 'Priodweddau',
 		searchWithGoogle: 'Chwilio efo Google',
 		searchThisMessageWithGoogle: 'Chwiliwch y neges hon efo Google',
 		searchWithBing: 'Chwilio efo Bing',
@@ -2262,21 +2250,9 @@ export default {
 		searchUmbracoIssues: 'Chwilio Problemau Umbraco',
 		searchUmbracoIssuesOnGithub: 'Chwilio Problemau Umbraco ar Github',
 		deleteThisSearch: 'Dileu chwiliad hon',
-		findLogsWithRequestId: 'Darganfod logiau efo ID y Cais',
-		findLogsWithNamespace: 'Darganfod logiau efo Namespace',
-		findLogsWithMachineName: 'Darganfod logiau efo Enw Peiriant',
-		open: 'Agor',
 		polling: 'Diweddaru',
-		every2: 'Pob 2 eiliad',
-		every5: 'Pob 5 eiliad',
-		every10: 'Pob 10 eiliad',
-		every20: 'Pob 20 eiliad',
-		every30: 'Pob 30 eiliad',
-		pollingEvery2: 'Diweddaru pob 2e',
-		pollingEvery5: 'Diweddaru pob 5e',
-		pollingEvery10: 'Diweddaru pob 10e',
-		pollingEvery20: 'Diweddaru pob 20e',
-		pollingEvery30: 'Diweddaru pob 30e',
+		pollingInterval: (seconds: number) => `Pob ${seconds} eiliad`,
+		pollingActive: (seconds: number) => `Diweddaru pob ${seconds}e`,
 	},
 	clipboard: {
 		labelForCopyAllEntries: 'Copi %0%',
@@ -2322,22 +2298,6 @@ export default {
 		trainingDescription:
 			'\n                <P>Eisiau meistroli Umbraco? Treuliwch gwpl o funudau yn dysgu rhai o\'r arferion gorau gan wylio un o\'r fideos hyn am sut i ddefnyddio Umbraco. Ac ymweld â <a href="http://umbraco.tv" target="_blank" rel="noopener">umbraco.tv</a> am fwy o fideos am Umbraco</p>\n            ',
 		getStarted: 'I roi cychwyn i chi',
-	},
-	settingsDashboard: {
-		start: 'Dechrau yma',
-		startDescription:
-			"Mae'r adran hon yn cynnwys y blociau adeiladu am eich safle Umbraco. Dilyn y dolenni isod i ddarganfod fwy am weithio gyda'r eitemau yn yr adran Gosodiadau",
-		more: 'Ddarganfod fwy',
-		bulletPointOne:
-			'\n            Darllenwch fwy am weithio efo\'r eitemau yn yr adran Gosodiadau <a class="btn-link -underline" href="https://docs.umbraco.com/umbraco-cms/fundamentals/backoffice/sections/" target="_blank" rel="noopener">fewn yr adran Dogfennaeth</a> o Our Umbraco\n        ',
-		bulletPointTwo:
-			'\n            Gofynnwch gwestiwn yn y <a class="btn-link -underline" href="https://our.umbraco.com/forum" target="_blank" rel="noopener">Fforwm Cymunedol</a>\n        ',
-		bulletPointFour:
-			'\n            Darganfyddwch fwy am ein <a class="btn-link -underline" href="https://umbraco.com/products/" target="_blank" rel="noopener">hoffer hybu cynhyrchiant a chefnogaeth fasnachol</a>\n        ',
-		bulletPointFive:
-			'\n            Darganfyddwch fwy am gyfleoedd <a class="btn-link -underline" href="https://umbraco.com/training/" target="_blank" rel="noopener">hyfforddi ac ardystio</a>\n        ',
-		bulletPointTutorials:
-			'\n            Gwyliwch ein <a class="btn-link -underline" href="https://umbra.co/ulb" target="_blank" rel="noopener">fideos tiwtorial rhad ac am ddim ar Ganolfan Ddysgu Umbraco</a>\n        ',
 	},
 	startupDashboard: {
 		fallbackHeadline: "Croeso i'r SRC cyfeillgar",

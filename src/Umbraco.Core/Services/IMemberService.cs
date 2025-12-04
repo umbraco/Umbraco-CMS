@@ -13,30 +13,6 @@ public interface IMemberService : IMembershipMemberService, IContentServiceBase<
     ///     Gets a list of paged <see cref="IMember" /> objects
     /// </summary>
     /// <remarks>An <see cref="IMember" /> can be of type <see cref="IMember" /> </remarks>
-    /// <param name="pageIndex">Current page index</param>
-    /// <param name="pageSize">Size of the page</param>
-    /// <param name="totalRecords">Total number of records found (out)</param>
-    /// <param name="orderBy">Field to order by</param>
-    /// <param name="orderDirection">Direction to order by</param>
-    /// <param name="memberTypeAlias"></param>
-    /// <param name="filter">Search text filter</param>
-    /// <returns>
-    ///     <see cref="IEnumerable{T}" />
-    /// </returns>
-    [Obsolete("Please use the skip & take instead of pageIndex & pageSize, scheduled for removal in v17")]
-    IEnumerable<IMember> GetAll(
-        long pageIndex,
-        int pageSize,
-        out long totalRecords,
-        string orderBy,
-        Direction orderDirection,
-        string? memberTypeAlias = null,
-        string filter = "");
-
-    /// <summary>
-    ///     Gets a list of paged <see cref="IMember" /> objects
-    /// </summary>
-    /// <remarks>An <see cref="IMember" /> can be of type <see cref="IMember" /> </remarks>
     /// <param name="skip">Amount to skip.</param>
     /// <param name="take">Amount to take.</param>
     /// <param name="totalRecords">Total number of records found (out)</param>
@@ -54,19 +30,7 @@ public interface IMemberService : IMembershipMemberService, IContentServiceBase<
         string orderBy,
         Direction orderDirection,
         string? memberTypeAlias = null,
-        string filter = "")
-    {
-        PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
-
-        return GetAll(
-            pageNumber,
-            pageSize,
-            out totalRecords,
-            orderBy,
-            orderDirection,
-            memberTypeAlias,
-            filter);
-    }
+        string filter = "");
 
     /// <summary>
     ///     Gets a list of paged <see cref="IMember" /> objects
@@ -385,7 +349,13 @@ public interface IMemberService : IMembershipMemberService, IContentServiceBase<
     /// <returns>
     ///     <see cref="IEnumerable{IMember}" />
     /// </returns>
-    IEnumerable<IMember>? GetMembersByPropertyValue(
+    /// <remarks>
+    /// Instead of using this method, which queries the database directly, we advise using search (Examine).
+    /// You can configure an `IValueSetValidator` to ensure all the properties you need are indexed.
+    /// <see href="https://docs.umbraco.com/umbraco-cms/reference/searching/examine/indexing#changing-ivaluesetvalidator" />
+    /// </remarks>
+    [Obsolete("Please use Search (Examine) instead, scheduled for removal in Umbraco 18.")]
+    IEnumerable<IMember> GetMembersByPropertyValue(
         string propertyTypeAlias,
         string value,
         StringPropertyMatchType matchType = StringPropertyMatchType.Exact);
@@ -402,7 +372,13 @@ public interface IMemberService : IMembershipMemberService, IContentServiceBase<
     /// <returns>
     ///     <see cref="IEnumerable{IMember}" />
     /// </returns>
-    IEnumerable<IMember>? GetMembersByPropertyValue(string propertyTypeAlias, int value, ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact);
+    /// <remarks>
+    /// Instead of using this method, which queries the database directly, we advise using search (Examine).
+    /// You can configure an `IValueSetValidator` to ensure all the properties you need are indexed.
+    /// <see href="https://docs.umbraco.com/umbraco-cms/reference/searching/examine/indexing#changing-ivaluesetvalidator" />
+    /// </remarks>
+    [Obsolete("Please use Search (Examine) instead, scheduled for removal in Umbraco 18.")]
+    IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, int value, ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact);
 
     /// <summary>
     ///     Gets a list of Members based on a property search
@@ -412,7 +388,13 @@ public interface IMemberService : IMembershipMemberService, IContentServiceBase<
     /// <returns>
     ///     <see cref="IEnumerable{IMember}" />
     /// </returns>
-    IEnumerable<IMember>? GetMembersByPropertyValue(string propertyTypeAlias, bool value);
+    /// <remarks>
+    /// Instead of using this method, which queries the database directly, we advise using search (Examine).
+    /// You can configure an `IValueSetValidator` to ensure all the properties you need are indexed.
+    /// <see href="https://docs.umbraco.com/umbraco-cms/reference/searching/examine/indexing#changing-ivaluesetvalidator" />
+    /// </remarks>
+    [Obsolete("Please use Search (Examine) instead, scheduled for removal in Umbraco 18.")]
+    IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, bool value);
 
     /// <summary>
     ///     Gets a list of Members based on a property search
@@ -426,7 +408,13 @@ public interface IMemberService : IMembershipMemberService, IContentServiceBase<
     /// <returns>
     ///     <see cref="IEnumerable{IMember}" />
     /// </returns>
-    IEnumerable<IMember>? GetMembersByPropertyValue(string propertyTypeAlias, DateTime value, ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact);
+    /// <remarks>
+    /// Instead of using this method, which queries the database directly, we advise using search (Examine).
+    /// You can configure an `IValueSetValidator` to ensure all the properties you need are indexed.
+    /// <see href="https://docs.umbraco.com/umbraco-cms/reference/searching/examine/indexing#changing-ivaluesetvalidator" />
+    /// </remarks>
+    [Obsolete("Please use Search (Examine) instead, scheduled for removal in Umbraco 18.")]
+    IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, DateTime value, ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact);
 
     /// <summary>
     /// Saves only the properties related to login for the member, using an optimized, non-locking update.

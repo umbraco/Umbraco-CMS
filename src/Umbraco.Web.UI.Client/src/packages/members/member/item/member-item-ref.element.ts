@@ -48,6 +48,7 @@ export class UmbMemberItemRefElement extends UmbLitElement {
 		]);
 
 		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+			.addUniquePaths(['unique'])
 			.onSetup(() => {
 				return { data: { entityType: UMB_MEMBER_ENTITY_TYPE, preset: {} } };
 			})

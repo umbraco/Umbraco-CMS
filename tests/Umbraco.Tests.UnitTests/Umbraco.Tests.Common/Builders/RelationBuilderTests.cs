@@ -19,8 +19,8 @@ public class RelationBuilderTests
         const int childId = 8;
         const int id = 4;
         var key = Guid.NewGuid();
-        var createDate = DateTime.Now.AddHours(-1);
-        var updateDate = DateTime.Now;
+        var createDate = DateTime.UtcNow.AddHours(-1);
+        var updateDate = DateTime.UtcNow;
         const string comment = "test comment";
         const int relationTypeId = 66;
         const string relationTypeAlias = "test";

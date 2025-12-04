@@ -9,12 +9,13 @@ import {
 } from '@umbraco-cms/backoffice/observable-api';
 import { transformServerPathToClientPath } from '@umbraco-cms/backoffice/utils';
 import { UmbBlockManagerContext } from '@umbraco-cms/backoffice/block';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
+import { UMB_PROPERTY_SORT_MODE_CONTEXT } from '@umbraco-cms/backoffice/property-sort-mode';
 import type { UmbBlockDataModel } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockTypeGroup } from '@umbraco-cms/backoffice/block-type';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 
 /**
  * A implementation of the Block Manager specifically for the Block Grid Editor.
@@ -31,6 +32,17 @@ export class UmbBlockGridManagerContext<
 	}
 	getInlineEditingMode(): boolean | undefined {
 		return this.#inlineEditingMode.getValue();
+	}
+
+	#sortModeContext?: typeof UMB_PROPERTY_SORT_MODE_CONTEXT.TYPE;
+	#isSortMode = new UmbBooleanState(undefined);
+	readonly isSortMode = this.#isSortMode.asObservable();
+
+	setIsSortMode(isSortMode: boolean) {
+		this.#sortModeContext?.setIsSortMode(isSortMode);
+	}
+	getIsSortMode(): boolean | undefined {
+		return this.#sortModeContext?.getIsSortMode();
 	}
 
 	#initAppUrl: Promise<unknown>;
@@ -90,25 +102,20 @@ export class UmbBlockGridManagerContext<
 		this.#initAppUrl = this.consumeContext(UMB_SERVER_CONTEXT, (instance) => {
 			this.#serverUrl = instance?.getServerUrl();
 		}).asPromise({ preventTimeout: true });
+
+		this.consumeContext(UMB_PROPERTY_SORT_MODE_CONTEXT, (sortModeContext) => {
+			this.#sortModeContext = sortModeContext;
+			this.observe(this.#sortModeContext?.isSortMode, (isSortMode) => {
+				this.#isSortMode.setValue(isSortMode);
+			});
+		});
 	}
+
 	/**
 	 * @param contentElementTypeKey
 	 * @param partialLayoutEntry
-	 * @param _originData
-	 * @deprecated Use createWithPresets instead. Will be removed in v.17.
+	 * @param originData
 	 */
-	create(
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		contentElementTypeKey: string,
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey'>,
-		// This property is used by some implementations, but not used in this. Do not remove. [NL]
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		_originData?: UmbBlockGridWorkspaceOriginData,
-	): never {
-		throw new Error('Method deparecated use createWithPresets');
-	}
-
 	async createWithPresets(
 		contentElementTypeKey: string,
 		partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey'>,

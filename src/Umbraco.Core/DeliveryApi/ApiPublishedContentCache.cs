@@ -1,10 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.DeliveryApi;
@@ -16,35 +13,6 @@ public sealed class ApiPublishedContentCache : IApiPublishedContentCache
     private readonly IPublishedContentCache _publishedContentCache;
     private readonly IVariationContextAccessor _variationContextAccessor;
     private DeliveryApiSettings _deliveryApiSettings;
-
-    [Obsolete("Use the non-obsolete constructor. Will be removed in V17.")]
-    public ApiPublishedContentCache(
-        IRequestPreviewService requestPreviewService,
-        IRequestCultureService requestCultureService,
-        IOptionsMonitor<DeliveryApiSettings> deliveryApiSettings,
-        IDocumentUrlService documentUrlService,
-        IPublishedContentCache publishedContentCache)
-        : this(
-            requestPreviewService,
-            deliveryApiSettings,
-            StaticServiceProvider.Instance.GetRequiredService<IApiDocumentUrlService>(),
-            publishedContentCache,
-            StaticServiceProvider.Instance.GetRequiredService<IVariationContextAccessor>())
-    {
-    }
-
-    [Obsolete("Use the non-obsolete constructor. Will be removed in V17.")]
-    public ApiPublishedContentCache(
-        IRequestPreviewService requestPreviewService,
-        IRequestCultureService requestCultureService,
-        IOptionsMonitor<DeliveryApiSettings> deliveryApiSettings,
-        IDocumentUrlService documentUrlService,
-        IApiDocumentUrlService apiDocumentUrlService,
-        IPublishedContentCache publishedContentCache,
-        IVariationContextAccessor variationContextAccessor)
-        : this(requestPreviewService, deliveryApiSettings, apiDocumentUrlService, publishedContentCache, variationContextAccessor)
-    {
-    }
 
     public ApiPublishedContentCache(
         IRequestPreviewService requestPreviewService,

@@ -1,435 +1,452 @@
 import {expect} from '@playwright/test';
 import {test, AliasHelper} from '@umbraco/playwright-testhelpers';
 
-// Media Folder
+// Media Folders
 const rootMediaFolderName = 'RootMediaFolder';
 const childMediaFolderName = 'ChildMediaFolder';
+let rootFolderId = '';
+let childFolderId = '';
 // Media Items
 const rootImageName = 'RootImage';
 const rootArticleName = 'RootArticle';
 const rootAudioName = 'RootAudio';
 const rootSVGName = 'RootSVG';
-const rootCustomMediaName = 'TestCustomMedia'
+const rootCustomMediaName = 'TestCustomMedia';
 const fileName = 'TestFile';
 const videoName = 'TestVideo';
 const imageSizeNamePrefix = 'Test Image Size';
 const rootImageSizeNamePrefix = 'Root Test Image Size';
-const specialCharacterImageName = ', . ! ? # $ % & * @ é ü ă đ 漢字'
+const specialCharacterImageName = ', . ! ? # $ % & * @ é ü ă đ 漢字';
+let rootImageId = '';
 // Media Type
 const customMediaTypeName = 'CustomMediaType';
 // Data Type
 const textStringDataType = 'Textstring';
 const textStringValue = 'This is a test textstring';
-// Constant
+// Constants
 const imageSize = 3;
 const rootImageSize = 5;
 
-test.describe('Media Delivery API', () => {
-  test.beforeAll(async ({umbracoApi}) => {
-    // Create a root level folder
-    const rootFolderId = await umbracoApi.media.createDefaultMediaFolder(rootMediaFolderName);
-    // Create child folder
-    const childFolderId = await umbracoApi.media.createDefaultMediaFolderAndParentId(childMediaFolderName, rootFolderId);
-    // Create an image item at root level
-    await umbracoApi.media.createDefaultMediaWithImage(rootImageName);
-    // Create a article file item at root level
-    await umbracoApi.media.createDefaultMediaWithArticle(rootArticleName);
-    // Create an audio item at root level
-    await umbracoApi.media.createDefaultMediaWithAudio(rootAudioName);
-    // Create an vector graphic item at root level
-    await umbracoApi.media.createDefaultMediaWithSVG(rootSVGName);
-    // Create a file item in the child folder
-    await umbracoApi.media.createDefaultMediaFileAndParentId(fileName, childFolderId);
-    // Create a video item in the child folder
-    await umbracoApi.media.createDefaultMediaWithVideoAndParentId(videoName, childFolderId);
-    // Create multiple image items in the child folder, named have prefix imageSizeNamePrefix
-    for (let i = 1; i <= imageSize; i++) {
-      await umbracoApi.media.createDefaultMediaWithImageAndParentId(imageSizeNamePrefix + i, childFolderId);
-    }
-    // Create multiple image items in the root folder, named have prefix rootImageSizeNamePrefix
-    for (let i = 1; i <= rootImageSize; i++) {
-      await umbracoApi.media.createDefaultMediaWithImage(rootImageSizeNamePrefix + i);
-    }
-    // Create custom media item at root level
-    await umbracoApi.media.createDefaultMediaWithTextstring(rootCustomMediaName, customMediaTypeName, textStringValue, textStringDataType);
-    // Create an image item at root level and its name has special characters
-    await umbracoApi.media.createDefaultMediaWithImage(specialCharacterImageName);
-  });
+test.beforeEach(async ({umbracoApi}) => {
+  // Create a folder at root level
+  rootFolderId = await umbracoApi.media.createDefaultMediaFolder(rootMediaFolderName);
+  // Create child folder
+  childFolderId = await umbracoApi.media.createDefaultMediaFolderAndParentId(childMediaFolderName, rootFolderId);
+  // Create an image item at root level
+  rootImageId = await umbracoApi.media.createDefaultMediaWithImage(rootImageName);
+});
 
-  test.afterAll(async ({umbracoApi}) => {
-    await umbracoApi.media.ensureNameNotExists(rootMediaFolderName);
-    await umbracoApi.media.ensureNameNotExists(childMediaFolderName);
-    await umbracoApi.media.ensureNameNotExists(rootImageName);
-    await umbracoApi.media.ensureNameNotExists(rootArticleName);
-    await umbracoApi.media.ensureNameNotExists(rootAudioName);
-    await umbracoApi.media.ensureNameNotExists(rootSVGName);
-    await umbracoApi.media.ensureNameNotExists(fileName);
-    await umbracoApi.media.ensureNameNotExists(videoName);
-    await umbracoApi.media.ensureNameNotExists(specialCharacterImageName);
-    for (let i = 1; i <= imageSize; i++) {
-      await umbracoApi.media.ensureNameNotExists(imageSizeNamePrefix + i);
-    }
-    for (let i = 1; i <= rootImageSize; i++) {
-      await umbracoApi.media.ensureNameNotExists(rootImageSizeNamePrefix + i);
-    }
-    await umbracoApi.media.ensureNameNotExists(rootCustomMediaName);
-    await umbracoApi.mediaType.ensureNameNotExists(customMediaTypeName);
-  });
+test.afterEach(async ({umbracoApi}) => {
+  await umbracoApi.media.ensureNameNotExists(rootMediaFolderName);
+  await umbracoApi.media.ensureNameNotExists(childMediaFolderName);
+  await umbracoApi.media.ensureNameNotExists(rootImageName);
+});
 
-  // Gets a media item by id
-  test('can fetch an image item by its ID', async ({umbracoApi}) => {
-    // Arrange
-    const mediaTypeName = 'Image';
-    const mediaData = await umbracoApi.media.getByName(rootImageName);
-    const mediaPath = '/' + rootImageName.toLowerCase() + '/';
+test('can fetch an image item by its ID', async ({umbracoApi}) => {
+  // Arrange
+  const mediaTypeName = 'Image';
+  const mediaPath = '/' + rootImageName.toLowerCase() + '/';
 
-    // Act
-    const mediaItem = await umbracoApi.mediaDeliveryApi.getMediaItemWithId(mediaData.id);
+  // Act
+  const mediaItem = await umbracoApi.mediaDeliveryApi.getMediaItemWithId(rootImageId);
 
-    // Assert
-    expect(mediaItem.status()).toBe(200);
-    const mediaItemJson = await mediaItem.json();
-    await umbracoApi.mediaDeliveryApi.verifyDefaultMediaItemJson(rootImageName, mediaItemJson, mediaPath, mediaTypeName);
-  });
+  // Assert
+  expect(mediaItem.status()).toBe(200);
+  const mediaItemJson = await mediaItem.json();
+  await umbracoApi.mediaDeliveryApi.verifyDefaultMediaItemJson(rootImageName, mediaItemJson, mediaPath, mediaTypeName);
 
-  test('can fetch an audio item by its ID', async ({umbracoApi}) => {
-    // Arrange
-    const mediaTypeName = 'Audio';
-    const mediaData = await umbracoApi.media.getByName(rootAudioName);
-    const mediaPath = '/' + rootAudioName.toLowerCase() + '/';
+  // Clean
+  await umbracoApi.media.ensureNameNotExists(rootImageName);
+});
 
-    // Act
-    const mediaItem = await umbracoApi.mediaDeliveryApi.getMediaItemWithId(mediaData.id);
+test('can fetch an audio item by its ID', async ({umbracoApi}) => {
+  // Arrange
+  const mediaTypeName = 'Audio';
+  // Create an audio item at root level
+  const mediaId = await umbracoApi.media.createDefaultMediaWithAudio(rootAudioName);
+  const mediaPath = '/' + rootAudioName.toLowerCase() + '/';
 
-    // Assert
-    expect(mediaItem.status()).toBe(200);
-    const mediaItemJson = await mediaItem.json();
-    await umbracoApi.mediaDeliveryApi.verifyDefaultMediaItemJson(rootAudioName, mediaItemJson, mediaPath, mediaTypeName);
-  });
+  // Act
+  const mediaItem = await umbracoApi.mediaDeliveryApi.getMediaItemWithId(mediaId);
 
-  test('can fetch a vector graphics item by its ID', async ({umbracoApi}) => {
-    // Arrange
-    const mediaTypeName = 'Vector Graphics (SVG)';
-    const mediaData = await umbracoApi.media.getByName(rootSVGName);
-    const mediaPath = '/' + rootSVGName.toLowerCase() + '/';
+  // Assert
+  expect(mediaItem.status()).toBe(200);
+  const mediaItemJson = await mediaItem.json();
+  await umbracoApi.mediaDeliveryApi.verifyDefaultMediaItemJson(rootAudioName, mediaItemJson, mediaPath, mediaTypeName);
 
-    // Act
-    const mediaItem = await umbracoApi.mediaDeliveryApi.getMediaItemWithId(mediaData.id);
+  // Clean
+  await umbracoApi.media.ensureNameNotExists(rootAudioName);
+});
 
-    // Assert
-    expect(mediaItem.status()).toBe(200);
-    const mediaItemJson = await mediaItem.json();
-    await umbracoApi.mediaDeliveryApi.verifyDefaultMediaItemJson(rootSVGName, mediaItemJson, mediaPath, mediaTypeName);
-  });
+test('can fetch a vector graphics item by its ID', async ({umbracoApi}) => {
+  // Arrange
+  const mediaTypeName = 'Vector Graphics (SVG)';
+  // Create an vector graphic item at root level
+  const mediaId = await umbracoApi.media.createDefaultMediaWithSVG(rootSVGName);
+  const mediaPath = '/' + rootSVGName.toLowerCase() + '/';
 
-  test('can fetch a media folder by its ID', async ({umbracoApi}) => {
-    // Arrange
-    const mediaTypeName = 'Folder';
-    const mediaData = await umbracoApi.media.getByName(rootMediaFolderName);
-    const mediaPath = '/' + rootMediaFolderName.toLowerCase() + '/';
+  // Act
+  const mediaItem = await umbracoApi.mediaDeliveryApi.getMediaItemWithId(mediaId);
 
-    // Act
-    const mediaItem = await umbracoApi.mediaDeliveryApi.getMediaItemWithId(mediaData.id);
+  // Assert
+  expect(mediaItem.status()).toBe(200);
+  const mediaItemJson = await mediaItem.json();
+  await umbracoApi.mediaDeliveryApi.verifyDefaultMediaItemJson(rootSVGName, mediaItemJson, mediaPath, mediaTypeName);
 
-    // Assert
-    expect(mediaItem.status()).toBe(200);
-    const mediaItemJson = await mediaItem.json();
-    await umbracoApi.mediaDeliveryApi.verifyDefaultMediaItemJson(rootMediaFolderName, mediaItemJson, mediaPath, mediaTypeName);
-  });
+  // Clean
+  await umbracoApi.media.ensureNameNotExists(rootSVGName);
+});
 
-  test('can fetch a media item in a folder in a folder by its ID', async ({umbracoApi}) => {
-    // Arrange
-    const mediaTypeName = 'File';
-    const mediaData = await umbracoApi.media.getByName(fileName);
-    const mediaPath = '/' + rootMediaFolderName.toLowerCase() + '/' + childMediaFolderName.toLowerCase() + '/' + fileName.toLowerCase() + '/';
+test('can fetch a media folder by its ID', async ({umbracoApi}) => {
+  // Arrange
+  const mediaTypeName = 'Folder';
+  const mediaPath = '/' + rootMediaFolderName.toLowerCase() + '/';
 
-    // Act
-    const mediaItem = await umbracoApi.mediaDeliveryApi.getMediaItemWithId(mediaData.id);
+  // Act
+  const mediaItem = await umbracoApi.mediaDeliveryApi.getMediaItemWithId(rootFolderId);
 
-    // Assert
-    expect(mediaItem.status()).toBe(200);
-    const mediaItemJson = await mediaItem.json();
-    await umbracoApi.mediaDeliveryApi.verifyDefaultMediaItemJson(fileName, mediaItemJson, mediaPath, mediaTypeName);
-  });
+  // Assert
+  expect(mediaItem.status()).toBe(200);
+  const mediaItemJson = await mediaItem.json();
+  await umbracoApi.mediaDeliveryApi.verifyDefaultMediaItemJson(rootMediaFolderName, mediaItemJson, mediaPath, mediaTypeName);
 
-  test('can fetch an custom media item by its ID', async ({umbracoApi}) => {
-    // Arrange
-    const mediaData = await umbracoApi.media.getByName(rootCustomMediaName);
-    const mediaPath = '/' + rootCustomMediaName.toLowerCase() + '/';
+  // Clean
+  await umbracoApi.media.ensureNameNotExists(rootMediaFolderName);
+});
 
-    // Act
-    const mediaItem = await umbracoApi.mediaDeliveryApi.getMediaItemWithId(mediaData.id);
+test('can fetch a media item in a folder in a folder by its ID', async ({umbracoApi}) => {
+  // Arrange
+  const mediaTypeName = 'File';
+  // Create a file item in the child folder
+  const mediaId = await umbracoApi.media.createDefaultMediaFileAndParentId(fileName, childFolderId);
+  const mediaPath = '/' + rootMediaFolderName.toLowerCase() + '/' + childMediaFolderName.toLowerCase() + '/' + fileName.toLowerCase() + '/';
 
-    // Assert
-    expect(mediaItem.status()).toBe(200);
-    const mediaItemJson = await mediaItem.json();
-    await umbracoApi.mediaDeliveryApi.verifyDefaultMediaItemJson(rootCustomMediaName, mediaItemJson, mediaPath, customMediaTypeName);
-    expect(mediaItemJson.properties[AliasHelper.toAlias(textStringDataType)]).toBe(textStringValue);
-  });
+  // Act
+  const mediaItem = await umbracoApi.mediaDeliveryApi.getMediaItemWithId(mediaId);
 
-  test('returns 404 when fetching a non-existent media item', async ({umbracoApi}) => {
-    // Arrange
-    const nonExistentMediaId = '00000000-0000-0000-0000-000000000000';
+  // Assert
+  expect(mediaItem.status()).toBe(200);
+  const mediaItemJson = await mediaItem.json();
+  await umbracoApi.mediaDeliveryApi.verifyDefaultMediaItemJson(fileName, mediaItemJson, mediaPath, mediaTypeName);
 
-    // Act
-    const mediaItem = await umbracoApi.mediaDeliveryApi.getMediaItemWithId(nonExistentMediaId);
+  // Clean
+  await umbracoApi.media.ensureNameNotExists(fileName);  
+});
 
-    // Assert
-    expect(mediaItem.status()).toBe(404);
-  });
+test('can fetch a custom media item by its ID', async ({umbracoApi}) => {
+  // Arrange
+  // Create custom media item at root level
+  const mediaId = await umbracoApi.media.createDefaultMediaWithTextstring(rootCustomMediaName, customMediaTypeName, textStringValue, textStringDataType);
+  const mediaPath = '/' + rootCustomMediaName.toLowerCase() + '/';
 
-  test('returns 401 when fetching a media item without proper authorization', async ({umbracoApi}) => {
-  });
+  // Act
+  const mediaItem = await umbracoApi.mediaDeliveryApi.getMediaItemWithId(mediaId);
 
-  // Gets a media item by path
-  test('can fetch an media item by its path', async ({umbracoApi}) => {
-    // Arrange
-    const mediaTypeName = 'Article';
-    const mediaPath = '/' + rootArticleName.toLowerCase() + '/';
+  // Assert
+  expect(mediaItem.status()).toBe(200);
+  const mediaItemJson = await mediaItem.json();
+  await umbracoApi.mediaDeliveryApi.verifyDefaultMediaItemJson(rootCustomMediaName, mediaItemJson, mediaPath, customMediaTypeName);
+  expect(mediaItemJson.properties[AliasHelper.toAlias(textStringDataType)]).toBe(textStringValue);
 
-    // Act
-    const mediaItem = await umbracoApi.mediaDeliveryApi.getMediaItemWithPath(mediaPath);
+  // Clean
+  await umbracoApi.media.ensureNameNotExists(rootCustomMediaName);
+});
 
-    // Assert
-    expect(mediaItem.status()).toBe(200);
-    const mediaItemJson = await mediaItem.json();
-    await umbracoApi.mediaDeliveryApi.verifyDefaultMediaItemJson(rootArticleName, mediaItemJson, mediaPath, mediaTypeName);
-  });
+test('returns 404 when fetching a non-existent media item', async ({umbracoApi}) => {
+  // Arrange
+  const nonExistentMediaId = '00000000-0000-0000-0000-000000000000';
 
-  // Skip this because it will return 404 error if the path includes # or ?
-  // Issue link: https://github.com/umbraco/Umbraco-CMS/issues/20024
-  test.skip('can fetch an media item by its path with special character', async ({umbracoApi}) => {
-    // Arrange
-    const mediaTypeName = 'Image';
-    const mediaPath = '/' + specialCharacterImageName.toLowerCase() + '/';
+  // Act
+  const mediaItem = await umbracoApi.mediaDeliveryApi.getMediaItemWithId(nonExistentMediaId);
 
-    // Act
-    const mediaItem = await umbracoApi.mediaDeliveryApi.getMediaItemWithPath(mediaPath);
+  // Assert
+  expect(mediaItem.status()).toBe(404);
+});
 
-    // Assert
-    expect(mediaItem.status()).toBe(200);
-    const mediaItemJson = await mediaItem.json();
-    await umbracoApi.mediaDeliveryApi.verifyDefaultMediaItemJson(specialCharacterImageName, mediaItemJson, mediaPath, mediaTypeName);
-  });
+test('can fetch a media item by its path', async ({umbracoApi}) => {
+  // Arrange
+  const mediaTypeName = 'Article';
+  // Create a article file item at root level
+  await umbracoApi.media.createDefaultMediaWithArticle(rootArticleName);
+  const mediaPath = '/' + rootArticleName.toLowerCase() + '/';
 
-  test('can fetch a media folder in a folder by its path', async ({umbracoApi}) => {
-    // Arrange
-    const mediaTypeName = 'Folder';
-    const mediaPath = '/' + rootMediaFolderName.toLowerCase() + '/' + childMediaFolderName.toLowerCase() + '/';
+  // Act
+  const mediaItem = await umbracoApi.mediaDeliveryApi.getMediaItemWithPath(mediaPath);
 
-    // Act
-    const mediaItem = await umbracoApi.mediaDeliveryApi.getMediaItemWithPath(mediaPath);
+  // Assert
+  expect(mediaItem.status()).toBe(200);
+  const mediaItemJson = await mediaItem.json();
+  await umbracoApi.mediaDeliveryApi.verifyDefaultMediaItemJson(rootArticleName, mediaItemJson, mediaPath, mediaTypeName);
+  
+  // Clean
+  await umbracoApi.media.ensureNameNotExists(rootArticleName);  
+});
 
-    // Assert
-    expect(mediaItem.status()).toBe(200);
-    const mediaItemJson = await mediaItem.json();
-    await umbracoApi.mediaDeliveryApi.verifyDefaultMediaItemJson(childMediaFolderName, mediaItemJson, mediaPath, mediaTypeName);
-  });
+// Skip this because it will return 404 error if the path includes # or ?
+// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/20024
+test.skip('can fetch a media item by its path with special characters', async ({umbracoApi}) => {
+  // Arrange
+  const mediaTypeName = 'Image';
+  // Create an image item at root level and its name has special characters
+  await umbracoApi.media.createDefaultMediaWithImage(specialCharacterImageName);
+  const mediaPath = '/' + specialCharacterImageName.toLowerCase() + '/';
 
-  test('can fetch a media item in a folder in a folder by its path', async ({umbracoApi}) => {
-    // Arrange
-    const mediaTypeName = 'Video';
-    const mediaPath = '/' + rootMediaFolderName.toLowerCase() + '/' + childMediaFolderName.toLowerCase() + '/' + videoName.toLowerCase() + '/';
+  // Act
+  const mediaItem = await umbracoApi.mediaDeliveryApi.getMediaItemWithPath(mediaPath);
 
-    // Act
-    const mediaItem = await umbracoApi.mediaDeliveryApi.getMediaItemWithId(mediaPath);
+  // Assert
+  expect(mediaItem.status()).toBe(200);
+  const mediaItemJson = await mediaItem.json();
+  await umbracoApi.mediaDeliveryApi.verifyDefaultMediaItemJson(specialCharacterImageName, mediaItemJson, mediaPath, mediaTypeName);
 
-    // Assert
-    expect(mediaItem.status()).toBe(200);
-    const mediaItemJson = await mediaItem.json();
-    await umbracoApi.mediaDeliveryApi.verifyDefaultMediaItemJson(videoName, mediaItemJson, mediaPath, mediaTypeName);
-  });
+  // Clean
+  await umbracoApi.media.ensureNameNotExists(specialCharacterImageName);  
+});
 
-  test('returns 404 when fetching a non-existent media path', async ({umbracoApi}) => {
-    // Arrange
-    const nonExistentMediaPath = '/non-existent-media-path/';
+test('can fetch a media folder in a folder by its path', async ({umbracoApi}) => {
+  // Arrange
+  const mediaTypeName = 'Folder';
+  const mediaPath = '/' + rootMediaFolderName.toLowerCase() + '/' + childMediaFolderName.toLowerCase() + '/';
 
-    // Act
-    const mediaItem = await umbracoApi.mediaDeliveryApi.getMediaItemWithPath(nonExistentMediaPath);
+  // Act
+  const mediaItem = await umbracoApi.mediaDeliveryApi.getMediaItemWithPath(mediaPath);
 
-    // Assert
-    expect(mediaItem.status()).toBe(404);
-  });
+  // Assert
+  expect(mediaItem.status()).toBe(200);
+  const mediaItemJson = await mediaItem.json();
+  await umbracoApi.mediaDeliveryApi.verifyDefaultMediaItemJson(childMediaFolderName, mediaItemJson, mediaPath, mediaTypeName);
+});
 
-  test('returns 401 when fetching a media item by path without proper authorization', async ({umbracoApi}) => {
-  });
+test('can fetch a media item in a folder in a folder by its path', async ({umbracoApi}) => {
+  // Arrange
+  const mediaTypeName = 'Video';
+  // Create a video item in the child folder
+  await umbracoApi.media.createDefaultMediaWithVideoAndParentId(videoName, childFolderId);
+  const mediaPath = '/' + rootMediaFolderName.toLowerCase() + '/' + childMediaFolderName.toLowerCase() + '/' + videoName.toLowerCase() + '/';
 
-  // Gets media item(s) by id
-  test('can fetch multiple media items by their IDs', async ({umbracoApi}) => {
-    // Arrange
-    const firstMediaName = rootImageSizeNamePrefix + '1';
-    const secondMediaName = childMediaFolderName;
-    const mediaNames = [firstMediaName, secondMediaName];
-    const firstMediaPath = '/' + firstMediaName.toLowerCase() + '/';
-    const secondMediaPath = '/' + rootMediaFolderName.toLowerCase() + '/' + childMediaFolderName.toLowerCase() + '/';
-    const mediaPaths = [firstMediaPath, secondMediaPath];
-    const mediaTypeNames = ['Image', 'Folder'];
-    const firstMediaData = await umbracoApi.media.getByName(firstMediaName);
-    const secondMediaData = await umbracoApi.media.getByName(secondMediaName);
-    const mediaIds = [firstMediaData.id, secondMediaData.id];
+  // Act
+  const mediaItem = await umbracoApi.mediaDeliveryApi.getMediaItemWithId(mediaPath);
 
-    // Act
-    const mediaItems = await umbracoApi.mediaDeliveryApi.getMediaItemsWithIds(mediaIds);
+  // Assert
+  expect(mediaItem.status()).toBe(200);
+  const mediaItemJson = await mediaItem.json();
+  await umbracoApi.mediaDeliveryApi.verifyDefaultMediaItemJson(videoName, mediaItemJson, mediaPath, mediaTypeName);
 
-    // Assert
+  // Clean
+  await umbracoApi.media.ensureNameNotExists(videoName);
+});
+
+test('returns 404 when fetching a non-existent media path', async ({umbracoApi}) => {
+  // Arrange
+  const nonExistentMediaPath = '/non-existent-media-path/';
+
+  // Act
+  const mediaItem = await umbracoApi.mediaDeliveryApi.getMediaItemWithPath(nonExistentMediaPath);
+
+  // Assert
+  expect(mediaItem.status()).toBe(404);
+});
+
+test('can fetch multiple media items by their IDs', async ({umbracoApi}) => {
+  // Arrange
+  const firstMediaName = rootImageName;
+  const secondMediaName = childMediaFolderName;
+  const mediaNames = [firstMediaName, secondMediaName];
+  const firstMediaPath = '/' + firstMediaName.toLowerCase() + '/';
+  const secondMediaPath = '/' + rootMediaFolderName.toLowerCase() + '/' + childMediaFolderName.toLowerCase() + '/';
+  const mediaPaths = [firstMediaPath, secondMediaPath];
+  const mediaTypeNames = ['Image', 'Folder'];
+  const firstMediaData = await umbracoApi.media.getByName(firstMediaName);
+  const secondMediaData = await umbracoApi.media.getByName(secondMediaName);
+  const mediaIds = [firstMediaData.id, secondMediaData.id];
+
+  // Act
+  const mediaItems = await umbracoApi.mediaDeliveryApi.getMediaItemsWithIds(mediaIds);
+
+  // Assert
+  expect(mediaItems.status()).toBe(200);
+  const mediaItemsJson = await mediaItems.json();
+  await umbracoApi.mediaDeliveryApi.verifyMultipleMediaItemsJson(mediaNames, mediaItemsJson, mediaPaths, mediaTypeNames);
+});
+
+test('returns only valid media items when some IDs are invalid', async ({umbracoApi}) => {
+  // Arrange
+  const validMediaName = rootImageName;
+  const validMediaPath = '/' + validMediaName.toLowerCase() + '/';
+  const validMediaTypeName = 'Image';
+  const validMediaId = await umbracoApi.media.getByName(validMediaName);
+  const nonExistentMediaId = '00000000-0000-0000-0000-000000000000';
+  const mediaIds = [validMediaId.id, nonExistentMediaId];
+
+  // Act
+  const mediaItems = await umbracoApi.mediaDeliveryApi.getMediaItemsWithIds(mediaIds);
+
+  // Assert
+  expect(mediaItems.status()).toBe(200);
+  const mediaItemsJson = await mediaItems.json();
+  await umbracoApi.mediaDeliveryApi.verifyMultipleMediaItemsJson([validMediaName], mediaItemsJson, [validMediaPath], [validMediaTypeName]);
+});
+
+test('can fetch children at root', async ({umbracoApi}) => {
+  // Arrange
+  const fetch = 'children:/';
+  const rootItems = await umbracoApi.media.getAllAtRoot();
+  const rootItemsJson = await rootItems.json();
+
+  // Act
+  const mediaItems = await umbracoApi.mediaDeliveryApi.getMediaItemsFromAQuery(fetch);
+
+  // Assert
+  expect(mediaItems).not.toBeNull();
+  if (mediaItems !== null) {
     expect(mediaItems.status()).toBe(200);
     const mediaItemsJson = await mediaItems.json();
-    await umbracoApi.mediaDeliveryApi.verifyMultipleMediaItemsJson(mediaNames, mediaItemsJson, mediaPaths, mediaTypeNames);
-  });
+    expect(mediaItemsJson.total).toBe(rootItemsJson.total);
+  }
+});
 
-  test('returns only valid media items when some IDs are invalid', async ({umbracoApi}) => {
-    // Arrange
-    const validMediaName = rootArticleName;
-    const validMediaPath = '/' + validMediaName.toLowerCase() + '/';
-    const validMediaTypeName = 'Article';
-    const validMediaId = await umbracoApi.media.getByName(validMediaName);
-    const nonExistentMediaId = '00000000-0000-0000-0000-000000000000';
-    const mediaIds = [validMediaId.id, nonExistentMediaId];
+test('can fetch children of a media folder', async ({umbracoApi}) => {
+  // Arrange
+  const mediaFolderData = await umbracoApi.media.getByName(childMediaFolderName);
+  const fetch = 'children:/' + rootMediaFolderName.toLowerCase() + '/' + childMediaFolderName.toLowerCase() + '/';
+  const childrenItems = await umbracoApi.media.getChildren(mediaFolderData.id);
 
-    // Act
-    const mediaItems = await umbracoApi.mediaDeliveryApi.getMediaItemsWithIds(mediaIds);
+  // Act
+  const mediaItems = await umbracoApi.mediaDeliveryApi.getMediaItemsFromAQuery(fetch);
 
-    // Assert
+  // Assert
+  expect(mediaItems).not.toBeNull();
+  if (mediaItems !== null) {
     expect(mediaItems.status()).toBe(200);
     const mediaItemsJson = await mediaItems.json();
-    await umbracoApi.mediaDeliveryApi.verifyMultipleMediaItemsJson([validMediaName], mediaItemsJson, [validMediaPath], [validMediaTypeName]);
-  });
+    expect(mediaItemsJson.total).toBe(childrenItems.length);
+  } 
+});
 
-  // Gets media item(s) from a query
-  test('can fetch children at root', async ({umbracoApi}) => {
+test('can filter media items', async ({umbracoApi}) => {
+  // Arrange
+  // Create multiple image items in the child folder, named have prefix imageSizeNamePrefix
+  for (let i = 1; i <= imageSize; i++) {
+    await umbracoApi.media.createDefaultMediaWithImageAndParentId(imageSizeNamePrefix + i, childFolderId);
+  }
+  const fetch = 'children:/' + rootMediaFolderName.toLowerCase() + '/' + childMediaFolderName.toLowerCase() + '/';
+  const filter = 'name:' + imageSizeNamePrefix;
+
+  // Act
+  const mediaItems = await umbracoApi.mediaDeliveryApi.getMediaItemsFromAQuery(fetch, filter);
+
+  // Assert
+  expect(mediaItems).not.toBeNull();
+  if (mediaItems !== null) {
+    expect(mediaItems.status()).toBe(200);
+    const mediaItemsJson = await mediaItems.json();
+    expect(mediaItemsJson.total).toBe(imageSize);
+  }
+  
+  // Clean
+  for (let i = 1; i <= imageSize; i++) {
+    await umbracoApi.media.ensureNameNotExists(imageSizeNamePrefix + i);
+  }  
+});
+
+test('can sort media items', async ({umbracoApi}) => {
+  // Arrange
+  // Create multiple image items in the child folder, named have prefix imageSizeNamePrefix
+  for (let i = 1; i <= imageSize; i++) {
+    await umbracoApi.media.createDefaultMediaWithImageAndParentId(imageSizeNamePrefix + i, childFolderId);
+  }
+  const fetch = 'children:/' + rootMediaFolderName.toLowerCase() + '/' + childMediaFolderName.toLowerCase() + '/';
+  const filter = 'name:' + imageSizeNamePrefix;
+  const sort = 'name:desc';
+
+  // Act
+  const mediaItems = await umbracoApi.mediaDeliveryApi.getMediaItemsFromAQuery(fetch, filter, sort);
+
+  // Assert
+  expect(mediaItems).not.toBeNull();
+  if (mediaItems !== null) {
+    expect(mediaItems.status()).toBe(200);
+    const mediaItemsJson = await mediaItems.json();
+    for (let i = 0; i < mediaItemsJson.items.length; i++) {
+      expect(mediaItemsJson.items[i].name).toBe(imageSizeNamePrefix + (imageSize - i)); 
+    }
+  }
+
+  // Clean
+  for (let i = 1; i <= imageSize; i++) {
+    await umbracoApi.media.ensureNameNotExists(imageSizeNamePrefix + i);
+  }  
+});
+
+test('can paginate media items', async ({umbracoApi}) => {
+  // Arrange
+  // Create multiple image items in the root folder, named have prefix rootImageSizeNamePrefix
+  for (let i = 1; i <= rootImageSize; i++) {
+    await umbracoApi.media.createDefaultMediaWithImage(rootImageSizeNamePrefix + i);
+  }
+  const fetch = 'children:/';
+  const filter = 'name:' + rootImageSizeNamePrefix;
+  const skip = 0;
+  const take = rootImageSize - 2;
+
+  // Act
+  const mediaItems = await umbracoApi.mediaDeliveryApi.getMediaItemsFromAQuery(fetch, filter, undefined, skip, take);
+
+  // Assert
+  expect(mediaItems).not.toBeNull();
+  if (mediaItems !== null) {
+    expect(mediaItems.status()).toBe(200);
+    const mediaItemsJson = await mediaItems.json();
+    expect(mediaItemsJson.total).toBe(rootImageSize);
+    expect(mediaItemsJson.items.length).toBe(take);
+  }
+
+  // Clean
+  for (let i = 1; i <= rootImageSize; i++) {
+    await umbracoApi.media.ensureNameNotExists(rootImageSizeNamePrefix + i);
+  }
+});
+
+test('returns 400 when using an invalid sort parameter', async ({umbracoApi}) => {
+  // Arrange
+  const fetch = 'children:/';
+  const invalidSort= 'invalidSort';
+
+  // Act
+  const mediaItems = await umbracoApi.mediaDeliveryApi.getMediaItemsFromAQuery(fetch, undefined, invalidSort);
+
+  // Assert
+  expect(mediaItems).not.toBeNull();
+  if (mediaItems !== null) {
+    expect(mediaItems.status()).toBe(400);
+  }
+});
+
+test('returns 400 when using an invalid filter parameter', async ({umbracoApi}) => {
+  // Arrange
+  const fetch = 'children:/';
+  const invalidFilter = 'invalidFilter';
+
+  // Act
+  const mediaItems = await umbracoApi.mediaDeliveryApi.getMediaItemsFromAQuery(fetch, invalidFilter);
+
+  // Assert
+  expect(mediaItems).not.toBeNull();
+  if (mediaItems !== null) {
+    expect(mediaItems.status()).toBe(400);
+  }
+});
+
+test('returns 400 when using an invalid fetch type', async ({umbracoApi}) => {
     // Arrange
-    const fetch = 'children:/';
-    const rootItems = await umbracoApi.media.getAllAtRoot();
-    const rootItemsJson = await rootItems.json();
+  const fetch = 'invalid:/';
 
-    // Act
-    const mediaItems = await umbracoApi.mediaDeliveryApi.getMediaItemsFromAQuery(fetch);
+  // Act
+  const mediaItems = await umbracoApi.mediaDeliveryApi.getMediaItemsFromAQuery(fetch);
 
-    // Assert
-    expect(mediaItems).not.toBeNull();
-    if (mediaItems !== null) {
-      expect(mediaItems.status()).toBe(200);
-      const mediaItemsJson = await mediaItems.json();
-      expect(mediaItemsJson.total).toBe(rootItemsJson.total);
-    }
-  });
-
-  test('can fetch children of a media folder', async ({umbracoApi}) => {
-    // Arrange
-    const mediaFolderData = await umbracoApi.media.getByName(childMediaFolderName);
-    const fetch = 'children:/' + rootMediaFolderName.toLowerCase() + '/' + childMediaFolderName.toLowerCase() + '/';
-    const childrenItems = await umbracoApi.media.getChildren(mediaFolderData.id);
-
-    // Act
-    const mediaItems = await umbracoApi.mediaDeliveryApi.getMediaItemsFromAQuery(fetch);
-
-    // Assert
-    expect(mediaItems).not.toBeNull();
-    if (mediaItems !== null) {
-      expect(mediaItems.status()).toBe(200);
-      const mediaItemsJson = await mediaItems.json();
-      expect(mediaItemsJson.total).toBe(childrenItems.length);
-    }
-  });
-
-  test('can filter media items', async ({umbracoApi}) => {
-    // Arrange
-    const fetch = 'children:/' + rootMediaFolderName.toLowerCase() + '/' + childMediaFolderName.toLowerCase() + '/';
-    const filter = 'name:' + imageSizeNamePrefix;
-
-    // Act
-    const mediaItems = await umbracoApi.mediaDeliveryApi.getMediaItemsFromAQuery(fetch, filter);
-
-    // Assert
-    expect(mediaItems).not.toBeNull();
-    if (mediaItems !== null) {
-      expect(mediaItems.status()).toBe(200);
-      const mediaItemsJson = await mediaItems.json();
-      expect(mediaItemsJson.total).toBe(imageSize);
-    }
-  });
-
-  test('can sort media items', async ({umbracoApi}) => {
-    // Arrange
-    const fetch = 'children:/' + rootMediaFolderName.toLowerCase() + '/' + childMediaFolderName.toLowerCase() + '/';
-    const filter = 'name:' + imageSizeNamePrefix;
-    const sort = 'name:desc';
-
-    // Act
-    const mediaItems = await umbracoApi.mediaDeliveryApi.getMediaItemsFromAQuery(fetch, filter, sort);
-
-    // Assert
-    expect(mediaItems).not.toBeNull();
-    if (mediaItems !== null) {
-      expect(mediaItems.status()).toBe(200);
-      const mediaItemsJson = await mediaItems.json();
-      for (let i = 0; i < mediaItemsJson.items.length; i++) {
-        expect(mediaItemsJson.items[i].name).toBe(imageSizeNamePrefix + (imageSize - i)); 
-      }
-    }
-  });
-
-  test('can paginate media items', async ({umbracoApi}) => {
-    // Arrange
-    const fetch = 'children:/';
-    const filter = 'name:' + rootImageSizeNamePrefix;
-    const skip = 0;
-    const take = rootImageSize - 2;
-
-    // Act
-    const mediaItems = await umbracoApi.mediaDeliveryApi.getMediaItemsFromAQuery(fetch, filter, undefined, skip, take);
-
-    // Assert
-    expect(mediaItems).not.toBeNull();
-    if (mediaItems !== null) {
-      expect(mediaItems.status()).toBe(200);
-      const mediaItemsJson = await mediaItems.json();
-      expect(mediaItemsJson.total).toBe(rootImageSize);
-      expect(mediaItemsJson.items.length).toBe(take);
-    }
-  });
-
-  test('returns 400 when using an invalid sort parameter', async ({umbracoApi}) => {
-    // Arrange
-    const fetch = 'children:/';
-    const invalidSort= 'invalidSort';
-
-    // Act
-    const mediaItems = await umbracoApi.mediaDeliveryApi.getMediaItemsFromAQuery(fetch, undefined, invalidSort);
-
-    // Assert
-    expect(mediaItems).not.toBeNull();
-    if (mediaItems !== null) {
-      expect(mediaItems.status()).toBe(400);
-    }
-  });
-
-  test('returns 400 when using an invalid filter parameter', async ({umbracoApi}) => {
-    // Arrange
-    const fetch = 'children:/';
-    const invalidFilter = 'invalidFilter';
-
-    // Act
-    const mediaItems = await umbracoApi.mediaDeliveryApi.getMediaItemsFromAQuery(fetch, invalidFilter);
-
-    // Assert
-    expect(mediaItems).not.toBeNull();
-    if (mediaItems !== null) {
-      expect(mediaItems.status()).toBe(400);
-    }
-  });
-
-  test('returns 400 when using an invalid fetch type', async ({umbracoApi}) => {
-      // Arrange
-    const fetch = 'invalid:/';
-
-    // Act
-    const mediaItems = await umbracoApi.mediaDeliveryApi.getMediaItemsFromAQuery(fetch);
-
-    // Assert
-    expect(mediaItems).not.toBeNull();
-    if (mediaItems !== null) {
-      expect(mediaItems.status()).toBe(400);
-    }
-  });
+  // Assert
+  expect(mediaItems).not.toBeNull();
+  if (mediaItems !== null) {
+    expect(mediaItems.status()).toBe(400);
+  }
 });

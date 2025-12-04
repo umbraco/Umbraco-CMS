@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Controllers.Content;
 using Umbraco.Cms.Api.Management.Routing;
-using Umbraco.Cms.Api.Management.Services.Signs;
+using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
 using Umbraco.Cms.Core;
@@ -18,14 +18,8 @@ namespace Umbraco.Cms.Api.Management.Controllers.Document.Collection;
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDocuments)]
 public abstract class DocumentCollectionControllerBase : ContentCollectionControllerBase<IContent, DocumentCollectionResponseModel, DocumentValueResponseModel, DocumentVariantResponseModel>
 {
-    protected DocumentCollectionControllerBase(IUmbracoMapper mapper, SignProviderCollection signProviders)
-        : base(mapper, signProviders)
-    {
-    }
-
-    [Obsolete("Please use the constructor with all parameters. Scheduled to be removed in V18")]
-    protected DocumentCollectionControllerBase(IUmbracoMapper mapper)
-        : base(mapper)
+    protected DocumentCollectionControllerBase(IUmbracoMapper mapper, FlagProviderCollection flagProviders)
+        : base(mapper, flagProviders)
     {
     }
 

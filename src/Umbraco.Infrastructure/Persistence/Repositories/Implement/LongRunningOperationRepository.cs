@@ -1,6 +1,5 @@
-using System.Linq.Expressions;
+using Microsoft.Extensions.Logging;
 using NPoco;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -48,7 +47,7 @@ internal class LongRunningOperationRepository : RepositoryBase, ILongRunningOper
             .From<LongRunningOperationDto>()
             .Where<LongRunningOperationDto>(x => x.Id == id);
 
-        LongRunningOperationDto dto = await Database.FirstOrDefaultAsync<LongRunningOperationDto>(sql);
+        LongRunningOperationDto? dto = await Database.FirstOrDefaultAsync<LongRunningOperationDto>(sql);
         return dto == null ? null : MapDtoToEntity(dto);
     }
 
@@ -60,7 +59,7 @@ internal class LongRunningOperationRepository : RepositoryBase, ILongRunningOper
             .From<LongRunningOperationDto>()
             .Where<LongRunningOperationDto>(x => x.Id == id);
 
-        LongRunningOperationDto dto = await Database.FirstOrDefaultAsync<LongRunningOperationDto>(sql);
+        LongRunningOperationDto? dto = await Database.FirstOrDefaultAsync<LongRunningOperationDto>(sql);
         return dto == null ? null : MapDtoToEntity<T>(dto);
     }
 
@@ -79,9 +78,12 @@ internal class LongRunningOperationRepository : RepositoryBase, ILongRunningOper
         if (statuses.Length > 0)
         {
             var includeStale = statuses.Contains(LongRunningOperationStatus.Stale);
-            string[] possibleStaleStatuses =
-                [nameof(LongRunningOperationStatus.Enqueued), nameof(LongRunningOperationStatus.Running)];
-            IEnumerable<string> statusList = statuses.Except([LongRunningOperationStatus.Stale]).Select(s => s.ToString());
+            var possibleStaleStatuses = new List<string>
+            {
+                nameof(LongRunningOperationStatus.Enqueued),
+                nameof(LongRunningOperationStatus.Running)
+            };
+            var statusList = statuses.Except([LongRunningOperationStatus.Stale]).Select(s => s.ToString()).ToList();
 
             DateTime now = _timeProvider.GetUtcNow().UtcDateTime;
             sql = sql.Where<LongRunningOperationDto>(x =>

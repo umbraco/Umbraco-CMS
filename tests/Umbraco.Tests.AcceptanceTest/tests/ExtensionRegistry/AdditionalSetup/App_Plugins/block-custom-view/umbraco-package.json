@@ -1,0 +1,21 @@
+{
+  "$schema": "../../umbraco-package-schema.json",
+  "name": "My.CustomViewPackage",
+  "version": "0.1.0",
+  "extensions": [
+    {
+      "type": "blockEditorCustomView",
+      "alias": "my.blockEditorCustomView.Example",
+      "name": "My Example Custom View",
+      "element": "/App_Plugins/block-custom-view/block-custom-view.js",
+      "forContentTypeAlias": "elementTypeForCustomBlockView"
+    },
+    {
+      "type": "blockEditorCustomView",
+      "alias": "my.blockGridCustomView.Example",
+      "name": "My Block Grid Custom View",
+      "element": "/App_Plugins/block-custom-view/block-grid-custom-view.js",
+      "forBlockEditor": "block-grid"
+    }
+  ]
+}

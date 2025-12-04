@@ -2,7 +2,7 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Api.Management.Services.Signs;
+using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core.Services;
 
@@ -18,8 +18,8 @@ public class AncestorsMediaTypeTreeController : MediaTypeTreeControllerBase
     }
 
     [ActivatorUtilitiesConstructor]
-    public AncestorsMediaTypeTreeController(IEntityService entityService, SignProviderCollection signProviders, IMediaTypeService mediaTypeService)
-        : base(entityService, signProviders, mediaTypeService)
+    public AncestorsMediaTypeTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IMediaTypeService mediaTypeService)
+        : base(entityService, flagProviders, mediaTypeService)
     {
     }
 

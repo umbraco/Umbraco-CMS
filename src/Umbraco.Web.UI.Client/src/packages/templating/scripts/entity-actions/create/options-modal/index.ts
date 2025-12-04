@@ -5,8 +5,7 @@ export const UMB_SCRIPT_CREATE_OPTIONS_MODAL = new UmbModalToken<UmbScriptCreate
 	'Umb.Modal.Script.CreateOptions',
 	{
 		modal: {
-			type: 'sidebar',
-			size: 'small',
+			type: 'dialog',
 		},
 	},
 );

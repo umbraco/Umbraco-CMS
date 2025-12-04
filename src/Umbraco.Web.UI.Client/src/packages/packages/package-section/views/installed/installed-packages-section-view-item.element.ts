@@ -31,9 +31,6 @@ export class UmbInstalledPackagesSectionViewItemElement extends UmbLitElement {
 	@property({ type: Boolean, attribute: false })
 	hasPendingMigrations = false;
 
-	@property({ attribute: 'custom-icon' })
-	customIcon?: string;
-
 	@state()
 	private _migrationButtonState?: UUIButtonState;
 
@@ -122,8 +119,8 @@ export class UmbInstalledPackagesSectionViewItemElement extends UmbLitElement {
 						name=${ifDefined(this.name)}
 						version="${ifDefined(this.version ?? undefined)}"
 						@open=${this.#onConfigure}
-						?disabled="${!this._packageView}">
-						${this.customIcon ? html`<umb-icon slot="icon" name=${this.customIcon}></umb-icon>` : nothing}
+						?readonly="${!this._packageView}">
+						<umb-icon slot="icon" name="icon-command"></umb-icon>
 						<div slot="tag">
 							${this.hasPendingMigrations
 								? html`<uui-button

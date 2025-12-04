@@ -31,21 +31,37 @@ public class ModelsGenerator : IModelsGenerator
             Directory.CreateDirectory(modelsDirectory);
         }
 
-        foreach (var file in Directory.GetFiles(modelsDirectory, "*.generated.cs"))
-        {
-            File.Delete(file);
-        }
-
         IList<TypeModel> typeModels = _umbracoService.GetAllTypes();
 
         var builder = new TextBuilder(_config, typeModels);
 
+        var generatedFiles = new List<string>();
         foreach (TypeModel typeModel in builder.GetModelsToGenerate())
         {
             var sb = new StringBuilder();
             builder.Generate(sb, typeModel);
             var filename = Path.Combine(modelsDirectory, typeModel.ClrName + ".generated.cs");
-            File.WriteAllText(filename, sb.ToString());
+            generatedFiles.Add(filename);
+
+            var code = sb.ToString();
+
+            // leave the file alone if its contents is identical to the generated model
+            if (File.Exists(filename) && File.ReadAllText(filename).Equals(code))
+            {
+                continue;
+            }
+
+            // overwrite the file
+            File.WriteAllText(filename, code);
+        }
+
+        // clean up old/leftover generated files
+        foreach (var file in Directory.GetFiles(modelsDirectory, "*.generated.cs"))
+        {
+            if (generatedFiles.InvariantContains(file) is false)
+            {
+                File.Delete(file);
+            }
         }
 
         // the idea was to calculate the current hash and to add it as an extra file to the compilation,

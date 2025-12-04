@@ -1,6 +1,5 @@
 import {expect} from '@playwright/test';
 import {test} from '@umbraco/playwright-testhelpers';
-import { text } from 'stream/consumers';
 
 // Document
 const publishInvRootContent = 'Publish Invariant Root';

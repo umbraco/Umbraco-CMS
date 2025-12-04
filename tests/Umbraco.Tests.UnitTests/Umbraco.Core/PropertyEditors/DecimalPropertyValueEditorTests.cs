@@ -26,8 +26,10 @@ public class DecimalPropertyValueEditorTests
         { 123, 123m },
         { -123, -123m },
         { 123.45d, 123.45m },
+        { 123.45f, 123.45m },
         { "123.45", 123.45m },
         { "1234.56", 1234.56m },
+        { "1,234.56", 1234.56m },
         { "123,45", 12345m },
         { "1.234,56", null },
         { "123 45", null },
@@ -47,6 +49,18 @@ public class DecimalPropertyValueEditorTests
             var fromEditor = FromEditor(value);
             Assert.AreEqual(expected, fromEditor, message: $"Failed for: {value}");
         }
+    }
+
+    [SetCulture("it-IT")]
+    [SetUICulture("it-IT")]
+    [TestCase("123,45", 123.45)]
+    [TestCase("1.234,56", 1234.56)]
+    [TestCase("123.45", 12345)]
+    [TestCase("1,234.56", null)]
+    public void Can_Parse_Values_From_Editor_Using_Culture_With_Non_EnUs_Decimal_Separator(object value, decimal? expected)
+    {
+        var fromEditor = FromEditor(value);
+        Assert.AreEqual(expected, fromEditor);
     }
 
     [Test]
@@ -147,7 +161,27 @@ public class DecimalPropertyValueEditorTests
             Assert.AreEqual(1, result.Count());
 
             var validationResult = result.First();
-            Assert.AreEqual(validationResult.ErrorMessage, "validation_outOfRangeMaximum");
+            Assert.AreEqual("validation_outOfRangeMaximum", validationResult.ErrorMessage);
+        }
+    }
+
+    [TestCase(1.8, true)]
+    [TestCase(2.2, false)]
+    [SetCulture("it-IT")] // Uses "," as the decimal separator.
+    public void Validates_Is_Less_Than_Or_Equal_To_Configured_Max_With_Comma_Decimal_Separator(object value, bool expectedSuccess)
+    {
+        var editor = CreateValueEditor(min: 1, max: 2);
+        var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
+        if (expectedSuccess)
+        {
+            Assert.IsEmpty(result);
+        }
+        else
+        {
+            Assert.AreEqual(1, result.Count());
+
+            var validationResult = result.First();
+            Assert.AreEqual("validation_outOfRangeMaximum", validationResult.ErrorMessage);
         }
     }
 

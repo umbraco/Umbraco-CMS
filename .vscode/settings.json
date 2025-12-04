@@ -1,5 +1,11 @@
 {
-  "cSpell.words": ["unprovide"],
+  "cSpell.words": [
+    "backoffice",
+    "pickable",
+    "Pickable",
+    "unprovide",
+    "Unproviding"
+  ],
   "eslint.useFlatConfig": true,
   "eslint.workingDirectories": [
     "./src/Umbraco.Web.UI.Client/",

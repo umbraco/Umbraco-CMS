@@ -1,21 +1,18 @@
-using System;
-using System.Threading.Tasks;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Infrastructure.ModelsBuilder;
 using Umbraco.Cms.Infrastructure.ModelsBuilder.Building;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.ModelsBuilder;
 
 [ApiVersion("1.0")]
 public class BuildModelsBuilderController : ModelsBuilderControllerBase
 {
-    private ModelsBuilderSettings _modelsBuilderSettings;
+    private readonly ModelsBuilderSettings _modelsBuilderSettings;
     private readonly ModelsGenerationError _mbErrors;
     private readonly IModelsGenerator _modelGenerator;
 
@@ -27,8 +24,6 @@ public class BuildModelsBuilderController : ModelsBuilderControllerBase
         _mbErrors = mbErrors;
         _modelGenerator = modelGenerator;
         _modelsBuilderSettings = modelsBuilderSettings.CurrentValue;
-
-        modelsBuilderSettings.OnChange(x => _modelsBuilderSettings = x);
     }
 
     [HttpPost("build")]
@@ -39,7 +34,8 @@ public class BuildModelsBuilderController : ModelsBuilderControllerBase
     {
         try
         {
-            if (!_modelsBuilderSettings.ModelsMode.SupportsExplicitGeneration())
+            if (_modelsBuilderSettings.ModelsMode != Constants.ModelsBuilder.ModelsModes.SourceCodeManual
+                && _modelsBuilderSettings.ModelsMode != Constants.ModelsBuilder.ModelsModes.SourceCodeAuto)
             {
                 var problemDetailsModel = new ProblemDetails
                 {

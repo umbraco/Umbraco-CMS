@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services.Filters;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
 
@@ -23,6 +24,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly IContentValidationServiceBase<TContentType> _validationService;
     private readonly IRelationService _relationService;
+    private readonly ContentTypeFilterCollection _contentTypeFilters;
 
     protected ContentEditingServiceBase(
         TContentService contentService,
@@ -34,7 +36,8 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         IUserIdKeyResolver userIdKeyResolver,
         IContentValidationServiceBase<TContentType> validationService,
         IOptionsMonitor<ContentSettings> optionsMonitor,
-        IRelationService relationService)
+        IRelationService relationService,
+        ContentTypeFilterCollection contentTypeFilters)
     {
         _propertyEditorCollection = propertyEditorCollection;
         _dataTypeService = dataTypeService;
@@ -51,6 +54,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         CoreScopeProvider = scopeProvider;
         ContentService = contentService;
         ContentTypeService = contentTypeService;
+        _contentTypeFilters = contentTypeFilters;
     }
 
     protected abstract TContent New(string? name, int parentId, TContentType contentType);
@@ -70,6 +74,11 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     protected TContentService ContentService { get; }
 
     protected TContentTypeService ContentTypeService { get; }
+
+    /// <summary>
+    /// Gets the alias used to relate the parent entity when handling content (document or media) delete operations.
+    /// </summary>
+    protected virtual string? RelateParentOnDeleteAlias => null;
 
     protected async Task<Attempt<TContentCreateResult, ContentEditingOperationStatus>> MapCreate<TContentCreateResult>(ContentCreationModelBase contentCreationModelBase)
         where TContentCreateResult : ContentCreateResultBase<TContent>, new()
@@ -198,9 +207,27 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
             return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(status, content);
         }
 
-        if (disabledWhenReferenced && _relationService.IsRelated(content.Id, RelationDirectionFilter.Child))
+        if (disabledWhenReferenced)
         {
-            return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(referenceFailStatus, content);
+            // When checking if an item is related, we may need to exclude the "relate parent on delete" relation type, as this prevents
+            // deleting from the recycle bin.
+            int[]? excludeRelationTypeIds = null;
+            if (string.IsNullOrWhiteSpace(RelateParentOnDeleteAlias) is false)
+            {
+                IRelationType? relateParentOnDeleteRelationType = _relationService.GetRelationTypeByAlias(RelateParentOnDeleteAlias);
+                if (relateParentOnDeleteRelationType is not null)
+                {
+                    excludeRelationTypeIds = [relateParentOnDeleteRelationType.Id];
+                }
+            }
+
+            if (_relationService.IsRelated(
+                content.Id,
+                RelationDirectionFilter.Child,
+                excludeRelationTypeIds: excludeRelationTypeIds))
+            {
+                return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(referenceFailStatus, content);
+            }
         }
 
         var userId = await GetUserIdAsync(userKey);
@@ -373,7 +400,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         return contentType;
     }
 
-    protected virtual Task<(int? ParentId, ContentEditingOperationStatus OperationStatus)> TryGetAndValidateParentIdAsync(Guid? parentKey, TContentType contentType)
+    protected virtual async Task<(int? ParentId, ContentEditingOperationStatus OperationStatus)> TryGetAndValidateParentIdAsync(Guid? parentKey, TContentType contentType)
     {
         TContent? parent = parentKey.HasValue
             ? ContentService.GetById(parentKey.Value)
@@ -381,32 +408,63 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
 
         if (parentKey.HasValue && parent == null)
         {
-            return Task.FromResult<(int?, ContentEditingOperationStatus)>((null, ContentEditingOperationStatus.ParentNotFound));
+            return (null, ContentEditingOperationStatus.ParentNotFound);
         }
 
-        if (parent == null && contentType.AllowedAsRoot == false)
+        if (parent == null &&
+            (contentType.AllowedAsRoot == false ||
+
+            // We could have a content type filter registered that prevents the content from being created at the root level,
+            // even if it's allowed in the content type definition.
+            await IsAllowedAtRootByContentTypeFilters(contentType) == false))
         {
-            return Task.FromResult<(int?, ContentEditingOperationStatus)>((null, ContentEditingOperationStatus.NotAllowed));
+            return (null, ContentEditingOperationStatus.NotAllowed);
         }
 
         if (parent != null)
         {
             if (parent.Trashed)
             {
-                return Task.FromResult<(int?, ContentEditingOperationStatus)>((null, ContentEditingOperationStatus.InTrash));
+                return (null, ContentEditingOperationStatus.InTrash);
             }
 
             TContentType? parentContentType = ContentTypeService.Get(parent.ContentType.Key);
             Guid[] allowedContentTypeKeys = parentContentType?.AllowedContentTypes?.Select(c => c.Key).ToArray()
                                             ?? Array.Empty<Guid>();
 
-            if (allowedContentTypeKeys.Contains(contentType.Key) == false)
+            if (allowedContentTypeKeys.Contains(contentType.Key) == false ||
+
+                // We could have a content type filter registered that prevents the content from being created as a child,
+                // even if it's allowed in the content type definition.
+                await IsAllowedAsChildByContentTypeFilters(contentType, parentContentType!.Key, parent.Key) == false)
             {
-                return Task.FromResult<(int?, ContentEditingOperationStatus)>((null, ContentEditingOperationStatus.NotAllowed));
+                return (null, ContentEditingOperationStatus.NotAllowed);
             }
         }
 
-        return Task.FromResult<(int?, ContentEditingOperationStatus)>((parent?.Id ?? Constants.System.Root, ContentEditingOperationStatus.Success));
+        return (parent?.Id ?? Constants.System.Root, ContentEditingOperationStatus.Success);
+    }
+
+    private async Task<bool> IsAllowedAtRootByContentTypeFilters(TContentType contentType)
+    {
+        IEnumerable<TContentType> filteredContentTypes = [contentType];
+        foreach (IContentTypeFilter filter in _contentTypeFilters)
+        {
+            filteredContentTypes = await filter.FilterAllowedAtRootAsync(filteredContentTypes);
+        }
+
+        return filteredContentTypes.Any();
+    }
+
+    private async Task<bool> IsAllowedAsChildByContentTypeFilters(TContentType contentType, Guid parentContentTypeKey, Guid parentKey)
+    {
+        IEnumerable<ContentTypeSort> filteredContentTypes = [new ContentTypeSort(contentType.Key, contentType.SortOrder, contentType.Alias)];
+        foreach (IContentTypeFilter filter in _contentTypeFilters)
+        {
+            filteredContentTypes = await filter.FilterAllowedChildrenAsync(filteredContentTypes, parentContentTypeKey, parentKey);
+        }
+
+        return filteredContentTypes.Any();
     }
 
     private void UpdateNames(ContentEditingModelBase contentEditingModelBase, TContent content, TContentType contentType)
@@ -491,8 +549,12 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         // this should already have been validated by now, so it's OK to throw exceptions here
         if (_propertyEditorCollection.TryGet(propertyType.PropertyEditorAlias, out IDataEditor? dataEditor) == false)
         {
-            _logger.LogWarning("Unable to retrieve property value - no data editor found for property editor: {PropertyEditorAlias}", propertyType.PropertyEditorAlias);
-            return null;
+            _logger.LogWarning(
+                "Unable to find property editor {PropertyEditorAlias}, for property {PropertyAlias}. Leaving property value unchanged.",
+                propertyType.PropertyEditorAlias,
+                propertyType.Alias);
+
+            return content.GetValue(propertyType.Alias, culture, segment);
         }
 
         IDataValueEditor dataValueEditor = dataEditor.GetValueEditor();

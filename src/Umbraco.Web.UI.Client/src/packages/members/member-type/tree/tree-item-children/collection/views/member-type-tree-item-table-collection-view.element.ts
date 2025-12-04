@@ -76,7 +76,7 @@ export class UmbMemberTypeTreeItemTableCollectionViewElement extends UmbLitEleme
 
 			return {
 				id: item.unique,
-				icon: item.icon,
+				icon: item.isFolder && !item.icon ? 'icon-folder' : item.icon,
 				data: [
 					{
 						columnAlias: 'name',

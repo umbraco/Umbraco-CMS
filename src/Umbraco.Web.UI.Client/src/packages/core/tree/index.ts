@@ -1,3 +1,4 @@
+export * from './active-manager/index.js';
 export * from './components/index.js';
 export * from './constants.js';
 export * from './data/index.js';

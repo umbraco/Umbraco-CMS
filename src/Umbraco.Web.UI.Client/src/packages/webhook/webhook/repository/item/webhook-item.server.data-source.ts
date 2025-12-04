@@ -1,3 +1,4 @@
+import { UMB_WEBHOOK_ENTITY_TYPE } from '../../../entity.js';
 import type { UmbWebhookItemModel } from './types.js';
 import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
 import type { WebhookItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
@@ -42,7 +43,8 @@ export class UmbWebhookItemServerDataSource extends UmbItemServerDataSourceBase<
 
 const mapper = (item: WebhookItemResponseModel): UmbWebhookItemModel => {
 	return {
-		unique: item.name,
+		unique: item.id,
 		name: item.name,
+		entityType: UMB_WEBHOOK_ENTITY_TYPE,
 	};
 };

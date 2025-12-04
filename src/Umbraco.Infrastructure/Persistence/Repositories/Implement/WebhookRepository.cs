@@ -3,6 +3,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
@@ -16,11 +17,20 @@ public class WebhookRepository : IWebhookRepository
 
     public async Task<PagedModel<IWebhook>> GetAllAsync(int skip, int take)
     {
-        Sql<ISqlContext>? sql = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql()
+        if (_scopeAccessor.AmbientScope is null)
+        {
+            return new PagedModel<IWebhook>
+            {
+                Items = Enumerable.Empty<IWebhook>(),
+                Total = 0,
+            };
+        }
+
+        Sql<ISqlContext>? sql = _scopeAccessor.AmbientScope.Database.SqlContext.Sql()
             .Select<WebhookDto>()
             .From<WebhookDto>();
 
-        List<WebhookDto>? webhookDtos = await _scopeAccessor.AmbientScope?.Database.FetchAsync<WebhookDto>(sql)!;
+        List<WebhookDto>? webhookDtos = await _scopeAccessor.AmbientScope.Database.FetchAsync<WebhookDto>(sql);
 
         return new PagedModel<IWebhook>
         {
@@ -48,19 +58,33 @@ public class WebhookRepository : IWebhookRepository
 
     public async Task<IWebhook?> GetAsync(Guid key)
     {
-        Sql<ISqlContext>? sql = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql()
+        if (_scopeAccessor.AmbientScope is null)
+        {
+            return null;
+        }
+
+        Sql<ISqlContext>? sql = _scopeAccessor.AmbientScope.Database.SqlContext.Sql()
             .Select<WebhookDto>()
             .From<WebhookDto>()
             .Where<WebhookDto>(x => x.Key == key);
 
-        WebhookDto? webhookDto = await _scopeAccessor.AmbientScope?.Database.FirstOrDefaultAsync<WebhookDto>(sql)!;
+        WebhookDto? webhookDto = await _scopeAccessor.AmbientScope.Database.FirstOrDefaultAsync<WebhookDto>(sql);
 
         return webhookDto is null ? null : await DtoToEntity(webhookDto);
     }
 
     public async Task<PagedModel<IWebhook>> GetByIdsAsync(IEnumerable<Guid> keys)
     {
-        Sql<ISqlContext>? sql = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql()
+        if (_scopeAccessor.AmbientScope is null)
+        {
+            return new PagedModel<IWebhook>
+            {
+                Items = Enumerable.Empty<IWebhook>(),
+                Total = 0,
+            };
+        }
+
+        Sql<ISqlContext>? sql = _scopeAccessor.AmbientScope.Database.SqlContext.Sql()
             .Select<WebhookDto>()
             .From<WebhookDto>()
             .WhereIn<WebhookDto>(x => x.Key, keys);
@@ -76,7 +100,16 @@ public class WebhookRepository : IWebhookRepository
 
     public async Task<PagedModel<IWebhook>> GetByAliasAsync(string alias)
     {
-        Sql<ISqlContext>? sql = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql()
+        if (_scopeAccessor.AmbientScope is null)
+        {
+            return new PagedModel<IWebhook>
+            {
+                Items = Enumerable.Empty<IWebhook>(),
+                Total = 0,
+            };
+        }
+
+        Sql<ISqlContext> sql = _scopeAccessor.AmbientScope.Database.SqlContext.Sql()
             .SelectAll()
             .From<WebhookDto>()
             .InnerJoin<Webhook2EventsDto>()
@@ -114,9 +147,26 @@ public class WebhookRepository : IWebhookRepository
 
     private void DeleteManyToOneReferences(int webhookId)
     {
-        _scopeAccessor.AmbientScope?.Database.Delete<Webhook2ContentTypeKeysDto>("WHERE webhookId = @webhookId", new { webhookId });
-        _scopeAccessor.AmbientScope?.Database.Delete<Webhook2EventsDto>("WHERE webhookId = @webhookId", new { webhookId });
-        _scopeAccessor.AmbientScope?.Database.Delete<Webhook2HeadersDto>("WHERE webhookId = @webhookId", new { webhookId });
+        IUmbracoDatabase? database = _scopeAccessor.AmbientScope?.Database;
+        if (database is null)
+        {
+            return;
+        }
+
+        Sql<ISqlContext> sql = database.SqlContext.Sql()
+            .Delete<Webhook2ContentTypeKeysDto>()
+            .Where<Webhook2ContentTypeKeysDto>(x => x.WebhookId == webhookId);
+        database.Execute(sql);
+
+        sql = database.SqlContext.Sql()
+            .Delete<Webhook2EventsDto>()
+            .Where<Webhook2EventsDto>(x => x.WebhookId == webhookId);
+        database.Execute(sql);
+
+        sql = database.SqlContext.Sql()
+            .Delete<Webhook2HeadersDto>()
+            .Where<Webhook2HeadersDto>(x => x.WebhookId == webhookId);
+        database.Execute(sql);
     }
 
     private void InsertManyToOneReferences(IWebhook webhook)
@@ -144,9 +194,29 @@ public class WebhookRepository : IWebhookRepository
 
     private async Task<IWebhook> DtoToEntity(WebhookDto dto)
     {
-        List<Webhook2ContentTypeKeysDto>? webhookEntityKeyDtos = await _scopeAccessor.AmbientScope?.Database.FetchAsync<Webhook2ContentTypeKeysDto>("WHERE webhookId = @webhookId", new { webhookId = dto.Id })!;
-        List<Webhook2EventsDto>? event2WebhookDtos = await _scopeAccessor.AmbientScope?.Database.FetchAsync<Webhook2EventsDto>("WHERE webhookId = @webhookId", new { webhookId = dto.Id })!;
-        List<Webhook2HeadersDto>? headersWebhookDtos = await _scopeAccessor.AmbientScope?.Database.FetchAsync<Webhook2HeadersDto>("WHERE webhookId = @webhookId", new { webhookId = dto.Id })!;
+        List<Webhook2ContentTypeKeysDto>? webhookEntityKeyDtos = null;
+        List<Webhook2EventsDto>? event2WebhookDtos = null;
+        List<Webhook2HeadersDto>? headersWebhookDtos = null;
+        IUmbracoDatabase? database = _scopeAccessor.AmbientScope?.Database;
+        if (database is not null)
+        {
+            Sql<ISqlContext> sql = database.SqlContext.Sql()
+                .Select<Webhook2ContentTypeKeysDto>()
+                .From<Webhook2ContentTypeKeysDto>()
+                .Where<Webhook2ContentTypeKeysDto>(x => x.WebhookId == dto.Id);
+            webhookEntityKeyDtos = await database.FetchAsync<Webhook2ContentTypeKeysDto>(sql);
+            sql = database.SqlContext.Sql()
+                .Select<Webhook2EventsDto>()
+                .From<Webhook2EventsDto>()
+                .Where<Webhook2EventsDto>(x => x.WebhookId == dto.Id);
+            event2WebhookDtos = await database.FetchAsync<Webhook2EventsDto>(sql);
+            sql = database.SqlContext.Sql()
+                .Select<Webhook2HeadersDto>()
+                .From<Webhook2HeadersDto>()
+                .Where<Webhook2HeadersDto>(x => x.WebhookId == dto.Id);
+            headersWebhookDtos = await database.FetchAsync<Webhook2HeadersDto>(sql);
+        }
+
         Webhook entity = WebhookFactory.BuildEntity(dto, webhookEntityKeyDtos, event2WebhookDtos, headersWebhookDtos);
 
         return entity;
