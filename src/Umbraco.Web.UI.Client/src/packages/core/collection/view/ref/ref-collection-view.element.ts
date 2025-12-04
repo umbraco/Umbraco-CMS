@@ -15,9 +15,6 @@ export class UmbRefCollectionViewElement extends UmbLitElement {
 	private _loading = false;
 
 	@state()
-	private _selectOnly: boolean | undefined;
-
-	@state()
 	private _itemHrefs: Map<string, string> = new Map();
 
 	#collectionContext?: typeof UMB_COLLECTION_CONTEXT.TYPE;
@@ -32,12 +29,6 @@ export class UmbRefCollectionViewElement extends UmbLitElement {
 				this.#collectionContext?.selection.selection,
 				(selection) => (this._selection = selection ?? []),
 				'umbCollectionSelectionObserver',
-			);
-
-			this.observe(
-				this.#collectionContext?.selection.selectOnly,
-				(selectOnly) => (this._selectOnly = selectOnly ?? undefined),
-				'umbCollectionSelectOnlyObserver',
 			);
 
 			this.observe(
@@ -89,7 +80,7 @@ export class UmbRefCollectionViewElement extends UmbLitElement {
 			.item=${item}
 			href=${href ?? nothing}
 			selectable
-			?select-only=${this._selection.length > 0 || this._selectOnly}
+			?select-only=${this._selection.length > 0}
 			?selected=${this.#collectionContext?.selection.isSelected(item.unique)}
 			@selected=${() => this.#onSelect(item)}
 			@deselected=${() => this.#onDeselect(item)}>
