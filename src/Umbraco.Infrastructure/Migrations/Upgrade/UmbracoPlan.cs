@@ -138,5 +138,14 @@ public class UmbracoPlan : MigrationPlan
         To<V_17_0_0.MigrateSystemDatesToUtc>("{7208B20D-6BFC-472E-9374-85EEA817B27D}");
         To<V_17_0_0.AddDistributedJobLock>("{263075BF-F18A-480D-92B4-4947D2EAB772}");
         To<V_17_0_0.AddLastSyncedTable>("26179D88-58CE-4C92-B4A4-3CBA6E7188AC");
+        To<V_17_0_0.EnsureDefaultMediaFolderHasDefaultCollection>("{8B2C830A-4FFB-4433-8337-8649B0BF52C8}");
+        To<V_17_0_0.InvalidateBackofficeUserAccess>("{1C38D589-26BB-4A46-9ABE-E4A0DF548A87}");
+
+        // To 17.0.1
+        To<V_17_0_1.EnsureUmbracoPropertyDataColumnCasing>("{BE5CA411-E12D-4455-A59E-F12A669E5363}");
+
+        // To 18.0.0
+        // TODO (V18): Enable on 18 branch
+        //// To<V_18_0_0.MigrateSingleBlockList>("{74332C49-B279-4945-8943-F8F00B1F5949}");
     }
 }

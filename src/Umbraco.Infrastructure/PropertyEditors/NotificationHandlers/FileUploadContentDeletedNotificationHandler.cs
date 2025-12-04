@@ -1,6 +1,8 @@
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache.PropertyEditors;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
@@ -14,16 +16,20 @@ using Umbraco.Cms.Infrastructure.Extensions;
 namespace Umbraco.Cms.Infrastructure.PropertyEditors.NotificationHandlers;
 
 /// <summary>
-/// Provides base class for notification handler that processes file uploads when a content entity is deleted, removing associated files.
+/// Provides base class for notification handler that processes file uploads when a content entity is deleted or media
+/// operations are carried out, processing the associated files.
 /// </summary>
 internal sealed class FileUploadContentDeletedNotificationHandler : FileUploadNotificationHandlerBase,
     INotificationHandler<ContentDeletedNotification>,
     INotificationHandler<ContentDeletedBlueprintNotification>,
     INotificationHandler<MediaDeletedNotification>,
+    INotificationHandler<MediaMovedToRecycleBinNotification>,
+    INotificationHandler<MediaMovedNotification>,
     INotificationHandler<MemberDeletedNotification>
 {
     private readonly BlockEditorValues<BlockListValue, BlockListLayoutItem> _blockListEditorValues;
     private readonly BlockEditorValues<BlockGridValue, BlockGridLayoutItem> _blockGridEditorValues;
+    private ContentSettings _contentSettings;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FileUploadContentDeletedNotificationHandler"/> class.
@@ -32,11 +38,15 @@ internal sealed class FileUploadContentDeletedNotificationHandler : FileUploadNo
         IJsonSerializer jsonSerializer,
         MediaFileManager mediaFileManager,
         IBlockEditorElementTypeCache elementTypeCache,
-        ILogger<FileUploadContentDeletedNotificationHandler> logger)
+        ILogger<FileUploadContentDeletedNotificationHandler> logger,
+        IOptionsMonitor<ContentSettings> contentSettngs)
         : base(jsonSerializer, mediaFileManager, elementTypeCache)
     {
         _blockListEditorValues = new(new BlockListEditorDataConverter(jsonSerializer), elementTypeCache, logger);
         _blockGridEditorValues = new(new BlockGridEditorDataConverter(jsonSerializer), elementTypeCache, logger);
+
+        _contentSettings = contentSettngs.CurrentValue;
+        contentSettngs.OnChange(x => _contentSettings = x);
     }
 
     /// <inheritdoc/>
@@ -49,16 +59,63 @@ internal sealed class FileUploadContentDeletedNotificationHandler : FileUploadNo
     public void Handle(MediaDeletedNotification notification) => DeleteContainedFiles(notification.DeletedEntities);
 
     /// <inheritdoc/>
+    public void Handle(MediaMovedToRecycleBinNotification notification)
+    {
+        if (_contentSettings.EnableMediaRecycleBinProtection is false)
+        {
+            return;
+        }
+
+        SuffixContainedFiles(
+            notification.MoveInfoCollection
+                .Select(x => x.Entity));
+    }
+
+    /// <inheritdoc/>
+    public void Handle(MediaMovedNotification notification)
+    {
+        if (_contentSettings.EnableMediaRecycleBinProtection is false)
+        {
+            return;
+        }
+
+        RemoveSuffixFromContainedFiles(
+            notification.MoveInfoCollection
+                .Where(x => x.OriginalPath.StartsWith($"{Constants.System.RootString},{Constants.System.RecycleBinMediaString}"))
+                .Select(x => x.Entity));
+    }
+
+    /// <inheritdoc/>
     public void Handle(MemberDeletedNotification notification) => DeleteContainedFiles(notification.DeletedEntities);
 
     /// <summary>
     /// Deletes all file upload property files contained within a collection of content entities.
     /// </summary>
-    /// <param name="deletedEntities"></param>
+    /// <param name="deletedEntities">Delete media entities.</param>
     private void DeleteContainedFiles(IEnumerable<IContentBase> deletedEntities)
     {
         IReadOnlyList<string> filePathsToDelete = ContainedFilePaths(deletedEntities);
         MediaFileManager.DeleteMediaFiles(filePathsToDelete);
+    }
+
+    /// <summary>
+    /// Renames all file upload property files contained within a collection of media entities that have been moved to the recycle bin.
+    /// </summary>
+    /// <param name="trashedMedia">Media entities that have been moved to the recycle bin.</param>
+    private void SuffixContainedFiles(IEnumerable<IMedia> trashedMedia)
+    {
+        IEnumerable<string> filePathsToRename = ContainedFilePaths(trashedMedia);
+        RecycleBinMediaProtectionHelper.SuffixContainedFiles(filePathsToRename, MediaFileManager);
+    }
+
+    /// <summary>
+    /// Renames all file upload property files contained within a collection of media entities that have been restored from the recycle bin.
+    /// </summary>
+    /// <param name="restoredMedia">Media entities that have been restored from the recycle bin.</param>
+    private void RemoveSuffixFromContainedFiles(IEnumerable<IMedia> restoredMedia)
+    {
+        IEnumerable<string> filePathsToRename = ContainedFilePaths(restoredMedia);
+        MediaFileManager.RemoveSuffixFromMediaFiles(filePathsToRename, Constants.Conventions.Media.TrashedMediaSuffix);
     }
 
     /// <summary>

@@ -1,11 +1,9 @@
 import { UMB_BACKOFFICE_CONTEXT } from '../backoffice.context.js';
-import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { isCurrentUserAnAdmin } from '@umbraco-cms/backoffice/current-user';
+import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import { UMB_NEWVERSION_MODAL, UMB_SYSINFO_MODAL } from '@umbraco-cms/backoffice/sysinfo';
-import type { UmbServerUpgradeCheck } from '@umbraco-cms/backoffice/sysinfo';
+import { UMB_SYSINFO_MODAL } from '@umbraco-cms/backoffice/sysinfo';
 
 /**
  * The backoffice header logo element.
@@ -22,14 +20,6 @@ export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
 	@state()
 	private _version?: string;
 
-	@state()
-	private _isUserAdmin = false;
-
-	@state()
-	private _serverUpgradeCheck: UmbServerUpgradeCheck | null = null;
-
-	#backofficeContext?: typeof UMB_BACKOFFICE_CONTEXT.TYPE;
-
 	constructor() {
 		super();
 
@@ -42,21 +32,7 @@ export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
 				},
 				'_observeVersion',
 			);
-
-			this.#backofficeContext = context;
 		});
-	}
-
-	protected override firstUpdated() {
-		this.#isAdmin();
-	}
-
-	async #isAdmin() {
-		this._isUserAdmin = await isCurrentUserAnAdmin(this);
-
-		if (this._isUserAdmin) {
-			this._serverUpgradeCheck = this.#backofficeContext ? await this.#backofficeContext.serverUpgradeCheck() : null;
-		}
 	}
 
 	override render() {
@@ -73,14 +49,7 @@ export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
 				<umb-popover-layout>
 					<div id="modal">
 						<umb-app-logo id="logo" logo-type="logo"></umb-app-logo>
-						<span>${this._version}</span>
-
-						${this._serverUpgradeCheck
-							? html`<uui-button
-									@click=${this.#openNewVersion}
-									color="positive"
-									label=${this.localize.term('general_newVersionAvailable')}></uui-button>`
-							: ''}
+						<span>${this._version ?? nothing}</span>
 
 						<a href="https://umbraco.com" target="_blank" rel="noopener">Umbraco.com</a>
 
@@ -99,21 +68,6 @@ export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
 
 		modalManager
 			.open(this, UMB_SYSINFO_MODAL)
-			.onSubmit()
-			.catch(() => {});
-	}
-
-	async #openNewVersion() {
-		if (!this._serverUpgradeCheck) return;
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		if (!modalManager) return;
-		modalManager
-			.open(this, UMB_NEWVERSION_MODAL, {
-				data: {
-					comment: this._serverUpgradeCheck.comment,
-					downloadUrl: this._serverUpgradeCheck.url,
-				},
-			})
 			.onSubmit()
 			.catch(() => {});
 	}
