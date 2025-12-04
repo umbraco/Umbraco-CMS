@@ -53,22 +53,20 @@ public class DocumentUrlService : IDocumentUrlService
     /// <remarks>Internal for the purpose of unit and benchmark testing.</remarks>
     internal readonly struct UrlCacheKey : IEquatable<UrlCacheKey>
     {
-#pragma warning disable IDE1006 // Naming Styles
         /// <summary>
         /// Gets the document key.
         /// </summary>
-        public readonly Guid DocumentKey;
+        public Guid DocumentKey { get; }
 
         /// <summary>
         /// Gets the language Id.
         /// </summary>
-        public readonly int LanguageId;
+        public int LanguageId { get; }
 
         /// <summary>
         /// Gets a value indicating whether the URL is for a draft or published version.
         /// </summary>
-        public readonly bool IsDraft;
-#pragma warning restore IDE1006 // Naming Styles
+        public bool IsDraft { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UrlCacheKey"/> struct.
@@ -302,6 +300,7 @@ public class DocumentUrlService : IDocumentUrlService
 
         foreach (PublishedDocumentUrlSegment model in publishedDocumentUrlSegments)
         {
+            // Group using composite key of document/language/draft.
             (Guid DocumentKey, int LanguageId, bool IsDraft) key = (model.DocumentKey, model.LanguageId, model.IsDraft);
 
             if (grouped.TryGetValue(key, out (string? Primary, List<string> Alternates) segments) is false)
@@ -310,6 +309,7 @@ public class DocumentUrlService : IDocumentUrlService
                 grouped[key] = segments;
             }
 
+            // Each segment is either added as the primrary setment or de-duplicated and added as an alternate.
             if (model.IsPrimary && segments.Primary is null)
             {
                 grouped[key] = (model.UrlSegment, segments.Alternates);
@@ -320,6 +320,7 @@ public class DocumentUrlService : IDocumentUrlService
             }
         }
 
+        // Prepare output as a collection of key value pairs of the cache key (UrlCacheKey struct) and cache entry (UrlSegmentCache object).
         foreach (KeyValuePair<(Guid DocumentKey, int LanguageId, bool IsDraft), (string? Primary, List<string> Alternates)> kvp in grouped)
         {
             (Guid documentKey, int languageId, bool isDraft) = kvp.Key;
