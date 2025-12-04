@@ -21,9 +21,6 @@ export class UmbCardCollectionViewElement extends UmbLitElement {
 	@state()
 	private _itemHrefs: Map<string, string> = new Map();
 
-	@state()
-	private _hasBulkActions = false;
-
 	#collectionContext?: typeof UMB_COLLECTION_CONTEXT.TYPE;
 
 	constructor() {
