@@ -8,6 +8,7 @@ internal static class NewsDashboardBuilderExtensions
 {
     internal static IUmbracoBuilder AddNewsDashboard(this IUmbracoBuilder builder)
     {
+        builder.Services.AddSingleton<NewsDashboardOptions>();
         builder.Services.AddSingleton<INewsDashboardService, NewsDashboardService>();
 
         return builder;
