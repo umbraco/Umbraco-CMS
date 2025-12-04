@@ -18,7 +18,7 @@ public sealed class MediaFileManager
     private readonly IShortStringHelper _shortStringHelper;
     private MediaUrlGeneratorCollection? _mediaUrlGenerators;
 
-    [Obsolete("Please use the constructor taking all arguments")]
+    [Obsolete("Please use the constructor taking all arguments, scheduled for removal in Umbraco 19")]
     public MediaFileManager(
         IFileSystem fileSystem,
         IMediaPathScheme mediaPathScheme,
