@@ -1,4 +1,4 @@
-import { html, LitElement, customElement, property, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { html, LitElement, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbTableColumn } from '@umbraco-cms/backoffice/components';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
