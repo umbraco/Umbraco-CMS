@@ -197,7 +197,7 @@ export class UmbDefaultCollectionContext<
 	}
 
 	#configureSelection() {
-		// TODO: We need support a collecion selection configuration here so ex. Pickers can turn on single and multi select and set a selection.
+		// TODO: We need support a collection selection configuration here so ex. Pickers can turn on single and multi select and set a selection.
 		this.selection.setSelectable(false);
 		this.selection.setMultiple(false);
 
