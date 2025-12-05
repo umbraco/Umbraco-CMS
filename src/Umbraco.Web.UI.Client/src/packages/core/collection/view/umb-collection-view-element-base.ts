@@ -47,7 +47,7 @@ export abstract class UmbCollectionViewElementBase extends UmbLitElement {
 				this.#collectionContext?.items,
 				async (items) => {
 					this._items = items ?? [];
-					await this._updateItemHrefs();
+					await this.#updateItemHrefs();
 				},
 				'umbCollectionItemsObserver',
 			);
@@ -79,14 +79,13 @@ export abstract class UmbCollectionViewElementBase extends UmbLitElement {
 		return this.#collectionContext?.selection.isSelected(unique) ?? false;
 	}
 
-	protected async _updateItemHrefs() {
-		const hrefs = new Map<string, string>();
-		for (const item of this._items) {
-			const href = await this.#collectionContext?.requestItemHref?.(item);
-			if (href && item.unique) {
-				hrefs.set(item.unique, href);
-			}
-		}
-		this._itemHrefs = hrefs;
+	async #updateItemHrefs() {
+		const entries = await Promise.all(
+			this._items.map(async (item) => {
+				const href = await this.#collectionContext?.requestItemHref?.(item);
+				return item.unique && href ? ([item.unique, href] as const) : null;
+			}),
+		);
+		this._itemHrefs = new Map(entries.filter((entry): entry is [string, string] => entry !== null));
 	}
 }
