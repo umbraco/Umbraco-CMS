@@ -1,1 +1,1 @@
-export type * from '../view/collection-view.extension.js';
+export type * from './collection-view.extension.js';
