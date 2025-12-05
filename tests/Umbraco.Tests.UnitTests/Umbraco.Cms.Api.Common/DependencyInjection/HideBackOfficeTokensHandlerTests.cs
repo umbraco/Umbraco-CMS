@@ -43,7 +43,7 @@ internal class HideBackOfficeTokensHandlerTests
 
         private Mock<IDataProtectionProvider> DataProtectionProvider { get; } = new();
 
-        private Mock<IDataProtector> DataProtector { get; } = new();
+        public Mock<IDataProtector> DataProtector { get; } = new();
 
         private BackOfficeTokenCookieSettings BackOfficeTokenCookieSettings { get; set; } = new();
 
@@ -166,11 +166,19 @@ internal class HideBackOfficeTokensHandlerTests
         // Act
         await setup.Sut.HandleAsync(context);
 
+        setup.ResponseCookies.TryGetValue(AccessTokenCookieName, out var accessTokenCookieValue);
+        var unprotectedAccessTokenCookieValue = setup.DataProtector.Object.Unprotect(accessTokenCookieValue!);
+
+        setup.ResponseCookies.TryGetValue(RefreshTokenCookieName, out var refreshTokenCookieValue);
+        var unprotectedRefreshTokenCookieValue = setup.DataProtector.Object.Unprotect(refreshTokenCookieValue!);
+
         // Assert
         Assert.AreEqual(RedactedTokenValue, context.Response.AccessToken);
         Assert.AreEqual(RedactedTokenValue, context.Response.RefreshToken);
         Assert.IsTrue(setup.ResponseCookies.ContainsKey(AccessTokenCookieName));
         Assert.IsTrue(setup.ResponseCookies.ContainsKey(RefreshTokenCookieName));
+        Assert.AreEqual(AccessTokenValue, unprotectedAccessTokenCookieValue);
+        Assert.AreEqual(RefreshTokenValue, unprotectedRefreshTokenCookieValue);
     }
 
     [TestCase(true, false, true, TestName = "ApplyTokenResponse_UseHttpsTrue_HttpRequest_UsesSecurePrefix")]
