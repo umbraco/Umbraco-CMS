@@ -6,22 +6,30 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+/// Implements <see cref="IOEmbedService"/> for retrieving embeddable HTML markup using the oEmbed protocol.
+/// </summary>
 public class OEmbedService : IOEmbedService
 {
     private readonly EmbedProvidersCollection _embedProvidersCollection;
     private readonly ILogger<OEmbedService> _logger;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="OEmbedService"/> class.
+    /// </summary>
     public OEmbedService(EmbedProvidersCollection embedProvidersCollection, ILogger<OEmbedService> logger)
     {
         _embedProvidersCollection = embedProvidersCollection;
         _logger = logger;
     }
 
+    /// <inheritdoc/>
     public async Task<Attempt<string, OEmbedOperationStatus>> GetMarkupAsync(Uri url, int? maxWidth, int? maxHeight, CancellationToken cancellationToken)
     {
         // Find the first provider that supports the URL
         IEmbedProvider? matchedProvider = _embedProvidersCollection
-            .FirstOrDefault(provider => provider.UrlSchemeRegex.Any(regex=>new Regex(regex, RegexOptions.IgnoreCase).IsMatch(url.OriginalString)));
+            .FirstOrDefault(provider => provider.UrlSchemeRegex
+                .Any(regex => new Regex(regex, RegexOptions.IgnoreCase).IsMatch(url.OriginalString)));
 
         if (matchedProvider is null)
         {
@@ -39,8 +47,8 @@ public class OEmbedService : IOEmbedService
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Unexpected exception happened while trying to get oembed markup. Provider: {Provider}",matchedProvider.GetType().Name);
-            Attempt.FailWithStatus(OEmbedOperationStatus.UnexpectedException, string.Empty, e);
+            _logger.LogError(e, "Unexpected exception happened while trying to get oEmbed markup. Provider: {Provider}", matchedProvider.GetType().Name);
+            return Attempt.FailWithStatus(OEmbedOperationStatus.UnexpectedException, string.Empty, e);
         }
 
         return Attempt.FailWithStatus(OEmbedOperationStatus.ProviderReturnedInvalidResult, string.Empty);
