@@ -276,15 +276,16 @@
 
                 };
 
-                Utilities.extend(baseLineConfigObj, standardConfig);
-
-                // Readonly mode
-                baseLineConfigObj.toolbar = vm.readonly ? false : baseLineConfigObj.toolbar;
-                baseLineConfigObj.readonly = vm.readonly ? true : baseLineConfigObj.readonly;
+                const options = Utilities.extend({}, baseLineConfigObj, standardConfig);
 
                 // We need to wait for DOM to have rendered before we can find the element by ID.
                 $timeout(function () {
-                  tinymce.init(baseLineConfigObj);
+
+                  // Readonly mode - ensure observe of readonly attribute has triggered, see https://github.com/umbraco/Umbraco-CMS/issues/20952
+                  options.toolbar = vm.readonly ? false : options.toolbar;
+                  options.readonly = vm.readonly ? true : options.readonly;
+
+                  tinymce.init(options);
                 }, 50);
 
                 //listen for formSubmitting event (the result is callback used to remove the event subscription)
