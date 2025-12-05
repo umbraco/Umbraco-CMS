@@ -39,7 +39,7 @@ export class UmbDictionarySearchServerDataSource implements UmbSearchDataSource<
 		if (data) {
 			const mappedItems: Array<UmbDictionarySearchItemModel> = data.items.map((item) => {
 				return {
-					href: '/section/translation/workspace/dictionary/edit/' + item.id,
+					href: 'section/translation/workspace/dictionary/edit/' + item.id,
 					entityType: UMB_DICTIONARY_ENTITY_TYPE,
 					unique: item.id,
 					name: item.name ?? '',
