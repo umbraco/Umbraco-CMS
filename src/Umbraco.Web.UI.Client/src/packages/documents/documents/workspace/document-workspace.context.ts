@@ -18,7 +18,6 @@ import { UmbDocumentValidationRepository } from '../repository/validation/index.
 import { UMB_DOCUMENT_CONFIGURATION_CONTEXT } from '../index.js';
 import { UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD, UMB_DOCUMENT_WORKSPACE_ALIAS } from './constants.js';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
-import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { umbPeekError } from '@umbraco-cms/backoffice/notification';
 import { UmbContentDetailWorkspaceContextBase } from '@umbraco-cms/backoffice/content';
 import { UmbDeprecation, type UmbVariantGuardRule } from '@umbraco-cms/backoffice/utils';
@@ -37,7 +36,6 @@ import type { UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
-import type { UmbVariantPropertyGuardRule } from '@umbraco-cms/backoffice/property';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UmbPreviewRepository } from '@umbraco-cms/backoffice/preview';
@@ -93,7 +91,6 @@ export class UmbDocumentWorkspaceContext
 		this.consumeContext(UMB_DOCUMENT_CONFIGURATION_CONTEXT, async (context) => {
 			const config = await context?.getDocumentConfiguration();
 			const allowSegmentCreation = config?.allowNonExistingSegmentsCreation ?? false;
-			const allowEditInvariantFromNonDefault = config?.allowEditInvariantFromNonDefault ?? true;
 
 			// Deprecation warning for allowNonExistingSegmentsCreation (default from server is true, so we warn on false)
 			if (!allowSegmentCreation) {
@@ -114,10 +111,6 @@ export class UmbDocumentWorkspaceContext
 
 				return true;
 			};
-
-			if (allowEditInvariantFromNonDefault === false) {
-				this.#preventEditInvariantFromNonDefault();
-			}
 		});
 
 		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (actionEventContext) => {
@@ -401,35 +394,6 @@ export class UmbDocumentWorkspaceContext
 			If the user does not have permission, we set it to true = permitted to be read-only. */
 			permitted: true,
 		});
-	}
-
-	#preventEditInvariantFromNonDefault() {
-		this.observe(
-			observeMultiple([this.structure.contentTypeProperties, this.variantOptions]),
-			([properties, variantOptions]) => {
-				if (properties.length === 0) return;
-				if (variantOptions.length === 0) return;
-
-				variantOptions.forEach((variantOption) => {
-					// Do not add a rule for the default language. It is always permitted to edit.
-					if (variantOption.language.isDefault) return;
-
-					const datasetVariantId = UmbVariantId.CreateFromPartial(variantOption);
-					const invariantVariantId = UmbVariantId.CreateInvariant();
-					const unique = `UMB_PREVENT_EDIT_INVARIANT_FROM_NON_DEFAULT_DATASET=${datasetVariantId.toString()}_PROPERTY_${invariantVariantId.toString()}`;
-
-					const rule: UmbVariantPropertyGuardRule = {
-						unique,
-						message: 'Shared properties can only be edited in the default language',
-						variantId: invariantVariantId,
-						datasetVariantId,
-						permitted: false,
-					};
-
-					this.propertyWriteGuard.addRule(rule);
-				});
-			},
-		);
 	}
 
 	#addEventListeners() {
