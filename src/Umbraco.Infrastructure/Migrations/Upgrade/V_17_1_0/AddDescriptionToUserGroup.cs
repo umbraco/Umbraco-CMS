@@ -21,20 +21,23 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_17_1_0
         /// <inheritdoc/>
         protected override async Task MigrateAsync()
         {
-            if (TableExists(Constants.DatabaseSchema.Tables.UserGroup))
+            if (TableExists(Constants.DatabaseSchema.Tables.UserGroup) is false)
             {
                 return;
             }
 
-            string columnName = "description";
-            var hasColumn = Context.SqlContext.SqlSyntax.GetColumnsInSchema(Context.Database).ToList().Any(c =>
-            c.TableName == Constants.DatabaseSchema.Tables.UserGroup &&
-            c.ColumnName == columnName);
+            const string ColumnName = "description";
+            var hasColumn = Context.SqlContext.SqlSyntax.GetColumnsInSchema(Context.Database)
+                .Any(c =>
+                    c.TableName == Constants.DatabaseSchema.Tables.UserGroup &&
+                    c.ColumnName == ColumnName);
 
-            if (!hasColumn)
+            if (hasColumn)
             {
-                AddColumn<UserGroupDto>(Constants.DatabaseSchema.Tables.UserGroup, columnName);
+                return;
             }
+
+            AddColumn<UserGroupDto>(Constants.DatabaseSchema.Tables.UserGroup, ColumnName);
         }
     }
 }
