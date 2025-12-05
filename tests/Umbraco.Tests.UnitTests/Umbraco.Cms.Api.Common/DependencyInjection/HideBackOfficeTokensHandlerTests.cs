@@ -25,6 +25,10 @@ internal class HideBackOfficeTokensHandlerTests
     private const string RefreshTokenCookieName = "umbRefreshToken";
     private const string PkceCodeCookieName = "umbPkceCode";
 
+    private const string AccessTokenValue = "my-access-token";
+    private const string RefreshTokenValue = "my-refresh-token";
+    private const string PkceCodeValue = "my-pkce-code";
+
     private class TestSetup
     {
         [field: AllowNull]
@@ -102,14 +106,14 @@ internal class HideBackOfficeTokensHandlerTests
         var setup = new TestSetup();
         setup.SetupHttpContext();
 
-        var context = CreateApplyTokenResponseContext("other-client", "access-token", "refresh-token");
+        var context = CreateApplyTokenResponseContext("other-client", AccessTokenValue, RefreshTokenValue);
 
         // Act
         await setup.Sut.HandleAsync(context);
 
         // Assert
-        Assert.AreEqual("access-token", context.Response.AccessToken);
-        Assert.AreEqual("refresh-token", context.Response.RefreshToken);
+        Assert.AreEqual(AccessTokenValue, context.Response.AccessToken);
+        Assert.AreEqual(RefreshTokenValue, context.Response.RefreshToken);
         Assert.IsEmpty(setup.ResponseCookies);
     }
 
@@ -121,7 +125,7 @@ internal class HideBackOfficeTokensHandlerTests
         setup.GlobalSettings.UseHttps = false;
         setup.SetupHttpContext(isHttps: false);
 
-        var context = CreateApplyTokenResponseContext(Constants.OAuthClientIds.BackOffice, "my-access-token", null);
+        var context = CreateApplyTokenResponseContext(Constants.OAuthClientIds.BackOffice, AccessTokenValue, null);
 
         // Act
         await setup.Sut.HandleAsync(context);
@@ -139,7 +143,7 @@ internal class HideBackOfficeTokensHandlerTests
         setup.GlobalSettings.UseHttps = false;
         setup.SetupHttpContext(isHttps: false);
 
-        var context = CreateApplyTokenResponseContext(Constants.OAuthClientIds.BackOffice, null, "my-refresh-token");
+        var context = CreateApplyTokenResponseContext(Constants.OAuthClientIds.BackOffice, null, RefreshTokenValue);
 
         // Act
         await setup.Sut.HandleAsync(context);
@@ -157,7 +161,7 @@ internal class HideBackOfficeTokensHandlerTests
         setup.GlobalSettings.UseHttps = false;
         setup.SetupHttpContext(isHttps: false);
 
-        var context = CreateApplyTokenResponseContext(Constants.OAuthClientIds.BackOffice, "my-access-token", "my-refresh-token");
+        var context = CreateApplyTokenResponseContext(Constants.OAuthClientIds.BackOffice, AccessTokenValue, RefreshTokenValue);
 
         // Act
         await setup.Sut.HandleAsync(context);
@@ -180,7 +184,7 @@ internal class HideBackOfficeTokensHandlerTests
         setup.GlobalSettings.UseHttps = useHttps;
         setup.SetupHttpContext(isHttps: isHttps);
 
-        var context = CreateApplyTokenResponseContext(Constants.OAuthClientIds.BackOffice, "access-token", "refresh-token");
+        var context = CreateApplyTokenResponseContext(Constants.OAuthClientIds.BackOffice, AccessTokenValue, RefreshTokenValue);
 
         // Act
         await setup.Sut.HandleAsync(context);
@@ -210,13 +214,13 @@ internal class HideBackOfficeTokensHandlerTests
         var setup = new TestSetup();
         setup.SetupHttpContext();
 
-        var context = CreateApplyAuthorizationResponseContext("other-client", "pkce-code");
+        var context = CreateApplyAuthorizationResponseContext("other-client", PkceCodeValue);
 
         // Act
         await setup.Sut.HandleAsync(context);
 
         // Assert
-        Assert.AreEqual("pkce-code", context.Response.Code);
+        Assert.AreEqual(PkceCodeValue, context.Response.Code);
         Assert.IsEmpty(setup.ResponseCookies);
     }
 
@@ -228,7 +232,7 @@ internal class HideBackOfficeTokensHandlerTests
         setup.GlobalSettings.UseHttps = false;
         setup.SetupHttpContext(isHttps: false);
 
-        var context = CreateApplyAuthorizationResponseContext(Constants.OAuthClientIds.BackOffice, "my-pkce-code");
+        var context = CreateApplyAuthorizationResponseContext(Constants.OAuthClientIds.BackOffice, PkceCodeValue);
 
         // Act
         await setup.Sut.HandleAsync(context);
@@ -249,7 +253,7 @@ internal class HideBackOfficeTokensHandlerTests
         setup.GlobalSettings.UseHttps = useHttps;
         setup.SetupHttpContext(isHttps: isHttps);
 
-        var context = CreateApplyAuthorizationResponseContext(Constants.OAuthClientIds.BackOffice, "pkce-code");
+        var context = CreateApplyAuthorizationResponseContext(Constants.OAuthClientIds.BackOffice, PkceCodeValue);
 
         // Act
         await setup.Sut.HandleAsync(context);
@@ -292,7 +296,7 @@ internal class HideBackOfficeTokensHandlerTests
         // Arrange
         var setup = new TestSetup();
         setup.GlobalSettings.UseHttps = false;
-        var encryptedCode = setup.EncryptValue("my-pkce-code");
+        var encryptedCode = setup.EncryptValue(PkceCodeValue);
         setup.SetupHttpContext(isHttps: false, requestCookies: new Dictionary<string, string> { { PkceCodeCookieName, encryptedCode } });
 
         var context = CreateExtractTokenRequestContext(Constants.OAuthClientIds.BackOffice, RedactedTokenValue, null);
@@ -301,7 +305,7 @@ internal class HideBackOfficeTokensHandlerTests
         await setup.Sut.HandleAsync(context);
 
         // Assert
-        Assert.AreEqual("my-pkce-code", context.Request.Code);
+        Assert.AreEqual(PkceCodeValue, context.Request.Code);
     }
 
     [Test]
@@ -310,7 +314,7 @@ internal class HideBackOfficeTokensHandlerTests
         // Arrange
         var setup = new TestSetup();
         setup.GlobalSettings.UseHttps = false;
-        var encryptedCode = setup.EncryptValue("my-pkce-code");
+        var encryptedCode = setup.EncryptValue(PkceCodeValue);
         setup.SetupHttpContext(isHttps: false, requestCookies: new Dictionary<string, string> { { PkceCodeCookieName, encryptedCode } });
 
         var context = CreateExtractTokenRequestContext(Constants.OAuthClientIds.BackOffice, RedactedTokenValue, null);
@@ -345,7 +349,7 @@ internal class HideBackOfficeTokensHandlerTests
         // Arrange
         var setup = new TestSetup();
         setup.GlobalSettings.UseHttps = false;
-        var encryptedToken = setup.EncryptValue("my-refresh-token");
+        var encryptedToken = setup.EncryptValue(RefreshTokenValue);
         setup.SetupHttpContext(isHttps: false, requestCookies: new Dictionary<string, string> { { RefreshTokenCookieName, encryptedToken } });
 
         var context = CreateExtractTokenRequestContext(Constants.OAuthClientIds.BackOffice, null, RedactedTokenValue);
@@ -354,7 +358,7 @@ internal class HideBackOfficeTokensHandlerTests
         await setup.Sut.HandleAsync(context);
 
         // Assert
-        Assert.AreEqual("my-refresh-token", context.Request.RefreshToken);
+        Assert.AreEqual(RefreshTokenValue, context.Request.RefreshToken);
     }
 
     [Test]
@@ -383,7 +387,7 @@ internal class HideBackOfficeTokensHandlerTests
         // Arrange
         var setup = new TestSetup();
         setup.GlobalSettings.UseHttps = useHttps;
-        var encryptedCode = setup.EncryptValue("my-pkce-code");
+        var encryptedCode = setup.EncryptValue(PkceCodeValue);
         var expectedCookieName = setup.GetExpectedCookieName(PkceCodeCookieName, useHttps, isHttps);
         setup.SetupHttpContext(isHttps: isHttps, requestCookies: new Dictionary<string, string>
         {
@@ -396,7 +400,7 @@ internal class HideBackOfficeTokensHandlerTests
         await setup.Sut.HandleAsync(context);
 
         // Assert
-        Assert.AreEqual("my-pkce-code", context.Request.Code);
+        Assert.AreEqual(PkceCodeValue, context.Request.Code);
         Assert.IsTrue(setup.DeletedCookies.Contains(expectedCookieName), $"Expected cookie '{expectedCookieName}' to be deleted");
 
         if (!useHttps && !isHttps)
@@ -414,7 +418,7 @@ internal class HideBackOfficeTokensHandlerTests
         // Arrange
         var setup = new TestSetup();
         setup.GlobalSettings.UseHttps = useHttps;
-        var encryptedToken = setup.EncryptValue("my-refresh-token");
+        var encryptedToken = setup.EncryptValue(RefreshTokenValue);
         var expectedCookieName = setup.GetExpectedCookieName(RefreshTokenCookieName, useHttps, isHttps);
         setup.SetupHttpContext(isHttps: isHttps, requestCookies: new Dictionary<string, string>
         {
@@ -427,7 +431,7 @@ internal class HideBackOfficeTokensHandlerTests
         await setup.Sut.HandleAsync(context);
 
         // Assert
-        Assert.AreEqual("my-refresh-token", context.Request.RefreshToken);
+        Assert.AreEqual(RefreshTokenValue, context.Request.RefreshToken);
     }
 
     #endregion
@@ -457,7 +461,7 @@ internal class HideBackOfficeTokensHandlerTests
         // Arrange
         var setup = new TestSetup();
         setup.GlobalSettings.UseHttps = false;
-        var encryptedToken = setup.EncryptValue("my-access-token");
+        var encryptedToken = setup.EncryptValue(AccessTokenValue);
         setup.SetupHttpContext(isHttps: false, requestCookies: new Dictionary<string, string> { { AccessTokenCookieName, encryptedToken } });
 
         var context = CreateProcessAuthenticationContext(RedactedTokenValue);
@@ -466,7 +470,7 @@ internal class HideBackOfficeTokensHandlerTests
         await setup.Sut.HandleAsync(context);
 
         // Assert
-        Assert.AreEqual("my-access-token", context.AccessToken);
+        Assert.AreEqual(AccessTokenValue, context.AccessToken);
     }
 
     [TestCase(true, false, TestName = "ProcessAuthentication_UseHttpsTrue_HttpRequest_UsesSecurePrefix")]
@@ -478,7 +482,7 @@ internal class HideBackOfficeTokensHandlerTests
         // Arrange
         var setup = new TestSetup();
         setup.GlobalSettings.UseHttps = useHttps;
-        var encryptedToken = setup.EncryptValue("my-access-token");
+        var encryptedToken = setup.EncryptValue(AccessTokenValue);
         var expectedCookieName = setup.GetExpectedCookieName(AccessTokenCookieName, useHttps, isHttps);
         setup.SetupHttpContext(isHttps: isHttps, requestCookies: new Dictionary<string, string>
         {
@@ -491,7 +495,7 @@ internal class HideBackOfficeTokensHandlerTests
         await setup.Sut.HandleAsync(context);
 
         // Assert
-        Assert.AreEqual("my-access-token", context.AccessToken);
+        Assert.AreEqual(AccessTokenValue, context.AccessToken);
     }
 
     #endregion
