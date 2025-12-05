@@ -1,12 +1,12 @@
 namespace Umbraco.Cms.Api.Management.Services.NewsDashboard;
 
 /// <summary>
-/// Options for the news dashboard service.
+/// Cache duration provider for the news dashboard service.
 /// </summary>
-public class NewsDashboardOptions
+public interface INewsCacheDurationProvider
 {
     /// <summary>
     /// Gets the cache duration for news dashboard items.
     /// </summary>
-    public virtual TimeSpan CacheDuration => TimeSpan.FromMinutes(30);
+    TimeSpan CacheDuration { get; }
 }

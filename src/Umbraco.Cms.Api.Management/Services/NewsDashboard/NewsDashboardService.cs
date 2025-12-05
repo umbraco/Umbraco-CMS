@@ -23,7 +23,7 @@ public class NewsDashboardService : INewsDashboardService
     private readonly ILogger<NewsDashboardService> _logger;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly GlobalSettings _globalSettings;
-    private readonly NewsDashboardOptions _newsDashboardOptions;
+    private readonly INewsCacheDurationProvider _newsCacheDurationProvider;
 
     private static readonly HttpClient _httpClient = new();
 
@@ -37,7 +37,7 @@ public class NewsDashboardService : INewsDashboardService
         ILogger<NewsDashboardService> logger,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IOptions<GlobalSettings> globalSettings,
-        NewsDashboardOptions newsDashboardOptions)
+        INewsCacheDurationProvider newsCacheDurationProvider)
     {
         _appCaches = appCaches;
         _umbracoVersion = umbracoVersion;
@@ -45,7 +45,7 @@ public class NewsDashboardService : INewsDashboardService
         _logger = logger;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
         _globalSettings = globalSettings.Value;
-        _newsDashboardOptions = newsDashboardOptions;
+        _newsCacheDurationProvider = newsCacheDurationProvider;
     }
 
     [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19")]
@@ -63,7 +63,7 @@ public class NewsDashboardService : INewsDashboardService
         logger,
         backOfficeSecurityAccessor,
         globalSettings,
-        StaticServiceProvider.Instance.GetRequiredService<NewsDashboardOptions>())
+        StaticServiceProvider.Instance.GetRequiredService<INewsCacheDurationProvider>())
     {
     }
 
@@ -93,7 +93,7 @@ public class NewsDashboardService : INewsDashboardService
 
             if (TryMapModel(json, out NewsDashboardResponseModel? model))
             {
-                _appCaches.RuntimeCache.InsertCacheItem(CacheKey, () => model, _newsDashboardOptions.CacheDuration);
+                _appCaches.RuntimeCache.InsertCacheItem(CacheKey, () => model, _newsCacheDurationProvider.CacheDuration);
                 content = model;
             }
         }
