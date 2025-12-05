@@ -50,7 +50,8 @@ internal sealed class FileSystemsTests : UmbracoIntegrationTest
         Assert.IsFalse(File.Exists(physPath));
 
         // ~/media exists
-        physPath = Path.GetDirectoryName(physPath);
+        physPath = Path.GetDirectoryName(physPath); // ~/media/folder
+        physPath = Path.GetDirectoryName(physPath); // ~/media
         Assert.IsTrue(Directory.Exists(physPath));
     }
 
