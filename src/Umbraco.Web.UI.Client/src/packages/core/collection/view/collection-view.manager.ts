@@ -1,4 +1,4 @@
-import type { ManifestCollectionView } from './extensions/types.js';
+import type { ManifestCollectionView } from './collection-view.extension.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbExtensionsManifestInitializer, createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';

@@ -1,5 +1,5 @@
-import type { ManifestCollectionView } from './extensions/types.js';
-import { umbExtensionsRegistry } from '../extension-registry/index.js';
+import type { ManifestCollectionView } from './collection-view.extension.js';
+import { umbExtensionsRegistry } from '../../extension-registry/index.js';
 import { UmbCollectionViewManager } from './collection-view.manager.js';
 import { expect } from '@open-wc/testing';
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';

@@ -1,4 +1,5 @@
 import type { UmbUserDetailModel } from '../types.js';
+import { UMB_EDIT_USER_WORKSPACE_PATH_PATTERN } from '../paths.js';
 import { UMB_COLLECTION_VIEW_USER_GRID } from './views/index.js';
 import type { UmbUserCollectionFilterModel, UmbUserOrderByOption } from './types.js';
 import type { UmbUserOrderByType, UmbUserStateFilterType } from './utils/index.js';
@@ -119,6 +120,15 @@ export class UmbUserCollectionContext extends UmbDefaultCollectionContext<
 	 */
 	setOrderDirectionFilter(orderDirection: UmbDirectionType) {
 		this.setFilter({ orderDirection });
+	}
+
+	/**
+	 * Returns the href for a specific user collection item.
+	 * @param {UmbUserDetailModel} item - The user item to get the href for.
+	 * @returns {Promise<string | undefined>} - The edit workspace href for the user.
+	 */
+	override async requestItemHref(item: UmbUserDetailModel): Promise<string | undefined> {
+		return `${UMB_EDIT_USER_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: item.unique })}`;
 	}
 }
 

@@ -13,4 +13,7 @@ export const UMB_USER_ROOT_WORKSPACE_PATH = UMB_WORKSPACE_PATH_PATTERN.generateA
 	entityType: UMB_USER_ROOT_ENTITY_TYPE,
 });
 
-export const UMB_EDIT_USER_WORKSPACE_PATH_PATTERN = new UmbPathPattern<{ unique: string }>('edit/:unique');
+export const UMB_EDIT_USER_WORKSPACE_PATH_PATTERN = new UmbPathPattern<{ unique: string }>(
+	'edit/:unique',
+	UMB_USER_WORKSPACE_PATH,
+);
