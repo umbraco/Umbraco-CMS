@@ -287,7 +287,7 @@ The test suite is organized into multiple Playwright projects (see `playwright.c
 |---------|-------------|
 | `setup` | Authentication setup (runs first) |
 | `defaultConfig` | Main test suite (depends on setup) |
-| `extensionRegistry` | Extension/plugin tests |
+| `extensionRegistry` | Extension registry tests |
 | `entityDataPicker` | Entity data picker tests |
 | `deliveryApi` | Delivery API tests |
 | `externalLoginAzureADB2C` | Azure AD B2C authentication tests |
