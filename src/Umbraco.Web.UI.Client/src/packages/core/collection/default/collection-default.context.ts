@@ -93,19 +93,6 @@ export class UmbDefaultCollectionContext<
 		this.#defaultViewAlias = defaultViewAlias;
 		this.#defaultFilter = defaultFilter;
 
-		this.selection.setSelectable(false);
-
-		this.observe(
-			this.bulkAction.hasBulkActions,
-			(hasBulkActions) => {
-				// Allow selection if there are bulk actions available
-				if (hasBulkActions) {
-					this.selection.setSelectable(true);
-				}
-			},
-			'umbCollectionHasBulkActionsObserver',
-		);
-
 		this.pagination.addEventListener(UmbChangeEvent.TYPE, this.#onPageChange);
 		this.#listenToEntityEvents();
 
@@ -178,7 +165,7 @@ export class UmbDefaultCollectionContext<
 	protected _configure() {
 		if (!this.#config) return;
 
-		this.selection.setMultiple(true);
+		this.#configureSelection();
 
 		if (this.#config.pageSize) {
 			this.pagination.setPageSize(this.#config.pageSize);
@@ -207,6 +194,26 @@ export class UmbDefaultCollectionContext<
 		this.view.setConfig(viewManagerConfig);
 
 		this._configured = true;
+	}
+
+	#configureSelection() {
+		// TODO: We need support a collecion selection configuration here so ex. Pickers can turn on single and multi select and set a selection.
+		this.selection.setSelectable(false);
+		this.selection.setMultiple(false);
+
+		// Observe bulk actions to enable selection when bulk actions are available
+		// Bulk Actions are an integrated part of a Collection so we handle it here instead of a configuration
+		this.observe(
+			this.bulkAction.hasBulkActions,
+			(hasBulkActions) => {
+				// Allow selection if there are bulk actions available
+				if (hasBulkActions) {
+					this.selection.setSelectable(true);
+					this.selection.setMultiple(true);
+				}
+			},
+			'umbCollectionHasBulkActionsObserver',
+		);
 	}
 
 	#checkIfInitialized() {
@@ -373,7 +380,7 @@ export class UmbDefaultCollectionContext<
 
 	/**
 	 * Sets the manifest for the collection.
-	 * @param {ManifestCollection} manifest
+	 * @param {ManifestCollection} manifest - The manifest for the collection.
 	 * @memberof UmbCollectionContext
 	 * @deprecated Use set the `.manifest` property instead.
 	 */
@@ -387,7 +394,7 @@ export class UmbDefaultCollectionContext<
 
 	/**
 	 * Returns the manifest for the collection.
-	 * @returns {ManifestCollection}
+	 * @returns {ManifestCollection} - The manifest for the collection.
 	 * @memberof UmbCollectionContext
 	 * @deprecated Use the `.manifest` property instead.
 	 */
