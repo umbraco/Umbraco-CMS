@@ -17,10 +17,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Common.DependencyInjection
 [TestFixture]
 internal class HideBackOfficeTokensHandlerTests
 {
-    // can't decide whether it's better to keep these in sync manually => it will make the tests fail which notifices whoever changes them to think about the implications
-    // make the consts on HideBackOfficeTokensHandler internal so we can use them here
-    // move them to public consts outside of the HideBackOfficeTokensHandler incase we need them somewhere else.
-    // will do like this for now.
+    // We have decided to keep these in sync manually => it will make the tests fail,
+    // which notifies whoever changes their counterparts in HideBackOfficeTokensHandler to think about the implications
     private const string RedactedTokenValue = "[redacted]";
     private const string SecureCookiePrefix = "__Host-";
     private const string AccessTokenCookieName = "umbAccessToken";
