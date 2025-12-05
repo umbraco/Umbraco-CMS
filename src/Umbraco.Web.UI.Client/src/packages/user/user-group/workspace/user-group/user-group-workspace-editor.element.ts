@@ -140,9 +140,10 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 			}
 
 			#icon {
-				font-size: var(--uui-size-5);
-				height: 30px;
-				width: 30px;
+				font-size: var(--uui-size-8);
+				height: 60px;
+				width: 60px;
+				--uui-button-border-color-hover: var(--uui-color-border);
 			}
 
 			#name {
