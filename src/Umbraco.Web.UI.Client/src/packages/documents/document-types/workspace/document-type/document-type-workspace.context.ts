@@ -7,6 +7,7 @@ import {
 import type { UmbCreateDocumentTypeWorkspacePresetType } from '../../paths.js';
 import type { UmbDocumentTypeDetailModel } from '../../types.js';
 import { UMB_DOCUMENT_TYPE_ENTITY_TYPE, UMB_DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS } from '../../constants.js';
+import { UmbDocumentTypeTemplateRepository } from '../../repository/template/document-type-template.repository.js';
 import { UMB_DOCUMENT_TYPE_WORKSPACE_ALIAS } from './constants.js';
 import { UmbDocumentTypeWorkspaceEditorElement } from './document-type-workspace-editor.element.js';
 import { CompositionTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
@@ -17,7 +18,7 @@ import {
 	UmbWorkspaceIsNewRedirectControllerAlias,
 } from '@umbraco-cms/backoffice/workspace';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import { UMB_TEMPLATE_ROOT_ENTITY_TYPE, UmbTemplateDetailRepository } from '@umbraco-cms/backoffice/template';
+import { UMB_TEMPLATE_ROOT_ENTITY_TYPE } from '@umbraco-cms/backoffice/template';
 import type { UmbContentTypeSortModel, UmbContentTypeWorkspaceContext } from '@umbraco-cms/backoffice/content-type';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
@@ -36,8 +37,7 @@ export class UmbDocumentTypeWorkspaceContext
 	readonly cleanup;
 
 	createTemplateMode: boolean = false;
-
-	#templateRepository = new UmbTemplateDetailRepository(this);
+	#documentTypeRepository = new UmbDocumentTypeTemplateRepository(this);
 
 	constructor(host: UmbControllerHost) {
 		super(host, {
@@ -167,28 +167,31 @@ export class UmbDocumentTypeWorkspaceContext
 	}
 
 	protected override async _create(currentData: DetailModelType, parent: UmbEntityModel) {
-		// TODO: move this responsibility to the template package
-		if (this.createTemplateMode) {
-			await this.#createAndAssignTemplate();
-		}
-
 		try {
-			super._create(currentData, parent);
-			this.createTemplateMode = false;
+			// First create the document type (without template)
+			await super._create(currentData, parent);
+
+			if (this.createTemplateMode) {
+				// If in create template mode, create a template
+				await this.#createTemplate();
+				this.createTemplateMode = false;
+
+				await this.reload();
+			}
 		} catch (error) {
 			console.warn(error);
 		}
 	}
 
-	// TODO: move this responsibility to the template package
-	async #createAndAssignTemplate() {
-		const { data: templateScaffold } = await this.#templateRepository.createScaffold({
-			name: this.getName(),
-			alias: this.getName(), // NOTE: Uses "name" over alias, as the server handle the template filename. [LK]
-		});
+	async #createTemplate() {
+		const documentTypeUnique = this.getUnique();
+		if (!documentTypeUnique) throw new Error('Document type unique is missing');
 
-		if (!templateScaffold) throw new Error('Could not create template scaffold');
-		const { data: template } = await this.#templateRepository.create(templateScaffold, null);
+		const { data: template } = await this.#documentTypeRepository.createTemplate(documentTypeUnique, {
+			name: this.getName() ?? '',
+			alias: this.getName() ?? '', // NOTE: Uses "name" over alias, as the server handle the template filename. [LK]
+			isDefault: true,
+		});
 		if (!template) throw new Error('Could not create template');
 
 		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
@@ -201,10 +204,7 @@ export class UmbDocumentTypeWorkspaceContext
 		});
 		eventContext.dispatchEvent(event);
 
-		const templateEntity = { id: template.unique };
-		const allowedTemplates = this.getAllowedTemplateIds() ?? [];
-		this.setAllowedTemplateIds([templateEntity, ...allowedTemplates]);
-		this.setDefaultTemplate(templateEntity);
+		return template;
 	}
 }
 
