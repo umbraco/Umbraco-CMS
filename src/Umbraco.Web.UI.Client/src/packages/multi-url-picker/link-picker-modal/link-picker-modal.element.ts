@@ -203,8 +203,8 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 			this.#partialUpdateLink({ queryString: `#${query}` });
 		} else {
 			this.#partialUpdateLink({ queryString: '' });
-			this.#validationContext.messages.removeMessageByKey('UmbLinkPickerValueValidator');
 		}
+		this.#validationContext.messages.removeMessageByKey('UmbLinkPickerValueValidator');
 	}
 
 	#onLinkTitleInput(event: UUIInputEvent) {
