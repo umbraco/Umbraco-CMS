@@ -17,6 +17,7 @@ public static partial class Constants
         /// </summary>
         public const string AcceptPreviewCookieName = "UMB-WEBSITE-PREVIEW-ACCEPT";
 
+        [Obsolete("InstallerCookieName is no longer used and will be removed in Umbraco 19.")]
         public const string InstallerCookieName = "umb_installId";
 
         /// <summary>

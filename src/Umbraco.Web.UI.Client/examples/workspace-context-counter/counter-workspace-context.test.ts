@@ -1,5 +1,5 @@
-import { WorkspaceContextCounterElement, EXAMPLE_COUNTER_CONTEXT } from './counter-workspace-context.js';
-import { ExampleCounterWorkspaceView } from './counter-workspace-view.js';
+import { ExampleWorkspaceContextCounterContext, EXAMPLE_COUNTER_CONTEXT } from './counter-workspace-context.js';
+import { ExampleCounterWorkspaceViewElement } from './counter-workspace-view.js';
 import { ExampleCounterStatusFooterAppElement } from './counter-status-footer-app.element.js';
 import { expect, fixture, defineCE } from '@open-wc/testing';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -10,11 +10,11 @@ const testHostElement = defineCE(TestHostElement);
 
 describe('WorkspaceContextCounterElement', () => {
 	let element: UmbLitElement;
-	let context: WorkspaceContextCounterElement;
+	let context: ExampleWorkspaceContextCounterContext;
 
 	beforeEach(async () => {
 		element = await fixture(`<${testHostElement}></${testHostElement}>`);
-		context = new WorkspaceContextCounterElement(element);
+		context = new ExampleWorkspaceContextCounterContext(element);
 	});
 
 	describe('Counter functionality', () => {
@@ -147,18 +147,18 @@ describe('WorkspaceContextCounterElement', () => {
 });
 
 describe('ExampleCounterWorkspaceView', () => {
-	let element: ExampleCounterWorkspaceView;
-	let context: WorkspaceContextCounterElement;
+	let element: ExampleCounterWorkspaceViewElement;
+	let context: ExampleWorkspaceContextCounterContext;
 	let hostElement: UmbLitElement;
 
 	beforeEach(async () => {
 		hostElement = await fixture(`<${testHostElement}></${testHostElement}>`);
-		context = new WorkspaceContextCounterElement(hostElement);
-		
+		context = new ExampleWorkspaceContextCounterContext(hostElement);
+
 		element = await fixture(html`<example-counter-workspace-view></example-counter-workspace-view>`, {
 			parentNode: hostElement,
 		});
-		
+
 		// Wait for context consumption
 		await element.updateComplete;
 	});
@@ -173,7 +173,7 @@ describe('ExampleCounterWorkspaceView', () => {
 		it('reflects counter value changes when incremented', async () => {
 			context.increment();
 			await element.updateComplete;
-			
+
 			const displayText = element.shadowRoot?.textContent;
 			expect(displayText).to.include('Current count value: 1');
 		});
@@ -183,7 +183,7 @@ describe('ExampleCounterWorkspaceView', () => {
 			context.increment();
 			context.increment();
 			await element.updateComplete;
-			
+
 			const displayText = element.shadowRoot?.textContent;
 			expect(displayText).to.include('Current count value: 3');
 		});
@@ -192,13 +192,13 @@ describe('ExampleCounterWorkspaceView', () => {
 			context.increment();
 			context.increment();
 			await element.updateComplete;
-			
+
 			let displayText = element.shadowRoot?.textContent;
 			expect(displayText).to.include('Current count value: 2');
-			
+
 			context.reset();
 			await element.updateComplete;
-			
+
 			displayText = element.shadowRoot?.textContent;
 			expect(displayText).to.include('Current count value: 0');
 		});
@@ -210,11 +210,11 @@ describe('ExampleCounterWorkspaceView', () => {
 			context.increment();
 			await element.updateComplete;
 			expect(element.shadowRoot?.textContent).to.include('Current count value: 3');
-			
+
 			context.reset();
 			await element.updateComplete;
 			expect(element.shadowRoot?.textContent).to.include('Current count value: 0');
-			
+
 			context.increment();
 			await element.updateComplete;
 			expect(element.shadowRoot?.textContent).to.include('Current count value: 1');
@@ -224,17 +224,17 @@ describe('ExampleCounterWorkspaceView', () => {
 
 describe('ExampleCounterStatusFooterAppElement', () => {
 	let element: ExampleCounterStatusFooterAppElement;
-	let context: WorkspaceContextCounterElement;
+	let context: ExampleWorkspaceContextCounterContext;
 	let hostElement: UmbLitElement;
 
 	beforeEach(async () => {
 		hostElement = await fixture(`<${testHostElement}></${testHostElement}>`);
-		context = new WorkspaceContextCounterElement(hostElement);
-		
+		context = new ExampleWorkspaceContextCounterContext(hostElement);
+
 		element = await fixture(html`<example-counter-status-footer-app></example-counter-status-footer-app>`, {
 			parentNode: hostElement,
 		});
-		
+
 		// Wait for context consumption
 		await element.updateComplete;
 	});
@@ -249,7 +249,7 @@ describe('ExampleCounterStatusFooterAppElement', () => {
 		it('reflects counter state changes when incremented', async () => {
 			context.increment();
 			await element.updateComplete;
-			
+
 			const displayText = element.shadowRoot?.textContent;
 			expect(displayText).to.include('Counter: 1');
 		});
@@ -261,7 +261,7 @@ describe('ExampleCounterStatusFooterAppElement', () => {
 			context.increment();
 			context.increment();
 			await element.updateComplete;
-			
+
 			const displayText = element.shadowRoot?.textContent;
 			expect(displayText).to.include('Counter: 5');
 		});
@@ -271,13 +271,13 @@ describe('ExampleCounterStatusFooterAppElement', () => {
 			context.increment();
 			context.increment();
 			await element.updateComplete;
-			
+
 			let displayText = element.shadowRoot?.textContent;
 			expect(displayText).to.include('Counter: 3');
-			
+
 			context.reset();
 			await element.updateComplete;
-			
+
 			displayText = element.shadowRoot?.textContent;
 			expect(displayText).to.include('Counter: 0');
 		});
@@ -286,16 +286,16 @@ describe('ExampleCounterStatusFooterAppElement', () => {
 			// Test comprehensive state change tracking
 			await element.updateComplete;
 			expect(element.shadowRoot?.textContent).to.include('Counter: 0');
-			
+
 			context.increment();
 			context.increment();
 			await element.updateComplete;
 			expect(element.shadowRoot?.textContent).to.include('Counter: 2');
-			
+
 			context.reset();
 			await element.updateComplete;
 			expect(element.shadowRoot?.textContent).to.include('Counter: 0');
-			
+
 			context.increment();
 			await element.updateComplete;
 			expect(element.shadowRoot?.textContent).to.include('Counter: 1');
@@ -310,7 +310,7 @@ describe('ExampleCounterStatusFooterAppElement', () => {
 			context.increment();
 			context.increment();
 			await element.updateComplete;
-			
+
 			const displayText = element.shadowRoot?.textContent;
 			expect(displayText).to.include('Counter: 2');
 		});

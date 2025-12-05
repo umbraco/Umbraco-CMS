@@ -1,4 +1,4 @@
-import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
 
 const userPassword = '0123456789';
 let testUserCookieAndToken = {cookie: "", accessToken: "", refreshToken: ""};

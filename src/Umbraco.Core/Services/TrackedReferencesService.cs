@@ -1,6 +1,8 @@
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -20,6 +22,7 @@ public class TrackedReferencesService : ITrackedReferencesService
         _entityService = entityService;
     }
 
+    [Obsolete("Use the GetPagedRelationsForItemAsync overload which returns an Attempt with operation status. Scheduled for removal in Umbraco 19.")]
     public Task<PagedModel<RelationItemModel>> GetPagedRelationsForItemAsync(Guid key, long skip, long take, bool filterMustBeIsDependency)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
@@ -27,6 +30,21 @@ public class TrackedReferencesService : ITrackedReferencesService
         var pagedModel = new PagedModel<RelationItemModel>(totalItems, items);
 
         return Task.FromResult(pagedModel);
+    }
+
+    public async Task<Attempt<PagedModel<RelationItemModel>, GetReferencesOperationStatus>> GetPagedRelationsForItemAsync(Guid key, UmbracoObjectTypes objectType, long skip, long take, bool filterMustBeIsDependency)
+    {
+        IEntitySlim? entity = _entityService.Get(key, objectType);
+        if (entity is null)
+        {
+            return Attempt.FailWithStatus(GetReferencesOperationStatus.ContentNotFound, new PagedModel<RelationItemModel>());
+        }
+
+#pragma warning disable CS0618 // Type or member is obsolete (but using whilst it exists to avoid code repetition)
+        PagedModel<RelationItemModel> pagedModel = await GetPagedRelationsForItemAsync(key, skip, take, filterMustBeIsDependency);
+#pragma warning restore CS0618 // Type or member is obsolete
+
+        return Attempt.SucceedWithStatus(GetReferencesOperationStatus.Success, pagedModel);
     }
 
     public Task<PagedModel<RelationItemModel>> GetPagedRelationsForRecycleBinAsync(UmbracoObjectTypes objectType, long skip, long take, bool filterMustBeIsDependency)
@@ -44,6 +62,7 @@ public class TrackedReferencesService : ITrackedReferencesService
         return Task.FromResult(pagedModel);
     }
 
+    [Obsolete("Use GetPagedDescendantsInReferencesAsync which returns an Attempt with operation status. Scheduled for removal in Umbraco 19.")]
     public Task<PagedModel<RelationItemModel>> GetPagedDescendantsInReferencesAsync(Guid parentKey, long skip, long take, bool filterMustBeIsDependency)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
@@ -57,6 +76,21 @@ public class TrackedReferencesService : ITrackedReferencesService
         var pagedModel = new PagedModel<RelationItemModel>(totalItems, items);
 
         return Task.FromResult(pagedModel);
+    }
+
+    public async Task<Attempt<PagedModel<RelationItemModel>, GetReferencesOperationStatus>> GetPagedDescendantsInReferencesAsync(Guid parentKey, UmbracoObjectTypes objectType, long skip, long take, bool filterMustBeIsDependency)
+    {
+        IEntitySlim? entity = _entityService.Get(parentKey, objectType);
+        if (entity is null)
+        {
+            return Attempt.FailWithStatus(GetReferencesOperationStatus.ContentNotFound, new PagedModel<RelationItemModel>());
+        }
+
+#pragma warning disable CS0618 // Type or member is obsolete (but using whilst it exists to avoid code repetition)
+        PagedModel<RelationItemModel> pagedModel = await GetPagedDescendantsInReferencesAsync(parentKey, skip, take, filterMustBeIsDependency);
+#pragma warning restore CS0618 // Type or member is obsolete
+
+        return Attempt.SucceedWithStatus(GetReferencesOperationStatus.Success, pagedModel);
     }
 
     public Task<PagedModel<RelationItemModel>> GetPagedItemsWithRelationsAsync(ISet<Guid> keys, long skip, long take, bool filterMustBeIsDependency)
