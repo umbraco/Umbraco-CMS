@@ -49,17 +49,50 @@ internal sealed class FileSystemsTests : UmbracoIntegrationTest
         mediaFileManager.DeleteMediaFiles(new[] { virtualPath });
         Assert.IsFalse(File.Exists(physPath));
 
-        var scheme = GetRequiredService<IMediaPathScheme>();
-        if (scheme is UniqueMediaPathScheme)
-        {
-            // ~/media/1234 is gone
-            physPath = Path.GetDirectoryName(physPath);
-            Assert.IsFalse(Directory.Exists(physPath));
-        }
-
         // ~/media exists
         physPath = Path.GetDirectoryName(physPath);
         Assert.IsTrue(Directory.Exists(physPath));
+    }
+
+    [Test]
+    public void Deletes_Media_Folder_When_Deleting_Last_Media_Item()
+    {
+        var mediaFileManager = GetRequiredService<MediaFileManager>();
+        var hostingEnvironment = GetRequiredService<IHostingEnvironment>();
+
+        CreateMediaFile(mediaFileManager, hostingEnvironment, out string virtualPath, out string physicalPath);
+        var directoryName = Path.GetDirectoryName(physicalPath);
+
+        Assert.IsTrue(File.Exists(physicalPath));
+        Assert.IsTrue(Directory.Exists(directoryName));
+
+        mediaFileManager.DeleteMediaFiles([virtualPath]);
+        Assert.IsFalse(File.Exists(physicalPath));
+        Assert.IsFalse(Directory.Exists(directoryName));
+    }
+
+    [Test]
+    public void Does_Not_Delete_Media_Folder_When_Folder_Is_Not_Emptied()
+    {
+        var mediaFileManager = GetRequiredService<MediaFileManager>();
+        var hostingEnvironment = GetRequiredService<IHostingEnvironment>();
+        var memoryStream = new MemoryStream("test"u8.ToArray());
+
+        CreateMediaFile(mediaFileManager, hostingEnvironment, out string virtualPath, out string physicalPath);
+
+        var secondPath = $"{Path.GetDirectoryName(physicalPath)}/test2.txt";
+        mediaFileManager.FileSystem.AddFile(secondPath, memoryStream);
+
+        var directoryName = Path.GetDirectoryName(physicalPath);
+
+        Assert.IsTrue(File.Exists(physicalPath));
+        Assert.IsTrue(File.Exists(secondPath));
+        Assert.IsTrue(Directory.Exists(directoryName));
+
+        mediaFileManager.DeleteMediaFiles([virtualPath]);
+        Assert.IsFalse(File.Exists(physicalPath));
+        Assert.IsTrue(File.Exists(secondPath));
+        Assert.True(Directory.Exists(directoryName));
     }
 
     [Test]
