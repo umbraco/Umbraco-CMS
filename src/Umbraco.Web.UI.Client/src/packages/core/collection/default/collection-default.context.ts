@@ -197,7 +197,7 @@ export class UmbDefaultCollectionContext<
 	}
 
 	#configureSelection() {
-		// TODO: We need support a collecion selection configuration here so ex. Pickers can turn on single and multi select and set a selection.
+		// TODO: We need support a collection selection configuration here so ex. Pickers can turn on single and multi select and set a selection.
 		this.selection.setSelectable(false);
 		this.selection.setMultiple(false);
 
@@ -419,7 +419,7 @@ export class UmbDefaultCollectionContext<
 	 * Returns the href for a specific collection item.
 	 * Override this method in specialized collection contexts to provide item-specific hrefs.
 	 * @param {CollectionItemType} _item  - The collection item to get the href for.
-	 * @returns {Promise<string | undefined>} - Undefined. The collection item do not link to anything by default.
+	 * @returns {Promise<string | undefined>} - Undefined. The collection item does not link to anything by default.
 	 */
 	public async requestItemHref(_item: CollectionItemType): Promise<string | undefined> {
 		return undefined;
