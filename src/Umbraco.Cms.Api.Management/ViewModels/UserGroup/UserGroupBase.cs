@@ -23,6 +23,11 @@ public class UserGroupBase
     public required string Alias { get; init; }
 
     /// <summary>
+    /// The description of the user group
+    /// </summary>
+    public string? Description { get; set; }
+
+    /// <summary>
     /// The Icon for the user group
     /// </summary>
     public string? Icon { get; init; }
@@ -79,9 +84,4 @@ public class UserGroupBase
     /// </summary>
     public required ISet<string> FallbackPermissions { get; init; }
     public required ISet<IPermissionPresentationModel> Permissions { get; init; }
-
-    /// <summary>
-    /// The description of the user group
-    /// </summary>
-    public string? Description { get; set; }
 }
