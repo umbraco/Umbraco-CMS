@@ -25,6 +25,9 @@ public static partial class StringExtensions
     private static readonly Lazy<Regex> FileExtensionRegex = new(() =>
         new Regex(@"(?<extension>\.[^\.\?]+)(\?.*|$)", RegexOptions.Compiled));
 
+    private static readonly Lazy<Regex> HtmlTagRegex = new(() =>
+        new Regex(@"<(.|\n)*?>", RegexOptions.Compiled));
+
     /// <summary>
     ///     Cleans string to aid in preventing xss attacks.
     /// </summary>
@@ -45,11 +48,7 @@ public static partial class StringExtensions
     /// </summary>
     /// <param name="text">The text.</param>
     /// <returns>Returns the string without any HTML tags.</returns>
-    public static string StripHtml(this string text)
-    {
-        const string pattern = @"<(.|\n)*?>";
-        return Regex.Replace(text, pattern, string.Empty, RegexOptions.Compiled);
-    }
+    public static string StripHtml(this string text) => HtmlTagRegex.Value.Replace(text, string.Empty);
 
     /// <summary>
     ///     An extension method that returns a new string in which all occurrences of an
