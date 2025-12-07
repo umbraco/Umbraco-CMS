@@ -345,7 +345,7 @@ public static partial class StringExtensions
     /// </summary>
     /// <param name="txt"></param>
     /// <returns></returns>
-    public static string StripWhitespace(this string txt) => Regex.Replace(txt, @"\s", string.Empty);
+    public static string StripWhitespace(this string txt) => Whitespace.Value.Replace(txt, string.Empty);
 
     /// <summary>
     ///     Strips carrage returns and line feeds from the specified text.
