@@ -34,7 +34,7 @@ public class StringExtensionsPerformanceTests
     [TestCase('z', true)]
     [TestCase('A', false)]
     [TestCase('Z', false)]
-    [TestCase('5', true)]
+    [TestCase('5', false)]
     public void IsLowerCase_ReturnsCorrectResult(char input, bool expected)
         => Assert.AreEqual(expected, input.IsLowerCase());
 
@@ -42,7 +42,7 @@ public class StringExtensionsPerformanceTests
     [TestCase('Z', true)]
     [TestCase('a', false)]
     [TestCase('z', false)]
-    [TestCase('5', true)]
+    [TestCase('5', false)]
     public void IsUpperCase_ReturnsCorrectResult(char input, bool expected)
         => Assert.AreEqual(expected, input.IsUpperCase());
 

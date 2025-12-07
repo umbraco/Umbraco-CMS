@@ -420,11 +420,9 @@ public static partial class StringExtensions
         return false;
     }
 
-    public static bool IsLowerCase(this char ch) => ch.ToString(CultureInfo.InvariantCulture) ==
-                                                    ch.ToString(CultureInfo.InvariantCulture).ToLowerInvariant();
+    public static bool IsLowerCase(this char ch) => char.IsLower(ch);
 
-    public static bool IsUpperCase(this char ch) => ch.ToString(CultureInfo.InvariantCulture) ==
-                                                    ch.ToString(CultureInfo.InvariantCulture).ToUpperInvariant();
+    public static bool IsUpperCase(this char ch) => char.IsUpper(ch);
 
     // FORMAT STRINGS
 
