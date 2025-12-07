@@ -22,6 +22,9 @@ public static partial class StringExtensions
             @"(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F\uFEFF\uFFFE\uFFFF]",
             RegexOptions.Compiled));
 
+    private static readonly Lazy<Regex> FileExtensionRegex = new(() =>
+        new Regex(@"(?<extension>\.[^\.\?]+)(\?.*|$)", RegexOptions.Compiled));
+
     /// <summary>
     ///     Cleans string to aid in preventing xss attacks.
     /// </summary>
@@ -117,12 +120,8 @@ public static partial class StringExtensions
     /// <returns>Extension of the file</returns>
     public static string GetFileExtension(this string file)
     {
-        // Find any characters between the last . and the start of a query string or the end of the string
-        const string pattern = @"(?<extension>\.[^\.\?]+)(\?.*|$)";
-        Match match = Regex.Match(file, pattern);
-        return match.Success
-            ? match.Groups["extension"].Value
-            : string.Empty;
+        Match match = FileExtensionRegex.Value.Match(file);
+        return match.Success ? match.Groups["extension"].Value : string.Empty;
     }
 
     /// <summary>
