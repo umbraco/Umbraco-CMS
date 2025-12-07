@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Runtime.InteropServices;
 using BenchmarkDotNet.Attributes;
 using Umbraco.Cms.Core;
+using Umbraco.Extensions;
 
 namespace Umbraco.Tests.Benchmarks;
 
@@ -254,4 +255,28 @@ public class StringExtensionsBenchmarks
 // | SplitToStackSpansWithoutEmptyCheckReversingListAsSpan | 20.47 us | 0.290 us | 0.257 us | 2.7161 |  16.73 KB |
 // | SplitToStackSpansWithoutEmptyCheck                    | 20.60 us | 0.315 us | 0.280 us | 2.7161 |  16.73 KB |
 // | SplitToStackSpansWithEmptyCheck                       | 20.57 us | 0.308 us | 0.288 us | 2.7161 |  16.73 KB |
+
+    private const string HtmlTestString = "<div><p>Hello <strong>world</strong></p></div>";
+    private const string WhitespaceTestString = "Hello   world\t\ntest  string";
+    private const string FilePathTestString = "path/to/some/file.extension?query=param";
+    private const string NonAlphanumericTestString = "hello-world_test!@#$%^&*()123";
+
+    [Benchmark]
+    public string StripWhitespace_Benchmark() => WhitespaceTestString.StripWhitespace();
+
+    [Benchmark]
+    public string GetFileExtension_Benchmark() => FilePathTestString.GetFileExtension();
+
+    [Benchmark]
+    public string StripHtml_Benchmark() => HtmlTestString.StripHtml();
+
+    [Benchmark]
+    public bool IsLowerCase_Benchmark() => 'a'.IsLowerCase();
+
+    [Benchmark]
+    public bool IsUpperCase_Benchmark() => 'A'.IsUpperCase();
+
+    [Benchmark]
+    public string ReplaceNonAlphanumericChars_String_Benchmark()
+        => NonAlphanumericTestString.ReplaceNonAlphanumericChars("-");
 }
