@@ -269,14 +269,31 @@ public static partial class StringExtensions
 
     public static string ReplaceNonAlphanumericChars(this string input, string replacement)
     {
-        // any character that is not alphanumeric, convert to a hyphen
-        var mName = input;
-        foreach (var c in mName.ToCharArray().Where(c => !char.IsLetterOrDigit(c)))
+        if (string.IsNullOrEmpty(input))
         {
-            mName = mName.Replace(c.ToString(CultureInfo.InvariantCulture), replacement);
+            return input;
         }
 
-        return mName;
+        // Single-char replacement can use the optimized char overload
+        if (replacement.Length == 1)
+        {
+            return input.ReplaceNonAlphanumericChars(replacement[0]);
+        }
+
+        // Multi-char replacement: single pass with StringBuilder
+        var sb = new StringBuilder(input.Length);
+        foreach (var c in input)
+        {
+            if (char.IsLetterOrDigit(c))
+            {
+                sb.Append(c);
+            }
+            else
+            {
+                sb.Append(replacement);
+            }
+        }
+        return sb.ToString();
     }
 
     public static string ReplaceNonAlphanumericChars(this string input, char replacement)
