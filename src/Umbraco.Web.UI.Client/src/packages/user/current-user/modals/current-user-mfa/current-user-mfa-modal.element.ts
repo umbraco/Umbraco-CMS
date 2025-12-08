@@ -87,29 +87,32 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 		this.modalContext?.submit();
 	}
 
+	#renderContent() {
+		if (this._isLoading) {
+			return html`<uui-loader></uui-loader>`;
+		}
+
+		if (this._error) {
+			return html`<p>${this._error}</p>`;
+		}
+
+		if (this._items.length > 0) {
+			return html`
+				${repeat(
+					this._items,
+					(item) => item.providerName,
+					(item) => this.#renderProvider(item),
+				)}
+			`;
+		}
+
+		return nothing;
+	}
+
 	override render() {
 		return html`
 			<umb-body-layout headline="${this.localize.term('member_2fa')}">
-				<div id="main">
-					${when(
-						this._isLoading,
-						() => html`<uui-loader></uui-loader>`,
-						() => when(
-							this._error,
-							() => html`<p>${this._error}</p>`,
-							() => when(
-								this._items.length > 0,
-								() => html`
-									${repeat(
-										this._items,
-										(item) => item.providerName,
-										(item) => this.#renderProvider(item),
-									)}
-								`,
-							),
-						),
-					)}
-				</div>
+				<div id="main">${this.#renderContent()}</div>
 				<div slot="actions">
 					<uui-button @click=${this.#close} look="secondary" .label=${this.localize.term('general_close')}></uui-button>
 				</div>
