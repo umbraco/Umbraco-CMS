@@ -1,7 +1,7 @@
+import type { UmbEntitySignElement } from '../../types.js';
 import type { ManifestEntitySignIconKind } from './types.js';
 import { css, customElement, html, nothing, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbEntitySignElement } from '../../types.js';
 
 @customElement('umb-entity-sign-icon')
 export class UmbEntitySignIconElement extends UmbLitElement implements UmbEntitySignElement {

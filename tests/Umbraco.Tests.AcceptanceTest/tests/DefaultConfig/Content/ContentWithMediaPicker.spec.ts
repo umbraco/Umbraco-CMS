@@ -185,5 +185,7 @@ test('can add a media image to a media picker in variant content, remove it and 
   await umbracoUi.content.clickChooseModalButton();
 
   // Assert
+  // Wait for the media file to be visible
+  await umbracoUi.waitForTimeout(500);
   await umbracoUi.content.isMediaNameVisible(mediaFileName);
 });

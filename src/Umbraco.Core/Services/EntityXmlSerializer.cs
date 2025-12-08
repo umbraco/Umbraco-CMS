@@ -214,7 +214,7 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
         xml.Add(new XAttribute("EditorUiAlias", dataType.EditorUiAlias ?? dataType.EditorAlias));
         xml.Add(new XAttribute("Definition", dataType.Key));
         xml.Add(new XAttribute("DatabaseType", dataType.DatabaseType.ToString()));
-        xml.Add(new XAttribute("Configuration", _configurationEditorJsonSerializer.Serialize(dataType.ConfigurationObject)));
+        xml.Add(new XAttribute("Configuration", SerializeDataTypeConfiguration(dataType)));
 
         var folderNames = string.Empty;
         var folderKeys = string.Empty;
@@ -708,4 +708,14 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
             }
         }
     }
+
+    /// <summary>
+    /// We have two properties containing configuration data:
+    /// 1. ConfigurationData - a dictionary that contains all the configuration data stored as key/value pairs.
+    /// 2. ConfigurationObject - a strongly typed object that represents the configuration data known to the server.
+    /// To fully be able to restore the package, we need to serialize the full ConfigurationData dictionary, not
+    /// just the configuration properties known to the server.
+    /// </summary>
+    private string SerializeDataTypeConfiguration(IDataType dataType) =>
+        _configurationEditorJsonSerializer.Serialize(dataType.ConfigurationData);
 }

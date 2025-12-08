@@ -996,7 +996,6 @@ export default {
 		media: 'Phương tiện',
 		revert: 'Hoàn tác',
 		validate: 'Xác thực',
-		newVersionAvailable: 'Có phiên bản mới',
 		duration: (duration: string, date: Date | string, now: Date | string) => {
 			if (new Date(date).getTime() < new Date(now).getTime()) return `${duration} trước`;
 			return `trong ${duration}`;

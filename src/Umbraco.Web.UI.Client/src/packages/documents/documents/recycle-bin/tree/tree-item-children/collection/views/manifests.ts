@@ -10,7 +10,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		weight: 300,
 		meta: {
 			label: 'Table',
-			icon: 'icon-list',
+			icon: 'icon-table',
 			pathName: 'table',
 		},
 		conditions: [
