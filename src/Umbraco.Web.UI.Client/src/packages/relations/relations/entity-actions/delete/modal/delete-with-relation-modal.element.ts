@@ -29,6 +29,9 @@ export class UmbDeleteWithRelationConfirmModalElement extends UmbModalBaseElemen
 	@state()
 	private _referencesConfig?: UmbConfirmActionModalEntityReferencesConfig;
 
+	@state()
+	private _isDeletable?: boolean;
+
 	#itemRepository?: UmbItemRepository<any>;
 
 	protected override firstUpdated(_changedProperties: PropertyValues): void {
@@ -49,6 +52,7 @@ export class UmbDeleteWithRelationConfirmModalElement extends UmbModalBaseElemen
 		if (!item) throw new Error('Item not found.');
 
 		this._name = item.name;
+		this._isDeletable = item.isDeletable;
 
 		this._referencesConfig = {
 			unique: this.data.unique,
@@ -59,30 +63,45 @@ export class UmbDeleteWithRelationConfirmModalElement extends UmbModalBaseElemen
 
 	override render() {
 		const headline = this.localize.string('#actions_delete');
-		const content = this.localize.string('#defaultdialogs_confirmdelete', this._name);
+		const isNotDeletable = this._isDeletable === false;
+
+		const message = isNotDeletable
+			? html`<p>${this.localize.string('#defaultdialogs_cannotDeleteSystemItem')}</p>`
+			: html`<p>${unsafeHTML(this.localize.string('#defaultdialogs_confirmdelete', this._name))}</p>`;
+
+		const actions = isNotDeletable
+			? html`
+					<uui-button
+						slot="actions"
+						label=${this.localize.term('general_close')}
+						look="primary"
+						@click=${this._rejectModal}
+						${umbFocus()}></uui-button>
+				`
+			: html`
+					<uui-button
+						slot="actions"
+						id="cancel"
+						label=${this.localize.term('general_cancel')}
+						@click=${this._rejectModal}></uui-button>
+					<uui-button
+						slot="actions"
+						id="confirm"
+						color="danger"
+						look="primary"
+						label=${this.localize.term('general_delete')}
+						@click=${this._submitModal}
+						${umbFocus()}></uui-button>
+				`;
 
 		return html`
 			<uui-dialog-layout class="uui-text" headline=${headline}>
-				<p>${unsafeHTML(content)}</p>
+				${message}
 				${this._referencesConfig
 					? html`<umb-confirm-action-modal-entity-references
 							.config=${this._referencesConfig}></umb-confirm-action-modal-entity-references>`
 					: nothing}
-
-				<uui-button
-					slot="actions"
-					id="cancel"
-					label=${this.localize.term('general_cancel')}
-					@click=${this._rejectModal}></uui-button>
-
-				<uui-button
-					slot="actions"
-					id="confirm"
-					color="danger"
-					look="primary"
-					label=${this.localize.term('general_delete')}
-					@click=${this._submitModal}
-					${umbFocus()}></uui-button>
+				${actions}
 			</uui-dialog-layout>
 		`;
 	}

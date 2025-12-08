@@ -548,6 +548,7 @@ export default {
 			`Are you sure you want to move <strong>${total} ${total === 1 ? 'item' : 'items'}</strong> to the Recycle Bin?`,
 		confirmBulkDelete: (total: number) =>
 			`Are you sure you want to delete <strong>${total} ${total === 1 ? 'item' : 'items'}</strong>?`,
+		cannotDeleteSystemItem: 'This item is used by the system and cannot be deleted.',
 		cut: 'Cut',
 		editDictionary: 'Edit dictionary item',
 		editLanguage: 'Edit language',

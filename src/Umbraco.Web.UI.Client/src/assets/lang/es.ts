@@ -291,6 +291,7 @@ export default {
 		confirmdisable: 'Estás seguro que quieres deshabilitar',
 		confirmlogout: '¿Estás seguro?',
 		confirmSure: '¿Estás seguro?',
+		cannotDeleteSystemItem: 'Este elemento es utilizado por el sistema y no se puede eliminar.',
 		cut: 'Cortar',
 		editDictionary: 'Editar entrada del Diccionario',
 		editLanguage: 'Editar idioma',
