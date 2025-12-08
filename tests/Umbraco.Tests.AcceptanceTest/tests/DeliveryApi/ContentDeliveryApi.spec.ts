@@ -38,6 +38,7 @@ const childContentAmount = 5;
 let templateId: string | null = null;
 let invariantDocTypeId = '';
 let collectionDocTypeId = '';
+let publishInvParentId = '';
 
 test.beforeEach(async ({umbracoApi}) => {
   // Create a template
@@ -51,14 +52,17 @@ test.beforeEach(async ({umbracoApi}) => {
   // Create document types
   invariantDocTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(invariantDocumentType) ?? '';
   collectionDocTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNodeAndCollectionId(collectionDocumentType, invariantDocTypeId, listViewDataType.id) ?? '';
+  publishInvParentId = await umbracoApi.document.createDefaultDocument(publishInvParentContent, collectionDocTypeId) ?? '';
+  await umbracoApi.document.publish(publishInvParentId);
 });
 
 test.afterEach(async ({umbracoApi}) => {
-  // await umbracoApi.documentType.ensureNameNotExists(invariantDocumentType);
-  // await umbracoApi.documentType.ensureNameNotExists(collectionDocumentType);
-  // await umbracoApi.template.ensureNameNotExists(templateName);
-  // await umbracoApi.language.ensureIsoCodeNotExists('da');
-  // await umbracoApi.language.ensureIsoCodeNotExists('vi');
+  await umbracoApi.document.ensureNameNotExists(publishInvParentContent);
+  await umbracoApi.documentType.ensureNameNotExists(invariantDocumentType);
+  await umbracoApi.documentType.ensureNameNotExists(collectionDocumentType);
+  await umbracoApi.template.ensureNameNotExists(templateName);
+  await umbracoApi.language.ensureIsoCodeNotExists('da');
+  await umbracoApi.language.ensureIsoCodeNotExists('vi');
 });
 
 // Gets a content item by id
@@ -85,8 +89,6 @@ test('can fetch an content item at root by its ID', async ({umbracoApi}) => {
 
 test('can fetch a child content item by its ID', async ({umbracoApi}) => {
   // Arrange
-  const publishInvParentId = await umbracoApi.document.createDefaultDocument(publishInvParentContent, collectionDocTypeId);
-  await umbracoApi.document.publish(publishInvParentId);
   const contentName = childPublishInvContentPrefix + '2';
   const childId = await umbracoApi.document.createDefaultDocumentWithParent(contentName, invariantDocTypeId, publishInvParentId);
   await umbracoApi.document.publish(childId);
@@ -104,14 +106,11 @@ test('can fetch a child content item by its ID', async ({umbracoApi}) => {
 
   // Clean
   await umbracoApi.document.ensureNameNotExists(contentName);
-  await umbracoApi.document.ensureNameNotExists(publishInvParentContent);
 });
 
 test('can fetch a content item that has children by its ID', async ({umbracoApi}) => {
   // Arrange
   const contentName = publishInvParentContent;
-  const publishInvParentId = await umbracoApi.document.createDefaultDocument(contentName, collectionDocTypeId);
-  await umbracoApi.document.publish(publishInvParentId);
   // Create child items
   for (let i = 1; i <= childContentAmount; i++) {
     const childId = await umbracoApi.document.createDefaultDocumentWithParent(childPublishInvContentPrefix + i, invariantDocTypeId, publishInvParentId);
@@ -133,7 +132,6 @@ test('can fetch a content item that has children by its ID', async ({umbracoApi}
   for (let i = 1; i <= childContentAmount; i++) {
     await umbracoApi.document.ensureNameNotExists(childPublishInvContentPrefix + i);
   }
-  await umbracoApi.document.ensureNameNotExists(contentName);
 });
 
 test('cannot fetch an unpublished content item without preview by its ID', async ({umbracoApi}) => {
@@ -217,9 +215,7 @@ test('can fetch a content item with numeric property', async ({umbracoApi}) => {
 
 test('can fetch a content item with multi URL picker property', async ({umbracoApi}) => {
   // Arrange
-  // Create parent and child content first
-  const publishInvParentId = await umbracoApi.document.createDefaultDocument(publishInvParentContent, collectionDocTypeId);
-  await umbracoApi.document.publish(publishInvParentId);
+  // Create child content 
   const pickerName = childPublishInvContentPrefix + '2';
   const pickerId = await umbracoApi.document.createDefaultDocumentWithParent(pickerName, invariantDocTypeId, publishInvParentId);
   await umbracoApi.document.publish(pickerId);
@@ -242,7 +238,6 @@ test('can fetch a content item with multi URL picker property', async ({umbracoA
   // Clean
   await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.document.ensureNameNotExists(pickerName);
-  await umbracoApi.document.ensureNameNotExists(publishInvParentContent);
   await umbracoApi.documentType.ensureNameNotExists(invariantDocumentTypeWithMultiUrlPicker);
 });
 
@@ -306,8 +301,6 @@ test('can fetch a content item by its route', async ({umbracoApi}) => {
 
 test('can fetch a child content item by its route', async ({umbracoApi}) => {
   // Arrange
-  const publishInvParentId = await umbracoApi.document.createDefaultDocument(publishInvParentContent, collectionDocTypeId);
-  await umbracoApi.document.publish(publishInvParentId);
   const contentName = childPublishInvContentPrefix + '1';
   const childId = await umbracoApi.document.createDefaultDocumentWithParent(contentName, invariantDocTypeId, publishInvParentId);
   await umbracoApi.document.publish(childId);
@@ -326,7 +319,6 @@ test('can fetch a child content item by its route', async ({umbracoApi}) => {
 
   // Clean
   await umbracoApi.document.ensureNameNotExists(contentName);
-  await umbracoApi.document.ensureNameNotExists(publishInvParentContent);
 });
 
 test('can fetch a content item by its route with special character', async ({umbracoApi}) => {
@@ -369,8 +361,6 @@ test('can fetch multiple content items by their IDs', async ({umbracoApi}) => {
   const publishInvRootId = await umbracoApi.document.createDefaultDocument(contentName1, invariantDocTypeId);
   await umbracoApi.document.publish(publishInvRootId);
 
-  const publishInvParentId = await umbracoApi.document.createDefaultDocument(publishInvParentContent, collectionDocTypeId);
-  await umbracoApi.document.publish(publishInvParentId);
   const contentName2 = childPublishInvContentPrefix + '3';
   const childId = await umbracoApi.document.createDefaultDocumentWithParent(contentName2, invariantDocTypeId, publishInvParentId);
   await umbracoApi.document.publish(childId);
@@ -395,14 +385,11 @@ test('can fetch multiple content items by their IDs', async ({umbracoApi}) => {
 
   // Clean
   await umbracoApi.document.ensureNameNotExists(contentName2);
-  await umbracoApi.document.ensureNameNotExists(publishInvParentContent);
   await umbracoApi.document.ensureNameNotExists(contentName1);
 });
 
 test('returns only valid content items when some IDs are invalid', async ({umbracoApi}) => {
   // Arrange
-  const publishInvParentId = await umbracoApi.document.createDefaultDocument(publishInvParentContent, collectionDocTypeId);
-  await umbracoApi.document.publish(publishInvParentId);
   const contentName = childPublishInvContentPrefix + '4';
   const childId = await umbracoApi.document.createDefaultDocumentWithParent(contentName, invariantDocTypeId, publishInvParentId);
   await umbracoApi.document.publish(childId);
@@ -424,7 +411,6 @@ test('returns only valid content items when some IDs are invalid', async ({umbra
 
   // Clean
   await umbracoApi.document.ensureNameNotExists(contentName);
-  await umbracoApi.document.ensureNameNotExists(publishInvParentContent);
 });
 
 test('returns only publish content items when some IDs are unpublish', async ({umbracoApi}) => {
@@ -460,8 +446,6 @@ test('returns only publish content items when some IDs are unpublish', async ({u
 test('can fetch children of a content', async ({umbracoApi}) => {
   // Arrange
   const parentContentName = publishInvParentContent;
-  const publishInvParentId = await umbracoApi.document.createDefaultDocument(parentContentName, collectionDocTypeId);
-  await umbracoApi.document.publish(publishInvParentId);
   // Create child items
   for (let i = 1; i <= childContentAmount; i++) {
     const childId = await umbracoApi.document.createDefaultDocumentWithParent(childPublishInvContentPrefix + i, invariantDocTypeId, publishInvParentId);
@@ -485,18 +469,15 @@ test('can fetch children of a content', async ({umbracoApi}) => {
   for (let i = 1; i <= childContentAmount; i++) {
     await umbracoApi.document.ensureNameNotExists(childPublishInvContentPrefix + i);
   }
-  await umbracoApi.document.ensureNameNotExists(parentContentName);
 });
 
 test('can fetch ancestors of a content item', async ({umbracoApi}) => {
   // Arrange
   const expectedParentContentName = publishInvParentContent;
-  const publishInvParentId = await umbracoApi.document.createDefaultDocument(expectedParentContentName, collectionDocTypeId);
-  await umbracoApi.document.publish(publishInvParentId);
   const childContentName = childPublishInvContentPrefix + '1';
   const childId = await umbracoApi.document.createDefaultDocumentWithParent(childContentName, invariantDocTypeId, publishInvParentId);
   await umbracoApi.document.publish(childId);
-
+  await umbracoApi.page.waitForTimeout(1000); // Wait is needed to ensure content is indexed
   const fetch = 'ancestors:' + childId;
 
   // Act
@@ -511,18 +492,15 @@ test('can fetch ancestors of a content item', async ({umbracoApi}) => {
 
   // Clean
   await umbracoApi.document.ensureNameNotExists(childContentName);
-  await umbracoApi.document.ensureNameNotExists(expectedParentContentName);
 });
 
 test('can filter content items', async ({umbracoApi}) => {
   // Arrange
   const expectedContentName = publishInvParentContent;
-  const publishInvParentId = await umbracoApi.document.createDefaultDocument(expectedContentName, collectionDocTypeId);
-  await umbracoApi.document.publish(publishInvParentId);
-
   const contentType = collectionDocumentType;
   const contentTypeData = await umbracoApi.documentType.getByName(contentType);
   const filter = 'contentType:' + contentTypeData.alias;
+  await umbracoApi.page.waitForTimeout(500); // Wait is needed to ensure content is indexed
 
   // Act
   const contentItems = await umbracoApi.contentDeliveryApi.getContentItemsFromAQuery(undefined, undefined, filter);
@@ -533,21 +511,16 @@ test('can filter content items', async ({umbracoApi}) => {
   expect(contentItemsJson.total).toBe(1);
   await umbracoApi.contentDeliveryApi.verifyBasicPropertiesForContentItem(expectedContentName, contentItemsJson.items[0]);
   await umbracoApi.contentDeliveryApi.verifyCulturePropertyForContentItem(expectedContentName, contentItemsJson.items[0]);
-
-  // Clean
-  await umbracoApi.document.ensureNameNotExists(expectedContentName);
 });
 
 test('can sort content items', async ({umbracoApi}) => {
   // Arrange
-  const publishInvParentId = await umbracoApi.document.createDefaultDocument(publishInvParentContent, collectionDocTypeId);
-  await umbracoApi.document.publish(publishInvParentId);
   // Create child items
-  for (let i = 1; i <= childContentAmount; i++) {
+  for (let i = 0; i < childContentAmount; i++) {
     const childId = await umbracoApi.document.createDefaultDocumentWithParent(childPublishInvContentPrefix + i, invariantDocTypeId, publishInvParentId);
     await umbracoApi.document.publish(childId);
   }
-
+  await umbracoApi.page.waitForTimeout(1000); // Wait is needed to ensure content is indexed
   const sort = 'name:desc';
   const filter = 'name:' + 'Child';
 
@@ -559,32 +532,29 @@ test('can sort content items', async ({umbracoApi}) => {
   const contentItemsJson = await contentItems.json();
   expect(contentItemsJson.total).toBe(childContentAmount);
   for (let i = 0; i < childContentAmount; i++) {
-    expect(contentItemsJson.items[i].name).toBe(childPublishInvContentPrefix + ' ' + (i + 1));
-    await umbracoApi.contentDeliveryApi.verifyBasicPropertiesForContentItem(childPublishInvContentPrefix + i, contentItemsJson.items[childContentAmount - i]);
-    await umbracoApi.contentDeliveryApi.verifyCulturePropertyForContentItem(childPublishInvContentPrefix + i, contentItemsJson.items[childContentAmount - i]);
+    expect(contentItemsJson.items[i].name).toBe(childPublishInvContentPrefix + (childContentAmount - 1 - i));
+    await umbracoApi.contentDeliveryApi.verifyBasicPropertiesForContentItem(childPublishInvContentPrefix + i, contentItemsJson.items[childContentAmount - 1 - i]);
+    await umbracoApi.contentDeliveryApi.verifyCulturePropertyForContentItem(childPublishInvContentPrefix + i, contentItemsJson.items[childContentAmount - 1 - i]);
   }
 
   // Clean
-  for (let i = 1; i <= childContentAmount; i++) {
+  for (let i = 0; i < childContentAmount; i++) {
     await umbracoApi.document.ensureNameNotExists(childPublishInvContentPrefix + i);
   }
-  await umbracoApi.document.ensureNameNotExists(publishInvParentContent);
 });
 
 test('can paginate content items', async ({umbracoApi}) => {
   // Arrange
-  const publishInvParentId = await umbracoApi.document.createDefaultDocument(publishInvParentContent, collectionDocTypeId);
-  await umbracoApi.document.publish(publishInvParentId);
   // Create child items
   for (let i = 1; i <= childContentAmount; i++) {
     const childId = await umbracoApi.document.createDefaultDocumentWithParent(childPublishInvContentPrefix + i, invariantDocTypeId, publishInvParentId);
     await umbracoApi.document.publish(childId);
   }
-
+  await umbracoApi.page.waitForTimeout(1000); // Wait is needed to ensure content is indexed
   const sort = 'name:asc';
   const filter = 'name:' + 'Child';
   const skip = 0;
-  const take = childContentAmount - 1;
+  const take = childContentAmount - 2;
 
   // Act
   const contentItems = await umbracoApi.contentDeliveryApi.getContentItemsFromAQuery(undefined, undefined, filter, sort, skip, take);
@@ -592,6 +562,7 @@ test('can paginate content items', async ({umbracoApi}) => {
   // Assert
   expect(contentItems.status()).toBe(200);
   const contentItemsJson = await contentItems.json();
+  console.log(contentItemsJson);
   expect(contentItemsJson.total).toBe(childContentAmount);
   expect(contentItemsJson.items.length).toBe(take);
 
@@ -599,7 +570,6 @@ test('can paginate content items', async ({umbracoApi}) => {
   for (let i = 1; i <= childContentAmount; i++) {
     await umbracoApi.document.ensureNameNotExists(childPublishInvContentPrefix + i);
   }
-  await umbracoApi.document.ensureNameNotExists(publishInvParentContent);
 });
 
 test('returns 400 when using an invalid sort parameter', async ({umbracoApi}) => {
