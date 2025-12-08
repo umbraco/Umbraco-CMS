@@ -155,15 +155,15 @@ export class UmbPickerInputContext<
 		this.getHostElement().dispatchEvent(new UmbChangeEvent());
 	}
 
-	#controller?: UmbModalRouteRegistrationController;
+	#pickerModalRouteRegistration?: UmbModalRouteRegistrationController;
 
 	#createPickerModalRoute() {
 		if (!this.modalAlias) {
-			this.#controller?.destroy();
+			this.#pickerModalRouteRegistration?.destroy();
 			return;
 		}
 
-		this.#controller = new UmbModalRouteRegistrationController(this, this.modalAlias)
+		this.#pickerModalRouteRegistration = new UmbModalRouteRegistrationController(this, this.modalAlias)
 			.addUniquePaths(['picker'])
 			.onSetup(() => {
 				return {
