@@ -1,7 +1,9 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.BackgroundJobs;
 using Umbraco.Cms.Infrastructure.Models;
@@ -17,6 +19,24 @@ public class DistributedJobService : IDistributedJobService
     private readonly IEnumerable<IDistributedBackgroundJob> _distributedBackgroundJobs;
     private readonly ILogger<DistributedJobService> _logger;
     private readonly DistributedJobSettings _settings;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DistributedJobService"/> class.
+    /// </summary>
+    [Obsolete("Use the constructor that accepts IOptions<DistributedJobSettings>. Scheduled for removal in V18.")]
+    public DistributedJobService(
+        ICoreScopeProvider coreScopeProvider,
+        IDistributedJobRepository distributedJobRepository,
+        IEnumerable<IDistributedBackgroundJob> distributedBackgroundJobs,
+        ILogger<DistributedJobService> logger)
+        : this(
+            coreScopeProvider,
+            distributedJobRepository,
+            distributedBackgroundJobs,
+            logger,
+            StaticServiceProvider.Instance.GetRequiredService<IOptions<DistributedJobSettings>>())
+    {
+    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DistributedJobService"/> class.
