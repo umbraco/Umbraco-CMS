@@ -98,6 +98,8 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 			if (hasError) {
 				this._hasError = true;
 				this._loading = false;
+			} else {
+				this._hasError = false;
 			}
 		});
 	}
@@ -112,7 +114,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 	}
 
 	#observeBlockTypes(items: Array<UmbDocumentTypeItemModel> | undefined) {
-		// Handle empty or undefined items - still need to process and set loading to false
+		// Process items even if empty/undefined to ensure filtered state is updated and loading is cleared
 		const lookup =
 			items?.reduce(
 				(acc, item) => {
