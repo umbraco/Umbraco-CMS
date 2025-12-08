@@ -97,7 +97,7 @@ export class UmbDeleteWithRelationConfirmModalElement extends UmbModalBaseElemen
 		return html`
 			<uui-dialog-layout class="uui-text" headline=${headline}>
 				${message}
-				${this._referencesConfig
+				${this._referencesConfig && !isNotDeletable
 					? html`<umb-confirm-action-modal-entity-references
 							.config=${this._referencesConfig}></umb-confirm-action-modal-entity-references>`
 					: nothing}
