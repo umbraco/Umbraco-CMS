@@ -89,6 +89,7 @@
 		"./property-action": "./dist-cms/packages/core/property-action/index.js",
 		"./property-editor-data-source": "./dist-cms/packages/core/property-editor-data-source/index.js",
 		"./property-editor": "./dist-cms/packages/core/property-editor/index.js",
+		"./property-sort-mode": "./dist-cms/packages/core/property-sort-mode/index.js",
 		"./property-type": "./dist-cms/packages/content/property-type/index.js",
 		"./property": "./dist-cms/packages/core/property/index.js",
 		"./recycle-bin": "./dist-cms/packages/core/recycle-bin/index.js",
