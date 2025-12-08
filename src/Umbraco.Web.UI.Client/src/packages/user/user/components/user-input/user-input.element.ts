@@ -192,20 +192,20 @@ export class UmbUserInputElement extends UmbFormControlMixin<string, typeof UmbL
 		const item = this._items?.find((x) => x.unique === unique);
 		const isError = status.state.type === 'error';
 		return html`
-        <umb-entity-item-ref
-              id=${unique}
-              .item=${item}
-              ?error=${isError}
-              .errorMessage=${status.state.error}
-              .errorDetail=${isError ? unique : undefined}
-              ?standalone=${this.max === 1}
-              ?readonly=${this.readonly}>
-              <uui-action-bar slot="actions">
-                <uui-button
-                  label=${this.localize.term('general_remove')}
-                  @click=${() => this.#removeItem(unique)}></uui-button>
-              </uui-action-bar>
-            </umb-entity-item-ref>
+			<umb-entity-item-ref
+				id=${unique}
+				.item=${item}
+				?error=${isError}
+				.errorMessage=${status.state.error}
+				.errorDetail=${isError ? unique : undefined}
+				?standalone=${this.max === 1}
+				?readonly=${this.readonly}>
+				<uui-action-bar slot="actions">
+					<uui-button
+						label=${this.localize.term('general_remove')}
+						@click=${() => this.#removeItem(unique)}></uui-button>
+				</uui-action-bar>
+			</umb-entity-item-ref>
 		`;
 	}
 

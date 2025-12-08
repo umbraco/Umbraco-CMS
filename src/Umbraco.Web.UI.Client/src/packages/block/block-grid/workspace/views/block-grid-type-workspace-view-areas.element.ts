@@ -22,7 +22,10 @@ export class UmbBlockGridTypeWorkspaceViewAreasElement extends UmbLitElement imp
 				await context?.propertyValueByAlias<undefined | string>('gridColumns'),
 				(value) => {
 					const dataTypeGridColumns = value ? parseInt(value, 10) : 12;
-					this._areaColumnsConfigurationObject = [{ alias: 'placeholder', value: dataTypeGridColumns }, { alias: 'min', value: 1 }];
+					this._areaColumnsConfigurationObject = [
+						{ alias: 'placeholder', value: dataTypeGridColumns },
+						{ alias: 'min', value: 1 },
+					];
 					this._areaConfigConfigurationObject = [{ alias: 'defaultAreaGridColumns', value: dataTypeGridColumns }];
 				},
 				'observeGridColumns',

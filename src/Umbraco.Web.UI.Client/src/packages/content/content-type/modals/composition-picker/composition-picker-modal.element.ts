@@ -42,6 +42,9 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 	@state()
 	private _usedForComposition: Array<string> = [];
 
+	@state()
+	private _loading = true;
+
 	override connectedCallback() {
 		super.connectedCallback();
 
@@ -113,7 +116,10 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 			currentPropertyAliases: currentPropertyAliases,
 		});
 
-		if (!data) return;
+		if (!data) {
+			this._loading = false;
+			return;
+		}
 
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-expect-error
@@ -121,6 +127,8 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 		this._compatibleCompositions = Object.keys(grouped)
 			.sort((a, b) => a.localeCompare(b))
 			.map((key) => ({ path: key, compositions: grouped[key] }));
+
+		this._loading = false;
 	}
 
 	#onSelectionAdd(unique: string) {
@@ -183,6 +191,10 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 	}
 
 	#renderAvailableCompositions() {
+		if (this._loading) {
+			return html`<div id="loader"><uui-loader></uui-loader></div>`;
+		}
+
 		if (this._compatibleCompositions) {
 			return html`
 				<umb-localize key="contentTypeEditor_compositionsDescription">
@@ -242,6 +254,13 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 
 	static override styles = [
 		css`
+			#loader {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				padding: var(--uui-size-layout-1);
+			}
+
 			uui-input {
 				margin: var(--uui-size-6) 0;
 				display: flex;
