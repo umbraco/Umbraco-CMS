@@ -3,11 +3,11 @@ import { UMB_DOCUMENT_PICKER_MODAL, UMB_DOCUMENT_SEARCH_PROVIDER_ALIAS } from '.
 import type { UmbDocumentItemModel } from '../../item/types.js';
 import { UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS } from '../../item/constants.js';
 import type { UmbDocumentTreeItemModel } from '../../tree/types.js';
+import { UmbDocumentItemDataResolver } from '../../item/index.js';
 import { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDocumentTypeEntityType } from '@umbraco-cms/backoffice/document-type';
 import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
-import { UmbDocumentItemDataResolver } from '../../item/index.js';
 
 interface UmbDocumentPickerInputContextOpenArgs {
 	allowedContentTypes?: Array<{ unique: string; entityType: UmbDocumentTypeEntityType }>;
