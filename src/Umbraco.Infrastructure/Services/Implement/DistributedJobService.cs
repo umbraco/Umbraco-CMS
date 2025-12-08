@@ -95,45 +95,64 @@ public class DistributedJobService : IDistributedJobService
     /// <inheritdoc />
     public async Task EnsureJobsAsync()
     {
+        // Pre-compute registered job data outside the lock to minimize lock hold time
+        var registeredJobsByName = _distributedBackgroundJobs.ToDictionary(x => x.Name, x => x.Period);
+
+        // Early exit if no registered jobs
+        if (registeredJobsByName.Count == 0)
+        {
+            return;
+        }
+
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         scope.WriteLock(Constants.Locks.DistributedJobs);
 
         DistributedBackgroundJobModel[] existingJobs = _distributedJobRepository.GetAll().ToArray();
         var existingJobsByName = existingJobs.ToDictionary(x => x.Name);
 
-        foreach (IDistributedBackgroundJob registeredJob in _distributedBackgroundJobs)
+        // Collect all changes first, then execute - minimizes time spent in the critical section
+        var jobsToAdd = new List<DistributedBackgroundJobModel>();
+        DateTime utcNow = DateTime.UtcNow;
+
+        foreach (KeyValuePair<string, TimeSpan> registeredJob in registeredJobsByName)
         {
-            if (existingJobsByName.TryGetValue(registeredJob.Name, out DistributedBackgroundJobModel? existingJob))
+            if (existingJobsByName.TryGetValue(registeredJob.Key, out DistributedBackgroundJobModel? existingJob))
             {
-                // Update if period has changed
-                if (existingJob.Period != registeredJob.Period)
+                // Update only if period has actually changed
+                if (existingJob.Period != registeredJob.Value)
                 {
-                    existingJob.Period = registeredJob.Period;
+                    existingJob.Period = registeredJob.Value;
                     _distributedJobRepository.Update(existingJob);
                 }
             }
             else
             {
-                // Add new job (fresh install or newly registered job)
-                var newJob = new DistributedBackgroundJobModel
+                // Collect new jobs for batch insert
+                jobsToAdd.Add(new DistributedBackgroundJobModel
                 {
-                    Name = registeredJob.Name,
-                    Period = registeredJob.Period,
-                    LastRun = DateTime.UtcNow,
+                    Name = registeredJob.Key,
+                    Period = registeredJob.Value,
+                    LastRun = utcNow,
                     IsRunning = false,
-                    LastAttemptedRun = DateTime.UtcNow,
-                };
-                _distributedJobRepository.Add(newJob);
+                    LastAttemptedRun = utcNow,
+                });
             }
         }
 
-        // Remove jobs that are no longer registered in code
-        var registeredJobNames = _distributedBackgroundJobs.Select(x => x.Name).ToHashSet();
-        IEnumerable<DistributedBackgroundJobModel> jobsToRemove = existingJobs.Where(x => registeredJobNames.Contains(x.Name) is false);
-
-        foreach (DistributedBackgroundJobModel jobToRemove in jobsToRemove)
+        // Batch insert new jobs
+        if (jobsToAdd.Count > 0)
         {
-            _distributedJobRepository.Delete(jobToRemove);
+            _distributedJobRepository.Add(jobsToAdd);
+        }
+
+        // Batch delete jobs that are no longer registered
+        var jobsToRemove = existingJobs
+            .Where(x => !registeredJobsByName.ContainsKey(x.Name))
+            .ToList();
+
+        if (jobsToRemove.Count > 0)
+        {
+            _distributedJobRepository.Delete(jobsToRemove);
         }
 
         scope.Complete();
