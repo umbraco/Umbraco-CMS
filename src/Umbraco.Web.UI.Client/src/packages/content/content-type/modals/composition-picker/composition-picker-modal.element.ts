@@ -42,6 +42,11 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 	@state()
 	private _usedForComposition: Array<string> = [];
 
+	/**
+	 * Loading state for the composition data fetch.
+	 * Initialized to true to show loader immediately when modal opens.
+	 * Set to false when data is successfully loaded or an error occurs.
+	 */
 	@state()
 	private _loading = true;
 
@@ -192,7 +197,9 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 
 	#renderAvailableCompositions() {
 		if (this._loading) {
-			return html`<div id="loader"><uui-loader></uui-loader></div>`;
+			return html`<div id="loader" role="status" aria-live="polite" aria-label="Loading compositions">
+				<uui-loader></uui-loader>
+			</div>`;
 		}
 
 		if (this._compatibleCompositions) {
@@ -259,6 +266,7 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 				justify-content: center;
 				align-items: center;
 				padding: var(--uui-size-layout-1);
+				min-height: 200px;
 			}
 
 			uui-input {
