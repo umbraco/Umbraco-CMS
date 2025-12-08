@@ -22,6 +22,12 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 	@state()
 	private _items: Array<UmbMfaLoginProviderOption> = [];
 
+	@state()
+	private _isLoading = true;
+
+	@state()
+	private _error?: string;
+
 	#currentUserRepository = new UmbCurrentUserRepository(this);
 
 	constructor() {
@@ -30,35 +36,52 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 	}
 
 	async #loadProviders() {
-		const serverLoginProviders$ = (await this.#currentUserRepository.requestMfaLoginProviders()).asObservable();
-		const manifestLoginProviders$ = umbExtensionsRegistry.byType('mfaLoginProvider');
+		this._isLoading = true;
+		this._error = undefined;
 
-		// Merge the server and manifest providers to get the final list of providers
-		const mfaLoginProviders$ = mergeObservables(
-			[serverLoginProviders$, manifestLoginProviders$],
-			([serverLoginProviders, manifestLoginProviders]) => {
-				return manifestLoginProviders.map((manifestLoginProvider) => {
-					const serverLoginProvider = serverLoginProviders.find(
-						(serverLoginProvider) => serverLoginProvider.providerName === manifestLoginProvider.forProviderName,
-					);
-					return {
-						existsOnServer: !!serverLoginProvider,
-						isEnabledOnUser: serverLoginProvider?.isEnabledOnUser ?? false,
-						providerName: serverLoginProvider?.providerName ?? manifestLoginProvider.forProviderName,
-						displayName:
-							manifestLoginProvider.meta?.label ?? serverLoginProvider?.providerName ?? manifestLoginProvider.name,
-					} satisfies UmbMfaLoginProviderOption;
-				});
-			},
-		);
+		try {
+			const serverLoginProvidersResponse = await this.#currentUserRepository.requestMfaLoginProviders();
+			
+			if (serverLoginProvidersResponse.error) {
+				this._error = 'Failed to load MFA providers';
+				this._isLoading = false;
+				return;
+			}
 
-		this.observe(
-			mfaLoginProviders$,
-			(providers) => {
-				this._items = providers;
-			},
-			'_mfaLoginProviders',
-		);
+			const serverLoginProviders$ = serverLoginProvidersResponse.asObservable();
+			const manifestLoginProviders$ = umbExtensionsRegistry.byType('mfaLoginProvider');
+
+			// Merge the server and manifest providers to get the final list of providers
+			const mfaLoginProviders$ = mergeObservables(
+				[serverLoginProviders$, manifestLoginProviders$],
+				([serverLoginProviders, manifestLoginProviders]) => {
+					return manifestLoginProviders.map((manifestLoginProvider) => {
+						const serverLoginProvider = serverLoginProviders.find(
+							(serverLoginProvider) => serverLoginProvider.providerName === manifestLoginProvider.forProviderName,
+						);
+						return {
+							existsOnServer: !!serverLoginProvider,
+							isEnabledOnUser: serverLoginProvider?.isEnabledOnUser ?? false,
+							providerName: serverLoginProvider?.providerName ?? manifestLoginProvider.forProviderName,
+							displayName:
+								manifestLoginProvider.meta?.label ?? serverLoginProvider?.providerName ?? manifestLoginProvider.name,
+						} satisfies UmbMfaLoginProviderOption;
+					});
+				},
+			);
+
+			this.observe(
+				mfaLoginProviders$,
+				(providers) => {
+					this._items = providers;
+					this._isLoading = false;
+				},
+				'_mfaLoginProviders',
+			);
+		} catch (error) {
+			this._error = 'Failed to load MFA providers';
+			this._isLoading = false;
+		}
 	}
 
 	#close() {
@@ -70,14 +93,22 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 			<umb-body-layout headline="${this.localize.term('member_2fa')}">
 				<div id="main">
 					${when(
-						this._items.length > 0,
-						() => html`
-							${repeat(
-								this._items,
-								(item) => item.providerName,
-								(item) => this.#renderProvider(item),
-							)}
-						`,
+						this._isLoading,
+						() => html`<uui-loader></uui-loader>`,
+						() => when(
+							this._error,
+							() => html`<p>${this._error}</p>`,
+							() => when(
+								this._items.length > 0,
+								() => html`
+									${repeat(
+										this._items,
+										(item) => item.providerName,
+										(item) => this.#renderProvider(item),
+									)}
+								`,
+							),
+						),
 					)}
 				</div>
 				<div slot="actions">
