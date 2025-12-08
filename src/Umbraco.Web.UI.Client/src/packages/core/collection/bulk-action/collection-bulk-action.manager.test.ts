@@ -1,7 +1,7 @@
 import { UmbCollectionBulkActionManager } from './collection-bulk-action.manager.js';
 import { umbExtensionsRegistry } from '../../extension-registry/index.js';
 import { expect } from '@open-wc/testing';
-import { Observable, first } from '@umbraco-cms/backoffice/external/rxjs';
+import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 
@@ -45,7 +45,6 @@ describe('UmbCollectionBulkActionManager', () => {
 		});
 
 		it('it emits false if there are no actions', (done) => {
-			// Use first() to only get the initial emission and auto-unsubscribe
 			manager.hasBulkActions.subscribe((value) => {
 				expect(value).to.equal(false);
 				done();

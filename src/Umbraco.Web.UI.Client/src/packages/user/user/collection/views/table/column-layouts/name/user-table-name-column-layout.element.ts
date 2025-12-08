@@ -23,7 +23,10 @@ export class UmbUserTableNameColumnLayoutElement extends LitElement {
 				name=${this.value.name}
 				kind=${this.value.kind}
 				.imgUrls=${this.value.avatarUrls}></umb-user-avatar>
-			<a style="font-weight: bold;" href="${this.value.href}">${this.value.name}</a>
+
+			${this.value.href
+				? html`<a style="font-weight: bold;" href="${this.value.href}">${this.value.name}</a>`
+				: html` <span>${this.value.name}</span>`}
 		</div>`;
 	}
 	static override styles = [UmbTextStyles];
