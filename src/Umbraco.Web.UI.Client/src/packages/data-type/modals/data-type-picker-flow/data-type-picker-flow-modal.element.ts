@@ -269,8 +269,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 
 	#renderGrid() {
 		if (this._isLoading) {
-			return html`<div
-				style="display: flex; justify-content: center; align-items: center; padding: var(--uui-size-space-6);">
+			return html`<div class="loader-container">
 				<uui-loader></uui-loader>
 			</div>`;
 		}
@@ -485,6 +484,13 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 
 			.choice-type-headline {
 				border-bottom: 1px solid var(--uui-color-divider);
+			}
+
+			.loader-container {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				padding: var(--uui-size-space-6);
 			}
 		`,
 	];
