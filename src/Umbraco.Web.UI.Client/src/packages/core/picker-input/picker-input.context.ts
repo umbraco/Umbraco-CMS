@@ -126,13 +126,8 @@ export class UmbPickerInputContext<
 		}
 
 		const modalValue = await umbOpenModal(this, this.modalAlias, {
-			data: {
-				multiple: this._max === 1 ? false : true,
-				...pickerData,
-			},
-			value: {
-				selection: this.getSelection(),
-			} as PickerModalValueType,
+			data: this.#getPickerModalDataArgs(pickerData),
+			value: this.#getPickerModalValueArgs(),
 		}).catch(() => undefined);
 
 		this.#applyModalValue(modalValue);
@@ -170,6 +165,13 @@ export class UmbPickerInputContext<
 
 		this.#controller = new UmbModalRouteRegistrationController(this, this.modalAlias)
 			.addUniquePaths(['picker'])
+			.onSetup(() => {
+				return {
+					// TODO: we need to handle the same picker data as passed to the open method as well.
+					data: this.#getPickerModalDataArgs(),
+					value: this.#getPickerModalValueArgs(),
+				};
+			})
 			.onSubmit((value) => {
 				this.#applyModalValue(value);
 			})
@@ -177,6 +179,19 @@ export class UmbPickerInputContext<
 				const path = routeBuilder({});
 				this.#modalRoute.setValue(path);
 			});
+	}
+
+	#getPickerModalDataArgs(pickerData?: Partial<PickerModalConfigType>) {
+		return {
+			multiple: this._max === 1 ? false : true,
+			...pickerData,
+		};
+	}
+
+	#getPickerModalValueArgs(): PickerModalValueType {
+		return {
+			selection: this.getSelection(),
+		} as PickerModalValueType;
 	}
 
 	#applyModalValue(value: PickerModalValueType | undefined) {
