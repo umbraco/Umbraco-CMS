@@ -440,3 +440,19 @@ test('can add a thumbnail to a block', {tag: '@release'}, async ({umbracoApi, um
 test.fixme('can remove a thumbnail to a block ', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // TODO: Implement it later
 });
+
+test('only allow image file as a block thumbnail', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const notAllowedFileName = 'Program.cs';
+  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
+  const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
+  await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListEditorName, contentElementTypeId);
+
+  // Act
+  await umbracoUi.dataType.goToDataType(blockListEditorName);
+  await umbracoUi.dataType.goToBlockWithName(elementTypeName);
+  await umbracoUi.dataType.clickChooseThumbnailButton();
+  
+  // Assert
+  await umbracoUi.dataType.isModalMenuItemWithNameVisible(notAllowedFileName, false);
+});
