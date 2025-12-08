@@ -48,13 +48,13 @@ public static class UmbracoBuilderApiExtensions
         services.AddOptions<SwaggerUIOptions>()
             .Configure<IServiceProvider>((swaggerUiOptions, sp) =>
             {
-                OpenApiRouteTemplatePipelineFilter? swaggerPipelineFilter = sp.GetRequiredService<IOptions<UmbracoPipelineOptions>>().Value.PipelineFilters.OfType<OpenApiRouteTemplatePipelineFilter>().FirstOrDefault();
-                if (swaggerPipelineFilter is null)
+                OpenApiRouteTemplatePipelineFilter? openApiPipelineFilter = sp.GetRequiredService<IOptions<UmbracoPipelineOptions>>().Value.PipelineFilters.OfType<OpenApiRouteTemplatePipelineFilter>().FirstOrDefault();
+                if (openApiPipelineFilter is null)
                 {
                     return;
                 }
 
-                var openApiRoute = swaggerPipelineFilter.SwaggerRouteTemplate(sp).Replace("{documentName}", apiName).EnsureStartsWith("/");
+                var openApiRoute = openApiPipelineFilter.OpenApiRouteTemplate(sp).Replace("{documentName}", apiName).EnsureStartsWith("/");
                 swaggerUiOptions.SwaggerEndpoint(openApiRoute, apiTitle);
                 swaggerUiOptions.ConfigObject.Urls = swaggerUiOptions.ConfigObject.Urls.OrderBy(x => x.Name);
             });

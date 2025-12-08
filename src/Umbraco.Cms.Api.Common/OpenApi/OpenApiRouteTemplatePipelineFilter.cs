@@ -18,38 +18,30 @@ public class OpenApiRouteTemplatePipelineFilter : UmbracoPipelineFilter
 
     private void PostPipelineAction(IApplicationBuilder applicationBuilder)
     {
-        if (SwaggerIsEnabled(applicationBuilder) is false)
+        if (OpenApiIsEnabled(applicationBuilder.ApplicationServices) is false)
         {
             return;
         }
 
         // TODO: Check if there is a better way to do this without calling UseEndpoints twice
-        applicationBuilder.UseEndpoints(e => e.MapOpenApi(SwaggerRouteTemplate(applicationBuilder)));
-        applicationBuilder.UseSwaggerUI(swaggerUiOptions => SwaggerUiConfiguration(swaggerUiOptions, applicationBuilder));
+        applicationBuilder.UseEndpoints(e => e.MapOpenApi(OpenApiRouteTemplate(e.ServiceProvider)));
+        applicationBuilder.UseSwaggerUI(swaggerUiOptions => ConfigureOpenApiUI(swaggerUiOptions, applicationBuilder.ApplicationServices));
     }
 
-    protected virtual bool SwaggerIsEnabled(IApplicationBuilder applicationBuilder)
-        => applicationBuilder.ApplicationServices.GetRequiredService<IWebHostEnvironment>().IsProduction() is false;
+    protected virtual bool OpenApiIsEnabled(IServiceProvider serviceProvider)
+        => serviceProvider.GetRequiredService<IWebHostEnvironment>().IsProduction() is false;
 
-    public virtual string SwaggerRouteTemplate(IServiceProvider serviceProvider)
+    public virtual string OpenApiRouteTemplate(IServiceProvider serviceProvider)
             => $"{GetBackOfficePath(serviceProvider).TrimStart(Constants.CharArrays.ForwardSlash)}/swagger/{{documentName}}/swagger.json";
 
-    [Obsolete("Use the non-obsolete overload that accepts IServiceProvider instead. Scheduled for removal in v19.")]
-    protected virtual string SwaggerRouteTemplate(IApplicationBuilder applicationBuilder)
-        => SwaggerRouteTemplate(applicationBuilder.ApplicationServices);
-
-    public virtual string SwaggerUiRoutePrefix(IServiceProvider serviceProvider)
+    public virtual string OpenApiUiRoutePrefix(IServiceProvider serviceProvider)
         => $"{GetBackOfficePath(serviceProvider).TrimStart(Constants.CharArrays.ForwardSlash)}/swagger";
 
-    [Obsolete("Use the non-obsolete overload that accepts IServiceProvider instead. Scheduled for removal in v19.")]
-    protected virtual string SwaggerUiRoutePrefix(IApplicationBuilder applicationBuilder)
-        => SwaggerUiRoutePrefix(applicationBuilder.ApplicationServices);
-
-    protected virtual void SwaggerUiConfiguration(
+    protected virtual void ConfigureOpenApiUI(
         SwaggerUIOptions swaggerUiOptions,
-        IApplicationBuilder applicationBuilder)
+        IServiceProvider serviceProvider)
     {
-        swaggerUiOptions.RoutePrefix = SwaggerUiRoutePrefix(applicationBuilder);
+        swaggerUiOptions.RoutePrefix = OpenApiUiRoutePrefix(serviceProvider);
 
         // Add custom configuration from https://swagger.io/docs/open-source-tools/swagger-ui/usage/configuration/
         swaggerUiOptions.ConfigObject.PersistAuthorization = true; // persists authorization data so it would not be lost on browser close/refresh
@@ -59,6 +51,6 @@ public class OpenApiRouteTemplatePipelineFilter : UmbracoPipelineFilter
         swaggerUiOptions.OAuthUsePkce();
     }
 
-    private string GetBackOfficePath(IServiceProvider serviceProvider)
+    private static string GetBackOfficePath(IServiceProvider serviceProvider)
         => serviceProvider.GetRequiredService<IHostingEnvironment>().GetBackOfficePath();
 }
