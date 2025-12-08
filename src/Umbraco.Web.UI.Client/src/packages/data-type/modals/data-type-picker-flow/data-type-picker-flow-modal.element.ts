@@ -44,6 +44,9 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 	@state()
 	private _dataTypePickerModalRouteBuilder?: UmbModalRouteBuilder;
 
+	@state()
+	private _isLoading = false;
+
 	pagination = new UmbPaginationManager();
 
 	#collectionRepository;
@@ -162,20 +165,25 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 	}
 
 	async #getDataTypes() {
-		this.pagination.setCurrentPageNumber(this._currentPage);
+		this._isLoading = true;
+		try {
+			this.pagination.setCurrentPageNumber(this._currentPage);
 
-		const { data } = await this.#collectionRepository.requestCollection({
-			skip: this.pagination.getSkip(),
-			take: this.pagination.getPageSize(),
-			name: this.#currentFilterQuery,
-		});
+			const { data } = await this.#collectionRepository.requestCollection({
+				skip: this.pagination.getSkip(),
+				take: this.pagination.getPageSize(),
+				name: this.#currentFilterQuery,
+			});
 
-		this.pagination.setTotalItems(data?.total ?? 0);
+			this.pagination.setTotalItems(data?.total ?? 0);
 
-		if (this.pagination.getCurrentPageNumber() > 1) {
-			this.#dataTypes = [...this.#dataTypes, ...(data?.items ?? [])];
-		} else {
-			this.#dataTypes = data?.items ?? [];
+			if (this.pagination.getCurrentPageNumber() > 1) {
+				this.#dataTypes = [...this.#dataTypes, ...(data?.items ?? [])];
+			} else {
+				this.#dataTypes = data?.items ?? [];
+			}
+		} finally {
+			this._isLoading = false;
 		}
 	}
 
@@ -260,6 +268,12 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 	}
 
 	#renderGrid() {
+		if (this._isLoading) {
+			return html`<div
+				style="display: flex; justify-content: center; align-items: center; padding: var(--uui-size-space-6);">
+				<uui-loader></uui-loader>
+			</div>`;
+		}
 		return this.#currentFilterQuery ? this.#renderFilteredList() : this.#renderUIs();
 	}
 
