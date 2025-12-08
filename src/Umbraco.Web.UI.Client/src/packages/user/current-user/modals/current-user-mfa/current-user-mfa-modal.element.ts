@@ -41,9 +41,8 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 
 		try {
 			const serverLoginProvidersResponse = await this.#currentUserRepository.requestMfaLoginProviders();
-			
 			if (serverLoginProvidersResponse.error) {
-				this._error = 'Failed to load MFA providers';
+				this._error = this.localize.term('errors_defaultError');
 				this._isLoading = false;
 				return;
 			}
@@ -79,7 +78,7 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 				'_mfaLoginProviders',
 			);
 		} catch (error) {
-			this._error = 'Failed to load MFA providers';
+			this._error = this.localize.term('errors_defaultError');
 			this._isLoading = false;
 		}
 	}
