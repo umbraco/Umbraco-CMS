@@ -189,9 +189,73 @@ internal sealed class DistributedJobServiceTests : UmbracoIntegrationTest
         Assert.IsNull(job);
     }
 
+    [Test]
+    public async Task EnsureJobsAsync_RemovesUnregisteredJobs()
+    {
+        // Arrange - First ensure our test job is registered
+        await DistributedJobService.EnsureJobsAsync();
+
+        // Add an orphaned job directly to the database (simulating a job that was removed from code)
+        var orphanedJobName = "OrphanedJob";
+        InsertJob(orphanedJobName, TimeSpan.FromHours(1));
+
+        // Verify both jobs exist
+        Assert.IsNotNull(GetJobStateOrDefault(TestJobName));
+        Assert.IsNotNull(GetJobStateOrDefault(orphanedJobName));
+
+        // Act - EnsureJobsAsync should remove the orphaned job
+        await DistributedJobService.EnsureJobsAsync();
+
+        // Assert
+        Assert.IsNotNull(GetJobStateOrDefault(TestJobName)); // Registered job still exists
+        Assert.IsNull(GetJobStateOrDefault(orphanedJobName)); // Orphaned job was removed
+    }
+
+    [Test]
+    public async Task EnsureJobsAsync_UpdatesJobPeriodWhenChanged()
+    {
+        // Arrange - First ensure job is registered
+        await DistributedJobService.EnsureJobsAsync();
+
+        // Manually change the period in the database to simulate a mismatch
+        var originalPeriod = TestJobPeriod;
+        var differentPeriod = TimeSpan.FromHours(99);
+        UpdateJobPeriod(TestJobName, differentPeriod);
+
+        // Verify the period was changed
+        var beforeUpdate = GetJobState(TestJobName);
+        Assert.AreEqual(differentPeriod.Ticks, beforeUpdate.Period);
+
+        // Act - EnsureJobsAsync should update the period back to the registered value
+        await DistributedJobService.EnsureJobsAsync();
+
+        // Assert - Period should be restored to the registered value
+        var afterUpdate = GetJobState(TestJobName);
+        Assert.AreEqual(originalPeriod.Ticks, afterUpdate.Period);
+    }
+
+    [Test]
+    public async Task EnsureJobsAsync_IsIdempotent()
+    {
+        // Act - Call EnsureJobsAsync multiple times
+        await DistributedJobService.EnsureJobsAsync();
+        var afterFirst = GetJobState(TestJobName);
+
+        await DistributedJobService.EnsureJobsAsync();
+        var afterSecond = GetJobState(TestJobName);
+
+        await DistributedJobService.EnsureJobsAsync();
+        var afterThird = GetJobState(TestJobName);
+
+        // Assert - Job should still exist with same properties
+        Assert.AreEqual(afterFirst.Id, afterSecond.Id);
+        Assert.AreEqual(afterSecond.Id, afterThird.Id);
+        Assert.AreEqual(TestJobPeriod.Ticks, afterThird.Period);
+    }
+
     private void SetJobState(string jobName, DateTime lastRun, bool isRunning, DateTime? lastAttemptedRun = null)
     {
-        using var scope = ScopeProvider.CreateScope(autoComplete: true);
+        using var scope = ScopeProvider.CreateScope();
         var sql = ScopeAccessor.AmbientScope!.SqlContext.Sql()
             .Update<DistributedJobDto>(u => u
                 .Set(x => x.LastRun, lastRun)
@@ -200,17 +264,59 @@ internal sealed class DistributedJobServiceTests : UmbracoIntegrationTest
             .Where<DistributedJobDto>(x => x.Name == jobName);
 
         ScopeAccessor.AmbientScope.Database.Execute(sql);
+        scope.Complete();
+    }
+
+    private void InsertJob(string jobName, TimeSpan period)
+    {
+        using var scope = ScopeProvider.CreateScope();
+        var dto = new DistributedJobDto
+        {
+            Name = jobName,
+            Period = period.Ticks,
+            LastRun = DateTime.UtcNow,
+            IsRunning = false,
+            LastAttemptedRun = DateTime.UtcNow,
+        };
+        ScopeAccessor.AmbientScope!.Database.Insert(dto);
+        scope.Complete();
+    }
+
+    private void UpdateJobPeriod(string jobName, TimeSpan period)
+    {
+        using var scope = ScopeProvider.CreateScope();
+        var sql = ScopeAccessor.AmbientScope!.SqlContext.Sql()
+            .Update<DistributedJobDto>(u => u.Set(x => x.Period, period.Ticks))
+            .Where<DistributedJobDto>(x => x.Name == jobName);
+
+        ScopeAccessor.AmbientScope.Database.Execute(sql);
+        scope.Complete();
     }
 
     private DistributedJobDto GetJobState(string jobName)
     {
-        using var scope = ScopeProvider.CreateScope(autoComplete: true);
+        using var scope = ScopeProvider.CreateScope();
         var sql = ScopeAccessor.AmbientScope!.SqlContext.Sql()
             .Select<DistributedJobDto>()
             .From<DistributedJobDto>()
             .Where<DistributedJobDto>(x => x.Name == jobName);
 
-        return ScopeAccessor.AmbientScope.Database.Single<DistributedJobDto>(sql);
+        var result = ScopeAccessor.AmbientScope.Database.Single<DistributedJobDto>(sql);
+        scope.Complete();
+        return result;
+    }
+
+    private DistributedJobDto? GetJobStateOrDefault(string jobName)
+    {
+        using var scope = ScopeProvider.CreateScope();
+        var sql = ScopeAccessor.AmbientScope!.SqlContext.Sql()
+            .Select<DistributedJobDto>()
+            .From<DistributedJobDto>()
+            .Where<DistributedJobDto>(x => x.Name == jobName);
+
+        var result = ScopeAccessor.AmbientScope.Database.FirstOrDefault<DistributedJobDto>(sql);
+        scope.Complete();
+        return result;
     }
 
     /// <summary>
