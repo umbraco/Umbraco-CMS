@@ -145,14 +145,21 @@ public class UmbracoContentIndex : UmbracoExamineIndex, IUmbracoContentIndex
                 _logger.LogDebug("DeleteFromIndex with query: {Query} (found {TotalItems} results)", rawQuery, results.TotalItemCount);
             }
 
-            var toRemove = results.Select(x => x.Id).ToList();
-            // delete those descendants (ensure base. is used here so we aren't calling ourselves!)
-            base.PerformDeleteFromIndex(toRemove, null);
-
-            // remove any ids from our list that were part of the descendants
-            idsAsList.RemoveAll(x => toRemove.Contains(x));
+            if (results.TotalItemCount > 0)
+            {
+                var toRemove = results.Select(x => x.Id).ToList();
+            
+                // delete those descendants (ensure base. is used here so we aren't calling ourselves!)
+                base.PerformDeleteFromIndex(toRemove, null);
+            
+                // remove any ids from our list that were part of the descendants
+                idsAsList.RemoveAll(x => toRemove.Contains(x));
+            }
         }
 
-        base.PerformDeleteFromIndex(idsAsList, onComplete);
+        if (idsAsList.Count > 0)
+        {
+            base.PerformDeleteFromIndex(idsAsList, onComplete);
+        }
     }
 }
