@@ -43,7 +43,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.language.ensureIsoCodeNotExists(secondCulture);
 });
 
-test('can edit variant text property in non-default language when AllowEditInvariantFromNonDefault is true', async ({umbracoApi, umbracoUi}) => {
+test('can edit variant text property in non-default language when AllowEditInvariantFromNonDefault is false', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithVariantAndInvariantBlockLists(
     documentTypeName,
@@ -71,8 +71,7 @@ test('can edit variant text property in non-default language when AllowEditInvar
   await umbracoUi.content.isDocumentPropertyEditable(text1Name, true);
 });
 
-// Currently failing due to issue: invariant text properties not being editable in non-default languages
-test.skip('can edit invariant text property in non-default language when AllowEditInvariantFromNonDefault is true', async ({umbracoApi, umbracoUi}) => {
+test('cannot edit invariant text property in non-default language when AllowEditInvariantFromNonDefault is false', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithVariantAndInvariantBlockLists(
     documentTypeName,
@@ -97,10 +96,10 @@ test.skip('can edit invariant text property in non-default language when AllowEd
   await umbracoUi.content.switchLanguage(secondCulture);
 
   // Assert
-  await umbracoUi.content.isDocumentPropertyEditable(text2Name, true);
+  await umbracoUi.content.isDocumentPropertyEditable(text2Name, false);
 });
 
-test('can edit variant block list in non-default language when AllowEditInvariantFromNonDefault is true', async ({umbracoApi, umbracoUi}) => {
+test('can edit variant block list in non-default language when AllowEditInvariantFromNonDefault is false', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithVariantAndInvariantBlockLists(
     documentTypeName,
@@ -128,8 +127,7 @@ test('can edit variant block list in non-default language when AllowEditInvarian
   await umbracoUi.content.isAddBlockListElementWithNameVisible(blockList1Name);
 });
 
-// Currently failing due to issue: invariant block lists not being editable in non-default languages
-test.skip('can edit invariant block list in non-default language when AllowEditInvariantFromNonDefault is true', async ({umbracoApi, umbracoUi}) => {
+test('cannot create block in invariant block list in non-default language when AllowEditInvariantFromNonDefault is false', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithVariantAndInvariantBlockLists(
     documentTypeName,
@@ -154,10 +152,10 @@ test.skip('can edit invariant block list in non-default language when AllowEditI
   await umbracoUi.content.switchLanguage(secondCulture);
 
   // Assert
-  await umbracoUi.content.isAddBlockListElementWithNameVisible(blockList2Name);
+  await umbracoUi.content.isAddBlockListElementWithNameDisabled(blockList2Name);
 });
 
-test('can edit variant text property inside a variant block in non-default language when AllowEditInvariantFromNonDefault is true', async ({umbracoApi, umbracoUi}) => {
+test('can edit variant text property inside a variant block in non-default language when AllowEditInvariantFromNonDefault is false', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithVariantAndInvariantBlockLists(
     documentTypeName,
@@ -192,7 +190,7 @@ test('can edit variant text property inside a variant block in non-default langu
   await umbracoUi.content.isBlockPropertyEditable(text1Name, true);
 });
 
-test('can edit invariant text property inside a variant block in non-default language when AllowEditInvariantFromNonDefault is true', async ({umbracoApi, umbracoUi}) => {
+test('cannot edit invariant text property inside a variant block in non-default language when AllowEditInvariantFromNonDefault is false', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithVariantAndInvariantBlockLists(
     documentTypeName,
@@ -224,11 +222,10 @@ test('can edit invariant text property inside a variant block in non-default lan
   await umbracoUi.content.clickBlockElementWithName(block1ElementTypeName);
 
   // Assert
-  await umbracoUi.content.isBlockPropertyEditable(text2Name, true);
+  await umbracoUi.content.isBlockPropertyEditable(text2Name, false);
 });
 
-// Currently failing due to issue: variant text properties inside invariant blocks not being editable in non-default languages
-test.skip('can edit variant text property inside invariant block in non-default language when AllowEditInvariantFromNonDefault is true', async ({umbracoApi, umbracoUi}) => {
+test('cannot edit variant text property inside invariant block in non-default language when AllowEditInvariantFromNonDefault is false', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithVariantAndInvariantBlockLists(
     documentTypeName,
@@ -260,11 +257,10 @@ test.skip('can edit variant text property inside invariant block in non-default 
   await umbracoUi.content.clickBlockElementWithName(block2ElementTypeName);
 
   // Assert
-  await umbracoUi.content.isBlockPropertyEditable(text1Name, true);
+  await umbracoUi.content.isBlockPropertyEditable(text1Name, false);
 });
 
-// Currently failing due to issue: invariant text properties inside invariant blocks not being editable in non-default languages
-test.skip('can edit invariant text property inside an invariant block in non-default language when AllowEditInvariantFromNonDefault is true', async ({umbracoApi, umbracoUi}) => {
+test('cannot edit invariant text property inside an invariant block in non-default language when AllowEditInvariantFromNonDefault is false', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithVariantAndInvariantBlockLists(
     documentTypeName,
@@ -296,5 +292,5 @@ test.skip('can edit invariant text property inside an invariant block in non-def
   await umbracoUi.content.clickBlockElementWithName(block2ElementTypeName);
 
   // Assert
-  await umbracoUi.content.isBlockPropertyEditable(text2Name, true);
+  await umbracoUi.content.isBlockPropertyEditable(text2Name, false);
 });
