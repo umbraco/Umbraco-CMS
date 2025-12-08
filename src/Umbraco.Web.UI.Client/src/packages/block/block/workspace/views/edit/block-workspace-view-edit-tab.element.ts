@@ -91,7 +91,7 @@ export class UmbBlockWorkspaceViewEditTabElement extends UmbLitElement {
 						this._groups,
 						(group) => group.key,
 						(group) =>
-							html`<uui-box .headline=${this.localize.string(group.name) ?? ''}>${this.renderGroup(group)}</uui-box>`,
+							html`<uui-box .headline=${this.localize.string(group.name)}>${this.renderGroup(group)}</uui-box>`,
 					)}
 		`;
 	}
