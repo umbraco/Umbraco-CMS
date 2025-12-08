@@ -55,6 +55,9 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 	@state()
 	private _loading = true;
 
+	@state()
+	private _hasError = false;
+
 	constructor() {
 		super();
 
@@ -88,6 +91,15 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 		this.observe(this.#itemManager.items, async (items) => {
 			this.#observeBlockTypes(items);
 		});
+
+		this.observe(this.#itemManager.statuses, (statuses) => {
+			// Check if any status has an error
+			const hasError = statuses?.some((status) => status.state.type === 'error') ?? false;
+			if (hasError) {
+				this._hasError = true;
+				this._loading = false;
+			}
+		});
 	}
 
 	override connectedCallback() {
@@ -100,19 +112,19 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 	}
 
 	#observeBlockTypes(items: Array<UmbDocumentTypeItemModel> | undefined) {
-		if (!items?.length) return;
-
-		const lookup = items.reduce(
-			(acc, item) => {
-				acc[item.unique] = {
-					...item,
-					name: this.localize.string(item.name),
-					description: this.localize.string(item.description),
-				};
-				return acc;
-			},
-			{} as { [key: string]: UmbDocumentTypeItemModel },
-		);
+		// Handle empty or undefined items - still need to process and set loading to false
+		const lookup =
+			items?.reduce(
+				(acc, item) => {
+					acc[item.unique] = {
+						...item,
+						name: this.localize.string(item.name),
+						description: this.localize.string(item.description),
+					};
+					return acc;
+				},
+				{} as { [key: string]: UmbDocumentTypeItemModel },
+			) ?? {};
 
 		const blocks: Array<UmbBlockTypeItemWithGroupKey> =
 			this.data?.blocks?.map((block) => ({ ...(lookup[block.contentElementTypeKey] ?? {}), ...block })) ?? [];
@@ -206,6 +218,12 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 
 	#renderCreateEmpty() {
 		if (this._loading) return html`<div id="loader"><uui-loader></uui-loader></div>`;
+		if (this._hasError) {
+			return html`<div id="error">
+				<uui-icon name="icon-alert" style="font-size: 3rem; color: var(--uui-color-danger);"></uui-icon>
+				<p>${this.localize.term('general_error')}</p>
+			</div>`;
+		}
 		return html`
 			${when(
 				this.data?.blocks && this.data?.blocks.length > 8,
@@ -285,9 +303,19 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 
 	static override styles = [
 		css`
-			#loader {
+			#loader,
+			#error {
 				display: flex;
+				flex-direction: column;
+				align-items: center;
 				justify-content: center;
+				gap: var(--uui-size-space-4);
+				padding: var(--uui-size-layout-3);
+			}
+
+			#error p {
+				margin: 0;
+				color: var(--uui-color-danger);
 			}
 
 			#search {
