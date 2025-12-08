@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.BackgroundJobs;
 using Umbraco.Cms.Infrastructure.Models;
@@ -14,24 +16,23 @@ public class DistributedJobService : IDistributedJobService
     private readonly IDistributedJobRepository _distributedJobRepository;
     private readonly IEnumerable<IDistributedBackgroundJob> _distributedBackgroundJobs;
     private readonly ILogger<DistributedJobService> _logger;
+    private readonly DistributedJobSettings _settings;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DistributedJobService"/> class.
     /// </summary>
-    /// <param name="coreScopeProvider"></param>
-    /// <param name="distributedJobRepository"></param>
-    /// <param name="distributedBackgroundJobs"></param>
-    /// <param name="logger"></param>
     public DistributedJobService(
         ICoreScopeProvider coreScopeProvider,
         IDistributedJobRepository distributedJobRepository,
         IEnumerable<IDistributedBackgroundJob> distributedBackgroundJobs,
-        ILogger<DistributedJobService> logger)
+        ILogger<DistributedJobService> logger,
+        IOptions<DistributedJobSettings> settings)
     {
         _coreScopeProvider = coreScopeProvider;
         _distributedJobRepository = distributedJobRepository;
         _distributedBackgroundJobs = distributedBackgroundJobs;
         _logger = logger;
+        _settings = settings.Value;
     }
 
     /// <inheritdoc />
@@ -42,7 +43,8 @@ public class DistributedJobService : IDistributedJobService
         scope.EagerWriteLock(Constants.Locks.DistributedJobs);
 
         IEnumerable<DistributedBackgroundJobModel> jobs = _distributedJobRepository.GetAll();
-        DistributedBackgroundJobModel? job = jobs.FirstOrDefault(x => x.LastRun < DateTime.UtcNow - x.Period);
+        DistributedBackgroundJobModel? job = jobs.FirstOrDefault(x => x.LastRun < DateTime.UtcNow - x.Period
+                                                                      && (x.IsRunning is false || x.LastAttemptedRun < DateTime.UtcNow - x.Period - _settings.MaximumExecutionTime));
 
         if (job is null)
         {
