@@ -26,6 +26,8 @@ public class DistributedJobSettings
 
     /// <summary>
     ///     Gets or sets the maximum execution time for a distributed job before it is considered timed out.
+    ///     When a job exceeds this time, it is considered stale and can be picked up by another server for recovery and restarted.
     /// </summary>
+    [DefaultValue(StaticMaxExecutionTime)]
     public TimeSpan MaximumExecutionTime { get; set; } = TimeSpan.Parse(StaticMaxExecutionTime);
 }
