@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
@@ -22,10 +21,6 @@ public class DistributedBackgroundJobHostedService : BackgroundService
     /// <summary>
     /// Initializes a new instance of the <see cref="DistributedBackgroundJobHostedService"/> class.
     /// </summary>
-    /// <param name="logger"></param>
-    /// <param name="runtimeState"></param>
-    /// <param name="distributedJobService"></param>
-    /// <param name="distributedJobSettings"></param>
     public DistributedBackgroundJobHostedService(
         ILogger<DistributedBackgroundJobHostedService> logger,
         IRuntimeState runtimeState,
@@ -67,6 +62,13 @@ public class DistributedBackgroundJobHostedService : BackgroundService
         catch (OperationCanceledException)
         {
             _logger.LogInformation("Timed Hosted Service is stopping.");
+        }
+        catch (Exception)
+        {
+            // Ensure that the app doesn't shut down gracefully so that environments like Kubernetes can restart it
+            // See https://github.com/dotnet/runtime/issues/67146 for more information.
+            Environment.ExitCode = 1;
+            throw;
         }
     }
 
