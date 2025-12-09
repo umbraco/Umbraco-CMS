@@ -451,7 +451,7 @@ test('can fetch children of a content', async ({umbracoApi}) => {
     const childId = await umbracoApi.document.createDefaultDocumentWithParent(childPublishInvContentPrefix + i, invariantDocTypeId, publishInvParentId);
     await umbracoApi.document.publish(childId);
   }
-
+  await umbracoApi.page.waitForTimeout(1000); // Wait is needed to ensure content is indexed
   const parentContentData = await umbracoApi.document.getByName(parentContentName);
   const parentContentId = parentContentData.id;
   const fetch = 'children:' + parentContentId;
@@ -500,7 +500,7 @@ test('can filter content items', async ({umbracoApi}) => {
   const contentType = collectionDocumentType;
   const contentTypeData = await umbracoApi.documentType.getByName(contentType);
   const filter = 'contentType:' + contentTypeData.alias;
-  await umbracoApi.page.waitForTimeout(500); // Wait is needed to ensure content is indexed
+  await umbracoApi.page.waitForTimeout(1000); // Wait is needed to ensure content is indexed
 
   // Act
   const contentItems = await umbracoApi.contentDeliveryApi.getContentItemsFromAQuery(undefined, undefined, filter);
@@ -562,7 +562,6 @@ test('can paginate content items', async ({umbracoApi}) => {
   // Assert
   expect(contentItems.status()).toBe(200);
   const contentItemsJson = await contentItems.json();
-  console.log(contentItemsJson);
   expect(contentItemsJson.total).toBe(childContentAmount);
   expect(contentItemsJson.items.length).toBe(take);
 
