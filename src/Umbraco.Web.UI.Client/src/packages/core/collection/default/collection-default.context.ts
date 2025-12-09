@@ -1,5 +1,5 @@
-import { UmbCollectionViewManager } from '../collection-view.manager.js';
-import type { UmbCollectionViewManagerConfig } from '../collection-view.manager.js';
+import { UmbCollectionViewManager } from '../view/collection-view.manager.js';
+import type { UmbCollectionViewManagerConfig } from '../view/collection-view.manager.js';
 import type {
 	UmbCollectionColumnConfiguration,
 	UmbCollectionConfiguration,
@@ -9,6 +9,7 @@ import type {
 import type { UmbCollectionFilterModel } from '../collection-filter-model.interface.js';
 import type { UmbCollectionRepository } from '../repository/collection-repository.interface.js';
 import type { ManifestCollection } from '../extensions/types.js';
+import { UmbCollectionBulkActionManager } from '../bulk-action/collection-bulk-action.manager.js';
 import { UMB_COLLECTION_CONTEXT } from './collection-default.context-token.js';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbArrayState, UmbBasicState, UmbNumberState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
@@ -67,6 +68,7 @@ export class UmbDefaultCollectionContext<
 	public readonly pagination = new UmbPaginationManager();
 	public readonly selection = new UmbSelectionManager(this);
 	public readonly view = new UmbCollectionViewManager(this);
+	public readonly bulkAction = new UmbCollectionBulkActionManager(this);
 
 	#defaultViewAlias: string;
 	#defaultFilter: Partial<FilterModelType>;
@@ -163,7 +165,7 @@ export class UmbDefaultCollectionContext<
 	protected _configure() {
 		if (!this.#config) return;
 
-		this.selection.setMultiple(true);
+		this.#configureSelection();
 
 		if (this.#config.pageSize) {
 			this.pagination.setPageSize(this.#config.pageSize);
@@ -192,6 +194,26 @@ export class UmbDefaultCollectionContext<
 		this.view.setConfig(viewManagerConfig);
 
 		this._configured = true;
+	}
+
+	#configureSelection() {
+		// TODO: We need support a collection selection configuration here so ex. Pickers can turn on single and multi select and set a selection.
+		this.selection.setSelectable(false);
+		this.selection.setMultiple(false);
+
+		// Observe bulk actions to enable selection when bulk actions are available
+		// Bulk Actions are an integrated part of a Collection so we handle it here instead of a configuration
+		this.observe(
+			this.bulkAction.hasBulkActions,
+			(hasBulkActions) => {
+				// Allow selection if there are bulk actions available
+				if (hasBulkActions) {
+					this.selection.setSelectable(true);
+					this.selection.setMultiple(true);
+				}
+			},
+			'umbCollectionHasBulkActionsObserver',
+		);
 	}
 
 	#checkIfInitialized() {
@@ -358,7 +380,7 @@ export class UmbDefaultCollectionContext<
 
 	/**
 	 * Sets the manifest for the collection.
-	 * @param {ManifestCollection} manifest
+	 * @param {ManifestCollection} manifest - The manifest for the collection.
 	 * @memberof UmbCollectionContext
 	 * @deprecated Use set the `.manifest` property instead.
 	 */
@@ -372,11 +394,11 @@ export class UmbDefaultCollectionContext<
 
 	/**
 	 * Returns the manifest for the collection.
-	 * @returns {ManifestCollection}
+	 * @returns {ManifestCollection} - The manifest for the collection.
 	 * @memberof UmbCollectionContext
 	 * @deprecated Use the `.manifest` property instead.
 	 */
-	public getManifest() {
+	public getManifest(): ManifestCollection | undefined {
 		new UmbDeprecation({
 			removeInVersion: '18.0.0',
 			deprecated: 'getManifest',
@@ -389,7 +411,17 @@ export class UmbDefaultCollectionContext<
 	 * Returns the items in the collection.
 	 * @returns {Array<CollectionItemType>} - The items in the collection.
 	 */
-	public getItems() {
+	public getItems(): Array<CollectionItemType> {
 		return this._items.getValue();
+	}
+
+	/**
+	 * Returns the href for a specific collection item.
+	 * Override this method in specialized collection contexts to provide item-specific hrefs.
+	 * @param {CollectionItemType} _item  - The collection item to get the href for.
+	 * @returns {Promise<string | undefined>} - Undefined. The collection item does not link to anything by default.
+	 */
+	public async requestItemHref(_item: CollectionItemType): Promise<string | undefined> {
+		return undefined;
 	}
 }

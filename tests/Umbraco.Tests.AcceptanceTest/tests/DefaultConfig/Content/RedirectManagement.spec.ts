@@ -37,7 +37,7 @@ test('can disable URL tracker', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.redirectManagement.clickDisableURLTrackerButton();
   await umbracoUi.redirectManagement.clickDisableButton();
   // Rename the published content
-  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content, true, true);
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.enterContentName(updatedContentName);
   await umbracoUi.content.clickSaveAndPublishButton();
@@ -46,7 +46,7 @@ test('can disable URL tracker', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   // Verify that there is no redirects have been made
   const contentUrl = await umbracoApi.document.getDocumentUrl(contentId);
-  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content, true, true);
   await umbracoUi.redirectManagement.clickRedirectManagementTab();
   await umbracoUi.redirectManagement.isTextWithExactNameVisible(contentUrl, false);
   // Verify that the status is Disable
@@ -63,7 +63,7 @@ test('can re-enable URL tracker', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.redirectManagement.clickRedirectManagementTab();
   await umbracoUi.redirectManagement.clickEnableURLTrackerButton();
   // Rename the published content
-  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content, true, true);
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.enterContentName(updatedContentName);
   await umbracoUi.content.clickSaveAndPublishButton();
@@ -72,7 +72,7 @@ test('can re-enable URL tracker', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   // Verify that there is one redirects have been made
   const contentUrl = await umbracoApi.document.getDocumentUrl(contentId);
-  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content, true, true);
   await umbracoUi.redirectManagement.clickRedirectManagementTab();
   await umbracoUi.redirectManagement.isTextWithExactNameVisible(contentUrl);
   // Verify that the status is Enable
@@ -91,7 +91,7 @@ test('can search for original URL', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
 
   // Act
-  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content, true, true);
   await umbracoUi.redirectManagement.clickRedirectManagementTab();
   await umbracoUi.redirectManagement.enterOriginalUrl(searchKeyword);
   await umbracoUi.redirectManagement.clickSearchButton();
@@ -113,7 +113,7 @@ test('can delete a redirect', async ({umbracoApi, umbracoUi}) => {
   const contentUrl = await umbracoApi.document.getDocumentUrl(contentId);
 
   // Act
-  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content, true, true);
   await umbracoUi.redirectManagement.clickRedirectManagementTab();
   await umbracoUi.redirectManagement.isTextWithExactNameVisible(contentUrl);
   await umbracoUi.redirectManagement.deleteFirstRedirectURL();

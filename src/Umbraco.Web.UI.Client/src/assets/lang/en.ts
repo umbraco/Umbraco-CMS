@@ -2447,7 +2447,7 @@ export default {
 			'This item or its descendants is being used. Unpublishing can lead to broken links on your website. Please take the appropriate actions.',
 		deleteDisabledWarning: 'This item or its descendants is being used. Therefore, deletion has been disabled.',
 		listViewDialogWarning: 'The following items you are trying to %0% are used by other content.',
-		labelUsedByItems: 'Referenced by the following items',
+		labelUsedByItems: 'Referenced by',
 		labelDependsOnThis: 'The following items depend on this',
 		labelDependentDescendants: 'The following descending items have dependencies',
 		labelMoreReferences: (count: number) => {
@@ -2550,13 +2550,19 @@ export default {
 	profiling: {
 		performanceProfiling: 'Performance profiling',
 		performanceProfilingDescription:
-			"<p>Umbraco currently runs in debug mode. This means you can use the built-in performance profiler to assess the performance when rendering pages.</p><p>If you want to activate the profiler for a specific page rendering, simply add <strong>umbDebug=true</strong> to the querystring when requesting the page.</p><p>If you want the profiler to be activated by default for all page renderings, you can use the toggle below. It will set a cookie in your browser, which then activates the profiler automatically. In other words, the profiler will only be active by default in <em>your</em> browser - not everyone else's.</p>",
+			"<p>Umbraco currently runs in debug mode. This means you can use the built-in performance profiler to assess the performance when rendering pages.</p><p>If you want to activate the profiler for a specific page rendering, simply add <strong>umbDebug=true</strong> to the querystring when requesting the page.</p><p>If you want the profiler to be activated by default for all page renderings, you can use the toggle below. It will set a cookie in your browser, which then activates the profiler automatically. In other words, the profiler will only be active by default in <em>your</em> browser - not everyone else's.</p><p><strong>Note:</strong> This will only work if the Backoffice is currently located on the same URL as the front-end website.</p>",
 		activateByDefault: 'Activate the profiler by default',
 		reminder: 'Friendly reminder',
 		reminderDescription:
 			'<p>You should never let a production site run in debug mode. Debug mode is turned off by setting <strong>Umbraco:CMS:Hosting:Debug</strong> to <strong>false</strong> in appsettings.json, appsettings.{Environment}.json or via an environment variable.</p>',
 		profilerEnabledDescription:
 			"<p>Umbraco currently does not run in debug mode, so you can't use the built-in profiler. This is how it should be for a production site.</p><p>Debug mode is turned on by setting <strong>Umbraco:CMS:Hosting:Debug</strong> to <strong>true</strong> in appsettings.json, appsettings.{Environment}.json or via an environment variable.</p>",
+		errorEnablingProfilerTitle: 'Error enabling profiler',
+		errorEnablingProfilerDescription:
+			'It was not possible to enable the profiler. Check that you are accessing the Backoffice on the same URL as the front-end website, and try again. If the problem persists, please check the log for more details.',
+		errorDisablingProfilerTitle: 'Error disabling profiler',
+		errorDisablingProfilerDescription:
+			'It was not possible to disable the profiler. Try again, and if the problem persists, please check the log for more details.',
 	},
 	settingsDashboard: {
 		documentationHeader: 'Documentation',
