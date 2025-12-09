@@ -92,18 +92,18 @@ export const umbRteBlockInline = umbRteBlock.extend({
 	},
 });
 
-export type UmbRteBlockPasteHandler = (view: unknown, event: ClipboardEvent) => boolean;
+export type UmbRteBlockPasteHandler = (event: ClipboardEvent) => boolean;
 
-export const createUmbRteBlockPaste = (handleBlockPaste: UmbRteBlockPasteHandler) =>
+export const umbRteBlockPaste = (handleBlockPaste: UmbRteBlockPasteHandler) =>
 	Extension.create({
 		name: 'umbRteBlockPaste',
 		addProseMirrorPlugins() {
 			return [
 				new Plugin({
-					key: new PluginKey('umbRteBlockPaste'),
+					key: new PluginKey(this.name),
 					props: {
-						handlePaste(view, event, _slice) {
-							return handleBlockPaste(view, event);
+						handlePaste(_view, event, _slice) {
+							return handleBlockPaste(event);
 						},
 					},
 				}),

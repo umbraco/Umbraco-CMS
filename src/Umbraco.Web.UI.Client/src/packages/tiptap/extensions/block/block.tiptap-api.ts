@@ -1,14 +1,11 @@
 import { UmbTiptapExtensionApiBase } from '../tiptap-extension-api-base.js';
-import { umbRteBlock, umbRteBlockInline, createUmbRteBlockPaste } from './block.tiptap-extension.js';
+import { umbRteBlock, umbRteBlockInline, umbRteBlockPaste } from './block.tiptap-extension.js';
 import { distinctUntilChanged } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UMB_BLOCK_RTE_DATA_CONTENT_KEY } from '@umbraco-cms/backoffice/rte';
-import {
-	UMB_BLOCK_RTE_MANAGER_CONTEXT,
-	type UmbBlockRteManagerContext,
-	type UmbBlockRteLayoutModel,
-} from '@umbraco-cms/backoffice/block-rte';
+import { UMB_BLOCK_RTE_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/block-rte';
 import type { UmbBlockDataModel } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockRteManagerContext, UmbBlockRteLayoutModel } from '@umbraco-cms/backoffice/block-rte';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export default class UmbTiptapBlockElementApi extends UmbTiptapExtensionApiBase {
@@ -37,23 +34,18 @@ export default class UmbTiptapBlockElementApi extends UmbTiptapExtensionApiBase 
 	/**
 	 * Handles paste events containing RTE blocks.
 	 * Clones block data with new content keys to avoid duplicate references.
-	 * @param {unknown} _view - The ProseMirror editor view (unused).
 	 * @param {ClipboardEvent} event - The clipboard event containing pasted content.
 	 * @returns {boolean} True if the paste was handled, false to let default paste proceed.
 	 */
-	#handleBlockPaste = (_view: unknown, event: ClipboardEvent): boolean => {
-		const html = event.clipboardData?.getData('text/html');
-		if (!html) {
+	#handleBlockPaste = (event: ClipboardEvent): boolean => {
+		// Ensure we have a manager context and editor
+		if (!this.#managerContext || !this._editor) {
 			return false;
 		}
 
 		// Check if the HTML contains block elements
-		if (!html.includes('umb-rte-block')) {
-			return false;
-		}
-
-		// Ensure we have a manager context and editor
-		if (!this.#managerContext || !this._editor) {
+		const html = event.clipboardData?.getData('text/html');
+		if (!html || !html.includes('umb-rte-block')) {
 			return false;
 		}
 
@@ -129,19 +121,11 @@ export default class UmbTiptapBlockElementApi extends UmbTiptapExtensionApiBase 
 
 		// Get the modified HTML and insert it
 		const modifiedHtml = doc.body.innerHTML;
-		this._editor.commands.insertContent(modifiedHtml, {
-			parseOptions: {
-				preserveWhitespace: 'full',
-			},
-		});
+		this._editor.commands.insertContent(modifiedHtml, { parseOptions: { preserveWhitespace: 'full' } });
 
 		// Return true to indicate we handled the paste
 		return true;
 	};
-
-	getTiptapExtensions() {
-		return [umbRteBlock, umbRteBlockInline, createUmbRteBlockPaste(this.#handleBlockPaste)];
-	}
 
 	#updateBlocks(blocks: UmbBlockDataModel[], layouts: Array<UmbBlockRteLayoutModel>) {
 		const editor = this._editor;
@@ -163,5 +147,9 @@ export default class UmbTiptapBlockElementApi extends UmbTiptapExtensionApiBase 
 				editor.commands.setBlock({ contentKey: block.key });
 			}
 		});
+	}
+
+	getTiptapExtensions() {
+		return [umbRteBlock, umbRteBlockInline, umbRteBlockPaste(this.#handleBlockPaste)];
 	}
 }
