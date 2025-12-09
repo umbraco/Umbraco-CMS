@@ -44,9 +44,7 @@ export interface UmbConsumeOptions<
  *
  * This decorator supports both modern "standard" decorators (Stage 3 TC39 proposal) and
  * legacy TypeScript experimental decorators for backward compatibility.
- *
  * @param {UmbConsumeOptions} options Configuration object containing context, callback, and subscribe options
- *
  * @example
  * ```ts
  * import {consumeContext} from '@umbraco-cms/backoffice/context-api';
@@ -94,6 +92,11 @@ export function consumeContext<
  *
  * Note: Standard decorators currently don't work with @state()/@property()
  * decorators, which is why we still need the legacy branch.
+ * @param protoOrTarget
+ * @param decoratorContext
+ * @param context
+ * @param callback
+ * @param subscribe
  */
 function setupStandardDecorator<BaseType extends UmbContextMinimal, ResultType extends BaseType>(
 	protoOrTarget: any,
@@ -146,6 +149,11 @@ function setupStandardDecorator<BaseType extends UmbContextMinimal, ResultType e
  * 1. addInitializer (if available, e.g., on LitElement classes)
  * 2. hostConnected wrapper (for UmbController classes)
  * 3. Warning (if neither is available)
+ * @param protoOrTarget
+ * @param propertyKey
+ * @param context
+ * @param callback
+ * @param subscribe
  */
 function setupLegacyDecorator<BaseType extends UmbContextMinimal, ResultType extends BaseType>(
 	protoOrTarget: any,

@@ -21,6 +21,10 @@ public abstract class WebhookControllerBase : ManagementApiControllerBase
                 .WithTitle("Cancelled by notification")
                 .WithDetail("A notification handler prevented the webhook operation.")
                 .Build()),
+            WebhookOperationStatus.NoEvents => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("No events specified")
+                .WithDetail("The webhook must be configured to listen to at least one event.")
+                .Build()),
             _ => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
                 .WithTitle("Unknown webhook operation status.")
                 .Build()),
