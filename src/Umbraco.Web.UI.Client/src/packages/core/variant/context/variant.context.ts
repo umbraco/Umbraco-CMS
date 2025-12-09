@@ -2,7 +2,12 @@ import { UmbVariantId } from '../variant-id.class.js';
 import { UMB_VARIANT_CONTEXT } from './variant.context.token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import { mergeObservables, UmbClassState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+import {
+	createObservablePart,
+	mergeObservables,
+	UmbClassState,
+	UmbStringState,
+} from '@umbraco-cms/backoffice/observable-api';
 
 /**
  * A context for the current variant state.
@@ -11,10 +16,34 @@ import { mergeObservables, UmbClassState, UmbStringState } from '@umbraco-cms/ba
  * @implements {UmbVariantContext}
  */
 export class UmbVariantContext extends UmbContextBase {
+	// Local variant ID:
 	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
 	public readonly variantId = this.#variantId.asObservable();
 	public readonly culture = this.#variantId.asObservablePart((x) => x?.culture);
 	public readonly segment = this.#variantId.asObservablePart((x) => x?.segment);
+
+	// The contextual variant ID is the inherited variant ID from parent contexts, only set when inherited: [NL]
+	#contextualVariantId = new UmbClassState<UmbVariantId | undefined>(undefined);
+	// The contextual variant ID observables, this is based on the inherited context and adapted with the local variant ID: [NL]
+	public readonly contextualVariantId = mergeObservables(
+		[this.#contextualVariantId.asObservable(), this.variantId],
+		([contextual, local]) => {
+			// If no context, then provide the local: [NL]
+			if (!contextual) return local;
+			// If a context, then adjust with the local variant ID specifics. (But only for defined cultures or segments) [NL]
+			let variantId = contextual.clone();
+			if (!local) return local;
+			if (!local.isCultureInvariant()) {
+				variantId = variantId.toCulture(local.culture);
+			}
+			if (!local.isSegmentInvariant()) {
+				variantId = variantId.toSegment(local.segment);
+			}
+			return variantId;
+		},
+	);
+	public readonly contextualCulture = createObservablePart(this.contextualVariantId, (x) => x?.culture);
+	public readonly contextualSegment = createObservablePart(this.contextualVariantId, (x) => x?.segment);
 
 	#fallbackCulture = new UmbStringState<string | null | undefined>(undefined);
 	public fallbackCulture = this.#fallbackCulture.asObservable();
@@ -37,6 +66,14 @@ export class UmbVariantContext extends UmbContextBase {
 	 */
 	inherit(): UmbVariantContext {
 		this.consumeContext(UMB_VARIANT_CONTEXT, (context) => {
+			this.observe(
+				context?.contextualVariantId,
+				(contextualVariantId) => {
+					this.#contextualVariantId.setValue(contextualVariantId);
+				},
+				'observeContextualVariantId',
+			);
+
 			this.observe(
 				context?.fallbackCulture,
 				(fallbackCulture) => {
