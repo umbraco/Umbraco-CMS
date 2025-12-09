@@ -1,19 +1,9 @@
-# Workspace Context Communication Across Extensions Example
+# Consuming Variant Context in a Block Workspace View Example
+This example demonstrates how to consume and display the contextual variant information (culture and segment) from the `UMB_VARIANT_CONTEXT` within a block workspace view extension.
 
-The Workspace Context serves as the central communication hub for all Workspace extensions. In this example, the Context manages a counter that can be manipulated and displayed by different Extension Types, showcasing the power of shared state management in Workspace extensions.
-
-## Extension types included
-
-This example includes:
-
-- **Workspace Context** - Manages shared counter state and provides communication between extensions
-- **Workspace Action** - Primary "Increment" button that increases the counter value
-- **Workspace Action Menu Item** - "Reset Counter" dropdown option that resets the counter to zero
-- **Workspace View** - Dedicated tab that displays the current counter value
-- **Workspace Footer App** - Status indicator showing the counter value in the workspace footer
+## What this example includes
+- **Workspace View** – A custom workspace view that reads the current variant context (culture and segment) and displays it to the user.
 
 ## How it works
-
-All extensions communicate through the shared Workspace Context. When you increment or reset the counter using the actions, the Workspace view and Footer app update to show the new value, demonstrating reactive state management across Workspace extensions.
-
-This pattern shows how various Workspace extensions can communicate via a Workspace Context as their mediator.
+The workspace view extension uses the `UMB_VARIANT_CONTEXT` context token to access the current variant's culture and segment. This allows the extension to react to changes in the variant context and display the relevant information.
+This pattern is useful for extension developers who need to make their workspace views aware of the current variant, enabling context-sensitive UI and logic.
