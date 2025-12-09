@@ -143,6 +143,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 				font-size: var(--uui-size-8);
 				height: 60px;
 				width: 60px;
+				--uui-button-border-color: transparent;
 				--uui-button-border-color-hover: var(--uui-color-border);
 			}
 
