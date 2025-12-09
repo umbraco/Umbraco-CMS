@@ -1,58 +1,18 @@
 import type { UmbConfirmActionModalEntityReferencesConfig } from '../../../global-components/types.js';
-import type {
-	UmbDeleteWithRelationConfirmModalData,
-	UmbDeleteWithRelationConfirmModalValue,
-} from './delete-with-relation-modal.token.js';
-import {
-	html,
-	customElement,
-	css,
-	state,
-	type PropertyValues,
-	nothing,
-	unsafeHTML,
-} from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import type { UmbDeleteWithRelationConfirmModalData } from './delete-with-relation-modal.token.js';
+import { UmbEntityDeleteModalElement } from '@umbraco-cms/backoffice/entity-action';
+import { html, customElement, state, nothing, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
-import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-delete-with-relation-confirm-modal')
-export class UmbDeleteWithRelationConfirmModalElement extends UmbModalBaseElement<
-	UmbDeleteWithRelationConfirmModalData,
-	UmbDeleteWithRelationConfirmModalValue
-> {
-	@state()
-	private _name?: string;
-
+export class UmbDeleteWithRelationConfirmModalElement extends UmbEntityDeleteModalElement<UmbDeleteWithRelationConfirmModalData> {
 	@state()
 	private _referencesConfig?: UmbConfirmActionModalEntityReferencesConfig;
 
-	@state()
-	private _isDeletable?: boolean;
+	protected override async _initData() {
+		await super._initData();
 
-	#itemRepository?: UmbItemRepository<any>;
-
-	protected override firstUpdated(_changedProperties: PropertyValues): void {
-		super.firstUpdated(_changedProperties);
-		this.#initData();
-	}
-
-	async #initData() {
-		if (!this.data) {
-			this.#itemRepository?.destroy();
-			return;
-		}
-
-		this.#itemRepository = await createExtensionApiByAlias<UmbItemRepository<any>>(this, this.data.itemRepositoryAlias);
-
-		const { data } = await this.#itemRepository.requestItems([this.data.unique]);
-		const item = data?.[0];
-		if (!item) throw new Error('Item not found.');
-
-		this._name = item.name;
-		this._isDeletable = item.isDeletable;
+		if (!this.data?.unique) return;
 
 		this._referencesConfig = {
 			unique: this.data.unique,
@@ -62,7 +22,7 @@ export class UmbDeleteWithRelationConfirmModalElement extends UmbModalBaseElemen
 	}
 
 	override render() {
-		const headline = this.localize.string('#actions_delete');
+		const headline = 'Delete with relations'; //this.data?.headline ?? '#actions_delete';
 		const isNotDeletable = this._isDeletable === false;
 
 		const message = isNotDeletable
@@ -105,15 +65,6 @@ export class UmbDeleteWithRelationConfirmModalElement extends UmbModalBaseElemen
 			</uui-dialog-layout>
 		`;
 	}
-
-	static override styles = [
-		UmbTextStyles,
-		css`
-			uui-dialog-layout {
-				max-inline-size: 60ch;
-			}
-		`,
-	];
 }
 
 export { UmbDeleteWithRelationConfirmModalElement as element };
