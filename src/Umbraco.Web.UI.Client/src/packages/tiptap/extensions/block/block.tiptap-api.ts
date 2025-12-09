@@ -2,6 +2,7 @@ import { UmbTiptapExtensionApiBase } from '../tiptap-extension-api-base.js';
 import { umbRteBlock, umbRteBlockInline, umbRteBlockPaste } from './block.tiptap-extension.js';
 import { distinctUntilChanged } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbId } from '@umbraco-cms/backoffice/id';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UMB_BLOCK_RTE_DATA_CONTENT_KEY } from '@umbraco-cms/backoffice/rte';
 import { UMB_BLOCK_RTE_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/block-rte';
 import type { UmbBlockDataModel } from '@umbraco-cms/backoffice/block';
@@ -84,6 +85,7 @@ export default class UmbTiptapBlockElementApi extends UmbTiptapExtensionApiBase 
 			const clonedContent: UmbBlockDataModel = structuredClone(originalContent);
 			clonedContent.key = newContentKey;
 			this.#managerContext!.setOneContent(clonedContent);
+			this.#managerContext!.setOneExpose(newContentKey, UmbVariantId.CreateInvariant());
 
 			// Find and clone layout
 			const layouts = this.#managerContext!.getLayouts();
