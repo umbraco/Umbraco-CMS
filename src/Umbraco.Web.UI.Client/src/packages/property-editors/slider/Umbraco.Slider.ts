@@ -13,14 +13,14 @@ export const manifest: ManifestPropertyEditorSchema = {
 					label: 'Minimum value',
 					description: '',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Decimal',
-					config: [{ alias: 'step', value: '0.001' }],
+					config: [{ alias: 'step', value: '0.00001' }],
 				},
 				{
 					alias: 'maxVal',
 					label: 'Maximum value',
 					description: '',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Decimal',
-					config: [{ alias: 'step', value: '0.001' }],
+					config: [{ alias: 'step', value: '0.00001' }],
 				},
 			],
 			defaultData: [
