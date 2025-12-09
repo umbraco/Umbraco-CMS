@@ -674,8 +674,21 @@ public class ContentTypeController : ContentTypeControllerBase<IContentType>
     [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
     public IActionResult Import(string file)
     {
+        if (string.IsNullOrWhiteSpace(file))
+        {
+            return NotFound();
+        }
+
+        // The incoming 'file' parameter we expect to contain the just a file name and extension.
+        // We accept only this and no input parameters containing paths, to prevent any path based security exploits.
+        var invalidFileNameChars = Path.GetInvalidFileNameChars();
+        if (file.IndexOfAny(invalidFileNameChars) >= 0 || file.Contains(Path.DirectorySeparatorChar) || file.Contains(Path.AltDirectorySeparatorChar))
+        {
+            return NotFound();
+        }
+
         var filePath = Path.Combine(_hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempFileUploads), file);
-        if (string.IsNullOrEmpty(file) || !System.IO.File.Exists(filePath))
+        if (System.IO.File.Exists(filePath) is false)
         {
             return NotFound();
         }
