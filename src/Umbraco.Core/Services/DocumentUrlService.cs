@@ -437,7 +437,7 @@ public class DocumentUrlService : IDocumentUrlService
     public string? GetUrlSegment(Guid documentKey, string culture, bool isDraft)
     {
         ThrowIfNotInitialized();
-        if (!_cultureToLanguageIdMap.TryGetValue(culture, out var languageId))
+        if (TryGetLanguageIdFromCulture(culture, out int languageId) is false)
         {
             return null;
         }
@@ -446,11 +446,31 @@ public class DocumentUrlService : IDocumentUrlService
         return _documentUrlCache.TryGetValue(cacheKey, out UrlSegmentCache? cache) ? cache.PrimarySegment : null;
     }
 
+    private bool TryGetLanguageIdFromCulture(string culture, out int languageId)
+    {
+        if (_cultureToLanguageIdMap.TryGetValue(culture, out languageId))
+        {
+            return true;
+        }
+
+        // Not found in map, try to retrieve from language service. Although we are already updating after initialization in CreateOrUpdateUrlSegmentsAsync,
+        // this ensures there's no chance of missing existing languages if this method is called with a newly introduced culture.
+        ILanguage? language = _languageService.GetAsync(culture).GetAwaiter().GetResult();
+        if (language is not null)
+        {
+            _cultureToLanguageIdMap[culture] = language.Id;
+            languageId = language.Id;
+            return true;
+        }
+
+        return false;
+    }
+
     /// <inheritdoc/>
     public IEnumerable<string> GetUrlSegments(Guid documentKey, string culture, bool isDraft)
     {
         ThrowIfNotInitialized();
-        if (!_cultureToLanguageIdMap.TryGetValue(culture, out var languageId))
+        if (TryGetLanguageIdFromCulture(culture, out int languageId) is false)
         {
             return Enumerable.Empty<string>();
         }
@@ -508,7 +528,7 @@ public class DocumentUrlService : IDocumentUrlService
 
         IEnumerable<ILanguage> languages = await _languageService.GetAllAsync();
 
-        // Update culture-to-languageId map with any new languages created after InitAsync
+        // Update culture-to-languageId map with any new languages created after InitAsync.
         PopulateCultureToLanguageIdMap(languages);
 
         var languageDictionary = languages.ToDictionary(x => x.IsoCode);
@@ -1045,7 +1065,7 @@ public class DocumentUrlService : IDocumentUrlService
 
     private bool TryGetPrimaryUrlSegment(Guid documentKey, string culture, bool isDraft, [NotNullWhen(true)] out string? segment)
     {
-        if (_cultureToLanguageIdMap.TryGetValue(culture, out var languageId) &&
+        if (TryGetLanguageIdFromCulture(culture, out int languageId) &&
             _documentUrlCache.TryGetValue(CreateCacheKey(documentKey, languageId, isDraft), out UrlSegmentCache? cache))
         {
             segment = cache.PrimarySegment;
