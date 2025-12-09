@@ -1,27 +1,27 @@
-using System.Xml;
 using System.Globalization;
 using System.Net.Mime;
 using System.Text;
+using System.Xml;
+using System.Xml.Linq;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
-using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Packaging;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Extensions;
-using Umbraco.Cms.Infrastructure.Packaging;
-using System.Xml.Linq;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers;
 
@@ -460,7 +460,17 @@ public class DictionaryController : BackOfficeNotificationsController
             return NotFound();
         }
 
-        var filePath = Path.Combine(_hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Data), file);
+        // The incoming 'file' parameter we expect to contain the full path to the uploaded file.
+        // We accept only files coming from the uploads folder to prevent any path based security exploits.
+        var fileName = Path.GetFileName(file);
+        var invalidFileNameChars = Path.GetInvalidFileNameChars();
+        if (fileName.IndexOfAny(invalidFileNameChars) >= 0 || fileName.Contains(Path.DirectorySeparatorChar) || fileName.Contains(Path.AltDirectorySeparatorChar))
+        {
+            return NotFound();
+        }
+
+        var root = _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempFileUploads);
+        var filePath = Path.Combine(root, fileName);
         if (!System.IO.File.Exists(filePath))
         {
             return NotFound();
