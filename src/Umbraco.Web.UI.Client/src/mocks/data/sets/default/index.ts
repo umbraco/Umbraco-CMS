@@ -47,4 +47,4 @@ export {
 	getSearchResultsMockData as examineGetSearchResults,
 } from './examine.data.js';
 export { items as trackedReferenceItems } from './tracked-reference.data.js';
-export { umbNewsData } from './umbraco-news.data.js';
+export { data as news } from './umbraco-news.data.js';

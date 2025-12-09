@@ -41,7 +41,7 @@ export const examineSearchResults = [] as never[];
 export const examineGetIndexByName = (_indexName: string) => undefined;
 export const examineGetSearchResults = () => [];
 export const trackedReferenceItems = [] as never[];
-export const umbNewsData = { items: [] };
+export const news = [] as never[];
 
 // Template-specific exports
 export const createTemplateScaffold = (masterTemplateAlias: string) => {
