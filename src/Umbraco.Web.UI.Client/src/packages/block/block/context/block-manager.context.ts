@@ -244,11 +244,28 @@ export abstract class UmbBlockManagerContext<
 		return this.#settings.asObservablePart((source) => source.find((x) => x.key === key));
 	}
 	currentExposeOf(contentKey: string) {
-		const variantId = this.getVariantId();
-		if (!variantId) return;
+		const contentTypeKey = this.getContentTypeKeyOfContentKey(contentKey);
+		if (!contentTypeKey) {
+			throw new Error(`Cannot lookup expose of block, missing content type key for ${contentKey}`);
+		}
+		const contentStructure = this.getStructure(contentTypeKey);
+		if (!contentStructure) {
+			throw new Error(`Cannot lookup expose of block, missing content structure for ${contentTypeKey}`);
+		}
+
 		return mergeObservables(
 			[this.#exposes.asObservablePart((source) => source.filter((x) => x.contentKey === contentKey)), this.variantId],
-			([exposes, variantId]) => (variantId ? exposes.find((x) => variantId.compare(x)) : undefined),
+			([exposes, variantId]) => {
+				if (!variantId) {
+					return undefined;
+				}
+
+				const varyByCulture = contentStructure.getVariesByCulture();
+				const varyBySegment = contentStructure.getVariesBySegment();
+				const blockVariantId = variantId.toVariant(varyByCulture, varyBySegment);
+
+				return exposes.find((x) => blockVariantId.compare(x));
+			},
 		);
 	}
 
