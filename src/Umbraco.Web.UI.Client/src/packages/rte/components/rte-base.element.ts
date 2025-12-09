@@ -12,7 +12,7 @@ import {
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_VARIANT_CONTEXT, UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UMB_CONTENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
-import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
+import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { StyleInfo } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbBlockDataModel } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockRteLayoutModel, UmbBlockRteTypeModel } from '@umbraco-cms/backoffice/block-rte';
