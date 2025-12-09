@@ -22,41 +22,36 @@ Extensible rich text editor (RTE) framework for the Umbraco CMS backoffice. Buil
 
 ```
 tiptap/
-  components/                          # UI components
-    input-tiptap/                      # Main editor component (`umb-input-tiptap`)
-    toolbar/                           # Editor toolbar (`umb-tiptap-toolbar`)
-    statusbar/                         # Editor status bar (`umb-tiptap-statusbar`)
-    menu/                              # Menu system (`umb-tiptap-menu`)
-    cascading-menu-popover/            # Nested menu UI (`umb-cascading-menu-popover`)
-
-  contexts/                            # Context API
-    tiptap-rte.context.ts              # Shared editor context (`UMB_TIPTAP_RTE_CONTEXT`)
-
- extensions/                           # 50+ editor extensions
-    tiptap-extension-api-base.ts       # Base class for extensions
-    tiptap-toolbar-element-api-base.ts # Base class for toolbar actions
-    types.ts                           # API interfaces
-    manifests.ts                       # Aggregated extension manifests
-
-    [extension-name]/                  # Individual extensions
-        {name}.tiptap-api.ts           # Extension API
-        {name}.tiptap-extension.ts     # Custom Tiptap extension (if needed)
-				{name}.tiptap-statusbar-api.ts # Statusbar action API
-        {name}.tiptap-toolbar-api.ts   # Toolbar action API
-        manifests.ts                   # Extension manifests
-
-  property-editors/                    # Property editor configurations
-    tiptap-rte/                        # Main RTE property editor UI
-    extensions-configuration/          # Capabilities/extension picker
-    toolbar-configuration/             # Toolbar layout builder
-    statusbar-configuration/           # Statusbar layout builder
-
-  constants.ts                         # Aggregated exported constants
-	externals.ts                         # Tiptap library re-exports
-  index.ts                             # Aggregated exports
-  manifests.ts                         # Root manifest registry
-	type.ts                              # Aggregated type exports
-  umbraco-package.ts                   # Package metadata
+├── components/                            # UI components
+│   ├── input-tiptap/                      # Main editor component (`umb-input-tiptap`)
+│   ├── toolbar/                           # Editor toolbar (`umb-tiptap-toolbar`)
+│   ├── statusbar/                         # Editor status bar (`umb-tiptap-statusbar`)
+│   ├── menu/                              # Menu system (`umb-tiptap-menu`)
+│   └── cascading-menu-popover/            # Nested menu UI (`umb-cascading-menu-popover`)
+├── contexts/                              # Context API
+│   └── tiptap-rte.context.ts              # Shared editor context (`UMB_TIPTAP_RTE_CONTEXT`)
+├── extensions/                            # 50+ editor extensions
+│   ├── tiptap-extension-api-base.ts       # Base class for extensions
+│   ├── tiptap-toolbar-element-api-base.ts # Base class for toolbar actions
+│   ├── types.ts                           # API interfaces
+│   ├── manifests.ts                       # Aggregated extension manifests
+│   └── [extension-name]/                  # Individual extensions
+│       ├── {name}.tiptap-api.ts           # Extension API
+│       ├── {name}.tiptap-extension.ts     # Custom Tiptap extension (if needed)
+│       ├── {name}.tiptap-statusbar-api.ts # Statusbar action API
+│       ├── {name}.tiptap-toolbar-api.ts   # Toolbar action API
+│       └── manifests.ts                   # Extension manifests
+├── property-editors/                      # Property editor configurations
+│   ├── tiptap-rte/                        # Main RTE property editor UI
+│   ├── extensions-configuration/          # Capabilities/extension picker
+│   ├── toolbar-configuration/             # Toolbar layout builder
+│   └── statusbar-configuration/           # Statusbar layout builder
+├── constants.ts                           # Aggregated exported constants
+├── externals.ts                           # Tiptap library re-exports
+├── index.ts                               # Aggregated exports
+├── manifests.ts                           # Root manifest registry
+├── type.ts                                # Aggregated type exports
+└── umbraco-package.ts                     # Package metadata
 ```
 
 ---
