@@ -1,6 +1,7 @@
 import { UmbTiptapExtensionApiBase } from '../tiptap-extension-api-base.js';
 import { umbRteBlock, umbRteBlockInline, umbRteBlockPaste } from './block.tiptap-extension.js';
 import { distinctUntilChanged } from '@umbraco-cms/backoffice/external/rxjs';
+import { DOMPurify } from '@umbraco-cms/backoffice/external/dompurify';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UMB_BLOCK_RTE_DATA_CONTENT_KEY } from '@umbraco-cms/backoffice/rte';
@@ -50,9 +51,15 @@ export default class UmbTiptapBlockElementApi extends UmbTiptapExtensionApiBase 
 			return false;
 		}
 
-		// Parse the HTML
+		// Sanitize the HTML immediately to prevent XSS attacks while preserving RTE block elements
+		const sanitizedHtml = DOMPurify.sanitize(html, {
+			ADD_TAGS: ['umb-rte-block', 'umb-rte-block-inline'],
+			ADD_ATTR: [UMB_BLOCK_RTE_DATA_CONTENT_KEY],
+		});
+
+		// Parse the sanitized HTML
 		const parser = new DOMParser();
-		const doc = parser.parseFromString(html, 'text/html');
+		const doc = parser.parseFromString(sanitizedHtml, 'text/html');
 		const blockElements = doc.querySelectorAll('umb-rte-block, umb-rte-block-inline');
 
 		if (blockElements.length === 0) {
@@ -121,9 +128,8 @@ export default class UmbTiptapBlockElementApi extends UmbTiptapExtensionApiBase 
 			return false;
 		}
 
-		// Get the modified HTML and insert it
-		const modifiedHtml = doc.body.innerHTML;
-		this._editor.commands.insertContent(modifiedHtml, { parseOptions: { preserveWhitespace: 'full' } });
+		// Insert the modified HTML (already sanitized at function entry)
+		this._editor.commands.insertContent(doc.body.innerHTML, { parseOptions: { preserveWhitespace: 'full' } });
 
 		// Return true to indicate we handled the paste
 		return true;
