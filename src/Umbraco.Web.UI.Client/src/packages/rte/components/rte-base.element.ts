@@ -194,7 +194,7 @@ export abstract class UmbPropertyEditorUiRteElementBase
 
 		this.consumeContext(UMB_VARIANT_CONTEXT, async (context) => {
 			this.observe(
-				context?.contextualVariantId,
+				context?.displayVariantId,
 				(variantId) => {
 					this.#managerContext.setVariantId(variantId);
 				},

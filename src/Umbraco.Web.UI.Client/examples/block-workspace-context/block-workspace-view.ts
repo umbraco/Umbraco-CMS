@@ -14,7 +14,7 @@ export class ExampleBlockWorkspaceViewElement extends UmbElementMixin(LitElement
 		super();
 
 		this.consumeContext(UMB_VARIANT_CONTEXT, (context) => {
-			this.observe(context?.contextualVariantId, (variantId) => {
+			this.observe(context?.displayVariantId, (variantId) => {
 				this._culture = variantId?.culture;
 				this._segment = variantId?.segment;
 			});

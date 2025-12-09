@@ -249,7 +249,7 @@ export class UmbPropertyEditorUIBlockListElement
 
 		this.consumeContext(UMB_VARIANT_CONTEXT, async (context) => {
 			this.observe(
-				context?.contextualVariantId,
+				context?.displayVariantId,
 				(variantId) => {
 					this.#managerContext.setVariantId(variantId);
 				},

@@ -22,11 +22,11 @@ export class UmbVariantContext extends UmbContextBase {
 	public readonly culture = this.#variantId.asObservablePart((x) => x?.culture);
 	public readonly segment = this.#variantId.asObservablePart((x) => x?.segment);
 
-	// The contextual variant ID is the inherited variant ID from parent contexts, only set when inherited: [NL]
-	#contextualVariantId = new UmbClassState<UmbVariantId | undefined>(undefined);
-	// The contextual variant ID observables, this is based on the inherited context and adapted with the local variant ID: [NL]
-	public readonly contextualVariantId = mergeObservables(
-		[this.#contextualVariantId.asObservable(), this.variantId],
+	// The inherited variant ID is the inherited variant ID from parent contexts, only set when inherited: [NL]
+	#inheritedVariantId = new UmbClassState<UmbVariantId | undefined>(undefined);
+	// The display variant ID observables, this is based on the inherited variantID and adapted with the local variant ID: [NL]
+	public readonly displayVariantId = mergeObservables(
+		[this.#inheritedVariantId.asObservable(), this.variantId],
 		([contextual, local]) => {
 			// If no context, then provide the local: [NL]
 			if (!contextual) return local;
@@ -42,18 +42,14 @@ export class UmbVariantContext extends UmbContextBase {
 			return variantId;
 		},
 	);
-	public readonly contextualCulture = createObservablePart(this.contextualVariantId, (x) => x?.culture);
-	public readonly contextualSegment = createObservablePart(this.contextualVariantId, (x) => x?.segment);
+	public readonly displayCulture = createObservablePart(this.displayVariantId, (x) => x?.culture);
+	public readonly displaySegment = createObservablePart(this.displayVariantId, (x) => x?.segment);
 
 	#fallbackCulture = new UmbStringState<string | null | undefined>(undefined);
 	public fallbackCulture = this.#fallbackCulture.asObservable();
 
 	#appCulture = new UmbStringState<string | null | undefined>(undefined);
 	public appCulture = this.#appCulture.asObservable();
-
-	public readonly displayCulture = mergeObservables([this.culture, this.appCulture], ([culture, appCulture]) => {
-		return culture ?? appCulture;
-	});
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_VARIANT_CONTEXT);
@@ -67,9 +63,9 @@ export class UmbVariantContext extends UmbContextBase {
 	inherit(): UmbVariantContext {
 		this.consumeContext(UMB_VARIANT_CONTEXT, (context) => {
 			this.observe(
-				context?.contextualVariantId,
+				context?.displayVariantId,
 				(contextualVariantId) => {
-					this.#contextualVariantId.setValue(contextualVariantId);
+					this.#inheritedVariantId.setValue(contextualVariantId);
 				},
 				'observeContextualVariantId',
 			);
