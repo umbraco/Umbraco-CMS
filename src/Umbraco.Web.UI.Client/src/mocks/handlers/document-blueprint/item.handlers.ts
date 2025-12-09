@@ -1,5 +1,5 @@
 const { http, HttpResponse } = window.MockServiceWorker;
-import { umbDocumentBlueprintMockDb } from '../../data/document-blueprint/document-blueprint.db.js';
+import { umbDocumentBlueprintMockDb } from '../../db/document-blueprint.db.js';
 import { UMB_SLUG } from './slug.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 

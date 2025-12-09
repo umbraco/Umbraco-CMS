@@ -1,5 +1,5 @@
 const { http, HttpResponse } = window.MockServiceWorker;
-import { umbMemberTypeMockDb } from '../../data/member-type/member-type.db.js';
+import { umbMemberTypeMockDb } from '../../db/member-type.db.js';
 import { UMB_SLUG } from './slug.js';
 import type {
 	CreateMemberTypeRequestModel,

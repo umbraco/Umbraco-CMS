@@ -1,5 +1,5 @@
 const { http, HttpResponse } = window.MockServiceWorker;
-import { umbTemplateMockDb } from '../../data/template/template.db.js';
+import { umbTemplateMockDb } from '../../db/template.db.js';
 import { UMB_SLUG } from './slug.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 

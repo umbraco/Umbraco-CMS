@@ -1,5 +1,5 @@
 const { http, HttpResponse } = window.MockServiceWorker;
-import { umbRelationTypeMockDb } from '../../data/relation-type/relationType.db.js';
+import { umbRelationTypeMockDb } from '../../db/relationType.db.js';
 import { UMB_SLUG } from './slug.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 import type {

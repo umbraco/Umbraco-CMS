@@ -1,6 +1,6 @@
 const { http, HttpResponse } = window.MockServiceWorker;
-import { createProblemDetails } from '../../data/utils.js';
-import { umbTemplateMockDb } from '../../data/template/template.db.js';
+import { createProblemDetails } from '../../utils.js';
+import { umbTemplateMockDb } from '../../db/template.db.js';
 import { UMB_SLUG } from './slug.js';
 import type {
 	CreateTemplateRequestModel,

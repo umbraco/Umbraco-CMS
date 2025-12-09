@@ -1,5 +1,5 @@
 const { http, HttpResponse } = window.MockServiceWorker;
-import { umbMediaTypeMockDb } from '../../data/media-type/media-type.db.js';
+import { umbMediaTypeMockDb } from '../../db/media-type.db.js';
 import { UMB_SLUG } from './slug.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 

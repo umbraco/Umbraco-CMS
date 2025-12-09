@@ -1,6 +1,6 @@
 const { http, HttpResponse } = window.MockServiceWorker;
 //import type { UmbMockDictionaryModel } from '../../data/dictionary/dictionary.data.js';
-import { umbDictionaryMockDb } from '../../data/dictionary/dictionary.db.js';
+import { umbDictionaryMockDb } from '../../db/dictionary.db.js';
 import { UMB_SLUG } from './slug.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 

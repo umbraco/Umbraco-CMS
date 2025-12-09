@@ -1,5 +1,5 @@
 const { http, HttpResponse } = window.MockServiceWorker;
-import { umbUserGroupMockDb } from '../../data/user-group/user-group.db.js';
+import { umbUserGroupMockDb } from '../../db/user-group.db.js';
 import { UMB_SLUG } from './slug.js';
 import type {
 	CreateUserGroupRequestModel,

@@ -1,6 +1,6 @@
 const { http, HttpResponse } = window.MockServiceWorker;
-import { umbDocumentBlueprintMockDb } from '../../data/document-blueprint/document-blueprint.db.js';
-import { umbDocumentTypeMockDb } from '../../data/document-type/document-type.db.js';
+import { umbDocumentBlueprintMockDb } from '../../db/document-blueprint.db.js';
+import { umbDocumentTypeMockDb } from '../../db/document-type.db.js';
 import { UMB_SLUG } from './slug.js';
 import type {
 	CreateMediaTypeRequestModel,

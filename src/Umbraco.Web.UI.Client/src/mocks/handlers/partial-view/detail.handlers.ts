@@ -1,6 +1,6 @@
 const { http, HttpResponse } = window.MockServiceWorker;
-import { createProblemDetails } from '../../data/utils.js';
-import { umbPartialViewMockDB } from '../../data/partial-view/partial-view.db.js';
+import { createProblemDetails } from '../../utils.js';
+import { umbPartialViewMockDB } from '../../db/partial-view.db.js';
 import { UMB_SLUG } from './slug.js';
 import type {
 	CreatePartialViewRequestModel,

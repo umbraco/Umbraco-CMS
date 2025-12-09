@@ -1,5 +1,5 @@
 const { http, HttpResponse } = window.MockServiceWorker;
-import { umbDataTypeMockDb } from '../../data/data-type/data-type.db.js';
+import { umbDataTypeMockDb } from '../../db/data-type.db.js';
 import { UMB_SLUG } from './slug.js';
 import type { CopyDataTypeRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';

@@ -1,5 +1,5 @@
 const { http, HttpResponse } = window.MockServiceWorker;
-import { umbLogViewerData } from '../data/log-viewer.data.js';
+import { umbLogViewerData } from '../db/log-viewer.db.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 import type { SavedLogSearchRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 

@@ -1,4 +1,4 @@
-import { umbDocumentMockDb } from '../data/document/document.db.js';
+import { umbDocumentMockDb } from '../db/document.db.js';
 import type { DynamicRootRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 

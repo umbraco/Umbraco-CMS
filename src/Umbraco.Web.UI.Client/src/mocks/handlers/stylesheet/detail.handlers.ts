@@ -1,6 +1,6 @@
 const { http, HttpResponse } = window.MockServiceWorker;
-import { createProblemDetails } from '../../data/utils.js';
-import { umbStylesheetMockDb } from '../../data/stylesheet/stylesheet.db.js';
+import { createProblemDetails } from '../../utils.js';
+import { umbStylesheetMockDb } from '../../db/stylesheet.db.js';
 import { UMB_SLUG } from './slug.js';
 import type {
 	CreateStylesheetRequestModel,

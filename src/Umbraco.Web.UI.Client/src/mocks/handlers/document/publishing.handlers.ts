@@ -1,6 +1,6 @@
 const { http, HttpResponse } = window.MockServiceWorker;
-import { createProblemDetails } from '../../data/utils.js';
-import { umbDocumentMockDb } from '../../data/document/document.db.js';
+import { createProblemDetails } from '../../utils.js';
+import { umbDocumentMockDb } from '../../db/document.db.js';
 import { UMB_SLUG } from './slug.js';
 import type {
 	PublishWithDescendantsResultModel,

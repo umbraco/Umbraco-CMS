@@ -1,3 +1,4 @@
+import { dataSet } from '../sets/index.js';
 import type {
 	FileSystemTreeItemPresentationModel,
 	StaticFileItemResponseModel,
@@ -5,35 +6,4 @@ import type {
 
 export type UmbMockStaticFileModel = StaticFileItemResponseModel & FileSystemTreeItemPresentationModel;
 
-export const data: Array<UmbMockStaticFileModel> = [
-	{
-		path: '/some-file.js',
-		parent: null,
-		name: 'some-file.js',
-		hasChildren: false,
-		isFolder: false,
-	},
-	{
-		path: '/another-file.js',
-		parent: null,
-		name: 'another-file.js',
-		hasChildren: false,
-		isFolder: false,
-	},
-	{
-		path: '/Folder 1',
-		parent: null,
-		name: 'Folder 1',
-		hasChildren: true,
-		isFolder: true,
-	},
-	{
-		path: '/Folder 1/File in Folder 1.js',
-		parent: {
-			path: '/Folder 1',
-		},
-		name: 'File in Folder 1.js',
-		hasChildren: false,
-		isFolder: false,
-	},
-];
+export const data: Array<UmbMockStaticFileModel> = dataSet.staticFile;

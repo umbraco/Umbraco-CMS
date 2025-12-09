@@ -1,6 +1,6 @@
 const { http, HttpResponse } = window.MockServiceWorker;
 import type { UmbMockDocumentModel } from '../../data/document/document.data.js';
-import { umbDocumentMockDb } from '../../data/document/document.db.js';
+import { umbDocumentMockDb } from '../../db/document.db.js';
 import { items as referenceData } from '../../data/tracked-reference.data.js';
 import { UMB_SLUG } from './slug.js';
 import type {

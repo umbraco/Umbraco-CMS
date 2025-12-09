@@ -1,10 +1,4 @@
-import type { CultureReponseModel, PagedCultureReponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-
-class UmbCulturesData {
-	get(): PagedCultureReponseModel {
-		return { total: culturesMock.length, items: culturesMock };
-	}
-}
+import type { CultureReponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export const culturesMock: Array<CultureReponseModel> = [
 	{
@@ -3792,5 +3786,3 @@ export const culturesMock: Array<CultureReponseModel> = [
 		englishName: 'Zulu (South Africa)',
 	},
 ];
-
-export const umbCulturesData = new UmbCulturesData();

@@ -1,6 +1,6 @@
 const { http, HttpResponse } = window.MockServiceWorker;
 
-import { umbCulturesData } from '../data/culture.data.js';
+import { umbCulturesData } from '../db/culture.db.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const handlers = [

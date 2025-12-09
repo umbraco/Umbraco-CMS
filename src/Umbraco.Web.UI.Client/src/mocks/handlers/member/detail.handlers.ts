@@ -1,5 +1,5 @@
 const { http, HttpResponse } = window.MockServiceWorker;
-import { umbMemberMockDb } from '../../data/member/member.db.js';
+import { umbMemberMockDb } from '../../db/member.db.js';
 import { UMB_SLUG } from './slug.js';
 import type { CreateMemberRequestModel, UpdateMemberRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';

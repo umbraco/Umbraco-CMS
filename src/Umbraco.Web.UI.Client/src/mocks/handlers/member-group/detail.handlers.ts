@@ -1,5 +1,5 @@
 const { http, HttpResponse } = window.MockServiceWorker;
-import { umbMemberGroupMockDb } from '../../data/member-group/member-group.db.js';
+import { umbMemberGroupMockDb } from '../../db/member-group.db.js';
 import { UMB_SLUG } from './slug.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
