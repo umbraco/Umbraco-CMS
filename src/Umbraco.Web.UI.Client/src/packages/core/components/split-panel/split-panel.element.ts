@@ -91,17 +91,17 @@ export class UmbSplitPanelElement extends UmbLitElement {
 	}
 
 	#setPosition(pos: number) {
-    const { width } = this.mainElement.getBoundingClientRect();
-    const localPos = clamp(pos, 0, width);
-    const percentagePos = (localPos / width) * 100;
-    this.position = percentagePos + '%';
-    
-	// Update ARIA value for divider
-    const formatted = percentagePos.toFixed(0);
-    const ariaText = this.localize?.term('general_dividerPosition', [formatted]) ?? `Divider at ${formatted}%`;
+		const { width } = this.mainElement.getBoundingClientRect();
+		const localPos = clamp(pos, 0, width);
+		const percentagePos = (localPos / width) * 100;
+		this.position = percentagePos + '%';
 
-    this.dividerTouchAreaElement.setAttribute('aria-valuetext', ariaText);
-}
+		// Update ARIA value for divider
+		const formatted = percentagePos.toFixed(0);
+		const ariaText = this.localize?.term('general_dividerPosition', [formatted]) ?? `Divider at ${formatted}%`;
+
+		this.dividerTouchAreaElement.setAttribute('aria-valuetext', ariaText);
+	}
 
 	#updateSplit() {
 		// If lock is none
