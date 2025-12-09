@@ -22,6 +22,7 @@ import type {
 
 // TODO: consider moving the components to the property editor folder as they are only used here
 import '../../local-components.js';
+import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
 
 /**
  * @element umb-property-editor-ui-block-grid
@@ -232,8 +233,14 @@ export class UmbPropertyEditorUIBlockGridElement
 			);
 		});
 
-		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (context) => {
-			this.#managerContext.setVariantId(context?.getVariantId());
+		this.consumeContext(UMB_VARIANT_CONTEXT, async (context) => {
+			this.observe(
+				context?.contextualVariantId,
+				(variantId) => {
+					this.#managerContext.setVariantId(variantId);
+				},
+				'observeContextualVariantId',
+			);
 		});
 
 		this.observe(this.#managerContext.isSortMode, (isSortMode) => (this._isSortMode = isSortMode ?? false));
