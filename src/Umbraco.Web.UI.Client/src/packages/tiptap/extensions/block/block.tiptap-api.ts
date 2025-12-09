@@ -7,6 +7,11 @@ import type { UmbBlockDataModel } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockRteLayoutModel } from '@umbraco-cms/backoffice/block-rte';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
+// eslint-disable-next-line local-rules/enforce-umbraco-external-imports
+import type { Editor } from '@tiptap/core';
+// eslint-disable-next-line local-rules/enforce-umbraco-external-imports
+import type { Slice } from '@tiptap/pm/model';
+
 export default class UmbTiptapBlockElementApi extends UmbTiptapExtensionApiBase {
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -25,6 +30,25 @@ export default class UmbTiptapBlockElementApi extends UmbTiptapExtensionApiBase 
 				'contents',
 			);
 		});
+	}
+
+	#handlePaste = ({ editor, event, slice }: { editor: Editor; event: ClipboardEvent; slice: Slice }) => {
+		const html = event.clipboardData?.getData('text/html');
+		if (!html) {
+			return;
+		}
+
+		console.log('umbRteBlockInlinePasteHandler.handlePaste', [editor, event, slice, html]);
+
+		// Check if the HTML contains an umb-rte-block-inline element
+		// If it does, then loop over the elements and insert them as inline blocks
+		// For each copied block, call the block RTE manager context to clone the block properties
+		// Give the pasted block a new content key
+	};
+
+	override setEditor(editor: Editor): void {
+		super.setEditor(editor);
+		editor.on('paste', this.#handlePaste);
 	}
 
 	getTiptapExtensions() {
@@ -51,5 +75,10 @@ export default class UmbTiptapBlockElementApi extends UmbTiptapExtensionApiBase 
 				editor.commands.setBlock({ contentKey: block.key });
 			}
 		});
+	}
+
+	override destroy(): void {
+		super.destroy();
+		this._editor?.off('paste', this.#handlePaste);
 	}
 }
