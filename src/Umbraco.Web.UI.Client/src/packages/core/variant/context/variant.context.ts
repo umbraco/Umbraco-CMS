@@ -32,7 +32,7 @@ export class UmbVariantContext extends UmbContextBase {
 			if (!contextual) return local;
 			// If a context, then adjust with the local variant ID specifics. (But only for defined cultures or segments) [NL]
 			let variantId = contextual.clone();
-			if (!local) return local;
+			if (!local) return variantId;
 			if (!local.isCultureInvariant()) {
 				variantId = variantId.toCulture(local.culture);
 			}
