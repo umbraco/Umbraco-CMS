@@ -161,5 +161,9 @@ public class UmbracoContentIndex : UmbracoExamineIndex, IUmbracoContentIndex
         {
             base.PerformDeleteFromIndex(idsAsList, onComplete);
         }
+        else if (onComplete != null)
+        {
+            onComplete(new IndexOperationEventArgs(this, 0));
+        }
     }
 }
