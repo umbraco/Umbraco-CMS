@@ -155,6 +155,10 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 
 			#editors {
 				width: 100%;
+				display: flex;
+				flex: 1 1 auto;
+				flex-direction: column;
+				gap: 1px;
 			}
 
 			#description {
