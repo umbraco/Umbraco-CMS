@@ -33,7 +33,7 @@ test('can render content with rich text editor', async ({umbracoApi, umbracoUi})
 });
 
 // This tests for regression issue: https://github.com/umbraco/Umbraco-CMS/issues/20454
-test('can render default value for empty rich text editor', async ({umbracoApi, umbracoUi}) => {
+test('can render default value for empty rich text editor', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const defaultValue = 'This is default value of RTE';
   const templateId = await umbracoApi.template.createTemplateWithDisplayingDefaultValue(templateName, AliasHelper.toAlias(propertyName), defaultValue);

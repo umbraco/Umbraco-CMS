@@ -242,7 +242,7 @@ test('can duplicate a content node to other parent', async ({umbracoApi, umbraco
   await umbracoApi.document.ensureNameNotExists(parentDocumentTypeName);
 });
 
-test('can restore a content item from the recycle bin', async ({umbracoApi, umbracoUi}) => {
+test('can restore a content item from the recycle bin', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const restoreMessage = 'Restore ' + contentName + ' to Root';
   await umbracoApi.document.emptyRecycleBin();

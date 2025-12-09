@@ -279,7 +279,7 @@ test.fixme('can remove a thumbnail from a block', async ({umbracoApi, umbracoUi}
   // TODO: Implement it later
 });
 
-test('only allow image file as a block thumbnail', async ({umbracoApi, umbracoUi}) => {
+test('only allow image file as a block thumbnail', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const notAllowedFileName = 'Program.cs';
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
