@@ -586,6 +586,48 @@ public class EntityService : RepositoryService, IEntityService
 
     /// <inheritdoc />
     public IEnumerable<IEntitySlim> GetPagedDescendants(
+        Guid? parentKey,
+        UmbracoObjectTypes parentObjectType,
+        IEnumerable<UmbracoObjectTypes> childObjectTypes,
+        int skip,
+        int take,
+        out long totalRecords,
+        IQuery<IUmbracoEntity>? filter = null,
+        Ordering? ordering = null)
+    {
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            Guid objectTypeGuid = parentObjectType.GetGuid();
+            IQuery<IUmbracoEntity> query = Query<IUmbracoEntity>();
+
+            if (parentKey.HasValue)
+            {
+                // lookup the path so we can use it in the prefix query below
+                TreeEntityPath[] paths = _entityRepository.GetAllPaths(objectTypeGuid, parentKey.Value).ToArray();
+                if (paths.Length == 0)
+                {
+                    totalRecords = 0;
+                    return Enumerable.Empty<IEntitySlim>();
+                }
+
+                var path = paths[0].Path;
+                query.Where(x => x.Path.SqlStartsWith(path + ",", TextColumnType.NVarchar));
+            }
+
+            PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
+            var objectTypeGuids = childObjectTypes.Select(x => x.GetGuid()).ToHashSet();
+            if (pageSize == 0)
+            {
+                totalRecords = _entityRepository.CountByQuery(query, objectTypeGuids, filter);
+                return Enumerable.Empty<IEntitySlim>();
+            }
+
+            return _entityRepository.GetPagedResultsByQuery(query, objectTypeGuids, pageNumber, pageSize, out totalRecords, filter, ordering);
+        }
+    }
+
+    /// <inheritdoc />
+    public IEnumerable<IEntitySlim> GetPagedDescendants(
         IEnumerable<int> ids,
         UmbracoObjectTypes objectType,
         long pageIndex,

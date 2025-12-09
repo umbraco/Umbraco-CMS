@@ -385,6 +385,19 @@ public interface IEntityService
         bool includeTrashed = true);
 
     /// <summary>
+    ///     Gets descendants of an entity.
+    /// </summary>
+    IEnumerable<IEntitySlim> GetPagedDescendants(
+        Guid? parentKey,
+        UmbracoObjectTypes parentObjectType,
+        IEnumerable<UmbracoObjectTypes> childObjectTypes,
+        int skip,
+        int take,
+        out long totalRecords,
+        IQuery<IUmbracoEntity>? filter = null,
+        Ordering? ordering = null);
+
+    /// <summary>
     ///     Gets the object type of an entity.
     /// </summary>
     UmbracoObjectTypes GetObjectType(int id);

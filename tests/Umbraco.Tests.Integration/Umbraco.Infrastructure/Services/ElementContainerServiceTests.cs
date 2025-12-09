@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -8,11 +9,18 @@ using Umbraco.Cms.Tests.Integration.Testing;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
+// TODO ELEMENTS: split this into multiple partials (CRUD)
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class ElementContainerServiceTests : UmbracoIntegrationTest
+public partial class ElementContainerServiceTests : UmbracoIntegrationTest
 {
     private IElementContainerService ElementContainerService => GetRequiredService<IElementContainerService>();
+
+    private IEntityService EntityService => GetRequiredService<IEntityService>();
+
+    private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
+
+    private IElementEditingService ElementEditingService => GetRequiredService<IElementEditingService>();
 
     [Test]
     public async Task Can_Create_Container_At_Root()
@@ -225,4 +233,10 @@ public class ElementContainerServiceTests : UmbracoIntegrationTest
             Assert.AreEqual(EntityContainerOperationStatus.NotFound, result.Status);
         });
     }
+
+    private IEntitySlim[] GetAtRoot()
+        => EntityService.GetRootEntities(UmbracoObjectTypes.ElementContainer).Union(EntityService.GetRootEntities(UmbracoObjectTypes.Element)).ToArray();
+
+    private IEntitySlim[] GetFolderChildren(Guid containerKey)
+        => EntityService.GetPagedChildren(containerKey, [UmbracoObjectTypes.ElementContainer], [UmbracoObjectTypes.ElementContainer, UmbracoObjectTypes.Element], 0, 999, false, out _).ToArray();
 }

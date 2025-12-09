@@ -31,7 +31,7 @@ public sealed class EntityContainer : TreeEntityBase, IUmbracoEntity
 
         ParentId = -1;
         Path = "-1";
-        Level = 0;
+        Level = 1;
         SortOrder = 0;
     }
 

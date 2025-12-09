@@ -237,7 +237,7 @@ internal abstract class EntityTypeContainerService<TTreeEntity, TEntityContainer
         return _entityContainerRepository.Get(treeEntity.ParentId);
     }
 
-    private async Task AuditAsync(AuditType type, Guid userKey, int objectId) =>
+    protected async Task AuditAsync(AuditType type, Guid userKey, int objectId) =>
         await _auditService.AddAsync(
             type,
             userKey,

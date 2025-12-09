@@ -319,9 +319,11 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
 
         // update
         nodeDto.Text = entity.Name;
+        nodeDto.Path = entity.Path;
+        nodeDto.Level = Convert.ToInt16(entity.Level);
         if (nodeDto.ParentId != entity.ParentId)
         {
-            nodeDto.Level = 0;
+            nodeDto.Level = 1;
             nodeDto.Path = "-1";
             if (entity.ParentId > -1)
             {
@@ -334,6 +336,10 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
 
                 nodeDto.Level = Convert.ToInt16(parent.Level + 1);
                 nodeDto.Path = parent.Path + "," + nodeDto.NodeId;
+            }
+            else
+            {
+                nodeDto.Path += "," + nodeDto.NodeId;
             }
 
             nodeDto.ParentId = entity.ParentId;
