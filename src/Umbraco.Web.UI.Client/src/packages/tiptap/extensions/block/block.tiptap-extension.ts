@@ -1,5 +1,8 @@
-import { Node } from '../../externals.js';
+import { Extension, Node } from '../../externals.js';
 import { UMB_BLOCK_RTE_DATA_CONTENT_KEY } from '@umbraco-cms/backoffice/rte';
+
+// eslint-disable-next-line local-rules/enforce-umbraco-external-imports
+import { Plugin, PluginKey } from '@tiptap/pm/state';
 
 declare module '@tiptap/core' {
 	interface Commands<ReturnType> {
@@ -88,3 +91,22 @@ export const umbRteBlockInline = umbRteBlock.extend({
 		};
 	},
 });
+
+export type UmbRteBlockPasteHandler = (view: unknown, event: ClipboardEvent) => boolean;
+
+export const createUmbRteBlockPaste = (handleBlockPaste: UmbRteBlockPasteHandler) =>
+	Extension.create({
+		name: 'umbRteBlockPaste',
+		addProseMirrorPlugins() {
+			return [
+				new Plugin({
+					key: new PluginKey('umbRteBlockPaste'),
+					props: {
+						handlePaste(view, event, _slice) {
+							return handleBlockPaste(view, event);
+						},
+					},
+				}),
+			];
+		},
+	});

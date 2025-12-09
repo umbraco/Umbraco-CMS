@@ -1,22 +1,24 @@
 import { UmbTiptapExtensionApiBase } from '../tiptap-extension-api-base.js';
-import { umbRteBlock, umbRteBlockInline } from './block.tiptap-extension.js';
+import { umbRteBlock, umbRteBlockInline, createUmbRteBlockPaste } from './block.tiptap-extension.js';
 import { distinctUntilChanged } from '@umbraco-cms/backoffice/external/rxjs';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UMB_BLOCK_RTE_DATA_CONTENT_KEY } from '@umbraco-cms/backoffice/rte';
-import { UMB_BLOCK_RTE_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/block-rte';
+import {
+	UMB_BLOCK_RTE_MANAGER_CONTEXT,
+	type UmbBlockRteManagerContext,
+	type UmbBlockRteLayoutModel,
+} from '@umbraco-cms/backoffice/block-rte';
 import type { UmbBlockDataModel } from '@umbraco-cms/backoffice/block';
-import type { UmbBlockRteLayoutModel } from '@umbraco-cms/backoffice/block-rte';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-// eslint-disable-next-line local-rules/enforce-umbraco-external-imports
-import type { Editor } from '@tiptap/core';
-// eslint-disable-next-line local-rules/enforce-umbraco-external-imports
-import type { Slice } from '@tiptap/pm/model';
-
 export default class UmbTiptapBlockElementApi extends UmbTiptapExtensionApiBase {
+	#managerContext?: UmbBlockRteManagerContext;
+
 	constructor(host: UmbControllerHost) {
 		super(host);
 
 		this.consumeContext(UMB_BLOCK_RTE_MANAGER_CONTEXT, (context) => {
+			this.#managerContext = context;
 			this.observe(
 				context?.contents.pipe(
 					distinctUntilChanged((prev, curr) => prev.map((y) => y.key).join() === curr.map((y) => y.key).join()),
@@ -32,27 +34,113 @@ export default class UmbTiptapBlockElementApi extends UmbTiptapExtensionApiBase 
 		});
 	}
 
-	#handlePaste = ({ editor, event, slice }: { editor: Editor; event: ClipboardEvent; slice: Slice }) => {
+	/**
+	 * Handles paste events containing RTE blocks.
+	 * Clones block data with new content keys to avoid duplicate references.
+	 * @param {unknown} _view - The ProseMirror editor view (unused).
+	 * @param {ClipboardEvent} event - The clipboard event containing pasted content.
+	 * @returns {boolean} True if the paste was handled, false to let default paste proceed.
+	 */
+	#handleBlockPaste = (_view: unknown, event: ClipboardEvent): boolean => {
 		const html = event.clipboardData?.getData('text/html');
 		if (!html) {
-			return;
+			return false;
 		}
 
-		console.log('umbRteBlockInlinePasteHandler.handlePaste', [editor, event, slice, html]);
+		// Check if the HTML contains block elements
+		if (!html.includes('umb-rte-block')) {
+			return false;
+		}
 
-		// Check if the HTML contains an umb-rte-block-inline element
-		// If it does, then loop over the elements and insert them as inline blocks
-		// For each copied block, call the block RTE manager context to clone the block properties
-		// Give the pasted block a new content key
+		// Ensure we have a manager context and editor
+		if (!this.#managerContext || !this._editor) {
+			return false;
+		}
+
+		// Parse the HTML
+		const parser = new DOMParser();
+		const doc = parser.parseFromString(html, 'text/html');
+		const blockElements = doc.querySelectorAll('umb-rte-block, umb-rte-block-inline');
+
+		if (blockElements.length === 0) {
+			return false;
+		}
+
+		// Process each block element
+		let hasValidBlocks = false;
+
+		blockElements.forEach((blockElement) => {
+			const oldContentKey = blockElement.getAttribute(UMB_BLOCK_RTE_DATA_CONTENT_KEY);
+			if (!oldContentKey) {
+				// Remove block elements without content keys
+				blockElement.remove();
+				return;
+			}
+
+			// Check if block data exists in the manager context
+			const originalContent = this.#managerContext!.getContentOf(oldContentKey);
+			if (!originalContent) {
+				// Block data doesn't exist (stale paste or cross-RTE), remove the element
+				blockElement.remove();
+				return;
+			}
+
+			// Generate new content key
+			const newContentKey = UmbId.new();
+
+			// Clone content data with new key
+			const clonedContent: UmbBlockDataModel = structuredClone(originalContent);
+			clonedContent.key = newContentKey;
+			this.#managerContext!.setOneContent(clonedContent);
+
+			// Find and clone layout
+			const layouts = this.#managerContext!.getLayouts();
+			const originalLayout = layouts.find((l) => l.contentKey === oldContentKey);
+			if (originalLayout) {
+				let newSettingsKey: string | undefined = undefined;
+
+				// Clone settings if present
+				if (originalLayout.settingsKey) {
+					const originalSettings = this.#managerContext!.getSettingsOf(originalLayout.settingsKey);
+					if (originalSettings) {
+						newSettingsKey = UmbId.new();
+						const clonedSettings: UmbBlockDataModel = structuredClone(originalSettings);
+						clonedSettings.key = newSettingsKey;
+						this.#managerContext!.setOneSettings(clonedSettings);
+					}
+				}
+
+				// Create new layout entry
+				const clonedLayout: UmbBlockRteLayoutModel = structuredClone(originalLayout);
+				clonedLayout.contentKey = newContentKey;
+				clonedLayout.settingsKey = newSettingsKey;
+				this.#managerContext!.setOneLayout(clonedLayout);
+			}
+
+			// Update the DOM element with the new content key
+			blockElement.setAttribute(UMB_BLOCK_RTE_DATA_CONTENT_KEY, newContentKey);
+			hasValidBlocks = true;
+		});
+
+		// If no valid blocks remain and body is empty, let default paste handle it
+		if (!hasValidBlocks && doc.body.innerHTML.trim() === '') {
+			return false;
+		}
+
+		// Get the modified HTML and insert it
+		const modifiedHtml = doc.body.innerHTML;
+		this._editor.commands.insertContent(modifiedHtml, {
+			parseOptions: {
+				preserveWhitespace: 'full',
+			},
+		});
+
+		// Return true to indicate we handled the paste
+		return true;
 	};
 
-	override setEditor(editor: Editor): void {
-		super.setEditor(editor);
-		editor.on('paste', this.#handlePaste);
-	}
-
 	getTiptapExtensions() {
-		return [umbRteBlock, umbRteBlockInline];
+		return [umbRteBlock, umbRteBlockInline, createUmbRteBlockPaste(this.#handleBlockPaste)];
 	}
 
 	#updateBlocks(blocks: UmbBlockDataModel[], layouts: Array<UmbBlockRteLayoutModel>) {
@@ -75,10 +163,5 @@ export default class UmbTiptapBlockElementApi extends UmbTiptapExtensionApiBase 
 				editor.commands.setBlock({ contentKey: block.key });
 			}
 		});
-	}
-
-	override destroy(): void {
-		super.destroy();
-		this._editor?.off('paste', this.#handlePaste);
 	}
 }
