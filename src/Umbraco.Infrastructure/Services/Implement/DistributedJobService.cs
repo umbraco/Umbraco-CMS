@@ -119,7 +119,7 @@ public class DistributedJobService : IDistributedJobService
         var registeredJobsByName = _distributedBackgroundJobs.ToDictionary(x => x.Name, x => x.Period);
 
         // Early exit if no registered jobs
-        if (registeredJobsByName.Count == 0)
+        if (registeredJobsByName.Count is 0)
         {
             return;
         }
@@ -167,7 +167,7 @@ public class DistributedJobService : IDistributedJobService
 
         // Batch delete jobs that are no longer registered
         var jobsToRemove = existingJobs
-            .Where(x => !registeredJobsByName.ContainsKey(x.Name))
+            .Where(x => registeredJobsByName.ContainsKey(x.Name) is false)
             .ToList();
 
         if (jobsToRemove.Count > 0)

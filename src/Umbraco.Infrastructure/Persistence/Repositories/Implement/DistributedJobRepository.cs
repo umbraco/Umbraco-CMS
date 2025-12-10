@@ -108,7 +108,7 @@ internal class DistributedJobRepository(IScopeAccessor scopeAccessor) : IDistrib
         }
 
         var jobIds = jobs.Select(x => x.Id).ToArray();
-        if (jobIds.Length == 0)
+        if (jobIds.Length is 0)
         {
             return;
         }
