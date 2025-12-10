@@ -453,6 +453,11 @@ public class TemplateService : RepositoryService, ITemplateService
 
     private async Task<Attempt<ITemplate, TemplateOperationStatus>> CreateAsync(ITemplate template, Guid userKey, string? contentTypeAlias)
     {
+        if (IsValidAlias(template.Alias) is false)
+        {
+            return Attempt.FailWithStatus(TemplateOperationStatus.InvalidAlias, template);
+        }
+
         try
         {
             // file might already be on disk, if so grab the content to avoid overwriting
