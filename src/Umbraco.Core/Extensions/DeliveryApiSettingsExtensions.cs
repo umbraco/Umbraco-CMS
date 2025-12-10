@@ -1,13 +1,19 @@
-﻿using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Extensions;
 
+/// <summary>
+/// Provides extension methods for determining whether content types or content items are allowed to be exposed through
+/// the Delivery API based on the configured allow and disallow lists.
+/// </summary>
 public static class DeliveryApiSettingsExtensions
 {
+    [Obsolete("Please use the overload of IsAllowedContentType taking a content type alias. Scheduled for removal in Umbraco 19.")]
     public static bool IsAllowedContentType(this DeliveryApiSettings settings, IPublishedContent content)
         => settings.IsAllowedContentType(content.ContentType.Alias);
 
+    [Obsolete("Please use IsAllowedContentType and negate the result instead. Scheduled for removal in Umbraco 19.")]
     public static bool IsDisallowedContentType(this DeliveryApiSettings settings, IPublishedContent content)
         => settings.IsDisallowedContentType(content.ContentType.Alias);
 
@@ -26,16 +32,17 @@ public static class DeliveryApiSettingsExtensions
     /// </remarks>
     public static bool IsAllowedContentType(this DeliveryApiSettings settings, string contentTypeAlias)
     {
-        // If allow list is configured, it takes precedence
+        // If allow list is configured, it takes precedence.
         if (settings.AllowedContentTypeAliases.Count > 0)
         {
             return settings.AllowedContentTypeAliases.InvariantContains(contentTypeAlias);
         }
 
-        // Otherwise the content type is allowed if it's not in the disallow list
+        // Otherwise the content type is allowed if it's not in the disallow list.
         return settings.DisallowedContentTypeAliases.InvariantContains(contentTypeAlias) is false;
     }
 
+    [Obsolete("Please use IsAllowedContentType and negate the result instead. Scheduled for removal in Umbraco 19.")]
     public static bool IsDisallowedContentType(this DeliveryApiSettings settings, string contentTypeAlias)
         => settings.IsAllowedContentType(contentTypeAlias) is false;
 }
