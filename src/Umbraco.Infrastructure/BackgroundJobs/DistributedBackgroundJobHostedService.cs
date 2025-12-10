@@ -56,19 +56,25 @@ public class DistributedBackgroundJobHostedService : BackgroundService
         {
             while (await timer.WaitForNextTickAsync(stoppingToken))
             {
-                await RunRunnableJob();
+                try
+                {
+                    await RunRunnableJob();
+                }
+                catch (Exception exception)
+                {
+                    if (exception is OperationCanceledException)
+                    {
+                        // If the operation was canceled, just re-throw to stop the service
+                        throw;
+                    }
+
+                    _logger.LogError(exception, "An exception occurred while attempting to run a distributed background job.");
+                }
             }
         }
         catch (OperationCanceledException)
         {
             _logger.LogInformation("Timed Hosted Service is stopping.");
-        }
-        catch (Exception)
-        {
-            // Ensure that the app doesn't shut down gracefully so that environments like Kubernetes can restart it
-            // See https://github.com/dotnet/runtime/issues/67146 for more information.
-            Environment.ExitCode = 1;
-            throw;
         }
     }
 
