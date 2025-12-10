@@ -9,7 +9,7 @@
     "testSqlite": "npx playwright test DefaultConfig --grep-invert \"Users\"",
     "all": "npx playwright test",
     "createTest": "node createTest.js",
-    "smokeTest": "npx playwright test DefaultConfig --grep \"@smoke\"",
+    "smokeTest": "npx playwright test DefaultConfig --grep \"BlockGridInlineWithTabs|BlockListInlineWithTabs|RichTextEditorInlineWithTabs\"",
     "smokeTestSqlite": "npx playwright test DefaultConfig --grep \"@smoke\" --grep-invert \"Users\"",
     "releaseTest": "npx playwright test DefaultConfig --grep \"@release\"",
     "testWindows": "npx playwright test DefaultConfig --grep-invert \"RelationType\""
@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "@umbraco/json-models-builders": "^2.0.42",
-    "@umbraco/playwright-testhelpers": "^17.0.15",
+    "@umbraco/playwright-testhelpers": "^17.0.19",
     "camelize": "^1.0.0",
     "dotenv": "^16.3.1",
     "node-fetch": "^2.6.7"
