@@ -115,7 +115,7 @@ public class DistributedJobService : IDistributedJobService
     /// <inheritdoc />
     public async Task EnsureJobsAsync()
     {
-        _logger.LogInformation("Initializing distributed background jobs");
+        _logger.LogInformation("Registering distributed background jobs");
 
         // Pre-compute registered job data outside the lock to minimize lock hold time
         var registeredJobsByName = _distributedBackgroundJobs.ToDictionary(x => x.Name, x => x.Period);
@@ -123,7 +123,7 @@ public class DistributedJobService : IDistributedJobService
         // Early exit if no registered jobs
         if (registeredJobsByName.Count is 0)
         {
-            _logger.LogInformation("No distributed background jobs to initialize");
+            _logger.LogInformation("No distributed background jobs to register");
             return;
         }
 
@@ -182,6 +182,6 @@ public class DistributedJobService : IDistributedJobService
 
         scope.Complete();
 
-        _logger.LogInformation("Completed initializing distributed background jobs");
+        _logger.LogInformation("Completed registering distributed background jobs");
     }
 }
