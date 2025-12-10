@@ -50,7 +50,7 @@ tiptap/
 ├── externals.ts                           # Tiptap library re-exports
 ├── index.ts                               # Aggregated exports
 ├── manifests.ts                           # Root manifest registry
-├── type.ts                                # Aggregated type exports
+├── types.ts                               # Aggregated type exports
 └── umbraco-package.ts                     # Package metadata
 ```
 
