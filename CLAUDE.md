@@ -155,6 +155,41 @@ Web.UI → Web.Common → Infrastructure → Core
 - **Merge Strategy**: Squash and merge (via GitHub UI)
 - **Reviews**: Required from code owners
 
+#### PR Naming Convention
+
+Use the format: `Area: Description (closes #IssueID)`
+
+**Examples**:
+| Area | Description | Issue |
+|------|-------------|-------|
+| Relations: | Move persistence of relations from repository into notification handlers | (closes #00000) |
+| Management API: | Correct the population of the parent for sibling items when retrieved under a folder | |
+| Docs: | Updated contributing guidelines to welcome contributions on bugfixes | |
+
+**Area**: The feature or aspect affected (e.g., UFM, TipTap, Docs, Segmentation, Migrations). Helps readers quickly understand what is being changed.
+
+**Description Types**:
+| Type | Definition |
+|------|------------|
+| **Fix** | Fixing a bug |
+| **Feature** | Adding a new feature |
+| **Build** | Updates that affect the build system/process |
+| **Improvement** | Updates to existing functionality that isn't broken |
+| **Docs** | Documentation changes only |
+| **QA** | Adding or fixing tests |
+| **Refactor** | Code change that neither fixes a bug nor adds a feature |
+| **Localize** | Translation and localization changes |
+| **Bump** | Dependency version updates |
+| **Revert** | Undoing a previous commit |
+| **Hotfix** | Urgent fix outside normal release schedule |
+
+**Description Best Practices**:
+- Include the type of change (Fix, Feature, etc.)
+- Describe the change and/or its impact
+- Be specific, not vague (describe "a golden retriever" not just "a dog")
+
+**Issue Linking**: Add `(closes #IssueID)` to auto-close linked issues on merge. Alternatives: `fixes`, `resolves`.
+
 ### Commit Messages
 
 Follow Conventional Commits format:
