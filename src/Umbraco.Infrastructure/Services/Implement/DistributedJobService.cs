@@ -161,7 +161,7 @@ public class DistributedJobService : IDistributedJobService
                 });
             }
 
-            _logger.LogInformation("Initialized distributed background job {JobName}, running every {Period}", registeredJob.Key, registeredJob.Value);
+            _logger.LogInformation("Registered distributed background job {JobName}, running every {Period}", registeredJob.Key, registeredJob.Value);
         }
 
         // Batch insert new jobs
