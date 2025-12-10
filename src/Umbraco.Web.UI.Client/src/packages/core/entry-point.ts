@@ -1,4 +1,3 @@
-import { manifests } from '../../../examples/block-workspace-context/index.js';
 import { manifests as coreManifests } from './manifests.js';
 import { UMB_AUTH_CONTEXT } from './auth/auth.context.token.js';
 import { UmbActionEventContext } from './action/action-event.context.js';
@@ -27,7 +26,6 @@ export const onInit: UmbEntryPointOnInit = (host, extensionRegistry) => {
 	new UmbExtensionsApiInitializer(host, extensionRegistry, 'itemStore', [host]);
 
 	extensionRegistry.registerMany(coreManifests);
-	extensionRegistry.registerMany(manifests);
 
 	const notificationContainerElement = new UmbBackofficeNotificationContainerElement();
 	host.shadowRoot?.appendChild(notificationContainerElement);
