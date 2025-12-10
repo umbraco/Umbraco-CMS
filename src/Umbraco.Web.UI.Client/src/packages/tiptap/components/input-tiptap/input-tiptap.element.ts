@@ -30,7 +30,6 @@ const TIPTAP_CORE_EXTENSION_ALIAS = 'Umb.Tiptap.RichTextEssentials';
  * The root path for the stylesheets on the server.
  * This is used to load the stylesheets from the server as a workaround until the server supports virtual paths.
  */
-const STYLESHEET_ROOT_PATH = '/css';
 
 @customElement('umb-input-tiptap')
 export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof UmbLitElement, string>(UmbLitElement) {
@@ -145,10 +144,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 		const stylesheets = this.configuration?.getValueByAlias<Array<string>>('stylesheets');
 		if (stylesheets?.length) {
 			stylesheets.forEach((stylesheet) => {
-				const linkHref =
-					stylesheet.startsWith('http') || stylesheet.startsWith(STYLESHEET_ROOT_PATH)
-						? stylesheet
-						: `${STYLESHEET_ROOT_PATH}${stylesheet}`;
+				const linkHref = stylesheet.startsWith('http') ? stylesheet : `${stylesheet}`;
 				this.#stylesheets.add(linkHref);
 			});
 		}

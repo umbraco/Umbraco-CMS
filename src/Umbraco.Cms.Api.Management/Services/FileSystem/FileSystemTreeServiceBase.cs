@@ -91,11 +91,12 @@ public abstract class FileSystemTreeServiceBase : IFileSystemTreeService
     private FileSystemTreeItemPresentationModel MapViewModel(string path, string name, bool isFolder)
     {
         var parentPath = Path.GetDirectoryName(path);
+        var hasChildren = isFolder && DirectoryHasChildren(path);
         return new FileSystemTreeItemPresentationModel
         {
-            Path = path.SystemPathToVirtualPath(),
+            Path = FileSystem.GetUrl(path),
             Name = name,
-            HasChildren = isFolder && DirectoryHasChildren(path),
+            HasChildren = hasChildren,
             IsFolder = isFolder,
             Parent = parentPath.IsNullOrWhiteSpace()
                 ? null
