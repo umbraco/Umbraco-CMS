@@ -24,7 +24,7 @@ public class PublishedContentCacheTests : DeliveryApiTests
     private IDocumentUrlService _documentUrlService;
 
     [SetUp]
-    public void Setup()
+    public override void Setup()
     {
         var contentTypeOneMock = new Mock<IPublishedContentType>();
         contentTypeOneMock.SetupGet(m => m.Alias).Returns("theContentType");
@@ -123,7 +123,7 @@ public class PublishedContentCacheTests : DeliveryApiTests
 
     [TestCase(true)]
     [TestCase(false)]
-    public void PublishedContentCache_GetById_SupportsDenyList(bool denied)
+    public void PublishedContentCache_GetById_SupportsDisallowList(bool denied)
     {
         var denyList = denied ? new[] { "theOtherContentType" } : null;
         var publishedContentCache = CreateApiPublishedContentCache(CreateDeliveryApiSettings(denyList));
@@ -141,7 +141,7 @@ public class PublishedContentCacheTests : DeliveryApiTests
 
     [TestCase(true)]
     [TestCase(false)]
-    public void PublishedContentCache_GetByRoute_SupportsDenyList(bool denied)
+    public void PublishedContentCache_GetByRoute_SupportsDisallowList(bool denied)
     {
         var denyList = denied ? new[] { "theContentType" } : null;
         var publishedContentCache = CreateApiPublishedContentCache(CreateDeliveryApiSettings(denyList));
@@ -159,7 +159,7 @@ public class PublishedContentCacheTests : DeliveryApiTests
 
     [TestCase("theContentType")]
     [TestCase("theOtherContentType")]
-    public void PublishedContentCache_GetByIds_SupportsDenyList(string deniedContentType)
+    public void PublishedContentCache_GetByIds_SupportsDisallowList(string deniedContentType)
     {
         var denyList = new[] { deniedContentType };
         var publishedContentCache = CreateApiPublishedContentCache(CreateDeliveryApiSettings(denyList));
@@ -177,7 +177,7 @@ public class PublishedContentCacheTests : DeliveryApiTests
     }
 
     [Test]
-    public void PublishedContentCache_GetById_CanRetrieveContentTypesOutsideTheDenyList()
+    public void PublishedContentCache_GetById_CanRetrieveContentTypesOutsideTheDisallowList()
     {
         var denyList = new[] { "theContentType" };
         var publishedContentCache = CreateApiPublishedContentCache(CreateDeliveryApiSettings(denyList));
@@ -189,7 +189,7 @@ public class PublishedContentCacheTests : DeliveryApiTests
     }
 
     [Test]
-    public void PublishedContentCache_GetByRoute_CanRetrieveContentTypesOutsideTheDenyList()
+    public void PublishedContentCache_GetByRoute_CanRetrieveContentTypesOutsideTheDisallowList()
     {
         var denyList = new[] { "theOtherContentType" };
         var publishedContentCache = CreateApiPublishedContentCache(CreateDeliveryApiSettings(denyList));
@@ -231,7 +231,7 @@ public class PublishedContentCacheTests : DeliveryApiTests
     }
 
     [Test]
-    public void PublishedContentCache_DenyListIsCaseInsensitive()
+    public void PublishedContentCache_DisallowListIsCaseInsensitive()
     {
         var denyList = new[] { "THEcontentTYPE" };
         var publishedContentCache = CreateApiPublishedContentCache(CreateDeliveryApiSettings(denyList));
@@ -313,7 +313,7 @@ public class PublishedContentCacheTests : DeliveryApiTests
     }
 
     [Test]
-    public void PublishedContentCache_AllowListTakesPrecedenceOverDenyList()
+    public void PublishedContentCache_AllowListTakesPrecedenceOverDisallowList()
     {
         var denyList = new[] { "theContentType" };
         var allowList = new[] { "theContentType" };
@@ -323,7 +323,7 @@ public class PublishedContentCacheTests : DeliveryApiTests
     }
 
     [Test]
-    public void PublishedContentCache_AllowListIgnoresDenyListCompletely()
+    public void PublishedContentCache_AllowListIgnoresDisallowListCompletely()
     {
         var denyList = new[] { "theOtherContentType" };
         var allowList = new[] { "theContentType" };
@@ -337,7 +337,7 @@ public class PublishedContentCacheTests : DeliveryApiTests
     }
 
     [Test]
-    public void PublishedContentCache_EmptyAllowListFallsBackToDenyList()
+    public void PublishedContentCache_EmptyAllowListFallsBackToDisallowList()
     {
         var denyList = new[] { "theContentType" };
         string[] allowList = Array.Empty<string>();
