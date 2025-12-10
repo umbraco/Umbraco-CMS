@@ -2,9 +2,10 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state, LitElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
 import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
+import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
 
 @customElement('example-block-workspace-view')
-export class ExampleBlockWorkspaceViewElement extends UmbElementMixin(LitElement) {
+export class ExampleBlockWorkspaceViewElement extends UmbElementMixin(LitElement) implements UmbWorkspaceViewElement {
 	@state()
 	private _culture?: string | null;
 	@state()
