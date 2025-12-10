@@ -270,7 +270,7 @@ export abstract class UmbBlockManagerContext<
 	}
 
 	hasExposeOf(contentKey: string, variantId: UmbVariantId) {
-		if (!variantId) return;
+		if (!variantId) return false;
 
 		const contentTypeKey = this.getContentTypeKeyOfContentKey(contentKey);
 		if (!contentTypeKey) {
