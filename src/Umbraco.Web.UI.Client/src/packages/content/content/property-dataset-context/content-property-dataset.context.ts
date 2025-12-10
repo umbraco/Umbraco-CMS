@@ -33,13 +33,6 @@ export class UmbContentPropertyDatasetContext<
 	setName(name: string) {
 		this._dataOwner.setName(name, this.getVariantId());
 	}
-	/**
-	 * @deprecated Its not clear why we have this. We should either document the need better or get rid of it.
-	 * @returns {UmbEntityVariantModel | undefined} - gives information about the current variant.
-	 */
-	getVariantInfo() {
-		return this._dataOwner.getVariant(this.getVariantId());
-	}
 
 	constructor(
 		host: UmbControllerHost,

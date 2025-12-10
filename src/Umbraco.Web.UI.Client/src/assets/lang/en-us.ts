@@ -30,10 +30,13 @@ export default {
 		noColors: 'You have not configured any approved colors',
 	},
 	colorPickerConfigurations: {
-		colorsDescription: 'Add, remove or sort colors',
+		colorsDescription: 'Add, remove or sort colors (and labels).',
 		colorsTitle: 'Colors',
 		showLabelDescription:
-			'Stores colors as a JSON object containing both the color hex string and label, rather than just the hex string.',
+			'Displays colored field and a label for each color in the color picker, rather than just a colored field.',
+	},
+	colors: {
+		grey: 'Gray',
 	},
 	create: {
 		folderDescription: 'Used to organize items and other folders. Keep items structured and easy to access.',
@@ -48,10 +51,8 @@ export default {
 		color: 'Text color',
 	},
 	installer: {
-		databaseNotFound:
-			'<p>Database not found! Please check that the information in the "connection string" of the "web.config" file is correct.</p><p>To proceed, please edit the "web.config" file (using Visual Studio or your favorite text editor), scroll to the bottom, add the connection string for your database in the key named "UmbracoDbDSN" and save the file.</p><p>Click the <strong>retry</strong> button when done.<br /><a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">More information on editing web.config here</a>.</p>',
 		showLabelDescription:
-			'Stores colors as a JSON object containing both the color hex string and label, rather than just the hex string.',
+			'Displays colored field and a label for each color in the color picker, rather than just a colored field.',
 	},
 	openidErrors: {
 		unauthorizedClient: 'Unauthorized client',

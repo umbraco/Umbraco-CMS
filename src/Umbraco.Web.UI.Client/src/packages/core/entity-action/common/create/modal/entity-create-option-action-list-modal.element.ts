@@ -14,6 +14,7 @@ import {
 	repeat,
 	ifDefined,
 	type PropertyValues,
+	css,
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 
@@ -101,25 +102,23 @@ export class UmbEntityCreateOptionActionListModalElement extends UmbModalBaseEle
 
 	override render() {
 		return html`
-			<umb-body-layout headline="${this.localize.term('general_create')}">
-				<uui-box>
-					${this._apiControllers.length === 0
-						? html`<div>No create options available.</div>`
-						: html`
-								<uui-ref-list>
-									${repeat(
-										this._apiControllers,
-										(controller) => controller.manifest?.alias,
-										(controller, index) => this.#renderRefItem(controller, index),
-									)}
-								</uui-ref-list>
-							`}
-				</uui-box>
+			<uui-dialog-layout headline="${this.localize.term('general_create')}">
+				${this._apiControllers.length === 0
+					? html`<div>No create options available.</div>`
+					: html`
+							<uui-ref-list>
+								${repeat(
+									this._apiControllers,
+									(controller) => controller.manifest?.alias,
+									(controller, index) => this.#renderRefItem(controller, index),
+								)}
+							</uui-ref-list>
+						`}
 				<uui-button
 					slot="actions"
 					label=${this.localize.term('general_cancel')}
 					@click=${this._rejectModal}></uui-button>
-			</umb-body-layout>
+			</uui-dialog-layout>
 		`;
 	}
 
@@ -133,7 +132,7 @@ export class UmbEntityCreateOptionActionListModalElement extends UmbModalBaseEle
 
 		return html`
 			<umb-ref-item
-				name=${label}
+				name=${manifest.meta.additionalOptions ? label + '...' : label}
 				detail=${ifDefined(description)}
 				icon=${manifest.meta.icon}
 				href=${ifDefined(href)}
@@ -143,6 +142,12 @@ export class UmbEntityCreateOptionActionListModalElement extends UmbModalBaseEle
 			</umb-ref-item>
 		`;
 	}
+
+	static override styles = css`
+		:host {
+			max-width: 800px;
+		}
+	`;
 }
 
 export { UmbEntityCreateOptionActionListModalElement as element };

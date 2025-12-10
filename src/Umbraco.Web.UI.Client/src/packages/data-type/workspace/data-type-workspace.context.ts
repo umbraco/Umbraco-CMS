@@ -20,6 +20,7 @@ import type {
 	PropertyEditorSettingsProperty,
 } from '@umbraco-cms/backoffice/property-editor';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestPropertyEditorDataSource } from '@umbraco-cms/backoffice/property-editor-data-source';
 
 type EntityType = UmbDataTypeDetailModel;
 
@@ -46,6 +47,9 @@ export class UmbDataTypeWorkspaceContext
 {
 	readonly propertyEditorUiAlias = this._data.createObservablePartOfCurrent((data) => data?.editorUiAlias);
 	readonly propertyEditorSchemaAlias = this._data.createObservablePartOfCurrent((data) => data?.editorAlias);
+	readonly propertyEditorDataSourceAlias = this._data.createObservablePartOfCurrent(
+		(data) => data?.editorDataSourceAlias,
+	);
 
 	readonly values = this._data.createObservablePartOfCurrent((data) => data?.values);
 	async getValues() {
@@ -59,9 +63,11 @@ export class UmbDataTypeWorkspaceContext
 
 	#propertyEditorSchemaSettingsDefaultData: Array<PropertyEditorSettingsDefaultData> = [];
 	#propertyEditorUISettingsDefaultData: Array<PropertyEditorSettingsDefaultData> = [];
+	#propertyEditorDataSourceSettingsDefaultData: Array<PropertyEditorSettingsDefaultData> = [];
 
 	#propertyEditorSchemaSettingsProperties: Array<PropertyEditorSettingsProperty> = [];
 	#propertyEditorUISettingsProperties: Array<PropertyEditorSettingsProperty> = [];
+	#propertyEditorDataSourceSettingsProperties: Array<PropertyEditorSettingsProperty> = [];
 
 	#propertyEditorSchemaConfigDefaultUIAlias: string | null = null;
 
@@ -82,6 +88,7 @@ export class UmbDataTypeWorkspaceContext
 
 		this.#observePropertyEditorSchemaAlias();
 		this.#observePropertyEditorUIAlias();
+		this.#observePropertyEditorDataSourceAlias();
 
 		this.routes.setRoutes([
 			{
@@ -116,6 +123,8 @@ export class UmbDataTypeWorkspaceContext
 		this.#propertyEditorUISettingsProperties = [];
 		this.#propertyEditorSchemaSettingsDefaultData = [];
 		this.#propertyEditorUISettingsDefaultData = [];
+		this.#propertyEditorDataSourceSettingsProperties = [];
+		this.#propertyEditorDataSourceSettingsDefaultData = [];
 		this.#settingsDefaultData = undefined;
 		this.#mergeConfigProperties();
 	}
@@ -148,6 +157,18 @@ export class UmbDataTypeWorkspaceContext
 				this.#observePropertyEditorSchemaManifest(propertyEditorSchemaAlias);
 			},
 			'schemaAlias',
+		);
+	}
+
+	#observePropertyEditorDataSourceAlias() {
+		return this.observe(
+			this.propertyEditorDataSourceAlias,
+			(propertyEditorDataSourceAlias) => {
+				this.#propertyEditorDataSourceSettingsProperties = [];
+				this.#propertyEditorDataSourceSettingsDefaultData = [];
+				this.#observePropertyEditorDataSourceManifest(propertyEditorDataSourceAlias);
+			},
+			'dataSourceAlias',
 		);
 	}
 
@@ -187,7 +208,7 @@ export class UmbDataTypeWorkspaceContext
 			umbExtensionsRegistry.byTypeAndAlias('propertyEditorUi', propertyEditorUIAlias),
 			(manifest) => {
 				this.#propertyEditorUiIcon.setValue(manifest?.meta.icon || null);
-				this.#propertyEditorUiName.setValue(manifest?.name || null);
+				this.#propertyEditorUiName.setValue(manifest?.meta?.label || manifest?.name || null);
 
 				// Maps properties to have a weight, so they can be sorted, notice UI properties have a +1000 weight compared to schema properties.
 				this.#propertyEditorUISettingsProperties = (manifest?.meta.settings?.properties ?? []).map((x, i) => ({
@@ -205,12 +226,38 @@ export class UmbDataTypeWorkspaceContext
 		);
 	}
 
+	#observePropertyEditorDataSourceManifest(propertyEditorDataSourceAlias: string | null | undefined) {
+		if (!propertyEditorDataSourceAlias) {
+			this.removeUmbControllerByAlias('dataSource');
+			this.#mergeConfigProperties();
+			return;
+		}
+		this.observe(
+			umbExtensionsRegistry.byAlias<ManifestPropertyEditorDataSource>(propertyEditorDataSourceAlias),
+			(manifest) => {
+				// Maps properties to have a weight, so they can be sorted, notice data source properties have a +2000 weight compared to schema properties.
+				this.#propertyEditorDataSourceSettingsProperties = (manifest?.meta.settings?.properties ?? []).map((x, i) => ({
+					...x,
+					weight: x.weight ?? 2000 + i,
+				}));
+				this.#propertyEditorDataSourceSettingsDefaultData = manifest?.meta.settings?.defaultData || [];
+				this.#mergeConfigProperties();
+			},
+			'dataSource',
+		);
+	}
+
 	#mergeConfigProperties() {
-		if (this.#propertyEditorSchemaSettingsProperties && this.#propertyEditorUISettingsProperties) {
-			// Reset the value to this array, and then afterwards append:
-			this.#properties.setValue(this.#propertyEditorSchemaSettingsProperties);
-			// Append the UI settings properties to the schema properties, so they can override the schema properties:
-			this.#properties.append(this.#propertyEditorUISettingsProperties);
+		const settings = [
+			this.#propertyEditorSchemaSettingsProperties,
+			this.#propertyEditorUISettingsProperties,
+			this.#propertyEditorDataSourceSettingsProperties,
+		].filter((x) => Array.isArray(x) && x.length > 0);
+
+		const mergedSettings = settings.flat();
+
+		if (mergedSettings) {
+			this.#properties.setValue(mergedSettings);
 
 			// If new or if the alias was changed then set default values. This 'complexity' to prevent setting default data when initialized [NL]
 			const previousPropertyEditorUIAlias = this.#lastPropertyEditorUIAlias;
@@ -225,7 +272,12 @@ export class UmbDataTypeWorkspaceContext
 	}
 
 	#transferConfigDefaultData() {
-		if (!this.#propertyEditorSchemaSettingsDefaultData || !this.#propertyEditorUISettingsDefaultData) return;
+		if (
+			!this.#propertyEditorSchemaSettingsDefaultData ||
+			!this.#propertyEditorUISettingsDefaultData ||
+			!this.#propertyEditorDataSourceSettingsDefaultData
+		)
+			return;
 
 		const data = this._data.getCurrent();
 		if (!data) return;
@@ -236,6 +288,7 @@ export class UmbDataTypeWorkspaceContext
 		this.#settingsDefaultData = [
 			...this.#propertyEditorSchemaSettingsDefaultData,
 			...this.#propertyEditorUISettingsDefaultData,
+			...this.#propertyEditorDataSourceSettingsDefaultData,
 		] satisfies Array<UmbDataTypePropertyValueModel>;
 
 		const values: Array<UmbDataTypePropertyValueModel> = [];
@@ -283,6 +336,14 @@ export class UmbDataTypeWorkspaceContext
 
 	setPropertyEditorUiAlias(alias?: string) {
 		this._data.updateCurrent({ editorUiAlias: alias });
+	}
+
+	getPropertyEditorDataSourceAlias() {
+		return this._data.getCurrent()?.editorDataSourceAlias;
+	}
+
+	setPropertyEditorDataSourceAlias(alias?: string) {
+		this._data.updateCurrent({ editorDataSourceAlias: alias });
 	}
 
 	/**

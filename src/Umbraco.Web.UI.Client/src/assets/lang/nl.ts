@@ -1172,12 +1172,6 @@ export default {
 		translation: 'Vertaling',
 		users: 'Gebruikers',
 	},
-	help: {
-		tours: 'Rondleidingen',
-		theBestUmbracoVideoTutorials: 'De beste Umbraco video tutorials',
-		umbracoForum: 'Bezoek our.umbraco.com',
-		umbracoTv: 'Bezoek umbraco.tv',
-	},
 	settings: {
 		defaulttemplate: 'Standaard template',
 		importDocumentTypeHelp:
@@ -1984,14 +1978,10 @@ export default {
 		savedSearches: 'Opgeslagen Zoekopdrachten',
 		saveSearch: 'Zoekopdracht opslaan',
 		saveSearchDescription: 'Enter a friendly name for your search query',
-		filterSearch: 'Zoekopdracht filteren',
-		totalItems: 'Aantal items',
 		timestamp: 'Tijdstempel',
 		level: 'Niveau',
 		machine: 'Machine',
 		message: 'Bericht',
-		exception: 'Uitzondering',
-		properties: 'Eigenschappen',
 		searchWithGoogle: 'Zoeken Met Google',
 		searchThisMessageWithGoogle: 'Dit bericht met Google opzoeken',
 		searchWithBing: 'Zoeken Met Bing',
@@ -2005,21 +1995,9 @@ export default {
 		searchUmbracoIssues: 'Umbraco Issues doorzoeken',
 		searchUmbracoIssuesOnGithub: 'Umbraco Issues op Github doorzoeken',
 		deleteThisSearch: 'Zoekopdracht verwijderen',
-		findLogsWithRequestId: 'Logs met Request ID zoeken',
-		findLogsWithNamespace: 'Logs met Namespace zoeken',
-		findLogsWithMachineName: 'Logs met Machine Naam zoeken',
-		open: 'Openen',
 		polling: 'Peilen',
-		every2: 'Elke 2 seconden',
-		every5: 'Elke 5 seconden',
-		every10: 'Elke 10 seconden',
-		every20: 'Elke 20 seconden',
-		every30: 'Elke 30 seconden',
-		pollingEvery2: 'Elke 2s peilen',
-		pollingEvery5: 'Elke 5s peilen',
-		pollingEvery10: 'Elke 10s peilen',
-		pollingEvery20: 'Elke 20s peilen',
-		pollingEvery30: 'Elke 30s peilen',
+		pollingInterval: (seconds: number) => `Elke ${seconds} seconden`,
+		pollingActive: (seconds: number) => `Elke ${seconds}s peilen`,
 	},
 	clipboard: {
 		labelForCopyAllEntries: 'Kopieer %0%',
@@ -2054,28 +2032,6 @@ export default {
 			"\n              <p>\n                  Umbraco wordt uitgevoerd in de foutopsporingsmodus. Dit betekent dat u de ingebouwde prestatieprofiler kunt gebruiken om de prestaties te beoordelen bij het renderen van pagina's.\n              </p>\n              <p>\n                  Als je de profiler voor een specifieke paginaweergave wilt activeren, voeg je <strong>umbDebug=true</strong> toe aan de querystring wanneer je de pagina opvraagt.\n              </p>\n              <p>\n                  Als je wil dat de profiler standaard wordt geactiveerd voor alle paginaweergaven, kun je de onderstaande schakelaar gebruiken.\n                  Het plaatst een cookie in je browser, die vervolgens de profiler automatisch activeert.\n                  Met andere woorden, de profiler zal alleen voor <em>jouw</em> browser actief zijn, niet voor andere bezoekers.\n              </p>\n      ",
 		activateByDefault: 'Activeer de profiler standaard',
 		reminder: 'Vriendelijke herinnering',
-	},
-	settingsDashboardVideos: {
-		trainingHeadline: "Je bent slechts een klik verwijderd van uren aan Umbraco trainingvideo's.",
-		trainingDescription:
-			'\n        <p>Wil je Umbraco onder de knie krijgen? Besteed een paar minuten aan het leren van enkele best practices door een van deze video\'s over het gebruik van Umbraco te bekijken. Bezoek <a href="https://umbraco.tv" target="_blank" rel="noopener">umbraco.tv</a> voor meer Umbraco videos</p>\n    ',
-		getStarted: 'Om je op weg te helpen',
-	},
-	settingsDashboard: {
-		start: 'Start hier',
-		startDescription:
-			'Deze sectie bevat de bouwstenen voor jouw Umbraco-site. Volg de onderstaande links\n      voor meer informatie over het werken met de items in de sectie Instellingen\n    ',
-		more: 'Meer te weten komen',
-		bulletPointOne:
-			'\n            Lees meer over het werken met de items in de sectie Instellingen <a class="btn-link -underline" href="https://docs.umbraco.com/umbraco-cms/fundamentals/backoffice/sections/" target="_blank" rel="noopener">in het Documentatiegedeelte</a> van Our Umbraco\n        ',
-		bulletPointTwo:
-			'\n            Stel een vraag op het <a class="btn-link -underline" href="https://our.umbraco.com/forum" target="_blank" rel="noopener">Community Forum</a>\n        ',
-		bulletPointThree:
-			'\n            Bekijk onze <a class="btn-link -underline" href="https://umbraco.tv" target="_blank" rel="noopener">instructievideo\'s</a> (sommige zijn gratis, andere vereisen een abonnement)\n        ',
-		bulletPointFour:
-			'\n            Lees meer over onze <a class="btn-link -underline" href="https://umbraco.com/products/" target="_blank" rel="noopener">productiviteitsverhogende programma\'s en commerciële ondersteuning</a>\n        ',
-		bulletPointFive:
-			'\n            Lees meer over real-life <a class="btn-link -underline" href="https://umbraco.com/training/" target="_blank" rel="noopener">training en certificering</a> opportuniteiten\n        ',
 	},
 	startupDashboard: {
 		fallbackHeadline: 'Welkom bij Het Vriendelijke CMS',

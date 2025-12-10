@@ -110,15 +110,6 @@ export type UmbSorterResolvePlacementArgs<T, ElementType extends HTMLElement = H
 	pointerY: number;
 };
 
-/**
- * @deprecated will be removed in v.17, use `UmbSorterResolvePlacementArgs`
- */
-// eslint-disable-next-line @typescript-eslint/naming-convention
-export type resolvePlacementArgs<T, ElementType extends HTMLElement = HTMLElement> = UmbSorterResolvePlacementArgs<
-	T,
-	ElementType
->;
-
 type UniqueType = string | symbol | number;
 
 /**
@@ -584,7 +575,6 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		}
 	};
 
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	#itemDropped = async (_e: DragEvent) => {
 		this.#handleMoveEnd();
 	};

@@ -1,6 +1,7 @@
 import { UmbClipboardCollectionRepository } from '../../collection/index.js';
 import type { UmbClipboardEntryDetailModel } from '../types.js';
-import { css, customElement, html, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
+import UmbClipboardEntryDetailRepository from '../detail/clipboard-entry-detail.repository.js';
+import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import {
@@ -10,6 +11,7 @@ import {
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
+import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 
 // TODO: make this into an extension point (Picker) with two kinds of pickers: tree-item-picker and collection-item-picker;
 @customElement('umb-clipboard-entry-picker')
@@ -27,6 +29,8 @@ export class UmbClipboardEntryPickerElement extends UmbLitElement {
 	#selectionManager = new UmbSelectionManager(this);
 	#entityContext = new UmbEntityContext(this);
 	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
+
+	#clipboardDetailRepository = new UmbClipboardEntryDetailRepository(this);
 
 	constructor() {
 		super();
@@ -117,17 +121,57 @@ export class UmbClipboardEntryPickerElement extends UmbLitElement {
 		}
 	};
 
+	async #clearClipboard() {
+		try {
+			await umbConfirmModal(this, {
+				headline: '#clipboard_labelForClearClipboard',
+				content: '#clipboard_confirmClearDescription',
+				color: 'danger',
+				confirmLabel: '#general_clear',
+				cancelLabel: '#general_cancel',
+			});
+		} catch {
+			return;
+		}
+
+		for (const item of this._items) {
+			const { error } = await this.#clipboardDetailRepository.delete(item.unique);
+			if (error) {
+				console.error(`Unable to delete clipboard item with unique ${item.unique}`, error);
+			}
+		}
+
+		this.#requestItems();
+	}
+
 	override render() {
-		return when(
-			this._items.length > 0,
-			() =>
-				repeat(
-					this._items,
-					(item) => item.unique,
-					(item) => this.#renderItem(item),
-				),
-			() => html`<p>There are no items in the clipboard.</p>`,
-		);
+		return html`
+			<uui-box headline=${this.localize.term('general_clipboard')}>
+				<span slot="header-actions">
+					${when(
+						this._items.length > 0,
+						() => html`
+							<uui-button color="default" look="default" @click="${this.#clearClipboard}">
+								<uui-icon name="delete"></uui-icon>
+								<umb-localize key="clipboard_labelForClearClipboard">Clear Clipboard</umb-localize>
+							</uui-button>
+						`,
+						() => nothing,
+					)}
+				</span>
+
+				${when(
+					this._items.length > 0,
+					() =>
+						repeat(
+							this._items,
+							(item) => item.unique,
+							(item) => this.#renderItem(item),
+						),
+					() => html`<p>There are no items in the clipboard.</p>`,
+				)}
+			</uui-box>
+		`;
 	}
 
 	#renderItem(item: UmbClipboardEntryDetailModel) {
@@ -156,7 +200,7 @@ export class UmbClipboardEntryPickerElement extends UmbLitElement {
 				slot="actions"
 				.entityType=${item.entityType}
 				.unique=${item.unique}
-				.label=${this.localize.string(item.name)}>
+				.label=${this.localize.string(item.name ?? '')}>
 			</umb-entity-actions-bundle>
 		`;
 	}

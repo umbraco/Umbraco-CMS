@@ -269,7 +269,7 @@ export abstract class UmbBlockManagerContext<
 		return this.#settings.value.find((x) => x.key === settingsKey);
 	}
 	// originData param is used by some implementations. [NL] should be here, do not remove it.
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 	setOneLayout(layoutData: BlockLayoutType, _originData?: BlockOriginDataType) {
 		this._layouts.appendOne(layoutData);
 	}
@@ -324,18 +324,6 @@ export abstract class UmbBlockManagerContext<
 			(source) => source.find((x) => x.key === key)?.values?.find((values) => values.alias === propertyAlias)?.value,
 		);
 	}
-
-	/**
-	 * @deprecated Use `createWithPresets` instead. Which is Async. Will be removed in v.17
-	 * @param contentElementTypeKey
-	 * @param partialLayoutEntry
-	 * @param originData
-	 */
-	abstract create(
-		contentElementTypeKey: string,
-		partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey'>,
-		originData?: BlockOriginDataType,
-	): never;
 
 	abstract createWithPresets(
 		contentElementTypeKey: string,
@@ -471,7 +459,7 @@ export abstract class UmbBlockManagerContext<
 		layoutEntry: BlockLayoutType,
 		content: UmbBlockDataModel,
 		settings: UmbBlockDataModel | undefined,
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 		_originData: BlockOriginDataType,
 	) {
 		// Create content entry:

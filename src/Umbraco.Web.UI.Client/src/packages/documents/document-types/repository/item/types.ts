@@ -5,6 +5,6 @@ export type UmbDocumentTypeItemModel = {
 	unique: string;
 	name: string;
 	isElement: boolean;
-	icon?: string | null;
-	description?: string | null;
+	icon?: string;
+	description?: string;
 };

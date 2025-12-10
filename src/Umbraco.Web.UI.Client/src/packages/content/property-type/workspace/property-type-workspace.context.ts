@@ -45,7 +45,7 @@ export class UmbPropertyTypeWorkspaceContext
 	readonly data = this.#data.asObservable();
 
 	readonly name = this.#data.asObservablePart((data) => data?.name);
-	readonly unique = this.#data.asObservablePart((data) => data?.id);
+	readonly unique = this.#data.asObservablePart((data) => data?.unique);
 
 	readonly values = this.#data.asObservablePart((data) => {
 		return umbObjectToPropertyValueArray(data);
@@ -67,7 +67,7 @@ export class UmbPropertyTypeWorkspaceContext
 			this.unique,
 			(unique) => {
 				if (unique) {
-					this.validationContext.setDataPath(UmbDataPathPropertyTypeQuery({ id: unique }));
+					this.validationContext.setDataPath(UmbDataPathPropertyTypeQuery({ unique }));
 				}
 			},
 			null,
@@ -155,7 +155,6 @@ export class UmbPropertyTypeWorkspaceContext
 
 		const unique = UmbId.new();
 		let data: PropertyTypeDataModel = {
-			id: unique,
 			unique: unique,
 			container: containerId ? { id: containerId } : null,
 			alias: '',
@@ -194,7 +193,7 @@ export class UmbPropertyTypeWorkspaceContext
 	}
 
 	getUnique() {
-		return this.getData()!.id;
+		return this.getData()!.unique;
 	}
 
 	getEntityType() {

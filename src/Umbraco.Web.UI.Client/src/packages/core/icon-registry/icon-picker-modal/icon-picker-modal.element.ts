@@ -16,6 +16,7 @@ import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIColorSwatchesEvent } from '@umbraco-cms/backoffice/external/uui';
+import { toCamelCase } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-icon-picker-modal')
 export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPickerModalData, UmbIconPickerModalValue> {
@@ -137,12 +138,11 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 						label=${this.localize.term('defaultdialogs_colorSwitcher')}
 						@change=${this.#onColorChange}>
 						${
-							// TODO: Missing localization for the color aliases. [NL]
 							this._colorList.map(
 								(color) => html`
 									<uui-color-swatch
-										label=${color.alias}
-										title=${color.alias}
+										label=${this.localize.term('colors_' + toCamelCase(color.alias))}
+										title=${this.localize.term('colors_' + toCamelCase(color.alias))}
 										value=${color.alias}
 										style="--uui-swatch-color: var(${color.varName})">
 									</uui-color-swatch>

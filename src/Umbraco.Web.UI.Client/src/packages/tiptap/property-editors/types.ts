@@ -16,6 +16,3 @@ export type UmbTiptapToolbarExtension = UmbTiptapExtensionBase;
 
 export type UmbTiptapToolbarRowViewModel = UmbTiptapSortableViewModel<Array<UmbTiptapToolbarGroupViewModel>>;
 export type UmbTiptapToolbarGroupViewModel = UmbTiptapSortableViewModel<Array<string>>;
-
-/** @deprecated No longer used internally. This will be removed in Umbraco 17. [LK] */
-export type UmbTiptapToolbarSortableViewModel<T> = UmbTiptapSortableViewModel<T>;

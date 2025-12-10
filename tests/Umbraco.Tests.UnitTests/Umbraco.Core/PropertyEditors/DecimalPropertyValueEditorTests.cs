@@ -161,7 +161,27 @@ public class DecimalPropertyValueEditorTests
             Assert.AreEqual(1, result.Count());
 
             var validationResult = result.First();
-            Assert.AreEqual(validationResult.ErrorMessage, "validation_outOfRangeMaximum");
+            Assert.AreEqual("validation_outOfRangeMaximum", validationResult.ErrorMessage);
+        }
+    }
+
+    [TestCase(1.8, true)]
+    [TestCase(2.2, false)]
+    [SetCulture("it-IT")] // Uses "," as the decimal separator.
+    public void Validates_Is_Less_Than_Or_Equal_To_Configured_Max_With_Comma_Decimal_Separator(object value, bool expectedSuccess)
+    {
+        var editor = CreateValueEditor(min: 1, max: 2);
+        var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
+        if (expectedSuccess)
+        {
+            Assert.IsEmpty(result);
+        }
+        else
+        {
+            Assert.AreEqual(1, result.Count());
+
+            var validationResult = result.First();
+            Assert.AreEqual("validation_outOfRangeMaximum", validationResult.ErrorMessage);
         }
     }
 

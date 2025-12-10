@@ -282,6 +282,28 @@ export class UmbContentTypeStructureManager<
 	}
 
 	/**
+	 * Reload the owner content type.
+	 * @returns {Promise} - A promise that will be resolved when the content type is reloaded.
+	 */
+	public async reload(): Promise<T> {
+		await this.#initRepository;
+		const contentTypeUnique = this.getOwnerContentTypeUnique();
+		if (!contentTypeUnique) throw new Error('Could not find the Content Type to reload');
+
+		const { error, data } = await this.#repository!.requestByUnique(contentTypeUnique);
+		if (error || !data) {
+			throw error?.message ?? 'Repository did not return data.';
+		}
+
+		// Update state with latest version:
+		this.#contentTypes.updateOne(contentTypeUnique, data);
+
+		// Update entry in the repo manager:
+		this.#repoManager!.addEntry(data);
+		return data;
+	}
+
+	/**
 	 * Create the owner content type. Notice this is for a Content Type that is NOT already stored on the server.
 	 * @param {string | null} parentUnique - The unique of the parent content type
 	 * @returns {Promise} - a promise that is resolved when the content type has been created.
@@ -447,7 +469,7 @@ export class UmbContentTypeStructureManager<
 				const newName = 'Unnamed';
 				this.#editedTypes.appendOne(contentTypeUnique);
 				this.updateContainer(null, container.id, {
-					name: this.makeContainerNameUniqueForOwnerContentType(container.id, newName, type, parentId) ?? newName,
+					name: this.makeContainerNameUniqueForOwnerContentType(container.id, newName) ?? newName,
 				});
 			}
 		});
@@ -511,32 +533,16 @@ export class UmbContentTypeStructureManager<
 		return newContainer;
 	}
 
-	makeEmptyContainerName(
-		containerId: string,
-		legacyContainerType?: UmbPropertyContainerTypes,
-		legacyParentId?: string | null,
-	): string {
-		return (
-			this.makeContainerNameUniqueForOwnerContentType(containerId, 'Unnamed', legacyContainerType, legacyParentId) ??
-			'Unnamed'
-		);
+	makeEmptyContainerName(containerId: string): string {
+		return this.makeContainerNameUniqueForOwnerContentType(containerId, 'Unnamed') ?? 'Unnamed';
 	}
 	/**
 	 *
 	 * @param {string} containerId - The id of the container to make unique
 	 * @param {string} newName - The new name to make unique
-	 * @param {never} _legacyContainerType - do not use, has no effect. Is deprecated and will be removed in v.17
-	 * @param {never} _legacyParentId - do not use, has no effect. Is deprecated and will be removed in v.17
 	 * @returns
 	 */
-	makeContainerNameUniqueForOwnerContentType(
-		containerId: string,
-		newName: string,
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		_legacyContainerType?: UmbPropertyContainerTypes,
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		_legacyParentId?: string | null,
-	) {
+	makeContainerNameUniqueForOwnerContentType(containerId: string, newName: string) {
 		const container = this.getOwnerContainerById(containerId);
 		if (!container) {
 			console.warn(`Container with id ${containerId} not found in owner content type.`);

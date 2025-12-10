@@ -10,7 +10,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 namespace Umbraco.Cms.Infrastructure.Examine.DependencyInjection;
 
 /// <summary>
-///     Configures the index options to construct the Examine indexes
+///     Configures the index options to construct the Examine indexes.
 /// </summary>
 public sealed class ConfigureIndexOptions : IConfigureNamedOptions<LuceneDirectoryIndexOptions>
 {
@@ -18,6 +18,9 @@ public sealed class ConfigureIndexOptions : IConfigureNamedOptions<LuceneDirecto
     private readonly IUmbracoIndexConfig _umbracoIndexConfig;
     private readonly IDeliveryApiContentIndexFieldDefinitionBuilder _deliveryApiContentIndexFieldDefinitionBuilder;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ConfigureIndexOptions"/> class.
+    /// </summary>
     public ConfigureIndexOptions(
         IUmbracoIndexConfig umbracoIndexConfig,
         IOptions<IndexCreatorSettings> settings,
@@ -28,24 +31,27 @@ public sealed class ConfigureIndexOptions : IConfigureNamedOptions<LuceneDirecto
         _deliveryApiContentIndexFieldDefinitionBuilder = deliveryApiContentIndexFieldDefinitionBuilder;
     }
 
+    /// <inheritdoc/>
     public void Configure(string? name, LuceneDirectoryIndexOptions options)
     {
+        // When creating FieldDefinitions with Umbraco defaults, pass in any already defined to avoid overwriting
+        // those added via a package or custom code.
         switch (name)
         {
             case Constants.UmbracoIndexes.InternalIndexName:
                 options.Analyzer = new CultureInvariantWhitespaceAnalyzer();
                 options.Validator = _umbracoIndexConfig.GetContentValueSetValidator();
-                options.FieldDefinitions = new UmbracoFieldDefinitionCollection();
+                options.FieldDefinitions = new UmbracoFieldDefinitionCollection(options.FieldDefinitions);
                 break;
             case Constants.UmbracoIndexes.ExternalIndexName:
                 options.Analyzer = new StandardAnalyzer(LuceneInfo.CurrentVersion);
                 options.Validator = _umbracoIndexConfig.GetPublishedContentValueSetValidator();
-                options.FieldDefinitions = new UmbracoFieldDefinitionCollection();
+                options.FieldDefinitions = new UmbracoFieldDefinitionCollection(options.FieldDefinitions);
                 break;
             case Constants.UmbracoIndexes.MembersIndexName:
                 options.Analyzer = new CultureInvariantWhitespaceAnalyzer();
                 options.Validator = _umbracoIndexConfig.GetMemberValueSetValidator();
-                options.FieldDefinitions = new UmbracoFieldDefinitionCollection();
+                options.FieldDefinitions = new UmbracoFieldDefinitionCollection(options.FieldDefinitions);
                 break;
             case Constants.UmbracoIndexes.DeliveryApiContentIndexName:
                 options.Analyzer = new StandardAnalyzer(LuceneInfo.CurrentVersion);
@@ -64,6 +70,7 @@ public sealed class ConfigureIndexOptions : IConfigureNamedOptions<LuceneDirecto
         }
     }
 
+    /// <inheritdoc/>
     public void Configure(LuceneDirectoryIndexOptions options)
         => throw new NotImplementedException("This is never called and is just part of the interface");
 }

@@ -1,7 +1,6 @@
 import { UMB_PICKER_INPUT_CONTEXT } from './picker-input.context-token.js';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbInteractionMemoryManager } from '@umbraco-cms/backoffice/interaction-memory';
 import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -13,17 +12,16 @@ import {
 	type UmbPickerModalData,
 	type UmbPickerModalValue,
 } from '@umbraco-cms/backoffice/modal';
+import type { UmbItemModel } from '@umbraco-cms/backoffice/entity-item';
 
-type PickerItemBaseType = { name: string; unique: string };
 export class UmbPickerInputContext<
-	PickedItemType extends PickerItemBaseType = PickerItemBaseType,
-	PickerItemType extends PickerItemBaseType = PickedItemType,
+	PickedItemType extends UmbItemModel = UmbItemModel,
+	PickerItemType extends UmbItemModel = UmbItemModel,
 	PickerModalConfigType extends UmbPickerModalData<PickerItemType> = UmbPickerModalData<PickerItemType>,
 	PickerModalValueType extends UmbPickerModalValue = UmbPickerModalValue,
 > extends UmbContextBase {
-	modalAlias: string | UmbModalToken<UmbPickerModalData<PickerItemType>, PickerModalValueType>;
+	modalAlias?: string | UmbModalToken<UmbPickerModalData<PickerItemType>, PickerModalValueType>;
 	repository?: UmbItemRepository<PickedItemType>;
-	#getUnique: (entry: PickedItemType) => string | undefined;
 
 	#itemManager;
 
@@ -33,7 +31,8 @@ export class UmbPickerInputContext<
 	public readonly interactionMemory = new UmbInteractionMemoryManager(this);
 
 	/**
-	 * Define a minimum amount of selected items in this input, for this input to be valid.
+	 * Define a maximum amount of selected items in this input, for this input to be valid.
+	 * @returns {number} The maximum number of items required.
 	 */
 	public get max() {
 		return this._max;
@@ -44,7 +43,8 @@ export class UmbPickerInputContext<
 	private _max = Infinity;
 
 	/**
-	 * Define a maximum amount of selected items in this input, for this input to be valid.
+	 * Define a minimum amount of selected items in this input, for this input to be valid.
+	 * @returns {number} The minimum number of items required.
 	 */
 	public get min() {
 		return this._min;
@@ -59,30 +59,20 @@ export class UmbPickerInputContext<
 	 * @param {UmbControllerHost} host - The host for the controller.
 	 * @param {string} repositoryAlias - The alias of the repository to use.
 	 * @param {(string | UmbModalToken<UmbPickerModalData<PickerItemType>, PickerModalValueType>)} modalAlias - The alias of the modal to use.
-	 * @param {((entry: PickedItemType) => string | undefined)} [getUniqueMethod] - DEPRECATED since 15.3. Will be removed in v. 17: A method to get the unique key from the item.
 	 * @memberof UmbPickerInputContext
 	 */
 	constructor(
 		host: UmbControllerHost,
 		repositoryAlias: string,
-		modalAlias: string | UmbModalToken<UmbPickerModalData<PickerItemType>, PickerModalValueType>,
-		getUniqueMethod?: (entry: PickedItemType) => string | undefined,
+		modalAlias?: string | UmbModalToken<UmbPickerModalData<PickerItemType>, PickerModalValueType>,
 	) {
 		super(host, UMB_PICKER_INPUT_CONTEXT);
-		this.modalAlias = modalAlias;
 
-		this.#getUnique = getUniqueMethod
-			? (entry: PickedItemType) => {
-					new UmbDeprecation({
-						deprecated: 'The getUniqueMethod parameter.',
-						removeInVersion: '17.0.0',
-						solution: 'The required unique property on the item will be used instead.',
-					}).warn();
-					return getUniqueMethod(entry);
-				}
-			: (entry) => entry.unique;
+		if (modalAlias) {
+			this.modalAlias = modalAlias;
+		}
 
-		this.#itemManager = new UmbRepositoryItemsManager<PickedItemType>(this, repositoryAlias, getUniqueMethod);
+		this.#itemManager = new UmbRepositoryItemsManager<PickedItemType>(this, repositoryAlias);
 
 		this.selection = this.#itemManager.uniques;
 		this.statuses = this.#itemManager.statuses;
@@ -92,6 +82,12 @@ export class UmbPickerInputContext<
 	getSelection() {
 		return this.#itemManager.getUniques();
 	}
+	getSelectedItems() {
+		return this.#itemManager.getItems();
+	}
+	getSelectedItemByUnique(unique: string) {
+		return this.#itemManager.getItems().find((item) => item.unique === unique);
+	}
 
 	setSelection(selection: Array<string | null>) {
 		// Note: Currently we do not support picking root item. So we filter out null values:
@@ -100,6 +96,11 @@ export class UmbPickerInputContext<
 
 	async openPicker(pickerData?: Partial<PickerModalConfigType>) {
 		await this.#itemManager.init;
+
+		if (!this.modalAlias) {
+			throw new Error('No modal alias defined for the picker input context.');
+		}
+
 		const modalValue = await umbOpenModal(this, this.modalAlias, {
 			data: {
 				multiple: this._max === 1 ? false : true,
@@ -116,21 +117,23 @@ export class UmbPickerInputContext<
 		this.getHostElement().dispatchEvent(new UmbChangeEvent());
 	}
 
-	async requestRemoveItem(unique: string) {
-		const item = this.#itemManager.getItems().find((item) => this.#getUnique(item) === unique);
+	protected async _requestItemName(unique: string) {
+		return this.getSelectedItemByUnique(unique)?.name ?? '#general_notFound';
+	}
 
-		const name = item?.name ?? '#general_notFound';
+	async requestRemoveItem(unique: string) {
+		const name = await this._requestItemName(unique);
 		await umbConfirmModal(this, {
 			color: 'danger',
-			headline: `#actions_remove ${name}?`,
+			headline: `#actions_remove?`,
 			content: `#defaultdialogs_confirmremove ${name}?`,
 			confirmLabel: '#actions_remove',
 		});
 
-		this.#removeItem(unique);
+		this._removeItem(unique);
 	}
 
-	#removeItem(unique: string) {
+	protected _removeItem(unique: string) {
 		const newSelection = this.getSelection().filter((value) => value !== unique);
 		this.setSelection(newSelection);
 		this.getHostElement().dispatchEvent(new UmbChangeEvent());

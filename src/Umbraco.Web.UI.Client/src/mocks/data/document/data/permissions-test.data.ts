@@ -46,12 +46,6 @@ export const data: Array<UmbMockDocumentModel> = [
 		hasChildren: false,
 		id: 'permissions-1-document-id',
 		parent: { id: 'permissions-document-id' },
-		urls: [
-			{
-				culture: null,
-				url: '/permission-1',
-			},
-		],
 		variants: permissionsTestDocument.variants.map((variant) => ({
 			...variant,
 			name: 'Permissions 1',
@@ -65,12 +59,6 @@ export const data: Array<UmbMockDocumentModel> = [
 		hasChildren: true,
 		id: 'permissions-2-document-id',
 		parent: { id: 'permissions-document-id' },
-		urls: [
-			{
-				culture: null,
-				url: '/permissions-2',
-			},
-		],
 		variants: permissionsTestDocument.variants.map((variant) => ({
 			...variant,
 			name: 'Permissions 2',

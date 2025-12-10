@@ -18,7 +18,7 @@ public sealed class InternalPublishedContent : IPublishedContent
         // initialize boring stuff
         TemplateId = 0;
         WriterId = CreatorId = 0;
-        CreateDate = UpdateDate = DateTime.Now;
+        CreateDate = UpdateDate = DateTime.UtcNow;
         Version = Guid.Empty;
         Path = string.Empty;
         ContentType = contentType;

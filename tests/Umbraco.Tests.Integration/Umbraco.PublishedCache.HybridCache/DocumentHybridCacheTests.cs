@@ -2,6 +2,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.ContentPublishing;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PublishedCache;
@@ -84,17 +85,50 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
         Assert.IsFalse(textPage.IsPublished());
     }
 
-    [Test]
-    public async Task Cannot_get_unpublished_content()
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task Can_Get_Unpublished_Content_By_Key(bool preview)
     {
         // Arrange
         var unpublishAttempt = await ContentPublishingService.UnpublishAsync(PublishedTextPage.Key.Value, null, Constants.Security.SuperUserKey);
+        Assert.IsTrue(unpublishAttempt.Success);
 
-        //Act
-        var textPage = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPageId, false);
+        // Act
+        var textPage = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPage.Key.Value, preview);
 
         // Assert
-        Assert.IsNull(textPage);
+        if (preview)
+        {
+            Assert.IsNotNull(textPage);
+            Assert.IsFalse(textPage.IsPublished());
+        }
+        else
+        {
+            Assert.IsNull(textPage);
+        }
+    }
+
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task Can_Get_Unpublished_Content_By_Id(bool preview)
+    {
+        // Arrange
+        var unpublishAttempt = await ContentPublishingService.UnpublishAsync(PublishedTextPage.Key.Value, null, Constants.Security.SuperUserKey);
+        Assert.IsTrue(unpublishAttempt.Success);
+
+        // Act
+        var textPage = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPageId, preview);
+
+        // Assert
+        if (preview)
+        {
+            Assert.IsNotNull(textPage);
+            Assert.IsFalse(textPage.IsPublished());
+        }
+        else
+        {
+            Assert.IsNull(textPage);
+        }
     }
 
     [Test]
@@ -324,7 +358,10 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
             TemplateKey = PublishedTextPage.TemplateKey,
         };
         await ContentEditingService.UpdateAsync(PublishedTextPage.Key.Value, updateModel, Constants.Security.SuperUserKey);
-        await ContentPublishingService.PublishAsync(PublishedTextPage.Key.Value, CultureAndSchedule, Constants.Security.SuperUserKey);
+        await ContentPublishingService.PublishAsync(
+            PublishedTextPage.Key.Value,
+            [new CulturePublishScheduleModel { Culture = "*" }],
+            Constants.Security.SuperUserKey);
 
         // Act
         var textPage = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPage.Key.Value, true);
@@ -345,7 +382,10 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
             TemplateKey = PublishedTextPage.TemplateKey,
         };
         await ContentEditingService.UpdateAsync(PublishedTextPage.Key.Value, updateModel, Constants.Security.SuperUserKey);
-        await ContentPublishingService.PublishAsync(PublishedTextPage.Key.Value, CultureAndSchedule, Constants.Security.SuperUserKey);
+        await ContentPublishingService.PublishAsync(
+            PublishedTextPage.Key.Value,
+            [new CulturePublishScheduleModel { Culture = "*" }],
+            Constants.Security.SuperUserKey);
 
         // Act
         var textPage = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPage.Key.Value);

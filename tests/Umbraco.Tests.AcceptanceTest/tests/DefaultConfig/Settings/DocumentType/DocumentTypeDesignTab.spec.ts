@@ -258,8 +258,7 @@ test('can remove a composition from a document type', async ({umbracoApi, umbrac
   await umbracoApi.documentType.ensureNameNotExists(compositionDocumentTypeName);
 });
 
-// Skip this flaky tests as sometimes the properties are not dragged correctly.
-test.skip('can reorder groups in a document type', async ({umbracoApi, umbracoUi}) => {
+test('can reorder groups in a document type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const secondGroupName = 'SecondGroup';
@@ -284,8 +283,7 @@ test.skip('can reorder groups in a document type', async ({umbracoApi, umbracoUi
   expect(await umbracoApi.documentType.doesDocumentTypeGroupNameContainCorrectSortOrder(documentTypeName, firstGroupValue, 1)).toBeTruthy();
 });
 
-// Skip this flaky tests as sometimes the properties are not dragged correctly.
-test.skip('can reorder properties in a document type', async ({umbracoApi, umbracoUi}) => {
+test('can reorder properties in a document type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const dataTypeNameTwo = "Second Color Picker";
@@ -309,8 +307,7 @@ test.skip('can reorder properties in a document type', async ({umbracoApi, umbra
   expect(documentTypeData.properties[1].name).toBe(dataTypeName);
 });
 
-// TODO: Remove skip when the frontend is ready. Currently it is impossible to reorder tab by drag and drop
-test.skip('can reorder tabs in a document type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test('can reorder tabs in a document type', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const secondTabName = 'SecondTab';
@@ -384,7 +381,7 @@ test('can enable validation for a property in a document type', {tag: '@release'
   // Act
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
   await umbracoUi.documentType.clickEditorSettingsButton();
-  await umbracoUi.documentType.selectValidationOption('');
+  await umbracoUi.documentType.selectValidationOption('.+');
   await umbracoUi.documentType.enterRegEx(regex);
   await umbracoUi.documentType.enterRegExMessage(regexMessage);
   await umbracoUi.documentType.clickSubmitButton();

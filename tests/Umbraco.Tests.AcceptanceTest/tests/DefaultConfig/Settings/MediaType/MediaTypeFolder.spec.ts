@@ -54,14 +54,14 @@ test('can rename a media type folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.mediaType.clickRootFolderCaretButton();
   await umbracoUi.mediaType.clickActionsMenuForName(oldFolderName);
   await umbracoUi.mediaType.clickUpdateActionMenuOption();
-  await umbracoUi.waitForTimeout(500);
   await umbracoUi.mediaType.enterFolderName(mediaTypeFolderName);
   await umbracoUi.mediaType.clickConfirmRenameButton();
 
   // Assert
   await umbracoUi.mediaType.waitForMediaTypeToBeRenamed();
-  const folder = await umbracoApi.mediaType.getByName(mediaTypeFolderName);
-  expect(folder.name).toBe(mediaTypeFolderName);
+  await umbracoUi.waitForTimeout(500); // Small wait to ensure the API has caught up
+  const folderData = await umbracoApi.mediaType.getByName(mediaTypeFolderName);
+  expect(folderData.name).toBe(mediaTypeFolderName);
   await umbracoUi.mediaType.isMediaTypeTreeItemVisible(oldFolderName, false);
   await umbracoUi.mediaType.isMediaTypeTreeItemVisible(mediaTypeFolderName, true);
 });

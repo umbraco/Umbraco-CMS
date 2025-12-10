@@ -1,6 +1,6 @@
+import type { Editor } from '../externals.js';
 import { UMB_TIPTAP_RTE_CONTEXT } from './tiptap-rte.context-token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbTiptapRteContext extends UmbContextBase {
