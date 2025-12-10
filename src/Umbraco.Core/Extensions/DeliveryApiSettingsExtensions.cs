@@ -32,10 +32,10 @@ public static class DeliveryApiSettingsExtensions
             return settings.AllowedContentTypeAliases.InvariantContains(contentTypeAlias);
         }
 
-        // Fall back to disallow list behavior
-        return settings.IsDisallowedContentType(contentTypeAlias) is false;
+        // Otherwise the content type is allowed if it's not in the disallow list
+        return settings.DisallowedContentTypeAliases.InvariantContains(contentTypeAlias) is false;
     }
 
     public static bool IsDisallowedContentType(this DeliveryApiSettings settings, string contentTypeAlias)
-        => settings.DisallowedContentTypeAliases.InvariantContains(contentTypeAlias);
+        => settings.IsAllowedContentType(contentTypeAlias) is false;
 }
