@@ -123,7 +123,7 @@ public class DistributedJobService : IDistributedJobService
         // Early exit if no registered jobs
         if (registeredJobsByName.Count is 0)
         {
-            _logger.LogInformation("Completed initializing distributed background jobs");
+            _logger.LogInformation("No distributed background jobs to initialize");
             return;
         }
 
