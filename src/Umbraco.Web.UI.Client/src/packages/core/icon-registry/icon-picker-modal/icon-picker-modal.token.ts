@@ -5,6 +5,7 @@ export interface UmbIconPickerModalData {
 	filter?: (item: UmbIconDefinition) => boolean;
 	placeholder?: string;
 	showEmptyOption?: boolean;
+	hideColors?: boolean;
 }
 
 export interface UmbIconPickerModalValue {
