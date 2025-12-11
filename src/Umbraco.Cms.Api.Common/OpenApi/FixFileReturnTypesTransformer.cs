@@ -9,7 +9,8 @@ namespace Umbraco.Cms.Api.Common.OpenApi;
 /// <summary>
 /// Transformer to fix file return types in OpenAPI schema.
 /// </summary>
-/// <remarks>Can be removed once https://github.com/dotnet/aspnetcore/pull/63504 is released.</remarks>
+/// <remarks>Can be removed once https://github.com/dotnet/aspnetcore/pull/63504 and
+/// https://github.com/dotnet/aspnetcore/pull/64562 are released.</remarks>
 public class FixFileReturnTypesTransformer : IOpenApiSchemaTransformer
 {
     private static readonly Type[] _binaryStringTypes =
