@@ -15,6 +15,7 @@ import '../ref-rte-block/index.js';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
 import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
 import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
+import { UMB_CLIPBOARD_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/clipboard';
 
 /**
  * @class UmbBlockRteEntryElement
@@ -95,11 +96,17 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		this.requestUpdate('_blockViewProps');
 	}
 
+	#clipboardContext?: typeof UMB_CLIPBOARD_PROPERTY_CONTEXT.TYPE;
+
 	constructor() {
 		super();
 
 		// We do not have index for RTE Blocks at the moment.
 		this.#context.setIndex(0);
+
+		this.consumeContext(UMB_CLIPBOARD_PROPERTY_CONTEXT, (clipboardContext) => {
+			this.#clipboardContext = clipboardContext;
+		});
 
 		this.observe(
 			this.#context.showContentEdit,
@@ -243,6 +250,11 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	}
 
 	async #copyToClipboard() {
+		if (!this.#clipboardContext) {
+			console.warn('Clipboard context is not available.');
+			return;
+		}
+
 	}
 
 	readonly #filterBlockCustomViews = (manifest: ManifestBlockEditorCustomView) => {
@@ -361,6 +373,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	}
 
 	#renderCopyToClipboardAction() {
+		if (!this.#clipboardContext) return nothing;
 		return html`
 			<uui-button
 				label=${this.localize.term('clipboard_labelForCopyToClipboard')}
