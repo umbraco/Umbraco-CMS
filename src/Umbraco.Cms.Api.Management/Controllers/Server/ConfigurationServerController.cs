@@ -2,10 +2,12 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Management.Security;
 using Umbraco.Cms.Api.Management.ViewModels.Server;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 namespace Umbraco.Cms.Api.Management.Controllers.Server;
 
@@ -23,6 +25,12 @@ public class ConfigurationServerController : ServerControllerBase
         _globalSettings = globalSettings.Value;
         _externalLoginProviders = externalLoginProviders;
         _hostingEnvironment = hostingEnvironment;
+    }
+
+    [Obsolete("Please use the constructor with IHostingEnvironment. Scheduled to be removed in V18")]
+    public ConfigurationServerController(IOptions<SecuritySettings> securitySettings, IOptions<GlobalSettings> globalSettings, IBackOfficeExternalLoginProviders externalLoginProviders)
+        : this(securitySettings, globalSettings, externalLoginProviders, StaticServiceProvider.Instance.GetRequiredService<IHostingEnvironment>())
+    {
     }
 
     [AllowAnonymous]
