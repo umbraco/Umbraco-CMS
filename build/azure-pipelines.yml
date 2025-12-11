@@ -220,7 +220,7 @@ stages:
             inputs:
               targetType: inline
               script: |
-                dotnet tool update -g docfx
+                dotnet tool update -g docfx --version 2.74.1  # Pinned to 2.74.1 due to issues with later versions hanging on AzureDevOps. See: https://github.com/dotnet/docfx/issues/10144#issuecomment-2446499459
                 if ($lastexitcode -ne 0){
                     throw ("Error installing DocFX")
                 }
