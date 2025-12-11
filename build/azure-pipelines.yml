@@ -225,6 +225,26 @@ stages:
                     throw ("Error installing DocFX")
                 }
           - task: PowerShell@2
+            displayName: Disable NBGV cloud build features  # Nerdbank Gitversioning and docfx appear not to play together nicely,
+                                                            # at least when running on AzureDevOps (there are no problems running it locally).
+                                                            # So we rewrite `version.json` to include configuration to disable the parts
+                                                            # that block docfx from working.
+                                                            # See: https://github.com/dotnet/docfx/issues/10144#issuecomment-2446499459
+            inputs:
+              targetType: inline
+              script: |
+                $versionJsonPath = "$(Build.SourcesDirectory)/version.json"
+                $versionJson = Get-Content $versionJsonPath | ConvertFrom-Json
+                $versionJson.cloudBuild = @{
+                    setVersionVariables = $false
+                    buildNumber = @{
+                        enabled = $false
+                    }
+                }
+                $versionJson | ConvertTo-Json -Depth 10 | Set-Content $versionJsonPath
+                Write-Host "Updated version.json to disable NBGV cloud build features"
+                Get-Content $versionJsonPath
+          - task: PowerShell@2
             displayName: Generate metadata
             inputs:
               targetType: inline
