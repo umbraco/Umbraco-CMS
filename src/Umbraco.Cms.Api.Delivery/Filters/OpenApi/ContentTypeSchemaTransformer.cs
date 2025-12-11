@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi;
-using Umbraco.Cms.Api.Common.Configuration;
+using Umbraco.Cms.Api.Common.OpenApi;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.DeliveryApi;
@@ -21,6 +21,7 @@ public class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApiD
 {
     private const string CustomRecursiveRefKey = "x-recursive-ref";
     private readonly IContentTypeSchemaService _contentTypeSchemaService;
+    private readonly ISchemaIdSelector _schemaIdSelector;
     private readonly HashSet<string> _handledSchemas = [];
     private readonly IJsonTypeInfoResolver _jsonTypeInfoResolver;
     private readonly JsonSerializerOptions _serializerOptions;
@@ -29,12 +30,15 @@ public class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApiD
     /// Initializes a new instance of the <see cref="ContentTypeSchemaTransformer"/> class.
     /// </summary>
     /// <param name="contentTypeSchemaService">The content type info service.</param>
+    /// <param name="schemaIdSelector">The schema ID selector.</param>
     /// <param name="jsonOptionsMonitor">The JSON options monitor.</param>
     public ContentTypeSchemaTransformer(
         IContentTypeSchemaService contentTypeSchemaService,
+        ISchemaIdSelector schemaIdSelector,
         IOptionsMonitor<JsonOptions> jsonOptionsMonitor)
     {
         _contentTypeSchemaService = contentTypeSchemaService;
+        _schemaIdSelector = schemaIdSelector;
         _serializerOptions = jsonOptionsMonitor
             .Get(Constants.JsonOptionsNames.DeliveryApi)
             .SerializerOptions;
@@ -213,8 +217,11 @@ public class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApiD
         return schema;
     }
 
-    private static string? GetSchemaId(JsonTypeInfo type)
-        => ConfigureUmbracoOpenApiOptionsBase.CreateSchemaReferenceId(type);
+    private string? GetSchemaId(JsonTypeInfo type)
+    {
+        var defaultSchemaReferenceId = OpenApiOptions.CreateDefaultSchemaReferenceId(type);
+        return defaultSchemaReferenceId is null ? null : _schemaIdSelector.SchemaId(type.Type);
+    }
 
     private static OpenApiSchema GetPlaceholderSchema(string schemaId)
         => new()
