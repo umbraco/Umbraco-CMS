@@ -114,7 +114,7 @@ internal sealed class ContentApiTransformer : DeliveryApiTransformerBase
     private Dictionary<string, IOpenApiExample> FetchQueryParameterExamples() =>
         new()
         {
-            { "Select all", new OpenApiExample { Value = null } },
+            { "Select all", new OpenApiExample { Value = "" } },
             { "Select all ancestors of a node by id", new OpenApiExample { Value = "ancestors:id" } },
             { "Select all ancestors of a node by path", new OpenApiExample { Value = "ancestors:path" } },
             { "Select all children of a node by id", new OpenApiExample { Value = "children:id" } },
@@ -126,7 +126,7 @@ internal sealed class ContentApiTransformer : DeliveryApiTransformerBase
     private Dictionary<string, IOpenApiExample> FilterQueryParameterExamples() =>
         new()
         {
-            { "Default filter", new OpenApiExample { Value = new JsonArray() } },
+            { "Default filter", new OpenApiExample { Value = new JsonArray("") } },
             { "Filter by content type (equals)", new OpenApiExample { Value = new JsonArray("contentType:alias1") } },
             { "Filter by name (contains)", new OpenApiExample { Value = new JsonArray("name:nodeName") } },
             { "Filter by creation date (less than)", new OpenApiExample { Value = new JsonArray("createDate<2024-01-01") } },
@@ -136,7 +136,7 @@ internal sealed class ContentApiTransformer : DeliveryApiTransformerBase
     private Dictionary<string, IOpenApiExample> SortQueryParameterExamples() =>
         new()
         {
-            { "Default sort", new OpenApiExample { Value = new JsonArray() } },
+            { "Default sort", new OpenApiExample { Value = new JsonArray("") } },
             { "Sort by create date", new OpenApiExample { Value = new JsonArray("createDate:asc", "createDate:desc") } },
             { "Sort by level", new OpenApiExample { Value = new JsonArray("level:asc", "level:desc") } },
             { "Sort by name", new OpenApiExample { Value = new JsonArray("name:asc", "name:desc") } },
