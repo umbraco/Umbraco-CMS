@@ -13,7 +13,9 @@
             "**/Umbraco.Web.csproj",
             "**/Umbraco.Web.UI.csproj",
             "**/Umbraco.Cms.StaticAssets.csproj",
-            "**/JsonSchema.csproj"
+            "**/JsonSchema.csproj",
+            "**/Umbraco.Cms.csproj",
+            "**/Umbraco.Cms.Targets.csproj"
           ]
         }
       ],
