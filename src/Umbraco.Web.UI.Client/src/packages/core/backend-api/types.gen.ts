@@ -6738,7 +6738,7 @@ export type PutDocumentTypeByIdMoveResponses = {
 };
 
 export type PostDocumentTypeByIdTemplateData = {
-    body?: CreateDocumentTypeTemplateRequestModel;
+    body: CreateDocumentTypeTemplateRequestModel;
     path: {
         id: string;
     };
