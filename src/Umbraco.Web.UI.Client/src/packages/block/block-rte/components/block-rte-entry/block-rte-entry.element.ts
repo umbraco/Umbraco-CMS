@@ -242,6 +242,9 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		this.setAttribute('contenteditable', 'false');
 	}
 
+	async #copyToClipboard() {
+	}
+
 	readonly #filterBlockCustomViews = (manifest: ManifestBlockEditorCustomView) => {
 		const elementTypeAlias = this._contentTypeAlias ?? '';
 		const isForBlockEditor =
@@ -291,9 +294,12 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	}
 
 	#renderActionBar() {
-		return this._showActions
-			? html`<uui-action-bar>${this.#renderEditAction()}${this.#renderEditSettingsAction()}</uui-action-bar>`
-			: nothing;
+		if (!this._showActions) return nothing;
+		return html`
+			<uui-action-bar>
+				${this.#renderEditAction()} ${this.#renderEditSettingsAction()} ${this.#renderCopyToClipboardAction()}
+			</uui-action-bar>
+		`;
 	}
 
 	#renderBuiltinBlockView = () => {
@@ -351,6 +357,17 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 							: nothing}
 					</uui-button>`
 				: nothing}
+		`;
+	}
+
+	#renderCopyToClipboardAction() {
+		return html`
+			<uui-button
+				label=${this.localize.term('clipboard_labelForCopyToClipboard')}
+				look="secondary"
+				@click=${() => this.#copyToClipboard()}>
+				<uui-icon name="icon-clipboard-copy"></uui-icon>
+			</uui-button>
 		`;
 	}
 
