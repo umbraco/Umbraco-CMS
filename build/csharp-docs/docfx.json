@@ -22,7 +22,8 @@
       "dest": "api",
       "filter": "docfx.filter.yml",
       "properties": {
-        "TargetFramework": "net10.0"
+        "TargetFramework": "net10.0",
+        "GitVersion": "false"
       },
       "disableGitFeatures": true
     }
