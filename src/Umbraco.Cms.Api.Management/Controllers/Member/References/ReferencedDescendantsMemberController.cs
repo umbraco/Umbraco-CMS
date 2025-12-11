@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.ViewModels;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Member.References;
 
@@ -15,23 +17,16 @@ public class ReferencedDescendantsMemberController : MemberControllerBase
     private readonly ITrackedReferencesService _trackedReferencesSkipTakeService;
     private readonly IUmbracoMapper _umbracoMapper;
 
-    public ReferencedDescendantsMemberController(ITrackedReferencesService trackedReferencesSkipTakeService, IUmbracoMapper umbracoMapper)
+    public ReferencedDescendantsMemberController(
+        ITrackedReferencesService trackedReferencesSkipTakeService,
+        IUmbracoMapper umbracoMapper)
     {
         _trackedReferencesSkipTakeService = trackedReferencesSkipTakeService;
         _umbracoMapper = umbracoMapper;
     }
 
-    /// <summary>
-    ///     Gets a page list of the child nodes of the current item used in any kind of relation.
-    /// </summary>
-    /// <remarks>
-    ///     Used when deleting and unpublishing a single item to check if this item has any descending items that are in any
-    ///     kind of relation.
-    ///     This is basically finding the descending items which are children in relations.
-    /// </remarks>
-    [HttpGet("{id:guid}/referenced-descendants")]
-    [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(PagedViewModel<ReferenceByIdModel>), StatusCodes.Status200OK)]
+    [Obsolete("Use the ReferencedDescendants2 action method instead. Scheduled for removal in Umbraco 19, when ReferencedDescendants2 will be renamed back to ReferencedDescendants.")]
+    [NonAction]
     public async Task<ActionResult<PagedViewModel<ReferenceByIdModel>>> ReferencedDescendants(
         CancellationToken cancellationToken,
         Guid id,
@@ -46,5 +41,39 @@ public class ReferencedDescendantsMemberController : MemberControllerBase
         };
 
         return pagedViewModel;
+    }
+
+    /// <summary>
+    ///     Gets a page list of the child nodes of the current item used in any kind of relation.
+    /// </summary>
+    /// <remarks>
+    ///     Used when deleting and unpublishing a single item to check if this item has any descending items that are in any
+    ///     kind of relation.
+    ///     This is basically finding the descending items which are children in relations.
+    /// </remarks>
+    [HttpGet("{id:guid}/referenced-descendants")]
+    [MapToApiVersion("1.0")]
+    [ProducesResponseType(typeof(PagedViewModel<ReferenceByIdModel>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> ReferencedDescendants2(
+        CancellationToken cancellationToken,
+        Guid id,
+        int skip = 0,
+        int take = 20)
+    {
+        Attempt<PagedModel<RelationItemModel>, GetReferencesOperationStatus> relationItemsAttempt = await _trackedReferencesSkipTakeService.GetPagedDescendantsInReferencesAsync(id, UmbracoObjectTypes.Member, skip, take, true);
+
+        if (relationItemsAttempt.Success is false)
+        {
+            return GetReferencesOperationStatusResult(relationItemsAttempt.Status);
+        }
+
+        var pagedViewModel = new PagedViewModel<ReferenceByIdModel>
+        {
+            Total = relationItemsAttempt.Result.Total,
+            Items = _umbracoMapper.MapEnumerable<RelationItemModel, ReferenceByIdModel>(relationItemsAttempt.Result.Items),
+        };
+
+        return Ok(pagedViewModel);
     }
 }

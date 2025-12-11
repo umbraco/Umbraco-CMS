@@ -28,6 +28,12 @@ export interface UmbDocumentTypeAvailableCompositionRequestModel
 	isElement: boolean;
 }
 
+export type UmbDocumentTypeTemplateModel = {
+	isDefault: boolean;
+	alias: string;
+	name: string;
+};
+
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbDocumentTypeCompositionCompatibleModel extends UmbContentTypeCompositionCompatibleModel {}
 
