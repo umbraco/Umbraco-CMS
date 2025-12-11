@@ -306,6 +306,9 @@ export class UmbViewController extends UmbControllerBase {
 			return;
 		}
 		const localTitle = this.getComputedTitle();
+		if (!localTitle) {
+			return;
+		}
 		document.title = (localTitle ? localTitle + ' | ' : '') + 'Umbraco';
 	}
 
