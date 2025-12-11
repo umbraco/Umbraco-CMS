@@ -368,7 +368,19 @@ angular.module("umbraco")
             }
 
             function onUploadComplete(files) {
+
+                // Refresh the current folder to get updated pagination info.
                 gotoFolder($scope.currentFolder).then(function () {
+
+                    // If there are multiple pages, navigate to the last page where new uploads appear.
+                    if (vm.searchOptions.totalPages > 1) {
+                        vm.searchOptions.pageNumber = vm.searchOptions.totalPages;
+                        return getChildren($scope.currentFolder.id);
+                    }
+
+                }).then(function () {
+
+                    // Select the newly uploaded items.
                     $timeout(function () {
                         if ($scope.multiPicker) {
                             var images = _.rest(_.sortBy($scope.images, 'id'), $scope.images.length - files.length);
@@ -378,6 +390,7 @@ angular.module("umbraco")
                             clickHandler(image);
                         }
                     });
+
                 });
             }
 
