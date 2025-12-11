@@ -161,7 +161,7 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
             {
                 // if the cache contains the (proper version of the) item, use it
                 IMedia? cached =
-                    IsolatedCache.GetCacheItem<IMedia>(Core.Persistence.Repositories.RepositoryCacheKeys.GetKey<IMedia, int>(dto.NodeId));
+                    IsolatedCache.GetCacheItem<IMedia>(RepositoryCacheKeys.GetKey<IMedia, int>(dto.NodeId));
                 if (cached != null && cached.VersionId == dto.ContentVersionDto.Id)
                 {
                     content[i] = (Core.Models.Media)cached;
@@ -567,7 +567,7 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
         // We need to flush the isolated cache by key explicitly here.
         // The MediaCacheRefresher does the same thing, but by the time it's invoked, custom notification handlers
         // might have already consumed the cached version (which at this point is the previous version).
-        IsolatedCache.ClearByKey(Core.Persistence.Repositories.RepositoryCacheKeys.GetKey<IMedia, Guid>(entity.Key));
+        IsolatedCache.ClearByKey(RepositoryCacheKeys.GetKey<IMedia, Guid>(entity.Key));
     }
 
     protected override void PersistDeletedItem(IMedia entity)
