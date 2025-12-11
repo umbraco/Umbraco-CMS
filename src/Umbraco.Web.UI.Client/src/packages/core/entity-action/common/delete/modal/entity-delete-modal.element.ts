@@ -42,7 +42,9 @@ export class UmbEntityDeleteModalElement<
 	}
 
 	override render() {
-		const headline = 'Base delete modal'; //this.data?.headline ?? '#actions_delete';
+		const headline = this.data?.headline
+			? this.localize.string(this.data.headline)
+			: this.localize.string('#actions_delete');
 
 		const isNotDeletable = this._isDeletable === false;
 

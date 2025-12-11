@@ -22,7 +22,7 @@ export class UmbDeleteWithRelationConfirmModalElement extends UmbEntityDeleteMod
 	}
 
 	override render() {
-		const headline = 'Delete with relations'; //this.data?.headline ?? '#actions_delete';
+		const headline = this.localize.string('#actions_delete');
 		const isNotDeletable = this._isDeletable === false;
 
 		const message = isNotDeletable
