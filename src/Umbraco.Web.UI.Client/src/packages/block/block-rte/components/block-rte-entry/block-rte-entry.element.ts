@@ -1,5 +1,5 @@
-import type { UmbBlockRteLayoutModel } from '../../types.js';
-import { UMB_BLOCK_RTE } from '../../constants.js';
+import type { UmbBlockRteLayoutModel, UmbBlockRteValueModel } from '../../types.js';
+import { UMB_BLOCK_RTE, UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../../constants.js';
 import { UmbBlockRteEntryContext } from '../../context/block-rte-entry.context.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { html, css, property, state, customElement, nothing } from '@umbraco-cms/backoffice/external/lit';
@@ -10,12 +10,13 @@ import type {
 	UmbBlockEditorCustomViewProperties,
 } from '@umbraco-cms/backoffice/block-custom-view';
 import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
-
-import '../ref-rte-block/index.js';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
 import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
 import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UMB_CLIPBOARD_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/clipboard';
+import { UMB_PROPERTY_DATASET_CONTEXT, UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
+
+import '../ref-rte-block/index.js';
 
 /**
  * @class UmbBlockRteEntryElement
@@ -255,6 +256,34 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			return;
 		}
 
+		const propertyDatasetContext = await this.getContext(UMB_PROPERTY_DATASET_CONTEXT);
+		const propertyContext = await this.getContext(UMB_PROPERTY_CONTEXT);
+		if (!propertyDatasetContext || !propertyContext) {
+			throw new Error('Could not get required contexts to copy.');
+		}
+
+		const workspaceName = propertyDatasetContext?.getName();
+		const propertyLabel = propertyContext?.getLabel();
+		const blockLabel = this.#context.getName();
+		const entryName = [workspaceName, propertyLabel, blockLabel].filter(Boolean).join(' - ');
+		const content = this.#context.getContent();
+		const layout = this.#context.getLayout();
+		const settings = this.#context.getSettings();
+		const expose = this.#context.getExpose();
+		const propertyValue: UmbBlockRteValueModel = {
+			contentData: content ? [structuredClone(content)] : [],
+			layout: { [UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS]: layout ? [structuredClone(layout)] : undefined },
+			settingsData: settings ? [structuredClone(settings)] : [],
+			expose: expose ? [structuredClone(expose)] : [],
+		};
+		const editorUiManifest = propertyContext.getEditorManifest();
+
+		this.#clipboardContext.write({
+			icon: this._icon,
+			name: entryName,
+			propertyValue,
+			propertyEditorUiAlias: editorUiManifest?.alias ?? '',
+		});
 	}
 
 	readonly #filterBlockCustomViews = (manifest: ManifestBlockEditorCustomView) => {
