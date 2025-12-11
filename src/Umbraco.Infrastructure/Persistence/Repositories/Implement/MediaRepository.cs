@@ -161,7 +161,7 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
             {
                 // if the cache contains the (proper version of the) item, use it
                 IMedia? cached =
-                    IsolatedCache.GetCacheItem<IMedia>(RepositoryCacheKeys.GetKey<IMedia, int>(dto.NodeId));
+                    IsolatedCache.GetCacheItem<IMedia>(Core.Persistence.Repositories.RepositoryCacheKeys.GetKey<IMedia, int>(dto.NodeId));
                 if (cached != null && cached.VersionId == dto.ContentVersionDto.Id)
                 {
                     content[i] = (Core.Models.Media)cached;
@@ -567,7 +567,7 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
         // We need to flush the isolated cache by key explicitly here.
         // The MediaCacheRefresher does the same thing, but by the time it's invoked, custom notification handlers
         // might have already consumed the cached version (which at this point is the previous version).
-        IsolatedCache.ClearByKey(RepositoryCacheKeys.GetKey<IMedia, Guid>(entity.Key));
+        IsolatedCache.ClearByKey(Core.Persistence.Repositories.RepositoryCacheKeys.GetKey<IMedia, Guid>(entity.Key));
     }
 
     protected override void PersistDeletedItem(IMedia entity)
@@ -628,7 +628,7 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
         }
     }
 
-    private static string GetCacheKey(int id) => $"uRepo_{nameof(IMedia)}_{id}";
+    private static string GetCacheKey(int id) => RepositoryCacheKeys.GetKey<IMedia>() + id;
 
     // A reading repository purely for looking up by GUID
     // TODO: This is ugly and to fix we need to decouple the IRepositoryQueryable -> IRepository -> IReadRepository which should all be separate things!
@@ -732,7 +732,7 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
             }
         }
 
-        private static string GetCacheKey(Guid key) => $"uRepo_{nameof(IMedia)}_{key}";
+        private static string GetCacheKey(Guid key) => RepositoryCacheKeys.GetKey<IMedia>() + key;
     }
 
     #endregion

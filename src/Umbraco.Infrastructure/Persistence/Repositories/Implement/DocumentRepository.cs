@@ -261,7 +261,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             {
                 // if the cache contains the (proper version of the) item, use it
                 IContent? cached =
-                    IsolatedCache.GetCacheItem<IContent>(RepositoryCacheKeys.GetKey<IContent, int>(dto.NodeId));
+                    IsolatedCache.GetCacheItem<IContent>(Core.Persistence.Repositories.RepositoryCacheKeys.GetKey<IContent, int>(dto.NodeId));
                 if (cached != null && cached.VersionId == dto.DocumentVersionDto.ContentVersionDto.Id)
                 {
                     content[i] = (Content)cached;
@@ -1404,7 +1404,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         // We need to flush the isolated cache by key explicitly here.
         // The ContentCacheRefresher does the same thing, but by the time it's invoked, custom notification handlers
         // might have already consumed the cached version (which at this point is the previous version).
-        IsolatedCache.ClearByKey(RepositoryCacheKeys.GetKey<IContent, Guid>(entity.Key));
+        IsolatedCache.ClearByKey(Core.Persistence.Repositories.RepositoryCacheKeys.GetKey<IContent, Guid>(entity.Key));
 
         // troubleshooting
         //if (Database.ExecuteScalar<int>($"SELECT COUNT(*) FROM {Constants.DatabaseSchema.Tables.DocumentVersion} JOIN {Constants.DatabaseSchema.Tables.ContentVersion} ON {Constants.DatabaseSchema.Tables.DocumentVersion}.id={Constants.DatabaseSchema.Tables.ContentVersion}.id WHERE published=1 AND nodeId=" + content.Id) > 1)
@@ -1649,7 +1649,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         }
     }
 
-    private static string GetCacheKey(int id) => $"uRepo_{nameof(IContent)}_{id}";
+    private static string GetCacheKey(int id) => RepositoryCacheKeys.GetKey<IContent>() + id;
 
     // reading repository purely for looking up by GUID
     // TODO: ugly and to fix we need to decouple the IRepositoryQueryable -> IRepository -> IReadRepository which should all be separate things!
@@ -1753,7 +1753,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             }
         }
 
-        private static string GetCacheKey(Guid key) => $"uRepo_{nameof(IContent)}_{key}";
+        private static string GetCacheKey(Guid key) => RepositoryCacheKeys.GetKey<IContent>() + key;
     }
 
     #endregion
