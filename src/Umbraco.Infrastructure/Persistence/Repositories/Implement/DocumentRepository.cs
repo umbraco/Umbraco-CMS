@@ -1628,7 +1628,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
     /// Populates the int-keyed cache with the given entity.
     /// This allows entities retrieved by GUID to also be cached for int ID lookups.
     /// </summary>
-    private void PopulateCacheById(IContent entity)
+    private void PopulateCache(IContent entity)
     {
         if (entity.HasIdentity)
         {
@@ -1641,11 +1641,11 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
     /// Populates the int-keyed cache with the given entities.
     /// This allows entities retrieved by GUID to also be cached for int ID lookups.
     /// </summary>
-    private void PopulateCacheById(IEnumerable<IContent> entities)
+    private void PopulateCache(IEnumerable<IContent> entities)
     {
         foreach (IContent entity in entities)
         {
-            PopulateCacheById(entity);
+            PopulateCache(entity);
         }
     }
 
@@ -1688,7 +1688,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             IContent content = _outerRepo.MapDtoToContent(dto);
 
             // Also populate the int-keyed cache so subsequent lookups by int ID don't hit the database
-            _outerRepo.PopulateCacheById(content);
+            _outerRepo.PopulateCache(content);
 
             return content;
         }
@@ -1705,7 +1705,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             IEnumerable<IContent> contents = _outerRepo.MapDtosToContent(Database.Fetch<DocumentDto>(sql));
 
             // Also populate the int-keyed cache so subsequent lookups by int ID don't hit the database
-            _outerRepo.PopulateCacheById(contents);
+            _outerRepo.PopulateCache(contents);
 
             return contents;
         }
