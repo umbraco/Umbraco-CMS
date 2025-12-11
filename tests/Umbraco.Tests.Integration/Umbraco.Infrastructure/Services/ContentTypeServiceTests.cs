@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -2028,6 +2029,116 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         Assert.That(ctBase.PropertyTypes.Count(), Is.EqualTo(1));
         Assert.That(ctBase.PropertyTypes.First().DataTypeId, Is.EqualTo(dtdYesNo.Id));
         Assert.That(ctBase.PropertyTypes.First().PropertyEditorAlias, Is.EqualTo(dtdYesNo.EditorAlias));
+    }
+
+    [Test]
+    public async Task CreateTemplateAsync_Success()
+    {
+        // Arrange
+        IContentType contentType = ContentTypeBuilder.CreateBasicContentType();
+        ContentTypeService.Save(contentType);
+
+        // Act
+        var result = await ContentTypeService.CreateTemplateAsync(
+            contentType.Key,
+            "Test Template",
+            "testTemplate",
+            isDefaultTemplate: false,
+            Constants.Security.SuperUserKey);
+
+        // Assert
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.Not.Null);
+        Assert.That(result.Status, Is.EqualTo(ContentTypeOperationStatus.Success));
+
+        // Verify template was associated with content type
+        var updatedContentType = ContentTypeService.Get(contentType.Key);
+        Assert.That(updatedContentType!.AllowedTemplates.Any(t => t.Key == result.Result), Is.True);
+    }
+
+    [Test]
+    public async Task CreateTemplateAsync_ContentTypeNotFound_ReturnsNotFound()
+    {
+        // Arrange
+        var nonExistentKey = Guid.NewGuid();
+
+        // Act
+        var result = await ContentTypeService.CreateTemplateAsync(
+            nonExistentKey,
+            "Test Template",
+            "testTemplate",
+            isDefaultTemplate: false,
+            Constants.Security.SuperUserKey);
+
+        // Assert
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentTypeOperationStatus.NotFound));
+    }
+
+    [Test]
+    public async Task CreateTemplateAsync_EmptyAlias_ReturnsInvalidTemplateAlias()
+    {
+        // Arrange
+        IContentType contentType = ContentTypeBuilder.CreateBasicContentType();
+        ContentTypeService.Save(contentType);
+
+        // Act - use an empty alias which is invalid
+        var result = await ContentTypeService.CreateTemplateAsync(
+            contentType.Key,
+            "Test Template",
+            "   ",
+            isDefaultTemplate: false,
+            Constants.Security.SuperUserKey);
+
+        // Assert
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentTypeOperationStatus.InvalidTemplateAlias));
+    }
+
+    [Test]
+    public async Task CreateTemplateAsync_TooLongAlias_ReturnsInvalidTemplateAlias()
+    {
+        // Arrange
+        IContentType contentType = ContentTypeBuilder.CreateBasicContentType();
+        ContentTypeService.Save(contentType);
+
+        // Act - use an alias that exceeds the maximum length (255 characters)
+        var tooLongAlias = new string('a', 300);
+        var result = await ContentTypeService.CreateTemplateAsync(
+            contentType.Key,
+            "Test Template",
+            tooLongAlias,
+            isDefaultTemplate: false,
+            Constants.Security.SuperUserKey);
+
+        // Assert
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentTypeOperationStatus.InvalidTemplateAlias));
+    }
+
+    [Test]
+    public async Task CreateTemplateAsync_WithIsDefault_SetsAsDefaultTemplate()
+    {
+        // Arrange
+        IContentType contentType = ContentTypeBuilder.CreateBasicContentType();
+        ContentTypeService.Save(contentType);
+
+        // Act
+        var result = await ContentTypeService.CreateTemplateAsync(
+            contentType.Key,
+            "Default Template",
+            "defaultTemplate",
+            isDefaultTemplate: true,
+            Constants.Security.SuperUserKey);
+
+        // Assert
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.Not.Null);
+
+        // Verify template was set as default
+        var updatedContentType = ContentTypeService.Get(contentType.Key);
+        Assert.That(updatedContentType!.DefaultTemplate, Is.Not.Null);
+        Assert.That(updatedContentType.DefaultTemplate!.Key, Is.EqualTo(result.Result));
     }
 
     private ContentType CreateComponent()

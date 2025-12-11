@@ -69,6 +69,9 @@ export class UmbUserTableCollectionViewElement extends UmbLitElement {
 	@state()
 	private _selection: Array<string | null> = [];
 
+	@state()
+	private _itemHrefs: Map<string, string> = new Map();
+
 	#collectionContext?: UmbUserCollectionContext;
 
 	constructor() {
@@ -83,8 +86,9 @@ export class UmbUserTableCollectionViewElement extends UmbLitElement {
 			);
 			this.observe(
 				this.#collectionContext?.items,
-				(items) => {
+				async (items) => {
 					this._users = items ?? [];
+					await this.#updateItemHrefs();
 					this.#observeUserGroups();
 				},
 				'umbCollectionItemsObserver',
@@ -116,6 +120,17 @@ export class UmbUserTableCollectionViewElement extends UmbLitElement {
 			.join(', ');
 	}
 
+	async #updateItemHrefs() {
+		const hrefs = new Map<string, string>();
+		for (const user of this._users) {
+			const href = await this.#collectionContext?.requestItemHref?.(user);
+			if (href && user.unique) {
+				hrefs.set(user.unique, href);
+			}
+		}
+		this._itemHrefs = hrefs;
+	}
+
 	#createTableItems() {
 		this._tableItems = this._users.map((user) => {
 			return {
@@ -129,6 +144,7 @@ export class UmbUserTableCollectionViewElement extends UmbLitElement {
 							name: user.name,
 							avatarUrls: user.avatarUrls,
 							kind: user.kind,
+							href: user.unique ? this._itemHrefs.get(user.unique) : undefined,
 						},
 					},
 					{

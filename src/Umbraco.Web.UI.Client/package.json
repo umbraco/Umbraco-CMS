@@ -273,6 +273,14 @@
 	"msw": {
 		"workerDirectory": "public"
 	},
+	"keywords": [
+		"Umbraco",
+		"CMS",
+		"Backoffice",
+		"Content Management System",
+		"Web Components",
+		"Extensions"
+	],
 	"publishConfig": {
 		"access": "public",
 		"registry": "https://registry.npmjs.org/"
