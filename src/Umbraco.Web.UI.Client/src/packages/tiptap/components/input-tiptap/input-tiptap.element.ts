@@ -1,4 +1,5 @@
 import { Editor } from '../../externals.js';
+import { UmbTiptapUmbracoPathConfigRepository } from '../../config/config.repository.js';
 import { UmbTiptapRteContext } from '../../contexts/tiptap-rte.context.js';
 import type { AnyExtension } from '../../externals.js';
 import type { UmbTiptapExtensionApi } from '../../extensions/types.js';
@@ -27,15 +28,17 @@ import '../statusbar/tiptap-statusbar.element.js';
 const TIPTAP_CORE_EXTENSION_ALIAS = 'Umb.Tiptap.RichTextEssentials';
 
 /**
- * The root path for the stylesheets on the server.
- * This is used to load the stylesheets from the server as a workaround until the server supports virtual paths.
+ * The default root path for the stylesheets on the server.
+ * This is used as a fallback if the server configuration is not available.
  */
-
+const DEFAULT_STYLESHEET_ROOT_PATH = '/css';
 @customElement('umb-input-tiptap')
 export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof UmbLitElement, string>(UmbLitElement) {
 	#context = new UmbTiptapRteContext(this);
+	#umbracoPathConfigRepository = new UmbTiptapUmbracoPathConfigRepository(this);
 
 	#stylesheets = new Set(['/umbraco/backoffice/css/rte-content.css']);
+	#stylesheetRootPath = DEFAULT_STYLESHEET_ROOT_PATH;
 
 	@property({ type: String })
 	override set value(value: string) {
@@ -100,7 +103,16 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	}
 
 	protected override async firstUpdated() {
-		await Promise.all([await this.#loadExtensions(), await this.#loadEditor()]);
+		await Promise.all([this.#loadUmbracoPathConfig(), this.#loadExtensions()]);
+		await this.#loadEditor();
+	}
+
+	async #loadUmbracoPathConfig() {
+		await this.#umbracoPathConfigRepository.initialized;
+		const config = await this.#umbracoPathConfigRepository.requestUmbracoPathConfiguration();
+		if (config?.umbracoCssPath) {
+			this.#stylesheetRootPath = config.umbracoCssPath;
+		}
 	}
 
 	/**
@@ -144,7 +156,10 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 		const stylesheets = this.configuration?.getValueByAlias<Array<string>>('stylesheets');
 		if (stylesheets?.length) {
 			stylesheets.forEach((stylesheet) => {
-				const linkHref = stylesheet.startsWith('http') ? stylesheet : `${stylesheet}`;
+				const linkHref =
+					stylesheet.startsWith('http') || stylesheet.startsWith(this.#stylesheetRootPath)
+						? stylesheet
+						: `${this.#stylesheetRootPath}${stylesheet}`;
 				this.#stylesheets.add(linkHref);
 			});
 		}

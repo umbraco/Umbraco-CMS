@@ -2315,6 +2315,7 @@ export type ServerConfigurationResponseModel = {
     allowPasswordReset: boolean;
     versionCheckPeriod: number;
     allowLocalLogin: boolean;
+    umbracoCssPath: string;
 };
 
 export type ServerInformationResponseModel = {
