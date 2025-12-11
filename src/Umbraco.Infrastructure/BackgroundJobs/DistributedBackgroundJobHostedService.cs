@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
@@ -22,10 +21,6 @@ public class DistributedBackgroundJobHostedService : BackgroundService
     /// <summary>
     /// Initializes a new instance of the <see cref="DistributedBackgroundJobHostedService"/> class.
     /// </summary>
-    /// <param name="logger"></param>
-    /// <param name="runtimeState"></param>
-    /// <param name="distributedJobService"></param>
-    /// <param name="distributedJobSettings"></param>
     public DistributedBackgroundJobHostedService(
         ILogger<DistributedBackgroundJobHostedService> logger,
         IRuntimeState runtimeState,
