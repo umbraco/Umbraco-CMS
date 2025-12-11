@@ -1,4 +1,5 @@
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
+import type { UmbIconDefinition } from '../types.js';
 
 export interface UmbIconPickerModalData {
 	filter?: (item: UmbIconDefinition) => boolean;
