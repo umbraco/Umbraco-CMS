@@ -38,10 +38,10 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 		super();
 		this.consumeContext(UMB_ICON_REGISTRY_CONTEXT, (context) => {
 			this.observe(context?.approvedIcons, (icons) => {
-				this.#icons = icons;
-				if (this.data?.filter) {
-					this.#icons = this.#icons.filter(this.data.filter);
-				}
+				this.#icons = this.data?.filter
+					? icons.filter(this.data.filter)
+					: icons;
+
 				this.#filterIcons();
 			});
 		});
