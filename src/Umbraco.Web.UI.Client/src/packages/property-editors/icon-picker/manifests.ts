@@ -1,3 +1,5 @@
+import { manifest as schemaManifest } from './Umbraco.IconPicker.js';
+
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'propertyEditorUi',
@@ -26,4 +28,5 @@ export const manifests: Array<UmbExtensionManifest> = [
 			},
 		},
 	},
+	schemaManifest,
 ];
