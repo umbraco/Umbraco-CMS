@@ -2,6 +2,7 @@
   <PropertyGroup>
     <Title>Umbraco CMS - Management API</Title>
     <Description>Contains the presentation layer for the Umbraco CMS Management API.</Description>
+    <InterceptorsNamespaces>$(InterceptorsNamespaces);Microsoft.AspNetCore.OpenApi.Generated</InterceptorsNamespaces>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -25,7 +26,6 @@
 
   <ItemGroup>
     <PackageReference Include="JsonPatch.Net" />
-    <PackageReference Include="Swashbuckle.AspNetCore" />
   </ItemGroup>
 
   <ItemGroup>

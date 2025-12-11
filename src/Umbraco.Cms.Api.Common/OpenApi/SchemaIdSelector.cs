@@ -9,7 +9,10 @@ public class SchemaIdSelector : ISchemaIdSelector
 
     public virtual string SchemaId(Type type)
     {
-        ISchemaIdHandler? handler = _schemaIdHandlers.FirstOrDefault(h => h.CanHandle(type));
-        return handler?.Handle(type) ?? type.Name;
+        // Unwrap nullable types so handlers receive the underlying type
+        Type targetType = Nullable.GetUnderlyingType(type) ?? type;
+
+        ISchemaIdHandler? handler = _schemaIdHandlers.FirstOrDefault(h => h.CanHandle(targetType));
+        return handler?.Handle(targetType) ?? targetType.Name;
     }
 }
