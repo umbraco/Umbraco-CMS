@@ -12,7 +12,7 @@ internal class SortTagsAndPathsTransformer : IOpenApiDocumentTransformer
     /// Transforms the specified OpenAPI document to sort its tags and paths alphabetically.
     /// </summary>
     /// <param name="document">The <see cref="OpenApiDocument"/> to modify.</param>
-    /// <param name="context">The <see cref="OpenApiDocumentTransformerContext"/> associated with the <see paramref="document"/>.</param>
+    /// <param name="context">The <see cref="OpenApiDocumentTransformerContext"/> associated with the <paramref name="document"/>.</param>
     /// <param name="cancellationToken">The cancellation token to use.</param>
     /// <returns>The task object representing the asynchronous operation.</returns>
     public Task TransformAsync(

@@ -1,6 +1,5 @@
 import { UMB_BACKOFFICE_CONTEXT } from '../backoffice.context.js';
 import type { UmbBackofficeContext } from '../backoffice.context.js';
-import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
 import { css, customElement, html, ifDefined, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestSection } from '@umbraco-cms/backoffice/section';
@@ -113,15 +112,13 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 		const label = this.localize.string(manifest?.meta.label || manifest?.name);
 		return html`<uui-tab
 			data-mark="section-link:${manifest.alias}"
-			href=${this.#getSectionPath(manifest)}
+			.href=${this.#getSectionPath(manifest)}
 			label=${ifDefined(label)}
 			?active=${this._currentSectionAlias === manifest.alias}
-			@click=${(event: PointerEvent) => this.#onSectionClick(event, manifest)}
-			>${label}</uui-tab
-		>`;
+			@click=${(event: PointerEvent) => this.#onSectionClick(event, manifest)}></uui-tab>`;
 	}
 
-	static override styles: CSSResultGroup = [
+	static override readonly styles = [
 		css`
 			:host {
 				display: contents;

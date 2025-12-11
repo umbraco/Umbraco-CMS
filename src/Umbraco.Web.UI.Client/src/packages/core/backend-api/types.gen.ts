@@ -209,6 +209,12 @@ export type CreateDocumentTypeRequestModel = {
     containers: Array<CreateDocumentTypePropertyTypeContainerRequestModel>;
 };
 
+export type CreateDocumentTypeTemplateRequestModel = {
+    alias: string;
+    name: string;
+    isDefault: boolean;
+};
+
 export type CreateFolderRequestModel = {
     id?: null | string;
     parent?: null | ReferenceByIdModel;
@@ -1046,7 +1052,7 @@ export type HelpPageResponseModel = {
     type?: null | string;
 };
 
-export enum ImageCropMode {
+export enum ImageCropModeModel {
     CROP = 'Crop',
     MAX = 'Max',
     STRETCH = 'Stretch',
@@ -6731,6 +6737,39 @@ export type PutDocumentTypeByIdMoveResponses = {
     200: unknown;
 };
 
+export type PostDocumentTypeByIdTemplateData = {
+    body: CreateDocumentTypeTemplateRequestModel;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/document-type/{id}/template';
+};
+
+export type PostDocumentTypeByIdTemplateErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type PostDocumentTypeByIdTemplateError = PostDocumentTypeByIdTemplateErrors[keyof PostDocumentTypeByIdTemplateErrors];
+
+export type PostDocumentTypeByIdTemplateResponses = {
+    /**
+     * Created
+     */
+    201: unknown;
+};
+
 export type GetDocumentTypeAllowedAtRootData = {
     body?: never;
     path?: never;
@@ -7559,7 +7598,7 @@ export type GetImagingResizeUrlsData = {
         id?: Array<string>;
         height?: number;
         width?: number;
-        mode?: ImageCropMode;
+        mode?: ImageCropModeModel;
     };
     url: '/umbraco/management/api/v1/imaging/resize/urls';
 };

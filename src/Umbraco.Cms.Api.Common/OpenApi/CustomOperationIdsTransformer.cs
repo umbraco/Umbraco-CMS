@@ -18,7 +18,7 @@ internal class CustomOperationIdsTransformer : IOpenApiOperationTransformer
     /// Transforms the specified OpenAPI operation, setting its operation ID using a custom selector.
     /// </summary>
     /// <param name="operation">The <see cref="OpenApiOperation"/> to modify.</param>
-    /// <param name="context">The <see cref="OpenApiOperationTransformerContext"/> associated with the <see paramref="operation"/>.</param>
+    /// <param name="context">The <see cref="OpenApiOperationTransformerContext"/> associated with the <paramref name="operation"/>.</param>
     /// <param name="cancellationToken">The cancellation token to use.</param>
     /// <returns>The task object representing the asynchronous operation.</returns>
     public Task TransformAsync(

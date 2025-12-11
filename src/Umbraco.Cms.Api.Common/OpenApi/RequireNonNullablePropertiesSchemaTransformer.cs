@@ -34,17 +34,10 @@ internal class RequireNonNullablePropertiesSchemaTransformer : IOpenApiSchemaTra
         if (jsonTypeInfo.Properties.FirstOrDefault(p => p.Name == propertyName) is not { } property)
         {
             // If we can't find the property in the type (e.g. discriminator )'$type', use the schema type information
-            return schema.Properties?[propertyName].Type is { } propertyType && (propertyType & JsonSchemaType.Null) == 0;
+            IOpenApiSchema? schemaProperty = schema.Properties?[propertyName];
+            return schemaProperty?.Type is { } propertyType && propertyType.HasFlag(JsonSchemaType.Null) is false;
         }
 
-        if (property.AttributeProvider is not PropertyInfo propInfo)
-        {
-            return false;
-        }
-
-        // Use NullabilityInfoContext to check nullable annotations
-        var context = new NullabilityInfoContext();
-        NullabilityInfo nullability = context.Create(propInfo);
-        return nullability.ReadState == NullabilityState.NotNull;
+        return property.IsGetNullable is false;
     }
 }

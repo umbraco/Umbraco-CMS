@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.OpenApi;
 using Umbraco.Cms.Api.Common.Configuration;
+using Umbraco.Cms.Api.Common.OpenApi;
 using Umbraco.Cms.Api.Delivery.Filters.OpenApi;
 
 namespace Umbraco.Cms.Api.Delivery.Configuration;
@@ -7,8 +8,17 @@ namespace Umbraco.Cms.Api.Delivery.Configuration;
 /// <summary>
 /// Configures the OpenAPI options for the Umbraco Delivery API.
 /// </summary>
-public class ConfigureUmbracoDeliveryApiSwaggerGenOptions : ConfigureUmbracoOpenApiOptionsBase
+public class ConfigureUmbracoDeliveryApiOpenApiOptions : ConfigureUmbracoOpenApiOptionsBase
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ConfigureUmbracoDeliveryApiOpenApiOptions"/> class.
+    /// </summary>
+    /// <param name="schemaIdSelector">The schema ID selector.</param>
+    public ConfigureUmbracoDeliveryApiOpenApiOptions(ISchemaIdSelector schemaIdSelector)
+        : base(schemaIdSelector)
+    {
+    }
+
     /// <inheritdoc />
     protected override string ApiName => DeliveryApiConfiguration.ApiName;
 

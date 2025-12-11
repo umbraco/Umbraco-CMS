@@ -12,7 +12,7 @@ internal class TagActionsByGroupNameTransformer : IOpenApiOperationTransformer, 
     /// Transforms the specified OpenAPI operation in order to tag it by its group name.
     /// </summary>
     /// <param name="operation">The <see cref="OpenApiOperation"/> to modify.</param>
-    /// <param name="context">The <see cref="OpenApiOperationTransformerContext"/> associated with the <see paramref="operation"/>.</param>
+    /// <param name="context">The <see cref="OpenApiOperationTransformerContext"/> associated with the <paramref name="operation"/>.</param>
     /// <param name="cancellationToken">The cancellation token to use.</param>
     /// <returns>The task object representing the asynchronous operation.</returns>
     public Task TransformAsync(
@@ -40,7 +40,7 @@ internal class TagActionsByGroupNameTransformer : IOpenApiOperationTransformer, 
     /// Transforms the specified OpenAPI document in order to clean up unused tags.
     /// </summary>
     /// <param name="document">The <see cref="OpenApiDocument"/> to modify.</param>
-    /// <param name="context">The <see cref="OpenApiDocumentTransformerContext"/> associated with the <see paramref="document"/>.</param>
+    /// <param name="context">The <see cref="OpenApiDocumentTransformerContext"/> associated with the <paramref name="document"/>.</param>
     /// <param name="cancellationToken">The cancellation token to use.</param>
     /// <returns>The task object representing the asynchronous operation.</returns>
     public Task TransformAsync(
@@ -53,13 +53,12 @@ internal class TagActionsByGroupNameTransformer : IOpenApiOperationTransformer, 
             .SelectMany(o => o.Tags ?? new HashSet<OpenApiTagReference>())
             .Select(t => t.Name));
 
-        foreach (OpenApiTag tag in document.Tags ?? Enumerable.Empty<OpenApiTag>())
-        {
-            if (usedTags.Contains(tag.Name))
-            {
-                continue;
-            }
+        var tagsToRemove = (document.Tags ?? Enumerable.Empty<OpenApiTag>())
+            .Where(tag => usedTags.Contains(tag.Name) is false)
+            .ToList();
 
+        foreach (OpenApiTag tag in tagsToRemove)
+        {
             document.Tags?.Remove(tag);
         }
 

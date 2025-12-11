@@ -6,13 +6,13 @@ using Umbraco.Cms.Api.Common.Security;
 namespace Umbraco.Cms.Api.Delivery.Configuration;
 
 /// <summary>
-/// This configures member authentication for the Delivery API in Swagger. Consult the docs for
+/// This configures member authentication for the Delivery API in OpenAPI. Consult the docs for
 /// member authentication within the Delivery API for instructions on how to use this.
 /// </summary>
 /// <remarks>
 /// This class is not used by the core CMS due to the required installation dependencies (local login page among other things).
 /// </remarks>
-public class ConfigureUmbracoMemberAuthenticationDeliveryApiSwaggerGenOptions : IConfigureNamedOptions<OpenApiOptions>
+public class ConfigureUmbracoMemberAuthenticationDeliveryApiOpenApiOptions : IConfigureNamedOptions<OpenApiOptions>
 {
     private const string AuthSchemeName = "UmbracoMember";
 

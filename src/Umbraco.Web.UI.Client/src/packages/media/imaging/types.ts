@@ -1,4 +1,4 @@
-import { ImageCropMode as UmbImagingCropMode } from '@umbraco-cms/backoffice/external/backend-api';
+import { ImageCropModeModel as UmbImagingCropMode } from '@umbraco-cms/backoffice/external/backend-api';
 
 export { UmbImagingCropMode };
 
