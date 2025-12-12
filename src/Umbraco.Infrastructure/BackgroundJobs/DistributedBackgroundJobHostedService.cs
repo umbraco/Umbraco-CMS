@@ -47,8 +47,17 @@ public class DistributedBackgroundJobHostedService : BackgroundService
             await Task.Delay(_distributedJobSettings.Delay, stoppingToken);
         }
 
-        // Update all jobs, periods might have changed when restarting.
-        await _distributedJobService.EnsureJobsAsync();
+        try
+        {
+            // Update all jobs, periods might have changed when restarting.
+            await _distributedJobService.EnsureJobsAsync();
+        }
+        catch (Exception exception)
+        {
+            // We swallow exception here, don't want the app to crash if something goes wrong
+            _logger.LogError(exception, "An exception occurred while attempting to ensure distributed background jobs on startup.");
+        }
+
 
         using PeriodicTimer timer = new(_distributedJobSettings.Period);
 
