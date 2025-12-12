@@ -650,7 +650,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             .Where<NodeDto>(x => x.NodeId == id);
 
         DocumentDto? dto = Database.FirstOrDefault<DocumentDto>(sql);
-        if (dto == null)
+        if (dto is null)
         {
             return null;
         }
