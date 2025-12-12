@@ -9,7 +9,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			label: 'Icon Picker',
 			icon: 'icon-autofill',
-			group: 'common',
+			group: 'pickers',
 			propertyEditorSchemaAlias: 'Umbraco.IconPicker',
 			settings: {
 				properties: [
