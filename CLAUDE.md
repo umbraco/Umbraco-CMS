@@ -155,6 +155,26 @@ Web.UI → Web.Common → Infrastructure → Core
 - **Merge Strategy**: Squash and merge (via GitHub UI)
 - **Reviews**: Required from code owners
 
+#### PR Naming Convention
+
+Use the format: `Area: Description (closes #IssueID)`
+
+**Examples**:
+| Area | Description | Issue |
+|------|-------------|-------|
+| Relations: | Move persistence of relations from repository into notification handlers | (closes #00000) |
+| Management API: | Correct the population of the parent for sibling items when retrieved under a folder | |
+| Docs: | Updated contributing guidelines to welcome contributions on bugfixes | |
+
+**Area**: The feature or aspect affected (e.g., UFM, TipTap, Docs, Segmentation, Migrations). Helps readers quickly understand what is being changed.
+
+**Description Best Practices**:
+- Include the area of change (Relations, Management API, etc.)
+- Describe the change and its impact
+- Be specific, not vague (describe "a golden retriever" not just "a dog")
+
+**Issue Linking**: Add `(closes #IssueID)` to auto-close linked issues on merge.
+
 ### Commit Messages
 
 Follow Conventional Commits format:
