@@ -714,7 +714,7 @@ export abstract class UmbBlockEntryContext<
 		this.observe(
 			this._manager?.hasExposeOf(this.#contentKey, variantId),
 			(hasExpose) => {
-				this.#hasExpose.setValue(hasExpose);
+				this.#hasExpose.setValue(hasExpose ?? false);
 			},
 			'observeExpose',
 		);
