@@ -17,8 +17,8 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
     private Lazy<Dictionary<string, Guid>> _contentTypeAliasToKeyMap;
     private ConcurrentDictionary<Guid, NavigationNode> _navigationStructure = new();
     private ConcurrentDictionary<Guid, NavigationNode> _recycleBinNavigationStructure = new();
-    private HashSet<Guid> _roots = [];
-    private HashSet<Guid> _recycleBinRoots = [];
+    private ConcurrentDictionary<Guid, byte> _roots = new();
+    private ConcurrentDictionary<Guid, byte> _recycleBinRoots = new();
 
     protected ContentNavigationServiceBase(ICoreScopeProvider coreScopeProvider, INavigationRepository navigationRepository, TContentTypeService typeService)
     {
@@ -42,13 +42,13 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         => TryGetParentKeyFromStructure(_navigationStructure, childKey, out parentKey);
 
     public bool TryGetRootKeys(out IEnumerable<Guid> rootKeys)
-        => TryGetRootKeysFromStructure(_roots, out rootKeys);
+        => TryGetRootKeysFromStructure(_roots.Keys, out rootKeys);
 
     public bool TryGetRootKeysOfType(string contentTypeAlias, out IEnumerable<Guid> rootKeys)
     {
         if (TryGetContentTypeKey(contentTypeAlias, out Guid? contentTypeKey))
         {
-            return TryGetRootKeysFromStructure(_roots, out rootKeys, contentTypeKey);
+            return TryGetRootKeysFromStructure(_roots.Keys, out rootKeys, contentTypeKey);
         }
 
         // Content type alias doesn't exist
@@ -182,7 +182,7 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         }
         else
         {
-            _roots.Add(key);
+            _roots.TryAdd(key, 0);
         }
 
         // Note: sortOrder can't be automatically determined for items at root level, so it needs to be passed in
@@ -209,7 +209,7 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
             return false; // Cannot move a node to itself
         }
 
-        _roots.Remove(key); // Just in case
+        _roots.TryRemove(key, out _); // Just in case
 
         NavigationNode? targetParentNode = null;
         if (targetParentKey.HasValue)
@@ -221,7 +221,7 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         }
         else
         {
-            _roots.Add(key);
+            _roots.TryAdd(key, 0);
         }
 
         // Remove the node from its current parent's children list
@@ -255,7 +255,7 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
             return false; // Node doesn't exist
         }
 
-        _recycleBinRoots.Remove(key);
+        _recycleBinRoots.TryRemove(key, out _);
 
         RemoveDescendantsRecursively(nodeToRemove);
 
@@ -309,7 +309,7 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         {
             _recycleBinRoots.Clear();
             IEnumerable<INavigationModel> navigationModels = _navigationRepository.GetTrashedContentNodesByObjectType(objectTypeKey);
-            BuildNavigationDictionary(_recycleBinNavigationStructure, _recycleBinRoots,  navigationModels);
+            BuildNavigationDictionary(_recycleBinNavigationStructure, _recycleBinRoots, navigationModels);
         }
         else
         {
@@ -335,7 +335,7 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
     }
 
     private bool TryGetRootKeysFromStructure(
-        HashSet<Guid> input,
+        ICollection<Guid> input,
         out IEnumerable<Guid> rootKeys,
         Guid? contentTypeKey = null)
     {
@@ -512,8 +512,8 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
 
     private void AddDescendantsToRecycleBinRecursively(NavigationNode node)
     {
-        _recycleBinRoots.Add(node.Key);
-        _roots.Remove(node.Key);
+        _recycleBinRoots.TryAdd(node.Key, 0);
+        _roots.TryRemove(node.Key, out _);
         IReadOnlyList<Guid> childrenKeys = GetOrderedChildren(node, _navigationStructure);
 
         foreach (Guid childKey in childrenKeys)
@@ -554,10 +554,10 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
     {
         if (node.Parent is null)
         {
-            _roots.Add(node.Key);
+            _roots.TryAdd(node.Key, 0);
         }
 
-        _recycleBinRoots.Remove(node.Key);
+        _recycleBinRoots.TryRemove(node.Key, out _);
         IReadOnlyList<Guid> childrenKeys = GetOrderedChildren(node, _recycleBinNavigationStructure);
 
         foreach (Guid childKey in childrenKeys)
@@ -631,7 +631,7 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         return true;
     }
 
-    private static void BuildNavigationDictionary(ConcurrentDictionary<Guid, NavigationNode> nodesStructure, HashSet<Guid> roots, IEnumerable<INavigationModel> entities)
+    private static void BuildNavigationDictionary(ConcurrentDictionary<Guid, NavigationNode> nodesStructure, ConcurrentDictionary<Guid, byte> roots, IEnumerable<INavigationModel> entities)
     {
         var entityList = entities.ToList();
         var idToKeyMap = entityList.ToDictionary(x => x.Id, x => x.Key);
@@ -644,7 +644,7 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
             // We don't set the parent for items under root, it will stay null
             if (entity.ParentId == -1)
             {
-                roots.Add(entity.Key);
+                roots.TryAdd(entity.Key, 0);
                 continue;
             }
 
