@@ -55,6 +55,8 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
 
     public string Name { get; }
 
+    public string? Description { get; }
+
     public string? Icon { get; }
 
     public int? StartContentId { get; }
