@@ -231,7 +231,7 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
         base.Save(entity);
 
         // Also populate the GUID cache so subsequent lookups by GUID don't hit the database
-        _mediaByGuidReadRepository.PopulateCache(entity);
+        _mediaByGuidReadRepository.PopulateCacheByKey(entity);
     }
 
     protected override IMedia? PerformGet(int id)
@@ -248,7 +248,7 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
         IMedia media = MapDtoToContent(dto);
 
         // Also populate the GUID cache so subsequent lookups by GUID don't hit the database
-        _mediaByGuidReadRepository.PopulateCache(media);
+        _mediaByGuidReadRepository.PopulateCacheByKey(media);
 
         return media;
     }
@@ -266,7 +266,7 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
         IEnumerable<IMedia> media = MapDtosToContent(Database.Fetch<ContentDto>(sql));
 
         // Also populate the GUID cache so subsequent lookups by GUID don't hit the database
-        _mediaByGuidReadRepository.PopulateCache(media);
+        _mediaByGuidReadRepository.PopulateCacheByKey(media);
 
         return media;
     }
@@ -607,7 +607,7 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
     /// Populates the int-keyed cache with the given entity.
     /// This allows entities retrieved by GUID to also be cached for int ID lookups.
     /// </summary>
-    private void PopulateCache(IMedia entity)
+    private void PopulateCacheById(IMedia entity)
     {
         if (entity.HasIdentity)
         {
@@ -620,11 +620,11 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
     /// Populates the int-keyed cache with the given entities.
     /// This allows entities retrieved by GUID to also be cached for int ID lookups.
     /// </summary>
-    private void PopulateCache(IEnumerable<IMedia> entities)
+    private void PopulateCacheById(IEnumerable<IMedia> entities)
     {
         foreach (IMedia entity in entities)
         {
-            PopulateCache(entity);
+            PopulateCacheById(entity);
         }
     }
 
@@ -667,7 +667,7 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
             IMedia media = _outerRepo.MapDtoToContent(dto);
 
             // Also populate the int-keyed cache so subsequent lookups by int ID don't hit the database
-            _outerRepo.PopulateCache(media);
+            _outerRepo.PopulateCacheById(media);
 
             return media;
         }
@@ -684,7 +684,7 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
             IEnumerable<IMedia> media = _outerRepo.MapDtosToContent(Database.Fetch<ContentDto>(sql));
 
             // Also populate the int-keyed cache so subsequent lookups by int ID don't hit the database
-            _outerRepo.PopulateCache(media);
+            _outerRepo.PopulateCacheById(media);
 
             return media;
         }
@@ -711,7 +711,7 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
         /// Populates the GUID-keyed cache with the given entity.
         /// This allows entities retrieved by int ID to also be cached for GUID lookups.
         /// </summary>
-        public void PopulateCache(IMedia entity)
+        public void PopulateCacheByKey(IMedia entity)
         {
             if (entity.HasIdentity)
             {
@@ -724,11 +724,11 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
         /// Populates the GUID-keyed cache with the given entities.
         /// This allows entities retrieved by int ID to also be cached for GUID lookups.
         /// </summary>
-        public void PopulateCache(IEnumerable<IMedia> entities)
+        public void PopulateCacheByKey(IEnumerable<IMedia> entities)
         {
             foreach (IMedia entity in entities)
             {
-                PopulateCache(entity);
+                PopulateCacheByKey(entity);
             }
         }
 

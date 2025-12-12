@@ -641,7 +641,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         base.Save(entity);
 
         // Also populate the GUID cache so subsequent lookups by GUID don't hit the database.
-        _contentByGuidReadRepository.PopulateCache(entity);
+        _contentByGuidReadRepository.PopulateCacheByKey(entity);
     }
 
     protected override IContent? PerformGet(int id)
@@ -658,7 +658,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         IContent content = MapDtoToContent(dto);
 
         // Also populate the GUID cache so subsequent lookups by GUID don't hit the database.
-        _contentByGuidReadRepository.PopulateCache(content);
+        _contentByGuidReadRepository.PopulateCacheByKey(content);
 
         return content;
     }
@@ -676,7 +676,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         IEnumerable<IContent> contents = MapDtosToContent(Database.Fetch<DocumentDto>(sql));
 
         // Also populate the GUID cache so subsequent lookups by GUID don't hit the database.
-        _contentByGuidReadRepository.PopulateCache(contents);
+        _contentByGuidReadRepository.PopulateCacheByKey(contents);
 
         return contents;
     }
@@ -1628,7 +1628,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
     /// Populates the int-keyed cache with the given entity.
     /// This allows entities retrieved by GUID to also be cached for int ID lookups.
     /// </summary>
-    private void PopulateCache(IContent entity)
+    private void PopulateCacheById(IContent entity)
     {
         if (entity.HasIdentity)
         {
@@ -1641,11 +1641,11 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
     /// Populates the int-keyed cache with the given entities.
     /// This allows entities retrieved by GUID to also be cached for int ID lookups.
     /// </summary>
-    private void PopulateCache(IEnumerable<IContent> entities)
+    private void PopulateCacheById(IEnumerable<IContent> entities)
     {
         foreach (IContent entity in entities)
         {
-            PopulateCache(entity);
+            PopulateCacheById(entity);
         }
     }
 
@@ -1688,7 +1688,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             IContent content = _outerRepo.MapDtoToContent(dto);
 
             // Also populate the int-keyed cache so subsequent lookups by int ID don't hit the database
-            _outerRepo.PopulateCache(content);
+            _outerRepo.PopulateCacheById(content);
 
             return content;
         }
@@ -1705,7 +1705,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             IEnumerable<IContent> contents = _outerRepo.MapDtosToContent(Database.Fetch<DocumentDto>(sql));
 
             // Also populate the int-keyed cache so subsequent lookups by int ID don't hit the database
-            _outerRepo.PopulateCache(contents);
+            _outerRepo.PopulateCacheById(contents);
 
             return contents;
         }
@@ -1732,7 +1732,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         /// Populates the GUID-keyed cache with the given entity.
         /// This allows entities retrieved by int ID to also be cached for GUID lookups.
         /// </summary>
-        public void PopulateCache(IContent entity)
+        public void PopulateCacheByKey(IContent entity)
         {
             if (entity.HasIdentity)
             {
@@ -1745,11 +1745,11 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         /// Populates the GUID-keyed cache with the given entities.
         /// This allows entities retrieved by int ID to also be cached for GUID lookups.
         /// </summary>
-        public void PopulateCache(IEnumerable<IContent> entities)
+        public void PopulateCacheByKey(IEnumerable<IContent> entities)
         {
             foreach (IContent entity in entities)
             {
-                PopulateCache(entity);
+                PopulateCacheByKey(entity);
             }
         }
 

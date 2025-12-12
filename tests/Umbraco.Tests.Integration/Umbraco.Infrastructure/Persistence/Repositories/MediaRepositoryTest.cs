@@ -97,31 +97,29 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
         var provider = ScopeProvider;
         var scopeAccessor = ScopeAccessor;
 
-        using (var scope = provider.CreateScope())
-        {
-            var repository = CreateRepository(provider, out var mediaTypeRepository, realCache);
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository(provider, out var mediaTypeRepository, realCache);
 
-            var udb = scopeAccessor.AmbientScope.Database;
+        var database = scopeAccessor.AmbientScope.Database;
 
-            udb.EnableSqlCount = false;
+        database.EnableSqlCount = false;
 
-            var media = CreateMedia(repository, mediaTypeRepository);
+        var media = CreateMedia(repository, mediaTypeRepository);
 
-            udb.EnableSqlCount = true;
+        database.EnableSqlCount = true;
 
-            // Initial and subsequent requests should use the cache, since the cache by Id and Key was populated on save.
-            repository.Get(media.Id);
-            Assert.AreEqual(0, udb.SqlCount);
+        // Initial and subsequent requests should use the cache, since the cache by Id and Key was populated on save.
+        repository.Get(media.Id);
+        Assert.AreEqual(0, database.SqlCount);
 
-            repository.Get(media.Id);
-            Assert.AreEqual(0, udb.SqlCount);
+        repository.Get(media.Id);
+        Assert.AreEqual(0, database.SqlCount);
 
-            repository.Get(media.Key);
-            Assert.AreEqual(0, udb.SqlCount);
+        repository.Get(media.Key);
+        Assert.AreEqual(0, database.SqlCount);
 
-            repository.Get(media.Key);
-            Assert.AreEqual(0, udb.SqlCount);
-        }
+        repository.Get(media.Key);
+        Assert.AreEqual(0, database.SqlCount);
     }
 
     [Test]
@@ -135,36 +133,34 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
         var provider = ScopeProvider;
         var scopeAccessor = ScopeAccessor;
 
-        using (var scope = provider.CreateScope())
-        {
-            var repository = CreateRepository(provider, out var mediaTypeRepository, realCache);
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository(provider, out var mediaTypeRepository, realCache);
 
-            var udb = scopeAccessor.AmbientScope.Database;
+        var database = scopeAccessor.AmbientScope.Database;
 
-            udb.EnableSqlCount = false;
+        database.EnableSqlCount = false;
 
-            var media = CreateMedia(repository, mediaTypeRepository);
+        var media = CreateMedia(repository, mediaTypeRepository);
 
-            udb.EnableSqlCount = true;
+        database.EnableSqlCount = true;
 
-            // Clear the isolated cache for IMedia so the next retrieval hits the database
-            realCache.IsolatedCaches.ClearCache<IMedia>();
+        // Clear the isolated cache for IMedia so the next retrieval hits the database
+        realCache.IsolatedCaches.ClearCache<IMedia>();
 
-            // Initial request by ID should hit the database.
-            repository.Get(media.Id);
-            Assert.Greater(udb.SqlCount, 0);
+        // Initial request by ID should hit the database.
+        repository.Get(media.Id);
+        Assert.Greater(database.SqlCount, 0);
 
-            // Reset counter.
-            udb.EnableSqlCount = false;
-            udb.EnableSqlCount = true;
+        // Reset counter.
+        database.EnableSqlCount = false;
+        database.EnableSqlCount = true;
 
-            // Subsequent requests should use the cache, since the cache by Id and Key was populated on retrieval.
-            repository.Get(media.Id);
-            Assert.AreEqual(0, udb.SqlCount);
+        // Subsequent requests should use the cache, since the cache by Id and Key was populated on retrieval.
+        repository.Get(media.Id);
+        Assert.AreEqual(0, database.SqlCount);
 
-            repository.Get(media.Key);
-            Assert.AreEqual(0, udb.SqlCount);
-        }
+        repository.Get(media.Key);
+        Assert.AreEqual(0, database.SqlCount);
     }
 
     [Test]
@@ -178,36 +174,34 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
         var provider = ScopeProvider;
         var scopeAccessor = ScopeAccessor;
 
-        using (var scope = provider.CreateScope())
-        {
-            var repository = CreateRepository(provider, out var mediaTypeRepository, realCache);
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository(provider, out var mediaTypeRepository, realCache);
 
-            var udb = scopeAccessor.AmbientScope.Database;
+        var database = scopeAccessor.AmbientScope.Database;
 
-            udb.EnableSqlCount = false;
+        database.EnableSqlCount = false;
 
-            var media = CreateMedia(repository, mediaTypeRepository);
+        var media = CreateMedia(repository, mediaTypeRepository);
 
-            udb.EnableSqlCount = true;
+        database.EnableSqlCount = true;
 
-            // Clear the isolated cache for IMedia so the next retrieval hits the database
-            realCache.IsolatedCaches.ClearCache<IMedia>();
+        // Clear the isolated cache for IMedia so the next retrieval hits the database
+        realCache.IsolatedCaches.ClearCache<IMedia>();
 
-            // Initial request by key should hit the database.
-            repository.Get(media.Key);
-            Assert.Greater(udb.SqlCount, 0);
+        // Initial request by key should hit the database.
+        repository.Get(media.Key);
+        Assert.Greater(database.SqlCount, 0);
 
-            // Reset counter.
-            udb.EnableSqlCount = false;
-            udb.EnableSqlCount = true;
+        // Reset counter.
+        database.EnableSqlCount = false;
+        database.EnableSqlCount = true;
 
-            // Subsequent requests should use the cache, since the cache by Id and Key was populated on retrieval.
-            repository.Get(media.Key);
-            Assert.AreEqual(0, udb.SqlCount);
+        // Subsequent requests should use the cache, since the cache by Id and Key was populated on retrieval.
+        repository.Get(media.Key);
+        Assert.AreEqual(0, database.SqlCount);
 
-            repository.Get(media.Id);
-            Assert.AreEqual(0, udb.SqlCount);
-        }
+        repository.Get(media.Id);
+        Assert.AreEqual(0, database.SqlCount);
     }
 
     private Media CreateMedia(MediaRepository repository, MediaTypeRepository mediaTypeRepository)
