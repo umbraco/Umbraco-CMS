@@ -10,6 +10,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			label: 'Icon Picker',
 			icon: 'icon-autofill',
 			group: 'common',
+			propertyEditorSchemaAlias: 'Umbraco.IconPicker',
 			settings: {
 				properties: [
 					{
