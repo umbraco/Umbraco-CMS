@@ -5,28 +5,20 @@
         {
           "src": "../../src",
           "files": [
-            "**/*.csproj"
+            "**/*.cs"
           ],
           "exclude": [
             "**/obj/**",
             "**/bin/**",
-            "**/Umbraco.Web.csproj",
-            "**/Umbraco.Web.UI.csproj",
-            "**/Umbraco.Cms.StaticAssets.csproj",
-            "**/JsonSchema.csproj",
-            "**/Umbraco.Cms.csproj",
-            "**/Umbraco.Cms.Targets.csproj",
-            "**/Umbraco.Cms.Api.Common.csproj"
+            "**/Umbraco.Web.UI/**",
+            "**/Umbraco.Cms.StaticAssets/**",
+            "**/Umbraco.Cms/**",
+            "**/Umbraco.Cms.Targets/**"
           ]
         }
       ],
       "dest": "api",
       "filter": "docfx.filter.yml",
-      "properties": {
-        "TargetFramework": "net10.0",
-        "GitVersion": "false",
-        "BuildInParallel": "false"
-      },
       "disableGitFeatures": true,
       "maxParallelism": 1
     }
