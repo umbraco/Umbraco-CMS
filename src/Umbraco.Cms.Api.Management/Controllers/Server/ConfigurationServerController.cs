@@ -28,7 +28,7 @@ public class ConfigurationServerController : ServerControllerBase
         _hostingEnvironment = hostingEnvironment;
     }
 
-    [Obsolete("Please use the constructor with IHostingEnvironment. Scheduled to be removed in V18")]
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
     public ConfigurationServerController(IOptions<SecuritySettings> securitySettings, IOptions<GlobalSettings> globalSettings, IBackOfficeExternalLoginProviders externalLoginProviders)
         : this(securitySettings, globalSettings, externalLoginProviders, StaticServiceProvider.Instance.GetRequiredService<IHostingEnvironment>())
     {
