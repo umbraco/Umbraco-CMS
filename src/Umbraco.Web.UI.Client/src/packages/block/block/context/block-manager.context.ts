@@ -243,21 +243,22 @@ export abstract class UmbBlockManagerContext<
 	settingsOf(key: string) {
 		return this.#settings.asObservablePart((source) => source.find((x) => x.key === key));
 	}
-	currentExposeOf(contentKey: string) {
-		const contentTypeKey = this.getContentTypeKeyOfContentKey(contentKey);
-		if (!contentTypeKey) {
-			throw new Error(`Cannot lookup expose of block, missing content type key for ${contentKey}`);
-		}
-		const contentStructure = this.getStructure(contentTypeKey);
-		if (!contentStructure) {
-			throw new Error(`Cannot lookup expose of block, missing content structure for ${contentTypeKey}`);
-		}
 
+	currentExposeOf(contentKey: string) {
 		return mergeObservables(
 			[this.#exposes.asObservablePart((source) => source.filter((x) => x.contentKey === contentKey)), this.variantId],
 			([exposes, variantId]) => {
 				if (!variantId) {
 					return undefined;
+				}
+
+				const contentTypeKey = this.getContentTypeKeyOfContentKey(contentKey);
+				if (!contentTypeKey) {
+					return false;
+				}
+				const contentStructure = this.getStructure(contentTypeKey);
+				if (!contentStructure) {
+					throw new Error(`Cannot lookup expose of block, missing content structure for ${contentTypeKey}`);
 				}
 
 				const varyByCulture = contentStructure.getVariesByCulture();
@@ -274,7 +275,13 @@ export abstract class UmbBlockManagerContext<
 
 		const contentTypeKey = this.getContentTypeKeyOfContentKey(contentKey);
 		if (!contentTypeKey) {
-			throw new Error(`Cannot lookup expose of block, missing content type key for ${contentKey}`);
+			// Not created yet and therefor not exposed.
+			// (This currently does not give any trouble,
+			// but this is not returning a observable,
+			// meaning one trying to observe this would
+			// not be updated when it is exposed. But it
+			// is not a problem currently. [NL])
+			return;
 		}
 		const contentStructure = this.getStructure(contentTypeKey);
 		if (!contentStructure) {
