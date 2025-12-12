@@ -23,9 +23,11 @@
       "filter": "docfx.filter.yml",
       "properties": {
         "TargetFramework": "net10.0",
-        "GitVersion": "false"
+        "GitVersion": "false",
+        "BuildInParallel": "false"
       },
-      "disableGitFeatures": true
+      "disableGitFeatures": true,
+      "maxParallelism": 1
     }
   ],
   "build": {

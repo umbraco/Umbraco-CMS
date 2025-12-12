@@ -249,10 +249,16 @@ stages:
             inputs:
               targetType: inline
               script: |
+                # Set MSBuild environment variables to prevent hangs
+                $env:MSBUILDDISABLENODEREUSE = "1"
+                $env:MSBuildNodeReuse = "false"
+
+                Write-Host "Starting docfx metadata generation..."
                 docfx metadata "$(Build.SourcesDirectory)/build/csharp-docs/docfx.json" --noRestore
                 if ($lastexitcode -ne 0){
                     throw ("Error generating metadata.")
                 }
+            timeoutInMinutes: 30
           - task: PowerShell@2
             displayName: Generate documentation
             inputs:
