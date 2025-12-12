@@ -210,11 +210,11 @@ stages:
             displayName: Use .NET SDK from global.json
             inputs:
               useGlobalJson: true
-          - task: DotNetCoreCLI@2
-            displayName: Run dotnet restore
-            inputs:
-              command: restore
-              projects: $(solution)
+          # - task: DotNetCoreCLI@2
+          #   displayName: Run dotnet restore
+          #   inputs:
+          #     command: restore
+          #     projects: $(solution)
           - task: PowerShell@2
             displayName: Install DocFX
             inputs:
@@ -249,7 +249,7 @@ stages:
             inputs:
               targetType: inline
               script: |
-                docfx metadata "$(Build.SourcesDirectory)/build/csharp-docs/docfx.json" --noRestore
+                docfx metadata "$(Build.SourcesDirectory)/build/csharp-docs/docfx.json"
                 if ($lastexitcode -ne 0){
                     throw ("Error generating metadata.")
                 }
