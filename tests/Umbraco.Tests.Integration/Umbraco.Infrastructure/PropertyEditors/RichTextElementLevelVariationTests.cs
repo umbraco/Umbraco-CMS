@@ -805,4 +805,253 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
         ContentService.Save(content);
         return content;
     }
+
+    [Test]
+    public async Task Publishing_After_Changing_Element_Property_From_Variant_To_Invariant_Does_Not_Keep_Old_Culture_Specific_Values()
+    {
+        // 1. Create element type WITH culture variation
+        var elementType = CreateElementType(ContentVariation.Culture);
+        var rteDataType = await CreateRichTextDataType(elementType);
+        var contentType = CreateContentType(rteDataType);
+
+        // 2. Create a simple rich text value with a single block for clarity
+        var contentElementKey = Guid.NewGuid();
+        var settingsElementKey = Guid.NewGuid();
+        var richTextValue = new RichTextEditorValue
+        {
+            Markup = $"""
+                      <p>Some text.</p>
+                      <umb-rte-block data-content-key="{contentElementKey:D}"><!--Umbraco-Block--></umb-rte-block>
+                      <p>More text.</p>
+                      """,
+            Blocks = new RichTextBlockValue([
+                new RichTextBlockLayoutItem(contentElementKey, settingsElementKey)
+            ])
+            {
+                ContentData =
+                [
+                    new(contentElementKey, elementType.Key, elementType.Alias)
+                    {
+                        Values =
+                        [
+                            new() { Alias = "invariantText", Value = "The invariant content value" },
+                            new() { Alias = "variantText", Value = "The content value in English", Culture = "en-US" },
+                            new() { Alias = "variantText", Value = "The content value in Danish", Culture = "da-DK" }
+                        ]
+                    }
+                ],
+                SettingsData =
+                [
+                    new(settingsElementKey, elementType.Key, elementType.Alias)
+                    {
+                        Values =
+                        [
+                            new() { Alias = "invariantText", Value = "The invariant settings value" },
+                            new() { Alias = "variantText", Value = "The settings value in English", Culture = "en-US" },
+                            new() { Alias = "variantText", Value = "The settings value in Danish", Culture = "da-DK" }
+                        ]
+                    }
+                ],
+                Expose =
+                [
+                    new(contentElementKey, "en-US", null),
+                    new(contentElementKey, "da-DK", null)
+                ]
+            }
+        };
+
+        var content = CreateContent(contentType, richTextValue);
+        PublishContent(content, ["en-US", "da-DK"]);
+
+        // 3. Change element property type to invariant (remove culture variation)
+        foreach (var propertyType in elementType.PropertyTypes.Where(pt => pt.Alias == "variantText"))
+        {
+            propertyType.Variations = ContentVariation.Nothing;
+        }
+
+        ContentTypeService.Save(elementType);
+
+        // 4. Update the content values to be invariant
+        richTextValue = JsonSerializer.Deserialize<RichTextEditorValue>((string)content.Properties["blocks"]!.GetValue()!)!;
+
+        foreach (var blockPropertyValue in richTextValue.Blocks!.ContentData[0].Values.Where(v => v.Alias == "variantText"))
+        {
+            blockPropertyValue.Value += " => to invariant";
+            blockPropertyValue.Culture = null;
+        }
+
+        foreach (var blockPropertyValue in richTextValue.Blocks.SettingsData[0].Values.Where(v => v.Alias == "variantText"))
+        {
+            blockPropertyValue.Value += " => to invariant";
+            blockPropertyValue.Culture = null;
+        }
+
+        richTextValue.Blocks.Expose = richTextValue.Blocks.Expose
+            .Select(e => new BlockItemVariation(e.ContentKey, null, null))
+            .DistinctBy(e => e.ContentKey)
+            .ToList();
+
+        content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(richTextValue));
+        ContentService.Save(content);
+
+        // 5. Publish
+        PublishContent(content, ["en-US", "da-DK"]);
+
+        // 6. Verify published JSON doesn't contain old culture-specific values
+        content = ContentService.GetById(content.Key)!;
+        var publishedValue = (string?)content.Properties["blocks"]!.GetValue(null, null, published: true);
+        Assert.IsNotNull(publishedValue, "Published value should not be null");
+
+        var publishedRichTextValue = JsonSerializer.Deserialize<RichTextEditorValue>(publishedValue);
+        Assert.IsNotNull(publishedRichTextValue?.Blocks);
+
+        foreach (var contentData in publishedRichTextValue!.Blocks!.ContentData)
+        {
+            var aliasGroups = contentData.Values.GroupBy(v => v.Alias);
+            foreach (var group in aliasGroups)
+            {
+                Assert.AreEqual(1, group.Count(),
+                    $"Property '{group.Key}' has multiple values. Values: {string.Join(", ", group.Select(v => $"Culture={v.Culture ?? "null"}:Value={v.Value}"))}");
+            }
+        }
+
+        foreach (var settingsData in publishedRichTextValue.Blocks.SettingsData)
+        {
+            var aliasGroups = settingsData.Values.GroupBy(v => v.Alias);
+            foreach (var group in aliasGroups)
+            {
+                Assert.AreEqual(1, group.Count(),
+                    $"Property '{group.Key}' has multiple values. Values: {string.Join(", ", group.Select(v => $"Culture={v.Culture ?? "null"}:Value={v.Value}"))}");
+            }
+        }
+    }
+
+    [Test]
+    public async Task Publishing_After_Changing_Element_Property_From_Invariant_To_Variant_Does_Not_Keep_Old_Invariant_Values()
+    {
+        // 1. Create element type WITHOUT culture variation (invariant)
+        var elementType = CreateElementType(ContentVariation.Nothing);
+        var rteDataType = await CreateRichTextDataType(elementType);
+        var contentType = CreateContentType(rteDataType);
+
+        // 2. Create a simple rich text value with a single block
+        var contentElementKey = Guid.NewGuid();
+        var settingsElementKey = Guid.NewGuid();
+        var richTextValue = new RichTextEditorValue
+        {
+            Markup = $"""
+                      <p>Some text.</p>
+                      <umb-rte-block data-content-key="{contentElementKey:D}"><!--Umbraco-Block--></umb-rte-block>
+                      <p>More text.</p>
+                      """,
+            Blocks = new RichTextBlockValue([
+                new RichTextBlockLayoutItem(contentElementKey, settingsElementKey)
+            ])
+            {
+                ContentData =
+                [
+                    new(contentElementKey, elementType.Key, elementType.Alias)
+                    {
+                        Values =
+                        [
+                            new() { Alias = "invariantText", Value = "The invariant content value" },
+                            new() { Alias = "variantText", Value = "The original invariant value for content" }
+                        ]
+                    }
+                ],
+                SettingsData =
+                [
+                    new(settingsElementKey, elementType.Key, elementType.Alias)
+                    {
+                        Values =
+                        [
+                            new() { Alias = "invariantText", Value = "The invariant settings value" },
+                            new() { Alias = "variantText", Value = "The original invariant value for settings" }
+                        ]
+                    }
+                ],
+                Expose =
+                [
+                    new(contentElementKey, null, null)
+                ]
+            }
+        };
+
+        var content = CreateContent(contentType, richTextValue);
+        PublishContent(content, ["en-US", "da-DK"]);
+
+        // 3. Change element type to variant (add culture variation)
+        elementType.Variations = ContentVariation.Culture;
+        foreach (var propertyType in elementType.PropertyTypes.Where(pt => pt.Alias == "variantText"))
+        {
+            propertyType.Variations = ContentVariation.Culture;
+        }
+
+        ContentTypeService.Save(elementType);
+
+        // 4. Update the content values to have culture-specific values
+        richTextValue = JsonSerializer.Deserialize<RichTextEditorValue>((string)content.Properties["blocks"]!.GetValue()!)!;
+
+        richTextValue.Blocks!.ContentData[0].Values.Add(new BlockPropertyValue
+        {
+            Alias = "variantText",
+            Value = "The content value in English",
+            Culture = "en-US"
+        });
+        richTextValue.Blocks.ContentData[0].Values.Add(new BlockPropertyValue
+        {
+            Alias = "variantText",
+            Value = "The content value in Danish",
+            Culture = "da-DK"
+        });
+
+        richTextValue.Blocks.SettingsData[0].Values.Add(new BlockPropertyValue
+        {
+            Alias = "variantText",
+            Value = "The settings value in English",
+            Culture = "en-US"
+        });
+        richTextValue.Blocks.SettingsData[0].Values.Add(new BlockPropertyValue
+        {
+            Alias = "variantText",
+            Value = "The settings value in Danish",
+            Culture = "da-DK"
+        });
+
+        richTextValue.Blocks.Expose =
+        [
+            new BlockItemVariation(contentElementKey, "en-US", null),
+            new BlockItemVariation(contentElementKey, "da-DK", null)
+        ];
+
+        content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(richTextValue));
+        ContentService.Save(content);
+
+        // 5. Publish all cultures
+        PublishContent(content, ["en-US", "da-DK"]);
+
+        // 6. Verify published JSON doesn't contain old invariant values for variantText
+        content = ContentService.GetById(content.Key)!;
+        var publishedValue = (string?)content.Properties["blocks"]!.GetValue(null, null, published: true);
+        Assert.IsNotNull(publishedValue, "Published value should not be null");
+
+        var publishedRichTextValue = JsonSerializer.Deserialize<RichTextEditorValue>(publishedValue);
+        Assert.IsNotNull(publishedRichTextValue?.Blocks);
+
+        foreach (var contentData in publishedRichTextValue!.Blocks!.ContentData)
+        {
+            var variantTextValues = contentData.Values.Where(v => v.Alias == "variantText").ToList();
+            Assert.IsFalse(
+                variantTextValues.Any(v => v.Culture is null),
+                $"variantText property should not have invariant values after changing to variant. Values: {string.Join(", ", variantTextValues.Select(v => $"Culture={v.Culture ?? "null"}:Value={v.Value}"))}");
+        }
+
+        foreach (var settingsData in publishedRichTextValue.Blocks.SettingsData)
+        {
+            var variantTextValues = settingsData.Values.Where(v => v.Alias == "variantText").ToList();
+            Assert.IsFalse(
+                variantTextValues.Any(v => v.Culture is null),
+                $"variantText property should not have invariant values after changing to variant. Values: {string.Join(", ", variantTextValues.Select(v => $"Culture={v.Culture ?? "null"}:Value={v.Value}"))}");
+        }
+    }
 }

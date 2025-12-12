@@ -675,7 +675,8 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
                     {
                         Alias = sourceBlockPropertyValue.Alias,
                         Culture = sourceBlockPropertyValue.Culture,
-                        Segment = sourceBlockPropertyValue.Segment
+                        Segment = sourceBlockPropertyValue.Segment,
+                        PropertyType = sourceBlockPropertyValue.PropertyType
                     };
                     targetBlockItem.Values.Add(targetBlockPropertyValue);
                 }
@@ -685,6 +686,30 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
                     ? sourceBlockPropertyValue.Value
                     : mergingDataEditor!.MergePartialPropertyValueForCulture(sourceBlockPropertyValue.Value, targetBlockPropertyValue.Value, culture);
             }
+        }
+
+        // After merging, remove stale values when property variation changed
+        foreach (BlockItemData targetBlockItem in targetBlockItems)
+        {
+            // Get all invariant values (Culture is null) for properties that no longer vary by culture
+            var invariantAliases = targetBlockItem.Values
+                .Where(v => v.Culture is null && v.PropertyType?.VariesByCulture() == false)
+                .Select(v => v.Alias)
+                .ToHashSet();
+
+            // Remove any variant values for properties that are now invariant
+            targetBlockItem.Values.RemoveAll(v =>
+                v.Culture is not null && invariantAliases.Contains(v.Alias));
+
+            // Get all variant values (Culture is not null) for properties that now vary by culture
+            var variantAliases = targetBlockItem.Values
+                .Where(v => v.Culture is not null && v.PropertyType?.VariesByCulture() == true)
+                .Select(v => v.Alias)
+                .ToHashSet();
+
+            // Remove any invariant values for properties that are now variant
+            targetBlockItem.Values.RemoveAll(v =>
+                v.Culture is null && variantAliases.Contains(v.Alias));
         }
     }
 }
