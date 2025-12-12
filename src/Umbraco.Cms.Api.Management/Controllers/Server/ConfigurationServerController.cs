@@ -19,6 +19,7 @@ public class ConfigurationServerController : ServerControllerBase
     private readonly IBackOfficeExternalLoginProviders _externalLoginProviders;
     private readonly IHostingEnvironment _hostingEnvironment;
 
+    [ActivatorUtilitiesConstructor]
     public ConfigurationServerController(IOptions<SecuritySettings> securitySettings, IOptions<GlobalSettings> globalSettings, IBackOfficeExternalLoginProviders externalLoginProviders, IHostingEnvironment hostingEnvironment)
     {
         _securitySettings = securitySettings.Value;
