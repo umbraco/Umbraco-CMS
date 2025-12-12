@@ -8,7 +8,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		element: () => import('./property-editor-ui-icon-picker.element.js'),
 		meta: {
 			label: 'Icon Picker',
-			icon: 'icon-autofill',
+			icon: 'icon-shapes',
 			group: 'pickers',
 			propertyEditorSchemaAlias: 'Umbraco.IconPicker',
 			settings: {
