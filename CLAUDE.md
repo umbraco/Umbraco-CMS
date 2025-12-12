@@ -168,27 +168,12 @@ Use the format: `Area: Description (closes #IssueID)`
 
 **Area**: The feature or aspect affected (e.g., UFM, TipTap, Docs, Segmentation, Migrations). Helps readers quickly understand what is being changed.
 
-**Description Types**:
-| Type | Definition |
-|------|------------|
-| **Fix** | Fixing a bug |
-| **Feature** | Adding a new feature |
-| **Build** | Updates that affect the build system/process |
-| **Improvement** | Updates to existing functionality that isn't broken |
-| **Docs** | Documentation changes only |
-| **QA** | Adding or fixing tests |
-| **Refactor** | Code change that neither fixes a bug nor adds a feature |
-| **Localize** | Translation and localization changes |
-| **Bump** | Dependency version updates |
-| **Revert** | Undoing a previous commit |
-| **Hotfix** | Urgent fix outside normal release schedule |
-
 **Description Best Practices**:
-- Include the type of change (Fix, Feature, etc.)
-- Describe the change and/or its impact
+- Include the area of change (Relations, Management API, etc.)
+- Describe the change and its impact
 - Be specific, not vague (describe "a golden retriever" not just "a dog")
 
-**Issue Linking**: Add `(closes #IssueID)` to auto-close linked issues on merge. Alternatives: `fixes`, `resolves`.
+**Issue Linking**: Add `(closes #IssueID)` to auto-close linked issues on merge.
 
 ### Commit Messages
 
