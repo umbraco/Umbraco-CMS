@@ -188,7 +188,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 				this.observe(
 					manager.hasExposeOf(contentKey, variantId),
 					(exposed) => {
-						this.#exposed.setValue(exposed);
+						this.#exposed.setValue(exposed ?? false);
 					},
 					'observeHasExpose',
 				);
