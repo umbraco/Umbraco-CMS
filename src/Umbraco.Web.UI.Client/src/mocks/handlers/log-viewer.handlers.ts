@@ -1,14 +1,15 @@
-const { rest } = window.MockServiceWorker;
+const { http, HttpResponse } = window.MockServiceWorker;
 import { umbLogViewerData } from '../data/log-viewer.data.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 import type { SavedLogSearchRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export const handlers = [
 	//#region Searches
-	rest.get(umbracoPath('/log-viewer/saved-search'), (req, res, ctx) => {
-		const skip = req.url.searchParams.get('skip');
+	http.get(umbracoPath('/log-viewer/saved-search'), ({ request }) => {
+		const searchParams = new URL(request.url).searchParams;
+		const skip = searchParams.get('skip');
 		const skipNumber = skip ? Number.parseInt(skip) : undefined;
-		const take = req.url.searchParams.get('take');
+		const take = searchParams.get('take');
 		const takeNumber = take ? Number.parseInt(take) : undefined;
 
 		const items = umbLogViewerData.searches.getSavedSearches(skipNumber, takeNumber);
@@ -18,33 +19,34 @@ export const handlers = [
 			items,
 		};
 
-		return res(ctx.delay(), ctx.status(200), ctx.json(response));
+		return HttpResponse.json(response);
 	}),
 
-	rest.get(umbracoPath('/log-viewer/saved-search/:name'), (req, res, ctx) => {
-		const name = req.params.name as string;
+	http.get(umbracoPath('/log-viewer/saved-search/:name'), ({ params }) => {
+		const name = params.name as string;
 
 		if (!name) return;
 
 		const item = umbLogViewerData.searches.getByName(name);
-		return res(ctx.delay(), ctx.status(200), ctx.json(item));
+		return HttpResponse.json(item);
 	}),
 
-	rest.post<SavedLogSearchRequestModel>(umbracoPath('/log-viewer/saved-search'), async (req, res, ctx) => {
-		return res(ctx.delay(), ctx.status(200));
+	http.post<SavedLogSearchRequestModel>(umbracoPath('/log-viewer/saved-search'), async () => {
+		return HttpResponse.json(null);
 	}),
 
-	rest.delete(umbracoPath('/log-viewer/saved-search/:name'), async (req, res, ctx) => {
+	http.delete(umbracoPath('/log-viewer/saved-search/:name'), async () => {
 		// TODO: implement this
-		return res(ctx.status(200));
+		return HttpResponse.json(null);
 	}),
 	//#endregion
 
 	//#region Templates
-	rest.get(umbracoPath('/log-viewer/message-template'), (req, res, ctx) => {
-		const skip = req.url.searchParams.get('skip');
+	http.get(umbracoPath('/log-viewer/message-template'), ({ request }) => {
+		const searchParams = new URL(request.url).searchParams;
+		const skip = searchParams.get('skip');
 		const skipNumber = skip ? Number.parseInt(skip) : undefined;
-		const take = req.url.searchParams.get('take');
+		const take = searchParams.get('take');
 		const takeNumber = take ? Number.parseInt(take) : undefined;
 
 		const items = umbLogViewerData.templates.getTemplates(skipNumber, takeNumber);
@@ -54,27 +56,28 @@ export const handlers = [
 			items,
 		};
 
-		return res(ctx.delay(), ctx.status(200), ctx.json(response));
+		return HttpResponse.json(response);
 	}),
 	//#endregion
 
 	//#region Logs
-	rest.get(umbracoPath('/log-viewer/level'), (req, res, ctx) => {
-		return res(ctx.delay(), ctx.status(200), ctx.json(umbLogViewerData.logLevels));
+	http.get(umbracoPath('/log-viewer/level'), () => {
+		return HttpResponse.json(umbLogViewerData.logLevels);
 	}),
 
-	rest.get(umbracoPath('/log-viewer/level-count'), (req, res, ctx) => {
-		return res(ctx.delay(), ctx.status(200), ctx.json(umbLogViewerData.logs.getLevelCount()));
+	http.get(umbracoPath('/log-viewer/level-count'), () => {
+		return HttpResponse.json(umbLogViewerData.logs.getLevelCount());
 	}),
 
-	rest.get(umbracoPath('/log-viewer/validate-logs-size'), (req, res, ctx) => {
-		return res(ctx.delay(), ctx.status(200));
+	http.get(umbracoPath('/log-viewer/validate-logs-size'), () => {
+		return HttpResponse.json(null);
 	}),
 
-	rest.get(umbracoPath('/log-viewer/log'), (req, res, ctx) => {
-		const skip = req.url.searchParams.get('skip');
+	http.get(umbracoPath('/log-viewer/log'), ({ request }) => {
+		const searchParams = new URL(request.url).searchParams;
+		const skip = searchParams.get('skip');
 		const skipNumber = skip ? Number.parseInt(skip) : undefined;
-		const take = req.url.searchParams.get('take');
+		const take = searchParams.get('take');
 		const takeNumber = take ? Number.parseInt(take) : undefined;
 
 		const items = umbLogViewerData.logs.getLogs(skipNumber, takeNumber);
@@ -83,6 +86,6 @@ export const handlers = [
 			items,
 		};
 
-		return res(ctx.delay(), ctx.status(200), ctx.json(response));
+		return HttpResponse.json(response);
 	}),
 ];

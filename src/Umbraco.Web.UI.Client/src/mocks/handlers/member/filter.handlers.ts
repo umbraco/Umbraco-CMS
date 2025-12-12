@@ -1,17 +1,18 @@
-const { rest } = window.MockServiceWorker;
+const { http, HttpResponse } = window.MockServiceWorker;
 import { umbMemberMockDb } from '../../data/member/member.db.js';
 import { UMB_SLUG } from './slug.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const handlers = [
-	rest.get(umbracoPath(`/filter${UMB_SLUG}`), (req, res, ctx) => {
-		const skip = Number(req.url.searchParams.get('skip'));
-		const take = Number(req.url.searchParams.get('take'));
-		const orderBy = req.url.searchParams.get('orderBy');
-		const orderDirection = req.url.searchParams.get('orderDirection');
-		const memberGroupIds = req.url.searchParams.getAll('memberGroupIds');
-		const memberTypeId = req.url.searchParams.get('memberTypeId');
-		const filter = req.url.searchParams.get('filter');
+	http.get(umbracoPath(`/filter${UMB_SLUG}`), ({ request }) => {
+		const url = new URL(request.url);
+		const skip = Number(url.searchParams.get('skip'));
+		const take = Number(url.searchParams.get('take'));
+		const orderBy = url.searchParams.get('orderBy');
+		const orderDirection = url.searchParams.get('orderDirection');
+		const memberGroupIds = url.searchParams.getAll('memberGroupIds');
+		const memberTypeId = url.searchParams.get('memberTypeId');
+		const filter = url.searchParams.get('filter');
 
 		const options: any = {
 			skip: skip || undefined,
@@ -24,6 +25,6 @@ export const handlers = [
 		};
 
 		const response = umbMemberMockDb.filter(options);
-		return res(ctx.status(200), ctx.json(response));
+		return HttpResponse.json(response);
 	}),
 ];
