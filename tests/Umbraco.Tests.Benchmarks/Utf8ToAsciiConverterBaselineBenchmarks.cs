@@ -21,32 +21,32 @@ public class Utf8ToAsciiConverterBaselineBenchmarks
     private static readonly string LargeWorstCase = BenchmarkTextGenerator.GenerateWorstCase(100 * 1024);
 
     [Benchmark]
-    public string Tiny_Ascii() => Utf8ToAsciiConverter.ToAsciiString(TinyAscii);
+    public string Tiny_Ascii() => OldUtf8ToAsciiConverter.ToAsciiString(TinyAscii);
 
     [Benchmark]
-    public string Tiny_Mixed() => Utf8ToAsciiConverter.ToAsciiString(TinyMixed);
+    public string Tiny_Mixed() => OldUtf8ToAsciiConverter.ToAsciiString(TinyMixed);
 
     [Benchmark]
-    public string Small_Ascii() => Utf8ToAsciiConverter.ToAsciiString(SmallAscii);
+    public string Small_Ascii() => OldUtf8ToAsciiConverter.ToAsciiString(SmallAscii);
 
     [Benchmark]
-    public string Small_Mixed() => Utf8ToAsciiConverter.ToAsciiString(SmallMixed);
+    public string Small_Mixed() => OldUtf8ToAsciiConverter.ToAsciiString(SmallMixed);
 
     [Benchmark]
-    public string Medium_Ascii() => Utf8ToAsciiConverter.ToAsciiString(MediumAscii);
+    public string Medium_Ascii() => OldUtf8ToAsciiConverter.ToAsciiString(MediumAscii);
 
     [Benchmark]
-    public string Medium_Mixed() => Utf8ToAsciiConverter.ToAsciiString(MediumMixed);
+    public string Medium_Mixed() => OldUtf8ToAsciiConverter.ToAsciiString(MediumMixed);
 
     [Benchmark]
-    public string Large_Ascii() => Utf8ToAsciiConverter.ToAsciiString(LargeAscii);
+    public string Large_Ascii() => OldUtf8ToAsciiConverter.ToAsciiString(LargeAscii);
 
     [Benchmark]
-    public string Large_Mixed() => Utf8ToAsciiConverter.ToAsciiString(LargeMixed);
+    public string Large_Mixed() => OldUtf8ToAsciiConverter.ToAsciiString(LargeMixed);
 
     [Benchmark]
-    public string Large_WorstCase() => Utf8ToAsciiConverter.ToAsciiString(LargeWorstCase);
+    public string Large_WorstCase() => OldUtf8ToAsciiConverter.ToAsciiString(LargeWorstCase);
 
     [Benchmark]
-    public char[] CharArray_Medium_Mixed() => Utf8ToAsciiConverter.ToAsciiCharArray(MediumMixed);
+    public char[] CharArray_Medium_Mixed() => OldUtf8ToAsciiConverter.ToAsciiCharArray(MediumMixed);
 }
