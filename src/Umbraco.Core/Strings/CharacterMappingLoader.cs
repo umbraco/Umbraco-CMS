@@ -73,18 +73,26 @@ public sealed class CharacterMappingLoader : ICharacterMappingLoader
         return MergeMappings(allMappings);
     }
 
-    private static FrozenDictionary<char, string> MergeMappings(
+    private FrozenDictionary<char, string> MergeMappings(
         List<(int Priority, string Name, Dictionary<string, string> Mappings)> allMappings)
     {
         var merged = new Dictionary<char, string>();
 
-        foreach (var (_, _, mappings) in allMappings.OrderBy(m => m.Priority))
+        foreach (var (_, name, mappings) in allMappings.OrderBy(m => m.Priority))
         {
             foreach (var (key, value) in mappings)
             {
                 if (key.Length == 1)
                 {
                     merged[key[0]] = value;
+                }
+                else if (key.Length > 1)
+                {
+                    // Multi-character keys are not supported for single-character mapping
+                    // This could happen if someone adds multi-character keys in their custom mapping files
+                    _logger.LogWarning(
+                        "Skipping multi-character key '{Key}' in mapping '{Name}' - only single characters are supported",
+                        key, name);
                 }
             }
         }
