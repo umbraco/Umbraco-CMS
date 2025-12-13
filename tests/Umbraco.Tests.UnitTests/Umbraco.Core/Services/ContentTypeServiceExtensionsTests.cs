@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services;
 [TestFixture]
 public class ContentTypeServiceExtensionsTests
 {
-    private IShortStringHelper ShortStringHelper => new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
+    private IShortStringHelper ShortStringHelper => new DefaultShortStringHelper(new DefaultShortStringHelperConfig(), Utf8ToAsciiConverterStatic.Instance);
 
     [Test]
     public void GetAvailableCompositeContentTypes_No_Overlap_By_Content_Type_And_Property_Type_Alias()

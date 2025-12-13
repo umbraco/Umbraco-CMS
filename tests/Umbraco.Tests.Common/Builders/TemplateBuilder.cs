@@ -111,7 +111,9 @@ public class TemplateBuilder
         var masterTemplateAlias = _masterTemplateAlias ?? string.Empty;
         var masterTemplateId = _masterTemplateId ?? new Lazy<int>(() => -1);
 
-        var shortStringHelper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
+        var shortStringHelper = new DefaultShortStringHelper(
+            new DefaultShortStringHelperConfig(),
+            Utf8ToAsciiConverterStatic.Instance);
 
         var template = new Template(shortStringHelper, name, alias)
         {

@@ -19,6 +19,11 @@ public static class Utf8ToAsciiConverterStatic
         return new Utf8ToAsciiConverter(loader);
     });
 
+    /// <summary>
+    /// Gets the default converter instance for use in tests and other scenarios where DI is not available.
+    /// </summary>
+    internal static IUtf8ToAsciiConverter Instance => DefaultConverter.Value;
+
     // Simple IHostEnvironment implementation for static initialization
     private sealed class SimpleHostEnvironment : IHostEnvironment
     {

@@ -12,8 +12,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ShortStringHelper;
 [TestFixture]
 public class CmsHelperCasingTests
 {
+    private static readonly IUtf8ToAsciiConverter AsciiConverter = Utf8ToAsciiConverterStatic.Instance;
+
     private IShortStringHelper ShortStringHelper =>
-        new DefaultShortStringHelper(Options.Create(new RequestHandlerSettings()));
+        new DefaultShortStringHelper(Options.Create(new RequestHandlerSettings()), AsciiConverter);
 
     [TestCase("thisIsTheEnd", "This Is The End")]
     [TestCase("th", "Th")]

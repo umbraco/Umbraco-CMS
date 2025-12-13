@@ -151,7 +151,9 @@ public class UserGroupBuilder<TParent>
         var startMediaId = _startMediaId ?? -1;
         var icon = _icon ?? "icon-group";
 
-        var shortStringHelper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
+        var shortStringHelper = new DefaultShortStringHelper(
+            new DefaultShortStringHelperConfig(),
+            Utf8ToAsciiConverterStatic.Instance);
 
         var userGroup = new UserGroup(shortStringHelper, userCount, alias, name, icon)
         {
