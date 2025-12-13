@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Core.Strings;
 public sealed class CharacterMappingLoader : ICharacterMappingLoader
 {
     private static readonly string[] BuiltInFiles =
-        ["ligatures.json", "special-latin.json", "cyrillic.json"];
+        ["ligatures.json", "special-latin.json", "cyrillic.json", "extended-mappings.json"];
 
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
