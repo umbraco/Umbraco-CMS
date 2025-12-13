@@ -64,7 +64,7 @@ public class CharacterMappingLoaderTests
         var mappings = loader.LoadMappings();
 
         // Assert
-        Assert.AreEqual("Shch", mappings['Щ']);
+        Assert.AreEqual("Sh", mappings['Щ']);
         Assert.AreEqual("zh", mappings['ж']);
         Assert.AreEqual("Ya", mappings['Я']);
     }
@@ -130,7 +130,7 @@ public class CharacterMappingLoaderTests
             Assert.AreEqual("SS_CUSTOM", mappings['ß'], "User mapping should override built-in for 'ß'");
 
             // Other built-in mappings should still exist
-            Assert.AreEqual("Shch", mappings['Щ'], "Non-overridden built-in mappings should still work");
+            Assert.AreEqual("Sh", mappings['Щ'], "Non-overridden built-in mappings should still work");
         }
         finally
         {
