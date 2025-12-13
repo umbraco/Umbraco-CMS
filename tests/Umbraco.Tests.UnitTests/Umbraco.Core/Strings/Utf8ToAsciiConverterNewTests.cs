@@ -59,10 +59,11 @@ public class Utf8ToAsciiConverterNewTests
         => Assert.That(_converter.Convert(input), Is.EqualTo(expected));
 
     // === Cyrillic ===
+    // Note: These match the original Utf8ToAsciiConverter behavior (non-standard transliteration)
 
     [TestCase("Москва", "Moskva")]
-    [TestCase("Борщ", "Borshch")]
-    [TestCase("Щука", "Shchuka")]
+    [TestCase("Борщ", "Borsh")]      // Original uses Щ→Sh (non-standard)
+    [TestCase("Щука", "Shuka")]      // Original uses Щ→Sh (non-standard)
     [TestCase("Привет", "Privet")]
     public void Convert_Cyrillic_TransliteratesCorrectly(string input, string expected)
         => Assert.That(_converter.Convert(input), Is.EqualTo(expected));
@@ -92,13 +93,13 @@ public class Utf8ToAsciiConverterNewTests
     [Test]
     public void Convert_SpanApi_HandlesExpansion()
     {
-        ReadOnlySpan<char> input = "Щ"; // Expands to "Shch" (4 chars)
+        ReadOnlySpan<char> input = "Щ"; // Expands to "Sh" (2 chars) in original
         Span<char> output = stackalloc char[20];
 
         var written = _converter.Convert(input, output);
 
-        Assert.That(written, Is.EqualTo(4));
-        Assert.That(new string(output[..written]), Is.EqualTo("Shch"));
+        Assert.That(written, Is.EqualTo(2));
+        Assert.That(new string(output[..written]), Is.EqualTo("Sh"));
     }
 
     // === Mixed Content ===
