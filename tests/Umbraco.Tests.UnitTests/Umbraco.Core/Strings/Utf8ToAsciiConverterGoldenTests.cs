@@ -53,7 +53,7 @@ public class Utf8ToAsciiConverterGoldenTests
             hostEnv.Object,
             NullLogger<CharacterMappingLoader>.Instance);
 
-        _newConverter = new Utf8ToAsciiConverterNew(loader);
+        _newConverter = new Utf8ToAsciiConverter(loader);
     }
 
     public static IEnumerable<TestCaseData> GetGoldenMappings()
@@ -74,23 +74,8 @@ public class Utf8ToAsciiConverterGoldenTests
     [TestCaseSource(nameof(GetGoldenMappings))]
     public void NewConverter_MatchesOriginalBehavior(string input, string expected)
     {
-        // Compare new implementation against original
-        // Note: Original has buffer overflow bugs for chars that expand to 4+ chars (e.g., ⑽→(10))
-        string? originalResult;
-        try
-        {
-            originalResult = Utf8ToAsciiConverter.ToAsciiString(input);
-        }
-        catch (IndexOutOfRangeException)
-        {
-            // Original converter has known buffer bugs for high-expansion characters
-            // New converter fixes these - verify it produces the expected golden mapping
-            var newResult = _newConverter.Convert(input);
-            Assert.That(newResult, Is.EqualTo(expected),
-                $"Original throws IndexOutOfRangeException, but new converter should match golden mapping");
-            return;
-        }
-
+        // Compare new implementation against static wrapper (which uses new implementation)
+        var originalResult = Utf8ToAsciiConverterStatic.ToAsciiString(input);
         var result = _newConverter.Convert(input);
         Assert.That(result, Is.EqualTo(originalResult));
     }

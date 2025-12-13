@@ -278,11 +278,11 @@ namespace Umbraco.Cms.Core.Strings
             switch (codeType)
             {
                 case CleanStringType.Ascii:
-                    text = Utf8ToAsciiConverter.ToAsciiString(text);
+                    text = Utf8ToAsciiConverterStatic.ToAsciiString(text);
                     break;
                 case CleanStringType.TryAscii:
                     const char ESC = (char) 27;
-                    var ctext = Utf8ToAsciiConverter.ToAsciiString(text, ESC);
+                    var ctext = Utf8ToAsciiConverterStatic.ToAsciiString(text, ESC);
                     if (ctext.Contains(ESC) == false)
                     {
                         text = ctext;

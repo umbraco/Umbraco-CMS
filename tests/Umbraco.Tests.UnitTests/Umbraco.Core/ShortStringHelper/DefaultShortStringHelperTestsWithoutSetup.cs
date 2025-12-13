@@ -343,7 +343,7 @@ public class DefaultShortStringHelperTestsWithoutSetup
     public void Utf8ToAsciiConverter()
     {
         const string str = "a\U00010F00z\uA74Ftéô";
-        var output = global::Umbraco.Cms.Core.Strings.Utf8ToAsciiConverter.ToAsciiString(str);
+        var output = global::Umbraco.Cms.Core.Strings.Utf8ToAsciiConverterStatic.ToAsciiString(str);
         Assert.AreEqual("a?zooteo", output);
     }
 

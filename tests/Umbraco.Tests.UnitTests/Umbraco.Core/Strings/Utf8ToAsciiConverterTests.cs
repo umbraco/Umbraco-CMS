@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Strings;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Strings;
 
 [TestFixture]
-public class Utf8ToAsciiConverterNewTests
+public class Utf8ToAsciiConverterTests
 {
     private IUtf8ToAsciiConverter _converter = null!;
 
@@ -21,7 +21,7 @@ public class Utf8ToAsciiConverterNewTests
             hostEnv.Object,
             NullLogger<CharacterMappingLoader>.Instance);
 
-        _converter = new Utf8ToAsciiConverterNew(loader);
+        _converter = new Utf8ToAsciiConverter(loader);
     }
 
     // === Null/Empty ===
