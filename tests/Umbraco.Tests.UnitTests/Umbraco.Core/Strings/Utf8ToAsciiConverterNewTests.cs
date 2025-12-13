@@ -112,4 +112,104 @@ public class Utf8ToAsciiConverterNewTests
 
         Assert.That(_converter.Convert(input), Is.EqualTo(expected));
     }
+
+    // === Edge Cases: Control Characters ===
+
+    [Test]
+    public void Convert_ControlCharacters_AreStripped()
+    {
+        // Tab, newline, carriage return should be stripped
+        var input = "hello\t\n\rworld";
+        var result = _converter.Convert(input);
+
+        // Control characters are stripped (not converted to space)
+        Assert.That(result, Is.EqualTo("helloworld"));
+    }
+
+    [Test]
+    public void Convert_NullCharacter_IsStripped()
+    {
+        var input = "hello\0world";
+        var result = _converter.Convert(input);
+
+        Assert.That(result, Is.EqualTo("helloworld"));
+    }
+
+    // === Edge Cases: Whitespace Variants ===
+
+    [Test]
+    public void Convert_NonBreakingSpace_NormalizesToSpace()
+    {
+        // Non-breaking space (U+00A0)
+        var input = "hello\u00A0world";
+        var result = _converter.Convert(input);
+
+        Assert.That(result, Is.EqualTo("hello world"));
+    }
+
+    [Test]
+    public void Convert_EmSpace_NormalizesToSpace()
+    {
+        // Em space (U+2003)
+        var input = "hello\u2003world";
+        var result = _converter.Convert(input);
+
+        Assert.That(result, Is.EqualTo("hello world"));
+    }
+
+    // === Edge Cases: Empty Mappings ===
+
+    [Test]
+    public void Convert_CyrillicHardSign_MapsToQuote()
+    {
+        // Ъ maps to " in original Umbraco implementation
+        var input = "Ъ";
+        var result = _converter.Convert(input);
+
+        Assert.That(result, Is.EqualTo("\""));
+    }
+
+    [Test]
+    public void Convert_CyrillicSoftSign_MapsToApostrophe()
+    {
+        // Ь maps to ' in original Umbraco implementation
+        var input = "Ь";
+        var result = _converter.Convert(input);
+
+        Assert.That(result, Is.EqualTo("'"));
+    }
+
+    // === Edge Cases: Surrogate Pairs (Emoji) ===
+
+    [Test]
+    public void Convert_Emoji_ReplacedWithFallback()
+    {
+        // Emoji (surrogate pair)
+        var input = "hello 😀 world";
+        var result = _converter.Convert(input);
+
+        Assert.That(result, Is.EqualTo("hello ? world"));
+    }
+
+    [Test]
+    public void Convert_Emoji_CustomFallback()
+    {
+        var input = "test 🎉 emoji";
+        var result = _converter.Convert(input, fallback: '*');
+
+        Assert.That(result, Is.EqualTo("test * emoji"));
+    }
+
+    // === Edge Cases: Long Input ===
+
+    [Test]
+    public void Convert_LongAsciiString_ReturnsSameReference()
+    {
+        // Pure ASCII should return same string instance (no allocation)
+        var input = new string('a', 10000);
+        var result = _converter.Convert(input);
+
+        Assert.That(ReferenceEquals(input, result), Is.True,
+            "Pure ASCII input should return same string instance");
+    }
 }

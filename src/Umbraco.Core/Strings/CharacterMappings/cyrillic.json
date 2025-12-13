@@ -1,6 +1,6 @@
 {
   "name": "Cyrillic",
-  "description": "Russian Cyrillic to Latin transliteration",
+  "description": "Russian Cyrillic to Latin transliteration. NOTE: Uses original Umbraco mappings for backward compatibility with existing URLs, not ISO 9 or BGN/PCGN standard transliteration.",
   "priority": 0,
   "mappings": {
     "А": "A",

@@ -8,8 +8,29 @@ namespace Umbraco.Cms.Core.Strings;
 /// <summary>
 /// SIMD-optimized UTF-8 to ASCII converter with extensible character mappings.
 /// </summary>
+/// <remarks>
+/// <para>
+/// This converter uses a multi-step fallback strategy:
+/// 1. Dictionary lookup for special cases (ligatures, Cyrillic, special Latin)
+/// 2. Unicode normalization (FormD) for accented Latin characters
+/// 3. Control character stripping
+/// 4. Whitespace normalization
+/// 5. Fallback character for unmapped characters
+/// </para>
+/// <para>
+/// Most accented Latin characters (À, é, ñ, etc.) are handled automatically via
+/// Unicode normalization. Dictionary mappings are only needed for characters that
+/// don't decompose correctly (ligatures like Æ→AE, Cyrillic, special Latin like Ø→O).
+/// </para>
+/// </remarks>
 public sealed class Utf8ToAsciiConverterNew : IUtf8ToAsciiConverter
 {
+    /// <summary>
+    /// Maximum expansion ratio for output buffer sizing.
+    /// Worst case: single char becomes 4 chars (e.g., Щ→Shch in standard transliteration).
+    /// </summary>
+    private const int MaxExpansionRatio = 4;
+
     // SIMD-optimized ASCII detection (uses AVX-512 when available)
     private static readonly SearchValues<char> AsciiPrintable =
         SearchValues.Create(" !\"#$%&'()*+,-./0123456789:;<=>?@" +
@@ -39,8 +60,8 @@ public sealed class Utf8ToAsciiConverterNew : IUtf8ToAsciiConverter
             return text;
         }
 
-        // Allocate output buffer (worst case: each char becomes 4, e.g., Щ→Shch)
-        var maxLen = text.Length * 4;
+        // Allocate output buffer for worst-case expansion
+        var maxLen = text.Length * MaxExpansionRatio;
         char[] arrayBuffer = ArrayPool<char>.Shared.Rent(maxLen);
         try
         {

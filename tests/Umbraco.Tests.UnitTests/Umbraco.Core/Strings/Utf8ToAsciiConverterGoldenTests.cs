@@ -22,18 +22,24 @@ public class Utf8ToAsciiConverterGoldenTests
             "TestData",
             "golden-mappings.json");
 
-        if (File.Exists(testDataPath))
+        if (!File.Exists(testDataPath))
         {
-            var json = File.ReadAllText(testDataPath);
-            var doc = JsonDocument.Parse(json);
-            GoldenMappings = doc.RootElement
-                .GetProperty("mappings")
-                .EnumerateObject()
-                .ToDictionary(p => p.Name, p => p.Value.GetString() ?? "");
+            throw new InvalidOperationException(
+                $"Golden mappings file not found at: {testDataPath}. " +
+                "Ensure the test data is configured to copy to output directory.");
         }
-        else
+
+        var json = File.ReadAllText(testDataPath);
+        var doc = JsonDocument.Parse(json);
+        GoldenMappings = doc.RootElement
+            .GetProperty("mappings")
+            .EnumerateObject()
+            .ToDictionary(p => p.Name, p => p.Value.GetString() ?? "");
+
+        if (GoldenMappings.Count == 0)
         {
-            GoldenMappings = new Dictionary<string, string>();
+            throw new InvalidOperationException(
+                "Golden mappings file is empty. Test data may be corrupted.");
         }
     }
 
@@ -69,9 +75,23 @@ public class Utf8ToAsciiConverterGoldenTests
     public void NewConverter_MatchesOriginalBehavior(string input, string expected)
     {
         // Compare new implementation against original
-        var originalResult = Utf8ToAsciiConverter.ToAsciiString(input);
-        var newResult = _newConverter.Convert(input);
+        // Note: Original has buffer overflow bugs for chars that expand to 4+ chars (e.g., ⑽→(10))
+        string? originalResult;
+        try
+        {
+            originalResult = Utf8ToAsciiConverter.ToAsciiString(input);
+        }
+        catch (IndexOutOfRangeException)
+        {
+            // Original converter has known buffer bugs for high-expansion characters
+            // New converter fixes these - verify it produces the expected golden mapping
+            var newResult = _newConverter.Convert(input);
+            Assert.That(newResult, Is.EqualTo(expected),
+                $"Original throws IndexOutOfRangeException, but new converter should match golden mapping");
+            return;
+        }
 
-        Assert.That(newResult, Is.EqualTo(originalResult));
+        var result = _newConverter.Convert(input);
+        Assert.That(result, Is.EqualTo(originalResult));
     }
 }
