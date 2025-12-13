@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Extensions;
 
@@ -58,17 +59,23 @@ internal sealed class ApiRichTextMarkupParser : ApiRichTextParserBase, IApiRichT
                     mediaCache,
                 link.GetAttributeValue("href", string.Empty),
                 link.GetAttributeValue("type", "unknown"),
-                route =>
+                (route, content) =>
                 {
                     link.SetAttributeValue("href", $"{route.Path}{route.QueryString}");
+                    link.SetAttributeValue("data-destination-id", content.Key.ToString("D"));
+                    link.SetAttributeValue("data-destination-type", content.ContentType.Alias);
                     link.SetAttributeValue("data-start-item-path", route.StartItem.Path);
                     link.SetAttributeValue("data-start-item-id", route.StartItem.Id.ToString("D"));
                     link.Attributes["type"]?.Remove();
+                    link.SetAttributeValue("data-link-type", nameof(LinkType.Content));
                 },
-                url =>
+                (url, media) =>
                 {
                     link.SetAttributeValue("href", url);
+                    link.SetAttributeValue("data-destination-id", media.Key.ToString("D"));
+                    link.SetAttributeValue("data-destination-type", media.ContentType.Alias);
                     link.Attributes["type"]?.Remove();
+                    link.SetAttributeValue("data-link-type", nameof(LinkType.Media));
                 },
                 () =>
                 {
