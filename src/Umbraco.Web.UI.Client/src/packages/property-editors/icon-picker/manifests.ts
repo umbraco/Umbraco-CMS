@@ -25,6 +25,12 @@ export const manifests: Array<UmbExtensionManifest> = [
 						description: 'Hide color swatches from modal',
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 					},
+					{
+						alias: 'colors',
+						label: '#colorPickerConfigurations_colorsTitle',
+						description: '{umbLocalize: colorPickerConfigurations_colorsDescription}',
+						propertyEditorUiAlias: 'Umb.PropertyEditorUi.ColorSwatchesEditor',
+					},
 				],
 			},
 		},

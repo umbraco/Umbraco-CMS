@@ -61,11 +61,15 @@ export class UmbPropertyEditorUIIconPickerElement
 	@state()
 	private _hideColors = false;
 
+	@state()
+	private _colors = [];
+
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 		const placeholder = config.getValueByAlias('placeholder');
 		this._placeholderIcon = typeof placeholder === 'string' ? placeholder : '';
 		this._hideColors = config.getValueByAlias('hideColors') as boolean;
+		this._colors = config.getValueByAlias('colors') as Array<{ value: string, label: string}>;
 	}
 
 	private async _openModal() {
@@ -74,7 +78,7 @@ export class UmbPropertyEditorUIIconPickerElement
 				icon: this._icon,
 				color: this._color,
 			},
-			data: { placeholder: this._placeholderIcon, showEmptyOption: !this.mandatory, hideColors: this._hideColors },
+			data: { placeholder: this._placeholderIcon, showEmptyOption: !this.mandatory, hideColors: this._hideColors, colors: this._colors },
 		}).catch(() => undefined);
 
 		if (!data) return;
