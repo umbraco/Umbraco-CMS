@@ -3,11 +3,15 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { InputType, UUIFormLayoutItemElement } from '@umbraco-cms/backoffice/external/uui';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
-import { UMB_AUTH_CONTEXT, UmbAuthContext } from './contexts';
-import { UmbSlimBackofficeController } from './controllers';
+import { UMB_AUTH_CONTEXT, UmbAuthContext } from './contexts/index.js';
+import { UmbSlimBackofficeController } from './controllers/index.js';
 
 // We import the authStyles here so that we can inline it in the shadow DOM that is created outside of the UmbAuthElement.
 import authStyles from './auth-styles.css?inline';
+
+// Import the SVG files
+import svgEyeOpen from './assets/eye-open.svg?raw';
+import svgEyeClosed from './assets/eye-closed.svg?raw';
 
 // Import the main bundle
 import { extensions } from './umbraco-package.js';
@@ -17,6 +21,7 @@ const createInput = (opts: {
 	type: InputType;
 	name: string;
 	autocomplete: AutoFill;
+	errorId: string;
 	inputmode: string;
 	autofocus?: boolean;
 }) => {
@@ -27,7 +32,10 @@ const createInput = (opts: {
 	input.id = opts.id;
 	input.required = true;
 	input.inputMode = opts.inputmode;
+	input.setAttribute('aria-errormessage', opts.errorId);
 	input.autofocus = opts.autofocus || false;
+	input.className = 'input';
+
 	return input;
 };
 
@@ -42,26 +50,116 @@ const createLabel = (opts: { forId: string; localizeAlias: string; localizeFallb
 	return label;
 };
 
-const createFormLayoutItem = (label: HTMLLabelElement, input: HTMLInputElement) => {
+const createValidationMessage = (errorId: string) => {
+	const validationElement = document.createElement('div');
+	validationElement.className = 'errormessage';
+	validationElement.id = errorId;
+	validationElement.role = 'alert';
+	return validationElement;
+};
+
+const createShowPasswordToggleButton = (opts: {
+	id: string;
+	name: string;
+	ariaLabelShowPassword: string;
+	ariaLabelHidePassword: string;
+}) => {
+	const button = document.createElement('button');
+	button.id = opts.id;
+	button.ariaLabel = opts.ariaLabelShowPassword;
+	button.name = opts.name;
+	button.type = 'button';
+
+	button.innerHTML = svgEyeOpen;
+
+	button.onclick = () => {
+		const passwordInput = document.getElementById('password-input') as HTMLInputElement;
+
+		if (passwordInput.type === 'password') {
+			passwordInput.type = 'text';
+			button.ariaLabel = opts.ariaLabelHidePassword;
+			button.innerHTML = svgEyeClosed;
+		} else {
+			passwordInput.type = 'password';
+			button.ariaLabel = opts.ariaLabelShowPassword;
+			button.innerHTML = svgEyeOpen;
+		}
+
+		passwordInput.focus();
+	};
+
+	return button;
+};
+
+const createShowPasswordToggleItem = (button: HTMLButtonElement) => {
+	const span = document.createElement('span');
+	span.id = 'password-show-toggle-span';
+	span.appendChild(button);
+
+	return span;
+};
+
+const createFormLayoutItem = (label: HTMLLabelElement, input: HTMLInputElement, localizationKey: string) => {
 	const formLayoutItem = document.createElement('uui-form-layout-item') as UUIFormLayoutItemElement;
+	const errorId = input.getAttribute('aria-errormessage') || input.id + '-error';
+
 	formLayoutItem.appendChild(label);
 	formLayoutItem.appendChild(input);
+
+	const validationMessage = createValidationMessage(errorId);
+	formLayoutItem.appendChild(validationMessage);
+
+	// Bind validation
+	input.oninput = () => validateInput(input, validationMessage, localizationKey);
+	input.onblur = () => validateInput(input, validationMessage, localizationKey);
 
 	return formLayoutItem;
 };
 
-const createForm = (elements: HTMLElement[]) => {
-	const styles = document.createElement('style');
-	styles.innerHTML = authStyles;
-	const form = document.createElement('form');
-	form.id = 'umb-login-form';
-	form.name = 'login-form';
-	form.spellcheck = false;
+const createFormLayoutPasswordItem = (
+	label: HTMLLabelElement,
+	input: HTMLInputElement,
+	showPasswordToggle: HTMLSpanElement,
+	requiredMessageKey: string
+) => {
+	const formLayoutItem = document.createElement('uui-form-layout-item') as UUIFormLayoutItemElement;
+	const errorId = input.getAttribute('aria-errormessage') || input.id + '-error';
 
-	elements.push(styles);
-	elements.forEach((element) => form.appendChild(element));
+	formLayoutItem.appendChild(label);
 
-	return form;
+	const span = document.createElement('span');
+	span.id = 'password-input-span';
+	span.appendChild(input);
+	span.appendChild(showPasswordToggle);
+	formLayoutItem.appendChild(span);
+
+	const validationMessage = createValidationMessage(errorId);
+	formLayoutItem.appendChild(validationMessage);
+
+	// Bind validation
+	input.oninput = () => validateInput(input, validationMessage, requiredMessageKey);
+	input.onblur = () => validateInput(input, validationMessage, requiredMessageKey);
+
+	return formLayoutItem;
+};
+
+const validateInput = (input: HTMLInputElement, validationElement: HTMLElement, requiredMessage = '') => {
+	validationElement.innerHTML = '';
+	if (input.validity.valid) {
+		input.removeAttribute('aria-invalid');
+		validationElement.classList.remove('active');
+		validationElement.ariaLive = 'off';
+	} else {
+		input.setAttribute('aria-invalid', 'true');
+
+		const localizeElement = document.createElement('umb-localize');
+		localizeElement.innerHTML = input.validationMessage;
+		localizeElement.key = requiredMessage;
+		validationElement.appendChild(localizeElement);
+
+		validationElement.classList.add('active');
+		validationElement.ariaLive = 'assertive';
+	}
 };
 
 @customElement('umb-auth')
@@ -105,14 +203,6 @@ export default class UmbAuthElement extends UmbLitElement {
 	 */
 	protected flow?: 'mfa' | 'reset-password' | 'invite-user';
 
-	_form?: HTMLFormElement;
-	_usernameLayoutItem?: UUIFormLayoutItemElement;
-	_passwordLayoutItem?: UUIFormLayoutItemElement;
-	_usernameInput?: HTMLInputElement;
-	_passwordInput?: HTMLInputElement;
-	_usernameLabel?: HTMLLabelElement;
-	_passwordLabel?: HTMLLabelElement;
-
 	#authContext = new UmbAuthContext(this, UMB_AUTH_CONTEXT);
 
 	constructor() {
@@ -121,6 +211,16 @@ export default class UmbAuthElement extends UmbLitElement {
 		(this as unknown as EventTarget).addEventListener('umb-login-flow', (e) => {
 			if (e instanceof CustomEvent) {
 				this.flow = e.detail.flow || undefined;
+				if (typeof e.detail.status !== 'undefined') {
+					const searchParams = new URLSearchParams(window.location.search);
+					if (e.detail.status === null) {
+						searchParams.delete('status');
+					} else {
+						searchParams.set('status', e.detail.status);
+					}
+					const newRelativePathQuery = window.location.pathname + '?' + searchParams.toString();
+					window.history.pushState(null, '', newRelativePathQuery);
+				}
 			}
 			this.requestUpdate();
 		});
@@ -133,21 +233,35 @@ export default class UmbAuthElement extends UmbLitElement {
 		// Register the main package for Umbraco.Auth
 		umbExtensionsRegistry.registerMany(extensions);
 
-		setTimeout(() => {
-			requestAnimationFrame(() => {
-				this.#initializeForm();
-			});
-		}, 100);
+		// Wait for localization to be ready before loading the form
+		await this.#waitForLocalization();
+
+		this.#initializeForm();
 	}
 
-	disconnectedCallback() {
-		super.disconnectedCallback();
-		this._usernameLayoutItem?.remove();
-		this._passwordLayoutItem?.remove();
-		this._usernameLabel?.remove();
-		this._usernameInput?.remove();
-		this._passwordLabel?.remove();
-		this._passwordInput?.remove();
+	async #waitForLocalization(): Promise<void> {
+		return new Promise((resolve, reject) => {
+			let retryCount = 0;
+			// Retries 40 times with a 50ms interval = 2 seconds
+			const maxRetries = 40;
+
+			// We check periodically until it is available or we reach the max retries
+			const checkInterval = setInterval(() => {
+				// If we reach max retries, we give up and reject the promise
+				if (retryCount > maxRetries) {
+					clearInterval(checkInterval);
+					reject('Localization not available');
+					return;
+				}
+				// Check if localization is available
+				if (this.localize.term('auth_showPassword') !== 'auth_showPassword') {
+					clearInterval(checkInterval);
+					resolve();
+					return;
+				}
+				retryCount++;
+			}, 50);
+		});
 	}
 
 	/**
@@ -158,38 +272,65 @@ export default class UmbAuthElement extends UmbLitElement {
 	 * @private
 	 */
 	#initializeForm() {
-		this._usernameInput = createInput({
+		const usernameInput = createInput({
 			id: 'username-input',
 			type: 'text',
 			name: 'username',
 			autocomplete: 'username',
+			errorId: 'username-input-error',
 			inputmode: this.usernameIsEmail ? 'email' : '',
 			autofocus: true,
 		});
-		this._passwordInput = createInput({
+		const passwordInput = createInput({
 			id: 'password-input',
 			type: 'password',
 			name: 'password',
 			autocomplete: 'current-password',
+			errorId: 'password-input-error',
 			inputmode: '',
 		});
-		this._usernameLabel = createLabel({
+		const passwordShowPasswordToggleButton = createShowPasswordToggleButton({
+			id: 'password-show-toggle',
+			name: 'password-show-toggle',
+			ariaLabelShowPassword: this.localize.term('auth_showPassword'),
+			ariaLabelHidePassword: this.localize.term('auth_hidePassword'),
+		});
+		const passwordShowPasswordToggleItem = createShowPasswordToggleItem(passwordShowPasswordToggleButton);
+		const usernameLabel = createLabel({
 			forId: 'username-input',
 			localizeAlias: this.usernameIsEmail ? 'auth_email' : 'auth_username',
 			localizeFallback: this.usernameIsEmail ? 'Email' : 'Username',
 		});
-		this._passwordLabel = createLabel({
+		const passwordLabel = createLabel({
 			forId: 'password-input',
 			localizeAlias: 'auth_password',
 			localizeFallback: 'Password',
 		});
+		const usernameLayoutItem = createFormLayoutItem(
+			usernameLabel,
+			usernameInput,
+			this.usernameIsEmail ? 'auth_requiredEmailValidationMessage' : 'auth_requiredUsernameValidationMessage'
+		);
+		const passwordLayoutItem = createFormLayoutPasswordItem(
+			passwordLabel,
+			passwordInput,
+			passwordShowPasswordToggleItem,
+			'auth_requiredPasswordValidationMessage'
+		);
+		const style = document.createElement('style');
+		style.innerHTML = authStyles;
+		document.head.appendChild(style);
 
-		this._usernameLayoutItem = createFormLayoutItem(this._usernameLabel, this._usernameInput);
-		this._passwordLayoutItem = createFormLayoutItem(this._passwordLabel, this._passwordInput);
+		const form = document.createElement('form');
+		form.id = 'umb-login-form';
+		form.name = 'login-form';
+		form.spellcheck = false;
+		form.setAttribute('novalidate', '');
 
-		this._form = createForm([this._usernameLayoutItem, this._passwordLayoutItem]);
+		form.appendChild(usernameLayoutItem);
+		form.appendChild(passwordLayoutItem);
 
-		this.insertAdjacentElement('beforeend', this._form);
+		this.insertAdjacentElement('beforeend', form);
 	}
 
 	render() {
@@ -246,12 +387,11 @@ export default class UmbAuthElement extends UmbLitElement {
 				return html` <umb-invite-page></umb-invite-page>`;
 
 			default:
-				return html` <umb-login-page
-					?allow-password-reset=${this.allowPasswordReset}
-					?username-is-email=${this.usernameIsEmail}>
-					<slot></slot>
-					<slot name="subheadline" slot="subheadline"></slot>
-				</umb-login-page>`;
+				return html`
+					<umb-login-page ?allow-password-reset=${this.allowPasswordReset} ?username-is-email=${this.usernameIsEmail}>
+						<slot></slot>
+					</umb-login-page>
+				`;
 		}
 	}
 }

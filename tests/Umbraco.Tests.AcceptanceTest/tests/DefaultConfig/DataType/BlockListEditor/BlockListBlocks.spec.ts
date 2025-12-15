@@ -427,6 +427,7 @@ test('can add a thumbnail to a block', {tag: '@release'}, async ({umbracoApi, um
   // Act
   await umbracoUi.dataType.goToDataType(blockListEditorName);
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
+  await umbracoUi.waitForTimeout(500);
   await umbracoUi.dataType.chooseBlockThumbnailWithPath(mediaUrl);
   await umbracoUi.dataType.clickSubmitButton();
   await umbracoUi.dataType.clickSaveButton();
@@ -436,7 +437,6 @@ test('can add a thumbnail to a block', {tag: '@release'}, async ({umbracoApi, um
   await umbracoUi.dataType.doesBlockHaveThumbnailImage(mediaUrl);
 });
 
-// TODO: Thumbnails are not showing in the UI
-test.skip('can remove a thumbnail to a block ', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
-
+test.fixme('can remove a thumbnail to a block ', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+  // TODO: Implement it later
 });

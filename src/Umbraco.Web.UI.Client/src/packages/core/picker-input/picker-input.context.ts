@@ -31,8 +31,8 @@ export class UmbPickerInputContext<
 	public readonly interactionMemory = new UmbInteractionMemoryManager(this);
 
 	/**
-	 * Define a minimum amount of selected items in this input, for this input to be valid.
-	 * @returns {number} The minimum number of items required.
+	 * Define a maximum amount of selected items in this input, for this input to be valid.
+	 * @returns {number} The maximum number of items required.
 	 */
 	public get max() {
 		return this._max;
@@ -43,7 +43,7 @@ export class UmbPickerInputContext<
 	private _max = Infinity;
 
 	/**
-	 * Define a maximum amount of selected items in this input, for this input to be valid.
+	 * Define a minimum amount of selected items in this input, for this input to be valid.
 	 * @returns {number} The minimum number of items required.
 	 */
 	public get min() {
@@ -125,15 +125,15 @@ export class UmbPickerInputContext<
 		const name = await this._requestItemName(unique);
 		await umbConfirmModal(this, {
 			color: 'danger',
-			headline: `#actions_remove ${name}?`,
+			headline: `#actions_remove?`,
 			content: `#defaultdialogs_confirmremove ${name}?`,
 			confirmLabel: '#actions_remove',
 		});
 
-		this.#removeItem(unique);
+		this._removeItem(unique);
 	}
 
-	#removeItem(unique: string) {
+	protected _removeItem(unique: string) {
 		const newSelection = this.getSelection().filter((value) => value !== unique);
 		this.setSelection(newSelection);
 		this.getHostElement().dispatchEvent(new UmbChangeEvent());

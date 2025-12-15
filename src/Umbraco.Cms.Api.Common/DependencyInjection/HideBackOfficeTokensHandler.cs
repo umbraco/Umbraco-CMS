@@ -155,8 +155,7 @@ internal sealed class HideBackOfficeTokensHandler
             return ValueTask.CompletedTask;
         }
 
-        HttpContext httpContext = GetHttpContext();
-        if (TryGetCookie(httpContext, AccessTokenCookieName, out var accessToken))
+        if (TryGetCookie(GetHttpContext(), AccessTokenCookieName, out var accessToken))
         {
             context.AccessToken = accessToken;
         }

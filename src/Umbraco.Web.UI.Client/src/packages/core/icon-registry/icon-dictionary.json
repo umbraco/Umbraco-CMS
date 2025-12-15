@@ -1973,6 +1973,10 @@
 			"file": "cloud-snow.svg"
 		},
 		{
+			"name": "icon-sort",
+			"file": "arrow-down-up.svg"
+		},
+		{
 			"name": "icon-sound-low",
 			"file": "volume-1.svg"
 		},
@@ -2593,6 +2597,7 @@
 			"file": "land-plot.svg"
 		}
 	],
+	"custom": [],
 	"simpleIcons": [
 		{
 			"name": "icon-facebook",
@@ -2626,277 +2631,282 @@
 	"umbraco": [
 		{
 			"name": "icon-art-easel",
-			"file": "icon-art-easel.svg",
+			"file": "legacy/icon-art-easel.svg",
 			"legacy": true
 		},
 		{
 			"name": "icon-article",
-			"file": "icon-article.svg",
+			"file": "legacy/icon-article.svg",
 			"legacy": true
 		},
 		{
 			"name": "icon-auction-hammer",
-			"file": "icon-auction-hammer.svg",
+			"file": "legacy/icon-auction-hammer.svg",
 			"legacy": true
 		},
 		{
 			"name": "icon-badge-count",
-			"file": "icon-badge-count.svg",
+			"file": "legacy/icon-badge-count.svg",
 			"legacy": true
 		},
 		{
 			"name": "icon-band-aid",
-			"file": "icon-band-aid.svg",
+			"file": "legacy/icon-band-aid.svg",
 			"legacy": true
 		},
 		{
 			"name": "icon-baby-stroller",
-			"file": "icon-baby-stroller.svg",
+			"file": "legacy/icon-baby-stroller.svg",
 			"legacy": true
 		},
 		{
 			"name": "icon-bill-dollar",
-			"file": "icon-bill-dollar.svg",
+			"file": "legacy/icon-bill-dollar.svg",
 			"legacy": true
 		},
 		{
 			"name": "icon-bill-euro",
-			"file": "icon-bill-euro.svg",
+			"file": "legacy/icon-bill-euro.svg",
 			"legacy": true
 		},
 		{
 			"name": "icon-bill-pound",
-			"file": "icon-bill-pound.svg",
+			"file": "legacy/icon-bill-pound.svg",
 			"legacy": true
 		},
 		{
 			"name": "icon-bill-yen",
-			"file": "icon-bill-yen.svg",
+			"file": "legacy/icon-bill-yen.svg",
 			"legacy": true
 		},
 		{
 			"name": "icon-bill",
-			"file": "icon-bill.svg",
+			"file": "legacy/icon-bill.svg",
 			"legacy": true
 		},
 		{
 			"name": "icon-billboard",
-			"file": "icon-billboard.svg",
+			"file": "legacy/icon-billboard.svg",
 			"legacy": true
 		},
 		{
 			"name": "icon-bills-dollar",
-			"file": "icon-bills-dollar.svg",
+			"file": "legacy/icon-bills-dollar.svg",
 			"legacy": true
 		},
 		{
 			"name": "icon-bills-euro",
-			"file": "icon-bills-euro.svg",
+			"file": "legacy/icon-bills-euro.svg",
 			"legacy": true
 		},
 		{
 			"name": "icon-bills-pound",
-			"file": "icon-bills-pound.svg",
+			"file": "legacy/icon-bills-pound.svg",
 			"legacy": true
 		},
 		{
 			"name": "icon-bills-yen",
-			"file": "icon-bills-yen.svg",
+			"file": "legacy/icon-bills-yen.svg",
 			"legacy": true
 		},
 		{
 			"name": "icon-bills",
-			"file": "icon-bills.svg",
+			"file": "legacy/icon-bills.svg",
 			"legacy": true
 		},
 		{
 			"name": "icon-blueprint",
-			"file": "icon-blueprint.svg",
+			"file": "legacy/icon-blueprint.svg",
 			"legacy": true
 		},
 		{
 			"name": "icon-bomb",
-			"file": "icon-bomb.svg",
+			"file": "legacy/icon-bomb.svg",
 			"legacy": true
 		},
 		{
 			"name": "icon-cash-register",
-			"file": "icon-cash-register.svg",
+			"file": "legacy/icon-cash-register.svg",
 			"legacy": true
 		},
 		{
 			"name": "icon-checkbox-dotted-active",
-			"file": "icon-checkbox-dotted-active.svg",
+			"file": "legacy/icon-checkbox-dotted-active.svg",
 			"legacy": true
 		},
 		{
 			"name": "icon-chess",
-			"file": "icon-chess.svg",
+			"file": "legacy/icon-chess.svg",
 			"legacy": true
 		},
 		{
 			"name": "icon-circus",
-			"file": "icon-circus.svg",
+			"file": "legacy/icon-circus.svg",
 			"legacy": true
 		},
 		{
 			"name": "icon-clothes-hanger",
-			"file": "icon-clothes-hanger.svg",
+			"file": "legacy/icon-clothes-hanger.svg",
 			"legacy": true
 		},
 		{
 			"name": "icon-coin",
-			"file": "icon-coin.svg",
+			"file": "legacy/icon-coin.svg",
 			"legacy": true
 		},
 		{
 			"name": "icon-coins-dollar-alt",
-			"file": "icon-coins-dollar-alt.svg",
+			"file": "legacy/icon-coins-dollar-alt.svg",
 			"legacy": true
 		},
 		{
 			"name": "icon-coins-dollar",
-			"file": "icon-coins-dollar.svg",
+			"file": "legacy/icon-coins-dollar.svg",
 			"legacy": true
 		},
 		{
 			"name": "icon-coins-euro-alt",
-			"file": "icon-coins-euro-alt.svg",
+			"file": "legacy/icon-coins-euro-alt.svg",
 			"legacy": true
 		},
 		{
 			"name": "icon-coins-euro",
-			"file": "icon-coins-euro.svg",
+			"file": "legacy/icon-coins-euro.svg",
 			"legacy": true
 		},
 		{
 			"name": "icon-coins-pound-alt",
-			"file": "icon-coins-pound-alt.svg",
+			"file": "legacy/icon-coins-pound-alt.svg",
 			"legacy": true
 		},
 		{
 			"name": "icon-coins-pound",
-			"file": "icon-coins-pound.svg",
+			"file": "legacy/icon-coins-pound.svg",
 			"legacy": true
 		},
 		{
 			"name": "icon-coins-yen-alt",
-			"file": "icon-coins-yen-alt.svg",
+			"file": "legacy/icon-coins-yen-alt.svg",
 			"legacy": true
 		},
 		{
 			"name": "icon-coins-yen",
-			"file": "icon-coins-yen.svg",
+			"file": "legacy/icon-coins-yen.svg",
 			"legacy": true
 		},
 		{
 			"name": "icon-comb",
-			"file": "icon-comb.svg",
+			"file": "legacy/icon-comb.svg",
 			"legacy": true
 		},
 		{
 			"name": "icon-desk",
-			"file": "icon-desk.svg",
+			"file": "legacy/icon-desk.svg",
 			"legacy": true
 		},
 		{
 			"name": "icon-dollar-bag",
-			"file": "icon-dollar-bag.svg",
+			"file": "legacy/icon-dollar-bag.svg",
 			"legacy": true
 		},
 		{
 			"name": "icon-eject",
-			"file": "icon-eject.svg",
+			"file": "legacy/icon-eject.svg",
 			"legacy": true
 		},
 		{
 			"name": "icon-euro-bag",
-			"file": "icon-euro-bag.svg",
+			"file": "legacy/icon-euro-bag.svg",
 			"legacy": true
 		},
 		{
 			"name": "icon-female-symbol",
-			"file": "icon-female-symbol.svg",
+			"file": "legacy/icon-female-symbol.svg",
 			"legacy": true
 		},
 		{
 			"name": "icon-firewall",
-			"file": "icon-firewall.svg",
+			"file": "legacy/icon-firewall.svg",
 			"legacy": true
 		},
 		{
 			"name": "icon-folder-open",
-			"file": "icon-folder-open.svg",
+			"file": "legacy/icon-folder-open.svg",
 			"legacy": true
 		},
 		{
 			"name": "icon-folder-outline",
-			"file": "icon-folder-outline.svg",
+			"file": "legacy/icon-folder-outline.svg",
 			"legacy": true
 		},
 		{
 			"name": "icon-handprint",
-			"file": "icon-handprint.svg",
+			"file": "legacy/icon-handprint.svg",
 			"legacy": true
 		},
 		{
 			"name": "icon-hat",
-			"file": "icon-hat.svg",
+			"file": "legacy/icon-hat.svg",
 			"legacy": true
 		},
 		{
 			"name": "icon-hd",
-			"file": "icon-hd.svg",
+			"file": "legacy/icon-hd.svg",
 			"legacy": true
 		},
 		{
 			"name": "icon-inactive-line",
-			"file": "icon-inactive-line.svg",
+			"file": "legacy/icon-inactive-line.svg",
 			"legacy": true
 		},
 		{
 			"name": "icon-keychain",
-			"file": "icon-keychain.svg",
+			"file": "legacy/icon-keychain.svg",
 			"legacy": true
 		},
 		{
 			"name": "icon-keyhole",
-			"file": "icon-keyhole.svg",
+			"file": "legacy/icon-keyhole.svg",
 			"legacy": true
 		},
 		{
 			"name": "icon-linkedin",
-			"file": "icon-linkedin.svg",
+			"file": "legacy/icon-linkedin.svg",
 			"legacy": true
 		},
 		{
 			"name": "icon-linux-tux",
-			"file": "icon-linux-tux.svg",
+			"file": "legacy/icon-linux-tux.svg",
 			"legacy": true
 		},
 		{
 			"name": "icon-male-and-female",
-			"file": "icon-users.svg",
+			"file": "legacy/icon-users.svg",
 			"legacy": true
 		},
 		{
 			"name": "icon-male-symbol",
-			"file": "icon-male-symbol.svg",
+			"file": "legacy/icon-male-symbol.svg",
 			"legacy": true
 		},
 		{
 			"name": "icon-molecular-network",
-			"file": "icon-molecular-network.svg",
+			"file": "legacy/icon-molecular-network.svg",
 			"legacy": true
 		},
 		{
 			"name": "icon-molecular",
-			"file": "icon-molecular.svg",
+			"file": "legacy/icon-molecular.svg",
 			"legacy": true
 		},
 		{
+			"name": "icon-trash-empty",
+			"file": "legacy/icon-trash-empty.svg",
+			"internal": true
+		},
+		{
 			"name": "icon-umbraco",
-			"file": "icon-umbraco.svg"
+			"file": "legacy/icon-umbraco.svg"
 		}
 	]
 }

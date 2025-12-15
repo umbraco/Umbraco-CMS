@@ -22,7 +22,6 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
-// TODO: Investigate pipeline flakiness for this test. Reapply '@smoke' tag once the issue is resolved.
 test('can create content with the image cropper data type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Draft';
@@ -36,6 +35,9 @@ test('can create content with the image cropper data type', async ({umbracoApi, 
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.uploadFile(imageFilePath);
+  // Wait for the upload to complete
+  await umbracoUi.content.isInputDropzoneVisible(false);
+  await umbracoUi.content.isImageCropperFieldVisible();
   await umbracoUi.content.clickSaveButton();
 
   // Assert
@@ -60,6 +62,9 @@ test('can publish content with the image cropper data type', {tag: '@smoke'}, as
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.uploadFile(imageFilePath);
+  // Wait for the upload to complete
+  await umbracoUi.content.isInputDropzoneVisible(false);
+  await umbracoUi.content.isImageCropperFieldVisible();
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
@@ -74,8 +79,7 @@ test('can publish content with the image cropper data type', {tag: '@smoke'}, as
   expect(contentData.values[0].value.focalPoint).toEqual(defaultFocalPoint);
 });
 
-// TODO: Fix flaky test
-test.fixme('can create content with the custom image cropper data type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test('can create content with the custom image cropper data type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const customDataTypeName = 'CustomImageCropper';
   const cropAlias = 'TestCropLabel';
@@ -89,6 +93,9 @@ test.fixme('can create content with the custom image cropper data type', {tag: '
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.uploadFile(imageFilePath);
+  // Wait for the upload to complete
+  await umbracoUi.content.isInputDropzoneVisible(false);
+  await umbracoUi.content.isImageCropperFieldVisible();
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert

@@ -101,6 +101,7 @@
       "env": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "ASPNETCORE_URLS": "https://localhost:44339",
+        "UMBRACO__CMS__WEBROUTING__UMBRACOAPPLICATIONURL": "https://localhost:44339",
         "UMBRACO__CMS__SECURITY__BACKOFFICEHOST": "http://localhost:5173",
         "UMBRACO__CMS__SECURITY__AUTHORIZECALLBACKPATHNAME": "/oauth_complete",
         "UMBRACO__CMS__SECURITY__AUTHORIZECALLBACKLOGOUTPATHNAME": "/logout",

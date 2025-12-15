@@ -37,7 +37,6 @@ public class DecimalPropertyEditor : DataEditor
     /// <inheritdoc />
     protected override IConfigurationEditor CreateConfigurationEditor() => new DecimalConfigurationEditor();
 
-
     /// <summary>
     /// Defines the value editor for the decimal property editor.
     /// </summary>
@@ -109,7 +108,38 @@ public class DecimalPropertyEditor : DataEditor
 
             /// <inheritdoc/>
             protected override bool TryParsePropertyValue(object? value, out double parsedDecimalValue)
-                => double.TryParse(value?.ToString(), CultureInfo.InvariantCulture, out parsedDecimalValue);
+            {
+                if (value is null)
+                {
+                    parsedDecimalValue = default;
+                    return false;
+                }
+
+                if (value is decimal decimalValue)
+                {
+                    parsedDecimalValue = (double)decimalValue;
+                    return true;
+                }
+
+                if (value is double doubleValue)
+                {
+                    parsedDecimalValue = doubleValue;
+                    return true;
+                }
+
+                if (value is float floatValue)
+                {
+                    parsedDecimalValue = (double)floatValue;
+                    return true;
+                }
+
+                if (value is IFormattable formattableValue)
+                {
+                    return double.TryParse(formattableValue.ToString(null, CultureInfo.InvariantCulture), NumberStyles.Any, CultureInfo.InvariantCulture, out parsedDecimalValue);
+                }
+
+                return double.TryParse(value.ToString(), NumberStyles.Any, CultureInfo.CurrentCulture, out parsedDecimalValue);
+            }
         }
 
         /// <summary>

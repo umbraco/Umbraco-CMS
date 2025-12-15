@@ -1,5 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -151,6 +149,12 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
 
         }
 
+        // Clear partial view cache when published content changes
+        if (ShouldClearPartialViewCache(payloads))
+        {
+            AppCaches.ClearPartialViewCache();
+        }
+
         if (idsRemoved.Count > 0)
         {
             var assignedDomains = _domainService.GetAll(true)
@@ -173,6 +177,28 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         }
 
         base.Refresh(payloads);
+    }
+
+    private static bool ShouldClearPartialViewCache(JsonPayload[] payloads)
+    {
+        return payloads.Any(x =>
+        {
+            // Check for relelvant change type
+            var isRelevantChangeType = x.ChangeTypes.HasType(TreeChangeTypes.RefreshAll) ||
+                x.ChangeTypes.HasType(TreeChangeTypes.Remove) ||
+                x.ChangeTypes.HasType(TreeChangeTypes.RefreshNode) ||
+                x.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch);
+
+            // Check for published/unpublished changes
+            var hasChanges = x.PublishedCultures?.Length > 0 ||
+                   x.UnpublishedCultures?.Length > 0;
+
+            // There's no other way to detect trashed content as the change type is only Remove when deleted permanently
+            var isTrashed = x.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch) && x.PublishedCultures is null && x.UnpublishedCultures is null;
+
+            // Skip blueprints and only clear the partial cache for removals or refreshes with changes
+            return x.Blueprint == false && (isTrashed || (isRelevantChangeType && hasChanges));
+        });
     }
 
     private void HandleMemoryCache(JsonPayload payload)
@@ -365,7 +391,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
     }
     private void HandleRouting(JsonPayload payload)
     {
-        if(payload.ChangeTypes.HasType(TreeChangeTypes.Remove))
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.Remove))
         {
             var key = payload.Key ?? _idKeyMap.GetKeyForId(payload.Id, UmbracoObjectTypes.Document).Result;
 
@@ -374,24 +400,24 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
             {
                 _documentUrlService.DeleteUrlsFromCacheAsync(descendantsOrSelfKeys).GetAwaiter().GetResult();
             }
-            else if(_documentNavigationQueryService.TryGetDescendantsKeysOrSelfKeysInBin(key, out var descendantsOrSelfKeysInBin))
+            else if (_documentNavigationQueryService.TryGetDescendantsKeysOrSelfKeysInBin(key, out var descendantsOrSelfKeysInBin))
             {
                 _documentUrlService.DeleteUrlsFromCacheAsync(descendantsOrSelfKeysInBin).GetAwaiter().GetResult();
             }
 
         }
-        if(payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
         {
             _documentUrlService.InitAsync(false, CancellationToken.None).GetAwaiter().GetResult(); //TODO make async
         }
 
-        if(payload.ChangeTypes.HasType(TreeChangeTypes.RefreshNode))
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshNode))
         {
             var key = payload.Key ?? _idKeyMap.GetKeyForId(payload.Id, UmbracoObjectTypes.Document).Result;
             _documentUrlService.CreateOrUpdateUrlSegmentsAsync(key).GetAwaiter().GetResult();
         }
 
-        if(payload.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch))
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch))
         {
             var key = payload.Key ?? _idKeyMap.GetKeyForId(payload.Id, UmbracoObjectTypes.Document).Result;
             _documentUrlService.CreateOrUpdateUrlSegmentsWithDescendantsAsync(key).GetAwaiter().GetResult();

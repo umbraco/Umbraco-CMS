@@ -220,7 +220,7 @@ test.fixme('can move a block from a group to another group in a block grid edito
   // Drag and Drop
   const dragFromLocator = await umbracoUi.dataType.getLinkWithName(elementTypeName);
   const dragToLocator = await umbracoUi.dataType.getAddButtonInGroupWithName(secondGroupName);
-  // This needs to be fixed
+  // TODO: This needs to be fixed
   await umbracoUi.dataType.dragAndDrop(dragFromLocator, dragToLocator, -10, 0, 10);
   await umbracoUi.dataType.clickSaveButton();
 
@@ -230,8 +230,7 @@ test.fixme('can move a block from a group to another group in a block grid edito
   expect(await umbracoApi.dataType.doesBlockGridGroupContainCorrectBlocks(blockGridEditorName, groupName, [elementTypeId])).toBeFalsy();
 });
 
-// TODO: When deleting a group should there not be a confirmation button? and should the block be moved another group when the group it was in is deleted?
-test.skip('can delete a group in a block grid editor', async ({umbracoApi, umbracoUi}) => {
+test.fixme('can delete a group in a block grid editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const elementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
@@ -240,6 +239,7 @@ test.skip('can delete a group in a block grid editor', async ({umbracoApi, umbra
 
   // Act
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
+  // TODO: Implement it later
 });
 
 test('can add a min and max amount to a block grid editor', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
@@ -390,6 +390,7 @@ test('can update grid columns in a block grid editor', async ({umbracoApi, umbra
 
 // TODO: wait until fixed by frontend, currently you are able to insert multiple stylesheets
 test.skip('can add a stylesheet a block grid editor', async ({umbracoApi, umbracoUi}) => {
+  // TODO: Implement it later
 });
 
 test('can remove a stylesheet in a block grid editor', async ({umbracoApi, umbracoUi}) => {

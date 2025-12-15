@@ -97,7 +97,9 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 	}
 
 	private _updateFieldFilter() {
-		this._searchResults?.map((doc) => {
+		const documentFields: ExposedSearchResultField[] = [];
+
+		this._searchResults?.forEach((doc) => {
 			const document = doc.fields?.filter((field) => {
 				return field.name?.toUpperCase() !== 'NODENAME';
 			});
@@ -106,16 +108,16 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 					return field.name ?? '';
 				});
 
-				// TODO: I don't get this code, not sure what the purpose is, it seems like a mistake: [NL]
-				this._exposedFields = this._exposedFields
-					? this._exposedFields.filter((field) => {
-							return { name: field.name, exposed: field.exposed };
-						})
-					: newFieldNames?.map((name) => {
-							return { name, exposed: false };
-						});
+				newFieldNames.forEach((name) => {
+					if (!documentFields.find((field) => field.name === name)) {
+						const exposed = this._exposedFields?.find((field) => field.name === name)?.exposed ?? false;
+						documentFields.push({ name, exposed });
+					}
+				});
 			}
 		});
+
+		this._exposedFields = documentFields.sort((a, b) => a.name.localeCompare(b.name));
 	}
 
 	async #onFieldFilterClick() {
@@ -286,11 +288,17 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 
 	renderBodyCells(cellData: UmbSearchFieldPresentationModel[]) {
 		return html`${this._exposedFields?.map((slot) => {
-			return cellData.map((field) => {
-				return slot.exposed && field.name == slot.name
-					? html`<uui-table-cell clip-text>${field.values}</uui-table-cell>`
-					: html``;
-			});
+			if (slot.exposed) {
+				const field = cellData.find((field) => field.name === slot.name);
+				if (field) {
+					return html`<uui-table-cell clip-text>${field.values}</uui-table-cell>`;
+				}
+
+				// Exposed field not found for this record, render empty cell.
+				return html`<uui-table-cell></uui-table-cell>`;
+			}
+
+			return html``;
 		})}`;
 	}
 
