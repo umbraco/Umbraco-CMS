@@ -1,4 +1,5 @@
 import type { UmbMediaItemModel } from '../../repository/item/types.js';
+import type { UmbMediaTreeItemModel } from '../../tree/types.js';
 import { UmbMediaItemRepository } from '../../repository/index.js';
 import { UMB_MEDIA_TREE_ALIAS } from '../../constants.js';
 import { UMB_BULK_MOVE_MEDIA_REPOSITORY_ALIAS } from './constants.js';
@@ -22,6 +23,7 @@ export class UmbMoveMediaBulkAction extends UmbEntityBulkActionBase<never> {
 	#itemRepository = new UmbMediaItemRepository(this);
 	#structureRepository = new UmbMediaTypeStructureRepository(this);
 	#sourceItems: UmbMediaItemModel[] = [];
+	#disallowedMediaTypes = new Set<string>();
 
 	async execute() {
 		if (this.selection?.length === 0) return;
@@ -42,7 +44,12 @@ export class UmbMoveMediaBulkAction extends UmbEntityBulkActionBase<never> {
 				unique: this.selection[0], // Use first item for entity context
 				entityType: 'media',
 				treeAlias: UMB_MEDIA_TREE_ALIAS,
-				pickableFilter: (treeItem: UmbTreeItemModel) => !this.selection.includes(treeItem.unique as string),
+				pickableFilter: (treeItem: UmbTreeItemModel) => {
+					if (this.selection.includes(treeItem.unique as string)) return false;
+					const mediaType = (treeItem as UmbMediaTreeItemModel).mediaType?.unique;
+					if (mediaType && this.#disallowedMediaTypes.has(mediaType)) return false;
+					return true;
+				},
 				onSelection: async (destinationUnique: string | null) => this.#onSelection(destinationUnique),
 				onBeforeSubmit: async (destinationUnique: string | null) =>
 					this.#onBeforeSubmit(bulkMoveRepository, destinationUnique),
@@ -85,6 +92,9 @@ export class UmbMoveMediaBulkAction extends UmbEntityBulkActionBase<never> {
 		const invalidItems = this.#sourceItems.filter((item) => !allowedTypeUniques.has(item.mediaType.unique));
 
 		if (invalidItems.length > 0) {
+			// Add to disallowed types so all items of this type become unselectable
+			this.#disallowedMediaTypes.add(destinationItem.mediaType.unique);
+
 			// Get names of invalid items (use variant name or fallback)
 			const invalidNames = invalidItems.map((item) => item.variants?.[0]?.name || item.name || item.unique);
 

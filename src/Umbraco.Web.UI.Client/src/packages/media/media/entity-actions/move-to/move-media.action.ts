@@ -1,4 +1,5 @@
 import type { UmbMediaItemModel } from '../../repository/item/types.js';
+import type { UmbMediaTreeItemModel } from '../../tree/types.js';
 import { UmbMediaItemRepository } from '../../repository/index.js';
 import { UMB_MEDIA_TREE_ALIAS } from '../../constants.js';
 import { UMB_MOVE_MEDIA_REPOSITORY_ALIAS } from './constants.js';
@@ -17,6 +18,7 @@ export class UmbMoveMediaEntityAction extends UmbEntityActionBase<never> {
 	#itemRepository = new UmbMediaItemRepository(this);
 	#structureRepository = new UmbMediaTypeStructureRepository(this);
 	#sourceItem?: UmbMediaItemModel;
+	#disallowedMediaTypes = new Set<string>();
 
 	override async execute() {
 		if (!this.args.unique) throw new Error('Unique is not available');
@@ -36,7 +38,12 @@ export class UmbMoveMediaEntityAction extends UmbEntityActionBase<never> {
 				entityType: this.args.entityType,
 				treeAlias: UMB_MEDIA_TREE_ALIAS,
 				name: this.#sourceItem.name,
-				pickableFilter: (treeItem: UmbTreeItemModel) => treeItem.unique !== this.args.unique,
+				pickableFilter: (treeItem: UmbTreeItemModel) => {
+					if (treeItem.unique === this.args.unique) return false;
+					const mediaType = (treeItem as UmbMediaTreeItemModel).mediaType?.unique;
+					if (mediaType && this.#disallowedMediaTypes.has(mediaType)) return false;
+					return true;
+				},
 				onSelection: async (destinationUnique: string | null) => this.#onSelection(destinationUnique),
 				onBeforeSubmit: async (destinationUnique: string | null) => this.#onBeforeSubmit(destinationUnique),
 			},
@@ -76,6 +83,8 @@ export class UmbMoveMediaEntityAction extends UmbEntityActionBase<never> {
 		const isAllowed = allowedChildren.items.some((allowed) => allowed.unique === this.#sourceItem!.mediaType.unique);
 
 		if (!isAllowed) {
+			// Add to disallowed types so all items of this type become unselectable
+			this.#disallowedMediaTypes.add(destinationItem.mediaType.unique);
 			return {
 				valid: false,
 				error: this.#localize.term('moveOrCopy_notAllowedByContentType'),

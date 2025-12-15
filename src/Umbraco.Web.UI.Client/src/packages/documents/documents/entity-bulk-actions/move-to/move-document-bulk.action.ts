@@ -1,4 +1,5 @@
 import type { UmbDocumentItemModel } from '../../item/repository/types.js';
+import type { UmbDocumentTreeItemModel } from '../../tree/types.js';
 import { UmbDocumentItemRepository } from '../../item/index.js';
 import { UMB_DOCUMENT_TREE_ALIAS } from '../../tree/index.js';
 import { UMB_BULK_MOVE_DOCUMENT_REPOSITORY_ALIAS } from './repository/constants.js';
@@ -22,6 +23,7 @@ export class UmbMoveDocumentBulkAction extends UmbEntityBulkActionBase<never> {
 	#itemRepository = new UmbDocumentItemRepository(this);
 	#structureRepository = new UmbDocumentTypeStructureRepository(this);
 	#sourceItems: UmbDocumentItemModel[] = [];
+	#disallowedDocumentTypes = new Set<string>();
 
 	async execute() {
 		if (this.selection?.length === 0) return;
@@ -42,7 +44,12 @@ export class UmbMoveDocumentBulkAction extends UmbEntityBulkActionBase<never> {
 				unique: this.selection[0], // Use first item for entity context
 				entityType: 'document',
 				treeAlias: UMB_DOCUMENT_TREE_ALIAS,
-				pickableFilter: (treeItem: UmbTreeItemModel) => !this.selection.includes(treeItem.unique as string),
+				pickableFilter: (treeItem: UmbTreeItemModel) => {
+					if (this.selection.includes(treeItem.unique as string)) return false;
+					const documentType = (treeItem as UmbDocumentTreeItemModel).documentType?.unique;
+					if (documentType && this.#disallowedDocumentTypes.has(documentType)) return false;
+					return true;
+				},
 				onSelection: async (destinationUnique: string | null) => this.#onSelection(destinationUnique),
 				onBeforeSubmit: async (destinationUnique: string | null) =>
 					this.#onBeforeSubmit(bulkMoveRepository, destinationUnique),
@@ -85,6 +92,9 @@ export class UmbMoveDocumentBulkAction extends UmbEntityBulkActionBase<never> {
 		const invalidItems = this.#sourceItems.filter((item) => !allowedTypeUniques.has(item.documentType.unique));
 
 		if (invalidItems.length > 0) {
+			// Add to disallowed types so all items of this type become unselectable
+			this.#disallowedDocumentTypes.add(destinationItem.documentType.unique);
+
 			// Get names of invalid items (use variant name or fallback)
 			const invalidNames = invalidItems.map((item) => item.variants?.[0]?.name || item.unique);
 

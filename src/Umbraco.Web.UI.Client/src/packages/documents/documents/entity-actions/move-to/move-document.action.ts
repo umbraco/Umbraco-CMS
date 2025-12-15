@@ -1,4 +1,5 @@
 import type { UmbDocumentItemModel } from '../../item/repository/types.js';
+import type { UmbDocumentTreeItemModel } from '../../tree/types.js';
 import { UmbDocumentItemRepository } from '../../item/index.js';
 import { UMB_DOCUMENT_TREE_ALIAS } from '../../tree/index.js';
 import { UMB_MOVE_DOCUMENT_REPOSITORY_ALIAS } from './constants.js';
@@ -17,6 +18,7 @@ export class UmbMoveDocumentEntityAction extends UmbEntityActionBase<never> {
 	#itemRepository = new UmbDocumentItemRepository(this);
 	#structureRepository = new UmbDocumentTypeStructureRepository(this);
 	#sourceItem?: UmbDocumentItemModel;
+	#disallowedDocumentTypes = new Set<string>();
 
 	override async execute() {
 		if (!this.args.unique) throw new Error('Unique is not available');
@@ -36,7 +38,12 @@ export class UmbMoveDocumentEntityAction extends UmbEntityActionBase<never> {
 				entityType: this.args.entityType,
 				treeAlias: UMB_DOCUMENT_TREE_ALIAS,
 				name: this.#sourceItem.variants[0]?.name,
-				pickableFilter: (treeItem: UmbTreeItemModel) => treeItem.unique !== this.args.unique,
+				pickableFilter: (treeItem: UmbTreeItemModel) => {
+					if (treeItem.unique === this.args.unique) return false;
+					const documentType = (treeItem as UmbDocumentTreeItemModel).documentType?.unique;
+					if (documentType && this.#disallowedDocumentTypes.has(documentType)) return false;
+					return true;
+				},
 				onSelection: async (destinationUnique: string | null) => this.#onSelection(destinationUnique),
 				onBeforeSubmit: async (destinationUnique: string | null) => this.#onBeforeSubmit(destinationUnique),
 			},
@@ -76,6 +83,8 @@ export class UmbMoveDocumentEntityAction extends UmbEntityActionBase<never> {
 		const isAllowed = allowedChildren.items.some((allowed) => allowed.unique === this.#sourceItem!.documentType.unique);
 
 		if (!isAllowed) {
+			// Add to disallowed types so all items of this type become unselectable
+			this.#disallowedDocumentTypes.add(destinationItem.documentType.unique);
 			return {
 				valid: false,
 				error: this.#localize.term('moveOrCopy_notAllowedByContentType'),

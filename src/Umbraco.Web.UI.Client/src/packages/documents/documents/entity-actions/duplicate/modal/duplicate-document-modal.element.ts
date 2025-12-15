@@ -38,16 +38,21 @@ export class UmbDocumentDuplicateToModalElement extends UmbModalBaseElement<
 	 * @returns A filter function or undefined if no filtering needed
 	 */
 	#getSelectableFilter(): ((item: UmbTreeItemModel) => boolean) | undefined {
+		const originalFilter = this.data?.pickableFilter;
 		const disabledItems = this._disabledItems;
 
-		// If no disabled items, return undefined (all selectable)
-		if (disabledItems.size === 0) {
+		// If no original filter and no disabled items, return undefined (all selectable)
+		if (!originalFilter && disabledItems.size === 0) {
 			return undefined;
 		}
 
 		return (item: UmbTreeItemModel) => {
 			// Check if item is in disabled set
 			if (disabledItems.has(item.unique)) {
+				return false;
+			}
+			// Check original filter if provided
+			if (originalFilter && !originalFilter(item)) {
 				return false;
 			}
 			return true;

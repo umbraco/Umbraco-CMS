@@ -1,5 +1,6 @@
 import { UMB_DUPLICATE_DOCUMENT_MODAL_ALIAS } from './manifests.js';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import type { UmbTreeItemModel } from '@umbraco-cms/backoffice/tree';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbDuplicateDocumentModalSelectionResult {
@@ -14,6 +15,7 @@ export interface UmbDuplicateDocumentModalSubmitResult {
 
 export interface UmbDuplicateDocumentModalData extends UmbEntityModel {
 	name?: string;
+	pickableFilter?: (item: UmbTreeItemModel) => boolean;
 	onSelection?: (destinationUnique: string | null) => Promise<UmbDuplicateDocumentModalSelectionResult>;
 	onBeforeSubmit?: (
 		destinationUnique: string | null,

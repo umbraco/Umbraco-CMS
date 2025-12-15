@@ -1,4 +1,5 @@
 import type { UmbDocumentItemModel } from '../../item/repository/types.js';
+import type { UmbDocumentTreeItemModel } from '../../tree/types.js';
 import { UmbDocumentItemRepository } from '../../item/index.js';
 import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_ROOT_ENTITY_TYPE } from '../../entity.js';
 import { UMB_DUPLICATE_DOCUMENT_MODAL } from './modal/index.js';
@@ -8,6 +9,7 @@ import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbEntityActionBase, UmbRequestReloadChildrenOfEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UmbDocumentTypeStructureRepository } from '@umbraco-cms/backoffice/document-type';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
+import type { UmbTreeItemModel } from '@umbraco-cms/backoffice/tree';
 
 export class UmbDuplicateDocumentEntityAction extends UmbEntityActionBase<never> {
 	#localize = new UmbLocalizationController(this);
@@ -16,6 +18,7 @@ export class UmbDuplicateDocumentEntityAction extends UmbEntityActionBase<never>
 	#structureRepository = new UmbDocumentTypeStructureRepository(this);
 	#sourceItem?: UmbDocumentItemModel;
 	#destinationUnique?: string | null;
+	#disallowedDocumentTypes = new Set<string>();
 
 	override async execute() {
 		if (!this.args.unique) throw new Error('Unique is not available');
@@ -31,6 +34,11 @@ export class UmbDuplicateDocumentEntityAction extends UmbEntityActionBase<never>
 				unique: this.args.unique,
 				entityType: this.args.entityType,
 				name: this.#sourceItem.variants[0]?.name,
+				pickableFilter: (treeItem: UmbTreeItemModel) => {
+					const documentType = (treeItem as UmbDocumentTreeItemModel).documentType?.unique;
+					if (documentType && this.#disallowedDocumentTypes.has(documentType)) return false;
+					return true;
+				},
 				onSelection: async (destinationUnique: string | null) => this.#onSelection(destinationUnique),
 				onBeforeSubmit: async (
 					destinationUnique: string | null,
@@ -73,6 +81,8 @@ export class UmbDuplicateDocumentEntityAction extends UmbEntityActionBase<never>
 		const isAllowed = allowedChildren.items.some((allowed) => allowed.unique === this.#sourceItem!.documentType.unique);
 
 		if (!isAllowed) {
+			// Add to disallowed types so all items of this type become unselectable
+			this.#disallowedDocumentTypes.add(destinationItem.documentType.unique);
 			return {
 				valid: false,
 				error: this.#localize.term('moveOrCopy_notAllowedByContentType'),
