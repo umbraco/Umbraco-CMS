@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -47,6 +48,7 @@ internal sealed class ContentTypeSchemaServiceTests : UmbracoIntegrationTestWith
             Assert.That(titleProperty.Alias, Is.EqualTo("title"));
             Assert.That(titleProperty.EditorAlias, Is.EqualTo("Umbraco.TextArea"));
             Assert.That(titleProperty.Inherited, Is.False);
+            Assert.That(titleProperty.DeliveryApiClrType, Is.EqualTo(typeof(string)));
         });
     }
 
@@ -72,5 +74,6 @@ internal sealed class ContentTypeSchemaServiceTests : UmbracoIntegrationTestWith
         var umbracoFileProperty = imageSchema!.Properties.FirstOrDefault(p => p.Alias == "umbracoFile");
         Assert.That(umbracoFileProperty, Is.Not.Null);
         Assert.That(umbracoFileProperty!.EditorAlias, Is.EqualTo("Umbraco.ImageCropper"));
+        Assert.That(umbracoFileProperty.DeliveryApiClrType, Is.EqualTo(typeof(ApiImageCropperValue)));
     }
 }
