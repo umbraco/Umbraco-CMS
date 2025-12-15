@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
@@ -39,7 +40,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Scoping
                 Mock.Of<IMediaPathScheme>(),
                 loggerFactory.CreateLogger<MediaFileManager>(),
                 Mock.Of<IShortStringHelper>(),
-                Mock.Of<IServiceProvider>());
+                Mock.Of<IServiceProvider>(),
+                Mock.Of<Lazy<ICoreScopeProvider>>());
             var databaseFactory = new Mock<IUmbracoDatabaseFactory>();
             var database = new Mock<IUmbracoDatabase>();
             var sqlContext = new Mock<ISqlContext>();

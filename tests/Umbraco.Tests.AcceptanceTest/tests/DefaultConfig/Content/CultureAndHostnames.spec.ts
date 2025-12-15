@@ -36,7 +36,6 @@ test('can add a culture', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickCultureAndHostnamesActionMenuOption();
-  await umbracoUi.content.clickAddNewHostnameButton();
   await umbracoUi.content.selectCultureLanguageOption(languageName);
   await umbracoUi.content.clickSaveModalButton();
 
