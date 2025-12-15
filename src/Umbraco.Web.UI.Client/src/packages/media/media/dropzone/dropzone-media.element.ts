@@ -84,7 +84,7 @@ export class UmbDropzoneMediaElement extends UmbInputDropzoneElement {
 		if (this.disabled) return;
 
 		// Normalize types for Safari
-		const types = Array.from(e.dataTransfer?.types || []).map(t => t.toLowerCase());
+		const types = Array.from(e.dataTransfer?.types || []).map((t) => t.toLowerCase());
 		if (!types.includes('files')) return;
 
 		this.#dragCounter++;
@@ -96,7 +96,7 @@ export class UmbDropzoneMediaElement extends UmbInputDropzoneElement {
 		e.preventDefault();
 	}
 
-	#handleDragLeave(e: DragEvent) {
+	#handleDragLeave(_e: DragEvent) {
 		if (this.disabled) return;
 
 		this.#dragCounter--;
