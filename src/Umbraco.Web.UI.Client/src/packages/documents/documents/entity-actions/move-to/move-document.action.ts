@@ -39,9 +39,22 @@ export class UmbMoveDocumentEntityAction extends UmbEntityActionBase<never> {
 				treeAlias: UMB_DOCUMENT_TREE_ALIAS,
 				name: this.#sourceItem.variants[0]?.name,
 				pickableFilter: (treeItem: UmbTreeItemModel) => {
+					// Prevent selecting self
 					if (treeItem.unique === this.args.unique) return false;
-					const documentType = (treeItem as UmbDocumentTreeItemModel).documentType?.unique;
+
+					const docTreeItem = treeItem as UmbDocumentTreeItemModel;
+
+					// Prevent moving to a descendant (would create circular reference)
+					const isDescendant = docTreeItem.ancestors?.some((ancestor) => ancestor.unique === this.args.unique);
+					if (isDescendant) return false;
+
+					// Prevent moving to current parent (no-op)
+					if (this.#sourceItem?.parent?.unique === treeItem.unique) return false;
+
+					// Prevent selecting document types that have already been found to be disallowed
+					const documentType = docTreeItem.documentType?.unique;
 					if (documentType && this.#disallowedDocumentTypes.has(documentType)) return false;
+
 					return true;
 				},
 				onSelection: async (destinationUnique: string | null) => this.#onSelection(destinationUnique),

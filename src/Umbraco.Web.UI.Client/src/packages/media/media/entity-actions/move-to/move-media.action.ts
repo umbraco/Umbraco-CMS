@@ -39,9 +39,16 @@ export class UmbMoveMediaEntityAction extends UmbEntityActionBase<never> {
 				treeAlias: UMB_MEDIA_TREE_ALIAS,
 				name: this.#sourceItem.name,
 				pickableFilter: (treeItem: UmbTreeItemModel) => {
+					// Prevent selecting self
 					if (treeItem.unique === this.args.unique) return false;
+
+					// Prevent moving to current parent (no-op)
+					if (this.#sourceItem?.parent?.unique === treeItem.unique) return false;
+
+					// Prevent selecting media types that have already been found to be disallowed
 					const mediaType = (treeItem as UmbMediaTreeItemModel).mediaType?.unique;
 					if (mediaType && this.#disallowedMediaTypes.has(mediaType)) return false;
+
 					return true;
 				},
 				onSelection: async (destinationUnique: string | null) => this.#onSelection(destinationUnique),

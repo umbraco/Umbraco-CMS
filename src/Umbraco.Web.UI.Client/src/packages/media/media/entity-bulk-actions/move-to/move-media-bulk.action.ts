@@ -45,9 +45,15 @@ export class UmbMoveMediaBulkAction extends UmbEntityBulkActionBase<never> {
 				entityType: 'media',
 				treeAlias: UMB_MEDIA_TREE_ALIAS,
 				pickableFilter: (treeItem: UmbTreeItemModel) => {
+					// Prevent selecting any of the source items
 					if (this.selection.includes(treeItem.unique as string)) return false;
+
+					// Note: Media tree items don't have ancestors, so descendant check relies on backend validation
+
+					// Prevent selecting media types that have already been found to be disallowed
 					const mediaType = (treeItem as UmbMediaTreeItemModel).mediaType?.unique;
 					if (mediaType && this.#disallowedMediaTypes.has(mediaType)) return false;
+
 					return true;
 				},
 				onSelection: async (destinationUnique: string | null) => this.#onSelection(destinationUnique),
