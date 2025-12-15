@@ -1,4 +1,5 @@
 import type { UmbTreeElement } from '../../../tree.element.js';
+import type { UmbTreeItemModel } from '../../../types.js';
 import type { UmbMoveToModalData, UmbMoveToModalValue } from './move-to-modal.token.js';
 import { css, customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
@@ -20,6 +21,36 @@ export class UmbMoveToModalElement extends UmbModalBaseElement<UmbMoveToModalDat
 	@state()
 	private _isSubmitting = false;
 
+	@state()
+	private _disabledItems: Set<string | null> = new Set();
+
+	/**
+	 * Combined selectable filter that checks both the original pickableFilter
+	 * and the dynamically disabled items
+	 * @returns A filter function or undefined if no filtering needed
+	 */
+	#getSelectableFilter(): ((item: UmbTreeItemModel) => boolean) | undefined {
+		const originalFilter = this.data?.pickableFilter;
+		const disabledItems = this._disabledItems;
+
+		// If no original filter and no disabled items, return undefined (all selectable)
+		if (!originalFilter && disabledItems.size === 0) {
+			return undefined;
+		}
+
+		return (item: UmbTreeItemModel) => {
+			// Check if item is in disabled set
+			if (disabledItems.has(item.unique)) {
+				return false;
+			}
+			// Check original filter if provided
+			if (originalFilter && !originalFilter(item)) {
+				return false;
+			}
+			return true;
+		};
+	}
+
 	async #onTreeSelectionChange(event: UmbSelectionChangeEvent) {
 		const target = event.target as UmbTreeElement;
 		const selection = target.getSelection();
@@ -36,6 +67,10 @@ export class UmbMoveToModalElement extends UmbModalBaseElement<UmbMoveToModalDat
 			const result = await this.data.onSelection(this._destinationUnique);
 			if (!result.valid) {
 				this._selectionError = result.error;
+				// Add to disabled items so it can't be selected again
+				if (this._destinationUnique !== null) {
+					this._disabledItems = new Set([...this._disabledItems, this._destinationUnique]);
+				}
 			}
 		}
 	}
@@ -77,7 +112,7 @@ export class UmbMoveToModalElement extends UmbModalBaseElement<UmbMoveToModalDat
 							hideTreeItemActions: true,
 							foldersOnly: this.data?.foldersOnly,
 							expandTreeRoot: true,
-							selectableFilter: this.data?.pickableFilter,
+							selectableFilter: this.#getSelectableFilter(),
 						}}
 						@selection-change=${this.#onTreeSelectionChange}></umb-tree>
 				</uui-box>

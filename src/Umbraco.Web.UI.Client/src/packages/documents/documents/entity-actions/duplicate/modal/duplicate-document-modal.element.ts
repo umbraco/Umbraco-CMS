@@ -9,7 +9,7 @@ import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 
 import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
-import type { UmbTreeElement } from '@umbraco-cms/backoffice/tree';
+import type { UmbTreeElement, UmbTreeItemModel } from '@umbraco-cms/backoffice/tree';
 
 const elementName = 'umb-document-duplicate-to-modal';
 @customElement(elementName)
@@ -29,6 +29,31 @@ export class UmbDocumentDuplicateToModalElement extends UmbModalBaseElement<
 	@state()
 	private _isSubmitting = false;
 
+	@state()
+	private _disabledItems: Set<string | null> = new Set();
+
+	/**
+	 * Combined selectable filter that checks both the original pickableFilter
+	 * and the dynamically disabled items
+	 * @returns A filter function or undefined if no filtering needed
+	 */
+	#getSelectableFilter(): ((item: UmbTreeItemModel) => boolean) | undefined {
+		const disabledItems = this._disabledItems;
+
+		// If no disabled items, return undefined (all selectable)
+		if (disabledItems.size === 0) {
+			return undefined;
+		}
+
+		return (item: UmbTreeItemModel) => {
+			// Check if item is in disabled set
+			if (disabledItems.has(item.unique)) {
+				return false;
+			}
+			return true;
+		};
+	}
+
 	async #onTreeSelectionChange(event: UmbSelectionChangeEvent) {
 		const target = event.target as UmbTreeElement;
 		const selection = target.getSelection();
@@ -45,6 +70,10 @@ export class UmbDocumentDuplicateToModalElement extends UmbModalBaseElement<
 			const result = await this.data.onSelection(this._destinationUnique);
 			if (!result.valid) {
 				this._selectionError = result.error;
+				// Add to disabled items so it can't be selected again
+				if (this._destinationUnique !== null) {
+					this._disabledItems = new Set([...this._disabledItems, this._destinationUnique]);
+				}
 			}
 		}
 	}
@@ -98,6 +127,7 @@ export class UmbDocumentDuplicateToModalElement extends UmbModalBaseElement<
 						.props=${{
 							expandTreeRoot: true,
 							hideTreeItemActions: true,
+							selectableFilter: this.#getSelectableFilter(),
 						}}
 						@selection-change=${this.#onTreeSelectionChange}></umb-tree>
 				</uui-box>
