@@ -1,5 +1,4 @@
 import { Editor } from '../../externals.js';
-import { UmbTiptapUmbracoPathConfigRepository } from '../../config/config.repository.js';
 import { UmbTiptapRteContext } from '../../contexts/tiptap-rte.context.js';
 import type { AnyExtension } from '../../externals.js';
 import type { UmbTiptapExtensionApi } from '../../extensions/types.js';
@@ -32,12 +31,13 @@ const TIPTAP_CORE_EXTENSION_ALIAS = 'Umb.Tiptap.RichTextEssentials';
  * This is used as a fallback if the server configuration is not available.
  */
 const DEFAULT_STYLESHEET_ROOT_PATH = '/css';
+
 @customElement('umb-input-tiptap')
 export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof UmbLitElement, string>(UmbLitElement) {
 	#context = new UmbTiptapRteContext(this);
-	#umbracoPathConfigRepository = new UmbTiptapUmbracoPathConfigRepository(this);
 
 	#stylesheets = new Set(['/umbraco/backoffice/css/rte-content.css']);
+
 	#stylesheetRootPath = DEFAULT_STYLESHEET_ROOT_PATH;
 
 	@property({ type: String })
@@ -103,16 +103,9 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	}
 
 	protected override async firstUpdated() {
-		await Promise.all([this.#loadUmbracoPathConfig(), this.#loadExtensions()]);
+		await this.#loadStylesheetPath();
+		await this.#loadExtensions();
 		await this.#loadEditor();
-	}
-
-	async #loadUmbracoPathConfig() {
-		await this.#umbracoPathConfigRepository.initialized;
-		const config = await this.#umbracoPathConfigRepository.requestUmbracoPathConfiguration();
-		if (config?.umbracoCssPath) {
-			this.#stylesheetRootPath = config.umbracoCssPath;
-		}
 	}
 
 	/**
@@ -121,6 +114,14 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	 */
 	public isEmpty(): boolean {
 		return this._editor?.isEmpty ?? false;
+	}
+
+	async #loadStylesheetPath() {
+		return this.observe(this.#context.stylesheetRootPath, (stylesheetRootPath) => {
+			if (stylesheetRootPath) {
+				this.#stylesheetRootPath = stylesheetRootPath;
+			}
+		}).asPromise();
 	}
 
 	async #loadExtensions() {
