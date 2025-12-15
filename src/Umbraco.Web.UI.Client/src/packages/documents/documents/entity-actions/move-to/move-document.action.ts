@@ -35,6 +35,7 @@ export class UmbMoveDocumentEntityAction extends UmbEntityActionBase<never> {
 				unique: this.args.unique,
 				entityType: this.args.entityType,
 				treeAlias: UMB_DOCUMENT_TREE_ALIAS,
+				name: this.#sourceItem.variants[0]?.name,
 				pickableFilter: (treeItem: UmbTreeItemModel) => treeItem.unique !== this.args.unique,
 				onSelection: async (destinationUnique: string | null) => this.#onSelection(destinationUnique),
 				onBeforeSubmit: async (destinationUnique: string | null) => this.#onBeforeSubmit(destinationUnique),

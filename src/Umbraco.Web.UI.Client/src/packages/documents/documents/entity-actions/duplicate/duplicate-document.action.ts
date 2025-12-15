@@ -30,6 +30,7 @@ export class UmbDuplicateDocumentEntityAction extends UmbEntityActionBase<never>
 			data: {
 				unique: this.args.unique,
 				entityType: this.args.entityType,
+				name: this.#sourceItem.variants[0]?.name,
 				onSelection: async (destinationUnique: string | null) => this.#onSelection(destinationUnique),
 				onBeforeSubmit: async (
 					destinationUnique: string | null,

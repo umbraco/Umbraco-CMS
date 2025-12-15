@@ -13,6 +13,7 @@ export interface UmbDuplicateDocumentModalSubmitResult {
 }
 
 export interface UmbDuplicateDocumentModalData extends UmbEntityModel {
+	name?: string;
 	onSelection?: (destinationUnique: string | null) => Promise<UmbDuplicateDocumentModalSelectionResult>;
 	onBeforeSubmit?: (
 		destinationUnique: string | null,

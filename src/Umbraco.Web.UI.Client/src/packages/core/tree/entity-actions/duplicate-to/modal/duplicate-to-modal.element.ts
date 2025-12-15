@@ -105,7 +105,7 @@ export class UmbDuplicateToModalElement extends UmbModalBaseElement<UmbDuplicate
 
 		return html`
 			<umb-body-layout headline=${this.localize.term('actions_copy')}>
-				<uui-box>
+				<uui-box headline=${this.localize.term('moveOrCopy_copyTo', this.data.name ?? '')}>
 					<umb-tree
 						alias=${this.data.treeAlias}
 						.props=${{
@@ -116,27 +116,22 @@ export class UmbDuplicateToModalElement extends UmbModalBaseElement<UmbDuplicate
 						}}
 						@selection-change=${this.#onTreeSelectionChange}></umb-tree>
 				</uui-box>
-				${this.#renderError()} ${this.#renderActions()}
+				${this.#renderActions()}
 			</umb-body-layout>
 		`;
 	}
 
-	#renderError() {
-		const error = this._submitError ?? this._selectionError;
-		if (!error) return nothing;
-
-		return html`
-			<div id="error">
-				<uui-icon name="icon-alert"></uui-icon>
-				<span>${error}</span>
-			</div>
-		`;
-	}
-
 	#renderActions() {
+		const error = this._submitError ?? this._selectionError;
 		const canSubmit = this._destinationUnique !== undefined && !this._selectionError && !this._isSubmitting;
 
 		return html`
+			${error
+				? html`<div id="error" slot="actions">
+						<uui-icon name="icon-alert"></uui-icon>
+						<span>${error}</span>
+					</div>`
+				: nothing}
 			<uui-button
 				slot="actions"
 				label=${this.localize.term('general_cancel')}

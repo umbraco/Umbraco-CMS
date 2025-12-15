@@ -1186,9 +1186,9 @@ export default {
 	moveOrCopy: {
 		choose: 'Choose page above...',
 		copyDone: '%0% has been copied to %1%',
-		copyTo: 'Select where the document %0% should be copied to below',
+		copyTo: 'Select where "%0%" should be copied to below',
 		moveDone: '%0% has been moved to %1%',
-		moveTo: 'Select where the document %0% should be moved to below',
+		moveTo: 'Select where "%0%" should be moved to below',
 		nodeSelected: "has been selected as the root of your new content, click 'ok' below.",
 		noNodeSelected: "No node selected yet, please select a node in the list above before clicking 'ok'",
 		notAllowedByContentType: 'The current node is not allowed under the chosen node because of its type',

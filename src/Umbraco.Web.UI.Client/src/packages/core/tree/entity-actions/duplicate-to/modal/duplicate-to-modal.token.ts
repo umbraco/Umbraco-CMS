@@ -16,6 +16,7 @@ export interface UmbDuplicateToModalSubmitResult {
 
 export interface UmbDuplicateToModalData extends UmbEntityModel {
 	treeAlias: string;
+	name?: string;
 	foldersOnly?: boolean;
 	pickableFilter?: (item: UmbTreeItemModel) => boolean;
 	onSelection?: (destinationUnique: string | null) => Promise<UmbDuplicateToModalSelectionResult>;

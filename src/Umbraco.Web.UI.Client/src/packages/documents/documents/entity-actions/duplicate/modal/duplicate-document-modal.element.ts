@@ -121,7 +121,7 @@ export class UmbDocumentDuplicateToModalElement extends UmbModalBaseElement<
 
 		return html`
 			<umb-body-layout headline=${this.localize.term('actions_copy')}>
-				<uui-box id="tree-box" headline=${this.localize.term('moveOrCopy_copyTo')}>
+				<uui-box id="tree-box" headline=${this.localize.term('moveOrCopy_copyTo', this.data.name ?? '')}>
 					<umb-tree
 						alias=${UMB_DOCUMENT_TREE_ALIAS}
 						.props=${{
@@ -140,7 +140,7 @@ export class UmbDocumentDuplicateToModalElement extends UmbModalBaseElement<
 						</div>
 					</umb-property-layout>
 
-					<umb-property-layout label=${this.localize.term('moveOrCopy_includeDescendants')} orientation="vertical"
+					<umb-property-layout label=${this.localize.term('defaultdialogs_includeDescendants')} orientation="vertical"
 						><div slot="editor">
 							<uui-toggle
 								@change=${this.#onIncludeDescendantsChange}
@@ -148,27 +148,22 @@ export class UmbDocumentDuplicateToModalElement extends UmbModalBaseElement<
 						</div>
 					</umb-property-layout>
 				</uui-box>
-				${this.#renderError()} ${this.#renderActions()}
+				${this.#renderActions()}
 			</umb-body-layout>
 		`;
 	}
 
-	#renderError() {
-		const error = this._submitError ?? this._selectionError;
-		if (!error) return nothing;
-
-		return html`
-			<div id="error">
-				<uui-icon name="icon-alert"></uui-icon>
-				<span>${error}</span>
-			</div>
-		`;
-	}
-
 	#renderActions() {
+		const error = this._submitError ?? this._selectionError;
 		const canSubmit = this._destinationUnique !== undefined && !this._selectionError && !this._isSubmitting;
 
 		return html`
+			${error
+				? html`<div id="error" slot="actions">
+						<uui-icon name="icon-alert"></uui-icon>
+						<span>${error}</span>
+					</div>`
+				: nothing}
 			<uui-button
 				slot="actions"
 				label=${this.localize.term('general_cancel')}
