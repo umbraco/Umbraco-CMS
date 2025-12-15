@@ -21,7 +21,7 @@ internal abstract partial class ApiRichTextParserBase
         _apiMediaUrlProvider = apiMediaUrlProvider;
     }
 
-    protected void ReplaceLocalLinks(IPublishedContentCache contentCache, IPublishedMediaCache mediaCache, string href, string type, Action<IApiContentRoute> handleContentRoute, Action<string> handleMediaUrl, Action handleInvalidLink)
+    protected void ReplaceLocalLinks(IPublishedContentCache contentCache, IPublishedMediaCache mediaCache, string href, string type, Action<IApiContentRoute, IPublishedContent> handleContentRoute, Action<string, IPublishedContent> handleMediaUrl, Action handleInvalidLink)
     {
         ReplaceStatus replaceAttempt = ReplaceLocalLink(contentCache, mediaCache, href, type, handleContentRoute, handleMediaUrl);
         if (replaceAttempt == ReplaceStatus.Success)
@@ -35,7 +35,7 @@ internal abstract partial class ApiRichTextParserBase
         }
     }
 
-    private ReplaceStatus ReplaceLocalLink(IPublishedContentCache contentCache, IPublishedMediaCache mediaCache, string href, string type, Action<IApiContentRoute> handleContentRoute, Action<string> handleMediaUrl)
+    private ReplaceStatus ReplaceLocalLink(IPublishedContentCache contentCache, IPublishedMediaCache mediaCache, string href, string type, Action<IApiContentRoute, IPublishedContent> handleContentRoute, Action<string, IPublishedContent> handleMediaUrl)
     {
         Match match = LocalLinkRegex().Match(href);
         if (match.Success is false)
@@ -60,7 +60,7 @@ internal abstract partial class ApiRichTextParserBase
                 if (route != null)
                 {
                     route.QueryString = match.Groups["query"].Value.NullOrWhiteSpaceAsNull();
-                    handleContentRoute(route);
+                    handleContentRoute(route, content!);
                     return ReplaceStatus.Success;
                 }
 
@@ -69,7 +69,7 @@ internal abstract partial class ApiRichTextParserBase
                 IPublishedContent? media = mediaCache.GetById(guid);
                 if (media != null)
                 {
-                    handleMediaUrl(_apiMediaUrlProvider.GetUrl(media));
+                    handleMediaUrl(_apiMediaUrlProvider.GetUrl(media), media);
                     return ReplaceStatus.Success;
                 }
 
@@ -79,7 +79,7 @@ internal abstract partial class ApiRichTextParserBase
         return ReplaceStatus.InvalidEntityType;
     }
 
-    private ReplaceStatus ReplaceLegacyLocalLink(IPublishedContentCache contentCache, IPublishedMediaCache mediaCache, string href, Action<IApiContentRoute> handleContentRoute, Action<string> handleMediaUrl)
+    private ReplaceStatus ReplaceLegacyLocalLink(IPublishedContentCache contentCache, IPublishedMediaCache mediaCache, string href, Action<IApiContentRoute, IPublishedContent> handleContentRoute, Action<string, IPublishedContent> handleMediaUrl)
     {
         Match match = LegacyLocalLinkRegex().Match(href);
         if (match.Success is false)
@@ -108,7 +108,7 @@ internal abstract partial class ApiRichTextParserBase
                 if (route != null)
                 {
                     route.QueryString = match.Groups["query"].Value.NullOrWhiteSpaceAsNull();
-                    handleContentRoute(route);
+                    handleContentRoute(route, content!);
                     return ReplaceStatus.Success;
                 }
 
@@ -117,7 +117,7 @@ internal abstract partial class ApiRichTextParserBase
                 IPublishedContent? media = mediaCache.GetById(guidUdi.Guid);
                 if (media != null)
                 {
-                    handleMediaUrl(_apiMediaUrlProvider.GetUrl(media));
+                    handleMediaUrl(_apiMediaUrlProvider.GetUrl(media), media);
                     return ReplaceStatus.Success;
                 }
 
