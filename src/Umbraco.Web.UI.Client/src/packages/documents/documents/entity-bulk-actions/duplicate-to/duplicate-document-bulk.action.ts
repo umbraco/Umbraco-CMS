@@ -44,6 +44,7 @@ export class UmbDuplicateDocumentBulkAction extends UmbEntityBulkActionBase<neve
 				unique: this.selection[0], // Use first item for entity context
 				entityType: 'document',
 				treeAlias: UMB_DOCUMENT_TREE_ALIAS,
+				name: `${this.selection.length} ${this.#localize.term('defaultdialogs_items')}`,
 				pickableFilter: (treeItem: UmbTreeItemModel) => {
 					if (this.selection.includes(treeItem.unique as string)) return false;
 					const documentType = (treeItem as UmbDocumentTreeItemModel).documentType?.unique;
