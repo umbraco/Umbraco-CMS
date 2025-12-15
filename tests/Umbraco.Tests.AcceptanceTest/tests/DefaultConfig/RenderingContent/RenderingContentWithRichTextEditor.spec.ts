@@ -2,7 +2,7 @@ import {AliasHelper, test} from '@umbraco/playwright-testhelpers';
 
 const contentName = 'Test Rendering Content';
 const documentTypeName = 'TestDocumentTypeForContent';
-const dataTypeName = 'Rich Text Editor';
+const dataTypeName = 'Richtext editor';
 const templateName = 'TestTemplateForContent';
 const propertyName = 'Test Rich Text Editor';
 let dataTypeData = null;
