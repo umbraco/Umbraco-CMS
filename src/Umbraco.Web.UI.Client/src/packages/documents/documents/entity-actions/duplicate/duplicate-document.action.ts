@@ -33,8 +33,9 @@ export class UmbDuplicateDocumentEntityAction extends UmbEntityActionBase<never>
 			data: {
 				unique: this.args.unique,
 				entityType: this.args.entityType,
-				name: this.#sourceItem.variants[0]?.name,
+				name: this.#sourceItem.variants[0]?.name || this.#sourceItem.unique,
 				pickableFilter: (treeItem: UmbTreeItemModel) => {
+					// Note: Unlike move, duplicating to a descendant IS allowed (no circular reference issue)
 					const documentType = (treeItem as UmbDocumentTreeItemModel).documentType?.unique;
 					if (documentType && this.#disallowedDocumentTypes.has(documentType)) return false;
 					return true;
