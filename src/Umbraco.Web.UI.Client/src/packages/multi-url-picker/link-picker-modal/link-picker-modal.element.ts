@@ -471,8 +471,8 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 							</div>
 						`,
 					)}
-				</uui-input></umb-property-layout
-			>
+				</uui-input>
+			</umb-property-layout>
 		`;
 	}
 
