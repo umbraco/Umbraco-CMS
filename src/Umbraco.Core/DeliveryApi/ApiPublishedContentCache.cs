@@ -129,5 +129,5 @@ public sealed class ApiPublishedContentCache : IApiPublishedContentCache
             : null;
 
     private bool IsAllowedContentType(IPublishedContent content)
-        => _deliveryApiSettings.IsAllowedContentType(content);
+        => _deliveryApiSettings.IsAllowedContentType(content.ContentType.Alias);
 }

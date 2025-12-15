@@ -142,6 +142,20 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 		return response;
 	}
 
+	/**
+	 * Reload the workspace data
+	 * @returns { Promise<void> } The promise of the reload
+	 */
+	override async reload(): Promise<void> {
+		const unique = this.getUnique();
+		if (!unique) throw new Error('Unique is not set');
+
+		const data = await this.structure.reload();
+		if (data) {
+			this._data.setPersisted(data);
+		}
+	}
+
 	#onDetailStoreChange(entity: DetailModelType | undefined) {
 		if (!entity) {
 			this._data.clear();
