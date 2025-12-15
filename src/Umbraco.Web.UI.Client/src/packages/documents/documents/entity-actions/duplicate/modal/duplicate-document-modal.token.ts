@@ -2,8 +2,23 @@ import { UMB_DUPLICATE_DOCUMENT_MODAL_ALIAS } from './manifests.js';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface UmbDuplicateDocumentModalData extends UmbEntityModel {}
+export interface UmbDuplicateDocumentModalSelectionResult {
+	valid: boolean;
+	error?: string;
+}
+
+export interface UmbDuplicateDocumentModalSubmitResult {
+	success: boolean;
+	error?: { message: string };
+}
+
+export interface UmbDuplicateDocumentModalData extends UmbEntityModel {
+	onSelection?: (destinationUnique: string | null) => Promise<UmbDuplicateDocumentModalSelectionResult>;
+	onBeforeSubmit?: (
+		destinationUnique: string | null,
+		options: { relateToOriginal: boolean; includeDescendants: boolean },
+	) => Promise<UmbDuplicateDocumentModalSubmitResult>;
+}
 
 export interface UmbDuplicateDocumentModalValue {
 	destination: {

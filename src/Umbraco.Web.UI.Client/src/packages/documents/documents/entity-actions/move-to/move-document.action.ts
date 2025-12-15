@@ -1,44 +1,47 @@
 import type { UmbDocumentItemModel } from '../../item/repository/types.js';
 import { UmbDocumentItemRepository } from '../../item/index.js';
-import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_ROOT_ENTITY_TYPE } from '../../entity.js';
-import { UMB_DUPLICATE_DOCUMENT_MODAL } from './modal/index.js';
-import { UmbDuplicateDocumentRepository } from './repository/index.js';
+import { UMB_DOCUMENT_TREE_ALIAS } from '../../tree/index.js';
+import { UMB_MOVE_DOCUMENT_REPOSITORY_ALIAS } from './constants.js';
+import type { UmbMoveRepository, UmbTreeItemModel } from '@umbraco-cms/backoffice/tree';
+import { UMB_MOVE_TO_MODAL } from '@umbraco-cms/backoffice/tree';
+import { UmbEntityActionBase, UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
+import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import { UmbEntityActionBase, UmbRequestReloadChildrenOfEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UmbDocumentTypeStructureRepository } from '@umbraco-cms/backoffice/document-type';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 
-export class UmbDuplicateDocumentEntityAction extends UmbEntityActionBase<never> {
+export class UmbMoveDocumentEntityAction extends UmbEntityActionBase<never> {
 	#localize = new UmbLocalizationController(this);
-	#duplicateRepository = new UmbDuplicateDocumentRepository(this);
+	#moveRepository?: UmbMoveRepository;
 	#itemRepository = new UmbDocumentItemRepository(this);
 	#structureRepository = new UmbDocumentTypeStructureRepository(this);
 	#sourceItem?: UmbDocumentItemModel;
-	#destinationUnique?: string | null;
 
 	override async execute() {
 		if (!this.args.unique) throw new Error('Unique is not available');
 		if (!this.args.entityType) throw new Error('Entity Type is not available');
+
+		this.#moveRepository = await createExtensionApiByAlias<UmbMoveRepository>(this, UMB_MOVE_DOCUMENT_REPOSITORY_ALIAS);
+		if (!this.#moveRepository) throw new Error('Move Repository is not available');
 
 		// Fetch source item to get its document type
 		const { data } = await this.#itemRepository.requestItems([this.args.unique]);
 		if (!data?.length) throw new Error('Source item not found');
 		this.#sourceItem = data[0];
 
-		await umbOpenModal(this, UMB_DUPLICATE_DOCUMENT_MODAL, {
+		await umbOpenModal(this, UMB_MOVE_TO_MODAL, {
 			data: {
 				unique: this.args.unique,
 				entityType: this.args.entityType,
+				treeAlias: UMB_DOCUMENT_TREE_ALIAS,
+				pickableFilter: (treeItem: UmbTreeItemModel) => treeItem.unique !== this.args.unique,
 				onSelection: async (destinationUnique: string | null) => this.#onSelection(destinationUnique),
-				onBeforeSubmit: async (
-					destinationUnique: string | null,
-					options: { relateToOriginal: boolean; includeDescendants: boolean },
-				) => this.#onBeforeSubmit(destinationUnique, options),
+				onBeforeSubmit: async (destinationUnique: string | null) => this.#onBeforeSubmit(destinationUnique),
 			},
 		});
 
-		this.#reloadMenu(this.#destinationUnique ?? null);
+		this.#reloadMenu();
 	}
 
 	async #onSelection(destinationUnique: string | null): Promise<{ valid: boolean; error?: string }> {
@@ -81,48 +84,37 @@ export class UmbDuplicateDocumentEntityAction extends UmbEntityActionBase<never>
 		return { valid: true };
 	}
 
-	async #onBeforeSubmit(
-		destinationUnique: string | null,
-		options: { relateToOriginal: boolean; includeDescendants: boolean },
-	): Promise<{ success: boolean; error?: { message: string } }> {
+	async #onBeforeSubmit(destinationUnique: string | null): Promise<{ success: boolean; error?: { message: string } }> {
+		if (!this.#moveRepository) {
+			return { success: false, error: { message: 'Move Repository is not available' } };
+		}
+
 		if (!this.args.unique) {
 			return { success: false, error: { message: 'Unique is not available' } };
 		}
 
-		const { error } = await this.#duplicateRepository.requestDuplicate({
+		const { error } = await this.#moveRepository.requestMoveTo({
 			unique: this.args.unique,
 			destination: { unique: destinationUnique },
-			relateToOriginal: options.relateToOriginal,
-			includeDescendants: options.includeDescendants,
 		});
 
 		if (error) {
 			return { success: false, error: { message: error.message } };
 		}
 
-		this.#destinationUnique = destinationUnique;
 		return { success: true };
 	}
 
-	async #reloadMenu(destinationUnique: string | null) {
+	async #reloadMenu() {
 		const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-		if (!actionEventContext) {
-			throw new Error('Action event context is not available');
-		}
-
-		// When duplicating, the destination entity type may or may not be the same as that of
-		// the item selected for duplication (that is available in this.args).
-		// For documents though, we know the entity type will be "document", unless we are duplicating
-		// to the root (when the destinationUnique will be null).
-		const destinationEntityType = destinationUnique === null ? UMB_DOCUMENT_ROOT_ENTITY_TYPE : UMB_DOCUMENT_ENTITY_TYPE;
-
-		const event = new UmbRequestReloadChildrenOfEntityEvent({
-			unique: destinationUnique,
-			entityType: destinationEntityType,
+		if (!actionEventContext) throw new Error('Action Event Context is not available');
+		const event = new UmbRequestReloadStructureForEntityEvent({
+			unique: this.args.unique,
+			entityType: this.args.entityType,
 		});
 
 		actionEventContext.dispatchEvent(event);
 	}
 }
 
-export { UmbDuplicateDocumentEntityAction as api };
+export { UmbMoveDocumentEntityAction as api };
