@@ -9,8 +9,10 @@ import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbMediaTypeStructureRepository } from '@umbraco-cms/backoffice/media-type';
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 
 export class UmbMoveMediaEntityAction extends UmbEntityActionBase<never> {
+	#localize = new UmbLocalizationController(this);
 	#moveRepository?: UmbMoveRepository;
 	#itemRepository = new UmbMediaItemRepository(this);
 	#structureRepository = new UmbMediaTypeStructureRepository(this);
@@ -44,7 +46,7 @@ export class UmbMoveMediaEntityAction extends UmbEntityActionBase<never> {
 
 	async #onSelection(destinationUnique: string | null): Promise<{ valid: boolean; error?: string }> {
 		if (!this.#sourceItem) {
-			return { valid: false, error: 'Source item not found' };
+			return { valid: false, error: this.#localize.term('general_error') };
 		}
 
 		// Root is always valid (will be validated by onBeforeSubmit if not allowed)
@@ -55,7 +57,7 @@ export class UmbMoveMediaEntityAction extends UmbEntityActionBase<never> {
 		// Fetch destination item to get its media type
 		const { data: destinationItems } = await this.#itemRepository.requestItems([destinationUnique]);
 		if (!destinationItems?.length) {
-			return { valid: false, error: 'Destination not found' };
+			return { valid: false, error: this.#localize.term('general_error') };
 		}
 		const destinationItem = destinationItems[0];
 
@@ -66,7 +68,7 @@ export class UmbMoveMediaEntityAction extends UmbEntityActionBase<never> {
 		);
 
 		if (!allowedChildren?.items) {
-			return { valid: false, error: 'Could not determine allowed children' };
+			return { valid: false, error: this.#localize.term('general_error') };
 		}
 
 		// Check if source media type is allowed
@@ -75,7 +77,7 @@ export class UmbMoveMediaEntityAction extends UmbEntityActionBase<never> {
 		if (!isAllowed) {
 			return {
 				valid: false,
-				error: `This media type is not allowed under the selected destination`,
+				error: this.#localize.term('moveOrCopy_notAllowedByContentType'),
 			};
 		}
 
