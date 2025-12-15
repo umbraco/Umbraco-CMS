@@ -242,6 +242,7 @@ test('can duplicate a content node to other parent', async ({umbracoApi, umbraco
   await umbracoApi.document.ensureNameNotExists(parentDocumentTypeName);
 });
 
+// This tests for regression issue: https://github.com/umbraco/Umbraco-CMS/issues/20520
 test('can restore a content item from the recycle bin', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const restoreMessage = 'Restore ' + contentName + ' to Root';

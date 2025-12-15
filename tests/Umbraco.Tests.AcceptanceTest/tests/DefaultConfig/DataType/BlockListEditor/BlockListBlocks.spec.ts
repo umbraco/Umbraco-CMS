@@ -441,9 +441,10 @@ test.fixme('can remove a thumbnail to a block ', {tag: '@smoke'}, async ({umbrac
   // TODO: Implement it later
 });
 
+// This tests for regression issue: https://github.com/umbraco/Umbraco-CMS/issues/20962
 test('only allow image file as a block thumbnail', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const notAllowedFileName = 'Program.cs';
+  const notAllowedFileNames = ['Program.cs', 'appsettings.json', '.csproj'];
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
   await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListEditorName, contentElementTypeId);
@@ -454,5 +455,7 @@ test('only allow image file as a block thumbnail', {tag: '@release'}, async ({um
   await umbracoUi.dataType.clickChooseThumbnailButton();
   
   // Assert
-  await umbracoUi.dataType.isModalMenuItemWithNameVisible(notAllowedFileName, false);
+  for (const notAllowedFileName of notAllowedFileNames) {
+    await umbracoUi.dataType.isModalMenuItemWithNameVisible(notAllowedFileName, false);
+  }
 });
