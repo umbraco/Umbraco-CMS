@@ -6,38 +6,51 @@ import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-reg
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 
 export class UmbDuplicateToEntityAction extends UmbEntityActionBase<MetaEntityActionDuplicateToKind> {
+	#duplicateRepository?: UmbDuplicateToRepository;
+
 	override async execute() {
 		if (!this.args.unique) throw new Error('Unique is not available');
 		if (!this.args.entityType) throw new Error('Entity Type is not available');
 
-		const value = await umbOpenModal(this, UMB_DUPLICATE_TO_MODAL, {
+		this.#duplicateRepository = await createExtensionApiByAlias<UmbDuplicateToRepository>(
+			this,
+			this.args.meta.duplicateRepositoryAlias,
+		);
+		if (!this.#duplicateRepository) throw new Error('Duplicate repository is not available');
+
+		await umbOpenModal(this, UMB_DUPLICATE_TO_MODAL, {
 			data: {
 				unique: this.args.unique,
 				entityType: this.args.entityType,
 				treeAlias: this.args.meta.treeAlias,
 				foldersOnly: this.args.meta.foldersOnly,
+				pickableFilter: (treeItem) => treeItem.unique !== this.args.unique,
+				onBeforeSubmit: async (destinationUnique) => this.#onBeforeSubmit(destinationUnique),
 			},
 		});
 
-		const destinationUnique = value.destination.unique;
-		if (destinationUnique === undefined) throw new Error('Destination Unique is not available');
+		this.#reloadMenu();
+	}
 
-		const duplicateRepository = await createExtensionApiByAlias<UmbDuplicateToRepository>(
-			this,
-			this.args.meta.duplicateRepositoryAlias,
-		);
-		if (!duplicateRepository) throw new Error('Duplicate repository is not available');
+	async #onBeforeSubmit(destinationUnique: string | null): Promise<{ success: boolean; error?: { message: string } }> {
+		if (!this.#duplicateRepository) {
+			return { success: false, error: { message: 'Duplicate repository is not available' } };
+		}
 
-		const { error } = await duplicateRepository.requestDuplicateTo({
+		if (!this.args.unique) {
+			return { success: false, error: { message: 'Unique is not available' } };
+		}
+
+		const { error } = await this.#duplicateRepository.requestDuplicateTo({
 			unique: this.args.unique,
 			destination: { unique: destinationUnique },
 		});
 
 		if (error) {
-			throw error;
+			return { success: false, error: { message: error.message } };
 		}
 
-		this.#reloadMenu();
+		return { success: true };
 	}
 
 	async #reloadMenu() {
