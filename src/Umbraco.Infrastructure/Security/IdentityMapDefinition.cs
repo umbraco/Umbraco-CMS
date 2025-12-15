@@ -167,7 +167,7 @@ public class IdentityMapDefinition : IMapDefinition
         DateTime? lockedOutUntil = source.LastLockoutDate?.AddMinutes(_securitySettings.MemberDefaultLockoutTimeInMinutes);
         if (lockedOutUntil.HasValue is false)
         {
-            return DateTime.MaxValue;
+            return DateTimeOffset.MaxValue;
         }
 
         return EnsureUtcWithServerTime(lockedOutUntil.Value);
