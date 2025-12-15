@@ -635,15 +635,32 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
 
     protected override Guid NodeObjectTypeId => Constants.ObjectTypes.Document;
 
+    /// <inheritdoc />
+    public override void Save(IContent entity)
+    {
+        base.Save(entity);
+
+        // Also populate the GUID cache so subsequent lookups by GUID don't hit the database.
+        _contentByGuidReadRepository.PopulateCacheByKey(entity);
+    }
+
     protected override IContent? PerformGet(int id)
     {
         Sql<ISqlContext> sql = GetBaseQuery(QueryType.Single)
             .Where<NodeDto>(x => x.NodeId == id);
 
         DocumentDto? dto = Database.FirstOrDefault<DocumentDto>(sql);
-        return dto == null
-            ? null
-            : MapDtoToContent(dto);
+        if (dto is null)
+        {
+            return null;
+        }
+
+        IContent content = MapDtoToContent(dto);
+
+        // Also populate the GUID cache so subsequent lookups by GUID don't hit the database.
+        _contentByGuidReadRepository.PopulateCacheByKey(content);
+
+        return content;
     }
 
     protected override IEnumerable<IContent> PerformGetAll(params int[]? ids)
@@ -655,7 +672,13 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             sql.WhereIn<NodeDto>(x => x.NodeId, ids);
         }
 
-        return MapDtosToContent(Database.Fetch<DocumentDto>(sql));
+        // MapDtosToContent returns a materialized array, so this is safe to enumerate multiple times.
+        IEnumerable<IContent> contents = MapDtosToContent(Database.Fetch<DocumentDto>(sql));
+
+        // Also populate the GUID cache so subsequent lookups by GUID don't hit the database.
+        _contentByGuidReadRepository.PopulateCacheByKey(contents);
+
+        return contents;
     }
 
     protected override IEnumerable<IContent> PerformGetByQuery(IQuery<IContent> query)
@@ -1601,6 +1624,33 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
 
     public bool Exists(Guid id) => _contentByGuidReadRepository.Exists(id);
 
+    /// <summary>
+    /// Populates the int-keyed cache with the given entity.
+    /// This allows entities retrieved by GUID to also be cached for int ID lookups.
+    /// </summary>
+    private void PopulateCacheById(IContent entity)
+    {
+        if (entity.HasIdentity)
+        {
+            var cacheKey = GetCacheKey(entity.Id);
+            IsolatedCache.Insert(cacheKey, () => entity, TimeSpan.FromMinutes(5), true);
+        }
+    }
+
+    /// <summary>
+    /// Populates the int-keyed cache with the given entities.
+    /// This allows entities retrieved by GUID to also be cached for int ID lookups.
+    /// </summary>
+    private void PopulateCacheById(IEnumerable<IContent> entities)
+    {
+        foreach (IContent entity in entities)
+        {
+            PopulateCacheById(entity);
+        }
+    }
+
+    private static string GetCacheKey(int id) => RepositoryCacheKeys.GetKey<IContent>() + id;
+
     // reading repository purely for looking up by GUID
     // TODO: ugly and to fix we need to decouple the IRepositoryQueryable -> IRepository -> IReadRepository which should all be separate things!
     // This sub-repository pattern is super old and totally unecessary anymore, caching can be handled in much nicer ways without this
@@ -1637,6 +1687,9 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
 
             IContent content = _outerRepo.MapDtoToContent(dto);
 
+            // Also populate the int-keyed cache so subsequent lookups by int ID don't hit the database
+            _outerRepo.PopulateCacheById(content);
+
             return content;
         }
 
@@ -1648,7 +1701,13 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
                 sql.WhereIn<NodeDto>(x => x.UniqueId, ids);
             }
 
-            return _outerRepo.MapDtosToContent(Database.Fetch<DocumentDto>(sql));
+            // MapDtosToContent returns a materialized array, so this is safe to enumerate multiple times
+            IEnumerable<IContent> contents = _outerRepo.MapDtosToContent(Database.Fetch<DocumentDto>(sql));
+
+            // Also populate the int-keyed cache so subsequent lookups by int ID don't hit the database
+            _outerRepo.PopulateCacheById(contents);
+
+            return contents;
         }
 
         protected override IEnumerable<IContent> PerformGetByQuery(IQuery<IContent> query) =>
@@ -1668,6 +1727,33 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
 
         protected override string GetBaseWhereClause() =>
             throw new InvalidOperationException("This method won't be implemented.");
+
+        /// <summary>
+        /// Populates the GUID-keyed cache with the given entity.
+        /// This allows entities retrieved by int ID to also be cached for GUID lookups.
+        /// </summary>
+        public void PopulateCacheByKey(IContent entity)
+        {
+            if (entity.HasIdentity)
+            {
+                var cacheKey = GetCacheKey(entity.Key);
+                IsolatedCache.Insert(cacheKey, () => entity, TimeSpan.FromMinutes(5), true);
+            }
+        }
+
+        /// <summary>
+        /// Populates the GUID-keyed cache with the given entities.
+        /// This allows entities retrieved by int ID to also be cached for GUID lookups.
+        /// </summary>
+        public void PopulateCacheByKey(IEnumerable<IContent> entities)
+        {
+            foreach (IContent entity in entities)
+            {
+                PopulateCacheByKey(entity);
+            }
+        }
+
+        private static string GetCacheKey(Guid key) => RepositoryCacheKeys.GetKey<IContent>() + key;
     }
 
     #endregion
