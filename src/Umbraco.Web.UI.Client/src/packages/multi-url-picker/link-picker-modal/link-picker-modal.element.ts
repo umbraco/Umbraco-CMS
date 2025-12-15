@@ -384,11 +384,8 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 							<div slot="append">
 								<uui-button
 									slot="append"
-									compact
 									label=${this.localize.term('general_remove')}
-									@click=${this.#onResetUrl}>
-									<uui-icon name="remove"></uui-icon>
-								</uui-button>
+									@click=${this.#onResetUrl}></uui-button>
 							</div>
 						`,
 					)}
