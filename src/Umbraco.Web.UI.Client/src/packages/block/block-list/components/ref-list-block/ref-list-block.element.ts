@@ -86,6 +86,7 @@ export class UmbRefListBlockElement extends UmbLitElement {
 				umb-icon {
 					animation: umb-icon-jiggle 500ms infinite ease-in-out;
 				}
+			}
 		`,
 	];
 }
