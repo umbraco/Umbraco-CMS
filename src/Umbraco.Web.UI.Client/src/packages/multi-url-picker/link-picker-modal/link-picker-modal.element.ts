@@ -8,6 +8,7 @@ import { css, customElement, html, nothing, query, state, when } from '@umbraco-
 import { isUmbracoFolder, UmbMediaTypeStructureRepository } from '@umbraco-cms/backoffice/media-type';
 import {
 	UMB_VALIDATION_CONTEXT,
+	umbBindToValidation,
 	UmbObserveValidationStateController,
 	UmbValidationContext,
 	type UmbValidator,
@@ -100,7 +101,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 	};
 
 	@state()
-	private _missingLinkUrl = false;
+	private _missingType = false;
 
 	@query('umb-input-document')
 	private _documentPickerElement?: UmbInputDocumentElement;
@@ -112,7 +113,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		super();
 
 		new UmbObserveValidationStateController(this, '$.type', (invalid) => {
-			this._missingLinkUrl = invalid;
+			this._missingType = invalid;
 		});
 	}
 
@@ -340,6 +341,14 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		this.#partialUpdateLink({ type: 'external' });
 	}
 
+	#checkIfUrlIsMissing() {
+		if (this.value.link.type !== 'external') return false;
+		const hasUrl = this.value.link.url && this.value.link.url.length > 0;
+		const hasAnchor = this.value.link.queryString && this.value.link.queryString.length > 0;
+
+		return !hasUrl && !hasAnchor;
+	}
+
 	override render() {
 		return html`
 			<umb-body-layout
@@ -363,96 +372,113 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 	}
 
 	#renderLinkType() {
-		return html`
-			<umb-property-layout
-				orientation=${this.#propertyLayoutOrientation}
-				label=${this.localize.term('linkPicker_modalSource')}
-				?invalid=${this._missingLinkUrl}>
-				<div slot="editor">
-					${this.#renderLinkTypeSelection()} ${this.#renderDocumentPicker()} ${this.#renderMediaPicker()}
-					${this.#renderLinkUrlInput()} ${this.#renderLinkUrlInputReadOnly()}
-				</div>
-			</umb-property-layout>
-		`;
+		return html`${this.#renderLinkTypeSelection()} ${this.#renderDocumentPicker()} ${this.#renderMediaPicker()}
+		${this.#renderLinkUrlInput()} ${this.#renderEntryUrl()}`;
 	}
 
 	#renderLinkTypeSelection() {
 		if (this.value.link.type) return nothing;
 		return html`
-			<uui-button-group>
-				<uui-button
-					data-mark="action:document"
-					look="placeholder"
-					label=${this.localize.term('general_content')}
-					@click=${this.#triggerDocumentPicker}></uui-button>
-				<uui-button
-					data-mark="action:media"
-					look="placeholder"
-					label=${this.localize.term('general_media')}
-					@click=${this.#triggerMediaPicker}></uui-button>
-				<uui-button
-					data-mark="action:external"
-					look="placeholder"
-					label=${this.localize.term('linkPicker_modalManual')}
-					@click=${this.#triggerExternalUrl}></uui-button>
-			</uui-button-group>
+			<umb-property-layout
+				orientation=${this.#propertyLayoutOrientation}
+				label=${this.localize.term('linkPicker_modalSource')}
+				?invalid=${this._missingType}>
+				<uui-button-group slot="editor">
+					<uui-button
+						data-mark="action:document"
+						look="placeholder"
+						label=${this.localize.term('general_content')}
+						.color=${this._missingType ? 'invalid' : 'default'}
+						@click=${this.#triggerDocumentPicker}></uui-button>
+					<uui-button
+						data-mark="action:media"
+						look="placeholder"
+						label=${this.localize.term('general_media')}
+						.color=${this._missingType ? 'invalid' : 'default'}
+						@click=${this.#triggerMediaPicker}></uui-button>
+					<uui-button
+						data-mark="action:external"
+						look="placeholder"
+						label=${this.localize.term('linkPicker_modalManual')}
+						.color=${this._missingType ? 'invalid' : 'default'}
+						@click=${this.#triggerExternalUrl}></uui-button>
+				</uui-button-group>
+			</umb-property-layout>
 		`;
 	}
 
 	#renderDocumentPicker() {
 		return html`
-			<umb-input-document
+			<umb-property-layout
 				?hidden=${!this.value.link.unique || this.value.link.type !== 'document'}
-				.max=${1}
-				.value=${this.value.link.unique && this.value.link.type === 'document' ? this.value.link.unique : ''}
-				@change=${(e: UmbInputPickerEvent) => this.#onPickerSelection(e, 'document')}>
-			</umb-input-document>
+				orientation=${this.#propertyLayoutOrientation}
+				label=${this.localize.term('general_content')}>
+				<umb-input-document
+					slot="editor"
+					.max=${1}
+					.value=${this.value.link.unique && this.value.link.type === 'document' ? this.value.link.unique : ''}
+					@change=${(e: UmbInputPickerEvent) => this.#onPickerSelection(e, 'document')}>
+				</umb-input-document>
+			</umb-property-layout>
 		`;
 	}
 
 	#renderMediaPicker() {
 		return html`
-			<umb-input-media
+			<umb-property-layout
 				?hidden=${!this.value.link.unique || this.value.link.type !== 'media'}
-				.allowedContentTypeIds=${this._allowedMediaTypeUniques}
-				.max=${1}
-				.value=${this.value.link.unique && this.value.link.type === 'media' ? this.value.link.unique : ''}
-				@change=${(e: UmbInputPickerEvent) => this.#onPickerSelection(e, 'media')}></umb-input-media>
+				orientation=${this.#propertyLayoutOrientation}
+				label=${this.localize.term('general_media')}>
+				<umb-input-media
+					slot="editor"
+					.allowedContentTypeIds=${this._allowedMediaTypeUniques}
+					.max=${1}
+					.value=${this.value.link.unique && this.value.link.type === 'media' ? this.value.link.unique : ''}
+					@change=${(e: UmbInputPickerEvent) => this.#onPickerSelection(e, 'media')}></umb-input-media>
+			</umb-property-layout>
 		`;
 	}
 
 	#renderLinkUrlInput() {
 		if (this.value.link.type !== 'external') return nothing;
 		return html`
-			<uui-input
-				data-mark="input:url"
-				label=${this.localize.term('placeholders_enterUrl')}
-				placeholder=${this.localize.term('placeholders_enterUrl')}
-				.value=${this.value.link.url ?? ''}
-				?disabled=${!!this.value.link.unique}
-				@input=${this.#onLinkUrlInput}
-				${umbFocus()}>
-				${when(
-					!this.value.link.unique,
-					() => html`
-						<div slot="append">
-							<uui-button
-								slot="append"
-								compact
-								label=${this.localize.term('general_remove')}
-								@click=${this.#onResetUrl}>
-								<uui-icon name="remove"></uui-icon>
-							</uui-button>
-						</div>
-					`,
-				)}
-			</uui-input>
+			<umb-property-layout
+				orientation=${this.#propertyLayoutOrientation}
+				label=${this.localize.term('linkPicker_modalManual')}>
+				<uui-input
+					slot="editor"
+					data-mark="input:url"
+					label=${this.localize.term('placeholders_enterUrl')}
+					placeholder=${this.localize.term('placeholders_enterUrl')}
+					.value=${this.value.link.url ?? ''}
+					?disabled=${!!this.value.link.unique}
+					@input=${this.#onLinkUrlInput}
+					.error=${this.#checkIfUrlIsMissing()}
+					.errorMessage=${this.localize.term('linkPicker_modalUrlOrAnchorValidationMessage')}
+					${umbBindToValidation(this)}
+					${umbFocus()}>
+					${when(
+						!this.value.link.unique,
+						() => html`
+							<div slot="append">
+								<uui-button
+									slot="append"
+									compact
+									label=${this.localize.term('general_remove')}
+									@click=${this.#onResetUrl}>
+									<uui-icon name="remove"></uui-icon>
+								</uui-button>
+							</div>
+						`,
+					)}
+				</uui-input></umb-property-layout
+			>
 		`;
 	}
 
-	#renderLinkUrlInputReadOnly() {
+	#renderEntryUrl() {
 		if (!this.value.link.unique || !this.value.link.url) return nothing;
-		return html`<uui-input readonly value=${this.value.link.url}></uui-input>`;
+		return html` <uui-input readonly value=${this.value.link.url}></uui-input> `;
 	}
 
 	#renderLinkAnchorInput() {
@@ -460,15 +486,17 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		return html`
 			<umb-property-layout
 				orientation=${this.#propertyLayoutOrientation}
-				?invalid=${this._missingLinkUrl}
 				label=${this.localize.term('defaultdialogs_anchorLinkPicker')}>
 				<uui-input
 					data-mark="input:anchor"
 					slot="editor"
 					label=${this.localize.term('placeholders_anchor')}
 					placeholder=${this.localize.term('placeholders_anchor')}
+					.error=${this.#checkIfUrlIsMissing()}
+					.errorMessage=${this.localize.term('linkPicker_modalUrlOrAnchorValidationMessage')}
 					.value=${this.value.link.queryString ?? ''}
-					@input=${this.#onLinkAnchorInput}></uui-input>
+					@input=${this.#onLinkAnchorInput}
+					${umbBindToValidation(this)}></uui-input>
 			</umb-property-layout>
 		`;
 	}
@@ -507,6 +535,10 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 
 	static override styles = [
 		css`
+			*[hidden] {
+				display: none;
+			}
+
 			uui-box {
 				--uui-box-default-padding: 0 var(--uui-size-space-5);
 			}
