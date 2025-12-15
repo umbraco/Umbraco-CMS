@@ -10,13 +10,14 @@ import type { UmbCollectionFilterModel } from '../collection-filter-model.interf
 import type { UmbCollectionRepository } from '../repository/collection-repository.interface.js';
 import type { ManifestCollection } from '../extensions/types.js';
 import { UmbCollectionBulkActionManager } from '../bulk-action/collection-bulk-action.manager.js';
+import { UmbCollectionSelectionManager } from '../selection/collection-selection.manager.js';
 import { UMB_COLLECTION_CONTEXT } from './collection-default.context-token.js';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbArrayState, UmbBasicState, UmbNumberState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
-import { UmbSelectionManager, UmbPaginationManager, UmbDeprecation, debounce } from '@umbraco-cms/backoffice/utils';
+import { UmbPaginationManager, UmbDeprecation, debounce } from '@umbraco-cms/backoffice/utils';
 import type { ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -66,7 +67,7 @@ export class UmbDefaultCollectionContext<
 	public readonly viewLayouts = this.#viewLayouts.asObservable();
 
 	public readonly pagination = new UmbPaginationManager();
-	public readonly selection = new UmbSelectionManager(this);
+	public readonly selection = new UmbCollectionSelectionManager(this);
 	public readonly view = new UmbCollectionViewManager(this);
 	public readonly bulkAction = new UmbCollectionBulkActionManager(this);
 
@@ -165,7 +166,21 @@ export class UmbDefaultCollectionContext<
 	protected _configure() {
 		if (!this.#config) return;
 
-		this.#configureSelection();
+		this.selection.setConfig(this.#config.selectionConfiguration);
+
+		// Observe bulk actions to enable selection when bulk actions are available
+		// Bulk Actions are an integrated part of a Collection so we handle it here instead of a configuration
+		this.observe(
+			this.bulkAction.hasBulkActions,
+			(hasBulkActions) => {
+				// Allow selection if there are bulk actions available
+				if (hasBulkActions) {
+					this.selection.setSelectable(true);
+					this.selection.setMultiple(true);
+				}
+			},
+			'umbCollectionHasBulkActionsObserver',
+		);
 
 		if (this.#config.pageSize) {
 			this.pagination.setPageSize(this.#config.pageSize);
@@ -194,28 +209,6 @@ export class UmbDefaultCollectionContext<
 		this.view.setConfig(viewManagerConfig);
 
 		this._configured = true;
-	}
-
-	#configureSelection() {
-		debugger;
-		this.selection.setSelectable(this.#config?.selectionConfiguration?.selectable ?? false);
-		this.selection.setMultiple(this.#config?.selectionConfiguration?.multiple ?? false);
-		this.selection.setSelectOnly(this.#config?.selectionConfiguration?.selectOnly ?? false);
-		this.selection.setSelection(this.#config?.selectionConfiguration?.selection ?? []);
-
-		// Observe bulk actions to enable selection when bulk actions are available
-		// Bulk Actions are an integrated part of a Collection so we handle it here instead of a configuration
-		this.observe(
-			this.bulkAction.hasBulkActions,
-			(hasBulkActions) => {
-				// Allow selection if there are bulk actions available
-				if (hasBulkActions) {
-					this.selection.setSelectable(true);
-					this.selection.setMultiple(true);
-				}
-			},
-			'umbCollectionHasBulkActionsObserver',
-		);
 	}
 
 	#checkIfInitialized() {

@@ -55,6 +55,23 @@ export abstract class UmbCollectionViewElementBase extends UmbLitElement {
 	}
 
 	/**
+	 * Determines if an item is selectable
+	 * @param {UmbCollectionItemModel} item - The item to check for selectability.
+	 * @returns {boolean} True if the item is selectable, false otherwise.
+	 */
+	protected _isSelectableItem(item: UmbCollectionItemModel): boolean {
+		if (!this._selectable) {
+			return false;
+		}
+
+		if (!this.#collectionContext?.selection.selectableFilter) {
+			return true;
+		}
+
+		return this.#collectionContext.selection.selectableFilter(item);
+	}
+
+	/**
 	 * Selects an item in the collection.
 	 * @param {string} unique - The unique identifier of the item to select.
 	 */

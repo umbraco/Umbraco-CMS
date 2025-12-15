@@ -43,7 +43,8 @@ export type UmbCollectionSelectionConfiguration = {
 	multiple?: boolean;
 	selectable?: boolean;
 	selectOnly?: boolean;
-	selection?: Array<string | null>;
+	selection?: Array<UmbCollectionItemModel['unique']>;
+	selectableFilter?(item: UmbCollectionItemModel): boolean;
 };
 
 export interface UmbCollectionContext {

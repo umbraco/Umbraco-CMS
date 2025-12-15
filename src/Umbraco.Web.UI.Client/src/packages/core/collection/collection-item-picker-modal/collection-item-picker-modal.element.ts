@@ -53,12 +53,14 @@ export class UmbCollectionItemPickerModalElement extends UmbModalBaseElement<
 			this._selectionConfiguration = {
 				...this._selectionConfiguration,
 				multiple,
+				selectableFilter: this.data?.pickableFilter,
 			};
 		}
 
 		if (_changedProperties.has('value')) {
 			const selection = this.value?.selection ?? [];
 			this.#pickerContext.selection.setSelection(selection);
+
 			this._selectionConfiguration = {
 				...this._selectionConfiguration,
 				selection: [...selection],
