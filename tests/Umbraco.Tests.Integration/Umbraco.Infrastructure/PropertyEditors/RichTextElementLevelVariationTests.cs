@@ -910,7 +910,9 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
             var aliasGroups = contentData.Values.GroupBy(v => v.Alias);
             foreach (var group in aliasGroups)
             {
-                Assert.AreEqual(1, group.Count(),
+                Assert.AreEqual(
+                    1,
+                    group.Count(),
                     $"Property '{group.Key}' has multiple values. Values: {string.Join(", ", group.Select(v => $"Culture={v.Culture ?? "null"}:Value={v.Value}"))}");
             }
         }
@@ -920,7 +922,9 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
             var aliasGroups = settingsData.Values.GroupBy(v => v.Alias);
             foreach (var group in aliasGroups)
             {
-                Assert.AreEqual(1, group.Count(),
+                Assert.AreEqual(
+                    1,
+                    group.Count(),
                     $"Property '{group.Key}' has multiple values. Values: {string.Join(", ", group.Select(v => $"Culture={v.Culture ?? "null"}:Value={v.Value}"))}");
             }
         }

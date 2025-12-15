@@ -2051,13 +2051,19 @@ internal partial class BlockListElementLevelVariationTests
             true);
 
         // Verify initial state
-        AssertPropertyValues("en-US",
-            "The invariant content value", "The content value in English",
-            "The invariant settings value", "The settings value in English");
+        AssertPropertyValues(
+            "en-US",
+            "The invariant content value",
+            "The content value in English",
+            "The invariant settings value",
+            "The settings value in English");
 
-        AssertPropertyValues("da-DK",
-            "The invariant content value", "The content value in Danish",
-            "The invariant settings value", "The settings value in Danish");
+        AssertPropertyValues(
+            "da-DK",
+            "The invariant content value",
+            "The content value in Danish",
+            "The invariant settings value",
+            "The settings value in Danish");
 
         // 3. Change element property type to invariant (remove culture variation)
         foreach (var propertyType in elementType.PropertyTypes.Where(pt => pt.Alias == "variantText"))
@@ -2127,7 +2133,9 @@ internal partial class BlockListElementLevelVariationTests
             var aliasGroups = contentData.Values.GroupBy(v => v.Alias);
             foreach (var group in aliasGroups)
             {
-                Assert.AreEqual(1, group.Count(),
+                Assert.AreEqual(
+                    1,
+                    group.Count(),
                     $"Property '{group.Key}' has multiple values with different cultures. Values: {string.Join(", ", group.Select(v => $"Culture={v.Culture ?? "null"}:Value={v.Value}"))}");
             }
         }
@@ -2137,19 +2145,25 @@ internal partial class BlockListElementLevelVariationTests
             var aliasGroups = settingsData.Values.GroupBy(v => v.Alias);
             foreach (var group in aliasGroups)
             {
-                Assert.AreEqual(1, group.Count(),
+                Assert.AreEqual(
+                    1,
+                    group.Count(),
                     $"Property '{group.Key}' has multiple values with different cultures. Values: {string.Join(", ", group.Select(v => $"Culture={v.Culture ?? "null"}:Value={v.Value}"))}");
             }
         }
 
         // Verify Expose entries are not duplicated
         var exposeGroups = publishedBlockListValue.Expose.GroupBy(e => (e.ContentKey, e.Culture, e.Segment));
-        Assert.IsTrue(exposeGroups.All(g => g.Count() == 1),
+        Assert.IsTrue(exposeGroups.All(
+            g => g.Count() == 1),
             $"Duplicate Expose entries found. Expose: {string.Join(", ", publishedBlockListValue.Expose.Select(e => $"{e.ContentKey}:{e.Culture}:{e.Segment}"))}");
 
-        void AssertPropertyValues(string culture,
-            string expectedInvariantContentValue, string expectedVariantContentValue,
-            string expectedInvariantSettingsValue, string expectedVariantSettingsValue)
+        void AssertPropertyValues(
+            string culture,
+            string expectedInvariantContentValue,
+            string expectedVariantContentValue,
+            string expectedInvariantSettingsValue,
+            string expectedVariantSettingsValue)
         {
             SetVariationContext(culture, null);
             var publishedContent = GetPublishedContent(content.Key);

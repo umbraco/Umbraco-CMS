@@ -582,10 +582,7 @@ internal sealed class BlockGridElementLevelVariationTests : BlockEditorElementVa
         PublishContent(content, ["en-US", "da-DK"]);
 
         // 3. Change element property type to invariant (remove culture variation)
-        foreach (var propertyType in elementType.PropertyTypes.Where(pt => pt.Alias == "variantText"))
-        {
-            propertyType.Variations = ContentVariation.Nothing;
-        }
+        elementType.PropertyTypes.Single(pt => pt.Alias == "variantText").Variations = ContentVariation.Nothing;
 
         ContentTypeService.Save(elementType);
 
@@ -628,7 +625,9 @@ internal sealed class BlockGridElementLevelVariationTests : BlockEditorElementVa
             var aliasGroups = contentData.Values.GroupBy(v => v.Alias);
             foreach (var group in aliasGroups)
             {
-                Assert.AreEqual(1, group.Count(),
+                Assert.AreEqual(
+                    1,
+                    group.Count(),
                     $"Property '{group.Key}' has multiple values. Values: {string.Join(", ", group.Select(v => $"Culture={v.Culture ?? "null"}:Value={v.Value}"))}");
             }
         }
@@ -638,7 +637,9 @@ internal sealed class BlockGridElementLevelVariationTests : BlockEditorElementVa
             var aliasGroups = settingsData.Values.GroupBy(v => v.Alias);
             foreach (var group in aliasGroups)
             {
-                Assert.AreEqual(1, group.Count(),
+                Assert.AreEqual(
+                    1,
+                    group.Count(),
                     $"Property '{group.Key}' has multiple values. Values: {string.Join(", ", group.Select(v => $"Culture={v.Culture ?? "null"}:Value={v.Value}"))}");
             }
         }
@@ -693,10 +694,7 @@ internal sealed class BlockGridElementLevelVariationTests : BlockEditorElementVa
 
         // 3. Change element type to variant (add culture variation)
         elementType.Variations = ContentVariation.Culture;
-        foreach (var propertyType in elementType.PropertyTypes.Where(pt => pt.Alias == "variantText"))
-        {
-            propertyType.Variations = ContentVariation.Culture;
-        }
+        elementType.PropertyTypes.Single(pt => pt.Alias == "variantText").Variations = ContentVariation.Culture;
 
         ContentTypeService.Save(elementType);
 
