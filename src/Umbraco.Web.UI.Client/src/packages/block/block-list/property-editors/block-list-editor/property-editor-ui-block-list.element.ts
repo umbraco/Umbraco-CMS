@@ -27,7 +27,6 @@ import type {
 import type { UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
 
 import '../../components/block-list-entry/index.js';
-import '@umbraco-cms/backoffice/property-sort-mode';
 
 const SORTER_CONFIG: UmbSorterConfig<UmbBlockListLayoutModel, UmbBlockListEntryElement> = {
 	getUniqueOfElement: (element) => {
