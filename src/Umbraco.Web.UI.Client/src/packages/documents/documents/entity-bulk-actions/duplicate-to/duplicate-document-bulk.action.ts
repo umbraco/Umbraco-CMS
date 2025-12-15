@@ -1,0 +1,147 @@
+import type { UmbDocumentItemModel } from '../../item/repository/types.js';
+import { UmbDocumentItemRepository } from '../../item/index.js';
+import { UMB_DOCUMENT_TREE_ALIAS } from '../../tree/index.js';
+import { UMB_BULK_DUPLICATE_DOCUMENT_REPOSITORY_ALIAS } from './repository/constants.js';
+import type { UmbBulkDuplicateToRepository } from '@umbraco-cms/backoffice/entity-bulk-action';
+import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-bulk-action';
+import type { UmbTreeItemModel } from '@umbraco-cms/backoffice/tree';
+import { UMB_DUPLICATE_TO_MODAL } from '@umbraco-cms/backoffice/tree';
+import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
+import {
+	UmbRequestReloadChildrenOfEntityEvent,
+	UmbRequestReloadStructureForEntityEvent,
+} from '@umbraco-cms/backoffice/entity-action';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
+import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
+import { UmbDocumentTypeStructureRepository } from '@umbraco-cms/backoffice/document-type';
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
+
+export class UmbDuplicateDocumentBulkAction extends UmbEntityBulkActionBase<never> {
+	#localize = new UmbLocalizationController(this);
+	#itemRepository = new UmbDocumentItemRepository(this);
+	#structureRepository = new UmbDocumentTypeStructureRepository(this);
+	#sourceItems: UmbDocumentItemModel[] = [];
+
+	async execute() {
+		if (this.selection?.length === 0) return;
+
+		// Fetch all selected items to get their document types
+		const { data } = await this.#itemRepository.requestItems(this.selection);
+		if (!data?.length) throw new Error('Source items not found');
+		this.#sourceItems = data;
+
+		const bulkDuplicateRepository = await createExtensionApiByAlias<UmbBulkDuplicateToRepository>(
+			this,
+			UMB_BULK_DUPLICATE_DOCUMENT_REPOSITORY_ALIAS,
+		);
+		if (!bulkDuplicateRepository) throw new Error('Bulk Duplicate Repository is not available');
+
+		await umbOpenModal(this, UMB_DUPLICATE_TO_MODAL, {
+			data: {
+				unique: this.selection[0], // Use first item for entity context
+				entityType: 'document',
+				treeAlias: UMB_DOCUMENT_TREE_ALIAS,
+				pickableFilter: (treeItem: UmbTreeItemModel) => !this.selection.includes(treeItem.unique as string),
+				onSelection: async (destinationUnique: string | null) => this.#onSelection(destinationUnique),
+				onBeforeSubmit: async (destinationUnique: string | null) =>
+					this.#onBeforeSubmit(bulkDuplicateRepository, destinationUnique),
+			},
+		});
+
+		await this.#reloadMenu();
+	}
+
+	async #onSelection(destinationUnique: string | null): Promise<{ valid: boolean; error?: string }> {
+		if (!this.#sourceItems.length) {
+			return { valid: false, error: this.#localize.term('general_error') };
+		}
+
+		// Root is always valid (will be validated by onBeforeSubmit if not allowed)
+		if (destinationUnique === null) {
+			return { valid: true };
+		}
+
+		// Fetch destination item to get its document type
+		const { data: destinationItems } = await this.#itemRepository.requestItems([destinationUnique]);
+		if (!destinationItems?.length) {
+			return { valid: false, error: this.#localize.term('general_error') };
+		}
+		const destinationItem = destinationItems[0];
+
+		// Get allowed children of the destination's document type
+		const { data: allowedChildren } = await this.#structureRepository.requestAllowedChildrenOf(
+			destinationItem.documentType.unique,
+			destinationUnique,
+		);
+
+		if (!allowedChildren?.items) {
+			return { valid: false, error: this.#localize.term('general_error') };
+		}
+
+		const allowedTypeUniques = new Set(allowedChildren.items.map((item) => item.unique));
+
+		// Check which items are NOT allowed
+		const invalidItems = this.#sourceItems.filter((item) => !allowedTypeUniques.has(item.documentType.unique));
+
+		if (invalidItems.length > 0) {
+			// Get names of invalid items (use variant name or fallback)
+			const invalidNames = invalidItems.map((item) => item.variants?.[0]?.name || item.unique);
+
+			if (invalidItems.length === this.#sourceItems.length) {
+				// All items are invalid
+				return {
+					valid: false,
+					error: this.#localize.term('moveOrCopy_notAllowedByContentType'),
+				};
+			}
+
+			// Some items are invalid - list them
+			return {
+				valid: false,
+				error: `${this.#localize.term('moveOrCopy_notAllowedByContentType')}: ${invalidNames.join(', ')}`,
+			};
+		}
+
+		return { valid: true };
+	}
+
+	async #onBeforeSubmit(
+		bulkDuplicateRepository: UmbBulkDuplicateToRepository,
+		destinationUnique: string | null,
+	): Promise<{ success: boolean; error?: { message: string } }> {
+		const { error } = await bulkDuplicateRepository.requestBulkDuplicateTo({
+			uniques: this.selection,
+			destination: { unique: destinationUnique },
+		});
+
+		if (error) {
+			return { success: false, error: { message: error.message } };
+		}
+
+		return { success: true };
+	}
+
+	async #reloadMenu() {
+		const entityContext = await this.getContext(UMB_ENTITY_CONTEXT);
+		if (!entityContext) throw new Error('Entity Context is not available');
+
+		const entityType = entityContext.getEntityType();
+		const unique = entityContext.getUnique();
+
+		if (entityType && unique !== undefined) {
+			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+			if (!eventContext) throw new Error('Event Context is not available');
+
+			const args = { entityType, unique };
+
+			const reloadChildren = new UmbRequestReloadChildrenOfEntityEvent(args);
+			eventContext.dispatchEvent(reloadChildren);
+
+			const reloadStructure = new UmbRequestReloadStructureForEntityEvent(args);
+			eventContext.dispatchEvent(reloadStructure);
+		}
+	}
+}
+
+export { UmbDuplicateDocumentBulkAction as api };
