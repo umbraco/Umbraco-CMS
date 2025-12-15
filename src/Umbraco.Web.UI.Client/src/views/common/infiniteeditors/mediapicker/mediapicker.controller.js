@@ -376,8 +376,9 @@ angular.module("umbraco")
                     if (vm.searchOptions.totalPages > 1) {
                         vm.searchOptions.pageNumber = vm.searchOptions.totalPages;
                         return getChildren($scope.currentFolder.id);
+                    } else {
+                        return Promise.resolve();
                     }
-
                 }).then(function () {
 
                     // Select the newly uploaded items.
