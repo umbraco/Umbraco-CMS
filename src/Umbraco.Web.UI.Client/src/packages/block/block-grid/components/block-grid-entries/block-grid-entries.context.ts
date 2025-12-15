@@ -284,7 +284,8 @@ export class UmbBlockGridEntriesContext
 	async #clipboardEntriesFilter(propertyValue: UmbBlockGridValueModel) {
 		const allowedElementTypeKeys = this.#retrieveAllowedElementTypes().map((x) => x.contentElementTypeKey);
 
-		const rootContentKeys = propertyValue.layout['Umbraco.BlockGrid']?.map((block) => block.contentKey) ?? [];
+		const rootContentKeys =
+			propertyValue.layout[UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS]?.map((block) => block.contentKey) ?? [];
 		const rootContentTypeKeys = propertyValue.contentData
 			.filter((content) => rootContentKeys.includes(content.key))
 			.map((content) => content.contentTypeKey);
@@ -401,6 +402,7 @@ export class UmbBlockGridEntriesContext
 		this.#allowedBlockTypes.setValue(this.#retrieveAllowedElementTypes());
 		this.#setupAllowedBlockTypesLimits();
 	}
+
 	#setupRangeLimits() {
 		if (!this._manager) return;
 		//const range = this.#retrieveRangeLimits();
