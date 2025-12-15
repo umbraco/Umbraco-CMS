@@ -282,6 +282,28 @@ export class UmbContentTypeStructureManager<
 	}
 
 	/**
+	 * Reload the owner content type.
+	 * @returns {Promise} - A promise that will be resolved when the content type is reloaded.
+	 */
+	public async reload(): Promise<T> {
+		await this.#initRepository;
+		const contentTypeUnique = this.getOwnerContentTypeUnique();
+		if (!contentTypeUnique) throw new Error('Could not find the Content Type to reload');
+
+		const { error, data } = await this.#repository!.requestByUnique(contentTypeUnique);
+		if (error || !data) {
+			throw error?.message ?? 'Repository did not return data.';
+		}
+
+		// Update state with latest version:
+		this.#contentTypes.updateOne(contentTypeUnique, data);
+
+		// Update entry in the repo manager:
+		this.#repoManager!.addEntry(data);
+		return data;
+	}
+
+	/**
 	 * Create the owner content type. Notice this is for a Content Type that is NOT already stored on the server.
 	 * @param {string | null} parentUnique - The unique of the parent content type
 	 * @returns {Promise} - a promise that is resolved when the content type has been created.
