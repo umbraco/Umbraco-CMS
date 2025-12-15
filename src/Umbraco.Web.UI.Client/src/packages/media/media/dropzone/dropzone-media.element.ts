@@ -96,7 +96,7 @@ export class UmbDropzoneMediaElement extends UmbInputDropzoneElement {
 		e.preventDefault();
 	}
 
-	#handleDragLeave(_e: DragEvent) {
+	#handleDragLeave() {
 		if (this.disabled) return;
 
 		this.#dragCounter--;
