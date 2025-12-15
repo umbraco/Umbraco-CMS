@@ -19,10 +19,10 @@ import type {
 	UmbPropertyEditorUiElement,
 	UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
+import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
 
 // TODO: consider moving the components to the property editor folder as they are only used here
 import '../../local-components.js';
-import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
 
 /**
  * @element umb-property-editor-ui-block-grid
