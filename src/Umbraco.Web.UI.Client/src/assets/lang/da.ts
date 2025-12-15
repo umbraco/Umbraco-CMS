@@ -1179,9 +1179,9 @@ export default {
 	moveOrCopy: {
 		choose: 'Vælg siden ovenover...',
 		copyDone: '%0% er nu kopieret til %1%',
-		copyTo: 'Kopier "%0%" til',
+		copyTo: 'Kopier %0% til',
 		moveDone: '%0% er nu flyttet til %1%',
-		moveTo: 'Flyt "%0%" til',
+		moveTo: 'Flyt %0% til',
 		nodeSelected: "er blevet valgt som roden for dit nye indhold, klik 'ok' nedenunder.",
 		noNodeSelected: "Intet element valgt, vælg et element i listen ovenfor før der klikkes 'fortsæt'",
 		notAllowedByContentType: 'Det nuværende element kan ikke lægges under denne pga. sin type',
