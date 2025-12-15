@@ -44,7 +44,7 @@ export class UmbMoveMediaBulkAction extends UmbEntityBulkActionBase<never> {
 				unique: this.selection[0], // Use first item for entity context
 				entityType: 'media',
 				treeAlias: UMB_MEDIA_TREE_ALIAS,
-				name: `${this.selection.length} ${this.#localize.term('defaultdialogs_items')}`,
+				name: `${this.selection.length} ${this.#localize.term('validation_items')}`,
 				pickableFilter: (treeItem: UmbTreeItemModel) => {
 					// Prevent selecting any of the source items
 					if (this.selection.includes(treeItem.unique as string)) return false;
