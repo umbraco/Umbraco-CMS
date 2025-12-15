@@ -43,9 +43,14 @@ public class ContentService : RepositoryService, IContentService
     private readonly IIdKeyMap _idKeyMap;
     private ContentSettings _contentSettings;
     private readonly IRelationService _relationService;
+    private readonly IDocumentUrlRepository _documentUrlRepository;
+
     private IQuery<IContent>? _queryNotTrashed;
 
     #region Constructors
+
+    // TODO (V19): When cleaning up the obsolete constructors, also remove the factory registration in UmbracoBuilder.cs.
+    // This has only been added to resolve an issue with ambiguous constructor resolution in this class.
 
     public ContentService(
         ICoreScopeProvider provider,
@@ -64,7 +69,8 @@ public class ContentService : RepositoryService, IContentService
         PropertyEditorCollection propertyEditorCollection,
         IIdKeyMap idKeyMap,
         IOptionsMonitor<ContentSettings> optionsMonitor,
-        IRelationService relationService)
+        IRelationService relationService,
+        IDocumentUrlRepository documentUrlRepository)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _documentRepository = documentRepository;
@@ -86,6 +92,48 @@ public class ContentService : RepositoryService, IContentService
         });
         _relationService = relationService;
         _logger = loggerFactory.CreateLogger<ContentService>();
+        _documentUrlRepository = documentUrlRepository;
+    }
+
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+    public ContentService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IDocumentRepository documentRepository,
+        IEntityRepository entityRepository,
+        IAuditService auditService,
+        IContentTypeRepository contentTypeRepository,
+        IDocumentBlueprintRepository documentBlueprintRepository,
+        ILanguageRepository languageRepository,
+        Lazy<IPropertyValidationService> propertyValidationService,
+        IShortStringHelper shortStringHelper,
+        ICultureImpactFactory cultureImpactFactory,
+        IUserIdKeyResolver userIdKeyResolver,
+        PropertyEditorCollection propertyEditorCollection,
+        IIdKeyMap idKeyMap,
+        IOptionsMonitor<ContentSettings> optionsMonitor,
+        IRelationService relationService)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            documentRepository,
+            entityRepository,
+            auditService,
+            contentTypeRepository,
+            documentBlueprintRepository,
+            languageRepository,
+            propertyValidationService,
+            shortStringHelper,
+            cultureImpactFactory,
+            userIdKeyResolver,
+            propertyEditorCollection,
+            idKeyMap,
+            optionsMonitor,
+            relationService,
+            StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlRepository>())
+    {
     }
 
     [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
@@ -1111,6 +1159,16 @@ public class ContentService : RepositoryService, IContentService
                 return OperationResult.Cancel(eventMessages);
             }
 
+            // Changing key is not something we encourage, but it can be done, and there are valid use cases for it.
+            // See: https://github.com/umbraco/Umbraco-CMS/issues/21131
+            // If the key has changed for an existing document, we need to delete any existing URL records for the old key. This is
+            // because this is the only database relation where we use the key as a foreign key constraint.
+            // TODO (V18): Consider removing this and instead adding validation across all entities to prevent changing keys.
+            if (content.HasIdentity && content.IsPropertyDirty(nameof(IContent.Key)))
+            {
+                RemoveDocumentUrls(content);
+            }
+
             scope.WriteLock(Constants.Locks.ContentTree);
             userId ??= Constants.Security.SuperUserId;
 
@@ -1161,6 +1219,20 @@ public class ContentService : RepositoryService, IContentService
         }
 
         return OperationResult.Succeed(eventMessages);
+    }
+
+    private void RemoveDocumentUrls(IContent content)
+    {
+        IContent? existingContent = GetById(content.Id);
+        if (existingContent is null)
+        {
+            return;
+        }
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(Constants.Locks.DocumentUrls);
+        _documentUrlRepository.DeleteByDocumentKey([existingContent.Key]);
+        scope.Complete();
     }
 
     /// <inheritdoc />

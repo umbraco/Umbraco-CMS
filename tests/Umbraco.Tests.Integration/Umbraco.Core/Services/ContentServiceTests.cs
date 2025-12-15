@@ -77,6 +77,8 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
 
     private IValueEditorCache ValueEditorCache => GetRequiredService<IValueEditorCache>();
 
+    private IDocumentUrlService DocumentUrlService => GetRequiredService<IDocumentUrlService>();
+
     protected override void CustomTestSetup(IUmbracoBuilder builder) => builder
         .AddNotificationHandler<ContentPublishingNotification, ContentNotificationHandler>()
         .AddNotificationHandler<ContentCopyingNotification, ContentNotificationHandler>()
@@ -1625,6 +1627,37 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         Assert.That(published.Success, Is.False);
         Assert.That(content.Published, Is.False);
         Assert.That(content.Trashed, Is.True);
+    }
+
+    [Test]
+    public void Can_Save_Content_And_Change_Key()
+    {
+        // Arrange
+        var content = ContentService.GetById(Textpage.Id);
+        Assert.That(content.Key, Is.EqualTo(Textpage.Key));
+
+        // - save and publish the content so it has a document URL
+        var saved = ContentService.Save(content, userId: Constants.Security.SuperUserId);
+        var published = ContentService.Publish(content, content.AvailableCultures.ToArray(), userId: Constants.Security.SuperUserId);
+        Assert.IsTrue(saved.Success);
+        Assert.IsTrue(published.Success);
+
+        // - ensure the document URL cache is populated (in production this is done via a cache refresher, but for the test
+        //   it's OK to just call the method directly).
+        DocumentUrlService.CreateOrUpdateUrlSegmentsAsync(content.Key);
+
+        // - prepare a new key
+        var newKey = Guid.NewGuid();
+        content.Key = newKey;
+
+        // Act
+        saved = ContentService.Save(content, userId: Constants.Security.SuperUserId);
+
+        // Assert
+        Assert.IsTrue(saved.Success);
+
+        content = ContentService.GetById(Textpage.Id);
+        Assert.That(content.Key, Is.EqualTo(newKey));
     }
 
     [Test]
