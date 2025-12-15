@@ -197,8 +197,8 @@ export class UmbDocumentDuplicateToModalElement extends UmbModalBaseElement<
 				align-items: center;
 				gap: var(--uui-size-space-2);
 				color: var(--uui-color-danger);
-				padding: var(--uui-size-space-4);
-				margin-top: var(--uui-size-space-4);
+				padding: var(--uui-size-space-3) 0;
+				padding-inline-start: var(--uui-size-space-3);
 			}
 		`,
 	];
