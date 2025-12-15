@@ -273,7 +273,10 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		const label = this.#labelRender.toString();
 		const title = `${prefix} ${label}`;
 		this.#name.setValue(title);
-		this.view.setTitle(title);
+
+		if (this.#modalContext) {
+			this.view.setTitle(title);
+		}
 	}
 
 	#allowNavigateAway = false;
