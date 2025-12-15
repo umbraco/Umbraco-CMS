@@ -49,17 +49,11 @@ test('variant block values are readable in UI after page reload', {tag: '@smoke'
   const textStringDataType = await umbracoApi.dataType.getByName(textStringDataTypeName);
   const textStringDataTypeId = textStringDataType.id;
 
-  const variantBlockId = await umbracoApi.documentType.createVariantElementTypeWithVariantAndInvariantProperty(
-    variantBlockName, variantBlockGroupName, variantPropertyName, invariantPropertyName, textStringDataTypeId
-  );
+  const variantBlockId = await umbracoApi.documentType.createVariantElementTypeWithVariantAndInvariantProperty(variantBlockName, variantBlockGroupName, variantPropertyName, invariantPropertyName, textStringDataTypeId);
   const innerBlockListId = await umbracoApi.dataType.createBlockListDataTypeWithABlock(innerBlockListName, variantBlockId);
-  const wrapperBlockId = await umbracoApi.documentType.createDefaultElementType(
-    wrapperBlockName, wrapperGroupName, innerBlockListName, innerBlockListId
-  );
+  const wrapperBlockId = await umbracoApi.documentType.createDefaultElementType(wrapperBlockName, wrapperGroupName, innerBlockListName, innerBlockListId);
   const outerRteId = await umbracoApi.dataType.createRichTextEditorWithABlock(outerRteName, wrapperBlockId);
-  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(
-    documentTypeName, outerRteName, outerRteId, documentTypeGroupName, true, false
-  );
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, outerRteName, outerRteId, documentTypeGroupName, true, false);
   await umbracoApi.document.createDefaultDocumentWithEnglishCulture(contentName, documentTypeId);
 
   await umbracoUi.goToBackOffice();
