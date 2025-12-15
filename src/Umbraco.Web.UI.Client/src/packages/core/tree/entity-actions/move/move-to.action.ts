@@ -1,4 +1,4 @@
-import { UMB_TREE_PICKER_MODAL } from '../../tree-picker-modal/index.js';
+import { UMB_MOVE_TO_MODAL } from './modal/constants.js';
 import type { UmbMoveRepository } from './move-repository.interface.js';
 import type { MetaEntityActionMoveToKind } from './types.js';
 import { UmbEntityActionBase, UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
@@ -7,35 +7,48 @@ import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-reg
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 
 export class UmbMoveToEntityAction extends UmbEntityActionBase<MetaEntityActionMoveToKind> {
+	#moveRepository?: UmbMoveRepository;
+
 	override async execute() {
 		if (!this.args.unique) throw new Error('Unique is not available');
 		if (!this.args.entityType) throw new Error('Entity Type is not available');
 
-		const value = await umbOpenModal(this, UMB_TREE_PICKER_MODAL, {
+		this.#moveRepository = await createExtensionApiByAlias<UmbMoveRepository>(this, this.args.meta.moveRepositoryAlias);
+		if (!this.#moveRepository) throw new Error('Move Repository is not available');
+
+		await umbOpenModal(this, UMB_MOVE_TO_MODAL, {
 			data: {
+				unique: this.args.unique,
+				entityType: this.args.entityType,
 				treeAlias: this.args.meta.treeAlias,
 				foldersOnly: this.args.meta.foldersOnly,
-				expandTreeRoot: true,
 				pickableFilter: (treeItem) => treeItem.unique !== this.args.unique,
+				onBeforeSubmit: async (destinationUnique) => this.#onBeforeSubmit(destinationUnique),
 			},
 		});
 
-		const destinationUnique = value.selection[0];
-		if (destinationUnique === undefined) throw new Error('Destination Unique is not available');
+		this.#reloadMenu();
+	}
 
-		const moveRepository = await createExtensionApiByAlias<UmbMoveRepository>(this, this.args.meta.moveRepositoryAlias);
-		if (!moveRepository) throw new Error('Move Repository is not available');
+	async #onBeforeSubmit(destinationUnique: string | null): Promise<{ success: boolean; error?: { message: string } }> {
+		if (!this.#moveRepository) {
+			return { success: false, error: { message: 'Move Repository is not available' } };
+		}
 
-		const { error } = await moveRepository.requestMoveTo({
+		if (!this.args.unique) {
+			return { success: false, error: { message: 'Unique is not available' } };
+		}
+
+		const { error } = await this.#moveRepository.requestMoveTo({
 			unique: this.args.unique,
 			destination: { unique: destinationUnique },
 		});
 
 		if (error) {
-			throw error;
+			return { success: false, error: { message: error.message } };
 		}
 
-		this.#reloadMenu();
+		return { success: true };
 	}
 
 	async #reloadMenu() {

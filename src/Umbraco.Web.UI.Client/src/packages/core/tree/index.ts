@@ -4,6 +4,7 @@ export * from './constants.js';
 export * from './data/index.js';
 export * from './default/index.js';
 export * from './entity-actions/duplicate-to/index.js';
+export * from './entity-actions/move/index.js';
 export * from './entity-actions/reload-tree-item-children/index.js';
 export * from './entity-actions/sort-children-of/index.js';
 export * from './folder/index.js';
