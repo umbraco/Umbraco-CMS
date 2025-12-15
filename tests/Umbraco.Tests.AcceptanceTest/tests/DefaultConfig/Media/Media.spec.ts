@@ -53,8 +53,8 @@ const mediaFileTypes = [
   {fileName: 'Article', filePath: 'Article.pdf', thumbnail: 'icon-article'},
   {fileName: 'Audio', filePath: 'Audio.mp3', thumbnail: 'icon-audio-lines'},
   {fileName: 'File', filePath: 'File.txt', thumbnail: 'icon-document'},
-  {fileName: 'Image', filePath: 'Umbraco.png', thumbnail: 'image'},
-  {fileName: 'Vector Graphics (SVG)', filePath: 'VectorGraphics.svg', thumbnail: 'image'},
+  {fileName: 'Image', filePath: 'Umbraco.png', thumbnail: 'icon-picture'},
+  {fileName: 'Vector Graphics (SVG)', filePath: 'VectorGraphics.svg', thumbnail: 'icon-origami'},
   {fileName: 'Video', filePath: 'Video.mp4', thumbnail: 'icon-video'}
 ];
 
@@ -68,16 +68,18 @@ for (const mediaFileType of mediaFileTypes) {
     await umbracoUi.media.clickCreateMediaWithType(mediaFileType.fileName);
     await umbracoUi.media.enterMediaItemName(mediaFileType.fileName);
     await umbracoUi.media.uploadFile('./fixtures/mediaLibrary/' + mediaFileType.filePath);
-    await umbracoUi.waitForTimeout(500); // Wait for the file to be uploaded
+    // Wait for the upload to complete
+    await umbracoUi.media.isInputDropzoneVisible(false);
+    if (mediaFileType.fileName === 'Image') {
+      await umbracoUi.media.isImageCropperFieldVisible();
+    } else {
+      await umbracoUi.media.isInputUploadFieldVisible();
+    }
     await umbracoUi.media.clickSaveButton();
 
     // Assert
     await umbracoUi.media.waitForMediaItemToBeCreated();
-    await umbracoUi.media.goToSection(ConstantHelper.sections.media);
-    const mediaData = await umbracoApi.media.getByName(mediaFileType.fileName);
-    const mediaUrl = await umbracoApi.media.getFullMediaUrl(mediaData.id);
-    await umbracoUi.media.doesMediaHaveThumbnail(mediaData.id, mediaFileType.thumbnail, mediaUrl);
-    await umbracoUi.media.isMediaTreeItemVisible(mediaFileType.fileName);
+    await umbracoUi.media.doesMediaItemInTreeHaveThumbnail(mediaFileType.fileName, mediaFileType.thumbnail);
     expect(await umbracoApi.media.doesNameExist(mediaFileType.fileName)).toBeTruthy();
 
     // Clean

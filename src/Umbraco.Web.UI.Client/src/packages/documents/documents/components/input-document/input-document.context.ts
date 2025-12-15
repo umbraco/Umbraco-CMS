@@ -3,6 +3,7 @@ import { UMB_DOCUMENT_PICKER_MODAL, UMB_DOCUMENT_SEARCH_PROVIDER_ALIAS } from '.
 import type { UmbDocumentItemModel } from '../../item/types.js';
 import { UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS } from '../../item/constants.js';
 import type { UmbDocumentTreeItemModel } from '../../tree/types.js';
+import { UmbDocumentItemDataResolver } from '../../item/index.js';
 import { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDocumentTypeEntityType } from '@umbraco-cms/backoffice/document-type';
@@ -54,6 +55,15 @@ export class UmbDocumentPickerInputContext extends UmbPickerInputContext<
 		};
 
 		await super.openPicker(combinedPickerData);
+	}
+
+	protected override async _requestItemName(unique: string): Promise<string> {
+		const item = this.getSelectedItemByUnique(unique);
+		const resolver = new UmbDocumentItemDataResolver(this);
+		resolver.setData(item);
+		const name = await resolver.getName();
+		this.removeUmbController(resolver);
+		return name ?? '#general_notFound';
 	}
 
 	#pickableFilter = (

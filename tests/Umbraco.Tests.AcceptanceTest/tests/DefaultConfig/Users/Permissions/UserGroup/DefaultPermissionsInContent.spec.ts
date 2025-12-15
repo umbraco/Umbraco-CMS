@@ -221,9 +221,9 @@ test('can not create content with create permission disabled', async ({umbracoAp
   await umbracoUi.content.isActionsMenuForNameVisible(rootDocumentName, false);
 });
 
-// TODO: Setup SMTP server to test notifications, do this when we test appsettings.json
-test.skip('can create notifications with notification permission enabled', async ({umbracoApi, umbracoUi}) => {
+test('can set up notifications with notification permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
+  const notificationActionIds = ['Umb.Document.Delete', 'Umb.Document.Publish'];
   userGroupId = await umbracoApi.userGroup.createUserGroupWithNotificationsPermission(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
   testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
@@ -231,9 +231,19 @@ test.skip('can create notifications with notification permission enabled', async
 
   // Act
   await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
+  await umbracoUi.content.clickActionsMenuForContent(rootDocumentName);
+  await umbracoUi.content.clickNotificationsActionMenuOption();
+  await umbracoUi.content.clickDocumentNotificationOptionWithName(notificationActionIds[0]);
+  await umbracoUi.content.clickDocumentNotificationOptionWithName(notificationActionIds[1]);
+  await umbracoUi.content.clickSaveModalButton();
+
+  // Assert
+  await umbracoUi.content.isSuccessNotificationVisible();
+  expect(await umbracoApi.document.doesNotificationExist(rootDocumentId, notificationActionIds[0])).toBeTruthy();
+  expect(await umbracoApi.document.doesNotificationExist(rootDocumentId, notificationActionIds[1])).toBeTruthy();
 });
 
-test('can not create notifications with notification permission disabled', async ({umbracoApi, umbracoUi}) => {
+test('can not set up notifications with notification permission disabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithNotificationsPermission(userGroupName, false);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -279,8 +289,7 @@ test('can not publish content with publish permission disabled', async ({umbraco
   await umbracoUi.content.isActionsMenuForNameVisible(rootDocumentName, false);
 });
 
-// Remove .skip when the front-end is ready. Currently there is no "Permissions" menu item displays
-// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/19339
+// Skip this as this function is removed from the front-end.
 test.skip('can set permissions with set permissions permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithSetPermissionsPermission(userGroupName);
@@ -292,12 +301,13 @@ test.skip('can set permissions with set permissions permission enabled', async (
   // Act
   await umbracoUi.content.clickActionsMenuForContent(rootDocumentName);
   // await umbracoUi.content.clickSetPermissionsButton();
-  //
-  // // Assert
+
+  // Assert
   // await umbracoUi.content.doesDocumentPermissionsDialogExist();
 });
 
-test('can not set permissions with set permissions permission disabled', async ({umbracoApi, umbracoUi}) => {
+// Skip this as this function is removed from the front-end.
+test.skip('can not set permissions with set permissions permission disabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithSetPermissionsPermission(userGroupName, false);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -383,8 +393,7 @@ test('can not update content with update permission disabled', async ({umbracoAp
   await umbracoUi.content.isDocumentReadOnly(true);
 });
 
-// Needs create permission to be enabled to duplicate content
-test.fixme('can duplicate content with duplicate permission enabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test('can duplicate content with duplicate permission enabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const duplicatedContentName = rootDocumentName + ' (1)';
   userGroupId = await umbracoApi.userGroup.createUserGroupWithDuplicatePermission(userGroupName);
@@ -425,8 +434,7 @@ test('can not duplicate content with duplicate permission disabled', async ({umb
   await umbracoUi.content.isActionsMenuForNameVisible(rootDocumentName, false);
 });
 
-// Needs create permission to be enabled to move content
-test.fixme('can move content with move to permission enabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test('can move content with move to permission enabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const moveToDocumentName = 'SecondRootDocument';
   const moveToDocumentId = await umbracoApi.document.createDocumentWithTextContent(moveToDocumentName, rootDocumentTypeId, documentText, dataTypeName);
@@ -444,7 +452,8 @@ test.fixme('can move content with move to permission enabled', {tag: '@release'}
 
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.moved);
-  await umbracoUi.content.reloadContentTree();
+  await umbracoUi.content.clickActionsMenuForContent(moveToDocumentName);
+  await umbracoUi.content.clickReloadChildrenActionMenuOption();
   await umbracoUi.content.isCaretButtonVisibleForContentName(moveToDocumentName, true);
   await umbracoUi.content.openContentCaretButtonForName(moveToDocumentName);
   await umbracoUi.content.isChildContentInTreeVisible(moveToDocumentName, childDocumentOneName, true);
@@ -470,7 +479,7 @@ test('can not move content with move to permission disabled', async ({umbracoApi
 });
 
 // Needs a better way to assert
-test.fixme('can sort children with sort children permission enabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test('can sort children with sort children permission enabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.document.createDefaultDocumentWithParent(childDocumentTwoName, childDocumentTypeId, rootDocumentId);
   userGroupId = await umbracoApi.userGroup.createUserGroupWithSortChildrenPermission(userGroupName);
@@ -482,15 +491,12 @@ test.fixme('can sort children with sort children permission enabled', {tag: '@re
   // Act
   await umbracoUi.content.clickActionsMenuForContent(rootDocumentName);
   await umbracoUi.content.clickSortChildrenActionMenuOption();
-
-  // TODO: uncomment when it is not flaky
-  // const childDocumentOneLocator = await umbracoUi.content.getButtonWithName(childDocumentOneName);
-  // const childDocumentTwoLocator = await umbracoUi.content.getButtonWithName(childDocumentTwoName)
-  // await umbracoUi.content.sortChildrenDragAndDrop(childDocumentOneLocator, childDocumentTwoLocator, 10, 0, 10);
+  const childDocumentOneLocator = umbracoUi.content.getTextLocatorWithName(childDocumentOneName);
+  const childDocumentTwoLocator = umbracoUi.content.getTextLocatorWithName(childDocumentTwoName)
+  await umbracoUi.content.dragAndDrop(childDocumentTwoLocator, childDocumentOneLocator);
   await umbracoUi.content.clickSortButton();
 
   // Assert
-  // TODO: uncomment when it is not flaky
   await umbracoUi.content.openContentCaretButtonForName(rootDocumentName);
   await umbracoUi.content.doesIndexDocumentInTreeContainName(rootDocumentName, childDocumentTwoName, 0);
   await umbracoUi.content.doesIndexDocumentInTreeContainName(rootDocumentName, childDocumentOneName, 1);
@@ -523,7 +529,7 @@ test('can set culture and hostnames with culture and hostnames permission enable
   // Act
   await umbracoUi.content.clickActionsMenuForContent(rootDocumentName);
   await umbracoUi.content.clickCultureAndHostnamesActionMenuOption();
-  await umbracoUi.content.clickAddNewDomainButton();
+  await umbracoUi.content.clickAddNewHostnameButton();
   await umbracoUi.content.enterDomain(domainName);
   await umbracoUi.content.clickSaveModalButton();
 

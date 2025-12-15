@@ -564,6 +564,32 @@ stages:
               CONNECTIONSTRINGS__UMBRACODBDSN: Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True
               CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
               additionalEnvironmentVariables: false
+            # EntityDataPicker
+            WindowsEntityDataPicker:
+              vmImage: "windows-latest"
+              testFolder: "EntityDataPicker"
+              port: ''
+              testCommand: "npx playwright test --project=entityDataPicker"
+              CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=(localdb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Umbraco.mdf;Integrated Security=True
+              CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
+              additionalEnvironmentVariables: false
+            LinuxEntityDataPicker:
+              vmImage: "ubuntu-latest"
+              testFolder: "EntityDataPicker"
+              port: ''
+              testCommand: "npx playwright test --project=entityDataPicker"
+              CONNECTIONSTRINGS__UMBRACODBDSN: Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True
+              CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
+              additionalEnvironmentVariables: false
+            # SMTP
+            LinuxSMTP:
+              vmImage: "ubuntu-latest"
+              testFolder: "SMTP"
+              port: ''
+              testCommand: "npx playwright test --project=smtp"
+              CONNECTIONSTRINGS__UMBRACODBDSN: Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True
+              CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
+              additionalEnvironmentVariables: false
         pool:
           vmImage: $(vmImage)
         steps:
@@ -641,6 +667,23 @@ stages:
               AZUREADB2CCLIENTID: $(AZUREB2CCLIENTID)
               AZUREADB2CCLIENTSECRET: $(AZUREB2CCLIENTSECRET)
 
+          # Start SMTP4dev via Docker for SMTP tests
+          - bash: |
+              echo "Starting SMTP4dev container..."
+              docker run -d --name smtp4dev -p 5000:80 -p 25:25 rnwood/smtp4dev
+
+              echo "Waiting for SMTP4dev to be ready..."
+              for i in {1..30}; do
+                if curl -s http://localhost:5000/api/messages > /dev/null; then
+                  echo "SMTP4dev is ready"
+                  break
+                fi
+                echo "Attempt $i: Waiting for SMTP4dev..."
+                sleep 2
+              done
+            displayName: Start SMTP4dev Docker container (Linux)
+            condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'), contains(variables['testFolder'], 'SMTP'))
+
           # Run tests Template
           - template: nightly-E2E-run-tests-template.yml
             parameters:
@@ -650,6 +693,14 @@ stages:
               AZUREB2CTESTUSEREMAIL: $(AZUREB2CTESTUSEREMAIL)
               AZUREB2CTESTUSERPASSWORD: $(AZUREB2CTESTUSERPASSWORD)
               DatabaseType: ${{ variables.DatabaseType }}
+          
+          # Stop SMTP4dev container
+          - bash: |
+              echo "Stopping SMTP4dev container..."
+              docker stop smtp4dev
+              docker rm smtp4dev
+            displayName: Stop SMTP4dev Docker container
+            condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'), contains(variables['testFolder'], 'SMTP'))
 
   - stage: NotifySlackBot
     displayName: Notify Slack on Failure
