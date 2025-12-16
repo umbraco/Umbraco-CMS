@@ -1,5 +1,4 @@
 import { UmbUnpublishDocumentEntityAction } from '../entity-action/index.js';
-import type { UmbDocumentVariantOptionModel } from '../../../types.js';
 import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_UNPUBLISH_MODAL } from '../../../constants.js';
 import { UmbDocumentPublishingRepository } from '../../repository/index.js';
 import { UmbDocumentItemRepository } from '../../../item/repository/index.js';
