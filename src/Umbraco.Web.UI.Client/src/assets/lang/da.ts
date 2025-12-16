@@ -1006,6 +1006,7 @@ export default {
 		manifest: 'Manifest',
 		toggleFor: 'Toggle for %0%',
 		document: 'Dokument',
+		documentCount: (count: number) => (count === 1 ? '1 dokument' : `${count} dokumenter`),
 	},
 	colors: {
 		black: 'Sort',
