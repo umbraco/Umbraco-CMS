@@ -3,6 +3,6 @@ import type { ManifestCollectionTextFilter } from './collection-text-filter.exte
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 export interface UmbCollectionTextFilterElement extends UmbControllerHostElement {
-	api: UmbCollectionTextFilterApi;
+	api?: UmbCollectionTextFilterApi;
 	manifest?: ManifestCollectionTextFilter;
 }

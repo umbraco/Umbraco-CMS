@@ -2,13 +2,29 @@ import type { UmbCollectionTextFilterApi } from './collection-text-filter-api.in
 import { css, customElement, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
+/**
+ * Default element for the collection text filter extension.
+ *
+ * Renders a text input that allows users to filter collection items.
+ * Works in conjunction with {@link UmbDefaultCollectionTextFilterApi} to apply the filter.
+ * @element umb-default-collection-text-filter
+ */
 @customElement('umb-default-collection-text-filter')
 export class UmbDefaultCollectionTextFilterElement extends UmbLitElement {
 	#api?: UmbCollectionTextFilterApi;
 
+	/**
+	 * The API instance that handles the filter logic.
+	 * This is set by the extension system when the element is created.
+	 * @returns {UmbCollectionTextFilterApi | undefined} The collection text filter API instance.
+	 */
 	public get api(): UmbCollectionTextFilterApi | undefined {
 		return this.#api;
 	}
+	/**
+	 * Sets the API instance that handles the filter logic.
+	 * @param {UmbCollectionTextFilterApi | undefined} value - The collection text filter API instance.
+	 */
 	public set api(value: UmbCollectionTextFilterApi | undefined) {
 		this.#api = value;
 	}

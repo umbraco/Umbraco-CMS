@@ -4,6 +4,15 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { debounce } from '@umbraco-cms/backoffice/utils';
 
+/**
+ * Default API for the collection text filter extension.
+ *
+ * This API handles updating the collection filter with a debounced text value.
+ * It consumes the collection context and applies the filter when the user types.
+ * @class UmbDefaultCollectionTextFilterApi
+ * @augments {UmbControllerBase}
+ * @implements {UmbCollectionTextFilterApi}
+ */
 export class UmbDefaultCollectionTextFilterApi extends UmbControllerBase implements UmbCollectionTextFilterApi {
 	#collectionContext?: typeof UMB_COLLECTION_CONTEXT.TYPE;
 
@@ -15,14 +24,19 @@ export class UmbDefaultCollectionTextFilterApi extends UmbControllerBase impleme
 		});
 	}
 
+	/**
+	 * Updates the collection filter with the given text value.
+	 * The filter is debounced to avoid excessive updates while the user is typing.
+	 * @param {string} value - The text value to filter the collection by.
+	 */
 	public updateTextFilter(value: string) {
-		this.#debouncedSearch(value);
+		this.#debouncedFilter(value);
 	}
 
-	#debouncedSearch = debounce((value: string) => this.#collectionContext?.setFilter({ filter: value }), 500);
+	#debouncedFilter = debounce((value: string) => this.#collectionContext?.setFilter({ filter: value }), 500);
 
 	override destroy() {
-		this.#debouncedSearch.cancel();
+		this.#debouncedFilter.cancel();
 		super.destroy();
 	}
 }
