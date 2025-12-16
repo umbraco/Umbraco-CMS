@@ -5,7 +5,6 @@ import { UserGroupService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
-import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
 /**
  * A data source for the UserGroup that fetches data from the server

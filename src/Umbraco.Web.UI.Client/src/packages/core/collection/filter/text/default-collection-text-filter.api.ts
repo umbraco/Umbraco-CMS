@@ -20,6 +20,11 @@ export class UmbDefaultCollectionTextFilterApi extends UmbControllerBase impleme
 	}
 
 	#debouncedSearch = debounce((value: string) => this.#collectionContext?.setFilter({ filter: value }), 500);
+
+	override destroy() {
+		this.#debouncedSearch.cancel();
+		super.destroy();
+	}
 }
 
 export { UmbDefaultCollectionTextFilterApi as api };
