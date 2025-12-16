@@ -10,6 +10,6 @@ export interface ManifestCollectionTextFilter
 
 declare global {
 	interface UmbExtensionManifestMap {
-		collectionTextFilter: ManifestCollectionTextFilter;
+		umbCollectionTextFilter: ManifestCollectionTextFilter;
 	}
 }
