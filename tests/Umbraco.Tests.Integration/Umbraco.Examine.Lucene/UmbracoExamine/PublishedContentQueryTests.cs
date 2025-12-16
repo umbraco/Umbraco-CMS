@@ -24,7 +24,7 @@ internal sealed class PublishedContentQueryTests : ExamineBaseTest
     {
         private readonly string[] _fieldNames;
 
-        public TestIndex(ILoggerFactory loggerFactory, string name, Directory luceneDirectory, string[] fieldNames)
+        public TestIndex(ILoggerFactory loggerFactory, string name, Directory luceneDirectory, Directory luceneTaxonomyDirectory, string[] fieldNames)
             : base(
                 loggerFactory,
                 name,
@@ -32,7 +32,7 @@ internal sealed class PublishedContentQueryTests : ExamineBaseTest
                     name,
                     new LuceneDirectoryIndexOptions
                     {
-                        DirectoryFactory = new GenericDirectoryFactory(s => luceneDirectory)
+                        DirectoryFactory = new GenericDirectoryFactory(_ => luceneDirectory, _ => luceneTaxonomyDirectory)
                     })) =>
             _fieldNames = fieldNames;
 
@@ -42,9 +42,9 @@ internal sealed class PublishedContentQueryTests : ExamineBaseTest
         public IEnumerable<string> GetFields() => _fieldNames;
     }
 
-    private TestIndex CreateTestIndex(Directory luceneDirectory, (string Name, string Culture)[] fields)
+    private TestIndex CreateTestIndex(Directory luceneDirectory, Directory luceneTaxonomyDirectory, (string Name, string Culture)[] fields)
     {
-        var index = new TestIndex(LoggerFactory, "TestIndex", luceneDirectory, fields.Select(f => f.Name).ToArray());
+        var index = new TestIndex(LoggerFactory, "TestIndex", luceneDirectory, luceneTaxonomyDirectory, fields.Select(f => f.Name).ToArray());
 
         using (index.WithThreadingMode(IndexThreadingMode.Synchronous))
         {
@@ -90,19 +90,13 @@ internal sealed class PublishedContentQueryTests : ExamineBaseTest
     [LongRunning]
     public string Search(string culture)
     {
-        using (var luceneDir = new RandomIdRAMDirectory())
-        {
-            var fields = new[] { (Name: "title", Culture: null), (Name: "title_en-us", Culture: "en-us"), (Name: "title_fr-fr", Culture: "fr-fr") };
-            using (var indexer = CreateTestIndex(luceneDir, fields))
-            {
-                var pcq = CreatePublishedContentQuery(indexer);
-
-                var results = pcq.Search("Products", culture, "TestIndex");
-
-                var ids = results.Select(x => x.Content.Id).ToArray();
-
-                return string.Join(", ", ids);
-            }
-        }
+        using var luceneDir = new RandomIdRAMDirectory();
+        using var luceneTaxonomyDir = new RandomIdRAMDirectory();
+        var fields = new[] { (Name: "title", Culture: null), (Name: "title_en-us", Culture: "en-us"), (Name: "title_fr-fr", Culture: "fr-fr") };
+        using var indexer = CreateTestIndex(luceneDir, luceneTaxonomyDir, fields);
+        var pcq = CreatePublishedContentQuery(indexer);
+        var results = pcq.Search("Products", culture, "TestIndex");
+        var ids = results.Select(x => x.Content.Id).ToArray();
+        return string.Join(", ", ids);
     }
 }

@@ -228,6 +228,7 @@ public class IndexInitializer
         IHostingEnvironment hostingEnvironment,
         IRuntimeState runtimeState,
         Directory luceneDir,
+        Directory luceneTaxonomyDir,
         Analyzer analyzer = null,
         ILocalizationService languageService = null,
         IContentValueSetValidator validator = null)
@@ -253,7 +254,7 @@ public class IndexInitializer
             {
                 Analyzer = analyzer,
                 Validator = validator,
-                DirectoryFactory = new GenericDirectoryFactory(s => luceneDir),
+                DirectoryFactory = new GenericDirectoryFactory(_ => luceneDir, _ => luceneTaxonomyDir),
                 FieldDefinitions = new UmbracoFieldDefinitionCollection()
             });
 

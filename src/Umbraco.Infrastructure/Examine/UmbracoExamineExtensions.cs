@@ -94,7 +94,7 @@ public static partial class UmbracoExamineExtensions
     {
         IBooleanOperation? fieldQuery = query.Field(
             UmbracoExamineFieldNames.NodeNameFieldName,
-            (IExamineValue)new ExamineValue(Examineness.Explicit, nodeName));
+            ExamineValue.Create(Examineness.Default, nodeName));
         return fieldQuery;
     }
 
@@ -120,7 +120,7 @@ public static partial class UmbracoExamineExtensions
     {
         IBooleanOperation? fieldQuery = query.Field(
             ExamineFieldNames.ItemTypeFieldName,
-            (IExamineValue)new ExamineValue(Examineness.Explicit, nodeTypeAlias));
+            ExamineValue.Create(Examineness.Default, nodeTypeAlias));
         return fieldQuery;
     }
 
