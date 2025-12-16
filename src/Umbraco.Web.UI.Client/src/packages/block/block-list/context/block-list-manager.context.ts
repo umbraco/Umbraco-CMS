@@ -3,6 +3,8 @@ import type { UmbBlockListWorkspaceOriginData } from '../index.js';
 import type { UmbBlockDataModel } from '../../block/types.js';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbBlockManagerContext } from '@umbraco-cms/backoffice/block';
+import { UMB_PROPERTY_SORT_MODE_CONTEXT } from '@umbraco-cms/backoffice/property-sort-mode';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * A implementation of the Block Manager specifically for the Block List Editor.
@@ -19,6 +21,28 @@ export class UmbBlockListManagerContext<
 	}
 	getInlineEditingMode(): boolean | undefined {
 		return this.#inlineEditingMode.getValue();
+	}
+
+	#sortModeContext?: typeof UMB_PROPERTY_SORT_MODE_CONTEXT.TYPE;
+	#isSortMode = new UmbBooleanState(undefined);
+	readonly isSortMode = this.#isSortMode.asObservable();
+
+	setIsSortMode(isSortMode: boolean) {
+		this.#sortModeContext?.setIsSortMode(isSortMode);
+	}
+	getIsSortMode(): boolean | undefined {
+		return this.#sortModeContext?.getIsSortMode();
+	}
+
+	constructor(host: UmbControllerHost) {
+		super(host);
+
+		this.consumeContext(UMB_PROPERTY_SORT_MODE_CONTEXT, (sortPropertyContext) => {
+			this.#sortModeContext = sortPropertyContext;
+			this.observe(this.#sortModeContext?.isSortMode, (isSortMode) => {
+				this.#isSortMode.setValue(isSortMode);
+			});
+		});
 	}
 
 	/**

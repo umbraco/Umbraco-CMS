@@ -71,7 +71,7 @@ internal sealed class ContentTypeSchemaService : IContentTypeSchemaService
                             Alias = p.Alias,
                             EditorAlias = p.EditorAlias,
                             DeliveryApiClrType = p.DeliveryApiModelClrType,
-                            Inherited = !ownPropertyAliases.Contains(p.Alias),
+                            Inherited = ownPropertyAliases.Contains(p.Alias) is false,
                         })
                     ],
                     IsElement = publishedContentType.IsElement,
