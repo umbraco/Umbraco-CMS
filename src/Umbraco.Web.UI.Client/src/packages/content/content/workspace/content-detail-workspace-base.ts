@@ -546,14 +546,11 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			);
 		}
 		// No variant specified - observe first active variant's name
-		return mergeObservables(
-			[this.splitView.activeVariantByIndex(0), this.variants],
-			([activeVariant, variants]) => {
-				if (!activeVariant || !variants) return '';
-				const activeVariantId = UmbVariantId.Create(activeVariant);
-				return variants.find((x) => activeVariantId.compare(x))?.name ?? '';
-			},
-		);
+		return mergeObservables([this.splitView.activeVariantByIndex(0), this.variants], ([activeVariant, variants]) => {
+			if (!activeVariant || !variants) return '';
+			const activeVariantId = UmbVariantId.Create(activeVariant);
+			return variants.find((x) => activeVariantId.compare(x))?.name ?? '';
+		});
 	}
 
 	/* Variants */
