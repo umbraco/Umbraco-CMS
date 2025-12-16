@@ -10,6 +10,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 			type: 'collectionTextFilter',
 			kind: 'default',
 			element: () => import('./default-collection-text-filter.element.js'),
+			api: () => import('./default-collection-text-filter.api.js'),
 		},
 	},
 ];

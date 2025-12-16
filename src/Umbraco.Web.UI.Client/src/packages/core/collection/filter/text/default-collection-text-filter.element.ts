@@ -1,26 +1,23 @@
-import { UMB_COLLECTION_CONTEXT } from '../../default/index.js';
+import type { UmbCollectionTextFilterApi } from './collection-text-filter-api.interface.js';
 import { css, customElement, html } from '@umbraco-cms/backoffice/external/lit';
-import { debounce } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-default-collection-text-filter')
 export class UmbDefaultCollectionTextFilterElement extends UmbLitElement {
-	#collectionContext?: typeof UMB_COLLECTION_CONTEXT.TYPE;
+	#api?: UmbCollectionTextFilterApi;
 
-	constructor() {
-		super();
-		this.consumeContext(UMB_COLLECTION_CONTEXT, (instance) => {
-			this.#collectionContext = instance;
-		});
+	public get api(): UmbCollectionTextFilterApi | undefined {
+		return this.#api;
+	}
+	public set api(value: UmbCollectionTextFilterApi | undefined) {
+		this.#api = value;
 	}
 
 	#onTextFilterChange(event: InputEvent) {
 		const target = event.target as HTMLInputElement;
 		const value = target.value || '';
-		this.#debouncedSearch(value);
+		this.#api?.updateTextFilter(value);
 	}
-
-	#debouncedSearch = debounce((value: string) => this.#collectionContext?.setFilter({ filter: value }), 500);
 
 	protected override render() {
 		return html`
@@ -35,6 +32,11 @@ export class UmbDefaultCollectionTextFilterElement extends UmbLitElement {
 
 	static override styles = [
 		css`
+			:host {
+				display: flex;
+				flex: 1 1 auto;
+			}
+
 			uui-input {
 				width: 100%;
 			}

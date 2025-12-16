@@ -5,6 +5,7 @@ import { UserGroupService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
 /**
  * A data source for the UserGroup that fetches data from the server
@@ -24,9 +25,11 @@ export class UmbUserGroupCollectionServerDataSource implements UmbCollectionData
 	}
 
 	async getCollection(filter: UmbUserGroupCollectionFilterModel) {
+		const filterText = filter.filter ?? filter.query ?? undefined;
+
 		const { data, error } = await tryExecute(
 			this.#host,
-			UserGroupService.getFilterUserGroup({ query: { skip: filter.skip, take: filter.take, filter: filter.query } }),
+			UserGroupService.getFilterUserGroup({ query: { skip: filter.skip, take: filter.take, filter: filterText } }),
 		);
 
 		if (data) {
