@@ -1,7 +1,9 @@
 import { UMB_COLLECTION_CONTEXT } from '../../default/index.js';
+import type { UmbCollectionFilterModel } from '../../collection-filter-model.interface.js';
 import type { UmbCollectionTextFilterApi } from './collection-text-filter-api.interface.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { debounce } from '@umbraco-cms/backoffice/utils';
 
 /**
@@ -14,6 +16,9 @@ import { debounce } from '@umbraco-cms/backoffice/utils';
  * @implements {UmbCollectionTextFilterApi}
  */
 export class UmbDefaultCollectionTextFilterApi extends UmbControllerBase implements UmbCollectionTextFilterApi {
+	#text = new UmbStringState(undefined);
+	public readonly text = this.#text.asObservable();
+
 	#collectionContext?: typeof UMB_COLLECTION_CONTEXT.TYPE;
 
 	constructor(host: UmbControllerHost) {
@@ -21,6 +26,14 @@ export class UmbDefaultCollectionTextFilterApi extends UmbControllerBase impleme
 
 		this.consumeContext(UMB_COLLECTION_CONTEXT, (instance) => {
 			this.#collectionContext = instance;
+			this.#observeFilter();
+		});
+	}
+
+	#observeFilter() {
+		this.observe(this.#collectionContext?.filter, (value) => {
+			const filterText = (value as UmbCollectionFilterModel)?.filter;
+			this.#text.setValue(filterText);
 		});
 	}
 
@@ -29,7 +42,7 @@ export class UmbDefaultCollectionTextFilterApi extends UmbControllerBase impleme
 	 * The filter is debounced to avoid excessive updates while the user is typing.
 	 * @param {string} value - The text value to filter the collection by.
 	 */
-	public updateTextFilter(value: string) {
+	public setText(value: string) {
 		this.#debouncedFilter(value);
 	}
 

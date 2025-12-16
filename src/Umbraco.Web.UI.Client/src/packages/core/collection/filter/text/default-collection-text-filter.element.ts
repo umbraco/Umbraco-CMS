@@ -1,5 +1,5 @@
 import type { UmbCollectionTextFilterApi } from './collection-text-filter-api.interface.js';
-import { css, customElement, html } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 /**
@@ -11,6 +11,9 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
  */
 @customElement('umb-default-collection-text-filter')
 export class UmbDefaultCollectionTextFilterElement extends UmbLitElement {
+	@state()
+	private _text: string | undefined = undefined;
+
 	#api?: UmbCollectionTextFilterApi;
 
 	/**
@@ -27,17 +30,19 @@ export class UmbDefaultCollectionTextFilterElement extends UmbLitElement {
 	 */
 	public set api(value: UmbCollectionTextFilterApi | undefined) {
 		this.#api = value;
+		this.observe(this.#api?.text, (value) => (this._text = value), 'umbApiTextObserver');
 	}
 
 	#onTextFilterChange(event: InputEvent) {
 		const target = event.target as HTMLInputElement;
 		const value = target.value || '';
-		this.#api?.updateTextFilter(value);
+		this.#api?.setText(value);
 	}
 
 	protected override render() {
 		return html`
 			<uui-input
+				value=${this._text || ''}
 				@input=${this.#onTextFilterChange}
 				label=${this.localize.term('placeholders_filter')}
 				placeholder=${this.localize.term('placeholders_filter')}
