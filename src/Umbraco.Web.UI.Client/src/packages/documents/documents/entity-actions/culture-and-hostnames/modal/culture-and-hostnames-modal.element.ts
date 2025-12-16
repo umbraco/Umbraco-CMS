@@ -77,6 +77,11 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 		}
 	}
 
+	constructor() {
+		super();
+		this.#sorter.disable();
+	}
+
 	override firstUpdated() {
 		this.#unique = this.data?.unique;
 		this.#requestLanguages();
@@ -94,6 +99,7 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 		}
 		this._defaultIsoCode = data.defaultIsoCode;
 		this._domains = data.domains.map((domain) => ({ ...domain, unique: UmbId.new() }));
+		this.#sorter.enable();
 	}
 
 	async #requestLanguages() {
