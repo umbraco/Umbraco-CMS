@@ -1,10 +1,12 @@
 import { UmbDocumentPublishingRepository } from '../../index.js';
+import type { UmbDocumentVariantOptionModel } from '../../../types.js';
+import type { UmbDocumentItemModel } from '../../../item/types.js';
 import { UMB_DOCUMENT_PUBLISH_MODAL } from '../../../constants.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../../entity.js';
 import { UmbPublishDocumentEntityAction } from '../entity-action/index.js';
 import { UmbDocumentItemRepository } from '../../../item/repository/index.js';
 import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-bulk-action';
-import { UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
+import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { umbConfirmModal, umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
@@ -13,7 +15,64 @@ import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbRequestReloadChildrenOfEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 
+export interface UmbBulkVariantOptions {
+	allInvariant: boolean;
+	options: Array<UmbDocumentVariantOptionModel>;
+}
+
 export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<object> {
+	/**
+	 * Builds variant options for bulk publish/unpublish actions based on selected documents.
+	 * @param documentItems - The document items to process
+	 * @param languages - Available languages in the system
+	 * @returns Object containing whether all documents are invariant and the filtered variant options with document counts
+	 */
+	static buildVariantOptions(
+		documentItems: Array<UmbDocumentItemModel>,
+		languages: Array<UmbLanguageDetailModel>,
+	): UmbBulkVariantOptions {
+		// Check if all selected documents are invariant
+		const allInvariant = documentItems.every((item) => item.variants.length === 1 && item.variants[0].culture === null);
+
+		// Count documents per culture (variant cultures only, invariant documents excluded)
+		const cultureCounts = new Map<string, number>();
+		documentItems.forEach((item) => {
+			item.variants.forEach((variant) => {
+				if (variant.culture) {
+					cultureCounts.set(variant.culture, (cultureCounts.get(variant.culture) ?? 0) + 1);
+				}
+			});
+		});
+
+		// Filter options to only include languages that exist in the selected documents
+		const options: Array<UmbDocumentVariantOptionModel> = languages
+			.filter((language) => cultureCounts.has(language.unique))
+			.map((language) => {
+				const count = cultureCounts.get(language.unique) ?? 0;
+				return {
+					language,
+					variant: {
+						name: language.name,
+						culture: language.unique,
+						state: null,
+						createDate: null,
+						publishDate: null,
+						updateDate: null,
+						segment: null,
+						scheduledPublishDate: null,
+						scheduledUnpublishDate: null,
+						flags: [],
+					},
+					unique: new UmbVariantId(language.unique, null).toString(),
+					culture: language.unique,
+					segment: null,
+					documentCount: count,
+				};
+			});
+
+		return { allInvariant, options };
+	}
+
 	async execute() {
 		const entityContext = await this.getContext(UMB_ENTITY_CONTEXT);
 		if (!entityContext) {
@@ -49,46 +108,10 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 
 		if (!documentItems?.length) return;
 
-		// Check if all selected documents are invariant
-		const allInvariant = documentItems.every(
-			(item) => item.variants.length === 1 && item.variants[0].culture === null,
+		const { allInvariant, options } = UmbDocumentPublishEntityBulkAction.buildVariantOptions(
+			documentItems,
+			languageData?.items ?? [],
 		);
-
-		// Count documents per culture (variant cultures only, invariant documents excluded)
-		const cultureCounts = new Map<string, number>();
-		documentItems.forEach((item) => {
-			item.variants.forEach((variant) => {
-				if (variant.culture) {
-					cultureCounts.set(variant.culture, (cultureCounts.get(variant.culture) ?? 0) + 1);
-				}
-			});
-		});
-
-		// Filter options to only include languages that exist in the selected documents
-		const options = (languageData?.items ?? [])
-			.filter((language) => cultureCounts.has(language.unique))
-			.map((language) => {
-				const count = cultureCounts.get(language.unique) ?? 0;
-				return {
-					language,
-					variant: {
-						name: language.name,
-						culture: language.unique,
-						state: null,
-						createDate: null,
-						publishDate: null,
-						updateDate: null,
-						segment: null,
-						scheduledPublishDate: null,
-						scheduledUnpublishDate: null,
-						flags: [],
-					},
-					unique: new UmbVariantId(language.unique, null).toString(),
-					culture: language.unique,
-					segment: null,
-					documentCount: count,
-				};
-			});
 
 		// If there is only one language available, or all selected documents are invariant, we can skip the modal and publish directly:
 		if (options.length === 1 || allInvariant) {

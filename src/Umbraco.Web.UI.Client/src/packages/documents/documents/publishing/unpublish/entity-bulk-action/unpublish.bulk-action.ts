@@ -1,6 +1,7 @@
 import { UmbUnpublishDocumentEntityAction } from '../entity-action/index.js';
 import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_UNPUBLISH_MODAL } from '../../../constants.js';
 import { UmbDocumentPublishingRepository } from '../../repository/index.js';
+import { UmbDocumentPublishEntityBulkAction } from '../../publish/entity-bulk-action/publish.bulk-action.js';
 import { UmbDocumentItemRepository } from '../../../item/repository/index.js';
 import { umbConfirmModal, umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-bulk-action';
@@ -48,46 +49,10 @@ export class UmbDocumentUnpublishEntityBulkAction extends UmbEntityBulkActionBas
 
 		if (!documentItems?.length) return;
 
-		// Check if all selected documents are invariant
-		const allInvariant = documentItems.every(
-			(item) => item.variants.length === 1 && item.variants[0].culture === null,
+		const { allInvariant, options } = UmbDocumentPublishEntityBulkAction.buildVariantOptions(
+			documentItems,
+			languageData?.items ?? [],
 		);
-
-		// Count documents per culture (variant cultures only, invariant documents excluded)
-		const cultureCounts = new Map<string, number>();
-		documentItems.forEach((item) => {
-			item.variants.forEach((variant) => {
-				if (variant.culture) {
-					cultureCounts.set(variant.culture, (cultureCounts.get(variant.culture) ?? 0) + 1);
-				}
-			});
-		});
-
-		// Filter options to only include languages that exist in the selected documents
-		const options = (languageData?.items ?? [])
-			.filter((language) => cultureCounts.has(language.unique))
-			.map((language) => {
-				const count = cultureCounts.get(language.unique) ?? 0;
-				return {
-					language,
-					variant: {
-						name: language.name,
-						culture: language.unique,
-						state: null,
-						createDate: null,
-						publishDate: null,
-						updateDate: null,
-						segment: null,
-						scheduledPublishDate: null,
-						scheduledUnpublishDate: null,
-						flags: [],
-					},
-					unique: new UmbVariantId(language.unique, null).toString(),
-					culture: language.unique,
-					segment: null,
-					documentCount: count,
-				};
-			});
 
 		// If there is only one language available, or all selected documents are invariant, we can skip the modal and unpublish directly:
 		if (options.length === 1 || allInvariant) {
