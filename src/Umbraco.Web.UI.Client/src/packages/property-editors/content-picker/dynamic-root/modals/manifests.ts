@@ -18,6 +18,18 @@ export const manifests: Array<UmbExtensionManifest> = [
 	},
 	{
 		type: 'dynamicRootOrigin',
+		alias: 'Umb.DynamicRootOrigin.ContentRoot',
+		name: 'Dynamic Root Origin: Content Root',
+		meta: {
+			originAlias: 'ContentRoot',
+			label: 'Content Root',
+			description: 'Root of the content tree.',
+			icon: 'icon-tree',
+		},
+		weight: 100,
+	},
+	{
+		type: 'dynamicRootOrigin',
 		alias: 'Umb.DynamicRootOrigin.Root',
 		name: 'Dynamic Root Origin: Root',
 		meta: {
@@ -26,7 +38,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			description: 'Root node of this editing session.',
 			icon: 'icon-home',
 		},
-		weight: 100,
+		weight: 95,
 	},
 	{
 		type: 'dynamicRootOrigin',
