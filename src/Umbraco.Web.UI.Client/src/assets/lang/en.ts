@@ -2870,6 +2870,7 @@ export default {
 		modalManual: 'Manual',
 		modalAnchorValidationMessage:
 			'Please enter an anchor or querystring, select a document or media item, or manually configure the URL.',
+		modalUrlOrAnchorValidationMessage: 'Please enter an URL or Anchor.',
 		resetUrlHeadline: 'Reset URL?',
 		resetUrlMessage: 'Are you sure you want to reset this URL?',
 		resetUrlLabel: 'Reset',

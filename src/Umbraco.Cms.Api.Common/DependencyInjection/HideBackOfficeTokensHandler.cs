@@ -21,9 +21,13 @@ internal sealed class HideBackOfficeTokensHandler
         INotificationHandler<UserLogoutSuccessNotification>
 {
     private const string RedactedTokenValue = "[redacted]";
-    private const string AccessTokenCookieKey = "__Host-umbAccessToken";
-    private const string RefreshTokenCookieKey = "__Host-umbRefreshToken";
-    private const string PkceCodeCookieKey = "__Host-umbPkceCode";
+
+    // The __Host- prefix enforces secure cookies at browser level (requires Secure, Path=/, no Domain).
+    // For local development over HTTP, we use a simpler prefix to avoid browser rejection.
+    private const string SecureCookiePrefix = "__Host-";
+    private const string AccessTokenCookieName = "umbAccessToken";
+    private const string RefreshTokenCookieName = "umbRefreshToken";
+    private const string PkceCodeCookieName = "umbPkceCode";
 
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IDataProtectionProvider _dataProtectionProvider;
@@ -59,13 +63,13 @@ internal sealed class HideBackOfficeTokensHandler
 
         if (context.Response.AccessToken is not null)
         {
-            SetCookie(httpContext, AccessTokenCookieKey, context.Response.AccessToken);
+            SetCookie(httpContext, AccessTokenCookieName, context.Response.AccessToken);
             context.Response.AccessToken = RedactedTokenValue;
         }
 
         if (context.Response.RefreshToken is not null)
         {
-            SetCookie(httpContext, RefreshTokenCookieKey, context.Response.RefreshToken);
+            SetCookie(httpContext, RefreshTokenCookieName, context.Response.RefreshToken);
             context.Response.RefreshToken = RedactedTokenValue;
         }
 
@@ -87,7 +91,7 @@ internal sealed class HideBackOfficeTokensHandler
 
         if (context.Response.Code is not null)
         {
-            SetCookie(GetHttpContext(), PkceCodeCookieKey, context.Response.Code);
+            SetCookie(GetHttpContext(), PkceCodeCookieName, context.Response.Code);
             context.Response.Code = RedactedTokenValue;
         }
 
@@ -105,14 +109,16 @@ internal sealed class HideBackOfficeTokensHandler
             return ValueTask.CompletedTask;
         }
 
+        HttpContext httpContext = GetHttpContext();
+
         // Handle when the PKCE code is being exchanged for an access token.
         if (context.Request.Code == RedactedTokenValue
-            && TryGetCookie(PkceCodeCookieKey, out var code))
+            && TryGetCookie(httpContext, PkceCodeCookieName, out var code))
         {
             context.Request.Code = code;
 
             // We won't need the PKCE cookie after this, let's remove it.
-            RemoveCookie(GetHttpContext(), PkceCodeCookieKey);
+            RemoveCookie(httpContext, PkceCodeCookieName);
         }
         else
         {
@@ -123,7 +129,7 @@ internal sealed class HideBackOfficeTokensHandler
 
         // Handle when a refresh token is being exchanged for a new access token.
         if (context.Request.RefreshToken == RedactedTokenValue
-            && TryGetCookie(RefreshTokenCookieKey, out var refreshToken))
+            && TryGetCookie(httpContext, RefreshTokenCookieName, out var refreshToken))
         {
             context.Request.RefreshToken = refreshToken;
         }
@@ -149,7 +155,7 @@ internal sealed class HideBackOfficeTokensHandler
             return ValueTask.CompletedTask;
         }
 
-        if (TryGetCookie(AccessTokenCookieKey, out var accessToken))
+        if (TryGetCookie(GetHttpContext(), AccessTokenCookieName, out var accessToken))
         {
             context.AccessToken = accessToken;
         }
@@ -159,8 +165,8 @@ internal sealed class HideBackOfficeTokensHandler
 
     public void Handle(UserLogoutSuccessNotification notification)
     {
-        HttpContext? context = _httpContextAccessor.HttpContext;
-        if (context is null)
+        HttpContext? httpContext = _httpContextAccessor.HttpContext;
+        if (httpContext is null)
         {
             // For some reason there is no ambient HTTP context, so we can't clean up the cookies.
             // This is OK, because the tokens in the cookies have already been revoked at user sign-out,
@@ -168,23 +174,32 @@ internal sealed class HideBackOfficeTokensHandler
             return;
         }
 
-        context.Response.Cookies.Delete(AccessTokenCookieKey);
-        context.Response.Cookies.Delete(RefreshTokenCookieKey);
+        RemoveCookie(httpContext, AccessTokenCookieName);
+        RemoveCookie(httpContext, RefreshTokenCookieName);
     }
 
     private HttpContext GetHttpContext()
         => _httpContextAccessor.GetRequiredHttpContext();
 
-    private void SetCookie(HttpContext httpContext, string key, string value)
+    private string GetCookieKey(HttpContext httpContext, string cookieName)
+        => _globalSettings.UseHttps || httpContext.Request.IsHttps
+            ? $"{SecureCookiePrefix}{cookieName}"
+            : cookieName;
+
+    private void SetCookie(HttpContext httpContext, string cookieName, string value)
     {
+        var key = GetCookieKey(httpContext, cookieName);
         var cookieValue = EncryptionHelper.Encrypt(value, _dataProtectionProvider);
 
-        RemoveCookie(httpContext, key);
+        RemoveCookie(httpContext, cookieName);
         httpContext.Response.Cookies.Append(key, cookieValue, GetCookieOptions(httpContext));
     }
 
-    private void RemoveCookie(HttpContext httpContext, string key)
-        => httpContext.Response.Cookies.Delete(key, GetCookieOptions(httpContext));
+    private void RemoveCookie(HttpContext httpContext, string cookieName)
+    {
+        var key = GetCookieKey(httpContext, cookieName);
+        httpContext.Response.Cookies.Delete(key, GetCookieOptions(httpContext));
+    }
 
     private CookieOptions GetCookieOptions(HttpContext httpContext) =>
         new()
@@ -211,9 +226,10 @@ internal sealed class HideBackOfficeTokensHandler
             SameSite = ParseSameSiteMode(_backOfficeTokenCookieSettings.SameSite),
         };
 
-    private bool TryGetCookie(string key, [NotNullWhen(true)] out string? value)
+    private bool TryGetCookie(HttpContext httpContext, string cookieName, [NotNullWhen(true)] out string? value)
     {
-        if (GetHttpContext().Request.Cookies.TryGetValue(key, out var cookieValue))
+        var key = GetCookieKey(httpContext, cookieName);
+        if (httpContext.Request.Cookies.TryGetValue(key, out var cookieValue))
         {
             value = EncryptionHelper.Decrypt(cookieValue, _dataProtectionProvider);
             return true;
