@@ -285,6 +285,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 					<uui-button
 						color="positive"
 						look="primary"
+						?disabled=${!this.value.link.type}
 						label=${this.localize.term(this.modalContext?.data?.isNew ? 'general_add' : 'general_update')}
 						@click=${this.#onSubmit}></uui-button>
 				</div>
