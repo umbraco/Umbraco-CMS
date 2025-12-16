@@ -47,14 +47,16 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 			languageRepository.requestCollection({}),
 		]);
 
+		if (!documentItems?.length) return;
+
 		// Check if all selected documents are invariant
-		const allInvariant = documentItems?.every(
+		const allInvariant = documentItems.every(
 			(item) => item.variants.length === 1 && item.variants[0].culture === null,
 		);
 
-		// Count documents per culture (excluding null for invariant)
+		// Count documents per culture (variant cultures only, invariant documents excluded)
 		const cultureCounts = new Map<string, number>();
-		documentItems?.forEach((item) => {
+		documentItems.forEach((item) => {
 			item.variants.forEach((variant) => {
 				if (variant.culture) {
 					cultureCounts.set(variant.culture, (cultureCounts.get(variant.culture) ?? 0) + 1);
