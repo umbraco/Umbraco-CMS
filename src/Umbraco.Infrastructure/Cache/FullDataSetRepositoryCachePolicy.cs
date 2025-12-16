@@ -3,6 +3,7 @@
 
 using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
@@ -53,7 +54,7 @@ internal sealed class FullDataSetRepositoryCachePolicy<TEntity, TId> : Repositor
         }
     }
 
-    protected string GetEntityTypeCacheKey() => $"uRepo_{typeof(TEntity).Name}_";
+    protected string GetEntityTypeCacheKey() => RepositoryCacheKeys.GetKey<TEntity>();
 
     protected void InsertEntities(TEntity[]? entities)
     {
