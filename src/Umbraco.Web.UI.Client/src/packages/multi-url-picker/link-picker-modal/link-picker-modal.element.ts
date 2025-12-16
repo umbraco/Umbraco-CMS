@@ -49,8 +49,8 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 
 	@query('umb-input-media')
 	private _mediaPickerElement?: UmbInputMediaElement;
-
-	constructor() {
+	
+		constructor() {
 		super();
 
 		new UmbObserveValidationStateController(this, '$.type', (invalid) => {
@@ -242,6 +242,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 	}
 
 	async #onSubmit() {
+		this.#validateExternalLink();
 		try {
 			await this.#validationContext.validate();
 			this.modalContext?.submit();
@@ -262,12 +263,28 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		this.#partialUpdateLink({ type: 'external' });
 	}
 
-	#checkIfUrlIsMissing() {
-		if (this.value.link.type !== 'external') return false;
-		const hasUrl = this.value.link.url && this.value.link.url.length > 0;
-		const hasAnchor = this.value.link.queryString && this.value.link.queryString.length > 0;
+	#validateExternalLink(): void {
+		if (this.#isNonExternalType()) return;
+
+		this._missingType = this.#isUrlMissing();
+	}
+
+	#isUrlMissing(): boolean {
+		if (this.#isNonExternalType()) return false;
+
+		const hasUrl = Boolean(this.value.link.url?.length);
+		const hasAnchor = Boolean(this.value.link.queryString?.length);
+		const hasValue = hasUrl || hasAnchor;
+
+		if (hasValue) {
+			this._missingType = false;
+		}
 
 		return !hasUrl && !hasAnchor;
+	}
+
+	#isNonExternalType(): boolean {
+		return this.value.link.type !== 'external' && Boolean(this.value.link.type);
 	}
 
 	override render() {
@@ -374,7 +391,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 					.value=${this.value.link.url ?? ''}
 					?disabled=${!!this.value.link.unique}
 					@input=${this.#onLinkUrlInput}
-					.error=${this.#checkIfUrlIsMissing()}
+					.error=${this.#isUrlMissing()}
 					.errorMessage=${this.localize.term('linkPicker_modalUrlOrAnchorValidationMessage')}
 					${umbBindToValidation(this, '$.link.unique')}
 					${umbFocus()}>
@@ -410,7 +427,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 					slot="editor"
 					label=${this.localize.term('placeholders_anchor')}
 					placeholder=${this.localize.term('placeholders_anchor')}
-					.error=${this.#checkIfUrlIsMissing()}
+					.error=${this.#isUrlMissing()}
 					.errorMessage=${this.localize.term('linkPicker_modalUrlOrAnchorValidationMessage')}
 					.value=${this.value.link.queryString ?? ''}
 					@input=${this.#onLinkAnchorInput}
