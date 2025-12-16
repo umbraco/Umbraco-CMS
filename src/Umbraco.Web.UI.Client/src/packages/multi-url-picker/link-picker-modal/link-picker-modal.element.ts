@@ -49,8 +49,8 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 
 	@query('umb-input-media')
 	private _mediaPickerElement?: UmbInputMediaElement;
-	
-		constructor() {
+
+	constructor() {
 		super();
 
 		new UmbObserveValidationStateController(this, '$.type', (invalid) => {
