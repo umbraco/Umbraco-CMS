@@ -215,6 +215,7 @@ export class UmbBodyLayoutElement extends LitElement {
 				white-space: nowrap;
 				overflow: hidden;
 				text-overflow: ellipsis;
+				min-width: 0;
 			}
 
 			#main {
