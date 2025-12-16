@@ -22,9 +22,7 @@ public interface IUserGroup : IEntity, IRememberBeingDirty
     /// </summary>
     string? Name { get; set; }
 
-    /// <summary>
-    ///    The description
-    /// </summary>
+    /// TODO (V18): Remove the default implementations.
     string? Description {
         get => null;
         set { }

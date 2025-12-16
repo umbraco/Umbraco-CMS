@@ -144,8 +144,8 @@ public class UmbracoPlan : MigrationPlan
         // To 17.0.1
         To<V_17_0_1.EnsureUmbracoPropertyDataColumnCasing>("{BE5CA411-E12D-4455-A59E-F12A669E5363}");
 
-        // To 17.1.0
-        To<V_17_1_0.AddDescriptionToUserGroup>("{F1A2B3C4-D5E6-4789-ABCD-1234567890AB}");
+        // To 17.2.0
+        To<V_17_2_0.AddDescriptionToUserGroup>("{F1A2B3C4-D5E6-4789-ABCD-1234567890AB}");
 
         // To 18.0.0
         // TODO (V18): Enable on 18 branch

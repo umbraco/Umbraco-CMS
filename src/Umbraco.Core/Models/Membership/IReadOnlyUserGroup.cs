@@ -11,6 +11,7 @@ public interface IReadOnlyUserGroup
 
     string Alias { get; }
 
+    // TODO (V18): Remove the default implementations.
     string? Description { get { return null; } }
 
     string? Icon { get; }
