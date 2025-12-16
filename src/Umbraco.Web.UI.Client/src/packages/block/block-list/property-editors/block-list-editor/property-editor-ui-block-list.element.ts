@@ -14,7 +14,7 @@ import {
 import { jsonStringComparison, observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { umbDestroyOnDisconnect, UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
+import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UMB_CONTENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
 import type { UmbBlockLayoutBaseModel } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
@@ -25,6 +25,7 @@ import type {
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
+import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
 
 import '../../components/block-list-entry/index.js';
 
@@ -248,8 +249,14 @@ export class UmbPropertyEditorUIBlockListElement
 			null,
 		);
 
-		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, async (context) => {
-			this.#managerContext.setVariantId(context?.getVariantId());
+		this.consumeContext(UMB_VARIANT_CONTEXT, async (context) => {
+			this.observe(
+				context?.displayVariantId,
+				(variantId) => {
+					this.#managerContext.setVariantId(variantId);
+				},
+				'observeContextualVariantId',
+			);
 		});
 
 		this.observe(this.#managerContext.isSortMode, (isSortMode) => (this._isSortMode = isSortMode ?? false));
