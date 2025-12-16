@@ -22,7 +22,6 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 		const entityType = entityContext.getEntityType();
 		const unique = entityContext.getUnique();
 
-		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
 		const localize = new UmbLocalizationController(this);
 
 		if (!entityType) throw new Error('Entity type not found');
@@ -39,9 +38,14 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 			return;
 		}
 
-		// Fetch document items to check their variants
+		// Fetch document items and languages in parallel
 		const itemRepository = new UmbDocumentItemRepository(this._host);
-		const { data: documentItems } = await itemRepository.requestItems(this.selection);
+		const languageRepository = new UmbLanguageCollectionRepository(this._host);
+
+		const [{ data: documentItems }, { data: languageData }] = await Promise.all([
+			itemRepository.requestItems(this.selection),
+			languageRepository.requestCollection({}),
+		]);
 
 		// Check if all selected documents are invariant
 		const allInvariant = documentItems?.every(
@@ -57,9 +61,6 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 				}
 			});
 		});
-
-		const languageRepository = new UmbLanguageCollectionRepository(this._host);
-		const { data: languageData } = await languageRepository.requestCollection({});
 
 		// Filter options to only include languages that exist in the selected documents
 		const options = (languageData?.items ?? [])
@@ -87,23 +88,13 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 				};
 			});
 
-		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-		if (!eventContext) {
-			throw new Error('Event context not found');
-		}
-		const event = new UmbRequestReloadChildrenOfEntityEvent({
-			entityType,
-			unique,
-		});
-
 		// If there is only one language available, or all selected documents are invariant, we can skip the modal and publish directly:
 		if (options.length === 1 || allInvariant) {
-			const localizationController = new UmbLocalizationController(this._host);
 			const confirm = await umbConfirmModal(this, {
-				headline: localizationController.term('content_readyToPublish'),
-				content: localizationController.term('prompt_confirmListViewPublish'),
+				headline: localize.term('content_readyToPublish'),
+				content: localize.term('prompt_confirmListViewPublish'),
 				color: 'positive',
-				confirmLabel: localizationController.term('actions_publish'),
+				confirmLabel: localize.term('actions_publish'),
 			}).catch(() => false);
 
 			if (confirm !== false) {
@@ -111,18 +102,10 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 				const variantId = allInvariant
 					? UmbVariantId.CreateInvariant()
 					: new UmbVariantId(options[0].language.unique, null);
-				const publishingRepository = new UmbDocumentPublishingRepository(this._host);
-				let documentCnt = 0;
 
-				for (let i = 0; i < this.selection.length; i++) {
-					const id = this.selection[i];
-					const { error } = await publishingRepository.publish(id, [{ variantId }]);
+				const documentCnt = await this.#publishDocuments(this.selection, [{ variantId }]);
 
-					if (!error) {
-						documentCnt++;
-					}
-				}
-
+				const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
 				notificationContext?.peek('positive', {
 					data: {
 						headline: localize.term('speechBubbles_editContentPublishedHeader'),
@@ -130,7 +113,7 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 					},
 				});
 
-				eventContext.dispatchEvent(event);
+				await this.#reloadChildren(entityType, unique);
 			}
 			return;
 		}
@@ -149,21 +132,13 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 
 		const variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
 
-		const repository = new UmbDocumentPublishingRepository(this._host);
-
 		if (variantIds.length) {
-			let documentCnt = 0;
-			for (const unique of this.selection) {
-				const { error } = await repository.publish(
-					unique,
-					variantIds.map((variantId) => ({ variantId })),
-				);
+			const documentCnt = await this.#publishDocuments(
+				this.selection,
+				variantIds.map((variantId) => ({ variantId })),
+			);
 
-				if (!error) {
-					documentCnt++;
-				}
-			}
-
+			const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
 			notificationContext?.peek('positive', {
 				data: {
 					headline: localize.term('speechBubbles_editContentPublishedHeader'),
@@ -175,8 +150,25 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 				},
 			});
 
-			eventContext.dispatchEvent(event);
+			await this.#reloadChildren(entityType, unique);
 		}
+	}
+
+	async #publishDocuments(uniques: Array<string>, variants: Array<{ variantId: UmbVariantId }>): Promise<number> {
+		const repository = new UmbDocumentPublishingRepository(this._host);
+		let successCount = 0;
+		for (const unique of uniques) {
+			const { error } = await repository.publish(unique, variants);
+			if (!error) successCount++;
+		}
+		return successCount;
+	}
+
+	async #reloadChildren(entityType: string, unique: string | null): Promise<void> {
+		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+		if (!eventContext) return;
+		const event = new UmbRequestReloadChildrenOfEntityEvent({ entityType, unique });
+		eventContext.dispatchEvent(event);
 	}
 }
 
