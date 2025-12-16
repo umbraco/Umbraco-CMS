@@ -25,7 +25,6 @@ export class UmbDefaultCollectionTextFilterElement extends UmbLitElement {
 				@input=${this.#onTextFilterChange}
 				label=${this.localize.term('placeholders_filter')}
 				placeholder=${this.localize.term('placeholders_filter')}
-				id="input-search"
 				data-mark="collection-text-filter"></uui-input>
 		`;
 	}
