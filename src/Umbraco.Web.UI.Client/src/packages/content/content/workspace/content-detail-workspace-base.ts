@@ -515,7 +515,8 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		// Get the first active variant's name
 		const activeVariant = this.splitView.getActiveVariants()[0];
 		if (activeVariant) {
-			return variants.find((x) => x.culture === activeVariant.culture && x.segment === activeVariant.segment)?.name;
+			const activeVariantId = UmbVariantId.Create(activeVariant);
+			return variants.find((x) => activeVariantId.compare(x))?.name;
 		}
 		// Fallback to first variant if no active variant is set
 		return variants[0]?.name;
@@ -549,9 +550,8 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			[this.splitView.activeVariantByIndex(0), this.variants],
 			([activeVariant, variants]) => {
 				if (!activeVariant || !variants) return '';
-				return (
-					variants.find((x) => x.culture === activeVariant.culture && x.segment === activeVariant.segment)?.name ?? ''
-				);
+				const activeVariantId = UmbVariantId.Create(activeVariant);
+				return variants.find((x) => activeVariantId.compare(x))?.name ?? '';
 			},
 		);
 	}
