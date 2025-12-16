@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.OpenApi;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi;
 using Umbraco.Cms.Api.Common.OpenApi;
@@ -22,6 +23,7 @@ public class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApiD
     private const string CustomRecursiveRefKey = "x-recursive-ref";
     private readonly IContentTypeSchemaService _contentTypeSchemaService;
     private readonly ISchemaIdSelector _schemaIdSelector;
+    private readonly ILogger<ContentTypeSchemaTransformer> _logger;
     private readonly HashSet<string> _handledSchemas = [];
     private readonly IJsonTypeInfoResolver _jsonTypeInfoResolver;
     private readonly JsonSerializerOptions _serializerOptions;
@@ -35,10 +37,12 @@ public class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApiD
     public ContentTypeSchemaTransformer(
         IContentTypeSchemaService contentTypeSchemaService,
         ISchemaIdSelector schemaIdSelector,
-        IOptionsMonitor<JsonOptions> jsonOptionsMonitor)
+        IOptionsMonitor<JsonOptions> jsonOptionsMonitor,
+        ILogger<ContentTypeSchemaTransformer> logger)
     {
         _contentTypeSchemaService = contentTypeSchemaService;
         _schemaIdSelector = schemaIdSelector;
+        _logger = logger;
         _serializerOptions = jsonOptionsMonitor
             .Get(Constants.JsonOptionsNames.DeliveryApi)
             .SerializerOptions;
@@ -212,7 +216,19 @@ public class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApiD
             return GetPlaceholderSchema(schemaId);
         }
 
-        OpenApiSchema schema = await context.GetOrCreateSchemaAsync(jsonTypeInfo.Type, cancellationToken: cancellationToken);
+        OpenApiSchema schema;
+        try
+        {
+            schema = await context.GetOrCreateSchemaAsync(
+                jsonTypeInfo.Type,
+                cancellationToken: cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to create OpenAPI schema for type {TypeName}", jsonTypeInfo.Type.FullName);
+            schema = new OpenApiSchema();
+        }
+
         configureSchema?.Invoke(schema);
         return schema;
     }
