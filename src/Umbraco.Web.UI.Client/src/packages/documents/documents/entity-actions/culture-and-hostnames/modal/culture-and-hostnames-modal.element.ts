@@ -201,7 +201,7 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 					this.#isLoading(),
 					() => html`
 						<div id="loader-container">
-							<uui-loader-circle></uui-loader-circle>
+							<uui-loader></uui-loader>
 						</div>
 					`,
 					() => html`
