@@ -1,5 +1,7 @@
 using Examine;
+using Examine.Lucene;
 using Examine.Lucene.Directories;
+using Microsoft.Extensions.Options;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.Infrastructure.Examine
@@ -12,8 +14,9 @@ namespace Umbraco.Cms.Infrastructure.Examine
         public UmbracoTempEnvFileSystemDirectoryFactory(
             IApplicationIdentifier applicationIdentifier,
             ILockFactory lockFactory,
-            IHostingEnvironment hostingEnvironment)
-            : base(new DirectoryInfo(GetTempPath(applicationIdentifier, hostingEnvironment)), lockFactory)
+            IHostingEnvironment hostingEnvironment,
+            IOptionsMonitor<LuceneDirectoryIndexOptions> luceneDirectoryIndexOptions)
+            : base(new DirectoryInfo(GetTempPath(applicationIdentifier, hostingEnvironment)), lockFactory, luceneDirectoryIndexOptions)
         {
         }
 

@@ -8,9 +8,12 @@ using Directory = Lucene.Net.Store.Directory;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
 
-public class LuceneRAMDirectoryFactory : DirectoryFactoryBase
+public class LuceneRAMDirectoryFactory : IDirectoryFactory
 {
-    protected override Directory CreateDirectory(LuceneIndex luceneIndex, bool forceUnlock)
+    public Directory CreateTaxonomyDirectory(LuceneIndex luceneIndex, bool forceUnlock)
+        => new RandomIdRAMDirectory();
+
+    public Directory CreateDirectory(LuceneIndex luceneIndex, bool forceUnlock)
         => new RandomIdRAMDirectory();
 
     private sealed class RandomIdRAMDirectory : RAMDirectory

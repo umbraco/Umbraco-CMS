@@ -23,7 +23,7 @@ public class MemberValueSetBuilder : BaseValueSetBuilder<IMember>
 
         foreach (IMember m in members)
         {
-            var values = new Dictionary<string, IEnumerable<object?>>
+            var values = new Dictionary<string, IEnumerable<object>>
             {
                 { "icon", m.ContentType.Icon?.Yield() ?? Enumerable.Empty<string>() },
                 { "id", new object[] { m.Id } },

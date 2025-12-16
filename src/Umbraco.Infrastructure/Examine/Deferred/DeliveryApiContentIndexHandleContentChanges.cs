@@ -134,8 +134,8 @@ internal sealed class DeliveryApiContentIndexHandleContentChanges : DeliveryApiC
         return valueSets
             .Select(v => new CulturePublishStatus
             {
-                Culture = v.GetValue(UmbracoExamineFieldNames.DeliveryApiContentIndex.Culture).ToString()!,
-                Published = v.GetValue(UmbracoExamineFieldNames.DeliveryApiContentIndex.Published).ToString()!
+                Culture = v.GetValue(UmbracoExamineFieldNames.DeliveryApiContentIndex.Culture)!.ToString()!,
+                Published = v.GetValue(UmbracoExamineFieldNames.DeliveryApiContentIndex.Published)!.ToString()!
             })
             .ToArray();
     }

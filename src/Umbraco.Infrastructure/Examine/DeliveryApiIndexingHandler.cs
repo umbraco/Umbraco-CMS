@@ -134,7 +134,7 @@ internal sealed class DeliveryApiIndexingHandler : IDeliveryApiIndexingHandler
     }
 
     internal IIndex? GetIndex()
-        => _examineManager.TryGetIndex(Constants.UmbracoIndexes.DeliveryApiContentIndexName, out IIndex index)
+        => _examineManager.TryGetIndex(Constants.UmbracoIndexes.DeliveryApiContentIndexName, out IIndex? index)
             ? index
             : null;
 }
