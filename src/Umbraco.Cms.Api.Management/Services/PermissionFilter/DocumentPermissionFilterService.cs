@@ -19,6 +19,8 @@ internal sealed class DocumentPermissionFilterService : IDocumentPermissionFilte
     /// <summary>
     /// Initializes a new instance of the <see cref="DocumentPermissionFilterService"/> class.
     /// </summary>
+    /// <param name="backOfficeSecurityAccessor">Provides access to the current backoffice user's security context.</param>
+    /// <param name="userService">Service used to retrieve user and document permissions.</param>
     public DocumentPermissionFilterService(
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IUserService userService)

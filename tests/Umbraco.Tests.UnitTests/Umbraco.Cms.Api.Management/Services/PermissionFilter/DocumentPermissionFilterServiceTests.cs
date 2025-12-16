@@ -19,8 +19,9 @@ public class DocumentPermissionFilterServiceTests
     {
         private readonly Guid _userKey = Guid.NewGuid();
 
+        private DocumentPermissionFilterService? _sut;
         public DocumentPermissionFilterService Sut =>
-            field ??= new DocumentPermissionFilterService(
+            _sut ??= new DocumentPermissionFilterService(
                 BackOfficeSecurityAccessor.Object,
                 UserService.Object);
 
