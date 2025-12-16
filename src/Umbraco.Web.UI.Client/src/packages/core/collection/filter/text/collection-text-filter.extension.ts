@@ -6,11 +6,7 @@ export interface ManifestCollectionTextFilter
 	extends ManifestElementAndApi<UmbCollectionTextFilterElement, UmbCollectionTextFilterApi>,
 		ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
 	type: 'collectionTextFilter';
-	meta: MetaCollectionTextFilter;
 }
-
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface MetaCollectionTextFilter {}
 
 declare global {
 	interface UmbExtensionManifestMap {
