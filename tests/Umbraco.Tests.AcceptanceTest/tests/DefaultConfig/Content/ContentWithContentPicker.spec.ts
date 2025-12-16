@@ -174,7 +174,8 @@ test('can remove content picker in the content', async ({umbracoApi, umbracoUi})
   expect(contentData.values).toEqual([]);
 });
 
-test('can remove a not-found content picker', async ({umbracoApi, umbracoUi}) => {
+// This test for regression issue: https://github.com/umbraco/Umbraco-CMS/issues/21130
+test('can remove a not-found content picker', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
