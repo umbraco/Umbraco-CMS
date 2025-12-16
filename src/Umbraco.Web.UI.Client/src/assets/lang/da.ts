@@ -2854,6 +2854,7 @@ export default {
 		modalManual: 'Manuel',
 		modalAnchorValidationMessage:
 			'Indtast et anker eller en querystring, vælg et dokument eller medieelement, eller konfigurer URL’en manuelt.',
+		modalUrlOrAnchorValidationMessage: 'Indtast en adresse eller et anker.',
 		resetUrlHeadline: 'Nulstil URL?',
 		resetUrlMessage: 'Er du sikker på, at du vil nulstille denne URL?',
 		resetUrlLabel: 'Nulstil',
