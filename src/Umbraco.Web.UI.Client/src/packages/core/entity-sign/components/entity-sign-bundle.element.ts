@@ -168,11 +168,12 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 				--ease-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
 			}
 
+			/* Base positioning for browsers WITHOUT anchor positioning support (Safari) */
 			.infobox {
 				position: absolute;
-				top: 0;
+				top: 1px;
 				margin-top: calc(-12px + var(--offset-h));
-				left: 19px;
+				left: 17px;
 				margin-left: -6px;
 				background-color: transparent;
 				padding: var(--uui-size-2);
@@ -183,9 +184,10 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 					background-color 80ms 40ms linear,
 					clip-path 120ms var(--ease-bounce),
 					font-size 120ms var(--ease);
-				/*will-change: clip-path;*/
 				min-height: fit-content;
+				z-index: 1;
 			}
+
 			.infobox::before {
 				content: '';
 				position: absolute;
@@ -212,11 +214,12 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 				transform: translate(calc((var(--i) * -5px) - 10px), calc((-1 * var(--i) * var(--row-h)) - var(--offset-h)));
 				transition:
 					transform 120ms var(--ease),
-					visibility 0ms linear 120ms opacity 120ms linear;
+					visibility 0ms linear 120ms,
+					opacity 120ms linear;
 				z-index: calc(var(--count) - var(--i));
-				/*will-change: transform;*/
 				pointer-events: none;
 			}
+
 			.infobox > .sign-container.hide-in-overview {
 				visibility: hidden;
 			}
@@ -228,21 +231,31 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 
 			/*OPEN STATE -- Prevent the hover state in firefox(until support of the position-anchor)*/
 			@supports (position-anchor: --any-check) {
+				/* Closed state positioning for Chrome */
 				.infobox {
+					position: absolute;
+					top: 18px;
+					margin-top: calc(-12px + var(--offset-h));
+					left: 18px;
+					margin-left: -6px;
+				}
+
+				/* Open state for Chrome */
+				.infobox.is-open {
 					position: fixed;
 					position-anchor: --entity-sign;
 					top: anchor(bottom);
 					left: anchor(right);
-					z-index: 1;
-				}
-				.infobox.is-open {
-					z-index: 10;
+					margin-top: 0;
+					margin-left: 0;
+					//z-index: 10;
 					background-color: var(--uui-color-surface);
 					font-size: 12px;
 					color: var(--uui-color-text);
 					clip-path: inset(-6px);
 					--umb-sign-bundle-bg: var(--uui-color-surface);
 				}
+
 				.infobox.is-open::before {
 					right: 0;
 					bottom: 0;
@@ -255,12 +268,14 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 						opacity 120ms var(--ease),
 						display 0 0;
 				}
+
 				.infobox.is-open > .sign-container {
 					transform: none;
 					align-items: center;
 					transition: transform 120ms var(--ease);
 					visibility: visible;
 				}
+
 				.infobox.is-open .sign-container .label {
 					opacity: 1;
 					pointer-events: auto;
