@@ -76,7 +76,8 @@ public class ComponentTests
             Mock.Of<IMediaPathScheme>(),
             Mock.Of<ILogger<MediaFileManager>>(),
             Mock.Of<IShortStringHelper>(),
-            Mock.Of<IServiceProvider>());
+            Mock.Of<IServiceProvider>(),
+            Mock.Of<Lazy<ICoreScopeProvider>>());
         var eventAggregator = Mock.Of<IEventAggregator>();
         var scopeProvider = new ScopeProvider(
             new AmbientScopeStack(),
