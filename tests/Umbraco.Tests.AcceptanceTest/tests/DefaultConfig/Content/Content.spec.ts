@@ -241,3 +241,29 @@ test('can duplicate a content node to other parent', async ({umbracoApi, umbraco
   await umbracoApi.document.ensureNameNotExists(parentContentName);
   await umbracoApi.document.ensureNameNotExists(parentDocumentTypeName);
 });
+
+// This tests for regression issue: https://github.com/umbraco/Umbraco-CMS/issues/20520
+test('can restore a content item from the recycle bin', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const restoreMessage = 'Restore ' + contentName + ' to Root';
+  await umbracoApi.document.emptyRecycleBin();
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+  contentId = await umbracoApi.document.createDocumentWithTextContent(contentName, documentTypeId, contentText, dataTypeName);
+  await umbracoApi.document.moveToRecycleBin(contentId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.clickCaretButtonForName('Recycle Bin');
+  await umbracoUi.content.clickActionsMenuForContent(contentName);
+  await umbracoUi.content.clickRestoreActionMenuOption();
+  await umbracoUi.content.isTextWithExactNameVisible(restoreMessage);
+  await umbracoUi.content.clickRestoreButton();
+
+  // Assert
+  await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.isItemVisibleInRecycleBin(contentName, false, false);
+  expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
+  expect(await umbracoApi.document.doesItemExistInRecycleBin(contentName)).toBeFalsy();
+});
