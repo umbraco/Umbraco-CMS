@@ -645,8 +645,10 @@ internal sealed class BlockGridElementLevelVariationTests : BlockEditorElementVa
         }
     }
 
-    [Test]
-    public async Task Publishing_After_Changing_Element_Property_From_Invariant_To_Variant_Does_Not_Keep_Old_Invariant_Values()
+    [TestCase(true, true)]
+    [TestCase(true, false)]
+    [TestCase(false, true)]
+    public async Task Publishing_After_Changing_Element_Property_From_Invariant_To_Variant_Does_Not_Keep_Old_Invariant_Values(bool republishEnglish, bool republishDanish)
     {
         // 1. Create element type WITHOUT culture variation (invariant)
         var elementType = CreateElementType(ContentVariation.Nothing);
@@ -701,6 +703,8 @@ internal sealed class BlockGridElementLevelVariationTests : BlockEditorElementVa
         // 4. Update the content values to have culture-specific values
         blockGridValue = JsonSerializer.Deserialize<BlockGridValue>((string)content.Properties["blocks"]!.GetValue()!)!;
 
+        // Add variant values for the property that is now variant
+        blockGridValue.ContentData[0].Values.RemoveAll(value => value.Alias == "variantText");
         blockGridValue.ContentData[0].Values.Add(new BlockPropertyValue
         {
             Alias = "variantText",
@@ -714,6 +718,7 @@ internal sealed class BlockGridElementLevelVariationTests : BlockEditorElementVa
             Culture = "da-DK"
         });
 
+        blockGridValue.SettingsData[0].Values.RemoveAll(value => value.Alias == "variantText");
         blockGridValue.SettingsData[0].Values.Add(new BlockPropertyValue
         {
             Alias = "variantText",
@@ -736,8 +741,15 @@ internal sealed class BlockGridElementLevelVariationTests : BlockEditorElementVa
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockGridValue));
         ContentService.Save(content);
 
-        // 5. Publish all cultures
-        PublishContent(content, ["en-US", "da-DK"]);
+        // 5. Publish selected cultures
+        string[] culturesToPublish = republishEnglish && republishDanish
+            ? ["en-US", "da-DK"]
+            : republishEnglish
+                ? ["en-US"]
+                : republishDanish
+                    ? ["da-DK"]
+                    : throw new ArgumentException("Can't proceed without republishing at least one culture");
+        PublishContent(content, culturesToPublish);
 
         // 6. Verify published JSON doesn't contain old invariant values for variantText
         content = ContentService.GetById(content.Key)!;
@@ -747,20 +759,24 @@ internal sealed class BlockGridElementLevelVariationTests : BlockEditorElementVa
         var publishedBlockGridValue = JsonSerializer.Deserialize<BlockGridValue>(publishedValue);
         Assert.IsNotNull(publishedBlockGridValue);
 
-        foreach (var contentData in publishedBlockGridValue!.ContentData)
-        {
-            var variantTextValues = contentData.Values.Where(v => v.Alias == "variantText").ToList();
-            Assert.IsFalse(
-                variantTextValues.Any(v => v.Culture is null),
-                $"variantText property should not have invariant values after changing to variant. Values: {string.Join(", ", variantTextValues.Select(v => $"Culture={v.Culture ?? "null"}:Value={v.Value}"))}");
-        }
+        // Verify ContentData entries are not duplicated
+        Assert.AreEqual(1, publishedBlockGridValue!.ContentData.Count, "Should have exactly 1 content data entry");
+        Assert.AreEqual(1, publishedBlockGridValue.SettingsData.Count, "Should have exactly 1 settings data entry");
 
-        foreach (var settingsData in publishedBlockGridValue.SettingsData)
-        {
-            var variantTextValues = settingsData.Values.Where(v => v.Alias == "variantText").ToList();
-            Assert.IsFalse(
-                variantTextValues.Any(v => v.Culture is null),
-                $"variantText property should not have invariant values after changing to variant. Values: {string.Join(", ", variantTextValues.Select(v => $"Culture={v.Culture ?? "null"}:Value={v.Value}"))}");
-        }
+        var variantTextValues = publishedBlockGridValue.ContentData[0].Values.Where(v => v.Alias == "variantText").ToList();
+        Assert.IsFalse(
+            variantTextValues.Any(v => v.Culture is null),
+            $"variantText property should not have invariant values after changing to variant. Values: {string.Join(", ", variantTextValues.Select(v => $"Culture={v.Culture ?? "null"}:Value={v.Value}"))}");
+
+        variantTextValues = publishedBlockGridValue.SettingsData[0].Values.Where(v => v.Alias == "variantText").ToList();
+        Assert.IsFalse(
+            variantTextValues.Any(v => v.Culture is null),
+            $"variantText property should not have invariant values after changing to variant. Values: {string.Join(", ", variantTextValues.Select(v => $"Culture={v.Culture ?? "null"}:Value={v.Value}"))}");
+
+        // Verify Expose entries are not duplicated
+        var exposeGroups = publishedBlockGridValue.Expose.GroupBy(e => (e.ContentKey, e.Culture, e.Segment));
+        Assert.IsTrue(
+            exposeGroups.All(g => g.Count() == 1),
+            $"Duplicate Expose entries found. Expose: {string.Join(", ", publishedBlockGridValue.Expose.Select(e => $"{e.ContentKey}:{e.Culture}:{e.Segment}"))}");
     }
 }

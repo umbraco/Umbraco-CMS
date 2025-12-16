@@ -2024,8 +2024,10 @@ internal partial class BlockListElementLevelVariationTests
         }
     }
 
-    [Test]
-    public async Task Publishing_After_Changing_Element_Property_From_Variant_To_Invariant_Does_Not_Keep_Old_Culture_Specific_Values()
+    [TestCase(true, true)]
+    [TestCase(true, false)]
+    [TestCase(false, true)]
+    public async Task Publishing_After_Changing_Element_Property_From_Variant_To_Invariant_Does_Not_Keep_Old_Culture_Specific_Values(bool republishEnglish, bool republishDanish)
     {
         // 1. Create element type WITH culture variation
         var elementType = CreateElementType(ContentVariation.Culture);
@@ -2082,23 +2084,27 @@ internal partial class BlockListElementLevelVariationTests
         Assert.IsFalse(variantTextProperty!.VariesByCulture(), $"variantText should NOT vary by culture after element type change. Variations={variantTextProperty.Variations}");
 
         // 4. Update the content values - simulating real-world scenario where:
-        //    - Old variant values remain in the JSON (leftover from before element type change)
-        //    - New invariant values are added (after element type became invariant)
+        //    - Old variant values remain in the published JSON value (leftover from before element type change)
+        //    - New invariant values replace the variant ones in the draft JSON value (after element type became invariant)
         //    This is the critical scenario that triggers the bug.
         var blockListValue = JsonSerializer.Deserialize<BlockListValue>((string)content.Properties["blocks"]!.GetValue()!);
 
-        // Update invariant to variant values
-        foreach (var blockPropertyValue in blockListValue.ContentData[0].Values.Where(v => v.Alias == "variantText"))
+        // Update variant to invariant values
+        blockListValue!.ContentData[0].Values.RemoveAll(value => value.Alias == "variantText");
+        blockListValue.ContentData[0].Values.Add(new BlockPropertyValue
         {
-            blockPropertyValue.Value += " => to invariant";
-            blockPropertyValue.Culture = null;
-        }
+            Alias = "variantText",
+            Value = "The invariant content value",
+            Culture = null
+        });
 
-        foreach (var blockPropertyValue in blockListValue.SettingsData[0].Values.Where(v => v.Alias == "variantText"))
+        blockListValue.SettingsData[0].Values.RemoveAll(value => value.Alias == "variantText");
+        blockListValue.SettingsData[0].Values.Add(new BlockPropertyValue
         {
-            blockPropertyValue.Value += " => to invariant";
-            blockPropertyValue.Culture = null;
-        }
+            Alias = "variantText",
+            Value = "The invariant settings value",
+            Culture = null
+        });
 
         // Update Expose to only have invariant entry (no culture)
         blockListValue.Expose = blockListValue.Expose
@@ -2109,8 +2115,15 @@ internal partial class BlockListElementLevelVariationTests
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
         ContentService.Save(content);
 
-        // 5. Publish invariant culture
-        PublishContent(content, contentType);
+        // 5. Publish selected cultures
+        string[] culturesToPublish = republishEnglish && republishDanish
+            ? ["en-US", "da-DK"]
+            : republishEnglish
+                ? ["en-US"]
+                : republishDanish
+                    ? ["da-DK"]
+                    : throw new ArgumentException("Can't proceed without republishing at least one culture");
+        PublishContent(content, contentType, culturesToPublish);
 
         // 6. Verify: Get the published value and check for duplicates in the raw data
         content = ContentService.GetById(content.Key)!;
@@ -2128,35 +2141,26 @@ internal partial class BlockListElementLevelVariationTests
         // The bug causes the same property alias to appear multiple times with different cultures
         // (e.g., variantText:en-US AND variantText:null both present)
         // After element type becomes invariant, there should only be ONE value per alias (the invariant one)
-        foreach (var contentData in publishedBlockListValue.ContentData)
+        var aliasGroups = publishedBlockListValue.ContentData[0].Values.GroupBy(v => v.Alias);
+        foreach (var group in aliasGroups)
         {
-            var aliasGroups = contentData.Values.GroupBy(v => v.Alias);
-            foreach (var group in aliasGroups)
-            {
-                Assert.AreEqual(
-                    1,
-                    group.Count(),
-                    $"Property '{group.Key}' has multiple values with different cultures. Values: {string.Join(", ", group.Select(v => $"Culture={v.Culture ?? "null"}:Value={v.Value}"))}");
-            }
+            Assert.AreEqual(
+                1,
+                group.Count(),
+                $"Property '{group.Key}' has multiple values with different cultures. Values: {string.Join(", ", group.Select(v => $"Culture={v.Culture ?? "null"}:Value={v.Value}"))}");
         }
 
-        foreach (var settingsData in publishedBlockListValue.SettingsData)
+        aliasGroups = publishedBlockListValue.SettingsData[0].Values.GroupBy(v => v.Alias);
+        foreach (var group in aliasGroups)
         {
-            var aliasGroups = settingsData.Values.GroupBy(v => v.Alias);
-            foreach (var group in aliasGroups)
-            {
-                Assert.AreEqual(
-                    1,
-                    group.Count(),
-                    $"Property '{group.Key}' has multiple values with different cultures. Values: {string.Join(", ", group.Select(v => $"Culture={v.Culture ?? "null"}:Value={v.Value}"))}");
-            }
+            Assert.AreEqual(
+                1,
+                group.Count(),
+                $"Property '{group.Key}' has multiple values with different cultures. Values: {string.Join(", ", group.Select(v => $"Culture={v.Culture ?? "null"}:Value={v.Value}"))}");
         }
 
         // Verify Expose entries are not duplicated
-        var exposeGroups = publishedBlockListValue.Expose.GroupBy(e => (e.ContentKey, e.Culture, e.Segment));
-        Assert.IsTrue(exposeGroups.All(
-            g => g.Count() == 1),
-            $"Duplicate Expose entries found. Expose: {string.Join(", ", publishedBlockListValue.Expose.Select(e => $"{e.ContentKey}:{e.Culture}:{e.Segment}"))}");
+        Assert.AreEqual(1, publishedBlockListValue.Expose.Count);
 
         void AssertPropertyValues(
             string culture,
@@ -2187,29 +2191,48 @@ internal partial class BlockListElementLevelVariationTests
         }
     }
 
-    [Test]
-    public async Task Publishing_After_Changing_Element_Property_From_Invariant_To_Variant_Does_Not_Keep_Old_Invariant_Values()
+    [TestCase(true, true)]
+    [TestCase(true, false)]
+    [TestCase(false, true)]
+    public async Task Publishing_After_Changing_Element_Property_From_Invariant_To_Variant_Does_Not_Keep_Old_Invariant_Values(bool republishEnglish, bool republishDanish)
     {
-        // 1. Create element type WITHOUT culture variation (invariant)
-        var elementType = CreateElementType(ContentVariation.Nothing);
+        // 1. Create variant element type WITHOUT variant properties
+        var elementType = CreateElementType(ContentVariation.Culture);
+        elementType.PropertyTypes.First(p => p.Alias == "variantText").Variations = ContentVariation.Nothing;
+        await ContentTypeService.UpdateAsync(elementType, Constants.Security.SuperUserKey);
         var blockListDataType = await CreateBlockListDataType(elementType);
         var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
 
         // 2. Create content with invariant values and publish
-        var content = CreateContent(
-            contentType,
+        var content = CreateContent(contentType, elementType, [], false);
+        var blockListValue = BlockListPropertyValue(
             elementType,
-            new List<BlockPropertyValue>
-            {
-                new() { Alias = "invariantText", Value = "The invariant content value" },
-                new() { Alias = "variantText", Value = "The original invariant value for content" },
-            },
-            new List<BlockPropertyValue>
-            {
-                new() { Alias = "invariantText", Value = "The invariant settings value" },
-                new() { Alias = "variantText", Value = "The original invariant value for settings" },
-            },
-            true);
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            new BlockProperty(
+                new List<BlockPropertyValue>
+                {
+                    new() { Alias = "invariantText", Value = "The invariant content value" },
+                    new() { Alias = "variantText", Value = "The original invariant value for content" },
+                },
+                new List<BlockPropertyValue>
+                {
+                    new() { Alias = "invariantText", Value = "The invariant settings value" },
+                    new() { Alias = "variantText", Value = "The original invariant value for settings" },
+                },
+                null,
+                null)
+        );
+
+        blockListValue.Expose =
+        [
+            new() { ContentKey = blockListValue.ContentData[0].Key, Culture = "en-US" },
+            new() { ContentKey = blockListValue.ContentData[0].Key, Culture = "da-DK" },
+        ];
+
+        content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
+        ContentService.Save(content);
+        PublishContent(content, ["en-US", "da-DK"]);
 
         // Verify initial state - both cultures should see the same invariant value
         AssertPropertyValues(
@@ -2246,10 +2269,11 @@ internal partial class BlockListElementLevelVariationTests
         //    - Old invariant value remains in the JSON (leftover from before element type change)
         //    - New variant values are added (after element type became variant)
         //    This is the critical scenario that could trigger a bug.
-        var blockListValue = JsonSerializer.Deserialize<BlockListValue>((string)content.Properties["blocks"]!.GetValue()!);
+        blockListValue = JsonSerializer.Deserialize<BlockListValue>((string)content.Properties["blocks"]!.GetValue()!);
 
         // Add variant values for the property that is now variant
-        blockListValue!.ContentData[0].Values.Add(new BlockPropertyValue
+        blockListValue!.ContentData[0].Values.RemoveAll(value => value.Alias == "variantText");
+        blockListValue.ContentData[0].Values.Add(new BlockPropertyValue
         {
             Alias = "variantText",
             Value = "The content value in English",
@@ -2262,6 +2286,7 @@ internal partial class BlockListElementLevelVariationTests
             Culture = "da-DK"
         });
 
+        blockListValue.SettingsData[0].Values.RemoveAll(value => value.Alias == "variantText");
         blockListValue.SettingsData[0].Values.Add(new BlockPropertyValue
         {
             Alias = "variantText",
@@ -2286,10 +2311,17 @@ internal partial class BlockListElementLevelVariationTests
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
         ContentService.Save(content);
 
-        // 5. Publish all cultures
-        PublishContent(content, contentType, ["en-US", "da-DK"]);
+        // 5. Publish selected cultures
+        string[] culturesToPublish = republishEnglish && republishDanish
+            ? ["en-US", "da-DK"]
+            : republishEnglish
+                ? ["en-US"]
+                : republishDanish
+                    ? ["da-DK"]
+                    : throw new ArgumentException("Can't proceed without republishing at least one culture");
+        PublishContent(content, contentType, culturesToPublish);
 
-        // 6. Verify: Get the published value and check for duplicates in the raw data
+        // 6. Verify published JSON doesn't contain old invariant values for variantText
         content = ContentService.GetById(content.Key)!;
         var publishedValue = (string?)content.Properties["blocks"]!.GetValue(null, null, published: true);
         Assert.IsNotNull(publishedValue, "Published value should not be null");
@@ -2301,40 +2333,15 @@ internal partial class BlockListElementLevelVariationTests
         Assert.AreEqual(1, publishedBlockListValue!.ContentData.Count, "Should have exactly 1 content data entry");
         Assert.AreEqual(1, publishedBlockListValue.SettingsData.Count, "Should have exactly 1 settings data entry");
 
-        // Verify Values within each ContentData are not duplicated
-        // After element type becomes variant, there should be culture-specific values, not a mix of invariant + variant
-        foreach (var contentData in publishedBlockListValue.ContentData)
-        {
-            var aliasGroups = contentData.Values.GroupBy(v => v.Alias);
-            foreach (var group in aliasGroups)
-            {
-                // For variant properties, we expect one value per culture, but NOT multiple values with the same culture
-                var cultureGroups = group.GroupBy(v => v.Culture);
-                foreach (var cultureGroup in cultureGroups)
-                {
-                    Assert.AreEqual(
-                        1,
-                        cultureGroup.Count(),
-                        $"Property '{group.Key}' has duplicate values for culture '{cultureGroup.Key ?? "null"}'. Values: {string.Join(", ", cultureGroup.Select(v => $"Value={v.Value}"))}");
-                }
-            }
-        }
+        var variantTextValues = publishedBlockListValue.ContentData[0].Values.Where(v => v.Alias == "variantText").ToList();
+        Assert.IsFalse(
+            variantTextValues.Any(v => v.Culture is null),
+            $"variantText property should not have invariant values after changing to variant. Values: {string.Join(", ", variantTextValues.Select(v => $"Culture={v.Culture ?? "null"}:Value={v.Value}"))}");
 
-        foreach (var settingsData in publishedBlockListValue.SettingsData)
-        {
-            var aliasGroups = settingsData.Values.GroupBy(v => v.Alias);
-            foreach (var group in aliasGroups)
-            {
-                var cultureGroups = group.GroupBy(v => v.Culture);
-                foreach (var cultureGroup in cultureGroups)
-                {
-                    Assert.AreEqual(
-                        1,
-                        cultureGroup.Count(),
-                        $"Property '{group.Key}' has duplicate values for culture '{cultureGroup.Key ?? "null"}'. Values: {string.Join(", ", cultureGroup.Select(v => $"Value={v.Value}"))}");
-                }
-            }
-        }
+        variantTextValues = publishedBlockListValue.SettingsData[0].Values.Where(v => v.Alias == "variantText").ToList();
+        Assert.IsFalse(
+            variantTextValues.Any(v => v.Culture is null),
+            $"variantText property should not have invariant values after changing to variant. Values: {string.Join(", ", variantTextValues.Select(v => $"Culture={v.Culture ?? "null"}:Value={v.Value}"))}");
 
         // Verify Expose entries are not duplicated
         var exposeGroups = publishedBlockListValue.Expose.GroupBy(e => (e.ContentKey, e.Culture, e.Segment));
