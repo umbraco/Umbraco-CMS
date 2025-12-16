@@ -10,6 +10,7 @@ public class ContentRootDynamicRootOriginFinder : IDynamicRootOriginFinder
         {
             return null;
         }
+
         return Constants.System.RootSystemKey;
     }
 }
