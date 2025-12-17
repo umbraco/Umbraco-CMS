@@ -36,7 +36,6 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
     /// <param name="externalLoginService">The external login service</param>
     /// <param name="twoFactorLoginService">The two factor login service</param>
     /// <param name="memberCache"></param>
-    [ActivatorUtilitiesConstructor]
     public MemberUserStore(
         IMemberService memberService,
         IUmbracoMapper mapper,
@@ -299,13 +298,13 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
 
     public IPublishedContent? GetPublishedMember(MemberIdentityUser? user)
     {
-        if (user == null)
+        if (user is null)
         {
             return null;
         }
 
         IMember? member = _memberService.GetById(user.Key);
-        if (member == null)
+        if (member is null)
         {
             return null;
         }
