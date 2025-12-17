@@ -123,7 +123,7 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 		super.connectedCallback();
 		// Cancel any pending destruction if we're being reconnected (e.g., during a DOM move/sort)
 		if (this.#disconnectTimeoutId !== undefined) {
-			clearTimeout(this.#disconnectTimeoutId);
+			cancelAnimationFrame(this.#disconnectTimeoutId);
 			this.#disconnectTimeoutId = undefined;
 			// Only skip re-initialization if the controller still exists
 			if (this.#extensionsController) {
@@ -136,13 +136,13 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 	}
 	override disconnectedCallback(): void {
 		this.#attached = false;
-		// Clear any existing pending timeout (defensive cleanup)
+		// Clear any existing pending frame request (defensive cleanup)
 		if (this.#disconnectTimeoutId !== undefined) {
-			clearTimeout(this.#disconnectTimeoutId);
+			cancelAnimationFrame(this.#disconnectTimeoutId);
 		}
 		// Defer destruction to allow for reconnection during DOM moves/sorting
-		// If reconnected before the timeout, the destruction is cancelled
-		this.#disconnectTimeoutId = setTimeout(() => {
+		// If reconnected before the next frame, the destruction is cancelled
+		this.#disconnectTimeoutId = requestAnimationFrame(() => {
 			this.#disconnectTimeoutId = undefined;
 			// Only destroy if still detached
 			if (!this.#attached) {
@@ -150,7 +150,7 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 				this.#extensionsController?.destroy();
 				this.#extensionsController = undefined;
 			}
-		}, 0) as unknown as number;
+		});
 		super.disconnectedCallback();
 	}
 
