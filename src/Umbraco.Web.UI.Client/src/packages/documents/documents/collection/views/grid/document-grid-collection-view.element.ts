@@ -7,7 +7,6 @@ import type { UmbDefaultCollectionContext, UmbCollectionColumnConfiguration } fr
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 import '@umbraco-cms/backoffice/ufm';
-import './document-grid-collection-card.element.js';
 
 @customElement('umb-document-grid-collection-view')
 export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
@@ -84,18 +83,16 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 
 	#renderItem(item: UmbDocumentCollectionItemModel) {
 		return html`
-			<umb-document-grid-collection-card
-				class="document-grid-item"
+			<umb-entity-collection-item-card
 				href=${this.#getEditUrl(item)}
 				.item=${item}
-				.columns=${this._userDefinedProperties}
+				.detailProperties=${this._userDefinedProperties}
 				selectable
 				?select-only=${this._selection.length > 0}
 				?selected=${this.#isSelected(item)}
 				@selected=${() => this.#onSelect(item)}
 				@deselected=${() => this.#onDeselect(item)}>
-				<umb-icon slot="icon" name=${item.documentType.icon}></umb-icon>
-			</umb-document-grid-collection-card>
+			</umb-entity-collection-item-card>
 		`;
 	}
 
@@ -111,11 +108,6 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 				display: grid;
 				grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
 				gap: var(--uui-size-space-4);
-			}
-
-			.document-grid-item {
-				width: 100%;
-				min-height: 180px;
 			}
 		`,
 	];

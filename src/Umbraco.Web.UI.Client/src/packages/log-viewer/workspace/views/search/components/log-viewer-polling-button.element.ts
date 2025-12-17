@@ -50,21 +50,30 @@ export class UmbLogViewerPollingButtonElement extends UmbLitElement {
 		this.#togglePolling();
 	}
 
+	#getPollingLabel(): string {
+		const seconds = this._poolingConfig.interval / 1000;
+		return this.localize.term('logViewer_pollingActive', seconds);
+	}
+
+	#getIntervalLabel(interval: UmbPoolingInterval): string {
+		const seconds = interval / 1000;
+		return this.localize.term('logViewer_pollingInterval', seconds);
+	}
+
 	override render() {
 		return html`
 			<uui-button-group>
-				<uui-button label="Start pooling" @click=${this.#togglePolling}
-					>${this._poolingConfig.enabled
-						? html`<uui-icon name="icon-axis-rotation" id="polling-enabled-icon"></uui-icon>Polling
-								${this._poolingConfig.interval / 1000} seconds`
-						: 'Polling'}</uui-button
-				>
+				<uui-button label=${this.localize.term('logViewer_startPolling')} @click=${this.#togglePolling}>
+					${this._poolingConfig.enabled
+						? html`<uui-icon name="icon-axis-rotation" id="polling-enabled-icon"></uui-icon>${this.#getPollingLabel()}`
+						: html`<umb-localize key="logViewer_polling">Polling</umb-localize>`}
+				</uui-button>
 
-				<umb-dropdown id="polling-rate-dropdown" compact label="Choose pooling time">
+				<umb-dropdown id="polling-rate-dropdown" compact label=${this.localize.term('logViewer_choosePollingInterval')}>
 					${this.#pollingIntervals.map(
 						(interval: UmbPoolingInterval) =>
 							html`<uui-menu-item
-								label="Every ${interval / 1000} seconds"
+								label=${this.#getIntervalLabel(interval)}
 								@click-label=${() => this.#setPolingInterval(interval)}></uui-menu-item>`,
 					)}
 				</umb-dropdown>

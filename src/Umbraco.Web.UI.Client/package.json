@@ -1,7 +1,7 @@
 {
 	"name": "@umbraco-cms/backoffice",
 	"license": "MIT",
-	"version": "17.0.0-rc",
+	"version": "17.2.0-rc",
 	"type": "module",
 	"exports": {
 		".": null,
@@ -85,9 +85,11 @@
 		"./picker-input": "./dist-cms/packages/core/picker-input/index.js",
 		"./picker-data-source": "./dist-cms/packages/core/picker-data-source/index.js",
 		"./picker": "./dist-cms/packages/core/picker/index.js",
+		"./preview": "./dist-cms/packages/preview/index.js",
 		"./property-action": "./dist-cms/packages/core/property-action/index.js",
 		"./property-editor-data-source": "./dist-cms/packages/core/property-editor-data-source/index.js",
 		"./property-editor": "./dist-cms/packages/core/property-editor/index.js",
+		"./property-sort-mode": "./dist-cms/packages/core/property-sort-mode/index.js",
 		"./property-type": "./dist-cms/packages/content/property-type/index.js",
 		"./property": "./dist-cms/packages/core/property/index.js",
 		"./recycle-bin": "./dist-cms/packages/core/recycle-bin/index.js",
@@ -214,8 +216,8 @@
 		"generate:ui-api-docs": "npm run generate:check-const-test && typedoc --options typedoc.config.js"
 	},
 	"engines": {
-		"node": ">=22",
-		"npm": ">=10.9"
+		"node": ">=22.17.1",
+		"npm": ">=10.9.2"
 	},
 	"dependencies": {
 		"element-internals-polyfill": "^3.0.2"
@@ -271,6 +273,14 @@
 	"msw": {
 		"workerDirectory": "public"
 	},
+	"keywords": [
+		"Umbraco",
+		"CMS",
+		"Backoffice",
+		"Content Management System",
+		"Web Components",
+		"Extensions"
+	],
 	"publishConfig": {
 		"access": "public",
 		"registry": "https://registry.npmjs.org/"

@@ -87,9 +87,44 @@ internal class DistributedJobRepository(IScopeAccessor scopeAccessor) : IDistrib
         }
     }
 
+    /// <inheritdoc/>
+    public void Add(IEnumerable<DistributedBackgroundJobModel> jobs)
+    {
+        if (scopeAccessor.AmbientScope is null)
+        {
+            throw new InvalidOperationException("No scope, could not add distributed jobs");
+        }
+
+        IEnumerable<DistributedJobDto> dtos = jobs.Select(MapToDto);
+        scopeAccessor.AmbientScope.Database.InsertBulk(dtos);
+    }
+
+    /// <inheritdoc/>
+    public void Delete(IEnumerable<DistributedBackgroundJobModel> jobs)
+    {
+        if (scopeAccessor.AmbientScope is null)
+        {
+            throw new InvalidOperationException("No scope, could not delete distributed jobs");
+        }
+
+        var jobIds = jobs.Select(x => x.Id).ToArray();
+        if (jobIds.Length is 0)
+        {
+            return;
+        }
+
+        Sql<ISqlContext> sql = scopeAccessor.AmbientScope.SqlContext.Sql()
+            .Delete()
+            .From<DistributedJobDto>()
+            .WhereIn<DistributedJobDto>(x => x.Id, jobIds);
+
+        scopeAccessor.AmbientScope.Database.Execute(sql);
+    }
+
     private DistributedJobDto MapToDto(DistributedBackgroundJobModel model) =>
         new()
         {
+            Id = model.Id,
             Name = model.Name,
             Period = model.Period.Ticks,
             LastRun = model.LastRun,
@@ -100,6 +135,7 @@ internal class DistributedJobRepository(IScopeAccessor scopeAccessor) : IDistrib
     private DistributedBackgroundJobModel MapFromDto(DistributedJobDto jobDto) =>
         new()
         {
+            Id = jobDto.Id,
             Name = jobDto.Name,
             Period = TimeSpan.FromTicks(jobDto.Period),
             LastRun = jobDto.LastRun,

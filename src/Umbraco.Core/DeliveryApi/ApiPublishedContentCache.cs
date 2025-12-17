@@ -1,10 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.DeliveryApi;
@@ -132,5 +129,5 @@ public sealed class ApiPublishedContentCache : IApiPublishedContentCache
             : null;
 
     private bool IsAllowedContentType(IPublishedContent content)
-        => _deliveryApiSettings.IsAllowedContentType(content);
+        => _deliveryApiSettings.IsAllowedContentType(content.ContentType.Alias);
 }

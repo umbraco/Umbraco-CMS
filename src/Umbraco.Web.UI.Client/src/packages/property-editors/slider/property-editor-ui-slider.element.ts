@@ -8,14 +8,23 @@ import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
+/**
+ *
+ * @param value
+ */
 function stringToValueObject(value: string | undefined): Partial<UmbSliderPropertyEditorUiValueObject> {
 	const [from, to] = (value ?? ',').split(',');
 	const fromNumber = makeNumberOrUndefined(from);
 	return { from: fromNumber, to: makeNumberOrUndefined(to, fromNumber) };
 }
 
+/**
+ *
+ * @param value
+ * @param fallback
+ */
 function makeNumberOrUndefined(value: string | undefined, fallback?: undefined | number) {
 	if (value === undefined) {
 		return fallback;
@@ -27,6 +36,11 @@ function makeNumberOrUndefined(value: string | undefined, fallback?: undefined |
 	return n;
 }
 
+/**
+ *
+ * @param value
+ * @param fallback
+ */
 function undefinedFallback(value: number | undefined, fallback: number) {
 	return value === undefined ? fallback : value;
 }
@@ -47,6 +61,16 @@ export class UmbPropertyEditorUISliderElement
 	 */
 	@property({ type: Boolean, reflect: true })
 	readonly = false;
+
+	/**
+	 * Sets the input to mandatory, meaning validation will fail if the value is empty.
+	 * @type {boolean}
+	 */
+	@property({ type: Boolean })
+	mandatory?: boolean;
+
+	@property({ type: String })
+	mandatoryMessage = UMB_VALIDATION_EMPTY_LOCALIZATION_KEY;
 
 	@state()
 	private _enableRange = false;
@@ -84,8 +108,8 @@ export class UmbPropertyEditorUISliderElement
 		const initVal2 = Number(config.getValueByAlias('initVal2'));
 		this._initVal2 = isNaN(initVal2) ? this._initVal1 + this._step : initVal2;
 
-		this._min = this.#parseInt(config.getValueByAlias('minVal')) || 0;
-		this._max = this.#parseInt(config.getValueByAlias('maxVal')) || 100;
+		this._min = this.#parseNumber(config.getValueByAlias('minVal')) || 0;
+		this._max = this.#parseNumber(config.getValueByAlias('maxVal')) || 100;
 
 		if (this._min === this._max) {
 			this._max = this._min + 100;
@@ -113,9 +137,9 @@ export class UmbPropertyEditorUISliderElement
 		}
 	}
 
-	#parseInt(input: unknown): number | undefined {
+	#parseNumber(input: unknown): number | undefined {
 		const num = Number(input);
-		return Number.isNaN(num) ? undefined : num;
+		return Number.isFinite(num) ? undefined : num;
 	}
 
 	#onChange(event: CustomEvent & { target: UmbInputSliderElement }) {
@@ -139,7 +163,9 @@ export class UmbPropertyEditorUISliderElement
 				.max=${this._max}
 				?enable-range=${this._enableRange}
 				@change=${this.#onChange}
-				?readonly=${this.readonly}>
+				?readonly=${this.readonly}
+				?required=${this.mandatory}
+				.requiredMessage=${this.mandatoryMessage}>
 			</umb-input-slider>
 		`;
 	}

@@ -1,15 +1,16 @@
 import type { ManifestEntityItemRef } from './entity-item-ref.extension.js';
-import { customElement, property, type PropertyValueMap, state, css, html } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbExtensionsElementInitializer } from '@umbraco-cms/backoffice/extension-api';
-import { UMB_MARK_ATTRIBUTE_NAME } from '@umbraco-cms/backoffice/const';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 import { UmbRoutePathAddendumContext } from '@umbraco-cms/backoffice/router';
-import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import { UMB_MARK_ATTRIBUTE_NAME } from '@umbraco-cms/backoffice/const';
 import { UUIBlinkAnimationValue } from '@umbraco-cms/backoffice/external/uui';
+import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 import './default-item-ref.element.js';
-import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-entity-item-ref')
 export class UmbEntityItemRefElement extends UmbLitElement {
@@ -20,9 +21,6 @@ export class UmbEntityItemRefElement extends UmbLitElement {
 	private _component?: any; // TODO: Add type
 
 	@property({ type: Object, attribute: false })
-	public get item(): UmbEntityModel | undefined {
-		return this.#item;
-	}
 	public set item(value: UmbEntityModel | undefined) {
 		const oldValue = this.#item;
 		this.#item = value;
@@ -40,6 +38,9 @@ export class UmbEntityItemRefElement extends UmbLitElement {
 
 		// If the component is already created, but the entity type is different, we need to destroy the component.
 		this.#createController(value.entityType);
+	}
+	public get item(): UmbEntityModel | undefined {
+		return this.#item;
 	}
 
 	#readonly = false;
@@ -124,20 +125,23 @@ export class UmbEntityItemRefElement extends UmbLitElement {
 	error?: boolean;
 
 	@property({ type: String, attribute: 'error-message', reflect: false })
-	errorMessage?: string;
+	errorMessage?: string | null;
+
+	@property({ type: String, attribute: 'error-detail', reflect: false })
+	errorDetail?: string | null;
 
 	#pathAddendum = new UmbRoutePathAddendumContext(this);
 
 	#onSelected(event: UmbSelectedEvent) {
 		event.stopPropagation();
-		const unique = this.#item?.unique;
+		const unique = this.item?.unique;
 		if (!unique) throw new Error('No unique id found for item');
 		this.dispatchEvent(new UmbSelectedEvent(unique));
 	}
 
 	#onDeselected(event: UmbDeselectedEvent) {
 		event.stopPropagation();
-		const unique = this.#item?.unique;
+		const unique = this.item?.unique;
 		if (!unique) throw new Error('No unique id found for item');
 		this.dispatchEvent(new UmbDeselectedEvent(unique));
 	}
@@ -146,6 +150,9 @@ export class UmbEntityItemRefElement extends UmbLitElement {
 		super.firstUpdated(_changedProperties);
 		this.setAttribute(UMB_MARK_ATTRIBUTE_NAME, 'entity-item-ref');
 	}
+
+	#boundOnSelected = this.#onSelected.bind(this);
+	#boundOnDeselected = this.#onDeselected.bind(this);
 
 	#createController(entityType: string) {
 		if (this.#extensionsController) {
@@ -163,7 +170,7 @@ export class UmbEntityItemRefElement extends UmbLitElement {
 
 				// TODO: I would say this code can use feature of the UmbExtensionsElementInitializer, to set properties and get a fallback element. [NL]
 				// assign the properties to the component
-				component.item = this.#item;
+				component.item = this.item;
 				component.readonly = this.readonly;
 				component.standalone = this.standalone;
 				component.selectOnly = this.selectOnly;
@@ -171,8 +178,8 @@ export class UmbEntityItemRefElement extends UmbLitElement {
 				component.selected = this.selected;
 				component.disabled = this.disabled;
 
-				component.addEventListener(UmbSelectedEvent.TYPE, this.#onSelected.bind(this));
-				component.addEventListener(UmbDeselectedEvent.TYPE, this.#onDeselected.bind(this));
+				component.addEventListener(UmbSelectedEvent.TYPE, this.#boundOnSelected);
+				component.addEventListener(UmbDeselectedEvent.TYPE, this.#boundOnDeselected);
 
 				// Proxy the actions slot to the component
 				const slotElement = document.createElement('slot');
@@ -192,27 +199,32 @@ export class UmbEntityItemRefElement extends UmbLitElement {
 		if (this._component) {
 			return html`${this._component}`;
 		}
+
 		// Error:
 		if (this.error) {
-			return html`<uui-ref-node
-				style="color: var(--uui-color-danger);"
-				.name=${this.localize.string(this.errorMessage ?? '#general_notFound')}
-				.readonly=${this.readonly}
-				.standalone=${this.standalone}
-				.selectOnly=${this.selectOnly}
-				.selected=${this.selected}
-				.disabled=${this.disabled}>
-				<uui-icon slot="icon" name="icon-alert" style="color: var(--uui-color-danger);"></uui-icon>
-				<slot name="actions"></slot>
-			</uui-ref-node>`;
+			return html`
+				<uui-ref-node
+					style="color: var(--uui-color-danger);"
+					.name=${this.localize.string(this.errorMessage ?? '#general_notFound')}
+					.detail=${this.errorDetail ?? ''}
+					.readonly=${this.readonly}
+					.standalone=${this.standalone}
+					.selectOnly=${this.selectOnly}
+					.selected=${this.selected}
+					.disabled=${this.disabled}>
+					<uui-icon slot="icon" name="icon-alert" style="color: var(--uui-color-danger);"></uui-icon>
+					<slot name="actions"></slot>
+				</uui-ref-node>
+			`;
 		}
+
 		// Loading:
 		return html`<uui-loader-bar style="margin-top:10px;"></uui-loader-bar>`;
 	}
 
 	override destroy(): void {
-		this._component?.removeEventListener(UmbSelectedEvent.TYPE, this.#onSelected.bind(this));
-		this._component?.removeEventListener(UmbDeselectedEvent.TYPE, this.#onDeselected.bind(this));
+		this._component?.removeEventListener(UmbSelectedEvent.TYPE, this.#boundOnSelected);
+		this._component?.removeEventListener(UmbDeselectedEvent.TYPE, this.#boundOnDeselected);
 		super.destroy();
 	}
 

@@ -708,9 +708,6 @@ export default {
 		help: '帮助',
 		forms: '窗体',
 	},
-	help: {
-		theBestUmbracoVideoTutorials: '最佳 Umbraco 视频教程',
-	},
 	settings: {
 		defaulttemplate: '默认模板',
 		importDocumentTypeHelp:

@@ -524,7 +524,6 @@ export default {
 		move: 'Flytt',
 		name: 'Navn',
 		new: 'Ny',
-		newVersionAvailable: 'Ny versjon tilgjengelig',
 		next: 'Neste',
 		no: 'Nei',
 		noItemsInList: 'Ingen elementer er lagt til',
@@ -846,9 +845,6 @@ export default {
 		users: 'Brukere',
 		help: 'Hjelp',
 		forms: 'Skjemaer',
-	},
-	help: {
-		theBestUmbracoVideoTutorials: 'De beste Umbraco opplæringsvideoer',
 	},
 	settings: {
 		defaulttemplate: 'Standardmal',

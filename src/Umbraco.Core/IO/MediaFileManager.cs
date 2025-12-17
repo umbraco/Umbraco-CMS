@@ -1,9 +1,9 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
 
@@ -14,20 +14,39 @@ public sealed class MediaFileManager
     private readonly ILogger<MediaFileManager> _logger;
     private readonly IMediaPathScheme _mediaPathScheme;
     private readonly IServiceProvider _serviceProvider;
+    private readonly Lazy<ICoreScopeProvider> _coreScopeProvider;
     private readonly IShortStringHelper _shortStringHelper;
     private MediaUrlGeneratorCollection? _mediaUrlGenerators;
 
+    [Obsolete("Please use the constructor taking all arguments, scheduled for removal in Umbraco 19")]
     public MediaFileManager(
         IFileSystem fileSystem,
         IMediaPathScheme mediaPathScheme,
         ILogger<MediaFileManager> logger,
         IShortStringHelper shortStringHelper,
         IServiceProvider serviceProvider)
+        : this(fileSystem,
+            mediaPathScheme,
+            logger,
+            shortStringHelper,
+            serviceProvider,
+            StaticServiceProvider.Instance.GetRequiredService<Lazy<ICoreScopeProvider>>())
+    {
+    }
+
+    public MediaFileManager(
+        IFileSystem fileSystem,
+        IMediaPathScheme mediaPathScheme,
+        ILogger<MediaFileManager> logger,
+        IShortStringHelper shortStringHelper,
+        IServiceProvider serviceProvider,
+        Lazy<ICoreScopeProvider> coreScopeProvider)
     {
         _mediaPathScheme = mediaPathScheme;
         _logger = logger;
         _shortStringHelper = shortStringHelper;
         _serviceProvider = serviceProvider;
+        _coreScopeProvider = coreScopeProvider;
         FileSystem = fileSystem;
     }
 
@@ -40,8 +59,62 @@ public sealed class MediaFileManager
     ///     Delete media files.
     /// </summary>
     /// <param name="files">Files to delete (filesystem-relative paths).</param>
-    public void DeleteMediaFiles(IEnumerable<string> files)
+    public void DeleteMediaFiles(IEnumerable<string> files) =>
+        PerformMediaFileOperation(
+            files,
+            file =>
+            {
+                FileSystem.DeleteFile(file);
+
+                var directory = _mediaPathScheme.GetDeleteDirectory(this, file);
+                if (!directory.IsNullOrWhiteSpace())
+                {
+                    FileSystem.DeleteDirectory(directory!, true);
+                }
+            },
+            "Failed to delete media file '{File}'.");
+
+    /// <summary>
+    /// Adds a suffix to media files.
+    /// </summary>
+    /// <param name="files">Files to append a suffix to.</param>
+    /// <param name="suffix">The suffix to append.</param>
+    /// <remarks>
+    /// The suffix will be added prior to the file extension, e.g. "image.jpg" with suffix ".deleted" will become "image.deleted.jpg".
+    /// </remarks>
+    public void SuffixMediaFiles(IEnumerable<string> files, string suffix)
+        => PerformMediaFileOperation(
+            files,
+            file =>
+            {
+                var suffixedFile = Path.ChangeExtension(file, suffix + Path.GetExtension(file));
+                FileSystem.MoveFile(file, suffixedFile);
+            },
+            "Failed to rename media file '{File}'.");
+
+    /// <summary>
+    /// Removes a suffix from media files.
+    /// </summary>
+    /// <param name="files">Files to remove a suffix from.</param>
+    /// <param name="suffix">The suffix to remove.</param>
+    /// <remarks>
+    /// The suffix will be removed prior to the file extension, e.g. "image.deleted.jpg" with suffix ".deleted" will become "image.jpg".
+    /// </remarks>
+    public void RemoveSuffixFromMediaFiles(IEnumerable<string> files, string suffix)
+        => PerformMediaFileOperation(
+            files,
+            file =>
+            {
+                var fileWithSuffixRemoved = file.Replace(suffix + Path.GetExtension(file), Path.GetExtension(file));
+                FileSystem.MoveFile(file, fileWithSuffixRemoved);
+            },
+            "Failed to rename media file '{File}'.");
+
+    private void PerformMediaFileOperation(IEnumerable<string> files, Action<string> fileOperation, string errorMessage)
     {
+        using ICoreScope scope = _coreScopeProvider.Value.CreateCoreScope();
+        scope.WriteLock(Constants.Locks.MediaTree);
+
         files = files.Distinct();
 
         // kinda try to keep things under control
@@ -61,19 +134,15 @@ public sealed class MediaFileManager
                     return;
                 }
 
-                FileSystem.DeleteFile(file);
-
-                var directory = _mediaPathScheme.GetDeleteDirectory(this, file);
-                if (!directory.IsNullOrWhiteSpace())
-                {
-                    FileSystem.DeleteDirectory(directory!, true);
-                }
+                fileOperation(file);
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Failed to delete media file '{File}'.", file);
+                _logger.LogError(e, errorMessage, file);
             }
         });
+
+        scope.Complete();
     }
 
     #region Media Path

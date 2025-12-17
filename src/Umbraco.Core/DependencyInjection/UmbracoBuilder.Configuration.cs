@@ -41,6 +41,7 @@ public static partial class UmbracoBuilderExtensions
     {
         // Register configuration validators.
         builder.Services.AddSingleton<IValidateOptions<ContentSettings>, ContentSettingsValidator>();
+        builder.Services.AddSingleton<IValidateOptions<DeliveryApiSettings>, DeliveryApiSettingsValidator>();
         builder.Services.AddSingleton<IValidateOptions<GlobalSettings>, GlobalSettingsValidator>();
         builder.Services.AddSingleton<IValidateOptions<HealthChecksSettings>, HealthChecksSettingsValidator>();
         builder.Services.AddSingleton<IValidateOptions<LoggingSettings>, LoggingSettingsValidator>();
@@ -88,7 +89,8 @@ public static partial class UmbracoBuilderExtensions
             .AddUmbracoOptions<WebhookSettings>()
             .AddUmbracoOptions<CacheSettings>()
             .AddUmbracoOptions<SystemDateMigrationSettings>()
-            .AddUmbracoOptions<DistributedJobSettings>();
+            .AddUmbracoOptions<DistributedJobSettings>()
+            .AddUmbracoOptions<BackOfficeTokenCookieSettings>();
 
         // Configure connection string and ensure it's updated when the configuration changes
         builder.Services.AddSingleton<IConfigureOptions<ConnectionStrings>, ConfigureConnectionStrings>();

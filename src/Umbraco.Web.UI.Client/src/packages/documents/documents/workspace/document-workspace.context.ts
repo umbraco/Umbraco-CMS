@@ -14,7 +14,6 @@ import {
 	UMB_USER_PERMISSION_DOCUMENT_CREATE,
 	UMB_USER_PERMISSION_DOCUMENT_UPDATE,
 } from '../constants.js';
-import { UmbDocumentPreviewRepository } from '../repository/preview/index.js';
 import { UmbDocumentValidationRepository } from '../repository/validation/index.js';
 import { UMB_DOCUMENT_CONFIGURATION_CONTEXT } from '../index.js';
 import { UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD, UMB_DOCUMENT_WORKSPACE_ALIAS } from './constants.js';
@@ -41,6 +40,7 @@ import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbVariantPropertyGuardRule } from '@umbraco-cms/backoffice/property';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
+import { UmbPreviewRepository } from '@umbraco-cms/backoffice/preview';
 
 type ContentModel = UmbDocumentDetailModel;
 type ContentTypeModel = UmbDocumentTypeDetailModel;
@@ -72,6 +72,8 @@ export class UmbDocumentWorkspaceContext
 	#documentSegmentRepository = new UmbDocumentSegmentRepository(this);
 	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 	#localize = new UmbLocalizationController(this);
+	#previewWindow?: WindowProxy | null = null;
+	#previewWindowDocumentId?: string | null = null;
 
 	constructor(host: UmbControllerHost) {
 		super(host, {
@@ -227,22 +229,16 @@ export class UmbDocumentWorkspaceContext
 		this.#isTrashedContext.setIsTrashed(false);
 	}
 
-	protected override async loadSegments(): Promise<void> {
-		this.observe(
-			this.unique,
-			async (unique) => {
-				if (!unique) {
-					this._segments.setValue([]);
-					return;
-				}
-				const { data } = await this.#documentSegmentRepository.getDocumentByIdSegmentOptions(unique, {
-					skip: 0,
-					take: 9999,
-				});
-				this._segments.setValue(data?.items ?? []);
-			},
-			'_loadSegmentsUnique',
-		);
+	protected override async _loadSegmentsFor(unique: string): Promise<void> {
+		if (!unique) {
+			this._segments.setValue([]);
+			return;
+		}
+		const { data } = await this.#documentSegmentRepository.getDocumentByIdSegmentOptions(unique, {
+			skip: 0,
+			take: 9999,
+		});
+		this._segments.setValue(data?.items ?? []);
 	}
 
 	async create(parent: UmbEntityModel, documentTypeUnique: string, blueprintUnique?: string) {
@@ -332,12 +328,32 @@ export class UmbDocumentWorkspaceContext
 			firstVariantId = UmbVariantId.FromString(selected[0]);
 			const variantIds = [firstVariantId];
 			const saveData = await this._data.constructData(variantIds);
-			await this.runMandatoryValidationForSaveData(saveData);
+
+			// Run mandatory validation (checks for name, etc.)
+			await this.runMandatoryValidationForSaveData(saveData, variantIds);
+
+			// Ask server to validate and show validation tooltips (like the Save action does)
+			await this.askServerToValidate(saveData, variantIds);
+
+			// Perform save
 			await this.performCreateOrUpdate(variantIds, saveData);
 		}
 
-		// Get the preview URL from the server.
-		const previewRepository = new UmbDocumentPreviewRepository(this);
+		// Check if preview window is still open and showing the same document
+		// If so, just focus it and let SignalR handle the refresh
+		try {
+			if (this.#previewWindow && !this.#previewWindow.closed && this.#previewWindowDocumentId === unique) {
+				this.#previewWindow.focus();
+				return;
+			}
+		} catch {
+			// Window reference is stale, continue to create new preview session
+			this.#previewWindow = null;
+			this.#previewWindowDocumentId = null;
+		}
+
+		// Preview not open, create new preview session and open window
+		const previewRepository = new UmbPreviewRepository(this);
 		const previewUrlData = await previewRepository.getPreviewUrl(
 			unique,
 			urlProviderAlias,
@@ -346,8 +362,12 @@ export class UmbDocumentWorkspaceContext
 		);
 
 		if (previewUrlData.url) {
-			const previewWindow = window.open(previewUrlData.url, `umbpreview-${unique}`);
-			previewWindow?.focus();
+			// Add cache-busting parameter to ensure the preview tab reloads with the new preview session
+			const previewUrl = new URL(previewUrlData.url, window.document.baseURI);
+			previewUrl.searchParams.set('rnd', Date.now().toString());
+			this.#previewWindow = window.open(previewUrl.toString(), `umbpreview-${unique}`);
+			this.#previewWindowDocumentId = unique;
+			this.#previewWindow?.focus();
 			return;
 		}
 

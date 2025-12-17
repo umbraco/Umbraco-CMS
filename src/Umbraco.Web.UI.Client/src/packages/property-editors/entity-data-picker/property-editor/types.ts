@@ -1,1 +1,3 @@
-export type UmbEntityDataPickerPropertyEditorValue = Array<string>;
+export type UmbEntityDataPickerPropertyEditorValue = {
+	ids: Array<string>;
+};
