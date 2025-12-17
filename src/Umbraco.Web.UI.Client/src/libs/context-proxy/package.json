@@ -1,0 +1,9 @@
+{
+	"name": "@umbraco-backoffice/context-proxy",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"build": "vite build",
+		"generate:server-api": "openapi-ts --file openapi-ts.config.js"
+	}
+}
