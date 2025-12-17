@@ -10,6 +10,7 @@ import {
 	query,
 	repeat,
 	state,
+	when,
 	type PropertyValues,
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
@@ -51,14 +52,18 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 
 	#unique?: string | null;
 
+	// Initialize as undefined to track loading state
+	// When both _languageModel and _domains are set (non-undefined), loading is complete
 	@state()
-	private _languageModel: Array<UmbLanguageDetailModel> = [];
+	private _languageModel: Array<UmbLanguageDetailModel> | undefined = undefined;
 
 	@state()
 	private _defaultIsoCode?: string | null;
 
+	// Initialize as undefined to track loading state
+	// When both _languageModel and _domains are set (non-undefined), loading is complete
 	@state()
-	private _domains: Array<UmbDomainPresentationModel> = [];
+	private _domains: Array<UmbDomainPresentationModel> | undefined = undefined;
 
 	@query('#more-options')
 	popoverContainerElement?: UUIPopoverContainerElement;
@@ -66,10 +71,15 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 	// Init
 
 	override willUpdate(changedProperties: PropertyValues) {
-		if (changedProperties.has('_domains')) {
-			// Update sorter whenever _domains changes
+		if (changedProperties.has('_domains') && this._domains) {
+			// Update sorter whenever _domains changes and is defined
 			this.#sorter.setModel(this._domains);
 		}
+	}
+
+	constructor() {
+		super();
+		this.#sorter.disable();
 	}
 
 	override firstUpdated() {
@@ -82,18 +92,25 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 		if (!this.#unique) return;
 		const { data } = await this.#documentRepository.readCultureAndHostnames(this.#unique);
 
-		if (!data) return;
+		if (!data) {
+			// Set to empty array to indicate loading is complete
+			this._domains = [];
+			return;
+		}
 		this._defaultIsoCode = data.defaultIsoCode;
 		this._domains = data.domains.map((domain) => ({ ...domain, unique: UmbId.new() }));
+		this.#sorter.enable();
 	}
 
 	async #requestLanguages() {
-		const { data } = await this.#languageCollectionRepository.requestCollection({});
-		if (!data) return;
-		this._languageModel = data.items;
+		const { data } = await this.#languageCollectionRepository.requestCollection({ take: 999 });
+		// Set to empty array if no data, to indicate loading is complete
+		this._languageModel = data?.items ?? [];
 	}
 
 	async #handleSave() {
+		// Ensure data is loaded before saving
+		if (!this._domains) return;
 		const cleanDomains = this._domains.map((domain) => ({ domainName: domain.domainName, isoCode: domain.isoCode }));
 		this.value = { defaultIsoCode: this._defaultIsoCode, domains: cleanDomains };
 		const { error } = await this.#documentRepository.updateCultureAndHostnames(this.#unique!, this.value);
@@ -120,19 +137,27 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 
 	#onChangeDomainLanguage(e: UUISelectEvent, index: number) {
 		const isoCode = e.target.value as string;
+		// Only update if _domains is defined
+		if (!this._domains) return;
 		this._domains = this._domains.map((domain, i) => (index === i ? { ...domain, isoCode } : domain));
 	}
 
 	#onChangeDomainHostname(e: UUIInputEvent, index: number) {
 		const domainName = e.target.value as string;
+		// Only update if _domains is defined
+		if (!this._domains) return;
 		this._domains = this._domains.map((domain, i) => (index === i ? { ...domain, domainName } : domain));
 	}
 
 	async #onRemoveDomain(index: number) {
+		// Only update if _domains is defined
+		if (!this._domains) return;
 		this._domains = this._domains.filter((d, i) => index !== i);
 	}
 
 	#onAddDomain(useCurrentDomain?: boolean) {
+		// Only add domain if both _domains and _languageModel are defined
+		if (!this._domains || !this._languageModel) return;
 		const defaultModel = this._languageModel.find((model) => model.isDefault);
 		if (useCurrentDomain) {
 			// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
@@ -162,38 +187,57 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 
 	// Renders
 
+	// Check if data is still loading
+	// Returns true when both _domains and _languageModel have been set (non-undefined)
+	#isLoading(): boolean {
+		return this._domains === undefined || this._languageModel === undefined;
+	}
+
 	override render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('actions_assigndomain')}>
-				<uui-box>
-					<umb-property-layout
-						label=${this.localize.term('assignDomain_language')}
-						description=${this.localize.term('assignDomain_setLanguageHelp')}
-						orientation="vertical"
-						><div slot="editor">
-							<uui-combobox
-								id="select"
-								label=${this.localize.term('assignDomain_language')}
-								.value=${(this._defaultIsoCode as string) ?? 'inherit'}
-								@change=${this.#onChangeLanguage}>
-								<uui-combobox-list>
-									<uui-combobox-list-option .value=${'inherit'}>
-										${this.localize.term('assignDomain_inherit')}
-									</uui-combobox-list-option>
-									${this.#renderLanguageModelOptions()}
-								</uui-combobox-list>
-							</uui-combobox>
+				<!-- Display loader while _domains and _languageModel are being loaded -->
+				${when(
+					this.#isLoading(),
+					() => html`
+						<div id="loader-container">
+							<uui-loader></uui-loader>
 						</div>
-					</umb-property-layout>
-				</uui-box>
-				<uui-box>
-					<umb-property-layout
-						label=${this.localize.term('assignDomain_setDomains')}
-						description=${this.localize.term('assignDomain_domainHelpWithVariants')}
-						orientation="vertical"
-						><div slot="editor">${this.#renderDomains()} ${this.#renderAddNewDomainButton()}</div></umb-property-layout
-					>
-				</uui-box>
+					`,
+					() => html`
+						<uui-box>
+							<umb-property-layout
+								label=${this.localize.term('assignDomain_language')}
+								description=${this.localize.term('assignDomain_setLanguageHelp')}
+								orientation="vertical"
+								><div slot="editor">
+									<uui-combobox
+										id="select"
+										label=${this.localize.term('assignDomain_language')}
+										.value=${(this._defaultIsoCode as string) ?? 'inherit'}
+										@change=${this.#onChangeLanguage}>
+										<uui-combobox-list>
+											<uui-combobox-list-option .value=${'inherit'}>
+												${this.localize.term('assignDomain_inherit')}
+											</uui-combobox-list-option>
+											${this.#renderLanguageModelOptions()}
+										</uui-combobox-list>
+									</uui-combobox>
+								</div>
+							</umb-property-layout>
+						</uui-box>
+						<uui-box>
+							<umb-property-layout
+								label=${this.localize.term('assignDomain_setDomains')}
+								description=${this.localize.term('assignDomain_domainHelpWithVariants')}
+								orientation="vertical"
+								><div slot="editor">
+									${this.#renderDomains()} ${this.#renderAddNewDomainButton()}
+								</div></umb-property-layout
+							>
+						</uui-box>
+					`,
+				)}
 				<uui-button
 					slot="actions"
 					id="close"
@@ -214,7 +258,7 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 		return html`
 			<div id="sorter-wrapper">
 				${repeat(
-					this._domains,
+					this._domains ?? [],
 					(domain) => domain.unique,
 					(domain, index) => html`
 						<div class="hostname-item" data-sort-entry-id=${domain.unique}>
@@ -247,7 +291,7 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 
 	#renderLanguageModelOptions() {
 		return html`${repeat(
-			this._languageModel,
+			this._languageModel ?? [],
 			(model) => model.unique,
 			(model) => html`<uui-combobox-list-option .value=${model.unique}>${model.name}</uui-combobox-list-option>`,
 		)}`;
@@ -281,6 +325,13 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 	static override styles = [
 		UmbTextStyles,
 		css`
+			#loader-container {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				min-height: 200px;
+			}
+
 			umb-property-layout[orientation='vertical'] {
 				padding: 0;
 			}
