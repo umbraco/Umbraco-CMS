@@ -154,21 +154,14 @@ export class UmbUserGroupRefElement extends UmbElementMixin(UUIRefNodeElement) {
 	}
 
 	#renderDetails() {
-		return html`
-			<div id="details">
-				${this.#renderDescription()} ${this.#renderSections()} ${this.#renderDocumentStartNode()}
-				${this.#renderMediaStartNode()} ${this.#renderUserPermissions()}
-			</div>
-		`;
-	}
+		const content = this.description
+			? html`<small>${this.description}</small>`
+			: html`
+					${this.#renderSections()} ${this.#renderDocumentStartNode()} ${this.#renderMediaStartNode()}
+					${this.#renderUserPermissions()}
+				`;
 
-	#renderDescription() {
-		if (!this.description) return;
-		return html`
-			<div>
-				<small>${this.description}</small>
-			</div>
-		`;
+		return html`<div id="details">${content}</div>`;
 	}
 
 	#renderSections() {

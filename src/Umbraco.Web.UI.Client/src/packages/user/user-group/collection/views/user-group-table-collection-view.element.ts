@@ -16,7 +16,6 @@ import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import type { UmbUniqueItemModel } from '@umbraco-cms/backoffice/models';
 
 import '../components/user-group-table-name-column-layout.element.js';
-import '../components/user-group-table-description-column-layout.element.js';
 import '../components/user-group-table-sections-column-layout.element.js';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -37,7 +36,6 @@ export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
 		{
 			name: this.localize.term('general_description'),
 			alias: 'description',
-			elementName: 'umb-user-group-table-description-column-layout',
 		},
 		{
 			name: this.localize.term('main_sections'),
