@@ -8,8 +8,9 @@ export interface UmbPropertyGuardRule extends UmbGuardRule {
 
 /**
  *
- * @param rule
- * @param propertyType
+ * @param {UmbPropertyGuardRule} rule - The rule to check.
+ * @param {UmbReferenceByUnique} propertyType - The property type to check.
+ * @returns {boolean} - Returns true if the rule applies to the given property type.
  */
 function findRule(rule: UmbPropertyGuardRule, propertyType: UmbReferenceByUnique) {
 	return rule.propertyType?.unique === propertyType.unique || rule.propertyType === undefined;
@@ -17,14 +18,13 @@ function findRule(rule: UmbPropertyGuardRule, propertyType: UmbReferenceByUnique
 
 /**
  * @description - A Guard to manage property rules.
- * @export
  * @class UmbPropertyGuardManager
  * @augments {UmbGuardManagerBase<UmbPropertyGuardRule>}
  */
 export class UmbPropertyGuardManager extends UmbGuardManagerBase<UmbPropertyGuardRule> {
 	/**
 	 * Checks if the property is permitted for the given property type
-	 * @param {UmbReferenceByUnique} propertyType
+	 * @param {UmbReferenceByUnique} propertyType - The property type to check.
 	 * @returns {Observable<boolean>} - Observable that emits true if the property is permitted
 	 * @memberof UmbPropertyGuardManager
 	 */
@@ -34,7 +34,7 @@ export class UmbPropertyGuardManager extends UmbGuardManagerBase<UmbPropertyGuar
 
 	/**
 	 * Checks if the property is permitted for the given property type
-	 * @param {UmbReferenceByUnique} propertyType
+	 * @param {UmbReferenceByUnique} propertyType - The property type to check.
 	 * @returns {boolean} - Returns true if the property is permitted
 	 * @memberof UmbPropertyGuardManager
 	 */

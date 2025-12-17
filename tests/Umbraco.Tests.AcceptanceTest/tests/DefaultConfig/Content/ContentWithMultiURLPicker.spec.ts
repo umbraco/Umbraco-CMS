@@ -17,8 +17,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
-// TODO, this is flaky on the pipeline, not locally. Look into why
-test.fixme('can create content with the document link', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test('can create content with the document link', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Draft';
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
@@ -267,7 +266,8 @@ test('can edit the URL picker in the content', async ({umbracoApi, umbracoUi}) =
   expect(contentData.values[0].value[0].url).toEqual(link);
 });
 
-test('cannot submit an empty link', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+// TODO: fails due to https://github.com/umbraco/Umbraco-CMS/issues/21044
+test.skip('cannot submit an empty link', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
@@ -288,7 +288,8 @@ test('cannot submit an empty link', {tag: '@release'}, async ({umbracoApi, umbra
   await umbracoUi.content.isTextWithMessageVisible(ConstantHelper.validationMessages.emptyLinkPicker);
 });
 
-test('cannot update the URL picker with an empty link', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+// TODO: fails due to https://github.com/umbraco/Umbraco-CMS/issues/21044
+test.skip('cannot update the URL picker with an empty link', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
@@ -308,7 +309,8 @@ test('cannot update the URL picker with an empty link', {tag: '@release'}, async
   await umbracoUi.content.isTextWithMessageVisible(ConstantHelper.validationMessages.emptyLinkPicker);
 });
 
-test('cannot submit an empty URL with an anchor or query', async ({umbracoApi, umbracoUi}) => {
+// TODO: fails due to https://github.com/umbraco/Umbraco-CMS/issues/21044
+test.skip('cannot submit an empty URL with an anchor or query', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);

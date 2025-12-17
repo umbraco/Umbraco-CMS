@@ -157,6 +157,13 @@ export class UmbTableElement extends UmbLitElement {
 	@state()
 	private _selectionMode = false;
 
+	override updated(changedProperties: Map<string | number | symbol, unknown>) {
+		super.updated(changedProperties);
+		if (changedProperties.has('selection')) {
+			this._selectionMode = this.selection.length > 0;
+		}
+	}
+
 	#sorter = new UmbSorterController<UmbTableItem>(this, {
 		getUniqueOfElement: (element) => {
 			return element.dataset.sortableId;
@@ -291,7 +298,7 @@ export class UmbTableElement extends UmbLitElement {
 		return html`
 			<uui-table-row
 				data-sortable-id=${item.id}
-				?selectable="${this.config.allowSelection && !this._sortable}"
+				?selectable=${this.config.allowSelection && !this._sortable}
 				?select-only=${this._selectionMode}
 				?selected=${this._isSelected(item.id)}
 				@selected=${() => this._selectRow(item.id)}

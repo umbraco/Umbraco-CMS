@@ -92,7 +92,6 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 		let { data } = await request;
 
 		if (data) {
-			data = await this._processIncomingData(data);
 			data = await this._scaffoldProcessData(data);
 
 			if (this.modalContext) {
@@ -141,6 +140,20 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 
 		this.loading.removeState(LOADING_STATE_UNIQUE);
 		return response;
+	}
+
+	/**
+	 * Reload the workspace data
+	 * @returns { Promise<void> } The promise of the reload
+	 */
+	override async reload(): Promise<void> {
+		const unique = this.getUnique();
+		if (!unique) throw new Error('Unique is not set');
+
+		const data = await this.structure.reload();
+		if (data) {
+			this._data.setPersisted(data);
+		}
 	}
 
 	#onDetailStoreChange(entity: DetailModelType | undefined) {

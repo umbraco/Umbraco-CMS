@@ -110,6 +110,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
         Guid userKey)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        scope.WriteLock(Constants.Locks.ContentTree);
         IContent? content = _contentService.GetById(key);
         if (content is null)
         {

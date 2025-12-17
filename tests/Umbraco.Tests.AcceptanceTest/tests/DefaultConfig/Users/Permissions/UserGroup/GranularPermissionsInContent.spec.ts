@@ -267,9 +267,9 @@ test('can set culture and hostnames for a specific content with culture and host
   // Act
   await umbracoUi.content.clickActionsMenuForContent(firstDocumentName);
   await umbracoUi.content.clickCultureAndHostnamesActionMenuOption();
-  await umbracoUi.content.clickAddNewDomainButton();
+  await umbracoUi.content.clickAddNewHostnameButton();
   await umbracoUi.content.enterDomain(domainName, 0);
-  await umbracoUi.content.selectDomainLanguageOption(languageName, 0);
+  await umbracoUi.content.selectHostnameLanguageOption(languageName, 0);
   await umbracoUi.content.clickSaveModalButton();
 
   // Assert

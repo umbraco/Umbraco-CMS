@@ -278,3 +278,23 @@ test.fixme('can remove a thumbnail from a block', async ({umbracoApi, umbracoUi}
   await umbracoUi.dataType.goToBlockAdvancedTab();
   // TODO: Implement it later
 });
+
+// This tests for regression issue: https://github.com/umbraco/Umbraco-CMS/issues/20962
+test('only allow image file as a block thumbnail', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const notAllowedFileNames = ['Program.cs', 'appsettings.json', '.csproj'];
+  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
+  const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
+  await umbracoApi.dataType.createBlockGridWithABlock(blockGridEditorName, contentElementTypeId);
+
+  // Act
+  await umbracoUi.dataType.goToDataType(blockGridEditorName);
+  await umbracoUi.dataType.goToBlockWithName(elementTypeName);
+  await umbracoUi.dataType.goToBlockAdvancedTab();
+  await umbracoUi.dataType.clickChooseThumbnailButton();
+  
+  // Assert
+  for (const notAllowedFileName of notAllowedFileNames) {
+    await umbracoUi.dataType.isModalMenuItemWithNameVisible(notAllowedFileName, false);
+  }
+});

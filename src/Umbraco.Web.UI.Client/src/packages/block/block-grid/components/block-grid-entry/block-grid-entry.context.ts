@@ -52,6 +52,7 @@ export class UmbBlockGridEntryContext
 		if (!x) return undefined;
 		return [x.rowMinSpan ?? 1, x.rowMaxSpan ?? 1];
 	}
+
 	readonly inlineEditingMode = this._blockType.asObservablePart((x) => x?.inlineEditing === true);
 
 	#relevantColumnSpanOptions = new UmbArrayState<number>([], (x) => x);
@@ -75,6 +76,9 @@ export class UmbBlockGridEntryContext
 		[this._contentStructureHasProperties, this.forceHideContentEditorInOverlay],
 		([a, b]) => a === true && b === false,
 	);
+
+	#isSortMode = new UmbBooleanState(undefined);
+	readonly isSortMode = this.#isSortMode.asObservable();
 
 	readonly scaleManager = new UmbBlockGridScaleManager(this);
 
@@ -270,6 +274,12 @@ export class UmbBlockGridEntryContext
 				}
 			},
 			'observeRowSpanValidation',
+		);
+
+		this.observe(
+			this._manager.isSortMode,
+			(isSortMode) => this.#isSortMode.setValue(isSortMode ?? false),
+			'observeIsSortMode',
 		);
 	}
 
