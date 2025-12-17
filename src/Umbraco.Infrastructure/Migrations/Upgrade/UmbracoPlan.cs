@@ -29,6 +29,7 @@ public class UmbracoPlan : MigrationPlan
     /// <remarks>
     /// This is virtual for testing purposes.
     /// </remarks>
+    // codescene:ignore:large-method
     protected virtual void DefinePlan()
     {
         // Please take great care when modifying the plan!
