@@ -1439,9 +1439,13 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
             }
             else if (ev.Key.langId.HasValue)
             {
-                // This should never happen! If a property culture is flagged as edited then the culture must exist at the document level
-                throw new PanicException(
-                    $"The existing DocumentCultureVariationDto was not found for node {ev.Key.nodeId} and language {ev.Key.langId}");
+                // This can happen when a property changes from invariant to variant and the content
+                // was only created in non-default languages. The invariant property data gets migrated
+                // to the default language, but no DocumentCultureVariationDto exists for the default
+                // language because the content was never created in that language.
+                // In this case, we simply skip updating the edited flag since there's no document
+                // culture variation record to update.
+                continue;
             }
         }
 
