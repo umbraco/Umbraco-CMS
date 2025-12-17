@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Routing;
 
 namespace Umbraco.Cms.Web.Common.ApplicationBuilder;
 
@@ -56,4 +57,22 @@ public interface IUmbracoPipelineFilter
     /// </summary>
     /// <param name="app">The application.</param>
     void OnEndpoints(IApplicationBuilder app);
+
+    /// <summary>
+    /// Executes inside UseEndpoints, before Umbraco registers its endpoints.
+    /// </summary>
+    /// <param name="endpoints">The endpoint route builder.</param>
+    void OnPreMapEndpoints(IEndpointRouteBuilder endpoints)
+    {
+        // TODO (V19): Remove default implementation.
+    }
+
+    /// <summary>
+    /// Executes inside UseEndpoints, after Umbraco registers its endpoints.
+    /// </summary>
+    /// <param name="endpoints">The endpoint route builder.</param>
+    void OnPostMapEndpoints(IEndpointRouteBuilder endpoints)
+    {
+        // TODO (V19): Remove default implementation.
+    }
 }

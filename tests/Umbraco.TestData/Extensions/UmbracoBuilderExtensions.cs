@@ -29,11 +29,11 @@ public static class UmbracoBuilderExtensions
         builder.Services.Configure<UmbracoPipelineOptions>(options =>
             options.AddFilter(new UmbracoPipelineFilter(nameof(LoadTestController))
             {
-                Endpoints = app => app.UseEndpoints(endpoints =>
+                PreMapEndpoints = endpoints =>
                     endpoints.MapControllerRoute(
                         "LoadTest",
                         "/LoadTest/{action}",
-                        new { controller = "LoadTest", Action = "Index" }))
+                        new { controller = "LoadTest", Action = "Index" }),
             }));
 
         builder.Services.AddScoped(typeof(LoadTestController));
