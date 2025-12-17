@@ -1,7 +1,7 @@
 import { css, customElement, html, nothing, property, unsafeHTML, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { NewsDashboardItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 @customElement('umb-news-card')
 export class UmbNewsCardElement extends UmbLitElement {
@@ -61,7 +61,7 @@ export class UmbNewsCardElement extends UmbLitElement {
 	}
 
 	static override styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			:host {
 				display: block;
