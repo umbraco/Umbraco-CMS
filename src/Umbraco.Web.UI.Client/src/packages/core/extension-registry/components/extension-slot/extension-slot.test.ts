@@ -204,7 +204,7 @@ describe('UmbExtensionSlotElement', () => {
 			expect(extensionAfterMove).to.equal(originalExtensionElement);
 		});
 
-		it('properly destroys extension when permanently removed from DOM', async () => {
+		it('properly destroys and reinitializes extension after permanent removal', async () => {
 			const container = await fixture(html`<div></div>`) as HTMLDivElement;
 			element = document.createElement('umb-extension-slot') as UmbExtensionSlotElement;
 			element.type = 'dashboard';
@@ -214,17 +214,23 @@ describe('UmbExtensionSlotElement', () => {
 			await sleep(20);
 
 			// Verify extension is rendered
-			expect(element.shadowRoot!.firstElementChild).to.be.instanceOf(UmbTestExtensionSlotManifestElement);
+			const originalExtensionElement = element.shadowRoot!.firstElementChild;
+			expect(originalExtensionElement).to.be.instanceOf(UmbTestExtensionSlotManifestElement);
 
 			// Permanently remove from DOM
 			container.removeChild(element);
 
-			// Wait for deferred destruction to complete
+			// Wait for deferred destruction to complete (controller should be destroyed)
 			await sleep(20);
 
-			// Extension should be destroyed (shadowRoot children cleared due to controller destruction)
-			// The element's internal state should be cleaned up
-			expect(element.shadowRoot!.childElementCount).to.equal(0);
+			// Re-add the element to DOM - it should reinitialize with a fresh controller
+			container.appendChild(element);
+			await sleep(20);
+
+			// Extension should be a NEW instance (not the same as before destruction)
+			const newExtensionElement = element.shadowRoot!.firstElementChild;
+			expect(newExtensionElement).to.be.instanceOf(UmbTestExtensionSlotManifestElement);
+			expect(newExtensionElement).to.not.equal(originalExtensionElement);
 		});
 
 		it('cancels pending destruction timeout when reconnected', async () => {
