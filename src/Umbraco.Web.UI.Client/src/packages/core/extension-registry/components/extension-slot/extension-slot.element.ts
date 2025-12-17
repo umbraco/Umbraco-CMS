@@ -22,6 +22,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 export class UmbExtensionSlotElement extends UmbLitElement {
 	#attached = false;
 	#extensionsController?: UmbExtensionsElementInitializer | UmbExtensionElementInitializer;
+	#disconnectTimeoutId?: number;
 
 	@state()
 	private _permitted?: Array<UmbExtensionElementInitializer>;
@@ -120,15 +121,30 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 
 	override connectedCallback(): void {
 		super.connectedCallback();
+		// Cancel any pending destruction if we're being reconnected (e.g., during a DOM move/sort)
+		if (this.#disconnectTimeoutId !== undefined) {
+			clearTimeout(this.#disconnectTimeoutId);
+			this.#disconnectTimeoutId = undefined;
+			// Already attached and controller exists, no need to re-initialize
+			this.#attached = true;
+			return;
+		}
 		this.#attached = true;
 		this.#observeExtensions();
 	}
 	override disconnectedCallback(): void {
-		// _permitted is reset as the extensionsController fires a callback on destroy.
-		this.#removeEventListenersFromExtensionElement();
 		this.#attached = false;
-		this.#extensionsController?.destroy();
-		this.#extensionsController = undefined;
+		// Defer destruction to allow for reconnection during DOM moves/sorting
+		// If reconnected before the timeout, the destruction is cancelled
+		this.#disconnectTimeoutId = setTimeout(() => {
+			this.#disconnectTimeoutId = undefined;
+			// Only destroy if still detached
+			if (!this.#attached) {
+				this.#removeEventListenersFromExtensionElement();
+				this.#extensionsController?.destroy();
+				this.#extensionsController = undefined;
+			}
+		}, 0) as unknown as number;
 		super.disconnectedCallback();
 	}
 
