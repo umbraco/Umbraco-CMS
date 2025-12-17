@@ -243,20 +243,57 @@ export abstract class UmbBlockManagerContext<
 	settingsOf(key: string) {
 		return this.#settings.asObservablePart((source) => source.find((x) => x.key === key));
 	}
+
 	currentExposeOf(contentKey: string) {
-		const variantId = this.getVariantId();
-		if (!variantId) return;
 		return mergeObservables(
 			[this.#exposes.asObservablePart((source) => source.filter((x) => x.contentKey === contentKey)), this.variantId],
-			([exposes, variantId]) => (variantId ? exposes.find((x) => variantId.compare(x)) : undefined),
+			([exposes, variantId]) => {
+				if (!variantId) {
+					return undefined;
+				}
+
+				const contentTypeKey = this.getContentTypeKeyOfContentKey(contentKey);
+				if (!contentTypeKey) {
+					return false;
+				}
+				const contentStructure = this.getStructure(contentTypeKey);
+				if (!contentStructure) {
+					throw new Error(`Cannot lookup expose of block, missing content structure for ${contentTypeKey}`);
+				}
+
+				const varyByCulture = contentStructure.getVariesByCulture();
+				const varyBySegment = contentStructure.getVariesBySegment();
+				const blockVariantId = variantId.toVariant(varyByCulture, varyBySegment);
+
+				return exposes.find((x) => blockVariantId.compare(x));
+			},
 		);
 	}
 
 	hasExposeOf(contentKey: string, variantId: UmbVariantId) {
 		if (!variantId) return;
-		return this.#exposes.asObservablePart((source) =>
-			source.some((x) => x.contentKey === contentKey && variantId.compare(x)),
-		);
+
+		const contentTypeKey = this.getContentTypeKeyOfContentKey(contentKey);
+		if (!contentTypeKey) {
+			// Not created yet and therefor not exposed.
+			// (This currently does not give any trouble,
+			// but this is not returning a observable,
+			// meaning one trying to observe this would
+			// not be updated when it is exposed. But it
+			// is not a problem currently. [NL])
+			return;
+		}
+		const contentStructure = this.getStructure(contentTypeKey);
+		if (!contentStructure) {
+			throw new Error(`Cannot lookup expose of block, missing content structure for ${contentTypeKey}`);
+		}
+		const varyByCulture = contentStructure.getVariesByCulture();
+		const varyBySegment = contentStructure.getVariesBySegment();
+		const blockVariantId = variantId.toVariant(varyByCulture, varyBySegment);
+
+		return this.#exposes.asObservablePart((exposes) => {
+			return exposes.some((x) => x.contentKey === contentKey && blockVariantId.compare(x));
+		});
 	}
 
 	getBlockTypeOf(contentTypeKey: string) {

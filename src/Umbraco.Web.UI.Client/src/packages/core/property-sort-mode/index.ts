@@ -1,5 +1,5 @@
 export * from './constants.js';
-export * from './components/index.js';
+export * from './global-components/index.js';
 export * from './property-action/index.js';
 export * from './property-context/index.js';
 
