@@ -96,11 +96,11 @@ public static partial class UmbracoBuilderExtensions
 
             services.Configure<UmbracoPipelineOptions>(options =>
             {
-                options.AddFilter(new UmbracoPipelineFilter(
+                options.AddFilter(
+                    new UmbracoPipelineFilter(
                     "BackOfficeManagementApiFilter",
                     applicationBuilder => applicationBuilder.UseProblemDetailsExceptionHandling(),
-                    postPipeline: _ => { },
-                    endpoints: applicationBuilder => applicationBuilder.UseEndpoints()));
+                    preMapEndpoints: endpoints => endpoints.MapManagementApiEndpoints()));
             });
         }
 
