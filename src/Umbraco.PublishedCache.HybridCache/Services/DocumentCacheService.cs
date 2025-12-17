@@ -178,6 +178,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
     public async Task RefreshMemoryCacheAsync(Guid key)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        scope.ReadLock(Constants.Locks.ContentTree);
 
         ContentCacheNode? draftNode = await _databaseCacheRepository.GetContentSourceAsync(key, true);
         if (draftNode is not null)
