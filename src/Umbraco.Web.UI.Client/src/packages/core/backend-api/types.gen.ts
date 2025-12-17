@@ -599,6 +599,9 @@ export type DictionaryOverviewResponseModel = {
     id: string;
     parent?: ReferenceByIdModel | null;
     translatedIsoCodes: Array<string>;
+    translations: {
+        [key: string]: string;
+    };
 };
 
 export enum DirectionModel {
@@ -6688,7 +6691,13 @@ export type GetDocumentByIdReferencedByErrors = {
      * The authenticated user does not have access to this resource
      */
     403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
 };
+
+export type GetDocumentByIdReferencedByError = GetDocumentByIdReferencedByErrors[keyof GetDocumentByIdReferencedByErrors];
 
 export type GetDocumentByIdReferencedByResponses = {
     /**
@@ -6720,7 +6729,13 @@ export type GetDocumentByIdReferencedDescendantsErrors = {
      * The authenticated user does not have access to this resource
      */
     403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
 };
+
+export type GetDocumentByIdReferencedDescendantsError = GetDocumentByIdReferencedDescendantsErrors[keyof GetDocumentByIdReferencedDescendantsErrors];
 
 export type GetDocumentByIdReferencedDescendantsResponses = {
     /**
@@ -9677,7 +9692,13 @@ export type GetMediaByIdReferencedByErrors = {
      * The authenticated user does not have access to this resource
      */
     403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
 };
+
+export type GetMediaByIdReferencedByError = GetMediaByIdReferencedByErrors[keyof GetMediaByIdReferencedByErrors];
 
 export type GetMediaByIdReferencedByResponses = {
     /**
@@ -9709,7 +9730,13 @@ export type GetMediaByIdReferencedDescendantsErrors = {
      * The authenticated user does not have access to this resource
      */
     403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
 };
+
+export type GetMediaByIdReferencedDescendantsError = GetMediaByIdReferencedDescendantsErrors[keyof GetMediaByIdReferencedDescendantsErrors];
 
 export type GetMediaByIdReferencedDescendantsResponses = {
     /**
@@ -11523,7 +11550,13 @@ export type GetMemberByIdReferencedByErrors = {
      * The authenticated user does not have access to this resource
      */
     403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
 };
+
+export type GetMemberByIdReferencedByError = GetMemberByIdReferencedByErrors[keyof GetMemberByIdReferencedByErrors];
 
 export type GetMemberByIdReferencedByResponses = {
     /**
@@ -11555,7 +11588,13 @@ export type GetMemberByIdReferencedDescendantsErrors = {
      * The authenticated user does not have access to this resource
      */
     403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
 };
+
+export type GetMemberByIdReferencedDescendantsError = GetMemberByIdReferencedDescendantsErrors[keyof GetMemberByIdReferencedDescendantsErrors];
 
 export type GetMemberByIdReferencedDescendantsResponses = {
     /**
