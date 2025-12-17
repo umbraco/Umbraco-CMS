@@ -130,5 +130,8 @@ public class UmbracoPlan : MigrationPlan
 
         // To 16.4.0
         To<V_16_4_0.CreateMissingTabs>("{6A7D3B80-8B64-4E41-A7C0-02EC39336E97}");
+
+        // To 16.5.0
+        To<V_16_5_0.ChangeValidationRegExpToNvarcharMax>("{0C555A5F-8D7D-4B22-BA11-7C74A7A41964}");
     }
 }
