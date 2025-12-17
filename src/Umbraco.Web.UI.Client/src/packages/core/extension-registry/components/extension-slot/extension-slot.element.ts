@@ -125,15 +125,21 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 		if (this.#disconnectTimeoutId !== undefined) {
 			clearTimeout(this.#disconnectTimeoutId);
 			this.#disconnectTimeoutId = undefined;
-			// Already attached and controller exists, no need to re-initialize
-			this.#attached = true;
-			return;
+			// Only skip re-initialization if the controller still exists
+			if (this.#extensionsController) {
+				this.#attached = true;
+				return;
+			}
 		}
 		this.#attached = true;
 		this.#observeExtensions();
 	}
 	override disconnectedCallback(): void {
 		this.#attached = false;
+		// Clear any existing pending timeout (defensive cleanup)
+		if (this.#disconnectTimeoutId !== undefined) {
+			clearTimeout(this.#disconnectTimeoutId);
+		}
 		// Defer destruction to allow for reconnection during DOM moves/sorting
 		// If reconnected before the timeout, the destruction is cancelled
 		this.#disconnectTimeoutId = setTimeout(() => {
