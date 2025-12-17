@@ -112,7 +112,8 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
 
                     if (filter.IsNullOrWhiteSpace() is false)
                     {
-                        sql.Where<DictionaryDto>(x => x.Key.StartsWith(filter));
+                        // Search in both dictionary key and translation values
+                        sql.Where($"({QuotedColumn("key")} LIKE @filter OR EXISTS (SELECT 1 FROM {SqlContext.SqlSyntax.GetQuotedTableName(LanguageTextDto.TableName)} lt WHERE lt.{SqlContext.SqlSyntax.GetQuotedColumnName("UniqueId")} = {QuotedColumn("id")} AND lt.{SqlContext.SqlSyntax.GetQuotedColumnName("value")} LIKE @filter))", new { filter = $"%{filter}%" });
                     }
 
                     sql.OrderBy<DictionaryDto>(x => x.UniqueId);
@@ -130,7 +131,8 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
 
             if (filter.IsNullOrWhiteSpace() is false)
             {
-                sql.Where<DictionaryDto>(x => x.Key.StartsWith(filter));
+                // Search in both dictionary key and translation values
+                sql.Where($"({QuotedColumn("key")} LIKE @filter OR EXISTS (SELECT 1 FROM {SqlContext.SqlSyntax.GetQuotedTableName(LanguageTextDto.TableName)} lt WHERE lt.{SqlContext.SqlSyntax.GetQuotedColumnName("UniqueId")} = {QuotedColumn("id")} AND lt.{SqlContext.SqlSyntax.GetQuotedColumnName("value")} LIKE @filter))", new { filter = $"%{filter}%" });
             }
 
             return Database

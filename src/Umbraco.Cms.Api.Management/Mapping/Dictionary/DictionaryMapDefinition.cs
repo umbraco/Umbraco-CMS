@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels;
+using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Api.Management.ViewModels.Dictionary;
@@ -62,5 +62,10 @@ public class DictionaryMapDefinition : IMapDefinition
             .Where(translation => translation.Value.IsNullOrWhiteSpace() == false)
             .Select(translation => translation.LanguageIsoCode)
             .ToArray();
+        target.Translations = source
+            .Translations
+            .ToDictionary(
+                translation => translation.LanguageIsoCode,
+                translation => translation.Value ?? string.Empty);
     }
 }

@@ -10,5 +10,6 @@ export interface UmbDictionaryCollectionModel {
 	name: string;
 	parentUnique: string | null;
 	translatedIsoCodes: Array<string>;
+	translations: Record<string, string>;
 	unique: string;
 }

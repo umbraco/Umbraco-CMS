@@ -38,6 +38,7 @@ export class UmbDictionaryCollectionServerDataSource implements UmbCollectionDat
 					name: item.name!,
 					parentUnique: item.parent ? item.parent.id : null,
 					translatedIsoCodes: item.translatedIsoCodes,
+					translations: item.translations || {},
 					unique: item.id,
 				};
 				return model;

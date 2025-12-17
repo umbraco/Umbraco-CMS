@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Api.Management.ViewModels.Dictionary;
+namespace Umbraco.Cms.Api.Management.ViewModels.Dictionary;
 
 public class DictionaryOverviewResponseModel
 {
@@ -21,4 +21,9 @@ public class DictionaryOverviewResponseModel
     ///     Sets the translations.
     /// </summary>
     public IEnumerable<string> TranslatedIsoCodes { get; set; } = Enumerable.Empty<string>();
+
+    /// <summary>
+    ///     Gets or sets the translation values by ISO code.
+    /// </summary>
+    public Dictionary<string, string> Translations { get; set; } = new();
 }

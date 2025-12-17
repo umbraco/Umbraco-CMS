@@ -88,11 +88,10 @@ export class UmbDictionaryTableCollectionViewElement extends UmbLitElement {
 						value: html`<a style="font-weight:bold" href=${editPath}> ${dictionary.name}</a> `,
 					},
 					...languages.map((language) => {
+						const translation = dictionary.translations?.[language.unique];
 						return {
 							columnAlias: language.unique,
-							value: dictionary.translatedIsoCodes?.includes(language.unique)
-								? this.#renderCheckIcon(language.name)
-								: this.#renderAlertIcon(language.name),
+							value: translation ? this.#renderTranslation(translation) : this.#renderMissingTranslation(language.name),
 						};
 					}),
 				],
@@ -100,18 +99,12 @@ export class UmbDictionaryTableCollectionViewElement extends UmbLitElement {
 		});
 	}
 
-	#renderCheckIcon(name: string) {
-		return html`<uui-icon
-			name="check"
-			title="${this.localize.term('visuallyHiddenTexts_hasTranslation')} (${name})"
-			style="color:var(--uui-color-positive-standalone);display:inline-block"></uui-icon>`;
+	#renderTranslation(value: string) {
+		return html`<span style="color:var(--uui-color-text)" title="${value}">${value}</span>`;
 	}
 
-	#renderAlertIcon(name: string) {
-		return html`<uui-icon
-			name="alert"
-			title="${this.localize.term('visuallyHiddenTexts_noTranslation')} (${name})"
-			style="color:var(--uui-color-danger-standalone);display:inline-block"></uui-icon>`;
+	#renderMissingTranslation(languageName: string) {
+		return html`<span style="color:var(--uui-color-danger-standalone);font-style:italic" title="${this.localize.term('visuallyHiddenTexts_noTranslation')} (${languageName})">—</span>`;
 	}
 
 	override render() {
