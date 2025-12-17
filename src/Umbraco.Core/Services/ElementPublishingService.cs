@@ -30,4 +30,6 @@ internal sealed class ElementPublishingService : ContentPublishingServiceBase<IE
             logger)
     {
     }
+
+    protected override int WriteLockId => Constants.Locks.ElementTree;
 }

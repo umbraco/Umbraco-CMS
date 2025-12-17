@@ -21,6 +21,8 @@ internal sealed class ContentPublishingService : ContentPublishingServiceBase<IC
     private readonly ILongRunningOperationService _longRunningOperationService;
     private readonly IUmbracoContextFactory _umbracoContextFactory;
 
+    protected override int WriteLockId => Constants.Locks.ContentTree;
+
     public ContentPublishingService(
         ICoreScopeProvider coreScopeProvider,
         IContentService contentService,

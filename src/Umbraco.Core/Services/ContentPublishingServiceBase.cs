@@ -26,6 +26,8 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
     private readonly IRelationService _relationService;
     private readonly ILogger<ContentPublishingServiceBase<TContent, TContentService>> _logger;
 
+    protected abstract int WriteLockId { get; }
+
     protected ContentPublishingServiceBase(
         ICoreScopeProvider coreScopeProvider,
         TContentService contentService,
@@ -95,14 +97,15 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
         return await PublishAsync(key, cultureAndSchedule, userKey);
     }
 
-    /// <inheritdoc />
+    // TODO - Integrate this implementation into the one above.
     [Obsolete("Use non obsoleted version instead. Scheduled for removal in v17")]
-    public async Task<Attempt<ContentPublishingResult, ContentPublishingOperationStatus>> PublishAsync(
+    private async Task<Attempt<ContentPublishingResult, ContentPublishingOperationStatus>> PublishAsync(
         Guid key,
         CultureAndScheduleModel cultureAndSchedule,
         Guid userKey)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        scope.WriteLock(WriteLockId);
         TContent? content = _contentService.GetById(key);
         if (content is null)
         {
