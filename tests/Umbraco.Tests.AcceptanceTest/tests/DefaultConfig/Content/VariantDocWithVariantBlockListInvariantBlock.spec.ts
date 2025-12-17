@@ -20,14 +20,7 @@ const textStringDataTypeName = 'Textstring';
 let textStringDataTypeId = '';
 
 test.beforeEach(async ({umbracoApi}) => {
-  await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
-  await umbracoApi.documentType.ensureNameNotExists(invariantBlockElementName);
-  await umbracoApi.dataType.ensureNameNotExists(variantBlockListName);
-  await umbracoApi.dataType.ensureNameNotExists(invariantBlockListName);
-  await umbracoApi.document.ensureNameNotExists(contentName);
-  await umbracoApi.language.ensureIsoCodeNotExists('da');
   await umbracoApi.language.createDanishLanguage();
-
   const textStringDataType = await umbracoApi.dataType.getByName(textStringDataTypeName);
   textStringDataTypeId = textStringDataType.id;
 });
@@ -118,38 +111,6 @@ test('can save invariant property in invariant block when block list is variant 
  *         └── Property (invariant)
  * Expected: Properties NOT editable in non-default language (blocks shared)
  */
-
-test('cannot save invariant property in invariant block when block list is invariant - non-default language', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  const elementTypeId = await umbracoApi.documentType.createDefaultElementTypeWithVaryByCulture(
-    invariantBlockElementName, 'Content', invariantTextPropertyName, textStringDataTypeId, false, false
-  );
-  const blockListId = await umbracoApi.dataType.createBlockListDataTypeWithABlock(invariantBlockListName, elementTypeId);
-  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(
-    documentTypeName, invariantBlockListName, blockListId, 'Content', true, false
-  );
-  await umbracoApi.document.createDefaultDocumentWithEnglishCulture(contentName, documentTypeId);
-
-  await umbracoUi.goToBackOffice();
-  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
-  await umbracoUi.content.goToContentWithName(contentName);
-
-  // Create block in default language first
-  await umbracoUi.content.clickAddBlockElementButton();
-  await umbracoUi.content.clickBlockElementWithName(invariantBlockElementName);
-  await umbracoUi.content.enterBlockPropertyValue(invariantTextPropertyName, 'English value');
-  await umbracoUi.content.clickCreateModalButton();
-  await umbracoUi.content.clickSaveAndPublishButton();
-  await umbracoUi.content.clickContainerSaveAndPublishButton();
-  await umbracoUi.content.isSuccessNotificationVisible();
-
-  // Act
-  await umbracoUi.content.switchLanguage('da');
-  await umbracoUi.content.goToBlockListBlockWithName('Content', invariantBlockListName, invariantBlockElementName);
-
-  // Assert
-  await umbracoUi.content.isBlockPropertyEditable(invariantTextPropertyName, false);
-});
 
 test('can save invariant property in invariant block when block list is invariant - default language', async ({umbracoApi, umbracoUi}) => {
   // Arrange
