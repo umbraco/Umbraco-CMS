@@ -507,6 +507,7 @@ public class DocumentUrlService : IDocumentUrlService
         IContent? item = _contentService.GetById(id);
         if (item is null)
         {
+            _logger.LogDebug("Skipping URL segment rebuild for document with key {DocumentKey} was not found.", key);
             return;
         }
 
