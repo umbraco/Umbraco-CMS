@@ -282,11 +282,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 .From<NodeDto>()
                 .Where<NodeDto>(x => x.UniqueId == parentKey);
 
-            // Gets the descendants of the parent node
+            // Gets the descendants of the parent node (using ",%" to exclude the parent itself)
             Sql<ISqlContext> subQuery = sqlContext.Sql()
                 .Select<NodeDto>(x => x.NodeId)
                 .From<NodeDto>()
-                .WhereLike<NodeDto>(x => x.Path, subsubQuery);
+                .WhereLike<NodeDto>(x => x.Path, subsubQuery, ",%");
 
             ISqlSyntaxProvider sx = sqlContext.SqlSyntax;
             string[] columns = [
