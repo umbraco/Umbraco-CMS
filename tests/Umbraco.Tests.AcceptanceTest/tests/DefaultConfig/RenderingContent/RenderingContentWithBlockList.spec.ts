@@ -17,7 +17,7 @@ const blockListDataTypeName = 'CustomBlockList';
 const textstringDataTypeName = 'Textstring';
 const elementPropertyEditorAlias = 'Umbraco.TextBox';
 // Other
-const noBlocksMessage = 'Test no blocks mesage';
+const noBlocksMessage = 'Test no block list mesage';
 
 test.beforeEach(async ({umbracoApi}) => {
   const textstringData = await umbracoApi.dataType.getByName(textstringDataTypeName);
