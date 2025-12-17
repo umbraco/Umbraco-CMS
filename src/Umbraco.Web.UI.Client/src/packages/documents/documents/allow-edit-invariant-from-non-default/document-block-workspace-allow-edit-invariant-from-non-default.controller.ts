@@ -7,9 +7,12 @@ export class UmbDocumentBlockWorkspaceAllowEditInvariantFromNonDefaultController
 	protected async _preventEditInvariantFromNonDefault() {
 		const varyingPropertyContext = await this.getContext(UMB_PROPERTY_CONTEXT_FOR_CULTURE_VARIANT, {
 			passContextAliasMatches: true,
-		});
+		}).catch(() => undefined);
 
-		console.log('varyingPropertyContext', varyingPropertyContext);
+		if (varyingPropertyContext) {
+			// If we have a varying property context, we can assume we are in a culture variant branch and therefor we can assume the property is allowed to be edited.
+			return;
+		}
 
 		const documentWorkspaceContext = await this.getContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, {
 			passContextAliasMatches: true,
