@@ -91,7 +91,6 @@ test('can render content with a block list containing multiple blocks', async ({
 
 test('can render content with an empty block list', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const noBlocksMessage = 'Test no blocks mesage';
   // Create document with no blocks
   const blockListDataTypeId = await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListDataTypeName, elementTypeId);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditorAndAllowedTemplate(documentTypeName, blockListDataTypeId, blockListDataTypeName, templateId);
