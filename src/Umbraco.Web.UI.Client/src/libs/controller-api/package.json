@@ -1,5 +1,5 @@
 {
-	"name": "@umbraco-backoffice/controller-api",
+	"name": "@umbraco-backoffice-lib/controller-api",
 	"private": true,
 	"type": "module",
 	"scripts": {

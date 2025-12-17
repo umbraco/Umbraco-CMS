@@ -1,5 +1,5 @@
 {
-	"name": "@umbraco-backoffice/observable-api",
+	"name": "@umbraco-backoffice-lib/observable-api",
 	"private": true,
 	"type": "module",
 	"scripts": {

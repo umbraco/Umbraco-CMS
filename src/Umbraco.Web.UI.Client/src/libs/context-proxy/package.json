@@ -1,5 +1,5 @@
 {
-	"name": "@umbraco-backoffice/context-proxy",
+	"name": "@umbraco-backoffice-lib/context-proxy",
 	"private": true,
 	"type": "module",
 	"scripts": {

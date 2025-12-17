@@ -1,5 +1,5 @@
 {
-	"name": "@umbraco-backoffice/element-api",
+	"name": "@umbraco-backoffice-lib/element-api",
 	"private": true,
 	"type": "module",
 	"scripts": {
