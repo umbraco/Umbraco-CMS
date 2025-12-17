@@ -688,28 +688,19 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
             }
         }
 
-        // After merging, remove stale values when property variation changed
+        // After merging, remove stale values when property variation changed.
         foreach (BlockItemData targetBlockItem in targetBlockItems)
         {
-            // Get all invariant values (Culture is null) for properties that no longer vary by culture
-            var invariantAliases = targetBlockItem.Values
-                .Where(v => v.Culture is null && v.PropertyType?.VariesByCulture() == false)
-                .Select(v => v.Alias)
-                .ToHashSet();
+            targetBlockItem.Values.RemoveAll(value =>
+            {
+                if (value.PropertyType is null)
+                {
+                    throw new ArgumentException("One or more block item values did not have a resolved property type. Block item value property types must be resolved before attempting perform partial value merging.", nameof(targetBlockItem));
+                }
 
-            // Remove any variant values for properties that are now invariant
-            targetBlockItem.Values.RemoveAll(v =>
-                v.Culture is not null && invariantAliases.Contains(v.Alias));
-
-            // Get all variant values (Culture is not null) for properties that now vary by culture
-            var variantAliases = targetBlockItem.Values
-                .Where(v => v.Culture is not null && v.PropertyType?.VariesByCulture() == true)
-                .Select(v => v.Alias)
-                .ToHashSet();
-
-            // Remove any invariant values for properties that are now variant
-            targetBlockItem.Values.RemoveAll(v =>
-                v.Culture is null && variantAliases.Contains(v.Alias));
+                var propertyValueIsCultureVariant = value.Culture is not null;
+                return propertyValueIsCultureVariant != value.PropertyType.VariesByCulture();
+            });
         }
     }
 }
