@@ -41,10 +41,9 @@ test('can rename a media file', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoUi.media.goToMediaWithName(wrongMediaFileName);
   await umbracoUi.media.enterMediaItemName(mediaFileName);
-  await umbracoUi.media.clickSaveButton();
+  await umbracoUi.media.clickSaveButtonAndWaitForMediaToBeUpdated();
 
   // Assert
-  await umbracoUi.media.isSuccessStateVisibleForSaveButton();
   await umbracoUi.media.isMediaTreeItemVisible(mediaFileName);
   expect(await umbracoApi.media.doesNameExist(mediaFileName)).toBeTruthy();
 });
@@ -75,12 +74,12 @@ for (const mediaFileType of mediaFileTypes) {
     } else {
       await umbracoUi.media.isInputUploadFieldVisible();
     }
-    await umbracoUi.media.clickSaveButton();
+    const mediaId = await umbracoUi.media.clickSaveButtonAndWaitForMediaToBeCreated();
 
     // Assert
-    await umbracoUi.media.waitForMediaItemToBeCreated();
+    const mediaData = await umbracoApi.media.get(mediaId);
+    expect(mediaData).toBeTruthy();
     await umbracoUi.media.doesMediaItemInTreeHaveThumbnail(mediaFileType.fileName, mediaFileType.thumbnail);
-    expect(await umbracoApi.media.doesNameExist(mediaFileType.fileName)).toBeTruthy();
 
     // Clean
     await umbracoApi.media.ensureNameNotExists(mediaFileType.fileName);
@@ -96,12 +95,12 @@ test('can create a folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.media.clickCreateMediaItemButton();
   await umbracoUi.media.clickMediaTypeWithNameButton('Folder');
   await umbracoUi.media.enterMediaItemName(folderName);
-  await umbracoUi.media.clickSaveButton();
+  const folderId = await umbracoUi.media.clickSaveButtonAndWaitForMediaToBeCreated();
 
   // Assert
-  await umbracoUi.media.waitForMediaItemToBeCreated();
+  const folderData = await umbracoApi.media.get(folderId);
+  expect(folderData).toBeTruthy();
   await umbracoUi.media.isMediaTreeItemVisible(folderName);
-  expect(await umbracoApi.media.doesNameExist(folderName)).toBeTruthy();
 
   // Clean
   await umbracoApi.media.ensureNameNotExists(folderName);
@@ -138,9 +137,11 @@ test('can create a folder in a folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.media.clickCreateActionMenuOption();
   await umbracoUi.media.clickMediaTypeName('Folder');
   await umbracoUi.media.enterMediaItemName(folderName);
-  await umbracoUi.media.clickSaveButton();
+  const childFolderId = await umbracoUi.media.clickSaveButtonAndWaitForMediaToBeCreated();
 
   // Assert
+  const childFolderData = await umbracoApi.media.get(childFolderId);
+  expect(childFolderData).toBeTruthy();
   await umbracoUi.media.isMediaTreeItemVisible(parentFolderName);
   await umbracoUi.media.openMediaCaretButtonForName(parentFolderName);
   await umbracoUi.media.isMediaTreeItemVisible(folderName, true);

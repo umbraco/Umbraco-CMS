@@ -58,10 +58,9 @@ test('can publish a rich text editor with a rich text editor', async ({umbracoAp
   await umbracoUi.content.clickBlockCardWithName(richTextElementTypeName, true);
   await umbracoUi.content.enterRTETipTapEditorWithName(AliasHelper.toAlias(secondRichTextDataTypeName), secondRichTextEditorValue);
   await umbracoUi.content.clickCreateModalButton();
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   // Asserts that the value in the RTE is as expected
   const documentData = await umbracoApi.document.getByName(contentName);
   const documentValues = documentData.values.find(value => value.alias === AliasHelper.toAlias(richTextDataTypeName));
@@ -105,10 +104,9 @@ test('can publish a rich text editor with a block grid editor', async ({umbracoA
   await umbracoUi.content.enterTextstring(textStringValue);
   await umbracoUi.content.clickCreateForModalWithHeadline('Add ' + textStringElementTypeName);
   await umbracoUi.content.clickCreateForModalWithHeadline('Add ' + blockGridElementTypeName);
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   // Asserts that the value in the BlockGrid is as expected
   const documentData = await umbracoApi.document.getByName(contentName);
   expect(documentData.values[0].value.blocks.contentData[0].values[0].value.contentData[0].values[0].value).toContain(textStringValue);
@@ -148,10 +146,9 @@ test('can publish a rich text editor with a block list editor', async ({umbracoA
   await umbracoUi.content.enterTextstring(textStringValue);
   await umbracoUi.content.clickCreateForModalWithHeadline('Add ' + textStringElementTypeName);
   await umbracoUi.content.clickCreateForModalWithHeadline('Add ' + blockListElementTypeName);
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   // Asserts that the value in the BlockGrid is as expected
   const documentData = await umbracoApi.document.getByName(contentName);
   expect(documentData.values[0].value.blocks.contentData[0].values[0].value.contentData[0].values[0].value).toContain(textStringValue);

@@ -34,10 +34,10 @@ test('can create child node', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) =
   await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(childDocumentTypeName);
   await umbracoUi.content.enterContentName(childContentName);
-  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
+  const childId = await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert
-  expect(await umbracoApi.document.doesNameExist(childContentName)).toBeTruthy();
+  expect(await umbracoApi.document.doesExist(childId)).toBe(true);
   const childData = await umbracoApi.document.getChildren(contentId);
   expect(childData[0].variants[0].name).toBe(childContentName);
   // Verify that the child content displays in the tree after reloading children
@@ -71,9 +71,10 @@ test('can create child node in child node', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(childOfChildDocumentTypeName);
   await umbracoUi.content.enterContentName(childOfChildContentName);
-  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
+  const childOfChildId = await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert
+  expect(await umbracoApi.document.doesExist(childOfChildId)).toBe(true);
   const childOfChildData = await umbracoApi.document.getChildren(childContentId);
   expect(childOfChildData[0].variants[0].name).toBe(childOfChildContentName);
   // verify that the child content displays in the tree

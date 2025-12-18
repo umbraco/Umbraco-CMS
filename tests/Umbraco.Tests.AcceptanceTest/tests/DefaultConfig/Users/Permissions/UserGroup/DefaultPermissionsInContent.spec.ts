@@ -368,10 +368,9 @@ test('can update content with update permission enabled', {tag: '@release'}, asy
   await umbracoUi.content.goToContentWithName(rootDocumentName);
   await umbracoUi.content.isDocumentReadOnly(false);
   await umbracoUi.content.enterContentName(testDocumentName);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesNameExist(testDocumentName)).toBeTruthy();
   expect(await umbracoApi.document.doesNameExist(rootDocumentName)).toBeFalsy();
 });
@@ -668,8 +667,7 @@ test('can create and update content with permission enabled', {tag: '@release'},
   await umbracoUi.content.goToContentWithName(testDocumentName);
   await umbracoUi.content.isDocumentReadOnly(false);
   await umbracoUi.content.enterContentName(updatedDocumentName);
-  await umbracoUi.content.clickSaveButton();
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
   expect(await umbracoApi.document.doesNameExist(updatedDocumentName)).toBeTruthy();
   await umbracoUi.content.doesDocumentHaveName(updatedDocumentName);
 

@@ -23,10 +23,9 @@ test('can create an empty partial view', {tag: '@smoke'}, async ({umbracoApi, um
   await umbracoUi.partialView.clickCreateOptionsActionMenuOption();
   await umbracoUi.partialView.clickNewEmptyPartialViewButton();
   await umbracoUi.partialView.enterPartialViewName(partialViewName);
-  await umbracoUi.partialView.clickSaveButton();
+  await umbracoUi.partialView.clickSaveButtonAndWaitForPartialViewToBeCreated();
 
   // Assert
-  await umbracoUi.partialView.waitForPartialViewToBeCreated();
   expect(await umbracoApi.partialView.doesNameExist(partialViewFileName)).toBeTruthy();
   // Verify the new partial view is displayed under the Partial Views section
   await umbracoUi.partialView.isPartialViewRootTreeItemVisible(partialViewFileName);
@@ -43,10 +42,9 @@ test('can create a partial view from snippet', async ({umbracoApi, umbracoUi}) =
   await umbracoUi.partialView.clickNewPartialViewFromSnippetButton();
   await umbracoUi.partialView.clickBreadcrumbButton();
   await umbracoUi.partialView.enterPartialViewName(partialViewName);
-  await umbracoUi.partialView.clickSaveButton();
+  await umbracoUi.partialView.clickSaveButtonAndWaitForPartialViewToBeCreated();
 
   // Assert
-  await umbracoUi.partialView.waitForPartialViewToBeCreated();
   expect(await umbracoApi.partialView.doesExist(partialViewFileName)).toBeTruthy();
   const partialViewData = await umbracoApi.partialView.getByName(partialViewFileName);
 
@@ -103,10 +101,9 @@ test('can update a partial view content', {tag: '@smoke'}, async ({umbracoApi, u
   //Act
   await umbracoUi.partialView.openPartialViewAtRoot(partialViewFileName);
   await umbracoUi.partialView.enterPartialViewContent(updatedPartialViewContent);
-  await umbracoUi.partialView.clickSaveButton();
+  await umbracoUi.partialView.clickSaveButtonAndWaitForPartialViewToBeUpdated();
 
   // Assert
-  await umbracoUi.partialView.isSuccessStateVisibleForSaveButton();
   const updatedPartialView = await umbracoApi.partialView.getByName(partialViewFileName);
   expect(updatedPartialView.content).toBe(updatedPartialViewContent);
 });
@@ -142,10 +139,9 @@ test('can use query builder with Order By statement for a partial view', async (
   // Verify that the code is shown
   await umbracoUi.partialView.isQueryBuilderCodeShown(expectedCode);
   await umbracoUi.partialView.clickSubmitButton();
-  await umbracoUi.partialView.clickSaveButton();
+  await umbracoUi.partialView.clickSaveButtonAndWaitForPartialViewToBeUpdated();
 
   // Assert
-  await umbracoUi.partialView.isSuccessStateVisibleForSaveButton();
   const updatedPartialView = await umbracoApi.partialView.getByName(partialViewFileName);
   expect(updatedPartialView.content).toBe(expectedTemplateContent);
 });
@@ -182,10 +178,9 @@ test('can use query builder with Where statement for a partial view', async ({um
   // Verify that the code is shown
   await umbracoUi.partialView.isQueryBuilderCodeShown(expectedCode);
   await umbracoUi.partialView.clickSubmitButton();
-  await umbracoUi.partialView.clickSaveButton();
+  await umbracoUi.partialView.clickSaveButtonAndWaitForPartialViewToBeUpdated();
 
   // Assert
-  await umbracoUi.partialView.isSuccessStateVisibleForSaveButton();
   const updatedPartialView = await umbracoApi.partialView.getByName(partialViewFileName);
   expect(updatedPartialView.content).toBe(expectedTemplateContent);
 });
@@ -202,10 +197,9 @@ test('can insert dictionary item into a partial view', async ({umbracoApi, umbra
   await umbracoUi.partialView.openPartialViewAtRoot(partialViewFileName);
   await umbracoUi.partialView.insertDictionaryItem(dictionaryName);
   await umbracoUi.waitForTimeout(500); // Wait for the dictionary item to be inserted
-  await umbracoUi.partialView.clickSaveButton();
+  await umbracoUi.partialView.clickSaveButtonAndWaitForPartialViewToBeUpdated();
 
   // Assert
-  await umbracoUi.partialView.isSuccessStateVisibleForSaveButton();
   const partialViewData = await umbracoApi.partialView.getByName(partialViewFileName);
   expect(partialViewData.content).toBe(partialViewContent);
 });
@@ -221,10 +215,9 @@ test('can insert value into a partial view', async ({umbracoApi, umbracoUi}) => 
   await umbracoUi.partialView.openPartialViewAtRoot(partialViewFileName);
   await umbracoUi.waitForTimeout(1000);
   await umbracoUi.template.insertSystemFieldValue(systemFieldValue);
-  await umbracoUi.template.clickSaveButton();
+  await umbracoUi.partialView.clickSaveButtonAndWaitForPartialViewToBeUpdated();
 
   // Assert
-  await umbracoUi.partialView.isSuccessStateVisibleForSaveButton();
   const partialViewData = await umbracoApi.partialView.getByName(partialViewFileName);
   expect(partialViewData.content).toBe(partialViewContent);
 });

@@ -39,7 +39,7 @@ test('can trigger when content is published', async ({umbracoApi, umbracoUi}) =>
 
   // Act
   await umbracoUi.content.goToContentWithName(documentName);
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
 
   // Assert
   await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
@@ -102,7 +102,7 @@ test('can trigger when media is saved', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.media.goToMediaWithName(mediaName);
-  await umbracoUi.media.clickSaveButton();
+  await umbracoUi.media.clickSaveButtonAndWaitForMediaToBeUpdated();
   await umbracoUi.content.isSuccessStateVisibleForSaveButton();
 
   // Assert

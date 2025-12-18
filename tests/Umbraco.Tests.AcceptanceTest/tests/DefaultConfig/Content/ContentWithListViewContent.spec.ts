@@ -57,10 +57,9 @@ test('can publish content with the list view data type', async ({umbracoApi, umb
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -80,10 +79,9 @@ test('can create content with a child in the list', async ({umbracoApi, umbracoU
   // Act
   await umbracoUi.content.clickCreateContentWithName(childDocumentTypeName);
   await umbracoUi.content.enterContentName(childContentName);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   expect(await umbracoApi.document.getChildrenAmount(documentId)).toEqual(1);
 });
@@ -103,10 +101,9 @@ test('can publish content with a child in the list', async ({umbracoApi, umbraco
   // Act
   // Currently necessary
   await umbracoUi.waitForTimeout(500);
-  await umbracoUi.content.clickSaveAndPublishButton();
-  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
   await umbracoUi.content.goToContentInListViewWithName(childContentName);
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
 
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();

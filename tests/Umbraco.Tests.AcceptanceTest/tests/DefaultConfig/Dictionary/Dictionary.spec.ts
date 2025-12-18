@@ -20,10 +20,9 @@ test('can create a dictionary item', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.dictionary.clickCreateLink();
   await umbracoUi.dictionary.enterDictionaryName(dictionaryName);
-  await umbracoUi.dictionary.clickSaveButton();
+  await umbracoUi.dictionary.clickSaveButtonAndWaitForDictionaryToBeCreated();
 
   // Assert
-  await umbracoUi.dictionary.waitForDictionaryToBeCreated();
   await umbracoUi.dictionary.isErrorNotificationVisible(false);
   expect(await umbracoApi.dictionary.doesNameExist(dictionaryName)).toBeTruthy();
   await umbracoUi.dictionary.clickLeftArrowButton();
@@ -64,10 +63,9 @@ test('can create a dictionary item in a dictionary', {tag: '@smoke'}, async ({um
   await umbracoUi.dictionary.clickActionsMenuForDictionary(parentDictionaryName);
   await umbracoUi.dictionary.clickCreateActionMenuOption();
   await umbracoUi.dictionary.enterDictionaryName(dictionaryName);
-  await umbracoUi.dictionary.clickSaveButton();
+  await umbracoUi.dictionary.clickSaveButtonAndWaitForDictionaryToBeCreated();
 
   // Assert
-  await umbracoUi.dictionary.waitForDictionaryToBeCreated();
   await umbracoUi.dictionary.isErrorNotificationVisible(false);
   const dictionaryChildren = await umbracoApi.dictionary.getChildren(parentDictionaryId);
   expect(dictionaryChildren[0].name).toEqual(dictionaryName);

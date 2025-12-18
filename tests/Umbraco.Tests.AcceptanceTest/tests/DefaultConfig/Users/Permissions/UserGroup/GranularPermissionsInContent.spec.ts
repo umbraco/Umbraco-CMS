@@ -183,10 +183,9 @@ test('can update a specific content with update permission enabled', async ({umb
   await umbracoUi.content.goToContentWithName(firstDocumentName);
   await umbracoUi.content.isDocumentReadOnly(false);
   await umbracoUi.content.enterContentName(testDocumentName);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesNameExist(testDocumentName)).toBeTruthy();
   await umbracoUi.content.goToContentWithName(secondDocumentName);
   await umbracoUi.content.isActionsMenuForNameVisible(secondDocumentName, false);

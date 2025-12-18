@@ -62,10 +62,9 @@ test('can create a partial view in a folder', async ({umbracoApi, umbracoUi}) =>
   await umbracoUi.partialView.clickCreateOptionsActionMenuOption();
   await umbracoUi.partialView.clickNewEmptyPartialViewButton();
   await umbracoUi.partialView.enterPartialViewName(partialViewName);
-  await umbracoUi.partialView.clickSaveButton();
+  await umbracoUi.partialView.clickSaveButtonAndWaitForPartialViewToBeCreated();
 
   // Assert
-  await umbracoUi.partialView.waitForPartialViewToBeCreated();
   const childrenData = await umbracoApi.partialView.getChildren(folderPath);
   expect(childrenData[0].name).toEqual(partialViewFileName);
   // Verify the partial view is displayed in the folder under the Partial Views section
@@ -90,10 +89,9 @@ test('can create a partial view in a folder in a folder', async ({umbracoApi, um
   await umbracoUi.partialView.clickCreateOptionsActionMenuOption();
   await umbracoUi.partialView.clickNewEmptyPartialViewButton();
   await umbracoUi.partialView.enterPartialViewName(partialViewName);
-  await umbracoUi.partialView.clickSaveButton();
+  await umbracoUi.partialView.clickSaveButtonAndWaitForPartialViewToBeCreated();
 
   // Assert
-  await umbracoUi.partialView.waitForPartialViewToBeCreated();
   const childFolderChildrenData = await umbracoApi.partialView.getChildren(childFolderPath);
   expect(childFolderChildrenData[0].name).toEqual(partialViewFileName);
 

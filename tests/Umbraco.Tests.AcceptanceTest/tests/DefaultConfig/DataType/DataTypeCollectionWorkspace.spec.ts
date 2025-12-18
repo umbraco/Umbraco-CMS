@@ -25,10 +25,9 @@ test('can create a data type using create options', async ({umbracoApi, umbracoU
   await umbracoUi.dataType.enterDataTypeName(dataTypeName);
   await umbracoUi.dataType.clickSelectAPropertyEditorButton();
   await umbracoUi.dataType.selectAPropertyEditor('Text Box');
-  await umbracoUi.dataType.clickSaveButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeCreated();
 
   // Assert
-  await umbracoUi.dataType.waitForDataTypeToBeCreated();
   expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeTruthy();
   // Check if the created data type is displayed in the collection view and has correct icon
   await umbracoUi.dataType.clickDataTypesMenu();
@@ -65,10 +64,9 @@ test('can create a data type in a folder using create options', async ({umbracoA
   await umbracoUi.dataType.enterDataTypeName(dataTypeName);
   await umbracoUi.dataType.clickSelectAPropertyEditorButton();
   await umbracoUi.dataType.selectAPropertyEditor('Text Box');
-  await umbracoUi.dataType.clickSaveButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeCreated();
 
   // Assert
-  await umbracoUi.dataType.waitForDataTypeToBeCreated();
   expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeTruthy();
   // Check if the created data type is displayed in the collection view and has correct icon
   await umbracoUi.dataType.goToDataType(dataTypeFolderName);

@@ -56,7 +56,7 @@ test('can see notification when content is published', async ({umbracoUi, umbrac
   expect(await umbracoApi.document.doesNotificationExist(contentId, notificationActionIds[0])).toBeTruthy();
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
-  
+
   // Act
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickPublishActionMenuOption();
@@ -75,11 +75,11 @@ test('can see notification when content is updated', async ({umbracoUi, umbracoA
   expect(await umbracoApi.document.doesNotificationExist(contentId, notificationActionIds[0])).toBeTruthy();
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
-  
+
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.enterTextstring(contentText);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
   await umbracoUi.content.isSuccessStateVisibleForSaveButton();
@@ -94,7 +94,7 @@ test('can see notification when content is trashed', async ({umbracoUi, umbracoA
   expect(await umbracoApi.document.doesNotificationExist(contentId, notificationActionIds[0])).toBeTruthy();
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
-  
+
   // Act
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickTrashActionMenuOption();
@@ -122,10 +122,10 @@ test('can see notification when child content is created', async ({umbracoUi, um
   await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(childDocumentTypeName);
   await umbracoUi.content.enterContentName(childContentName);
-  await umbracoUi.content.clickSaveButton();
+  const childContentId = await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeCreated();
+  expect(await umbracoApi.document.doesExist(childContentId)).toBe(true);
   expect(await umbracoApi.smtp.doesNotificationEmailWithSubjectExist(actionName, childContentName)).toBeTruthy();
 
   // Clean
@@ -142,7 +142,7 @@ test('can see notification when content is restored', async ({umbracoUi, umbraco
   await umbracoApi.document.moveToRecycleBin(contentId);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
-  
+
   // Act
   await umbracoUi.content.clickCaretButtonForName('Recycle Bin');
   await umbracoUi.content.clickActionsMenuForContent(contentName);
@@ -162,7 +162,7 @@ test('can see notification when content is duplicated', async ({umbracoUi, umbra
   expect(await umbracoApi.document.doesNotificationExist(contentId, notificationActionIds[0])).toBeTruthy();
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
-  
+
   // Act
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickDuplicateToActionMenuOption();
@@ -245,7 +245,7 @@ test('can see notification when content is sorted', async ({umbracoApi, umbracoU
   // Clean
   await umbracoApi.document.ensureNameNotExists(rootDocumentName);
   await umbracoApi.documentType.ensureNameNotExists(rootDocumentTypeName);
-  await umbracoApi.documentType.ensureNameNotExists(childDocumentTypeName); 
+  await umbracoApi.documentType.ensureNameNotExists(childDocumentTypeName);
 });
 
 test('can see notification when content is set public access', async ({umbracoApi, umbracoUi}) => {

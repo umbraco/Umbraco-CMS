@@ -56,10 +56,9 @@ test('can create a script in a folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.script.clickNewJavascriptFileButton();
   await umbracoUi.script.enterScriptName(scriptName);
   await umbracoUi.script.enterScriptContent(scriptContent);
-  await umbracoUi.script.clickSaveButton();
+  await umbracoUi.script.clickSaveButtonAndWaitForScriptToBeCreated();
 
   // Assert
-  await umbracoUi.script.waitForScriptToBeCreated();
   expect(await umbracoApi.script.doesNameExist(scriptName)).toBeTruthy();
   const scriptChildren = await umbracoApi.script.getChildren('/' + scriptFolderName);
   expect(scriptChildren[0].path).toBe('/' + scriptFolderName + '/' + scriptName);
@@ -126,10 +125,9 @@ test('can create a script in a folder in a folder', async ({umbracoApi, umbracoU
   await umbracoUi.script.clickCreateOptionsActionMenuOption();
   await umbracoUi.script.clickNewJavascriptFileButton();
   await umbracoUi.script.enterScriptName(scriptName);
-  await umbracoUi.script.clickSaveButton();
+  await umbracoUi.script.clickSaveButtonAndWaitForScriptToBeCreated();
 
   // Assert
-  await umbracoUi.script.waitForScriptToBeCreated();
   expect(await umbracoApi.script.doesNameExist(scriptName)).toBeTruthy();
   const scriptChildren = await umbracoApi.script.getChildren('/' + scriptFolderName + '/' + childFolderName);
   expect(scriptChildren[0].path).toBe('/' + scriptFolderName + '/' + childFolderName + '/' + scriptName);

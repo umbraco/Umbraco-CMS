@@ -55,10 +55,9 @@ test('can publish a block list editor with a rich text editor', async ({umbracoA
   await umbracoUi.content.clickBlockCardWithName(richTextElementTypeName, true);
   await umbracoUi.content.enterRTETipTapEditor(richTextEditorValue);
   await umbracoUi.content.clickCreateModalButton();
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   // Asserts that the value in the RTE is as expected
   const documentData = await umbracoApi.document.getByName(contentName);
   const documentRichTextValues = documentData.values[0].value.contentData[0].values.find(value => value.alias === AliasHelper.toAlias(richTextDataTypeName));
@@ -98,10 +97,9 @@ test('can publish a block list editor with a block grid editor', async ({umbraco
   await umbracoUi.content.enterTextstring(textStringValue);
   await umbracoUi.content.clickCreateForModalWithHeadline('Add ' + textStringElementTypeName);
   await umbracoUi.content.clickCreateForModalWithHeadline('Add ' + blockGridElementTypeName);
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   // Asserts that the value in the BlockGrid is as expected
   const documentData = await umbracoApi.document.getByName(contentName);
   const documentValues = documentData.values.find(value => value.alias === AliasHelper.toAlias(blockListDataTypeName));
@@ -142,10 +140,9 @@ test('can publish a block list editor with a block list editor', async ({umbraco
   await umbracoUi.content.enterTextstring(textStringValue);
   await umbracoUi.content.clickCreateForModalWithHeadline('Add ' + textStringElementTypeName);
   await umbracoUi.content.clickCreateForModalWithHeadline('Add ' + blockListElementTypeName);
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   // Asserts that the value in the BlockList is as expected
   const documentData = await umbracoApi.document.getByName(contentName);
   const documentValues = documentData.values.find(value => value.alias === AliasHelper.toAlias(blockListDataTypeName));

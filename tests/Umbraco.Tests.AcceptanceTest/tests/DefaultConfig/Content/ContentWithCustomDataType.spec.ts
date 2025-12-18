@@ -50,10 +50,9 @@ test('can add text to the email address in the content section', async ({umbraco
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.enterTextstring(emailAddress);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(customDataTypeName));
@@ -95,10 +94,9 @@ test('can add decimal number to the decimal in the content section', async ({umb
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.enterNumeric(decimal);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(customDataTypeName));
@@ -139,10 +137,9 @@ test('can add javascript code to the code editor in the content section', async 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.enterCodeEditorValue(javascriptCode);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(customDataTypeName));
@@ -183,10 +180,9 @@ test('can add code to the markdown editor in the content section', async ({umbra
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.enterMarkdownEditorValue(inputText);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(customDataTypeName));
@@ -227,10 +223,9 @@ test('can add string to the multiple text string in the content section', async 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.addMultipleTextStringItem(multipleTextStringValue);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(customDataTypeName));
@@ -276,10 +271,9 @@ test('can change slider value in the content section', {tag: '@release'}, async 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.changeSliderValue(sliderValue.toString());
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(customDataTypeName));
@@ -304,8 +298,10 @@ test('can save content after changing the property editor of the custom data typ
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.addMultipleTextStringItem(inputText);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
   await umbracoUi.content.isSuccessStateVisibleForSaveButton();
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.values[0].value).toContain(inputText);
 });

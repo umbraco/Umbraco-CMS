@@ -74,10 +74,9 @@ test('can publish content with RTE Tiptap property editor', async ({umbracoApi, 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.enterRTETipTapEditor(inputText);
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -116,16 +115,15 @@ test('can save a variant content node after removing embedded block in RTE', asy
   await umbracoUi.content.enterTextstring(textStringValue);
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.clickSaveButtonForContent();
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
   const contentData = await umbracoApi.document.getByName(englishContentName);
   expect(contentData.values[0].value.blocks.contentData[0].values[0].value).toBe(textStringValue);
   await umbracoUi.content.clearTipTapEditor();
   await umbracoUi.content.clickSaveButtonForContent();
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
   await umbracoUi.content.isErrorNotificationVisible(false);
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesNameExist(englishContentName)).toBeTruthy();
 
   // Clean

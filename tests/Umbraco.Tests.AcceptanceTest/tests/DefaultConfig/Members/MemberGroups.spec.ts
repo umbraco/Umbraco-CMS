@@ -17,10 +17,9 @@ test('can create a member group', {tag: '@smoke'}, async ({umbracoApi, umbracoUi
   // Act
   await umbracoUi.memberGroup.clickMemberGroupCreateButton();
   await umbracoUi.memberGroup.enterMemberGroupName(memberGroupName);
-  await umbracoUi.memberGroup.clickSaveButton();
+  await umbracoUi.memberGroup.clickSaveButtonAndWaitForMemberGroupToBeCreated();
 
   // Assert
-  await umbracoUi.memberGroup.waitForMemberGroupToBeCreated();
   await umbracoUi.memberGroup.clickMemberGroupsSidebarButton();
   await umbracoUi.memberGroup.isMemberGroupNameVisible(memberGroupName);
   expect(await umbracoApi.memberGroup.doesNameExist(memberGroupName)).toBeTruthy();
