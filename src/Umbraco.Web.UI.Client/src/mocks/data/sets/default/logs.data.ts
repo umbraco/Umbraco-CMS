@@ -7310,7 +7310,7 @@ const randomEnumValue = (enumeration: any): LogLevelModel => {
 	return enumeration[enumKey];
 };
 
-export const logs: LogMessageResponseModel[] = allLogs.map((log) => {
+export const data: LogMessageResponseModel[] = allLogs.map((log) => {
 	const randomLevel = randomEnumValue(LogLevelModel);
 
 	return {

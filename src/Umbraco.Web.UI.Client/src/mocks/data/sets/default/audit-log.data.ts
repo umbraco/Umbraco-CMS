@@ -4,7 +4,7 @@ import { AuditTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 const userId = userData[0].id;
 
-export const auditLogs: Array<AuditLogResponseModel> = [
+export const data: Array<AuditLogResponseModel> = [
 	{
 		user: { id: userId },
 		timestamp: '2021-09-14T09:32:49.0000000Z',

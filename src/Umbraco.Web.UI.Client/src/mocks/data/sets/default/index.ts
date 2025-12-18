@@ -33,8 +33,8 @@ import {
 	messageTemplates as logViewerMessageTemplates,
 	logLevels as logViewerLogLevels,
 } from './log-viewer.data.js';
-import { logs } from './logs.data.js';
-import { auditLogs } from './audit-log.data.js';
+import { data as logs } from './logs.data.js';
+import { data as auditLogs } from './audit-log.data.js';
 import {
 	healthGroups,
 	healthGroupsWithoutResult,
