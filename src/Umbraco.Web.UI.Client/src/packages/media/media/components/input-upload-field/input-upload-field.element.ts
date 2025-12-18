@@ -149,19 +149,22 @@ export class UmbInputUploadFieldElement extends UmbFormControlMixin<UmbMediaValu
 
 		if (file?.status !== UmbFileDropzoneItemStatus.COMPLETE) return;
 
-		this.temporaryFile = (file as UmbUploadableFile).temporaryFile;
+		// Brief delay to show completion state before switching to preview UI
+		setTimeout(() => {
+			this.temporaryFile = (file as UmbUploadableFile).temporaryFile;
 
-		if (!this.temporaryFile?.file) {
-			console.error('No file available for upload');
-			return;
-		}
+			if (!this.temporaryFile?.file) {
+				console.error('No file available for upload');
+				return;
+			}
 
-		this.#clearObjectUrl();
+			this.#clearObjectUrl();
 
-		const blobUrl = URL.createObjectURL(this.temporaryFile.file);
-		this.value = { src: blobUrl };
+			const blobUrl = URL.createObjectURL(this.temporaryFile.file);
+			this.value = { src: blobUrl };
 
-		this.dispatchEvent(new UmbChangeEvent());
+			this.dispatchEvent(new UmbChangeEvent());
+		}, 750);
 	}
 
 	override render() {
