@@ -1,4 +1,4 @@
-import { UMB_DOCUMENT_CONFIGURATION_CONTEXT } from '../global-contexts/index.js';
+import { UMB_DOCUMENT_CONFIGURATION_CONTEXT } from '../global-contexts/document-configuration.context.js';
 import type { UmbDocumentVariantModel } from '../types.js';
 import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
