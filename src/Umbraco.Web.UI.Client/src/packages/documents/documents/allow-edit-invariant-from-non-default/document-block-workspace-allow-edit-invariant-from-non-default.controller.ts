@@ -1,3 +1,4 @@
+import type { UmbDocumentVariantModel } from '../types.js';
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../constants.js';
 import { UmbDocumentAllowEditInvariantFromNonDefaultControllerBase } from './document-allow-edit-invariant-from-non-default-controller-base.js';
 import type { UmbVariantPropertyGuardManager } from '@umbraco-cms/backoffice/property';
@@ -5,7 +6,6 @@ import { UMB_PROPERTY_CONTEXT_FOR_CULTURE_VARIANT } from '@umbraco-cms/backoffic
 import { UMB_BLOCK_WORKSPACE_CONTEXT, UMB_BLOCK_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/block';
 import { UmbVariantId, type UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 import { observeMultiple, type Observable } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbDocumentVariantModel } from '../types.js';
 
 export class UmbDocumentBlockWorkspaceAllowEditInvariantFromNonDefaultController extends UmbDocumentAllowEditInvariantFromNonDefaultControllerBase {
 	protected async _preventEditInvariantFromNonDefault() {
