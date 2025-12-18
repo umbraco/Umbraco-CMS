@@ -1,4 +1,3 @@
-using System.Collections.Concurrent;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Scoping;
@@ -12,8 +11,6 @@ internal sealed class MemberCacheService : IMemberCacheService
     private readonly IPublishedContentFactory _publishedContentFactory;
     private readonly IDatabaseCacheRepository _databaseCacheRepository;
     private readonly ICoreScopeProvider _scopeProvider;
-
-    private readonly ConcurrentDictionary<string, IPublishedContent> _publishedContentCache = [];
 
     public MemberCacheService(
         IPublishedContentFactory publishedContentFactory,
