@@ -14,7 +14,7 @@ export class UmbDocumentBlockWorkspaceAllowEditInvariantFromNonDefaultController
 		}).catch(() => undefined);
 
 		if (varyingPropertyContext) {
-			// If we have a varying property context, we can assume we are in a culture variant branch and therefor we can assume the property is allowed to be edited.
+			// If we have a varying property context, we can assume we are in a culture variant branch and therefore we can assume the property is allowed to be edited.
 			return;
 		}
 
@@ -39,12 +39,12 @@ export class UmbDocumentBlockWorkspaceAllowEditInvariantFromNonDefaultController
 		this._observeAndApplyRule({
 			propertiesObservable: blockWorkspaceContext.content.structure.contentTypeProperties,
 			variantOptionsObservable: documentWorkspaceContext.variantOptions,
-			propertyWriteGuard: blockWorkspaceContext?.content.propertyWriteGuard,
+			propertyWriteGuard: blockWorkspaceContext.content.propertyWriteGuard,
 		});
 		this._observeAndApplyRule({
 			propertiesObservable: blockWorkspaceContext.settings.structure.contentTypeProperties,
 			variantOptionsObservable: documentWorkspaceContext.variantOptions,
-			propertyWriteGuard: blockWorkspaceContext?.settings.propertyWriteGuard,
+			propertyWriteGuard: blockWorkspaceContext.settings.propertyWriteGuard,
 		});
 
 		// Additional rules for invariant blocks (where datasetVariantId is invariant)
