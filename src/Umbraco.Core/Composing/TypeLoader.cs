@@ -118,7 +118,11 @@ public sealed class TypeLoader
         // if not IDiscoverable, directly get types
         if (!typeof(IDiscoverable).IsAssignableFrom(typeof(T)))
         {
-            LogFullScan<T>(cache);
+            LogDebugIf(
+                true,
+                "Running a full, {CacheStatus}cached, scan for non-discoverable type {TypeName} (slow).",
+                CacheStatus(cache),
+                typeof(T).FullName);
 
             return GetTypesInternal(
                 typeof(T),
@@ -131,7 +135,10 @@ public sealed class TypeLoader
         // get IDiscoverable and always cache
         IEnumerable<Type> discovered = GetDiscoverableTypes();
 
-        LogNonCachedFilter<T>(cache);
+        LogDebugIf(
+            !cache,
+            "Running a non-cached, filter for discoverable type {TypeName} (slowish).",
+            typeof(T).FullName);
 
         // filter the cached discovered types (and maybe cache the result)
         return GetTypesInternal(
@@ -164,7 +171,12 @@ public sealed class TypeLoader
         // if not IDiscoverable, directly get types
         if (!typeof(IDiscoverable).IsAssignableFrom(typeof(T)))
         {
-            LogFullScanWithAttribute<T, TAttribute>(cache);
+            LogDebugIf(
+                true,
+                "Running a full, {CacheStatus}cached, scan for non-discoverable type {TypeName} / attribute {AttributeName} (slow).",
+                CacheStatus(cache),
+                typeof(T).FullName,
+                typeof(TAttribute).FullName);
 
             return GetTypesInternal(
                 typeof(T),
@@ -177,7 +189,11 @@ public sealed class TypeLoader
         // get IDiscoverable and always cache
         IEnumerable<Type> discovered = GetDiscoverableTypes();
 
-        LogNonCachedFilterWithAttribute<T, TAttribute>(cache);
+        LogDebugIf(
+            !cache,
+            "Running a non-cached, filter for discoverable type {TypeName} / attribute {AttributeName} (slowish).",
+            typeof(T).FullName,
+            typeof(TAttribute).FullName);
 
         // filter the cached discovered types (and maybe cache the result)
         return GetTypesInternal(
@@ -208,7 +224,10 @@ public sealed class TypeLoader
         // do not cache anything from specific assemblies
         cache &= specificAssemblies == null;
 
-        LogAttributeScan<TAttribute>(cache);
+        LogDebugIf(
+            !cache,
+            "Running a full, non-cached, scan for types / attribute {AttributeName} (slow).",
+            typeof(TAttribute).FullName);
 
         return GetTypesInternal(
             typeof(object),
@@ -241,70 +260,21 @@ public sealed class TypeLoader
             "scanning assemblies",
             true);
 
-    private void LogDebug(string message, params object?[] args)
+    /// <summary>
+    /// Logs a debug message if the specified condition is true and debug logging is enabled.
+    /// </summary>
+    /// <param name="condition">The condition that must be true to log.</param>
+    /// <param name="message">The log message template.</param>
+    /// <param name="args">The message arguments.</param>
+    private void LogDebugIf(bool condition, string message, params object?[] args)
     {
-        if (IsDebugEnabled)
+        if (condition && IsDebugEnabled)
         {
             _logger.LogDebug(message, args);
         }
     }
 
-    private void LogFullScan<T>(bool cache)
-    {
-        if (IsDebugEnabled)
-        {
-            _logger.LogDebug(
-                "Running a full, {CacheStatus}cached, scan for non-discoverable type {TypeName} (slow).",
-                cache ? string.Empty : "non-",
-                typeof(T).FullName);
-        }
-    }
-
-    private void LogFullScanWithAttribute<T, TAttribute>(bool cache)
-        where TAttribute : Attribute
-    {
-        if (IsDebugEnabled)
-        {
-            _logger.LogDebug(
-                "Running a full, {CacheStatus}cached, scan for non-discoverable type {TypeName} / attribute {AttributeName} (slow).",
-                cache ? string.Empty : "non-",
-                typeof(T).FullName,
-                typeof(TAttribute).FullName);
-        }
-    }
-
-    private void LogNonCachedFilter<T>(bool cache)
-    {
-        if (!cache && IsDebugEnabled)
-        {
-            _logger.LogDebug(
-                "Running a non-cached, filter for discoverable type {TypeName} (slowish).",
-                typeof(T).FullName);
-        }
-    }
-
-    private void LogNonCachedFilterWithAttribute<T, TAttribute>(bool cache)
-        where TAttribute : Attribute
-    {
-        if (!cache && IsDebugEnabled)
-        {
-            _logger.LogDebug(
-                "Running a non-cached, filter for discoverable type {TypeName} / attribute {AttributeName} (slowish).",
-                typeof(T).FullName,
-                typeof(TAttribute).FullName);
-        }
-    }
-
-    private void LogAttributeScan<TAttribute>(bool cache)
-        where TAttribute : Attribute
-    {
-        if (!cache && IsDebugEnabled)
-        {
-            _logger.LogDebug(
-                "Running a full, non-cached, scan for types / attribute {AttributeName} (slow).",
-                typeof(TAttribute).FullName);
-        }
-    }
+    private string CacheStatus(bool cache) => cache ? string.Empty : "non-";
 
     private IEnumerable<Type> GetTypesInternal(
         Type baseType,
@@ -337,7 +307,7 @@ public sealed class TypeLoader
         // need to put some logging here to try to figure out why this is happening: http://issues.umbraco.org/issue/U4-3505
         if (cache && _types.TryGetValue(listKey, out TypeList? cachedList))
         {
-            LogDebug("Getting {TypeName}: found a cached type list.", GetName(baseType, attributeType));
+            LogDebugIf(true, "Getting {TypeName}: found a cached type list.", GetName(baseType, attributeType));
             return cachedList.Types;
         }
 
@@ -345,7 +315,7 @@ public sealed class TypeLoader
         var typeList = new TypeList(baseType, attributeType);
 
         // either we had to scan, or we could not get the types from the cache file - scan now
-        LogDebug("Getting {TypeName}: " + action + ".", GetName(baseType, attributeType));
+        LogDebugIf(true, "Getting {TypeName}: " + action + ".", GetName(baseType, attributeType));
 
         foreach (Type t in finder())
         {
@@ -356,11 +326,11 @@ public sealed class TypeLoader
         if (cache)
         {
             var added = _types.TryAdd(listKey, typeList);
-            LogDebug("Got {TypeName}, caching ({CacheType}).", GetName(baseType, attributeType), added.ToString().ToLowerInvariant());
+            LogDebugIf(true, "Got {TypeName}, caching ({CacheType}).", GetName(baseType, attributeType), added.ToString().ToLowerInvariant());
         }
         else
         {
-            LogDebug("Got {TypeName}.", GetName(baseType, attributeType));
+            LogDebugIf(true, "Got {TypeName}.", GetName(baseType, attributeType));
         }
 
         return typeList.Types;
