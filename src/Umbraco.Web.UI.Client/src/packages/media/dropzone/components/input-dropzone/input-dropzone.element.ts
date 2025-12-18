@@ -117,36 +117,42 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 			this._manager.progressItems,
 			async (progressItems) => {
 				this._progressItems = [...progressItems];
-				const waiting = this._progressItems.find((item) => item.status === UmbFileDropzoneItemStatus.WAITING);
+				const hasWaiting = this._progressItems.some((item) => item.status === UmbFileDropzoneItemStatus.WAITING);
 
 				// Clear any pending auto-close when new uploads start
-				if (waiting) {
+				if (hasWaiting) {
 					clearTimeout(this.#autoCloseTimeout);
 				}
 
-				if (this._progressItems.length && !waiting) {
-					this.value = [...this._progressItems];
-					this.dispatchEvent(new UmbDropzoneChangeEvent(this._progressItems));
-
-					// Only auto-close if all items completed successfully (no errors)
-					const allSuccessful = this._progressItems.every((item) => item.status === UmbFileDropzoneItemStatus.COMPLETE);
-					if (allSuccessful) {
-						this.#autoCloseTimeout = setTimeout(() => {
-							this._manager.removeAll();
-						}, 750);
-					}
-				}
-
-				// Show popover after render completes (if there are items to show)
-				if (this._progressItems.length > 0) {
-					await this.updateComplete;
-					if (this._uploader && !this._uploader.matches(':popover-open')) {
-						this._uploader.showPopover();
-					}
-				}
+				this.#handleUploadComplete(hasWaiting);
+				await this.#showPopover();
 			},
 			'_observeProgressItems',
 		);
+	}
+
+	#handleUploadComplete(hasWaiting: boolean): void {
+		if (!this._progressItems.length || hasWaiting) return;
+
+		this.value = [...this._progressItems];
+		this.dispatchEvent(new UmbDropzoneChangeEvent(this._progressItems));
+
+		// Only auto-close if all items completed successfully (no errors)
+		const allSuccessful = this._progressItems.every((item) => item.status === UmbFileDropzoneItemStatus.COMPLETE);
+		if (!allSuccessful) return;
+
+		this.#autoCloseTimeout = setTimeout(() => {
+			this._manager.removeAll();
+		}, 750);
+	}
+
+	async #showPopover(): Promise<void> {
+		if (!this._progressItems.length) return;
+
+		await this.updateComplete;
+		if (this._uploader && !this._uploader.matches(':popover-open')) {
+			this._uploader.showPopover();
+		}
 	}
 
 	override disconnectedCallback(): void {
