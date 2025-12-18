@@ -1,9 +1,7 @@
 using System.Reflection;
 using System.Runtime.Serialization;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Collections;
-using Umbraco.Cms.Core.Logging;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Composing;
@@ -399,60 +397,6 @@ public sealed class TypeLoader
             }
 
             _types.Add(type);
-        }
-    }
-
-    /// <summary>
-    ///     Represents the error that occurs when a type was not found in the cache type list with the specified
-    ///     TypeResolutionKind.
-    /// </summary>
-    /// <seealso cref="System.Exception" />
-    [Serializable]
-    internal sealed class CachedTypeNotFoundInFileException : Exception
-    {
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="CachedTypeNotFoundInFileException" /> class.
-        /// </summary>
-        public CachedTypeNotFoundInFileException()
-        {
-        }
-
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="CachedTypeNotFoundInFileException" /> class.
-        /// </summary>
-        /// <param name="message">The message that describes the error.</param>
-        public CachedTypeNotFoundInFileException(string message)
-            : base(message)
-        {
-        }
-
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="CachedTypeNotFoundInFileException" /> class.
-        /// </summary>
-        /// <param name="message">The error message that explains the reason for the exception.</param>
-        /// <param name="innerException">
-        ///     The exception that is the cause of the current exception, or a null reference (
-        ///     <see langword="Nothing" /> in Visual Basic) if no inner exception is specified.
-        /// </param>
-        public CachedTypeNotFoundInFileException(string message, Exception innerException)
-            : base(message, innerException)
-        {
-        }
-
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="CachedTypeNotFoundInFileException" /> class.
-        /// </summary>
-        /// <param name="info">
-        ///     The <see cref="T:System.Runtime.Serialization.SerializationInfo" /> that holds the serialized object
-        ///     data about the exception being thrown.
-        /// </param>
-        /// <param name="context">
-        ///     The <see cref="T:System.Runtime.Serialization.StreamingContext" /> that contains contextual
-        ///     information about the source or destination.
-        /// </param>
-        private CachedTypeNotFoundInFileException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
-        {
         }
     }
 
