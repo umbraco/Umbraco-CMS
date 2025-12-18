@@ -34,6 +34,7 @@ export const serverInformationHandlers = [
 			allowPasswordReset: true,
 			versionCheckPeriod: 7, // days
 			allowLocalLogin: true,
+			umbracoCssPath: '/css',
 		});
 	}),
 	http.get(umbracoPath('/server/information'), () => {

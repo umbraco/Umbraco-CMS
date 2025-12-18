@@ -128,7 +128,7 @@ internal class LongRunningOperationService : ILongRunningOperationService
             {
                 // Acquire a write lock to ensure that no other operations of the same type can be enqueued while this one is being processed.
                 // This is only needed if we do not allow multiple runs of the same type.
-                scope.WriteLock(Constants.Locks.LongRunningOperations);
+                scope.EagerWriteLock(Constants.Locks.LongRunningOperations);
                 if (await IsAlreadyRunning(type))
                 {
                     scope.Complete();
