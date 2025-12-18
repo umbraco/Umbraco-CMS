@@ -259,7 +259,7 @@
 		"postcss-cli": "^11.0.1",
 		"prettier": "3.6.2",
 		"remark-gfm": "^4.0.1",
-		"storybook": "9.0.14",
+		"storybook": "9.1.17",
 		"tiny-glob": "^0.2.9",
 		"tsc-alias": "^1.8.16",
 		"typedoc": "^0.28.13",
