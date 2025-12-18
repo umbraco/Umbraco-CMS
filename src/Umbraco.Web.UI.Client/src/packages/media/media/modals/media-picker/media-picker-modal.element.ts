@@ -199,7 +199,7 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 
 		if (this.data?.multiple) {
 			// Multiple selection: add all uploaded items to selection
-			const newSelection = [...this.value.selection, ...completedUniques];
+			const newSelection = [...(this.value?.selection ?? []), ...completedUniques];
 			this._isSelectionMode = newSelection.length > 0;
 			this.modalContext?.setValue({ selection: newSelection });
 		} else {
