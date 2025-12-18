@@ -1,5 +1,5 @@
-import type { UmbMockScriptModel } from '../data/script/script.data.js';
-import { data as scriptData } from '../data/script/script.data.js';
+import type { UmbMockScriptModel } from '../data/script.data.js';
+import { data as scriptData } from '../data/script.data.js';
 import { UmbFileSystemMockDbBase } from './utils/file-system/file-system-base.js';
 import { UmbMockFileSystemFolderManager } from './utils/file-system/file-system-folder.manager.js';
 import { UmbMockFileSystemItemManager } from './utils/file-system/file-system-item.manager.js';

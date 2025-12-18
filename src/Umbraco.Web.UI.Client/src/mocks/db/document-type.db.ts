@@ -1,5 +1,5 @@
-import type { UmbMockDocumentTypeModel } from '../data/document-type/document-type.data.js';
-import { data } from '../data/document-type/document-type.data.js';
+import type { UmbMockDocumentTypeModel } from '../data/document-type.data.js';
+import { data } from '../data/document-type.data.js';
 import { UmbEntityMockDbBase } from './utils/entity/entity-base.js';
 import { UmbMockEntityFolderManager } from './utils/entity/entity-folder.manager.js';
 import { UmbMockEntityTreeManager } from './utils/entity/entity-tree.manager.js';

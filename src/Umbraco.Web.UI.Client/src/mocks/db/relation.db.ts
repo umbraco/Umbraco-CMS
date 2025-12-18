@@ -1,5 +1,5 @@
-import type { UmbMockRelationModel } from '../data/relation/relation.data.js';
-import { data } from '../data/relation/relation.data.js';
+import type { UmbMockRelationModel } from '../data/relation.data.js';
+import { data } from '../data/relation.data.js';
 import { UmbMockEntityDetailManager } from './utils/entity/entity-detail.manager.js';
 import { UmbEntityMockDbBase } from './utils/entity/entity-base.js';
 import type { RelationResponseModel } from '@umbraco-cms/backoffice/external/backend-api';

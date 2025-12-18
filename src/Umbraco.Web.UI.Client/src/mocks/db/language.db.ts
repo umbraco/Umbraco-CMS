@@ -1,5 +1,5 @@
-import type { UmbMockLanguageModel } from '../data/language/language.data.js';
-import { data } from '../data/language/language.data.js';
+import type { UmbMockLanguageModel } from '../data/language.data.js';
+import { data } from '../data/language.data.js';
 import { UmbMockCultureItemManager } from './utils/culture/culture-item.manager.js';
 import { UmbCultureMockDbBase } from './utils/culture/culture-base.js';
 import { UmbMockCultureDetailManager } from './utils/culture/culture-detail.manager.js';

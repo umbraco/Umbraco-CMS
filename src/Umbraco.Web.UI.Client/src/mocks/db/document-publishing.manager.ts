@@ -1,4 +1,4 @@
-import type { UmbMockDocumentModel } from '../data/document/document.data.js';
+import type { UmbMockDocumentModel } from '../data/document.data.js';
 import type { UmbDocumentMockDB } from './document.db.js';
 import type {
 	PublishDocumentRequestModel,

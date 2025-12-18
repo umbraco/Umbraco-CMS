@@ -1,4 +1,4 @@
-import { createTemplateScaffold, type UmbMockTemplateModel } from '../data/template/template.data.js';
+import { createTemplateScaffold, type UmbMockTemplateModel } from '../data/template.data.js';
 import { UmbMockEntityDetailManager } from './utils/entity/entity-detail.manager.js';
 import type { UmbEntityMockDbBase } from './utils/entity/entity-base.js';
 import type { CreateTemplateRequestModel, TemplateResponseModel } from '@umbraco-cms/backoffice/external/backend-api';

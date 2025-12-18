@@ -1,4 +1,4 @@
-import { dataSet } from '../sets/index.js';
+import { dataSet } from './sets/index.js';
 import type { RelationResponseModel, RelationReferenceModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export type UmbMockRelationModel = RelationResponseModel;

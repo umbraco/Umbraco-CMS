@@ -1,8 +1,5 @@
-import type {
-	UmbMockRelationTypeItemModel,
-	UmbMockRelationTypeModel,
-} from '../data/relation-type/relationType.data.js';
-import { data } from '../data/relation-type/relationType.data.js';
+import type { UmbMockRelationTypeItemModel, UmbMockRelationTypeModel } from '../data/relationType.data.js';
+import { data } from '../data/relationType.data.js';
 import { UmbMockEntityDetailManager } from './utils/entity/entity-detail.manager.js';
 import { UmbEntityMockDbBase } from './utils/entity/entity-base.js';
 import type {

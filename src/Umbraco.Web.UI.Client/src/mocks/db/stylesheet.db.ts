@@ -1,5 +1,5 @@
-import type { UmbMockStylesheetModel } from '../data/stylesheet/stylesheet.data.js';
-import { data } from '../data/stylesheet/stylesheet.data.js';
+import type { UmbMockStylesheetModel } from '../data/stylesheet.data.js';
+import { data } from '../data/stylesheet.data.js';
 import { UmbFileSystemMockDbBase } from './utils/file-system/file-system-base.js';
 import { UmbMockFileSystemDetailManager } from './utils/file-system/file-system-detail.manager.js';
 import { UmbMockFileSystemFolderManager } from './utils/file-system/file-system-folder.manager.js';

@@ -1,6 +1,6 @@
 import { objectArrayFilter, queryFilter } from '../utils.js';
-import type { UmbMockMemberModel } from '../data/member/member.data.js';
-import { data } from '../data/member/member.data.js';
+import type { UmbMockMemberModel } from '../data/member.data.js';
+import { data } from '../data/member.data.js';
 import { UmbEntityMockDbBase } from './utils/entity/entity-base.js';
 import { UmbMockEntityItemManager } from './utils/entity/entity-item.manager.js';
 import { UmbMockEntityDetailManager } from './utils/entity/entity-detail.manager.js';

@@ -1,4 +1,4 @@
-import { savedSearches, messageTemplates, logLevels } from '../data/log-viewer/log-viewer.data.js';
+import { savedSearches, messageTemplates, logLevels } from '../data/log-viewer.data.js';
 import { logs } from '../data/logs.data.js';
 import { UmbMockDBBase } from './utils/mock-db-base.js';
 import type {

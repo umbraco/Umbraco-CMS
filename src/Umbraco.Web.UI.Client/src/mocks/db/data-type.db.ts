@@ -1,6 +1,6 @@
 import { queryFilter } from '../utils.js';
-import type { UmbMockDataTypeModel } from '../data/data-type/data-type.data.js';
-import { data } from '../data/data-type/data-type.data.js';
+import type { UmbMockDataTypeModel } from '../data/data-type.data.js';
+import { data } from '../data/data-type.data.js';
 import { UmbEntityMockDbBase } from './utils/entity/entity-base.js';
 import { UmbMockEntityFolderManager } from './utils/entity/entity-folder.manager.js';
 import { UmbMockEntityTreeManager } from './utils/entity/entity-tree.manager.js';

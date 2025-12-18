@@ -1,4 +1,4 @@
-import { dataSet } from '../sets/index.js';
+import { dataSet } from './sets/index.js';
 import type {
 	MemberTypeItemResponseModel,
 	MemberTypeResponseModel,
