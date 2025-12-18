@@ -1,5 +1,4 @@
 import type { UmbMockUserModel } from '../../types/mock-data-set.types.js';
-import type { UserTwoFactorProviderModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UserKindModel, UserStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export const data: Array<UmbMockUserModel> = [
@@ -140,20 +139,5 @@ export const data: Array<UmbMockUserModel> = [
 		userGroupIds: [{ id: 'user-group-editors-id' }, { id: 'user-group-sensitive-data-id' }],
 		userName: '',
 		flags: [],
-	},
-];
-
-/**
- * Mock data for MFA login providers
- * This is usually linked to a user, but for the sake of the mock, we're just going to have a list of providers
- */
-export const mfaLoginProviders: Array<UserTwoFactorProviderModel> = [
-	{
-		isEnabledOnUser: true,
-		providerName: 'Google Authenticator',
-	},
-	{
-		isEnabledOnUser: false,
-		providerName: 'sms',
 	},
 ];

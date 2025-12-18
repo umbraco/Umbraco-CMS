@@ -25,7 +25,8 @@ import {
 	templateQueryResult,
 	templateQuerySettings,
 } from './template.data.js';
-import { data as user, mfaLoginProviders } from './user.data.js';
+import { data as user } from './user.data.js';
+import { data as mfaLoginProviders } from './user-mfa-login-providers.data.js';
 import { data as userGroup } from './user-group.data.js';
 import { data as objectType } from './object-type.data.js';
 import {
