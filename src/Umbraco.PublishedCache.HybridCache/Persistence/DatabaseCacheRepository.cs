@@ -250,7 +250,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
             .Where<NodeDto>(n => n.NodeObjectType == Constants.ObjectTypes.Document)
             .WhereIn<NodeDto>(x => x.UniqueId, keys, "ct");
 
-        foreach (CacheRefreshKeyDto row in Database.Fetch<CacheRefreshKeyDto>(sql))
+        foreach (DocumentKeysWithPublishedStatusDto row in Database.Fetch<DocumentKeysWithPublishedStatusDto>(sql))
         {
             yield return (row.UniqueId, row.Published is false);
         }
@@ -259,10 +259,45 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     /// <summary>
     /// Lightweight DTO for cache refresh key queries.
     /// </summary>
-    private class CacheRefreshKeyDto
+    private class DocumentKeysWithPublishedStatusDto
     {
         public Guid UniqueId { get; set; }
+
         public bool Published { get; set; }
+    }
+
+    /// <inheritdoc />
+    public IEnumerable<Guid> GetMediaKeysByContentTypeKeys(IEnumerable<Guid> mediaTypeKeys)
+    {
+        Guid[] keys = mediaTypeKeys.ToArray();
+        if (keys.Length == 0)
+        {
+            yield break;
+        }
+
+        // Lightweight query that only gets keys - no serialized data.
+        // Media items don't have published state, so we just need the keys.
+        Sql<ISqlContext> sql = SqlContext.Sql()
+            .Select<NodeDto>(x => x.UniqueId)
+            .From<ContentNuDto>()
+            .InnerJoin<NodeDto>().On<ContentNuDto, NodeDto>((nu, n) => nu.NodeId == n.NodeId)
+            .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((n, c) => n.NodeId == c.NodeId)
+            .InnerJoin<NodeDto>("ct").On<ContentDto, NodeDto>((c, ct) => c.ContentTypeId == ct.NodeId, aliasRight: "ct")
+            .Where<NodeDto>(n => n.NodeObjectType == Constants.ObjectTypes.Media)
+            .WhereIn<NodeDto>(x => x.UniqueId, keys, "ct");
+
+        foreach (MediaKeyDto row in Database.Fetch<MediaKeyDto>(sql))
+        {
+            yield return row.UniqueId;
+        }
+    }
+
+    /// <summary>
+    /// Lightweight DTO for media key queries.
+    /// </summary>
+    private class MediaKeyDto
+    {
+        public Guid UniqueId { get; set; }
     }
 
     /// <inheritdoc/>
