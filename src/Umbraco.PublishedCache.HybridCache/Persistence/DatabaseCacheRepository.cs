@@ -327,26 +327,31 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         do
         {
             // The tree is locked, counting and comparing to total is safe.
-            IEnumerable<IContent> descendants =
-                _documentRepository.GetPage(query, pageIndex++, groupSize, out total, null, Ordering.By("Path"));
-            var items = new List<ContentNuDto>();
-            var count = 0;
-            foreach (IContent c in descendants)
-            {
-                // Always include the edited version.
-                items.Add(GetDtoFromContent(c, false, serializer));
+            var contentList = _documentRepository.GetPage(query, pageIndex++, groupSize, out total, null, Ordering.By("Path")).ToList();
 
-                // And also the published version if the document is published.
-                if (c.Published)
+            // Serialize to collection of ContentNuDto instances. As an optimization we parallelize this.
+            // (showed 5-10% speed up on save of document type triggering large content cache rebuild).
+            var items = contentList
+                .AsParallel()
+                .WithDegreeOfParallelism(Environment.ProcessorCount)
+                .SelectMany(c =>
                 {
-                    items.Add(GetDtoFromContent(c, true, serializer));
-                }
+                    // Always include the edited version.
+                    var results = new List<ContentNuDto>(2) { GetDtoFromContent(c, false, serializer) };
 
-                count++;
-            }
+                    // And also the published version if the document is published.
+                    if (c.Published)
+                    {
+                        results.Add(GetDtoFromContent(c, true, serializer));
+                    }
+
+                    return results;
+                })
+                .ToList();
 
             Database.BulkInsertRecords(items);
-            processed += count;
+
+            processed += contentList.Count;
         }
         while (processed < total);
     }
@@ -378,9 +383,15 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         do
         {
             // The tree is locked, counting and comparing to total is safe.
-            IEnumerable<IMedia> descendants =
-                _mediaRepository.GetPage(query, pageIndex++, groupSize, out total, null, Ordering.By("Path"));
-            ContentNuDto[] items = descendants.Select(m => GetDtoFromContent(m, false, serializer)).ToArray();
+            var mediaList = _mediaRepository.GetPage(query, pageIndex++, groupSize, out total, null, Ordering.By("Path")).ToList();
+
+            // Serialize to collection of ContentNuDto instances. As an optimization we parallelize this.
+            ContentNuDto[] items = mediaList
+                .AsParallel()
+                .WithDegreeOfParallelism(Environment.ProcessorCount)
+                .Select(m => GetDtoFromContent(m, false, serializer))
+                .ToArray();
+
             Database.BulkInsertRecords(items);
             processed += items.Length;
         }
@@ -413,9 +424,15 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         long total;
         do
         {
-            IEnumerable<IMember> descendants =
-                _memberRepository.GetPage(query, pageIndex++, groupSize, out total, null, Ordering.By("Path"));
-            ContentNuDto[] items = descendants.Select(m => GetDtoFromContent(m, false, serializer)).ToArray();
+            var memberList = _memberRepository.GetPage(query, pageIndex++, groupSize, out total, null, Ordering.By("Path")).ToList();
+
+            // Serialize to collection of ContentNuDto instances. As an optimization we parallelize this.
+            ContentNuDto[] items = memberList
+                .AsParallel()
+                .WithDegreeOfParallelism(Environment.ProcessorCount)
+                .Select(m => GetDtoFromContent(m, false, serializer))
+                .ToArray();
+
             Database.BulkInsertRecords(items);
             processed += items.Length;
         }
