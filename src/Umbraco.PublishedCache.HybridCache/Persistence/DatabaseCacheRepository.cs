@@ -883,7 +883,6 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         }
 
         var total = Database.ExecuteScalar<long>(countSql);
-        _logger.LogInformation("Total media items to rebuild: {Total}", total);
 
         if (total == 0)
         {

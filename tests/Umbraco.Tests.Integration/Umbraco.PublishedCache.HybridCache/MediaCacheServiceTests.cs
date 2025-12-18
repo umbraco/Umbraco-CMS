@@ -109,7 +109,7 @@ internal sealed class MediaCacheServiceTests : UmbracoIntegrationTestWithContent
         }
 
         // Modify content
-        MediaItem.Name = MediaItem.Name += " - Modified";
+        MediaItem.Name += " - Modified";
         MediaService.Save(MediaItem);
 
         // Act - Rebuild again
