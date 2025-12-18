@@ -34,7 +34,7 @@ public class SetStatusRedirectUrlManagementController : RedirectUrlManagementCon
     /// <summary>
     /// Sets the redirect URL tracking status.
     /// </summary>
-    /// <param name="cancellationToken">The cancellation token (currently unused, reserved for future use).</param>
+    /// <param name="cancellationToken">The cancellation token for the HTTP request.</param>
     /// <param name="status">The redirect status to set.</param>
     /// <returns>An OK result if successful.</returns>
     [HttpPost("status")]
