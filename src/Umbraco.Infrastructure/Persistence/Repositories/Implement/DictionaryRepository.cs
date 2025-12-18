@@ -115,21 +115,7 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
                         .Where<DictionaryDto>(x => x.Parent != null)
                         .WhereIn<DictionaryDto>(x => x.Parent, group);
 
-                    if (filter.IsNullOrWhiteSpace() is false)
-                    {
-                        if (_dictionarySettings.UseDictionaryValueSearch)
-                        {
-                            // Search in both keys and values
-                            sql.Where($"({QuotedColumn("key")} LIKE @0 OR {QuoteTableName(LanguageTextDto.TableName)}.{QuoteColumnName("value")} LIKE @1)", 
-                                $"{filter}%", $"%{filter}%");
-                        }
-                        else
-                        {
-                            // Search only in keys
-                            sql.Where<DictionaryDto>(x => x.Key.StartsWith(filter));
-                        }
-                    }
-
+                    ApplyFilterToQuery(sql, filter);
                     sql.OrderBy<DictionaryDto>(x => x.UniqueId);
 
                     return Database
@@ -143,20 +129,7 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
             Sql<ISqlContext> sql = GetBaseQuery(false)
                 .Where<DictionaryDto>(x => x.PrimaryKey > 0);
 
-            if (filter.IsNullOrWhiteSpace() is false)
-            {
-                if (_dictionarySettings.UseDictionaryValueSearch)
-                {
-                    // Search in both keys and values
-                    sql.Where($"({QuotedColumn("key")} LIKE @0 OR {QuoteTableName(LanguageTextDto.TableName)}.{QuoteColumnName("value")} LIKE @1)", 
-                        $"{filter}%", $"%{filter}%");
-                }
-                else
-                {
-                    // Search only in keys
-                    sql.Where<DictionaryDto>(x => x.Key.StartsWith(filter));
-                }
-            }
+            ApplyFilterToQuery(sql, filter);
 
             return Database
                 .FetchOneToMany<DictionaryDto>(x => x.LanguageTextDtos, sql)
@@ -170,6 +143,31 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
 
         // we're loading all descendants into memory, sometimes recursively... so we have to order them in memory too
         string DictionaryItemOrdering(IDictionaryItem item) => item.ItemKey;
+    }
+
+    /// <summary>
+    ///     Applies the filter condition to the SQL query based on configuration settings.
+    /// </summary>
+    /// <param name="sql">The SQL query to modify.</param>
+    /// <param name="filter">The filter string to apply, or null if no filter should be applied.</param>
+    private void ApplyFilterToQuery(Sql<ISqlContext> sql, string? filter)
+    {
+        if (filter.IsNullOrWhiteSpace())
+        {
+            return;
+        }
+
+        if (_dictionarySettings.UseDictionaryValueSearch)
+        {
+            // Search in both keys and values
+            sql.Where($"({QuotedColumn("key")} LIKE @0 OR {QuoteTableName(LanguageTextDto.TableName)}.{QuoteColumnName("value")} LIKE @1)", 
+                $"{filter}%", $"%{filter}%");
+        }
+        else
+        {
+            // Search only in keys
+            sql.Where<DictionaryDto>(x => x.Key.StartsWith(filter));
+        }
     }
 
     protected override IRepositoryCachePolicy<IDictionaryItem, int> CreateCachePolicy()
