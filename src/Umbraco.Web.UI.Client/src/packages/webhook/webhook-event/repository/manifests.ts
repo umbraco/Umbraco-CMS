@@ -1,3 +1,5 @@
+import { UmbWebhookEventStore } from './webhook-event.store.js';
+
 export const UMB_WEBHOOK_EVENT_REPOSITORY_ALIAS = 'Umb.Repository.Webhook.Event';
 export const UMB_WEBHOOK_EVENT_STORE_ALIAS = 'Umb.Store.Webhook.Event';
 
@@ -12,6 +14,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'store',
 		alias: UMB_WEBHOOK_EVENT_STORE_ALIAS,
 		name: 'Webhook Event Store',
-		api: () => import('./webhook-event.store.js'),
+		api: UmbWebhookEventStore,
 	},
 ];
