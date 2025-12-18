@@ -4,15 +4,13 @@ import type { UmbEntityMockDbBase } from './utils/entity/entity-base.js';
 import type { CreateTemplateRequestModel, TemplateResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 
-const createTemplateScaffold = dataSet.createTemplateScaffold;
-
 export class UmbMockTemplateDetailManager extends UmbMockEntityDetailManager<UmbMockTemplateModel> {
 	constructor(db: UmbEntityMockDbBase<UmbMockTemplateModel>) {
 		super(db, createDetailMockMapper, detailResponseMapper);
 	}
 
 	createScaffold() {
-		return createTemplateScaffold('master');
+		return dataSet.createTemplateScaffold('master');
 	}
 }
 

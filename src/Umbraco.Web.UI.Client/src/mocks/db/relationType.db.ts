@@ -1,7 +1,5 @@
 import type { UmbMockRelationTypeModel, UmbMockRelationTypeItemModel } from '../data/sets/index.js';
 import { dataSet } from '../data/sets/index.js';
-
-const data = dataSet.relationType;
 import { UmbMockEntityDetailManager } from './utils/entity/entity-detail.manager.js';
 import { UmbEntityMockDbBase } from './utils/entity/entity-base.js';
 import type {
@@ -43,4 +41,4 @@ const itemResponseMapper = (item: UmbMockRelationTypeItemModel): RelationTypeIte
 	};
 };
 
-export const umbRelationTypeMockDb = new UmbRelationTypeMockDB(data);
+export const umbRelationTypeMockDb = new UmbRelationTypeMockDB(dataSet.relationType);

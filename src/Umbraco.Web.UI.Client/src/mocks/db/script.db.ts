@@ -1,7 +1,5 @@
 import type { UmbMockScriptModel } from '../data/sets/index.js';
 import { dataSet } from '../data/sets/index.js';
-
-const scriptData = dataSet.script;
 import { UmbFileSystemMockDbBase } from './utils/file-system/file-system-base.js';
 import { UmbMockFileSystemFolderManager } from './utils/file-system/file-system-folder.manager.js';
 import { UmbMockFileSystemItemManager } from './utils/file-system/file-system-item.manager.js';
@@ -19,4 +17,4 @@ class UmbScriptMockDB extends UmbFileSystemMockDbBase<UmbMockScriptModel> {
 	}
 }
 
-export const umbScriptMockDb = new UmbScriptMockDB(scriptData);
+export const umbScriptMockDb = new UmbScriptMockDB(dataSet.script);

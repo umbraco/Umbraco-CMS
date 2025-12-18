@@ -1,7 +1,5 @@
 import type { UmbMockDocumentTypeModel } from '../data/sets/index.js';
 import { dataSet } from '../data/sets/index.js';
-
-const data = dataSet.documentType;
 import { UmbEntityMockDbBase } from './utils/entity/entity-base.js';
 import { UmbMockEntityFolderManager } from './utils/entity/entity-folder.manager.js';
 import { UmbMockEntityTreeManager } from './utils/entity/entity-tree.manager.js';
@@ -159,4 +157,4 @@ const allowedDocumentTypeMapper = (item: UmbMockDocumentTypeModel): AllowedDocum
 	};
 };
 
-export const umbDocumentTypeMockDb = new UmbDocumentTypeMockDB(data);
+export const umbDocumentTypeMockDb = new UmbDocumentTypeMockDB(dataSet.documentType);

@@ -1,8 +1,6 @@
 import { queryFilter } from '../utils.js';
 import type { UmbMockMemberGroupModel } from '../data/sets/index.js';
 import { dataSet } from '../data/sets/index.js';
-
-const data = dataSet.memberGroup;
 import { UmbEntityMockDbBase } from './utils/entity/entity-base.js';
 import { UmbMockEntityItemManager } from './utils/entity/entity-item.manager.js';
 import { UmbMockEntityDetailManager } from './utils/entity/entity-detail.manager.js';
@@ -63,4 +61,4 @@ const itemResponseMapper = (item: UmbMockMemberGroupModel): MemberGroupItemRespo
 	};
 };
 
-export const umbMemberGroupMockDb = new UmbMemberGroupMockDB(data);
+export const umbMemberGroupMockDb = new UmbMemberGroupMockDB(dataSet.memberGroup);

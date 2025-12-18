@@ -1,8 +1,6 @@
 import { queryFilter } from '../utils.js';
 import type { UmbMockDataTypeModel } from '../data/sets/index.js';
 import { dataSet } from '../data/sets/index.js';
-
-const data = dataSet.dataType;
 import { UmbEntityMockDbBase } from './utils/entity/entity-base.js';
 import { UmbMockEntityFolderManager } from './utils/entity/entity-folder.manager.js';
 import { UmbMockEntityTreeManager } from './utils/entity/entity-tree.manager.js';
@@ -132,4 +130,4 @@ const itemResponseMapper = (item: UmbMockDataTypeModel): DataTypeItemResponseMod
 	};
 };
 
-export const umbDataTypeMockDb = new UmbDataTypeMockDB(data);
+export const umbDataTypeMockDb = new UmbDataTypeMockDB(dataSet.dataType);

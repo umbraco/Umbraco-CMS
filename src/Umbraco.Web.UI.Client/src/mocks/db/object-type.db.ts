@@ -2,11 +2,9 @@ import { dataSet } from '../data/sets/index.js';
 import { UmbMockDBBase } from './utils/mock-db-base.js';
 import type { ObjectTypeResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
-const data = dataSet.objectType;
-
 class UmbObjectTypeMockDB extends UmbMockDBBase<ObjectTypeResponseModel> {
 	constructor() {
-		super(data);
+		super(dataSet.objectType);
 	}
 
 	getById(id: string) {

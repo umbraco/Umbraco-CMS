@@ -4,8 +4,6 @@ import { UmbFileSystemMockDbBase } from './utils/file-system/file-system-base.js
 import { UmbMockFileSystemItemManager } from './utils/file-system/file-system-item.manager.js';
 import { UmbMockFileSystemTreeManager } from './utils/file-system/file-system-tree.manager.js';
 
-const staticFileData = dataSet.staticFile;
-
 class UmbStaticFileMockDB extends UmbFileSystemMockDbBase<UmbMockStaticFileModel> {
 	tree = new UmbMockFileSystemTreeManager<UmbMockStaticFileModel>(this);
 	item = new UmbMockFileSystemItemManager<UmbMockStaticFileModel>(this);
@@ -15,4 +13,4 @@ class UmbStaticFileMockDB extends UmbFileSystemMockDbBase<UmbMockStaticFileModel
 	}
 }
 
-export const umbStaticFileMockDb = new UmbStaticFileMockDB(staticFileData);
+export const umbStaticFileMockDb = new UmbStaticFileMockDB(dataSet.staticFile);

@@ -6,11 +6,6 @@ import type {
 	SavedLogSearchResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 
-const savedSearches = dataSet.logViewerSavedSearches;
-const messageTemplates = dataSet.logViewerMessageTemplates;
-const logLevels = dataSet.logViewerLogLevels;
-const logs = dataSet.logs;
-
 class UmbLogViewerSearchesData extends UmbMockDBBase<SavedLogSearchResponseModel> {
 	constructor(data: SavedLogSearchResponseModel[]) {
 		super(data);
@@ -65,8 +60,8 @@ class UmbLogViewerMessagesData extends UmbMockDBBase<LogMessageResponseModel> {
 }
 
 export const umbLogViewerData = {
-	searches: new UmbLogViewerSearchesData(savedSearches),
-	templates: new UmbLogViewerTemplatesData(messageTemplates),
-	logs: new UmbLogViewerMessagesData(logs),
-	logLevels: logLevels,
+	searches: new UmbLogViewerSearchesData(dataSet.logViewerSavedSearches),
+	templates: new UmbLogViewerTemplatesData(dataSet.logViewerMessageTemplates),
+	logs: new UmbLogViewerMessagesData(dataSet.logs),
+	logLevels: dataSet.logViewerLogLevels,
 };

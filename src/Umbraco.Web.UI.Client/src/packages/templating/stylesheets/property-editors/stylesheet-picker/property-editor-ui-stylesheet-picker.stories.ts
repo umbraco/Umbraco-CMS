@@ -1,4 +1,4 @@
-import { umbDataTypeMockDb } from '../../../../../mocks/data/data-type/data-type.db.js';
+import { umbDataTypeMockDb } from '../../../../../mocks/db/data-type.db.js';
 import type UmbPropertyEditorUIStylesheetPickerElement from './property-editor-ui-stylesheet-picker.element.js';
 import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import type { UmbDataTypeDetailModel } from '@umbraco-cms/backoffice/data-type';

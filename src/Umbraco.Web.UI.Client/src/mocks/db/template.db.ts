@@ -1,7 +1,5 @@
 import type { UmbMockTemplateModel } from '../data/sets/index.js';
 import { dataSet } from '../data/sets/index.js';
-
-const data = dataSet.template;
 import { UmbEntityMockDbBase } from './utils/entity/entity-base.js';
 import { UmbMockEntityTreeManager } from './utils/entity/entity-tree.manager.js';
 import { UmbMockEntityItemManager } from './utils/entity/entity-item.manager.js';
@@ -42,4 +40,4 @@ const itemMapper = (item: UmbMockTemplateModel): TemplateItemResponseModel => {
 	};
 };
 
-export const umbTemplateMockDb = new UmbTemplateMockDB(data);
+export const umbTemplateMockDb = new UmbTemplateMockDB(dataSet.template);

@@ -1,7 +1,5 @@
 import type { UmbMockMemberTypeModel } from '../data/sets/index.js';
 import { dataSet } from '../data/sets/index.js';
-
-const data = dataSet.memberType;
 import { UmbEntityMockDbBase } from './utils/entity/entity-base.js';
 import { UmbMockEntityTreeManager } from './utils/entity/entity-tree.manager.js';
 import { UmbMockEntityItemManager } from './utils/entity/entity-item.manager.js';
@@ -81,4 +79,4 @@ const itemResponseMapper = (item: UmbMockMemberTypeModel): MemberTypeItemRespons
 	};
 };
 
-export const umbMemberTypeMockDb = new UmbMemberTypeMockDB(data);
+export const umbMemberTypeMockDb = new UmbMemberTypeMockDB(dataSet.memberType);

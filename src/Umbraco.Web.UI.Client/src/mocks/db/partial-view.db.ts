@@ -1,8 +1,5 @@
 import type { UmbMockPartialViewModel } from '../data/sets/index.js';
 import { dataSet } from '../data/sets/index.js';
-
-const data = dataSet.partialView;
-const snippets = dataSet.partialViewSnippets;
 import { UmbFileSystemMockDbBase } from './utils/file-system/file-system-base.js';
 import { UmbMockFileSystemFolderManager } from './utils/file-system/file-system-folder.manager.js';
 import { UmbMockFileSystemItemManager } from './utils/file-system/file-system-item.manager.js';
@@ -25,13 +22,13 @@ class UmbPartialViewMockDB extends UmbFileSystemMockDbBase<UmbMockPartialViewMod
 	}
 
 	getSnippets(): PagedPartialViewSnippetItemResponseModel {
-		const snippetItems = snippets.map((item) => createSnippetItem(item));
+		const snippetItems = dataSet.partialViewSnippets.map((item) => createSnippetItem(item));
 		const total = snippetItems.length;
 		return { items: snippetItems, total };
 	}
 
 	getSnippet(id: string): PartialViewSnippetResponseModel | undefined {
-		return snippets.find((item) => item.id === id);
+		return dataSet.partialViewSnippets.find((item) => item.id === id);
 	}
 }
 
@@ -42,4 +39,4 @@ const createSnippetItem = (item: PartialViewSnippetResponseModel): PartialViewSn
 	};
 };
 
-export const umbPartialViewMockDB = new UmbPartialViewMockDB(data);
+export const umbPartialViewMockDB = new UmbPartialViewMockDB(dataSet.partialView);

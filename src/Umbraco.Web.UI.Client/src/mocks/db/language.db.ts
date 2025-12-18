@@ -1,7 +1,5 @@
 import type { UmbMockLanguageModel } from '../data/sets/index.js';
 import { dataSet } from '../data/sets/index.js';
-
-const data = dataSet.language;
 import { UmbMockCultureItemManager } from './utils/culture/culture-item.manager.js';
 import { UmbCultureMockDbBase } from './utils/culture/culture-base.js';
 import { UmbMockCultureDetailManager } from './utils/culture/culture-detail.manager.js';
@@ -47,4 +45,4 @@ const itemResponseMapper = (item: UmbMockLanguageModel): LanguageItemResponseMod
 	};
 };
 
-export const umbLanguageMockDb = new UmbLanguageMockDB(data);
+export const umbLanguageMockDb = new UmbLanguageMockDB(dataSet.language);

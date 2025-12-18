@@ -1,8 +1,6 @@
 import { objectArrayFilter, queryFilter } from '../utils.js';
 import type { UmbMockMemberModel } from '../data/sets/index.js';
 import { dataSet } from '../data/sets/index.js';
-
-const data = dataSet.member;
 import { UmbEntityMockDbBase } from './utils/entity/entity-base.js';
 import { UmbMockEntityItemManager } from './utils/entity/entity-item.manager.js';
 import { UmbMockEntityDetailManager } from './utils/entity/entity-detail.manager.js';
@@ -147,4 +145,4 @@ const collectionItemResponseMapper = (item: UmbMockMemberModel): any => {
 	};
 };
 
-export const umbMemberMockDb = new UmbMemberMockDB(data);
+export const umbMemberMockDb = new UmbMemberMockDB(dataSet.member);
