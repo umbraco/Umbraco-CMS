@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Core.PublishedCache;
 
 internal sealed class PublishedElementPropertyBase : PublishedPropertyBase
 {
-    protected readonly IPublishedElement Element;
+    private readonly IPublishedElement Element;
 
     // define constant - determines whether to use cache when previewing
     // to store eg routes, property converted values, anything - caching
@@ -14,8 +14,8 @@ internal sealed class PublishedElementPropertyBase : PublishedPropertyBase
     // so making it configurable.
     private readonly Lock _locko = new();
     private readonly object? _sourceValue;
-    protected readonly bool IsMember;
-    protected readonly bool IsPreviewing;
+    private readonly bool IsMember;
+    private readonly bool IsPreviewing;
     private readonly VariationContext _variationContext;
     private readonly ICacheManager? _cacheManager;
     private CacheValues? _cacheValues;
@@ -220,7 +220,7 @@ internal sealed class PublishedElementPropertyBase : PublishedPropertyBase
         return cacheValues.DeliveryApiExpandedObjectValue;
     }
 
-    protected class CacheValues
+    private class CacheValues
     {
         public bool ObjectInitialized;
         public object? ObjectValue;

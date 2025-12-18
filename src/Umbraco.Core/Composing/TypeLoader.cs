@@ -450,7 +450,7 @@ public sealed class TypeLoader
         ///     The <see cref="T:System.Runtime.Serialization.StreamingContext" /> that contains contextual
         ///     information about the source or destination.
         /// </param>
-        protected CachedTypeNotFoundInFileException(SerializationInfo info, StreamingContext context)
+        private CachedTypeNotFoundInFileException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
         }
