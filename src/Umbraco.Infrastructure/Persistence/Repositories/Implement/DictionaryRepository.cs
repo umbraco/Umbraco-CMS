@@ -1,8 +1,10 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -23,6 +25,7 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
 {
     private readonly ILoggerFactory _loggerFactory;
     private readonly ILanguageRepository _languageRepository;
+    private readonly DictionarySettings _dictionarySettings;
 
     private string QuotedColumn(string columnName) => $"{QuoteTableName(DictionaryDto.TableName)}.{QuoteColumnName(columnName)}";
 
@@ -33,11 +36,13 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
         ILoggerFactory loggerFactory,
         ILanguageRepository languageRepository,
         IRepositoryCacheVersionService repositoryCacheVersionService,
-        ICacheSyncService cacheSyncService)
+        ICacheSyncService cacheSyncService,
+        IOptions<DictionarySettings> dictionarySettings)
         : base(scopeAccessor, cache, logger, repositoryCacheVersionService, cacheSyncService)
     {
         _loggerFactory = loggerFactory;
         _languageRepository = languageRepository;
+        _dictionarySettings = dictionarySettings.Value;
     }
 
     public IDictionaryItem? Get(Guid uniqueId)
@@ -112,7 +117,17 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
 
                     if (filter.IsNullOrWhiteSpace() is false)
                     {
-                        sql.Where<DictionaryDto>(x => x.Key.StartsWith(filter));
+                        if (_dictionarySettings.UseDictionaryValueSearch)
+                        {
+                            // Search in both keys and values
+                            sql.Where($"({QuotedColumn("key")} LIKE @0 OR {QuoteTableName(LanguageTextDto.TableName)}.{QuoteColumnName("value")} LIKE @1)", 
+                                $"{filter}%", $"%{filter}%");
+                        }
+                        else
+                        {
+                            // Search only in keys
+                            sql.Where<DictionaryDto>(x => x.Key.StartsWith(filter));
+                        }
                     }
 
                     sql.OrderBy<DictionaryDto>(x => x.UniqueId);
@@ -130,7 +145,17 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
 
             if (filter.IsNullOrWhiteSpace() is false)
             {
-                sql.Where<DictionaryDto>(x => x.Key.StartsWith(filter));
+                if (_dictionarySettings.UseDictionaryValueSearch)
+                {
+                    // Search in both keys and values
+                    sql.Where($"({QuotedColumn("key")} LIKE @0 OR {QuoteTableName(LanguageTextDto.TableName)}.{QuoteColumnName("value")} LIKE @1)", 
+                        $"{filter}%", $"%{filter}%");
+                }
+                else
+                {
+                    // Search only in keys
+                    sql.Where<DictionaryDto>(x => x.Key.StartsWith(filter));
+                }
             }
 
             return Database

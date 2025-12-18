@@ -2,10 +2,12 @@
 // See LICENSE for more details.
 
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Services;
@@ -35,7 +37,8 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
             GetRequiredService<ILoggerFactory>(),
             GetRequiredService<ILanguageRepository>(),
             GetRequiredService<IRepositoryCacheVersionService>(),
-            GetRequiredService<ICacheSyncService>());
+            GetRequiredService<ICacheSyncService>(),
+            Options.Create(new DictionarySettings()));
 
     [Test]
     public async Task Can_Perform_Get_By_Key_On_DictionaryRepository()
