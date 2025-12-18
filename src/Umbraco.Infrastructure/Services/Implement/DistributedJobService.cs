@@ -84,6 +84,10 @@ public class DistributedJobService : IDistributedJobService
         {
             _logger.LogWarning("Could not find a distributed job with the name '{JobName}'", job.Name);
         }
+        else
+        {
+            _logger.LogDebug("Running distributed job with the name '{JobName}'", job.Name);
+        }
 
         return distributedJob;
     }
