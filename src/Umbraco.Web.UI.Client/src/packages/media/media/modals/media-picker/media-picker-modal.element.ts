@@ -180,7 +180,7 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 		this._currentTotalPages = paginationManager.getTotalPages();
 	}
 
-	#onDropzoneChange(evt: UmbDropzoneChangeEvent) {
+	async #onDropzoneChange(evt: UmbDropzoneChangeEvent) {
 		const target = evt.target as UmbDropzoneMediaElement;
 		const uploadedItems = target.value;
 
@@ -190,6 +190,9 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 		if (completedItems.length === 0) {
 			return;
 		}
+
+		// Navigate to the last page where new items appear (they get highest SortOrder)
+		await this.#navigateToLastPage();
 
 		// Auto-select uploaded items based on picker mode (single vs multiple)
 		const completedUniques = completedItems.map((item) => item.unique);
@@ -203,6 +206,21 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 			// Single selection: select the first uploaded item
 			this._isSelectionMode = true;
 			this.modalContext?.setValue({ selection: [completedUniques[0]] });
+		}
+	}
+
+	async #navigateToLastPage() {
+		// First reload to get fresh total from server (including newly uploaded items)
+		await this.#loadChildrenOfCurrentMediaItem();
+
+		// If we're not on the last page, navigate there
+		if (this._currentPage < this._currentTotalPages) {
+			const key = this._currentMediaEntity.entityType + this._currentMediaEntity.unique;
+			const paginationManager = this.#pagingMap.get(key);
+			if (paginationManager) {
+				paginationManager.setCurrentPageNumber(this._currentTotalPages);
+				await this.#loadChildrenOfCurrentMediaItem();
+			}
 		}
 	}
 
