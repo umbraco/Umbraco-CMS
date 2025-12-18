@@ -1,11 +1,15 @@
-import { savedSearches, messageTemplates, logLevels } from '../data/log-viewer.data.js';
-import { logs } from '../data/logs.data.js';
+import { dataSet } from '../data/sets/index.js';
 import { UmbMockDBBase } from './utils/mock-db-base.js';
 import type {
 	LogMessageResponseModel,
 	LogTemplateResponseModel,
 	SavedLogSearchResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
+
+const savedSearches = dataSet.logViewerSavedSearches;
+const messageTemplates = dataSet.logViewerMessageTemplates;
+const logLevels = dataSet.logViewerLogLevels;
+const logs = dataSet.logs;
 
 class UmbLogViewerSearchesData extends UmbMockDBBase<SavedLogSearchResponseModel> {
 	constructor(data: SavedLogSearchResponseModel[]) {

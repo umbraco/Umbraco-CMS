@@ -1,14 +1,4 @@
-import type {
-	MemberTypeItemResponseModel,
-	MemberTypeResponseModel,
-} from '@umbraco-cms/backoffice/external/backend-api';
-
-export type UmbMockMemberTypeModel = MemberTypeResponseModel &
-	MemberTypeItemResponseModel & {
-		hasChildren: boolean;
-		parent: { id: string } | null;
-		hasListView: boolean;
-	};
+import type { UmbMockMemberTypeModel } from '../../types/mock-data-set.types.js';
 
 export const data: Array<UmbMockMemberTypeModel> = [
 	{

@@ -1,6 +1,4 @@
-import type { MemberGroupItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-
-export type UmbMockMemberGroupModel = MemberGroupItemResponseModel;
+import type { UmbMockMemberGroupModel } from '../../types/mock-data-set.types.js';
 
 export const data: Array<UmbMockMemberGroupModel> = [
 	{

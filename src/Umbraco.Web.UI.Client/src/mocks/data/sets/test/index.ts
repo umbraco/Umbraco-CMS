@@ -1,5 +1,6 @@
-// Test mock data set - empty arrays for all entities
+// Test mock data set - implements UmbMockDataSet interface with empty/minimal data
 // Uses 'as never[]' to satisfy type constraints while keeping arrays empty
+import type { UmbMockDataSet } from '../../types/mock-data-set.types.js';
 
 export const dataType = [] as never[];
 export const dictionary = [] as never[];
@@ -27,7 +28,7 @@ export const logViewerSavedSearches = [] as never[];
 export const logViewerMessageTemplates = [] as never[];
 export const logViewerLogLevels = {
 	total: 0,
-	items: [],
+	items: [] as Array<{ name: string; level: string }>,
 };
 export const logs = [] as never[];
 export const auditLogs = [] as never[];
@@ -39,7 +40,7 @@ export const examineIndexers = [] as never[];
 export const examinePagedIndexers = { items: [], total: 0 };
 export const examineSearchResults = [] as never[];
 export const examineGetIndexByName = (_indexName: string) => undefined;
-export const examineGetSearchResults = () => [];
+export const examineGetSearchResults = () => [] as never[];
 export const trackedReferenceItems = [] as never[];
 export const news = [] as never[];
 
@@ -64,3 +65,55 @@ export const templateQuerySettings = {
 	properties: [],
 	operators: [],
 };
+
+// Type assertion to ensure this module satisfies UmbMockDataSet
+// Note: This will fail at compile-time if the module doesn't satisfy the interface
+// We import user and userGroup from the default set for authentication testing
+import { data as user, mfaLoginProviders } from '../default/user.data.js';
+import { data as userGroup } from '../default/user-group.data.js';
+
+const _typeCheck: UmbMockDataSet = {
+	dataType,
+	dictionary,
+	document,
+	documentBlueprint,
+	documentType,
+	language,
+	media,
+	mediaType,
+	member,
+	memberGroup,
+	memberType,
+	partialView,
+	partialViewSnippets,
+	relation,
+	relationType,
+	script,
+	staticFile,
+	stylesheet,
+	template,
+	createTemplateScaffold,
+	templateQueryResult,
+	templateQuerySettings,
+	user,
+	mfaLoginProviders,
+	userGroup,
+	objectType,
+	logViewerSavedSearches,
+	logViewerMessageTemplates,
+	logViewerLogLevels,
+	logs,
+	auditLogs,
+	healthGroups,
+	healthGroupsWithoutResult,
+	getGroupByName,
+	getGroupWithResultsByName,
+	examineIndexers,
+	examinePagedIndexers,
+	examineSearchResults,
+	examineGetIndexByName,
+	examineGetSearchResults,
+	trackedReferenceItems,
+	news,
+};
+void _typeCheck;

@@ -1,17 +1,4 @@
-import type {
-	MediaTypeItemResponseModel,
-	MediaTypeResponseModel,
-	MediaTypeTreeItemResponseModel,
-} from '@umbraco-cms/backoffice/external/backend-api';
-
-export type UmbMockMediaTypeModel = MediaTypeResponseModel &
-	MediaTypeTreeItemResponseModel &
-	MediaTypeItemResponseModel;
-
-export type UmbMockMediaTypeUnionModel =
-	| MediaTypeResponseModel
-	| MediaTypeTreeItemResponseModel
-	| MediaTypeItemResponseModel;
+import type { UmbMockMediaTypeModel } from '../../types/mock-data-set.types.js';
 
 export const data: Array<UmbMockMediaTypeModel> = [
 	{

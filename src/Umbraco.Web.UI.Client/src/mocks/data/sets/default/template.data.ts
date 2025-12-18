@@ -1,13 +1,9 @@
+import type { UmbMockTemplateModel } from '../../types/mock-data-set.types.js';
 import type {
-	TemplateResponseModel,
-	TemplateItemResponseModel,
 	TemplateQuerySettingsResponseModel,
 	TemplateQueryResultResponseModel,
-	NamedEntityTreeItemResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { TemplateQueryPropertyTypeModel, OperatorModel } from '@umbraco-cms/backoffice/external/backend-api';
-
-export type UmbMockTemplateModel = TemplateResponseModel & NamedEntityTreeItemResponseModel & TemplateItemResponseModel;
 
 export const data: Array<UmbMockTemplateModel> = [
 	{

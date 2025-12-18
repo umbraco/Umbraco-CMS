@@ -1,13 +1,5 @@
-import type {
-	FileSystemTreeItemPresentationModel,
-	PartialViewItemResponseModel,
-	PartialViewResponseModel,
-	PartialViewSnippetResponseModel,
-} from '@umbraco-cms/backoffice/external/backend-api';
-
-export type UmbMockPartialViewModel = PartialViewResponseModel &
-	FileSystemTreeItemPresentationModel &
-	PartialViewItemResponseModel;
+import type { UmbMockPartialViewModel } from '../../types/mock-data-set.types.js';
+import type { PartialViewSnippetResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export const data: Array<UmbMockPartialViewModel> = [
 	{

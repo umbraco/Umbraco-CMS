@@ -1,9 +1,4 @@
-import type {
-	FileSystemTreeItemPresentationModel,
-	StaticFileItemResponseModel,
-} from '@umbraco-cms/backoffice/external/backend-api';
-
-export type UmbMockStaticFileModel = StaticFileItemResponseModel & FileSystemTreeItemPresentationModel;
+import type { UmbMockStaticFileModel } from '../../types/mock-data-set.types.js';
 
 export const data: Array<UmbMockStaticFileModel> = [
 	{

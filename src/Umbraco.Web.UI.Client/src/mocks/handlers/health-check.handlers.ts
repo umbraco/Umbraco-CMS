@@ -1,12 +1,6 @@
 const { http, HttpResponse } = window.MockServiceWorker;
 
-import {
-	getGroupByName,
-	getGroupWithResultsByName,
-	healthGroups,
-	healthGroupsWithoutResult,
-} from '../data/health-check.data.js';
-
+import { dataSet } from '../data/sets/index.js';
 import type {
 	HealthCheckActionRequestModel,
 	HealthCheckGroupResponseModel,
@@ -16,6 +10,11 @@ import type {
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { StatusResultTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
+
+const getGroupByName = dataSet.getGroupByName;
+const getGroupWithResultsByName = dataSet.getGroupWithResultsByName;
+const healthGroups = dataSet.healthGroups;
+const healthGroupsWithoutResult = dataSet.healthGroupsWithoutResult;
 
 export const handlers = [
 	http.get(umbracoPath('/health-check-group'), () => {

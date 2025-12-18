@@ -1,5 +1,8 @@
-import type { UmbMockPartialViewModel } from '../data/partial-view.data.js';
-import { data, snippets } from '../data/partial-view.data.js';
+import type { UmbMockPartialViewModel } from '../data/sets/index.js';
+import { dataSet } from '../data/sets/index.js';
+
+const data = dataSet.partialView;
+const snippets = dataSet.partialViewSnippets;
 import { UmbFileSystemMockDbBase } from './utils/file-system/file-system-base.js';
 import { UmbMockFileSystemFolderManager } from './utils/file-system/file-system-folder.manager.js';
 import { UmbMockFileSystemItemManager } from './utils/file-system/file-system-item.manager.js';

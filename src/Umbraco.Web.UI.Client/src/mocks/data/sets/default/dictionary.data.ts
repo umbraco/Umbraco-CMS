@@ -1,14 +1,4 @@
-import type {
-	DictionaryItemItemResponseModel,
-	DictionaryItemResponseModel,
-	DictionaryOverviewResponseModel,
-	NamedEntityTreeItemResponseModel,
-} from '@umbraco-cms/backoffice/external/backend-api';
-
-export type UmbMockDictionaryModel = DictionaryItemResponseModel &
-	NamedEntityTreeItemResponseModel &
-	DictionaryItemItemResponseModel &
-	DictionaryOverviewResponseModel;
+import type { UmbMockDictionaryModel } from '../../types/mock-data-set.types.js';
 
 export const data: Array<UmbMockDictionaryModel> = [
 	{

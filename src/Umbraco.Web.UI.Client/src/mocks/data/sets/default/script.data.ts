@@ -1,10 +1,4 @@
-import type {
-	FileSystemTreeItemPresentationModel,
-	ScriptItemResponseModel,
-	ScriptResponseModel,
-} from '@umbraco-cms/backoffice/external/backend-api';
-
-export type UmbMockScriptModel = ScriptResponseModel & FileSystemTreeItemPresentationModel & ScriptItemResponseModel;
+import type { UmbMockScriptModel } from '../../types/mock-data-set.types.js';
 
 export const data: Array<UmbMockScriptModel> = [
 	{

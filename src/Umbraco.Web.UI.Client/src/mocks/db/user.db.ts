@@ -1,6 +1,9 @@
 import { stringFilter, queryFilter, objectArrayFilter } from '../utils.js';
-import type { UmbMockUserModel } from '../data/user.data.js';
-import { data, mfaLoginProviders } from '../data/user.data.js';
+import type { UmbMockUserModel } from '../data/sets/index.js';
+import { dataSet } from '../data/sets/index.js';
+
+const data = dataSet.user;
+const mfaLoginProviders = dataSet.mfaLoginProviders;
 import { umbUserGroupMockDb } from './user-group.db.js';
 import { UmbEntityMockDbBase } from './utils/entity/entity-base.js';
 import { UmbMockEntityItemManager } from './utils/entity/entity-item.manager.js';

@@ -1,6 +1,5 @@
 const { http, HttpResponse } = window.MockServiceWorker;
-import { searchResultMockData, getIndexByName, PagedIndexers } from '../data/examine.data.js';
-
+import { dataSet } from '../data/sets/index.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 import type {
 	IndexResponseModel,
@@ -8,6 +7,10 @@ import type {
 	PagedSearcherResponseModel,
 	PagedSearchResultResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
+
+const searchResultMockData = dataSet.examineSearchResults;
+const getIndexByName = dataSet.examineGetIndexByName;
+const PagedIndexers = dataSet.examinePagedIndexers;
 
 export const handlers = [
 	http.get(umbracoPath('/indexer'), () => {

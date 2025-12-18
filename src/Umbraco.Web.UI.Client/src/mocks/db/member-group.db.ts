@@ -1,6 +1,8 @@
 import { queryFilter } from '../utils.js';
-import type { UmbMockMemberGroupModel } from '../data/member-group.data.js';
-import { data } from '../data/member-group.data.js';
+import type { UmbMockMemberGroupModel } from '../data/sets/index.js';
+import { dataSet } from '../data/sets/index.js';
+
+const data = dataSet.memberGroup;
 import { UmbEntityMockDbBase } from './utils/entity/entity-base.js';
 import { UmbMockEntityItemManager } from './utils/entity/entity-item.manager.js';
 import { UmbMockEntityDetailManager } from './utils/entity/entity-detail.manager.js';

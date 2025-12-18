@@ -1,12 +1,4 @@
-import type {
-	FileSystemTreeItemPresentationModel,
-	StylesheetItemResponseModel,
-	StylesheetResponseModel,
-} from '@umbraco-cms/backoffice/external/backend-api';
-
-export type UmbMockStylesheetModel = StylesheetResponseModel &
-	FileSystemTreeItemPresentationModel &
-	StylesheetItemResponseModel;
+import type { UmbMockStylesheetModel } from '../../types/mock-data-set.types.js';
 
 export const data: Array<UmbMockStylesheetModel> = [
 	{

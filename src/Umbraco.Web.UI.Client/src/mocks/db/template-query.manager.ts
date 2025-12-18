@@ -1,4 +1,7 @@
-import { templateQueryResult, templateQuerySettings } from '../data/template.data.js';
+import { dataSet } from '../data/sets/index.js';
+
+const templateQueryResult = dataSet.templateQueryResult;
+const templateQuerySettings = dataSet.templateQuerySettings;
 
 export class UmbMockTemplateQueryManager {
 	constructor() {}

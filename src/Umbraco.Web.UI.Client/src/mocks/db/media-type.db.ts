@@ -1,5 +1,7 @@
-import type { UmbMockMediaTypeModel } from '../data/media-type.data.js';
-import { data } from '../data/media-type.data.js';
+import type { UmbMockMediaTypeModel } from '../data/sets/index.js';
+import { dataSet } from '../data/sets/index.js';
+
+const data = dataSet.mediaType;
 import { UmbEntityMockDbBase } from './utils/entity/entity-base.js';
 import { UmbMockEntityFolderManager } from './utils/entity/entity-folder.manager.js';
 import { UmbMockEntityTreeManager } from './utils/entity/entity-tree.manager.js';

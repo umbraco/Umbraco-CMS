@@ -1,5 +1,7 @@
-import { data } from '../data/document-blueprint.data.js';
-import type { UmbMockDocumentBlueprintModel } from '../data/document-blueprint.data.js';
+import type { UmbMockDocumentBlueprintModel } from '../data/sets/index.js';
+import { dataSet } from '../data/sets/index.js';
+
+const data = dataSet.documentBlueprint;
 import { UmbMockEntityTreeManager } from './utils/entity/entity-tree.manager.js';
 import { UmbMockEntityItemManager } from './utils/entity/entity-item.manager.js';
 import { UmbMockEntityDetailManager } from './utils/entity/entity-detail.manager.js';

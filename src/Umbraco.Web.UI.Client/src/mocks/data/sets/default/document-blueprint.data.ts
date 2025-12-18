@@ -1,13 +1,5 @@
-import {
-	DocumentVariantStateModel,
-	type DocumentBlueprintItemResponseModel,
-	type DocumentBlueprintResponseModel,
-	type DocumentBlueprintTreeItemResponseModel,
-} from '@umbraco-cms/backoffice/external/backend-api';
-
-export type UmbMockDocumentBlueprintModel = DocumentBlueprintResponseModel &
-	DocumentBlueprintItemResponseModel &
-	DocumentBlueprintTreeItemResponseModel;
+import type { UmbMockDocumentBlueprintModel } from '../../types/mock-data-set.types.js';
+import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export const data: Array<UmbMockDocumentBlueprintModel> = [
 	{

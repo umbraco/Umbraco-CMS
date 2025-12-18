@@ -1,12 +1,6 @@
+import type { UmbMockDocumentModel } from '../../types/mock-data-set.types.js';
 import { data as permissionsTestData } from './document-permissions-test.data.js';
-import type {
-	DocumentItemResponseModel,
-	DocumentResponseModel,
-	DocumentTreeItemResponseModel,
-} from '@umbraco-cms/backoffice/external/backend-api';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
-
-export type UmbMockDocumentModel = DocumentResponseModel & DocumentTreeItemResponseModel & DocumentItemResponseModel;
 
 export const data: Array<UmbMockDocumentModel> = [
 	{

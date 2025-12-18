@@ -1,11 +1,6 @@
-import type {
-	UserItemResponseModel,
-	UserResponseModel,
-	UserTwoFactorProviderModel,
-} from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbMockUserModel } from '../../types/mock-data-set.types.js';
+import type { UserTwoFactorProviderModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UserKindModel, UserStateModel } from '@umbraco-cms/backoffice/external/backend-api';
-
-export type UmbMockUserModel = UserResponseModel & UserItemResponseModel;
 
 export const data: Array<UmbMockUserModel> = [
 	{

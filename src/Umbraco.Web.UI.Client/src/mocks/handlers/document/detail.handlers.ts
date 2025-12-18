@@ -1,7 +1,7 @@
 const { http, HttpResponse } = window.MockServiceWorker;
-import type { UmbMockDocumentModel } from '../../data/document/document.data.js';
+import type { UmbMockDocumentModel } from '../../data/sets/index.js';
+import { dataSet } from '../../data/sets/index.js';
 import { umbDocumentMockDb } from '../../db/document.db.js';
-import { items as referenceData } from '../../data/tracked-reference.data.js';
 import { UMB_SLUG } from './slug.js';
 import type {
 	CreateDocumentRequestModel,
@@ -12,6 +12,8 @@ import type {
 	UpdateDocumentRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
+
+const referenceData = dataSet.trackedReferenceItems;
 
 export const detailHandlers = [
 	http.post(umbracoPath(`${UMB_SLUG}`), async ({ request }) => {

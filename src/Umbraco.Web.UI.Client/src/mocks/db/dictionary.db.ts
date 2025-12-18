@@ -1,5 +1,7 @@
-import type { UmbMockDictionaryModel } from '../data/dictionary.data.js';
-import { data } from '../data/dictionary.data.js';
+import type { UmbMockDictionaryModel } from '../data/sets/index.js';
+import { dataSet } from '../data/sets/index.js';
+
+const data = dataSet.dictionary;
 import { UmbMockEntityTreeManager } from './utils/entity/entity-tree.manager.js';
 import { UmbMockEntityItemManager } from './utils/entity/entity-item.manager.js';
 import { UmbMockEntityDetailManager } from './utils/entity/entity-detail.manager.js';

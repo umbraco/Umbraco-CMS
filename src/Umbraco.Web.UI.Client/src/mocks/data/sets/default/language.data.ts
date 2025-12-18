@@ -1,6 +1,4 @@
-import type { LanguageItemResponseModel, LanguageResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-
-export type UmbMockLanguageModel = LanguageResponseModel & LanguageItemResponseModel;
+import type { UmbMockLanguageModel } from '../../types/mock-data-set.types.js';
 
 export const data: Array<UmbMockLanguageModel> = [
 	{

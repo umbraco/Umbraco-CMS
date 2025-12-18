@@ -1,6 +1,8 @@
 const { http, HttpResponse, delay } = window.MockServiceWorker;
-import { data as news } from '../data/umbraco-news.data.js';
+import { dataSet } from '../data/sets/index.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
+
+const news = dataSet.news;
 
 export const handlers = [
 	http.get(umbracoPath('/news-dashboard'), async () => {

@@ -1,4 +1,4 @@
-import type { UmbMockDocumentModel } from './document.data.js';
+import type { UmbMockDocumentModel } from '../../types/mock-data-set.types.js';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 const permissionsTestDocument = {
