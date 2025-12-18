@@ -75,6 +75,16 @@ internal interface IDatabaseCacheRepository
     IEnumerable<Guid> GetDocumentKeysByContentTypeKeys(IEnumerable<Guid> keys, bool published = false);
 
     /// <summary>
+    /// Gets content keys and their draft/published status for specific document types.
+    /// </summary>
+    /// <param name="contentTypeKeys">The document type keys to find content for.</param>
+    /// <returns>Tuples of content key and whether the cache entry is a draft.</returns>
+    // TODO (V18): Remove the default implementation on this method.
+    IEnumerable<(Guid Key, bool IsDraft)> GetDocumentKeysWithPublishedStatus(IEnumerable<Guid> contentTypeKeys)
+        => GetContentByContentTypeKey(contentTypeKeys, ContentCacheDataSerializerEntityType.Document)
+            .Select(x => (x.Key, x.IsDraft));
+
+    /// <summary>
     /// Refreshes the cache for the given document cache node.
     /// </summary>
     Task RefreshContentAsync(ContentCacheNode contentCacheNode, PublishedState publishedState);

@@ -4,7 +4,9 @@
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
@@ -16,7 +18,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.PublishedCache.HybridCache;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, PublishedRepositoryEvents = true)]
-internal sealed class DocumentCacheServiceRebuildTests : UmbracoIntegrationTestWithContent
+internal sealed class DocumentCacheServiceTests : UmbracoIntegrationTestWithContent
 {
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
@@ -32,7 +34,7 @@ internal sealed class DocumentCacheServiceRebuildTests : UmbracoIntegrationTestW
     private IDocumentCacheService DocumentCacheService => GetRequiredService<IDocumentCacheService>();
 
     [Test]
-    public void Rebuild_Creates_CmsContentNu_Records_For_ContentType()
+    public void Rebuild_Creates_Document_Database_Cache_Records_For_Document_Type()
     {
         // Arrange - Content is created in base class Setup()
         // The base class creates: Textpage, Subpage, Subpage2, Subpage3 (all using ContentType)
@@ -40,7 +42,7 @@ internal sealed class DocumentCacheServiceRebuildTests : UmbracoIntegrationTestW
         // - publish the root page to ensure we have published and draft content
         ContentService.Publish(Textpage, ["*"]);
 
-        // Act - Call Rebuild for the ContentType
+        // Act - Call Rebuild for the document type
         DocumentCacheService.Rebuild([ContentType.Id]);
 
         // Assert - Verify cmsContentNu table has records for the content items
@@ -77,11 +79,15 @@ internal sealed class DocumentCacheServiceRebuildTests : UmbracoIntegrationTestW
             // Verify cache data is not empty
             var textpageDto = dtos.First(d => d.NodeId == Textpage.Id);
             Assert.That(textpageDto.Data, Is.Not.Null.And.Not.Empty, "Cache data should not be empty");
+
+            // Verify the cached data is correct across refactorings and optimizations.
+            const string ExpectedJson = "{\"pd\":{\"title\":[{\"c\":\"\",\"s\":\"\",\"v\":\"Welcome to our Home page\"}],\"bodyText\":[{\"c\":\"\",\"s\":\"\",\"v\":\"This is the welcome message on the first page\"}],\"author\":[{\"c\":\"\",\"s\":\"\",\"v\":\"John Doe\"}]},\"cd\":{},\"us\":\"textpage\"}";
+            Assert.That(textpageDto.Data, Is.EqualTo(ExpectedJson), "Cache data does not match expected JSON");
         }
     }
 
     [Test]
-    public void Rebuild_Replaces_Existing_CmsContentNu_Records()
+    public void Rebuild_Replaces_Existing_Document_Database_Cache_Records()
     {
         // Arrange - First rebuild to create initial records
         DocumentCacheService.Rebuild([ContentType.Id]);

@@ -342,24 +342,29 @@ internal sealed class DocumentCacheService : IDocumentCacheService
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
         _databaseCacheRepository.Rebuild(contentTypeIds.ToList());
-        RebuildMemoryCacheByContentTypeAsync(contentTypeIds).GetAwaiter().GetResult();
         scope.Complete();
+
+        RebuildMemoryCacheByContentTypeAsync(contentTypeIds).GetAwaiter().GetResult();
     }
 
     public async Task RebuildMemoryCacheByContentTypeAsync(IEnumerable<int> contentTypeIds)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope();
-
-        IEnumerable<ContentCacheNode> contentByContentTypeKey = _databaseCacheRepository.GetContentByContentTypeKey(contentTypeIds.Select(x => _idKeyMap.GetKeyForId(x, UmbracoObjectTypes.DocumentType).Result), ContentCacheDataSerializerEntityType.Document);
-        scope.Complete();
-
-        foreach (ContentCacheNode content in contentByContentTypeKey)
+        // Use lightweight query to get only keys and draft status - avoids loading all serialized data.
+        IReadOnlyList<(Guid Key, bool IsDraft)> contentKeys;
+        using (ICoreScope scope = _scopeProvider.CreateCoreScope())
         {
-            await _hybridCache.RemoveAsync(GetCacheKey(content.Key, true));
+            contentKeys = _databaseCacheRepository.GetDocumentKeysWithPublishedStatus(
+                contentTypeIds.Select(x => _idKeyMap.GetKeyForId(x, UmbracoObjectTypes.DocumentType).Result)).ToList();
+            scope.Complete();
+        }
 
-            if (content.IsDraft is false)
+        foreach ((Guid key, bool isDraft) in contentKeys)
+        {
+            await _hybridCache.RemoveAsync(GetCacheKey(key, true));
+
+            if (isDraft is false)
             {
-                await ClearPublishedCacheAsync(content.Key);
+                await ClearPublishedCacheAsync(key);
             }
         }
     }
