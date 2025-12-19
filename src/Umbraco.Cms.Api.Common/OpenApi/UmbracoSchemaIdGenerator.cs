@@ -3,22 +3,19 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Common.OpenApi;
 
-// NOTE: Left unsealed on purpose, so it is extendable.
-public class SchemaIdHandler : ISchemaIdHandler
+/// <summary>
+/// Static utility for generating OpenAPI schema IDs following Umbraco's naming conventions.
+/// </summary>
+public static class UmbracoSchemaIdGenerator
 {
-    public virtual bool CanHandle(Type type)
-        => type.Namespace?.StartsWith("Umbraco.Cms") is true;
-
-    public virtual string Handle(Type type)
-        => UmbracoSchemaId(type);
-
     /// <summary>
-    ///     Generates a sanitized and consistent schema identifier for a given type following Umbraco's schema id naming conventions.
+    /// Generates a schema ID for the specified type following Umbraco's naming conventions.
     /// </summary>
-    protected string UmbracoSchemaId(Type type)
+    /// <param name="type">The type to generate a schema ID for.</param>
+    /// <returns>The generated schema ID.</returns>
+    public static string Generate(Type type)
     {
         var name = SanitizedTypeName(type);
-
         name = HandleGenerics(name, type);
 
         if (name.EndsWith("Model") == false)
@@ -32,13 +29,13 @@ public class SchemaIdHandler : ISchemaIdHandler
         return Regex.Replace(name, @"[^\w]", string.Empty);
     }
 
-    private string SanitizedTypeName(Type t) => t.Name
+    private static string SanitizedTypeName(Type t) => t.Name
         // first grab the "non-generic" part of any generic type name (i.e. "PagedViewModel`1" becomes "PagedViewModel")
         .Split('`').First()
         // then remove the "ViewModel" postfix from type names
         .TrimEnd("ViewModel");
 
-    private string HandleGenerics(string name, Type type)
+    private static string HandleGenerics(string name, Type type)
     {
         if (!type.IsGenericType)
         {

@@ -13,13 +13,6 @@ namespace Umbraco.Cms.Api.Management.OpenApi;
 /// </summary>
 internal sealed class NotificationHeaderTransformer : IOpenApiOperationTransformer
 {
-    private readonly ISchemaIdSelector _schemaIdSelector;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="NotificationHeaderTransformer"/> class.
-    /// </summary>
-    /// <param name="schemaIdSelector">The schema ID selector.</param>
-    public NotificationHeaderTransformer(ISchemaIdSelector schemaIdSelector) => _schemaIdSelector = schemaIdSelector;
 
     /// <inheritdoc/>
     public async Task TransformAsync(
@@ -49,7 +42,7 @@ internal sealed class NotificationHeaderTransformer : IOpenApiOperationTransform
         }
 
         Type eventMessageType = typeof(EventMessageType);
-        var eventMessageTypeSchemaId = _schemaIdSelector.SchemaId(eventMessageType);
+        var eventMessageTypeSchemaId = UmbracoSchemaIdGenerator.Generate(eventMessageType);
         if (context.Document?.Components?.Schemas?.ContainsKey(eventMessageTypeSchemaId) != true)
         {
             // Ensure the EventMessageType schema is registered and doesn't get inlined
@@ -60,7 +53,7 @@ internal sealed class NotificationHeaderTransformer : IOpenApiOperationTransform
         }
 
         Type notificationHeaderModelType = typeof(NotificationHeaderModel);
-        var notificationHeaderSchemaId = _schemaIdSelector.SchemaId(notificationHeaderModelType);
+        var notificationHeaderSchemaId = UmbracoSchemaIdGenerator.Generate(notificationHeaderModelType);
         if (context.Document?.Components?.Schemas?.ContainsKey(notificationHeaderSchemaId) != true)
         {
             OpenApiSchema notificationHeaderSchema = await context.GetOrCreateSchemaAsync(

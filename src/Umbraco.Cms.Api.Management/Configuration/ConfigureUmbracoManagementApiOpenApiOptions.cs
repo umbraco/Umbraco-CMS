@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.OpenApi;
 using Umbraco.Cms.Api.Common.Configuration;
-using Umbraco.Cms.Api.Common.OpenApi;
 using Umbraco.Cms.Api.Management.DependencyInjection;
 using Umbraco.Cms.Api.Management.Extensions;
 using Umbraco.Cms.Api.Management.OpenApi;
@@ -12,15 +11,6 @@ namespace Umbraco.Cms.Api.Management.Configuration;
 /// </summary>
 public class ConfigureUmbracoManagementApiOpenApiOptions : ConfigureUmbracoOpenApiOptionsBase
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ConfigureUmbracoManagementApiOpenApiOptions"/> class.
-    /// </summary>
-    /// <param name="schemaIdSelector">The schema ID selector.</param>
-    public ConfigureUmbracoManagementApiOpenApiOptions(ISchemaIdSelector schemaIdSelector)
-        : base(schemaIdSelector)
-    {
-    }
-
     /// <inheritdoc />
     protected override string ApiName => ManagementApiConfiguration.ApiName;
 
