@@ -67,7 +67,7 @@ test.afterEach(async ({umbracoApi}) => {
 });
 
 test.describe('fetch a content item by id', () => {
-  test('can fetch an content item at root by its id', async ({umbracoApi}) => {
+  test('can fetch an content item at root', async ({umbracoApi}) => {
     // Arrange
     const contentName = publishInvariantRootContent;
     const publishInvariantRootId = await umbracoApi.document.createDefaultDocument(contentName, invariantDocTypeId);
@@ -88,7 +88,7 @@ test.describe('fetch a content item by id', () => {
     await umbracoApi.document.ensureNameNotExists(contentName);
   });
 
-  test('can fetch a child content item by its id', async ({umbracoApi}) => {
+  test('can fetch a child content item', async ({umbracoApi}) => {
     // Arrange
     const contentName = childPublishInvariantContentPrefix + '2';
     const childId = await umbracoApi.document.createDefaultDocumentWithParent(contentName, invariantDocTypeId, publishInvariantParentId);
@@ -109,7 +109,7 @@ test.describe('fetch a content item by id', () => {
     await umbracoApi.document.ensureNameNotExists(contentName);
   });
 
-  test('can fetch a content item that has children by its id', async ({umbracoApi}) => {
+  test('can fetch a content item that has children', async ({umbracoApi}) => {
     // Arrange
     const contentName = publishInvariantParentContent;
     // Create child items
@@ -135,7 +135,7 @@ test.describe('fetch a content item by id', () => {
     }
   });
 
-  test('cannot fetch an unpublished content item without preview by its id', async ({umbracoApi}) => {
+  test('cannot fetch an unpublished content item without preview', async ({umbracoApi}) => {
     // Arrange
     const contentName = unpublishInvariantRootContent;
     await umbracoApi.document.createDefaultDocument(contentName, invariantDocTypeId);
@@ -242,7 +242,7 @@ test.describe('fetch a content item by id', () => {
     await umbracoApi.documentType.ensureNameNotExists(invariantDocumentTypeWithMultiUrlPicker);
   });
 
-  test('can fetch a variant content item by its id', async ({umbracoApi}) => {
+  test('can fetch a variant content item', async ({umbracoApi}) => {
     // Arrange
     const contentName = publishVariantRootContent;
     const textStringDataType = await umbracoApi.dataType.getByName(textstringDataTypeName);
@@ -279,7 +279,7 @@ test.describe('fetch a content item by id', () => {
 });
 
 test.describe('fetch a content item by route', () => {
-  test('can fetch a content item by its route', async ({umbracoApi}) => {
+  test('can fetch a content item', async ({umbracoApi}) => {
     // Arrange
     const contentName = publishInvariantRootContent;
     const publishInvariantRootId = await umbracoApi.document.createDefaultDocument(contentName, invariantDocTypeId);
@@ -301,7 +301,7 @@ test.describe('fetch a content item by route', () => {
     await umbracoApi.document.ensureNameNotExists(contentName);
   });
 
-  test('can fetch a child content item by its route', async ({umbracoApi}) => {
+  test('can fetch a child content item', async ({umbracoApi}) => {
     // Arrange
     const contentName = childPublishInvariantContentPrefix + '1';
     const childId = await umbracoApi.document.createDefaultDocumentWithParent(contentName, invariantDocTypeId, publishInvariantParentId);
@@ -323,14 +323,13 @@ test.describe('fetch a content item by route', () => {
     await umbracoApi.document.ensureNameNotExists(contentName);
   });
 
-  test('can fetch a content item by its route with special character', async ({umbracoApi}) => {
+  test('can fetch a content item with a special character route', async ({umbracoApi}) => {
     // Arrange
     const contentName = publishInvariantContentWithSpecialCharacters;
     const publishInvariantContentWithSpecialCharactersId = await umbracoApi.document.createDefaultDocument(contentName, invariantDocTypeId);
     await umbracoApi.document.publish(publishInvariantContentWithSpecialCharactersId);
     const contentData = await umbracoApi.document.getByName(contentName);
     const contentURL = await umbracoApi.document.getDocumentUrl(contentData.id);
-
     // Act
     const contentItem = await umbracoApi.contentDeliveryApi.getContentItemWithId(contentURL);
 
@@ -358,7 +357,7 @@ test.describe('fetch a content item by route', () => {
 });
 
 test.describe('fetch content items by ids', () => {
-  test('can fetch multiple content items by their IDs', async ({umbracoApi}) => {
+  test('can fetch multiple content items', async ({umbracoApi}) => {
     // Arrange
     const contentName1 = publishInvariantRootContent;
     const publishInvariantRootId = await umbracoApi.document.createDefaultDocument(contentName1, invariantDocTypeId);
@@ -391,7 +390,7 @@ test.describe('fetch content items by ids', () => {
     await umbracoApi.document.ensureNameNotExists(contentName1);
   });
 
-  test('returns only valid content items when some IDs are invalid', async ({umbracoApi}) => {
+  test('returns only valid content items when some ids are invalid', async ({umbracoApi}) => {
     // Arrange
     const contentName = childPublishInvariantContentPrefix + '4';
     const childId = await umbracoApi.document.createDefaultDocumentWithParent(contentName, invariantDocTypeId, publishInvariantParentId);
@@ -416,7 +415,7 @@ test.describe('fetch content items by ids', () => {
     await umbracoApi.document.ensureNameNotExists(contentName);
   });
 
-  test('returns only published content items when some IDs are unpublished', async ({umbracoApi}) => {
+  test('returns only published content items when some ids are unpublished', async ({umbracoApi}) => {
     // Arrange
     const contentName = publishInvariantRootContent;
     const publishInvariantRootId = await umbracoApi.document.createDefaultDocument(contentName, invariantDocTypeId);
