@@ -44,7 +44,7 @@ test('can create content with the document link', {tag: '@release'}, async ({umb
   await umbracoUi.content.clickDocumentLinkButton();
   await umbracoUi.content.selectLinkByName(linkedDocumentName);
   await umbracoUi.content.clickChooseModalButton();
-  await umbracoUi.content.clickAddButton();
+  await umbracoUi.content.clickLinkPickerAddButton();
   await umbracoUi.content.clickSaveButton();
 
   // Assert
@@ -85,7 +85,7 @@ test('can publish content with the document link', async ({umbracoApi, umbracoUi
   await umbracoUi.content.selectLinkByName(linkedDocumentName);
   await umbracoUi.waitForTimeout(500); // Wait for the document link to be selected
   await umbracoUi.content.clickButtonWithName('Choose');
-  await umbracoUi.content.clickAddButton();
+  await umbracoUi.content.clickLinkPickerAddButton();
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
@@ -106,7 +106,7 @@ test('can publish content with the document link', async ({umbracoApi, umbracoUi
   await umbracoApi.document.ensureNameNotExists(linkedDocumentName);
 });
 
-test('can create content with the external link', async ({umbracoApi, umbracoUi}) => {
+test('can create content with the manual link with title', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.goToBackOffice();
@@ -118,7 +118,7 @@ test('can create content with the external link', async ({umbracoApi, umbracoUi}
   await umbracoUi.content.clickManualLinkButton();
   await umbracoUi.content.enterLink(link);
   await umbracoUi.content.enterLinkTitle(linkTitle);
-  await umbracoUi.content.clickAddButton();
+  await umbracoUi.content.clickLinkPickerAddButton();
   await umbracoUi.content.clickSaveButton();
 
   // Assert
@@ -147,9 +147,9 @@ test('can create content with the media link', async ({umbracoApi, umbracoUi}) =
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickAddMultiURLPickerButton();
   await umbracoUi.content.clickMediaLinkButton();
-  await umbracoUi.content.selectMediaWithName(mediaFileName);
+  await umbracoUi.content.selectMediaWithName(mediaFileName, true);
   await umbracoUi.content.clickChooseModalButton();
-  await umbracoUi.content.clickAddButton();
+  await umbracoUi.content.clickLinkPickerAddButton();
   await umbracoUi.content.clickSaveButton();
 
   // Assert
@@ -169,6 +169,7 @@ test('can create content with the media link', async ({umbracoApi, umbracoUi}) =
 
 test('can add multiple links in the content', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   // Create a media to pick
   const mediaFileName = 'TestMediaFileForContent';
   await umbracoApi.media.ensureNameNotExists(mediaFileName);
@@ -181,16 +182,16 @@ test('can add multiple links in the content', {tag: '@release'}, async ({umbraco
   // Add media link
   await umbracoUi.content.clickAddMultiURLPickerButton();
   await umbracoUi.content.clickMediaLinkButton();
-  await umbracoUi.content.selectMediaWithName(mediaFileName);
+  await umbracoUi.content.selectMediaWithName(mediaFileName, true);
   await umbracoUi.content.clickChooseModalButton();
-  await umbracoUi.content.clickAddButton();
+  await umbracoUi.content.clickLinkPickerAddButton();
   await umbracoUi.waitForTimeout(500); // Wait for the media link to be added
   // Add external link
   await umbracoUi.content.clickAddMultiURLPickerButton();
   await umbracoUi.content.clickManualLinkButton();
   await umbracoUi.content.enterLink(link);
   await umbracoUi.content.enterLinkTitle(linkTitle);
-  await umbracoUi.content.clickAddButton();
+  await umbracoUi.content.clickLinkPickerAddButton();
   await umbracoUi.content.clickSaveButton();
 
   // Assert
@@ -278,7 +279,7 @@ test('can create content with the link to an unpublished document', async ({umbr
   await umbracoUi.content.clickDocumentLinkButton();
   await umbracoUi.content.selectLinkByName(linkedDocumentName);
   await umbracoUi.content.clickButtonWithName('Choose');
-  await umbracoUi.content.clickAddButton();
+  await umbracoUi.content.clickLinkPickerAddButton();
   await umbracoUi.content.clickSaveButton();
 
   // Assert
@@ -313,30 +314,92 @@ test('cannot add link when no source tab is selected', async ({umbracoApi, umbra
   await umbracoUi.content.isLinkPickerAddButtonDisabled();
 });
 
-test('can see add button state update correctly when switching between tabs', async ({umbracoApi, umbracoUi}) => {
+test('can close dialog without saving link', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
-  // Act & Assert
+  // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickAddMultiURLPickerButton();
-
-  // Initially Add button should be disabled (no tab selected)
-  await umbracoUi.content.isLinkPickerAddButtonDisabled();
-
-  // Click Manual tab and enter URL - Add button should be enabled
   await umbracoUi.content.clickManualLinkButton();
   await umbracoUi.content.enterLink(link);
-  await umbracoUi.content.isLinkPickerAddButtonEnabled();
+  await umbracoUi.content.enterLinkTitle(linkTitle);
+  await umbracoUi.content.clickLinkPickerCloseButton();
+  await umbracoUi.content.clickSaveButton();
 
-  // Click Content tab (without selecting content) - Add button should be disabled
-  await umbracoUi.content.clickDocumentLinkButton();
+  // Assert
+  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
+  const contentData = await umbracoApi.document.getByName(contentName);
+  // Verify no link was added since dialog was closed without clicking Add
+  expect(contentData.values).toEqual([]);
+});
+
+test('can reset manual URL using remove button', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickAddMultiURLPickerButton();
+  await umbracoUi.content.clickManualLinkButton();
+  await umbracoUi.content.enterLink(link);
+  // Click remove button to reset URL
+  await umbracoUi.content.clickRemoveExactButton();
+  await umbracoUi.content.clickConfirmToResetButton();
+
+  // Assert
   await umbracoUi.content.isLinkPickerAddButtonDisabled();
 });
 
-test.describe('Manual Tab Validation Tests', () => {
+test('can create content with special characters in title field', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const customTitle = 'Custom Link Title with Special Characters !@#$%^&*()';
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickAddMultiURLPickerButton();
+  await umbracoUi.content.clickManualLinkButton();
+  await umbracoUi.content.enterLink(link);
+  await umbracoUi.content.enterLinkTitle(customTitle);
+  await umbracoUi.content.clickLinkPickerAddButton();
+  await umbracoUi.content.clickSaveButton();
+
+  // Assert
+  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.values[0].value[0].name).toEqual(customTitle);
+});
+
+test('can create content with target toggle enabled to open link in new window', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickAddMultiURLPickerButton();
+  await umbracoUi.content.clickManualLinkButton();
+  await umbracoUi.content.enterLink(link);
+  await umbracoUi.content.enterLinkTitle(linkTitle);
+  await umbracoUi.content.clickLinkPickerTargetToggle();
+  await umbracoUi.content.clickLinkPickerAddButton();
+  await umbracoUi.content.clickSaveButton();
+
+  // Assert
+  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.values[0].value[0].target).toEqual('_blank');
+});
+
+test.describe('manual tab validation tests', () => {
   test('cannot create content with empty manual url and anchor', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
@@ -349,7 +412,7 @@ test.describe('Manual Tab Validation Tests', () => {
     await umbracoUi.content.clickManualLinkButton();
     await umbracoUi.content.enterLink('');
     await umbracoUi.content.enterAnchorOrQuerystring('');
-    await umbracoUi.content.clickAddButton();
+    await umbracoUi.content.clickLinkPickerAddButton();
 
     // Assert
     await umbracoUi.content.doesPropertyWithNameContainValidationMessage(manualPropertyName, ConstantHelper.validationMessages.emptyManualLinkPicker);
@@ -369,7 +432,7 @@ test.describe('Manual Tab Validation Tests', () => {
     // Leave both fields empty first to trigger validation
     await umbracoUi.content.enterLink('');
     await umbracoUi.content.enterAnchorOrQuerystring('');
-    await umbracoUi.content.clickAddButton();
+    await umbracoUi.content.clickLinkPickerAddButton();
     // Verify validation messages appear
     await umbracoUi.content.doesPropertyWithNameContainValidationMessage(manualPropertyName, ConstantHelper.validationMessages.emptyManualLinkPicker);
     await umbracoUi.content.doesPropertyWithNameContainValidationMessage(anchorOrQuerystringPropertyName, ConstantHelper.validationMessages.emptyManualLinkPicker);
@@ -394,7 +457,7 @@ test.describe('Manual Tab Validation Tests', () => {
     // Leave both fields empty first to trigger validation
     await umbracoUi.content.enterLink('');
     await umbracoUi.content.enterAnchorOrQuerystring('');
-    await umbracoUi.content.clickAddButton();
+    await umbracoUi.content.clickLinkPickerAddButton();
     // Verify validation messages appear
     await umbracoUi.content.doesPropertyWithNameContainValidationMessage(manualPropertyName, ConstantHelper.validationMessages.emptyManualLinkPicker);
     await umbracoUi.content.doesPropertyWithNameContainValidationMessage(anchorOrQuerystringPropertyName, ConstantHelper.validationMessages.emptyManualLinkPicker);
@@ -418,7 +481,7 @@ test.describe('Manual Tab Validation Tests', () => {
     await umbracoUi.content.clickManualLinkButton();
     await umbracoUi.content.enterLink(link);
     // Leave Anchor empty
-    await umbracoUi.content.clickAddButton();
+    await umbracoUi.content.clickLinkPickerAddButton();
     await umbracoUi.content.clickSaveButton();
 
     // Assert
@@ -443,7 +506,7 @@ test.describe('Manual Tab Validation Tests', () => {
     await umbracoUi.content.clickManualLinkButton();
     // Leave URL empty
     await umbracoUi.content.enterAnchorOrQuerystring(anchorValue);
-    await umbracoUi.content.clickAddButton();
+    await umbracoUi.content.clickLinkPickerAddButton();
     await umbracoUi.content.clickSaveButton();
 
     // Assert
@@ -467,7 +530,7 @@ test.describe('Manual Tab Validation Tests', () => {
     await umbracoUi.content.clickManualLinkButton();
     await umbracoUi.content.enterLink(link);
     await umbracoUi.content.enterAnchorOrQuerystring(querystringValue);
-    await umbracoUi.content.clickAddButton();
+    await umbracoUi.content.clickLinkPickerAddButton();
     await umbracoUi.content.clickSaveButton();
 
     // Assert
