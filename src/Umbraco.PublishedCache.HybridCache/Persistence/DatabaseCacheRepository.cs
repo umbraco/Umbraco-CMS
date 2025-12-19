@@ -403,8 +403,8 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         // Pre-fetch all languages for culture code lookup.
         Dictionary<short, string> languageMap = GetLanguageMap();
 
-        // Pre-fetch property aliases for all relevant content types (including compositions).
-        Dictionary<int, List<string>> propertyAliasesByContentType = GetPropertyAliasesByContentType(contentTypeIds);
+        // Pre-fetch property info (aliases and variations) for all relevant content types (including compositions).
+        Dictionary<int, List<PropertyTypeInfo>> propertyInfoByContentType = GetPropertyInfoByContentType(contentTypeIds);
 
         long processed = 0;
         long pageIndex = 0;
@@ -436,7 +436,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
                     documentCultureDtos,
                     contentTypeVariations,
                     languageMap,
-                    propertyAliasesByContentType,
+                    propertyInfoByContentType,
                     serializer))
                 .ToList();
 
@@ -618,18 +618,20 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         List<CacheRebuildDocumentCultureDto> allDocumentCultureDtos,
         Dictionary<int, byte> contentTypeVariations,
         Dictionary<short, string> languageMap,
-        Dictionary<int, List<string>> propertyAliasesByContentType,
+        Dictionary<int, List<PropertyTypeInfo>> propertyInfoByContentType,
         IContentCacheDataSerializer serializer)
     {
         var results = new List<ContentNuDto>(2);
 
         // Get content type variation.
-        var variesByCulture = contentTypeVariations.TryGetValue(content.ContentTypeId, out var variations)
-            && (variations & (byte)ContentVariation.Culture) > 0;
+        byte contentTypeVariation = contentTypeVariations.TryGetValue(content.ContentTypeId, out var variations)
+            ? variations
+            : (byte)0;
+        var variesByCulture = (contentTypeVariation & (byte)ContentVariation.Culture) > 0;
 
-        // Get property aliases for this content type (including compositions).
-        List<string> propertyAliases = propertyAliasesByContentType.TryGetValue(content.ContentTypeId, out List<string>? aliases)
-            ? aliases
+        // Get property info for this content type (including compositions).
+        List<PropertyTypeInfo> propertyTypes = propertyInfoByContentType.TryGetValue(content.ContentTypeId, out List<PropertyTypeInfo>? props)
+            ? props
             : [];
 
         // Filter data for this content's versions.
@@ -640,7 +642,8 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         Dictionary<string, PropertyData[]> editPropertyData = BuildPropertyDataDictionary(
             allPropertyDtos.Where(p => p.VersionId == editVersionId),
             languageMap,
-            propertyAliases);
+            propertyTypes,
+            contentTypeVariation);
 
         // Create culture data dictionary.
         Dictionary<string, CultureVariation> editCultureData = variesByCulture
@@ -676,7 +679,8 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
             Dictionary<string, PropertyData[]> pubPropertyData = BuildPropertyDataDictionary(
                 allPropertyDtos.Where(p => p.VersionId == publishedVersionId.Value),
                 languageMap,
-                propertyAliases);
+                propertyTypes,
+                contentTypeVariation);
 
             // Create culture data dictionary.
             Dictionary<string, CultureVariation> pubCultureData = variesByCulture
@@ -711,7 +715,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     }
 
     /// <summary>
-    /// Builds property data dictionary from property DTOs.
+    /// Builds property data dictionary from property DTOs for invariant content types (media/members).
     /// Includes empty arrays for all defined property aliases to match original serialization behavior.
     /// </summary>
     private Dictionary<string, PropertyData[]> BuildPropertyDataDictionary(
@@ -719,18 +723,48 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         Dictionary<short, string> languageMap,
         List<string> propertyAliases)
     {
+        // For media and members (invariant), create PropertyTypeInfo with no variations
+        var propertyTypes = propertyAliases
+            .Select(alias => new PropertyTypeInfo { Alias = alias, Variations = 0 })
+            .ToList();
+        return BuildPropertyDataDictionary(propertyDtos, languageMap, propertyTypes, contentTypeVariation: 0);
+    }
+
+    /// <summary>
+    /// Builds property data dictionary from property DTOs.
+    /// Includes empty arrays for all defined property aliases to match original serialization behavior.
+    /// Filters property values based on effective variation (content type variation AND property type variation).
+    /// </summary>
+    private static Dictionary<string, PropertyData[]> BuildPropertyDataDictionary(
+        IEnumerable<CacheRebuildPropertyDto> propertyDtos,
+        Dictionary<short, string> languageMap,
+        List<PropertyTypeInfo> propertyTypes,
+        byte contentTypeVariation)
+    {
         var result = new Dictionary<string, PropertyData[]>(StringComparer.OrdinalIgnoreCase);
 
+        // Build a lookup for property variations.
+        var propertyVariations = propertyTypes.ToDictionary(
+            p => p.Alias,
+            p => p.Variations,
+            StringComparer.OrdinalIgnoreCase);
+
         // Initialize all property aliases with empty arrays to match original serialization behavior.
-        foreach (var alias in propertyAliases)
+        foreach (PropertyTypeInfo prop in propertyTypes)
         {
-            result[alias] = [];
+            result[prop.Alias] = [];
         }
 
         IEnumerable<IGrouping<string, CacheRebuildPropertyDto>> grouped = propertyDtos.GroupBy(p => p.PropertyAlias);
 
         foreach (IGrouping<string, CacheRebuildPropertyDto> group in grouped)
         {
+            // Calculate effective variation for this property.
+            // A property only varies by culture if BOTH the content type AND the property type support it.
+            byte propertyVariation = propertyVariations.TryGetValue(group.Key, out var pv) ? pv : (byte)0;
+            var effectiveVariation = (byte)(contentTypeVariation & propertyVariation);
+            var effectivelyVariesByCulture = (effectiveVariation & (byte)ContentVariation.Culture) != 0;
+
             var propertyDataList = new List<PropertyData>();
 
             foreach (CacheRebuildPropertyDto? prop in group.OrderBy(p => GetCultureCode((short?)p.LanguageId, languageMap)))
@@ -738,12 +772,19 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
                 var value = GetPropertyValue(prop);
                 if (value != null)
                 {
-                    propertyDataList.Add(new PropertyData
+                    var cultureCode = GetCultureCode((short?)prop.LanguageId, languageMap);
+
+                    // If property is effectively invariant, only include values without a culture.
+                    // If property is effectively variant, include all values.
+                    if (effectivelyVariesByCulture || string.IsNullOrEmpty(cultureCode))
                     {
-                        Culture = GetCultureCode((short?)prop.LanguageId, languageMap),
-                        Segment = prop.Segment ?? string.Empty,
-                        Value = value,
-                    });
+                        propertyDataList.Add(new PropertyData
+                        {
+                            Culture = effectivelyVariesByCulture ? cultureCode : string.Empty,
+                            Segment = prop.Segment ?? string.Empty,
+                            Value = value,
+                        });
+                    }
                 }
             }
 
@@ -924,14 +965,13 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     }
 
     /// <summary>
-    /// Gets property type aliases grouped by content type ID, including inherited and composed properties.
-    /// Used for media and members.
+    /// Gets property type info (alias and variations) grouped by content type ID, including inherited and composed properties.
     /// </summary>
-    private Dictionary<int, List<string>> GetPropertyAliasesByContentType(IReadOnlyCollection<int> contentTypeIds)
+    private Dictionary<int, List<PropertyTypeInfo>> GetPropertyInfoByContentType(IReadOnlyCollection<int> contentTypeIds)
     {
         if (contentTypeIds.Count == 0)
         {
-            return new Dictionary<int, List<string>>();
+            return new Dictionary<int, List<PropertyTypeInfo>>();
         }
 
         // Get the composition hierarchy: which content types compose which other content types.
@@ -945,9 +985,9 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
             allContentTypeIds.UnionWith(compositions);
         }
 
-        // Get all property aliases for all relevant content types.
+        // Get all property info (alias and variations) for all relevant content types.
         Sql<ISqlContext> sql = Sql()
-            .Select<PropertyTypeDto>(x => x.Alias)
+            .Select<PropertyTypeDto>(x => x.Alias, x => x.Variations)
             .AndSelect<ContentTypeDto>(x => x.NodeId)
             .From<PropertyTypeDto>()
             .InnerJoin<ContentTypeDto>().On<PropertyTypeDto, ContentTypeDto>((pt, ct) => pt.ContentTypeId == ct.NodeId)
@@ -958,19 +998,24 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         // Group properties by the content type that defines them.
         var propertiesByDefiningType = results
             .GroupBy(x => x.ContentTypeId)
-            .ToDictionary(g => g.Key, g => g.Select(x => x.Alias).ToList());
+            .ToDictionary(
+                g => g.Key,
+                g => g.Select(x => new PropertyTypeInfo { Alias = x.Alias, Variations = x.Variations }).ToList());
 
         // Build the final result: for each requested content type, include its own properties
         // plus all properties from its compositions.
-        var result = new Dictionary<int, List<string>>();
+        var result = new Dictionary<int, List<PropertyTypeInfo>>();
         foreach (var contentTypeId in contentTypeIds)
         {
-            var allAliases = new HashSet<string>();
+            var allProperties = new Dictionary<string, PropertyTypeInfo>(StringComparer.OrdinalIgnoreCase);
 
             // Add direct properties.
-            if (propertiesByDefiningType.TryGetValue(contentTypeId, out List<string>? directAliases))
+            if (propertiesByDefiningType.TryGetValue(contentTypeId, out List<PropertyTypeInfo>? directProperties))
             {
-                allAliases.UnionWith(directAliases);
+                foreach (PropertyTypeInfo prop in directProperties)
+                {
+                    allProperties[prop.Alias] = prop;
+                }
             }
 
             // Add properties from compositions.
@@ -978,17 +1023,32 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
             {
                 foreach (var compositionId in compositionIds)
                 {
-                    if (propertiesByDefiningType.TryGetValue(compositionId, out List<string>? composedAliases))
+                    if (propertiesByDefiningType.TryGetValue(compositionId, out List<PropertyTypeInfo>? composedProperties))
                     {
-                        allAliases.UnionWith(composedAliases);
+                        foreach (PropertyTypeInfo prop in composedProperties)
+                        {
+                            allProperties[prop.Alias] = prop;
+                        }
                     }
                 }
             }
 
-            result[contentTypeId] = allAliases.ToList();
+            result[contentTypeId] = allProperties.Values.ToList();
         }
 
         return result;
+    }
+
+    /// <summary>
+    /// Gets property type aliases grouped by content type ID, including inherited and composed properties.
+    /// Used for media and members which don't need variation info.
+    /// </summary>
+    private Dictionary<int, List<string>> GetPropertyAliasesByContentType(IReadOnlyCollection<int> contentTypeIds)
+    {
+        Dictionary<int, List<PropertyTypeInfo>> propertyInfo = GetPropertyInfoByContentType(contentTypeIds);
+        return propertyInfo.ToDictionary(
+            kvp => kvp.Key,
+            kvp => kvp.Value.Select(p => p.Alias).ToList());
     }
 
     /// <summary>
@@ -1717,6 +1777,19 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
         [Column("nodeId")]
         public int ContentTypeId { get; set; }
+
+        [Column("variations")]
+        public byte Variations { get; set; }
+    }
+
+    /// <summary>
+    /// Property type information including alias and variation settings.
+    /// </summary>
+    private sealed class PropertyTypeInfo
+    {
+        public required string Alias { get; init; }
+
+        public byte Variations { get; init; }
     }
 
     /// <summary>
