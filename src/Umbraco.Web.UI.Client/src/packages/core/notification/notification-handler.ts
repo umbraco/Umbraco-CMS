@@ -64,6 +64,16 @@ export class UmbNotificationHandler<UmbNotificationData = UmbNotificationDefault
 	}
 
 	/**
+	 * Updates the notification color.
+	 * @param {UmbNotificationColor} color - The new color for the notification
+	 * @memberof UmbNotificationHandler
+	 */
+	public updateColor(color: UmbNotificationColor): void {
+		this.color = color;
+		this.element.color = color;
+	}
+
+	/**
 	 * @param {...any} args
 	 * @memberof UmbNotificationHandler
 	 */

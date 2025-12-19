@@ -48,6 +48,10 @@ describe('UmbNotificationHandler', () => {
 				expect(notificationHandler).to.have.property('updateData').that.is.a('function');
 			});
 
+			it('has an updateColor method', () => {
+				expect(notificationHandler).to.have.property('updateColor').that.is.a('function');
+			});
+
 			it('returns result from close method in onClose promise', () => {
 				notificationHandler.close('result value');
 
@@ -173,6 +177,50 @@ describe('UmbNotificationHandler', () => {
 
 			expect(layoutElement.data.message).to.equal('Only message, no headline');
 			expect(layoutElement.data.headline).to.be.undefined;
+		});
+	});
+
+	describe('updateColor', () => {
+		let handler: UmbNotificationHandler;
+
+		beforeEach(async () => {
+			const options: UmbNotificationOptions = {
+				color: 'warning',
+				data: {
+					message: 'Test message',
+				},
+			};
+			handler = new UmbNotificationHandler(options);
+		});
+
+		it('updates the color property on the handler', () => {
+			expect(handler.color).to.equal('warning');
+
+			handler.updateColor('positive');
+
+			expect(handler.color).to.equal('positive');
+		});
+
+		it('updates the color on the toast notification element', () => {
+			expect(handler.element.color).to.equal('warning');
+
+			handler.updateColor('danger');
+
+			expect(handler.element.color).to.equal('danger');
+		});
+
+		it('can change color multiple times', () => {
+			handler.updateColor('positive');
+			expect(handler.color).to.equal('positive');
+			expect(handler.element.color).to.equal('positive');
+
+			handler.updateColor('danger');
+			expect(handler.color).to.equal('danger');
+			expect(handler.element.color).to.equal('danger');
+
+			handler.updateColor('default');
+			expect(handler.color).to.equal('default');
+			expect(handler.element.color).to.equal('default');
 		});
 	});
 });
