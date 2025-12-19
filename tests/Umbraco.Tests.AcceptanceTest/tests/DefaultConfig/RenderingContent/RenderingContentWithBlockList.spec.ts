@@ -7,21 +7,20 @@ const documentTypeName = 'TestDocumentTypeForContent';
 // Template
 const templateName = 'TestTemplateForContent';
 let templateId: string;
-// Element Type
-const elementTypeName = 'BlockListElement';
-const elementGroupName = 'ElementGroup';
-let elementTypeId: string;
-let elementPropertyAlias: string;
 // Data Types
 const blockListDataTypeName = 'CustomBlockList';
 const textstringDataTypeName = 'Textstring';
 const elementPropertyEditorAlias = 'Umbraco.TextBox';
+// Element Type
+const elementTypeName = 'BlockListElement';
+const elementGroupName = 'ElementGroup';
+const elementPropertyAlias = AliasHelper.toAlias(textstringDataTypeName);
+let elementTypeId: string;
 // Other
 const noBlocksMessage = 'Test no block list mesage';
 
 test.beforeEach(async ({umbracoApi}) => {
   const textstringData = await umbracoApi.dataType.getByName(textstringDataTypeName);
-  elementPropertyAlias = AliasHelper.toAlias(textstringDataTypeName);
   elementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, elementGroupName, textstringDataTypeName, textstringData.id) || '';
   templateId = await umbracoApi.template.createTemplateWithDisplayingBlockListItems(templateName, blockListDataTypeName, elementPropertyAlias, noBlocksMessage);
 });
