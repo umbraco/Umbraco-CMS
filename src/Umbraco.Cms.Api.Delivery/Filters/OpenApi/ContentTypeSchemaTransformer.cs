@@ -34,6 +34,7 @@ public class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IOpenApiD
     /// <param name="contentTypeSchemaService">The content type info service.</param>
     /// <param name="schemaIdSelector">The schema ID selector.</param>
     /// <param name="jsonOptionsMonitor">The JSON options monitor.</param>
+    /// <param name="logger">The logger.</param>
     public ContentTypeSchemaTransformer(
         IContentTypeSchemaService contentTypeSchemaService,
         ISchemaIdSelector schemaIdSelector,
