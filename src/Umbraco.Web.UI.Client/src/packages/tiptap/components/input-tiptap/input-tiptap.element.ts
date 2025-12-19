@@ -27,16 +27,18 @@ import '../statusbar/tiptap-statusbar.element.js';
 const TIPTAP_CORE_EXTENSION_ALIAS = 'Umb.Tiptap.RichTextEssentials';
 
 /**
- * The root path for the stylesheets on the server.
- * This is used to load the stylesheets from the server as a workaround until the server supports virtual paths.
+ * The default root path for the stylesheets on the server.
+ * This is used as a fallback if the server configuration is not available.
  */
-const STYLESHEET_ROOT_PATH = '/css';
+const DEFAULT_STYLESHEET_ROOT_PATH = '/css';
 
 @customElement('umb-input-tiptap')
 export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof UmbLitElement, string>(UmbLitElement) {
 	#context = new UmbTiptapRteContext(this);
 
 	#stylesheets = new Set(['/umbraco/backoffice/css/rte-content.css']);
+
+	#stylesheetRootPath = DEFAULT_STYLESHEET_ROOT_PATH;
 
 	@property({ type: String })
 	override set value(value: string) {
@@ -101,7 +103,9 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	}
 
 	protected override async firstUpdated() {
-		await Promise.all([await this.#loadExtensions(), await this.#loadEditor()]);
+		await this.#loadStylesheetPath();
+		await this.#loadExtensions();
+		await this.#loadEditor();
 	}
 
 	/**
@@ -110,6 +114,14 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	 */
 	public isEmpty(): boolean {
 		return this._editor?.isEmpty ?? false;
+	}
+
+	async #loadStylesheetPath() {
+		return this.observe(this.#context.stylesheetRootPath, (stylesheetRootPath) => {
+			if (stylesheetRootPath) {
+				this.#stylesheetRootPath = stylesheetRootPath;
+			}
+		}).asPromise();
 	}
 
 	async #loadExtensions() {
@@ -146,9 +158,9 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 		if (stylesheets?.length) {
 			stylesheets.forEach((stylesheet) => {
 				const linkHref =
-					stylesheet.startsWith('http') || stylesheet.startsWith(STYLESHEET_ROOT_PATH)
+					stylesheet.startsWith('http') || stylesheet.startsWith(this.#stylesheetRootPath)
 						? stylesheet
-						: `${STYLESHEET_ROOT_PATH}${stylesheet}`;
+						: `${this.#stylesheetRootPath}${stylesheet}`;
 				this.#stylesheets.add(linkHref);
 			});
 		}
