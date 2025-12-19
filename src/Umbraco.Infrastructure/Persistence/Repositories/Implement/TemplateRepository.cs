@@ -401,7 +401,7 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
         return list;
     }
 
-    protected Guid NodeObjectTypeId => Constants.ObjectTypes.Template;
+    private Guid NodeObjectTypeId => Constants.ObjectTypes.Template;
 
     protected override void PersistNewItem(ITemplate entity)
     {
