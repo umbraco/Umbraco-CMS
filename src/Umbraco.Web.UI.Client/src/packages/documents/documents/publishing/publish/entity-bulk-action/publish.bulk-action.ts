@@ -95,7 +95,6 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 			this.selection,
 			(unique) => repository.publish(unique, variants),
 			notificationContext,
-			localize,
 			localize.term('speechBubbles_editContentPublishedHeader'),
 		);
 

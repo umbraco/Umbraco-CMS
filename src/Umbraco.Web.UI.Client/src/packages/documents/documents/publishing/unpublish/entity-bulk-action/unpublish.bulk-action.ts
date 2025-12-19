@@ -93,7 +93,6 @@ export class UmbDocumentUnpublishEntityBulkAction extends UmbEntityBulkActionBas
 			this.selection,
 			(unique) => repository.unpublish(unique, variantIds),
 			notificationContext,
-			localize,
 			localize.term('speechBubbles_contentUnpublished'),
 		);
 

@@ -91,7 +91,6 @@ export function showBulkResultNotification(
  * @param {Array<string>} documentUniques - Array of document unique identifiers to process
  * @param {function(string): Promise<{error?: unknown}>} processFn - Function to call for each document
  * @param {UmbNotificationContext | undefined} notificationContext - Notification context for showing progress
- * @param {UmbLocalizationController} _localize - Localization controller (reserved for future use)
  * @param {string} progressHeadline - Headline to show in the progress notification
  * @returns {Promise<UmbBulkPublishResult>} Object with succeeded and failed counts
  */
@@ -99,7 +98,6 @@ export async function processDocumentsInBatches(
 	documentUniques: Array<string>,
 	processFn: (unique: string) => Promise<{ error?: unknown }>,
 	notificationContext: UmbNotificationContext | undefined,
-	_localize: UmbLocalizationController,
 	progressHeadline: string,
 ): Promise<UmbBulkPublishResult> {
 	const total = documentUniques.length;
@@ -112,18 +110,16 @@ export async function processDocumentsInBatches(
 
 	const updateProgress = () => {
 		const message = `${processed} / ${total}`;
+
+		// Close existing notification before creating updated one
 		if (progressNotice) {
-			// Update existing notification by accessing the inner layout element
-			const layoutElement = progressNotice.element.firstElementChild as HTMLElement & { data?: unknown };
-			if (layoutElement) {
-				layoutElement.data = { headline: progressHeadline, message };
-			}
-		} else {
-			// Create initial notification
-			progressNotice = notificationContext?.stay('warning', {
-				data: { headline: progressHeadline, message },
-			});
+			progressNotice.close();
 		}
+
+		// Create notification with current progress
+		progressNotice = notificationContext?.stay('warning', {
+			data: { headline: progressHeadline, message },
+		});
 	};
 
 	// Show initial progress
