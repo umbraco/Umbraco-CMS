@@ -82,14 +82,13 @@ public class SearchMediaItemController : MediaItemControllerBase
         [FromQuery] IEnumerable<Guid>? allowedMediaTypes = null,
         Guid? dataTypeId = null)
     {
-        IEnumerable<Guid>? allowedMediaTypesWithFolder = null;
         //We always want to include folders in the search results
         if (allowedMediaTypes != null)
         {
-            var folderMediaType = _mediaTypeService.Get(Constants.Conventions.MediaTypes.Folder);
+            IMediaType? folderMediaType = _mediaTypeService.Get(Constants.Conventions.MediaTypes.Folder);
             if (folderMediaType != null && !allowedMediaTypes.Contains(folderMediaType.Key))
             {
-                allowedMediaTypesWithFolder = [..allowedMediaTypes, folderMediaType.Key];
+                allowedMediaTypes = [..allowedMediaTypes, folderMediaType.Key];
             }
         }
 
@@ -98,7 +97,7 @@ public class SearchMediaItemController : MediaItemControllerBase
             UmbracoObjectTypes.Media,
             query,
             parentId,
-            allowedMediaTypesWithFolder,
+            allowedMediaTypes,
             trashed,
             culture,
             skip,
