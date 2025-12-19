@@ -10,9 +10,12 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Api.Common.OpenApi;
 
 /// <summary>
-/// Transforms OpenAPI operation IDs using a custom selector.
+/// Transforms OpenAPI operation IDs using Umbraco's naming conventions.
 /// </summary>
-internal class CustomOperationIdsTransformer : IOpenApiOperationTransformer
+/// <remarks>
+/// This transformer can be registered manually for custom OpenAPI configurations.
+/// </remarks>
+public class UmbracoOperationIdTransformer : IOpenApiOperationTransformer
 {
     /// <summary>
     /// Transforms the specified OpenAPI operation, setting its operation ID using a custom selector.

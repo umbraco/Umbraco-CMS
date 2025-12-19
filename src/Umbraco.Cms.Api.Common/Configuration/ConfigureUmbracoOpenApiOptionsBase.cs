@@ -71,7 +71,7 @@ public abstract class ConfigureUmbracoOpenApiOptionsBase : IConfigureNamedOption
         options.ShouldInclude = ShouldInclude;
         options.CreateSchemaReferenceId = CreateSchemaReferenceId;
 
-        options.AddOperationTransformer<CustomOperationIdsTransformer>();
+        options.AddOperationTransformer<UmbracoOperationIdTransformer>();
 
         // Tag actions by group name and cleanup unused tags (caused by the tag changes)
         options
@@ -112,7 +112,8 @@ public abstract class ConfigureUmbracoOpenApiOptionsBase : IConfigureNamedOption
 
     private bool ShouldInclude(ApiDescription apiDescription)
     {
-        if (apiDescription.ActionDescriptor is ControllerActionDescriptor controllerActionDescriptor && controllerActionDescriptor.HasMapToApiAttribute(ApiName))
+        if (apiDescription.ActionDescriptor is ControllerActionDescriptor controllerActionDescriptor
+            && controllerActionDescriptor.HasMapToApiAttribute(ApiName))
         {
             return true;
         }
