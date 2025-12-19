@@ -44,6 +44,10 @@ describe('UmbNotificationHandler', () => {
 				expect(notificationHandler).to.have.property('onClose').that.is.a('function');
 			});
 
+			it('has an updateData method', () => {
+				expect(notificationHandler).to.have.property('updateData').that.is.a('function');
+			});
+
 			it('returns result from close method in onClose promise', () => {
 				notificationHandler.close('result value');
 
@@ -119,6 +123,56 @@ describe('UmbNotificationHandler', () => {
 			it('it sets data on custom element', () => {
 				expect(layoutElement.data.message).to.equal('Notification custom layout message');
 			});
+		});
+	});
+
+	describe('updateData', () => {
+		let handler: UmbNotificationHandler;
+		let layoutElement: any;
+
+		beforeEach(async () => {
+			const options: UmbNotificationOptions = {
+				color: 'warning',
+				data: {
+					headline: 'Initial headline',
+					message: 'Initial message',
+				},
+			};
+			handler = new UmbNotificationHandler(options);
+			layoutElement = handler.element.querySelector('umb-notification-layout-default');
+		});
+
+		it('updates the data on the layout element', () => {
+			expect(layoutElement.data.message).to.equal('Initial message');
+			expect(layoutElement.data.headline).to.equal('Initial headline');
+
+			handler.updateData({
+				headline: 'Updated headline',
+				message: 'Updated message',
+			});
+
+			expect(layoutElement.data.message).to.equal('Updated message');
+			expect(layoutElement.data.headline).to.equal('Updated headline');
+		});
+
+		it('can update data multiple times', () => {
+			handler.updateData({ headline: 'First update', message: '1 / 10' });
+			expect(layoutElement.data.message).to.equal('1 / 10');
+
+			handler.updateData({ headline: 'Second update', message: '5 / 10' });
+			expect(layoutElement.data.message).to.equal('5 / 10');
+
+			handler.updateData({ headline: 'Final update', message: '10 / 10' });
+			expect(layoutElement.data.message).to.equal('10 / 10');
+		});
+
+		it('replaces all data properties', () => {
+			handler.updateData({
+				message: 'Only message, no headline',
+			});
+
+			expect(layoutElement.data.message).to.equal('Only message, no headline');
+			expect(layoutElement.data.headline).to.be.undefined;
 		});
 	});
 });
