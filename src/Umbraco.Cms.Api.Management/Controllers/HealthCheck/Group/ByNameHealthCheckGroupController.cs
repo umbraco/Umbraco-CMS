@@ -25,6 +25,7 @@ public class ByNameHealthCheckGroupController : HealthCheckGroupControllerBase
     /// <summary>
     ///     Gets a health check group with all its health checks by a group name.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <param name="name">The name of the group.</param>
     /// <returns>The health check group or not found result.</returns>
     [HttpGet("{name}")]
