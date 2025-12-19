@@ -115,7 +115,10 @@ public class TypeFinder : ITypeFinder
     {
         IEnumerable<Assembly> assemblyList = assemblies ?? AssembliesToScan;
 
-        return GetClassesWithBaseType(assignTypeFrom, assemblyList, onlyConcreteClasses,
+        return GetClassesWithBaseType(
+            assignTypeFrom,
+            assemblyList,
+            onlyConcreteClasses,
 
             // the additional filter will ensure that any found types also have the attribute applied.
             t => t.GetCustomAttributes(attributeType, false).Any());

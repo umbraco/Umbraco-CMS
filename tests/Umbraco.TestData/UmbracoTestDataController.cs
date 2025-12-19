@@ -1,4 +1,4 @@
-﻿using Bogus;
+using Bogus;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
@@ -263,11 +263,16 @@ public class UmbracoTestDataController : SurfaceController
         docType.AddPropertyGroup("content", "Content");
         docType.AddPropertyType(
             new PropertyType(_shortStringHelper, Constants.PropertyEditors.Aliases.RichText, ValueStorageType.Ntext, "review")
-        {
-            Name = "Review",
-        }, "content");
-        docType.AddPropertyType(new PropertyType(_shortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "desc") { Name = "Description" }, "content");
-        docType.AddPropertyType(new PropertyType(_shortStringHelper, Constants.PropertyEditors.Aliases.MediaPicker3, ValueStorageType.Integer, "media") { Name = "Media" }, "content");
+            {
+                Name = "Review",
+            },
+            "content");
+        docType.AddPropertyType(
+            new PropertyType(_shortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "desc") { Name = "Description" },
+            "content");
+        docType.AddPropertyType(
+            new PropertyType(_shortStringHelper, Constants.PropertyEditors.Aliases.MediaPicker3, ValueStorageType.Integer, "media") { Name = "Media" },
+            "content");
 
 
         Services.ContentTypeService.Save(docType);
