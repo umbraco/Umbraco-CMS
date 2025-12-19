@@ -111,15 +111,15 @@ export async function processDocumentsInBatches(
 	const updateProgress = () => {
 		const message = `${processed} / ${total}`;
 
-		// Close existing notification before creating updated one
 		if (progressNotice) {
-			progressNotice.close();
+			// Update existing notification data
+			progressNotice.updateData({ headline: progressHeadline, message });
+		} else {
+			// Create initial notification
+			progressNotice = notificationContext?.stay('warning', {
+				data: { headline: progressHeadline, message },
+			});
 		}
-
-		// Create notification with current progress
-		progressNotice = notificationContext?.stay('warning', {
-			data: { headline: progressHeadline, message },
-		});
 	};
 
 	// Show initial progress
