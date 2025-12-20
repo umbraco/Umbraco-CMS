@@ -62,7 +62,99 @@ internal sealed class ContentServiceRefactoringTests : UmbracoIntegrationTestWit
 
     #region Notification Ordering Tests
 
-    // Tests 1-2 will be added in Task 2
+    /// <summary>
+    /// Test 1: Verifies that MoveToRecycleBin for published content fires notifications in the correct order.
+    /// Expected order: MovingToRecycleBin -> MovedToRecycleBin
+    /// Note: As per design doc, MoveToRecycleBin does NOT unpublish first - content is "masked" not unpublished.
+    /// </summary>
+    [Test]
+    public void MoveToRecycleBin_PublishedContent_FiresNotificationsInCorrectOrder()
+    {
+        // Arrange - Create and publish content
+        // First publish parent if not already published
+        if (!Textpage.Published)
+        {
+            ContentService.Publish(Textpage, new[] { "*" });
+        }
+
+        var content = ContentBuilder.CreateSimpleContent(ContentType, "TestContent", Textpage.Id);
+        ContentService.Save(content);
+        ContentService.Publish(content, new[] { "*" });
+
+        // Verify it's published
+        Assert.That(content.Published, Is.True, "Content should be published before test");
+
+        // Clear notification tracking
+        RefactoringTestNotificationHandler.Reset();
+
+        // Act
+        var result = ContentService.MoveToRecycleBin(content);
+
+        // Assert
+        Assert.That(result.Success, Is.True, "MoveToRecycleBin should succeed");
+
+        var notifications = RefactoringTestNotificationHandler.NotificationOrder;
+
+        // Verify notification sequence
+        Assert.That(notifications, Does.Contain(nameof(ContentMovingToRecycleBinNotification)),
+            "MovingToRecycleBin notification should fire");
+        Assert.That(notifications, Does.Contain(nameof(ContentMovedToRecycleBinNotification)),
+            "MovedToRecycleBin notification should fire");
+
+        // Verify order: Moving comes before Moved
+        var movingIndex = notifications.IndexOf(nameof(ContentMovingToRecycleBinNotification));
+        var movedIndex = notifications.IndexOf(nameof(ContentMovedToRecycleBinNotification));
+        Assert.That(movingIndex, Is.LessThan(movedIndex),
+            "MovingToRecycleBin should fire before MovedToRecycleBin");
+    }
+
+    /// <summary>
+    /// Test 2: Verifies that MoveToRecycleBin for unpublished content only fires move notifications.
+    /// No publish/unpublish notifications should be fired.
+    /// </summary>
+    [Test]
+    public void MoveToRecycleBin_UnpublishedContent_OnlyFiresMoveNotifications()
+    {
+        // Arrange - Create content but don't publish
+        // First publish parent if not already published (required for creating child content)
+        if (!Textpage.Published)
+        {
+            ContentService.Publish(Textpage, new[] { "*" });
+        }
+
+        var content = ContentBuilder.CreateSimpleContent(ContentType, "UnpublishedContent", Textpage.Id);
+        ContentService.Save(content);
+
+        // Verify it's not published
+        Assert.That(content.Published, Is.False, "Content should not be published before test");
+
+        // Clear notification tracking
+        RefactoringTestNotificationHandler.Reset();
+
+        // Act
+        var result = ContentService.MoveToRecycleBin(content);
+
+        // Assert
+        Assert.That(result.Success, Is.True, "MoveToRecycleBin should succeed");
+
+        var notifications = RefactoringTestNotificationHandler.NotificationOrder;
+
+        // Verify move notifications fire
+        Assert.That(notifications, Does.Contain(nameof(ContentMovingToRecycleBinNotification)),
+            "MovingToRecycleBin notification should fire");
+        Assert.That(notifications, Does.Contain(nameof(ContentMovedToRecycleBinNotification)),
+            "MovedToRecycleBin notification should fire");
+
+        // Verify no publish/unpublish notifications
+        Assert.That(notifications, Does.Not.Contain(nameof(ContentPublishingNotification)),
+            "Publishing notification should not fire for unpublished content");
+        Assert.That(notifications, Does.Not.Contain(nameof(ContentPublishedNotification)),
+            "Published notification should not fire for unpublished content");
+        Assert.That(notifications, Does.Not.Contain(nameof(ContentUnpublishingNotification)),
+            "Unpublishing notification should not fire for unpublished content");
+        Assert.That(notifications, Does.Not.Contain(nameof(ContentUnpublishedNotification)),
+            "Unpublished notification should not fire for unpublished content");
+    }
 
     #endregion
 
