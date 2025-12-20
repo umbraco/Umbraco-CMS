@@ -1,0 +1,194 @@
+[
+  {
+    "Name": "BaselineComparison",
+    "ElapsedMs": 1357,
+    "ItemCount": 10,
+    "MsPerItem": 135.7
+  },
+  {
+    "Name": "Copy_Recursive_100Items",
+    "ElapsedMs": 2809,
+    "ItemCount": 101,
+    "MsPerItem": 27.81188118811881
+  },
+  {
+    "Name": "Copy_SingleItem",
+    "ElapsedMs": 30,
+    "ItemCount": 1,
+    "MsPerItem": 30
+  },
+  {
+    "Name": "Count_ByContentType",
+    "ElapsedMs": 1,
+    "ItemCount": 1000,
+    "MsPerItem": 0.001
+  },
+  {
+    "Name": "CountDescendants_LargeTree",
+    "ElapsedMs": 1,
+    "ItemCount": 1000,
+    "MsPerItem": 0.001
+  },
+  {
+    "Name": "Delete_SingleItem",
+    "ElapsedMs": 35,
+    "ItemCount": 1,
+    "MsPerItem": 35
+  },
+  {
+    "Name": "Delete_WithDescendants",
+    "ElapsedMs": 243,
+    "ItemCount": 101,
+    "MsPerItem": 2.405940594059406
+  },
+  {
+    "Name": "DeleteVersions_ByDate",
+    "ElapsedMs": 5,
+    "ItemCount": 100,
+    "MsPerItem": 0.05
+  },
+  {
+    "Name": "EmptyRecycleBin_100Items",
+    "ElapsedMs": 847,
+    "ItemCount": 100,
+    "MsPerItem": 8.47
+  },
+  {
+    "Name": "GetAncestors_DeepHierarchy",
+    "ElapsedMs": 31,
+    "ItemCount": 10,
+    "MsPerItem": 3.1
+  },
+  {
+    "Name": "GetById_Single",
+    "ElapsedMs": 8,
+    "ItemCount": 1,
+    "MsPerItem": 8
+  },
+  {
+    "Name": "GetByIds_BatchOf100",
+    "ElapsedMs": 14,
+    "ItemCount": 100,
+    "MsPerItem": 0.14
+  },
+  {
+    "Name": "GetContentSchedulesByIds_100Items",
+    "ElapsedMs": 1,
+    "ItemCount": 100,
+    "MsPerItem": 0.01
+  },
+  {
+    "Name": "GetPagedChildren_100Items",
+    "ElapsedMs": 16,
+    "ItemCount": 100,
+    "MsPerItem": 0.16
+  },
+  {
+    "Name": "GetPagedDescendants_DeepTree",
+    "ElapsedMs": 25,
+    "ItemCount": 300,
+    "MsPerItem": 0.08333333333333333
+  },
+  {
+    "Name": "GetVersions_ItemWith100Versions",
+    "ElapsedMs": 11,
+    "ItemCount": 100,
+    "MsPerItem": 0.11
+  },
+  {
+    "Name": "GetVersionsSlim_Paged",
+    "ElapsedMs": 8,
+    "ItemCount": 10,
+    "MsPerItem": 0.8
+  },
+  {
+    "Name": "HasChildren_100Nodes",
+    "ElapsedMs": 65,
+    "ItemCount": 100,
+    "MsPerItem": 0.65
+  },
+  {
+    "Name": "Move_SingleItem",
+    "ElapsedMs": 22,
+    "ItemCount": 1,
+    "MsPerItem": 22
+  },
+  {
+    "Name": "Move_WithDescendants",
+    "ElapsedMs": 592,
+    "ItemCount": 101,
+    "MsPerItem": 5.861386138613861
+  },
+  {
+    "Name": "MoveToRecycleBin_LargeTree",
+    "ElapsedMs": 8955,
+    "ItemCount": 1001,
+    "MsPerItem": 8.946053946053945
+  },
+  {
+    "Name": "MoveToRecycleBin_Published",
+    "ElapsedMs": 34,
+    "ItemCount": 1,
+    "MsPerItem": 34
+  },
+  {
+    "Name": "PerformScheduledPublish",
+    "ElapsedMs": 2526,
+    "ItemCount": 100,
+    "MsPerItem": 25.26
+  },
+  {
+    "Name": "Publish_BatchOf100",
+    "ElapsedMs": 2456,
+    "ItemCount": 100,
+    "MsPerItem": 24.56
+  },
+  {
+    "Name": "Publish_SingleItem",
+    "ElapsedMs": 21,
+    "ItemCount": 1,
+    "MsPerItem": 21
+  },
+  {
+    "Name": "PublishBranch_DeepTree",
+    "ElapsedMs": 51,
+    "ItemCount": 101,
+    "MsPerItem": 0.504950495049505
+  },
+  {
+    "Name": "PublishBranch_ShallowTree",
+    "ElapsedMs": 50,
+    "ItemCount": 101,
+    "MsPerItem": 0.49504950495049505
+  },
+  {
+    "Name": "Save_BatchOf100",
+    "ElapsedMs": 676,
+    "ItemCount": 100,
+    "MsPerItem": 6.76
+  },
+  {
+    "Name": "Save_BatchOf1000",
+    "ElapsedMs": 7649,
+    "ItemCount": 1000,
+    "MsPerItem": 7.649
+  },
+  {
+    "Name": "Save_SingleItem",
+    "ElapsedMs": 7,
+    "ItemCount": 1,
+    "MsPerItem": 7
+  },
+  {
+    "Name": "Sort_100Children",
+    "ElapsedMs": 758,
+    "ItemCount": 100,
+    "MsPerItem": 7.58
+  },
+  {
+    "Name": "Unpublish_SingleItem",
+    "ElapsedMs": 23,
+    "ItemCount": 1,
+    "MsPerItem": 23
+  }
+]

@@ -1,0 +1,838 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  Umbraco.Core -> /home/yv01p/Umbraco-CMS/src/Umbraco.Core/bin/Debug/net10.0/Umbraco.Core.dll
+  Umbraco.Infrastructure -> /home/yv01p/Umbraco-CMS/src/Umbraco.Infrastructure/bin/Debug/net10.0/Umbraco.Infrastructure.dll
+  Umbraco.PublishedCache.HybridCache -> /home/yv01p/Umbraco-CMS/src/Umbraco.PublishedCache.HybridCache/bin/Debug/net10.0/Umbraco.PublishedCache.HybridCache.dll
+  Umbraco.Cms.Persistence.EFCore -> /home/yv01p/Umbraco-CMS/src/Umbraco.Cms.Persistence.EFCore/bin/Debug/net10.0/Umbraco.Cms.Persistence.EFCore.dll
+  Umbraco.Examine.Lucene -> /home/yv01p/Umbraco-CMS/src/Umbraco.Examine.Lucene/bin/Debug/net10.0/Umbraco.Examine.Lucene.dll
+  Umbraco.Cms.Persistence.SqlServer -> /home/yv01p/Umbraco-CMS/src/Umbraco.Cms.Persistence.SqlServer/bin/Debug/net10.0/Umbraco.Cms.Persistence.SqlServer.dll
+  Umbraco.Cms.Persistence.Sqlite -> /home/yv01p/Umbraco-CMS/src/Umbraco.Cms.Persistence.Sqlite/bin/Debug/net10.0/Umbraco.Cms.Persistence.Sqlite.dll
+  Umbraco.Cms.Persistence.EFCore.SqlServer -> /home/yv01p/Umbraco-CMS/src/Umbraco.Cms.Persistence.EFCore.SqlServer/bin/Debug/net10.0/Umbraco.Cms.Persistence.EFCore.SqlServer.dll
+  Umbraco.Cms.Persistence.EFCore.Sqlite -> /home/yv01p/Umbraco-CMS/src/Umbraco.Cms.Persistence.EFCore.Sqlite/bin/Debug/net10.0/Umbraco.Cms.Persistence.EFCore.Sqlite.dll
+  Umbraco.Web.Common -> /home/yv01p/Umbraco-CMS/src/Umbraco.Web.Common/bin/Debug/net10.0/Umbraco.Web.Common.dll
+  Umbraco.Cms.Api.Common -> /home/yv01p/Umbraco-CMS/src/Umbraco.Cms.Api.Common/bin/Debug/net10.0/Umbraco.Cms.Api.Common.dll
+  Umbraco.Web.Website -> /home/yv01p/Umbraco-CMS/src/Umbraco.Web.Website/bin/Debug/net10.0/Umbraco.Web.Website.dll
+  Umbraco.Cms.Imaging.ImageSharp -> /home/yv01p/Umbraco-CMS/src/Umbraco.Cms.Imaging.ImageSharp/bin/Debug/net10.0/Umbraco.Cms.Imaging.ImageSharp.dll
+  Umbraco.Cms.Api.Delivery -> /home/yv01p/Umbraco-CMS/src/Umbraco.Cms.Api.Delivery/bin/Debug/net10.0/Umbraco.Cms.Api.Delivery.dll
+  Umbraco.Cms.Api.Management -> /home/yv01p/Umbraco-CMS/src/Umbraco.Cms.Api.Management/bin/Debug/net10.0/Umbraco.Cms.Api.Management.dll
+  Skip BuildBackoffice target because 'wwwroot/umbraco/backoffice' already exists
+  Skip BuildLogin target because 'wwwroot/umbraco/login' already exists
+  Umbraco.Cms.StaticAssets -> /home/yv01p/Umbraco-CMS/src/Umbraco.Cms.StaticAssets/bin/Debug/net10.0/Umbraco.Cms.StaticAssets.dll
+  Umbraco.Cms.Targets -> /home/yv01p/Umbraco-CMS/src/Umbraco.Cms.Targets/bin/Debug/net10.0/Umbraco.Cms.Targets.dll
+  Umbraco.Cms -> /home/yv01p/Umbraco-CMS/src/Umbraco.Cms/bin/Debug/net10.0/Umbraco.Cms.dll
+  Umbraco.Tests.Common -> /home/yv01p/Umbraco-CMS/tests/Umbraco.Tests.Common/bin/Debug/net10.0/Umbraco.Tests.Common.dll
+  Umbraco.Tests.Integration -> /home/yv01p/Umbraco-CMS/tests/Umbraco.Tests.Integration/bin/Debug/net10.0/Umbraco.Tests.Integration.dll
+  Copying JSON schema files into project directory: appsettings-schema.Umbraco.Cms.json
+  Copying JSON schema files into project directory: umbraco-package-schema.json
+  Adding JSON schema references to appsettings-schema.json: https://json.schemastore.org/appsettings.json;appsettings-schema.Umbraco.Cms.json#
+Test run for /home/yv01p/Umbraco-CMS/tests/Umbraco.Tests.Integration/bin/Debug/net10.0/Umbraco.Tests.Integration.dll (.NETCoreApp,Version=v10.0)
+VSTest version 18.0.1 (x64)
+
+Starting test execution, please wait...
+A total of 1 test files matched the specified pattern.
+/home/yv01p/Umbraco-CMS/tests/Umbraco.Tests.Integration/bin/Debug/net10.0/Umbraco.Tests.Integration.dll
+NUnit Adapter 4.6.0.0: Test execution started
+Running selected tests in /home/yv01p/Umbraco-CMS/tests/Umbraco.Tests.Integration/bin/Debug/net10.0/Umbraco.Tests.Integration.dll
+   NUnit3TestExecutor discovered 33 of 33 NUnit test cases using Current Discovery mode, Non-Explicit run
+******************************************************************************
+* Umbraco.Tests.Integration
+*
+* DatabaseType     : Sqlite
+* UmbracoVersion   : 17.1.0--rc.preview.219
+* WorkingDirectory : /home/yv01p/Umbraco-CMS/tests/Umbraco.Tests.Integration/TEMP
+******************************************************************************
+Start test 1: Benchmark_BaselineComparison[BENCHMARK] BaselineComparison: 1357ms (135.70ms/item, 10 items)
+[BASELINE] Total time for representative operations: 1357ms
+[BENCHMARK_JSON][
+  {
+    "Name": "BaselineComparison",
+    "ElapsedMs": 1357,
+    "ItemCount": 10,
+    "MsPerItem": 135.7
+  }
+][/BENCHMARK_JSON]
+  Passed
+  Passed Benchmark_BaselineComparison [3 s]
+  Standard Output Messages:
+ Start test 1: Benchmark_BaselineComparison[BENCHMARK] BaselineComparison: 1357ms (135.70ms/item, 10 items)
+ [BASELINE] Total time for representative operations: 1357ms
+ [BENCHMARK_JSON][
+   {
+     "Name": "BaselineComparison",
+     "ElapsedMs": 1357,
+     "ItemCount": 10,
+     "MsPerItem": 135.7
+   }
+ ][/BENCHMARK_JSON]
+   Passed
+
+Start test 2: Benchmark_Copy_Recursive_100Items[BENCHMARK] Copy_Recursive_100Items: 2809ms (27.81ms/item, 101 items)
+[BENCHMARK_JSON][
+  {
+    "Name": "Copy_Recursive_100Items",
+    "ElapsedMs": 2809,
+    "ItemCount": 101,
+    "MsPerItem": 27.81188118811881
+  }
+][/BENCHMARK_JSON]
+  Passed
+  Passed Benchmark_Copy_Recursive_100Items [5 s]
+  Standard Output Messages:
+ Start test 2: Benchmark_Copy_Recursive_100Items[BENCHMARK] Copy_Recursive_100Items: 2809ms (27.81ms/item, 101 items)
+ [BENCHMARK_JSON][
+   {
+     "Name": "Copy_Recursive_100Items",
+     "ElapsedMs": 2809,
+     "ItemCount": 101,
+     "MsPerItem": 27.81188118811881
+   }
+ ][/BENCHMARK_JSON]
+   Passed
+
+Start test 3: Benchmark_Copy_SingleItem[BENCHMARK] Copy_SingleItem: 30ms (30.00ms/item, 1 items)
+[BENCHMARK_JSON][
+  {
+    "Name": "Copy_SingleItem",
+    "ElapsedMs": 30,
+    "ItemCount": 1,
+    "MsPerItem": 30
+  }
+][/BENCHMARK_JSON]
+  Passed
+  Passed Benchmark_Copy_SingleItem [565 ms]
+  Standard Output Messages:
+ Start test 3: Benchmark_Copy_SingleItem[BENCHMARK] Copy_SingleItem: 30ms (30.00ms/item, 1 items)
+ [BENCHMARK_JSON][
+   {
+     "Name": "Copy_SingleItem",
+     "ElapsedMs": 30,
+     "ItemCount": 1,
+     "MsPerItem": 30
+   }
+ ][/BENCHMARK_JSON]
+   Passed
+
+Start test 4: Benchmark_Count_ByContentType[BENCHMARK] Count_ByContentType: 1ms (0.00ms/item, 1000 items)
+[BENCHMARK_JSON][
+  {
+    "Name": "Count_ByContentType",
+    "ElapsedMs": 1,
+    "ItemCount": 1000,
+    "MsPerItem": 0.001
+  }
+][/BENCHMARK_JSON]
+  Passed
+  Passed Benchmark_Count_ByContentType [8 s]
+  Standard Output Messages:
+ Start test 4: Benchmark_Count_ByContentType[BENCHMARK] Count_ByContentType: 1ms (0.00ms/item, 1000 items)
+ [BENCHMARK_JSON][
+   {
+     "Name": "Count_ByContentType",
+     "ElapsedMs": 1,
+     "ItemCount": 1000,
+     "MsPerItem": 0.001
+   }
+ ][/BENCHMARK_JSON]
+   Passed
+
+Start test 5: Benchmark_CountDescendants_LargeTree[BENCHMARK] CountDescendants_LargeTree: 1ms (0.00ms/item, 1000 items)
+[BENCHMARK_JSON][
+  {
+    "Name": "CountDescendants_LargeTree",
+    "ElapsedMs": 1,
+    "ItemCount": 1000,
+    "MsPerItem": 0.001
+  }
+][/BENCHMARK_JSON]
+  Passed
+  Passed Benchmark_CountDescendants_LargeTree [7 s]
+  Standard Output Messages:
+ Start test 5: Benchmark_CountDescendants_LargeTree[BENCHMARK] CountDescendants_LargeTree: 1ms (0.00ms/item, 1000 items)
+ [BENCHMARK_JSON][
+   {
+     "Name": "CountDescendants_LargeTree",
+     "ElapsedMs": 1,
+     "ItemCount": 1000,
+     "MsPerItem": 0.001
+   }
+ ][/BENCHMARK_JSON]
+   Passed
+
+Start test 6: Benchmark_Delete_SingleItem[BENCHMARK] Delete_SingleItem: 35ms (35.00ms/item, 1 items)
+[BENCHMARK_JSON][
+  {
+    "Name": "Delete_SingleItem",
+    "ElapsedMs": 35,
+    "ItemCount": 1,
+    "MsPerItem": 35
+  }
+][/BENCHMARK_JSON]
+  Passed
+  Passed Benchmark_Delete_SingleItem [291 ms]
+  Standard Output Messages:
+ Start test 6: Benchmark_Delete_SingleItem[BENCHMARK] Delete_SingleItem: 35ms (35.00ms/item, 1 items)
+ [BENCHMARK_JSON][
+   {
+     "Name": "Delete_SingleItem",
+     "ElapsedMs": 35,
+     "ItemCount": 1,
+     "MsPerItem": 35
+   }
+ ][/BENCHMARK_JSON]
+   Passed
+
+Start test 7: Benchmark_Delete_WithDescendants[BENCHMARK] Delete_WithDescendants: 243ms (2.41ms/item, 101 items)
+[BENCHMARK_JSON][
+  {
+    "Name": "Delete_WithDescendants",
+    "ElapsedMs": 243,
+    "ItemCount": 101,
+    "MsPerItem": 2.405940594059406
+  }
+][/BENCHMARK_JSON]
+  Passed
+Start test 8: Benchmark_DeleteVersions_ByDate[BENCHMARK] DeleteVersions_ByDate: 5ms (0.05ms/item, 100 items)
+[BENCHMARK_JSON][
+  {
+    "Name": "DeleteVersions_ByDate",
+    "ElapsedMs": 5,
+    "ItemCount": 100,
+    "MsPerItem": 0.05
+  }
+][/BENCHMARK_JSON]
+  Passed
+  Passed Benchmark_Delete_WithDescendants [1 s]
+  Standard Output Messages:
+ Start test 7: Benchmark_Delete_WithDescendants[BENCHMARK] Delete_WithDescendants: 243ms (2.41ms/item, 101 items)
+ [BENCHMARK_JSON][
+   {
+     "Name": "Delete_WithDescendants",
+     "ElapsedMs": 243,
+     "ItemCount": 101,
+     "MsPerItem": 2.405940594059406
+   }
+ ][/BENCHMARK_JSON]
+   Passed
+
+  Passed Benchmark_DeleteVersions_ByDate [1 s]
+  Standard Output Messages:
+ Start test 8: Benchmark_DeleteVersions_ByDate[BENCHMARK] DeleteVersions_ByDate: 5ms (0.05ms/item, 100 items)
+ [BENCHMARK_JSON][
+   {
+     "Name": "DeleteVersions_ByDate",
+     "ElapsedMs": 5,
+     "ItemCount": 100,
+     "MsPerItem": 0.05
+   }
+ ][/BENCHMARK_JSON]
+   Passed
+
+Start test 9: Benchmark_EmptyRecycleBin_100Items[BENCHMARK] EmptyRecycleBin_100Items: 847ms (8.47ms/item, 100 items)
+[BENCHMARK_JSON][
+  {
+    "Name": "EmptyRecycleBin_100Items",
+    "ElapsedMs": 847,
+    "ItemCount": 100,
+    "MsPerItem": 8.47
+  }
+][/BENCHMARK_JSON]
+  Passed
+  Passed Benchmark_EmptyRecycleBin_100Items [3 s]
+  Standard Output Messages:
+ Start test 9: Benchmark_EmptyRecycleBin_100Items[BENCHMARK] EmptyRecycleBin_100Items: 847ms (8.47ms/item, 100 items)
+ [BENCHMARK_JSON][
+   {
+     "Name": "EmptyRecycleBin_100Items",
+     "ElapsedMs": 847,
+     "ItemCount": 100,
+     "MsPerItem": 8.47
+   }
+ ][/BENCHMARK_JSON]
+   Passed
+
+Start test 10: Benchmark_GetAncestors_DeepHierarchy[BENCHMARK] GetAncestors_DeepHierarchy: 31ms (3.10ms/item, 10 items)
+[BENCHMARK_JSON][
+  {
+    "Name": "GetAncestors_DeepHierarchy",
+    "ElapsedMs": 31,
+    "ItemCount": 10,
+    "MsPerItem": 3.1
+  }
+][/BENCHMARK_JSON]
+  Passed
+Start test 11: Benchmark_GetById_Single[BENCHMARK] GetById_Single: 8ms (8.00ms/item, 1 items)
+[BENCHMARK_JSON][
+  {
+    "Name": "GetById_Single",
+    "ElapsedMs": 8,
+    "ItemCount": 1,
+    "MsPerItem": 8
+  }
+][/BENCHMARK_JSON]
+  Passed
+  Passed Benchmark_GetAncestors_DeepHierarchy [391 ms]
+  Standard Output Messages:
+ Start test 10: Benchmark_GetAncestors_DeepHierarchy[BENCHMARK] GetAncestors_DeepHierarchy: 31ms (3.10ms/item, 10 items)
+ [BENCHMARK_JSON][
+   {
+     "Name": "GetAncestors_DeepHierarchy",
+     "ElapsedMs": 31,
+     "ItemCount": 10,
+     "MsPerItem": 3.1
+   }
+ ][/BENCHMARK_JSON]
+   Passed
+
+  Passed Benchmark_GetById_Single [279 ms]
+  Standard Output Messages:
+ Start test 11: Benchmark_GetById_Single[BENCHMARK] GetById_Single: 8ms (8.00ms/item, 1 items)
+ [BENCHMARK_JSON][
+   {
+     "Name": "GetById_Single",
+     "ElapsedMs": 8,
+     "ItemCount": 1,
+     "MsPerItem": 8
+   }
+ ][/BENCHMARK_JSON]
+   Passed
+
+Start test 12: Benchmark_GetByIds_BatchOf100[BENCHMARK] GetByIds_BatchOf100: 14ms (0.14ms/item, 100 items)
+[BENCHMARK_JSON][
+  {
+    "Name": "GetByIds_BatchOf100",
+    "ElapsedMs": 14,
+    "ItemCount": 100,
+    "MsPerItem": 0.14
+  }
+][/BENCHMARK_JSON]
+  Passed
+Start test 13: Benchmark_GetContentSchedulesByIds_100Items[BENCHMARK] GetContentSchedulesByIds_100Items: 1ms (0.01ms/item, 100 items)
+[BENCHMARK_JSON][
+  {
+    "Name": "GetContentSchedulesByIds_100Items",
+    "ElapsedMs": 1,
+    "ItemCount": 100,
+    "MsPerItem": 0.01
+  }
+][/BENCHMARK_JSON]
+  Passed
+  Passed Benchmark_GetByIds_BatchOf100 [1 s]
+  Standard Output Messages:
+ Start test 12: Benchmark_GetByIds_BatchOf100[BENCHMARK] GetByIds_BatchOf100: 14ms (0.14ms/item, 100 items)
+ [BENCHMARK_JSON][
+   {
+     "Name": "GetByIds_BatchOf100",
+     "ElapsedMs": 14,
+     "ItemCount": 100,
+     "MsPerItem": 0.14
+   }
+ ][/BENCHMARK_JSON]
+   Passed
+
+  Passed Benchmark_GetContentSchedulesByIds_100Items [1 s]
+  Standard Output Messages:
+ Start test 13: Benchmark_GetContentSchedulesByIds_100Items[BENCHMARK] GetContentSchedulesByIds_100Items: 1ms (0.01ms/item, 100 items)
+ [BENCHMARK_JSON][
+   {
+     "Name": "GetContentSchedulesByIds_100Items",
+     "ElapsedMs": 1,
+     "ItemCount": 100,
+     "MsPerItem": 0.01
+   }
+ ][/BENCHMARK_JSON]
+   Passed
+
+Start test 14: Benchmark_GetPagedChildren_100Items[BENCHMARK] GetPagedChildren_100Items: 16ms (0.16ms/item, 100 items)
+[BENCHMARK_JSON][
+  {
+    "Name": "GetPagedChildren_100Items",
+    "ElapsedMs": 16,
+    "ItemCount": 100,
+    "MsPerItem": 0.16
+  }
+][/BENCHMARK_JSON]
+  Passed
+  Passed Benchmark_GetPagedChildren_100Items [1 s]
+  Standard Output Messages:
+ Start test 14: Benchmark_GetPagedChildren_100Items[BENCHMARK] GetPagedChildren_100Items: 16ms (0.16ms/item, 100 items)
+ [BENCHMARK_JSON][
+   {
+     "Name": "GetPagedChildren_100Items",
+     "ElapsedMs": 16,
+     "ItemCount": 100,
+     "MsPerItem": 0.16
+   }
+ ][/BENCHMARK_JSON]
+   Passed
+
+Start test 15: Benchmark_GetPagedDescendants_DeepTree[BENCHMARK] GetPagedDescendants_DeepTree: 25ms (0.08ms/item, 300 items)
+[BENCHMARK_JSON][
+  {
+    "Name": "GetPagedDescendants_DeepTree",
+    "ElapsedMs": 25,
+    "ItemCount": 300,
+    "MsPerItem": 0.08333333333333333
+  }
+][/BENCHMARK_JSON]
+  Passed
+  Passed Benchmark_GetPagedDescendants_DeepTree [2 s]
+  Standard Output Messages:
+ Start test 15: Benchmark_GetPagedDescendants_DeepTree[BENCHMARK] GetPagedDescendants_DeepTree: 25ms (0.08ms/item, 300 items)
+ [BENCHMARK_JSON][
+   {
+     "Name": "GetPagedDescendants_DeepTree",
+     "ElapsedMs": 25,
+     "ItemCount": 300,
+     "MsPerItem": 0.08333333333333333
+   }
+ ][/BENCHMARK_JSON]
+   Passed
+
+Start test 16: Benchmark_GetVersions_ItemWith100Versions[BENCHMARK] GetVersions_ItemWith100Versions: 11ms (0.11ms/item, 100 items)
+[BENCHMARK_JSON][
+  {
+    "Name": "GetVersions_ItemWith100Versions",
+    "ElapsedMs": 11,
+    "ItemCount": 100,
+    "MsPerItem": 0.11
+  }
+][/BENCHMARK_JSON]
+  Failed
+  Failed Benchmark_GetVersions_ItemWith100Versions [1 s]
+  Error Message:
+     Expected: greater than or equal to 100
+  But was:  1
+
+  Stack Trace:
+     at Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services.ContentServiceRefactoringBenchmarks.Benchmark_GetVersions_ItemWith100Versions() in /home/yv01p/Umbraco-CMS/tests/Umbraco.Tests.Integration/Umbraco.Infrastructure/Services/ContentServiceRefactoringBenchmarks.cs:line 972
+
+1)    at Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services.ContentServiceRefactoringBenchmarks.Benchmark_GetVersions_ItemWith100Versions() in /home/yv01p/Umbraco-CMS/tests/Umbraco.Tests.Integration/Umbraco.Infrastructure/Services/ContentServiceRefactoringBenchmarks.cs:line 972
+
+
+  Standard Output Messages:
+ Start test 16: Benchmark_GetVersions_ItemWith100Versions[BENCHMARK] GetVersions_ItemWith100Versions: 11ms (0.11ms/item, 100 items)
+ [BENCHMARK_JSON][
+   {
+     "Name": "GetVersions_ItemWith100Versions",
+     "ElapsedMs": 11,
+     "ItemCount": 100,
+     "MsPerItem": 0.11
+   }
+ ][/BENCHMARK_JSON]
+   Failed
+
+Start test 17: Benchmark_GetVersionsSlim_Paged[BENCHMARK] GetVersionsSlim_Paged: 8ms (0.80ms/item, 10 items)
+[BENCHMARK_JSON][
+  {
+    "Name": "GetVersionsSlim_Paged",
+    "ElapsedMs": 8,
+    "ItemCount": 10,
+    "MsPerItem": 0.8
+  }
+][/BENCHMARK_JSON]
+  Failed
+  Failed Benchmark_GetVersionsSlim_Paged [1 s]
+  Error Message:
+     Expected: 10
+  But was:  1
+
+  Stack Trace:
+     at Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services.ContentServiceRefactoringBenchmarks.Benchmark_GetVersionsSlim_Paged() in /home/yv01p/Umbraco-CMS/tests/Umbraco.Tests.Integration/Umbraco.Infrastructure/Services/ContentServiceRefactoringBenchmarks.cs:line 1000
+
+1)    at Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services.ContentServiceRefactoringBenchmarks.Benchmark_GetVersionsSlim_Paged() in /home/yv01p/Umbraco-CMS/tests/Umbraco.Tests.Integration/Umbraco.Infrastructure/Services/ContentServiceRefactoringBenchmarks.cs:line 1000
+
+
+  Standard Output Messages:
+ Start test 17: Benchmark_GetVersionsSlim_Paged[BENCHMARK] GetVersionsSlim_Paged: 8ms (0.80ms/item, 10 items)
+ [BENCHMARK_JSON][
+   {
+     "Name": "GetVersionsSlim_Paged",
+     "ElapsedMs": 8,
+     "ItemCount": 10,
+     "MsPerItem": 0.8
+   }
+ ][/BENCHMARK_JSON]
+   Failed
+
+Start test 18: Benchmark_HasChildren_100Nodes[BENCHMARK] HasChildren_100Nodes: 65ms (0.65ms/item, 100 items)
+[BENCHMARK_JSON][
+  {
+    "Name": "HasChildren_100Nodes",
+    "ElapsedMs": 65,
+    "ItemCount": 100,
+    "MsPerItem": 0.65
+  }
+][/BENCHMARK_JSON]
+  Failed
+Start test 19: Benchmark_Move_SingleItem[BENCHMARK] Move_SingleItem: 22ms (22.00ms/item, 1 items)
+[BENCHMARK_JSON][
+  {
+    "Name": "Move_SingleItem",
+    "ElapsedMs": 22,
+    "ItemCount": 1,
+    "MsPerItem": 22
+  }
+][/BENCHMARK_JSON]
+  Passed
+  Failed Benchmark_HasChildren_100Nodes [1 s]
+  Error Message:
+     Expected: 50
+  But was:  100
+
+  Stack Trace:
+     at Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services.ContentServiceRefactoringBenchmarks.Benchmark_HasChildren_100Nodes() in /home/yv01p/Umbraco-CMS/tests/Umbraco.Tests.Integration/Umbraco.Infrastructure/Services/ContentServiceRefactoringBenchmarks.cs:line 424
+
+1)    at Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services.ContentServiceRefactoringBenchmarks.Benchmark_HasChildren_100Nodes() in /home/yv01p/Umbraco-CMS/tests/Umbraco.Tests.Integration/Umbraco.Infrastructure/Services/ContentServiceRefactoringBenchmarks.cs:line 424
+
+
+  Standard Output Messages:
+ Start test 18: Benchmark_HasChildren_100Nodes[BENCHMARK] HasChildren_100Nodes: 65ms (0.65ms/item, 100 items)
+ [BENCHMARK_JSON][
+   {
+     "Name": "HasChildren_100Nodes",
+     "ElapsedMs": 65,
+     "ItemCount": 100,
+     "MsPerItem": 0.65
+   }
+ ][/BENCHMARK_JSON]
+   Failed
+
+  Passed Benchmark_Move_SingleItem [419 ms]
+  Standard Output Messages:
+ Start test 19: Benchmark_Move_SingleItem[BENCHMARK] Move_SingleItem: 22ms (22.00ms/item, 1 items)
+ [BENCHMARK_JSON][
+   {
+     "Name": "Move_SingleItem",
+     "ElapsedMs": 22,
+     "ItemCount": 1,
+     "MsPerItem": 22
+   }
+ ][/BENCHMARK_JSON]
+   Passed
+
+Start test 20: Benchmark_Move_WithDescendants[BENCHMARK] Move_WithDescendants: 592ms (5.86ms/item, 101 items)
+[BENCHMARK_JSON][
+  {
+    "Name": "Move_WithDescendants",
+    "ElapsedMs": 592,
+    "ItemCount": 101,
+    "MsPerItem": 5.861386138613861
+  }
+][/BENCHMARK_JSON]
+  Passed
+  Passed Benchmark_Move_WithDescendants [1 s]
+  Standard Output Messages:
+ Start test 20: Benchmark_Move_WithDescendants[BENCHMARK] Move_WithDescendants: 592ms (5.86ms/item, 101 items)
+ [BENCHMARK_JSON][
+   {
+     "Name": "Move_WithDescendants",
+     "ElapsedMs": 592,
+     "ItemCount": 101,
+     "MsPerItem": 5.861386138613861
+   }
+ ][/BENCHMARK_JSON]
+   Passed
+
+Start test 21: Benchmark_MoveToRecycleBin_LargeTree[BENCHMARK] MoveToRecycleBin_LargeTree: 8955ms (8.95ms/item, 1001 items)
+[BENCHMARK_JSON][
+  {
+    "Name": "MoveToRecycleBin_LargeTree",
+    "ElapsedMs": 8955,
+    "ItemCount": 1001,
+    "MsPerItem": 8.946053946053945
+  }
+][/BENCHMARK_JSON]
+  Passed
+  Passed Benchmark_MoveToRecycleBin_LargeTree [17 s]
+  Standard Output Messages:
+ Start test 21: Benchmark_MoveToRecycleBin_LargeTree[BENCHMARK] MoveToRecycleBin_LargeTree: 8955ms (8.95ms/item, 1001 items)
+ [BENCHMARK_JSON][
+   {
+     "Name": "MoveToRecycleBin_LargeTree",
+     "ElapsedMs": 8955,
+     "ItemCount": 1001,
+     "MsPerItem": 8.946053946053945
+   }
+ ][/BENCHMARK_JSON]
+   Passed
+
+Start test 22: Benchmark_MoveToRecycleBin_Published[BENCHMARK] MoveToRecycleBin_Published: 34ms (34.00ms/item, 1 items)
+[BENCHMARK_JSON][
+  {
+    "Name": "MoveToRecycleBin_Published",
+    "ElapsedMs": 34,
+    "ItemCount": 1,
+    "MsPerItem": 34
+  }
+][/BENCHMARK_JSON]
+  Passed
+  Passed Benchmark_MoveToRecycleBin_Published [426 ms]
+  Standard Output Messages:
+ Start test 22: Benchmark_MoveToRecycleBin_Published[BENCHMARK] MoveToRecycleBin_Published: 34ms (34.00ms/item, 1 items)
+ [BENCHMARK_JSON][
+   {
+     "Name": "MoveToRecycleBin_Published",
+     "ElapsedMs": 34,
+     "ItemCount": 1,
+     "MsPerItem": 34
+   }
+ ][/BENCHMARK_JSON]
+   Passed
+
+Start test 23: Benchmark_PerformScheduledPublishfail: Umbraco.Cms.Core.Services.ContentService[0]
+      Failed to publish document id=1059, reason=FailedPublishPathNotPublished.
+[BENCHMARK] PerformScheduledPublish: 2526ms (25.26ms/item, 100 items)
+[BENCHMARK_JSON][
+  {
+    "Name": "PerformScheduledPublish",
+    "ElapsedMs": 2526,
+    "ItemCount": 100,
+    "MsPerItem": 25.26
+  }
+][/BENCHMARK_JSON]
+  Passed
+  Passed Benchmark_PerformScheduledPublish [3 s]
+  Standard Output Messages:
+ Start test 23: Benchmark_PerformScheduledPublishfail: Umbraco.Cms.Core.Services.ContentService[0]
+       Failed to publish document id=1059, reason=FailedPublishPathNotPublished.
+ [BENCHMARK] PerformScheduledPublish: 2526ms (25.26ms/item, 100 items)
+ [BENCHMARK_JSON][
+   {
+     "Name": "PerformScheduledPublish",
+     "ElapsedMs": 2526,
+     "ItemCount": 100,
+     "MsPerItem": 25.26
+   }
+ ][/BENCHMARK_JSON]
+   Passed
+
+Start test 24: Benchmark_Publish_BatchOf100[BENCHMARK] Publish_BatchOf100: 2456ms (24.56ms/item, 100 items)
+[BENCHMARK_JSON][
+  {
+    "Name": "Publish_BatchOf100",
+    "ElapsedMs": 2456,
+    "ItemCount": 100,
+    "MsPerItem": 24.56
+  }
+][/BENCHMARK_JSON]
+  Passed
+  Passed Benchmark_Publish_BatchOf100 [3 s]
+  Standard Output Messages:
+ Start test 24: Benchmark_Publish_BatchOf100[BENCHMARK] Publish_BatchOf100: 2456ms (24.56ms/item, 100 items)
+ [BENCHMARK_JSON][
+   {
+     "Name": "Publish_BatchOf100",
+     "ElapsedMs": 2456,
+     "ItemCount": 100,
+     "MsPerItem": 24.56
+   }
+ ][/BENCHMARK_JSON]
+   Passed
+
+Start test 25: Benchmark_Publish_SingleItem[BENCHMARK] Publish_SingleItem: 21ms (21.00ms/item, 1 items)
+[BENCHMARK_JSON][
+  {
+    "Name": "Publish_SingleItem",
+    "ElapsedMs": 21,
+    "ItemCount": 1,
+    "MsPerItem": 21
+  }
+][/BENCHMARK_JSON]
+  Passed
+Start test 26: Benchmark_PublishBranch_DeepTree[BENCHMARK] PublishBranch_DeepTree: 51ms (0.50ms/item, 101 items)
+[BENCHMARK_JSON][
+  {
+    "Name": "PublishBranch_DeepTree",
+    "ElapsedMs": 51,
+    "ItemCount": 101,
+    "MsPerItem": 0.504950495049505
+  }
+][/BENCHMARK_JSON]
+  Passed
+  Passed Benchmark_Publish_SingleItem [318 ms]
+  Standard Output Messages:
+ Start test 25: Benchmark_Publish_SingleItem[BENCHMARK] Publish_SingleItem: 21ms (21.00ms/item, 1 items)
+ [BENCHMARK_JSON][
+   {
+     "Name": "Publish_SingleItem",
+     "ElapsedMs": 21,
+     "ItemCount": 1,
+     "MsPerItem": 21
+   }
+ ][/BENCHMARK_JSON]
+   Passed
+
+  Passed Benchmark_PublishBranch_DeepTree [1 s]
+  Standard Output Messages:
+ Start test 26: Benchmark_PublishBranch_DeepTree[BENCHMARK] PublishBranch_DeepTree: 51ms (0.50ms/item, 101 items)
+ [BENCHMARK_JSON][
+   {
+     "Name": "PublishBranch_DeepTree",
+     "ElapsedMs": 51,
+     "ItemCount": 101,
+     "MsPerItem": 0.504950495049505
+   }
+ ][/BENCHMARK_JSON]
+   Passed
+
+Start test 27: Benchmark_PublishBranch_ShallowTree[BENCHMARK] PublishBranch_ShallowTree: 50ms (0.50ms/item, 101 items)
+[BENCHMARK_JSON][
+  {
+    "Name": "PublishBranch_ShallowTree",
+    "ElapsedMs": 50,
+    "ItemCount": 101,
+    "MsPerItem": 0.49504950495049505
+  }
+][/BENCHMARK_JSON]
+  Passed
+  Passed Benchmark_PublishBranch_ShallowTree [1 s]
+  Standard Output Messages:
+ Start test 27: Benchmark_PublishBranch_ShallowTree[BENCHMARK] PublishBranch_ShallowTree: 50ms (0.50ms/item, 101 items)
+ [BENCHMARK_JSON][
+   {
+     "Name": "PublishBranch_ShallowTree",
+     "ElapsedMs": 50,
+     "ItemCount": 101,
+     "MsPerItem": 0.49504950495049505
+   }
+ ][/BENCHMARK_JSON]
+   Passed
+
+Start test 28: Benchmark_Rollback_ToVersion  Failed
+  Failed Benchmark_Rollback_ToVersion [417 ms]
+  Error Message:
+     Need at least 6 versions for rollback test
+  Expected: greater than or equal to 6
+  But was:  1
+
+  Stack Trace:
+     at Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services.ContentServiceRefactoringBenchmarks.Benchmark_Rollback_ToVersion() in /home/yv01p/Umbraco-CMS/tests/Umbraco.Tests.Integration/Umbraco.Infrastructure/Services/ContentServiceRefactoringBenchmarks.cs:line 1022
+
+1)    at Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services.ContentServiceRefactoringBenchmarks.Benchmark_Rollback_ToVersion() in /home/yv01p/Umbraco-CMS/tests/Umbraco.Tests.Integration/Umbraco.Infrastructure/Services/ContentServiceRefactoringBenchmarks.cs:line 1022
+
+
+  Standard Output Messages:
+ Start test 28: Benchmark_Rollback_ToVersion  Failed
+
+Start test 29: Benchmark_Save_BatchOf100[BENCHMARK] Save_BatchOf100: 676ms (6.76ms/item, 100 items)
+[BENCHMARK_JSON][
+  {
+    "Name": "Save_BatchOf100",
+    "ElapsedMs": 676,
+    "ItemCount": 100,
+    "MsPerItem": 6.76
+  }
+][/BENCHMARK_JSON]
+  Passed
+  Passed Benchmark_Save_BatchOf100 [1 s]
+  Standard Output Messages:
+ Start test 29: Benchmark_Save_BatchOf100[BENCHMARK] Save_BatchOf100: 676ms (6.76ms/item, 100 items)
+ [BENCHMARK_JSON][
+   {
+     "Name": "Save_BatchOf100",
+     "ElapsedMs": 676,
+     "ItemCount": 100,
+     "MsPerItem": 6.76
+   }
+ ][/BENCHMARK_JSON]
+   Passed
+
+Start test 30: Benchmark_Save_BatchOf1000[BENCHMARK] Save_BatchOf1000: 7649ms (7.65ms/item, 1000 items)
+[BENCHMARK_JSON][
+  {
+    "Name": "Save_BatchOf1000",
+    "ElapsedMs": 7649,
+    "ItemCount": 1000,
+    "MsPerItem": 7.649
+  }
+][/BENCHMARK_JSON]
+  Passed
+  Passed Benchmark_Save_BatchOf1000 [8 s]
+  Standard Output Messages:
+ Start test 30: Benchmark_Save_BatchOf1000[BENCHMARK] Save_BatchOf1000: 7649ms (7.65ms/item, 1000 items)
+ [BENCHMARK_JSON][
+   {
+     "Name": "Save_BatchOf1000",
+     "ElapsedMs": 7649,
+     "ItemCount": 1000,
+     "MsPerItem": 7.649
+   }
+ ][/BENCHMARK_JSON]
+   Passed
+
+Start test 31: Benchmark_Save_SingleItem[BENCHMARK] Save_SingleItem: 7ms (7.00ms/item, 1 items)
+[BENCHMARK_JSON][
+  {
+    "Name": "Save_SingleItem",
+    "ElapsedMs": 7,
+    "ItemCount": 1,
+    "MsPerItem": 7
+  }
+][/BENCHMARK_JSON]
+  Passed
+  Passed Benchmark_Save_SingleItem [306 ms]
+  Standard Output Messages:
+ Start test 31: Benchmark_Save_SingleItem[BENCHMARK] Save_SingleItem: 7ms (7.00ms/item, 1 items)
+ [BENCHMARK_JSON][
+   {
+     "Name": "Save_SingleItem",
+     "ElapsedMs": 7,
+     "ItemCount": 1,
+     "MsPerItem": 7
+   }
+ ][/BENCHMARK_JSON]
+   Passed
+
+Start test 32: Benchmark_Sort_100Children[BENCHMARK] Sort_100Children: 758ms (7.58ms/item, 100 items)
+[BENCHMARK_JSON][
+  {
+    "Name": "Sort_100Children",
+    "ElapsedMs": 758,
+    "ItemCount": 100,
+    "MsPerItem": 7.58
+  }
+][/BENCHMARK_JSON]
+  Passed
+Start test 33: Benchmark_Unpublish_SingleItem[BENCHMARK] Unpublish_SingleItem: 23ms (23.00ms/item, 1 items)
+[BENCHMARK_JSON][
+  {
+    "Name": "Unpublish_SingleItem",
+    "ElapsedMs": 23,
+    "ItemCount": 1,
+    "MsPerItem": 23
+  }
+][/BENCHMARK_JSON]
+  Passed
+NUnit Adapter 4.6.0.0: Test execution complete
+  Passed Benchmark_Sort_100Children [1 s]
+  Standard Output Messages:
+ Start test 32: Benchmark_Sort_100Children[BENCHMARK] Sort_100Children: 758ms (7.58ms/item, 100 items)
+ [BENCHMARK_JSON][
+   {
+     "Name": "Sort_100Children",
+     "ElapsedMs": 758,
+     "ItemCount": 100,
+     "MsPerItem": 7.58
+   }
+ ][/BENCHMARK_JSON]
+   Passed
+
+  Passed Benchmark_Unpublish_SingleItem [411 ms]
+  Standard Output Messages:
+ Start test 33: Benchmark_Unpublish_SingleItem[BENCHMARK] Unpublish_SingleItem: 23ms (23.00ms/item, 1 items)
+ [BENCHMARK_JSON][
+   {
+     "Name": "Unpublish_SingleItem",
+     "ElapsedMs": 23,
+     "ItemCount": 1,
+     "MsPerItem": 23
+   }
+ ][/BENCHMARK_JSON]
+   Passed
+
+
+Test Run Failed.
+Total tests: 33
+     Passed: 29
+     Failed: 4
+ Total time: 1.4469 Minutes
