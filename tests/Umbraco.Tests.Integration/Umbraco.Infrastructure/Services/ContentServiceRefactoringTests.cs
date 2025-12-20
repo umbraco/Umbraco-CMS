@@ -160,7 +160,131 @@ internal sealed class ContentServiceRefactoringTests : UmbracoIntegrationTestWit
 
     #region Sort Operation Tests
 
-    // Tests 3-5 will be added in Task 3
+    /// <summary>
+    /// Test 3: Verifies Sort(IEnumerable&lt;IContent&gt;) correctly reorders children.
+    /// </summary>
+    [Test]
+    public void Sort_WithContentItems_ChangesSortOrder()
+    {
+        // Arrange - Use existing subpages from base class (Subpage, Subpage2, Subpage3)
+        // Get fresh copies to ensure we have current sort orders
+        var child1 = ContentService.GetById(Subpage.Id)!;
+        var child2 = ContentService.GetById(Subpage2.Id)!;
+        var child3 = ContentService.GetById(Subpage3.Id)!;
+
+        // v1.2: Verify initial sort order assumption
+        Assert.That(child1.SortOrder, Is.LessThan(child2.SortOrder), "Setup: child1 before child2");
+        Assert.That(child2.SortOrder, Is.LessThan(child3.SortOrder), "Setup: child2 before child3");
+
+        // Record original sort orders
+        var originalOrder1 = child1.SortOrder;
+        var originalOrder2 = child2.SortOrder;
+        var originalOrder3 = child3.SortOrder;
+
+        // Create reversed order list
+        var reorderedItems = new[] { child3, child2, child1 };
+
+        // Act
+        var result = ContentService.Sort(reorderedItems);
+
+        // Assert
+        Assert.That(result.Success, Is.True, "Sort should succeed");
+
+        // Re-fetch to verify persisted order
+        child1 = ContentService.GetById(Subpage.Id)!;
+        child2 = ContentService.GetById(Subpage2.Id)!;
+        child3 = ContentService.GetById(Subpage3.Id)!;
+
+        Assert.That(child3.SortOrder, Is.EqualTo(0), "Child3 should now be first (sort order 0)");
+        Assert.That(child2.SortOrder, Is.EqualTo(1), "Child2 should now be second (sort order 1)");
+        Assert.That(child1.SortOrder, Is.EqualTo(2), "Child1 should now be third (sort order 2)");
+    }
+
+    /// <summary>
+    /// Test 4: Verifies Sort(IEnumerable&lt;int&gt;) correctly reorders children by ID.
+    /// </summary>
+    [Test]
+    public void Sort_WithIds_ChangesSortOrder()
+    {
+        // Arrange - Use existing subpages from base class
+        var child1 = ContentService.GetById(Subpage.Id)!;
+        var child2 = ContentService.GetById(Subpage2.Id)!;
+        var child3 = ContentService.GetById(Subpage3.Id)!;
+
+        // v1.2: Verify initial sort order assumption
+        Assert.That(child1.SortOrder, Is.LessThan(child2.SortOrder), "Setup: child1 before child2");
+        Assert.That(child2.SortOrder, Is.LessThan(child3.SortOrder), "Setup: child2 before child3");
+
+        var child1Id = Subpage.Id;
+        var child2Id = Subpage2.Id;
+        var child3Id = Subpage3.Id;
+
+        // Create reversed order list by ID
+        var reorderedIds = new[] { child3Id, child2Id, child1Id };
+
+        // Act
+        var result = ContentService.Sort(reorderedIds);
+
+        // Assert
+        Assert.That(result.Success, Is.True, "Sort should succeed");
+
+        // Re-fetch to verify persisted order (v1.3: removed var to avoid shadowing)
+        child1 = ContentService.GetById(child1Id)!;
+        child2 = ContentService.GetById(child2Id)!;
+        child3 = ContentService.GetById(child3Id)!;
+
+        Assert.That(child3.SortOrder, Is.EqualTo(0), "Child3 should now be first (sort order 0)");
+        Assert.That(child2.SortOrder, Is.EqualTo(1), "Child2 should now be second (sort order 1)");
+        Assert.That(child1.SortOrder, Is.EqualTo(2), "Child1 should now be third (sort order 2)");
+    }
+
+    /// <summary>
+    /// Test 5: Verifies Sort fires Sorting and Sorted notifications in correct sequence.
+    /// </summary>
+    [Test]
+    public void Sort_FiresSortingAndSortedNotifications()
+    {
+        // Arrange - Use existing subpages from base class
+        var child1 = ContentService.GetById(Subpage.Id)!;
+        var child2 = ContentService.GetById(Subpage2.Id)!;
+        var child3 = ContentService.GetById(Subpage3.Id)!;
+
+        // v1.2: Verify initial sort order assumption
+        Assert.That(child1.SortOrder, Is.LessThan(child2.SortOrder), "Setup: child1 before child2");
+        Assert.That(child2.SortOrder, Is.LessThan(child3.SortOrder), "Setup: child2 before child3");
+
+        var reorderedItems = new[] { child3, child2, child1 };
+
+        // Clear notification tracking
+        RefactoringTestNotificationHandler.Reset();
+
+        // Act
+        var result = ContentService.Sort(reorderedItems);
+
+        // Assert
+        Assert.That(result.Success, Is.True, "Sort should succeed");
+
+        var notifications = RefactoringTestNotificationHandler.NotificationOrder;
+
+        // Verify both sorting notifications fire
+        Assert.That(notifications, Does.Contain(nameof(ContentSortingNotification)),
+            "Sorting notification should fire");
+        Assert.That(notifications, Does.Contain(nameof(ContentSortedNotification)),
+            "Sorted notification should fire");
+
+        // Also verify Saving/Saved fire (Sort saves content)
+        Assert.That(notifications, Does.Contain(nameof(ContentSavingNotification)),
+            "Saving notification should fire during sort");
+        Assert.That(notifications, Does.Contain(nameof(ContentSavedNotification)),
+            "Saved notification should fire during sort");
+
+        // Verify order: Sorting -> Saving -> Saved -> Sorted
+        var sortingIndex = notifications.IndexOf(nameof(ContentSortingNotification));
+        var sortedIndex = notifications.IndexOf(nameof(ContentSortedNotification));
+
+        Assert.That(sortingIndex, Is.LessThan(sortedIndex),
+            "Sorting should fire before Sorted");
+    }
 
     #endregion
 
