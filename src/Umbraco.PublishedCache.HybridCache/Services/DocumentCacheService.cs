@@ -345,6 +345,11 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         scope.Complete();
 
         RebuildMemoryCacheByContentTypeAsync(contentTypeIds).GetAwaiter().GetResult();
+
+        // Clear the entire published content cache.
+        // It doesn't seem feasible to be smarter about this, as a changed content type could be used for a document,
+        // an elements within the document, an ancestor or a composition.
+        _publishedContentCache.Clear();
     }
 
     public async Task RebuildMemoryCacheByContentTypeAsync(IEnumerable<int> contentTypeIds)
