@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence;
 internal sealed class LocksTests : UmbracoIntegrationTest
 {
     [SetUp]
-    protected void SetUp()
+    public void SetUp()
     {
         // create a few lock objects
         using (var scope = ScopeProvider.CreateScope())

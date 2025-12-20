@@ -571,7 +571,8 @@ public static class PublishedContentExtensions
     /// </summary>
     /// <typeparam name="T">The content type.</typeparam>
     /// <param name="content">The content.</param>
-    /// <param name="publishedStatusFilteringService"></param>
+    /// <param name="navigationQueryService">The query service for the in-memory navigation structure.</param>
+    /// <param name="publishedStatusFilteringService">The service for filtering published content by status.</param>
     /// <param name="maxLevel">The level.</param>
     /// <returns>
     ///     The ancestors of the content, at a level lesser or equal to the specified level, and of the specified
@@ -1307,14 +1308,12 @@ public static class PublishedContentExtensions
     /// </summary>
     /// <typeparam name="T">The content type.</typeparam>
     /// <param name="content">The content.</param>
-    /// <param name="variationContextAccessor">The accessor for the VariationContext</param>
-    /// <param name="navigationQueryService"></param>
-    /// <param name="publishStatusQueryService"></param>
+    /// <param name="navigationQueryService">The query service for the in-memory navigation structure.</param>
+    /// <param name="publishedStatusFilteringService">The service for filtering published content by status.</param>
     /// <param name="culture">
     ///     The specific culture to filter for. If null is used the current culture is used. (Default is
     ///     null)
     /// </param>
-    /// <param name="publishedCache"></param>
     /// <returns>The children of content, of the given content type.</returns>
     /// <remarks>
     ///     <para>Children are sorted by their sortOrder.</para>
