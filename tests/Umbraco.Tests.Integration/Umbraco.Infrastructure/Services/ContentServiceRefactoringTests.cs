@@ -547,7 +547,111 @@ internal sealed class ContentServiceRefactoringTests : UmbracoIntegrationTestWit
 
     #region Transaction Boundary Tests
 
-    // Tests 13-15 will be added in Task 6
+    /// <summary>
+    /// Test 13: Verifies that multiple operations within an uncompleted scope all roll back together.
+    /// </summary>
+    [Test]
+    public void AmbientScope_NestedOperationsShareTransaction()
+    {
+        // Arrange
+        var content1 = ContentBuilder.CreateSimpleContent(ContentType, "RollbackTest1", -1);
+        var content2 = ContentBuilder.CreateSimpleContent(ContentType, "RollbackTest2", -1);
+
+        // Act - Create scope, save content, but don't complete the scope
+        using (var scope = ScopeProvider.CreateScope())
+        {
+            ContentService.Save(content1);
+            ContentService.Save(content2);
+
+            // Verify content has IDs (was saved within transaction)
+            Assert.That(content1.Id, Is.GreaterThan(0), "Content1 should have an ID");
+            Assert.That(content2.Id, Is.GreaterThan(0), "Content2 should have an ID");
+
+            // v1.2: Note - IDs are captured for debugging but cannot be used after rollback
+            // since they were assigned within the rolled-back transaction
+            var id1 = content1.Id;
+            var id2 = content2.Id;
+
+            // DON'T call scope.Complete() - should roll back
+        }
+
+        // Assert - Content should not exist after rollback
+        // We can't use the IDs because they were assigned in the rolled-back transaction
+        // Instead, search by name
+        var foundContent = ContentService.GetRootContent()
+            .Where(c => c.Name == "RollbackTest1" || c.Name == "RollbackTest2")
+            .ToList();
+
+        Assert.That(foundContent, Is.Empty, "Content should not exist after transaction rollback");
+    }
+
+    /// <summary>
+    /// Test 14: Verifies that multiple operations within a completed scope all commit together.
+    /// </summary>
+    [Test]
+    public void AmbientScope_CompletedScopeCommitsAllOperations()
+    {
+        // Arrange
+        var content1 = ContentBuilder.CreateSimpleContent(ContentType, "CommitTest1", -1);
+        var content2 = ContentBuilder.CreateSimpleContent(ContentType, "CommitTest2", -1);
+        int id1, id2;
+
+        // Act - Create scope, save content, and complete the scope
+        using (var scope = ScopeProvider.CreateScope())
+        {
+            ContentService.Save(content1);
+            ContentService.Save(content2);
+
+            id1 = content1.Id;
+            id2 = content2.Id;
+
+            scope.Complete(); // Commit transaction
+        }
+
+        // Assert - Content should exist after commit
+        var retrieved1 = ContentService.GetById(id1);
+        var retrieved2 = ContentService.GetById(id2);
+
+        Assert.That(retrieved1, Is.Not.Null, "Content1 should exist after commit");
+        Assert.That(retrieved2, Is.Not.Null, "Content2 should exist after commit");
+        Assert.That(retrieved1!.Name, Is.EqualTo("CommitTest1"));
+        Assert.That(retrieved2!.Name, Is.EqualTo("CommitTest2"));
+    }
+
+    /// <summary>
+    /// Test 15: Verifies MoveToRecycleBin within an uncompleted scope rolls back completely.
+    /// </summary>
+    [Test]
+    public void AmbientScope_MoveToRecycleBinRollsBackCompletely()
+    {
+        // Arrange - Create and save content OUTSIDE the test scope so it persists
+        var content = ContentBuilder.CreateSimpleContent(ContentType, "MoveRollbackTest", -1);
+        ContentService.Save(content);
+        var contentId = content.Id;
+
+        // Verify content exists and is not trashed
+        var beforeMove = ContentService.GetById(contentId);
+        Assert.That(beforeMove, Is.Not.Null, "Content should exist before test");
+        Assert.That(beforeMove!.Trashed, Is.False, "Content should not be trashed before test");
+
+        // Act - Move to recycle bin within an uncompleted scope
+        using (var scope = ScopeProvider.CreateScope())
+        {
+            ContentService.MoveToRecycleBin(content);
+
+            // Verify it's trashed within the transaction
+            var duringMove = ContentService.GetById(contentId);
+            Assert.That(duringMove!.Trashed, Is.True, "Content should be trashed within transaction");
+
+            // DON'T call scope.Complete() - should roll back
+        }
+
+        // Assert - Content should be back to original state after rollback
+        var afterRollback = ContentService.GetById(contentId);
+        Assert.That(afterRollback, Is.Not.Null, "Content should still exist after rollback");
+        Assert.That(afterRollback!.Trashed, Is.False, "Content should not be trashed after rollback");
+        Assert.That(afterRollback.ParentId, Is.EqualTo(-1), "Content should be at root level after rollback");
+    }
 
     #endregion
 
