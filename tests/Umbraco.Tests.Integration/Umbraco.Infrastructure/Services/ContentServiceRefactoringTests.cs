@@ -290,7 +290,132 @@ internal sealed class ContentServiceRefactoringTests : UmbracoIntegrationTestWit
 
     #region DeleteOfType Tests
 
-    // Tests 6-8 will be added in Task 4
+    /// <summary>
+    /// Test 6: Verifies DeleteOfType with hierarchical content deletes everything correctly.
+    /// </summary>
+    [Test]
+    public void DeleteOfType_MovesDescendantsToRecycleBinFirst()
+    {
+        // Arrange - Create a second content type for descendants
+        var template = FileService.GetTemplate("defaultTemplate");
+        Assert.That(template, Is.Not.Null, "Default template must exist for test setup");
+        var childContentType = ContentTypeBuilder.CreateSimpleContentType(
+            "childType", "Child Type", defaultTemplateId: template!.Id);
+        ContentTypeService.Save(childContentType);
+
+        // Create parent of target type
+        var parent = ContentBuilder.CreateSimpleContent(ContentType, "ParentToDelete", -1);
+        ContentService.Save(parent);
+
+        // Create child of different type (should be moved to bin, not deleted)
+        var childOfDifferentType = ContentBuilder.CreateSimpleContent(childContentType, "ChildDifferentType", parent.Id);
+        ContentService.Save(childOfDifferentType);
+
+        // Create child of same type (should be deleted)
+        var childOfSameType = ContentBuilder.CreateSimpleContent(ContentType, "ChildSameType", parent.Id);
+        ContentService.Save(childOfSameType);
+
+        var parentId = parent.Id;
+        var childDiffId = childOfDifferentType.Id;
+        var childSameId = childOfSameType.Id;
+
+        // Act
+        ContentService.DeleteOfType(ContentType.Id);
+
+        // Assert
+        // Parent should be deleted (it's the target type)
+        var deletedParent = ContentService.GetById(parentId);
+        Assert.That(deletedParent, Is.Null, "Parent of target type should be deleted");
+
+        // Child of same type should be deleted
+        var deletedChildSame = ContentService.GetById(childSameId);
+        Assert.That(deletedChildSame, Is.Null, "Child of same type should be deleted");
+
+        // Child of different type should be in recycle bin
+        var trashedChild = ContentService.GetById(childDiffId);
+        Assert.That(trashedChild, Is.Not.Null, "Child of different type should still exist");
+        Assert.That(trashedChild!.Trashed, Is.True, "Child of different type should be in recycle bin");
+    }
+
+    /// <summary>
+    /// Test 7: Verifies DeleteOfType only deletes content of the specified type.
+    /// </summary>
+    [Test]
+    public void DeleteOfType_WithMixedTypes_OnlyDeletesSpecifiedType()
+    {
+        // Arrange - Create a second content type
+        var template = FileService.GetTemplate("defaultTemplate");
+        Assert.That(template, Is.Not.Null, "Default template must exist for test setup");
+        var otherContentType = ContentTypeBuilder.CreateSimpleContentType(
+            "otherType", "Other Type", defaultTemplateId: template!.Id);
+        ContentTypeService.Save(otherContentType);
+
+        // Create content of target type
+        var targetContent1 = ContentBuilder.CreateSimpleContent(ContentType, "Target1", -1);
+        var targetContent2 = ContentBuilder.CreateSimpleContent(ContentType, "Target2", -1);
+        ContentService.Save(targetContent1);
+        ContentService.Save(targetContent2);
+
+        // Create content of other type (should survive)
+        var otherContent = ContentBuilder.CreateSimpleContent(otherContentType, "Other", -1);
+        ContentService.Save(otherContent);
+
+        var target1Id = targetContent1.Id;
+        var target2Id = targetContent2.Id;
+        var otherId = otherContent.Id;
+
+        // Act
+        ContentService.DeleteOfType(ContentType.Id);
+
+        // Assert
+        Assert.That(ContentService.GetById(target1Id), Is.Null, "Target1 should be deleted");
+        Assert.That(ContentService.GetById(target2Id), Is.Null, "Target2 should be deleted");
+        Assert.That(ContentService.GetById(otherId), Is.Not.Null, "Other type content should survive");
+        Assert.That(ContentService.GetById(otherId)!.Trashed, Is.False, "Other type content should not be trashed");
+    }
+
+    /// <summary>
+    /// Test 8: Verifies DeleteOfTypes deletes multiple content types in a single operation.
+    /// </summary>
+    [Test]
+    public void DeleteOfTypes_DeletesMultipleTypesAtOnce()
+    {
+        // Arrange - Create additional content types
+        var template = FileService.GetTemplate("defaultTemplate");
+        Assert.That(template, Is.Not.Null, "Default template must exist for test setup");
+
+        var type1 = ContentTypeBuilder.CreateSimpleContentType(
+            "deleteType1", "Delete Type 1", defaultTemplateId: template!.Id);
+        var type2 = ContentTypeBuilder.CreateSimpleContentType(
+            "deleteType2", "Delete Type 2", defaultTemplateId: template.Id);
+        var survivorType = ContentTypeBuilder.CreateSimpleContentType(
+            "survivorType", "Survivor Type", defaultTemplateId: template.Id);
+
+        ContentTypeService.Save(type1);
+        ContentTypeService.Save(type2);
+        ContentTypeService.Save(survivorType);
+
+        // Create content of each type
+        var content1 = ContentBuilder.CreateSimpleContent(type1, "Content1", -1);
+        var content2 = ContentBuilder.CreateSimpleContent(type2, "Content2", -1);
+        var survivor = ContentBuilder.CreateSimpleContent(survivorType, "Survivor", -1);
+
+        ContentService.Save(content1);
+        ContentService.Save(content2);
+        ContentService.Save(survivor);
+
+        var content1Id = content1.Id;
+        var content2Id = content2.Id;
+        var survivorId = survivor.Id;
+
+        // Act - Delete multiple types
+        ContentService.DeleteOfTypes(new[] { type1.Id, type2.Id });
+
+        // Assert
+        Assert.That(ContentService.GetById(content1Id), Is.Null, "Content of type1 should be deleted");
+        Assert.That(ContentService.GetById(content2Id), Is.Null, "Content of type2 should be deleted");
+        Assert.That(ContentService.GetById(survivorId), Is.Not.Null, "Content of survivor type should exist");
+    }
 
     #endregion
 
