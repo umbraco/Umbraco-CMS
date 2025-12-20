@@ -347,7 +347,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
 
         // Clear the entire published content cache.
         // It doesn't seem feasible to be smarter about this, as a changed content type could be used for a document,
-        // an elements within the document, an ancestor or a composition.
+        // elements within the document, an ancestor or composition.
         _publishedContentCache.Clear();
     }
 

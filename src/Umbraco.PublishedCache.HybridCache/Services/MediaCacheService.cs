@@ -294,7 +294,7 @@ internal sealed class MediaCacheService : IMediaCacheService
 
         // Clear the entire published content cache.
         // It doesn't seem feasible to be smarter about this, as a changed content type could be used for a media item,
-        // an elements within the media item, an ancestor, or a composition.
+        // elements within the media item, an ancestor, or a composition.
         _publishedContentCache.Clear();
     }
 
