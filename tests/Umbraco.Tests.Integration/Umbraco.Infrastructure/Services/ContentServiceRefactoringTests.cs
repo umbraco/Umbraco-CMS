@@ -6,6 +6,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -30,6 +31,7 @@ internal sealed class ContentServiceRefactoringTests : UmbracoIntegrationTestWit
 {
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
     private IUserService UserService => GetRequiredService<IUserService>();
+    private IUserGroupService UserGroupService => GetRequiredService<IUserGroupService>();
 
     protected override void CustomTestSetup(IUmbracoBuilder builder) => builder
         .AddNotificationHandler<ContentSavingNotification, RefactoringTestNotificationHandler>()
@@ -421,7 +423,125 @@ internal sealed class ContentServiceRefactoringTests : UmbracoIntegrationTestWit
 
     #region Permission Tests
 
-    // Tests 9-12 will be added in Task 5
+    /// <summary>
+    /// Test 9: Verifies SetPermission assigns a permission and GetPermissions retrieves it.
+    /// </summary>
+    [Test]
+    public async Task SetPermission_AssignsPermissionToUserGroup()
+    {
+        // Arrange
+        var content = ContentBuilder.CreateSimpleContent(ContentType, "PermissionTest", -1);
+        ContentService.Save(content);
+
+        // Get admin user group ID (should always exist)
+        var adminGroup = await UserGroupService.GetAsync(Constants.Security.AdminGroupAlias);
+        Assert.That(adminGroup, Is.Not.Null, "Admin group should exist");
+
+        // Act - Assign browse permission ('F' is typically the Browse Node permission)
+        ContentService.SetPermission(content, "F", new[] { adminGroup!.Id });
+
+        // Assert
+        var permissions = ContentService.GetPermissions(content);
+        Assert.That(permissions, Is.Not.Null, "Permissions should be returned");
+
+        var adminPermissions = permissions.FirstOrDefault(p => p.UserGroupId == adminGroup.Id);
+        Assert.That(adminPermissions, Is.Not.Null, "Should have permissions for admin group");
+        Assert.That(adminPermissions!.AssignedPermissions, Does.Contain("F"),
+            "Admin group should have Browse permission");
+    }
+
+    /// <summary>
+    /// Test 10: Verifies multiple SetPermission calls accumulate permissions for a user group.
+    /// </summary>
+    /// <remarks>
+    /// v1.2: Expected behavior documentation -
+    /// SetPermission assigns permissions per-permission-type, not per-entity.
+    /// Calling SetPermission("F", ...) then SetPermission("U", ...) results in both F and U
+    /// permissions being assigned. Each call only replaces permissions of the same type.
+    /// </remarks>
+    [Test]
+    public async Task SetPermission_MultiplePermissionsForSameGroup()
+    {
+        // Arrange
+        var content = ContentBuilder.CreateSimpleContent(ContentType, "MultiPermissionTest", -1);
+        ContentService.Save(content);
+
+        var adminGroup = (await UserGroupService.GetAsync(Constants.Security.AdminGroupAlias))!;
+
+        // Act - Assign multiple permissions
+        ContentService.SetPermission(content, "F", new[] { adminGroup.Id }); // Browse
+        ContentService.SetPermission(content, "U", new[] { adminGroup.Id }); // Update
+
+        // Assert
+        var permissions = ContentService.GetPermissions(content);
+        var adminPermissions = permissions.FirstOrDefault(p => p.UserGroupId == adminGroup.Id);
+
+        Assert.That(adminPermissions, Is.Not.Null, "Should have permissions for admin group");
+        Assert.That(adminPermissions!.AssignedPermissions, Does.Contain("F"), "Should have Browse permission");
+        Assert.That(adminPermissions.AssignedPermissions, Does.Contain("U"), "Should have Update permission");
+    }
+
+    /// <summary>
+    /// Test 11: Verifies SetPermissions assigns a complete permission set.
+    /// </summary>
+    [Test]
+    public async Task SetPermissions_AssignsPermissionSet()
+    {
+        // Arrange
+        var content = ContentBuilder.CreateSimpleContent(ContentType, "PermissionSetTest", -1);
+        ContentService.Save(content);
+
+        var adminGroup = (await UserGroupService.GetAsync(Constants.Security.AdminGroupAlias))!;
+
+        // Create permission set
+        var permissionSet = new EntityPermissionSet(
+            content.Id,
+            new EntityPermissionCollection(new[]
+            {
+                new EntityPermission(adminGroup.Id, content.Id, new HashSet<string> { "F", "U", "P" }) // Browse, Update, Publish
+            }));
+
+        // Act
+        ContentService.SetPermissions(permissionSet);
+
+        // Assert
+        var permissions = ContentService.GetPermissions(content);
+        var adminPermissions = permissions.FirstOrDefault(p => p.UserGroupId == adminGroup.Id);
+
+        Assert.That(adminPermissions, Is.Not.Null, "Should have permissions for admin group");
+        Assert.That(adminPermissions!.AssignedPermissions, Does.Contain("F"), "Should have Browse permission");
+        Assert.That(adminPermissions.AssignedPermissions, Does.Contain("U"), "Should have Update permission");
+        Assert.That(adminPermissions.AssignedPermissions, Does.Contain("P"), "Should have Publish permission");
+    }
+
+    /// <summary>
+    /// Test 12: Verifies SetPermission can assign to multiple user groups simultaneously.
+    /// </summary>
+    [Test]
+    public async Task SetPermission_AssignsToMultipleUserGroups()
+    {
+        // Arrange
+        var content = ContentBuilder.CreateSimpleContent(ContentType, "MultiGroupTest", -1);
+        ContentService.Save(content);
+
+        var adminGroup = (await UserGroupService.GetAsync(Constants.Security.AdminGroupAlias))!;
+        var editorGroup = (await UserGroupService.GetAsync(Constants.Security.EditorGroupKey))!;
+
+        // Act - Assign permission to multiple groups at once
+        ContentService.SetPermission(content, "F", new[] { adminGroup.Id, editorGroup.Id });
+
+        // Assert
+        var permissions = ContentService.GetPermissions(content);
+
+        var adminPermissions = permissions.FirstOrDefault(p => p.UserGroupId == adminGroup.Id);
+        var editorPermissions = permissions.FirstOrDefault(p => p.UserGroupId == editorGroup.Id);
+
+        Assert.That(adminPermissions, Is.Not.Null, "Should have permissions for admin group");
+        Assert.That(adminPermissions!.AssignedPermissions, Does.Contain("F"), "Admin should have Browse permission");
+
+        Assert.That(editorPermissions, Is.Not.Null, "Should have permissions for editor group");
+        Assert.That(editorPermissions!.AssignedPermissions, Does.Contain("F"), "Editor should have Browse permission");
+    }
 
     #endregion
 
