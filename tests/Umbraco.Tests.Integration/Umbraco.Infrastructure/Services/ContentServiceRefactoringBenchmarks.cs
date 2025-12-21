@@ -65,7 +65,9 @@ internal sealed class ContentServiceRefactoringBenchmarks : ContentServiceBenchm
         var sw = Stopwatch.StartNew();
         ContentService.Save(content);
         sw.Stop();
-        RecordBenchmark("Save_SingleItem", sw.ElapsedMilliseconds, 1);
+
+        // Gate: Fail if >20% regression from baseline
+        AssertNoRegression("Save_SingleItem", sw.ElapsedMilliseconds, 1);
 
         Assert.That(content.Id, Is.GreaterThan(0));
     }
@@ -97,7 +99,9 @@ internal sealed class ContentServiceRefactoringBenchmarks : ContentServiceBenchm
         var sw = Stopwatch.StartNew();
         ContentService.Save(items);
         sw.Stop();
-        RecordBenchmark("Save_BatchOf100", sw.ElapsedMilliseconds, itemCount);
+
+        // Gate: Fail if >20% regression from baseline
+        AssertNoRegression("Save_BatchOf100", sw.ElapsedMilliseconds, itemCount);
 
         Assert.That(items.All(c => c.Id > 0), Is.True);
     }
@@ -129,7 +133,9 @@ internal sealed class ContentServiceRefactoringBenchmarks : ContentServiceBenchm
         var sw = Stopwatch.StartNew();
         ContentService.Save(items);
         sw.Stop();
-        RecordBenchmark("Save_BatchOf1000", sw.ElapsedMilliseconds, itemCount);
+
+        // Gate: Fail if >20% regression from baseline
+        AssertNoRegression("Save_BatchOf1000", sw.ElapsedMilliseconds, itemCount);
 
         Assert.That(items.All(c => c.Id > 0), Is.True);
     }
@@ -147,7 +153,7 @@ internal sealed class ContentServiceRefactoringBenchmarks : ContentServiceBenchm
         var id = content.Id;
 
         IContent? result = null;
-        MeasureAndRecord("GetById_Single", 1, () =>
+        MeasureAndAssertNoRegression("GetById_Single", 1, () =>
         {
             result = ContentService.GetById(id);
         });
@@ -176,7 +182,7 @@ internal sealed class ContentServiceRefactoringBenchmarks : ContentServiceBenchm
         var ids = items.Select(c => c.Id).ToList();
 
         IEnumerable<IContent>? results = null;
-        MeasureAndRecord("GetByIds_BatchOf100", itemCount, () =>
+        MeasureAndAssertNoRegression("GetByIds_BatchOf100", itemCount, () =>
         {
             results = ContentService.GetByIds(ids);
         });
@@ -194,7 +200,7 @@ internal sealed class ContentServiceRefactoringBenchmarks : ContentServiceBenchm
         var content = ContentBuilder.CreateSimpleContent(ContentType, "DeleteTest", -1);
         ContentService.Save(content);
 
-        MeasureAndRecord("Delete_SingleItem", 1, () =>
+        MeasureAndAssertNoRegression("Delete_SingleItem", 1, () =>
         {
             ContentService.Delete(content);
         }, skipWarmup: true); // Destructive operation - cannot repeat
@@ -220,7 +226,7 @@ internal sealed class ContentServiceRefactoringBenchmarks : ContentServiceBenchm
             ContentService.Save(child);
         }
 
-        MeasureAndRecord("Delete_WithDescendants", childCount + 1, () =>
+        MeasureAndAssertNoRegression("Delete_WithDescendants", childCount + 1, () =>
         {
             ContentService.Delete(parent);
         }, skipWarmup: true); // Destructive operation - cannot repeat
@@ -253,7 +259,7 @@ internal sealed class ContentServiceRefactoringBenchmarks : ContentServiceBenchm
         IEnumerable<IContent>? results = null;
         long totalRecords = 0;
 
-        MeasureAndRecord("GetPagedChildren_100Items", childCount, () =>
+        MeasureAndAssertNoRegression("GetPagedChildren_100Items", childCount, () =>
         {
             results = ContentService.GetPagedChildren(parent.Id, 0, 100, out totalRecords);
         });
@@ -293,7 +299,7 @@ internal sealed class ContentServiceRefactoringBenchmarks : ContentServiceBenchm
         IEnumerable<IContent>? results = null;
         long totalRecords = 0;
 
-        MeasureAndRecord("GetPagedDescendants_DeepTree", 300, () =>
+        MeasureAndAssertNoRegression("GetPagedDescendants_DeepTree", 300, () =>
         {
             results = ContentService.GetPagedDescendants(root.Id, 0, 1000, out totalRecords);
         });
@@ -324,7 +330,7 @@ internal sealed class ContentServiceRefactoringBenchmarks : ContentServiceBenchm
         var deepestId = current.Id;
 
         IEnumerable<IContent>? results = null;
-        MeasureAndRecord("GetAncestors_DeepHierarchy", depth, () =>
+        MeasureAndAssertNoRegression("GetAncestors_DeepHierarchy", depth, () =>
         {
             results = ContentService.GetAncestors(deepestId);
         });
