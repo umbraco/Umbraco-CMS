@@ -223,7 +223,7 @@ public class ContentServiceBaseTests
         // 2. Delete this tracking test
         // 3. Verify all tests pass
 
-        var type = Type.GetType("Umbraco.Cms.Infrastructure.Services.ContentServiceBase, Umbraco.Infrastructure");
+        var type = Type.GetType("Umbraco.Cms.Core.Services.ContentServiceBase, Umbraco.Core");
 
         Assert.That(type, Is.Null,
             "ContentServiceBase now exists! Uncomment all tests in this file and delete this tracking test.");
