@@ -386,22 +386,29 @@ public class ContentServicesComposer : IComposer
 
 Each phase MUST run tests before and after to verify no regressions.
 
-| Phase | Service | Tests to Run | Gate |
-|-------|---------|--------------|------|
-| 0 | Write tests | `ContentServiceRefactoringTests` | All 15 pass |
-| 1 | CRUD Service | All ContentService*Tests | All pass |
-| 2 | Query Service | All ContentService*Tests | All pass |
-| 3 | Version Service | All ContentService*Tests | All pass |
-| 4 | Move Service | All ContentService*Tests + Sort/MoveToRecycleBin tests | All pass |
-| 5 | Publish Operation Service | All ContentService*Tests + Notification ordering tests | All pass |
-| 6 | Permission Manager | All ContentService*Tests + Permission tests | All pass |
-| 7 | Blueprint Manager | All ContentService*Tests | All pass |
-| 8 | Facade | **Full test suite** | All pass |
+| Phase | Service | Tests to Run | Gate | Status |
+|-------|---------|--------------|------|--------|
+| 0 | Write tests | `ContentServiceRefactoringTests` | All 15 pass | ✅ Complete |
+| 1 | CRUD Service | All ContentService*Tests | All pass | ✅ Complete |
+| 2 | Query Service | All ContentService*Tests | All pass | Pending |
+| 3 | Version Service | All ContentService*Tests | All pass | Pending |
+| 4 | Move Service | All ContentService*Tests + Sort/MoveToRecycleBin tests | All pass | Pending |
+| 5 | Publish Operation Service | All ContentService*Tests + Notification ordering tests | All pass | Pending |
+| 6 | Permission Manager | All ContentService*Tests + Permission tests | All pass | Pending |
+| 7 | Blueprint Manager | All ContentService*Tests | All pass | Pending |
+| 8 | Facade | **Full test suite** | All pass | Pending |
 
 ### Phase Details
 
-1. **Phase 0: Write Tests** - Create `ContentServiceRefactoringTests.cs` with all 15 tests
-2. **Phase 1: CRUD Service** - Establish patterns, base class
+1. **Phase 0: Write Tests** ✅ - Created `ContentServiceRefactoringTests.cs` with 16 tests (15 original + 1 DI test)
+2. **Phase 1: CRUD Service** ✅ - Complete! Created:
+   - `ContentServiceBase.cs` - Abstract base class with shared infrastructure
+   - `ContentServiceConstants.cs` - Shared constants
+   - `IContentCrudService.cs` - Interface (21 methods)
+   - `ContentCrudService.cs` - Implementation (~750 lines)
+   - Updated `ContentService.cs` to delegate CRUD operations (reduced from 3823 to 3497 lines)
+   - Benchmark regression enforcement (20% threshold, CI-configurable)
+   - Git tag: `phase-1-crud-extraction`
 3. **Phase 2: Query Service** - Read-only operations, low risk
 4. **Phase 3: Version Service** - Straightforward extraction
 5. **Phase 4: Move Service** - Depends on CRUD; Sort and MoveToRecycleBin tests critical
