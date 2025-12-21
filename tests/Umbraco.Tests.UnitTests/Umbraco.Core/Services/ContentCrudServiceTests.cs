@@ -133,7 +133,7 @@ public class ContentCrudServiceTests
     }
 
     [Test]
-    public void Create_WithNullContentType_ThrowsArgumentException()
+    public void Create_WithNonExistentContentType_ThrowsException()
     {
         // Arrange
         CreateMockScopeWithReadLock();
@@ -141,7 +141,8 @@ public class ContentCrudServiceTests
             .Returns(Enumerable.Empty<IContentType>());
 
         // Act & Assert
-        Assert.Throws<ArgumentException>(() =>
+        // Note: Throws generic Exception to match original ContentService behavior
+        Assert.Throws<Exception>(() =>
             _sut.Create("Test", Constants.System.Root, "nonExistentType"));
     }
 
