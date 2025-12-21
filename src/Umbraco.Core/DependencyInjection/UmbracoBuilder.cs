@@ -46,6 +46,7 @@ using Umbraco.Cms.Core.Services.ImportExport;
 using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Services.Querying;
 using Umbraco.Cms.Core.Services.Querying.RecycleBin;
+using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Telemetry;
 using Umbraco.Cms.Core.Templates;
@@ -297,7 +298,27 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<ITagService, TagService>();
             Services.AddUnique<IContentPermissionService, ContentPermissionService>();
             Services.AddUnique<IDictionaryPermissionService, DictionaryPermissionService>();
-            Services.AddUnique<IContentService, ContentService>();
+            Services.AddUnique<IContentCrudService, ContentCrudService>();
+            Services.AddUnique<IContentService>(sp =>
+                new ContentService(
+                    sp.GetRequiredService<ICoreScopeProvider>(),
+                    sp.GetRequiredService<ILoggerFactory>(),
+                    sp.GetRequiredService<IEventMessagesFactory>(),
+                    sp.GetRequiredService<IDocumentRepository>(),
+                    sp.GetRequiredService<IEntityRepository>(),
+                    sp.GetRequiredService<IAuditService>(),
+                    sp.GetRequiredService<IContentTypeRepository>(),
+                    sp.GetRequiredService<IDocumentBlueprintRepository>(),
+                    sp.GetRequiredService<ILanguageRepository>(),
+                    sp.GetRequiredService<Lazy<IPropertyValidationService>>(),
+                    sp.GetRequiredService<IShortStringHelper>(),
+                    sp.GetRequiredService<ICultureImpactFactory>(),
+                    sp.GetRequiredService<IUserIdKeyResolver>(),
+                    sp.GetRequiredService<PropertyEditorCollection>(),
+                    sp.GetRequiredService<IIdKeyMap>(),
+                    sp.GetRequiredService<IOptionsMonitor<ContentSettings>>(),
+                    sp.GetRequiredService<IRelationService>(),
+                    sp.GetRequiredService<IContentCrudService>()));
             Services.AddUnique<IContentBlueprintEditingService, ContentBlueprintEditingService>();
             Services.AddUnique<IContentEditingService, ContentEditingService>();
             Services.AddUnique<IContentPublishingService, ContentPublishingService>();

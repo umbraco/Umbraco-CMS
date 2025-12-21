@@ -655,6 +655,24 @@ internal sealed class ContentServiceRefactoringTests : UmbracoIntegrationTestWit
 
     #endregion
 
+    #region Phase 1 Tests
+
+    /// <summary>
+    /// Phase 1 Test: Verifies IContentCrudService is registered and resolvable from DI.
+    /// </summary>
+    [Test]
+    public void IContentCrudService_CanBeResolvedFromDI()
+    {
+        // Act
+        var crudService = GetRequiredService<IContentCrudService>();
+
+        // Assert
+        Assert.That(crudService, Is.Not.Null);
+        Assert.That(crudService, Is.InstanceOf<ContentCrudService>());
+    }
+
+    #endregion
+
     /// <summary>
     /// Notification handler that tracks the order of notifications for test verification.
     /// </summary>

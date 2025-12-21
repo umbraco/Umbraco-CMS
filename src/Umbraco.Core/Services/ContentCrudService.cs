@@ -48,7 +48,7 @@ public class ContentCrudService : ContentServiceBase, IContentCrudService
         IContentType? contentType = GetContentType(contentTypeAlias);
         if (contentType == null)
         {
-            throw new ArgumentException($"No ContentType matching the passed in Alias: '{contentTypeAlias}' was found", nameof(contentTypeAlias));
+            throw new Exception($"No ContentType matching the passed in Alias: '{contentTypeAlias}' was found");
         }
 
         return Create(name, parentId, contentType, userId);

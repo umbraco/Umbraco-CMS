@@ -43,9 +43,9 @@
   },
   {
     "Name": "DeleteVersions_ByDate",
-    "ElapsedMs": 5,
+    "ElapsedMs": 178,
     "ItemCount": 100,
-    "MsPerItem": 0.05
+    "MsPerItem": 1.78
   },
   {
     "Name": "EmptyRecycleBin_100Items",
@@ -91,9 +91,9 @@
   },
   {
     "Name": "GetVersions_ItemWith100Versions",
-    "ElapsedMs": 11,
+    "ElapsedMs": 19,
     "ItemCount": 100,
-    "MsPerItem": 0.11
+    "MsPerItem": 0.19
   },
   {
     "Name": "GetVersionsSlim_Paged",
@@ -160,6 +160,12 @@
     "ElapsedMs": 50,
     "ItemCount": 101,
     "MsPerItem": 0.49504950495049505
+  },
+  {
+    "Name": "Rollback_ToVersion",
+    "ElapsedMs": 33,
+    "ItemCount": 1,
+    "MsPerItem": 33
   },
   {
     "Name": "Save_BatchOf100",

@@ -1,0 +1,216 @@
+// Validating benchmarks:
+// ***** BenchmarkRunner: Start   *****
+// ***** Found 11 benchmark(s) in total *****
+// ***** Building 2 exe(s) in Parallel: Start   *****
+// ***** Done, took 00:01:38 (98.93 sec)   *****
+// ***** Failed to build in Parallel, switching to sequential build   *****
+// ***** Done, took 00:00:03 (3.56 sec)   *****
+// Found 1 benchmarks:
+//   LoggerAllocationBenchmark.Baseline: Job-RELKCN(IterationCount=3, IterationTime=100ms, LaunchCount=1, WarmupCount=3)
+
+// **************************
+// Benchmark: LoggerAllocationBenchmark.Baseline: Job-RELKCN(IterationCount=3, IterationTime=100ms, LaunchCount=1, WarmupCount=3)
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet Umbraco.Tests.Benchmarks-Job-RELKCN-1.dll --anonymousPipes 123 124 --benchmarkName Umbraco.Tests.Benchmarks.LoggerAllocationBenchmark.Baseline --job "IterationCount=3, IterationTime=100ms, LaunchCount=1, WarmupCount=3" --benchmarkId 0 in /home/yv01p/Umbraco-CMS/tests/Umbraco.Tests.Benchmarks/bin/Release/net10.0/Umbraco.Tests.Benchmarks-Job-RELKCN-1/bin/Release/net10.0
+// Failed to set up high priority (Permission denied). In order to run benchmarks with high priority, make sure you have the right permissions.
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// BenchmarkDotNet v0.15.6
+// Runtime=.NET 10.0.0 (10.0.0, 10.0.25.52411), X64 RyuJIT x86-64-v4
+// GC=Concurrent Workstation
+// HardwareIntrinsics=AVX512 F+BW+CD+DQ+VL,AVX2+BMI1+BMI2+F16C+FMA+LZCNT+MOVBE,AVX,SSE3+SSSE3+SSE4.1+SSE4.2+POPCNT,X86Base+SSE+SSE2,AES+PCLMUL VectorSize=256
+// Job: Job-RELKCN(IterationCount=3, IterationTime=100ms, LaunchCount=1, WarmupCount=3)
+
+OverheadJitting  1: 1 op, 329662.00 ns, 329.6620 us/op
+WorkloadJitting  1: 1 op, 440548.00 ns, 440.5480 us/op
+
+OverheadJitting  2: 16 op, 279932.00 ns, 17.4958 us/op
+WorkloadJitting  2: 16 op, 1813645.00 ns, 113.3528 us/op
+
+WorkloadPilot    1: 16 op, 1104041.00 ns, 69.0026 us/op
+WorkloadPilot    2: 1456 op, 67166451.00 ns, 46.1308 us/op
+WorkloadPilot    3: 2176 op, 76232074.00 ns, 35.0331 us/op
+WorkloadPilot    4: 2864 op, 54990059.00 ns, 19.2004 us/op
+WorkloadPilot    5: 5216 op, 103296692.00 ns, 19.8038 us/op
+WorkloadPilot    6: 5056 op, 95686128.00 ns, 18.9253 us/op
+WorkloadPilot    7: 5296 op, 99203282.00 ns, 18.7317 us/op
+WorkloadPilot    8: 5344 op, 104144375.00 ns, 19.4881 us/op
+WorkloadPilot    9: 5136 op, 93310630.00 ns, 18.1680 us/op
+WorkloadPilot   10: 5504 op, 101066291.00 ns, 18.3623 us/op
+
+OverheadWarmup   1: 5504 op, 18514.00 ns, 3.3637 ns/op
+OverheadWarmup   2: 5504 op, 15771.00 ns, 2.8654 ns/op
+OverheadWarmup   3: 5504 op, 15650.00 ns, 2.8434 ns/op
+OverheadWarmup   4: 5504 op, 15522.00 ns, 2.8201 ns/op
+OverheadWarmup   5: 5504 op, 15725.00 ns, 2.8570 ns/op
+OverheadWarmup   6: 5504 op, 15595.00 ns, 2.8334 ns/op
+OverheadWarmup   7: 5504 op, 15599.00 ns, 2.8341 ns/op
+OverheadWarmup   8: 5504 op, 15769.00 ns, 2.8650 ns/op
+OverheadWarmup   9: 5504 op, 15601.00 ns, 2.8345 ns/op
+
+OverheadActual   1: 5504 op, 15957.00 ns, 2.8992 ns/op
+OverheadActual   2: 5504 op, 15832.00 ns, 2.8765 ns/op
+OverheadActual   3: 5504 op, 17221.00 ns, 3.1288 ns/op
+OverheadActual   4: 5504 op, 15701.00 ns, 2.8527 ns/op
+OverheadActual   5: 5504 op, 15703.00 ns, 2.8530 ns/op
+OverheadActual   6: 5504 op, 15700.00 ns, 2.8525 ns/op
+OverheadActual   7: 5504 op, 29718.00 ns, 5.3993 ns/op
+OverheadActual   8: 5504 op, 15626.00 ns, 2.8390 ns/op
+OverheadActual   9: 5504 op, 15610.00 ns, 2.8361 ns/op
+OverheadActual  10: 5504 op, 21303.00 ns, 3.8705 ns/op
+OverheadActual  11: 5504 op, 15816.00 ns, 2.8735 ns/op
+OverheadActual  12: 5504 op, 15816.00 ns, 2.8735 ns/op
+OverheadActual  13: 5504 op, 15548.00 ns, 2.8249 ns/op
+OverheadActual  14: 5504 op, 15593.00 ns, 2.8330 ns/op
+OverheadActual  15: 5504 op, 16904.00 ns, 3.0712 ns/op
+
+WorkloadWarmup   1: 5504 op, 111452782.00 ns, 20.2494 us/op
+WorkloadWarmup   2: 5504 op, 131013662.00 ns, 23.8034 us/op
+WorkloadWarmup   3: 5504 op, 100778633.00 ns, 18.3101 us/op
+
+// BeforeActualRun
+WorkloadActual   1: 5504 op, 101621540.00 ns, 18.4632 us/op
+WorkloadActual   2: 5504 op, 104940024.00 ns, 19.0661 us/op
+WorkloadActual   3: 5504 op, 106892662.00 ns, 19.4209 us/op
+
+// AfterActualRun
+WorkloadResult   1: 5504 op, 101605724.00 ns, 18.4603 us/op
+WorkloadResult   2: 5504 op, 104924208.00 ns, 19.0633 us/op
+WorkloadResult   3: 5504 op, 106876846.00 ns, 19.4180 us/op
+// GC:  20 0 0 352256000 5504
+// Threading:  0 0 5504
+
+// AfterAll
+// Benchmark Process 249668 has exited with code 0.
+
+Mean = 18.981 μs, StdErr = 0.280 μs (1.47%), N = 3, StdDev = 0.484 μs
+Min = 18.460 μs, Q1 = 18.762 μs, Median = 19.063 μs, Q3 = 19.241 μs, Max = 19.418 μs
+IQR = 0.479 μs, LowerFence = 18.044 μs, UpperFence = 19.959 μs
+ConfidenceInterval = [10.147 μs; 27.814 μs] (CI 99.9%), Margin = 8.833 μs (46.54% of Mean)
+Skewness = -0.17, Kurtosis = 0.67, MValue = 2
+
+// ** Remained 10 (90.9 %) benchmark(s) to run. Estimated finish 2025-12-12 23:04 (0h 0m from now) **
+// ***** BenchmarkRunner: Finish  *****
+
+// * Export *
+  BenchmarkDotNet.Artifacts/results/Umbraco.Tests.Benchmarks.LoggerAllocationBenchmark-report.csv
+  BenchmarkDotNet.Artifacts/results/Umbraco.Tests.Benchmarks.LoggerAllocationBenchmark-report-github.md
+  BenchmarkDotNet.Artifacts/results/Umbraco.Tests.Benchmarks.LoggerAllocationBenchmark-report.html
+  BenchmarkDotNet.Artifacts/results/Umbraco.Tests.Benchmarks.LoggerAllocationBenchmark-report-default.md
+
+// * Detailed results *
+LoggerAllocationBenchmark.Baseline: Job-RELKCN(IterationCount=3, IterationTime=100ms, LaunchCount=1, WarmupCount=3)
+Runtime = .NET 10.0.0 (10.0.0, 10.0.25.52411), X64 RyuJIT x86-64-v4; GC = Concurrent Workstation
+Mean = 18.981 μs, StdErr = 0.280 μs (1.47%), N = 3, StdDev = 0.484 μs
+Min = 18.460 μs, Q1 = 18.762 μs, Median = 19.063 μs, Q3 = 19.241 μs, Max = 19.418 μs
+IQR = 0.479 μs, LowerFence = 18.044 μs, UpperFence = 19.959 μs
+ConfidenceInterval = [10.147 μs; 27.814 μs] (CI 99.9%), Margin = 8.833 μs (46.54% of Mean)
+Skewness = -0.17, Kurtosis = 0.67, MValue = 2
+-------------------- Histogram --------------------
+[18.020 μs ; 18.800 μs) | @
+[18.800 μs ; 19.681 μs) | @@
+---------------------------------------------------
+
+// * Summary *
+
+BenchmarkDotNet v0.15.6, Linux Ubuntu 25.10 (Questing Quokka)
+Intel Xeon CPU 2.80GHz, 1 CPU, 16 logical and 8 physical cores
+.NET SDK 10.0.100
+  [Host]     : .NET 10.0.0 (10.0.0, 10.0.25.52411), X64 RyuJIT x86-64-v4
+  Job-RELKCN : .NET 10.0.0 (10.0.0, 10.0.25.52411), X64 RyuJIT x86-64-v4
+
+IterationCount=3  IterationTime=100ms  LaunchCount=1  
+WarmupCount=3  
+
+| Method   | Mean     | Error    | StdDev   | Ratio | RatioSD | Gen0   | Allocated | Alloc Ratio |
+|--------- |---------:|---------:|---------:|------:|--------:|-------:|----------:|------------:|
+| Baseline | 18.98 μs | 8.833 μs | 0.484 μs |  1.00 |    0.03 | 3.6337 |   62.5 KB |        1.00 |
+
+// * Legends *
+  Mean        : Arithmetic mean of all measurements
+  Error       : Half of 99.9% confidence interval
+  StdDev      : Standard deviation of all measurements
+  Ratio       : Mean of the ratio distribution ([Current]/[Baseline])
+  RatioSD     : Standard deviation of the ratio distribution ([Current]/[Baseline])
+  Gen0        : GC Generation 0 collects per 1000 operations
+  Allocated   : Allocated memory per single operation (managed only, inclusive, 1KB = 1024B)
+  Alloc Ratio : Allocated memory ratio distribution ([Current]/[Baseline])
+  1 μs        : 1 Microsecond (0.000001 sec)
+
+// * Diagnostic Output - MemoryDiagnoser *
+
+
+// ***** BenchmarkRunner: End *****
+Run time: 00:00:01 (1.95 sec), executed benchmarks: 1
+
+// Found 10 benchmarks:
+//   Utf8ToAsciiConverterBaselineBenchmarks.Tiny_Ascii: .NET 9.0(Runtime=.NET 9.0)
+//   Utf8ToAsciiConverterBaselineBenchmarks.Tiny_Mixed: .NET 9.0(Runtime=.NET 9.0)
+//   Utf8ToAsciiConverterBaselineBenchmarks.Small_Ascii: .NET 9.0(Runtime=.NET 9.0)
+//   Utf8ToAsciiConverterBaselineBenchmarks.Small_Mixed: .NET 9.0(Runtime=.NET 9.0)
+//   Utf8ToAsciiConverterBaselineBenchmarks.Medium_Ascii: .NET 9.0(Runtime=.NET 9.0)
+//   Utf8ToAsciiConverterBaselineBenchmarks.Medium_Mixed: .NET 9.0(Runtime=.NET 9.0)
+//   Utf8ToAsciiConverterBaselineBenchmarks.Large_Ascii: .NET 9.0(Runtime=.NET 9.0)
+//   Utf8ToAsciiConverterBaselineBenchmarks.Large_Mixed: .NET 9.0(Runtime=.NET 9.0)
+//   Utf8ToAsciiConverterBaselineBenchmarks.Large_WorstCase: .NET 9.0(Runtime=.NET 9.0)
+//   Utf8ToAsciiConverterBaselineBenchmarks.CharArray_Medium_Mixed: .NET 9.0(Runtime=.NET 9.0)
+
+// Build Error: Standard output: 
+  
+ Standard error: 
+   Determining projects to restore...
+/home/yv01p/Umbraco-CMS/tests/Umbraco.Tests.Benchmarks/bin/Release/net10.0/Umbraco.Tests.Benchmarks-.NET 9.0-2/BenchmarkDotNet.Autogenerated.csproj : error NU1201: Project Umbraco.Tests.Benchmarks is not compatible with net9.0 (.NETCoreApp,Version=v9.0). Project Umbraco.Tests.Benchmarks supports: net10.0 (.NETCoreApp,Version=v10.0)
+  Failed to restore /home/yv01p/Umbraco-CMS/tests/Umbraco.Tests.Benchmarks/bin/Release/net10.0/Umbraco.Tests.Benchmarks-.NET 9.0-2/BenchmarkDotNet.Autogenerated.csproj (in 495 ms).
+  19 of 20 projects are up-to-date for restore.
+
+// BenchmarkDotNet has failed to build the auto-generated boilerplate code.
+// It can be found in /home/yv01p/Umbraco-CMS/tests/Umbraco.Tests.Benchmarks/bin/Release/net10.0/Umbraco.Tests.Benchmarks-.NET 9.0-2
+// Please follow the troubleshooting guide: https://benchmarkdotnet.org/articles/guides/troubleshooting.html
+
+// ** Remained 0 (0.0 %) benchmark(s) to run. Estimated finish 2025-12-12 23:04 (0h 0m from now) **
+// ***** BenchmarkRunner: Finish  *****
+
+// * Export *
+  BenchmarkDotNet.Artifacts/results/Umbraco.Tests.Benchmarks.Utf8ToAsciiConverterBaselineBenchmarks-report.csv
+  BenchmarkDotNet.Artifacts/results/Umbraco.Tests.Benchmarks.Utf8ToAsciiConverterBaselineBenchmarks-report-github.md
+  BenchmarkDotNet.Artifacts/results/Umbraco.Tests.Benchmarks.Utf8ToAsciiConverterBaselineBenchmarks-report.html
+  BenchmarkDotNet.Artifacts/results/Umbraco.Tests.Benchmarks.Utf8ToAsciiConverterBaselineBenchmarks-report-default.md
+
+// * Detailed results *
+Utf8ToAsciiConverterBaselineBenchmarks.Tiny_Ascii: .NET 9.0(Runtime=.NET 9.0)
+Runtime = ; GC = 
+There are not any results runs
+
+// * Summary *
+
+BenchmarkDotNet v0.15.6, Linux Ubuntu 25.10 (Questing Quokka)
+Intel Xeon CPU 2.80GHz, 1 CPU, 16 logical and 8 physical cores
+.NET SDK 10.0.100
+  [Host] : .NET 10.0.0 (10.0.0, 10.0.25.52411), X64 RyuJIT x86-64-v4
+
+Job=.NET 9.0  Runtime=.NET 9.0  
+
+| Method     | Mean | Error | Rank |
+|----------- |-----:|------:|-----:|
+| Tiny_Ascii |   NA |    NA |    ? |
+
+Benchmarks with issues:
+  Utf8ToAsciiConverterBaselineBenchmarks.Tiny_Ascii: .NET 9.0(Runtime=.NET 9.0)
+
+// * Legends *
+  Mean  : Arithmetic mean of all measurements
+  Error : Half of 99.9% confidence interval
+  Rank  : Relative position of current benchmark mean among all benchmarks (Arabic style)
+  1 ns  : 1 Nanosecond (0.000000001 sec)
+
+// * Diagnostic Output - MemoryDiagnoser *
+
+
+// ***** BenchmarkRunner: End *****
+Run time: 00:00:00 (0 sec), executed benchmarks: 0
+
+Global total time: 00:01:44 (104.6 sec), executed benchmarks: 1
+// * Artifacts cleanup *
+Artifacts cleanup is finished

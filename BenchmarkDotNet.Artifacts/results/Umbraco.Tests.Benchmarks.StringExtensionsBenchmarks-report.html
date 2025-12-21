@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8' />
+<title>Umbraco.Tests.Benchmarks.StringExtensionsBenchmarks-20251207-223758</title>
+
+<style type="text/css">
+	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
+	td, th { padding: 6px 13px; border: 1px solid #ddd; text-align: right; }
+	tr { background-color: #fff; border-top: 1px solid #ccc; }
+	tr:nth-child(even) { background: #f8f8f8; }
+</style>
+</head>
+<body>
+<pre><code>
+BenchmarkDotNet v0.15.6, Linux Ubuntu 25.10 (Questing Quokka)
+Intel Xeon CPU 2.80GHz, 1 CPU, 16 logical and 8 physical cores
+.NET SDK 10.0.100-rc.2.25502.107
+  [Host]   : .NET 10.0.0 (10.0.0-rc.2.25502.107, 10.0.25.50307), X64 RyuJIT x86-64-v4
+  ShortRun : .NET 10.0.0 (10.0.0-rc.2.25502.107, 10.0.25.50307), X64 RyuJIT x86-64-v4
+</code></pre>
+<pre><code>Job=ShortRun  IterationCount=3  LaunchCount=1  
+WarmupCount=3  
+</code></pre>
+
+<table>
+<thead><tr><th>Method                                         </th><th>Mean    </th><th>Error  </th><th>StdDev</th><th>Median  </th><th>Gen0</th><th>Allocated</th>
+</tr>
+</thead><tbody><tr><td>Linq</td><td>51,195.5380 ns</td><td>1,617.4345 ns</td><td>88.6570 ns</td><td>51,163.7063 ns</td><td>3.4180</td><td>59712 B</td>
+</tr><tr><td>SplitToHeapStrings</td><td>37,354.8894 ns</td><td>9,999.4406 ns</td><td>548.1031 ns</td><td>37,333.8901 ns</td><td>2.5635</td><td>44592 B</td>
+</tr><tr><td>SplitToStackSpansWithoutEmptyCheckReversingListAsSpan</td><td>25,784.9531 ns</td><td>1,949.3238 ns</td><td>106.8490 ns</td><td>25,818.4337 ns</td><td>0.9766</td><td>17128 B</td>
+</tr><tr><td>SplitToStackSpansWithoutEmptyCheck</td><td>26,441.8317 ns</td><td>4,054.8077 ns</td><td>222.2577 ns</td><td>26,557.4375 ns</td><td>0.9766</td><td>17128 B</td>
+</tr><tr><td>SplitToStackSpansWithEmptyCheck</td><td>25,821.9195 ns</td><td>4,840.3751 ns</td><td>265.3173 ns</td><td>25,718.1962 ns</td><td>0.9766</td><td>17128 B</td>
+</tr><tr><td>StripWhitespace_Benchmark</td><td>269.2084 ns</td><td>46.5960 ns</td><td>2.5541 ns</td><td>267.8466 ns</td><td>0.0033</td><td>64 B</td>
+</tr><tr><td>GetFileExtension_Benchmark</td><td>308.9820 ns</td><td>100.8086 ns</td><td>5.5257 ns</td><td>309.7014 ns</td><td>0.0319</td><td>552 B</td>
+</tr><tr><td>StripHtml_Benchmark</td><td>719.6788 ns</td><td>182.4947 ns</td><td>10.0031 ns</td><td>718.6075 ns</td><td>0.0019</td><td>48 B</td>
+</tr><tr><td>IsLowerCase_Benchmark</td><td>0.0194 ns</td><td>0.2102 ns</td><td>0.0115 ns</td><td>0.0218 ns</td><td>-</td><td>-</td>
+</tr><tr><td>IsUpperCase_Benchmark</td><td>0.0078 ns</td><td>0.2461 ns</td><td>0.0135 ns</td><td>0.0000 ns</td><td>-</td><td>-</td>
+</tr><tr><td>ReplaceNonAlphanumericChars_String_Benchmark</td><td>84.6292 ns</td><td>48.9647 ns</td><td>2.6839 ns</td><td>84.3141 ns</td><td>0.0097</td><td>168 B</td>
+</tr></tbody></table>
+</body>
+</html>

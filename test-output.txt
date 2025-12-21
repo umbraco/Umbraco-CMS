@@ -1,0 +1,27 @@
+Test run for /home/yv01p/Umbraco-CMS/tests/Umbraco.Tests.Integration/bin/Debug/net10.0/Umbraco.Tests.Integration.dll (.NETCoreApp,Version=v10.0)
+VSTest version 18.0.1 (x64)
+
+Starting test execution, please wait...
+A total of 1 test files matched the specified pattern.
+  Failed Cannot_Create_Content_With_Non_Existing_ContentType_Alias [364 ms]
+  Error Message:
+     Expected: <System.Exception>
+  But was:  <System.ArgumentException: No ContentType matching the passed in Alias: 'umbAliasDoesntExist' was found (Parameter 'contentTypeAlias')
+   at Umbraco.Cms.Core.Services.ContentCrudService.Create(String name, Int32 parentId, String contentTypeAlias, Int32 userId) in /home/yv01p/Umbraco-CMS/src/Umbraco.Core/Services/ContentCrudService.cs:line 51
+   at Umbraco.Cms.Core.Services.ContentService.Create(String name, Int32 parentId, String contentTypeAlias, Int32 userId) in /home/yv01p/Umbraco-CMS/src/Umbraco.Core/Services/ContentService.cs:line 398
+   at Umbraco.Cms.Tests.Integration.Umbraco.Core.Services.ContentServiceTests.<Cannot_Create_Content_With_Non_Existing_ContentType_Alias>b__50_0() in /home/yv01p/Umbraco-CMS/tests/Umbraco.Tests.Integration/Umbraco.Core/Services/ContentServiceTests.cs:line 531
+   at NUnit.Framework.Assert.Throws(IResolveConstraint expression, TestDelegate code, String message, Object[] args)>
+
+  Stack Trace:
+     at Umbraco.Cms.Tests.Integration.Umbraco.Core.Services.ContentServiceTests.Cannot_Create_Content_With_Non_Existing_ContentType_Alias() in /home/yv01p/Umbraco-CMS/tests/Umbraco.Tests.Integration/Umbraco.Core/Services/ContentServiceTests.cs:line 531
+
+1)    at Umbraco.Cms.Tests.Integration.Umbraco.Core.Services.ContentServiceTests.Cannot_Create_Content_With_Non_Existing_ContentType_Alias() in /home/yv01p/Umbraco-CMS/tests/Umbraco.Tests.Integration/Umbraco.Core/Services/ContentServiceTests.cs:line 531
+
+
+  Standard Output Messages:
+ Start test 55: Cannot_Create_Content_With_Non_Existing_ContentType_Alias  Failed
+
+  Skipped TagsAreUpdatedWhenContentIsTrashedAndUnTrashed_Tree [< 1 ms]
+  Skipped TagsAreUpdatedWhenContentIsUnpublishedAndRePublished_Tree [< 1 ms]
+
+Failed!  - Failed:     1, Passed:   208, Skipped:     2, Total:   211, Duration: 3 m 18 s - Umbraco.Tests.Integration.dll (net10.0)

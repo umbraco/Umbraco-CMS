@@ -412,6 +412,8 @@ internal sealed class ContentServiceRefactoringBenchmarks : ContentServiceBenchm
         int trueCount = 0;
         MeasureAndRecord("HasChildren_100Nodes", nodeCount, () =>
         {
+            // Reset counter to avoid double-counting from warmup run
+            trueCount = 0;
             foreach (var node in nodes)
             {
                 if (ContentService.HasChildren(node.Id))
@@ -947,20 +949,27 @@ internal sealed class ContentServiceRefactoringBenchmarks : ContentServiceBenchm
     /// <summary>
     /// Benchmark 29: GetVersions for item with 100 versions.
     /// </summary>
-    /// <remarks>v1.2: Renamed from 50Versions to 100Versions for standardization. Read-only operation.</remarks>
+    /// <remarks>
+    /// v1.2: Renamed from 50Versions to 100Versions for standardization. Read-only operation.
+    /// v1.3: Fixed to create actual versions by publishing. Save() updates existing version;
+    /// Publish() creates a new version.
+    /// </remarks>
     [Test]
     [LongRunning]
     public void Benchmark_GetVersions_ItemWith100Versions()
     {
         var content = ContentBuilder.CreateSimpleContent(ContentType, "VersionTest", -1);
         ContentService.Save(content);
+        ContentService.Publish(content, new[] { "*" }); // Initial publish creates version 1
 
-        // Create 100 versions by saving repeatedly
+        // Create 100 versions by publishing repeatedly
+        // Note: Save() updates existing version; Publish() creates new version
         const int versionCount = 100; // v1.2: Standardized to 100
         for (var i = 0; i < versionCount; i++)
         {
             content.Name = $"VersionTest_v{i}";
             ContentService.Save(content);
+            ContentService.Publish(content, new[] { "*" }); // Each publish creates a new version
         }
 
         IEnumerable<IContent>? versions = null;
@@ -969,26 +978,34 @@ internal sealed class ContentServiceRefactoringBenchmarks : ContentServiceBenchm
             versions = ContentService.GetVersions(content.Id);
         });
 
+        // versionCount publishes + 1 initial publish = versionCount + 1 versions
         Assert.That(versions!.Count(), Is.GreaterThanOrEqualTo(versionCount));
     }
 
     /// <summary>
     /// Benchmark 30: GetVersionsSlim with paging (100 versions, page of 10).
     /// </summary>
-    /// <remarks>v1.2: Standardized from 50 to 100 versions. Read-only operation.</remarks>
+    /// <remarks>
+    /// v1.2: Standardized from 50 to 100 versions. Read-only operation.
+    /// v1.3: Fixed to create actual versions by publishing. Save() updates existing version;
+    /// Publish() creates a new version.
+    /// </remarks>
     [Test]
     [LongRunning]
     public void Benchmark_GetVersionsSlim_Paged()
     {
         var content = ContentBuilder.CreateSimpleContent(ContentType, "SlimVersionTest", -1);
         ContentService.Save(content);
+        ContentService.Publish(content, new[] { "*" }); // Initial publish creates version 1
 
-        // Create 100 versions
+        // Create 100 versions by publishing repeatedly
+        // Note: Save() updates existing version; Publish() creates new version
         const int versionCount = 100; // v1.2: Standardized to 100
         for (var i = 0; i < versionCount; i++)
         {
             content.Name = $"SlimVersionTest_v{i}";
             ContentService.Save(content);
+            ContentService.Publish(content, new[] { "*" }); // Each publish creates a new version
         }
 
         IEnumerable<IContent>? versions = null;
@@ -1003,18 +1020,25 @@ internal sealed class ContentServiceRefactoringBenchmarks : ContentServiceBenchm
     /// <summary>
     /// Benchmark 31: Rollback to previous version.
     /// </summary>
+    /// <remarks>
+    /// v1.3: Fixed to create actual versions by publishing. Save() updates existing version;
+    /// Publish() creates a new version.
+    /// </remarks>
     [Test]
     [LongRunning]
     public void Benchmark_Rollback_ToVersion()
     {
         var content = ContentBuilder.CreateSimpleContent(ContentType, "RollbackTest", -1);
         ContentService.Save(content);
+        ContentService.Publish(content, new[] { "*" }); // Initial publish creates version 1
 
-        // Create 10 versions
+        // Create 10 versions by publishing repeatedly
+        // Note: Save() updates existing version; Publish() creates new version
         for (var i = 0; i < 10; i++)
         {
             content.Name = $"RollbackTest_v{i}";
             ContentService.Save(content);
+            ContentService.Publish(content, new[] { "*" }); // Each publish creates a new version
         }
 
         var versions = ContentService.GetVersions(content.Id).ToList();
@@ -1031,20 +1055,27 @@ internal sealed class ContentServiceRefactoringBenchmarks : ContentServiceBenchm
     /// <summary>
     /// Benchmark 32: DeleteVersions by date (100 versions).
     /// </summary>
-    /// <remarks>v1.2: Standardized from 50 to 100 versions.</remarks>
+    /// <remarks>
+    /// v1.2: Standardized from 50 to 100 versions.
+    /// v1.3: Fixed to create actual versions by publishing. Save() updates existing version;
+    /// Publish() creates a new version.
+    /// </remarks>
     [Test]
     [LongRunning]
     public void Benchmark_DeleteVersions_ByDate()
     {
         var content = ContentBuilder.CreateSimpleContent(ContentType, "DeleteVersionsTest", -1);
         ContentService.Save(content);
+        ContentService.Publish(content, new[] { "*" }); // Initial publish creates version 1
 
-        // Create 100 versions
+        // Create 100 versions by publishing repeatedly
+        // Note: Save() updates existing version; Publish() creates new version
         const int versionCount = 100; // v1.2: Standardized to 100
         for (var i = 0; i < versionCount; i++)
         {
             content.Name = $"DeleteVersionsTest_v{i}";
             ContentService.Save(content);
+            ContentService.Publish(content, new[] { "*" }); // Each publish creates a new version
         }
 
         // Delete all versions before "now" (which should be all of them)

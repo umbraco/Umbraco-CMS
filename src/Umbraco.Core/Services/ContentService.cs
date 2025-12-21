@@ -1,6 +1,8 @@
 using System.Collections.Immutable;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
+using System.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -44,9 +46,14 @@ public class ContentService : RepositoryService, IContentService
     private ContentSettings _contentSettings;
     private readonly IRelationService _relationService;
     private IQuery<IContent>? _queryNotTrashed;
+    private readonly Lazy<IContentCrudService> _crudServiceLazy;
+
+    // Property for convenient access (deferred resolution for both paths)
+    private IContentCrudService CrudService => _crudServiceLazy.Value;
 
     #region Constructors
 
+    [Microsoft.Extensions.DependencyInjection.ActivatorUtilitiesConstructor]
     public ContentService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -64,7 +71,8 @@ public class ContentService : RepositoryService, IContentService
         PropertyEditorCollection propertyEditorCollection,
         IIdKeyMap idKeyMap,
         IOptionsMonitor<ContentSettings> optionsMonitor,
-        IRelationService relationService)
+        IRelationService relationService,
+        IContentCrudService crudService)  // NEW PARAMETER - direct injection
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _documentRepository = documentRepository;
@@ -86,16 +94,20 @@ public class ContentService : RepositoryService, IContentService
         });
         _relationService = relationService;
         _logger = loggerFactory.CreateLogger<ContentService>();
+        ArgumentNullException.ThrowIfNull(crudService);
+        // Wrap in Lazy for consistent access pattern (already resolved, so returns immediately)
+        _crudServiceLazy = new Lazy<IContentCrudService>(() => crudService);
     }
 
     [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public ContentService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
         IEventMessagesFactory eventMessagesFactory,
         IDocumentRepository documentRepository,
         IEntityRepository entityRepository,
-        IAuditRepository auditRepository,
+        IAuditRepository auditRepository,  // Old parameter (kept for signature compatibility)
         IContentTypeRepository contentTypeRepository,
         IDocumentBlueprintRepository documentBlueprintRepository,
         ILanguageRepository languageRepository,
@@ -107,35 +119,46 @@ public class ContentService : RepositoryService, IContentService
         IIdKeyMap idKeyMap,
         IOptionsMonitor<ContentSettings> optionsMonitor,
         IRelationService relationService)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            documentRepository,
-            entityRepository,
-            StaticServiceProvider.Instance.GetRequiredService<IAuditService>(),
-            contentTypeRepository,
-            documentBlueprintRepository,
-            languageRepository,
-            propertyValidationService,
-            shortStringHelper,
-            cultureImpactFactory,
-            userIdKeyResolver,
-            propertyEditorCollection,
-            idKeyMap,
-            optionsMonitor,
-            relationService)
+        : base(provider, loggerFactory, eventMessagesFactory)
     {
+        // All existing field assignments...
+        _documentRepository = documentRepository ?? throw new ArgumentNullException(nameof(documentRepository));
+        _entityRepository = entityRepository ?? throw new ArgumentNullException(nameof(entityRepository));
+        _contentTypeRepository = contentTypeRepository ?? throw new ArgumentNullException(nameof(contentTypeRepository));
+        _documentBlueprintRepository = documentBlueprintRepository ?? throw new ArgumentNullException(nameof(documentBlueprintRepository));
+        _languageRepository = languageRepository ?? throw new ArgumentNullException(nameof(languageRepository));
+        _propertyValidationService = propertyValidationService ?? throw new ArgumentNullException(nameof(propertyValidationService));
+        _shortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
+        _cultureImpactFactory = cultureImpactFactory ?? throw new ArgumentNullException(nameof(cultureImpactFactory));
+        _userIdKeyResolver = userIdKeyResolver ?? throw new ArgumentNullException(nameof(userIdKeyResolver));
+        _propertyEditorCollection = propertyEditorCollection ?? throw new ArgumentNullException(nameof(propertyEditorCollection));
+        _idKeyMap = idKeyMap ?? throw new ArgumentNullException(nameof(idKeyMap));
+        _contentSettings = optionsMonitor?.CurrentValue ?? throw new ArgumentNullException(nameof(optionsMonitor));
+        optionsMonitor.OnChange((contentSettings) =>
+        {
+            _contentSettings = contentSettings;
+        });
+        _relationService = relationService ?? throw new ArgumentNullException(nameof(relationService));
+        _logger = loggerFactory.CreateLogger<ContentService>();
+
+        // Lazy resolution of IAuditService (from StaticServiceProvider)
+        _auditService = StaticServiceProvider.Instance.GetRequiredService<IAuditService>();
+
+        // NEW: Lazy resolution of IContentCrudService
+        _crudServiceLazy = new Lazy<IContentCrudService>(() =>
+            StaticServiceProvider.Instance.GetRequiredService<IContentCrudService>(),
+            LazyThreadSafetyMode.ExecutionAndPublication);
     }
 
     [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public ContentService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
         IEventMessagesFactory eventMessagesFactory,
         IDocumentRepository documentRepository,
         IEntityRepository entityRepository,
-        IAuditRepository auditRepository,
+        IAuditRepository auditRepository,  // Old parameter (kept for signature compatibility)
         IAuditService auditService,
         IContentTypeRepository contentTypeRepository,
         IDocumentBlueprintRepository documentBlueprintRepository,
@@ -148,25 +171,33 @@ public class ContentService : RepositoryService, IContentService
         IIdKeyMap idKeyMap,
         IOptionsMonitor<ContentSettings> optionsMonitor,
         IRelationService relationService)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            documentRepository,
-            entityRepository,
-            auditService,
-            contentTypeRepository,
-            documentBlueprintRepository,
-            languageRepository,
-            propertyValidationService,
-            shortStringHelper,
-            cultureImpactFactory,
-            userIdKeyResolver,
-            propertyEditorCollection,
-            idKeyMap,
-            optionsMonitor,
-            relationService)
+        : base(provider, loggerFactory, eventMessagesFactory)
     {
+        // All existing field assignments...
+        _documentRepository = documentRepository ?? throw new ArgumentNullException(nameof(documentRepository));
+        _entityRepository = entityRepository ?? throw new ArgumentNullException(nameof(entityRepository));
+        _auditService = auditService ?? throw new ArgumentNullException(nameof(auditService));
+        _contentTypeRepository = contentTypeRepository ?? throw new ArgumentNullException(nameof(contentTypeRepository));
+        _documentBlueprintRepository = documentBlueprintRepository ?? throw new ArgumentNullException(nameof(documentBlueprintRepository));
+        _languageRepository = languageRepository ?? throw new ArgumentNullException(nameof(languageRepository));
+        _propertyValidationService = propertyValidationService ?? throw new ArgumentNullException(nameof(propertyValidationService));
+        _shortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
+        _cultureImpactFactory = cultureImpactFactory ?? throw new ArgumentNullException(nameof(cultureImpactFactory));
+        _userIdKeyResolver = userIdKeyResolver ?? throw new ArgumentNullException(nameof(userIdKeyResolver));
+        _propertyEditorCollection = propertyEditorCollection ?? throw new ArgumentNullException(nameof(propertyEditorCollection));
+        _idKeyMap = idKeyMap ?? throw new ArgumentNullException(nameof(idKeyMap));
+        _contentSettings = optionsMonitor?.CurrentValue ?? throw new ArgumentNullException(nameof(optionsMonitor));
+        optionsMonitor.OnChange((contentSettings) =>
+        {
+            _contentSettings = contentSettings;
+        });
+        _relationService = relationService ?? throw new ArgumentNullException(nameof(relationService));
+        _logger = loggerFactory.CreateLogger<ContentService>();
+
+        // NEW: Lazy resolution of IContentCrudService
+        _crudServiceLazy = new Lazy<IContentCrudService>(() =>
+            StaticServiceProvider.Instance.GetRequiredService<IContentCrudService>(),
+            LazyThreadSafetyMode.ExecutionAndPublication);
     }
 
     #endregion
@@ -348,11 +379,7 @@ public class ContentService : RepositoryService, IContentService
     ///     <see cref="IContent" />
     /// </returns>
     public IContent Create(string name, Guid parentId, string contentTypeAlias, int userId = Constants.Security.SuperUserId)
-    {
-        // TODO: what about culture?
-        IContent? parent = GetById(parentId);
-        return Create(name, parent, contentTypeAlias, userId);
-    }
+        => CrudService.Create(name, parentId, contentTypeAlias, userId);
 
     /// <summary>
     ///     Creates an <see cref="IContent" /> object of a specified content type.
@@ -368,11 +395,7 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="userId">The optional id of the user creating the content.</param>
     /// <returns>The content object.</returns>
     public IContent Create(string name, int parentId, string contentTypeAlias, int userId = Constants.Security.SuperUserId)
-    {
-        // TODO: what about culture?
-        IContentType contentType = GetContentType(contentTypeAlias);
-        return Create(name, parentId, contentType, userId);
-    }
+        => CrudService.Create(name, parentId, contentTypeAlias, userId);
 
     /// <summary>
     ///     Creates an <see cref="IContent" /> object of a specified content type.
@@ -388,22 +411,7 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="userId">The optional id of the user creating the content.</param>
     /// <returns>The content object.</returns>
     public IContent Create(string name, int parentId, IContentType contentType, int userId = Constants.Security.SuperUserId)
-    {
-        if (contentType is null)
-        {
-            throw new ArgumentException("Content type must be specified", nameof(contentType));
-        }
-
-        IContent? parent = parentId > 0 ? GetById(parentId) : null;
-        if (parentId > 0 && parent is null)
-        {
-            throw new ArgumentException("No content with that id.", nameof(parentId));
-        }
-
-        var content = new Content(name, parentId, contentType, userId);
-
-        return content;
-    }
+        => CrudService.Create(name, parentId, contentType, userId);
 
     /// <summary>
     ///     Creates an <see cref="IContent" /> object of a specified content type, under a parent.
@@ -419,21 +427,7 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="userId">The optional id of the user creating the content.</param>
     /// <returns>The content object.</returns>
     public IContent Create(string name, IContent? parent, string contentTypeAlias, int userId = Constants.Security.SuperUserId)
-    {
-        // TODO: what about culture?
-        if (parent == null)
-        {
-            throw new ArgumentNullException(nameof(parent));
-        }
-
-        IContentType contentType = GetContentType(contentTypeAlias)
-            // causes rollback
-            ?? throw new ArgumentException("No content type with that alias.", nameof(contentTypeAlias));
-
-        var content = new Content(name, parent, contentType, userId);
-
-        return content;
-    }
+        => CrudService.Create(name, parent, contentTypeAlias, userId);
 
     /// <summary>
     ///     Creates an <see cref="IContent" /> object of a specified content type.
@@ -445,36 +439,7 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="userId">The optional id of the user creating the content.</param>
     /// <returns>The content object.</returns>
     public IContent CreateAndSave(string name, int parentId, string contentTypeAlias, int userId = Constants.Security.SuperUserId)
-    {
-        // TODO: what about culture?
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            // locking the content tree secures content types too
-            scope.WriteLock(Constants.Locks.ContentTree);
-
-            IContentType contentType = GetContentType(contentTypeAlias)
-                // + locks
-                ??
-                // causes rollback
-                throw new ArgumentException("No content type with that alias.", nameof(contentTypeAlias));
-
-            IContent? parent = parentId > 0 ? GetById(parentId) : null; // + locks
-            if (parentId > 0 && parent == null)
-            {
-                throw new ArgumentException("No content with that id.", nameof(parentId)); // causes rollback
-            }
-
-            Content content = parentId > 0
-                ? new Content(name, parent!, contentType, userId)
-                : new Content(name, parentId, contentType, userId);
-
-            Save(content, userId);
-
-            scope.Complete();
-
-            return content;
-        }
-    }
+        => CrudService.CreateAndSave(name, parentId, contentTypeAlias, userId);
 
     /// <summary>
     ///     Creates an <see cref="IContent" /> object of a specified content type, under a parent.
@@ -486,32 +451,7 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="userId">The optional id of the user creating the content.</param>
     /// <returns>The content object.</returns>
     public IContent CreateAndSave(string name, IContent parent, string contentTypeAlias, int userId = Constants.Security.SuperUserId)
-    {
-        // TODO: what about culture?
-        if (parent == null)
-        {
-            throw new ArgumentNullException(nameof(parent));
-        }
-
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            // locking the content tree secures content types too
-            scope.WriteLock(Constants.Locks.ContentTree);
-
-            IContentType contentType = GetContentType(contentTypeAlias)
-            // + locks
-                ??
-                // causes rollback
-                throw new ArgumentException("No content type with that alias.", nameof(contentTypeAlias));
-
-            var content = new Content(name, parent, contentType, userId);
-
-            Save(content, userId);
-
-            scope.Complete();
-            return content;
-        }
-    }
+        => CrudService.CreateAndSave(name, parent, contentTypeAlias, userId);
 
     #endregion
 
@@ -525,13 +465,7 @@ public class ContentService : RepositoryService, IContentService
     ///     <see cref="IContent" />
     /// </returns>
     public IContent? GetById(int id)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            return _documentRepository.Get(id);
-        }
-    }
+        => CrudService.GetById(id);
 
     /// <summary>
     ///     Gets an <see cref="IContent" /> object by Id
@@ -541,21 +475,7 @@ public class ContentService : RepositoryService, IContentService
     ///     <see cref="IContent" />
     /// </returns>
     public IEnumerable<IContent> GetByIds(IEnumerable<int> ids)
-    {
-        var idsA = ids.ToArray();
-        if (idsA.Length == 0)
-        {
-            return Enumerable.Empty<IContent>();
-        }
-
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            IEnumerable<IContent> items = _documentRepository.GetMany(idsA);
-            var index = items.ToDictionary(x => x.Id, x => x);
-            return idsA.Select(x => index.GetValueOrDefault(x)).WhereNotNull();
-        }
-    }
+        => CrudService.GetByIds(ids);
 
     /// <summary>
     ///     Gets an <see cref="IContent" /> object by its 'UniqueId'
@@ -565,13 +485,7 @@ public class ContentService : RepositoryService, IContentService
     ///     <see cref="IContent" />
     /// </returns>
     public IContent? GetById(Guid key)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            return _documentRepository.Get(key);
-        }
-    }
+        => CrudService.GetById(key);
 
     /// <inheritdoc />
     public ContentScheduleCollection GetContentScheduleByContentId(int contentId)
@@ -621,28 +535,7 @@ public class ContentService : RepositoryService, IContentService
     ///     <see cref="IContent" />
     /// </returns>
     public IEnumerable<IContent> GetByIds(IEnumerable<Guid> ids)
-    {
-        Guid[] idsA = ids.ToArray();
-        if (idsA.Length == 0)
-        {
-            return Enumerable.Empty<IContent>();
-        }
-
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            IEnumerable<IContent>? items = _documentRepository.GetMany(idsA);
-
-            if (items is not null)
-            {
-                var index = items.ToDictionary(x => x.Key, x => x);
-
-                return idsA.Select(x => index.GetValueOrDefault(x)).WhereNotNull();
-            }
-
-            return Enumerable.Empty<IContent>();
-        }
-    }
+        => CrudService.GetByIds(ids);
 
     /// <inheritdoc />
     public IEnumerable<IContent> GetPagedOfType(
@@ -787,16 +680,7 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="id">Id of the <see cref="IContent" /> to retrieve ancestors for</param>
     /// <returns>An Enumerable list of <see cref="IContent" /> objects</returns>
     public IEnumerable<IContent> GetAncestors(int id)
-    {
-        // intentionally not locking
-        IContent? content = GetById(id);
-        if (content is null)
-        {
-            return Enumerable.Empty<IContent>();
-        }
-
-        return GetAncestors(content);
-    }
+        => CrudService.GetAncestors(id);
 
     /// <summary>
     ///     Gets a collection of <see cref="IContent" /> objects, which are ancestors of the current content.
@@ -804,25 +688,7 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="content"><see cref="IContent" /> to retrieve ancestors for</param>
     /// <returns>An Enumerable list of <see cref="IContent" /> objects</returns>
     public IEnumerable<IContent> GetAncestors(IContent content)
-    {
-        // null check otherwise we get exceptions
-        if (content.Path.IsNullOrWhiteSpace())
-        {
-            return Enumerable.Empty<IContent>();
-        }
-
-        var ids = content.GetAncestorIds()?.ToArray();
-        if (ids?.Any() == false)
-        {
-            return new List<IContent>();
-        }
-
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            return _documentRepository.GetMany(ids!);
-        }
-    }
+        => CrudService.GetAncestors(content);
 
     /// <summary>
     ///     Gets a collection of published <see cref="IContent" /> objects by Parent Id
@@ -841,54 +707,11 @@ public class ContentService : RepositoryService, IContentService
 
     /// <inheritdoc />
     public IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalChildren, IQuery<IContent>? filter = null, Ordering? ordering = null)
-    {
-        if (pageIndex < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(pageIndex));
-        }
-
-        if (pageSize <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(pageSize));
-        }
-
-        ordering ??= Ordering.By("sortOrder");
-
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-
-            IQuery<IContent>? query = Query<IContent>()?.Where(x => x.ParentId == id);
-            return _documentRepository.GetPage(query, pageIndex, pageSize, out totalChildren, filter, ordering);
-        }
-    }
+        => CrudService.GetPagedChildren(id, pageIndex, pageSize, out totalChildren, filter, ordering);
 
     /// <inheritdoc />
     public IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren, IQuery<IContent>? filter = null, Ordering? ordering = null)
-    {
-        ordering ??= Ordering.By("Path");
-
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-
-            // if the id is System Root, then just get all
-            if (id != Constants.System.Root)
-            {
-                TreeEntityPath[] contentPath =
-                    _entityRepository.GetAllPaths(Constants.ObjectTypes.Document, id).ToArray();
-                if (contentPath.Length == 0)
-                {
-                    totalChildren = 0;
-                    return Enumerable.Empty<IContent>();
-                }
-
-                return GetPagedLocked(GetPagedDescendantQuery(contentPath[0].Path), pageIndex, pageSize, out totalChildren, filter, ordering);
-            }
-
-            return GetPagedLocked(null, pageIndex, pageSize, out totalChildren, filter, ordering);
-        }
-    }
+        => CrudService.GetPagedDescendants(id, pageIndex, pageSize, out totalChildren, filter, ordering);
 
     private IQuery<IContent>? GetPagedDescendantQuery(string contentPath)
     {
@@ -927,11 +750,7 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="id">Id of the <see cref="IContent" /> to retrieve the parent from</param>
     /// <returns>Parent <see cref="IContent" /> object</returns>
     public IContent? GetParent(int id)
-    {
-        // intentionally not locking
-        IContent? content = GetById(id);
-        return GetParent(content);
-    }
+        => CrudService.GetParent(id);
 
     /// <summary>
     ///     Gets the parent of the current content as an <see cref="IContent" /> item.
@@ -939,29 +758,14 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="content"><see cref="IContent" /> to retrieve the parent from</param>
     /// <returns>Parent <see cref="IContent" /> object</returns>
     public IContent? GetParent(IContent? content)
-    {
-        if (content?.ParentId == Constants.System.Root || content?.ParentId == Constants.System.RecycleBinContent ||
-            content is null)
-        {
-            return null;
-        }
-
-        return GetById(content.ParentId);
-    }
+        => CrudService.GetParent(content);
 
     /// <summary>
     ///     Gets a collection of <see cref="IContent" /> objects, which reside at the first level / root
     /// </summary>
     /// <returns>An Enumerable list of <see cref="IContent" /> objects</returns>
     public IEnumerable<IContent> GetRootContent()
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            IQuery<IContent> query = Query<IContent>().Where(x => x.ParentId == Constants.System.Root);
-            return _documentRepository.Get(query);
-        }
-    }
+        => CrudService.GetRootContent();
 
     /// <summary>
     ///     Gets all published content items
@@ -1018,8 +822,24 @@ public class ContentService : RepositoryService, IContentService
     /// </summary>
     /// <param name="id">Id of the <see cref="IContent" /></param>
     /// <returns>True if the content has any children otherwise False</returns>
-    public bool HasChildren(int id) => CountChildren(id) > 0;
+    public bool HasChildren(int id)
+        => CrudService.HasChildren(id);
 
+    /// <summary>
+    ///     Checks whether a document with the specified id exists.
+    /// </summary>
+    /// <param name="id">The document id.</param>
+    /// <returns>True if the document exists; otherwise false.</returns>
+    public bool Exists(int id)
+        => CrudService.Exists(id);
+
+    /// <summary>
+    ///     Checks whether a document with the specified key exists.
+    /// </summary>
+    /// <param name="key">The document key.</param>
+    /// <returns>True if the document exists; otherwise false.</returns>
+    public bool Exists(Guid key)
+        => CrudService.Exists(key);
 
     /// <inheritdoc/>
     public IDictionary<int, IEnumerable<ContentSchedule>> GetContentSchedulesByIds(Guid[] keys)
@@ -1086,126 +906,11 @@ public class ContentService : RepositoryService, IContentService
 
     /// <inheritdoc />
     public OperationResult Save(IContent content, int? userId = null, ContentScheduleCollection? contentSchedule = null)
-    {
-        PublishedState publishedState = content.PublishedState;
-        if (publishedState != PublishedState.Published && publishedState != PublishedState.Unpublished)
-        {
-            throw new InvalidOperationException(
-                $"Cannot save (un)publishing content with name: {content.Name} - and state: {content.PublishedState}, use the dedicated SavePublished method.");
-        }
-
-        if (content.Name != null && content.Name.Length > 255)
-        {
-            throw new InvalidOperationException(
-                $"Content with the name {content.Name} cannot be more than 255 characters in length.");
-        }
-
-        EventMessages eventMessages = EventMessagesFactory.Get();
-
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            var savingNotification = new ContentSavingNotification(content, eventMessages);
-            if (scope.Notifications.PublishCancelable(savingNotification))
-            {
-                scope.Complete();
-                return OperationResult.Cancel(eventMessages);
-            }
-
-            scope.WriteLock(Constants.Locks.ContentTree);
-            userId ??= Constants.Security.SuperUserId;
-
-            if (content.HasIdentity == false)
-            {
-                content.CreatorId = userId.Value;
-            }
-
-            content.WriterId = userId.Value;
-
-            // track the cultures that have changed
-            List<string>? culturesChanging = content.ContentType.VariesByCulture()
-                ? content.CultureInfos?.Values.Where(x => x.IsDirty()).Select(x => x.Culture).ToList()
-                : null;
-
-            // TODO: Currently there's no way to change track which variant properties have changed, we only have change
-            // tracking enabled on all values on the Property which doesn't allow us to know which variants have changed.
-            // in this particular case, determining which cultures have changed works with the above with names since it will
-            // have always changed if it's been saved in the back office but that's not really fail safe.
-            _documentRepository.Save(content);
-
-            if (contentSchedule != null)
-            {
-                _documentRepository.PersistContentSchedule(content, contentSchedule);
-            }
-
-            scope.Notifications.Publish(
-                new ContentSavedNotification(content, eventMessages).WithStateFrom(savingNotification));
-
-            // TODO: we had code here to FORCE that this event can never be suppressed. But that just doesn't make a ton of sense?!
-            // I understand that if its suppressed that the caches aren't updated, but that would be expected. If someone
-            // is supressing events then I think it's expected that nothing will happen. They are probably doing it for perf
-            // reasons like bulk import and in those cases we don't want this occuring.
-            scope.Notifications.Publish(
-                new ContentTreeChangeNotification(content, TreeChangeTypes.RefreshNode, eventMessages));
-
-            if (culturesChanging != null)
-            {
-                var langs = GetLanguageDetailsForAuditEntry(culturesChanging);
-                Audit(AuditType.SaveVariant, userId.Value, content.Id, $"Saved languages: {langs}", langs);
-            }
-            else
-            {
-                Audit(AuditType.Save, userId.Value, content.Id);
-            }
-
-            scope.Complete();
-        }
-
-        return OperationResult.Succeed(eventMessages);
-    }
+        => CrudService.Save(content, userId, contentSchedule);
 
     /// <inheritdoc />
     public OperationResult Save(IEnumerable<IContent> contents, int userId = Constants.Security.SuperUserId)
-    {
-        EventMessages eventMessages = EventMessagesFactory.Get();
-        IContent[] contentsA = contents.ToArray();
-
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            var savingNotification = new ContentSavingNotification(contentsA, eventMessages);
-            if (scope.Notifications.PublishCancelable(savingNotification))
-            {
-                scope.Complete();
-                return OperationResult.Cancel(eventMessages);
-            }
-
-            scope.WriteLock(Constants.Locks.ContentTree);
-            foreach (IContent content in contentsA)
-            {
-                if (content.HasIdentity == false)
-                {
-                    content.CreatorId = userId;
-                }
-
-                content.WriterId = userId;
-
-                _documentRepository.Save(content);
-            }
-
-            scope.Notifications.Publish(
-                new ContentSavedNotification(contentsA, eventMessages).WithStateFrom(savingNotification));
-
-            // TODO: See note above about supressing events
-            scope.Notifications.Publish(
-                new ContentTreeChangeNotification(contentsA, TreeChangeTypes.RefreshNode, eventMessages));
-
-            string contentIds = string.Join(", ", contentsA.Select(x => x.Id));
-            Audit(AuditType.Save, userId, Constants.System.Root, $"Saved multiple content items (#{contentIds.Length})");
-
-            scope.Complete();
-        }
-
-        return OperationResult.Succeed(eventMessages);
-    }
+        => CrudService.Save(contents, userId);
 
     /// <inheritdoc/>
     public PublishResult Publish(IContent content, string[] cultures, int userId = Constants.Security.SuperUserId)
@@ -2286,38 +1991,7 @@ public class ContentService : RepositoryService, IContentService
 
     /// <inheritdoc />
     public OperationResult Delete(IContent content, int userId = Constants.Security.SuperUserId)
-    {
-        EventMessages eventMessages = EventMessagesFactory.Get();
-
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            if (scope.Notifications.PublishCancelable(new ContentDeletingNotification(content, eventMessages)))
-            {
-                scope.Complete();
-                return OperationResult.Cancel(eventMessages);
-            }
-
-            scope.WriteLock(Constants.Locks.ContentTree);
-
-            // if it's not trashed yet, and published, we should unpublish
-            // but... Unpublishing event makes no sense (not going to cancel?) and no need to save
-            // just raise the event
-            if (content.Trashed == false && content.Published)
-            {
-                scope.Notifications.Publish(new ContentUnpublishedNotification(content, eventMessages));
-            }
-
-            DeleteLocked(scope, content, eventMessages);
-
-            scope.Notifications.Publish(
-                new ContentTreeChangeNotification(content, TreeChangeTypes.Remove, eventMessages));
-            Audit(AuditType.Delete, userId, content.Id);
-
-            scope.Complete();
-        }
-
-        return OperationResult.Succeed(eventMessages);
-    }
+        => CrudService.Delete(content, userId);
 
     private void DeleteLocked(ICoreScope scope, IContent content, EventMessages evtMsgs)
     {

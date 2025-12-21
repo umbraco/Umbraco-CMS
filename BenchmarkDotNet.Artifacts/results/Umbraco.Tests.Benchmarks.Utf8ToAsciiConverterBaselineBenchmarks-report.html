@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8' />
+<title>Umbraco.Tests.Benchmarks.Utf8ToAsciiConverterBaselineBenchmarks-20251212-230710</title>
+
+<style type="text/css">
+	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
+	td, th { padding: 6px 13px; border: 1px solid #ddd; text-align: right; }
+	tr { background-color: #fff; border-top: 1px solid #ccc; }
+	tr:nth-child(even) { background: #f8f8f8; }
+</style>
+</head>
+<body>
+<pre><code>
+BenchmarkDotNet v0.15.6, Linux Ubuntu 25.10 (Questing Quokka)
+Intel Xeon CPU 2.80GHz, 1 CPU, 16 logical and 8 physical cores
+.NET SDK 10.0.100
+  [Host]     : .NET 10.0.0 (10.0.0, 10.0.25.52411), X64 RyuJIT x86-64-v4
+  DefaultJob : .NET 10.0.0 (10.0.0, 10.0.25.52411), X64 RyuJIT x86-64-v4
+</code></pre>
+<pre><code></code></pre>
+
+<table>
+<thead><tr><th>Method          </th><th>Mean     </th><th>Error  </th><th>StdDev </th><th>Rank</th><th>Gen0</th><th>Gen1</th><th>Gen2</th><th>Allocated</th>
+</tr>
+</thead><tbody><tr><td>Tiny_Ascii</td><td>82.81 ns</td><td>0.402 ns</td><td>0.314 ns</td><td>2</td><td>0.0027</td><td>-</td><td>-</td><td>48 B</td>
+</tr><tr><td>Tiny_Mixed</td><td>71.05 ns</td><td>0.225 ns</td><td>0.176 ns</td><td>1</td><td>0.0027</td><td>-</td><td>-</td><td>48 B</td>
+</tr><tr><td>Small_Ascii</td><td>695.75 ns</td><td>4.394 ns</td><td>3.669 ns</td><td>3</td><td>0.0124</td><td>-</td><td>-</td><td>224 B</td>
+</tr><tr><td>Small_Mixed</td><td>686.54 ns</td><td>8.868 ns</td><td>8.295 ns</td><td>3</td><td>0.0124</td><td>-</td><td>-</td><td>224 B</td>
+</tr><tr><td>Medium_Ascii</td><td>5,994.68 ns</td><td>32.905 ns</td><td>30.779 ns</td><td>4</td><td>0.4730</td><td>-</td><td>-</td><td>8240 B</td>
+</tr><tr><td>Medium_Mixed</td><td>7,116.65 ns</td><td>27.489 ns</td><td>22.955 ns</td><td>5</td><td>0.4730</td><td>-</td><td>-</td><td>8264 B</td>
+</tr><tr><td>Large_Ascii</td><td>593,733.29 ns</td><td>2,040.378 ns</td><td>1,703.808 ns</td><td>7</td><td>249.0234</td><td>249.0234</td><td>249.0234</td><td>819332 B</td>
+</tr><tr><td>Large_Mixed</td><td>1,066,297.43 ns</td><td>8,507.650 ns</td><td>7,958.061 ns</td><td>8</td><td>248.0469</td><td>248.0469</td><td>248.0469</td><td>823523 B</td>
+</tr><tr><td>Large_WorstCase</td><td>2,148,169.56 ns</td><td>16,455.374 ns</td><td>15,392.367 ns</td><td>9</td><td>246.0938</td><td>246.0938</td><td>246.0938</td><td>1024125 B</td>
+</tr><tr><td>CharArray_Medium_Mixed</td><td>7,357.24 ns</td><td>59.719 ns</td><td>55.861 ns</td><td>6</td><td>0.5951</td><td>0.0076</td><td>-</td><td>10336 B</td>
+</tr></tbody></table>
+</body>
+</html>
