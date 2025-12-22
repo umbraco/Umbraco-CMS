@@ -614,14 +614,7 @@ public class ContentService : RepositoryService, IContentService
     /// <returns>An Enumerable list of <see cref="IContent" /> objects</returns>
     /// <remarks>Contrary to most methods, this method filters out trashed content items.</remarks>
     public IEnumerable<IContent> GetByLevel(int level)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            IQuery<IContent>? query = Query<IContent>().Where(x => x.Level == level && x.Trashed == false);
-            return _documentRepository.Get(query);
-        }
-    }
+        => QueryOperationService.GetByLevel(level);
 
     /// <summary>
     ///     Gets a specific version of an <see cref="IContent" /> item.

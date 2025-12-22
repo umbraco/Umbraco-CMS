@@ -746,6 +746,24 @@ internal sealed class ContentServiceRefactoringTests : UmbracoIntegrationTestWit
         Assert.That(facadeCount, Is.EqualTo(directCount));
     }
 
+    /// <summary>
+    /// Phase 2 Test: Verifies GetByLevel() via facade returns same result as direct service call.
+    /// </summary>
+    [Test]
+    public void GetByLevel_ViaFacade_ReturnsEquivalentResultToDirectService()
+    {
+        // Arrange
+        var queryService = GetRequiredService<IContentQueryOperationService>();
+
+        // Act
+        var facadeItems = ContentService.GetByLevel(1).ToList();
+        var directItems = queryService.GetByLevel(1).ToList();
+
+        // Assert
+        Assert.That(facadeItems.Count, Is.EqualTo(directItems.Count));
+        Assert.That(facadeItems.Select(x => x.Id), Is.EquivalentTo(directItems.Select(x => x.Id)));
+    }
+
     #endregion
 
     /// <summary>
