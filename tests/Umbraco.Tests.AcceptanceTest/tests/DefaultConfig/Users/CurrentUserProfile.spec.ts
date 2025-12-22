@@ -22,6 +22,7 @@ for (const userGroup of userGroups) {
     testUserCookieAndToken = await umbracoApi.user.loginToUser(userName, userEmail, userPassword);
     await umbracoUi.goToBackOffice();
     await umbracoUi.currentUserProfile.isBackOfficeMainVisible();
+    await umbracoUi.waitForTimeout(1000); // Wait for 1 second to ensure the UI is fully loaded
 
     // Act
     await umbracoUi.currentUserProfile.clickCurrentUserAvatarButton();

@@ -18,6 +18,7 @@ public class CheckHealthCheckGroupController : HealthCheckGroupControllerBase
     /// <summary>
     ///     Check all health checks in the group with a given group name.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <param name="name">The name of the group.</param>
     /// <remarks>The health check result(s) will be included as part of the health checks.</remarks>
     /// <returns>The health check group or not found result.</returns>
