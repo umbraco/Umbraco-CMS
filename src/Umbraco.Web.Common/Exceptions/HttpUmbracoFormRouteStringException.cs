@@ -1,11 +1,8 @@
-using System.Runtime.Serialization;
-
 namespace Umbraco.Cms.Web.Common.Exceptions;
 
 /// <summary>
 ///     Exception that occurs when an Umbraco form route string is invalid
 /// </summary>
-[Serializable]
 public sealed class HttpUmbracoFormRouteStringException : Exception
 {
     /// <summary>
@@ -34,22 +31,6 @@ public sealed class HttpUmbracoFormRouteStringException : Exception
     /// </param>
     public HttpUmbracoFormRouteStringException(string message, Exception innerException)
         : base(message, innerException)
-    {
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="HttpUmbracoFormRouteStringException" /> class.
-    /// </summary>
-    /// <param name="info">
-    ///     The <see cref="T:System.Runtime.Serialization.SerializationInfo" /> that holds the serialized object
-    ///     data about the exception being thrown.
-    /// </param>
-    /// <param name="context">
-    ///     The <see cref="T:System.Runtime.Serialization.StreamingContext" /> that holds the contextual
-    ///     information about the source or destination.
-    /// </param>
-    private HttpUmbracoFormRouteStringException(SerializationInfo info, StreamingContext context)
-        : base(info, context)
     {
     }
 }

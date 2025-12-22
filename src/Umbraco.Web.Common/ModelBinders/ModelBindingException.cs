@@ -1,13 +1,9 @@
-using System.Runtime.Serialization;
-
 namespace Umbraco.Cms.Web.Common.ModelBinders;
 
 /// <summary>
 ///     The exception that is thrown when an error occurs while binding a source to a model.
 /// </summary>
 /// <seealso cref="Exception" />
-/// Migrated to .NET Core
-[Serializable]
 public class ModelBindingException : Exception
 {
     /// <summary>
@@ -36,22 +32,6 @@ public class ModelBindingException : Exception
     /// </param>
     public ModelBindingException(string message, Exception innerException)
         : base(message, innerException)
-    {
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="ModelBindingException" /> class.
-    /// </summary>
-    /// <param name="info">
-    ///     The <see cref="T:System.Runtime.Serialization.SerializationInfo" /> that holds the serialized object
-    ///     data about the exception being thrown.
-    /// </param>
-    /// <param name="context">
-    ///     The <see cref="T:System.Runtime.Serialization.StreamingContext" /> that contains contextual
-    ///     information about the source or destination.
-    /// </param>
-    protected ModelBindingException(SerializationInfo info, StreamingContext context)
-        : base(info, context)
     {
     }
 }

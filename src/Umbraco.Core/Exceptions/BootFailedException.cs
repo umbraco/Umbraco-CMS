@@ -1,4 +1,3 @@
-using System.Runtime.Serialization;
 using System.Text;
 
 namespace Umbraco.Cms.Core.Exceptions;
@@ -7,7 +6,6 @@ namespace Umbraco.Cms.Core.Exceptions;
 ///     An exception that is thrown if the Umbraco application cannot boot.
 /// </summary>
 /// <seealso cref="System.Exception" />
-[Serializable]
 public class BootFailedException : Exception
 {
     /// <summary>
@@ -39,22 +37,6 @@ public class BootFailedException : Exception
     /// <param name="innerException">The inner exception, or null.</param>
     public BootFailedException(string message, Exception innerException)
         : base(message, innerException)
-    {
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="BootFailedException" /> class.
-    /// </summary>
-    /// <param name="info">
-    ///     The <see cref="T:System.Runtime.Serialization.SerializationInfo" /> that holds the serialized object
-    ///     data about the exception being thrown.
-    /// </param>
-    /// <param name="context">
-    ///     The <see cref="T:System.Runtime.Serialization.StreamingContext" /> that contains contextual
-    ///     information about the source or destination.
-    /// </param>
-    protected BootFailedException(SerializationInfo info, StreamingContext context)
-        : base(info, context)
     {
     }
 
