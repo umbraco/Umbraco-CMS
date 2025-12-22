@@ -299,6 +299,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IContentPermissionService, ContentPermissionService>();
             Services.AddUnique<IDictionaryPermissionService, DictionaryPermissionService>();
             Services.AddUnique<IContentCrudService, ContentCrudService>();
+            Services.AddUnique<IContentQueryOperationService, ContentQueryOperationService>();
             Services.AddUnique<IContentService>(sp =>
                 new ContentService(
                     sp.GetRequiredService<ICoreScopeProvider>(),
@@ -318,7 +319,8 @@ namespace Umbraco.Cms.Core.DependencyInjection
                     sp.GetRequiredService<IIdKeyMap>(),
                     sp.GetRequiredService<IOptionsMonitor<ContentSettings>>(),
                     sp.GetRequiredService<IRelationService>(),
-                    sp.GetRequiredService<IContentCrudService>()));
+                    sp.GetRequiredService<IContentCrudService>(),
+                    sp.GetRequiredService<IContentQueryOperationService>()));
             Services.AddUnique<IContentBlueprintEditingService, ContentBlueprintEditingService>();
             Services.AddUnique<IContentEditingService, ContentEditingService>();
             Services.AddUnique<IContentPublishingService, ContentPublishingService>();
