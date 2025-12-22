@@ -52,12 +52,15 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 			if (this._containerId === undefined) {
 				throw new Error('ContainerId is not set');
 			}
+			if (this._ownerContentTypeUnique === undefined) {
+				throw new Error('OwnerContentTypeUnique is not set');
+			}
 			let containerId = this._containerId;
 			// ensure container is local:
 			if (this._containerId !== null) {
 				const container = await this.#propertyStructureHelper
 					.getStructureManager()
-					?.ensureContainerOf(this._containerId, this._ownerContentTypeUnique!);
+					?.ensureContainerOf(this._containerId, this._ownerContentTypeUnique);
 				containerId = container?.id || this._containerId;
 			}
 
