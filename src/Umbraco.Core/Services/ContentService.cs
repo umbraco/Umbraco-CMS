@@ -302,40 +302,16 @@ public class ContentService : RepositoryService, IContentService
     #region Count
 
     public int CountPublished(string? contentTypeAlias = null)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            return _documentRepository.CountPublished(contentTypeAlias);
-        }
-    }
+        => QueryOperationService.CountPublished(contentTypeAlias);
 
     public int Count(string? contentTypeAlias = null)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            return _documentRepository.Count(contentTypeAlias);
-        }
-    }
+        => QueryOperationService.Count(contentTypeAlias);
 
     public int CountChildren(int parentId, string? contentTypeAlias = null)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            return _documentRepository.CountChildren(parentId, contentTypeAlias);
-        }
-    }
+        => QueryOperationService.CountChildren(parentId, contentTypeAlias);
 
     public int CountDescendants(int parentId, string? contentTypeAlias = null)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            return _documentRepository.CountDescendants(parentId, contentTypeAlias);
-        }
-    }
+        => QueryOperationService.CountDescendants(parentId, contentTypeAlias);
 
     #endregion
 

@@ -673,6 +673,81 @@ internal sealed class ContentServiceRefactoringTests : UmbracoIntegrationTestWit
 
     #endregion
 
+    #region Phase 2 - Count Method Delegation Tests
+
+    /// <summary>
+    /// Phase 2 Test: Verifies Count() via facade returns same result as direct service call.
+    /// </summary>
+    [Test]
+    public void Count_ViaFacade_ReturnsEquivalentResultToDirectService()
+    {
+        // Arrange
+        var queryService = GetRequiredService<IContentQueryOperationService>();
+
+        // Act
+        var facadeCount = ContentService.Count();
+        var directCount = queryService.Count();
+
+        // Assert
+        Assert.That(facadeCount, Is.EqualTo(directCount));
+    }
+
+    /// <summary>
+    /// Phase 2 Test: Verifies CountPublished() via facade returns same result as direct service call.
+    /// </summary>
+    [Test]
+    public void CountPublished_ViaFacade_ReturnsEquivalentResultToDirectService()
+    {
+        // Arrange
+        var queryService = GetRequiredService<IContentQueryOperationService>();
+        ContentService.Publish(Textpage, new[] { "*" });
+
+        // Act
+        var facadeCount = ContentService.CountPublished();
+        var directCount = queryService.CountPublished();
+
+        // Assert
+        Assert.That(facadeCount, Is.EqualTo(directCount));
+    }
+
+    /// <summary>
+    /// Phase 2 Test: Verifies CountChildren() via facade returns same result as direct service call.
+    /// </summary>
+    [Test]
+    public void CountChildren_ViaFacade_ReturnsEquivalentResultToDirectService()
+    {
+        // Arrange
+        var queryService = GetRequiredService<IContentQueryOperationService>();
+        var parentId = Textpage.Id;
+
+        // Act
+        var facadeCount = ContentService.CountChildren(parentId);
+        var directCount = queryService.CountChildren(parentId);
+
+        // Assert
+        Assert.That(facadeCount, Is.EqualTo(directCount));
+    }
+
+    /// <summary>
+    /// Phase 2 Test: Verifies CountDescendants() via facade returns same result as direct service call.
+    /// </summary>
+    [Test]
+    public void CountDescendants_ViaFacade_ReturnsEquivalentResultToDirectService()
+    {
+        // Arrange
+        var queryService = GetRequiredService<IContentQueryOperationService>();
+        var parentId = Textpage.Id;
+
+        // Act
+        var facadeCount = ContentService.CountDescendants(parentId);
+        var directCount = queryService.CountDescendants(parentId);
+
+        // Assert
+        Assert.That(facadeCount, Is.EqualTo(directCount));
+    }
+
+    #endregion
+
     /// <summary>
     /// Notification handler that tracks the order of notifications for test verification.
     /// </summary>
