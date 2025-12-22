@@ -165,7 +165,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		} else {
 			return html`
 				<div id="header">
-					<p><b>${this.property.name}</b></p>
+					<p>${this.property.name}</p>
 					<p><i>${this.property.alias}</i></p>
 					<p>${this.property.description}</p>
 				</div>
