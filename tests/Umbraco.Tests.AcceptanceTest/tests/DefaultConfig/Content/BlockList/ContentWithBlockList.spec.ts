@@ -298,9 +298,9 @@ test('can add a variant block element with variant RTE Tiptap in the content', a
   await umbracoUi.content.clickAddBlockElementButton();
   await umbracoUi.content.clickBlockElementWithName(customElementTypeName);
   await umbracoUi.content.enterRTETipTapEditor(inputText);
-  await umbracoUi.content.clickCreateModalButton();
+  await umbracoUi.content.clickCreateBlockModalButtonAndWaitForModalToClose();
   await umbracoUi.content.clickSaveButtonForContent();
-  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
+  await umbracoUi.content.clickSaveModalButtonAndWaitForContentToBeUpdated();
 
   // Assert
   const contentData = await umbracoApi.document.getByName(contentName);
@@ -333,9 +333,9 @@ test('can add a variant block element with invariant RTE Tiptap in the content',
   await umbracoUi.content.clickAddBlockElementButton();
   await umbracoUi.content.clickBlockElementWithName(customElementTypeName);
   await umbracoUi.content.enterRTETipTapEditor(inputText);
-  await umbracoUi.content.clickCreateModalButton();
+  await umbracoUi.content.clickCreateBlockModalButtonAndWaitForModalToClose();
   await umbracoUi.content.clickSaveButtonForContent();
-  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
+  await umbracoUi.content.clickSaveModalButtonAndWaitForContentToBeUpdated();
 
   // Assert
   const contentData = await umbracoApi.document.getByName(contentName);

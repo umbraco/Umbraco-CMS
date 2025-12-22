@@ -41,10 +41,9 @@ test('can create a media type folder using create options', {tag: '@release'}, a
   // Act
   await umbracoUi.mediaType.clickCreateActionWithOptionName('Folder');
   await umbracoUi.mediaType.enterFolderName(mediaTypeFolderName);
-  await umbracoUi.mediaType.clickConfirmCreateFolderButton();
+  await umbracoUi.mediaType.clickConfirmCreateFolderButtonAndWaitForMediaTypeToBeCreated();
 
   // Assert
-  await umbracoUi.mediaType.waitForMediaTypeToBeCreated();
   expect(await umbracoApi.mediaType.doesNameExist(mediaTypeFolderName)).toBeTruthy();
   // Check if the created media type is displayed in the collection view and has correct icon
   await umbracoUi.mediaType.clickMediaTypesMenu();
@@ -80,10 +79,9 @@ test('can create a media type folder in a folder using create options', async ({
   // Act
   await umbracoUi.mediaType.clickCreateActionWithOptionName('Folder');
   await umbracoUi.mediaType.enterFolderName(childFolderName);
-  await umbracoUi.mediaType.clickConfirmCreateFolderButton();
+  await umbracoUi.mediaType.clickConfirmCreateFolderButtonAndWaitForMediaTypeToBeCreated();
 
   // Assert
-  await umbracoUi.mediaType.waitForMediaTypeToBeCreated();
   expect(await umbracoApi.mediaType.doesNameExist(childFolderName)).toBeTruthy();
   // Check if the created media type is displayed in the collection view and has correct icon
   await umbracoUi.mediaType.doesCollectionTreeItemTableRowHaveName(childFolderName);

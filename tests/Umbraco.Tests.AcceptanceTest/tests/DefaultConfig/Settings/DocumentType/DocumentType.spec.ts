@@ -134,9 +134,8 @@ test('can delete a document type', {tag: '@smoke'}, async ({umbracoApi, umbracoU
   // Act
   await umbracoUi.documentType.clickRootFolderCaretButton();
   await umbracoUi.documentType.clickActionsMenuForDocumentType(documentTypeName);
-  await umbracoUi.documentType.clickDeleteAndConfirmButton();
+  await umbracoUi.documentType.clickDeleteAndConfirmButtonAndWaitForDocumentTypeToBeDeleted();
 
   // Assert
-  await umbracoUi.documentType.waitForDocumentTypeToBeDeleted();
   expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeFalsy();
 });

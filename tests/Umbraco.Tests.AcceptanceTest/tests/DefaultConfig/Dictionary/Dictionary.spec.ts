@@ -40,11 +40,9 @@ test('can delete a dictionary item', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.dictionary.clickActionsMenuForDictionary(dictionaryName);
-  await umbracoUi.dictionary.deleteDictionary();
+  await umbracoUi.dictionary.deleteDictionaryAndWaitForDictionaryToBeDeleted();
 
   // Assert
-  await umbracoUi.dictionary.waitForDictionaryToBeDeleted();
-  await umbracoUi.dictionary.isErrorNotificationVisible(false);
   // Verify the dictionary item does not display in the tree
   await umbracoUi.dictionary.isDictionaryTreeItemVisible(dictionaryName, false);
   // Verify the dictionary item does not display in the list
@@ -125,11 +123,10 @@ test('can import a dictionary item', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.dictionary.clickActionsMenuForDictionary(dictionaryName);
-  await umbracoUi.dictionary.clickImportButton();
-  await umbracoUi.dictionary.importDictionary(udtFilePath);
+  await umbracoUi.dictionary.clickImportActionMenuOption();
+  await umbracoUi.dictionary.importDictionaryAndWaitForDictionaryToBeImported(udtFilePath);
 
   // Assert
-  await umbracoUi.dictionary.waitForDictionaryToBeImported();
   // Verify the imported dictionary item displays in the list
   await umbracoUi.reloadPage();
   expect(await umbracoUi.dictionary.doesDictionaryListHaveText(importDictionaryName)).toBeTruthy();
@@ -151,11 +148,10 @@ test('can import a dictionary item with descendants', {tag: '@smoke'}, async ({u
   // Act
   await umbracoUi.dictionary.clickActionsMenuForDictionary(dictionaryName);
   await umbracoUi.dictionary.clickImportActionMenuOption();
-  await umbracoUi.dictionary.importDictionary(udtFilePath);
+  await umbracoUi.dictionary.importDictionaryAndWaitForDictionaryToBeImported(udtFilePath);
 
   // Assert
   // Verify the imported dictionary items display in the list
-  await umbracoUi.dictionary.waitForDictionaryToBeImported();
   await umbracoUi.reloadPage();
   expect(await umbracoUi.dictionary.doesDictionaryListHaveText(importParentDictionaryName)).toBeTruthy();
   expect(await umbracoUi.dictionary.doesDictionaryListHaveText(importChildDictionaryName)).toBeTruthy();

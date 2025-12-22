@@ -152,7 +152,7 @@ test('cannot update a variant block list with invalid text', {tag: '@release'}, 
   await umbracoUi.content.enterPropertyValue(textStringElementDataTypeName, correctPropertyValue);
   await umbracoUi.content.clickUpdateBlockModalButtonAndWaitForModalToClose();
   await umbracoUi.content.clickSaveButtonForContent();
-  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
+  await umbracoUi.content.clickSaveModalButtonAndWaitForContentToBeUpdated();
 
   // Assert
   const contentData = await umbracoApi.document.getByName(contentName);

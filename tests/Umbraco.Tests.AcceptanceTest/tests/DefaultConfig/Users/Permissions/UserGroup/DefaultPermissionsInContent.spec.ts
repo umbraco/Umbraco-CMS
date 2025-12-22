@@ -130,10 +130,9 @@ test('can delete content with delete permission enabled', {tag: '@release'}, asy
   // Act
   await umbracoUi.content.clickActionsMenuForContent(rootDocumentName);
   await umbracoUi.content.clickTrashActionMenuOption();
-  await umbracoUi.content.clickConfirmTrashButton();
+  await umbracoUi.content.clickConfirmTrashButtonAndWaitForContentToBeTrashed();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeTrashed();
   await umbracoUi.content.isItemVisibleInRecycleBin(rootDocumentName);
 });
 
@@ -164,10 +163,9 @@ test('can empty recycle bin with delete permission enabled', {tag: '@release'}, 
   await umbracoUi.content.clickRecycleBinButton();
   await umbracoUi.waitForTimeout(700);
   await umbracoUi.content.clickEmptyRecycleBinButton();
-  await umbracoUi.content.clickConfirmEmptyRecycleBinButton();
+  await umbracoUi.content.clickConfirmEmptyRecycleBinButtonAndWaitForRecycleBinToBeEmptied();
 
   // Assert
-  await umbracoUi.content.waitForRecycleBinToBeEmptied();
   await umbracoUi.content.isItemVisibleInRecycleBin(rootDocumentName, false, false);
 });
 
@@ -529,10 +527,9 @@ test('can set culture and hostnames with culture and hostnames permission enable
   await umbracoUi.content.clickCultureAndHostnamesActionMenuOption();
   await umbracoUi.content.clickAddNewHostnameButton();
   await umbracoUi.content.enterDomain(domainName);
-  await umbracoUi.content.clickSaveModalButton();
+  await umbracoUi.content.clickSaveModalButtonAndWaitForDomainToBeCreated();
 
   // Assert
-  await umbracoUi.content.waitForDomainToBeCreated();
   const document = await umbracoApi.document.getByName(rootDocumentName);
   const domains = await umbracoApi.document.getDomains(document.id);
   expect(domains.domains[0].domainName).toEqual(domainName);

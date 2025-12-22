@@ -102,10 +102,9 @@ test('can allow bulk trash in the media section', {tag: '@release'}, async ({umb
   await umbracoUi.media.selectMediaWithName(firstMediaFileName);
   await umbracoUi.media.selectMediaWithName(secondMediaFileName);
   await umbracoUi.media.clickBulkTrashButton();
-  await umbracoUi.media.clickConfirmTrashButton();
+  await umbracoUi.media.clickConfirmTrashButtonAndWaitForMediaToBeTrashed();
 
   // Assert
-  await umbracoUi.media.waitForMediaToBeTrashed();
   expect(await umbracoApi.media.doesNameExist(firstMediaFileName)).toBeFalsy();
   expect(await umbracoApi.media.doesNameExist(secondMediaFileName)).toBeFalsy();
   expect(await umbracoApi.media.doesMediaItemExistInRecycleBin(firstMediaFileName)).toBeTruthy();
@@ -124,15 +123,12 @@ test('can allow bulk move in the media section', async ({umbracoApi, umbracoUi})
   await umbracoUi.media.goToSection(ConstantHelper.sections.media);
   await umbracoUi.media.selectMediaWithName(firstMediaFileName);
   await umbracoUi.media.selectMediaWithName(secondMediaFileName);
-  await umbracoUi.waitForTimeout(200);
   await umbracoUi.media.clickBulkMoveToButton();
   await umbracoUi.media.openCaretButtonForName('Media');
   await umbracoUi.media.clickModalTextByName(mediaFolderName);
-  await umbracoUi.media.clickChooseModalButton();
-  await umbracoUi.waitForTimeout(500);
+  await umbracoUi.media.clickChooseModalButtonAndWaitForMediaToBeMoved();
 
   // Assert
-  await umbracoUi.media.waitForMediaToBeMoved();
   expect(await umbracoApi.media.doesMediaItemHaveChildName(mediaFolderId, firstMediaFileName)).toBeTruthy();
   expect(await umbracoApi.media.doesMediaItemHaveChildName(mediaFolderId, secondMediaFileName)).toBeTruthy();
 

@@ -28,10 +28,9 @@ test('can create a user', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.user.clickChooseButton();
   await umbracoUi.user.clickButtonWithName(defaultUserGroupName);
   await umbracoUi.user.clickChooseModalButton();
-  await umbracoUi.user.clickCreateUserButton();
+  await umbracoUi.user.clickCreateUserButtonAndWaitForUserToBeCreated();
 
   // Assert
-  await umbracoUi.user.waitForUserToBeCreated();
   expect(await umbracoApi.user.doesNameExist(nameOfTheUser)).toBeTruthy();
 });
 
@@ -60,10 +59,9 @@ test('can delete a user', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.user.clickActionButton();
   await umbracoUi.user.clickDeleteButton();
-  await umbracoUi.user.clickConfirmToDeleteButton();
+  await umbracoUi.user.clickConfirmToDeleteButtonAndWaitForUserToBeDeleted();
 
   // Assert
-  await umbracoUi.user.waitForUserToBeDeleted();
   expect(await umbracoApi.user.doesNameExist(nameOfTheUser)).toBeFalsy();
   // Checks if the user is deleted from the list
   await umbracoUi.user.clickUsersMenu();

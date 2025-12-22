@@ -119,7 +119,6 @@ test.skip('image count can not be less than min amount set in image media picker
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton(false);
   await umbracoUi.content.isErrorNotificationVisible();
 
   // Clean
@@ -144,7 +143,6 @@ test.skip('image count can not be more than max amount set in image media picker
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton(false);
   await umbracoUi.content.isErrorNotificationVisible();
 
   // Clean

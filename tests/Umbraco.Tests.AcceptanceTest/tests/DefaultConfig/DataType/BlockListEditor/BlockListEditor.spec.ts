@@ -62,10 +62,9 @@ test('can delete a block list editor', {tag: '@smoke'}, async ({umbracoApi, umbr
   await umbracoUi.dataType.clickRootFolderCaretButton();
   await umbracoUi.dataType.clickActionsMenuForDataType(blockListEditorName);
   await umbracoUi.dataType.clickDeleteActionMenuOption();
-  await umbracoUi.dataType.clickConfirmToDeleteButton();
+  await umbracoUi.dataType.clickConfirmToDeleteButtonAndWaitForDataTypeToBeDeleted();
 
   // Assert
-  await umbracoUi.dataType.waitForDataTypeToBeDeleted();
   expect(await umbracoApi.dataType.doesExist(blockListId)).toBeFalsy();
   await umbracoUi.dataType.isDataTypeTreeItemVisible(blockListEditorName, false);
 });

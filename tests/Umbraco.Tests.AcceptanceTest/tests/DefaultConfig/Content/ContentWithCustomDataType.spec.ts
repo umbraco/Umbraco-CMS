@@ -301,7 +301,6 @@ test('can save content after changing the property editor of the custom data typ
   await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].value).toContain(inputText);
 });

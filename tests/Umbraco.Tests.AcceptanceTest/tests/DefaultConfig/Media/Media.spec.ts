@@ -116,10 +116,9 @@ test('can trash a folder', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.media.clickActionsMenuForName(folderName);
   await umbracoUi.media.clickTrashActionMenuOption();
-  await umbracoUi.media.clickConfirmTrashButton();
+  await umbracoUi.media.clickConfirmTrashButtonAndWaitForMediaToBeTrashed();
 
   // Assert
-  await umbracoUi.media.waitForMediaToBeTrashed();
   await umbracoUi.media.isTreeItemVisible(folderName, false);
   await umbracoUi.media.isItemVisibleInRecycleBin(folderName);
   expect(await umbracoApi.media.doesNameExist(folderName)).toBeFalsy();
@@ -179,10 +178,9 @@ test('can trash a media item', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.media.clickActionsMenuForName(mediaFileName);
   await umbracoUi.media.clickTrashActionMenuOption();
-  await umbracoUi.media.clickConfirmTrashButton();
+  await umbracoUi.media.clickConfirmTrashButtonAndWaitForMediaToBeTrashed();
 
   // Assert
-  await umbracoUi.media.waitForMediaToBeTrashed();
   await umbracoUi.media.isMediaTreeItemVisible(mediaFileName, false);
   await umbracoUi.media.isItemVisibleInRecycleBin(mediaFileName);
   expect(await umbracoApi.media.doesNameExist(mediaFileName)).toBeFalsy();
@@ -224,10 +222,9 @@ test('can delete a media item from the recycle bin', async ({umbracoApi, umbraco
 
   // Act
   await umbracoUi.media.isItemVisibleInRecycleBin(mediaFileName, true, true);
-  await umbracoUi.media.deleteMediaItem(mediaFileName);
+  await umbracoUi.media.deleteMediaItemAndWaitForMediaToBeDeleted(mediaFileName);
 
   // Assert
-  await umbracoUi.media.waitForMediaToBeTrashed();
   await umbracoUi.media.isItemVisibleInRecycleBin(mediaFileName, false, false);
   expect(await umbracoApi.media.doesNameExist(mediaFileName)).toBeFalsy();
   expect(await umbracoApi.media.doesMediaItemExistInRecycleBin(mediaFileName)).toBeFalsy();
@@ -243,10 +240,9 @@ test('can empty the recycle bin', {tag: '@release'}, async ({umbracoApi, umbraco
   // Act
   await umbracoUi.media.isItemVisibleInRecycleBin(mediaFileName, true, true);
   await umbracoUi.media.clickEmptyRecycleBinButton();
-  await umbracoUi.media.clickConfirmEmptyRecycleBinButton();
+  await umbracoUi.media.clickConfirmEmptyRecycleBinButtonAndWaitForRecycleBinToBeEmptied();
 
   // Assert
-  await umbracoUi.media.waitForRecycleBinToBeEmptied();
   await umbracoUi.media.isItemVisibleInRecycleBin(mediaFileName, false, false);
   expect(await umbracoApi.media.doesNameExist(mediaFileName)).toBeFalsy();
   expect(await umbracoApi.media.doesMediaItemExistInRecycleBin(mediaFileName)).toBeFalsy();
@@ -269,10 +265,9 @@ test('can trash a media node with a relation', {tag: '@release'}, async ({umbrac
   await umbracoUi.media.doesReferenceHeadlineHaveText(ConstantHelper.trashDeleteDialogMessage.referenceHeadline);
   await umbracoUi.media.doesReferenceItemsHaveCount(1);
   await umbracoUi.media.isReferenceItemNameVisible(documentPickerName[0]);
-  await umbracoUi.media.clickConfirmTrashButton();
+  await umbracoUi.media.clickConfirmTrashButtonAndWaitForMediaToBeTrashed();
 
   // Assert
-  await umbracoUi.media.waitForMediaToBeTrashed();
   await umbracoUi.media.isItemVisibleInRecycleBin(mediaFileName);
   expect(await umbracoApi.media.doesNameExist(mediaFileName)).toBeFalsy();
   expect(await umbracoApi.media.doesMediaItemExistInRecycleBin(mediaFileName)).toBeTruthy();
@@ -307,10 +302,9 @@ test('can bulk trash media nodes with a relation', async ({umbracoApi, umbracoUi
   await umbracoUi.media.doesReferenceItemsHaveCount(2);
   await umbracoUi.media.isReferenceItemNameVisible(firstMediaFileName);
   await umbracoUi.media.isReferenceItemNameVisible(secondMediaFileName);
-  await umbracoUi.media.clickConfirmTrashButton();
+  await umbracoUi.media.clickConfirmTrashButtonAndWaitForMediaToBeTrashed();
 
   // Assert
-  await umbracoUi.media.waitForMediaToBeTrashed();
   expect(await umbracoApi.media.doesNameExist(firstMediaFileName)).toBeFalsy();
   expect(await umbracoApi.media.doesNameExist(secondMediaFileName)).toBeFalsy();
   expect(await umbracoApi.media.doesMediaItemExistInRecycleBin(firstMediaFileName)).toBeTruthy();

@@ -57,10 +57,9 @@ test('can delete a rich text editor with tiptap', async ({umbracoApi, umbracoUi}
   // Act
   await umbracoUi.dataType.clickRootFolderCaretButton();
   await umbracoUi.dataType.clickActionsMenuForDataType(tipTapName);
-  await umbracoUi.dataType.clickDeleteAndConfirmButton();
+  await umbracoUi.dataType.clickDeleteAndConfirmButtonAndWaitForDataTypeToBeDeleted();
 
   // Assert
-  await umbracoUi.dataType.waitForDataTypeToBeDeleted();
   await umbracoUi.dataType.isErrorNotificationVisible(false);
   expect(await umbracoApi.dataType.doesNameExist(tipTapName)).toBeFalsy();
   await umbracoUi.dataType.isDataTypeTreeItemVisible(tipTapName, false);

@@ -116,9 +116,9 @@ test('variant document type with variant block list with variant block with an v
   await umbracoUi.content.clickAddBlockElementButton();
   await umbracoUi.content.clickBlockElementWithName(blockName);
   await umbracoUi.content.enterTextstring(textStringText);
-  await umbracoUi.content.clickCreateModalButton();
-  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
-  await umbracoUi.content.clickContainerSaveAndPublishButton();
+  await umbracoUi.content.clickCreateBlockModalButtonAndWaitForModalToClose();
+  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickContainerSaveAndPublishButtonAndWaitForContentToBePublished();
 
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
@@ -142,9 +142,9 @@ test('variant document type with invariant block list with variant block with an
   await umbracoUi.content.clickAddBlockElementButton();
   await umbracoUi.content.clickBlockElementWithName(blockName);
   await umbracoUi.content.enterTextstring(textStringText);
-  await umbracoUi.content.clickCreateModalButton();
-  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
-  await umbracoUi.content.clickContainerSaveAndPublishButton();
+  await umbracoUi.content.clickCreateBlockModalButtonAndWaitForModalToClose();
+  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickContainerSaveAndPublishButtonAndWaitForContentToBePublished();
 
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
@@ -168,9 +168,9 @@ test('variant document type with invariant block list with variant block with an
   await umbracoUi.content.clickAddBlockElementButton()
   await umbracoUi.content.clickBlockElementWithName(blockName);
   await umbracoUi.content.enterTextstring(textStringText);
-  await umbracoUi.content.clickCreateModalButton();
-  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
-  await umbracoUi.content.clickContainerSaveAndPublishButton();
+  await umbracoUi.content.clickCreateBlockModalButtonAndWaitForModalToClose();
+  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickContainerSaveAndPublishButtonAndWaitForContentToBePublished();
 
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);

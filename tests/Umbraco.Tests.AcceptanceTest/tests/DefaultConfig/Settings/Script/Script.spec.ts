@@ -73,10 +73,9 @@ test('can delete a script', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => 
   // Act
   await umbracoUi.script.reloadScriptTree();
   await umbracoUi.script.clickActionsMenuForScript(scriptName);
-  await umbracoUi.script.clickDeleteAndConfirmButton();
+  await umbracoUi.script.clickDeleteAndConfirmButtonAndWaitForScriptToBeDeleted();
 
   // Assert
-  await umbracoUi.script.waitForScriptToBeDeleted();
   expect(await umbracoApi.script.doesNameExist(scriptName)).toBeFalsy();
   await umbracoUi.script.isScriptRootTreeItemVisible(scriptName, false, false);
 });
@@ -90,10 +89,9 @@ test('can rename a script', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.script.clickActionsMenuForScript(wrongScriptName);
-  await umbracoUi.script.rename(scriptName);
+  await umbracoUi.script.renameAndWaitForScriptToBeRenamed(scriptName);
 
   // Assert
-  await umbracoUi.script.waitForScriptToBeRenamed();
   expect(await umbracoApi.script.doesNameExist(scriptName)).toBeTruthy();
   expect(await umbracoApi.script.doesNameExist(wrongScriptName)).toBeFalsy();
 });

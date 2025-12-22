@@ -76,7 +76,7 @@ test('can rename content with language set in userGroup', async ({umbracoApi, um
   await umbracoUi.content.isDocumentReadOnly(false);
   await umbracoUi.content.enterContentName(updatedContentName);
   await umbracoUi.content.clickSaveButtonForContent();
-  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
+  await umbracoUi.content.clickSaveModalButtonAndWaitForContentToBeUpdated();
 
   // Assert
   await umbracoUi.content.isContentInTreeVisible(updatedContentName);

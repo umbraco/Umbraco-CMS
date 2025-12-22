@@ -74,10 +74,9 @@ test('can delete language', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => 
   await umbracoUi.language.goToLanguages();
 
   // Act
-  await umbracoUi.language.removeLanguageByName(languageName);
+  await umbracoUi.language.removeLanguageByNameAndWaitForLanguageToBeDeleted(languageName);
 
   // Assert
-  await umbracoUi.language.waitForLanguageToBeDeleted();
   expect(await umbracoApi.language.doesExist(isoCode)).toBeFalsy();
   await umbracoUi.language.isLanguageNameVisible(languageName, false);
 });

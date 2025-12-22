@@ -70,10 +70,9 @@ test('can delete a document blueprint', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.documentBlueprint.reloadDocumentBlueprintsTree();
   await umbracoUi.documentBlueprint.clickActionsMenuForDocumentBlueprints(documentBlueprintName);
   await umbracoUi.documentBlueprint.clickDeleteActionMenuOption();
-  await umbracoUi.documentBlueprint.clickConfirmToDeleteButton();
+  await umbracoUi.documentBlueprint.clickConfirmToDeleteButtonAndWaitForDocumentBlueprintToBeDeleted();
 
   // Assert
-  await umbracoUi.documentBlueprint.waitForDocumentBlueprintToBeDeleted();
   expect(await umbracoApi.documentBlueprint.doesNameExist(documentBlueprintName)).toBeFalsy();
   await umbracoUi.documentBlueprint.isDocumentBlueprintRootTreeItemVisible(documentBlueprintName, false, false);
 });
@@ -88,10 +87,9 @@ test('can create a document blueprint from the content menu', {tag: '@release'},
   // Act
   await umbracoUi.content.clickActionsMenuForContent(documentBlueprintName);
   await umbracoUi.content.clickCreateBlueprintActionMenuOption();
-  await umbracoUi.content.clickSaveModalButton();
+  await umbracoUi.content.clickSaveModalButtonAndWaitForDocumentBlueprintToBeCreated();
 
   // Assert
-  await umbracoUi.documentBlueprint.waitForDocumentBlueprintToBeCreated();
   expect(await umbracoApi.documentBlueprint.doesNameExist(documentBlueprintName)).toBeTruthy();
   await umbracoUi.documentBlueprint.goToSettingsTreeItem('Document Blueprints');
   await umbracoUi.documentBlueprint.isDocumentBlueprintRootTreeItemVisible(documentBlueprintName, true);

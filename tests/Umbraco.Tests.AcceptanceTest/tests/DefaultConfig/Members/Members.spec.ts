@@ -203,10 +203,9 @@ test('can delete member', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.member.clickMemberLinkByName(memberName);
   await umbracoUi.memberGroup.clickActionButton();
   await umbracoUi.memberGroup.clickDeleteButton();
-  await umbracoUi.memberGroup.clickConfirmToDeleteButton();
+  await umbracoUi.member.clickConfirmToDeleteButtonAndWaitForMemberToBeDeleted();
 
   // Assert
-  await umbracoUi.member.waitForMemberToBeDeleted();
   await umbracoUi.member.clickMembersSidebarButton();
   await umbracoUi.member.isMemberWithNameVisible(memberName, false);
   expect(await umbracoApi.member.doesNameExist(memberName)).toBeFalsy();

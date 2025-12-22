@@ -52,7 +52,7 @@ test('can create content using an invariant document blueprint', async ({umbraco
   await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.selectDocumentBlueprintWithName(documentBlueprintName);
-  await umbracoUi.content.clickSaveModalButtonAndWaitForContentToBeCreated();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert
   expect(await umbracoApi.document.doesNameExist(documentBlueprintName)).toBeTruthy();

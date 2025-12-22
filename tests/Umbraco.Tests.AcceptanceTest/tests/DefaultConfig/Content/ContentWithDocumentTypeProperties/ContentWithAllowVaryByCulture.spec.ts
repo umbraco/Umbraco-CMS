@@ -50,7 +50,7 @@ test('can create content with names that vary by culture', async ({umbracoApi, u
   await umbracoUi.content.clickVariantAddModeButtonForLanguageName(secondLanguageName);
   await umbracoUi.content.enterContentName(danishContentName);
   await umbracoUi.content.clickSaveButtonForContent();
-  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
+  await umbracoUi.content.clickSaveModalButtonAndWaitForContentToBeUpdated();
 
   // Assert
   expect(await umbracoApi.document.doesNameExist(danishContentName)).toBeTruthy();
@@ -77,7 +77,7 @@ test('can create content with names that vary by culture and content that is inv
   await umbracoUi.content.clickVariantAddModeButtonForLanguageName(secondLanguageName);
   await umbracoUi.content.enterContentName(danishContentName);
   await umbracoUi.content.clickSaveButtonForContent();
-  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
+  await umbracoUi.content.clickSaveModalButtonAndWaitForContentToBeUpdated();
 
   // Assert
   expect(await umbracoApi.document.doesNameExist(danishContentName)).toBeTruthy();
@@ -108,7 +108,7 @@ test('can create content with names and content that vary by culture', async ({u
   await umbracoUi.content.enterContentName(danishContentName);
   await umbracoUi.content.enterTextstring(danishTextContent);
   await umbracoUi.content.clickSaveButtonForContent();
-  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
+  await umbracoUi.content.clickSaveModalButtonAndWaitForContentToBeUpdated();
 
   // Assert
   expect(await umbracoApi.document.doesNameExist(danishContentName)).toBeTruthy();

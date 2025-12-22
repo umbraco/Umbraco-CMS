@@ -68,8 +68,7 @@ test('variant block values are readable in UI after page reload', {tag: '@smoke'
   await umbracoUi.content.enterPropertyValue(variantPropertyName, englishVariantText);
   await umbracoUi.content.enterPropertyValue(invariantPropertyName, invariantText);
   await umbracoUi.content.clickCreateForModalWithHeadline('Add ' + variantBlockName);
-  await umbracoUi.content.clickCreateForModalWithHeadline('Add ' + wrapperBlockName);
-  await umbracoUi.content.clickSaveButtonForContent();
+  await umbracoUi.content.clickCreateForModalWithHeadlineAndWaitForModalToClose('Add ' + wrapperBlockName);
   await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
   await umbracoUi.reloadPage();
 

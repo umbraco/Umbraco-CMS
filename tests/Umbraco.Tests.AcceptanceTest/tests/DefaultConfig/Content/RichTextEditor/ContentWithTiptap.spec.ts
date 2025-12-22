@@ -115,12 +115,12 @@ test('can save a variant content node after removing embedded block in RTE', asy
   await umbracoUi.content.enterTextstring(textStringValue);
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.clickSaveButtonForContent();
-  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
+  await umbracoUi.content.clickSaveModalButtonAndWaitForContentToBeUpdated();
   const contentData = await umbracoApi.document.getByName(englishContentName);
   expect(contentData.values[0].value.blocks.contentData[0].values[0].value).toBe(textStringValue);
   await umbracoUi.content.clearTipTapEditor();
   await umbracoUi.content.clickSaveButtonForContent();
-  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
+  await umbracoUi.content.clickSaveModalButtonAndWaitForContentToBeUpdated();
 
   // Assert
   await umbracoUi.content.isErrorNotificationVisible(false);

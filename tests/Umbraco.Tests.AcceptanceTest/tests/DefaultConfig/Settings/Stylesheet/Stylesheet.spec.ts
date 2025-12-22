@@ -73,10 +73,9 @@ test('can delete a stylesheet', {tag: '@smoke'}, async ({umbracoApi, umbracoUi})
   //Act
   await umbracoUi.stylesheet.reloadStylesheetTree();
   await umbracoUi.stylesheet.clickActionsMenuForStylesheet(stylesheetName);
-  await umbracoUi.stylesheet.clickDeleteAndConfirmButton();
+  await umbracoUi.stylesheet.clickDeleteAndConfirmButtonAndWaitForStylesheetToBeDeleted();
 
   // Assert
-  await umbracoUi.stylesheet.waitForStylesheetToBeDeleted();
   expect(await umbracoApi.stylesheet.doesNameExist(stylesheetName)).toBeFalsy();
   await umbracoUi.stylesheet.isStylesheetRootTreeItemVisible(stylesheetName, false, false);
 });
@@ -91,10 +90,9 @@ test('can rename a stylesheet', {tag: '@smoke'}, async ({umbracoApi, umbracoUi})
   //Act
   await umbracoUi.stylesheet.reloadStylesheetTree();
   await umbracoUi.stylesheet.clickActionsMenuForStylesheet(wrongStylesheetName);
-  await umbracoUi.stylesheet.rename(stylesheetName);
+  await umbracoUi.stylesheet.renameAndWaitForStylesheetToBeRenamed(stylesheetName);
 
   // Assert
-  await umbracoUi.stylesheet.waitForStylesheetToBeRenamed();
   expect(await umbracoApi.stylesheet.doesNameExist(stylesheetName)).toBeTruthy();
   expect(await umbracoApi.stylesheet.doesNameExist(wrongStylesheetName)).toBeFalsy();
 });

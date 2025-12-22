@@ -82,7 +82,6 @@ test('can see notification when content is updated', async ({umbracoUi, umbracoA
   await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.smtp.doesNotificationEmailWithSubjectExist(actionName, contentName)).toBeTruthy();
 });
 
@@ -98,10 +97,9 @@ test('can see notification when content is trashed', async ({umbracoUi, umbracoA
   // Act
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickTrashActionMenuOption();
-  await umbracoUi.content.clickConfirmTrashButton();
+  await umbracoUi.content.clickConfirmTrashButtonAndWaitForContentToBeTrashed();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeTrashed();
   expect(await umbracoApi.smtp.doesNotificationEmailWithSubjectExist(actionName, contentName)).toBeTruthy();
 });
 

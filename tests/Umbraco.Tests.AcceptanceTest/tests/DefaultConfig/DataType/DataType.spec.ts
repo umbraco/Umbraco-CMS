@@ -53,10 +53,9 @@ test('can delete a data type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) 
 
   // Act
   await umbracoUi.dataType.clickRootFolderCaretButton();
-  await umbracoUi.dataType.deleteDataType(dataTypeName);
+  await umbracoUi.dataType.deleteDataTypeAndWaitForDataTypeToBeDeleted(dataTypeName);
 
   // Assert
-  await umbracoUi.dataType.waitForDataTypeToBeDeleted();
   await umbracoUi.dataType.isDataTypeTreeItemVisible(dataTypeName, false);
   expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeFalsy();
 });

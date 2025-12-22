@@ -109,10 +109,9 @@ test('can delete a user group', {tag: '@release'}, async ({umbracoApi, umbracoUi
   // Act
   await umbracoUi.userGroup.clickActionButton();
   await umbracoUi.userGroup.clickDeleteButton();
-  await umbracoUi.userGroup.clickConfirmToDeleteButton();
+  await umbracoUi.userGroup.clickConfirmToDeleteButtonAndWaitForUserGroupToBeDeleted();
 
   // Assert
-  await umbracoUi.userGroup.waitForUserGroupToBeDeleted();
   expect(await umbracoApi.userGroup.doesNameExist(userGroupName)).toBeFalsy();
   await umbracoUi.userGroup.clickUserGroupsButton();
   await umbracoUi.userGroup.isUserGroupWithNameVisible(userGroupName, false);

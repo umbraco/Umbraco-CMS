@@ -75,10 +75,9 @@ test('can rename a partial view', {tag: '@smoke'}, async ({umbracoApi, umbracoUi
   //Act
   await umbracoUi.partialView.reloadPartialViewTree();
   await umbracoUi.partialView.clickActionsMenuForPartialView(wrongPartialViewFileName);
-  await umbracoUi.partialView.rename(partialViewName);
+  await umbracoUi.partialView.renameAndWaitForPartialViewToBeRenamed(partialViewName);
 
   // Assert
-  await umbracoUi.partialView.waitForPartialViewToBeRenamed();
   // Verify the old partial view is NOT displayed under the Partial Views section
   await umbracoUi.partialView.isPartialViewRootTreeItemVisible(wrongPartialViewFileName, false, false);
   // Verify the new partial view is displayed under the Partial Views section
@@ -230,10 +229,9 @@ test('can delete a partial view', {tag: '@smoke'}, async ({umbracoApi, umbracoUi
   //Act
   await umbracoUi.partialView.clickRootFolderCaretButton();
   await umbracoUi.partialView.clickActionsMenuForPartialView(partialViewFileName);
-  await umbracoUi.partialView.clickDeleteAndConfirmButton();
+  await umbracoUi.partialView.clickDeleteAndConfirmButtonAndWaitForPartialViewToBeDeleted();
 
   // Assert
-  await umbracoUi.partialView.waitForPartialViewToBeDeleted();
   expect(await umbracoApi.partialView.doesExist(partialViewFileName)).toBeFalsy();
   // Verify the partial view is NOT displayed under the Partial Views section
   await umbracoUi.partialView.clickRootFolderCaretButton();

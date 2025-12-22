@@ -87,10 +87,9 @@ test('can delete a media type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi})
   await umbracoUi.mediaType.clickRootFolderCaretButton();
   await umbracoUi.mediaType.clickActionsMenuForName(mediaTypeName);
   await umbracoUi.mediaType.clickDeleteActionMenuOption();
-  await umbracoUi.mediaType.clickConfirmToDeleteButton();
+  await umbracoUi.mediaType.clickConfirmToDeleteButtonAndWaitForMediaTypeToBeDeleted();
 
   // Assert
-  await umbracoUi.mediaType.waitForMediaTypeToBeDeleted();
   expect(await umbracoApi.mediaType.doesNameExist(mediaTypeName)).toBeFalsy();
   await umbracoUi.mediaType.isMediaTypeTreeItemVisible(mediaTypeName, false);
 });
