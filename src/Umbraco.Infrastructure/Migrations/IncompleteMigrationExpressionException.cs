@@ -1,3 +1,5 @@
+using System.Runtime.Serialization;
+
 namespace Umbraco.Cms.Infrastructure.Migrations;
 
 /// <summary>
@@ -8,6 +10,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations;
 ///     When a non-executed expression is detected, an IncompleteMigrationExpressionException is thrown.
 /// </remarks>
 /// <seealso cref="Exception" />
+[Serializable]
 public class IncompleteMigrationExpressionException : Exception
 {
     /// <summary>
@@ -36,6 +39,23 @@ public class IncompleteMigrationExpressionException : Exception
     /// </param>
     public IncompleteMigrationExpressionException(string message, Exception innerException)
         : base(message, innerException)
+    {
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="IncompleteMigrationExpressionException" /> class.
+    /// </summary>
+    /// <param name="info">
+    ///     The <see cref="T:System.Runtime.Serialization.SerializationInfo" /> that holds the serialized object
+    ///     data about the exception being thrown.
+    /// </param>
+    /// <param name="context">
+    ///     The <see cref="T:System.Runtime.Serialization.StreamingContext" /> that contains contextual
+    ///     information about the source or destination.
+    /// </param>
+    [Obsolete("Constructors taking a signature of SerializationInfo info, StreamingContext context are deprecated and not used within Umbraco. Scheduled for removal in Umbraco 19.", DiagnosticId = "SYSLIB0051")]
+    protected IncompleteMigrationExpressionException(SerializationInfo info, StreamingContext context)
+        : base(info, context)
     {
     }
 }

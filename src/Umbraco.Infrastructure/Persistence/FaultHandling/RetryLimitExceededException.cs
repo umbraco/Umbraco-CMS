@@ -1,3 +1,5 @@
+using System.Runtime.Serialization;
+
 namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling;
 
 /// <summary>
@@ -5,6 +7,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling;
 ///     notify the retry policy that no further retry attempts are required.
 /// </summary>
 /// <seealso cref="System.Exception" />
+[Serializable]
 public sealed class RetryLimitExceededException : Exception
 {
     /// <summary>
@@ -40,6 +43,23 @@ public sealed class RetryLimitExceededException : Exception
     /// <param name="innerException">The exception that is the cause of the current exception.</param>
     public RetryLimitExceededException(string message, Exception innerException)
         : base(message, innerException)
+    {
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="RetryLimitExceededException" /> class.
+    /// </summary>
+    /// <param name="info">
+    ///     The <see cref="T:System.Runtime.Serialization.SerializationInfo" /> that holds the serialized object
+    ///     data about the exception being thrown.
+    /// </param>
+    /// <param name="context">
+    ///     The <see cref="T:System.Runtime.Serialization.StreamingContext" /> that contains contextual
+    ///     information about the source or destination.
+    /// </param>
+    [Obsolete("Constructors taking a signature of SerializationInfo info, StreamingContext context are deprecated and not used within Umbraco. Scheduled for removal in Umbraco 19.", DiagnosticId = "SYSLIB0051")]
+    private RetryLimitExceededException(SerializationInfo info, StreamingContext context)
+        : base(info, context)
     {
     }
 }
