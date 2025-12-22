@@ -160,7 +160,7 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
             : Enumerable.Empty<IContentType>();
     }
 
-    protected IEnumerable<int> PerformGetByQuery(IQuery<PropertyType> query)
+    private IEnumerable<int> PerformGetByQuery(IQuery<PropertyType> query)
     {
         // used by DataTypeService to remove properties
         // from content types if they have a deleted data type - see
@@ -272,7 +272,7 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
         entity.ResetDirtyProperties();
     }
 
-    protected void PersistTemplates(IContentType entity, bool clearAll)
+    private void PersistTemplates(IContentType entity, bool clearAll)
     {
         // remove and insert, if required
         Sql<ISqlContext> sql = Sql()

@@ -53,9 +53,9 @@ internal sealed class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserR
     /// <param name="passwordConfiguration">The password configuration.</param>
     /// <param name="jsonSerializer">The JSON serializer.</param>
     /// <param name="runtimeState">State of the runtime.</param>
+    /// <param name="repositoryCacheVersionService">The repository cache version service.</param>
     /// <param name="permissionMappers">The permission mappers.</param>
-    /// <param name="globalCache">The app policy cache.</param>
-    /// <param name="repositoryCacheVersionService"></param>
+    /// <param name="cacheSyncService">The cache synchronization service.</param>
     /// <exception cref="System.ArgumentNullException">
     ///     mapperCollection
     ///     or

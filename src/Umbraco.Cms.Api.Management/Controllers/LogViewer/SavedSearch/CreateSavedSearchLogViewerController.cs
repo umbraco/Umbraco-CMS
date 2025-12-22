@@ -19,6 +19,7 @@ public class CreateSavedSearchLogViewerController : SavedSearchLogViewerControll
     /// <summary>
     ///     Creates a saved log search.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <param name="savedSearch">The log search to be saved.</param>
     /// <returns>The location of the saved log search after the creation.</returns>
     [HttpPost]
