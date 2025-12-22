@@ -61,10 +61,9 @@ test('can delete a block grid editor', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.dataType.clickRootFolderCaretButton();
   await umbracoUi.dataType.clickActionsMenuForDataType(blockGridEditorName);
-  await umbracoUi.dataType.clickDeleteAndConfirmButton();
+  await umbracoUi.dataType.clickDeleteAndConfirmButtonAndWaitForDataTypeToBeDeleted();
 
   // Assert
-  await umbracoUi.dataType.waitForDataTypeToBeDeleted();
   expect(await umbracoApi.dataType.doesExist(blockGridId)).toBeFalsy();
   await umbracoUi.dataType.isDataTypeTreeItemVisible(blockGridEditorName, false);
 });

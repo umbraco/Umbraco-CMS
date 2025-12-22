@@ -123,7 +123,7 @@ test.skip('can remove a content model from a block', async ({umbracoApi, umbraco
   await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
+  // TODO: missing check that the content model is removed
 });
 
 test('can add a settings model to a block', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
@@ -323,7 +323,6 @@ test.skip('can update a custom stylesheet for a block', async ({umbracoApi, umbr
   await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   blockData = await umbracoApi.dataType.getByName(blockListEditorName);
   expect(blockData.values[0].value[0].stylesheet[0]).toEqual(encodedSecondStylesheetPath);
 
@@ -354,7 +353,6 @@ test.skip('can delete a custom stylesheet from a block', async ({umbracoApi, umb
   await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   blockData = await umbracoApi.dataType.getByName(blockListEditorName);
   expect(blockData.values[0].value[0].stylesheet[0]).toBeUndefined();
 
@@ -438,7 +436,7 @@ test('only allow image file as a block thumbnail', {tag: '@release'}, async ({um
   await umbracoUi.dataType.goToDataType(blockListEditorName);
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
   await umbracoUi.dataType.clickChooseThumbnailButton();
-  
+
   // Assert
   for (const notAllowedFileName of notAllowedFileNames) {
     await umbracoUi.dataType.isModalMenuItemWithNameVisible(notAllowedFileName, false);

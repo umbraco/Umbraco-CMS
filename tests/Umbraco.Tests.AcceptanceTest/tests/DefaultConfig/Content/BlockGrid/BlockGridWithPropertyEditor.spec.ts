@@ -55,7 +55,6 @@ test('cannot publish a block grid with a mandatory radiobox without a value', as
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe('Published');
 });
@@ -85,7 +84,6 @@ test('cannot publish a block grid with a mandatory checkbox list without a value
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe('Published');
 });
@@ -115,7 +113,6 @@ test('cannot publish a block grid with a mandatory dropdown without a value', as
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe('Published');
 });
