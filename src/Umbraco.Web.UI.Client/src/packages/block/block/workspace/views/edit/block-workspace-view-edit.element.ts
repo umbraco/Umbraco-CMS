@@ -5,13 +5,17 @@ import { css, html, customElement, state, repeat, property, nothing } from '@umb
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbContentTypeModel, UmbPropertyTypeContainerMergedModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
-import type { UmbRoute, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
+import type {
+	UmbRoute,
+	UmbRouterSlotChangeEvent,
+	UmbRouterSlotInitEvent,
+	PageComponent,
+} from '@umbraco-cms/backoffice/router';
 import { encodeFolderName } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestWorkspaceView, UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
 import type { UmbVariantHint } from '@umbraco-cms/backoffice/hint';
 import { UmbViewController, UMB_VIEW_CONTEXT } from '@umbraco-cms/backoffice/view';
-import type { PageComponent } from '@umbraco-cms/backoffice/router';
 
 @customElement('umb-block-workspace-view-edit')
 export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -243,10 +247,7 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 			fullPath === this._activePath ||
 			(!this._hasRootGroups && index === 0 && this._routerPath + '/' === this._activePath) ||
 			(this._hasRootGroups && index === 0 && path === null && this._routerPath + '/' === this._activePath);
-		return html`<uui-tab
-			label=${this.localize.string(name ?? '#general_unnamed')}
-			.active=${active}
-			href=${fullPath}
+		return html`<uui-tab label=${this.localize.string(name ?? '#general_unnamed')} .active=${active} href=${fullPath}
 			>${this.localize.string(name)}${hint && !active
 				? html`<umb-badge slot="extra" .color=${hint.color ?? 'default'} ?attention=${hint.color === 'invalid'}
 						>${hint.text}</umb-badge
