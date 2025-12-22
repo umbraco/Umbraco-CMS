@@ -45,7 +45,7 @@ export class UmbDocumentBlockWorkspaceAllowEditInvariantFromNonDefaultController
 			propertyWriteGuard: blockWorkspace.settings.propertyWriteGuard,
 		});
 
-		// --- Rule for everything inside invariant blocks viewed from a non-default language ---
+		// --- Rule for fields inside invariant blocks viewed from a non-default language ---
 
 		/** Note because this rule only applies in invariant contexts, then we can use the nearest Block Manager to see what the active variant is. In a data-branch of a mix between varying and not-varying data this would not work [NL] */
 		const blockManager = await this.getContext(UMB_BLOCK_MANAGER_CONTEXT);
