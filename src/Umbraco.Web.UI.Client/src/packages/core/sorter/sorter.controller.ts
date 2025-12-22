@@ -1340,7 +1340,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 				newModel.splice(newIndex, 0, item);
 				this.#model = newModel;
 
-				await this.#config.onContainerChange?.({
+				this.#config.onContainerChange?.({
 					model: newModel,
 					item,
 					from: fromCtrl as unknown as UmbSorterController<T, ElementType> | undefined,
