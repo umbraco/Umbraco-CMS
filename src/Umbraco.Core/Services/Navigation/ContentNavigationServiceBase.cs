@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
+using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Navigation;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -17,8 +18,8 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
     private Lazy<Dictionary<string, Guid>> _contentTypeAliasToKeyMap;
     private ConcurrentDictionary<Guid, NavigationNode> _navigationStructure = new();
     private ConcurrentDictionary<Guid, NavigationNode> _recycleBinNavigationStructure = new();
-    private HashSet<Guid> _roots = [];
-    private HashSet<Guid> _recycleBinRoots = [];
+    private ConcurrentHashSet<Guid> _roots = new();
+    private ConcurrentHashSet<Guid> _recycleBinRoots = new();
 
     protected ContentNavigationServiceBase(ICoreScopeProvider coreScopeProvider, INavigationRepository navigationRepository, TContentTypeService typeService)
     {
@@ -304,18 +305,22 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
         scope.ReadLock(readLock);
 
-        // Build the corresponding navigation structure
+        // Build new structures and atomically swap references to avoid race conditions
+        IEnumerable<INavigationModel> navigationModels = trashed
+            ? _navigationRepository.GetTrashedContentNodesByObjectType(objectTypeKey)
+            : _navigationRepository.GetContentNodesByObjectType(objectTypeKey);
+
+        (ConcurrentDictionary<Guid, NavigationNode> structure, ConcurrentHashSet<Guid> roots) = BuildNavigationDictionary(navigationModels);
+
         if (trashed)
         {
-            _recycleBinRoots.Clear();
-            IEnumerable<INavigationModel> navigationModels = _navigationRepository.GetTrashedContentNodesByObjectType(objectTypeKey);
-            BuildNavigationDictionary(_recycleBinNavigationStructure, _recycleBinRoots,  navigationModels);
+            _recycleBinNavigationStructure = structure;
+            _recycleBinRoots = roots;
         }
         else
         {
-            _roots.Clear();
-            IEnumerable<INavigationModel> navigationModels = _navigationRepository.GetContentNodesByObjectType(objectTypeKey);
-            BuildNavigationDictionary(_navigationStructure, _roots, navigationModels);
+            _navigationStructure = structure;
+            _roots = roots;
         }
 
         return Task.CompletedTask;
@@ -335,7 +340,7 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
     }
 
     private bool TryGetRootKeysFromStructure(
-        HashSet<Guid> input,
+        ICollection<Guid> input,
         out IEnumerable<Guid> rootKeys,
         Guid? contentTypeKey = null)
     {
@@ -631,8 +636,11 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         return true;
     }
 
-    private static void BuildNavigationDictionary(ConcurrentDictionary<Guid, NavigationNode> nodesStructure, HashSet<Guid> roots, IEnumerable<INavigationModel> entities)
+    private static (ConcurrentDictionary<Guid, NavigationNode> Structure, ConcurrentHashSet<Guid> Roots) BuildNavigationDictionary(IEnumerable<INavigationModel> entities)
     {
+        var nodesStructure = new ConcurrentDictionary<Guid, NavigationNode>();
+        var roots = new ConcurrentHashSet<Guid>();
+
         var entityList = entities.ToList();
         var idToKeyMap = entityList.ToDictionary(x => x.Id, x => x.Key);
 
@@ -659,6 +667,8 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
                 parentNode.AddChild(nodesStructure, entity.Key);
             }
         }
+
+        return (nodesStructure, roots);
     }
 
     private Dictionary<string, Guid> LoadContentTypes()
