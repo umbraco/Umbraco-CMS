@@ -170,7 +170,7 @@ type INTERNAL_UmbSorterConfig<T, ElementType extends HTMLElement> = {
 		item: T;
 		model: Array<T>;
 		from: UmbSorterController<T, ElementType> | undefined;
-	}) => void;
+	}) => void | Promise<void>;
 	onEnd?: (argument: { item: T; element: ElementType }) => void;
 	itemHasNestedContainersResolver?: (element: HTMLElement) => boolean;
 	/**
@@ -1340,7 +1340,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 				newModel.splice(newIndex, 0, item);
 				this.#model = newModel;
 
-				this.#config.onContainerChange?.({
+				await this.#config.onContainerChange?.({
 					model: newModel,
 					item,
 					from: fromCtrl as unknown as UmbSorterController<T, ElementType> | undefined,
