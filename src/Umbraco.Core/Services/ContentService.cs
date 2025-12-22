@@ -51,6 +51,18 @@ public class ContentService : RepositoryService, IContentService
     // Property for convenient access (deferred resolution for both paths)
     private IContentCrudService CrudService => _crudServiceLazy.Value;
 
+    // Query operation service fields (for Phase 2 extracted query operations)
+    private readonly IContentQueryOperationService? _queryOperationService;
+    private readonly Lazy<IContentQueryOperationService>? _queryOperationServiceLazy;
+
+    /// <summary>
+    /// Gets the query operation service.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">Thrown if the service was not properly initialized.</exception>
+    private IContentQueryOperationService QueryOperationService =>
+        _queryOperationService ?? _queryOperationServiceLazy?.Value
+        ?? throw new InvalidOperationException("QueryOperationService not initialized. Ensure the service is properly injected via constructor.");
+
     #region Constructors
 
     [Microsoft.Extensions.DependencyInjection.ActivatorUtilitiesConstructor]
@@ -72,7 +84,8 @@ public class ContentService : RepositoryService, IContentService
         IIdKeyMap idKeyMap,
         IOptionsMonitor<ContentSettings> optionsMonitor,
         IRelationService relationService,
-        IContentCrudService crudService)  // NEW PARAMETER - direct injection
+        IContentCrudService crudService,
+        IContentQueryOperationService queryOperationService)  // NEW PARAMETER - Phase 2 query operations
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _documentRepository = documentRepository;
@@ -97,6 +110,11 @@ public class ContentService : RepositoryService, IContentService
         ArgumentNullException.ThrowIfNull(crudService);
         // Wrap in Lazy for consistent access pattern (already resolved, so returns immediately)
         _crudServiceLazy = new Lazy<IContentCrudService>(() => crudService);
+
+        // Phase 2: Query operation service (direct injection)
+        ArgumentNullException.ThrowIfNull(queryOperationService);
+        _queryOperationService = queryOperationService;
+        _queryOperationServiceLazy = null;  // Not needed when directly injected
     }
 
     [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
@@ -148,6 +166,11 @@ public class ContentService : RepositoryService, IContentService
         _crudServiceLazy = new Lazy<IContentCrudService>(() =>
             StaticServiceProvider.Instance.GetRequiredService<IContentCrudService>(),
             LazyThreadSafetyMode.ExecutionAndPublication);
+
+        // Phase 2: Lazy resolution of IContentQueryOperationService
+        _queryOperationServiceLazy = new Lazy<IContentQueryOperationService>(() =>
+            StaticServiceProvider.Instance.GetRequiredService<IContentQueryOperationService>(),
+            LazyThreadSafetyMode.ExecutionAndPublication);
     }
 
     [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
@@ -197,6 +220,11 @@ public class ContentService : RepositoryService, IContentService
         // NEW: Lazy resolution of IContentCrudService
         _crudServiceLazy = new Lazy<IContentCrudService>(() =>
             StaticServiceProvider.Instance.GetRequiredService<IContentCrudService>(),
+            LazyThreadSafetyMode.ExecutionAndPublication);
+
+        // Phase 2: Lazy resolution of IContentQueryOperationService
+        _queryOperationServiceLazy = new Lazy<IContentQueryOperationService>(() =>
+            StaticServiceProvider.Instance.GetRequiredService<IContentQueryOperationService>(),
             LazyThreadSafetyMode.ExecutionAndPublication);
     }
 
