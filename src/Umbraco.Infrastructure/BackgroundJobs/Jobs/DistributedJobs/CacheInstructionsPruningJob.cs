@@ -22,10 +22,11 @@ internal class CacheInstructionsPruningJob : IDistributedBackgroundJob
     /// <summary>
     /// Initializes a new instance of the <see cref="CacheInstructionsPruningJob"/> class.
     /// </summary>
-    /// <param name="scopeProvider">Provides scopes for database operations.</param>
     /// <param name="globalSettings">The global settings configuration.</param>
     /// <param name="cacheInstructionRepository">The repository for cache instructions.</param>
+    /// <param name="scopeProvider">Provides scopes for database operations.</param>
     /// <param name="timeProvider">The time provider.</param>
+    /// <param name="lastSyncedManager">The manager for tracking last synced cache instructions.</param>
     public CacheInstructionsPruningJob(
         IOptions<GlobalSettings> globalSettings,
         ICacheInstructionRepository cacheInstructionRepository,
