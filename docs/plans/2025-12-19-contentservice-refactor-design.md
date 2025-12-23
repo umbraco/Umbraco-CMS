@@ -16,6 +16,7 @@
 | 1.5 | Added performance benchmarks (33 tests for baseline comparison) |
 | 1.6 | Phase 2 complete - QueryOperationService extracted |
 | 1.7 | Phase 3 complete - VersionOperationService extracted |
+| 1.8 | Phase 4 complete - ContentMoveOperationService extracted |
 
 ## Overview
 
@@ -394,7 +395,7 @@ Each phase MUST run tests before and after to verify no regressions.
 | 1 | CRUD Service | All ContentService*Tests | All pass | ✅ Complete |
 | 2 | Query Service | All ContentService*Tests | All pass | ✅ Complete |
 | 3 | Version Service | All ContentService*Tests | All pass | ✅ Complete |
-| 4 | Move Service | All ContentService*Tests + Sort/MoveToRecycleBin tests | All pass | Pending |
+| 4 | Move Service | All ContentService*Tests + Sort/MoveToRecycleBin tests | All pass | ✅ Complete |
 | 5 | Publish Operation Service | All ContentService*Tests + Notification ordering tests | All pass | Pending |
 | 6 | Permission Manager | All ContentService*Tests + Permission tests | All pass | Pending |
 | 7 | Blueprint Manager | All ContentService*Tests | All pass | Pending |
@@ -421,7 +422,12 @@ Each phase MUST run tests before and after to verify no regressions.
    - `ContentVersionOperationService.cs` - Implementation
    - Updated `ContentService.cs` to delegate version operations
    - Git tag: `phase-3-version-extraction`
-5. **Phase 4: Move Service** - Depends on CRUD; Sort and MoveToRecycleBin tests critical
+5. **Phase 4: Move Service** ✅ - Complete! Created:
+   - `IContentMoveOperationService.cs` - Interface (10 methods: Move, Copy, Sort, RecycleBin operations)
+   - `ContentMoveOperationService.cs` - Implementation (~450 lines)
+   - Updated `ContentService.cs` to delegate move/copy/sort operations
+   - Note: `MoveToRecycleBin` stays in facade for unpublish orchestration
+   - Git tag: `phase-4-move-extraction`
 6. **Phase 5: Publish Operation Service** - Most complex; notification ordering tests critical
 7. **Phase 6: Permission Manager** - Small extraction; permission tests critical
 8. **Phase 7: Blueprint Manager** - Final cleanup
