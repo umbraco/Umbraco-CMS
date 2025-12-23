@@ -37,12 +37,24 @@ public class SearchMediaItemController : MediaItemControllerBase
     [Obsolete("Use the non-obsolete constructor instead, will be removed in Umbraco 18.")]
     public SearchMediaItemController(
         IIndexedEntitySearchService indexedEntitySearchService,
+        IMediaPresentationFactory mediaPresentationFactory,
+        IDataTypeService dataTypeService)
+        : this(
+            indexedEntitySearchService,
+            mediaPresentationFactory,
+            dataTypeService,
+            StaticServiceProvider.Instance.GetRequiredService<IMediaTypeService>())
+    {
+    }
+
+    [Obsolete("Use the non-obsolete constructor instead, will be removed in Umbraco 18.")]
+    public SearchMediaItemController(
+        IIndexedEntitySearchService indexedEntitySearchService,
         IMediaPresentationFactory mediaPresentationFactory)
         : this(
             indexedEntitySearchService,
             mediaPresentationFactory,
-            StaticServiceProvider.Instance.GetRequiredService<IDataTypeService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IMediaTypeService>())
+            StaticServiceProvider.Instance.GetRequiredService<IDataTypeService>())
     {
     }
 
@@ -82,11 +94,12 @@ public class SearchMediaItemController : MediaItemControllerBase
         [FromQuery] IEnumerable<Guid>? allowedMediaTypes = null,
         Guid? dataTypeId = null)
     {
-        //We always want to include folders in the search results
-        if (allowedMediaTypes != null)
+        // We always want to include folders in the search results (aligns with behaviour in Umbraco 13, and allows folders
+        // to be selected to find the selectable items inside).
+        if (allowedMediaTypes is not null)
         {
             IMediaType? folderMediaType = _mediaTypeService.Get(Constants.Conventions.MediaTypes.Folder);
-            if (folderMediaType != null && !allowedMediaTypes.Contains(folderMediaType.Key))
+            if (folderMediaType is not null && allowedMediaTypes.Contains(folderMediaType.Key) is false)
             {
                 allowedMediaTypes = [..allowedMediaTypes, folderMediaType.Key];
             }
