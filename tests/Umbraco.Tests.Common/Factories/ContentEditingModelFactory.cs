@@ -43,10 +43,8 @@ public class ContentEditingModelFactory : IContentEditingModelFactory
         if (contentVariesByCulture || contentVariesBySegment)
         {
             // Get all unique culture/segment combinations from CultureInfos
-            var cultureSegmentCombinations = new HashSet<(string? culture, string? segment)>();
-
             // Add invariant combination
-            cultureSegmentCombinations.Add((null, null));
+            var cultureSegmentCombinations = new HashSet<(string? culture, string? segment)> { (null, null) };
             if (contentVariesByCulture)
             {
                 // Add cultures
@@ -179,9 +177,4 @@ public class ContentEditingModelFactory : IContentEditingModelFactory
             }
         }
     }
-}
-
-public interface IContentEditingModelFactory
-{
-    Task<ContentUpdateModel> CreateFromAsync(IContent content);
 }
