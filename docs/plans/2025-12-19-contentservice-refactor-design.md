@@ -17,6 +17,7 @@
 | 1.6 | Phase 2 complete - QueryOperationService extracted |
 | 1.7 | Phase 3 complete - VersionOperationService extracted |
 | 1.8 | Phase 4 complete - ContentMoveOperationService extracted |
+| 1.9 | Phase 5 complete - ContentPublishOperationService extracted |
 
 ## Overview
 
@@ -396,7 +397,7 @@ Each phase MUST run tests before and after to verify no regressions.
 | 2 | Query Service | All ContentService*Tests | All pass | ✅ Complete |
 | 3 | Version Service | All ContentService*Tests | All pass | ✅ Complete |
 | 4 | Move Service | All ContentService*Tests + Sort/MoveToRecycleBin tests | All pass | ✅ Complete |
-| 5 | Publish Operation Service | All ContentService*Tests + Notification ordering tests | All pass | Pending |
+| 5 | Publish Operation Service | All ContentService*Tests + Notification ordering tests | All pass | ✅ Complete |
 | 6 | Permission Manager | All ContentService*Tests + Permission tests | All pass | Pending |
 | 7 | Blueprint Manager | All ContentService*Tests | All pass | Pending |
 | 8 | Facade | **Full test suite** | All pass | Pending |
