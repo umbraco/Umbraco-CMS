@@ -7,4 +7,5 @@ export interface UmbDataTypeItemModel {
 	propertyEditorUiAlias: string;
 	propertyEditorSchemaAlias: string;
 	icon?: string;
+	isDeletable?: boolean;
 }

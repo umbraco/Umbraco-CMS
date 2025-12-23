@@ -4,6 +4,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
@@ -49,7 +50,7 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
     {
     }
 
-    protected string EntityTypeCacheKey { get; } = $"uRepo_{typeof(TEntity).Name}_";
+    protected string EntityTypeCacheKey { get; } = RepositoryCacheKeys.GetKey<TEntity>();
 
     /// <inheritdoc />
     public override void Create(TEntity entity, Action<TEntity> persistNew)

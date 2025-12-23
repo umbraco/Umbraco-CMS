@@ -55,5 +55,6 @@ const mapper = (item: DataTypeItemResponseModel): UmbDataTypeItemModel => {
 		propertyEditorSchemaAlias: item.editorAlias,
 		propertyEditorUiAlias: item.editorUiAlias || '', // TODO: why can this be undefined or null on the server?
 		icon: manifestPropertyEditorUis.find((ui) => ui.alias === item.editorUiAlias)?.meta.icon,
+		isDeletable: item.isDeletable,
 	};
 };
