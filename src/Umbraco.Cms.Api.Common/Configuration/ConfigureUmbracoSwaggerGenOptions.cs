@@ -51,7 +51,10 @@ public class ConfigureUmbracoSwaggerGenOptions : IConfigureOptions<SwaggerGenOpt
             return apiVersionMetadata.Name == name
                    || (string.IsNullOrEmpty(apiVersionMetadata.Name) && name == DefaultApiConfiguration.ApiName);
         });
-        swaggerGenOptions.TagActionsBy(api => new[] { api.GroupName });
+        swaggerGenOptions.TagActionsBy(api =>
+            api.GroupName is null
+                ? []
+                : new[] { api.GroupName });
         swaggerGenOptions.OrderActionsBy(ActionOrderBy);
         swaggerGenOptions.SchemaFilter<EnumSchemaFilter>();
         swaggerGenOptions.CustomSchemaIds(_schemaIdSelector.SchemaId);
