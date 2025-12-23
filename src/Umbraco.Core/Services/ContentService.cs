@@ -55,6 +55,10 @@ public class ContentService : RepositoryService, IContentService
     private readonly IContentQueryOperationService? _queryOperationService;
     private readonly Lazy<IContentQueryOperationService>? _queryOperationServiceLazy;
 
+    // Version operation service fields (for Phase 3 extracted version operations)
+    private readonly IContentVersionOperationService? _versionOperationService;
+    private readonly Lazy<IContentVersionOperationService>? _versionOperationServiceLazy;
+
     /// <summary>
     /// Gets the query operation service.
     /// </summary>
@@ -62,6 +66,14 @@ public class ContentService : RepositoryService, IContentService
     private IContentQueryOperationService QueryOperationService =>
         _queryOperationService ?? _queryOperationServiceLazy?.Value
         ?? throw new InvalidOperationException("QueryOperationService not initialized. Ensure the service is properly injected via constructor.");
+
+    /// <summary>
+    /// Gets the version operation service.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">Thrown if the service was not properly initialized.</exception>
+    private IContentVersionOperationService VersionOperationService =>
+        _versionOperationService ?? _versionOperationServiceLazy?.Value
+        ?? throw new InvalidOperationException("VersionOperationService not initialized. Ensure the service is properly injected via constructor.");
 
     #region Constructors
 
@@ -85,7 +97,8 @@ public class ContentService : RepositoryService, IContentService
         IOptionsMonitor<ContentSettings> optionsMonitor,
         IRelationService relationService,
         IContentCrudService crudService,
-        IContentQueryOperationService queryOperationService)  // NEW PARAMETER - Phase 2 query operations
+        IContentQueryOperationService queryOperationService,  // NEW PARAMETER - Phase 2 query operations
+        IContentVersionOperationService versionOperationService)  // NEW PARAMETER - Phase 3 version operations
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _documentRepository = documentRepository;
@@ -115,6 +128,11 @@ public class ContentService : RepositoryService, IContentService
         ArgumentNullException.ThrowIfNull(queryOperationService);
         _queryOperationService = queryOperationService;
         _queryOperationServiceLazy = null;  // Not needed when directly injected
+
+        // Phase 3: Version operation service (direct injection)
+        ArgumentNullException.ThrowIfNull(versionOperationService);
+        _versionOperationService = versionOperationService;
+        _versionOperationServiceLazy = null;  // Not needed when directly injected
     }
 
     [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
@@ -171,6 +189,11 @@ public class ContentService : RepositoryService, IContentService
         _queryOperationServiceLazy = new Lazy<IContentQueryOperationService>(() =>
             StaticServiceProvider.Instance.GetRequiredService<IContentQueryOperationService>(),
             LazyThreadSafetyMode.ExecutionAndPublication);
+
+        // Phase 3: Lazy resolution of IContentVersionOperationService
+        _versionOperationServiceLazy = new Lazy<IContentVersionOperationService>(() =>
+            StaticServiceProvider.Instance.GetRequiredService<IContentVersionOperationService>(),
+            LazyThreadSafetyMode.ExecutionAndPublication);
     }
 
     [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
@@ -225,6 +248,11 @@ public class ContentService : RepositoryService, IContentService
         // Phase 2: Lazy resolution of IContentQueryOperationService
         _queryOperationServiceLazy = new Lazy<IContentQueryOperationService>(() =>
             StaticServiceProvider.Instance.GetRequiredService<IContentQueryOperationService>(),
+            LazyThreadSafetyMode.ExecutionAndPublication);
+
+        // Phase 3: Lazy resolution of IContentVersionOperationService
+        _versionOperationServiceLazy = new Lazy<IContentVersionOperationService>(() =>
+            StaticServiceProvider.Instance.GetRequiredService<IContentVersionOperationService>(),
             LazyThreadSafetyMode.ExecutionAndPublication);
     }
 
