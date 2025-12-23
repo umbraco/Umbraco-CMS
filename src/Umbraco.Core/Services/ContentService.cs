@@ -598,13 +598,7 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="versionId">Id of the version to retrieve</param>
     /// <returns>An <see cref="IContent" /> item</returns>
     public IContent? GetVersion(int versionId)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            return _documentRepository.GetVersion(versionId);
-        }
-    }
+        => VersionOperationService.GetVersion(versionId);
 
     /// <summary>
     ///     Gets a collection of an <see cref="IContent" /> objects versions by Id
@@ -612,26 +606,14 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="id"></param>
     /// <returns>An Enumerable list of <see cref="IContent" /> objects</returns>
     public IEnumerable<IContent> GetVersions(int id)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            return _documentRepository.GetAllVersions(id);
-        }
-    }
+        => VersionOperationService.GetVersions(id);
 
     /// <summary>
     ///     Gets a collection of an <see cref="IContent" /> objects versions by Id
     /// </summary>
     /// <returns>An Enumerable list of <see cref="IContent" /> objects</returns>
     public IEnumerable<IContent> GetVersionsSlim(int id, int skip, int take)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            return _documentRepository.GetAllVersionsSlim(id, skip, take);
-        }
-    }
+        => VersionOperationService.GetVersionsSlim(id, skip, take);
 
     /// <summary>
     ///     Gets a list of all version Ids for the given content item ordered so latest is first
@@ -640,12 +622,7 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="maxRows">The maximum number of rows to return</param>
     /// <returns></returns>
     public IEnumerable<int> GetVersionIds(int id, int maxRows)
-    {
-        using (ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _documentRepository.GetVersionIds(id, maxRows);
-        }
-    }
+        => VersionOperationService.GetVersionIds(id, maxRows);
 
     /// <summary>
     ///     Gets a collection of <see cref="IContent" /> objects, which are ancestors of the current content.
