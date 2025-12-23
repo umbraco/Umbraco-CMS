@@ -1927,30 +1927,7 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="versionDate">Latest version date</param>
     /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
     public void DeleteVersions(int id, DateTime versionDate, int userId = Constants.Security.SuperUserId)
-    {
-        EventMessages evtMsgs = EventMessagesFactory.Get();
-
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            var deletingVersionsNotification =
-                new ContentDeletingVersionsNotification(id, evtMsgs, dateToRetain: versionDate);
-            if (scope.Notifications.PublishCancelable(deletingVersionsNotification))
-            {
-                scope.Complete();
-                return;
-            }
-
-            scope.WriteLock(Constants.Locks.ContentTree);
-            _documentRepository.DeleteVersions(id, versionDate);
-
-            scope.Notifications.Publish(
-                new ContentDeletedVersionsNotification(id, evtMsgs, dateToRetain: versionDate).WithStateFrom(
-                    deletingVersionsNotification));
-            Audit(AuditType.Delete, userId, Constants.System.Root, "Delete (by version date)");
-
-            scope.Complete();
-        }
-    }
+        => VersionOperationService.DeleteVersions(id, versionDate, userId);
 
     /// <summary>
     ///     Permanently deletes specific version(s) from an <see cref="IContent" /> object.
@@ -1961,42 +1938,7 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="deletePriorVersions">Boolean indicating whether to delete versions prior to the versionId</param>
     /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
     public void DeleteVersion(int id, int versionId, bool deletePriorVersions, int userId = Constants.Security.SuperUserId)
-    {
-        EventMessages evtMsgs = EventMessagesFactory.Get();
-
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            var deletingVersionsNotification = new ContentDeletingVersionsNotification(id, evtMsgs, versionId);
-            if (scope.Notifications.PublishCancelable(deletingVersionsNotification))
-            {
-                scope.Complete();
-                return;
-            }
-
-            if (deletePriorVersions)
-            {
-                IContent? content = GetVersion(versionId);
-                DeleteVersions(id, content?.UpdateDate ?? DateTime.UtcNow, userId);
-            }
-
-            scope.WriteLock(Constants.Locks.ContentTree);
-            IContent? c = _documentRepository.Get(id);
-
-            // don't delete the current or published version
-            if (c?.VersionId != versionId &&
-                c?.PublishedVersionId != versionId)
-            {
-                _documentRepository.DeleteVersion(versionId);
-            }
-
-            scope.Notifications.Publish(
-                new ContentDeletedVersionsNotification(id, evtMsgs, versionId).WithStateFrom(
-                    deletingVersionsNotification));
-            Audit(AuditType.Delete, userId, Constants.System.Root, "Delete (by version)");
-
-            scope.Complete();
-        }
-    }
+        => VersionOperationService.DeleteVersion(id, versionId, deletePriorVersions, userId);
 
     #endregion
 
