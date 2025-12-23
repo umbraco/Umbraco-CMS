@@ -804,6 +804,90 @@ internal sealed class ContentServiceRefactoringTests : UmbracoIntegrationTestWit
 
     #endregion
 
+    #region Phase 5 - Publish Operation Tests
+
+    [Test]
+    public void ContentPublishOperationService_Can_Be_Resolved_From_DI()
+    {
+        // Act
+        var publishOperationService = GetRequiredService<IContentPublishOperationService>();
+
+        // Assert
+        Assert.That(publishOperationService, Is.Not.Null);
+        Assert.That(publishOperationService, Is.InstanceOf<ContentPublishOperationService>());
+    }
+
+    [Test]
+    public async Task Publish_Through_ContentService_Uses_PublishOperationService()
+    {
+        // Arrange
+        var contentService = GetRequiredService<IContentService>();
+        var contentTypeService = GetRequiredService<IContentTypeService>();
+
+        var contentType = new ContentTypeBuilder()
+            .WithAlias("testPublishPage")
+            .Build();
+        await contentTypeService.SaveAsync(contentType, Constants.Security.SuperUserId);
+
+        var content = contentService.Create("Test Publish Page", Constants.System.Root, contentType.Alias);
+        contentService.Save(content);
+
+        // Act
+        var result = contentService.Publish(content, new[] { "*" });
+
+        // Assert
+        Assert.That(result.Success, Is.True);
+        Assert.That(content.Published, Is.True);
+    }
+
+    [Test]
+    public async Task Unpublish_Through_ContentService_Uses_PublishOperationService()
+    {
+        // Arrange
+        var contentService = GetRequiredService<IContentService>();
+        var contentTypeService = GetRequiredService<IContentTypeService>();
+
+        var contentType = new ContentTypeBuilder()
+            .WithAlias("testUnpublishPage")
+            .Build();
+        await contentTypeService.SaveAsync(contentType, Constants.Security.SuperUserId);
+
+        var content = contentService.Create("Test Unpublish Page", Constants.System.Root, contentType.Alias);
+        contentService.Save(content);
+        contentService.Publish(content, new[] { "*" });
+
+        // Act
+        var result = contentService.Unpublish(content);
+
+        // Assert
+        Assert.That(result.Success, Is.True);
+        Assert.That(content.Published, Is.False);
+    }
+
+    [Test]
+    public async Task IsPathPublishable_RootContent_ReturnsTrue()
+    {
+        // Arrange
+        var contentService = GetRequiredService<IContentService>();
+        var contentTypeService = GetRequiredService<IContentTypeService>();
+
+        var contentType = new ContentTypeBuilder()
+            .WithAlias("testPathPage")
+            .Build();
+        await contentTypeService.SaveAsync(contentType, Constants.Security.SuperUserId);
+
+        var content = contentService.Create("Test Path Page", Constants.System.Root, contentType.Alias);
+        contentService.Save(content);
+
+        // Act
+        var result = contentService.IsPathPublishable(content);
+
+        // Assert
+        Assert.That(result, Is.True);
+    }
+
+    #endregion
+
     /// <summary>
     /// Notification handler that tracks the order of notifications for test verification.
     /// </summary>
