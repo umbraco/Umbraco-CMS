@@ -14,6 +14,7 @@
 | 1.3 | Added detailed test strategy (15 tests for coverage gaps) |
 | 1.4 | Added phase gates with test execution commands and regression protocol |
 | 1.5 | Added performance benchmarks (33 tests for baseline comparison) |
+| 1.6 | Phase 2 complete - QueryOperationService extracted |
 
 ## Overview
 
@@ -390,7 +391,7 @@ Each phase MUST run tests before and after to verify no regressions.
 |-------|---------|--------------|------|--------|
 | 0 | Write tests | `ContentServiceRefactoringTests` | All 15 pass | ✅ Complete |
 | 1 | CRUD Service | All ContentService*Tests | All pass | ✅ Complete |
-| 2 | Query Service | All ContentService*Tests | All pass | Pending |
+| 2 | Query Service | All ContentService*Tests | All pass | ✅ Complete |
 | 3 | Version Service | All ContentService*Tests | All pass | Pending |
 | 4 | Move Service | All ContentService*Tests + Sort/MoveToRecycleBin tests | All pass | Pending |
 | 5 | Publish Operation Service | All ContentService*Tests + Notification ordering tests | All pass | Pending |
