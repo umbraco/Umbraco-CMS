@@ -15,6 +15,7 @@
 | 1.4 | Added phase gates with test execution commands and regression protocol |
 | 1.5 | Added performance benchmarks (33 tests for baseline comparison) |
 | 1.6 | Phase 2 complete - QueryOperationService extracted |
+| 1.7 | Phase 3 complete - VersionOperationService extracted |
 
 ## Overview
 
@@ -392,7 +393,7 @@ Each phase MUST run tests before and after to verify no regressions.
 | 0 | Write tests | `ContentServiceRefactoringTests` | All 15 pass | ✅ Complete |
 | 1 | CRUD Service | All ContentService*Tests | All pass | ✅ Complete |
 | 2 | Query Service | All ContentService*Tests | All pass | ✅ Complete |
-| 3 | Version Service | All ContentService*Tests | All pass | Pending |
+| 3 | Version Service | All ContentService*Tests | All pass | ✅ Complete |
 | 4 | Move Service | All ContentService*Tests + Sort/MoveToRecycleBin tests | All pass | Pending |
 | 5 | Publish Operation Service | All ContentService*Tests + Notification ordering tests | All pass | Pending |
 | 6 | Permission Manager | All ContentService*Tests + Permission tests | All pass | Pending |
@@ -410,8 +411,16 @@ Each phase MUST run tests before and after to verify no regressions.
    - Updated `ContentService.cs` to delegate CRUD operations (reduced from 3823 to 3497 lines)
    - Benchmark regression enforcement (20% threshold, CI-configurable)
    - Git tag: `phase-1-crud-extraction`
-3. **Phase 2: Query Service** - Read-only operations, low risk
-4. **Phase 3: Version Service** - Straightforward extraction
+3. **Phase 2: Query Service** ✅ - Complete! Created:
+   - `IContentQueryOperationService.cs` - Interface (12 methods)
+   - `ContentQueryOperationService.cs` - Implementation
+   - Updated `ContentService.cs` to delegate query operations
+   - Git tag: `phase-2-query-extraction`
+4. **Phase 3: Version Service** ✅ - Complete! Created:
+   - `IContentVersionOperationService.cs` - Interface (7 methods)
+   - `ContentVersionOperationService.cs` - Implementation
+   - Updated `ContentService.cs` to delegate version operations
+   - Git tag: `phase-3-version-extraction`
 5. **Phase 4: Move Service** - Depends on CRUD; Sort and MoveToRecycleBin tests critical
 6. **Phase 5: Publish Operation Service** - Most complex; notification ordering tests critical
 7. **Phase 6: Permission Manager** - Small extraction; permission tests critical
