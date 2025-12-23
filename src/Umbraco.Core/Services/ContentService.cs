@@ -63,6 +63,10 @@ public class ContentService : RepositoryService, IContentService
     private readonly IContentMoveOperationService? _moveOperationService;
     private readonly Lazy<IContentMoveOperationService>? _moveOperationServiceLazy;
 
+    // Publish operation service fields (for Phase 5 extracted publish operations)
+    private readonly IContentPublishOperationService? _publishOperationService;
+    private readonly Lazy<IContentPublishOperationService>? _publishOperationServiceLazy;
+
     /// <summary>
     /// Gets the query operation service.
     /// </summary>
@@ -86,6 +90,14 @@ public class ContentService : RepositoryService, IContentService
     private IContentMoveOperationService MoveOperationService =>
         _moveOperationService ?? _moveOperationServiceLazy?.Value
         ?? throw new InvalidOperationException("MoveOperationService not initialized. Ensure the service is properly injected via constructor.");
+
+    /// <summary>
+    /// Gets the publish operation service.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">Thrown if the service was not properly initialized.</exception>
+    private IContentPublishOperationService PublishOperationService =>
+        _publishOperationService ?? _publishOperationServiceLazy?.Value
+        ?? throw new InvalidOperationException("PublishOperationService not initialized. Ensure the service is properly injected via constructor.");
 
     #region Constructors
 
@@ -111,7 +123,8 @@ public class ContentService : RepositoryService, IContentService
         IContentCrudService crudService,
         IContentQueryOperationService queryOperationService,  // NEW PARAMETER - Phase 2 query operations
         IContentVersionOperationService versionOperationService,  // NEW PARAMETER - Phase 3 version operations
-        IContentMoveOperationService moveOperationService)  // NEW PARAMETER - Phase 4 move operations
+        IContentMoveOperationService moveOperationService,  // NEW PARAMETER - Phase 4 move operations
+        IContentPublishOperationService publishOperationService)  // NEW PARAMETER - Phase 5 publish operations
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _documentRepository = documentRepository;
@@ -151,6 +164,11 @@ public class ContentService : RepositoryService, IContentService
         ArgumentNullException.ThrowIfNull(moveOperationService);
         _moveOperationService = moveOperationService;
         _moveOperationServiceLazy = null;  // Not needed when directly injected
+
+        // Phase 5: Publish operation service (direct injection)
+        ArgumentNullException.ThrowIfNull(publishOperationService);
+        _publishOperationService = publishOperationService;
+        _publishOperationServiceLazy = null;  // Not needed when directly injected
     }
 
     [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
@@ -217,6 +235,11 @@ public class ContentService : RepositoryService, IContentService
         _moveOperationServiceLazy = new Lazy<IContentMoveOperationService>(() =>
             StaticServiceProvider.Instance.GetRequiredService<IContentMoveOperationService>(),
             LazyThreadSafetyMode.ExecutionAndPublication);
+
+        // Phase 5: Lazy resolution of IContentPublishOperationService
+        _publishOperationServiceLazy = new Lazy<IContentPublishOperationService>(() =>
+            StaticServiceProvider.Instance.GetRequiredService<IContentPublishOperationService>(),
+            LazyThreadSafetyMode.ExecutionAndPublication);
     }
 
     [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
@@ -281,6 +304,11 @@ public class ContentService : RepositoryService, IContentService
         // Phase 4: Lazy resolution of IContentMoveOperationService
         _moveOperationServiceLazy = new Lazy<IContentMoveOperationService>(() =>
             StaticServiceProvider.Instance.GetRequiredService<IContentMoveOperationService>(),
+            LazyThreadSafetyMode.ExecutionAndPublication);
+
+        // Phase 5: Lazy resolution of IContentPublishOperationService
+        _publishOperationServiceLazy = new Lazy<IContentPublishOperationService>(() =>
+            StaticServiceProvider.Instance.GetRequiredService<IContentPublishOperationService>(),
             LazyThreadSafetyMode.ExecutionAndPublication);
     }
 
