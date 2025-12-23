@@ -219,7 +219,7 @@ public interface IMediaService : IContentServiceBase<IMedia>
     /// </summary>
     /// <param name="medias">Collection of <see cref="IMedia" /> to save</param>
     /// <param name="userId">Id of the User saving the Media</param>
-    Attempt<OperationResult?> Save(IEnumerable<IMedia> medias, int userId = Constants.Security.SuperUserId);
+    new Attempt<OperationResult?> Save(IEnumerable<IMedia> medias, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Gets an <see cref="IMedia" /> object by its 'UniqueId'
@@ -228,7 +228,7 @@ public interface IMediaService : IContentServiceBase<IMedia>
     /// <returns>
     ///     <see cref="IMedia" />
     /// </returns>
-    IMedia? GetById(Guid key);
+    new IMedia? GetById(Guid key);
 
     /// <summary>
     ///     Gets a collection of <see cref="IMedia" /> objects by Level

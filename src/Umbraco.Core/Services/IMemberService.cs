@@ -202,7 +202,7 @@ public interface IMemberService : IMembershipMemberService, IContentServiceBase<
     /// </summary>
     /// <param name="members">Collection of <see cref="IMember" /> to save</param>
     /// <param name="userId">Id of the User saving the Members</param>
-    Attempt<OperationResult?> Save(IEnumerable<IMember> members, int userId = Constants.Security.SuperUserId);
+    new Attempt<OperationResult?> Save(IEnumerable<IMember> members, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Gets the count of Members by an optional MemberType alias
