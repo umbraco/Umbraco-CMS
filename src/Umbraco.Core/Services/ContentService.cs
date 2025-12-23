@@ -59,6 +59,10 @@ public class ContentService : RepositoryService, IContentService
     private readonly IContentVersionOperationService? _versionOperationService;
     private readonly Lazy<IContentVersionOperationService>? _versionOperationServiceLazy;
 
+    // Move operation service fields (for Phase 4 extracted move operations)
+    private readonly IContentMoveOperationService? _moveOperationService;
+    private readonly Lazy<IContentMoveOperationService>? _moveOperationServiceLazy;
+
     /// <summary>
     /// Gets the query operation service.
     /// </summary>
@@ -74,6 +78,14 @@ public class ContentService : RepositoryService, IContentService
     private IContentVersionOperationService VersionOperationService =>
         _versionOperationService ?? _versionOperationServiceLazy?.Value
         ?? throw new InvalidOperationException("VersionOperationService not initialized. Ensure the service is properly injected via constructor.");
+
+    /// <summary>
+    /// Gets the move operation service.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">Thrown if the service was not properly initialized.</exception>
+    private IContentMoveOperationService MoveOperationService =>
+        _moveOperationService ?? _moveOperationServiceLazy?.Value
+        ?? throw new InvalidOperationException("MoveOperationService not initialized. Ensure the service is properly injected via constructor.");
 
     #region Constructors
 
@@ -98,7 +110,8 @@ public class ContentService : RepositoryService, IContentService
         IRelationService relationService,
         IContentCrudService crudService,
         IContentQueryOperationService queryOperationService,  // NEW PARAMETER - Phase 2 query operations
-        IContentVersionOperationService versionOperationService)  // NEW PARAMETER - Phase 3 version operations
+        IContentVersionOperationService versionOperationService,  // NEW PARAMETER - Phase 3 version operations
+        IContentMoveOperationService moveOperationService)  // NEW PARAMETER - Phase 4 move operations
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _documentRepository = documentRepository;
@@ -133,6 +146,11 @@ public class ContentService : RepositoryService, IContentService
         ArgumentNullException.ThrowIfNull(versionOperationService);
         _versionOperationService = versionOperationService;
         _versionOperationServiceLazy = null;  // Not needed when directly injected
+
+        // Phase 4: Move operation service (direct injection)
+        ArgumentNullException.ThrowIfNull(moveOperationService);
+        _moveOperationService = moveOperationService;
+        _moveOperationServiceLazy = null;  // Not needed when directly injected
     }
 
     [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
@@ -194,6 +212,11 @@ public class ContentService : RepositoryService, IContentService
         _versionOperationServiceLazy = new Lazy<IContentVersionOperationService>(() =>
             StaticServiceProvider.Instance.GetRequiredService<IContentVersionOperationService>(),
             LazyThreadSafetyMode.ExecutionAndPublication);
+
+        // Phase 4: Lazy resolution of IContentMoveOperationService
+        _moveOperationServiceLazy = new Lazy<IContentMoveOperationService>(() =>
+            StaticServiceProvider.Instance.GetRequiredService<IContentMoveOperationService>(),
+            LazyThreadSafetyMode.ExecutionAndPublication);
     }
 
     [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
@@ -253,6 +276,11 @@ public class ContentService : RepositoryService, IContentService
         // Phase 3: Lazy resolution of IContentVersionOperationService
         _versionOperationServiceLazy = new Lazy<IContentVersionOperationService>(() =>
             StaticServiceProvider.Instance.GetRequiredService<IContentVersionOperationService>(),
+            LazyThreadSafetyMode.ExecutionAndPublication);
+
+        // Phase 4: Lazy resolution of IContentMoveOperationService
+        _moveOperationServiceLazy = new Lazy<IContentMoveOperationService>(() =>
+            StaticServiceProvider.Instance.GetRequiredService<IContentMoveOperationService>(),
             LazyThreadSafetyMode.ExecutionAndPublication);
     }
 
@@ -701,17 +729,7 @@ public class ContentService : RepositoryService, IContentService
     /// </summary>
     /// <returns>An Enumerable list of <see cref="IContent" /> objects</returns>
     public IEnumerable<IContent> GetPagedContentInRecycleBin(long pageIndex, int pageSize, out long totalRecords, IQuery<IContent>? filter = null, Ordering? ordering = null)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            ordering ??= Ordering.By("Path");
-
-            scope.ReadLock(Constants.Locks.ContentTree);
-            IQuery<IContent>? query = Query<IContent>()?
-                .Where(x => x.Path.StartsWith(Constants.System.RecycleBinContentPathPrefix));
-            return _documentRepository.GetPage(query, pageIndex, pageSize, out totalRecords, filter, ordering);
-        }
-    }
+        => MoveOperationService.GetPagedContentInRecycleBin(pageIndex, pageSize, out totalRecords, filter, ordering);
 
     /// <summary>
     ///     Checks whether an <see cref="IContent" /> item has any children
@@ -2003,78 +2021,13 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="userId">Optional Id of the User moving the Content</param>
     public OperationResult Move(IContent content, int parentId, int userId = Constants.Security.SuperUserId)
     {
-        EventMessages eventMessages = EventMessagesFactory.Get();
-
-        if (content.ParentId == parentId)
-        {
-            return OperationResult.Succeed(eventMessages);
-        }
-
-        // if moving to the recycle bin then use the proper method
+        // If moving to recycle bin, use MoveToRecycleBin which handles unpublish
         if (parentId == Constants.System.RecycleBinContent)
         {
             return MoveToRecycleBin(content, userId);
         }
 
-        var moves = new List<(IContent, string)>();
-
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            scope.WriteLock(Constants.Locks.ContentTree);
-
-            IContent? parent = parentId == Constants.System.Root ? null : GetById(parentId);
-            if (parentId != Constants.System.Root && (parent == null || parent.Trashed))
-            {
-                throw new InvalidOperationException("Parent does not exist or is trashed."); // causes rollback
-            }
-
-            TryGetParentKey(parentId, out Guid? parentKey);
-            var moveEventInfo = new MoveEventInfo<IContent>(content, content.Path, parentId, parentKey);
-
-            var movingNotification = new ContentMovingNotification(moveEventInfo, eventMessages);
-            if (scope.Notifications.PublishCancelable(movingNotification))
-            {
-                scope.Complete();
-                return OperationResult.Cancel(eventMessages); // causes rollback
-            }
-
-            // if content was trashed, and since we're not moving to the recycle bin,
-            // indicate that the trashed status should be changed to false, else just
-            // leave it unchanged
-            var trashed = content.Trashed ? false : (bool?)null;
-
-            // if the content was trashed under another content, and so has a published version,
-            // it cannot move back as published but has to be unpublished first - that's for the
-            // root content, everything underneath will retain its published status
-            if (content.Trashed && content.Published)
-            {
-                // however, it had been masked when being trashed, so there's no need for
-                // any special event here - just change its state
-                content.PublishedState = PublishedState.Unpublishing;
-            }
-
-            PerformMoveLocked(content, parentId, parent, userId, moves, trashed);
-
-            scope.Notifications.Publish(
-                new ContentTreeChangeNotification(content, TreeChangeTypes.RefreshBranch, eventMessages));
-
-            // changes
-            MoveEventInfo<IContent>[] moveInfo = moves
-                .Select(x =>
-                {
-                    TryGetParentKey(x.Item1.ParentId, out Guid? itemParentKey);
-                    return new MoveEventInfo<IContent>(x.Item1, x.Item2, x.Item1.ParentId, itemParentKey);
-                })
-                .ToArray();
-
-            scope.Notifications.Publish(
-                new ContentMovedNotification(moveInfo, eventMessages).WithStateFrom(movingNotification));
-
-            Audit(AuditType.Move, userId, content.Id);
-
-            scope.Complete();
-            return OperationResult.Succeed(eventMessages);
-        }
+        return MoveOperationService.Move(content, parentId, userId);
     }
 
     // MUST be called from within WriteLock
@@ -2143,67 +2096,16 @@ public class ContentService : RepositoryService, IContentService
     }
 
     public async Task<OperationResult> EmptyRecycleBinAsync(Guid userId)
-        => EmptyRecycleBin(await _userIdKeyResolver.GetAsync(userId));
+        => await MoveOperationService.EmptyRecycleBinAsync(userId);
 
     /// <summary>
     ///     Empties the Recycle Bin by deleting all <see cref="IContent" /> that resides in the bin
     /// </summary>
     public OperationResult EmptyRecycleBin(int userId = Constants.Security.SuperUserId)
-    {
-        var deleted = new List<IContent>();
-        EventMessages eventMessages = EventMessagesFactory.Get();
-
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            scope.WriteLock(Constants.Locks.ContentTree);
-
-            // emptying the recycle bin means deleting whatever is in there - do it properly!
-            IQuery<IContent>? query = Query<IContent>().Where(x => x.ParentId == Constants.System.RecycleBinContent);
-            IContent[] contents = _documentRepository.Get(query).ToArray();
-
-            var emptyingRecycleBinNotification = new ContentEmptyingRecycleBinNotification(contents, eventMessages);
-            var deletingContentNotification = new ContentDeletingNotification(contents, eventMessages);
-            if (scope.Notifications.PublishCancelable(emptyingRecycleBinNotification) || scope.Notifications.PublishCancelable(deletingContentNotification))
-            {
-                scope.Complete();
-                return OperationResult.Cancel(eventMessages);
-            }
-
-            if (contents is not null)
-            {
-                foreach (IContent content in contents)
-                {
-                    if (_contentSettings.DisableDeleteWhenReferenced && _relationService.IsRelated(content.Id, RelationDirectionFilter.Child))
-                    {
-                        continue;
-                    }
-
-                    DeleteLocked(scope, content, eventMessages);
-                    deleted.Add(content);
-                }
-            }
-
-            scope.Notifications.Publish(
-                new ContentEmptiedRecycleBinNotification(deleted, eventMessages).WithStateFrom(
-                    emptyingRecycleBinNotification));
-            scope.Notifications.Publish(
-                new ContentTreeChangeNotification(deleted, TreeChangeTypes.Remove, eventMessages));
-            Audit(AuditType.Delete, userId, Constants.System.RecycleBinContent, "Recycle bin emptied");
-
-            scope.Complete();
-        }
-
-        return OperationResult.Succeed(eventMessages);
-    }
+        => MoveOperationService.EmptyRecycleBin(userId);
 
     public bool RecycleBinSmells()
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            return _documentRepository.RecycleBinSmells();
-        }
-    }
+        => MoveOperationService.RecycleBinSmells();
 
     #endregion
 
@@ -2219,7 +2121,8 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="relateToOriginal">Boolean indicating whether the copy should be related to the original</param>
     /// <param name="userId">Optional Id of the User copying the Content</param>
     /// <returns>The newly created <see cref="IContent" /> object</returns>
-    public IContent? Copy(IContent content, int parentId, bool relateToOriginal, int userId = Constants.Security.SuperUserId) => Copy(content, parentId, relateToOriginal, true, userId);
+    public IContent? Copy(IContent content, int parentId, bool relateToOriginal, int userId = Constants.Security.SuperUserId)
+        => MoveOperationService.Copy(content, parentId, relateToOriginal, userId);
 
     /// <summary>
     ///     Copies an <see cref="IContent" /> object by creating a new Content object of the same type and copies all data from
@@ -2233,137 +2136,7 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="userId">Optional Id of the User copying the Content</param>
     /// <returns>The newly created <see cref="IContent" /> object</returns>
     public IContent? Copy(IContent content, int parentId, bool relateToOriginal, bool recursive, int userId = Constants.Security.SuperUserId)
-    {
-        EventMessages eventMessages = EventMessagesFactory.Get();
-
-        // keep track of updates (copied item key and parent key) for the in-memory navigation structure
-        var navigationUpdates = new List<Tuple<Guid, Guid?>>();
-
-        IContent copy = content.DeepCloneWithResetIdentities();
-        copy.ParentId = parentId;
-
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            TryGetParentKey(parentId, out Guid? parentKey);
-            if (scope.Notifications.PublishCancelable(new ContentCopyingNotification(content, copy, parentId, parentKey, eventMessages)))
-            {
-                scope.Complete();
-                return null;
-            }
-
-            // note - relateToOriginal is not managed here,
-            // it's just part of the Copied event args so the RelateOnCopyHandler knows what to do
-            // meaning that the event has to trigger for every copied content including descendants
-            var copies = new List<Tuple<IContent, IContent>>();
-
-            scope.WriteLock(Constants.Locks.ContentTree);
-
-            // a copy is not published (but not really unpublishing either)
-            // update the create author and last edit author
-            if (copy.Published)
-            {
-                copy.Published = false;
-            }
-
-            copy.CreatorId = userId;
-            copy.WriterId = userId;
-
-            // get the current permissions, if there are any explicit ones they need to be copied
-            EntityPermissionCollection currentPermissions = GetPermissions(content);
-            currentPermissions.RemoveWhere(p => p.IsDefaultPermissions);
-
-            // save and flush because we need the ID for the recursive Copying events
-            _documentRepository.Save(copy);
-
-            // store navigation update information for copied item
-            navigationUpdates.Add(Tuple.Create(copy.Key, GetParent(copy)?.Key));
-
-            // add permissions
-            if (currentPermissions.Count > 0)
-            {
-                var permissionSet = new ContentPermissionSet(copy, currentPermissions);
-                _documentRepository.AddOrUpdatePermissions(permissionSet);
-            }
-
-            // keep track of copies
-            copies.Add(Tuple.Create(content, copy));
-            var idmap = new Dictionary<int, int> { [content.Id] = copy.Id };
-
-            // process descendants
-            if (recursive)
-            {
-                const int pageSize = 500;
-                var page = 0;
-                var total = long.MaxValue;
-                while (page * pageSize < total)
-                {
-                    IEnumerable<IContent> descendants =
-                        GetPagedDescendants(content.Id, page++, pageSize, out total);
-                    foreach (IContent descendant in descendants)
-                    {
-                        // when copying a branch into itself, the copy of a root would be seen as a descendant
-                        // and would be copied again => filter it out.
-                        if (descendant.Id == copy.Id)
-                        {
-                            continue;
-                        }
-
-                        // if parent has not been copied, skip, else gets its copy id
-                        if (idmap.TryGetValue(descendant.ParentId, out parentId) == false)
-                        {
-                            continue;
-                        }
-
-                        IContent descendantCopy = descendant.DeepCloneWithResetIdentities();
-                        descendantCopy.ParentId = parentId;
-
-                        if (scope.Notifications.PublishCancelable(new ContentCopyingNotification(descendant, descendantCopy, parentId, parentKey, eventMessages)))
-                        {
-                            continue;
-                        }
-
-                        // a copy is not published (but not really unpublishing either)
-                        // update the create author and last edit author
-                        if (descendantCopy.Published)
-                        {
-                            descendantCopy.Published = false;
-                        }
-
-                        descendantCopy.CreatorId = userId;
-                        descendantCopy.WriterId = userId;
-
-                        // since the repository relies on the dirty state to figure out whether it needs to update the sort order, we mark it dirty here
-                        descendantCopy.SortOrder = descendantCopy.SortOrder;
-
-                        // save and flush (see above)
-                        _documentRepository.Save(descendantCopy);
-
-                        // store navigation update information for descendants
-                        navigationUpdates.Add(Tuple.Create(descendantCopy.Key, GetParent(descendantCopy)?.Key));
-
-                        copies.Add(Tuple.Create(descendant, descendantCopy));
-                        idmap[descendant.Id] = descendantCopy.Id;
-                    }
-                }
-            }
-
-            // not handling tags here, because
-            // - tags should be handled by the content repository
-            // - a copy is unpublished and therefore has no impact on tags in DB
-            scope.Notifications.Publish(
-                new ContentTreeChangeNotification(copy, TreeChangeTypes.RefreshBranch, eventMessages));
-            foreach (Tuple<IContent, IContent> x in CollectionsMarshal.AsSpan(copies))
-            {
-                scope.Notifications.Publish(new ContentCopiedNotification(x.Item1, x.Item2, parentId, parentKey, relateToOriginal, eventMessages));
-            }
-
-            Audit(AuditType.Copy, userId, content.Id);
-
-            scope.Complete();
-        }
-
-        return copy;
-    }
+        => MoveOperationService.Copy(content, parentId, relateToOriginal, recursive, userId);
 
     private bool TryGetParentKey(int parentId, [NotNullWhen(true)] out Guid? parentKey)
     {
@@ -2446,24 +2219,7 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="userId"></param>
     /// <returns>Result indicating what action was taken when handling the command.</returns>
     public OperationResult Sort(IEnumerable<IContent> items, int userId = Constants.Security.SuperUserId)
-    {
-        EventMessages evtMsgs = EventMessagesFactory.Get();
-
-        IContent[] itemsA = items.ToArray();
-        if (itemsA.Length == 0)
-        {
-            return new OperationResult(OperationResultType.NoOperation, evtMsgs);
-        }
-
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            scope.WriteLock(Constants.Locks.ContentTree);
-
-            OperationResult ret = Sort(scope, itemsA, userId, evtMsgs);
-            scope.Complete();
-            return ret;
-        }
-    }
+        => MoveOperationService.Sort(items, userId);
 
     /// <summary>
     ///     Sorts a collection of <see cref="IContent" /> objects by updating the SortOrder according
@@ -2477,90 +2233,7 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="userId"></param>
     /// <returns>Result indicating what action was taken when handling the command.</returns>
     public OperationResult Sort(IEnumerable<int>? ids, int userId = Constants.Security.SuperUserId)
-    {
-        EventMessages evtMsgs = EventMessagesFactory.Get();
-
-        var idsA = ids?.ToArray();
-        if (idsA is null || idsA.Length == 0)
-        {
-            return new OperationResult(OperationResultType.NoOperation, evtMsgs);
-        }
-
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            scope.WriteLock(Constants.Locks.ContentTree);
-            IContent[] itemsA = GetByIds(idsA).ToArray();
-
-            OperationResult ret = Sort(scope, itemsA, userId, evtMsgs);
-            scope.Complete();
-            return ret;
-        }
-    }
-
-    private OperationResult Sort(ICoreScope scope, IContent[] itemsA, int userId, EventMessages eventMessages)
-    {
-        var sortingNotification = new ContentSortingNotification(itemsA, eventMessages);
-        var savingNotification = new ContentSavingNotification(itemsA, eventMessages);
-
-        // raise cancelable sorting event
-        if (scope.Notifications.PublishCancelable(sortingNotification))
-        {
-            return OperationResult.Cancel(eventMessages);
-        }
-
-        // raise cancelable saving event
-        if (scope.Notifications.PublishCancelable(savingNotification))
-        {
-            return OperationResult.Cancel(eventMessages);
-        }
-
-        var published = new List<IContent>();
-        var saved = new List<IContent>();
-        var sortOrder = 0;
-
-        foreach (IContent content in itemsA)
-        {
-            // if the current sort order equals that of the content we don't
-            // need to update it, so just increment the sort order and continue.
-            if (content.SortOrder == sortOrder)
-            {
-                sortOrder++;
-                continue;
-            }
-
-            // else update
-            content.SortOrder = sortOrder++;
-            content.WriterId = userId;
-
-            // if it's published, register it, no point running StrategyPublish
-            // since we're not really publishing it and it cannot be cancelled etc
-            if (content.Published)
-            {
-                published.Add(content);
-            }
-
-            // save
-            saved.Add(content);
-            _documentRepository.Save(content);
-            Audit(AuditType.Sort, userId, content.Id, "Sorting content performed by user");
-        }
-
-        // first saved, then sorted
-        scope.Notifications.Publish(
-            new ContentSavedNotification(itemsA, eventMessages).WithStateFrom(savingNotification));
-        scope.Notifications.Publish(
-            new ContentSortedNotification(itemsA, eventMessages).WithStateFrom(sortingNotification));
-
-        scope.Notifications.Publish(
-            new ContentTreeChangeNotification(saved, TreeChangeTypes.RefreshNode, eventMessages));
-
-        if (published.Any())
-        {
-            scope.Notifications.Publish(new ContentPublishedNotification(published, eventMessages));
-        }
-
-        return OperationResult.Succeed(eventMessages);
-    }
+        => MoveOperationService.Sort(ids, userId);
 
     private static bool HasUnsavedChanges(IContent content) => content.HasIdentity is false || content.IsDirty();
 
