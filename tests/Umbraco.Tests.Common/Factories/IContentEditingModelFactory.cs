@@ -5,6 +5,5 @@ namespace Umbraco.Cms.Core.Services;
 
 public interface IContentEditingModelFactory
 {
-    Task<ContentUpdateModel> CreateFromAsync(IContent content);
+    public Task<ContentUpdateModel> CreateFromAsync(IContent content);
 }
-
