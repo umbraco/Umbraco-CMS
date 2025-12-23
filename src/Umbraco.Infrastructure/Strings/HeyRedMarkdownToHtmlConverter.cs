@@ -13,6 +13,6 @@ public class HeyRedMarkdownToHtmlConverter : IMarkdownToHtmlConverter
 {
     private static readonly Markdown _markdownConverter = new();
 
-    /// <inheritdoc/>>
+    /// <inheritdoc/>
     public string ToHtml(string markdown) => _markdownConverter.Transform(markdown);
 }

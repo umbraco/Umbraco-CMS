@@ -9,6 +9,6 @@ public interface IMarkdownToHtmlConverter
     /// Converts the specified Markdown-formatted text to an HTML-encoded string.
     /// </summary>
     /// <param name="markdown">The input string containing Markdown syntax to be converted.</param>
-    /// <returns>An <see cref="HtmlEncodedString"/> containing the HTML representation of the input Markdown.</returns>
+    /// <returns>A string containing the HTML representation of the input Markdown.</returns>
     public string ToHtml(string markdown);
 }

@@ -10,6 +10,6 @@ public class MarkdigMarkdownToHtmlConverter : IMarkdownToHtmlConverter
 {
     private static readonly MarkdownPipeline _markdownPipeline = new MarkdownPipelineBuilder().Build();
 
-    /// <inheritdoc/>>
+    /// <inheritdoc/>
     public string ToHtml(string markdown) => Markdown.ToHtml(markdown, _markdownPipeline);
 }
