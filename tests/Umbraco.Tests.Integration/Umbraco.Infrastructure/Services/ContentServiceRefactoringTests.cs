@@ -764,6 +764,44 @@ internal sealed class ContentServiceRefactoringTests : UmbracoIntegrationTestWit
         Assert.That(facadeItems.Select(x => x.Id), Is.EquivalentTo(directItems.Select(x => x.Id)));
     }
 
+    /// <summary>
+    /// Phase 2 Test: Verifies GetPagedOfType() via facade returns same result as direct service call.
+    /// </summary>
+    [Test]
+    public void GetPagedOfType_ViaFacade_ReturnsEquivalentResultToDirectService()
+    {
+        // Arrange
+        var queryService = GetRequiredService<IContentQueryOperationService>();
+        var contentTypeId = ContentType.Id;
+
+        // Act
+        var facadeItems = ContentService.GetPagedOfType(contentTypeId, 0, 10, out var facadeTotal).ToList();
+        var directItems = queryService.GetPagedOfType(contentTypeId, 0, 10, out var directTotal).ToList();
+
+        // Assert
+        Assert.That(facadeTotal, Is.EqualTo(directTotal));
+        Assert.That(facadeItems.Select(x => x.Id), Is.EquivalentTo(directItems.Select(x => x.Id)));
+    }
+
+    /// <summary>
+    /// Phase 2 Test: Verifies GetPagedOfTypes() via facade returns same result as direct service call.
+    /// </summary>
+    [Test]
+    public void GetPagedOfTypes_ViaFacade_ReturnsEquivalentResultToDirectService()
+    {
+        // Arrange
+        var queryService = GetRequiredService<IContentQueryOperationService>();
+        var contentTypeIds = new[] { ContentType.Id };
+
+        // Act
+        var facadeItems = ContentService.GetPagedOfTypes(contentTypeIds, 0, 10, out var facadeTotal, null).ToList();
+        var directItems = queryService.GetPagedOfTypes(contentTypeIds, 0, 10, out var directTotal).ToList();
+
+        // Assert
+        Assert.That(facadeTotal, Is.EqualTo(directTotal));
+        Assert.That(facadeItems.Select(x => x.Id), Is.EquivalentTo(directItems.Select(x => x.Id)));
+    }
+
     #endregion
 
     /// <summary>

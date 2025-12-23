@@ -549,63 +549,11 @@ public class ContentService : RepositoryService, IContentService
         out long totalRecords,
         IQuery<IContent>? filter = null,
         Ordering? ordering = null)
-    {
-        if (pageIndex < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(pageIndex));
-        }
-
-        if (pageSize <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(pageSize));
-        }
-
-        ordering ??= Ordering.By("sortOrder");
-
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            return _documentRepository.GetPage(
-                Query<IContent>()?.Where(x => x.ContentTypeId == contentTypeId),
-                pageIndex,
-                pageSize,
-                out totalRecords,
-                filter,
-                ordering);
-        }
-    }
+        => QueryOperationService.GetPagedOfType(contentTypeId, pageIndex, pageSize, out totalRecords, filter, ordering);
 
     /// <inheritdoc />
     public IEnumerable<IContent> GetPagedOfTypes(int[] contentTypeIds, long pageIndex, int pageSize, out long totalRecords, IQuery<IContent>? filter, Ordering? ordering = null)
-    {
-        if (pageIndex < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(pageIndex));
-        }
-
-        if (pageSize <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(pageSize));
-        }
-
-        ordering ??= Ordering.By("sortOrder");
-
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            // Need to use a List here because the expression tree cannot convert the array when used in Contains.
-            // See ExpressionTests.Sql_In().
-            List<int> contentTypeIdsAsList = [.. contentTypeIds];
-
-            scope.ReadLock(Constants.Locks.ContentTree);
-            return _documentRepository.GetPage(
-                Query<IContent>()?.Where(x => contentTypeIdsAsList.Contains(x.ContentTypeId)),
-                pageIndex,
-                pageSize,
-                out totalRecords,
-                filter,
-                ordering);
-        }
-    }
+        => QueryOperationService.GetPagedOfTypes(contentTypeIds, pageIndex, pageSize, out totalRecords, filter, ordering);
 
     /// <summary>
     ///     Gets a collection of <see cref="IContent" /> objects by Level
