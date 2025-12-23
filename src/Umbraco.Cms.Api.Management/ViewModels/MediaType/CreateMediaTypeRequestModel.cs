@@ -17,9 +17,4 @@ public class CreateMediaTypeRequestModel
     ///     Gets or sets the compositions for this media type.
     /// </summary>
     public IEnumerable<MediaTypeComposition> Compositions { get; set; } = Enumerable.Empty<MediaTypeComposition>();
-
-    /// <summary>
-    ///     Gets or sets the collection reference for this media type.
-    /// </summary>
-    public new ReferenceByIdModel? Collection { get; set; }
 }
