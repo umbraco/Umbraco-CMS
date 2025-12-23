@@ -1,11 +1,9 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Persistence.Querying;
@@ -157,11 +155,13 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
             return;
         }
 
-        if (_dictionarySettings.UseDictionaryValueSearch)
+        if (_dictionarySettings.EnableValueSearch)
         {
             // Search in both keys and values
-            sql.Where($"({QuotedColumn("key")} LIKE @0 OR {QuoteTableName(LanguageTextDto.TableName)}.{QuoteColumnName("value")} LIKE @1)", 
-                $"{filter}%", $"%{filter}%");
+            sql.Where(
+                $"({QuotedColumn("key")} LIKE @0 OR {QuoteTableName(LanguageTextDto.TableName)}.{QuoteColumnName("value")} LIKE @1)",
+                $"{filter}%",
+                $"%{filter}%");
         }
         else
         {

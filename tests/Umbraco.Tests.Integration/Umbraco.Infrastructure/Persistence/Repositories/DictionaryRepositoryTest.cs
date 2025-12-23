@@ -27,7 +27,7 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
 
     private IDictionaryRepository CreateRepository() => GetRequiredService<IDictionaryRepository>();
 
-    private IDictionaryRepository CreateRepositoryWithCache(AppCaches cache) =>
+    private IDictionaryRepository CreateRepositoryWithCache(AppCaches cache, bool enableValueSearch = false) =>
 
         // Create a repository with a real runtime cache.
         new DictionaryRepository(
@@ -38,7 +38,7 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
             GetRequiredService<ILanguageRepository>(),
             GetRequiredService<IRepositoryCacheVersionService>(),
             GetRequiredService<ICacheSyncService>(),
-            Options.Create(new DictionarySettings()));
+            Options.Create(new DictionarySettings { EnableValueSearch = enableValueSearch }));
 
     [Test]
     public async Task Can_Perform_Get_By_Key_On_DictionaryRepository()
@@ -539,6 +539,41 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
             var dictionaryItem = repository.Get("Read More Updated");
 
             Assert.IsNotNull(dictionaryItem);
+        }
+    }
+
+    [Test]
+    public void GetDictionaryItemDescendants_WithValueSearch_Disabled_Does_Not_Return_Items_Matching_Only_Translation_Value()
+    {
+        // Arrange
+        var cache = AppCaches.Create(Mock.Of<IRequestCache>());
+        var repository = CreateRepositoryWithCache(cache, enableValueSearch: false);
+
+        using (ScopeProvider.CreateScope())
+        {
+            // Act - Search for "Læs" which only exists in Danish translation value, not in any key
+            var results = repository.GetDictionaryItemDescendants(null, "Læs").ToArray();
+
+            // Assert - Should not find anything because value search is disabled
+            Assert.That(results, Is.Empty);
+        }
+    }
+
+    [Test]
+    public void GetDictionaryItemDescendants_WithValueSearch_Enabled_Returns_Items_Matching_Translation_Value()
+    {
+        // Arrange
+        var cache = AppCaches.Create(Mock.Of<IRequestCache>());
+        var repository = CreateRepositoryWithCache(cache, enableValueSearch: true);
+
+        using (ScopeProvider.CreateScope())
+        {
+            // Act - Search for "Læs" which only exists in Danish translation value, not in any key
+            var results = repository.GetDictionaryItemDescendants(null, "Læs").ToArray();
+
+            // Assert - Should find "Read More" because its Danish translation contains "Læs mere"
+            Assert.That(results, Has.Length.EqualTo(1));
+            Assert.That(results[0].ItemKey, Is.EqualTo("Read More"));
         }
     }
 
