@@ -387,7 +387,9 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
     }
 
     /// <inheritdoc />
-    public override Task AddLoginAsync(MemberIdentityUser user, UserLoginInfo login,
+    public override Task AddLoginAsync(
+        MemberIdentityUser user,
+        UserLoginInfo login,
         CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -428,7 +430,10 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
     }
 
     /// <inheritdoc />
-    public override Task RemoveLoginAsync(MemberIdentityUser user, string loginProvider, string providerKey,
+    public override Task RemoveLoginAsync(
+        MemberIdentityUser user,
+        string loginProvider,
+        string providerKey,
         CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -491,7 +496,9 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
     /// <summary>
     ///     Returns true if a user is in the role
     /// </summary>
-    public override Task<bool> IsInRoleAsync(MemberIdentityUser user, string roleName,
+    public override Task<bool> IsInRoleAsync(
+        MemberIdentityUser user,
+        string roleName,
         CancellationToken cancellationToken = default)
     {
         EnsureRoles(user);
@@ -658,7 +665,10 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
     ///     tracking ORMs like EFCore.
     /// </remarks>
     /// <inheritdoc />
-    public override Task<string?> GetTokenAsync(MemberIdentityUser user, string loginProvider, string name,
+    public override Task<string?> GetTokenAsync(
+        MemberIdentityUser user,
+        string loginProvider,
+        string name,
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -697,7 +707,9 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
     }
 
     /// <inheritdoc />
-    protected override async Task<IdentityUserRole<string>?> FindUserRoleAsync(string userId, string roleId,
+    protected override async Task<IdentityUserRole<string>?> FindUserRoleAsync(
+        string userId,
+        string roleId,
         CancellationToken cancellationToken)
     {
         MemberIdentityUser? user = await FindUserAsync(userId, cancellationToken);
