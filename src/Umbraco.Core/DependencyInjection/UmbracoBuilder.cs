@@ -302,6 +302,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IContentQueryOperationService, ContentQueryOperationService>();
             Services.AddUnique<IContentVersionOperationService, ContentVersionOperationService>();
             Services.AddUnique<IContentMoveOperationService, ContentMoveOperationService>();
+            Services.AddUnique<IContentPublishOperationService, ContentPublishOperationService>();
             Services.AddUnique<IContentService>(sp =>
                 new ContentService(
                     sp.GetRequiredService<ICoreScopeProvider>(),
@@ -324,7 +325,8 @@ namespace Umbraco.Cms.Core.DependencyInjection
                     sp.GetRequiredService<IContentCrudService>(),
                     sp.GetRequiredService<IContentQueryOperationService>(),
                     sp.GetRequiredService<IContentVersionOperationService>(),
-                    sp.GetRequiredService<IContentMoveOperationService>()));
+                    sp.GetRequiredService<IContentMoveOperationService>(),
+                    sp.GetRequiredService<IContentPublishOperationService>()));
             Services.AddUnique<IContentBlueprintEditingService, ContentBlueprintEditingService>();
             Services.AddUnique<IContentEditingService, ContentEditingService>();
             Services.AddUnique<IContentPublishingService, ContentPublishingService>();
