@@ -299,7 +299,7 @@ public interface IContentService : IContentServiceBase<IContent>
     ///     Saves documents.
     /// </summary>
     // TODO: why only 1 result not 1 per content?!
-    OperationResult Save(IEnumerable<IContent> contents, int userId = Constants.Security.SuperUserId);
+    new OperationResult Save(IEnumerable<IContent> contents, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Deletes a document.
