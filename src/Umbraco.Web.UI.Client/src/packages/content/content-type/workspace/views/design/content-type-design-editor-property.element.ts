@@ -459,7 +459,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 			}
 			#editor-name {
 				position: absolute;
-				top: var(--uui-size-space-4);
+				top: var(--uui-size-space-3);
 				left: var(--uui-size-space-4);
 				font-size: var(--uui-type-small-size);
 				font-weight: 400;

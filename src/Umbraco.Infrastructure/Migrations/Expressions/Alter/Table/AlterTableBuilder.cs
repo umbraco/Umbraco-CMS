@@ -149,14 +149,17 @@ public class AlterTableBuilder : ExpressionBuilderBase<AlterTableExpression, IAl
         ForeignKey(string primaryTableName, string primaryColumnName) =>
         ForeignKey(null, null, primaryTableName, primaryColumnName);
 
-    public IAlterTableColumnOptionForeignKeyCascadeBuilder ForeignKey(string foreignKeyName, string primaryTableName,
+    public IAlterTableColumnOptionForeignKeyCascadeBuilder ForeignKey(
+        string foreignKeyName,
+        string primaryTableName,
         string primaryColumnName) =>
         ForeignKey(foreignKeyName, null, primaryTableName, primaryColumnName);
 
     public IAlterTableColumnOptionForeignKeyCascadeBuilder ForeignKey(
         string? foreignKeyName,
         string? primaryTableSchema,
-        string primaryTableName, string primaryColumnName)
+        string primaryTableName,
+        string primaryColumnName)
     {
         CurrentColumn.IsForeignKey = true;
 
@@ -188,14 +191,17 @@ public class AlterTableBuilder : ExpressionBuilderBase<AlterTableExpression, IAl
         string foreignTableName,
         string foreignColumnName) => ReferencedBy(null, null, foreignTableName, foreignColumnName);
 
-    public IAlterTableColumnOptionForeignKeyCascadeBuilder ReferencedBy(string foreignKeyName, string foreignTableName,
+    public IAlterTableColumnOptionForeignKeyCascadeBuilder ReferencedBy(
+        string foreignKeyName,
+        string foreignTableName,
         string foreignColumnName) =>
         ReferencedBy(foreignKeyName, null, foreignTableName, foreignColumnName);
 
     public IAlterTableColumnOptionForeignKeyCascadeBuilder ReferencedBy(
         string? foreignKeyName,
         string? foreignTableSchema,
-        string foreignTableName, string foreignColumnName)
+        string foreignTableName,
+        string foreignColumnName)
     {
         var fk = new CreateForeignKeyExpression(
             _context,

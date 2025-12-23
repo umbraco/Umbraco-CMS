@@ -31,6 +31,7 @@ public class UpdateCreatedPackageController : CreatedPackageControllerBase
     /// <summary>
     ///     Updates a package.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <param name="id">The id of the package.</param>
     /// <param name="updatePackageRequestModel">The model containing the data for updating a package.</param>
     /// <returns>The created package.</returns>
