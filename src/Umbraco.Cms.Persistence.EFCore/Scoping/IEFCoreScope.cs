@@ -13,6 +13,9 @@ public interface IEfCoreScope<TDbContext> : ICoreScope
     /// <returns></returns>
     Task<T> ExecuteWithContextAsync<T>(Func<TDbContext, Task<T>> method);
 
+    /// <summary>
+    ///     Gets or sets the scope context.
+    /// </summary>
     public IScopeContext? ScopeContext { get; set; }
 
     /// <summary>
@@ -26,5 +29,5 @@ public interface IEfCoreScope<TDbContext> : ICoreScope
     /// <summary>
     ///     Gets the scope notification publisher
     /// </summary>
-    IScopedNotificationPublisher Notifications { get; }
+    new IScopedNotificationPublisher Notifications { get; }
 }
