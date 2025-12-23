@@ -99,11 +99,6 @@ public interface IContentService : IContentServiceBase<IContent>
     IContent? GetById(int id);
 
     /// <summary>
-    ///     Gets a document.
-    /// </summary>
-    new IContent? GetById(Guid key);
-
-    /// <summary>
     ///     Gets publish/unpublish schedule for a content node.
     /// </summary>
     /// <param name="contentId">Id of the Content to load schedule for</param>
@@ -294,12 +289,6 @@ public interface IContentService : IContentServiceBase<IContent>
     ///     Saves a document.
     /// </summary>
     OperationResult Save(IContent content, int? userId = null, ContentScheduleCollection? contentSchedule = null);
-
-    /// <summary>
-    ///     Saves documents.
-    /// </summary>
-    // TODO: why only 1 result not 1 per content?!
-    new OperationResult Save(IEnumerable<IContent> contents, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Deletes a document.
