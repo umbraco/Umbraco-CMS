@@ -80,7 +80,12 @@ public class SegmentTestController : SurfaceController
         ct.SetVariesBy(ContentVariation.Segment);
         propType.SetVariesBy(ContentVariation.Segment);
 
-        await Services.ContentTypeService.UpdateAsync(ct, Constants.Security.SuperUserKey);
+        var result = await Services.ContentTypeService.UpdateAsync(ct, Constants.Security.SuperUserKey);
+        if (result.Success is false)
+        {
+            return Content($"Failed to enable segments on document type {alias} and property type {propertyTypeAlias}");
+        }
+
         return Content($"The document type {alias} and property type {propertyTypeAlias} now allows segments");
     }
 
@@ -114,8 +119,9 @@ public class SegmentTestController : SurfaceController
         var result = await Services.ContentTypeService.UpdateAsync(ct, Constants.Security.SuperUserKey);
         if (result.Success is false)
         {
-            return Content($"Failed to disable segments on document type {alias}: {result.Status}");
+            return Content($"Failed to disable segments on document type {alias}.");
         }
+
         return Content($"The document type {alias} no longer allows segments");
     }
 

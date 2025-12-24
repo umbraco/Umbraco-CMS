@@ -97,6 +97,9 @@ public class UmbracoTestDataController : SurfaceController
         {
             var imageIds = CreateMediaTree(company, faker, count, depth).ToList();
             var (contentIds, root) = await CreateContentTreeAsync(company, faker, count, depth, imageIds);
+
+            // Force enumeration of the lazy content hierarchy (CreateHierarchy uses yield return)
+            // so that all content is created before we publish the root branch.
             _ = contentIds.ToList();
 
             Services.ContentService.PublishBranch(root, PublishBranchFilter.IncludeUnpublished, ["*"]);
@@ -197,13 +200,12 @@ public class UmbracoTestDataController : SurfaceController
     }
 
     /// <summary>
-    ///     Creates the media tree hiearachy
+    ///     Creates the media tree hiearachy.
     /// </summary>
-    /// <param name="company"></param>
-    /// <param name="faker"></param>
-    /// <param name="count"></param>
-    /// <param name="depth"></param>
-    /// <returns></returns>
+    /// <param name="company">The company name used as the root content name.</param>
+    /// <param name="faker">The faker instance for generating test data.</param>
+    /// <param name="count">The total number of content items to create.</param>
+    /// <param name="depth">The maximum depth of the content hierarchy.</param>
     private IEnumerable<Udi> CreateMediaTree(string company, Faker faker, int count, int depth)
     {
         var parent =
@@ -312,8 +314,19 @@ public class UmbracoTestDataController : SurfaceController
 
 
         await Services.ContentTypeService.CreateAsync(docType, Constants.Security.SuperUserKey);
-        docType.AllowedContentTypes = new[] { new ContentTypeSort(docType.Key, 0, docType.Alias) };
-        await Services.ContentTypeService.UpdateAsync(docType, Constants.Security.SuperUserKey);
+        var createResult = await Services.ContentTypeService.CreateAsync(docType, Constants.Security.SuperUserKey);
+        if (createResult.Success is false)
+        {
+            throw new InvalidOperationException($"Failed to create content type with alias {docType.Alias}.");
+        }
+
+        docType.AllowedContentTypes = [new ContentTypeSort(docType.Key, 0, docType.Alias)];
+        var updateResult = await Services.ContentTypeService.UpdateAsync(docType, Constants.Security.SuperUserKey);
+        if (updateResult.Success is false)
+        {
+            throw new InvalidOperationException($"Failed to update content type with alias {docType.Alias}.");
+        }
+
         return docType;
     }
 }
