@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
@@ -1033,6 +1034,193 @@ internal sealed class ContentServiceRefactoringTests : UmbracoIntegrationTestWit
         // Assert
         Assert.That(blueprints.Count, Is.GreaterThanOrEqualTo(2), "Should find at least 2 blueprints");
         Assert.That(blueprints.All(b => b.Blueprint), Is.True, "All returned items should be blueprints");
+    }
+
+    #endregion
+
+    #region Phase 8 - Exposed Interface Methods Tests
+
+    /// <summary>
+    /// Phase 8 Test: Verifies PerformMoveLocked returns non-null collection.
+    /// </summary>
+    [Test]
+    public void PerformMoveLocked_ReturnsNonNullCollection()
+    {
+        // Arrange
+        var moveService = GetRequiredService<IContentMoveOperationService>();
+        var content = ContentBuilder.CreateSimpleContent(ContentType, "MoveTest", -1);
+        ContentService.Save(content);
+
+        // Create a destination parent
+        var destination = ContentBuilder.CreateSimpleContent(ContentType, "Destination", -1);
+        ContentService.Save(destination);
+
+        // Act
+        IReadOnlyCollection<(IContent Content, string OriginalPath)> result;
+        using (var scope = ScopeProvider.CreateScope())
+        {
+            scope.WriteLock(Constants.Locks.ContentTree);
+            result = moveService.PerformMoveLocked(content, destination.Id, null, Constants.Security.SuperUserId, null);
+            scope.Complete();
+        }
+
+        // Assert
+        Assert.That(result, Is.Not.Null, "PerformMoveLocked should return non-null collection");
+    }
+
+    /// <summary>
+    /// Phase 8 Test: Verifies PerformMoveLocked includes moved item in returned collection.
+    /// </summary>
+    [Test]
+    public void PerformMoveLocked_IncludesMovedItemInCollection()
+    {
+        // Arrange
+        var moveService = GetRequiredService<IContentMoveOperationService>();
+        var content = ContentBuilder.CreateSimpleContent(ContentType, "MoveItem", -1);
+        ContentService.Save(content);
+        var contentId = content.Id;
+
+        var destination = ContentBuilder.CreateSimpleContent(ContentType, "Destination", -1);
+        ContentService.Save(destination);
+        var destinationId = destination.Id;
+
+        // Act
+        IReadOnlyCollection<(IContent Content, string OriginalPath)> result;
+        using (var scope = ScopeProvider.CreateScope())
+        {
+            scope.WriteLock(Constants.Locks.ContentTree);
+            result = moveService.PerformMoveLocked(content, destinationId, null, Constants.Security.SuperUserId, null);
+            scope.Complete();
+        }
+
+        // Assert
+        Assert.That(result.Count, Is.GreaterThan(0), "Should return at least one move event");
+        Assert.That(result.Any(e => e.Content.Id == contentId), Is.True,
+            "Moved item should be included in returned collection");
+    }
+
+    /// <summary>
+    /// Phase 8 Test: Verifies PerformMoveLocked handles nested hierarchy correctly.
+    /// </summary>
+    [Test]
+    public void PerformMoveLocked_HandlesNestedHierarchy()
+    {
+        // Arrange
+        var moveService = GetRequiredService<IContentMoveOperationService>();
+
+        // Create parent with child
+        var parent = ContentBuilder.CreateSimpleContent(ContentType, "ParentToMove", -1);
+        ContentService.Save(parent);
+
+        var child = ContentBuilder.CreateSimpleContent(ContentType, "Child", parent.Id);
+        ContentService.Save(child);
+
+        // Create destination
+        var destination = ContentBuilder.CreateSimpleContent(ContentType, "Destination", -1);
+        ContentService.Save(destination);
+
+        // Act
+        IReadOnlyCollection<(IContent Content, string OriginalPath)> result;
+        using (var scope = ScopeProvider.CreateScope())
+        {
+            scope.WriteLock(Constants.Locks.ContentTree);
+            result = moveService.PerformMoveLocked(parent, destination.Id, null, Constants.Security.SuperUserId, null);
+            scope.Complete();
+        }
+
+        // Assert
+        Assert.That(result.Count, Is.GreaterThan(0), "Should return move events for hierarchy");
+
+        // Verify parent was moved
+        var movedParent = ContentService.GetById(parent.Id);
+        Assert.That(movedParent!.ParentId, Is.EqualTo(destination.Id), "Parent should be moved to destination");
+    }
+
+    /// <summary>
+    /// Phase 8 Test: Verifies DeleteLocked handles content with no descendants.
+    /// </summary>
+    [Test]
+    public void DeleteLocked_HandlesEmptyTree()
+    {
+        // Arrange
+        var crudService = GetRequiredService<IContentCrudService>();
+        var content = ContentBuilder.CreateSimpleContent(ContentType, "DeleteTest", -1);
+        ContentService.Save(content);
+        var contentId = content.Id;
+
+        // Act & Assert - Should not throw
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        {
+            scope.WriteLock(Constants.Locks.ContentTree);
+            var eventMessages = new EventMessages();
+            Assert.DoesNotThrow(() => crudService.DeleteLocked(scope, content, eventMessages));
+            scope.Complete();
+        }
+
+        // Verify deletion
+        Assert.That(ContentService.GetById(contentId), Is.Null, "Content should be deleted");
+    }
+
+    /// <summary>
+    /// Phase 8 Test: Verifies DeleteLocked handles content with descendants.
+    /// </summary>
+    [Test]
+    public void DeleteLocked_HandlesLargeTree()
+    {
+        // Arrange
+        var crudService = GetRequiredService<IContentCrudService>();
+
+        // Create parent with multiple children
+        var parent = ContentBuilder.CreateSimpleContent(ContentType, "ParentToDelete", -1);
+        ContentService.Save(parent);
+
+        var child1 = ContentBuilder.CreateSimpleContent(ContentType, "Child1", parent.Id);
+        var child2 = ContentBuilder.CreateSimpleContent(ContentType, "Child2", parent.Id);
+        var child3 = ContentBuilder.CreateSimpleContent(ContentType, "Child3", parent.Id);
+        ContentService.Save(child1);
+        ContentService.Save(child2);
+        ContentService.Save(child3);
+
+        var parentId = parent.Id;
+        var child1Id = child1.Id;
+        var child2Id = child2.Id;
+        var child3Id = child3.Id;
+
+        // Act
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        {
+            scope.WriteLock(Constants.Locks.ContentTree);
+            var eventMessages = new EventMessages();
+            crudService.DeleteLocked(scope, parent, eventMessages);
+            scope.Complete();
+        }
+
+        // Assert - All should be deleted
+        Assert.That(ContentService.GetById(parentId), Is.Null, "Parent should be deleted");
+        Assert.That(ContentService.GetById(child1Id), Is.Null, "Child1 should be deleted");
+        Assert.That(ContentService.GetById(child2Id), Is.Null, "Child2 should be deleted");
+        Assert.That(ContentService.GetById(child3Id), Is.Null, "Child3 should be deleted");
+    }
+
+    /// <summary>
+    /// Phase 8 Test: Verifies DeleteLocked throws exception for null content.
+    /// Note: Current implementation throws NullReferenceException rather than ArgumentNullException.
+    /// This test documents the actual behavior.
+    /// </summary>
+    [Test]
+    public void DeleteLocked_ThrowsForNullContent()
+    {
+        // Arrange
+        var crudService = GetRequiredService<IContentCrudService>();
+
+        // Act & Assert
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        {
+            scope.WriteLock(Constants.Locks.ContentTree);
+            var eventMessages = new EventMessages();
+            Assert.Throws<NullReferenceException>(() =>
+                crudService.DeleteLocked(scope, null!, eventMessages));
+        }
     }
 
     #endregion
