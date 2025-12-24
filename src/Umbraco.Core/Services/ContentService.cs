@@ -20,7 +20,6 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Changes;
-using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
@@ -34,7 +33,6 @@ public class ContentService : RepositoryService, IContentService
     private readonly IContentTypeRepository _contentTypeRepository;
     private readonly IDocumentRepository _documentRepository;
     private readonly ILogger<ContentService> _logger;
-    private readonly IShortStringHelper _shortStringHelper;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly IIdKeyMap _idKeyMap;
     private IQuery<IContent>? _queryNotTrashed;
@@ -89,7 +87,6 @@ public class ContentService : RepositoryService, IContentService
         IDocumentRepository documentRepository,
         IAuditService auditService,
         IContentTypeRepository contentTypeRepository,
-        IShortStringHelper shortStringHelper,
         IUserIdKeyResolver userIdKeyResolver,
         IIdKeyMap idKeyMap,
         IContentCrudService crudService,
@@ -104,7 +101,6 @@ public class ContentService : RepositoryService, IContentService
         _documentRepository = documentRepository;
         _auditService = auditService;
         _contentTypeRepository = contentTypeRepository;
-        _shortStringHelper = shortStringHelper;
         _userIdKeyResolver = userIdKeyResolver;
         _idKeyMap = idKeyMap;
         _logger = loggerFactory.CreateLogger<ContentService>();
@@ -737,25 +733,7 @@ public class ContentService : RepositoryService, IContentService
     private static bool HasUnsavedChanges(IContent content) => content.HasIdentity is false || content.IsDirty();
 
     public ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            scope.WriteLock(Constants.Locks.ContentTree);
-
-            ContentDataIntegrityReport report = _documentRepository.CheckDataIntegrity(options);
-
-            if (report.FixedIssues.Count > 0)
-            {
-                // The event args needs a content item so we'll make a fake one with enough properties to not cause a null ref
-                var root = new Content("root", -1, new ContentType(_shortStringHelper, -1)) { Id = -1, Key = Guid.Empty };
-                scope.Notifications.Publish(new ContentTreeChangeNotification(root, TreeChangeTypes.RefreshAll, EventMessagesFactory.Get()));
-            }
-
-            scope.Complete();
-
-            return report;
-        }
-    }
+        => CrudService.CheckDataIntegrity(options);
 
     #endregion
 

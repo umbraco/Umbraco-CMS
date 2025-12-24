@@ -259,4 +259,15 @@ public interface IContentCrudService : IService
     void DeleteLocked(ICoreScope scope, IContent content, EventMessages evtMsgs);
 
     #endregion
+
+    #region Data Integrity
+
+    /// <summary>
+    /// Checks content data integrity and optionally fixes issues.
+    /// </summary>
+    /// <param name="options">Options for the integrity check.</param>
+    /// <returns>A report of detected and fixed issues.</returns>
+    ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options);
+
+    #endregion
 }

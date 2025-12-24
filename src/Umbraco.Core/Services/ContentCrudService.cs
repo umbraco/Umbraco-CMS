@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
@@ -20,6 +21,7 @@ public class ContentCrudService : ContentServiceBase, IContentCrudService
     private readonly IEntityRepository _entityRepository;
     private readonly IContentTypeRepository _contentTypeRepository;
     private readonly ILanguageRepository _languageRepository;
+    private readonly IShortStringHelper _shortStringHelper;
     private readonly ILogger<ContentCrudService> _logger;
 
     public ContentCrudService(
@@ -31,12 +33,14 @@ public class ContentCrudService : ContentServiceBase, IContentCrudService
         IContentTypeRepository contentTypeRepository,
         IAuditService auditService,
         IUserIdKeyResolver userIdKeyResolver,
-        ILanguageRepository languageRepository)
+        ILanguageRepository languageRepository,
+        IShortStringHelper shortStringHelper)
         : base(provider, loggerFactory, eventMessagesFactory, documentRepository, auditService, userIdKeyResolver)
     {
         _entityRepository = entityRepository ?? throw new ArgumentNullException(nameof(entityRepository));
         _contentTypeRepository = contentTypeRepository ?? throw new ArgumentNullException(nameof(contentTypeRepository));
         _languageRepository = languageRepository ?? throw new ArgumentNullException(nameof(languageRepository));
+        _shortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
         _logger = loggerFactory.CreateLogger<ContentCrudService>();
     }
 
@@ -525,6 +529,31 @@ public class ContentCrudService : ContentServiceBase, IContentCrudService
         }
 
         return OperationResult.Succeed(eventMessages);
+    }
+
+    #endregion
+
+    #region Data Integrity
+
+    /// <inheritdoc />
+    public ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options)
+    {
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        {
+            scope.WriteLock(Constants.Locks.ContentTree);
+
+            ContentDataIntegrityReport report = DocumentRepository.CheckDataIntegrity(options);
+
+            if (report.FixedIssues.Count > 0)
+            {
+                var root = new Content("root", -1, new ContentType(_shortStringHelper, -1)) { Id = -1, Key = Guid.Empty };
+                scope.Notifications.Publish(new ContentTreeChangeNotification(root, TreeChangeTypes.RefreshAll, EventMessagesFactory.Get()));
+            }
+
+            scope.Complete();
+
+            return report;
+        }
     }
 
     #endregion

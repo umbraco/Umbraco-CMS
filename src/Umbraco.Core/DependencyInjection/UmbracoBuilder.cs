@@ -315,7 +315,6 @@ namespace Umbraco.Cms.Core.DependencyInjection
                     sp.GetRequiredService<IDocumentRepository>(),
                     sp.GetRequiredService<IAuditService>(),
                     sp.GetRequiredService<IContentTypeRepository>(),
-                    sp.GetRequiredService<IShortStringHelper>(),
                     sp.GetRequiredService<IUserIdKeyResolver>(),
                     sp.GetRequiredService<IIdKeyMap>(),
                     sp.GetRequiredService<IContentCrudService>(),
