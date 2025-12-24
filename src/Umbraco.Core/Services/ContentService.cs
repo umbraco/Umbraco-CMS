@@ -35,7 +35,6 @@ public class ContentService : RepositoryService, IContentService
     private readonly ILogger<ContentService> _logger;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly IIdKeyMap _idKeyMap;
-    private IQuery<IContent>? _queryNotTrashed;
     private readonly Lazy<IContentCrudService> _crudServiceLazy;
 
     // Property for convenient access (deferred resolution for both paths)
@@ -127,14 +126,6 @@ public class ContentService : RepositoryService, IContentService
         _blueprintManager = blueprintManager;
     }
 
-
-    #endregion
-
-    #region Static queries
-
-    // lazy-constructed because when the ctor runs, the query factory may not be ready
-    private IQuery<IContent> QueryNotTrashed =>
-        _queryNotTrashed ??= Query<IContent>().Where(x => x.Trashed == false);
 
     #endregion
 
@@ -451,19 +442,6 @@ public class ContentService : RepositoryService, IContentService
     public IEnumerable<IContent> GetRootContent()
         => CrudService.GetRootContent();
 
-    /// <summary>
-    ///     Gets all published content items
-    /// </summary>
-    /// <returns></returns>
-    internal IEnumerable<IContent> GetAllPublished()
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            return _documentRepository.Get(QueryNotTrashed);
-        }
-    }
-
     /// <inheritdoc />
     public IEnumerable<IContent> GetContentForExpiration(DateTime date)
         => PublishOperationService.GetContentForExpiration(date);
@@ -691,13 +669,6 @@ public class ContentService : RepositoryService, IContentService
     public IContent? Copy(IContent content, int parentId, bool relateToOriginal, bool recursive, int userId = Constants.Security.SuperUserId)
         => MoveOperationService.Copy(content, parentId, relateToOriginal, recursive, userId);
 
-    private bool TryGetParentKey(int parentId, [NotNullWhen(true)] out Guid? parentKey)
-    {
-        Attempt<Guid> parentKeyAttempt = _idKeyMap.GetKeyForId(parentId, UmbracoObjectTypes.Document);
-        parentKey = parentKeyAttempt.Success ? parentKeyAttempt.Result : null;
-        return parentKeyAttempt.Success;
-    }
-
     /// <inheritdoc />
     public bool SendToPublication(IContent? content, int userId = Constants.Security.SuperUserId)
         => PublishOperationService.SendToPublication(content, userId);
@@ -729,8 +700,6 @@ public class ContentService : RepositoryService, IContentService
     /// <returns>Result indicating what action was taken when handling the command.</returns>
     public OperationResult Sort(IEnumerable<int>? ids, int userId = Constants.Security.SuperUserId)
         => MoveOperationService.Sort(ids, userId);
-
-    private static bool HasUnsavedChanges(IContent content) => content.HasIdentity is false || content.IsDirty();
 
     public ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options)
         => CrudService.CheckDataIntegrity(options);

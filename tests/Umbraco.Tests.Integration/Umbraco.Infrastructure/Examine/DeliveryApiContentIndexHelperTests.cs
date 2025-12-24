@@ -113,8 +113,11 @@ public class DeliveryApiContentIndexHelperTests : UmbracoIntegrationTestWithCont
 
     private int GetExpectedNumberOfContentItems()
     {
-        var result = ContentService.GetAllPublished().Count();
-        Assert.AreEqual(10, result);
-        return result;
+        // Count all non-trashed content items - matching the behavior of the old GetAllPublished method
+        // which was actually getting all non-trashed content, not just published content
+        var allContent = ContentService.GetPagedDescendants(Cms.Core.Constants.System.Root, 0, int.MaxValue, out var total);
+        var nonTrashedCount = allContent.Count(c => !c.Trashed);
+        Assert.AreEqual(10, nonTrashedCount);
+        return nonTrashedCount;
     }
 }
