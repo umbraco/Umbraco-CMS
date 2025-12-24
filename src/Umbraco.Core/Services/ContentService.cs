@@ -381,14 +381,7 @@ public class ContentService : RepositoryService, IContentService
     /// </summary>
     /// <param name="permissionSet"></param>
     public void SetPermissions(EntityPermissionSet permissionSet)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            scope.WriteLock(Constants.Locks.ContentTree);
-            _documentRepository.ReplaceContentPermissions(permissionSet);
-            scope.Complete();
-        }
-    }
+        => PermissionManager.SetPermissions(permissionSet);
 
     /// <summary>
     ///     Assigns a single permission to the current content item for the specified group ids
@@ -397,14 +390,7 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="permission"></param>
     /// <param name="groupIds"></param>
     public void SetPermission(IContent entity, string permission, IEnumerable<int> groupIds)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            scope.WriteLock(Constants.Locks.ContentTree);
-            _documentRepository.AssignEntityPermission(entity, permission, groupIds);
-            scope.Complete();
-        }
-    }
+        => PermissionManager.SetPermission(entity, permission, groupIds);
 
     /// <summary>
     ///     Returns implicit/inherited permissions assigned to the content item for all user groups
@@ -412,13 +398,7 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="content"></param>
     /// <returns></returns>
     public EntityPermissionCollection GetPermissions(IContent content)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            return _documentRepository.GetPermissionsForEntity(content.Id);
-        }
-    }
+        => PermissionManager.GetPermissions(content);
 
     #endregion
 
