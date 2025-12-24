@@ -90,7 +90,9 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 						);
 						this.#signLabelObservations.push(obs);
 					} else if (sign.api?.getLabel) {
-						this._labels.set(sign.alias, this.localize.string(sign.api.getLabel() ?? ''));
+						const label = sign.api.getLabel() ?? '';
+						const localizedLabel = label.startsWith('#') ? this.localize.string(label) : label;
+						this._labels.set(sign.alias, localizedLabel);
 						this.requestUpdate('_labels');
 					}
 				});
