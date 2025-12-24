@@ -1286,126 +1286,30 @@ public class ContentService : RepositoryService, IContentService
     #region Blueprints
 
     public IContent? GetBlueprintById(int id)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            IContent? blueprint = _documentBlueprintRepository.Get(id);
-            if (blueprint != null)
-            {
-                blueprint.Blueprint = true;
-            }
-
-            return blueprint;
-        }
-    }
+        => BlueprintManager.GetBlueprintById(id);
 
     public IContent? GetBlueprintById(Guid id)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            IContent? blueprint = _documentBlueprintRepository.Get(id);
-            if (blueprint != null)
-            {
-                blueprint.Blueprint = true;
-            }
-
-            return blueprint;
-        }
-    }
+        => BlueprintManager.GetBlueprintById(id);
 
     public void SaveBlueprint(IContent content, int userId = Constants.Security.SuperUserId)
-        => SaveBlueprint(content, null, userId);
+        => BlueprintManager.SaveBlueprint(content, userId);
 
     public void SaveBlueprint(IContent content, IContent? createdFromContent, int userId = Constants.Security.SuperUserId)
-    {
-        EventMessages evtMsgs = EventMessagesFactory.Get();
-
-        content.Blueprint = true;
-
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            scope.WriteLock(Constants.Locks.ContentTree);
-
-            if (content.HasIdentity == false)
-            {
-                content.CreatorId = userId;
-            }
-
-            content.WriterId = userId;
-
-            _documentBlueprintRepository.Save(content);
-
-            Audit(AuditType.Save, userId, content.Id, $"Saved content template: {content.Name}");
-
-            scope.Notifications.Publish(new ContentSavedBlueprintNotification(content, createdFromContent, evtMsgs));
-            scope.Notifications.Publish(new ContentTreeChangeNotification(content, TreeChangeTypes.RefreshNode, evtMsgs));
-
-            scope.Complete();
-        }
-    }
+        => BlueprintManager.SaveBlueprint(content, createdFromContent, userId);
 
     public void DeleteBlueprint(IContent content, int userId = Constants.Security.SuperUserId)
-    {
-        EventMessages evtMsgs = EventMessagesFactory.Get();
+        => BlueprintManager.DeleteBlueprint(content, userId);
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            scope.WriteLock(Constants.Locks.ContentTree);
-            _documentBlueprintRepository.Delete(content);
-            scope.Notifications.Publish(new ContentDeletedBlueprintNotification(content, evtMsgs));
-            scope.Notifications.Publish(new ContentTreeChangeNotification(content, TreeChangeTypes.Remove, evtMsgs));
-            scope.Complete();
-        }
-    }
-
-    private static readonly string?[] ArrayOfOneNullString = { null };
-
+    /// <remarks>
+    /// Note: This method name is historically confusing. It creates content FROM a blueprint,
+    /// not a blueprint from content. The manager method is named correctly (CreateContentFromBlueprint).
+    /// This method name is preserved for backward compatibility.
+    /// </remarks>
     public IContent CreateBlueprintFromContent(
         IContent blueprint,
         string name,
         int userId = Constants.Security.SuperUserId)
-    {
-        ArgumentNullException.ThrowIfNull(blueprint);
-
-        IContentType contentType = GetContentType(blueprint.ContentType.Alias);
-        var content = new Content(name, -1, contentType);
-        content.Path = string.Concat(content.ParentId.ToString(), ",", content.Id);
-
-        content.CreatorId = userId;
-        content.WriterId = userId;
-
-        IEnumerable<string?> cultures = ArrayOfOneNullString;
-        if (blueprint.CultureInfos?.Count > 0)
-        {
-            cultures = blueprint.CultureInfos.Values.Select(x => x.Culture);
-            using ICoreScope scope = ScopeProvider.CreateCoreScope();
-            if (blueprint.CultureInfos.TryGetValue(_languageRepository.GetDefaultIsoCode(), out ContentCultureInfos defaultCulture))
-            {
-                defaultCulture.Name = name;
-            }
-
-            scope.Complete();
-        }
-
-        DateTime now = DateTime.UtcNow;
-        foreach (var culture in cultures)
-        {
-            foreach (IProperty property in blueprint.Properties)
-            {
-                var propertyCulture = property.PropertyType.VariesByCulture() ? culture : null;
-                content.SetValue(property.Alias, property.GetValue(propertyCulture), propertyCulture);
-            }
-
-            if (!string.IsNullOrEmpty(culture))
-            {
-                content.SetCultureInfo(culture, blueprint.GetCultureName(culture), now);
-            }
-        }
-
-        return content;
-    }
+        => BlueprintManager.CreateContentFromBlueprint(blueprint, name, userId);
 
     /// <inheritdoc />
     [Obsolete("Use IContentBlueprintEditingService.GetScaffoldedAsync() instead. Scheduled for removal in V18.")]
@@ -1413,66 +1317,13 @@ public class ContentService : RepositoryService, IContentService
         => CreateBlueprintFromContent(blueprint, name, userId);
 
     public IEnumerable<IContent> GetBlueprintsForContentTypes(params int[] contentTypeId)
-    {
-        using (ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            IQuery<IContent> query = Query<IContent>();
-            if (contentTypeId.Length > 0)
-            {
-                // Need to use a List here because the expression tree cannot convert the array when used in Contains.
-                // See ExpressionTests.Sql_In().
-                List<int> contentTypeIdsAsList = [.. contentTypeId];
-                query.Where(x => contentTypeIdsAsList.Contains(x.ContentTypeId));
-            }
-
-            return _documentBlueprintRepository.Get(query).Select(x =>
-            {
-                x.Blueprint = true;
-                return x;
-            });
-        }
-    }
+        => BlueprintManager.GetBlueprintsForContentTypes(contentTypeId);
 
     public void DeleteBlueprintsOfTypes(IEnumerable<int> contentTypeIds, int userId = Constants.Security.SuperUserId)
-    {
-        EventMessages evtMsgs = EventMessagesFactory.Get();
+        => BlueprintManager.DeleteBlueprintsOfTypes(contentTypeIds, userId);
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            scope.WriteLock(Constants.Locks.ContentTree);
-
-            // Need to use a List here because the expression tree cannot convert an array when used in Contains.
-            // See ExpressionTests.Sql_In().
-            var contentTypeIdsAsList = contentTypeIds.ToList();
-
-            IQuery<IContent> query = Query<IContent>();
-            if (contentTypeIdsAsList.Count > 0)
-            {
-                query.Where(x => contentTypeIdsAsList.Contains(x.ContentTypeId));
-            }
-
-            IContent[]? blueprints = _documentBlueprintRepository.Get(query)?.Select(x =>
-            {
-                x.Blueprint = true;
-                return x;
-            }).ToArray();
-
-            if (blueprints is not null)
-            {
-                foreach (IContent blueprint in blueprints)
-                {
-                    _documentBlueprintRepository.Delete(blueprint);
-                }
-
-                scope.Notifications.Publish(new ContentDeletedBlueprintNotification(blueprints, evtMsgs));
-                scope.Notifications.Publish(new ContentTreeChangeNotification(blueprints, TreeChangeTypes.Remove, evtMsgs));
-                scope.Complete();
-            }
-        }
-    }
-
-    public void DeleteBlueprintsOfType(int contentTypeId, int userId = Constants.Security.SuperUserId) =>
-        DeleteBlueprintsOfTypes(new[] { contentTypeId }, userId);
+    public void DeleteBlueprintsOfType(int contentTypeId, int userId = Constants.Security.SuperUserId)
+        => BlueprintManager.DeleteBlueprintsOfType(contentTypeId, userId);
 
     #endregion
 
