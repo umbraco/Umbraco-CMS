@@ -8,7 +8,6 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.PropertyEditors;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
-using Umbraco.Cms.Tests.Common.Factories;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
