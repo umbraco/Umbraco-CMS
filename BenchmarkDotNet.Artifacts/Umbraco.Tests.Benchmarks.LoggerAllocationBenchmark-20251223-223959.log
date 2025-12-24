@@ -1,0 +1,253 @@
+// Validating benchmarks:
+// ***** BenchmarkRunner: Start   *****
+// ***** Found 2 benchmark(s) in total *****
+// ***** Building 1 exe(s) in Parallel: Start   *****
+// start dotnet  restore --nodeReuse:false /p:UseSharedCompilation=false /p:Deterministic=true /p:Optimize=true /p:ArtifactsPath="R:\Development\Open Source\Umbraco-CMS-2\tests\Umbraco.Tests.Benchmarks\bin\Release\net10.0\Umbraco.Tests.Benchmarks-1/" /p:OutDir="R:\Development\Open Source\Umbraco-CMS-2\tests\Umbraco.Tests.Benchmarks\bin\Release\net10.0\Umbraco.Tests.Benchmarks-1\bin\Release\net10.0/" /p:OutputPath="R:\Development\Open Source\Umbraco-CMS-2\tests\Umbraco.Tests.Benchmarks\bin\Release\net10.0\Umbraco.Tests.Benchmarks-1\bin\Release\net10.0/" /p:PublishDir="R:\Development\Open Source\Umbraco-CMS-2\tests\Umbraco.Tests.Benchmarks\bin\Release\net10.0\Umbraco.Tests.Benchmarks-1\publish/" in R:\Development\Open Source\Umbraco-CMS-2\tests\Umbraco.Tests.Benchmarks\bin\Release\net10.0\Umbraco.Tests.Benchmarks-1
+// command took 2.08 sec and exited with 0
+// start dotnet  build -c Release --no-restore --nodeReuse:false /p:UseSharedCompilation=false /p:Deterministic=true /p:Optimize=true /p:ArtifactsPath="R:\Development\Open Source\Umbraco-CMS-2\tests\Umbraco.Tests.Benchmarks\bin\Release\net10.0\Umbraco.Tests.Benchmarks-1/" /p:OutDir="R:\Development\Open Source\Umbraco-CMS-2\tests\Umbraco.Tests.Benchmarks\bin\Release\net10.0\Umbraco.Tests.Benchmarks-1\bin\Release\net10.0/" /p:OutputPath="R:\Development\Open Source\Umbraco-CMS-2\tests\Umbraco.Tests.Benchmarks\bin\Release\net10.0\Umbraco.Tests.Benchmarks-1\bin\Release\net10.0/" /p:PublishDir="R:\Development\Open Source\Umbraco-CMS-2\tests\Umbraco.Tests.Benchmarks\bin\Release\net10.0\Umbraco.Tests.Benchmarks-1\publish/" --output "R:\Development\Open Source\Umbraco-CMS-2\tests\Umbraco.Tests.Benchmarks\bin\Release\net10.0\Umbraco.Tests.Benchmarks-1\bin\Release\net10.0/" in R:\Development\Open Source\Umbraco-CMS-2\tests\Umbraco.Tests.Benchmarks\bin\Release\net10.0\Umbraco.Tests.Benchmarks-1
+// command took 49.35 sec and exited with 0
+// ***** Done, took 00:00:52 (52.83 sec)   *****
+// Found 2 benchmarks:
+//   LoggerAllocationBenchmark.Baseline: Job-RELKCN(IterationCount=3, IterationTime=100ms, LaunchCount=1, WarmupCount=3)
+//   LoggerAllocationBenchmark.NewOverload2: Job-RELKCN(IterationCount=3, IterationTime=100ms, LaunchCount=1, WarmupCount=3)
+
+Setup power plan (GUID: 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c FriendlyName: High performance)
+// **************************
+// Benchmark: LoggerAllocationBenchmark.Baseline: Job-RELKCN(IterationCount=3, IterationTime=100ms, LaunchCount=1, WarmupCount=3)
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet Umbraco.Tests.Benchmarks-1.dll --anonymousPipes 9428 4680 --benchmarkName Umbraco.Tests.Benchmarks.LoggerAllocationBenchmark.Baseline --job "IterationCount=3, IterationTime=100ms, LaunchCount=1, WarmupCount=3" --benchmarkId 0 in R:\Development\Open Source\Umbraco-CMS-2\tests\Umbraco.Tests.Benchmarks\bin\Release\net10.0\Umbraco.Tests.Benchmarks-1\bin\Release\net10.0
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// BenchmarkDotNet v0.15.6
+// Runtime=.NET 10.0.1 (10.0.1, 10.0.125.57005), X64 RyuJIT x86-64-v3
+// GC=Concurrent Workstation
+// HardwareIntrinsics=AVX2+BMI1+BMI2+F16C+FMA+LZCNT+MOVBE,AVX,SSE3+SSSE3+SSE4.1+SSE4.2+POPCNT,X86Base+SSE+SSE2,AES+PCLMUL,AvxVnni,SERIALIZE VectorSize=256
+// Job: Job-RELKCN(IterationCount=3, IterationTime=100ms, LaunchCount=1, WarmupCount=3)
+
+OverheadJitting  1: 1 op, 83800.00 ns, 83.8000 us/op
+WorkloadJitting  1: 1 op, 173300.00 ns, 173.3000 us/op
+
+OverheadJitting  2: 16 op, 99800.00 ns, 6.2375 us/op
+WorkloadJitting  2: 16 op, 896400.00 ns, 56.0250 us/op
+
+WorkloadPilot    1: 16 op, 535500.00 ns, 33.4688 us/op
+WorkloadPilot    2: 2992 op, 59039300.00 ns, 19.7324 us/op
+WorkloadPilot    3: 5072 op, 95341500.00 ns, 18.7976 us/op
+WorkloadPilot    4: 5328 op, 70345200.00 ns, 13.2029 us/op
+WorkloadPilot    5: 7584 op, 35731700.00 ns, 4.7115 us/op
+WorkloadPilot    6: 21232 op, 89502700.00 ns, 4.2155 us/op
+WorkloadPilot    7: 23728 op, 98469600.00 ns, 4.1499 us/op
+WorkloadPilot    8: 24112 op, 102262100.00 ns, 4.2411 us/op
+WorkloadPilot    9: 23584 op, 103696200.00 ns, 4.3969 us/op
+WorkloadPilot   10: 22752 op, 94763900.00 ns, 4.1651 us/op
+WorkloadPilot   11: 24016 op, 99091600.00 ns, 4.1261 us/op
+WorkloadPilot   12: 24240 op, 96312000.00 ns, 3.9733 us/op
+WorkloadPilot   13: 25168 op, 98986700.00 ns, 3.9330 us/op
+WorkloadPilot   14: 25440 op, 101326300.00 ns, 3.9830 us/op
+
+OverheadWarmup   1: 25440 op, 44000.00 ns, 1.7296 ns/op
+OverheadWarmup   2: 25440 op, 41900.00 ns, 1.6470 ns/op
+OverheadWarmup   3: 25440 op, 43500.00 ns, 1.7099 ns/op
+OverheadWarmup   4: 25440 op, 41800.00 ns, 1.6431 ns/op
+OverheadWarmup   5: 25440 op, 42600.00 ns, 1.6745 ns/op
+OverheadWarmup   6: 25440 op, 43000.00 ns, 1.6903 ns/op
+OverheadWarmup   7: 25440 op, 42500.00 ns, 1.6706 ns/op
+
+OverheadActual   1: 25440 op, 42200.00 ns, 1.6588 ns/op
+OverheadActual   2: 25440 op, 42600.00 ns, 1.6745 ns/op
+OverheadActual   3: 25440 op, 41800.00 ns, 1.6431 ns/op
+OverheadActual   4: 25440 op, 42800.00 ns, 1.6824 ns/op
+OverheadActual   5: 25440 op, 42600.00 ns, 1.6745 ns/op
+OverheadActual   6: 25440 op, 43400.00 ns, 1.7060 ns/op
+OverheadActual   7: 25440 op, 43200.00 ns, 1.6981 ns/op
+OverheadActual   8: 25440 op, 44700.00 ns, 1.7571 ns/op
+OverheadActual   9: 25440 op, 44200.00 ns, 1.7374 ns/op
+OverheadActual  10: 25440 op, 43100.00 ns, 1.6942 ns/op
+OverheadActual  11: 25440 op, 43000.00 ns, 1.6903 ns/op
+OverheadActual  12: 25440 op, 44100.00 ns, 1.7335 ns/op
+OverheadActual  13: 25440 op, 43300.00 ns, 1.7020 ns/op
+OverheadActual  14: 25440 op, 43600.00 ns, 1.7138 ns/op
+OverheadActual  15: 25440 op, 42600.00 ns, 1.6745 ns/op
+
+WorkloadWarmup   1: 25440 op, 103594300.00 ns, 4.0721 us/op
+WorkloadWarmup   2: 25440 op, 103661100.00 ns, 4.0747 us/op
+WorkloadWarmup   3: 25440 op, 101737600.00 ns, 3.9991 us/op
+
+// BeforeActualRun
+WorkloadActual   1: 25440 op, 102440900.00 ns, 4.0268 us/op
+WorkloadActual   2: 25440 op, 108709200.00 ns, 4.2732 us/op
+WorkloadActual   3: 25440 op, 108523100.00 ns, 4.2658 us/op
+
+// AfterActualRun
+WorkloadResult   1: 25440 op, 102397800.00 ns, 4.0251 us/op
+WorkloadResult   2: 25440 op, 108666100.00 ns, 4.2715 us/op
+WorkloadResult   3: 25440 op, 108480000.00 ns, 4.2642 us/op
+// GC:  86 0 0 1628160000 25440
+// Threading:  0 0 25440
+
+// AfterAll
+// Benchmark Process 75208 has exited with code 0.
+
+Mean = 4.187 μs, StdErr = 0.081 μs (1.93%), N = 3, StdDev = 0.140 μs
+Min = 4.025 μs, Q1 = 4.145 μs, Median = 4.264 μs, Q3 = 4.268 μs, Max = 4.271 μs
+IQR = 0.123 μs, LowerFence = 3.960 μs, UpperFence = 4.453 μs
+ConfidenceInterval = [1.629 μs; 6.745 μs] (CI 99.9%), Margin = 2.558 μs (61.09% of Mean)
+Skewness = -0.38, Kurtosis = 0.67, MValue = 2
+
+// ** Remained 1 (50.0%) benchmark(s) to run. Estimated finish 2025-12-23 22:41 (0h 0m from now) **
+Setup power plan (GUID: 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c FriendlyName: High performance)
+// **************************
+// Benchmark: LoggerAllocationBenchmark.NewOverload2: Job-RELKCN(IterationCount=3, IterationTime=100ms, LaunchCount=1, WarmupCount=3)
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet Umbraco.Tests.Benchmarks-1.dll --anonymousPipes 9428 4680 --benchmarkName Umbraco.Tests.Benchmarks.LoggerAllocationBenchmark.NewOverload2 --job "IterationCount=3, IterationTime=100ms, LaunchCount=1, WarmupCount=3" --benchmarkId 1 in R:\Development\Open Source\Umbraco-CMS-2\tests\Umbraco.Tests.Benchmarks\bin\Release\net10.0\Umbraco.Tests.Benchmarks-1\bin\Release\net10.0
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// BenchmarkDotNet v0.15.6
+// Runtime=.NET 10.0.1 (10.0.1, 10.0.125.57005), X64 RyuJIT x86-64-v3
+// GC=Concurrent Workstation
+// HardwareIntrinsics=AVX2+BMI1+BMI2+F16C+FMA+LZCNT+MOVBE,AVX,SSE3+SSSE3+SSE4.1+SSE4.2+POPCNT,X86Base+SSE+SSE2,AES+PCLMUL,AvxVnni,SERIALIZE VectorSize=256
+// Job: Job-RELKCN(IterationCount=3, IterationTime=100ms, LaunchCount=1, WarmupCount=3)
+
+OverheadJitting  1: 1 op, 77300.00 ns, 77.3000 us/op
+WorkloadJitting  1: 1 op, 152500.00 ns, 152.5000 us/op
+
+OverheadJitting  2: 16 op, 100200.00 ns, 6.2625 us/op
+WorkloadJitting  2: 16 op, 315000.00 ns, 19.6875 us/op
+
+WorkloadPilot    1: 16 op, 98100.00 ns, 6.1313 us/op
+WorkloadPilot    2: 16320 op, 57343300.00 ns, 3.5137 us/op
+WorkloadPilot    3: 28464 op, 93903500.00 ns, 3.2990 us/op
+WorkloadPilot    4: 30320 op, 5622300.00 ns, 185.4321 ns/op
+WorkloadPilot    5: 539296 op, 99348200.00 ns, 184.2183 ns/op
+WorkloadPilot    6: 542848 op, 100666300.00 ns, 185.4410 ns/op
+WorkloadPilot    7: 539264 op, 100381900.00 ns, 186.1461 ns/op
+WorkloadPilot    8: 537216 op, 100090200.00 ns, 186.3128 ns/op
+
+OverheadWarmup   1: 537216 op, 977200.00 ns, 1.8190 ns/op
+OverheadWarmup   2: 537216 op, 972200.00 ns, 1.8097 ns/op
+OverheadWarmup   3: 537216 op, 971700.00 ns, 1.8088 ns/op
+OverheadWarmup   4: 537216 op, 982200.00 ns, 1.8283 ns/op
+OverheadWarmup   5: 537216 op, 977000.00 ns, 1.8186 ns/op
+OverheadWarmup   6: 537216 op, 969800.00 ns, 1.8052 ns/op
+OverheadWarmup   7: 537216 op, 970500.00 ns, 1.8065 ns/op
+OverheadWarmup   8: 537216 op, 979300.00 ns, 1.8229 ns/op
+OverheadWarmup   9: 537216 op, 988300.00 ns, 1.8397 ns/op
+OverheadWarmup  10: 537216 op, 969100.00 ns, 1.8039 ns/op
+
+OverheadActual   1: 537216 op, 971000.00 ns, 1.8075 ns/op
+OverheadActual   2: 537216 op, 975500.00 ns, 1.8158 ns/op
+OverheadActual   3: 537216 op, 979800.00 ns, 1.8238 ns/op
+OverheadActual   4: 537216 op, 974100.00 ns, 1.8132 ns/op
+OverheadActual   5: 537216 op, 980800.00 ns, 1.8257 ns/op
+OverheadActual   6: 537216 op, 985900.00 ns, 1.8352 ns/op
+OverheadActual   7: 537216 op, 972100.00 ns, 1.8095 ns/op
+OverheadActual   8: 537216 op, 981800.00 ns, 1.8276 ns/op
+OverheadActual   9: 537216 op, 973900.00 ns, 1.8129 ns/op
+OverheadActual  10: 537216 op, 987600.00 ns, 1.8384 ns/op
+OverheadActual  11: 537216 op, 970000.00 ns, 1.8056 ns/op
+OverheadActual  12: 537216 op, 969800.00 ns, 1.8052 ns/op
+OverheadActual  13: 537216 op, 986000.00 ns, 1.8354 ns/op
+OverheadActual  14: 537216 op, 989800.00 ns, 1.8425 ns/op
+OverheadActual  15: 537216 op, 991400.00 ns, 1.8454 ns/op
+
+WorkloadWarmup   1: 537216 op, 98903700.00 ns, 184.1042 ns/op
+WorkloadWarmup   2: 537216 op, 99785500.00 ns, 185.7456 ns/op
+WorkloadWarmup   3: 537216 op, 99801800.00 ns, 185.7759 ns/op
+
+// BeforeActualRun
+WorkloadActual   1: 537216 op, 98839200.00 ns, 183.9841 ns/op
+WorkloadActual   2: 537216 op, 99132100.00 ns, 184.5293 ns/op
+WorkloadActual   3: 537216 op, 99455000.00 ns, 185.1304 ns/op
+
+// AfterActualRun
+WorkloadResult   1: 537216 op, 97859400.00 ns, 182.1602 ns/op
+WorkloadResult   2: 537216 op, 98152300.00 ns, 182.7055 ns/op
+WorkloadResult   3: 537216 op, 98475200.00 ns, 183.3065 ns/op
+// GC:  0 0 0 0 537216
+// Threading:  0 0 537216
+
+// AfterAll
+// Benchmark Process 18672 has exited with code 0.
+
+Mean = 182.724 ns, StdErr = 0.331 ns (0.18%), N = 3, StdDev = 0.573 ns
+Min = 182.160 ns, Q1 = 182.433 ns, Median = 182.705 ns, Q3 = 183.006 ns, Max = 183.307 ns
+IQR = 0.573 ns, LowerFence = 181.573 ns, UpperFence = 183.866 ns
+ConfidenceInterval = [172.264 ns; 193.184 ns] (CI 99.9%), Margin = 10.460 ns (5.72% of Mean)
+Skewness = 0.03, Kurtosis = 0.67, MValue = 2
+
+// ** Remained 0 (0.0%) benchmark(s) to run. Estimated finish 2025-12-23 22:41 (0h 0m from now) **
+Successfully reverted power plan (GUID: 381b4222-f694-41f0-9685-ff5bb260df2e FriendlyName: Balanced)
+// ***** BenchmarkRunner: Finish  *****
+
+// * Export *
+  BenchmarkDotNet.Artifacts\results\Umbraco.Tests.Benchmarks.LoggerAllocationBenchmark-report.csv
+  BenchmarkDotNet.Artifacts\results\Umbraco.Tests.Benchmarks.LoggerAllocationBenchmark-report-github.md
+  BenchmarkDotNet.Artifacts\results\Umbraco.Tests.Benchmarks.LoggerAllocationBenchmark-report.html
+
+// * Detailed results *
+LoggerAllocationBenchmark.Baseline: Job-RELKCN(IterationCount=3, IterationTime=100ms, LaunchCount=1, WarmupCount=3)
+Runtime = .NET 10.0.1 (10.0.1, 10.0.125.57005), X64 RyuJIT x86-64-v3; GC = Concurrent Workstation
+Mean = 4.187 μs, StdErr = 0.081 μs (1.93%), N = 3, StdDev = 0.140 μs
+Min = 4.025 μs, Q1 = 4.145 μs, Median = 4.264 μs, Q3 = 4.268 μs, Max = 4.271 μs
+IQR = 0.123 μs, LowerFence = 3.960 μs, UpperFence = 4.453 μs
+ConfidenceInterval = [1.629 μs; 6.745 μs] (CI 99.9%), Margin = 2.558 μs (61.09% of Mean)
+Skewness = -0.38, Kurtosis = 0.67, MValue = 2
+-------------------- Histogram --------------------
+[4.021 μs ; 4.276 μs) | @@@
+---------------------------------------------------
+
+LoggerAllocationBenchmark.NewOverload2: Job-RELKCN(IterationCount=3, IterationTime=100ms, LaunchCount=1, WarmupCount=3)
+Runtime = .NET 10.0.1 (10.0.1, 10.0.125.57005), X64 RyuJIT x86-64-v3; GC = Concurrent Workstation
+Mean = 182.724 ns, StdErr = 0.331 ns (0.18%), N = 3, StdDev = 0.573 ns
+Min = 182.160 ns, Q1 = 182.433 ns, Median = 182.705 ns, Q3 = 183.006 ns, Max = 183.307 ns
+IQR = 0.573 ns, LowerFence = 181.573 ns, UpperFence = 183.866 ns
+ConfidenceInterval = [172.264 ns; 193.184 ns] (CI 99.9%), Margin = 10.460 ns (5.72% of Mean)
+Skewness = 0.03, Kurtosis = 0.67, MValue = 2
+-------------------- Histogram --------------------
+[181.638 ns ; 183.828 ns) | @@@
+---------------------------------------------------
+
+// * Summary *
+
+BenchmarkDotNet v0.15.6, Windows 11 (10.0.26200.7462)
+Intel Core i9-14900K 3.20GHz, 1 CPU, 32 logical and 24 physical cores
+.NET SDK 10.0.101
+  [Host]     : .NET 10.0.1 (10.0.1, 10.0.125.57005), X64 RyuJIT x86-64-v3
+  Job-RELKCN : .NET 10.0.1 (10.0.1, 10.0.125.57005), X64 RyuJIT x86-64-v3
+
+IterationCount=3  IterationTime=100ms  LaunchCount=1  
+WarmupCount=3  
+
+| Method       | Mean       | Error       | StdDev    | Ratio | RatioSD | Gen0   | Allocated | Alloc Ratio |
+|------------- |-----------:|------------:|----------:|------:|--------:|-------:|----------:|------------:|
+| Baseline     | 4,186.9 ns | 2,557.63 ns | 140.19 ns |  1.00 |    0.04 | 3.3805 |   64000 B |        1.00 |
+| NewOverload2 |   182.7 ns |    10.46 ns |   0.57 ns |  0.04 |    0.00 |      - |         - |        0.00 |
+
+// * Warnings *
+MinIterationTime
+  LoggerAllocationBenchmark.NewOverload2: IterationCount=3, IterationTime=100ms, LaunchCount=1, WarmupCount=3 -> The minimum observed iteration time is 98.839ms which is very small. It's recommended to increase it to at least 100ms using more operations.
+
+// * Legends *
+  Mean        : Arithmetic mean of all measurements
+  Error       : Half of 99.9% confidence interval
+  StdDev      : Standard deviation of all measurements
+  Ratio       : Mean of the ratio distribution ([Current]/[Baseline])
+  RatioSD     : Standard deviation of the ratio distribution ([Current]/[Baseline])
+  Gen0        : GC Generation 0 collects per 1000 operations
+  Allocated   : Allocated memory per single operation (managed only, inclusive, 1KB = 1024B)
+  Alloc Ratio : Allocated memory ratio distribution ([Current]/[Baseline])
+  1 ns        : 1 Nanosecond (0.000000001 sec)
+
+// * Diagnostic Output - MemoryDiagnoser *
+
+
+// ***** BenchmarkRunner: End *****
+Run time: 00:00:07 (7.74 sec), executed benchmarks: 2
+
+Global total time: 00:01:01 (61.43 sec), executed benchmarks: 2
+// * Artifacts cleanup *
+Artifacts cleanup is finished
