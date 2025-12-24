@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
@@ -827,7 +828,7 @@ internal sealed class ContentServiceRefactoringTests : UmbracoIntegrationTestWit
         var contentType = new ContentTypeBuilder()
             .WithAlias("testPublishPage")
             .Build();
-        await contentTypeService.SaveAsync(contentType, Constants.Security.SuperUserId);
+        await contentTypeService.SaveAsync(contentType, Constants.Security.SuperUserKey);
 
         var content = contentService.Create("Test Publish Page", Constants.System.Root, contentType.Alias);
         contentService.Save(content);
@@ -850,7 +851,7 @@ internal sealed class ContentServiceRefactoringTests : UmbracoIntegrationTestWit
         var contentType = new ContentTypeBuilder()
             .WithAlias("testUnpublishPage")
             .Build();
-        await contentTypeService.SaveAsync(contentType, Constants.Security.SuperUserId);
+        await contentTypeService.SaveAsync(contentType, Constants.Security.SuperUserKey);
 
         var content = contentService.Create("Test Unpublish Page", Constants.System.Root, contentType.Alias);
         contentService.Save(content);
@@ -874,7 +875,7 @@ internal sealed class ContentServiceRefactoringTests : UmbracoIntegrationTestWit
         var contentType = new ContentTypeBuilder()
             .WithAlias("testPathPage")
             .Build();
-        await contentTypeService.SaveAsync(contentType, Constants.Security.SuperUserId);
+        await contentTypeService.SaveAsync(contentType, Constants.Security.SuperUserKey);
 
         var content = contentService.Create("Test Path Page", Constants.System.Root, contentType.Alias);
         contentService.Save(content);
