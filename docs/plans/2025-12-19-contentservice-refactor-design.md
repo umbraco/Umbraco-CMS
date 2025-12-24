@@ -398,7 +398,7 @@ Each phase MUST run tests before and after to verify no regressions.
 | 3 | Version Service | All ContentService*Tests | All pass | ✅ Complete |
 | 4 | Move Service | All ContentService*Tests + Sort/MoveToRecycleBin tests | All pass | ✅ Complete |
 | 5 | Publish Operation Service | All ContentService*Tests + Notification ordering tests | All pass | ✅ Complete |
-| 6 | Permission Manager | All ContentService*Tests + Permission tests | All pass | Pending |
+| 6 | Permission Manager | All ContentService*Tests + Permission tests | All pass | ✅ Complete |
 | 7 | Blueprint Manager | All ContentService*Tests | All pass | Pending |
 | 8 | Facade | **Full test suite** | All pass | Pending |
 
@@ -429,8 +429,16 @@ Each phase MUST run tests before and after to verify no regressions.
    - Updated `ContentService.cs` to delegate move/copy/sort operations
    - Note: `MoveToRecycleBin` stays in facade for unpublish orchestration
    - Git tag: `phase-4-move-extraction`
-6. **Phase 5: Publish Operation Service** - Most complex; notification ordering tests critical
-7. **Phase 6: Permission Manager** - Small extraction; permission tests critical
+6. **Phase 5: Publish Operation Service** ✅ - Complete! Created:
+   - `IContentPublishOperationService.cs` - Interface (publish/unpublish operations)
+   - `ContentPublishOperationService.cs` - Implementation (~800 lines)
+   - Updated `ContentService.cs` to delegate publish operations
+   - Git tag: `phase-5-publish-extraction`
+7. **Phase 6: Permission Manager** ✅ - Complete! Created:
+   - `ContentPermissionManager.cs` - Public sealed class (~120 lines)
+   - 3 methods: SetPermissions, SetPermission, GetPermissions
+   - Updated `ContentService.cs` to delegate permission operations
+   - Git tag: `phase-6-permission-extraction`
 8. **Phase 7: Blueprint Manager** - Final cleanup
 9. **Phase 8: Facade** - Wire everything together, add async methods
 
