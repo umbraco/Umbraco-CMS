@@ -32,19 +32,11 @@ public class ContentService : RepositoryService, IContentService
 {
     private readonly IAuditService _auditService;
     private readonly IContentTypeRepository _contentTypeRepository;
-    private readonly IDocumentBlueprintRepository _documentBlueprintRepository;
     private readonly IDocumentRepository _documentRepository;
-    private readonly IEntityRepository _entityRepository;
-    private readonly ILanguageRepository _languageRepository;
     private readonly ILogger<ContentService> _logger;
-    private readonly Lazy<IPropertyValidationService> _propertyValidationService;
     private readonly IShortStringHelper _shortStringHelper;
-    private readonly ICultureImpactFactory _cultureImpactFactory;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
-    private readonly PropertyEditorCollection _propertyEditorCollection;
     private readonly IIdKeyMap _idKeyMap;
-    private ContentSettings _contentSettings;
-    private readonly IRelationService _relationService;
     private IQuery<IContent>? _queryNotTrashed;
     private readonly Lazy<IContentCrudService> _crudServiceLazy;
 
@@ -95,72 +87,46 @@ public class ContentService : RepositoryService, IContentService
         ILoggerFactory loggerFactory,
         IEventMessagesFactory eventMessagesFactory,
         IDocumentRepository documentRepository,
-        IEntityRepository entityRepository,
         IAuditService auditService,
         IContentTypeRepository contentTypeRepository,
-        IDocumentBlueprintRepository documentBlueprintRepository,
-        ILanguageRepository languageRepository,
-        Lazy<IPropertyValidationService> propertyValidationService,
         IShortStringHelper shortStringHelper,
-        ICultureImpactFactory cultureImpactFactory,
         IUserIdKeyResolver userIdKeyResolver,
-        PropertyEditorCollection propertyEditorCollection,
         IIdKeyMap idKeyMap,
-        IOptionsMonitor<ContentSettings> optionsMonitor,
-        IRelationService relationService,
         IContentCrudService crudService,
-        IContentQueryOperationService queryOperationService,  // NEW PARAMETER - Phase 2 query operations
-        IContentVersionOperationService versionOperationService,  // NEW PARAMETER - Phase 3 version operations
-        IContentMoveOperationService moveOperationService,  // NEW PARAMETER - Phase 4 move operations
-        IContentPublishOperationService publishOperationService,  // NEW PARAMETER - Phase 5 publish operations
-        ContentPermissionManager permissionManager,  // NEW PARAMETER - Phase 6 permission operations
-        ContentBlueprintManager blueprintManager)  // NEW PARAMETER - Phase 7 blueprint operations
+        IContentQueryOperationService queryOperationService,
+        IContentVersionOperationService versionOperationService,
+        IContentMoveOperationService moveOperationService,
+        IContentPublishOperationService publishOperationService,
+        ContentPermissionManager permissionManager,
+        ContentBlueprintManager blueprintManager)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _documentRepository = documentRepository;
-        _entityRepository = entityRepository;
         _auditService = auditService;
         _contentTypeRepository = contentTypeRepository;
-        _documentBlueprintRepository = documentBlueprintRepository;
-        _languageRepository = languageRepository;
-        _propertyValidationService = propertyValidationService;
         _shortStringHelper = shortStringHelper;
-        _cultureImpactFactory = cultureImpactFactory;
         _userIdKeyResolver = userIdKeyResolver;
-        _propertyEditorCollection = propertyEditorCollection;
         _idKeyMap = idKeyMap;
-        _contentSettings = optionsMonitor.CurrentValue;
-        optionsMonitor.OnChange((contentSettings) =>
-        {
-            _contentSettings = contentSettings;
-        });
-        _relationService = relationService;
         _logger = loggerFactory.CreateLogger<ContentService>();
+
         ArgumentNullException.ThrowIfNull(crudService);
-        // Wrap in Lazy for consistent access pattern (already resolved, so returns immediately)
         _crudServiceLazy = new Lazy<IContentCrudService>(() => crudService);
 
-        // Phase 2: Query operation service (direct injection)
         ArgumentNullException.ThrowIfNull(queryOperationService);
         _queryOperationService = queryOperationService;
 
-        // Phase 3: Version operation service (direct injection)
         ArgumentNullException.ThrowIfNull(versionOperationService);
         _versionOperationService = versionOperationService;
 
-        // Phase 4: Move operation service (direct injection)
         ArgumentNullException.ThrowIfNull(moveOperationService);
         _moveOperationService = moveOperationService;
 
-        // Phase 5: Publish operation service (direct injection)
         ArgumentNullException.ThrowIfNull(publishOperationService);
         _publishOperationService = publishOperationService;
 
-        // Phase 6: Permission manager (direct injection)
         ArgumentNullException.ThrowIfNull(permissionManager);
         _permissionManager = permissionManager;
 
-        // Phase 7: Blueprint manager (direct injection)
         ArgumentNullException.ThrowIfNull(blueprintManager);
         _blueprintManager = blueprintManager;
     }
