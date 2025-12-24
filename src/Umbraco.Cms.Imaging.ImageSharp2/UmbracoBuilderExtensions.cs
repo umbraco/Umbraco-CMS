@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Imaging.ImageSharp;
 public static class UmbracoBuilderExtensions
 {
     /// <summary>
-    ///     Adds Image Sharp with Umbraco settings.
+    ///     Adds ImageSharp with Umbraco settings.
     /// </summary>
     /// <param name="builder">The Umbraco builder.</param>
     /// <returns>The <see cref="IServiceCollection" />.</returns>
