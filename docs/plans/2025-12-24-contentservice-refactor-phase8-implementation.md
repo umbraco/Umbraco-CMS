@@ -2,9 +2,9 @@
 
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
-**Version:** 4.0 (Updated based on Critical Review 3)
+**Version:** 6.0 (Updated based on Critical Review 5)
 **Last Updated:** 2025-12-24
-**Change Summary:** Fixed Task 4 Step 6 (IContentCrudService already exists); corrected line count target (~990 lines); added _contentSettings verification step; changed PerformMoveLocked to return collection (Option A); added unit tests for new interface methods; added API project checks; use method signatures instead of line numbers; resolved _queryNotTrashed disposition.
+**Change Summary:** Added Task 6 Step 1b (test refactoring for GetAllPublished - CRITICAL); added Task 4 Step 1a (ICoreScope import verification); added Task 8 Step 2b (DeliveryApiContentIndexHelper test coverage); enhanced Task 4 Step 5a with behavioral change documentation; added null assignment cleanup to Task 1 Step 3; added version check command to Task 1 Step 1; added tolerance range to Task 7 line count.
 
 ---
 
@@ -24,6 +24,8 @@
 | 2.0 | 2025-12-24 | Updated based on Critical Review 1 - see change summary |
 | 3.0 | 2025-12-24 | Updated based on Critical Review 2 - reordered tasks, unified DeleteLocked, explicit constructor steps |
 | 4.0 | 2025-12-24 | Updated based on Critical Review 3 - fixed Task 4 Step 6, corrected line count, PerformMoveLocked returns collection |
+| 5.0 | 2025-12-24 | Updated based on Critical Review 4 - added DeleteOfTypes update step (CRITICAL), internal caller update step, constant verification, enhanced MoveToRecycleBin pattern, clarified non-lazy fields, GetAllPublished fallback |
+| 6.0 | 2025-12-24 | Updated based on Critical Review 5 - test refactoring for GetAllPublished (CRITICAL), ICoreScope import verification, behavioral change documentation, null assignment cleanup, version check command, line count tolerance |
 
 ---
 
@@ -125,8 +127,13 @@ All CRUD, Query, Version, Move, Publish, Permission, and Blueprint methods are a
 
 The obsolete constructors are marked "Scheduled removal in v19". Verify this is acceptable:
 
-1. Check if current version is v19 or if early removal is approved
-2. Review the obsolete message text
+1. Check the current version target:
+   ```bash
+   grep -r "Version>" Directory.Build.props | head -5
+   ```
+2. If version is v19 or later, removal is approved
+3. If version is earlier, check with team lead or skip this task
+4. Review the obsolete message text to confirm scheduled removal version
 
 If removal is NOT approved for current version, **skip this task** and keep obsolete constructors.
 
@@ -145,7 +152,7 @@ grep -n 'Obsolete.*Scheduled removal in v19' src/Umbraco.Core/Services/ContentSe
 
 Delete both constructors entirely, including their `[Obsolete]` attributes and method bodies.
 
-### Step 3: Remove Lazy field declarations (v3.0 explicit list)
+### Step 3: Remove Lazy field declarations (v3.0 explicit list, v5.0 clarification, v6.0 null assignments)
 
 Remove these Lazy fields that are no longer needed:
 - `_queryOperationServiceLazy`
@@ -156,6 +163,19 @@ Remove these Lazy fields that are no longer needed:
 - `_blueprintManagerLazy`
 
 **Note:** Keep `_crudServiceLazy` - it is used by the main constructor.
+
+**Clarification (v5.0):** Keep the non-lazy versions (`_queryOperationService`, `_versionOperationService`, `_moveOperationService`, `_publishOperationService`, `_permissionManager`, `_blueprintManager`) as they are populated by the main constructor. Only the Lazy variants are removed.
+
+**v6.0 Addition:** Also remove the null assignment lines in the main constructor that become dead code after removing the Lazy fields:
+```csharp
+// Remove these lines from the main constructor:
+_queryOperationServiceLazy = null;
+_versionOperationServiceLazy = null;
+_moveOperationServiceLazy = null;
+_publishOperationServiceLazy = null;
+_permissionManagerLazy = null;
+_blueprintManagerLazy = null;
+```
 
 ### Step 4: Simplify service accessor properties
 
@@ -476,24 +496,98 @@ private void PerformMoveLockedInternal(IContent content, int parentId, IContent?
 
 This keeps the internal recursive implementation unchanged while providing a clean public interface.
 
+### Step 2a: Update internal callers to use renamed method (v5.0 addition)
+
+After renaming to `PerformMoveLockedInternal`, update all internal call sites within `ContentMoveOperationService`:
+
+1. Run grep to find all internal callers:
+   ```bash
+   grep -n "PerformMoveLocked" src/Umbraco.Core/Services/ContentMoveOperationService.cs
+   ```
+
+2. In the `Move()` method, update the call:
+   ```csharp
+   // FROM:
+   PerformMoveLocked(content, parentId, parent, userId, moves, trash);
+   // TO:
+   PerformMoveLockedInternal(content, parentId, parent, userId, moves, trash);
+   ```
+
+3. Verify no other internal callers remain pointing to the old method name.
+
 ### Step 3: Verify build compiles
 
 Run: `dotnet build src/Umbraco.Core/Umbraco.Core.csproj`
 Expected: Build succeeds
 
-### Step 4: Update ContentService.MoveToRecycleBin to use service (v4.0 - new return value)
+### Step 4: Update ContentService.MoveToRecycleBin to use service (v4.0 - new return value, v5.0 enhanced)
 
-Replace the `PerformMoveLocked` call in ContentService with delegation. The new signature returns the collection:
+Replace the `PerformMoveLocked` call in ContentService with delegation. The new signature returns the collection.
+
+**Complete update pattern (v5.0):**
 
 ```csharp
-// In MoveToRecycleBin, replace:
-// var moves = new List<(IContent, string)>();
-// PerformMoveLocked(content, Constants.System.RecycleBinContent, null, userId, moves, true);
-// With:
+// In MoveToRecycleBin, find this pattern (lines ~907-918):
+// OLD:
+var moves = new List<(IContent, string)>();
+PerformMoveLocked(content, Constants.System.RecycleBinContent, null, userId, moves, true);
+scope.Notifications.Publish(new ContentTreeChangeNotification(...));
+
+MoveToRecycleBinEventInfo<IContent>[] moveInfo = moves
+    .Select(x => new MoveToRecycleBinEventInfo<IContent>(x.Item1, x.Item2))
+    .ToArray();
+
+// NEW:
 var moves = MoveOperationService.PerformMoveLocked(content, Constants.System.RecycleBinContent, null, userId, true);
+scope.Notifications.Publish(new ContentTreeChangeNotification(...));
+
+// The rest of the code using 'moves' works as-is since tuple destructuring is compatible
+// (x.Item1/x.Item2 or x.Content/x.OriginalPath both work with named tuples)
+MoveToRecycleBinEventInfo<IContent>[] moveInfo = moves
+    .Select(x => new MoveToRecycleBinEventInfo<IContent>(x.Content, x.OriginalPath))
+    .ToArray();
 ```
 
 The caller no longer needs to create the collection - it's returned by the service.
+
+### Step 4a: Update ContentService.DeleteOfTypes to use new signatures (v5.0 addition - CRITICAL)
+
+The `DeleteOfTypes` method also calls both `PerformMoveLocked` and `DeleteLocked`. **Without this update, the build will fail after removing the local methods.**
+
+1. First, locate the `DeleteOfTypes` method in ContentService (lines ~1154-1231).
+
+2. Find the loop that calls `PerformMoveLocked` (around line 1207):
+   ```csharp
+   // OLD:
+   foreach (IContent child in children)
+   {
+       PerformMoveLocked(child, Constants.System.RecycleBinContent, null, userId, moves, true);
+   }
+
+   // NEW:
+   foreach (IContent child in children)
+   {
+       var childMoves = MoveOperationService.PerformMoveLocked(child, Constants.System.RecycleBinContent, null, userId, true);
+       foreach (var move in childMoves)
+       {
+           moves.Add(move);  // Aggregate into the overall moves list
+       }
+   }
+   ```
+
+3. Find the `DeleteLocked` call (around line 1213):
+   ```csharp
+   // OLD:
+   DeleteLocked(scope, content, eventMessages);
+
+   // NEW:
+   CrudService.DeleteLocked(scope, content, eventMessages);
+   ```
+
+4. Ensure the `moves` list is still properly initialized before the loop:
+   ```csharp
+   var moves = new List<(IContent Content, string OriginalPath)>();
+   ```
 
 ### Step 5: Remove duplicate methods from ContentService
 
@@ -559,6 +653,21 @@ EOF
 void DeleteLocked(ICoreScope scope, IContent content, EventMessages evtMsgs);
 ```
 
+### Step 1a: Verify ICoreScope import (v6.0 addition)
+
+The `DeleteLocked` signature uses `ICoreScope`. Verify the using statement exists in `IContentCrudService.cs`:
+
+```bash
+grep -n "using Umbraco.Cms.Core.Scoping" src/Umbraco.Core/Services/IContentCrudService.cs
+```
+
+If missing, add the using statement at the top of the file:
+```csharp
+using Umbraco.Cms.Core.Scoping;
+```
+
+**Note:** Without this import, the interface will fail to compile with an error about `ICoreScope` being undefined.
+
 ### Step 2: Change existing method visibility in ContentCrudService
 
 Change the existing private method to public:
@@ -597,6 +706,51 @@ CrudService.DeleteLocked(scope, content, eventMessages);
 ### Step 5: Remove DeleteLocked from ContentService
 
 Delete the `DeleteLocked` method (lines ~825-848).
+
+### Step 5a: Verify DeleteLocked constant values match (v5.0 addition, v6.0 behavioral note)
+
+Before unification, verify both implementations use equivalent values to avoid behavioral changes:
+
+```bash
+# Check ContentCrudService constants
+grep -n "pageSize = \|maxIterations = " src/Umbraco.Core/Services/ContentCrudService.cs
+
+# Check ContentMoveOperationService constants
+grep -n "MaxDeleteIterations\|DefaultPageSize" src/Umbraco.Core/Services/ContentMoveOperationService.cs
+```
+
+**Expected:** `pageSize = 500` and `maxIterations = 10000` in both implementations.
+
+**If values differ:**
+1. Document the change in the commit message
+2. Update tests if behavior changes
+3. Consider which values are correct and whether to update ContentCrudService to match
+
+### Step 5b: Verify locking compatibility (v6.0 addition)
+
+The ContentService.DeleteOfTypes method already holds a write lock:
+```csharp
+scope.WriteLock(Constants.Locks.ContentTree);  // line 1172
+```
+
+Verify that `CrudService.DeleteLocked` uses the locked variant internally (`GetPagedDescendantsLocked`) which expects an existing lock. This is already the case in ContentCrudService.DeleteLocked.
+
+**Behavioral change note (v6.0):** The ContentService.DeleteLocked implementation lacks:
+- Iteration bounds (infinite loop protection)
+- Empty batch detection with logging
+- Warning logs for data inconsistencies
+
+Switching to ContentCrudService.DeleteLocked **IMPROVES safety**. This is intentional and beneficial.
+
+Consider adding a test to verify the iteration bound behavior:
+```csharp
+[Test]
+public void DeleteLocked_WithIterationBound_DoesNotInfiniteLoop()
+{
+    // Test that deletion completes within MaxDeleteIterations
+    // even if there's a data inconsistency
+}
+```
 
 ### Step 6: Unify ContentMoveOperationService.EmptyRecycleBin (v4.0 corrected)
 
@@ -763,9 +917,17 @@ EOF
 **Files:**
 - Modify: `src/Umbraco.Core/Services/ContentService.cs`
 
-### Step 1: Check GetAllPublished usage (v4.0 expanded)
+### Step 1: Check GetAllPublished usage (v4.0 expanded, v5.0 fallback)
 
 This method is `internal` (not public). Check if it's called externally:
+
+**First, verify if GetAllPublished exists (v5.0):**
+
+Run: `grep -n "GetAllPublished" src/Umbraco.Core/Services/ContentService.cs`
+
+**If no matches found:** The method has already been removed. Proceed to verify `_queryNotTrashed` usage only and skip to Step 2.
+
+**If matches found**, continue with the usage check:
 
 Run: `grep -rn "GetAllPublished" src/ --include="*.cs" | grep -v ContentService.cs`
 
@@ -781,7 +943,48 @@ Run: `grep -rn "GetAllPublished" src/Umbraco.Infrastructure/ src/Umbraco.Web.Com
 
 Run: `grep -rn "GetAllPublished" src/Umbraco.Cms.Api.Management/ src/Umbraco.Cms.Api.Delivery/ --include="*.cs"`
 
-If not used externally, in tests, or in API projects, remove it along with `_queryNotTrashed` field. If used, keep both.
+If not used externally, in tests, or in API projects, remove it along with `_queryNotTrashed` field. If used, see Step 1b.
+
+### Step 1b: Refactor test usage of GetAllPublished (v6.0 addition - CRITICAL)
+
+**Known usage:** `tests/Umbraco.Tests.Integration/Umbraco.Infrastructure/Examine/DeliveryApiContentIndexHelperTests.cs:116`
+
+The test method `GetExpectedNumberOfContentItems()` calls `ContentService.GetAllPublished().Count()`.
+
+**Refactor the test to use repository directly:**
+
+```csharp
+// File: tests/Umbraco.Tests.Integration/Umbraco.Infrastructure/Examine/DeliveryApiContentIndexHelperTests.cs
+// Method: GetExpectedNumberOfContentItems()
+
+// FROM:
+var result = ContentService.GetAllPublished().Count();
+
+// TO (use repository query):
+private int GetExpectedNumberOfContentItems()
+{
+    using var scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+    scope.ReadLock(Constants.Locks.ContentTree);
+
+    // Query for published content count using repository
+    var query = ScopeAccessor.AmbientScope?.SqlContext.Query<IContent>()
+        .Where(x => x.Published && !x.Trashed);
+    return DocumentRepository.Count(query);
+}
+```
+
+**Alternative if repository access is complex:**
+```csharp
+// Use IContentQueryOperationService if available in test base
+var publishedCount = ContentQueryOperationService.CountPublished();
+```
+
+After refactoring, verify the test still passes:
+```bash
+dotnet test tests/Umbraco.Tests.Integration --filter "FullyQualifiedName~DeliveryApiContentIndexHelper"
+```
+
+**Once the test is refactored**, `GetAllPublished` and `_queryNotTrashed` can be safely removed from ContentService.
 
 ### Step 2: Remove HasUnsavedChanges if unused
 
@@ -835,11 +1038,16 @@ EOF
 **Files:**
 - Review: `src/Umbraco.Core/Services/ContentService.cs`
 
-### Step 1: Count lines (v4.0 corrected)
+### Step 1: Count lines (v4.0 corrected, v6.0 tolerance)
 
 Run: `wc -l src/Umbraco.Core/Services/ContentService.cs`
 
-**Expected: ~990 lines** (calculated from 1330 - ~340 lines of removal)
+**Expected: ~990 lines (±50 lines acceptable)** - calculated from 1330 - ~340 lines of removal
+
+The tolerance accounts for:
+- Formatting variations
+- Optional cleanup decisions (comments, blank lines)
+- Minor differences in removed method lengths
 
 Line removal breakdown:
 - Obsolete constructors: ~160 lines
@@ -895,7 +1103,17 @@ Expected: All 15+ tests pass
 Run: `dotnet test tests/Umbraco.Tests.Integration --filter "FullyQualifiedName~ContentService"`
 Expected: All tests pass
 
-### Step 2a: Add unit tests for newly exposed interface methods (v4.0 addition)
+### Step 2a: Run DeliveryApiContentIndexHelper tests (v6.0 addition)
+
+This test file was modified in Task 6 Step 1b. Verify the refactored test still passes:
+
+```bash
+dotnet test tests/Umbraco.Tests.Integration --filter "FullyQualifiedName~DeliveryApiContentIndexHelper"
+```
+
+Expected: All tests pass, confirming the GetAllPublished refactoring didn't break functionality.
+
+### Step 2b: Add unit tests for newly exposed interface methods (v4.0 addition, renumbered v6.0)
 
 Create or update unit tests to cover the newly public interface methods:
 
@@ -1002,20 +1220,20 @@ EOF
 
 ## Summary
 
-### Tasks Overview (v4.0 - Updated)
+### Tasks Overview (v6.0 - Updated)
 
-| Task | Description | Est. Steps | v4.0 Changes |
+| Task | Description | Est. Steps | v6.0 Changes |
 |------|-------------|------------|--------------|
-| 1 | Remove Obsolete Constructors | 7 | Use method signatures instead of line numbers |
-| 2 | Remove Unused Fields and Simplify Constructor | 10 | **Added** Step 1a: _contentSettings verification |
-| 3 | Expose PerformMoveLocked on interface | 7 | **Changed** to return collection (Option A - clean API) |
-| 4 | Expose DeleteLocked + Unify Implementations | 8 | **Fixed** Step 6: IContentCrudService already exists |
+| 1 | Remove Obsolete Constructors | 7 | **Added** version check command, **Added** null assignment cleanup |
+| 2 | Remove Unused Fields and Simplify Constructor | 10 | No change |
+| 3 | Expose PerformMoveLocked on interface | 9 | No change from v5.0 |
+| 4 | Expose DeleteLocked + Unify Implementations | 11 | **Added** Step 1a (ICoreScope import), **Added** Step 5b (locking/behavioral note) |
 | 5 | Extract CheckDataIntegrity to ContentCrudService | 8 | No change |
-| 6 | Clean Up Remaining Internal Methods | 7 | **Added** API project checks |
-| 7 | Verify Line Count and Final Cleanup | 4 | **Fixed** target: ~990 lines |
-| 8 | Run Full Test Suite (Phase Gate) | 6 | **Added** Step 2a: unit tests for new interface methods |
-| 9 | Update Design Document | 4 | Updated line count references |
-| **Total** | | **61** | |
+| 6 | Clean Up Remaining Internal Methods | 8 | **Added** Step 1b (test refactoring - CRITICAL) |
+| 7 | Verify Line Count and Final Cleanup | 4 | **Added** ±50 line tolerance |
+| 8 | Run Full Test Suite (Phase Gate) | 7 | **Added** Step 2a (DeliveryApiContentIndexHelper tests) |
+| 9 | Update Design Document | 4 | No change |
+| **Total** | | **68** | |
 
 ### Expected Outcomes
 
@@ -1098,4 +1316,36 @@ This version addresses all findings from Critical Review 3:
 
 ---
 
-**End of Phase 8 Implementation Plan v4.0**
+## Review Feedback Incorporated (v5.0)
+
+This version addresses all findings from Critical Review 4:
+
+| Review Finding | Section | Resolution |
+|----------------|---------|------------|
+| **CRITICAL:** DeleteOfTypes method uses both PerformMoveLocked and DeleteLocked but not updated | 2.3 | **Added** Task 3 Step 4a - explicit step to update DeleteOfTypes method |
+| PerformMoveLocked internal caller updates missing | 2.1 | **Added** Task 3 Step 2a - update internal callers after renaming to PerformMoveLockedInternal |
+| Missing DeleteLocked constant value verification | 2.2 | **Added** Task 4 Step 5a - verify pageSize/maxIterations match before unification |
+| MoveToRecycleBin update pattern incomplete | 3.1 | **Enhanced** Task 3 Step 4 - show complete code update pattern with tuple element names |
+| Lazy field list clarification needed | 3.2 | **Clarified** Task 1 Step 3 - explicitly note that non-lazy versions are kept |
+| GetAllPublished may not exist | 3.3 | **Added** fallback handling in Task 6 Step 1 - check existence first |
+
+---
+
+## Review Feedback Incorporated (v6.0)
+
+This version addresses all findings from Critical Review 5:
+
+| Review Finding | Section | Resolution |
+|----------------|---------|------------|
+| **CRITICAL:** GetAllPublished used by integration tests | 2.1 | **Added** Task 6 Step 1b - refactor DeliveryApiContentIndexHelperTests to use repository query instead |
+| Missing ICoreScope import verification | 2.3 | **Added** Task 4 Step 1a - verify using statement exists in IContentCrudService.cs |
+| DeleteLocked safety bounds differ (undocumented improvement) | 2.2 | **Enhanced** Task 4 Step 5a - documented behavioral improvement (iteration bounds, logging) |
+| Different descendant query methods | 2.4 | **Added** Task 4 Step 5b - verify locking compatibility |
+| Incomplete Lazy field cleanup (null assignments) | 3.1 | **Added** null assignment removal to Task 1 Step 3 |
+| Missing specific test coverage for DeliveryApiContentIndexHelper | 3.4 | **Added** Task 8 Step 2a - run DeliveryApiContentIndexHelper tests |
+| Line count target needs tolerance | 3.5 | **Added** ±50 lines tolerance to Task 7 Step 1 |
+| Missing version check command | Q3 | **Added** explicit grep command to Task 1 Step 1 |
+
+---
+
+**End of Phase 8 Implementation Plan v6.0**
