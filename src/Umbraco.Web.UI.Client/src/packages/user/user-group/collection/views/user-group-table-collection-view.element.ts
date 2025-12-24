@@ -34,6 +34,10 @@ export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
 			elementName: 'umb-user-group-table-name-column-layout',
 		},
 		{
+			name: this.localize.term('general_description'),
+			alias: 'description',
+		},
+		{
 			name: this.localize.term('main_sections'),
 			alias: 'userGroupSections',
 			elementName: 'umb-user-group-table-sections-column-layout',
@@ -132,6 +136,10 @@ export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
 						value: {
 							name: userGroup.name,
 						},
+					},
+					{
+						columnAlias: 'description',
+						value: userGroup.description ?? '',
 					},
 					{
 						columnAlias: 'userGroupSections',
