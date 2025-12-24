@@ -432,37 +432,6 @@ public class ContentService : RepositoryService, IContentService
     public IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren, IQuery<IContent>? filter = null, Ordering? ordering = null)
         => CrudService.GetPagedDescendants(id, pageIndex, pageSize, out totalChildren, filter, ordering);
 
-    private IQuery<IContent>? GetPagedDescendantQuery(string contentPath)
-    {
-        IQuery<IContent>? query = Query<IContent>();
-        if (!contentPath.IsNullOrWhiteSpace())
-        {
-            query?.Where(x => x.Path.SqlStartsWith($"{contentPath},", TextColumnType.NVarchar));
-        }
-
-        return query;
-    }
-
-    private IEnumerable<IContent> GetPagedLocked(IQuery<IContent>? query, long pageIndex, int pageSize, out long totalChildren, IQuery<IContent>? filter, Ordering? ordering)
-    {
-        if (pageIndex < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(pageIndex));
-        }
-
-        if (pageSize <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(pageSize));
-        }
-
-        if (ordering == null)
-        {
-            throw new ArgumentNullException(nameof(ordering));
-        }
-
-        return _documentRepository.GetPage(query, pageIndex, pageSize, out totalChildren, filter, ordering);
-    }
-
     /// <summary>
     ///     Gets the parent of the current content as an <see cref="IContent" /> item.
     /// </summary>
@@ -645,7 +614,6 @@ public class ContentService : RepositoryService, IContentService
     public OperationResult MoveToRecycleBin(IContent content, int userId = Constants.Security.SuperUserId)
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
-        var moves = new List<(IContent, string)>();
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
@@ -668,7 +636,7 @@ public class ContentService : RepositoryService, IContentService
             // it's NOT unpublishing, only the content is now masked - allowing us to restore it if wanted
             // if (content.HasPublishedVersion)
             // { }
-            PerformMoveLocked(content, Constants.System.RecycleBinContent, null, userId, moves, true);
+            var moves = MoveOperationService.PerformMoveLocked(content, Constants.System.RecycleBinContent, null, userId, true);
             scope.Notifications.Publish(
                 new ContentTreeChangeNotification(content, TreeChangeTypes.RefreshBranch, eventMessages));
 
@@ -707,71 +675,6 @@ public class ContentService : RepositoryService, IContentService
         }
 
         return MoveOperationService.Move(content, parentId, userId);
-    }
-
-    // MUST be called from within WriteLock
-    // trash indicates whether we are trashing, un-trashing, or not changing anything
-    private void PerformMoveLocked(IContent content, int parentId, IContent? parent, int userId, ICollection<(IContent, string)> moves, bool? trash)
-    {
-        content.WriterId = userId;
-        content.ParentId = parentId;
-
-        // get the level delta (old pos to new pos)
-        // note that recycle bin (id:-20) level is 0!
-        var levelDelta = 1 - content.Level + (parent?.Level ?? 0);
-
-        var paths = new Dictionary<int, string>();
-
-        moves.Add((content, content.Path)); // capture original path
-
-        // need to store the original path to lookup descendants based on it below
-        var originalPath = content.Path;
-
-        // these will be updated by the repo because we changed parentId
-        // content.Path = (parent == null ? "-1" : parent.Path) + "," + content.Id;
-        // content.SortOrder = ((ContentRepository) repository).NextChildSortOrder(parentId);
-        // content.Level += levelDelta;
-        PerformMoveContentLocked(content, userId, trash);
-
-        // if uow is not immediate, content.Path will be updated only when the UOW commits,
-        // and because we want it now, we have to calculate it by ourselves
-        // paths[content.Id] = content.Path;
-        paths[content.Id] =
-            (parent == null
-                ? parentId == Constants.System.RecycleBinContent ? "-1,-20" : Constants.System.RootString
-                : parent.Path) + "," + content.Id;
-
-        const int pageSize = 500;
-        IQuery<IContent>? query = GetPagedDescendantQuery(originalPath);
-        long total;
-        do
-        {
-            // We always page a page 0 because for each page, we are moving the result so the resulting total will be reduced
-            IEnumerable<IContent> descendants =
-                GetPagedLocked(query, 0, pageSize, out total, null, Ordering.By("Path"));
-
-            foreach (IContent descendant in descendants)
-            {
-                moves.Add((descendant, descendant.Path)); // capture original path
-
-                // update path and level since we do not update parentId
-                descendant.Path = paths[descendant.Id] = paths[descendant.ParentId] + "," + descendant.Id;
-                descendant.Level += levelDelta;
-                PerformMoveContentLocked(descendant, userId, trash);
-            }
-        }
-        while (total > pageSize);
-    }
-
-    private void PerformMoveContentLocked(IContent content, int userId, bool? trash)
-    {
-        if (trash.HasValue)
-        {
-            ((ContentBase)content).Trashed = trash.Value;
-        }
-
-        content.WriterId = userId;
-        _documentRepository.Save(content);
     }
 
     public async Task<OperationResult> EmptyRecycleBinAsync(Guid userId)
@@ -968,7 +871,11 @@ public class ContentService : RepositoryService, IContentService
                 foreach (IContent child in children)
                 {
                     // see MoveToRecycleBin
-                    PerformMoveLocked(child, Constants.System.RecycleBinContent, null, userId, moves, true);
+                    var childMoves = MoveOperationService.PerformMoveLocked(child, Constants.System.RecycleBinContent, null, userId, true);
+                    foreach (var move in childMoves)
+                    {
+                        moves.Add(move);
+                    }
                     changes.Add(new TreeChange<IContent>(content, TreeChangeTypes.RefreshBranch));
                 }
 

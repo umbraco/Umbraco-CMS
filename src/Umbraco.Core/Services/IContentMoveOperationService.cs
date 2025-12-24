@@ -159,4 +159,21 @@ public interface IContentMoveOperationService : IService
     OperationResult Sort(IEnumerable<int>? ids, int userId = Constants.Security.SuperUserId);
 
     #endregion
+
+    #region Internal Move Operations
+
+    /// <summary>
+    /// Performs the locked move operation for a content item and its descendants.
+    /// Used internally by MoveToRecycleBin orchestration.
+    /// </summary>
+    /// <param name="content">The content to move.</param>
+    /// <param name="parentId">The target parent id.</param>
+    /// <param name="parent">The target parent content (can be null for root/recycle bin).</param>
+    /// <param name="userId">The user performing the operation.</param>
+    /// <param name="trash">Whether to mark as trashed (true), un-trashed (false), or unchanged (null).</param>
+    /// <returns>Collection of moved items with their original paths.</returns>
+    IReadOnlyCollection<(IContent Content, string OriginalPath)> PerformMoveLocked(
+        IContent content, int parentId, IContent? parent, int userId, bool? trash);
+
+    #endregion
 }

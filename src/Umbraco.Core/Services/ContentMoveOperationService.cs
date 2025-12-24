@@ -111,7 +111,7 @@ public class ContentMoveOperationService : ContentServiceBase, IContentMoveOpera
                 content.PublishedState = PublishedState.Unpublishing;
             }
 
-            PerformMoveLocked(content, parentId, parent, userId, moves, trashed);
+            PerformMoveLockedInternal(content, parentId, parent, userId, moves, trashed);
 
             scope.Notifications.Publish(
                 new ContentTreeChangeNotification(content, TreeChangeTypes.RefreshBranch, eventMessages));
@@ -134,10 +134,19 @@ public class ContentMoveOperationService : ContentServiceBase, IContentMoveOpera
         }
     }
 
+    /// <inheritdoc />
+    public IReadOnlyCollection<(IContent Content, string OriginalPath)> PerformMoveLocked(
+        IContent content, int parentId, IContent? parent, int userId, bool? trash)
+    {
+        var moves = new List<(IContent, string)>();
+        PerformMoveLockedInternal(content, parentId, parent, userId, moves, trash);
+        return moves.AsReadOnly();
+    }
+
     /// <summary>
     /// Performs the actual move operation within an existing write lock.
     /// </summary>
-    private void PerformMoveLocked(IContent content, int parentId, IContent? parent, int userId, ICollection<(IContent, string)> moves, bool? trash)
+    private void PerformMoveLockedInternal(IContent content, int parentId, IContent? parent, int userId, ICollection<(IContent, string)> moves, bool? trash)
     {
         content.WriterId = userId;
         content.ParentId = parentId;
