@@ -1,6 +1,8 @@
 // src/Umbraco.Core/Services/IContentCrudService.cs
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Scoping;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -246,6 +248,15 @@ public interface IContentCrudService : IService
     /// <param name="userId">Optional id of the user deleting the content.</param>
     /// <returns>The operation result.</returns>
     OperationResult Delete(IContent content, int userId = Constants.Security.SuperUserId);
+
+    /// <summary>
+    /// Performs the locked delete operation including descendants.
+    /// Used internally by DeleteOfTypes orchestration and EmptyRecycleBin.
+    /// </summary>
+    /// <param name="scope">The active scope with write lock.</param>
+    /// <param name="content">The document to delete.</param>
+    /// <param name="evtMsgs">Event messages collection.</param>
+    void DeleteLocked(ICoreScope scope, IContent content, EventMessages evtMsgs);
 
     #endregion
 }

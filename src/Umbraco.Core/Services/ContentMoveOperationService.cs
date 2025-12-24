@@ -251,7 +251,7 @@ public class ContentMoveOperationService : ContentServiceBase, IContentMoveOpera
                         continue;
                     }
 
-                    DeleteLocked(scope, content, eventMessages);
+                    _crudService.DeleteLocked(scope, content, eventMessages);
                     deleted.Add(content);
                 }
             }
@@ -296,64 +296,6 @@ public class ContentMoveOperationService : ContentServiceBase, IContentMoveOpera
                 .Where(x => x.Path.StartsWith(Constants.System.RecycleBinContentPathPrefix));
             return DocumentRepository.GetPage(query, pageIndex, pageSize, out totalRecords, filter, ordering);
         }
-    }
-
-    /// <summary>
-    /// Deletes content and all descendants within an existing scope.
-    /// </summary>
-    private void DeleteLocked(ICoreScope scope, IContent content, EventMessages evtMsgs)
-    {
-        void DoDelete(IContent c)
-        {
-            DocumentRepository.Delete(c);
-            scope.Notifications.Publish(new ContentDeletedNotification(c, evtMsgs));
-        }
-
-        // v1.1: Using class-level constants
-        var iteration = 0;
-        var total = long.MaxValue;
-
-        while (total > 0 && iteration < MaxDeleteIterations)
-        {
-            IEnumerable<IContent> descendants = GetPagedDescendantsLocked(
-                content.Id,
-                0,
-                DefaultPageSize,
-                out total,
-                ordering: Ordering.By("Path", Direction.Descending));
-
-            var batch = descendants.ToList();
-
-            // v1.1: Break immediately when batch is empty (fix from critical review 2.5)
-            if (batch.Count == 0)
-            {
-                if (total > 0)
-                {
-                    _logger.LogWarning(
-                        "GetPagedDescendants reported {Total} total descendants but returned empty batch for content {ContentId}. Breaking loop.",
-                        total,
-                        content.Id);
-                }
-                break;  // Break immediately, don't continue iterating
-            }
-
-            foreach (IContent c in batch)
-            {
-                DoDelete(c);
-            }
-
-            iteration++;
-        }
-
-        if (iteration >= MaxDeleteIterations)
-        {
-            _logger.LogError(
-                "DeleteLocked exceeded maximum iteration limit ({MaxIterations}) for content {ContentId}. Tree may be incompletely deleted.",
-                MaxDeleteIterations,
-                content.Id);
-        }
-
-        DoDelete(content);
     }
 
     #endregion

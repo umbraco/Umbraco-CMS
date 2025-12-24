@@ -634,7 +634,7 @@ public class ContentCrudService : ContentServiceBase, IContentCrudService
     /// Uses paging to handle large trees without loading everything into memory.
     /// Iteration bound prevents infinite loops if database is in inconsistent state.
     /// </remarks>
-    private void DeleteLocked(ICoreScope scope, IContent content, EventMessages evtMsgs)
+    public void DeleteLocked(ICoreScope scope, IContent content, EventMessages evtMsgs)
     {
         void DoDelete(IContent c)
         {

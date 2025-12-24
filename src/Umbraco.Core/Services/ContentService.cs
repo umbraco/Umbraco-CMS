@@ -555,31 +555,6 @@ public class ContentService : RepositoryService, IContentService
     public OperationResult Delete(IContent content, int userId = Constants.Security.SuperUserId)
         => CrudService.Delete(content, userId);
 
-    private void DeleteLocked(ICoreScope scope, IContent content, EventMessages evtMsgs)
-    {
-        void DoDelete(IContent c)
-        {
-            _documentRepository.Delete(c);
-            scope.Notifications.Publish(new ContentDeletedNotification(c, evtMsgs));
-
-            // media files deleted by QueuingEventDispatcher
-        }
-
-        const int pageSize = 500;
-        var total = long.MaxValue;
-        while (total > 0)
-        {
-            // get descendants - ordered from deepest to shallowest
-            IEnumerable<IContent> descendants = GetPagedDescendants(content.Id, 0, pageSize, out total, ordering: Ordering.By("Path", Direction.Descending));
-            foreach (IContent c in descendants)
-            {
-                DoDelete(c);
-            }
-        }
-
-        DoDelete(content);
-    }
-
     // TODO: both DeleteVersions methods below have an issue. Sort of. They do NOT take care of files the way
     // Delete does - for a good reason: the file may be referenced by other, non-deleted, versions. BUT,
     // if that's not the case, then the file will never be deleted, because when we delete the content,
@@ -881,7 +856,7 @@ public class ContentService : RepositoryService, IContentService
 
                 // delete content
                 // triggers the deleted event (and handles the files)
-                DeleteLocked(scope, content, eventMessages);
+                CrudService.DeleteLocked(scope, content, eventMessages);
                 changes.Add(new TreeChange<IContent>(content, TreeChangeTypes.Remove));
             }
 
