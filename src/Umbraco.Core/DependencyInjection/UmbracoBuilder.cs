@@ -331,7 +331,8 @@ namespace Umbraco.Cms.Core.DependencyInjection
                     sp.GetRequiredService<IContentVersionOperationService>(),
                     sp.GetRequiredService<IContentMoveOperationService>(),
                     sp.GetRequiredService<IContentPublishOperationService>(),
-                    sp.GetRequiredService<ContentPermissionManager>()));
+                    sp.GetRequiredService<ContentPermissionManager>(),
+                    sp.GetRequiredService<ContentBlueprintManager>()));
             Services.AddUnique<IContentBlueprintEditingService, ContentBlueprintEditingService>();
             Services.AddUnique<IContentEditingService, ContentEditingService>();
             Services.AddUnique<IContentPublishingService, ContentPublishingService>();

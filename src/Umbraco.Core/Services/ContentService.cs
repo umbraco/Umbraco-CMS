@@ -71,6 +71,10 @@ public class ContentService : RepositoryService, IContentService
     private readonly ContentPermissionManager? _permissionManager;
     private readonly Lazy<ContentPermissionManager>? _permissionManagerLazy;
 
+    // Blueprint manager field (for Phase 7 extracted blueprint operations)
+    private readonly ContentBlueprintManager? _blueprintManager;
+    private readonly Lazy<ContentBlueprintManager>? _blueprintManagerLazy;
+
     /// <summary>
     /// Gets the query operation service.
     /// </summary>
@@ -111,6 +115,14 @@ public class ContentService : RepositoryService, IContentService
         _permissionManager ?? _permissionManagerLazy?.Value
         ?? throw new InvalidOperationException("PermissionManager not initialized. Ensure the manager is properly injected via constructor.");
 
+    /// <summary>
+    /// Gets the blueprint manager.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">Thrown if the manager was not properly initialized.</exception>
+    private ContentBlueprintManager BlueprintManager =>
+        _blueprintManager ?? _blueprintManagerLazy?.Value
+        ?? throw new InvalidOperationException("BlueprintManager not initialized. Ensure the manager is properly injected via constructor.");
+
     #region Constructors
 
     [Microsoft.Extensions.DependencyInjection.ActivatorUtilitiesConstructor]
@@ -137,7 +149,8 @@ public class ContentService : RepositoryService, IContentService
         IContentVersionOperationService versionOperationService,  // NEW PARAMETER - Phase 3 version operations
         IContentMoveOperationService moveOperationService,  // NEW PARAMETER - Phase 4 move operations
         IContentPublishOperationService publishOperationService,  // NEW PARAMETER - Phase 5 publish operations
-        ContentPermissionManager permissionManager)  // NEW PARAMETER - Phase 6 permission operations
+        ContentPermissionManager permissionManager,  // NEW PARAMETER - Phase 6 permission operations
+        ContentBlueprintManager blueprintManager)  // NEW PARAMETER - Phase 7 blueprint operations
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _documentRepository = documentRepository;
@@ -187,6 +200,11 @@ public class ContentService : RepositoryService, IContentService
         ArgumentNullException.ThrowIfNull(permissionManager);
         _permissionManager = permissionManager;
         _permissionManagerLazy = null;  // Not needed when directly injected
+
+        // Phase 7: Blueprint manager (direct injection)
+        ArgumentNullException.ThrowIfNull(blueprintManager);
+        _blueprintManager = blueprintManager;
+        _blueprintManagerLazy = null;  // Not needed when directly injected
     }
 
     [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
@@ -263,6 +281,11 @@ public class ContentService : RepositoryService, IContentService
         _permissionManagerLazy = new Lazy<ContentPermissionManager>(() =>
             StaticServiceProvider.Instance.GetRequiredService<ContentPermissionManager>(),
             LazyThreadSafetyMode.ExecutionAndPublication);
+
+        // Phase 7: Lazy resolution of ContentBlueprintManager
+        _blueprintManagerLazy = new Lazy<ContentBlueprintManager>(() =>
+            StaticServiceProvider.Instance.GetRequiredService<ContentBlueprintManager>(),
+            LazyThreadSafetyMode.ExecutionAndPublication);
     }
 
     [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
@@ -337,6 +360,11 @@ public class ContentService : RepositoryService, IContentService
         // Phase 6: Lazy resolution of ContentPermissionManager
         _permissionManagerLazy = new Lazy<ContentPermissionManager>(() =>
             StaticServiceProvider.Instance.GetRequiredService<ContentPermissionManager>(),
+            LazyThreadSafetyMode.ExecutionAndPublication);
+
+        // Phase 7: Lazy resolution of ContentBlueprintManager
+        _blueprintManagerLazy = new Lazy<ContentBlueprintManager>(() =>
+            StaticServiceProvider.Instance.GetRequiredService<ContentBlueprintManager>(),
             LazyThreadSafetyMode.ExecutionAndPublication);
     }
 
