@@ -1,7 +1,7 @@
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 
-namespace Umbraco.Cms.Core.Services;
+namespace Umbraco.Cms.Tests.Common.Factories;
 
 public interface IContentEditingModelFactory
 {
