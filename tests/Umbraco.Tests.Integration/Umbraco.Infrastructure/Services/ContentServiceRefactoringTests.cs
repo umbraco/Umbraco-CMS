@@ -932,6 +932,111 @@ internal sealed class ContentServiceRefactoringTests : UmbracoIntegrationTestWit
 
     #endregion
 
+    #region Phase 7 - Blueprint Manager Tests
+
+    /// <summary>
+    /// Phase 7 Test: Verifies ContentBlueprintManager is registered and resolvable from DI.
+    /// </summary>
+    [Test]
+    public void ContentBlueprintManager_CanBeResolvedFromDI()
+    {
+        // Act
+        var blueprintManager = GetRequiredService<ContentBlueprintManager>();
+
+        // Assert
+        Assert.That(blueprintManager, Is.Not.Null);
+        Assert.That(blueprintManager, Is.InstanceOf<ContentBlueprintManager>());
+    }
+
+    /// <summary>
+    /// Phase 7 Test: Verifies ContentBlueprintManager can be used directly without going through ContentService.
+    /// This validates the manager is independently functional (v2.0: added per critical review).
+    /// </summary>
+    [Test]
+    public void ContentBlueprintManager_CanBeUsedDirectly()
+    {
+        // Arrange
+        var blueprintManager = GetRequiredService<ContentBlueprintManager>();
+        var blueprint = ContentBuilder.CreateSimpleContent(ContentType, "DirectManagerBlueprint", -1);
+
+        // Act - Use manager directly, not through ContentService
+        blueprintManager.SaveBlueprint(blueprint, null, Constants.Security.SuperUserId);
+
+        // Assert
+        Assert.That(blueprint.Blueprint, Is.True, "Content should be marked as blueprint");
+        Assert.That(blueprint.HasIdentity, Is.True, "Blueprint should have been saved");
+
+        // Retrieve directly through manager
+        var retrieved = blueprintManager.GetBlueprintById(blueprint.Id);
+        Assert.That(retrieved, Is.Not.Null, "Blueprint should be retrievable via manager");
+        Assert.That(retrieved!.Name, Is.EqualTo("DirectManagerBlueprint"));
+    }
+
+    /// <summary>
+    /// Phase 7 Test: Verifies blueprint operations work via ContentService after delegation.
+    /// </summary>
+    [Test]
+    public void SaveBlueprint_ViaContentService_DelegatesToBlueprintManager()
+    {
+        // Arrange
+        var blueprint = ContentBuilder.CreateSimpleContent(ContentType, "TestBlueprint", -1);
+
+        // Act - This should delegate to ContentBlueprintManager
+        ContentService.SaveBlueprint(blueprint);
+
+        // Assert - Verify it was saved as a blueprint
+        Assert.That(blueprint.Blueprint, Is.True, "Content should be marked as blueprint");
+        Assert.That(blueprint.HasIdentity, Is.True, "Blueprint should have been saved");
+
+        // Retrieve and verify
+        var retrieved = ContentService.GetBlueprintById(blueprint.Id);
+        Assert.That(retrieved, Is.Not.Null, "Blueprint should be retrievable");
+        Assert.That(retrieved!.Blueprint, Is.True, "Retrieved content should be marked as blueprint");
+        Assert.That(retrieved.Name, Is.EqualTo("TestBlueprint"));
+    }
+
+    /// <summary>
+    /// Phase 7 Test: Verifies DeleteBlueprint works via ContentService.
+    /// </summary>
+    [Test]
+    public void DeleteBlueprint_ViaContentService_DelegatesToBlueprintManager()
+    {
+        // Arrange
+        var blueprint = ContentBuilder.CreateSimpleContent(ContentType, "BlueprintToDelete", -1);
+        ContentService.SaveBlueprint(blueprint);
+        var blueprintId = blueprint.Id;
+
+        Assert.That(ContentService.GetBlueprintById(blueprintId), Is.Not.Null, "Blueprint should exist before delete");
+
+        // Act
+        ContentService.DeleteBlueprint(blueprint);
+
+        // Assert
+        Assert.That(ContentService.GetBlueprintById(blueprintId), Is.Null, "Blueprint should be deleted");
+    }
+
+    /// <summary>
+    /// Phase 7 Test: Verifies GetBlueprintsForContentTypes works via ContentService.
+    /// </summary>
+    [Test]
+    public void GetBlueprintsForContentTypes_ViaContentService_DelegatesToBlueprintManager()
+    {
+        // Arrange
+        var blueprint1 = ContentBuilder.CreateSimpleContent(ContentType, "Blueprint1", -1);
+        var blueprint2 = ContentBuilder.CreateSimpleContent(ContentType, "Blueprint2", -1);
+        ContentService.SaveBlueprint(blueprint1);
+        ContentService.SaveBlueprint(blueprint2);
+
+        // Act
+        var blueprints = ContentService.GetBlueprintsForContentTypes(ContentType.Id).ToList();
+
+        // Assert
+        Assert.That(blueprints.Count, Is.GreaterThanOrEqualTo(2), "Should find at least 2 blueprints");
+        Assert.That(blueprints.All(b => b.Blueprint), Is.True, "All returned items should be blueprints");
+    }
+
+    #endregion
+
     /// <summary>
     /// Notification handler that tracks the order of notifications for test verification.
     /// </summary>
