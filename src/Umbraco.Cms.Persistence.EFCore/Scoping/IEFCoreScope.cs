@@ -16,7 +16,7 @@ public interface IEfCoreScope<TDbContext> : ICoreScope
     /// <summary>
     ///     Gets or sets the scope context.
     /// </summary>
-    public IScopeContext? ScopeContext { get; set; }
+    IScopeContext? ScopeContext { get; set; }
 
     /// <summary>
     /// Executes the given function on the database.
