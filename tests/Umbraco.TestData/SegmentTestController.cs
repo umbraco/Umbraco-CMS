@@ -111,7 +111,11 @@ public class SegmentTestController : SurfaceController
 
         ct.SetVariesBy(ContentVariation.Segment, false);
 
-        await Services.ContentTypeService.UpdateAsync(ct, Constants.Security.SuperUserKey);
+        var result = await Services.ContentTypeService.UpdateAsync(ct, Constants.Security.SuperUserKey);
+        if (result.Success is false)
+        {
+            return Content($"Failed to disable segments on document type {alias}: {result.Status}");
+        }
         return Content($"The document type {alias} no longer allows segments");
     }
 
