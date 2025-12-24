@@ -13,11 +13,11 @@ namespace Umbraco.Cms.Core.Services;
 /// </summary>
 /// <remarks>
 /// <para>
-/// This is an internal class that encapsulates permission operations extracted from ContentService
+/// This class encapsulates permission operations extracted from ContentService
 /// as part of the ContentService refactoring initiative (Phase 6).
 /// </para>
 /// <para>
-/// <strong>Design Decision:</strong> This class is internal (not public interface) because:
+/// <strong>Design Decision:</strong> This class is public for DI but not intended for direct external use:
 /// <list type="bullet">
 ///   <item><description>Permission operations are tightly coupled to content entities</description></item>
 ///   <item><description>They don't require independent testability beyond ContentService tests</description></item>
@@ -29,7 +29,7 @@ namespace Umbraco.Cms.Core.Services;
 /// materialized collection (not deferred), so scope disposal before enumeration is safe.
 /// </para>
 /// </remarks>
-internal sealed class ContentPermissionManager
+public sealed class ContentPermissionManager
 {
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly IDocumentRepository _documentRepository;

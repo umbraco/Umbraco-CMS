@@ -67,6 +67,10 @@ public class ContentService : RepositoryService, IContentService
     private readonly IContentPublishOperationService? _publishOperationService;
     private readonly Lazy<IContentPublishOperationService>? _publishOperationServiceLazy;
 
+    // Permission manager field (for Phase 6 extracted permission operations)
+    private readonly ContentPermissionManager? _permissionManager;
+    private readonly Lazy<ContentPermissionManager>? _permissionManagerLazy;
+
     /// <summary>
     /// Gets the query operation service.
     /// </summary>
@@ -99,6 +103,14 @@ public class ContentService : RepositoryService, IContentService
         _publishOperationService ?? _publishOperationServiceLazy?.Value
         ?? throw new InvalidOperationException("PublishOperationService not initialized. Ensure the service is properly injected via constructor.");
 
+    /// <summary>
+    /// Gets the permission manager.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">Thrown if the manager was not properly initialized.</exception>
+    private ContentPermissionManager PermissionManager =>
+        _permissionManager ?? _permissionManagerLazy?.Value
+        ?? throw new InvalidOperationException("PermissionManager not initialized. Ensure the manager is properly injected via constructor.");
+
     #region Constructors
 
     [Microsoft.Extensions.DependencyInjection.ActivatorUtilitiesConstructor]
@@ -124,7 +136,8 @@ public class ContentService : RepositoryService, IContentService
         IContentQueryOperationService queryOperationService,  // NEW PARAMETER - Phase 2 query operations
         IContentVersionOperationService versionOperationService,  // NEW PARAMETER - Phase 3 version operations
         IContentMoveOperationService moveOperationService,  // NEW PARAMETER - Phase 4 move operations
-        IContentPublishOperationService publishOperationService)  // NEW PARAMETER - Phase 5 publish operations
+        IContentPublishOperationService publishOperationService,  // NEW PARAMETER - Phase 5 publish operations
+        ContentPermissionManager permissionManager)  // NEW PARAMETER - Phase 6 permission operations
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _documentRepository = documentRepository;
@@ -169,6 +182,11 @@ public class ContentService : RepositoryService, IContentService
         ArgumentNullException.ThrowIfNull(publishOperationService);
         _publishOperationService = publishOperationService;
         _publishOperationServiceLazy = null;  // Not needed when directly injected
+
+        // Phase 6: Permission manager (direct injection)
+        ArgumentNullException.ThrowIfNull(permissionManager);
+        _permissionManager = permissionManager;
+        _permissionManagerLazy = null;  // Not needed when directly injected
     }
 
     [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
@@ -240,6 +258,11 @@ public class ContentService : RepositoryService, IContentService
         _publishOperationServiceLazy = new Lazy<IContentPublishOperationService>(() =>
             StaticServiceProvider.Instance.GetRequiredService<IContentPublishOperationService>(),
             LazyThreadSafetyMode.ExecutionAndPublication);
+
+        // Phase 6: Lazy resolution of ContentPermissionManager
+        _permissionManagerLazy = new Lazy<ContentPermissionManager>(() =>
+            StaticServiceProvider.Instance.GetRequiredService<ContentPermissionManager>(),
+            LazyThreadSafetyMode.ExecutionAndPublication);
     }
 
     [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
@@ -309,6 +332,11 @@ public class ContentService : RepositoryService, IContentService
         // Phase 5: Lazy resolution of IContentPublishOperationService
         _publishOperationServiceLazy = new Lazy<IContentPublishOperationService>(() =>
             StaticServiceProvider.Instance.GetRequiredService<IContentPublishOperationService>(),
+            LazyThreadSafetyMode.ExecutionAndPublication);
+
+        // Phase 6: Lazy resolution of ContentPermissionManager
+        _permissionManagerLazy = new Lazy<ContentPermissionManager>(() =>
+            StaticServiceProvider.Instance.GetRequiredService<ContentPermissionManager>(),
             LazyThreadSafetyMode.ExecutionAndPublication);
     }
 
