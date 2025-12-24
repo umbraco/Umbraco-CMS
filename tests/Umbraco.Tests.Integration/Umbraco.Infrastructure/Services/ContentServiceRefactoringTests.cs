@@ -888,6 +888,49 @@ internal sealed class ContentServiceRefactoringTests : UmbracoIntegrationTestWit
 
     #endregion
 
+    #region Phase 6 - Permission Manager Tests
+
+    /// <summary>
+    /// Phase 6 Test: Verifies ContentPermissionManager is registered and resolvable from DI.
+    /// </summary>
+    [Test]
+    public void ContentPermissionManager_CanBeResolvedFromDI()
+    {
+        // Act
+        var permissionManager = GetRequiredService<ContentPermissionManager>();
+
+        // Assert
+        Assert.That(permissionManager, Is.Not.Null);
+        Assert.That(permissionManager, Is.InstanceOf<ContentPermissionManager>());
+    }
+
+    /// <summary>
+    /// Phase 6 Test: Verifies permission operations work via ContentService after delegation.
+    /// </summary>
+    [Test]
+    public async Task SetPermission_ViaContentService_DelegatesToPermissionManager()
+    {
+        // Arrange
+        var content = ContentBuilder.CreateSimpleContent(ContentType, "PermissionDelegationTest", -1);
+        ContentService.Save(content);
+
+        var adminGroup = await UserGroupService.GetAsync(Constants.Security.AdminGroupAlias);
+        Assert.That(adminGroup, Is.Not.Null, "Admin group should exist");
+
+        // Act - This should delegate to ContentPermissionManager
+        ContentService.SetPermission(content, "F", new[] { adminGroup!.Id });
+
+        // Assert - Verify it worked (via GetPermissions which also delegates)
+        var permissions = ContentService.GetPermissions(content);
+        var adminPermissions = permissions.FirstOrDefault(p => p.UserGroupId == adminGroup.Id);
+
+        Assert.That(adminPermissions, Is.Not.Null, "Should have permissions for admin group");
+        Assert.That(adminPermissions!.AssignedPermissions, Does.Contain("F"),
+            "Admin group should have Browse permission");
+    }
+
+    #endregion
+
     /// <summary>
     /// Notification handler that tracks the order of notifications for test verification.
     /// </summary>
