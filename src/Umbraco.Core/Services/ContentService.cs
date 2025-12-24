@@ -53,75 +53,39 @@ public class ContentService : RepositoryService, IContentService
 
     // Query operation service fields (for Phase 2 extracted query operations)
     private readonly IContentQueryOperationService? _queryOperationService;
-    private readonly Lazy<IContentQueryOperationService>? _queryOperationServiceLazy;
 
     // Version operation service fields (for Phase 3 extracted version operations)
     private readonly IContentVersionOperationService? _versionOperationService;
-    private readonly Lazy<IContentVersionOperationService>? _versionOperationServiceLazy;
 
     // Move operation service fields (for Phase 4 extracted move operations)
     private readonly IContentMoveOperationService? _moveOperationService;
-    private readonly Lazy<IContentMoveOperationService>? _moveOperationServiceLazy;
 
     // Publish operation service fields (for Phase 5 extracted publish operations)
     private readonly IContentPublishOperationService? _publishOperationService;
-    private readonly Lazy<IContentPublishOperationService>? _publishOperationServiceLazy;
 
     // Permission manager field (for Phase 6 extracted permission operations)
     private readonly ContentPermissionManager? _permissionManager;
-    private readonly Lazy<ContentPermissionManager>? _permissionManagerLazy;
 
     // Blueprint manager field (for Phase 7 extracted blueprint operations)
     private readonly ContentBlueprintManager? _blueprintManager;
-    private readonly Lazy<ContentBlueprintManager>? _blueprintManagerLazy;
 
-    /// <summary>
-    /// Gets the query operation service.
-    /// </summary>
-    /// <exception cref="InvalidOperationException">Thrown if the service was not properly initialized.</exception>
     private IContentQueryOperationService QueryOperationService =>
-        _queryOperationService ?? _queryOperationServiceLazy?.Value
-        ?? throw new InvalidOperationException("QueryOperationService not initialized. Ensure the service is properly injected via constructor.");
+        _queryOperationService ?? throw new InvalidOperationException("QueryOperationService not initialized.");
 
-    /// <summary>
-    /// Gets the version operation service.
-    /// </summary>
-    /// <exception cref="InvalidOperationException">Thrown if the service was not properly initialized.</exception>
     private IContentVersionOperationService VersionOperationService =>
-        _versionOperationService ?? _versionOperationServiceLazy?.Value
-        ?? throw new InvalidOperationException("VersionOperationService not initialized. Ensure the service is properly injected via constructor.");
+        _versionOperationService ?? throw new InvalidOperationException("VersionOperationService not initialized.");
 
-    /// <summary>
-    /// Gets the move operation service.
-    /// </summary>
-    /// <exception cref="InvalidOperationException">Thrown if the service was not properly initialized.</exception>
     private IContentMoveOperationService MoveOperationService =>
-        _moveOperationService ?? _moveOperationServiceLazy?.Value
-        ?? throw new InvalidOperationException("MoveOperationService not initialized. Ensure the service is properly injected via constructor.");
+        _moveOperationService ?? throw new InvalidOperationException("MoveOperationService not initialized.");
 
-    /// <summary>
-    /// Gets the publish operation service.
-    /// </summary>
-    /// <exception cref="InvalidOperationException">Thrown if the service was not properly initialized.</exception>
     private IContentPublishOperationService PublishOperationService =>
-        _publishOperationService ?? _publishOperationServiceLazy?.Value
-        ?? throw new InvalidOperationException("PublishOperationService not initialized. Ensure the service is properly injected via constructor.");
+        _publishOperationService ?? throw new InvalidOperationException("PublishOperationService not initialized.");
 
-    /// <summary>
-    /// Gets the permission manager.
-    /// </summary>
-    /// <exception cref="InvalidOperationException">Thrown if the manager was not properly initialized.</exception>
     private ContentPermissionManager PermissionManager =>
-        _permissionManager ?? _permissionManagerLazy?.Value
-        ?? throw new InvalidOperationException("PermissionManager not initialized. Ensure the manager is properly injected via constructor.");
+        _permissionManager ?? throw new InvalidOperationException("PermissionManager not initialized.");
 
-    /// <summary>
-    /// Gets the blueprint manager.
-    /// </summary>
-    /// <exception cref="InvalidOperationException">Thrown if the manager was not properly initialized.</exception>
     private ContentBlueprintManager BlueprintManager =>
-        _blueprintManager ?? _blueprintManagerLazy?.Value
-        ?? throw new InvalidOperationException("BlueprintManager not initialized. Ensure the manager is properly injected via constructor.");
+        _blueprintManager ?? throw new InvalidOperationException("BlueprintManager not initialized.");
 
     #region Constructors
 
@@ -179,194 +143,28 @@ public class ContentService : RepositoryService, IContentService
         // Phase 2: Query operation service (direct injection)
         ArgumentNullException.ThrowIfNull(queryOperationService);
         _queryOperationService = queryOperationService;
-        _queryOperationServiceLazy = null;  // Not needed when directly injected
 
         // Phase 3: Version operation service (direct injection)
         ArgumentNullException.ThrowIfNull(versionOperationService);
         _versionOperationService = versionOperationService;
-        _versionOperationServiceLazy = null;  // Not needed when directly injected
 
         // Phase 4: Move operation service (direct injection)
         ArgumentNullException.ThrowIfNull(moveOperationService);
         _moveOperationService = moveOperationService;
-        _moveOperationServiceLazy = null;  // Not needed when directly injected
 
         // Phase 5: Publish operation service (direct injection)
         ArgumentNullException.ThrowIfNull(publishOperationService);
         _publishOperationService = publishOperationService;
-        _publishOperationServiceLazy = null;  // Not needed when directly injected
 
         // Phase 6: Permission manager (direct injection)
         ArgumentNullException.ThrowIfNull(permissionManager);
         _permissionManager = permissionManager;
-        _permissionManagerLazy = null;  // Not needed when directly injected
 
         // Phase 7: Blueprint manager (direct injection)
         ArgumentNullException.ThrowIfNull(blueprintManager);
         _blueprintManager = blueprintManager;
-        _blueprintManagerLazy = null;  // Not needed when directly injected
     }
 
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    public ContentService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IDocumentRepository documentRepository,
-        IEntityRepository entityRepository,
-        IAuditRepository auditRepository,  // Old parameter (kept for signature compatibility)
-        IContentTypeRepository contentTypeRepository,
-        IDocumentBlueprintRepository documentBlueprintRepository,
-        ILanguageRepository languageRepository,
-        Lazy<IPropertyValidationService> propertyValidationService,
-        IShortStringHelper shortStringHelper,
-        ICultureImpactFactory cultureImpactFactory,
-        IUserIdKeyResolver userIdKeyResolver,
-        PropertyEditorCollection propertyEditorCollection,
-        IIdKeyMap idKeyMap,
-        IOptionsMonitor<ContentSettings> optionsMonitor,
-        IRelationService relationService)
-        : base(provider, loggerFactory, eventMessagesFactory)
-    {
-        // All existing field assignments...
-        _documentRepository = documentRepository ?? throw new ArgumentNullException(nameof(documentRepository));
-        _entityRepository = entityRepository ?? throw new ArgumentNullException(nameof(entityRepository));
-        _contentTypeRepository = contentTypeRepository ?? throw new ArgumentNullException(nameof(contentTypeRepository));
-        _documentBlueprintRepository = documentBlueprintRepository ?? throw new ArgumentNullException(nameof(documentBlueprintRepository));
-        _languageRepository = languageRepository ?? throw new ArgumentNullException(nameof(languageRepository));
-        _propertyValidationService = propertyValidationService ?? throw new ArgumentNullException(nameof(propertyValidationService));
-        _shortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
-        _cultureImpactFactory = cultureImpactFactory ?? throw new ArgumentNullException(nameof(cultureImpactFactory));
-        _userIdKeyResolver = userIdKeyResolver ?? throw new ArgumentNullException(nameof(userIdKeyResolver));
-        _propertyEditorCollection = propertyEditorCollection ?? throw new ArgumentNullException(nameof(propertyEditorCollection));
-        _idKeyMap = idKeyMap ?? throw new ArgumentNullException(nameof(idKeyMap));
-        _contentSettings = optionsMonitor?.CurrentValue ?? throw new ArgumentNullException(nameof(optionsMonitor));
-        optionsMonitor.OnChange((contentSettings) =>
-        {
-            _contentSettings = contentSettings;
-        });
-        _relationService = relationService ?? throw new ArgumentNullException(nameof(relationService));
-        _logger = loggerFactory.CreateLogger<ContentService>();
-
-        // Lazy resolution of IAuditService (from StaticServiceProvider)
-        _auditService = StaticServiceProvider.Instance.GetRequiredService<IAuditService>();
-
-        // NEW: Lazy resolution of IContentCrudService
-        _crudServiceLazy = new Lazy<IContentCrudService>(() =>
-            StaticServiceProvider.Instance.GetRequiredService<IContentCrudService>(),
-            LazyThreadSafetyMode.ExecutionAndPublication);
-
-        // Phase 2: Lazy resolution of IContentQueryOperationService
-        _queryOperationServiceLazy = new Lazy<IContentQueryOperationService>(() =>
-            StaticServiceProvider.Instance.GetRequiredService<IContentQueryOperationService>(),
-            LazyThreadSafetyMode.ExecutionAndPublication);
-
-        // Phase 3: Lazy resolution of IContentVersionOperationService
-        _versionOperationServiceLazy = new Lazy<IContentVersionOperationService>(() =>
-            StaticServiceProvider.Instance.GetRequiredService<IContentVersionOperationService>(),
-            LazyThreadSafetyMode.ExecutionAndPublication);
-
-        // Phase 4: Lazy resolution of IContentMoveOperationService
-        _moveOperationServiceLazy = new Lazy<IContentMoveOperationService>(() =>
-            StaticServiceProvider.Instance.GetRequiredService<IContentMoveOperationService>(),
-            LazyThreadSafetyMode.ExecutionAndPublication);
-
-        // Phase 5: Lazy resolution of IContentPublishOperationService
-        _publishOperationServiceLazy = new Lazy<IContentPublishOperationService>(() =>
-            StaticServiceProvider.Instance.GetRequiredService<IContentPublishOperationService>(),
-            LazyThreadSafetyMode.ExecutionAndPublication);
-
-        // Phase 6: Lazy resolution of ContentPermissionManager
-        _permissionManagerLazy = new Lazy<ContentPermissionManager>(() =>
-            StaticServiceProvider.Instance.GetRequiredService<ContentPermissionManager>(),
-            LazyThreadSafetyMode.ExecutionAndPublication);
-
-        // Phase 7: Lazy resolution of ContentBlueprintManager
-        _blueprintManagerLazy = new Lazy<ContentBlueprintManager>(() =>
-            StaticServiceProvider.Instance.GetRequiredService<ContentBlueprintManager>(),
-            LazyThreadSafetyMode.ExecutionAndPublication);
-    }
-
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    public ContentService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IDocumentRepository documentRepository,
-        IEntityRepository entityRepository,
-        IAuditRepository auditRepository,  // Old parameter (kept for signature compatibility)
-        IAuditService auditService,
-        IContentTypeRepository contentTypeRepository,
-        IDocumentBlueprintRepository documentBlueprintRepository,
-        ILanguageRepository languageRepository,
-        Lazy<IPropertyValidationService> propertyValidationService,
-        IShortStringHelper shortStringHelper,
-        ICultureImpactFactory cultureImpactFactory,
-        IUserIdKeyResolver userIdKeyResolver,
-        PropertyEditorCollection propertyEditorCollection,
-        IIdKeyMap idKeyMap,
-        IOptionsMonitor<ContentSettings> optionsMonitor,
-        IRelationService relationService)
-        : base(provider, loggerFactory, eventMessagesFactory)
-    {
-        // All existing field assignments...
-        _documentRepository = documentRepository ?? throw new ArgumentNullException(nameof(documentRepository));
-        _entityRepository = entityRepository ?? throw new ArgumentNullException(nameof(entityRepository));
-        _auditService = auditService ?? throw new ArgumentNullException(nameof(auditService));
-        _contentTypeRepository = contentTypeRepository ?? throw new ArgumentNullException(nameof(contentTypeRepository));
-        _documentBlueprintRepository = documentBlueprintRepository ?? throw new ArgumentNullException(nameof(documentBlueprintRepository));
-        _languageRepository = languageRepository ?? throw new ArgumentNullException(nameof(languageRepository));
-        _propertyValidationService = propertyValidationService ?? throw new ArgumentNullException(nameof(propertyValidationService));
-        _shortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
-        _cultureImpactFactory = cultureImpactFactory ?? throw new ArgumentNullException(nameof(cultureImpactFactory));
-        _userIdKeyResolver = userIdKeyResolver ?? throw new ArgumentNullException(nameof(userIdKeyResolver));
-        _propertyEditorCollection = propertyEditorCollection ?? throw new ArgumentNullException(nameof(propertyEditorCollection));
-        _idKeyMap = idKeyMap ?? throw new ArgumentNullException(nameof(idKeyMap));
-        _contentSettings = optionsMonitor?.CurrentValue ?? throw new ArgumentNullException(nameof(optionsMonitor));
-        optionsMonitor.OnChange((contentSettings) =>
-        {
-            _contentSettings = contentSettings;
-        });
-        _relationService = relationService ?? throw new ArgumentNullException(nameof(relationService));
-        _logger = loggerFactory.CreateLogger<ContentService>();
-
-        // NEW: Lazy resolution of IContentCrudService
-        _crudServiceLazy = new Lazy<IContentCrudService>(() =>
-            StaticServiceProvider.Instance.GetRequiredService<IContentCrudService>(),
-            LazyThreadSafetyMode.ExecutionAndPublication);
-
-        // Phase 2: Lazy resolution of IContentQueryOperationService
-        _queryOperationServiceLazy = new Lazy<IContentQueryOperationService>(() =>
-            StaticServiceProvider.Instance.GetRequiredService<IContentQueryOperationService>(),
-            LazyThreadSafetyMode.ExecutionAndPublication);
-
-        // Phase 3: Lazy resolution of IContentVersionOperationService
-        _versionOperationServiceLazy = new Lazy<IContentVersionOperationService>(() =>
-            StaticServiceProvider.Instance.GetRequiredService<IContentVersionOperationService>(),
-            LazyThreadSafetyMode.ExecutionAndPublication);
-
-        // Phase 4: Lazy resolution of IContentMoveOperationService
-        _moveOperationServiceLazy = new Lazy<IContentMoveOperationService>(() =>
-            StaticServiceProvider.Instance.GetRequiredService<IContentMoveOperationService>(),
-            LazyThreadSafetyMode.ExecutionAndPublication);
-
-        // Phase 5: Lazy resolution of IContentPublishOperationService
-        _publishOperationServiceLazy = new Lazy<IContentPublishOperationService>(() =>
-            StaticServiceProvider.Instance.GetRequiredService<IContentPublishOperationService>(),
-            LazyThreadSafetyMode.ExecutionAndPublication);
-
-        // Phase 6: Lazy resolution of ContentPermissionManager
-        _permissionManagerLazy = new Lazy<ContentPermissionManager>(() =>
-            StaticServiceProvider.Instance.GetRequiredService<ContentPermissionManager>(),
-            LazyThreadSafetyMode.ExecutionAndPublication);
-
-        // Phase 7: Lazy resolution of ContentBlueprintManager
-        _blueprintManagerLazy = new Lazy<ContentBlueprintManager>(() =>
-            StaticServiceProvider.Instance.GetRequiredService<ContentBlueprintManager>(),
-            LazyThreadSafetyMode.ExecutionAndPublication);
-    }
 
     #endregion
 
