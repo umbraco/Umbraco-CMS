@@ -305,6 +305,8 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IContentPublishOperationService, ContentPublishOperationService>();
             // Phase 6: Internal permission manager (AddScoped, not AddUnique, because it's internal without interface)
             Services.AddScoped<ContentPermissionManager>();
+            // Phase 7: Internal blueprint manager (AddScoped, not AddUnique, because it's internal without interface)
+            Services.AddScoped<ContentBlueprintManager>();
             Services.AddUnique<IContentService>(sp =>
                 new ContentService(
                     sp.GetRequiredService<ICoreScopeProvider>(),
