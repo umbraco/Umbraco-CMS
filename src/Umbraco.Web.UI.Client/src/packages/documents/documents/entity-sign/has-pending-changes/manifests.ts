@@ -8,6 +8,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Has Pending Changes Document Entity Sign',
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		forEntityFlags: ['Umb.PendingChanges'],
-		meta: { iconName: 'icon-edit', label: 'Unpublished changes' },
+		meta: { iconName: 'icon-edit', label: '#content_unpublishedChanges' },
 	},
 ];
