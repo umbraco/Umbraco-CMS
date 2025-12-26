@@ -141,7 +141,6 @@ export class UmbCurrentUserRepository extends UmbRepositoryBase {
 		} else {
 			const notification = { data: { message: error.message ?? 'Unknown failure' } };
 			this.notificationContext?.peek('danger', notification);
-			return { data: new ReadableStream() };
 		}
 
 		return { data, error };
