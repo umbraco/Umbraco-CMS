@@ -13,11 +13,11 @@ Full documentation and details of the refactoring can be found in docs/plans
 
 # Utf8ToAsciiConverter Refactoring - Final Report
 
-**Date:** 2025-12-13
-**Branch:** `refactor/Utf8ToAsciiConverter`
-**Baseline:** Original 3,631-line switch statement implementation
-**Final:** SIMD-optimized with FrozenDictionary and JSON mappings
-**Runtime:** .NET 10.0
+- **Date:** 2025-12-13
+- **Branch:** `refactor/Utf8ToAsciiConverter`
+- **Baseline:** Original 3,631-line switch statement implementation
+- **Final:** SIMD-optimized with FrozenDictionary and JSON mappings
+- **Runtime:** .NET 10.0
 
 ---
 
