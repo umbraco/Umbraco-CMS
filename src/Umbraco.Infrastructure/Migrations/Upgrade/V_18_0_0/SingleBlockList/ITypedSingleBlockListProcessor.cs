@@ -19,8 +19,11 @@ public interface ITypedSingleBlockListProcessor
     public IEnumerable<string> PropertyEditorAliases { get; }
 
     /// <summary>
-    /// <para><c>object?</c>: the editorValue being processed.</para>
-    /// <para><c>Func&lt;object?, bool&gt;</c>: the function that will be called when nested content is detected.</para>
+    /// Gets the function that processes property editor values during migration and detects nested content structures.
+    /// <para><c>object?</c>: the editor value being processed.</para>
+    /// <para><c>Func&lt;object?, bool&gt;</c>: the callback that is invoked when nested content is detected in a processed value.</para>
+    /// <para><c>Func&lt;BlockListValue, object&gt;</c>: the function used to convert a <see cref="BlockListValue"/> into the nested content value passed to the callback.</para>
+    /// <para><c>bool</c>: returns <see langword="true"/> if the value was successfully processed and any nested content was handled; otherwise, <see langword="false"/>.</para>
     /// </summary>
     public Func<object?, Func<object?, bool>, Func<BlockListValue, object>, bool> Process { get; }
 }
