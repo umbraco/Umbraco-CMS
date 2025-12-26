@@ -2125,7 +2125,7 @@ public static class PublishedContentExtensions
     public static IEnumerable<IPublishedContent> Breadcrumbs<T>(
         this IPublishedContent content,
         bool andSelf = true)
-        where T : class, IPublishedContent=>
+        where T : class, IPublishedContent =>
         content.Breadcrumbs<T>(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), andSelf);
 
     /// <summary>
