@@ -3,7 +3,17 @@ import { UmbBlockListEntriesContext } from '../../context/block-list-entries.con
 import type { UmbBlockListLayoutModel, UmbBlockListValueModel } from '../../types.js';
 import type { UmbBlockListEntryElement } from '../../components/block-list-entry/index.js';
 import { UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS } from './constants.js';
-import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement, umbDestroyOnDisconnect } from '@umbraco-cms/backoffice/lit-element';
+import {
+	html,
+	customElement,
+	property,
+	state,
+	repeat,
+	css,
+	nothing,
+	ifDefined,
+} from '@umbraco-cms/backoffice/external/lit';
 import { debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
 import {
 	extractJsonQueryProps,
@@ -12,7 +22,6 @@ import {
 	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
 } from '@umbraco-cms/backoffice/validation';
 import { jsonStringComparison, observeMultiple } from '@umbraco-cms/backoffice/observable-api';
-import { umbDestroyOnDisconnect, UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UMB_CONTENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
@@ -96,8 +105,8 @@ export class UmbPropertyEditorUIBlockListElement
 		const blocks = config.getValueByAlias<Array<UmbBlockTypeBaseModel>>('blocks') ?? [];
 		this.#managerContext.setBlockTypes(blocks);
 
-		const useInlineEditingAsDefault = config.getValueByAlias<boolean>('useInlineEditingAsDefault');
-		this.#managerContext.setInlineEditingMode(useInlineEditingAsDefault);
+		this._useInlineEditingAsDefault = config.getValueByAlias<boolean>('useInlineEditingAsDefault');
+		this.#managerContext.setInlineEditingMode(this._useInlineEditingAsDefault);
 		this.style.maxWidth = config.getValueByAlias<string>('maxPropertyWidth') ?? '';
 
 		this.#managerContext.setEditorConfiguration(config);
@@ -164,6 +173,9 @@ export class UmbPropertyEditorUIBlockListElement
 
 	@state()
 	private _isSortMode = false;
+
+	@state()
+	private _useInlineEditingAsDefault?: boolean;
 
 	constructor() {
 		super();
@@ -418,21 +430,43 @@ export class UmbPropertyEditorUIBlockListElement
 		`;
 	}
 
-	#renderCreateButton() {
-		let createPath: string | undefined;
+	#getPathForCreateBlock(index: number): string | undefined {
 		if (this._blocks?.length === 1) {
 			const elementKey = this._blocks[0].contentElementTypeKey;
-			createPath =
-				this._catalogueRouteBuilder?.({ view: 'create', index: -1 }) + 'modal/umb-modal-workspace/create/' + elementKey;
+			if (this._useInlineEditingAsDefault) {
+				return undefined;
+			} else {
+				return (
+					this._catalogueRouteBuilder?.({ view: 'create', index: index }) +
+					'modal/umb-modal-workspace/create/' +
+					elementKey
+				);
+			}
 		} else {
-			createPath = this._catalogueRouteBuilder?.({ view: 'create', index: -1 });
+			return this._catalogueRouteBuilder?.({ view: 'create', index: index });
 		}
+	}
+
+	#renderCreateButton() {
+		if (!this._catalogueRouteBuilder) return nothing;
+		const createPath = this.#getPathForCreateBlock(-1);
 		return html`
 			<uui-button
 				look="placeholder"
-				label=${this._createButtonLabel}
-				href=${createPath ?? ''}
-				?disabled=${this.readonly}></uui-button>
+				.label=${this._createButtonLabel}
+				href=${ifDefined(createPath)}
+				?disabled=${this.readonly}
+				@click=${async () => {
+					if (this._blocks?.length === 1 && this._useInlineEditingAsDefault) {
+						const originData = { index: -1 };
+						const created = await this.#entriesContext.create(this._blocks[0].contentElementTypeKey, {}, originData);
+						if (created) {
+							this.#entriesContext.insert(created.layout, created.content, created.settings, originData);
+						} else {
+							throw new Error('Failed to create block');
+						}
+					}
+				}}></uui-button>
 		`;
 	}
 
