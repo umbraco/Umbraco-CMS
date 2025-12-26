@@ -196,6 +196,14 @@ Copyright: 2013-2024 .NET Foundation and Contributors
 
 ---
 
+Markdig: A fast, powerful, CommonMark compliant, extensible Markdown processor for .NET
+
+URL: https://github.com/xoofx/markdig
+License: BSD-2-Clause license
+Copyright: 2018+, Alexandre Mutel. All rights reserved.
+
+---
+
 Markdown: A library for parsing and compiling Markdown
 
 URL: https://github.com/hey-red/Markdown
