@@ -34,7 +34,7 @@ public class ContentImagingSettings
     public ISet<string> ImageFileTypes { get; set; } = new HashSet<string>(StaticImageFileTypes.Split(Constants.CharArrays.Comma));
 
     /// <summary>
-    ///     Gets or sets a value for the imaging autofill following media file upload fields.
+    ///     Gets or sets the collection of media property mappings that are automatically populated with image metadata after a media file is uploaded.
     /// </summary>
     public ISet<ImagingAutoFillUploadField> AutoFillImageProperties { get; set; } = _defaultImagingAutoFillUploadField;
 }
