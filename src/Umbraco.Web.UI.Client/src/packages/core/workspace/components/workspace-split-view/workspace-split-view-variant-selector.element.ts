@@ -709,6 +709,10 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 				padding-left: var(--uui-size-space-3);
 			}
 
+			.culture-variant > .switch-button.add-mode {
+				padding-left: var(--uui-size-space-3);
+			}
+
 			.segment-variant > .switch-button {
 				padding-left: var(--uui-size-space-6);
 			}
