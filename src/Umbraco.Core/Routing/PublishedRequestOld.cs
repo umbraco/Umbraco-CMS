@@ -15,9 +15,6 @@ public class PublishedRequestOld // : IPublishedRequest
     private CultureInfo? _culture;
     private DomainAndUri? _domain;
     private bool _is404;
-    private IPublishedContent? _publishedContent;
-
-    private bool _readonly; // after prepared
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="PublishedRequest" /> class.
@@ -103,12 +100,9 @@ public class PublishedRequestOld // : IPublishedRequest
     }
 
     // utility for ensuring it is ok to set some properties
+    // Note: _readonly field removed as it was never set to true (legacy code)
     public void EnsureWriteable()
     {
-        if (_readonly)
-        {
-            throw new InvalidOperationException("Cannot modify a PublishedRequest once it is read-only.");
-        }
     }
 
     // #region Events
@@ -226,18 +220,19 @@ public class PublishedRequestOld // : IPublishedRequest
     /// <summary>
     ///     Gets value indicating whether the current published content is the initial one.
     /// </summary>
-    public bool IsInitialPublishedContent =>
-        InitialPublishedContent != null && InitialPublishedContent == _publishedContent;
+    /// <remarks>Always returns false as _publishedContent field was removed (never assigned).</remarks>
+    public bool IsInitialPublishedContent => false;
 
     /// <summary>
     ///     Indicates that the current PublishedContent is the initial one.
     /// </summary>
+    /// <remarks>Note: _publishedContent field was removed (never assigned), so this sets InitialPublishedContent to null.</remarks>
     public void SetIsInitialPublishedContent()
     {
         EnsureWriteable();
 
         // note: it can very well be null if the initial content was not found
-        InitialPublishedContent = _publishedContent;
+        InitialPublishedContent = null;
         IsInternalRedirectPublishedContent = false;
     }
 

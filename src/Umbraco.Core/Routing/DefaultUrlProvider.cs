@@ -20,7 +20,6 @@ namespace Umbraco.Cms.Core.Routing;
 public class DefaultUrlProvider : IUrlProvider
 {
     private readonly ILocalizationService _localizationService;
-    private readonly ILocalizedTextService? _localizedTextService;
     private readonly ILogger<DefaultUrlProvider> _logger;
     private readonly ISiteDomainMapper _siteDomainMapper;
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;

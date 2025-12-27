@@ -9,8 +9,6 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 [DataContract]
 public class ConfigurationField
 {
-    private readonly string? _view;
-
     /// <summary>
     ///     Initializes a new instance of the <see cref="ConfigurationField" /> class.
     /// </summary>

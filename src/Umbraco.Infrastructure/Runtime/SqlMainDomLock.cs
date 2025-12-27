@@ -20,7 +20,6 @@ public class SqlMainDomLock : IMainDomLock
     private const string MainDomKeyPrefix = "Umbraco.Core.Runtime.SqlMainDom";
     private const string UpdatedSuffix = "_updated";
     private readonly CancellationTokenSource _cancellationTokenSource = new();
-    private readonly IUmbracoDatabase? _db;
     private readonly UmbracoDatabaseFactory _dbFactory;
     private readonly IOptions<GlobalSettings> _globalSettings;
     private readonly Lock _locker = new();
