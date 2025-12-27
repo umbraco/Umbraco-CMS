@@ -20,6 +20,7 @@ public class ConfigurationField
     /// <summary>
     ///     Initializes a new instance of the <see cref="ConfigurationField" /> class.
     /// </summary>
+    /// <param name="validators">The validators for this configuration field.</param>
     public ConfigurationField(params IValueValidator[] validators)
         : this(validators.ToList())
     {

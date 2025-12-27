@@ -7,7 +7,19 @@ using Umbraco.Cms.Core.Web;
 
 namespace Umbraco.Cms.Core.Routing;
 
-// TODO: Kill this, but we need to port all of it's functionality
+/// <summary>
+///     Represents a legacy published content request.
+/// </summary>
+/// <remarks>
+///     <para>
+///         This class is deprecated and scheduled for removal. Its functionality is being
+///         migrated to the newer <see cref="IPublishedRequest"/> implementations.
+///     </para>
+///     <para>
+///         TODO: Kill this, but we need to port all of its functionality.
+///     </para>
+/// </remarks>
+[Obsolete("This class is deprecated and will be removed in a future version. Use IPublishedRequest instead.")]
 public class PublishedRequestOld // : IPublishedRequest
 {
     private readonly IPublishedRouter _publishedRouter;
@@ -17,8 +29,12 @@ public class PublishedRequestOld // : IPublishedRequest
     private bool _is404;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="PublishedRequest" /> class.
+    ///     Initializes a new instance of the <see cref="PublishedRequestOld" /> class.
     /// </summary>
+    /// <param name="publishedRouter">The published router.</param>
+    /// <param name="umbracoContext">The Umbraco context.</param>
+    /// <param name="webRoutingSettings">The web routing settings.</param>
+    /// <param name="uri">The optional URI for this request. If not provided, uses the cleaned Umbraco URL from the context.</param>
     public PublishedRequestOld(IPublishedRouter publishedRouter, IUmbracoContext umbracoContext, IOptions<WebRoutingSettings> webRoutingSettings, Uri? uri = null)
     {
         UmbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
@@ -38,6 +54,9 @@ public class PublishedRequestOld // : IPublishedRequest
     /// <remarks>The cleaned up Uri has no virtual directory, no trailing slash, no .aspx extension, etc.</remarks>
     public Uri Uri { get; }
 
+    /// <summary>
+    ///     Gets or sets a value indicating whether caching should be disabled for this request.
+    /// </summary>
     public bool CacheabilityNoCache { get; set; }
 
     ///// <summary>
@@ -99,8 +118,13 @@ public class PublishedRequestOld // : IPublishedRequest
         }
     }
 
-    // utility for ensuring it is ok to set some properties
-    // Note: _readonly field removed as it was never set to true (legacy code)
+    /// <summary>
+    ///     Ensures the request is in a writeable state.
+    /// </summary>
+    /// <remarks>
+    ///     This method is a no-op. The readonly check was removed because the backing field
+    ///     was never set to true, making the check unnecessary. Retained for API compatibility.
+    /// </remarks>
     public void EnsureWriteable()
     {
     }
