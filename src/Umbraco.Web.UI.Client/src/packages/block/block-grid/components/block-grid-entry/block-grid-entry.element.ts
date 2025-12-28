@@ -1,26 +1,25 @@
 import type { UmbBlockGridLayoutModel } from '../../types.js';
 import { UMB_BLOCK_GRID } from '../../constants.js';
 import { UmbBlockGridEntryContext } from './block-grid-entry.context.js';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { html, css, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
-import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
+import { css, customElement, html, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
-import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
 import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
+import { UUIBlinkAnimationValue, UUIBlinkKeyframes } from '@umbraco-cms/backoffice/external/uui';
+import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import type {
 	ManifestBlockEditorCustomView,
 	UmbBlockEditorCustomViewProperties,
 } from '@umbraco-cms/backoffice/block-custom-view';
-import { UUIBlinkAnimationValue, UUIBlinkKeyframes } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
 
 /**
  * @element umb-block-grid-entry
  */
 @customElement('umb-block-grid-entry')
 export class UmbBlockGridEntryElement extends UmbLitElement implements UmbPropertyEditorUiElement {
-	//
 	@property({ type: Number, reflect: true })
 	public get index(): number | undefined {
 		return this.#context.getIndex();
@@ -51,7 +50,6 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		);
 	}
 	private _contentKey?: string | undefined;
-	//
 
 	#context = new UmbBlockGridEntryContext(this);
 	#renderTimeout: number | undefined;
@@ -107,6 +105,9 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	private _inlineEditingMode?: boolean;
 
 	@state()
+	private _isSortMode?: boolean;
+
+	@state()
 	private _canScale?: boolean;
 
 	@state()
@@ -151,6 +152,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		super();
 		this.#init();
 	}
+
 	#init() {
 		// Misc:
 		this.observe(
@@ -169,20 +171,8 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			},
 			null,
 		);
-		this.observe(
-			this.#context.canScale,
-			(canScale) => {
-				this._canScale = canScale;
-			},
-			null,
-		);
-		this.observe(
-			this.#context.isAllowed,
-			(isAllowed) => {
-				this._invalidLocation = !isAllowed;
-			},
-			null,
-		);
+		this.observe(this.#context.canScale, (canScale) => (this._canScale = canScale), null);
+		this.observe(this.#context.isAllowed, (isAllowed) => (this._invalidLocation = !isAllowed), null);
 		this.observe(
 			this.#context.blockType,
 			(blockType) => {
@@ -225,21 +215,9 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			},
 			null,
 		);
-		this.observe(
-			this.#context.actionsVisibility,
-			(showActions) => {
-				this._showActions = showActions;
-			},
-			null,
-		);
-
-		this.observe(
-			this.#context.inlineEditingMode,
-			(mode) => {
-				this._inlineEditingMode = mode;
-			},
-			null,
-		);
+		this.observe(this.#context.actionsVisibility, (showActions) => (this._showActions = showActions), null);
+		this.observe(this.#context.inlineEditingMode, (mode) => (this._inlineEditingMode = mode), null);
+		this.observe(this.#context.isSortMode, (isSortMode) => (this._isSortMode = isSortMode), null);
 
 		// Data:
 		this.observe(
@@ -429,6 +407,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			// accept no extensions if we don't have a content type alias
 			return false;
 		}
+
 		// We do have _contentTypeAlias at this stage, cause we do use the filter method in the extension slot which first gets rendered when we have the _contentTypeAlias. [NL]
 		if (
 			manifest.forContentTypeAlias &&
@@ -436,9 +415,11 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		) {
 			return false;
 		}
+
 		if (manifest.forBlockEditor && !stringOrStringArrayContains(manifest.forBlockEditor, UMB_BLOCK_GRID)) {
 			return false;
 		}
+
 		return true;
 	};
 
@@ -450,92 +431,116 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		if (this._exposed) {
 			return ext.component;
 		} else {
-			return html`<div>
-				${ext.component}
-				<umb-block-overlay-expose-button
-					.contentTypeName=${this._contentTypeName}
-					@click=${this.#expose}></umb-block-overlay-expose-button>
-			</div>`;
+			return html`
+				<div>
+					${ext.component}
+					<umb-block-overlay-expose-button .contentTypeName=${this._contentTypeName} @click=${this.#expose}>
+					</umb-block-overlay-expose-button>
+				</div>
+			`;
 		}
 	};
 
 	override render() {
-		return this.contentKey && (this._contentTypeAlias || this._unsupported)
-			? html`
-					${this.#renderCreateBeforeInlineButton()}
-					<div class="umb-block-grid__block" part="umb-block-grid__block">
-						<umb-extension-slot
-							.filter=${this.#extensionSlotFilterMethod}
-							.renderMethod=${this.#extensionSlotRenderMethod}
-							.fallbackRenderMethod=${this.#renderBuiltinBlockView}
-							.props=${this._blockViewProps}
-							default-element=${this._inlineEditingMode ? 'umb-block-grid-block-inline' : 'umb-block-grid-block'}
-							type="blockEditorCustomView"
-							single></umb-extension-slot>
-						${this.#renderActionBar()}
-						${!this._showContentEdit && this._contentInvalid
-							? html`<uui-badge attention color="invalid" label="Invalid content">!</uui-badge>`
-							: nothing}
-						${this._invalidLocation
-							? html`<uui-tag id="invalidLocation" color="danger"
-									><umb-localize key="blockEditor_invalidDropPosition" .args=${[this._label]}></umb-localize
-								></uui-tag>`
-							: nothing}
-						${this._canScale
-							? html` <umb-block-scale-handler
-									@mousedown=${(e: MouseEvent) => this.#context.scaleManager.onScaleMouseDown(e)}>
-									${this._columnSpan}x${this._rowSpan}
-								</umb-block-scale-handler>`
-							: nothing}
-					</div>
-					${this.#renderCreateAfterInlineButton()}
-				`
-			: nothing;
+		return when(
+			this.contentKey && (this._contentTypeAlias || this._unsupported),
+			() => html`
+				${this.#renderCreateBeforeInlineButton()}
+				<div class="umb-block-grid__block" part="umb-block-grid__block">
+					${when(
+						this._isSortMode,
+						() => this.#renderRefBlock(),
+						() => html`
+							<umb-extension-slot
+								single
+								type="blockEditorCustomView"
+								.filter=${this.#extensionSlotFilterMethod}
+								.renderMethod=${this.#extensionSlotRenderMethod}
+								.fallbackRenderMethod=${this.#renderBuiltinBlockView}
+								.props=${this._blockViewProps}></umb-extension-slot>
+						`,
+					)}
+					${this.#renderActionBar()}
+					${when(
+						!this._showContentEdit && this._contentInvalid,
+						() => html`<uui-badge attention color="invalid" label="Invalid content">!</uui-badge>`,
+					)}
+					${when(
+						this._invalidLocation,
+						() => html`
+							<uui-tag id="invalidLocation" color="danger">
+								<umb-localize key="blockEditor_invalidDropPosition" .args=${[this._label]}></umb-localize>
+							</uui-tag>
+						`,
+					)}
+					${when(
+						this._canScale,
+						() => html`
+							<umb-block-scale-handler @mousedown=${(e: MouseEvent) => this.#context.scaleManager.onScaleMouseDown(e)}>
+								${this._columnSpan}x${this._rowSpan}
+							</umb-block-scale-handler>
+						`,
+					)}
+				</div>
+				${this.#renderCreateAfterInlineButton()}
+			`,
+		);
 	}
 
 	#renderBuiltinBlockView = () => {
 		if (this._unsupported) {
 			return this.#renderUnsupportedBlock();
 		}
+
 		if (this._inlineEditingMode) {
-			return this.renderInlineBlock();
+			return this.#renderInlineBlock();
 		}
+
 		return this.#renderRefBlock();
 	};
 
 	#renderUnsupportedBlock() {
-		return html`<umb-block-grid-block-unsupported
-			class="umb-block-grid__block--view"
-			.config=${this._blockViewProps.config}
-			.content=${this._blockViewProps.content}
-			.settings=${this._blockViewProps.settings}></umb-block-grid-block-unsupported>`;
-		//TODO: investigate if we should have ${umbDestroyOnDisconnect()} here. Note how it works for drag n' drop in grid between areas and areas-root
+		return html`
+			<umb-block-grid-block-unsupported
+				class="umb-block-grid__block--view"
+				.config=${this._blockViewProps.config}
+				.content=${this._blockViewProps.content}
+				.settings=${this._blockViewProps.settings}>
+			</umb-block-grid-block-unsupported>
+		`;
+		//TODO: investigate if we should have ${umbDestroyOnDisconnect()} here. Note how it works for drag n' drop in grid between areas and areas-root. [NL]
 	}
 
-	renderInlineBlock() {
-		return html`<umb-block-grid-block-inline
-			class="umb-block-grid__block--view"
-			.label=${this._label}
-			.icon=${this._icon}
-			.index=${this._blockViewProps.index}
-			.unpublished=${!this._exposed}
-			.config=${this._blockViewProps.config}
-			.content=${this._blockViewProps.content}
-			.settings=${this._blockViewProps.settings}></umb-block-grid-block-inline>`;
-		//TODO: investigate if we should have ${umbDestroyOnDisconnect()} here. Note how it works for drag n' drop in grid between areas and areas-root
+	#renderInlineBlock() {
+		return html`
+			<umb-block-grid-block-inline
+				class="umb-block-grid__block--view"
+				.label=${this._label}
+				.icon=${this._icon}
+				.index=${this._blockViewProps.index}
+				.unpublished=${!this._exposed}
+				.config=${this._blockViewProps.config}
+				.content=${this._blockViewProps.content}
+				.settings=${this._blockViewProps.settings}>
+			</umb-block-grid-block-inline>
+		`;
+		//TODO: investigate if we should have ${umbDestroyOnDisconnect()} here. Note how it works for drag n' drop in grid between areas and areas-root. [NL]
 	}
 
 	#renderRefBlock() {
-		return html`<umb-block-grid-block
-			class="umb-block-grid__block--view"
-			.label=${this._label}
-			.icon=${this._icon}
-			.index=${this._blockViewProps.index}
-			.unpublished=${!this._exposed}
-			.config=${this._blockViewProps.config}
-			.content=${this._blockViewProps.content}
-			.settings=${this._blockViewProps.settings}></umb-block-grid-block>`;
-		//TODO: investigate if we should have ${umbDestroyOnDisconnect()} here. Note how it works for drag n' drop in grid between areas and areas-root
+		return html`
+			<umb-block-grid-block
+				class="umb-block-grid__block--view ${this._isSortMode ? 'sortable' : ''}"
+				.label=${this._label}
+				.icon=${this._icon}
+				.index=${this._blockViewProps.index}
+				.unpublished=${!this._exposed}
+				.config=${this._blockViewProps.config}
+				.content=${this._blockViewProps.content}
+				.settings=${this._blockViewProps.settings}>
+			</umb-block-grid-block>
+		`;
+		//TODO: investigate if we should have ${umbDestroyOnDisconnect()} here. Note how it works for drag n' drop in grid between areas and areas-root. [NL]
 	}
 
 	#renderCreateBeforeInlineButton() {
@@ -543,12 +548,13 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		if (!this._createBeforePath) return nothing;
 		if (!this._showInlineCreateBefore) return nothing;
 
-		return html`<uui-button-inline-create
-			href=${this._createBeforePath}
-			label=${this.localize.term('blockEditor_addBlock')}
-			style=${this._inlineCreateAboveWidth
-				? `width: ${this._inlineCreateAboveWidth}`
-				: ''}></uui-button-inline-create>`;
+		return html`
+			<uui-button-inline-create
+				href=${this._createBeforePath}
+				label=${this.localize.term('blockEditor_addBlock')}
+				style=${this._inlineCreateAboveWidth ? `width: ${this._inlineCreateAboveWidth}` : ''}>
+			</uui-button-inline-create>
+		`;
 	}
 
 	#renderCreateAfterInlineButton() {
@@ -565,59 +571,74 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	}
 
 	#renderActionBar() {
-		return this._showActions
-			? html`
-					<uui-action-bar>
-						${this.#renderEditAction()} ${this.#renderEditSettingsAction()} ${this.#renderCopyToClipboardAction()}
-						${this.#renderDeleteAction()}</uui-action-bar
-					>
-				`
-			: nothing;
+		if (this._isSortMode) return nothing;
+		if (!this._showActions) return nothing;
+		return html`
+			<uui-action-bar>
+				${this.#renderEditAction()} ${this.#renderEditSettingsAction()} ${this.#renderCopyToClipboardAction()}
+				${this.#renderDeleteAction()}
+			</uui-action-bar>
+		`;
 	}
 
 	#renderEditAction() {
-		return this._showContentEdit && this._workspaceEditContentPath
-			? html`<uui-button
-					label="edit"
-					look="secondary"
-					color=${this._contentInvalid ? 'danger' : ''}
-					href=${this._workspaceEditContentPath}>
-					<uui-icon name=${this._exposed === false ? 'icon-add' : 'icon-edit'}></uui-icon>
-					${this._contentInvalid
-						? html`<uui-badge attention color="invalid" label="Invalid content">!</uui-badge>`
-						: nothing}
-				</uui-button>`
-			: this._showContentEdit === false && this._exposed === false
-				? html`<uui-button
+		return html`
+			${when(
+				this._showContentEdit && this._workspaceEditContentPath,
+				() => html`
+					<uui-button
+						label="edit"
+						look="secondary"
+						color=${this._contentInvalid ? 'danger' : ''}
+						href=${this._workspaceEditContentPath!}>
+						<uui-icon name=${this._exposed === false ? 'icon-add' : 'icon-edit'}></uui-icon>
+						${when(
+							this._contentInvalid,
+							() => html`<uui-badge attention color="invalid" label="Invalid content">!</uui-badge>`,
+						)}
+					</uui-button>
+				`,
+			)}
+			${when(
+				this._showContentEdit === false && this._exposed === false,
+				() => html`
+					<uui-button
 						@click=${this.#expose}
 						label=${this.localize.term('blockEditor_createThisFor', this._contentTypeName)}
-						look="secondary"
-						><uui-icon name="icon-add"></uui-icon
-					></uui-button>`
-				: nothing;
+						look="secondary">
+						<uui-icon name="icon-add"></uui-icon>
+					</uui-button>
+				`,
+			)}
+		`;
 	}
 
 	#renderEditSettingsAction() {
 		return html`
 			${this._hasSettings && this._workspaceEditSettingsPath
-				? html`<uui-button
-						label="Edit settings"
-						look="secondary"
-						color=${this._settingsInvalid ? 'invalid' : ''}
-						href=${this._workspaceEditSettingsPath}>
-						<uui-icon name="icon-settings"></uui-icon>
-						${this._settingsInvalid
-							? html`<uui-badge attention color="invalid" label="Invalid settings">!</uui-badge>`
-							: nothing}
-					</uui-button>`
+				? html`
+						<uui-button
+							label="Edit settings"
+							look="secondary"
+							color=${this._settingsInvalid ? 'invalid' : ''}
+							href=${this._workspaceEditSettingsPath}>
+							<uui-icon name="icon-settings"></uui-icon>
+							${when(
+								this._settingsInvalid,
+								() => html`<uui-badge attention color="invalid" label="Invalid settings">!</uui-badge>`,
+							)}
+						</uui-button>
+					`
 				: nothing}
 		`;
 	}
 
 	#renderCopyToClipboardAction() {
-		return html`<uui-button label="Copy to clipboard" look="secondary" @click=${() => this.#context.copyToClipboard()}>
-			<uui-icon name="icon-clipboard-copy"></uui-icon>
-		</uui-button>`;
+		return html`
+			<uui-button label="Copy to clipboard" look="secondary" @click=${() => this.#context.copyToClipboard()}>
+				<uui-icon name="icon-clipboard-copy"></uui-icon>
+			</uui-button>
+		`;
 	}
 
 	#renderDeleteAction() {
@@ -682,6 +703,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 				opacity: var(--umb-block-grid-entry-actions-opacity, 0);
 				transition: opacity 120ms;
 			}
+
 			uui-button-inline-create {
 				top: 0px;
 				position: absolute;
@@ -689,13 +711,16 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 				--umb-block-grid__block--inline-create-button-display--condition: var(--umb-block-grid--dragging-mode) none;
 				display: var(--umb-block-grid__block--inline-create-button-display--condition);
 			}
+
 			uui-button-inline-create:not([vertical]) {
 				left: 0;
 				width: var(--umb-block-grid-editor--inline-create-width, 100%);
 			}
+
 			:host(:not([index='0'])) uui-button-inline-create:not([vertical]) {
 				top: calc(var(--umb-block-grid--row-gap, 0px) * -0.5);
 			}
+
 			uui-button-inline-create[vertical] {
 				right: calc(1px - (var(--umb-block-grid--column-gap, 0px) * 0.5));
 			}
@@ -718,6 +743,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 				border-color: var(--uui-color-interactive-emphasis);
 				animation: ${UUIBlinkAnimationValue};
 			}
+
 			:host([drag-placeholder])::before {
 				content: '';
 				position: absolute;
@@ -727,6 +753,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 				background-color: var(--uui-color-interactive-emphasis);
 				opacity: 0.12;
 			}
+
 			:host([drag-placeholder]) .umb-block-grid__block {
 				transition: opacity 50ms 16ms;
 				opacity: 0;

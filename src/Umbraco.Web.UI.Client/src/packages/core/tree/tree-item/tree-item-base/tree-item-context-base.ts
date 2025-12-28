@@ -254,6 +254,7 @@ export abstract class UmbTreeItemContextBase<
 	}
 
 	async #consumeContexts() {
+		// TODO: Stop consuming the section context, instead lets get the needed data from the tree context. [NL]
 		this.consumeContext(UMB_SECTION_CONTEXT, (instance) => {
 			this.#sectionContext = instance;
 			this.#observeSectionPath();

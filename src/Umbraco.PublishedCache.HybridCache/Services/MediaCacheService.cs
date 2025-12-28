@@ -291,6 +291,11 @@ internal sealed class MediaCacheService : IMediaCacheService
         }
 
         scope.Complete();
+
+        // Clear the entire published content cache.
+        // It doesn't seem feasible to be smarter about this, as a changed content type could be used for a media item,
+        // elements within the media item, an ancestor, or a composition.
+        _publishedContentCache.Clear();
     }
 
     public IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType)

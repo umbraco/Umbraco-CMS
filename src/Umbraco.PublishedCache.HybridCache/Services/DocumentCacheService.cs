@@ -178,6 +178,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
     public async Task RefreshMemoryCacheAsync(Guid key)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        scope.ReadLock(Constants.Locks.ContentTree);
 
         ContentCacheNode? draftNode = await _databaseCacheRepository.GetContentSourceAsync(key, true);
         if (draftNode is not null)
@@ -343,6 +344,11 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         _databaseCacheRepository.Rebuild(contentTypeIds.ToList());
         RebuildMemoryCacheByContentTypeAsync(contentTypeIds).GetAwaiter().GetResult();
         scope.Complete();
+
+        // Clear the entire published content cache.
+        // It doesn't seem feasible to be smarter about this, as a changed content type could be used for a document,
+        // elements within the document, an ancestor or composition.
+        _publishedContentCache.Clear();
     }
 
     public async Task RebuildMemoryCacheByContentTypeAsync(IEnumerable<int> contentTypeIds)

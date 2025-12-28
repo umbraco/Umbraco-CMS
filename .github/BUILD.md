@@ -37,7 +37,7 @@ In order to work with the Umbraco source code locally, first make sure you have 
 
 ### Familiarizing yourself with the code
 
-Umbraco is a .NET application using C#. The solution is broken down into multiple projects.  There are several class libraries. The `Umbraco.Web.UI` project is the main project that hosts the back office and login screen. This is the project you will want to run to see your changes.
+Umbraco is a .NET application using C#. The solution is broken down into multiple projects. There are several class libraries. The `Umbraco.Web.UI` project is the main project that hosts the back office and login screen. This is the project you will want to run to see your changes.
 
 There are two web projects in the solution with client-side assets based on TypeScript, `Umbraco.Web.UI.Client` and `Umbraco.Web.UI.Login`.
 
@@ -73,12 +73,18 @@ Just be careful not to include this change in your PR.
 
 Conversely, if you are working on front-end only, you want to build the back-end once and then run it. Before you do so, update the configuration in `appSettings.json` to add the following under `Umbraco:Cms:Security`:
 
-```
+```json
 "BackOfficeHost": "http://localhost:5173",
 "AuthorizeCallbackPathName": "/oauth_complete",
 "AuthorizeCallbackLogoutPathName": "/logout",
-"AuthorizeCallbackErrorPathName": "/error"
+"AuthorizeCallbackErrorPathName": "/error",
+"BackOfficeTokenCookie": {
+  "SameSite": "None"
+}
 ```
+
+> [!NOTE]
+> If you get stuck in a login loop, try clearing your browser cookies for localhost, and make sure that the `Umbraco:Cms:Security:BackOfficeTokenCookie:SameSite` setting is set to `None`.
 
 Then run Umbraco from the command line.
 

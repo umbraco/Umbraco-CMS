@@ -198,13 +198,6 @@ public interface IMemberService : IMembershipMemberService, IContentServiceBase<
     Attempt<OperationResult?> Save(IMember media, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
-    ///     Saves a list of <see cref="IMember" /> objects
-    /// </summary>
-    /// <param name="members">Collection of <see cref="IMember" /> to save</param>
-    /// <param name="userId">Id of the User saving the Members</param>
-    Attempt<OperationResult?> Save(IEnumerable<IMember> members, int userId = Constants.Security.SuperUserId);
-
-    /// <summary>
     ///     Gets the count of Members by an optional MemberType alias
     /// </summary>
     /// <remarks>If no alias is supplied then the count for all Member will be returned</remarks>
