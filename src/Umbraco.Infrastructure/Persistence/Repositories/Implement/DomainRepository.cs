@@ -194,7 +194,7 @@ internal sealed class DomainRepository : EntityRepositoryBase<int, IDomain>, IDo
         entity.ResetDirtyProperties();
     }
 
-    protected int GetNewSortOrder(int? rootContentId, bool isWildcard)
+    private int GetNewSortOrder(int? rootContentId, bool isWildcard)
         => isWildcard
         ? -1
         : Database.ExecuteScalar<int>(

@@ -190,19 +190,25 @@ export const parameters = {
 		},
 	},
 	backgrounds: {
-		default: 'Greyish',
-		values: [
-			{
+        options: {
+            greyish: {
 				name: 'Greyish',
 				value: '#F3F3F5',
 			},
-			{
+
+            white: {
 				name: 'White',
 				value: '#ffffff',
-			},
-		],
-	},
+			}
+        }
+    },
 };
 
 setCustomElements(customElementManifests);
 export const tags = ['autodocs'];
+
+export const initialGlobals = {
+    backgrounds: {
+        value: 'greyish'
+    }
+};

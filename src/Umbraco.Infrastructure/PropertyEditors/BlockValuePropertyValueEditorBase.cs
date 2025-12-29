@@ -675,7 +675,8 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
                     {
                         Alias = sourceBlockPropertyValue.Alias,
                         Culture = sourceBlockPropertyValue.Culture,
-                        Segment = sourceBlockPropertyValue.Segment
+                        Segment = sourceBlockPropertyValue.Segment,
+                        PropertyType = sourceBlockPropertyValue.PropertyType
                     };
                     targetBlockItem.Values.Add(targetBlockPropertyValue);
                 }
@@ -685,6 +686,21 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
                     ? sourceBlockPropertyValue.Value
                     : mergingDataEditor!.MergePartialPropertyValueForCulture(sourceBlockPropertyValue.Value, targetBlockPropertyValue.Value, culture);
             }
+        }
+
+        // After merging, remove stale values when property variation changed.
+        foreach (BlockItemData targetBlockItem in targetBlockItems)
+        {
+            targetBlockItem.Values.RemoveAll(value =>
+            {
+                if (value.PropertyType is null)
+                {
+                    throw new ArgumentException("One or more block item values did not have a resolved property type. Block item value property types must be resolved before attempting perform partial value merging.", nameof(targetBlockItem));
+                }
+
+                var propertyValueIsCultureVariant = value.Culture is not null;
+                return propertyValueIsCultureVariant != value.PropertyType.VariesByCulture();
+            });
         }
     }
 }

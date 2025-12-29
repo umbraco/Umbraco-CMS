@@ -61,7 +61,9 @@ public class RichTextPropertyIndexValueFactoryTests
 
         // create a mock property with the rich text value
         var property = Mock.Of<IProperty>(p => p.Alias == alias
-                                               && (string)p.GetValue(It.IsAny<string>(), It.IsAny<string>(),
+                                               && (string)p.GetValue(
+                                                   It.IsAny<string>(),
+                                                   It.IsAny<string>(),
                                                    It.IsAny<bool>()) == testContent);
 
         // get the index value for the property

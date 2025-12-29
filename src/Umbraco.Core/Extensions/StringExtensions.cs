@@ -758,13 +758,7 @@ public static class StringExtensions
     /// <returns>The hashed string</returns>
     private static string GenerateHash(this string str, string? hashType)
     {
-        HashAlgorithm? hasher = null;
-
-        // create an instance of the correct hashing provider based on the type passed in
-        if (hashType is not null)
-        {
-            hasher = HashAlgorithm.Create(hashType);
-        }
+        HashAlgorithm? hasher = CreateHashAlgorithm(hashType);
 
         if (hasher == null)
         {
@@ -792,6 +786,33 @@ public static class StringExtensions
             // return the hashed value
             return stringBuilder.ToString();
         }
+    }
+
+    /// <summary>
+    ///     Creates a hash algorithm instance by name.
+    /// </summary>
+    /// <param name="algorithmName">The algorithm name (e.g., "SHA1", "SHA256", "MD5").</param>
+    /// <returns>A HashAlgorithm instance, or null if the algorithm is not recognized.</returns>
+    private static HashAlgorithm? CreateHashAlgorithm(string? algorithmName)
+    {
+        if (string.IsNullOrEmpty(algorithmName))
+        {
+            return null;
+        }
+
+        return algorithmName.ToUpperInvariant() switch
+        {
+            "SHA1" or "SHA-1" or "SYSTEM.SECURITY.CRYPTOGRAPHY.SHA1" => SHA1.Create(),
+            "SHA256" or "SHA-256" or "SYSTEM.SECURITY.CRYPTOGRAPHY.SHA256" => SHA256.Create(),
+            "SHA384" or "SHA-384" or "SYSTEM.SECURITY.CRYPTOGRAPHY.SHA384" => SHA384.Create(),
+            "SHA512" or "SHA-512" or "SYSTEM.SECURITY.CRYPTOGRAPHY.SHA512" => SHA512.Create(),
+            "MD5" or "SYSTEM.SECURITY.CRYPTOGRAPHY.MD5" => MD5.Create(),
+            "HMACSHA1" or "SYSTEM.SECURITY.CRYPTOGRAPHY.HMACSHA1" => new HMACSHA1(),
+            "HMACSHA256" or "SYSTEM.SECURITY.CRYPTOGRAPHY.HMACSHA256" => new HMACSHA256(),
+            "HMACSHA384" or "SYSTEM.SECURITY.CRYPTOGRAPHY.HMACSHA384" => new HMACSHA384(),
+            "HMACSHA512" or "SYSTEM.SECURITY.CRYPTOGRAPHY.HMACSHA512" => new HMACSHA512(),
+            _ => null
+        };
     }
 
     /// <summary>

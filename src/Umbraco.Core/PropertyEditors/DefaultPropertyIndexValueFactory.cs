@@ -8,8 +8,14 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 public class DefaultPropertyIndexValueFactory : IPropertyIndexValueFactory
 {
-    public IEnumerable<IndexValue> GetIndexValues(IProperty property, string? culture, string? segment, bool published,
-        IEnumerable<string> availableCultures, IDictionary<Guid, IContentType> contentTypeDictionary)
+    /// <inheritdoc />
+    public IEnumerable<IndexValue> GetIndexValues(
+        IProperty property,
+        string? culture,
+        string? segment,
+        bool published,
+        IEnumerable<string> availableCultures,
+        IDictionary<Guid, IContentType> contentTypeDictionary)
         =>
         [
             new IndexValue
