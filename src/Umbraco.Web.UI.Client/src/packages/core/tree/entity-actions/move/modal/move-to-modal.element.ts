@@ -1,22 +1,13 @@
-import { UMB_DOCUMENT_TREE_ALIAS } from '../../../tree/manifests.js';
-import type {
-	UmbDuplicateDocumentModalData,
-	UmbDuplicateDocumentModalValue,
-} from './duplicate-document-modal.token.js';
-import { html, customElement, nothing, css, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { UmbTreeElement } from '../../../tree.element.js';
+import type { UmbMoveToModalData, UmbMoveToModalValue } from './move-to-modal.token.js';
+import { css, customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-
-import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
-import type { UmbTreeElement } from '@umbraco-cms/backoffice/tree';
 
-const elementName = 'umb-document-duplicate-to-modal';
+const elementName = 'umb-move-to-modal';
 @customElement(elementName)
-export class UmbDocumentDuplicateToModalElement extends UmbModalBaseElement<
-	UmbDuplicateDocumentModalData,
-	UmbDuplicateDocumentModalValue
-> {
+export class UmbMoveToModalElement extends UmbModalBaseElement<UmbMoveToModalData, UmbMoveToModalValue> {
 	@state()
 	private _destinationUnique?: string | null;
 
@@ -49,16 +40,6 @@ export class UmbDocumentDuplicateToModalElement extends UmbModalBaseElement<
 		}
 	}
 
-	#onRelateToOriginalChange(event: UUIBooleanInputEvent) {
-		const target = event.target;
-		this.updateValue({ relateToOriginal: target.checked });
-	}
-
-	#onIncludeDescendantsChange(event: UUIBooleanInputEvent) {
-		const target = event.target;
-		this.updateValue({ includeDescendants: target.checked });
-	}
-
 	async #onSubmit() {
 		if (this._destinationUnique === undefined) return;
 
@@ -72,10 +53,7 @@ export class UmbDocumentDuplicateToModalElement extends UmbModalBaseElement<
 		this._submitError = undefined;
 
 		try {
-			const result = await this.data.onBeforeSubmit(this._destinationUnique, {
-				relateToOriginal: this.value?.relateToOriginal ?? false,
-				includeDescendants: this.value?.includeDescendants ?? false,
-			});
+			const result = await this.data.onBeforeSubmit(this._destinationUnique);
 			if (result.success) {
 				this._submitModal();
 			} else {
@@ -91,33 +69,17 @@ export class UmbDocumentDuplicateToModalElement extends UmbModalBaseElement<
 		if (!this.data) return nothing;
 
 		return html`
-			<umb-body-layout headline=${this.localize.term('actions_copy')}>
-				<uui-box id="tree-box" headline=${this.localize.term('moveOrCopy_copyTo', this.data.name ?? '')}>
+			<umb-body-layout headline=${this.localize.term('actions_move')}>
+				<uui-box headline=${this.localize.term('moveOrCopy_moveTo', this.data.name ?? '')}>
 					<umb-tree
-						alias=${UMB_DOCUMENT_TREE_ALIAS}
+						alias=${this.data.treeAlias}
 						.props=${{
-							expandTreeRoot: true,
 							hideTreeItemActions: true,
+							foldersOnly: this.data?.foldersOnly,
+							expandTreeRoot: true,
 							selectableFilter: this.data?.pickableFilter,
 						}}
 						@selection-change=${this.#onTreeSelectionChange}></umb-tree>
-				</uui-box>
-				<uui-box headline=${this.localize.term('general_options')}>
-					<umb-property-layout label=${this.localize.term('moveOrCopy_relateToOriginal')} orientation="vertical"
-						><div slot="editor">
-							<uui-toggle
-								@change=${this.#onRelateToOriginalChange}
-								.checked=${this.value?.relateToOriginal}></uui-toggle>
-						</div>
-					</umb-property-layout>
-
-					<umb-property-layout label=${this.localize.term('defaultdialogs_includeDescendants')} orientation="vertical"
-						><div slot="editor">
-							<uui-toggle
-								@change=${this.#onIncludeDescendantsChange}
-								.checked=${this.value?.includeDescendants}></uui-toggle>
-						</div>
-					</umb-property-layout>
 				</uui-box>
 				${this.#renderActions()}
 			</umb-body-layout>
@@ -138,13 +100,13 @@ export class UmbDocumentDuplicateToModalElement extends UmbModalBaseElement<
 			<uui-button
 				slot="actions"
 				label=${this.localize.term('general_cancel')}
-				@click="${this._rejectModal}"
+				@click=${this._rejectModal}
 				?disabled=${this._isSubmitting}></uui-button>
 			<uui-button
 				slot="actions"
 				color="positive"
 				look="primary"
-				label=${this.localize.term('actions_copy')}
+				label=${this.localize.term('actions_move')}
 				@click=${this.#onSubmit}
 				?disabled=${!canSubmit}
 				.state=${this._isSubmitting ? 'waiting' : undefined}></uui-button>
@@ -154,10 +116,6 @@ export class UmbDocumentDuplicateToModalElement extends UmbModalBaseElement<
 	static override styles = [
 		UmbTextStyles,
 		css`
-			#tree-box {
-				margin-bottom: var(--uui-size-layout-1);
-			}
-
 			#error {
 				display: flex;
 				align-items: center;
@@ -170,10 +128,10 @@ export class UmbDocumentDuplicateToModalElement extends UmbModalBaseElement<
 	];
 }
 
-export { UmbDocumentDuplicateToModalElement as element };
+export { UmbMoveToModalElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbDocumentDuplicateToModalElement;
+		[elementName]: UmbMoveToModalElement;
 	}
 }
