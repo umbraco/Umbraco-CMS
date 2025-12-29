@@ -9,24 +9,36 @@ public interface IPublishableContentService<TContent> : IContentServiceBase<TCon
     /// <summary>
     ///     Saves content.
     /// </summary>
+    /// <param name="content">The content to save.</param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
+    /// <param name="contentSchedule">The content schedule collection.</param>
+    /// <returns>The operation result.</returns>
     OperationResult Save(TContent content, int? userId = null, ContentScheduleCollection? contentSchedule = null);
 
     /// <summary>
     ///     Deletes content.
     /// </summary>
+    /// <param name="content">The content to delete.</param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
+    /// <returns>The operation result.</returns>
     /// <remarks>
     ///     <para>This method will also delete associated media files, child content and possibly associated domains.</para>
     ///     <para>This method entirely clears the content from the database.</para>
     /// </remarks>
     OperationResult Delete(TContent content, int userId = Constants.Security.SuperUserId);
 
+    /// <summary>
+    ///     Gets publish/unpublish schedule for a content node.
+    /// </summary>
+    /// <param name="contentId">The unique identifier of the content to load schedule for.</param>
+    /// <returns>The <see cref="ContentScheduleCollection" />.</returns>
     ContentScheduleCollection GetContentScheduleByContentId(Guid contentId);
 
     /// <summary>
-    ///     Persists publish/unpublish schedule for content.
+    ///     Persists publish/unpublish schedule for a content node.
     /// </summary>
-    /// <param name="content"></param>
-    /// <param name="contentSchedule"></param>
+    /// <param name="content">The content to persist the schedule for.</param>
+    /// <param name="contentSchedule">The content schedule collection.</param>
     void PersistContentSchedule(IPublishableContentBase content, ContentScheduleCollection contentSchedule);
 
     /// <summary>

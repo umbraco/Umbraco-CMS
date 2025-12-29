@@ -25,6 +25,8 @@ public class ElementServiceTests : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
 
         // Arrange
+        // TODO ELEMENTS: This seems to be a leftover from early POC implementation; IElementService.Create() is not
+        //                used anywhere else than this. Should probably be removed.
         var element = ElementService.Create("My Element", elementType.Alias);
         element.SetValue("title", "The Element Title");
 
