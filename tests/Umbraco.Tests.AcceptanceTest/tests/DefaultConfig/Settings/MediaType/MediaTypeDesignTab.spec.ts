@@ -277,7 +277,7 @@ test('can create a media type with a composition', async ({umbracoApi, umbracoUi
 
   // Act
   await umbracoUi.mediaType.goToMediaType(mediaTypeName);
-  await umbracoUi.waitForTimeout(500);
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoUi.mediaType.clickCompositionsButton();
   await umbracoUi.mediaType.clickModalMenuItemWithName(compositionMediaTypeName);
   await umbracoUi.mediaType.clickSubmitButton();
