@@ -4,6 +4,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
@@ -150,12 +151,6 @@ internal sealed class ElementEditingService
         using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
         scope.WriteLock(Constants.Locks.ElementTree);
 
-        IElement? toMove = await GetAsync(key);
-        if (toMove is null)
-        {
-            return Attempt.Fail(ContentEditingOperationStatus.NotFound);
-        }
-
         var parentId = Constants.System.Root;
         if (containerKey.HasValue && containerKey.Value != Guid.Empty)
         {
@@ -168,6 +163,74 @@ internal sealed class ElementEditingService
             parentId = container.Id;
         }
 
+        Attempt<ContentEditingOperationStatus> moveResult = await MoveLockedAsync(
+            scope,
+            key,
+            parentId,
+            false,
+            userKey,
+            (element, eventMessages) =>
+            {
+                var moveEventInfo = new MoveEventInfo<IElement>(element, element.Path, parentId, containerKey);
+                return new ElementMovingNotification(moveEventInfo, eventMessages);
+            },
+            (element, eventMessages) =>
+            {
+                var moveEventInfo = new MoveEventInfo<IElement>(element, element.Path, parentId, containerKey);
+                return new ElementMovedNotification(moveEventInfo, eventMessages);
+            });
+
+        scope.Complete();
+
+        return moveResult;
+    }
+
+    public async Task<Attempt<ContentEditingOperationStatus>> MoveToRecycleBinAsync(Guid key, Guid userKey)
+    {
+        using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
+        scope.WriteLock(Constants.Locks.ElementTree);
+
+        Attempt<ContentEditingOperationStatus> moveResult = await MoveLockedAsync(
+            scope,
+            key,
+            Constants.System.RecycleBinElement,
+            true,
+            userKey,
+            (element, eventMessages) =>
+            {
+                var moveEventInfo = new MoveToRecycleBinEventInfo<IElement>(element, element.Path);
+                return new ElementMovingToRecycleBinNotification(moveEventInfo, eventMessages);
+            },
+            (element, eventMessages) =>
+            {
+                var moveEventInfo = new MoveToRecycleBinEventInfo<IElement>(element, element.Path);
+                return new ElementMovedToRecycleBinNotification(moveEventInfo, eventMessages);
+            });
+
+        scope.Complete();
+
+        return moveResult;
+    }
+
+    public async Task<Attempt<IElement?, ContentEditingOperationStatus>> CopyAsync(Guid key, Guid? parentKey, Guid userKey)
+        => await HandleCopyAsync(key, parentKey, false, false, userKey);
+
+    private async Task<Attempt<ContentEditingOperationStatus>> MoveLockedAsync<TNotification>(
+        ICoreScope scope,
+        Guid key,
+        int parentId,
+        bool trash,
+        Guid userKey,
+        Func<IElement, EventMessages, TNotification> movingNotificationFactory,
+        Func<IElement, EventMessages, IStatefulNotification> movedNotificationFactory)
+        where TNotification : IStatefulNotification, ICancelableNotification
+    {
+        IElement? toMove = await GetAsync(key);
+        if (toMove is null)
+        {
+            return Attempt.Fail(ContentEditingOperationStatus.NotFound);
+        }
+
         if (toMove.ParentId == parentId)
         {
             return Attempt.Succeed(ContentEditingOperationStatus.Success);
@@ -175,11 +238,9 @@ internal sealed class ElementEditingService
 
         EventMessages eventMessages = _eventMessagesFactory.Get();
 
-        var moveEventInfo = new MoveEventInfo<IElement>(toMove, toMove.Path, parentId, containerKey);
-        var movingNotification = new ElementMovingNotification(moveEventInfo, eventMessages);
+        TNotification movingNotification = movingNotificationFactory(toMove,  eventMessages);
         if (await scope.Notifications.PublishCancelableAsync(movingNotification))
         {
-            scope.Complete();
             return Attempt.Fail(ContentEditingOperationStatus.CancelledByNotification);
         }
 
@@ -187,18 +248,21 @@ internal sealed class ElementEditingService
         //       structural node data like path, level, sort orders etc.
         toMove.ParentId = parentId;
 
-        await SaveAsync(toMove, userKey);
+        // NOTE: this cast isn't pretty, but it's the best we can do now. the content and media services do something
+        //       similar, and at the time of writing this, we are subject to the limitations imposed there.
+        ((TreeEntityBase)toMove).Trashed = trash;
 
-        scope.Notifications.Publish(
-            new ElementMovedNotification(moveEventInfo, eventMessages).WithStateFrom(movingNotification));
+        ContentEditingOperationStatus saveResult = await SaveAsync(toMove, userKey);
+        if (saveResult is not ContentEditingOperationStatus.Success)
+        {
+            return Attempt.Fail(saveResult);
+        }
 
-        scope.Complete();
+        IStatefulNotification movedNotification = movedNotificationFactory(toMove, eventMessages);
+        scope.Notifications.Publish(movedNotification.WithStateFrom(movingNotification));
 
         return Attempt.Succeed(ContentEditingOperationStatus.Success);
     }
-
-    public async Task<Attempt<IElement?, ContentEditingOperationStatus>> CopyAsync(Guid key, Guid? parentKey, Guid userKey)
-        => await HandleCopyAsync(key, parentKey, false, false, userKey);
 
     protected override IElement? Copy(IElement element, int newParentId, Guid? newParentKey, bool relateToOriginal, bool includeDescendants, int userId)
     {

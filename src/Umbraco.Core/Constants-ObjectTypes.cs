@@ -13,6 +13,8 @@ public static partial class Constants
 
         public static readonly Guid MediaRecycleBin = new(Strings.MediaRecycleBin);
 
+        public static readonly Guid ElementRecycleBin = new(Strings.ElementRecycleBin);
+
         public static readonly Guid DataTypeContainer = new(Strings.DataTypeContainer);
 
         public static readonly Guid DocumentTypeContainer = new(Strings.DocumentTypeContainer);
@@ -102,6 +104,8 @@ public static partial class Constants
             public const string Element = "3D7B623C-94B1-487D-8554-A46EC37568BE";
 
             public const string ElementContainer = "2815B0CF-9706-499F-AA2A-8A4C7AEF005D";
+
+            public const string ElementRecycleBin = "A1EE71EB-659C-4EEE-BC97-6243E721CC0D";
 
             public const string Media = "B796F64C-1F99-4FFB-B886-4BF4BC011A9C";
 

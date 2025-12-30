@@ -17,6 +17,7 @@ public class AddElements : AsyncMigrationBase
     {
         EnsureElementTreeLock();
         EnsureElementTables();
+        EnsureElementRecycleBin();
         return Task.CompletedTask;
     }
 
@@ -51,5 +52,34 @@ public class AddElements : AsyncMigrationBase
         {
             Create.Table<ElementCultureVariationDto>().Do();
         }
+    }
+
+    private void EnsureElementRecycleBin()
+    {
+        Sql<ISqlContext> sql = Database.SqlContext.Sql()
+            .Select<NodeDto>(x => x.NodeId)
+            .From<NodeDto>()
+            .Where<NodeDto>(x => x.UniqueId == Constants.System.RecycleBinElementKey);
+
+        if (Database.FirstOrDefault<NodeDto>(sql) is not null)
+        {
+            return;
+        }
+
+        Database.Insert(Constants.DatabaseSchema.Tables.Node, "id", false,
+            new NodeDto
+            {
+                NodeId = Constants.System.RecycleBinElement,
+                Trashed = false,
+                ParentId = -1,
+                UserId = -1,
+                Level = 0,
+                Path = "-1,-22",
+                SortOrder = 0,
+                UniqueId = Constants.System.RecycleBinElementKey,
+                Text = "Recycle Bin",
+                NodeObjectType = Constants.ObjectTypes.ElementRecycleBin,
+                CreateDate = DateTime.UtcNow,
+            });
     }
 }

@@ -331,6 +331,21 @@ internal sealed class DatabaseDataCreator
                 NodeObjectType = Constants.ObjectTypes.MediaRecycleBin,
                 CreateDate = DateTime.UtcNow,
             });
+        _database.Insert(Constants.DatabaseSchema.Tables.Node, "id", false,
+            new NodeDto
+            {
+                NodeId = Constants.System.RecycleBinElement,
+                Trashed = false,
+                ParentId = -1,
+                UserId = -1,
+                Level = 0,
+                Path = "-1,-22",
+                SortOrder = 0,
+                UniqueId = Constants.System.RecycleBinElementKey,
+                Text = "Recycle Bin",
+                NodeObjectType = Constants.ObjectTypes.ElementRecycleBin,
+                CreateDate = DateTime.UtcNow,
+            });
 
         InsertDataTypeNodeDto(
             Constants.DataTypes.LabelString,

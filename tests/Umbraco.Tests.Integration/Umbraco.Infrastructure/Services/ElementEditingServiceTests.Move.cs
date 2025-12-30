@@ -90,4 +90,49 @@ public partial class ElementEditingServiceTests
 
         Assert.AreEqual(0, GetFolderChildren(containerKey1).Length);
     }
+
+    [Test]
+    public async Task Can_Move_Trashed_Element_To_Root()
+    {
+        var element = await CreateInvariantElement();
+
+        var moveResult = await ElementEditingService.MoveToRecycleBinAsync(element.Key, Constants.Security.SuperUserKey);
+        Assert.IsTrue(moveResult.Success);
+
+        moveResult = await ElementEditingService.MoveAsync(element.Key, null, Constants.Security.SuperUserKey);
+        Assert.IsTrue(moveResult.Success);
+
+        element = await ElementEditingService.GetAsync(element.Key);
+        Assert.NotNull(element);
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(element.Trashed);
+            Assert.AreEqual(Constants.System.Root, element.ParentId);
+            Assert.AreEqual($"{Constants.System.Root},{element.Id}", element.Path);
+        });
+    }
+
+    [Test]
+    public async Task Can_Move_Trashed_Element_To_A_Folder()
+    {
+        var containerKey1 = Guid.NewGuid();
+        var container1 = (await ElementContainerService.CreateAsync(containerKey1, "Container #1", null, Constants.Security.SuperUserKey)).Result;
+
+        var element = await CreateInvariantElement();
+
+        var moveResult = await ElementEditingService.MoveToRecycleBinAsync(element.Key, Constants.Security.SuperUserKey);
+        Assert.IsTrue(moveResult.Success);
+
+        moveResult = await ElementEditingService.MoveAsync(element.Key, containerKey1, Constants.Security.SuperUserKey);
+        Assert.IsTrue(moveResult.Success);
+
+        element = await ElementEditingService.GetAsync(element.Key);
+        Assert.NotNull(element);
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(element.Trashed);
+            Assert.AreEqual(container1.Id, element.ParentId);
+            Assert.AreEqual($"{container1.Path},{element.Id}", element.Path);
+        });
+    }
 }
