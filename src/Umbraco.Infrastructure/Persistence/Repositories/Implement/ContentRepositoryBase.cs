@@ -1130,16 +1130,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         }
 
         /// <summary>
-        /// Used to atomically replace the property values for the entity version specified
+        /// Used to atomically replace the property values for the entity version specified.
         /// </summary>
-        /// <param name="entity"></param>
-        /// <param name="versionId"></param>
-        /// <param name="publishedVersionId"></param>
-        /// <param name="edited"></param>
-        /// <param name="editedCultures"></param>
-
         protected void ReplacePropertyValues(TEntity entity, int versionId, int publishedVersionId, out bool edited, out HashSet<string>? editedCultures)
         {
+            /*
+            // *** LOCK, DELETE AND INSERT IMPLEMENTATION ***
             var propertyDataDtos = PropertyFactory.BuildDtos(
                     entity.ContentType.Variations,
                     entity.VersionId,
@@ -1150,23 +1146,86 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     out editedCultures)
                 .ToList();
 
-            // Acquire locks on existing property data rows using FOR UPDATE.
+            // Get all distinct versionIds from the DTOs - BuildDtos may produce DTOs for multiple versions
+            // (e.g., both edit and published versions).
+            var versionIds = propertyDataDtos.Select(x => x.VersionId).Distinct().ToList();
+
+            if (versionIds.Count == 0)
+            {
+                // No property data to save - just delete existing for the parameter versionId
+                Database.Execute(SqlContext.Sql().Delete<PropertyDataDto>().Where<PropertyDataDto>(x => x.VersionId == versionId));
+                return;
+            }
+
+            // Acquire locks on existing property data rows for ALL versionIds using FOR UPDATE.
             // This ensures concurrent transactions wait rather than fail with constraint violations.
             // We only need the lock, not the data, so we select just the id column.
             Sql<ISqlContext> lockSql = SqlContext.Sql()
                 .Select<PropertyDataDto>(x => x.Id)
                 .From<PropertyDataDto>()
-                .Where<PropertyDataDto>(x => x.VersionId == versionId)
+                .WhereIn<PropertyDataDto>(x => x.VersionId, versionIds)
                 .ForUpdate();
             Database.Fetch<int>(lockSql);
 
             // Now that we hold the locks, we can safely DELETE + bulk INSERT.
             // This is more efficient than UPDATE batches as it reduces round trips.
-            Database.Execute(SqlContext.Sql().Delete<PropertyDataDto>().Where<PropertyDataDto>(x => x.VersionId == versionId));
+            Database.Execute(SqlContext.Sql().Delete<PropertyDataDto>().WhereIn<PropertyDataDto>(x => x.VersionId, versionIds));
 
-            if (propertyDataDtos.Count > 0)
+            Database.InsertBulk(propertyDataDtos);
+            */
+
+            // *** ORIGINAL IMPLEMENTATION ***
+            // Replace the property data.
+            // Lookup the data to update with a UPDLOCK (using ForUpdate()) this is because we need to be atomic
+            // and handle DB concurrency. Doing a clear and then re-insert is prone to concurrency issues.
+            Sql<ISqlContext> propDataSql = SqlContext.Sql().Select("*").From<PropertyDataDto>().Where<PropertyDataDto>(x => x.VersionId == versionId).ForUpdate();
+            List<PropertyDataDto>? existingPropData = Database.Fetch<PropertyDataDto>(propDataSql);
+            var propertyTypeToPropertyData = new Dictionary<(int propertyTypeId, int versionId, int? languageId, string? segment), PropertyDataDto>();
+            var existingPropDataIds = new List<int>();
+            foreach (PropertyDataDto? p in existingPropData)
             {
-                Database.InsertBulk(propertyDataDtos);
+                existingPropDataIds.Add(p.Id);
+                propertyTypeToPropertyData[(p.PropertyTypeId, p.VersionId, p.LanguageId, p.Segment)] = p;
+            }
+
+            IEnumerable<PropertyDataDto> propertyDataDtos = PropertyFactory.BuildDtos(entity.ContentType.Variations, entity.VersionId, publishedVersionId, entity.Properties, LanguageRepository, out edited, out editedCultures);
+
+            var toUpdate = new List<PropertyDataDto>();
+            var toInsert = new List<PropertyDataDto>();
+            foreach (PropertyDataDto propertyDataDto in propertyDataDtos)
+            {
+                // Check if this already exists and update, else insert a new one
+                if (propertyTypeToPropertyData.TryGetValue((propertyDataDto.PropertyTypeId, propertyDataDto.VersionId, propertyDataDto.LanguageId, propertyDataDto.Segment), out PropertyDataDto? propData))
+                {
+                    propertyDataDto.Id = propData.Id;
+                    toUpdate.Add(propertyDataDto);
+                }
+                else
+                {
+                    toInsert.Add(propertyDataDto);
+                }
+
+                // track which ones have been processed
+                existingPropDataIds.Remove(propertyDataDto.Id);
+            }
+
+            if (toUpdate.Count > 0)
+            {
+                var updateBatch = toUpdate
+                    .Select(x => UpdateBatch.For(x))
+                    .ToList();
+                Database.UpdateBatch(updateBatch, new BatchOptions { BatchSize = 100 });
+            }
+
+            if (toInsert.Count > 0)
+            {
+                Database.InsertBulk(toInsert);
+            }
+
+            // For any remaining that haven't been processed they need to be deleted
+            if (existingPropDataIds.Count > 0)
+            {
+                Database.Execute(SqlContext.Sql().Delete<PropertyDataDto>().WhereIn<PropertyDataDto>(x => x.Id, existingPropDataIds));
             }
         }
     }

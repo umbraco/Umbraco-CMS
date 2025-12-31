@@ -1,10 +1,11 @@
+using System.Text;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentPublishing;
-using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Integration.Attributes;
 
@@ -22,6 +23,50 @@ public partial class ContentPublishingServiceTests
         Assert.IsTrue(result.Success);
         Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Status);
         VerifyIsPublished(Textpage.Key);
+    }
+
+    [Test]
+    public async Task Can_Publish_Root_And_Persist_Expected_Property_Data()
+    {
+        // Act: Publish the root content item.
+        var publishResult = await ContentPublishingService.PublishAsync(Textpage.Key, [new CulturePublishScheduleModel()], Constants.Security.SuperUserKey);
+        Assert.IsTrue(publishResult.Success);
+
+        // Assert the actual values in the umbracoPropertyData table (this is primarily as a regression protection against failures coming from optimizations in the publishing code).
+        var propertyData = GetSerializedPropertyData(2, 6);
+        Assert.AreEqual("1,52,Welcome to our Home page;1,53,This is the welcome message on the first page;1,54,John Doe;6,52,Welcome to our Home page;6,53,This is the welcome message on the first page;6,54,John Doe;", propertyData);
+
+        // Act: Edit and publish the root content item a second time.
+        var textPage = ContentService.GetById(Textpage.Key)!;
+        textPage.SetValue("bodyText", "This is the updated welcome message on the first page");
+        ContentService.Save(textPage);
+
+        // Assert the actual values in the umbracoPropertyData table.
+        publishResult = await ContentPublishingService.PublishAsync(Textpage.Key, [new CulturePublishScheduleModel()], Constants.Security.SuperUserKey);
+        Assert.IsTrue(publishResult.Success);
+
+        propertyData = GetSerializedPropertyData(3, 9);
+        Assert.AreEqual("1,52,Welcome to our Home page;1,53,This is the welcome message on the first page;1,54,John Doe;6,52,Welcome to our Home page;6,53,This is the updated welcome message on the first page;6,54,John Doe;7,52,Welcome to our Home page;7,53,This is the updated welcome message on the first page;7,54,John Doe;", propertyData);
+    }
+
+    private string GetSerializedPropertyData(int expectedNumberOfContentVersionRecords, int expectedNumberOfPropertyDataRecords)
+    {
+        using var scope = ScopeProvider.CreateScope();
+        var contentVersionIds = scope.Database.Fetch<ContentVersionDto>().Where(x => x.NodeId == Textpage.Id).Select(x => x.Id).ToList();
+        Assert.AreEqual(expectedNumberOfContentVersionRecords, contentVersionIds.Count);
+
+        var propertyDataDtos = scope.Database.Fetch<PropertyDataDto>().Where(x => contentVersionIds.Contains(x.VersionId)).ToList();
+        Assert.AreEqual(expectedNumberOfPropertyDataRecords, propertyDataDtos.Count);  // 3 properties * 2 (published + edited).
+
+        var sb = new StringBuilder();
+        foreach (var propertyDataDto in propertyDataDtos.OrderBy(x => x.VersionId).ThenBy(x => x.PropertyTypeId))
+        {
+            sb.AppendFormat("{0},{1},{2};", propertyDataDto.VersionId, propertyDataDto.PropertyTypeId, propertyDataDto.TextValue ?? propertyDataDto.VarcharValue);
+        }
+
+        scope.Complete();
+
+        return sb.ToString();
     }
 
     [Test]
