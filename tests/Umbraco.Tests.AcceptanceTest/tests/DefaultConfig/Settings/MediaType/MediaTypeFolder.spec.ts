@@ -59,7 +59,7 @@ test('can rename a media type folder', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   await umbracoUi.mediaType.waitForMediaTypeToBeRenamed();
-  await umbracoUi.waitForTimeout(500); // Small wait to ensure the API has caught up
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short); // Small wait to ensure the API has caught up
   const folderData = await umbracoApi.mediaType.getByName(mediaTypeFolderName);
   expect(folderData.name).toBe(mediaTypeFolderName);
   await umbracoUi.mediaType.isMediaTypeTreeItemVisible(oldFolderName, false);
