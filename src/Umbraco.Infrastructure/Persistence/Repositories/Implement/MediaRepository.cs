@@ -52,7 +52,8 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
         IJsonSerializer serializer,
         IEventAggregator eventAggregator,
         IRepositoryCacheVersionService repositoryCacheVersionService,
-        ICacheSyncService cacheSyncService)
+        ICacheSyncService cacheSyncService,
+        IDatabaseProviderOperationFactory databaseProviderOperationFactory)
         : base(
             scopeAccessor,
             cache,
@@ -65,7 +66,8 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
             dataTypeService,
             eventAggregator,
             repositoryCacheVersionService,
-            cacheSyncService)
+            cacheSyncService,
+            databaseProviderOperationFactory)
     {
         _cache = cache;
         _mediaTypeRepository = mediaTypeRepository ?? throw new ArgumentNullException(nameof(mediaTypeRepository));
@@ -79,6 +81,47 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
             loggerFactory.CreateLogger<MediaByGuidReadRepository>(),
             repositoryCacheVersionService,
             cacheSyncService);
+    }
+
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
+    public MediaRepository(
+        IScopeAccessor scopeAccessor,
+        AppCaches cache,
+        ILogger<MediaRepository> logger,
+        ILoggerFactory loggerFactory,
+        IMediaTypeRepository mediaTypeRepository,
+        ITagRepository tagRepository,
+        ILanguageRepository languageRepository,
+        IRelationRepository relationRepository,
+        IRelationTypeRepository relationTypeRepository,
+        PropertyEditorCollection propertyEditorCollection,
+        MediaUrlGeneratorCollection mediaUrlGenerators,
+        DataValueReferenceFactoryCollection dataValueReferenceFactories,
+        IDataTypeService dataTypeService,
+        IJsonSerializer serializer,
+        IEventAggregator eventAggregator,
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : this(
+            scopeAccessor,
+            cache,
+            logger,
+            loggerFactory,
+            mediaTypeRepository,
+            tagRepository,
+            languageRepository,
+            relationRepository,
+            relationTypeRepository,
+            propertyEditorCollection,
+            mediaUrlGenerators,
+            dataValueReferenceFactories,
+            dataTypeService,
+            serializer,
+            eventAggregator,
+            repositoryCacheVersionService,
+            cacheSyncService,
+            StaticServiceProvider.Instance.GetRequiredService<IDatabaseProviderOperationFactory>())
+    {
     }
 
     [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
@@ -98,7 +141,8 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
         IDataTypeService dataTypeService,
         IJsonSerializer serializer,
         IEventAggregator eventAggregator)
-        : this(scopeAccessor,
+        : this(
+            scopeAccessor,
             cache,
             logger,
             loggerFactory,
@@ -114,8 +158,8 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
             serializer,
             eventAggregator,
             StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>(),
-            StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>()
-            )
+            StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IDatabaseProviderOperationFactory>())
     {
     }
 

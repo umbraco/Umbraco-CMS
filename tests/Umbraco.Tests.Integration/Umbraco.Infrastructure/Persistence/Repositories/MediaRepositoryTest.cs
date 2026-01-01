@@ -1,14 +1,12 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence;
@@ -16,6 +14,7 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Infrastructure.Scoping;
@@ -41,6 +40,8 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
     private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
 
     private IJsonSerializer JsonSerializer => GetRequiredService<IJsonSerializer>();
+
+    private IDatabaseProviderOperationFactory DatabaseProviderOperationFactory => GetRequiredService<IDatabaseProviderOperationFactory>();
 
     // Makes handing IDs easier, these are set by CreateTestData
     private Media _testFolder;
@@ -82,7 +83,8 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
             JsonSerializer,
             Mock.Of<IEventAggregator>(),
             Mock.Of<IRepositoryCacheVersionService>(),
-            Mock.Of<ICacheSyncService>());
+            Mock.Of<ICacheSyncService>(),
+            DatabaseProviderOperationFactory);
         return repository;
     }
 

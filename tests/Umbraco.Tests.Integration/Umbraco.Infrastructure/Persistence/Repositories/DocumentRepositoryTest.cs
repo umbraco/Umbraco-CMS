@@ -1,8 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -27,7 +25,6 @@ using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositories;
 
@@ -59,6 +56,8 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
     private IFileService FileService => GetRequiredService<IFileService>();
 
     private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
+
+    private IDatabaseProviderOperationFactory DatabaseProviderOperationFactory => GetRequiredService<IDatabaseProviderOperationFactory>();
 
     private FileSystems FileSystems => GetRequiredService<FileSystems>();
 
@@ -158,7 +157,8 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
             ConfigurationEditorJsonSerializer,
             Mock.Of<IEventAggregator>(),
             Mock.Of<IRepositoryCacheVersionService>(),
-            Mock.Of<ICacheSyncService>());
+            Mock.Of<ICacheSyncService>(),
+            DatabaseProviderOperationFactory);
         return repository;
     }
 

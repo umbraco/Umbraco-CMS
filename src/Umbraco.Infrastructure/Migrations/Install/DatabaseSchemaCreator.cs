@@ -154,6 +154,8 @@ public class DatabaseSchemaCreator
                 _logger.LogError(ex, "Could not drop table {TableName}", tableName);
             }
         }
+
+        DropAdditionalSchema();
     }
 
     /// <summary>
@@ -182,6 +184,8 @@ public class DatabaseSchemaCreator
             {
                 CreateTable(false, table, dataCreation);
             }
+
+            CreateAdditionalSchema();
         }
 
         DatabaseSchemaCreatedNotification createdNotification =
@@ -538,6 +542,28 @@ public class DatabaseSchemaCreator
     {
         var sql = new Sql(string.Format(SqlSyntax.DropTable, SqlSyntax.GetQuotedTableName(tableName)));
         _database.Execute(sql);
+    }
+
+    private void CreateAdditionalSchema()
+    {
+        // Additional schema consists of SQL Server specific stored procedures, types, etc. used for optimization of specific operations.
+        ISqlSyntaxProvider sqlSyntaxProvider = _database.SqlContext.SqlSyntax;
+        if (sqlSyntaxProvider.GetType().Name == "SqlServerSyntaxProvider")
+        {
+            // Create the Table-Valued Type and stored procedure for efficient property data replacement.
+            AdditionalSchema.CreateOperations.CreateSchemaForPropertyDataReplacementOperation(_database);
+        }
+    }
+
+    private void DropAdditionalSchema()
+    {
+        // Additional schema consists of SQL Server specific stored procedures, types, etc. used for optimization of specific operations.
+        ISqlSyntaxProvider sqlSyntaxProvider = _database.SqlContext.SqlSyntax;
+        if (sqlSyntaxProvider.GetType().Name == "SqlServerSyntaxProvider")
+        {
+            // Drop the Table-Valued Type and stored procedure for efficient property data replacement.
+            AdditionalSchema.CreateOperations.DropSchemaForPropertyDataReplacementOperation(_database);
+        }
     }
 
     #endregion

@@ -34,19 +34,19 @@ public partial class ContentPublishingServiceTests
 
         // Assert the actual values in the umbracoPropertyData table (this is primarily as a regression protection against failures coming from optimizations in the publishing code).
         var propertyData = GetSerializedPropertyData(2, 6);
-        Assert.AreEqual("1,52,Welcome to our Home page;1,53,This is the welcome message on the first page;1,54,John Doe;6,52,Welcome to our Home page;6,53,This is the welcome message on the first page;6,54,John Doe;", propertyData);
+        Assert.AreEqual("1,1,52,Welcome to our Home page|2,1,53,This is the welcome message on the first page|3,1,54,John Doe|16,6,52,Welcome to our Home page|17,6,53,This is the welcome message on the first page|18,6,54,John Doe|", propertyData);
 
         // Act: Edit and publish the root content item a second time.
         var textPage = ContentService.GetById(Textpage.Key)!;
         textPage.SetValue("bodyText", "This is the updated welcome message on the first page");
+        textPage.SetValue("author", null);
         ContentService.Save(textPage);
-
-        // Assert the actual values in the umbracoPropertyData table.
         publishResult = await ContentPublishingService.PublishAsync(Textpage.Key, [new CulturePublishScheduleModel()], Constants.Security.SuperUserKey);
         Assert.IsTrue(publishResult.Success);
 
-        propertyData = GetSerializedPropertyData(3, 9);
-        Assert.AreEqual("1,52,Welcome to our Home page;1,53,This is the welcome message on the first page;1,54,John Doe;6,52,Welcome to our Home page;6,53,This is the updated welcome message on the first page;6,54,John Doe;7,52,Welcome to our Home page;7,53,This is the updated welcome message on the first page;7,54,John Doe;", propertyData);
+        // Assert the actual values in the umbracoPropertyData table.
+        propertyData = GetSerializedPropertyData(3, 7);
+        Assert.AreEqual("1,1,52,Welcome to our Home page|2,1,53,This is the welcome message on the first page|3,1,54,John Doe|16,6,52,Welcome to our Home page|17,6,53,This is the updated welcome message on the first page|19,7,52,Welcome to our Home page|20,7,53,This is the updated welcome message on the first page|", propertyData);
     }
 
     private string GetSerializedPropertyData(int expectedNumberOfContentVersionRecords, int expectedNumberOfPropertyDataRecords)
@@ -56,12 +56,12 @@ public partial class ContentPublishingServiceTests
         Assert.AreEqual(expectedNumberOfContentVersionRecords, contentVersionIds.Count);
 
         var propertyDataDtos = scope.Database.Fetch<PropertyDataDto>().Where(x => contentVersionIds.Contains(x.VersionId)).ToList();
-        Assert.AreEqual(expectedNumberOfPropertyDataRecords, propertyDataDtos.Count);  // 3 properties * 2 (published + edited).
+        Assert.AreEqual(expectedNumberOfPropertyDataRecords, propertyDataDtos.Count);
 
         var sb = new StringBuilder();
         foreach (var propertyDataDto in propertyDataDtos.OrderBy(x => x.VersionId).ThenBy(x => x.PropertyTypeId))
         {
-            sb.AppendFormat("{0},{1},{2};", propertyDataDto.VersionId, propertyDataDto.PropertyTypeId, propertyDataDto.TextValue ?? propertyDataDto.VarcharValue);
+            sb.AppendFormat("{0},{1},{2},{3}|", propertyDataDto.Id, propertyDataDto.VersionId, propertyDataDto.PropertyTypeId, propertyDataDto.TextValue ?? propertyDataDto.VarcharValue);
         }
 
         scope.Complete();

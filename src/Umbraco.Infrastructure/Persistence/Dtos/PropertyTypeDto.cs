@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(TableName)]
 [PrimaryKey("id")]
 [ExplicitColumns]
-internal class PropertyTypeDto
+public class PropertyTypeDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.PropertyType;
 

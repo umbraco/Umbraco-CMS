@@ -51,7 +51,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             IDataTypeService dataTypeService,
             IEventAggregator eventAggregator,
             IRepositoryCacheVersionService repositoryCacheVersionService,
-            ICacheSyncService cacheSyncService)
+            ICacheSyncService cacheSyncService,
+            IDatabaseProviderOperationFactory databaseProviderOperationFactory)
             : base(
                 scopeAccessor,
                 cache,
@@ -66,6 +67,38 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             PropertyEditors = propertyEditors;
             _dataValueReferenceFactories = dataValueReferenceFactories;
             _eventAggregator = eventAggregator;
+            DatabaseProviderOperationFactory = databaseProviderOperationFactory;
+        }
+
+        [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
+        protected ContentRepositoryBase(
+            IScopeAccessor scopeAccessor,
+            AppCaches cache,
+            ILogger<EntityRepositoryBase<TId, TEntity>> logger,
+            ILanguageRepository languageRepository,
+            IRelationRepository relationRepository,
+            IRelationTypeRepository relationTypeRepository,
+            PropertyEditorCollection propertyEditors,
+            DataValueReferenceFactoryCollection dataValueReferenceFactories,
+            IDataTypeService dataTypeService,
+            IEventAggregator eventAggregator,
+            IRepositoryCacheVersionService repositoryCacheVersionService,
+            ICacheSyncService cacheSyncService)
+            : this(
+                scopeAccessor,
+                cache,
+                logger,
+                languageRepository,
+                relationRepository,
+                relationTypeRepository,
+                propertyEditors,
+                dataValueReferenceFactories,
+                dataTypeService,
+                eventAggregator,
+                repositoryCacheVersionService,
+                cacheSyncService,
+                StaticServiceProvider.Instance.GetRequiredService<IDatabaseProviderOperationFactory>())
+        {
         }
 
         [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
@@ -113,6 +146,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         protected IRelationTypeRepository RelationTypeRepository { get; }
 
         protected PropertyEditorCollection PropertyEditors { get; }
+
+        protected IDatabaseProviderOperationFactory DatabaseProviderOperationFactory { get; }
 
         #region Versions
 
@@ -1134,99 +1169,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         /// </summary>
         protected void ReplacePropertyValues(TEntity entity, int versionId, int publishedVersionId, out bool edited, out HashSet<string>? editedCultures)
         {
-            /*
-            // *** LOCK, DELETE AND INSERT IMPLEMENTATION ***
-            var propertyDataDtos = PropertyFactory.BuildDtos(
-                    entity.ContentType.Variations,
-                    entity.VersionId,
-                    publishedVersionId,
-                    entity.Properties,
-                    LanguageRepository,
-                    out edited,
-                    out editedCultures)
-                .ToList();
-
-            // Get all distinct versionIds from the DTOs - BuildDtos may produce DTOs for multiple versions
-            // (e.g., both edit and published versions).
-            var versionIds = propertyDataDtos.Select(x => x.VersionId).Distinct().ToList();
-
-            if (versionIds.Count == 0)
-            {
-                // No property data to save - just delete existing for the parameter versionId
-                Database.Execute(SqlContext.Sql().Delete<PropertyDataDto>().Where<PropertyDataDto>(x => x.VersionId == versionId));
-                return;
-            }
-
-            // Acquire locks on existing property data rows for ALL versionIds using FOR UPDATE.
-            // This ensures concurrent transactions wait rather than fail with constraint violations.
-            // We only need the lock, not the data, so we select just the id column.
-            Sql<ISqlContext> lockSql = SqlContext.Sql()
-                .Select<PropertyDataDto>(x => x.Id)
-                .From<PropertyDataDto>()
-                .WhereIn<PropertyDataDto>(x => x.VersionId, versionIds)
-                .ForUpdate();
-            Database.Fetch<int>(lockSql);
-
-            // Now that we hold the locks, we can safely DELETE + bulk INSERT.
-            // This is more efficient than UPDATE batches as it reduces round trips.
-            Database.Execute(SqlContext.Sql().Delete<PropertyDataDto>().WhereIn<PropertyDataDto>(x => x.VersionId, versionIds));
-
-            Database.InsertBulk(propertyDataDtos);
-            */
-
-            // *** ORIGINAL IMPLEMENTATION ***
-            // Replace the property data.
-            // Lookup the data to update with a UPDLOCK (using ForUpdate()) this is because we need to be atomic
-            // and handle DB concurrency. Doing a clear and then re-insert is prone to concurrency issues.
-            Sql<ISqlContext> propDataSql = SqlContext.Sql().Select("*").From<PropertyDataDto>().Where<PropertyDataDto>(x => x.VersionId == versionId).ForUpdate();
-            List<PropertyDataDto>? existingPropData = Database.Fetch<PropertyDataDto>(propDataSql);
-            var propertyTypeToPropertyData = new Dictionary<(int propertyTypeId, int versionId, int? languageId, string? segment), PropertyDataDto>();
-            var existingPropDataIds = new List<int>();
-            foreach (PropertyDataDto? p in existingPropData)
-            {
-                existingPropDataIds.Add(p.Id);
-                propertyTypeToPropertyData[(p.PropertyTypeId, p.VersionId, p.LanguageId, p.Segment)] = p;
-            }
-
             IEnumerable<PropertyDataDto> propertyDataDtos = PropertyFactory.BuildDtos(entity.ContentType.Variations, entity.VersionId, publishedVersionId, entity.Properties, LanguageRepository, out edited, out editedCultures);
 
-            var toUpdate = new List<PropertyDataDto>();
-            var toInsert = new List<PropertyDataDto>();
-            foreach (PropertyDataDto propertyDataDto in propertyDataDtos)
-            {
-                // Check if this already exists and update, else insert a new one
-                if (propertyTypeToPropertyData.TryGetValue((propertyDataDto.PropertyTypeId, propertyDataDto.VersionId, propertyDataDto.LanguageId, propertyDataDto.Segment), out PropertyDataDto? propData))
-                {
-                    propertyDataDto.Id = propData.Id;
-                    toUpdate.Add(propertyDataDto);
-                }
-                else
-                {
-                    toInsert.Add(propertyDataDto);
-                }
-
-                // track which ones have been processed
-                existingPropDataIds.Remove(propertyDataDto.Id);
-            }
-
-            if (toUpdate.Count > 0)
-            {
-                var updateBatch = toUpdate
-                    .Select(x => UpdateBatch.For(x))
-                    .ToList();
-                Database.UpdateBatch(updateBatch, new BatchOptions { BatchSize = 100 });
-            }
-
-            if (toInsert.Count > 0)
-            {
-                Database.InsertBulk(toInsert);
-            }
-
-            // For any remaining that haven't been processed they need to be deleted
-            if (existingPropDataIds.Count > 0)
-            {
-                Database.Execute(SqlContext.Sql().Delete<PropertyDataDto>().WhereIn<PropertyDataDto>(x => x.Id, existingPropDataIds));
-            }
+            // Here we'll optimize the operation for SQL Server to help with database latency issues. On large content items with many properties,
+            // replacing property data can be slow due to the multiple round-trips to the database. For SQL Server we have an optimized operation
+            // that uses a TVP (table-valued parameter) to perform the operation in a single round-trip via a stored procedure.
+            var providerName = Database.DatabaseType.GetProviderName();
+            IPropertyDataReplacerOperation propertyDataReplacer = DatabaseProviderOperationFactory.GetPropertyDataReplacerOperation(providerName);
+            propertyDataReplacer.ReplacePropertyData(Database, versionId, propertyDataDtos);
         }
     }
 }

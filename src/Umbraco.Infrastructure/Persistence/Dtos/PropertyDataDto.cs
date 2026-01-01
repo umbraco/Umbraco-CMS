@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(TableName)]
 [PrimaryKey("id")]
 [ExplicitColumns]
-internal sealed class PropertyDataDto
+public sealed class PropertyDataDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.PropertyData;
     public const int VarcharLength = 512;

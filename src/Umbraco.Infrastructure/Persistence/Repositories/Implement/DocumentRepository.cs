@@ -59,7 +59,8 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         IJsonSerializer serializer,
         IEventAggregator eventAggregator,
         IRepositoryCacheVersionService repositoryCacheVersionService,
-        ICacheSyncService cacheSyncService)
+        ICacheSyncService cacheSyncService,
+        IDatabaseProviderOperationFactory databaseProviderOperationFactory)
         : base(
             scopeAccessor,
             appCaches,
@@ -72,7 +73,8 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             dataTypeService,
             eventAggregator,
             repositoryCacheVersionService,
-            cacheSyncService)
+            cacheSyncService,
+            databaseProviderOperationFactory)
     {
         _contentTypeRepository =
             contentTypeRepository ?? throw new ArgumentNullException(nameof(contentTypeRepository));
@@ -91,6 +93,47 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             loggerFactory.CreateLogger<ContentByGuidReadRepository>(),
             repositoryCacheVersionService,
             cacheSyncService);
+    }
+
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
+    public DocumentRepository(
+        IScopeAccessor scopeAccessor,
+        AppCaches appCaches,
+        ILogger<DocumentRepository> logger,
+        ILoggerFactory loggerFactory,
+        IContentTypeRepository contentTypeRepository,
+        ITemplateRepository templateRepository,
+        ITagRepository tagRepository,
+        ILanguageRepository languageRepository,
+        IRelationRepository relationRepository,
+        IRelationTypeRepository relationTypeRepository,
+        PropertyEditorCollection propertyEditors,
+        DataValueReferenceFactoryCollection dataValueReferenceFactories,
+        IDataTypeService dataTypeService,
+        IJsonSerializer serializer,
+        IEventAggregator eventAggregator,
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : this(
+            scopeAccessor,
+            appCaches,
+            logger,
+            loggerFactory,
+            contentTypeRepository,
+            templateRepository,
+            tagRepository,
+            languageRepository,
+            relationRepository,
+            relationTypeRepository,
+            propertyEditors,
+            dataValueReferenceFactories,
+            dataTypeService,
+            serializer,
+            eventAggregator,
+            repositoryCacheVersionService,
+            cacheSyncService,
+            StaticServiceProvider.Instance.GetRequiredService<IDatabaseProviderOperationFactory>())
+    {
     }
 
     [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]

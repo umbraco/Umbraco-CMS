@@ -60,7 +60,8 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
         IEventAggregator eventAggregator,
         IOptions<MemberPasswordConfigurationSettings> passwordConfiguration,
         IRepositoryCacheVersionService repositoryCacheVersionService,
-        ICacheSyncService cacheSyncService)
+        ICacheSyncService cacheSyncService,
+        IDatabaseProviderOperationFactory databaseProviderOperationFactory)
         : base(
             scopeAccessor,
             cache,
@@ -73,7 +74,8 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
             dataTypeService,
             eventAggregator,
             repositoryCacheVersionService,
-            cacheSyncService)
+            cacheSyncService,
+            databaseProviderOperationFactory)
     {
         _memberTypeRepository =
             memberTypeRepository ?? throw new ArgumentNullException(nameof(memberTypeRepository));
@@ -84,6 +86,49 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
         _passwordConfiguration = passwordConfiguration.Value;
         _memberByUsernameCachePolicy =
             new MemberRepositoryUsernameCachePolicy(GlobalIsolatedCache, ScopeAccessor, DefaultOptions, repositoryCacheVersionService, cacheSyncService);
+    }
+
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
+    public MemberRepository(
+        IScopeAccessor scopeAccessor,
+        AppCaches cache,
+        ILogger<MemberRepository> logger,
+        IMemberTypeRepository memberTypeRepository,
+        IMemberGroupRepository memberGroupRepository,
+        ITagRepository tagRepository,
+        ILanguageRepository languageRepository,
+        IRelationRepository relationRepository,
+        IRelationTypeRepository relationTypeRepository,
+        IPasswordHasher passwordHasher,
+        PropertyEditorCollection propertyEditors,
+        DataValueReferenceFactoryCollection dataValueReferenceFactories,
+        IDataTypeService dataTypeService,
+        IJsonSerializer serializer,
+        IEventAggregator eventAggregator,
+        IOptions<MemberPasswordConfigurationSettings> passwordConfiguration,
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : this(
+            scopeAccessor,
+            cache,
+            logger,
+            memberTypeRepository,
+            memberGroupRepository,
+            tagRepository,
+            languageRepository,
+            relationRepository,
+            relationTypeRepository,
+            passwordHasher,
+            propertyEditors,
+            dataValueReferenceFactories,
+            dataTypeService,
+            serializer,
+            eventAggregator,
+            passwordConfiguration,
+            repositoryCacheVersionService,
+            cacheSyncService,
+            StaticServiceProvider.Instance.GetRequiredService<IDatabaseProviderOperationFactory>())
+    {
     }
 
     [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
@@ -122,7 +167,8 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
             eventAggregator,
             passwordConfiguration,
             StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>(),
-            StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>())
+            StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IDatabaseProviderOperationFactory>())
     {
     }
 

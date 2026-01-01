@@ -37,7 +37,10 @@ internal sealed class DocumentBlueprintRepository : DocumentRepository, IDocumen
         IDataTypeService dataTypeService,
         DataValueReferenceFactoryCollection dataValueReferenceFactories,
         IJsonSerializer serializer,
-        IEventAggregator eventAggregator)
+        IEventAggregator eventAggregator,
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService,
+        IDatabaseProviderOperationFactory databaseProviderOperationFactory)
         : base(
             scopeAccessor,
             appCaches,
@@ -53,7 +56,10 @@ internal sealed class DocumentBlueprintRepository : DocumentRepository, IDocumen
             dataValueReferenceFactories,
             dataTypeService,
             serializer,
-            eventAggregator)
+            eventAggregator,
+            repositoryCacheVersionService,
+            cacheSyncService,
+            databaseProviderOperationFactory)
     {
     }
 

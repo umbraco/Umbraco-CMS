@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Cms.Persistence.SqlServer.Interceptors;
+using Umbraco.Cms.Persistence.SqlServer.Operations;
 using Umbraco.Cms.Persistence.SqlServer.Services;
 
 namespace Umbraco.Cms.Persistence.SqlServer;
@@ -43,6 +44,10 @@ public static class UmbracoBuilderExtensions
             .Singleton<IProviderSpecificInterceptor, SqlServerAddMiniProfilerInterceptor>());
         builder.Services.TryAddEnumerable(ServiceDescriptor
             .Singleton<IProviderSpecificInterceptor, SqlServerAddRetryPolicyInterceptor>());
+
+        // Optimized database operations using SQL Server specific features.
+        builder.Services.TryAddEnumerable(ServiceDescriptor
+            .Singleton<IPropertyDataReplacerOperation, SqlServerPropertyDataReplacerOperation>());
 
         DbProviderFactories.UnregisterFactory(Constants.ProviderName);
         DbProviderFactories.RegisterFactory(Constants.ProviderName, SqlClientFactory.Instance);
