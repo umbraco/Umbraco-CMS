@@ -48,10 +48,31 @@ public interface IContentPublishingService
     /// <param name="key">The key of the root content.</param>
     /// <param name="culturesToPublishOrSchedule">The cultures to publish or schedule.</param>
     /// <param name="userKey">The identifier of the user performing the operation.</param>
-    /// <returns></returns>
+    /// <returns>Result of the publish operation.</returns>
     Task<Attempt<ContentPublishingResult, ContentPublishingOperationStatus>> PublishAsync(
         Guid key,
         ICollection<CulturePublishScheduleModel> culturesToPublishOrSchedule,
-        Guid userKey) => StaticServiceProvider.Instance.GetRequiredService<ContentPublishingService>()
-        .PublishAsync(key, culturesToPublishOrSchedule, userKey);
+        Guid userKey);
+
+    /// <summary>
+    /// Publishes a single content item using an already-loaded content entity.
+    /// </summary>
+    /// <param name="content">The content entity to publish.</param>
+    /// <param name="culturesToPublishOrSchedule">The cultures to publish or schedule.</param>
+    /// <param name="userKey">The identifier of the user performing the operation.</param>
+    /// <param name="skipValidation">
+    /// When true, skips property validation. Only use when the caller has already validated
+    /// the content (e.g., after a successful create/update with no validation errors).
+    /// </param>
+    /// <returns>Result of the publish operation.</returns>
+    /// <remarks>
+    /// Use this overload when you already have the IContent entity (e.g., after creating or updating)
+    /// to avoid an unnecessary database round-trip.
+    /// </remarks>
+    // TODO (18): Remove the default implementation.
+    Task<Attempt<ContentPublishingResult, ContentPublishingOperationStatus>> PublishAsync(
+        IContent content,
+        ICollection<CulturePublishScheduleModel> culturesToPublishOrSchedule,
+        Guid userKey,
+        bool skipValidation = false) => PublishAsync(content.Key, culturesToPublishOrSchedule, userKey);
 }

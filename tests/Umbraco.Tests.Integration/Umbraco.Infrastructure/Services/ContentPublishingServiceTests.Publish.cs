@@ -817,4 +817,71 @@ public partial class ContentPublishingServiceTests
             Assert.AreEqual(status, item.OperationStatus);
         }
     }
+
+    [Test]
+    public async Task Can_Publish_Valid_Content_Using_IContent_Overload_With_SkipValidation()
+    {
+        // Arrange: Use Textpage which has valid content
+        VerifyIsNotPublished(Textpage.Key);
+
+        // Act: Publish using IContent overload with skipValidation: true
+        // This simulates what CreateAndPublishDocumentController does after a successful create
+        var result = await ContentPublishingService.PublishAsync(
+            Textpage,
+            [new CulturePublishScheduleModel()],
+            Constants.Security.SuperUserKey,
+            skipValidation: true);
+
+        // Assert: Should succeed - content is valid
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Status);
+        VerifyIsPublished(Textpage.Key);
+    }
+
+    [Test]
+    public async Task Cannot_Publish_Invalid_Content_Even_When_SkipValidation_Is_True()
+    {
+        // Arrange: Create invalid content (mandatory properties set to empty)
+        var content = await CreateInvalidContent();
+
+        // Act: Publish using IContent overload with skipValidation: true
+        // Note: skipValidation only skips ContentPublishingService's early validation,
+        // but ContentService.Publish still validates as a safety check
+        var result = await ContentPublishingService.PublishAsync(
+            content,
+            [new CulturePublishScheduleModel()],
+            Constants.Security.SuperUserKey,
+            skipValidation: true);
+
+        // Assert: Should still fail because ContentService.Publish validates
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentPublishingOperationStatus.ContentInvalid, result.Status);
+        VerifyIsNotPublished(content.Key);
+    }
+
+    [Test]
+    public async Task Cannot_Publish_Invalid_Content_When_SkipValidation_Is_False()
+    {
+        // Arrange: Create invalid content (mandatory properties set to empty)
+        var content = await CreateInvalidContent();
+
+        // Act: Publish using IContent overload with skipValidation: false (default)
+        var result = await ContentPublishingService.PublishAsync(
+            content,
+            [new CulturePublishScheduleModel()],
+            Constants.Security.SuperUserKey,
+            skipValidation: false);
+
+        // Assert: Should fail with ContentInvalid and return invalid property aliases
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentPublishingOperationStatus.ContentInvalid, result.Status);
+
+        var invalidPropertyAliases = result.Result.InvalidPropertyAliases.ToArray();
+        Assert.AreEqual(3, invalidPropertyAliases.Length);
+        Assert.Contains("title", invalidPropertyAliases);
+        Assert.Contains("bodyText", invalidPropertyAliases);
+        Assert.Contains("author", invalidPropertyAliases);
+
+        VerifyIsNotPublished(content.Key);
+    }
 }

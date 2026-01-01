@@ -76,17 +76,27 @@ public class UpdateAndPublishDocumentController : DocumentControllerBase
             return ContentEditingOperationStatusResult(updateResult.Status);
         }
 
+        // If update had validation errors, don't attempt to publish - it will fail.
+        if (updateResult.Status == ContentEditingOperationStatus.PropertyValidationError)
+        {
+            return DocumentPublishingOperationStatusResult(
+                ContentPublishingOperationStatus.ContentInvalid,
+                invalidPropertyAliases: updateResult.Result.ValidationResult.ValidationErrors.Select(e => e.Alias));
+        }
+
         // Build immediate publish model (no schedule).
         var culturePublishSchedules = requestModel.Cultures
             .Select(culture => new CulturePublishScheduleModel { Culture = culture })
             .ToList();
 
-        // Publish the document immediately.
+        // Publish the document immediately using the already-loaded content.
+        // Skip validation since update succeeded with no validation errors.
         Attempt<ContentPublishingResult, ContentPublishingOperationStatus> publishResult =
             await _contentPublishingService.PublishAsync(
-                id,
+                updateResult.Result.Content!,
                 culturePublishSchedules,
-                CurrentUserKey(_backOfficeSecurityAccessor));
+                CurrentUserKey(_backOfficeSecurityAccessor),
+                skipValidation: true);
 
         if (publishResult.Success is false)
         {

@@ -75,25 +75,33 @@ public class CreateAndPublishDocumentController : DocumentControllerBase
             return ContentEditingOperationStatusResult(createResult.Status);
         }
 
-        Guid documentKey = createResult.Result.Content!.Key;
+        // If create had validation errors, don't attempt to publish - it will fail.
+        if (createResult.Status == ContentEditingOperationStatus.PropertyValidationError)
+        {
+            return DocumentPublishingOperationStatusResult(
+                ContentPublishingOperationStatus.ContentInvalid,
+                invalidPropertyAliases: createResult.Result.ValidationResult.ValidationErrors.Select(e => e.Alias));
+        }
 
         // Build immediate publish model (no schedule).
         var culturePublishSchedules = requestModel.Cultures
             .Select(culture => new CulturePublishScheduleModel { Culture = culture })
             .ToList();
 
-        // Publish the document immediately.
+        // Publish the document immediately using the already-loaded content.
+        // Skip validation since create succeeded with no validation errors.
         Attempt<ContentPublishingResult, ContentPublishingOperationStatus> publishResult =
             await _contentPublishingService.PublishAsync(
-                documentKey,
+                createResult.Result.Content!,
                 culturePublishSchedules,
-                CurrentUserKey(_backOfficeSecurityAccessor));
+                CurrentUserKey(_backOfficeSecurityAccessor),
+                skipValidation: true);
 
         if (publishResult.Success is false)
         {
             return DocumentPublishingOperationStatusResult(publishResult.Status, invalidPropertyAliases: publishResult.Result.InvalidPropertyAliases);
         }
 
-        return CreatedAtId<ByKeyDocumentController>(controller => nameof(controller.ByKey), documentKey);
+        return CreatedAtId<ByKeyDocumentController>(controller => nameof(controller.ByKey), createResult.Result.Content!.Key);
     }
 }
