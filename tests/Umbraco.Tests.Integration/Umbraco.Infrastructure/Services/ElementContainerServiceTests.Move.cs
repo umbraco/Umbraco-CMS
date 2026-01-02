@@ -1,22 +1,12 @@
 using NUnit.Framework;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Events;
-using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.ContentEditing;
-using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Tests.Common.Attributes;
-using Umbraco.Cms.Tests.Common.Builders;
-using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 public partial class ElementContainerServiceTests
 {
-    protected override void CustomTestSetup(IUmbracoBuilder builder) => builder
-        .AddNotificationHandler<EntityContainerMovingNotification, EntityContainerNotificationHandler>()
-        .AddNotificationHandler<EntityContainerMovedNotification, EntityContainerNotificationHandler>();
-
     [Test]
     public async Task Can_Move_Empty_Container_From_Root_To_Another_Container()
     {
@@ -220,7 +210,6 @@ public partial class ElementContainerServiceTests
     }
 
     [Test]
-    [LongRunning]
     public async Task Can_Move_Container_With_Descendant_Containers_From_One_Container_To_Another_Container()
     {
         var rootContainerKey = Guid.NewGuid();
@@ -296,70 +285,37 @@ public partial class ElementContainerServiceTests
     [LongRunning]
     public async Task Can_Move_Container_With_Descendant_Containers_And_Lots_Of_Elements_From_Root_To_Another_Container()
     {
-        var rootContainerKey = Guid.NewGuid();
-        var rootContainer = (await ElementContainerService.CreateAsync(rootContainerKey, "Root Container", null, Constants.Security.SuperUserKey)).Result;
-        Assert.NotNull(rootContainer);
+        var setup = await CreateContainerWithDescendantContainersAndLotsOfElements(true);
 
-        var childContainerKey = Guid.NewGuid();
-        var childContainer = (await ElementContainerService.CreateAsync(childContainerKey, "Child Container", null, Constants.Security.SuperUserKey)).Result;
-        Assert.NotNull(childContainer);
-        Assert.AreEqual(Constants.System.Root, childContainer.ParentId);
-        Assert.AreEqual($"{Constants.System.Root},{childContainer.Id}", childContainer.Path);
-        Assert.AreEqual(1, childContainer.Level);
-
-        var grandchildContainerKey = Guid.NewGuid();
-        var grandchildContainer = (await ElementContainerService.CreateAsync(grandchildContainerKey, "Grandchild Container", childContainerKey, Constants.Security.SuperUserKey)).Result;
-        Assert.NotNull(grandchildContainer);
-
-        var elementType = await CreateElementType();
-
-        // ensure that we have at least three pages of descendants to iterate across
-        var iterations = Cms.Core.Services.ElementContainerService.DescendantsIteratorPageSize + 5;
-        for (var i = 0; i < iterations; i++)
-        {
-            var element = await CreateElement(elementType.Key, childContainerKey);
-            Assert.AreEqual(childContainer.Id, element.ParentId);
-            Assert.AreEqual($"{childContainer.Path},{element.Id}", element.Path);
-            Assert.AreEqual(2, element.Level);
-
-            element = await CreateElement(elementType.Key, grandchildContainerKey);
-            Assert.AreEqual(grandchildContainer.Id, element.ParentId);
-            Assert.AreEqual($"{grandchildContainer.Path},{element.Id}", element.Path);
-            Assert.AreEqual(3, element.Level);
-        }
-
-        Assert.AreEqual(2, GetAtRoot().Length);
-        Assert.AreEqual(0, GetFolderChildren(rootContainerKey).Length);
-        Assert.AreEqual(506, GetFolderChildren(childContainerKey).Length);
-        Assert.AreEqual(505, GetFolderChildren(grandchildContainerKey).Length);
-
-        var moveResult = await ElementContainerService.MoveAsync(childContainerKey, rootContainerKey, Constants.Security.SuperUserKey);
+        var moveResult = await ElementContainerService.MoveAsync(setup.ChildContainerKey, setup.RootContainerKey, Constants.Security.SuperUserKey);
         Assert.Multiple(() =>
         {
             Assert.IsTrue(moveResult.Success);
             Assert.AreEqual(EntityContainerOperationStatus.Success, moveResult.Status);
         });
 
-        childContainer = await ElementContainerService.GetAsync(childContainerKey);
+        var rootContainer = await ElementContainerService.GetAsync(setup.RootContainerKey);
+        var childContainer = await ElementContainerService.GetAsync(setup.ChildContainerKey);
+        Assert.NotNull(rootContainer);
         Assert.NotNull(childContainer);
         Assert.AreEqual(rootContainer.Id, childContainer.ParentId);
         Assert.AreEqual($"{rootContainer.Path},{childContainer.Id}", childContainer.Path);
         Assert.AreEqual(2, childContainer.Level);
 
-        grandchildContainer = await ElementContainerService.GetAsync(grandchildContainerKey);
+        var grandchildContainer = await ElementContainerService.GetAsync(setup.GrandchildContainerKey);
         Assert.NotNull(grandchildContainer);
         Assert.AreEqual(childContainer.Id, grandchildContainer.ParentId);
         Assert.AreEqual($"{childContainer.Path},{grandchildContainer.Id}", grandchildContainer.Path);
         Assert.AreEqual(3, grandchildContainer.Level);
 
         Assert.AreEqual(1, GetAtRoot().Length);
-        Assert.AreEqual(1, GetFolderChildren(rootContainerKey).Length);
+        Assert.AreEqual(1, GetFolderChildren(setup.RootContainerKey).Length);
 
-        var grandchildren = GetFolderChildren(childContainerKey);
-        Assert.AreEqual(506, grandchildren.Length);
+        var grandchildren = GetFolderChildren(setup.ChildContainerKey);
+        Assert.AreEqual(setup.ChildContainerItems, grandchildren.Length);
 
-        var greatGrandchildren = GetFolderChildren(grandchildContainerKey);
-        Assert.AreEqual(505, greatGrandchildren.Length);
+        var greatGrandchildren = GetFolderChildren(setup.GrandchildContainerKey);
+        Assert.AreEqual(setup.GrandchildContainerItems, greatGrandchildren.Length);
 
         foreach (var element in grandchildren)
         {
@@ -377,72 +333,38 @@ public partial class ElementContainerServiceTests
     }
 
     [Test]
+    [LongRunning]
     public async Task Can_Move_Container_With_Descendant_Containers_And_Lots_Of_Elements_From_A_Container_To_Root()
     {
-        var rootContainerKey = Guid.NewGuid();
-        var rootContainer = (await ElementContainerService.CreateAsync(rootContainerKey, "Root Container", null, Constants.Security.SuperUserKey)).Result;
-        Assert.NotNull(rootContainer);
+        var setup = await CreateContainerWithDescendantContainersAndLotsOfElements(false);
 
-        var childContainerKey = Guid.NewGuid();
-        var childContainer = (await ElementContainerService.CreateAsync(childContainerKey, "Child Container", rootContainerKey, Constants.Security.SuperUserKey)).Result;
-        Assert.NotNull(childContainer);
-        Assert.AreEqual(rootContainer.Id, childContainer.ParentId);
-        Assert.AreEqual($"{rootContainer.Path},{childContainer.Id}", childContainer.Path);
-        Assert.AreEqual(2, childContainer.Level);
-
-        var grandchildContainerKey = Guid.NewGuid();
-        var grandchildContainer = (await ElementContainerService.CreateAsync(grandchildContainerKey, "Grandchild Container", childContainerKey, Constants.Security.SuperUserKey)).Result;
-        Assert.NotNull(grandchildContainer);
-
-        var elementType = await CreateElementType();
-
-        // ensure that we have at least three pages of descendants to iterate across
-        var iterations = Cms.Core.Services.ElementContainerService.DescendantsIteratorPageSize + 5;
-        for (var i = 0; i < iterations; i++)
-        {
-            var element = await CreateElement(elementType.Key, childContainerKey);
-            Assert.AreEqual(childContainer.Id, element.ParentId);
-            Assert.AreEqual($"{childContainer.Path},{element.Id}", element.Path);
-            Assert.AreEqual(3, element.Level);
-
-            element = await CreateElement(elementType.Key, grandchildContainerKey);
-            Assert.AreEqual(grandchildContainer.Id, element.ParentId);
-            Assert.AreEqual($"{grandchildContainer.Path},{element.Id}", element.Path);
-            Assert.AreEqual(4, element.Level);
-        }
-
-        Assert.AreEqual(1, GetAtRoot().Length);
-        Assert.AreEqual(1, GetFolderChildren(rootContainerKey).Length);
-        Assert.AreEqual(506, GetFolderChildren(childContainerKey).Length);
-        Assert.AreEqual(505, GetFolderChildren(grandchildContainerKey).Length);
-
-        var moveResult = await ElementContainerService.MoveAsync(childContainerKey, null, Constants.Security.SuperUserKey);
+        var moveResult = await ElementContainerService.MoveAsync(setup.ChildContainerKey, null, Constants.Security.SuperUserKey);
         Assert.Multiple(() =>
         {
             Assert.IsTrue(moveResult.Success);
             Assert.AreEqual(EntityContainerOperationStatus.Success, moveResult.Status);
         });
 
-        childContainer = await ElementContainerService.GetAsync(childContainerKey);
+        var childContainer = await ElementContainerService.GetAsync(setup.ChildContainerKey);
         Assert.NotNull(childContainer);
         Assert.AreEqual(Constants.System.Root, childContainer.ParentId);
         Assert.AreEqual($"{Constants.System.Root},{childContainer.Id}", childContainer.Path);
         Assert.AreEqual(1, childContainer.Level);
 
-        grandchildContainer = await ElementContainerService.GetAsync(grandchildContainerKey);
+        var grandchildContainer = await ElementContainerService.GetAsync(setup.GrandchildContainerKey);
         Assert.NotNull(grandchildContainer);
         Assert.AreEqual(childContainer.Id, grandchildContainer.ParentId);
         Assert.AreEqual($"{childContainer.Path},{grandchildContainer.Id}", grandchildContainer.Path);
         Assert.AreEqual(2, grandchildContainer.Level);
 
         Assert.AreEqual(2, GetAtRoot().Length);
-        Assert.AreEqual(0, GetFolderChildren(rootContainerKey).Length);
+        Assert.AreEqual(0, GetFolderChildren(setup.RootContainerKey).Length);
 
-        var grandchildren = GetFolderChildren(childContainerKey);
-        Assert.AreEqual(506, grandchildren.Length);
+        var grandchildren = GetFolderChildren(setup.ChildContainerKey);
+        Assert.AreEqual(setup.ChildContainerItems, grandchildren.Length);
 
-        var greatGrandchildren = GetFolderChildren(grandchildContainerKey);
-        Assert.AreEqual(505, greatGrandchildren.Length);
+        var greatGrandchildren = GetFolderChildren(setup.GrandchildContainerKey);
+        Assert.AreEqual(setup.GrandchildContainerItems, greatGrandchildren.Length);
 
         foreach (var element in grandchildren)
         {
@@ -600,49 +522,5 @@ public partial class ElementContainerServiceTests
             Assert.IsFalse(moveResult.Success);
             Assert.AreEqual(EntityContainerOperationStatus.InvalidParent, moveResult.Status);
         });
-    }
-
-    private async Task<IContentType> CreateElementType()
-    {
-        var elementType = new ContentTypeBuilder()
-            .WithAlias("test")
-            .WithName("Test")
-            .WithAllowAsRoot(true)
-            .WithIsElement(true)
-            .Build();
-
-        var result = await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
-        Assert.AreEqual(true, result.Success);
-        return elementType;
-    }
-
-    private async Task<IElement> CreateElement(Guid contentTypeKey, Guid? parentKey = null)
-    {
-        var createModel = new ElementCreateModel
-        {
-            ContentTypeKey = contentTypeKey,
-            ParentKey = parentKey,
-            Variants =
-            [
-                new VariantModel { Name = Guid.NewGuid().ToString("N") }
-            ],
-        };
-
-        var result = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        return result.Result.Content!;
-    }
-
-    private sealed class EntityContainerNotificationHandler :
-        INotificationHandler<EntityContainerMovingNotification>,
-        INotificationHandler<EntityContainerMovedNotification>
-    {
-        public static Action<EntityContainerMovingNotification>? MovingContainer { get; set; }
-
-        public static Action<EntityContainerMovedNotification>? MovedContainer { get; set; }
-
-        public void Handle(EntityContainerMovingNotification notification) => MovingContainer?.Invoke(notification);
-
-        public void Handle(EntityContainerMovedNotification notification) => MovedContainer?.Invoke(notification);
     }
 }

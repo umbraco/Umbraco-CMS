@@ -11,5 +11,6 @@ public enum EntityContainerOperationStatus
     ParentNotFound,
     NotEmpty,
     DuplicateName,
-    InvalidParent
+    InvalidParent,
+    InTrash,
 }
