@@ -49,7 +49,7 @@ public class ElementTreeControllerBase : FolderTreeControllerBase<ElementTreeIte
             if (entity is IElementEntitySlim elementEntitySlim)
             {
                 responseModel.HasChildren = false;
-                responseModel.DocumentType = _umbracoMapper.Map<DocumentTypeReferenceResponseModel>(elementEntitySlim)!;
+                responseModel.DocumentType = _elementPresentationFactory.CreateDocumentTypeReferenceResponseModel(elementEntitySlim);
                 responseModel.Variants = _elementPresentationFactory.CreateVariantsItemResponseModels(elementEntitySlim);
             }
 

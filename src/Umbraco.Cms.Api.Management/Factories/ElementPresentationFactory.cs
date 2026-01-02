@@ -77,4 +77,7 @@ public class ElementPresentationFactory : IElementPresentationFactory
             yield return model;
         }
     }
+
+    public DocumentTypeReferenceResponseModel CreateDocumentTypeReferenceResponseModel(IElementEntitySlim entity)
+        => _umbracoMapper.Map<DocumentTypeReferenceResponseModel>(entity)!;
 }
