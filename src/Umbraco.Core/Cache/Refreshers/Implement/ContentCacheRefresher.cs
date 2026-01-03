@@ -152,11 +152,9 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
 
         foreach (JsonPayload payload in payloads)
         {
-            var changeTypeContainsRemove = payload.ChangeTypes.HasTypesAny(TreeChangeTypes.Remove);
-
             // If the item is not a blueprint and is being completely removed, we need to refresh the domains cache if any domain was assigned to the content.
             // So track the IDs that have been removed.
-            if (payload.Blueprint is false && changeTypeContainsRemove)
+            if (payload.Blueprint is false && payload.ChangeTypes.HasTypesAny(TreeChangeTypes.Remove))
             {
                 idsRemoved.Add(payload.Id);
             }
@@ -428,6 +426,12 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
 
     private void HandleIdKeyMap(JsonPayload payload)
     {
+        // We only need to flush the ID/Key map when content is deleted.
+        if (payload.ChangeTypes.HasTypesAny(TreeChangeTypes.Remove) is false)
+        {
+            return;
+        }
+
         if (payload.Id != default)
         {
             _idKeyMap.ClearCache(payload.Id);
