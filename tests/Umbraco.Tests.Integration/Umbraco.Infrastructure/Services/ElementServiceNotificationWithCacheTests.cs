@@ -58,7 +58,9 @@ internal sealed class ElementServiceNotificationWithCacheTests : UmbracoIntegrat
         .AddNotificationHandler<ElementMovingNotification, ElementNotificationHandler>()
         .AddNotificationHandler<ElementMovedNotification, ElementNotificationHandler>()
         .AddNotificationHandler<ElementCopyingNotification, ElementNotificationHandler>()
-        .AddNotificationHandler<ElementCopiedNotification, ElementNotificationHandler>();
+        .AddNotificationHandler<ElementCopiedNotification, ElementNotificationHandler>()
+        .AddNotificationHandler<ElementMovingToRecycleBinNotification, ElementNotificationHandler>()
+        .AddNotificationHandler<ElementMovedToRecycleBinNotification, ElementNotificationHandler>();
 
     [Test]
     public async Task Saving_Saved_Get_Value()
@@ -231,6 +233,110 @@ internal sealed class ElementServiceNotificationWithCacheTests : UmbracoIntegrat
     }
 
     [Test]
+    public async Task Moving_To_Recycle_Bin_Moved_Fires_Notifications()
+    {
+        var element = (await ElementEditingService.CreateAsync(
+            new ElementCreateModel
+            {
+                ContentTypeKey = _contentType.Key,
+                Variants = [
+                    new() { Name = "Name" }
+                ],
+            },
+            Constants.Security.SuperUserKey)).Result.Content!;
+
+        Assert.IsNotNull(element);
+        var elementKey = element.Key;
+        var elementPath = element.Path;
+
+        var movingWasCalled = false;
+        var movedWasCalled = false;
+
+        try
+        {
+            ElementNotificationHandler.MovingElementToRecycleBin = notification =>
+            {
+                movingWasCalled = true;
+                var moveInfo = notification.MoveInfoCollection.Single();
+                Assert.AreEqual(elementKey, moveInfo.Entity.Key);
+                Assert.AreEqual(elementPath, moveInfo.OriginalPath);
+            };
+            ElementNotificationHandler.MovedElementToRecycleBin = notification =>
+            {
+                movedWasCalled = true;
+                var moveInfo = notification.MoveInfoCollection.Single();
+                Assert.AreEqual(elementKey, moveInfo.Entity.Key);
+                Assert.AreEqual(elementPath, moveInfo.OriginalPath);
+            };
+
+            var moveAttempt = await ElementEditingService.MoveToRecycleBinAsync(element.Key, Constants.Security.SuperUserKey);
+
+            Assert.Multiple(() =>
+            {
+                Assert.IsTrue(moveAttempt.Success);
+                Assert.AreEqual(moveAttempt.Result, ContentEditingOperationStatus.Success);
+            });
+
+            Assert.IsTrue(movingWasCalled);
+            Assert.IsTrue(movedWasCalled);
+        }
+        finally
+        {
+            ElementNotificationHandler.MovingElement = null;
+            ElementNotificationHandler.MovedElement = null;
+        }
+
+        element = (await ElementEditingService.GetAsync(element.Key))!;
+        Assert.AreEqual(Constants.System.RecycleBinElement, element.ParentId);
+    }
+
+    [Test]
+    public async Task Moving_To_Recycle_Bin_Can_Cancel_Move()
+    {
+        var element = (await ElementEditingService.CreateAsync(
+            new ElementCreateModel
+            {
+                ContentTypeKey = _contentType.Key,
+                Variants = [
+                    new() { Name = "Name" }
+                ],
+            },
+            Constants.Security.SuperUserKey)).Result.Content!;
+
+        var movingWasCalled = false;
+        var movedWasCalled = false;
+
+        ElementNotificationHandler.MovingElementToRecycleBin = notification =>
+        {
+            movingWasCalled = true;
+            notification.Cancel = true;
+        };
+        ElementNotificationHandler.MovedElementToRecycleBin = _ => movedWasCalled = true;
+
+        try
+        {
+            var moveAttempt = await ElementEditingService.MoveToRecycleBinAsync(element.Key, Constants.Security.SuperUserKey);
+
+            Assert.Multiple(() =>
+            {
+                Assert.IsFalse(moveAttempt.Success);
+                Assert.AreEqual(moveAttempt.Result, ContentEditingOperationStatus.CancelledByNotification);
+            });
+
+            Assert.IsTrue(movingWasCalled);
+            Assert.IsFalse(movedWasCalled);
+        }
+        finally
+        {
+            ElementNotificationHandler.MovingElement = null;
+            ElementNotificationHandler.MovedElement = null;
+        }
+
+        element = (await ElementEditingService.GetAsync(element.Key))!;
+        Assert.AreEqual(Constants.System.Root, element.ParentId);
+    }
+
+    [Test]
     public async Task Copying_Copied_Fires_Notifications()
     {
         var element = (await ElementEditingService.CreateAsync(
@@ -320,7 +426,9 @@ internal sealed class ElementServiceNotificationWithCacheTests : UmbracoIntegrat
         INotificationHandler<ElementMovingNotification>,
         INotificationHandler<ElementMovedNotification>,
         INotificationHandler<ElementCopyingNotification>,
-        INotificationHandler<ElementCopiedNotification>
+        INotificationHandler<ElementCopiedNotification>,
+        INotificationHandler<ElementMovingToRecycleBinNotification>,
+        INotificationHandler<ElementMovedToRecycleBinNotification>
     {
         public static Action<ElementSavingNotification>? SavingElement { get; set; }
 
@@ -334,6 +442,10 @@ internal sealed class ElementServiceNotificationWithCacheTests : UmbracoIntegrat
 
         public static Action<ElementCopiedNotification>? CopiedElement { get; set; }
 
+        public static Action<ElementMovingToRecycleBinNotification>? MovingElementToRecycleBin { get; set; }
+
+        public static Action<ElementMovedToRecycleBinNotification>? MovedElementToRecycleBin { get; set; }
+
         public void Handle(ElementSavedNotification notification) => SavedElement?.Invoke(notification);
 
         public void Handle(ElementSavingNotification notification) => SavingElement?.Invoke(notification);
@@ -345,5 +457,9 @@ internal sealed class ElementServiceNotificationWithCacheTests : UmbracoIntegrat
         public void Handle(ElementCopyingNotification notification) => CopyingElement?.Invoke(notification);
 
         public void Handle(ElementCopiedNotification notification) => CopiedElement?.Invoke(notification);
+
+        public void Handle(ElementMovingToRecycleBinNotification notification) => MovingElementToRecycleBin?.Invoke(notification);
+
+        public void Handle(ElementMovedToRecycleBinNotification notification) => MovedElementToRecycleBin?.Invoke(notification);
     }
 }

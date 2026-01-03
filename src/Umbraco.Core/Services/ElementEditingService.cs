@@ -160,6 +160,12 @@ internal sealed class ElementEditingService
                 return Attempt.Fail(ContentEditingOperationStatus.ParentNotFound);
             }
 
+            if (container.Trashed)
+            {
+                // cannot move to a trashed container
+                return Attempt.Fail(ContentEditingOperationStatus.InTrash);
+            }
+
             parentId = container.Id;
         }
 
@@ -190,6 +196,7 @@ internal sealed class ElementEditingService
         using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
         scope.WriteLock(Constants.Locks.ElementTree);
 
+        var originalPath = string.Empty;
         Attempt<ContentEditingOperationStatus> moveResult = await MoveLockedAsync(
             scope,
             key,
@@ -198,12 +205,13 @@ internal sealed class ElementEditingService
             userKey,
             (element, eventMessages) =>
             {
-                var moveEventInfo = new MoveToRecycleBinEventInfo<IElement>(element, element.Path);
+                originalPath = element.Path;
+                var moveEventInfo = new MoveToRecycleBinEventInfo<IElement>(element, originalPath);
                 return new ElementMovingToRecycleBinNotification(moveEventInfo, eventMessages);
             },
             (element, eventMessages) =>
             {
-                var moveEventInfo = new MoveToRecycleBinEventInfo<IElement>(element, element.Path);
+                var moveEventInfo = new MoveToRecycleBinEventInfo<IElement>(element, originalPath);
                 return new ElementMovedToRecycleBinNotification(moveEventInfo, eventMessages);
             });
 

@@ -135,4 +135,51 @@ public partial class ElementEditingServiceTests
             Assert.AreEqual($"{container1.Path},{element.Id}", element.Path);
         });
     }
+
+    [Test]
+    public async Task Cannot_Move_Element_To_Container_In_Recycle_Bin()
+    {
+        var element = await CreateInvariantElement();
+
+        var trashedContainerKey = Guid.NewGuid();
+        await ElementContainerService.CreateAsync(trashedContainerKey, "Trashed Container", null, Constants.Security.SuperUserKey);
+        await ElementContainerService.MoveToRecycleBinAsync(trashedContainerKey, Constants.Security.SuperUserKey);
+
+        var moveResult = await ElementContainerService.MoveAsync(element.Key, trashedContainerKey, Constants.Security.SuperUserKey);
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(moveResult.Success);
+            Assert.AreEqual(EntityContainerOperationStatus.InTrash, moveResult.Status);
+        });
+
+        element = await ElementEditingService.GetAsync(element.Key);
+        Assert.IsNotNull(element);
+        Assert.IsFalse(element.Trashed);
+
+        Assert.AreEqual(0, GetFolderChildren(trashedContainerKey, true).Length);
+    }
+
+    [Test]
+    public async Task Cannot_Move_Element_In_Recycle_Bin_To_Container_In_Recycle_Bin()
+    {
+        var element = await CreateInvariantElement();
+        await ElementEditingService.MoveToRecycleBinAsync(element.Key, Constants.Security.SuperUserKey);
+
+        var trashedContainerKey = Guid.NewGuid();
+        await ElementContainerService.CreateAsync(trashedContainerKey, "Trashed Container", null, Constants.Security.SuperUserKey);
+        await ElementContainerService.MoveToRecycleBinAsync(trashedContainerKey, Constants.Security.SuperUserKey);
+
+        var moveResult = await ElementContainerService.MoveAsync(element.Key, trashedContainerKey, Constants.Security.SuperUserKey);
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(moveResult.Success);
+            Assert.AreEqual(EntityContainerOperationStatus.InTrash, moveResult.Status);
+        });
+
+        element = await ElementEditingService.GetAsync(element.Key);
+        Assert.IsNotNull(element);
+        Assert.IsTrue(element.Trashed);
+
+        Assert.AreEqual(0, GetFolderChildren(trashedContainerKey, true).Length);
+    }
 }

@@ -1,6 +1,5 @@
 using NUnit.Framework;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Tests.Common.Attributes;
 
@@ -340,30 +339,6 @@ public partial class ElementContainerServiceTests
     }
 
     [Test]
-    public async Task Cannot_Move_Element_To_Container_In_Recycle_Bin()
-    {
-        var elementType = await CreateElementType();
-        var element = await CreateElement(elementType.Key);
-
-        var trashedContainerKey = Guid.NewGuid();
-        await ElementContainerService.CreateAsync(trashedContainerKey, "Trashed Container", null, Constants.Security.SuperUserKey);
-        await ElementContainerService.MoveToRecycleBinAsync(trashedContainerKey, Constants.Security.SuperUserKey);
-
-        var moveResult = await ElementContainerService.MoveAsync(element.Key, trashedContainerKey, Constants.Security.SuperUserKey);
-        Assert.Multiple(() =>
-        {
-            Assert.IsFalse(moveResult.Success);
-            Assert.AreEqual(EntityContainerOperationStatus.InTrash, moveResult.Status);
-        });
-
-        element = await ElementEditingService.GetAsync(element.Key);
-        Assert.IsNotNull(element);
-        Assert.IsFalse(element.Trashed);
-
-        Assert.AreEqual(0, GetFolderChildren(trashedContainerKey, true).Length);
-    }
-
-    [Test]
     public async Task Cannot_Move_Container_In_Recycle_Bin_To_Other_Container_In_Recycle_Bin()
     {
         var firstContainerKey = Guid.NewGuid();
@@ -385,54 +360,5 @@ public partial class ElementContainerServiceTests
         Assert.IsNotNull(firstContainer);
         Assert.IsTrue(firstContainer.Trashed);
         Assert.AreEqual(Constants.System.RecycleBinElement, firstContainer.ParentId);
-    }
-
-    [Test]
-    public async Task Cannot_Move_Element_In_Recycle_Bin_To_Container_In_Recycle_Bin()
-    {
-        var elementType = await CreateElementType();
-        var element = await CreateElement(elementType.Key);
-        await ElementEditingService.MoveToRecycleBinAsync(element.Key, Constants.Security.SuperUserKey);
-
-        var trashedContainerKey = Guid.NewGuid();
-        await ElementContainerService.CreateAsync(trashedContainerKey, "Trashed Container", null, Constants.Security.SuperUserKey);
-        await ElementContainerService.MoveToRecycleBinAsync(trashedContainerKey, Constants.Security.SuperUserKey);
-
-        var moveResult = await ElementContainerService.MoveAsync(element.Key, trashedContainerKey, Constants.Security.SuperUserKey);
-        Assert.Multiple(() =>
-        {
-            Assert.IsFalse(moveResult.Success);
-            Assert.AreEqual(EntityContainerOperationStatus.InTrash, moveResult.Status);
-        });
-
-        element = await ElementEditingService.GetAsync(element.Key);
-        Assert.IsNotNull(element);
-        Assert.IsTrue(element.Trashed);
-
-        Assert.AreEqual(0, GetFolderChildren(trashedContainerKey, true).Length);
-    }
-
-    private async Task AssertContainerIsInRecycleBin(Guid containerKey)
-    {
-        var container = await ElementContainerService.GetAsync(containerKey);
-        Assert.NotNull(container);
-        Assert.Multiple(() =>
-        {
-            Assert.AreEqual(Constants.System.RecycleBinElement, container.ParentId);
-            Assert.AreEqual($"{Constants.System.RecycleBinElementPathPrefix}{container.Id}", container.Path);
-            Assert.IsTrue(container.Trashed);
-        });
-
-        var recycleBinItems = EntityService
-            .GetPagedChildren(Constants.System.RecycleBinElementKey, [UmbracoObjectTypes.ElementContainer], [UmbracoObjectTypes.ElementContainer, UmbracoObjectTypes.Element], 0, 999, true, out var total)
-            .ToArray();
-
-        Assert.Multiple(() =>
-        {
-            Assert.AreEqual(1, total);
-            Assert.AreEqual(1, recycleBinItems.Length);
-        });
-
-        Assert.AreEqual(container.Key, recycleBinItems[0].Key);
     }
 }

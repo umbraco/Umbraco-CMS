@@ -333,6 +333,30 @@ public partial class ElementContainerServiceTests : UmbracoIntegrationTest
         };
     }
 
+    private async Task AssertContainerIsInRecycleBin(Guid containerKey)
+    {
+        var container = await ElementContainerService.GetAsync(containerKey);
+        Assert.NotNull(container);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(Constants.System.RecycleBinElement, container.ParentId);
+            Assert.AreEqual($"{Constants.System.RecycleBinElementPathPrefix}{container.Id}", container.Path);
+            Assert.IsTrue(container.Trashed);
+        });
+
+        var recycleBinItems = EntityService
+            .GetPagedChildren(Constants.System.RecycleBinElementKey, [UmbracoObjectTypes.ElementContainer], [UmbracoObjectTypes.ElementContainer, UmbracoObjectTypes.Element], 0, 999, true, out var total)
+            .ToArray();
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(1, total);
+            Assert.AreEqual(1, recycleBinItems.Length);
+        });
+
+        Assert.AreEqual(container.Key, recycleBinItems[0].Key);
+    }
+
     private struct FolderWithElementsStructureInfo
     {
         public Guid RootContainerKey { get; init; }

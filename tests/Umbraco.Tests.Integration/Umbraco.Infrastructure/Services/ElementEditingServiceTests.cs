@@ -211,6 +211,6 @@ public partial class ElementEditingServiceTests : UmbracoIntegrationTest
         return result.Result.Content!;
     }
 
-    private IEntitySlim[] GetFolderChildren(Guid containerKey)
-        => EntityService.GetPagedChildren(containerKey, [UmbracoObjectTypes.ElementContainer], UmbracoObjectTypes.Element, 0, 100, out _).ToArray();
+    private IEntitySlim[] GetFolderChildren(Guid containerKey, bool trashed = false)
+        => EntityService.GetPagedChildren(containerKey, [UmbracoObjectTypes.ElementContainer], [UmbracoObjectTypes.ElementContainer, UmbracoObjectTypes.Element], 0, 999, trashed, out _).ToArray();
 }

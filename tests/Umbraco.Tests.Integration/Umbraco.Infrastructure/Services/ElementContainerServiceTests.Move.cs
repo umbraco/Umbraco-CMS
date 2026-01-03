@@ -382,6 +382,74 @@ public partial class ElementContainerServiceTests
     }
 
     [Test]
+    public async Task Can_Move_Container_With_Descendants_From_Recycle_Bin_To_Root()
+    {
+        var rootContainerKey = Guid.NewGuid();
+        await ElementContainerService.CreateAsync(rootContainerKey, "Root Container", null, Constants.Security.SuperUserKey);
+        Assert.AreEqual(0, GetFolderChildren(rootContainerKey).Length);
+
+        var childContainerKey = Guid.NewGuid();
+        var childContainer = (await ElementContainerService.CreateAsync(childContainerKey, "Child Container", rootContainerKey, Constants.Security.SuperUserKey)).Result;
+        Assert.NotNull(childContainer);
+
+        var elementType = await CreateElementType();
+
+        var childElement = await CreateElement(elementType.Key, rootContainerKey);
+        Assert.IsNotNull(childElement);
+
+        var grandchildElement = await CreateElement(elementType.Key, childContainerKey);
+        Assert.IsNotNull(grandchildElement);
+
+        Assert.AreEqual(2, GetFolderChildren(rootContainerKey).Length);
+        Assert.AreEqual(1, GetFolderChildren(childContainerKey).Length);
+
+        var moveToRecycleBinResult = await ElementContainerService.MoveToRecycleBinAsync(rootContainerKey, Constants.Security.SuperUserKey);
+        Assert.IsTrue(moveToRecycleBinResult.Success);
+        await AssertContainerIsInRecycleBin(rootContainerKey);
+
+        childContainer = await ElementContainerService.GetAsync(childContainerKey);
+        Assert.IsNotNull(childContainer);
+        Assert.IsTrue(childContainer.Trashed);
+
+        childElement = await ElementEditingService.GetAsync(childElement.Key);
+        Assert.IsNotNull(childElement);
+        Assert.IsTrue(childElement.Trashed);
+
+        grandchildElement = await ElementEditingService.GetAsync(grandchildElement.Key);
+        Assert.IsNotNull(grandchildElement);
+        Assert.IsTrue(grandchildElement.Trashed);
+
+        Assert.AreEqual(2, GetFolderChildren(rootContainerKey, true).Length);
+        Assert.AreEqual(1, GetFolderChildren(childContainerKey, true).Length);
+
+        var moveResult = await ElementContainerService.MoveAsync(rootContainerKey, null, Constants.Security.SuperUserKey);
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(moveResult.Success);
+            Assert.AreEqual(EntityContainerOperationStatus.Success, moveResult.Status);
+        });
+
+        var rootContainer = await ElementContainerService.GetAsync(rootContainerKey);
+        Assert.IsNotNull(rootContainer);
+        Assert.IsFalse(rootContainer.Trashed);
+
+        childContainer = await ElementContainerService.GetAsync(childContainerKey);
+        Assert.IsNotNull(childContainer);
+        Assert.IsFalse(childContainer.Trashed);
+
+        childElement = await ElementEditingService.GetAsync(childElement.Key);
+        Assert.IsNotNull(childElement);
+        Assert.IsFalse(childElement.Trashed);
+
+        grandchildElement = await ElementEditingService.GetAsync(grandchildElement.Key);
+        Assert.IsNotNull(grandchildElement);
+        Assert.IsFalse(grandchildElement.Trashed);
+
+        Assert.AreEqual(2, GetFolderChildren(rootContainerKey).Length);
+        Assert.AreEqual(1, GetFolderChildren(childContainerKey).Length);
+    }
+
+    [Test]
     public async Task Container_Move_Events_Are_Fired()
     {
         var movingWasCalled = false;
