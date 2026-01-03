@@ -143,18 +143,45 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     /// <inheritdoc/>
     public async Task<ContentCacheNode?> GetContentSourceAsync(Guid key, bool preview = false)
     {
-        Sql<ISqlContext>? sql = SqlContentSourcesSelect()
-            .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document))
-            .Append(SqlWhereNodeKey(SqlContext, key))
-            .Append(SqlOrderByLevelIdSortOrder(SqlContext));
-
-        ContentSourceDto? dto = await Database.FirstOrDefaultAsync<ContentSourceDto>(sql);
+        ContentSourceDto? dto = await GetContentSourceDto(key);
 
         if (dto == null)
         {
             return null;
         }
 
+        return CreateContentCacheNode(dto, preview);
+    }
+
+    private async Task<ContentSourceDto?> GetContentSourceDto(Guid key)
+    {
+        // Requests for a single ContentSourceDto are only made in cache refreshing contexts, so it's
+        // reasonable to cache the result for the lifetime of the request.
+        var cacheKey = $"{nameof(DatabaseCacheRepository)}_ContentSourceDto_{key}";
+
+        ContentSourceDto? dto = AppCaches.RequestCache.GetCacheItem<ContentSourceDto>(cacheKey);
+        if (dto is not null)
+        {
+            return dto;
+        }
+
+        Sql<ISqlContext>? sql = SqlContentSourcesSelect()
+            .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document))
+            .Append(SqlWhereNodeKey(SqlContext, key))
+            .Append(SqlOrderByLevelIdSortOrder(SqlContext));
+
+        dto = await Database.FirstOrDefaultAsync<ContentSourceDto>(sql);
+
+        if (dto is not null)
+        {
+            AppCaches.RequestCache.Set(cacheKey, dto);
+        }
+
+        return dto;
+    }
+
+    private ContentCacheNode? CreateContentCacheNode(ContentSourceDto dto, bool preview)
+    {
         if (preview is false && dto.PubDataRaw is null && dto.PubData is null)
         {
             return null;

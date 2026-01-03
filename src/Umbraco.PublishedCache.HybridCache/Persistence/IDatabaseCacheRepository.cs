@@ -14,7 +14,7 @@ internal interface IDatabaseCacheRepository
     Task DeleteContentItemAsync(int id);
 
     /// <summary>
-    /// Gets a single cache node for a document key.
+    /// Gets a single cache node for a document key and preview status.
     /// </summary>
     Task<ContentCacheNode?> GetContentSourceAsync(Guid key, bool preview = false);
 
