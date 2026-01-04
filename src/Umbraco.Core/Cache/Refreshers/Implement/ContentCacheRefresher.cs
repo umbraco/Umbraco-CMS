@@ -499,12 +499,12 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
     public class JsonPayload
     {
         /// <summary>
-        /// Gets the unique identifier for the entity.
+        /// Gets the unique integer identifier for the entity.
         /// </summary>
         public int Id { get; init; }
 
         /// <summary>
-        /// Gets the unique identifier associated with the entity, or null if no key is assigned.
+        /// Gets the unique GUID key associated with the entity, or null if no key is assigned.
         /// </summary>
         public Guid? Key { get; init; }
 
