@@ -41,6 +41,7 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 	override firstUpdated() {
 		this.#unique = this.data?.unique;
 		this.#getDocumentName();
+		this.#getPublicAccessModel();
 	}
 
 	async #getDocumentName() {
@@ -51,14 +52,13 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 		const item = data[0];
 		//TODO How do we ensure we get the correct variant?
 		this._documentName = item.variants[0]?.name;
-
-		if (item.isProtected) {
-			this.#getPublicAccessModel();
-		}
 	}
 
 	async #getPublicAccessModel() {
 		if (!this.#unique) return;
+
+		// Always fetch public access state directly from the API to avoid race conditions
+		// where a requested item's isProtected flag might be stale after saving.
 		const { data } = await this.#publicAccessRepository.read(this.#unique);
 
 		if (!data) return;
