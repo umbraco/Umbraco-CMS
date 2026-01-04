@@ -8,4 +8,8 @@ public class ElementRecycleBinItemResponseModel : RecycleBinItemResponseModelBas
     public DocumentTypeReferenceResponseModel DocumentType { get; set; } = new();
 
     public IEnumerable<ElementVariantItemResponseModel> Variants { get; set; } = Enumerable.Empty<ElementVariantItemResponseModel>();
+
+    public bool IsFolder { get; set; }
+
+    public string Name { get; set; } = string.Empty;
 }

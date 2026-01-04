@@ -21,13 +21,16 @@ namespace Umbraco.Cms.Api.Management.Controllers.Element.RecycleBin;
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDocuments)]
 public class ElementRecycleBinControllerBase : RecycleBinControllerBase<ElementRecycleBinItemResponseModel>
 {
+    private readonly IEntityService _entityService;
     private readonly IElementPresentationFactory _elementPresentationFactory;
 
     public ElementRecycleBinControllerBase( IEntityService entityService, IElementPresentationFactory elementPresentationFactory)
         : base(entityService)
-        => _elementPresentationFactory = elementPresentationFactory;
+    {
+        _entityService = entityService;
+        _elementPresentationFactory = elementPresentationFactory;
+    }
 
-    // TODO ELEMENTS: recycle bin controller base must support multiple item object types to handle both containers and elements
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.Element;
 
     protected override Guid RecycleBinRootKey => Constants.System.RecycleBinElementKey;
@@ -36,12 +39,39 @@ public class ElementRecycleBinControllerBase : RecycleBinControllerBase<ElementR
     {
         ElementRecycleBinItemResponseModel responseModel = base.MapRecycleBinViewModel(parentId, entity);
 
+        responseModel.Name = entity.Name ?? string.Empty;
+
         if (entity is IElementEntitySlim elementEntitySlim)
         {
             responseModel.Variants = _elementPresentationFactory.CreateVariantsItemResponseModels(elementEntitySlim);
             responseModel.DocumentType = _elementPresentationFactory.CreateDocumentTypeReferenceResponseModel(elementEntitySlim);
+            responseModel.IsFolder = false;
+        }
+        else
+        {
+            responseModel.Variants = [];
+            responseModel.IsFolder = true;
         }
 
         return responseModel;
+    }
+
+    protected override IEntitySlim[] GetPagedRootEntities(int skip, int take, out long totalItems)
+        => GetPagedChildEntities(RecycleBinRootKey, skip, take, out totalItems);
+
+    protected override IEntitySlim[] GetPagedChildEntities(Guid parentKey, int skip, int take, out long totalItems)
+    {
+        IEntitySlim[] rootEntities = _entityService
+            .GetPagedChildren(
+                parentKey,
+                parentObjectTypes: [UmbracoObjectTypes.ElementContainer],
+                childObjectTypes: [UmbracoObjectTypes.ElementContainer, ItemObjectType],
+                skip: skip,
+                take: take,
+                trashed: true,
+                out totalItems)
+            .ToArray();
+
+        return rootEntities;
     }
 }
