@@ -318,9 +318,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
                        @""")]
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
 		[ImplementPropertyType(""foo"")]
-		public virtual global::System.Collections.Generic.IEnumerable<global::" + modelsBuilderConfig.ModelsNamespace +
-                       @".Foo> Foo => this.Value<global::System.Collections.Generic.IEnumerable<global::" +
-                       modelsBuilderConfig.ModelsNamespace + @".Foo>>(_publishedValueFallback, ""foo"");
+		public virtual global::System.Collections.Generic.IEnumerable<global::{foo}> Foo => this.Value<global::System.Collections.Generic.IEnumerable<global::{foo}>>(_publishedValueFallback, ""foo"");
 	}
 }
 ";
