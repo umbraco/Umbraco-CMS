@@ -27,7 +27,6 @@ internal sealed class UserIdKeyResolver : IUserIdKeyResolver
     /// <summary>
     /// Initializes a new instance of the <see cref="UserIdKeyResolver"/> class.
     /// </summary>
-    /// <param name="scopeProvider"></param>
     public UserIdKeyResolver(IScopeProvider scopeProvider) => _scopeProvider = scopeProvider;
 
     /// <inheritdoc/>
