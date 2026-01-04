@@ -121,7 +121,7 @@ internal sealed class UserIdKeyResolver : IUserIdKeyResolver
                 .From<UserDto>()
                 .Where<UserDto>(x => x.Id == id);
 
-            Guid? fetchedKey = await scope.Database.ExecuteScalarAsync<Guid?>(query);
+            Guid? fetchedKey = scope.Database.ExecuteScalar<Guid?>(query);
             if (fetchedKey is null)
             {
                 return Attempt<Guid>.Fail();
