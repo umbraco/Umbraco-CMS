@@ -11,6 +11,7 @@ export class UmbExtensionTableCollectionViewElement extends UmbLitElement {
 	@state()
 	private _tableConfig: UmbTableConfig = {
 		allowSelection: false,
+		hideIcon: true,
 	};
 
 	@state()
