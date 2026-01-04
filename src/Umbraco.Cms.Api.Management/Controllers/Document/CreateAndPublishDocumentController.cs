@@ -84,9 +84,7 @@ public class CreateAndPublishDocumentController : DocumentControllerBase
         }
 
         // Build immediate publish model (no schedule).
-        var culturePublishSchedules = requestModel.Cultures
-            .Select(culture => new CulturePublishScheduleModel { Culture = culture })
-            .ToList();
+        IList<CulturePublishScheduleModel> culturePublishSchedules = GetImmediateCulturePublishSchedule(requestModel.Cultures);
 
         // Publish the document immediately using the already-loaded content.
         // Skip validation since create succeeded with no validation errors.
