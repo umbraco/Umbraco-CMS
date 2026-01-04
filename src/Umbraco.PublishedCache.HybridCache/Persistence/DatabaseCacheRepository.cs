@@ -141,9 +141,14 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     }
 
     /// <inheritdoc/>
+    [Obsolete("Please use the method overload takng all parameters. Scheduled for removal in Umbraco 19.")]
     public async Task<ContentCacheNode?> GetContentSourceAsync(Guid key, bool preview = false)
+        => await GetContentSourceAsync(key, preview, false);
+
+    /// <inheritdoc/>
+    public async Task<ContentCacheNode?> GetContentSourceAsync(Guid key, bool preview = false, bool useCache = false)
     {
-        ContentSourceDto? dto = await GetContentSourceDto(key);
+        ContentSourceDto? dto = await GetContentSourceDto(key, useCache);
 
         if (dto == null)
         {
@@ -153,16 +158,18 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         return CreateContentCacheNode(dto, preview);
     }
 
-    private async Task<ContentSourceDto?> GetContentSourceDto(Guid key)
+    private async Task<ContentSourceDto?> GetContentSourceDto(Guid key, bool useRequestCache)
     {
-        // Requests for a single ContentSourceDto are only made in cache refreshing contexts, so it's
-        // reasonable to cache the result for the lifetime of the request.
         var cacheKey = $"{nameof(DatabaseCacheRepository)}_ContentSourceDto_{key}";
 
-        ContentSourceDto? dto = AppCaches.RequestCache.GetCacheItem<ContentSourceDto>(cacheKey);
-        if (dto is not null)
+        ContentSourceDto? dto;
+        if (useRequestCache)
         {
-            return dto;
+            dto = AppCaches.RequestCache.GetCacheItem<ContentSourceDto>(cacheKey);
+            if (dto is not null)
+            {
+                return dto;
+            }
         }
 
         Sql<ISqlContext>? sql = SqlContentSourcesSelect()
@@ -172,7 +179,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
         dto = await Database.FirstOrDefaultAsync<ContentSourceDto>(sql);
 
-        if (dto is not null)
+        if (useRequestCache && dto is not null)
         {
             AppCaches.RequestCache.Set(cacheKey, dto);
         }

@@ -16,7 +16,13 @@ internal interface IDatabaseCacheRepository
     /// <summary>
     /// Gets a single cache node for a document key and preview status.
     /// </summary>
+    [Obsolete("Please use the method overload takng all parameters. Scheduled for removal in Umbraco 19.")]
     Task<ContentCacheNode?> GetContentSourceAsync(Guid key, bool preview = false);
+
+    /// <summary>
+    /// Gets a single cache node for a document key and preview status.
+    /// </summary>
+    Task<ContentCacheNode?> GetContentSourceAsync(Guid key, bool preview = false, bool useCache = false);
 
     /// <summary>
     /// Gets a collection of cache nodes for a collection of document keys.
@@ -27,7 +33,7 @@ internal interface IDatabaseCacheRepository
         var contentCacheNodes = new List<ContentCacheNode>();
         foreach (Guid key in keys)
         {
-            ContentCacheNode? contentSource = await GetContentSourceAsync(key, preview);
+            ContentCacheNode? contentSource = await GetContentSourceAsync(key, preview, false);
             if (contentSource is not null)
             {
                 contentCacheNodes.Add(contentSource);

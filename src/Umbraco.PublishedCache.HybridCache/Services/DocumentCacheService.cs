@@ -121,7 +121,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
             async cancel =>
             {
                 using ICoreScope scope = _scopeProvider.CreateCoreScope();
-                ContentCacheNode? contentCacheNode = await _databaseCacheRepository.GetContentSourceAsync(key, preview);
+                ContentCacheNode? contentCacheNode = await _databaseCacheRepository.GetContentSourceAsync(key, preview, false);
 
                 // If we can resolve the content cache node, we still need to check if the ancestor path is published.
                 // This does cost some performance, but it's necessary to ensure that the content is actually published.
@@ -180,13 +180,13 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
         scope.ReadLock(Constants.Locks.ContentTree);
 
-        ContentCacheNode? draftNode = await _databaseCacheRepository.GetContentSourceAsync(key, true);
+        ContentCacheNode? draftNode = await _databaseCacheRepository.GetContentSourceAsync(key, true, false);
         if (draftNode is not null)
         {
             await _hybridCache.SetAsync(GetCacheKey(draftNode.Key, true), draftNode, GetEntryOptions(draftNode.Key, true), GenerateTags(key));
         }
 
-        ContentCacheNode? publishedNode = await _databaseCacheRepository.GetContentSourceAsync(key, false);
+        ContentCacheNode? publishedNode = await _databaseCacheRepository.GetContentSourceAsync(key, false, true);
         if (publishedNode is not null && _publishStatusQueryService.HasPublishedAncestorPath(publishedNode.Key))
         {
             var cacheKey = GetCacheKey(publishedNode.Key, false);
