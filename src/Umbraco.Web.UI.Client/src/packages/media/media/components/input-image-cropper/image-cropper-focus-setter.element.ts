@@ -3,6 +3,7 @@ import type { UmbImageCropperFocalPoint } from './types.js';
 import { UmbFocalPointChangeEvent } from './focalpoint-change.event.js';
 import { drag } from '@umbraco-cms/backoffice/external/uui';
 import { clamp } from '@umbraco-cms/backoffice/utils';
+import { isCentered } from './utils.js';
 import {
 	css,
 	customElement,
@@ -126,7 +127,7 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 	#isCentered(focalPoint: UmbImageCropperFocalPoint) {
 		if (!this.focalPoint) return;
 
-		return focalPoint.left === 0.5 && focalPoint.top === 0.5;
+		return isCentered(focalPoint);
 	}
 
 	#resetCoords() {
