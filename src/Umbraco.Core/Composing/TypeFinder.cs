@@ -29,7 +29,7 @@ public class TypeFinder : ITypeFinder
         "DataAnnotationsExtensions,", "DataAnnotationsExtensions.", "Dynamic,", "Examine,", "Examine.",
         "HtmlAgilityPack,", "HtmlAgilityPack.", "HtmlDiff,", "ICSharpCode.", "Iesi.Collections,", // used by NHibernate
         "JetBrains.Annotations,", "LightInject.", // DI
-        "LightInject,", "Lucene.", "Markdown,", "Microsoft.", "MiniProfiler,", "Moq,", "MySql.", "NHibernate,",
+        "LightInject,", "Lucene.", "Markdig,", "Markdown,", "Microsoft.", "MiniProfiler,", "Moq,", "MySql.", "NHibernate,",
         "NHibernate.", "Newtonsoft.", "NPoco,", "NuGet.", "RouteDebugger,", "Semver.", "Serilog.", "Serilog,",
         "ServiceStack.", "SqlCE4Umbraco,", "Superpower,", // used by Serilog
         "System.", "TidyNet,", "TidyNet.", "WebDriver,", "itextsharp,", "mscorlib,", "NUnit,", "NUnit.", "NUnit3.",

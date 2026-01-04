@@ -174,7 +174,7 @@ public static partial class UmbracoBuilderExtensions
             .Remove<SimpleRichTextValueConverter>();
 
         // register *all* checks, except those marked [HideFromTypeFinder] of course
-        builder.Services.AddSingleton<IMarkdownToHtmlConverter, MarkdownToHtmlConverter>();
+        builder.Services.AddSingleton<Core.HealthChecks.NotificationMethods.IMarkdownToHtmlConverter, MarkdownToHtmlConverter>();
 
         builder.Services.AddSingleton<IContentLastChanceFinder, ContentFinderByConfigured404>();
 
