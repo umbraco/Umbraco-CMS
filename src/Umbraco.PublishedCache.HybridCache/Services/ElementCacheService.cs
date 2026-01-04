@@ -31,7 +31,7 @@ internal class ElementCacheService : IElementCacheService
     {
         IPublishedElement? result = null;
         IElement? element = _elementService.GetById(key);
-        if (element is null)
+        if (element is null || element.Trashed is true)
         {
             return Task.FromResult(result);
         }
