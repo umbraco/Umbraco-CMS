@@ -34,13 +34,13 @@ test.beforeEach(async ({umbracoApi}) => {
 });
 
 test.afterEach(async ({umbracoApi}) => {
-  // await umbracoApi.document.ensureNameNotExists(englishContentName);
-  // await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
-  // await umbracoApi.documentType.ensureNameNotExists(firstBlockElementTypeName);
-  // await umbracoApi.documentType.ensureNameNotExists(secondBlockElementTypeName);
-  // await umbracoApi.dataType.ensureNameNotExists(firstBlockListName);
-  // await umbracoApi.dataType.ensureNameNotExists(secondBlockListName);
-  // await umbracoApi.language.ensureIsoCodeNotExists(secondCulture);
+  await umbracoApi.document.ensureNameNotExists(englishContentName);
+  await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(firstBlockElementTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(secondBlockElementTypeName);
+  await umbracoApi.dataType.ensureNameNotExists(firstBlockListName);
+  await umbracoApi.dataType.ensureNameNotExists(secondBlockListName);
+  await umbracoApi.language.ensureIsoCodeNotExists(secondCulture);
 });
 
 test('can edit variant text property in non-default language when AllowEditInvariantFromNonDefault is false', async ({umbracoApi, umbracoUi}) => {
