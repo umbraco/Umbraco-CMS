@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using Umbraco.Cms.Core;
@@ -55,10 +55,10 @@ public class JsonBlockValueConverter : JsonConverter<BlockValue>
                 switch (propertyName.ToFirstUpperInvariant())
                 {
                     case nameof(BlockValue.ContentData):
-                        blockValue.ContentData = DeserializeBlockItemData(ref reader, options, typeToConvert, nameof(BlockValue.ContentData));
+                        blockValue.ContentData = DeserializeBlockItemData(ref reader, options);
                         break;
                     case nameof(BlockValue.SettingsData):
-                        blockValue.SettingsData = DeserializeBlockItemData(ref reader, options, typeToConvert, nameof(BlockValue.SettingsData));
+                        blockValue.SettingsData = DeserializeBlockItemData(ref reader, options);
                         break;
                     case nameof(BlockValue.Layout):
                         DeserializeAndSetLayout(ref reader, options, typeToConvert, blockValue);
@@ -122,17 +122,19 @@ public class JsonBlockValueConverter : JsonConverter<BlockValue>
         return layoutItemType;
     }
 
-    private List<BlockItemData> DeserializeBlockItemData(ref Utf8JsonReader reader, JsonSerializerOptions options, Type typeToConvert, string propertyName)
+    private List<BlockItemData> DeserializeBlockItemData(ref Utf8JsonReader reader, JsonSerializerOptions options)
     {
-        // Always use the custom deserialization to handle legacy "udi" field and "values" property conflict.
+        // Use custom deserialization to handle legacy "udi" field and "values" property conflict.
         // The Udi property has [JsonIgnore] to prevent serialization differences between save and publish paths,
         // so we must manually extract it from JSON and convert to Key.
         JsonArray? arrayElement = JsonSerializer.Deserialize<JsonArray>(ref reader, options);
 
+#pragma warning disable CS0618 // Type or member is obsolete
         return arrayElement?
             .Select(itemElement => DeserializeBlockItemData(itemElement, options))
             .OfType<BlockItemData>()
             .ToList() ?? [];
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 
     private List<BlockItemVariation> DeserializeBlockVariation(ref Utf8JsonReader reader, JsonSerializerOptions options, Type typeToConvert, string propertyName)
