@@ -2364,6 +2364,7 @@ export default {
 	dashboardTabs: {
 		contentIntro: 'Welcome to Umbraco',
 		contentRedirectManager: 'Redirect URL Management',
+		libraryWelcome: 'Welcome',
 		mediaFolderBrowser: 'Content',
 		settingsWelcome: 'Welcome',
 		settingsExamine: 'Examine Management',
@@ -2564,6 +2565,9 @@ export default {
 		errorDisablingProfilerTitle: 'Error disabling profiler',
 		errorDisablingProfilerDescription:
 			'It was not possible to disable the profiler. Try again, and if the problem persists, please check the log for more details.',
+	},
+	libraryDashboard: {
+		welcomeHeader: 'Welcome to the library',
 	},
 	settingsDashboard: {
 		documentationHeader: 'Documentation',
