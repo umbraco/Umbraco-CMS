@@ -8,64 +8,39 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 public partial class ElementContainerServiceTests
 {
     [Test]
-    public async Task Can_Create_Container_At_Root()
+    public async Task Can_Delete_Container_At_Root()
     {
-        var result = await ElementContainerService.CreateAsync(null, "Root Container", null, Constants.Security.SuperUserKey);
+        EntityContainer root = (await ElementContainerService.CreateAsync(null,"Root Container", null, Constants.Security.SuperUserKey)).Result;
+
+        var result = await ElementContainerService.DeleteAsync(root.Key, Constants.Security.SuperUserKey);
         Assert.Multiple(() =>
         {
             Assert.IsTrue(result.Success);
             Assert.AreEqual(EntityContainerOperationStatus.Success, result.Status);
         });
 
-        var created = await ElementContainerService.GetAsync(result.Result.Key);
-        Assert.NotNull(created);
-        Assert.Multiple(() =>
-        {
-            Assert.AreEqual("Root Container", created.Name);
-            Assert.AreEqual(Constants.System.Root, created.ParentId);
-        });
+        var current = await ElementContainerService.GetAsync(root.Key);
+        Assert.IsNull(current);
     }
 
     [Test]
-    public async Task Can_Create_Child_Container()
+    public async Task Can_Delete_Child_Container()
     {
-        EntityContainer root = (await ElementContainerService.CreateAsync(null, "Root Container", null, Constants.Security.SuperUserKey)).Result;
+        EntityContainer root = (await ElementContainerService.CreateAsync(null,"Root Container", null, Constants.Security.SuperUserKey)).Result;
+        EntityContainer child = (await ElementContainerService.CreateAsync(null, "Child Container", root.Key, Constants.Security.SuperUserKey)).Result;
 
-        var result = await ElementContainerService.CreateAsync(null, "Child Container", root.Key, Constants.Security.SuperUserKey);
+        var result = await ElementContainerService.DeleteAsync(child.Key, Constants.Security.SuperUserKey);
         Assert.Multiple(() =>
         {
             Assert.IsTrue(result.Success);
             Assert.AreEqual(EntityContainerOperationStatus.Success, result.Status);
         });
 
-        var created = await ElementContainerService.GetAsync(result.Result.Key);
-        Assert.NotNull(created);
-        Assert.Multiple(() =>
-        {
-            Assert.AreEqual("Child Container", created.Name);
-            Assert.AreEqual(root.Id, created.ParentId);
-        });
-    }
+        child = await ElementContainerService.GetAsync(child.Key);
+        Assert.IsNull(child);
 
-    [Test]
-    public async Task Can_Create_Container_With_Explicit_Key()
-    {
-        var key = Guid.NewGuid();
-        var result = await ElementContainerService.CreateAsync(key, "Root Container", null, Constants.Security.SuperUserKey);
-        Assert.Multiple(() =>
-        {
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(EntityContainerOperationStatus.Success, result.Status);
-            Assert.AreEqual(key, result.Result.Key);
-        });
-
-        var created = await ElementContainerService.GetAsync(key);
-        Assert.NotNull(created);
-        Assert.Multiple(() =>
-        {
-            Assert.AreEqual("Root Container", created.Name);
-            Assert.AreEqual(Constants.System.Root, created.ParentId);
-        });
+        root = await ElementContainerService.GetAsync(root.Key);
+        Assert.IsNotNull(root);
     }
 
     [Test]
