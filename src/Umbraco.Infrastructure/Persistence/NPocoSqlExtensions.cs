@@ -478,7 +478,9 @@ namespace Umbraco.Extensions
 
         }
 
-        public static Sql<ISqlContext> AndBy<TDto>(this Sql<ISqlContext> sql, string tableAlias,
+        public static Sql<ISqlContext> AndBy<TDto>(
+            this Sql<ISqlContext> sql,
+            string tableAlias,
             params Expression<Func<TDto, object?>>[] fields)
         {
             ISqlSyntaxProvider sqlSyntax = sql.SqlContext.SqlSyntax;

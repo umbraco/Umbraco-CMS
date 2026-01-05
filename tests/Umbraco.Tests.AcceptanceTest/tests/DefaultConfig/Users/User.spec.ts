@@ -1,4 +1,4 @@
-import {NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from '@playwright/test';
 
 const nameOfTheUser = 'TestUser';
@@ -13,7 +13,7 @@ test.beforeEach(async ({umbracoUi, umbracoApi}) => {
 
 test.afterEach(async ({umbracoApi, umbracoUi}) => {
   // Waits so we can try to avoid db locks
-  await umbracoUi.waitForTimeout(500);
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoApi.user.ensureNameNotExists(nameOfTheUser);
 });
 
@@ -351,7 +351,7 @@ test('can see if the user has the correct access based on content start nodes', 
   // Act
   await umbracoUi.user.goToUserWithName(nameOfTheUser);
   // Currently this wait is necessary
-  await umbracoUi.waitForTimeout(2000);
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.long);
 
   // Assert
   await umbracoUi.user.doesUserHaveAccessToContentNode(documentName);
@@ -509,7 +509,7 @@ test('can search for a user', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   // Wait for filtering to be done
-  await umbracoUi.waitForTimeout(200);
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   const userData = await umbracoApi.user.filterByText(nameOfTheUser);
   await umbracoUi.user.doesUserSectionContainUserAmount(userData.total);
   await umbracoUi.user.doesUserSectionContainUserWithText(nameOfTheUser);
@@ -529,7 +529,7 @@ test('can filter by status', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   // Wait for filtering to be done
-  await umbracoUi.waitForTimeout(200);
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   const userData = await umbracoApi.user.filterByUserStates(inactiveStatus);
   await umbracoUi.user.doesUserSectionContainUserAmount(userData.total);
   await umbracoUi.user.doesUserSectionContainUserWithText(nameOfTheUser);
@@ -549,7 +549,7 @@ test('can filter by user groups', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   // Wait for filtering to be done
-  await umbracoUi.waitForTimeout(200);
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   const userData = await umbracoApi.user.filterByUserGroupIds(userGroup.id);
   await umbracoUi.user.doesUserSectionContainUserAmount(userData.total);
   await umbracoUi.user.doesUserSectionContainUserWithText(defaultUserGroupName);
@@ -568,7 +568,7 @@ test('can order by newest user', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   // Wait for filtering to be done
-  await umbracoUi.waitForTimeout(200);
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
 
   await umbracoUi.user.doesUserSectionContainUserAmount(userCount);
   await umbracoUi.user.isUserWithNameTheFirstUserInList(nameOfTheUser);
