@@ -157,6 +157,14 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	}
 
 	/**
+	 * Get the current data
+	 * @param {DetailModelType | undefined} data - New data of this workspace.
+	 */
+	setData(data: DetailModelType | undefined): void {
+		this._data.setCurrent(data);
+	}
+
+	/**
 	 * Get the persisted data
 	 * @returns { DetailModelType | undefined } The persisted data
 	 */

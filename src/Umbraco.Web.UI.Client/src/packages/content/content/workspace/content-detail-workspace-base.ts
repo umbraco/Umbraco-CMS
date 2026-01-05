@@ -56,6 +56,7 @@ import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import type { UmbPropertyTypePresetModel, UmbPropertyTypePresetModelTypeModel } from '@umbraco-cms/backoffice/property';
 import type { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 import type { UmbSegmentModel } from '@umbraco-cms/backoffice/segment';
+import { UmbContentDetailWorkspaceTypeTransformController } from './content-detail-workspace-type-transform.controller.js';
 
 export interface UmbContentDetailWorkspaceContextArgs<
 	DetailModelType extends UmbContentDetailModel<VariantModelType>,
@@ -154,6 +155,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	 * @internal
 	 */
 	public readonly languages = this.#languages.asObservable();
+	getLanguages(): Array<UmbLanguageDetailModel> {
+		return this.#languages.getValue();
+	}
 
 	protected readonly _segments = new UmbArrayState<UmbSegmentModel>([], (x) => x.alias);
 
@@ -177,9 +181,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 	#saveModalToken?: UmbModalToken<UmbContentVariantPickerData<VariantOptionModelType>, UmbContentVariantPickerValue>;
 	#contentTypePropertyName: string;
-
-	// Current property types, currently used to detect variation changes:
-	#propertyTypes?: Array<UmbPropertyTypeModel>;
 
 	constructor(
 		host: UmbControllerHost,
@@ -224,6 +225,8 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			this.validationContext,
 			this.view.hints,
 		);
+
+		new UmbContentDetailWorkspaceTypeTransformController(this);
 
 		this.variantOptions = mergeObservables(
 			[this.variesByCulture, this.variesBySegment, this.variants, this.languages, this._segments.asObservable()],
@@ -378,17 +381,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			this.structure.contentTypeDataTypeUniques,
 			(dataTypeUniques: Array<string>) => {
 				this.#dataTypeItemManager.setUniques(dataTypeUniques);
-			},
-			null,
-		);
-
-		// Observe property variation changes to trigger value migration when properties change
-		// from invariant to variant (or vice versa) via Infinite Editing
-		this.observe(
-			this.structure.contentTypeProperties,
-			(propertyTypes: Array<UmbPropertyTypeModel>) => {
-				this.#handlePropertyTypeVariationChanges(this.#propertyTypes, propertyTypes);
-				this.#propertyTypes = propertyTypes;
 			},
 			null,
 		);
@@ -1106,54 +1098,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		host: UmbControllerHost,
 		variantId: UmbVariantId,
 	): UmbContentPropertyDatasetContext<DetailModelType, ContentTypeDetailModelType, VariantModelType>;
-
-	/**
-	 * Handles property variation changes when the document type is updated while editing.
-	 * When a property's variation setting changes (e.g., from shared/invariant to variant or vice versa),
-	 * this method reloads the document to get properly migrated values from the server.
-	 */
-	#handlePropertyTypeVariationChanges(
-		oldPropertyTypes: Array<UmbPropertyTypeModel> | undefined,
-		newPropertyTypes: Array<UmbPropertyTypeModel> | undefined,
-	): void {
-		if (!oldPropertyTypes || !newPropertyTypes) {
-			return;
-		}
-		// Skip if no current data or if this is initial load
-		const currentData = this._data.getCurrent();
-		if (!currentData) {
-			return;
-		}
-
-		// Get default language:
-		const languages = this.#languages.getValue();
-		const defaultLanguage = languages.find((lang) => lang.isDefault)?.unique;
-		if (!defaultLanguage) {
-			throw new Error('Default language not found');
-		}
-
-		const values = currentData.values.map((v) => {
-			const oldType = oldPropertyTypes.find((p) => p.alias === v.alias);
-			const newType = newPropertyTypes.find((p) => p.alias === v.alias);
-			if (!oldType || !newType) {
-				// If we cant find both, we do not dare changing anything. Notice a composition may not have been loaded yet.
-				return v;
-			}
-			if (oldType.variesByCulture !== newType.variesByCulture) {
-				// Variation has changed, we need to migrate this value
-				if (newType.variesByCulture) {
-					// If it now varies by culture, set to default language:
-					return { ...v, culture: defaultLanguage };
-				} else {
-					// If it no longer varies by culture, set to invariant:
-					return { ...v, culture: null };
-				}
-			}
-			return v;
-		});
-
-		this._data.setCurrent({ ...currentData, values });
-	}
 
 	public override destroy(): void {
 		this.structure.destroy();
