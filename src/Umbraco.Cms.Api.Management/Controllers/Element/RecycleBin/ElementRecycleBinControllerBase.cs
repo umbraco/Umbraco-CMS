@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.Controllers.Element.Folder;
 using Umbraco.Cms.Api.Management.Controllers.RecycleBin;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Filters;
@@ -9,6 +10,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Element.RecycleBin;
@@ -74,4 +76,19 @@ public class ElementRecycleBinControllerBase : RecycleBinControllerBase<ElementR
 
         return rootEntities;
     }
+
+    protected override IEntitySlim[] GetSiblingEntities(Guid target, int before, int after, out long totalBefore, out long totalAfter) =>
+        _entityService
+            .GetTrashedSiblings(
+                target,
+                objectTypes: [UmbracoObjectTypes.ElementContainer, ItemObjectType],
+                before,
+                after,
+                out totalBefore,
+                out totalAfter,
+                ordering: Ordering.By(nameof(Infrastructure.Persistence.Dtos.NodeDto.Text)))
+            .ToArray();
+
+    protected IActionResult OperationStatusResult(EntityContainerOperationStatus status)
+        => ElementFolderControllerBase.OperationStatusResult(status);
 }

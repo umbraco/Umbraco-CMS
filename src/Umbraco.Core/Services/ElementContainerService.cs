@@ -126,6 +126,46 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
         return moveResult;
     }
 
+    public async Task<Attempt<EntityContainer?, EntityContainerOperationStatus>> DeleteFromRecycleBinAsync(Guid key, Guid userKey)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.WriteLock(Constants.Locks.ElementTree);
+
+        Attempt<EntityContainer?, EntityContainerOperationStatus> deleteResult = await DeleteLockedAsync(
+            scope,
+            key,
+            userKey,
+            true);
+
+        scope.Complete();
+        return deleteResult;
+    }
+
+    public async Task<Attempt<EntityContainerOperationStatus>> EmptyRecycleBinAsync(Guid userKey)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.WriteLock(Constants.Locks.ElementTree);
+
+        EventMessages eventMessages = EventMessagesFactory.Get();
+
+        // fire the emptying notification and handle cancellation
+        var emptyingNotification = new ElementEmptyingRecycleBinNotification(eventMessages);
+        if (await scope.Notifications.PublishCancelableAsync(emptyingNotification))
+        {
+            return Attempt.Fail(EntityContainerOperationStatus.CancelledByNotification);
+        }
+
+        DeleteDescendantsLocked(null);
+
+        await AuditAsync(AuditType.Delete, userKey, Constants.System.RecycleBinElement, "Recycle bin emptied");
+
+        // fire the deleted notification
+        scope.Notifications.Publish(new ElementEmptiedRecycleBinNotification(eventMessages).WithStateFrom(emptyingNotification));
+
+        scope.Complete();
+        return Attempt.Succeed(EntityContainerOperationStatus.Success);
+    }
+
     private async Task<Attempt<EntityContainer?, EntityContainerOperationStatus>> MoveLockedAsync<TNotification>(
         ICoreScope scope,
         Guid key,
@@ -220,6 +260,77 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
         scope.Notifications.Publish(movedNotification.WithStateFrom(movingNotification));
 
         return Attempt.SucceedWithStatus<EntityContainer?, EntityContainerOperationStatus>(EntityContainerOperationStatus.Success, container);
+    }
+
+    private async Task<Attempt<EntityContainer?, EntityContainerOperationStatus>> DeleteLockedAsync(
+        ICoreScope scope,
+        Guid key,
+        Guid userKey,
+        bool mustBeTrashed)
+    {
+        EntityContainer? container = _entityContainerRepository.Get(key);
+        if (container is null)
+        {
+            return Attempt.FailWithStatus<EntityContainer?, EntityContainerOperationStatus>(EntityContainerOperationStatus.NotFound, null);
+        }
+
+        if (mustBeTrashed && container.Trashed is false)
+        {
+            return Attempt.FailWithStatus<EntityContainer?, EntityContainerOperationStatus>(EntityContainerOperationStatus.NotInTrash, container);
+        }
+
+        EventMessages eventMessages = EventMessagesFactory.Get();
+
+        // fire the deleting notification and handle cancellation
+        var deletingNotification = new EntityContainerDeletingNotification(container, eventMessages);
+        if (await scope.Notifications.PublishCancelableAsync(deletingNotification))
+        {
+            return Attempt.FailWithStatus<EntityContainer?, EntityContainerOperationStatus>(EntityContainerOperationStatus.CancelledByNotification, container);
+        }
+
+        DeleteDescendantsLocked(container.Key);
+
+        _entityContainerRepository.Delete(container);
+
+        await AuditAsync(AuditType.Delete, userKey, container.Id);
+
+        // fire the deleted notification
+        scope.Notifications.Publish(new EntityContainerDeletedNotification(container, eventMessages).WithStateFrom(deletingNotification));
+
+        return Attempt.SucceedWithStatus<EntityContainer?, EntityContainerOperationStatus>(EntityContainerOperationStatus.Success, container);
+    }
+
+    private void DeleteDescendantsLocked(Guid? key)
+    {
+        long total;
+
+        do
+        {
+            IEnumerable<IEntitySlim> descendants = _entityService.GetPagedDescendants(
+                key,
+                UmbracoObjectTypes.ElementContainer,
+                [UmbracoObjectTypes.ElementContainer, UmbracoObjectTypes.Element],
+                0, // pageIndex = 0 because the move operation is path based (starts-with), and we update paths as we move through the descendants
+                DescendantsIteratorPageSize,
+                out total);
+
+            foreach (IEntitySlim descendant in descendants)
+            {
+                if (descendant.NodeObjectType == Constants.ObjectTypes.ElementContainer)
+                {
+                    EntityContainer descendantContainer = _entityContainerRepository.Get(descendant.Id)
+                                                          ?? throw new InvalidOperationException($"Descendant container with ID {descendant.Id} was not found.");
+                    _entityContainerRepository.Delete(descendantContainer);
+                }
+                else
+                {
+                    IElement descendantElement = _elementRepository.Get(descendant.Id)
+                                                 ?? throw new InvalidOperationException($"Descendant element with ID {descendant.Id} was not found.");
+                    _elementRepository.Delete(descendantElement);
+                }
+            }
+        }
+        while (total > DescendantsIteratorPageSize);
     }
 
     protected override Guid ContainedObjectType => Constants.ObjectTypes.Element;

@@ -60,7 +60,9 @@ internal sealed class ElementServiceNotificationWithCacheTests : UmbracoIntegrat
         .AddNotificationHandler<ElementCopyingNotification, ElementNotificationHandler>()
         .AddNotificationHandler<ElementCopiedNotification, ElementNotificationHandler>()
         .AddNotificationHandler<ElementMovingToRecycleBinNotification, ElementNotificationHandler>()
-        .AddNotificationHandler<ElementMovedToRecycleBinNotification, ElementNotificationHandler>();
+        .AddNotificationHandler<ElementMovedToRecycleBinNotification, ElementNotificationHandler>()
+        .AddNotificationHandler<ElementDeletingNotification, ElementNotificationHandler>()
+        .AddNotificationHandler<ElementDeletedNotification, ElementNotificationHandler>();
 
     [Test]
     public async Task Saving_Saved_Get_Value()
@@ -233,6 +235,95 @@ internal sealed class ElementServiceNotificationWithCacheTests : UmbracoIntegrat
     }
 
     [Test]
+    public async Task Delete_Fires_Notifications()
+    {
+        var element = (await ElementEditingService.CreateAsync(
+            new ElementCreateModel
+            {
+                ContentTypeKey = _contentType.Key,
+                Variants = [
+                    new() { Name = "Name" }
+                ],
+            },
+            Constants.Security.SuperUserKey)).Result.Content!;
+
+        var deletingWasCalled = false;
+        var deletedWasCalled = false;
+
+        ElementNotificationHandler.DeletingElement = _ => deletingWasCalled = true;
+        ElementNotificationHandler.DeletedElement = _ => deletedWasCalled = true;
+
+        Assert.IsNotNull(EntityService.Get(element.Key, UmbracoObjectTypes.Element));
+
+        try
+        {
+            var moveAttempt = await ElementEditingService.DeleteAsync(element.Key, Constants.Security.SuperUserKey);
+
+            Assert.Multiple(() =>
+            {
+                Assert.IsTrue(moveAttempt.Success);
+                Assert.AreEqual(ContentEditingOperationStatus.Success, moveAttempt.Status);
+            });
+
+            Assert.IsTrue(deletingWasCalled);
+            Assert.IsTrue(deletedWasCalled);
+        }
+        finally
+        {
+            ElementNotificationHandler.DeletingElement = null;
+            ElementNotificationHandler.DeletedElement = null;
+        }
+
+        Assert.IsNull(EntityService.Get(element.Key, UmbracoObjectTypes.Element));
+   }
+
+    [Test]
+    public async Task Delete_Can_Cancel_Deletion()
+    {
+        var element = (await ElementEditingService.CreateAsync(
+            new ElementCreateModel
+            {
+                ContentTypeKey = _contentType.Key,
+                Variants = [
+                    new() { Name = "Name" }
+                ],
+            },
+            Constants.Security.SuperUserKey)).Result.Content!;
+
+        var deletingWasCalled = false;
+        var deletedWasCalled = false;
+
+        ElementNotificationHandler.DeletingElement = notification =>
+        {
+            notification.Cancel = true;
+            deletingWasCalled = true;
+        };
+        ElementNotificationHandler.DeletedElement = _ => deletedWasCalled = true;
+
+        try
+        {
+            var deleteAttempt = await ElementEditingService.DeleteAsync(element.Key, Constants.Security.SuperUserKey);
+
+            Assert.Multiple(() =>
+            {
+                Assert.IsFalse(deleteAttempt.Success);
+                Assert.AreEqual(ContentEditingOperationStatus.CancelledByNotification, deleteAttempt.Status);
+            });
+
+            Assert.IsTrue(deletingWasCalled);
+            Assert.IsFalse(deletedWasCalled);
+        }
+        finally
+        {
+            ElementNotificationHandler.DeletingElement = null;
+            ElementNotificationHandler.DeletedElement = null;
+        }
+
+        element = (await ElementEditingService.GetAsync(element.Key))!;
+        Assert.NotNull(element);
+    }
+
+    [Test]
     public async Task Moving_To_Recycle_Bin_Moved_Fires_Notifications()
     {
         var element = (await ElementEditingService.CreateAsync(
@@ -337,6 +428,95 @@ internal sealed class ElementServiceNotificationWithCacheTests : UmbracoIntegrat
     }
 
     [Test]
+    public async Task Delete_From_Recycle_Bin_Fires_Notifications()
+    {
+        var element = (await ElementEditingService.CreateAsync(
+            new ElementCreateModel
+            {
+                ContentTypeKey = _contentType.Key,
+                Variants = [
+                    new() { Name = "Name" }
+                ],
+            },
+            Constants.Security.SuperUserKey)).Result.Content!;
+
+        await ElementEditingService.MoveToRecycleBinAsync(element.Key, Constants.Security.SuperUserKey);
+
+        var deletingWasCalled = false;
+        var deletedWasCalled = false;
+
+        ElementNotificationHandler.DeletingElement = _ => deletingWasCalled = true;
+        ElementNotificationHandler.DeletedElement = _ => deletedWasCalled = true;
+
+        try
+        {
+            var moveAttempt = await ElementEditingService.DeleteFromRecycleBinAsync(element.Key, Constants.Security.SuperUserKey);
+
+            Assert.Multiple(() =>
+            {
+                Assert.IsTrue(moveAttempt.Success);
+                Assert.AreEqual(ContentEditingOperationStatus.Success, moveAttempt.Status);
+            });
+
+            Assert.IsTrue(deletingWasCalled);
+            Assert.IsTrue(deletedWasCalled);
+        }
+        finally
+        {
+            ElementNotificationHandler.DeletingElement = null;
+            ElementNotificationHandler.DeletedElement = null;
+        }
+    }
+
+    [Test]
+    public async Task Delete_From_Recycle_Bin_Can_Cancel_Deletion()
+    {
+        var element = (await ElementEditingService.CreateAsync(
+            new ElementCreateModel
+            {
+                ContentTypeKey = _contentType.Key,
+                Variants = [
+                    new() { Name = "Name" }
+                ],
+            },
+            Constants.Security.SuperUserKey)).Result.Content!;
+
+        await ElementEditingService.MoveToRecycleBinAsync(element.Key, Constants.Security.SuperUserKey);
+
+        var deletingWasCalled = false;
+        var deletedWasCalled = false;
+
+        ElementNotificationHandler.DeletingElement = notification =>
+        {
+            notification.Cancel = true;
+            deletingWasCalled = true;
+        };
+        ElementNotificationHandler.DeletedElement = _ => deletedWasCalled = true;
+
+        try
+        {
+            var deleteAttempt = await ElementEditingService.DeleteFromRecycleBinAsync(element.Key, Constants.Security.SuperUserKey);
+
+            Assert.Multiple(() =>
+            {
+                Assert.IsFalse(deleteAttempt.Success);
+                Assert.AreEqual(ContentEditingOperationStatus.CancelledByNotification, deleteAttempt.Status);
+            });
+
+            Assert.IsTrue(deletingWasCalled);
+            Assert.IsFalse(deletedWasCalled);
+        }
+        finally
+        {
+            ElementNotificationHandler.DeletingElement = null;
+            ElementNotificationHandler.DeletedElement = null;
+        }
+
+        element = (await ElementEditingService.GetAsync(element.Key))!;
+        Assert.NotNull(element);
+    }
+
+    [Test]
     public async Task Copying_Copied_Fires_Notifications()
     {
         var element = (await ElementEditingService.CreateAsync(
@@ -428,7 +608,9 @@ internal sealed class ElementServiceNotificationWithCacheTests : UmbracoIntegrat
         INotificationHandler<ElementCopyingNotification>,
         INotificationHandler<ElementCopiedNotification>,
         INotificationHandler<ElementMovingToRecycleBinNotification>,
-        INotificationHandler<ElementMovedToRecycleBinNotification>
+        INotificationHandler<ElementMovedToRecycleBinNotification>,
+        INotificationHandler<ElementDeletingNotification>,
+        INotificationHandler<ElementDeletedNotification>
     {
         public static Action<ElementSavingNotification>? SavingElement { get; set; }
 
@@ -446,6 +628,10 @@ internal sealed class ElementServiceNotificationWithCacheTests : UmbracoIntegrat
 
         public static Action<ElementMovedToRecycleBinNotification>? MovedElementToRecycleBin { get; set; }
 
+        public static Action<ElementDeletingNotification>? DeletingElement { get; set; }
+
+        public static Action<ElementDeletedNotification>? DeletedElement { get; set; }
+
         public void Handle(ElementSavedNotification notification) => SavedElement?.Invoke(notification);
 
         public void Handle(ElementSavingNotification notification) => SavingElement?.Invoke(notification);
@@ -461,5 +647,9 @@ internal sealed class ElementServiceNotificationWithCacheTests : UmbracoIntegrat
         public void Handle(ElementMovingToRecycleBinNotification notification) => MovingElementToRecycleBin?.Invoke(notification);
 
         public void Handle(ElementMovedToRecycleBinNotification notification) => MovedElementToRecycleBin?.Invoke(notification);
+
+        public void Handle(ElementDeletingNotification notification) => DeletingElement?.Invoke(notification);
+
+        public void Handle(ElementDeletedNotification notification) => DeletedElement?.Invoke(notification);
     }
 }

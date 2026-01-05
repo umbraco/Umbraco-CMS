@@ -70,4 +70,85 @@ public partial class ElementContainerServiceTests
             Assert.AreEqual(EntityContainerOperationStatus.NotFound, result.Status);
         });
     }
+
+    [Test]
+    public async Task Container_Delete_Events_Are_Fired()
+    {
+        var deletingWasCalled = false;
+        var deletedWasCalled = false;
+
+        var containerKey = Guid.NewGuid();
+        var container = (await ElementContainerService.CreateAsync(containerKey, "The Container", null, Constants.Security.SuperUserKey)).Result;
+        Assert.IsNotNull(container);
+
+        try
+        {
+            EntityContainerNotificationHandler.DeletingContainer = notification =>
+            {
+                deletingWasCalled = true;
+                Assert.AreEqual(containerKey, notification.DeletedEntities.Single().Key);
+            };
+
+            EntityContainerNotificationHandler.DeletedContainer = notification =>
+            {
+                deletedWasCalled = true;
+                Assert.AreEqual(containerKey, notification.DeletedEntities.Single().Key);
+            };
+
+            var result = await ElementContainerService.DeleteAsync(containerKey, Constants.Security.SuperUserKey);
+
+            Assert.AreEqual(EntityContainerOperationStatus.Success, result.Status);
+            Assert.IsTrue(result.Success);
+            Assert.IsTrue(deletingWasCalled);
+            Assert.IsTrue(deletedWasCalled);
+        }
+        finally
+        {
+            EntityContainerNotificationHandler.DeletingContainer = null;
+            EntityContainerNotificationHandler.DeletedContainer = null;
+        }
+
+        Assert.AreEqual(0, GetAtRoot().Length);
+        Assert.IsNull(await ElementContainerService.GetAsync(containerKey));
+    }
+
+    [Test]
+    public async Task Container_Delete_Event_Can_Be_Cancelled()
+    {
+        var deletingWasCalled = false;
+        var deletedWasCalled = false;
+
+        var containerKey = Guid.NewGuid();
+        var container = (await ElementContainerService.CreateAsync(containerKey, "The Container", null, Constants.Security.SuperUserKey)).Result;
+        Assert.IsNotNull(container);
+
+        try
+        {
+            EntityContainerNotificationHandler.DeletingContainer = notification =>
+            {
+                deletingWasCalled = true;
+                notification.Cancel = true;
+            };
+
+            EntityContainerNotificationHandler.DeletedContainer = _ =>
+            {
+                deletedWasCalled = true;
+            };
+
+            var result = await ElementContainerService.DeleteAsync(containerKey, Constants.Security.SuperUserKey);
+
+            Assert.AreEqual(EntityContainerOperationStatus.CancelledByNotification, result.Status);
+            Assert.IsFalse(result.Success);
+            Assert.IsTrue(deletingWasCalled);
+            Assert.IsFalse(deletedWasCalled);
+
+            Assert.AreEqual(1, GetAtRoot().Length);
+            Assert.IsNotNull(await ElementContainerService.GetAsync(containerKey));
+        }
+        finally
+        {
+            EntityContainerNotificationHandler.DeletingContainer = null;
+            EntityContainerNotificationHandler.DeletedContainer = null;
+        }
+    }
 }

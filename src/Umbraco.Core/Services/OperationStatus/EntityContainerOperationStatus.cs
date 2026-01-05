@@ -13,4 +13,5 @@ public enum EntityContainerOperationStatus
     DuplicateName,
     InvalidParent,
     InTrash,
+    NotInTrash
 }

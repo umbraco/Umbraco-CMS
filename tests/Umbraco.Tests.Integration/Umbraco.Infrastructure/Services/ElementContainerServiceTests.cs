@@ -29,7 +29,9 @@ public partial class ElementContainerServiceTests : UmbracoIntegrationTest
         .AddNotificationHandler<EntityContainerMovingNotification, EntityContainerNotificationHandler>()
         .AddNotificationHandler<EntityContainerMovedNotification, EntityContainerNotificationHandler>()
         .AddNotificationHandler<EntityContainerMovingToRecycleBinNotification, EntityContainerNotificationHandler>()
-        .AddNotificationHandler<EntityContainerMovedToRecycleBinNotification, EntityContainerNotificationHandler>();
+        .AddNotificationHandler<EntityContainerMovedToRecycleBinNotification, EntityContainerNotificationHandler>()
+        .AddNotificationHandler<EntityContainerDeletingNotification, EntityContainerNotificationHandler>()
+        .AddNotificationHandler<EntityContainerDeletedNotification, EntityContainerNotificationHandler>();
 
     private IEntitySlim[] GetAtRoot()
         => EntityService.GetRootEntities(UmbracoObjectTypes.ElementContainer).Union(EntityService.GetRootEntities(UmbracoObjectTypes.Element)).ToArray();
@@ -164,7 +166,9 @@ public partial class ElementContainerServiceTests : UmbracoIntegrationTest
         INotificationHandler<EntityContainerMovingNotification>,
         INotificationHandler<EntityContainerMovedNotification>,
         INotificationHandler<EntityContainerMovingToRecycleBinNotification>,
-        INotificationHandler<EntityContainerMovedToRecycleBinNotification>
+        INotificationHandler<EntityContainerMovedToRecycleBinNotification>,
+        INotificationHandler<EntityContainerDeletingNotification>,
+        INotificationHandler<EntityContainerDeletedNotification>
     {
         public static Action<EntityContainerMovingNotification>? MovingContainer { get; set; }
 
@@ -174,6 +178,10 @@ public partial class ElementContainerServiceTests : UmbracoIntegrationTest
 
         public static Action<EntityContainerMovedToRecycleBinNotification>? MovedContainerToRecycleBin { get; set; }
 
+        public static Action<EntityContainerDeletingNotification>? DeletingContainer { get; set; }
+
+        public static Action<EntityContainerDeletedNotification>? DeletedContainer { get; set; }
+
         public void Handle(EntityContainerMovingNotification notification) => MovingContainer?.Invoke(notification);
 
         public void Handle(EntityContainerMovedNotification notification) => MovedContainer?.Invoke(notification);
@@ -181,5 +189,9 @@ public partial class ElementContainerServiceTests : UmbracoIntegrationTest
         public void Handle(EntityContainerMovingToRecycleBinNotification notification) => MovingContainerToRecycleBin?.Invoke(notification);
 
         public void Handle(EntityContainerMovedToRecycleBinNotification notification) => MovedContainerToRecycleBin?.Invoke(notification);
+
+        public void Handle(EntityContainerDeletingNotification notification) => DeletingContainer?.Invoke(notification);
+
+        public void Handle(EntityContainerDeletedNotification notification) => DeletedContainer?.Invoke(notification);
     }
 }

@@ -352,5 +352,8 @@
     <Compile Update="Umbraco.Infrastructure\Services\ElementContainerServiceTests.Delete.cs">
       <DependentUpon>ElementContainerServiceTests.cs</DependentUpon>
     </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ElementContainerServiceTests.EmptyRecycleBin.cs">
+      <DependentUpon>ElementContainerServiceTests.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>
