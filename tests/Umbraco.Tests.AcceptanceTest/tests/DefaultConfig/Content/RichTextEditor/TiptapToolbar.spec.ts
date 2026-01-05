@@ -137,8 +137,10 @@ test('can insert a link to an unpublished document in RTE Tiptap property editor
   await umbracoUi.content.clickDocumentLinkButton();
   await umbracoUi.content.selectLinkByName(linkedDocumentName);
   await umbracoUi.content.clickButtonWithName('Choose');
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short); // Wait for the link to be inserted
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.medium); // Wait for the link to be inserted
   await umbracoUi.content.clickAddButton();
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.medium); // Wait for the modal to close
+  await umbracoUi.content.typeRTETipTapEditorValue(linkedDocumentName);
   await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert

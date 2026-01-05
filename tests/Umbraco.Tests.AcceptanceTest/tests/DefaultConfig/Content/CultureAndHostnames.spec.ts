@@ -51,8 +51,6 @@ test('can add a domain', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.clickAddNewHostnameButton();
   await umbracoUi.content.enterDomain(domainName, 0);
   await umbracoUi.content.selectHostnameLanguageOption(languageName, 0);
-  await umbracoUi.content.clickSaveModalButton();
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoUi.content.clickSaveModalButtonAndWaitForDomainToBeCreated();
 
   // Assert

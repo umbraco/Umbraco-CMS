@@ -5,7 +5,6 @@ const dataTypeName = 'List View - Media';
 let dataTypeDefaultData = null;
 const firstMediaFileName = 'FirstMediaFile';
 const secondMediaFileName = 'SecondMediaFile';
-
 test.beforeEach(async ({umbracoUi, umbracoApi}) => {
   dataTypeDefaultData = await umbracoApi.dataType.getByName(dataTypeName);
   await umbracoApi.media.ensureNameNotExists(firstMediaFileName);
@@ -125,9 +124,9 @@ test('can allow bulk move in the media section', async ({umbracoApi, umbracoUi})
   await umbracoUi.media.selectMediaWithName(secondMediaFileName);
   await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoUi.media.clickBulkMoveToButton();
-  await umbracoUi.media.openCaretButtonForName('Media');
+  await umbracoUi.media.openCaretButtonForName('Media', true);
   await umbracoUi.media.clickModalTextByName(mediaFolderName);
-  await umbracoUi.media.clickChooseModalButtonAndWaitForMediaToBeMoved();
+  await umbracoUi.media.clickChooseModalButtonAndWaitForMediaItemsToBeMoved(2);
 
   // Assert
   expect(await umbracoApi.media.doesMediaItemHaveChildName(mediaFolderId, firstMediaFileName)).toBeTruthy();

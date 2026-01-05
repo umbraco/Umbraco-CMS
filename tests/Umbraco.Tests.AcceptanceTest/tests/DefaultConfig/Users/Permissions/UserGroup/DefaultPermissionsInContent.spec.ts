@@ -232,7 +232,7 @@ test('can set up notifications with notification permission enabled', async ({um
   await umbracoUi.content.clickNotificationsActionMenuOption();
   await umbracoUi.content.clickDocumentNotificationOptionWithName(notificationActionIds[0]);
   await umbracoUi.content.clickDocumentNotificationOptionWithName(notificationActionIds[1]);
-  await umbracoUi.content.clickSaveModalButton();
+  await umbracoUi.content.clickSaveModalButtonAndWaitForNotificationToBeCreated();
 
   // Assert
   await umbracoUi.content.isSuccessNotificationVisible();
