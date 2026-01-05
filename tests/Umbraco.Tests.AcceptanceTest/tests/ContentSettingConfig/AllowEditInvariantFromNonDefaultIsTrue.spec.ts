@@ -244,8 +244,8 @@ test('can edit variant text property inside invariant block in non-default langu
 
   // Act
   await umbracoUi.content.goToContentWithName(englishContentName);
-  await umbracoUi.content.clickAddBlockListElementWithName(firstBlockListName);
-  await umbracoUi.content.clickBlockElementWithName(secondBlockElementTypeName);
+  await umbracoUi.content.clickAddBlockListElementWithName(secondBlockListName);
+  await umbracoUi.content.clickBlockElementWithName(firstBlockElementTypeName);
   await umbracoUi.content.enterBlockPropertyValue(firstTextName, 'Text1 in invariant block');
   await umbracoUi.content.enterBlockPropertyValue(secondTextName, 'Text2 in invariant block');
   await umbracoUi.content.clickCreateModalButton();
@@ -253,8 +253,7 @@ test('can edit variant text property inside invariant block in non-default langu
   await umbracoUi.content.clickContainerSaveAndPublishButton();
   await umbracoUi.content.isSuccessNotificationVisible();
   await umbracoUi.content.switchLanguage(secondCulture);
-  await umbracoUi.content.clickAddBlockListElementWithName(firstBlockListName);
-  await umbracoUi.content.clickBlockElementWithName(secondBlockElementTypeName);
+  await umbracoUi.content.clickEditBlockListBlockButton();
 
   // Assert
   await umbracoUi.content.isBlockPropertyEditable(firstTextName, true);
@@ -279,8 +278,8 @@ test('can edit invariant text property inside an invariant block in non-default 
 
   // Act
   await umbracoUi.content.goToContentWithName(englishContentName);
-  await umbracoUi.content.clickAddBlockListElementWithName(firstBlockListName);
-  await umbracoUi.content.clickBlockElementWithName(secondBlockElementTypeName);
+  await umbracoUi.content.clickAddBlockListElementWithName(secondBlockListName);
+  await umbracoUi.content.clickBlockElementWithName(firstBlockElementTypeName);
   await umbracoUi.content.enterBlockPropertyValue(firstTextName, 'Text1 in invariant block');
   await umbracoUi.content.enterBlockPropertyValue(secondTextName, 'Text2 in invariant block');
   await umbracoUi.content.clickCreateModalButton();
@@ -288,8 +287,7 @@ test('can edit invariant text property inside an invariant block in non-default 
   await umbracoUi.content.clickContainerSaveAndPublishButton();
   await umbracoUi.content.isSuccessNotificationVisible();
   await umbracoUi.content.switchLanguage(secondCulture);
-  await umbracoUi.content.clickAddBlockListElementWithName(firstBlockListName);
-  await umbracoUi.content.clickBlockElementWithName(secondBlockElementTypeName);
+  await umbracoUi.content.clickEditBlockListBlockButton();
 
   // Assert
   await umbracoUi.content.isBlockPropertyEditable(secondTextName, true);

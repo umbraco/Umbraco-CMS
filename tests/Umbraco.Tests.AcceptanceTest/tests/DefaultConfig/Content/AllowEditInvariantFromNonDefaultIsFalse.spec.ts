@@ -34,13 +34,13 @@ test.beforeEach(async ({umbracoApi}) => {
 });
 
 test.afterEach(async ({umbracoApi}) => {
-  await umbracoApi.document.ensureNameNotExists(englishContentName);
-  await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
-  await umbracoApi.documentType.ensureNameNotExists(firstBlockElementTypeName);
-  await umbracoApi.documentType.ensureNameNotExists(secondBlockElementTypeName);
-  await umbracoApi.dataType.ensureNameNotExists(firstBlockListName);
-  await umbracoApi.dataType.ensureNameNotExists(secondBlockListName);
-  await umbracoApi.language.ensureIsoCodeNotExists(secondCulture);
+  // await umbracoApi.document.ensureNameNotExists(englishContentName);
+  // await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
+  // await umbracoApi.documentType.ensureNameNotExists(firstBlockElementTypeName);
+  // await umbracoApi.documentType.ensureNameNotExists(secondBlockElementTypeName);
+  // await umbracoApi.dataType.ensureNameNotExists(firstBlockListName);
+  // await umbracoApi.dataType.ensureNameNotExists(secondBlockListName);
+  // await umbracoApi.language.ensureIsoCodeNotExists(secondCulture);
 });
 
 test('can edit variant text property in non-default language when AllowEditInvariantFromNonDefault is false', async ({umbracoApi, umbracoUi}) => {
@@ -244,8 +244,8 @@ test('cannot edit variant text property inside invariant block in non-default la
 
   // Act
   await umbracoUi.content.goToContentWithName(englishContentName);
-  await umbracoUi.content.clickAddBlockListElementWithName(firstBlockListName);
-  await umbracoUi.content.clickBlockElementWithName(secondBlockElementTypeName);
+  await umbracoUi.content.clickAddBlockListElementWithName(secondBlockListName);
+  await umbracoUi.content.clickBlockElementWithName(firstBlockElementTypeName);
   await umbracoUi.content.enterBlockPropertyValue(firstTextName, 'Text1 in invariant block');
   await umbracoUi.content.enterBlockPropertyValue(secondTextName, 'Text2 in invariant block');
   await umbracoUi.content.clickCreateModalButton();
@@ -253,8 +253,7 @@ test('cannot edit variant text property inside invariant block in non-default la
   await umbracoUi.content.clickContainerSaveAndPublishButton();
   await umbracoUi.content.isSuccessNotificationVisible();
   await umbracoUi.content.switchLanguage(secondCulture);
-  await umbracoUi.content.clickAddBlockListElementWithName(firstBlockListName);
-  await umbracoUi.content.clickBlockElementWithName(secondBlockElementTypeName);
+  await umbracoUi.content.clickEditBlockListBlockButton();
 
   // Assert
   await umbracoUi.content.isBlockPropertyEditable(firstTextName, false);
@@ -279,8 +278,8 @@ test('cannot edit invariant text property inside an invariant block in non-defau
 
   // Act
   await umbracoUi.content.goToContentWithName(englishContentName);
-  await umbracoUi.content.clickAddBlockListElementWithName(firstBlockListName);
-  await umbracoUi.content.clickBlockElementWithName(secondBlockElementTypeName);
+  await umbracoUi.content.clickAddBlockListElementWithName(secondBlockListName);
+  await umbracoUi.content.clickBlockElementWithName(firstBlockElementTypeName);
   await umbracoUi.content.enterBlockPropertyValue(firstTextName, 'Text1 in invariant block');
   await umbracoUi.content.enterBlockPropertyValue(secondTextName, 'Text2 in invariant block');
   await umbracoUi.content.clickCreateModalButton();
@@ -288,8 +287,7 @@ test('cannot edit invariant text property inside an invariant block in non-defau
   await umbracoUi.content.clickContainerSaveAndPublishButton();
   await umbracoUi.content.isSuccessNotificationVisible();
   await umbracoUi.content.switchLanguage(secondCulture);
-  await umbracoUi.content.clickAddBlockListElementWithName(firstBlockListName);
-  await umbracoUi.content.clickBlockElementWithName(secondBlockElementTypeName);
+  await umbracoUi.content.clickEditBlockListBlockButton();
 
   // Assert
   await umbracoUi.content.isBlockPropertyEditable(secondTextName, false);
