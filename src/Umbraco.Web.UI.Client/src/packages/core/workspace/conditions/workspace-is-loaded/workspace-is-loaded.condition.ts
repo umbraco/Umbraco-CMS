@@ -7,7 +7,7 @@ import type {
 } from '@umbraco-cms/backoffice/extension-api';
 import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
 
-export class UmbEntityDetailWorkspaceIsLoadedCondition
+export class UmbContentWorkspaceIsLoadedCondition
 	extends UmbConditionBase<UmbConditionConfigBase>
 	implements UmbExtensionCondition
 {
@@ -27,4 +27,4 @@ export class UmbEntityDetailWorkspaceIsLoadedCondition
 	}
 }
 
-export { UmbEntityDetailWorkspaceIsLoadedCondition as api };
+export { UmbContentWorkspaceIsLoadedCondition as api };
