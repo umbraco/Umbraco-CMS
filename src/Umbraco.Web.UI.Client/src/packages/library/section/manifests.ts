@@ -6,7 +6,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'section',
 		alias: UMB_LIBRARY_SECTION_ALIAS,
 		name: 'Library Section',
-		weight: 400,
+		weight: 850,
 		meta: {
 			label: '#sections_library',
 			pathname: 'library',

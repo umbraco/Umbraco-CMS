@@ -10,7 +10,7 @@ export class UmbLibraryWelcomeDashboardElement extends UmbLitElement {
 				<uui-box headline=${this.localize.term('libraryDashboard_welcomeHeader')}>
 					<p>
 						<umb-localize key="libraryDashboard_welcomeDescription">
-							Welcome to the Library section. This is where you can manage your shared content elements.
+							Welcome to the Library section. This is where you can manage your global elements.
 						</umb-localize>
 					</p>
 				</uui-box>
