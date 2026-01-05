@@ -84,7 +84,8 @@ test('cannot input the text that exceeds the allowed amount of characters', {tag
   // Arrange
   const maxChars = 100;
   const textExceedMaxChars = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam mattis porttitor orci id cursus. Nulla';
-  const warningMessage = 'The string length exceeds the maximum length of';
+  const exceedNumberOfChars = textExceedMaxChars.length - maxChars;
+  const warningMessage = 'The string length exceeds the maximum length of ' + maxChars + ' characters, ' + exceedNumberOfChars + ' too many.';
   const dataTypeId = await umbracoApi.dataType.createTextareaDataType(customDataTypeName, maxChars);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, dataTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
