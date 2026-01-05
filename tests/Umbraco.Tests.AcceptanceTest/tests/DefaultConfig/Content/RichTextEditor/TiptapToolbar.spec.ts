@@ -31,7 +31,7 @@ test('can add a media in RTE Tiptap property editor', async ({umbracoApi, umbrac
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickTipTapToolbarIconWithTitle(iconTitle);
-  await umbracoUi.content.selectMediaWithName(imageName, true);
+  await umbracoUi.content.selectMediaWithName(imageName);
   await umbracoUi.content.clickChooseModalButton();
   await umbracoUi.content.clickMediaCaptionAltTextModalSubmitButton();
   await umbracoUi.content.clickSaveAndPublishButton();
@@ -139,7 +139,7 @@ test('can insert a link to an unpublished document in RTE Tiptap property editor
   await umbracoUi.content.clickDocumentLinkButton();
   await umbracoUi.content.selectLinkByName(linkedDocumentName);
   await umbracoUi.content.clickButtonWithName('Choose');
-  await umbracoUi.waitForTimeout(500); // Wait for the link to be inserted
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short); // Wait for the link to be inserted
   await umbracoUi.content.clickAddButton();
   await umbracoUi.content.clickSaveButton();
 

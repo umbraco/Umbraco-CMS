@@ -113,7 +113,10 @@ public class ImageCropperPropertyEditor : DataEditor,
                     ? _jsonSerializer.Deserialize<ImageCropperValue>(stringValue)
                     : null) ?? new ImageCropperValue();
                 newValue.Src = _mediaFileManager.FileSystem.GetUrl(copyPath);
-                notification.Copy.SetValue(property.Alias,  _jsonSerializer.Serialize(newValue), propertyValue.Culture,
+                notification.Copy.SetValue(
+                    property.Alias,
+                    _jsonSerializer.Serialize(newValue),
+                    propertyValue.Culture,
                     propertyValue.Segment);
                 isUpdated = true;
             }
@@ -335,7 +338,8 @@ public class ImageCropperPropertyEditor : DataEditor,
                         // are fixing that anomaly here - does not make any sense at all but... bah...
                         property.SetValue(
                             _jsonSerializer.Serialize(new LightWeightImageCropperValue { Src = stringValue }),
-                            pvalue.Culture, pvalue.Segment);
+                            pvalue.Culture,
+                            pvalue.Segment);
                     }
 
                     if (source is null)
