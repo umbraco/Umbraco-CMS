@@ -253,8 +253,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 				}
 			}
 		} else if (data) {
-			const processedData = await this._scaffoldProcessData(data);
-
+			const processedData = await this._processIncomingData(data);
 			this._data.setPersisted(processedData);
 			this._data.setCurrent(processedData);
 
@@ -275,8 +274,10 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		const { data } = await this._detailRepository!.requestByUnique(unique);
 
 		if (data) {
-			this._data.setPersisted(data);
-			this._data.setCurrent(data);
+			// Process the data through _processIncomingData to handle value migration
+			const processedData = await this._processIncomingData(data);
+			this._data.setPersisted(processedData);
+			this._data.setCurrent(processedData);
 		}
 	}
 

@@ -1153,23 +1153,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		}
 	}
 
-	/**
-	 * Override reload to process incoming data through the value migration pipeline.
-	 * This ensures property values are properly transformed when variation settings change.
-	 */
-	public override async reload(): Promise<void> {
-		const unique = this.getUnique();
-		if (!unique) throw new Error('Unique is not set');
-		const { data } = await this._detailRepository!.requestByUnique(unique);
-
-		if (data) {
-			// Process the data through _processIncomingData to handle value migration
-			const processedData = await this._processIncomingData(data);
-			this._data.setPersisted(processedData);
-			this._data.setCurrent(processedData);
-		}
-	}
-
 	public override destroy(): void {
 		this.structure.destroy();
 		this.#languageRepository.destroy();
