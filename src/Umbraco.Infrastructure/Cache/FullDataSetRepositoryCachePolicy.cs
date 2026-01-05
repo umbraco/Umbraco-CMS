@@ -3,6 +3,7 @@
 
 using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
@@ -24,7 +25,7 @@ namespace Umbraco.Cms.Core.Cache;
 internal sealed class FullDataSetRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyBase<TEntity, TId>
     where TEntity : class, IEntity
 {
-    protected static readonly TId[] EmptyIds = new TId[0]; // const
+    private static readonly TId[] EmptyIds = new TId[0]; // const
     private readonly Func<TEntity, TId> _entityGetId;
     private readonly bool _expires;
 
@@ -53,9 +54,9 @@ internal sealed class FullDataSetRepositoryCachePolicy<TEntity, TId> : Repositor
         }
     }
 
-    protected string GetEntityTypeCacheKey() => $"uRepo_{typeof(TEntity).Name}_";
+    private string GetEntityTypeCacheKey() => RepositoryCacheKeys.GetKey<TEntity>();
 
-    protected void InsertEntities(TEntity[]? entities)
+    private void InsertEntities(TEntity[]? entities)
     {
         if (entities is null)
         {

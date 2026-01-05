@@ -72,7 +72,9 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
             // get the event arg type
             var eventArgType = e.EventHandlerType.GenericTypeArguments[1];
 
-            var found = EventNameExtractor.FindEvent(typeof(MediaService), eventArgType,
+            var found = EventNameExtractor.FindEvent(
+                typeof(MediaService),
+                eventArgType,
                 EventNameExtractor.MatchIngNames);
             if (!found.Success && found.Result.Error == EventNameExtractorError.Ambiguous)
             {

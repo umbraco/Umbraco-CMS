@@ -13,8 +13,18 @@ public class ModelsGenerator : IModelsGenerator
     private readonly UmbracoServices _umbracoService;
     private ModelsBuilderSettings _config;
 
-    public ModelsGenerator(UmbracoServices umbracoService, IOptionsMonitor<ModelsBuilderSettings> config,
-        OutOfDateModelsStatus outOfDateModels, IHostEnvironment hostEnvironment)
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ModelsGenerator" /> class.
+    /// </summary>
+    /// <param name="umbracoService">The Umbraco services.</param>
+    /// <param name="config">The models builder configuration.</param>
+    /// <param name="outOfDateModels">The out of date models status.</param>
+    /// <param name="hostEnvironment">The host environment.</param>
+    public ModelsGenerator(
+        UmbracoServices umbracoService,
+        IOptionsMonitor<ModelsBuilderSettings> config,
+        OutOfDateModelsStatus outOfDateModels,
+        IHostEnvironment hostEnvironment)
     {
         _umbracoService = umbracoService;
         _config = config.CurrentValue;

@@ -1,4 +1,4 @@
-﻿using NPoco;
+using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 using Umbraco.Extensions;
@@ -122,7 +122,7 @@ internal sealed class PropertyDataDto
             PropertyTypeDto = PropertyTypeDto,
         };
 
-    protected bool Equals(PropertyDataDto other) => Id == other.Id;
+    private bool Equals(PropertyDataDto other) => Id == other.Id;
 
     public override bool Equals(object? other) =>
         !ReferenceEquals(null, other) // other is not null

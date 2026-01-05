@@ -93,7 +93,7 @@ test('can add layouts', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
-  expect(await umbracoApi.dataType.doesListViewHaveLayout(customDataTypeName, layoutName, 'icon-list', layoutCollectionView)).toBeTruthy();
+  expect(await umbracoApi.dataType.doesListViewHaveLayout(customDataTypeName, layoutName, 'icon-table', layoutCollectionView)).toBeTruthy();
 });
 
 test('can remove layouts', async ({umbracoApi, umbracoUi}) => {

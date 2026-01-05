@@ -25,6 +25,7 @@ public class AllHealthCheckGroupController : HealthCheckGroupControllerBase
     /// <summary>
     ///     Gets a paginated grouped list of all names the health checks are grouped by.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <param name="skip">The amount of items to skip.</param>
     /// <param name="take">The amount of items to take.</param>
     /// <returns>The paged result of health checks group names.</returns>
