@@ -61,7 +61,7 @@ test('can rename a document type folder', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   await umbracoUi.documentType.waitForDocumentTypeToBeRenamed();
-  await umbracoUi.waitForTimeout(500); // Wait for the rename to be fully processed
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short); // Wait for the rename to be fully processed
   expect(await umbracoApi.documentType.doesNameExist(oldFolderName)).toBeFalsy();
   expect(await umbracoApi.documentType.doesNameExist(documentFolderName)).toBeTruthy();
   await umbracoUi.documentType.isDocumentTreeItemVisible(oldFolderName, false);

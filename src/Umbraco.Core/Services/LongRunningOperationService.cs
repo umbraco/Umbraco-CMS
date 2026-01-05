@@ -20,6 +20,7 @@ internal class LongRunningOperationService : ILongRunningOperationService
     /// <summary>
     /// Initializes a new instance of the <see cref="LongRunningOperationService"/> class.
     /// </summary>
+    /// <param name="options">The options for long-running operations settings.</param>
     /// <param name="repository">The repository for tracking long-running operations.</param>
     /// <param name="scopeProvider">The scope provider for managing database transactions.</param>
     /// <param name="timeProvider">The time provider for getting the current UTC time.</param>

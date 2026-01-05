@@ -34,5 +34,5 @@ public class BlockListModel : BlockModelCollection<BlockListItem>
     /// <value>
     ///     The empty <see cref="BlockListModel" />.
     /// </value>
-    public static BlockListModel Empty { get; } = new();
+    public static new BlockListModel Empty { get; } = new();
 }

@@ -36,7 +36,6 @@ test('can add a culture', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickCultureAndHostnamesActionMenuOption();
-  await umbracoUi.content.clickAddNewHostnameButton();
   await umbracoUi.content.selectCultureLanguageOption(languageName);
   await umbracoUi.content.clickSaveModalButton();
 
@@ -51,13 +50,10 @@ test('can add a domain', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickCultureAndHostnamesActionMenuOption();
   await umbracoUi.content.clickAddNewHostnameButton();
-  await umbracoUi.waitForTimeout(500);
-  await umbracoUi.content.enterDomain(domainName);
-  await umbracoUi.waitForTimeout(500);
-  await umbracoUi.content.selectHostnameLanguageOption(languageName);
-  await umbracoUi.waitForTimeout(500);
+  await umbracoUi.content.enterDomain(domainName, 0);
+  await umbracoUi.content.selectHostnameLanguageOption(languageName, 0);
   await umbracoUi.content.clickSaveModalButton();
-  await umbracoUi.waitForTimeout(500);
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
 
   // Assert
   await umbracoUi.content.waitForDomainToBeCreated();
