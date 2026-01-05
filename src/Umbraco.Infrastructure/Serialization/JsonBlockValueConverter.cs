@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Extensions;
 
@@ -123,15 +124,15 @@ public class JsonBlockValueConverter : JsonConverter<BlockValue>
 
     private List<BlockItemData> DeserializeBlockItemData(ref Utf8JsonReader reader, JsonSerializerOptions options, Type typeToConvert, string propertyName)
     {
-        try
-        {
-            return DeserializeListOf<BlockItemData>(ref reader, options, typeToConvert, propertyName);
-        }
-        catch (JsonException ex) when (ex.Path?.EndsWith(".values") is true)
-        {
-            // If we hit a JsonException due to the "values" property conflict, attempt the fallback deserialization
-            return FallbackBlockItemDataDeserialization(ref reader, options);
-        }
+        // Always use the custom deserialization to handle legacy "udi" field and "values" property conflict.
+        // The Udi property has [JsonIgnore] to prevent serialization differences between save and publish paths,
+        // so we must manually extract it from JSON and convert to Key.
+        JsonArray? arrayElement = JsonSerializer.Deserialize<JsonArray>(ref reader, options);
+
+        return arrayElement?
+            .Select(itemElement => DeserializeBlockItemData(itemElement, options))
+            .OfType<BlockItemData>()
+            .ToList() ?? [];
     }
 
     private List<BlockItemVariation> DeserializeBlockVariation(ref Utf8JsonReader reader, JsonSerializerOptions options, Type typeToConvert, string propertyName)
@@ -237,34 +238,55 @@ public class JsonBlockValueConverter : JsonConverter<BlockValue>
     }
 
     [Obsolete("Only needed to support the old data schema. Remove in V18.")]
-    private static List<BlockItemData> FallbackBlockItemDataDeserialization(ref Utf8JsonReader reader, JsonSerializerOptions options)
-    {
-        JsonArray? arrayElement = JsonSerializer.Deserialize<JsonArray>(ref reader, options);
-
-        return arrayElement?
-            .Select(itemElement => DeserializeBlockItemData(itemElement, options))
-            .OfType<BlockItemData>()
-            .ToList() ?? [];
-    }
-
-    [Obsolete("Only needed to support the old data schema. Remove in V18.")]
     private static BlockItemData? DeserializeBlockItemData(JsonNode? jsonNode, JsonSerializerOptions options)
     {
-        if (jsonNode is not JsonObject jsonObject || jsonObject.ContainsKey("values") is false)
+        if (jsonNode is not JsonObject jsonObject)
         {
-            // Nothing to be done, just deserialize as usual
             return jsonNode.Deserialize<BlockItemData>(options);
         }
 
-        // Handle the "values" property conflict by extracting the "values" property first and adding it to the
-        // RawPropertyValues dictionary after deserialization
-        JsonNode? values = jsonObject["values"];
-        jsonObject.Remove("values");
+        // Detect old format: has "udi" but no "key" (or key is missing/empty)
+        var hasUdi = jsonObject.ContainsKey("udi");
+        var hasKey = jsonObject.ContainsKey("key");
+
+        // If this is the new format (has key, no udi), use standard deserialization
+        if (hasKey && !hasUdi)
+        {
+            return jsonObject.Deserialize<BlockItemData>(options);
+        }
+
+        // Handle the legacy "udi" field by extracting the GUID and setting it as Key after deserialization.
+        // The Udi property has [JsonIgnore] to prevent serialization differences, so we must handle it manually.
+        string? udiValue = null;
+        if (hasUdi)
+        {
+            udiValue = jsonObject["udi"]?.GetValue<string>();
+            jsonObject.Remove("udi");
+        }
+
+        // Handle the "values" property conflict in old format by extracting the "values" property first
+        // and adding it to the RawPropertyValues dictionary after deserialization.
+        // Note: In old format, "values" could be a custom property name (not the Values collection).
+        JsonNode? values = null;
+        if (jsonObject.ContainsKey("values"))
+        {
+            values = jsonObject["values"];
+            jsonObject.Remove("values");
+        }
 
         BlockItemData? blockItemData = jsonObject.Deserialize<BlockItemData>(options);
         if (blockItemData is not null)
         {
-            blockItemData.RawPropertyValues["values"] = values.Deserialize<object?>(options);
+            // Set Key from legacy UDI if Key wasn't already set
+            if (blockItemData.Key == Guid.Empty && udiValue is not null && UdiParser.TryParse(udiValue, out Udi? udi) && udi is GuidUdi guidUdi)
+            {
+                blockItemData.Key = guidUdi.Guid;
+            }
+
+            if (values is not null)
+            {
+                blockItemData.RawPropertyValues["values"] = values.Deserialize<object?>(options);
+            }
         }
 
         return blockItemData;
