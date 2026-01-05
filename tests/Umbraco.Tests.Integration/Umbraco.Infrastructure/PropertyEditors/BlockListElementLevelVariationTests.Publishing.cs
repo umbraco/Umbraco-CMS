@@ -2459,7 +2459,7 @@ internal partial class BlockListElementLevelVariationTests
     /// the content should NOT show as having pending changes in either the default or other language.
     /// </summary>
     [Test]
-    public async Task Publish_All_Cultures_Should_Not_Mark_Content_As_Edited()
+    public async Task Publishing_All_Cultures_Should_Not_Mark_Content_As_Edited()
     {
         // Arrange: Create culture-variant content type with INVARIANT BlockList property
         // containing culture-variant element type.
