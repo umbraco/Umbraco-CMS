@@ -247,24 +247,16 @@ public class JsonBlockValueConverter : JsonConverter<BlockValue>
             return jsonNode.Deserialize<BlockItemData>(options);
         }
 
-        // Detect old format: has "udi" but no "key" (or key is missing/empty)
-        var hasUdi = jsonObject.ContainsKey("udi");
-        var hasKey = jsonObject.ContainsKey("key");
-
-        // If this is the new format (has key, no udi), use standard deserialization
-        if (hasKey && !hasUdi)
+        // If this is the new format (no udi), use standard deserialization.
+        if (jsonObject.ContainsKey("udi") is false)
         {
             return jsonObject.Deserialize<BlockItemData>(options);
         }
 
         // Handle the legacy "udi" field by extracting the GUID and setting it as Key after deserialization.
         // The Udi property has [JsonIgnore] to prevent serialization differences, so we must handle it manually.
-        string? udiValue = null;
-        if (hasUdi)
-        {
-            udiValue = jsonObject["udi"]?.GetValue<string>();
-            jsonObject.Remove("udi");
-        }
+        var udiValue = jsonObject["udi"]?.GetValue<string>();
+        jsonObject.Remove("udi");
 
         // Handle the "values" property conflict in old format by extracting the "values" property first
         // and adding it to the RawPropertyValues dictionary after deserialization.
@@ -279,7 +271,7 @@ public class JsonBlockValueConverter : JsonConverter<BlockValue>
         BlockItemData? blockItemData = jsonObject.Deserialize<BlockItemData>(options);
         if (blockItemData is not null)
         {
-            // Set Key from legacy UDI if Key wasn't already set
+            // Set Key from legacy UDI if Key wasn't already set.
             if (blockItemData.Key == Guid.Empty && udiValue is not null && UdiParser.TryParse(udiValue, out Udi? udi) && udi is GuidUdi guidUdi)
             {
                 blockItemData.Key = guidUdi.Guid;
