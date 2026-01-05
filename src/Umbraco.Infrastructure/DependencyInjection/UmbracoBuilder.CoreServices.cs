@@ -321,7 +321,8 @@ public static partial class UmbracoBuilderExtensions
                 default:
                     return new FileSystemMainDomLock(
                         loggerFactory.CreateLogger<FileSystemMainDomLock>(),
-                        mainDomKeyGenerator, hostingEnvironment,
+                        mainDomKeyGenerator,
+                        hostingEnvironment,
                         factory.GetRequiredService<IOptionsMonitor<GlobalSettings>>());
             }
         });

@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.NPoco
 internal sealed class NPocoFetchTests : UmbracoIntegrationTest
 {
     [SetUp]
-    protected void SeedDatabase()
+    public void SeedDatabase()
     {
         using (var scope = ScopeProvider.CreateScope())
         {

@@ -79,16 +79,24 @@ export class UmbUserAvatarElement extends UmbLitElement {
 				return;
 			}
 
-			this._avatarFileField.addEventListener('change', (event) => {
-				const target = event?.target as HTMLInputElement;
-				const file = target.files?.[0] as File;
-				if (!file) {
-					reject("Can't find avatar file");
-					return;
-				}
+			// Reset value to allow selecting the same file again
+			this._avatarFileField.value = '';
 
-				resolve(file);
-			});
+			// Use { once: true } to auto-remove listener after first trigger
+			this._avatarFileField.addEventListener(
+				'change',
+				(event) => {
+					const target = event?.target as HTMLInputElement;
+					const file = target.files?.[0];
+					if (!file) {
+						reject("Can't find avatar file");
+						return;
+					}
+
+					resolve(file);
+				},
+				{ once: true },
+			);
 
 			this._avatarFileField.click();
 		});
@@ -96,7 +104,7 @@ export class UmbUserAvatarElement extends UmbLitElement {
 
 	#deleteAvatar = async () => {
 		if (!this.#userWorkspaceContext) return;
-		this.#userWorkspaceContext.deleteAvatar();
+		await this.#userWorkspaceContext.deleteAvatar();
 	};
 
 	#hasAvatar() {
