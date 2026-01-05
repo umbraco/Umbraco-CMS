@@ -9,6 +9,7 @@ import type { UmbContentCollectionWorkspaceContext } from '../collection/content
 import type { UmbContentWorkspaceContext } from './content-workspace-context.interface.js';
 import { UmbContentDetailValidationPathTranslator } from './content-detail-validation-path-translator.js';
 import { UmbContentValidationToHintsManager } from './content-validation-to-hints.manager.js';
+import { UmbContentDetailWorkspaceTypeTransformController } from './content-detail-workspace-type-transform.controller.js';
 import {
 	appendToFrozenArray,
 	mergeObservables,
@@ -56,7 +57,6 @@ import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import type { UmbPropertyTypePresetModel, UmbPropertyTypePresetModelTypeModel } from '@umbraco-cms/backoffice/property';
 import type { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 import type { UmbSegmentModel } from '@umbraco-cms/backoffice/segment';
-import { UmbContentDetailWorkspaceTypeTransformController } from './content-detail-workspace-type-transform.controller.js';
 
 export interface UmbContentDetailWorkspaceContextArgs<
 	DetailModelType extends UmbContentDetailModel<VariantModelType>,
@@ -226,7 +226,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			this.view.hints,
 		);
 
-		new UmbContentDetailWorkspaceTypeTransformController(this);
+		new UmbContentDetailWorkspaceTypeTransformController(this as any);
 
 		this.variantOptions = mergeObservables(
 			[this.variesByCulture, this.variesBySegment, this.variants, this.languages, this._segments.asObservable()],

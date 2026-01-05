@@ -1,17 +1,21 @@
+import type { UmbContentDetailModel } from '../index.js';
 import type { UmbContentDetailWorkspaceContextBase } from './content-detail-workspace-base.js';
 import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import type { UmbEntityVariantModel } from '@umbraco-cms/backoffice/variant';
 
 /**
  * @class UmbContentDetailWorkspaceTypeTransformController
  * @description - Controller to handle content detail workspace type transformations, such as property variation changes.
  */
-export class UmbContentDetailWorkspaceTypeTransformController extends UmbControllerBase {
-	#workspace: UmbContentDetailWorkspaceContextBase<any, any, any, any>;
+export class UmbContentDetailWorkspaceTypeTransformController<
+	DetailModelType extends UmbContentDetailModel<UmbEntityVariantModel>,
+> extends UmbControllerBase {
+	#workspace: UmbContentDetailWorkspaceContextBase<DetailModelType, any, any, any>;
 	// Current property types, currently used to detect variation changes:
 	#propertyTypes?: Array<UmbPropertyTypeModel>;
 
-	constructor(host: UmbContentDetailWorkspaceContextBase<any, any, any, any>) {
+	constructor(host: UmbContentDetailWorkspaceContextBase<DetailModelType, any, any, any>) {
 		super(host);
 
 		this.#workspace = host;
