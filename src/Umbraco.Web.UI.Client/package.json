@@ -62,6 +62,7 @@
 		"./imaging": "./dist-cms/packages/media/imaging/index.js",
 		"./interaction-memory": "./dist-cms/packages/core/interaction-memory/index.js",
 		"./language": "./dist-cms/packages/language/index.js",
+		"./library": "./dist-cms/packages/library/index.js",
 		"./lit-element": "./dist-cms/packages/core/lit-element/index.js",
 		"./localization": "./dist-cms/packages/core/localization/index.js",
 		"./log-viewer": "./dist-cms/packages/log-viewer/index.js",

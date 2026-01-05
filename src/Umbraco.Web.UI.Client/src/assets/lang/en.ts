@@ -1431,6 +1431,7 @@ export default {
 	},
 	sections: {
 		content: 'Content',
+		library: 'Library',
 		media: 'Media',
 		member: 'Members',
 		packages: 'Packages',
