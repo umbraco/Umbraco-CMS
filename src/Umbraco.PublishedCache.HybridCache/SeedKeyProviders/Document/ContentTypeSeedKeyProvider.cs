@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Navigation;
@@ -28,6 +29,7 @@ internal sealed class ContentTypeSeedKeyProvider : IDocumentSeedKeyProvider
     public ISet<Guid> GetSeedKeys()
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        scope.ReadLock(Constants.Locks.ContentTree);
         var documentKeys = _databaseCacheRepository
             .GetDocumentKeysByContentTypeKeys(_cacheSettings.ContentTypeKeys, published: true)
             .Where(key => _publishStatusService.IsDocumentPublishedInAnyCulture(key))
