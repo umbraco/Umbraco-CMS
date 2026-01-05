@@ -36,7 +36,7 @@ test('can create content with the list view data type', async ({umbracoApi, umbr
   await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
-  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
+  await umbracoUi.content.clickSaveButton();
 
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
@@ -100,7 +100,7 @@ test('can publish content with a child in the list', async ({umbracoApi, umbraco
 
   // Act
   // Currently necessary
-  await umbracoUi.waitForTimeout(500);
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
   await umbracoUi.content.goToContentInListViewWithName(childContentName);
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();

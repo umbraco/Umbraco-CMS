@@ -43,7 +43,9 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
     }
 
     [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
-    protected EntityRepositoryBase(IScopeAccessor scopeAccessor, AppCaches appCaches,
+    protected EntityRepositoryBase(
+        IScopeAccessor scopeAccessor,
+        AppCaches appCaches,
         ILogger<EntityRepositoryBase<TId, TEntity>> logger)
         : this(
             scopeAccessor,

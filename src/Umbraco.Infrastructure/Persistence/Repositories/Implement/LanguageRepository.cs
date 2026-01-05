@@ -139,7 +139,7 @@ internal sealed class LanguageRepository : EntityRepositoryBase<int, ILanguage>,
     protected override IRepositoryCachePolicy<ILanguage, int> CreateCachePolicy() =>
         new FullDataSetRepositoryCachePolicy<ILanguage, int>(GlobalIsolatedCache, ScopeAccessor,  RepositoryCacheVersionService, CacheSyncService, GetEntityId, /*expires:*/ false);
 
-    protected ILanguage ConvertFromDto(LanguageDto dto)
+    private ILanguage ConvertFromDto(LanguageDto dto)
     {
         lock (_codeIdMap)
         {

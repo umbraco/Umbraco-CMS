@@ -53,7 +53,7 @@ test('can update the alias for a media type', async ({umbracoApi, umbracoUi}) =>
 
   // Act
   await umbracoUi.mediaType.goToMediaType(mediaTypeName);
-  await umbracoUi.waitForTimeout(500);
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoUi.mediaType.enterAliasName(updatedAlias);
   await umbracoUi.mediaType.clickSaveButtonAndWaitForMediaTypeToBeUpdated();
 
@@ -69,7 +69,7 @@ test('can add an icon for a media type', {tag: '@smoke'}, async ({umbracoApi, um
 
   // Act
   await umbracoUi.mediaType.goToMediaType(mediaTypeName);
-  await umbracoUi.waitForTimeout(500);
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoUi.mediaType.updateIcon(bugIcon);
   await umbracoUi.mediaType.clickSaveButtonAndWaitForMediaTypeToBeUpdated();
 

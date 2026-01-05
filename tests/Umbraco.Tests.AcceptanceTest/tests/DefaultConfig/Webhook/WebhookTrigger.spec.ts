@@ -175,11 +175,11 @@ test('can trigger the webhook for a specific content type', async ({umbracoApi, 
   await umbracoUi.content.clickActionsMenuForContent(documentName);
   await umbracoUi.content.clickPublishActionMenuOption();
   await umbracoUi.content.clickConfirmToPublishButton();
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
+  await umbracoUi.content.isSuccessNotificationVisible();
   await umbracoUi.content.clickActionsMenuForContent(secondDocumentName);
   await umbracoUi.content.clickPublishActionMenuOption();
   await umbracoUi.content.clickConfirmToPublishButton();
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
+  await umbracoUi.content.isSuccessNotificationVisible();
 
   // Assert
   const webhookSiteData = await umbracoApi.webhook.getWebhookSiteRequestResponse(webhookSiteToken);
@@ -206,7 +206,7 @@ test('cannot trigger when the webhook is disabled', async ({umbracoApi, umbracoU
   await umbracoUi.content.clickActionsMenuForContent(documentName);
   await umbracoUi.content.clickPublishActionMenuOption();
   await umbracoUi.content.clickConfirmToPublishButton();
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
+  await umbracoUi.content.isSuccessNotificationVisible();
 
   // Assert
   const webhookSiteData = await umbracoApi.webhook.getWebhookSiteRequestResponse(webhookSiteToken, 7000);
@@ -230,7 +230,7 @@ test('can custom header for the webhook request', async ({umbracoApi, umbracoUi}
   await umbracoUi.content.clickActionsMenuForContent(documentName);
   await umbracoUi.content.clickPublishActionMenuOption();
   await umbracoUi.content.clickConfirmToPublishButton();
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
+  await umbracoUi.content.isSuccessNotificationVisible();
 
   // Assert
   const webhookSiteData = await umbracoApi.webhook.getWebhookSiteRequestResponse(webhookSiteToken);

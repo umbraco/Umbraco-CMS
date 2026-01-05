@@ -93,7 +93,10 @@ internal class ContentVersionCleanupServiceTest : UmbracoIntegrationTest
         }
     }
 
-    private void InsertCleanupPolicy(IContentType contentType, int daysToKeepAll, int daysToRollupAll,
+    private void InsertCleanupPolicy(
+        IContentType contentType,
+        int daysToKeepAll,
+        int daysToRollupAll,
         bool preventCleanup = false)
     {
         using (var scope = ScopeProvider.CreateScope(autoComplete: true))

@@ -311,7 +311,8 @@ public class TextBuilder : Builder
         // write the ctor
         sb.AppendFormat(
             "\n\n\t\t// ctor\n\t\tpublic {0}(IPublished{1} content, IPublishedValueFallback publishedValueFallback)\n\t\t\t: base(content, publishedValueFallback)\n\t\t{{\n\t\t\t_publishedValueFallback = publishedValueFallback;\n\t\t}}\n\n",
-            type.ClrName, type.IsElement ? "Element" : "Content");
+            type.ClrName,
+            type.IsElement ? "Element" : "Content");
 
         // write the properties
         sb.Append("\t\t// properties\n");
@@ -364,7 +365,9 @@ public class TextBuilder : Builder
 
             if (!string.IsNullOrWhiteSpace(property.Description))
             {
-                sb.AppendFormat("\t\t/// {0}: {1}\n", XmlCommentString(property.Name),
+                sb.AppendFormat(
+                    "\t\t/// {0}: {1}\n",
+                    XmlCommentString(property.Name),
                     XmlCommentString(property.Description));
             }
             else
@@ -443,7 +446,9 @@ public class TextBuilder : Builder
 
             if (!string.IsNullOrWhiteSpace(property.Description))
             {
-                sb.AppendFormat("\t\t/// {0}: {1}\n", XmlCommentString(property.Name),
+                sb.AppendFormat(
+                    "\t\t/// {0}: {1}\n",
+                    XmlCommentString(property.Name),
                     XmlCommentString(property.Description));
             }
             else
@@ -472,7 +477,8 @@ public class TextBuilder : Builder
             WriteClrType(sb, property.ClrTypeName);
             sb.AppendFormat(
                 " {0} => {1}(this, _publishedValueFallback);\n",
-                property.ClrName, MixinStaticGetterName(property.ClrName));
+                property.ClrName,
+                MixinStaticGetterName(property.ClrName));
         }
         else
         {
@@ -529,7 +535,8 @@ public class TextBuilder : Builder
         WriteClrType(sb, property.ClrTypeName);
         sb.AppendFormat(
             " {0}(I{1} that, IPublishedValueFallback publishedValueFallback) => that.Value",
-            mixinStaticGetterName, mixinClrName);
+            mixinStaticGetterName,
+            mixinClrName);
         if (property.ModelClrType != typeof(object))
         {
             sb.Append("<");

@@ -195,7 +195,7 @@ test('can insert dictionary item into a partial view', async ({umbracoApi, umbra
   // Act
   await umbracoUi.partialView.openPartialViewAtRoot(partialViewFileName);
   await umbracoUi.partialView.insertDictionaryItem(dictionaryName);
-  await umbracoUi.waitForTimeout(500); // Wait for the dictionary item to be inserted
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short); // Wait for the dictionary item to be inserted
   await umbracoUi.partialView.clickSaveButtonAndWaitForPartialViewToBeUpdated();
 
   // Assert
@@ -212,7 +212,7 @@ test('can insert value into a partial view', async ({umbracoApi, umbracoUi}) => 
 
   // Act
   await umbracoUi.partialView.openPartialViewAtRoot(partialViewFileName);
-  await umbracoUi.waitForTimeout(1000);
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);
   await umbracoUi.template.insertSystemFieldValue(systemFieldValue);
   await umbracoUi.partialView.clickSaveButtonAndWaitForPartialViewToBeUpdated();
 
