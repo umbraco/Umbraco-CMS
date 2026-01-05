@@ -53,6 +53,8 @@ export class UmbContentDetailWorkspaceTypeTransformController<
 			throw new Error('Default language not found');
 		}
 
+		// To spare a bit of energy we keep awareness of whether this brings any changes:
+		let hasChanges = false;
 		const values = currentData.values.map((v) => {
 			const oldType = oldPropertyTypes.find((p) => p.alias === v.alias);
 			const newType = newPropertyTypes.find((p) => p.alias === v.alias);
@@ -63,9 +65,11 @@ export class UmbContentDetailWorkspaceTypeTransformController<
 			if (oldType.variesByCulture !== newType.variesByCulture) {
 				// Variation has changed, we need to migrate this value
 				if (newType.variesByCulture) {
+					hasChanges = true;
 					// If it now varies by culture, set to default language:
 					return { ...v, culture: defaultLanguage };
 				} else {
+					hasChanges = true;
 					// If it no longer varies by culture, set to invariant:
 					return { ...v, culture: null };
 				}
@@ -73,6 +77,8 @@ export class UmbContentDetailWorkspaceTypeTransformController<
 			return v;
 		});
 
-		this.#workspace.setData({ ...currentData, values });
+		if (hasChanges) {
+			this.#workspace.setData({ ...currentData, values });
+		}
 	}
 }
