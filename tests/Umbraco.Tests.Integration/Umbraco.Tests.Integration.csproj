@@ -340,5 +340,17 @@
     <Compile Update="Umbraco.Infrastructure\Services\ElementContainerServiceTests.MoveToRecycleBin.cs">
       <DependentUpon>ElementContainerServiceTests.cs</DependentUpon>
     </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ElementContainerServiceTests.Create.cs">
+      <DependentUpon>ElementContainerServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ElementContainerServiceTests.Update.cs">
+      <DependentUpon>ElementContainerServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ElementContainerServiceTests.Get.cs">
+      <DependentUpon>ElementContainerServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ElementContainerServiceTests.Delete.cs">
+      <DependentUpon>ElementContainerServiceTests.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>
