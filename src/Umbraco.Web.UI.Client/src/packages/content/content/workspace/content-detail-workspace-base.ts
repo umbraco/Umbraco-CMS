@@ -178,11 +178,8 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	#saveModalToken?: UmbModalToken<UmbContentVariantPickerData<VariantOptionModelType>, UmbContentVariantPickerValue>;
 	#contentTypePropertyName: string;
 
-	/**
-	 * Cache of property variation settings to detect changes when structure is updated.
-	 * Used to trigger value migration when properties change from invariant to variant or vice versa.
-	 */
-	#propertyVariationCache = new Map<string, { variesByCulture: boolean; variesBySegment: boolean }>();
+	// Current property types, currently used to detect variation changes:
+	#propertyTypes?: Array<UmbPropertyTypeModel>;
 
 	constructor(
 		host: UmbControllerHost,
@@ -389,8 +386,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		// from invariant to variant (or vice versa) via Infinite Editing
 		this.observe(
 			this.structure.contentTypeProperties,
-			(properties: Array<UmbPropertyTypeModel>) => {
-				this.#handlePropertyVariationChanges(properties);
+			(propertyTypes: Array<UmbPropertyTypeModel>) => {
+				this.#handlePropertyTypeVariationChanges(this.#propertyTypes, propertyTypes);
+				this.#propertyTypes = propertyTypes;
 			},
 			null,
 		);
@@ -1110,47 +1108,51 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	): UmbContentPropertyDatasetContext<DetailModelType, ContentTypeDetailModelType, VariantModelType>;
 
 	/**
-	 * Handles property variation changes when the document type is updated via Infinite Editing.
+	 * Handles property variation changes when the document type is updated while editing.
 	 * When a property's variation setting changes (e.g., from shared/invariant to variant or vice versa),
 	 * this method reloads the document to get properly migrated values from the server.
 	 */
-	#handlePropertyVariationChanges(properties: Array<UmbPropertyTypeModel>): void {
+	#handlePropertyTypeVariationChanges(
+		oldPropertyTypes: Array<UmbPropertyTypeModel> | undefined,
+		newPropertyTypes: Array<UmbPropertyTypeModel> | undefined,
+	): void {
+		if (!oldPropertyTypes || !newPropertyTypes) {
+			return;
+		}
 		// Skip if no current data or if this is initial load
 		const currentData = this._data.getCurrent();
-		if (!currentData || this.#propertyVariationCache.size === 0) {
-			// Initial load - just populate the cache
-			for (const property of properties) {
-				this.#propertyVariationCache.set(property.alias, {
-					variesByCulture: property.variesByCulture,
-					variesBySegment: property.variesBySegment,
-				});
-			}
+		if (!currentData) {
 			return;
 		}
 
-		// Check for variation setting changes
-		let hasChanges = false;
-		for (const property of properties) {
-			const cached = this.#propertyVariationCache.get(property.alias);
-			if (cached) {
-				if (
-					cached.variesByCulture !== property.variesByCulture ||
-					cached.variesBySegment !== property.variesBySegment
-				) {
-					hasChanges = true;
-				}
-			}
-			// Update cache
-			this.#propertyVariationCache.set(property.alias, {
-				variesByCulture: property.variesByCulture,
-				variesBySegment: property.variesBySegment,
-			});
+		// Get default language:
+		const languages = this.#languages.getValue();
+		const defaultLanguage = languages.find((lang) => lang.isDefault)?.unique;
+		if (!defaultLanguage) {
+			throw new Error('Default language not found');
 		}
 
-		// If variation settings changed, reload to get properly migrated values
-		if (hasChanges) {
-			this.reload();
-		}
+		const values = currentData.values.map((v) => {
+			const oldType = oldPropertyTypes.find((p) => p.alias === v.alias);
+			const newType = newPropertyTypes.find((p) => p.alias === v.alias);
+			if (!oldType || !newType) {
+				// If we cant find both, we do not dare changing anything. Notice a composition may not have been loaded yet.
+				return v;
+			}
+			if (oldType.variesByCulture !== newType.variesByCulture) {
+				// Variation has changed, we need to migrate this value
+				if (newType.variesByCulture) {
+					// If it now varies by culture, set to default language:
+					return { ...v, culture: defaultLanguage };
+				} else {
+					// If it no longer varies by culture, set to invariant:
+					return { ...v, culture: null };
+				}
+			}
+			return v;
+		});
+
+		this._data.setCurrent({ ...currentData, values });
 	}
 
 	public override destroy(): void {
