@@ -1,4 +1,5 @@
 import { UMB_ELEMENT_TREE_ALIAS, UMB_ELEMENT_TREE_REPOSITORY_ALIAS } from './constants.js';
+import { manifests as folderManifests } from './folder/manifests.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -16,4 +17,5 @@ export const manifests: Array<UmbExtensionManifest> = [
 			repositoryAlias: UMB_ELEMENT_TREE_REPOSITORY_ALIAS,
 		},
 	},
+	...folderManifests,
 ];
