@@ -55,10 +55,10 @@ public class JsonBlockValueConverter : JsonConverter<BlockValue>
                 switch (propertyName.ToFirstUpperInvariant())
                 {
                     case nameof(BlockValue.ContentData):
-                        blockValue.ContentData = DeserializeBlockItemData(ref reader, options);
+                        blockValue.ContentData = DeserializeBlockItemData(ref reader, options, typeToConvert, nameof(BlockValue.ContentData));
                         break;
                     case nameof(BlockValue.SettingsData):
-                        blockValue.SettingsData = DeserializeBlockItemData(ref reader, options);
+                        blockValue.SettingsData = DeserializeBlockItemData(ref reader, options, typeToConvert, nameof(BlockValue.SettingsData));
                         break;
                     case nameof(BlockValue.Layout):
                         DeserializeAndSetLayout(ref reader, options, typeToConvert, blockValue);
@@ -122,19 +122,78 @@ public class JsonBlockValueConverter : JsonConverter<BlockValue>
         return layoutItemType;
     }
 
-    private List<BlockItemData> DeserializeBlockItemData(ref Utf8JsonReader reader, JsonSerializerOptions options)
+    private List<BlockItemData> DeserializeBlockItemData(ref Utf8JsonReader reader, JsonSerializerOptions options, Type typeToConvert, string propertyName)
     {
-        // Use custom deserialization to handle legacy "udi" field and "values" property conflict.
-        // The Udi property has [JsonIgnore] to prevent serialization differences between save and publish paths,
-        // so we must manually extract it from JSON and convert to Key.
-        JsonArray? arrayElement = JsonSerializer.Deserialize<JsonArray>(ref reader, options);
+        try
+        {
+            return CurrentDeserializeBlockItemData(ref reader, options);
+        }
+        catch (JsonException ex) when (ex.Path?.EndsWith(".values") is true)
+        {
+            // If we hit a JsonException due to the "values" property conflict, attempt the fallback deserialization
+            return FallbackBlockItemDataDeserialization(ref reader, options);
+        }
+    }
 
-#pragma warning disable CS0618 // Type or member is obsolete
+    private List<BlockItemData> CurrentDeserializeBlockItemData(ref Utf8JsonReader reader, JsonSerializerOptions options)
+    {
+        JsonArray? arrayElement = JsonSerializer.Deserialize<JsonArray>(ref reader, options);
         return arrayElement?
-            .Select(itemElement => DeserializeBlockItemData(itemElement, options))
+            .Select(itemElement => CurrentDeserializeBlockItemData(itemElement, options))
             .OfType<BlockItemData>()
             .ToList() ?? [];
-#pragma warning restore CS0618 // Type or member is obsolete
+    }
+
+    private static BlockItemData? CurrentDeserializeBlockItemData(JsonNode? jsonNode, JsonSerializerOptions options)
+    {
+        if (jsonNode is not JsonObject jsonObject)
+        {
+            return jsonNode.Deserialize<BlockItemData>(options);
+        }
+
+        // Handle legacy "udi" field if present.
+        string? udiValue = ExtractLegacyUdi(jsonObject);
+
+        BlockItemData? blockItemData = jsonObject.Deserialize<BlockItemData>(options);
+
+        SetKeyFromLegacyUdi(blockItemData, udiValue);
+
+        return blockItemData;
+    }
+
+    /// <summary>
+    /// Extracts and removes the legacy "udi" field from a JsonObject if present.
+    /// </summary>
+    /// <remarks>
+    /// The Udi property has [JsonIgnore] to prevent serialization differences between save and publish paths,
+    /// so we must handle it manually during deserialization.
+    /// </remarks>
+    private static string? ExtractLegacyUdi(JsonObject jsonObject)
+    {
+        if (jsonObject.ContainsKey("udi") is false)
+        {
+            return null;
+        }
+
+        var udiValue = jsonObject["udi"]?.GetValue<string>();
+        jsonObject.Remove("udi");
+        return udiValue;
+    }
+
+    /// <summary>
+    /// Sets the Key property from a legacy UDI string if the Key wasn't already set.
+    /// </summary>
+    private static void SetKeyFromLegacyUdi(BlockItemData? blockItemData, string? udiValue)
+    {
+        if (blockItemData is null || blockItemData.Key != Guid.Empty || udiValue is null)
+        {
+            return;
+        }
+
+        if (UdiParser.TryParse(udiValue, out Udi? udi) && udi is GuidUdi guidUdi)
+        {
+            blockItemData.Key = guidUdi.Guid;
+        }
     }
 
     private List<BlockItemVariation> DeserializeBlockVariation(ref Utf8JsonReader reader, JsonSerializerOptions options, Type typeToConvert, string propertyName)
@@ -240,48 +299,37 @@ public class JsonBlockValueConverter : JsonConverter<BlockValue>
     }
 
     [Obsolete("Only needed to support the old data schema. Remove in V18.")]
-    private static BlockItemData? DeserializeBlockItemData(JsonNode? jsonNode, JsonSerializerOptions options)
+    private static List<BlockItemData> FallbackBlockItemDataDeserialization(ref Utf8JsonReader reader, JsonSerializerOptions options)
     {
-        if (jsonNode is not JsonObject jsonObject)
+        JsonArray? arrayElement = JsonSerializer.Deserialize<JsonArray>(ref reader, options);
+
+        return arrayElement?
+            .Select(itemElement => FallbackDeserializeBlockItemData(itemElement, options))
+            .OfType<BlockItemData>()
+            .ToList() ?? [];
+    }
+
+    [Obsolete("Only needed to support the old data schema. Remove in V18.")]
+    private static BlockItemData? FallbackDeserializeBlockItemData(JsonNode? jsonNode, JsonSerializerOptions options)
+    {
+        if (jsonNode is not JsonObject jsonObject || jsonObject.ContainsKey("values") is false)
         {
+            // Nothing to be done, just deserialize as usual
             return jsonNode.Deserialize<BlockItemData>(options);
         }
 
-        // If this is the new format (no udi), use standard deserialization.
-        if (jsonObject.ContainsKey("udi") is false)
-        {
-            return jsonObject.Deserialize<BlockItemData>(options);
-        }
+        // Handle legacy "udi" field if present.
+        string? udiValue = ExtractLegacyUdi(jsonObject);
 
-        // Handle the legacy "udi" field by extracting the GUID and setting it as Key after deserialization.
-        // The Udi property has [JsonIgnore] to prevent serialization differences, so we must handle it manually.
-        var udiValue = jsonObject["udi"]?.GetValue<string>();
-        jsonObject.Remove("udi");
-
-        // Handle the "values" property conflict in old format by extracting the "values" property first
-        // and adding it to the RawPropertyValues dictionary after deserialization.
-        // Note: In old format, "values" could be a custom property name (not the Values collection).
-        JsonNode? values = null;
-        if (jsonObject.ContainsKey("values"))
-        {
-            values = jsonObject["values"];
-            jsonObject.Remove("values");
-        }
+        // Handle the "values" property conflict by extracting the "values" property first and adding it to the
+        // RawPropertyValues dictionary after deserialization.
+        JsonNode? values = jsonObject["values"];
+        jsonObject.Remove("values");
 
         BlockItemData? blockItemData = jsonObject.Deserialize<BlockItemData>(options);
-        if (blockItemData is not null)
-        {
-            // Set Key from legacy UDI if Key wasn't already set.
-            if (blockItemData.Key == Guid.Empty && udiValue is not null && UdiParser.TryParse(udiValue, out Udi? udi) && udi is GuidUdi guidUdi)
-            {
-                blockItemData.Key = guidUdi.Guid;
-            }
+        blockItemData?.RawPropertyValues["values"] = values.Deserialize<object?>(options);
 
-            if (values is not null)
-            {
-                blockItemData.RawPropertyValues["values"] = values.Deserialize<object?>(options);
-            }
-        }
+        SetKeyFromLegacyUdi(blockItemData, udiValue);
 
         return blockItemData;
     }
