@@ -25,6 +25,26 @@ const externalMocksPath = EXTERNAL_MOCKS_PATH ? path.resolve(EXTERNAL_MOCKS_PATH
 // Fallback to empty handlers when no mocks path is provided
 const mocksAliasPath = externalMocksPath || path.resolve('./src/mocks');
 
+// Packages that should resolve from main project's node_modules
+const SHARED_PACKAGE_PREFIXES = ['@umbraco-cms/backoffice', 'lit', '@umbraco-ui/uui'];
+
+function isSharedPackage(source: string): boolean {
+	return SHARED_PACKAGE_PREFIXES.some((prefix) => source.startsWith(prefix));
+}
+
+function isExternalImporter(importer: string | undefined): boolean {
+	if (!importer) {
+		return false;
+	}
+	if (importer.startsWith(externalPath)) {
+		return true;
+	}
+	if (externalMocksPath && importer.startsWith(externalMocksPath)) {
+		return true;
+	}
+	return false;
+}
+
 console.log(`\n📦 Loading external extension from: ${externalPath}`);
 if (externalMocksPath) {
 	console.log(`🎭 Loading external MSW handlers from: ${externalMocksPath}`);
@@ -41,20 +61,14 @@ export default mergeConfig(
 				name: 'external-extension-resolver',
 				enforce: 'pre',
 				resolveId(source, importer) {
-					// Only apply to files from the external extension or external mocks
-					const isExternalFile = importer && (
-						importer.startsWith(externalPath) ||
-						(externalMocksPath && importer.startsWith(externalMocksPath))
-					);
-					if (isExternalFile) {
-						if (source.startsWith('@umbraco-cms/backoffice') ||
-							source.startsWith('lit') ||
-							source.startsWith('@umbraco-ui/uui')) {
-							// Resolve from main project's node_modules
-							return this.resolve(source, path.resolve('./index.ts'), { skipSelf: true });
-						}
+					if (!isExternalImporter(importer)) {
+						return null;
 					}
-					return null;
+					if (!isSharedPackage(source)) {
+						return null;
+					}
+					// Resolve from main project's node_modules
+					return this.resolve(source, path.resolve('./index.ts'), { skipSelf: true });
 				},
 			},
 		],
