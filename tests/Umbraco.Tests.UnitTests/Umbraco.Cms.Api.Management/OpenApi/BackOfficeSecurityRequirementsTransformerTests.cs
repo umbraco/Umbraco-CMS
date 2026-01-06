@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.OpenApi;
+using Umbraco.Cms.Api.Management.OpenApi.Transformers;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.OpenApi;
 

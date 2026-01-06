@@ -6,14 +6,13 @@ using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Events;
 
-namespace Umbraco.Cms.Api.Management.OpenApi;
+namespace Umbraco.Cms.Api.Management.OpenApi.Transformers;
 
 /// <summary>
 /// Transforms OpenAPI operations to include notification headers in responses.
 /// </summary>
 internal sealed class NotificationHeaderTransformer : IOpenApiOperationTransformer
 {
-
     /// <inheritdoc/>
     public async Task TransformAsync(
         OpenApiOperation operation,
@@ -27,16 +26,16 @@ internal sealed class NotificationHeaderTransformer : IOpenApiOperationTransform
 
         // filter out irrelevant responses (401 will never produce notifications)
         List<OpenApiResponse> relevantResponses = operation
-                                                             .Responses
-                                                             ?.Where(pair =>
-                                                                 pair.Key !=
-                                                                 StatusCodes.Status401Unauthorized.ToString())
-                                                             .Select(pair => pair.Value)
-                                                             .OfType<OpenApiResponse>()
-                                                         .ToList()
-                                                         ?? [];
+             .Responses
+             ?.Where(pair =>
+                 pair.Key !=
+                 StatusCodes.Status401Unauthorized.ToString())
+             .Select(pair => pair.Value)
+             .OfType<OpenApiResponse>()
+             .ToList()
+             ?? [];
 
-        if (!relevantResponses.Any())
+        if (relevantResponses.Count == 0)
         {
             return;
         }

@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.OpenApi;
 using Umbraco.Cms.Api.Common.Configuration;
 using Umbraco.Cms.Api.Management.DependencyInjection;
-using Umbraco.Cms.Api.Management.Extensions;
 using Umbraco.Cms.Api.Management.OpenApi;
+using Umbraco.Cms.Api.Management.OpenApi.Transformers;
 
 namespace Umbraco.Cms.Api.Management.Configuration;
 

@@ -6,7 +6,7 @@ using Microsoft.OpenApi;
 using Umbraco.Cms.Api.Common.Security;
 using Umbraco.Cms.Api.Management.DependencyInjection;
 
-namespace Umbraco.Cms.Api.Management.OpenApi;
+namespace Umbraco.Cms.Api.Management.OpenApi.Transformers;
 
 /// <summary>
 /// Transforms OpenAPI operations to include back-office security requirements.

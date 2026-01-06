@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.OpenApi;
-using Umbraco.Cms.Api.Management.OpenApi;
+using Umbraco.Cms.Api.Management.OpenApi.Transformers;
 
-namespace Umbraco.Cms.Api.Management.Extensions;
+namespace Umbraco.Cms.Api.Management.OpenApi;
 
 /// <summary>
 /// Extension methods for configuring OpenAPI options for the Management API.

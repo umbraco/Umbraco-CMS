@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.OpenApi;
 using Microsoft.OpenApi;
 using Umbraco.Cms.Core;
 
-namespace Umbraco.Cms.Api.Management.OpenApi;
+namespace Umbraco.Cms.Api.Management.OpenApi.Transformers;
 
 /// <summary>
 /// Transforms OpenAPI operations to include response headers for specific status codes.
