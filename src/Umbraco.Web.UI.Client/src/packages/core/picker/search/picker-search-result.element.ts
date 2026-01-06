@@ -3,7 +3,7 @@ import type { UmbPickerContext } from '../picker.context.js';
 import { UmbDefaultPickerSearchResultItemElement } from './result-item/default/default-picker-search-result-item.element.js';
 import type { ManifestPickerSearchResultItem } from './result-item/picker-search-result-item.extension.js';
 import { UmbDefaultPickerSearchResultItemContext } from './result-item/default/default-picker-search-result-item.context.js';
-import { customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbSearchRequestArgs, UmbSearchResultItemModel } from '@umbraco-cms/backoffice/search';
 import type { UmbItemModel } from '@umbraco-cms/backoffice/entity-item';
@@ -56,17 +56,25 @@ export class UmbPickerSearchResultElement extends UmbLitElement {
 			return this.#renderEmptyResult();
 		}
 
+		if (this._items.length === 0) {
+			return;
+		}
+
 		return html`
-			${repeat(
-				this._items,
-				(item) => item.unique,
-				(item) => this.#renderResultItem(item),
-			)}
+			<uui-box id="result-container">
+				${repeat(
+					this._items,
+					(item) => item.unique,
+					(item) => this.#renderResultItem(item),
+				)}
+			</uui-box>
 		`;
 	}
 
 	#renderEmptyResult() {
-		return html`<small>No result for <strong>"${this._query?.query}"</strong>.</small>`;
+		return html`<uui-box id="result-container">
+			<small>No result for <strong>"${this._query?.query}"</strong>.</small>
+		</uui-box>`;
 	}
 
 	#renderResultItem(item: UmbSearchResultItemModel) {
@@ -89,6 +97,18 @@ export class UmbPickerSearchResultElement extends UmbLitElement {
 		new UmbDefaultPickerSearchResultItemContext(element);
 		return element;
 	}
+
+	static override readonly styles = [
+		css`
+			host: {
+				display: block;
+			}
+
+			#result-container {
+				margin-top: var(--uui-size-4);
+			}
+		`,
+	];
 }
 
 declare global {

@@ -2,7 +2,7 @@ import type { UmbCollectionSelectionConfiguration } from '../types.js';
 import { UmbCollectionItemPickerContext } from './collection-item-picker-modal.context.js';
 import type { UmbCollectionItemPickerModalData, UmbCollectionItemPickerModalValue } from './types.js';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
-import { html, customElement, state, nothing, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, state, nothing, ifDefined, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 
@@ -104,15 +104,12 @@ export class UmbCollectionItemPickerModalElement extends UmbModalBaseElement<
 	#searchSelectableFilter = () => true;
 
 	override render() {
+		const hasCollectionAlias = !!this.data?.collection.alias;
+
 		return html`
-			${this.data?.collection.alias
-				? html` <umb-body-layout headline=${this.localize.term('general_choose')} main-no-padding>
-						${this.#renderCollection()} ${this.#renderActions()}
-					</umb-body-layout>`
-				: html` <umb-body-layout headline=${this.localize.term('general_choose')}>
-						<uui-box> ${this.#renderSearch()} ${this.#renderCollectionMenu()}</uui-box>
-						${this.#renderActions()}
-					</umb-body-layout>`}
+			<umb-body-layout headline="${this.localize.term('general_choose')}" ?main-no-padding=${hasCollectionAlias}>
+				${this.#renderSearch()} ${this.#renderMain(hasCollectionAlias)} ${this.#renderActions()}
+			</umb-body-layout>
 		`;
 	}
 
@@ -121,12 +118,22 @@ export class UmbCollectionItemPickerModalElement extends UmbModalBaseElement<
 			this.data?.search?.pickableFilter ?? this.data?.pickableFilter ?? this.#searchSelectableFilter;
 
 		return html`
-			<umb-picker-search-field></umb-picker-search-field>
-			<umb-picker-search-result .pickableFilter=${selectableFilter}></umb-picker-search-result>
+			<div id="picker-search">
+				<umb-picker-search-field></umb-picker-search-field>
+				<umb-picker-search-result .pickableFilter=${selectableFilter}></umb-picker-search-result>
+			</div>
 		`;
 	}
 
+	#renderMain(hasCollectionAlias: boolean) {
+		return html` ${hasCollectionAlias ? this.#renderCollection() : this.#renderCollectionMenu()} `;
+	}
+
 	#renderCollection() {
+		if (this._searchQuery) {
+			return nothing;
+		}
+
 		return html`
 			<umb-collection
 				alias=${this.data?.collection.alias}
@@ -143,16 +150,20 @@ export class UmbCollectionItemPickerModalElement extends UmbModalBaseElement<
 			return nothing;
 		}
 
-		return html` <umb-collection-menu
-			alias=${ifDefined(this.data?.collection?.menuAlias)}
-			.props=${{
-				selectionConfiguration: this._selectionConfiguration,
-				filterArgs: this.data?.collection?.filterArgs,
-				filter: this.data?.filter,
-				selectableFilter: this.data?.pickableFilter,
-			}}
-			@selected=${this.#onItemSelected}
-			@deselected=${this.#onItemDeselected}></umb-collection-menu>`;
+		return html`
+			<uui-box
+				><umb-collection-menu
+					alias=${ifDefined(this.data?.collection?.menuAlias)}
+					.props=${{
+						selectionConfiguration: this._selectionConfiguration,
+						filterArgs: this.data?.collection?.filterArgs,
+						filter: this.data?.filter,
+						selectableFilter: this.data?.pickableFilter,
+					}}
+					@selected=${this.#onItemSelected}
+					@deselected=${this.#onItemDeselected}></umb-collection-menu
+			></uui-box>
+		`;
 	}
 
 	#renderActions() {
@@ -168,6 +179,20 @@ export class UmbCollectionItemPickerModalElement extends UmbModalBaseElement<
 			</div>
 		`;
 	}
+
+	static override styles = [
+		css`
+			#picker-search {
+				margin: var(--uui-size-layout-1);
+				margin-bottom: 0;
+			}
+
+			umb-collection {
+				display: block;
+				height: fit-content;
+			}
+		`,
+	];
 }
 
 export { UmbCollectionItemPickerModalElement as element };

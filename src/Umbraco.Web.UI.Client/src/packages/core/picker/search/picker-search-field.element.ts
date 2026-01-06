@@ -57,13 +57,16 @@ export class UmbPickerSearchFieldElement extends UmbLitElement {
 						`
 					: nothing}
 			</uui-input>
-			<div id="divider"></div>
 		`;
 	}
 
 	static override readonly styles = [
 		UmbTextStyles,
 		css`
+			host: {
+				display: block;
+			}
+
 			uui-input {
 				width: 100%;
 			}
@@ -71,14 +74,6 @@ export class UmbPickerSearchFieldElement extends UmbLitElement {
 			uui-input [slot='prepend'] {
 				display: flex;
 				align-items: center;
-			}
-
-			#divider {
-				width: 100%;
-				height: 1px;
-				background-color: var(--uui-color-divider);
-				margin-top: var(--uui-size-space-5);
-				margin-bottom: var(--uui-size-space-3);
 			}
 
 			#searching-indicator {
