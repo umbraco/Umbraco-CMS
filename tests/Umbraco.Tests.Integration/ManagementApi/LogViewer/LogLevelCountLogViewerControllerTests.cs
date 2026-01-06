@@ -4,11 +4,10 @@ using Umbraco.Cms.Api.Management.Controllers.LogViewer;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.LogViewer;
 
-public class LogLevelCountLogViewerControllerTests : ManagementApiUserGroupTestBase<LogLevelCountLogViewerController>
+public class LogLevelCountLogViewerControllerTests : LogViewerTestBase<LogLevelCountLogViewerController>
 {
     protected override Expression<Func<LogLevelCountLogViewerController, object>> MethodSelector => x => x.LogLevelCounts(CancellationToken.None, null, null);
 
-    // We get the InternalServerError for the admin because it has access, but there is no log file to view
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
         ExpectedStatusCode = HttpStatusCode.OK

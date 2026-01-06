@@ -215,22 +215,6 @@ public interface IMediaService : IContentServiceBase<IMedia>
     Attempt<OperationResult?> Save(IMedia media, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
-    ///     Saves a collection of <see cref="IMedia" /> objects
-    /// </summary>
-    /// <param name="medias">Collection of <see cref="IMedia" /> to save</param>
-    /// <param name="userId">Id of the User saving the Media</param>
-    Attempt<OperationResult?> Save(IEnumerable<IMedia> medias, int userId = Constants.Security.SuperUserId);
-
-    /// <summary>
-    ///     Gets an <see cref="IMedia" /> object by its 'UniqueId'
-    /// </summary>
-    /// <param name="key">Guid key of the Media to retrieve</param>
-    /// <returns>
-    ///     <see cref="IMedia" />
-    /// </returns>
-    IMedia? GetById(Guid key);
-
-    /// <summary>
     ///     Gets a collection of <see cref="IMedia" /> objects by Level
     /// </summary>
     /// <param name="level">The level to retrieve Media from</param>
