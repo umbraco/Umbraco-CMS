@@ -274,7 +274,7 @@ test('can set culture and hostnames for a specific content with culture and host
 
   // Assert
   await umbracoUi.content.waitForDomainToBeCreated();
-  await umbracoUi.waitForTimeout(1000); // Wait for the domain to be set
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.medium); // Wait for the domain to be set
   const document = await umbracoApi.document.getByName(firstDocumentName);
   const domains = await umbracoApi.document.getDomains(document.id);
   expect(domains.domains[0].domainName).toEqual(domainName);

@@ -1,4 +1,4 @@
-﻿import {test} from '@umbraco/playwright-testhelpers';
+﻿import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 const blockListEditorName = 'TestBlockListEditor';
@@ -427,7 +427,7 @@ test('can add a thumbnail to a block', {tag: '@release'}, async ({umbracoApi, um
   // Act
   await umbracoUi.dataType.goToDataType(blockListEditorName);
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
-  await umbracoUi.waitForTimeout(500);
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoUi.dataType.chooseBlockThumbnailWithPath(mediaUrl);
   await umbracoUi.dataType.clickSubmitButton();
   await umbracoUi.dataType.clickSaveButton();

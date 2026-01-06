@@ -197,7 +197,7 @@ test('can see notification when content is rollbacked', async ({umbracoApi, umbr
   await umbracoUi.content.doesDocumentPropertyHaveValue(textStringDataTypeName, updatedContentText);
   await umbracoUi.content.clickInfoTab();
   await umbracoUi.content.clickRollbackButton();
-  await umbracoUi.waitForTimeout(700); // Wait for the rollback items to load
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.medium); // Wait for the rollback items to load
   await umbracoUi.content.clickLatestRollBackItem();
   await umbracoUi.content.clickRollbackContainerButton();
 
