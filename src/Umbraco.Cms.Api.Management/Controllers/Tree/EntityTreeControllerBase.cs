@@ -36,7 +36,7 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
 
     protected abstract UmbracoObjectTypes ItemObjectType { get; }
 
-    protected virtual Ordering ItemOrdering => Ordering.By(nameof(Infrastructure.Persistence.Dtos.NodeDto.Text));
+    protected virtual Ordering ItemOrdering => Ordering.By(Infrastructure.Persistence.Dtos.NodeDto.SortOrderColumnName);
 
     protected async Task<ActionResult<PagedViewModel<TItem>>> GetRoot(int skip, int take)
     {
@@ -100,7 +100,7 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
             .Select(ancestor =>
             {
                 IEntitySlim? parent = ancestor.ParentId > 0
-                    ? ancestorEntities.Single(a => a.Id == ancestor.ParentId)
+                    ? ancestorEntities.SingleOrDefault(a => a.Id == ancestor.ParentId)
                     : null;
 
                 return MapTreeItemViewModel(parent?.Key, ancestor);
