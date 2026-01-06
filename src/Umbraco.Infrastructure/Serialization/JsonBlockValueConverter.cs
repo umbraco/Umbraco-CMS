@@ -124,14 +124,21 @@ public class JsonBlockValueConverter : JsonConverter<BlockValue>
 
     private List<BlockItemData> DeserializeBlockItemData(ref Utf8JsonReader reader, JsonSerializerOptions options, Type typeToConvert, string propertyName)
     {
+        // Create a copy of the reader in case we have to go into the fallback flow.
+        // Given FallbackBlockItemDataDeserialization method will be called following an exception in the main
+        // deserialisation flow, the original reader would already advanced past the initial StartArray token and fail on
+        // attempting to deserialize it to a JSON array.
+        // We can do this as Utf8JsonReader is a struct and thus a value type (see https://stackoverflow.com/questions/71396687/how-to-reset-an-utf8jsonreader-to-its-starting-position).
+        Utf8JsonReader readerCopy = reader;
         try
         {
             return CurrentDeserializeBlockItemData(ref reader, options);
         }
         catch (JsonException ex) when (ex.Path?.EndsWith(".values") is true)
         {
-            // If we hit a JsonException due to the "values" property conflict, attempt the fallback deserialization
-            return FallbackBlockItemDataDeserialization(ref reader, options);
+            // If we hit a JsonException due to the "values" property conflict, attempt the fallback deserialization (using
+            // the copied reader).
+            return FallbackBlockItemDataDeserialization(ref readerCopy, options);
         }
     }
 
