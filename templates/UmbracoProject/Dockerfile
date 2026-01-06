@@ -42,7 +42,7 @@ RUN mkdir -p /https && \
 COPY UmbracoProject/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-# Create directories that may be needed (for non-bind-mount volumes)
+# Create Umbraco directories as a fallback so they exist, and can be chowned by the entrypoint, for both bind-mounted and regular volumes
 RUN mkdir -p umbraco/Logs && chown -R $APP_UID:$APP_UID umbraco
 
 # Run as root initially - entrypoint will fix permissions and drop to APP_UID
