@@ -110,7 +110,12 @@ public abstract class ConfigureUmbracoOpenApiOptionsBase : IConfigureNamedOption
         return UmbracoSchemaIdGenerator.Generate(targetType);
     }
 
-    private bool ShouldInclude(ApiDescription apiDescription)
+    /// <summary>
+    /// Determines whether the specified API description should be included in this OpenAPI document.
+    /// </summary>
+    /// <param name="apiDescription">The API description to evaluate.</param>
+    /// <returns><c>true</c> if the endpoint should be included; otherwise, <c>false</c>.</returns>
+    protected virtual bool ShouldInclude(ApiDescription apiDescription)
     {
         if (apiDescription.ActionDescriptor is ControllerActionDescriptor controllerActionDescriptor
             && controllerActionDescriptor.HasMapToApiAttribute(ApiName))
@@ -119,7 +124,6 @@ public abstract class ConfigureUmbracoOpenApiOptionsBase : IConfigureNamedOption
         }
 
         ApiVersionMetadata apiVersionMetadata = apiDescription.ActionDescriptor.GetApiVersionMetadata();
-        return apiVersionMetadata.Name == ApiName
-               || (string.IsNullOrEmpty(apiVersionMetadata.Name) && ApiName == DefaultApiConfiguration.ApiName);
+        return apiVersionMetadata.Name == ApiName;
     }
 }
