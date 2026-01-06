@@ -1,11 +1,25 @@
 import type { UmbElementEntityType, UmbElementRootEntityType } from '../entity.js';
 import type { UmbElementFolderEntityType } from './folder/entity.js';
+import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import type { UmbTreeItemModel, UmbTreeRootModel } from '@umbraco-cms/backoffice/tree';
 
 export interface UmbElementTreeItemModel extends UmbTreeItemModel {
 	entityType: UmbElementEntityType | UmbElementFolderEntityType;
+	documentType: {
+		unique: string;
+		icon: string;
+		collection: UmbReferenceByUnique | null;
+	};
+	createDate: string;
+	variants: Array<UmbElementTreeItemVariantModel>;
 }
 
 export interface UmbElementTreeRootModel extends UmbTreeRootModel {
 	entityType: UmbElementRootEntityType;
+}
+
+export interface UmbElementTreeItemVariantModel {
+	name: string;
+	culture: string | null;
+	segment: string | null;
 }

@@ -1,0 +1,65 @@
+import { UMB_EDIT_ELEMENT_WORKSPACE_PATH_PATTERN } from '../../../paths.js';
+import type { UmbElementRecycleBinTreeItemModel } from '../../tree/types.js';
+import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+//import { UmbDocumentItemDataResolver } from '@umbraco-cms/backoffice/document';
+import type { UmbTableColumn, UmbTableColumnLayoutElement, UmbTableItem } from '@umbraco-cms/backoffice/components';
+
+@customElement('umb-trashed-element-name-table-column')
+export class UmbTrashedElementNameTableColumnElement extends UmbLitElement implements UmbTableColumnLayoutElement {
+	// TODO: Review this, do we need an `UmbElementItemDataResolver` yet? [LK:2026-01-06]
+	//#resolver = new UmbDocumentItemDataResolver(this);
+
+	@state()
+	private _name = '';
+
+	@state()
+	private _editPath = '';
+
+	column!: UmbTableColumn;
+	item!: UmbTableItem;
+
+	@property({ attribute: false })
+	public set value(value: UmbElementRecycleBinTreeItemModel) {
+		this.#value = value;
+
+		if (value) {
+			// TODO: Review this, do we need an `UmbElementItemDataResolver` yet? [LK:2026-01-06]
+			//this.#resolver.setData(value);
+			this._name = value.name;
+
+			this._editPath = UMB_EDIT_ELEMENT_WORKSPACE_PATH_PATTERN.generateAbsolute({
+				unique: value.unique,
+			});
+		}
+	}
+	public get value(): UmbElementRecycleBinTreeItemModel {
+		return this.#value;
+	}
+	#value!: UmbElementRecycleBinTreeItemModel;
+
+	constructor() {
+		super();
+		//this.#resolver.observe(this.#resolver.name, (name) => (this._name = name || ''));
+	}
+
+	override render() {
+		if (!this.value) return nothing;
+		if (!this._name) return nothing;
+		return html`<uui-button compact href=${this._editPath} label=${this._name}></uui-button>`;
+	}
+
+	static override styles = [
+		css`
+			uui-button {
+				text-align: left;
+			}
+		`,
+	];
+}
+
+declare global {
+	interface HTMLElementTagNameMap {
+		'umb-trashed-element-name-table-column': UmbTrashedElementNameTableColumnElement;
+	}
+}
