@@ -37,32 +37,32 @@ services:
     # create_host_path: true ensures the host directories are created if they don't exist.
     volumes:
       - type: bind
-        source: ./MyProject/wwwroot/media
+        source: ./UmbracoProject/wwwroot/media
         target: /app/wwwroot/media
         bind:
           create_host_path: true
       - type: bind
-        source: ./MyProject/wwwroot/scripts
+        source: ./UmbracoProject/wwwroot/scripts
         target: /app/wwwroot/scripts
         bind:
           create_host_path: true
       - type: bind
-        source: ./MyProject/wwwroot/css
+        source: ./UmbracoProject/wwwroot/css
         target: /app/wwwroot/css
         bind:
           create_host_path: true
-      - umb_logs:/app/umbraco/Logs
       - type: bind
-        source: ./MyProject/Views
+        source: ./UmbracoProject/Views
         target: /app/Views
         bind:
           create_host_path: true
-      - umb_data:/app/umbraco
       - type: bind
-        source: ./MyProject/umbraco/models
+        source: ./UmbracoProject/umbraco/models
         target: /app/umbraco/models
         bind:
           create_host_path: true
+      - umb_logs:/app/umbraco/Logs
+      - umb_data:/app/umbraco
     build:
       context: .
       dockerfile: UmbracoProject/Dockerfile
