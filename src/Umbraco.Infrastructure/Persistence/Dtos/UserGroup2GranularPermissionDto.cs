@@ -5,23 +5,25 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey("id", AutoIncrement = true)]
+[PrimaryKey(PrimaryKeyName, AutoIncrement = true)]
 [ExplicitColumns]
 public class UserGroup2GranularPermissionDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.UserGroup2GranularPermission;
+    public const string PrimaryKeyName = Constants.DatabaseSchema.PrimaryKeyNameId;
+    public const string UniqueIdName = Constants.DatabaseSchema.UniqueIdName;
 
-    [Column("id")]
+    [Column(PrimaryKeyName)]
     [PrimaryKeyColumn(Name = "PK_umbracoUserGroup2GranularPermissionDto", AutoIncrement = true)]
     public int Id { get; set; }
 
     [Column("userGroupKey")]
-    [Index(IndexTypes.NonClustered, Name = "IX_umbracoUserGroup2GranularPermissionDto_UserGroupKey_UniqueId", IncludeColumns = "uniqueId")]
-    [ForeignKey(typeof(UserGroupDto), Column = "key")]
+    [Index(IndexTypes.NonClustered, Name = "IX_umbracoUserGroup2GranularPermissionDto_UserGroupKey_UniqueId", IncludeColumns = UniqueIdName)]
+    [ForeignKey(typeof(UserGroupDto), Column = UserGroupDto.KeyColumnName)]
     public Guid UserGroupKey { get; set; }
 
-    [Column("uniqueId")]
-    [ForeignKey(typeof(NodeDto), Column = "uniqueId")]
+    [Column(UniqueIdName)]
+    [ForeignKey(typeof(NodeDto), Column = UniqueIdName)]
     [NullSetting(NullSetting = NullSettings.Null)]
     [Index(IndexTypes.NonClustered, Name = "IX_umbracoUserGroup2GranularPermissionDto_UniqueId")]
     public Guid? UniqueId { get; set; }

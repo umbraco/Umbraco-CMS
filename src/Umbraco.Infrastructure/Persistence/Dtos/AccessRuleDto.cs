@@ -6,12 +6,14 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey("id", AutoIncrement = false)]
+[PrimaryKey(PrimaryKeyName, AutoIncrement = false)]
 [ExplicitColumns]
 internal sealed class AccessRuleDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.AccessRule;
-    [Column("id")]
+    public const string PrimaryKeyName = Constants.DatabaseSchema.PrimaryKeyNameId;
+
+    [Column(PrimaryKeyName)]
     [PrimaryKeyColumn(Name = "PK_umbracoAccessRule", AutoIncrement = false)]
     public Guid Id { get; set; }
 

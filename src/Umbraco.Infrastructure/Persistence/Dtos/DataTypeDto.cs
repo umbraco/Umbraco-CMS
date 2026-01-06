@@ -5,12 +5,14 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey("nodeId", AutoIncrement = false)]
+[PrimaryKey(PrimaryKeyName, AutoIncrement = false)]
 [ExplicitColumns]
 public class DataTypeDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.DataType;
-    [Column("nodeId")]
+    public const string PrimaryKeyName = "nodeId";
+
+    [Column(PrimaryKeyName)]
     [PrimaryKeyColumn(AutoIncrement = false)]
     [ForeignKey(typeof(NodeDto))]
     public int NodeId { get; set; }
