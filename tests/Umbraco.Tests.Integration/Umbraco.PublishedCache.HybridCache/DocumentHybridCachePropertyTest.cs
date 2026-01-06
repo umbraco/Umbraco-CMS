@@ -110,8 +110,11 @@ internal sealed class DocumentHybridCachePropertyTest : UmbracoIntegrationTest
         var pickerContentType = ContentTypeEditingBuilder.CreateContentTypeWithContentPicker(templateKey: templateKey);
         await ContentTypeEditingService.CreateAsync(pickerContentType, Constants.Security.SuperUserKey);
 
-        var createOtherModel = ContentEditingBuilder.CreateContentWithOneInvariantProperty(pickerContentType.Key.Value,
-            "Test Create", "contentPicker", textPageKey);
+        var createOtherModel = ContentEditingBuilder.CreateContentWithOneInvariantProperty(
+            pickerContentType.Key.Value,
+            "Test Create",
+            "contentPicker",
+            textPageKey);
         var result = await ContentEditingService.CreateAsync(createOtherModel, Constants.Security.SuperUserKey);
 
         Assert.IsTrue(result.Success);
@@ -132,7 +135,12 @@ internal sealed class DocumentHybridCachePropertyTest : UmbracoIntegrationTest
         await ContentTypeEditingService.CreateAsync(textContentType, Constants.Security.SuperUserKey);
 
         var contentCreateModel = ContentEditingBuilder.CreateContentWithTwoInvariantProperties(
-            textContentType.Key.Value, "Root Create", "title", "The title value", "bodyText", "The body text",
+            textContentType.Key.Value,
+            "Root Create",
+            "title",
+            "The title value",
+            "bodyText",
+            "The body text",
             Constants.System.RootKey);
 
         var createResult = await ContentEditingService.CreateAsync(contentCreateModel, Constants.Security.SuperUserKey);

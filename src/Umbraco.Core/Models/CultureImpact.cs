@@ -145,7 +145,9 @@ public sealed class CultureImpact
     /// <param name="savingCultures"></param>
     /// <param name="defaultCulture"></param>
     /// <returns></returns>
-    public static string? GetCultureForInvariantErrors(IContent? content, string?[] savingCultures,
+    public static string? GetCultureForInvariantErrors(
+        IContent? content,
+        string?[] savingCultures,
         string? defaultCulture)
     {
         if (content == null)
