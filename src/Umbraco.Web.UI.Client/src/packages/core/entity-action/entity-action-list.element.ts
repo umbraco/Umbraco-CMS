@@ -61,21 +61,10 @@ export class UmbEntityActionListElement extends UmbLitElement {
 	}
 
 	override focus() {
-		const extensionComponent = this.renderRoot.querySelector('umb-extension-with-api-slot');
-		if (!extensionComponent) return;
-
-		// Wait for the slot component to render
-		extensionComponent.updateComplete.then(() => {
-			const firstEntityAction = extensionComponent.shadowRoot?.querySelector('umb-entity-action');
-			if (!firstEntityAction) return;
-
-			firstEntityAction.updateComplete.then(() => {
-				const firstMenuItem = firstEntityAction.shadowRoot?.querySelector('uui-menu-item');
-
-				firstMenuItem?.focus();
-			});
-		});
+		this.#firstEntityAction?.focus();
 	}
+
+	#firstEntityAction?: HTMLElement;
 
 	#hasRenderedOnce?: boolean;
 	override render() {
@@ -88,7 +77,8 @@ export class UmbEntityActionListElement extends UmbLitElement {
 						.apiArgs=${this._apiArgs}
 						.renderMethod=${(ext: any, i: number) => {
 							if (!this.#hasRenderedOnce && i === 0) {
-								ext.component?.focus();
+								this.#firstEntityAction = ext.component;
+								this.#firstEntityAction?.focus();
 								this.#hasRenderedOnce = true;
 							}
 							return ext.component;
