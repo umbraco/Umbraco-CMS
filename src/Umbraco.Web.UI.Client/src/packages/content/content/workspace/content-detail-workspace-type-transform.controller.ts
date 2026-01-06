@@ -45,40 +45,63 @@ export class UmbContentDetailWorkspaceTypeTransformController<
 			return;
 		}
 
-		// Get default language:
-		// get the next value of this observable:
+		const defaultLanguage = this.#getDefaultLanguage();
+
+		// To spare a bit of energy we keep awareness of whether this brings any changes:
+		let hasChanges = false;
+		const values = currentData.values.map((v) => {
+			const transformation = this.#transformValueForVariationChange(
+				v,
+				oldPropertyTypes,
+				newPropertyTypes,
+				defaultLanguage,
+			);
+			if (transformation.changed) {
+				hasChanges = true;
+			}
+			return transformation.value;
+		});
+
+		if (hasChanges) {
+			this.#workspace.setData({ ...currentData, values });
+		}
+	}
+
+	#getDefaultLanguage(): string {
 		const languages = this.#workspace.getLanguages();
 		const defaultLanguage = languages.find((lang) => lang.isDefault)?.unique;
 		if (!defaultLanguage) {
 			throw new Error('Default language not found');
 		}
+		return defaultLanguage;
+	}
 
-		// To spare a bit of energy we keep awareness of whether this brings any changes:
-		let hasChanges = false;
-		const values = currentData.values.map((v) => {
-			const oldType = oldPropertyTypes.find((p) => p.alias === v.alias);
-			const newType = newPropertyTypes.find((p) => p.alias === v.alias);
-			if (!oldType || !newType) {
-				// If we cant find both, we do not dare changing anything. Notice a composition may not have been loaded yet.
-				return v;
-			}
-			if (oldType.variesByCulture !== newType.variesByCulture) {
-				// Variation has changed, we need to migrate this value
-				if (newType.variesByCulture) {
-					hasChanges = true;
-					// If it now varies by culture, set to default language:
-					return { ...v, culture: defaultLanguage };
-				} else {
-					hasChanges = true;
-					// If it no longer varies by culture, set to invariant:
-					return { ...v, culture: null };
-				}
-			}
-			return v;
-		});
+	#transformValueForVariationChange(
+		value: any,
+		oldPropertyTypes: Array<UmbPropertyTypeModel>,
+		newPropertyTypes: Array<UmbPropertyTypeModel>,
+		defaultLanguage: string,
+	): { value: any; changed: boolean } {
+		const oldType = oldPropertyTypes.find((p) => p.alias === value.alias);
+		const newType = newPropertyTypes.find((p) => p.alias === value.alias);
 
-		if (hasChanges) {
-			this.#workspace.setData({ ...currentData, values });
+		// If we cant find both, we do not dare changing anything. Notice a composition may not have been loaded yet.
+		if (!oldType || !newType) {
+			return { value, changed: false };
+		}
+
+		// If variation hasn't changed, return unchanged
+		if (oldType.variesByCulture === newType.variesByCulture) {
+			return { value, changed: false };
+		}
+
+		// Variation has changed, migrate the value
+		if (newType.variesByCulture) {
+			// If it now varies by culture, set to default language
+			return { value: { ...value, culture: defaultLanguage }, changed: true };
+		} else {
+			// If it no longer varies by culture, set to invariant
+			return { value: { ...value, culture: null }, changed: true };
 		}
 	}
 }
