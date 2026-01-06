@@ -1,6 +1,6 @@
 import type { UmbDropdownElement } from '../../../components/dropdown/index.js';
 import { UmbEntityActionListElement } from '../../entity-action-list.element.js';
-import { html, customElement, property, css, query, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, css, query } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UUIScrollContainerElement } from '@umbraco-cms/backoffice/external/uui';
 import { UMB_ENTITY_CONTEXT, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
@@ -49,7 +49,7 @@ export class UmbEntityActionsDropdownElement extends UmbLitElement {
 
 	#onDropdownOpened() {
 		if (this.#entityActionListElement) {
-       this.#entityActionListElement.focus();
+			this.#entityActionListElement.focus();
 			return;
 		}
 
@@ -65,16 +65,15 @@ export class UmbEntityActionsDropdownElement extends UmbLitElement {
 		this._dropdownElement?.appendChild(this.#scrollContainerElement);
 	}
 
-
 	override render() {
 		return html`<umb-dropdown
 			id="action-modal"
 			@click=${this.#onDropdownClick}
 			@opened=${this.#onDropdownOpened}
 			@focusout=${(e: FocusEvent) =>
-				!['umb-entity-action-list', 'uui-scroll-container'].includes((e.relatedTarget as HTMLElement)?.tagName.toLowerCase() || '')
-					&& this.#onActionExecuted()
-			}
+				!['umb-entity-action-list', 'uui-scroll-container'].includes(
+					(e.relatedTarget as HTMLElement)?.tagName.toLowerCase() || '',
+				) && this.#onActionExecuted()}
 			.label=${this.label}
 			?compact=${this.compact}
 			hide-expand>
