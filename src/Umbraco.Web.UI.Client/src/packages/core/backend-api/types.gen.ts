@@ -285,6 +285,7 @@ export type CreateMediaTypeRequestModel = {
     allowedAsRoot: boolean;
     variesByCulture: boolean;
     variesBySegment: boolean;
+    collection?: ReferenceByIdModel | null;
     isElement: boolean;
     properties: Array<CreateMediaTypePropertyTypeRequestModel>;
     containers: Array<CreateMediaTypePropertyTypeContainerRequestModel>;
@@ -292,7 +293,6 @@ export type CreateMediaTypeRequestModel = {
     parent?: ReferenceByIdModel | null;
     allowedMediaTypes: Array<MediaTypeSortModel>;
     compositions: Array<MediaTypeCompositionModel>;
-    collection?: ReferenceByIdModel | null;
 };
 
 export type CreateMemberGroupRequestModel = {
@@ -1006,7 +1006,7 @@ export type ElementRecycleBinItemResponseModel = {
     createDate: string;
     hasChildren: boolean;
     parent?: ItemReferenceByIdResponseModel | null;
-    documentType: DocumentTypeReferenceResponseModel;
+    documentType?: DocumentTypeReferenceResponseModel | null;
     variants: Array<ElementVariantItemResponseModel>;
     isFolder: boolean;
     name: string;
@@ -1028,6 +1028,7 @@ export type ElementTreeItemResponseModel = {
     flags: Array<FlagModel>;
     name: string;
     isFolder: boolean;
+    createDate: string;
     documentType?: DocumentTypeReferenceResponseModel | null;
     variants: Array<ElementVariantItemResponseModel>;
 };
@@ -2434,6 +2435,7 @@ export type ServerConfigurationResponseModel = {
     allowPasswordReset: boolean;
     versionCheckPeriod: number;
     allowLocalLogin: boolean;
+    umbracoCssPath: string;
 };
 
 export type ServerInformationResponseModel = {
@@ -2522,6 +2524,12 @@ export type SubsetDocumentTypeTreeItemResponseModel = {
     totalBefore: number;
     totalAfter: number;
     items: Array<DocumentTypeTreeItemResponseModel>;
+};
+
+export type SubsetElementRecycleBinItemResponseModel = {
+    totalBefore: number;
+    totalAfter: number;
+    items: Array<ElementRecycleBinItemResponseModel>;
 };
 
 export type SubsetElementTreeItemResponseModel = {
@@ -8221,6 +8229,74 @@ export type GetItemElementResponses = {
 
 export type GetItemElementResponse = GetItemElementResponses[keyof GetItemElementResponses];
 
+export type DeleteRecycleBinElementData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/umbraco/management/api/v1/recycle-bin/element';
+};
+
+export type DeleteRecycleBinElementErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type DeleteRecycleBinElementError = DeleteRecycleBinElementErrors[keyof DeleteRecycleBinElementErrors];
+
+export type DeleteRecycleBinElementResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type DeleteRecycleBinElementByIdData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/recycle-bin/element/{id}';
+};
+
+export type DeleteRecycleBinElementByIdErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type DeleteRecycleBinElementByIdError = DeleteRecycleBinElementByIdErrors[keyof DeleteRecycleBinElementByIdErrors];
+
+export type DeleteRecycleBinElementByIdResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
 export type GetRecycleBinElementChildrenData = {
     body?: never;
     path?: never;
@@ -8252,6 +8328,43 @@ export type GetRecycleBinElementChildrenResponses = {
 
 export type GetRecycleBinElementChildrenResponse = GetRecycleBinElementChildrenResponses[keyof GetRecycleBinElementChildrenResponses];
 
+export type DeleteRecycleBinElementFolderByIdData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/recycle-bin/element/folder/{id}';
+};
+
+export type DeleteRecycleBinElementFolderByIdErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type DeleteRecycleBinElementFolderByIdError = DeleteRecycleBinElementFolderByIdErrors[keyof DeleteRecycleBinElementFolderByIdErrors];
+
+export type DeleteRecycleBinElementFolderByIdResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
 export type GetRecycleBinElementRootData = {
     body?: never;
     path?: never;
@@ -8281,6 +8394,38 @@ export type GetRecycleBinElementRootResponses = {
 };
 
 export type GetRecycleBinElementRootResponse = GetRecycleBinElementRootResponses[keyof GetRecycleBinElementRootResponses];
+
+export type GetRecycleBinElementSiblingsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        target?: string;
+        before?: number;
+        after?: number;
+        dataTypeId?: string;
+    };
+    url: '/umbraco/management/api/v1/recycle-bin/element/siblings';
+};
+
+export type GetRecycleBinElementSiblingsErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetRecycleBinElementSiblingsResponses = {
+    /**
+     * OK
+     */
+    200: SubsetElementRecycleBinItemResponseModel;
+};
+
+export type GetRecycleBinElementSiblingsResponse = GetRecycleBinElementSiblingsResponses[keyof GetRecycleBinElementSiblingsResponses];
 
 export type GetTreeElementAncestorsData = {
     body?: never;
