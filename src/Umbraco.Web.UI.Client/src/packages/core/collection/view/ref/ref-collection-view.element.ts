@@ -42,6 +42,10 @@ export class UmbRefCollectionViewElement extends UmbCollectionViewElementBase {
 				display: flex;
 				flex-direction: column;
 			}
+
+			umb-entity-collection-item-ref {
+				margin-bottom: var(--uui-size-4);
+			}
 		`,
 	];
 }
