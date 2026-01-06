@@ -107,6 +107,11 @@ export class UmbPickerSearchResultElement extends UmbLitElement {
 			#result-container {
 				margin-top: var(--uui-size-4);
 			}
+
+			umb-extension-with-api-slot {
+				display: block;
+				margin-bottom: var(--uui-size-3);
+			}
 		`,
 	];
 }
