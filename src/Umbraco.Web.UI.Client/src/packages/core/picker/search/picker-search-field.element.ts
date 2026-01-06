@@ -82,7 +82,7 @@ export class UmbPickerSearchFieldElement extends UmbLitElement {
 			}
 
 			#searching-indicator {
-				margin-left: 7px;			
+				margin-left: 7px;
 			}
 		`,
 	];
