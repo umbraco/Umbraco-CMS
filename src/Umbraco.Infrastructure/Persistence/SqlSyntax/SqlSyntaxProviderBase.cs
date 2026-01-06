@@ -1,7 +1,6 @@
 // Don't remove the unused System using, for some reason this breaks docfx, and I have no clue why.
 using System;
 using System.Data;
-using System.Data.SqlTypes;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq.Expressions;
@@ -159,9 +158,6 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
 
     public virtual string GetQuotedValue(string value) => $"'{value}'";
 
-    /// <inheritdoc />
-    public virtual string GetNullExtension<T>() => string.Empty;
-
     public virtual string GetIndexType(IndexTypes indexTypes)
     {
         var indexType = string.Empty;
@@ -260,15 +256,6 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
     public virtual bool SupportsClustered() => true;
 
     public virtual bool SupportsIdentityInsert() => true;
-
-    /// <inheritdoc />
-    public virtual bool SupportsSequences() => false;
-
-    /// <inheritdoc />
-    public virtual void AlterSequences(IUmbracoDatabase database) { }
-
-    /// <inheritdoc />
-    public virtual void AlterSequences(IUmbracoDatabase database, string tableName) { }
 
     /// <summary>
     ///     This is used ONLY if we need to format datetime without using SQL parameters (i.e. during migrations)
