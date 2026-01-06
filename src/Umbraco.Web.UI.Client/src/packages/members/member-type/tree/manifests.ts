@@ -4,6 +4,7 @@ import {
 	UMB_MEMBER_TYPE_TREE_REPOSITORY_ALIAS,
 	UMB_MEMBER_TYPE_TREE_STORE_ALIAS,
 } from './constants.js';
+import { UmbMemberTypeTreeStore } from './member-type-tree.store.js';
 import { manifests as folderManifests } from './folder/manifests.js';
 import { manifests as treeItemChildrenManifests } from './tree-item-children/manifests.js';
 
@@ -18,7 +19,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'treeStore',
 		alias: UMB_MEMBER_TYPE_TREE_STORE_ALIAS,
 		name: 'Member Type Tree Store',
-		api: () => import('./member-type-tree.store.js'),
+		api: UmbMemberTypeTreeStore,
 	},
 	{
 		type: 'tree',

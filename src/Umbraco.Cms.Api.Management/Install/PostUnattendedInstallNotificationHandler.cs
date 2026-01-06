@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
@@ -19,7 +19,18 @@ public class PostUnattendedInstallNotificationHandler : INotificationAsyncHandle
     private readonly IUserService _userService;
     private readonly IMetricsConsentService _metricsConsentService;
 
-    public PostUnattendedInstallNotificationHandler(IOptions<UnattendedSettings> unattendedSettings, IUserService userService, IServiceScopeFactory serviceScopeFactory, IMetricsConsentService metricsConsentService)
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="PostUnattendedInstallNotificationHandler" /> class.
+    /// </summary>
+    /// <param name="unattendedSettings">The unattended settings.</param>
+    /// <param name="userService">The user service.</param>
+    /// <param name="serviceScopeFactory">The service scope factory.</param>
+    /// <param name="metricsConsentService">The metrics consent service.</param>
+    public PostUnattendedInstallNotificationHandler(
+        IOptions<UnattendedSettings> unattendedSettings,
+        IUserService userService,
+        IServiceScopeFactory serviceScopeFactory,
+        IMetricsConsentService metricsConsentService)
     {
         _unattendedSettings = unattendedSettings;
         _userService = userService;
@@ -95,7 +106,9 @@ public class PostUnattendedInstallNotificationHandler : INotificationAsyncHandle
         }
 
         IdentityResult resetResult =
-            await backOfficeUserManager.ChangePasswordWithResetAsync(membershipUser.Id, resetToken,
+            await backOfficeUserManager.ChangePasswordWithResetAsync(
+                membershipUser.Id,
+                resetToken,
                 unattendedPassword!.Trim());
         if (!resetResult.Succeeded)
         {

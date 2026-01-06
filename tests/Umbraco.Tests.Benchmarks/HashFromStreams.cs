@@ -5,17 +5,37 @@ using BenchmarkDotNet.Attributes;
 
 namespace Umbraco.Tests.Benchmarks;
 
+/// <summary>
+///     Benchmark tests comparing SHA1 hashing performance across different file sizes.
+/// </summary>
+/// <remarks>
+///     <para>
+///         This benchmark was originally created to compare SHA1Managed, SHA1CryptoServiceProvider,
+///         and SHA1.Create(). In modern .NET (Core/.NET 5+), all three implementations are equivalent
+///         as SHA1Managed and SHA1CryptoServiceProvider have been deprecated.
+///     </para>
+///     <para>
+///         The benchmark is retained for historical reference and to verify that all implementations
+///         perform identically in modern .NET.
+///     </para>
+/// </remarks>
 [MemoryDiagnoser]
 public class HashFromStreams
 {
     private readonly Stream _largeFile;
-    private readonly SHA1Managed _managed;
+    private readonly SHA1 _managed;
     private readonly Stream _medFile;
     private readonly SHA1 _normal;
 
     private readonly Stream _smallFile;
+
     // according to this post: https://stackoverflow.com/a/1051777/694494
     // the SHA1CryptoServiceProvider is faster, but that is not reflected in these benchmarks.
+
+    // NOTE: 18 Dec 2025 - SHA1Managed and SHA1CryptoServiceProvider are obsolete in modern .NET.
+    // All SHA1 implementations now use SHA1.Create() which provides the same performance.
+    // This benchmark is retained for historical reference but will show identical results
+    // for all three implementations in .NET Core/.NET 5+.
 
     /*
 
@@ -42,12 +62,12 @@ public class HashFromStreams
 
     */
 
-    private readonly SHA1CryptoServiceProvider _unmanaged;
+    private readonly SHA1 _unmanaged;
 
     public HashFromStreams()
     {
-        _unmanaged = new SHA1CryptoServiceProvider();
-        _managed = new SHA1Managed();
+        _unmanaged = SHA1.Create();
+        _managed = SHA1.Create();
         _normal = SHA1.Create();
         _smallFile = File.OpenRead(@"C:\YOUR_PATH_GOES_HERE\small-file.bin");
         _medFile = File.OpenRead(@"C:\YOUR_PATH_GOES_HERE\med-file.bin");

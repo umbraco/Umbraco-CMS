@@ -100,7 +100,10 @@ internal sealed class FileSystemMainDomLock : IMainDomLock
     public void Dispose() => Dispose(true);
 
     public void CreateLockReleaseSignalFile() =>
-        File.Open(_releaseSignalFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite,
+        File.Open(
+                _releaseSignalFilePath,
+                FileMode.OpenOrCreate,
+                FileAccess.ReadWrite,
                 FileShare.ReadWrite | FileShare.Delete)
             .Close();
 
