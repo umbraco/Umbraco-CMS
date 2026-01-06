@@ -27,7 +27,7 @@ test('can create a document blueprint from the settings menu', {tag: '@smoke'}, 
   await umbracoUi.documentBlueprint.clickTextButtonWithName(documentTypeName);
   await umbracoUi.documentBlueprint.clickChooseButton();
   // We need to wait for a bit while the new document is being loaded
-  await umbracoUi.waitForTimeout(1000);
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);
   await umbracoUi.documentBlueprint.enterDocumentBlueprintName(documentBlueprintName);
   await umbracoUi.documentBlueprint.clickSaveButton();
 
@@ -116,7 +116,7 @@ test('can create a variant document blueprint', {tag: '@release'}, async ({umbra
   await umbracoUi.documentBlueprint.clickTextButtonWithName(documentTypeName);
   await umbracoUi.documentBlueprint.clickChooseButton();
   // We need to wait for a bit while the new document is being loaded
-  await umbracoUi.waitForTimeout(1000);
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);
   await umbracoUi.documentBlueprint.enterDocumentBlueprintName(documentBlueprintName);
   await umbracoUi.documentBlueprint.clickSaveButton();
 
