@@ -4,13 +4,14 @@ using Umbraco.Cms.Core;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey("id")]
+[PrimaryKey(PrimaryKeyName)]
 [ExplicitColumns]
 internal sealed class PropertyTypeReadOnlyDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.PropertyType;
+    public const string PrimaryKeyName = "PropertyTypeId"; // Constants.DatabaseSchema.PrimaryKeyNameId;
 
-    [Column("PropertyTypeId")]
+    [Column(PrimaryKeyName)]
     public int? Id { get; set; }
 
     [Column("dataTypeId")]
@@ -66,6 +67,6 @@ internal sealed class PropertyTypeReadOnlyDto
     [Column("dbType")]
     public string? DbType { get; set; }
 
-    [Column("UniqueID")]
+    [Column("uniqueId")]
     public Guid UniqueId { get; set; }
 }

@@ -5,11 +5,12 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey("id", AutoIncrement = true)]
+[PrimaryKey(PrimaryKeyName, AutoIncrement = true)]
 [ExplicitColumns]
 public class UserStartNodeDto : IEquatable<UserStartNodeDto>
 {
     public const string TableName = Constants.DatabaseSchema.Tables.UserStartNode;
+    public const string PrimaryKeyName = Constants.DatabaseSchema.PrimaryKeyNameId;
 
     public enum StartNodeTypeValue
     {
@@ -17,7 +18,7 @@ public class UserStartNodeDto : IEquatable<UserStartNodeDto>
         Media = 2,
     }
 
-    [Column("id")]
+    [Column(PrimaryKeyName)]
     [PrimaryKeyColumn(Name = "PK_userStartNode")]
     public int Id { get; set; }
 

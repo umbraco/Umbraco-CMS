@@ -7,13 +7,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 
 [TableName(TableName)]
-[PrimaryKey("key", AutoIncrement = false)]
+[PrimaryKey(PrimaryKeyName, AutoIncrement = false)]
 [ExplicitColumns]
 internal sealed class KeyValueDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.KeyValue;
+    public const string PrimaryKeyName = Constants.DatabaseSchema.PrimaryKeyNameKey;
 
-    [Column("key")]
+    [Column(PrimaryKeyName)]
     [Length(256)]
     [PrimaryKeyColumn(AutoIncrement = false, Clustered = true)]
     public string Key { get; set; } = null!;

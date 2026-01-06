@@ -6,13 +6,14 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey("nodeId", AutoIncrement = false)]
+[PrimaryKey(PrimaryKeyName, AutoIncrement = false)]
 [ExplicitColumns]
 public class ContentNuDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.NodeData;
+    public const string PrimaryKeyName = "nodeId";
 
-    [Column("nodeId")]
+    [Column(PrimaryKeyName)]
     [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_cmsContentNu", OnColumns = "nodeId, published")]
     [ForeignKey(typeof(ContentDto), Column = "nodeId", OnDelete = Rule.Cascade)]
     public int NodeId { get; set; }

@@ -5,13 +5,14 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey("nodeId", AutoIncrement = false)]
+[PrimaryKey(PrimaryKeyName, AutoIncrement = false)]
 [ExplicitColumns]
 internal sealed class TagRelationshipDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.TagRelationship;
+    public const string PrimaryKeyName = "nodeId";
 
-    [Column("nodeId")]
+    [Column(PrimaryKeyName)]
     [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_cmsTagRelationship", OnColumns = "nodeId, propertyTypeId, tagId")]
     [ForeignKey(typeof(ContentDto), Name = "FK_cmsTagRelationship_cmsContent", Column = "nodeId")]
     [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_tagId_nodeId", ForColumns = "tagId,nodeId", IncludeColumns = "propertyTypeId")]

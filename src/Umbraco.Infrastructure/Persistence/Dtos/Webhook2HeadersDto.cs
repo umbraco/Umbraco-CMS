@@ -15,9 +15,9 @@ public class Webhook2HeadersDto
     [ForeignKey(typeof(WebhookDto), OnDelete = Rule.Cascade)]
     public int WebhookId { get; set; }
 
-    [Column("Key")]
+    [Column("key")]
     public string Key { get; set; } = string.Empty;
 
-    [Column("Value")]
+    [Column("value")]
     public string Value { get; set; } = string.Empty;
 }

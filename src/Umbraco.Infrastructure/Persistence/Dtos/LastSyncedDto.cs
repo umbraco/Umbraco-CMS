@@ -1,4 +1,4 @@
-﻿using NPoco;
+using NPoco;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 using Constants = Umbraco.Cms.Core.Constants;
 
@@ -6,13 +6,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 
 [TableName(TableName)]
-[PrimaryKey("machineId", AutoIncrement = false)]
+[PrimaryKey(PrimaryKeyName, AutoIncrement = false)]
 [ExplicitColumns]
 public class LastSyncedDto
 {
     internal const string TableName = Constants.DatabaseSchema.Tables.LastSynced;
+    public const string PrimaryKeyName = "machineId";
 
-    [Column("machineId")]
+    [Column(PrimaryKeyName)]
     [PrimaryKeyColumn(Name = "PK_lastSyncedMachineId", AutoIncrement = false, Clustered = true)]
     public required string MachineId { get; set; }
 

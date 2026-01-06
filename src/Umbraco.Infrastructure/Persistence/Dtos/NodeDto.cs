@@ -6,19 +6,22 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey("id")]
+[PrimaryKey(PrimaryKeyName)]
 [ExplicitColumns]
 public class NodeDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.Node;
+    public const string PrimaryKeyName = Constants.DatabaseSchema.PrimaryKeyNameId;
     public const int NodeIdSeed = 1060;
 
     // Public constants to bind properties between DTOs
-    public const string IdColumnName = "id";
+    public const string IdColumnName = PrimaryKeyName;
     public const string KeyColumnName = "uniqueId";
     public const string ParentIdColumnName = "parentId";
     public const string SortOrderColumnName = "sortOrder";
     public const string TrashedColumnName = "trashed";
+    public const string NodeObjectTypeColumnName = "nodeObjectType";
+    public const string TextColumnName = "text";
 
     private int? _userId;
 
