@@ -27,6 +27,9 @@ services:
     image: umbraco_image
     environment:
         - ASPNETCORE_ENVIRONMENT=Development
+        - ASPNETCORE_URLS=https://+:8081;http://+:8080
+        - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetcore.pfx
+        - ASPNETCORE_Kestrel__Certificates__Default__Password=DevOnlyPassword
         - ConnectionStrings__umbracoDbDSN=Server=umb_database;Database=umbracoDb;User Id=sa;Password=${DB_PASSWORD};TrustServerCertificate=true;
         - ConnectionStrings__umbracoDbDSN_ProviderName=Microsoft.Data.SqlClient
     # These volumes are bind mounts to the host machine's file system.
@@ -71,7 +74,7 @@ services:
         condition: service_healthy
     restart: always
     ports:
-      - "TEMPLATE_PORT:8080"
+      - "TEMPLATE_PORT:8081"
     networks:
       - umbnet
     develop:

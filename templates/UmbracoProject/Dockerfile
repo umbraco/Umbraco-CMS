@@ -21,9 +21,22 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 
-# Install gosu for dropping privileges in entrypoint
+# Install gosu for dropping privileges and openssl for certificate generation
 USER root
-RUN apt-get update && apt-get install -y --no-install-recommends gosu && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends gosu openssl && rm -rf /var/lib/apt/lists/*
+
+# Generate self-signed certificate for HTTPS
+RUN mkdir -p /https && \
+    openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+      -keyout /https/aspnetcore.key \
+      -out /https/aspnetcore.crt \
+      -subj "/CN=localhost" \
+      -addext "subjectAltName=DNS:localhost,DNS:myproject" && \
+    openssl pkcs12 -export -out /https/aspnetcore.pfx \
+      -inkey /https/aspnetcore.key \
+      -in /https/aspnetcore.crt \
+      -password pass:DevOnlyPassword && \
+    chmod 644 /https/aspnetcore.pfx
 
 # Copy entrypoint script
 COPY UmbracoProject/entrypoint.sh /entrypoint.sh
