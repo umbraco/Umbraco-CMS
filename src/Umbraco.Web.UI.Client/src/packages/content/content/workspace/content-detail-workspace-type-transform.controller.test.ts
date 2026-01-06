@@ -9,12 +9,11 @@ import type { UmbEntityVariantModel } from '@umbraco-cms/backoffice/variant';
 import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 
 @customElement('umb-test-workspace-host')
-class UmbTestWorkspaceHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
+class UmbTestWorkspaceHostElement extends UmbControllerHostElementMixin(HTMLElement) {
+	#propertyTypesState = new UmbObjectState<Array<UmbPropertyTypeModel> | undefined>(undefined);
 
-// Mock workspace context
-class MockContentDetailWorkspaceContext {
 	structure = {
-		contentTypeProperties: new UmbObjectState<Array<UmbPropertyTypeModel> | undefined>(undefined),
+		contentTypeProperties: this.#propertyTypesState.asObservable(),
 	};
 
 	#data: UmbContentDetailModel<UmbEntityVariantModel> | undefined;
@@ -34,16 +33,17 @@ class MockContentDetailWorkspaceContext {
 	getLanguages(): Array<UmbLanguageDetailModel> {
 		return this.#languages;
 	}
+
+	setPropertyTypes(propertyTypes: Array<UmbPropertyTypeModel>): void {
+		this.#propertyTypesState.setValue(propertyTypes);
+	}
 }
 
 describe('UmbContentDetailWorkspaceTypeTransformController', () => {
-	let hostElement: UmbTestWorkspaceHostElement;
-	let mockWorkspace: MockContentDetailWorkspaceContext;
-	let controller: UmbContentDetailWorkspaceTypeTransformController<any>;
+	let mockWorkspace: UmbTestWorkspaceHostElement;
 
 	beforeEach(() => {
-		hostElement = new UmbTestWorkspaceHostElement();
-		mockWorkspace = new MockContentDetailWorkspaceContext();
+		mockWorkspace = new UmbTestWorkspaceHostElement();
 	});
 
 	it('migrates invariant value to variant when property variation changes', async () => {
@@ -69,10 +69,10 @@ describe('UmbContentDetailWorkspaceTypeTransformController', () => {
 				variesBySegment: false,
 			} as UmbPropertyTypeModel,
 		];
-		mockWorkspace.structure.contentTypeProperties.setValue(oldPropertyTypes);
+		mockWorkspace.setPropertyTypes(oldPropertyTypes);
 
 		// Create controller - it will observe property type changes
-		controller = new UmbContentDetailWorkspaceTypeTransformController(mockWorkspace as any);
+		new UmbContentDetailWorkspaceTypeTransformController(mockWorkspace as any);
 
 		// Wait for initial observation
 		await new Promise((resolve) => setTimeout(resolve, 0));
@@ -85,7 +85,7 @@ describe('UmbContentDetailWorkspaceTypeTransformController', () => {
 				variesBySegment: false,
 			} as UmbPropertyTypeModel,
 		];
-		mockWorkspace.structure.contentTypeProperties.setValue(newPropertyTypes);
+		mockWorkspace.setPropertyTypes(newPropertyTypes);
 
 		// Wait for observation to trigger
 		await new Promise((resolve) => setTimeout(resolve, 0));
@@ -129,10 +129,10 @@ describe('UmbContentDetailWorkspaceTypeTransformController', () => {
 				variesBySegment: false,
 			} as UmbPropertyTypeModel,
 		];
-		mockWorkspace.structure.contentTypeProperties.setValue(oldPropertyTypes);
+		mockWorkspace.setPropertyTypes(oldPropertyTypes);
 
 		// Create controller
-		controller = new UmbContentDetailWorkspaceTypeTransformController(mockWorkspace as any);
+		new UmbContentDetailWorkspaceTypeTransformController(mockWorkspace as any);
 
 		// Wait for initial observation
 		await new Promise((resolve) => setTimeout(resolve, 0));
@@ -145,7 +145,7 @@ describe('UmbContentDetailWorkspaceTypeTransformController', () => {
 				variesBySegment: false,
 			} as UmbPropertyTypeModel,
 		];
-		mockWorkspace.structure.contentTypeProperties.setValue(newPropertyTypes);
+		mockWorkspace.setPropertyTypes(newPropertyTypes);
 
 		// Wait for observation to trigger
 		await new Promise((resolve) => setTimeout(resolve, 0));
@@ -185,10 +185,10 @@ describe('UmbContentDetailWorkspaceTypeTransformController', () => {
 				variesBySegment: false,
 			} as UmbPropertyTypeModel,
 		];
-		mockWorkspace.structure.contentTypeProperties.setValue(oldPropertyTypes);
+		mockWorkspace.setPropertyTypes(oldPropertyTypes);
 
 		// Create controller
-		controller = new UmbContentDetailWorkspaceTypeTransformController(mockWorkspace as any);
+		new UmbContentDetailWorkspaceTypeTransformController(mockWorkspace as any);
 
 		// Wait for initial observation
 		await new Promise((resolve) => setTimeout(resolve, 0));
@@ -201,7 +201,7 @@ describe('UmbContentDetailWorkspaceTypeTransformController', () => {
 				variesBySegment: false,
 			} as UmbPropertyTypeModel,
 		];
-		mockWorkspace.structure.contentTypeProperties.setValue(newPropertyTypes);
+		mockWorkspace.setPropertyTypes(newPropertyTypes);
 
 		// Wait for observation to trigger
 		await new Promise((resolve) => setTimeout(resolve, 0));
@@ -234,10 +234,10 @@ describe('UmbContentDetailWorkspaceTypeTransformController', () => {
 				variesBySegment: false,
 			} as UmbPropertyTypeModel,
 		];
-		mockWorkspace.structure.contentTypeProperties.setValue(oldPropertyTypes);
+		mockWorkspace.setPropertyTypes(oldPropertyTypes);
 
 		// Create controller
-		controller = new UmbContentDetailWorkspaceTypeTransformController(mockWorkspace as any);
+		new UmbContentDetailWorkspaceTypeTransformController(mockWorkspace as any);
 
 		// Wait for initial observation
 		await new Promise((resolve) => setTimeout(resolve, 0));
@@ -253,7 +253,7 @@ describe('UmbContentDetailWorkspaceTypeTransformController', () => {
 				variesBySegment: false,
 			} as UmbPropertyTypeModel,
 		];
-		mockWorkspace.structure.contentTypeProperties.setValue(newPropertyTypes);
+		mockWorkspace.setPropertyTypes(newPropertyTypes);
 
 		// Wait for observation to trigger
 		await new Promise((resolve) => setTimeout(resolve, 0));
@@ -298,10 +298,10 @@ describe('UmbContentDetailWorkspaceTypeTransformController', () => {
 				variesBySegment: false,
 			} as UmbPropertyTypeModel,
 		];
-		mockWorkspace.structure.contentTypeProperties.setValue(oldPropertyTypes);
+		mockWorkspace.setPropertyTypes(oldPropertyTypes);
 
 		// Create controller
-		controller = new UmbContentDetailWorkspaceTypeTransformController(mockWorkspace as any);
+		new UmbContentDetailWorkspaceTypeTransformController(mockWorkspace as any);
 
 		// Wait for initial observation
 		await new Promise((resolve) => setTimeout(resolve, 0));
@@ -319,7 +319,7 @@ describe('UmbContentDetailWorkspaceTypeTransformController', () => {
 				variesBySegment: false,
 			} as UmbPropertyTypeModel,
 		];
-		mockWorkspace.structure.contentTypeProperties.setValue(newPropertyTypes);
+		mockWorkspace.setPropertyTypes(newPropertyTypes);
 
 		// Wait for observation to trigger
 		await new Promise((resolve) => setTimeout(resolve, 0));
