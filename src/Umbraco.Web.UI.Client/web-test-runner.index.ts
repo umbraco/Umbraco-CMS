@@ -3,7 +3,7 @@ import { onUnhandledRequest, setupWorker } from './src/mocks/index.js';
 
 const worker = setupWorker(...handlers);
 
-worker.start({
+await worker.start({
 	onUnhandledRequest,
 	quiet: true,
 });

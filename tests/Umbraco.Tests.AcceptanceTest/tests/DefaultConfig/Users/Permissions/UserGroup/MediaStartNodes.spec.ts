@@ -64,7 +64,7 @@ test.skip('can see parent of start node but not access it', async ({umbracoApi, 
   // Assert
   await umbracoUi.media.isMediaTreeItemVisible(rootFolderName);
   await umbracoUi.media.goToMediaWithName(rootFolderName);
-  await umbracoUi.waitForTimeout(500); // Wait for workspace to load
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short); // Wait for workspace to load
   await umbracoUi.media.doesMediaWorkspaceHaveText('Access denied');
   await umbracoUi.media.openMediaCaretButtonForName(rootFolderName);
   await umbracoUi.media.isChildMediaVisible(rootFolderName, childFolderOneName);

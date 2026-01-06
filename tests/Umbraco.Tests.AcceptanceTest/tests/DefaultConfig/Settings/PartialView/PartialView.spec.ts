@@ -65,8 +65,7 @@ test('can create a partial view from snippet', async ({umbracoApi, umbracoUi}) =
   await umbracoUi.partialView.isPartialViewRootTreeItemVisible(partialViewFileName);
 });
 
-// TODO: Fix flaky test
-test.fixme('can rename a partial view', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test('can rename a partial view', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const wrongPartialViewName = 'WrongName';
   const wrongPartialViewFileName = wrongPartialViewName + '.cshtml';
@@ -82,12 +81,12 @@ test.fixme('can rename a partial view', {tag: '@smoke'}, async ({umbracoApi, umb
 
   // Assert
   await umbracoUi.partialView.waitForPartialViewToBeRenamed();
-  expect(await umbracoApi.partialView.doesNameExist(partialViewFileName)).toBeTruthy();
-  expect(await umbracoApi.partialView.doesNameExist(wrongPartialViewFileName)).toBeFalsy();
   // Verify the old partial view is NOT displayed under the Partial Views section
   await umbracoUi.partialView.isPartialViewRootTreeItemVisible(wrongPartialViewFileName, false, false);
   // Verify the new partial view is displayed under the Partial Views section
   await umbracoUi.partialView.isPartialViewRootTreeItemVisible(partialViewFileName, true, false);
+  expect(await umbracoApi.partialView.doesNameExist(partialViewFileName)).toBeTruthy();
+  expect(await umbracoApi.partialView.doesNameExist(wrongPartialViewFileName)).toBeFalsy();
 });
 
 test('can update a partial view content', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
@@ -202,7 +201,7 @@ test('can insert dictionary item into a partial view', async ({umbracoApi, umbra
   // Act
   await umbracoUi.partialView.openPartialViewAtRoot(partialViewFileName);
   await umbracoUi.partialView.insertDictionaryItem(dictionaryName);
-  await umbracoUi.waitForTimeout(500); // Wait for the dictionary item to be inserted
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short); // Wait for the dictionary item to be inserted
   await umbracoUi.partialView.clickSaveButton();
 
   // Assert
@@ -220,7 +219,7 @@ test('can insert value into a partial view', async ({umbracoApi, umbracoUi}) => 
 
   // Act
   await umbracoUi.partialView.openPartialViewAtRoot(partialViewFileName);
-  await umbracoUi.waitForTimeout(1000);
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);
   await umbracoUi.template.insertSystemFieldValue(systemFieldValue);
   await umbracoUi.template.clickSaveButton();
 

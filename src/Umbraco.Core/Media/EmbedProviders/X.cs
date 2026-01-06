@@ -12,7 +12,7 @@ public class X : OEmbedProviderBase
     {
     }
 
-    public override string ApiEndpoint => "http://publish.twitter.com/oembed";
+    public override string ApiEndpoint => "https://publish.x.com/oembed";
 
     public override string[] UrlSchemeRegex => new[] { @"(https?:\/\/(www\.)?)(twitter|x)\.com\/.*\/status\/.*" };
 

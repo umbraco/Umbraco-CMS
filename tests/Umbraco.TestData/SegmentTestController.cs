@@ -1,7 +1,6 @@
-using System;
-using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
@@ -15,10 +14,28 @@ using Umbraco.TestData.Configuration;
 
 namespace Umbraco.TestData;
 
+/// <summary>
+/// Controller for testing content segmentation functionality in Umbraco.
+/// Provides endpoints for enabling, disabling, and managing segment variations on content types and content items.
+/// </summary>
+/// <remarks>
+/// This controller requires the TestData settings to be enabled in configuration.
+/// It is intended for testing purposes only and should not be used in production environments.
+/// </remarks>
 public class SegmentTestController : SurfaceController
 {
     private readonly IOptions<TestDataSettings> _testDataSettings;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SegmentTestController"/> class.
+    /// </summary>
+    /// <param name="umbracoContextAccessor">The Umbraco context accessor.</param>
+    /// <param name="databaseFactory">The database factory.</param>
+    /// <param name="services">The service context.</param>
+    /// <param name="appCaches">The application caches.</param>
+    /// <param name="profilingLogger">The profiling logger.</param>
+    /// <param name="publishedUrlProvider">The published URL provider.</param>
+    /// <param name="testDataSettings">The test data settings.</param>
     public SegmentTestController(
         IUmbracoContextAccessor umbracoContextAccessor,
         IUmbracoDatabaseFactory databaseFactory,
@@ -30,7 +47,13 @@ public class SegmentTestController : SurfaceController
         : base(umbracoContextAccessor, databaseFactory, services, appCaches, profilingLogger, publishedUrlProvider) =>
         _testDataSettings = testDataSettings;
 
-    public IActionResult EnableDocTypeSegments(string alias, string propertyTypeAlias)
+    /// <summary>
+    /// Enables segment variation on a document type and a specific property type.
+    /// </summary>
+    /// <param name="alias">The alias of the document type to enable segments on.</param>
+    /// <param name="propertyTypeAlias">The alias of the property type to enable segment variation on.</param>
+    /// <returns>A text response indicating the result of the operation.</returns>
+    public async Task<IActionResult> EnableDocTypeSegments(string alias, string propertyTypeAlias)
     {
         if (_testDataSettings.Value.Enabled != true)
         {
@@ -57,13 +80,23 @@ public class SegmentTestController : SurfaceController
         ct.SetVariesBy(ContentVariation.Segment);
         propType.SetVariesBy(ContentVariation.Segment);
 
-        Services.ContentTypeService.Save(ct);
+        var result = await Services.ContentTypeService.UpdateAsync(ct, Constants.Security.SuperUserKey);
+        if (result.Success is false)
+        {
+            return Content($"Failed to enable segments on document type {alias} and property type {propertyTypeAlias}");
+        }
+
         return Content($"The document type {alias} and property type {propertyTypeAlias} now allows segments");
     }
 
     private IActionResult HttpNotFound() => throw new NotImplementedException();
 
-    public IActionResult DisableDocTypeSegments(string alias)
+    /// <summary>
+    /// Disables segment variation on a document type.
+    /// </summary>
+    /// <param name="alias">The alias of the document type to disable segments on.</param>
+    /// <returns>A text response indicating the result of the operation.</returns>
+    public async Task<IActionResult> DisableDocTypeSegments(string alias)
     {
         if (_testDataSettings.Value.Enabled != true)
         {
@@ -83,10 +116,24 @@ public class SegmentTestController : SurfaceController
 
         ct.SetVariesBy(ContentVariation.Segment, false);
 
-        Services.ContentTypeService.Save(ct);
+        var result = await Services.ContentTypeService.UpdateAsync(ct, Constants.Security.SuperUserKey);
+        if (result.Success is false)
+        {
+            return Content($"Failed to disable segments on document type {alias}.");
+        }
+
         return Content($"The document type {alias} no longer allows segments");
     }
 
+    /// <summary>
+    /// Adds segment-specific data to a content item's property.
+    /// </summary>
+    /// <param name="contentId">The ID of the content item to update.</param>
+    /// <param name="propertyAlias">The alias of the property to set the segment value on.</param>
+    /// <param name="value">The value to set for the segment.</param>
+    /// <param name="segment">The segment identifier.</param>
+    /// <param name="culture">The culture code (optional, required if the content varies by culture).</param>
+    /// <returns>A text response indicating the result of the operation.</returns>
     public ActionResult AddSegmentData(int contentId, string propertyAlias, string value, string segment, string? culture = null)
     {
         var content = Services.ContentService.GetById(contentId);

@@ -284,6 +284,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IDictionaryItemService, DictionaryItemService>();
             Services.AddUnique<IDataTypeContainerService, DataTypeContainerService>();
             Services.AddUnique<IContentTypeContainerService, ContentTypeContainerService>();
+            Services.AddUnique<IContentTypeSchemaService, ContentTypeSchemaService>();
             Services.AddUnique<IMediaTypeContainerService, MediaTypeContainerService>();
             Services.AddUnique<IContentBlueprintContainerService, ContentBlueprintContainerService>();
             Services.AddUnique<IIsoCodeValidator, IsoCodeValidator>();
@@ -430,6 +431,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<ITemporaryFileToXmlImportService, TemporaryFileToXmlImportService>();
             Services.AddUnique<IContentTypeImportService, ContentTypeImportService>();
             Services.AddUnique<IMediaTypeImportService, MediaTypeImportService>();
+            Services.AddUnique<IMemberTypeImportService, MemberTypeImportService>();
 
             // add validation services
             Services.AddUnique<IElementSwitchValidator, ElementSwitchValidator>();

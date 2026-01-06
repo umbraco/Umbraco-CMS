@@ -267,14 +267,14 @@ test('can set culture and hostnames for a specific content with culture and host
   // Act
   await umbracoUi.content.clickActionsMenuForContent(firstDocumentName);
   await umbracoUi.content.clickCultureAndHostnamesActionMenuOption();
-  await umbracoUi.content.clickAddNewDomainButton();
+  await umbracoUi.content.clickAddNewHostnameButton();
   await umbracoUi.content.enterDomain(domainName, 0);
-  await umbracoUi.content.selectDomainLanguageOption(languageName, 0);
+  await umbracoUi.content.selectHostnameLanguageOption(languageName, 0);
   await umbracoUi.content.clickSaveModalButton();
 
   // Assert
   await umbracoUi.content.waitForDomainToBeCreated();
-  await umbracoUi.waitForTimeout(1000); // Wait for the domain to be set
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.medium); // Wait for the domain to be set
   const document = await umbracoApi.document.getByName(firstDocumentName);
   const domains = await umbracoApi.document.getDomains(document.id);
   expect(domains.domains[0].domainName).toEqual(domainName);

@@ -61,6 +61,8 @@ public class TemporaryFileToXmlImportService : ITemporaryFileToXmlImportService
                 => Attempt<UmbracoEntityTypes>.Succeed(UmbracoEntityTypes.DocumentType),
             IEntityXmlSerializer.MediaTypeElementName
                 => Attempt<UmbracoEntityTypes>.Succeed(UmbracoEntityTypes.MediaType),
+            IEntityXmlSerializer.MemberTypeElementName
+                => Attempt<UmbracoEntityTypes>.Succeed(UmbracoEntityTypes.MemberType),
             _ => Attempt<UmbracoEntityTypes>.Fail()
         };
     }

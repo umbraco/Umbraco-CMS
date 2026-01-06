@@ -45,6 +45,7 @@ export class UmbEntityActionListElement extends UmbLitElement {
 		[UmbEntityActionArgs<MetaEntityAction>]
 	>;
 
+	// TODO: Ideally this is provided on a higher level, as in the Tree-item, Workspace, Collection-Row, etc [NL]
 	#entityContext = new UmbEntityContext(this);
 
 	#generateApiArgs() {

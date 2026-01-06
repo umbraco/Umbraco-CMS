@@ -1,8 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Linq;
-using System.Threading;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
@@ -84,5 +82,17 @@ internal sealed class RedirectUrlServiceTests : UmbracoIntegrationTestWithConten
     {
         var redirect = RedirectUrlService.GetMostRecentRedirectUrl(UrlAlt, UnusedCulture);
         Assert.AreEqual(redirect.ContentId, _thirdSubPage.Id);
+    }
+
+    [Test]
+    public void Can_Register_Redirect()
+    {
+        const string TestUrl = "testUrl";
+
+        RedirectUrlService.Register(TestUrl, _firstSubPage.Key);
+
+        var redirect = RedirectUrlService.GetMostRecentRedirectUrl(TestUrl, CultureEnglish);
+
+        Assert.AreEqual(redirect.ContentId, _firstSubPage.Id);
     }
 }

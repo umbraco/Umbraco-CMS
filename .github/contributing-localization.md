@@ -115,7 +115,7 @@ Save the changes and return to the Backoffice to see the update.
 
 
 
-1. Commit your changes to a new temporary branch (avoid committing directly to `contrib`). 
+1. Commit your changes to a new temporary branch (avoid committing directly to `main`). 
 
 2. Push the changes to your fork on GitHub.
 

@@ -5,10 +5,4 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Sysinfo Modal',
 		js: () => import('./components/sysinfo.element.js'),
 	},
-	{
-		type: 'modal',
-		alias: 'Umb.Modal.NewVersion',
-		name: 'New Version Modal',
-		js: () => import('./components/new-version.element.js'),
-	},
 ];

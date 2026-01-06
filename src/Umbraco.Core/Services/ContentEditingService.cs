@@ -62,6 +62,9 @@ internal sealed class ContentEditingService
         _languageService = languageService;
     }
 
+    /// <inheritdoc/>
+    protected override string? RelateParentOnDeleteAlias => Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias;
+
     public Task<IContent?> GetAsync(Guid key)
     {
         IContent? content = ContentService.GetById(key);
@@ -289,7 +292,9 @@ internal sealed class ContentEditingService
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> CopyAsync(Guid key, Guid? parentKey, bool relateToOriginal, bool includeDescendants, Guid userKey)
         => await HandleCopyAsync(key, parentKey, relateToOriginal, includeDescendants, userKey);
 
-    public async Task<ContentEditingOperationStatus> SortAsync(Guid? parentKey, IEnumerable<SortingModel> sortingModels,
+    public async Task<ContentEditingOperationStatus> SortAsync(
+        Guid? parentKey,
+        IEnumerable<SortingModel> sortingModels,
         Guid userKey)
         => await HandleSortAsync(parentKey, sortingModels, userKey);
 
