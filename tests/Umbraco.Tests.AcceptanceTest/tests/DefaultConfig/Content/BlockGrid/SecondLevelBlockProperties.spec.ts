@@ -95,8 +95,8 @@ test('can publish a block grid editor with a block list editor', async ({umbraco
   await umbracoUi.content.clickAddBlockWithNameButton(textStringElementTypeName);
   await umbracoUi.content.clickBlockCardWithName(textStringElementTypeName, true);
   await umbracoUi.content.enterTextstring(textStringValue);
-  await umbracoUi.content.clickCreateForModalWithHeadline('Add ' + textStringElementTypeName);
-  await umbracoUi.content.clickCreateForModalWithHeadline('Add ' + blockListElementTypeName);
+  await umbracoUi.content.clickCreateInModal('Add ' + textStringElementTypeName);
+  await umbracoUi.content.clickCreateInModal('Add ' + blockListElementTypeName);
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
 
   // Assert
@@ -138,8 +138,8 @@ test('can publish a block grid editor with a block grid editor', async ({umbraco
   await umbracoUi.content.clickAddBlockWithNameButton(textStringElementTypeName);
   await umbracoUi.content.clickBlockCardWithName(textStringElementTypeName, true);
   await umbracoUi.content.enterTextstring(textStringValue);
-  await umbracoUi.content.clickCreateForModalWithHeadline('Add ' + textStringElementTypeName);
-  await umbracoUi.content.clickCreateForModalWithHeadline('Add ' + blockGridElementTypeName);
+  await umbracoUi.content.clickCreateInModal('Add ' + textStringElementTypeName);
+  await umbracoUi.content.clickCreateInModal('Add ' + blockGridElementTypeName);
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
 
   // Assert
