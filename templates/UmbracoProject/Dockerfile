@@ -31,7 +31,7 @@ RUN mkdir -p /https && \
       -keyout /https/aspnetcore.key \
       -out /https/aspnetcore.crt \
       -subj "/CN=localhost" \
-      -addext "subjectAltName=DNS:localhost,DNS:myproject" && \
+      -addext "subjectAltName=DNS:localhost" && \
     openssl pkcs12 -export -out /https/aspnetcore.pfx \
       -inkey /https/aspnetcore.key \
       -in /https/aspnetcore.crt \
