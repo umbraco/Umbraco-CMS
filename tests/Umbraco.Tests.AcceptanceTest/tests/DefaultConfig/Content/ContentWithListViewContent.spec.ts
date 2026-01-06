@@ -103,7 +103,7 @@ test('can publish content with a child in the list', async ({umbracoApi, umbraco
 
   // Act
   // Currently necessary
-  await umbracoUi.waitForTimeout(500);
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoUi.content.clickSaveAndPublishButton();
   await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   await umbracoUi.content.goToContentInListViewWithName(childContentName);

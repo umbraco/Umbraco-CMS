@@ -327,7 +327,7 @@ test('can not copy a block from a block grid to a block list without allowed blo
   await umbracoUi.content.doesClipboardContainCopiedBlocksCount(0);
   await umbracoUi.content.clickCloseButton();
 
-  await umbracoUi.waitForTimeout(500);
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   // Checks if the block is visible in the blockGrid
   await umbracoUi.content.clickPasteFromClipboardButtonForProperty(blockGridDataTypeName, blockGridDataTypeName);
   await umbracoUi.content.doesClipboardContainCopiedBlocksCount(1);
