@@ -20,11 +20,17 @@ RUN dotnet publish "UmbracoProject.csproj" -c $BUILD_CONFIGURATION -o /app/publi
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-# We need to make sure that the user running the app has write access to the umbraco folder, in order to write logs and other files.
-# Since these are volumes they are created as root by the docker daemon.
+
+# Install gosu for dropping privileges in entrypoint
 USER root
-RUN mkdir umbraco
-RUN mkdir umbraco/Logs
-RUN chown $APP_UID umbraco --recursive
-USER $APP_UID
-ENTRYPOINT ["dotnet", "UmbracoProject.dll"]
+RUN apt-get update && apt-get install -y --no-install-recommends gosu && rm -rf /var/lib/apt/lists/*
+
+# Copy entrypoint script
+COPY UmbracoProject/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+# Create directories that may be needed (for non-bind-mount volumes)
+RUN mkdir -p umbraco/Logs && chown -R $APP_UID:$APP_UID umbraco
+
+# Run as root initially - entrypoint will fix permissions and drop to APP_UID
+ENTRYPOINT ["/entrypoint.sh"]
