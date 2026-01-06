@@ -111,6 +111,10 @@ export class UmbPickerSearchResultElement extends UmbLitElement {
 			umb-extension-with-api-slot {
 				display: block;
 				margin-bottom: var(--uui-size-3);
+
+				&:last-of-type {
+					margin-bottom: 0;
+				}
 			}
 		`,
 	];

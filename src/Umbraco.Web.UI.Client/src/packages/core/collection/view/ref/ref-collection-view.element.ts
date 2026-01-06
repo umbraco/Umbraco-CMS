@@ -45,6 +45,10 @@ export class UmbRefCollectionViewElement extends UmbCollectionViewElementBase {
 
 			umb-entity-collection-item-ref {
 				margin-bottom: var(--uui-size-4);
+
+				&:last-of-type {
+					margin-bottom: 0;
+				}
 			}
 		`,
 	];
