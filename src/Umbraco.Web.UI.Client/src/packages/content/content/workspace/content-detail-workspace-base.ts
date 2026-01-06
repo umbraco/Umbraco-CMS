@@ -9,6 +9,7 @@ import type { UmbContentCollectionWorkspaceContext } from '../collection/content
 import type { UmbContentWorkspaceContext } from './content-workspace-context.interface.js';
 import { UmbContentDetailValidationPathTranslator } from './content-detail-validation-path-translator.js';
 import { UmbContentValidationToHintsManager } from './content-validation-to-hints.manager.js';
+import { UmbContentDetailWorkspaceTypeTransformController } from './content-detail-workspace-type-transform.controller.js';
 import {
 	appendToFrozenArray,
 	mergeObservables,
@@ -154,6 +155,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	 * @internal
 	 */
 	public readonly languages = this.#languages.asObservable();
+	getLanguages(): Array<UmbLanguageDetailModel> {
+		return this.#languages.getValue();
+	}
 
 	protected readonly _segments = new UmbArrayState<UmbSegmentModel>([], (x) => x.alias);
 
@@ -177,12 +181,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 	#saveModalToken?: UmbModalToken<UmbContentVariantPickerData<VariantOptionModelType>, UmbContentVariantPickerValue>;
 	#contentTypePropertyName: string;
-
-	/**
-	 * Cache of property variation settings to detect changes when structure is updated.
-	 * Used to trigger value migration when properties change from invariant to variant or vice versa.
-	 */
-	#propertyVariationCache = new Map<string, { variesByCulture: boolean; variesBySegment: boolean }>();
 
 	constructor(
 		host: UmbControllerHost,
@@ -227,6 +225,8 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			this.validationContext,
 			this.view.hints,
 		);
+
+		new UmbContentDetailWorkspaceTypeTransformController(this as any);
 
 		this.variantOptions = mergeObservables(
 			[this.variesByCulture, this.variesBySegment, this.variants, this.languages, this._segments.asObservable()],
@@ -381,16 +381,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			this.structure.contentTypeDataTypeUniques,
 			(dataTypeUniques: Array<string>) => {
 				this.#dataTypeItemManager.setUniques(dataTypeUniques);
-			},
-			null,
-		);
-
-		// Observe property variation changes to trigger value migration when properties change
-		// from invariant to variant (or vice versa) via Infinite Editing
-		this.observe(
-			this.structure.contentTypeProperties,
-			(properties: Array<UmbPropertyTypeModel>) => {
-				this.#handlePropertyVariationChanges(properties);
 			},
 			null,
 		);
@@ -1108,67 +1098,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		host: UmbControllerHost,
 		variantId: UmbVariantId,
 	): UmbContentPropertyDatasetContext<DetailModelType, ContentTypeDetailModelType, VariantModelType>;
-
-	/**
-	 * Handles property variation changes when the document type is updated via Infinite Editing.
-	 * When a property's variation setting changes (e.g., from shared/invariant to variant or vice versa),
-	 * this method reloads the document to get properly migrated values from the server.
-	 */
-	#handlePropertyVariationChanges(properties: Array<UmbPropertyTypeModel>): void {
-		// Skip if no current data or if this is initial load
-		const currentData = this._data.getCurrent();
-		if (!currentData || this.#propertyVariationCache.size === 0) {
-			// Initial load - just populate the cache
-			for (const property of properties) {
-				this.#propertyVariationCache.set(property.alias, {
-					variesByCulture: property.variesByCulture,
-					variesBySegment: property.variesBySegment,
-				});
-			}
-			return;
-		}
-
-		// Check for variation setting changes
-		let hasChanges = false;
-		for (const property of properties) {
-			const cached = this.#propertyVariationCache.get(property.alias);
-			if (cached) {
-				if (
-					cached.variesByCulture !== property.variesByCulture ||
-					cached.variesBySegment !== property.variesBySegment
-				) {
-					hasChanges = true;
-				}
-			}
-			// Update cache
-			this.#propertyVariationCache.set(property.alias, {
-				variesByCulture: property.variesByCulture,
-				variesBySegment: property.variesBySegment,
-			});
-		}
-
-		// If variation settings changed, reload to get properly migrated values
-		if (hasChanges) {
-			this.reload();
-		}
-	}
-
-	/**
-	 * Override reload to process incoming data through the value migration pipeline.
-	 * This ensures property values are properly transformed when variation settings change.
-	 */
-	public override async reload(): Promise<void> {
-		const unique = this.getUnique();
-		if (!unique) throw new Error('Unique is not set');
-		const { data } = await this._detailRepository!.requestByUnique(unique);
-
-		if (data) {
-			// Process the data through _processIncomingData to handle value migration
-			const processedData = await this._processIncomingData(data);
-			this._data.setPersisted(processedData);
-			this._data.setCurrent(processedData);
-		}
-	}
 
 	public override destroy(): void {
 		this.structure.destroy();
