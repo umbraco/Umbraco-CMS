@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
+using Umbraco.Cms.Api.Management.ViewModels.Element;
 using Umbraco.Cms.Api.Management.ViewModels.Media;
 using Umbraco.Cms.Api.Management.ViewModels.MediaType;
 using Umbraco.Cms.Api.Management.ViewModels.Member;
@@ -71,5 +72,14 @@ public class ConfigurationPresentationFactory : IConfigurationPresentationFactor
         new()
         {
             ReservedFieldNames = _reservedFieldNamesService.GetMediaReservedFieldNames(),
+        };
+
+    public ElementConfigurationResponseModel CreateElementConfigurationResponseModel() =>
+        new()
+        {
+            DisableDeleteWhenReferenced = _contentSettings.DisableDeleteWhenReferenced,
+            DisableUnpublishWhenReferenced = _contentSettings.DisableUnpublishWhenReferenced,
+            AllowEditInvariantFromNonDefault = _contentSettings.AllowEditInvariantFromNonDefault,
+            AllowNonExistingSegmentsCreation = _segmentSettings.AllowCreation,
         };
 }
