@@ -21,12 +21,11 @@ test('can create a data type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) 
   await umbracoUi.dataType.enterDataTypeName(dataTypeName);
   await umbracoUi.dataType.clickSelectAPropertyEditorButton();
   await umbracoUi.dataType.selectAPropertyEditor('Text Box');
-  await umbracoUi.dataType.clickSaveButton();
+  const dataTypeId = await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeCreated();
 
   // Assert
-  await umbracoUi.dataType.waitForDataTypeToBeCreated();
+  expect(await umbracoApi.dataType.doesExist(dataTypeId)).toBe(true);
   await umbracoUi.dataType.isDataTypeTreeItemVisible(dataTypeName);
-  expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeTruthy();
 });
 
 test('can rename a data type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
@@ -39,10 +38,9 @@ test('can rename a data type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) 
   // Act
   await umbracoUi.dataType.goToDataType(wrongDataTypeName);
   await umbracoUi.dataType.enterDataTypeName(dataTypeName);
-  await umbracoUi.dataType.clickSaveButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   await umbracoUi.dataType.isDataTypeTreeItemVisible(dataTypeName);
   expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeTruthy();
   expect(await umbracoApi.dataType.doesNameExist(wrongDataTypeName)).toBeFalsy();
@@ -55,10 +53,9 @@ test('can delete a data type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) 
 
   // Act
   await umbracoUi.dataType.clickRootFolderCaretButton();
-  await umbracoUi.dataType.deleteDataType(dataTypeName);
+  await umbracoUi.dataType.deleteDataTypeAndWaitForDataTypeToBeDeleted(dataTypeName);
 
   // Assert
-  await umbracoUi.dataType.waitForDataTypeToBeDeleted();
   await umbracoUi.dataType.isDataTypeTreeItemVisible(dataTypeName, false);
   expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeFalsy();
 });
@@ -77,10 +74,9 @@ test('can change property editor in a data type', {tag: '@smoke'}, async ({umbra
   await umbracoUi.dataType.goToDataType(dataTypeName);
   await umbracoUi.dataType.clickChangeButton();
   await umbracoUi.dataType.selectAPropertyEditor(updatedEditorName);
-  await umbracoUi.dataType.clickSaveButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeTruthy();
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   expect(dataTypeData.editorAlias).toBe(updatedEditorAlias);
@@ -112,9 +108,8 @@ test('can change settings', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => 
   // Act
   await umbracoUi.dataType.goToDataType(dataTypeName);
   await umbracoUi.dataType.enterMaximumAllowedCharactersValue(maxCharsValue.toString());
-  await umbracoUi.dataType.clickSaveButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(dataTypeName, 'maxChars', maxCharsValue)).toBeTruthy();
 });

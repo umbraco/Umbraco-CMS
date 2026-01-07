@@ -31,10 +31,9 @@ test('can add crop', async ({umbracoApi, umbracoUi}) => {
     cropObject.height.toString()
   );
   await umbracoUi.dataType.clickCreateCropButton();
-  await umbracoUi.dataType.clickSaveButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesDataTypeHaveCrops(customDataTypeName, cropObject.label, cropObject.alias, cropObject.width, cropObject.height)).toBeTruthy();
 });
 
@@ -55,10 +54,9 @@ test('can edit crop', async ({umbracoApi, umbracoUi}) => {
     updatedCropObject.height.toString()
   );
   await umbracoUi.dataType.clickEditCropButton();
-  await umbracoUi.dataType.clickSaveButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesDataTypeHaveCrops(customDataTypeName, updatedCropObject.label, updatedCropObject.alias, updatedCropObject.width, updatedCropObject.height)).toBeTruthy();
   expect(await umbracoApi.dataType.doesDataTypeHaveCrops(customDataTypeName, cropObject.label, cropObject.alias, cropObject.width, cropObject.height)).toBeFalsy();
 });
@@ -71,10 +69,9 @@ test('can delete crop', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.dataType.removeCropByAlias(cropObject.alias);
-  await umbracoUi.dataType.clickSaveButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesDataTypeHaveCrops(customDataTypeName, cropObject.label, cropObject.alias, cropObject.width, cropObject.height)).toBeFalsy();
 });
 
