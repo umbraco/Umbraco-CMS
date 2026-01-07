@@ -42,6 +42,10 @@ RUN mkdir -p /https && \
 COPY UmbracoProject/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
+# Make APP_UID available at runtime (inherits from .NET base image ARG)
+ARG APP_UID
+ENV APP_UID=${APP_UID}
+
 # Create Umbraco directories as a fallback so they exist, and can be chowned by the entrypoint, for both bind-mounted and regular volumes
 RUN mkdir -p umbraco/Logs && chown -R $APP_UID:$APP_UID umbraco
 
