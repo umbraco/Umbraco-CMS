@@ -28,10 +28,10 @@ public static class UmbracoBuilderApiExtensions
         builder.Services.AddOptions<UmbracoOpenApiOptions>()
             .Configure<IHostingEnvironment, IWebHostEnvironment>((options, hostingEnv, webHostEnv) =>
             {
-                var backOfficePath = hostingEnv.GetBackOfficePath().TrimStart(Constants.CharArrays.ForwardSlash);
                 options.Enabled = webHostEnv.IsProduction() is false;
-                options.RouteTemplate = $"{backOfficePath}/swagger/{{documentName}}/swagger.json";
-                options.UiRoutePrefix = $"{backOfficePath}/swagger";
+                var backOfficePath = hostingEnv.GetBackOfficePath().TrimStart(Constants.CharArrays.ForwardSlash);
+                options.RouteTemplate = $"{backOfficePath}/openapi/{{documentName}}.json";
+                options.UiRoutePrefix = $"{backOfficePath}/openapi";
             });
         builder.Services.AddUmbracoApi<ConfigureDefaultApiOptions>(DefaultApiConfiguration.ApiName, "Default API");
         builder.Services.AddSingleton<IUmbracoJsonTypeInfoResolver, UmbracoJsonTypeInfoResolver>();

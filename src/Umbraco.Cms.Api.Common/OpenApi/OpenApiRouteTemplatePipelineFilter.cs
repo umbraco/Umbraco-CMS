@@ -17,12 +17,12 @@ public class OpenApiRouteTemplatePipelineFilter : UmbracoPipelineFilter
         PreMapEndpoints = OnPreMapEndpointsAction;
     }
 
-    private void PostPipelineAction(IApplicationBuilder applicationBuilder)
+    private static void PostPipelineAction(IApplicationBuilder applicationBuilder)
     {
         UmbracoOpenApiOptions options = applicationBuilder.ApplicationServices
             .GetRequiredService<IOptions<UmbracoOpenApiOptions>>().Value;
 
-        if (options.Enabled is false)
+        if (options.Enabled is false || options.DefaultUiEnabled is false)
         {
             return;
         }
@@ -30,7 +30,7 @@ public class OpenApiRouteTemplatePipelineFilter : UmbracoPipelineFilter
         applicationBuilder.UseSwaggerUI(swaggerUiOptions => ConfigureSwaggerUi(swaggerUiOptions, options));
     }
 
-    private void OnPreMapEndpointsAction(IEndpointRouteBuilder endpoints)
+    private static void OnPreMapEndpointsAction(IEndpointRouteBuilder endpoints)
     {
         UmbracoOpenApiOptions options = endpoints.ServiceProvider
             .GetRequiredService<IOptions<UmbracoOpenApiOptions>>().Value;
@@ -51,7 +51,7 @@ public class OpenApiRouteTemplatePipelineFilter : UmbracoPipelineFilter
         swaggerUiOptions.ConfigObject.PersistAuthorization = true; // persists authorization data so it would not be lost on browser close/refresh
         swaggerUiOptions.ConfigObject.Filter = string.Empty; // Enable the filter with an empty string as default filter.
 
-        swaggerUiOptions.OAuthClientId(Constants.OAuthClientIds.Swagger);
+        swaggerUiOptions.OAuthClientId(Constants.OAuthClientIds.OpenApiUi);
         swaggerUiOptions.OAuthUsePkce();
     }
 }
