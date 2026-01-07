@@ -39,10 +39,15 @@ public interface IContentTypeComposition : IContentTypeBase
     /// </summary>
     /// <param name="contentType"><see cref="IContentType" /> to add</param>
     /// <param name="removedPropertyTypeAliases">
-    /// Aliases of property types that are to be removed in the current update operation.
-    /// It's OK if the composition has property type aliases that clash with these.
+    /// Aliases of property types that are being removed from the current content type in this update operation.
+    /// The composition is allowed to have properties with these aliases since they won't conflict.
     /// </param>
     /// <returns>True if ContentType was added, otherwise returns False</returns>
+    /// <remarks>
+    ///     The default implementation of this overload ignores <paramref name="removedPropertyTypeAliases" />
+    ///     and simply calls <see cref="AddContentType(IContentTypeComposition?)" />. Implementations that need to
+    ///     respect removed property type aliases must override this method.
+    /// </remarks>
     // TODO (V18): Remove the default implementation.
     bool AddContentType(IContentTypeComposition contentType, string[] removedPropertyTypeAliases) => AddContentType(contentType);
 

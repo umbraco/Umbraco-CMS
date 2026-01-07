@@ -119,7 +119,6 @@ public abstract class ContentTypeCompositionBase : ContentTypeBase, IContentType
         return AddContentType(contentType, []);
     }
 
-
     /// <inheritdoc />
     public bool AddContentType(IContentTypeComposition contentType, string[] removedPropertyTypeAliases)
     {
