@@ -5,7 +5,6 @@ const dataTypeName = 'List View - Media';
 let dataTypeDefaultData = null;
 const firstMediaFileName = 'FirstMediaFile';
 const secondMediaFileName = 'SecondMediaFile';
-
 test.beforeEach(async ({umbracoUi, umbracoApi}) => {
   dataTypeDefaultData = await umbracoApi.dataType.getByName(dataTypeName);
   await umbracoApi.media.ensureNameNotExists(firstMediaFileName);
@@ -102,10 +101,9 @@ test('can allow bulk trash in the media section', {tag: '@release'}, async ({umb
   await umbracoUi.media.selectMediaWithName(firstMediaFileName);
   await umbracoUi.media.selectMediaWithName(secondMediaFileName);
   await umbracoUi.media.clickBulkTrashButton();
-  await umbracoUi.media.clickConfirmTrashButton();
+  await umbracoUi.media.clickConfirmTrashButtonAndWaitForMediaToBeTrashed();
 
   // Assert
-  await umbracoUi.media.waitForMediaToBeTrashed();
   expect(await umbracoApi.media.doesNameExist(firstMediaFileName)).toBeFalsy();
   expect(await umbracoApi.media.doesNameExist(secondMediaFileName)).toBeFalsy();
   expect(await umbracoApi.media.doesMediaItemExistInRecycleBin(firstMediaFileName)).toBeTruthy();
@@ -126,13 +124,11 @@ test('can allow bulk move in the media section', async ({umbracoApi, umbracoUi})
   await umbracoUi.media.selectMediaWithName(secondMediaFileName);
   await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoUi.media.clickBulkMoveToButton();
-  await umbracoUi.media.openCaretButtonForName('Media');
+  await umbracoUi.media.openCaretButtonForName('Media', true);
   await umbracoUi.media.clickModalTextByName(mediaFolderName);
-  await umbracoUi.media.clickChooseModalButton();
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
+  await umbracoUi.media.clickChooseModalButtonAndWaitForMediaItemsToBeMoved(2);
 
   // Assert
-  await umbracoUi.media.waitForMediaToBeMoved();
   expect(await umbracoApi.media.doesMediaItemHaveChildName(mediaFolderId, firstMediaFileName)).toBeTruthy();
   expect(await umbracoApi.media.doesMediaItemHaveChildName(mediaFolderId, secondMediaFileName)).toBeTruthy();
 
