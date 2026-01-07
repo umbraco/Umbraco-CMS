@@ -2348,8 +2348,15 @@ internal sealed class DatabaseDataCreator
 
     private void ConditionalInsert<TDto>(string configKey, string id, TDto dto)
     {
-        var alwaysInsert = _entitiesToAlwaysCreate.ContainsKey(configKey) &&
-                           _entitiesToAlwaysCreate[configKey].InvariantContains(id);
+
+        // var alwaysInsert = _entitiesToAlwaysCreate.ContainsKey(configKey) &&
+        //                   _entitiesToAlwaysCreate[configKey].InvariantContains(id);
+        // copilot rewrite:
+        var alwaysInsert = false;
+        if (_entitiesToAlwaysCreate.TryGetValue(configKey, out IList<string>? alwaysCreateIds))
+        {
+            alwaysInsert = alwaysCreateIds.InvariantContains(id);
+        }
 
         InstallDefaultDataSettings installDefaultDataSettings = _installDefaultDataSettings.Get(configKey);
 
@@ -2412,12 +2419,9 @@ internal sealed class DatabaseDataCreator
             {
                 autoIncrement = false;
             }
-            else if (primaryColumnValues.FirstOrDefault() is int primaryKeyValue)
+            else if (primaryColumnValues.FirstOrDefault() is int)
             {
-                //if (primaryKeyValue < 0)
-                //{
                 autoIncrement = false;
-                //}
             }
         }
 
