@@ -531,20 +531,20 @@ test.describe('manual tab validation tests', () => {
   });
 
   test('cannot update content with empty manual url and anchor', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  await umbracoApi.document.createDocumentWithExternalLinkURLPicker(contentName, documentTypeId, link, linkTitle);
-  await umbracoUi.goToBackOffice();
-  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+    // Arrange
+    await umbracoApi.document.createDocumentWithExternalLinkURLPicker(contentName, documentTypeId, link, linkTitle);
+    await umbracoUi.goToBackOffice();
+    await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
-  // Act
-  await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.clickLinkWithName(linkTitle);
-  await umbracoUi.content.enterLink('');
-  await umbracoUi.content.enterAnchorOrQuerystring('');
-  await umbracoUi.content.clickUpdateButton();
+    // Act
+    await umbracoUi.content.goToContentWithName(contentName);
+    await umbracoUi.content.clickLinkWithName(linkTitle);
+    await umbracoUi.content.enterLink('');
+    await umbracoUi.content.enterAnchorOrQuerystring('');
+    await umbracoUi.content.clickUpdateButton();
 
-  // Assert
-  await umbracoUi.content.doesPropertyWithNameContainValidationMessage(manualPropertyName, ConstantHelper.validationMessages.emptyManualLinkPicker);
-  await umbracoUi.content.doesPropertyWithNameContainValidationMessage(anchorOrQuerystringPropertyName, ConstantHelper.validationMessages.emptyManualLinkPicker);
-});
+    // Assert
+    await umbracoUi.content.doesPropertyWithNameContainValidationMessage(manualPropertyName, ConstantHelper.validationMessages.emptyManualLinkPicker);
+    await umbracoUi.content.doesPropertyWithNameContainValidationMessage(anchorOrQuerystringPropertyName, ConstantHelper.validationMessages.emptyManualLinkPicker);
+  });
 });
