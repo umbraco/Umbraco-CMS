@@ -38,6 +38,9 @@ import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
 
 import '../../components/block-list-entry/index.js';
 
+// Default assumption when we can't determine if block has properties
+const DEFAULT_BLOCK_HAS_PROPERTIES = true;
+
 const SORTER_CONFIG: UmbSorterConfig<UmbBlockListLayoutModel, UmbBlockListEntryElement> = {
 	getUniqueOfElement: (element) => {
 		return element.contentKey!;
@@ -318,27 +321,30 @@ export class UmbPropertyEditorUIBlockListElement
 
 		this.observe(
 			this.#managerContext.blockTypes,
-			async (blockTypes) => {
+			(blockTypes) => {
 				this._blocks = blockTypes;
 
 				// Check if single block type has properties
 				if (blockTypes.length === 1) {
 					const elementKey = blockTypes[0].contentElementTypeKey;
-					await this.#managerContext.contentTypesLoaded;
-					const structure = this.#managerContext.getStructure(elementKey);
 
-					if (structure) {
-						this.observe(
-							structure.contentTypeHasProperties,
-							(hasProperties) => {
-								this._singleBlockTypeHasProperties = hasProperties ?? true;
-							},
-							'observeSingleBlockTypeHasProperties',
-						);
-					} else {
-						// If we can't get the structure, assume it has properties (safe default)
-						this._singleBlockTypeHasProperties = true;
-					}
+					// Wait for content types to be loaded before checking structure
+					this.#managerContext.contentTypesLoaded.then(() => {
+						const structure = this.#managerContext.getStructure(elementKey);
+
+						if (structure) {
+							this.observe(
+								structure.contentTypeHasProperties,
+								(hasProperties) => {
+									this._singleBlockTypeHasProperties = hasProperties ?? DEFAULT_BLOCK_HAS_PROPERTIES;
+								},
+								'observeSingleBlockTypeHasProperties',
+							);
+						} else {
+							// If we can't get the structure, assume it has properties (safe default)
+							this._singleBlockTypeHasProperties = DEFAULT_BLOCK_HAS_PROPERTIES;
+						}
+					});
 				} else {
 					// Not a single block type scenario, clear the state
 					this._singleBlockTypeHasProperties = undefined;

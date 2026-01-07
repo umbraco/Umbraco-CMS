@@ -35,6 +35,9 @@ import {
 	type UmbBlockDataModel,
 } from '@umbraco-cms/backoffice/block';
 
+// Default assumption when we can't determine if block has properties
+const DEFAULT_BLOCK_HAS_PROPERTIES = true;
+
 interface UmbBlockGridAreaTypeInvalidRuleType {
 	groupKey?: string;
 	key?: string;
@@ -413,7 +416,7 @@ export class UmbBlockGridEntriesContext
 		// Observe allowed block types to check if single type has properties
 		this.observe(
 			this.allowedBlockTypes,
-			async (blockTypes) => {
+			(blockTypes) => {
 				if (blockTypes.length === 1) {
 					const elementKey = blockTypes[0].contentElementTypeKey;
 					const structure = this._manager?.getStructure(elementKey);
@@ -422,13 +425,13 @@ export class UmbBlockGridEntriesContext
 						this.observe(
 							structure.contentTypeHasProperties,
 							(hasProperties) => {
-								this.#singleBlockTypeHasProperties.setValue(hasProperties ?? true);
+								this.#singleBlockTypeHasProperties.setValue(hasProperties ?? DEFAULT_BLOCK_HAS_PROPERTIES);
 							},
 							'observeSingleBlockTypeHasProperties',
 						);
 					} else {
 						// If we can't get the structure, assume it has properties (safe default)
-						this.#singleBlockTypeHasProperties.setValue(true);
+						this.#singleBlockTypeHasProperties.setValue(DEFAULT_BLOCK_HAS_PROPERTIES);
 					}
 				} else {
 					// Not a single block type scenario, clear the state
