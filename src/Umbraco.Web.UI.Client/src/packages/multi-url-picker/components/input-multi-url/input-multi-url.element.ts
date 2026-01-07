@@ -385,7 +385,7 @@ export class UmbInputMultiUrlElement extends UmbFormControlMixin<string, typeof 
 	#renderItems() {
 		if (!this.urls) return;
 		return html`
-			<uui-ref-list>
+			<uui-ref-list class=${this.urls.length === 0 ? 'empty' : ''}>
 				${repeat(
 					this.urls,
 					(link) => link.unique,
@@ -427,6 +427,10 @@ export class UmbInputMultiUrlElement extends UmbFormControlMixin<string, typeof 
 		css`
 			#btn-add {
 				width: 100%;
+			}
+
+			uui-ref-list.empty {
+				min-height: var(--uui-size-layout-1);
 			}
 		`,
 	];
