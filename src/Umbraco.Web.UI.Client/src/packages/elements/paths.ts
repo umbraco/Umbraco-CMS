@@ -12,7 +12,8 @@ export const UMB_ELEMENT_WORKSPACE_PATH = UMB_WORKSPACE_PATH_PATTERN.generateAbs
 export const UMB_CREATE_ELEMENT_WORKSPACE_PATH_PATTERN = new UmbPathPattern<{
 	parentEntityType: UmbElementEntityTypeUnion;
 	parentUnique?: string | null;
-}>('create/parent/:parentEntityType/:parentUnique', UMB_ELEMENT_WORKSPACE_PATH);
+	documentTypeUnique: string;
+}>('create/parent/:parentEntityType/:parentUnique/:documentTypeUnique', UMB_ELEMENT_WORKSPACE_PATH);
 
 export const UMB_EDIT_ELEMENT_WORKSPACE_PATH_PATTERN = new UmbPathPattern<{ unique: string }>(
 	'edit/:unique',
