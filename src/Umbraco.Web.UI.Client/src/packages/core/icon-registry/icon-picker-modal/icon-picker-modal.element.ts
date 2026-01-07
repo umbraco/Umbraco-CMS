@@ -81,8 +81,7 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 		return html`
 			<umb-body-layout headline=${this.localize.term('defaultdialogs_selectIcon')}>
 				<div id="container">
-					${this.renderSearch()}
-					${this.renderColors()}
+					${this.renderSearch()} ${this.renderColors()}
 					<uui-scroll-container id="icons">
 						${this.data?.showEmptyOption && !this._isSearching
 							? html`
@@ -137,21 +136,18 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 						value=${ifDefined(this.value.color)}
 						label=${this.localize.term('defaultdialogs_colorSwitcher')}
 						@change=${this.#onColorChange}>
-						${
-							this._colorList.map(
-								(color) => html`
-									<uui-color-swatch
-										label=${this.localize.term('colors_' + toCamelCase(color.alias))}
-										title=${this.localize.term('colors_' + toCamelCase(color.alias))}
-										value=${color.alias}
-										style="--uui-swatch-color: var(${color.varName})">
-									</uui-color-swatch>
-								`,
-							)
-						}
+						${this._colorList.map(
+							(color) => html`
+								<uui-color-swatch
+									label=${this.localize.term('colors_' + toCamelCase(color.alias))}
+									title=${this.localize.term('colors_' + toCamelCase(color.alias))}
+									value=${color.alias}
+									style="--uui-swatch-color: var(${color.varName})">
+								</uui-color-swatch>
+							`,
+						)}
 					</uui-color-swatches>
-					<hr />
-			`;
+					<hr /> `;
 	}
 
 	renderIcons() {
