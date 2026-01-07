@@ -94,7 +94,7 @@ internal sealed class UserIdKeyResolver : IUserIdKeyResolver
     {
         // The super-user Id and key is known, so we don't need a look-up here.
 #pragma warning disable CS0618 // Type or member is obsolete
-        if (id == Constants.Security.SuperUserId)
+        if (id is Constants.Security.SuperUserId)
 #pragma warning restore CS0618 // Type or member is obsolete
         {
             return Attempt.Succeed(Constants.Security.SuperUserKey);
