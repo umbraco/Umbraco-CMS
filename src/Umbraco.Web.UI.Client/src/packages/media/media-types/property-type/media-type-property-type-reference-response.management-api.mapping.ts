@@ -1,6 +1,6 @@
 import type { UmbMediaTypePropertyTypeReferenceModel } from './types.js';
 import { UMB_MEDIA_TYPE_PROPERTY_TYPE_ENTITY_TYPE } from './entity.js';
-import type { MediaTypePropertyTypeReferenceResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { IReferenceResponseModelMediaTypePropertyTypeReferenceResponseModel as MediaTypePropertyTypeReferenceResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbDataSourceDataMapping } from '@umbraco-cms/backoffice/repository';
 
