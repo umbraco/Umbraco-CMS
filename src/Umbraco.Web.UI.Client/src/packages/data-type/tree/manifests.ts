@@ -5,6 +5,7 @@ import {
 	UMB_DATA_TYPE_TREE_REPOSITORY_ALIAS,
 	UMB_DATA_TYPE_TREE_STORE_ALIAS,
 } from './constants.js';
+import { UmbDataTypeTreeStore } from './data-type-tree.store.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -17,7 +18,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'treeStore',
 		alias: UMB_DATA_TYPE_TREE_STORE_ALIAS,
 		name: 'Data Type Tree Store',
-		api: () => import('./data-type-tree.store.js'),
+		api: UmbDataTypeTreeStore,
 	},
 	{
 		type: 'tree',

@@ -95,6 +95,7 @@ tools/docfx/
 /tests/Umbraco.Tests.Integration/[Uu]mbraco/[Ll]ogs/
 /tests/Umbraco.Tests.Integration/Views/
 /tests/Umbraco.Tests.UnitTests/[Uu]mbraco/[Dd]ata/TEMP/
+/BenchmarkDotNet.Artifacts/
 
 # Ignore auto-generated schema
 /src/Umbraco.Cms.Targets/tasks/

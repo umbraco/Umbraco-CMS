@@ -44,7 +44,7 @@ public class LogProfiler : IProfiler
         private readonly Action<long> _callback;
         private readonly Stopwatch _stopwatch = Stopwatch.StartNew();
 
-        protected internal LightDisposableTimer(Action<long> callback)
+        internal LightDisposableTimer(Action<long> callback)
         {
             _callback = callback ?? throw new ArgumentNullException(nameof(callback));
         }

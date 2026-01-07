@@ -123,10 +123,10 @@ test('can update property value nested in a block grid area with an RTE with a b
   // Checks if the textstring block has the correct value after reloading the page
   await umbracoUi.reloadPage();
   // Waits to make sure the page has loaded
-  await umbracoUi.waitForTimeout(2000);
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.long);
   await umbracoUi.content.clickBlockElementInRTEWithName(blockListElementTypeName);
   // Needs to wait to make sure it has loaded
-  await umbracoUi.waitForTimeout(2000);
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.long);
   await umbracoUi.content.clickEditBlockListEntryWithName(textStringElementTypeName);
   await umbracoUi.content.doesPropertyContainValue(textStringElementDataTypeName, correctPropertyValue);
 });

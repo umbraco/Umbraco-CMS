@@ -20,7 +20,9 @@ public sealed class ContentTypeIndexingNotificationHandler : INotificationHandle
 
     public ContentTypeIndexingNotificationHandler(
         IUmbracoIndexingHandler umbracoIndexingHandler,
-        IContentService contentService, IMemberService memberService, IMediaService mediaService,
+        IContentService contentService,
+        IMemberService memberService,
+        IMediaService mediaService,
         IMemberTypeService memberTypeService)
     {
         _umbracoIndexingHandler =
@@ -117,7 +119,11 @@ public sealed class ContentTypeIndexingNotificationHandler : INotificationHandle
             while (page * pageSize < total)
             {
                 IEnumerable<IMember> memberToRefresh = _memberService.GetAll(
-                    page * pageSize, pageSize, out total, "LoginName", Direction.Ascending,
+                    page * pageSize,
+                    pageSize,
+                    out total,
+                    "LoginName",
+                    Direction.Ascending,
                     memberType.Alias);
 
                 foreach (IMember c in memberToRefresh)
@@ -141,7 +147,10 @@ public sealed class ContentTypeIndexingNotificationHandler : INotificationHandle
 
                 // Re-index all content of these types
                 mediaTypeIds,
-                page++, pageSize, out total, null,
+                page++,
+                pageSize,
+                out total,
+                null,
                 Ordering.By("Path"));
 
             foreach (IMedia c in mediaToRefresh)
@@ -162,7 +171,10 @@ public sealed class ContentTypeIndexingNotificationHandler : INotificationHandle
 
                 // Re-index all content of these types
                 contentTypeIds,
-                page++, pageSize, out total, null,
+                page++,
+                pageSize,
+                out total,
+                null,
 
                 // order by shallowest to deepest, this allows us to check it's published state without checking every item
                 Ordering.By("Path"));
