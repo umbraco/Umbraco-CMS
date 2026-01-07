@@ -1,21 +1,42 @@
-import { UMB_ELEMENT_TREE_ALIAS, UMB_ELEMENT_TREE_REPOSITORY_ALIAS } from './constants.js';
+import { UMB_ELEMENT_ENTITY_TYPE, UMB_ELEMENT_ROOT_ENTITY_TYPE } from '../entity.js';
 import { manifests as folderManifests } from './folder/manifests.js';
+import { UMB_ELEMENT_TREE_ALIAS, UMB_ELEMENT_TREE_REPOSITORY_ALIAS } from './constants.js';
+import type { ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestTree, ManifestTreeItem } from '@umbraco-cms/backoffice/tree';
 
-export const manifests: Array<UmbExtensionManifest> = [
+const repository: ManifestRepository = {
+	type: 'repository',
+	alias: UMB_ELEMENT_TREE_REPOSITORY_ALIAS,
+	name: 'Element Tree Repository',
+	api: () => import('./element-tree.repository.js'),
+};
+
+const tree: ManifestTree = {
+	type: 'tree',
+	kind: 'default',
+	alias: UMB_ELEMENT_TREE_ALIAS,
+	name: 'Element Tree',
+	meta: {
+		repositoryAlias: UMB_ELEMENT_TREE_REPOSITORY_ALIAS,
+	},
+};
+
+const treeItems: Array<ManifestTreeItem> = [
 	{
-		type: 'repository',
-		alias: UMB_ELEMENT_TREE_REPOSITORY_ALIAS,
-		name: 'Element Tree Repository',
-		api: () => import('./element-tree.repository.js'),
+		type: 'treeItem',
+		alias: 'Umb.TreeItem.Element',
+		name: 'Element Tree Item',
+		element: () => import('./tree-item/element-tree-item.element.js'),
+		api: () => import('./tree-item/element-tree-item.context.js'),
+		forEntityTypes: [UMB_ELEMENT_ENTITY_TYPE],
 	},
 	{
-		type: 'tree',
+		type: 'treeItem',
 		kind: 'default',
-		alias: UMB_ELEMENT_TREE_ALIAS,
-		name: 'Element Tree',
-		meta: {
-			repositoryAlias: UMB_ELEMENT_TREE_REPOSITORY_ALIAS,
-		},
+		alias: 'Umb.TreeItem.Element.Root',
+		name: 'Element Tree Root',
+		forEntityTypes: [UMB_ELEMENT_ROOT_ENTITY_TYPE],
 	},
-	...folderManifests,
 ];
+
+export const manifests: Array<UmbExtensionManifest> = [...folderManifests, repository, tree, ...treeItems];

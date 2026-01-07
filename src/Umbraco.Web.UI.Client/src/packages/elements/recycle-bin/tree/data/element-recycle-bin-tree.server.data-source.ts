@@ -65,7 +65,8 @@ const mapper = (item: ElementRecycleBinItemResponseModel): UmbElementRecycleBinT
 			entityType: item.parent ? UMB_ELEMENT_ENTITY_TYPE : UMB_ELEMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE,
 		},
 		entityType: UMB_ELEMENT_ENTITY_TYPE,
-		//isTrashed: true,
+		icon: item.documentType!.icon,
+		isTrashed: true,
 		hasChildren: item.hasChildren,
 		//isProtected: false,
 		documentType: {

@@ -5,6 +5,7 @@ import type { UmbTreeItemModel, UmbTreeRootModel } from '@umbraco-cms/backoffice
 
 export interface UmbElementTreeItemModel extends UmbTreeItemModel {
 	entityType: UmbElementEntityType | UmbElementFolderEntityType;
+	isTrashed: boolean;
 	documentType: {
 		unique: string;
 		icon: string;
