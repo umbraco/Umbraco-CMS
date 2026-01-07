@@ -41,10 +41,9 @@ test('can create content with the document link', {tag: '@release'}, async ({umb
   await umbracoUi.content.selectLinkByName(linkedDocumentName);
   await umbracoUi.content.clickChooseModalButton();
   await umbracoUi.content.clickAddButton();
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -81,13 +80,12 @@ test('can publish content with the document link', async ({umbracoApi, umbracoUi
   await umbracoUi.content.clickAddMultiURLPickerButton();
   await umbracoUi.content.clickDocumentLinkButton();
   await umbracoUi.content.selectLinkByName(linkedDocumentName);
-  await umbracoUi.waitForTimeout(500); // Wait for the document link to be selected
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short); // Wait for the document link to be selected
   await umbracoUi.content.clickButtonWithName('Choose');
   await umbracoUi.content.clickAddButton();
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -119,10 +117,9 @@ test('can create content with the external link', async ({umbracoApi, umbracoUi}
   await umbracoUi.content.enterLink(link);
   await umbracoUi.content.enterLinkTitle(linkTitle);
   await umbracoUi.content.clickAddButton();
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
@@ -152,10 +149,9 @@ test('can create content with the media link', async ({umbracoApi, umbracoUi}) =
   await umbracoUi.content.selectMediaWithName(mediaFileName);
   await umbracoUi.content.clickChooseModalButton();
   await umbracoUi.content.clickAddButton();
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
@@ -189,17 +185,16 @@ test('can add multiple links in the content', {tag: '@release'}, async ({umbraco
   await umbracoUi.content.selectMediaWithName(mediaFileName);
   await umbracoUi.content.clickChooseModalButton();
   await umbracoUi.content.clickAddButton();
-  await umbracoUi.waitForTimeout(500); // Wait for the media link to be added
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short); // Wait for the media link to be added
   // Add external link
   await umbracoUi.content.clickAddMultiURLPickerButton();
   await umbracoUi.content.clickManualLinkButton();
   await umbracoUi.content.enterLink(link);
   await umbracoUi.content.enterLinkTitle(linkTitle);
   await umbracoUi.content.clickAddButton();
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
@@ -230,10 +225,9 @@ test('can remove the URL picker in the content', async ({umbracoApi, umbracoUi})
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.removeUrlPickerByName(linkTitle);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values).toEqual([]);
@@ -253,10 +247,9 @@ test('can edit the URL picker in the content', async ({umbracoApi, umbracoUi}) =
   await umbracoUi.content.clickLinkWithName(linkTitle);
   await umbracoUi.content.enterLinkTitle(updatedLinkTitle);
   await umbracoUi.content.clickUpdateButton();
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
@@ -377,10 +370,9 @@ test('can create content with the link to an unpublished document', async ({umbr
   await umbracoUi.content.selectLinkByName(linkedDocumentName);
   await umbracoUi.content.clickButtonWithName('Choose');
   await umbracoUi.content.clickAddButton();
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);

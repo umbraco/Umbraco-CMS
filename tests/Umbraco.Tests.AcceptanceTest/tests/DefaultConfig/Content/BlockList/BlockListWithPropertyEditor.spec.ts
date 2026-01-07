@@ -53,10 +53,9 @@ test('cannot publish a block list with a mandatory radiobox without a value', as
   await umbracoUi.content.chooseRadioboxOption(optionValues[0]);
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.emptyValue, false);
   await umbracoUi.content.clickCreateModalButton();
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   expect(await umbracoApi.document.isDocumentPublished(contentId)).toBeTruthy();
 });
 
@@ -82,10 +81,9 @@ test('cannot publish a block list with a mandatory checkbox list without a value
   await umbracoUi.content.chooseCheckboxListOption(optionValues[0]);
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.emptyValue, false);
   await umbracoUi.content.clickCreateModalButton();
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   expect(await umbracoApi.document.isDocumentPublished(contentId)).toBeTruthy();
 });
 
@@ -111,10 +109,9 @@ test('cannot publish a block list with a mandatory dropdown without a value', as
   await umbracoUi.content.chooseDropdownOption([optionValues[0]]);
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.emptyValue, false);
   await umbracoUi.content.clickCreateModalButton();
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   expect(await umbracoApi.document.isDocumentPublished(contentId)).toBeTruthy();
 });
 
@@ -144,7 +141,7 @@ test('cannot update a variant block list with invalid text', {tag: '@release'}, 
   await umbracoUi.content.clickBlockElementWithName(blockName);
   // Enter text in the textstring block that won't match regex
   await umbracoUi.content.enterPropertyValue(textStringElementDataTypeName, wrongPropertyValue);
-  await umbracoUi.content.clickCreateModalButton();
+  await umbracoUi.content.clickCreateBlockModalButtonAndWaitForModalToClose();
   await umbracoUi.content.clickSaveButtonForContent();
   await umbracoUi.content.clickSaveButton();
   // Verify that the block list entry has an invalid badge
@@ -153,9 +150,9 @@ test('cannot update a variant block list with invalid text', {tag: '@release'}, 
   await umbracoUi.content.doesModalFormValidationMessageContainText(ConstantHelper.validationMessages.invalidValue);
   // Update the textstring block with a valid email address
   await umbracoUi.content.enterPropertyValue(textStringElementDataTypeName, correctPropertyValue);
-  await umbracoUi.content.clickUpdateButton();
+  await umbracoUi.content.clickUpdateBlockModalButtonAndWaitForModalToClose();
   await umbracoUi.content.clickSaveButtonForContent();
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveModalButtonAndWaitForContentToBeUpdated();
 
   // Assert
   const contentData = await umbracoApi.document.getByName(contentName);
