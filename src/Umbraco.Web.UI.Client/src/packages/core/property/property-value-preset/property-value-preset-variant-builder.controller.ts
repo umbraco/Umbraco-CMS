@@ -106,46 +106,15 @@ export class UmbPropertyValuePresetVariantBuilderController extends UmbPropertyV
 		return args;
 	}
 
-	/**
-	 * Finds an existing value for a property, with fallback logic for variation setting changes.
-	 * When a property changes from invariant to variant (or vice versa), the existing values
-	 * may have a different culture/segment than what we're looking for. This method handles
-	 * value migration by trying fallback lookups.
-	 */
 	#findExistingValue(alias: string, variantId: UmbVariantId): unknown {
-		if (!this._existingValues) return undefined;
+		if (!this._existingValues) {
+			return undefined;
+		}
 
-		// First, try exact match (same alias + same culture/segment)
 		const exactMatch = this._existingValues.find((x) => x.alias === alias && variantId.compare(x));
 		if (exactMatch) {
 			return exactMatch.value;
 		}
-
-		// No exact match - try fallback for variation setting changes
-		// Get all values for this property alias
-		const valuesForAlias = this._existingValues.filter((x) => x.alias === alias);
-		if (valuesForAlias.length === 0) {
-			return undefined;
-		}
-
-		// Fallback 1: If looking for a culture-specific value, try to use the invariant value
-		// This handles: invariant → variant migration
-		if (variantId.culture !== null) {
-			const invariantValue = valuesForAlias.find((x) => x.culture === null && x.segment === variantId.segment);
-			if (invariantValue) {
-				return invariantValue.value;
-			}
-		}
-
-		// Fallback 2: If looking for an invariant value, try to use the first culture-specific value
-		// This handles: variant → invariant migration
-		if (variantId.culture === null) {
-			const anyVariantValue = valuesForAlias.find((x) => x.culture !== null && x.segment === variantId.segment);
-			if (anyVariantValue) {
-				return anyVariantValue.value;
-			}
-		}
-
 		return undefined;
 	}
 }
