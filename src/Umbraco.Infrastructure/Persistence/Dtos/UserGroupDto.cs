@@ -42,6 +42,11 @@ public class UserGroupDto
     [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoUserGroup_userGroupName")]
     public string? Name { get; set; }
 
+    [Column(Name = "description")]
+    [SpecialDbType(SpecialDbTypes.NVARCHARMAX)]
+    [NullSetting(NullSetting = NullSettings.Null)]
+    public string? Description { get; set; }
+
     [Column("userGroupDefaultPermissions")]
     [Length(50)]
     [NullSetting(NullSetting = NullSettings.Null)]
