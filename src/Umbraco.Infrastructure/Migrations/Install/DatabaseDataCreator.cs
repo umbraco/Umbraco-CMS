@@ -1191,6 +1191,7 @@ internal sealed class DatabaseDataCreator
             StartContentId = -1,
             Alias = Constants.Security.AdminGroupAlias,
             Name = "Administrators",
+            Description = "Users with full access to all sections and functionality",
             CreateDate = DateTime.UtcNow,
             UpdateDate = DateTime.UtcNow,
             Icon = "icon-medal",
@@ -1204,6 +1205,7 @@ internal sealed class DatabaseDataCreator
             StartContentId = -1,
             Alias = WriterGroupAlias,
             Name = "Writers",
+            Description = "Users with permission to create and update but not publish content",
             CreateDate = DateTime.UtcNow,
             UpdateDate = DateTime.UtcNow,
             Icon = "icon-edit",
@@ -1217,6 +1219,7 @@ internal sealed class DatabaseDataCreator
             StartContentId = -1,
             Alias = EditorGroupAlias,
             Name = "Editors",
+            Description = "Users with full permission to create, update and publish content",
             CreateDate = DateTime.UtcNow,
             UpdateDate = DateTime.UtcNow,
             Icon = "icon-tools",
@@ -1230,6 +1233,7 @@ internal sealed class DatabaseDataCreator
             StartContentId = -1,
             Alias = TranslatorGroupAlias,
             Name = "Translators",
+            Description = "Users with permission to manage dictionary entries",
             CreateDate = DateTime.UtcNow,
             UpdateDate = DateTime.UtcNow,
             Icon = "icon-globe",
@@ -1241,6 +1245,7 @@ internal sealed class DatabaseDataCreator
             Key = Constants.Security.SensitiveDataGroupKey,
             Alias = SensitiveDataGroupAlias,
             Name = "Sensitive data",
+            Description = "Users with the specific permission to be able to manage properties and data marked as sensitive",
             CreateDate = DateTime.UtcNow,
             UpdateDate = DateTime.UtcNow,
             Icon = "icon-lock",
@@ -2348,8 +2353,15 @@ internal sealed class DatabaseDataCreator
 
     private void ConditionalInsert<TDto>(string configKey, string id, TDto dto)
     {
-        var alwaysInsert = _entitiesToAlwaysCreate.ContainsKey(configKey) &&
-                           _entitiesToAlwaysCreate[configKey].InvariantContains(id);
+
+        // var alwaysInsert = _entitiesToAlwaysCreate.ContainsKey(configKey) &&
+        //                   _entitiesToAlwaysCreate[configKey].InvariantContains(id);
+        // copilot rewrite:
+        var alwaysInsert = false;
+        if (_entitiesToAlwaysCreate.TryGetValue(configKey, out IList<string>? alwaysCreateIds))
+        {
+            alwaysInsert = alwaysCreateIds.InvariantContains(id);
+        }
 
         InstallDefaultDataSettings installDefaultDataSettings = _installDefaultDataSettings.Get(configKey);
 
@@ -2412,12 +2424,9 @@ internal sealed class DatabaseDataCreator
             {
                 autoIncrement = false;
             }
-            else if (primaryColumnValues.FirstOrDefault() is int primaryKeyValue)
+            else if (primaryColumnValues.FirstOrDefault() is int)
             {
-                //if (primaryKeyValue < 0)
-                //{
                 autoIncrement = false;
-                //}
             }
         }
 

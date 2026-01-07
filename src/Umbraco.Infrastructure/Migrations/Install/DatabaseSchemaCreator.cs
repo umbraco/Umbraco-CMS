@@ -103,22 +103,22 @@ public class DatabaseSchemaCreator
     private readonly ILoggerFactory _loggerFactory;
     private readonly IUmbracoVersion _umbracoVersion;
 
-        public DatabaseSchemaCreator(
-            IUmbracoDatabase? database,
-            ILogger<DatabaseSchemaCreator> logger,
-            ILoggerFactory loggerFactory,
-            IUmbracoVersion umbracoVersion,
-            IEventAggregator eventAggregator,
-            IOptionsMonitor<InstallDefaultDataSettings> defaultDataCreationSettings)
-        {
-            _database = database ?? throw new ArgumentNullException(nameof(database));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
-            _umbracoVersion = umbracoVersion ?? throw new ArgumentNullException(nameof(umbracoVersion));
-            _eventAggregator = eventAggregator;
-            _installDefaultDataSettings = defaultDataCreationSettings;  // TODO (V13): Rename this parameter to installDefaultDataSettings.
+    public DatabaseSchemaCreator(
+        IUmbracoDatabase? database,
+        ILogger<DatabaseSchemaCreator> logger,
+        ILoggerFactory loggerFactory,
+        IUmbracoVersion umbracoVersion,
+        IEventAggregator eventAggregator,
+        IOptionsMonitor<InstallDefaultDataSettings> installDefaultDataSettings)
+    {
+        _database = database ?? throw new ArgumentNullException(nameof(database));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
+        _umbracoVersion = umbracoVersion ?? throw new ArgumentNullException(nameof(umbracoVersion));
+        _eventAggregator = eventAggregator;
+        _installDefaultDataSettings = installDefaultDataSettings;
 
-        if (_database?.SqlContext?.SqlSyntax == null)
+        if (_database.SqlContext?.SqlSyntax == null)
         {
             throw new InvalidOperationException("No SqlContext has been assigned to the database");
         }
@@ -516,9 +516,16 @@ public class DatabaseSchemaCreator
 
         dataCreation.InitializeBaseData(tableName);
 
-        if (SqlSyntax.SupportsIdentityInsert() && tableDefinition.Columns.Any(x => x.IsIdentity))
+        if (tableDefinition.Columns.Any(x => x.IsIdentity))
         {
-            _database.Execute(new Sql($"SET IDENTITY_INSERT {SqlSyntax.GetQuotedTableName(tableName)} OFF;"));
+            if (SqlSyntax.SupportsIdentityInsert())
+            {
+                _database.Execute(new Sql($"SET IDENTITY_INSERT {SqlSyntax.GetQuotedTableName(tableName)} OFF;"));
+            }
+            else if (SqlSyntax.SupportsSequences())
+            {
+                SqlSyntax.AlterSequences(_database, tableName);
+            }
         }
 
         if (overwrite)
