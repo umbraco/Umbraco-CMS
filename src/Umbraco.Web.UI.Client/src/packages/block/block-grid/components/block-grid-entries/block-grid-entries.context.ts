@@ -80,6 +80,9 @@ export class UmbBlockGridEntriesContext
 	#hasTypeLimits = new UmbBooleanState(undefined);
 	public readonly hasTypeLimits = this.#hasTypeLimits.asObservable();
 
+	#singleBlockTypeHasProperties = new UmbBooleanState(undefined);
+	public readonly singleBlockTypeHasProperties = this.#singleBlockTypeHasProperties.asObservable();
+
 	firstAllowedBlockTypeName() {
 		if (!this._manager) {
 			throw new Error('Manager not ready');
@@ -401,6 +404,40 @@ export class UmbBlockGridEntriesContext
 		if (!this._manager) return;
 		this.#allowedBlockTypes.setValue(this.#retrieveAllowedElementTypes());
 		this.#setupAllowedBlockTypesLimits();
+		this.#setupSingleBlockTypePropertyCheck();
+	}
+
+	#setupSingleBlockTypePropertyCheck() {
+		if (!this._manager) return;
+
+		// Observe allowed block types to check if single type has properties
+		this.observe(
+			this.allowedBlockTypes,
+			async (blockTypes) => {
+				if (blockTypes.length === 1) {
+					const elementKey = blockTypes[0].contentElementTypeKey;
+					const structure = this._manager?.getStructure(elementKey);
+
+					if (structure) {
+						this.observe(
+							structure.contentTypeHasProperties,
+							(hasProperties) => {
+								this.#singleBlockTypeHasProperties.setValue(hasProperties ?? true);
+							},
+							'observeSingleBlockTypeHasProperties',
+						);
+					} else {
+						// If we can't get the structure, assume it has properties (safe default)
+						this.#singleBlockTypeHasProperties.setValue(true);
+					}
+				} else {
+					// Not a single block type scenario, clear the state
+					this.#singleBlockTypeHasProperties.setValue(undefined);
+					this.removeUmbControllerByAlias('observeSingleBlockTypeHasProperties');
+				}
+			},
+			'observeAllowedBlockTypesForPropertyCheck',
+		);
 	}
 
 	#setupRangeLimits() {
@@ -438,6 +475,14 @@ export class UmbBlockGridEntriesContext
 		const allowedBlockTypes = this.#allowedBlockTypes.getValue();
 		if (allowedBlockTypes?.length === 1) {
 			const elementKey = allowedBlockTypes[0].contentElementTypeKey;
+			const hasProperties = this.#singleBlockTypeHasProperties.getValue();
+
+			// Only append the workspace modal path if the block type has properties
+			// If it has no properties (only areas), skip the modal and create directly
+			if (hasProperties === false) {
+				return pathBuilder({ view: 'create', index: index });
+			}
+
 			return pathBuilder({ view: 'create', index: index }) + 'modal/umb-modal-workspace/create/' + elementKey;
 		}
 

@@ -177,6 +177,9 @@ export class UmbPropertyEditorUIBlockListElement
 	@state()
 	private _useInlineEditingAsDefault?: boolean;
 
+	@state()
+	private _singleBlockTypeHasProperties?: boolean;
+
 	constructor() {
 		super();
 
@@ -315,8 +318,32 @@ export class UmbPropertyEditorUIBlockListElement
 
 		this.observe(
 			this.#managerContext.blockTypes,
-			(blockTypes) => {
+			async (blockTypes) => {
 				this._blocks = blockTypes;
+
+				// Check if single block type has properties
+				if (blockTypes.length === 1) {
+					const elementKey = blockTypes[0].contentElementTypeKey;
+					await this.#managerContext.contentTypesLoaded;
+					const structure = this.#managerContext.getStructure(elementKey);
+
+					if (structure) {
+						this.observe(
+							structure.contentTypeHasProperties,
+							(hasProperties) => {
+								this._singleBlockTypeHasProperties = hasProperties ?? true;
+							},
+							'observeSingleBlockTypeHasProperties',
+						);
+					} else {
+						// If we can't get the structure, assume it has properties (safe default)
+						this._singleBlockTypeHasProperties = true;
+					}
+				} else {
+					// Not a single block type scenario, clear the state
+					this._singleBlockTypeHasProperties = undefined;
+					this.removeUmbControllerByAlias('observeSingleBlockTypeHasProperties');
+				}
 			},
 			null,
 		);
@@ -433,7 +460,12 @@ export class UmbPropertyEditorUIBlockListElement
 	#getPathForCreateBlock(index: number): string | undefined {
 		if (this._blocks?.length === 1) {
 			const elementKey = this._blocks[0].contentElementTypeKey;
+			const hasProperties = this._singleBlockTypeHasProperties;
+
 			if (this._useInlineEditingAsDefault) {
+				return undefined;
+			} else if (hasProperties === false) {
+				// Block has no properties (only areas), skip the modal
 				return undefined;
 			} else {
 				return (
@@ -457,13 +489,18 @@ export class UmbPropertyEditorUIBlockListElement
 				href=${ifDefined(createPath)}
 				?disabled=${this.readonly}
 				@click=${async () => {
-					if (this._blocks?.length === 1 && this._useInlineEditingAsDefault) {
-						const originData = { index: -1 };
-						const created = await this.#entriesContext.create(this._blocks[0].contentElementTypeKey, {}, originData);
-						if (created) {
-							this.#entriesContext.insert(created.layout, created.content, created.settings, originData);
-						} else {
-							throw new Error('Failed to create block');
+					if (this._blocks?.length === 1) {
+						const hasProperties = this._singleBlockTypeHasProperties;
+
+						// Create inline if: inline editing is enabled OR block has no properties
+						if (this._useInlineEditingAsDefault || hasProperties === false) {
+							const originData = { index: -1 };
+							const created = await this.#entriesContext.create(this._blocks[0].contentElementTypeKey, {}, originData);
+							if (created) {
+								this.#entriesContext.insert(created.layout, created.content, created.settings, originData);
+							} else {
+								throw new Error('Failed to create block');
+							}
 						}
 					}
 				}}></uui-button>
