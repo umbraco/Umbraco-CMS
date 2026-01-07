@@ -448,6 +448,52 @@ internal sealed class ServerEventSenderTests
     }
 
     [Test]
+    public async Task HandleAsync_PublicAccessEntrySavedNotification_RoutesUpdatedEventAndDocumentUpdatedEvent()
+    {
+        // Arrange
+        var entryKey = Guid.NewGuid();
+        var protectedDocumentKey = Guid.NewGuid();
+        var protectedNodeId = 123;
+        var createDate = DateTime.UtcNow.AddDays(-1);
+        var updateDate = DateTime.UtcNow;
+
+        var entry = new PublicAccessEntry(entryKey, protectedNodeId, loginNodeId: 456, noAccessNodeId: 789, [])
+        {
+            CreateDate = createDate,
+            UpdateDate = updateDate,
+        };
+
+        var idKeyMapMock = new Mock<IIdKeyMap>();
+        idKeyMapMock
+            .Setup(x => x.GetKeyForId(protectedNodeId, UmbracoObjectTypes.Document))
+            .Returns(Attempt<Guid>.Succeed(protectedDocumentKey));
+
+        var notification = new PublicAccessEntrySavedNotification(entry, new EventMessages());
+        var recordingRouter = new RecordingServerEventRouter();
+        var serverEventSender = CreateServerEventSender(recordingRouter, idKeyMapMock.Object);
+
+        // Act
+        await serverEventSender.HandleAsync(notification, CancellationToken.None);
+
+        // Assert
+        AssertPrimaryRoutedEvent(
+            recordingRouter,
+            entryKey,
+            Constants.ServerEvents.EventType.Updated,
+            Constants.ServerEvents.EventSource.PublicAccessEntry,
+            expectedNumberOfRoutedEvents: 2);
+
+        // Assert the second event is for the protected document.
+        var documentEvent = recordingRouter.RoutedEvents[1];
+        Assert.Multiple(() =>
+        {
+            Assert.That(documentEvent.EventType, Is.EqualTo(Constants.ServerEvents.EventType.Updated));
+            Assert.That(documentEvent.EventSource, Is.EqualTo(Constants.ServerEvents.EventSource.Document));
+            Assert.That(documentEvent.Key, Is.EqualTo(protectedDocumentKey));
+        });
+    }
+
+    [Test]
     public async Task HandleAsync_PublicAccessEntryDeletedNotification_RoutesDeletedEventAndDocumentUpdatedEvent()
     {
         // Arrange
