@@ -1,7 +1,7 @@
 import type { UmbBlockGridEntryElement } from '../block-grid-entry/block-grid-entry.element.js';
 import type { UmbBlockGridLayoutModel } from '../../types.js';
 import { UmbBlockGridEntriesContext } from './block-grid-entries.context.js';
-import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, ifDefined, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import {
 	getAccumulatedValueOfIndex,
 	getInterpolatedIndexOfPositionInWeightMap,
@@ -194,6 +194,9 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 	@state()
 	private _styleElement?: HTMLLinkElement;
 
+	@state()
+	private _allowedBlockTypes: Array<any> = [];
+
 	constructor() {
 		super();
 
@@ -223,6 +226,14 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 					this.removeUmbControllerByAlias('observeSingleBlockTypeName');
 					this._createLabel = this.localize.term('blockEditor_addBlock');
 				}
+			},
+			null,
+		);
+
+		this.observe(
+			this.#context.allowedBlockTypes,
+			(blockTypes) => {
+				this._allowedBlockTypes = blockTypes;
 			},
 			null,
 		);
@@ -383,6 +394,26 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 	}
 
 	// TODO: Missing ability to jump directly to creating a Block, when there is only one Block Type. [NL]
+	
+	async #createBlockInline(index: number) {
+		if (this._allowedBlockTypes.length !== 1) return;
+		
+		const elementKey = this._allowedBlockTypes[0].contentElementTypeKey;
+		const parentUnique = this.#context.getParentUnique();
+		const originData = { 
+			index: index,
+			areaKey: this._areaKey ?? null,
+			parentUnique: parentUnique ?? null,
+		};
+		
+		const created = await this.#context.create(elementKey, {} as any, originData);
+		if (created) {
+			await this.#context.insert(created.layout, created.content, created.settings, originData);
+		} else {
+			throw new Error('Failed to create block');
+		}
+	}
+
 	override render() {
 		return html`
 			${this._styleElement}
@@ -414,10 +445,17 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 				</uui-button-group>
 			`;
 		} else if (this._isReadOnly === false) {
+			const createPath = this.#context.getPathForCreateBlock(-1);
 			return html`
 				<uui-button-inline-create
-					href=${this.#context.getPathForCreateBlock(-1) ?? ''}
-					label=${this.localize.term('blockEditor_addBlock')}></uui-button-inline-create>
+					href=${ifDefined(createPath)}
+					label=${this.localize.term('blockEditor_addBlock')}
+					@click=${async (e: Event) => {
+						if (!createPath && this._allowedBlockTypes.length === 1) {
+							e.preventDefault();
+							await this.#createBlockInline(-1);
+						}
+					}}></uui-button-inline-create>
 			`;
 		} else {
 			return nothing;
@@ -427,13 +465,20 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 	#renderCreateButton() {
 		if (this._isReadOnly && this._layoutEntries.length > 0) return nothing;
 
+		const createPath = this.#context.getPathForCreateBlock(-1);
 		return html`
 			<uui-button
 				look="placeholder"
 				color=${this.pristine === false && this.validity.valid === false ? 'invalid' : 'default'}
 				label=${this._configCreateLabel ?? this._createLabel ?? ''}
-				href=${this.#context.getPathForCreateBlock(-1) ?? ''}
-				?disabled=${this._isReadOnly}></uui-button>
+				href=${ifDefined(createPath)}
+				?disabled=${this._isReadOnly}
+				@click=${async (e: Event) => {
+					if (!createPath && this._allowedBlockTypes.length === 1) {
+						e.preventDefault();
+						await this.#createBlockInline(-1);
+					}
+				}}></uui-button>
 		`;
 	}
 

@@ -488,9 +488,9 @@ export class UmbBlockGridEntriesContext
 			const hasProperties = this.#singleBlockTypeHasProperties.getValue();
 
 			// Only append the workspace modal path if the block type has properties
-			// If it has no properties (only areas), skip the modal and create directly
+			// If it has no properties (only areas), return undefined to trigger inline creation
 			if (hasProperties === false) {
-				return pathBuilder({ view: 'create', index: index });
+				return undefined;
 			}
 
 			return pathBuilder({ view: 'create', index: index }) + 'modal/umb-modal-workspace/create/' + elementKey;
