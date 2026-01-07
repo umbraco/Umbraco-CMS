@@ -144,7 +144,7 @@ Web.UI → Web.Common → Infrastructure → Core
 - **Main branch**: `main` (protected)
 - **Branch naming convention**: `v<version>/<type>/<description>`
 
-**Format**: `v{major-version}/{type}/{snake-case-description}`
+**Format**: `v{major-version}/{type}/{kebab-case-description}`
 
 **Version**: Read from `version.json` in the repository root. Use the major version number (e.g., `v17` for version 17.x.x).
 
@@ -157,11 +157,11 @@ Web.UI → Web.Common → Infrastructure → Core
 | `improvement` | Update to something that already exists but isn't broken (UI finessing, refactoring) |
 | `task` | Update that doesn't directly impact product behavior (dependency updates, build pipeline) |
 
-**Description**: A short, snake_case description (a few words).
+**Description**: A short, kebab-case description (a few words). This should be prefixed with the GitHub issue number if the update is related to resolving a tracked issue.
 
 **Examples**:
 ```
-v17/bugfix/correct-display-of-pending-migrations
+v17/bugfix/12345-correct-display-of-pending-migrations
 v17/feature/add-webhook-support
 v17/improvement/optimize-content-cache
 v17/qa/add-media-service-tests
