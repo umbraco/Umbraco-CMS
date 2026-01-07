@@ -122,11 +122,6 @@ public abstract class ContentTypeCompositionBase : ContentTypeBase, IContentType
     /// <inheritdoc />
     public bool AddContentType(IContentTypeComposition contentType, string[] removedPropertyTypeAliases)
     {
-        if (contentType is null)
-        {
-            return false;
-        }
-
         if (contentType.ContentTypeComposition.Any(x => x.CompositionAliases().Any(ContentTypeCompositionExists)))
         {
             return false;
