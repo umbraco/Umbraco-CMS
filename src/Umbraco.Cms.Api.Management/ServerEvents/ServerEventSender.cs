@@ -201,9 +201,9 @@ internal sealed class ServerEventSender :
         await RouteDocumentUpdatedEventForPublicAccessModification(notification.SavedEntities);
     }
 
-    private async Task RouteDocumentUpdatedEventForPublicAccessModification(IEnumerable<PublicAccessEntry> savedEntities)
+    private async Task RouteDocumentUpdatedEventForPublicAccessModification(IEnumerable<PublicAccessEntry> entities)
     {
-        foreach (PublicAccessEntry entity in savedEntities)
+        foreach (PublicAccessEntry entity in entities)
         {
             Attempt<Guid> getKeyAttempt = _idKeyMap.GetKeyForId(
                 entity.ProtectedNodeId,
