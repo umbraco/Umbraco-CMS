@@ -431,7 +431,8 @@ export class UmbInputMultiUrlElement extends UmbFormControlMixin<string, typeof 
 			}
 
 			uui-ref-list.empty {
-				min-height: var(--uui-size-layout-1);
+				margin-top: -20px;
+				padding-top: 20px;
 			}
 		`,
 	];
