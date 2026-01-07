@@ -31,7 +31,20 @@ public interface IContentTypeComposition : IContentTypeBase
     /// </summary>
     /// <param name="contentType"><see cref="IContentType" /> to add</param>
     /// <returns>True if ContentType was added, otherwise returns False</returns>
+    // TODO (V18): Update nullability so only a non-null contentType can be passed.
     bool AddContentType(IContentTypeComposition? contentType);
+
+    /// <summary>
+    ///     Adds a new ContentType to the list of composite ContentTypes
+    /// </summary>
+    /// <param name="contentType"><see cref="IContentType" /> to add</param>
+    /// <param name="removedPropertyTypeAliases">
+    /// Aliases of property types that are to be removed in the current update operation.
+    /// It's OK if the composition has property type aliases that clash with these.
+    /// </param>
+    /// <returns>True if ContentType was added, otherwise returns False</returns>
+    // TODO (V18): Remove the default implementation.
+    bool AddContentType(IContentTypeComposition contentType, string[] removedPropertyTypeAliases) => AddContentType(contentType);
 
     /// <summary>
     ///     Removes a ContentType with the supplied alias from the list of composite ContentTypes

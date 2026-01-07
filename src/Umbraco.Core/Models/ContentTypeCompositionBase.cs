@@ -108,12 +108,20 @@ public abstract class ContentTypeCompositionBase : ContentTypeBase, IContentType
     /// <inheritdoc />
     public IEnumerable<IPropertyType> GetOriginalComposedPropertyTypes() => GetRawComposedPropertyTypes();
 
-    /// <summary>
-    ///     Adds a content type to the composition.
-    /// </summary>
-    /// <param name="contentType">The content type to add.</param>
-    /// <returns>True if the content type was added, otherwise false.</returns>
+    /// <inheritdoc />
     public bool AddContentType(IContentTypeComposition? contentType)
+    {
+        if (contentType is null)
+        {
+            return false;
+        }
+
+        return AddContentType(contentType, []);
+    }
+
+
+    /// <inheritdoc />
+    public bool AddContentType(IContentTypeComposition contentType, string[] removedPropertyTypeAliases)
     {
         if (contentType is null)
         {
@@ -134,10 +142,10 @@ public abstract class ContentTypeCompositionBase : ContentTypeBase, IContentType
         {
             // Before we actually go ahead and add the ContentType as a Composition we ensure that we don't
             // end up with duplicate PropertyType aliases - in which case we throw an exception.
-            var conflictingPropertyTypeAliases = CompositionPropertyTypes.SelectMany(
-                x => contentType.CompositionPropertyTypes
-                    .Where(y => y.Alias.Equals(x.Alias, StringComparison.InvariantCultureIgnoreCase))
-                    .Select(p => p.Alias)).ToList();
+            IList<string> conflictingPropertyTypeAliases = GetConflictingPropertyTypeAliases(
+                CompositionPropertyTypes,
+                contentType.CompositionPropertyTypes,
+                removedPropertyTypeAliases);
 
             if (conflictingPropertyTypeAliases.Any())
             {
@@ -153,6 +161,17 @@ public abstract class ContentTypeCompositionBase : ContentTypeBase, IContentType
 
         return false;
     }
+
+    private static List<string> GetConflictingPropertyTypeAliases(
+        IEnumerable<IPropertyType> currentPropertyTypes,
+        IEnumerable<IPropertyType> compositionPropertyTypes,
+        string[] removedPropertyTypeAliases) =>
+        currentPropertyTypes
+            .SelectMany(x => compositionPropertyTypes
+                .Where(y => y.Alias.Equals(x.Alias, StringComparison.InvariantCultureIgnoreCase))
+                .Where(y => removedPropertyTypeAliases.Contains(y.Alias, StringComparer.InvariantCultureIgnoreCase) is false)
+                .Select(p => p.Alias))
+            .ToList();
 
     /// <inheritdoc />
     public bool RemoveContentType(Guid key)
