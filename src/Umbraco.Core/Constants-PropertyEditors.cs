@@ -111,6 +111,11 @@ public static partial class Constants
             public const string Grid = "Umbraco.Grid";
 
             /// <summary>
+            ///     Icon Picker.
+            /// </summary>
+            public const string IconPicker = "Umbraco.IconPicker";
+
+            /// <summary>
             ///     Image Cropper.
             /// </summary>
             public const string ImageCropper = "Umbraco.ImageCropper";

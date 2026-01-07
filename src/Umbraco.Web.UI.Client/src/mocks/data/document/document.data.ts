@@ -140,6 +140,13 @@ export const data: Array<UmbMockDocumentModel> = [
 				value: undefined,
 			},
 			{
+				editorAlias: 'Umbraco.IconPicker',
+				alias: 'iconPicker',
+				culture: null,
+				segment: null,
+				value: undefined,
+			},
+			{
 				editorAlias: 'Umbraco.MultiUrlPicker',
 				alias: 'multiUrlPicker',
 				culture: 'en-US',

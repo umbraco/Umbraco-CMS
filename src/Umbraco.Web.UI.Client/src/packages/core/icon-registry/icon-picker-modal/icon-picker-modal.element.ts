@@ -137,9 +137,21 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 						value=${ifDefined(this.value.color)}
 						label=${this.localize.term('defaultdialogs_colorSwitcher')}
 						@change=${this.#onColorChange}>
-						${
-							this._colorList.map(
-								(color) => html`
+						${this.data?.colors?.length ?
+								html`${this.data.colors.map(
+									(color) => html`
+											<uui-color-swatch
+												label=${color.name}
+												title=${color.name}
+												value=${color.value}
+												color=#${color.value}>
+											</uui-color-swatch>
+										`,
+								)
+							}`
+							: html`${
+								this._colorList.map(
+									(color) => html`
 									<uui-color-swatch
 										label=${this.localize.term('colors_' + toCamelCase(color.alias))}
 										title=${this.localize.term('colors_' + toCamelCase(color.alias))}
@@ -147,7 +159,8 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 										style="--uui-swatch-color: var(${color.varName})">
 									</uui-color-swatch>
 								`,
-							)
+								)
+							}`
 						}
 					</uui-color-swatches>
 					<hr />

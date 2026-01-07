@@ -1,3 +1,5 @@
+import { manifest as schemaManifest } from './Umbraco.IconPicker.js';
+
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'propertyEditorUi',
@@ -6,8 +8,9 @@ export const manifests: Array<UmbExtensionManifest> = [
 		element: () => import('./property-editor-ui-icon-picker.element.js'),
 		meta: {
 			label: 'Icon Picker',
-			icon: 'icon-autofill',
-			group: 'common',
+			icon: 'icon-shapes',
+			group: 'pickers',
+			propertyEditorSchemaAlias: 'Umbraco.IconPicker',
 			settings: {
 				properties: [
 					{
@@ -22,8 +25,15 @@ export const manifests: Array<UmbExtensionManifest> = [
 						description: 'Hide color swatches from modal',
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 					},
+					{
+						alias: 'colors',
+						label: '#colorPickerConfigurations_colorsTitle',
+						description: '{umbLocalize: colorPickerConfigurations_colorsDescription}',
+						propertyEditorUiAlias: 'Umb.PropertyEditorUi.ColorSwatchesEditor',
+					},
 				],
 			},
 		},
 	},
+	schemaManifest,
 ];
