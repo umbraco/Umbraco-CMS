@@ -114,6 +114,7 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<
 								?mediaRootAccess=${userGroup.mediaRootAccess}
 								.mediaStartNode=${!userGroup.mediaRootAccess ? userGroup.mediaStartNode?.unique : null}
 								.sections=${userGroup.sections}
+								.description=${userGroup.description}
 								@selected=${(event: UUIMenuItemEvent) => this.#onSelected(event, userGroup)}
 								@deselected=${(event: UUIMenuItemEvent) => this.#onDeselected(event, userGroup)}>
 								${when(userGroup.icon, () => html`<umb-icon name=${userGroup.icon!} slot="icon"></umb-icon>`)}
