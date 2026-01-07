@@ -30,6 +30,7 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
     private string _alias;
     private string? _icon;
     private string _name;
+    private string? _description;
     private bool _hasAccessToAllLanguages;
     private ISet<string> _permissions;
     private ISet<IGranularPermission> _granularPermissions;
@@ -110,6 +111,13 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
     {
         get => _name;
         set => SetPropertyValueAndDetectChanges(value, ref _name!, nameof(Name));
+    }
+
+    [DataMember]
+    public string? Description
+    {
+        get => _description;
+        set => SetPropertyValueAndDetectChanges(value, ref _description!, nameof(Description));
     }
 
     [DataMember]

@@ -45,10 +45,9 @@ test('can create content with the document link', {tag: '@release'}, async ({umb
   await umbracoUi.content.selectLinkByName(linkedDocumentName);
   await umbracoUi.content.clickChooseModalButton();
   await umbracoUi.content.clickLinkPickerAddButton();
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -86,10 +85,9 @@ test('can publish content with the document link', async ({umbracoApi, umbracoUi
   await umbracoUi.waitForTimeout(ConstantHelper.wait.short); // Wait for the document link to be selected
   await umbracoUi.content.clickButtonWithName('Choose');
   await umbracoUi.content.clickLinkPickerAddButton();
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -119,10 +117,9 @@ test('can create content with the manual link with title', async ({umbracoApi, u
   await umbracoUi.content.enterLink(link);
   await umbracoUi.content.enterLinkTitle(linkTitle);
   await umbracoUi.content.clickLinkPickerAddButton();
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
@@ -150,10 +147,9 @@ test('can create content with the media link', async ({umbracoApi, umbracoUi}) =
   await umbracoUi.content.selectMediaWithName(mediaFileName, true);
   await umbracoUi.content.clickChooseModalButton();
   await umbracoUi.content.clickLinkPickerAddButton();
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
@@ -192,10 +188,9 @@ test('can add multiple links in the content', {tag: '@release'}, async ({umbraco
   await umbracoUi.content.enterLink(link);
   await umbracoUi.content.enterLinkTitle(linkTitle);
   await umbracoUi.content.clickLinkPickerAddButton();
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
@@ -224,10 +219,9 @@ test('can remove the URL picker in the content', async ({umbracoApi, umbracoUi})
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.removeUrlPickerByName(linkTitle);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values).toEqual([]);
@@ -245,10 +239,9 @@ test('can edit the URL picker in the content', async ({umbracoApi, umbracoUi}) =
   await umbracoUi.content.clickLinkWithName(linkTitle);
   await umbracoUi.content.enterLinkTitle(updatedLinkTitle);
   await umbracoUi.content.clickUpdateButton();
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
@@ -280,10 +273,9 @@ test('can create content with the link to an unpublished document', async ({umbr
   await umbracoUi.content.selectLinkByName(linkedDocumentName);
   await umbracoUi.content.clickButtonWithName('Choose');
   await umbracoUi.content.clickLinkPickerAddButton();
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -327,10 +319,9 @@ test('can close dialog without saving link', {tag: '@release'}, async ({umbracoA
   await umbracoUi.content.enterLink(link);
   await umbracoUi.content.enterLinkTitle(linkTitle);
   await umbracoUi.content.clickLinkPickerCloseButton();
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   const contentData = await umbracoApi.document.getByName(contentName);
   // Verify no link was added since dialog was closed without clicking Add
   expect(contentData.values).toEqual([]);
@@ -369,10 +360,9 @@ test('can create content with special characters in title field', async ({umbrac
   await umbracoUi.content.enterLink(link);
   await umbracoUi.content.enterLinkTitle(customTitle);
   await umbracoUi.content.clickLinkPickerAddButton();
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].value[0].name).toEqual(customTitle);
 });
@@ -391,10 +381,9 @@ test('can create content with target toggle enabled to open link in new window',
   await umbracoUi.content.enterLinkTitle(linkTitle);
   await umbracoUi.content.clickLinkPickerTargetToggle();
   await umbracoUi.content.clickLinkPickerAddButton();
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].value[0].target).toEqual('_blank');
 });
@@ -482,10 +471,9 @@ test.describe('manual tab validation tests', () => {
     await umbracoUi.content.enterLink(link);
     // Leave Anchor empty
     await umbracoUi.content.clickLinkPickerAddButton();
-    await umbracoUi.content.clickSaveButton();
+    await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
     // Assert
-    await umbracoUi.content.isSuccessStateVisibleForSaveButton();
     expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
     const contentData = await umbracoApi.document.getByName(contentName);
     expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
@@ -507,10 +495,9 @@ test.describe('manual tab validation tests', () => {
     // Leave URL empty
     await umbracoUi.content.enterAnchorOrQuerystring(anchorValue);
     await umbracoUi.content.clickLinkPickerAddButton();
-    await umbracoUi.content.clickSaveButton();
+    await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
     // Assert
-    await umbracoUi.content.isSuccessStateVisibleForSaveButton();
     expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
     const contentData = await umbracoApi.document.getByName(contentName);
     expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
@@ -531,10 +518,9 @@ test.describe('manual tab validation tests', () => {
     await umbracoUi.content.enterLink(link);
     await umbracoUi.content.enterAnchorOrQuerystring(querystringValue);
     await umbracoUi.content.clickLinkPickerAddButton();
-    await umbracoUi.content.clickSaveButton();
+    await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
     // Assert
-    await umbracoUi.content.isSuccessStateVisibleForSaveButton();
     expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
     const contentData = await umbracoApi.document.getByName(contentName);
     expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
