@@ -1,6 +1,7 @@
 import type { UmbLinkPickerLink } from '../../link-picker-modal/types.js';
 import { UMB_LINK_PICKER_MODAL } from '../../link-picker-modal/link-picker-modal.token.js';
 import {
+	classMap,
 	css,
 	customElement,
 	html,
@@ -385,7 +386,7 @@ export class UmbInputMultiUrlElement extends UmbFormControlMixin<string, typeof 
 	#renderItems() {
 		if (!this.urls) return;
 		return html`
-			<uui-ref-list class=${this.urls.length === 0 ? 'empty' : ''}>
+			<uui-ref-list class=${classMap({ empty: this.urls.length === 0 })}>
 				${repeat(
 					this.urls,
 					(link) => link.unique,
