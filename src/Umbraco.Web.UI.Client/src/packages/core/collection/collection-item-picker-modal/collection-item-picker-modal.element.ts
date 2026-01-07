@@ -63,7 +63,7 @@ export class UmbCollectionItemPickerModalElement extends UmbModalBaseElement<
 
 			this._selectionConfiguration = {
 				...this._selectionConfiguration,
-				selection: [...selection],
+				selection: [...selection].filter((x) => x !== null),
 			};
 		}
 	}
