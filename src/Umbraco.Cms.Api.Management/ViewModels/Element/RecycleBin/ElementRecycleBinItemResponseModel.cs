@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Api.Management.ViewModels.Element.RecycleBin;
 
 public class ElementRecycleBinItemResponseModel : RecycleBinItemResponseModelBase
 {
-    public DocumentTypeReferenceResponseModel DocumentType { get; set; } = new();
+    public DocumentTypeReferenceResponseModel? DocumentType { get; set; } = new();
 
     public IEnumerable<ElementVariantItemResponseModel> Variants { get; set; } = Enumerable.Empty<ElementVariantItemResponseModel>();
 

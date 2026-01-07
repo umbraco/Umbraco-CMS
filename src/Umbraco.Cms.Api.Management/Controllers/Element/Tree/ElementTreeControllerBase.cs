@@ -49,6 +49,7 @@ public class ElementTreeControllerBase : FolderTreeControllerBase<ElementTreeIte
             if (entity is IElementEntitySlim elementEntitySlim)
             {
                 responseModel.HasChildren = false;
+                responseModel.CreateDate = elementEntitySlim.CreateDate;
                 responseModel.DocumentType = _elementPresentationFactory.CreateDocumentTypeReferenceResponseModel(elementEntitySlim);
                 responseModel.Variants = _elementPresentationFactory.CreateVariantsItemResponseModels(elementEntitySlim);
             }
