@@ -238,6 +238,7 @@ export default {
 	},
 	content: {
 		isPublished: 'Is Published',
+		unpublishedChanges: 'Unpublished changes',
 		about: 'About this page',
 		alias: 'Alias',
 		alternativeTextHelp: '(how would you describe the picture over the phone)',
