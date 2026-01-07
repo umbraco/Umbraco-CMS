@@ -9,6 +9,12 @@ public static partial class Constants
         // TODO: Why aren't all table names with the same prefix?
         public const string TableNamePrefix = "umbraco";
 
+        public const string PrimaryKeyNameId = "id";
+        public const string PrimaryKeyNamePK = "pk";
+        public const string PrimaryKeyNameKey = "key";
+        public const string NodeIdName = "nodeId";
+        public const string UniqueIdName = "uniqueId";
+
         public static class Tables
         {
             public const string Lock = TableNamePrefix + "Lock";

@@ -6,13 +6,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 
 [TableName(TableName)]
-[PrimaryKey("id", AutoIncrement = true)]
+[PrimaryKey(PrimaryKeyName, AutoIncrement = true)]
 [ExplicitColumns]
 internal sealed class WebhookDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.Webhook;
+    public const string PrimaryKeyName = Constants.DatabaseSchema.PrimaryKeyNameId;
 
-    [Column("id")]
+    [Column(PrimaryKeyName)]
     [PrimaryKeyColumn(AutoIncrement = true)]
     public int Id { get; set; }
 

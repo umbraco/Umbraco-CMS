@@ -6,13 +6,14 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey("key", AutoIncrement = false)]
+[PrimaryKey(PrimaryKeyName, AutoIncrement = false)]
 [ExplicitColumns]
 public class UserDataDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.UserData;
+    public const string PrimaryKeyName = Constants.DatabaseSchema.PrimaryKeyNameKey;
 
-    [Column("key")]
+    [Column(PrimaryKeyName)]
     [PrimaryKeyColumn(Name = "PK_umbracoUserDataDto", AutoIncrement = false)]
     public Guid Key { get; set; }
 

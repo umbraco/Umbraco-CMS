@@ -6,11 +6,13 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey("id")]
+[PrimaryKey(PrimaryKeyName)]
 [ExplicitColumns]
 public class UserGroupDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.UserGroup;
+    public const string PrimaryKeyName = Constants.DatabaseSchema.PrimaryKeyNameId;
+    public const string KeyColumnName = Constants.DatabaseSchema.PrimaryKeyNameKey;
 
     public UserGroupDto()
     {
@@ -20,11 +22,11 @@ public class UserGroupDto
         UserGroup2GranularPermissionDtos = new List<UserGroup2GranularPermissionDto>();
     }
 
-    [Column("id")]
+    [Column(PrimaryKeyName)]
     [PrimaryKeyColumn(IdentitySeed = 6)]
     public int Id { get; set; }
 
-    [Column("key")]
+    [Column(KeyColumnName)]
     [NullSetting(NullSetting = NullSettings.NotNull)]
     [Constraint(Default = SystemMethods.NewGuid)]
     [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoUserGroup_userGroupKey")]
