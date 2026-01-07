@@ -1,4 +1,4 @@
-import { UMB_LIBRARY_SECTION_ALIAS } from './constants.js';
+import { UMB_LIBRARY_SECTION_ALIAS, UMB_LIBRARY_SECTION_PATHNAME } from './constants.js';
 import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
 
 export const manifests: Array<UmbExtensionManifest> = [
@@ -9,7 +9,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		weight: 850,
 		meta: {
 			label: '#sections_library',
-			pathname: 'library',
+			pathname: UMB_LIBRARY_SECTION_PATHNAME,
 		},
 		conditions: [
 			{
