@@ -5,13 +5,14 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey("sessionId", AutoIncrement = false)]
+[PrimaryKey(PrimaryKeyName, AutoIncrement = false)]
 [ExplicitColumns]
 internal sealed class UserLoginDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.UserLogin;
+    public const string PrimaryKeyName = "sessionId";
 
-    [Column("sessionId")]
+    [Column(PrimaryKeyName)]
     [PrimaryKeyColumn(AutoIncrement = false)]
     public Guid SessionId { get; set; }
 

@@ -5,11 +5,12 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey("id", AutoIncrement = false)]
+[PrimaryKey(PrimaryKeyName, AutoIncrement = false)]
 [ExplicitColumns]
 internal sealed class RedirectUrlDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.RedirectUrl;
+    public const string PrimaryKeyName = Constants.DatabaseSchema.PrimaryKeyNameId;
 
     public RedirectUrlDto() => CreateDateUtc = DateTime.UtcNow;
 
@@ -19,7 +20,7 @@ internal sealed class RedirectUrlDto
     // problem is that the index key must be 900 bytes max. should we run without an index? done
     // some perfs comparisons, and running with an index on a hash is only slightly slower on
     // inserts, and much faster on reads, so... we have an index on a hash.
-    [Column("id")]
+    [Column(PrimaryKeyName)]
     [PrimaryKeyColumn(Name = "PK_umbracoRedirectUrl", AutoIncrement = false)]
     public Guid Id { get; set; }
 

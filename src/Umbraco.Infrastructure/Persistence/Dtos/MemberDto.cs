@@ -5,13 +5,14 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey("nodeId", AutoIncrement = false)]
+[PrimaryKey(PrimaryKeyName, AutoIncrement = false)]
 [ExplicitColumns]
 internal sealed class MemberDto
 {
     private const string TableName = Constants.DatabaseSchema.Tables.Member;
+    public const string PrimaryKeyName = "nodeId";
 
-    [Column("nodeId")]
+    [Column(PrimaryKeyName)]
     [PrimaryKeyColumn(AutoIncrement = false)]
     [ForeignKey(typeof(ContentDto))]
     public int NodeId { get; set; }

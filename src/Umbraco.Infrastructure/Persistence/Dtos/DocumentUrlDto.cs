@@ -6,13 +6,14 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey("id", AutoIncrement = true)]
+[PrimaryKey(PrimaryKeyName, AutoIncrement = true)]
 [ExplicitColumns]
 public class DocumentUrlDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.DocumentUrl;
+    public const string PrimaryKeyName = Constants.DatabaseSchema.PrimaryKeyNameId;
 
-    [Column("id")]
+    [Column(PrimaryKeyName)]
     [PrimaryKeyColumn(Clustered = false, AutoIncrement = true)]
     public int NodeId { get; set; }
 

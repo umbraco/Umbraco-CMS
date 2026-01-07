@@ -6,11 +6,12 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey("id", AutoIncrement = true)]
+[PrimaryKey(PrimaryKeyName, AutoIncrement = true)]
 [ExplicitColumns]
 public class UserDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.User;
+    public const string PrimaryKeyName = Constants.DatabaseSchema.PrimaryKeyNameId;
 
     public UserDto()
     {
@@ -18,7 +19,7 @@ public class UserDto
         UserStartNodeDtos = new HashSet<UserStartNodeDto>();
     }
 
-    [Column("id")]
+    [Column(PrimaryKeyName)]
     [PrimaryKeyColumn(Name = "PK_user")]
     public int Id { get; set; }
 

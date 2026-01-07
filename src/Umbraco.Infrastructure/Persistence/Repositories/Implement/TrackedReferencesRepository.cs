@@ -68,7 +68,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 return [];
             }
 
-            ISqlSyntaxProvider? sx = _scopeAccessor.AmbientScope.Database.SqlContext.SqlSyntax;
+            ISqlSyntaxProvider sx = _scopeAccessor.AmbientScope.Database.SqlContext.SqlSyntax;
             string[] columns = [
                     sx.ColumnWithAlias("x", "otherId", "nodeId"),
                     sx.ColumnWithAlias("n", "uniqueId", "nodeKey"),
@@ -447,7 +447,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         private sealed class UnionHelperDto
         {
-            [Column("id")] public int Id { get; set; }
+            public const string PrimaryKeyName = Core.Constants.DatabaseSchema.PrimaryKeyNameId;
+
+            [Column(PrimaryKeyName)] public int Id { get; set; }
 
             [Column("otherId")] public int OtherId { get; set; }
 

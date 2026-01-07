@@ -4,13 +4,14 @@ using Umbraco.Cms.Core;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey("id", AutoIncrement = true)]
+[PrimaryKey(PrimaryKeyName, AutoIncrement = true)]
 [ExplicitColumns]
 internal sealed class PropertyTypeGroupReadOnlyDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.PropertyTypeGroup;
+    public const string PrimaryKeyName = "PropertyTypeGroupId"; // Constants.DatabaseSchema.PrimaryKeyNameId;
 
-    [Column("PropertyTypeGroupId")]
+    [Column(PrimaryKeyName)]
     public int? Id { get; set; }
 
     [Column("PropertyGroupName")]

@@ -7,12 +7,13 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
 [ExplicitColumns]
-[PrimaryKey("id")]
+[PrimaryKey(PrimaryKeyName)]
 public class CreatedPackageSchemaDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.CreatedPackageSchema;
+    public const string PrimaryKeyName = Constants.DatabaseSchema.PrimaryKeyNameId;
 
-    [Column("id")]
+    [Column(PrimaryKeyName)]
     [PrimaryKeyColumn]
     public int Id { get; set; }
 

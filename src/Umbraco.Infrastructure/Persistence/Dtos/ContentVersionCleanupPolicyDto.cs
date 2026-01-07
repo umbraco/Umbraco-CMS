@@ -5,13 +5,14 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey("contentTypeId", AutoIncrement = false)]
+[PrimaryKey(PrimaryKeyName, AutoIncrement = false)]
 [ExplicitColumns]
 internal sealed class ContentVersionCleanupPolicyDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.ContentVersionCleanupPolicy;
+    public const string PrimaryKeyName = "contentTypeId";
 
-    [Column("contentTypeId")]
+    [Column(PrimaryKeyName)]
     [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_umbracoContentVersionCleanupPolicy")]
     [ForeignKey(typeof(ContentTypeDto), Column = "nodeId")]
     public int ContentTypeId { get; set; }
