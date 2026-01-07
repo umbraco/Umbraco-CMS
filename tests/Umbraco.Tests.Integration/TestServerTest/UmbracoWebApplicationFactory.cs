@@ -9,7 +9,6 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest;
 public class UmbracoWebApplicationFactory<TStartup> : WebApplicationFactory<TStartup>
     where TStartup : class
 {
-    private readonly Action<IHost> _beforeStart;
     private readonly Func<IHostBuilder> _createHostBuilder;
     private IHost _host;
 
@@ -24,9 +23,6 @@ public class UmbracoWebApplicationFactory<TStartup> : WebApplicationFactory<TSta
     protected override IHost CreateHost(IHostBuilder builder)
     {
         _host = builder.Build();
-
-        _beforeStart?.Invoke(_host);
-
         _host.Start();
 
         return _host;

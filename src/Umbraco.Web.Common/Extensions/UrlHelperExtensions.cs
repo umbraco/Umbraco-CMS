@@ -290,8 +290,12 @@ public static class UrlHelperExtensions
             throw new ArgumentException("Value can't be empty.", nameof(controllerName));
         }
 
-        var encryptedRoute = EncryptionHelper.CreateEncryptedRouteString(dataProtectionProvider, controllerName, action,
-            area, additionalRouteVals);
+        var encryptedRoute = EncryptionHelper.CreateEncryptedRouteString(
+            dataProtectionProvider,
+            controllerName,
+            action,
+            area,
+            additionalRouteVals);
 
         var result = umbracoContext.OriginalRequestUrl.AbsolutePath.EnsureEndsWith('?') + "ufprt=" + encryptedRoute;
         return result;
