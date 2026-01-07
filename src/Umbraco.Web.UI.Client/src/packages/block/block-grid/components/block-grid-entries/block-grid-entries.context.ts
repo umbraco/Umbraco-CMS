@@ -419,20 +419,27 @@ export class UmbBlockGridEntriesContext
 			(blockTypes) => {
 				if (blockTypes.length === 1) {
 					const elementKey = blockTypes[0].contentElementTypeKey;
-					const structure = this._manager?.getStructure(elementKey);
+					
+					// Wait for content types to be loaded before checking structure
+					this._manager?.contentTypesLoaded.then(() => {
+						const structure = this._manager?.getStructure(elementKey);
 
-					if (structure) {
-						this.observe(
-							structure.contentTypeHasProperties,
-							(hasProperties) => {
-								this.#singleBlockTypeHasProperties.setValue(hasProperties ?? DEFAULT_BLOCK_HAS_PROPERTIES);
-							},
-							'observeSingleBlockTypeHasProperties',
-						);
-					} else {
-						// If we can't get the structure, assume it has properties (safe default)
+						if (structure) {
+							this.observe(
+								structure.contentTypeHasProperties,
+								(hasProperties) => {
+									this.#singleBlockTypeHasProperties.setValue(hasProperties ?? DEFAULT_BLOCK_HAS_PROPERTIES);
+								},
+								'observeSingleBlockTypeHasProperties',
+							);
+						} else {
+							// If we can't get the structure, assume it has properties (safe default)
+							this.#singleBlockTypeHasProperties.setValue(DEFAULT_BLOCK_HAS_PROPERTIES);
+						}
+					}).catch(() => {
+						// If loading fails, assume it has properties (safe default)
 						this.#singleBlockTypeHasProperties.setValue(DEFAULT_BLOCK_HAS_PROPERTIES);
-					}
+					});
 				} else {
 					// Not a single block type scenario, clear the state
 					this.#singleBlockTypeHasProperties.setValue(undefined);

@@ -344,6 +344,9 @@ export class UmbPropertyEditorUIBlockListElement
 							// If we can't get the structure, assume it has properties (safe default)
 							this._singleBlockTypeHasProperties = DEFAULT_BLOCK_HAS_PROPERTIES;
 						}
+					}).catch(() => {
+						// If loading fails, assume it has properties (safe default)
+						this._singleBlockTypeHasProperties = DEFAULT_BLOCK_HAS_PROPERTIES;
 					});
 				} else {
 					// Not a single block type scenario, clear the state
