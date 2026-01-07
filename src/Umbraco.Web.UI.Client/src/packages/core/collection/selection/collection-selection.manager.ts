@@ -27,6 +27,40 @@ export class UmbCollectionSelectionManager<
 	}
 
 	/**
+	 * Selects an item by its unique identifier.
+	 * Enables select-only mode based on the configuration before selecting.
+	 * @param {string} unique - The unique identifier of the item to select.
+	 */
+	override select(unique: string): void {
+		/* In collection we want to enable select-only mode when selecting an item so we don't accidentally navigate away. */
+		this.setSelectOnly(true);
+		super.select(unique);
+	}
+
+	/**
+	 * Deselects an item by its unique identifier.
+	 * Disables select-only mode based on the configuration before deselecting.
+	 * @param {string} unique - The unique identifier of the item to deselect.
+	 */
+	override deselect(unique: string): void {
+		// In collection we want to disable select-only mode when deselecting an item to allow navigation.
+		// This only applies if the config doesn't enforce select-only.
+		this.setSelectOnly(this.#config?.selectOnly ?? false);
+		super.deselect(unique);
+	}
+
+	/**
+	 * Clears all selected items.
+	 * Disables select-only mode based on the configuration before clearing.
+	 */
+	override clearSelection(): void {
+		// In collection we want to disable select-only mode when clearing selection to allow navigation.
+		// This only applies if the config doesn't enforce select-only.
+		this.setSelectOnly(this.#config?.selectOnly ?? false);
+		super.clearSelection();
+	}
+
+	/**
 	 * The current configuration of the selection manager.
 	 * @returns {UmbCollectionSelectionConfiguration | undefined} - The current configuration of the selection manager.
 	 */

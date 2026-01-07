@@ -24,7 +24,7 @@ export class UmbRefCollectionViewElement extends UmbCollectionViewElementBase {
 			.item=${item}
 			href=${href ?? nothing}
 			?selectable=${this._isSelectableItem(item)}
-			?select-only=${this._selection.length > 0}
+			?select-only=${this._selectOnly}
 			?selected=${this._isSelectedItem(item.unique)}
 			@selected=${() => this._selectItem(item.unique)}
 			@deselected=${() => this._deselectItem(item.unique)}>

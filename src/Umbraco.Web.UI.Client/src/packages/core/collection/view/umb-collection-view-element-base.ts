@@ -15,6 +15,9 @@ export abstract class UmbCollectionViewElementBase extends UmbLitElement {
 	protected _selectable = false;
 
 	@state()
+	protected _selectOnly = false;
+
+	@state()
 	protected _selection: Array<string | null> = [];
 
 	@state()
@@ -35,6 +38,14 @@ export abstract class UmbCollectionViewElementBase extends UmbLitElement {
 				this.#collectionContext?.selection.selectable,
 				(selectable) => (this._selectable = selectable ?? false),
 				'umbCollectionSelectableObserver',
+			);
+
+			this.observe(
+				this.#collectionContext?.selection.selectOnly,
+				(selectOnly) => {
+					this._selectOnly = selectOnly ?? false;
+				},
+				'umbCollectionSelectOnlyObserver',
 			);
 
 			this.observe(
