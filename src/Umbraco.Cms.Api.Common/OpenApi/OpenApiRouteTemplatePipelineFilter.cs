@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.SwaggerUI;
@@ -11,7 +12,10 @@ public class OpenApiRouteTemplatePipelineFilter : UmbracoPipelineFilter
 {
     public OpenApiRouteTemplatePipelineFilter(string name)
         : base(name)
-        => PostPipeline = PostPipelineAction;
+    {
+        PostPipeline = PostPipelineAction;
+        PreMapEndpoints = OnPreMapEndpointsAction;
+    }
 
     private void PostPipelineAction(IApplicationBuilder applicationBuilder)
     {
@@ -23,12 +27,23 @@ public class OpenApiRouteTemplatePipelineFilter : UmbracoPipelineFilter
             return;
         }
 
-        // TODO: Check if there is a better way to do this without calling UseEndpoints twice
-        applicationBuilder.UseEndpoints(e => e.MapOpenApi(options.RouteTemplate));
         applicationBuilder.UseSwaggerUI(swaggerUiOptions => ConfigureSwaggerUi(swaggerUiOptions, options));
     }
 
-    private void ConfigureSwaggerUi(SwaggerUIOptions swaggerUiOptions, UmbracoOpenApiOptions options)
+    private void OnPreMapEndpointsAction(IEndpointRouteBuilder endpoints)
+    {
+        UmbracoOpenApiOptions options = endpoints.ServiceProvider
+            .GetRequiredService<IOptions<UmbracoOpenApiOptions>>().Value;
+
+        if (options.Enabled is false)
+        {
+            return;
+        }
+
+        endpoints.MapOpenApi(options.RouteTemplate);
+    }
+
+    private static void ConfigureSwaggerUi(SwaggerUIOptions swaggerUiOptions, UmbracoOpenApiOptions options)
     {
         swaggerUiOptions.RoutePrefix = options.UiRoutePrefix;
 
