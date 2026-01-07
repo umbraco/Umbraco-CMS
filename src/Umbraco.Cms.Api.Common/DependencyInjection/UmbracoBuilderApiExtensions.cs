@@ -1,13 +1,18 @@
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.SwaggerUI;
 using Umbraco.Cms.Api.Common.Configuration;
 using Umbraco.Cms.Api.Common.OpenApi;
 using Umbraco.Cms.Api.Common.Serialization;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
 using Umbraco.Extensions;
+using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.Api.Common.DependencyInjection;
 
@@ -20,6 +25,14 @@ public static class UmbracoBuilderApiExtensions
             return builder;
         }
 
+        builder.Services.AddOptions<UmbracoOpenApiOptions>()
+            .Configure<IHostingEnvironment, IWebHostEnvironment>((options, hostingEnv, webHostEnv) =>
+            {
+                var backOfficePath = hostingEnv.GetBackOfficePath().TrimStart(Constants.CharArrays.ForwardSlash);
+                options.Enabled = webHostEnv.IsProduction() is false;
+                options.RouteTemplate = $"{backOfficePath}/swagger/{{documentName}}/swagger.json";
+                options.UiRoutePrefix = $"{backOfficePath}/swagger";
+            });
         builder.Services.AddUmbracoApi<ConfigureDefaultApiOptions>(DefaultApiConfiguration.ApiName, "Default API");
         builder.Services.AddSingleton<IUmbracoJsonTypeInfoResolver, UmbracoJsonTypeInfoResolver>();
         builder.Services.Configure<UmbracoPipelineOptions>(options => options.AddFilter(new OpenApiRouteTemplatePipelineFilter("UmbracoApiCommon")));
@@ -44,15 +57,9 @@ public static class UmbracoBuilderApiExtensions
         services.AddOpenApi(apiName);
         services.ConfigureOptions<TConfigureOptions>();
         services.AddOptions<SwaggerUIOptions>()
-            .Configure<IServiceProvider>((swaggerUiOptions, sp) =>
+            .Configure<IOptions<UmbracoOpenApiOptions>>((swaggerUiOptions, openApiOptions) =>
             {
-                OpenApiRouteTemplatePipelineFilter? openApiPipelineFilter = sp.GetRequiredService<IOptions<UmbracoPipelineOptions>>().Value.PipelineFilters.OfType<OpenApiRouteTemplatePipelineFilter>().FirstOrDefault();
-                if (openApiPipelineFilter is null)
-                {
-                    return;
-                }
-
-                var openApiRoute = openApiPipelineFilter.OpenApiRouteTemplate(sp).Replace("{documentName}", apiName).EnsureStartsWith("/");
+                var openApiRoute = openApiOptions.Value.RouteTemplate.Replace("{documentName}", apiName).EnsureStartsWith("/");
                 swaggerUiOptions.SwaggerEndpoint(openApiRoute, apiTitle);
                 swaggerUiOptions.ConfigObject.Urls = swaggerUiOptions.ConfigObject.Urls.OrderBy(x => x.Name);
             });
