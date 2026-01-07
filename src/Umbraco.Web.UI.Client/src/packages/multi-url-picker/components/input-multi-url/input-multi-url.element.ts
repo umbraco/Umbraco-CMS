@@ -1,7 +1,6 @@
 import type { UmbLinkPickerLink } from '../../link-picker-modal/types.js';
 import { UMB_LINK_PICKER_MODAL } from '../../link-picker-modal/link-picker-modal.token.js';
 import {
-	classMap,
 	css,
 	customElement,
 	html,
@@ -386,7 +385,7 @@ export class UmbInputMultiUrlElement extends UmbFormControlMixin<string, typeof 
 	#renderItems() {
 		if (!this.urls) return;
 		return html`
-			<uui-ref-list class=${classMap({ empty: this.urls.length === 0 })}>
+			<uui-ref-list>
 				${repeat(
 					this.urls,
 					(link) => link.unique,
@@ -430,7 +429,7 @@ export class UmbInputMultiUrlElement extends UmbFormControlMixin<string, typeof 
 				width: 100%;
 			}
 
-			uui-ref-list.empty {
+			uui-ref-list:not(:has(:nth-child(1))) {
 				margin-top: -20px;
 				padding-top: 20px;
 			}
