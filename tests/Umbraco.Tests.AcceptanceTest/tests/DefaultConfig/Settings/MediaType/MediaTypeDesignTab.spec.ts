@@ -117,7 +117,7 @@ test('can set a property as mandatory in a media type', {tag: '@smoke'}, async (
   // Act
   await umbracoUi.mediaType.goToMediaType(mediaTypeName);
   await umbracoUi.mediaType.clickEditorSettingsButton();
-  await umbracoUi.mediaType.clickMandatorySlider();
+  await umbracoUi.mediaType.clickMandatoryToggle();
   await umbracoUi.mediaType.clickSubmitButton();
   await umbracoUi.mediaType.clickSaveButton();
 
@@ -277,6 +277,7 @@ test('can create a media type with a composition', async ({umbracoApi, umbracoUi
 
   // Act
   await umbracoUi.mediaType.goToMediaType(mediaTypeName);
+  await umbracoUi.waitForTimeout(500);
   await umbracoUi.mediaType.clickCompositionsButton();
   await umbracoUi.mediaType.clickButtonWithName(compositionMediaTypeName);
   await umbracoUi.mediaType.clickSubmitButton();

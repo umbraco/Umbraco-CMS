@@ -43,7 +43,7 @@ public class HstsCheck : BaseHttpHeaderCheck
     protected override string ReadMoreLink => Constants.HealthChecks.DocumentationLinks.Security.HstsCheck;
 
     /// <inheritdoc />
-    public override async Task<IEnumerable<HealthCheckStatus>> GetStatus() =>
+    public override async Task<IEnumerable<HealthCheckStatus>> GetStatusAsync() =>
         new HealthCheckStatus[] { await CheckForHeader() };
 
     /// <summary>

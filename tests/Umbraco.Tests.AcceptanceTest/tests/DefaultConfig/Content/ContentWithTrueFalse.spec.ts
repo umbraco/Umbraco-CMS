@@ -84,13 +84,15 @@ test('can toggle the true/false value in the content ', async ({umbracoApi, umbr
 test('can toggle the true/false value with the initial state enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeId = await umbracoApi.dataType.createTrueFalseDataTypeWithInitialState(customDataTypeName);
-  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, dataTypeId);
-  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, dataTypeId);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
-  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickActionsMenuAtRoot();
+  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.chooseDocumentType(documentTypeName);
+  await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.clickToggleButton();
   await umbracoUi.content.clickSaveButton();
 
@@ -100,6 +102,9 @@ test('can toggle the true/false value with the initial state enabled', async ({u
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(customDataTypeName));
   expect(contentData.values[0].value).toEqual(false);
+
+  // Clean
+  await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
 test('can show the label on for the true/false in the content ', async ({umbracoApi, umbracoUi}) => {

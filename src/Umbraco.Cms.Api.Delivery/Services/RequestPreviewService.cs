@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Umbraco.Cms.Core.DeliveryApi;
 
 namespace Umbraco.Cms.Api.Delivery.Services;
@@ -11,5 +11,5 @@ internal sealed class RequestPreviewService : RequestHeaderHandler, IRequestPrev
     }
 
     /// <inheritdoc />
-    public bool IsPreview() => GetHeaderValue("Preview") == "true";
+    public bool IsPreview() => string.Equals(GetHeaderValue("Preview"), "true", StringComparison.OrdinalIgnoreCase);
 }

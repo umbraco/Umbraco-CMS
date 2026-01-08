@@ -9,7 +9,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		weight: 200,
 		meta: {
 			label: '#general_create',
-			href: 'section/member-management/workspace/member/create/member-type-1-id', // TODO: remove hardcoded member type id
 		},
 		element: () => import('./create-member-collection-action.element.js'),
 		conditions: [

@@ -57,7 +57,7 @@ public abstract class UmbracoIntegrationTestWithContent : UmbracoIntegrationTest
         // Create and Save Content "Text Page 1" based on "umbTextpage" -> 1054
         Subpage = ContentBuilder.CreateSimpleContent(ContentType, "Text Page 1", Textpage.Id);
         Subpage.Key = new Guid(SubPageKey);
-        var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.Now.AddMinutes(-5), null);
+        var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddMinutes(-5), null);
         ContentService.Save(Subpage, -1, contentSchedule);
 
         // Create and Save Content "Text Page 1" based on "umbTextpage" -> 1055

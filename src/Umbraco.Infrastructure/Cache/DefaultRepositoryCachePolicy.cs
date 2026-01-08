@@ -24,6 +24,8 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
     private static readonly TEntity[] _emptyEntities = new TEntity[0]; // const
     private readonly RepositoryCachePolicyOptions _options;
 
+    private const string NullRepresentationInCache = "*NULL*";
+
     public DefaultRepositoryCachePolicy(IAppPolicyCache cache, IScopeAccessor scopeAccessor, RepositoryCachePolicyOptions options)
         : base(cache, scopeAccessor) =>
         _options = options ?? throw new ArgumentNullException(nameof(options));
@@ -116,6 +118,7 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
         {
             // whatever happens, clear the cache
             var cacheKey = GetEntityCacheKey(entity.Id);
+
             Cache.Clear(cacheKey);
 
             // if there's a GetAllCacheAllowZeroCount cache, ensure it is cleared
@@ -127,19 +130,35 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
     public override TEntity? Get(TId? id, Func<TId?, TEntity?> performGet, Func<TId[]?, IEnumerable<TEntity>?> performGetAll)
     {
         var cacheKey = GetEntityCacheKey(id);
+
         TEntity? fromCache = Cache.GetCacheItem<TEntity>(cacheKey);
 
-        // if found in cache then return else fetch and cache
-        if (fromCache != null)
+        // If found in cache then return immediately.
+        if (fromCache is not null)
         {
             return fromCache;
         }
 
+        // Because TEntity can never be a string, we will never be in a position where the proxy value collides withs a real value.
+        // Therefore this point can only be reached if there is a proxy null value => becomes null when cast to TEntity above OR the item simply does not exist.
+        // If we've cached a "null" value, return null.
+        if (_options.CacheNullValues && Cache.GetCacheItem<string>(cacheKey) == NullRepresentationInCache)
+        {
+            return null;
+        }
+
+        // Otherwise go to the database to retrieve.
         TEntity? entity = performGet(id);
 
         if (entity != null && entity.HasIdentity)
         {
+            // If we've found an identified entity, cache it for subsequent retrieval.
             InsertEntity(cacheKey, entity);
+        }
+        else if (entity is null && _options.CacheNullValues)
+        {
+            // If we've not found an entity, and we're caching null values, cache a "null" value.
+            InsertNull(cacheKey);
         }
 
         return entity;
@@ -247,6 +266,15 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
 
     protected virtual void InsertEntity(string cacheKey, TEntity entity)
         => Cache.Insert(cacheKey, () => entity, TimeSpan.FromMinutes(5), true);
+
+    protected virtual void InsertNull(string cacheKey)
+    {
+        // We can't actually cache a null value, as in doing so wouldn't be able to distinguish between
+        // a value that does exist but isn't yet cached, or a value that has been explicitly cached with a null value.
+        // Both would return null when we retrieve from the cache and we couldn't distinguish between the two.
+        // So we cache a special value that represents null, and then we can check for that value when we retrieve from the cache.
+        Cache.Insert(cacheKey, () => NullRepresentationInCache, TimeSpan.FromMinutes(5), true);
+    }
 
     protected virtual void InsertEntities(TId[]? ids, TEntity[]? entities)
     {

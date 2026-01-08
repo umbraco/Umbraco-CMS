@@ -159,12 +159,20 @@ public interface IContentTypeBaseService<TItem> : IContentTypeBaseService, IServ
     /// <summary>
     /// Returns all the content type allowed as root.
     /// </summary>
-    /// <returns></returns>
     Task<PagedModel<TItem>> GetAllAllowedAsRootAsync(int skip, int take);
 
     /// <summary>
     /// Returns all content types allowed as children for a given content type key.
     /// </summary>
-    /// <returns></returns>
+    /// <param name="key">The content type key.</param>
     Task<Attempt<PagedModel<TItem>?, ContentTypeOperationStatus>> GetAllowedChildrenAsync(Guid key, int skip, int take);
+
+    /// <summary>
+    /// Returns all content types allowed as children for a given content type key.
+    /// </summary>
+    /// <param name="key">The content type key.</param>
+    /// <param name="parentContentKey">The parent content key.</param>
+    Task<Attempt<PagedModel<TItem>?, ContentTypeOperationStatus>> GetAllowedChildrenAsync(Guid key, Guid? parentContentKey, int skip, int take)
+        => GetAllowedChildrenAsync(key, skip, take);
+
 }

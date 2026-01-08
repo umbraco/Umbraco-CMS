@@ -23,12 +23,6 @@ const manifest: ManifestPropertyEditorUi = {
 					description: 'Select the applicable types',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.ContentPicker.SourceType',
 				},
-				{
-					alias: 'showOpenButton',
-					label: 'Show open button',
-					description: 'Opens the node in a dialog',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
-				},
 			],
 		},
 	},

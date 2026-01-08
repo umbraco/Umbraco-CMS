@@ -170,7 +170,7 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 		css`
 			:host {
 				display: block;
-				background: rgb(244, 244, 244);
+				background: var(--uui-color-surface, #f4f4f4);
 
 				--curves-color: var(--umb-login-curves-color, #f5c1bc);
 				--curves-display: var(--umb-login-curves-display, inline);

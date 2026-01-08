@@ -4,6 +4,7 @@ import { manifests as treeManifests } from './tree/manifests.js';
 import { manifests as workspaceManifests } from './workspace/manifests.js';
 import { manifests as entityActionManifests } from './entity-actions/manifests.js';
 import { manifests as componentManifests } from './global-components/manifests.js';
+import { manifests as propertyEditorsManifests } from './property-editors/manifests.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	...repositoryManifests,
@@ -12,4 +13,5 @@ export const manifests: Array<UmbExtensionManifest> = [
 	...workspaceManifests,
 	...entityActionManifests,
 	...componentManifests,
+	...propertyEditorsManifests,
 ];

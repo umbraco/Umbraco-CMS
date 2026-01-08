@@ -70,7 +70,7 @@ export class UmbLogViewerDateRangeSelectorElement extends UmbLitElement {
 		return html`
 			<div class="input-container">
 				<uui-label for="start-date">From:</uui-label>
-				<input
+				<umb-input-date
 					@click=${(e: Event) => {
 						(e.target as HTMLInputElement).showPicker();
 					}}
@@ -78,11 +78,11 @@ export class UmbLogViewerDateRangeSelectorElement extends UmbLitElement {
 					type="date"
 					label="From"
 					.max=${this.#logViewerContext?.today ?? ''}
-					.value=${this._startDate} />
+					.value=${this._startDate}></umb-input-date>
 			</div>
 			<div class="input-container">
 				<uui-label for="end-date">To: </uui-label>
-				<input
+				<umb-input-date
 					@click=${(e: Event) => {
 						(e.target as HTMLInputElement).showPicker();
 					}}
@@ -91,7 +91,7 @@ export class UmbLogViewerDateRangeSelectorElement extends UmbLitElement {
 					label="To"
 					.min=${this._startDate}
 					.max=${this.#logViewerContext?.today ?? ''}
-					.value=${this._endDate} />
+					.value=${this._endDate}></umb-input-date>
 			</div>
 		`;
 	}
@@ -104,30 +104,14 @@ export class UmbLogViewerDateRangeSelectorElement extends UmbLitElement {
 				flex-direction: column;
 				gap: var(--uui-size-space-3);
 			}
-
-			input {
-				font-family: inherit;
-				padding: var(--uui-size-1) var(--uui-size-space-3);
-				font-size: inherit;
-				color: inherit;
-				border-radius: 0;
-				box-sizing: border-box;
-				border: none;
-				background: none;
+			umb-input-date {
 				width: 100%;
-				outline: none;
-				position: relative;
-				border-bottom: 2px solid transparent;
-			}
-
-			/* find out better validation for that  */
-			input:out-of-range {
-				border-color: var(--uui-color-danger);
 			}
 
 			:host([horizontal]) .input-container {
 				display: flex;
 				align-items: baseline;
+				gap: var(--uui-size-space-3);
 			}
 		`,
 	];

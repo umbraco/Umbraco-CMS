@@ -43,16 +43,16 @@ public class ConvertersTests
 
         var elementType1 = contentTypeFactory.CreateContentType(Guid.NewGuid(), 1000, "element1", CreatePropertyTypes);
 
-        var element1 = new PublishedElement(elementType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false);
+        var element1 = new PublishedElement(elementType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false, new VariationContext());
 
         Assert.AreEqual(1234, element1.Value(Mock.Of<IPublishedValueFallback>(), "prop1"));
 
         // 'null' would be considered a 'missing' value by the default, magic logic
-        var e = new PublishedElement(elementType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", null } }, false);
+        var e = new PublishedElement(elementType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", null } }, false, new VariationContext());
         Assert.IsFalse(e.HasValue("prop1"));
 
         // '0' would not - it's a valid integer - but the converter knows better
-        e = new PublishedElement(elementType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "0" } }, false);
+        e = new PublishedElement(elementType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "0" } }, false, new VariationContext());
         Assert.IsFalse(e.HasValue("prop1"));
     }
 
@@ -120,7 +120,7 @@ public class ConvertersTests
 
         var elementType1 = contentTypeFactory.CreateContentType(Guid.NewGuid(), 1000, "element1", CreatePropertyTypes);
 
-        var element1 = new PublishedElement(elementType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false);
+        var element1 = new PublishedElement(elementType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false, new VariationContext());
 
         var cntType1 = contentTypeFactory.CreateContentType(Guid.NewGuid(), 1001, "cnt1", t => Enumerable.Empty<PublishedPropertyType>());
         var cnt1 = new InternalPublishedContent(cntType1) { Id = 1234 };

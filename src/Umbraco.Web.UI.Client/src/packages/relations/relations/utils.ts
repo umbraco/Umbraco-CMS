@@ -3,6 +3,7 @@ import type {
 	DefaultReferenceResponseModel,
 	DocumentReferenceResponseModel,
 	MediaReferenceResponseModel,
+	MemberReferenceResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 
 /**
@@ -19,6 +20,14 @@ export function isDocumentReference(item: UmbReferenceModel): item is DocumentRe
  */
 export function isMediaReference(item: UmbReferenceModel): item is MediaReferenceResponseModel {
 	return typeof (item as MediaReferenceResponseModel).mediaType !== 'undefined';
+}
+
+/**
+ *
+ * @param item
+ */
+export function isMemberReference(item: UmbReferenceModel): item is MemberReferenceResponseModel {
+	return typeof (item as MemberReferenceResponseModel).memberType !== 'undefined';
 }
 
 /**

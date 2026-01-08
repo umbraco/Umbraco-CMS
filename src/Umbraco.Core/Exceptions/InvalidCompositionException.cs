@@ -35,7 +35,7 @@ public class InvalidCompositionException : Exception
     /// <param name="addedCompositionAlias">The added composition alias.</param>
     /// <param name="propertyTypeAliases">The property type aliases.</param>
     public InvalidCompositionException(string contentTypeAlias, string? addedCompositionAlias, string[] propertyTypeAliases)
-        : this(contentTypeAlias, addedCompositionAlias, propertyTypeAliases, new string[0])
+        : this(contentTypeAlias, addedCompositionAlias, propertyTypeAliases, [])
     {
     }
 

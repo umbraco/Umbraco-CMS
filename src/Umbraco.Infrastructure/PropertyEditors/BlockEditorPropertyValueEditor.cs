@@ -20,8 +20,6 @@ public abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : BlockVal
     where TValue : BlockValue<TLayout>, new()
     where TLayout : class, IBlockLayoutItem, new()
 {
-    private readonly IJsonSerializer _jsonSerializer;
-
     [Obsolete("Please use the non-obsolete constructor. Will be removed in V16.")]
     protected BlockEditorPropertyValueEditor(
         DataEditorAttribute attribute,
@@ -52,7 +50,12 @@ public abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : BlockVal
         IIOHelper ioHelper,
         DataEditorAttribute attribute)
         : base(propertyEditors, dataTypeConfigurationCache, shortStringHelper, jsonSerializer, dataValueReferenceFactories, blockEditorVarianceHandler, languageService, ioHelper, attribute) =>
-        _jsonSerializer = jsonSerializer;
+        JsonSerializer = jsonSerializer;
+
+    /// <summary>
+    /// Gets the <see cref="IJsonSerializer"/>.
+    /// </summary>
+    protected IJsonSerializer JsonSerializer { get; }
 
     /// <inheritdoc />
     public override IEnumerable<UmbracoEntityReference> GetReferences(object? value)
@@ -143,6 +146,6 @@ public abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : BlockVal
         MapBlockValueFromEditor(blockEditorData.BlockValue);
 
         // return json
-        return _jsonSerializer.Serialize(blockEditorData.BlockValue);
+        return JsonSerializer.Serialize(blockEditorData.BlockValue);
     }
 }

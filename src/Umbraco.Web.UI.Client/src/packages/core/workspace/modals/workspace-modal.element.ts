@@ -7,7 +7,22 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 @customElement('umb-workspace-modal')
 export class UmbWorkspaceModalElement extends UmbLitElement {
 	@property({ attribute: false })
-	data?: UmbWorkspaceModalData;
+	public get data(): UmbWorkspaceModalData | undefined {
+		return this._data;
+	}
+	public set data(value: UmbWorkspaceModalData | undefined) {
+		this._data = value;
+		if (value?.inheritValidationLook) {
+			// Do nothing.
+		} else {
+			const elementStyle = this.style;
+			elementStyle.setProperty('--uui-color-invalid', 'var(--uui-color-danger)');
+			elementStyle.setProperty('--uui-color-invalid-emphasis', 'var(--uui-color-danger-emphasis)');
+			elementStyle.setProperty('--uui-color-invalid-standalone', 'var(--uui-color-danger-standalone)');
+			elementStyle.setProperty('--uui-color-invalid-contrast', 'var(--uui-color-danger-contrast)');
+		}
+	}
+	private _data?: UmbWorkspaceModalData | undefined;
 
 	/**
 	 * TODO: Consider if this binding and events integration is the right for communicating back the modal handler. Or if we should go with some Context API. like a Modal Context API.

@@ -85,7 +85,7 @@ export class UmbFormValidationMessageElement extends UmbLitElement {
 	static override styles = [
 		css`
 			#messages {
-				color: var(--uui-color-danger-standalone);
+				color: var(--uui-color-invalid-standalone);
 			}
 		`,
 	];

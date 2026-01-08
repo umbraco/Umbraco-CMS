@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -38,7 +38,7 @@ public abstract class BackOfficeSecurityRequirementsOperationFilterBase : IOpera
                                 Type = ReferenceType.SecurityScheme,
                                 Id = ManagementApiConfiguration.ApiSecurityName
                             }
-                        }, new string[] { }
+                        }, []
                     }
                 }
             };
@@ -59,7 +59,7 @@ public abstract class BackOfficeSecurityRequirementsOperationFilterBase : IOpera
         {
             operation.Responses.Add(StatusCodes.Status403Forbidden.ToString(), new OpenApiResponse()
             {
-                Description = "The authenticated user do not have access to this resource"
+                Description = "The authenticated user does not have access to this resource"
             });
         }
     }

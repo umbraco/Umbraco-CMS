@@ -2076,9 +2076,6 @@ export default {
 			"Gosodiadau SMTP wedi ffurfweddu'n gywir ac mae'r gwasanaeth yn gweithio fel y disgwylir.",
 		notificationEmailsCheckSuccessMessage: "Ebost hysbusu wedi'i osod at <strong>%0%</strong>.",
 		notificationEmailsCheckErrorMessage: "Ebost hysbusu yn dal wedi'i osod at y gwerth diofyn o <strong>%0%</strong>.",
-		scheduledHealthCheckEmailBody:
-			"<html><body><p>Canlyniadau'r gwiriad Statws Iechyd Umbraco ar amserlen rhedwyd ar %0% am %1% fel y ganlyn:</p>%2%</body></html>",
-		scheduledHealthCheckEmailSubject: 'Statws Iechyd Umbraco: %0%',
 		checkGroup: 'Gwiriwch y grŵp',
 		helpText:
 			'\n            <p>Mae\'r gwiriwr iechyd yn gwerthuso gwahanol rannau o\'ch gwefan ar gyfer gosodiadau arfer gorau, cyfluniad, problemau posibl, ac ati. Gallwch chi drwsio problemau yn hawdd trwy wasgu botwm.\n            Gallwch chi ychwanegu eich gwiriadau iechyd eich hun, edrych ar <a href="https://docs.umbraco.com/umbraco-cms/extending/health-check" target="_blank" rel="noopener" class="btn-link -underline">y ddogfennaeth i gael mwy o wybodaeth</a> am wiriadau iechyd arferu.</p>\n            ',

@@ -81,6 +81,7 @@ export default class UmbTinyMceMultiUrlPickerPlugin extends UmbTinyMcePluginBase
 			data: {
 				config: {},
 				index: null,
+				isNew: currentTarget?.url === undefined,
 			},
 			value: {
 				link: currentTarget ?? {},

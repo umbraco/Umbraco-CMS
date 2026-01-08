@@ -79,6 +79,7 @@ export class UmbClipboardPastePropertyValueTranslatorValueResolver<
 		}
 
 		// Pick the manifest with the highest priority
+		// TODO: This should have been handled in the extension registry, but until then we do it here: [NL]
 		return supportedManifests.sort((a: ManifestBase, b: ManifestBase): number => (b.weight || 0) - (a.weight || 0))[0];
 	}
 

@@ -12,6 +12,7 @@ using Umbraco.Cms.Core.Media.EmbedProviders;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.ServerEvents;
+using Umbraco.Cms.Core.Services.Filters;
 using Umbraco.Cms.Core.Snippets;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Webhooks;
@@ -92,6 +93,7 @@ public static partial class UmbracoBuilderExtensions
         builder.SortHandlers().Add(() => builder.TypeLoader.GetTypes<ISortHandler>());
         builder.ContentIndexHandlers().Add(() => builder.TypeLoader.GetTypes<IContentIndexHandler>());
         builder.WebhookEvents().AddCms(true);
+        builder.ContentTypeFilters();
     }
 
     /// <summary>
@@ -246,4 +248,11 @@ public static partial class UmbracoBuilderExtensions
     /// </summary>
     public static ContentIndexHandlerCollectionBuilder ContentIndexHandlers(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<ContentIndexHandlerCollectionBuilder>();
+
+    /// <summary>
+    /// Gets the content type filters collection builder.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    public static ContentTypeFilterCollectionBuilder ContentTypeFilters(this IUmbracoBuilder builder)
+        => builder.WithCollectionBuilder<ContentTypeFilterCollectionBuilder>();
 }

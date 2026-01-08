@@ -1,3 +1,4 @@
+using System.Data;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
@@ -97,6 +98,16 @@ internal class DocumentVersionRepository : IDocumentVersionRepository
 
         Page<ContentVersionMeta>? page =
             _scopeAccessor.AmbientScope?.Database.Page<ContentVersionMeta>(pageIndex + 1, pageSize, query);
+
+        // Dates stored in the database are local server time, but for SQL Server, will be considered
+        // as DateTime.Kind = Utc. Fix this so we are consistent when later mapping to DataTimeOffset.
+        if (page is not null)
+        {
+            foreach (ContentVersionMeta item in page.Items)
+            {
+                item.SpecifyVersionDateKind(DateTimeKind.Local);
+            }
+        }
 
         totalRecords = page?.TotalItems ?? 0;
 

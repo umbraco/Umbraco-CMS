@@ -14,13 +14,18 @@ export interface UmbTreeItemContext<TreeItemType extends UmbTreeItemModel> exten
 	isSelectable: Observable<boolean>;
 	isSelected: Observable<boolean>;
 	isActive: Observable<boolean>;
+	isOpen: Observable<boolean>;
 	hasActions: Observable<boolean>;
 	path: Observable<string>;
 	pagination: UmbPaginationManager;
+	getTreeItem(): TreeItemType | undefined;
 	setTreeItem(treeItem: TreeItemType | undefined): void;
 	loadChildren(): void;
 	toggleContextMenu(): void;
 	select(): void;
 	deselect(): void;
 	constructPath(pathname: string, entityType: string, unique: string): string;
+	loadChildren(): void;
+	showChildren(): void;
+	hideChildren(): void;
 }

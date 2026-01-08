@@ -8,9 +8,9 @@ test.beforeEach(async ({umbracoUi}) => {
 
 test('can update value of activate the profiler by default', async ({umbracoUi}) => {
   // Act
-  await umbracoUi.profiling.clickActivateProfilerByDefaultSlider();
+  await umbracoUi.profiling.clickActivateProfilerByDefaultToggle();
   await umbracoUi.reloadPage();
 
   // Assert
-  await umbracoUi.profiling.isActivateProfilerByDefaultSliderChecked(true);
+  await umbracoUi.profiling.isActivateProfilerByDefaultToggleChecked(true);
 });

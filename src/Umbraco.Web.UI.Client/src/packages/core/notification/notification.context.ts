@@ -1,31 +1,9 @@
 import { UmbNotificationHandler } from './notification-handler.js';
+import type { UmbNotificationColor, UmbNotificationOptions } from './types.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbBasicState } from '@umbraco-cms/backoffice/observable-api';
-
-/**
- * The default data of notifications
- * @interface UmbNotificationDefaultData
- */
-export interface UmbNotificationDefaultData {
-	message: string;
-	headline?: string;
-	structuredList?: Record<string, Array<unknown>>;
-}
-
-/**
- * @interface UmbNotificationOptions
- * @template UmbNotificationData
- */
-export interface UmbNotificationOptions<UmbNotificationData = UmbNotificationDefaultData> {
-	color?: UmbNotificationColor;
-	duration?: number | null;
-	elementName?: string;
-	data?: UmbNotificationData;
-}
-
-export type UmbNotificationColor = '' | 'default' | 'positive' | 'warning' | 'danger';
 
 export class UmbNotificationContext extends UmbContextBase<UmbNotificationContext> {
 	// Notice this cannot use UniqueBehaviorSubject as it holds a HTML Element. which cannot be Serialized to JSON (it has some circular references)
@@ -42,9 +20,9 @@ export class UmbNotificationContext extends UmbContextBase<UmbNotificationContex
 	 * @returns {*}  {UmbNotificationHandler}
 	 * @memberof UmbNotificationContext
 	 */
-	private _open(options: UmbNotificationOptions): UmbNotificationHandler {
+	#open<T extends UmbNotificationOptions = UmbNotificationOptions>(options: T): UmbNotificationHandler {
 		const notificationHandler = new UmbNotificationHandler(options);
-		notificationHandler.element.addEventListener('closed', () => this._handleClosed(notificationHandler));
+		notificationHandler.element?.addEventListener('closed', () => this._handleClosed(notificationHandler));
 
 		this._notifications.setValue([...this._notifications.getValue(), notificationHandler]);
 
@@ -78,8 +56,11 @@ export class UmbNotificationContext extends UmbContextBase<UmbNotificationContex
 	 * @returns {*}
 	 * @memberof UmbNotificationContext
 	 */
-	public peek(color: UmbNotificationColor, options: UmbNotificationOptions): UmbNotificationHandler {
-		return this._open({ color, ...options });
+	public peek<T extends UmbNotificationOptions = UmbNotificationOptions>(
+		color: UmbNotificationColor,
+		options: T,
+	): UmbNotificationHandler {
+		return this.#open({ color, ...options });
 	}
 
 	/**
@@ -89,8 +70,11 @@ export class UmbNotificationContext extends UmbContextBase<UmbNotificationContex
 	 * @returns {*}
 	 * @memberof UmbNotificationContext
 	 */
-	public stay(color: UmbNotificationColor, options: UmbNotificationOptions): UmbNotificationHandler {
-		return this._open({ ...options, color, duration: null });
+	public stay<T extends UmbNotificationOptions = UmbNotificationOptions>(
+		color: UmbNotificationColor,
+		options: T,
+	): UmbNotificationHandler {
+		return this.#open({ ...options, color, duration: null });
 	}
 }
 

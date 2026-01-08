@@ -382,4 +382,12 @@ public interface IEntityService
     /// <returns>The identifier.</returns>
     /// <remarks>When a new content or a media is saved with the key, it will have the reserved identifier.</remarks>
     int ReserveId(Guid key);
+
+    /// <summary>
+    /// Gets the GUID keys for an entity's path (provided as a comma separated list of integer Ids).
+    /// </summary>
+    /// <param name="entity">The entity.</param>
+    /// <param name="omitSelf">A value indicating whether to omit the entity's own key from the result.</param>
+    /// <returns>The path with each ID converted to a GUID.</returns>
+    Guid[] GetPathKeys(ITreeEntity entity, bool omitSelf = false) => [];
 }

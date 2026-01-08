@@ -81,4 +81,10 @@ public abstract class BlockLayoutItemBase : IBlockLayoutItem
         SettingsKey = settingsKey;
         SettingsUdi = new GuidUdi(Constants.UdiEntityType.Element, settingsKey);
     }
+
+    public virtual bool ReferencesContent(Guid key)
+        => ContentKey == key;
+
+    public virtual bool ReferencesSetting(Guid key)
+        => SettingsKey == key;
 }

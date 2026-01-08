@@ -6,8 +6,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
-const elementName = 'umb-picker-search-result';
-@customElement(elementName)
+@customElement('umb-picker-search-result')
 export class UmbPickerSearchResultElement extends UmbLitElement {
 	@state()
 	_query?: UmbSearchRequestArgs;
@@ -67,6 +66,6 @@ export class UmbPickerSearchResultElement extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbPickerSearchResultElement;
+		'umb-picker-search-result': UmbPickerSearchResultElement;
 	}
 }

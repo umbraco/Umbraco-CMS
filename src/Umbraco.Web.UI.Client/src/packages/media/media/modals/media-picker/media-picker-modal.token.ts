@@ -1,17 +1,11 @@
-import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
+import type { UmbMediaItemModel } from '../../repository/types.js';
+import type { UmbTreePickerModalData } from '@umbraco-cms/backoffice/tree';
+import { UmbModalToken, type UmbPickerModalValue } from '@umbraco-cms/backoffice/modal';
 
-export interface UmbMediaPickerModalData<ItemType> {
-	startNode?: string | null;
-	multiple?: boolean;
-	pickableFilter?: (item: ItemType) => boolean;
-	filter?: (item: ItemType) => boolean;
-}
+export type UmbMediaPickerModalData = UmbTreePickerModalData<UmbMediaItemModel>;
+export type UmbMediaPickerModalValue = UmbPickerModalValue;
 
-export interface UmbMediaPickerModalValue {
-	selection: string[];
-}
-
-export const UMB_MEDIA_PICKER_MODAL = new UmbModalToken<UmbMediaPickerModalData<any>, UmbMediaPickerModalValue>(
+export const UMB_MEDIA_PICKER_MODAL = new UmbModalToken<UmbMediaPickerModalData, UmbMediaPickerModalValue>(
 	'Umb.Modal.MediaPicker',
 	{
 		modal: {

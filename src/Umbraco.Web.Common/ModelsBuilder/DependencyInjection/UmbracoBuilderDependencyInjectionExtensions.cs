@@ -15,6 +15,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Infrastructure.ModelsBuilder;
 using Umbraco.Cms.Infrastructure.ModelsBuilder.Building;
+using Umbraco.Cms.Infrastructure.ModelsBuilder.Options;
 using Umbraco.Cms.Web.Common.ModelsBuilder;
 using Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto;
 
@@ -140,6 +141,8 @@ public static class UmbracoBuilderDependencyInjectionExtensions
         builder.Services.AddSingleton<ModelsGenerator>();
         builder.Services.AddSingleton<OutOfDateModelsStatus>();
         builder.Services.AddSingleton<ModelsGenerationError>();
+
+        builder.Services.ConfigureOptions<ConfigurePropertySettingsOptions>();
 
         return builder;
     }

@@ -1,6 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
@@ -24,11 +26,75 @@ public class AddUnroutableContentWarningsWhenPublishingNotificationHandler : INo
     private readonly ILoggerFactory _loggerFactory;
     private readonly UriUtility _uriUtility;
     private readonly IPublishedUrlProvider _publishedUrlProvider;
-    private readonly IPublishedContentCache _publishedContentCache;
     private readonly IDocumentNavigationQueryService _navigationQueryService;
+    private readonly IPublishedContentStatusFilteringService _publishedContentStatusFilteringService;
     private readonly IEventMessagesFactory _eventMessagesFactory;
     private readonly ContentSettings _contentSettings;
 
+    public AddUnroutableContentWarningsWhenPublishingNotificationHandler(
+        IPublishedRouter publishedRouter,
+        IUmbracoContextAccessor umbracoContextAccessor,
+        ILanguageService languageService,
+        ILocalizedTextService localizedTextService,
+        IContentService contentService,
+        IVariationContextAccessor variationContextAccessor,
+        ILoggerFactory loggerFactory,
+        UriUtility uriUtility,
+        IPublishedUrlProvider publishedUrlProvider,
+        IDocumentNavigationQueryService navigationQueryService,
+        IPublishedContentStatusFilteringService publishedContentStatusFilteringService,
+        IEventMessagesFactory eventMessagesFactory,
+        IOptions<ContentSettings> contentSettings)
+    {
+        _publishedRouter = publishedRouter;
+        _umbracoContextAccessor = umbracoContextAccessor;
+        _languageService = languageService;
+        _localizedTextService = localizedTextService;
+        _contentService = contentService;
+        _variationContextAccessor = variationContextAccessor;
+        _loggerFactory = loggerFactory;
+        _uriUtility = uriUtility;
+        _publishedUrlProvider = publishedUrlProvider;
+        _navigationQueryService = navigationQueryService;
+        _publishedContentStatusFilteringService = publishedContentStatusFilteringService;
+        _eventMessagesFactory = eventMessagesFactory;
+        _contentSettings = contentSettings.Value;
+    }
+
+    [Obsolete("Use the non-obsolete constructor. Scheduled for removal in V17.")]
+    public AddUnroutableContentWarningsWhenPublishingNotificationHandler(
+        IPublishedRouter publishedRouter,
+        IUmbracoContextAccessor umbracoContextAccessor,
+        ILanguageService languageService,
+        ILocalizedTextService localizedTextService,
+        IContentService contentService,
+        IVariationContextAccessor variationContextAccessor,
+        ILoggerFactory loggerFactory,
+        UriUtility uriUtility,
+        IPublishedUrlProvider publishedUrlProvider,
+        IPublishedContentCache publishedContentCache,
+        IDocumentNavigationQueryService navigationQueryService,
+        IPublishedContentStatusFilteringService publishedContentStatusFilteringService,
+        IEventMessagesFactory eventMessagesFactory,
+        IOptions<ContentSettings> contentSettings)
+        : this(
+            publishedRouter,
+            umbracoContextAccessor,
+            languageService,
+            localizedTextService,
+            contentService,
+            variationContextAccessor,
+            loggerFactory,
+            uriUtility,
+            publishedUrlProvider,
+            navigationQueryService,
+            publishedContentStatusFilteringService,
+            eventMessagesFactory,
+            contentSettings)
+    {
+    }
+
+    [Obsolete("Use the non-obsolete constructor. Scheduled for removal in V17.")]
     public AddUnroutableContentWarningsWhenPublishingNotificationHandler(
         IPublishedRouter publishedRouter,
         IUmbracoContextAccessor umbracoContextAccessor,
@@ -43,20 +109,21 @@ public class AddUnroutableContentWarningsWhenPublishingNotificationHandler : INo
         IDocumentNavigationQueryService navigationQueryService,
         IEventMessagesFactory eventMessagesFactory,
         IOptions<ContentSettings> contentSettings)
+        : this(
+            publishedRouter,
+            umbracoContextAccessor,
+            languageService,
+            localizedTextService,
+            contentService,
+            variationContextAccessor,
+            loggerFactory,
+            uriUtility,
+            publishedUrlProvider,
+            navigationQueryService,
+            StaticServiceProvider.Instance.GetRequiredService<IPublishedContentStatusFilteringService>(),
+            eventMessagesFactory,
+            contentSettings)
     {
-        _publishedRouter = publishedRouter;
-        _umbracoContextAccessor = umbracoContextAccessor;
-        _languageService = languageService;
-        _localizedTextService = localizedTextService;
-        _contentService = contentService;
-        _variationContextAccessor = variationContextAccessor;
-        _loggerFactory = loggerFactory;
-        _uriUtility = uriUtility;
-        _publishedUrlProvider = publishedUrlProvider;
-        _publishedContentCache = publishedContentCache;
-        _navigationQueryService = navigationQueryService;
-        _eventMessagesFactory = eventMessagesFactory;
-        _contentSettings = contentSettings.Value;
     }
 
     public async Task HandleAsync(ContentPublishedNotification notification, CancellationToken cancellationToken)
@@ -99,8 +166,8 @@ public class AddUnroutableContentWarningsWhenPublishingNotificationHandler : INo
                 _loggerFactory.CreateLogger<IContent>(),
                 _uriUtility,
                 _publishedUrlProvider,
-                _publishedContentCache,
-                _navigationQueryService)).ToArray();
+                _navigationQueryService,
+                _publishedContentStatusFilteringService)).ToArray();
 
 
             EventMessages eventMessages = _eventMessagesFactory.Get();

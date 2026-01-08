@@ -44,8 +44,8 @@ export abstract class UmbElementPropertyDatasetContext<
 	#propertyVariantIdMap = new UmbBasicState<UmbPropertyVariantIdMapType>([]);
 	private readonly _propertyVariantIdMap = this.#propertyVariantIdMap.asObservable();
 
-	#readOnly = new UmbBooleanState(false);
-	public readOnly = this.#readOnly.asObservable();
+	protected _readOnly = new UmbBooleanState(false);
+	public readOnly = this._readOnly.asObservable();
 
 	getEntityType(): string {
 		return this._dataOwner.getEntityType();
@@ -56,7 +56,7 @@ export abstract class UmbElementPropertyDatasetContext<
 	abstract getName(): string | undefined;
 
 	getReadOnly() {
-		return this.#readOnly.getValue();
+		return this._readOnly.getValue();
 	}
 
 	constructor(host: UmbControllerHost, dataOwner: DataOwnerType, variantId?: UmbVariantId) {
@@ -73,7 +73,7 @@ export abstract class UmbElementPropertyDatasetContext<
 			this._dataOwner.readOnlyState.states,
 			(states) => {
 				const isReadOnly = states.some((state) => state.variantId.equal(this.#variantId));
-				this.#readOnly.setValue(isReadOnly);
+				this._readOnly.setValue(isReadOnly);
 			},
 			null,
 		);

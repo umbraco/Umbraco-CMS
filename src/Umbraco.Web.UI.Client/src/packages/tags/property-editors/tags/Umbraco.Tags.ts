@@ -10,14 +10,15 @@ export const manifest: ManifestPropertyEditorSchema = {
 			properties: [
 				{
 					alias: 'group',
-					label: 'Define a tag group',
+					label: 'Tag group',
 					description: '',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TextBox',
 				},
 				{
 					alias: 'storageType',
 					label: 'Storage Type',
-					description: '',
+					description:
+						'Select whether to store the tags in cache as JSON (default) or CSV format. Notice that CSV does not support commas in the tag value.',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Select',
 					config: [
 						{

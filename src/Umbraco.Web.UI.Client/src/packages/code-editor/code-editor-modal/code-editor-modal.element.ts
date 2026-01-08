@@ -1,11 +1,9 @@
 import type { UmbCodeEditorElement } from '../components/code-editor.element.js';
 import type { UmbCodeEditorModalData, UmbCodeEditorModalValue } from './code-editor-modal.token.js';
-import { css, html, ifDefined, customElement, query } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, ifDefined, query } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 
-const elementName = 'umb-code-editor-modal';
-
-@customElement(elementName)
+@customElement('umb-code-editor-modal')
 export class UmbCodeEditorModalElement extends UmbModalBaseElement<UmbCodeEditorModalData, UmbCodeEditorModalValue> {
 	@query('umb-code-editor')
 	_codeEditor?: UmbCodeEditorElement;
@@ -18,29 +16,39 @@ export class UmbCodeEditorModalElement extends UmbModalBaseElement<UmbCodeEditor
 	#handleCancel() {
 		this.modalContext?.reject();
 	}
+
+	#onLoaded() {
+		if (this.data?.formatOnLoad) {
+			setTimeout(() => {
+				this._codeEditor?.editor?.monacoEditor?.getAction('editor.action.formatDocument')?.run();
+			}, 100);
+		}
+	}
+
 	override render() {
 		return html`
 			<umb-body-layout .headline=${this.data?.headline ?? 'Code Editor'}>
 				<div id="editor-box">${this.#renderCodeEditor()}</div>
-				<div slot="actions">
-					<uui-button
-						id="cancel"
-						label=${this.localize.term('general_cancel')}
-						@click=${this.#handleCancel}></uui-button>
-					<uui-button
-						id="confirm"
-						color="${this.data?.color || 'positive'}"
-						look="primary"
-						label="${this.data?.confirmLabel || this.localize.term('general_submit')}"
-						@click=${this.#handleConfirm}></uui-button>
-				</div>
+				<uui-button
+					slot="actions"
+					label=${this.localize.term('general_cancel')}
+					@click=${this.#handleCancel}></uui-button>
+				<uui-button
+					slot="actions"
+					color=${this.data?.color || 'positive'}
+					look="primary"
+					label=${this.localize.string(this.data?.confirmLabel) || this.localize.term('general_submit')}
+					@click=${this.#handleConfirm}></uui-button>
 			</umb-body-layout>
 		`;
 	}
 
 	#renderCodeEditor() {
 		return html`
-			<umb-code-editor language=${ifDefined(this.data?.language)} .code=${this.data?.content ?? ''}></umb-code-editor>
+			<umb-code-editor
+				language=${ifDefined(this.data?.language)}
+				.code=${this.data?.content ?? ''}
+				@loaded=${this.#onLoaded}></umb-code-editor>
 		`;
 	}
 
@@ -63,6 +71,6 @@ export default UmbCodeEditorModalElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbCodeEditorModalElement;
+		'umb-code-editor-modal': UmbCodeEditorModalElement;
 	}
 }

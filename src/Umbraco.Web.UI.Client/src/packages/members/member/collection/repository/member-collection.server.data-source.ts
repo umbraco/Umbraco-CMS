@@ -59,7 +59,7 @@ export class UmbMemberCollectionServerDataSource implements UmbCollectionDataSou
 				isLockedOut: item.isLockedOut,
 				groups: item.groups,
 				isTwoFactorEnabled: item.isTwoFactorEnabled,
-				memberType: { unique: item.memberType.id },
+				memberType: { unique: item.memberType.id, icon: item.memberType.icon },
 				username: item.username,
 				values: item.values as UmbMemberValueModel[],
 			};

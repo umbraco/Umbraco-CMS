@@ -18,7 +18,6 @@ export class UmbBlockTypeCardElement extends UmbLitElement {
 	readonly #itemManager = new UmbRepositoryItemsManager<UmbDocumentTypeItemModel>(
 		this,
 		UMB_DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS,
-		(x) => x.unique,
 	);
 
 	@property({ type: String })
@@ -81,12 +80,17 @@ export class UmbBlockTypeCardElement extends UmbLitElement {
 			this.#serverUrl = appContext.getServerUrl();
 		});
 
-		this.observe(this.#itemManager.items, (items) => {
-			const item = items[0];
-			if (item) {
+		this.observe(this.#itemManager.statuses, async (statuses) => {
+			const status = statuses[0];
+			if (status?.state.type === 'success') {
+				const item = await this.#itemManager.getItemByUnique(status.unique);
 				this._fallbackIcon = item.icon;
 				this._name = item.name ? this.localize.string(item.name) : this.localize.term('general_unknown');
 				this._description = this.localize.string(item.description);
+			} else if (status?.state.type === 'error') {
+				this._fallbackIcon = 'icon-alert';
+				this._name = this.localize.term('blockEditor_elementTypeDoesNotExistHeadline');
+				this._description = this.localize.term('blockEditor_elementTypeDoesNotExistDescription');
 			}
 		});
 	}

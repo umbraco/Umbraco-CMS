@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
@@ -272,7 +273,7 @@ public class TemplateRepositoryTest : UmbracoIntegrationTest
             var propertyEditors =
                 new PropertyEditorCollection(new DataEditorCollection(() => Enumerable.Empty<IDataEditor>()));
             var dataValueReferences =
-                new DataValueReferenceFactoryCollection(() => Enumerable.Empty<IDataValueReferenceFactory>());
+                new DataValueReferenceFactoryCollection(() => Enumerable.Empty<IDataValueReferenceFactory>(), new NullLogger<DataValueReferenceFactoryCollection>());
             var contentRepo = new DocumentRepository(
                 scopeAccessor,
                 AppCaches.Disabled,

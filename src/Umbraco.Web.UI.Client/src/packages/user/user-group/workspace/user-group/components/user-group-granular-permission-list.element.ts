@@ -11,6 +11,9 @@ export class UmbUserGroupGranularPermissionListElement extends UmbLitElement {
 	@state()
 	_userGroupPermissions?: Array<any>;
 
+	@state()
+	_userGroupFallbackPermissions?: Array<string>;
+
 	#workspaceContext?: typeof UMB_USER_GROUP_WORKSPACE_CONTEXT.TYPE;
 
 	constructor() {
@@ -23,6 +26,7 @@ export class UmbUserGroupGranularPermissionListElement extends UmbLitElement {
 				this.#workspaceContext.data,
 				(userGroup) => {
 					this._userGroupPermissions = userGroup?.permissions;
+					this._userGroupFallbackPermissions = userGroup?.fallbackPermissions;
 				},
 				'umbUserGroupGranularPermissionObserver',
 			);
@@ -55,6 +59,7 @@ export class UmbUserGroupGranularPermissionListElement extends UmbLitElement {
 		if (!this._userGroupPermissions) return;
 		return html`<umb-extension-slot
 			type="userGranularPermission"
+			.props=${{ fallbackPermissions: this._userGroupFallbackPermissions }}
 			.renderMethod=${this.#renderProperty}></umb-extension-slot>`;
 	}
 

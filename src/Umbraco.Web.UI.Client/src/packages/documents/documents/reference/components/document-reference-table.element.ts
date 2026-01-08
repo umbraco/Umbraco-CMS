@@ -6,9 +6,15 @@ import {
 	type UmbReferenceModel,
 	isDocumentReference,
 	isMediaReference,
+	isMemberReference,
 	isDefaultReference,
 } from '@umbraco-cms/backoffice/relations';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
+/**
+ * @deprecated Deprecated from 15.4. The element will be removed in v17.0.0. For modals use the <umb-confirm-action-modal-entity-references> or <umb-confirm-bulk-action-modal-entity-references> element instead
+ * @class UmbDocumentReferenceTableElement
+ */
 @customElement('umb-document-reference-table')
 export class UmbDocumentReferenceTableElement extends UmbLitElement {
 	#documentReferenceRepository = new UmbDocumentReferenceRepository(this);
@@ -31,6 +37,13 @@ export class UmbDocumentReferenceTableElement extends UmbLitElement {
 	_errorMessage = '';
 
 	override firstUpdated() {
+		new UmbDeprecation({
+			removeInVersion: '17',
+			deprecated: '<umb-document-reference-table> element',
+			solution:
+				'For modals use the <umb-confirm-action-modal-entity-references> or <umb-confirm-bulk-action-modal-entity-references> element instead',
+		}).warn();
+
 		this.#getReferences();
 	}
 
@@ -44,7 +57,8 @@ export class UmbDocumentReferenceTableElement extends UmbLitElement {
 		}
 
 		if (!data) return;
-
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		//@ts-ignore
 		this._items = data.items;
 		this._hasMoreReferences = data.total > this.#pageSize ? data.total - this.#pageSize : 0;
 	}
@@ -59,6 +73,9 @@ export class UmbDocumentReferenceTableElement extends UmbLitElement {
 		}
 		if (isMediaReference(item)) {
 			return item.mediaType.icon ?? 'icon-picture';
+		}
+		if (isMemberReference(item)) {
+			return item.memberType.icon ?? 'icon-user';
 		}
 		if (isDefaultReference(item)) {
 			return item.icon ?? 'icon-document';

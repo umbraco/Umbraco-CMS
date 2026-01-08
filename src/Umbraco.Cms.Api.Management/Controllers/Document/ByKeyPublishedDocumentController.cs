@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -53,6 +53,7 @@ public class ByKeyPublishedDocumentController : DocumentControllerBase
         }
 
         PublishedDocumentResponseModel model = await _documentPresentationFactory.CreatePublishedResponseModelAsync(content);
+
         return Ok(model);
     }
 }

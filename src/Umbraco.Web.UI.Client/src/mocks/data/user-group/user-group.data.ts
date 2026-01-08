@@ -9,7 +9,6 @@ export const data: Array<UmbMockUserGroupModel> = [
 		name: 'Administrators',
 		alias: 'admin',
 		icon: 'icon-medal',
-		documentStartNode: { id: 'all-property-editors-document-id' },
 		fallbackPermissions: [
 			'Umb.Document.Read',
 			'Umb.Document.Create',
@@ -30,8 +29,24 @@ export const data: Array<UmbMockUserGroupModel> = [
 		permissions: [
 			{
 				$type: 'DocumentPermissionPresentationModel',
-				verbs: ['Umb.Document.Rollback'],
-				document: { id: 'simple-document-id' },
+				document: {
+					id: 'permissions-document-id',
+				},
+				verbs: ['Umb.Document.Read'],
+			},
+			{
+				$type: 'DocumentPermissionPresentationModel',
+				document: {
+					id: 'permissions-2-document-id',
+				},
+				verbs: ['Umb.Document.Create', 'Umb.Document.Read'],
+			},
+			{
+				$type: 'DocumentPermissionPresentationModel',
+				document: {
+					id: 'permissions-2-2-document-id',
+				},
+				verbs: ['Umb.Document.Delete', 'Umb.Document.Read'],
 			},
 		],
 		sections: [

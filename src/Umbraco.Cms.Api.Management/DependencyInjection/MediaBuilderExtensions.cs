@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Mapping.Media;
 using Umbraco.Cms.Api.Management.Routing;
@@ -18,6 +18,7 @@ internal static class MediaBuilderExtensions
         builder.Services.AddTransient<IMediaUrlFactory, MediaUrlFactory>();
         builder.Services.AddTransient<IReziseImageUrlFactory, ReziseImageUrlFactory>();
         builder.Services.AddScoped<IAbsoluteUrlBuilder, DefaultAbsoluteUrlBuilder>();
+        builder.Services.AddTransient<IMediaCollectionPresentationFactory, MediaCollectionPresentationFactory>();
 
         builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>().Add<MediaMapDefinition>();
 

@@ -25,63 +25,38 @@ internal sealed class CacheRefreshingNotificationHandler :
 {
     private readonly IDocumentCacheService _documentCacheService;
     private readonly IMediaCacheService _mediaCacheService;
-    private readonly IElementsCache _elementsCache;
-    private readonly IRelationService _relationService;
     private readonly IPublishedContentTypeCache _publishedContentTypeCache;
 
     public CacheRefreshingNotificationHandler(
         IDocumentCacheService documentCacheService,
         IMediaCacheService mediaCacheService,
-        IElementsCache elementsCache,
-        IRelationService relationService,
         IPublishedContentTypeCache publishedContentTypeCache)
     {
         _documentCacheService = documentCacheService;
         _mediaCacheService = mediaCacheService;
-        _elementsCache = elementsCache;
-        _relationService = relationService;
         _publishedContentTypeCache = publishedContentTypeCache;
     }
 
     public async Task HandleAsync(ContentRefreshNotification notification, CancellationToken cancellationToken)
-    {
-        ClearElementsCache();
-
-        await _documentCacheService.RefreshContentAsync(notification.Entity);
-    }
+        => await _documentCacheService.RefreshContentAsync(notification.Entity);
 
     public async Task HandleAsync(ContentDeletedNotification notification, CancellationToken cancellationToken)
     {
         foreach (IContent deletedEntity in notification.DeletedEntities)
         {
-            ClearElementsCache();
             await _documentCacheService.DeleteItemAsync(deletedEntity);
         }
     }
 
     public async Task HandleAsync(MediaRefreshNotification notification, CancellationToken cancellationToken)
-    {
-        ClearElementsCache();
-        await _mediaCacheService.RefreshMediaAsync(notification.Entity);
-    }
+        => await _mediaCacheService.RefreshMediaAsync(notification.Entity);
 
     public async Task HandleAsync(MediaDeletedNotification notification, CancellationToken cancellationToken)
     {
         foreach (IMedia deletedEntity in notification.DeletedEntities)
         {
-            ClearElementsCache();
             await _mediaCacheService.DeleteItemAsync(deletedEntity);
         }
-    }
-
-    private void ClearElementsCache()
-    {
-        // Ideally we'd like to not have to clear the entire cache here. However, this was the existing behavior in NuCache.
-        // The reason for this is that we have no way to know which elements are affected by the changes. or what their keys are.
-        // This is because currently published elements lives exclusively in a JSON blob in the umbracoPropertyData table.
-        // This means that the only way to resolve these keys are to actually parse this data with a specific value converter, and for all cultures, which is not feasible.
-        // If published elements become their own entities with relations, instead of just property data, we can revisit this,
-        _elementsCache.Clear();
     }
 
     public Task HandleAsync(ContentTypeRefreshedNotification notification, CancellationToken cancellationToken)

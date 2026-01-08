@@ -95,6 +95,22 @@ public class RichTextPropertyEditorHelperTests
     }
 
     [Test]
+    public void Can_Parse_JObject_With_Missing_Blocks()
+    {
+        var input = JsonNode.Parse(""""
+                                   {
+                                    "markup": "<h2>Vælg et af vores mest populære produkter</h2>"
+                                   }
+                                   """");
+
+        var result = RichTextPropertyEditorHelper.TryParseRichTextEditorValue(input, JsonSerializer(), Logger(), out RichTextEditorValue? value);
+        Assert.IsTrue(result);
+        Assert.IsNotNull(value);
+        Assert.AreEqual("<h2>Vælg et af vores mest populære produkter</h2>", value.Markup);
+        Assert.IsNull(value.Blocks);
+    }
+
+    [Test]
     public void Can_Parse_Blocks_With_Both_Content_And_Settings()
     {
         const string input = """

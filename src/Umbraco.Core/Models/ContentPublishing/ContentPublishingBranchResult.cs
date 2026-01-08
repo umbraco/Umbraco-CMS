@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Models.ContentPublishing;
+namespace Umbraco.Cms.Core.Models.ContentPublishing;
 
 public sealed class ContentPublishingBranchResult
 {
@@ -7,4 +7,6 @@ public sealed class ContentPublishingBranchResult
     public IEnumerable<ContentPublishingBranchItemResult> SucceededItems { get; set; } = [];
 
     public IEnumerable<ContentPublishingBranchItemResult> FailedItems { get; set; } = [];
+
+    public Guid? AcceptedTaskId { get; init; }
 }

@@ -83,7 +83,9 @@ test('can rename a document type', {tag: '@smoke'}, async ({umbracoApi, umbracoU
 
   // Act
   await umbracoUi.documentType.goToDocumentType(wrongName);
+  await umbracoUi.waitForTimeout(1000);
   await umbracoUi.documentType.enterDocumentTypeName(documentTypeName);
+  await umbracoUi.waitForTimeout(1000);
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert

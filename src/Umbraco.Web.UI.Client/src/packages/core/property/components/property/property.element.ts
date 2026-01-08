@@ -28,7 +28,6 @@ import { UmbRoutePathAddendumContext } from '@umbraco-cms/backoffice/router';
  *	The Element will render a Property Editor based on the Property Editor UI alias passed to the element.
  *  This will also render all Property Actions related to the Property Editor UI Alias.
  */
-
 @customElement('umb-property')
 export class UmbPropertyElement extends UmbLitElement {
 	/**
@@ -178,6 +177,7 @@ export class UmbPropertyElement extends UmbLitElement {
 	#validationMessageBinder?: UmbBindServerValidationToFormControl;
 	#valueObserver?: UmbObserverController<unknown>;
 	#configObserver?: UmbObserverController<UmbPropertyEditorConfigCollection | undefined>;
+	#validationMessageObserver?: UmbObserverController<string | undefined>;
 	#extensionsController?: UmbExtensionsApiInitializer<any>;
 
 	constructor() {
@@ -293,6 +293,7 @@ export class UmbPropertyElement extends UmbLitElement {
 			// cleanup:
 			this.#valueObserver?.destroy();
 			this.#configObserver?.destroy();
+			this.#validationMessageObserver?.destroy();
 			this.#controlValidator?.destroy();
 			oldElement?.removeEventListener('change', this._onPropertyEditorChange as any as EventListener);
 			oldElement?.removeEventListener('property-value-change', this._onPropertyEditorChange as any as EventListener);
@@ -330,7 +331,7 @@ export class UmbPropertyElement extends UmbLitElement {
 					},
 					null,
 				);
-				this.#configObserver = this.observe(
+				this.#validationMessageObserver = this.observe(
 					this.#propertyContext.validationMandatoryMessage,
 					(mandatoryMessage) => {
 						if (mandatoryMessage) {

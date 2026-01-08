@@ -21,4 +21,6 @@ public enum ContentEditingOperationStatus
     DuplicateKey,
     DuplicateName,
     Unknown,
+    CannotDeleteWhenReferenced,
+    CannotMoveToRecycleBinWhenReferenced,
 }

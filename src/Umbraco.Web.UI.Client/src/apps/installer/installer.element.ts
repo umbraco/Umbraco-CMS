@@ -1,4 +1,4 @@
-import { UmbInstallerContext, UMB_INSTALLER_CONTEXT } from './installer.context.js';
+import { UmbInstallerContext } from './installer.context.js';
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
@@ -14,12 +14,7 @@ export class UmbInstallerElement extends UmbLitElement {
 	@state()
 	step = 1;
 
-	private _umbInstallerContext = new UmbInstallerContext();
-
-	constructor() {
-		super();
-		this.provideContext(UMB_INSTALLER_CONTEXT, this._umbInstallerContext);
-	}
+	private _umbInstallerContext = new UmbInstallerContext(this);
 
 	override connectedCallback(): void {
 		super.connectedCallback();

@@ -8,7 +8,9 @@ namespace Umbraco.Cms.Infrastructure.HostedServices;
 /// <remarks>
 ///     Borrowed from https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/hosted-services?view=aspnetcore-5.0
 /// </remarks>
+#pragma warning disable CS0618 // Type or member is obsolete
 public class BackgroundTaskQueue : IBackgroundTaskQueue
+#pragma warning restore CS0618 // Type or member is obsolete
 {
     private readonly SemaphoreSlim _signal = new(0);
 

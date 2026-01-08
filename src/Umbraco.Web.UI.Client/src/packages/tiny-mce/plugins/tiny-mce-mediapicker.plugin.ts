@@ -231,19 +231,18 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 
 	readonly #uploadImageHandler: RawEditorOptions['images_upload_handler'] = (blobInfo, progress) => {
 		return new Promise((resolve, reject) => {
-			// Fetch does not support progress, so we need to fake it.
 			progress(0);
 
 			const id = UmbId.new();
 			const fileBlob = blobInfo.blob();
 			const file = new File([fileBlob], blobInfo.filename(), { type: fileBlob.type });
 
-			progress(50);
-
 			document.dispatchEvent(new CustomEvent('rte.file.uploading', { composed: true, bubbles: true }));
 
 			this.#temporaryFileRepository
-				.upload(id, file)
+				.upload(id, file, (evt) => {
+					progress((evt.loaded / evt.total) * 100);
+				})
 				.then((response) => {
 					if (response.error) {
 						reject(response.error);

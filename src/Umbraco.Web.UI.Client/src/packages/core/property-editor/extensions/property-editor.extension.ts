@@ -42,6 +42,7 @@ export interface MetaPropertyEditorSchema {
 export interface PropertyEditorSettings {
 	properties: PropertyEditorSettingsProperty[];
 	// default data is kept separate from the properties, to give the ability for Property Editor UI to overwrite default values for the property editor settings.
+	// TODO: Deprecate defaultData in the future and rename to preset. [NL]
 	defaultData?: PropertyEditorSettingsDefaultData[];
 }
 

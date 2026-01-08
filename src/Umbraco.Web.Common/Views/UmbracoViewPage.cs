@@ -142,7 +142,10 @@ public abstract class UmbracoViewPage<TModel> : RazorPage<TModel>
                         string.Format(
                             ContentSettings.PreviewBadge,
                             HostingEnvironment.ToAbsolute(Core.Constants.System.DefaultUmbracoPath),
-                            Context.Request.GetEncodedUrl(),
+                            System.Web.HttpUtility.HtmlEncode(Context.Request.GetEncodedUrl()), // Belt and braces - via a browser at least it doesn't seem possible to have anything other than
+                                                                                                // a valid culture code provided in the querystring of this URL.
+                                                                                                // But just to be sure of prevention of an XSS vulnterablity we'll HTML encode here too.
+                                                                                                // An expected URL is untouched by this encoding.
                             UmbracoContext.PublishedRequest?.PublishedContent?.Key);
                 }
                 else

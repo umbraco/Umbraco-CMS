@@ -60,10 +60,17 @@ public class LuceneIndexDiagnostics : IIndexDiagnostics
                 ["LuceneDirectory"] = luceneDir.GetType().Name
             };
 
-            if (luceneDir is FSDirectory fsDir)
+            var directoryPath = luceneDir switch
+            {
+                NRTCachingDirectory nrtDir => nrtDir.Delegate.ToString(),
+                FSDirectory fsDir => fsDir.Directory.ToString(),
+                _ => null
+            };
+
+            if (directoryPath != null)
             {
                 var rootDir = _hostingEnvironment.ApplicationPhysicalPath;
-                d["LuceneIndexFolder"] = fsDir.Directory.ToString().ToLowerInvariant()
+                d["LuceneIndexFolder"] = directoryPath.ToLowerInvariant()
                     .TrimStart(rootDir.ToLowerInvariant()).Replace("\\", " /").EnsureStartsWith('/');
             }
 

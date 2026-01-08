@@ -20,7 +20,7 @@ test('can create a folder', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.partialView.clickActionsMenuAtRoot();
-  await umbracoUi.partialView.createFolder(folderName);
+  await umbracoUi.partialView.createPartialViewFolder(folderName);
 
   // Assert
   await umbracoUi.partialView.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
@@ -111,7 +111,7 @@ test('can create a folder in a folder', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.partialView.reloadPartialViewTree();
   await umbracoUi.partialView.clickActionsMenuForPartialView(folderName);
-  await umbracoUi.partialView.createFolder(childFolderName);
+  await umbracoUi.partialView.createPartialViewFolder(childFolderName);
 
   // Assert
   await umbracoUi.partialView.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
@@ -134,7 +134,7 @@ test('can create a folder in a folder in a folder', {tag: '@smoke'}, async ({umb
   await umbracoUi.partialView.reloadPartialViewTree();
   await umbracoUi.partialView.clickCaretButtonForName(folderName);
   await umbracoUi.partialView.clickActionsMenuForPartialView(childFolderName);
-  await umbracoUi.partialView.createFolder(childOfChildFolderName);
+  await umbracoUi.partialView.createPartialViewFolder(childOfChildFolderName);
 
   // Assert
   await umbracoUi.partialView.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);

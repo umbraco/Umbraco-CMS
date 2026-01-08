@@ -1,17 +1,10 @@
-using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.Entities;
-using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
-using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
-
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
@@ -36,14 +29,15 @@ public class DocumentUrlRepository : IDocumentUrlRepository
 
     public void Save(IEnumerable<PublishedDocumentUrlSegment> publishedDocumentUrlSegments)
     {
-        //TODO avoid this is called as first thing on first restart after install
+        // TODO: avoid this is called as first thing on first restart after install
         IEnumerable<Guid> documentKeys = publishedDocumentUrlSegments.Select(x => x.DocumentKey).Distinct();
 
-        Dictionary<(Guid UniqueId, int LanguageId, bool isDraft), DocumentUrlDto> dtoDictionary = publishedDocumentUrlSegments.Select(BuildDto).ToDictionary(x=> (x.UniqueId, x.LanguageId, x.IsDraft));
+        Dictionary<(Guid UniqueId, int LanguageId, bool isDraft, string urlSegment), DocumentUrlDto> dtoDictionary = publishedDocumentUrlSegments
+            .Select(BuildDto)
+            .ToDictionary(x => (x.UniqueId, x.LanguageId, x.IsDraft, x.UrlSegment));
 
-        var toUpdate = new List<DocumentUrlDto>();
         var toDelete = new List<int>();
-        var toInsert = dtoDictionary.Values.ToDictionary(x => (x.UniqueId, x.LanguageId, x.IsDraft));
+        var toInsert = dtoDictionary.Values.ToDictionary(x => (x.UniqueId, x.LanguageId, x.IsDraft, x.UrlSegment));
 
         foreach (IEnumerable<Guid> group in documentKeys.InGroupsOf(Constants.Sql.MaxParameterCount))
         {
@@ -57,18 +51,12 @@ public class DocumentUrlRepository : IDocumentUrlRepository
 
             foreach (DocumentUrlDto existing in existingUrlsInBatch)
             {
-
-                if (dtoDictionary.TryGetValue((existing.UniqueId, existing.LanguageId, existing.IsDraft), out DocumentUrlDto? found))
+                if (dtoDictionary.TryGetValue((existing.UniqueId, existing.LanguageId, existing.IsDraft, existing.UrlSegment), out DocumentUrlDto? found))
                 {
                     found.NodeId = existing.NodeId;
 
-                    // Only update if the url segment is different
-                    if (found.UrlSegment != existing.UrlSegment)
-                    {
-                        toUpdate.Add(found);
-                    }
-                    // if we found it, we know we should not insert it as a new
-                    toInsert.Remove((found.UniqueId, found.LanguageId, found.IsDraft));
+                    // If we found it, we know we should not insert it as a new record.
+                    toInsert.Remove((found.UniqueId, found.LanguageId, found.IsDraft, found.UrlSegment));
                 }
                 else
                 {
@@ -81,14 +69,6 @@ public class DocumentUrlRepository : IDocumentUrlRepository
         if (toDelete.Count > 0)
         {
             Database.DeleteMany<DocumentUrlDto>().Where(x => toDelete.Contains(x.NodeId)).Execute();
-        }
-
-        if (toUpdate.Any())
-        {
-            foreach (DocumentUrlDto updated in toUpdate)
-            {
-                Database.Update(updated);
-            }
         }
 
         Database.InsertBulk(toInsert.Values);
@@ -115,7 +95,8 @@ public class DocumentUrlRepository : IDocumentUrlRepository
             UrlSegment = dto.UrlSegment,
             DocumentKey = dto.UniqueId,
             LanguageId = dto.LanguageId,
-            IsDraft = dto.IsDraft
+            IsDraft = dto.IsDraft,
+            IsPrimary = dto.IsPrimary
         };
 
     private DocumentUrlDto BuildDto(PublishedDocumentUrlSegment model)
@@ -126,6 +107,7 @@ public class DocumentUrlRepository : IDocumentUrlRepository
             UniqueId = model.DocumentKey,
             LanguageId = model.LanguageId,
             IsDraft = model.IsDraft,
+            IsPrimary = model.IsPrimary,
         };
     }
 }

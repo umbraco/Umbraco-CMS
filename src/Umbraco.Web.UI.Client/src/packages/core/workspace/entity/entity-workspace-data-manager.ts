@@ -28,6 +28,14 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 	 */
 	public readonly current = this._current.asObservable();
 
+	protected _sortCurrentData<GivenType extends Partial<ModelType> = Partial<ModelType>>(
+		persistedData: Partial<ModelType>,
+		currentData: GivenType,
+	): GivenType {
+		// do nothing.
+		return currentData;
+	}
+
 	/**
 	 * Gets persisted data
 	 * @returns {(ModelType | undefined)}
@@ -81,6 +89,12 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 	 * @memberof UmbSubmittableWorkspaceDataManager
 	 */
 	setCurrent(data: ModelType | undefined) {
+		if (data) {
+			const persistedData = this._persisted.getValue();
+			if (persistedData) {
+				data = this._sortCurrentData(persistedData, data);
+			}
+		}
 		this._current.setValue(data);
 	}
 
@@ -90,6 +104,12 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 	 * @memberof UmbSubmittableWorkspaceDataManager
 	 */
 	updateCurrent(partialData: Partial<ModelType>) {
+		if (partialData) {
+			const persistedData = this._persisted.getValue();
+			if (persistedData) {
+				partialData = this._sortCurrentData(persistedData, partialData);
+			}
+		}
 		this._current.update(partialData);
 	}
 
@@ -112,7 +132,12 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 	getHasUnpersistedChanges() {
 		const persisted = this._persisted.getValue();
 		const current = this._current.getValue();
-		return jsonStringComparison(persisted, current) === false;
+		const result = jsonStringComparison(persisted, current) === false;
+		// TODO: Implement developer-mode
+		if (result) {
+			console.warn('Changes detected based on JSON comparison between', persisted, 'and', current);
+		}
+		return result;
 	}
 
 	/**

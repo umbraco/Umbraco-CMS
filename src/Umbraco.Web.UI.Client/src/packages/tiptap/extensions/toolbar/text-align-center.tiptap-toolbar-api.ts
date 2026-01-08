@@ -7,6 +7,10 @@ export default class UmbTiptapToolbarTextAlignCenterExtensionApi extends UmbTipt
 	}
 
 	override execute(editor?: Editor) {
-		editor?.chain().focus().setTextAlign('center').run();
+		if (!this.isActive(editor)) {
+			editor?.chain().focus().setTextAlign('center').run();
+		} else {
+			editor?.chain().focus().unsetTextAlign().run();
+		}
 	}
 }

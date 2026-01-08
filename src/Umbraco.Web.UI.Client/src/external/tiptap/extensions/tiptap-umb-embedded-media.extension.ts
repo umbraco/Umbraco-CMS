@@ -8,6 +8,7 @@ export const umbEmbeddedMedia = Node.create({
 	inline() {
 		return this.options.inline;
 	},
+
 	atom: true,
 	marks: '',
 	draggable: true,
@@ -19,12 +20,18 @@ export const umbEmbeddedMedia = Node.create({
 			'data-embed-height': { default: 240 },
 			'data-embed-url': { default: null },
 			'data-embed-width': { default: 360 },
-			markup: { default: null },
+			markup: { default: null, parseHTML: (element) => element.innerHTML },
 		};
 	},
 
 	parseHTML() {
-		return [{ tag: 'div', class: 'umb-embed-holder', getAttrs: (node) => ({ markup: node.innerHTML }) }];
+		return [
+			{
+				tag: 'div',
+				priority: 100,
+				getAttrs: (dom) => dom.classList.contains('umb-embed-holder') && null,
+			},
+		];
 	},
 
 	renderHTML({ HTMLAttributes }) {

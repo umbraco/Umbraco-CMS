@@ -22,4 +22,6 @@ public static class CacheKeys
 
     public const string PreviewPropertyCacheKeyPrefix = "Cache.Property.CacheValues[D:";
     public const string PropertyCacheKeyPrefix = "Cache.Property.CacheValues[P:";
+
+    public const string MemberUserNameCachePrefix = "uRepo_userNameKey+";
 }

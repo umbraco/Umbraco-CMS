@@ -4,7 +4,7 @@ import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controlle
 import { UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../../../property-editors/constants.js';
 import type { UmbBlockGridValueModel, UmbGridBlockClipboardEntryValueModel } from '../../../types.js';
 import { UmbBlockGridToGridBlockClipboardCopyPropertyValueTranslator } from './block-grid-to-grid-block-copy-translator.js';
-import { UmbBlockGridManagerContext } from '../../../context/block-grid-manager.context.js';
+import { UmbBlockGridManagerContext } from '../../../block-grid-manager/block-grid-manager.context.js';
 
 @customElement('test-controller-host')
 class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {

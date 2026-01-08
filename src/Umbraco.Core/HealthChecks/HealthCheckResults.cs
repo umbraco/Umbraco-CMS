@@ -26,7 +26,7 @@ public class HealthCheckResults
             {
                 try
                 {
-                    return await t.GetStatus();
+                    return await t.GetStatusAsync();
                 }
                 catch (Exception ex)
                 {

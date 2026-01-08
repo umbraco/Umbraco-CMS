@@ -45,7 +45,7 @@ export const getUmbracoFieldSnippet = (field: string, defaultValue: string | nul
 
 	const value = `${field !== null ? `@Model.Value("${field}"` : ''}${
 		fallback !== null ? `, fallback: ${fallback}` : ''
-	}${defaultValue !== null ? `, defaultValue: new HtmlString("${defaultValue}")` : ''}${field ? ')' : ')'}`;
+	}${defaultValue !== null ? `, defaultValue: (object)"${defaultValue}"` : ''}${field ? ')' : ')'}`;
 
 	return value;
 };

@@ -1,8 +1,8 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Factories;
-using Umbraco.Cms.Api.Management.ViewModels.Webhook;
 using Umbraco.Cms.Api.Management.ViewModels.Webhook.Logs;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
@@ -23,12 +23,11 @@ public class AllWebhookLogController : WebhookLogControllerBase
 
     [HttpGet("logs")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(WebhookResponseModel), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(PagedViewModel<WebhookLogResponseModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> Logs(CancellationToken cancellationToken, int skip = 0, int take = 100)
     {
         PagedModel<WebhookLog> logs = await _webhookLogService.Get(skip, take);
-        IEnumerable<WebhookLogResponseModel> logResponseModels = logs.Items.Select(x => _webhookPresentationFactory.CreateResponseModel(x));
-        return Ok(logResponseModels);
+        PagedViewModel<WebhookLogResponseModel> viewModel = CreatePagedWebhookLogResponseModel(logs, _webhookPresentationFactory);
+        return Ok(viewModel);
     }
 }

@@ -5,9 +5,9 @@ import type {
 } from '@umbraco-cms/backoffice/property-editor';
 import { html, customElement, property, css } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 type BulkActionPermissionType =
 	| 'allowBulkCopy'
@@ -64,7 +64,7 @@ export class UmbPropertyEditorUICollectionPermissionsElement
 				break;
 		}
 
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	protected override firstUpdated() {

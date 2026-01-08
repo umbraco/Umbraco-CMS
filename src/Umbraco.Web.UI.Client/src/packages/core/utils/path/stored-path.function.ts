@@ -1,5 +1,6 @@
 import { ensureLocalPath } from './ensure-local-path.function.js';
-import { UMB_STORAGE_REDIRECT_URL } from '@umbraco-cms/backoffice/auth';
+
+export const UMB_STORAGE_REDIRECT_URL = 'umb:auth:redirect';
 
 /**
  * Retrieve the stored path from the session storage.

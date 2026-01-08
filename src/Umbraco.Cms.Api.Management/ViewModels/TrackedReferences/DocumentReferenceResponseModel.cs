@@ -1,12 +1,12 @@
-﻿namespace Umbraco.Cms.Api.Management.ViewModels.TrackedReferences;
+using Umbraco.Cms.Api.Management.ViewModels.Document;
 
-public class DocumentReferenceResponseModel : IReferenceResponseModel
+namespace Umbraco.Cms.Api.Management.ViewModels.TrackedReferences;
+
+public class DocumentReferenceResponseModel : ReferenceResponseModel
 {
-    public Guid Id { get; set; }
-
-    public string? Name { get; set; }
-
     public bool? Published { get; set; }
 
     public TrackedReferenceDocumentType DocumentType { get; set; } = new();
+
+    public IEnumerable<DocumentVariantItemResponseModel> Variants { get; set; } = Enumerable.Empty<DocumentVariantItemResponseModel>();
 }

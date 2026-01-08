@@ -1,4 +1,4 @@
-import { UmbMediaUrlRepository } from '../../media/repository/index.js';
+import { UmbMediaUrlRepository } from '../../media/url/index.js';
 import { css, customElement, html, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';

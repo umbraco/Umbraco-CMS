@@ -24,9 +24,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		forPropertyEditorUis,
 		conditions: [
 			{
-				alias: UMB_WRITABLE_PROPERTY_CONDITION_ALIAS,
-			},
-			{
 				alias: UMB_PROPERTY_HAS_VALUE_CONDITION_ALIAS,
 			},
 		],

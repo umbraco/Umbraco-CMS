@@ -51,6 +51,7 @@ export class UmbMediaWorkspaceContext
 			contentTypeDetailRepository: UmbMediaTypeDetailRepository,
 			contentValidationRepository: UmbMediaValidationRepository,
 			contentVariantScaffold: UMB_MEMBER_DETAIL_MODEL_VARIANT_SCAFFOLD,
+			contentTypePropertyName: 'mediaType',
 		});
 
 		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique), null);
@@ -89,13 +90,14 @@ export class UmbMediaWorkspaceContext
 
 	public override resetState() {
 		super.resetState();
+		this.#isTrashedContext.setIsTrashed(false);
 		this.removeUmbControllerByAlias(UmbWorkspaceIsNewRedirectControllerAlias);
 	}
 
 	public override async load(unique: string) {
 		const response = await super.load(unique);
 
-		if (response.data) {
+		if (response?.data) {
 			this.#isTrashedContext.setIsTrashed(response.data.isTrashed);
 		}
 

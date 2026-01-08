@@ -3,6 +3,7 @@ import { UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN } from '../../../paths.js';
 import type { UmbDocumentCollectionItemModel } from '../../types.js';
 import type { UmbDocumentCollectionContext } from '../../document-collection.context.js';
 import { UMB_DOCUMENT_COLLECTION_CONTEXT } from '../../document-collection.context-token.js';
+import { UMB_DOCUMENT_ENTITY_TYPE } from '../../../entity.js';
 import type { UmbCollectionColumnConfiguration } from '@umbraco-cms/backoffice/collection';
 import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -18,6 +19,7 @@ import type {
 	UmbTableSelectedEvent,
 } from '@umbraco-cms/backoffice/components';
 
+import './column-layouts/document-entity-actions-table-column-view.element.js';
 import './column-layouts/document-table-column-name.element.js';
 import './column-layouts/document-table-column-state.element.js';
 
@@ -125,7 +127,11 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 				};
 			});
 
-			this._tableColumns = [...this.#systemColumns, ...userColumns, { name: '', alias: 'entityActions' }];
+			this._tableColumns = [
+				...this.#systemColumns,
+				...userColumns,
+				{ name: '', alias: 'entityActions', align: 'right' },
+			];
 		}
 	}
 
@@ -138,11 +144,8 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 					if (column.alias === 'entityActions') {
 						return {
 							columnAlias: 'entityActions',
-							value: html`<umb-entity-actions-table-column-view
-								.value=${{
-									entityType: item.entityType,
-									unique: item.unique,
-								}}></umb-entity-actions-table-column-view>`,
+							value: html`<umb-document-entity-actions-table-column-view
+								.value=${item}></umb-document-entity-actions-table-column-view>`,
 						};
 					}
 
@@ -162,8 +165,8 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 
 			return {
 				id: item.unique,
-				icon: item.icon,
-				entityType: 'document',
+				icon: item.documentType.icon,
+				entityType: UMB_DOCUMENT_ENTITY_TYPE,
 				data: data,
 			};
 		});

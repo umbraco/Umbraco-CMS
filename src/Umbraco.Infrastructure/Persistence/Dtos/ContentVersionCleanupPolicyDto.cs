@@ -27,6 +27,6 @@ internal class ContentVersionCleanupPolicyDto
     [NullSetting(NullSetting = NullSettings.Null)]
     public int? KeepLatestVersionPerDayForDays { get; set; }
 
-    [Column("updated")]
+    [Column("updated", ForceToUtc = false)]
     public DateTime Updated { get; set; }
 }

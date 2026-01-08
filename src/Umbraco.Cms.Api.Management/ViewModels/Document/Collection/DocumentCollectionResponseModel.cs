@@ -7,5 +7,11 @@ public class DocumentCollectionResponseModel : ContentCollectionResponseModelBas
 {
     public DocumentTypeCollectionReferenceResponseModel DocumentType { get; set; } = new();
 
+    public bool IsTrashed { get; set; }
+
+    public bool IsProtected { get; set; }
+
+    public IEnumerable<ReferenceByIdModel> Ancestors { get; set; } = [];
+
     public string? Updater { get; set; }
 }

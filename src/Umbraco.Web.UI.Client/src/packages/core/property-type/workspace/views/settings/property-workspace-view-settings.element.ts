@@ -203,9 +203,12 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 
 	#onVaryByCultureChange(event: UUIBooleanInputEvent) {
 		const variesByCulture = event.target.checked;
-		this.updateValue({
-			variesByCulture,
-		});
+		this.updateValue({ variesByCulture });
+	}
+
+	#onVaryBySegmentChange(event: UUIBooleanInputEvent) {
+		const variesBySegment = event.target.checked;
+		this.updateValue({ variesBySegment });
 	}
 
 	override render() {
@@ -267,14 +270,11 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 					</p>
 					${this.#renderCustomValidation()}
 				</div>
-				<hr />
 				${this.#renderVariationControls()}
-				<div class="container">
-					<b style="margin-bottom: var(--uui-size-space-3)">
-						<umb-localize key="contentTypeEditor_displaySettingsHeadline">Appearance</umb-localize>
-					</b>
-					<div id="appearances">${this.#renderAlignLeftIcon()} ${this.#renderAlignTopIcon()}</div>
-				</div>
+				<umb-property-layout label="#contentTypeEditor_displaySettingsHeadline" orientation="vertical">
+					<div id="appearances" slot="editor">${this.#renderAlignLeftIcon()} ${this.#renderAlignTopIcon()}</div>
+				</umb-property-layout>
+
 				${this.#renderMemberTypeOptions()}
 			</uui-box>
 		`;
@@ -405,18 +405,35 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 
 	#renderVariationControls() {
 		return this._contentTypeVariesByCulture || this._contentTypeVariesBySegment
-			? html` <div class="container">
-						<b><umb-localize key="contentTypeEditor_variantsHeading">Allow variations</umb-localize></b>
-						${this._contentTypeVariesByCulture ? this.#renderVaryByCulture() : ''}
-					</div>
-					<hr />`
+			? html` <umb-property-layout label="#contentTypeEditor_variantsHeading" orientation="vertical">
+					<umb-stack slot="editor" look="compact">
+						${this._contentTypeVariesByCulture ? this.#renderVaryByCulture() : nothing}
+						${this._contentTypeVariesBySegment ? this.#renderVaryBySegment() : nothing}
+					</umb-stack>
+				</umb-property-layout>`
 			: '';
 	}
+
 	#renderVaryByCulture() {
-		return html`<uui-toggle
-			@change=${this.#onVaryByCultureChange}
-			.checked=${this._data?.variesByCulture ?? false}
-			label=${this.localize.term('contentTypeEditor_cultureVariantLabel')}></uui-toggle> `;
+		return html`
+			<div>
+				<uui-toggle
+					@change=${this.#onVaryByCultureChange}
+					.checked=${this._data?.variesByCulture ?? false}
+					label=${this.localize.term('contentTypeEditor_cultureVariantLabel')}></uui-toggle>
+			</div>
+		`;
+	}
+
+	#renderVaryBySegment() {
+		return html`
+			<div>
+				<uui-toggle
+					@change=${this.#onVaryBySegmentChange}
+					.checked=${this._data?.variesBySegment ?? false}
+					label=${this.localize.term('contentTypeEditor_segmentVariantLabel')}></uui-toggle>
+			</div>
+		`;
 	}
 
 	static override styles = [

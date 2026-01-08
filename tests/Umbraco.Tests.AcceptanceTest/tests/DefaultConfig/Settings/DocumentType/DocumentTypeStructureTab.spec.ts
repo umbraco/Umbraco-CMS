@@ -83,7 +83,7 @@ test('can configure a collection for a document type', async ({umbracoApi, umbra
   // Act
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
   await umbracoUi.documentType.clickStructureTab();
-  await umbracoUi.documentType.clickConfigureAsACollectionButton();
+  await umbracoUi.documentType.clickAddCollectionButton();
   await umbracoUi.documentType.clickTextButtonWithName(collectionDataTypeName);
   await umbracoUi.documentType.clickSaveButton();
 

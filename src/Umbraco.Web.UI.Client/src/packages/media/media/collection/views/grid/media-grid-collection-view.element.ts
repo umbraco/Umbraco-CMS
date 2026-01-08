@@ -2,11 +2,11 @@ import { UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN } from '../../../paths.js';
 import type { UmbMediaCollectionItemModel } from '../../types.js';
 import type { UmbMediaCollectionContext } from '../../media-collection.context.js';
 import { UMB_MEDIA_COLLECTION_CONTEXT } from '../../media-collection.context-token.js';
-import { UmbFileDropzoneItemStatus } from '../../../dropzone/types.js';
 import { UMB_MEDIA_PLACEHOLDER_ENTITY_TYPE } from '../../../entity.js';
 import { css, customElement, html, ifDefined, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone';
 
 import '@umbraco-cms/backoffice/imaging';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
@@ -113,8 +113,12 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 
 	#renderPlaceholder(item: UmbMediaCollectionItemModel) {
 		const complete = item.status === UmbFileDropzoneItemStatus.COMPLETE;
+		const error = item.status !== UmbFileDropzoneItemStatus.WAITING && !complete;
 		return html`<uui-card-media disabled class="media-placeholder-item" name=${ifDefined(item.name)}>
-			<umb-temporary-file-badge ?complete=${complete}></umb-temporary-file-badge>
+			<umb-temporary-file-badge
+				.progress=${item.progress ?? 0}
+				?complete=${complete}
+				?error=${error}></umb-temporary-file-badge>
 		</uui-card-media>`;
 	}
 
@@ -130,10 +134,6 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 				display: flex;
 				justify-content: center;
 				align-items: center;
-			}
-
-			.media-placeholder-item {
-				font-style: italic;
 			}
 
 			/** TODO: Remove this fix when UUI gets upgrade to 1.3 */

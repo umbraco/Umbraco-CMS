@@ -703,9 +703,6 @@ export default {
 		notificationEmailsCheckSuccessMessage: 'Адрес для отправки уведомлений установлен в <strong>%0%</strong>.',
 		notificationEmailsCheckErrorMessage:
 			'Адрес для отправки уведомлений все еще установлен в значение по-умолчанию <strong>%0%</strong>.',
-		scheduledHealthCheckEmailBody:
-			'<html><body><p>Зафиксированы следующие результаты автоматической проверки состояния Umbraco по расписанию, запущенной на %0% в %1%:</p>%2%</body></html>',
-		scheduledHealthCheckEmailSubject: 'Результат проверки состояния Umbraco: %0%',
 	},
 	help: {
 		theBestUmbracoVideoTutorials: 'Лучшие обучающие видео-курсы по Umbraco',

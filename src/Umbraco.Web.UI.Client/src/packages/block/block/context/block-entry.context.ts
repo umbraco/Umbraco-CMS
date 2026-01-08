@@ -1,9 +1,13 @@
 import type { UmbBlockManagerContext, UmbBlockWorkspaceOriginData } from '../index.js';
-import type { UmbBlockLayoutBaseModel, UmbBlockDataModel, UmbBlockDataType, UmbBlockExposeModel } from '../types.js';
+import type {
+	UmbBlockLayoutBaseModel,
+	UmbBlockDataModel,
+	UmbBlockDataType,
+	UmbBlockExposeModel,
+	UmbBlockDataValueModel,
+} from '../types.js';
 import type { UmbBlockEntriesContext } from './block-entries.context.js';
-import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
 	UmbBooleanState,
 	UmbClassState,
@@ -15,16 +19,19 @@ import {
 } from '@umbraco-cms/backoffice/observable-api';
 import { encodeFilePath, UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
+import { UmbRoutePathAddendumContext } from '@umbraco-cms/backoffice/router';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UmbUfmVirtualRenderController } from '@umbraco-cms/backoffice/ufm';
+import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
+import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
+import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type {
 	UmbContentTypeModel,
 	UmbContentTypeStructureManager,
 	UmbPropertyTypeModel,
 } from '@umbraco-cms/backoffice/content-type';
-import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import { UmbUfmVirtualRenderController } from '@umbraco-cms/backoffice/ufm';
-import { UmbRoutePathAddendumContext } from '@umbraco-cms/backoffice/router';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export abstract class UmbBlockEntryContext<
 	BlockManagerContextTokenType extends UmbContextToken<BlockManagerContextType>,
@@ -46,6 +53,10 @@ export abstract class UmbBlockEntryContext<
 	_entries?: BlockEntriesContextType;
 
 	#contentKey?: string;
+	#unsupported = new UmbBooleanState(undefined);
+	readonly unsupported = this.#unsupported.asObservable();
+
+	readonly #localize = new UmbLocalizationController(this);
 
 	#pathAddendum = new UmbRoutePathAddendumContext(this);
 	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
@@ -238,17 +249,7 @@ export abstract class UmbBlockEntryContext<
 		if (!this.#contentValuesObservable) {
 			this.#contentValuesObservable = mergeObservables(
 				[this._contentValueArray, this.#contentStructure!.contentTypeProperties, this._variantId],
-				([propertyValues, properties, variantId]) => {
-					if (!propertyValues || !properties || !variantId) return;
-
-					return properties.reduce((acc, property) => {
-						const propertyVariantId = this.#createPropertyVariantId(property, variantId);
-						acc[property.alias] = propertyValues.find(
-							(x) => x.alias === property.alias && propertyVariantId.compare(x),
-						)?.value;
-						return acc;
-					}, {} as UmbBlockDataType);
-				},
+				this.#propertyValuesToObjectCallback,
 			);
 		}
 		return this.#contentValuesObservable;
@@ -274,20 +275,27 @@ export abstract class UmbBlockEntryContext<
 		if (!this.#settingsValuesObservable) {
 			this.#settingsValuesObservable = mergeObservables(
 				[this._settingsValueArray, this.#settingsStructure!.contentTypeProperties, this._variantId],
-				([propertyValues, properties, variantId]) => {
-					if (!propertyValues || !properties || !variantId) return;
-
-					return properties.reduce((acc, property) => {
-						acc[property.alias] = propertyValues.find((x) =>
-							this.#createPropertyVariantId(property, variantId).compare(x),
-						)?.value;
-						return acc;
-					}, {} as UmbBlockDataType);
-				},
+				this.#propertyValuesToObjectCallback,
 			);
 		}
 		return this.#settingsValuesObservable;
 	}
+
+	#propertyValuesToObjectCallback = ([propertyValues, properties, variantId]: [
+		UmbBlockDataValueModel<unknown>[] | undefined,
+		UmbPropertyTypeModel[],
+		UmbVariantId | undefined,
+	]) => {
+		if (!propertyValues || !properties || !variantId) return;
+
+		return properties.reduce((acc, property) => {
+			const propertyVariantId = this.#createPropertyVariantId(property, variantId);
+			acc[property.alias] = propertyValues.find(
+				(x) => x.alias === property.alias && propertyVariantId.compare(x),
+			)?.value;
+			return acc;
+		}, {} as UmbBlockDataType);
+	};
 
 	/**
 	 * Get the settings of the block.
@@ -390,11 +398,11 @@ export abstract class UmbBlockEntryContext<
 
 		this.observe(
 			observeMultiple([this.settingsKey, this.blockType]),
-			([settingsKey, blockType]) => {
+			async ([settingsKey, blockType]) => {
 				if (!this.#contentKey || settingsKey === undefined || !blockType) return;
 				if (settingsKey == null && blockType.settingsElementTypeKey) {
 					// We have a settings ElementType in config but not in data, so lets create the scaffold for that: [NL]
-					const settingsData = this._manager!.createBlockSettingsData(blockType.contentElementTypeKey); // Yes its on purpose we use the contentElementTypeKey here, as this is our identifier for a BlockType. [NL]
+					const settingsData = await this._manager!.createBlockSettingsData(blockType.contentElementTypeKey); // Yes its on purpose we use the contentElementTypeKey here, as this is our identifier for a BlockType. [NL]
 					this._manager?.setOneSettings(settingsData);
 					this._layout.update({ settingsKey: settingsData.key } as Partial<BlockLayoutType>);
 				} else if (settingsKey && blockType.settingsElementTypeKey === undefined) {
@@ -490,17 +498,14 @@ export abstract class UmbBlockEntryContext<
 	#gotEntries() {
 		this.#updateCreatePaths();
 		this.#observeLayout();
-		if (this._entries) {
-			this.observe(
-				this._entries.workspacePath,
-				(workspacePath) => {
-					this.#workspacePath.setValue(workspacePath);
-				},
-				'observeWorkspacePath',
-			);
-		} else {
-			this.removeUmbControllerByAlias('observeWorkspacePath');
-		}
+
+		this.observe(
+			this._entries?.workspacePath,
+			(workspacePath) => {
+				this.#workspacePath.setValue(workspacePath);
+			},
+			'observeWorkspacePath',
+		);
 	}
 
 	abstract _gotEntries(): void;
@@ -512,6 +517,10 @@ export abstract class UmbBlockEntryContext<
 		this.observe(
 			this._manager.contentOf(this.#contentKey),
 			(content) => {
+				if (this.#unsupported.getValue() !== true) {
+					// If we could not find content, then we do not know the contentTypeKey and then the content is broken. [NL]
+					this.#unsupported.setValue(!content);
+				}
 				this.#content.setValue(content);
 			},
 			'observeContent',
@@ -545,7 +554,7 @@ export abstract class UmbBlockEntryContext<
 			throw new Error('No contentStructure found');
 		}
 
-		// observe blockType:
+		// observe variantId:
 		this.observe(
 			observeMultiple([
 				this._manager.variantId,
@@ -557,7 +566,7 @@ export abstract class UmbBlockEntryContext<
 				this.#variantId.setValue(variantId.toVariant(variesByCulture, variesBySegment));
 				this.#gotVariantId();
 			},
-			'observeBlockType',
+			'observeVariantId',
 		);
 	}
 
@@ -595,6 +604,11 @@ export abstract class UmbBlockEntryContext<
 		// observe blockType:
 		this.#contentStructure = this._manager.getStructure(contentTypeKey);
 		this.#contentStructurePromiseResolve?.();
+
+		if (!this.#contentStructure) {
+			// If we got no content structure, then this is element type did not load and there for it is not supported any longer.
+			this.#unsupported.setValue(true);
+		}
 
 		this.observe(
 			this.#contentStructure?.ownerContentType,
@@ -636,6 +650,10 @@ export abstract class UmbBlockEntryContext<
 			this._manager.blockTypeOf(contentTypeKey),
 			(blockType) => {
 				this._blockType.setValue(blockType as BlockType);
+				if (!blockType) {
+					// If the block type is undefined, then we do not have this Block Type and the Block is then unsupported. [NL]
+					this.#unsupported.setValue(true);
+				}
 			},
 			'observeBlockType',
 		);
@@ -657,7 +675,7 @@ export abstract class UmbBlockEntryContext<
 			this.observe(
 				this.contentElementTypeName,
 				(contentTypeName) => {
-					this.#label.setValue(contentTypeName ?? 'no name');
+					this.#label.setValue(this.#localize.string(contentTypeName) || 'no name');
 				},
 				'observeContentTypeName',
 			);
@@ -696,11 +714,10 @@ export abstract class UmbBlockEntryContext<
 
 	async requestDelete() {
 		const blockName = this.getName();
-		// TODO: Localizations missing [NL]
 		await umbConfirmModal(this, {
-			headline: `Delete ${blockName}`,
-			content: `Are you sure you want to delete this ${blockName}?`,
-			confirmLabel: 'Delete',
+			headline: this.#localize.term('blockEditor_confirmDeleteBlockTitle', blockName),
+			content: this.#localize.term('blockEditor_confirmDeleteBlockMessage', blockName),
+			confirmLabel: this.#localize.term('general_delete'),
 			color: 'danger',
 		});
 		this.delete();

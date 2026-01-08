@@ -5,6 +5,7 @@ using HtmlAgilityPack;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Exceptions;
@@ -33,6 +34,8 @@ public sealed class RichTextEditorPastedImages
     private readonly IScopeProvider _scopeProvider;
     private readonly IMediaImportService _mediaImportService;
     private readonly IImageUrlGenerator _imageUrlGenerator;
+    private readonly IEntityService _entityService;
+    private readonly AppCaches _appCaches;
     private readonly IUserService _userService;
 
     [Obsolete("Please use the non-obsolete constructor. Will be removed in V16.")]
@@ -84,6 +87,30 @@ public sealed class RichTextEditorPastedImages
     {
     }
 
+    // highest overload to be picked by DI, pointing to newest ctor
+    [Obsolete("Please use the non-obsolete constructor. Will be removed in V17.")]
+    public RichTextEditorPastedImages(
+        IUmbracoContextAccessor umbracoContextAccessor,
+        ILogger<RichTextEditorPastedImages> logger,
+        IHostingEnvironment hostingEnvironment,
+        IMediaService mediaService,
+        IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
+        MediaFileManager mediaFileManager,
+        MediaUrlGeneratorCollection mediaUrlGenerators,
+        IShortStringHelper shortStringHelper,
+        IPublishedUrlProvider publishedUrlProvider,
+        ITemporaryFileService temporaryFileService,
+        IScopeProvider scopeProvider,
+        IMediaImportService mediaImportService,
+        IImageUrlGenerator imageUrlGenerator,
+        IOptions<ContentSettings> contentSettings,
+        IEntityService entityService,
+        AppCaches appCaches)
+        : this(umbracoContextAccessor, publishedUrlProvider, temporaryFileService, scopeProvider, mediaImportService, imageUrlGenerator, entityService, appCaches)
+    {
+    }
+
+    [Obsolete("Please use the non-obsolete constructor. Will be removed in V17.")]
     public RichTextEditorPastedImages(
         IUmbracoContextAccessor umbracoContextAccessor,
         IPublishedUrlProvider publishedUrlProvider,
@@ -91,6 +118,27 @@ public sealed class RichTextEditorPastedImages
         IScopeProvider scopeProvider,
         IMediaImportService mediaImportService,
         IImageUrlGenerator imageUrlGenerator)
+        : this(
+            umbracoContextAccessor,
+            publishedUrlProvider,
+            temporaryFileService,
+            scopeProvider,
+            mediaImportService,
+            imageUrlGenerator,
+            StaticServiceProvider.Instance.GetRequiredService<IEntityService>(),
+            StaticServiceProvider.Instance.GetRequiredService<AppCaches>())
+    {
+    }
+
+    public RichTextEditorPastedImages(
+        IUmbracoContextAccessor umbracoContextAccessor,
+        IPublishedUrlProvider publishedUrlProvider,
+        ITemporaryFileService temporaryFileService,
+        IScopeProvider scopeProvider,
+        IMediaImportService mediaImportService,
+        IImageUrlGenerator imageUrlGenerator,
+        IEntityService entityService,
+        AppCaches appCaches)
     {
         _umbracoContextAccessor =
             umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
@@ -99,6 +147,8 @@ public sealed class RichTextEditorPastedImages
         _scopeProvider = scopeProvider;
         _mediaImportService = mediaImportService;
         _imageUrlGenerator = imageUrlGenerator;
+        _entityService = entityService;
+        _appCaches = appCaches;
 
         // this obviously is not correct. however, we only use IUserService in an obsolete method,
         // so this is better than having even more obsolete constructors for V16
@@ -161,7 +211,7 @@ public sealed class RichTextEditorPastedImages
                 if (uploadedImages.ContainsKey(temporaryFileKey) == false)
                 {
                     using Stream fileStream = temporaryFile.OpenReadStream();
-                    Guid? parentFolderKey = mediaParentFolder == Guid.Empty ? Constants.System.RootKey : mediaParentFolder;
+                    Guid? parentFolderKey = mediaParentFolder == Guid.Empty ? await GetDefaultMediaRoot(userKey) : mediaParentFolder;
                     IMedia mediaFile = await _mediaImportService.ImportAsync(temporaryFile.FileName, fileStream, parentFolderKey, MediaTypeAlias(temporaryFile.FileName), userKey);
                     udi = mediaFile.GetUdi();
                 }
@@ -212,6 +262,20 @@ public sealed class RichTextEditorPastedImages
         }
 
         return htmlDoc.DocumentNode.OuterHtml;
+    }
+
+    private async Task<Guid?> GetDefaultMediaRoot(Guid userKey)
+    {
+        IUser user = await _userService.GetAsync(userKey) ?? throw new ArgumentException("User could not be found");
+        var userStartNodes = user.CalculateMediaStartNodeIds(_entityService, _appCaches);
+        var firstNodeId = userStartNodes?.FirstOrDefault();
+        if (firstNodeId is null)
+        {
+            return Constants.System.RootKey;
+        }
+
+        Attempt<Guid> firstNodeKeyAttempt = _entityService.GetKey(firstNodeId.Value, UmbracoObjectTypes.Media);
+        return firstNodeKeyAttempt.Success ? firstNodeKeyAttempt.Result : Constants.System.RootKey;
     }
 
     private string MediaTypeAlias(string fileName)

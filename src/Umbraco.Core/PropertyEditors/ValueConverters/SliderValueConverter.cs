@@ -49,29 +49,16 @@ public class SliderValueConverter : PropertyValueConverterBase
     /// <inheritdoc />
     public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel cacheLevel, object? source, bool preview)
     {
-        SliderConfiguration? configuration = propertyType.DataType.ConfigurationAs<SliderConfiguration>();
-        bool isRange = IsRange(configuration);
+        bool isRange = IsRange(propertyType);
 
         var sourceString = source?.ToString();
-
-        // If source is null, the returned value depends on the configured initial values.
-        if (string.IsNullOrEmpty(sourceString))
-        {
-            return isRange
-                ? new Range<decimal>
-                {
-                    Minimum = configuration?.InitialValue1 ?? 0M,
-                    Maximum = configuration?.InitialValue2 ?? 0M
-                }
-                : configuration?.InitialValue1 ?? 0M;
-        }
 
         return isRange
             ? HandleRange(sourceString)
             : HandleDecimal(sourceString);
     }
 
-    private static Range<decimal> HandleRange(string sourceString)
+    private static Range<decimal> HandleRange(string? sourceString)
     {
         if (sourceString is null)
         {
@@ -105,8 +92,13 @@ public class SliderValueConverter : PropertyValueConverterBase
         return new Range<decimal>();
     }
 
-    private static decimal HandleDecimal(string sourceString)
+    private static decimal HandleDecimal(string? sourceString)
     {
+        if (string.IsNullOrEmpty(sourceString))
+        {
+            return default;
+        }
+
         // This used to be a range slider, so we'll assign the minimum value as the new value
         if (sourceString.Contains(','))
         {
@@ -131,9 +123,7 @@ public class SliderValueConverter : PropertyValueConverterBase
     private static bool TryParseDecimal(string? representation, out decimal value)
         => decimal.TryParse(representation, NumberStyles.Number, CultureInfo.InvariantCulture, out value);
 
-    private static bool IsRange(IPublishedPropertyType propertyType)
-        => IsRange(propertyType.DataType.ConfigurationAs<SliderConfiguration>());
 
-    private static bool IsRange(SliderConfiguration? configuration)
-        => configuration?.EnableRange == true;
+    private static bool IsRange(IPublishedPropertyType propertyType)
+        => propertyType.DataType.ConfigurationAs<SliderConfiguration>()?.EnableRange == true;
 }

@@ -1414,9 +1414,6 @@ export default {
 		notificationEmailsCheckSuccessMessage: 'Email de notificación has sido configurado como <strong>%0%</strong>.',
 		notificationEmailsCheckErrorMessage:
 			'El email de notificación está todavía configurado en tuvalor por defecto: <strong>%0%</strong>.',
-		scheduledHealthCheckEmailBody:
-			'<html><body><p>Los resultados de los Chequeos de Salud de Umbraco programados para ejecutarse el %0% a las %1% son:</p>%2%</body></html>',
-		scheduledHealthCheckEmailSubject: 'Status de los Chequeos de Salud de Umbraco: %0%',
 	},
 	redirectUrls: {
 		disableUrlTracker: 'Desactivar URL tracker',

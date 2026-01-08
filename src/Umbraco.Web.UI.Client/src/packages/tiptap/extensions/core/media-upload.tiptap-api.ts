@@ -111,13 +111,14 @@ export default class UmbTiptapMediaUploadExtensionApi extends UmbTiptapExtension
 				return;
 			}
 
-			const { width, height } = await imageSize(URL.createObjectURL(upload.file), { maxWidth: maxImageSize });
+			const blobUrl = URL.createObjectURL(upload.file);
+			const { width, height } = await imageSize(blobUrl, { maxWidth: maxImageSize });
 
 			editor
 				.chain()
 				.focus()
 				.setImage({
-					src: URL.createObjectURL(upload.file),
+					src: blobUrl,
 					width: width.toString(),
 					height: height.toString(),
 					'data-tmpimg': upload.temporaryUnique,

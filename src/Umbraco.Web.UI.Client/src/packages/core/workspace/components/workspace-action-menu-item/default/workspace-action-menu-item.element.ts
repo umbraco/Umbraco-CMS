@@ -1,4 +1,4 @@
-import type { UmbWorkspaceActionMenuItem } from '../index.js';
+import type { UmbWorkspaceActionMenuItem } from '../types.js';
 import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
 import { html, customElement, property, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';

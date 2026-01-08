@@ -40,7 +40,7 @@ public class ContentPickerValueConverterTests : PropertyValueConverterTests
         Assert.NotNull(result);
         Assert.AreEqual("The page", result.Name);
         Assert.AreEqual(PublishedContent.Key, result.Id);
-        Assert.AreEqual("/the-page-url", result.Route.Path);
+        Assert.AreEqual("/the-page-url/", result.Route.Path);
         Assert.AreEqual("TheContentType", result.ContentType);
         Assert.IsEmpty(result.Properties);
     }
@@ -72,8 +72,8 @@ public class ContentPickerValueConverterTests : PropertyValueConverterTests
     {
         var content = new Mock<IPublishedContent>();
 
-        var prop1 = new PublishedElementPropertyBase(DeliveryApiPropertyType, content.Object, false, PropertyCacheLevel.None, Mock.Of<ICacheManager>());
-        var prop2 = new PublishedElementPropertyBase(DefaultPropertyType, content.Object, false, PropertyCacheLevel.None, Mock.Of<ICacheManager>());
+        var prop1 = new PublishedElementPropertyBase(DeliveryApiPropertyType, content.Object, false, PropertyCacheLevel.None, new VariationContext(), Mock.Of<ICacheManager>());
+        var prop2 = new PublishedElementPropertyBase(DefaultPropertyType, content.Object, false, PropertyCacheLevel.None, new VariationContext(), Mock.Of<ICacheManager>());
 
         var publishedPropertyType = new Mock<IPublishedPropertyType>();
         publishedPropertyType.SetupGet(p => p.Alias).Returns("test");
@@ -103,7 +103,7 @@ public class ContentPickerValueConverterTests : PropertyValueConverterTests
         Assert.NotNull(result);
         Assert.AreEqual("The page", result.Name);
         Assert.AreEqual(content.Object.Key, result.Id);
-        Assert.AreEqual("/page-url-segment", result.Route.Path);
+        Assert.AreEqual("/page-url-segment/", result.Route.Path);
         Assert.AreEqual("TheContentType", result.ContentType);
         Assert.AreEqual(2, result.Properties.Count);
         Assert.AreEqual("Delivery API value", result.Properties[DeliveryApiPropertyType.Alias]);

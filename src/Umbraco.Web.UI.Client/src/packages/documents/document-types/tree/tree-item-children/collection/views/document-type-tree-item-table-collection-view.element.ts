@@ -31,6 +31,7 @@ export class UmbDocumentTypeTreeItemTableCollectionViewElement extends UmbLitEle
 		{
 			name: '',
 			alias: 'entityActions',
+			align: 'right',
 		},
 	];
 

@@ -25,6 +25,11 @@ export class UmbPasteFromClipboardPropertyAction extends UmbPropertyActionBase<M
 		]);
 	}
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	protected async _pickerFilter(value: any, config: any) {
+		return true;
+	}
+
 	override async execute() {
 		await this.#init;
 		if (!this.#clipboardContext) throw new Error('Clipboard context not found');
@@ -39,6 +44,7 @@ export class UmbPasteFromClipboardPropertyAction extends UmbPropertyActionBase<M
 		const result = await this.#clipboardContext.pick({
 			propertyEditorUiAlias: propertyEditorManifest.alias,
 			multiple: false,
+			filter: this._pickerFilter,
 		});
 
 		const selectedUnique = result.selection[0];

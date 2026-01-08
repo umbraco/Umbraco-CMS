@@ -1,10 +1,9 @@
 import type { UmbBlockGridTypeAreaType } from '../../types.js';
-import { UMB_BLOCK_GRID_ENTRY_CONTEXT } from '../../context/index.js';
-import { UMB_BLOCK_GRID_MANAGER_CONTEXT } from '../../context/block-grid-manager.context-token.js';
+import { UMB_BLOCK_GRID_ENTRY_CONTEXT } from '../block-grid-entry/constants.js';
+import { UMB_BLOCK_GRID_MANAGER_CONTEXT } from '../../block-grid-manager/constants.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { css, customElement, html, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 
-import '../block-grid-entries/index.js';
 /**
  * @description
  * This element is used to render the block grid areas.

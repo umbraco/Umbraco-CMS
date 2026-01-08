@@ -2,8 +2,7 @@ import { UMB_PREVIEW_CONTEXT } from '../preview.context.js';
 import { css, customElement, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-const elementName = 'umb-preview-exit';
-@customElement(elementName)
+@customElement('umb-preview-exit')
 export class UmbPreviewExitElement extends UmbLitElement {
 	async #onClick() {
 		const previewContext = await this.getContext(UMB_PREVIEW_CONTEXT);
@@ -44,6 +43,6 @@ export { UmbPreviewExitElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbPreviewExitElement;
+		'umb-preview-exit': UmbPreviewExitElement;
 	}
 }

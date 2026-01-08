@@ -701,9 +701,6 @@ export default {
 		notificationEmailsCheckSuccessMessage: 'Адреса для надсилання повідомлень є наступною: <strong>%0%</strong>.',
 		notificationEmailsCheckErrorMessage:
 			'Адреса для надсилання повідомлень все ще встановлена за замовчуванням <strong>%0%</strong>.',
-		scheduledHealthCheckEmailBody:
-			'<html><body><p>Зафіксовано такі результати автоматичної перевірки стану Umbraco за розкладом, запущеним %0% в %1%:</p>%2%</body></html>',
-		scheduledHealthCheckEmailSubject: 'Результат перевірки стану Umbraco: %0%',
 	},
 	help: {
 		theBestUmbracoVideoTutorials: 'Найкращі навчальні відео-курси з Umbraco',

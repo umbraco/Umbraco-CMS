@@ -506,7 +506,7 @@ public class XmlHelper
         }
 
         xml = xml.Trim();
-        return xml.StartsWith("<") && xml.EndsWith(">") && xml.Contains('/');
+        return xml.StartsWith('<') && xml.EndsWith('>') && xml.Contains('/');
     }
 
     /// <summary>

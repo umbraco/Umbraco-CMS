@@ -1,4 +1,4 @@
-﻿using Examine;
+using Examine;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Infrastructure.Examine;
@@ -7,7 +7,8 @@ namespace Umbraco.Cms.Infrastructure.Services;
 
 public class IndexingRebuilderService : IIndexingRebuilderService
 {
-    private const string TempKey = "temp_indexing_op_";
+    private const string IsRebuildingIndexRuntimeCacheKeyPrefix = "temp_indexing_op_";
+
     private readonly IAppPolicyCache _runtimeCache;
     private readonly IIndexRebuilder _indexRebuilder;
     private readonly ILogger<IndexingRebuilderService> _logger;
@@ -49,7 +50,7 @@ public class IndexingRebuilderService : IIndexingRebuilderService
 
     private void Set(string indexName)
     {
-        var cacheKey = TempKey + indexName;
+        var cacheKey = IsRebuildingIndexRuntimeCacheKeyPrefix + indexName;
 
         // put temp val in cache which is used as a rudimentary way to know when the indexing is done
         _runtimeCache.Insert(cacheKey, () => "tempValue", TimeSpan.FromMinutes(5));
@@ -57,13 +58,13 @@ public class IndexingRebuilderService : IIndexingRebuilderService
 
     private void Clear(string? indexName)
     {
-        var cacheKey = TempKey + indexName;
+        var cacheKey = IsRebuildingIndexRuntimeCacheKeyPrefix + indexName;
         _runtimeCache.Clear(cacheKey);
     }
 
     public bool IsRebuilding(string indexName)
     {
-        var cacheKey = "temp_indexing_op_" + indexName;
+        var cacheKey = IsRebuildingIndexRuntimeCacheKeyPrefix + indexName;
         return _runtimeCache.Get(cacheKey) is not null;
     }
 

@@ -14,4 +14,8 @@ public interface IBlockLayoutItem
     public Guid ContentKey { get; set; }
 
     public Guid? SettingsKey { get; set; }
+
+    public bool ReferencesContent(Guid key) => ContentKey == key;
+
+    public bool ReferencesSetting(Guid key) => SettingsKey == key;
 }

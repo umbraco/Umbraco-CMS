@@ -92,7 +92,7 @@ export class UmbInputCollectionConfigurationElement extends UmbFormControlMixin<
 				id="create-button"
 				color="default"
 				look="placeholder"
-				label="Configure as a collection"
+				label=${this.localize.term('collection_addCollectionConfiguration')}
 				href=${this._dataTypePickerModalPath}></uui-button>
 		`;
 	}

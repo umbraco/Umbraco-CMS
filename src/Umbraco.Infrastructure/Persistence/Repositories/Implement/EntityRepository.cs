@@ -452,10 +452,12 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
         return AddGroupBy(isContent, isMedia, isMember, sql, true);
     }
 
+    protected Sql<ISqlContext> GetBase(bool isContent, bool isMedia, bool isMember, Action<Sql<ISqlContext>>? filter, bool isCount = false)
+        => GetBase(isContent, isMedia, isMember, filter, [], isCount);
+
     // gets the base SELECT + FROM [+ filter] sql
     // always from the 'current' content version
-    protected Sql<ISqlContext> GetBase(bool isContent, bool isMedia, bool isMember, Action<Sql<ISqlContext>>? filter,
-        bool isCount = false)
+    protected Sql<ISqlContext> GetBase(bool isContent, bool isMedia, bool isMember, Action<Sql<ISqlContext>>? filter, Guid[] objectTypes, bool isCount = false)
     {
         Sql<ISqlContext> sql = Sql();
 
@@ -469,8 +471,19 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
                 .Select<NodeDto>(x => x.NodeId, x => x.Trashed, x => x.ParentId, x => x.UserId, x => x.Level,
                     x => x.Path)
                 .AndSelect<NodeDto>(x => x.SortOrder, x => x.UniqueId, x => x.Text, x => x.NodeObjectType,
-                    x => x.CreateDate)
-                .Append(", COUNT(child.id) AS children");
+                    x => x.CreateDate);
+
+            if (objectTypes.Length == 0)
+            {
+                sql.Append(", COUNT(child.id) AS children");
+            }
+            else
+            {
+                // The following is safe from SQL injection as we are dealing with GUIDs, not strings.
+                // Upper-case is necessary for SQLite, and also works for SQL Server.
+                var objectTypesForInClause = string.Join("','",  objectTypes.Select(x => x.ToString().ToUpperInvariant()));
+                sql.Append($", SUM(CASE WHEN child.nodeObjectType IN ('{objectTypesForInClause}') THEN 1 ELSE 0 END) AS children");
+            }
 
             if (isContent || isMedia || isMember)
             {
@@ -545,7 +558,7 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
     protected Sql<ISqlContext> GetBaseWhere(bool isContent, bool isMedia, bool isMember, bool isCount,
         Action<Sql<ISqlContext>>? filter, Guid[] objectTypes)
     {
-        Sql<ISqlContext> sql = GetBase(isContent, isMedia, isMember, filter, isCount);
+        Sql<ISqlContext> sql = GetBase(isContent, isMedia, isMember, filter, objectTypes, isCount);
         if (objectTypes.Length > 0)
         {
             sql.WhereIn<NodeDto>(x => x.NodeObjectType, objectTypes);

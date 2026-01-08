@@ -146,8 +146,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 									label="${this.localize.term('redirectUrls_originalUrl')}"
 									@keypress=${this.#onKeypress}></uui-input>
 								<uui-button
-									look="primary"
-									color="positive"
+									look="outline"
 									label="${this.localize.term('general_search')}"
 									@click=${this.#onSearch}
 									.state=${this._buttonState}>
@@ -156,7 +155,6 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 							</div>
 							<uui-button
 								look="outline"
-								color="danger"
 								label="${this.localize.term('redirectUrls_disableUrlTracker')}"
 								@click=${this.#onRequestTrackerToggle}>
 								${this.localize.term('redirectUrls_disableUrlTracker')}

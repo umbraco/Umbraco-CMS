@@ -91,7 +91,7 @@ public sealed class BlockEditorConverter
             return null;
         }
 
-        IPublishedElement element = new PublishedElement(publishedContentType, key, propertyValues, preview, referenceCacheLevel, _cacheManager);
+        IPublishedElement element = new PublishedElement(publishedContentType, key, propertyValues, preview, referenceCacheLevel, variationContext, _cacheManager);
         element = _publishedModelFactory.CreateModel(element);
 
         return element;

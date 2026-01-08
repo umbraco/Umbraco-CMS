@@ -1,4 +1,3 @@
-using System.Globalization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -13,7 +12,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
-internal class PublicAccessService : RepositoryService, IPublicAccessService
+internal sealed class PublicAccessService : RepositoryService, IPublicAccessService
 {
     private readonly IPublicAccessRepository _publicAccessRepository;
     private readonly IEntityService _entityService;
@@ -87,13 +86,8 @@ internal class PublicAccessService : RepositoryService, IPublicAccessService
     {
         // Get all ids in the path for the content item and ensure they all
         // parse to ints that are not -1.
-        var ids = contentPath.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
-            .Select(x => int.TryParse(x, NumberStyles.Integer, CultureInfo.InvariantCulture, out var val) ? val : -1)
-            .Where(x => x != -1)
-            .ToList();
-
-        // start with the deepest id
-        ids.Reverse();
+        // Start with the deepest id.
+        IEnumerable<int> ids = contentPath.GetIdsFromPathReversed().Where(x => x != -1);
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
@@ -101,7 +95,7 @@ internal class PublicAccessService : RepositoryService, IPublicAccessService
             var entries = _publicAccessRepository.GetMany().ToList();
             foreach (var id in ids)
             {
-                PublicAccessEntry? found = entries.FirstOrDefault(x => x.ProtectedNodeId == id);
+                PublicAccessEntry? found = entries.Find(x => x.ProtectedNodeId == id);
                 if (found != null)
                 {
                     return found;

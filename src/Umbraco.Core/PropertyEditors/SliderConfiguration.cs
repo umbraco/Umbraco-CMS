@@ -1,5 +1,3 @@
-using System.Text.Json.Serialization;
-
 namespace Umbraco.Cms.Core.PropertyEditors;
 
 /// <summary>
@@ -16,9 +14,6 @@ public class SliderConfiguration
     [ConfigurationField("maxVal")]
     public decimal MaximumValue { get; set; }
 
-    [ConfigurationField("initVal1")]
-    public decimal InitialValue1 { get; set; }
-
-    [ConfigurationField("initVal2")]
-    public decimal InitialValue2 { get; set; }
+    [ConfigurationField("step")]
+    public decimal Step { get; set; }
 }

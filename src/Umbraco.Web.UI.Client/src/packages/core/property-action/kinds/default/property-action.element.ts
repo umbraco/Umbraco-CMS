@@ -4,7 +4,7 @@ import type {
 } from '../../property-action.extension.js';
 import type { UmbPropertyAction } from '../../property-action.interface.js';
 import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
-import { html, customElement, property, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, html, ifDefined, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';
 
@@ -48,13 +48,11 @@ export class UmbPropertyActionElement<
 	override render() {
 		return html`
 			<uui-menu-item
-				label=${ifDefined(this.manifest?.meta.label)}
+				label=${this.localize.string(this.manifest?.meta.label)}
 				href=${ifDefined(this._href)}
 				@click-label=${this.#onClickLabel}
 				@click=${this.#onClick}>
-				${this.manifest?.meta.icon
-					? html`<umb-icon slot="icon" name="${this.manifest?.meta.icon}"></umb-icon>`
-					: nothing}
+				${when(this.manifest?.meta.icon, (icon) => html`<umb-icon slot="icon" name=${icon}></umb-icon>`)}
 			</uui-menu-item>
 		`;
 	}

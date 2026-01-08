@@ -53,6 +53,11 @@ export default class UmbTiptapToolbarMediaPickerToolbarExtensionApi extends UmbT
 		if (!selection?.length) return;
 
 		const mediaGuid = selection[0];
+
+		if (!mediaGuid) {
+			throw new Error('No media selected');
+		}
+
 		const media = await this.#showMediaCaptionAltText(mediaGuid, currentAltText, currentCaption);
 		if (!media) return;
 

@@ -2,7 +2,6 @@ import type { UmbLinkPickerLink } from '../link-picker-modal/types.js';
 import type { UmbInputMultiUrlElement } from '../components/input-multi-url/index.js';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type {
 	UmbPropertyEditorConfigCollection,
@@ -11,15 +10,17 @@ import type {
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 
 import '../components/input-multi-url/index.js';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 /**
  * @element umb-property-editor-ui-multi-url-picker
  */
 @customElement('umb-property-editor-ui-multi-url-picker')
-export class UmbPropertyEditorUIMultiUrlPickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
-	@property({ type: Array })
-	value: Array<UmbLinkPickerLink> = [];
-
+export class UmbPropertyEditorUIMultiUrlPickerElement
+	extends UmbFormControlMixin<Array<UmbLinkPickerLink>, typeof UmbLitElement, undefined>(UmbLitElement)
+	implements UmbPropertyEditorUiElement
+{
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 
@@ -40,7 +41,7 @@ export class UmbPropertyEditorUIMultiUrlPickerElement extends UmbLitElement impl
 
 	#parseInt(value: unknown, fallback: number): number {
 		const num = Number(value);
-		return !isNaN(num) && num > 0 ? num : fallback;
+		return !Number.isNaN(num) && num > 0 ? num : fallback;
 	}
 
 	@state()
@@ -56,6 +57,9 @@ export class UmbPropertyEditorUIMultiUrlPickerElement extends UmbLitElement impl
 	private _max = Infinity;
 
 	@state()
+	private _label?: string;
+
+	@state()
 	private _alias?: string;
 
 	@state()
@@ -65,14 +69,25 @@ export class UmbPropertyEditorUIMultiUrlPickerElement extends UmbLitElement impl
 		super();
 
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
+			this._label = context.getLabel();
 			this.observe(context.alias, (alias) => (this._alias = alias));
 			this.observe(context.variantId, (variantId) => (this._variantId = variantId?.toString() || 'invariant'));
 		});
 	}
 
+	protected override firstUpdated() {
+		if (this._min && this._max && this._min > this._max) {
+			console.warn(
+				`Property '${this._label}' (Multi URL Picker) has been misconfigured, 'min' is greater than 'max'. Please correct your data type configuration.`,
+				this,
+			);
+		}
+		this.addFormControlElement(this.shadowRoot!.querySelector('umb-input-multi-url')!);
+	}
+
 	#onChange(event: CustomEvent & { target: UmbInputMultiUrlElement }) {
 		this.value = event.target.urls;
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	override render() {

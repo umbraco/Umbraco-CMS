@@ -1,8 +1,8 @@
-import { UmbMediaUrlRepository } from '../../repository/index.js';
 import { UMB_MEDIA_PICKER_MODAL } from '../media-picker/media-picker-modal.token.js';
 import type { UmbCropModel } from '../../types.js';
 import type { UmbInputImageCropperFieldElement } from '../../components/input-image-cropper/image-cropper-field.element.js';
 import type { UmbImageCropperPropertyEditorValue } from '../../components/index.js';
+import { UmbMediaUrlRepository } from '../../url/index.js';
 import type {
 	UmbImageCropperEditorModalData,
 	UmbImageCropperEditorModalValue,
@@ -108,7 +108,14 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 		const data = await modal?.onSubmit().catch(() => null);
 		if (!data) return;
 
-		this._unique = data.selection[0];
+		const selected = data.selection[0];
+
+		if (!selected) {
+			throw new Error('No media selected');
+		}
+
+		this._unique = selected;
+
 		this.value = { ...this.value, unique: this._unique };
 		this.#getSrc();
 	}

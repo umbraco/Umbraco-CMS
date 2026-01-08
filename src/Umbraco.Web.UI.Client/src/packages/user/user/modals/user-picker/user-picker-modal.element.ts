@@ -48,7 +48,7 @@ export class UmbUserPickerModalElement extends UmbModalBaseElement<UmbUserPicker
 
 	override render() {
 		return html`
-			<umb-body-layout headline=${this.localize.term('defaultdialogs_selectUsers')}>
+			<umb-body-layout headline=${this.localize.term('defaultdialogs_chooseUsers')}>
 				<uui-box>
 					${this._users.map(
 						(user) => html`
@@ -68,8 +68,12 @@ export class UmbUserPickerModalElement extends UmbModalBaseElement<UmbUserPicker
 					)}
 				</uui-box>
 				<div slot="actions">
-					<uui-button label="Close" @click=${this.#close}></uui-button>
-					<uui-button label="Submit" look="primary" color="positive" @click=${this.#submit}></uui-button>
+					<uui-button label=${this.localize.term('general_close')} @click=${this.#close}></uui-button>
+					<uui-button
+						label=${this.localize.term('general_choose')}
+						look="primary"
+						color="positive"
+						@click=${this.#submit}></uui-button>
 				</div>
 			</umb-body-layout>
 		`;

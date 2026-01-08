@@ -20,7 +20,7 @@ test.afterEach(async ({umbracoApi}) => {
 test('can create a data type folder', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.dataType.clickActionsMenuAtRoot();
-  await umbracoUi.dataType.createFolder(dataTypeFolderName);
+  await umbracoUi.dataType.createDataTypeFolder(dataTypeFolderName);
 
   // Assert
   await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
@@ -39,7 +39,7 @@ test('can rename a data type folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickActionsMenuForDataType(wrongDataTypeFolderName);
   await umbracoUi.dataType.clickRenameFolderButton();
   await umbracoUi.dataType.enterFolderName(dataTypeFolderName);
-  await umbracoUi.dataType.clickConfirmRenameFolderButton();
+  await umbracoUi.dataType.clickConfirmRenameButton();
 
   // Assert
   await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
@@ -70,8 +70,8 @@ test('can create a data type in a folder', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.dataType.clickRootFolderCaretButton();
   await umbracoUi.dataType.clickActionsMenuForDataType(dataTypeFolderName);
-  await umbracoUi.dataType.clickCreateButton();
-  await umbracoUi.dataType.clickNewDataTypeThreeDotsButton();
+  await umbracoUi.dataType.clickActionsMenuCreateButton();
+  await umbracoUi.dataType.clickDataTypeButton();
   await umbracoUi.dataType.enterDataTypeName(dataTypeName);
   await umbracoUi.dataType.clickSelectAPropertyEditorButton();
   await umbracoUi.dataType.selectAPropertyEditor(propertyEditorName);
@@ -95,7 +95,7 @@ test('can create a folder in a folder', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.dataType.clickRootFolderCaretButton();
   await umbracoUi.dataType.clickActionsMenuForDataType(dataTypeFolderName);
-  await umbracoUi.dataType.createFolder(childFolderName);
+  await umbracoUi.dataType.createDataTypeFolder(childFolderName);
 
   // Assert
   await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
@@ -116,7 +116,7 @@ test('can create a folder in a folder in a folder', async ({umbracoApi, umbracoU
   await umbracoUi.dataType.clickRootFolderCaretButton();
   await umbracoUi.dataType.clickCaretButtonForName(dataTypeFolderName);
   await umbracoUi.dataType.clickActionsMenuForDataType(childFolderName);
-  await umbracoUi.dataType.createFolder(childOfChildFolderName);
+  await umbracoUi.dataType.createDataTypeFolder(childOfChildFolderName);
 
   // Assert
   await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);

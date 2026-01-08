@@ -1,8 +1,12 @@
-﻿using Umbraco.Cms.Core;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Api.Management.Models.Entities;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Services.Entities;
@@ -10,8 +14,24 @@ namespace Umbraco.Cms.Api.Management.Services.Entities;
 public class UserStartNodeEntitiesService : IUserStartNodeEntitiesService
 {
     private readonly IEntityService _entityService;
+    private readonly ICoreScopeProvider _scopeProvider;
+    private readonly IIdKeyMap _idKeyMap;
 
-    public UserStartNodeEntitiesService(IEntityService entityService) => _entityService = entityService;
+    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in V17.")]
+    public UserStartNodeEntitiesService(IEntityService entityService)
+        : this(
+            entityService,
+            StaticServiceProvider.Instance.GetRequiredService<ICoreScopeProvider>(),
+            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>())
+    {
+    }
+
+    public UserStartNodeEntitiesService(IEntityService entityService, ICoreScopeProvider scopeProvider, IIdKeyMap idKeyMap)
+    {
+        _entityService = entityService;
+        _scopeProvider = scopeProvider;
+        _idKeyMap = idKeyMap;
+    }
 
     /// <inheritdoc />
     public IEnumerable<UserAccessEntity> RootUserAccessEntities(UmbracoObjectTypes umbracoObjectType, int[] userStartNodeIds)
@@ -41,6 +61,54 @@ public class UserStartNodeEntitiesService : IUserStartNodeEntitiesService
                 nonAllowedTopmostEntities
                     .Select(entity => new UserAccessEntity(entity, false)))
             .ToArray();
+    }
+
+    public IEnumerable<UserAccessEntity> ChildUserAccessEntities(UmbracoObjectTypes umbracoObjectType, string[] userStartNodePaths, Guid parentKey, int skip, int take, Ordering ordering, out long totalItems)
+    {
+        Attempt<int> parentIdAttempt = _idKeyMap.GetIdForKey(parentKey, umbracoObjectType);
+        if (parentIdAttempt.Success is false)
+        {
+            totalItems = 0;
+            return [];
+        }
+
+        var parentId = parentIdAttempt.Result;
+        IEntitySlim? parent = _entityService.Get(parentId);
+        if (parent is null)
+        {
+            totalItems = 0;
+            return [];
+        }
+
+        IEntitySlim[] children;
+        if (userStartNodePaths.Any(path => $"{parent.Path},".StartsWith($"{path},")))
+        {
+            // the requested parent is one of the user start nodes (or a descendant of one), all children are by definition allowed
+            children = _entityService.GetPagedChildren(parentKey, umbracoObjectType, skip, take, out totalItems, ordering: ordering).ToArray();
+            return ChildUserAccessEntities(children, userStartNodePaths);
+        }
+
+        // if one or more of the user start nodes are descendants of the requested parent, find the "next child IDs" in those user start node paths
+        // - e.g. given the user start node path "-1,2,3,4,5", if the requested parent ID is 3, the "next child ID" is 4.
+        var userStartNodePathIds = userStartNodePaths.Select(path => path.Split(Constants.CharArrays.Comma).Select(int.Parse).ToArray()).ToArray();
+        var allowedChildIds = userStartNodePathIds
+            .Where(ids => ids.Contains(parentId))
+            // given the previous checks, the parent ID can never be the last in the user start node path, so this is safe
+            .Select(ids => ids[ids.IndexOf(parentId) + 1])
+            .Distinct()
+            .ToArray();
+
+        totalItems = allowedChildIds.Length;
+        if (allowedChildIds.Length == 0)
+        {
+            // the requested parent is outside the scope of any user start nodes
+            return [];
+        }
+
+        // even though we know the IDs of the allowed child entities to fetch, we still use a Query to yield correctly sorted children
+        IQuery<IUmbracoEntity> query = _scopeProvider.CreateQuery<IUmbracoEntity>().Where(x => allowedChildIds.Contains(x.Id));
+        children = _entityService.GetPagedChildren(parentKey, umbracoObjectType, skip, take, out totalItems, query, ordering).ToArray();
+        return ChildUserAccessEntities(children, userStartNodePaths);
     }
 
     /// <inheritdoc />

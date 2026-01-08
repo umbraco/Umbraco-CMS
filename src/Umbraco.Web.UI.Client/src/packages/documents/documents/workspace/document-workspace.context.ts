@@ -9,7 +9,10 @@ import {
 	UMB_DOCUMENT_COLLECTION_ALIAS,
 	UMB_DOCUMENT_ENTITY_TYPE,
 	UMB_DOCUMENT_SAVE_MODAL,
+	UMB_DOCUMENT_USER_PERMISSION_CONDITION_ALIAS,
 	UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN,
+	UMB_USER_PERMISSION_DOCUMENT_CREATE,
+	UMB_USER_PERMISSION_DOCUMENT_UPDATE,
 } from '../constants.js';
 import { UmbDocumentPreviewRepository } from '../repository/preview/index.js';
 import { UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT, UmbDocumentPublishingRepository } from '../publishing/index.js';
@@ -32,7 +35,8 @@ import {
 import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
 import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
-import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
+import { ensurePathEndsWithSlash, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
+import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 
 type ContentModel = UmbDocumentDetailModel;
 type ContentTypeModel = UmbDocumentTypeDetailModel;
@@ -66,6 +70,8 @@ export class UmbDocumentWorkspaceContext
 
 	#isTrashedContext = new UmbIsTrashedEntityContext(this);
 	#publishingContext?: typeof UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT.TYPE;
+	#userCanCreate = false;
+	#userCanUpdate = false;
 
 	constructor(host: UmbControllerHost) {
 		super(host, {
@@ -74,8 +80,10 @@ export class UmbDocumentWorkspaceContext
 			detailRepositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 			contentTypeDetailRepository: UmbDocumentTypeDetailRepository,
 			contentValidationRepository: UmbDocumentValidationRepository,
-			skipValidationOnSubmit: true,
+			skipValidationOnSubmit: false,
+			ignoreValidationResultOnSubmit: true,
 			contentVariantScaffold: UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD,
+			contentTypePropertyName: 'documentType',
 			saveModalToken: UMB_DOCUMENT_SAVE_MODAL,
 		});
 
@@ -84,6 +92,54 @@ export class UmbDocumentWorkspaceContext
 		// TODO: Remove this in v17 as we have moved the publishing methods to the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT.
 		this.consumeContext(UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT, (context) => {
 			this.#publishingContext = context;
+		});
+
+		createExtensionApiByAlias(this, UMB_DOCUMENT_USER_PERMISSION_CONDITION_ALIAS, [
+			{
+				config: {
+					allOf: [UMB_USER_PERMISSION_DOCUMENT_CREATE],
+				},
+				onChange: (permitted: boolean) => {
+					if (permitted === this.#userCanCreate) return;
+					this.#userCanCreate = permitted;
+					this.#setReadOnlyStateForUserPermission(
+						UMB_USER_PERMISSION_DOCUMENT_CREATE,
+						this.#userCanCreate,
+						'You do not have permission to create documents.',
+					);
+				},
+			},
+		]);
+
+		createExtensionApiByAlias(this, UMB_DOCUMENT_USER_PERMISSION_CONDITION_ALIAS, [
+			{
+				config: {
+					allOf: [UMB_USER_PERMISSION_DOCUMENT_UPDATE],
+				},
+				onChange: (permitted: boolean) => {
+					if (permitted === this.#userCanUpdate) return;
+					this.#userCanUpdate = permitted;
+					this.#setReadOnlyStateForUserPermission(
+						UMB_USER_PERMISSION_DOCUMENT_UPDATE,
+						this.#userCanUpdate,
+						'You do not have permission to update documents.',
+					);
+				},
+			},
+		]);
+
+		this.observe(this.variants, () => {
+			this.#setReadOnlyStateForUserPermission(
+				UMB_USER_PERMISSION_DOCUMENT_CREATE,
+				this.#userCanCreate,
+				'You do not have permission to create documents.',
+			);
+
+			this.#setReadOnlyStateForUserPermission(
+				UMB_USER_PERMISSION_DOCUMENT_UPDATE,
+				this.#userCanUpdate,
+				'You do not have permission to update documents.',
+			);
 		});
 
 		this.routes.setRoutes([
@@ -102,6 +158,7 @@ export class UmbDocumentWorkspaceContext
 						documentTypeUnique,
 						blueprintUnique,
 					);
+
 					new UmbWorkspaceIsNewRedirectController(
 						this,
 						this,
@@ -117,7 +174,6 @@ export class UmbDocumentWorkspaceContext
 					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
 					const documentTypeUnique = info.match.params.documentTypeUnique;
 					await this.create({ entityType: parentEntityType, unique: parentUnique }, documentTypeUnique);
-
 					new UmbWorkspaceIsNewRedirectController(
 						this,
 						this,
@@ -128,19 +184,24 @@ export class UmbDocumentWorkspaceContext
 			{
 				path: UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN.toString(),
 				component: () => import('./document-workspace-editor.element.js'),
-				setup: (_component, info) => {
+				setup: async (_component, info) => {
 					this.removeUmbControllerByAlias(UmbWorkspaceIsNewRedirectControllerAlias);
 					const unique = info.match.params.unique;
-					this.load(unique);
+					await this.load(unique);
 				},
 			},
 		]);
 	}
 
+	override resetState(): void {
+		super.resetState();
+		this.#isTrashedContext.setIsTrashed(false);
+	}
+
 	override async load(unique: string) {
 		const response = await super.load(unique);
 
-		if (response.data) {
+		if (response?.data) {
 			this.#isTrashedContext.setIsTrashed(response.data.isTrashed);
 		}
 
@@ -150,14 +211,16 @@ export class UmbDocumentWorkspaceContext
 	async create(parent: UmbEntityModel, documentTypeUnique: string, blueprintUnique?: string) {
 		if (blueprintUnique) {
 			const blueprintRepository = new UmbDocumentBlueprintDetailRepository(this);
-			const { data } = await blueprintRepository.requestByUnique(blueprintUnique);
+			const { data } = await blueprintRepository.scaffoldByUnique(blueprintUnique);
+
+			if (!data) throw new Error('Blueprint data is missing');
 
 			return this.createScaffold({
 				parent,
 				preset: {
-					documentType: data?.documentType,
-					values: data?.values,
-					variants: data?.variants as Array<UmbDocumentVariantModel>,
+					documentType: data.documentType,
+					values: data.values,
+					variants: data.variants as Array<UmbDocumentVariantModel>,
 				},
 			});
 		}
@@ -210,11 +273,11 @@ export class UmbDocumentWorkspaceContext
 	 * @returns {Promise<void>} a promise which resolves once it has been completed.
 	 */
 	public override requestSubmit() {
-		return this._handleSubmit();
-	}
-
-	// Because we do not make validation prevent submission this also submits the workspace. [NL]
-	public override invalidSubmit() {
+		const elementStyle = (this.getHostElement() as HTMLElement).style;
+		elementStyle.setProperty('--uui-color-invalid', 'var(--uui-color-warning)');
+		elementStyle.setProperty('--uui-color-invalid-emphasis', 'var(--uui-color-warning-emphasis)');
+		elementStyle.setProperty('--uui-color-invalid-standalone', 'var(--uui-color-warning-standalone)');
+		elementStyle.setProperty('--uui-color-invalid-contrast', 'var(--uui-color-warning-contrast)');
 		return this._handleSubmit();
 	}
 
@@ -243,7 +306,8 @@ export class UmbDocumentWorkspaceContext
 
 		const appContext = await this.getContext(UMB_APP_CONTEXT);
 
-		const previewUrl = new URL(appContext.getBackofficePath() + '/preview', appContext.getServerUrl());
+		const backofficePath = appContext.getBackofficePath();
+		const previewUrl = new URL(ensurePathEndsWithSlash(backofficePath) + 'preview', appContext.getServerUrl());
 		previewUrl.searchParams.set('id', unique);
 
 		if (culture && culture !== UMB_INVARIANT_CULTURE) {
@@ -257,7 +321,7 @@ export class UmbDocumentWorkspaceContext
 	public async publish() {
 		new UmbDeprecation({
 			deprecated: 'The Publish method on the UMB_DOCUMENT_WORKSPACE_CONTEXT is deprecated.',
-			removeInVersion: '17',
+			removeInVersion: '17.0.0',
 			solution: 'Use the Publish method on the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.',
 		}).warn();
 		if (!this.#publishingContext) throw new Error('Publishing context is missing');
@@ -271,7 +335,7 @@ export class UmbDocumentWorkspaceContext
 	public async saveAndPublish(): Promise<void> {
 		new UmbDeprecation({
 			deprecated: 'The SaveAndPublish method on the UMB_DOCUMENT_WORKSPACE_CONTEXT is deprecated.',
-			removeInVersion: '17',
+			removeInVersion: '17.0.0',
 			solution: 'Use the SaveAndPublish method on the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.',
 		}).warn();
 		if (!this.#publishingContext) throw new Error('Publishing context is missing');
@@ -285,7 +349,7 @@ export class UmbDocumentWorkspaceContext
 	public async schedule() {
 		new UmbDeprecation({
 			deprecated: 'The Schedule method on the UMB_DOCUMENT_WORKSPACE_CONTEXT is deprecated.',
-			removeInVersion: '17',
+			removeInVersion: '17.0.0',
 			solution: 'Use the Schedule method on the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.',
 		}).warn();
 		if (!this.#publishingContext) throw new Error('Publishing context is missing');
@@ -299,7 +363,7 @@ export class UmbDocumentWorkspaceContext
 	public async unpublish() {
 		new UmbDeprecation({
 			deprecated: 'The Unpublish method on the UMB_DOCUMENT_WORKSPACE_CONTEXT is deprecated.',
-			removeInVersion: '17',
+			removeInVersion: '17.0.0',
 			solution: 'Use the Unpublish method on the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.',
 		}).warn();
 		if (!this.#publishingContext) throw new Error('Publishing context is missing');
@@ -313,7 +377,7 @@ export class UmbDocumentWorkspaceContext
 	public async publishWithDescendants() {
 		new UmbDeprecation({
 			deprecated: 'The PublishWithDescendants method on the UMB_DOCUMENT_WORKSPACE_CONTEXT is deprecated.',
-			removeInVersion: '17',
+			removeInVersion: '17.0.0',
 			solution: 'Use the PublishWithDescendants method on the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.',
 		}).warn();
 		if (!this.#publishingContext) throw new Error('Publishing context is missing');
@@ -325,6 +389,30 @@ export class UmbDocumentWorkspaceContext
 		variantId: UmbVariantId,
 	): UmbDocumentPropertyDatasetContext {
 		return new UmbDocumentPropertyDatasetContext(host, this, variantId);
+	}
+
+	async #setReadOnlyStateForUserPermission(identifier: string, permitted: boolean, message: string) {
+		const variants = this.getVariants();
+		const uniques = variants?.map((variant) => identifier + variant.culture) || [];
+
+		if (permitted) {
+			this.readOnlyState?.removeStates(uniques);
+			return;
+		}
+
+		const variantIds = variants?.map((variant) => new UmbVariantId(variant.culture, variant.segment)) || [];
+
+		const readOnlyStates = variantIds.map((variantId) => {
+			return {
+				unique: identifier + variantId.culture,
+				variantId,
+				message,
+			};
+		});
+
+		this.readOnlyState?.removeStates(uniques);
+
+		this.readOnlyState?.addStates(readOnlyStates);
 	}
 }
 

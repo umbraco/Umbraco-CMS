@@ -18,6 +18,7 @@ dist-ssr
 
 ## testing
 coverage/
+utils/all-umb-consts/
 
 # Editor directories and files
 .vscode/*

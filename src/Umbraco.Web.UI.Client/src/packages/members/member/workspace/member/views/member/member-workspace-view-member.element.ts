@@ -9,6 +9,7 @@ import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui'
 
 import './member-workspace-view-member-info.element.js';
 import type { UmbInputMemberGroupElement } from '@umbraco-cms/backoffice/member-group';
+import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 
 @customElement('umb-member-workspace-view-member')
 export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -24,6 +25,12 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 				this._isNew = !!isNew;
 			});
 		});
+
+		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
+			this.observe(context.hasAccessToSensitiveData, (hasAccessToSensitiveData) => {
+				this._hasAccessToSensitiveData = hasAccessToSensitiveData === true;
+			});
+		});
 	}
 
 	@state()
@@ -34,6 +41,9 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 
 	@state()
 	private _isNew = true;
+
+	@state()
+	private _hasAccessToSensitiveData = false;
 
 	#onChange(propertyName: keyof UmbMemberDetailModel, value: UmbMemberDetailModel[keyof UmbMemberDetailModel]) {
 		if (!this._workspaceContext) return;
@@ -181,25 +191,28 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 							.selection=${this._workspaceContext.memberGroups}></umb-input-member-group>
 					</umb-property-layout>
 
-					<umb-property-layout label=${this.localize.term('user_stateApproved')} data-mark="property-layout:${this.localize.term('user_stateApproved')}">
-						<uui-toggle
-							slot="editor"
+					${when(this._hasAccessToSensitiveData,
+						() => html`
+							<umb-property-layout label=${this.localize.term('user_stateApproved')} data-mark="property-layout:${this.localize.term('user_stateApproved')}">
+								<uui-toggle
+									slot="editor"
 							data-mark="toggle:${this.localize.term('user_stateApproved')}"
-							.checked=${this._workspaceContext.isApproved}
-							@change=${(e: UUIBooleanInputEvent) => this.#onChange('isApproved', e.target.checked)}>
-						</uui-toggle>
-					</umb-property-layout>
+									.checked=${this._workspaceContext!.isApproved}
+									@change=${(e: UUIBooleanInputEvent) => this.#onChange('isApproved', e.target.checked)}>
+								</uui-toggle>
+							</umb-property-layout>
 
-					<umb-property-layout label=${this.localize.term('user_stateLockedOut')} data-mark="property-layout:locked-out">
-						<uui-toggle
-							slot="editor"
+							<umb-property-layout label=${this.localize.term('user_stateLockedOut')} data-mark="property-layout:locked-out">
+								<uui-toggle
+									slot="editor"
 							data-mark="toggle:locked-out""
-							?disabled=${this._isNew || !this._workspaceContext.isLockedOut}
-							.checked=${this._workspaceContext.isLockedOut}
-							@change=${(e: UUIBooleanInputEvent) => this.#onChange('isLockedOut', e.target.checked)}>
-						</uui-toggle>
-					</umb-property-layout>
-
+									?disabled=${this._isNew || !this._workspaceContext!.isLockedOut}
+									.checked=${this._workspaceContext!.isLockedOut}
+									@change=${(e: UUIBooleanInputEvent) => this.#onChange('isLockedOut', e.target.checked)}>
+								</uui-toggle>
+							</umb-property-layout>
+						`)
+					}
 					<umb-property-layout label=${this.localize.term('member_2fa')} data-mark="property-layout:two-factor">
 						<uui-toggle
 							slot="editor"
@@ -210,6 +223,10 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 						</uui-toggle>
 					</umb-property-layout>
 				</uui-box>
+
+				<div class="container">
+					<umb-extension-slot id="workspace-info-apps" type="workspaceInfoApp"></umb-extension-slot>
+				</div>
 			</div>
 		`;
 	}
@@ -281,6 +298,9 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 			#left-column {
 				/* Is there a way to make the wrapped right column grow only when wrapped? */
 				flex: 9999 1 500px;
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-space-4);
 			}
 			#right-column {
 				flex: 1 1 350px;

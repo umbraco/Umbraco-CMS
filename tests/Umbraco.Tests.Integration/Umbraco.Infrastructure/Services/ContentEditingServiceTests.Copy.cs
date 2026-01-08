@@ -198,6 +198,48 @@ public partial class ContentEditingServiceTests
         }
     }
 
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task Can_Copy_Onto_Self(bool includeDescendants)
+    {
+        var contentType = await CreateTextPageContentTypeAsync();
+        (IContent root, IContent child) = await CreateRootAndChildAsync(contentType);
+
+        var result = await ContentEditingService.CopyAsync(root.Key, root.Key, false, includeDescendants, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+
+        VerifyCopy(result.Result);
+
+        // re-get and re-test
+        VerifyCopy(await ContentEditingService.GetAsync(result.Result!.Key));
+
+        void VerifyCopy(IContent? copiedRoot)
+        {
+            Assert.IsNotNull(copiedRoot);
+            Assert.AreEqual(root.Id, copiedRoot.ParentId);
+            Assert.IsTrue(copiedRoot.HasIdentity);
+            Assert.AreNotEqual(root.Key, copiedRoot.Key);
+            Assert.AreEqual(root.Name, copiedRoot.Name);
+            var copiedChildren = ContentService.GetPagedChildren(copiedRoot.Id, 0, 100, out var total).ToArray();
+
+            if (includeDescendants)
+            {
+                Assert.AreEqual(1, copiedChildren.Length);
+                Assert.AreEqual(1, total);
+                var copiedChild = copiedChildren.First();
+                Assert.AreNotEqual(child.Id, copiedChild.Id);
+                Assert.AreNotEqual(child.Key, copiedChild.Key);
+                Assert.AreEqual(child.Name, copiedChild.Name);
+            }
+            else
+            {
+                Assert.AreEqual(0, copiedChildren.Length);
+                Assert.AreEqual(0, total);
+            }
+        }
+    }
+
     [Test]
     public async Task Can_Relate_Copy_To_Original()
     {

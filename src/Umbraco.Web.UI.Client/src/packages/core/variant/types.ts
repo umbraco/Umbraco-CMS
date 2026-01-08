@@ -3,6 +3,11 @@ import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import type { ScheduleRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbPropertyValueData } from '@umbraco-cms/backoffice/property';
 
+export type UmbObjectWithVariantProperties = {
+	culture: string | null;
+	segment: string | null;
+};
+
 export interface UmbVariantDataModel {
 	culture: string | null;
 	segment: string | null;

@@ -1,6 +1,6 @@
 import { UMB_MEDIA_ENTITY_TYPE } from '../entity.js';
-import type { UmbMediaSearchItemModel } from './types.js';
-import type { UmbSearchDataSource, UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
+import type { UmbMediaSearchItemModel, UmbMediaSearchRequestArgs } from './types.js';
+import type { UmbSearchDataSource } from '@umbraco-cms/backoffice/search';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { MediaService } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
@@ -10,7 +10,9 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @class UmbMediaSearchServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
-export class UmbMediaSearchServerDataSource implements UmbSearchDataSource<UmbMediaSearchItemModel> {
+export class UmbMediaSearchServerDataSource
+	implements UmbSearchDataSource<UmbMediaSearchItemModel, UmbMediaSearchRequestArgs>
+{
 	#host: UmbControllerHost;
 
 	/**
@@ -24,16 +26,17 @@ export class UmbMediaSearchServerDataSource implements UmbSearchDataSource<UmbMe
 
 	/**
 	 * Get a list of versions for a data
-	 * @param args
+	 * @param {UmbMediaSearchRequestArgs}args - The arguments for the search
 	 * @returns {*}
 	 * @memberof UmbMediaSearchServerDataSource
 	 */
-	async search(args: UmbSearchRequestArgs) {
+	async search(args: UmbMediaSearchRequestArgs) {
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
 			MediaService.getItemMediaSearch({
 				query: args.query,
 				parentId: args.searchFrom?.unique || undefined,
+				allowedMediaTypes: args.allowedContentTypes?.map((mediaReference) => mediaReference.unique),
 			}),
 		);
 

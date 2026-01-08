@@ -16,7 +16,10 @@ export interface UmbContentTypeStructureServerDataSourceBaseArgs<
 	ServerItemType extends AllowedContentTypeBaseModel,
 	ClientItemType extends UmbEntityModel,
 > {
-	getAllowedChildrenOf: (unique: string | null) => Promise<UmbPagedModel<ServerItemType>>;
+	getAllowedChildrenOf: (
+		unique: string | null,
+		parentContentUnique: string | null,
+	) => Promise<UmbPagedModel<ServerItemType>>;
 	mapper: (item: ServerItemType) => ClientItemType;
 }
 
@@ -47,11 +50,15 @@ export abstract class UmbContentTypeStructureServerDataSourceBase<
 	/**
 	 * Returns a promise with the allowed content types for the given unique
 	 * @param {string} unique
+	 * @param parentContentUnique
 	 * @returns {*}
 	 * @memberof UmbContentTypeStructureServerDataSourceBase
 	 */
-	async getAllowedChildrenOf(unique: string | null) {
-		const { data, error } = await tryExecuteAndNotify(this.#host, this.#getAllowedChildrenOf(unique));
+	async getAllowedChildrenOf(unique: string | null, parentContentUnique: string | null) {
+		const { data, error } = await tryExecuteAndNotify(
+			this.#host,
+			this.#getAllowedChildrenOf(unique, parentContentUnique),
+		);
 
 		if (data) {
 			const items = data.items.map((item) => this.#mapper(item));

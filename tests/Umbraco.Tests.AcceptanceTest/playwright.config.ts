@@ -23,7 +23,8 @@ export default defineConfig({
   // We don't want to run parallel, as tests might differ in state
   workers: 1,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: process.env.CI ? 'line' : 'html',
+  //reporter: process.env.CI ? 'line' : 'html',
+  reporter: process.env.CI ? [['line'], ['junit', {outputFile: 'results/results.xml'}]] : 'html',
   outputDir: "./results",
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
@@ -42,14 +43,43 @@ export default defineConfig({
       testMatch: '**/*.setup.ts',
     },
     {
-      name: 'chromium',
+      name: 'defaultConfig',
+      testMatch: 'DefaultConfig/**',
       dependencies: ['setup'],
       use: {
         ...devices['Desktop Chrome'],
         // Use prepared auth state.
         ignoreHTTPSErrors: true,
-        storageState: STORAGE_STATE,
+        storageState: STORAGE_STATE
+      }
+    },
+    {
+      name: 'deliveryApi',
+      testMatch: 'DeliveryApi/**',
+      dependencies: ['setup'],
+      use: {
+        ...devices['Desktop Chrome'],
+        // Use prepared auth state.
+        ignoreHTTPSErrors: true,
+        storageState: STORAGE_STATE
       },
     },
+    {
+      name: 'externalLoginAzureADB2C',
+      testMatch: 'ExternalLogin/AzureADB2C/**',
+      use: {
+        ...devices['Desktop Chrome'],
+        // Use prepared auth state.
+        ignoreHTTPSErrors: true,
+      }
+    },
+    // This project is used to test the install steps, for that we do not need to authenticate.
+    {
+      name: 'unattendedInstallConfig',
+      testMatch: 'UnattendedInstallConfig/**',
+      use: {
+        ...devices['Desktop Chrome']
+      }
+    }
   ],
 });

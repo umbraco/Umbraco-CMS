@@ -13,4 +13,6 @@ export const UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD: UmbDocumentVariantModel
 	publishDate: null,
 	createDate: null,
 	updateDate: null,
+	scheduledPublishDate: null,
+	scheduledUnpublishDate: null,
 } as const;

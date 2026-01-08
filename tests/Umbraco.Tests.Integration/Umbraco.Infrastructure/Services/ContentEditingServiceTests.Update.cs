@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -346,6 +346,7 @@ public partial class ContentEditingServiceTests
             InvariantName = "Updated Name",
             InvariantProperties = new[]
             {
+                new PropertyValueModel { Alias = "title", Value = "The initial title" },
                 new PropertyValueModel { Alias = "label", Value = "The updated label value" }
             }
         };
@@ -390,6 +391,7 @@ public partial class ContentEditingServiceTests
                     Name = "Updated English Name",
                     Properties = new []
                     {
+                        new PropertyValueModel { Alias = "variantTitle", Value = "The initial English title" },
                         new PropertyValueModel { Alias = "variantLabel", Value = "The updated English label value" }
                     }
                 },
@@ -399,6 +401,7 @@ public partial class ContentEditingServiceTests
                     Name = "Updated Danish Name",
                     Properties = new []
                     {
+                        new PropertyValueModel { Alias = "variantTitle", Value = "The initial Danish title" },
                         new PropertyValueModel { Alias = "variantLabel", Value = "The updated Danish  label value" }
                     }
                 }

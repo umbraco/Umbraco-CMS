@@ -17,7 +17,7 @@ test('can create a media type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi})
   // Act
   await umbracoUi.mediaType.clickActionsMenuForName('Media Types');
   await umbracoUi.mediaType.clickCreateButton();
-  await umbracoUi.mediaType.clickNewMediaTypeButton();
+  await umbracoUi.mediaType.clickMediaTypeButton();
   await umbracoUi.mediaType.enterMediaTypeName(mediaTypeName);
   await umbracoUi.mediaType.clickSaveButton();
 

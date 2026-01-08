@@ -7,6 +7,10 @@ export default class UmbTiptapToolbarTextAlignLeftExtensionApi extends UmbTiptap
 	}
 
 	override execute(editor?: Editor) {
-		editor?.chain().focus().setTextAlign('left').run();
+		if (!this.isActive(editor)) {
+			editor?.chain().focus().setTextAlign('left').run();
+		} else {
+			editor?.chain().focus().unsetTextAlign().run();
+		}
 	}
 }

@@ -1875,9 +1875,6 @@ export default {
 			'Die E-Mail-Adresse für Benachrichtigungen wurde auf <strong>%0%</strong> eingestellt.',
 		notificationEmailsCheckErrorMessage:
 			'Die E-Mail-Adresse für Benachrichtigungen ist noch auf den Standardwert <strong>%0%</strong> gestellt.',
-		scheduledHealthCheckEmailBody:
-			'\n    <html><body><p>\n    Die Ergebnisse der geplanten Systemzustandsprüfung läuft am %0% um %1% lauten wie folgt:\n    </p>%2%</body></html>\n    ',
-		scheduledHealthCheckEmailSubject: 'Status der Umbraco Systemzustand: %0%',
 	},
 	redirectUrls: {
 		disableUrlTracker: 'URL-Änderungsaufzeichnung abschalten',

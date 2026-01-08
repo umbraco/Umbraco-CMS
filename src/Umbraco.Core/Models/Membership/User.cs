@@ -53,8 +53,8 @@ public class User : EntityBase, IUser, IProfile
         _language = globalSettings.DefaultUILanguage;
         _isApproved = true;
         _isLockedOut = false;
-        _startContentIds = new int[] { };
-        _startMediaIds = new int[] { };
+        _startContentIds = [];
+        _startMediaIds = [];
 
         // cannot be null
         _rawPasswordValue = string.Empty;
@@ -101,8 +101,8 @@ public class User : EntityBase, IUser, IProfile
         _userGroups = new HashSet<IReadOnlyUserGroup>();
         _isApproved = true;
         _isLockedOut = false;
-        _startContentIds = new int[] { };
-        _startMediaIds = new int[] { };
+        _startContentIds = [];
+        _startMediaIds = [];
     }
 
     /// <summary>

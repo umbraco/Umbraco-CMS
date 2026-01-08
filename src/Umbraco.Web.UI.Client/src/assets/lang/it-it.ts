@@ -1980,9 +1980,6 @@ export default {
 		notificationEmailsCheckSuccessMessage: "L'email di notifica è stata impostata a <strong>%0%</strong>.",
 		notificationEmailsCheckErrorMessage:
 			"L'email di notifica è ancora impostata al valore predefinito di <strong>%0%</strong>.",
-		scheduledHealthCheckEmailBody:
-			"<html><body><p>I risultati dell'Health Check programmato di Umbraco del %0% alle %1% è il seguente:</p>%2%</body></html>",
-		scheduledHealthCheckEmailSubject: "Stato dell'Health Check di Umbraco: %0%",
 		checkAllGroups: 'Controlla tutti i gruppi',
 		checkGroup: 'Controlla gruppo',
 		helpText:

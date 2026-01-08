@@ -1,6 +1,6 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
-import type { UmbDocumentSearchItemModel } from './types.js';
-import type { UmbSearchDataSource, UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
+import type { UmbDocumentSearchItemModel, UmbDocumentSearchRequestArgs } from './types.js';
+import type { UmbSearchDataSource } from '@umbraco-cms/backoffice/search';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
@@ -10,7 +10,9 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @class UmbDocumentSearchServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
-export class UmbDocumentSearchServerDataSource implements UmbSearchDataSource<UmbDocumentSearchItemModel> {
+export class UmbDocumentSearchServerDataSource
+	implements UmbSearchDataSource<UmbDocumentSearchItemModel, UmbDocumentSearchRequestArgs>
+{
 	#host: UmbControllerHost;
 
 	/**
@@ -24,16 +26,17 @@ export class UmbDocumentSearchServerDataSource implements UmbSearchDataSource<Um
 
 	/**
 	 * Get a list of versions for a document
-	 * @param args
+	 * @param {UmbDocumentSearchRequestArgs} args - The arguments for the search
 	 * @returns {*}
 	 * @memberof UmbDocumentSearchServerDataSource
 	 */
-	async search(args: UmbSearchRequestArgs) {
+	async search(args: UmbDocumentSearchRequestArgs) {
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
 			DocumentService.getItemDocumentSearch({
 				query: args.query,
 				parentId: args.searchFrom?.unique ?? undefined,
+				allowedDocumentTypes: args.allowedContentTypes?.map((contentType) => contentType.unique),
 			}),
 		);
 

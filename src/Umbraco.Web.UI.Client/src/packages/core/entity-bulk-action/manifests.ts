@@ -2,6 +2,8 @@ import { manifests as defaultEntityBulkActionManifests } from './default/manifes
 import { manifests as duplicateEntityBulkActionManifests } from './common/duplicate-to/manifests.js';
 import { manifests as moveToEntityBulkActionManifests } from './common/move-to/manifests.js';
 import { manifests as trashEntityBulkActionManifests } from './common/trash/manifests.js';
+import { manifests as deleteEntityBulkActionManifests } from './common/bulk-delete/manifests.js';
+
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
@@ -9,4 +11,5 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 	...duplicateEntityBulkActionManifests,
 	...moveToEntityBulkActionManifests,
 	...trashEntityBulkActionManifests,
+	...deleteEntityBulkActionManifests,
 ];

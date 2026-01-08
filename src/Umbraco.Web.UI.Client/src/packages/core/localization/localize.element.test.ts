@@ -95,6 +95,14 @@ describe('umb-localize', () => {
 			expect(element.shadowRoot?.innerHTML).to.contain('Hello World');
 		});
 
+		it('should localize a key with multiple arguments as encoded HTML', async () => {
+			element.key = 'general_moreThanOneArgument';
+			element.args = ['<strong>Hello</strong>', '<em>World</em>'];
+			await elementUpdated(element);
+
+			expect(element.shadowRoot?.innerHTML).to.contain('&lt;strong&gt;Hello&lt;/strong&gt; &lt;em&gt;World&lt;/em&gt;');
+		});
+
 		it('should localize a key with args as an attribute', async () => {
 			element.key = 'general_moreThanOneArgument';
 			element.setAttribute('args', '["Hello","World"]');

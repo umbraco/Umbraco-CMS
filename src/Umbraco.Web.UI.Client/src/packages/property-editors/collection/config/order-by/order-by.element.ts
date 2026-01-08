@@ -1,13 +1,13 @@
 import type { UmbCollectionColumnConfiguration } from '@umbraco-cms/backoffice/collection';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
 import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 /**
  * @element umb-property-editor-ui-collection-order-by
@@ -48,7 +48,7 @@ export class UmbPropertyEditorUICollectionOrderByElement extends UmbLitElement i
 
 	#onChange(e: UUISelectEvent) {
 		this.value = e.target.value as string;
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	override render() {

@@ -24,8 +24,8 @@ test('can create a block grid editor', {tag: '@smoke'}, async ({umbracoApi, umbr
 
   // Act
   await umbracoUi.dataType.clickActionsMenuAtRoot();
-  await umbracoUi.dataType.clickCreateButton();
-  await umbracoUi.dataType.clickNewDataTypeThreeDotsButton();
+  await umbracoUi.dataType.clickActionsMenuCreateButton();
+  await umbracoUi.dataType.clickDataTypeButton();
   await umbracoUi.dataType.enterDataTypeName(blockGridEditorName);
   await umbracoUi.dataType.clickSelectAPropertyEditorButton();
   await umbracoUi.dataType.selectAPropertyEditor(blockGridLocatorName);
@@ -286,8 +286,6 @@ test('can enable live editing mode in a block grid editor', async ({umbracoApi, 
 
   // Act
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
-  // This wait is currently necessary, sometimes there are issues when clicking the liveEdtingMode button
-  await umbracoUi.waitForTimeout(2000);
   await umbracoUi.dataType.clickLiveEditingMode();
   await umbracoUi.dataType.clickSaveButton();
 
@@ -302,8 +300,6 @@ test('can disable live editing mode in a block grid editor', async ({umbracoApi,
 
   // Act
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
-  // This wait is currently necessary, sometimes there are issues when clicking the liveEditingMode button
-  await umbracoUi.waitForTimeout(2000);
   await umbracoUi.dataType.clickLiveEditingMode();
   await umbracoUi.dataType.clickSaveButton();
 

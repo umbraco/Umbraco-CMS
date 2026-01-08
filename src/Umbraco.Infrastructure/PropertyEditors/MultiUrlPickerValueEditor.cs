@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.IO;
@@ -8,10 +9,13 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Models.Validation;
+using Umbraco.Cms.Core.PropertyEditors.Validation;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -41,6 +45,9 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
         _jsonSerializer = jsonSerializer;
         _contentService = contentService;
         _mediaService = mediaService;
+        Validators.Add(new TypedJsonValidatorRunner<LinkDisplay[], MultiUrlPickerConfiguration>(
+            _jsonSerializer,
+            new MinMaxValidator(localizedTextService)));
     }
 
     public IEnumerable<UmbracoEntityReference> GetReferences(object? value)
@@ -208,5 +215,52 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
 
         [DataMember(Name = "queryString")]
         public string? QueryString { get; set; }
+    }
+
+    internal class MinMaxValidator : ITypedJsonValidator<LinkDisplay[], MultiUrlPickerConfiguration>
+    {
+        private readonly ILocalizedTextService _localizedTextService;
+
+        public MinMaxValidator(ILocalizedTextService localizedTextService) => _localizedTextService = localizedTextService;
+
+        public IEnumerable<ValidationResult> Validate(
+            LinkDisplay[]? linksDtos,
+            MultiUrlPickerConfiguration? multiUrlPickerConfiguration,
+            string? valueType,
+            PropertyValidationContext validationContext)
+        {
+           if (multiUrlPickerConfiguration is null || (linksDtos is null && multiUrlPickerConfiguration.MinNumber == 0))
+           {
+               return [];
+           }
+
+           if (linksDtos is null || linksDtos.Length < multiUrlPickerConfiguration.MinNumber)
+           {
+               return [new ValidationResult(
+                   _localizedTextService.Localize(
+                       "validation",
+                       "entriesShort",
+                       [multiUrlPickerConfiguration.MinNumber.ToString(), (multiUrlPickerConfiguration.MinNumber - (linksDtos?.Length ?? 0)).ToString()]),
+                   ["value"])];
+           }
+
+           if (linksDtos.Length > multiUrlPickerConfiguration.MaxNumber && multiUrlPickerConfiguration.MaxNumber > 0)
+           {
+               return
+               [
+                   new ValidationResult(
+                       _localizedTextService.Localize(
+                           "validation",
+                           "entriesExceed",
+                           [
+                               multiUrlPickerConfiguration.MaxNumber.ToString(),
+                               (linksDtos.Length - multiUrlPickerConfiguration.MaxNumber).ToString()
+                           ]),
+                       ["value"])
+               ];
+           }
+
+           return [];
+        }
     }
 }

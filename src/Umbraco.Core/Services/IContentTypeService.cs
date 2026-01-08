@@ -1,4 +1,5 @@
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
@@ -30,4 +31,6 @@ public interface IContentTypeService : IContentTypeBaseService<IContentType>
     /// <param name="aliases"></param>
     /// <returns></returns>
     IEnumerable<int> GetAllContentTypeIds(string[] aliases);
+
+    Task<IEnumerable<IContentType>> GetByQueryAsync(IQuery<IContentType> query, CancellationToken cancellationToken) => Task.FromResult(Enumerable.Empty<IContentType>());
 }

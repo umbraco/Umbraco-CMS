@@ -1,6 +1,6 @@
 import type { UmbInputTinyMceElement } from '../../components/input-tiny-mce/input-tiny-mce.element.js';
-import { UmbPropertyEditorUiRteElementBase, UMB_BLOCK_RTE_DATA_CONTENT_KEY } from '@umbraco-cms/backoffice/rte';
 import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
+import { UmbPropertyEditorUiRteElementBase } from '@umbraco-cms/backoffice/rte';
 
 import '../../components/input-tiny-mce/input-tiny-mce.element.js';
 
@@ -10,49 +10,37 @@ import '../../components/input-tiny-mce/input-tiny-mce.element.js';
 @customElement('umb-property-editor-ui-tiny-mce')
 export class UmbPropertyEditorUITinyMceElement extends UmbPropertyEditorUiRteElementBase {
 	#onChange(event: CustomEvent & { target: UmbInputTinyMceElement }) {
-		const value = typeof event.target.value === 'string' ? event.target.value : '';
+		const markup = typeof event.target.value === 'string' ? event.target.value : '';
 
 		// If we don't get any markup clear the property editor value.
-		if (value === '') {
+		if (markup === '') {
 			this.value = undefined;
 			this._fireChangeEvent();
 			return;
 		}
 
-		// Clone the DOM, to remove the classes and attributes on the original:
-		const div = document.createElement('div');
-		div.innerHTML = value;
-
-		// Loop through used, to remove the classes on these.
-		const blockEls = div.querySelectorAll(`umb-rte-block, umb-rte-block-inline`);
-		blockEls.forEach((blockEl) => {
-			blockEl.removeAttribute('contenteditable');
-			blockEl.removeAttribute('class');
-		});
-
-		const markup = div.innerHTML;
-
 		// Remove unused Blocks of Blocks Layout. Leaving only the Blocks that are present in Markup.
-		//const blockElements = editor.dom.select(`umb-rte-block, umb-rte-block-inline`);
-		const usedContentKeys = Array.from(blockEls).map((blockElement) =>
-			blockElement.getAttribute(UMB_BLOCK_RTE_DATA_CONTENT_KEY),
+		const usedContentKeys: string[] = [];
+
+		// Regex matching all block elements in the markup, and extracting the content key. It's the same as the one used on the backend.
+		const regex = new RegExp(
+			/<umb-rte-block(?:-inline)?(?: class="(?:.[^"]*)")? data-content-key="(?<key>.[^"]*)">(?:<!--Umbraco-Block-->)?<\/umb-rte-block(?:-inline)?>/gi,
 		);
-
-		this._filterUnusedBlocks(usedContentKeys);
-
-		// Then get the content of the editor and update the value.
-		// maybe in this way doc.body.innerHTML;
-
-		this._latestMarkup = markup;
+		let blockElement: RegExpExecArray | null;
+		while ((blockElement = regex.exec(markup)) !== null) {
+			if (blockElement.groups?.key) {
+				usedContentKeys.push(blockElement.groups.key);
+			}
+		}
 
 		if (this.value) {
 			this.value = {
 				...this.value,
-				markup: this._latestMarkup,
+				markup: markup,
 			};
 		} else {
 			this.value = {
-				markup: this._latestMarkup,
+				markup: markup,
 				blocks: {
 					layout: {},
 					contentData: [],
@@ -61,6 +49,9 @@ export class UmbPropertyEditorUITinyMceElement extends UmbPropertyEditorUiRteEle
 				},
 			};
 		}
+
+		// lets run this one after we set the value, to make sure we don't reset the value.
+		this._filterUnusedBlocks(usedContentKeys);
 
 		this._fireChangeEvent();
 	}

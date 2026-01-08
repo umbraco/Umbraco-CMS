@@ -33,7 +33,9 @@ interface UmbMarkdownEditorAction extends monaco.editor.IActionDescriptor {
  * @fires change - when the value of the input changes
  */
 @customElement('umb-input-markdown')
-export class UmbInputMarkdownElement extends UmbFormControlMixin(UmbLitElement, '') {
+export class UmbInputMarkdownElement extends UmbFormControlMixin<string, typeof UmbLitElement, undefined>(
+	UmbLitElement,
+) {
 	protected override getFormElement() {
 		return this._codeEditor;
 	}
@@ -225,7 +227,7 @@ export class UmbInputMarkdownElement extends UmbFormControlMixin(UmbLitElement, 
 			.then(async (value) => {
 				if (!value) return;
 
-				const uniques = value.selection;
+				const uniques = value.selection.filter((unique) => unique !== null) as Array<string>;
 				const { data: mediaUrls } = await this.#mediaUrlRepository.requestItems(uniques);
 				const mediaUrl = mediaUrls?.length ? (mediaUrls[0].url ?? 'URL') : 'URL';
 

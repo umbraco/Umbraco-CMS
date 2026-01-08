@@ -88,6 +88,8 @@ public class WebhookService : IWebhookService
         currentWebhook.Enabled = webhook.Enabled;
         currentWebhook.ContentTypeKeys = webhook.ContentTypeKeys;
         currentWebhook.Events = webhook.Events;
+        currentWebhook.Name = webhook.Name;
+        currentWebhook.Description = webhook.Description;
         currentWebhook.Url = webhook.Url;
         currentWebhook.Headers = webhook.Headers;
 

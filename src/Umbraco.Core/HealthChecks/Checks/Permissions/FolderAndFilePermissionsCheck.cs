@@ -35,7 +35,7 @@ public class FolderAndFilePermissionsCheck : HealthCheck
     /// <summary>
     ///     Get the status for this health check
     /// </summary>
-    public override Task<IEnumerable<HealthCheckStatus>> GetStatus()
+    public override Task<IEnumerable<HealthCheckStatus>> GetStatusAsync()
     {
         _filePermissionHelper.RunFilePermissionTestSuite(
             out Dictionary<FilePermissionTest, IEnumerable<string>> errors);

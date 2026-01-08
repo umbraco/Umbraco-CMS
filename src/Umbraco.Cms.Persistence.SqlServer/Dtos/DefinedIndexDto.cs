@@ -2,7 +2,7 @@ using NPoco;
 
 namespace Umbraco.Cms.Persistence.SqlServer.Dtos;
 
-internal class DefinedIndexDto
+internal sealed class DefinedIndexDto
 {
     [Column("TABLE_NAME")]
     public string TableName { get; set; } = null!;

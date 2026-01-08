@@ -8,11 +8,7 @@ import { UMB_DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS } from '@umbraco-cms/backoffice
 
 @customElement('umb-block-type-workspace-editor')
 export class UmbBlockTypeWorkspaceEditorElement extends UmbLitElement {
-	#itemManager = new UmbRepositoryItemsManager<UmbDocumentTypeItemModel>(
-		this,
-		UMB_DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS,
-		(x) => x.unique,
-	);
+	#itemManager = new UmbRepositoryItemsManager<UmbDocumentTypeItemModel>(this, UMB_DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS);
 
 	#workspaceContext?: typeof UMB_BLOCK_TYPE_WORKSPACE_CONTEXT.TYPE;
 

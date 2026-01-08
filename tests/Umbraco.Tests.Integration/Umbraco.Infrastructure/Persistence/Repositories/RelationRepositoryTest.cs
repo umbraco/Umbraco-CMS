@@ -225,20 +225,22 @@ public class RelationRepositoryTest : UmbracoIntegrationTest
                 RelationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelatedMediaAlias);
             var relatedContentRelType =
                 RelationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelatedDocumentAlias);
+            var relatedMemberRelType =
+                RelationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelatedMemberAlias);
 
-            parents = repository.GetPagedParentEntitiesByChildId(createdMedia[0].Id, 0, 11, out totalRecords, new[] { relatedContentRelType.Id, relatedMediaRelType.Id }).ToList();
+            parents = repository.GetPagedParentEntitiesByChildId(createdMedia[0].Id, 0, 11, out totalRecords, [relatedContentRelType.Id, relatedMediaRelType.Id, relatedMemberRelType.Id]).ToList();
             Assert.AreEqual(6, totalRecords);
             Assert.AreEqual(6, parents.Count);
 
-            parents = repository.GetPagedParentEntitiesByChildId(createdMedia[0].Id, 1, 11, out totalRecords, new[] { relatedContentRelType.Id, relatedMediaRelType.Id }).ToList();
+            parents = repository.GetPagedParentEntitiesByChildId(createdMedia[0].Id, 1, 11, out totalRecords, [relatedContentRelType.Id, relatedMediaRelType.Id, relatedMemberRelType.Id]).ToList();
             Assert.AreEqual(6, totalRecords);
             Assert.AreEqual(0, parents.Count);
 
-            parents = repository.GetPagedParentEntitiesByChildId(createdContent[0].Id, 0, 6, out totalRecords, new[] { relatedContentRelType.Id, relatedMediaRelType.Id }).ToList();
+            parents = repository.GetPagedParentEntitiesByChildId(createdContent[0].Id, 0, 6, out totalRecords, [relatedContentRelType.Id, relatedMediaRelType.Id, relatedMemberRelType.Id]).ToList();
             Assert.AreEqual(3, totalRecords);
             Assert.AreEqual(3, parents.Count);
 
-            parents = repository.GetPagedParentEntitiesByChildId(createdContent[0].Id, 1, 6, out totalRecords, new[] { relatedContentRelType.Id, relatedMediaRelType.Id }).ToList();
+            parents = repository.GetPagedParentEntitiesByChildId(createdContent[0].Id, 1, 6, out totalRecords, [relatedContentRelType.Id, relatedMediaRelType.Id, relatedMemberRelType.Id]).ToList();
             Assert.AreEqual(3, totalRecords);
             Assert.AreEqual(0, parents.Count);
         }
@@ -281,15 +283,15 @@ public class RelationRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository(ScopeProvider, out _);
 
             // Get parent entities for child id
-            var parents = repository.GetPagedChildEntitiesByParentId(createdContent[0].Id, 0, 6, out var totalRecords)
+            var parents = repository.GetPagedChildEntitiesByParentId(createdContent[0].Id, 0, 9, out var totalRecords)
                 .ToList();
-            Assert.AreEqual(6, totalRecords);
-            Assert.AreEqual(6, parents.Count);
+            Assert.AreEqual(9, totalRecords);
+            Assert.AreEqual(9, parents.Count);
 
             // Add the next page
-            parents.AddRange(repository.GetPagedChildEntitiesByParentId(createdContent[0].Id, 1, 6, out totalRecords));
-            Assert.AreEqual(6, totalRecords);
-            Assert.AreEqual(6, parents.Count);
+            parents.AddRange(repository.GetPagedChildEntitiesByParentId(createdContent[0].Id, 1, 9, out totalRecords));
+            Assert.AreEqual(9, totalRecords);
+            Assert.AreEqual(9, parents.Count);
 
             var contentEntities = parents.OfType<IDocumentEntitySlim>().ToList();
             var mediaEntities = parents.OfType<IMediaEntitySlim>().ToList();
@@ -297,7 +299,7 @@ public class RelationRepositoryTest : UmbracoIntegrationTest
 
             Assert.AreEqual(3, contentEntities.Count);
             Assert.AreEqual(3, mediaEntities.Count);
-            Assert.AreEqual(0, memberEntities.Count);
+            Assert.AreEqual(3, memberEntities.Count);
 
             // only of a certain type
             parents.AddRange(repository.GetPagedChildEntitiesByParentId(createdContent[0].Id, 0, 100, out totalRecords, UmbracoObjectTypes.Media.GetGuid()));
@@ -307,20 +309,22 @@ public class RelationRepositoryTest : UmbracoIntegrationTest
             Assert.AreEqual(3, totalRecords);
 
             parents.AddRange(repository.GetPagedChildEntitiesByParentId(createdContent[0].Id, 0, 100, out totalRecords, UmbracoObjectTypes.Member.GetGuid()));
-            Assert.AreEqual(0, totalRecords);
+            Assert.AreEqual(3, totalRecords);
 
             // Test getting relations of specified relation types
             var relatedMediaRelType =
                 RelationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelatedMediaAlias);
             var relatedContentRelType =
                 RelationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelatedDocumentAlias);
+            var relatedMemberRelType =
+                RelationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelatedMemberAlias);
 
-            parents = repository.GetPagedChildEntitiesByParentId(createdContent[0].Id, 0, 6, out totalRecords, new[] { relatedContentRelType.Id, relatedMediaRelType.Id }).ToList();
-            Assert.AreEqual(3, totalRecords);
-            Assert.AreEqual(3, parents.Count);
+            parents = repository.GetPagedChildEntitiesByParentId(createdContent[0].Id, 0, 6, out totalRecords, [relatedContentRelType.Id, relatedMediaRelType.Id, relatedMemberRelType.Id]).ToList();
+            Assert.AreEqual(6, totalRecords);
+            Assert.AreEqual(6, parents.Count);
 
-            parents = repository.GetPagedChildEntitiesByParentId(createdContent[0].Id, 1, 6, out totalRecords, new[] { relatedContentRelType.Id, relatedMediaRelType.Id }).ToList();
-            Assert.AreEqual(3, totalRecords);
+            parents = repository.GetPagedChildEntitiesByParentId(createdContent[0].Id, 1, 6, out totalRecords, [relatedContentRelType.Id, relatedMediaRelType.Id, relatedMemberRelType.Id]).ToList();
+            Assert.AreEqual(6, totalRecords);
             Assert.AreEqual(0, parents.Count);
         }
     }
@@ -368,6 +372,8 @@ public class RelationRepositoryTest : UmbracoIntegrationTest
             RelationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelatedMediaAlias);
         var relatedContentRelType =
             RelationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelatedDocumentAlias);
+        var relatedMemberRelType =
+            RelationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelatedMemberAlias);
 
         // Relate content to media
         foreach (var content in createdContent)
@@ -384,6 +390,15 @@ public class RelationRepositoryTest : UmbracoIntegrationTest
             foreach (var content in createdContent)
             {
                 RelationService.Relate(relContent.Id, content.Id, relatedContentRelType);
+            }
+        }
+
+        // Relate content to member
+        foreach (var content in createdContent)
+        {
+            foreach (var member in createdMembers)
+            {
+                RelationService.Relate(content.Id, member.Id, relatedMemberRelType);
             }
         }
 

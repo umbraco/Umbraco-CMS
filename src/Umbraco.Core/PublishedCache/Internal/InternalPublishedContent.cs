@@ -70,7 +70,7 @@ public sealed class InternalPublishedContent : IPublishedContent
     public PublishedItemType ItemType => PublishedItemType.Content;
 
     [Obsolete("Please use TryGetParentKey() on IDocumentNavigationQueryService or IMediaNavigationQueryService instead. Scheduled for removal in V16.")]
-    public IPublishedContent? Parent => this.Parent<IPublishedContent>(StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>(), StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>());
+    public IPublishedContent? Parent => this.Parent<IPublishedContent>(StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>(), StaticServiceProvider.Instance.GetRequiredService<IPublishedContentStatusFilteringService>());
 
     public bool IsDraft(string? culture = null) => false;
 
@@ -78,9 +78,8 @@ public sealed class InternalPublishedContent : IPublishedContent
 
     [Obsolete("Please use TryGetChildrenKeys() on IDocumentNavigationQueryService or IMediaNavigationQueryService instead. Scheduled for removal in V16.")]
     public IEnumerable<IPublishedContent> Children => this.Children(
-        StaticServiceProvider.Instance.GetRequiredService<IVariationContextAccessor>(),
-        StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>(),
-        StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>());
+        StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>(),
+        StaticServiceProvider.Instance.GetRequiredService<IPublishedContentStatusFilteringService>());
 
     public IEnumerable<IPublishedContent> ChildrenForAllCultures => Children;
 
@@ -102,7 +101,7 @@ public sealed class InternalPublishedContent : IPublishedContent
         IPublishedContent? content = this;
         while (content != null && (property == null || property.HasValue() == false))
         {
-            content = content.Parent<IPublishedContent>(StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>(), StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>());
+            content = content.Parent<IPublishedContent>(StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>(), StaticServiceProvider.Instance.GetRequiredService<IPublishedContentStatusFilteringService>());
             property = content?.GetProperty(alias);
         }
 

@@ -28,7 +28,8 @@ public static class HexEncoder
     public static string Encode(byte[] bytes)
     {
         var length = bytes.Length;
-        var chars = new char[length * 2];
+        int charsLength = length * 2;
+        Span<char> chars = charsLength <= 1024 ? stackalloc char[charsLength] : new char[charsLength];
 
         var index = 0;
         for (var i = 0; i < length; i++)
@@ -38,7 +39,7 @@ public static class HexEncoder
             chars[index++] = HexLutLo[byteIndex];
         }
 
-        return new string(chars, 0, chars.Length);
+        return new string(chars);
     }
 
     /// <summary>
@@ -54,7 +55,8 @@ public static class HexEncoder
     public static string Encode(byte[] bytes, char separator, int blockSize, int blockCount)
     {
         var length = bytes.Length;
-        var chars = new char[(length * 2) + blockCount];
+        int charsLength = (length * 2) + blockCount;
+        Span<char> chars = charsLength <= 1024 ? stackalloc char[charsLength] : new char[charsLength];
         var count = 0;
         var size = 0;
         var index = 0;
@@ -80,6 +82,6 @@ public static class HexEncoder
             count++;
         }
 
-        return new string(chars, 0, chars.Length);
+        return new string(chars);
     }
 }

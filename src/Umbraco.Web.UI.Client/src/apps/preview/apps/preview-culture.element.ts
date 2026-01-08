@@ -4,9 +4,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
 import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 
-const elementName = 'umb-preview-culture';
-
-@customElement(elementName)
+@customElement('umb-preview-culture')
 export class UmbPreviewCultureElement extends UmbLitElement {
 	#languageRepository = new UmbLanguageCollectionRepository(this);
 
@@ -98,6 +96,6 @@ export { UmbPreviewCultureElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbPreviewCultureElement;
+		'umb-preview-culture': UmbPreviewCultureElement;
 	}
 }

@@ -55,6 +55,9 @@ export class UmbNotificationLayoutDefaultElement extends LitElement {
 	static override styles = [
 		UmbTextStyles,
 		css`
+			#message {
+				white-space: pre-line;
+			}
 			.structured-list ul {
 				margin: 0;
 			}

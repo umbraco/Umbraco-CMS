@@ -20,7 +20,7 @@ public abstract class UmbracoIntegrationTestWithContentEditing : UmbracoIntegrat
 
     protected ITemplateService TemplateService => GetRequiredService<ITemplateService>();
 
-    private IContentEditingService ContentEditingService => (IContentEditingService)GetRequiredService<IContentEditingService>();
+    protected IContentEditingService ContentEditingService => (IContentEditingService)GetRequiredService<IContentEditingService>();
 
     private IContentPublishingService ContentPublishingService => (IContentPublishingService)GetRequiredService<IContentPublishingService>();
 

@@ -19,7 +19,7 @@ export const manifest: ManifestPropertyEditorSchema = {
 					label: 'Amount',
 					description: 'Set a required range of blocks',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.NumberRange',
-					config: [{ alias: 'validationRange', value: { min: 0, max: Infinity } }],
+					config: [{ alias: 'validationRange', value: { min: 0 } }],
 				},
 			],
 		},

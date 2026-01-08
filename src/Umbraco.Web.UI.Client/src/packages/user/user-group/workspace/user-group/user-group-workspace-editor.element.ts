@@ -244,7 +244,9 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 					<uui-box>
 						<div slot="headline"><umb-localize key="user_permissionsDefault"></umb-localize></div>
 
-						<umb-property-layout label="Entity permissions" description="Assign permissions for an entity type">
+						<umb-property-layout
+							label=${this.localize.term('user_entityPermissionsLabel')}
+							description=${this.localize.term('user_entityPermissionsDescription')}>
 							<umb-user-group-entity-user-permission-list slot="editor"></umb-user-group-entity-user-permission-list>
 						</umb-property-layout>
 					</uui-box>

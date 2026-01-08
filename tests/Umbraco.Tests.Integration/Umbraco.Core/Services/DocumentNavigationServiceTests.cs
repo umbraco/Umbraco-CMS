@@ -281,4 +281,47 @@ public partial class DocumentNavigationServiceTests : DocumentNavigationServiceT
             Assert.AreEqual(3, allSiblingsList.Count);
         });
     }
+
+    // a lot of structural querying assumes a specific order of descendants, so let's ensure that.
+    [Test]
+    public void Descendants_Are_In_Top_Down_Order_Of_Structure()
+    {
+        var result = DocumentNavigationQueryService.TryGetDescendantsKeysOrSelfKeys(Root.Key, out IEnumerable<Guid> descendantsKeys);
+        Assert.IsTrue(result);
+
+        var descendantsKeysAsArray = descendantsKeys.ToArray();
+        Assert.AreEqual(9, descendantsKeysAsArray.Length);
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(Root.Key, descendantsKeysAsArray[0]);
+            Assert.AreEqual(Child1.Key, descendantsKeysAsArray[1]);
+            Assert.AreEqual(Grandchild1.Key, descendantsKeysAsArray[2]);
+            Assert.AreEqual(Grandchild2.Key, descendantsKeysAsArray[3]);
+            Assert.AreEqual(Child2.Key, descendantsKeysAsArray[4]);
+            Assert.AreEqual(Grandchild3.Key, descendantsKeysAsArray[5]);
+            Assert.AreEqual(GreatGrandchild1.Key, descendantsKeysAsArray[6]);
+            Assert.AreEqual(Child3.Key, descendantsKeysAsArray[7]);
+            Assert.AreEqual(Grandchild4.Key, descendantsKeysAsArray[8]);
+        });
+    }
+
+    // a lot of structural querying assumes a specific order of ancestors, so let's ensure that.
+    [Test]
+    public void Ancestors_Are_In_Down_Top_Order()
+    {
+        var result = DocumentNavigationQueryService.TryGetAncestorsOrSelfKeys(GreatGrandchild1.Key, out IEnumerable<Guid> ancestorsKeys);
+        Assert.IsTrue(result);
+
+        var ancestorKeysAsArray = ancestorsKeys.ToArray();
+        Assert.AreEqual(4, ancestorKeysAsArray.Length);
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(GreatGrandchild1.Key, ancestorKeysAsArray[0]);
+            Assert.AreEqual(Grandchild3.Key, ancestorKeysAsArray[1]);
+            Assert.AreEqual(Child2.Key, ancestorKeysAsArray[2]);
+            Assert.AreEqual(Root.Key, ancestorKeysAsArray[3]);
+        });
+    }
 }

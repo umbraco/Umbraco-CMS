@@ -71,11 +71,22 @@ public sealed class MemberCacheRefresher : PayloadCacheRefresherBase<MemberCache
         foreach (JsonPayload p in payloads)
         {
             _idKeyMap.ClearCache(p.Id);
-            if (memberCache.Success)
+            if (memberCache.Success is false)
             {
-                memberCache.Result?.Clear(RepositoryCacheKeys.GetKey<IMember, int>(p.Id));
-                memberCache.Result?.Clear(RepositoryCacheKeys.GetKey<IMember, string>(p.Username));
+                continue;
             }
+
+            memberCache.Result?.Clear(RepositoryCacheKeys.GetKey<IMember, int>(p.Id));
+            memberCache.Result?.Clear(RepositoryCacheKeys.GetKey<IMember, string>(p.Username));
+
+            // This specific cache key was introduced to fix an issue where the member username could not be the same as the member id, because the cache keys collided.
+            // This is done in a bit of a hacky way, because the cache key is created internally in the repository, but we need to clear it here.
+            // Ideally, we want to use a shared way of generating the key between this and the repository.
+            // Additionally, the RepositoryCacheKeys actually caches the string to avoid re-allocating memory; we would like to also use this in the repository
+            // See:
+            // https://github.com/umbraco/Umbraco-CMS/pull/17350
+            // https://github.com/umbraco/Umbraco-CMS/pull/17815
+            memberCache.Result?.Clear(RepositoryCacheKeys.GetKey<IMember, string>(CacheKeys.MemberUserNameCachePrefix + p.Username));
         }
     }
 }

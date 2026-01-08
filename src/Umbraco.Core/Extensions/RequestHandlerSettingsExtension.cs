@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using Microsoft.Extensions.Configuration;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -63,9 +64,9 @@ public static class RequestHandlerSettingsExtension
         var priorityReplacementsList = priorityReplacements.ToList();
         var alternativeReplacementsList = alternativeReplacements.ToList();
 
-        foreach (CharItem alternativeReplacement in alternativeReplacementsList)
+        foreach (CharItem alternativeReplacement in CollectionsMarshal.AsSpan(alternativeReplacementsList))
         {
-            foreach (CharItem priorityReplacement in priorityReplacementsList)
+            foreach (CharItem priorityReplacement in CollectionsMarshal.AsSpan(priorityReplacementsList))
             {
                 if (priorityReplacement.Char == alternativeReplacement.Char)
                 {

@@ -1,15 +1,24 @@
-import { getDisplayStateFromUserStatus } from '../../../utils.js';
-import type { UmbUserCollectionContext } from '../../user-collection.context.js';
-import type { UmbUserDetailModel } from '../../../types.js';
+import { getDisplayStateFromUserStatus, TimeFormatOptions } from '../../../utils.js';
+import { UmbUserKind } from '../../../utils/index.js';
 import { UMB_USER_COLLECTION_CONTEXT } from '../../user-collection.context-token.js';
 import { UMB_USER_WORKSPACE_PATH } from '../../../paths.js';
-import { UmbUserKind } from '../../../utils/index.js';
-import { css, html, nothing, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { UmbUserCollectionContext } from '../../user-collection.context.js';
+import type { UmbUserDetailModel } from '../../../types.js';
+import {
+	css,
+	customElement,
+	html,
+	ifDefined,
+	nothing,
+	repeat,
+	state,
+	when,
+} from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UmbUserGroupCollectionRepository } from '@umbraco-cms/backoffice/user-group';
 import { UserStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbUserGroupDetailModel } from '@umbraco-cms/backoffice/user-group';
-import { UmbUserGroupCollectionRepository } from '@umbraco-cms/backoffice/user-group';
 
 @customElement('umb-user-grid-collection-view')
 export class UmbUserGridCollectionViewElement extends UmbLitElement {
@@ -23,6 +32,7 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 	private _loading = false;
 
 	#userGroups: Array<UmbUserGroupDetailModel> = [];
+
 	#collectionContext?: UmbUserCollectionContext;
 
 	// TODO: we need to use the item repository here
@@ -33,11 +43,13 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 
 		this.consumeContext(UMB_USER_COLLECTION_CONTEXT, (instance) => {
 			this.#collectionContext = instance;
+
 			this.observe(
 				this.#collectionContext.selection.selection,
 				(selection) => (this._selection = selection),
 				'umbCollectionSelectionObserver',
 			);
+
 			this.observe(this.#collectionContext.items, (items) => (this._users = items), 'umbCollectionItemsObserver');
 		});
 
@@ -48,7 +60,9 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 		this._loading = true;
 
 		const { data } = await this.#userGroupCollectionRepository.requestCollection();
+
 		this.#userGroups = data?.items ?? [];
+
 		this._loading = false;
 	}
 
@@ -74,12 +88,10 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 	}
 
 	#renderUserCard(user: UmbUserDetailModel) {
-		const href = UMB_USER_WORKSPACE_PATH + '/edit/' + user.unique;
-
 		return html`
 			<uui-card-user
-				.name=${user.name ?? 'Unnamed user'}
-				href=${href}
+				.name=${user.name ?? this.localize.term('general_unnamed')}
+				href="${UMB_USER_WORKSPACE_PATH}/edit/${user.unique}"
 				selectable
 				?select-only=${this._selection.length > 0}
 				?selected=${this.#collectionContext?.selection.isSelected(user.unique)}
@@ -90,8 +102,7 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 					slot="avatar"
 					.name=${user.name}
 					.kind=${user.kind}
-					.imgUrls=${user.avatarUrls}
-					style="font-size: 1.6rem;"></umb-user-avatar>
+					.imgUrls=${user.avatarUrls}></umb-user-avatar>
 			</uui-card-user>
 		`;
 	}
@@ -102,13 +113,11 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 		}
 
 		const statusLook = user.state ? getDisplayStateFromUserStatus(user.state) : undefined;
-		return html`<uui-tag
-			slot="tag"
-			size="s"
-			look="${ifDefined(statusLook?.look)}"
-			color="${ifDefined(statusLook?.color)}">
-			<umb-localize key=${'user_' + statusLook?.key}></umb-localize>
-		</uui-tag>`;
+		return html`
+			<uui-tag slot="tag" look=${ifDefined(statusLook?.look)} color=${ifDefined(statusLook?.color)}>
+				<umb-localize key=${'user_' + statusLook?.key}></umb-localize>
+			</uui-tag>
+		`;
 	}
 
 	#renderUserGroupNames(user: UmbUserDetailModel) {
@@ -122,17 +131,18 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 
 	#renderUserLoginDate(user: UmbUserDetailModel) {
 		if (user.kind === UmbUserKind.API) return nothing;
-
-		if (!user.lastLoginDate) {
-			return html`<div class="user-login-time">${`${user.name} ${this.localize.term('user_noLogin')}`}</div>`;
-		}
-		const lastLoggedinLocalTime: Date = new Date(user.lastLoginDate);
-		const formattedTime = lastLoggedinLocalTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-		return html`<div class="user-login-time">
-			<umb-localize key="user_lastLogin"></umb-localize>
-			${this.localize.date(user.lastLoginDate)} ${formattedTime}
-		</div>`;
+		return html`
+			<div class="user-login-time">
+				${when(
+					user.lastLoginDate,
+					(lastLoginDate) => html`
+						<umb-localize key="user_lastLogin">Last login</umb-localize>
+						<span>${this.localize.date(lastLoginDate, TimeFormatOptions)}</span>
+					`,
+					() => html`<umb-localize key="user_noLogin">has not logged in yet</umb-localize>`,
+				)}
+			</div>
+		`;
 	}
 
 	static override styles = [
@@ -145,25 +155,31 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 
 			#user-grid {
 				display: grid;
-				grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+				grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
 				gap: var(--uui-size-space-4);
 			}
 
 			uui-card-user {
 				width: 100%;
-				height: 180px;
 				justify-content: normal;
 				padding-top: var(--uui-size-space-5);
+				flex-direction: column;
+
+				umb-user-avatar {
+					font-size: 1.6rem;
+				}
 			}
 
 			.user-login-time {
-				margin-top: auto;
+				margin-top: var(--uui-size-1);
 			}
 		`,
 	];
 }
 
 export default UmbUserGridCollectionViewElement;
+
+export { UmbUserGridCollectionViewElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {

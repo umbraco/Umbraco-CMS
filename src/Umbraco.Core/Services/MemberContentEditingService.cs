@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -24,8 +26,10 @@ internal sealed class MemberContentEditingService
         ICoreScopeProvider scopeProvider,
         IUserIdKeyResolver userIdKeyResolver,
         IMemberValidationService memberValidationService,
-        IUserService userService)
-        : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, userIdKeyResolver, memberValidationService)
+        IUserService userService,
+        IOptionsMonitor<ContentSettings> optionsMonitor,
+        IRelationService relationService)
+        : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, userIdKeyResolver, memberValidationService, optionsMonitor, relationService)
     {
         _logger = logger;
         _userService = userService;

@@ -36,5 +36,7 @@ public class ConfigureUmbracoBackofficeJsonOptions : IConfigureNamedOptions<Json
         options.JsonSerializerOptions.Converters.Add(new JsonObjectConverter());
 
         options.JsonSerializerOptions.TypeInfoResolver = _umbracoJsonTypeInfoResolver;
+
+        options.JsonSerializerOptions.MaxDepth = 64; // Ensures the maximum possible value is used, in particular to support handling as best we can levels of nested blocks.
     }
 }

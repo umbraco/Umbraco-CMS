@@ -5,10 +5,11 @@ import type {
 	UmbTreeSelectionConfiguration,
 	UmbTreeStartNode,
 } from '../types.js';
+import type { UmbTreeExpansionModel } from '../expansion-manager/types.js';
 import type { UmbDefaultTreeContext } from './default-tree.context.js';
 import { UMB_TREE_CONTEXT } from './default-tree.context-token.js';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
-import { html, nothing, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { html, nothing, customElement, property, state, repeat, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-default-tree')
@@ -28,6 +29,9 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	@property({ type: Boolean, attribute: false })
 	hideTreeRoot: boolean = false;
 
+	@property({ type: Boolean, attribute: false })
+	expandTreeRoot: boolean = false;
+
 	@property({ type: Object, attribute: false })
 	startNode?: UmbTreeStartNode;
 
@@ -39,6 +43,9 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 
 	@property({ attribute: false })
 	filter: (item: UmbTreeItemModelBase) => boolean = () => true;
+
+	@property({ attribute: false })
+	expansion: UmbTreeExpansionModel = [];
 
 	@state()
 	private _rootItems: UmbTreeItemModel[] = [];
@@ -92,6 +99,10 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 			this.#treeContext!.setHideTreeRoot(this.hideTreeRoot);
 		}
 
+		if (_changedProperties.has('expandTreeRoot')) {
+			this.#treeContext!.setExpandTreeRoot(this.expandTreeRoot);
+		}
+
 		if (_changedProperties.has('foldersOnly')) {
 			this.#treeContext!.setFoldersOnly(this.foldersOnly ?? false);
 		}
@@ -103,10 +114,18 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 		if (_changedProperties.has('filter')) {
 			this.#treeContext!.filter = this.filter;
 		}
+
+		if (_changedProperties.has('expansion')) {
+			this.#treeContext!.setExpansion(this.expansion);
+		}
 	}
 
 	getSelection() {
 		return this.#treeContext?.selection.getSelection();
+	}
+
+	getExpansion() {
+		return this.#treeContext?.expansion.getExpansion();
 	}
 
 	override render() {
@@ -152,8 +171,14 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 			return nothing;
 		}
 
-		return html` <uui-button @click=${this.#onLoadMoreClick} label="Load more"></uui-button> `;
+		return html` <uui-button id="load-more" @click=${this.#onLoadMoreClick} label="Load more"></uui-button> `;
 	}
+
+	static override styles = css`
+		#load-more {
+			width: 100%;
+		}
+	`;
 }
 
 export default UmbDefaultTreeElement;

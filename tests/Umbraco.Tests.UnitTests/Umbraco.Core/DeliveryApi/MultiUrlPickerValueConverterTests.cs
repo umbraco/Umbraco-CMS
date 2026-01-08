@@ -46,7 +46,7 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
         Assert.Null(link.Target);
         var route = link.Route;
         Assert.NotNull(route);
-        Assert.AreEqual("/the-page-url", route.Path);
+        Assert.AreEqual("/the-page-url/", route.Path);
     }
 
     [Test]
@@ -221,7 +221,7 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
         var link = result.First();
         Assert.AreEqual("Custom link name", link.Title);
         Assert.AreEqual(PublishedContent.Key, link.DestinationId);
-        Assert.AreEqual("/the-page-url",  link.Route!.Path);
+        Assert.AreEqual("/the-page-url/",  link.Route!.Path);
         Assert.AreEqual(LinkType.Content, link.LinkType);
         Assert.AreEqual("_blank", link.Target);
         Assert.AreEqual("?something=true", link.QueryString);
@@ -252,7 +252,7 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
         var link = result.First();
         Assert.AreEqual(PublishedContent.Name, link.Title);
         Assert.AreEqual(PublishedContent.Key, link.DestinationId);
-        Assert.AreEqual("/the-page-url", link.Route!.Path);
+        Assert.AreEqual("/the-page-url/", link.Route!.Path);
         Assert.AreEqual(LinkType.Content, link.LinkType);
         Assert.Null(link.Target);
         Assert.Null(link.Url);

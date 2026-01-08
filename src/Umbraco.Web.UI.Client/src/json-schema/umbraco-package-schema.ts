@@ -1,4 +1,4 @@
-import './all-packages.js';
+import '@umbraco-cms/backoffice/extension-registry';
 
 /**
  * Umbraco package manifest JSON
@@ -26,6 +26,13 @@ export interface UmbracoPackage {
 	 * @default true
 	 */
 	allowTelemetry?: boolean;
+
+	/**
+	 * @title Decides if the package sends telemetry data for collection
+	 * @default true
+	 * @deprecated Use allowTelemetry instead
+	 */
+	allowPackageTelemetry?: boolean;
 
 	/**
 	 * @title Decides if the package is allowed to be accessed by the public, e.g. on the login screen

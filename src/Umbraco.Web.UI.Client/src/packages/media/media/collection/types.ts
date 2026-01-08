@@ -1,4 +1,4 @@
-import type { UmbFileDropzoneItemStatus } from '../dropzone/types.js';
+import type { UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone';
 import type { UmbCollectionFilterModel } from '@umbraco-cms/backoffice/collection';
 
 export interface UmbMediaCollectionFilterModel extends UmbCollectionFilterModel {
@@ -23,6 +23,10 @@ export interface UmbMediaCollectionItemModel {
 	values?: Array<{ alias: string; value: string }>;
 	url?: string;
 	status?: UmbFileDropzoneItemStatus;
+	/**
+	 * The progress of the item in percentage.
+	 */
+	progress?: number;
 }
 
 export interface UmbEditableMediaCollectionItemModel {

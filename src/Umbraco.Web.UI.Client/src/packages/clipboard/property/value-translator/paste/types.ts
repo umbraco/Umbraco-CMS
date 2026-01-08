@@ -4,9 +4,13 @@ export type * from './clipboard-paste-translator.extension.js';
 
 export interface UmbClipboardPastePropertyValueTranslator<
 	ClipboardEntryValueType = any,
-	PropertyValueModelType = any,
+	PropertyValueType = any,
 	ConfigType = any,
 > extends UmbApi {
-	translate: (value: ClipboardEntryValueType) => Promise<PropertyValueModelType>;
-	isCompatibleValue?: (value: ClipboardEntryValueType, config: ConfigType) => Promise<boolean>;
+	translate: (clipboardEntryValue: ClipboardEntryValueType) => Promise<PropertyValueType>;
+	isCompatibleValue?: (
+		propertyValue: PropertyValueType,
+		config: ConfigType,
+		filter?: (propertyValue: PropertyValueType, config: ConfigType) => Promise<boolean>,
+	) => Promise<boolean>;
 }

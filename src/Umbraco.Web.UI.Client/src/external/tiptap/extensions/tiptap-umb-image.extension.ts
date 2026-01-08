@@ -18,7 +18,7 @@ export const UmbImage = Image.extend({
 		return {
 			...this.parent?.(),
 			width: {
-				default: '100%',
+				default: null,
 			},
 			height: {
 				default: null,

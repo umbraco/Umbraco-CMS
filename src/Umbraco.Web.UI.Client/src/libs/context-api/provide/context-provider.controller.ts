@@ -48,8 +48,9 @@ export class UmbContextProviderController<
 
 	public override destroy(): void {
 		if (this.#host) {
-			this.#host.removeUmbController(this);
+			const host = this.#host;
 			(this.#host as unknown) = undefined;
+			host.removeUmbController(this);
 		}
 		super.destroy();
 	}

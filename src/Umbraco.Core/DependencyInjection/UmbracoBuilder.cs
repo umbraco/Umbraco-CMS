@@ -34,6 +34,8 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.ContentTypeEditing;
 using Umbraco.Cms.Core.DynamicRoot;
 using Umbraco.Cms.Core.Preview;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.PublishedCache.Internal;
 using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services.FileSystem;
@@ -46,6 +48,7 @@ using Umbraco.Cms.Core.Telemetry;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
+using Umbraco.Cms.Core.Services.Filters;
 
 namespace Umbraco.Cms.Core.DependencyInjection
 {
@@ -238,6 +241,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             // register published router
             Services.AddUnique<IPublishedRouter, PublishedRouter>();
+            Services.AddUnique<IPublishedUrlInfoProvider, PublishedUrlInfoProvider>();
 
             Services.AddUnique<IEventMessagesFactory, DefaultEventMessagesFactory>();
             Services.AddUnique<IEventMessagesAccessor, HybridEventMessagesAccessor>();
@@ -383,6 +387,9 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IPublishStatusManagementService>(x => x.GetRequiredService<PublishStatusService>());
             Services.AddUnique<IPublishStatusQueryService>(x => x.GetRequiredService<PublishStatusService>());
 
+            Services.AddUnique<IPublishedContentStatusFilteringService, PublishedContentStatusFilteringService>();
+            Services.AddUnique<IPublishedMediaStatusFilteringService, PublishedMediaStatusFilteringService>();
+
             // Register a noop IHtmlSanitizer & IMarkdownSanitizer to be replaced
             Services.AddUnique<IHtmlSanitizer, NoopHtmlSanitizer>();
             Services.AddUnique<IMarkdownSanitizer, NoopMarkdownSanitizer>();
@@ -415,6 +422,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             // Two factor providers
             Services.AddUnique<ITwoFactorLoginService, TwoFactorLoginService>();
             Services.AddUnique<IUserTwoFactorLoginService, UserTwoFactorLoginService>();
+            Services.AddUnique<IMemberTwoFactorLoginService, MemberTwoFactorLoginService>();
 
             // Add Query services
             Services.AddUnique<IDocumentRecycleBinQueryService, DocumentRecycleBinQueryService>();
@@ -444,7 +452,6 @@ namespace Umbraco.Cms.Core.DependencyInjection
             // Routing
             Services.AddUnique<IDocumentUrlService, DocumentUrlService>();
             Services.AddNotificationAsyncHandler<UmbracoApplicationStartingNotification, DocumentUrlServiceInitializerNotificationHandler>();
-
         }
     }
 }

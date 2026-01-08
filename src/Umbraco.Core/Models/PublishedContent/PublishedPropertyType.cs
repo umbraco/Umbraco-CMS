@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
     {
         private readonly IPublishedModelFactory _publishedModelFactory;
         private readonly PropertyValueConverterCollection _propertyValueConverters;
-        private readonly object _locker = new object();
+        private readonly Lock _locker = new();
         private volatile bool _initialized;
         private IPropertyValueConverter? _converter;
         private PropertyCacheLevel _cacheLevel;

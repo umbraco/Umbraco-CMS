@@ -5,6 +5,7 @@ import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_VARIANT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbAncestorsEntityContext } from '@umbraco-cms/backoffice/entity';
 
 interface UmbMenuVariantTreeStructureWorkspaceContextBaseArgs {
 	treeRepositoryAlias: string;
@@ -20,6 +21,8 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 
 	#parent = new UmbObjectState<UmbVariantStructureItemModel | undefined>(undefined);
 	public readonly parent = this.#parent.asObservable();
+
+	#ancestorContext = new UmbAncestorsEntityContext(this);
 
 	constructor(host: UmbControllerHost, args: UmbMenuVariantTreeStructureWorkspaceContextBaseArgs) {
 		// TODO: set up context token
@@ -84,6 +87,15 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 					}),
 				};
 			});
+
+			const ancestorEntities = data.map((treeItem) => {
+				return {
+					unique: treeItem.unique,
+					entityType: treeItem.entityType,
+				};
+			});
+
+			this.#ancestorContext.setAncestors(ancestorEntities);
 
 			structureItems.push(...ancestorItems);
 

@@ -1,6 +1,6 @@
 import type { UmbLanguageItemModel } from '../../types.js';
 import { UmbLanguagePickerInputContext } from './input-language.context.js';
-import { css, html, customElement, property, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state, repeat, nothing, when } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -91,6 +91,27 @@ export class UmbInputLanguageElement extends UUIFormControlMixin(UmbLitElement, 
 		return this.selection.join(',');
 	}
 
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default
+	 */
+	@property({ type: Boolean, reflect: true })
+	public get readonly() {
+		return this.#readonly;
+	}
+	public set readonly(value) {
+		this.#readonly = value;
+
+		if (this.#readonly) {
+			this.#sorter.disable();
+		} else {
+			this.#sorter.enable();
+		}
+	}
+	#readonly = false;
+
 	@state()
 	private _items: Array<UmbLanguageItemModel> = [];
 
@@ -126,7 +147,7 @@ export class UmbInputLanguageElement extends UUIFormControlMixin(UmbLitElement, 
 		});
 	}
 
-	#removeItem(item: UmbLanguageItemModel) {
+	#onRemove(item: UmbLanguageItemModel) {
 		this.#pickerContext.requestRemoveItem(item.unique);
 	}
 
@@ -146,27 +167,31 @@ export class UmbInputLanguageElement extends UUIFormControlMixin(UmbLitElement, 
 	}
 
 	#renderItems() {
-		if (!this._items) return nothing;
+		if (!this._items) return;
 		return html`
 			<uui-ref-list>
 				${repeat(
 					this._items,
 					(item) => item.unique,
-					(item) => this.#renderItem(item),
+					(item) =>
+						html`<umb-entity-item-ref
+							id=${item.unique}
+							.item=${item}
+							?readonly=${this.readonly}
+							?standalone=${this.max === 1}>
+							${when(
+								!this.readonly,
+								() => html`
+									<uui-action-bar slot="actions">
+										<uui-button
+											label=${this.localize.term('general_remove')}
+											@click=${() => this.#onRemove(item)}></uui-button>
+									</uui-action-bar>
+								`,
+							)}
+						</umb-entity-item-ref>`,
 				)}
 			</uui-ref-list>
-		`;
-	}
-
-	#renderItem(item: UmbLanguageItemModel) {
-		if (!item.unique) return;
-		return html`
-			<!-- TODO: add language ref element -->
-			<uui-ref-node name=${item.name} id=${item.unique} detail=${item.unique}>
-				<uui-action-bar slot="actions">
-					<uui-button @click=${() => this.#removeItem(item)} label=${this.localize.term('general_remove')}></uui-button>
-				</uui-action-bar>
-			</uui-ref-node>
 		`;
 	}
 

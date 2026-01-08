@@ -1,9 +1,8 @@
 import type { CodeEditorLanguage } from '../models/index.js';
 import type { UmbCodeEditorElement } from '../components/code-editor.element.js';
 import { css, customElement, html, property, state, styleMap } from '@umbraco-cms/backoffice/external/lit';
-import { UmbInputEvent } from '@umbraco-cms/backoffice/event';
+import { UmbChangeEvent, UmbInputEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
@@ -49,7 +48,7 @@ export class UmbPropertyEditorUICodeEditorElement extends UmbLitElement implemen
 	#onChange(event: UmbInputEvent & { target: UmbCodeEditorElement }) {
 		if (!(event instanceof UmbInputEvent)) return;
 		this.value = event.target.code;
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	override render() {

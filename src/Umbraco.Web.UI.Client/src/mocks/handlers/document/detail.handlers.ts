@@ -41,6 +41,13 @@ export const detailHandlers = [
 		return res(ctx.status(200), ctx.json<PagedIReferenceResponseModel>(PagedTrackedReference));
 	}),
 
+	rest.put(umbracoPath(`${UMB_SLUG}/:id/validate`, 'v1.1'), (_req, res, ctx) => {
+		const id = _req.params.id as string;
+		if (!id) return res(ctx.status(400));
+
+		return res(ctx.status(200));
+	}),
+
 	rest.get(umbracoPath(`${UMB_SLUG}/:id`), (req, res, ctx) => {
 		const id = req.params.id as string;
 		if (!id) return res(ctx.status(400));

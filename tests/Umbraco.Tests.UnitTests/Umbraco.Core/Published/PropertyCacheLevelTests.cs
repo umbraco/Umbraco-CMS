@@ -56,7 +56,7 @@ public class PropertyCacheLevelTests
         // anything else is not > None, use Content
         //
         // for standalone elements, it's only None or Content
-        var set1 = new PublishedElement(setType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false);
+        var set1 = new PublishedElement(setType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false, new VariationContext());
 
         Assert.AreEqual(1234, set1.Value(Mock.Of<IPublishedValueFallback>(), "prop1"));
         Assert.AreEqual(1, converter.SourceConverts);
@@ -133,6 +133,7 @@ public class PropertyCacheLevelTests
             },
             false,
             referenceCacheLevel,
+            new VariationContext(),
             cacheManager.Object);
 
         Assert.AreEqual(1234, set1.Value(Mock.Of<IPublishedValueFallback>(), "prop1"));
@@ -185,7 +186,7 @@ public class PropertyCacheLevelTests
 
         Assert.Throws<Exception>(() =>
         {
-            var unused = new PublishedElement(setType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false);
+            var unused = new PublishedElement(setType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false, new VariationContext());
         });
     }
 

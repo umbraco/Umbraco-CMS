@@ -50,7 +50,7 @@ export class UmbSectionSidebarMenuElement<
 			h3 {
 				margin: var(--uui-size-5) 0;
 				padding: var(--uui-size-4) var(--uui-size-8);
-				font-size: 15px;
+				font-size: 14px;
 			}
 		`,
 	];

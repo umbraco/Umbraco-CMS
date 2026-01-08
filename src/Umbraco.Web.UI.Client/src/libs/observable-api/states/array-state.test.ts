@@ -183,4 +183,35 @@ describe('ArrayState', () => {
 			}
 		});
 	});
+
+	it('append only updates observable if changes item', (done) => {
+		let count = 0;
+
+		const observer = subject.asObservable();
+		observer.subscribe((value) => {
+			count++;
+			if (count === 1) {
+				expect(value.length).to.be.equal(initialData.length);
+				expect(value[0]).to.be.equal(initialData[0]);
+				expect(value[0].another).to.be.equal(initialData[0].another);
+				expect(value[1].another).to.be.equal(initialData[1].another);
+				expect(value[2].another).to.be.equal(initialData[2].another);
+			} else if (count === 2) {
+				expect(value.length).to.be.equal(4);
+				expect(value[3].another).to.be.equal('myValue4');
+				done();
+			}
+		});
+
+		Promise.resolve().then(() => {
+			// Despite how many times this happens it should not trigger any change.
+			subject.append(initialData);
+			subject.append(initialData);
+			subject.append(initialData);
+
+			Promise.resolve().then(() => {
+				subject.appendOne({ key: '4', another: 'myValue4' });
+			});
+		});
+	});
 });

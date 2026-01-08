@@ -12,6 +12,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		meta: {
 			icon: 'icon-autofill',
 			label: '#create_newDataType',
+			description: '#create_newDataTypeDescription',
 		},
 	},
 ];

@@ -51,6 +51,12 @@ public class WebhookFiring : IRecurringBackgroundJob
 
     public async Task RunJobAsync()
     {
+        if (_webhookSettings.Enabled is false)
+        {
+            _logger.LogInformation("WebhookFiring task will not run as it has been globally disabled via configuration");
+            return;
+        }
+
         IEnumerable<WebhookRequest> requests;
         using (ICoreScope scope = _coreScopeProvider.CreateCoreScope())
         {
