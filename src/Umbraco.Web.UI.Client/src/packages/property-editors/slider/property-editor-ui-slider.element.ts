@@ -139,7 +139,7 @@ export class UmbPropertyEditorUISliderElement
 
 	#parseNumber(input: unknown): number | undefined {
 		const num = Number(input);
-		return Number.isFinite(num) ? undefined : num;
+		return Number.isFinite(num) ? num : undefined;
 	}
 
 	#onChange(event: CustomEvent & { target: UmbInputSliderElement }) {
