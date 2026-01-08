@@ -35,6 +35,7 @@ export class UmbCollectionSelectionManager<
 		/* In collection we want to enable select-only mode when selecting an item so we don't accidentally navigate away. */
 		this.setSelectOnly(true);
 		super.select(unique);
+		console.log('select in selection manager', unique);
 	}
 
 	/**
@@ -43,10 +44,13 @@ export class UmbCollectionSelectionManager<
 	 * @param {string} unique - The unique identifier of the item to deselect.
 	 */
 	override deselect(unique: string): void {
-		// In collection we want to disable select-only mode when deselecting an item to allow navigation.
-		// This only applies if the config doesn't enforce select-only.
-		this.setSelectOnly(this.#config?.selectOnly ?? false);
 		super.deselect(unique);
+
+		// In collection we want to disable select-only mode when all items are deselected to allow navigation.
+		// This only applies if the config doesn't enforce select-only.
+		if (this.getSelection().length === 0) {
+			this.setSelectOnly(this.#config?.selectOnly ?? false);
+		}
 	}
 
 	/**

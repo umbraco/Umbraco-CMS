@@ -148,10 +148,12 @@ describe('UmbCollectionSelectionManager', () => {
 			manager.setConfig({ selectable: true, multiple: true, selection: ['1', '2'] });
 		});
 
-		it('disables select-only mode when deselecting (no selectOnly in config)', () => {
+		it('disables select-only mode when deselecting all items (no selectOnly in config)', () => {
 			manager.setSelectOnly(true);
 			expect(manager.getSelectOnly()).to.equal(true);
 			manager.deselect('1');
+			expect(manager.getSelectOnly()).to.equal(true);
+			manager.deselect('2');
 			expect(manager.getSelectOnly()).to.equal(false);
 		});
 
