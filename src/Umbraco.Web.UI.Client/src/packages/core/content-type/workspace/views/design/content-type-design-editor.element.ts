@@ -447,7 +447,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 							<uui-button
 								look="outline"
 								label=${this.localize.term('contentTypeEditor_compositions')}
-								data-mark="action:${this.localize.term('contentTypeEditor_compositions')}"
+								data-mark="action:compositions"
 								compact
 								@click=${this.#openCompositionModal}>
 								<uui-icon name="icon-merge"></uui-icon>
@@ -493,7 +493,6 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 				data-mark="root-tab"
 				class=${this._hasRootGroups || rootTabActive ? '' : 'content-tab-is-empty'}
 				label=${this.localize.term('general_generic')}
-				data-mark="uui-tab:${this.localize.term('general_generic')}"
 				.active=${rootTabActive}
 				href=${rootTabPath}>
 				${this.localize.term('general_generic')}
@@ -508,7 +507,6 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 
 		return html`<uui-tab
 			label=${tab.name && tab.name !== '' ? tab.name : 'Unnamed'}
-			data-mark="uui-tab:${tab.name && tab.name !== '' ? tab.name : 'Unnamed'}"
 			.active=${tabActive}
 			href=${path}
 			data-umb-tab-id=${ifDefined(tab.id)}
@@ -544,7 +542,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 					look="placeholder"
 					placeholder="Unnamed"
 					label=${tab.name!}
-					data-mark="input${tab.name!}"
+					data-mark="input:${tab.name!}"
 					value="${tab.name!}"
 					auto-width
 					minlength="1"
@@ -576,7 +574,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	renderDeleteFor(tab: UmbPropertyTypeContainerModel) {
 		return html`<uui-button
 			label=${this.localize.term('actions_remove')}
-			data-mark="action:${this.localize.term('actions_remove')}"
+			data-mark="action:remove"
 			class="trash"
 			slot="append"
 			@click=${(e: MouseEvent) => {
