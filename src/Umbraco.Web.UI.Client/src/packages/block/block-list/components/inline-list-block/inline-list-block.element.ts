@@ -138,6 +138,10 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 		this.#workspaceContext?.expose();
 	};
 
+	public expand() {
+		this._isOpen = true;
+	}
+
 	override render() {
 		return html`
 			<div id="host">
