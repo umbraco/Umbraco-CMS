@@ -1,4 +1,3 @@
-import { expect } from '@playwright/test';
 import {ConstantHelper, test, AliasHelper} from '@umbraco/playwright-testhelpers';
 
 // Content
@@ -128,6 +127,7 @@ test('can edit variant block list in non-default language when AllowEditInvarian
   await umbracoUi.content.clickSaveAndPublishButton();
   await umbracoUi.content.clickContainerSaveAndPublishButton();
   await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.switchLanguage(secondCulture);
   // TODO: Review if we can replace this with a more reliable wait
   // Wait for the property to be fully loaded
   await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
@@ -158,6 +158,7 @@ test('cannot create block in invariant block list in non-default language when A
   await umbracoUi.content.clickSaveAndPublishButton();
   await umbracoUi.content.clickContainerSaveAndPublishButton();
   await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.switchLanguage(secondCulture);
   // TODO: Review if we can replace this with a more reliable wait
   // Wait for the property to be fully loaded
   await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
