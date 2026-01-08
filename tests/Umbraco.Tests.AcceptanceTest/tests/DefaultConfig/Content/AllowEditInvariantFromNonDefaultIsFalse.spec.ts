@@ -1,3 +1,4 @@
+import { expect } from '@playwright/test';
 import {ConstantHelper, test, AliasHelper} from '@umbraco/playwright-testhelpers';
 
 // Content
@@ -66,6 +67,9 @@ test('can edit variant text property in non-default language when AllowEditInvar
   await umbracoUi.content.clickContainerSaveAndPublishButton();
   await umbracoUi.content.isSuccessNotificationVisible();
   await umbracoUi.content.switchLanguage(secondCulture);
+  // TODO: Review if we can replace this with a more reliable wait
+  // Wait for the property to be fully loaded
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
 
   // Assert
   await umbracoUi.content.isDocumentPropertyEditable(firstTextName, true);
@@ -94,6 +98,9 @@ test('cannot edit invariant text property in non-default language when AllowEdit
   await umbracoUi.content.clickContainerSaveAndPublishButton();
   await umbracoUi.content.isSuccessNotificationVisible();
   await umbracoUi.content.switchLanguage(secondCulture);
+  // TODO: Review if we can replace this with a more reliable wait
+  // Wait for the property to be fully loaded
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
 
   // Assert
   await umbracoUi.content.isDocumentPropertyEditable(secondTextName, false);
@@ -121,7 +128,9 @@ test('can edit variant block list in non-default language when AllowEditInvarian
   await umbracoUi.content.clickSaveAndPublishButton();
   await umbracoUi.content.clickContainerSaveAndPublishButton();
   await umbracoUi.content.isSuccessNotificationVisible();
-  await umbracoUi.content.switchLanguage(secondCulture);
+  // TODO: Review if we can replace this with a more reliable wait
+  // Wait for the property to be fully loaded
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
 
   // Assert
   await umbracoUi.content.isAddBlockListElementWithNameVisible(firstBlockListName);
@@ -149,7 +158,9 @@ test('cannot create block in invariant block list in non-default language when A
   await umbracoUi.content.clickSaveAndPublishButton();
   await umbracoUi.content.clickContainerSaveAndPublishButton();
   await umbracoUi.content.isSuccessNotificationVisible();
-  await umbracoUi.content.switchLanguage(secondCulture);
+  // TODO: Review if we can replace this with a more reliable wait
+  // Wait for the property to be fully loaded
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
 
   // Assert
   await umbracoUi.content.isAddBlockListElementWithNameDisabled(secondBlockListName);
@@ -183,6 +194,9 @@ test('can edit variant text property inside a variant block in non-default langu
   await umbracoUi.content.clickContainerSaveAndPublishButton();
   await umbracoUi.content.isSuccessNotificationVisible();
   await umbracoUi.content.switchLanguage(secondCulture);
+  // TODO: Review if we can replace this with a more reliable wait
+  // Wait for the property to be fully loaded
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoUi.content.clickAddBlockListElementWithName(firstBlockListName);
   await umbracoUi.content.clickBlockElementWithName(firstBlockElementTypeName);
 
@@ -218,6 +232,9 @@ test('can edit invariant text property inside a variant block in non-default lan
   await umbracoUi.content.clickContainerSaveAndPublishButton();
   await umbracoUi.content.isSuccessNotificationVisible();
   await umbracoUi.content.switchLanguage(secondCulture);
+  // TODO: Review if we can replace this with a more reliable wait
+  // Wait for the property to be fully loaded
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoUi.content.clickAddBlockListElementWithName(firstBlockListName);
   await umbracoUi.content.clickBlockElementWithName(firstBlockElementTypeName);
 
@@ -253,6 +270,9 @@ test('can edit variant text property inside invariant block in non-default langu
   await umbracoUi.content.clickContainerSaveAndPublishButton();
   await umbracoUi.content.isSuccessNotificationVisible();
   await umbracoUi.content.switchLanguage(secondCulture);
+  // TODO: Review if we can replace this with a more reliable wait
+  // Wait for the property to be fully loaded
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoUi.content.clickEditBlockListBlockButton();
 
   // Assert
@@ -287,6 +307,9 @@ test('cannot edit invariant text property inside an invariant block in non-defau
   await umbracoUi.content.clickContainerSaveAndPublishButton();
   await umbracoUi.content.isSuccessNotificationVisible();
   await umbracoUi.content.switchLanguage(secondCulture);
+  // TODO: Review if we can replace this with a more reliable wait
+  // Wait for the property to be fully loaded
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoUi.content.clickEditBlockListBlockButton();
 
   // Assert
