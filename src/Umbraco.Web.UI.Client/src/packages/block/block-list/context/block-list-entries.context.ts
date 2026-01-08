@@ -98,11 +98,17 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 						data.originData as UmbBlockListWorkspaceOriginData,
 					);
 					if (created) {
-						this.insert(
+						await this.insert(
 							created.layout,
 							created.content,
 							created.settings,
 							data.originData as UmbBlockListWorkspaceOriginData,
+						);
+						// A dirty communication towards the UI, so it can react to a new block being created (to open the inline editing of the block): [NL]
+						this.dispatchEvent(
+							new CustomEvent('umb-internal:blockCreated', {
+								detail: { originData: data.originData },
+							}),
 						);
 					} else {
 						throw new Error('Failed to create block');

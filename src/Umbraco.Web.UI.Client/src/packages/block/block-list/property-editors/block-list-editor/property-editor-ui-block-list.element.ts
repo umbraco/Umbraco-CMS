@@ -105,7 +105,15 @@ export class UmbPropertyEditorUIBlockListElement
 		const blocks = config.getValueByAlias<Array<UmbBlockTypeBaseModel>>('blocks') ?? [];
 		this.#managerContext.setBlockTypes(blocks);
 
-		this.#managerContext.setInlineEditingMode(config.getValueByAlias<boolean>('useInlineEditingAsDefault'));
+		const useInlineEditingAsDefault = config.getValueByAlias<boolean>('useInlineEditingAsDefault');
+		this.#managerContext.setInlineEditingMode(useInlineEditingAsDefault);
+		if (useInlineEditingAsDefault) {
+			// Notice a hacky solution for how the entriesContext can inform when a new block has been created, to expand it: [NL]
+			this.#entriesContext.addEventListener('umb-internal:blockCreated', (event) => {
+				const index = (event as CustomEvent).detail.originData.index;
+				this.#tryToExpandBlock(index);
+			});
+		}
 		this.style.maxWidth = config.getValueByAlias<string>('maxPropertyWidth') ?? '';
 
 		this.#managerContext.setEditorConfiguration(config);
@@ -418,10 +426,17 @@ export class UmbPropertyEditorUIBlockListElement
 
 	#renderInlineCreateButton(index: number) {
 		if (this.readonly) return nothing;
+		const createPath = this.#entriesContext.getPathForCreateBlock(index);
 		return html`
 			<uui-button-inline-create
 				label=${this._createButtonLabel}
-				href=${this.#entriesContext.getPathForCreateBlock(index) ?? ''}>
+				href=${ifDefined(createPath)}
+				@click=${() => {
+					// If no path, then we can conclude there is not modal flow for the user to follow, instead we will just insert the Block: [NL]
+					if (createPath === undefined) {
+						this.#handleCreateWithNoCreatePath(index);
+					}
+				}}>
 			</uui-button-inline-create>
 		`;
 	}
@@ -435,22 +450,40 @@ export class UmbPropertyEditorUIBlockListElement
 				.label=${this._createButtonLabel}
 				href=${ifDefined(createPath)}
 				?disabled=${this.readonly}
-				@click=${async () => {
+				@click=${() => {
 					// If no path, then we can conclude there is not modal flow for the user to follow, instead we will just insert the Block: [NL]
 					if (createPath === undefined) {
-						if (!this._blocks || this._blocks.length === 0) {
-							throw new Error('No block types are configured for this Block List property editor');
-						}
-						const originData = { index: -1 };
-						const created = await this.#entriesContext.create(this._blocks[0].contentElementTypeKey, {}, originData);
-						if (created) {
-							this.#entriesContext.insert(created.layout, created.content, created.settings, originData);
-						} else {
-							throw new Error('Failed to create block');
-						}
+						this.#handleCreateWithNoCreatePath();
 					}
 				}}></uui-button>
 		`;
+	}
+
+	async #handleCreateWithNoCreatePath(index?: number) {
+		if (!this._blocks || this._blocks.length === 0) {
+			throw new Error('No block types are configured for this Block List property editor');
+		}
+		if (index === undefined) {
+			index = -1;
+		}
+		const originData = { index };
+		const created = await this.#entriesContext.create(this._blocks[0].contentElementTypeKey, {}, originData);
+		if (created) {
+			this.#entriesContext.insert(created.layout, created.content, created.settings, originData);
+		} else {
+			throw new Error('Failed to create block');
+		}
+
+		if (this.#managerContext.getInlineEditingMode()) {
+			this.#tryToExpandBlock(index);
+		}
+	}
+
+	async #tryToExpandBlock(index: number) {
+		// Notice this is a bit of a hack here to open the newly created block: [NL]
+		await new Promise((resolve) => requestAnimationFrame(() => resolve(true)));
+		const indexToOpen = index === -1 ? this._layouts.length - 1 : index;
+		this.shadowRoot?.querySelectorAll('umb-block-list-entry').item(indexToOpen)?.expand?.();
 	}
 
 	#renderPasteButton() {
