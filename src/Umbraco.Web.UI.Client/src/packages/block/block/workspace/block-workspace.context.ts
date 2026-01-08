@@ -91,7 +91,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			this.#modalContext = context;
 			this.#originData = context?.data.originData;
 			context?.onSubmit().catch(this.#modalRejected);
-		}).asPromise({ preventTimeout: true });
+		});
 
 		this.#retrieveBlockManager = this.consumeContext(UMB_BLOCK_MANAGER_CONTEXT, (manager) => {
 			this.#blockManager = manager;

@@ -10,6 +10,8 @@ import type { UmbApiConstructorArgumentsMethodType } from '@umbraco-cms/backoffi
 import type { UmbBlockDataType, UMB_BLOCK_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/block';
 
 import '../../../block/workspace/views/edit/block-workspace-view-edit-content-no-router.element.js';
+import { UmbContextBoundary } from '@umbraco-cms/backoffice/context-api';
+import { UMB_VIEW_CONTEXT } from '@umbraco-cms/backoffice/view';
 
 const apiArgsCreator: UmbApiConstructorArgumentsMethodType<unknown> = (manifest: unknown) => {
 	return [{ manifest }];
@@ -69,6 +71,9 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 			);
 		});
 
+		// Block the access to the View Context for this inline block workspace: [NL]
+		new UmbContextBoundary(this, UMB_VIEW_CONTEXT);
+
 		new UmbExtensionApiInitializer(
 			this,
 			umbExtensionsRegistry,
@@ -79,6 +84,9 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 				if (permitted && context) {
 					this.#workspaceContext = context;
 					this.#workspaceContext.establishLiveSync();
+					// Avoid view context becoming active: [NL]
+					// in this case its not a routable workspace and we do not want it to become an active view, appending shortcuts or setting browser title. (maybe this code needs to be more explicit. Like a inlineMode()?) [NL]
+					this.#workspaceContext.view.destroy();
 					this.#load();
 
 					this.observe(
