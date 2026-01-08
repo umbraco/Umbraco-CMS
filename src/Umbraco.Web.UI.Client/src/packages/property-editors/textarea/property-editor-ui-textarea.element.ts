@@ -82,6 +82,7 @@ export class UmbPropertyEditorUITextareaElement
 		return html`
 			<uui-textarea
 				.label=${this.localize.term('general_fieldFor', [this.name])}
+				data-mark="input:textarea"
 				style=${styleMap(this._css)}
 				.autoHeight=${this._rows ? false : true}
 				maxlength=${ifDefined(this._maxChars)}

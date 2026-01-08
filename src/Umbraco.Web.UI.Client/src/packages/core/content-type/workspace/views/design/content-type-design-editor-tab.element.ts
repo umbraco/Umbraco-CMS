@@ -207,6 +207,7 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 			<uui-button
 				id="btn-add"
 				label=${this.localize.term('contentTypeEditor_addGroup')}
+				data-mark="action:add-group"
 				look="placeholder"
 				@click=${this.#onAddGroup}></uui-button>
 		`;

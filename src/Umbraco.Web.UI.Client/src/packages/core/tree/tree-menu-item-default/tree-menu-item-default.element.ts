@@ -28,6 +28,7 @@ export class UmbMenuItemTreeDefaultElement extends UmbLitElement implements UmbM
 			? html`
 					<umb-tree
 						alias=${this.manifest?.meta.treeAlias}
+						data-mark="umb-tree:${this.manifest?.meta.treeAlias}"
 						.props=${{
 							hideTreeRoot: this.manifest?.meta.hideTreeRoot === true,
 							selectionConfiguration: {

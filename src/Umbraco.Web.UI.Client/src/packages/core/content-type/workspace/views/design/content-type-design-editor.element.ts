@@ -428,7 +428,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		// TODO: Localize this:
 		if (this._sortModeActive) return;
 		return html`
-			<uui-button id="add-tab" @click="${this.#addTab}" label="Add tab">
+			<uui-button id="add-tab" @click="${this.#addTab}" label="Add tab" data-mark="action:add-tab">
 				<uui-icon name="icon-add"></uui-icon>
 				Add tab
 			</uui-button>
@@ -447,6 +447,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 							<uui-button
 								look="outline"
 								label=${this.localize.term('contentTypeEditor_compositions')}
+								data-mark="action:compositions"
 								compact
 								@click=${this.#openCompositionModal}>
 								<uui-icon name="icon-merge"></uui-icon>
@@ -454,7 +455,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 							</uui-button>
 						`
 					: ''}
-				<uui-button look="outline" label=${sortButtonText} compact @click=${this.#toggleSortMode}>
+				<uui-button look="outline" label=${sortButtonText} data-mark="action:reorder" compact @click=${this.#toggleSortMode}>
 					<uui-icon name="icon-height"></uui-icon>
 					${sortButtonText}
 				</uui-button>
@@ -525,6 +526,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 					? html`<uui-icon name="icon-grip" class="drag-${tab.id}"> </uui-icon>${tabName}
 							<uui-input
 								label="sort order"
+								data-mark="input:sort-order"
 								type="number"
 								value=${ifDefined(tab.sortOrder)}
 								style="width:50px"
@@ -540,6 +542,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 					look="placeholder"
 					placeholder="Unnamed"
 					label=${tab.name!}
+					data-mark="input:${tab.name!}"
 					value="${tab.name!}"
 					auto-width
 					minlength="1"
@@ -571,6 +574,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	renderDeleteFor(tab: UmbPropertyTypeContainerModel) {
 		return html`<uui-button
 			label=${this.localize.term('actions_remove')}
+			data-mark="action:remove"
 			class="trash"
 			slot="append"
 			@click=${(e: MouseEvent) => {

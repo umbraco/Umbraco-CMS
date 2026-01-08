@@ -27,6 +27,7 @@ export class UmbCollectionFilterFieldElement extends UmbLitElement {
 			<uui-input
 				label=${this.localize.term('general_search')}
 				placeholder=${this.localize.term('placeholders_search')}
+				data-mark="input:search"
 				@input=${this.#onInput}></uui-input>
 		`;
 	}

@@ -223,6 +223,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 					<uui-input
 						name="label"
 						id="label-input"
+						data-mark="input:group-name"
 						placeholder=${this.localize.term('placeholders_label')}
 						label="label"
 						.value=${this.property.name}
@@ -233,6 +234,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 						<uui-textarea
 							label="description"
 							name="description"
+							data-mark="input:description"
 							id="description-input"
 							placeholder=${this.localize.term('placeholders_enterDescription')}
 							.value=${this.property.description}
@@ -246,11 +248,12 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 					id="editor"
 					look="outline"
 					label=${this.localize.term('contentTypeEditor_editorSettings')}
+					data-mark="action:editor-settings"
 					href=${this.editPropertyTypePath +
 					UMB_EDIT_PROPERTY_TYPE_WORKSPACE_PATH_PATTERN.generateLocal({ unique: this.property.id })}>
 					${this.renderPropertyTags()}
 					<uui-action-bar>
-						<uui-button label="${this.localize.term('actions_delete')}" @click="${this.#requestRemove}">
+						<uui-button label="${this.localize.term('actions_delete')}" data-mark="action:delete" @click="${this.#requestRemove}">
 							<uui-icon name="delete"></uui-icon>
 						</uui-button>
 					</uui-action-bar>
@@ -271,6 +274,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 				type="number"
 				?disabled=${this._inherited}
 				label="sort order"
+				data-mark="input:sort-order"
 				@change=${(e: UUIInputEvent) =>
 					this.#partialUpdate({ sortOrder: parseInt(e.target.value as string) ?? 0 } as UmbPropertyTypeModel)}
 				.value=${this.property.sortOrder ?? 0}></uui-input>
@@ -284,6 +288,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 				name="alias"
 				id="alias-input"
 				label=${this.localize.term('placeholders_enterAlias')}
+				data-mark="input-lock:enter-alias"
 				placeholder=${this.localize.term('placeholders_enterAlias')}
 				.value=${this.property.alias}
 				?locked=${this._aliasLocked}
