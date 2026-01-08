@@ -992,6 +992,16 @@ export type DynamicRootResponseModel = {
     roots: Array<string>;
 };
 
+export type ElementConfigurationResponseModel = {
+    disableDeleteWhenReferenced: boolean;
+    disableUnpublishWhenReferenced: boolean;
+    allowEditInvariantFromNonDefault: boolean;
+    /**
+     * @deprecated
+     */
+    allowNonExistingSegmentsCreation: boolean;
+};
+
 export type ElementItemResponseModel = {
     id: string;
     flags: Array<FlagModel>;
@@ -7974,6 +7984,33 @@ export type PutElementByIdValidateResponses = {
      */
     200: unknown;
 };
+
+export type GetElementConfigurationData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/umbraco/management/api/v1/element/configuration';
+};
+
+export type GetElementConfigurationErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetElementConfigurationResponses = {
+    /**
+     * OK
+     */
+    200: ElementConfigurationResponseModel;
+};
+
+export type GetElementConfigurationResponse = GetElementConfigurationResponses[keyof GetElementConfigurationResponses];
 
 export type PostElementFolderData = {
     body?: CreateFolderRequestModel;
