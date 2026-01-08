@@ -110,3 +110,5 @@ tools/docfx/
 /src/Umbraco.Cms/appsettings-schema.json
 playwright-report
 trace.zip
+.claude/settings.local.json
+.env.local
