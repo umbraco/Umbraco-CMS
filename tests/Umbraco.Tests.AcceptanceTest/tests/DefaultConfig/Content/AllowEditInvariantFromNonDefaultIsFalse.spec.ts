@@ -99,7 +99,7 @@ test('cannot edit invariant text property in non-default language when AllowEdit
   await umbracoUi.content.switchLanguage(secondCulture);
   // TODO: Review if we can replace this with a more reliable wait
   // Wait for the property to be fully loaded
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);
 
   // Assert
   await umbracoUi.content.isDocumentPropertyEditable(secondTextName, false);
