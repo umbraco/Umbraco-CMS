@@ -175,8 +175,15 @@ export class UmbDefaultCollectionContext<
 			(hasBulkActions) => {
 				// Allow selection if there are bulk actions available
 				if (hasBulkActions) {
-					this.selection.setSelectable(true);
-					this.selection.setMultiple(true);
+					// TODO: This is a temporary workaround until we support two types of selection (bulk action selection and normal selection)
+					// We have to use the same selection configuration for both types of selection to ensure that selection works as expected in multi vs single select mode (ex: pickers).
+					// We currently disable bulk actions in pickers until we have a solution in place for supporting both types of selection.
+					// With this workaround the experience will be that a collection, supporting bulk actions configured as single select, will only be able to select one item at a time.
+					const config = this.#config?.selectionConfiguration;
+					const selectable = config?.selectable ?? true;
+					const multiple = config?.multiple ?? true;
+					this.selection.setSelectable(selectable);
+					this.selection.setMultiple(multiple);
 				}
 			},
 			'umbCollectionHasBulkActionsObserver',
