@@ -108,6 +108,14 @@ export abstract class UmbCollectionViewElementBase extends UmbLitElement {
 	}
 
 	/**
+	 * Sets the current selection in the collection.
+	 * @param {Array<string>} selection - An array of unique identifiers representing the new selection.
+	 */
+	protected _setSelection(selection: Array<string>) {
+		this.#collectionContext?.selection.setSelection(selection);
+	}
+
+	/**
 	 * Checks if an item is currently selected.
 	 * @param {string} unique - The unique identifier of the item to check.
 	 * @returns {boolean} True if the item is selected, false otherwise.

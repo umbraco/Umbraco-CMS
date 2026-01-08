@@ -138,19 +138,27 @@ export class UmbUserTableCollectionViewElement extends UmbCollectionViewElementB
 	#onSelected(event: UmbTableSelectedEvent) {
 		event.stopPropagation();
 		const itemId = event.getItemId();
-		if (!itemId) {
-			throw new Error('No item id on selected event');
+
+		// We get the same event for both single and multiple selection.
+		if (itemId) {
+			this._selectItem(itemId);
+		} else {
+			const target = event.target as UmbTableElement;
+			this._setSelection(target.selection);
 		}
-		this._selectItem(itemId);
 	}
 
 	#onDeselected(event: UmbTableDeselectedEvent) {
 		event.stopPropagation();
 		const itemId = event.getItemId();
-		if (!itemId) {
-			throw new Error('No item id on selected event');
+
+		// We get the same event for both single and multiple deselection.
+		if (itemId) {
+			this._deselectItem(itemId);
+		} else {
+			const target = event.target as UmbTableElement;
+			this._setSelection(target.selection);
 		}
-		this._deselectItem(itemId);
 	}
 
 	#onOrdering(event: UmbTableOrderedEvent) {
