@@ -110,3 +110,4 @@ tools/docfx/
 /src/Umbraco.Cms/appsettings-schema.json
 playwright-report
 trace.zip
+/tests/Umbraco.Tests.AcceptanceTest/results
