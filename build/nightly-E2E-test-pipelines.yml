@@ -28,8 +28,9 @@ parameters:
     type: boolean
     default: false
 
-  - name: sqliteAcceptanceTests
-    displayName: Run SQLite Acceptance Tests
+  # Can we slow our tests down when running on SQLite? That way we might be able to avoid DB locks
+  - name: skipSqliteAcceptanceTests
+    displayName: Skip SQLite acceptance tests
     type: boolean
     default: true
 
@@ -347,7 +348,7 @@ stages:
       - job:
         displayName: E2E Tests (SQLite)
         timeoutInMinutes: 180
-        condition: ${{ and(eq(parameters.skipDefaultConfigAcceptanceTests, false), eq(parameters.sqliteAcceptanceTests, false)) }}
+        condition: ${{ and(eq(parameters.skipDefaultConfigAcceptanceTests, false), eq(parameters.skipSqliteAcceptanceTests, false)) }}
         variables:
           # Connection string
           CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=Umbraco;Mode=Memory;Cache=Shared;Foreign Keys=True;Pooling=True
