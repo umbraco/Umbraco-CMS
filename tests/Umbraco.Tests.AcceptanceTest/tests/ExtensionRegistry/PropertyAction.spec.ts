@@ -50,10 +50,9 @@ test('can write value to textstring editor using write property action', async (
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickActionsMenuForProperty(groupName, dataTypeName);
   await umbracoUi.content.clickPropertyActionWithName(writeActionName);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   const updatedContentData = await umbracoApi.document.get(contentId);
   expect(updatedContentData.values[0].value).toBe(writeTextValue);
 });
