@@ -17,6 +17,7 @@ internal sealed class ElementEditingService
     : ContentEditingServiceBase<IElement, IContentType, IElementService, IContentTypeService>, IElementEditingService
 {
     private readonly ILogger<ElementEditingService> _logger;
+    private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly IElementContainerService _containerService;
     private readonly IEventMessagesFactory _eventMessagesFactory;
 
@@ -48,6 +49,7 @@ internal sealed class ElementEditingService
             contentTypeFilters)
     {
         _logger = logger;
+        _userIdKeyResolver = userIdKeyResolver;
         _containerService = containerService;
         _eventMessagesFactory = eventMessagesFactory;
     }
@@ -226,6 +228,28 @@ internal sealed class ElementEditingService
     public async Task<Attempt<IElement?, ContentEditingOperationStatus>> CopyAsync(Guid key, Guid? parentKey, Guid userKey)
         => await HandleCopyAsync(key, parentKey, false, false, userKey);
 
+    internal static async Task<bool> UnpublishTrashedElementOnRestore(IElement element, Guid userKey, IElementService elementService, IUserIdKeyResolver userIdKeyResolver, ILogger logger)
+    {
+        // this only applies to trashed, published elements
+        if (element is not { Trashed: true, Published: true })
+        {
+            return true;
+        }
+
+        var userId = await userIdKeyResolver.GetAsync(userKey);
+        PublishResult result = elementService.Unpublish(element, "*", userId);
+
+        // we will accept if custom code cancels the unpublish operation here - all other error states should
+        // result in a failed move.
+        if (result.Success is false && result.Result is not PublishResultType.FailedUnpublishCancelledByEvent)
+        {
+            logger.LogError("An error occurred while attempting to unpublish an element being moved from the recycle bin. Status was: {unpublishStatus}", result.Result);
+            return false;
+        }
+
+        return true;
+    }
+
     private async Task<Attempt<ContentEditingOperationStatus>> MoveLockedAsync<TNotification>(
         ICoreScope scope,
         Guid key,
@@ -253,6 +277,12 @@ internal sealed class ElementEditingService
         if (await scope.Notifications.PublishCancelableAsync(movingNotification))
         {
             return Attempt.Fail(ContentEditingOperationStatus.CancelledByNotification);
+        }
+
+        var unpublishSuccess = await UnpublishTrashedElementOnRestore(toMove, userKey, ContentService, _userIdKeyResolver, _logger);
+        if (unpublishSuccess is false)
+        {
+            return Attempt.Fail(ContentEditingOperationStatus.Unknown);
         }
 
         // NOTE: as long as the parent ID is correct, the element repo takes care of updating the rest of the

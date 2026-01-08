@@ -270,8 +270,8 @@ public partial class ElementContainerServiceTests
         }
         finally
         {
-            EntityContainerNotificationHandler.MovingContainer = null;
-            EntityContainerNotificationHandler.MovedContainer = null;
+            EntityContainerNotificationHandler.MovingContainerToRecycleBin = null;
+            EntityContainerNotificationHandler.MovedContainerToRecycleBin = null;
         }
     }
 
@@ -308,8 +308,8 @@ public partial class ElementContainerServiceTests
         }
         finally
         {
-            EntityContainerNotificationHandler.MovingContainer = null;
-            EntityContainerNotificationHandler.MovedContainer = null;
+            EntityContainerNotificationHandler.MovingContainerToRecycleBin = null;
+            EntityContainerNotificationHandler.MovedContainerToRecycleBin = null;
         }
     }
 

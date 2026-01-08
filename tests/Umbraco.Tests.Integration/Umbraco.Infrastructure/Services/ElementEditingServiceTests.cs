@@ -1,8 +1,10 @@
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
@@ -31,9 +33,14 @@ public partial class ElementEditingServiceTests : UmbracoIntegrationTest
     [SetUp]
     public void Setup() => ContentRepositoryBase.ThrowOnWarning = true;
 
+    protected override void CustomTestSetup(IUmbracoBuilder builder) => builder
+        .AddNotificationHandler<ElementUnpublishingNotification, ElementNotificationHandler>();
+
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
     private IElementEditingService ElementEditingService => GetRequiredService<IElementEditingService>();
+
+    private IElementPublishingService ElementPublishingService => GetRequiredService<IElementPublishingService>();
 
     private IElementContainerService ElementContainerService => GetRequiredService<IElementContainerService>();
 
@@ -213,4 +220,11 @@ public partial class ElementEditingServiceTests : UmbracoIntegrationTest
 
     private IEntitySlim[] GetFolderChildren(Guid containerKey, bool trashed = false)
         => EntityService.GetPagedChildren(containerKey, [UmbracoObjectTypes.ElementContainer], [UmbracoObjectTypes.ElementContainer, UmbracoObjectTypes.Element], 0, 999, trashed, out _).ToArray();
+
+    internal sealed class ElementNotificationHandler : INotificationHandler<ElementUnpublishingNotification>
+    {
+        public static Action<ElementUnpublishingNotification>? UnpublishingElement { get; set; }
+
+        public void Handle(ElementUnpublishingNotification notification) => UnpublishingElement?.Invoke(notification);
+    }
 }

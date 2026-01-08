@@ -14,6 +14,9 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
     private readonly IElementContainerRepository _entityContainerRepository;
     private readonly IEntityService _entityService;
     private readonly IElementRepository _elementRepository;
+    private readonly IUserIdKeyResolver _userIdKeyResolver;
+    private readonly IElementService _elementService;
+    private readonly ILogger<ElementContainerService> _logger;
 
     // internal so the tests can reach it
     internal const int DescendantsIteratorPageSize = 500;
@@ -27,12 +30,17 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
         IEntityRepository entityRepository,
         IUserIdKeyResolver userIdKeyResolver,
         IEntityService entityService,
-        IElementRepository elementRepository)
+        IElementRepository elementRepository,
+        IElementService elementService,
+        ILogger<ElementContainerService> logger)
         : base(provider, loggerFactory, eventMessagesFactory, entityContainerRepository, auditService, entityRepository, userIdKeyResolver)
     {
         _entityContainerRepository = entityContainerRepository;
+        _userIdKeyResolver = userIdKeyResolver;
         _entityService = entityService;
         _elementRepository = elementRepository;
+        _elementService = elementService;
+        _logger = logger;
     }
 
     public async Task<Attempt<EntityContainer?, EntityContainerOperationStatus>> MoveAsync(Guid key, Guid? parentKey, Guid userKey)
@@ -237,6 +245,14 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
                                                  ?? throw new InvalidOperationException($"Descendant element with ID {descendant.Id} was not found.");
                     descendantElement.Path = $"{newContainerPath}{descendant.Path[container.Path.Length..]}";
                     descendantElement.Level += levelDelta;
+
+                    // make sure the element is unpublished if it is moved from trash
+                    var unpublishSuccess = await ElementEditingService.UnpublishTrashedElementOnRestore(descendantElement, userKey, _elementService, _userIdKeyResolver, _logger);
+                    if (unpublishSuccess is false)
+                    {
+                        return Attempt.FailWithStatus<EntityContainer?, EntityContainerOperationStatus>(EntityContainerOperationStatus.Unknown, container);
+                    }
+
                     // NOTE: this cast isn't pretty, but it's the best we can do now. the content and media services do something
                     //       similar, and at the time of writing this, we are subject to the limitations imposed there.
                     ((TreeEntityBase)descendantElement).Trashed = trash;
