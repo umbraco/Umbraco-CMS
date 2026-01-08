@@ -27,10 +27,9 @@ test('can create a webhook', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.webhook.clickChooseEventButton();
   await umbracoUi.webhook.clickTextButtonWithName(event);
   await umbracoUi.webhook.clickSubmitButton();
-  await umbracoUi.webhook.clickSaveButton();
+  await umbracoUi.webhook.clickSaveButtonAndWaitForWebhookToBeCreated();
 
   // Assert
-  await umbracoUi.webhook.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.webhook.doesNameExist(webhookName)).toBeTruthy();
   expect(await umbracoApi.webhook.doesWebhookHaveUrl(webhookName, webhookSiteUrl)).toBeTruthy();
   expect(await umbracoApi.webhook.doesWebhookHaveEvent(webhookName, event)).toBeTruthy();
@@ -45,10 +44,9 @@ test('can update webhook name', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.webhook.enterWebhookName(updatedName);
-  await umbracoUi.webhook.clickSaveButton();
+  await umbracoUi.webhook.clickSaveButtonAndWaitForWebhookToBeUpdated();
 
   // Assert
-  await umbracoUi.webhook.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.webhook.doesNameExist(updatedName)).toBeTruthy();
   expect(await umbracoApi.webhook.doesNameExist(webhookName)).toBeFalsy();
 });
@@ -77,10 +75,9 @@ test('can add content type for a webhook', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.webhook.clickChooseContentTypeButton();
   await umbracoUi.webhook.clickModalMenuItemWithName(contentTypeName);
   await umbracoUi.webhook.clickChooseModalButton();
-  await umbracoUi.webhook.clickSaveButton();
+  await umbracoUi.webhook.clickSaveButtonAndWaitForWebhookToBeUpdated();
 
   // Assert
-  await umbracoUi.webhook.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.webhook.doesNameExist(webhookName)).toBeTruthy();
   expect(await umbracoApi.webhook.doesWebhookHaveContentTypeId(webhookName, documentTypeId)).toBeTruthy();
 
@@ -99,10 +96,9 @@ test('can add header for a webhook', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.webhook.clickAddHeadersButton();
   await umbracoUi.webhook.enterHeaderName(headerName);
   await umbracoUi.webhook.enterHeaderValue(headerValue);
-  await umbracoUi.webhook.clickSaveButton();
+  await umbracoUi.webhook.clickSaveButtonAndWaitForWebhookToBeUpdated();
 
   // Assert
-  await umbracoUi.webhook.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.webhook.doesNameExist(webhookName)).toBeTruthy();
   expect(await umbracoApi.webhook.doesWebhookHaveHeader(webhookName, headerName, headerValue)).toBeTruthy();
 });
@@ -114,10 +110,9 @@ test('can disable a webhook', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.webhook.clickEnabledToggleButton();
-  await umbracoUi.webhook.clickSaveButton();
+  await umbracoUi.webhook.clickSaveButtonAndWaitForWebhookToBeUpdated();
 
   // Assert
-  await umbracoUi.webhook.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.webhook.doesNameExist(webhookName)).toBeTruthy();
   await umbracoApi.webhook.isWebhookEnabled(webhookName, false);
 });
@@ -148,10 +143,9 @@ test('can remove a content type from a webhook', async ({umbracoApi, umbracoUi})
   // Act
   await umbracoUi.webhook.clickRemoveButtonForName(mediaTypeName);
   await umbracoUi.webhook.clickConfirmRemoveButton();
-  await umbracoUi.webhook.clickSaveButton();
+  await umbracoUi.webhook.clickSaveButtonAndWaitForWebhookToBeUpdated();
 
   // Assert
-  await umbracoUi.webhook.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.webhook.doesWebhookHaveContentTypeId(webhookName, mediaTypeData.id)).toBeFalsy();
 });
 
@@ -166,10 +160,9 @@ test('can remove a header from a webhook', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.webhook.clickHeaderRemoveButton();
-  await umbracoUi.webhook.clickSaveButton();
+  await umbracoUi.webhook.clickSaveButtonAndWaitForWebhookToBeUpdated();
 
   // Assert
-  await umbracoUi.webhook.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.webhook.doesWebhookHaveHeader(webhookName, headerName, headerValue)).toBeFalsy();
 });
 
