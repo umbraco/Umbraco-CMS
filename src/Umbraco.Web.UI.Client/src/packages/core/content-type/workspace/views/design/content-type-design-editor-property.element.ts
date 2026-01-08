@@ -248,12 +248,12 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 					id="editor"
 					look="outline"
 					label=${this.localize.term('contentTypeEditor_editorSettings')}
-					data-mark="action:${this.localize.term('contentTypeEditor_editorSettings')}"
+					data-mark="action:editor-settings"
 					href=${this.editPropertyTypePath +
 					UMB_EDIT_PROPERTY_TYPE_WORKSPACE_PATH_PATTERN.generateLocal({ unique: this.property.id })}>
 					${this.renderPropertyTags()}
 					<uui-action-bar>
-						<uui-button label="${this.localize.term('actions_delete')}" data-mark="action:${this.localize.term('actions_delete')}" @click="${this.#requestRemove}">
+						<uui-button label="${this.localize.term('actions_delete')}" data-mark="action:delete" @click="${this.#requestRemove}">
 							<uui-icon name="delete"></uui-icon>
 						</uui-button>
 					</uui-action-bar>

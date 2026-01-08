@@ -144,7 +144,7 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 		if (!this._firstActionApi) return nothing;
 		return html`<uui-button
 			label=${ifDefined(this._firstActionManifest?.meta.label)}
-			data-mark="action:${ifDefined(this._firstActionManifest?.meta.label)}"
+			data-mark="action:${ifDefined(this._firstActionManifest?.alias)}"
 			@click=${this.#onFirstActionClick}
 			href="${ifDefined(this._firstActionHref)}">
 			<uui-icon name=${ifDefined(this._firstActionManifest?.meta.icon)}></uui-icon>

@@ -67,7 +67,7 @@ export class UmbEntityActionDefaultElement<
 			<uui-menu-item
 				label=${ifDefined(this.manifest?.meta.additionalOptions ? label + '…' : label)}
 				href=${ifDefined(this._href)}
-				data-mark="action:${label}"
+				data-mark="action:${this.manifest?.alias}"
 				@click-label=${this.#onClickLabel}
 				@click=${this.#onClick}>
 				${this.manifest?.meta.icon
