@@ -13,10 +13,7 @@ export class UmbImageCropperElement extends UmbLitElement {
 
 	@property({ type: Object, attribute: false }) value?: UmbImageCropperCrop;
 	@property({ type: String }) src: string = '';
-	@property({ attribute: false }) focalPoint: UmbImageCropperFocalPoint = {
-		left: 0.5,
-		top: 0.5,
-	};
+	@property({ attribute: false }) focalPoint: UmbImageCropperFocalPoint | null = null;
 	@property({ type: Number })
 	get zoom() {
 		return this.#zoom;
@@ -157,9 +154,10 @@ export class UmbImageCropperElement extends UmbLitElement {
 			imageWidth = this.imageElement.naturalWidth * this.#minImageScale;
 			imageHeight = this.imageElement.naturalHeight * this.#minImageScale;
 
-			// position image so that its center is at the focal point
-			imageLeft = maskLeft + maskWidth / 2 - imageWidth * this.focalPoint.left;
-			imageTop = maskTop + maskHeight / 2 - imageHeight * this.focalPoint.top;
+			// position image so that its center is at the focal point (default to center if null)
+			const focalPoint = this.focalPoint ?? { left: 0.5, top: 0.5 };
+			imageLeft = maskLeft + maskWidth / 2 - imageWidth * focalPoint.left;
+			imageTop = maskTop + maskHeight / 2 - imageHeight * focalPoint.top;
 
 			// clamp image position so it stays within the mask
 			const minLeft = maskLeft + maskWidth - imageWidth;
