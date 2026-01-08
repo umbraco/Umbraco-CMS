@@ -55,27 +55,26 @@ internal sealed class RequestRedirectService : RoutingServiceBase, IRequestRedir
 
         // important: redirect URLs are always tracked without trailing slashes
         requestedPath = requestedPath.TrimEnd("/");
-        IRedirectUrl? redirectUrl = _redirectUrlService.GetMostRecentRedirectUrl(requestedPath, culture);
 
-        // if a redirect URL was not found, try by appending the start item ID because URL tracking might have tracked
-        // a redirect with "{root content ID}/{content path}"
+        IRedirectUrl? redirectUrl = null;
+
+        Uri contentRoute = GetDefaultRequestUri(requestedPath);
+        DomainAndUri? domainAndUri = GetDomainAndUriForRoute(contentRoute);
+        if (domainAndUri is not null)
+        {
+            var domainPath = GetContentRoute(domainAndUri, contentRoute);
+            culture ??= domainAndUri.Culture;
+            redirectUrl = _redirectUrlService.GetMostRecentRedirectUrl(domainPath, culture);
+        }
+
         if (redirectUrl is null && startItem is not null)
         {
             redirectUrl = _redirectUrlService.GetMostRecentRedirectUrl($"{startItem.Id}{requestedPath}", culture);
         }
 
-        // still no redirect URL found - try looking for a configured domain if we have a domain bound request,
-        // because URL tracking might have tracked a redirect with "{domain content ID}/{content path}"
         if (redirectUrl is null)
         {
-            Uri contentRoute = GetDefaultRequestUri(requestedPath);
-            DomainAndUri? domainAndUri = GetDomainAndUriForRoute(contentRoute);
-            if (domainAndUri is not null)
-            {
-                requestedPath = GetContentRoute(domainAndUri, contentRoute);
-                culture ??= domainAndUri.Culture;
-                redirectUrl = _redirectUrlService.GetMostRecentRedirectUrl(requestedPath, culture);
-            }
+            redirectUrl = _redirectUrlService.GetMostRecentRedirectUrl(requestedPath, culture);
         }
 
         IPublishedContent? content = redirectUrl != null

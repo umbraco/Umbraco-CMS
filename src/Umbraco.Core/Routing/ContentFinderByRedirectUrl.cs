@@ -54,7 +54,27 @@ public class ContentFinderByRedirectUrl : IContentFinder
         }
 
         var route = frequest.AbsolutePathDecoded;
-        IRedirectUrl? redirectUrl = await _redirectUrlService.GetMostRecentRedirectUrlAsync(route, frequest.Culture);
+        IRedirectUrl? redirectUrl = null;
+
+        if (frequest.Domain is not null)
+        {
+            var domainRoute = frequest.Domain.ContentId + DomainUtilities.PathRelativeToDomain(frequest.Domain.Uri, frequest.AbsolutePathDecoded);
+            redirectUrl = await _redirectUrlService.GetMostRecentRedirectUrlAsync(domainRoute, frequest.Culture);
+
+            if (redirectUrl is not null)
+            {
+                route = domainRoute;
+            }
+            else if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                _logger.LogDebug("No match for route with domain: {Route}", domainRoute);
+            }
+        }
+
+        if (redirectUrl is null)
+        {
+            redirectUrl = await _redirectUrlService.GetMostRecentRedirectUrlAsync(route, frequest.Culture);
+        }
 
         if (redirectUrl is null)
         {
@@ -63,28 +83,7 @@ public class ContentFinderByRedirectUrl : IContentFinder
                 _logger.LogDebug("No match for route: {Route}", route);
             }
 
-            // Routes under domains can be stored with the integer ID of the content where the domains were defined as the first part of the route,
-            // so if we haven't found a redirect, try using that format too.
-            // See: https://github.com/umbraco/Umbraco-CMS/pull/18160 and https://github.com/umbraco/Umbraco-CMS/pull/18763
-            if (frequest.Domain is not null)
-            {
-                route = frequest.Domain.ContentId + DomainUtilities.PathRelativeToDomain(frequest.Domain.Uri, frequest.AbsolutePathDecoded);
-                redirectUrl = await _redirectUrlService.GetMostRecentRedirectUrlAsync(route, frequest.Culture);
-
-                if (redirectUrl is null)
-                {
-                    if (_logger.IsEnabled(LogLevel.Debug))
-                    {
-                        _logger.LogDebug("No match for route with domain: {Route}", route);
-                    }
-
-                    return false;
-                }
-            }
-            else
-            {
-                return false;
-            }
+            return false;
         }
 
         IPublishedContent? content = umbracoContext.Content?.GetById(redirectUrl.ContentId);
