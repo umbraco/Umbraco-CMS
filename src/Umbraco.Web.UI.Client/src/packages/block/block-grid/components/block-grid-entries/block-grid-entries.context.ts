@@ -218,6 +218,7 @@ export class UmbBlockGridEntriesContext
 							areaKey: this.#areaKey,
 							parentUnique: this.#parentUnique,
 						} as UmbBlockGridWorkspaceOriginData,
+						// TODO: Check if we use this for anything. I think its not possible to configure inline editing for block grid? [NL]
 						createBlockInWorkspace: this._manager.getInlineEditingMode() === false,
 					},
 				};
