@@ -82,95 +82,138 @@ export class UmbImageCropperElement extends UmbLitElement {
 
 		const viewportWidth = this.viewportElement.clientWidth;
 		const viewportHeight = this.viewportElement.clientHeight;
-
-		const viewportAspectRatio = viewportWidth / viewportHeight;
 		const cropAspectRatio = this.value.width / this.value.height;
 
-		// Init variables
-		let maskWidth = 0,
-			maskHeight = 0,
-			imageWidth = 0,
-			imageHeight = 0,
-			imageLeft = 0,
-			imageTop = 0;
+		const { maskWidth, maskHeight, maskLeft, maskTop } = this.#calculateMaskDimensions(
+			viewportWidth,
+			viewportHeight,
+			cropAspectRatio,
+		);
 
-		// NOTE {} are used to keep some variables in scope, preventing them from being used outside.
+		this.#applyMaskStyles(maskWidth, maskHeight, maskLeft, maskTop);
+		this.#calculateImageScales(maskWidth, maskHeight);
 
-		{
-			// Calculate mask size
-			const viewportPadding = 2 * this.#VIEWPORT_PADDING;
-			const availableWidth = viewportWidth - viewportPadding;
-			const availableHeight = viewportHeight - viewportPadding;
+		const { imageWidth, imageHeight, imageLeft, imageTop } = this.#calculateImageDimensionsAndPosition(
+			maskWidth,
+			maskHeight,
+			maskLeft,
+			maskTop,
+			cropAspectRatio,
+		);
 
-			const isCropWider = cropAspectRatio > viewportAspectRatio;
+		this.#applyImageStyles(imageWidth, imageHeight, imageLeft, imageTop);
+		this.#updateZoomLevel(imageWidth, imageHeight);
+	}
 
-			maskWidth = isCropWider ? availableWidth : availableHeight * cropAspectRatio;
-			maskHeight = isCropWider ? availableWidth / cropAspectRatio : availableHeight;
-		}
+	#calculateMaskDimensions(
+		viewportWidth: number,
+		viewportHeight: number,
+		cropAspectRatio: number,
+	): { maskWidth: number; maskHeight: number; maskLeft: number; maskTop: number } {
+		const viewportAspectRatio = viewportWidth / viewportHeight;
+		const viewportPadding = 2 * this.#VIEWPORT_PADDING;
+		const availableWidth = viewportWidth - viewportPadding;
+		const availableHeight = viewportHeight - viewportPadding;
 
-		// Center the mask within the viewport
+		const isCropWider = cropAspectRatio > viewportAspectRatio;
+		const maskWidth = isCropWider ? availableWidth : availableHeight * cropAspectRatio;
+		const maskHeight = isCropWider ? availableWidth / cropAspectRatio : availableHeight;
+
 		const maskLeft = (viewportWidth - maskWidth) / 2;
 		const maskTop = (viewportHeight - maskHeight) / 2;
 
+		return { maskWidth, maskHeight, maskLeft, maskTop };
+	}
+
+	#applyMaskStyles(maskWidth: number, maskHeight: number, maskLeft: number, maskTop: number): void {
 		this.maskElement.style.width = `${maskWidth}px`;
 		this.maskElement.style.height = `${maskHeight}px`;
 		this.maskElement.style.left = `${maskLeft}px`;
 		this.maskElement.style.top = `${maskTop}px`;
+	}
 
-		{
-			// Calculate the scaling factors to fill the mask area while preserving aspect ratio
-			const scaleX = maskWidth / this.imageElement.naturalWidth;
-			const scaleY = maskHeight / this.imageElement.naturalHeight;
-			const scale = Math.max(scaleX, scaleY);
-			this.#minImageScale = scale;
-			this.#maxImageScale = scale * this.#MAX_SCALE_FACTOR;
+	#calculateImageScales(maskWidth: number, maskHeight: number): void {
+		const scaleX = maskWidth / this.imageElement.naturalWidth;
+		const scaleY = maskHeight / this.imageElement.naturalHeight;
+		const scale = Math.max(scaleX, scaleY);
+		this.#minImageScale = scale;
+		this.#maxImageScale = scale * this.#MAX_SCALE_FACTOR;
+	}
+
+	#calculateImageDimensionsAndPosition(
+		maskWidth: number,
+		maskHeight: number,
+		maskLeft: number,
+		maskTop: number,
+		cropAspectRatio: number,
+	): { imageWidth: number; imageHeight: number; imageLeft: number; imageTop: number } {
+		if (this.value!.coordinates) {
+			return this.#calculateImagePositionWithCoordinates(maskWidth, maskHeight, maskLeft, maskTop, cropAspectRatio);
 		}
 
-		// Calculate the image size and position
-		if (this.value.coordinates) {
-			const imageAspectRatio = this.imageElement.naturalWidth / this.imageElement.naturalHeight;
+		return this.#calculateImagePositionWithFocalPoint(maskWidth, maskHeight, maskLeft, maskTop);
+	}
 
-			if (cropAspectRatio > 1) {
-				// Landscape-oriented cropping
-				const cropAmount = this.value.coordinates.x1 + this.value.coordinates.x2;
-				// Use crop amount to extrapolate the image width from the mask width.
-				imageWidth = calculateExtrapolatedValue(maskWidth, cropAmount);
-				imageHeight = imageWidth / imageAspectRatio;
-				// Move the image up and left from the top and left edges of the mask based on the crop coordinates
-				imageLeft = -imageWidth * this.value.coordinates.x1 + maskLeft;
-				imageTop = -imageHeight * this.value.coordinates.y1 + maskTop;
-			} else {
-				// Portrait-oriented cropping
-				const cropAmount = this.value.coordinates.y1 + this.value.coordinates.y2;
-				// Use crop amount to extrapolate the image height from the mask height.
-				imageHeight = calculateExtrapolatedValue(maskHeight, cropAmount);
-				imageWidth = imageHeight * imageAspectRatio;
-				// Move the image up and left from the top and left edges of the mask based on the crop coordinates
-				imageLeft = -imageWidth * this.value.coordinates.x1 + maskLeft;
-				imageTop = -imageHeight * this.value.coordinates.y1 + maskTop;
-			}
+	#calculateImagePositionWithCoordinates(
+		maskWidth: number,
+		maskHeight: number,
+		maskLeft: number,
+		maskTop: number,
+		cropAspectRatio: number,
+	): { imageWidth: number; imageHeight: number; imageLeft: number; imageTop: number } {
+		const imageAspectRatio = this.imageElement.naturalWidth / this.imageElement.naturalHeight;
+		let imageWidth: number;
+		let imageHeight: number;
+
+		if (cropAspectRatio > 1) {
+			// Landscape-oriented cropping
+			const cropAmount = this.value!.coordinates!.x1 + this.value!.coordinates!.x2;
+			imageWidth = calculateExtrapolatedValue(maskWidth, cropAmount);
+			imageHeight = imageWidth / imageAspectRatio;
 		} else {
-			// Set the image size to fill the mask while preserving aspect ratio
-			imageWidth = this.imageElement.naturalWidth * this.#minImageScale;
-			imageHeight = this.imageElement.naturalHeight * this.#minImageScale;
-
-			// position image so that its center is at the focal point (default to center if null)
-			const focalPoint = this.focalPoint ?? { left: 0.5, top: 0.5 };
-			imageLeft = maskLeft + maskWidth / 2 - imageWidth * focalPoint.left;
-			imageTop = maskTop + maskHeight / 2 - imageHeight * focalPoint.top;
-
-			// clamp image position so it stays within the mask
-			const minLeft = maskLeft + maskWidth - imageWidth;
-			const minTop = maskTop + maskHeight - imageHeight;
-			imageLeft = clamp(imageLeft, minLeft, maskLeft);
-			imageTop = clamp(imageTop, minTop, maskTop);
+			// Portrait-oriented cropping
+			const cropAmount = this.value!.coordinates!.y1 + this.value!.coordinates!.y2;
+			imageHeight = calculateExtrapolatedValue(maskHeight, cropAmount);
+			imageWidth = imageHeight * imageAspectRatio;
 		}
 
+		const imageLeft = -imageWidth * this.value!.coordinates!.x1 + maskLeft;
+		const imageTop = -imageHeight * this.value!.coordinates!.y1 + maskTop;
+
+		return { imageWidth, imageHeight, imageLeft, imageTop };
+	}
+
+	#calculateImagePositionWithFocalPoint(
+		maskWidth: number,
+		maskHeight: number,
+		maskLeft: number,
+		maskTop: number,
+	): { imageWidth: number; imageHeight: number; imageLeft: number; imageTop: number } {
+		const imageWidth = this.imageElement.naturalWidth * this.#minImageScale;
+		const imageHeight = this.imageElement.naturalHeight * this.#minImageScale;
+
+		// position image so that its center is at the focal point (default to center if null)
+		const focalPoint = this.focalPoint ?? { left: 0.5, top: 0.5 };
+		let imageLeft = maskLeft + maskWidth / 2 - imageWidth * focalPoint.left;
+		let imageTop = maskTop + maskHeight / 2 - imageHeight * focalPoint.top;
+
+		// clamp image position so it stays within the mask
+		const minLeft = maskLeft + maskWidth - imageWidth;
+		const minTop = maskTop + maskHeight - imageHeight;
+		imageLeft = clamp(imageLeft, minLeft, maskLeft);
+		imageTop = clamp(imageTop, minTop, maskTop);
+
+		return { imageWidth, imageHeight, imageLeft, imageTop };
+	}
+
+	#applyImageStyles(imageWidth: number, imageHeight: number, imageLeft: number, imageTop: number): void {
 		this.imageElement.style.left = `${imageLeft}px`;
 		this.imageElement.style.top = `${imageTop}px`;
 		this.imageElement.style.width = `${imageWidth}px`;
 		this.imageElement.style.height = `${imageHeight}px`;
+	}
 
+	#updateZoomLevel(imageWidth: number, imageHeight: number): void {
 		const currentScaleX = imageWidth / this.imageElement.naturalWidth;
 		const currentScaleY = imageHeight / this.imageElement.naturalHeight;
 		const currentScale = Math.max(currentScaleX, currentScaleY);
