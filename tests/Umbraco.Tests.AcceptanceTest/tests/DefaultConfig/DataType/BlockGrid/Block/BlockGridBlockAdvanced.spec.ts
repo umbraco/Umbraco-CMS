@@ -237,7 +237,6 @@ test('can remove a icon color from a block', async ({umbracoApi, umbracoUi}) => 
 test('can add a thumbnail to a block', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const mediaName = 'TestMedia';
-  await umbracoApi.media.ensureNameNotExists(mediaName);
   const mediaId = await umbracoApi.media.createDefaultMediaWithImage(mediaName);
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
@@ -258,15 +257,18 @@ test('can add a thumbnail to a block', {tag: '@release'}, async ({umbracoApi, um
 
 test.fixme('can remove a thumbnail from a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
+  const mediaName = 'TestMedia';
+  const mediaId = await umbracoApi.media.createDefaultMediaWithImage(mediaName);
+  const mediaUrl = await umbracoApi.media.getFullMediaUrl(mediaId);
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
-  await umbracoApi.dataType.createBlockGridWithABlock(blockGridEditorName, contentElementTypeId);
+  await umbracoApi.dataType.createBlockGridWithAThumbnail(blockGridEditorName, contentElementTypeId, mediaUrl);
 
   // Act
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
   await umbracoUi.dataType.goToBlockAdvancedTab();
-  // TODO: Implement it later
+  await umbracoUi.dataType.clickRemoveBlockThumbnailButton();
 });
 
 // This tests for regression issue: https://github.com/umbraco/Umbraco-CMS/issues/20962
