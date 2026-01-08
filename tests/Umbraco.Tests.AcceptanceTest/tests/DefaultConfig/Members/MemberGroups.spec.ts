@@ -57,6 +57,9 @@ test('can delete a member group', {tag: '@smoke'}, async ({umbracoApi, umbracoUi
 
   // Act
   await umbracoUi.memberGroup.clickMemberGroupLinkByName(memberGroupName);
+  // This wait is currently necessary as the action button is clicked before it is "ready"
+  // TODO: Remove the wait and fix the 'clickActionButton'
+  await umbracoUi.memberGroup.waitForTimeout(ConstantHelper.wait.medium);
   await umbracoUi.memberGroup.clickActionButton();
   await umbracoUi.memberGroup.clickDeleteButton();
   await umbracoUi.memberGroup.clickConfirmToDeleteButtonAndWaitForMemberGroupToBeDeleted();
