@@ -28,6 +28,7 @@ internal static class UserGroupFactory
             userGroup.UpdateDate = dto.UpdateDate.EnsureUtc();
             userGroup.StartContentId = dto.StartContentId;
             userGroup.StartMediaId = dto.StartMediaId;
+            userGroup.StartElementId = dto.StartElementId;
             userGroup.Permissions = dto.UserGroup2PermissionDtos.Select(x => x.Permission).ToHashSet();
             userGroup.HasAccessToAllLanguages = dto.HasAccessToAllLanguages;
             if (dto.UserGroup2AppDtos != null)
@@ -90,6 +91,7 @@ internal static class UserGroupFactory
             Icon = entity.Icon,
             StartMediaId = entity.StartMediaId,
             StartContentId = entity.StartContentId,
+            StartElementId = entity.StartElementId,
             HasAccessToAllLanguages = entity.HasAccessToAllLanguages,
         };
 

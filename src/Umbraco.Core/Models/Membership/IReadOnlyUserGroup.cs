@@ -19,6 +19,8 @@ public interface IReadOnlyUserGroup
 
     int? StartMediaId { get; }
 
+    int? StartElementId { get; }
+
     /// <summary>
     ///     The alias
     /// </summary>

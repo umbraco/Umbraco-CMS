@@ -79,6 +79,15 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
             Constants.Applications.Content,
             Constants.Applications.Media,
             Constants.Applications.Members);
+        AddAllowedApplicationsPolicy(
+            AuthorizationPolicies.SectionAccessForElementTree,
+            Constants.Applications.Content,
+            Constants.Applications.Media,
+            Constants.Applications.Users,
+            Constants.Applications.Settings,
+            Constants.Applications.Packages,
+            Constants.Applications.Members,
+            Constants.Applications.Elements);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.SectionAccessMedia, Constants.Applications.Media);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.SectionAccessMembers, Constants.Applications.Members);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.SectionAccessPackages, Constants.Applications.Packages);
@@ -89,6 +98,7 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
         AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessDictionary, Constants.Applications.Translation);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessDictionaryOrTemplates, Constants.Applications.Translation, Constants.Applications.Settings);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessDocuments, Constants.Applications.Content);
+        AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessElements, Constants.Applications.Elements);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessDocumentsOrDocumentTypes, Constants.Applications.Content, Constants.Applications.Settings);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessDocumentOrMediaOrContentTypes, Constants.Applications.Content, Constants.Applications.Settings, Constants.Applications.Media);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessDocumentsOrMediaOrMembersOrContentTypes, Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members, Constants.Applications.Settings);

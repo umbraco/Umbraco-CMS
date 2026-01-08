@@ -18,6 +18,7 @@ public class AddElements : AsyncMigrationBase
         EnsureElementTreeLock();
         EnsureElementTables();
         EnsureElementRecycleBin();
+        EnsureElementStartNodeColumn();
         return Task.CompletedTask;
     }
 
@@ -81,5 +82,16 @@ public class AddElements : AsyncMigrationBase
                 NodeObjectType = Constants.ObjectTypes.ElementRecycleBin,
                 CreateDate = DateTime.UtcNow,
             });
+    }
+
+    private void EnsureElementStartNodeColumn()
+    {
+        var columns = SqlSyntax.GetColumnsInSchema(Context.Database).ToList();
+
+        if (columns.Any(x => x.TableName.InvariantEquals(Constants.DatabaseSchema.Tables.UserGroup)
+                             && x.ColumnName.InvariantEquals("startElementId")) == false)
+        {
+            AddColumn<UserGroupDto>(Constants.DatabaseSchema.Tables.UserGroup, "startElementId");
+        }
     }
 }

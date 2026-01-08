@@ -38,6 +38,7 @@ public class User : EntityBase, IUser, IProfile
     private int _sessionTimeout;
     private int[]? _startContentIds;
     private int[]? _startMediaIds;
+    private int[]? _startElementIds;
     private HashSet<IReadOnlyUserGroup> _userGroups;
 
     private string _username;
@@ -55,6 +56,7 @@ public class User : EntityBase, IUser, IProfile
         _isLockedOut = false;
         _startContentIds = [];
         _startMediaIds = [];
+        _startElementIds = [];
 
         // cannot be null
         _rawPasswordValue = string.Empty;
@@ -103,11 +105,13 @@ public class User : EntityBase, IUser, IProfile
         _isLockedOut = false;
         _startContentIds = [];
         _startMediaIds = [];
+        _startElementIds = [];
     }
 
     /// <summary>
     ///     Constructor for creating a new User instance for an existing user
     /// </summary>
+    /// <param name="globalSettings"></param>
     /// <param name="id"></param>
     /// <param name="name"></param>
     /// <param name="email"></param>
@@ -117,7 +121,7 @@ public class User : EntityBase, IUser, IProfile
     /// <param name="userGroups"></param>
     /// <param name="startContentIds"></param>
     /// <param name="startMediaIds"></param>
-    /// <param name="globalSettings"></param>
+    /// <param name="startElementIds"></param>
     public User(
         GlobalSettings globalSettings,
         int id,
@@ -128,7 +132,8 @@ public class User : EntityBase, IUser, IProfile
         string? passwordConfig,
         IEnumerable<IReadOnlyUserGroup> userGroups,
         int[] startContentIds,
-        int[] startMediaIds)
+        int[] startMediaIds,
+        int[] startElementIds)
         : this(globalSettings)
     {
         // we allow whitespace for this value so just check null
@@ -163,6 +168,7 @@ public class User : EntityBase, IUser, IProfile
         _isLockedOut = false;
         _startContentIds = startContentIds ?? throw new ArgumentNullException(nameof(startContentIds));
         _startMediaIds = startMediaIds ?? throw new ArgumentNullException(nameof(startMediaIds));
+        _startElementIds = startElementIds ?? throw new ArgumentNullException(nameof(startElementIds));
     }
 
     [DataMember]
@@ -351,6 +357,20 @@ public class User : EntityBase, IUser, IProfile
         set => SetPropertyValueAndDetectChanges(value, ref _startMediaIds, nameof(StartMediaIds), IntegerEnumerableComparer);
     }
 
+    /// <summary>
+    ///     Gets or sets the start element ids.
+    /// </summary>
+    /// <value>
+    ///     The start element ids.
+    /// </value>
+    [DataMember]
+    [DoNotClone]
+    public int[]? StartElementIds
+    {
+        get => _startElementIds;
+        set => SetPropertyValueAndDetectChanges(value, ref _startElementIds, nameof(StartElementIds), IntegerEnumerableComparer);
+    }
+
     [DataMember]
     public string? Language
     {
@@ -417,6 +437,7 @@ public class User : EntityBase, IUser, IProfile
         // manually clone the start node props
         clonedEntity._startContentIds = _startContentIds?.ToArray();
         clonedEntity._startMediaIds = _startMediaIds?.ToArray();
+        clonedEntity._startElementIds = _startElementIds?.ToArray();
 
         // need to create new collections otherwise they'll get copied by ref
         clonedEntity._userGroups = new HashSet<IReadOnlyUserGroup>(_userGroups);

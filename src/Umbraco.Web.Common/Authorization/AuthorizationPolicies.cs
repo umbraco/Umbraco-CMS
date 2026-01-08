@@ -31,9 +31,11 @@ public static class AuthorizationPolicies
     public const string SectionAccessForMemberTree = nameof(SectionAccessForMemberTree);
     public const string SectionAccessForMediaTree = nameof(SectionAccessForMediaTree);
     public const string SectionAccessForContentTree = nameof(SectionAccessForContentTree);
+    public const string SectionAccessForElementTree = nameof(SectionAccessForElementTree);
 
     // Single tree access
     public const string TreeAccessDocuments = nameof(TreeAccessDocuments);
+    public const string TreeAccessElements = nameof(TreeAccessElements);
     public const string TreeAccessPartialViews = nameof(TreeAccessPartialViews);
     public const string TreeAccessDataTypes = nameof(TreeAccessDataTypes);
     public const string TreeAccessWebhooks = nameof(TreeAccessWebhooks);
