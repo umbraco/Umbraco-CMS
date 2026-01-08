@@ -44,18 +44,34 @@ export interface UmbTableColumnLayoutElement extends HTMLElement {
 export interface UmbTableConfig {
 	allowSelection: boolean;
 	selectOnly?: boolean;
+	allowSelectAll?: boolean;
+	selectableFilter?(item: UmbTableItem): boolean;
 	hideIcon?: boolean;
 }
 
 export class UmbTableSelectedEvent extends Event {
-	public constructor() {
+	#itemId: string | undefined;
+
+	public constructor(args?: { itemId?: string }) {
 		super('selected', { bubbles: true, composed: true });
+		this.#itemId = args?.itemId;
+	}
+
+	public getItemId() {
+		return this.#itemId;
 	}
 }
 
 export class UmbTableDeselectedEvent extends Event {
-	public constructor() {
+	#itemId: string | undefined;
+
+	public constructor(args?: { itemId: string }) {
 		super('deselected', { bubbles: true, composed: true });
+		this.#itemId = args?.itemId;
+	}
+
+	public getItemId() {
+		return this.#itemId;
 	}
 }
 
@@ -220,12 +236,20 @@ export class UmbTableElement extends UmbLitElement {
 	}
 
 	private _selectAllRows() {
+		if (this.config.allowSelectAll === false) {
+			throw new Error('Select all is not allowed in the current table configuration.');
+		}
+
 		this.selection = this.items.map((item: UmbTableItem) => item.id);
 		this._selectionMode = true;
 		this.dispatchEvent(new UmbTableSelectedEvent());
 	}
 
 	private _deselectAllRows() {
+		if (this.config.allowSelectAll === false) {
+			throw new Error('Select all is not allowed in the current table configuration.');
+		}
+
 		this.selection = [];
 		this._selectionMode = false;
 		this.dispatchEvent(new UmbTableDeselectedEvent());
@@ -234,13 +258,13 @@ export class UmbTableElement extends UmbLitElement {
 	private _selectRow(key: string) {
 		this.selection = [...this.selection, key];
 		this._selectionMode = this.selection.length > 0;
-		this.dispatchEvent(new UmbTableSelectedEvent());
+		this.dispatchEvent(new UmbTableSelectedEvent({ itemId: key }));
 	}
 
 	private _deselectRow(key: string) {
 		this.selection = this.selection.filter((selectionKey) => selectionKey !== key);
 		this._selectionMode = this.selection.length > 0;
-		this.dispatchEvent(new UmbTableDeselectedEvent());
+		this.dispatchEvent(new UmbTableDeselectedEvent({ itemId: key }));
 	}
 
 	override render() {
@@ -283,7 +307,7 @@ export class UmbTableElement extends UmbLitElement {
 		return html`
 			<uui-table-head-cell style="--uui-table-cell-padding: 0; text-align: center;">
 				${when(
-					this.config.allowSelection,
+					this.config.allowSelection && this.config.allowSelectAll !== false,
 					() => html`
 						<uui-checkbox
 							aria-label=${this.localize.term('general_selectAll')}
