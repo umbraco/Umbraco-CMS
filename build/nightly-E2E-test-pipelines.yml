@@ -347,7 +347,7 @@ stages:
       - job:
         displayName: E2E Tests (SQLite)
         timeoutInMinutes: 180
-        condition: ${{ and(eq(parameters.skipDefaultConfigAcceptanceTests, false), eq(parameters.sqliteAcceptanceTests, false) }}
+        condition: ${{ and(eq(parameters.skipDefaultConfigAcceptanceTests, false), eq(parameters.sqliteAcceptanceTests, false)) }}
         variables:
           # Connection string
           CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=Umbraco;Mode=Memory;Cache=Shared;Foreign Keys=True;Pooling=True
