@@ -25,10 +25,9 @@ test('can add option', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.dataType.clickAddOptionButton();
   await umbracoUi.dataType.enterOptionName(optionName);
-  await umbracoUi.dataType.clickSaveButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'items', [optionName])).toBeTruthy();
 });
 
@@ -40,7 +39,7 @@ test('can remove option', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.dataType.removeOptionByName(removedOptionName);
-  await umbracoUi.dataType.clickSaveButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
   const customDataTypeData = await umbracoApi.dataType.getByName(customDataTypeName);
@@ -56,10 +55,9 @@ test('can update option', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.dataType.enterOptionName(updatedOptionName);
-  await umbracoUi.dataType.clickSaveButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'items', [updatedOptionName])).toBeTruthy();
 });
 
