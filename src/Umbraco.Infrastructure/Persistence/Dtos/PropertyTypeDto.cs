@@ -14,7 +14,7 @@ internal class PropertyTypeDto
     public const string PrimaryKeyName = Constants.DatabaseSchema.PrimaryKeyNameId;
     public const string DataTypeIdName = "dataTypeId";
     public const string ContentTypeIdName = "contentTypeId";
-    public const string PorpertyTypeGroupIdName = "propertyTypeGroupId";
+    public const string PropertyTypeGroupIdName = "propertyTypeGroupId";
 
     private string? _alias;
 
@@ -30,7 +30,7 @@ internal class PropertyTypeDto
     [ForeignKey(typeof(ContentTypeDto), Column = ContentTypeDto.NodeIdName)]
     public int ContentTypeId { get; set; }
 
-    [Column(PorpertyTypeGroupIdName)]
+    [Column(PropertyTypeGroupIdName)]
     [NullSetting(NullSetting = NullSettings.Null)]
     [ForeignKey(typeof(PropertyTypeGroupDto))]
     public int? PropertyTypeGroupId { get; set; }
