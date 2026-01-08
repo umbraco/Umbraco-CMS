@@ -11,15 +11,16 @@ internal sealed class ContentTypeAllowedContentTypeDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.ContentChildType;
     public const string PrimaryKeyName = Constants.DatabaseSchema.PrimaryKeyNameId;
+    public const string NodeIdColumnName = Constants.DatabaseSchema.NodeIdName;
     public const string AllowedIdName = "AllowedId";
 
     [Column(PrimaryKeyName)]
-    [ForeignKey(typeof(ContentTypeDto), Name = "FK_cmsContentTypeAllowedContentType_cmsContentType", Column = "nodeId")]
-    [PrimaryKeyColumn(AutoIncrement = false, Clustered = true, Name = "PK_cmsContentTypeAllowedContentType", OnColumns = $"{PrimaryKeyName}, AllowedId")]
+    [ForeignKey(typeof(ContentTypeDto), Name = "FK_cmsContentTypeAllowedContentType_cmsContentType", Column = NodeIdColumnName)]
+    [PrimaryKeyColumn(AutoIncrement = false, Clustered = true, Name = "PK_cmsContentTypeAllowedContentType", OnColumns = $"{PrimaryKeyName}, {AllowedIdName}")]
     public int Id { get; set; }
 
     [Column(AllowedIdName)]
-    [ForeignKey(typeof(ContentTypeDto), Name = "FK_cmsContentTypeAllowedContentType_cmsContentType1", Column = "nodeId")]
+    [ForeignKey(typeof(ContentTypeDto), Name = "FK_cmsContentTypeAllowedContentType_cmsContentType1", Column = NodeIdColumnName)]
     public int AllowedId { get; set; }
 
     [Column("SortOrder")]

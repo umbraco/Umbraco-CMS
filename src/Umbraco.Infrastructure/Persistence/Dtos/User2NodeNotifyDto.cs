@@ -12,9 +12,10 @@ internal sealed class User2NodeNotifyDto
     public const string TableName = Constants.DatabaseSchema.Tables.User2NodeNotify;
     public const string PrimaryKeyName = "userId";
     public const string NodeIdColumnName = Constants.DatabaseSchema.NodeIdName;
+    public const string ActionColumnName = "action";
 
     [Column(PrimaryKeyName)]
-    [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_umbracoUser2NodeNotify", OnColumns = $"{PrimaryKeyName}, nodeId, action")]
+    [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_umbracoUser2NodeNotify", OnColumns = $"{PrimaryKeyName}, {NodeIdColumnName}, {ActionColumnName}")]
     [ForeignKey(typeof(UserDto))]
     public int UserId { get; set; }
 
@@ -22,7 +23,7 @@ internal sealed class User2NodeNotifyDto
     [ForeignKey(typeof(NodeDto))]
     public int NodeId { get; set; }
 
-    [Column("action")]
+    [Column(ActionColumnName)]
     [Length(255)]
     public string? Action { get; set; }
 }

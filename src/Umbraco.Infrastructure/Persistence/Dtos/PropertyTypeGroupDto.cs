@@ -43,6 +43,6 @@ internal sealed class PropertyTypeGroupDto
     public int SortOrder { get; set; }
 
     [ResultColumn]
-    [Reference(ReferenceType.Many, ReferenceMemberName = PropertyTypeDto.PorpertyTypeGroupIdName)]
+    [Reference(ReferenceType.Many, ReferenceMemberName = PropertyTypeDto.PropertyTypeGroupIdName)]
     public List<PropertyTypeDto> PropertyTypeDtos { get; set; } = [];
 }
