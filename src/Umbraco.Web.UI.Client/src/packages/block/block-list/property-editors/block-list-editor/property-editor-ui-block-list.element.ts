@@ -105,8 +105,7 @@ export class UmbPropertyEditorUIBlockListElement
 		const blocks = config.getValueByAlias<Array<UmbBlockTypeBaseModel>>('blocks') ?? [];
 		this.#managerContext.setBlockTypes(blocks);
 
-		this._useInlineEditingAsDefault = config.getValueByAlias<boolean>('useInlineEditingAsDefault');
-		this.#managerContext.setInlineEditingMode(this._useInlineEditingAsDefault);
+		this.#managerContext.setInlineEditingMode(config.getValueByAlias<boolean>('useInlineEditingAsDefault'));
 		this.style.maxWidth = config.getValueByAlias<string>('maxPropertyWidth') ?? '';
 
 		this.#managerContext.setEditorConfiguration(config);
@@ -173,9 +172,6 @@ export class UmbPropertyEditorUIBlockListElement
 
 	@state()
 	private _isSortMode = false;
-
-	@state()
-	private _useInlineEditingAsDefault?: boolean;
 
 	constructor() {
 		super();
@@ -425,31 +421,14 @@ export class UmbPropertyEditorUIBlockListElement
 		return html`
 			<uui-button-inline-create
 				label=${this._createButtonLabel}
-				href=${this._catalogueRouteBuilder?.({ view: 'create', index: index }) ?? ''}>
+				href=${this.#entriesContext.getPathForCreateBlock(index) ?? ''}>
 			</uui-button-inline-create>
 		`;
 	}
 
-	#getPathForCreateBlock(index: number): string | undefined {
-		if (this._blocks?.length === 1) {
-			const elementKey = this._blocks[0].contentElementTypeKey;
-			if (this._useInlineEditingAsDefault) {
-				return undefined;
-			} else {
-				return (
-					this._catalogueRouteBuilder?.({ view: 'create', index: index }) +
-					'modal/umb-modal-workspace/create/' +
-					elementKey
-				);
-			}
-		} else {
-			return this._catalogueRouteBuilder?.({ view: 'create', index: index });
-		}
-	}
-
 	#renderCreateButton() {
 		if (!this._catalogueRouteBuilder) return nothing;
-		const createPath = this.#getPathForCreateBlock(-1);
+		const createPath = this.#entriesContext.getPathForCreateBlock(-1);
 		return html`
 			<uui-button
 				look="placeholder"
@@ -457,7 +436,11 @@ export class UmbPropertyEditorUIBlockListElement
 				href=${ifDefined(createPath)}
 				?disabled=${this.readonly}
 				@click=${async () => {
-					if (this._blocks?.length === 1 && this._useInlineEditingAsDefault) {
+					// If no path, then we can conclude there is not modal flow for the user to follow, instead we will just insert the Block: [NL]
+					if (createPath === undefined) {
+						if (!this._blocks || this._blocks.length === 0) {
+							throw new Error('No block types are configured for this Block List property editor');
+						}
 						const originData = { index: -1 };
 						const created = await this.#entriesContext.create(this._blocks[0].contentElementTypeKey, {}, originData);
 						if (created) {
