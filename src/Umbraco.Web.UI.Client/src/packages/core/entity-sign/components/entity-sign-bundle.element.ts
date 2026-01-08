@@ -176,9 +176,7 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 				left: 19px;
 				margin-left: -6px;
 				background-color: transparent;
-				padding: var(--uui-size-2);
-				padding-left: var(--uui-size-3);
-				padding-right: var(--uui-size-3);
+				padding: var(--uui-size-2) var(--uui-size-3);
 				font-size: 8px;
 				clip-path: inset(-10px calc(100% - 30px) calc(100% - 10px) -20px);
 				transition:
