@@ -35,7 +35,6 @@ export class UmbCollectionSelectionManager<
 		/* In collection we want to enable select-only mode when selecting an item so we don't accidentally navigate away. */
 		this.setSelectOnly(true);
 		super.select(unique);
-		console.log('select in selection manager', unique);
 	}
 
 	/**
