@@ -168,7 +168,7 @@ public abstract class RecycleBinControllerBase<TItem> : ContentControllerBase
                 after,
                 out totalBefore,
                 out totalAfter,
-                ordering: Ordering.By(nameof(Infrastructure.Persistence.Dtos.NodeDto.Text)))
+                ordering: Ordering.By(Infrastructure.Persistence.Dtos.NodeDto.TextColumnName))
             .ToArray();
 
     /// <summary>
