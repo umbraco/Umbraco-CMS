@@ -1,11 +1,8 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
-using System.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Models;
@@ -16,7 +13,6 @@ using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
@@ -902,6 +898,66 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         Assert.That(added, Is.True);
         Assert.Throws<InvalidCompositionException>(() => ContentTypeService.Save(composition));
         Assert.DoesNotThrow(() => ContentTypeService.Get("simpleChildPage"));
+    }
+
+    [Test]
+    public void Cannot_Add_Composition_With_Conflicting_Property_Type_Alias()
+    {
+        // Arrange - create a content type with a "title" property
+        var contentType = ContentTypeBuilder.CreateBasicContentType();
+        var titlePropertyType = new PropertyType(
+            ShortStringHelper,
+            Constants.PropertyEditors.Aliases.TextBox,
+            ValueStorageType.Nvarchar,
+            "title")
+        {
+            Name = "Title",
+            Description = string.Empty,
+            Mandatory = false,
+            SortOrder = 1,
+            DataTypeId = -88
+        };
+        contentType.AddPropertyType(titlePropertyType, "content", "Content");
+        ContentTypeService.Save(contentType);
+
+        // Create a composition that also has a "title" property
+        var composition = ContentTypeBuilder.CreateContentMetaContentType(); // Has "title" property
+        ContentTypeService.Save(composition);
+
+        // Act & Assert - adding the composition should throw because "title" already exists
+        Assert.Throws<InvalidCompositionException>(() => contentType.AddContentType(composition));
+    }
+
+    [Test]
+    public void Can_Add_Composition_With_Conflicting_Property_Type_Alias_When_Alias_Is_Being_Removed()
+    {
+        // Arrange - create a content type with a "title" property
+        var contentType = ContentTypeBuilder.CreateBasicContentType();
+        var titlePropertyType = new PropertyType(
+            ShortStringHelper,
+            Constants.PropertyEditors.Aliases.TextBox,
+            ValueStorageType.Nvarchar,
+            "title")
+        {
+            Name = "Title",
+            Description = string.Empty,
+            Mandatory = false,
+            SortOrder = 1,
+            DataTypeId = -88
+        };
+        contentType.AddPropertyType(titlePropertyType, "content", "Content");
+        ContentTypeService.Save(contentType);
+
+        // Create a composition that also has a "title" property
+        var composition = ContentTypeBuilder.CreateContentMetaContentType(); // Has "title" property
+        ContentTypeService.Save(composition);
+
+        // Act - adding the composition with "title" in removedPropertyAliases should succeed
+        var result = contentType.AddContentType(composition, ["title"]);
+
+        // Assert
+        Assert.That(result, Is.True);
+        Assert.That(contentType.ContentTypeCompositionExists(composition.Alias), Is.True);
     }
 
     [Test]
