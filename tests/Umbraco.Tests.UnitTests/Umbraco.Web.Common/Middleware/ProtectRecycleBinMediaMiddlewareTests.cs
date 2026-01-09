@@ -37,7 +37,7 @@ public class ProtectRecycleBinMediaMiddlewareTests
         var optionsMonitorMock = new Mock<IOptionsMonitor<ContentSettings>>();
         optionsMonitorMock.Setup(x => x.CurrentValue).Returns(_contentSettings);
 
-        _middleware = new ProtectRecycleBinMediaMiddleware(optionsMonitorMock.Object, _userServiceMock.Object);
+        _middleware = new ProtectRecycleBinMediaMiddleware(_userServiceMock.Object, optionsMonitorMock.Object);
     }
 
     private HttpContext CreateHttpContext(string? path)
