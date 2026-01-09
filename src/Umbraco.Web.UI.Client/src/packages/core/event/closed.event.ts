@@ -6,3 +6,9 @@ export class UmbClosedEvent extends Event {
 		super(UmbClosedEvent.TYPE, { bubbles: false, composed: false, cancelable: false });
 	}
 }
+
+declare global {
+	interface GlobalEventHandlersEventMap {
+		[UmbClosedEvent.TYPE]: UmbClosedEvent;
+	}
+}
