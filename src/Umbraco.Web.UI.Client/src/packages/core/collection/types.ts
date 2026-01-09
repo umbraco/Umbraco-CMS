@@ -7,6 +7,7 @@ import type { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 export type * from './action/create/types.js';
 export type * from './collection-item-picker-modal/types.js';
 export type * from './conditions/types.js';
+export type * from './filter/types.js';
 export type * from './extensions/types.js';
 export type * from './item/types.js';
 export type * from './menu/types.js';

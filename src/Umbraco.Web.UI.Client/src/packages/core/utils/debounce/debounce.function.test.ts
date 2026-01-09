@@ -35,4 +35,24 @@ describe('debounce', () => {
 
 		expect(count).to.equal(5);
 	});
+
+	it('should not call the function when cancelled', async () => {
+		let count = 0;
+		const debounced = debounce((value: number) => (count = value), 100);
+
+		debounced(1);
+		debounced(2);
+		debounced(3);
+
+		// Verify count is still 0 (debounce hasn't fired yet)
+		expect(count).to.equal(0);
+
+		// Clear the pending timeout
+		debounced.cancel();
+
+		await new Promise((resolve) => setTimeout(resolve, 200));
+
+		// Verify count is still 0 - proving the cancel prevented the execution
+		expect(count).to.equal(0);
+	});
 });
