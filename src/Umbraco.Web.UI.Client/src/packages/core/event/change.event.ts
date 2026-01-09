@@ -6,9 +6,3 @@ export class UmbChangeEvent extends Event {
 		super(UmbChangeEvent.TYPE, { bubbles: true, composed: false, cancelable: false });
 	}
 }
-
-declare global {
-	interface GlobalEventHandlersEventMap {
-		[UmbChangeEvent.TYPE]: UmbChangeEvent;
-	}
-}
