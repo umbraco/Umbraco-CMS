@@ -7,6 +7,7 @@ import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repositor
 import type { UmbUniqueItemModel } from '@umbraco-cms/backoffice/models';
 
 import '@umbraco-cms/backoffice/entity-item';
+import type { UmbTreeItemModel } from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-input-member-type')
 export class UmbInputMemberTypeElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
@@ -105,9 +106,14 @@ export class UmbInputMemberTypeElement extends UmbFormControlMixin<string | unde
 		return undefined;
 	}
 
+	#getPickableFilter() {
+		return (x: UmbTreeItemModel) => !x.isFolder;
+	}
+
 	#openPicker() {
 		this.#pickerContext.openPicker({
 			hideTreeRoot: true,
+			pickableFilter: this.#getPickableFilter(),
 		});
 	}
 
