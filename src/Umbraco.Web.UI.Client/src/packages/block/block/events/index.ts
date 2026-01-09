@@ -1,1 +1,1 @@
-export * from './block-created.event.js';
+export * from './block-inserted.event.js';

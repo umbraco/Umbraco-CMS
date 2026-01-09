@@ -3,7 +3,7 @@ import type { UmbBlockListLayoutModel, UmbBlockListWorkspaceOriginData } from '.
 import {
 	UMB_BLOCK_ENTRIES_CONTEXT,
 	UMB_BLOCK_WORKSPACE_ALIAS,
-	UmbBlockCreatedEvent,
+	UmbBlockInsertedEvent,
 } from '@umbraco-cms/backoffice/block';
 import { css, customElement, html, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbExtensionApiInitializer, UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-api';
@@ -79,10 +79,10 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 
 		this.consumeContext(UMB_BLOCK_ENTRIES_CONTEXT, (entries) => {
 			if (this.#entriesContext) {
-				this.#entriesContext.removeEventListener(UmbBlockCreatedEvent.TYPE, this.#onBlockCreated);
+				this.#entriesContext.removeEventListener(UmbBlockInsertedEvent.TYPE, this.#onBlockInserted);
 			}
 			this.#entriesContext = entries;
-			this.#entriesContext?.addEventListener(UmbBlockCreatedEvent.TYPE, this.#onBlockCreated);
+			this.#entriesContext?.addEventListener(UmbBlockInsertedEvent.TYPE, this.#onBlockInserted);
 		});
 
 		// Block the access to the View Context for this inline block workspace: [NL]
@@ -148,8 +148,8 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 		this.#workspaceContext.load(this.#contentKey);
 	}
 
-	#onBlockCreated = (event: Event) => {
-		const blockEvent = event as UmbBlockCreatedEvent<UmbBlockListLayoutModel, UmbBlockListWorkspaceOriginData>;
+	#onBlockInserted = (event: Event) => {
+		const blockEvent = event as UmbBlockInsertedEvent<UmbBlockListLayoutModel, UmbBlockListWorkspaceOriginData>;
 		if (blockEvent.detail.layout.contentKey !== this.#contentKey) return;
 		this._isOpen = true;
 	};
