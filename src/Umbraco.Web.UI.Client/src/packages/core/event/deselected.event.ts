@@ -8,3 +8,9 @@ export class UmbDeselectedEvent extends Event {
 		this.unique = unique;
 	}
 }
+
+declare global {
+	interface GlobalEventHandlersEventMap {
+		[UmbDeselectedEvent.TYPE]: UmbDeselectedEvent;
+	}
+}
