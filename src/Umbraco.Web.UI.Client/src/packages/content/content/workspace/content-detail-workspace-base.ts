@@ -964,7 +964,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 		await this.runMandatoryValidationForSaveData(saveData, variantIds);
 		if (this.#validateOnSubmit) {
-			console.log('we nare here..');
 			await this.askServerToValidate(saveData, variantIds);
 			const valid = await this._validateVariantsAndLog(variantIds).then(
 				() => true,
@@ -978,6 +977,14 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		} else {
 			await this.performCreateOrUpdate(variantIds, saveData);
 		}
+	}
+
+	public validateVariantsAndSubmit(
+		variantIds: Array<UmbVariantId>,
+		onValid: () => Promise<void>,
+		onInvalid: (reason?: any) => Promise<void>,
+	): Promise<void> {
+		return this._validateByAndSubmit(() => this._validateVariantsAndLog(variantIds), onValid, onInvalid);
 	}
 
 	protected async _validateVariantsAndLog(variantIds?: Array<UmbVariantId>): Promise<void> {
