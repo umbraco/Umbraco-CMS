@@ -1,3 +1,4 @@
+import { UmbManagementApiPartialViewItemDataCacheInvalidationManager } from './partial-view-item.server.cache-invalidation.manager.js';
 import { UmbPartialViewItemStore } from './partial-view-item.store.js';
 
 export const UMB_PARTIAL_VIEW_ITEM_REPOSITORY_ALIAS = 'Umb.Repository.PartialView.Item';
@@ -15,5 +16,11 @@ export const manifests: Array<UmbExtensionManifest> = [
 		alias: 'Umb.ItemStore.PartialView',
 		name: 'Partial View Item Store',
 		api: UmbPartialViewItemStore,
+	},
+	{
+		name: 'Partial View Backoffice Cache Invalidation Manager',
+		alias: 'Umb.EntryPoint.PartialView',
+		type: 'globalContext',
+		api: UmbManagementApiPartialViewItemDataCacheInvalidationManager,
 	},
 ];

@@ -6,10 +6,4 @@ export const manifests: Array<UmbExtensionManifest> = [
 	...propertyEditorManifests,
 	...treeManifests,
 	...repositoryManifests,
-	{
-		name: 'Static File Backoffice Entry Point',
-		alias: 'Umb.EntryPoint.StaticFile',
-		type: 'backofficeEntryPoint',
-		js: () => import('./entry-point.js'),
-	},
 ];

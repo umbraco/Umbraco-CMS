@@ -8,10 +8,4 @@ export const manifests: Array<UmbExtensionManifest> = [
 	...webhookEventManifests,
 	...webhookManifests,
 	...webhookRootManifests,
-	{
-		name: 'Webhook Backoffice Entry Point',
-		alias: 'Umb.EntryPoint.Webhook',
-		type: 'backofficeEntryPoint',
-		js: () => import('./entry-point.js'),
-	},
 ];

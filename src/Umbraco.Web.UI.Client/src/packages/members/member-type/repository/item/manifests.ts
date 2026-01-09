@@ -1,3 +1,4 @@
+import { UmbManagementApiMemberTypeItemDataCacheInvalidationManager } from './member-type-item.server.cache-invalidation.manager.js';
 import { UmbMemberTypeItemStore } from './member-type-item.store.js';
 
 export const UMB_MEMBER_TYPE_ITEM_REPOSITORY_ALIAS = 'Umb.Repository.MemberTypeItem';
@@ -15,5 +16,11 @@ export const manifests: Array<UmbExtensionManifest> = [
 		alias: UMB_MEMBER_TYPE_STORE_ALIAS,
 		name: 'Member Type Item Store',
 		api: UmbMemberTypeItemStore,
+	},
+	{
+		name: 'Member Type Backoffice Cache Invalidation Manager',
+		alias: 'Umb.EntryPoint.MemberType',
+		type: 'globalContext',
+		api: UmbManagementApiMemberTypeItemDataCacheInvalidationManager,
 	},
 ];
