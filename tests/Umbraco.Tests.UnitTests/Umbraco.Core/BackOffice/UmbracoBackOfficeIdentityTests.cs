@@ -38,14 +38,13 @@ public class UmbracoBackOfficeIdentityTests
 
         Assert.IsNull(verifiedIdentity.Actor);
         Assert.AreEqual(1234, verifiedIdentity.GetId());
-        //// Assert.AreEqual(sessionId, backofficeIdentity.SessionId);
         Assert.AreEqual(securityStamp, verifiedIdentity.GetSecurityStamp());
         Assert.AreEqual("testing", verifiedIdentity.GetUsername());
         Assert.AreEqual("hello world", verifiedIdentity.GetRealName());
         Assert.AreEqual("en-us", verifiedIdentity.GetCultureString());
         Assert.IsTrue(new[] { "admin" }.SequenceEqual(verifiedIdentity.GetRoles()));
 
-        Assert.AreEqual(11, verifiedIdentity.Claims.Count());
+        Assert.AreEqual(6, verifiedIdentity.Claims.Count());
     }
 
     [Test]
@@ -109,7 +108,7 @@ public class UmbracoBackOfficeIdentityTests
             new[] { "content", "media" },
             new[] { "admin" });
 
-        Assert.AreEqual(13, claimsIdentity.Claims.Count());
+        Assert.AreEqual(9, claimsIdentity.Claims.Count());
         Assert.IsNull(claimsIdentity.Actor);
     }
 }

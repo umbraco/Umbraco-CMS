@@ -49,6 +49,6 @@ internal sealed class ConfigureMiniProfilerOptions(IHostingEnvironment hostingEn
             return false;
         }
 
-        return user.AllowedSections.Contains(Core.Constants.Applications.Settings) == true;
+        return user.AllowedSections.Contains(Core.Constants.Applications.Settings);
     }
 }
