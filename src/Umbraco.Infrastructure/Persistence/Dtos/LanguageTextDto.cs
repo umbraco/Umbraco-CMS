@@ -12,7 +12,7 @@ public class LanguageTextDto
     public const string TableName = Constants.DatabaseSchema.Tables.DictionaryValue;
     public const string PrimaryKeyName = Constants.DatabaseSchema.Columns.PrimaryKeyNamePk;
     public const string LanguageIdName = "languageId";
-    public const string UniqueIdName = Constants.DatabaseSchema.Columns.UniqueIdName;
+    public const string UniqueIdName = "UniqueId";
 
     [Column(PrimaryKeyName)]
     [PrimaryKeyColumn]
