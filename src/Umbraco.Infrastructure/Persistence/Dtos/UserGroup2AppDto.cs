@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 public class UserGroup2AppDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.UserGroup2App;
-    public const string PrimaryKeyName = "userGroupId"; // Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
+    public const string PrimaryKeyName = "userGroupId";
     public const string AppAliasName = "app";
 
     [Column(PrimaryKeyName)]
