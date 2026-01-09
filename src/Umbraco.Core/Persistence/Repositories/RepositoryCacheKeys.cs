@@ -1,4 +1,4 @@
-using System.Runtime.InteropServices;
+using System.Collections.Concurrent;
 
 namespace Umbraco.Cms.Core.Persistence.Repositories;
 
@@ -8,33 +8,25 @@ namespace Umbraco.Cms.Core.Persistence.Repositories;
 public static class RepositoryCacheKeys
 {
     /// <summary>
-    /// A cache for the keys we don't keep allocating strings.
+    /// A thread-safe cache for the keys so we don't keep allocating strings.
     /// </summary>
-    private static readonly Dictionary<Type, string> Keys = new();
+    private static readonly ConcurrentDictionary<Type, string> _keys = new();
 
     /// <summary>
     /// Gets the repository cache key for the provided type.
     /// </summary>
+    /// <typeparam name="T">The entity type to get the cache key for.</typeparam>
+    /// <returns>A cache key string in the format "uRepo_{TypeName}_".</returns>
     public static string GetKey<T>()
-    {
-        Type type = typeof(T);
-
-        // The following code is a micro-optimization to avoid an unnecessary lookup in the Keys dictionary, when writing the newly created key.
-        // Previously, the code was:
-        //   return Keys.TryGetValue(type, out var key)
-        //     ? key
-        //     : Keys[type] = "uRepo_" + type.Name + "_";
-
-        // Look up the existing value or get a reference to the newly created default value.
-        ref string? key = ref CollectionsMarshal.GetValueRefOrAddDefault(Keys, type, out _);
-
-        // As we have the reference, we can just assign it if null, without the expensive write back to the dictionary.
-        return key ??= "uRepo_" + type.Name + "_";
-    }
+        => _keys.GetOrAdd(typeof(T), static type => "uRepo_" + type.Name + "_");
 
     /// <summary>
     /// Gets the repository cache key for the provided type and Id.
     /// </summary>
+    /// <typeparam name="T">The entity type to get the cache key for.</typeparam>
+    /// <typeparam name="TId">The type of the entity identifier.</typeparam>
+    /// <param name="id">The entity identifier.</param>
+    /// <returns>A cache key string in the format "uRepo_{TypeName}_{Id}", or an empty string if the id is the default value.</returns>
     public static string GetKey<T, TId>(TId? id)
     {
         if (EqualityComparer<TId?>.Default.Equals(id, default))
