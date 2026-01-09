@@ -30,6 +30,7 @@ import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interact
 import type { UmbPickerContext } from '@umbraco-cms/backoffice/picker';
 import type { UUIInputEvent, UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 
+import './components/index.js';
 import '@umbraco-cms/backoffice/imaging';
 
 const root: UmbMediaPathModel = { name: 'Media', unique: null, entityType: UMB_MEDIA_ROOT_ENTITY_TYPE };
