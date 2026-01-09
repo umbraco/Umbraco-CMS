@@ -157,10 +157,6 @@ export class UmbUserInputElement extends UmbFormControlMixin<string, typeof UmbL
 		return undefined;
 	}
 
-	#openPicker() {
-		this.#pickerContext.openPicker({});
-	}
-
 	#removeItem(unique: string) {
 		this.#pickerContext.requestRemoveItem(unique);
 	}
