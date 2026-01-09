@@ -133,7 +133,19 @@ public class ImageCropperPropertyEditor : DataEditor,
     public void Handle(ContentDeletedNotification notification) => DeleteContainedFiles(notification.DeletedEntities);
 
     /// <inheritdoc/>
-    public void Handle(MediaDeletedNotification notification) => DeleteContainedFiles(notification.DeletedEntities);
+    public void Handle(MediaDeletedNotification notification)
+    {
+        if (_contentSettings.EnableMediaRecycleBinProtection)
+        {
+            RecycleBinMediaProtectionHelper.DeleteContainedFilesWithProtection(
+                notification.DeletedEntities,
+                ContainedFilePaths,
+                _mediaFileManager);
+            return;
+        }
+
+        DeleteContainedFiles(notification.DeletedEntities);
+    }
 
     /// <inheritdoc/>
     public void Handle(MediaSavingNotification notification)
