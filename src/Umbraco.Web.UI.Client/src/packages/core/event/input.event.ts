@@ -6,9 +6,3 @@ export class UmbInputEvent extends Event {
 		super(UmbInputEvent.TYPE, { bubbles: true, composed: true, cancelable: false });
 	}
 }
-
-declare global {
-	interface GlobalEventHandlersEventMap {
-		[UmbInputEvent.TYPE]: UmbInputEvent;
-	}
-}
