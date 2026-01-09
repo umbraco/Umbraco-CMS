@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 public class UserGroup2PermissionDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.UserGroup2Permission;
-    public const string PrimaryKeyName = Constants.DatabaseSchema.PrimaryKeyNameId;
+    public const string PrimaryKeyName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
 
     [Column(PrimaryKeyName)]
     [PrimaryKeyColumn(Name = "PK_userGroup2Permission", AutoIncrement = true)]

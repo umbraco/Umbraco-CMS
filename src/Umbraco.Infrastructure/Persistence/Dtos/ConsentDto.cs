@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 public class ConsentDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.Consent;
-    public const string PrimaryKeyName = Constants.DatabaseSchema.PrimaryKeyNameId;
+    public const string PrimaryKeyName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
 
     [Column(PrimaryKeyName)]
     [PrimaryKeyColumn]

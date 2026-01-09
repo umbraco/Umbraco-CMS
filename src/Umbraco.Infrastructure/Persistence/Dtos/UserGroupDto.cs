@@ -11,8 +11,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 public class UserGroupDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.UserGroup;
-    public const string PrimaryKeyName = Constants.DatabaseSchema.PrimaryKeyNameId;
-    public const string KeyColumnName = Constants.DatabaseSchema.PrimaryKeyNameKey;
+    public const string PrimaryKeyName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
+    public const string KeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameKey;
 
     public UserGroupDto()
     {

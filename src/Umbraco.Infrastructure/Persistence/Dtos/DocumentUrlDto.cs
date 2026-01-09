@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 public class DocumentUrlDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.DocumentUrl;
-    public const string PrimaryKeyName = Constants.DatabaseSchema.PrimaryKeyNameId;
+    public const string PrimaryKeyName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
 
     [Column(PrimaryKeyName)]
     [PrimaryKeyColumn(Clustered = false, AutoIncrement = true)]

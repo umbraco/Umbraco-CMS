@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 internal sealed class AccessDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.Access;
-    public const string PrimaryKeyName = Constants.DatabaseSchema.PrimaryKeyNameId;
+    public const string PrimaryKeyName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
 
     [Column(PrimaryKeyName)]
     [PrimaryKeyColumn(Name = "PK_umbracoAccess", AutoIncrement = false)]

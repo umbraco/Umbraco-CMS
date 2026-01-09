@@ -11,15 +11,16 @@ internal sealed class ContentTypeTemplateDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.DocumentType;
     public const string PrimaryKeyName = "contentTypeNodeId";
+    public const string TemplateNodeIdName = "templateNodeId";
 
     [Column(PrimaryKeyName)]
-    [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_cmsDocumentType", OnColumns = "contentTypeNodeId, templateNodeId")]
-    [ForeignKey(typeof(ContentTypeDto), Column = "nodeId")]
+    [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_cmsDocumentType", OnColumns = $"{PrimaryKeyName}, {TemplateNodeIdName}")]
+    [ForeignKey(typeof(ContentTypeDto), Column = ContentTypeDto.NodeIdName)]
     [ForeignKey(typeof(NodeDto))]
     public int ContentTypeNodeId { get; set; }
 
-    [Column("templateNodeId")]
-    [ForeignKey(typeof(TemplateDto), Column = "nodeId")]
+    [Column(TemplateNodeIdName)]
+    [ForeignKey(typeof(TemplateDto), Column = TemplateDto.NodeIdName)]
     public int TemplateNodeId { get; set; }
 
     [Column("IsDefault")]

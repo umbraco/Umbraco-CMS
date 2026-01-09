@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 public class CacheInstructionDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.CacheInstruction;
-    public const string PrimaryKeyName = Constants.DatabaseSchema.PrimaryKeyNameId;
+    public const string PrimaryKeyName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
 
     [Column(PrimaryKeyName)]
     [NullSetting(NullSetting = NullSettings.NotNull)]

@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 internal sealed class AccessRuleDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.AccessRule;
-    public const string PrimaryKeyName = Constants.DatabaseSchema.PrimaryKeyNameId;
+    public const string PrimaryKeyName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
 
     [Column(PrimaryKeyName)]
     [PrimaryKeyColumn(Name = "PK_umbracoAccessRule", AutoIncrement = false)]

@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 internal sealed class DocumentCultureVariationDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.DocumentCultureVariation;
-    public const string PrimaryKeyName = Constants.DatabaseSchema.PrimaryKeyNameId;
+    public const string PrimaryKeyName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
 
     // Public constants to bind properties between DTOs
     public const string PublishedColumnName = "published";

@@ -10,19 +10,24 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 internal sealed class ContentVersionCultureVariationDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.ContentVersionCultureVariation;
-    public const string PrimaryKeyName = Constants.DatabaseSchema.PrimaryKeyNameId;
+    public const string PrimaryKeyName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
+    public const string LanguageIdName = "languageId";
+    public const string VersionIdName = "versionId";
+    public const string UpdateUserIdName = "availableUserId";
+    public const string UpdateDateName = "date";
+    public const string NameName = "name";
     private int? _updateUserId;
 
     [Column(PrimaryKeyName)]
     [PrimaryKeyColumn]
     public int Id { get; set; }
 
-    [Column("versionId")]
-    [ForeignKey(typeof(ContentVersionDto), Name = "FK_umbContentVersionCultureVariation_umbContentVersion_id")] // needs to be shorter than 64 chars for e.g. PostgreSQL
-    [Index(IndexTypes.UniqueNonClustered, Name = "IX_" + TableName + "_VersionId", ForColumns = "versionId,languageId", IncludeColumns = "id,name,date,availableUserId")]
+    [Column(VersionIdName)]
+    [ForeignKey(typeof(ContentVersionDto))]
+    [Index(IndexTypes.UniqueNonClustered, Name = "IX_" + TableName + "_VersionId", ForColumns = $"{VersionIdName},{LanguageIdName}", IncludeColumns = $"{PrimaryKeyName},{NameName},{UpdateDateName},{UpdateUserIdName}")]
     public int VersionId { get; set; }
 
-    [Column("languageId")]
+    [Column(LanguageIdName)]
     [ForeignKey(typeof(LanguageDto))]
     [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_LanguageId")]
     public int LanguageId { get; set; }
@@ -31,13 +36,13 @@ internal sealed class ContentVersionCultureVariationDto
     [Ignore]
     public string? Culture { get; set; }
 
-    [Column("name")]
+    [Column(NameName)]
     public string? Name { get; set; }
 
-    [Column("date")] // TODO: db rename to 'updateDate'
+    [Column(UpdateDateName)] // TODO: db rename to 'updateDate'
     public DateTime UpdateDate { get; set; }
 
-    [Column("availableUserId")] // TODO: db rename to 'updateDate'
+    [Column(UpdateUserIdName)] // TODO: db rename to 'updateDate'
     [ForeignKey(typeof(UserDto))]
     [NullSetting(NullSetting = NullSettings.Null)]
     public int? UpdateUserId

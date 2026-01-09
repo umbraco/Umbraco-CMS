@@ -120,7 +120,7 @@ public class ContentTypeRepositorySqlClausesTest : BaseUsingSqlSyntax
         var expected = Sql();
         expected.SelectAll()
             .From("[cmsContentTypeAllowedContentType]")
-            .Where("([cmsContentTypeAllowedContentType].[id] = @0)", 1050);
+            .Where("([cmsContentTypeAllowedContentType].[Id] = @0)", 1050);
 
         var sql = Sql();
         sql.SelectAll()
@@ -189,7 +189,7 @@ public class ContentTypeRepositorySqlClausesTest : BaseUsingSqlSyntax
 @"DELETE FROM [umbracoUserGroup2GranularPermission]
 WHERE (([umbracoUserGroup2GranularPermission].[uniqueId] = @0))
 AND ([umbracoUserGroup2GranularPermission].[permission] LIKE CONCAT(((SELECT 
- CONVERT(nvarchar(36), [cmsPropertyType].[uniqueId])
+ CONVERT(nvarchar(36), [cmsPropertyType].[UniqueId])
  
 FROM [cmsPropertyType]
 WHERE (([cmsPropertyType].[id] = @1))

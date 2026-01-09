@@ -10,8 +10,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 internal class ContentTypeDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.ContentType;
-    public const string PrimaryKeyName = "pk";
-    public const string NodeIdName = "nodeId";
+    public const string PrimaryKeyName = Constants.DatabaseSchema.Columns.PrimaryKeyNamePk;
+    public const string NodeIdName = Constants.DatabaseSchema.Columns.NodeIdName;
     private string? _alias;
 
     // Public constants to bind properties between DTOs
