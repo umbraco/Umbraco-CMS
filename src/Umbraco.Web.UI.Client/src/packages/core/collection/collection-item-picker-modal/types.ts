@@ -7,8 +7,8 @@ export interface UmbCollectionItemPickerModalData<CollectionItemType = UmbEntity
 }
 
 export interface UmbCollectionItemPickerModalCollectionConfig<FilterArgsType = Record<string, unknown>> {
-	alias: string;
-	menuAlias: string;
+	alias?: string;
+	menuAlias?: string;
 	filterArgs?: FilterArgsType;
 }
 
