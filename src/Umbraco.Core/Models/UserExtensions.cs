@@ -256,7 +256,7 @@ public static class UserExtensions
             var usn = user.StartElementIds;
             if (usn is not null)
             {
-                var vals = CombineStartNodes(UmbracoObjectTypes.Element, gsn, usn, entityService);
+                var vals = CombineStartNodes(UmbracoObjectTypes.ElementContainer, gsn, usn, entityService);
                 return vals;
             }
 
@@ -314,7 +314,7 @@ public static class UserExtensions
             () =>
         {
             var startNodeIds = user.CalculateElementStartNodeIds(entityService, appCaches);
-            var vals = entityService.GetAllPaths(UmbracoObjectTypes.Element, startNodeIds).Select(x => x.Path).ToArray();
+            var vals = entityService.GetAllPaths(UmbracoObjectTypes.ElementContainer, startNodeIds).Select(x => x.Path).ToArray();
             return vals;
         },
             TimeSpan.FromMinutes(2),
@@ -412,6 +412,7 @@ public static class UserExtensions
                 binPath += Constants.System.RecycleBinMediaString;
                 break;
             case UmbracoObjectTypes.Element:
+            case UmbracoObjectTypes.ElementContainer:
                 binPath += Constants.System.RecycleBinElementString;
                 break;
             default:

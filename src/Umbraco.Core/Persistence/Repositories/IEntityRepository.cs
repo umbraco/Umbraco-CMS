@@ -17,6 +17,15 @@ public interface IEntityRepository : IRepository
 
     IEnumerable<IEntitySlim> GetAll(Guid objectType, params int[] ids);
 
+    /// <summary>
+    ///     Gets entities of multiple object types.
+    /// </summary>
+    /// <param name="objectTypes">The object types of the entities.</param>
+    /// <param name="ids">The identifiers of the entities.</param>
+    /// <remarks>If <paramref name="ids" /> is empty, returns all entities of the specified types.</remarks>
+    IEnumerable<IEntitySlim> GetAll(IEnumerable<Guid> objectTypes, params int[] ids)
+        => throw new NotImplementedException();
+
     IEnumerable<IEntitySlim> GetAll(Guid objectType, params Guid[] keys);
 
     /// <summary>

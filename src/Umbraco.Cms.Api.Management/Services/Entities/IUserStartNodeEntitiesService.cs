@@ -24,6 +24,25 @@ public interface IUserStartNodeEntitiesService
     IEnumerable<UserAccessEntity> RootUserAccessEntities(UmbracoObjectTypes umbracoObjectType, int[] userStartNodeIds);
 
     /// <summary>
+    /// Calculates the applicable root entities for multiple object types for users without root access.
+    /// </summary>
+    /// <param name="umbracoObjectTypes">The object types to query.</param>
+    /// <param name="userStartNodeIds">The calculated start node IDs for the user.</param>
+    /// <returns>A list of root entities for the user across all specified object types.</returns>
+    /// <remarks>
+    /// The returned entities may include entities that outside of the user start node scope, but are needed to
+    /// for browsing to the actual user start nodes. These entities will be marked as "no access" entities.
+    ///
+    /// This method does not support pagination, because it must load all entities explicitly in order to calculate
+    /// the correct result, given that user start nodes can be descendants of root nodes. Consumers need to apply
+    /// pagination to the result if applicable.
+    /// </remarks>
+    IEnumerable<UserAccessEntity> RootUserAccessEntities(
+        UmbracoObjectTypes[] umbracoObjectTypes,
+        int[] userStartNodeIds)
+        => throw new NotImplementedException();
+
+    /// <summary>
     /// Calculates the applicable child entities for a given object type for users without root access.
     /// </summary>
     /// <param name="umbracoObjectType">The object type.</param>
@@ -50,6 +69,31 @@ public interface IUserStartNodeEntitiesService
         totalItems = 0;
         return [];
     }
+
+    /// <summary>
+    /// Calculates the applicable child entities for multiple object types for users without root access.
+    /// </summary>
+    /// <param name="umbracoObjectTypes">The object types to query.</param>
+    /// <param name="userStartNodePaths">The calculated start node paths for the user.</param>
+    /// <param name="parentKey">The key of the parent.</param>
+    /// <param name="skip">The number of applicable children to skip.</param>
+    /// <param name="take">The number of applicable children to take.</param>
+    /// <param name="ordering">The ordering to apply when fetching and paginating the children.</param>
+    /// <param name="totalItems">The total number of applicable children available across all object types.</param>
+    /// <returns>A list of child entities applicable for the user across all specified object types.</returns>
+    /// <remarks>
+    /// The returned entities may include entities that outside of the user start node scope, but are needed to
+    /// for browsing to the actual user start nodes. These entities will be marked as "no access" entities.
+    /// </remarks>
+    IEnumerable<UserAccessEntity> ChildUserAccessEntities(
+        UmbracoObjectTypes[] umbracoObjectTypes,
+        string[] userStartNodePaths,
+        Guid parentKey,
+        int skip,
+        int take,
+        Ordering ordering,
+        out long totalItems)
+        => throw new NotImplementedException();
 
     /// <summary>
     /// Calculates the applicable child entities from a list of candidate child entities for users without root access.
@@ -94,6 +138,33 @@ public interface IUserStartNodeEntitiesService
         totalAfter = 0;
         return [];
     }
+
+    /// <summary>
+    /// Calculates the applicable sibling entities for multiple object types for users without root access.
+    /// </summary>
+    /// <param name="umbracoObjectTypes">The object types to query.</param>
+    /// <param name="userStartNodePaths">The calculated start node paths for the user.</param>
+    /// <param name="targetKey">The key of the target.</param>
+    /// <param name="before">The number of applicable siblings to retrieve before the target.</param>
+    /// <param name="after">The number of applicable siblings to retrieve after the target.</param>
+    /// <param name="ordering">The ordering to apply when fetching and paginating the siblings.</param>
+    /// <param name="totalBefore">Outputs the total number of siblings before the target entity across all object types.</param>
+    /// <param name="totalAfter">Outputs the total number of siblings after the target entity across all object types.</param>
+    /// <returns>A list of sibling entities applicable for the user across all specified object types.</returns>
+    /// <remarks>
+    /// The returned entities may include entities that outside of the user start node scope, but are needed to
+    /// for browsing to the actual user start nodes. These entities will be marked as "no access" entities.
+    /// </remarks>
+    IEnumerable<UserAccessEntity> SiblingUserAccessEntities(
+        UmbracoObjectTypes[] umbracoObjectTypes,
+        string[] userStartNodePaths,
+        Guid targetKey,
+        int before,
+        int after,
+        Ordering ordering,
+        out long totalBefore,
+        out long totalAfter)
+        => throw new NotImplementedException();
 
     /// <summary>
     /// Calculates the access level of a collection of entities for users without root access.
