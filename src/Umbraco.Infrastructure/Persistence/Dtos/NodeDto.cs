@@ -16,7 +16,7 @@ public class NodeDto
 
     // Public constants to bind properties between DTOs
     public const string IdColumnName = PrimaryKeyName;
-    public const string KeyColumnName = "uniqueId";
+    public const string KeyColumnName = Constants.DatabaseSchema.Columns.UniqueIdName;
     public const string ParentIdColumnName = "parentId";
     public const string SortOrderColumnName = "sortOrder";
     public const string TrashedColumnName = "trashed";

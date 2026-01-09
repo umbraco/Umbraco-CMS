@@ -11,12 +11,14 @@ public class DictionaryDto // public as required to be accessible from Deploy fo
 {
     public const string TableName = Constants.DatabaseSchema.Tables.DictionaryEntry;
     public const string PrimaryKeyName = Constants.DatabaseSchema.Columns.PrimaryKeyNamePk;
+    public const string ReferenceName = "UniqueId";
+    public const string UniqueIdName = "id";
 
     [Column(PrimaryKeyName)]
     [PrimaryKeyColumn]
     public int PrimaryKey { get; set; }
 
-    [Column("id")]
+    [Column(UniqueIdName)]
     [Index(IndexTypes.UniqueNonClustered)]
     public Guid UniqueId { get; set; }
 
@@ -32,6 +34,6 @@ public class DictionaryDto // public as required to be accessible from Deploy fo
     public string Key { get; set; } = null!;
 
     [ResultColumn]
-    [Reference(ReferenceType.Many, ColumnName = "uniqueId", ReferenceMemberName = "uniqueId")]
+    [Reference(ReferenceType.Many, ColumnName = ReferenceName, ReferenceMemberName = ReferenceName)]
     public List<LanguageTextDto> LanguageTextDtos { get; set; } = [];
 }

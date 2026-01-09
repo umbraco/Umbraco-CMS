@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 public class DataTypeDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.DataType;
-    public const string PrimaryKeyName = "nodeId";
+    public const string PrimaryKeyName = Constants.DatabaseSchema.Columns.NodeIdName;
 
     [Column(PrimaryKeyName)]
     [PrimaryKeyColumn(AutoIncrement = false)]

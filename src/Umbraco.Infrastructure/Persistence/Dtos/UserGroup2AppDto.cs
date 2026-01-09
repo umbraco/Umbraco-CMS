@@ -11,13 +11,14 @@ public class UserGroup2AppDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.UserGroup2App;
     public const string PrimaryKeyName = "userGroupId"; // Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
+    public const string AppAliasName = "app";
 
     [Column(PrimaryKeyName)]
-    [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_userGroup2App", OnColumns = "userGroupId, app")]
+    [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_userGroup2App", OnColumns = $"{PrimaryKeyName}, {AppAliasName}")]
     [ForeignKey(typeof(UserGroupDto))]
     public int UserGroupId { get; set; }
 
-    [Column("app")]
+    [Column(AppAliasName)]
     [Length(50)]
     public string AppAlias { get; set; } = null!;
 }
