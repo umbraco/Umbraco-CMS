@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 public class ContentVersionDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.ContentVersion;
-    public const string PrimaryKeyName = Constants.DatabaseSchema.PrimaryKeyNameId;
+    public const string PrimaryKeyName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
     private int? _userId;
 
     [Column(PrimaryKeyName)]

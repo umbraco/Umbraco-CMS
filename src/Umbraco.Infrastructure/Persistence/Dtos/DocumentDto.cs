@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 public class DocumentDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.Document;
-    public const string PrimaryKeyName = "nodeId";
+    public const string PrimaryKeyName = Constants.DatabaseSchema.Columns.NodeIdName;
 
 
     // Public constants to bind properties between DTOs

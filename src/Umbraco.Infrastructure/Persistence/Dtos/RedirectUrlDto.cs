@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 internal sealed class RedirectUrlDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.RedirectUrl;
-    public const string PrimaryKeyName = Constants.DatabaseSchema.PrimaryKeyNameId;
+    public const string PrimaryKeyName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
 
     public RedirectUrlDto() => CreateDateUtc = DateTime.UtcNow;
 

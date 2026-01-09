@@ -31,9 +31,8 @@ internal sealed class AuditRepository : EntityRepositoryBase<int, IAuditItem>, I
 
     public IEnumerable<IAuditItem> Get(AuditType type, IQuery<IAuditItem> query)
     {
-        var logHeader = type.ToString(); // get the string representation of the enum first, because it does not work in the lambda expression of .Where<T>
         Sql<ISqlContext>? sqlClause = GetBaseQuery(false)
-            .Where<LogDto>(e => e.Header == logHeader);
+            .Where("(logHeader=@0)", type.ToString());
 
         var translator = new SqlTranslator<IAuditItem>(sqlClause, query);
         Sql<ISqlContext> sql = translator.Translate();

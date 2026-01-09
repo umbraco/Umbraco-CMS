@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 public class UserStartNodeDto : IEquatable<UserStartNodeDto>
 {
     public const string TableName = Constants.DatabaseSchema.Tables.UserStartNode;
-    public const string PrimaryKeyName = Constants.DatabaseSchema.PrimaryKeyNameId;
+    public const string PrimaryKeyName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
 
     public enum StartNodeTypeValue
     {

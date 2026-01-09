@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 public class WebhookRequestDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.WebhookRequest;
-    public const string PrimaryKeyName = Constants.DatabaseSchema.PrimaryKeyNameId;
+    public const string PrimaryKeyName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
 
     [Column(PrimaryKeyName)]
     [PrimaryKeyColumn(AutoIncrement = true)]

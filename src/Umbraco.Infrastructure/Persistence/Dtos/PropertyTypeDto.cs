@@ -11,10 +11,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 internal class PropertyTypeDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.PropertyType;
-    public const string PrimaryKeyName = Constants.DatabaseSchema.PrimaryKeyNameId;
+    public const string PrimaryKeyName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
     public const string DataTypeIdName = "dataTypeId";
     public const string ContentTypeIdName = "contentTypeId";
-    public const string PorpertyTypeGroupIdName = "propertyTypeGroupId";
+    public const string PropertyTypeGroupIdName = "propertyTypeGroupId";
 
     private string? _alias;
 
@@ -30,7 +30,7 @@ internal class PropertyTypeDto
     [ForeignKey(typeof(ContentTypeDto), Column = ContentTypeDto.NodeIdName)]
     public int ContentTypeId { get; set; }
 
-    [Column(PorpertyTypeGroupIdName)]
+    [Column(PropertyTypeGroupIdName)]
     [NullSetting(NullSetting = NullSettings.Null)]
     [ForeignKey(typeof(PropertyTypeGroupDto))]
     public int? PropertyTypeGroupId { get; set; }
@@ -83,7 +83,7 @@ internal class PropertyTypeDto
     [Reference(ReferenceType.OneToOne, ColumnName = "DataTypeId")]
     public DataTypeDto DataTypeDto { get; set; } = null!;
 
-    [Column("uniqueId")]
+    [Column("UniqueId")]
     [NullSetting(NullSetting = NullSettings.NotNull)]
     [Constraint(Default = SystemMethods.NewGuid)]
     [Index(IndexTypes.UniqueNonClustered, Name = "IX_cmsPropertyTypeUniqueID")]
