@@ -13,3 +13,9 @@ export class UmbDropzoneChangeEvent extends Event {
 		this.items = items;
 	}
 }
+
+declare global {
+	interface GlobalEventHandlersEventMap {
+		[UmbDropzoneChangeEvent.TYPE]: UmbDropzoneChangeEvent;
+	}
+}

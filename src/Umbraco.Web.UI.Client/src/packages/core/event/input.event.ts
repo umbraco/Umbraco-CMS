@@ -1,6 +1,14 @@
 export class UmbInputEvent extends Event {
+	public static readonly TYPE = 'input';
+
 	public constructor() {
 		// mimics the native input event
-		super('input', { bubbles: true, composed: true, cancelable: false });
+		super(UmbInputEvent.TYPE, { bubbles: true, composed: true, cancelable: false });
+	}
+}
+
+declare global {
+	interface GlobalEventHandlersEventMap {
+		[UmbInputEvent.TYPE]: UmbInputEvent;
 	}
 }

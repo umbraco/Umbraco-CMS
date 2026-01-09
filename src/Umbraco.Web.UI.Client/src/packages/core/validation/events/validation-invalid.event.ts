@@ -7,3 +7,9 @@ export class UmbValidationInvalidEvent extends UmbValidationEvent {
 		super(UmbValidationInvalidEvent.TYPE);
 	}
 }
+
+declare global {
+	interface GlobalEventHandlersEventMap {
+		[UmbValidationInvalidEvent.TYPE]: UmbValidationInvalidEvent;
+	}
+}
