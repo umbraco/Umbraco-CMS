@@ -513,8 +513,8 @@ public class Member : ContentBase, IMember
         {
             StaticApplicationLogging.Logger.LogWarning(
                 "Trying to access the '{PropertyName}' property on '{MemberType}' " +
-                "but the {PropertyAlias} property does not exist on the member type so a default value is returned. " +
-                "Ensure that you have a property type with alias:  {PropertyAlias} configured on your member type in order to use the '{PropertyName}' property on the model correctly.",
+                "but the property type with alias '{PropertyAlias}' does not exist on the member type. " +
+                "A default value is returned. Ensure this property type is configured on your member type.",
                 logPropertyName,
                 typeof(Member),
                 logPropertyAlias);

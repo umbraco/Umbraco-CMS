@@ -32,9 +32,10 @@ public interface IUrlSegmentProvider
     string? GetUrlSegment(IContentBase content, string? culture = null);
 
     /// <summary>
-    ///     Gets the URL segment for a specified content, published status and  and culture.
+    ///     Gets the URL segment for a specified content, published status and culture.
     /// </summary>
     /// <param name="content">The content.</param>
+    /// <param name="published">Whether to get the published URL segment.</param>
     /// <param name="culture">The culture.</param>
     /// <returns>The URL segment.</returns>
     /// <remarks>

@@ -130,10 +130,9 @@ test('can delete content with delete permission enabled', {tag: '@release'}, asy
   // Act
   await umbracoUi.content.clickActionsMenuForContent(rootDocumentName);
   await umbracoUi.content.clickTrashActionMenuOption();
-  await umbracoUi.content.clickConfirmTrashButton();
+  await umbracoUi.content.clickConfirmTrashButtonAndWaitForContentToBeTrashed();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeTrashed();
   await umbracoUi.content.isItemVisibleInRecycleBin(rootDocumentName);
 });
 
@@ -162,12 +161,11 @@ test('can empty recycle bin with delete permission enabled', {tag: '@release'}, 
 
   // Act
   await umbracoUi.content.clickRecycleBinButton();
-  await umbracoUi.waitForTimeout(700);
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);
   await umbracoUi.content.clickEmptyRecycleBinButton();
-  await umbracoUi.content.clickConfirmEmptyRecycleBinButton();
+  await umbracoUi.content.clickConfirmEmptyRecycleBinButtonAndWaitForRecycleBinToBeEmptied();
 
   // Assert
-  await umbracoUi.content.waitForRecycleBinToBeEmptied();
   await umbracoUi.content.isItemVisibleInRecycleBin(rootDocumentName, false, false);
 });
 
@@ -199,10 +197,9 @@ test('can create content with create permission enabled', {tag: '@release'}, asy
   await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(rootDocumentTypeName);
   await umbracoUi.content.enterContentName(testDocumentName);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(testDocumentName)).toBeTruthy();
   await umbracoUi.content.isDocumentReadOnly(true);
 });
@@ -221,9 +218,9 @@ test('can not create content with create permission disabled', async ({umbracoAp
   await umbracoUi.content.isActionsMenuForNameVisible(rootDocumentName, false);
 });
 
-// TODO: Setup SMTP server to test notifications, do this when we test appsettings.json
-test.skip('can create notifications with notification permission enabled', async ({umbracoApi, umbracoUi}) => {
+test('can set up notifications with notification permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
+  const notificationActionIds = ['Umb.Document.Delete', 'Umb.Document.Publish'];
   userGroupId = await umbracoApi.userGroup.createUserGroupWithNotificationsPermission(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
   testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
@@ -231,9 +228,19 @@ test.skip('can create notifications with notification permission enabled', async
 
   // Act
   await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
+  await umbracoUi.content.clickActionsMenuForContent(rootDocumentName);
+  await umbracoUi.content.clickNotificationsActionMenuOption();
+  await umbracoUi.content.clickDocumentNotificationOptionWithName(notificationActionIds[0]);
+  await umbracoUi.content.clickDocumentNotificationOptionWithName(notificationActionIds[1]);
+  await umbracoUi.content.clickSaveModalButtonAndWaitForNotificationToBeCreated();
+
+  // Assert
+  await umbracoUi.content.isSuccessNotificationVisible();
+  expect(await umbracoApi.document.doesNotificationExist(rootDocumentId, notificationActionIds[0])).toBeTruthy();
+  expect(await umbracoApi.document.doesNotificationExist(rootDocumentId, notificationActionIds[1])).toBeTruthy();
 });
 
-test('can not create notifications with notification permission disabled', async ({umbracoApi, umbracoUi}) => {
+test('can not set up notifications with notification permission disabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithNotificationsPermission(userGroupName, false);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -279,8 +286,7 @@ test('can not publish content with publish permission disabled', async ({umbraco
   await umbracoUi.content.isActionsMenuForNameVisible(rootDocumentName, false);
 });
 
-// Remove .skip when the front-end is ready. Currently there is no "Permissions" menu item displays
-// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/19339
+// Skip this as this function is removed from the front-end.
 test.skip('can set permissions with set permissions permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithSetPermissionsPermission(userGroupName);
@@ -292,12 +298,13 @@ test.skip('can set permissions with set permissions permission enabled', async (
   // Act
   await umbracoUi.content.clickActionsMenuForContent(rootDocumentName);
   // await umbracoUi.content.clickSetPermissionsButton();
-  //
-  // // Assert
+
+  // Assert
   // await umbracoUi.content.doesDocumentPermissionsDialogExist();
 });
 
-test('can not set permissions with set permissions permission disabled', async ({umbracoApi, umbracoUi}) => {
+// Skip this as this function is removed from the front-end.
+test.skip('can not set permissions with set permissions permission disabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithSetPermissionsPermission(userGroupName, false);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -359,10 +366,9 @@ test('can update content with update permission enabled', {tag: '@release'}, asy
   await umbracoUi.content.goToContentWithName(rootDocumentName);
   await umbracoUi.content.isDocumentReadOnly(false);
   await umbracoUi.content.enterContentName(testDocumentName);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesNameExist(testDocumentName)).toBeTruthy();
   expect(await umbracoApi.document.doesNameExist(rootDocumentName)).toBeFalsy();
 });
@@ -383,8 +389,7 @@ test('can not update content with update permission disabled', async ({umbracoAp
   await umbracoUi.content.isDocumentReadOnly(true);
 });
 
-// Needs create permission to be enabled to duplicate content
-test.fixme('can duplicate content with duplicate permission enabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test('can duplicate content with duplicate permission enabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const duplicatedContentName = rootDocumentName + ' (1)';
   userGroupId = await umbracoApi.userGroup.createUserGroupWithDuplicatePermission(userGroupName);
@@ -425,8 +430,7 @@ test('can not duplicate content with duplicate permission disabled', async ({umb
   await umbracoUi.content.isActionsMenuForNameVisible(rootDocumentName, false);
 });
 
-// Needs create permission to be enabled to move content
-test.fixme('can move content with move to permission enabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test('can move content with move to permission enabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const moveToDocumentName = 'SecondRootDocument';
   const moveToDocumentId = await umbracoApi.document.createDocumentWithTextContent(moveToDocumentName, rootDocumentTypeId, documentText, dataTypeName);
@@ -444,7 +448,8 @@ test.fixme('can move content with move to permission enabled', {tag: '@release'}
 
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.moved);
-  await umbracoUi.content.reloadContentTree();
+  await umbracoUi.content.clickActionsMenuForContent(moveToDocumentName);
+  await umbracoUi.content.clickReloadChildrenActionMenuOption();
   await umbracoUi.content.isCaretButtonVisibleForContentName(moveToDocumentName, true);
   await umbracoUi.content.openContentCaretButtonForName(moveToDocumentName);
   await umbracoUi.content.isChildContentInTreeVisible(moveToDocumentName, childDocumentOneName, true);
@@ -470,7 +475,7 @@ test('can not move content with move to permission disabled', async ({umbracoApi
 });
 
 // Needs a better way to assert
-test.fixme('can sort children with sort children permission enabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test('can sort children with sort children permission enabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.document.createDefaultDocumentWithParent(childDocumentTwoName, childDocumentTypeId, rootDocumentId);
   userGroupId = await umbracoApi.userGroup.createUserGroupWithSortChildrenPermission(userGroupName);
@@ -482,15 +487,12 @@ test.fixme('can sort children with sort children permission enabled', {tag: '@re
   // Act
   await umbracoUi.content.clickActionsMenuForContent(rootDocumentName);
   await umbracoUi.content.clickSortChildrenActionMenuOption();
-
-  // TODO: uncomment when it is not flaky
-  // const childDocumentOneLocator = await umbracoUi.content.getButtonWithName(childDocumentOneName);
-  // const childDocumentTwoLocator = await umbracoUi.content.getButtonWithName(childDocumentTwoName)
-  // await umbracoUi.content.sortChildrenDragAndDrop(childDocumentOneLocator, childDocumentTwoLocator, 10, 0, 10);
+  const childDocumentOneLocator = umbracoUi.content.getTextLocatorWithName(childDocumentOneName);
+  const childDocumentTwoLocator = umbracoUi.content.getTextLocatorWithName(childDocumentTwoName)
+  await umbracoUi.content.dragAndDrop(childDocumentTwoLocator, childDocumentOneLocator);
   await umbracoUi.content.clickSortButton();
 
   // Assert
-  // TODO: uncomment when it is not flaky
   await umbracoUi.content.openContentCaretButtonForName(rootDocumentName);
   await umbracoUi.content.doesIndexDocumentInTreeContainName(rootDocumentName, childDocumentTwoName, 0);
   await umbracoUi.content.doesIndexDocumentInTreeContainName(rootDocumentName, childDocumentOneName, 1);
@@ -523,12 +525,11 @@ test('can set culture and hostnames with culture and hostnames permission enable
   // Act
   await umbracoUi.content.clickActionsMenuForContent(rootDocumentName);
   await umbracoUi.content.clickCultureAndHostnamesActionMenuOption();
-  await umbracoUi.content.clickAddNewDomainButton();
+  await umbracoUi.content.clickAddNewHostnameButton();
   await umbracoUi.content.enterDomain(domainName);
-  await umbracoUi.content.clickSaveModalButton();
+  await umbracoUi.content.clickSaveModalButtonAndWaitForDomainToBeCreated();
 
   // Assert
-  await umbracoUi.content.waitForDomainToBeCreated();
   const document = await umbracoApi.document.getByName(rootDocumentName);
   const domains = await umbracoApi.document.getDomains(document.id);
   expect(domains.domains[0].domainName).toEqual(domainName);
@@ -602,7 +603,7 @@ test('can rollback content with rollback permission enabled', {tag: '@release'},
   await umbracoUi.content.doesDocumentPropertyHaveValue(dataTypeName, updatedTextStringText);
   await umbracoUi.content.clickInfoTab();
   await umbracoUi.content.clickRollbackButton();
-  await umbracoUi.waitForTimeout(700); // Wait for the rollback items to load
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);// Wait for the rollback items to load
   await umbracoUi.content.clickLatestRollBackItem();
   await umbracoUi.content.clickRollbackContainerButton();
 
@@ -655,17 +656,15 @@ test('can create and update content with permission enabled', {tag: '@release'},
   await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(rootDocumentTypeName);
   await umbracoUi.content.enterContentName(testDocumentName);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(testDocumentName)).toBeTruthy();
   // Update the content
   await umbracoUi.content.goToContentWithName(testDocumentName);
   await umbracoUi.content.isDocumentReadOnly(false);
   await umbracoUi.content.enterContentName(updatedDocumentName);
-  await umbracoUi.content.clickSaveButton();
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
   expect(await umbracoApi.document.doesNameExist(updatedDocumentName)).toBeTruthy();
   await umbracoUi.content.doesDocumentHaveName(updatedDocumentName);
 

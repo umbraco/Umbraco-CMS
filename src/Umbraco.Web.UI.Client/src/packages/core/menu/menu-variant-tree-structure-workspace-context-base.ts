@@ -10,6 +10,7 @@ import { UmbAncestorsEntityContext, UmbParentEntityContext, type UmbEntityModel 
 import {
 	UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT,
 	UMB_VARIANT_WORKSPACE_CONTEXT,
+	UMB_WORKSPACE_PATH_PATTERN,
 } from '@umbraco-cms/backoffice/workspace';
 import { linkEntityExpansionEntries } from '@umbraco-cms/backoffice/utils';
 import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
@@ -83,19 +84,46 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 				'observeUnique',
 			);
 
-			this.observe(this.#workspaceContext?.isNew, (value) => {
-				// Workspace has changed from new to existing
-				if (value === false && this.#isNew === true) {
-					// TODO: We do not need to request here as we already know the structure and unique
-					this.#requestStructure();
-				}
-				this.#isNew = value;
-			});
+			this.observe(
+				this.#workspaceContext?.isNew,
+				(value) => {
+					// Workspace has changed from new to existing
+					if (value === false && this.#isNew === true) {
+						// TODO: We do not need to request here as we already know the structure and unique
+						this.#requestStructure();
+					}
+					this.#isNew = value;
+				},
+				'observeIsNew',
+			);
 		});
 	}
 
 	getItemHref(structureItem: UmbVariantStructureItemModel): string | undefined {
-		return `section/${this._sectionContext?.getPathname()}/workspace/${structureItem.entityType}/edit/${structureItem.unique}/${this.#workspaceActiveVariantId?.toCultureString()}`;
+		const sectionName = this._sectionContext?.getPathname();
+		if (!sectionName) {
+			return undefined;
+		}
+		UMB_WORKSPACE_PATH_PATTERN.generateAbsolute({
+			sectionName,
+			entityType: structureItem.entityType,
+		});
+		const path = `section/${this._sectionContext!.getPathname()}/workspace/${structureItem.entityType}/edit/${structureItem.unique}`;
+
+		// find related variant id from structure item:
+		const itemVariantFit = structureItem.variants.find((variant) => {
+			return (
+				variant.culture === this.#workspaceActiveVariantId?.culture &&
+				variant.segment === this.#workspaceActiveVariantId?.segment
+			);
+		});
+		if (itemVariantFit) {
+			const variantId = UmbVariantId.CreateFromPartial(itemVariantFit);
+			return `${path}/${variantId.toString()}`;
+		}
+
+		// If no related variantID, then lets the redirect go to the main-variant:
+		return path;
 	}
 
 	async #requestStructure() {

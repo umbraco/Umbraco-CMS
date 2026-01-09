@@ -7,6 +7,7 @@ import {
 	UMB_STATIC_FILE_TREE_REPOSITORY_ALIAS,
 	UMB_STATIC_FILE_TREE_STORE_ALIAS,
 } from './constants.js';
+import { UmbStaticFileTreeStore } from './static-file-tree.store.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -19,7 +20,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'treeStore',
 		alias: UMB_STATIC_FILE_TREE_STORE_ALIAS,
 		name: 'Static File Tree Store',
-		api: () => import('./static-file-tree.store.js'),
+		api: UmbStaticFileTreeStore,
 	},
 	{
 		type: 'tree',

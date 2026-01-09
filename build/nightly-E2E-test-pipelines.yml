@@ -28,6 +28,12 @@ parameters:
     type: boolean
     default: false
 
+  # Can we slow our tests down when running on SQLite? That way we might be able to avoid DB locks
+  - name: skipSqliteAcceptanceTests
+    displayName: Skip SQLite acceptance tests
+    type: boolean
+    default: true
+
 variables:
   nodeVersion: 20
   solution: umbraco.sln
@@ -342,7 +348,7 @@ stages:
       - job:
         displayName: E2E Tests (SQLite)
         timeoutInMinutes: 180
-        condition: ${{ eq(parameters.skipDefaultConfigAcceptanceTests, false) }}
+        condition: ${{ and(eq(parameters.skipDefaultConfigAcceptanceTests, false), eq(parameters.skipSqliteAcceptanceTests, false)) }}
         variables:
           # Connection string
           CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=Umbraco;Mode=Memory;Cache=Shared;Foreign Keys=True;Pooling=True
@@ -581,6 +587,32 @@ stages:
               CONNECTIONSTRINGS__UMBRACODBDSN: Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True
               CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
               additionalEnvironmentVariables: false
+            # ContentSettingConfig
+            WindowsContentSettingsConfig:
+              vmImage: "windows-latest"
+              testFolder: "ContentSettingConfig"
+              port: ''
+              testCommand: "npx playwright test --project=contentSettingConfig"
+              CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=(localdb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Umbraco.mdf;Integrated Security=True
+              CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
+              additionalEnvironmentVariables: false
+            LinuxContentSettingsConfig:
+              vmImage: "ubuntu-latest"
+              testFolder: "ContentSettingConfig"
+              port: ''
+              testCommand: "npx playwright test --project=contentSettingConfig"
+              CONNECTIONSTRINGS__UMBRACODBDSN: Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True
+              CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
+              additionalEnvironmentVariables: false
+            # SMTP
+            LinuxSMTP:
+              vmImage: "ubuntu-latest"
+              testFolder: "SMTP"
+              port: ''
+              testCommand: "npx playwright test --project=smtp"
+              CONNECTIONSTRINGS__UMBRACODBDSN: Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True
+              CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
+              additionalEnvironmentVariables: false
         pool:
           vmImage: $(vmImage)
         steps:
@@ -658,6 +690,23 @@ stages:
               AZUREADB2CCLIENTID: $(AZUREB2CCLIENTID)
               AZUREADB2CCLIENTSECRET: $(AZUREB2CCLIENTSECRET)
 
+          # Start SMTP4dev via Docker for SMTP tests
+          - bash: |
+              echo "Starting SMTP4dev container..."
+              docker run -d --name smtp4dev -p 5000:80 -p 25:25 rnwood/smtp4dev
+
+              echo "Waiting for SMTP4dev to be ready..."
+              for i in {1..30}; do
+                if curl -s http://localhost:5000/api/messages > /dev/null; then
+                  echo "SMTP4dev is ready"
+                  break
+                fi
+                echo "Attempt $i: Waiting for SMTP4dev..."
+                sleep 2
+              done
+            displayName: Start SMTP4dev Docker container (Linux)
+            condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'), contains(variables['testFolder'], 'SMTP'))
+
           # Run tests Template
           - template: nightly-E2E-run-tests-template.yml
             parameters:
@@ -667,6 +716,14 @@ stages:
               AZUREB2CTESTUSEREMAIL: $(AZUREB2CTESTUSEREMAIL)
               AZUREB2CTESTUSERPASSWORD: $(AZUREB2CTESTUSERPASSWORD)
               DatabaseType: ${{ variables.DatabaseType }}
+
+          # Stop SMTP4dev container
+          - bash: |
+              echo "Stopping SMTP4dev container..."
+              docker stop smtp4dev
+              docker rm smtp4dev
+            displayName: Stop SMTP4dev Docker container
+            condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'), contains(variables['testFolder'], 'SMTP'))
 
   - stage: NotifySlackBot
     displayName: Notify Slack on Failure

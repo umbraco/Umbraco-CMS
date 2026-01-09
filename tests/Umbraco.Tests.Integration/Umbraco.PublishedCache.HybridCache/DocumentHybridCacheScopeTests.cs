@@ -111,10 +111,13 @@ internal sealed class DocumentHybridCacheScopeTests : UmbracoIntegrationTestWith
             Textpage.Key = key;
             var result = await ContentEditingService.CreateAsync(Textpage, Constants.Security.SuperUserKey);
             Assert.IsTrue(result);
-            var publishResult = await ContentPublishingService.PublishAsync(Textpage.Key.Value, new List<CulturePublishScheduleModel>
-            {
-                new() { Culture = "*" },
-            }, Constants.Security.SuperUserKey);
+            var publishResult = await ContentPublishingService.PublishAsync(
+                Textpage.Key.Value,
+                new List<CulturePublishScheduleModel>
+                {
+                    new() { Culture = "*" },
+                },
+                Constants.Security.SuperUserKey);
             Assert.IsTrue(publishResult.Success);
 
             scope.Complete();
