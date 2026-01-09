@@ -141,20 +141,54 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     }
 
     /// <inheritdoc/>
+    [Obsolete("Please use the method overload takng all parameters. Scheduled for removal in Umbraco 19.")]
     public async Task<ContentCacheNode?> GetContentSourceAsync(Guid key, bool preview = false)
-    {
-        Sql<ISqlContext>? sql = SqlContentSourcesSelect()
-            .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document))
-            .Append(SqlWhereNodeKey(SqlContext, key))
-            .Append(SqlOrderByLevelIdSortOrder(SqlContext));
+        => await GetContentSourceAsync(key, preview, false);
 
-        ContentSourceDto? dto = await Database.FirstOrDefaultAsync<ContentSourceDto>(sql);
+    /// <inheritdoc/>
+    public async Task<ContentCacheNode?> GetContentSourceAsync(Guid key, bool preview = false, bool useCache = false)
+    {
+        ContentSourceDto? dto = await GetContentSourceDto(key, useCache);
 
         if (dto == null)
         {
             return null;
         }
 
+        return CreateContentCacheNode(dto, preview);
+    }
+
+    private async Task<ContentSourceDto?> GetContentSourceDto(Guid key, bool useRequestCache)
+    {
+        var cacheKey = $"{nameof(DatabaseCacheRepository)}_ContentSourceDto_{key}";
+
+        ContentSourceDto? dto;
+        if (useRequestCache)
+        {
+            dto = AppCaches.RequestCache.GetCacheItem<ContentSourceDto>(cacheKey);
+            if (dto is not null)
+            {
+                return dto;
+            }
+        }
+
+        Sql<ISqlContext>? sql = SqlContentSourcesSelect()
+            .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document))
+            .Append(SqlWhereNodeKey(SqlContext, key))
+            .Append(SqlOrderByLevelIdSortOrder(SqlContext));
+
+        dto = await Database.FirstOrDefaultAsync<ContentSourceDto>(sql);
+
+        if (useRequestCache && dto is not null)
+        {
+            AppCaches.RequestCache.Set(cacheKey, dto);
+        }
+
+        return dto;
+    }
+
+    private ContentCacheNode? CreateContentCacheNode(ContentSourceDto dto, bool preview)
+    {
         if (preview is false && dto.PubDataRaw is null && dto.PubData is null)
         {
             return null;
