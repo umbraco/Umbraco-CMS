@@ -847,9 +847,13 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         Assert.IsFalse(document.IsCultureEdited("fr"));
         Assert.IsFalse(document.Edited);
 
-        document.SetValue("value1", "v1en",
+        document.SetValue(
+            "value1",
+            "v1en",
             "en"); // change the property culture value, so now this culture will be edited
-        document.SetValue("value1", "v1fr",
+        document.SetValue(
+            "value1",
+            "v1fr",
             "fr"); // change the property culture value, so now this culture will be edited
         ContentService.Save(document);
 
@@ -893,9 +897,13 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         Assert.AreEqual("doc1fr", document.GetCultureName("fr"));
         Assert.IsNull(document.GetValue("value1", "en")); // The values are there but the business logic returns null
         Assert.IsNull(document.GetValue("value1", "fr")); // The values are there but the business logic returns null
-        Assert.IsNull(document.GetValue("value1", "en",
+        Assert.IsNull(document.GetValue(
+            "value1",
+            "en",
             published: true)); // The values are there but the business logic returns null
-        Assert.IsNull(document.GetValue("value1", "fr",
+        Assert.IsNull(document.GetValue(
+            "value1",
+            "fr",
             published: true)); // The values are there but the business logic returns null
         Assert.AreEqual("v1inv", document.GetValue("value1"));
         Assert.AreEqual("v1inv", document.GetValue("value1", published: true));
@@ -1025,7 +1033,9 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
             document.GetValue("value1")); // The variant property value gets copied over to the invariant
         Assert.AreEqual("v1en2", document.GetValue("value1", published: true));
         Assert.IsNull(document.GetValue("value1", "fr")); // The values are there but the business logic returns null
-        Assert.IsNull(document.GetValue("value1", "fr",
+        Assert.IsNull(document.GetValue(
+            "value1",
+            "fr",
             published: true)); // The values are there but the business logic returns null
         Assert.IsFalse(
             document.IsCultureEdited("en")); // The variant published AND edited values are copied over to the invariant

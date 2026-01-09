@@ -34,5 +34,5 @@ public class RichTextBlockModel : BlockModelCollection<RichTextBlockItem>
     /// <value>
     ///     The empty <see cref="RichTextBlockModel" />.
     /// </value>
-    public static RichTextBlockModel Empty { get; } = new();
+    public static new RichTextBlockModel Empty { get; } = new();
 }

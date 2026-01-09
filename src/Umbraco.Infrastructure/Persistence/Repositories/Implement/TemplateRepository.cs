@@ -134,7 +134,10 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
     /// <returns></returns>
     private ITemplate MapFromDto(TemplateDto dto, IUmbracoEntity[] axisDefinitions)
     {
-        Template template = TemplateFactory.BuildEntity(_shortStringHelper, dto, axisDefinitions,
+        Template template = TemplateFactory.BuildEntity(
+            _shortStringHelper,
+            dto,
+            axisDefinitions,
             file => GetFileContent((Template)file, false));
 
         if (dto.NodeDto.ParentId > 0)

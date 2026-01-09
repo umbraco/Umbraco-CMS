@@ -30,6 +30,7 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
     private string _alias;
     private string? _icon;
     private string _name;
+    private string? _description;
     private bool _hasAccessToAllLanguages;
     private ISet<string> _permissions;
     private ISet<IGranularPermission> _granularPermissions;
@@ -53,13 +54,13 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
     }
 
     /// <summary>
-    ///     Constructor to create an existing user group
+    ///     Constructor to create an existing user group.
     /// </summary>
-    /// <param name="userCount"></param>
-    /// <param name="alias"></param>
-    /// <param name="name"></param>
-    /// <param name="icon"></param>
-    /// <param name="shortStringHelper"></param>
+    /// <param name="shortStringHelper">The short string helper.</param>
+    /// <param name="userCount">The user count.</param>
+    /// <param name="alias">The alias.</param>
+    /// <param name="name">The name.</param>
+    /// <param name="icon">The icon.</param>
     public UserGroup(
         IShortStringHelper shortStringHelper,
         int userCount,
@@ -100,7 +101,8 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
     {
         get => _alias;
         set => SetPropertyValueAndDetectChanges(
-            value.ToCleanString(_shortStringHelper, CleanStringType.Alias | CleanStringType.UmbracoCase), ref _alias!,
+            value.ToCleanString(_shortStringHelper, CleanStringType.Alias | CleanStringType.UmbracoCase),
+            ref _alias!,
             nameof(Alias));
     }
 
@@ -109,6 +111,13 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
     {
         get => _name;
         set => SetPropertyValueAndDetectChanges(value, ref _name!, nameof(Name));
+    }
+
+    [DataMember]
+    public string? Description
+    {
+        get => _description;
+        set => SetPropertyValueAndDetectChanges(value, ref _description!, nameof(Description));
     }
 
     [DataMember]

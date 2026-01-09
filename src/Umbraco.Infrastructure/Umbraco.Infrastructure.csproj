@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <PackageId>Umbraco.Cms.Infrastructure</PackageId>
     <Title>Umbraco CMS - Infrastructure</Title>
@@ -39,6 +39,7 @@
     <PackageReference Include="Examine.Core" />
     <PackageReference Include="HtmlAgilityPack" />
     <PackageReference Include="MailKit" />
+    <PackageReference Include="Markdig" />
     <PackageReference Include="Markdown" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" />

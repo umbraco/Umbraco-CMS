@@ -48,6 +48,7 @@ export class UmbUserAvatarElement extends UmbLitElement {
 	#setImgSrcSizes() {
 		if (this.#imgUrls.length === 0) {
 			this._imgSrcSizes = [];
+			this._imgSrc = '';
 			return;
 		}
 
