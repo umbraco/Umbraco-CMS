@@ -38,14 +38,16 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 	@property({ attribute: false })
 	set focalPoint(value) {
 		this.#focalPoint = value;
-		this.#setFocalPointStyle(this.#focalPoint.left, this.#focalPoint.top);
+		if (this.#focalPoint) {
+			this.#setFocalPointStyle(this.#focalPoint.left, this.#focalPoint.top);
+		}
 		this.#onFocalPointUpdated();
 	}
 	get focalPoint() {
 		return this.#focalPoint;
 	}
 
-	#focalPoint: UmbImageCropperFocalPoint = { left: 0.5, top: 0.5 };
+	#focalPoint: UmbImageCropperFocalPoint | null = null;
 
 	@property({ type: Boolean })
 	hideFocalPoint = false;
@@ -77,7 +79,7 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 	async #initializeImage() {
 		await this.updateComplete; // Wait for the @query to be resolved
 
-		if (!this.hideFocalPoint) {
+		if (!this.hideFocalPoint && this.focalPoint) {
 			this.#setFocalPointStyle(this.focalPoint.left, this.focalPoint.top);
 		}
 
@@ -123,8 +125,8 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 		this.focalPointElement.style.top = `calc(${top * 100}% - ${this.#DOT_RADIUS}px)`;
 	}
 
-	#isCentered(focalPoint: UmbImageCropperFocalPoint) {
-		if (!this.focalPoint) return;
+	#isCentered(focalPoint: UmbImageCropperFocalPoint | null) {
+		if (!focalPoint) return true;
 
 		return focalPoint.left === 0.5 && focalPoint.top === 0.5;
 	}
