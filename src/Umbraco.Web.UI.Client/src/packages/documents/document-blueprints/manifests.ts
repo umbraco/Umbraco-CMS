@@ -10,10 +10,4 @@ export const manifests: Array<UmbExtensionManifest> = [
 	...repositoryManifests,
 	...treeManifests,
 	...workspaceManifests,
-	{
-		name: 'Document Blueprint Backoffice Entry Point',
-		alias: 'Umb.BackofficeEntryPoint.DocumentBlueprint',
-		type: 'backofficeEntryPoint',
-		js: () => import('./entry-point.js'),
-	},
 ];

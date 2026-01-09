@@ -48,10 +48,4 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 	...userPermissionManifests,
 	...workspaceManifests,
 	...allowEditInvariantFromNonDefaultManifests,
-	{
-		name: 'Document Backoffice Entry Point',
-		alias: 'Umb.BackofficeEntryPoint.Document',
-		type: 'backofficeEntryPoint',
-		js: () => import('./entry-point.js'),
-	},
 ];

@@ -1,4 +1,5 @@
 import { UMB_MEDIA_TYPE_ITEM_REPOSITORY_ALIAS, UMB_MEDIA_TYPE_ITEM_STORE_ALIAS } from './constants.js';
+import { UmbManagementApiMediaTypeItemDataCacheInvalidationManager } from './media-type-item.server.cache-invalidation.manager.js';
 import { UmbMediaTypeItemStore } from './media-type-item.store.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
@@ -13,5 +14,11 @@ export const manifests: Array<UmbExtensionManifest> = [
 		alias: UMB_MEDIA_TYPE_ITEM_STORE_ALIAS,
 		name: 'Media Type Item Store',
 		api: UmbMediaTypeItemStore,
+	},
+	{
+		name: 'Media Type Backoffice Cache Invalidation Manager',
+		alias: 'Umb.EntryPoint.MediaType',
+		type: 'globalContext',
+		api: UmbManagementApiMediaTypeItemDataCacheInvalidationManager,
 	},
 ];

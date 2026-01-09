@@ -1,3 +1,4 @@
+import { UmbManagementApiStylesheetItemDataCacheInvalidationManager } from './stylesheet-item.server.cache-invalidation.manager.js';
 import { UmbStylesheetItemStore } from './stylesheet-item.store.js';
 
 export const UMB_STYLESHEET_ITEM_REPOSITORY_ALIAS = 'Umb.Repository.Stylesheet.Item';
@@ -15,5 +16,11 @@ export const manifests: Array<UmbExtensionManifest> = [
 		alias: 'Umb.ItemStore.Stylesheet',
 		name: 'Stylesheet Item Store',
 		api: UmbStylesheetItemStore,
+	},
+	{
+		name: 'Stylesheet Backoffice Cache Invalidation Manager',
+		alias: 'Umb.EntryPoint.Stylesheet',
+		type: 'globalContext',
+		api: UmbManagementApiStylesheetItemDataCacheInvalidationManager,
 	},
 ];

@@ -16,10 +16,4 @@ export const manifests: Array<UmbExtensionManifest> = [
 	...searchManifests,
 	...treeManifests,
 	...workspaceManifests,
-	{
-		name: 'Template Backoffice Entry Point',
-		alias: 'Umb.EntryPoint.Template',
-		type: 'backofficeEntryPoint',
-		js: () => import('./entry-point.js'),
-	},
 ];
