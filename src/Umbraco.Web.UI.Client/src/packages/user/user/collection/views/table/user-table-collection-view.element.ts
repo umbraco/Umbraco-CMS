@@ -1,4 +1,3 @@
-import type { UmbUserCollectionContext } from '../../user-collection.context.js';
 import { UmbUserKind } from '../../../utils/index.js';
 import type { UmbUserDetailModel } from '../../../types.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
