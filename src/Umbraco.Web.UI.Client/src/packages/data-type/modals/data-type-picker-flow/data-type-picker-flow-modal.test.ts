@@ -5,6 +5,11 @@ import { type UmbTestRunnerWindow, defaultA11yConfig } from '@umbraco-cms/intern
 describe('UmbDataTypePickerFlowModalElement', () => {
 	let element: UmbDataTypePickerFlowModalElement;
 
+	// Helper function to set loading state for testing
+	function setLoadingState(isLoading: boolean) {
+		(element as any)._isLoading = isLoading;
+	}
+
 	beforeEach(async () => {
 		element = await fixture(html` <umb-data-type-picker-flow-modal></umb-data-type-picker-flow-modal> `);
 	});
@@ -14,8 +19,8 @@ describe('UmbDataTypePickerFlowModalElement', () => {
 	});
 
 	it('should render a loader element when loading', async () => {
-		// Set loading state to true (using bracket notation to access private property for testing)
-		(element as any)._isLoading = true;
+		// Set the reactive loading state to true
+		setLoadingState(true);
 		await element.updateComplete;
 
 		const loaderContainer = element.shadowRoot?.querySelector('.loader-container');
@@ -27,7 +32,7 @@ describe('UmbDataTypePickerFlowModalElement', () => {
 
 	it('should not render a loader element when not loading', async () => {
 		// Ensure loading state is false
-		(element as any)._isLoading = false;
+		setLoadingState(false);
 		await element.updateComplete;
 
 		const loaderContainer = element.shadowRoot?.querySelector('.loader-container');
@@ -37,14 +42,14 @@ describe('UmbDataTypePickerFlowModalElement', () => {
 
 	it('should hide loader after loading is complete', async () => {
 		// Set loading state to true
-		(element as any)._isLoading = true;
+		setLoadingState(true);
 		await element.updateComplete;
 
 		let loaderContainer = element.shadowRoot?.querySelector('.loader-container');
 		expect(loaderContainer).to.exist;
 
 		// Set loading state to false (simulating completion)
-		(element as any)._isLoading = false;
+		setLoadingState(false);
 		await element.updateComplete;
 
 		loaderContainer = element.shadowRoot?.querySelector('.loader-container');
