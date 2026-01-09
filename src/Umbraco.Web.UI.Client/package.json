@@ -214,7 +214,8 @@
 		"generate:tsconfig": "node ./devops/tsconfig/index.js",
 		"generate:manifest": "node ./devops/build/create-umbraco-package.js",
 		"package:validate": "node ./devops/package/validate-exports.js",
-		"generate:ui-api-docs": "npm run generate:check-const-test && typedoc --options typedoc.config.js"
+		"generate:ui-api-docs": "npm run generate:check-const-test && typedoc --options typedoc.config.js",
+		"dev:external": "VITE_UMBRACO_USE_MSW=on vite --config vite.config.external.ts"
 	},
 	"engines": {
 		"node": ">=22.17.1",
