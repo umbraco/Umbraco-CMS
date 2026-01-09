@@ -107,13 +107,6 @@ export class UmbPropertyEditorUIBlockListElement
 
 		const useInlineEditingAsDefault = config.getValueByAlias<boolean>('useInlineEditingAsDefault');
 		this.#managerContext.setInlineEditingMode(useInlineEditingAsDefault);
-		if (useInlineEditingAsDefault) {
-			// Notice a hacky solution for how the entriesContext can inform when a new block has been created, to expand it: [NL]
-			this.#entriesContext.addEventListener('umb-internal:blockCreated', (event) => {
-				const index = (event as CustomEvent).detail.originData.index;
-				this.#tryToExpandBlock(index);
-			});
-		}
 		this.style.maxWidth = config.getValueByAlias<string>('maxPropertyWidth') ?? '';
 
 		this.#managerContext.setEditorConfiguration(config);
@@ -473,17 +466,6 @@ export class UmbPropertyEditorUIBlockListElement
 		} else {
 			throw new Error('Failed to create block');
 		}
-
-		if (this.#managerContext.getInlineEditingMode()) {
-			this.#tryToExpandBlock(index);
-		}
-	}
-
-	async #tryToExpandBlock(index: number) {
-		// Notice this is a bit of a hack here to open the newly created block: [NL]
-		await new Promise((resolve) => requestAnimationFrame(() => resolve(true)));
-		const indexToOpen = index === -1 ? this._layouts.length - 1 : index;
-		this.shadowRoot?.querySelectorAll('umb-block-list-entry').item(indexToOpen)?.expand?.();
 	}
 
 	#renderPasteButton() {

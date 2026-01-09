@@ -126,10 +126,6 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		this.#init();
 	}
 
-	public expand() {
-		this.shadowRoot?.querySelector('umb-extension-slot')?.shadowRoot?.querySelector('umb-inline-list-block')?.expand();
-	}
-
 	#init() {
 		this.observe(
 			this.#context.showContentEdit,
