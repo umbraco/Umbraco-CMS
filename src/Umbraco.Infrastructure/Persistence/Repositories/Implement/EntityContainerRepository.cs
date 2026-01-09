@@ -128,10 +128,16 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
             return null;
         }
 
-        var entity = new EntityContainer(nodeDto.NodeId, nodeDto.UniqueId,
-            nodeDto.ParentId, nodeDto.Path, nodeDto.Level, nodeDto.SortOrder,
+        var entity = new EntityContainer(
+            nodeDto.NodeId,
+            nodeDto.UniqueId,
+            nodeDto.ParentId,
+            nodeDto.Path,
+            nodeDto.Level,
+            nodeDto.SortOrder,
             containedObjectType,
-            nodeDto.Text, nodeDto.UserId ?? Constants.Security.UnknownUserId);
+            nodeDto.Text,
+            nodeDto.UserId ?? Constants.Security.UnknownUserId);
 
         // reset dirty initial properties (U4-1946)
         entity.ResetDirtyProperties(false);

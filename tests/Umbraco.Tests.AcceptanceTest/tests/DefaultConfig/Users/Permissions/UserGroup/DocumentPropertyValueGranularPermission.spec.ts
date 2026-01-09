@@ -115,7 +115,7 @@ test('can edit specific property values with UI read and write permission enable
   await umbracoUi.content.goToContentWithName(firstDocumentName);
   await umbracoUi.content.enterTextstring(inputText);
   await umbracoUi.content.clickToggleButton();
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
   const firstDocumentData = await umbracoApi.document.getByName(firstDocumentName);
