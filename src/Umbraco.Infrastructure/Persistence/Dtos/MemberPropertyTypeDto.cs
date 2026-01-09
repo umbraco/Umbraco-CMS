@@ -4,18 +4,22 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-[TableName(Constants.DatabaseSchema.Tables.MemberPropertyType)]
-[PrimaryKey("pk")]
+[TableName(TableName)]
+[PrimaryKey(PrimaryKeyName)]
 [ExplicitColumns]
 internal sealed class MemberPropertyTypeDto
 {
-    [Column("pk")]
+    public const string TableName = Constants.DatabaseSchema.Tables.MemberPropertyType;
+    public const string PrimaryKeyName = Constants.DatabaseSchema.Columns.PrimaryKeyNamePk;
+    public const string NodeIdName = Constants.DatabaseSchema.Columns.NodeIdName;
+
+    [Column(PrimaryKeyName)]
     [PrimaryKeyColumn]
     public int PrimaryKey { get; set; }
 
-    [Column("NodeId")]
+    [Column(NodeIdName)]
     [ForeignKey(typeof(NodeDto))]
-    [ForeignKey(typeof(ContentTypeDto), Column = "nodeId")]
+    [ForeignKey(typeof(ContentTypeDto), Column = NodeIdName)]
     public int NodeId { get; set; }
 
     [Column("propertytypeId")]

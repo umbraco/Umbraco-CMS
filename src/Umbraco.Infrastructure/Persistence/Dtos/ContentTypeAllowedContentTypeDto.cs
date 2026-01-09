@@ -5,19 +5,25 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey("Id", AutoIncrement = false)]
+[PrimaryKey(PrimaryKeyName, AutoIncrement = false)]
 [ExplicitColumns]
 internal sealed class ContentTypeAllowedContentTypeDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.ContentChildType;
 
-    [Column("Id")]
-    [ForeignKey(typeof(ContentTypeDto), Name = "FK_cmsContentTypeAllowedContentType_cmsContentType", Column = "nodeId")]
-    [PrimaryKeyColumn(AutoIncrement = false, Clustered = true, Name = "PK_cmsContentTypeAllowedContentType", OnColumns = "Id, AllowedId")]
+    // ToDo: Here we have an incosistent column name in DatabaseSchema. It should be Constants.DatabaseSchema.Columns.PrimaryKeyNameId; ("id")
+    // For now we leave the databse schema as is to avoid breaking changes.
+    public const string PrimaryKeyName = "Id";
+    public const string NodeIdName = Constants.DatabaseSchema.Columns.NodeIdName;
+    public const string AllowedIdName = "AllowedId";
+
+    [Column(PrimaryKeyName)]
+    [ForeignKey(typeof(ContentTypeDto), Name = "FK_cmsContentTypeAllowedContentType_cmsContentType", Column = NodeIdName)]
+    [PrimaryKeyColumn(AutoIncrement = false, Clustered = true, Name = "PK_cmsContentTypeAllowedContentType", OnColumns = $"{PrimaryKeyName}, {AllowedIdName}")]
     public int Id { get; set; }
 
-    [Column("AllowedId")]
-    [ForeignKey(typeof(ContentTypeDto), Name = "FK_cmsContentTypeAllowedContentType_cmsContentType1", Column = "nodeId")]
+    [Column(AllowedIdName)]
+    [ForeignKey(typeof(ContentTypeDto), Name = "FK_cmsContentTypeAllowedContentType_cmsContentType1", Column = NodeIdName)]
     public int AllowedId { get; set; }
 
     [Column("SortOrder")]
