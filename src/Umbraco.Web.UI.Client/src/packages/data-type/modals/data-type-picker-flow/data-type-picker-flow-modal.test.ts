@@ -13,8 +13,42 @@ describe('UmbDataTypePickerFlowModalElement', () => {
 		expect(element).to.be.instanceOf(UmbDataTypePickerFlowModalElement);
 	});
 
-	it('should have _isLoading state property', () => {
-		expect(element).to.have.property('_isLoading');
+	it('should render a loader element when loading', async () => {
+		// Set loading state to true (using bracket notation to access private property for testing)
+		(element as any)._isLoading = true;
+		await element.updateComplete;
+
+		const loaderContainer = element.shadowRoot?.querySelector('.loader-container');
+		const loader = element.shadowRoot?.querySelector('uui-loader');
+		
+		expect(loaderContainer).to.exist;
+		expect(loader).to.exist;
+	});
+
+	it('should not render a loader element when not loading', async () => {
+		// Ensure loading state is false
+		(element as any)._isLoading = false;
+		await element.updateComplete;
+
+		const loaderContainer = element.shadowRoot?.querySelector('.loader-container');
+		
+		expect(loaderContainer).to.not.exist;
+	});
+
+	it('should hide loader after loading is complete', async () => {
+		// Set loading state to true
+		(element as any)._isLoading = true;
+		await element.updateComplete;
+
+		let loaderContainer = element.shadowRoot?.querySelector('.loader-container');
+		expect(loaderContainer).to.exist;
+
+		// Set loading state to false (simulating completion)
+		(element as any)._isLoading = false;
+		await element.updateComplete;
+
+		loaderContainer = element.shadowRoot?.querySelector('.loader-container');
+		expect(loaderContainer).to.not.exist;
 	});
 
 	if ((window as UmbTestRunnerWindow).__UMBRACO_TEST_RUN_A11Y_TEST) {
