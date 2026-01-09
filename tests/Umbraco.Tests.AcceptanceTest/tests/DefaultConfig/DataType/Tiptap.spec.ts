@@ -15,7 +15,7 @@ test.afterEach(async ({umbracoApi}) => {
 
 test('can create a rich text editor with tiptap', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   //  Arrange
-  const tipTapLocatorName = 'Rich Text Editor [Tiptap]';
+  const tipTapLocatorName = 'Rich Text Editor';
   const tipTapAlias = 'Umbraco.RichText';
   const tipTapUiAlias = 'Umb.PropertyEditorUi.Tiptap';
 

@@ -63,6 +63,11 @@
       "isVisible": true
     },
     {
+      "id": "UnattendedTelemetryLevel",
+      "isVisible": true,
+      "defaultValue": "Detailed"
+    },
+    {
       "id": "NoNodesViewPath",
       "isVisible": true
     },

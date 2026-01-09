@@ -172,6 +172,7 @@ test('can create a document type folder in a folder using create options', async
   const childFolderName = 'Test Child Folder';
   await umbracoApi.documentType.ensureNameNotExists(childFolderName);
   await umbracoApi.documentType.createFolder(documentFolderName);
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short); // Wait for folder to be created before navigating to it
   await umbracoUi.documentType.goToDocumentType(documentFolderName);
 
   // Act

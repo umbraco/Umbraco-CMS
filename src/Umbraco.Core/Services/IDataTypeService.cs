@@ -9,17 +9,6 @@ namespace Umbraco.Cms.Core.Services;
 /// </summary>
 public interface IDataTypeService : IService
 {
-    [Obsolete("Please use GetPagedRelationsAsync. Scheduled for removal in Umbraco 17.")]
-    IReadOnlyDictionary<Udi, IEnumerable<string>> GetListViewReferences(int id) => throw new NotImplementedException();
-
-    /// <summary>
-    ///     Returns a dictionary of content type <see cref="Udi" />s and the property type aliases that use a <see cref="IDataType" />
-    /// </summary>
-    /// <param name="id">The guid Id of the <see cref="IDataType" /></param>
-    /// <returns></returns>
-    [Obsolete("Please use GetPagedRelationsAsync. Scheduled for removal in Umbraco 17.")]
-    Task<Attempt<IReadOnlyDictionary<Udi, IEnumerable<string>>, DataTypeOperationStatus>> GetReferencesAsync(Guid id);
-
     /// <summary>
     ///     Gets a paged result of items which are in relation with the current data type.
     /// </summary>
@@ -37,7 +26,10 @@ public interface IDataTypeService : IService
         => Task.FromResult(new PagedModel<RelationItemModel>());
 
     [Obsolete("Please use IDataTypeContainerService for all data type container operations. Will be removed in V15.")]
-    Attempt<OperationResult<OperationResultType, EntityContainer>?> CreateContainer(int parentId, Guid key, string name,
+    Attempt<OperationResult<OperationResultType, EntityContainer>?> CreateContainer(
+        int parentId,
+        Guid key,
+        string name,
         int userId = Constants.Security.SuperUserId);
 
     [Obsolete("Please use IDataTypeContainerService for all data type container operations. Will be removed in V15.")]
@@ -62,7 +54,9 @@ public interface IDataTypeService : IService
     Attempt<OperationResult?> DeleteContainer(int containerId, int userId = Constants.Security.SuperUserId);
 
     [Obsolete("Please use IDataTypeContainerService for all data type container operations. Will be removed in V15.")]
-    Attempt<OperationResult<OperationResultType, EntityContainer>?> RenameContainer(int id, string name,
+    Attempt<OperationResult<OperationResultType, EntityContainer>?> RenameContainer(
+        int id,
+        string name,
         int userId = Constants.Security.SuperUserId);
 
     /// <summary>
@@ -221,7 +215,9 @@ public interface IDataTypeService : IService
         Copy(copying, containerId, Constants.Security.SuperUserId);
 
     [Obsolete("Please use CopyASync instead. Will be removed in V15")]
-    Attempt<OperationResult<MoveOperationStatusType, IDataType>?> Copy(IDataType copying, int containerId,
+    Attempt<OperationResult<MoveOperationStatusType, IDataType>?> Copy(
+        IDataType copying,
+        int containerId,
         int userId = Constants.Security.SuperUserId) => throw new NotImplementedException();
 
     /// <summary>

@@ -45,7 +45,7 @@ public class FullDataSetCachePolicyTests
             .Callback(() => isCached = true);
 
         var policy =
-            new FullDataSetRepositoryCachePolicy<AuditItem, object>(cache.Object, DefaultAccessor, item => item.Id, false);
+            new FullDataSetRepositoryCachePolicy<AuditItem, object>(cache.Object, DefaultAccessor, new SingleServerCacheVersionService(), Mock.Of<ICacheSyncService>(), item => item.Id, false);
 
         var unused = policy.Get(1, id => new AuditItem(1, AuditType.Copy, 123, "test", "blah"), ids => getAll);
         Assert.IsTrue(isCached);
@@ -63,7 +63,7 @@ public class FullDataSetCachePolicyTests
         cache.Setup(x => x.Get(It.IsAny<string>())).Returns(new AuditItem(1, AuditType.Copy, 123, "test", "blah"));
 
         var defaultPolicy =
-            new FullDataSetRepositoryCachePolicy<AuditItem, object>(cache.Object, DefaultAccessor, item => item.Id, false);
+            new FullDataSetRepositoryCachePolicy<AuditItem, object>(cache.Object, DefaultAccessor, new SingleServerCacheVersionService(), Mock.Of<ICacheSyncService>(), item => item.Id, false);
 
         var found = defaultPolicy.Get(1, id => null, ids => getAll);
         Assert.IsNotNull(found);
@@ -92,7 +92,7 @@ public class FullDataSetCachePolicyTests
             .Returns(() => cached.Any() ? new DeepCloneableList<AuditItem>(ListCloneBehavior.CloneOnce) : null);
 
         var policy =
-            new FullDataSetRepositoryCachePolicy<AuditItem, object>(cache.Object, DefaultAccessor, item => item.Id, false);
+            new FullDataSetRepositoryCachePolicy<AuditItem, object>(cache.Object, DefaultAccessor, new SingleServerCacheVersionService(), Mock.Of<ICacheSyncService>(), item => item.Id, false);
 
         var found = policy.GetAll(new object[] { }, ids => getAll);
 
@@ -100,7 +100,7 @@ public class FullDataSetCachePolicyTests
         Assert.IsNotNull(list);
 
         // Do it again, ensure that its coming from the cache!
-        policy = new FullDataSetRepositoryCachePolicy<AuditItem, object>(cache.Object, DefaultAccessor, item => item.Id, false);
+        policy = new FullDataSetRepositoryCachePolicy<AuditItem, object>(cache.Object, DefaultAccessor, new SingleServerCacheVersionService(), Mock.Of<ICacheSyncService>(), item => item.Id, false);
 
         found = policy.GetAll(new object[] { }, ids => getAll);
 
@@ -131,7 +131,7 @@ public class FullDataSetCachePolicyTests
         cache.Setup(x => x.Get(It.IsAny<string>())).Returns(new AuditItem[] { });
 
         var defaultPolicy =
-            new FullDataSetRepositoryCachePolicy<AuditItem, object>(cache.Object, DefaultAccessor, item => item.Id, false);
+            new FullDataSetRepositoryCachePolicy<AuditItem, object>(cache.Object, DefaultAccessor, new SingleServerCacheVersionService(), Mock.Of<ICacheSyncService>(), item => item.Id, false);
 
         var found = defaultPolicy.GetAll(new object[] { }, ids => getAll);
 
@@ -154,7 +154,7 @@ public class FullDataSetCachePolicyTests
             });
 
         var defaultPolicy =
-            new FullDataSetRepositoryCachePolicy<AuditItem, object>(cache.Object, DefaultAccessor, item => item.Id, false);
+            new FullDataSetRepositoryCachePolicy<AuditItem, object>(cache.Object, DefaultAccessor, new SingleServerCacheVersionService(), Mock.Of<ICacheSyncService>(), item => item.Id, false);
 
         var found = defaultPolicy.GetAll(new object[] { }, ids => getAll);
         Assert.AreEqual(2, found.Length);
@@ -175,7 +175,7 @@ public class FullDataSetCachePolicyTests
             .Callback(() => cacheCleared = true);
 
         var defaultPolicy =
-            new FullDataSetRepositoryCachePolicy<AuditItem, object>(cache.Object, DefaultAccessor, item => item.Id, false);
+            new FullDataSetRepositoryCachePolicy<AuditItem, object>(cache.Object, DefaultAccessor, new SingleServerCacheVersionService(), Mock.Of<ICacheSyncService>(), item => item.Id, false);
         try
         {
             defaultPolicy.Update(new AuditItem(1, AuditType.Copy, 123, "test", "blah"), item => throw new Exception("blah!"));
@@ -205,7 +205,7 @@ public class FullDataSetCachePolicyTests
             .Callback(() => cacheCleared = true);
 
         var defaultPolicy =
-            new FullDataSetRepositoryCachePolicy<AuditItem, object>(cache.Object, DefaultAccessor, item => item.Id, false);
+            new FullDataSetRepositoryCachePolicy<AuditItem, object>(cache.Object, DefaultAccessor, new SingleServerCacheVersionService(), Mock.Of<ICacheSyncService>(), item => item.Id, false);
         try
         {
             defaultPolicy.Delete(new AuditItem(1, AuditType.Copy, 123, "test", "blah"), item => throw new Exception("blah!"));

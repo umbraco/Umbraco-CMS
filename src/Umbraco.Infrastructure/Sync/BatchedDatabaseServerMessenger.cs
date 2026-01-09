@@ -1,7 +1,10 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Factories;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Serialization;
@@ -18,9 +21,35 @@ public class BatchedDatabaseServerMessenger : DatabaseServerMessenger
 {
     private readonly IRequestCache _requestCache;
 
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="BatchedDatabaseServerMessenger" /> class.
-    /// </summary>
+    public BatchedDatabaseServerMessenger(
+        IMainDom mainDom,
+        CacheRefresherCollection cacheRefreshers,
+        ILogger<BatchedDatabaseServerMessenger> logger,
+        ISyncBootStateAccessor syncBootStateAccessor,
+        IHostingEnvironment hostingEnvironment,
+        ICacheInstructionService cacheInstructionService,
+        IJsonSerializer jsonSerializer,
+        IRequestCache requestCache,
+        ILastSyncedManager lastSyncedManager,
+        IOptionsMonitor<GlobalSettings> globalSettings,
+        IMachineInfoFactory machineInfoFactory)
+        : base(
+            mainDom,
+            cacheRefreshers,
+            logger,
+            true,
+            syncBootStateAccessor,
+            hostingEnvironment,
+            cacheInstructionService,
+            jsonSerializer,
+            globalSettings,
+            lastSyncedManager,
+            machineInfoFactory)
+    {
+        _requestCache = requestCache;
+    }
+
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in V18.")]
     public BatchedDatabaseServerMessenger(
         IMainDom mainDom,
         CacheRefresherCollection cacheRefreshers,
@@ -32,19 +61,19 @@ public class BatchedDatabaseServerMessenger : DatabaseServerMessenger
         IRequestCache requestCache,
         LastSyncedFileManager lastSyncedFileManager,
         IOptionsMonitor<GlobalSettings> globalSettings)
-        : base(
+        : this(
             mainDom,
             cacheRefreshers,
             logger,
-            true,
             syncBootStateAccessor,
             hostingEnvironment,
             cacheInstructionService,
             jsonSerializer,
-            lastSyncedFileManager,
-            globalSettings)
+            requestCache,
+            StaticServiceProvider.Instance.GetRequiredService<ILastSyncedManager>(),
+            globalSettings,
+            StaticServiceProvider.Instance.GetRequiredService<IMachineInfoFactory>())
     {
-        _requestCache = requestCache;
     }
 
     /// <summary>
@@ -94,8 +123,11 @@ public class BatchedDatabaseServerMessenger : DatabaseServerMessenger
     }
 
     /// <inheritdoc />
-    protected override void DeliverRemote(ICacheRefresher refresher, MessageType messageType,
-        IEnumerable<object>? ids = null, string? json = null)
+    protected override void DeliverRemote(
+        ICacheRefresher refresher,
+        MessageType messageType,
+        IEnumerable<object>? ids = null,
+        string? json = null)
     {
         var idsA = ids?.ToArray();
 

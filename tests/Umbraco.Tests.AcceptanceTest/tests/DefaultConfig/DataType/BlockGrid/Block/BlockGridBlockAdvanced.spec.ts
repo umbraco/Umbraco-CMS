@@ -27,6 +27,7 @@ test.skip('can add a custom view to a block', async ({umbracoApi, umbracoUi}) =>
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
   await umbracoUi.dataType.goToBlockAdvancedTab();
+  // TODO: Implement it later
 });
 
 // TODO: Remove skip and update test when the front-end is ready. Currently it is not possible to add a custom view to a block
@@ -40,6 +41,7 @@ test.skip('can remove a custom view from a block', async ({umbracoApi, umbracoUi
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
   await umbracoUi.dataType.goToBlockAdvancedTab();
+  // TODO: Implement it later
 });
 
 // TODO: Remove skip and update test when the front-end is ready. Currently it is not possible to add a custom stylesheet to a block
@@ -58,6 +60,7 @@ test.skip('can remove a custom stylesheet from a block', async ({umbracoApi, umb
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
   await umbracoUi.dataType.goToBlockAdvancedTab();
+  // TODO: Implement it later
 });
 
 test('can update overlay size in a block', async ({umbracoApi, umbracoUi}) => {
@@ -240,9 +243,7 @@ test('can remove a icon color from a block', async ({umbracoApi, umbracoUi}) => 
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainIconColor(blockGridEditorName, contentElementTypeId, '')).toBeTruthy();
 });
 
-// Remove skip when the front-end is ready. Currently it is not possible to add a thumbnail to a block
-// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/20264
-test.skip('can add a thumbnail to a block', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test('can add a thumbnail to a block', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const mediaName = 'TestMedia';
   await umbracoApi.media.ensureNameNotExists(mediaName);
@@ -265,8 +266,7 @@ test.skip('can add a thumbnail to a block', {tag: '@smoke'}, async ({umbracoApi,
   await umbracoUi.dataType.doesBlockHaveThumbnailImage(mediaUrl);
 });
 
-// TODO: Remove skip when the code is updated. Currently it is missing the assertion steps
-test.skip('can remove a thumbnail from a block', async ({umbracoApi, umbracoUi}) => {
+test.fixme('can remove a thumbnail from a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
@@ -276,4 +276,25 @@ test.skip('can remove a thumbnail from a block', async ({umbracoApi, umbracoUi})
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
   await umbracoUi.dataType.goToBlockAdvancedTab();
+  // TODO: Implement it later
+});
+
+// This tests for regression issue: https://github.com/umbraco/Umbraco-CMS/issues/20962
+test('only allow image file as a block thumbnail', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const notAllowedFileNames = ['Program.cs', 'appsettings.json', '.csproj'];
+  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
+  const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
+  await umbracoApi.dataType.createBlockGridWithABlock(blockGridEditorName, contentElementTypeId);
+
+  // Act
+  await umbracoUi.dataType.goToDataType(blockGridEditorName);
+  await umbracoUi.dataType.goToBlockWithName(elementTypeName);
+  await umbracoUi.dataType.goToBlockAdvancedTab();
+  await umbracoUi.dataType.clickChooseThumbnailButton();
+  
+  // Assert
+  for (const notAllowedFileName of notAllowedFileNames) {
+    await umbracoUi.dataType.isModalMenuItemWithNameVisible(notAllowedFileName, false);
+  }
 });

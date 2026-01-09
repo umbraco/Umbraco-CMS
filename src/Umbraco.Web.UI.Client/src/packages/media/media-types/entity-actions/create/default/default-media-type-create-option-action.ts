@@ -6,7 +6,7 @@ import type { MetaEntityCreateOptionAction } from '@umbraco-cms/backoffice/entit
 export class UmbDefaultMediaTypeCreateOptionAction extends UmbEntityCreateOptionActionBase<MetaEntityCreateOptionAction> {
 	override async getHref() {
 		const parentEntityType = this.args.entityType as UmbMediaTypeRootEntityType | UmbMediaTypeFolderEntityType;
-		if (!parentEntityType) throw new Error('Entity type is required to create a document type');
+		if (!parentEntityType) throw new Error('Entity type is required to create a media type');
 
 		const parentUnique = this.args.unique ?? null;
 

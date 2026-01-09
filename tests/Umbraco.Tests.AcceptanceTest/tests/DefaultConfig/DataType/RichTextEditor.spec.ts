@@ -2,12 +2,12 @@
 import {expect} from "@playwright/test";
 
 const dataTypeName = 'Richtext editor';
-const tipTapPropertyEditorName = 'Rich Text Editor [Tiptap] Property Editor UI';
 const tipTapAlias = 'Umbraco.RichText';
 const tipTapUiAlias = 'Umb.PropertyEditorUi.Tiptap';
 const extensionsDefaultValue = [
   "Umb.Tiptap.RichTextEssentials",
   "Umb.Tiptap.Anchor",
+  "Umb.Tiptap.Block",
   "Umb.Tiptap.Blockquote",
   "Umb.Tiptap.Bold",
   "Umb.Tiptap.BulletList",
@@ -35,8 +35,7 @@ const extensionsDefaultValue = [
   "Umb.Tiptap.TextDirection",
   "Umb.Tiptap.TextIndent",
   "Umb.Tiptap.TrailingNode",
-  "Umb.Tiptap.Underline",
-  "Umb.Tiptap.WordCount"
+  "Umb.Tiptap.Underline"
 ];
 
 const toolbarDefaultValue = [
@@ -81,10 +80,9 @@ test('tiptap is the default property editor in rich text editor', async ({umbrac
   // Act
   await umbracoUi.dataType.goToDataType(dataTypeName);
 
-  // Assert 
+  // Assert
   await umbracoUi.dataType.doesSettingHaveValue(ConstantHelper.tipTapSettings);
   await umbracoUi.dataType.doesSettingItemsHaveCount(ConstantHelper.tipTapSettings);
-  await umbracoUi.dataType.doesPropertyEditorHaveName(tipTapPropertyEditorName);
   await umbracoUi.dataType.doesPropertyEditorHaveAlias(tipTapAlias);
   await umbracoUi.dataType.doesPropertyEditorHaveUiAlias(tipTapUiAlias);
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);

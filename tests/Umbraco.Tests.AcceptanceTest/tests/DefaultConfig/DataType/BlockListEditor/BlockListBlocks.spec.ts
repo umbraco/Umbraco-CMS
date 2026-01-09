@@ -1,4 +1,4 @@
-﻿import {test} from '@umbraco/playwright-testhelpers';
+﻿import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 const blockListEditorName = 'TestBlockListEditor';
@@ -427,6 +427,7 @@ test('can add a thumbnail to a block', {tag: '@release'}, async ({umbracoApi, um
   // Act
   await umbracoUi.dataType.goToDataType(blockListEditorName);
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoUi.dataType.chooseBlockThumbnailWithPath(mediaUrl);
   await umbracoUi.dataType.clickSubmitButton();
   await umbracoUi.dataType.clickSaveButton();
@@ -436,7 +437,25 @@ test('can add a thumbnail to a block', {tag: '@release'}, async ({umbracoApi, um
   await umbracoUi.dataType.doesBlockHaveThumbnailImage(mediaUrl);
 });
 
-// TODO: Thumbnails are not showing in the UI
-test.skip('can remove a thumbnail to a block ', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test.fixme('can remove a thumbnail to a block ', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+  // TODO: Implement it later
+});
 
+// This tests for regression issue: https://github.com/umbraco/Umbraco-CMS/issues/20962
+test('only allow image file as a block thumbnail', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const notAllowedFileNames = ['Program.cs', 'appsettings.json', '.csproj'];
+  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
+  const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
+  await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListEditorName, contentElementTypeId);
+
+  // Act
+  await umbracoUi.dataType.goToDataType(blockListEditorName);
+  await umbracoUi.dataType.goToBlockWithName(elementTypeName);
+  await umbracoUi.dataType.clickChooseThumbnailButton();
+  
+  // Assert
+  for (const notAllowedFileName of notAllowedFileNames) {
+    await umbracoUi.dataType.isModalMenuItemWithNameVisible(notAllowedFileName, false);
+  }
 });

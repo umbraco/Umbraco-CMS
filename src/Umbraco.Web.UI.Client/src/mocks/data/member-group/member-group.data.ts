@@ -6,16 +6,16 @@ export const data: Array<UmbMockMemberGroupModel> = [
 	{
 		name: 'Member Group 1',
 		id: 'member-group-1-id',
-		signs: [],
+		flags: [],
 	},
 	{
 		name: 'Member Group 2',
 		id: 'member-group-2-id',
-		signs: [],
+		flags: [],
 	},
 	{
 		name: 'Forbidden Member Group',
 		id: 'forbidden',
-		signs: [],
+		flags: [],
 	},
 ];

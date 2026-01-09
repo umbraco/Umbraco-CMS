@@ -8,7 +8,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		js: () => import('./table/relation-type-table-collection-view.element.js'),
 		meta: {
 			label: 'Table',
-			icon: 'icon-list',
+			icon: 'icon-table',
 			pathName: 'table',
 		},
 		conditions: [

@@ -106,7 +106,8 @@ test('can copy and paste a single block into the same document but different gro
   await umbracoUi.content.doesBlockEditorBlockWithNameContainValue(elementGroupName, elementPropertyName, ConstantHelper.inputTypes.tipTap, blockPropertyValue);
 });
 
-test('can copy and paste a single block into another document', async ({umbracoApi, umbracoUi}) => {
+// Remove skip after this issue is resolved: https://github.com/umbraco/Umbraco-CMS/issues/20680
+test.skip('can copy and paste a single block into another document', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.document.ensureNameNotExists(secondContentName);
   await umbracoApi.document.createDefaultDocumentWithABlockGridEditorAndBlockWithValue(contentName, documentTypeName, blockGridDataTypeName, elementTypeId, AliasHelper.toAlias(elementPropertyName), blockPropertyValue, richTextDataTypeUiAlias);
@@ -326,7 +327,7 @@ test('can not copy a block from a block grid to a block list without allowed blo
   await umbracoUi.content.doesClipboardContainCopiedBlocksCount(0);
   await umbracoUi.content.clickCloseButton();
 
-  await umbracoUi.waitForTimeout(500);
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   // Checks if the block is visible in the blockGrid
   await umbracoUi.content.clickPasteFromClipboardButtonForProperty(blockGridDataTypeName, blockGridDataTypeName);
   await umbracoUi.content.doesClipboardContainCopiedBlocksCount(1);

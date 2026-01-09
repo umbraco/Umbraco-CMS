@@ -17,6 +17,7 @@ using Umbraco.Cms.Core.Dictionary;
 using Umbraco.Cms.Core.DynamicRoot;
 using Umbraco.Cms.Core.Editors;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Factories;
 using Umbraco.Cms.Core.Features;
 using Umbraco.Cms.Core.Handlers;
 using Umbraco.Cms.Core.Hosting;
@@ -283,6 +284,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IDictionaryItemService, DictionaryItemService>();
             Services.AddUnique<IDataTypeContainerService, DataTypeContainerService>();
             Services.AddUnique<IContentTypeContainerService, ContentTypeContainerService>();
+            Services.AddUnique<IContentTypeSchemaService, ContentTypeSchemaService>();
             Services.AddUnique<IMediaTypeContainerService, MediaTypeContainerService>();
             Services.AddUnique<IContentBlueprintContainerService, ContentBlueprintContainerService>();
             Services.AddUnique<IIsoCodeValidator, IsoCodeValidator>();
@@ -329,6 +331,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IMemberTypeService, MemberTypeService>();
             Services.AddUnique<IMemberContentEditingService, MemberContentEditingService>();
             Services.AddUnique<IMemberTypeEditingService, MemberTypeEditingService>();
+            Services.AddUnique<IMemberTypeContainerService, MemberTypeContainerService>();
             Services.AddUnique<INotificationService, NotificationService>();
             Services.AddUnique<ITrackedReferencesService, TrackedReferencesService>();
             Services.AddUnique<ITreeEntitySortingService, TreeEntitySortingService>();
@@ -336,13 +339,18 @@ namespace Umbraco.Cms.Core.DependencyInjection
                 factory.GetRequiredService<ICoreScopeProvider>(),
                 factory.GetRequiredService<ILoggerFactory>(),
                 factory.GetRequiredService<IEventMessagesFactory>(),
-                factory.GetRequiredService<IExternalLoginWithKeyRepository>()));
+                factory.GetRequiredService<IExternalLoginWithKeyRepository>(),
+                factory.GetRequiredService<IUserRepository>()));
             Services.AddUnique<ILogViewerService, LogViewerService>();
             Services.AddUnique<IExternalLoginWithKeyService>(factory => factory.GetRequiredService<ExternalLoginService>());
             Services.AddUnique<ILocalizedTextService>(factory => new LocalizedTextService(
                 factory.GetRequiredService<Lazy<LocalizedTextServiceFileSources>>(),
                 factory.GetRequiredService<ILogger<LocalizedTextService>>()));
+            // Default to a NOOP repository cache version service
+            Services.AddUnique<IRepositoryCacheVersionService, SingleServerCacheVersionService>();
             Services.AddUnique<ILongRunningOperationService, LongRunningOperationService>();
+            Services.AddUnique<ILastSyncedManager, LastSyncedManager>();
+            Services.AddUnique<IMachineInfoFactory, MachineInfoFactory>();
 
             Services.AddUnique<IEntityXmlSerializer, EntityXmlSerializer>();
 
@@ -423,6 +431,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<ITemporaryFileToXmlImportService, TemporaryFileToXmlImportService>();
             Services.AddUnique<IContentTypeImportService, ContentTypeImportService>();
             Services.AddUnique<IMediaTypeImportService, MediaTypeImportService>();
+            Services.AddUnique<IMemberTypeImportService, MemberTypeImportService>();
 
             // add validation services
             Services.AddUnique<IElementSwitchValidator, ElementSwitchValidator>();

@@ -1596,7 +1596,15 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
             "additionalProperties": { }
           }
         }
-      }
+      },
+      "tags": [
+        {
+          "name": "Content"
+        },
+        {
+          "name": "Media"
+        }
+      ]
     }
     """;
 }

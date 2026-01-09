@@ -861,14 +861,15 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.AreEqual(ContentTypeOperationStatus.InvalidAlias, result.Status);
     }
 
-    [Test]
-    public async Task Cannot_Use_Existing_Alias()
+    [TestCase("test")] // Matches alias case sensitively.
+    [TestCase("Test")] // Matches alias case insensitively.
+    public async Task Cannot_Use_Existing_Alias(string newAlias)
     {
         var createModel = ContentTypeCreateModel("Test", "test");
         var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
 
-        createModel = ContentTypeCreateModel("Test 2", "test");
+        createModel = ContentTypeCreateModel("Test 2", newAlias);
         result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentTypeOperationStatus.DuplicateAlias, result.Status);

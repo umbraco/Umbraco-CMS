@@ -1,4 +1,3 @@
-import type { UmbLogViewerWorkspaceContext } from '../../../logviewer-workspace.context.js';
 import { UMB_APP_LOG_VIEWER_CONTEXT } from '../../../logviewer-workspace.context-token.js';
 import type { UUICheckboxElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, queryAll, state } from '@umbraco-cms/backoffice/external/lit';
@@ -6,6 +5,7 @@ import { debounce } from '@umbraco-cms/backoffice/utils';
 import { LogLevelModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { path, query, toQueryString } from '@umbraco-cms/backoffice/router';
+import { consumeContext } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-log-viewer-log-level-filter-menu')
 export class UmbLogViewerLogLevelFilterMenuElement extends UmbLitElement {
@@ -15,27 +15,24 @@ export class UmbLogViewerLogLevelFilterMenuElement extends UmbLitElement {
 	@state()
 	private _logLevelFilter: LogLevelModel[] = [];
 
-	#logViewerContext?: UmbLogViewerWorkspaceContext;
+	#logViewerContext?: typeof UMB_APP_LOG_VIEWER_CONTEXT.TYPE;
 
-	constructor() {
-		super();
-		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT, (instance) => {
-			this.#logViewerContext = instance;
-			this.#observeLogLevelFilter();
-		});
+	@consumeContext({ context: UMB_APP_LOG_VIEWER_CONTEXT })
+	private set _logViewerContext(value) {
+		this.#logViewerContext = value;
+		this.#observeLogLevelFilter();
+	}
+	private get _logViewerContext() {
+		return this.#logViewerContext;
 	}
 
 	#observeLogLevelFilter() {
-		if (!this.#logViewerContext) return;
-
-		this.observe(this.#logViewerContext.logLevelsFilter, (levelsFilter) => {
+		this.observe(this._logViewerContext?.logLevelsFilter, (levelsFilter) => {
 			this._logLevelFilter = levelsFilter ?? [];
 		});
 	}
 
 	#setLogLevel() {
-		if (!this.#logViewerContext) return;
-
 		const logLevels = Array.from(this._logLevelSelectorCheckboxes)
 			.filter((checkbox) => checkbox.checked)
 			.map((checkbox) => checkbox.value as LogLevelModel);
@@ -79,22 +76,27 @@ export class UmbLogViewerLogLevelFilterMenuElement extends UmbLitElement {
 				<uui-button
 					class="log-level-menu-item"
 					@click=${this.#selectAllLogLevels}
-					label=${this.localize.term('general_selectAll')}></uui-button>
-				<uui-button class="log-level-menu-item" @click=${this.#deselectAllLogLevels} label="Deselect all"
-					>Deselect all</uui-button
-				>
+					label=${this.localize.term('logViewer_selectAllLogLevelFilters')}>
+					<umb-localize key="logViewer_selectAllLogLevelFilters">Select all</umb-localize>
+				</uui-button>
+				<uui-button
+					class="log-level-menu-item"
+					@click=${this.#deselectAllLogLevels}
+					label=${this.localize.term('logViewer_deselectAllLogLevelFilters')}>
+					<umb-localize key="logViewer_deselectAllLogLevelFilters">Deselect all</umb-localize>
+				</uui-button>
 			</div>
 		`;
 	}
 
 	override render() {
 		return html`
-			<umb-dropdown label="Select log levels">
+			<umb-dropdown label=${this.localize.term('logViewer_selectLogLevels')}>
 				<span slot="label">
-					Log Level:
+					<umb-localize key="logViewer_logLevels">Log Levels</umb-localize>:
 					${this._logLevelFilter.length > 0
 						? this._logLevelFilter.map((level) => html`<span class="log-level-button-indicator">${level}</span>`)
-						: 'All'}
+						: html`<umb-localize key="logViewer_all">All</umb-localize>`}
 				</span>
 				${this.#renderLogLevelSelector()}
 			</umb-dropdown>

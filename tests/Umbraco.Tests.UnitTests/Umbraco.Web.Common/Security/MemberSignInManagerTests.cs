@@ -1,6 +1,4 @@
-using System.Linq;
 using System.Net;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
@@ -13,6 +11,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
@@ -89,7 +88,8 @@ public class MemberSignInManagerTests
             Mock.Of<ILogger<UserManager<MemberIdentityUser>>>(),
             new TestOptionsSnapshot<MemberPasswordConfigurationSettings>(new MemberPasswordConfigurationSettings()),
             Mock.Of<IPublicAccessService>(),
-            Mock.Of<IHttpContextAccessor>());
+            Mock.Of<IHttpContextAccessor>(),
+            Mock.Of<IPublishedModelFactory>());
 
     [Test]
     public async Task

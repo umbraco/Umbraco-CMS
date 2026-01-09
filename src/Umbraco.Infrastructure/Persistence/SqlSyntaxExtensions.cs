@@ -19,9 +19,7 @@ public static class SqlSyntaxExtensions
     /// <param name="fieldSelector">An expression specifying the field.</param>
     /// <param name="tableAlias">An optional table alias.</param>
     /// <returns></returns>
-    public static string GetFieldName<TDto>(
-        this ISqlSyntaxProvider sqlSyntax,
-        Expression<Func<TDto, object?>> fieldSelector, string? tableAlias = null)
+    public static string GetFieldName<TDto>(this ISqlSyntaxProvider sqlSyntax, Expression<Func<TDto, object?>> fieldSelector, string? tableAlias = null)
     {
         var field = ExpressionHelper.FindProperty(fieldSelector).Item1 as PropertyInfo;
         var fieldName = field?.GetColumnName();

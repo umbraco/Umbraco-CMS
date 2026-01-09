@@ -1,5 +1,6 @@
 import { UMB_TEMPLATE_ENTITY_TYPE, UMB_TEMPLATE_ROOT_ENTITY_TYPE } from '../entity.js';
 import { manifests as reloadTreeItemChildrenManifest } from './reload-tree-item-children/manifests.js';
+import { UmbTemplateTreeStore } from './template-tree.store.js';
 
 export const UMB_TEMPLATE_TREE_REPOSITORY_ALIAS = 'Umb.Repository.Template.Tree';
 /**
@@ -19,7 +20,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'treeStore',
 		alias: UMB_TEMPLATE_TREE_STORE_ALIAS,
 		name: 'Template Tree Store',
-		api: () => import('./template-tree.store.js'),
+		api: UmbTemplateTreeStore,
 	},
 	{
 		type: 'tree',

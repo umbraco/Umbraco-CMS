@@ -4,14 +4,13 @@ import { UMB_MEDIA_ITEM_REPOSITORY_ALIAS } from '../../repository/constants.js';
 import { UmbMediaPickerInputContext } from '../input-media/input-media.context.js';
 import { UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone';
 import type { UmbDropzoneChangeEvent } from '@umbraco-cms/backoffice/dropzone';
-import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbSorterController, UmbSorterResolvePlacementAsGrid } from '@umbraco-cms/backoffice/sorter';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
-import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
@@ -136,24 +135,6 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		return this.#focalPointEnabled;
 	}
 	#focalPointEnabled: boolean = false;
-
-	@property()
-	/** @deprecated will be removed in v17 */
-	public set alias(value: string | undefined) {
-		//this.#modalRouter.setUniquePathValue('propertyAlias', value);
-	}
-	public get alias(): string | undefined {
-		return undefined; //this.#modalRouter.getUniquePathValue('propertyAlias');
-	}
-
-	@property()
-	/** @deprecated will be removed in v17 */
-	public set variantId(value: string | UmbVariantId | undefined) {
-		//this.#modalRouter.setUniquePathValue('variantId', value?.toString());
-	}
-	public get variantId(): string | undefined {
-		return undefined; //this.#modalRouter.getUniquePathValue('variantId');
-	}
 
 	/**
 	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
@@ -407,6 +388,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 
 	#renderAddButton() {
 		if (this.readonly) return nothing;
+		if (this.max === 1 && this._cards.length > 0) return nothing;
 		return html`
 			<uui-button
 				id="btn-add"
@@ -427,18 +409,15 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 	#renderItem(item: UmbRichMediaCardModel) {
 		if (!item.unique) return nothing;
 		const href = this.readonly ? undefined : this._routeBuilder?.({ key: item.unique });
+
 		return html`
 			<uui-card-media id=${item.unique} name=${item.name} .href=${href} ?readonly=${this.readonly}>
-				${when(
-					item.isLoading,
-					() => html`<uui-loader-circle></uui-loader-circle>`,
-					() => html`
-						<umb-imaging-thumbnail
-							unique=${item.media}
-							alt=${item.name}
-							icon=${item.icon ?? 'icon-picture'}></umb-imaging-thumbnail>
-					`,
-				)}
+				<umb-imaging-thumbnail
+					.unique=${item.media}
+					.alt=${item.name}
+					.icon=${item.icon ?? 'icon-picture'}
+					.externalLoading=${item.isLoading ?? false}></umb-imaging-thumbnail>
+
 				${this.#renderIsTrashed(item)} ${this.#renderActions(item)}
 			</uui-card-media>
 		`;
@@ -468,6 +447,8 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		css`
 			:host {
 				position: relative;
+				display: block;
+				width: 100%;
 			}
 			.container {
 				display: grid;

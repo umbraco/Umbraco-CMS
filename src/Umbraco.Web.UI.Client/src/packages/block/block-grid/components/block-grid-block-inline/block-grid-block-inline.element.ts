@@ -38,6 +38,9 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 	@property({ type: String, reflect: false })
 	icon?: string;
 
+	@property({ type: Number, attribute: false })
+	index?: number;
+
 	@property({ type: Boolean, reflect: true })
 	unpublished?: boolean;
 
@@ -73,10 +76,12 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 				'observeContentKey',
 			);
 		});
+
 		this.consumeContext(UMB_BLOCK_GRID_ENTRIES_CONTEXT, (entriesContext) => {
 			this.#parentUnique = entriesContext?.getParentUnique();
 			this.#areaKey = entriesContext?.getAreaKey();
 		});
+
 		new UmbExtensionApiInitializer(
 			this,
 			umbExtensionsRegistry,
@@ -173,7 +178,7 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 	}
 
 	#renderBlockInfo() {
-		const blockValue = { ...this.content, $settings: this.settings };
+		const blockValue = { ...this.content, $settings: this.settings, $index: this.index };
 		return html`
 			<span id="content">
 				<span id="icon">
@@ -185,30 +190,35 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 			</span>
 			${when(
 				this.unpublished,
-				() =>
-					html`<uui-tag slot="name" look="secondary" title=${this.localize.term('blockEditor_notExposedDescription')}
-						><umb-localize key="blockEditor_notExposedLabel"></umb-localize
-					></uui-tag>`,
+				() => html`
+					<uui-tag slot="name" look="secondary" title=${this.localize.term('blockEditor_notExposedDescription')}>
+						<umb-localize key="blockEditor_notExposedLabel"></umb-localize>
+					</uui-tag>
+				`,
 			)}
 		`;
 	}
 
 	#renderInside() {
 		if (this.unpublished === true) {
-			return html`<uui-button id="exposeButton" @click=${this.#expose}
-				><uui-icon name="icon-add"></uui-icon>
-				<umb-localize
-					key="blockEditor_createThisFor"
-					.args=${[this._ownerContentTypeName, this._variantName]}></umb-localize
-			></uui-button>`;
+			return html`
+				<uui-button id="exposeButton" @click=${this.#expose}>
+					<uui-icon name="icon-add"></uui-icon>
+					<umb-localize
+						key="blockEditor_createThisFor"
+						.args=${[this._ownerContentTypeName, this._variantName]}></umb-localize>
+				</uui-button>
+			`;
 		} else {
-			return html`<div id="inside" draggable="false">
-				<umb-property-type-based-property
-					.property=${this._inlineProperty}
-					.dataPath=${this._inlinePropertyDataPath ?? ''}
-					slot="areas"></umb-property-type-based-property>
-				<umb-block-grid-areas-container slot="areas" draggable="false"></umb-block-grid-areas-container>
-			</div>`;
+			return html`
+				<div id="inside" draggable="false">
+					<umb-property-type-based-property
+						.property=${this._inlineProperty}
+						.dataPath=${this._inlinePropertyDataPath ?? ''}
+						slot="areas"></umb-property-type-based-property>
+					<umb-block-grid-areas-container slot="areas" draggable="false"></umb-block-grid-areas-container>
+				</div>
+			`;
 		}
 	}
 

@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
@@ -398,7 +398,7 @@ public class ContentRouteBuilderTests : DeliveryApiTests
             .SetupGet(m => m.Cultures)
             .Returns(cultures.ToDictionary(
                 c => c,
-                c => new PublishedCultureInfo(c, $"{name}-{c}", DefaultUrlSegment(name, c), DateTime.Now)));
+                c => new PublishedCultureInfo(c, $"{name}-{c}", DefaultUrlSegment(name, c), DateTime.UtcNow)));
         return content.Object;
     }
 

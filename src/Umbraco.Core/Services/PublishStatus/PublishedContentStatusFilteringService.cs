@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Extensions;
 
@@ -40,13 +40,14 @@ internal sealed class PublishedContentStatusFilteringService : IPublishedContent
                 _publishStatusQueryService.IsDocumentPublished(key, culture)
                 && _publishStatusQueryService.HasPublishedAncestorPath(key));
 
-        return WhereIsInvariantOrHasCulture(candidateKeys, culture, preview).ToArray();
+        return WhereIsInvariantOrHasCultureOrRequestedAllCultures(candidateKeys, culture, preview).ToArray();
     }
 
-    private IEnumerable<IPublishedContent> WhereIsInvariantOrHasCulture(IEnumerable<Guid> keys, string culture, bool preview)
+    private IEnumerable<IPublishedContent> WhereIsInvariantOrHasCultureOrRequestedAllCultures(IEnumerable<Guid> keys, string culture, bool preview)
         => keys
             .Select(key => _publishedContentCache.GetById(preview, key))
             .WhereNotNull()
-            .Where(content => content.ContentType.VariesByCulture() is false
+            .Where(content => culture == Constants.System.InvariantCulture
+                              || content.ContentType.VariesByCulture() is false
                               || content.Cultures.ContainsKey(culture));
 }

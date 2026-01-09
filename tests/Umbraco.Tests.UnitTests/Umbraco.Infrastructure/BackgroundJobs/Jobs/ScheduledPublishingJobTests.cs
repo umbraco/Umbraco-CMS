@@ -15,6 +15,7 @@ using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure;
 using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
+using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.DistributedJobs;
 using Umbraco.Cms.Infrastructure.HostedServices;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.BackgroundJobs.Jobs;
@@ -29,7 +30,7 @@ public class ScheduledPublishingJobTests
     public async Task Does_Not_Execute_When_Not_Enabled()
     {
         var sut = CreateScheduledPublishing(enabled: false);
-        await sut.RunJobAsync();
+        await sut.ExecuteAsync();
         VerifyScheduledPublishingNotPerformed();
     }
 
@@ -37,7 +38,7 @@ public class ScheduledPublishingJobTests
     public async Task Executes_And_Performs_Scheduled_Publishing()
     {
         var sut = CreateScheduledPublishing();
-        await sut.RunJobAsync();
+        await sut.ExecuteAsync();
         VerifyScheduledPublishingPerformed();
     }
 

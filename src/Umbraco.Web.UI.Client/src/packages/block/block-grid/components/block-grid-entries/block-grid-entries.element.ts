@@ -1,25 +1,19 @@
 import type { UmbBlockGridEntryElement } from '../block-grid-entry/block-grid-entry.element.js';
 import type { UmbBlockGridLayoutModel } from '../../types.js';
 import { UmbBlockGridEntriesContext } from './block-grid-entries.context.js';
+import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import {
 	getAccumulatedValueOfIndex,
 	getInterpolatedIndexOfPositionInWeightMap,
 	isWithinRect,
 } from '@umbraco-cms/backoffice/utils';
+import { UmbFormControlMixin, UmbFormControlValidator } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { html, customElement, state, repeat, css, property, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import {
-	UmbSorterController,
-	type UmbSorterConfig,
-	type UmbSorterResolvePlacementArgs,
-} from '@umbraco-cms/backoffice/sorter';
-import {
-	UmbFormControlMixin,
-	UmbFormControlValidator,
-	type UmbFormControlValidatorConfig,
-} from '@umbraco-cms/backoffice/validation';
+import type { UmbFormControlValidatorConfig } from '@umbraco-cms/backoffice/validation';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
+import type { UmbSorterConfig, UmbSorterResolvePlacementArgs } from '@umbraco-cms/backoffice/sorter';
 
 /**
  * Notice this utility method is not really shareable with others as it also takes areas into account. [NL]
@@ -123,7 +117,6 @@ const SORTER_CONFIG: UmbSorterConfig<UmbBlockGridLayoutModel, UmbBlockGridEntryE
  */
 @customElement('umb-block-grid-entries')
 export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElement) {
-	//
 	#sorter = new UmbSorterController<UmbBlockGridLayoutModel, UmbBlockGridEntryElement>(this, {
 		...SORTER_CONFIG,
 		onStart: () => {
@@ -184,19 +177,22 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 	private _canCreate?: boolean;
 
 	@state()
-	private _createLabel?: string;
-
-	@state()
 	private _configCreateLabel?: string;
 
 	@state()
-	private _styleElement?: HTMLLinkElement;
+	private _createLabel?: string;
+
+	@state()
+	private _isReadOnly: boolean = false;
 
 	@state()
 	private _layoutEntries: Array<UmbBlockGridLayoutModel> = [];
 
 	@state()
-	private _isReadOnly: boolean = false;
+	private _limitMax?: number;
+
+	@state()
+	private _styleElement?: HTMLLinkElement;
 
 	constructor() {
 		super();
@@ -294,6 +290,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 	}
 
 	async #setupRangeValidation(rangeLimit: UmbNumberRangeValueType | undefined) {
+		this._limitMax = rangeLimit?.max;
 		if (this.#rangeUnderflowValidator) {
 			this.removeValidator(this.#rangeUnderflowValidator);
 			this.#rangeUnderflowValidator = undefined;
@@ -392,30 +389,36 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 			<div class="umb-block-grid__layout-container" data-area-length=${this._layoutEntries.length}>
 				${repeat(
 					this._layoutEntries,
-					(x) => x.contentKey,
-					(layoutEntry, index) =>
-						html`<umb-block-grid-entry
+					(layout, index) => `${index}_${layout.contentKey}`,
+					(layout, index) => html`
+						<umb-block-grid-entry
 							class="umb-block-grid__layout-item"
 							index=${index}
-							.contentKey=${layoutEntry.contentKey}
-							.layout=${layoutEntry}>
-						</umb-block-grid-entry>`,
+							.contentKey=${layout.contentKey}
+							.layout=${layout}>
+						</umb-block-grid-entry>
+					`,
 				)}
 			</div>
-			${this._canCreate ? this.#renderCreateButtonGroup() : nothing}
-			${this._areaKey ? html` <uui-form-validation-message .for=${this}></uui-form-validation-message>` : nothing}
+			${when(this._canCreate, () => this.#renderCreateButtonGroup())}
+			${when(this._areaKey, () => html`<uui-form-validation-message .for=${this}></uui-form-validation-message>`)}
 		`;
 	}
 
 	#renderCreateButtonGroup() {
+		if (this._limitMax === 1 && this._layoutEntries.length > 0) return nothing;
 		if (this._areaKey === null || this._layoutEntries.length === 0) {
-			return html` <uui-button-group id="createButton">
-				${this.#renderCreateButton()} ${this.#renderPasteButton()}
-			</uui-button-group>`;
+			return html`
+				<uui-button-group id="createButton">
+					${this.#renderCreateButton()} ${this.#renderPasteButton()}
+				</uui-button-group>
+			`;
 		} else if (this._isReadOnly === false) {
-			return html`<uui-button-inline-create
-				href=${this.#context.getPathForCreateBlock(-1) ?? ''}
-				label=${this.localize.term('blockEditor_addBlock')}></uui-button-inline-create> `;
+			return html`
+				<uui-button-inline-create
+					href=${this.#context.getPathForCreateBlock(-1) ?? ''}
+					label=${this.localize.term('blockEditor_addBlock')}></uui-button-inline-create>
+			`;
 		} else {
 			return nothing;
 		}

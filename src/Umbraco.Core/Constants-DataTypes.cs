@@ -107,15 +107,14 @@ public static partial class Constants
             public const string ListViewMedia = "3A0156C4-3B8C-4803-BDC1-6871FAA83FFF";
 
             /// <summary>
-            ///     Guid for List View - Members as string
-            /// </summary>
-            [Obsolete("No longer used in Umbraco. Scheduled for removal in Umbraco 17.")]
-            public const string ListViewMembers = "AA2C52A0-CE87-4E65-A47C-7DF09358585D";
-
-            /// <summary>
             ///     Guid for Date Picker with time as string
             /// </summary>
             public const string DatePickerWithTime = "e4d66c0f-b935-4200-81f0-025f7256b89a";
+
+            /// <summary>
+            ///     Guid for Date Time Picker (with Timezone) as string
+            /// </summary>
+            public const string DateTimePickerWithTimeZone = "88E8A052-30EE-4D44-A507-59F2CDFC769C";
 
             /// <summary>
             ///     Guid for Approved Color as string
@@ -301,6 +300,11 @@ public static partial class Constants
             ///     Guid for Date Picker with time
             /// </summary>
             public static readonly Guid DatePickerWithTimeGuid = new(DatePickerWithTime);
+
+            /// <summary>
+            ///     Guid for Date Time Picker (with Timezone).
+            /// </summary>
+            public static readonly Guid DateTimePickerWithTimeZoneGuid = new(DateTimePickerWithTimeZone);
 
             /// <summary>
             ///     Guid for Approved Color

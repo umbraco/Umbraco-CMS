@@ -3,6 +3,8 @@ import type { UmbBlockListWorkspaceOriginData } from '../index.js';
 import type { UmbBlockDataModel } from '../../block/types.js';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbBlockManagerContext } from '@umbraco-cms/backoffice/block';
+import { UMB_PROPERTY_SORT_MODE_CONTEXT } from '@umbraco-cms/backoffice/property-sort-mode';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * A implementation of the Block Manager specifically for the Block List Editor.
@@ -21,28 +23,38 @@ export class UmbBlockListManagerContext<
 		return this.#inlineEditingMode.getValue();
 	}
 
+	#sortModeContext?: typeof UMB_PROPERTY_SORT_MODE_CONTEXT.TYPE;
+	#isSortMode = new UmbBooleanState(undefined);
+	readonly isSortMode = this.#isSortMode.asObservable();
+
+	setIsSortMode(isSortMode: boolean) {
+		this.#sortModeContext?.setIsSortMode(isSortMode);
+	}
+	getIsSortMode(): boolean | undefined {
+		return this.#sortModeContext?.getIsSortMode();
+	}
+
+	constructor(host: UmbControllerHost) {
+		super(host);
+
+		this.consumeContext(UMB_PROPERTY_SORT_MODE_CONTEXT, (sortPropertyContext) => {
+			this.#sortModeContext = sortPropertyContext;
+			this.observe(this.#sortModeContext?.isSortMode, (isSortMode) => {
+				this.#isSortMode.setValue(isSortMode);
+			});
+		});
+	}
+
 	/**
 	 * @param contentElementTypeKey
 	 * @param partialLayoutEntry
 	 * @param _originData
-	 * @deprecated Use createWithPresets instead. Will be removed in v.17.
 	 */
-	create(
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		contentElementTypeKey: string,
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey'>,
-		// This property is used by some implementations, but not used in this. Do not remove. [NL]
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		_originData?: UmbBlockListWorkspaceOriginData,
-	): never {
-		throw new Error('Method deparecated use createWithPresets');
-	}
 	async createWithPresets(
 		contentElementTypeKey: string,
 		partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey'>,
 		// This property is used by some implementations, but not used in this. Do not remove. [NL]
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 		_originData?: UmbBlockListWorkspaceOriginData,
 	) {
 		return await super._createBlockData(contentElementTypeKey, partialLayoutEntry);

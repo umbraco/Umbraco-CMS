@@ -1,6 +1,6 @@
 import { UmbTiptapToolbarElementApiBase } from '../tiptap-toolbar-element-api-base.js';
 import type { MetaTiptapToolbarStyleMenuItem } from '../../extensions/types.js';
-import type { ChainedCommands, Editor } from '@umbraco-cms/backoffice/external/tiptap';
+import type { ChainedCommands, Editor } from '../../externals.js';
 
 type UmbTiptapToolbarStyleMenuCommandType = {
 	type: string;

@@ -8,10 +8,14 @@ import { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import type { UmbEntryPointOnInit } from '@umbraco-cms/backoffice/extension-api';
 
-import './property-action/components/index.js';
-import './menu/components/index.js';
-import './extension-registry/components/index.js';
+import './collection/global-components.js';
 import './entity-item/global-components.js';
+import './entity-sign/components/index.js';
+import './extension-registry/components/index.js';
+import './menu/components/index.js';
+import './property-action/components/index.js';
+import './property-editor-data-source/global-components.js';
+import './property-sort-mode/global-components/index.js';
 
 export const onInit: UmbEntryPointOnInit = (host, extensionRegistry) => {
 	new UmbExtensionsApiInitializer(host, extensionRegistry, 'globalContext', [host]);

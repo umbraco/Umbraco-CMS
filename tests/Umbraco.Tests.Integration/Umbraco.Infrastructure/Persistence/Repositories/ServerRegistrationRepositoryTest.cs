@@ -4,6 +4,7 @@
 using System.Data.Common;
 using System.Linq;
 using Microsoft.Extensions.Logging;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
@@ -28,7 +29,7 @@ internal sealed class ServerRegistrationRepositoryTest : UmbracoIntegrationTest
     private AppCaches _appCaches;
 
     private ServerRegistrationRepository CreateRepository(IScopeProvider provider) =>
-        new((IScopeAccessor)provider, LoggerFactory.CreateLogger<ServerRegistrationRepository>());
+        new((IScopeAccessor)provider, LoggerFactory.CreateLogger<ServerRegistrationRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
 
     [Test]
     public void Cannot_Add_Duplicate_Server_Identities()
@@ -39,7 +40,7 @@ internal sealed class ServerRegistrationRepositoryTest : UmbracoIntegrationTest
         {
             var repository = CreateRepository(provider);
 
-            var server = new ServerRegistration("http://shazwazza.com", "COMPUTER1", DateTime.Now);
+            var server = new ServerRegistration("http://shazwazza.com", "COMPUTER1", DateTime.UtcNow);
 
             Assert.That(() => repository.Save(server), Throws.InstanceOf<DbException>());
         }
@@ -156,7 +157,7 @@ internal sealed class ServerRegistrationRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository(provider);
 
             // Act
-            var server = new ServerRegistration("http://shazwazza.com", "COMPUTER4", DateTime.Now);
+            var server = new ServerRegistration("http://shazwazza.com", "COMPUTER4", DateTime.UtcNow);
             repository.Save(server);
 
             // Assert
@@ -237,9 +238,9 @@ internal sealed class ServerRegistrationRepositoryTest : UmbracoIntegrationTest
         {
             var repository = CreateRepository(provider);
 
-            repository.Save(new ServerRegistration("http://localhost", "COMPUTER1", DateTime.Now) { IsActive = true });
-            repository.Save(new ServerRegistration("http://www.mydomain.com", "COMPUTER2", DateTime.Now));
-            repository.Save(new ServerRegistration("https://www.another.domain.com", "Computer3", DateTime.Now));
+            repository.Save(new ServerRegistration("http://localhost", "COMPUTER1", DateTime.UtcNow) { IsActive = true });
+            repository.Save(new ServerRegistration("http://www.mydomain.com", "COMPUTER2", DateTime.UtcNow));
+            repository.Save(new ServerRegistration("https://www.another.domain.com", "Computer3", DateTime.UtcNow));
             scope.Complete();
         }
     }

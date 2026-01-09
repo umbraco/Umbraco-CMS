@@ -5,8 +5,8 @@ import type {
 	UmbPropertyTypeContainerModel,
 } from '../../../types.js';
 import { UmbContentTypeContainerStructureHelper } from '../../../structure/index.js';
-import { UMB_CONTENT_TYPE_DESIGN_EDITOR_CONTEXT } from './content-type-design-editor.context-token.js';
 import type { UmbContentTypeWorkspaceViewEditGroupElement } from './content-type-design-editor-group.element.js';
+import { UMB_CONTENT_TYPE_DESIGN_EDITOR_CONTEXT } from './content-type-design-editor.context-token.js';
 import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
@@ -19,13 +19,13 @@ import './content-type-design-editor-group.element.js';
 
 const SORTER_CONFIG: UmbSorterConfig<UmbPropertyTypeContainerMergedModel, UmbContentTypeWorkspaceViewEditGroupElement> =
 	{
-		getUniqueOfElement: (element) => element.group?.key,
-		getUniqueOfModel: (modelEntry) => modelEntry.key,
+		getUniqueOfElement: (element) => element.group?.ownerId ?? element.group?.ids[0],
+		getUniqueOfModel: (modelEntry) => modelEntry.ownerId ?? modelEntry.ids[0],
 		// TODO: Make specific to the current owner document. [NL]
 		identifier: 'content-type-container-sorter',
 		itemSelector: 'umb-content-type-design-editor-group',
 		handleSelector: '.drag-handle',
-		disabledItemSelector: '[inherited]', // Inherited attribute is set by the umb-content-type-design-editor-group.
+		disabledItemSelector: ':not([has-owner-container])', // Inherited attribute is set by the umb-content-type-design-editor-group.
 		containerSelector: '.container-list',
 	};
 
@@ -38,18 +38,34 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 			onChange: ({ model }) => {
 				this._groups = model;
 			},
+			onContainerChange: ({ item }) => {
+				if (this.#containerId === undefined) {
+					throw new Error('ContainerId is not set');
+				}
+				if (item.ownerId === undefined) {
+					// This may be possible later, but for now this is not possible. [NL]
+					throw new Error(
+						'OwnerId is not set for the given container, we cannot move containers that are not owned by the current Document.',
+					);
+				}
+				this.#groupStructureHelper.partialUpdateContainer(item.ownerId, {
+					parent: this.#containerId ? { id: this.#containerId } : null,
+				});
+			},
 			onEnd: ({ item }) => {
-				/*if (this._inherited === undefined) {
-				throw new Error('OwnerTabId is not set, we have not made a local duplicated of this container.');
-				return;
-			}*/
+				if (item.ownerId === undefined) {
+					// This may be possible later, but for now this is not possible. [NL]
+					throw new Error(
+						'OwnerId is not set for the given container, we cannot move containers that are not owned by the current Document.',
+					);
+				}
 				/**
 				 * Explanation: If the item is the first in list, we compare it to the item behind it to set a sortOrder.
 				 * If it's not the first in list, we will compare to the item in before it, and check the following item to see if it caused overlapping sortOrder, then update
 				 * the overlap if true, which may cause another overlap, so we loop through them till no more overlaps...
 				 */
 				const model = this._groups;
-				const newIndex = model.findIndex((entry) => entry.key === item.key);
+				const newIndex = model.findIndex((entry) => entry.ownerId === item.ownerId);
 
 				// Doesn't exist in model
 				if (newIndex === -1) return;
@@ -87,20 +103,22 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 						this.#groupStructureHelper.partialUpdateContainer(entry.ownerId, {
 							sortOrder: ++prevSortOrder,
 						});
-
-						i++;
 					}
+					i++;
 				}
 			},
 			onRequestDrop: async ({ unique }) => {
-				const context = await this.getContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT);
+				const context = this.#contentTypeWorkspaceContext;
 				if (!context) {
 					throw new Error('Could not get Workspace Context');
 				}
-				return context.structure.getMergedContainerById(unique) as UmbPropertyTypeContainerMergedModel | undefined;
+				const result = context.structure.getMergedContainerById(unique) as
+					| UmbPropertyTypeContainerMergedModel
+					| undefined;
+				return result;
 			},
 			requestExternalRemove: async ({ item }) => {
-				const context = await this.getContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT);
+				const context = this.#contentTypeWorkspaceContext;
 				if (!context) {
 					throw new Error('Could not get Workspace Context');
 				}
@@ -110,7 +128,7 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 				);
 			},
 			requestExternalInsert: async ({ item }) => {
-				const context = await this.getContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT);
+				const context = this.#contentTypeWorkspaceContext;
 				if (!context) {
 					throw new Error('Could not get Workspace Context');
 				}
@@ -165,11 +183,13 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 	private _editContentTypePath?: string;
 
 	#groupStructureHelper = new UmbContentTypeContainerStructureHelper<UmbContentTypeModel>(this);
+	#contentTypeWorkspaceContext?: typeof UMB_CONTENT_TYPE_WORKSPACE_CONTEXT.TYPE;
 
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, (context) => {
+			this.#contentTypeWorkspaceContext = context;
 			this.#groupStructureHelper.setStructureManager(context?.structure);
 
 			const entityType = context?.getEntityType();
@@ -190,11 +210,6 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 				context?.isSorting,
 				(isSorting) => {
 					this._sortModeActive = isSorting;
-					if (isSorting) {
-						this.#sorter.enable();
-					} else {
-						this.#sorter.disable();
-					}
 				},
 				'_observeIsSorting',
 			);
@@ -294,9 +309,19 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 				align-content: start;
 			}
 
+			/* Ensure the container-list has some height when its empty so groups can be dropped into it.*/
+			.container-list {
+				margin-top: calc(var(--uui-size-layout-1) * -1);
+				padding-top: var(--uui-size-layout-1);
+			}
+
 			.container-list #convert-to-tab {
 				margin-bottom: var(--uui-size-layout-1);
 				display: flex;
+			}
+
+			.container-list[sort-mode-active] {
+				min-height: 100px;
 			}
 		`,
 	];

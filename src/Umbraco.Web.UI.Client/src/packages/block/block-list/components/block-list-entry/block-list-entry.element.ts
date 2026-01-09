@@ -5,7 +5,7 @@ import {
 	UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS,
 	UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS,
 } from '../../constants.js';
-import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement, umbDestroyOnDisconnect } from '@umbraco-cms/backoffice/lit-element';
 import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
@@ -29,19 +29,15 @@ import '../unsupported-list-block/index.js';
  */
 @customElement('umb-block-list-entry')
 export class UmbBlockListEntryElement extends UmbLitElement implements UmbPropertyEditorUiElement {
-	//
 	@property({ type: Number })
-	public get index(): number | undefined {
-		return this.#context.getIndex();
-	}
 	public set index(value: number | undefined) {
 		this.#context.setIndex(value);
 	}
+	public get index(): number | undefined {
+		return this.#context.getIndex();
+	}
 
 	@property({ attribute: false })
-	public get contentKey(): string | undefined {
-		return this._contentKey;
-	}
 	public set contentKey(value: string | undefined) {
 		if (!value) return;
 		this._contentKey = value;
@@ -56,6 +52,9 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			},
 			'observeMessagesForContent',
 		);
+	}
+	public get contentKey(): string | undefined {
+		return this._contentKey;
 	}
 	private _contentKey?: string | undefined;
 
@@ -97,6 +96,9 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	@state()
 	private _inlineEditingMode?: boolean;
 
+	@state()
+	private _isSortMode?: boolean;
+
 	// 'content-invalid' attribute is used for styling purpose.
 	@property({ type: Boolean, attribute: 'content-invalid', reflect: true })
 	private _contentInvalid?: boolean;
@@ -123,6 +125,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		super();
 		this.#init();
 	}
+
 	#init() {
 		this.observe(
 			this.#context.showContentEdit,
@@ -147,7 +150,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			},
 			null,
 		);
-		// TODO: Implement index.
+		this.observe(this.#context.index, (index) => this.#updateBlockViewProps({ index }), null);
 		this.observe(
 			this.#context.label,
 			(label) => {
@@ -189,13 +192,9 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			},
 			null,
 		);
-		this.observe(
-			this.#context.inlineEditingMode,
-			(mode) => {
-				this._inlineEditingMode = mode;
-			},
-			null,
-		);
+		this.observe(this.#context.inlineEditingMode, (mode) => (this._inlineEditingMode = mode), null);
+		this.observe(this.#context.isSortMode, (isSortMode) => (this._isSortMode = isSortMode), null);
+
 		// Data props:
 		this.observe(
 			this.#context.layout,
@@ -308,8 +307,8 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			throw new Error('Could not get required contexts to copy.');
 		}
 
-		const workspaceName = propertyDatasetContext?.getName();
-		const propertyLabel = propertyContext?.getLabel();
+		const workspaceName = this.localize.string(propertyDatasetContext?.getName());
+		const propertyLabel = this.localize.string(propertyContext?.getLabel());
 		const blockLabel = this.#context.getName();
 
 		const entryName = workspaceName
@@ -371,20 +370,26 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	};
 
 	#renderRefBlock() {
-		return html`<umb-ref-list-block
-			.label=${this._label}
-			.icon=${this._icon}
-			.unpublished=${!this._exposed}
-			.config=${this._blockViewProps.config}
-			.content=${this._blockViewProps.content}
-			.settings=${this._blockViewProps.settings}
-			${umbDestroyOnDisconnect()}></umb-ref-list-block>`;
+		return html`
+			<umb-ref-list-block
+				class=${this._isSortMode ? 'sortable' : ''}
+				.label=${this._label}
+				.icon=${this._icon}
+				.index=${this._blockViewProps.index}
+				.unpublished=${!this._exposed}
+				.config=${this._blockViewProps.config}
+				.content=${this._blockViewProps.content}
+				.settings=${this._blockViewProps.settings}
+				${umbDestroyOnDisconnect()}>
+			</umb-ref-list-block>
+		`;
 	}
 
 	#renderInlineBlock() {
 		return html`<umb-inline-list-block
 			.label=${this._label}
 			.icon=${this._icon}
+			.index=${this._blockViewProps.index}
 			.unpublished=${!this._exposed}
 			.config=${this._blockViewProps.config}
 			.content=${this._blockViewProps.content}
@@ -411,33 +416,42 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	};
 
 	#renderBlock() {
-		return this.contentKey && (this._contentTypeAlias || this._unsupported)
-			? html`
-					<div class="umb-block-list__block">
-						<umb-extension-slot
-							type="blockEditorCustomView"
-							default-element=${this._inlineEditingMode ? 'umb-inline-list-block' : 'umb-ref-list-block'}
-							.renderMethod=${this.#extensionSlotRenderMethod}
-							.fallbackRenderMethod=${this.#renderBuiltinBlockView}
-							.props=${this._blockViewProps}
-							.filter=${this.#extensionSlotFilterMethod}
-							single></umb-extension-slot>
-						${this.#renderActionBar()}
-						${!this._showContentEdit && this._contentInvalid
-							? html`<uui-badge attention color="invalid" label="Invalid content">!</uui-badge>`
-							: nothing}
-					</div>
-				`
-			: nothing;
+		return when(
+			this.contentKey && (this._contentTypeAlias || this._unsupported),
+			() => html`
+				<div class="umb-block-list__block">
+					${when(
+						this._isSortMode,
+						() => this.#renderRefBlock(),
+						() => html`
+							<umb-extension-slot
+								single
+								type="blockEditorCustomView"
+								.filter=${this.#extensionSlotFilterMethod}
+								.renderMethod=${this.#extensionSlotRenderMethod}
+								.fallbackRenderMethod=${this.#renderBuiltinBlockView}
+								.props=${this._blockViewProps}>
+							</umb-extension-slot>
+						`,
+					)}
+					${this.#renderActionBar()}
+					${!this._showContentEdit && this._contentInvalid
+						? html`<uui-badge attention color="invalid" label="Invalid content">!</uui-badge>`
+						: nothing}
+				</div>
+			`,
+		);
 	}
 
 	#renderActionBar() {
-		return this._showActions
-			? html`<uui-action-bar>
-					${this.#renderEditContentAction()} ${this.#renderEditSettingsAction()} ${this.#renderCopyToClipboardAction()}
-					${this.#renderDeleteAction()}
-				</uui-action-bar>`
-			: nothing;
+		if (this._isSortMode) return nothing;
+		if (!this._showActions) return nothing;
+		return html`
+			<uui-action-bar>
+				${this.#renderEditContentAction()} ${this.#renderEditSettingsAction()} ${this.#renderCopyToClipboardAction()}
+				${this.#renderDeleteAction()}
+			</uui-action-bar>
+		`;
 	}
 
 	#renderEditContentAction() {

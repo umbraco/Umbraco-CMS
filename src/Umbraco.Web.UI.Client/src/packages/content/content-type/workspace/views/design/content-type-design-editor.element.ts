@@ -115,7 +115,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	private _hasRootGroups = false;
 
 	@state()
-	private _routes: UmbRoute[] = [];
+	private _routes?: UmbRoute[];
 
 	@state()
 	private _tabs?: Array<UmbPropertyTypeContainerMergedModel>;
@@ -207,15 +207,16 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			});
 		}
 
+		routes.push({
+			path: 'root',
+			component: () => import('./content-type-design-editor-tab.element.js'),
+			setup: (component) => {
+				this.#currentTabComponent = component as UmbContentTypeDesignEditorTabElement;
+				this.#currentTabComponent.containerId = null;
+			},
+		});
+
 		if (this._hasRootGroups || this._tabs.length === 0) {
-			routes.push({
-				path: 'root',
-				component: () => import('./content-type-design-editor-tab.element.js'),
-				setup: (component) => {
-					this.#currentTabComponent = component as UmbContentTypeDesignEditorTabElement;
-					this.#currentTabComponent.containerId = null;
-				},
-			});
 			routes.push({
 				path: '',
 				pathMatch: 'full',
@@ -352,7 +353,6 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		const changedName = this.#workspaceContext.structure.makeContainerNameUniqueForOwnerContentType(
 			tab.ownerId,
 			newName,
-			'Tab',
 		);
 
 		// Check if it collides with another tab name of this same content-type, if so adjust name:
@@ -371,7 +371,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		if (!this.#processingTabId || !tab.ownerId) return;
 		const newName = (event.target as HTMLInputElement | undefined)?.value;
 		if (newName === '') {
-			const changedName = this.#workspaceContext!.structure.makeEmptyContainerName(this.#processingTabId, 'Tab');
+			const changedName = this.#workspaceContext!.structure.makeEmptyContainerName(this.#processingTabId);
 
 			(event.target as HTMLInputElement).value = changedName;
 
@@ -604,7 +604,6 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 					auto-width
 					minlength="1"
 					@change=${(e: InputEvent) => this.#tabNameChanged(e, tab)}
-					@input=${(e: InputEvent) => this.#tabNameChanged(e, tab)}
 					@blur=${(e: FocusEvent) => this.#tabNameBlur(e, tab)}>
 					${this.renderDeleteFor(tab)}
 				</uui-input>
@@ -753,7 +752,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 				transition: opacity 100ms;
 			}
 
-			uui-tab:not(:hover, :focus) .trash {
+			uui-tab:not(:hover, :focus, :focus-within) .trash {
 				opacity: 0;
 				transition: opacity 100ms;
 			}

@@ -1,11 +1,13 @@
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping;
@@ -19,9 +21,11 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
     private const string SubSubPage2Key = "48AE405E-5142-4EBE-929F-55EB616F51F2";
     private const string SubSubPage3Key = "AACF2979-3F53-4184-B071-BA34D3338497";
 
-    protected IDocumentUrlService DocumentUrlService => GetRequiredService<IDocumentUrlService>();
+    private IDocumentUrlService DocumentUrlService => GetRequiredService<IDocumentUrlService>();
 
-    protected ILanguageService LanguageService => GetRequiredService<ILanguageService>();
+    private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
+
+    private IDomainService DomainService => GetRequiredService<IDomainService>();
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
@@ -148,6 +152,64 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
         Assert.IsNull(actual);
     }
 
+    [TestCase("/", ExpectedResult = TextpageKey)]
+    [TestCase("/text-page-1", ExpectedResult = SubPageKey)]
+    public string? GetDocumentKeyByUri_Without_Domains_Returns_Expected_DocumentKey(string path)
+    {
+        ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+
+        var uri = new Uri("http://example.com" + path);
+        return DocumentUrlService.GetDocumentKeyByUri(uri, false)?.ToString()?.ToUpper();
+    }
+
+    private const string VariantRootPageKey = "1D3283C7-64FD-4F4D-A741-442BDA487B71";
+    private const string VariantChildPageKey = "1D3283C7-64FD-4F4D-A741-442BDA487B72";
+
+    [TestCase("/", "/en", "http://example.com/en/", ExpectedResult = VariantRootPageKey)]
+    [TestCase("/child-page", "/en", "http://example.com/en/", ExpectedResult = VariantChildPageKey)]
+    [TestCase("/", "example.com", "http://example.com/", ExpectedResult = VariantRootPageKey)]
+    [TestCase("/child-page", "example.com", "http://example.com/", ExpectedResult = VariantChildPageKey)]
+    public async Task<string?> GetDocumentKeyByUri_With_Domains_Returns_Expected_DocumentKey(string path, string domain, string rootUrl)
+    {
+        var template = TemplateBuilder.CreateTextPageTemplate("variantPageTemplate", "Variant Page Template");
+        FileService.SaveTemplate(template);
+
+        var contentType = new ContentTypeBuilder()
+            .WithAlias("variantPage")
+            .WithName("Variant Page")
+            .WithContentVariation(ContentVariation.Culture)
+            .WithAllowAsRoot(true)
+            .WithDefaultTemplateId(template.Id)
+            .Build();
+        ContentTypeService.Save(contentType);
+
+        var rootPage = new ContentBuilder()
+            .WithKey(Guid.Parse(VariantRootPageKey))
+            .WithContentType(contentType)
+            .WithCultureName("en-US", $"Root Page")
+            .Build();
+        var childPage = new ContentBuilder()
+            .WithKey(Guid.Parse(VariantChildPageKey))
+            .WithContentType(contentType)
+            .WithCultureName("en-US", $"Child Page")
+            .WithParent(rootPage)
+            .Build();
+        ContentService.Save(rootPage, -1);
+        ContentService.Save(childPage, -1);
+        ContentService.PublishBranch(rootPage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+
+        var updateDomainResult = await DomainService.UpdateDomainsAsync(
+            rootPage.Key,
+            new DomainsUpdateModel
+            {
+                Domains = [new DomainModel { DomainName = domain, IsoCode = "en-US" }],
+            });
+        Assert.IsTrue(updateDomainResult.Success);
+
+        var uri = new Uri(rootUrl + path);
+        return DocumentUrlService.GetDocumentKeyByUri(uri, false)?.ToString()?.ToUpper();
+    }
+
     [TestCase("/", "en-US", true, ExpectedResult = TextpageKey)]
     [TestCase("/text-page-1", "en-US", true, ExpectedResult = SubPageKey)]
     [TestCase("/text-page-1-custom", "en-US", true, ExpectedResult = SubPageKey)] // Uses the segment registered by the custom IIUrlSegmentProvider that allows for more than one segment per document.
@@ -160,7 +222,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
     [TestCase("/text-page-2", "en-US", false, ExpectedResult = null)]
     [TestCase("/text-page-2-custom", "en-US", false, ExpectedResult = SubPage2Key)] // Uses the segment registered by the custom IIUrlSegmentProvider that does not allow for more than one segment per document.
     [TestCase("/text-page-3", "en-US", false, ExpectedResult = SubPage3Key)]
-    public string? GetDocumentKeyByRoute_Returns_Expected_Route(string route, string isoCode, bool loadDraft)
+    public string? GetDocumentKeyByRoute_Returns_Expected_DocumentKey(string route, string isoCode, bool loadDraft)
     {
         if (loadDraft is false)
         {
@@ -294,6 +356,28 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
         return DocumentUrlService.GetLegacyRouteFormat(Guid.Parse(documentKey), culture, false);
     }
 
+
+    [Test]
+    public async Task CreateOrUpdateUrlSegmentsWithDescendantsAsync_Does_Not_Throw_When_Content_Does_Not_Exist()
+    {
+        // Arrange - use a random key that doesn't exist
+        var nonExistentKey = Guid.NewGuid();
+
+        // Act & Assert - should not throw, just return gracefully
+        Assert.DoesNotThrowAsync(async () =>
+            await DocumentUrlService.CreateOrUpdateUrlSegmentsWithDescendantsAsync(nonExistentKey));
+    }
+
+    [Test]
+    public async Task CreateOrUpdateUrlSegmentsAsync_Does_Not_Throw_When_Content_Does_Not_Exist()
+    {
+        // Arrange - use a random key that doesn't exist
+        var nonExistentKey = Guid.NewGuid();
+
+        // Act & Assert - should not throw, just return gracefully
+        Assert.DoesNotThrowAsync(async () =>
+            await DocumentUrlService.CreateOrUpdateUrlSegmentsAsync(nonExistentKey));
+    }
 
     //TODO test cases:
     // - Find the root, when a domain is set

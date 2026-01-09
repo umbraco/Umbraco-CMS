@@ -1,4 +1,4 @@
-﻿import {test} from '@umbraco/playwright-testhelpers';
+﻿import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 const dataTypeName = 'TestDataType';
@@ -21,7 +21,7 @@ test('can create a data type using create options', async ({umbracoApi, umbracoU
   await umbracoUi.dataType.clickDataTypesMenu();
 
   // Act
-  await umbracoUi.dataType.clickCreateActionWithOptionName('New Data Type');
+  await umbracoUi.dataType.clickCreateActionWithOptionName('Data Type');
   await umbracoUi.dataType.enterDataTypeName(dataTypeName);
   await umbracoUi.dataType.clickSelectAPropertyEditorButton();
   await umbracoUi.dataType.selectAPropertyEditor('Text Box');
@@ -47,6 +47,7 @@ test('can create a data type folder using create options', async ({umbracoApi, u
 
   // Assert
   await umbracoUi.dataType.waitForDataTypeToBeCreated();
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short); // Wait for the folder to be fully created
   expect(await umbracoApi.dataType.doesNameExist(dataTypeFolderName)).toBeTruthy();
   // Check if the created data type is displayed in the collection view and has correct icon
   await umbracoUi.dataType.clickDataTypesMenu();
@@ -60,7 +61,7 @@ test('can create a data type in a folder using create options', async ({umbracoA
   await umbracoUi.dataType.goToDataType(dataTypeFolderName);
 
   // Act
-  await umbracoUi.dataType.clickCreateActionWithOptionName('New Data Type');
+  await umbracoUi.dataType.clickCreateActionWithOptionName('Data Type');
   await umbracoUi.dataType.enterDataTypeName(dataTypeName);
   await umbracoUi.dataType.clickSelectAPropertyEditorButton();
   await umbracoUi.dataType.selectAPropertyEditor('Text Box');
@@ -89,6 +90,7 @@ test('can create a data type folder in a folder using create options', async ({u
 
   // Assert
   await umbracoUi.dataType.waitForDataTypeToBeCreated();
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short); // Wait for folder to be created
   expect(await umbracoApi.dataType.doesNameExist(childFolderName)).toBeTruthy();
   // Check if the created data type is displayed in the collection view and has correct icon
   await umbracoUi.dataType.doesCollectionTreeItemTableRowHaveName(childFolderName);

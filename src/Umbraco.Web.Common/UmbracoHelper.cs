@@ -315,13 +315,6 @@ public class UmbracoHelper
     /// <returns>A collection of <see cref="IPublishedContent"/> found at the root.</returns>
     public IEnumerable<IPublishedContent> ContentAtRoot() => _publishedContentQuery.ContentAtRoot();
 
-    /// <summary>
-    /// Gets the documents at root.
-    /// </summary>
-    /// <param name="culture">The requested culture.</param>
-    /// <returns>A collection of <see cref="IPublishedContent"/> found at the root.</returns>
-    public IEnumerable<IPublishedContent> ContentAtRoot(string? culture) => _publishedContentQuery.ContentAtRoot(culture);
-
     #endregion
 
     #region Media

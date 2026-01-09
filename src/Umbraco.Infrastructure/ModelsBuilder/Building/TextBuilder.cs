@@ -51,13 +51,6 @@ public class TextBuilder : Builder
     ///     Outputs an "auto-generated" header to a string builder.
     /// </summary>
     /// <param name="sb">The string builder.</param>
-    [Obsolete("Please use the overload taking all parameters. Scheduled for removal in Umbraco 17.")]
-    public static void WriteHeader(StringBuilder sb) => WriteHeader(sb, true);
-
-    /// <summary>
-    ///     Outputs an "auto-generated" header to a string builder.
-    /// </summary>
-    /// <param name="sb">The string builder.</param>
     /// <param name="includeVersion">Flag indicating whether the tool version number should be included in the output.</param>
     public static void WriteHeader(StringBuilder sb, bool includeVersion) => TextHeaderWriter.WriteHeader(sb, includeVersion);
 
@@ -91,12 +84,17 @@ public class TextBuilder : Builder
     /// <param name="typeModels">The models to generate.</param>
     public void Generate(StringBuilder sb, IEnumerable<TypeModel> typeModels)
     {
+        // TODO: Ideally this should live in the Umbraco.Cms.DevelopmentMode.Backoffice project, but we dont want to clone the entire thing.
+        // This is only used for in memory auto.
         WriteHeader(sb, Config.IncludeVersionNumberInGeneratedModels);
 
         foreach (var t in TypesUsing)
         {
             sb.AppendFormat("using {0};\n", t);
         }
+
+        // A hack to include the using for the assembly attribute (works because this method is only called from InMemoryModelFactory)
+        sb.AppendLine("using Umbraco.Cms.DevelopmentMode.Backoffice.InMemoryAuto;");
 
         // assembly attributes marker
         sb.Append("\n//ASSATTR\n");
@@ -313,7 +311,8 @@ public class TextBuilder : Builder
         // write the ctor
         sb.AppendFormat(
             "\n\n\t\t// ctor\n\t\tpublic {0}(IPublished{1} content, IPublishedValueFallback publishedValueFallback)\n\t\t\t: base(content, publishedValueFallback)\n\t\t{{\n\t\t\t_publishedValueFallback = publishedValueFallback;\n\t\t}}\n\n",
-            type.ClrName, type.IsElement ? "Element" : "Content");
+            type.ClrName,
+            type.IsElement ? "Element" : "Content");
 
         // write the properties
         sb.Append("\t\t// properties\n");
@@ -366,7 +365,9 @@ public class TextBuilder : Builder
 
             if (!string.IsNullOrWhiteSpace(property.Description))
             {
-                sb.AppendFormat("\t\t/// {0}: {1}\n", XmlCommentString(property.Name),
+                sb.AppendFormat(
+                    "\t\t/// {0}: {1}\n",
+                    XmlCommentString(property.Name),
                     XmlCommentString(property.Description));
             }
             else
@@ -386,7 +387,11 @@ public class TextBuilder : Builder
 
         sb.AppendFormat("\t\t[ImplementPropertyType(\"{0}\")]\n", property.Alias);
 
-        sb.Append("\t\tpublic virtual ");
+        sb.Append("\t\tpublic ");
+        if (Config.GenerateVirtualProperties)
+        {
+            sb.Append("virtual ");
+        }
         WriteClrType(sb, property.ClrTypeName);
 
         sb.AppendFormat(
@@ -441,7 +446,9 @@ public class TextBuilder : Builder
 
             if (!string.IsNullOrWhiteSpace(property.Description))
             {
-                sb.AppendFormat("\t\t/// {0}: {1}\n", XmlCommentString(property.Name),
+                sb.AppendFormat(
+                    "\t\t/// {0}: {1}\n",
+                    XmlCommentString(property.Name),
                     XmlCommentString(property.Description));
             }
             else
@@ -462,15 +469,24 @@ public class TextBuilder : Builder
 
         if (mixinStatic)
         {
-            sb.Append("\t\tpublic virtual ");
+            sb.Append("\t\tpublic ");
+            if (Config.GenerateVirtualProperties)
+            {
+                sb.Append("virtual ");
+            }
             WriteClrType(sb, property.ClrTypeName);
             sb.AppendFormat(
                 " {0} => {1}(this, _publishedValueFallback);\n",
-                property.ClrName, MixinStaticGetterName(property.ClrName));
+                property.ClrName,
+                MixinStaticGetterName(property.ClrName));
         }
         else
         {
-            sb.Append("\t\tpublic virtual ");
+            sb.Append("\t\tpublic ");
+            if (Config.GenerateVirtualProperties)
+            {
+                sb.Append("virtual ");
+            }
             WriteClrType(sb, property.ClrTypeName);
             sb.AppendFormat(
                 " {0} => this.Value",
@@ -519,7 +535,8 @@ public class TextBuilder : Builder
         WriteClrType(sb, property.ClrTypeName);
         sb.AppendFormat(
             " {0}(I{1} that, IPublishedValueFallback publishedValueFallback) => that.Value",
-            mixinStaticGetterName, mixinClrName);
+            mixinStaticGetterName,
+            mixinClrName);
         if (property.ModelClrType != typeof(object))
         {
             sb.Append("<");

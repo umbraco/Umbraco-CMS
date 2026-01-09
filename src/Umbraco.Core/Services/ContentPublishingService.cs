@@ -2,11 +2,13 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.ContentPublishing;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
@@ -25,6 +27,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
     private readonly IRelationService _relationService;
     private readonly ILogger<ContentPublishingService> _logger;
     private readonly ILongRunningOperationService _longRunningOperationService;
+    private readonly IUmbracoContextFactory _umbracoContextFactory;
 
     public ContentPublishingService(
         ICoreScopeProvider coreScopeProvider,
@@ -36,7 +39,8 @@ internal sealed class ContentPublishingService : IContentPublishingService
         IOptionsMonitor<ContentSettings> optionsMonitor,
         IRelationService relationService,
         ILogger<ContentPublishingService> logger,
-        ILongRunningOperationService longRunningOperationService)
+        ILongRunningOperationService longRunningOperationService,
+        IUmbracoContextFactory umbracoContextFactory)
     {
         _coreScopeProvider = coreScopeProvider;
         _contentService = contentService;
@@ -52,6 +56,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
         {
             _contentSettings = contentSettings;
         });
+        _umbracoContextFactory = umbracoContextFactory;
     }
 
     /// <inheritdoc />
@@ -98,13 +103,14 @@ internal sealed class ContentPublishingService : IContentPublishingService
     }
 
     /// <inheritdoc />
-    [Obsolete("Use non obsoleted version instead. Scheduled for removal in v17")]
-    public async Task<Attempt<ContentPublishingResult, ContentPublishingOperationStatus>> PublishAsync(
+    // TODO - Integrate this implementation into the one above.
+    private async Task<Attempt<ContentPublishingResult, ContentPublishingOperationStatus>> PublishAsync(
         Guid key,
         CultureAndScheduleModel cultureAndSchedule,
         Guid userKey)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        scope.WriteLock(Constants.Locks.ContentTree);
         IContent? content = _contentService.GetById(key);
         if (content is null)
         {
@@ -165,7 +171,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
                 return Attempt.FailWithStatus(ContentPublishingOperationStatus.CannotPublishInvariantWhenVariant, new ContentPublishingResult());
             }
 
-            IEnumerable<string> validCultures = (await _languageService.GetAllAsync()).Select(x => x.IsoCode);
+            IEnumerable<string> validCultures = await _languageService.GetAllIsoCodesAsync();
             if (validCultures.ContainsAll(cultures) is false)
             {
                 scope.Complete();
@@ -265,16 +271,6 @@ internal sealed class ContentPublishingService : IContentPublishingService
     }
 
     /// <inheritdoc />
-    [Obsolete("This method is not longer used as the 'force' parameter has been extended into options for publishing unpublished and re-publishing changed content. Please use the overload containing the parameter for those options instead. Scheduled for removal in Umbraco 17.")]
-    public async Task<Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus>> PublishBranchAsync(Guid key, IEnumerable<string> cultures, bool force, Guid userKey)
-        => await PublishBranchAsync(key, cultures, force ? PublishBranchFilter.IncludeUnpublished : PublishBranchFilter.Default, userKey);
-
-    /// <inheritdoc />
-    [Obsolete("Please use the overload containing all parameters. Scheduled for removal in Umbraco 17.")]
-    public async Task<Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus>> PublishBranchAsync(Guid key, IEnumerable<string> cultures, PublishBranchFilter publishBranchFilter, Guid userKey)
-        => await PublishBranchAsync(key, cultures, publishBranchFilter, userKey, false);
-
-    /// <inheritdoc />
     public async Task<Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus>> PublishBranchAsync(
         Guid key,
         IEnumerable<string> cultures,
@@ -289,7 +285,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
             return MapInternalPublishingAttempt(minimalAttempt);
         }
 
-        _logger.LogInformation("Starting async background thread for publishing branch.");
+        _logger.LogDebug("Starting long running operation for publishing branch {Key} on background thread.", key);
         Attempt<Guid, LongRunningOperationEnqueueStatus> enqueueAttempt = await _longRunningOperationService.RunAsync(
             PublishBranchOperationType,
             async _ => await PerformPublishBranchAsync(key, cultures, publishBranchFilter, userKey, returnContent: false),
@@ -323,6 +319,10 @@ internal sealed class ContentPublishingService : IContentPublishingService
         Guid userKey,
         bool returnContent)
     {
+        // Ensure we have an UmbracoContext in case running on a background thread so operations that run in the published notification handlers
+        // have access to this (e.g. webhooks).
+        using UmbracoContextReference umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext();
+
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         IContent? content = _contentService.GetById(key);
         if (content is null)
@@ -488,7 +488,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
             return Attempt.Fail(ContentPublishingOperationStatus.CannotPublishVariantWhenNotVariant);
         }
 
-        var validCultures = (await _languageService.GetAllAsync()).Select(x => x.IsoCode).ToArray();
+        var validCultures = (await _languageService.GetAllIsoCodesAsync()).ToArray();
 
         foreach (var culture in cultures)
         {

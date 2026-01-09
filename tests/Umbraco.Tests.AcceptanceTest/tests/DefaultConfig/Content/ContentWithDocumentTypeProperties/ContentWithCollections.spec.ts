@@ -35,7 +35,7 @@ test('can create content configured as a collection', async ({umbracoApi, umbrac
 
   // Assert
   await umbracoUi.content.waitForContentToBeCreated();
-  await umbracoUi.content.isTabNameVisible('Collection');
+  await umbracoUi.content.isTabNameVisible('Child items');
   await umbracoUi.content.doesContentListHaveNoItemsInList();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
 });

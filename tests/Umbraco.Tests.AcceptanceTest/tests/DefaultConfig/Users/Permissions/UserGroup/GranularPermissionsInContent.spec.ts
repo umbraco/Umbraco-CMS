@@ -43,6 +43,7 @@ test.beforeEach(async ({umbracoApi}) => {
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNodeAndDataType(documentTypeName, childDocumentTypeId, dataTypeName, dataTypeId);
   firstDocumentId = await umbracoApi.document.createDocumentWithTextContent(firstDocumentName, documentTypeId, documentText, dataTypeName);
   secondDocumentId = await umbracoApi.document.createDocumentWithTextContent(secondDocumentName, documentTypeId, documentText, dataTypeName);
+  await umbracoApi.language.createDanishLanguage();
 });
 
 test.afterEach(async ({umbracoApi}) => {
@@ -54,9 +55,11 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(childDocumentTypeName);
   await umbracoApi.documentBlueprint.ensureNameNotExists(documentBlueprintName);
   await umbracoApi.userGroup.ensureNameNotExists(userGroupName);
+  await umbracoApi.language.ensureIsoCodeNotExists('da');
 });
 
-test('can read a specific document with read permission enabled', async ({umbracoApi, umbracoUi}) => {
+// Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/20505
+test.skip('can read a specific document with read permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithReadPermissionForSpecificDocument(userGroupName, firstDocumentId);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -254,6 +257,7 @@ test('can sort children with sort children permission enabled', async ({umbracoA
 test('can set culture and hostnames for a specific content with culture and hostnames permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const domainName = '/domain';
+  const languageName = 'Danish';
   userGroupId = await umbracoApi.userGroup.createUserGroupWithCultureAndHostnamesPermissionForSpecificDocument(userGroupName, firstDocumentId);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
   testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
@@ -263,17 +267,18 @@ test('can set culture and hostnames for a specific content with culture and host
   // Act
   await umbracoUi.content.clickActionsMenuForContent(firstDocumentName);
   await umbracoUi.content.clickCultureAndHostnamesActionMenuOption();
-  await umbracoUi.content.clickAddNewDomainButton();
-  await umbracoUi.content.enterDomain(domainName);
+  await umbracoUi.content.clickAddNewHostnameButton();
+  await umbracoUi.content.enterDomain(domainName, 0);
+  await umbracoUi.content.selectHostnameLanguageOption(languageName, 0);
   await umbracoUi.content.clickSaveModalButton();
 
   // Assert
   await umbracoUi.content.waitForDomainToBeCreated();
-  await umbracoUi.waitForTimeout(500); // Wait for the domain to be set
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.medium); // Wait for the domain to be set
   const document = await umbracoApi.document.getByName(firstDocumentName);
   const domains = await umbracoApi.document.getDomains(document.id);
   expect(domains.domains[0].domainName).toEqual(domainName);
-  expect(domains.domains[0].isoCode).toEqual('en-US');
+  expect(domains.domains[0].isoCode).toEqual('da');
   await umbracoUi.content.isActionsMenuForNameVisible(secondDocumentName, false);
 });
 
@@ -322,6 +327,7 @@ test('can rollback a specific content with rollback permission enabled', async (
   await umbracoUi.content.clickRollbackContainerButton();
 
   // Assert
+  await umbracoUi.content.isSuccessNotificationVisible();
   await umbracoUi.content.goToContentWithName(firstDocumentName);
   await umbracoUi.content.doesDocumentPropertyHaveValue(dataTypeName, documentText);
   await umbracoUi.content.isActionsMenuForNameVisible(secondDocumentName, false);

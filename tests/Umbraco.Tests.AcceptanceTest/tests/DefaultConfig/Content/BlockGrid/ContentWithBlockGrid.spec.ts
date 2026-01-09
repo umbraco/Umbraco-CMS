@@ -81,7 +81,7 @@ test('can add a block element in the content', async ({umbracoApi, umbracoUi}) =
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickAddBlockElementButton();
-  await umbracoUi.content.clickTextButtonWithName(elementTypeName);
+  await umbracoUi.content.clickBlockElementWithName(elementTypeName);
   await umbracoUi.content.enterTextstring(inputText);
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.clickSaveButton();
@@ -160,8 +160,7 @@ test('cannot add number of block element greater than the maximum amount', {tag:
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickAddBlockElementButton();
-  await umbracoUi.waitForTimeout(500);
-  await umbracoUi.content.clickTextButtonWithName(elementTypeName);
+  await umbracoUi.content.clickBlockElementWithName(elementTypeName);
   await umbracoUi.content.clickCreateModalButton();
 
   // Assert
@@ -196,7 +195,7 @@ test('can set the label of block element in the content', async ({umbracoApi, um
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickAddBlockElementButton();
-  await umbracoUi.content.clickTextButtonWithName(elementTypeName);
+  await umbracoUi.content.clickBlockElementWithName(elementTypeName);
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.clickSaveButton();
 
@@ -217,7 +216,7 @@ test('can set the number of columns for the layout in the content', async ({umbr
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickAddBlockElementButton();
-  await umbracoUi.content.clickTextButtonWithName(elementTypeName);
+  await umbracoUi.content.clickBlockElementWithName(elementTypeName);
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.clickSaveButton();
 
@@ -245,7 +244,7 @@ test('can add settings model for the block in the content', async ({umbracoApi, 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickAddBlockElementButton();
-  await umbracoUi.content.clickTextButtonWithName(elementTypeName);
+  await umbracoUi.content.clickBlockElementWithName(elementTypeName);
   await umbracoUi.content.enterTextstring(contentBlockInputText);
   await umbracoUi.content.clickAddBlockSettingsTabButton();
   await umbracoUi.content.enterTextArea(settingBlockInputText);
@@ -298,7 +297,7 @@ test('can add a block element with inline editing mode enabled', async ({umbraco
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickAddBlockElementButton();
-  await umbracoUi.content.clickTextButtonWithName(elementTypeName);
+  await umbracoUi.content.clickBlockElementWithName(elementTypeName);
   await umbracoUi.content.enterTextstring(inputText);
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.clickSaveAndPublishButton();
@@ -329,7 +328,7 @@ test('can add an invariant block element with an invariant RTE Tiptap in the con
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickAddBlockElementButton();
-  await umbracoUi.content.clickTextButtonWithName(customElementTypeName);
+  await umbracoUi.content.clickBlockElementWithName(customElementTypeName);
   await umbracoUi.content.enterRTETipTapEditor(inputText);
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.clickSaveButtonForContent();
@@ -363,7 +362,7 @@ test('can add a variant block element with variant RTE Tiptap in the content', a
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickAddBlockElementButton();
-  await umbracoUi.content.clickTextButtonWithName(customElementTypeName);
+  await umbracoUi.content.clickBlockElementWithName(customElementTypeName);
   await umbracoUi.content.enterRTETipTapEditor(inputText);
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.clickSaveButtonForContent();
@@ -399,7 +398,7 @@ test('can add a variant block element with invariant RTE Tiptap in the content',
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickAddBlockElementButton();
-  await umbracoUi.content.clickTextButtonWithName(customElementTypeName);
+  await umbracoUi.content.clickBlockElementWithName(customElementTypeName);
   await umbracoUi.content.enterRTETipTapEditor(inputText);
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.clickSaveButtonForContent();
@@ -417,3 +416,22 @@ test('can add a variant block element with invariant RTE Tiptap in the content',
   await umbracoApi.documentType.ensureNameNotExists(customElementTypeName);
   await umbracoApi.language.ensureNameNotExists('Danish');
 });
+
+// Tests regression issue: https://github.com/umbraco/Umbraco-CMS/issues/20680
+test('can move away from a content node with a block grid after making no changes without seeing discard unsaved changes', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const customDataTypeId = await umbracoApi.dataType.createBlockGridWithPermissions(customDataTypeName, elementTypeId, true, true);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+
+  // Act
+  await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
+
+  // Assert
+  // We do this to make sure that there is no discard changes button visible, if the discard changes was visible, we would not be able to go to the document type
+  await umbracoUi.documentType.goToDocumentType(documentTypeName);
+});
+

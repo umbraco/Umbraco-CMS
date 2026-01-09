@@ -4,6 +4,7 @@ using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
@@ -61,21 +62,30 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             bool filterMustBeIsDependency,
             out long totalRecords)
         {
+            if (_scopeAccessor.AmbientScope is null)
+            {
+                totalRecords = 0;
+                return [];
+            }
+
+            ISqlSyntaxProvider? sx = _scopeAccessor.AmbientScope.Database.SqlContext.SqlSyntax;
+            string[] columns = [
+                    sx.ColumnWithAlias("x", "otherId", "nodeId"),
+                    sx.ColumnWithAlias("n", "uniqueId", "nodeKey"),
+                    sx.ColumnWithAlias("n", "nodeObjectType", "nodeObjectType"),
+                    sx.ColumnWithAlias("d", "published", "nodePublished"),
+                    sx.ColumnWithAlias("ctn", "uniqueId", "contentTypeKey"),
+                    sx.ColumnWithAlias("ct", "icon", "contentTypeIcon"),
+                    sx.ColumnWithAlias("ct", "alias", "contentTypeAlias"),
+                    sx.ColumnWithAlias("ctn", "text", "contentTypeName"),
+                    sx.ColumnWithAlias("x", "alias", "relationTypeAlias"),
+                    sx.ColumnWithAlias("x", "name", "relationTypeName"),
+                    sx.ColumnWithAlias("x", "isDependency", "relationTypeIsDependency"),
+                    sx.ColumnWithAlias("x", "dual", "relationTypeIsBidirectional")
+                ];
             Sql<ISqlContext> innerUnionSql = GetInnerUnionSql();
-            Sql<ISqlContext>? sql = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql().SelectDistinct(
-                    "[x].[otherId] as nodeId",
-                    "[n].[uniqueId] as nodeKey",
-                    "[n].[text] as nodeName",
-                    "[n].[nodeObjectType] as nodeObjectType",
-                    "[d].[published] as nodePublished",
-                    "[ctn].[uniqueId] as contentTypeKey",
-                    "[ct].[icon] as contentTypeIcon",
-                    "[ct].[alias] as contentTypeAlias",
-                    "[ctn].[text] as contentTypeName",
-                    "[x].[alias] as relationTypeAlias",
-                    "[x].[name] as relationTypeName",
-                    "[x].[isDependency] as relationTypeIsDependency",
-                    "[x].[dual] as relationTypeIsBidirectional")
+            Sql<ISqlContext> sql = _scopeAccessor.AmbientScope.Database.SqlContext.Sql()
+                .SelectDistinct(columns)
                 .From<NodeDto>("n")
                 .InnerJoinNested(innerUnionSql, "x")
                 .On<NodeDto, UnionHelperDto>((n, x) => n.NodeId == x.OtherId, "n", "x")
@@ -104,7 +114,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             if (filterMustBeIsDependency)
             {
-                sql = sql?.Where<RelationTypeDto>(rt => rt.IsDependency, "x");
+                sql = sql.Where<RelationTypeDto>(rt => rt.IsDependency, "x");
             }
 
             // find the count before ordering
@@ -116,7 +126,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             if (totalRecords > 0)
             {
                 // Ordering is required for paging
-                sql = sql?.OrderBy<RelationTypeDto>(x => x.Alias, "x");
+                sql = sql.OrderBy<RelationTypeDto>(x => x.Alias, "x");
 
                 pagedResult =
                     _scopeAccessor.AmbientScope?.Database.SkipTake<RelationItemDto>(skip, take, sql).ToArray() ??
@@ -138,39 +148,47 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
            bool filterMustBeIsDependency,
            out long totalRecords)
         {
+            if (_scopeAccessor.AmbientScope is null)
+            {
+                totalRecords = 0;
+                return [];
+            }
+
+            ISqlSyntaxProvider sx = _scopeAccessor.AmbientScope.Database.SqlContext.SqlSyntax;
+            string[] columns = [
+                    sx.ColumnWithAlias("x", "id", "nodeId"),
+                    sx.ColumnWithAlias("n", "uniqueId", "nodeKey"),
+                    sx.ColumnWithAlias("n", "text", "nodeName"),
+                    sx.ColumnWithAlias("n", "nodeObjectType", "nodeObjectType"),
+                    sx.ColumnWithAlias("ctn", "uniqueId", "contentTypeKey"),
+                    sx.ColumnWithAlias("ct", "icon", "contentTypeIcon"),
+                    sx.ColumnWithAlias("ct", "alias", "contentTypeAlias"),
+                    sx.ColumnWithAlias("ctn", "text", "contentTypeName"),
+                    sx.ColumnWithAlias("x", "alias", "relationTypeAlias"),
+                    sx.ColumnWithAlias("x", "name", "relationTypeName"),
+                    sx.ColumnWithAlias("x", "isDependency", "relationTypeIsDependency"),
+                    sx.ColumnWithAlias("x", "dual", "relationTypeIsBidirectional")
+                ];
             Sql<ISqlContext> innerUnionSql = GetInnerUnionSql();
-            Sql<ISqlContext>? sql = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql().SelectDistinct(
-                    "[x].[id] as nodeId",
-                    "[n].[uniqueId] as nodeKey",
-                    "[n].[text] as nodeName",
-                    "[n].[nodeObjectType] as nodeObjectType",
-                    "[ctn].[uniqueId] as contentTypeKey",
-                    "[ct].[icon] as contentTypeIcon",
-                    "[ct].[alias] as contentTypeAlias",
-                    "[ctn].[text] as contentTypeName",
-                    "[x].[alias] as relationTypeAlias",
-                    "[x].[name] as relationTypeName",
-                    "[x].[isDependency] as relationTypeIsDependency",
-                    "[x].[dual] as relationTypeIsBidirectional")
+            Sql<ISqlContext>? sql = _scopeAccessor.AmbientScope.Database.SqlContext.Sql()
+                .SelectDistinct(columns)
                 .From<NodeDto>("n")
                 .InnerJoinNested(innerUnionSql, "x")
                 .On<NodeDto, UnionHelperDto>((n, x) => n.NodeId == x.Id, "n", "x")
                 .LeftJoin<ContentDto>("c")
                 .On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId, aliasLeft: "n", aliasRight: "c")
                 .LeftJoin<ContentTypeDto>("ct")
-                .On<ContentDto, ContentTypeDto>((left, right) => left.ContentTypeId == right.NodeId, aliasLeft: "c",
-                    aliasRight: "ct")
+                .On<ContentDto, ContentTypeDto>((left, right) => left.ContentTypeId == right.NodeId, aliasLeft: "c", aliasRight: "ct")
                 .LeftJoin<NodeDto>("ctn")
-                .On<ContentTypeDto, NodeDto>((left, right) => left.NodeId == right.NodeId, aliasLeft: "ct",
-                    aliasRight: "ctn");
+                .On<ContentTypeDto, NodeDto>((left, right) => left.NodeId == right.NodeId, aliasLeft: "ct", aliasRight: "ctn");
             if (keys.Any())
             {
-                sql = sql?.Where<NodeDto>(x => keys.Contains(x.UniqueId), "n");
+                sql = sql.Where<NodeDto>(x => keys.Contains(x.UniqueId), "n");
             }
 
             if (filterMustBeIsDependency)
             {
-                sql = sql?.Where<RelationTypeDto>(rt => rt.IsDependency, "x");
+                sql = sql.Where<RelationTypeDto>(rt => rt.IsDependency, "x");
             }
 
             // find the count before ordering
@@ -182,7 +200,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             if (totalRecords > 0)
             {
                 // Ordering is required for paging
-                sql = sql?.OrderBy<RelationTypeDto>(x => x.Alias, "x");
+                sql = sql.OrderBy<RelationTypeDto>(x => x.Alias, "x");
 
                 pagedResult =
                     _scopeAccessor.AmbientScope?.Database.SkipTake<RelationItemDto>(skip, take, sql).ToArray() ??
@@ -205,10 +223,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         {
             if (_scopeAccessor.AmbientScope is null)
             {
-                throw new InvalidOperationException("Can not execute without a valid AmbientScope");
+                throw new InvalidOperationException("Cannot execute without a valid AmbientScope");
             }
 
-            Sql<ISqlContext>? sql = _scopeAccessor.AmbientScope.Database.SqlContext.Sql()
+            Sql<ISqlContext> sql = _scopeAccessor.AmbientScope.Database.SqlContext.Sql()
                 .SelectDistinct<NodeDto>(node => node.UniqueId)
                 .From<NodeDto>()
                 .InnerJoin<RelationDto>()
@@ -247,39 +265,53 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             bool filterMustBeIsDependency,
             out long totalRecords)
         {
-            SqlSyntax.ISqlSyntaxProvider? syntax = _scopeAccessor.AmbientScope?.Database.SqlContext.SqlSyntax;
+            if (_scopeAccessor.AmbientScope is null)
+            {
+                totalRecords = 0;
+                return [];
+            }
+
+            IUmbracoDatabase database = _scopeAccessor.AmbientScope.Database;
+            ISqlContext sqlContext = database.SqlContext;
+
+            SqlSyntax.ISqlSyntaxProvider syntax = _scopeAccessor.AmbientScope.Database.SqlContext.SqlSyntax;
 
             // Gets the path of the parent with ",%" added
-            Sql<ISqlContext>? subsubQuery = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql()
-                .Select(syntax?.GetConcat("[node].[path]", "',%'"))
-                .From<NodeDto>("node")
-                .Where<NodeDto>(x => x.UniqueId == parentKey, "node");
+            Sql<ISqlContext> subsubQuery = sqlContext.Sql()
+                .Select<NodeDto>(c => c.Path)
+                .From<NodeDto>()
+                .Where<NodeDto>(x => x.UniqueId == parentKey);
 
-            // Gets the descendants of the parent node
-            Sql<ISqlContext>? subQuery = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql()
+            // Gets the descendants of the parent node (using ",%" to exclude the parent itself)
+            Sql<ISqlContext> subQuery = sqlContext.Sql()
                 .Select<NodeDto>(x => x.NodeId)
                 .From<NodeDto>()
-                .WhereLike<NodeDto>(x => x.Path, subsubQuery);
+                .WhereLike<NodeDto>(x => x.Path, subsubQuery, ",%");
 
+            ISqlSyntaxProvider sx = sqlContext.SqlSyntax;
+            string[] columns = [
+                    sx.ColumnWithAlias("x", "id", "nodeId"),
+                    sx.ColumnWithAlias("n", "uniqueId", "nodeKey"),
+                    sx.ColumnWithAlias("n", "text", "nodeName"),
+                    sx.ColumnWithAlias("n", "nodeObjectType", "nodeObjectType"),
+                    sx.ColumnWithAlias("d", "published", "nodePublished"),
+                    sx.ColumnWithAlias("ctn", "uniqueId", "contentTypeKey"),
+                    sx.ColumnWithAlias("ct", "icon", "contentTypeIcon"),
+                    sx.ColumnWithAlias("ct", "alias", "contentTypeAlias"),
+                    sx.ColumnWithAlias("ctn", "text", "contentTypeName"),
+                    sx.ColumnWithAlias("x", "alias", "relationTypeAlias"),
+                    sx.ColumnWithAlias("x", "name", "relationTypeName"),
+                    sx.ColumnWithAlias("x", "isDependency", "relationTypeIsDependency"),
+                    sx.ColumnWithAlias("x", "dual", "relationTypeIsBidirectional")
+                ];
             Sql<ISqlContext> innerUnionSql = GetInnerUnionSql();
-            Sql<ISqlContext>? sql = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql().SelectDistinct(
-                    "[x].[id] as nodeId",
-                    "[n].[uniqueId] as nodeKey",
-                    "[n].[text] as nodeName",
-                    "[n].[nodeObjectType] as nodeObjectType",
-                    "[d].[published] as nodePublished",
-                    "[ctn].[uniqueId] as contentTypeKey",
-                    "[ct].[icon] as contentTypeIcon",
-                    "[ct].[alias] as contentTypeAlias",
-                    "[ctn].[text] as contentTypeName",
-                    "[x].[alias] as relationTypeAlias",
-                    "[x].[name] as relationTypeName",
-                    "[x].[isDependency] as relationTypeIsDependency",
-                    "[x].[dual] as relationTypeIsBidirectional")
+            Sql<ISqlContext> sql = sqlContext.Sql()
+                .SelectDistinct(columns)
                 .From<NodeDto>("n")
                 .InnerJoinNested(innerUnionSql, "x")
                 .On<NodeDto, UnionHelperDto>((n, x) => n.NodeId == x.Id, "n", "x")
-                .LeftJoin<ContentDto>("c").On<NodeDto, ContentDto>(
+                .LeftJoin<ContentDto>("c")
+                .On<NodeDto, ContentDto>(
                 (left, right) => left.NodeId == right.NodeId,
                     aliasLeft: "n",
                     aliasRight: "c")
@@ -297,19 +329,15 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 .On<NodeDto, DocumentDto>(
                     (left, right) => left.NodeId == right.NodeId,
                     aliasLeft: "n",
-                    aliasRight: "d");
-            sql = sql?.WhereIn(
-                (System.Linq.Expressions.Expression<Func<NodeDto, object?>>)(x => x.NodeId),
-                subQuery,
-                "n");
+                    aliasRight: "d")
+                .WhereIn((Expression<Func<NodeDto, object?>>)(x => x.NodeId), subQuery, "n");
 
             if (filterMustBeIsDependency)
             {
-                sql = sql?.Where<RelationTypeDto>(rt => rt.IsDependency, "x");
+                sql.Where<RelationTypeDto>(rt => rt.IsDependency, "x");
             }
 
-            // find the count before ordering
-            totalRecords = _scopeAccessor.AmbientScope?.Database.Count(sql!) ?? 0;
+            totalRecords = database?.Count(sql!) ?? 0;
 
             RelationItemDto[] pagedResult;
 
@@ -317,7 +345,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             if (totalRecords > 0)
             {
                 // Ordering is required for paging
-                sql = sql?.OrderBy<RelationTypeDto>(x => x.Alias, "x");
+                sql.OrderBy<RelationTypeDto>(x => x.Alias, "x");
 
                 pagedResult =
                     _scopeAccessor.AmbientScope?.Database.SkipTake<RelationItemDto>(skip, take, sql).ToArray() ??
@@ -338,17 +366,23 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 throw new InvalidOperationException("No Ambient Scope available");
             }
 
-            Sql<ISqlContext> innerUnionSqlChild = _scopeAccessor.AmbientScope.Database.SqlContext.Sql().Select(
-                    "[cn].uniqueId as [key]",
-                    "[cn].trashed as [trashed]",
-                    "[cn].nodeObjectType as [nodeObjectType]",
-                    "[pn].uniqueId as otherKey," +
-                    "[cr].childId as id",
-                    "[cr].parentId as otherId",
-                    "[rt].[alias]",
-                    "[rt].[name]",
-                    "[rt].[isDependency]",
-                    "[rt].[dual]")
+            ISqlSyntaxProvider? sx = _scopeAccessor.AmbientScope.Database.SqlContext.SqlSyntax;
+            string[] columns = sx == null
+                ? []
+                : [
+                    sx.ColumnWithAlias("cn", "uniqueId", "key"),
+                    sx.ColumnWithAlias("cn", "trashed", "trashed"),
+                    sx.ColumnWithAlias("cn", "nodeObjectType", "nodeObjectType"),
+                    sx.ColumnWithAlias("pn", "uniqueId", "otherKey"),
+                    sx.ColumnWithAlias("cr", "childId", "id"),
+                    sx.ColumnWithAlias("cr", "parentId", "otherId"),
+                    sx.ColumnWithAlias("rt", "alias", string.Empty),
+                    sx.ColumnWithAlias("rt", "name", string.Empty),
+                    sx.ColumnWithAlias("rt", "isDependency", string.Empty),
+                    sx.ColumnWithAlias("rt", "dual", string.Empty)
+                ];
+            Sql<ISqlContext> innerUnionSqlChild = _scopeAccessor.AmbientScope.Database.SqlContext.Sql()
+                .Select(columns)
                 .From<RelationDto>("cr")
                 .InnerJoin<RelationTypeDto>("rt")
                 .On<RelationDto, RelationTypeDto>((cr, rt) => rt.Dual == false && rt.Id == cr.RelationType, "cr", "rt")
@@ -357,17 +391,22 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 .InnerJoin<NodeDto>("pn")
                 .On<RelationDto, NodeDto>((cr, pn) => cr.ParentId == pn.NodeId, "cr", "pn");
 
-            Sql<ISqlContext> innerUnionSqlDualParent = _scopeAccessor.AmbientScope.Database.SqlContext.Sql().Select(
-                    "[pn].uniqueId as [key]",
-                    "[pn].trashed as [trashed]",
-                    "[pn].nodeObjectType as [nodeObjectType]",
-                    "[cn].uniqueId as otherKey," +
-                    "[dpr].parentId as id",
-                    "[dpr].childId as otherId",
-                    "[dprt].[alias]",
-                    "[dprt].[name]",
-                    "[dprt].[isDependency]",
-                    "[dprt].[dual]")
+            columns = sx == null
+                ? []
+                : [
+                    sx.ColumnWithAlias("pn", "uniqueId", "key"),
+                    sx.ColumnWithAlias("pn", "trashed", "trashed"),
+                    sx.ColumnWithAlias("pn", "nodeObjectType", "nodeObjectType"),
+                    sx.ColumnWithAlias("cn", "uniqueId", "otherKey"),
+                    sx.ColumnWithAlias("dpr", "parentId", "id"),
+                    sx.ColumnWithAlias("dpr", "childId", "otherId"),
+                    sx.ColumnWithAlias("dprt", "alias", string.Empty),
+                    sx.ColumnWithAlias("dprt", "name", string.Empty),
+                    sx.ColumnWithAlias("dprt", "isDependency", string.Empty),
+                    sx.ColumnWithAlias("dprt", "dual", string.Empty)
+                ];
+            Sql<ISqlContext> innerUnionSqlDualParent = _scopeAccessor.AmbientScope.Database.SqlContext.Sql()
+                .Select(columns)
                 .From<RelationDto>("dpr")
                 .InnerJoin<RelationTypeDto>("dprt")
                 .On<RelationDto, RelationTypeDto>(
@@ -376,18 +415,22 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 .On<RelationDto, NodeDto>((dpr, cn) => dpr.ChildId == cn.NodeId, "dpr", "cn")
                 .InnerJoin<NodeDto>("pn")
                 .On<RelationDto, NodeDto>((dpr, pn) => dpr.ParentId == pn.NodeId, "dpr", "pn");
-
-            Sql<ISqlContext> innerUnionSql3 = _scopeAccessor.AmbientScope.Database.SqlContext.Sql().Select(
-                    "[cn].uniqueId as [key]",
-                    "[cn].trashed as [trashed]",
-                    "[cn].nodeObjectType as [nodeObjectType]",
-                    "[pn].uniqueId as otherKey," +
-                    "[dcr].childId as id",
-                    "[dcr].parentId as otherId",
-                    "[dcrt].[alias]",
-                    "[dcrt].[name]",
-                    "[dcrt].[isDependency]",
-                    "[dcrt].[dual]")
+            columns = sx == null
+                ? []
+                : [
+                    sx.ColumnWithAlias("cn", "uniqueId", "key"),
+                    sx.ColumnWithAlias("cn", "trashed", "trashed"),
+                    sx.ColumnWithAlias("cn", "nodeObjectType", "nodeObjectType"),
+                    sx.ColumnWithAlias("pn", "uniqueId", "otherKey"),
+                    sx.ColumnWithAlias("dcr", "childId", "id"),
+                    sx.ColumnWithAlias("dcr", "parentId", "otherId"),
+                    sx.ColumnWithAlias("dcrt", "alias", string.Empty),
+                    sx.ColumnWithAlias("dcrt", "name", string.Empty),
+                    sx.ColumnWithAlias("dcrt", "isDependency", string.Empty),
+                    sx.ColumnWithAlias("dcrt", "dual", string.Empty)
+                ];
+            Sql<ISqlContext> innerUnionSql3 = _scopeAccessor.AmbientScope.Database.SqlContext.Sql()
+                .Select(columns)
                 .From<RelationDto>("dcr")
                 .InnerJoin<RelationTypeDto>("dcrt")
                 .On<RelationDto, RelationTypeDto>(

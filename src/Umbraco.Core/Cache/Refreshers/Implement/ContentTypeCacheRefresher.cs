@@ -76,7 +76,7 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
 
     #region Refresher
 
-    public override void Refresh(JsonPayload[] payloads)
+    public override void RefreshInternal(JsonPayload[] payloads)
     {
         // TODO: refactor
         // we should NOT directly clear caches here, but instead ask whatever class
@@ -124,6 +124,11 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
             MemberCacheRefresher.RefreshMemberTypes(AppCaches);
         }
 
+        base.RefreshInternal(payloads);
+    }
+
+    public override void Refresh(JsonPayload[] payloads)
+    {
         _publishedContentTypeCache.ClearContentTypes(payloads.Select(x => x.Id));
         _publishedContentTypeFactory.NotifyDataTypeChanges();
         _publishedModelFactory.WithSafeLiveFactoryReset(() =>
@@ -131,8 +136,8 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
             IEnumerable<int> documentTypeIds = payloads.Where(x => x.ItemType == nameof(IContentType)).Select(x => x.Id);
             IEnumerable<int> mediaTypeIds = payloads.Where(x => x.ItemType == nameof(IMediaType)).Select(x => x.Id);
 
-            _documentCacheService.RebuildMemoryCacheByContentTypeAsync(documentTypeIds);
-            _mediaCacheService.RebuildMemoryCacheByContentTypeAsync(mediaTypeIds);
+            _documentCacheService.RebuildMemoryCacheByContentTypeAsync(documentTypeIds).GetAwaiter().GetResult();
+            _mediaCacheService.RebuildMemoryCacheByContentTypeAsync(mediaTypeIds).GetAwaiter().GetResult();
         });
 
         // now we can trigger the event

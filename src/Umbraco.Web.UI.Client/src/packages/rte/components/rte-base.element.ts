@@ -1,6 +1,6 @@
 import type { UmbPropertyEditorRteValueType } from '../types.js';
 import { UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../constants.js';
-import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import { jsonStringComparison, observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbBlockRteEntriesContext, UmbBlockRteManagerContext } from '@umbraco-cms/backoffice/block-rte';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
@@ -10,9 +10,9 @@ import {
 	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
 } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UMB_VARIANT_CONTEXT, UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UMB_CONTENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
-import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
+import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { StyleInfo } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbBlockDataModel } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockRteLayoutModel, UmbBlockRteTypeModel } from '@umbraco-cms/backoffice/block-rte';
@@ -192,8 +192,14 @@ export abstract class UmbPropertyEditorUiRteElementBase
 			this.#gotPropertyContext(context);
 		});
 
-		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (context) => {
-			this.#managerContext.setVariantId(context?.getVariantId());
+		this.consumeContext(UMB_VARIANT_CONTEXT, async (context) => {
+			this.observe(
+				context?.displayVariantId,
+				(variantId) => {
+					this.#managerContext.setVariantId(variantId);
+				},
+				'observeContextualVariantId',
+			);
 		});
 
 		this.observe(
@@ -243,9 +249,12 @@ export abstract class UmbPropertyEditorUiRteElementBase
 			([layouts, contents, settings, exposes]) => {
 				if (layouts.length === 0) {
 					if (super.value?.markup === undefined) {
+						if (this.value === undefined) {
+							return;
+						}
 						super.value = undefined;
 					} else {
-						super.value = {
+						const newValue = {
 							...super.value,
 							blocks: {
 								layout: {},
@@ -254,9 +263,13 @@ export abstract class UmbPropertyEditorUiRteElementBase
 								expose: [],
 							},
 						};
+						if (jsonStringComparison(this.value, newValue)) {
+							return;
+						}
+						super.value = newValue;
 					}
 				} else {
-					super.value = {
+					const newValue = {
 						markup: this._markup,
 						blocks: {
 							layout: { [UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS]: layouts },
@@ -265,6 +278,10 @@ export abstract class UmbPropertyEditorUiRteElementBase
 							expose: exposes,
 						},
 					};
+					if (jsonStringComparison(this.value, newValue)) {
+						return;
+					}
+					super.value = newValue;
 				}
 
 				// If we don't have a value set from the outside or an internal value, we don't want to set the value.

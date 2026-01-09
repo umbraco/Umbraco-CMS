@@ -8,8 +8,8 @@ schedules:
   displayName: Daily midnight build
   branches:
     include:
-    - v10/dev
     - v13/dev
+    - v16/dev
     - main
 
 steps:

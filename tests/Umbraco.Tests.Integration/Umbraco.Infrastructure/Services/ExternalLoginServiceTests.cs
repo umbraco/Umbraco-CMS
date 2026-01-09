@@ -29,8 +29,8 @@ internal sealed class ExternalLoginServiceTests : UmbracoIntegrationTest
         UserService.Save(user);
 
         var providerKey = Guid.NewGuid().ToString("N");
-        var latest = DateTime.Now.AddDays(-1);
-        var oldest = DateTime.Now.AddDays(-10);
+        var latest = DateTime.UtcNow.AddDays(-1);
+        var oldest = DateTime.UtcNow.AddDays(-10);
 
         using (var scope = ScopeProvider.CreateScope())
         {
@@ -239,7 +239,10 @@ internal sealed class ExternalLoginServiceTests : UmbracoIntegrationTest
         var tokens = ExternalLoginService.GetExternalLoginTokens(user.Key).OrderBy(x => x.LoginProvider).ToList();
 
         tokens.RemoveAt(0); // remove the first one
-        tokens.Add(new IdentityUserToken(externalLogins[1].LoginProvider, "hello2b", "world2b",
+        tokens.Add(new IdentityUserToken(
+            externalLogins[1].LoginProvider,
+            "hello2b",
+            "world2b",
             user.Id.ToString())); // add a new one
         tokens[0].Value = "abcd123"; // update
 

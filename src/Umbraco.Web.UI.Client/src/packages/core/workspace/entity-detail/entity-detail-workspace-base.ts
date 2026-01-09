@@ -19,7 +19,7 @@ import type {
 	UmbRepositoryResponse,
 	UmbRepositoryResponseWithAsObservable,
 } from '@umbraco-cms/backoffice/repository';
-import { UmbDeprecation, UmbStateManager } from '@umbraco-cms/backoffice/utils';
+import { UmbStateManager } from '@umbraco-cms/backoffice/utils';
 import { UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbApiError } from '@umbraco-cms/backoffice/resources';
@@ -253,8 +253,10 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 				}
 			}
 		} else if (data) {
-			this._data.setPersisted(data);
-			this._data.setCurrent(data);
+			const processedData = await this._scaffoldProcessData(data);
+
+			this._data.setPersisted(processedData);
+			this._data.setCurrent(processedData);
 
 			this.observe(asObservable?.(), (entity) => this.#onDetailStoreChange(entity), 'umbEntityDetailTypeStoreObserver');
 		}
@@ -327,7 +329,15 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		return data;
 	}
 
+	/**
+	 * @deprecated Override `_processIncomingData` instead. `_scaffoldProcessData` will be removed in v.18.
+	 * @param {DetailModelType} data - The data to process.
+	 * @returns {Promise<DetailModelType>} The processed data.
+	 */
 	protected async _scaffoldProcessData(data: DetailModelType): Promise<DetailModelType> {
+		return await this._processIncomingData(data);
+	}
+	protected async _processIncomingData(data: DetailModelType): Promise<DetailModelType> {
 		return data;
 	}
 
@@ -365,11 +375,14 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	/**
 	 * Check if the workspace is about to navigate away.
 	 * @protected
-	 * @param {string} newUrl The new url that the workspace is navigating to.
-	 * @returns { boolean} true if the workspace is navigating away.
+	 * @param {string | URL} newUrl The new url that the workspace is navigating to.
+	 * @returns {boolean} true if the workspace is navigating away.
 	 * @memberof UmbEntityWorkspaceContextBase
 	 */
-	protected _checkWillNavigateAway(newUrl: string): boolean {
+	protected _checkWillNavigateAway(newUrl: string | URL): boolean {
+		if (newUrl instanceof URL) {
+			newUrl = newUrl.href;
+		}
 		return !newUrl.includes(this.routes.getActiveLocalPath());
 	}
 
@@ -467,15 +480,6 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 */
 	public getHasUnpersistedChanges(): boolean {
 		return this._data.getHasUnpersistedChanges();
-	}
-	// @deprecated use getHasUnpersistedChanges instead, will be removed in v17.0
-	protected _getHasUnpersistedChanges(): boolean {
-		new UmbDeprecation({
-			removeInVersion: '17',
-			deprecated: '_getHasUnpersistedChanges',
-			solution: 'use public getHasUnpersistedChanges instead.',
-		}).warn();
-		return this.getHasUnpersistedChanges();
 	}
 
 	override resetState() {

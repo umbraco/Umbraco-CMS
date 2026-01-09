@@ -1,5 +1,5 @@
-import type { UmbBlockDataModel, UmbBlockLayoutBaseModel } from '../types.js';
-import { UMB_BLOCK_ENTRIES_CONTEXT, UMB_BLOCK_ENTRY_CONTEXT, UMB_BLOCK_MANAGER_CONTEXT } from '../context/index.js';
+import type { UmbBlockDataModel, UmbBlockDataValueModel, UmbBlockLayoutBaseModel } from '../types.js';
+import { UMB_BLOCK_ENTRIES_CONTEXT, UMB_BLOCK_MANAGER_CONTEXT } from '../context/index.js';
 import { UmbBlockWorkspaceEditorElement } from './block-workspace-editor.element.js';
 import { UmbBlockElementManager } from './block-element-manager.js';
 import type { UmbBlockWorkspaceOriginData } from './block-workspace.modal-token.js';
@@ -24,6 +24,7 @@ import { decodeFilePath, UmbReadOnlyVariantGuardManager } from '@umbraco-cms/bac
 
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
+import { UmbUfmVirtualRenderController } from '@umbraco-cms/backoffice/ufm';
 
 export type UmbBlockWorkspaceElementManagerNames = 'content' | 'settings';
 
@@ -66,6 +67,8 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	#name = new UmbStringState<string | undefined>(undefined);
 	readonly name = this.#name.asObservable();
 
+	#labelRender = new UmbUfmVirtualRenderController(this);
+
 	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
 	readonly variantId = this.#variantId.asObservable();
 
@@ -99,14 +102,22 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			this.#blockEntries = context;
 		}).asPromise({ preventTimeout: true });
 
-		this.consumeContext(UMB_BLOCK_ENTRY_CONTEXT, (context) => {
-			this.#name.setValue(context?.getName());
-		});
+		this.observe(
+			this.variantId,
+			(variantId) => {
+				this.content.setVariantId(variantId);
+				this.settings.setVariantId(variantId);
+			},
+			null,
+		);
 
-		this.observe(this.variantId, (variantId) => {
-			this.content.setVariantId(variantId);
-			this.settings.setVariantId(variantId);
-		});
+		this.observe(
+			observeMultiple([this.content.values, this.settings.values]),
+			async ([contentValues, settingsValues]) => {
+				this.#renderLabel(contentValues, settingsValues);
+			},
+			'observeContentForLabelRender',
+		);
 
 		this.routes.setRoutes([
 			{
@@ -177,7 +188,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 				this.observe(
 					manager.hasExposeOf(contentKey, variantId),
 					(exposed) => {
-						this.#exposed.setValue(exposed);
+						this.#exposed.setValue(exposed ?? false);
 					},
 					'observeHasExpose',
 				);
@@ -210,21 +221,62 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			(contentTypeId) => {
 				this.observe(
 					contentTypeId ? manager.blockTypeOf(contentTypeId) : undefined,
-					(blockType) => {
-						if (!blockType?.editorSize) return;
-
-						const editorConfig = manager.getEditorConfiguration();
-						const useInlineEditing = editorConfig?.find((x) => x.alias === 'useInlineEditingAsDefault')?.value;
-
-						if (!useInlineEditing) {
-							this.setEditorSize(blockType.editorSize);
+					async (blockType) => {
+						if (blockType?.editorSize) {
+							const editorConfig = manager.getEditorConfiguration();
+							const useInlineEditing = editorConfig?.find((x) => x.alias === 'useInlineEditingAsDefault')?.value;
+							if (!useInlineEditing) {
+								this.setEditorSize(blockType.editorSize);
+							}
 						}
+
+						await this.content.structure.whenLoaded();
+						this.#gotLabel(blockType?.label ?? this.content.structure.getOwnerContentTypeName());
 					},
 					'observeBlockType',
 				);
 			},
 			'observeContentTypeId',
 		);
+	}
+
+	#gotLabel(label: string | undefined) {
+		if (label) {
+			this.#labelRender.markdown = label;
+			this.#renderLabel(this.content.getValues(), this.settings.getValues());
+		}
+	}
+
+	async #renderLabel(
+		contentValues: Array<UmbBlockDataValueModel> | undefined,
+		settingsValues: Array<UmbBlockDataValueModel> | undefined,
+	) {
+		const valueObject = {} as Record<string, unknown>;
+		if (contentValues) {
+			for (const property of contentValues) {
+				valueObject[property.alias] = property.value;
+			}
+		}
+
+		if (settingsValues) {
+			valueObject['$settings'] = settingsValues;
+		}
+
+		// TODO: Look to add support for `$index`, requires wiring up the block-entry with the workspace. [LK]
+		//valueObject['$index'] = 0;
+
+		this.#labelRender.value = valueObject;
+
+		// Await one animation frame:
+		await new Promise((resolve) => requestAnimationFrame(() => resolve(true)));
+		const prefix = this.getIsNew() === true ? '#general_add' : '#general_edit';
+		const label = this.#labelRender.toString();
+		const title = `${prefix} ${label}`;
+		this.#name.setValue(title);
+
+		if (this.#modalContext) {
+			this.view.setTitle(title);
+		}
 	}
 
 	#allowNavigateAway = false;
@@ -264,11 +316,14 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	/**
 	 * Check if the workspace is about to navigate away.
 	 * @protected
-	 * @param {string} newUrl The new url that the workspace is navigating to.
-	 * @returns { boolean} true if the workspace is navigating away.
+	 * @param {string | URL} newUrl The new url that the workspace is navigating to.
+	 * @returns {boolean} true if the workspace is navigating away.
 	 * @memberof UmbEntityWorkspaceContextBase
 	 */
-	protected _checkWillNavigateAway(newUrl: string): boolean {
+	protected _checkWillNavigateAway(newUrl: string | URL): boolean {
+		if (newUrl instanceof URL) {
+			newUrl = newUrl.href;
+		}
 		return !newUrl.includes(this.routes.getActiveLocalPath());
 	}
 

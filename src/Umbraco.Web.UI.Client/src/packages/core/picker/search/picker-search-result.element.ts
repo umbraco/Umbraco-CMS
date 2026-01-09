@@ -1,12 +1,14 @@
 import { UMB_PICKER_CONTEXT } from '../picker.context.token.js';
 import type { UmbPickerContext } from '../picker.context.js';
+import { UmbDefaultPickerSearchResultItemElement } from './result-item/default/default-picker-search-result-item.element.js';
 import type { ManifestPickerSearchResultItem } from './result-item/picker-search-result-item.extension.js';
+import { UmbDefaultPickerSearchResultItemContext } from './result-item/default/default-picker-search-result-item.context.js';
 import { customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
-import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import type { UmbSearchRequestArgs, UmbSearchResultItemModel } from '@umbraco-cms/backoffice/search';
+import type { UmbItemModel } from '@umbraco-cms/backoffice/entity-item';
 
-type PickableFilterMethodType<T extends UmbEntityModel = UmbEntityModel> = (item: T) => boolean;
+type PickableFilterMethodType<T extends UmbSearchResultItemModel = UmbSearchResultItemModel> = (item: T) => boolean;
 
 @customElement('umb-picker-search-result')
 export class UmbPickerSearchResultElement extends UmbLitElement {
@@ -17,7 +19,7 @@ export class UmbPickerSearchResultElement extends UmbLitElement {
 	private _searching: boolean = false;
 
 	@state()
-	private _items: UmbEntityModel[] = [];
+	private _items: UmbItemModel[] = [];
 
 	@state()
 	private _isSearchable: boolean = false;
@@ -67,7 +69,7 @@ export class UmbPickerSearchResultElement extends UmbLitElement {
 		return html`<small>No result for <strong>"${this._query?.query}"</strong>.</small>`;
 	}
 
-	#renderResultItem(item: UmbEntityModel) {
+	#renderResultItem(item: UmbSearchResultItemModel) {
 		return html`
 			<umb-extension-with-api-slot
 				type="pickerSearchResultItem"
@@ -75,8 +77,17 @@ export class UmbPickerSearchResultElement extends UmbLitElement {
 				.elementProps=${{
 					item,
 					disabled: this.pickableFilter ? !this.pickableFilter(item) : undefined,
-				}}></umb-extension-with-api-slot>
+				}}
+				.fallbackRenderMethod=${() => this.#renderFallbackResultItem(item)}></umb-extension-with-api-slot>
 		`;
+	}
+
+	#renderFallbackResultItem(item: UmbSearchResultItemModel) {
+		const element = new UmbDefaultPickerSearchResultItemElement();
+		element.item = item;
+		element.disabled = this.pickableFilter ? !this.pickableFilter(item) : undefined;
+		new UmbDefaultPickerSearchResultItemContext(element);
+		return element;
 	}
 }
 

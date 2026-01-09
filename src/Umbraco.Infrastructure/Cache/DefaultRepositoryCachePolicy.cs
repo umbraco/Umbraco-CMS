@@ -1,7 +1,10 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
@@ -24,11 +27,30 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
     private static readonly TEntity[] _emptyEntities = new TEntity[0]; // const
     private readonly RepositoryCachePolicyOptions _options;
 
-    public DefaultRepositoryCachePolicy(IAppPolicyCache cache, IScopeAccessor scopeAccessor, RepositoryCachePolicyOptions options)
-        : base(cache, scopeAccessor) =>
+    public DefaultRepositoryCachePolicy(
+        IAppPolicyCache cache,
+        IScopeAccessor scopeAccessor,
+        RepositoryCachePolicyOptions options,
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(cache, scopeAccessor, repositoryCacheVersionService, cacheSyncService) =>
         _options = options ?? throw new ArgumentNullException(nameof(options));
 
-    protected string EntityTypeCacheKey { get; } = $"uRepo_{typeof(TEntity).Name}_";
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
+    public DefaultRepositoryCachePolicy(
+        IAppPolicyCache cache,
+        IScopeAccessor scopeAccessor,
+        RepositoryCachePolicyOptions options)
+        : this(
+            cache,
+            scopeAccessor,
+            options,
+            StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>(),
+            StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>())
+    {
+    }
+
+    protected string EntityTypeCacheKey { get; } = RepositoryCacheKeys.GetKey<TEntity>();
 
     /// <inheritdoc />
     public override void Create(TEntity entity, Action<TEntity> persistNew)
@@ -98,6 +120,10 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
 
             throw;
         }
+
+        // We've changed the entity, register cache change for other servers.
+        // We assume that if something goes wrong, we'll roll back, so don't need to register the change.
+        RegisterCacheChange();
     }
 
     /// <inheritdoc />
@@ -122,11 +148,16 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
             // if there's a GetAllCacheAllowZeroCount cache, ensure it is cleared
             Cache.Clear(EntityTypeCacheKey);
         }
+
+        // We've removed an entity, register cache change for other servers.
+        RegisterCacheChange();
     }
 
     /// <inheritdoc />
     public override TEntity? Get(TId? id, Func<TId?, TEntity?> performGet, Func<TId[]?, IEnumerable<TEntity>?> performGetAll)
     {
+        EnsureCacheIsSynced();
+
         var cacheKey = GetEntityCacheKey(id);
 
         TEntity? fromCache = Cache.GetCacheItem<TEntity>(cacheKey);
@@ -163,6 +194,7 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
     /// <inheritdoc />
     public override TEntity? GetCached(TId id)
     {
+        EnsureCacheIsSynced();
         var cacheKey = GetEntityCacheKey(id);
         return Cache.GetCacheItem<TEntity>(cacheKey);
     }
@@ -170,6 +202,7 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
     /// <inheritdoc />
     public override bool Exists(TId id, Func<TId, bool> performExists, Func<TId[], IEnumerable<TEntity>?> performGetAll)
     {
+        EnsureCacheIsSynced();
         // if found in cache the return else check
         var cacheKey = GetEntityCacheKey(id);
         TEntity? fromCache = Cache.GetCacheItem<TEntity>(cacheKey);
@@ -179,6 +212,7 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
     /// <inheritdoc />
     public override TEntity[] GetAll(TId[]? ids, Func<TId[]?, IEnumerable<TEntity>?> performGetAll)
     {
+        EnsureCacheIsSynced();
         if (ids?.Length > 0)
         {
             // try to get each entity from the cache

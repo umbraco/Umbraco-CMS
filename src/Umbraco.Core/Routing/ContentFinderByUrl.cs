@@ -10,6 +10,7 @@ namespace Umbraco.Cms.Core.Routing;
 /// <remarks>
 ///     <para>Handles <c>/foo/bar</c> where <c>/foo/bar</c> is the nice URL of a document.</para>
 /// </remarks>
+[Obsolete("Scheduled for removal in Umbraco 18")]
 public class ContentFinderByUrl : IContentFinder
 {
     private readonly ILogger<ContentFinderByUrl> _logger;
@@ -60,41 +61,5 @@ public class ContentFinderByUrl : IContentFinder
     ///     Tries to find an Umbraco document for a <c>PublishedRequest</c> and a route.
     /// </summary>
     /// <returns>The document node, or null.</returns>
-    protected IPublishedContent? FindContent(IPublishedRequestBuilder docreq, string route)
-    {
-        if (!UmbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext? umbracoContext))
-        {
-            return null;
-        }
-
-        if (docreq == null)
-        {
-            throw new ArgumentNullException(nameof(docreq));
-        }
-
-        if (_logger.IsEnabled(LogLevel.Debug))
-        {
-            _logger.LogDebug("Test route {Route}", route);
-        }
-
-        IPublishedContent? node =
-            umbracoContext.Content?.GetByRoute(umbracoContext.InPreviewMode, route, culture: docreq.Culture);
-        if (node != null)
-        {
-            docreq.SetPublishedContent(node);
-            if (_logger.IsEnabled(LogLevel.Debug))
-            {
-                _logger.LogDebug("Got content, id={NodeId}", node.Id);
-            }
-        }
-        else
-        {
-            if (_logger.IsEnabled(LogLevel.Debug))
-            {
-                _logger.LogDebug("No match.");
-            }
-        }
-
-        return node;
-    }
+    protected IPublishedContent? FindContent(IPublishedRequestBuilder docreq, string route) => null;
 }

@@ -15,6 +15,10 @@ using Umbraco.Cms.Core.Services.Navigation;
 
 namespace Umbraco.Extensions;
 
+/// <summary>
+/// Provides extension methods for <see cref="IPublishedContent"/> to navigate content trees,
+/// access properties, and retrieve related content such as ancestors, descendants, siblings, and children.
+/// </summary>
 public static class PublishedContentExtensions
 {
     #region Name
@@ -136,14 +140,6 @@ public static class PublishedContentExtensions
 
         return content.GetParent(navigationQueryService, publishedStatusFilteringService) as T;
     }
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static T? Parent<T>(
-        this IPublishedContent content,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService)
-        where T : class, IPublishedContent
-        => content.Parent<T>(navigationQueryService, GetPublishedStatusFilteringService(content));
 
     private static IPublishedContent? GetParent(
         this IPublishedContent content,
@@ -275,9 +271,26 @@ public static class PublishedContentExtensions
         return template?.Alias ?? string.Empty;
     }
 
+    /// <summary>
+    /// Determines whether a specific template is allowed for the content item.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="contentTypeService">The content type service.</param>
+    /// <param name="webRoutingSettings">The web routing settings.</param>
+    /// <param name="templateId">The template identifier.</param>
+    /// <returns><c>true</c> if the template is allowed; otherwise, <c>false</c>.</returns>
     public static bool IsAllowedTemplate(this IPublishedContent content, IContentTypeService contentTypeService, WebRoutingSettings webRoutingSettings, int templateId) =>
         content.IsAllowedTemplate(contentTypeService, webRoutingSettings.DisableAlternativeTemplates, webRoutingSettings.ValidateAlternativeTemplates, templateId);
 
+    /// <summary>
+    /// Determines whether a specific template is allowed for the content item.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="contentTypeService">The content type service.</param>
+    /// <param name="disableAlternativeTemplates">Whether alternative templates are disabled.</param>
+    /// <param name="validateAlternativeTemplates">Whether to validate alternative templates against allowed templates.</param>
+    /// <param name="templateId">The template identifier.</param>
+    /// <returns><c>true</c> if the template is allowed; otherwise, <c>false</c>.</returns>
     public static bool IsAllowedTemplate(this IPublishedContent content, IContentTypeService contentTypeService, bool disableAlternativeTemplates, bool validateAlternativeTemplates, int templateId)
     {
         if (disableAlternativeTemplates)
@@ -300,6 +313,16 @@ public static class PublishedContentExtensions
         return publishedContentContentType.IsAllowedTemplate(templateId);
     }
 
+    /// <summary>
+    /// Determines whether a specific template is allowed for the content item by template alias.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="fileService">The file service.</param>
+    /// <param name="contentTypeService">The content type service.</param>
+    /// <param name="disableAlternativeTemplates">Whether alternative templates are disabled.</param>
+    /// <param name="validateAlternativeTemplates">Whether to validate alternative templates against allowed templates.</param>
+    /// <param name="templateAlias">The template alias.</param>
+    /// <returns><c>true</c> if the template is allowed; otherwise, <c>false</c>.</returns>
     public static bool IsAllowedTemplate(this IPublishedContent content, IFileService fileService, IContentTypeService contentTypeService, bool disableAlternativeTemplates, bool validateAlternativeTemplates, string templateAlias)
     {
         ITemplate? template = fileService.GetTemplate(templateAlias);
@@ -451,8 +474,20 @@ public static class PublishedContentExtensions
 
     #region IsSomething: equality
 
+    /// <summary>
+    /// Determines whether this content item is equal to another content item by comparing their IDs.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="other">The other content item to compare.</param>
+    /// <returns><c>true</c> if both content items have the same ID; otherwise, <c>false</c>.</returns>
     public static bool IsEqual(this IPublishedContent content, IPublishedContent other) => content.Id == other.Id;
 
+    /// <summary>
+    /// Determines whether this content item is not equal to another content item by comparing their IDs.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="other">The other content item to compare.</param>
+    /// <returns><c>true</c> if the content items have different IDs; otherwise, <c>false</c>.</returns>
     public static bool IsNotEqual(this IPublishedContent content, IPublishedContent other) =>
         content.IsEqual(other) == false;
 
@@ -460,15 +495,39 @@ public static class PublishedContentExtensions
 
     #region IsSomething: ancestors and descendants
 
+    /// <summary>
+    /// Determines whether this content item is a descendant of another content item.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="other">The potential ancestor content item.</param>
+    /// <returns><c>true</c> if this content is a descendant of the other; otherwise, <c>false</c>.</returns>
     public static bool IsDescendant(this IPublishedContent content, IPublishedContent other) =>
         other.Level < content.Level && content.Path.InvariantStartsWith(other.Path.EnsureEndsWith(','));
 
+    /// <summary>
+    /// Determines whether this content item is a descendant of or the same as another content item.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="other">The potential ancestor or same content item.</param>
+    /// <returns><c>true</c> if this content is a descendant of or equal to the other; otherwise, <c>false</c>.</returns>
     public static bool IsDescendantOrSelf(this IPublishedContent content, IPublishedContent other) =>
         content.Path.InvariantEquals(other.Path) || content.IsDescendant(other);
 
+    /// <summary>
+    /// Determines whether this content item is an ancestor of another content item.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="other">The potential descendant content item.</param>
+    /// <returns><c>true</c> if this content is an ancestor of the other; otherwise, <c>false</c>.</returns>
     public static bool IsAncestor(this IPublishedContent content, IPublishedContent other) =>
         content.Level < other.Level && other.Path.InvariantStartsWith(content.Path.EnsureEndsWith(','));
 
+    /// <summary>
+    /// Determines whether this content item is an ancestor of or the same as another content item.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="other">The potential descendant or same content item.</param>
+    /// <returns><c>true</c> if this content is an ancestor of or equal to the other; otherwise, <c>false</c>.</returns>
     public static bool IsAncestorOrSelf(this IPublishedContent content, IPublishedContent other) =>
         other.Path.InvariantEquals(content.Path) || content.IsAncestor(other);
 
@@ -513,22 +572,6 @@ public static class PublishedContentExtensions
         IPublishedStatusFilteringService publishedStatusFilteringService)
         => content.AncestorsOrSelf(navigationQueryService, publishedStatusFilteringService, false, null);
 
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> Ancestors(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService)
-        => content.Ancestors(navigationQueryService, GetPublishedStatusFilteringService(content));
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> Ancestors(
-        this IPublishedContent content,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService)
-        => content.Ancestors(navigationQueryService, GetPublishedStatusFilteringService(content));
-
     /// <summary>
     ///     Gets the ancestors of the content, at a level lesser or equal to a specified level.
     /// </summary>
@@ -548,24 +591,6 @@ public static class PublishedContentExtensions
             publishedStatusFilteringService,
             false,
             n => n.Level <= maxLevel);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> Ancestors(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService,
-        int maxLevel)
-        => content.Ancestors(navigationQueryService, GetPublishedStatusFilteringService(content), maxLevel);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> Ancestors(
-        this IPublishedContent content,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        int maxLevel)
-        => content.Ancestors(navigationQueryService, GetPublishedStatusFilteringService(content), maxLevel);
 
     /// <summary>
     ///     Gets the ancestors of the content, of a specified content type.
@@ -591,24 +616,6 @@ public static class PublishedContentExtensions
             contentTypeAlias);
     }
 
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> Ancestors(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService,
-        string contentTypeAlias)
-        => content.Ancestors(navigationQueryService, GetPublishedStatusFilteringService(content), contentTypeAlias);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> Ancestors(
-        this IPublishedContent content,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        string contentTypeAlias)
-        => content.Ancestors(navigationQueryService, GetPublishedStatusFilteringService(content), contentTypeAlias);
-
     /// <summary>
     ///     Gets the ancestors of the content, of a specified content type.
     /// </summary>
@@ -625,31 +632,14 @@ public static class PublishedContentExtensions
         where T : class, IPublishedContent
         => content.Ancestors(navigationQueryService, publishedStatusFilteringService).OfType<T>();
 
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<T> Ancestors<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService)
-        where T : class, IPublishedContent
-        => content.Ancestors<T>(navigationQueryService, GetPublishedStatusFilteringService(content));
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<T> Ancestors<T>(
-        this IPublishedContent content,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService)
-        where T : class, IPublishedContent
-        => content.Ancestors<T>(navigationQueryService, GetPublishedStatusFilteringService(content));
-
     /// <summary>
     ///     Gets the ancestors of the content, at a level lesser or equal to a specified level, and of a specified content
     ///     type.
     /// </summary>
     /// <typeparam name="T">The content type.</typeparam>
     /// <param name="content">The content.</param>
-    /// <param name="publishedStatusFilteringService"></param>
+    /// <param name="navigationQueryService">The query service for the in-memory navigation structure.</param>
+    /// <param name="publishedStatusFilteringService">The service for filtering published content by status.</param>
     /// <param name="maxLevel">The level.</param>
     /// <returns>
     ///     The ancestors of the content, at a level lesser or equal to the specified level, and of the specified
@@ -667,26 +657,6 @@ public static class PublishedContentExtensions
         where T : class, IPublishedContent
         => content.Ancestors(navigationQueryService, publishedStatusFilteringService, maxLevel).OfType<T>();
 
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<T> Ancestors<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService,
-        int maxLevel)
-        where T : class, IPublishedContent
-        => content.Ancestors<T>(navigationQueryService, GetPublishedStatusFilteringService(content), maxLevel);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<T> Ancestors<T>(
-        this IPublishedContent content,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        int maxLevel)
-        where T : class, IPublishedContent
-        => content.Ancestors<T>(navigationQueryService, GetPublishedStatusFilteringService(content), maxLevel);
-
     /// <summary>
     ///     Gets the content and its ancestors.
     /// </summary>
@@ -699,22 +669,6 @@ public static class PublishedContentExtensions
         INavigationQueryService navigationQueryService,
         IPublishedStatusFilteringService publishedStatusFilteringService)
         => content.AncestorsOrSelf(navigationQueryService, publishedStatusFilteringService, true, null);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> AncestorsOrSelf(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService)
-        => content.AncestorsOrSelf(navigationQueryService, GetPublishedStatusFilteringService(content));
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> AncestorsOrSelf(
-        this IPublishedContent content,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService)
-        => content.AncestorsOrSelf(navigationQueryService, GetPublishedStatusFilteringService(content));
 
     /// <summary>
     ///     Gets the content and its ancestors, at a level lesser or equal to a specified level.
@@ -742,24 +696,6 @@ public static class PublishedContentExtensions
             true,
             n => n.Level <= maxLevel);
 
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> AncestorsOrSelf(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService,
-        int maxLevel)
-        => content.AncestorsOrSelf(navigationQueryService, GetPublishedStatusFilteringService(content), maxLevel);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> AncestorsOrSelf(
-        this IPublishedContent content,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        int maxLevel)
-        => content.AncestorsOrSelf(navigationQueryService, GetPublishedStatusFilteringService(content), maxLevel);
-
     /// <summary>
     ///     Gets the content and its ancestors, of a specified content type.
     /// </summary>
@@ -784,24 +720,6 @@ public static class PublishedContentExtensions
             contentTypeAlias);
     }
 
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> AncestorsOrSelf(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService,
-        string contentTypeAlias)
-        => content.AncestorsOrSelf(navigationQueryService, GetPublishedStatusFilteringService(content), contentTypeAlias);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> AncestorsOrSelf(
-        this IPublishedContent content,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        string contentTypeAlias)
-        => content.AncestorsOrSelf(navigationQueryService, GetPublishedStatusFilteringService(content), contentTypeAlias);
-
     /// <summary>
     ///     Gets the content and its ancestors, of a specified content type.
     /// </summary>
@@ -817,24 +735,6 @@ public static class PublishedContentExtensions
         IPublishedStatusFilteringService publishedStatusFilteringService)
         where T : class, IPublishedContent
         => content.AncestorsOrSelf(navigationQueryService, publishedStatusFilteringService).OfType<T>();
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<T> AncestorsOrSelf<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService)
-        where T : class, IPublishedContent
-        => content.AncestorsOrSelf<T>(navigationQueryService, GetPublishedStatusFilteringService(content));
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<T> AncestorsOrSelf<T>(
-        this IPublishedContent content,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService)
-        where T : class, IPublishedContent
-        => content.AncestorsOrSelf<T>(navigationQueryService, GetPublishedStatusFilteringService(content));
 
     /// <summary>
     ///     Gets the content and its ancestor, at a lever lesser or equal to a specified level, and of a specified content
@@ -858,26 +758,6 @@ public static class PublishedContentExtensions
         where T : class, IPublishedContent
         => content.AncestorsOrSelf(navigationQueryService, publishedStatusFilteringService, maxLevel).OfType<T>();
 
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<T> AncestorsOrSelf<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService,
-        int maxLevel)
-        where T : class, IPublishedContent
-        => content.AncestorsOrSelf<T>(navigationQueryService, GetPublishedStatusFilteringService(content), maxLevel);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<T> AncestorsOrSelf<T>(
-        this IPublishedContent content,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        int maxLevel)
-        where T : class, IPublishedContent
-        => content.AncestorsOrSelf<T>(navigationQueryService, GetPublishedStatusFilteringService(content), maxLevel);
-
     /// <summary>
     ///     Gets the ancestor of the content, ie its parent.
     /// </summary>
@@ -891,13 +771,6 @@ public static class PublishedContentExtensions
         INavigationQueryService navigationQueryService,
         IPublishedStatusFilteringService publishedStatusFilteringService)
         => content.GetParent(navigationQueryService, publishedStatusFilteringService);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IPublishedContent? Ancestor(
-        this IPublishedContent content,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService)
-        => content.Ancestor(navigationQueryService, GetPublishedStatusFilteringService(content));
 
     /// <summary>
     ///     Gets the nearest ancestor of the content, at a lever lesser or equal to a specified level.
@@ -916,24 +789,6 @@ public static class PublishedContentExtensions
         => content
             .EnumerateAncestors(navigationQueryService, publishedStatusFilteringService, false)
             .FirstOrDefault(x => x.Level <= maxLevel);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IPublishedContent? Ancestor(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService,
-        int maxLevel)
-        => content.Ancestor(navigationQueryService, GetPublishedStatusFilteringService(content), maxLevel);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IPublishedContent? Ancestor(
-        this IPublishedContent content,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        int maxLevel)
-        => content.Ancestor(navigationQueryService, GetPublishedStatusFilteringService(content), maxLevel);
 
     /// <summary>
     ///     Gets the nearest ancestor of the content, of a specified content type.
@@ -961,24 +816,6 @@ public static class PublishedContentExtensions
             .FirstOrDefault();
     }
 
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IPublishedContent? Ancestor(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService,
-        string contentTypeAlias)
-        => content.Ancestor(navigationQueryService, GetPublishedStatusFilteringService(content), contentTypeAlias);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IPublishedContent? Ancestor(
-        this IPublishedContent content,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        string contentTypeAlias)
-        => content.Ancestor(navigationQueryService, GetPublishedStatusFilteringService(content), contentTypeAlias);
-
     /// <summary>
     ///     Gets the nearest ancestor of the content, of a specified content type.
     /// </summary>
@@ -994,24 +831,6 @@ public static class PublishedContentExtensions
         IPublishedStatusFilteringService publishedStatusFilteringService)
         where T : class, IPublishedContent
         => content.Ancestors<T>(navigationQueryService, publishedStatusFilteringService).FirstOrDefault();
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static T? Ancestor<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService)
-        where T : class, IPublishedContent
-        => content.Ancestor<T>(navigationQueryService, GetPublishedStatusFilteringService(content));
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static T? Ancestor<T>(
-        this IPublishedContent content,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService)
-        where T : class, IPublishedContent
-        => content.Ancestor<T>(navigationQueryService, GetPublishedStatusFilteringService(content));
 
     /// <summary>
     ///     Gets the nearest ancestor of the content, at the specified level and of the specified content type.
@@ -1033,26 +852,6 @@ public static class PublishedContentExtensions
         int maxLevel)
         where T : class, IPublishedContent
         => content.Ancestors<T>(navigationQueryService, publishedStatusFilteringService, maxLevel).FirstOrDefault();
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static T? Ancestor<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService,
-        int maxLevel)
-        where T : class, IPublishedContent
-        => content.Ancestor<T>(navigationQueryService, GetPublishedStatusFilteringService(content), maxLevel);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static T? Ancestor<T>(
-        this IPublishedContent content,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        int maxLevel)
-        where T : class, IPublishedContent
-        => content.Ancestor<T>(navigationQueryService, GetPublishedStatusFilteringService(content), maxLevel);
 
     /// <summary>
     ///     Gets the content or its nearest ancestor.
@@ -1080,24 +879,6 @@ public static class PublishedContentExtensions
             .EnumerateAncestors(navigationQueryService, publishedStatusFilteringService, true)
             .FirstOrDefault(x => x.Level <= maxLevel) ?? content;
 
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IPublishedContent AncestorOrSelf(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService,
-        int maxLevel)
-        => content.AncestorOrSelf(navigationQueryService, GetPublishedStatusFilteringService(content), maxLevel);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IPublishedContent AncestorOrSelf(
-        this IPublishedContent content,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        int maxLevel)
-        => content.AncestorOrSelf(navigationQueryService, GetPublishedStatusFilteringService(content), maxLevel);
-
     /// <summary>
     ///     Gets the content or its nearest ancestor, of a specified content type.
     /// </summary>
@@ -1124,24 +905,6 @@ public static class PublishedContentExtensions
             .FirstOrDefault() ?? content;
     }
 
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IPublishedContent AncestorOrSelf(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService,
-        string contentTypeAlias)
-        => content.AncestorOrSelf(navigationQueryService, GetPublishedStatusFilteringService(content), contentTypeAlias);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IPublishedContent AncestorOrSelf(
-        this IPublishedContent content,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        string contentTypeAlias)
-        => content.AncestorOrSelf(navigationQueryService, GetPublishedStatusFilteringService(content), contentTypeAlias);
-
     /// <summary>
     ///     Gets the content or its nearest ancestor, of a specified content type.
     /// </summary>
@@ -1157,24 +920,6 @@ public static class PublishedContentExtensions
         IPublishedStatusFilteringService publishedStatusFilteringService)
         where T : class, IPublishedContent =>
         content.AncestorsOrSelf<T>(navigationQueryService, publishedStatusFilteringService).FirstOrDefault();
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static T? AncestorOrSelf<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService)
-        where T : class, IPublishedContent
-        => content.AncestorOrSelf<T>(navigationQueryService, GetPublishedStatusFilteringService(content));
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static T? AncestorOrSelf<T>(
-        this IPublishedContent content,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService)
-        where T : class, IPublishedContent
-        => content.AncestorOrSelf<T>(navigationQueryService, GetPublishedStatusFilteringService(content));
 
     /// <summary>
     ///     Gets the content or its nearest ancestor, at a lever lesser or equal to a specified level, and of a specified
@@ -1194,26 +939,15 @@ public static class PublishedContentExtensions
         where T : class, IPublishedContent
         => content.AncestorsOrSelf<T>(navigationQueryService, publishedStatusFilteringService, maxLevel).FirstOrDefault();
 
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static T? AncestorOrSelf<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService,
-        int maxLevel)
-        where T : class, IPublishedContent
-        => content.AncestorOrSelf<T>(navigationQueryService, GetPublishedStatusFilteringService(content), maxLevel);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static T? AncestorOrSelf<T>(
-        this IPublishedContent content,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        int maxLevel)
-        where T : class, IPublishedContent
-        => content.AncestorOrSelf<T>(navigationQueryService, GetPublishedStatusFilteringService(content), maxLevel);
-
+    /// <summary>
+    /// Gets the ancestors or self of the content item, optionally filtered by a predicate.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="orSelf">Whether to include the content item itself.</param>
+    /// <param name="func">An optional predicate to filter the ancestors.</param>
+    /// <returns>An enumerable of ancestors or self matching the criteria.</returns>
     public static IEnumerable<IPublishedContent> AncestorsOrSelf(
         this IPublishedContent content,
         INavigationQueryService navigationQueryService,
@@ -1227,26 +961,6 @@ public static class PublishedContentExtensions
             orSelf);
         return func == null ? ancestorsOrSelf : ancestorsOrSelf.Where(func);
     }
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> AncestorsOrSelf(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService,
-        bool orSelf,
-        Func<IPublishedContent, bool>? func)
-        => content.AncestorsOrSelf(navigationQueryService, GetPublishedStatusFilteringService(content), orSelf, func);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> AncestorsOrSelf(
-        this IPublishedContent content,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        bool orSelf,
-        Func<IPublishedContent, bool>? func)
-        => content.AncestorsOrSelf(navigationQueryService, GetPublishedStatusFilteringService(content), orSelf, func);
 
     private static IEnumerable<IPublishedContent> EnumerateAncestors(
         this IPublishedContent? content,
@@ -1280,14 +994,6 @@ public static class PublishedContentExtensions
         bool andSelf = true) =>
         content.AncestorsOrSelf(navigationQueryService, publishedStatusFilteringService, andSelf, null).Reverse();
 
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> Breadcrumbs(
-        this IPublishedContent content,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        bool andSelf = true)
-        => content.Breadcrumbs(navigationQueryService, GetPublishedStatusFilteringService(content), andSelf);
-
     /// <summary>
     ///     Gets the breadcrumbs (ancestors and self, top to bottom) for the specified <paramref name="content" /> at a level
     ///     higher or equal to <paramref name="minLevel" />.
@@ -1308,15 +1014,6 @@ public static class PublishedContentExtensions
         int minLevel,
         bool andSelf = true)
         => content.AncestorsOrSelf(navigationQueryService, publishedStatusFilteringService, andSelf, n => n.Level >= minLevel).Reverse();
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> Breadcrumbs(
-        this IPublishedContent content,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        int minLevel,
-        bool andSelf = true)
-        => content.Breadcrumbs(navigationQueryService, GetPublishedStatusFilteringService(content), minLevel, andSelf);
 
     /// <summary>
     ///     Gets the breadcrumbs (ancestors and self, top to bottom) for the specified <paramref name="content" /> at a level
@@ -1342,87 +1039,9 @@ public static class PublishedContentExtensions
             .TakeWhile(n => n is T)
             .Reverse();
 
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> Breadcrumbs<T>(
-        this IPublishedContent content,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        bool andSelf = true)
-        where T : class, IPublishedContent
-        => content.Breadcrumbs<T>(navigationQueryService, GetPublishedStatusFilteringService(content), andSelf);
-
     #endregion
 
     #region Axes: descendants, descendants-or-self
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> DescendantsOrSelfOfType(
-        this IEnumerable<IPublishedContent> parentNodes,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService,
-        string docTypeAlias,
-        string? culture = null)
-    {
-        IPublishedContent[] parentNodesAsArray = parentNodes as IPublishedContent[] ?? parentNodes.ToArray();
-        return parentNodesAsArray.DescendantsOrSelfOfType(
-            navigationQueryService,
-            GetPublishedStatusFilteringService(parentNodesAsArray.First()),
-            docTypeAlias,
-            culture);
-    }
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> DescendantsOrSelfOfType(
-        this IEnumerable<IPublishedContent> parentNodes,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        string docTypeAlias,
-        string? culture = null)
-    {
-        IPublishedContent[] parentNodesAsArray = parentNodes as IPublishedContent[] ?? parentNodes.ToArray();
-        return parentNodesAsArray.DescendantsOrSelfOfType(
-            navigationQueryService,
-            GetPublishedStatusFilteringService(parentNodesAsArray.First()),
-            docTypeAlias,
-            culture);
-    }
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<T> DescendantsOrSelf<T>(
-        this IEnumerable<IPublishedContent> parentNodes,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService,
-        string? culture = null)
-        where T : class, IPublishedContent
-    {
-        IPublishedContent[] parentNodesAsArray = parentNodes as IPublishedContent[] ?? parentNodes.ToArray();
-        return parentNodesAsArray.DescendantsOrSelf<T>(
-            navigationQueryService,
-            GetPublishedStatusFilteringService(parentNodesAsArray.First()),
-            culture);
-    }
-
-    [Obsolete("Use the overload with IPublishStatusQueryService instead, scheduled for removal in v17")]
-    public static IEnumerable<T> DescendantsOrSelf<T>(
-        this IEnumerable<IPublishedContent> parentNodes,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        string? culture = null)
-        where T : class, IPublishedContent
-    {
-        IPublishedContent[] parentNodesAsArray = parentNodes as IPublishedContent[] ?? parentNodes.ToArray();
-        return parentNodesAsArray.DescendantsOrSelf<T>(
-            navigationQueryService,
-            GetPublishedStatusFilteringService(parentNodesAsArray.First()),
-            culture);
-    }
-
 
     // as per XPath 1.0 specs �2.2,
     // - the descendant axis contains the descendants of the context node; a descendant is a child or a child of a child and so on; thus
@@ -1442,6 +1061,15 @@ public static class PublishedContentExtensions
     // - every node occurs before all of its children and descendants.
     // - the relative order of siblings is the order in which they occur in the children property of their parent node.
     // - children and descendants occur before following siblings.
+
+    /// <summary>
+    /// Gets all descendants of the content item.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="culture">The culture for variant content.</param>
+    /// <returns>An enumerable of all descendant content items.</returns>
     public static IEnumerable<IPublishedContent> Descendants(
         this IPublishedContent content,
         INavigationQueryService navigationQueryService,
@@ -1449,25 +1077,15 @@ public static class PublishedContentExtensions
         string? culture = null)
         => content.DescendantsOrSelf(navigationQueryService, publishedStatusFilteringService, false, null, culture);
 
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> Descendants(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService,
-        string? culture = null)
-        => content.Descendants(navigationQueryService, GetPublishedStatusFilteringService(content), culture);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> Descendants(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        string? culture = null)
-        => content.Descendants(navigationQueryService, GetPublishedStatusFilteringService(content), culture);
-
+    /// <summary>
+    /// Gets all descendants of the content item at or above a specified level.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="level">The minimum level of descendants to return.</param>
+    /// <param name="culture">The culture for variant content.</param>
+    /// <returns>An enumerable of descendant content items at or above the specified level.</returns>
     public static IEnumerable<IPublishedContent> Descendants(
         this IPublishedContent content,
         INavigationQueryService navigationQueryService,
@@ -1481,27 +1099,15 @@ public static class PublishedContentExtensions
             p => p.Level >= level,
             culture);
 
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> Descendants(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService,
-        int level,
-        string? culture = null)
-        => content.Descendants(navigationQueryService, GetPublishedStatusFilteringService(content), level, culture);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> Descendants(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        int level,
-        string? culture = null)
-        => content.Descendants(navigationQueryService, GetPublishedStatusFilteringService(content), level, culture);
-
+    /// <summary>
+    /// Gets all descendants of the content item of a specific content type.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="contentTypeAlias">The content type alias to filter by.</param>
+    /// <param name="culture">The culture for variant content.</param>
+    /// <returns>An enumerable of descendant content items of the specified type.</returns>
     public static IEnumerable<IPublishedContent> DescendantsOfType(
         this IPublishedContent content,
         INavigationQueryService navigationQueryService,
@@ -1515,27 +1121,15 @@ public static class PublishedContentExtensions
             false,
             contentTypeAlias);
 
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> DescendantsOfType(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService,
-        string contentTypeAlias,
-        string? culture = null)
-        => content.DescendantsOfType(navigationQueryService, GetPublishedStatusFilteringService(content), contentTypeAlias, culture);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> DescendantsOfType(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        string contentTypeAlias,
-        string? culture = null)
-        => content.DescendantsOfType(navigationQueryService, GetPublishedStatusFilteringService(content), contentTypeAlias, culture);
-
+    /// <summary>
+    /// Gets all descendants of the content item of a specific type.
+    /// </summary>
+    /// <typeparam name="T">The type of content to return.</typeparam>
+    /// <param name="content">The content item.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="culture">The culture for variant content.</param>
+    /// <returns>An enumerable of descendant content items of the specified type.</returns>
     public static IEnumerable<T> Descendants<T>(
         this IPublishedContent content,
         INavigationQueryService navigationQueryService,
@@ -1544,27 +1138,16 @@ public static class PublishedContentExtensions
         where T : class, IPublishedContent
         => content.Descendants(navigationQueryService, publishedStatusFilteringService, culture).OfType<T>();
 
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static IEnumerable<T> Descendants<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService,
-        string? culture = null)
-        where T : class, IPublishedContent
-        => content.Descendants<T>(navigationQueryService, GetPublishedStatusFilteringService(content), culture);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static IEnumerable<T> Descendants<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        string? culture = null)
-        where T : class, IPublishedContent
-        => content.Descendants<T>(navigationQueryService, GetPublishedStatusFilteringService(content), culture);
-
+    /// <summary>
+    /// Gets all descendants of the content item of a specific type at or above a specified level.
+    /// </summary>
+    /// <typeparam name="T">The type of content to return.</typeparam>
+    /// <param name="content">The content item.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="level">The minimum level of descendants to return.</param>
+    /// <param name="culture">The culture for variant content.</param>
+    /// <returns>An enumerable of descendant content items of the specified type at or above the level.</returns>
     public static IEnumerable<T> Descendants<T>(
         this IPublishedContent content,
         INavigationQueryService navigationQueryService,
@@ -1574,29 +1157,14 @@ public static class PublishedContentExtensions
         where T : class, IPublishedContent
         => content.Descendants(navigationQueryService, publishedStatusFilteringService, level, culture).OfType<T>();
 
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static IEnumerable<T> Descendants<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService,
-        int level,
-        string? culture = null)
-        where T : class, IPublishedContent
-        => content.Descendants<T>(navigationQueryService, GetPublishedStatusFilteringService(content), level, culture);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static IEnumerable<T> Descendants<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        int level,
-        string? culture = null)
-        where T : class, IPublishedContent
-        => content.Descendants<T>(navigationQueryService, GetPublishedStatusFilteringService(content), level, culture);
-
+    /// <summary>
+    /// Gets all descendants of the content item including itself.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="culture">The culture for variant content.</param>
+    /// <returns>An enumerable of the content item and all its descendants.</returns>
     public static IEnumerable<IPublishedContent> DescendantsOrSelf(
         this IPublishedContent content,
         INavigationQueryService navigationQueryService,
@@ -1604,25 +1172,15 @@ public static class PublishedContentExtensions
         string? culture = null)
         => content.DescendantsOrSelf(navigationQueryService, publishedStatusFilteringService, true, null, culture);
 
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> DescendantsOrSelf(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService,
-        string? culture = null)
-        => content.DescendantsOrSelf(navigationQueryService, GetPublishedStatusFilteringService(content), culture);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> DescendantsOrSelf(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        string? culture = null)
-        => content.DescendantsOrSelf(navigationQueryService, GetPublishedStatusFilteringService(content), culture);
-
+    /// <summary>
+    /// Gets all descendants of the content item including itself at or above a specified level.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="level">The minimum level to return.</param>
+    /// <param name="culture">The culture for variant content.</param>
+    /// <returns>An enumerable of the content item and all its descendants at or above the level.</returns>
     public static IEnumerable<IPublishedContent> DescendantsOrSelf(
         this IPublishedContent content,
         INavigationQueryService navigationQueryService,
@@ -1631,27 +1189,15 @@ public static class PublishedContentExtensions
         string? culture = null)
         => content.DescendantsOrSelf(navigationQueryService, publishedStatusFilteringService, true, p => p.Level >= level, culture);
 
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> DescendantsOrSelf(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService,
-        int level,
-        string? culture = null)
-        => content.DescendantsOrSelf(navigationQueryService, GetPublishedStatusFilteringService(content), level, culture);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> DescendantsOrSelf(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        int level,
-        string? culture = null)
-        => content.DescendantsOrSelf(navigationQueryService, GetPublishedStatusFilteringService(content), level, culture);
-
+    /// <summary>
+    /// Gets all descendants of the content item including itself of a specific content type.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="contentTypeAlias">The content type alias to filter by.</param>
+    /// <param name="culture">The culture for variant content.</param>
+    /// <returns>An enumerable of the content item and its descendants of the specified type.</returns>
     public static IEnumerable<IPublishedContent> DescendantsOrSelfOfType(
         this IPublishedContent content,
         INavigationQueryService navigationQueryService,
@@ -1665,27 +1211,15 @@ public static class PublishedContentExtensions
             true,
             contentTypeAlias);
 
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> DescendantsOrSelfOfType(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService,
-        string contentTypeAlias,
-        string? culture = null)
-        => content.DescendantsOrSelfOfType(navigationQueryService, GetPublishedStatusFilteringService(content), contentTypeAlias, culture);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> DescendantsOrSelfOfType(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        string contentTypeAlias,
-        string? culture = null)
-        => content.DescendantsOrSelfOfType(navigationQueryService, GetPublishedStatusFilteringService(content), contentTypeAlias, culture);
-
+    /// <summary>
+    /// Gets all descendants of the content item including itself of a specific type.
+    /// </summary>
+    /// <typeparam name="T">The type of content to return.</typeparam>
+    /// <param name="content">The content item.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="culture">The culture for variant content.</param>
+    /// <returns>An enumerable of the content item and its descendants of the specified type.</returns>
     public static IEnumerable<T> DescendantsOrSelf<T>(
         this IPublishedContent content,
         INavigationQueryService navigationQueryService,
@@ -1694,27 +1228,16 @@ public static class PublishedContentExtensions
         where T : class, IPublishedContent
         => content.DescendantsOrSelf(navigationQueryService, publishedStatusFilteringService, culture).OfType<T>();
 
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static IEnumerable<T> DescendantsOrSelf<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService,
-        string? culture = null)
-        where T : class, IPublishedContent
-        => content.DescendantsOrSelf<T>(navigationQueryService, GetPublishedStatusFilteringService(content), culture);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static IEnumerable<T> DescendantsOrSelf<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        string? culture = null)
-        where T : class, IPublishedContent
-        => content.DescendantsOrSelf<T>(navigationQueryService, GetPublishedStatusFilteringService(content), culture);
-
+    /// <summary>
+    /// Gets all descendants of the content item including itself of a specific type at or above a specified level.
+    /// </summary>
+    /// <typeparam name="T">The type of content to return.</typeparam>
+    /// <param name="content">The content item.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="level">The minimum level to return.</param>
+    /// <param name="culture">The culture for variant content.</param>
+    /// <returns>An enumerable of the content item and its descendants of the specified type at or above the level.</returns>
     public static IEnumerable<T> DescendantsOrSelf<T>(
         this IPublishedContent content,
         INavigationQueryService navigationQueryService,
@@ -1724,29 +1247,14 @@ public static class PublishedContentExtensions
         where T : class, IPublishedContent
         => content.DescendantsOrSelf(navigationQueryService, publishedStatusFilteringService, level, culture).OfType<T>();
 
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static IEnumerable<T> DescendantsOrSelf<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService,
-        int level,
-        string? culture = null)
-        where T : class, IPublishedContent
-        => content.DescendantsOrSelf<T>(navigationQueryService, GetPublishedStatusFilteringService(content), level, culture);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static IEnumerable<T> DescendantsOrSelf<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        int level,
-        string? culture = null)
-        where T : class, IPublishedContent
-        => content.DescendantsOrSelf<T>(navigationQueryService, GetPublishedStatusFilteringService(content), level, culture);
-
+    /// <summary>
+    /// Gets the first descendant of the content item.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="culture">The culture for variant content.</param>
+    /// <returns>The first descendant, or null if none exists.</returns>
     public static IPublishedContent? Descendant(
         this IPublishedContent content,
         INavigationQueryService navigationQueryService,
@@ -1754,25 +1262,15 @@ public static class PublishedContentExtensions
         string? culture = null)
         => content.Children(navigationQueryService, publishedStatusFilteringService, culture)?.FirstOrDefault();
 
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static IPublishedContent? Descendant(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService,
-        string? culture = null)
-        => content.Descendant(navigationQueryService, GetPublishedStatusFilteringService(content), culture);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static IPublishedContent? Descendant(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        string? culture = null)
-        => content.Descendant(navigationQueryService, GetPublishedStatusFilteringService(content), culture);
-
+    /// <summary>
+    /// Gets the first descendant of the content item at a specified level.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="level">The level to find a descendant at.</param>
+    /// <param name="culture">The culture for variant content.</param>
+    /// <returns>The first descendant at the specified level, or null if none exists.</returns>
     public static IPublishedContent? Descendant(
         this IPublishedContent content,
         INavigationQueryService navigationQueryService,
@@ -1783,27 +1281,15 @@ public static class PublishedContentExtensions
             .EnumerateDescendants(navigationQueryService, publishedStatusFilteringService, false, culture)
             .FirstOrDefault(x => x.Level == level);
 
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static IPublishedContent? Descendant(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService,
-        int level,
-        string? culture = null)
-        => content.Descendant(navigationQueryService, GetPublishedStatusFilteringService(content), level, culture);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static IPublishedContent? Descendant(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        int level,
-        string? culture = null)
-        => content.Descendant(navigationQueryService, GetPublishedStatusFilteringService(content), level, culture);
-
+    /// <summary>
+    /// Gets the first descendant of the content item of a specific content type.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="contentTypeAlias">The content type alias to filter by.</param>
+    /// <param name="culture">The culture for variant content.</param>
+    /// <returns>The first descendant of the specified type, or null if none exists.</returns>
     public static IPublishedContent? DescendantOfType(
         this IPublishedContent content,
         INavigationQueryService navigationQueryService,
@@ -1819,27 +1305,15 @@ public static class PublishedContentExtensions
                 contentTypeAlias)
             .FirstOrDefault();
 
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static IPublishedContent? DescendantOfType(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService,
-        string contentTypeAlias,
-        string? culture = null)
-        => content.DescendantOfType(navigationQueryService, GetPublishedStatusFilteringService(content), contentTypeAlias, culture);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static IPublishedContent? DescendantOfType(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        string contentTypeAlias,
-        string? culture = null)
-        => content.DescendantOfType(navigationQueryService, GetPublishedStatusFilteringService(content), contentTypeAlias, culture);
-
+    /// <summary>
+    /// Gets the first descendant of the content item of a specific type.
+    /// </summary>
+    /// <typeparam name="T">The type of content to return.</typeparam>
+    /// <param name="content">The content item.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="culture">The culture for variant content.</param>
+    /// <returns>The first descendant of the specified type, or null if none exists.</returns>
     public static T? Descendant<T>(
         this IPublishedContent content,
         INavigationQueryService navigationQueryService,
@@ -1850,27 +1324,16 @@ public static class PublishedContentExtensions
             .EnumerateDescendants(navigationQueryService, publishedStatusFilteringService, false, culture)
             .FirstOrDefault(x => x is T) as T;
 
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static T? Descendant<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService,
-        string? culture = null)
-        where T : class, IPublishedContent
-        => content.Descendant<T>(navigationQueryService, GetPublishedStatusFilteringService(content), culture);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static T? Descendant<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        string? culture = null)
-        where T : class, IPublishedContent
-        => content.Descendant<T>(navigationQueryService, GetPublishedStatusFilteringService(content), culture);
-
+    /// <summary>
+    /// Gets the first descendant of the content item of a specific type at a specified level.
+    /// </summary>
+    /// <typeparam name="T">The type of content to return.</typeparam>
+    /// <param name="content">The content item.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="level">The level to find a descendant at.</param>
+    /// <param name="culture">The culture for variant content.</param>
+    /// <returns>The first descendant of the specified type at the level, or null if none exists.</returns>
     public static T? Descendant<T>(
         this IPublishedContent content,
         INavigationQueryService navigationQueryService,
@@ -1880,29 +1343,14 @@ public static class PublishedContentExtensions
         where T : class, IPublishedContent
         => content.Descendant(navigationQueryService, publishedStatusFilteringService, level, culture) as T;
 
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static T? Descendant<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService,
-        int level,
-        string? culture = null)
-        where T : class, IPublishedContent
-        => content.Descendant<T>(navigationQueryService, GetPublishedStatusFilteringService(content), level, culture);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static T? Descendant<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        int level,
-        string? culture = null)
-        where T : class, IPublishedContent
-        => content.Descendant<T>(navigationQueryService, GetPublishedStatusFilteringService(content), level, culture);
-
+    /// <summary>
+    /// Gets the first descendant or self of the content item.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="culture">The culture for variant content.</param>
+    /// <returns>The first descendant, or the content item itself if no descendants exist.</returns>
     public static IPublishedContent DescendantOrSelf(
         this IPublishedContent content,
         INavigationQueryService navigationQueryService,
@@ -1916,21 +1364,15 @@ public static class PublishedContentExtensions
             .FirstOrDefault() ??
         content;
 
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static IPublishedContent DescendantOrSelf(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishStatusQueryService publishStatusQueryService,
-        string? culture = null)
-        => content.DescendantOrSelf(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), culture);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static IPublishedContent DescendantOrSelf(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        string? culture = null)
-        => content.DescendantOrSelf(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), culture);
-
+    /// <summary>
+    /// Gets the first descendant or self of the content item at a specified level.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="level">The level to find a descendant at.</param>
+    /// <param name="culture">The culture for variant content.</param>
+    /// <returns>The first descendant or self at the specified level, or null if none exists.</returns>
     public static IPublishedContent? DescendantOrSelf(
         this IPublishedContent content,
         INavigationQueryService navigationQueryService,
@@ -1941,28 +1383,15 @@ public static class PublishedContentExtensions
             .EnumerateDescendants(navigationQueryService, publishedStatusFilteringService, true, culture)
             .FirstOrDefault(x => x.Level == level);
 
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static IPublishedContent? DescendantOrSelf(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService,
-        int level,
-        string? culture = null)
-        => content.DescendantOrSelf(navigationQueryService, GetPublishedStatusFilteringService(content), level, culture);
-
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static IPublishedContent? DescendantOrSelf(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        int level,
-        string? culture = null)
-        => content.DescendantOrSelf(navigationQueryService, GetPublishedStatusFilteringService(content), level, culture);
-
+    /// <summary>
+    /// Gets the first descendant or self of the content item of a specific content type.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="contentTypeAlias">The content type alias to filter by.</param>
+    /// <param name="culture">The culture for variant content.</param>
+    /// <returns>The first descendant or self of the specified type, or null if none exists.</returns>
     public static IPublishedContent? DescendantOrSelfOfType(
         this IPublishedContent content,
         INavigationQueryService navigationQueryService,
@@ -1978,27 +1407,15 @@ public static class PublishedContentExtensions
                 contentTypeAlias)
             .FirstOrDefault();
 
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static IPublishedContent? DescendantOrSelfOfType(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService,
-        string contentTypeAlias,
-        string? culture = null)
-        => content.DescendantOrSelfOfType(navigationQueryService, GetPublishedStatusFilteringService(content), contentTypeAlias, culture);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static IPublishedContent? DescendantOrSelfOfType(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        string contentTypeAlias,
-        string? culture = null)
-        => content.DescendantOrSelfOfType(navigationQueryService, GetPublishedStatusFilteringService(content), contentTypeAlias, culture);
-
+    /// <summary>
+    /// Gets the first descendant or self of the content item of a specific type.
+    /// </summary>
+    /// <typeparam name="T">The type of content to return.</typeparam>
+    /// <param name="content">The content item.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="culture">The culture for variant content.</param>
+    /// <returns>The first descendant or self of the specified type, or null if none exists.</returns>
     public static T? DescendantOrSelf<T>(
         this IPublishedContent content,
         INavigationQueryService navigationQueryService,
@@ -2009,27 +1426,16 @@ public static class PublishedContentExtensions
             .EnumerateDescendants(navigationQueryService, publishedStatusFilteringService, true, culture)
             .FirstOrDefault(x => x is T) as T;
 
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static T? DescendantOrSelf<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService,
-        string? culture = null)
-        where T : class, IPublishedContent
-        => content.DescendantOrSelf<T>(navigationQueryService, GetPublishedStatusFilteringService(content), culture);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static T? DescendantOrSelf<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        string? culture = null)
-        where T : class, IPublishedContent
-        => content.DescendantOrSelf<T>(navigationQueryService, GetPublishedStatusFilteringService(content), culture);
-
+    /// <summary>
+    /// Gets the first descendant or self of the content item of a specific type at a specified level.
+    /// </summary>
+    /// <typeparam name="T">The type of content to return.</typeparam>
+    /// <param name="content">The content item.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="level">The level to find a descendant at.</param>
+    /// <param name="culture">The culture for variant content.</param>
+    /// <returns>The first descendant or self of the specified type at the level, or null if none exists.</returns>
     public static T? DescendantOrSelf<T>(
         this IPublishedContent content,
         INavigationQueryService navigationQueryService,
@@ -2038,29 +1444,6 @@ public static class PublishedContentExtensions
         string? culture = null)
         where T : class, IPublishedContent
         => content.DescendantOrSelf(navigationQueryService, publishedStatusFilteringService, level, culture) as T;
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static T? DescendantOrSelf<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService,
-        int level,
-        string? culture = null)
-        where T : class, IPublishedContent
-        => content.DescendantOrSelf<T>(navigationQueryService, GetPublishedStatusFilteringService(content), level, culture);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static T? DescendantOrSelf<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        int level,
-        string? culture = null)
-        where T : class, IPublishedContent
-        => content.DescendantOrSelf<T>(navigationQueryService, GetPublishedStatusFilteringService(content), level, culture);
 
     private static IEnumerable<IPublishedContent> DescendantsOrSelf(
         this IPublishedContent content,
@@ -2100,13 +1483,12 @@ public static class PublishedContentExtensions
     ///     Gets the children of the content item.
     /// </summary>
     /// <param name="content">The content item.</param>
-    /// <param name="navigationQueryService"></param>
-    /// <param name="publishedStatusFilteringService"></param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
     /// <param name="culture">
     ///     The specific culture to get the URL children for. Default is null which will use the current culture in
     ///     <see cref="VariationContext" />
     /// </param>
-    /// <param name="publishedCache"></param>
     /// <remarks>
     ///     <para>Gets children that are available for the specified culture.</para>
     ///     <para>Children are sorted by their sortOrder.</para>
@@ -2131,37 +1513,17 @@ public static class PublishedContentExtensions
         string? culture = null)
         => GetChildren(navigationQueryService, publishedStatusFilteringService, content.Key, null, culture);
 
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> Children(
-        this IPublishedContent content,
-        IVariationContextAccessor? variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService,
-        string? culture = null)
-        => content.Children(navigationQueryService, GetPublishedStatusFilteringService(content), culture);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> Children(
-        this IPublishedContent content,
-        IVariationContextAccessor? variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        string? culture = null)
-        => content.Children(navigationQueryService, GetPublishedStatusFilteringService(content), culture);
-
     /// <summary>
     ///     Gets the children of the content, filtered by a predicate.
     /// </summary>
     /// <param name="content">The content.</param>
-    /// <param name="navigationQueryService"></param>
-    /// <param name="publishedStatusFilteringService"></param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
     /// <param name="predicate">The predicate.</param>
     /// <param name="culture">
     ///     The specific culture to filter for. If null is used the current culture is used. (Default is
     ///     null)
     /// </param>
-    /// <param name="publishedCache"></param>
     /// <returns>The children of the content, filtered by the predicate.</returns>
     /// <remarks>
     ///     <para>Children are sorted by their sortOrder.</para>
@@ -2173,27 +1535,6 @@ public static class PublishedContentExtensions
         Func<IPublishedContent, bool> predicate,
         string? culture = null)
         => content.Children(navigationQueryService, publishedStatusFilteringService, culture).Where(predicate);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> Children(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService,
-        Func<IPublishedContent, bool> predicate,
-        string? culture = null)
-        => content.Children(navigationQueryService, GetPublishedStatusFilteringService(content), predicate, culture);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> Children(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        Func<IPublishedContent, bool> predicate,
-        string? culture = null)
-        => content.Children(navigationQueryService, GetPublishedStatusFilteringService(content), predicate, culture);
 
     /// <summary>
     ///     Gets the children of the content, of any of the specified types.
@@ -2217,40 +1558,17 @@ public static class PublishedContentExtensions
             ? GetChildren(navigationQueryService, publishedStatusFilteringService, content.Key, contentTypeAlias, culture)
             : [];
 
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> ChildrenOfType(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService,
-        string? contentTypeAlias,
-        string? culture = null)
-        => content.ChildrenOfType(navigationQueryService, GetPublishedStatusFilteringService(content), contentTypeAlias, culture);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> ChildrenOfType(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        string? contentTypeAlias,
-        string? culture = null)
-        => content.ChildrenOfType(navigationQueryService, GetPublishedStatusFilteringService(content), contentTypeAlias, culture);
-
     /// <summary>
     ///     Gets the children of the content, of a given content type.
     /// </summary>
     /// <typeparam name="T">The content type.</typeparam>
     /// <param name="content">The content.</param>
-    /// <param name="variationContextAccessor">The accessor for the VariationContext</param>
-    /// <param name="navigationQueryService"></param>
-    /// <param name="publishStatusQueryService"></param>
+    /// <param name="navigationQueryService">The query service for the in-memory navigation structure.</param>
+    /// <param name="publishedStatusFilteringService">The service for filtering published content by status.</param>
     /// <param name="culture">
     ///     The specific culture to filter for. If null is used the current culture is used. (Default is
     ///     null)
     /// </param>
-    /// <param name="publishedCache"></param>
     /// <returns>The children of content, of the given content type.</returns>
     /// <remarks>
     ///     <para>Children are sorted by their sortOrder.</para>
@@ -2263,27 +1581,14 @@ public static class PublishedContentExtensions
         where T : class, IPublishedContent
         => content.Children(navigationQueryService, publishedStatusFilteringService, culture).OfType<T>();
 
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static IEnumerable<T> Children<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService,
-        string? culture = null)
-        where T : class, IPublishedContent
-        => content.Children<T>(navigationQueryService, GetPublishedStatusFilteringService(content), culture);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static IEnumerable<T> Children<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        string? culture = null)
-        where T : class, IPublishedContent
-        => content.Children<T>(navigationQueryService, GetPublishedStatusFilteringService(content), culture);
-
+    /// <summary>
+    /// Gets the first child of the content item.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="culture">The culture for variant content.</param>
+    /// <returns>The first child, or null if no children exist.</returns>
     public static IPublishedContent? FirstChild(
         this IPublishedContent content,
         INavigationQueryService navigationQueryService,
@@ -2292,25 +1597,6 @@ public static class PublishedContentExtensions
         => content
             .Children(navigationQueryService, publishedStatusFilteringService, culture)
             .FirstOrDefault();
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static IPublishedContent? FirstChild(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService,
-        string? culture = null)
-        => content.FirstChild(navigationQueryService, GetPublishedStatusFilteringService(content), culture);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static IPublishedContent? FirstChild(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        string? culture = null)
-        => content.FirstChild(navigationQueryService, GetPublishedStatusFilteringService(content), culture);
 
     /// <summary>
     ///     Gets the first child of the content, of a given content type.
@@ -2325,27 +1611,15 @@ public static class PublishedContentExtensions
             .ChildrenOfType(navigationQueryService, publishedStatusFilteringService, contentTypeAlias, culture)
             .FirstOrDefault();
 
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static IPublishedContent? FirstChildOfType(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService,
-        string contentTypeAlias,
-        string? culture = null)
-        => content.FirstChildOfType(navigationQueryService, GetPublishedStatusFilteringService(content), contentTypeAlias, culture);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static IPublishedContent? FirstChildOfType(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        string contentTypeAlias,
-        string? culture = null)
-        => content.FirstChildOfType(navigationQueryService, GetPublishedStatusFilteringService(content), contentTypeAlias, culture);
-
+    /// <summary>
+    /// Gets the first child of the content item that matches a predicate.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="predicate">The predicate to filter children.</param>
+    /// <param name="culture">The culture for variant content.</param>
+    /// <returns>The first child matching the predicate, or null if none exists.</returns>
     public static IPublishedContent? FirstChild(
         this IPublishedContent content,
         INavigationQueryService navigationQueryService,
@@ -2356,27 +1630,15 @@ public static class PublishedContentExtensions
             .Children(navigationQueryService, publishedStatusFilteringService, predicate, culture)
             .FirstOrDefault();
 
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static IPublishedContent? FirstChild(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService,
-        Func<IPublishedContent, bool> predicate,
-        string? culture = null)
-        => content.FirstChild(navigationQueryService, GetPublishedStatusFilteringService(content), predicate, culture);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static IPublishedContent? FirstChild(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        Func<IPublishedContent, bool> predicate,
-        string? culture = null)
-        => content.FirstChild(navigationQueryService, GetPublishedStatusFilteringService(content), predicate, culture);
-
+    /// <summary>
+    /// Gets the first child of the content item with a specific unique identifier.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="uniqueId">The unique identifier of the child to find.</param>
+    /// <param name="culture">The culture for variant content.</param>
+    /// <returns>The first child with the specified unique identifier, or null if none exists.</returns>
     public static IPublishedContent? FirstChild(
         this IPublishedContent content,
         INavigationQueryService navigationQueryService,
@@ -2387,27 +1649,15 @@ public static class PublishedContentExtensions
             .Children(navigationQueryService, publishedStatusFilteringService, x => x.Key == uniqueId, culture)
             .FirstOrDefault();
 
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static IPublishedContent? FirstChild(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService,
-        Guid uniqueId,
-        string? culture = null)
-        => content.FirstChild(navigationQueryService, GetPublishedStatusFilteringService(content), uniqueId, culture);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static IPublishedContent? FirstChild(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        Guid uniqueId,
-        string? culture = null)
-        => content.FirstChild(navigationQueryService, GetPublishedStatusFilteringService(content), uniqueId, culture);
-
+    /// <summary>
+    /// Gets the first child of the content item of a specific type.
+    /// </summary>
+    /// <typeparam name="T">The type of content to return.</typeparam>
+    /// <param name="content">The content item.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="culture">The culture for variant content.</param>
+    /// <returns>The first child of the specified type, or null if none exists.</returns>
     public static T? FirstChild<T>(
         this IPublishedContent content,
         INavigationQueryService navigationQueryService,
@@ -2418,27 +1668,16 @@ public static class PublishedContentExtensions
             .Children<T>(navigationQueryService, publishedStatusFilteringService, culture)
             .FirstOrDefault();
 
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static T? FirstChild<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService,
-        string? culture = null)
-        where T : class, IPublishedContent
-        => content.FirstChild<T>(navigationQueryService, GetPublishedStatusFilteringService(content), culture);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static T? FirstChild<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        string? culture = null)
-        where T : class, IPublishedContent
-        => content.FirstChild<T>(navigationQueryService, GetPublishedStatusFilteringService(content), culture);
-
+    /// <summary>
+    /// Gets the first child of the content item of a specific type that matches a predicate.
+    /// </summary>
+    /// <typeparam name="T">The type of content to return.</typeparam>
+    /// <param name="content">The content item.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="predicate">The predicate to filter children.</param>
+    /// <param name="culture">The culture for variant content.</param>
+    /// <returns>The first child of the specified type matching the predicate, or null if none exists.</returns>
     public static T? FirstChild<T>(
         this IPublishedContent content,
         INavigationQueryService navigationQueryService,
@@ -2449,29 +1688,6 @@ public static class PublishedContentExtensions
         => content
             .Children<T>(navigationQueryService, publishedStatusFilteringService, culture)
             .FirstOrDefault(predicate);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static T? FirstChild<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService,
-        Func<T, bool> predicate,
-        string? culture = null)
-        where T : class, IPublishedContent
-        => content.FirstChild<T>(navigationQueryService, GetPublishedStatusFilteringService(content), predicate, culture);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService instead, scheduled for removal in v17")]
-    public static T? FirstChild<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        Func<T, bool> predicate,
-        string? culture = null)
-        where T : class, IPublishedContent
-        => content.FirstChild<T>(navigationQueryService, GetPublishedStatusFilteringService(content), predicate, culture);
 
     #endregion
 
@@ -2500,25 +1716,6 @@ public static class PublishedContentExtensions
             .SiblingsAndSelf(navigationQueryService, publishedStatusFilteringService, culture)
             .Where(x => x.Id != content.Id);
 
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> Siblings(
-        this IPublishedContent content,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishStatusQueryService publishStatusQueryService,
-        string? culture = null)
-        => content.Siblings(navigationQueryService, GetPublishedStatusFilteringService(content), culture);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> Siblings(
-        this IPublishedContent content,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IVariationContextAccessor variationContextAccessor,
-        string? culture = null)
-        => content.Siblings(navigationQueryService, GetPublishedStatusFilteringService(content), culture);
-
     /// <summary>
     ///     Gets the siblings of the content, of a given content type.
     /// </summary>
@@ -2543,27 +1740,6 @@ public static class PublishedContentExtensions
         => content
             .SiblingsAndSelfOfType(navigationQueryService, publishedStatusFilteringService, contentTypeAlias, culture)
             .Where(x => x.Id != content.Id);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> SiblingsOfType(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService,
-        string contentTypeAlias,
-        string? culture = null)
-        => content.SiblingsOfType(navigationQueryService, GetPublishedStatusFilteringService(content), contentTypeAlias, culture);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> SiblingsOfType(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        string contentTypeAlias,
-        string? culture = null)
-        => content.SiblingsOfType(navigationQueryService, GetPublishedStatusFilteringService(content), contentTypeAlias, culture);
 
     /// <summary>
     ///     Gets the siblings of the content, of a given content type.
@@ -2590,27 +1766,6 @@ public static class PublishedContentExtensions
             .SiblingsAndSelf<T>(navigationQueryService, publishedStatusFilteringService, culture)
             .Where(x => x.Id != content.Id);
 
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<T> Siblings<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService,
-        string? culture = null)
-        where T : class, IPublishedContent
-        => content.Siblings<T>(navigationQueryService, GetPublishedStatusFilteringService(content), culture);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<T> Siblings<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        string? culture = null)
-        where T : class, IPublishedContent
-        => content.Siblings<T>(navigationQueryService, GetPublishedStatusFilteringService(content), culture);
-
     /// <summary>
     ///     Gets the siblings of the content including the node itself to indicate the position.
     /// </summary>
@@ -2628,25 +1783,6 @@ public static class PublishedContentExtensions
         IPublishedStatusFilteringService publishedStatusFilteringService,
         string? culture = null)
         => content.SiblingsAndSelfInternal(navigationQueryService, publishedStatusFilteringService, null, culture);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> SiblingsAndSelf(
-        this IPublishedContent content,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishStatusQueryService publishStatusQueryService,
-        string? culture = null)
-        => content.SiblingsAndSelf(navigationQueryService, GetPublishedStatusFilteringService(content), culture);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> SiblingsAndSelf(
-        this IPublishedContent content,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IVariationContextAccessor variationContextAccessor,
-        string? culture = null)
-        => content.SiblingsAndSelf(navigationQueryService, GetPublishedStatusFilteringService(content), culture);
 
     /// <summary>
     ///     Gets the siblings of the content including the node itself to indicate the position, of a given content type.
@@ -2667,27 +1803,6 @@ public static class PublishedContentExtensions
         string contentTypeAlias,
         string? culture = null)
         => content.SiblingsAndSelfInternal(navigationQueryService, publishedStatusFilteringService, contentTypeAlias, culture);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> SiblingsAndSelfOfType(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService,
-        string contentTypeAlias,
-        string? culture = null)
-        => content.SiblingsAndSelfOfType(navigationQueryService, GetPublishedStatusFilteringService(content), contentTypeAlias, culture);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> SiblingsAndSelfOfType(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        string contentTypeAlias,
-        string? culture = null)
-        => content.SiblingsAndSelfOfType(navigationQueryService, GetPublishedStatusFilteringService(content), contentTypeAlias, culture);
 
     /// <summary>
     ///     Gets the siblings of the content including the node itself to indicate the position, of a given content type.
@@ -2710,27 +1825,6 @@ public static class PublishedContentExtensions
         => content
             .SiblingsAndSelfInternal(navigationQueryService, publishedStatusFilteringService, null, culture)
             .OfType<T>();
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<T> SiblingsAndSelf<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService,
-        string? culture = null)
-        where T : class, IPublishedContent
-        => content.SiblingsAndSelf<T>(navigationQueryService, GetPublishedStatusFilteringService(content), culture);
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<T> SiblingsAndSelf<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        string? culture = null)
-        where T : class, IPublishedContent
-        => content.SiblingsAndSelf<T>(navigationQueryService, GetPublishedStatusFilteringService(content), culture);
 
     #endregion
 
@@ -2756,22 +1850,6 @@ public static class PublishedContentExtensions
         IPublishedStatusFilteringService publishedStatusFilteringService)
         => content.AncestorOrSelf(navigationQueryService, publishedStatusFilteringService, 1);
 
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IPublishedContent Root(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService)
-        => content.Root(navigationQueryService, GetPublishedStatusFilteringService(content));
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IPublishedContent Root(
-        this IPublishedContent content,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService)
-        => content.Root(navigationQueryService, GetPublishedStatusFilteringService(content));
-
     /// <summary>
     ///     Gets the root content (ancestor or self at level 1) for the specified <paramref name="content" /> if it's of the
     ///     specified content type <typeparamref name="T" />.
@@ -2796,169 +1874,32 @@ public static class PublishedContentExtensions
         where T : class, IPublishedContent
         => content.AncestorOrSelf<T>(navigationQueryService, publishedStatusFilteringService, 1);
 
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static T? Root<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService)
-        where T : class, IPublishedContent
-        => content.Root<T>(navigationQueryService, GetPublishedStatusFilteringService(content));
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static T? Root<T>(
-        this IPublishedContent content,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService)
-        where T : class, IPublishedContent
-        => content.Root<T>(navigationQueryService, GetPublishedStatusFilteringService(content));
-
     #endregion
 
     #region Writer and creator
 
+    /// <summary>
+    /// Gets the name of the user who created the content item.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="userService">The user service.</param>
+    /// <returns>The name of the creator, or an empty string if not found.</returns>
     public static string GetCreatorName(this IPublishedContent content, IUserService userService)
     {
         IProfile? user = userService.GetProfileById(content.CreatorId);
         return user?.Name ?? string.Empty;
     }
 
+    /// <summary>
+    /// Gets the name of the user who last updated the content item.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="userService">The user service.</param>
+    /// <returns>The name of the writer, or an empty string if not found.</returns>
     public static string GetWriterName(this IPublishedContent content, IUserService userService)
     {
         IProfile? user = userService.GetProfileById(content.WriterId);
         return user?.Name ?? string.Empty;
-    }
-
-    #endregion
-
-    #region Axes: children
-
-    /// <summary>
-    ///     Gets the children of the content in a DataTable.
-    /// </summary>
-    /// <param name="content">The content.</param>
-    /// <param name="navigationQueryService"></param>
-    /// <param name="publishedStatusFilteringService"></param>
-    /// <param name="contentTypeService">The content type service.</param>
-    /// <param name="mediaTypeService">The media type service.</param>
-    /// <param name="memberTypeService">The member type service.</param>
-    /// <param name="publishedUrlProvider">The published url provider.</param>
-    /// <param name="contentTypeAliasFilter">An optional content type alias.</param>
-    /// <param name="culture">
-    ///     The specific culture to filter for. If null is used the current culture is used. (Default is
-    ///     null)
-    /// </param>
-    /// <returns>The children of the content.</returns>
-    [Obsolete("This method is no longer used in Umbraco. The method will be removed in Umbraco 17.")]
-    public static DataTable ChildrenAsTable(
-        this IPublishedContent content,
-        INavigationQueryService navigationQueryService,
-        IPublishedStatusFilteringService publishedStatusFilteringService,
-        IContentTypeService contentTypeService,
-        IMediaTypeService mediaTypeService,
-        IMemberTypeService memberTypeService,
-        IPublishedUrlProvider publishedUrlProvider,
-        string contentTypeAliasFilter = "",
-        string? culture = null)
-        => content.GenerateDataTable(navigationQueryService, publishedStatusFilteringService, contentTypeService, mediaTypeService, memberTypeService, publishedUrlProvider, contentTypeAliasFilter, culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static DataTable ChildrenAsTable(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedCache publishedCache,
-        INavigationQueryService navigationQueryService,
-        IContentTypeService contentTypeService,
-        IMediaTypeService mediaTypeService,
-        IMemberTypeService memberTypeService,
-        IPublishedUrlProvider publishedUrlProvider,
-        string contentTypeAliasFilter = "",
-        string? culture = null)
-        => content.GenerateDataTable(navigationQueryService, GetPublishedStatusFilteringService(content), contentTypeService, mediaTypeService, memberTypeService, publishedUrlProvider, contentTypeAliasFilter, culture);
-
-    private static DataTable GenerateDataTable(
-        this IPublishedContent content,
-        INavigationQueryService navigationQueryService,
-        IPublishedStatusFilteringService publishedStatusFilteringService,
-        IContentTypeService contentTypeService,
-        IMediaTypeService mediaTypeService,
-        IMemberTypeService memberTypeService,
-        IPublishedUrlProvider publishedUrlProvider,
-        string contentTypeAliasFilter = "",
-        string? culture = null)
-    {
-        IPublishedContent[] children = content.Children(navigationQueryService, publishedStatusFilteringService, culture).ToArray();
-        IPublishedContent? firstNode = contentTypeAliasFilter.IsNullOrWhiteSpace()
-            ? children.Length > 0
-                ? children.ElementAt(0)
-                : null
-            : children.FirstOrDefault(x => x.ContentType.Alias.InvariantEquals(contentTypeAliasFilter));
-        if (firstNode == null)
-        {
-            // No children found
-            return new DataTable();
-        }
-
-        // use new utility class to create table so that we don't have to maintain code in many places, just one
-        DataTable dt = DataTableExtensions.GenerateDataTable(
-
-            // pass in the alias of the first child node since this is the node type we're rendering headers for
-            firstNode.ContentType.Alias,
-
-            // pass in the callback to extract the Dictionary<string, string> of all defined aliases to their names
-            alias => GetPropertyAliasesAndNames(contentTypeService, mediaTypeService, memberTypeService, alias),
-            () =>
-            {
-                // here we pass in a callback to populate the datatable, yup its a bit ugly but it's already legacy and we just want to maintain code in one place.
-                // create all row data
-                List<Tuple<IEnumerable<KeyValuePair<string, object?>>, IEnumerable<KeyValuePair<string, object?>>>>
-                    tableData = DataTableExtensions.CreateTableData();
-                IOrderedEnumerable<IPublishedContent>? children =
-                    content.Children(navigationQueryService, publishedStatusFilteringService).OrderBy(x => x.SortOrder);
-                if (children is not null)
-                {
-                    // loop through each child and create row data for it
-                    foreach (IPublishedContent n in children)
-                    {
-                        if (contentTypeAliasFilter.IsNullOrWhiteSpace() == false)
-                        {
-                            if (n.ContentType.Alias.InvariantEquals(contentTypeAliasFilter) == false)
-                            {
-                                continue; // skip this one, it doesn't match the filter
-                            }
-                        }
-
-                        var standardVals = new Dictionary<string, object?>
-                        {
-                            { "Id", n.Id },
-                            { "NodeName", n.Name(null, culture) },
-                            { "NodeTypeAlias", n.ContentType.Alias },
-                            { "CreateDate", n.CreateDate },
-                            { "UpdateDate", n.UpdateDate },
-                            { "CreatorId", n.CreatorId },
-                            { "WriterId", n.WriterId },
-                            { "Url", n.Url(publishedUrlProvider) },
-                        };
-
-                        var userVals = new Dictionary<string, object?>();
-                        IEnumerable<IPublishedProperty> properties =
-                            n.Properties?.Where(p => p.GetSourceValue() is not null) ??
-                            Array.Empty<IPublishedProperty>();
-                        foreach (IPublishedProperty p in properties)
-                        {
-                            // probably want the "object value" of the property here...
-                            userVals[p.Alias] = p.GetValue();
-                        }
-
-                        // Add the row data
-                        DataTableExtensions.AddRowData(tableData, standardVals, userVals);
-                    }
-                }
-
-                return tableData;
-            });
-        return dt;
     }
 
     #endregion
@@ -3012,148 +1953,190 @@ public static class PublishedContentExtensions
 
     #endregion
 
+    #region Convenience overloads (using service locator)
+
+    /// <summary>
+    /// Gets an ancestor of the content item up to a maximum level.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="maxLevel">The maximum level to traverse.</param>
+    /// <returns>The ancestor at or below the maximum level, or null if not found.</returns>
     public static IPublishedContent? Ancestor(this IPublishedContent content, int maxLevel)
         => content.Ancestor(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), maxLevel);
 
+    /// <summary>
+    /// Gets an ancestor of the content item of a specific content type.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="contentTypeAlias">The content type alias to find.</param>
+    /// <returns>The first ancestor of the specified type, or null if not found.</returns>
     public static IPublishedContent? Ancestor(this IPublishedContent content, string contentTypeAlias)
         => content.Ancestor(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), contentTypeAlias);
 
+    /// <summary>
+    /// Gets an ancestor of the content item of a specific type up to a maximum level.
+    /// </summary>
+    /// <typeparam name="T">The type of content to return.</typeparam>
+    /// <param name="content">The content item.</param>
+    /// <param name="maxLevel">The maximum level to traverse.</param>
+    /// <returns>The ancestor of the specified type at or below the maximum level, or null if not found.</returns>
     public static T? Ancestor<T>(this IPublishedContent content, int maxLevel)
         where T : class, IPublishedContent
         => content.Ancestor<T>(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), maxLevel);
 
+    /// <summary>
+    /// Gets the ancestors of the content item up to a maximum level.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="maxLevel">The maximum level to traverse.</param>
+    /// <returns>An enumerable of ancestors at or below the maximum level.</returns>
     public static IEnumerable<IPublishedContent> Ancestors(this IPublishedContent content, int maxLevel)
         => content.Ancestors(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), maxLevel);
 
+    /// <summary>
+    /// Gets the ancestors of the content item of a specific content type.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="contentTypeAlias">The content type alias to filter by.</param>
+    /// <returns>An enumerable of ancestors of the specified type.</returns>
     public static IEnumerable<IPublishedContent> Ancestors(this IPublishedContent content, string contentTypeAlias)
         => content.Ancestors(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), contentTypeAlias);
 
+    /// <summary>
+    /// Gets the ancestors of the content item of a specific type.
+    /// </summary>
+    /// <typeparam name="T">The type of content to return.</typeparam>
+    /// <param name="content">The content item.</param>
+    /// <returns>An enumerable of ancestors of the specified type.</returns>
     public static IEnumerable<T> Ancestors<T>(this IPublishedContent content)
         where T : class, IPublishedContent
         => content.Ancestors<T>(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content));
 
+    /// <summary>
+    /// Gets the ancestors of the content item of a specific type up to a maximum level.
+    /// </summary>
+    /// <typeparam name="T">The type of content to return.</typeparam>
+    /// <param name="content">The content item.</param>
+    /// <param name="maxLevel">The maximum level to traverse.</param>
+    /// <returns>An enumerable of ancestors of the specified type at or below the maximum level.</returns>
     public static IEnumerable<T> Ancestors<T>(this IPublishedContent content, int maxLevel)
         where T : class, IPublishedContent
         => content.Ancestors<T>(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), maxLevel);
 
+    /// <summary>
+    /// Gets an ancestor or self of the content item at or below a maximum level.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="maxLevel">The maximum level to traverse.</param>
+    /// <returns>The content item or an ancestor at or below the maximum level.</returns>
     public static IPublishedContent AncestorOrSelf(this IPublishedContent content, int maxLevel)
         => content.AncestorOrSelf(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), maxLevel);
 
+    /// <summary>
+    /// Gets an ancestor or self of the content item of a specific content type.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="contentTypeAlias">The content type alias to find.</param>
+    /// <returns>The content item or an ancestor of the specified type.</returns>
     public static IPublishedContent AncestorOrSelf(this IPublishedContent content, string contentTypeAlias)
         => content.AncestorOrSelf(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), contentTypeAlias);
 
+    /// <summary>
+    /// Gets an ancestor or self of the content item of a specific type up to a maximum level.
+    /// </summary>
+    /// <typeparam name="T">The type of content to return.</typeparam>
+    /// <param name="content">The content item.</param>
+    /// <param name="maxLevel">The maximum level to traverse.</param>
+    /// <returns>The content item or an ancestor of the specified type at or below the maximum level, or null if not found.</returns>
     public static T? AncestorOrSelf<T>(this IPublishedContent content, int maxLevel)
         where T : class, IPublishedContent
         => content.AncestorOrSelf<T>(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), maxLevel);
 
+    /// <summary>
+    /// Gets the ancestors or self of the content item up to a maximum level.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="maxLevel">The maximum level to traverse.</param>
+    /// <returns>An enumerable of the content item and its ancestors at or below the maximum level.</returns>
     public static IEnumerable<IPublishedContent> AncestorsOrSelf(this IPublishedContent content, int maxLevel)
         => content.AncestorsOrSelf(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), maxLevel);
 
+    /// <summary>
+    /// Gets the ancestors or self of the content item of a specific content type.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="contentTypeAlias">The content type alias to filter by.</param>
+    /// <returns>An enumerable of the content item and its ancestors of the specified type.</returns>
     public static IEnumerable<IPublishedContent> AncestorsOrSelf(this IPublishedContent content, string contentTypeAlias)
         => content.Ancestors(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), contentTypeAlias);
 
+    /// <summary>
+    /// Gets the ancestors or self of the content item of a specific type up to a maximum level.
+    /// </summary>
+    /// <typeparam name="T">The type of content to return.</typeparam>
+    /// <param name="content">The content item.</param>
+    /// <param name="maxLevel">The maximum level to traverse.</param>
+    /// <returns>An enumerable of the content item and its ancestors of the specified type at or below the maximum level.</returns>
     public static IEnumerable<T> AncestorsOrSelf<T>(this IPublishedContent content, int maxLevel)
         where T : class, IPublishedContent
         => content.AncestorsOrSelf<T>(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), maxLevel);
 
+    /// <summary>
+    /// Gets the ancestors or self of the content item, optionally filtered by a predicate.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="orSelf">Whether to include the content item itself.</param>
+    /// <param name="func">An optional predicate to filter the ancestors.</param>
+    /// <returns>An enumerable of the content item and/or its ancestors matching the criteria.</returns>
     public static IEnumerable<IPublishedContent> AncestorsOrSelf(this IPublishedContent content, bool orSelf, Func<IPublishedContent, bool>? func)
         => content.AncestorsOrSelf(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), orSelf, func);
 
+    /// <summary>
+    /// Gets the breadcrumbs (ancestors and self, top to bottom) for the content item.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="andSelf">Whether to include the content item itself. Default is true.</param>
+    /// <returns>An enumerable of the breadcrumb trail from root to the content item.</returns>
     public static IEnumerable<IPublishedContent> Breadcrumbs(
         this IPublishedContent content,
         bool andSelf = true) =>
         content.Breadcrumbs(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), andSelf);
 
+    /// <summary>
+    /// Gets the breadcrumbs (ancestors and self, top to bottom) for the content item at or above a minimum level.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="minLevel">The minimum level to include in the breadcrumbs.</param>
+    /// <param name="andSelf">Whether to include the content item itself. Default is true.</param>
+    /// <returns>An enumerable of the breadcrumb trail from the minimum level to the content item.</returns>
     public static IEnumerable<IPublishedContent> Breadcrumbs(
         this IPublishedContent content,
         int minLevel,
         bool andSelf = true) =>
         content.Breadcrumbs(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), minLevel, andSelf);
 
+    /// <summary>
+    /// Gets the breadcrumbs (ancestors and self, top to bottom) for the content item of a specific type.
+    /// </summary>
+    /// <typeparam name="T">The type of content to include in the breadcrumbs.</typeparam>
+    /// <param name="content">The content item.</param>
+    /// <param name="andSelf">Whether to include the content item itself. Default is true.</param>
+    /// <returns>An enumerable of the breadcrumb trail of the specified type.</returns>
     public static IEnumerable<IPublishedContent> Breadcrumbs<T>(
         this IPublishedContent content,
         bool andSelf = true)
-        where T : class, IPublishedContent=>
+        where T : class, IPublishedContent =>
         content.Breadcrumbs<T>(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), andSelf);
 
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> Children(
-        this IPublishedContent content,
-        IVariationContextAccessor? variationContextAccessor,
-        IPublishStatusQueryService publishStatusQueryService,
-        string? culture = null)
-        => content.Children(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> Children(
-        this IPublishedContent content,
-        IVariationContextAccessor? variationContextAccessor,
-        string? culture = null)
-        => content.Children(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> Children(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishStatusQueryService publishStatusQueryService,
-        Func<IPublishedContent, bool> predicate,
-        string? culture = null)
-        => content.Children(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), predicate, culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> Children(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        Func<IPublishedContent, bool> predicate,
-        string? culture = null)
-        => content.Children(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), predicate, culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> ChildrenOfType(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishStatusQueryService publishStatusQueryService,
-        string? contentTypeAlias,
-        string? culture = null)
-        => content.ChildrenOfType(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), contentTypeAlias, culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> ChildrenOfType(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        string? contentTypeAlias,
-        string? culture = null)
-        => content.ChildrenOfType(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), contentTypeAlias, culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<T> Children<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishStatusQueryService publishStatusQueryService,
-        string? culture = null)
-        where T : class, IPublishedContent
-        => content.Children<T>(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<T> Children<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        string? culture = null)
-        where T : class, IPublishedContent
-        => content.Children<T>(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), culture);
-
-    [Obsolete("This method is no longer used in Umbraco. The method will be removed in Umbraco 17.")]
-    public static DataTable ChildrenAsTable(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IContentTypeService contentTypeService,
-        IMediaTypeService mediaTypeService,
-        IMemberTypeService memberTypeService,
-        IPublishedUrlProvider publishedUrlProvider,
-        string contentTypeAliasFilter = "",
-        string? culture = null)
-        => content.GenerateDataTable(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), contentTypeService, mediaTypeService, memberTypeService, publishedUrlProvider, contentTypeAliasFilter, culture);
-
+    /// <summary>
+    /// Gets all descendants or self of a collection of content items of a specific content type.
+    /// </summary>
+    /// <param name="parentNodes">The collection of parent content items.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="docTypeAlias">The content type alias to filter by.</param>
+    /// <param name="culture">The culture for variant content.</param>
+    /// <returns>An enumerable of all content items and their descendants of the specified type.</returns>
     public static IEnumerable<IPublishedContent> DescendantsOrSelfOfType(
         this IEnumerable<IPublishedContent> parentNodes,
         INavigationQueryService navigationQueryService,
@@ -3166,37 +2149,15 @@ public static class PublishedContentExtensions
             docTypeAlias,
             culture));
 
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> DescendantsOrSelfOfType(
-        this IEnumerable<IPublishedContent> parentNodes,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishStatusQueryService publishStatusQueryService,
-        string docTypeAlias,
-        string? culture = null)
-    {
-        IPublishedContent[] parentNodesAsArray = parentNodes as IPublishedContent[] ?? parentNodes.ToArray();
-        return parentNodesAsArray.DescendantsOrSelfOfType(
-            GetNavigationQueryService(parentNodesAsArray.First()),
-            GetPublishedStatusFilteringService(parentNodesAsArray.First()),
-            docTypeAlias,
-            culture);
-    }
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> DescendantsOrSelfOfType(
-        this IEnumerable<IPublishedContent> parentNodes,
-        IVariationContextAccessor variationContextAccessor,
-        string docTypeAlias,
-        string? culture = null)
-    {
-        IPublishedContent[] parentNodesAsArray = parentNodes as IPublishedContent[] ?? parentNodes.ToArray();
-        return parentNodesAsArray.DescendantsOrSelfOfType(
-            GetNavigationQueryService(parentNodesAsArray.First()),
-            GetPublishedStatusFilteringService(parentNodesAsArray.First()),
-            docTypeAlias,
-            culture);
-    }
-
+    /// <summary>
+    /// Gets all descendants or self of a collection of content items of a specific type.
+    /// </summary>
+    /// <typeparam name="T">The type of content to return.</typeparam>
+    /// <param name="parentNodes">The collection of parent content items.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedStatusFilteringService">The published status filtering service.</param>
+    /// <param name="culture">The culture for variant content.</param>
+    /// <returns>An enumerable of all content items and their descendants of the specified type.</returns>
     public static IEnumerable<T> DescendantsOrSelf<T>(
         this IEnumerable<IPublishedContent> parentNodes,
         INavigationQueryService navigationQueryService,
@@ -3208,516 +2169,7 @@ public static class PublishedContentExtensions
             publishedStatusFilteringService,
             culture));
 
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<T> DescendantsOrSelf<T>(
-        this IEnumerable<IPublishedContent> parentNodes,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishStatusQueryService publishStatusQueryService,
-        string? culture = null)
-        where T : class, IPublishedContent
-    {
-        IPublishedContent[] parentNodesAsArray = parentNodes as IPublishedContent[] ?? parentNodes.ToArray();
-        return parentNodesAsArray.DescendantsOrSelf<T>(
-            GetNavigationQueryService(parentNodesAsArray.First()),
-            GetPublishedStatusFilteringService(parentNodesAsArray.First()),
-            culture);
-    }
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<T> DescendantsOrSelf<T>(
-        this IEnumerable<IPublishedContent> parentNodes,
-        IVariationContextAccessor variationContextAccessor,
-        string? culture = null)
-        where T : class, IPublishedContent
-    {
-        IPublishedContent[] parentNodesAsArray = parentNodes as IPublishedContent[] ?? parentNodes.ToArray();
-        return parentNodesAsArray.DescendantsOrSelf<T>(
-            GetNavigationQueryService(parentNodesAsArray.First()),
-            GetPublishedStatusFilteringService(parentNodesAsArray.First()),
-            culture);
-    }
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> Descendants(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishStatusQueryService publishStatusQueryService,
-        string? culture = null)
-        => content.Descendants(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> Descendants(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        string? culture = null)
-        => content.Descendants(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> Descendants(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishStatusQueryService publishStatusQueryService,
-        int level,
-        string? culture = null)
-        => content.Descendants(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), level, culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> Descendants(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        int level,
-        string? culture = null)
-        => content.Descendants(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), level, culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> DescendantsOfType(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishStatusQueryService publishStatusQueryService,
-        string contentTypeAlias,
-        string? culture = null)
-        => content.DescendantsOfType(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), contentTypeAlias, culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> DescendantsOfType(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        string contentTypeAlias,
-        string? culture = null)
-        => content.DescendantsOfType(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), contentTypeAlias, culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<T> Descendants<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishStatusQueryService publishStatusQueryService,
-        string? culture = null)
-        where T : class, IPublishedContent
-        => content.Descendants<T>(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<T> Descendants<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        string? culture = null)
-        where T : class, IPublishedContent
-        => content.Descendants<T>(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<T> Descendants<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishStatusQueryService publishStatusQueryService,
-        int level,
-        string? culture = null)
-        where T : class, IPublishedContent
-        => content.Descendants<T>(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), level, culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<T> Descendants<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        int level,
-        string? culture = null)
-        where T : class, IPublishedContent
-        => content.Descendants<T>(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), level, culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> DescendantsOrSelf(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishStatusQueryService publishStatusQueryService,
-        string? culture = null)
-        => content.DescendantsOrSelf(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> DescendantsOrSelf(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        string? culture = null)
-        => content.DescendantsOrSelf(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> DescendantsOrSelf(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishStatusQueryService publishStatusQueryService,
-        int level,
-        string? culture = null)
-        => content.DescendantsOrSelf(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), level, culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> DescendantsOrSelf(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        int level,
-        string? culture = null)
-        => content.DescendantsOrSelf(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), level, culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> DescendantsOrSelfOfType(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishStatusQueryService publishStatusQueryService,
-        string contentTypeAlias,
-        string? culture = null)
-        => content.DescendantsOrSelfOfType(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), contentTypeAlias, culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> DescendantsOrSelfOfType(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        string contentTypeAlias,
-        string? culture = null)
-        => content.DescendantsOrSelfOfType(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), contentTypeAlias, culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<T> DescendantsOrSelf<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishStatusQueryService publishStatusQueryService,
-        string? culture = null)
-        where T : class, IPublishedContent
-        => content.DescendantsOrSelf<T>(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<T> DescendantsOrSelf<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        string? culture = null)
-        where T : class, IPublishedContent
-        => content.DescendantsOrSelf<T>(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<T> DescendantsOrSelf<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishStatusQueryService publishStatusQueryService,
-        int level,
-        string? culture = null)
-        where T : class, IPublishedContent
-        => content.DescendantsOrSelf<T>(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), level, culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<T> DescendantsOrSelf<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        int level,
-        string? culture = null)
-        where T : class, IPublishedContent
-        => content.DescendantsOrSelf<T>(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), level, culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IPublishedContent? Descendant(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishStatusQueryService publishStatusQueryService,
-        string? culture = null)
-        => content.Descendant(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IPublishedContent? Descendant(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        string? culture = null)
-        => content.Descendant(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IPublishedContent? Descendant(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishStatusQueryService publishStatusQueryService,
-        int level,
-        string? culture = null)
-        => content.Descendant(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), level, culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IPublishedContent? Descendant(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        int level,
-        string? culture = null)
-        => content.Descendant(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), level, culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IPublishedContent? DescendantOfType(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishStatusQueryService publishStatusQueryService,
-        string contentTypeAlias,
-        string? culture = null)
-        => content.DescendantOfType(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), contentTypeAlias, culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IPublishedContent? DescendantOfType(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        string contentTypeAlias,
-        string? culture = null)
-        => content.DescendantOfType(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), contentTypeAlias, culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static T? Descendant<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishStatusQueryService publishStatusQueryService,
-        string? culture = null)
-        where T : class, IPublishedContent
-        => content.Descendant<T>(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static T? Descendant<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        string? culture = null)
-        where T : class, IPublishedContent
-        => content.Descendant<T>(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static T? Descendant<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishStatusQueryService publishStatusQueryService,
-        int level,
-        string? culture = null)
-        where T : class, IPublishedContent
-        => content.Descendant<T>(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), level, culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static T? Descendant<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        int level,
-        string? culture = null)
-        where T : class, IPublishedContent
-        => content.Descendant<T>(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), level, culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IPublishedContent? DescendantOrSelf(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishStatusQueryService publishStatusQueryService,
-        int level,
-        string? culture = null)
-        => content.DescendantOrSelf(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), level, culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IPublishedContent? DescendantOrSelf(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        int level,
-        string? culture = null)
-        => content.DescendantOrSelf(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), level, culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IPublishedContent? DescendantOrSelfOfType(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishStatusQueryService publishStatusQueryService,
-        string contentTypeAlias,
-        string? culture = null)
-        => content.DescendantOrSelfOfType(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), contentTypeAlias, culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IPublishedContent? DescendantOrSelfOfType(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        string contentTypeAlias,
-        string? culture = null)
-        => content.DescendantOrSelfOfType(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), contentTypeAlias, culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static T? DescendantOrSelf<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishStatusQueryService publishStatusQueryService,
-        string? culture = null)
-        where T : class, IPublishedContent
-        => content.DescendantOrSelf<T>(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static T? DescendantOrSelf<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        string? culture = null)
-        where T : class, IPublishedContent
-        => content.DescendantOrSelf<T>(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static T? DescendantOrSelf<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishStatusQueryService publishStatusQueryService,
-        int level,
-        string? culture = null)
-        where T : class, IPublishedContent
-        => content.DescendantOrSelf<T>(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), level, culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static T? DescendantOrSelf<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        int level,
-        string? culture = null)
-        where T : class, IPublishedContent
-        => content.DescendantOrSelf<T>(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), level, culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IPublishedContent? FirstChild(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishStatusQueryService publishStatusQueryService,
-        string? culture = null)
-        => content.FirstChild(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IPublishedContent? FirstChild(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        string? culture = null)
-        => content.FirstChild(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IPublishedContent? FirstChildOfType(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishStatusQueryService publishStatusQueryService,
-        string contentTypeAlias,
-        string? culture = null)
-        => content.FirstChildOfType(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), contentTypeAlias, culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IPublishedContent? FirstChildOfType(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        string contentTypeAlias,
-        string? culture = null)
-        => content.FirstChildOfType(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), contentTypeAlias, culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IPublishedContent? FirstChild(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishStatusQueryService publishStatusQueryService,
-        Func<IPublishedContent, bool> predicate,
-        string? culture = null)
-        => content.FirstChild(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), predicate, culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IPublishedContent? FirstChild(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        Func<IPublishedContent, bool> predicate,
-        string? culture = null)
-        => content.FirstChild(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), predicate, culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IPublishedContent? FirstChild(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishStatusQueryService publishStatusQueryService,
-        Guid uniqueId,
-        string? culture = null)
-        => content.FirstChild(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), uniqueId, culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IPublishedContent? FirstChild(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        Guid uniqueId,
-        string? culture = null)
-        => content.FirstChild(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), uniqueId, culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static T? FirstChild<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishStatusQueryService publishStatusQueryService,
-        string? culture = null)
-        where T : class, IPublishedContent
-        => content.FirstChild<T>(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static T? FirstChild<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        string? culture = null)
-        where T : class, IPublishedContent
-        => content.FirstChild<T>(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static T? FirstChild<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishStatusQueryService publishStatusQueryService,
-        Func<T, bool> predicate,
-        string? culture = null)
-        where T : class, IPublishedContent
-        => content.FirstChild<T>(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), predicate, culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static T? FirstChild<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        Func<T, bool> predicate,
-        string? culture = null)
-        where T : class, IPublishedContent
-        => content.FirstChild<T>(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), predicate, culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> Siblings(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        string? culture = null)
-        => content.Siblings(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> SiblingsOfType(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        string contentTypeAlias,
-        string? culture = null)
-        => content.SiblingsOfType(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), contentTypeAlias, culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<T> Siblings<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        string? culture = null)
-        where T : class, IPublishedContent
-        => content.Siblings<T>(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent>? SiblingsAndSelf(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        string? culture = null)
-        => content.SiblingsAndSelf(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<IPublishedContent> SiblingsAndSelfOfType(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        string contentTypeAlias,
-        string? culture = null)
-        => content.SiblingsAndSelfOfType(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), contentTypeAlias, culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<T> SiblingsAndSelf<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishStatusQueryService publishStatusQueryService,
-        string? culture = null)
-        where T : class, IPublishedContent
-        => content.SiblingsAndSelf<T>(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), culture);
-
-    [Obsolete("Use the overload with INavigationQueryService and IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static IEnumerable<T> SiblingsAndSelf<T>(
-        this IPublishedContent content,
-        IVariationContextAccessor variationContextAccessor,
-        string? culture = null)
-        where T : class, IPublishedContent
-        => content.SiblingsAndSelf<T>(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), culture);
+    #endregion
 
     private static INavigationQueryService GetNavigationQueryService(IPublishedContent content)
     {
