@@ -13,7 +13,7 @@ import {
 	type UmbPickerModalValue,
 } from '@umbraco-cms/backoffice/modal';
 import type { UmbItemModel } from '@umbraco-cms/backoffice/entity-item';
-import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
+import { UmbModalRouteRegistrationController, type UmbModalRouteSetupReturn } from '@umbraco-cms/backoffice/router';
 import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbPickerInputContext<
@@ -155,7 +155,10 @@ export class UmbPickerInputContext<
 		this.getHostElement().dispatchEvent(new UmbChangeEvent());
 	}
 
-	#pickerModalRouteRegistration?: UmbModalRouteRegistrationController;
+	#pickerModalRouteRegistration?: UmbModalRouteRegistrationController<
+		UmbPickerModalData<PickerItemType>,
+		PickerModalValueType
+	>;
 
 	#createPickerModalRoute() {
 		if (!this.modalAlias) {
@@ -166,11 +169,11 @@ export class UmbPickerInputContext<
 		this.#pickerModalRouteRegistration = new UmbModalRouteRegistrationController(this, this.modalAlias)
 			.addUniquePaths(['picker'])
 			.onSetup(() => {
+				// TODO: we need to handle the same picker data as passed to the open method as well.
 				return {
-					// TODO: we need to handle the same picker data as passed to the open method as well.
 					data: this.#getPickerModalDataArgs(),
 					value: this.#getPickerModalValueArgs(),
-				};
+				} as UmbModalRouteSetupReturn<UmbPickerModalData<PickerItemType>, PickerModalValueType>;
 			})
 			.onSubmit((value) => {
 				this.#applyModalValue(value);
