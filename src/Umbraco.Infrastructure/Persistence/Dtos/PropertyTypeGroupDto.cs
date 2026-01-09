@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 internal sealed class PropertyTypeGroupDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.PropertyTypeGroup;
-    public const string PrimaryKeyName = Constants.DatabaseSchema.PrimaryKeyNameId;
+    public const string PrimaryKeyName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
     public const string ContentTypeNodeIdName = "contenttypeNodeId";
     public const string UniqueIdName = "uniqueId";
 

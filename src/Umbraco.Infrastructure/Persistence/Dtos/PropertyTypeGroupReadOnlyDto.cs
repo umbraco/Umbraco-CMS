@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 internal sealed class PropertyTypeGroupReadOnlyDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.PropertyTypeGroup;
-    public const string PrimaryKeyName = "PropertyTypeGroupId"; // Constants.DatabaseSchema.PrimaryKeyNameId;
+    public const string PrimaryKeyName = "PropertyTypeGroupId"; // Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
 
     [Column(PrimaryKeyName)]
     public int? Id { get; set; }

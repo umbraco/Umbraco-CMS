@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 internal class LongRunningOperationDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.LongRunningOperation;
-    public const string PrimaryKeyName = Constants.DatabaseSchema.PrimaryKeyNameId;
+    public const string PrimaryKeyName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
 
     [Column(PrimaryKeyName)]
     [PrimaryKeyColumn(Name = "PK_umbracoLongRunningOperation", AutoIncrement = false)]

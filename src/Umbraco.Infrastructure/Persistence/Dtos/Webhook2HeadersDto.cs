@@ -9,6 +9,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 public class Webhook2HeadersDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.Webhook2Headers;
+    public const string ValueName = "Value";
 
     [Column("webhookId")]
     [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_headers2WebhookDto", OnColumns = "webhookId, key")]
@@ -18,6 +19,6 @@ public class Webhook2HeadersDto
     [Column("key")]
     public string Key { get; set; } = string.Empty;
 
-    [Column("value")]
+    [Column(ValueName)]
     public string Value { get; set; } = string.Empty;
 }

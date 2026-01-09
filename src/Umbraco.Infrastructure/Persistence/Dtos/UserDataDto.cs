@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 public class UserDataDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.UserData;
-    public const string PrimaryKeyName = Constants.DatabaseSchema.PrimaryKeyNameKey;
+    public const string PrimaryKeyName = Constants.DatabaseSchema.Columns.PrimaryKeyNameKey;
 
     [Column(PrimaryKeyName)]
     [PrimaryKeyColumn(Name = "PK_umbracoUserDataDto", AutoIncrement = false)]

@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 internal sealed class TemplateDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.Template;
-    public const string PrimaryKeyName = Constants.DatabaseSchema.PrimaryKeyNamePK;
+    public const string PrimaryKeyName = Constants.DatabaseSchema.Columns.PrimaryKeyNamePk;
 
     [Column(PrimaryKeyName)]
     [PrimaryKeyColumn]

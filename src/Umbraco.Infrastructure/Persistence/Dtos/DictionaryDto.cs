@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 public class DictionaryDto // public as required to be accessible from Deploy for the RepairDictionaryIdsWorkItem.
 {
     public const string TableName = Constants.DatabaseSchema.Tables.DictionaryEntry;
-    public const string PrimaryKeyName = Constants.DatabaseSchema.PrimaryKeyNamePK;
+    public const string PrimaryKeyName = Constants.DatabaseSchema.Columns.PrimaryKeyNamePk;
 
     [Column(PrimaryKeyName)]
     [PrimaryKeyColumn]

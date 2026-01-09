@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 public class LanguageTextDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.DictionaryValue;
-    public const string PrimaryKeyName = Constants.DatabaseSchema.PrimaryKeyNamePK;
+    public const string PrimaryKeyName = Constants.DatabaseSchema.Columns.PrimaryKeyNamePk;
 
     [Column(PrimaryKeyName)]
     [PrimaryKeyColumn]
