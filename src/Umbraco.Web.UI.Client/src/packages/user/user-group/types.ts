@@ -19,4 +19,5 @@ export interface UmbUserGroupDetailModel {
 	permissions: Array<any>;
 	sections: Array<string>;
 	unique: string;
+	description: string | null;
 }

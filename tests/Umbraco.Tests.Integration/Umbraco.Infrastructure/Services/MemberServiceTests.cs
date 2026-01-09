@@ -1435,4 +1435,25 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         Assert.IsNotNull(found, "Verifying the created member instance has been retrieved");
         Assert.IsTrue(found?.Name == member?.Name, "Verifying the retrieved member instance has the expected name");
     }
+
+    [Test]
+    public async Task Can_Get_Multiple_By_Key()
+    {
+        var memberType = MemberTypeService.Get("member");
+        IMember memberA = new Member("aname", "a@email", "ausername", "arawpassword", memberType, true);
+        MemberService.Save(memberA);
+
+        IMember memberB = new Member("bname", "b@email", "busername", "brawpassword", memberType, true);
+        MemberService.Save(memberB);
+
+        IMember memberC = new Member("cname", "c@email", "cusername", "crawpassword", memberType, true);
+        MemberService.Save(memberC);
+
+        var members = (await MemberService.GetByKeysAsync(memberA.Key, memberB.Key, memberC.Key)).ToArray();
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(3, members.Length);
+            CollectionAssert.AreEquivalent(new [] { memberA.Key, memberB.Key, memberC.Key }, members.Select(m => m.Key).ToArray());
+        });
+    }
 }
