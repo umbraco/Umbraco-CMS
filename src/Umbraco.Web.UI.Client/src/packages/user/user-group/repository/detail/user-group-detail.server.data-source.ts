@@ -45,6 +45,7 @@ export class UmbUserGroupServerDataSource
 			permissions: [],
 			sections: [],
 			unique: UmbId.new(),
+			description: '',
 		};
 
 		return { data };
@@ -98,6 +99,7 @@ export class UmbUserGroupServerDataSource
 			permissions,
 			sections: data.sections,
 			unique: data.id,
+			description: data.description ?? null,
 		};
 
 		return { data: userGroup };
@@ -136,6 +138,7 @@ export class UmbUserGroupServerDataSource
 			name: model.name,
 			permissions,
 			sections: model.sections,
+			description: model.description,
 		};
 
 		const { data, error } = await tryExecute(
@@ -186,6 +189,7 @@ export class UmbUserGroupServerDataSource
 			name: model.name,
 			permissions,
 			sections: model.sections,
+			description: model.description,
 		};
 
 		const { error } = await tryExecute(

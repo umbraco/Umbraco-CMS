@@ -26,7 +26,10 @@ public interface IDataTypeService : IService
         => Task.FromResult(new PagedModel<RelationItemModel>());
 
     [Obsolete("Please use IDataTypeContainerService for all data type container operations. Will be removed in V15.")]
-    Attempt<OperationResult<OperationResultType, EntityContainer>?> CreateContainer(int parentId, Guid key, string name,
+    Attempt<OperationResult<OperationResultType, EntityContainer>?> CreateContainer(
+        int parentId,
+        Guid key,
+        string name,
         int userId = Constants.Security.SuperUserId);
 
     [Obsolete("Please use IDataTypeContainerService for all data type container operations. Will be removed in V15.")]
@@ -51,7 +54,9 @@ public interface IDataTypeService : IService
     Attempt<OperationResult?> DeleteContainer(int containerId, int userId = Constants.Security.SuperUserId);
 
     [Obsolete("Please use IDataTypeContainerService for all data type container operations. Will be removed in V15.")]
-    Attempt<OperationResult<OperationResultType, EntityContainer>?> RenameContainer(int id, string name,
+    Attempt<OperationResult<OperationResultType, EntityContainer>?> RenameContainer(
+        int id,
+        string name,
         int userId = Constants.Security.SuperUserId);
 
     /// <summary>
@@ -210,7 +215,9 @@ public interface IDataTypeService : IService
         Copy(copying, containerId, Constants.Security.SuperUserId);
 
     [Obsolete("Please use CopyASync instead. Will be removed in V15")]
-    Attempt<OperationResult<MoveOperationStatusType, IDataType>?> Copy(IDataType copying, int containerId,
+    Attempt<OperationResult<MoveOperationStatusType, IDataType>?> Copy(
+        IDataType copying,
+        int containerId,
         int userId = Constants.Security.SuperUserId) => throw new NotImplementedException();
 
     /// <summary>
