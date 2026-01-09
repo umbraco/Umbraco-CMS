@@ -1,5 +1,5 @@
 import type { UmbBlockDataModel } from '../../block/index.js';
-import { UMB_BLOCK_CATALOGUE_MODAL, UmbBlockEntriesContext } from '../../block/index.js';
+import { UMB_BLOCK_CATALOGUE_MODAL, UmbBlockEntriesContext, UmbBlockCreatedEvent } from '../../block/index.js';
 import type { UmbBlockListWorkspaceOriginData } from '../index.js';
 import {
 	UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS,
@@ -103,12 +103,6 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 							created.content,
 							created.settings,
 							data.originData as UmbBlockListWorkspaceOriginData,
-						);
-						// A dirty communication towards the UI, so it can react to a new block being created (to open the inline editing of the block): [NL]
-						this.dispatchEvent(
-							new CustomEvent('umb-internal:blockCreated', {
-								detail: { originData: data.originData },
-							}),
 						);
 					} else {
 						throw new Error('Failed to create block');
@@ -215,7 +209,17 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 	) {
 		await this._retrieveManager;
 
-		return this._manager?.insert(layoutEntry, content, settings, originData) ?? false;
+		const result = this._manager?.insert(layoutEntry, content, settings, originData) ?? false;
+
+		// A dirty communication towards the UI, so it can react to a new block being created (to open the inline editing of the block): [NL]
+		this.dispatchEvent(
+			new UmbBlockCreatedEvent({
+				originData,
+				layout: layoutEntry,
+			}),
+		);
+
+		return result;
 	}
 
 	protected async _insertFromPropertyValue(value: UmbBlockListValueModel, originData: UmbBlockListWorkspaceOriginData) {
