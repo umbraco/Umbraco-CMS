@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
@@ -23,8 +22,8 @@ public class ProtectRecycleBinMediaMiddleware : IMiddleware
     /// Initializes a new instance of the <see cref="ProtectRecycleBinMediaMiddleware"/> class.
     /// </summary>
     public ProtectRecycleBinMediaMiddleware(
-        IOptionsMonitor<ContentSettings> contentSettings,
-        IUserService userService)
+        IUserService userService,
+        IOptionsMonitor<ContentSettings> contentSettings)
     {
         _userService = userService;
         _contentSettings = contentSettings.CurrentValue;

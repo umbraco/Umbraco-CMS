@@ -38,13 +38,13 @@ internal sealed class ConfigureMiniProfilerOptions(IHostingEnvironment hostingEn
         ClaimsIdentity? identity = authenticateResult.Principal?.GetUmbracoIdentity();
 
         Guid? userKey = identity?.GetUserKey();
-        if (userKey == null)
+        if (userKey is null)
         {
             return false;
         }
 
         IUser? user = await userService.GetAsync(userKey.Value);
-        if (user == null)
+        if (user is null)
         {
             return false;
         }
