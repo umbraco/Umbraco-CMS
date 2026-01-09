@@ -162,7 +162,8 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		await this.#documentWorkspaceContext.askServerToValidate(saveData, variantIds);
 
 		// TODO: Only validate the specified selection.. [NL]
-		return this.#documentWorkspaceContext.validateAndSubmit(
+		return this.#documentWorkspaceContext.validateVariantsAndSubmit(
+			variantIds,
 			async () => {
 				if (!this.#documentWorkspaceContext) {
 					throw new Error('Document workspace context is missing');
@@ -259,7 +260,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
 		const localize = new UmbLocalizationController(this);
 
-		const primaryVariantName = await this.observe(this.#documentWorkspaceContext.name(variantIds[0])).asPromise();
+		const primaryVariantName = this.#documentWorkspaceContext.getName(variantIds[0]);
 
 		const waitNotice = notificationContext?.peek('warning', {
 			data: {
@@ -354,7 +355,8 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		await this.#documentWorkspaceContext.askServerToValidate(saveData, variantIds);
 
 		// TODO: Only validate the specified selection.. [NL]
-		return this.#documentWorkspaceContext.validateAndSubmit(
+		return this.#documentWorkspaceContext.validateVariantsAndSubmit(
+			variantIds,
 			async () => {
 				return this.#performSaveAndPublish(variantIds, saveData);
 			},
