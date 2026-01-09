@@ -8,7 +8,32 @@ import type { UmbContextProviderController } from '@umbraco-cms/backoffice/conte
 import { type UmbClassInterface, UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-const Regex = /@\.culture == ('[^']*'|null) *&& *@\.segment == ('[^']*'|null)/g;
+const Regex = /@\.culture == ('[^']*'|null) *&& *@\.segment == ('[^']*'|null)/g; //
+
+/**
+ * Filters a validation message by a given variantId.
+ * @param {UmbValidationMessage} msg - The validation message to filter.
+ * @param {UmbVariantId} variantId - The variantId to filter by.
+ * @returns {boolean} True if the message matches the variantId, false otherwise.
+ */
+function filterMsgByVariantId(msg: UmbValidationMessage, variantId: UmbVariantId) {
+	// Regex that finds all the @.culture == and @.segment == in the path.
+	const variantMatches = [...msg.path.matchAll(Regex)];
+
+	// if not cultures, then we like to keep it:
+	if (variantMatches.length === 0) return true;
+
+	return (
+		// Find any bad matches:
+		!variantMatches.some((match) => {
+			const culture = match[1] === 'null' ? null : match[1].substring(1, match[1].length - 1);
+			const segment = match[2] === 'null' ? null : match[2].substring(1, match[2].length - 1);
+
+			const result = (culture !== null && culture !== variantId.culture) || segment !== variantId.segment;
+			return result;
+		})
+	);
+}
 
 /**
  * Validation Context is the core of Validation.
@@ -46,25 +71,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	setVariantId(variantId: UmbVariantId): void {
 		this.#variantId = variantId;
 		// Setup a filter that will run when messages are added:
-		this.messages?.filter((msg) => {
-			// Regex that finds all the @.culture == and @.segment == in the path.
-			const variantMatches = [...msg.path.matchAll(Regex)];
-
-			// if not cultures, then we like to keep it:
-			if (variantMatches.length === 0) return true;
-
-			return (
-				// Find any bad matches:
-				!variantMatches.some((match) => {
-					const culture = match[1] === 'null' ? null : match[1].substring(1, match[1].length - 1);
-					const segment = match[2] === 'null' ? null : match[2].substring(1, match[2].length - 1);
-
-					const result =
-						(culture !== null && culture !== this.#variantId!.culture) || segment !== this.#variantId!.segment;
-					return result;
-				})
-			);
-		});
+		this.messages?.filter((msg) => filterMsgByVariantId(msg, this.#variantId!));
 	}
 
 	getVariantId(): UmbVariantId | undefined {
@@ -365,6 +372,76 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 		if (isValid === false) {
 			if (hasMessages === false && resultsStatus === false) {
 				const notValidValidators = this.#validators.filter((v) => v.isValid === false);
+				console.warn(
+					`Missing validation messages to represent why a child validation context is invalid.
+					This could be because the Validator does not have a 'data-path' and therefore not able to set a message to the Validation Context.
+					These Validators was not valid, one of these did not set a message to represent their state:`,
+					notValidValidators,
+				);
+			}
+			// Focus first invalid element:
+			this.focusFirstInvalidElement();
+			return Promise.reject();
+		}
+
+		return Promise.resolve();
+	}
+
+	/**
+	 * Validate this context, by a given set of VariantIDs.
+	 * Notice its a recursive check meaning sub validation contexts also validates their validators, but only for validators matching the given variantIds.
+	 * @param {Array<UmbVariantId>} variantIds - The variantIds to validate by.
+	 * @returns {Promise<boolean>} - Returns a promise that resolves to true if the validation succeeded.
+	 */
+	async validateByVariantIds(variantIds: Array<UmbVariantId>): Promise<void> {
+		this.#validationMode = true;
+
+		const properValidators = this.#validators.filter((v) => {
+			// If the validator has no variantId, then we always include it:
+			if ((v as any).getVariantId === undefined) return true;
+			const vVariantId: UmbVariantId | undefined = (v as any).getVariantId();
+			if (vVariantId === undefined) return true;
+			return variantIds.some((variantId) => variantId.equal(vVariantId));
+		});
+
+		const resultsStatus =
+			properValidators.length === 0
+				? true
+				: await Promise.all(
+						properValidators.map((v) => {
+							if (v.validateByVariantIds !== undefined) {
+								return v.validateByVariantIds?.(variantIds);
+							}
+							return v.validate();
+						}),
+					).then(
+						() => true,
+						() => false,
+					);
+
+		if (properValidators.length === 0 && resultsStatus === false) {
+			throw new Error('No validators to validate, but validation failed');
+		}
+
+		if (this.messages === undefined) {
+			// This Context has been destroyed while is was validating, so we should not continue. [NL]
+			return Promise.reject();
+		}
+
+		// We need to ask again for messages, as they might have been added during the validation process. [NL]
+		const messages = this.messages.getMessages();
+		const hasMessages =
+			messages?.filter((msg) => variantIds.some((variantId) => filterMsgByVariantId(msg, variantId))).length > 0;
+
+		// If we have any messages then we are not valid, otherwise lets check the validation results: [NL]
+		// This enables us to keep client validations though UI is not present anymore — because the client validations got defined as messages. [NL]
+		const isValid = hasMessages ? false : resultsStatus;
+
+		this.#isValid = isValid;
+
+		if (isValid === false) {
+			if (hasMessages === false && resultsStatus === false) {
+				const notValidValidators = properValidators.filter((v) => v.isValid === false);
 				console.warn(
 					`Missing validation messages to represent why a child validation context is invalid.
 					This could be because the Validator does not have a 'data-path' and therefore not able to set a message to the Validation Context.
