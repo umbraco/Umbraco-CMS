@@ -1,4 +1,5 @@
 import {
+	UMB_CONTENT_WORKSPACE_IS_LOADED_CONDITION_ALIAS,
 	UMB_WORKSPACE_CONDITION_ALIAS,
 	UMB_WORKSPACE_ENTITY_IS_NEW_CONDITION_ALIAS,
 } from '@umbraco-cms/backoffice/workspace';
@@ -16,6 +17,9 @@ export const manifests: Array<UmbExtensionManifest> = [
 			},
 			{
 				alias: UMB_WORKSPACE_ENTITY_IS_NEW_CONDITION_ALIAS,
+			},
+			{
+				alias: UMB_CONTENT_WORKSPACE_IS_LOADED_CONDITION_ALIAS,
 			},
 		],
 	},
