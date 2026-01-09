@@ -167,6 +167,7 @@ export class UmbDefaultCollectionContext<
 		if (!this.#config) return;
 
 		this.selection.setConfig(this.#config.selectionConfiguration);
+		this.bulkAction.setConfig(this.#config.bulkActionConfiguration);
 
 		// Observe bulk actions to enable selection when bulk actions are available
 		// Bulk Actions are an integrated part of a Collection so we handle it here instead of a configuration

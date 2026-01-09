@@ -24,6 +24,7 @@ export interface UmbCollectionConfiguration {
 	noItemsLabel?: string;
 	userDefinedProperties?: Array<UmbCollectionColumnConfiguration>;
 	selectionConfiguration?: UmbCollectionSelectionConfiguration;
+	bulkActionConfiguration?: UmbCollectionBulkActionConfiguration;
 }
 
 export interface UmbCollectionColumnConfiguration {
@@ -46,6 +47,10 @@ export type UmbCollectionSelectionConfiguration = {
 	selectOnly?: boolean;
 	selection?: Array<UmbCollectionItemModel['unique']>;
 	selectableFilter?(item: UmbCollectionItemModel): boolean;
+};
+
+export type UmbCollectionBulkActionConfiguration = {
+	enabled?: boolean;
 };
 
 export interface UmbCollectionContext {

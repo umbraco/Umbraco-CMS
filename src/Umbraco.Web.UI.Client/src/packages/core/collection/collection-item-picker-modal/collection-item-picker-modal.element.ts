@@ -139,6 +139,7 @@ export class UmbCollectionItemPickerModalElement extends UmbModalBaseElement<
 				alias=${this.data?.collection.alias}
 				.config=${{
 					selectionConfiguration: this._selectionConfiguration,
+					bulkActionConfiguration: { enabled: false },
 				}}
 				@selected=${this.#onItemSelected}
 				@deselected=${this.#onItemDeselected}></umb-collection>
