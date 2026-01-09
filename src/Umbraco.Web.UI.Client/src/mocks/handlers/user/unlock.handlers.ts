@@ -5,12 +5,13 @@ import type { UnlockUsersRequestModel } from '@umbraco-cms/backoffice/external/b
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const handlers = [
-	http.post<UnlockUsersRequestModel>(umbracoPath(`${UMB_SLUG}/unlock`), async ({ request }) => {
+	http.post<object, UnlockUsersRequestModel>(umbracoPath(`${UMB_SLUG}/unlock`), async ({ request }) => {
 		const data = await request.json();
 		if (!data) return;
 		if (!data.userIds) return;
 
-		umbUserMockDb.unlock(data.userIds);
+		const ids = data.userIds.map((ref) => ref.id);
+		umbUserMockDb.unlock(ids);
 
 		return new HttpResponse(null, { status: 200 });
 	}),
