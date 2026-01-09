@@ -32,12 +32,11 @@ public class ExposeBackOfficeAuthenticationOpenIddictServerEventsHandler : IOpen
 
         // These are the type identifiers for the claims required by the principal
         // for the custom authentication scheme.
-        // We make available the ID, user name and allowed applications (sections) claims.
+        // We make available the ID and user name claims.
         _claimTypes =
         [
             backOfficeIdentityOptions.Value.ClaimsIdentity.UserIdClaimType,
-            backOfficeIdentityOptions.Value.ClaimsIdentity.UserNameClaimType,
-            Core.Constants.Security.AllowedApplicationsClaimType,
+            backOfficeIdentityOptions.Value.ClaimsIdentity.UserNameClaimType
         ];
     }
 
