@@ -105,7 +105,12 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 		});
 	}
 
-	public async validateAndSubmit(
+	public validateAndSubmit(onValid: () => Promise<void>, onInvalid: (reason?: any) => Promise<void>): Promise<void> {
+		return this._validateByAndSubmit(this._validateAndLog, onValid, onInvalid);
+	}
+
+	protected async _validateByAndSubmit(
+		validationMethod: () => Promise<unknown>,
 		onValid: () => Promise<void>,
 		onInvalid: (reason?: any) => Promise<void>,
 	): Promise<void> {
@@ -116,7 +121,7 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 			this.#submitResolve = resolve;
 			this.#submitReject = reject;
 		});
-		this._validateAndLog().then(
+		validationMethod().then(
 			async () => {
 				onValid().then(this.#completeSubmit, this.#rejectSubmit);
 			},

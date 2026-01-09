@@ -965,7 +965,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		await this.runMandatoryValidationForSaveData(saveData, variantIds);
 		if (this.#validateOnSubmit) {
 			await this.askServerToValidate(saveData, variantIds);
-			const valid = await this._validateAndLog().then(
+			const valid = await this._validateVariantsAndLog(variantIds).then(
 				() => true,
 				() => false,
 			);
@@ -977,6 +977,46 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		} else {
 			await this.performCreateOrUpdate(variantIds, saveData);
 		}
+	}
+
+	public validateVariantsAndSubmit(
+		variantIds: Array<UmbVariantId>,
+		onValid: () => Promise<void>,
+		onInvalid: (reason?: any) => Promise<void>,
+	): Promise<void> {
+		return this._validateByAndSubmit(() => this._validateVariantsAndLog(variantIds), onValid, onInvalid);
+	}
+
+	protected async _validateVariantsAndLog(variantIds?: Array<UmbVariantId>): Promise<void> {
+		await this.validateByVariantIds(variantIds).catch(async () => {
+			// TODO: Implement developer-mode logging here. [NL]
+			console.warn(
+				'Validation failed because of these validation messages still begin present: ',
+				this.validationContext.messages.getMessages(),
+			);
+			return Promise.reject();
+		});
+	}
+
+	/**
+	 * If a Workspace has multiple validation contexts, then this method can be overwritten to return the correct one.
+	 * @param {Array<UmbVariantId> | undefined} variantIds Optional array of variantIds to filter which contexts to validate.
+	 * @returns {Promise<Array<void>>} Promise that resolves to void when the validation is complete.
+	 */
+	async validateByVariantIds(variantIds?: Array<UmbVariantId>): Promise<Array<void>> {
+		// If variantIds are provided, we only validate the contexts matching those variantIds, or those without a variantId.
+		if (variantIds) {
+			if (variantIds.length === 0) {
+				console.warn(
+					'Workspace Context: validate called with an empty array of variantIds, only validation-contexts with no variantId will be validated.',
+				);
+			}
+			console.log(this.#variantValidationContexts);
+			console.log('Workspace Context: validate called with variantIds: ', variantIds);
+			return (await this.validationContext.validateByVariantIds(variantIds)) as any as Promise<void[]>;
+		}
+
+		return await super.validate();
 	}
 
 	/**
