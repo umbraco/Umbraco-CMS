@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 internal sealed class PropertyTypeReadOnlyDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.PropertyType;
-    public const string PrimaryKeyName = "PropertyTypeId"; // there is an inconsistency in main branch between atributtes
+    public const string PrimaryKeyName = "PropertyTypeId";
 
     [Column(PrimaryKeyName)]
     public int? Id { get; set; }
@@ -67,6 +67,6 @@ internal sealed class PropertyTypeReadOnlyDto
     [Column("dbType")]
     public string? DbType { get; set; }
 
-    [Column("uniqueId")]
+    [Column("UniqueID")]
     public Guid UniqueId { get; set; }
 }
