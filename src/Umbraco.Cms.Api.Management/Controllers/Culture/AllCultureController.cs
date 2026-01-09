@@ -28,6 +28,8 @@ public class AllCultureController : CultureControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<CultureReponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a paginated collection of cultures available for creating languages.")]
+    [EndpointDescription("Gets a paginated collection containing the English and localized names of all available cultures.")]
     public Task<PagedViewModel<CultureReponseModel>> GetAll(CancellationToken cancellationToken, int skip = 0, int take = 100)
     {
         CultureInfo[] all = _cultureService.GetValidCultureInfos();
