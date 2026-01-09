@@ -1,5 +1,5 @@
 import type { UmbBlockDataModel } from '../../block/index.js';
-import { UMB_BLOCK_CATALOGUE_MODAL, UmbBlockEntriesContext, UmbBlockInsertedEvent } from '../../block/index.js';
+import { UMB_BLOCK_CATALOGUE_MODAL, UmbBlockEntriesContext } from '../../block/index.js';
 import type { UmbBlockListWorkspaceOriginData } from '../index.js';
 import {
 	UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS,
@@ -209,17 +209,7 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 	) {
 		await this._retrieveManager;
 
-		const result = this._manager?.insert(layoutEntry, content, settings, originData) ?? false;
-
-		// A dirty communication towards the UI, so it can react to a new block being inserted (to open the inline editing of the block): [NL]
-		this.dispatchEvent(
-			new UmbBlockInsertedEvent({
-				originData,
-				layout: layoutEntry,
-			}),
-		);
-
-		return result;
+		return this._manager?.insert(layoutEntry, content, settings, originData) ?? false;
 	}
 
 	protected async _insertFromPropertyValue(value: UmbBlockListValueModel, originData: UmbBlockListWorkspaceOriginData) {

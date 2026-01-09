@@ -216,6 +216,7 @@ export class UmbBlockGridManagerContext<
 	) {
 		this.setOneLayout(layoutEntry, originData);
 		this.insertBlockData(layoutEntry, content, settings, originData);
+		this.notifyBlockInserted(layoutEntry, originData);
 
 		return true;
 	}

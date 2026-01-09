@@ -1,7 +1,7 @@
 import { UMB_BLOCK_LIST_ENTRY_CONTEXT } from '../../context/index.js';
 import type { UmbBlockListLayoutModel, UmbBlockListWorkspaceOriginData } from '../../index.js';
 import {
-	UMB_BLOCK_ENTRIES_CONTEXT,
+	UMB_BLOCK_MANAGER_CONTEXT,
 	UMB_BLOCK_WORKSPACE_ALIAS,
 	UmbBlockInsertedEvent,
 } from '@umbraco-cms/backoffice/block';
@@ -27,7 +27,7 @@ const apiArgsCreator: UmbApiConstructorArgumentsMethodType<unknown> = (manifest:
  */
 @customElement('umb-inline-list-block')
 export class UmbInlineListBlockElement extends UmbLitElement {
-	#entriesContext?: typeof UMB_BLOCK_ENTRIES_CONTEXT.TYPE;
+	#manager?: typeof UMB_BLOCK_MANAGER_CONTEXT.TYPE;
 	#blockContext?: typeof UMB_BLOCK_LIST_ENTRY_CONTEXT.TYPE;
 	#workspaceContext?: typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE;
 	#contentKey?: string;
@@ -77,12 +77,12 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 			);
 		});
 
-		this.consumeContext(UMB_BLOCK_ENTRIES_CONTEXT, (entries) => {
-			if (this.#entriesContext) {
-				this.#entriesContext.removeEventListener(UmbBlockInsertedEvent.TYPE, this.#onBlockInserted);
+		this.consumeContext(UMB_BLOCK_MANAGER_CONTEXT, (manager) => {
+			if (this.#manager) {
+				this.#manager.removeEventListener(UmbBlockInsertedEvent.TYPE, this.#onBlockInserted);
 			}
-			this.#entriesContext = entries;
-			this.#entriesContext?.addEventListener(UmbBlockInsertedEvent.TYPE, this.#onBlockInserted);
+			this.#manager = manager;
+			this.#manager?.addEventListener(UmbBlockInsertedEvent.TYPE, this.#onBlockInserted);
 		});
 
 		// Block the access to the View Context for this inline block workspace: [NL]
@@ -150,8 +150,9 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 
 	#onBlockInserted = (event: Event) => {
 		const blockEvent = event as UmbBlockInsertedEvent<UmbBlockListLayoutModel, UmbBlockListWorkspaceOriginData>;
-		if (blockEvent.detail.layout.contentKey !== this.#contentKey) return;
-		this._isOpen = true;
+		if (blockEvent.detail.layout.contentKey === this.#contentKey) {
+			this._isOpen = true;
+		}
 	};
 
 	#expose = () => {

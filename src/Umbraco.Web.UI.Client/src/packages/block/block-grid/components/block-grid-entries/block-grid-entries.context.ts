@@ -32,7 +32,6 @@ import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import {
 	UMB_BLOCK_CATALOGUE_MODAL,
 	UmbBlockEntriesContext,
-	UmbBlockInsertedEvent,
 	type UmbBlockDataModel,
 } from '@umbraco-cms/backoffice/block';
 
@@ -495,17 +494,7 @@ export class UmbBlockGridEntriesContext
 		originData: UmbBlockGridWorkspaceOriginData,
 	) {
 		await this._retrieveManager;
-		const result = this._manager?.insert(layoutEntry, content, settings, originData) ?? false;
-
-		// A dirty communication towards the UI, so it can react to a new block being inserted (to open the inline editing of the block): [NL]
-		this.dispatchEvent(
-			new UmbBlockInsertedEvent({
-				originData,
-				layout: layoutEntry,
-			}),
-		);
-
-		return result;
+		return this._manager?.insert(layoutEntry, content, settings, originData) ?? false;
 	}
 
 	// create Block?
