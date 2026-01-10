@@ -28,6 +28,6 @@ internal sealed class TemplateDto
     public string? Alias { get; set; }
 
     [ResultColumn]
-    [Reference(ReferenceType.OneToOne, ColumnName = nameof(NodeDto.NodeId))]
+    [Reference(ReferenceType.OneToOne, ColumnName = nameof(this.NodeId))]
     public NodeDto NodeDto { get; set; } = null!;
 }

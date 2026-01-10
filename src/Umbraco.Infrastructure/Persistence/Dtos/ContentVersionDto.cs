@@ -19,7 +19,6 @@ public class ContentVersionDto
     private const string TextColumnName = "text";
     private const string NodeIdColumnName = Constants.DatabaseSchema.Columns.NodeIdName;
     private const string PreventCleanupColumnName = "preventCleanup";
-    private const string ReferenceColumnName = "NodeId";
 
     private int? _userId;
 
@@ -56,7 +55,7 @@ public class ContentVersionDto
     public string? Text { get; set; }
 
     [ResultColumn]
-    [Reference(ReferenceType.OneToOne, ColumnName = ReferenceColumnName, ReferenceMemberName = ReferenceColumnName)]
+    [Reference(ReferenceType.OneToOne, ColumnName = nameof(this.NodeId), ReferenceMemberName = nameof(ContentDto.NodeId))]
     public ContentDto? ContentDto { get; set; }
 
     [Column(PreventCleanupColumnName)]

@@ -15,7 +15,6 @@ internal sealed class ExternalLoginTokenDto
 
     private const string ExternalLoginIdColumnName = "externalLoginId";
     private const string NameColumnName = "name";
-    private const string ReferenceColumnName = "ExternalLoginId";
 
     [Column(PrimaryKeyColumnName)]
     [PrimaryKeyColumn]
@@ -41,6 +40,6 @@ internal sealed class ExternalLoginTokenDto
     public DateTime CreateDate { get; set; }
 
     [ResultColumn]
-    [Reference(ReferenceType.OneToOne, ColumnName = ReferenceColumnName)]
+    [Reference(ReferenceType.OneToOne, ColumnName = nameof(this.ExternalLoginId))]
     public ExternalLoginDto ExternalLoginDto { get; set; } = null!;
 }
