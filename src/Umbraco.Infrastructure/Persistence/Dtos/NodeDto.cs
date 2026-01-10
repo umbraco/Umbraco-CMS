@@ -17,7 +17,7 @@ public class NodeDto
     // Public constants to bind properties between DTOs
 
     /// <summary>
-    /// This is actually represents NodeId but kept as Id for backward compatibility.
+    /// This actually represents NodeId but kept as Id for backward compatibility.
     /// </summary>
     public const string IdColumnName = PrimaryKeyColumnName;
 
