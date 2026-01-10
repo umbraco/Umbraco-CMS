@@ -15,7 +15,6 @@ internal sealed class ExternalLoginTokenDto
 
     private const string ExternalLoginIdColumnName = "externalLoginId";
     private const string NameColumnName = "name";
-    private const string ReferenceColumnName = "ExternalLoginId";
 
     [Column(PrimaryKeyColumnName)]
     [PrimaryKeyColumn]

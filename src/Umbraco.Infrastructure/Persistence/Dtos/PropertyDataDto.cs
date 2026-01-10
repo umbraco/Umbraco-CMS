@@ -19,7 +19,7 @@ internal sealed class PropertyDataDto
 
     private const string LanguageIdColumnName = "languageId";
     private const string SegmentColumnName = "segment";
-    private const string ReferenceColumnName = "PropertyTypeId"; // differs in casing from PropertyTypeIdColumnName!
+
     private decimal? _decimalValue;
 
     // pk, not used at the moment (never updating)
