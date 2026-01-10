@@ -11,7 +11,7 @@ internal sealed class NavigationDto : INavigationModel
     public const string ContentTypeKeyColumnName = "contentTypeKey";
 
     /// <inheritdoc/>
-    [Column(NodeDto.NodeIdColumnName)]
+    [Column(NodeDto.IdColumnName)]
     public int Id { get; set; }
 
     /// <inheritdoc/>

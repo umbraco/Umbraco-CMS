@@ -36,7 +36,7 @@ public class ContentNavigationRepository : INavigationRepository
 
         Sql<ISqlContext> sql = AmbientScope.SqlContext.Sql()
             .Select(
-                $"n.{syntax.GetQuotedColumnName(NodeDto.NodeIdColumnName)} as {syntax.GetQuotedColumnName(NodeDto.NodeIdColumnName)}",
+                $"n.{syntax.GetQuotedColumnName(NodeDto.IdColumnName)} as {syntax.GetQuotedColumnName(NodeDto.IdColumnName)}",
                 $"n.{syntax.GetQuotedColumnName(NodeDto.KeyColumnName)} as {syntax.GetQuotedColumnName(NodeDto.KeyColumnName)}",
                 $"ctn.{syntax.GetQuotedColumnName(NodeDto.KeyColumnName)} as {syntax.GetQuotedColumnName(NavigationDto.ContentTypeKeyColumnName)}",
                 $"n.{syntax.GetQuotedColumnName(NodeDto.ParentIdColumnName)}  as  {syntax.GetQuotedColumnName(NodeDto.ParentIdColumnName)}",
