@@ -5,31 +5,31 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey(PrimaryKeyName, AutoIncrement = false)]
+[PrimaryKey(PrimaryKeyColumnName, AutoIncrement = false)]
 [ExplicitColumns]
 public class ContentDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.Content;
-    public const string PrimaryKeyName = Constants.DatabaseSchema.Columns.NodeIdName;
-    public const string ContentTypeIdName = "contentTypeId";
+    public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.NodeIdName;
+    public const string ContentTypeIdColumnName = "contentTypeId";
 
-    [Column(PrimaryKeyName)]
+    [Column(PrimaryKeyColumnName)]
     [PrimaryKeyColumn(AutoIncrement = false)]
     [ForeignKey(typeof(NodeDto))]
     public int NodeId { get; set; }
 
-    [Column(ContentTypeIdName)]
-    [ForeignKey(typeof(ContentTypeDto), Column = ContentTypeDto.NodeIdName)]
+    [Column(ContentTypeIdColumnName)]
+    [ForeignKey(typeof(ContentTypeDto), Column = ContentTypeDto.NodeIdColumnName)]
     public int ContentTypeId { get; set; }
 
     [ResultColumn]
-    [Reference(ReferenceType.OneToOne, ColumnName = PrimaryKeyName)]
+    [Reference(ReferenceType.OneToOne, ColumnName = PrimaryKeyColumnName)]
     public NodeDto NodeDto { get; set; } = null!;
 
     // although a content has many content versions,
     // they can only be loaded one by one (as several content),
     // so this here is a OneToOne reference
     [ResultColumn]
-    [Reference(ReferenceType.OneToOne, ReferenceMemberName = PrimaryKeyName)]
+    [Reference(ReferenceType.OneToOne, ReferenceMemberName = PrimaryKeyColumnName)]
     public ContentVersionDto ContentVersionDto { get; set; } = null!;
 }

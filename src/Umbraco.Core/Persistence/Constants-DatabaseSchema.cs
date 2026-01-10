@@ -6,6 +6,9 @@ public static partial class Constants
 {
     public static class DatabaseSchema
     {
+        // TODO: Why aren't all table names with the same prefix?
+        public const string TableNamePrefix = "umbraco";
+
         public static class Columns
         {
             // Defines constants for common field names used throughout the database, to ensure
@@ -19,8 +22,6 @@ public static partial class Constants
 
         public static class Tables
         {
-            // TODO: Why aren't all table names with the same prefix?
-            public const string TableNamePrefix = "umbraco";
 
             public const string Lock = TableNamePrefix + "Lock";
             public const string Log = TableNamePrefix + "Log";

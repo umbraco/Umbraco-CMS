@@ -6,31 +6,31 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey(PrimaryKeyName)]
+[PrimaryKey(PrimaryKeyColumnName)]
 [ExplicitColumns]
 internal class PropertyTypeDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.PropertyType;
-    public const string PrimaryKeyName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
-    public const string DataTypeIdName = "dataTypeId";
-    public const string ContentTypeIdName = "contentTypeId";
-    public const string PropertyTypeGroupIdName = "propertyTypeGroupId";
+    public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
+    public const string PropertyTypeGroupIdColumnName = "propertyTypeGroupId";
+    public const string DataTypeIdColumnName = "dataTypeId";
+    public const string ContentTypeIdColumnName = "contentTypeId";
 
     private string? _alias;
 
-    [Column(PrimaryKeyName)]
+    [Column(PrimaryKeyColumnName)]
     [PrimaryKeyColumn(IdentitySeed = 100)]
     public int Id { get; set; }
 
-    [Column(DataTypeIdName)]
-    [ForeignKey(typeof(DataTypeDto), Column = DataTypeDto.PrimaryKeyName)]
+    [Column(DataTypeIdColumnName)]
+    [ForeignKey(typeof(DataTypeDto), Column = DataTypeDto.PrimaryKeyColumnName)]
     public int DataTypeId { get; set; }
 
-    [Column(ContentTypeIdName)]
-    [ForeignKey(typeof(ContentTypeDto), Column = ContentTypeDto.NodeIdName)]
+    [Column(ContentTypeIdColumnName)]
+    [ForeignKey(typeof(ContentTypeDto), Column = ContentTypeDto.NodeIdColumnName)]
     public int ContentTypeId { get; set; }
 
-    [Column(PropertyTypeGroupIdName)]
+    [Column(PropertyTypeGroupIdColumnName)]
     [NullSetting(NullSetting = NullSettings.Null)]
     [ForeignKey(typeof(PropertyTypeGroupDto))]
     public int? PropertyTypeGroupId { get; set; }
