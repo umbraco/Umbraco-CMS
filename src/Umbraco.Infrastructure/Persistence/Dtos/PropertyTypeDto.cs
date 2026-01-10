@@ -6,27 +6,31 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey("id")]
+[PrimaryKey(PrimaryKeyColumnName)]
 [ExplicitColumns]
 internal class PropertyTypeDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.PropertyType;
+    public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
+    public const string PropertyTypeGroupIdColumnName = "propertyTypeGroupId";
+    public const string DataTypeIdColumnName = "dataTypeId";
+    public const string ContentTypeIdColumnName = "contentTypeId";
 
     private string? _alias;
 
-    [Column("id")]
+    [Column(PrimaryKeyColumnName)]
     [PrimaryKeyColumn(IdentitySeed = 100)]
     public int Id { get; set; }
 
-    [Column("dataTypeId")]
-    [ForeignKey(typeof(DataTypeDto), Column = "nodeId")]
+    [Column(DataTypeIdColumnName)]
+    [ForeignKey(typeof(DataTypeDto), Column = DataTypeDto.PrimaryKeyColumnName)]
     public int DataTypeId { get; set; }
 
-    [Column("contentTypeId")]
-    [ForeignKey(typeof(ContentTypeDto), Column = "nodeId")]
+    [Column(ContentTypeIdColumnName)]
+    [ForeignKey(typeof(ContentTypeDto), Column = ContentTypeDto.NodeIdColumnName)]
     public int ContentTypeId { get; set; }
 
-    [Column("propertyTypeGroupId")]
+    [Column(PropertyTypeGroupIdColumnName)]
     [NullSetting(NullSetting = NullSettings.Null)]
     [ForeignKey(typeof(PropertyTypeGroupDto))]
     public int? PropertyTypeGroupId { get; set; }
@@ -76,7 +80,7 @@ internal class PropertyTypeDto
     public byte Variations { get; set; }
 
     [ResultColumn]
-    [Reference(ReferenceType.OneToOne, ColumnName = "DataTypeId")]
+    [Reference(ReferenceType.OneToOne, ColumnName = nameof(this.DataTypeId))]
     public DataTypeDto DataTypeDto { get; set; } = null!;
 
     [Column("UniqueId")]

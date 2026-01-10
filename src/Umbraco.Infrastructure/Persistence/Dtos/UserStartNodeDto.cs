@@ -5,11 +5,16 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey("id", AutoIncrement = true)]
+[PrimaryKey(PrimaryKeyColumnName, AutoIncrement = true)]
 [ExplicitColumns]
 public class UserStartNodeDto : IEquatable<UserStartNodeDto>
 {
     public const string TableName = Constants.DatabaseSchema.Tables.UserStartNode;
+    public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
+
+    private const string UserIdColumnName = "userId";
+    private const string StartNodeColumnName = "startNode";
+    private const string StartNodeTypeColumnName = "startNodeType";
 
     public enum StartNodeTypeValue
     {
@@ -17,23 +22,23 @@ public class UserStartNodeDto : IEquatable<UserStartNodeDto>
         Media = 2,
     }
 
-    [Column("id")]
+    [Column(PrimaryKeyColumnName)]
     [PrimaryKeyColumn(Name = "PK_userStartNode")]
     public int Id { get; set; }
 
-    [Column("userId")]
+    [Column(UserIdColumnName)]
     [NullSetting(NullSetting = NullSettings.NotNull)]
     [ForeignKey(typeof(UserDto))]
     public int UserId { get; set; }
 
-    [Column("startNode")]
+    [Column(StartNodeColumnName)]
     [NullSetting(NullSetting = NullSettings.NotNull)]
     [ForeignKey(typeof(NodeDto))]
     public int StartNode { get; set; }
 
-    [Column("startNodeType")]
+    [Column(StartNodeTypeColumnName)]
     [NullSetting(NullSetting = NullSettings.NotNull)]
-    [Index(IndexTypes.UniqueNonClustered, ForColumns = "startNodeType, startNode, userId", Name = "IX_umbracoUserStartNode_startNodeType")]
+    [Index(IndexTypes.UniqueNonClustered, ForColumns = $"{StartNodeTypeColumnName}, {StartNodeColumnName}, {UserIdColumnName}", Name = "IX_umbracoUserStartNode_startNodeType")]
     public int StartNodeType { get; set; }
 
     public static bool operator ==(UserStartNodeDto left, UserStartNodeDto right) => Equals(left, right);
