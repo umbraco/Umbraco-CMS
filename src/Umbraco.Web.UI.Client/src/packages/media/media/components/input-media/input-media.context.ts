@@ -58,6 +58,10 @@ export class UmbMediaPickerInputContext extends UmbPickerInputContext<
 		item: UmbMediaItemModel,
 		allowedContentTypes?: Array<{ unique: string; entityType: UmbMediaTypeEntityType }>,
 	): boolean => {
+		// Check if the user has no access to this item (tree items include noAccess property)
+		if ('noAccess' in item && (item as unknown as UmbMediaTreeItemModel).noAccess === true) {
+			return false;
+		}
 		if (allowedContentTypes && allowedContentTypes.length > 0) {
 			return allowedContentTypes
 				.map((contentTypeReference) => contentTypeReference.unique)

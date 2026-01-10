@@ -20,6 +20,7 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 		if (this.#api) {
 			this.observe(this.#api.name, (name) => (this._name = name || ''));
 			this.observe(this.#api.isDraft, (isDraft) => (this._isDraft = isDraft || false));
+			this.observe(this.#api.noAccess, (noAccess) => (this._noAccess = noAccess || false));
 			this.observe(this.#api.hasCollection, (has) => {
 				const oldValue = this._forceShowExpand;
 				this._forceShowExpand = has;
@@ -41,6 +42,13 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 	 */
 	@property({ type: Boolean, reflect: true, attribute: 'draft' })
 	protected _isDraft = false;
+
+	/**
+	 * @internal
+	 * Indicates whether the user has no access to this document, this is controlled internally but present as an attribute as it affects styling.
+	 */
+	@property({ type: Boolean, reflect: true, attribute: 'no-access' })
+	protected _noAccess = false;
 
 	#icon: string | null | undefined;
 
@@ -75,6 +83,13 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 				opacity: 0.6;
 			}
 			:host([draft]) umb-icon {
+				opacity: 0.6;
+			}
+			:host([no-access]) #label {
+				opacity: 0.6;
+				font-style: italic;
+			}
+			:host([no-access]) umb-icon {
 				opacity: 0.6;
 			}
 		`,
