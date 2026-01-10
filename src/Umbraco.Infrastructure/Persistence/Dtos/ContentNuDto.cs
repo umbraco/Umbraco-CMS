@@ -6,22 +6,24 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey(PrimaryKeyName, AutoIncrement = false)]
+[PrimaryKey(PrimaryKeyColumnName, AutoIncrement = false)]
 [ExplicitColumns]
 public class ContentNuDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.NodeData;
-    public const string PrimaryKeyName = Constants.DatabaseSchema.Columns.NodeIdName;
-    public const string PublishedName = "published";
-    public const string RvName = "rv";
+    public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.NodeIdName;
 
-    [Column(PrimaryKeyName)]
-    [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_cmsContentNu", OnColumns = $"{PrimaryKeyName}, {PublishedName}")]
-    [ForeignKey(typeof(ContentDto), Column = PrimaryKeyName, OnDelete = Rule.Cascade)]
+    private const string PublishedColumnName = "published";
+    private const string RvColumnName = "rv";
+    private const string DataRawColumnName = "dataRaw";
+
+    [Column(PrimaryKeyColumnName)]
+    [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_cmsContentNu", OnColumns = $"{PrimaryKeyColumnName}, {PublishedColumnName}")]
+    [ForeignKey(typeof(ContentDto), Column = PrimaryKeyColumnName, OnDelete = Rule.Cascade)]
     public int NodeId { get; set; }
 
-    [Column(PublishedName)]
-    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_published", ForColumns = $"{PublishedName},{PrimaryKeyName},{RvName}", IncludeColumns = "dataRaw")]
+    [Column(PublishedColumnName)]
+    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_" + PublishedColumnName, ForColumns = $"{PublishedColumnName},{PrimaryKeyColumnName},{RvColumnName}", IncludeColumns = DataRawColumnName)]
     public bool Published { get; set; }
 
     /// <summary>
@@ -35,10 +37,10 @@ public class ContentNuDto
     [NullSetting(NullSetting = NullSettings.Null)]
     public string? Data { get; set; }
 
-    [Column(RvName)]
+    [Column(RvColumnName)]
     public long Rv { get; set; }
 
-    [Column("dataRaw")]
+    [Column(DataRawColumnName)]
     [NullSetting(NullSetting = NullSettings.Null)]
     public byte[]? RawData { get; set; }
 }

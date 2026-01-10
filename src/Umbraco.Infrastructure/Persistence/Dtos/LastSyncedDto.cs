@@ -6,14 +6,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 
 [TableName(TableName)]
-[PrimaryKey(PrimaryKeyName, AutoIncrement = false)]
+[PrimaryKey(PrimaryKeyColumnName, AutoIncrement = false)]
 [ExplicitColumns]
 public class LastSyncedDto
 {
     internal const string TableName = Constants.DatabaseSchema.Tables.LastSynced;
-    public const string PrimaryKeyName = "machineId";
+    public const string PrimaryKeyColumnName = "machineId";
 
-    [Column(PrimaryKeyName)]
+    [Column(PrimaryKeyColumnName)]
     [PrimaryKeyColumn(Name = "PK_lastSyncedMachineId", AutoIncrement = false, Clustered = true)]
     public required string MachineId { get; set; }
 

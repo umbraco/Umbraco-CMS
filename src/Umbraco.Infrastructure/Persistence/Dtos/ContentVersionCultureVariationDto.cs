@@ -5,26 +5,27 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey(PrimaryKeyName)]
+[PrimaryKey(PrimaryKeyColumnName)]
 [ExplicitColumns]
 internal sealed class ContentVersionCultureVariationDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.ContentVersionCultureVariation;
-    public const string PrimaryKeyName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
-    public const string LanguageIdName = "languageId";
-    public const string VersionIdName = "versionId";
-    public const string UpdateUserIdName = "availableUserId";
-    public const string UpdateDateName = "date";
-    public const string NameName = "name";
+    public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
+
+    private const string LanguageIdName = "languageId";
+    private const string VersionIdName = "versionId";
+    private const string UpdateUserIdName = "availableUserId";
+    private const string UpdateDateName = "date";
+    private const string NameName = "name";
     private int? _updateUserId;
 
-    [Column(PrimaryKeyName)]
+    [Column(PrimaryKeyColumnName)]
     [PrimaryKeyColumn]
     public int Id { get; set; }
 
     [Column(VersionIdName)]
     [ForeignKey(typeof(ContentVersionDto))]
-    [Index(IndexTypes.UniqueNonClustered, Name = "IX_" + TableName + "_VersionId", ForColumns = $"{VersionIdName},{LanguageIdName}", IncludeColumns = $"{PrimaryKeyName},{NameName},{UpdateDateName},{UpdateUserIdName}")]
+    [Index(IndexTypes.UniqueNonClustered, Name = "IX_" + TableName + "_VersionId", ForColumns = $"{VersionIdName},{LanguageIdName}", IncludeColumns = $"{PrimaryKeyColumnName},{NameName},{UpdateDateName},{UpdateUserIdName}")]
     public int VersionId { get; set; }
 
     [Column(LanguageIdName)]

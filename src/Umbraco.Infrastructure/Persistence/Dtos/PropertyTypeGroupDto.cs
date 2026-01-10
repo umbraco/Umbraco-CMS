@@ -6,27 +6,27 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey(PrimaryKeyName, AutoIncrement = true)]
+[PrimaryKey(PrimaryKeyColumnName, AutoIncrement = true)]
 [ExplicitColumns]
 internal sealed class PropertyTypeGroupDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.PropertyTypeGroup;
-    public const string PrimaryKeyName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
-    public const string ContentTypeNodeIdName = "contenttypeNodeId";
-    public const string UniqueIdName = "uniqueID";
+    public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
+    public const string ContentTypeNodeIdColumnName = "contenttypeNodeId";
+    public const string UniqueIdColumnName = "uniqueID";
 
-    [Column(PrimaryKeyName)]
+    [Column(PrimaryKeyColumnName)]
     [PrimaryKeyColumn(IdentitySeed = 56)]
     public int Id { get; set; }
 
-    [Column(UniqueIdName)]
+    [Column(UniqueIdColumnName)]
     [NullSetting(NullSetting = NullSettings.NotNull)]
     [Constraint(Default = SystemMethods.NewGuid)]
     [Index(IndexTypes.UniqueNonClustered, Name = "IX_cmsPropertyTypeGroupUniqueID")]
     public Guid UniqueId { get; set; }
 
-    [Column(ContentTypeNodeIdName)]
-    [ForeignKey(typeof(ContentTypeDto), Column = ContentTypeDto.NodeIdName)]
+    [Column(ContentTypeNodeIdColumnName)]
+    [ForeignKey(typeof(ContentTypeDto), Column = ContentTypeDto.NodeIdColumnName)]
     public int ContentTypeNodeId { get; set; }
 
     [Column("type")]
@@ -43,6 +43,6 @@ internal sealed class PropertyTypeGroupDto
     public int SortOrder { get; set; }
 
     [ResultColumn]
-    [Reference(ReferenceType.Many, ReferenceMemberName = PropertyTypeDto.PropertyTypeGroupIdName)]
+    [Reference(ReferenceType.Many, ReferenceMemberName = PropertyTypeDto.PropertyTypeGroupIdColumnName)]
     public List<PropertyTypeDto> PropertyTypeDtos { get; set; } = [];
 }

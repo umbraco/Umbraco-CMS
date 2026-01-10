@@ -5,20 +5,21 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey(PrimaryKeyName)]
+[PrimaryKey(PrimaryKeyColumnName)]
 [ExplicitColumns]
 public class DictionaryDto // public as required to be accessible from Deploy for the RepairDictionaryIdsWorkItem.
 {
     public const string TableName = Constants.DatabaseSchema.Tables.DictionaryEntry;
-    public const string PrimaryKeyName = Constants.DatabaseSchema.Columns.PrimaryKeyNamePk;
-    public const string ReferenceName = "UniqueId";
-    public const string UniqueIdName = "id";
+    public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNamePk;
+    public const string UniqueIdColumnName = "id";
 
-    [Column(PrimaryKeyName)]
+    private const string ReferenceName = "UniqueId";
+
+    [Column(PrimaryKeyColumnName)]
     [PrimaryKeyColumn]
     public int PrimaryKey { get; set; }
 
-    [Column(UniqueIdName)]
+    [Column(UniqueIdColumnName)]
     [Index(IndexTypes.UniqueNonClustered)]
     public Guid UniqueId { get; set; }
 

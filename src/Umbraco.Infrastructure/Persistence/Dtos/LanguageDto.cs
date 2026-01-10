@@ -5,12 +5,12 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey(PrimaryKeyName)]
+[PrimaryKey(PrimaryKeyColumnName)]
 [ExplicitColumns]
 internal sealed class LanguageDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.Language;
-    public const string PrimaryKeyName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
+    public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
 
     // Public constants to bind properties between DTOs
     public const string IsoCodeColumnName = "languageISOCode";
@@ -18,7 +18,7 @@ internal sealed class LanguageDto
     /// <summary>
     ///     Gets or sets the identifier of the language.
     /// </summary>
-    [Column(PrimaryKeyName)]
+    [Column(PrimaryKeyColumnName)]
     [PrimaryKeyColumn(IdentitySeed = 2)]
     public short Id { get; set; }
 

@@ -15,12 +15,12 @@ internal sealed class ContentTypeTemplateDto
 
     [Column(PrimaryKeyName)]
     [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_cmsDocumentType", OnColumns = $"{PrimaryKeyName}, {TemplateNodeIdName}")]
-    [ForeignKey(typeof(ContentTypeDto), Column = ContentTypeDto.NodeIdName)]
+    [ForeignKey(typeof(ContentTypeDto), Column = ContentTypeDto.NodeIdColumnName)]
     [ForeignKey(typeof(NodeDto))]
     public int ContentTypeNodeId { get; set; }
 
     [Column(TemplateNodeIdName)]
-    [ForeignKey(typeof(TemplateDto), Column = TemplateDto.NodeIdName)]
+    [ForeignKey(typeof(TemplateDto), Column = TemplateDto.NodeIdColumnName)]
     public int TemplateNodeId { get; set; }
 
     [Column("IsDefault")]
