@@ -5,26 +5,29 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey(PrimaryKeyName)]
+[PrimaryKey(PrimaryKeyColumnName)]
 [ExplicitColumns]
 internal sealed class DocumentCultureVariationDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.DocumentCultureVariation;
-    public const string PrimaryKeyName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
+    public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
 
     // Public constants to bind properties between DTOs
     public const string PublishedColumnName = "published";
 
-    [Column(PrimaryKeyName)]
+    private const string LanguageIdName = "languageId";
+    private const string NodeIdName = "nodeId";
+
+    [Column(PrimaryKeyColumnName)]
     [PrimaryKeyColumn]
     public int Id { get; set; }
 
-    [Column("nodeId")]
+    [Column(NodeIdName)]
     [ForeignKey(typeof(NodeDto))]
-    [Index(IndexTypes.UniqueNonClustered, Name = "IX_" + TableName + "_NodeId", ForColumns = "nodeId,languageId")]
+    [Index(IndexTypes.UniqueNonClustered, Name = "IX_" + TableName + "_NodeId", ForColumns = $"{NodeIdName},{LanguageIdName}")]
     public int NodeId { get; set; }
 
-    [Column("languageId")]
+    [Column(LanguageIdName)]
     [ForeignKey(typeof(LanguageDto))]
     [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_LanguageId")]
     public int LanguageId { get; set; }

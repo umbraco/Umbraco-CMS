@@ -84,7 +84,7 @@ public class UmbracoDbContext : DbContext
 
         foreach (IMutableEntityType entity in modelBuilder.Model.GetEntityTypes())
         {
-            entity.SetTableName(Core.Constants.DatabaseSchema.Tables.TableNamePrefix + entity.GetTableName());
+            entity.SetTableName(Core.Constants.DatabaseSchema.TableNamePrefix + entity.GetTableName());
         }
     }
 }

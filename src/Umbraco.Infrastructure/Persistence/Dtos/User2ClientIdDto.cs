@@ -5,16 +5,17 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey(PrimaryKeyName, AutoIncrement = false)]
+[PrimaryKey(PrimaryKeyColumnName, AutoIncrement = false)]
 [ExplicitColumns]
 public class User2ClientIdDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.User2ClientId;
-    public const string PrimaryKeyName = "userId";
-    public const string ClientIdName = "clientId";
+    public const string PrimaryKeyColumnName = "userId";
 
-    [Column(PrimaryKeyName)]
-    [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_umbracoUser2ClientId", OnColumns = $"{PrimaryKeyName}, {ClientIdName}")]
+    private const string ClientIdName = "clientId";
+
+    [Column(PrimaryKeyColumnName)]
+    [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_umbracoUser2ClientId", OnColumns = $"{PrimaryKeyColumnName}, {ClientIdName}")]
     [ForeignKey(typeof(UserDto))]
     public int UserId { get; set; }
 

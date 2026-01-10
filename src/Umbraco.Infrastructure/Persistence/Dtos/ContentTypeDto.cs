@@ -5,23 +5,24 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey(PrimaryKeyName)]
+[PrimaryKey(PrimaryKeyColumnName)]
 [ExplicitColumns]
 internal class ContentTypeDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.ContentType;
-    public const string PrimaryKeyName = Constants.DatabaseSchema.Columns.PrimaryKeyNamePk;
-    public const string NodeIdName = Constants.DatabaseSchema.Columns.NodeIdName;
+    public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNamePk;
+    public const string NodeIdColumnName = Constants.DatabaseSchema.Columns.NodeIdName;
+
     private string? _alias;
 
     // Public constants to bind properties between DTOs
     public const string VariationsColumnName = "variations";
 
-    [Column(PrimaryKeyName)]
+    [Column(PrimaryKeyColumnName)]
     [PrimaryKeyColumn(IdentitySeed = 700)]
     public int PrimaryKey { get; set; }
 
-    [Column(NodeIdName)]
+    [Column(NodeIdColumnName)]
     [ForeignKey(typeof(NodeDto))]
     [Index(IndexTypes.UniqueNonClustered, Name = "IX_cmsContentType")]
     public int NodeId { get; set; }

@@ -5,16 +5,16 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey(PrimaryKeyName)]
+[PrimaryKey(PrimaryKeyColumnName)]
 [ExplicitColumns]
 internal sealed class RelationTypeDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.RelationType;
-    public const string PrimaryKeyName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
+    public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
 
     public const int NodeIdSeed = 10;
 
-    [Column(PrimaryKeyName)]
+    [Column(PrimaryKeyColumnName)]
     [PrimaryKeyColumn(IdentitySeed = NodeIdSeed)]
     public int Id { get; set; }
 

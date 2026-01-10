@@ -5,14 +5,14 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey(PrimaryKeyName, AutoIncrement = false)]
+[PrimaryKey(PrimaryKeyColumnName, AutoIncrement = false)]
 [ExplicitColumns]
 internal sealed class MemberDto
 {
     private const string TableName = Constants.DatabaseSchema.Tables.Member;
-    public const string PrimaryKeyName = Constants.DatabaseSchema.Columns.NodeIdName;
+    public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.NodeIdName;
 
-    [Column(PrimaryKeyName)]
+    [Column(PrimaryKeyColumnName)]
     [PrimaryKeyColumn(AutoIncrement = false)]
     [ForeignKey(typeof(ContentDto))]
     public int NodeId { get; set; }
@@ -76,10 +76,10 @@ internal sealed class MemberDto
     public DateTime? LastPasswordChangeDate { get; set; }
 
     [ResultColumn]
-    [Reference(ReferenceType.OneToOne, ReferenceMemberName = "NodeId")]
+    [Reference(ReferenceType.OneToOne, ReferenceMemberName = nameof(ContentDto.NodeId))]
     public ContentDto ContentDto { get; set; } = null!;
 
     [ResultColumn]
-    [Reference(ReferenceType.OneToOne, ReferenceMemberName = "NodeId")]
+    [Reference(ReferenceType.OneToOne, ReferenceMemberName = nameof(ContentVersionDto.NodeId))]
     public ContentVersionDto ContentVersionDto { get; set; } = null!;
 }

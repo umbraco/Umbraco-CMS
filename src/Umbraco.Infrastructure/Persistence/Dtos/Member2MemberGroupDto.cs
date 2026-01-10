@@ -5,16 +5,17 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey(PrimaryKeyName, AutoIncrement = false)]
+[PrimaryKey(PrimaryKeyColumnName, AutoIncrement = false)]
 [ExplicitColumns]
 internal sealed class Member2MemberGroupDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.Member2MemberGroup;
-    public const string PrimaryKeyName = "Member";
-    public const string MemberGroupName = "MemberGroup";
+    public const string PrimaryKeyColumnName = "Member";
 
-    [Column(PrimaryKeyName)]
-    [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_cmsMember2MemberGroup", OnColumns = $"{PrimaryKeyName}, {MemberGroupName}")]
+    private const string MemberGroupName = "MemberGroup";
+
+    [Column(PrimaryKeyColumnName)]
+    [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_cmsMember2MemberGroup", OnColumns = $"{PrimaryKeyColumnName}, {MemberGroupName}")]
     [ForeignKey(typeof(MemberDto))]
     public int Member { get; set; }
 
