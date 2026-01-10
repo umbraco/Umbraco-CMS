@@ -13,8 +13,6 @@ public class DictionaryDto // public as required to be accessible from Deploy fo
     public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNamePk;
     public const string UniqueIdColumnName = "id";
 
-    private const string ReferenceName = "UniqueId";
-
     [Column(PrimaryKeyColumnName)]
     [PrimaryKeyColumn]
     public int PrimaryKey { get; set; }
@@ -35,6 +33,6 @@ public class DictionaryDto // public as required to be accessible from Deploy fo
     public string Key { get; set; } = null!;
 
     [ResultColumn]
-    [Reference(ReferenceType.Many, ColumnName = ReferenceName, ReferenceMemberName = ReferenceName)]
+    [Reference(ReferenceType.Many, ColumnName = nameof(this.UniqueId), ReferenceMemberName = nameof(LanguageTextDto.UniqueId))]
     public List<LanguageTextDto> LanguageTextDtos { get; set; } = [];
 }

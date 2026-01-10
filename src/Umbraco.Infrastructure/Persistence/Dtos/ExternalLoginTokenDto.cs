@@ -41,6 +41,6 @@ internal sealed class ExternalLoginTokenDto
     public DateTime CreateDate { get; set; }
 
     [ResultColumn]
-    [Reference(ReferenceType.OneToOne, ColumnName = ReferenceColumnName)]
+    [Reference(ReferenceType.OneToOne, ColumnName = nameof(this.ExternalLoginId))]
     public ExternalLoginDto ExternalLoginDto { get; set; } = null!;
 }

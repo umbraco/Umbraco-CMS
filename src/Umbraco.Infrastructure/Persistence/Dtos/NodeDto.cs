@@ -15,7 +15,7 @@ public class NodeDto
     public const int NodeIdSeed = 1060;
 
     // Public constants to bind properties between DTOs
-    public const string IdColumnName = PrimaryKeyColumnName;
+    public const string NodeIdColumnName = PrimaryKeyColumnName;
     public const string KeyColumnName = Constants.DatabaseSchema.Columns.UniqueIdName;
     public const string ParentIdColumnName = "parentId";
     public const string SortOrderColumnName = "sortOrder";
@@ -31,7 +31,7 @@ public class NodeDto
 
     private int? _userId;
 
-    [Column(IdColumnName)]
+    [Column(NodeIdColumnName)]
     [PrimaryKeyColumn(IdentitySeed = NodeIdSeed)]
     public int NodeId { get; set; }
 
@@ -57,7 +57,7 @@ public class NodeDto
     public string Path { get; set; } = null!;
 
     [Column(SortOrderColumnName)]
-    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_ObjectType_trashed_sorted", ForColumns = $"{NodeObjectTypeColumnName},{TrashedColumnName},{SortOrderColumnName},{IdColumnName}", IncludeColumns = $"{UniqueIdColumnNameTypo},{ParentIdColumnName},{LevelColumnName},{PathColumnName},{UserIdColumnName},{TextColumnName},{CreateDateColumnName}")]
+    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_ObjectType_trashed_sorted", ForColumns = $"{NodeObjectTypeColumnName},{TrashedColumnName},{SortOrderColumnName},{NodeIdColumnName}", IncludeColumns = $"{UniqueIdColumnNameTypo},{ParentIdColumnName},{LevelColumnName},{PathColumnName},{UserIdColumnName},{TextColumnName},{CreateDateColumnName}")]
     public int SortOrder { get; set; }
 
     [Column(TrashedColumnName)]

@@ -23,13 +23,13 @@ public class ContentDto
     public int ContentTypeId { get; set; }
 
     [ResultColumn]
-    [Reference(ReferenceType.OneToOne, ColumnName = PrimaryKeyColumnName)]
+    [Reference(ReferenceType.OneToOne, ColumnName = nameof(this.NodeId))]
     public NodeDto NodeDto { get; set; } = null!;
 
     // although a content has many content versions,
     // they can only be loaded one by one (as several content),
     // so this here is a OneToOne reference
     [ResultColumn]
-    [Reference(ReferenceType.OneToOne, ReferenceMemberName = PrimaryKeyColumnName)]
+    [Reference(ReferenceType.OneToOne, ReferenceMemberName = nameof(ContentVersionDto.NodeId))]
     public ContentVersionDto ContentVersionDto { get; set; } = null!;
 }

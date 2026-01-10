@@ -80,7 +80,7 @@ internal class PropertyTypeDto
     public byte Variations { get; set; }
 
     [ResultColumn]
-    [Reference(ReferenceType.OneToOne, ColumnName = "DataTypeId")]
+    [Reference(ReferenceType.OneToOne, ColumnName = nameof(this.DataTypeId))]
     public DataTypeDto DataTypeDto { get; set; } = null!;
 
     [Column("UniqueId")]

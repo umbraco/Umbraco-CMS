@@ -76,7 +76,7 @@ internal sealed class PropertyDataDto
     public string? TextValue { get; set; }
 
     [ResultColumn]
-    [Reference(ReferenceType.OneToOne, ColumnName = ReferenceColumnName)]
+    [Reference(ReferenceType.OneToOne, ColumnName = nameof(this.PropertyTypeId))]
     public PropertyTypeDto? PropertyTypeDto { get; set; }
 
     [Ignore]
