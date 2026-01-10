@@ -19,7 +19,7 @@ internal sealed class PropertyDataDto
 
     private const string LanguageIdColumnName = "languageId";
     private const string SegmentColumnName = "segment";
-    private const string ReferenceColumnName = "PropertyTypeId"; // differs in casing from PropertyTypeIdColumnName!
+
     private decimal? _decimalValue;
 
     // pk, not used at the moment (never updating)
@@ -76,7 +76,7 @@ internal sealed class PropertyDataDto
     public string? TextValue { get; set; }
 
     [ResultColumn]
-    [Reference(ReferenceType.OneToOne, ColumnName = ReferenceColumnName)]
+    [Reference(ReferenceType.OneToOne, ColumnName = nameof(this.PropertyTypeId))]
     public PropertyTypeDto? PropertyTypeDto { get; set; }
 
     [Ignore]

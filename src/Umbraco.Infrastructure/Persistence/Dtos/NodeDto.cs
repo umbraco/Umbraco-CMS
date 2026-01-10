@@ -15,7 +15,12 @@ public class NodeDto
     public const int NodeIdSeed = 1060;
 
     // Public constants to bind properties between DTOs
+
+    /// <summary>
+    /// This actually represents NodeId but kept as Id for backward compatibility.
+    /// </summary>
     public const string IdColumnName = PrimaryKeyColumnName;
+
     public const string KeyColumnName = Constants.DatabaseSchema.Columns.UniqueIdName;
     public const string ParentIdColumnName = "parentId";
     public const string SortOrderColumnName = "sortOrder";

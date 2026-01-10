@@ -34,6 +34,6 @@ public class DataTypeDto
     public string? Configuration { get; set; }
 
     [ResultColumn]
-    [Reference(ReferenceType.OneToOne, ColumnName = "NodeId")]
+    [Reference(ReferenceType.OneToOne, ColumnName = nameof(this.NodeId))]
     public NodeDto NodeDto { get; set; } = null!;
 }
