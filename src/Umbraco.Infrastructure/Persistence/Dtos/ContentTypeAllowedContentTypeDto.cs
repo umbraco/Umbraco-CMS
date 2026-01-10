@@ -11,8 +11,7 @@ internal sealed class ContentTypeAllowedContentTypeDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.ContentChildType;
 
-    // ToDo: Here we have an incosistent column name in DatabaseSchema. It should be Constants.DatabaseSchema.Columns.PrimaryKeyNameId; ("id")
-    // For now we leave the databse schema as is to avoid breaking changes.
+    // To avoid any risk of casing bugs caused by inconsistencies between upgraded and new installs, we keep the casing "Id" here even though in other tables the usual casing is lower-case ("id").
     public const string PrimaryKeyColumnName = "Id";
     public const string NodeIdColumnName = Constants.DatabaseSchema.Columns.NodeIdName;
     public const string SortOrderColumnName = "SortOrder";
