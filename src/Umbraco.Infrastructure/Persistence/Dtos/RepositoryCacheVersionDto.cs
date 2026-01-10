@@ -5,14 +5,14 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey(PrimaryKeyName, AutoIncrement = false)]
+[PrimaryKey(PrimaryKeyColumnName, AutoIncrement = false)]
 [ExplicitColumns]
 public class RepositoryCacheVersionDto
 {
     internal const string TableName = Constants.DatabaseSchema.Tables.RepositoryCacheVersion;
-    public const string PrimaryKeyName = "identifier";
+    public const string PrimaryKeyColumnName = "identifier";
 
-    [Column(PrimaryKeyName)]
+    [Column(PrimaryKeyColumnName)]
     [Length(256)]
     [PrimaryKeyColumn(Name = "PK_umbracoRepositoryCacheVersion", AutoIncrement = false, Clustered = true)]
     public required string Identifier { get; set; }

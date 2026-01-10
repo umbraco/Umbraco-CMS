@@ -9,18 +9,19 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 public class Webhook2HeadersDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.Webhook2Headers;
-    public const string KeyName = "Key";
-    public const string ValueName = "Value";
-    public const string WebhookIdName = "WebhookId";
 
-    [Column(WebhookIdName)]
-    [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_headers2WebhookDto", OnColumns = $"{WebhookIdName}, {KeyName}")]
+    private const string WebhookIdColumnName = "webhookId";
+    private const string KeyColumnName = "Key";
+    private const string ValueColumnName = "Value";
+
+    [Column(WebhookIdColumnName)]
+    [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_headers2WebhookDto", OnColumns = $"{WebhookIdColumnName}, {KeyColumnName}")]
     [ForeignKey(typeof(WebhookDto), OnDelete = Rule.Cascade)]
     public int WebhookId { get; set; }
 
-    [Column(KeyName)]
+    [Column(KeyColumnName)]
     public string Key { get; set; } = string.Empty;
 
-    [Column(ValueName)]
+    [Column(ValueColumnName)]
     public string Value { get; set; } = string.Empty;
 }
