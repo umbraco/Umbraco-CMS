@@ -447,7 +447,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         private sealed class UnionHelperDto
         {
-            public const string PrimaryKeyName = Core.Constants.DatabaseSchema.PrimaryKeyNameId;
+            public const string PrimaryKeyName = Core.Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
 
             [Column(PrimaryKeyName)] public int Id { get; set; }
 

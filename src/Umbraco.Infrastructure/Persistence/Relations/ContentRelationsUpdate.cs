@@ -162,7 +162,7 @@ internal sealed class ContentRelationsUpdate :
 
     private sealed class NodeIdKey
     {
-        public const string PrimaryKeyName = Constants.DatabaseSchema.PrimaryKeyNameId;
+        public const string PrimaryKeyName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
         [Column(PrimaryKeyName)]
         public int NodeId { get; set; }
 
