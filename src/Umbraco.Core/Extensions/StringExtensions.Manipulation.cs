@@ -15,12 +15,17 @@ public static partial class StringExtensions
     private const char DefaultEscapedStringEscapeChar = '\\';
 
     /// <summary>
-    ///     Removes new lines and tabs
+    /// Removes all whitespace characters including new lines, tabs, and spaces.
     /// </summary>
-    /// <param name="txt"></param>
-    /// <returns></returns>
+    /// <param name="txt">The string to strip whitespace from.</param>
+    /// <returns>The string with all whitespace removed.</returns>
     public static string StripWhitespace(this string txt) => Regex.Replace(txt, @"\s", string.Empty);
 
+    /// <summary>
+    /// Strips the file extension from a file name.
+    /// </summary>
+    /// <param name="fileName">The file name to process.</param>
+    /// <returns>The file name without the extension, or the original file name if no valid extension is found.</returns>
     public static string StripFileExtension(this string fileName)
     {
         // filenames cannot contain line breaks
@@ -48,10 +53,10 @@ public static partial class StringExtensions
     }
 
     /// <summary>
-    ///     Determines the extension of the path or URL
+    /// Determines the extension of the path or URL.
     /// </summary>
-    /// <param name="file"></param>
-    /// <returns>Extension of the file</returns>
+    /// <param name="file">The file path or URL to extract the extension from.</param>
+    /// <returns>The file extension including the leading period, or an empty string if no extension is found.</returns>
     public static string GetFileExtension(this string file)
     {
         // Find any characters between the last . and the start of a query string or the end of the string
@@ -62,6 +67,12 @@ public static partial class StringExtensions
             : string.Empty;
     }
 
+    /// <summary>
+    /// Replaces all non-alphanumeric characters in a string with the specified replacement string.
+    /// </summary>
+    /// <param name="input">The string to process.</param>
+    /// <param name="replacement">The string to replace non-alphanumeric characters with.</param>
+    /// <returns>The string with all non-alphanumeric characters replaced.</returns>
     public static string ReplaceNonAlphanumericChars(this string input, string replacement)
     {
         // any character that is not alphanumeric, convert to a hyphen
@@ -74,6 +85,12 @@ public static partial class StringExtensions
         return mName;
     }
 
+    /// <summary>
+    /// Replaces all non-alphanumeric characters in a string with the specified replacement character.
+    /// </summary>
+    /// <param name="input">The string to process.</param>
+    /// <param name="replacement">The character to replace non-alphanumeric characters with.</param>
+    /// <returns>The string with all non-alphanumeric characters replaced.</returns>
     public static string ReplaceNonAlphanumericChars(this string input, char replacement)
     {
         var chars = input.ToCharArray();
@@ -88,6 +105,12 @@ public static partial class StringExtensions
         return new string(chars);
     }
 
+    /// <summary>
+    /// Returns a new string with all characters from the specified exclusion set removed.
+    /// </summary>
+    /// <param name="str">The string to filter.</param>
+    /// <param name="toExclude">The set of characters to remove from the string.</param>
+    /// <returns>The filtered string with excluded characters removed.</returns>
     public static string ExceptChars(this string str, HashSet<char> toExclude)
     {
         var sb = new StringBuilder(str.Length);
@@ -100,14 +123,14 @@ public static partial class StringExtensions
     }
 
     /// <summary>
-    ///     This will append the query string to the URL
+    /// Appends one or more query strings to a URL.
     /// </summary>
-    /// <param name="url"></param>
-    /// <param name="queryStrings"></param>
-    /// <returns></returns>
+    /// <param name="url">The base URL to append query strings to.</param>
+    /// <param name="queryStrings">The query strings to append.</param>
+    /// <returns>The URL with the query strings appended.</returns>
     /// <remarks>
-    ///     This methods ensures that the resulting URL is structured correctly, that there's only one '?' and that things are
-    ///     delimited properly with '&amp;'
+    /// This method ensures that the resulting URL is structured correctly, that there is only one '?' and that
+    /// parameters are delimited properly with '&amp;'.
     /// </remarks>
     public static string AppendQueryStringToUrl(this string url, params string[] queryStrings)
     {
@@ -128,7 +151,11 @@ public static partial class StringExtensions
         return url + string.Join("&", nonEmpty).EnsureStartsWith('?');
     }
 
-    // this is from SqlMetal and just makes it a bit of fun to allow pluralization
+    /// <summary>
+    /// Converts a singular noun to its plural form using common English pluralisation rules.
+    /// </summary>
+    /// <param name="name">The singular noun to pluralise.</param>
+    /// <returns>The plural form of the noun.</returns>
     public static string MakePluralName(this string name)
     {
         if (name.EndsWith("x", StringComparison.OrdinalIgnoreCase) ||
@@ -156,6 +183,11 @@ public static partial class StringExtensions
         return name;
     }
 
+    /// <summary>
+    /// Determines whether the specified character is a vowel (A, E, I, O, U, Y).
+    /// </summary>
+    /// <param name="c">The character to check.</param>
+    /// <returns><c>true</c> if the character is a vowel; otherwise, <c>false</c>.</returns>
     public static bool IsVowel(this char c)
     {
         switch (c)
@@ -179,12 +211,14 @@ public static partial class StringExtensions
     }
 
     /// <summary>
-    ///     Trims the specified value from a string; accepts a string input whereas the in-built implementation only accepts
-    ///     char or char[].
+    /// Trims the specified string from both the start and end of the value.
     /// </summary>
-    /// <param name="value">The value.</param>
-    /// <param name="forRemoving">For removing.</param>
-    /// <returns></returns>
+    /// <param name="value">The string to trim.</param>
+    /// <param name="forRemoving">The string to remove from both ends.</param>
+    /// <returns>The trimmed string.</returns>
+    /// <remarks>
+    /// This method accepts a string input whereas the built-in implementation only accepts char or char[].
+    /// </remarks>
     public static string Trim(this string value, string forRemoving)
     {
         if (string.IsNullOrEmpty(value))
@@ -195,6 +229,12 @@ public static partial class StringExtensions
         return value.TrimEnd(forRemoving).TrimStart(forRemoving);
     }
 
+    /// <summary>
+    /// Trims the specified string from the end of the value.
+    /// </summary>
+    /// <param name="value">The string to trim.</param>
+    /// <param name="forRemoving">The string to remove from the end.</param>
+    /// <returns>The trimmed string.</returns>
     public static string TrimEnd(this string value, string forRemoving)
     {
         if (string.IsNullOrEmpty(value))
@@ -215,6 +255,12 @@ public static partial class StringExtensions
         return value;
     }
 
+    /// <summary>
+    /// Trims the specified string from the start of the value.
+    /// </summary>
+    /// <param name="value">The string to trim.</param>
+    /// <param name="forRemoving">The string to remove from the start.</param>
+    /// <returns>The trimmed string.</returns>
     public static string TrimStart(this string value, string forRemoving)
     {
         if (string.IsNullOrEmpty(value))
@@ -235,6 +281,12 @@ public static partial class StringExtensions
         return value;
     }
 
+    /// <summary>
+    /// Ensures that the string starts with the specified string.
+    /// </summary>
+    /// <param name="input">The string to check.</param>
+    /// <param name="toStartWith">The string that the input should start with.</param>
+    /// <returns>The input string if it already starts with the specified value; otherwise, the value prepended to the input.</returns>
     public static string EnsureStartsWith(this string input, string toStartWith)
     {
         if (input.StartsWith(toStartWith))
@@ -245,19 +297,39 @@ public static partial class StringExtensions
         return toStartWith + input.TrimStart(toStartWith);
     }
 
+    /// <summary>
+    /// Ensures that the string starts with the specified character.
+    /// </summary>
+    /// <param name="input">The string to check.</param>
+    /// <param name="value">The character that the input should start with.</param>
+    /// <returns>The input string if it already starts with the specified character; otherwise, the character prepended to the input.</returns>
     public static string EnsureStartsWith(this string input, char value) =>
         input.StartsWith(value.ToString(CultureInfo.InvariantCulture)) ? input : value + input;
 
+    /// <summary>
+    /// Ensures that the string ends with the specified character.
+    /// </summary>
+    /// <param name="input">The string to check.</param>
+    /// <param name="value">The character that the input should end with.</param>
+    /// <returns>The input string if it already ends with the specified character; otherwise, the character appended to the input.</returns>
     public static string EnsureEndsWith(this string input, char value) =>
         input.EndsWith(value.ToString(CultureInfo.InvariantCulture)) ? input : input + value;
 
+    /// <summary>
+    /// Ensures that the string ends with the specified string.
+    /// </summary>
+    /// <param name="input">The string to check.</param>
+    /// <param name="toEndWith">The string that the input should end with.</param>
+    /// <returns>The input string if it already ends with the specified value; otherwise, the value appended to the input.</returns>
     public static string EnsureEndsWith(this string input, string toEndWith) =>
         input.EndsWith(toEndWith.ToString(CultureInfo.InvariantCulture)) ? input : input + toEndWith;
 
-    /// <summary>The to delimited list.</summary>
-    /// <param name="list">The list.</param>
-    /// <param name="delimiter">The delimiter.</param>
-    /// <returns>the list</returns>
+    /// <summary>
+    /// Splits a delimited string into a list of strings.
+    /// </summary>
+    /// <param name="list">The delimited string to split.</param>
+    /// <param name="delimiter">The delimiter used to separate items. Defaults to comma.</param>
+    /// <returns>A list of strings from the delimited input, with empty entries removed and items trimmed.</returns>
     [SuppressMessage("Microsoft.Design", "CA1026:DefaultParametersShouldNotBeUsed", Justification = "By design")]
     public static IList<string> ToDelimitedList(this string list, string delimiter = ",")
     {
@@ -269,10 +341,10 @@ public static partial class StringExtensions
     }
 
     /// <summary>
-    ///     Strips all HTML from a string.
+    /// Strips all HTML tags from a string.
     /// </summary>
-    /// <param name="text">The text.</param>
-    /// <returns>Returns the string without any HTML tags.</returns>
+    /// <param name="text">The text to strip HTML from.</param>
+    /// <returns>The string with all HTML tags removed.</returns>
     public static string StripHtml(this string text)
     {
         const string pattern = @"<(.|\n)*?>";
@@ -280,10 +352,10 @@ public static partial class StringExtensions
     }
 
     /// <summary>
-    ///     Ensures that the folder path ends with a DirectorySeparatorChar
+    /// Ensures that the folder path ends with a directory separator character.
     /// </summary>
-    /// <param name="currentFolder"></param>
-    /// <returns></returns>
+    /// <param name="currentFolder">The folder path to normalise.</param>
+    /// <returns>The folder path with a trailing directory separator character.</returns>
     public static string NormaliseDirectoryPath(this string currentFolder)
     {
         currentFolder = currentFolder
@@ -293,12 +365,12 @@ public static partial class StringExtensions
     }
 
     /// <summary>
-    ///     Truncates the specified text string.
+    /// Truncates a string to the specified maximum length and appends a suffix.
     /// </summary>
-    /// <param name="text">The text.</param>
-    /// <param name="maxLength">Length of the max.</param>
-    /// <param name="suffix">The suffix.</param>
-    /// <returns></returns>
+    /// <param name="text">The text to truncate.</param>
+    /// <param name="maxLength">The maximum length of the resulting string including the suffix.</param>
+    /// <param name="suffix">The suffix to append when truncation occurs. Defaults to "...".</param>
+    /// <returns>The truncated string with suffix, or the original string if it does not exceed the maximum length.</returns>
     public static string Truncate(this string text, int maxLength, string suffix = "...")
     {
         // replaces the truncated string to a ...
@@ -329,15 +401,17 @@ public static partial class StringExtensions
     }
 
     /// <summary>
-    ///     Strips carrage returns and line feeds from the specified text.
+    /// Strips carriage returns and line feeds from the specified text.
     /// </summary>
-    /// <param name="input">The input.</param>
-    /// <returns></returns>
+    /// <param name="input">The string to process.</param>
+    /// <returns>The string with all carriage returns and line feeds removed.</returns>
     public static string StripNewLines(this string input) => input.Replace("\r", string.Empty).Replace("\n", string.Empty);
 
     /// <summary>
-    ///     Converts to single line by replacing line breaks with spaces.
+    /// Converts a multi-line string to a single line by replacing line breaks with spaces.
     /// </summary>
+    /// <param name="text">The text to convert.</param>
+    /// <returns>The text as a single line, or the original text if it is null or empty.</returns>
     public static string ToSingleLine(this string text)
     {
         if (string.IsNullOrEmpty(text))
@@ -352,11 +426,12 @@ public static partial class StringExtensions
     }
 
     /// <summary>
-    ///     Returns a new string in which all occurrences of specified strings are replaced by other specified strings.
+    /// Returns a new string in which all occurrences of specified strings are replaced by other specified strings.
     /// </summary>
     /// <param name="text">The string to filter.</param>
-    /// <param name="replacements">The replacements definition.</param>
-    /// <returns>The filtered string.</returns>
+    /// <param name="replacements">A dictionary mapping strings to find to their replacement values.</param>
+    /// <returns>The filtered string with all replacements applied.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when text or replacements is null.</exception>
     public static string ReplaceMany(this string text, IDictionary<string, string> replacements)
     {
         if (text == null)
@@ -378,12 +453,13 @@ public static partial class StringExtensions
     }
 
     /// <summary>
-    ///     Returns a new string in which all occurrences of specified characters are replaced by a specified character.
+    /// Returns a new string in which all occurrences of specified characters are replaced by a specified character.
     /// </summary>
     /// <param name="text">The string to filter.</param>
     /// <param name="chars">The characters to replace.</param>
     /// <param name="replacement">The replacement character.</param>
-    /// <returns>The filtered string.</returns>
+    /// <returns>The filtered string with all specified characters replaced.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when text or chars is null.</exception>
     public static string ReplaceMany(this string text, char[] chars, char replacement)
     {
         if (text == null)
@@ -405,13 +481,13 @@ public static partial class StringExtensions
     }
 
     /// <summary>
-    ///     Returns a new string in which only the first occurrence of a specified string is replaced by a specified
-    ///     replacement string.
+    /// Returns a new string in which only the first occurrence of a specified string is replaced by a specified replacement string.
     /// </summary>
     /// <param name="text">The string to filter.</param>
-    /// <param name="search">The string to replace.</param>
+    /// <param name="search">The string to search for.</param>
     /// <param name="replace">The replacement string.</param>
-    /// <returns>The filtered string.</returns>
+    /// <returns>The filtered string with the first occurrence replaced.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when text is null.</exception>
     public static string ReplaceFirst(this string text, string search, string replace)
     {
         if (text == null)
@@ -431,15 +507,14 @@ public static partial class StringExtensions
     }
 
     /// <summary>
-    ///     An extension method that returns a new string in which all occurrences of a
-    ///     specified string in the current instance are replaced with another specified string.
-    ///     StringComparison specifies the type of search to use for the specified string.
+    /// Returns a new string in which all occurrences of a specified string in the current instance are replaced with
+    /// another specified string, using the specified comparison type.
     /// </summary>
-    /// <param name="source">Current instance of the string</param>
-    /// <param name="oldString">Specified string to replace</param>
-    /// <param name="newString">Specified string to inject</param>
-    /// <param name="stringComparison">String Comparison object to specify search type</param>
-    /// <returns>Updated string</returns>
+    /// <param name="source">The current string instance.</param>
+    /// <param name="oldString">The string to replace.</param>
+    /// <param name="newString">The replacement string.</param>
+    /// <param name="stringComparison">The type of string comparison to use when searching.</param>
+    /// <returns>The string with all occurrences replaced.</returns>
     public static string Replace(this string source, string oldString, string newString, StringComparison stringComparison)
     {
         // This initialization ensures the first check starts at index zero of the source. On successive checks for
@@ -460,6 +535,11 @@ public static partial class StringExtensions
         return source;
     }
 
+    /// <summary>
+    /// Escapes all regular expression special characters in the string by prefixing them with a backslash.
+    /// </summary>
+    /// <param name="text">The string to escape.</param>
+    /// <returns>The string with all regex special characters escaped.</returns>
     public static string EscapeRegexSpecialCharacters(this string text)
     {
         var regexSpecialCharacters = new Dictionary<string, string>
@@ -485,10 +565,10 @@ public static partial class StringExtensions
     }
 
     /// <summary>
-    ///     Converts a file name to a friendly name for a content item
+    /// Converts a file name to a friendly name suitable for content items.
     /// </summary>
-    /// <param name="fileName"></param>
-    /// <returns></returns>
+    /// <param name="fileName">The file name to convert.</param>
+    /// <returns>A friendly name with the extension stripped, underscores and dashes converted to spaces, and title case applied.</returns>
     public static string ToFriendlyName(this string fileName)
     {
         // strip the file extension
@@ -511,7 +591,7 @@ public static partial class StringExtensions
     // FORMAT STRINGS
 
     /// <summary>
-    ///     Cleans a string to produce a string that can safely be used in an alias.
+    /// Cleans a string to produce a string that can safely be used in an alias.
     /// </summary>
     /// <param name="alias">The text to filter.</param>
     /// <param name="shortStringHelper">The short string helper.</param>
@@ -520,11 +600,11 @@ public static partial class StringExtensions
         shortStringHelper?.CleanStringForSafeAlias(alias) ?? string.Empty;
 
     /// <summary>
-    ///     Cleans a string to produce a string that can safely be used in an alias.
+    /// Cleans a string to produce a string that can safely be used in an alias.
     /// </summary>
     /// <param name="alias">The text to filter.</param>
-    /// <param name="camel">A value indicating that we want to camel-case the alias.</param>
     /// <param name="shortStringHelper">The short string helper.</param>
+    /// <param name="camel">A value indicating whether to camel-case the alias.</param>
     /// <returns>The safe alias.</returns>
     public static string ToSafeAlias(this string alias, IShortStringHelper shortStringHelper, bool camel)
     {
@@ -538,11 +618,11 @@ public static partial class StringExtensions
     }
 
     /// <summary>
-    ///     Cleans a string, in the context of a specified culture, to produce a string that can safely be used in an alias.
+    /// Cleans a string, in the context of a specified culture, to produce a string that can safely be used in an alias.
     /// </summary>
     /// <param name="alias">The text to filter.</param>
-    /// <param name="culture">The culture.</param>
     /// <param name="shortStringHelper">The short string helper.</param>
+    /// <param name="culture">The culture code.</param>
     /// <returns>The safe alias.</returns>
     public static string ToSafeAlias(this string alias, IShortStringHelper shortStringHelper, string culture) =>
         shortStringHelper.CleanStringForSafeAlias(alias, culture);
@@ -550,11 +630,13 @@ public static partial class StringExtensions
     // the new methods to get a url segment
 
     /// <summary>
-    ///     Cleans a string to produce a string that can safely be used in an url segment.
+    /// Cleans a string to produce a string that can safely be used in a URL segment.
     /// </summary>
     /// <param name="text">The text to filter.</param>
     /// <param name="shortStringHelper">The short string helper.</param>
-    /// <returns>The safe url segment.</returns>
+    /// <returns>The safe URL segment.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when text is null.</exception>
+    /// <exception cref="ArgumentException">Thrown when text is empty or consists only of white-space characters.</exception>
     public static string ToUrlSegment(this string text, IShortStringHelper shortStringHelper)
     {
         if (text == null)
@@ -573,13 +655,14 @@ public static partial class StringExtensions
     }
 
     /// <summary>
-    ///     Cleans a string, in the context of a specified culture, to produce a string that can safely be used in an url
-    ///     segment.
+    /// Cleans a string, in the context of a specified culture, to produce a string that can safely be used in a URL segment.
     /// </summary>
     /// <param name="text">The text to filter.</param>
     /// <param name="shortStringHelper">The short string helper.</param>
-    /// <param name="culture">The culture.</param>
-    /// <returns>The safe url segment.</returns>
+    /// <param name="culture">The culture code.</param>
+    /// <returns>The safe URL segment.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when text is null.</exception>
+    /// <exception cref="ArgumentException">Thrown when text is empty or consists only of white-space characters.</exception>
     public static string ToUrlSegment(this string text, IShortStringHelper shortStringHelper, string? culture)
     {
         if (text == null)
@@ -598,57 +681,57 @@ public static partial class StringExtensions
     }
 
     /// <summary>
-    ///     Cleans a string.
+    /// Cleans a string according to the specified string type.
     /// </summary>
     /// <param name="text">The text to clean.</param>
     /// <param name="shortStringHelper">The short string helper.</param>
     /// <param name="stringType">
-    ///     A flag indicating the target casing and encoding of the string. By default,
-    ///     strings are cleaned up to camelCase and Ascii.
+    /// A flag indicating the target casing and encoding of the string. By default,
+    /// strings are cleaned up to camelCase and ASCII.
     /// </param>
-    /// <returns>The clean string.</returns>
-    /// <remarks>The string is cleaned in the context of the ICurrent.ShortStringHelper default culture.</remarks>
+    /// <returns>The cleaned string.</returns>
+    /// <remarks>The string is cleaned in the context of the short string helper's default culture.</remarks>
     public static string ToCleanString(this string text, IShortStringHelper shortStringHelper, CleanStringType stringType) => shortStringHelper.CleanString(text, stringType);
 
     /// <summary>
-    ///     Cleans a string, using a specified separator.
+    /// Cleans a string according to the specified string type, using a specified separator.
     /// </summary>
     /// <param name="text">The text to clean.</param>
     /// <param name="shortStringHelper">The short string helper.</param>
     /// <param name="stringType">
-    ///     A flag indicating the target casing and encoding of the string. By default,
-    ///     strings are cleaned up to camelCase and Ascii.
+    /// A flag indicating the target casing and encoding of the string. By default,
+    /// strings are cleaned up to camelCase and ASCII.
     /// </param>
-    /// <param name="separator">The separator.</param>
-    /// <returns>The clean string.</returns>
-    /// <remarks>The string is cleaned in the context of the ICurrent.ShortStringHelper default culture.</remarks>
+    /// <param name="separator">The separator character to use.</param>
+    /// <returns>The cleaned string.</returns>
+    /// <remarks>The string is cleaned in the context of the short string helper's default culture.</remarks>
     public static string ToCleanString(this string text, IShortStringHelper shortStringHelper, CleanStringType stringType, char separator) => shortStringHelper.CleanString(text, stringType, separator);
 
     /// <summary>
-    ///     Cleans a string in the context of a specified culture.
+    /// Cleans a string according to the specified string type, in the context of a specified culture.
     /// </summary>
     /// <param name="text">The text to clean.</param>
     /// <param name="shortStringHelper">The short string helper.</param>
     /// <param name="stringType">
-    ///     A flag indicating the target casing and encoding of the string. By default,
-    ///     strings are cleaned up to camelCase and Ascii.
+    /// A flag indicating the target casing and encoding of the string. By default,
+    /// strings are cleaned up to camelCase and ASCII.
     /// </param>
-    /// <param name="culture">The culture.</param>
-    /// <returns>The clean string.</returns>
+    /// <param name="culture">The culture code.</param>
+    /// <returns>The cleaned string.</returns>
     public static string ToCleanString(this string text, IShortStringHelper shortStringHelper, CleanStringType stringType, string culture) => shortStringHelper.CleanString(text, stringType, culture);
 
     /// <summary>
-    ///     Cleans a string in the context of a specified culture, using a specified separator.
+    /// Cleans a string according to the specified string type, in the context of a specified culture, using a specified separator.
     /// </summary>
     /// <param name="text">The text to clean.</param>
     /// <param name="shortStringHelper">The short string helper.</param>
     /// <param name="stringType">
-    ///     A flag indicating the target casing and encoding of the string. By default,
-    ///     strings are cleaned up to camelCase and Ascii.
+    /// A flag indicating the target casing and encoding of the string. By default,
+    /// strings are cleaned up to camelCase and ASCII.
     /// </param>
-    /// <param name="separator">The separator.</param>
-    /// <param name="culture">The culture.</param>
-    /// <returns>The clean string.</returns>
+    /// <param name="separator">The separator character to use.</param>
+    /// <param name="culture">The culture code.</param>
+    /// <returns>The cleaned string.</returns>
     public static string ToCleanString(this string text, IShortStringHelper shortStringHelper, CleanStringType stringType, char separator, string culture) =>
         shortStringHelper.CleanString(text, stringType, separator, culture);
 
@@ -656,21 +739,20 @@ public static partial class StringExtensions
     // other helpers may not. DefaultCurrent.ShortStringHelper produces better, but non-compatible, results.
 
     /// <summary>
-    ///     Splits a Pascal cased string into a phrase separated by spaces.
+    /// Splits a Pascal-cased string into a phrase separated by spaces.
     /// </summary>
     /// <param name="phrase">The text to split.</param>
-    /// <param name="shortStringHelper"></param>
-    /// <returns>The split text.</returns>
+    /// <param name="shortStringHelper">The short string helper.</param>
+    /// <returns>The split text with spaces between words.</returns>
     public static string SplitPascalCasing(this string phrase, IShortStringHelper shortStringHelper) =>
         shortStringHelper.SplitPascalCasing(phrase, ' ');
 
     /// <summary>
-    ///     Cleans a string, in the context of the invariant culture, to produce a string that can safely be used as a
-    ///     filename,
-    ///     both internally (on disk) and externally (as a url).
+    /// Cleans a string, in the context of the invariant culture, to produce a string that can safely be used as a filename,
+    /// both internally (on disk) and externally (as a URL).
     /// </summary>
     /// <param name="text">The text to filter.</param>
-    /// <param name="shortStringHelper"></param>
+    /// <param name="shortStringHelper">The short string helper.</param>
     /// <returns>The safe filename.</returns>
     public static string ToSafeFileName(this string text, IShortStringHelper shortStringHelper) =>
         shortStringHelper.CleanStringForSafeFileName(text);
@@ -680,28 +762,34 @@ public static partial class StringExtensions
     // plugging string extensions here to be 99% compatible
     // the only diff. is with numbers, Number6Is was "Number6 Is", and the new string helper does it too,
     // but the legacy one does "Number6Is"... assuming it is not a big deal.
+
+    /// <summary>
+    /// Splits a Pascal-cased string into words separated by spaces and converts the first character to uppercase.
+    /// </summary>
+    /// <param name="phrase">The phrase to process.</param>
+    /// <param name="shortStringHelper">The short string helper.</param>
+    /// <returns>The phrase with words separated by spaces and first character in uppercase.</returns>
     internal static string SpaceCamelCasing(this string phrase, IShortStringHelper shortStringHelper) =>
         phrase.Length < 2 ? phrase : phrase.SplitPascalCasing(shortStringHelper).ToFirstUpperInvariant();
 
     /// <summary>
-    ///     Cleans a string, in the context of the invariant culture, to produce a string that can safely be used as a
-    ///     filename,
-    ///     both internally (on disk) and externally (as a url).
+    /// Cleans a string, in the context of a specified culture, to produce a string that can safely be used as a filename,
+    /// both internally (on disk) and externally (as a URL).
     /// </summary>
     /// <param name="text">The text to filter.</param>
-    /// <param name="shortStringHelper"></param>
-    /// <param name="culture">The culture.</param>
+    /// <param name="shortStringHelper">The short string helper.</param>
+    /// <param name="culture">The culture code.</param>
     /// <returns>The safe filename.</returns>
     public static string ToSafeFileName(this string text, IShortStringHelper shortStringHelper, string culture) =>
         shortStringHelper.CleanStringForSafeFileName(text, culture);
 
     /// <summary>
-    ///     Splits a string with an escape character that allows for the split character to exist in a string
+    /// Splits a string on a specified character while supporting an escape character to include the split character in values.
     /// </summary>
-    /// <param name="value">The string to split</param>
-    /// <param name="splitChar">The character to split on</param>
-    /// <param name="escapeChar">The character which can be used to escape the character to split on</param>
-    /// <returns>The string split into substrings delimited by the split character</returns>
+    /// <param name="value">The string to split.</param>
+    /// <param name="splitChar">The character to split on.</param>
+    /// <param name="escapeChar">The character used to escape the split character. Defaults to backslash.</param>
+    /// <returns>An enumerable of substrings delimited by the split character, with escape sequences resolved.</returns>
     public static IEnumerable<string> EscapedSplit(this string value, char splitChar, char escapeChar = DefaultEscapedStringEscapeChar)
     {
         if (value == null)

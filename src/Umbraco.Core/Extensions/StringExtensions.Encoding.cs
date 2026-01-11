@@ -21,6 +21,11 @@ public static partial class StringExtensions
         }
     }
 
+    /// <summary>
+    /// Encodes a string for safe use within JavaScript code by escaping special characters.
+    /// </summary>
+    /// <param name="s">The string to encode.</param>
+    /// <returns>The JavaScript-encoded string with special characters escaped.</returns>
     public static string EncodeJsString(this string s)
     {
         var sb = new StringBuilder();
@@ -68,10 +73,11 @@ public static partial class StringExtensions
     }
 
     /// <summary>
-    ///     Encodes as GUID.
+    /// Encodes a string as a GUID by converting it to hexadecimal and parsing as a GUID.
     /// </summary>
-    /// <param name="input">The input.</param>
-    /// <returns></returns>
+    /// <param name="input">The string to encode.</param>
+    /// <returns>A GUID representation of the string, or <see cref="Guid.Empty"/> if conversion fails.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the input is null or whitespace.</exception>
     public static Guid EncodeAsGuid(this string input)
     {
         if (string.IsNullOrWhiteSpace(input))
@@ -86,10 +92,10 @@ public static partial class StringExtensions
     }
 
     /// <summary>
-    ///     Converts to hex.
+    /// Converts a string to its hexadecimal representation.
     /// </summary>
-    /// <param name="input">The input.</param>
-    /// <returns></returns>
+    /// <param name="input">The string to convert.</param>
+    /// <returns>The hexadecimal representation of the string, or an empty string if the input is null or empty.</returns>
     public static string ConvertToHex(this string input)
     {
         if (string.IsNullOrEmpty(input))
@@ -106,6 +112,11 @@ public static partial class StringExtensions
         return sb.ToString();
     }
 
+    /// <summary>
+    /// Decodes a hexadecimal string back to its original string representation.
+    /// </summary>
+    /// <param name="hexValue">The hexadecimal string to decode.</param>
+    /// <returns>The decoded string.</returns>
     public static string DecodeFromHex(this string hexValue)
     {
         var strValue = string.Empty;
@@ -119,10 +130,11 @@ public static partial class StringExtensions
     }
 
     /// <summary>
-    ///     Encodes a string to a safe URL base64 string
+    /// Encodes a string to a URL-safe base64 string.
     /// </summary>
-    /// <param name="input"></param>
-    /// <returns></returns>
+    /// <param name="input">The string to encode.</param>
+    /// <returns>The URL-safe base64 encoded string.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the input is null.</exception>
     public static string ToUrlBase64(this string input)
     {
         if (input == null)
@@ -141,10 +153,11 @@ public static partial class StringExtensions
     }
 
     /// <summary>
-    ///     Decodes a URL safe base64 string back
+    /// Decodes a URL-safe base64 string back to its original string representation.
     /// </summary>
-    /// <param name="input"></param>
-    /// <returns></returns>
+    /// <param name="input">The URL-safe base64 string to decode.</param>
+    /// <returns>The decoded string, or null if decoding fails.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the input is null.</exception>
     public static string? FromUrlBase64(this string input)
     {
         if (input == null)
@@ -166,35 +179,34 @@ public static partial class StringExtensions
     }
 
     /// <summary>
-    ///     Generates a hash of a string based on the FIPS compliance setting.
+    /// Generates a hash of a string using SHA1.
     /// </summary>
-    /// <param name="str">Refers to itself</param>
-    /// <returns>The hashed string</returns>
+    /// <param name="str">The string to hash.</param>
+    /// <returns>The SHA1 hash of the string as a hexadecimal string.</returns>
     public static string GenerateHash(this string str) => str.ToSHA1();
 
     /// <summary>
-    ///     Generate a hash of a string based on the specified hash algorithm.
+    /// Generates a hash of a string using the specified hash algorithm type.
     /// </summary>
     /// <typeparam name="T">The hash algorithm implementation to use.</typeparam>
-    /// <param name="str">The <see cref="string" /> to hash.</param>
-    /// <returns>
-    ///     The hashed string.
-    /// </returns>
+    /// <param name="str">The string to hash.</param>
+    /// <returns>The hash of the string as a hexadecimal string.</returns>
     public static string GenerateHash<T>(this string str)
         where T : HashAlgorithm => str.GenerateHash(typeof(T).FullName);
 
     /// <summary>
-    ///     Converts the string to SHA1
+    /// Converts a string to its SHA1 hash representation.
     /// </summary>
-    /// <param name="stringToConvert">refers to itself</param>
-    /// <returns>The SHA1 hashed string</returns>
+    /// <param name="stringToConvert">The string to convert.</param>
+    /// <returns>The SHA1 hash of the string as a hexadecimal string.</returns>
     public static string ToSHA1(this string stringToConvert) => stringToConvert.GenerateHash("SHA1");
 
     /// <summary>
-    ///     Decodes a string that was encoded with UrlTokenEncode
+    /// Decodes a string that was encoded with <see cref="UrlTokenEncode"/>.
     /// </summary>
-    /// <param name="input"></param>
-    /// <returns></returns>
+    /// <param name="input">The URL token encoded string to decode.</param>
+    /// <returns>The decoded byte array.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the input is null.</exception>
     public static byte[] UrlTokenDecode(this string input)
     {
         if (input == null)
@@ -245,14 +257,15 @@ public static partial class StringExtensions
     }
 
     /// <summary>
-    ///     Generate a hash of a string based on the hashType passed in
+    /// Generates a hash of a string using the specified hash algorithm name.
     /// </summary>
-    /// <param name="str">Refers to itself</param>
+    /// <param name="str">The string to hash.</param>
     /// <param name="hashType">
-    ///     String with the hash type.  See remarks section of the CryptoConfig Class in MSDN docs for a
-    ///     list of possible values.
+    /// The name of the hash algorithm to use. See the remarks section of the CryptoConfig class in MSDN documentation
+    /// for a list of possible values.
     /// </param>
-    /// <returns>The hashed string</returns>
+    /// <returns>The hash of the string as a hexadecimal string.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when no hash algorithm is found with the specified name.</exception>
     private static string GenerateHash(this string str, string? hashType)
     {
         HashAlgorithm? hasher = CreateHashAlgorithm(hashType);
@@ -286,10 +299,10 @@ public static partial class StringExtensions
     }
 
     /// <summary>
-    ///     Creates a hash algorithm instance by name.
+    /// Creates a hash algorithm instance by name.
     /// </summary>
     /// <param name="algorithmName">The algorithm name (e.g., "SHA1", "SHA256", "MD5").</param>
-    /// <returns>A HashAlgorithm instance, or null if the algorithm is not recognized.</returns>
+    /// <returns>A <see cref="HashAlgorithm"/> instance, or null if the algorithm is not recognised.</returns>
     private static HashAlgorithm? CreateHashAlgorithm(string? algorithmName)
     {
         if (string.IsNullOrEmpty(algorithmName))
@@ -313,10 +326,11 @@ public static partial class StringExtensions
     }
 
     /// <summary>
-    ///     Encodes a string so that it is 'safe' for URLs, files, etc..
+    /// Encodes a byte array to a URL-safe string by replacing unsafe characters.
     /// </summary>
-    /// <param name="input"></param>
-    /// <returns></returns>
+    /// <param name="input">The byte array to encode.</param>
+    /// <returns>The URL-safe encoded string.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the input is null.</exception>
     public static string UrlTokenEncode(this byte[] input)
     {
         if (input == null)
@@ -364,10 +378,10 @@ public static partial class StringExtensions
     }
 
     /// <summary>
-    ///     Converts a literal string into a C# expression.
+    /// Converts a literal string into a C# string expression with escape sequences.
     /// </summary>
-    /// <param name="s">Current instance of the string.</param>
-    /// <returns>The string in a C# format.</returns>
+    /// <param name="s">The string to convert.</param>
+    /// <returns>The string formatted as a C# string literal, or "&lt;null&gt;" if the input is null.</returns>
     public static string ToCSharpString(this string s)
     {
         if (s == null)
