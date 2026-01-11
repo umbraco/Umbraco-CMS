@@ -82,4 +82,30 @@ public partial class StringExtensionsTests
         var result = input.StripWhitespace();
         Assert.AreEqual(expected, result);
     }
+
+    [TestCase("hello", "hello")] // no HTML
+    [TestCase("", "")] // empty string
+    [TestCase("<p>hello</p>", "hello")] // simple tags
+    [TestCase("<div>hello</div>", "hello")] // div tags
+    [TestCase("<br/>", "")] // self-closing tag
+    [TestCase("<br />", "")] // self-closing with space
+    [TestCase("<img src=\"test.jpg\"/>", "")] // self-closing with attributes
+    [TestCase("<a href=\"url\">link</a>", "link")] // tag with attributes
+    [TestCase("<p class=\"test\" id=\"1\">text</p>", "text")] // multiple attributes
+    [TestCase("<div><p>nested</p></div>", "nested")] // nested tags
+    [TestCase("<p>one</p><p>two</p>", "onetwo")] // multiple tags
+    [TestCase("before<p>middle</p>after", "beforemiddleafter")] // text around tags
+    [TestCase("<p>line1\nline2</p>", "line1\nline2")] // preserves newlines in content
+    [TestCase("<p\nclass=\"test\">text</p>", "text")] // tag spanning lines
+    [TestCase("<script>alert('xss')</script>", "alert('xss')")] // script tag (content preserved)
+    [TestCase("<!-- comment -->", "")] // HTML comment
+    [TestCase("<!DOCTYPE html>", "")] // doctype
+    [TestCase("<p>Hello &amp; World</p>", "Hello &amp; World")] // HTML entities preserved
+    [TestCase("<>", "<>")] // empty angle brackets (not valid HTML tag)
+    [TestCase("5 < 10 > 3", "5 < 10 > 3")] // comparison operators (not tags)
+    public void StripHtml_ReturnsStringWithoutHtmlTags(string input, string expected)
+    {
+        var result = input.StripHtml();
+        Assert.AreEqual(expected, result);
+    }
 }

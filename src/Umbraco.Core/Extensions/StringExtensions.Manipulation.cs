@@ -14,6 +14,9 @@ public static partial class StringExtensions
 {
     private const char DefaultEscapedStringEscapeChar = '\\';
 
+    [GeneratedRegex(@"<[a-zA-Z/!][\s\S]*?>")]
+    private static partial Regex StringHtmlRegex();
+
     /// <summary>
     /// Removes all whitespace characters including new lines, tabs, and spaces.
     /// </summary>
@@ -398,8 +401,10 @@ public static partial class StringExtensions
     /// <returns>The string with all HTML tags removed.</returns>
     public static string StripHtml(this string text)
     {
-        const string pattern = @"<(.|\n)*?>";
-        return Regex.Replace(text, pattern, string.Empty, RegexOptions.Compiled);
+        // Match valid HTML tags: must start with letter, /, or ! after <.
+        // This avoids matching empty <> or mathematical expressions like "5 < 10 > 3".
+        const string pattern = @"<[a-zA-Z/!][\s\S]*?>";
+        return StringHtmlRegex().Replace(text, string.Empty);
     }
 
     /// <summary>

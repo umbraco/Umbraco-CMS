@@ -119,14 +119,19 @@ public static partial class StringExtensions
     /// <returns>The decoded string.</returns>
     public static string DecodeFromHex(this string hexValue)
     {
-        var strValue = string.Empty;
-        while (hexValue.Length > 0)
+        if (string.IsNullOrEmpty(hexValue))
         {
-            strValue += Convert.ToChar(Convert.ToUInt32(hexValue[..2], 16)).ToString();
-            hexValue = hexValue[2..];
+            return string.Empty;
         }
 
-        return strValue;
+        var sb = new StringBuilder(hexValue.Length / 2);
+        for (var i = 0; i < hexValue.Length; i += 2)
+        {
+            ReadOnlySpan<char> hexPair = hexValue.AsSpan(i, 2);
+            sb.Append((char)Convert.ToUInt32(hexPair.ToString(), 16));
+        }
+
+        return sb.ToString();
     }
 
     /// <summary>
