@@ -85,7 +85,7 @@ public class IdKeyMapRepository(IScopeAccessor scopeAccessor) : IIdKeyMapReposit
                 .Select<NodeDto>(c => c.UniqueId)
                 .From<NodeDto>()
                 .Where<NodeDto>(n => n.NodeId == id);
-            return database?.ExecuteScalar<Guid?>(sql);
+            return database?.FirstOrDefault<Guid?>(sql);
         }
 
         Guid type = GetNodeObjectTypeGuid(umbracoObjectType);
@@ -96,7 +96,7 @@ public class IdKeyMapRepository(IScopeAccessor scopeAccessor) : IIdKeyMapReposit
                 n.NodeId == id
                 && (n.NodeObjectType == type
                     || n.NodeObjectType == Constants.ObjectTypes.IdReservation));
-        return database?.ExecuteScalar<Guid?>(sql);
+        return database?.FirstOrDefault<Guid?>(sql);
     }
 
     private Guid GetNodeObjectTypeGuid(UmbracoObjectTypes umbracoObjectType)

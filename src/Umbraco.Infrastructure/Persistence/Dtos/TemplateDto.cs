@@ -5,17 +5,19 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey("pk")]
+[PrimaryKey(PrimaryKeyColumnName)]
 [ExplicitColumns]
 internal sealed class TemplateDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.Template;
+    public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNamePk;
+    public const string NodeIdColumnName = Constants.DatabaseSchema.Columns.NodeIdName;
 
-    [Column("pk")]
+    [Column(PrimaryKeyColumnName)]
     [PrimaryKeyColumn]
     public int PrimaryKey { get; set; }
 
-    [Column("nodeId")]
+    [Column(NodeIdColumnName)]
     [Index(IndexTypes.UniqueNonClustered)]
     [ForeignKey(typeof(NodeDto), Name = "FK_cmsTemplate_umbracoNode")]
     public int NodeId { get; set; }
@@ -26,6 +28,6 @@ internal sealed class TemplateDto
     public string? Alias { get; set; }
 
     [ResultColumn]
-    [Reference(ReferenceType.OneToOne, ColumnName = "NodeId")]
+    [Reference(ReferenceType.OneToOne, ColumnName = nameof(this.NodeId))]
     public NodeDto NodeDto { get; set; } = null!;
 }
