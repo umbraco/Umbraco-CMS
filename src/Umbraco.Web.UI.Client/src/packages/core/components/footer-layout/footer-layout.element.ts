@@ -34,6 +34,7 @@ export class UmbFooterLayoutElement extends LitElement {
 
 			#actions {
 				display: flex;
+				align-items: center;
 				gap: var(--uui-size-space-2);
 				margin: 0 var(--uui-size-layout-1);
 				margin-left: auto;

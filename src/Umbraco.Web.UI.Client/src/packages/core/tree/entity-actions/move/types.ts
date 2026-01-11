@@ -19,6 +19,10 @@ export interface MetaEntityActionMoveToKind extends MetaEntityActionDefaultKind 
 	treeRepositoryAlias: string;
 	treeAlias: string;
 	foldersOnly?: boolean;
+	/** Optional: Repository alias for fetching item details (needed for pre-validation) */
+	itemRepositoryAlias?: string;
+	/** Optional: Repository alias for fetching content type structure (needed for pre-validation) */
+	structureRepositoryAlias?: string;
 }
 
 declare global {

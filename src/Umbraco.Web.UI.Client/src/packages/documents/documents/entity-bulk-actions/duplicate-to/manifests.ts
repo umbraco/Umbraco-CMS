@@ -1,8 +1,6 @@
 import { UMB_DOCUMENT_COLLECTION_ALIAS } from '../../collection/constants.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
-import { UMB_DOCUMENT_TREE_ALIAS } from '../../tree/manifests.js';
 import { UMB_USER_PERMISSION_DOCUMENT_DUPLICATE } from '../../user-permissions/document/constants.js';
-import { UMB_BULK_DUPLICATE_DOCUMENT_REPOSITORY_ALIAS } from './repository/constants.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
 import { UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/recycle-bin';
 import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
@@ -10,14 +8,14 @@ import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collecti
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'entityBulkAction',
-		kind: 'duplicateTo',
+		kind: 'default',
 		alias: 'Umb.EntityBulkAction.Document.DuplicateTo',
 		name: 'Duplicate Document Entity Bulk Action',
 		weight: 30,
+		api: () => import('./duplicate-document-bulk.action.js'),
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
-			bulkDuplicateRepositoryAlias: UMB_BULK_DUPLICATE_DOCUMENT_REPOSITORY_ALIAS,
-			treeAlias: UMB_DOCUMENT_TREE_ALIAS,
+			label: '#actions_copy',
 		},
 		conditions: [
 			{
