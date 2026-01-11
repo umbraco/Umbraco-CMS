@@ -454,7 +454,30 @@ public static partial class StringExtensions
     /// </summary>
     /// <param name="input">The string to process.</param>
     /// <returns>The string with all carriage returns and line feeds removed.</returns>
-    public static string StripNewLines(this string input) => input.Replace("\r", string.Empty).Replace("\n", string.Empty);
+    public static string StripNewLines(this string input)
+    {
+        if (string.IsNullOrEmpty(input))
+        {
+            return input;
+        }
+
+        // Check if any newlines exist to avoid allocating the StringBuilder unnessarily.
+        if (input.IndexOf('\r') < 0 && input.IndexOf('\n') < 0)
+        {
+            return input;
+        }
+
+        var sb = new StringBuilder(input.Length);
+        foreach (var c in input)
+        {
+            if (c is not '\r' and not '\n')
+            {
+                sb.Append(c);
+            }
+        }
+
+        return sb.ToString();
+    }
 
     /// <summary>
     /// Converts a multi-line string to a single line by replacing line breaks with spaces.
@@ -468,10 +491,37 @@ public static partial class StringExtensions
             return text;
         }
 
-        text = text.Replace("\r\n", " "); // remove CRLF
-        text = text.Replace("\r", " "); // remove CR
-        text = text.Replace("\n", " "); // remove LF
-        return text;
+        // Check if any newlines exist to avoid allocating the StringBuilder unnessarily.
+        if (text.IndexOf('\r') < 0 && text.IndexOf('\n') < 0)
+        {
+            return text;
+        }
+
+        var sb = new StringBuilder(text.Length);
+        for (var i = 0; i < text.Length; i++)
+        {
+            var c = text[i];
+            if (c == '\r')
+            {
+                sb.Append(' ');
+
+                // Skip the \n if this is a \r\n pair.
+                if (i + 1 < text.Length && text[i + 1] == '\n')
+                {
+                    i++;
+                }
+            }
+            else if (c == '\n')
+            {
+                sb.Append(' ');
+            }
+            else
+            {
+                sb.Append(c);
+            }
+        }
+
+        return sb.ToString();
     }
 
     /// <summary>

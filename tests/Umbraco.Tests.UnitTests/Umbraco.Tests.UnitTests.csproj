@@ -43,6 +43,9 @@
     <Compile Update="Umbraco.Core\Extensions\StringExtensionsTests.Culture.cs">
       <DependentUpon>StringExtensionsTests.cs</DependentUpon>
     </Compile>
+    <Compile Update="Umbraco.Core\Extensions\StringExtensionsTests.Encoding.cs">
+      <DependentUpon>StringExtensionsTests.cs</DependentUpon>
+    </Compile>
     <Compile Update="Umbraco.Core\Extensions\StringExtensionsTests.Manipulation.cs">
       <DependentUpon>StringExtensionsTests.cs</DependentUpon>
     </Compile>

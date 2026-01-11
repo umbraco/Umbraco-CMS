@@ -163,4 +163,39 @@ public partial class StringExtensionsTests
         var result = input.EnsureEndsWith(toEndWith);
         Assert.AreEqual(expected, result);
     }
+
+    [TestCase("hello", "hello")] // no newlines
+    [TestCase("", "")] // empty string
+    [TestCase("hello\nworld", "helloworld")] // LF removed
+    [TestCase("hello\rworld", "helloworld")] // CR removed
+    [TestCase("hello\r\nworld", "helloworld")] // CRLF removed
+    [TestCase("\n\r\n\r", "")] // only newlines
+    [TestCase("line1\nline2\nline3", "line1line2line3")] // multiple LF
+    [TestCase("line1\r\nline2\r\nline3", "line1line2line3")] // multiple CRLF
+    [TestCase("  hello\n  world  ", "  hello  world  ")] // preserves spaces
+    [TestCase("hello\tworld", "hello\tworld")] // preserves tabs
+    [TestCase("\nhello\n", "hello")] // leading and trailing newlines
+    public void StripNewLines_ReturnsStringWithoutNewLines(string input, string expected)
+    {
+        var result = input.StripNewLines();
+        Assert.AreEqual(expected, result);
+    }
+
+    [TestCase(null, null)] // null input
+    [TestCase("hello", "hello")] // no newlines
+    [TestCase("", "")] // empty string
+    [TestCase("hello\nworld", "hello world")] // LF to space
+    [TestCase("hello\rworld", "hello world")] // CR to space
+    [TestCase("hello\r\nworld", "hello world")] // CRLF to single space
+    [TestCase("\n\r\n\r", "   ")] // only newlines become spaces
+    [TestCase("line1\nline2\nline3", "line1 line2 line3")] // multiple LF
+    [TestCase("line1\r\nline2\r\nline3", "line1 line2 line3")] // multiple CRLF
+    [TestCase("  hello\n  world  ", "  hello   world  ")] // preserves existing spaces
+    [TestCase("hello\tworld", "hello\tworld")] // preserves tabs
+    [TestCase("\nhello\n", " hello ")] // leading and trailing become spaces
+    public void ToSingleLine_ReplacesNewLinesWithSpaces(string? input, string expected)
+    {
+        var result = input.ToSingleLine();
+        Assert.AreEqual(expected, result);
+    }
 }
