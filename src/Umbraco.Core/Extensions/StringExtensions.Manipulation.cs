@@ -75,14 +75,25 @@ public static partial class StringExtensions
     /// <returns>The string with all non-alphanumeric characters replaced.</returns>
     public static string ReplaceNonAlphanumericChars(this string input, string replacement)
     {
-        // any character that is not alphanumeric, convert to a hyphen
-        var mName = input;
-        foreach (var c in mName.ToCharArray().Where(c => !char.IsLetterOrDigit(c)))
+        if (string.IsNullOrEmpty(input))
         {
-            mName = mName.Replace(c.ToString(CultureInfo.InvariantCulture), replacement);
+            return input;
         }
 
-        return mName;
+        var sb = new StringBuilder(input.Length);
+        foreach (var c in input)
+        {
+            if (char.IsLetterOrDigit(c))
+            {
+                sb.Append(c);
+            }
+            else
+            {
+                sb.Append(replacement);
+            }
+        }
+
+        return sb.ToString();
     }
 
     /// <summary>
@@ -93,6 +104,11 @@ public static partial class StringExtensions
     /// <returns>The string with all non-alphanumeric characters replaced.</returns>
     public static string ReplaceNonAlphanumericChars(this string input, char replacement)
     {
+        if (string.IsNullOrEmpty(input))
+        {
+            return input;
+        }
+
         var chars = input.ToCharArray();
         for (var i = 0; i < chars.Length; i++)
         {
