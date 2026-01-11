@@ -341,15 +341,8 @@ public static partial class StringExtensions
     /// <param name="input">The string to check.</param>
     /// <param name="toStartWith">The string that the input should start with.</param>
     /// <returns>The input string if it already starts with the specified value; otherwise, the value prepended to the input.</returns>
-    public static string EnsureStartsWith(this string input, string toStartWith)
-    {
-        if (input.StartsWith(toStartWith))
-        {
-            return input;
-        }
-
-        return toStartWith + input.TrimStart(toStartWith);
-    }
+    public static string EnsureStartsWith(this string input, string toStartWith) =>
+        input.StartsWith(toStartWith) ? input : toStartWith + input;
 
     /// <summary>
     /// Ensures that the string starts with the specified character.
@@ -358,16 +351,7 @@ public static partial class StringExtensions
     /// <param name="value">The character that the input should start with.</param>
     /// <returns>The input string if it already starts with the specified character; otherwise, the character prepended to the input.</returns>
     public static string EnsureStartsWith(this string input, char value) =>
-        input.StartsWith(value.ToString(CultureInfo.InvariantCulture)) ? input : value + input;
-
-    /// <summary>
-    /// Ensures that the string ends with the specified character.
-    /// </summary>
-    /// <param name="input">The string to check.</param>
-    /// <param name="value">The character that the input should end with.</param>
-    /// <returns>The input string if it already ends with the specified character; otherwise, the character appended to the input.</returns>
-    public static string EnsureEndsWith(this string input, char value) =>
-        input.EndsWith(value.ToString(CultureInfo.InvariantCulture)) ? input : input + value;
+        input.Length > 0 && input[0] == value ? input : value + input;
 
     /// <summary>
     /// Ensures that the string ends with the specified string.
@@ -376,7 +360,16 @@ public static partial class StringExtensions
     /// <param name="toEndWith">The string that the input should end with.</param>
     /// <returns>The input string if it already ends with the specified value; otherwise, the value appended to the input.</returns>
     public static string EnsureEndsWith(this string input, string toEndWith) =>
-        input.EndsWith(toEndWith.ToString(CultureInfo.InvariantCulture)) ? input : input + toEndWith;
+        input.EndsWith(toEndWith) ? input : input + toEndWith;
+
+    /// <summary>
+    /// Ensures that the string ends with the specified character.
+    /// </summary>
+    /// <param name="input">The string to check.</param>
+    /// <param name="value">The character that the input should end with.</param>
+    /// <returns>The input string if it already ends with the specified character; otherwise, the character appended to the input.</returns>
+    public static string EnsureEndsWith(this string input, char value) =>
+        input.Length > 0 && input[^1] == value ? input : input + value;
 
     /// <summary>
     /// Splits a delimited string into a list of strings.

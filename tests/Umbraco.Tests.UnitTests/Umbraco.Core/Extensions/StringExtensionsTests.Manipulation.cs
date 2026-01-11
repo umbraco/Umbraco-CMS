@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Diagnostics;
 using NUnit.Framework;
 using Umbraco.Extensions;
 
@@ -106,6 +105,62 @@ public partial class StringExtensionsTests
     public void StripHtml_ReturnsStringWithoutHtmlTags(string input, string expected)
     {
         var result = input.StripHtml();
+        Assert.AreEqual(expected, result);
+    }
+
+    [TestCase("hello", '/', "/hello")] // prepends char
+    [TestCase("/hello", '/', "/hello")] // already starts with char
+    [TestCase("", '/', "/")] // empty string
+    [TestCase("hello", 'h', "hello")] // already starts with char
+    [TestCase("Hello", 'h', "hHello")] // case sensitive
+    [TestCase("world", '!', "!world")] // special char
+    [TestCase(" hello", ' ', " hello")] // space char already present
+    [TestCase("hello", ' ', " hello")] // prepend space
+    public void EnsureStartsWith_WithChar_ReturnsExpectedResult(string input, char value, string expected)
+    {
+        var result = input.EnsureStartsWith(value);
+        Assert.AreEqual(expected, result);
+    }
+
+    [TestCase("hello", "/", "/hello")] // prepends string
+    [TestCase("/hello", "/", "/hello")] // already starts with string
+    [TestCase("", "/", "/")] // empty string
+    [TestCase("hello", "hel", "hello")] // already starts with string
+    [TestCase("Hello", "hel", "helHello")] // case sensitive
+    [TestCase("world", "Hello ", "Hello world")] // multi-char prefix
+    [TestCase("hello", "", "hello")] // empty prefix
+    [TestCase("//hello", "/", "//hello")] // already starts, has duplicates
+    public void EnsureStartsWith_WithString_ReturnsExpectedResult(string input, string toStartWith, string expected)
+    {
+        var result = input.EnsureStartsWith(toStartWith);
+        Assert.AreEqual(expected, result);
+    }
+
+    [TestCase("hello", '/', "hello/")] // appends char
+    [TestCase("hello/", '/', "hello/")] // already ends with char
+    [TestCase("", '/', "/")] // empty string
+    [TestCase("hello", 'o', "hello")] // already ends with char
+    [TestCase("hellO", 'o', "hellOo")] // case sensitive
+    [TestCase("world", '!', "world!")] // special char
+    [TestCase("hello ", ' ', "hello ")] // space char already present
+    [TestCase("hello", ' ', "hello ")] // append space
+    public void EnsureEndsWith_WithChar_ReturnsExpectedResult(string input, char value, string expected)
+    {
+        var result = input.EnsureEndsWith(value);
+        Assert.AreEqual(expected, result);
+    }
+
+    [TestCase("hello", "/", "hello/")] // appends string
+    [TestCase("hello/", "/", "hello/")] // already ends with string
+    [TestCase("", "/", "/")] // empty string
+    [TestCase("hello", "llo", "hello")] // already ends with string
+    [TestCase("hellO", "llo", "hellOllo")] // case sensitive
+    [TestCase("Hello", " world", "Hello world")] // multi-char suffix
+    [TestCase("hello", "", "hello")] // empty suffix
+    [TestCase("hello//", "/", "hello//")] // already ends, has duplicates
+    public void EnsureEndsWith_WithString_ReturnsExpectedResult(string input, string toEndWith, string expected)
+    {
+        var result = input.EnsureEndsWith(toEndWith);
         Assert.AreEqual(expected, result);
     }
 }
