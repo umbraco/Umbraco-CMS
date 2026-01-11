@@ -589,7 +589,7 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
         $"{GetSpecialDbType(dbType)}({customSize})";
 
     /// <inheritdoc />
-    public virtual ConcurrentBag<string> GetHashedForeignKeys() => [];
+    public virtual bool IsValidHashedForeignKey(string? foreignKey) => false;
 
     protected virtual string FormatCascade(string onWhat, Rule rule)
     {

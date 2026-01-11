@@ -267,14 +267,10 @@ public class DatabaseSchemaCreator
 
         IEnumerable<string?> invalidForeignKeyDifferences = foreignKeysInDatabase
             .Except(foreignKeysInSchema, StringComparer.InvariantCultureIgnoreCase)
-            .Union(foreignKeysInSchema.Except(foreignKeysInDatabase, StringComparer.InvariantCultureIgnoreCase));
+            .Union(foreignKeysInSchema.Except(foreignKeysInDatabase, StringComparer.InvariantCultureIgnoreCase))
+            .Where(f => !_database.SqlContext.SqlSyntax.IsValidHashedForeignKey(f));
         foreach (var foreignKey in invalidForeignKeyDifferences)
         {
-            if (_database.SqlContext.SqlSyntax.GetHashedForeignKeyNames().Contains(foreignKey);)
-            {
-                continue;
-            }
-
             result.Errors.Add(new Tuple<string, string>("Constraint", foreignKey ?? "NULL"));
         }
 

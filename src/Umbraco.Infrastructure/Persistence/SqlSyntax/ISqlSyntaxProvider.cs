@@ -265,9 +265,10 @@ public interface ISqlSyntaxProvider
         string? alias = null);
 
     /// <summary>
-    /// returns a list of foreign keys that are hashed (i.e. their names are shortend and suffixed with a unique hashed) in the current database.
-    /// This is for limited FKs i.e. in PostgreSQL where FK names have a max length of 64 chars.
+    /// Determines whether the specified foreign key is stored in a valid hashed format.
+    /// Use case i.e., for databases that have limitations on index/key length.
     /// </summary>
-    /// <returns>Concurrent bag of modified / hashed FKs</returns>
-    ConcurrentBag<string> GetHashedForeignKeys();
+    /// <param name="foreignKey">The foreign key to evaluate. Can be null.</param>
+    /// <returns>true if the foreign key is hashed; otherwise, false.</returns>
+    bool IsValidHashedForeignKey(string? foreignKey);
 }
