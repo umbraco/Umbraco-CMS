@@ -588,6 +588,9 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
     public virtual string GetSpecialDbType(SpecialDbType dbType, int customSize) =>
         $"{GetSpecialDbType(dbType)}({customSize})";
 
+    /// <inheritdoc />
+    public virtual ConcurrentBag<string> GetHashedForeignKeys() => [];
+
     protected virtual string FormatCascade(string onWhat, Rule rule)
     {
         var action = "NO ACTION";
@@ -698,7 +701,4 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
     protected abstract string? FormatSystemMethods(SystemMethods systemMethod);
 
     protected abstract string FormatIdentity(ColumnDefinition column);
-
-    ///  <inheritdoc />
-    protected virtual ConcurrentBag<string> GetHashedForeignKeys() => new ConcurrentBag<string>();
 }
