@@ -170,7 +170,8 @@ public static partial class StringExtensions
         if (name.EndsWith("y", StringComparison.OrdinalIgnoreCase) && name.Length > 1 &&
             !IsVowel(name[^2]))
         {
-            name = name.Remove(name.Length - 1, 1);
+            // Change the y to i and add es.
+            name = name[..^1];
             name += "ies";
             return name;
         }
@@ -247,9 +248,10 @@ public static partial class StringExtensions
             return value;
         }
 
+        // Trim all occurrences from the end.
         while (value.EndsWith(forRemoving, StringComparison.InvariantCultureIgnoreCase))
         {
-            value = value.Remove(value.LastIndexOf(forRemoving, StringComparison.InvariantCultureIgnoreCase));
+            value = value[..value.LastIndexOf(forRemoving, StringComparison.InvariantCultureIgnoreCase)];
         }
 
         return value;

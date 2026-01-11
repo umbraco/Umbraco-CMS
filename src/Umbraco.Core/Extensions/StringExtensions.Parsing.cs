@@ -16,7 +16,9 @@ public static partial class StringExtensions
     /// The namespace for URLs (from RFC 4122, Appendix C).
     /// See <a href="http://www.ietf.org/rfc/rfc4122.txt">RFC 4122</a>.
     /// </summary>
+#pragma warning disable IDE1006 // Naming Styles (internal Guid is clearer without a _ prefix).
     internal static readonly Guid UrlNamespace = new("6ba7b811-9dad-11d1-80b4-00c04fd430c8");
+#pragma warning restore IDE1006 // Naming Styles
 
     /// <summary>
     /// Converts a path string to an array of node IDs in reverse order (deepest to shallowest).

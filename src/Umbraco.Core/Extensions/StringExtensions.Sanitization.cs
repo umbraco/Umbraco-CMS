@@ -10,15 +10,28 @@ namespace Umbraco.Extensions;
 
 public static partial class StringExtensions
 {
+#pragma warning disable IDE1006 // Naming Styles (internal Guid is clearer without a _ prefix).
+    /// <summary>
+    /// Provides a lazily initialized, compiled regular expression that matches one or more whitespace characters.
+    /// </summary>
     internal static readonly Lazy<Regex> Whitespace = new(() => new Regex(@"\s+", RegexOptions.Compiled));
 
+    /// <summary>
+    /// Provides a collection of JSON string representations that are considered empty objects or arrays.
+    /// </summary>
     internal static readonly string[] JsonEmpties = { "[]", "{}" };
+#pragma warning restore IDE1006 // Naming Styles
 
-    private static readonly char[] CleanForXssChars = "*?(){}[];:%<>/\\|&'\"".ToCharArray();
+    private static readonly char[] _cleanForXssChars = "*?(){}[];:%<>/\\|&'\"".ToCharArray();
 
-    // From: http://stackoverflow.com/a/961504/5018
-    // filters control characters but allows only properly-formed surrogate sequences
-    private static readonly Lazy<Regex> InvalidXmlChars = new(() =>
+    /// <summary>
+    /// A regex to match invalid XML characters.
+    /// </summary>
+    /// <remarks>
+    /// Filters control characters but allows only properly-formed surrogate sequences.
+    /// Hat-tip: http://stackoverflow.com/a/961504/5018.
+    /// </remarks>
+    private static readonly Lazy<Regex> _invalidXmlChars = new(() =>
         new Regex(
             @"(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F\uFEFF\uFFFE\uFFFF]",
             RegexOptions.Compiled));
@@ -63,7 +76,7 @@ public static partial class StringExtensions
         input = input.StripHtml();
 
         // strip out any potential chars involved with XSS
-        return input.ExceptChars(new HashSet<char>(CleanForXssChars.Except(ignoreFromClean)));
+        return input.ExceptChars(new HashSet<char>(_cleanForXssChars.Except(ignoreFromClean)));
     }
 
     /// <summary>
@@ -147,7 +160,7 @@ public static partial class StringExtensions
     /// <param name="text">The string to filter.</param>
     /// <returns>The string with invalid XML characters removed.</returns>
     public static string ToValidXmlString(this string text) =>
-        string.IsNullOrEmpty(text) ? text : InvalidXmlChars.Value.Replace(text, string.Empty);
+        string.IsNullOrEmpty(text) ? text : _invalidXmlChars.Value.Replace(text, string.Empty);
 
     /// <summary>
     /// Turns a null-or-whitespace string into a null string.

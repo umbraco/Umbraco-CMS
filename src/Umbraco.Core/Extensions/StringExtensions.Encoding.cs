@@ -8,16 +8,16 @@ namespace Umbraco.Extensions;
 
 public static partial class StringExtensions
 {
-    private static readonly char[] ToCSharpHexDigitLower = "0123456789abcdef".ToCharArray();
-    private static readonly char[] ToCSharpEscapeChars;
+    private static readonly char[] _toCSharpHexDigitLower = "0123456789abcdef".ToCharArray();
+    private static readonly char[] _toCSharpEscapeChars;
 
     static StringExtensions()
     {
         var escapes = new[] { "\aa", "\bb", "\ff", "\nn", "\rr", "\tt", "\vv", "\"\"", "\\\\", "??", "\00" };
-        ToCSharpEscapeChars = new char[escapes.Max(e => e[0]) + 1];
+        _toCSharpEscapeChars = new char[escapes.Max(e => e[0]) + 1];
         foreach (var escape in escapes)
         {
-            ToCSharpEscapeChars[escape[0]] = escape[1];
+            _toCSharpEscapeChars[escape[0]] = escape[1];
         }
     }
 
@@ -268,12 +268,7 @@ public static partial class StringExtensions
     /// <exception cref="InvalidOperationException">Thrown when no hash algorithm is found with the specified name.</exception>
     private static string GenerateHash(this string str, string? hashType)
     {
-        HashAlgorithm? hasher = CreateHashAlgorithm(hashType);
-
-        if (hasher == null)
-        {
-            throw new InvalidOperationException("No hashing type found by name " + hashType);
-        }
+        HashAlgorithm? hasher = CreateHashAlgorithm(hashType) ?? throw new InvalidOperationException("No hashing type found by name " + hashType);
 
         using (hasher)
         {
@@ -394,9 +389,9 @@ public static partial class StringExtensions
         for (var rp = 0; rp < s.Length; rp++)
         {
             var c = s[rp];
-            if (c < ToCSharpEscapeChars.Length && ToCSharpEscapeChars[c] != '\0')
+            if (c < _toCSharpEscapeChars.Length && _toCSharpEscapeChars[c] != '\0')
             {
-                sb.Append('\\').Append(ToCSharpEscapeChars[c]);
+                sb.Append('\\').Append(_toCSharpEscapeChars[c]);
             }
             else if (c <= '~' && c >= ' ')
             {
@@ -405,10 +400,10 @@ public static partial class StringExtensions
             else
             {
                 sb.Append(@"\x")
-                    .Append(ToCSharpHexDigitLower[(c >> 12) & 0x0F])
-                    .Append(ToCSharpHexDigitLower[(c >> 8) & 0x0F])
-                    .Append(ToCSharpHexDigitLower[(c >> 4) & 0x0F])
-                    .Append(ToCSharpHexDigitLower[c & 0x0F]);
+                    .Append(_toCSharpHexDigitLower[(c >> 12) & 0x0F])
+                    .Append(_toCSharpHexDigitLower[(c >> 8) & 0x0F])
+                    .Append(_toCSharpHexDigitLower[(c >> 4) & 0x0F])
+                    .Append(_toCSharpHexDigitLower[c & 0x0F]);
             }
         }
 
