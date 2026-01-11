@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Diagnostics;
 using NUnit.Framework;
 using Umbraco.Extensions;
 
@@ -55,6 +56,30 @@ public partial class StringExtensionsTests
         string expected)
     {
         var result = input.ReplaceNonAlphanumericChars(replacement);
+        Assert.AreEqual(expected, result);
+    }
+
+    [TestCase("hello", "hello")] // no whitespace
+    [TestCase("Hello123", "Hello123")] // alphanumeric only
+    [TestCase("hello world", "helloworld")] // single space
+    [TestCase("hello  world", "helloworld")] // multiple spaces
+    [TestCase("", "")] // empty string
+    [TestCase("   ", "")] // only spaces
+    [TestCase("hello\tworld", "helloworld")] // tab
+    [TestCase("hello\nworld", "helloworld")] // newline
+    [TestCase("hello\rworld", "helloworld")] // carriage return
+    [TestCase("hello\r\nworld", "helloworld")] // CRLF
+    [TestCase(" hello ", "hello")] // leading and trailing spaces
+    [TestCase("\t\n\r ", "")] // only whitespace characters
+    [TestCase("a b\tc\nd\re", "abcde")] // mixed whitespace types
+    [TestCase("café", "café")] // unicode letters preserved
+    [TestCase("日本語", "日本語")] // CJK characters preserved
+    [TestCase("hello\u00A0world", "helloworld")] // non-breaking space
+    [TestCase("hello\u2003world", "helloworld")] // em space
+    [TestCase("a\u0009\u000A\u000B\u000C\u000D\u0020b", "ab")] // various ASCII whitespace
+    public void StripWhitespace_ReturnsStringWithoutWhitespace(string input, string expected)
+    {
+        var result = input.StripWhitespace();
         Assert.AreEqual(expected, result);
     }
 }

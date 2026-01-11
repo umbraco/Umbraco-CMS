@@ -19,7 +19,40 @@ public static partial class StringExtensions
     /// </summary>
     /// <param name="txt">The string to strip whitespace from.</param>
     /// <returns>The string with all whitespace removed.</returns>
-    public static string StripWhitespace(this string txt) => Regex.Replace(txt, @"\s", string.Empty);
+    public static string StripWhitespace(this string txt)
+    {
+        if (string.IsNullOrEmpty(txt))
+        {
+            return txt;
+        }
+
+        // Check if any whitespace exists to avoid allocating StringBuilder unless needed.
+        var hasWhitespace = false;
+        foreach (var c in txt)
+        {
+            if (char.IsWhiteSpace(c))
+            {
+                hasWhitespace = true;
+                break;
+            }
+        }
+
+        if (hasWhitespace is false)
+        {
+            return txt;
+        }
+
+        var sb = new StringBuilder(txt.Length);
+        foreach (var c in txt)
+        {
+            if (!char.IsWhiteSpace(c))
+            {
+                sb.Append(c);
+            }
+        }
+
+        return sb.ToString();
+    }
 
     /// <summary>
     /// Strips the file extension from a file name.
