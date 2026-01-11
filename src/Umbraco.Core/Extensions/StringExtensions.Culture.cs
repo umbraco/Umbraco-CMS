@@ -12,16 +12,14 @@ public static partial class StringExtensions
     /// </summary>
     /// <param name="ch">The character to check.</param>
     /// <returns><c>true</c> if the character is lowercase; otherwise, <c>false</c>.</returns>
-    public static bool IsLowerCase(this char ch) => ch.ToString(CultureInfo.InvariantCulture) ==
-                                                    ch.ToString(CultureInfo.InvariantCulture).ToLowerInvariant();
+    public static bool IsLowerCase(this char ch) => ch == char.ToLowerInvariant(ch);
 
     /// <summary>
     /// Determines whether the specified character is uppercase using invariant culture rules.
     /// </summary>
     /// <param name="ch">The character to check.</param>
     /// <returns><c>true</c> if the character is uppercase; otherwise, <c>false</c>.</returns>
-    public static bool IsUpperCase(this char ch) => ch.ToString(CultureInfo.InvariantCulture) ==
-                                                    ch.ToString(CultureInfo.InvariantCulture).ToUpperInvariant();
+    public static bool IsUpperCase(this char ch) => ch == char.ToUpperInvariant(ch);
 
     /// <summary>
     /// Formats the string using the invariant culture.
