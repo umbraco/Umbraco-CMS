@@ -32,7 +32,7 @@ internal sealed class AuditRepository : EntityRepositoryBase<int, IAuditItem>, I
     public IEnumerable<IAuditItem> Get(AuditType type, IQuery<IAuditItem> query)
     {
         Sql<ISqlContext>? sqlClause = GetBaseQuery(false)
-            .Where("(logHeader=@0)", type.ToString());
+            .Where($"({SqlSyntax.GetQuotedColumnName("logHeader")}=@0)", type.ToString());
 
         var translator = new SqlTranslator<IAuditItem>(sqlClause, query);
         Sql<ISqlContext> sql = translator.Translate();
