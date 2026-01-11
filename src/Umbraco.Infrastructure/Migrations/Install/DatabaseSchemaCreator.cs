@@ -270,6 +270,11 @@ public class DatabaseSchemaCreator
             .Union(foreignKeysInSchema.Except(foreignKeysInDatabase, StringComparer.InvariantCultureIgnoreCase));
         foreach (var foreignKey in invalidForeignKeyDifferences)
         {
+            if (_database.SqlContext.SqlSyntax.GetHashedForeignKeyNames().Contains(foreignKey);)
+            {
+                continue;
+            }
+
             result.Errors.Add(new Tuple<string, string>("Constraint", foreignKey ?? "NULL"));
         }
 

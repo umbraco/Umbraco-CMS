@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Data;
 using System.Data.SqlTypes;
 using System.Diagnostics.CodeAnalysis;
@@ -263,5 +264,10 @@ public interface ISqlSyntaxProvider
         Func<Sql<ISqlContext>, Sql<ISqlContext>> nestedJoin,
         string? alias = null);
 
-
+    /// <summary>
+    /// returns a list of foreign keys that are hashed (i.e. their names are shortend and suffixed with a unique hashed) in the current database.
+    /// This is for limited FKs i.e. in PostgreSQL where FK names have a max length of 64 chars.
+    /// </summary>
+    /// <returns>Concurrent bag of modified / hashed FKs</returns>
+    ConcurrentBag<string> GetHashedForeignKeys();
 }
