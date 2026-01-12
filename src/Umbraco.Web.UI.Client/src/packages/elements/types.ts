@@ -15,6 +15,7 @@ export interface UmbElementDetailModel extends UmbContentDetailModel {
 	};
 	entityType: UmbElementEntityType;
 	unique: string;
+	isTrashed: boolean;
 	values: Array<UmbElementValueModel>;
 	variants: Array<UmbElementVariantModel>;
 }
