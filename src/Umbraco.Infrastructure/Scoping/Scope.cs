@@ -386,9 +386,9 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             _scopeProvider.Disposed(this);
 #endif
 
-            if (_autoComplete && Completed == null)
+            if (_autoComplete && _completed == null)
             {
-                Completed = true;
+                _completed = true;
             }
 
             // CoreScope.Dispose will handle file systems and notifications, as well as notifying any parent scope of the child scope's completion.
@@ -404,7 +404,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             }
             else
             {
-                ParentScope.ChildCompleted(Completed);
+                ParentScope.ChildCompleted(_completed);
             }
 
             _disposed = true;
@@ -430,7 +430,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             return ((LockingMechanism)Locks).GetWriteLocks();
         }
 
-        public void Reset() => Completed = null;
+        public void Reset() => _completed = null;
 
         internal void EnsureNotDisposed()
         {
@@ -454,7 +454,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
         private void DisposeLastScope()
         {
             // figure out completed
-            var completed = Completed.HasValue && Completed.Value;
+            var completed = _completed.HasValue && _completed.Value;
 
             // deal with database
             var databaseException = false;

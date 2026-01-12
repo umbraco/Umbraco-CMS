@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Core.Scoping;
 
 public class CoreScope : ICoreScope
 {
-    protected bool? Completed;
+    protected bool? _completed;
     private ICompletable? _scopedFileSystem;
     private IScopedNotificationPublisher? _notificationPublisher;
     private IsolatedCaches? _isolatedCaches;
@@ -183,12 +183,12 @@ public class CoreScope : ICoreScope
     /// <returns>A value indicating whether the scope is completed or not.</returns>
     public bool Complete()
     {
-        if (Completed.HasValue == false)
+        if (_completed.HasValue == false)
         {
-            Completed = true;
+            _completed = true;
         }
 
-        return Completed.Value;
+        return _completed.Value;
     }
 
     public void ReadLock(params int[] lockIds) => Locks.ReadLock(InstanceId, null, lockIds);
@@ -216,7 +216,7 @@ public class CoreScope : ICoreScope
         }
         else
         {
-            ParentScope.ChildCompleted(Completed);
+            ParentScope.ChildCompleted(_completed);
         }
 
         _disposed = true;
@@ -227,7 +227,7 @@ public class CoreScope : ICoreScope
         // if child did not complete we cannot complete
         if (completed.HasValue == false || completed.Value == false)
         {
-            Completed = false;
+            _completed = false;
         }
     }
 
@@ -235,7 +235,7 @@ public class CoreScope : ICoreScope
     {
         if (_shouldScopeFileSystems == true)
         {
-            if (Completed.HasValue && Completed.Value)
+            if (_completed.HasValue && _completed.Value)
             {
                 _scopedFileSystem?.Complete();
             }
@@ -252,7 +252,7 @@ public class CoreScope : ICoreScope
 
     protected bool HasParentScope => _parentScope is not null;
 
-    protected void HandleScopedNotifications() => _notificationPublisher?.ScopeExit(Completed.HasValue && Completed.Value);
+    protected void HandleScopedNotifications() => _notificationPublisher?.ScopeExit(_completed.HasValue && _completed.Value);
 
     private void EnsureNotDisposed()
     {

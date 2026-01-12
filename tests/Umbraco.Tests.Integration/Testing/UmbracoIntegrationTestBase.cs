@@ -25,7 +25,7 @@ public abstract class UmbracoIntegrationTestBase
     private static readonly Lock _dbLocker = new();
     private static ITestDatabase? _dbInstance;
     private static TestDbMeta _fixtureDbMeta;
-    protected static int TestCount = 1;
+    protected static int s_testCount = 1;
     private readonly List<Action> _fixtureTeardown = new();
     private readonly Queue<Action> _testTeardown = new();
     private bool _firstTestInFixture = true;
@@ -44,7 +44,7 @@ public abstract class UmbracoIntegrationTestBase
 
     [SetUp]
     public virtual void SetUp_Logging() =>
-        TestContext.Out.Write($"Start test {TestCount++}: {TestContext.CurrentContext.Test.Name}");
+        TestContext.Out.Write($"Start test {s_testCount++}: {TestContext.CurrentContext.Test.Name}");
 
     [TearDown]
     public void TearDown_Logging() =>
