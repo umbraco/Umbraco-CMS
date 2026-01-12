@@ -1,6 +1,5 @@
 import type { UmbMediaTreeItemModel } from '../types.js';
 import type { UmbMediaTreeItemContext } from './media-tree-item.context.js';
-import type { UUIMenuItemElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, nothing, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbTreeItemElementBase } from '@umbraco-cms/backoffice/tree';
@@ -86,26 +85,6 @@ export class UmbMediaTreeItemElement extends UmbTreeItemElementBase<UmbMediaTree
 
 	#renderIsCollectionIcon() {
 		return html`<umb-icon id="state-icon" slot="icon" name="icon-grid" title="Collection"></umb-icon>`;
-	}
-
-	override updated(changedProperties: Map<string, unknown>) {
-		super.updated(changedProperties);
-
-		if (changedProperties.has('_noAccess')) {
-			this.#updateMenuItemAccessibility();
-		}
-	}
-
-	#updateMenuItemAccessibility() {
-		const menuItem = this.shadowRoot?.querySelector('uui-menu-item') as UUIMenuItemElement | null;
-		if (!menuItem) return;
-
-		if (this._noAccess) {
-			menuItem.setAttribute('aria-disabled', 'true');
-			menuItem.removeAttribute('href');
-		} else {
-			menuItem.setAttribute('aria-disabled', 'false');
-		}
 	}
 
 	static override styles = [

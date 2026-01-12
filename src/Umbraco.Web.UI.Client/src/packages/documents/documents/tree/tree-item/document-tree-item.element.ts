@@ -1,6 +1,5 @@
 import type { UmbDocumentTreeItemModel } from '../types.js';
 import type { UmbDocumentTreeItemContext } from './document-tree-item.context.js';
-import type { UUIMenuItemElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state, property, classMap } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTreeItemElementBase } from '@umbraco-cms/backoffice/tree';
 
@@ -101,26 +100,6 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 
 	override renderLabel() {
 		return html`<span id="label" slot="label" class=${classMap({ draft: this._isDraft })}>${this._name}</span> `;
-	}
-
-	override updated(changedProperties: Map<string, unknown>) {
-		super.updated(changedProperties);
-
-		if (changedProperties.has('_noAccess')) {
-			this.#updateMenuItemAccessibility();
-		}
-	}
-
-	#updateMenuItemAccessibility() {
-		const menuItem = this.shadowRoot?.querySelector('uui-menu-item') as UUIMenuItemElement | null;
-		if (!menuItem) return;
-
-		if (this._noAccess) {
-			menuItem.setAttribute('aria-disabled', 'true');
-			menuItem.removeAttribute('href');
-		} else {
-			menuItem.setAttribute('aria-disabled', 'false');
-		}
 	}
 
 	static override styles = [
