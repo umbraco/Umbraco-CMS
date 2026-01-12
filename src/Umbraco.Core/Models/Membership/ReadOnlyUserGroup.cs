@@ -4,6 +4,39 @@ namespace Umbraco.Cms.Core.Models.Membership;
 
 public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGroup>
 {
+    [Obsolete("Please use the constructor that includes all parameters. Scheduled for removal in Umbraco 19.")]
+    public ReadOnlyUserGroup(
+        int id,
+        Guid key,
+        string? name,
+        string? icon,
+        int? startContentId,
+        int? startMediaId,
+        string? alias,
+        IEnumerable<int> allowedLanguages,
+        IEnumerable<string> allowedSections,
+        ISet<string> permissions,
+        ISet<IGranularPermission> granularPermissions,
+        bool hasAccessToAllLanguages)
+        : this(
+            id,
+            key,
+            name,
+            null,
+            icon,
+            startContentId,
+            startMediaId,
+            null,
+            alias,
+            allowedLanguages,
+            allowedSections,
+            permissions,
+            granularPermissions,
+            hasAccessToAllLanguages)
+    {
+    }
+
+    [Obsolete("Please use the constructor that includes all parameters. Scheduled for removal in Umbraco 19.")]
     public ReadOnlyUserGroup(
         int id,
         Guid key,
@@ -18,11 +51,45 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
         ISet<string> permissions,
         ISet<IGranularPermission> granularPermissions,
         bool hasAccessToAllLanguages)
+        : this(
+            id,
+            key,
+            name,
+            null,
+            icon,
+            startContentId,
+            startMediaId,
+            null,
+            alias,
+            allowedLanguages,
+            allowedSections,
+            permissions,
+            granularPermissions,
+            hasAccessToAllLanguages)
     {
-        Name = name ?? string.Empty;
-        Icon = icon;
+    }
+
+    public ReadOnlyUserGroup(
+        int id,
+        Guid key,
+        string? name,
+        string? description,
+        string? icon,
+        int? startContentId,
+        int? startMediaId,
+        int? startElementId,
+        string? alias,
+        IEnumerable<int> allowedLanguages,
+        IEnumerable<string> allowedSections,
+        ISet<string> permissions,
+        ISet<IGranularPermission> granularPermissions,
+        bool hasAccessToAllLanguages)
+    {
         Id = id;
         Key = key;
+        Name = name ?? string.Empty;
+        Description = description;
+        Icon = icon;
         Alias = alias ?? string.Empty;
         AllowedLanguages = allowedLanguages.ToArray();
         AllowedSections = allowedSections.ToArray();
@@ -40,22 +107,9 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
 
     public Guid Key { get; }
 
-    public bool Equals(ReadOnlyUserGroup? other)
-    {
-        if (ReferenceEquals(null, other))
-        {
-            return false;
-        }
-
-        if (ReferenceEquals(this, other))
-        {
-            return true;
-        }
-
-        return string.Equals(Alias, other.Alias);
-    }
-
     public string Name { get; }
+
+    public string? Description { get; }
 
     public string? Icon { get; }
 
@@ -81,7 +135,7 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
 
     public override bool Equals(object? obj)
     {
-        if (ReferenceEquals(null, obj))
+        if (obj is null)
         {
             return false;
         }
@@ -97,6 +151,21 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
         }
 
         return Equals((ReadOnlyUserGroup)obj);
+    }
+
+    public bool Equals(ReadOnlyUserGroup? other)
+    {
+        if (other is null)
+        {
+            return false;
+        }
+
+        if (ReferenceEquals(this, other))
+        {
+            return true;
+        }
+
+        return string.Equals(Alias, other.Alias);
     }
 
     public override int GetHashCode() => Alias?.GetHashCode() ?? base.GetHashCode();

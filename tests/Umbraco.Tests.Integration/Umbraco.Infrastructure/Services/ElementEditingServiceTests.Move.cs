@@ -1,5 +1,8 @@
 ﻿using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.ContentPublishing;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
@@ -134,6 +137,126 @@ public partial class ElementEditingServiceTests
             Assert.AreEqual(container1.Id, element.ParentId);
             Assert.AreEqual($"{container1.Path},{element.Id}", element.Path);
         });
+    }
+
+    [Test]
+    public async Task Restoring_Trashed_Published_Invariant_Element_Performs_Explicit_Unpublish()
+    {
+        var element = await CreateInvariantElement();
+
+        var publishResult = await ElementPublishingService.PublishAsync(
+            element.Key,
+            [new() { Culture = "*" }],
+            Constants.Security.SuperUserKey);
+        Assert.IsTrue(publishResult.Success);
+
+        var moveResult = await ElementEditingService.MoveToRecycleBinAsync(element.Key, Constants.Security.SuperUserKey);
+        Assert.IsTrue(moveResult.Success);
+
+        element = await ElementEditingService.GetAsync(element.Key);
+        Assert.NotNull(element);
+        Assert.IsTrue(element.Published);
+        Assert.IsTrue(element.Trashed);
+
+        moveResult = await ElementEditingService.MoveAsync(element.Key, null, Constants.Security.SuperUserKey);
+        Assert.IsTrue(moveResult.Success);
+
+        element = await ElementEditingService.GetAsync(element.Key);
+        Assert.NotNull(element);
+        Assert.IsFalse(element.Published);
+        Assert.IsFalse(element.Trashed);
+    }
+
+    [TestCase("en-US", "da-DK")]
+    [TestCase("en-US")]
+    [TestCase("da-DK")]
+    public async Task Restoring_Trashed_Published_Variant_Element_Performs_Explicit_Unpublish(params string[] publishedCultures)
+    {
+        var elementType = await CreateVariantElementType();
+
+        var createModel = new ElementCreateModel
+        {
+            ContentTypeKey = elementType.Key,
+            ParentKey = Constants.System.RootKey,
+            Properties =
+            [
+                new PropertyValueModel { Alias = "invariantTitle", Value = "The Invariant Title" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The English Title", Culture = "en-US" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The Danish Title", Culture = "da-DK" }
+            ],
+            Variants =
+            [
+                new VariantModel { Culture = "en-US", Name = "The English Name" },
+                new VariantModel { Culture = "da-DK", Name = "The Danish Name" }
+            ],
+        };
+
+        var result = await ElementEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+        var element = result.Result.Content!;
+
+        var culturePublishScheduleModels = publishedCultures
+            .Select(culture => new CulturePublishScheduleModel { Culture = culture })
+            .ToArray();
+        var publishResult = await ElementPublishingService.PublishAsync(element.Key,
+            culturePublishScheduleModels,
+            Constants.Security.SuperUserKey);
+        Assert.IsTrue(publishResult.Success);
+
+        var moveResult = await ElementEditingService.MoveToRecycleBinAsync(element.Key, Constants.Security.SuperUserKey);
+        Assert.IsTrue(moveResult.Success);
+
+        element = await ElementEditingService.GetAsync(element.Key);
+        Assert.NotNull(element);
+        Assert.IsTrue(element.Published);
+        CollectionAssert.AreEquivalent(publishedCultures, element.PublishedCultures);
+        Assert.IsTrue(element.Trashed);
+
+        moveResult = await ElementEditingService.MoveAsync(element.Key, null, Constants.Security.SuperUserKey);
+        Assert.IsTrue(moveResult.Success);
+
+        element = await ElementEditingService.GetAsync(element.Key);
+        Assert.NotNull(element);
+        Assert.IsFalse(element.Published);
+        Assert.IsEmpty(element.PublishedCultures);
+        Assert.IsFalse(element.Trashed);
+    }
+
+    [Test]
+    public async Task Can_Cancel_Unpublishing_When_Restoring_Trashed_Published_Element()
+    {
+        var element = await CreateInvariantElement();
+
+        var publishResult = await ElementPublishingService.PublishAsync(
+            element.Key,
+            [new() { Culture = "*" }],
+            Constants.Security.SuperUserKey);
+        Assert.IsTrue(publishResult.Success);
+
+        var moveResult = await ElementEditingService.MoveToRecycleBinAsync(element.Key, Constants.Security.SuperUserKey);
+        Assert.IsTrue(moveResult.Success);
+
+        element = await ElementEditingService.GetAsync(element.Key);
+        Assert.NotNull(element);
+        Assert.IsTrue(element.Published);
+        Assert.IsTrue(element.Trashed);
+
+        try
+        {
+            ElementNotificationHandler.UnpublishingElement = (notification) => notification.Cancel = true;
+
+            moveResult = await ElementEditingService.MoveAsync(element.Key, null, Constants.Security.SuperUserKey);
+            Assert.IsTrue(moveResult.Success);
+
+            element = await ElementEditingService.GetAsync(element.Key);
+            Assert.NotNull(element);
+            Assert.IsTrue(element.Published);
+            Assert.IsFalse(element.Trashed);
+        }
+        finally
+        {
+            ElementNotificationHandler.UnpublishingElement = null;
+        }
     }
 
     [Test]

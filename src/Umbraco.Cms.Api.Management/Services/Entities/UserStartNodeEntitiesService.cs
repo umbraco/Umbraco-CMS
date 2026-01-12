@@ -9,17 +9,31 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Services.Entities;
 
+/// <summary>
+/// Provides functionality for retrieving user start node entities with access information.
+/// </summary>
 public class UserStartNodeEntitiesService : IUserStartNodeEntitiesService
 {
     private readonly IEntityService _entityService;
     private readonly ICoreScopeProvider _scopeProvider;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UserStartNodeEntitiesService"/> class.
+    /// </summary>
+    /// <param name="entityService">The entity service.</param>
+    /// <param name="scopeProvider">The core scope provider.</param>
     public UserStartNodeEntitiesService(IEntityService entityService, ICoreScopeProvider scopeProvider)
     {
         _entityService = entityService;
         _scopeProvider = scopeProvider;
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UserStartNodeEntitiesService"/> class.
+    /// </summary>
+    /// <param name="entityService">The entity service.</param>
+    /// <param name="scopeProvider">The core scope provider.</param>
+    /// <param name="idKeyMap">The ID to key mapping service.</param>
     [Obsolete("Use the constructor without IIdKeyMap. Scheduled for removal in Umbraco 19.")]
     public UserStartNodeEntitiesService(IEntityService entityService, ICoreScopeProvider scopeProvider, IIdKeyMap idKeyMap)
         : this(entityService, scopeProvider)

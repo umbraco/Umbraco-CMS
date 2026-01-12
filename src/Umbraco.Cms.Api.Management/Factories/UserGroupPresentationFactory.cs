@@ -56,6 +56,7 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
         {
             Id = userGroup.Key,
             Name = userGroup.Name ?? string.Empty,
+            Description = userGroup.Description ?? string.Empty,
             Alias = userGroup.Alias,
             DocumentStartNode = ReferenceByIdModel.ReferenceOrNull(contentStartNodeKey),
             DocumentRootAccess = contentRootAccess,
@@ -92,6 +93,7 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
         {
             Id = userGroup.Key,
             Name = userGroup.Name ?? string.Empty,
+            Description = userGroup.Description ?? string.Empty,
             Alias = userGroup.Alias,
             DocumentStartNode = ReferenceByIdModel.ReferenceOrNull(contentStartNodeKey),
             MediaStartNode = ReferenceByIdModel.ReferenceOrNull(mediaStartNodeKey),
@@ -138,6 +140,7 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
         {
             Name = CleanUserGroupNameOrAliasForXss(requestModel.Name),
             Alias = CleanUserGroupNameOrAliasForXss(requestModel.Alias),
+            Description = requestModel.Description,
             Icon = requestModel.Icon,
             HasAccessToAllLanguages = requestModel.HasAccessToAllLanguages,
             Permissions = requestModel.FallbackPermissions,
@@ -203,9 +206,10 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
 
         current.Name = CleanUserGroupNameOrAliasForXss(request.Name);
         current.Alias = CleanUserGroupNameOrAliasForXss(request.Alias);
+        current.Description = request.Description;
         current.Icon = request.Icon;
         current.HasAccessToAllLanguages = request.HasAccessToAllLanguages;
-
+        
         current.Permissions = request.FallbackPermissions;
         current.GranularPermissions = await _permissionPresentationFactory.CreatePermissionSetsAsync(request.Permissions);
 

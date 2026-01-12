@@ -9,6 +9,11 @@ public interface IReadOnlyUserGroup
 {
     string? Name { get; }
 
+    string Alias { get; }
+
+    // TODO (V18): Remove the default implementations.
+    string? Description { get { return null; } }
+
     string? Icon { get; }
 
     int Id { get; }
@@ -20,11 +25,6 @@ public interface IReadOnlyUserGroup
     int? StartMediaId { get; }
 
     int? StartElementId { get; }
-
-    /// <summary>
-    ///     The alias
-    /// </summary>
-    string Alias { get; }
 
     // This is set to return true as default to avoid breaking changes.
     bool HasAccessToAllLanguages => true;

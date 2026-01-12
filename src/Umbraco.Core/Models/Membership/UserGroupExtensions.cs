@@ -18,6 +18,7 @@ public static class UserGroupExtensions
             group.Id,
             group.Key,
             group.Name,
+            group.Description,
             group.Icon,
             group.StartContentId,
             group.StartMediaId,

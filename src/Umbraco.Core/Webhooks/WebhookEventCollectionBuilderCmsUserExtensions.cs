@@ -46,7 +46,8 @@ public static class WebhookEventCollectionBuilderCmsUserExtensions
     /// The builder.
     /// </returns>
     public static WebhookEventCollectionBuilderCmsUser AddLogin(this WebhookEventCollectionBuilderCmsUser builder, WebhookPayloadType payloadType = WebhookPayloadType.Legacy)
-    {switch (payloadType)
+    {
+        switch (payloadType)
         {
             case WebhookPayloadType.Extended:
             case WebhookPayloadType.Minimal:

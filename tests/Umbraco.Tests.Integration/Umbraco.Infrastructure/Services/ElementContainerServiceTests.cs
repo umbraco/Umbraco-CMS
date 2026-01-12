@@ -25,6 +25,8 @@ public partial class ElementContainerServiceTests : UmbracoIntegrationTest
 
     private IElementEditingService ElementEditingService => GetRequiredService<IElementEditingService>();
 
+    private IElementPublishingService ElementPublishingService => GetRequiredService<IElementPublishingService>();
+
     protected override void CustomTestSetup(IUmbracoBuilder builder) => builder
         .AddNotificationHandler<EntityContainerMovingNotification, EntityContainerNotificationHandler>()
         .AddNotificationHandler<EntityContainerMovedNotification, EntityContainerNotificationHandler>()

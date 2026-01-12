@@ -12971,6 +12971,41 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/element/configuration": {
+      "get": {
+        "tags": [
+          "Element"
+        ],
+        "operationId": "GetElementConfiguration",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ElementConfigurationResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/element/folder": {
       "post": {
         "tags": [
@@ -44173,6 +44208,31 @@
               "type": "string",
               "format": "uuid"
             }
+          }
+        },
+        "additionalProperties": false
+      },
+      "ElementConfigurationResponseModel": {
+        "required": [
+          "allowEditInvariantFromNonDefault",
+          "allowNonExistingSegmentsCreation",
+          "disableDeleteWhenReferenced",
+          "disableUnpublishWhenReferenced"
+        ],
+        "type": "object",
+        "properties": {
+          "disableDeleteWhenReferenced": {
+            "type": "boolean"
+          },
+          "disableUnpublishWhenReferenced": {
+            "type": "boolean"
+          },
+          "allowEditInvariantFromNonDefault": {
+            "type": "boolean"
+          },
+          "allowNonExistingSegmentsCreation": {
+            "type": "boolean",
+            "deprecated": true
           }
         },
         "additionalProperties": false
