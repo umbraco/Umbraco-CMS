@@ -24,10 +24,9 @@ test('can update minimum value', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.dataType.enterMinimumValue(minimumValue.toString());
-  await umbracoUi.dataType.clickSaveButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'min', minimumValue)).toBeTruthy();
 });
 
@@ -39,10 +38,9 @@ test('can update Maximum value', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.dataType.enterMaximumValue(maximumValue.toString());
-  await umbracoUi.dataType.clickSaveButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'max', maximumValue)).toBeTruthy();
 });
 
@@ -54,10 +52,9 @@ test('can update step size value', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.dataType.enterStepSizeValue(stepSizeValue.toString());
-  await umbracoUi.dataType.clickSaveButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'step', stepSizeValue)).toBeTruthy();
 });
 
@@ -69,10 +66,9 @@ test.skip('can allow decimals', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.dataType.clickAllowDecimalsToggle();
-  await umbracoUi.dataType.clickSaveButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'allowDecimals', true)).toBeTruthy();
 });
 

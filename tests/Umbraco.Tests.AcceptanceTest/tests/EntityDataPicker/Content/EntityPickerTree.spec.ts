@@ -28,10 +28,9 @@ test('can create empty content with an entity picker using the tree data source'
   await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -49,13 +48,10 @@ test('can create content with an entity picker using the tree data source that h
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.chooseTreeMenuItemWithName('Example 1');
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeCreated();
-  expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe(expectedState);
   expect(contentData.values[0].value.ids[0]).toEqual('1');
 });
 
@@ -72,13 +68,10 @@ test('can create content with an entity picker using the tree data source that h
   await umbracoUi.content.chooseTreeMenuItemWithName('Example 1');
   await umbracoUi.content.chooseTreeMenuItemWithName('Example 3');
   await umbracoUi.content.chooseTreeMenuItemWithName('Example 5', ['Example Folder 1']);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeCreated();
-  expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe(expectedState);
   expect(contentData.values[0].value.ids[0]).toEqual('1');
   expect(contentData.values[0].value.ids[1]).toEqual('3');
   expect(contentData.values[0].value.ids[2]).toEqual('5');
@@ -119,9 +112,7 @@ test('can not create content with an entity picker using the tree data source th
   await umbracoUi.content.chooseTreeMenuItemWithName('Example 5', ['Example Folder 1']);
 
   // Assert
-  await umbracoUi.content.clickSaveAndPublishButton();
-  await umbracoUi.content.waitForContentToBeCreated();
-  expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
 });

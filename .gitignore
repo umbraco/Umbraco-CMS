@@ -96,6 +96,9 @@ tools/docfx/
 /tests/Umbraco.Tests.Integration/Views/
 /tests/Umbraco.Tests.UnitTests/[Uu]mbraco/[Dd]ata/TEMP/
 /BenchmarkDotNet.Artifacts/
+playwright-report
+trace.zip
+/tests/Umbraco.Tests.AcceptanceTest/results
 
 # Ignore auto-generated schema
 /src/Umbraco.Cms.Targets/tasks/
@@ -108,5 +111,3 @@ tools/docfx/
 /tests/Umbraco.Tests.Integration/appsettings-schema.*.json
 /tests/Umbraco.Tests.Integration/umbraco-package-schema.json
 /src/Umbraco.Cms/appsettings-schema.json
-playwright-report
-trace.zip

@@ -77,8 +77,8 @@ export const handlers = [
 		});
 	}),
 
-	http.post(umbracoPath('/install/validate-database'), async ({ request }) => {
-		const body = await request.json<DatabaseInstallRequestModel>();
+	http.post<object, DatabaseInstallRequestModel>(umbracoPath('/install/validate-database'), async ({ request }) => {
+		const body = await request.json();
 
 		if (body.name === 'validate') {
 			return HttpResponse.json<ProblemDetails>(
@@ -94,8 +94,8 @@ export const handlers = [
 		return new HttpResponse(null, { status: 201 });
 	}),
 
-	http.post(umbracoPath('/install/setup'), async ({ request }) => {
-		const body = await request.json<InstallRequestModel>();
+	http.post<object, InstallRequestModel>(umbracoPath('/install/setup'), async ({ request }) => {
+		const body = await request.json();
 
 		if (body.database?.name === 'fail') {
 			// Note: ctx.delay() is not directly supported in v2, needs to be implemented differently if delay is needed

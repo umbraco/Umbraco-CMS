@@ -11,6 +11,17 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Cache;
 
+/// <summary>
+/// Provides cache refresh functionality for content items, ensuring that content-related caches are updated or
+/// invalidated in response to content changes.
+/// </summary>
+/// <remarks>
+/// The ContentCacheRefresher coordinates cache invalidation for content, including memory caches, URL
+/// caches, navigation structures, and domain assignments. It responds to content change notifications and ensures that
+/// all relevant caches reflect the current state of published and unpublished content. This refresher is used
+/// internally to maintain cache consistency after content operations such as publish, unpublish, move,
+/// or delete.
+/// </remarks>
 public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCacheRefresherNotification,
     ContentCacheRefresher.JsonPayload>
 {
@@ -25,6 +36,9 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
     private readonly IPublishStatusManagementService _publishStatusManagementService;
     private readonly IIdKeyMap _idKeyMap;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ContentCacheRefresher"/> class.
+    /// </summary>
     public ContentCacheRefresher(
         AppCaches appCaches,
         IJsonSerializer serializer,
@@ -60,11 +74,15 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
 
     #region Indirect
 
+    /// <summary>
+    /// Clears cached content and public access data from the provided application caches.
+    /// </summary>
+    /// <param name="appCaches">The application caches instance from which to clear content and public access entries.</param>
     public static void RefreshContentTypes(AppCaches appCaches)
     {
-        // we could try to have a mechanism to notify the PublishedCachesService
+        // We could try to have a mechanism to notify the PublishedCachesService
         // and figure out whether published items were modified or not... keep it
-        // simple for now, just clear the whole thing
+        // simple for now, just clear the whole thing.
         appCaches.ClearPartialViewCache();
 
         appCaches.IsolatedCaches.ClearCache<PublicAccessEntry>();
@@ -75,16 +93,22 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
 
     #region Define
 
+    /// <summary>
+    /// Represents a unique identifier for the cache refresher.
+    /// </summary>
     public static readonly Guid UniqueId = Guid.Parse("900A4FBE-DF3C-41E6-BB77-BE896CD158EA");
 
+    /// <inheritdoc/>
     public override Guid RefresherUniqueId => UniqueId;
 
+    /// <inheritdoc/>
     public override string Name => "ContentCacheRefresher";
 
     #endregion
 
     #region Refresher
 
+    /// <inheritdoc/>
     public override void RefreshInternal(JsonPayload[] payloads)
     {
         AppCaches.RuntimeCache.ClearOfType<PublicAccessEntry>();
@@ -121,13 +145,15 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         base.RefreshInternal(payloads);
     }
 
+    /// <inheritdoc/>
     public override void Refresh(JsonPayload[] payloads)
     {
         var idsRemoved = new HashSet<int>();
 
         foreach (JsonPayload payload in payloads)
         {
-            // if the item is not a blueprint and is being completely removed, we need to refresh the domains cache if any domain was assigned to the content
+            // If the item is not a blueprint and is being completely removed, we need to refresh the domains cache if any domain was assigned to the content.
+            // So track the IDs that have been removed.
             if (payload.Blueprint is false && payload.ChangeTypes.HasTypesAny(TreeChangeTypes.Remove))
             {
                 idsRemoved.Add(payload.Id);
@@ -138,43 +164,18 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
 
             HandleNavigation(payload);
             HandlePublishedAsync(payload, CancellationToken.None).GetAwaiter().GetResult();
-            if (payload.Id != default)
-            {
-                _idKeyMap.ClearCache(payload.Id);
-            }
-            if (payload.Key.HasValue)
-            {
-                _idKeyMap.ClearCache(payload.Key.Value);
-            }
 
+            HandleIdKeyMap(payload);
         }
 
-        // Clear partial view cache when published content changes
+        // Clear partial view cache when published content changes.
         if (ShouldClearPartialViewCache(payloads))
         {
             AppCaches.ClearPartialViewCache();
         }
 
-        if (idsRemoved.Count > 0)
-        {
-            var assignedDomains = _domainService.GetAll(true)
-                ?.Where(x => x.RootContentId.HasValue && idsRemoved.Contains(x.RootContentId.Value)).ToList();
-
-            if (assignedDomains?.Count > 0)
-            {
-                // TODO: this is duplicating the logic in DomainCacheRefresher BUT we cannot inject that into this because it it not registered explicitly in the container,
-                // and we cannot inject the CacheRefresherCollection since that would be a circular reference, so what is the best way to call directly in to the
-                // DomainCacheRefresher?
-                ClearAllIsolatedCacheByEntityType<IDomain>();
-
-                // note: must do what's above FIRST else the repositories still have the old cached
-                // content and when the PublishedCachesService is notified of changes it does not see
-                // the new content...
-                // notify
-                _domainCacheService.Refresh(assignedDomains
-                    .Select(x => new DomainCacheRefresher.JsonPayload(x.Id, DomainChangeTypes.Remove)).ToArray());
-            }
-        }
+        // Clear the domain cache if any domain is assigned to removed content.
+        HandleDomainCache(idsRemoved);
 
         base.Refresh(payloads);
     }
@@ -251,18 +252,51 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         }
     }
 
-    private bool IsBranchUnpublished(JsonPayload payload)
-    {
+    private static bool IsBranchUnpublished(JsonPayload payload) =>
+
         // If unpublished cultures has one or more values, but published cultures does not, this means that the branch is unpublished entirely
         // And therefore should no longer be resolve-able from the cache, so we need to remove it instead.
         // Otherwise, some culture is still published, so it should be resolve-able from cache, and published cultures should instead be used.
-        return payload.UnpublishedCultures is not null && payload.UnpublishedCultures.Length != 0 &&
+        payload.UnpublishedCultures is not null && payload.UnpublishedCultures.Length != 0 &&
                (payload.PublishedCultures is null || payload.PublishedCultures.Length == 0);
+
+    private void HandleRouting(JsonPayload payload)
+    {
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.Remove))
+        {
+            Guid key = payload.Key ?? _idKeyMap.GetKeyForId(payload.Id, UmbracoObjectTypes.Document).Result;
+
+            // Note that we need to clear the navigation service as the last thing.
+            if (_documentNavigationQueryService.TryGetDescendantsKeysOrSelfKeys(key, out IEnumerable<Guid>? descendantsOrSelfKeys))
+            {
+                _documentUrlService.DeleteUrlsFromCacheAsync(descendantsOrSelfKeys).GetAwaiter().GetResult();
+            }
+            else if (_documentNavigationQueryService.TryGetDescendantsKeysOrSelfKeysInBin(key, out IEnumerable<Guid>? descendantsOrSelfKeysInBin))
+            {
+                _documentUrlService.DeleteUrlsFromCacheAsync(descendantsOrSelfKeysInBin).GetAwaiter().GetResult();
+            }
+        }
+
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
+        {
+            _documentUrlService.InitAsync(false, CancellationToken.None).GetAwaiter().GetResult(); // TODO: make async
+        }
+
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshNode))
+        {
+            Guid key = payload.Key ?? _idKeyMap.GetKeyForId(payload.Id, UmbracoObjectTypes.Document).Result;
+            _documentUrlService.CreateOrUpdateUrlSegmentsAsync(key).GetAwaiter().GetResult();
+        }
+
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch))
+        {
+            Guid key = payload.Key ?? _idKeyMap.GetKeyForId(payload.Id, UmbracoObjectTypes.Document).Result;
+            _documentUrlService.CreateOrUpdateUrlSegmentsWithDescendantsAsync(key).GetAwaiter().GetResult();
+        }
     }
 
     private void HandleNavigation(JsonPayload payload)
     {
-
         if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
         {
             _documentNavigationManagementService.RebuildAsync().GetAwaiter().GetResult();
@@ -389,50 +423,68 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
             await _publishStatusManagementService.AddOrUpdateStatusWithDescendantsAsync(payload.Key.Value, cancellationToken);
         }
     }
-    private void HandleRouting(JsonPayload payload)
+
+    private void HandleIdKeyMap(JsonPayload payload)
     {
-        if (payload.ChangeTypes.HasType(TreeChangeTypes.Remove))
+        // We only need to flush the ID/Key map when content is deleted.
+        if (payload.ChangeTypes.HasTypesAny(TreeChangeTypes.Remove) is false)
         {
-            var key = payload.Key ?? _idKeyMap.GetKeyForId(payload.Id, UmbracoObjectTypes.Document).Result;
-
-            //Note the we need to clear the navigation service as the last thing
-            if (_documentNavigationQueryService.TryGetDescendantsKeysOrSelfKeys(key, out var descendantsOrSelfKeys))
-            {
-                _documentUrlService.DeleteUrlsFromCacheAsync(descendantsOrSelfKeys).GetAwaiter().GetResult();
-            }
-            else if (_documentNavigationQueryService.TryGetDescendantsKeysOrSelfKeysInBin(key, out var descendantsOrSelfKeysInBin))
-            {
-                _documentUrlService.DeleteUrlsFromCacheAsync(descendantsOrSelfKeysInBin).GetAwaiter().GetResult();
-            }
-
-        }
-        if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
-        {
-            _documentUrlService.InitAsync(false, CancellationToken.None).GetAwaiter().GetResult(); //TODO make async
+            return;
         }
 
-        if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshNode))
+        if (payload.Id != default)
         {
-            var key = payload.Key ?? _idKeyMap.GetKeyForId(payload.Id, UmbracoObjectTypes.Document).Result;
-            _documentUrlService.CreateOrUpdateUrlSegmentsAsync(key).GetAwaiter().GetResult();
+            _idKeyMap.ClearCache(payload.Id);
         }
 
-        if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch))
+        if (payload.Key.HasValue)
         {
-            var key = payload.Key ?? _idKeyMap.GetKeyForId(payload.Id, UmbracoObjectTypes.Document).Result;
-            _documentUrlService.CreateOrUpdateUrlSegmentsWithDescendantsAsync(key).GetAwaiter().GetResult();
+            _idKeyMap.ClearCache(payload.Key.Value);
         }
-
     }
 
-    // these events should never trigger
-    // everything should be PAYLOAD/JSON
+    private void HandleDomainCache(HashSet<int> idsRemoved)
+    {
+        if (idsRemoved.Count == 0)
+        {
+            return;
+        }
+
+#pragma warning disable CS0618 // Type or member is obsolete
+        var assignedDomains = _domainService.GetAll(true)
+            .Where(x => x.RootContentId.HasValue && idsRemoved.Contains(x.RootContentId.Value))
+            .ToList();
+#pragma warning restore CS0618 // Type or member is obsolete
+        if (assignedDomains.Count <= 0)
+        {
+            return;
+        }
+
+        // TODO: this is duplicating the logic in DomainCacheRefresher BUT we cannot inject that into this because it it not registered explicitly in the container,
+        // and we cannot inject the CacheRefresherCollection since that would be a circular reference, so what is the best way to call directly in to the
+        // DomainCacheRefresher?
+        ClearAllIsolatedCacheByEntityType<IDomain>();
+
+        // note: must do what's above FIRST else the repositories still have the old cached
+        // content and when the PublishedCachesService is notified of changes it does not see
+        // the new content...
+        // notify
+        _domainCacheService.Refresh(assignedDomains
+            .Select(x => new DomainCacheRefresher.JsonPayload(x.Id, DomainChangeTypes.Remove)).ToArray());
+    }
+
+    // These events should never trigger. Everything should be PAYLOAD/JSON.
+
+    /// <inheritdoc/>
     public override void RefreshAll() => throw new NotSupportedException();
 
+    /// <inheritdoc/>
     public override void Refresh(int id) => throw new NotSupportedException();
 
+    /// <inheritdoc/>
     public override void Refresh(Guid id) => throw new NotSupportedException();
 
+    /// <inheritdoc/>
     public override void Remove(int id) => throw new NotSupportedException();
 
     #endregion
@@ -440,19 +492,40 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
     #region Json
 
     // TODO (V14): Change into a record
+    /// <summary>
+    /// Represents a JSON-serializable payload containing information about a content or tree change event, including
+    /// identifiers, change types, and culture-specific publishing details.
+    /// </summary>
     public class JsonPayload
     {
-
+        /// <summary>
+        /// Gets the unique integer identifier for the entity.
+        /// </summary>
         public int Id { get; init; }
 
+        /// <summary>
+        /// Gets the unique GUID key associated with the entity, or null if no key is assigned.
+        /// </summary>
         public Guid? Key { get; init; }
 
+        /// <summary>
+        /// Gets the types of changes that have occurred in the tree.
+        /// </summary>
         public TreeChangeTypes ChangeTypes { get; init; }
 
+        /// <summary>
+        /// Gets a value indicating whether the content represents a document blueprint.
+        /// </summary>
         public bool Blueprint { get; init; }
 
+        /// <summary>
+        /// Gets the collection of culture codes in which the content is published.
+        /// </summary>
         public string[]? PublishedCultures { get; init; }
 
+        /// <summary>
+        /// Gets the collection of culture codes for which the content has been unpublished.
+        /// </summary>
         public string[]? UnpublishedCultures { get; init; }
     }
 
