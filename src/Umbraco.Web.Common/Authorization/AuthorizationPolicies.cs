@@ -25,6 +25,7 @@ public static class AuthorizationPolicies
     public const string SectionAccessMedia = nameof(SectionAccessMedia);
     public const string SectionAccessSettings = nameof(SectionAccessSettings);
     public const string SectionAccessMembers = nameof(SectionAccessMembers);
+    public const string SectionAccessLibrary = nameof(SectionAccessLibrary);
 
     // Custom access based on multiple sections
     public const string SectionAccessContentOrMedia = nameof(SectionAccessContentOrMedia);

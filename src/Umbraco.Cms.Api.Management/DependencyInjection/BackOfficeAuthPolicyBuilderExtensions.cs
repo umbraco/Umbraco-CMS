@@ -87,18 +87,19 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
             Constants.Applications.Settings,
             Constants.Applications.Packages,
             Constants.Applications.Members,
-            Constants.Applications.Elements);
+            Constants.Applications.Library);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.SectionAccessMedia, Constants.Applications.Media);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.SectionAccessMembers, Constants.Applications.Members);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.SectionAccessPackages, Constants.Applications.Packages);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.SectionAccessSettings, Constants.Applications.Settings);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.SectionAccessUsers, Constants.Applications.Users);
+        AddAllowedApplicationsPolicy(AuthorizationPolicies.SectionAccessLibrary, Constants.Applications.Library);
 
         AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessDataTypes, Constants.Applications.Settings);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessDictionary, Constants.Applications.Translation);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessDictionaryOrTemplates, Constants.Applications.Translation, Constants.Applications.Settings);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessDocuments, Constants.Applications.Content);
-        AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessElements, Constants.Applications.Elements);
+        AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessElements, Constants.Applications.Library);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessDocumentsOrDocumentTypes, Constants.Applications.Content, Constants.Applications.Settings);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessDocumentOrMediaOrContentTypes, Constants.Applications.Content, Constants.Applications.Settings, Constants.Applications.Media);
         AddAllowedApplicationsPolicy(AuthorizationPolicies.TreeAccessDocumentsOrMediaOrMembersOrContentTypes, Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members, Constants.Applications.Settings);
