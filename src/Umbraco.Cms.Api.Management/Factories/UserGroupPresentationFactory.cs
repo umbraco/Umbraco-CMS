@@ -203,7 +203,7 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
         current.Description = request.Description;
         current.Icon = request.Icon;
         current.HasAccessToAllLanguages = request.HasAccessToAllLanguages;
-        
+
         current.Permissions = request.FallbackPermissions;
         current.GranularPermissions = await _permissionPresentationFactory.CreatePermissionSetsAsync(request.Permissions);
 
