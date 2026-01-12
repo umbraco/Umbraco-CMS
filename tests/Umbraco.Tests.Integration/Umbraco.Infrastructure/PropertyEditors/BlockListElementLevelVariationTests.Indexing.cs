@@ -149,32 +149,29 @@ internal partial class BlockListElementLevelVariationTests
                     Guid.NewGuid(),
                     Guid.NewGuid(),
                     new BlockProperty(
-                        new List<BlockPropertyValue> {
+                        new List<BlockPropertyValue>
+                        {
                             new() { Alias = "invariantText", Value = "#1: The invariant content value" },
                             new() { Alias = "variantText", Value = "#1: The content value in English", Culture = "en-US" },
                             new() { Alias = "variantText", Value = "#1: The content value in Danish", Culture = "da-DK" }
                         },
                         [],
                         null,
-                        null
-                    )
-                ),
+                        null)),
                 (
                     Guid.NewGuid(),
                     Guid.NewGuid(),
                     new BlockProperty(
-                        new List<BlockPropertyValue> {
+                        new List<BlockPropertyValue>
+                        {
                             new() { Alias = "invariantText", Value = "#2: The invariant content value" },
                             new() { Alias = "variantText", Value = "#2: The content value in English", Culture = "en-US" },
                             new() { Alias = "variantText", Value = "#2: The content value in Danish", Culture = "da-DK" }
                         },
                         [],
                         null,
-                        null
-                    )
-                )
-            ]
-        );
+                        null))
+            ]);
 
         // only expose the first block in English and the second block in Danish (to make a difference between published and unpublished index values)
         blockListValue.Expose =

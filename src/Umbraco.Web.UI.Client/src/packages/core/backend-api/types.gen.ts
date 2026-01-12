@@ -437,6 +437,7 @@ export type CreateUserGroupRequestModel = {
     fallbackPermissions: Array<string>;
     permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
     id?: string | null;
+    description?: string | null;
 };
 
 export type CreateUserRequestModel = {
@@ -2962,6 +2963,7 @@ export type UpdateUserDataRequestModel = {
 
 export type UpdateUserGroupRequestModel = {
     name: string;
+    description?: string | null;
     alias: string;
     icon?: string | null;
     sections: Array<string>;
@@ -3077,6 +3079,7 @@ export type UserGroupResponseModel = {
     id: string;
     isDeletable: boolean;
     aliasCanBeChanged: boolean;
+    description?: string | null;
 };
 
 export type UserInstallRequestModel = {

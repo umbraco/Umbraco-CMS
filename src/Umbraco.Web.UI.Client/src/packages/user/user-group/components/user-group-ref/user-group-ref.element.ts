@@ -36,6 +36,9 @@ export class UmbUserGroupRefElement extends UmbElementMixin(UUIRefNodeElement) {
 		this.#observeMediaStartNode(value);
 	}
 
+	@property({ type: String })
+	description: string | null = null;
+
 	@property({ type: Array })
 	public get sections(): Array<string> {
 		return [];
@@ -151,19 +154,14 @@ export class UmbUserGroupRefElement extends UmbElementMixin(UUIRefNodeElement) {
 	}
 
 	#renderDetails() {
-		const hasSections = this._sectionLabels.length;
-		const hasDocument = !!this._documentLabel || this.documentRootAccess;
-		const hasMedia = !!this._mediaLabel || this.mediaRootAccess;
-		const hasUserPermissions = this._userPermissionLabels.length;
+		const content = this.description
+			? html`<small>${this.description}</small>`
+			: html`
+					${this.#renderSections()} ${this.#renderDocumentStartNode()} ${this.#renderMediaStartNode()}
+					${this.#renderUserPermissions()}
+				`;
 
-		if (!hasSections && !hasDocument && !hasMedia && !hasUserPermissions) return;
-
-		return html`
-			<div id="details">
-				${this.#renderSections()} ${this.#renderDocumentStartNode()} ${this.#renderMediaStartNode()}
-				${this.#renderUserPermissions()}
-			</div>
-		`;
+		return html`<div id="details">${content}</div>`;
 	}
 
 	#renderSections() {
