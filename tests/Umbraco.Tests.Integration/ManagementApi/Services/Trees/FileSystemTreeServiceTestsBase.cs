@@ -74,14 +74,28 @@ public abstract class FileSystemTreeServiceTestsBase : UmbracoIntegrationTest
         var files = fs.GetFiles(path, "*");
         foreach (var file in files)
         {
-            fs.DeleteFile(file);
+            try
+            {
+                fs.DeleteFile(file);
+            }
+            catch (IOException)
+            {
+                // Ignore locked files during cleanup
+            }
         }
 
         var dirs = fs.GetDirectories(path);
         foreach (var dir in dirs)
         {
             Purge(fs, dir);
-            fs.DeleteDirectory(dir);
+            try
+            {
+                fs.DeleteDirectory(dir);
+            }
+            catch (IOException)
+            {
+                // Ignore locked directories during cleanup
+            }
         }
     }
 }

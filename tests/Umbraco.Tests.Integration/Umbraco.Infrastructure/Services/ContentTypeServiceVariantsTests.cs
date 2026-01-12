@@ -14,6 +14,7 @@ using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
+using Umbraco.Cms.Tests.Integration.Attributes;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping;
 
@@ -43,6 +44,9 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
             options.NuCacheSerializerType = NuCacheSerializerType.JSON;
         });
     }
+
+    public static void ConfigureAllowEditInvariantFromNonDefaultTrue(IUmbracoBuilder builder)
+        => builder.Services.Configure<ContentSettings>(config => config.AllowEditInvariantFromNonDefault = true);
 
     private void AssertJsonStartsWith(int id, string expected)
     {
@@ -843,9 +847,13 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         Assert.IsFalse(document.IsCultureEdited("fr"));
         Assert.IsFalse(document.Edited);
 
-        document.SetValue("value1", "v1en",
+        document.SetValue(
+            "value1",
+            "v1en",
             "en"); // change the property culture value, so now this culture will be edited
-        document.SetValue("value1", "v1fr",
+        document.SetValue(
+            "value1",
+            "v1fr",
             "fr"); // change the property culture value, so now this culture will be edited
         ContentService.Save(document);
 
@@ -889,9 +897,13 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         Assert.AreEqual("doc1fr", document.GetCultureName("fr"));
         Assert.IsNull(document.GetValue("value1", "en")); // The values are there but the business logic returns null
         Assert.IsNull(document.GetValue("value1", "fr")); // The values are there but the business logic returns null
-        Assert.IsNull(document.GetValue("value1", "en",
+        Assert.IsNull(document.GetValue(
+            "value1",
+            "en",
             published: true)); // The values are there but the business logic returns null
-        Assert.IsNull(document.GetValue("value1", "fr",
+        Assert.IsNull(document.GetValue(
+            "value1",
+            "fr",
             published: true)); // The values are there but the business logic returns null
         Assert.AreEqual("v1inv", document.GetValue("value1"));
         Assert.AreEqual("v1inv", document.GetValue("value1", published: true));
@@ -1021,7 +1033,9 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
             document.GetValue("value1")); // The variant property value gets copied over to the invariant
         Assert.AreEqual("v1en2", document.GetValue("value1", published: true));
         Assert.IsNull(document.GetValue("value1", "fr")); // The values are there but the business logic returns null
-        Assert.IsNull(document.GetValue("value1", "fr",
+        Assert.IsNull(document.GetValue(
+            "value1",
+            "fr",
             published: true)); // The values are there but the business logic returns null
         Assert.IsFalse(
             document.IsCultureEdited("en")); // The variant published AND edited values are copied over to the invariant
@@ -1309,5 +1323,397 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         }
 
         return propertyCollection;
+    }
+
+    /// <summary>
+    /// Tests that changing a property from invariant to variant does not throw an exception
+    /// when content exists only in a non-default language.
+    /// This is a regression test for https://github.com/umbraco/Umbraco-CMS/issues/11771
+    /// </summary>
+    [TestCase(ContentVariation.Nothing, ContentVariation.Culture)]
+    [TestCase(ContentVariation.Nothing, ContentVariation.CultureAndSegment)]
+    [TestCase(ContentVariation.Segment, ContentVariation.Culture)]
+    [TestCase(ContentVariation.Segment, ContentVariation.CultureAndSegment)]
+    public async Task Change_Property_Type_From_Invariant_To_Variant_When_Content_Only_Exists_In_Non_Default_Language(
+        ContentVariation invariant, ContentVariation variant)
+    {
+        // Arrange - Create languages with English as default and French as non-default
+        var languageEn = new Language("en", "English") { IsDefault = true };
+        await LanguageService.CreateAsync(languageEn, Constants.Security.SuperUserKey);
+        var languageFr = new Language("fr", "French");
+        await LanguageService.CreateAsync(languageFr, Constants.Security.SuperUserKey);
+
+        // Create a content type that varies by culture with an invariant property
+        var contentType = CreateContentType(ContentVariation.Culture | ContentVariation.Segment);
+        var properties = CreatePropertyCollection(("title", invariant));
+        contentType.PropertyGroups.Add(new PropertyGroup(properties) { Alias = "content", Name = "Content" });
+        ContentTypeService.Save(contentType);
+
+        // Create content ONLY in the non-default language (French)
+        // This is the key scenario - no content exists in the default language (English)
+        IContent document = new Content("document", -1, contentType);
+        document.SetCultureName("doc1fr", "fr");
+        document.SetValue("title", "hello world"); // invariant property
+        ContentService.Save(document);
+        ContentService.Publish(document, new[] { "fr" }); // Only publish in French
+
+        document = ContentService.GetById(document.Id);
+        Assert.IsNull(document.GetCultureName("en")); // No English version exists
+        Assert.AreEqual("doc1fr", document.GetCultureName("fr"));
+        Assert.AreEqual("hello world", document.GetValue("title"));
+
+        // Act - Change the property type from invariant to variant
+        // This should NOT throw a PanicException even though content only exists in non-default language
+        contentType.PropertyTypes.First(x => x.Alias == "title").Variations = variant;
+        Assert.DoesNotThrow(() => ContentTypeService.Save(contentType));
+
+        // Assert - Content should still be accessible
+        document = ContentService.GetById(document.Id);
+        Assert.IsNotNull(document);
+        Assert.AreEqual("doc1fr", document.GetCultureName("fr"));
+        // The invariant value should be migrated to the default language
+        Assert.AreEqual("hello world", document.GetValue("title", "en"));
+    }
+
+    /// <summary>
+    /// Tests that changing a property from variant to invariant does not throw an exception
+    /// when content exists only in a non-default language.
+    /// This is a regression test for https://github.com/umbraco/Umbraco-CMS/issues/11771
+    /// </summary>
+    [TestCase(ContentVariation.Culture, ContentVariation.Nothing)]
+    [TestCase(ContentVariation.Culture, ContentVariation.Segment)]
+    [TestCase(ContentVariation.CultureAndSegment, ContentVariation.Nothing)]
+    [TestCase(ContentVariation.CultureAndSegment, ContentVariation.Segment)]
+    public async Task Change_Property_Type_From_Variant_To_Invariant_When_Content_Only_Exists_In_Non_Default_Language(
+        ContentVariation variant, ContentVariation invariant)
+    {
+        // Arrange - Create languages with English as default and French as non-default
+        var languageEn = new Language("en", "English") { IsDefault = true };
+        await LanguageService.CreateAsync(languageEn, Constants.Security.SuperUserKey);
+        var languageFr = new Language("fr", "French");
+        await LanguageService.CreateAsync(languageFr, Constants.Security.SuperUserKey);
+
+        // Create a content type that varies by culture with a variant property
+        var contentType = CreateContentType(ContentVariation.Culture | ContentVariation.Segment);
+        var properties = CreatePropertyCollection(("title", variant));
+        contentType.PropertyGroups.Add(new PropertyGroup(properties) { Alias = "content", Name = "Content" });
+        ContentTypeService.Save(contentType);
+
+        // Create content ONLY in the non-default language (French)
+        IContent document = new Content("document", -1, contentType);
+        document.SetCultureName("doc1fr", "fr");
+        document.SetValue("title", "bonjour monde", "fr"); // variant property value in French only
+        ContentService.Save(document);
+        ContentService.Publish(document, new[] { "fr" }); // Only publish in French
+
+        document = ContentService.GetById(document.Id);
+        Assert.IsNull(document.GetCultureName("en")); // No English version exists
+        Assert.AreEqual("doc1fr", document.GetCultureName("fr"));
+        Assert.AreEqual("bonjour monde", document.GetValue("title", "fr"));
+        Assert.IsNull(document.GetValue("title", "en")); // No English value
+
+        // Act - Change the property type from variant to invariant
+        // This should NOT throw a PanicException even though content only exists in non-default language
+        contentType.PropertyTypes.First(x => x.Alias == "title").Variations = invariant;
+        Assert.DoesNotThrow(() => ContentTypeService.Save(contentType));
+
+        // Assert - Content should still be accessible
+        document = ContentService.GetById(document.Id);
+        Assert.IsNotNull(document);
+        Assert.AreEqual("doc1fr", document.GetCultureName("fr"));
+        // The variant value from the default language should be used (which was null/empty),
+        // or the French value depending on implementation
+    }
+
+    /// <summary>
+    /// Tests that changing a property from invariant to variant and back does not throw an exception
+    /// when content exists only in a non-default language.
+    /// This is a regression test for https://github.com/umbraco/Umbraco-CMS/issues/11771
+    /// </summary>
+    [Test]
+    public async Task Change_Property_Type_Invariant_To_Variant_And_Back_When_Content_Only_Exists_In_Non_Default_Language()
+    {
+        // Arrange - Create languages with English as default and French as non-default
+        var languageEn = new Language("en", "English") { IsDefault = true };
+        await LanguageService.CreateAsync(languageEn, Constants.Security.SuperUserKey);
+        var languageFr = new Language("fr", "French");
+        await LanguageService.CreateAsync(languageFr, Constants.Security.SuperUserKey);
+
+        // Create a content type that varies by culture with an invariant property
+        var contentType = CreateContentType(ContentVariation.Culture);
+        var properties = CreatePropertyCollection(("title", ContentVariation.Nothing));
+        contentType.PropertyGroups.Add(new PropertyGroup(properties) { Alias = "content", Name = "Content" });
+        ContentTypeService.Save(contentType);
+
+        // Create content ONLY in the non-default language (French)
+        IContent document = new Content("document", -1, contentType);
+        document.SetCultureName("doc1fr", "fr");
+        document.SetValue("title", "hello world"); // invariant property
+        ContentService.Save(document);
+        ContentService.Publish(document, new[] { "fr" }); // Only publish in French
+
+        document = ContentService.GetById(document.Id);
+        Assert.IsNull(document.GetCultureName("en"));
+        Assert.AreEqual("doc1fr", document.GetCultureName("fr"));
+        Assert.AreEqual("hello world", document.GetValue("title"));
+
+        // Act 1 - Change property from invariant to variant
+        contentType.PropertyTypes.First(x => x.Alias == "title").Variations = ContentVariation.Culture;
+        Assert.DoesNotThrow(() => ContentTypeService.Save(contentType));
+
+        document = ContentService.GetById(document.Id);
+        Assert.IsNotNull(document);
+        Assert.AreEqual("hello world", document.GetValue("title", "en")); // Migrated to default language
+
+        // Act 2 - Change property back from variant to invariant
+        contentType.PropertyTypes.First(x => x.Alias == "title").Variations = ContentVariation.Nothing;
+        Assert.DoesNotThrow(() => ContentTypeService.Save(contentType));
+
+        // Assert - Content should still be accessible
+        document = ContentService.GetById(document.Id);
+        Assert.IsNotNull(document);
+        Assert.AreEqual("hello world", document.GetValue("title"));
+    }
+
+    /// <summary>
+    /// Tests that changing a content type from invariant to variant does not throw an exception
+    /// when content exists only in a non-default language.
+    /// This is a regression test for https://github.com/umbraco/Umbraco-CMS/issues/11771
+    /// </summary>
+    [Test]
+    public async Task Change_Content_Type_From_Invariant_To_Variant_When_Content_Only_Exists_In_Non_Default_Language()
+    {
+        // Arrange - Create languages with English as default and French as non-default
+        var languageEn = new Language("en", "English") { IsDefault = true };
+        await LanguageService.CreateAsync(languageEn, Constants.Security.SuperUserKey);
+        var languageFr = new Language("fr", "French");
+        await LanguageService.CreateAsync(languageFr, Constants.Security.SuperUserKey);
+
+        // Create an invariant content type first
+        var contentType = CreateContentType(ContentVariation.Nothing);
+        var properties = CreatePropertyCollection(("title", ContentVariation.Nothing));
+        contentType.PropertyGroups.Add(new PropertyGroup(properties) { Alias = "content", Name = "Content" });
+        ContentTypeService.Save(contentType);
+
+        // Create invariant content
+        IContent document = new Content("document", -1, contentType);
+        document.Name = "doc1";
+        document.SetValue("title", "hello world");
+        ContentService.Save(document);
+        ContentService.Publish(document, Array.Empty<string>());
+
+        document = ContentService.GetById(document.Id);
+        Assert.AreEqual("doc1", document.Name);
+        Assert.AreEqual("hello world", document.GetValue("title"));
+
+        // Act - Change content type from invariant to variant
+        // This changes the content to be culture-variant, with the invariant data
+        // migrated to the default language
+        contentType.Variations = ContentVariation.Culture;
+        Assert.DoesNotThrow(() => ContentTypeService.Save(contentType));
+
+        // Assert - Content should be accessible in the default language
+        document = ContentService.GetById(document.Id);
+        Assert.IsNotNull(document);
+        Assert.AreEqual("doc1", document.GetCultureName("en"));
+        Assert.AreEqual("hello world", document.GetValue("title"));
+    }
+
+    /// <summary>
+    /// Tests that changing a property from invariant to variant does not throw an exception
+    /// when content exists only in a non-default language with AllowEditInvariantFromNonDefault enabled.
+    /// This is a regression test for https://github.com/umbraco/Umbraco-CMS/issues/11771
+    /// </summary>
+    [TestCase(ContentVariation.Nothing, ContentVariation.Culture)]
+    [TestCase(ContentVariation.Nothing, ContentVariation.CultureAndSegment)]
+    [TestCase(ContentVariation.Segment, ContentVariation.Culture)]
+    [TestCase(ContentVariation.Segment, ContentVariation.CultureAndSegment)]
+    [ConfigureBuilder(ActionName = nameof(ConfigureAllowEditInvariantFromNonDefaultTrue))]
+    public async Task Change_Property_Type_From_Invariant_To_Variant_When_Content_Only_Exists_In_Non_Default_Language_With_AllowEditInvariantFromNonDefault(
+        ContentVariation invariant, ContentVariation variant)
+    {
+        // Arrange - Create languages with English as default and French as non-default
+        var languageEn = new Language("en", "English") { IsDefault = true };
+        await LanguageService.CreateAsync(languageEn, Constants.Security.SuperUserKey);
+        var languageFr = new Language("fr", "French");
+        await LanguageService.CreateAsync(languageFr, Constants.Security.SuperUserKey);
+
+        // Create a content type that varies by culture with an invariant property
+        var contentType = CreateContentType(ContentVariation.Culture | ContentVariation.Segment);
+        var properties = CreatePropertyCollection(("title", invariant));
+        contentType.PropertyGroups.Add(new PropertyGroup(properties) { Alias = "content", Name = "Content" });
+        ContentTypeService.Save(contentType);
+
+        // Create content ONLY in the non-default language (French)
+        // This is the key scenario - no content exists in the default language (English)
+        IContent document = new Content("document", -1, contentType);
+        document.SetCultureName("doc1fr", "fr");
+        document.SetValue("title", "hello world"); // invariant property
+        ContentService.Save(document);
+        ContentService.Publish(document, new[] { "fr" }); // Only publish in French
+
+        document = ContentService.GetById(document.Id);
+        Assert.IsNull(document.GetCultureName("en")); // No English version exists
+        Assert.AreEqual("doc1fr", document.GetCultureName("fr"));
+        Assert.AreEqual("hello world", document.GetValue("title"));
+
+        // Act - Change the property type from invariant to variant
+        // This should NOT throw a PanicException even though content only exists in non-default language
+        contentType.PropertyTypes.First(x => x.Alias == "title").Variations = variant;
+        Assert.DoesNotThrow(() => ContentTypeService.Save(contentType));
+
+        // Assert - Content should still be accessible
+        document = ContentService.GetById(document.Id);
+        Assert.IsNotNull(document);
+        Assert.AreEqual("doc1fr", document.GetCultureName("fr"));
+        // The invariant value should be migrated to the default language
+        Assert.AreEqual("hello world", document.GetValue("title", "en"));
+    }
+
+    /// <summary>
+    /// Tests that changing a property from variant to invariant does not throw an exception
+    /// when content exists only in a non-default language with AllowEditInvariantFromNonDefault enabled.
+    /// This is a regression test for https://github.com/umbraco/Umbraco-CMS/issues/11771
+    /// </summary>
+    [TestCase(ContentVariation.Culture, ContentVariation.Nothing)]
+    [TestCase(ContentVariation.Culture, ContentVariation.Segment)]
+    [TestCase(ContentVariation.CultureAndSegment, ContentVariation.Nothing)]
+    [TestCase(ContentVariation.CultureAndSegment, ContentVariation.Segment)]
+    [ConfigureBuilder(ActionName = nameof(ConfigureAllowEditInvariantFromNonDefaultTrue))]
+    public async Task Change_Property_Type_From_Variant_To_Invariant_When_Content_Only_Exists_In_Non_Default_Language_With_AllowEditInvariantFromNonDefault(
+        ContentVariation variant, ContentVariation invariant)
+    {
+        // Arrange - Create languages with English as default and French as non-default
+        var languageEn = new Language("en", "English") { IsDefault = true };
+        await LanguageService.CreateAsync(languageEn, Constants.Security.SuperUserKey);
+        var languageFr = new Language("fr", "French");
+        await LanguageService.CreateAsync(languageFr, Constants.Security.SuperUserKey);
+
+        // Create a content type that varies by culture with a variant property
+        var contentType = CreateContentType(ContentVariation.Culture | ContentVariation.Segment);
+        var properties = CreatePropertyCollection(("title", variant));
+        contentType.PropertyGroups.Add(new PropertyGroup(properties) { Alias = "content", Name = "Content" });
+        ContentTypeService.Save(contentType);
+
+        // Create content ONLY in the non-default language (French)
+        IContent document = new Content("document", -1, contentType);
+        document.SetCultureName("doc1fr", "fr");
+        document.SetValue("title", "bonjour monde", "fr"); // variant property value in French only
+        ContentService.Save(document);
+        ContentService.Publish(document, new[] { "fr" }); // Only publish in French
+
+        document = ContentService.GetById(document.Id);
+        Assert.IsNull(document.GetCultureName("en")); // No English version exists
+        Assert.AreEqual("doc1fr", document.GetCultureName("fr"));
+        Assert.AreEqual("bonjour monde", document.GetValue("title", "fr"));
+        Assert.IsNull(document.GetValue("title", "en")); // No English value
+
+        // Act - Change the property type from variant to invariant
+        // This should NOT throw a PanicException even though content only exists in non-default language
+        contentType.PropertyTypes.First(x => x.Alias == "title").Variations = invariant;
+        Assert.DoesNotThrow(() => ContentTypeService.Save(contentType));
+
+        // Assert - Content should still be accessible
+        document = ContentService.GetById(document.Id);
+        Assert.IsNotNull(document);
+        Assert.AreEqual("doc1fr", document.GetCultureName("fr"));
+        // The variant value from the default language should be used (which was null/empty),
+        // or the French value depending on implementation
+    }
+
+    /// <summary>
+    /// Tests that changing a property from invariant to variant and back does not throw an exception
+    /// when content exists only in a non-default language with AllowEditInvariantFromNonDefault enabled.
+    /// This is a regression test for https://github.com/umbraco/Umbraco-CMS/issues/11771
+    /// </summary>
+    [Test]
+    [ConfigureBuilder(ActionName = nameof(ConfigureAllowEditInvariantFromNonDefaultTrue))]
+    public async Task Change_Property_Type_Invariant_To_Variant_And_Back_When_Content_Only_Exists_In_Non_Default_Language_With_AllowEditInvariantFromNonDefault()
+    {
+        // Arrange - Create languages with English as default and French as non-default
+        var languageEn = new Language("en", "English") { IsDefault = true };
+        await LanguageService.CreateAsync(languageEn, Constants.Security.SuperUserKey);
+        var languageFr = new Language("fr", "French");
+        await LanguageService.CreateAsync(languageFr, Constants.Security.SuperUserKey);
+
+        // Create a content type that varies by culture with an invariant property
+        var contentType = CreateContentType(ContentVariation.Culture);
+        var properties = CreatePropertyCollection(("title", ContentVariation.Nothing));
+        contentType.PropertyGroups.Add(new PropertyGroup(properties) { Alias = "content", Name = "Content" });
+        ContentTypeService.Save(contentType);
+
+        // Create content ONLY in the non-default language (French)
+        IContent document = new Content("document", -1, contentType);
+        document.SetCultureName("doc1fr", "fr");
+        document.SetValue("title", "hello world"); // invariant property
+        ContentService.Save(document);
+        ContentService.Publish(document, new[] { "fr" }); // Only publish in French
+
+        document = ContentService.GetById(document.Id);
+        Assert.IsNull(document.GetCultureName("en"));
+        Assert.AreEqual("doc1fr", document.GetCultureName("fr"));
+        Assert.AreEqual("hello world", document.GetValue("title"));
+
+        // Act 1 - Change property from invariant to variant
+        contentType.PropertyTypes.First(x => x.Alias == "title").Variations = ContentVariation.Culture;
+        Assert.DoesNotThrow(() => ContentTypeService.Save(contentType));
+
+        document = ContentService.GetById(document.Id);
+        Assert.IsNotNull(document);
+        Assert.AreEqual("hello world", document.GetValue("title", "en")); // Migrated to default language
+
+        // Act 2 - Change property back from variant to invariant
+        contentType.PropertyTypes.First(x => x.Alias == "title").Variations = ContentVariation.Nothing;
+        Assert.DoesNotThrow(() => ContentTypeService.Save(contentType));
+
+        // Assert - Content should still be accessible
+        document = ContentService.GetById(document.Id);
+        Assert.IsNotNull(document);
+        Assert.AreEqual("hello world", document.GetValue("title"));
+    }
+
+    /// <summary>
+    /// Tests that changing a content type from invariant to variant does not throw an exception
+    /// when content exists only in a non-default language with AllowEditInvariantFromNonDefault enabled.
+    /// This is a regression test for https://github.com/umbraco/Umbraco-CMS/issues/11771
+    /// </summary>
+    [Test]
+    [ConfigureBuilder(ActionName = nameof(ConfigureAllowEditInvariantFromNonDefaultTrue))]
+    public async Task Change_Content_Type_From_Invariant_To_Variant_When_Content_Only_Exists_In_Non_Default_Language_With_AllowEditInvariantFromNonDefault()
+    {
+        // Arrange - Create languages with English as default and French as non-default
+        var languageEn = new Language("en", "English") { IsDefault = true };
+        await LanguageService.CreateAsync(languageEn, Constants.Security.SuperUserKey);
+        var languageFr = new Language("fr", "French");
+        await LanguageService.CreateAsync(languageFr, Constants.Security.SuperUserKey);
+
+        // Create an invariant content type first
+        var contentType = CreateContentType(ContentVariation.Nothing);
+        var properties = CreatePropertyCollection(("title", ContentVariation.Nothing));
+        contentType.PropertyGroups.Add(new PropertyGroup(properties) { Alias = "content", Name = "Content" });
+        ContentTypeService.Save(contentType);
+
+        // Create invariant content
+        IContent document = new Content("document", -1, contentType);
+        document.Name = "doc1";
+        document.SetValue("title", "hello world");
+        ContentService.Save(document);
+        ContentService.Publish(document, Array.Empty<string>());
+
+        document = ContentService.GetById(document.Id);
+        Assert.AreEqual("doc1", document.Name);
+        Assert.AreEqual("hello world", document.GetValue("title"));
+
+        // Act - Change content type from invariant to variant
+        // This changes the content to be culture-variant, with the invariant data
+        // migrated to the default language
+        contentType.Variations = ContentVariation.Culture;
+        Assert.DoesNotThrow(() => ContentTypeService.Save(contentType));
+
+        // Assert - Content should be accessible in the default language
+        document = ContentService.GetById(document.Id);
+        Assert.IsNotNull(document);
+        Assert.AreEqual("doc1", document.GetCultureName("en"));
+        Assert.AreEqual("hello world", document.GetValue("title"));
     }
 }

@@ -39,7 +39,7 @@ export class UmbTemplateSearchServerDataSource implements UmbSearchDataSource<Um
 		if (data) {
 			const mappedItems: Array<UmbTemplateSearchItemModel> = data.items.map((item) => {
 				return {
-					href: '/section/settings/workspace/template/edit/' + item.id,
+					href: 'section/settings/workspace/template/edit/' + item.id,
 					entityType: UMB_TEMPLATE_ENTITY_TYPE,
 					unique: item.id,
 					name: item.name,

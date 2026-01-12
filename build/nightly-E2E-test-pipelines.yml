@@ -28,6 +28,12 @@ parameters:
     type: boolean
     default: false
 
+  # Can we slow our tests down when running on SQLite? That way we might be able to avoid DB locks
+  - name: skipSqliteAcceptanceTests
+    displayName: Skip SQLite acceptance tests
+    type: boolean
+    default: true
+
 variables:
   nodeVersion: 20
   solution: umbraco.sln
@@ -342,7 +348,7 @@ stages:
       - job:
         displayName: E2E Tests (SQLite)
         timeoutInMinutes: 180
-        condition: ${{ eq(parameters.skipDefaultConfigAcceptanceTests, false) }}
+        condition: ${{ and(eq(parameters.skipDefaultConfigAcceptanceTests, false), eq(parameters.skipSqliteAcceptanceTests, false)) }}
         variables:
           # Connection string
           CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=Umbraco;Mode=Memory;Cache=Shared;Foreign Keys=True;Pooling=True
@@ -581,6 +587,23 @@ stages:
               CONNECTIONSTRINGS__UMBRACODBDSN: Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True
               CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
               additionalEnvironmentVariables: false
+            # ContentSettingConfig
+            WindowsContentSettingsConfig:
+              vmImage: "windows-latest"
+              testFolder: "ContentSettingConfig"
+              port: ''
+              testCommand: "npx playwright test --project=contentSettingConfig"
+              CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=(localdb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Umbraco.mdf;Integrated Security=True
+              CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
+              additionalEnvironmentVariables: false
+            LinuxContentSettingsConfig:
+              vmImage: "ubuntu-latest"
+              testFolder: "ContentSettingConfig"
+              port: ''
+              testCommand: "npx playwright test --project=contentSettingConfig"
+              CONNECTIONSTRINGS__UMBRACODBDSN: Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True
+              CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
+              additionalEnvironmentVariables: false
             # SMTP
             LinuxSMTP:
               vmImage: "ubuntu-latest"
@@ -693,7 +716,7 @@ stages:
               AZUREB2CTESTUSEREMAIL: $(AZUREB2CTESTUSEREMAIL)
               AZUREB2CTESTUSERPASSWORD: $(AZUREB2CTESTUSERPASSWORD)
               DatabaseType: ${{ variables.DatabaseType }}
-          
+
           # Stop SMTP4dev container
           - bash: |
               echo "Stopping SMTP4dev container..."

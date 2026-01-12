@@ -1,4 +1,3 @@
-import '@umbraco-cms/backoffice/property-sort-mode';
 import './components/block-grid-areas-container/block-grid-areas-container.element.js';
 import './components/block-grid-block-inline/block-grid-block-inline.element.js';
 import './components/block-grid-block-unsupported/block-grid-block-unsupported.element.js';

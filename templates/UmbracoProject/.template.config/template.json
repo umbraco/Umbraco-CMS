@@ -32,7 +32,8 @@
           "condition": "(!Docker)",
           "exclude": [
             "Dockerfile",
-            ".dockerignore"
+            ".dockerignore",
+            "entrypoint.sh"
           ]
         }
       ]

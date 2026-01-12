@@ -320,7 +320,7 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
         var backOfficeClientId = await openIddictApplicationManager.GetIdAsync(backOfficeClient);
         if (backOfficeClientId is null)
         {
-            _logger.LogWarning("Could not extract the clientId from the openIddict backofficelient Application. Canceling token revocation. Users might have to manually log out to get proper access to the backoffice", Constants.OAuthClientIds.BackOffice);
+            _logger.LogWarning("Could not extract the clientId from the openIddict backoffice client Application for {BackOfficeClientId}. Canceling token revocation. Users might have to manually log out to get proper access to the backoffice", Constants.OAuthClientIds.BackOffice);
             return;
         }
 
