@@ -26,7 +26,7 @@ public partial class UserStartNodeEntitiesServiceElementTests : UserStartNodeEnt
 
     protected override UmbracoObjectTypes ObjectType => UmbracoObjectTypes.Element;
 
-    protected override string SectionAlias => "element";
+    protected override string SectionAlias => Constants.Applications.Library;
 
     protected override async Task CreateContentTypeAndHierarchy()
     {

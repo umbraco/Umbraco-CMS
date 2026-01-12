@@ -81,7 +81,7 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
         // TODO figure out how to reuse code from Task<UserGroupResponseModel> CreateAsync(IUserGroup userGroup) instead of copying
         Guid? contentStartNodeKey = GetKeyFromId(userGroup.StartContentId, UmbracoObjectTypes.Document);
         Guid? mediaStartNodeKey = GetKeyFromId(userGroup.StartMediaId, UmbracoObjectTypes.Media);
-        Guid? elementStartNodeKey = GetKeyFromId(userGroup.StartElementId, UmbracoObjectTypes.Element);
+        Guid? elementStartNodeKey = GetKeyFromId(userGroup.StartElementId, UmbracoObjectTypes.ElementContainer);
         Attempt<IEnumerable<string>, UserGroupOperationStatus> languageIsoCodesMappingAttempt = await MapLanguageIdsToIsoCodeAsync(userGroup.AllowedLanguages);
 
         if (languageIsoCodesMappingAttempt.Success is false)
