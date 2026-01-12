@@ -3,6 +3,7 @@ using Umbraco.Cms.Api.Management.Services.Entities;
 using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
@@ -46,6 +47,8 @@ public abstract class UserStartNodeFolderTreeControllerBase<TItem> : FolderTreeC
         _dataTypeService = dataTypeService;
     }
 
+    private UmbracoObjectTypes[] TreeObjectTypes => [FolderObjectType, ItemObjectType];
+
     /// <summary>
     /// Gets the calculated start node IDs for the current user.
     /// </summary>
@@ -68,7 +71,7 @@ public abstract class UserStartNodeFolderTreeControllerBase<TItem> : FolderTreeC
     protected override IEntitySlim[] GetPagedRootEntities(int skip, int take, out long totalItems)
         => UserHasRootAccess() || IgnoreUserStartNodes()
             ? base.GetPagedRootEntities(skip, take, out totalItems)
-            : CalculateAccessMap(() => _userStartNodeEntitiesService.RootUserAccessEntities(ItemObjectType, UserStartNodeIds), out totalItems);
+            : CalculateAccessMap(() => _userStartNodeEntitiesService.RootUserAccessEntities(TreeObjectTypes, UserStartNodeIds), out totalItems);
 
     /// <inheritdoc />
     protected override IEntitySlim[] GetPagedChildEntities(Guid parentKey, int skip, int take, out long totalItems)
@@ -79,7 +82,7 @@ public abstract class UserStartNodeFolderTreeControllerBase<TItem> : FolderTreeC
         }
 
         IEnumerable<UserAccessEntity> userAccessEntities = _userStartNodeEntitiesService.ChildUserAccessEntities(
-            ItemObjectType,
+            TreeObjectTypes,
             UserStartNodePaths,
             parentKey,
             skip,
@@ -99,7 +102,7 @@ public abstract class UserStartNodeFolderTreeControllerBase<TItem> : FolderTreeC
         }
 
         IEnumerable<UserAccessEntity> userAccessEntities = _userStartNodeEntitiesService.SiblingUserAccessEntities(
-            ItemObjectType,
+            TreeObjectTypes,
             UserStartNodePaths,
             target,
             before,

@@ -42,7 +42,7 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
         var contentRootAccess = contentStartNodeKey is null && userGroup.StartContentId == Constants.System.Root;
         Guid? mediaStartNodeKey = GetKeyFromId(userGroup.StartMediaId, UmbracoObjectTypes.Media);
         var mediaRootAccess = mediaStartNodeKey is null && userGroup.StartMediaId == Constants.System.Root;
-        Guid? elementStartNodeKey = GetKeyFromId(userGroup.StartElementId, UmbracoObjectTypes.Element);
+        Guid? elementStartNodeKey = GetKeyFromId(userGroup.StartElementId, UmbracoObjectTypes.ElementContainer);
         var elementRootAccess = elementStartNodeKey is null && userGroup.StartElementId == Constants.System.Root;
 
         Attempt<IEnumerable<string>, UserGroupOperationStatus> languageIsoCodesMappingAttempt = await MapLanguageIdsToIsoCodeAsync(userGroup.AllowedLanguages);
@@ -209,7 +209,7 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
         current.Description = request.Description;
         current.Icon = request.Icon;
         current.HasAccessToAllLanguages = request.HasAccessToAllLanguages;
-        
+
         current.Permissions = request.FallbackPermissions;
         current.GranularPermissions = await _permissionPresentationFactory.CreatePermissionSetsAsync(request.Permissions);
 
@@ -286,7 +286,7 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
 
         if (source.ElementStartNode is not null)
         {
-            var elementId = GetIdFromKey(source.ElementStartNode.Id, UmbracoObjectTypes.Element);
+            var elementId = GetIdFromKey(source.ElementStartNode.Id, UmbracoObjectTypes.ElementContainer);
 
             if (elementId is null)
             {
