@@ -102,7 +102,7 @@ test('can remove a not-found member picker in the content', async ({umbracoApi, 
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.removeNotFoundItemPickerWithId(memberId);
+  await umbracoUi.content.removeNotFoundItem(memberId);
   await umbracoUi.content.clickSaveButton();
 
   // Assert
