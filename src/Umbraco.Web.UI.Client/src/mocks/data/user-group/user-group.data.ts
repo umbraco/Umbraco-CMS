@@ -74,6 +74,7 @@ export const data: Array<UmbMockUserGroupModel> = [
 		sections: [
 			UMB_CONTENT_SECTION_ALIAS,
 			'Umb.Section.Media',
+			'Umb.Section.Library',
 			'Umb.Section.Settings',
 			'Umb.Section.Members',
 			'Umb.Section.Packages',
