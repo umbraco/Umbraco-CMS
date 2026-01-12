@@ -77,7 +77,7 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 				},
 				'_mfaLoginProviders',
 			);
-		} catch (error) {
+		} catch {
 			this._error = this.localize.term('errors_defaultError');
 			this._isLoading = false;
 		}
