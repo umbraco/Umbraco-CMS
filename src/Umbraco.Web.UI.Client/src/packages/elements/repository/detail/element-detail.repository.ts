@@ -11,16 +11,6 @@ export class UmbElementDetailRepository extends UmbDetailRepositoryBase<
 	constructor(host: UmbControllerHost) {
 		super(host, UmbElementServerDataSource, UMB_ELEMENT_DETAIL_STORE_CONTEXT);
 	}
-
-	/**
-	 * Gets an existing element by its unique identifier for scaffolding purposes, i.e. to create a new element based on a document type.
-	 * @param {string} unique - The unique identifier of the element.
-	 * @returns {UmbRepositoryResponse<UmbElementDetailModel>} - The element data.
-	 * @memberof UmbElementDetailRepository
-	 */
-	scaffoldByUnique(unique: string) {
-		return this.detailDataSource.scaffoldByUnique(unique);
-	}
 }
 
 export { UmbElementDetailRepository as api };

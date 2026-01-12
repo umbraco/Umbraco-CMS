@@ -1,6 +1,6 @@
 //import { UMB_ELEMENT_ENTITY_TYPE } from '../../entity.js';
 //import { ElementService } from '@umbraco-cms/backoffice/external/backend-api';
-import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import { /*tryExecute,*/ UmbError } from '@umbraco-cms/backoffice/resources';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 //import { UmbManagementApiDataMapper } from '@umbraco-cms/backoffice/repository';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
@@ -27,12 +27,13 @@ export class UmbElementReferenceServerDataSource extends UmbControllerBase imple
 		skip = 0,
 		take = 20,
 	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbReferenceItemModel>>> {
-		const { data, error } = await tryExecute(
-			this,
-			Promise.reject(`'getReferencedBy' has not been implemented yet. (${unique}, ${skip}, ${take})`),
-			// TODO: Uncomment this when backend endpoint is available. [LK:2026-01-06]
-			//ElementService.getElementByIdReferencedBy({ path: { id: unique }, query: { skip, take } }),
-		);
+		return { error: new UmbError(`'getReferencedBy' has not been implemented yet. (${unique}, ${skip}, ${take})`) };
+
+		// TODO: Uncomment this when backend endpoint is available. [LK:2026-01-06]
+		// const { data, error } = await tryExecute(
+		// 	this,
+		// 	ElementService.getElementByIdReferencedBy({ path: { id: unique }, query: { skip, take } }),
+		// );
 
 		// TODO: Uncomment this when backend endpoint is available. [LK:2026-01-06]
 		// if (data) {
@@ -55,7 +56,7 @@ export class UmbElementReferenceServerDataSource extends UmbControllerBase imple
 		// 	return { data: { items, total: data.total } };
 		// }
 
-		return { data, error };
+		//return { data, error };
 	}
 
 	/**
@@ -71,12 +72,15 @@ export class UmbElementReferenceServerDataSource extends UmbControllerBase imple
 		skip: number = 0,
 		take: number = 20,
 	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbEntityModel>>> {
-		const { data, error } = await tryExecute(
-			this,
-			Promise.reject(`'getElementAreReferenced' has not been implemented yet. (${uniques}, ${skip}, ${take})`),
-			// TODO: Uncomment this when backend endpoint is available. [LK:2026-01-06]
-			//ElementService.getElementAreReferenced({ query: { id: uniques, skip, take } }),
-		);
+		return {
+			error: new UmbError(`'getElementAreReferenced' has not been implemented yet. (${uniques}, ${skip}, ${take})`),
+		};
+
+		// TODO: Uncomment this when backend endpoint is available. [LK:2026-01-06]
+		// const { data, error } = await tryExecute(
+		// 	this,
+		// 	ElementService.getElementAreReferenced({ query: { id: uniques, skip, take } }),
+		// );
 
 		// if (data) {
 		// 	const items: Array<UmbEntityModel> = data.items.map((item) => {
@@ -89,7 +93,7 @@ export class UmbElementReferenceServerDataSource extends UmbControllerBase imple
 		// 	return { data: { items, total: data.total } };
 		// }
 
-		return { data, error };
+		//return { data, error };
 	}
 
 	/**
@@ -105,14 +109,17 @@ export class UmbElementReferenceServerDataSource extends UmbControllerBase imple
 		skip: number = 0,
 		take: number = 20,
 	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbEntityModel>>> {
-		const { data, error } = await tryExecute(
-			this,
-			Promise.reject(
+		return {
+			error: new UmbError(
 				`'getElementByIdReferencedDescendants' has not been implemented yet. (${unique}, ${skip}, ${take})`,
 			),
-			// TODO: Uncomment this when backend endpoint is available. [LK:2026-01-06]
-			//ElementService.getElementByIdReferencedDescendants({ path: { id: unique }, query: { skip, take } }),
-		);
+		};
+
+		// TODO: Uncomment this when backend endpoint is available. [LK:2026-01-06]
+		// const { data, error } = await tryExecute(
+		// 	this,
+		// 	ElementService.getElementByIdReferencedDescendants({ path: { id: unique }, query: { skip, take } }),
+		// );
 
 		// if (data) {
 		// 	const items: Array<UmbEntityModel> = data.items.map((item) => {
@@ -125,6 +132,6 @@ export class UmbElementReferenceServerDataSource extends UmbControllerBase imple
 		// 	return { data: { items, total: data.total } };
 		// }
 
-		return { data, error };
+		//return { data, error };
 	}
 }

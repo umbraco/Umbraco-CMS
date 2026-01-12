@@ -65,8 +65,24 @@ export class UmbElementTreeServerDataSource
 			name: item.name,
 			entityType: item.isFolder ? UMB_ELEMENT_FOLDER_ENTITY_TYPE : UMB_ELEMENT_ENTITY_TYPE,
 			hasChildren: item.hasChildren,
+			isTrashed: false, //item.isTrashed,
 			isFolder: item.isFolder,
+			documentType: {
+				unique: item.documentType?.id ?? '',
+				icon: item.documentType?.icon ?? 'icon-document',
+				collection: null,
+			},
 			icon: item.isFolder ? 'icon-folder' : (item.documentType?.icon ?? 'icon-document'),
+			createDate: item.createDate,
+			variants: item.variants.map((variant) => {
+				return {
+					name: variant.name,
+					culture: variant.culture || null,
+					segment: null, // TODO: add segment to the backend API?
+					state: variant.state,
+					flags: [], //variant.flags,
+				};
+			}),
 		};
 	}
 }
