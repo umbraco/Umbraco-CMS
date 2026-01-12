@@ -89,7 +89,7 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 
 	#renderContent() {
 		if (this._isLoading) {
-			return html`<uui-loader></uui-loader>`;
+			return html`<div id="loader"><uui-loader></uui-loader></div>`;
 		}
 
 		if (this._error) {
@@ -196,6 +196,12 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 		css`
 			uui-box {
 				margin-bottom: var(--uui-size-space-3);
+			}
+
+			#loader {
+				display: flex;
+				justify-content: center;
+				align-items: center;
 			}
 		`,
 	];
