@@ -121,7 +121,7 @@ export class UmbMediaTreeItemElement extends UmbTreeItemElementBase<UmbMediaTree
 				opacity: 0.6;
 				font-style: italic;
 			}
-			:host([no-access]) #icon {
+			:host([no-access]) umb-icon {
 				opacity: 0.6;
 			}
 		`,

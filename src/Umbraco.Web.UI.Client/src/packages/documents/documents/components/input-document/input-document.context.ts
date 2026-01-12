@@ -67,11 +67,11 @@ export class UmbDocumentPickerInputContext extends UmbPickerInputContext<
 	}
 
 	#pickableFilter = (
-		item: UmbDocumentItemModel,
+		item: UmbDocumentItemModel | UmbDocumentTreeItemModel,
 		allowedContentTypes?: Array<{ unique: string; entityType: UmbDocumentTypeEntityType }>,
 	): boolean => {
 		// Check if the user has no access to this item (tree items include noAccess property)
-		if ('noAccess' in item && (item as unknown as UmbDocumentTreeItemModel).noAccess === true) {
+		if ('noAccess' in item && item.noAccess === true) {
 			return false;
 		}
 		if (allowedContentTypes && allowedContentTypes.length > 0) {
