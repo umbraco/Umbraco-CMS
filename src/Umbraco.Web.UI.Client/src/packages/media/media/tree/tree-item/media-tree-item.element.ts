@@ -1,5 +1,6 @@
 import type { UmbMediaTreeItemModel } from '../types.js';
 import type { UmbMediaTreeItemContext } from './media-tree-item.context.js';
+import type { UUIMenuItemElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, nothing, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbTreeItemElementBase } from '@umbraco-cms/backoffice/tree';
@@ -29,6 +30,33 @@ export class UmbMediaTreeItemElement extends UmbTreeItemElementBase<UmbMediaTree
 	 */
 	@property({ type: Boolean, reflect: true, attribute: 'no-access' })
 	protected _noAccess = false;
+
+	override connectedCallback() {
+		super.connectedCallback();
+		this.addEventListener('click', this.#handleClick);
+		this.addEventListener('keydown', this.#handleKeydown);
+	}
+
+	override disconnectedCallback() {
+		this.removeEventListener('click', this.#handleClick);
+		this.removeEventListener('keydown', this.#handleKeydown);
+		super.disconnectedCallback();
+	}
+
+	#handleClick = (event: MouseEvent) => {
+		if (this._noAccess) {
+			event.preventDefault();
+			event.stopPropagation();
+		}
+	};
+
+	#handleKeydown = (event: KeyboardEvent) => {
+		if (this._noAccess && (event.key === 'Enter' || event.key === ' ')) {
+			event.preventDefault();
+			event.stopPropagation();
+		}
+	};
+
 	override renderIconContainer() {
 		const icon = this.item?.mediaType.icon;
 
@@ -58,6 +86,26 @@ export class UmbMediaTreeItemElement extends UmbTreeItemElementBase<UmbMediaTree
 
 	#renderIsCollectionIcon() {
 		return html`<umb-icon id="state-icon" slot="icon" name="icon-grid" title="Collection"></umb-icon>`;
+	}
+
+	override updated(changedProperties: Map<string, unknown>) {
+		super.updated(changedProperties);
+
+		if (changedProperties.has('_noAccess')) {
+			this.#updateMenuItemAccessibility();
+		}
+	}
+
+	#updateMenuItemAccessibility() {
+		const menuItem = this.shadowRoot?.querySelector('uui-menu-item') as UUIMenuItemElement | null;
+		if (!menuItem) return;
+
+		if (this._noAccess) {
+			menuItem.setAttribute('aria-disabled', 'true');
+			menuItem.removeAttribute('href');
+		} else {
+			menuItem.setAttribute('aria-disabled', 'false');
+		}
 	}
 
 	static override styles = [
@@ -117,6 +165,9 @@ export class UmbMediaTreeItemElement extends UmbTreeItemElementBase<UmbMediaTree
 			}
 
 			/** No Access */
+			:host([no-access]) {
+				cursor: not-allowed;
+			}
 			:host([no-access]) #label {
 				opacity: 0.6;
 				font-style: italic;

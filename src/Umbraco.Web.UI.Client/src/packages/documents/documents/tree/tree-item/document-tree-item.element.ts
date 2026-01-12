@@ -1,5 +1,6 @@
 import type { UmbDocumentTreeItemModel } from '../types.js';
 import type { UmbDocumentTreeItemContext } from './document-tree-item.context.js';
+import type { UUIMenuItemElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state, property, classMap } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTreeItemElementBase } from '@umbraco-cms/backoffice/tree';
 
@@ -52,6 +53,32 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 
 	#icon: string | null | undefined;
 
+	override connectedCallback() {
+		super.connectedCallback();
+		this.addEventListener('click', this.#handleClick);
+		this.addEventListener('keydown', this.#handleKeydown);
+	}
+
+	override disconnectedCallback() {
+		this.removeEventListener('click', this.#handleClick);
+		this.removeEventListener('keydown', this.#handleKeydown);
+		super.disconnectedCallback();
+	}
+
+	#handleClick = (event: MouseEvent) => {
+		if (this._noAccess) {
+			event.preventDefault();
+			event.stopPropagation();
+		}
+	};
+
+	#handleKeydown = (event: KeyboardEvent) => {
+		if (this._noAccess && (event.key === 'Enter' || event.key === ' ')) {
+			event.preventDefault();
+			event.stopPropagation();
+		}
+	};
+
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	protected override _extractFlags(item: UmbDocumentTreeItemModel | undefined) {
 		// Empty on purpose and NOT calling super to prevent doing what the base does. [NL]
@@ -76,6 +103,26 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 		return html`<span id="label" slot="label" class=${classMap({ draft: this._isDraft })}>${this._name}</span> `;
 	}
 
+	override updated(changedProperties: Map<string, unknown>) {
+		super.updated(changedProperties);
+
+		if (changedProperties.has('_noAccess')) {
+			this.#updateMenuItemAccessibility();
+		}
+	}
+
+	#updateMenuItemAccessibility() {
+		const menuItem = this.shadowRoot?.querySelector('uui-menu-item') as UUIMenuItemElement | null;
+		if (!menuItem) return;
+
+		if (this._noAccess) {
+			menuItem.setAttribute('aria-disabled', 'true');
+			menuItem.removeAttribute('href');
+		} else {
+			menuItem.setAttribute('aria-disabled', 'false');
+		}
+	}
+
 	static override styles = [
 		...UmbTreeItemElementBase.styles,
 		css`
@@ -84,6 +131,9 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 			}
 			:host([draft]) umb-icon {
 				opacity: 0.6;
+			}
+			:host([no-access]) {
+				cursor: not-allowed;
 			}
 			:host([no-access]) #label {
 				opacity: 0.6;
