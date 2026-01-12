@@ -26,6 +26,17 @@ public abstract class UmbracoIntegrationTestBase
     private static ITestDatabase? _dbInstance;
     private static TestDbMeta _fixtureDbMeta;
     protected static int s_testCount = 1;
+
+    /// <summary>
+    /// Gets or sets the test count.
+    /// </summary>
+    [Obsolete("Use s_testCount instead. This should be removed in V18.")]
+    protected static int TestCount
+    {
+        get => s_testCount;
+        set => s_testCount = value;
+    }
+
     private readonly List<Action> _fixtureTeardown = new();
     private readonly Queue<Action> _testTeardown = new();
     private bool _firstTestInFixture = true;
