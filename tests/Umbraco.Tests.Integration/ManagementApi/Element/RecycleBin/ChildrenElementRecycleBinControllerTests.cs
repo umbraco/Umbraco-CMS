@@ -10,7 +10,7 @@ using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.Element.RecycleBin;
 
-public class ChildrenElementRecycleBinControllerTests : ManagementApiUserGroupTestBase<ChildrenElementRecycleBinController>
+public class ChildrenElementRecycleBinControllerTests : ElementRecycleBinControllerTestBase<ChildrenElementRecycleBinController>
 {
     private IElementEditingService ElementEditingService => GetRequiredService<IElementEditingService>();
 

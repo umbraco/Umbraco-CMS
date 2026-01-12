@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.Element.RecycleBin;
 
-public class DeleteElementFolderRecycleBinControllerTests : ManagementApiUserGroupTestBase<DeleteElementFolderRecycleBinController>
+public class DeleteElementFolderRecycleBinControllerTests : ElementRecycleBinControllerTestBase<DeleteElementFolderRecycleBinController>
 {
     private IElementContainerService ElementContainerService => GetRequiredService<IElementContainerService>();
 
