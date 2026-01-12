@@ -45,6 +45,9 @@ test('can create a document type with a template', {tag: '@smoke'}, async ({umbr
   // Assert
   // Checks if the documentType contains the template
   const documentTypeData = await umbracoApi.documentType.get(documentTypeId);
+  // The clickSaveButtonAndWaitForDocumentTypeToBeCreated only waits for the DocumentType to be created, not the Template. Because of this we need a wait to make sure the template is created
+  // TODO: add a clickSaveButtonAndWaitForDocumentTypeAndTemplateToBeCreated in the testHelpers
+  await umbracoUi.documentType.waitForTimeout(ConstantHelper.wait.medium);
   const templateData = await umbracoApi.template.getByName(documentTypeName);
   expect(documentTypeData.allowedTemplates[0].id).toEqual(templateData.id);
 

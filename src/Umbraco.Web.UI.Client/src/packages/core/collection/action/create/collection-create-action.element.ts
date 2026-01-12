@@ -33,12 +33,12 @@ export class UmbCollectionCreateActionButtonElement extends UmbLitElement {
 	}
 
 	async #onClick(event: Event, controller: UmbExtensionApiInitializer<ManifestType>, href?: string) {
-		event.stopPropagation();
-
 		// skip if href is defined
 		if (href) {
 			return;
 		}
+
+		event.stopPropagation();
 
 		if (!controller.api) throw new Error('No API found');
 		await controller.api.execute().catch(() => {});

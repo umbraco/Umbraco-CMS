@@ -2,8 +2,7 @@
 // See LICENSE for more details.
 
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+using System.Collections.Concurrent;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
@@ -11,6 +10,7 @@ using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Scoping;
+using Umbraco.Cms.Tests.Common.Attributes;
 using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Cache;
@@ -218,5 +218,248 @@ public class FullDataSetCachePolicyTests
         {
             Assert.IsTrue(cacheCleared);
         }
+    }
+
+    /// <summary>
+    /// Verifies that GetAllCached is thread-safe when multiple threads encounter a cache miss simultaneously.
+    /// </summary>
+    /// <remarks>
+    /// This test exposes the "thundering herd" problem where multiple threads detect a cache miss
+    /// and all attempt to query the database and populate the cache concurrently.
+    /// See: https://github.com/umbraco/Umbraco-CMS/issues/21350.
+    /// </remarks>
+    [Test]
+    [LongRunning]
+    public void GetAllCached_Is_ThreadSafe_On_Cache_Miss()
+    {
+        // Arrange
+        const int ThreadCount = 20;
+        var threads = new Thread[ThreadCount];
+        var barrier = new ManualResetEventSlim(false);
+        var threadSafetyExceptions = new ConcurrentBag<Exception>();
+        var databaseCallCount = 0;
+
+        AuditItem[] getAll = Enumerable.Range(1, 100)
+            .Select(i => new AuditItem(i, AuditType.Copy, 123, "test", $"item{i}"))
+            .ToArray();
+
+        // Use a non-locking cache to expose race conditions.
+        var cache = new NonLockingCache();
+
+        var policy = new FullDataSetRepositoryCachePolicy<AuditItem, object>(
+            cache,
+            DefaultAccessor,
+            new SingleServerCacheVersionService(),
+            Mock.Of<ICacheSyncService>(),
+            item => item.Id,
+            false);
+
+        // Act - spawn threads that all call GetAll concurrently.
+        for (int i = 0; i < ThreadCount; i++)
+        {
+            threads[i] = new Thread(() =>
+            {
+                barrier.Wait(); // All threads start together for maximum contention.
+                try
+                {
+                    var result = policy.GetAll(null, ids =>
+                    {
+                        Interlocked.Increment(ref databaseCallCount);
+                        Thread.Sleep(10); // Simulate DB latency to increase race window.
+                        return getAll;
+                    });
+
+                    // Verify result integrity.
+                    Assert.AreEqual(100, result.Length, "Result should contain all items");
+                }
+                catch (Exception e)
+                {
+                    // Only collect thread-safety exceptions.
+                    if (e is InvalidOperationException && e.Message.Contains("concurrent"))
+                    {
+                        threadSafetyExceptions.Add(e);
+                    }
+                }
+            });
+        }
+
+        // Start all threads with suppressed execution context to avoid context leakage.
+        using (ExecutionContext.SuppressFlow())
+        {
+            foreach (var t in threads)
+            {
+                t.Start();
+            }
+        }
+
+        barrier.Set(); // Release all threads simultaneously.
+        foreach (var t in threads)
+        {
+            t.Join();
+        }
+
+        // Assert - no thread-safety violations.
+        Assert.IsEmpty(
+            threadSafetyExceptions,
+            $"Thread safety violation detected: {string.Join(Environment.NewLine, threadSafetyExceptions.Select(e => e.Message))}");
+
+        // After the fix, database should ideally be called only once due to locking.
+        // Before the fix, multiple threads may all call the database (thundering herd).
+        TestContext.WriteLine($"Database was called {databaseCallCount} times (should be 1 after fix)");
+        Assert.That(databaseCallCount, Is.EqualTo(1), "Database should only be called once with proper locking");
+    }
+
+    /// <summary>
+    /// Verifies that GetAllCached is thread-safe when reader threads iterate the cache
+    /// while writer threads clear and repopulate it.
+    /// </summary>
+    /// <remarks>
+    /// This test exposes race conditions where one thread iterates the cached DeepCloneableList
+    /// via ToArray() while another thread clears or replaces the cache entry.
+    /// See: https://github.com/umbraco/Umbraco-CMS/issues/21350.
+    /// </remarks>
+    [Test]
+    [LongRunning]
+    public void GetAllCached_Is_ThreadSafe_During_Iteration_And_Cache_Clear()
+    {
+        // Arrange
+        const int ThreadCount = 20;
+        const int Iterations = 50;
+        var threads = new Thread[ThreadCount];
+        var barrier = new ManualResetEventSlim(false);
+        var threadSafetyExceptions = new ConcurrentBag<Exception>();
+
+        // Use a non-locking cache to expose race conditions.
+        var cache = new NonLockingCache();
+
+        var policy = new FullDataSetRepositoryCachePolicy<AuditItem, object>(
+            cache,
+            DefaultAccessor,
+            new SingleServerCacheVersionService(),
+            Mock.Of<ICacheSyncService>(),
+            item => item.Id,
+            false);
+
+        // Pre-populate cache.
+        var initialData = Enumerable.Range(1, 50)
+            .Select(i => new AuditItem(i, AuditType.Copy, 123, "test", $"item{i}"))
+            .ToArray();
+        policy.GetAll(null, _ => initialData);
+
+        // Act - half threads read, half threads trigger cache refresh.
+        for (int i = 0; i < ThreadCount; i++)
+        {
+            int threadIndex = i;
+            threads[i] = new Thread(() =>
+            {
+                barrier.Wait(); // All threads start together.
+
+                for (int j = 0; j < Iterations; j++)
+                {
+                    try
+                    {
+                        if (threadIndex % 2 == 0)
+                        {
+                            // Reader thread.
+                            var result = policy.GetAll(null, _ => initialData);
+                            Assert.IsNotNull(result);
+                            Assert.IsTrue(result.Length > 0);
+                        }
+                        else
+                        {
+                            // Writer thread - clears and repopulates cache.
+                            policy.ClearAll();
+                            var newData = Enumerable.Range(1, 50)
+                                .Select(k => new AuditItem(k, AuditType.Copy, 123, "test", $"new{k}"))
+                                .ToArray();
+                            policy.GetAll(null, _ => newData);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        // Only collect thread-safety exceptions.
+                        if (e is InvalidOperationException && e.Message.Contains("concurrent"))
+                        {
+                            threadSafetyExceptions.Add(e);
+                        }
+                    }
+                }
+            });
+        }
+
+        // Start all threads with suppressed execution context.
+        using (ExecutionContext.SuppressFlow())
+        {
+            foreach (var t in threads)
+            {
+                t.Start();
+            }
+        }
+
+        barrier.Set(); // Release all threads.
+        foreach (var t in threads)
+        {
+            t.Join();
+        }
+
+        // Assert - no thread-safety violations.
+        Assert.IsEmpty(
+            threadSafetyExceptions,
+            $"Thread safety violation detected: {string.Join(Environment.NewLine, threadSafetyExceptions.Select(e => e.Message))}");
+    }
+
+    /// <summary>
+    /// A simple non-thread-safe cache for testing purposes.
+    /// This allows race conditions to manifest that would be hidden by ObjectCacheAppCache's internal locking.
+    /// </summary>
+    private sealed class NonLockingCache : IAppPolicyCache
+    {
+        private readonly Dictionary<string, object?> _cache = [];
+
+        public object? Get(string key)
+            => _cache.TryGetValue(key, out var value) ? value : null;
+
+        public object? Get(string key, Func<object?> factory) => Get(key, factory, null, false);
+
+        public object? Get(string key, Func<object?> factory, TimeSpan? timeout, bool isSliding = false)
+        {
+            if (_cache.TryGetValue(key, out var value))
+            {
+                return value;
+            }
+
+            value = factory();
+            _cache[key] = value;
+            return value;
+        }
+
+        public IEnumerable<object> SearchByKey(string keyStartsWith)
+            => _cache.Where(kvp => kvp.Key.StartsWith(keyStartsWith)).Select(kvp => kvp.Value!);
+
+        public IEnumerable<object> SearchByRegex(string regex) => throw new NotImplementedException();
+
+        public void Clear() => _cache.Clear();
+
+        public void Clear(string key) => _cache.Remove(key);
+
+        public void ClearOfType(Type type) => throw new NotImplementedException();
+
+        public void ClearOfType<T>() => throw new NotImplementedException();
+
+        public void ClearOfType<T>(Func<string, T, bool> predicate) => throw new NotImplementedException();
+
+        public void ClearByKey(string keyStartsWith)
+        {
+            var keysToRemove = _cache.Keys.Where(k => k.StartsWith(keyStartsWith)).ToList();
+            foreach (var key in keysToRemove)
+            {
+                _cache.Remove(key);
+            }
+        }
+
+        public void ClearByRegex(string regex) => throw new NotImplementedException();
+
+        public void Insert(string key, Func<object?> factory, TimeSpan? timeout = null, bool isSliding = false)
+            => _cache[key] = factory();
     }
 }
