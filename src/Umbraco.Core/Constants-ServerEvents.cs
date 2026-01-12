@@ -55,13 +55,14 @@ public static partial class Constants
 
         public static class EventType
         {
-            public const string Created = "Created";
+            // TODO (V18): Convert these statics to consts to comply with SA1401.
+            public static string Created = "Created";
 
-            public const string Updated = "Updated";
+            public static string Updated = "Updated";
 
-            public const string Deleted = "Deleted";
+            public static string Deleted = "Deleted";
 
-            public const string Trashed = "Trashed";
+            public static string Trashed = "Trashed";
         }
     }
 }

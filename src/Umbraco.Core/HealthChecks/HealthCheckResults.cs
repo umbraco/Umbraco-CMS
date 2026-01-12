@@ -6,7 +6,8 @@ namespace Umbraco.Cms.Core.HealthChecks;
 
 public class HealthCheckResults
 {
-    public bool AllChecksSuccessful { get; }
+    // TODO (V18): Convert to property to comply with SA1401 (fields should be private)
+    public readonly bool AllChecksSuccessful;
 
     private HealthCheckResults(Dictionary<string, IEnumerable<HealthCheckStatus>> results, bool allChecksSuccessful)
     {

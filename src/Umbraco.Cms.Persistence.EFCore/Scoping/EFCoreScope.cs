@@ -109,7 +109,7 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
             return true; // Do nothing
         });
 
-    public void Reset() => _completed = null;
+    public void Reset() => Completed = null;
 
     public override void Dispose()
     {
@@ -146,7 +146,7 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
         _disposed = true;
         if (ParentScope is null)
         {
-            if (_completed.HasValue && _completed.Value)
+            if (Completed.HasValue && Completed.Value)
             {
                 _innerScope?.Complete();
             }
@@ -197,7 +197,7 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
         {
             try
             {
-                _efCoreScopeProvider.AmbientScopeContext?.ScopeExit(_completed.HasValue && _completed.Value);
+                _efCoreScopeProvider.AmbientScopeContext?.ScopeExit(Completed.HasValue && Completed.Value);
             }
             finally
             {
@@ -209,7 +209,7 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
 
     private void DisposeEfCoreDatabase()
     {
-        var completed = _completed.HasValue && _completed.Value;
+        var completed = Completed.HasValue && Completed.Value;
         {
             try
             {

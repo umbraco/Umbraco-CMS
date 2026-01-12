@@ -8,7 +8,8 @@ namespace Umbraco.Cms.Core.Scoping;
 
 public class CoreScope : ICoreScope
 {
-    protected bool? _completed;
+    // TODO (V18): Rename to Completed to comply with SA1306 (field names should begin with lowercase)
+    protected bool? Completed;
     private ICompletable? _scopedFileSystem;
     private IScopedNotificationPublisher? _notificationPublisher;
     private IsolatedCaches? _isolatedCaches;
@@ -183,12 +184,12 @@ public class CoreScope : ICoreScope
     /// <returns>A value indicating whether the scope is completed or not.</returns>
     public bool Complete()
     {
-        if (_completed.HasValue == false)
+        if (Completed.HasValue == false)
         {
-            _completed = true;
+            Completed = true;
         }
 
-        return _completed.Value;
+        return Completed.Value;
     }
 
     public void ReadLock(params int[] lockIds) => Locks.ReadLock(InstanceId, null, lockIds);
@@ -216,7 +217,7 @@ public class CoreScope : ICoreScope
         }
         else
         {
-            ParentScope.ChildCompleted(_completed);
+            ParentScope.ChildCompleted(Completed);
         }
 
         _disposed = true;
@@ -227,7 +228,7 @@ public class CoreScope : ICoreScope
         // if child did not complete we cannot complete
         if (completed.HasValue == false || completed.Value == false)
         {
-            _completed = false;
+            Completed = false;
         }
     }
 
@@ -235,7 +236,7 @@ public class CoreScope : ICoreScope
     {
         if (_shouldScopeFileSystems == true)
         {
-            if (_completed.HasValue && _completed.Value)
+            if (Completed.HasValue && Completed.Value)
             {
                 _scopedFileSystem?.Complete();
             }
@@ -252,7 +253,7 @@ public class CoreScope : ICoreScope
 
     protected bool HasParentScope => _parentScope is not null;
 
-    protected void HandleScopedNotifications() => _notificationPublisher?.ScopeExit(_completed.HasValue && _completed.Value);
+    protected void HandleScopedNotifications() => _notificationPublisher?.ScopeExit(Completed.HasValue && Completed.Value);
 
     private void EnsureNotDisposed()
     {
