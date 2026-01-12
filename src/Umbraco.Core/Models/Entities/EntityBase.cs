@@ -18,6 +18,7 @@ public abstract class EntityBase : BeingDirtyBase, IEntity
     private bool _hasIdentity;
     private int _id;
     private Guid _key;
+    private bool _keyIsAssigned;
     private DateTime _createDate;
     private DateTime _updateDate;
 
@@ -47,7 +48,35 @@ public abstract class EntityBase : BeingDirtyBase, IEntity
 
             return _key;
         }
-        set => SetPropertyValueAndDetectChanges(value, ref _key, nameof(Key));
+        set
+        {
+            // The Key (GUID) should be immutable once an entity is persisted to the database.
+            // We throw if ALL of these conditions are true:
+            //   - HasIdentity: entity has been persisted (Id != 0)
+            //   - _keyIsAssigned: Key was previously set while entity had identity (i.e., loaded from DB or set after save)
+            //   - value != Guid.Empty: not resetting the Key (allowed for cloning/identity reset)
+            //   - value != _key: actually trying to change to a different value
+            if (HasIdentity && _keyIsAssigned && value != Guid.Empty && value != _key)
+            {
+                throw new InvalidOperationException($"Cannot change the Key of an existing {GetType().Name}.");
+            }
+
+            SetPropertyValueAndDetectChanges(value, ref _key, nameof(Key));
+
+            // Track that Key has been assigned, but only when the entity already has identity.
+            // This distinction is important:
+            //   - Before HasIdentity (new entity): Key can be set freely during setup, _keyIsAssigned stays false
+            //   - After HasIdentity (persisted entity): first assignment sets _keyIsAssigned = true, blocking future changes
+            // Setting to Guid.Empty resets the flag (used by ResetIdentity for cloning scenarios).
+            if (HasIdentity && value != Guid.Empty)
+            {
+                _keyIsAssigned = true;
+            }
+            else if (value == Guid.Empty)
+            {
+                _keyIsAssigned = false;
+            }
+        }
     }
 
     /// <inheritdoc />
@@ -71,7 +100,10 @@ public abstract class EntityBase : BeingDirtyBase, IEntity
     public DateTime? DeleteDate { get; set; } // no change tracking - not persisted
 
     /// <inheritdoc />
-    [DataMember]
+    /// <remarks>
+    /// Not serialized as [DataMember] because it's derived from Id.
+    /// When Id is deserialized, the setter sets _hasIdentity correctly.
+    /// </remarks>
     public virtual bool HasIdentity => _hasIdentity;
 
     /// <summary>
@@ -81,8 +113,17 @@ public abstract class EntityBase : BeingDirtyBase, IEntity
     {
         _id = default;
         _key = Guid.Empty;
+        _keyIsAssigned = false;
         _hasIdentity = false;
     }
+
+    /// <summary>
+    ///     Called after deserialization to restore the _keyIsAssigned flag.
+    ///     This ensures Key immutability is enforced regardless of property deserialization order.
+    /// </summary>
+    [OnDeserialized]
+    private void OnDeserialized(StreamingContext context) =>
+        _keyIsAssigned = HasIdentity && _key != Guid.Empty;
 
     public virtual bool Equals(EntityBase? other) =>
         other != null && (ReferenceEquals(this, other) || SameIdentityAs(other));
