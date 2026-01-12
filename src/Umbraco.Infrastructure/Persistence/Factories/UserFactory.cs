@@ -93,7 +93,7 @@ internal static class UserFactory
             Avatar = entity.Avatar,
             EmailConfirmedDate = entity.EmailConfirmedDate,
             InvitedDate = entity.InvitedDate,
-            Kind = (short)entity.Kind
+            Kind = (short)entity.Kind,
         };
 
         if (entity.StartContentIds is not null)
@@ -143,12 +143,12 @@ internal static class UserFactory
         return dto;
     }
 
-    private static IReadOnlyUserGroup ToReadOnlyGroup(UserGroupDto group, IDictionary<string, IPermissionMapper> permissionMappers)
-    {
-        return new ReadOnlyUserGroup(
+    private static IReadOnlyUserGroup ToReadOnlyGroup(UserGroupDto group, IDictionary<string, IPermissionMapper> permissionMappers) =>
+        new ReadOnlyUserGroup(
             group.Id,
             group.Key,
             group.Name,
+            group.Description,
             group.Icon,
             group.StartContentId,
             group.StartMediaId,
@@ -164,12 +164,11 @@ internal static class UserFactory
                     return mapper.MapFromDto(granularPermission);
                 }
 
-                return new UnknownTypeGranularPermission()
+                return new UnknownTypeGranularPermission
                 {
                     Permission = granularPermission.Permission,
-                    Context = granularPermission.Context
+                    Context = granularPermission.Context,
                 };
             })),
             group.HasAccessToAllLanguages);
-    }
 }

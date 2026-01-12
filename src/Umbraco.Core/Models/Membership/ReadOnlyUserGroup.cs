@@ -59,7 +59,7 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
             icon,
             startContentId,
             startMediaId,
-            null,
+            startElementId,
             alias,
             allowedLanguages,
             allowedSections,
