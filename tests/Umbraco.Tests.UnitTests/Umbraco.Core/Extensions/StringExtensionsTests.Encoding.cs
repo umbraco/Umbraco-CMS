@@ -27,6 +27,13 @@ public partial class StringExtensionsTests
     }
 
     [Test]
+    public void DecodeFromHex_WithOddStringLength_ThrowsArgumentException()
+    {
+        var hexInput = "123";
+        Assert.Throws<ArgumentException>(() => hexInput.DecodeFromHex());
+    }
+
+    [Test]
     public void DecodeFromHex_RoundTrip_WithConvertToHex()
     {
         var original = "Hello World! 123";

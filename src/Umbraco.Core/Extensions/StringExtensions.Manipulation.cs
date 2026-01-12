@@ -461,7 +461,7 @@ public static partial class StringExtensions
             return input;
         }
 
-        // Check if any newlines exist to avoid allocating the StringBuilder unnessarily.
+        // Check if any newlines exist to avoid allocating the StringBuilder unnecessarily.
         if (input.IndexOf('\r') < 0 && input.IndexOf('\n') < 0)
         {
             return input;
@@ -491,7 +491,7 @@ public static partial class StringExtensions
             return text;
         }
 
-        // Check if any newlines exist to avoid allocating the StringBuilder unnessarily.
+        // Check if any newlines exist to avoid allocating the StringBuilder unnecessarily.
         if (text.IndexOf('\r') < 0 && text.IndexOf('\n') < 0)
         {
             return text;

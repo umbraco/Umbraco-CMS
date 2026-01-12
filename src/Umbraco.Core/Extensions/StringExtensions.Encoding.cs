@@ -117,11 +117,17 @@ public static partial class StringExtensions
     /// </summary>
     /// <param name="hexValue">The hexadecimal string to decode.</param>
     /// <returns>The decoded string.</returns>
+    /// <exception cref="ArgumentException">Thrown when the hex string has an odd length.</exception>
     public static string DecodeFromHex(this string hexValue)
     {
         if (string.IsNullOrEmpty(hexValue))
         {
             return string.Empty;
+        }
+
+        if (hexValue.Length % 2 != 0)
+        {
+            throw new ArgumentException("Hex string must have an even length.", nameof(hexValue));
         }
 
         var sb = new StringBuilder(hexValue.Length / 2);
