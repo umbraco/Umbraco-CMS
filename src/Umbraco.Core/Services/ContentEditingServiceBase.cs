@@ -160,7 +160,8 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     }
 
     protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleMoveToRecycleBinAsync(Guid key, Guid userKey)
-        => await HandleDeletionAsync(key,
+        => await HandleDeletionAsync(
+                key,
                 userKey,
                 ContentTrashStatusRequirement.MustNotBeTrashed,
                 MoveToRecycleBin,
@@ -168,7 +169,8 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
                 ContentEditingOperationStatus.CannotMoveToRecycleBinWhenReferenced);
 
     protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleDeleteAsync(Guid key, Guid userKey, bool mustBeTrashed = true)
-        => await HandleDeletionAsync(key,
+        => await HandleDeletionAsync(
+                key,
                 userKey,
                 mustBeTrashed
                     ? ContentTrashStatusRequirement.MustBeTrashed
