@@ -217,7 +217,7 @@ export class UmbPropertyEditorUIBlockGridAreaTypePermissionElement
 					.value=${block.type.contentElementTypeKey}
 					?selected=${area.elementTypeKey === block.type.contentElementTypeKey}>
 					<umb-icon name=${block.icon}></umb-icon>
-					${block.name}
+					${this.localize.string(block.name)}
 				</uui-combobox-list-option>`,
 		);
 	}
