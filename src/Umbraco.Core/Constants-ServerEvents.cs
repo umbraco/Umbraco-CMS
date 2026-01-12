@@ -55,14 +55,13 @@ public static partial class Constants
 
         public static class EventType
         {
-            // TODO (V17): Convert these statics to consts.
-            public static string Created = "Created";
+            public const string Created = "Created";
 
-            public static string Updated = "Updated";
+            public const string Updated = "Updated";
 
-            public static string Deleted = "Deleted";
+            public const string Deleted = "Deleted";
 
-            public static string Trashed = "Trashed";
+            public const string Trashed = "Trashed";
         }
     }
 }

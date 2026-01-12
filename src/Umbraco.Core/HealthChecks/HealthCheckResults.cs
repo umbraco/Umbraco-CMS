@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Core.HealthChecks;
 
 public class HealthCheckResults
 {
-    public readonly bool AllChecksSuccessful;
+    public bool AllChecksSuccessful { get; }
 
     private HealthCheckResults(Dictionary<string, IEnumerable<HealthCheckStatus>> results, bool allChecksSuccessful)
     {
