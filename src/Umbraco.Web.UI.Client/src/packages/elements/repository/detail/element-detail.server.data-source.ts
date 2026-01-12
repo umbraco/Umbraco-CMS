@@ -42,6 +42,7 @@ export class UmbElementServerDataSource implements UmbDetailDataSource<UmbElemen
 				unique: '',
 				collection: null,
 			},
+			isTrashed: false,
 			values: [],
 			variants: [],
 			flags: [],
@@ -199,6 +200,7 @@ export class UmbElementServerDataSource implements UmbDetailDataSource<UmbElemen
 				unique: data.documentType.id,
 				collection: null,
 			},
+			isTrashed: data.isTrashed,
 			flags: data.flags,
 		};
 	}

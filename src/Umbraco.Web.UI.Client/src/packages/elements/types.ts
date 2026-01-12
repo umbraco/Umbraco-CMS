@@ -23,6 +23,8 @@ export interface UmbElementDetailModel extends UmbContentDetailModel {
 export interface UmbElementVariantModel extends UmbEntityVariantModel {
 	state?: UmbElementVariantState | null;
 	publishDate?: string | null;
+	scheduledPublishDate?: string | null;
+	scheduledUnpublishDate?: string | null;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type

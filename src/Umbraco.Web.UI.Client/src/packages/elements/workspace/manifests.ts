@@ -52,7 +52,7 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		api: UmbSubmitWorkspaceAction,
 		meta: {
 			label: '#buttons_save',
-			look: 'primary',
+			look: 'secondary',
 			color: 'positive',
 		},
 		conditions: [

@@ -2,6 +2,7 @@ import { manifests as collectionManifests } from './collection/manifests.js';
 import { manifests as entityActionManifests } from './entity-actions/manifests.js';
 import { manifests as itemManifests } from './item/manifests.js';
 import { manifests as menuManifests } from './menu/manifests.js';
+import { manifests as publishingManifests } from './publishing/manifests.js';
 import { manifests as recycleBinManifests } from './recycle-bin/manifests.js';
 import { manifests as referenceManifests } from './reference/manifests.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
@@ -13,6 +14,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 	...entityActionManifests,
 	...itemManifests,
 	...menuManifests,
+	...publishingManifests,
 	...recycleBinManifests,
 	...referenceManifests,
 	...repositoryManifests,

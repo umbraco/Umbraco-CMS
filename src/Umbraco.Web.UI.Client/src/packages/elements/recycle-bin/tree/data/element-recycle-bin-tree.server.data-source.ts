@@ -65,14 +65,14 @@ const mapper = (item: ElementRecycleBinItemResponseModel): UmbElementRecycleBinT
 			entityType: item.parent ? UMB_ELEMENT_ENTITY_TYPE : UMB_ELEMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE,
 		},
 		entityType: UMB_ELEMENT_ENTITY_TYPE,
-		icon: item.documentType!.icon,
+		icon: item.documentType?.icon,
 		isTrashed: true,
 		hasChildren: item.hasChildren,
 		//isProtected: false,
 		documentType: {
-			unique: item.documentType!.id,
-			icon: item.documentType!.icon,
-			collection: item.documentType!.collection ? { unique: item.documentType!.collection.id } : null,
+			unique: item.documentType?.id ?? '',
+			icon: item.documentType?.icon ?? '',
+			collection: null,
 		},
 		variants: item.variants.map((variant) => {
 			return {
