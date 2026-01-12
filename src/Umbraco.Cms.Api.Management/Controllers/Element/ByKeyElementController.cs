@@ -15,9 +15,7 @@ public class ByKeyElementController : ElementControllerBase
     private readonly IElementService _elementService;
     private readonly IElementPresentationFactory _elementPresentationFactory;
 
-    public ByKeyElementController(
-        IElementService elementService,
-        IElementPresentationFactory elementPresentationFactory)
+    public ByKeyElementController(IElementService elementService, IElementPresentationFactory elementPresentationFactory)
     {
         _elementService = elementService;
         _elementPresentationFactory = elementPresentationFactory;
@@ -27,17 +25,17 @@ public class ByKeyElementController : ElementControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ElementResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> ByKey(CancellationToken cancellationToken, Guid id)
+    public Task<IActionResult> ByKey(CancellationToken cancellationToken, Guid id)
     {
         IElement? element = _elementService.GetById(id);
         if (element is null)
         {
-            return ContentEditingOperationStatusResult(ContentEditingOperationStatus.NotFound);
+            return Task.FromResult(ContentEditingOperationStatusResult(ContentEditingOperationStatus.NotFound));
         }
 
         ContentScheduleCollection contentScheduleCollection = _elementService.GetContentScheduleByContentId(id);
 
         ElementResponseModel model = _elementPresentationFactory.CreateResponseModel(element, contentScheduleCollection);
-        return Ok(model);
+        return Task.FromResult<IActionResult>(Ok(model));
     }
 }
