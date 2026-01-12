@@ -9,7 +9,8 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi;
 public abstract class ManagementApiUserGroupTestBase<T> : ManagementApiTest<T>
     where T : ManagementApiControllerBase
 {
-    protected string _userEmail = "test@umbraco.com";
+    protected virtual string UserEmail => "test@umbraco.com";
+
     protected const string UserPassword = "1234567890";
 
     protected override Expression<Func<T, object>> MethodSelector { get; set; }
@@ -115,7 +116,7 @@ public abstract class ManagementApiUserGroupTestBase<T> : ManagementApiTest<T>
 
     protected virtual async Task AuthenticateUser(Guid userGroupKey, string groupName)
     {
-        await AuthenticateClientAsync(Client, _userEmail + groupName, UserPassword, userGroupKey);
+        await AuthenticateClientAsync(Client, UserEmail + groupName, UserPassword, userGroupKey);
     }
 
     protected virtual async Task<HttpResponseMessage> ClientRequest()

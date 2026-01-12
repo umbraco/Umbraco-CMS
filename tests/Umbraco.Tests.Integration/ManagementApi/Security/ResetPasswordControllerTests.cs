@@ -42,7 +42,7 @@ public class ResetPasswordControllerTests : ManagementApiUserGroupTestBase<Reset
 
     protected override async Task<HttpResponseMessage> ClientRequest()
     {
-        ResetPasswordRequestModel resetPasswordRequestModel = new() { Email = _userEmail };
+        ResetPasswordRequestModel resetPasswordRequestModel = new() { Email = UserEmail };
 
         return await Client.PostAsync(Url, JsonContent.Create(resetPasswordRequestModel));
     }
