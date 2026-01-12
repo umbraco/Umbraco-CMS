@@ -34,6 +34,12 @@ public abstract class EntityBase : BeingDirtyBase, IEntity
         }
     }
 
+    /// <summary>
+    ///     Gets a value indicating whether the Key can be changed after the entity has identity.
+    ///     Override this to return <c>true</c> for entities where Key is derived from other properties (e.g., file path).
+    /// </summary>
+    protected virtual bool SupportsKeyChange => false;
+
     /// <inheritdoc />
     [DataMember]
     public Guid Key
@@ -52,11 +58,12 @@ public abstract class EntityBase : BeingDirtyBase, IEntity
         {
             // The Key (GUID) should be immutable once an entity is persisted to the database.
             // We throw if ALL of these conditions are true:
+            //   - !SupportsKeyChange: entity doesn't allow Key changes (file-based entities override this)
             //   - HasIdentity: entity has been persisted (Id != 0)
             //   - _keyIsAssigned: Key was previously set while entity had identity (i.e., loaded from DB or set after save)
             //   - value != Guid.Empty: not resetting the Key (allowed for cloning/identity reset)
             //   - value != _key: actually trying to change to a different value
-            if (HasIdentity && _keyIsAssigned && value != Guid.Empty && value != _key)
+            if (!SupportsKeyChange && HasIdentity && _keyIsAssigned && value != Guid.Empty && value != _key)
             {
                 throw new InvalidOperationException($"Cannot change the Key of an existing {GetType().Name}.");
             }
@@ -67,14 +74,11 @@ public abstract class EntityBase : BeingDirtyBase, IEntity
             // This distinction is important:
             //   - Before HasIdentity (new entity): Key can be set freely during setup, _keyIsAssigned stays false
             //   - After HasIdentity (persisted entity): first assignment sets _keyIsAssigned = true, blocking future changes
-            // Setting to Guid.Empty resets the flag (used by ResetIdentity for cloning scenarios).
+            // Note: _keyIsAssigned can only be reset via ResetIdentity(), not by setting Key to Guid.Empty.
+            // This prevents bypassing the immutability check by setting Key = Guid.Empty then Key = newValue.
             if (HasIdentity && value != Guid.Empty)
             {
                 _keyIsAssigned = true;
-            }
-            else if (value == Guid.Empty)
-            {
-                _keyIsAssigned = false;
             }
         }
     }

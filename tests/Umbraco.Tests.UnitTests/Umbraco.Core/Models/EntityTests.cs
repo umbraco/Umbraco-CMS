@@ -64,10 +64,11 @@ public class EntityTests
     {
         // Arrange - simulate factory loading scenario
         // Create entity with default state (Key is Empty until accessed, HasIdentity is false)
-        var content = new Content("Test", -1, _contentType);
-
-        // Simulate factory loading: Set Id first (which sets HasIdentity = true)
-        content.Id = 123;
+        var content = new Content("Test", -1, _contentType)
+        {
+            // Simulate factory loading: Set Id first (which sets HasIdentity = true)
+            Id = 123,
+        };
         Assert.IsTrue(content.HasIdentity);
 
         // At this point, _key is still Guid.Empty (not accessed yet)
@@ -201,7 +202,6 @@ public class EntityTests
             .WithContentType(_contentType)
             .Build();
 
-        var originalKey = content.Key;
         Assert.IsTrue(content.HasIdentity);
 
         // Act - deep clone and reset identity
@@ -244,8 +244,10 @@ public class EntityTests
     public void Changing_Key_After_Explicit_Assignment_Throws()
     {
         // Arrange
-        var content = new Content("Test", -1, _contentType);
-        content.Id = 10;
+        var content = new Content("Test", -1, _contentType)
+        {
+            Id = 10,
+        };
 
         // First explicit assignment
         var firstKey = new Guid("29181B97-CB8F-403F-86DE-5FEB497F4800");
@@ -254,6 +256,28 @@ public class EntityTests
         // Act & Assert - second assignment should throw
         var secondKey = Guid.NewGuid();
         var ex = Assert.Throws<InvalidOperationException>(() => content.Key = secondKey);
+        Assert.That(ex!.Message, Does.Contain("Cannot change the Key"));
+    }
+
+    [Test]
+    public void Setting_Key_To_Empty_Then_New_Value_Still_Throws()
+    {
+        // Arrange - verify that setting Key to Empty doesn't create a bypass
+        var content = new Content("Test", -1, _contentType)
+        {
+            Id = 10,
+        };
+
+        // First explicit assignment
+        var firstKey = new Guid("29181B97-CB8F-403F-86DE-5FEB497F4800");
+        content.Key = firstKey;
+
+        // Setting to Empty is allowed
+        content.Key = Guid.Empty;
+
+        // Act & Assert - but then setting to a new value should still throw
+        var newKey = Guid.NewGuid();
+        var ex = Assert.Throws<InvalidOperationException>(() => content.Key = newKey);
         Assert.That(ex!.Message, Does.Contain("Cannot change the Key"));
     }
 
