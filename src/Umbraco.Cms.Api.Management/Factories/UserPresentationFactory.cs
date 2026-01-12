@@ -89,7 +89,7 @@ public class UserPresentationFactory : IUserPresentationFactory
             HasDocumentRootAccess = HasRootAccess(user.StartContentIds),
             MediaStartNodeIds = GetKeysFromIds(user.StartMediaIds, UmbracoObjectTypes.Media),
             HasMediaRootAccess = HasRootAccess(user.StartMediaIds),
-            ElementStartNodeIds = GetKeysFromIds(user.StartElementIds, UmbracoObjectTypes.Element),
+            ElementStartNodeIds = GetKeysFromIds(user.StartElementIds, UmbracoObjectTypes.ElementContainer),
             HasElementRootAccess = HasRootAccess(user.StartElementIds),
             FailedLoginAttempts = user.FailedPasswordAttempts,
             LastLoginDate = user.LastLoginDate,
@@ -219,7 +219,7 @@ public class UserPresentationFactory : IUserPresentationFactory
         var contentStartNodeIds = user.CalculateContentStartNodeIds(_entityService, _appCaches);
         ISet<ReferenceByIdModel> documentStartNodeKeys = GetKeysFromIds(contentStartNodeIds, UmbracoObjectTypes.Document);
         var elementStartNodeIds = user.CalculateElementStartNodeIds(_entityService, _appCaches);
-        ISet<ReferenceByIdModel> elementStartNodeKeys = GetKeysFromIds(elementStartNodeIds, UmbracoObjectTypes.Element);
+        ISet<ReferenceByIdModel> elementStartNodeKeys = GetKeysFromIds(elementStartNodeIds, UmbracoObjectTypes.ElementContainer);
 
         HashSet<IPermissionPresentationModel> permissions = GetAggregatedGranularPermissions(user, presentationGroups);
         var fallbackPermissions = presentationGroups.SelectMany(x => x.FallbackPermissions).ToHashSet();
@@ -312,7 +312,7 @@ public class UserPresentationFactory : IUserPresentationFactory
         var contentStartNodeIds = user.CalculateContentStartNodeIds(_entityService, _appCaches);
         ISet<ReferenceByIdModel> documentStartNodeKeys = GetKeysFromIds(contentStartNodeIds, UmbracoObjectTypes.Document);
         var elementStartNodeIds = user.CalculateElementStartNodeIds(_entityService, _appCaches);
-        ISet<ReferenceByIdModel> elementStartNodeKeys = GetKeysFromIds(elementStartNodeIds, UmbracoObjectTypes.Element);
+        ISet<ReferenceByIdModel> elementStartNodeKeys = GetKeysFromIds(elementStartNodeIds, UmbracoObjectTypes.ElementContainer);
 
         return Task.FromResult<CalculatedUserStartNodesResponseModel>(new CalculatedUserStartNodesResponseModel()
         {
