@@ -11,11 +11,16 @@ export { setupWorker };
 /**
  * Add additional MSW handlers at runtime.
  * Use this to register mock handlers for custom API endpoints.
+ * Extensions can use this via window.MockServiceWorker.addMockHandlers()
+ * to register their own API mocks.
  * @param additionalHandlers - Array of MSW request handlers to add
  */
 export const addMockHandlers = (...additionalHandlers: RequestHandler[]) => {
 	worker.use(...additionalHandlers);
 };
+
+// Expose addMockHandlers globally for extensions to use
+window.MockServiceWorker.addMockHandlers = addMockHandlers;
 
 export const onUnhandledRequest = (request: Request) => {
 	const url = new URL(request.url);
@@ -37,6 +42,7 @@ declare global {
 			http: typeof httpType;
 			HttpResponse: typeof HttpResponseType;
 			delay: typeof delayType;
+			addMockHandlers: typeof addMockHandlers;
 		};
 	}
 }
