@@ -72,6 +72,7 @@ public class DatabaseSchemaCreator
         typeof(ContentNuDto),
         typeof(DocumentVersionDto),
         typeof(DocumentUrlDto),
+        typeof(DocumentAliasDto),
         typeof(KeyValueDto),
         typeof(UserLoginDto),
         typeof(ConsentDto),

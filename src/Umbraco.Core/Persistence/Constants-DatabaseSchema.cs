@@ -38,6 +38,7 @@ public static partial class Constants
             public const string DocumentCultureVariation = TableNamePrefix + "DocumentCultureVariation";
             public const string DocumentVersion = TableNamePrefix + "DocumentVersion";
             public const string DocumentUrl = TableNamePrefix + "DocumentUrl";
+            public const string DocumentAlias = TableNamePrefix + "DocumentAlias";
             public const string MediaVersion = TableNamePrefix + "MediaVersion";
             public const string ContentSchedule = TableNamePrefix + "ContentSchedule";
 

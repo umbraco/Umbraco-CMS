@@ -1,12 +1,12 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Routing;
 
@@ -23,25 +23,41 @@ namespace Umbraco.Cms.Core.Routing;
 public class ContentFinderByUrlAlias : IContentFinder
 {
     private readonly ILogger<ContentFinderByUrlAlias> _logger;
-    private readonly IPublishedValueFallback _publishedValueFallback;
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
-    private readonly IDocumentNavigationQueryService _documentNavigationQueryService;
-    private readonly IPublishedContentStatusFilteringService _publishedContentStatusFilteringService;
+    private readonly IDocumentAliasService _documentAliasService;
+    private readonly IIdKeyMap _idKeyMap;
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="ContentFinderByUrlAlias" /> class.
     /// </summary>
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
     public ContentFinderByUrlAlias(
         ILogger<ContentFinderByUrlAlias> logger,
         IPublishedValueFallback publishedValueFallback,
         IUmbracoContextAccessor umbracoContextAccessor,
         IDocumentNavigationQueryService documentNavigationQueryService,
         IPublishedContentStatusFilteringService publishedContentStatusFilteringService)
+        : this(
+            logger,
+            umbracoContextAccessor,
+            StaticServiceProvider.Instance.GetRequiredService<IDocumentAliasService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>())
     {
-        _publishedValueFallback = publishedValueFallback;
-        _umbracoContextAccessor = umbracoContextAccessor;
-        _documentNavigationQueryService = documentNavigationQueryService;
-        _publishedContentStatusFilteringService = publishedContentStatusFilteringService;
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ContentFinderByUrlAlias" /> class.
+    /// </summary>
+    public ContentFinderByUrlAlias(
+        ILogger<ContentFinderByUrlAlias> logger,
+        IUmbracoContextAccessor umbracoContextAccessor,
+        IDocumentAliasService documentAliasService,
+        IIdKeyMap idKeyMap)
+    {
         _logger = logger;
+        _umbracoContextAccessor = umbracoContextAccessor;
+        _documentAliasService = documentAliasService;
+        _idKeyMap = idKeyMap;
     }
 
     /// <summary>
@@ -63,7 +79,7 @@ public class ContentFinderByUrlAlias : IContentFinder
         {
             node = FindContentByAlias(
                 umbracoContext.Content,
-                frequest.Domain != null ? frequest.Domain.ContentId : 0,
+                frequest.Domain?.ContentId ?? 0,
                 frequest.Culture,
                 frequest.AbsolutePathDecoded);
 
@@ -73,7 +89,9 @@ public class ContentFinderByUrlAlias : IContentFinder
                 if (_logger.IsEnabled(LogLevel.Debug))
                 {
                     _logger.LogDebug(
-                        "Path '{UriAbsolutePath}' is an alias for id={PublishedContentId}", frequest.Uri.AbsolutePath, node.Id);
+                        "Path '{UriAbsolutePath}' is an alias for id={PublishedContentId}",
+                        frequest.Uri.AbsolutePath,
+                        node.Id);
                 }
             }
         }
@@ -81,90 +99,42 @@ public class ContentFinderByUrlAlias : IContentFinder
         return Task.FromResult(node != null);
     }
 
-    private IPublishedContent? FindContentByAlias(IPublishedContentCache? cache, int rootNodeId, string? culture, string alias)
+    private IPublishedContent? FindContentByAlias(
+        IPublishedContentCache? cache,
+        int rootNodeId,
+        string? culture,
+        string alias)
     {
-        if (alias == null)
+        if (cache is null)
         {
-            throw new ArgumentNullException(nameof(alias));
+            return null;
         }
 
-        // the alias may be "foo/bar" or "/foo/bar"
-        // there may be spaces as in "/foo/bar,  /foo/nil"
-        // these should probably be taken care of earlier on
+        // Normalize alias (same as service)
+        var normalizedAlias = alias
+            .TrimStart('/')
+            .TrimEnd('/')
+            .ToLowerInvariant();
 
-        // TODO: can we normalize the values so that they contain no whitespaces, and no leading slashes?
-        // and then the comparisons in IsMatch can be way faster - and allocate way less strings
-        const string propertyAlias = Constants.Conventions.Content.UrlAlias;
-
-        var test1 = alias.TrimStart(Constants.CharArrays.ForwardSlash) + ",";
-        var test2 = ",/" + test1; // test2 is ",/alias,"
-        test1 = "," + test1; // test1 is ",alias,"
-
-        bool IsMatch(IPublishedContent c, string a1, string a2)
+        if (string.IsNullOrEmpty(normalizedAlias))
         {
-            // this basically implements the original XPath query ;-(
-            //
-            // "//* [@isDoc and (" +
-            // "contains(concat(',',translate(umbracoUrlAlias, ' ', ''),','),',{0},')" +
-            // " or contains(concat(',',translate(umbracoUrlAlias, ' ', ''),','),',/{0},')" +
-            // ")]"
-            if (!c.HasProperty(propertyAlias))
-            {
-                return false;
-            }
-
-            IPublishedProperty? p = c.GetProperty(propertyAlias);
-            var varies = p?.PropertyType?.VariesByCulture();
-            string? v;
-            if (varies ?? false)
-            {
-                if (!c.HasCulture(culture))
-                {
-                    return false;
-                }
-
-                v = c.Value<string>(_publishedValueFallback, propertyAlias, culture);
-            }
-            else
-            {
-                v = c.Value<string>(_publishedValueFallback, propertyAlias);
-            }
-
-            if (string.IsNullOrWhiteSpace(v))
-            {
-                return false;
-            }
-
-            v = "," + v.Replace(" ", string.Empty) + ",";
-            return v.InvariantContains(a1) || v.InvariantContains(a2);
+            return null;
         }
 
-        // TODO: even with Linq, what happens below has to be horribly slow
-        // but the only solution is to entirely refactor URL providers to stop being dynamic
+        // Convert domain root ID to Guid for scoping
+        Guid? domainRootKey = null;
         if (rootNodeId > 0)
         {
-            IPublishedContent? rootNode = cache?.GetById(rootNodeId);
-            return rootNode?.Descendants(_documentNavigationQueryService, _publishedContentStatusFilteringService).FirstOrDefault(x => IsMatch(x, test1, test2));
+            Attempt<Guid> attempt = _idKeyMap.GetKeyForId(rootNodeId, UmbracoObjectTypes.Document);
+            domainRootKey = attempt.Success ? attempt.Result : null;
         }
 
-        if (cache is not null)
-        {
-            if (_documentNavigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys) is false)
-            {
-                return null;
-            }
+        // O(1) lookup instead of O(n) tree traversal
+        Guid? documentKey = _documentAliasService.GetDocumentKeyByAlias(
+            normalizedAlias,
+            culture,
+            domainRootKey);
 
-            foreach (IPublishedContent rootContent in rootKeys.Select(x => cache.GetById(false, x)).WhereNotNull())
-            {
-                IPublishedContent? c = rootContent.DescendantsOrSelf(_documentNavigationQueryService, _publishedContentStatusFilteringService)
-                    .FirstOrDefault(x => IsMatch(x, test1, test2));
-                if (c != null)
-                {
-                    return c;
-                }
-            }
-        }
-
-        return null;
+        return documentKey.HasValue ? cache.GetById(documentKey.Value) : null;
     }
 }
