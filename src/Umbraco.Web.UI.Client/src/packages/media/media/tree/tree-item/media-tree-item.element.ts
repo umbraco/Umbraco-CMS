@@ -95,18 +95,6 @@ export class UmbMediaTreeItemElement extends UmbTreeItemElementBase<UmbMediaTree
 			[disabled] #state-icon {
 				background-color: var(--uui-color-disabled);
 			}
-
-			/** No Access */
-			:host([no-access]) {
-				cursor: not-allowed;
-			}
-			:host([no-access]) #label {
-				opacity: 0.6;
-				font-style: italic;
-			}
-			:host([no-access]) umb-icon {
-				opacity: 0.6;
-			}
 		`,
 	];
 }
