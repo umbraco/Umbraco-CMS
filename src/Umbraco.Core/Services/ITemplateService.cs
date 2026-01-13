@@ -18,10 +18,11 @@ public interface ITemplateService : IService
     Task<IEnumerable<ITemplate>> GetAllAsync(Guid[] keys);
 
     /// <summary>
-    ///     Gets a list of all <see cref="ITemplate" /> objects
+    ///     Gets a list of all <see cref="ITemplate" /> objects that use the specified layout
     /// </summary>
+    /// <param name="layoutId">The ID of the layout template</param>
     /// <returns>An enumerable list of <see cref="ITemplate" /> objects</returns>
-    Task<IEnumerable<ITemplate>> GetChildrenAsync(int masterTemplateId);
+    Task<IEnumerable<ITemplate>> GetChildrenAsync(int layoutId);
 
     /// <summary>
     ///     Gets a <see cref="ITemplate" /> object by its alias.
@@ -45,11 +46,11 @@ public interface ITemplateService : IService
     Task<ITemplate?> GetAsync(Guid id);
 
     /// <summary>
-    ///     Gets the template descendants
+    ///     Gets the template descendants (all templates that inherit from the specified layout)
     /// </summary>
-    /// <param name="masterTemplateId"></param>
-    /// <returns></returns>
-    Task<IEnumerable<ITemplate>> GetDescendantsAsync(int masterTemplateId);
+    /// <param name="layoutId">The ID of the layout template</param>
+    /// <returns>An enumerable list of descending templates</returns>
+    Task<IEnumerable<ITemplate>> GetDescendantsAsync(int layoutId);
 
     /// <summary>
     ///     Updates a <see cref="ITemplate" />

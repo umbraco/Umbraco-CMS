@@ -29,7 +29,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 	private _alias?: string = '';
 
 	@state()
-	private _masterTemplateName?: string | null = null;
+	private _layoutName?: string | null = null;
 
 	@query('umb-code-editor')
 	private _codeEditor?: UmbCodeEditorElement;
@@ -37,7 +37,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 	#templateWorkspaceContext?: typeof UMB_TEMPLATE_WORKSPACE_CONTEXT.TYPE;
 	#isNew = false;
 
-	#masterTemplateUnique: string | null = null;
+	#layoutUnique: string | null = null;
 
 	constructor() {
 		super();
@@ -60,9 +60,9 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 				this._content = content;
 			});
 
-			this.observe(this.#templateWorkspaceContext?.masterTemplate, (masterTemplate) => {
-				this.#masterTemplateUnique = masterTemplate?.unique ?? null;
-				this._masterTemplateName = masterTemplate?.name ?? null;
+			this.observe(this.#templateWorkspaceContext?.layout, (layout) => {
+				this.#layoutUnique = layout?.unique ?? null;
+				this._layoutName = layout?.name ?? null;
 			});
 
 			this.observe(this.#templateWorkspaceContext?.isNew, (isNew) => {
@@ -101,11 +101,11 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 			.catch(() => undefined);
 	}
 
-	#resetMasterTemplate() {
-		this.#templateWorkspaceContext?.setMasterTemplate(null, true);
+	#resetLayout() {
+		this.#templateWorkspaceContext?.setLayout(null, true);
 	}
 
-	#openMasterTemplatePicker() {
+	#openLayoutPicker() {
 		const modalContext = this.#modalContext?.open(this, UMB_TEMPLATE_PICKER_MODAL, {
 			data: {
 				pickableFilter: (item) => {
@@ -113,7 +113,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 				},
 			},
 			value: {
-				selection: [this.#masterTemplateUnique],
+				selection: [this.#layoutUnique],
 			},
 		});
 
@@ -121,7 +121,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 			?.onSubmit()
 			.then((value) => {
 				if (!value?.selection) return;
-				this.#templateWorkspaceContext?.setMasterTemplate(value.selection[0] ?? null, true);
+				this.#templateWorkspaceContext?.setLayout(value.selection[0] ?? null, true);
 			})
 			.catch(() => undefined);
 	}
@@ -139,19 +139,19 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 			.catch(() => undefined);
 	}
 
-	#renderMasterTemplatePicker() {
+	#renderLayoutPicker() {
 		return html`
 			<uui-button-group>
 				<uui-button
-					@click=${this.#openMasterTemplatePicker}
+					@click=${this.#openLayoutPicker}
 					look="secondary"
-					id="master-template-button"
-					label="${this.localize.term('template_mastertemplate')}: ${this._masterTemplateName
-						? this._masterTemplateName
-						: this.localize.term('template_noMaster')}"></uui-button>
-				${this._masterTemplateName
+					id="layout-button"
+					label="${this.localize.term('template_layout')}: ${this._layoutName
+						? this._layoutName
+						: this.localize.term('template_noLayout')}"></uui-button>
+				${this._layoutName
 					? html`<uui-button look="secondary" label=${this.localize.term('actions_remove')} compact>
-							<uui-icon name="icon-delete" @click=${this.#resetMasterTemplate}></uui-icon>
+							<uui-icon name="icon-delete" @click=${this.#resetLayout}></uui-icon>
 						</uui-button>`
 					: nothing}
 			</uui-button-group>
@@ -177,7 +177,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 				</umb-input-with-alias>
 
 				<uui-box>
-					<div slot="header" id="code-editor-menu-container">${this.#renderMasterTemplatePicker()}</div>
+					<div slot="header" id="code-editor-menu-container">${this.#renderLayoutPicker()}</div>
 					<div slot="header-actions">
 						<umb-templating-insert-menu @insert=${this.#insertSnippet}></umb-templating-insert-menu>
 						<uui-button

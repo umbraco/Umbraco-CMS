@@ -19,7 +19,7 @@ public sealed class TemplateMapper : BaseMapper
     protected override void DefineMaps()
     {
         DefineMap<Template, TemplateDto>(nameof(Template.Id), nameof(TemplateDto.NodeId));
-        DefineMap<Template, NodeDto>(nameof(Template.MasterTemplateId), nameof(NodeDto.ParentId));
+        DefineMap<Template, NodeDto>(nameof(Template.LayoutId), nameof(NodeDto.ParentId));
         DefineMap<Template, NodeDto>(nameof(Template.Key), nameof(NodeDto.UniqueId));
         DefineMap<Template, TemplateDto>(nameof(Template.Alias), nameof(TemplateDto.Alias));
     }

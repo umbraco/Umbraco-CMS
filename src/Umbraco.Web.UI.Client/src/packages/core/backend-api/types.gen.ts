@@ -2539,7 +2539,7 @@ export type TemplateResponseModel = {
     alias: string;
     content?: string | null;
     id: string;
-    masterTemplate?: ReferenceByIdModel | null;
+    layout?: ReferenceByIdModel | null;
 };
 
 export type TemporaryFileConfigurationResponseModel = {

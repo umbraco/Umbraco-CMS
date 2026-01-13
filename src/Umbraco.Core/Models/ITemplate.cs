@@ -18,17 +18,36 @@ public interface ITemplate : IFile
     /// <summary>
     ///     Returns true if the template is used as a layout for other templates (i.e. it has 'children')
     /// </summary>
-    bool IsMasterTemplate { get; set; }
+    bool IsLayout { get; set; }
 
     /// <summary>
-    ///     returns the master template alias
+    ///     Returns true if the template is used as a layout for other templates (i.e. it has 'children')
     /// </summary>
-    string? MasterTemplateAlias { get; }
+    [Obsolete("Use IsLayout instead. This will be removed in Umbraco 19.")]
+    bool IsMasterTemplate { get => IsLayout; set => IsLayout = value; }
 
     /// <summary>
-    ///     Set the mastertemplate
+    ///     Returns the layout alias (the parent template this template inherits from)
     /// </summary>
-    /// <param name="masterTemplate"></param>
-    [Obsolete("MasterTemplate is now calculated from the content. This will be removed in Umbraco 15.")]
-    void SetMasterTemplate(ITemplate? masterTemplate);
+    string? LayoutAlias { get; }
+
+    /// <summary>
+    ///     Returns the master template alias
+    /// </summary>
+    [Obsolete("Use LayoutAlias instead. This will be removed in Umbraco 19.")]
+    string? MasterTemplateAlias => LayoutAlias;
+
+    /// <summary>
+    ///     Set the layout template
+    /// </summary>
+    /// <param name="layout">The layout template</param>
+    [Obsolete("Layout is now calculated from the content. This will be removed in Umbraco 19.")]
+    void SetLayout(ITemplate? layout);
+
+    /// <summary>
+    ///     Set the master template
+    /// </summary>
+    /// <param name="masterTemplate">The master template</param>
+    [Obsolete("Use SetLayout instead. This will be removed in Umbraco 19.")]
+    void SetMasterTemplate(ITemplate? masterTemplate) => SetLayout(masterTemplate);
 }

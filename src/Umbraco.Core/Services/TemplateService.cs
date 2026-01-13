@@ -200,11 +200,11 @@ public class TemplateService : RepositoryService, ITemplateService
     }
 
     /// <inheritdoc />
-    public Task<IEnumerable<ITemplate>> GetChildrenAsync(int masterTemplateId)
+    public Task<IEnumerable<ITemplate>> GetChildrenAsync(int layoutId)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            return Task.FromResult<IEnumerable<ITemplate>>(_templateRepository.GetChildren(masterTemplateId).OrderBy(x => x.Name));
+            return Task.FromResult<IEnumerable<ITemplate>>(_templateRepository.GetChildren(layoutId).OrderBy(x => x.Name));
         }
     }
 
@@ -237,11 +237,11 @@ public class TemplateService : RepositoryService, ITemplateService
     }
 
     /// <inheritdoc />
-    public Task<IEnumerable<ITemplate>> GetDescendantsAsync(int masterTemplateId)
+    public Task<IEnumerable<ITemplate>> GetDescendantsAsync(int layoutId)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            return Task.FromResult(_templateRepository.GetDescendants(masterTemplateId));
+            return Task.FromResult(_templateRepository.GetDescendants(layoutId));
         }
     }
 
@@ -290,26 +290,26 @@ public class TemplateService : RepositoryService, ITemplateService
                 return Attempt.FailWithStatus(scopeValidatorStatus, template);
             }
 
-            var masterTemplateAlias = _templateContentParserService.MasterTemplateAlias(template.Content);
-            ITemplate? masterTemplate = masterTemplateAlias.IsNullOrWhiteSpace()
+            var layoutAlias = _templateContentParserService.LayoutAlias(template.Content);
+            ITemplate? layout = layoutAlias.IsNullOrWhiteSpace()
                 ? null
-                : await GetAsync(masterTemplateAlias);
+                : await GetAsync(layoutAlias);
 
-            // fail if the template content specifies a master template but said template does not exist
-            if (masterTemplateAlias.IsNullOrWhiteSpace() == false && masterTemplate == null)
+            // fail if the template content specifies a layout but said template does not exist
+            if (layoutAlias.IsNullOrWhiteSpace() == false && layout == null)
             {
-                return Attempt.FailWithStatus(TemplateOperationStatus.MasterTemplateNotFound, template);
+                return Attempt.FailWithStatus(TemplateOperationStatus.LayoutNotFound, template);
             }
 
             // detect circular references
-            if (masterTemplateAlias is not null
-                && masterTemplate is not null
-                && await HasCircularReference(masterTemplateAlias, template, masterTemplate))
+            if (layoutAlias is not null
+                && layout is not null
+                && await HasCircularReference(layoutAlias, template, layout))
             {
-                return Attempt.FailWithStatus(TemplateOperationStatus.CircularMasterTemplateReference, template);
+                return Attempt.FailWithStatus(TemplateOperationStatus.CircularLayoutReference, template);
             }
 
-            await SetMasterTemplateAsync(template, masterTemplate, userKey);
+            await SetLayoutAsync(template, layout, userKey);
 
             EventMessages eventMessages = EventMessagesFactory.Get();
             var savingNotification = new TemplateSavingNotification(
@@ -373,24 +373,24 @@ public class TemplateService : RepositoryService, ITemplateService
     }
 
     /// <inheritdoc />
-    private async Task SetMasterTemplateAsync(ITemplate template, ITemplate? masterTemplate, Guid userKey)
+    private async Task SetLayoutAsync(ITemplate template, ITemplate? layout, Guid userKey)
     {
-        if (template.MasterTemplateAlias == masterTemplate?.Alias)
+        if (template.LayoutAlias == layout?.Alias)
         {
             return;
         }
 
-        if (masterTemplate != null)
+        if (layout != null)
         {
-            if (masterTemplate.Id == template.Id)
+            if (layout.Id == template.Id)
             {
-                template.SetMasterTemplate(null);
+                template.SetLayout(null);
             }
             else
             {
-                template.SetMasterTemplate(masterTemplate);
+                template.SetLayout(layout);
 
-                //After updating the master - ensure we update the path property if it has any children already assigned
+                //After updating the layout - ensure we update the path property if it has any children already assigned
                 if (template.Id > 0)
                 {
                     IEnumerable<ITemplate> templateHasChildren = await GetDescendantsAsync(template.Id);
@@ -411,9 +411,9 @@ public class TemplateService : RepositoryService, ITemplateService
                         //Get the substring of the child & any children (descendants it may have too)
                         var childTemplatePath = childTemplate.Path.Substring(positionInPath);
 
-                        //As we are updating the template to be a child of a master
-                        //Set the path to the master's path + its current template id + the current child path substring
-                        childTemplate.Path = masterTemplate.Path + "," + template.Id + "," + childTemplatePath;
+                        //As we are updating the template to inherit from a layout
+                        //Set the path to the layout's path + its current template id + the current child path substring
+                        childTemplate.Path = layout.Path + "," + template.Id + "," + childTemplatePath;
 
                         //Save the children with the updated path
                         await UpdateAsync(childTemplate, userKey);
@@ -423,8 +423,8 @@ public class TemplateService : RepositoryService, ITemplateService
         }
         else
         {
-            //remove the master
-            template.SetMasterTemplate(null);
+            //remove the layout
+            template.SetLayout(null);
         }
     }
 
@@ -482,10 +482,10 @@ public class TemplateService : RepositoryService, ITemplateService
                 return Attempt.FailWithStatus<ITemplate?, TemplateOperationStatus>(TemplateOperationStatus.TemplateNotFound, null);
             }
 
-            if (template.IsMasterTemplate)
+            if (template.IsLayout)
             {
                 scope.Complete();
-                return Attempt.FailWithStatus<ITemplate?, TemplateOperationStatus>(TemplateOperationStatus.MasterTemplateCannotBeDeleted, null);
+                return Attempt.FailWithStatus<ITemplate?, TemplateOperationStatus>(TemplateOperationStatus.LayoutCannotBeDeleted, null);
             }
 
             EventMessages eventMessages = EventMessagesFactory.Get();
@@ -510,41 +510,41 @@ public class TemplateService : RepositoryService, ITemplateService
     private static bool IsValidAlias(string alias)
         => alias.IsNullOrWhiteSpace() == false && alias.Length <= 255;
 
-    private async Task<bool> HasCircularReference(string parsedMasterTemplateAlias, ITemplate template, ITemplate masterTemplate)
+    private async Task<bool> HasCircularReference(string parsedLayoutAlias, ITemplate template, ITemplate layout)
     {
         // quick check without extra DB calls as we already have both templates
-        if (parsedMasterTemplateAlias.IsNullOrWhiteSpace() is false
-            && masterTemplate.MasterTemplateAlias is not null
-            && masterTemplate.MasterTemplateAlias.Equals(template.Alias))
+        if (parsedLayoutAlias.IsNullOrWhiteSpace() is false
+            && layout.LayoutAlias is not null
+            && layout.LayoutAlias.Equals(template.Alias))
         {
             return true;
         }
 
-        var processedTemplates = new List<ITemplate> { template, masterTemplate };
-        return await HasRecursiveCircularReference(processedTemplates, masterTemplate.MasterTemplateAlias);
+        var processedTemplates = new List<ITemplate> { template, layout };
+        return await HasRecursiveCircularReference(processedTemplates, layout.LayoutAlias);
     }
 
-    private async Task<bool> HasRecursiveCircularReference(List<ITemplate> referencedTemplates, string? masterTemplateAlias)
+    private async Task<bool> HasRecursiveCircularReference(List<ITemplate> referencedTemplates, string? layoutAlias)
     {
-        if (masterTemplateAlias is null)
+        if (layoutAlias is null)
         {
             return false;
         }
 
-        if (referencedTemplates.Any(template => template.Alias.Equals(masterTemplateAlias)))
+        if (referencedTemplates.Any(template => template.Alias.Equals(layoutAlias)))
         {
             return true;
         }
 
-        ITemplate? masterTemplate = await GetAsync(masterTemplateAlias);
-        if (masterTemplate is null)
+        ITemplate? layout = await GetAsync(layoutAlias);
+        if (layout is null)
         {
             // this should not happen unless somebody manipulated the data by hand as this function is only called between persisted items
             return false;
         }
 
-        referencedTemplates.Add(masterTemplate);
+        referencedTemplates.Add(layout);
 
-        return await HasRecursiveCircularReference(referencedTemplates, masterTemplate.MasterTemplateAlias);
+        return await HasRecursiveCircularReference(referencedTemplates, layout.LayoutAlias);
     }
 }
