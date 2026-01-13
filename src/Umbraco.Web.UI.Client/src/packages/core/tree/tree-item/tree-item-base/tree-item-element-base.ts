@@ -228,12 +228,13 @@ export abstract class UmbTreeItemElementBase<
 	#handleClick = (event: MouseEvent) => {
 		if (this._noAccess) {
 			// Check if the click originated from a child tree item element
+			// Use this element's tag name to find any tree item of the same type
 			const target = event.target as HTMLElement;
-			const clickedChildTreeItem = target.closest('umb-document-tree-item, umb-media-tree-item, umb-tree-item');
+			const clickedTreeItem = target.closest(this.tagName.toLowerCase());
 
 			// If the closest tree item is not this element, it's a child - allow the click
-			if (clickedChildTreeItem && clickedChildTreeItem !== this) {
-				return;  // Allow clicks on child tree items
+			if (clickedTreeItem && clickedTreeItem !== this) {
+				return; // Allow clicks on child tree items
 			}
 
 			// Otherwise, block the click (it's on this noAccess item)
@@ -255,12 +256,13 @@ export abstract class UmbTreeItemElementBase<
 	#handleKeydown = (event: KeyboardEvent) => {
 		if (this._noAccess && (event.key === 'Enter' || event.key === ' ')) {
 			// Check if the event originated from a child tree item element
+			// Use this element's tag name to find any tree item of the same type
 			const target = event.target as HTMLElement;
-			const focusedChildTreeItem = target.closest('umb-document-tree-item, umb-media-tree-item, umb-tree-item');
+			const focusedTreeItem = target.closest(this.tagName.toLowerCase());
 
 			// If the closest tree item is not this element, it's a child - allow the keyboard action
-			if (focusedChildTreeItem && focusedChildTreeItem !== this) {
-				return;  // Allow keyboard navigation on child tree items
+			if (focusedTreeItem && focusedTreeItem !== this) {
+				return; // Allow keyboard navigation on child tree items
 			}
 
 			// Otherwise, block the keyboard action (it's on this noAccess item)
