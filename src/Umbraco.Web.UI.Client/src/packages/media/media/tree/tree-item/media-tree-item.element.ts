@@ -1,7 +1,6 @@
 import type { UmbMediaTreeItemModel } from '../types.js';
 import type { UmbMediaTreeItemContext } from './media-tree-item.context.js';
 import { css, html, customElement, nothing, classMap } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbTreeItemElementBase } from '@umbraco-cms/backoffice/tree';
 
 const elementName = 'umb-media-tree-item';
@@ -41,7 +40,7 @@ export class UmbMediaTreeItemElement extends UmbTreeItemElementBase<UmbMediaTree
 	}
 
 	static override styles = [
-		UmbTextStyles,
+		...UmbTreeItemElementBase.styles,
 		css`
 			#icon-container {
 				position: relative;
