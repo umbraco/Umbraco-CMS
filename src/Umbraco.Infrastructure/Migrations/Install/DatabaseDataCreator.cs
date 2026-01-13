@@ -238,7 +238,15 @@ internal sealed class DatabaseDataCreator
                 "7",
                 "T",
                 ActionDocumentPropertyRead.ActionLetter,
-                ActionDocumentPropertyWrite.ActionLetter
+                ActionDocumentPropertyWrite.ActionLetter,
+                ActionElementNew.ActionLetter,
+                ActionElementUpdate.ActionLetter,
+                ActionElementDelete.ActionLetter,
+                ActionElementMove.ActionLetter,
+                ActionElementCopy.ActionLetter,
+                ActionElementPublish.ActionLetter,
+                ActionElementUnpublish.ActionLetter,
+                ActionElementBrowse.ActionLetter,
             ],
             [Constants.Security.EditorGroupKey] =
             [
@@ -259,7 +267,15 @@ internal sealed class DatabaseDataCreator
                 "5",
                 "T",
                 ActionDocumentPropertyRead.ActionLetter,
-                ActionDocumentPropertyWrite.ActionLetter
+                ActionDocumentPropertyWrite.ActionLetter,
+                ActionElementNew.ActionLetter,
+                ActionElementUpdate.ActionLetter,
+                ActionElementDelete.ActionLetter,
+                ActionElementMove.ActionLetter,
+                ActionElementCopy.ActionLetter,
+                ActionElementPublish.ActionLetter,
+                ActionElementUnpublish.ActionLetter,
+                ActionElementBrowse.ActionLetter,
             ],
             [Constants.Security.WriterGroupKey] =
             [
@@ -269,14 +285,19 @@ internal sealed class DatabaseDataCreator
                 ActionNotify.ActionLetter,
                 ":",
                 ActionDocumentPropertyRead.ActionLetter,
-                ActionDocumentPropertyWrite.ActionLetter
+                ActionDocumentPropertyWrite.ActionLetter,
+                ActionElementNew.ActionLetter,
+                ActionElementUpdate.ActionLetter,
+                ActionElementBrowse.ActionLetter,
             ],
             [Constants.Security.TranslatorGroupKey] =
             [
                 ActionUpdate.ActionLetter,
                 ActionBrowse.ActionLetter,
                 ActionDocumentPropertyRead.ActionLetter,
-                ActionDocumentPropertyWrite.ActionLetter
+                ActionDocumentPropertyWrite.ActionLetter,
+                ActionElementUpdate.ActionLetter,
+                ActionElementBrowse.ActionLetter,
             ],
         };
 
