@@ -6,6 +6,4 @@ namespace Umbraco.Cms.Api.Management.Controllers.Element.Item;
 
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Item}/{Constants.UdiEntityType.Element}")]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Element))]
-public class ElementItemControllerBase : ManagementApiControllerBase
-{
-}
+public class ElementItemControllerBase : ManagementApiControllerBase;
