@@ -223,8 +223,13 @@ public class DatabaseSchemaCreator
     /// </remarks>
     private void ValidateDbConstraints(DatabaseSchemaResult result)
     {
-        //Check constraints in configured database against constraints in schema
+        // Check constraints in configured database against constraints in schema
         var constraintsInDatabase = SqlSyntax.GetConstraintsPerColumn(_database).DistinctBy(x => x.Item3).ToList();
+        if (constraintsInDatabase.Count == 0)
+        {
+            return;
+        }
+
         var foreignKeysInDatabase = constraintsInDatabase.Where(x => x.Item3.InvariantStartsWith("FK_"))
             .Select(x => x.Item3).ToList();
         var primaryKeysInDatabase = constraintsInDatabase.Where(x => x.Item3.InvariantStartsWith("PK_"))

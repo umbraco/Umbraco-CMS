@@ -263,12 +263,4 @@ public interface ISqlSyntaxProvider
         Sql<ISqlContext> sql,
         Func<Sql<ISqlContext>, Sql<ISqlContext>> nestedJoin,
         string? alias = null);
-
-    /// <summary>
-    /// Determines whether the specified foreign key is stored in a valid hashed format.
-    /// Use case i.e., for databases that have limitations on index/key length.
-    /// </summary>
-    /// <param name="foreignKey">The foreign key to evaluate. Can be null.</param>
-    /// <returns>true if the foreign key is hashed; otherwise, false.</returns>
-    bool IsValidHashedForeignKey(string? foreignKey);
 }
