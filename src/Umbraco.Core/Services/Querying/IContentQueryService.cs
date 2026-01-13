@@ -1,45 +1,17 @@
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentQuery;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services.Querying;
 
+/// <summary>
+/// Defines the ContentQueryService, which is an easy access to operations involving <see cref="ContentScheduleQueryResult"/>
+/// </summary>
 public interface IContentQueryService
 {
+    /// <summary>
+    /// Gets the content with schedules.
+    /// </summary>
+    /// <param name="id">The id of the content.</param>
+    /// <returns>The content with schedules.</returns>
     Task<Attempt<ContentScheduleQueryResult?, ContentQueryOperationStatus>> GetWithSchedulesAsync(Guid id);
-}
-
-public class ContentQueryService : IContentQueryService
-{
-    private readonly IContentService _contentService;
-    private readonly ICoreScopeProvider _coreScopeProvider;
-
-    public ContentQueryService(
-        IContentService contentService,
-        ICoreScopeProvider coreScopeProvider)
-    {
-        _contentService = contentService;
-        _coreScopeProvider = coreScopeProvider;
-    }
-
-    public Task<Attempt<ContentScheduleQueryResult?, ContentQueryOperationStatus>> GetWithSchedulesAsync(Guid id)
-    {
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
-
-        IContent? content = _contentService.GetById(id);
-
-        if (content == null)
-        {
-            return Task.FromResult(Attempt<ContentScheduleQueryResult, ContentQueryOperationStatus>.Fail(ContentQueryOperationStatus
-                .ContentNotFound));
-        }
-
-        ContentScheduleCollection schedules = _contentService.GetContentScheduleByContentId(id);
-
-        return Task.FromResult(Attempt<ContentScheduleQueryResult?, ContentQueryOperationStatus>
-            .Succeed(
-                ContentQueryOperationStatus.Success,
-                new ContentScheduleQueryResult(content, schedules)));
-    }
 }
