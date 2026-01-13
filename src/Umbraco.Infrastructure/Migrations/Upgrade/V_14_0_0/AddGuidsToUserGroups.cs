@@ -1,4 +1,4 @@
-﻿using NPoco;
+using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
@@ -26,6 +26,12 @@ public class AddGuidsToUserGroups : UnscopedMigrationBase
             Context.Complete();
             return;
         }
+
+        // Since this migration was added, the 'description' field has been added to the user group table (in 17.2).
+        // We need to ensure to add that column first before proceeding with this migration, otherwise
+        // we'll get exceptions on update.
+        var addDescriptionMigration = new V_17_2_0.AddDescriptionToUserGroup(Context);
+        addDescriptionMigration.RunAsync().GetAwaiter().GetResult();
 
         // SQL server can simply add the column, but for SQLite this won't work,
         // so we'll have to create a new table and copy over data.
