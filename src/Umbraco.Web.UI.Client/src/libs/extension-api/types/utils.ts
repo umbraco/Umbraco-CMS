@@ -47,7 +47,10 @@ export type ElementAndApiLoaderPromise<
 // Property Types:
 
 export type CssLoaderProperty<CssType extends string = string> = string | CssLoaderPromise<CssType>;
-export type JsLoaderProperty<JsExportType> = string | JsLoaderPromise<JsExportType>;
+export type JsLoaderProperty<JsExportType> =
+	| string
+	| JsLoaderPromise<JsExportType>
+	| (JsExportType extends object ? JsExportType : never);
 export type ElementLoaderProperty<ElementType extends HTMLElement = HTMLElement> =
 	| string
 	| ElementLoaderPromise<ElementType>
