@@ -105,6 +105,7 @@ export default defineConfig({
 		? {
 				'import.meta.env.VITE_USE_MOCK_REPO': JSON.stringify(process.env.VITE_USE_MOCK_REPO || ''),
 				'import.meta.env.VITE_USE_MSW': JSON.stringify(process.env.VITE_USE_MSW || ''),
+				'import.meta.env.VITE_UMBRACO_USE_MSW': JSON.stringify(process.env.VITE_UMBRACO_USE_MSW || ''),
 			}
 		: undefined,
 });

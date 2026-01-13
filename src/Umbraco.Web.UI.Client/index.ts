@@ -18,10 +18,11 @@ async function bootstrap() {
 	}
 
 	// Example injector - supports both relative and absolute paths
+	// For absolute paths, use Vite's /@fs/ prefix to access files outside the project
 	if (import.meta.env.VITE_EXAMPLE_PATH) {
 		const examplePath = import.meta.env.VITE_EXAMPLE_PATH;
-		const importPath = examplePath.startsWith('/') ? examplePath : './' + examplePath;
-		import(/* @vite-ignore */ importPath + '/index.ts').then((js) => {
+		const importPath = examplePath.startsWith('/') ? '/@fs' + examplePath : './' + examplePath;
+		import(/* @vite-ignore */ importPath + '/src/index.ts').then((js) => {
 			if (js) {
 				Object.keys(js).forEach((key) => {
 					const value = js[key];
