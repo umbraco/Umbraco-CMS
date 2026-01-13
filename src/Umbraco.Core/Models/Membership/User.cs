@@ -45,8 +45,9 @@ public class User : EntityBase, IUser, IProfile
     private UserKind _kind;
 
     /// <summary>
-    ///     Constructor for creating a new/empty user
+    /// Initializes a new instance of the <see cref="User"/> class for a new/empty user.
     /// </summary>
+    /// <param name="globalSettings">The global settings.</param>
     public User(GlobalSettings globalSettings)
     {
         SessionTimeout = 60;
@@ -66,13 +67,13 @@ public class User : EntityBase, IUser, IProfile
     }
 
     /// <summary>
-    ///     Constructor for creating a new/empty user
+    /// Initializes a new instance of the <see cref="User"/> class for a new/empty user.
     /// </summary>
-    /// <param name="name"></param>
-    /// <param name="email"></param>
-    /// <param name="username"></param>
-    /// <param name="rawPasswordValue"></param>
-    /// <param name="globalSettings"></param>
+    /// <param name="globalSettings">The global settings.</param>
+    /// <param name="name">The name.</param>
+    /// <param name="email">The email.</param>
+    /// <param name="username">The username.</param>
+    /// <param name="rawPasswordValue">The raw password value.</param>
     public User(GlobalSettings globalSettings, string? name, string email, string username, string rawPasswordValue)
         : this(globalSettings)
     {
@@ -109,19 +110,48 @@ public class User : EntityBase, IUser, IProfile
     }
 
     /// <summary>
-    ///     Constructor for creating a new User instance for an existing user
+    /// Initializes a new instance of the <see cref="User"/> class for an existing user.
     /// </summary>
-    /// <param name="globalSettings"></param>
-    /// <param name="id"></param>
-    /// <param name="name"></param>
-    /// <param name="email"></param>
-    /// <param name="username"></param>
-    /// <param name="rawPasswordValue"></param>
-    /// <param name="passwordConfig"></param>
-    /// <param name="userGroups"></param>
-    /// <param name="startContentIds"></param>
-    /// <param name="startMediaIds"></param>
-    /// <param name="startElementIds"></param>
+    /// <param name="globalSettings">The global settings.</param>
+    /// <param name="id">The identifier.</param>
+    /// <param name="name">The name.</param>
+    /// <param name="email">The email.</param>
+    /// <param name="username">The username.</param>
+    /// <param name="rawPasswordValue">The raw password value.</param>
+    /// <param name="passwordConfig">The password configuration.</param>
+    /// <param name="userGroups">The user groups.</param>
+    /// <param name="startContentIds">The start content identifiers.</param>
+    /// <param name="startMediaIds">The start media identifiers.</param>
+    [Obsolete("Use the constructor that includes startElementIds. Scheduled for removal in Umbraco 19.")]
+    public User(
+        GlobalSettings globalSettings,
+        int id,
+        string? name,
+        string email,
+        string? username,
+        string? rawPasswordValue,
+        string? passwordConfig,
+        IEnumerable<IReadOnlyUserGroup> userGroups,
+        int[] startContentIds,
+        int[] startMediaIds)
+        : this(globalSettings, id, name, email, username, rawPasswordValue, passwordConfig, userGroups, startContentIds, startMediaIds, [])
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="User"/> class for an existing user.
+    /// </summary>
+    /// <param name="globalSettings">The global settings.</param>
+    /// <param name="id">The identifier.</param>
+    /// <param name="name">The name.</param>
+    /// <param name="email">The email.</param>
+    /// <param name="username">The username.</param>
+    /// <param name="rawPasswordValue">The raw password value.</param>
+    /// <param name="passwordConfig">The password configuration.</param>
+    /// <param name="userGroups">The user groups.</param>
+    /// <param name="startContentIds">The start content identifiers.</param>
+    /// <param name="startMediaIds">The start media identifiers.</param>
+    /// <param name="startElementIds">The start element identifiers.</param>
     public User(
         GlobalSettings globalSettings,
         int id,
