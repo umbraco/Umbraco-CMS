@@ -35,6 +35,13 @@ export abstract class UmbTreeItemElementBase<
 	protected _item?: TreeItemModelType;
 
 	/**
+	 * @internal
+	 * Indicates whether the user has no access to this media item, this is controlled internally but present as an attribute as it affects styling.
+	 */
+	@property({ type: Boolean, reflect: true, attribute: 'no-access' })
+	protected _noAccess = false;
+
+	/**
 	 * @param item - The item from which to extract flags.
 	 * @description This method is called whenever the `item` property is set. It extracts the flags from the item and assigns them to the `_flags` state property.
 	 * This method is in some cases overridden in subclasses to customize how flags are extracted!
@@ -74,6 +81,7 @@ export abstract class UmbTreeItemElementBase<
 			this.observe(this.#api.pagination.totalPages, (value) => (this._totalPages = value));
 			this.observe(this.#api.isLoadingPrevChildren, (value) => (this._isLoadingPrevChildren = value ?? false));
 			this.observe(this.#api.isLoadingNextChildren, (value) => (this._isLoadingNextChildren = value ?? false));
+			this.observe(this.#api.noAccess, (noAccess) => (this._noAccess = noAccess));
 
 			this.observe(
 				this.#api.targetPagination?.totalPrevItems,
@@ -192,6 +200,20 @@ export abstract class UmbTreeItemElementBase<
 		this.#api?.pagination.setCurrentPageNumber(next);
 	}
 
+	#handleClick = (event: MouseEvent) => {
+		if (this._noAccess) {
+			event.preventDefault();
+			event.stopPropagation();
+		}
+	};
+
+	#handleKeydown = (event: KeyboardEvent) => {
+		if (this._noAccess && (event.key === 'Enter' || event.key === ' ')) {
+			event.preventDefault();
+			event.stopPropagation();
+		}
+	};
+
 	// Note: Currently we want to prevent opening when the item is in a selectable context, but this might change in the future.
 	// If we like to be able to open items in selectable context, then we might want to make it as a menu item action, so you have to click ... and chose an action called 'Edit'
 	override render() {
@@ -204,6 +226,8 @@ export abstract class UmbTreeItemElementBase<
 				@hide-children=${this._onHideChildren}
 				@selected=${this._handleSelectedItem}
 				@deselected=${this._handleDeselectedItem}
+				@click=${this.#handleClick}
+				@keydown=${this.#handleKeydown}
 				?active=${this._isActive}
 				?disabled=${this._isSelectableContext && !this._isSelectable}
 				?selectable=${this._isSelectable}

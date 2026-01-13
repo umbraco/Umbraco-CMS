@@ -1,61 +1,12 @@
 import type { UmbMediaTreeItemModel } from '../types.js';
 import type { UmbMediaTreeItemContext } from './media-tree-item.context.js';
-import { css, html, customElement, nothing, property } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, nothing, classMap } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbTreeItemElementBase } from '@umbraco-cms/backoffice/tree';
 
 const elementName = 'umb-media-tree-item';
 @customElement(elementName)
 export class UmbMediaTreeItemElement extends UmbTreeItemElementBase<UmbMediaTreeItemModel, UmbMediaTreeItemContext> {
-	#api: UmbMediaTreeItemContext | undefined;
-
-	@property({ type: Object, attribute: false })
-	public override get api(): UmbMediaTreeItemContext | undefined {
-		return this.#api;
-	}
-	public override set api(value: UmbMediaTreeItemContext | undefined) {
-		this.#api = value;
-
-		if (this.#api) {
-			this.observe(this.#api.noAccess, (noAccess) => (this._noAccess = noAccess || false));
-		}
-
-		super.api = value;
-	}
-
-	/**
-	 * @internal
-	 * Indicates whether the user has no access to this media item, this is controlled internally but present as an attribute as it affects styling.
-	 */
-	@property({ type: Boolean, reflect: true, attribute: 'no-access' })
-	protected _noAccess = false;
-
-	override connectedCallback() {
-		super.connectedCallback();
-		this.addEventListener('click', this.#handleClick);
-		this.addEventListener('keydown', this.#handleKeydown);
-	}
-
-	override disconnectedCallback() {
-		this.removeEventListener('click', this.#handleClick);
-		this.removeEventListener('keydown', this.#handleKeydown);
-		super.disconnectedCallback();
-	}
-
-	#handleClick = (event: MouseEvent) => {
-		if (this._noAccess) {
-			event.preventDefault();
-			event.stopPropagation();
-		}
-	};
-
-	#handleKeydown = (event: KeyboardEvent) => {
-		if (this._noAccess && (event.key === 'Enter' || event.key === ' ')) {
-			event.preventDefault();
-			event.stopPropagation();
-		}
-	};
-
 	override renderIconContainer() {
 		const icon = this.item?.mediaType.icon;
 
@@ -72,7 +23,9 @@ export class UmbMediaTreeItemElement extends UmbTreeItemElementBase<UmbMediaTree
 	}
 
 	override renderLabel() {
-		return html`<span id="label" slot="label">${this._item?.variants[0].name}</span> `;
+		return html`<span id="label" slot="label" class=${classMap({ noAccess: this._noAccess })}>
+			${this._item?.variants[0].name}
+		</span> `;
 	}
 
 	#renderStateIcon() {

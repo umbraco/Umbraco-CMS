@@ -20,7 +20,6 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 		if (this.#api) {
 			this.observe(this.#api.name, (name) => (this._name = name || ''));
 			this.observe(this.#api.isDraft, (isDraft) => (this._isDraft = isDraft || false));
-			this.observe(this.#api.noAccess, (noAccess) => (this._noAccess = noAccess || false));
 			this.observe(this.#api.hasCollection, (has) => {
 				const oldValue = this._forceShowExpand;
 				this._forceShowExpand = has;
@@ -43,41 +42,7 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 	@property({ type: Boolean, reflect: true, attribute: 'draft' })
 	protected _isDraft = false;
 
-	/**
-	 * @internal
-	 * Indicates whether the user has no access to this document, this is controlled internally but present as an attribute as it affects styling.
-	 */
-	@property({ type: Boolean, reflect: true, attribute: 'no-access' })
-	protected _noAccess = false;
-
 	#icon: string | null | undefined;
-
-	override connectedCallback() {
-		super.connectedCallback();
-		this.addEventListener('click', this.#handleClick);
-		this.addEventListener('keydown', this.#handleKeydown);
-	}
-
-	override disconnectedCallback() {
-		this.removeEventListener('click', this.#handleClick);
-		this.removeEventListener('keydown', this.#handleKeydown);
-		super.disconnectedCallback();
-	}
-
-	#handleClick = (event: MouseEvent) => {
-		if (this._noAccess) {
-			event.preventDefault();
-			event.stopPropagation();
-		}
-	};
-
-	#handleKeydown = (event: KeyboardEvent) => {
-		if (this._noAccess && (event.key === 'Enter' || event.key === ' ')) {
-			event.preventDefault();
-			event.stopPropagation();
-		}
-	};
-
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	protected override _extractFlags(item: UmbDocumentTreeItemModel | undefined) {
@@ -100,7 +65,9 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 	};
 
 	override renderLabel() {
-		return html`<span id="label" slot="label" class=${classMap({ draft: this._isDraft })}>${this._name}</span> `;
+		return html`<span id="label" slot="label" class=${classMap({ draft: this._isDraft, noAccess: this._noAccess })}>
+			${this._name}
+		</span> `;
 	}
 
 	static override styles = [
