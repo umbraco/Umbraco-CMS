@@ -1,18 +1,9 @@
+import { UMB_ELEMENT_DETAIL_REPOSITORY_ALIAS } from '../../repository/detail/constants.js';
 import { UMB_ELEMENT_ENTITY_TYPE } from '../../entity.js';
-import { UMB_ELEMENT_RECYCLE_BIN_REPOSITORY_ALIAS, UMB_ELEMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE } from '../constants.js';
-import { manifests as bulkTrashManifests } from './bulk-trash/manifests.js';
-// import {
-// 	UMB_ELEMENT_ENTITY_TYPE,
-// 	UMB_ELEMENT_PICKER_MODAL,
-// 	UMB_USER_PERMISSION_ELEMENT_DELETE,
-// 	UMB_USER_PERMISSION_ELEMENT_MOVE,
-// } from '../../constants.js';
-import { UMB_ELEMENT_REFERENCE_REPOSITORY_ALIAS } from '../../reference/constants.js';
 import { UMB_ELEMENT_ITEM_REPOSITORY_ALIAS } from '../../item/constants.js';
-// import {
-// 	UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
-// 	UMB_ENTITY_IS_TRASHED_CONDITION_ALIAS,
-// } from '@umbraco-cms/backoffice/recycle-bin';
+import { UMB_ELEMENT_RECYCLE_BIN_REPOSITORY_ALIAS, UMB_ELEMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE } from '../constants.js';
+import { UMB_ELEMENT_REFERENCE_REPOSITORY_ALIAS } from '../../reference/constants.js';
+import { manifests as bulkTrashManifests } from './bulk-trash/manifests.js';
 import { UMB_ENTITY_HAS_CHILDREN_CONDITION_ALIAS } from '@umbraco-cms/backoffice/entity-action';
 import {
 	UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
@@ -32,10 +23,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 			referenceRepositoryAlias: UMB_ELEMENT_REFERENCE_REPOSITORY_ALIAS,
 		},
 		conditions: [
-			// {
-			// 	alias: 'Umb.Condition.UserPermission.Element',
-			// 	allOf: [UMB_USER_PERMISSION_ELEMENT_DELETE],
-			// },
 			{
 				alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
 			},
@@ -50,14 +37,10 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			icon: 'icon-trash-empty',
 			itemRepositoryAlias: UMB_ELEMENT_ITEM_REPOSITORY_ALIAS,
-			//detailRepositoryAlias: UMB_ELEMENT_DETAIL_REPOSITORY_ALIAS,
+			detailRepositoryAlias: UMB_ELEMENT_DETAIL_REPOSITORY_ALIAS,
 			referenceRepositoryAlias: UMB_ELEMENT_REFERENCE_REPOSITORY_ALIAS,
 		},
 		conditions: [
-			// {
-			// 	alias: 'Umb.Condition.UserPermission.Element',
-			// 	allOf: [UMB_USER_PERMISSION_ELEMENT_DELETE],
-			// },
 			{
 				alias: UMB_ENTITY_IS_TRASHED_CONDITION_ALIAS,
 			},
@@ -76,10 +59,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 	// 		pickerModal: UMB_ELEMENT_PICKER_MODAL,
 	// 	},
 	// 	conditions: [
-	// 		// {
-	// 		// 	alias: 'Umb.Condition.UserPermission.Element',
-	// 		// 	allOf: [UMB_USER_PERMISSION_ELEMENT_MOVE],
-	// 		// },
 	// 		{
 	// 			alias: UMB_ENTITY_IS_TRASHED_CONDITION_ALIAS,
 	// 		},
@@ -95,10 +74,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 			recycleBinRepositoryAlias: UMB_ELEMENT_RECYCLE_BIN_REPOSITORY_ALIAS,
 		},
 		conditions: [
-			// {
-			// 	alias: 'Umb.Condition.UserPermission.Element',
-			// 	allOf: [UMB_USER_PERMISSION_ELEMENT_DELETE],
-			// },
 			{
 				alias: UMB_ENTITY_HAS_CHILDREN_CONDITION_ALIAS,
 			},

@@ -21,7 +21,7 @@ export class UmbElementRecycleBinTreeItemTableCollectionViewElement extends UmbL
 		{
 			name: this.localize.term('general_name'),
 			alias: 'name',
-			elementName: 'umb-trashed-Element-name-table-column',
+			elementName: 'umb-trashed-element-name-table-column',
 		},
 		{
 			name: '',
@@ -96,6 +96,6 @@ export { UmbElementRecycleBinTreeItemTableCollectionViewElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		['umb-element-recycle-bin-tree-item-table-collection-view']: UmbElementRecycleBinTreeItemTableCollectionViewElement;
+		'umb-element-recycle-bin-tree-item-table-collection-view': UmbElementRecycleBinTreeItemTableCollectionViewElement;
 	}
 }

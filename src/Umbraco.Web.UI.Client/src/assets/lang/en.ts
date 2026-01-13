@@ -469,6 +469,8 @@ export default {
 		documentType: 'Document Type',
 		documentTypeDescription:
 			'The data definition for a content component that can be created by editors in the content tree and be picked on other pages but has no direct URL.',
+		element: 'Element',
+		elementDescription: 'Select the Element Type you want to make an element for',
 		elementType: 'Element Type',
 		elementTypeDescription:
 			"Defines the schema for a repeating set of properties, for example, in a 'Block List' or 'Block Grid' property editor.",
@@ -1500,10 +1502,11 @@ export default {
 		editContentPublishedFailedByValidation: 'Document could not be published, but we saved it for you',
 		editContentPublishedFailedByParent: 'Document could not be published, because a parent page is not published',
 		editContentPublishedHeader: 'Document published',
-		editElementPublishedHeader: 'Document published',
+		editElementPublishedHeader: 'Element published',
 		editContentPublishedText: 'and is visible on the website',
 		editContentUnpublishedHeader: 'Document unpublished',
 		editContentUnpublishedText: 'and is no longer visible on the website',
+		editElementUnpublishedHeader: 'Element unpublished',
 		editVariantPublishedText: '%0% published and is visible on the website',
 		editVariantSavedText: '%0% saved',
 		editBlueprintSavedHeader: 'Document Blueprint saved',
