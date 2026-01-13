@@ -184,7 +184,7 @@ test('can remove a not-found content picker', {tag: '@release'}, async ({umbraco
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.removeNotFoundContentPickerWithId(contentPickerId);
+  await umbracoUi.content.removeNotFoundItem(contentPickerId);
   await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
