@@ -18,6 +18,7 @@ public class RunMigrationPackageController : PackageControllerBase
     /// <summary>
     ///     Runs all migration plans for a package with a given name if any are pending.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <param name="name">The name of the package.</param>
     /// <returns>The result of running the package migrations.</returns>
     [HttpPost("{name}/run-migration")]

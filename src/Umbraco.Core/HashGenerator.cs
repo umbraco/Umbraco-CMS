@@ -16,16 +16,39 @@ public class HashGenerator : DisposableObjectSlim
     private readonly MemoryStream _ms = new();
     private StreamWriter _writer;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="HashGenerator"/> class.
+    /// </summary>
     public HashGenerator() => _writer = new StreamWriter(_ms, Encoding.Unicode, 1024, true);
 
+    /// <summary>
+    ///     Adds an integer value to the hash computation.
+    /// </summary>
+    /// <param name="i">The integer value to add.</param>
     public void AddInt(int i) => _writer.Write(i);
 
+    /// <summary>
+    ///     Adds a long value to the hash computation.
+    /// </summary>
+    /// <param name="i">The long value to add.</param>
     public void AddLong(long i) => _writer.Write(i);
 
+    /// <summary>
+    ///     Adds an object's string representation to the hash computation.
+    /// </summary>
+    /// <param name="o">The object to add.</param>
     public void AddObject(object o) => _writer.Write(o);
 
+    /// <summary>
+    ///     Adds a DateTime value to the hash computation using its ticks.
+    /// </summary>
+    /// <param name="d">The DateTime value to add.</param>
     public void AddDateTime(DateTime d) => _writer.Write(d.Ticks);
 
+    /// <summary>
+    ///     Adds a string to the hash computation.
+    /// </summary>
+    /// <param name="s">The string to add. If null, nothing is added.</param>
     public void AddString(string s)
     {
         if (s != null)
@@ -34,6 +57,14 @@ public class HashGenerator : DisposableObjectSlim
         }
     }
 
+    /// <summary>
+    ///     Adds a string to the hash computation in a case-insensitive manner.
+    /// </summary>
+    /// <param name="s">The string to add. If null, nothing is added.</param>
+    /// <remarks>
+    ///     The string is converted to uppercase before being added to ensure
+    ///     case-insensitive hash generation.
+    /// </remarks>
     public void AddCaseInsensitiveString(string s)
     {
         // I've tried to no allocate a new string with this which can be done if we use the CompareInfo.GetSortKey method which will create a new
@@ -48,6 +79,14 @@ public class HashGenerator : DisposableObjectSlim
         }
     }
 
+    /// <summary>
+    ///     Adds a file system item (file or directory) to the hash computation.
+    /// </summary>
+    /// <param name="f">The file system item to add.</param>
+    /// <remarks>
+    ///     For files, adds the full name, creation time, last write time, and length.
+    ///     For directories, recursively adds all files and subdirectories.
+    /// </remarks>
     public void AddFileSystemItem(FileSystemInfo f)
     {
         // if it doesn't exist, don't proceed.
@@ -80,14 +119,27 @@ public class HashGenerator : DisposableObjectSlim
         }
     }
 
+    /// <summary>
+    ///     Adds a file to the hash computation.
+    /// </summary>
+    /// <param name="f">The file to add.</param>
     public void AddFile(FileInfo f) => AddFileSystemItem(f);
 
+    /// <summary>
+    ///     Adds a folder and its contents to the hash computation.
+    /// </summary>
+    /// <param name="d">The directory to add.</param>
     public void AddFolder(DirectoryInfo d) => AddFileSystemItem(d);
 
     /// <summary>
-    ///     Returns the generated hash output of all added objects
+    ///     Returns the generated hash of all added objects.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>A hexadecimal string representation of the computed hash.</returns>
+    /// <remarks>
+    ///     Uses SHA1 when FIPS compliance is required, otherwise uses MD5.
+    ///     This method can be called multiple times; subsequent calls will include
+    ///     any objects added after the previous call.
+    /// </remarks>
     public string GenerateHash()
     {
         // flush,close,dispose the writer,then create a new one since it's possible to keep adding after GenerateHash is called.
@@ -96,10 +148,8 @@ public class HashGenerator : DisposableObjectSlim
         _writer.Dispose();
         _writer = new StreamWriter(_ms, Encoding.UTF8, 1024, true);
 
-        var hashType = CryptoConfig.AllowOnlyFipsAlgorithms ? "SHA1" : "MD5";
-
-        // create an instance of the correct hashing provider based on the type passed in
-        HashAlgorithm hasher = HashAlgorithm.Create(hashType) ?? throw new InvalidOperationException("No hashing type found by name " + hashType);
+        // Use SHA1 for FIPS compliance, otherwise MD5
+        HashAlgorithm hasher = CryptoConfig.AllowOnlyFipsAlgorithms ? SHA1.Create() : MD5.Create();
 
         using (hasher)
         {
@@ -123,6 +173,7 @@ public class HashGenerator : DisposableObjectSlim
         }
     }
 
+    /// <inheritdoc />
     protected override void DisposeResources()
     {
         _writer.Close();

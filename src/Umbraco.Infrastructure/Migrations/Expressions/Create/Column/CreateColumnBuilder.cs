@@ -107,12 +107,17 @@ public class CreateColumnBuilder : ExpressionBuilderBase<CreateColumnExpression,
     public ICreateColumnOptionForeignKeyCascadeBuilder ForeignKey(string primaryTableName, string primaryColumnName) =>
         ForeignKey(null, null, primaryTableName, primaryColumnName);
 
-    public ICreateColumnOptionForeignKeyCascadeBuilder ForeignKey(string foreignKeyName, string primaryTableName,
+    public ICreateColumnOptionForeignKeyCascadeBuilder ForeignKey(
+        string foreignKeyName,
+        string primaryTableName,
         string primaryColumnName) =>
         ForeignKey(foreignKeyName, null, primaryTableName, primaryColumnName);
 
-    public ICreateColumnOptionForeignKeyCascadeBuilder ForeignKey(string? foreignKeyName, string? primaryTableSchema,
-        string primaryTableName, string primaryColumnName)
+    public ICreateColumnOptionForeignKeyCascadeBuilder ForeignKey(
+        string? foreignKeyName,
+        string? primaryTableSchema,
+        string primaryTableName,
+        string primaryColumnName)
     {
         Expression.Column.IsForeignKey = true;
 
@@ -144,12 +149,17 @@ public class CreateColumnBuilder : ExpressionBuilderBase<CreateColumnExpression,
         ReferencedBy(string foreignTableName, string foreignColumnName) =>
         ReferencedBy(null, null, foreignTableName, foreignColumnName);
 
-    public ICreateColumnOptionForeignKeyCascadeBuilder ReferencedBy(string foreignKeyName, string foreignTableName,
+    public ICreateColumnOptionForeignKeyCascadeBuilder ReferencedBy(
+        string foreignKeyName,
+        string foreignTableName,
         string foreignColumnName) =>
         ReferencedBy(foreignKeyName, null, foreignTableName, foreignColumnName);
 
-    public ICreateColumnOptionForeignKeyCascadeBuilder ReferencedBy(string? foreignKeyName, string? foreignTableSchema,
-        string foreignTableName, string foreignColumnName)
+    public ICreateColumnOptionForeignKeyCascadeBuilder ReferencedBy(
+        string? foreignKeyName,
+        string? foreignTableSchema,
+        string foreignTableName,
+        string foreignColumnName)
     {
         var fk = new CreateForeignKeyExpression(
             _context,

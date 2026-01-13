@@ -72,7 +72,11 @@ public class TextOnlyValueEditor : DataValueEditor
             _localizedTextService = localizedTextService;
         }
 
-        public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration,
+        /// <inheritdoc />
+        public IEnumerable<ValidationResult> Validate(
+            object? value,
+            string? valueType,
+            object? dataTypeConfiguration,
             PropertyValidationContext validationContext)
         {
             int? maxCharacters = dataTypeConfiguration switch

@@ -123,7 +123,7 @@ internal sealed class MemberTypeRepository : ContentTypeRepositoryBase<IMemberTy
         return sql;
     }
 
-    protected Sql<ISqlContext> GetSubquery()
+    private Sql<ISqlContext> GetSubquery()
     {
         Sql<ISqlContext> sql = Sql()
             .Select($"DISTINCT({QuoteTableName("umbracoNode")}.id)")

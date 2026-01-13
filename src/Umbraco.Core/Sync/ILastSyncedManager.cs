@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Sync;
+namespace Umbraco.Cms.Core.Sync;
 
 /// <summary>
 /// Handles saving and pruning of the LastSynced database table.
@@ -33,6 +33,6 @@ public interface ILastSyncedManager
     /// Deletes entries older than the set parameter. This method also removes any entries where both
     /// IDs are higher than the lowest synced CacheInstruction ID.
     /// </summary>
-    /// <param name="pruneDate">Any date entries in the DB before this parameter, will be removed from the Database.</param>
+    /// <param name="date">Any date entries in the DB before this parameter, will be removed from the Database.</param>
     Task DeleteOlderThanAsync(DateTime date);
 }
