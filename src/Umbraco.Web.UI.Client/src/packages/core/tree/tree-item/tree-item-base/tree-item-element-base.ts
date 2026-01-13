@@ -218,10 +218,25 @@ export abstract class UmbTreeItemElementBase<
 	/**
 	 * Prevents click events on tree items marked as no-access.
 	 * This ensures users cannot navigate to or interact with items they don't have permission to access.
+	 *
+	 * IMPORTANT: Only blocks clicks on THIS item's content, not on child tree items.
+	 * Child tree items are rendered in this item's slot when expanded, and users must be able
+	 * to click them to navigate to deeper accessible nodes (e.g., when start node is a grandchild).
+	 *
 	 * Works in conjunction with the `_noAccess` property which child classes should update.
 	 */
 	#handleClick = (event: MouseEvent) => {
 		if (this._noAccess) {
+			// Check if the click originated from a child tree item element
+			const target = event.target as HTMLElement;
+			const clickedChildTreeItem = target.closest('umb-document-tree-item, umb-media-tree-item, umb-tree-item');
+
+			// If the closest tree item is not this element, it's a child - allow the click
+			if (clickedChildTreeItem && clickedChildTreeItem !== this) {
+				return;  // Allow clicks on child tree items
+			}
+
+			// Otherwise, block the click (it's on this noAccess item)
 			event.preventDefault();
 			event.stopPropagation();
 		}
@@ -230,10 +245,25 @@ export abstract class UmbTreeItemElementBase<
 	/**
 	 * Prevents keyboard activation (Enter/Space) on tree items marked as no-access.
 	 * This ensures keyboard-only users cannot navigate to items they don't have permission to access.
+	 *
+	 * IMPORTANT: Only blocks keyboard activation on THIS item, not on focused child tree items.
+	 * Child tree items can receive focus and keyboard navigation should work on them even if
+	 * they're nested under a noAccess parent.
+	 *
 	 * Works in conjunction with the `_noAccess` property which child classes should update.
 	 */
 	#handleKeydown = (event: KeyboardEvent) => {
 		if (this._noAccess && (event.key === 'Enter' || event.key === ' ')) {
+			// Check if the event originated from a child tree item element
+			const target = event.target as HTMLElement;
+			const focusedChildTreeItem = target.closest('umb-document-tree-item, umb-media-tree-item, umb-tree-item');
+
+			// If the closest tree item is not this element, it's a child - allow the keyboard action
+			if (focusedChildTreeItem && focusedChildTreeItem !== this) {
+				return;  // Allow keyboard navigation on child tree items
+			}
+
+			// Otherwise, block the keyboard action (it's on this noAccess item)
 			event.preventDefault();
 			event.stopPropagation();
 		}
