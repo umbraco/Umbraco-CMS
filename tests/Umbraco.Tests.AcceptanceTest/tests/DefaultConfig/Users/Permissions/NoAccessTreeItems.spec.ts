@@ -2,29 +2,31 @@ import { expect } from "@playwright/test";
 import { test, ConstantHelper } from "@umbraco/playwright-testhelpers";
 
 const testUser = ConstantHelper.testUserCredentials;
-let testUserCookieAndToken = { cookie: "", accessToken: "", refreshToken: "" };
+let testUserCookieAndToken:
+  | { cookie: string; accessToken: string; refreshToken: string }
+  | undefined = { cookie: "", accessToken: "", refreshToken: "" };
 
 const userGroupName = "TestUserGroup";
-let userGroupId: string | null = null;
+let userGroupId: string | undefined = undefined;
 
 const rootDocumentTypeName = "RootDocumentType";
 const childDocumentTypeName = "ChildDocumentType";
 const grandchildDocumentTypeName = "GrandchildDocumentType";
-let rootDocumentTypeId: string | null = null;
-let childDocumentTypeId: string | null = null;
-let grandchildDocumentTypeId: string | null = null;
+let rootDocumentTypeId: string | undefined = undefined;
+let childDocumentTypeId: string | undefined = undefined;
+let grandchildDocumentTypeId: string | undefined = undefined;
 
 const rootDocumentName = "RootDocument";
 const childDocumentName = "ChildDocument";
 const grandchildDocumentName = "GrandchildDocument";
-let rootDocumentId: string | null = null;
-let childDocumentId: string | null = null;
-let grandchildDocumentId: string | null = null;
+let rootDocumentId: string | undefined = undefined;
+let childDocumentId: string | undefined = undefined;
+let grandchildDocumentId: string | undefined = undefined;
 
 const rootMediaName = "RootMediaFolder";
 const childMediaName = "ChildMediaFolder";
-let rootMediaId: string | null = null;
-let childMediaId: string | null = null;
+let rootMediaId: string | undefined = undefined;
+let childMediaId: string | undefined = undefined;
 
 test.beforeEach(async ({ umbracoApi }) => {
   // Clean up before each test
@@ -80,9 +82,9 @@ test.beforeEach(async ({ umbracoApi }) => {
 test.afterEach(async ({ umbracoApi }) => {
   // Ensure we are logged in to admin for cleanup
   await umbracoApi.loginToAdminUser(
-    testUserCookieAndToken.cookie,
-    testUserCookieAndToken.accessToken,
-    testUserCookieAndToken.refreshToken
+    testUserCookieAndToken!.cookie,
+    testUserCookieAndToken!.accessToken,
+    testUserCookieAndToken!.refreshToken
   );
 
   // Clean up
@@ -318,10 +320,10 @@ test.describe("Document Tree NoAccess Property Tests", () => {
 
     // Create user with start node at child level (root will be noAccess)
     userGroupId =
-      (await umbracoApi.userGroup.createUserGroupWithDocumentStartNode(
+      await umbracoApi.userGroup.createUserGroupWithDocumentStartNode(
         userGroupName,
         childDocumentId!
-      )) ?? null;
+      );
     await umbracoApi.user.setUserPermissions(
       testUser.name,
       testUser.email,
@@ -409,10 +411,10 @@ test.describe("Media Tree NoAccess Property Tests", () => {
     page,
   }) => {
     // Arrange - Create user with media start node at child level (not at root)
-    userGroupId = (await umbracoApi.userGroup.createUserGroupWithMediaStartNode(
+    userGroupId = await umbracoApi.userGroup.createUserGroupWithMediaStartNode(
       userGroupName,
       childMediaId!
-    )) ?? null;
+    );
     await umbracoApi.user.setUserPermissions(
       testUser.name,
       testUser.email,
@@ -459,10 +461,10 @@ test.describe("Media Tree NoAccess Property Tests", () => {
     page,
   }) => {
     // Arrange - Create user with media start node at child level (not at root)
-    userGroupId = (await umbracoApi.userGroup.createUserGroupWithMediaStartNode(
+    userGroupId = await umbracoApi.userGroup.createUserGroupWithMediaStartNode(
       userGroupName,
       childMediaId!
-    )) ?? null;
+    );
     await umbracoApi.user.setUserPermissions(
       testUser.name,
       testUser.email,
@@ -509,10 +511,10 @@ test.describe("Media Tree NoAccess Property Tests", () => {
     page,
   }) => {
     // Arrange - Create user with media start node at child level
-    userGroupId = (await umbracoApi.userGroup.createUserGroupWithMediaStartNode(
+    userGroupId = await umbracoApi.userGroup.createUserGroupWithMediaStartNode(
       userGroupName,
       childMediaId!
-    )) ?? null;
+    );
     await umbracoApi.user.setUserPermissions(
       testUser.name,
       testUser.email,
@@ -545,10 +547,7 @@ test.describe("Media Tree NoAccess Property Tests", () => {
     await umbracoUi.media.openMediaCaretButtonForName(rootMediaName);
 
     // Assert - Child media should now be visible
-    await umbracoUi.media.isChildMediaVisible(
-      rootMediaName,
-      childMediaName
-    );
+    await umbracoUi.media.isChildMediaVisible(rootMediaName, childMediaName);
 
     // Verify the child does NOT have noAccess attribute (it's the start node)
     const childMediaTreeItem = page
@@ -591,10 +590,10 @@ test.describe("Media Tree NoAccess Property Tests", () => {
     );
 
     // Create user with media start node at child level (root will be noAccess)
-    userGroupId = (await umbracoApi.userGroup.createUserGroupWithMediaStartNode(
+    userGroupId = await umbracoApi.userGroup.createUserGroupWithMediaStartNode(
       userGroupName,
       childMediaId!
-    )) ?? null;
+    );
     await umbracoApi.user.setUserPermissions(
       testUser.name,
       testUser.email,
