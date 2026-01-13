@@ -282,11 +282,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 .From<NodeDto>()
                 .Where<NodeDto>(x => x.UniqueId == parentKey);
 
-            // Gets the descendants of the parent node
+            // Gets the descendants of the parent node (using ",%" to exclude the parent itself)
             Sql<ISqlContext> subQuery = sqlContext.Sql()
                 .Select<NodeDto>(x => x.NodeId)
                 .From<NodeDto>()
-                .WhereLike<NodeDto>(x => x.Path, subsubQuery);
+                .WhereLike<NodeDto>(x => x.Path, subsubQuery, ",%");
 
             ISqlSyntaxProvider sx = sqlContext.SqlSyntax;
             string[] columns = [
@@ -447,25 +447,35 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         private sealed class UnionHelperDto
         {
-            [Column("id")] public int Id { get; set; }
+            [Column("id")]
+            public int Id { get; set; }
 
-            [Column("otherId")] public int OtherId { get; set; }
+            [Column("otherId")]
+            public int OtherId { get; set; }
 
-            [Column("key")] public Guid Key { get; set; }
+            [Column("key")]
+            public Guid Key { get; set; }
 
-            [Column("trashed")] public bool Trashed { get; set; }
+            [Column("trashed")]
+            public bool Trashed { get; set; }
 
-            [Column("nodeObjectType")] public Guid NodeObjectType { get; set; }
+            [Column("nodeObjectType")]
+            public Guid NodeObjectType { get; set; }
 
-            [Column("otherKey")] public Guid OtherKey { get; set; }
+            [Column("otherKey")]
+            public Guid OtherKey { get; set; }
 
-            [Column("alias")] public string? Alias { get; set; }
+            [Column("alias")]
+            public string? Alias { get; set; }
 
-            [Column("name")] public string? Name { get; set; }
+            [Column("name")]
+            public string? Name { get; set; }
 
-            [Column("isDependency")] public bool IsDependency { get; set; }
+            [Column("isDependency")]
+            public bool IsDependency { get; set; }
 
-            [Column("dual")] public bool Dual { get; set; }
+            [Column("dual")]
+            public bool Dual { get; set; }
         }
 
         private RelationItem MapDtoToEntity(RelationItemDto dto) =>

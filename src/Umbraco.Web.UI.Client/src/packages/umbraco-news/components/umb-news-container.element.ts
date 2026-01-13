@@ -65,7 +65,7 @@ export class UmbNewsContainerElement extends UmbLitElement {
 	static override styles = css`
 		.cards {
 			--cols: 4;
-			--gap: var(--uui-size-space-4);
+			--gap: var(--uui-size-space-5);
 			width: 100%;
 			display: grid;
 			grid-template-columns: repeat(auto-fit, minmax(calc((100% - (var(--cols) - 1) * var(--gap)) / var(--cols)), 1fr));

@@ -40,7 +40,7 @@ export class UmbDocumentTypeSearchServerDataSource implements UmbSearchDataSourc
 		if (data) {
 			const mappedItems: Array<UmbDocumentTypeSearchItemModel> = data.items.map((item) => {
 				return {
-					href: '/section/settings/workspace/document-type/edit/' + item.id,
+					href: 'section/settings/workspace/document-type/edit/' + item.id,
 					entityType: UMB_DOCUMENT_TYPE_ENTITY_TYPE,
 					isElement: item.isElement,
 					icon: item.icon ?? undefined,

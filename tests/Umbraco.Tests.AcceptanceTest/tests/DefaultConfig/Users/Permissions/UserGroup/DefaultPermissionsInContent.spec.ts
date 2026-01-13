@@ -130,10 +130,9 @@ test('can delete content with delete permission enabled', {tag: '@release'}, asy
   // Act
   await umbracoUi.content.clickActionsMenuForContent(rootDocumentName);
   await umbracoUi.content.clickTrashActionMenuOption();
-  await umbracoUi.content.clickConfirmTrashButton();
+  await umbracoUi.content.clickConfirmTrashButtonAndWaitForContentToBeTrashed();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeTrashed();
   await umbracoUi.content.isItemVisibleInRecycleBin(rootDocumentName);
 });
 
@@ -162,12 +161,11 @@ test('can empty recycle bin with delete permission enabled', {tag: '@release'}, 
 
   // Act
   await umbracoUi.content.clickRecycleBinButton();
-  await umbracoUi.waitForTimeout(700);
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);
   await umbracoUi.content.clickEmptyRecycleBinButton();
-  await umbracoUi.content.clickConfirmEmptyRecycleBinButton();
+  await umbracoUi.content.clickConfirmEmptyRecycleBinButtonAndWaitForRecycleBinToBeEmptied();
 
   // Assert
-  await umbracoUi.content.waitForRecycleBinToBeEmptied();
   await umbracoUi.content.isItemVisibleInRecycleBin(rootDocumentName, false, false);
 });
 
@@ -199,10 +197,9 @@ test('can create content with create permission enabled', {tag: '@release'}, asy
   await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(rootDocumentTypeName);
   await umbracoUi.content.enterContentName(testDocumentName);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(testDocumentName)).toBeTruthy();
   await umbracoUi.content.isDocumentReadOnly(true);
 });
@@ -235,7 +232,7 @@ test('can set up notifications with notification permission enabled', async ({um
   await umbracoUi.content.clickNotificationsActionMenuOption();
   await umbracoUi.content.clickDocumentNotificationOptionWithName(notificationActionIds[0]);
   await umbracoUi.content.clickDocumentNotificationOptionWithName(notificationActionIds[1]);
-  await umbracoUi.content.clickSaveModalButton();
+  await umbracoUi.content.clickSaveModalButtonAndWaitForNotificationToBeCreated();
 
   // Assert
   await umbracoUi.content.isSuccessNotificationVisible();
@@ -369,10 +366,9 @@ test('can update content with update permission enabled', {tag: '@release'}, asy
   await umbracoUi.content.goToContentWithName(rootDocumentName);
   await umbracoUi.content.isDocumentReadOnly(false);
   await umbracoUi.content.enterContentName(testDocumentName);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesNameExist(testDocumentName)).toBeTruthy();
   expect(await umbracoApi.document.doesNameExist(rootDocumentName)).toBeFalsy();
 });
@@ -531,10 +527,9 @@ test('can set culture and hostnames with culture and hostnames permission enable
   await umbracoUi.content.clickCultureAndHostnamesActionMenuOption();
   await umbracoUi.content.clickAddNewHostnameButton();
   await umbracoUi.content.enterDomain(domainName);
-  await umbracoUi.content.clickSaveModalButton();
+  await umbracoUi.content.clickSaveModalButtonAndWaitForDomainToBeCreated();
 
   // Assert
-  await umbracoUi.content.waitForDomainToBeCreated();
   const document = await umbracoApi.document.getByName(rootDocumentName);
   const domains = await umbracoApi.document.getDomains(document.id);
   expect(domains.domains[0].domainName).toEqual(domainName);
@@ -608,7 +603,7 @@ test('can rollback content with rollback permission enabled', {tag: '@release'},
   await umbracoUi.content.doesDocumentPropertyHaveValue(dataTypeName, updatedTextStringText);
   await umbracoUi.content.clickInfoTab();
   await umbracoUi.content.clickRollbackButton();
-  await umbracoUi.waitForTimeout(700); // Wait for the rollback items to load
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);// Wait for the rollback items to load
   await umbracoUi.content.clickLatestRollBackItem();
   await umbracoUi.content.clickRollbackContainerButton();
 
@@ -661,17 +656,15 @@ test('can create and update content with permission enabled', {tag: '@release'},
   await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(rootDocumentTypeName);
   await umbracoUi.content.enterContentName(testDocumentName);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(testDocumentName)).toBeTruthy();
   // Update the content
   await umbracoUi.content.goToContentWithName(testDocumentName);
   await umbracoUi.content.isDocumentReadOnly(false);
   await umbracoUi.content.enterContentName(updatedDocumentName);
-  await umbracoUi.content.clickSaveButton();
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
   expect(await umbracoApi.document.doesNameExist(updatedDocumentName)).toBeTruthy();
   await umbracoUi.content.doesDocumentHaveName(updatedDocumentName);
 
