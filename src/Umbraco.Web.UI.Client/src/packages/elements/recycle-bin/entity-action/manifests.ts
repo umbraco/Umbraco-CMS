@@ -1,5 +1,6 @@
 import { UMB_ELEMENT_ENTITY_TYPE } from '../../entity.js';
 import { UMB_ELEMENT_RECYCLE_BIN_REPOSITORY_ALIAS, UMB_ELEMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE } from '../constants.js';
+import { manifests as bulkTrashManifests } from './bulk-trash/manifests.js';
 // import {
 // 	UMB_ELEMENT_ENTITY_TYPE,
 // 	UMB_ELEMENT_PICKER_MODAL,
@@ -110,4 +111,5 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Reload Element Recycle Bin Tree Item Children Entity Action',
 		forEntityTypes: [UMB_ELEMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE],
 	},
+	...bulkTrashManifests,
 ];

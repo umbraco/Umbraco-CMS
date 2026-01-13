@@ -147,7 +147,7 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 
 		if (!error) {
 			this.#notificationContext?.peek('positive', {
-				data: { message: this.#localize.term('speechBubbles_editContentUnpublishedText') },
+				data: { message: this.#localize.term('speechBubbles_editElementUnpublishedHeader') },
 			});
 
 			await this.#elementWorkspaceContext?.reload();
