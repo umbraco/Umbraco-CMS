@@ -2,6 +2,7 @@ import { UMB_ELEMENT_ENTITY_TYPE } from '../../entity.js';
 import { UMB_ELEMENT_TREE_ALIAS, UMB_ELEMENT_TREE_REPOSITORY_ALIAS } from '../../tree/index.js';
 import { UMB_MOVE_ELEMENT_REPOSITORY_ALIAS } from './repository/index.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
+import { UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/recycle-bin';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -16,6 +17,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			treeAlias: UMB_ELEMENT_TREE_ALIAS,
 			foldersOnly: true,
 		},
+		conditions: [{ alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS }],
 	},
 	...repositoryManifests,
 ];

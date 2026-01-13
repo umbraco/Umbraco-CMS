@@ -1,5 +1,6 @@
 import type { UmbElementEntityType, UmbElementRootEntityType } from '../entity.js';
 import type { UmbElementFolderEntityType } from './folder/entity.js';
+import type { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import type { UmbTreeItemModel, UmbTreeRootModel } from '@umbraco-cms/backoffice/tree';
 
@@ -23,4 +24,5 @@ export interface UmbElementTreeItemVariantModel {
 	name: string;
 	culture: string | null;
 	segment: string | null;
+	state: DocumentVariantStateModel;
 }

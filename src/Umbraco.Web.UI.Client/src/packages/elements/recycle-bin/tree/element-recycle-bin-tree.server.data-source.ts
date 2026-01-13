@@ -1,6 +1,8 @@
-import { UMB_ELEMENT_ENTITY_TYPE } from '../../../entity.js';
-import { UMB_ELEMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE } from '../../constants.js';
+import { UMB_ELEMENT_ENTITY_TYPE } from '../../entity.js';
+import { UMB_ELEMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE } from '../constants.js';
 import type { UmbElementRecycleBinTreeItemModel } from '../types.js';
+import { UMB_ELEMENT_FOLDER_ENTITY_TYPE } from '../../tree/folder/entity.js';
+import type { UmbElementTreeItemVariantModel } from '../../tree/types.js';
 import { ElementService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 import type { ElementRecycleBinItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
@@ -62,9 +64,13 @@ const mapper = (item: ElementRecycleBinItemResponseModel): UmbElementRecycleBinT
 		unique: item.id,
 		parent: {
 			unique: item.parent ? item.parent.id : null,
-			entityType: item.parent ? UMB_ELEMENT_ENTITY_TYPE : UMB_ELEMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE,
+			entityType: item.parent
+				? item.isFolder
+					? UMB_ELEMENT_FOLDER_ENTITY_TYPE
+					: UMB_ELEMENT_ENTITY_TYPE
+				: UMB_ELEMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE,
 		},
-		entityType: UMB_ELEMENT_ENTITY_TYPE,
+		entityType: item.isFolder ? UMB_ELEMENT_FOLDER_ENTITY_TYPE : UMB_ELEMENT_ENTITY_TYPE,
 		icon: item.documentType?.icon,
 		isTrashed: true,
 		hasChildren: item.hasChildren,
@@ -74,17 +80,18 @@ const mapper = (item: ElementRecycleBinItemResponseModel): UmbElementRecycleBinT
 			icon: item.documentType?.icon ?? '',
 			collection: null,
 		},
-		variants: item.variants.map((variant) => {
+		variants: item.variants.map((variant): UmbElementTreeItemVariantModel => {
 			return {
 				name: variant.name,
 				culture: variant.culture || null,
 				segment: null, // TODO: add segment to the backend API?
-				//state: variant.state,
+				state: variant.state,
 				//flags: variant.flags ?? [],
 			};
 		}),
-		name: item.variants[0]?.name, // TODO: this is not correct. We need to get it from the variants. This is a temp solution.
-		isFolder: false,
+		// TODO: this is not correct. We need to get it from the variants. This is a temp solution. [LK]
+		name: item.isFolder ? item.name : item.variants[0]?.name,
+		isFolder: item.isFolder,
 		createDate: item.createDate,
 		// TODO: Recycle bin items should have flags, but the API does not return any at the moment. [NL]
 		flags: (item as any).flags ?? [],

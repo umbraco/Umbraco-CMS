@@ -2,9 +2,16 @@ import { UMB_ELEMENT_ENTITY_TYPE } from '../../entity.js';
 import { UMB_ELEMENT_FOLDER_ENTITY_TYPE } from '../../tree/folder/entity.js';
 import { UMB_ELEMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE } from '../root/constants.js';
 import { UMB_ELEMENT_RECYCLE_BIN_TREE_ALIAS, UMB_ELEMENT_RECYCLE_BIN_TREE_REPOSITORY_ALIAS } from './constants.js';
-import { manifests as dataManifests } from './data/manifests.js';
+import type { ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 import type { ManifestTree } from '@umbraco-cms/backoffice/tree';
 import type { ManifestTreeItemRecycleBinKind } from '@umbraco-cms/backoffice/recycle-bin';
+
+const repository: ManifestRepository = {
+	type: 'repository',
+	alias: UMB_ELEMENT_RECYCLE_BIN_TREE_REPOSITORY_ALIAS,
+	name: 'Element Recycle Bin Tree Repository',
+	api: () => import('./element-recycle-bin-tree.repository.js'),
+};
 
 const tree: ManifestTree = {
 	type: 'tree',
@@ -27,4 +34,4 @@ const treeItem: ManifestTreeItemRecycleBinKind = {
 	},
 };
 
-export const manifests: Array<UmbExtensionManifest> = [tree, treeItem, ...dataManifests];
+export const manifests: Array<UmbExtensionManifest> = [repository, tree, treeItem];

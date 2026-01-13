@@ -1,4 +1,4 @@
-import { UmbElementRecycleBinTreeRepository } from '../../tree/data/element-recycle-bin-tree.repository.js';
+import { UmbElementRecycleBinTreeRepository } from '../../tree/element-recycle-bin-tree.repository.js';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import type { UmbCollectionFilterModel, UmbCollectionRepository } from '@umbraco-cms/backoffice/collection';

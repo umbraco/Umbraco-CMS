@@ -1,4 +1,4 @@
-import { UMB_ELEMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE } from '../../constants.js';
+import { UMB_ELEMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE } from '../constants.js';
 import type { UmbElementRecycleBinTreeItemModel, UmbElementRecycleBinTreeRootModel } from '../types.js';
 import { UmbElementRecycleBinTreeServerDataSource } from './element-recycle-bin-tree.server.data-source.js';
 import { UmbTreeRepositoryBase } from '@umbraco-cms/backoffice/tree';
