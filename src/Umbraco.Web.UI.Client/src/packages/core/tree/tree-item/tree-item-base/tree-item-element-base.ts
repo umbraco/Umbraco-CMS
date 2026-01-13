@@ -36,7 +36,23 @@ export abstract class UmbTreeItemElementBase<
 
 	/**
 	 * @internal
-	 * Indicates whether the user has no access to this media item, this is controlled internally but present as an attribute as it affects styling.
+	 * Indicates whether the user has no access to this tree item.
+	 * This property is reflected as an attribute for styling purposes.
+	 *
+	 * **Usage Pattern (opt-in):**
+	 * Child classes that support access restrictions should observe their context's `noAccess` observable
+	 * and update this property. The base class provides the property, styling, and interaction prevention,
+	 * but does not subscribe to the observable to avoid forcing all tree item types to implement it.
+	 *
+	 * **Example (in child class api setter):**
+	 * ```typescript
+	 * this.observe(this.#api.noAccess, (noAccess) => (this._noAccess = noAccess));
+	 * ```
+	 *
+	 * **Why not in the base interface?**
+	 * Adding `noAccess` to `UmbTreeItemContext` would be a breaking change, forcing all tree item
+	 * implementations (users, members, data types, etc.) to provide this property even when access
+	 * restrictions don't apply to them.
 	 */
 	@property({ type: Boolean, reflect: true, attribute: 'no-access' })
 	protected _noAccess = false;
@@ -199,6 +215,11 @@ export abstract class UmbTreeItemElementBase<
 		this.#api?.pagination.setCurrentPageNumber(next);
 	}
 
+	/**
+	 * Prevents click events on tree items marked as no-access.
+	 * This ensures users cannot navigate to or interact with items they don't have permission to access.
+	 * Works in conjunction with the `_noAccess` property which child classes should update.
+	 */
 	#handleClick = (event: MouseEvent) => {
 		if (this._noAccess) {
 			event.preventDefault();
@@ -206,6 +227,11 @@ export abstract class UmbTreeItemElementBase<
 		}
 	};
 
+	/**
+	 * Prevents keyboard activation (Enter/Space) on tree items marked as no-access.
+	 * This ensures keyboard-only users cannot navigate to items they don't have permission to access.
+	 * Works in conjunction with the `_noAccess` property which child classes should update.
+	 */
 	#handleKeydown = (event: KeyboardEvent) => {
 		if (this._noAccess && (event.key === 'Enter' || event.key === ' ')) {
 			event.preventDefault();
@@ -379,7 +405,12 @@ export abstract class UmbTreeItemElementBase<
 				text-overflow: ellipsis;
 			}
 
-			/** No Access */
+			/**
+			 * No Access Styling
+			 * Applied when _noAccess property is true (reflected as [no-access] attribute).
+			 * Child classes opt-in by observing their context's noAccess observable.
+			 * See _noAccess property documentation for usage pattern.
+			 */
 			:host([no-access]) {
 				cursor: not-allowed;
 			}

@@ -7,6 +7,8 @@ const elementName = 'umb-media-tree-item';
 @customElement(elementName)
 export class UmbMediaTreeItemElement extends UmbTreeItemElementBase<UmbMediaTreeItemModel, UmbMediaTreeItemContext> {
 	public override set api(value: UmbMediaTreeItemContext | undefined) {
+		// Observe noAccess from context and update base class property (_noAccess).
+		// This enables access restriction behavior (click prevention) and styling from the base class.
 		this.observe(value?.noAccess, (noAccess) => (this._noAccess = noAccess ?? false));
 		super.api = value;
 	}
