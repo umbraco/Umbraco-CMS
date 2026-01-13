@@ -215,7 +215,7 @@ stages:
             inputs:
               targetType: inline
               script: |
-                dotnet tool install -g docfx
+                dotnet tool install docfx
                 if ($lastexitcode -ne 0){
                     throw ("Error installing DocFX")
                 }
