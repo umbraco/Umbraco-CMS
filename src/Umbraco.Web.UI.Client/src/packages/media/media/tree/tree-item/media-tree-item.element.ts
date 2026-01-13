@@ -6,6 +6,11 @@ import { UmbTreeItemElementBase } from '@umbraco-cms/backoffice/tree';
 const elementName = 'umb-media-tree-item';
 @customElement(elementName)
 export class UmbMediaTreeItemElement extends UmbTreeItemElementBase<UmbMediaTreeItemModel, UmbMediaTreeItemContext> {
+	public override set api(value: UmbMediaTreeItemContext | undefined) {
+		this.observe(value?.noAccess, (noAccess) => (this._noAccess = noAccess ?? false));
+		super.api = value;
+	}
+
 	override renderIconContainer() {
 		const icon = this.item?.mediaType.icon;
 

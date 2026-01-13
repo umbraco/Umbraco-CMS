@@ -81,7 +81,6 @@ export abstract class UmbTreeItemElementBase<
 			this.observe(this.#api.pagination.totalPages, (value) => (this._totalPages = value));
 			this.observe(this.#api.isLoadingPrevChildren, (value) => (this._isLoadingPrevChildren = value ?? false));
 			this.observe(this.#api.isLoadingNextChildren, (value) => (this._isLoadingNextChildren = value ?? false));
-			this.observe(this.#api.noAccess, (noAccess) => (this._noAccess = noAccess));
 
 			this.observe(
 				this.#api.targetPagination?.totalPrevItems,

@@ -38,5 +38,4 @@ export interface UmbTreeItemContext<TreeItemType extends UmbTreeItemModel = UmbT
 	isLoadingNextChildren: Observable<boolean>;
 	setIsMenu(isMenu: boolean): void;
 	getIsMenu(): boolean;
-	noAccess: Observable<boolean>;
 }

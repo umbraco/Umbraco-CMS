@@ -11,9 +11,6 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 	#api: UmbDocumentTreeItemContext | undefined;
 
 	@property({ type: Object, attribute: false })
-	public override get api(): UmbDocumentTreeItemContext | undefined {
-		return this.#api;
-	}
 	public override set api(value: UmbDocumentTreeItemContext | undefined) {
 		this.#api = value;
 
@@ -27,9 +24,13 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 			});
 			this.observe(this.#api.icon, (icon) => (this.#icon = icon || ''));
 			this.observe(this.#api.flags, (flags) => (this._flags = flags || ''));
+			this.observe(this.#api.noAccess, (noAccess) => (this._noAccess = noAccess));
 		}
 
 		super.api = value;
+	}
+	public override get api(): UmbDocumentTreeItemContext | undefined {
+		return this.#api;
 	}
 
 	@state()
