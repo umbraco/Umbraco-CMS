@@ -445,32 +445,36 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return innerUnionSql;
         }
 
-        /// <summary>
-        /// Represents a data transfer object used to encapsulate information for union operations between entities.
-        /// </summary>
-        /// <remarks>
-        /// It does NOT need NPoco Column attributes as it is used internally within SQL queries.
-        /// </remarks>
         private sealed class UnionHelperDto
         {
+            [Column("id")]
             public int Id { get; set; }
 
+            [Column("otherId")]
             public int OtherId { get; set; }
 
+            [Column("key")]
             public Guid Key { get; set; }
 
+            [Column("trashed")]
             public bool Trashed { get; set; }
 
+            [Column("nodeObjectType")]
             public Guid NodeObjectType { get; set; }
 
+            [Column("otherKey")]
             public Guid OtherKey { get; set; }
 
+            [Column("alias")]
             public string? Alias { get; set; }
 
+            [Column("name")]
             public string? Name { get; set; }
 
+            [Column("isDependency")]
             public bool IsDependency { get; set; }
 
+            [Column("dual")]
             public bool Dual { get; set; }
         }
 
