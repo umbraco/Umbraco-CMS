@@ -1,3 +1,5 @@
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_15_0_0;
@@ -7,16 +9,23 @@ public class RebuildDocumentUrls : MigrationBase
 {
     private readonly IKeyValueService _keyValueService;
 
-    public RebuildDocumentUrls(IMigrationContext context, IKeyValueService keyValueService)
-        : base(context) =>
-        _keyValueService = keyValueService;
-
-    protected override void Migrate()
+    public RebuildDocumentUrls(IMigrationContext context, IDocumentUrlService documentUrlService)
+        : this(
+              context,
+              documentUrlService,
+              StaticServiceProvider.Instance.GetRequiredService<IKeyValueService>())
     {
+    }
+
+    public RebuildDocumentUrls(IMigrationContext context, IDocumentUrlService documentUrlService, IKeyValueService keyValueService)
+        : base(context) => _keyValueService = keyValueService;
+
+    /// <inheritdoc/>
+    protected override void Migrate() =>
+
         // Clear any existing key to force rebuild on first normal startup.
         // This ensures URL generation runs when all services are fully initialized,
         // rather than during migration when variant content data may not be accessible.
         // See: https://github.com/umbraco/Umbraco-CMS/issues/21337
         _keyValueService.SetValue(DocumentUrlService.RebuildKey, string.Empty);
-    }
 }
