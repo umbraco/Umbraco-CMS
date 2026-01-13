@@ -44,6 +44,20 @@ export const data: Array<UmbMockDocumentModel> = [
 		...permissionsTestDocument,
 		ancestors: [{ id: 'permissions-document-id' }],
 		hasChildren: false,
+		id: 'permissions-0-document-id',
+		parent: { id: 'permissions-document-id' },
+		variants: permissionsTestDocument.variants.map((variant) => ({
+			...variant,
+			name: 'Permissions 0 - No Access',
+			id: 'permissions-0',
+		})),
+		flags: [],
+		noAccess: true,
+	},
+	{
+		...permissionsTestDocument,
+		ancestors: [{ id: 'permissions-document-id' }],
+		hasChildren: false,
 		id: 'permissions-1-document-id',
 		parent: { id: 'permissions-document-id' },
 		variants: permissionsTestDocument.variants.map((variant) => ({
