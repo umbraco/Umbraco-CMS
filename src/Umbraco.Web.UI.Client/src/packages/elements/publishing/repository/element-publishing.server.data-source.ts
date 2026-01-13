@@ -1,7 +1,7 @@
 import type { UmbElementVariantPublishModel } from '../types.js';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { ElementService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 /**
@@ -32,7 +32,7 @@ export class UmbElementPublishingServerDataSource {
 
 		const publishSchedules = variants.map((variant) => ({
 			culture: variant.variantId.isCultureInvariant() ? null : variant.variantId.toCultureString(),
-			schedule: null,
+			schedule: variant.schedule ?? null,
 		}));
 
 		return tryExecute(
