@@ -2,7 +2,6 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
@@ -78,16 +77,13 @@ internal sealed class DocumentHybridCacheAncestryTests : UmbracoIntegrationTestW
         cacheService!.ResetSeedKeys();
         await DocumentCacheService.ClearMemoryCacheAsync(CancellationToken.None);
 
-        var unpublished_subSubPage = await PublishedContentCache.GetByIdAsync(_subSubPage.Key);
+        var unpublishedSubSubPage = await PublishedContentCache.GetByIdAsync(_subSubPage.Key);
         var unpublishedSubPage = await PublishedContentCache.GetByIdAsync(Subpage.Key);
-        Assert.IsNull(unpublished_subSubPage);
+        Assert.IsNull(unpublishedSubSubPage);
         Assert.IsNull(unpublishedSubPage);
 
         // We should however be able to get the still published root Text Page
         var publishedTextPage = await PublishedContentCache.GetByIdAsync(Textpage.Key);
         CacheTestsHelper.AssertPage(Textpage, publishedTextPage);
-
     }
-
-
 }
