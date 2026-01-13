@@ -106,10 +106,9 @@ test('can delete a specific content with delete permission enabled', async ({umb
   // Act
   await umbracoUi.content.clickActionsMenuForContent(firstDocumentName);
   await umbracoUi.content.clickTrashActionMenuOption();
-  await umbracoUi.content.clickConfirmTrashButton();
+  await umbracoUi.content.clickConfirmTrashButtonAndWaitForContentToBeTrashed();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeDeleted();
   await umbracoUi.content.isActionsMenuForNameVisible(secondDocumentName, false);
 });
 
@@ -140,10 +139,9 @@ test('can publish a specific content with publish permission enabled', async ({u
   // Act
   await umbracoUi.content.clickActionsMenuForContent(firstDocumentName);
   await umbracoUi.content.clickPublishActionMenuOption();
-  await umbracoUi.content.clickConfirmToPublishButton();
+  await umbracoUi.content.clickConfirmToPublishButtonAndWaitForContentToBePublished();
 
   // Assert
-  await umbracoUi.content.waitForContentToBePublished();
   expect(await umbracoApi.document.isDocumentPublished(firstDocumentId)).toBeTruthy();
   await umbracoUi.content.isActionsMenuForNameVisible(secondDocumentName, false);
 });
@@ -183,10 +181,9 @@ test('can update a specific content with update permission enabled', async ({umb
   await umbracoUi.content.goToContentWithName(firstDocumentName);
   await umbracoUi.content.isDocumentReadOnly(false);
   await umbracoUi.content.enterContentName(testDocumentName);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesNameExist(testDocumentName)).toBeTruthy();
   await umbracoUi.content.goToContentWithName(secondDocumentName);
   await umbracoUi.content.isActionsMenuForNameVisible(secondDocumentName, false);
@@ -270,11 +267,9 @@ test('can set culture and hostnames for a specific content with culture and host
   await umbracoUi.content.clickAddNewHostnameButton();
   await umbracoUi.content.enterDomain(domainName, 0);
   await umbracoUi.content.selectHostnameLanguageOption(languageName, 0);
-  await umbracoUi.content.clickSaveModalButton();
+  await umbracoUi.content.clickSaveModalButtonAndWaitForDomainToBeCreated();
 
   // Assert
-  await umbracoUi.content.waitForDomainToBeCreated();
-  await umbracoUi.waitForTimeout(1000); // Wait for the domain to be set
   const document = await umbracoApi.document.getByName(firstDocumentName);
   const domains = await umbracoApi.document.getDomains(document.id);
   expect(domains.domains[0].domainName).toEqual(domainName);

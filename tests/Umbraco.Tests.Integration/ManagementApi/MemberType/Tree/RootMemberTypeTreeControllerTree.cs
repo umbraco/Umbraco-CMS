@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.MemberType.Tree;
 public class RootMemberTypeTreeControllerTests : ManagementApiUserGroupTestBase<RootMemberTypeTreeController>
 {
     protected override Expression<Func<RootMemberTypeTreeController, object>> MethodSelector =>
-        x => x.Root(CancellationToken.None, 0, 100);
+        x => x.Root(CancellationToken.None, 0, 100, false);
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {

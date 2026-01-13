@@ -113,7 +113,10 @@ public class ImageCropperPropertyEditor : DataEditor,
                     ? _jsonSerializer.Deserialize<ImageCropperValue>(stringValue)
                     : null) ?? new ImageCropperValue();
                 newValue.Src = _mediaFileManager.FileSystem.GetUrl(copyPath);
-                notification.Copy.SetValue(property.Alias,  _jsonSerializer.Serialize(newValue), propertyValue.Culture,
+                notification.Copy.SetValue(
+                    property.Alias,
+                    _jsonSerializer.Serialize(newValue),
+                    propertyValue.Culture,
                     propertyValue.Segment);
                 isUpdated = true;
             }
@@ -130,7 +133,19 @@ public class ImageCropperPropertyEditor : DataEditor,
     public void Handle(ContentDeletedNotification notification) => DeleteContainedFiles(notification.DeletedEntities);
 
     /// <inheritdoc/>
-    public void Handle(MediaDeletedNotification notification) => DeleteContainedFiles(notification.DeletedEntities);
+    public void Handle(MediaDeletedNotification notification)
+    {
+        if (_contentSettings.EnableMediaRecycleBinProtection)
+        {
+            RecycleBinMediaProtectionHelper.DeleteContainedFilesWithProtection(
+                notification.DeletedEntities,
+                ContainedFilePaths,
+                _mediaFileManager);
+            return;
+        }
+
+        DeleteContainedFiles(notification.DeletedEntities);
+    }
 
     /// <inheritdoc/>
     public void Handle(MediaSavingNotification notification)
@@ -335,7 +350,8 @@ public class ImageCropperPropertyEditor : DataEditor,
                         // are fixing that anomaly here - does not make any sense at all but... bah...
                         property.SetValue(
                             _jsonSerializer.Serialize(new LightWeightImageCropperValue { Src = stringValue }),
-                            pvalue.Culture, pvalue.Segment);
+                            pvalue.Culture,
+                            pvalue.Segment);
                     }
 
                     if (source is null)

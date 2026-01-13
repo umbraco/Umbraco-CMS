@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 internal sealed class LanguageRepositoryTest : UmbracoIntegrationTest
 {
     [SetUp]
-    public void SetUp() => CreateTestData();
+    public async Task SetUp() => await CreateTestData();
 
     [Test]
     public void Can_Perform_Get_On_LanguageRepository()

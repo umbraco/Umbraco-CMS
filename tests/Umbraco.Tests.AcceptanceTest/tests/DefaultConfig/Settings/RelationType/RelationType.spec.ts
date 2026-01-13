@@ -1,4 +1,4 @@
-﻿import {test} from '@umbraco/playwright-testhelpers';
+﻿import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 
 const documentTypeName = 'TestDocumentType';
 const contentName = 'TestContent';
@@ -24,7 +24,7 @@ const relationTypes = [
 for (const relationType of relationTypes) {
   test(`can see relation type ${relationType.name}`, async ({umbracoUi}) => {
     // Act
-    await umbracoUi.waitForTimeout(2000);
+    await umbracoUi.waitForTimeout(ConstantHelper.wait.long);
     await umbracoUi.relationType.goToRelationTypeWithName(relationType.name);
 
     // Assert
@@ -46,7 +46,7 @@ test('can see related document in relation type', async ({umbracoApi, umbracoUi}
   const contentToBePickedName = 'ContentToBePicked';
   const contentToBePickedId = await umbracoApi.document.createDefaultDocument(contentToBePickedName, documentTypeId);
   await umbracoApi.document.createDocumentWithContentPicker(contentName, documentTypeId, contentToBePickedId);
-  await umbracoUi.waitForTimeout(2000);
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.long);
 
   // Act
   await umbracoUi.relationType.goToRelationTypeWithName('Related Document');
@@ -67,7 +67,7 @@ test('can see related media in relation type', async ({umbracoApi, umbracoUi}) =
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, mediaPickerName, mediaPickerData.id);
   // Content
   await umbracoApi.document.createDocumentWithOneMediaPicker(contentName, documentTypeId, mediaFileId);
-  await umbracoUi.waitForTimeout(2000);
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.long);
 
   // Act
   await umbracoUi.relationType.goToRelationTypeWithName('Related Media');
@@ -93,7 +93,7 @@ test('can see related member in relation type', async ({umbracoApi, umbracoUi}) 
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, memberPickerName, memberPickerData.id);
   // Content
   await umbracoApi.document.createDocumentWithMemberPicker(contentName, documentTypeId, memberId);
-  await umbracoUi.waitForTimeout(2000);
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.long);
 
   // Act
   await umbracoUi.relationType.goToRelationTypeWithName('Related Member');
@@ -116,7 +116,7 @@ test('can not see relation after content with relation is deleted', async ({umbr
   const contentToBePickedName = 'ContentToBePicked';
   const contentToBePickedId = await umbracoApi.document.createDefaultDocument(contentToBePickedName, documentTypeId);
   await umbracoApi.document.createDocumentWithContentPicker(contentName, documentTypeId, contentToBePickedId);
-  await umbracoUi.waitForTimeout(2000);
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.long);
 
   await umbracoUi.relationType.goToRelationTypeWithName('Related Document');
   await umbracoUi.relationType.isRelationWithParentAndChildVisible(contentName, contentToBePickedName);
@@ -142,7 +142,7 @@ test('can not see relation after media with relation is deleted', async ({umbrac
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, mediaPickerName, mediaPickerData.id);
   // Content
   await umbracoApi.document.createDocumentWithOneMediaPicker(contentName, documentTypeId, mediaFileId);
-  await umbracoUi.waitForTimeout(2000);
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.long);
 
   await umbracoUi.relationType.goToRelationTypeWithName('Related Media');
   await umbracoUi.relationType.isRelationWithParentAndChildVisible(contentName, mediaName);
@@ -170,7 +170,7 @@ test('can not see relation after member with relation is deleted', async ({umbra
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, memberPickerName, memberPickerData.id);
   // Content
   await umbracoApi.document.createDocumentWithMemberPicker(contentName, documentTypeId, memberId);
-  await umbracoUi.waitForTimeout(2000);
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.long);
 
   await umbracoUi.relationType.goToRelationTypeWithName('Related Member');
   await umbracoUi.relationType.isRelationWithParentAndChildVisible(contentName, memberName);
