@@ -239,9 +239,9 @@ public class DatabaseSchemaCreator
             x => x.Item3.InvariantStartsWith("FK_") == false && x.Item3.InvariantStartsWith("PK_") == false &&
                  x.Item3.InvariantStartsWith("IX_") == false).Select(x => x.Item3).ToList();
 
-        var foreignKeysInSchema = result.TableDefinitions.SelectMany(x => x.ForeignKeys.Select(y => y.Name))
+        var foreignKeysInSchema = result.TableDefinitions.SelectMany(x => x.ForeignKeys.Select(y => SqlSyntax.TruncateConstraintName<ForeignKeyDefinition>(y.Name)))
             .Where(x => x is not null).ToList();
-        var primaryKeysInSchema = result.TableDefinitions.SelectMany(x => x.Columns.Select(y => y.PrimaryKeyName))
+        var primaryKeysInSchema = result.TableDefinitions.SelectMany(x => x.Columns.Select(y => SqlSyntax.TruncateConstraintName<ColumnDefinition>(y.PrimaryKeyName)))
             .Where(x => x.IsNullOrWhiteSpace() == false).ToList();
 
         // Add valid and invalid foreign key differences to the result object
@@ -272,8 +272,7 @@ public class DatabaseSchemaCreator
 
         IEnumerable<string?> invalidForeignKeyDifferences = foreignKeysInDatabase
             .Except(foreignKeysInSchema, StringComparer.InvariantCultureIgnoreCase)
-            .Union(foreignKeysInSchema.Except(foreignKeysInDatabase, StringComparer.InvariantCultureIgnoreCase))
-            .Where(f => !_database.SqlContext.SqlSyntax.IsValidHashedForeignKey(f));
+            .Union(foreignKeysInSchema.Except(foreignKeysInDatabase, StringComparer.InvariantCultureIgnoreCase));
         foreach (var foreignKey in invalidForeignKeyDifferences)
         {
             result.Errors.Add(new Tuple<string, string>("Constraint", foreignKey ?? "NULL"));

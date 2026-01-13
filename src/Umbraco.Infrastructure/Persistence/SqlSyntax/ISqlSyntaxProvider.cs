@@ -263,4 +263,12 @@ public interface ISqlSyntaxProvider
         Sql<ISqlContext> sql,
         Func<Sql<ISqlContext>, Sql<ISqlContext>> nestedJoin,
         string? alias = null);
+
+    /// <summary>
+    /// Some databases have a maximum length for constraint names, this method truncates the name if necessary.
+    /// </summary>
+    /// <typeparam name="T">type of the entity.</typeparam>
+    /// <param name="constraintName">unlimited name.</param>
+    /// <returns>truncated name.</returns>
+    string? TruncateConstraintName<T>(string? constraintName);
 }

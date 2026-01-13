@@ -588,6 +588,9 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
     public virtual string GetSpecialDbType(SpecialDbType dbType, int customSize) =>
         $"{GetSpecialDbType(dbType)}({customSize})";
 
+    /// <inheritdoc/>
+    public virtual string? TruncateConstraintName<T>(string? constraintName) => constraintName;
+
     protected virtual string FormatCascade(string onWhat, Rule rule)
     {
         var action = "NO ACTION";
