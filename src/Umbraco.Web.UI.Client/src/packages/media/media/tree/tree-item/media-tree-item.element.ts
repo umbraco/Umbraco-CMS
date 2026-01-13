@@ -30,6 +30,7 @@ export class UmbMediaTreeItemElement extends UmbTreeItemElementBase<UmbMediaTree
 	@property({ type: Boolean, reflect: true, attribute: 'no-access' })
 	protected _noAccess = false;
 
+<<<<<<< HEAD
 	override connectedCallback() {
 		super.connectedCallback();
 		this.addEventListener('click', this.#handleClick);
@@ -40,6 +41,11 @@ export class UmbMediaTreeItemElement extends UmbTreeItemElementBase<UmbMediaTree
 		this.removeEventListener('click', this.#handleClick);
 		this.removeEventListener('keydown', this.#handleKeydown);
 		super.disconnectedCallback();
+=======
+	constructor() {
+		super();
+		this.addEventListener('click', this.#handleClick);
+>>>>>>> origin/main
 	}
 
 	#handleClick = (event: MouseEvent) => {
