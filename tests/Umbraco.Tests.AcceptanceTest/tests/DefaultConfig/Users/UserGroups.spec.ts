@@ -450,3 +450,68 @@ test('can remove granular permission to a specific document for a user group', a
   // Clean
   await umbracoApi.document.ensureNameNotExists(documentTypeName);
 });
+
+test.describe('user group description tests', () => {
+  const descriptionTestCases = [
+    {
+      name: 'short description',
+      description: 'Short desc',
+      tag: '@release'
+    },
+    {
+      name: 'normal description',
+      description: 'This is a test description for user group',
+      tag: '@release'
+    },
+    {
+      name: 'long description',
+      description: 'This is a very long description that contains multiple sentences to test the maximum length handling of the description field. It should be able to handle large amounts of text without any issues. This description is intentionally verbose to ensure the system can process and store lengthy descriptions properly.',
+      tag: undefined
+    },
+    {
+      name: 'description with special characters',
+      description: 'Description with special chars: @#$%^&*()_+-=[]{}|;:\'",.<>?/~`!',
+      tag: undefined
+    },
+    {
+      name: 'description with unicode characters',
+      description: 'Description with unicode: émojis 😀🎉 và tiếng Việt ăn ơ ư đ 日本語 こんにちは カタカナ',
+      tag: undefined
+    },
+    {
+      name: 'description with HTML-like content',
+      description: '<script>alert("test")</script> & <b>bold</b> text',
+      tag: undefined
+    },
+    {
+      name: 'description with quotes and apostrophes',
+      description: 'It\'s a "test" description with \'single\' and "double" quotes',
+      tag: undefined
+    }
+  ];
+
+  for (const testCase of descriptionTestCases) {
+    test(`can create user group with ${testCase.name}`, testCase.tag ? {tag: testCase.tag} : {}, async ({umbracoApi, umbracoUi}) => {
+      // Act
+      await umbracoUi.userGroup.clickUserGroupsButton();
+      await umbracoUi.userGroup.clickCreateLink();
+      await umbracoUi.userGroup.enterUserGroupName(userGroupName);
+      if (testCase.description !== '') {
+        await umbracoUi.userGroup.enterDescription(testCase.description);
+      }
+      const userGroupId = await umbracoUi.userGroup.clickSaveButtonAndWaitForUserGroupToBeCreated();
+
+      // Assert
+      expect(userGroupId).toBeTruthy();
+      expect(await umbracoApi.userGroup.doesExist(userGroupId!)).toBe(true);
+      // Checks if the user group was created in the UI as well
+      await umbracoUi.userGroup.clickUserGroupsButton();
+      await umbracoUi.userGroup.isUserGroupWithNameVisible(userGroupName);
+      await umbracoUi.userGroup.doesUserGroupHaveDescription(userGroupName, testCase.description);
+
+      // Verify description was saved correctly via API
+      const userGroupData = await umbracoApi.userGroup.getByName(userGroupName);
+      expect(userGroupData.description).toBe(testCase.description);
+    });
+  }
+});
