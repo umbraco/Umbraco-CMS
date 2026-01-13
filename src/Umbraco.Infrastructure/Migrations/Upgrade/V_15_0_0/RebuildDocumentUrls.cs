@@ -18,7 +18,14 @@ public class RebuildDocumentUrls : MigrationBase
     }
 
     public RebuildDocumentUrls(IMigrationContext context, IDocumentUrlService documentUrlService, IKeyValueService keyValueService)
-        : base(context) => _keyValueService = keyValueService;
+        : base(context)
+    {
+        // The documentUrlService parameter is kept for backward compatibility and to maintain
+        // constructor signature compatibility with earlier versions/DI registrations. It is not
+        // required by this migration, which only needs access to IKeyValueService.
+        _ = documentUrlService;
+        _keyValueService = keyValueService;
+    }
 
     /// <inheritdoc/>
     protected override void Migrate() =>
