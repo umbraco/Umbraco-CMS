@@ -98,10 +98,7 @@ public class PasswordGenerator
                 var data = new byte[length];
                 var chArray = new char[length];
                 var num1 = 0;
-                using (var rng = new RNGCryptoServiceProvider())
-                {
-                    rng.GetBytes(data);
-                }
+                RandomNumberGenerator.Fill(data);
 
                 for (var index = 0; index < length; ++index)
                 {

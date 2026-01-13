@@ -13,6 +13,7 @@ public static class WebhookEventCollectionBuilderCmsContentExtensions
     /// Adds the content events.
     /// </summary>
     /// <param name="builder">The builder.</param>
+    /// <param name="payloadType">The webhook payload type.</param>
     /// <returns>
     /// The builder.
     /// </returns>
@@ -65,6 +66,7 @@ public static class WebhookEventCollectionBuilderCmsContentExtensions
     /// Adds the content blueprint events.
     /// </summary>
     /// <param name="builder">The builder.</param>
+    /// <param name="payloadType">The webhook payload type.</param>
     /// <returns>
     /// The builder.
     /// </returns>
@@ -92,6 +94,7 @@ public static class WebhookEventCollectionBuilderCmsContentExtensions
     /// Adds the content version events.
     /// </summary>
     /// <param name="builder">The builder.</param>
+    /// <param name="payloadType">The webhook payload type.</param>
     /// <returns>
     /// The builder.
     /// </returns>

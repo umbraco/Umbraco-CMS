@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using Umbraco.Cms.Api.Management.DependencyInjection;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Core;
 
@@ -10,6 +11,12 @@ internal sealed class NotificationHeaderFilter : IOperationFilter
 {
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
+        // Only apply to the Umbraco CMS Management API.
+        if (context.DocumentName != ManagementApiConfiguration.ApiName)
+        {
+            return;
+        }
+
         if (context.ApiDescription.HttpMethod == HttpMethod.Get.Method)
         {
             return;

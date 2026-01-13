@@ -27,8 +27,10 @@ public class ByKeyDocumentControllerTests : ManagementApiUserGroupTestBase<ByKey
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
         // Content Type
-        var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id,
-            name: Guid.NewGuid().ToString(), alias: Guid.NewGuid().ToString());
+        var contentType = ContentTypeBuilder.CreateTextPageContentType(
+            defaultTemplateId: template.Id,
+            name: Guid.NewGuid().ToString(),
+            alias: Guid.NewGuid().ToString());
         contentType.AllowedAsRoot = true;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 

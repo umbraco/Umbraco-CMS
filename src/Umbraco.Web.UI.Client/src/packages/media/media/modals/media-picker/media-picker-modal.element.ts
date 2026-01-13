@@ -517,7 +517,6 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 
 			#searching-indicator {
 				margin-left: 7px;
-				margin-top: 4px;
 			}
 
 			#media-grid {

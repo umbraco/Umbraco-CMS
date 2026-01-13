@@ -60,6 +60,12 @@ export class UmbEntityActionListElement extends UmbLitElement {
 		};
 	}
 
+	override focus() {
+		this.#firstEntityAction?.focus();
+	}
+
+	#firstEntityAction?: HTMLElement;
+
 	#hasRenderedOnce?: boolean;
 	override render() {
 		return this._filter
@@ -71,15 +77,8 @@ export class UmbEntityActionListElement extends UmbLitElement {
 						.apiArgs=${this._apiArgs}
 						.renderMethod=${(ext: any, i: number) => {
 							if (!this.#hasRenderedOnce && i === 0) {
-								// TODO: Replace this block:
-								ext.component?.updateComplete.then(async () => {
-									const menuitem = ext.component?.shadowRoot?.querySelector('uui-menu-item');
-									menuitem?.updateComplete.then(async () => {
-										menuitem?.shadowRoot?.querySelector('#label-button')?.focus?.();
-									});
-								});
-								// end of block, with this, when this PR is part of UI Lib: https://github.com/umbraco/Umbraco.UI/pull/789
-								// ext.component?.focus();
+								this.#firstEntityAction = ext.component;
+								this.#firstEntityAction?.focus();
 								this.#hasRenderedOnce = true;
 							}
 							return ext.component;

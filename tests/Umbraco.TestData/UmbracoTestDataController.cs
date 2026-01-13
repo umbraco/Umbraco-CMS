@@ -1,4 +1,4 @@
-﻿using Bogus;
+using Bogus;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
@@ -19,8 +19,13 @@ using Umbraco.TestData.Configuration;
 namespace Umbraco.TestData;
 
 /// <summary>
-///     Creates test data
+/// Controller for creating test data in Umbraco CMS.
+/// Provides functionality to generate hierarchical content and media trees for testing purposes.
 /// </summary>
+/// <remarks>
+/// This controller requires the TestData settings to be enabled in configuration.
+/// It is intended for testing purposes only and should not be used in production environments.
+/// </remarks>
 public class UmbracoTestDataController : SurfaceController
 {
     private const string TestDataContentTypeAlias = "umbTestDataContent";
@@ -29,6 +34,19 @@ public class UmbracoTestDataController : SurfaceController
     private readonly IShortStringHelper _shortStringHelper;
     private readonly TestDataSettings _testDataSettings;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UmbracoTestDataController"/> class.
+    /// </summary>
+    /// <param name="umbracoContextAccessor">The Umbraco context accessor.</param>
+    /// <param name="databaseFactory">The database factory.</param>
+    /// <param name="services">The service context.</param>
+    /// <param name="appCaches">The application caches.</param>
+    /// <param name="profilingLogger">The profiling logger.</param>
+    /// <param name="publishedUrlProvider">The published URL provider.</param>
+    /// <param name="scopeProvider">The core scope provider.</param>
+    /// <param name="propertyEditors">The property editor collection.</param>
+    /// <param name="shortStringHelper">The short string helper.</param>
+    /// <param name="testDataSettings">The test data settings.</param>
     public UmbracoTestDataController(
         IUmbracoContextAccessor umbracoContextAccessor,
         IUmbracoDatabaseFactory databaseFactory,
@@ -49,17 +67,18 @@ public class UmbracoTestDataController : SurfaceController
     }
 
     /// <summary>
-    ///     Creates a content and associated media tree (hierarchy)
+    /// Creates a content and associated media tree (hierarchy) for testing purposes.
     /// </summary>
-    /// <param name="count"></param>
-    /// <param name="depth"></param>
-    /// <param name="locale"></param>
-    /// <returns></returns>
+    /// <param name="count">The total number of items to create in the tree.</param>
+    /// <param name="depth">The maximum depth of the tree hierarchy.</param>
+    /// <param name="locale">The locale to use for generating fake data (default: "en").</param>
+    /// <returns>A text response indicating completion.</returns>
     /// <remarks>
-    ///     Each content item created is associated to a media item via a media picker and therefore a relation is created
-    ///     between the two
+    /// Each content item created is associated to a media item via a media picker,
+    /// therefore a relation is created between the two. The content is populated
+    /// with fake product data including reviews and descriptions.
     /// </remarks>
-    public IActionResult CreateTree(int count, int depth, string locale = "en")
+    public async Task<IActionResult> CreateTree(int count, int depth, string locale = "en")
     {
         if (_testDataSettings.Enabled == false)
         {
@@ -77,7 +96,11 @@ public class UmbracoTestDataController : SurfaceController
         using (var scope = _scopeProvider.CreateCoreScope())
         {
             var imageIds = CreateMediaTree(company, faker, count, depth).ToList();
-            var contentIds = CreateContentTree(company, faker, count, depth, imageIds, out var root).ToList();
+            var (contentIds, root) = await CreateContentTreeAsync(company, faker, count, depth, imageIds);
+
+            // Force enumeration of the lazy content hierarchy (CreateHierarchy uses yield return)
+            // so that all content is created before we publish the root branch.
+            _ = contentIds.ToList();
 
             Services.ContentService.PublishBranch(root, PublishBranchFilter.IncludeUnpublished, ["*"]);
 
@@ -88,6 +111,14 @@ public class UmbracoTestDataController : SurfaceController
         return Content("Done");
     }
 
+    /// <summary>
+    /// Validates the count and depth parameters for tree creation.
+    /// </summary>
+    /// <param name="count">The total number of items to create.</param>
+    /// <param name="depth">The maximum depth of the tree.</param>
+    /// <param name="message">The error message if validation fails.</param>
+    /// <param name="perLevel">The calculated number of items per level.</param>
+    /// <returns><c>true</c> if validation passes; otherwise, <c>false</c>.</returns>
     private static bool Validate(int count, int depth, out string message, out int perLevel)
     {
         perLevel = 0;
@@ -169,13 +200,12 @@ public class UmbracoTestDataController : SurfaceController
     }
 
     /// <summary>
-    ///     Creates the media tree hiearachy
+    ///     Creates the media tree hiearachy.
     /// </summary>
-    /// <param name="company"></param>
-    /// <param name="faker"></param>
-    /// <param name="count"></param>
-    /// <param name="depth"></param>
-    /// <returns></returns>
+    /// <param name="company">The company name used as the root content name.</param>
+    /// <param name="faker">The faker instance for generating test data.</param>
+    /// <param name="count">The total number of content items to create.</param>
+    /// <param name="depth">The maximum depth of the content hierarchy.</param>
     private IEnumerable<Udi> CreateMediaTree(string company, Faker faker, int count, int depth)
     {
         var parent =
@@ -207,20 +237,19 @@ public class UmbracoTestDataController : SurfaceController
     }
 
     /// <summary>
-    ///     Creates the content tree hiearachy
+    ///     Creates the content tree hierarchy
     /// </summary>
     /// <param name="company"></param>
     /// <param name="faker"></param>
     /// <param name="count"></param>
     /// <param name="depth"></param>
     /// <param name="imageIds"></param>
-    /// <param name="root"></param>
-    /// <returns></returns>
-    private IEnumerable<Udi> CreateContentTree(string company, Faker faker, int count, int depth, List<Udi> imageIds, out IContent root)
+    /// <returns>A tuple containing the UDIs of created content and the root content item.</returns>
+    private async Task<(IEnumerable<Udi> udis, IContent root)> CreateContentTreeAsync(string company, Faker faker, int count, int depth, List<Udi> imageIds)
     {
         var random = new Random(company.GetHashCode());
 
-        var docType = GetOrCreateContentType();
+        var docType = await GetOrCreateContentTypeAsync();
 
         var parent = Services.ContentService.Create(company, -1, docType.Alias);
 
@@ -230,9 +259,7 @@ public class UmbracoTestDataController : SurfaceController
         parent.SetValue("media", imageIds[random.Next(0, imageIds.Count - 1)]);
         Services.ContentService.Save(parent);
 
-        root = parent;
-
-        return CreateHierarchy(parent, count, depth, currParent =>
+        var udis = CreateHierarchy(parent, count, depth, currParent =>
         {
             var content = Services.ContentService.Create(faker.Commerce.ProductName(), currParent, docType.Alias);
 
@@ -244,9 +271,20 @@ public class UmbracoTestDataController : SurfaceController
             Services.ContentService.Save(content);
             return (content, () => content);
         });
+
+        return (udis, parent);
     }
 
-    private IContentType GetOrCreateContentType()
+    /// <summary>
+    /// Gets the existing test data content type or creates it if it doesn't exist.
+    /// </summary>
+    /// <returns>The test data content type.</returns>
+    /// <remarks>
+    /// The content type includes properties for review (rich text), description (textbox),
+    /// and media (media picker). It is configured to allow itself as a child content type
+    /// for creating nested hierarchies.
+    /// </remarks>
+    private async Task<IContentType> GetOrCreateContentTypeAsync()
     {
         var docType = Services.ContentTypeService.Get(TestDataContentTypeAlias);
         if (docType != null)
@@ -263,16 +301,32 @@ public class UmbracoTestDataController : SurfaceController
         docType.AddPropertyGroup("content", "Content");
         docType.AddPropertyType(
             new PropertyType(_shortStringHelper, Constants.PropertyEditors.Aliases.RichText, ValueStorageType.Ntext, "review")
+            {
+                Name = "Review",
+            },
+            "content");
+        docType.AddPropertyType(
+            new PropertyType(_shortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "desc") { Name = "Description" },
+            "content");
+        docType.AddPropertyType(
+            new PropertyType(_shortStringHelper, Constants.PropertyEditors.Aliases.MediaPicker3, ValueStorageType.Integer, "media") { Name = "Media" },
+            "content");
+
+
+        await Services.ContentTypeService.CreateAsync(docType, Constants.Security.SuperUserKey);
+        var createResult = await Services.ContentTypeService.CreateAsync(docType, Constants.Security.SuperUserKey);
+        if (createResult.Success is false)
         {
-            Name = "Review",
-        }, "content");
-        docType.AddPropertyType(new PropertyType(_shortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "desc") { Name = "Description" }, "content");
-        docType.AddPropertyType(new PropertyType(_shortStringHelper, Constants.PropertyEditors.Aliases.MediaPicker3, ValueStorageType.Integer, "media") { Name = "Media" }, "content");
+            throw new InvalidOperationException($"Failed to create content type with alias {docType.Alias}.");
+        }
 
+        docType.AllowedContentTypes = [new ContentTypeSort(docType.Key, 0, docType.Alias)];
+        var updateResult = await Services.ContentTypeService.UpdateAsync(docType, Constants.Security.SuperUserKey);
+        if (updateResult.Success is false)
+        {
+            throw new InvalidOperationException($"Failed to update content type with alias {docType.Alias}.");
+        }
 
-        Services.ContentTypeService.Save(docType);
-        docType.AllowedContentTypes = new[] { new ContentTypeSort(docType.Key, 0, docType.Alias) };
-        Services.ContentTypeService.Save(docType);
         return docType;
     }
 }
