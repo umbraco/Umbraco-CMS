@@ -485,6 +485,7 @@ test.describe("Media Tree NoAccess Property Tests", () => {
     await umbracoUi.media.isMediaTreeItemVisible(rootMediaName);
 
     // Get initial URL (should be on media section)
+    await page.waitForTimeout(500); // Ensure URL is fully loaded
     const initialUrl = page.url();
 
     // Click on the noAccess root media tree item
