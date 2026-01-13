@@ -2105,6 +2105,22 @@ internal partial class UserService : RepositoryService, IUserService
         return permissions;
     }
 
+    /// <inheritdoc/>
+    public async Task<Attempt<IEnumerable<NodePermissions>, UserOperationStatus>> GetElementPermissionsAsync(Guid userKey, IEnumerable<Guid> elementKeys)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        Attempt<Dictionary<Guid, int>?> idAttempt = CreateIdKeyMap(elementKeys, UmbracoObjectTypes.Element, UmbracoObjectTypes.ElementContainer);
+
+        if (idAttempt.Success is false || idAttempt.Result is null)
+        {
+            return Attempt.FailWithStatus(UserOperationStatus.ElementNodeNotFound, Enumerable.Empty<NodePermissions>());
+        }
+
+        Attempt<IEnumerable<NodePermissions>, UserOperationStatus> permissions = await GetPermissionsAsync(userKey, idAttempt.Result);
+        scope.Complete();
+
+        return permissions;
+    }
 
     private async Task<Attempt<IEnumerable<NodePermissions>, UserOperationStatus>> GetPermissionsAsync(Guid userKey, Dictionary<Guid, int> nodes)
     {
@@ -2131,19 +2147,34 @@ internal partial class UserService : RepositoryService, IUserService
     }
 
     private Attempt<Dictionary<Guid, int>?> CreateIdKeyMap(IEnumerable<Guid> nodeKeys, UmbracoObjectTypes objectType)
+        => CreateIdKeyMap(nodeKeys, [objectType]);
+
+    private Attempt<Dictionary<Guid, int>?> CreateIdKeyMap(IEnumerable<Guid> nodeKeys, params UmbracoObjectTypes[] objectTypes)
     {
         // We'll return this as a dictionary we can link the id and key again later.
         Dictionary<Guid, int> idKeys = new();
 
         foreach (Guid key in nodeKeys)
         {
-            Attempt<int> idAttempt = _entityService.GetId(key, objectType);
-            if (idAttempt.Success is false)
+            Attempt<int>? successfulAttempt = null;
+            foreach (UmbracoObjectTypes objectType in objectTypes)
+            {
+                Attempt<int> idAttempt = _entityService.GetId(key, objectType);
+                if (idAttempt.Success is false)
+                {
+                    continue;
+                }
+
+                successfulAttempt = idAttempt;
+                break;
+            }
+
+            if (successfulAttempt is null)
             {
                 return Attempt.Fail<Dictionary<Guid, int>?>(null);
             }
 
-            idKeys[key] = idAttempt.Result;
+            idKeys[key] = successfulAttempt.Value.Result;
         }
 
         return Attempt.Succeed<Dictionary<Guid, int>?>(idKeys);

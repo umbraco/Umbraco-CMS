@@ -10,20 +10,17 @@ namespace Umbraco.Cms.Core.Services;
 /// <inheritdoc />
 internal sealed class ElementPermissionService : IElementPermissionService
 {
-    private readonly IElementService _elementService;
     private readonly IEntityService _entityService;
     private readonly IUserService _userService;
     private readonly AppCaches _appCaches;
     private readonly ILanguageService _languageService;
 
     public ElementPermissionService(
-        IElementService elementService,
         IEntityService entityService,
         IUserService userService,
         AppCaches appCaches,
         ILanguageService languageService)
     {
-        _elementService = elementService;
         _entityService = entityService;
         _userService = userService;
         _appCaches = appCaches;
@@ -36,21 +33,31 @@ internal sealed class ElementPermissionService : IElementPermissionService
         IEnumerable<Guid> elementKeys,
         ISet<string> permissionsToCheck)
     {
-        var elementItems = _elementService.GetByIds(elementKeys).ToArray();
-
-        if (elementItems.Length == 0)
+        Guid[] keys = elementKeys.ToArray();
+        if (keys.Length == 0)
         {
             return Task.FromResult(ElementAuthorizationStatus.NotFound);
         }
 
-        if (elementItems.Any(elementItem => user.HasElementPathAccess(elementItem, _entityService, _appCaches) == false))
+        // Fetch both Elements and ElementContainers (folders)
+        IEntitySlim[] entities = _entityService.GetAll(
+            new[] { UmbracoObjectTypes.Element, UmbracoObjectTypes.ElementContainer },
+            keys).ToArray();
+
+        if (entities.Length == 0)
+        {
+            return Task.FromResult(ElementAuthorizationStatus.NotFound);
+        }
+
+        if (entities.Any(entity => user.HasElementPathAccess(entity, _entityService, _appCaches) == false))
         {
             return Task.FromResult(ElementAuthorizationStatus.UnauthorizedMissingPathAccess);
         }
 
-        return Task.FromResult(HasPermissionAccess(user, elementItems.Select(e => e.Path), permissionsToCheck)
-            ? ElementAuthorizationStatus.Success
-            : ElementAuthorizationStatus.UnauthorizedMissingPermissionAccess);
+        return Task.FromResult(
+            HasPermissionAccess(user, entities.Select(e => e.Path), permissionsToCheck)
+                ? ElementAuthorizationStatus.Success
+                : ElementAuthorizationStatus.UnauthorizedMissingPermissionAccess);
     }
 
     /// <inheritdoc/>
@@ -60,28 +67,36 @@ internal sealed class ElementPermissionService : IElementPermissionService
         ISet<string> permissionsToCheck)
     {
         var denied = new List<IUmbracoEntity>();
-        var page = 0;
-        const int pageSize = 500;
+        var skip = 0;
+        const int take = 500;
         var total = long.MaxValue;
 
-        IElement? elementItem = _elementService.GetById(parentKey);
+        UmbracoObjectTypes[] objectTypes = { UmbracoObjectTypes.Element, UmbracoObjectTypes.ElementContainer };
 
-        if (elementItem is null)
+        // Try to find the parent as either Element or ElementContainer
+        IEntitySlim? parentEntity = _entityService.GetAll(objectTypes, parentKey).FirstOrDefault();
+
+        if (parentEntity is null)
         {
             return Task.FromResult(ElementAuthorizationStatus.NotFound);
         }
 
-        while (page * pageSize < total)
+        UmbracoObjectTypes parentObjectType = ObjectTypes.GetUmbracoObjectType(parentEntity.NodeObjectType);
+
+        while (skip < total)
         {
-            // Order descendents by shallowest to deepest, this allows us to check permissions from top to bottom,
+            // Order descendants by shallowest to deepest, this allows us to check permissions from top to bottom,
             // so we can exit early if a permission higher up fails.
             IEnumerable<IEntitySlim> descendants = _entityService.GetPagedDescendants(
-                elementItem.Id,
-                UmbracoObjectTypes.Element,
-                page++,
-                pageSize,
+                parentKey,
+                parentObjectType,
+                objectTypes,
+                skip,
+                take,
                 out total,
                 ordering: Ordering.By("path"));
+
+            skip += take;
 
             foreach (IEntitySlim descendant in descendants)
             {

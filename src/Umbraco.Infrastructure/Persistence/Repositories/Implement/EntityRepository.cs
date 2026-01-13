@@ -420,6 +420,14 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
             ? PerformGetAll(objectType, sql => sql.WhereIn<NodeDto>(x => x.UniqueId, keys.Distinct()))
             : PerformGetAll(objectType);
 
+    public IEnumerable<IEntitySlim> GetAll(IEnumerable<Guid> objectTypes, params Guid[] keys)
+    {
+        Guid[] objectTypeArray = objectTypes.ToArray();
+        return keys.Length > 0
+            ? PerformGetAll(objectTypeArray, sql => sql.WhereIn<NodeDto>(x => x.UniqueId, keys.Distinct()))
+            : PerformGetAll(objectTypeArray);
+    }
+
     private IEnumerable<IEntitySlim> GetEntities(Sql<ISqlContext> sql, bool isContent, bool isMedia, bool isMember, bool isElement)
     {
         // isContent is going to return a 1:M result now with the variants so we need to do different things

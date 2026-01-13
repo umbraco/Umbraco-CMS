@@ -246,6 +246,17 @@ public class EntityService : RepositoryService, IEntityService
     }
 
     /// <inheritdoc />
+    public virtual IEnumerable<IEntitySlim> GetAll(IEnumerable<UmbracoObjectTypes> objectTypes, params Guid[] keys)
+    {
+        IEnumerable<Guid> objectTypeGuids = objectTypes.Select(x => x.GetGuid());
+
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            return _entityRepository.GetAll(objectTypeGuids, keys);
+        }
+    }
+
+    /// <inheritdoc />
     public virtual IEnumerable<IEntitySlim> GetAll(Guid objectType, params Guid[] keys)
     {
         Type? entityType = ObjectTypes.GetClrType(objectType);
