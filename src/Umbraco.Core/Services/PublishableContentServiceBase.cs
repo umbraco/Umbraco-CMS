@@ -110,10 +110,6 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
     protected abstract IStatefulNotification UnpublishedNotification(TContent content, EventMessages eventMessages);
 
-    protected abstract DeletingVersionsNotification<TContent> DeletingVersionsNotification(int id, EventMessages messages, int specificVersion = default, bool deletePriorVersions = false, DateTime dateToRetain = default);
-
-    protected abstract DeletedVersionsNotification<TContent> DeletedVersionsNotification(int id, EventMessages messages, int specificVersion = default, bool deletePriorVersions = false, DateTime dateToRetain = default);
-
     protected abstract RollingBackNotification<TContent> RollingBackNotification(TContent target, EventMessages messages);
 
     protected abstract RolledBackNotification<TContent> RolledBackNotification(TContent target, EventMessages messages);
@@ -177,7 +173,6 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
     }
 
     #endregion
-
 
     #region Count
 

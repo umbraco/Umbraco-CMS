@@ -52,6 +52,10 @@ internal abstract class ContentVersionServiceBase<TContent>
         _userIdKeyResolver = userIdKeyResolver;
     }
 
+    protected abstract DeletingVersionsNotification<TContent> DeletingVersionsNotification(int id, EventMessages messages, int specificVersion);
+
+    protected abstract DeletedVersionsNotification<TContent> DeletedVersionsNotification(int id, EventMessages messages, int specificVersion);
+
     /// <inheritdoc />
     public IReadOnlyCollection<ContentVersionMeta> PerformContentVersionCleanup(DateTime asAtDate) =>
 
@@ -245,8 +249,7 @@ internal abstract class ContentVersionServiceBase<TContent>
             {
                 EventMessages messages = _eventMessagesFactory.Get();
 
-                if (scope.Notifications.PublishCancelable(
-                        new ContentDeletingVersionsNotification(version.ContentId, messages, version.VersionId)))
+                if (scope.Notifications.PublishCancelable(DeletingVersionsNotification(version.ContentId, messages, version.VersionId)))
                 {
                     if (_logger.IsEnabled(LogLevel.Debug))
                     {
@@ -284,8 +287,7 @@ internal abstract class ContentVersionServiceBase<TContent>
                 {
                     EventMessages messages = _eventMessagesFactory.Get();
 
-                    scope.Notifications.Publish(
-                        new ContentDeletedVersionsNotification(version.ContentId, messages, version.VersionId));
+                    scope.Notifications.Publish(DeletedVersionsNotification(version.ContentId, messages, version.VersionId));
                 }
 
                 scope.Complete();

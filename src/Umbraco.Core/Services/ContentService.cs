@@ -2085,12 +2085,6 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
     protected override IStatefulNotification UnpublishedNotification(IContent content, EventMessages eventMessages)
         => new ContentUnpublishedNotification(content, eventMessages);
 
-    protected override DeletingVersionsNotification<IContent> DeletingVersionsNotification(int id, EventMessages messages, int specificVersion = default, bool deletePriorVersions = false, DateTime dateToRetain = default)
-        => new ContentDeletingVersionsNotification(id, messages, specificVersion, deletePriorVersions, dateToRetain);
-
-    protected override DeletedVersionsNotification<IContent> DeletedVersionsNotification(int id, EventMessages messages, int specificVersion = default, bool deletePriorVersions = false, DateTime dateToRetain = default)
-        => new ContentDeletedVersionsNotification(id, messages, specificVersion, deletePriorVersions, dateToRetain);
-
     protected override RollingBackNotification<IContent> RollingBackNotification(IContent target, EventMessages messages)
         => new ContentRollingBackNotification(target, messages);
 
