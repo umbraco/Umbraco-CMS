@@ -27,30 +27,11 @@ export default class UmbNewPasswordLayoutElement extends UmbLitElement {
   @state()
   _passwordConfiguration?: typeof UMB_AUTH_CONTEXT.TYPE['passwordConfiguration'];
 
-  @state()
-  _passwordPattern = '';
-
   constructor() {
     super();
 
     this.consumeContext(UMB_AUTH_CONTEXT, (authContext) => {
-      // Build a pattern
-      let pattern = '';
       this._passwordConfiguration = authContext?.passwordConfiguration;
-      if (this._passwordConfiguration?.requireDigit) {
-        pattern += '(?=.*\\d)';
-      }
-      if (this._passwordConfiguration?.requireLowercase) {
-        pattern += '(?=.*[a-z])';
-      }
-      if (this._passwordConfiguration?.requireUppercase) {
-        pattern += '(?=.*[A-Z])';
-      }
-      if (this._passwordConfiguration?.requireNonLetterOrDigit) {
-        pattern += '(?=.*\\W)';
-      }
-      pattern += `.{${this._passwordConfiguration?.minimumPasswordLength ?? 10},}`;
-      this._passwordPattern = pattern;
     });
   }
 
@@ -161,7 +142,6 @@ export default class UmbNewPasswordLayoutElement extends UmbLitElement {
               id="password"
               name="password"
               autocomplete="new-password"
-              pattern="${this._passwordPattern}"
               .minlength=${this._passwordConfiguration?.minimumPasswordLength}
               .minlengthMessage=${this.localize.term('auth_passwordMinLength', this._passwordConfiguration?.minimumPasswordLength ?? 10)}
               .label=${this.localize.term('auth_newPassword')}
@@ -179,7 +159,6 @@ export default class UmbNewPasswordLayoutElement extends UmbLitElement {
               id="confirmPassword"
               name="confirmPassword"
               autocomplete="new-password"
-              pattern="${this._passwordPattern}"
               .minlength=${this._passwordConfiguration?.minimumPasswordLength}
               .minlengthMessage=${this.localize.term('auth_passwordMinLength', this._passwordConfiguration?.minimumPasswordLength ?? 10)}
               .label=${this.localize.term('auth_confirmNewPassword')}
