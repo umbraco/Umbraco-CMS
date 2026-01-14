@@ -3,7 +3,7 @@ namespace Umbraco.Cms.Core.Models;
 /// <summary>
 /// Represents a URL alias for a published document.
 /// </summary>
-public class PublishedDocumentAlias
+public class PublishedDocumentUrlAlias
 {
     /// <summary>
     /// Gets or sets the document key.

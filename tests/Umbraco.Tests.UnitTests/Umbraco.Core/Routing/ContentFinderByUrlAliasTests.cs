@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Web;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing;
@@ -34,7 +35,7 @@ public class ContentFinderByUrlAliasTests
         var umbracoContextAccessor = new Mock<IUmbracoContextAccessor>();
         var umbracoContext = new Mock<IUmbracoContext>();
         var publishedContentCache = new Mock<IPublishedContentCache>();
-        var documentAliasService = new Mock<IDocumentAliasService>();
+        var documentUrlAliasService = new Mock<IDocumentUrlAliasService>();
         var idKeyMap = new Mock<IIdKeyMap>();
         var contentItem = new Mock<IPublishedContent>();
         var fileService = new Mock<IFileService>();
@@ -45,7 +46,7 @@ public class ContentFinderByUrlAliasTests
         umbracoContext.Setup(x => x.Content).Returns(publishedContentCache.Object);
 
         // Setup the document alias service to return the document key for the alias
-        documentAliasService
+        documentUrlAliasService
             .Setup(x => x.GetDocumentKeyByAlias(normalizedAlias, It.IsAny<string?>(), It.IsAny<Guid?>()))
             .Returns(DocumentKey);
 
@@ -59,7 +60,7 @@ public class ContentFinderByUrlAliasTests
         var sut = new ContentFinderByUrlAlias(
             Mock.Of<ILogger<ContentFinderByUrlAlias>>(),
             umbracoContextAccessor.Object,
-            documentAliasService.Object,
+            documentUrlAliasService.Object,
             idKeyMap.Object);
         var result = await sut.TryFindContent(publishedRequestBuilder);
 
@@ -77,7 +78,7 @@ public class ContentFinderByUrlAliasTests
         var umbracoContextAccessor = new Mock<IUmbracoContextAccessor>();
         var umbracoContext = new Mock<IUmbracoContext>();
         var publishedContentCache = new Mock<IPublishedContentCache>();
-        var documentAliasService = new Mock<IDocumentAliasService>();
+        var documentUrlAliasService = new Mock<IDocumentUrlAliasService>();
         var idKeyMap = new Mock<IIdKeyMap>();
         var fileService = new Mock<IFileService>();
 
@@ -87,7 +88,7 @@ public class ContentFinderByUrlAliasTests
         umbracoContext.Setup(x => x.Content).Returns(publishedContentCache.Object);
 
         // Setup the document alias service to return null (no match)
-        documentAliasService
+        documentUrlAliasService
             .Setup(x => x.GetDocumentKeyByAlias(It.IsAny<string>(), It.IsAny<string?>(), It.IsAny<Guid?>()))
             .Returns((Guid?)null);
 
@@ -97,7 +98,7 @@ public class ContentFinderByUrlAliasTests
         var sut = new ContentFinderByUrlAlias(
             Mock.Of<ILogger<ContentFinderByUrlAlias>>(),
             umbracoContextAccessor.Object,
-            documentAliasService.Object,
+            documentUrlAliasService.Object,
             idKeyMap.Object);
         var result = await sut.TryFindContent(publishedRequestBuilder);
 
@@ -115,7 +116,7 @@ public class ContentFinderByUrlAliasTests
         var umbracoContextAccessor = new Mock<IUmbracoContextAccessor>();
         var umbracoContext = new Mock<IUmbracoContext>();
         var publishedContentCache = new Mock<IPublishedContentCache>();
-        var documentAliasService = new Mock<IDocumentAliasService>();
+        var documentUrlAliasService = new Mock<IDocumentUrlAliasService>();
         var idKeyMap = new Mock<IIdKeyMap>();
         var fileService = new Mock<IFileService>();
 
@@ -130,13 +131,13 @@ public class ContentFinderByUrlAliasTests
         var sut = new ContentFinderByUrlAlias(
             Mock.Of<ILogger<ContentFinderByUrlAlias>>(),
             umbracoContextAccessor.Object,
-            documentAliasService.Object,
+            documentUrlAliasService.Object,
             idKeyMap.Object);
         var result = await sut.TryFindContent(publishedRequestBuilder);
 
         // Assert - root path "/" should not trigger alias lookup
         Assert.That(result, Is.False);
-        documentAliasService.Verify(
+        documentUrlAliasService.Verify(
             x => x.GetDocumentKeyByAlias(It.IsAny<string>(), It.IsAny<string?>(), It.IsAny<Guid?>()),
             Times.Never);
     }
@@ -148,7 +149,7 @@ public class ContentFinderByUrlAliasTests
         var absoluteUrl = "http://localhost/some-alias";
 
         var umbracoContextAccessor = new Mock<IUmbracoContextAccessor>();
-        var documentAliasService = new Mock<IDocumentAliasService>();
+        var documentUrlAliasService = new Mock<IDocumentUrlAliasService>();
         var idKeyMap = new Mock<IIdKeyMap>();
         var fileService = new Mock<IFileService>();
 
@@ -160,8 +161,11 @@ public class ContentFinderByUrlAliasTests
         // Act
         var sut = new ContentFinderByUrlAlias(
             Mock.Of<ILogger<ContentFinderByUrlAlias>>(),
+            Mock.Of<IPublishedValueFallback>(),
             umbracoContextAccessor.Object,
-            documentAliasService.Object,
+            Mock.Of<IDocumentNavigationQueryService>(),
+            Mock.Of<IPublishedContentStatusFilteringService>(),
+            documentUrlAliasService.Object,
             idKeyMap.Object);
         var result = await sut.TryFindContent(publishedRequestBuilder);
 
@@ -180,7 +184,7 @@ public class ContentFinderByUrlAliasTests
         var umbracoContextAccessor = new Mock<IUmbracoContextAccessor>();
         var umbracoContext = new Mock<IUmbracoContext>();
         var publishedContentCache = new Mock<IPublishedContentCache>();
-        var documentAliasService = new Mock<IDocumentAliasService>();
+        var documentUrlAliasService = new Mock<IDocumentUrlAliasService>();
         var idKeyMap = new Mock<IIdKeyMap>();
         var contentItem = new Mock<IPublishedContent>();
         var fileService = new Mock<IFileService>();
@@ -197,7 +201,7 @@ public class ContentFinderByUrlAliasTests
             .Returns(Attempt<Guid>.Succeed(domainRootKey));
 
         // Setup the document alias service - verify it's called with the domain root key
-        documentAliasService
+        documentUrlAliasService
             .Setup(x => x.GetDocumentKeyByAlias("my-alias", It.IsAny<string?>(), domainRootKey))
             .Returns(DocumentKey);
 
@@ -211,13 +215,13 @@ public class ContentFinderByUrlAliasTests
         var sut = new ContentFinderByUrlAlias(
             Mock.Of<ILogger<ContentFinderByUrlAlias>>(),
             umbracoContextAccessor.Object,
-            documentAliasService.Object,
+            documentUrlAliasService.Object,
             idKeyMap.Object);
         var result = await sut.TryFindContent(publishedRequestBuilder);
 
         // Assert
         Assert.That(result, Is.True);
-        documentAliasService.Verify(
+        documentUrlAliasService.Verify(
             x => x.GetDocumentKeyByAlias("my-alias", It.IsAny<string?>(), domainRootKey),
             Times.Once);
     }

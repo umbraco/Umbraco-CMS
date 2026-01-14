@@ -3,7 +3,7 @@ namespace Umbraco.Cms.Core.Services;
 /// <summary>
 /// Defines operations for handling document URL aliases (umbracoUrlAlias property).
 /// </summary>
-public interface IDocumentAliasService
+public interface IDocumentUrlAliasService
 {
     /// <summary>
     /// Initializes the service and ensures the alias cache is populated from the database.

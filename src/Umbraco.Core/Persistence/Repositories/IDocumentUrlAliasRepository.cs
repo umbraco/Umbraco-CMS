@@ -5,20 +5,20 @@ namespace Umbraco.Cms.Core.Persistence.Repositories;
 /// <summary>
 /// Repository for document URL aliases.
 /// </summary>
-public interface IDocumentAliasRepository
+public interface IDocumentUrlAliasRepository
 {
     /// <summary>
     /// Saves the specified aliases to the database.
     /// Handles insert/update/delete via diff - existing aliases not in the new set are deleted.
     /// </summary>
     /// <param name="aliases">The aliases to save.</param>
-    void Save(IEnumerable<PublishedDocumentAlias> aliases);
+    void Save(IEnumerable<PublishedDocumentUrlAlias> aliases);
 
     /// <summary>
     /// Gets all persisted aliases from the database.
     /// </summary>
     /// <returns>All persisted aliases.</returns>
-    IEnumerable<PublishedDocumentAlias> GetAll();
+    IEnumerable<PublishedDocumentUrlAlias> GetAll();
 
     /// <summary>
     /// Deletes all aliases for the specified document keys.
@@ -30,13 +30,13 @@ public interface IDocumentAliasRepository
     /// Gets all document aliases.
     /// </summary>
     /// <returns>Raw alias data from documents with umbracoUrlAlias property.</returns>
-    IEnumerable<DocumentAliasRaw> GetAllDocumentAliases();
+    IEnumerable<DocumentUrlAliasRaw> GetAllDocumentUrlAliases();
 }
 
 /// <summary>
 /// Raw alias data from a direct SQL query.
 /// </summary>
-public class DocumentAliasRaw
+public class DocumentUrlAliasRaw
 {
     /// <summary>
     /// Gets or sets the document key.

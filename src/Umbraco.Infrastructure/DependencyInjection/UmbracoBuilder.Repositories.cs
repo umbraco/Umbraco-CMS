@@ -34,7 +34,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IDocumentVersionRepository, DocumentVersionRepository>();
         builder.Services.AddUnique<IDocumentTypeContainerRepository, DocumentTypeContainerRepository>();
         builder.Services.AddUnique<IDocumentUrlRepository, DocumentUrlRepository>();
-        builder.Services.AddUnique<IDocumentAliasRepository, DocumentAliasRepository>();
+        builder.Services.AddUnique<IDocumentUrlAliasRepository, DocumentUrlAliasRepository>();
         builder.Services.AddUnique<IDomainRepository, DomainRepository>();
         builder.Services.AddMultipleUnique<IEntityRepository, IEntityRepositoryExtended, EntityRepository>();
         builder.Services.AddUnique<ITwoFactorLoginRepository, TwoFactorLoginRepository>();

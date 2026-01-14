@@ -9,15 +9,15 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
 /// <inheritdoc />
-internal class DocumentAliasRepository : IDocumentAliasRepository
+internal class DocumentUrlAliasRepository : IDocumentUrlAliasRepository
 {
     private readonly IScopeAccessor _scopeAccessor;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="DocumentAliasRepository"/> class.
+    /// Initializes a new instance of the <see cref="DocumentUrlAliasRepository"/> class.
     /// </summary>
-    /// <param name="scopeAccessor">The scope accessor. </param>
-    public DocumentAliasRepository(IScopeAccessor scopeAccessor) => _scopeAccessor = scopeAccessor;
+    /// <param name="scopeAccessor">The scope accessor.</param>
+    public DocumentUrlAliasRepository(IScopeAccessor scopeAccessor) => _scopeAccessor = scopeAccessor;
 
     private IUmbracoDatabase Database
     {
@@ -33,7 +33,7 @@ internal class DocumentAliasRepository : IDocumentAliasRepository
     }
 
     /// <inheritdoc/>
-    public void Save(IEnumerable<PublishedDocumentAlias> aliases)
+    public void Save(IEnumerable<PublishedDocumentUrlAlias> aliases)
     {
         IEnumerable<Guid> documentKeys = aliases.Select(x => x.DocumentKey).Distinct();
 
@@ -47,16 +47,16 @@ internal class DocumentAliasRepository : IDocumentAliasRepository
         foreach (IEnumerable<Guid> group in documentKeys.InGroupsOf(Constants.Sql.MaxParameterCount))
         {
             Sql<ISqlContext> sql = Database.SqlContext.Sql()
-                .Select<DocumentAliasDto>()
-                .From<DocumentAliasDto>()
-                .Where<DocumentAliasDto>(x => group.Contains(x.UniqueId))
+                .Select<DocumentUrlAliasDto>()
+                .From<DocumentUrlAliasDto>()
+                .Where<DocumentUrlAliasDto>(x => group.Contains(x.UniqueId))
                 .ForUpdate();
 
-            List<DocumentAliasDto> existingAliasesInBatch = Database.Fetch<DocumentAliasDto>(sql);
+            List<DocumentUrlAliasDto> existingAliasesInBatch = Database.Fetch<DocumentUrlAliasDto>(sql);
 
-            foreach (DocumentAliasDto existing in existingAliasesInBatch)
+            foreach (DocumentUrlAliasDto existing in existingAliasesInBatch)
             {
-                if (dtoDictionary.TryGetValue((existing.UniqueId, existing.LanguageId, existing.Alias), out DocumentAliasDto? found))
+                if (dtoDictionary.TryGetValue((existing.UniqueId, existing.LanguageId, existing.Alias), out DocumentUrlAliasDto? found))
                 {
                     found.Id = existing.Id;
 
@@ -73,17 +73,17 @@ internal class DocumentAliasRepository : IDocumentAliasRepository
         // do the deletes and inserts
         if (toDelete.Count > 0)
         {
-            Database.DeleteMany<DocumentAliasDto>().Where(x => toDelete.Contains(x.Id)).Execute();
+            Database.DeleteMany<DocumentUrlAliasDto>().Where(x => toDelete.Contains(x.Id)).Execute();
         }
 
         Database.InsertBulk(toInsert.Values);
     }
 
     /// <inheritdoc/>
-    public IEnumerable<PublishedDocumentAlias> GetAll()
+    public IEnumerable<PublishedDocumentUrlAlias> GetAll()
     {
-        List<DocumentAliasDto>? dtos = Database.Fetch<DocumentAliasDto>(
-            Database.SqlContext.Sql().Select<DocumentAliasDto>().From<DocumentAliasDto>());
+        List<DocumentUrlAliasDto>? dtos = Database.Fetch<DocumentUrlAliasDto>(
+            Database.SqlContext.Sql().Select<DocumentUrlAliasDto>().From<DocumentUrlAliasDto>());
 
         return dtos.Select(BuildModel);
     }
@@ -94,8 +94,8 @@ internal class DocumentAliasRepository : IDocumentAliasRepository
         foreach (IEnumerable<Guid> group in documentKeys.InGroupsOf(Constants.Sql.MaxParameterCount))
         {
             Database.Execute(Database.SqlContext.Sql()
-                .Delete<DocumentAliasDto>()
-                .WhereIn<DocumentAliasDto>(x => x.UniqueId, group));
+                .Delete<DocumentUrlAliasDto>()
+                .WhereIn<DocumentUrlAliasDto>(x => x.UniqueId, group));
         }
     }
 
@@ -104,11 +104,10 @@ internal class DocumentAliasRepository : IDocumentAliasRepository
     /// This gets all document aliases directly from property data (using an optimized SQL query).
     /// This is more efficient than loading all IContent objects.
     /// </remarks>
-    public IEnumerable<DocumentAliasRaw> GetAllDocumentAliases()
+    public IEnumerable<DocumentUrlAliasRaw> GetAllDocumentUrlAliases()
     {
         Sql<ISqlContext> sql = Database.SqlContext.Sql()
-            .Select<NodeDto>("n", x => x.UniqueId)
-            .AndSelect<PropertyDataDto>("pd", x => x.LanguageId)
+            .Append("SELECT n.uniqueId AS DocumentKey, pd.languageId")
             .Append(", COALESCE(pd.textValue, pd.varcharValue) AS AliasValue")
             .From<PropertyDataDto>("pd")
             .InnerJoin<PropertyTypeDto>("pt").On<PropertyDataDto, PropertyTypeDto>((pd, pt) => pd.PropertyTypeId == pt.Id, "pd", "pt")
@@ -120,10 +119,10 @@ internal class DocumentAliasRepository : IDocumentAliasRepository
             .Where<NodeDto>(n => n.NodeObjectType == Constants.ObjectTypes.Document, "n") // Exclude blueprints
             .Append("AND (pd.textValue IS NOT NULL OR pd.varcharValue IS NOT NULL)");
 
-        return Database.Fetch<DocumentAliasRaw>(sql);
+        return Database.Fetch<DocumentUrlAliasRaw>(sql);
     }
 
-    private PublishedDocumentAlias BuildModel(DocumentAliasDto dto) =>
+    private PublishedDocumentUrlAlias BuildModel(DocumentUrlAliasDto dto) =>
         new()
         {
             Alias = dto.Alias,
@@ -132,7 +131,7 @@ internal class DocumentAliasRepository : IDocumentAliasRepository
             RootAncestorKey = dto.RootAncestorKey,
         };
 
-    private DocumentAliasDto BuildDto(PublishedDocumentAlias model) =>
+    private DocumentUrlAliasDto BuildDto(PublishedDocumentUrlAlias model) =>
         new()
         {
             Alias = model.Alias,

@@ -7,9 +7,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(TableName)]
 [PrimaryKey("id", AutoIncrement = true)]
 [ExplicitColumns]
-internal class DocumentAliasDto
+internal class DocumentUrlAliasDto
 {
-    public const string TableName = Constants.DatabaseSchema.Tables.DocumentAlias;
+    public const string TableName = Constants.DatabaseSchema.Tables.DocumentUrlAlias;
 
     [Column("id")]
     [PrimaryKeyColumn(Clustered = false, AutoIncrement = true)]

@@ -104,6 +104,6 @@ public static partial class Constants
         /// <summary>
         ///     All document URL aliases.
         /// </summary>
-        public const int DocumentAliases = -348;
+        public const int DocumentUrlAliases = -348;
     }
 }

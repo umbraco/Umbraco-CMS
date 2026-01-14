@@ -24,13 +24,15 @@ public class ContentFinderByUrlAlias : IContentFinder
 {
     private readonly ILogger<ContentFinderByUrlAlias> _logger;
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
-    private readonly IDocumentAliasService _documentAliasService;
+    private readonly IDocumentUrlAliasService _documentUrlAliasService;
     private readonly IIdKeyMap _idKeyMap;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ContentFinderByUrlAlias" /> class.
     /// </summary>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
+    // TODO (V18): Remove this constructor and the unsued parameters from the remaining one. They are only retained to avoid
+    // an ambiguous constructor error.
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
     public ContentFinderByUrlAlias(
         ILogger<ContentFinderByUrlAlias> logger,
         IPublishedValueFallback publishedValueFallback,
@@ -39,8 +41,11 @@ public class ContentFinderByUrlAlias : IContentFinder
         IPublishedContentStatusFilteringService publishedContentStatusFilteringService)
         : this(
             logger,
+            publishedValueFallback,
             umbracoContextAccessor,
-            StaticServiceProvider.Instance.GetRequiredService<IDocumentAliasService>(),
+            documentNavigationQueryService,
+            publishedContentStatusFilteringService,
+            StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlAliasService>(),
             StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>())
     {
     }
@@ -50,13 +55,18 @@ public class ContentFinderByUrlAlias : IContentFinder
     /// </summary>
     public ContentFinderByUrlAlias(
         ILogger<ContentFinderByUrlAlias> logger,
+#pragma warning disable IDE0060 // Remove unused parameter
+        IPublishedValueFallback publishedValueFallback,
         IUmbracoContextAccessor umbracoContextAccessor,
-        IDocumentAliasService documentAliasService,
+        IDocumentNavigationQueryService documentNavigationQueryService,
+        IPublishedContentStatusFilteringService publishedContentStatusFilteringService,
+#pragma warning restore IDE0060 // Remove unused parameter
+        IDocumentUrlAliasService documentUrlAliasService,
         IIdKeyMap idKeyMap)
     {
         _logger = logger;
         _umbracoContextAccessor = umbracoContextAccessor;
-        _documentAliasService = documentAliasService;
+        _documentUrlAliasService = documentUrlAliasService;
         _idKeyMap = idKeyMap;
     }
 
@@ -130,7 +140,7 @@ public class ContentFinderByUrlAlias : IContentFinder
         }
 
         // O(1) lookup instead of O(n) tree traversal
-        Guid? documentKey = _documentAliasService.GetDocumentKeyByAlias(
+        Guid? documentKey = _documentUrlAliasService.GetDocumentKeyByAlias(
             normalizedAlias,
             culture,
             domainRootKey);

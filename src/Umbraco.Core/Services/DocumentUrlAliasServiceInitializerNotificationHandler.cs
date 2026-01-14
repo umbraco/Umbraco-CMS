@@ -4,21 +4,21 @@ using Umbraco.Cms.Core.Notifications;
 namespace Umbraco.Cms.Core.Services;
 
 /// <summary>
-/// Notification handler to initialize the <see cref="IDocumentAliasService"/> on application startup.
+/// Notification handler to initialize the <see cref="IDocumentUrlAliasService"/> on application startup.
 /// </summary>
-public class DocumentAliasServiceInitializerNotificationHandler : INotificationAsyncHandler<UmbracoApplicationStartingNotification>
+public class DocumentUrlAliasServiceInitializerNotificationHandler : INotificationAsyncHandler<UmbracoApplicationStartingNotification>
 {
-    private readonly IDocumentAliasService _documentAliasService;
+    private readonly IDocumentUrlAliasService _documentUrlAliasService;
     private readonly IRuntimeState _runtimeState;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="DocumentAliasServiceInitializerNotificationHandler"/> class.
+    /// Initializes a new instance of the <see cref="DocumentUrlAliasServiceInitializerNotificationHandler"/> class.
     /// </summary>
-    public DocumentAliasServiceInitializerNotificationHandler(
-        IDocumentAliasService documentAliasService,
+    public DocumentUrlAliasServiceInitializerNotificationHandler(
+        IDocumentUrlAliasService documentUrlAliasService,
         IRuntimeState runtimeState)
     {
-        _documentAliasService = documentAliasService;
+        _documentUrlAliasService = documentUrlAliasService;
         _runtimeState = runtimeState;
     }
 
@@ -31,7 +31,7 @@ public class DocumentAliasServiceInitializerNotificationHandler : INotificationA
             return;
         }
 
-        await _documentAliasService.InitAsync(
+        await _documentUrlAliasService.InitAsync(
             _runtimeState.Level <= RuntimeLevel.Install,
             cancellationToken);
     }
