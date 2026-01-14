@@ -222,6 +222,6 @@ public class UserStartNodeEntitiesService : IUserStartNodeEntitiesService
 
     private static bool IsDescendantOrSelf(IEntitySlim child, string[] userStartNodePaths)
         // Note: Add trailing commas to both paths to prevent false matches (e.g., path "-1,100" should not match "-1,1001")
-        // This matches the pattern used in lines 92 and 191 of this file
+        // This matches the pattern used in lines 92 and 192 of this file
         => userStartNodePaths.Any(path => $"{child.Path},".StartsWith($"{path},"));
 }
