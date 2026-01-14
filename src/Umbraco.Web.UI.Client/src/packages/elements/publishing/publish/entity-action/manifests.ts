@@ -7,7 +7,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'default',
 		alias: 'Umb.EntityAction.Element.Publish',
 		name: 'Publish Element Entity Action',
-		weight: 600,
+		weight: 510,
 		api: () => import('./publish.action.js'),
 		forEntityTypes: [UMB_ELEMENT_ENTITY_TYPE],
 		meta: {

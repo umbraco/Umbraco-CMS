@@ -3,7 +3,6 @@ import { UMB_ELEMENT_ENTITY_TYPE } from '../../entity.js';
 import { UMB_ELEMENT_ITEM_REPOSITORY_ALIAS } from '../../item/constants.js';
 import { UMB_ELEMENT_RECYCLE_BIN_REPOSITORY_ALIAS, UMB_ELEMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE } from '../constants.js';
 import { UMB_ELEMENT_REFERENCE_REPOSITORY_ALIAS } from '../../reference/constants.js';
-import { manifests as bulkTrashManifests } from './bulk-trash/manifests.js';
 import { UMB_ENTITY_HAS_CHILDREN_CONDITION_ALIAS } from '@umbraco-cms/backoffice/entity-action';
 import {
 	UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
@@ -86,5 +85,4 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Reload Element Recycle Bin Tree Item Children Entity Action',
 		forEntityTypes: [UMB_ELEMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE],
 	},
-	...bulkTrashManifests,
 ];
