@@ -1,4 +1,5 @@
 export * from './collection/index.js';
+export * from './entity-actions/index.js';
 export * from './constants.js';
 export * from './entity.js';
 export * from './global-components/index.js';
