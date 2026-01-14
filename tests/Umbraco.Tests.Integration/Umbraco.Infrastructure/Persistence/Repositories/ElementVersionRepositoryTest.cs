@@ -162,7 +162,6 @@ internal sealed class ElementVersionRepositoryTest : UmbracoIntegrationTest
 
         var content = ElementBuilder.CreateSimpleElement(contentType, "foo", culture: "en-US");
         content.SetCultureName("foo", "en-US");
-        ElementService.Save(content);
 
         ElementService.Save(content);
         ElementService.Publish(content, new[] { "en-US" }); // Draft + Published

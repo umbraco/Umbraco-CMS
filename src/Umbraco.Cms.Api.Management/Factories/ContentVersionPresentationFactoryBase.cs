@@ -15,6 +15,12 @@ internal abstract class ContentVersionPresentationFactoryBase<TVersionItemRespon
 
     protected abstract UmbracoObjectTypes ItemObjectType { get; }
 
+    protected ContentVersionPresentationFactoryBase(IEntityService entityService, IUserIdKeyResolver userIdKeyResolver)
+    {
+        _entityService = entityService;
+        _userIdKeyResolver = userIdKeyResolver;
+    }
+
     protected abstract TVersionItemResponseModel VersionItemResponseModelFactory(
         Guid versionId,
         ReferenceByIdModel item,
@@ -24,12 +30,6 @@ internal abstract class ContentVersionPresentationFactoryBase<TVersionItemRespon
         bool isCurrentPublishedVersion,
         bool isCurrentDraftVersion,
         bool preventCleanup);
-
-    protected ContentVersionPresentationFactoryBase(IEntityService entityService, IUserIdKeyResolver userIdKeyResolver)
-    {
-        _entityService = entityService;
-        _userIdKeyResolver = userIdKeyResolver;
-    }
 
     public async Task<TVersionItemResponseModel> CreateAsync(ContentVersionMeta contentVersion)
     {
