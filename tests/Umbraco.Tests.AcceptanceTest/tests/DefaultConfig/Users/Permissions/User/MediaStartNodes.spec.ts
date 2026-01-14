@@ -107,7 +107,7 @@ test("can see parent of start node but not access it", async ({
 
   // Assert
 
-  // Get initial URL (should be on content section)
+  // Get initial URL (should be on media section)
   await umbracoUi.waitForTimeout(100); // Wait for workspace to load
   const initialUrl = umbracoUi.page.url();
 
