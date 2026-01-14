@@ -31,7 +31,4 @@ internal class DocumentUrlAliasDto
     [NullSetting(NullSetting = NullSettings.NotNull)]
     [Length(255)]
     public string Alias { get; set; } = string.Empty;
-
-    [Column("rootAncestorKey")]
-    public Guid RootAncestorKey { get; set; }
 }

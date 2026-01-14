@@ -87,7 +87,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     }
 
     /// <summary>
-    /// Entry stores document key and root for domain scoping.
+    /// Entry stores document key for alias lookup.
     /// </summary>
     internal sealed class DocumentUrlAliasEntry
     {
@@ -95,11 +95,6 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         /// Gets the unique identifier for the document.
         /// </summary>
         public Guid DocumentKey { get; init; }
-
-        /// <summary>
-        /// Gets the unique identifier of the root ancestor entity in the hierarchy.
-        /// </summary>
-        public Guid RootAncestorKey { get; init; }
     }
 
     /// <summary>
@@ -191,23 +186,8 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
             return null;
         }
 
-        // If no domain scoping, return first match
-        if (domainRootKey is null)
-        {
-            return entries[0].DocumentKey;
-        }
-
-        // Filter by domain scope - find entry where RootAncestorKey matches or is descendant of domain root
-        foreach (DocumentUrlAliasEntry entry in entries)
-        {
-            if (entry.RootAncestorKey == domainRootKey.Value ||
-                IsDescendantOf(entry.DocumentKey, domainRootKey.Value))
-            {
-                return entry.DocumentKey;
-            }
-        }
-
-        // Fallback to first match if no domain-scoped match found
+        // Return first match
+        // Note: domainRootKey is currently unused but kept in the interface for future domain scoping support
         return entries[0].DocumentKey;
     }
 
@@ -232,16 +212,22 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         // Remove old aliases from cache
         RemoveFromCache(documentKey);
 
+        scope.WriteLock(Constants.Locks.DocumentUrlAliases);
+
         // Save to database (handles insert/update/delete via diff) and add to cache
         if (aliases.Count > 0)
         {
-            scope.WriteLock(Constants.Locks.DocumentUrlAliases);
             _documentUrlAliasRepository.Save(aliases);
 
             foreach (PublishedDocumentUrlAlias alias in aliases)
             {
                 AddToCache(alias);
             }
+        }
+        else
+        {
+            // No aliases - delete any existing aliases for this document from the database
+            _documentUrlAliasRepository.DeleteByDocumentKey(new[] { documentKey });
         }
 
         scope.Complete();
@@ -294,16 +280,11 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         // Use optimized SQL query to fetch only documents with aliases
         IEnumerable<DocumentUrlAliasRaw> rawAliases = _documentUrlAliasRepository.GetAllDocumentUrlAliases();
 
-        // Get root ancestor keys for domain scoping
         var documentKeys = rawAliases.Select(x => x.DocumentKey).Distinct().ToList();
-        Dictionary<Guid, Guid> rootAncestorMap = GetRootAncestorKeys(documentKeys);
-
         var toSave = new List<PublishedDocumentUrlAlias>();
 
         foreach (DocumentUrlAliasRaw raw in rawAliases)
         {
-            Guid rootAncestorKey = rootAncestorMap.GetValueOrDefault(raw.DocumentKey, raw.DocumentKey);
-
             // Invariant content (LanguageId = null) is stored for ALL languages (like DocumentUrlService)
             // This avoids cache invalidation when languages change or content varies by culture changes
             if (raw.LanguageId is null)
@@ -317,7 +298,6 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
                             DocumentKey = raw.DocumentKey,
                             LanguageId = language.Id,
                             Alias = alias,
-                            RootAncestorKey = rootAncestorKey,
                         });
                     }
                 }
@@ -331,7 +311,6 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
                         DocumentKey = raw.DocumentKey,
                         LanguageId = raw.LanguageId.Value,
                         Alias = alias,
-                        RootAncestorKey = rootAncestorKey,
                     });
                 }
             }
@@ -353,7 +332,6 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     private async Task<List<PublishedDocumentUrlAlias>> ExtractAliasesFromDocumentAsync(IContent document)
     {
         var aliases = new List<PublishedDocumentUrlAlias>();
-        Guid rootAncestorKey = GetRootAncestorKey(document.Key);
         IEnumerable<ILanguage> languages = await _languageService.GetAllAsync();
 
         // Handle invariant content - store alias for ALL languages (like DocumentUrlService)
@@ -373,7 +351,6 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
                             DocumentKey = document.Key,
                             LanguageId = language.Id,
                             Alias = alias,
-                            RootAncestorKey = rootAncestorKey,
                         });
                     }
                 }
@@ -399,7 +376,6 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
                     DocumentKey = document.Key,
                     LanguageId = language.Id,
                     Alias = alias,
-                    RootAncestorKey = rootAncestorKey,
                 });
             }
         }
@@ -442,7 +418,6 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         var entry = new DocumentUrlAliasEntry
         {
             DocumentKey = alias.DocumentKey,
-            RootAncestorKey = alias.RootAncestorKey
         };
 
         _aliasCache.AddOrUpdate(
@@ -503,38 +478,6 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
                 _aliasCache.TryRemove(key, out _);
             }
         }
-    }
-
-    private Dictionary<Guid, Guid> GetRootAncestorKeys(IEnumerable<Guid> documentKeys)
-    {
-        var result = new Dictionary<Guid, Guid>();
-        foreach (Guid documentKey in documentKeys)
-        {
-            result[documentKey] = GetRootAncestorKey(documentKey);
-        }
-        return result;
-    }
-
-    private Guid GetRootAncestorKey(Guid documentKey)
-    {
-        if (_documentNavigationQueryService.TryGetAncestorsKeys(documentKey, out IEnumerable<Guid> ancestorKeys))
-        {
-            var ancestors = ancestorKeys.ToList();
-            if (ancestors.Count > 0)
-            {
-                return ancestors[0]; // First ancestor is the root (ancestors are returned root → immediate parent)
-            }
-        }
-        return documentKey; // Document is itself a root
-    }
-
-    private bool IsDescendantOf(Guid documentKey, Guid potentialAncestorKey)
-    {
-        if (_documentNavigationQueryService.TryGetAncestorsKeys(documentKey, out IEnumerable<Guid> ancestorKeys))
-        {
-            return ancestorKeys.Contains(potentialAncestorKey);
-        }
-        return false;
     }
 
     private static string NormalizeAlias(string alias)

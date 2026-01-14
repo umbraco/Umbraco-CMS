@@ -300,6 +300,45 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task CreateOrUpdateAliasesAsync_Removes_Alias_From_Database_When_Cleared()
+    {
+        var documentKey = new Guid(PageWithSingleAliasKey);
+
+        // Verify original alias exists in database
+        List<PublishedDocumentUrlAlias> aliasesBefore;
+        using (ICoreScope scope = CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            aliasesBefore = DocumentUrlAliasRepository.GetAll()
+                .Where(a => a.DocumentKey == documentKey)
+                .ToList();
+        }
+
+        Assert.That(aliasesBefore, Has.Count.EqualTo(1), "Expected 1 alias in database before clearing");
+        Assert.That(aliasesBefore[0].Alias, Is.EqualTo("my-single-alias"));
+
+        // Re-fetch the content to get the current version (after PublishBranch in setup)
+        var content = ContentService.GetById(documentKey)!;
+
+        // Clear the alias
+        content.SetValue(Constants.Conventions.Content.UrlAlias, string.Empty);
+        ContentService.Save(content, -1);
+        ContentService.Publish(content, []);
+
+        await DocumentUrlAliasService.CreateOrUpdateAliasesAsync(content.Key);
+
+        // Alias should be removed from database
+        List<PublishedDocumentUrlAlias> aliasesAfter;
+        using (ICoreScope scope = CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            aliasesAfter = DocumentUrlAliasRepository.GetAll()
+                .Where(a => a.DocumentKey == documentKey)
+                .ToList();
+        }
+
+        Assert.That(aliasesAfter, Is.Empty, "Expected no aliases in database after clearing the property");
+    }
+
+    [Test]
     public async Task CreateOrUpdateAliasesAsync_Does_Not_Throw_For_Non_Existent_Document()
     {
         Assert.DoesNotThrowAsync(async () =>
