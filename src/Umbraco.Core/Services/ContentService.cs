@@ -186,67 +186,6 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
 
     #endregion
 
-    #region Rollback
-
-    public OperationResult Rollback(int id, int versionId, string culture = "*", int userId = Constants.Security.SuperUserId)
-    {
-        EventMessages evtMsgs = EventMessagesFactory.Get();
-
-        // Get the current copy of the node
-        IContent? content = GetById(id);
-
-        // Get the version
-        IContent? version = GetVersion(versionId);
-
-        // Good old null checks
-        if (content == null || version == null || content.Trashed)
-        {
-            return new OperationResult(OperationResultType.FailedCannot, evtMsgs);
-        }
-
-        // Store the result of doing the save of content for the rollback
-        OperationResult rollbackSaveResult;
-
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            var rollingBackNotification = new ContentRollingBackNotification(content, evtMsgs);
-            if (scope.Notifications.PublishCancelable(rollingBackNotification))
-            {
-                scope.Complete();
-                return OperationResult.Cancel(evtMsgs);
-            }
-
-            // Copy the changes from the version
-            content.CopyFrom(version, culture);
-
-            // Save the content for the rollback
-            rollbackSaveResult = Save(content, userId);
-
-            // Depending on the save result - is what we log & audit along with what we return
-            if (rollbackSaveResult.Success == false)
-            {
-                // Log the error/warning
-                _logger.LogError(
-                    "User '{UserId}' was unable to rollback content '{ContentId}' to version '{VersionId}'", userId, id, versionId);
-            }
-            else
-            {
-                scope.Notifications.Publish(
-                    new ContentRolledBackNotification(content, evtMsgs).WithStateFrom(rollingBackNotification));
-
-                // Logging & Audit message
-                _logger.LogInformation("User '{UserId}' rolled back content '{ContentId}' to version '{VersionId}'", userId, id, versionId);
-                Audit(AuditType.RollBack, userId, id, $"Content '{content.Name}' was rolled back to version '{versionId}'");
-            }
-
-            scope.Complete();
-        }
-
-        return rollbackSaveResult;
-    }
-
-    #endregion
-
     #region Permissions
 
     /// <summary>
@@ -2151,6 +2090,12 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
 
     protected override DeletedVersionsNotification<IContent> DeletedVersionsNotification(int id, EventMessages messages, int specificVersion = default, bool deletePriorVersions = false, DateTime dateToRetain = default)
         => new ContentDeletedVersionsNotification(id, messages, specificVersion, deletePriorVersions, dateToRetain);
+
+    protected override RollingBackNotification<IContent> RollingBackNotification(IContent target, EventMessages messages)
+        => new ContentRollingBackNotification(target, messages);
+
+    protected override RolledBackNotification<IContent> RolledBackNotification(IContent target, EventMessages messages)
+        => new ContentRolledBackNotification(target, messages);
 
     #endregion
 }

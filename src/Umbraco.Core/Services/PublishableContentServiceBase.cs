@@ -114,6 +114,70 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
     protected abstract DeletedVersionsNotification<TContent> DeletedVersionsNotification(int id, EventMessages messages, int specificVersion = default, bool deletePriorVersions = false, DateTime dateToRetain = default);
 
+    protected abstract RollingBackNotification<TContent> RollingBackNotification(TContent target, EventMessages messages);
+
+    protected abstract RolledBackNotification<TContent> RolledBackNotification(TContent target, EventMessages messages);
+
+    #region Rollback
+
+    public OperationResult Rollback(int id, int versionId, string culture = "*", int userId = Constants.Security.SuperUserId)
+    {
+        EventMessages evtMsgs = EventMessagesFactory.Get();
+
+        // Get the current copy of the node
+        TContent? content = GetById(id);
+
+        // Get the version
+        TContent? version = GetVersion(versionId);
+
+        // Good old null checks
+        if (content == null || version == null || content.Trashed)
+        {
+            return new OperationResult(OperationResultType.FailedCannot, evtMsgs);
+        }
+
+        // Store the result of doing the save of content for the rollback
+        OperationResult rollbackSaveResult;
+
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        {
+            var rollingBackNotification = RollingBackNotification(content, evtMsgs);
+            if (scope.Notifications.PublishCancelable(rollingBackNotification))
+            {
+                scope.Complete();
+                return OperationResult.Cancel(evtMsgs);
+            }
+
+            // Copy the changes from the version
+            content.CopyFrom(version, culture);
+
+            // Save the content for the rollback
+            rollbackSaveResult = Save(content, userId);
+
+            // Depending on the save result - is what we log & audit along with what we return
+            if (rollbackSaveResult.Success == false)
+            {
+                // Log the error/warning
+                Logger.LogError(
+                    "User '{UserId}' was unable to rollback content '{ContentId}' to version '{VersionId}'", userId, id, versionId);
+            }
+            else
+            {
+                scope.Notifications.Publish(RolledBackNotification(content, evtMsgs).WithStateFrom(rollingBackNotification));
+
+                // Logging & Audit message
+                Logger.LogInformation("User '{UserId}' rolled back content '{ContentId}' to version '{VersionId}'", userId, id, versionId);
+                Audit(AuditType.RollBack, userId, id, $"Content '{content.Name}' was rolled back to version '{versionId}'");
+            }
+
+            scope.Complete();
+        }
+
+        return rollbackSaveResult;
+    }
+
+    #endregion
+
 
     #region Count
 

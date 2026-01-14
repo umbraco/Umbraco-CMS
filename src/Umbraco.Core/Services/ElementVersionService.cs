@@ -1,24 +1,23 @@
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 
-// ReSharper disable once CheckNamespace
 namespace Umbraco.Cms.Core.Services;
 
-internal sealed class ContentVersionService : ContentVersionServiceBase<IContent>, IContentVersionService
+internal sealed class ElementVersionService : ContentVersionServiceBase<IElement>, IElementVersionService
 {
-    public ContentVersionService(
-        ILogger<ContentVersionService> logger,
-        IDocumentVersionRepository contentVersionRepository,
+    public ElementVersionService(
+        ILogger<ElementVersionService> logger,
+        IElementVersionRepository contentVersionRepository,
         IContentVersionCleanupPolicy contentVersionCleanupPolicy,
         ICoreScopeProvider scopeProvider,
         IEventMessagesFactory eventMessagesFactory,
         IAuditService auditService,
         ILanguageRepository languageRepository,
         IEntityService entityService,
-        IContentService contentService,
+        IElementService contentService,
         IUserIdKeyResolver userIdKeyResolver)
         : base(
             logger,
@@ -34,5 +33,5 @@ internal sealed class ContentVersionService : ContentVersionServiceBase<IContent
     {
     }
 
-    protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.Document;
+    protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.Element;
 }
