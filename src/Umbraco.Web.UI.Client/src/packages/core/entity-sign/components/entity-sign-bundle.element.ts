@@ -172,7 +172,7 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 			/* Base positioning for browsers WITHOUT anchor positioning support (Safari) */
 			.infobox {
 				position: absolute;
-				top: 1px;
+				top: 18px;
 				margin-top: calc(-12px + var(--offset-h));
 				left: 17px;
 				margin-left: -6px;
@@ -230,26 +230,16 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 			}
 
 			/*OPEN STATE -- Prevent the hover state in firefox(until support of the position-anchor)*/
-			@supports (position-anchor: --any-check) {
-				/* Closed state positioning for Chrome */
-				.infobox {
-					position: absolute;
-					top: 18px;
-					margin-top: calc(-12px + var(--offset-h));
-					left: 18px;
-					margin-left: -6px;
-				}
-
+			@supports (position-anchor: --entity-sign) {
 				/* Open state for Chrome */
 				.infobox.is-open {
 					position: fixed;
 					position-anchor: --entity-sign;
-					top: anchor(bottom);
-					left: anchor(right);
+					inset-block-start: anchor(--entity-sign bottom);
+					inset-inline-start: anchor(--entity-sign right);
+
 					margin-top: 0;
 					margin-left: 0;
-					//z-index: 10;
-					background-color: var(--uui-color-surface);
 					font-size: 12px;
 					color: var(--uui-color-text);
 					clip-path: inset(-12px);
@@ -279,6 +269,14 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 				.infobox.is-open .sign-container .label {
 					opacity: 1;
 					pointer-events: auto;
+				}
+			}
+			@-moz-document url-prefix() {
+				.infobox {
+					top: 1px;
+				}
+				.infobox.is-open {
+					margin-left: 12px;
 				}
 			}
 		`,
