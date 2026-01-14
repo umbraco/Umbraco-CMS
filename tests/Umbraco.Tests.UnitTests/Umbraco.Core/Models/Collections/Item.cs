@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Extensions;
@@ -239,4 +240,6 @@ public abstract class Item : IEntity, ICanBeDirty
 
         throw new NotImplementedException();
     }
+
+    public override int GetHashCode() => RuntimeHelpers.GetHashCode(this);
 }
