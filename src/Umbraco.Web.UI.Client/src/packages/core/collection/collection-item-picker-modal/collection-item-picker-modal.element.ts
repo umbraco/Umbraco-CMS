@@ -118,7 +118,7 @@ export class UmbCollectionItemPickerModalElement extends UmbModalBaseElement<
 			<umb-body-layout
 				headline="${this.localize.term('general_choose')}"
 				?main-no-padding=${renderFullCollection}
-				class=${classMap({ 'has-search': this._isSearchable })}>
+				class=${classMap({ 'has-search': this._isSearchable, 'is-searching': !!this._searchQuery })}>
 				${this.#renderSearch()} ${this.#renderMain(renderFullCollection)} ${this.#renderActions()}
 			</umb-body-layout>
 		`;
@@ -143,10 +143,6 @@ export class UmbCollectionItemPickerModalElement extends UmbModalBaseElement<
 	}
 
 	#renderCollection() {
-		if (this._searchQuery) {
-			return nothing;
-		}
-
 		return html`
 			<umb-collection
 				alias=${this.data?.collection.alias}
@@ -160,12 +156,8 @@ export class UmbCollectionItemPickerModalElement extends UmbModalBaseElement<
 	}
 
 	#renderCollectionMenu() {
-		if (this._searchQuery) {
-			return nothing;
-		}
-
 		return html`
-			<uui-box
+			<uui-box id="collection-menu-box"
 				><umb-collection-menu
 					alias=${ifDefined(this.data?.collection?.menuAlias)}
 					.props=${{
@@ -209,6 +201,13 @@ export class UmbCollectionItemPickerModalElement extends UmbModalBaseElement<
 
 				umb-collection {
 					margin-top: calc(-1 * var(--uui-size-4));
+				}
+			}
+
+			umb-body-layout.is-searching {
+				umb-collection,
+				#collection-menu-box {
+					display: none;
 				}
 			}
 		`,
