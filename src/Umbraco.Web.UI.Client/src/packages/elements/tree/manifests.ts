@@ -1,5 +1,4 @@
 import { UMB_ELEMENT_ENTITY_TYPE, UMB_ELEMENT_ROOT_ENTITY_TYPE } from '../entity.js';
-import { manifests as folderManifests } from './folder/manifests.js';
 import { UMB_ELEMENT_TREE_ALIAS, UMB_ELEMENT_TREE_REPOSITORY_ALIAS } from './constants.js';
 import type { ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 import type { ManifestTree, ManifestTreeItem } from '@umbraco-cms/backoffice/tree';
@@ -39,4 +38,4 @@ const treeItems: Array<ManifestTreeItem> = [
 	},
 ];
 
-export const manifests: Array<UmbExtensionManifest> = [...folderManifests, repository, tree, ...treeItems];
+export const manifests: Array<UmbExtensionManifest> = [repository, tree, ...treeItems];

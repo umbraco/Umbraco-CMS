@@ -1,5 +1,4 @@
-import { UMB_ELEMENT_FOLDER_ENTITY_TYPE } from '../../tree/folder/constants.js';
-import { UMB_ELEMENT_ROOT_ENTITY_TYPE } from '../../entity.js';
+import { UMB_ELEMENT_ROOT_ENTITY_TYPE, UMB_ELEMENT_FOLDER_ENTITY_TYPE } from '../../entity.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{

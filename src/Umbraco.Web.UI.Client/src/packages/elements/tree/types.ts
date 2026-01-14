@@ -1,5 +1,4 @@
-import type { UmbElementEntityType, UmbElementRootEntityType } from '../entity.js';
-import type { UmbElementFolderEntityType } from './folder/entity.js';
+import type { UmbElementEntityType, UmbElementRootEntityType, UmbElementFolderEntityType } from '../entity.js';
 import type { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import type { UmbTreeItemModel, UmbTreeRootModel } from '@umbraco-cms/backoffice/tree';

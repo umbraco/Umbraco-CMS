@@ -1,4 +1,4 @@
-import { UMB_ELEMENT_FOLDER_ENTITY_TYPE } from '../entity.js';
+import { UMB_ELEMENT_FOLDER_ENTITY_TYPE } from '../../entity.js';
 import { UmbPathPattern } from '@umbraco-cms/backoffice/router';
 import { UMB_LIBRARY_SECTION_PATHNAME } from '@umbraco-cms/backoffice/library';
 import { UMB_WORKSPACE_PATH_PATTERN } from '@umbraco-cms/backoffice/workspace';

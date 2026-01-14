@@ -1,4 +1,4 @@
-import { UMB_ELEMENT_FOLDER_ENTITY_TYPE } from '../entity.js';
+import { UMB_ELEMENT_FOLDER_ENTITY_TYPE } from '../../entity.js';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { ElementService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
@@ -9,7 +9,7 @@ import type { UmbFolderModel } from '@umbraco-cms/backoffice/tree';
 /**
  * A data source for a Element folder that fetches data from the server
  * @class UmbElementFolderServerDataSource
- * @implements {RepositoryDetailDataSource}
+ * @implements {UmbDetailDataSource}
  */
 export class UmbElementFolderServerDataSource implements UmbDetailDataSource<UmbFolderModel> {
 	#host: UmbControllerHost;

@@ -1,7 +1,6 @@
-import { UMB_ELEMENT_ENTITY_TYPE } from '../../entity.js';
+import { UMB_ELEMENT_ENTITY_TYPE, UMB_ELEMENT_FOLDER_ENTITY_TYPE } from '../../entity.js';
 import { UMB_ELEMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE } from '../constants.js';
 import type { UmbElementRecycleBinTreeItemModel } from '../types.js';
-import { UMB_ELEMENT_FOLDER_ENTITY_TYPE } from '../../tree/folder/entity.js';
 import type { UmbElementTreeItemVariantModel } from '../../tree/types.js';
 import { ElementService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
