@@ -241,7 +241,9 @@ public interface IUserService : IMembershipUserService
     /// <param name="userKey">Key of user to retrieve permissions for. </param>
     /// <param name="elementKeys">The keys of the elements to get permissions for.</param>
     /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="UserOperationStatus"/>, and an enumerable of permissions.</returns>
-    Task<Attempt<IEnumerable<NodePermissions>, UserOperationStatus>> GetElementPermissionsAsync(Guid userKey, IEnumerable<Guid> elementKeys);
+    Task<Attempt<IEnumerable<NodePermissions>, UserOperationStatus>> GetElementPermissionsAsync(
+        Guid userKey,
+        IEnumerable<Guid> elementKeys) => throw new NotImplementedException(); // TODO (V19): Remove default implementation.
 
     /// <summary>
     ///     Get explicitly assigned permissions for a user and optional node ids
