@@ -47,6 +47,7 @@ export class UmbUserGroupCollectionServerDataSource implements UmbCollectionData
 					mediaRootAccess: item.mediaRootAccess,
 					mediaStartNode: item.mediaStartNode ? { unique: item.mediaStartNode.id } : null,
 					name: item.name,
+					description: item.description || null,
 					permissions: item.permissions,
 					sections: item.sections,
 					unique: item.id,

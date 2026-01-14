@@ -67,7 +67,7 @@ test.skip('can edit property values in block list with UI write permission', {ta
   await umbracoUi.content.clickEditBlockListBlockButton();
   await umbracoUi.content.enterTextstring(updatedText);
   await umbracoUi.content.clickUpdateButton();
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
   const documentData = await umbracoApi.document.getByName(documentName);
@@ -126,7 +126,7 @@ test.skip('can edit property values in block grid with UI write permission', {ta
   await umbracoUi.content.clickEditBlockGridBlockButton();
   await umbracoUi.content.enterTextstring(updatedText);
   await umbracoUi.content.clickUpdateButton();
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
   const documentData = await umbracoApi.document.getByName(documentName);

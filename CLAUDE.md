@@ -142,8 +142,33 @@ Web.UI → Web.Common → Infrastructure → Core
 ### Branching Strategy
 
 - **Main branch**: `main` (protected)
-- **Branch naming**:
-  - See `.github/CONTRIBUTING.md` for full guidelines
+- **Branch naming convention**: `v<version>/<type>/<description>`
+
+**Format**: `v{major-version}/{type}/{kebab-case-description}`
+
+**Version**: Read from `version.json` in the repository root. Use the major version number (e.g., `v17` for version 17.x.x).
+
+**Types**:
+| Type | Use Case |
+|------|----------|
+| `feature` | New feature being introduced to the product |
+| `bugfix` | Fix to an existing issue with the product |
+| `qa` | Adding or updating unit, integration, or end-to-end tests |
+| `improvement` | Update to something that already exists but isn't broken (UI finessing, refactoring) |
+| `task` | Update that doesn't directly impact product behavior (dependency updates, build pipeline) |
+
+**Description**: A short, kebab-case description (a few words). This should be prefixed with the GitHub issue number if the update is related to resolving a tracked issue.
+
+**Examples**:
+```
+v17/bugfix/12345-correct-display-of-pending-migrations
+v17/feature/add-webhook-support
+v17/improvement/optimize-content-cache
+v17/qa/add-media-service-tests
+v17/task/update-ef-core-dependency
+```
+
+See `.github/CONTRIBUTING.md` for full guidelines.
 
 ### Pull Request Process
 
