@@ -163,7 +163,41 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
             return Attempt.Fail(EntityContainerOperationStatus.CancelledByNotification);
         }
 
-        DeleteDescendantsLocked(null);
+        long total;
+        do
+        {
+            IEnumerable<IEntitySlim> recycleBinRootItems = _entityService.GetPagedChildren(
+                Constants.System.RecycleBinElementKey,
+                [UmbracoObjectTypes.ElementContainer],
+                [UmbracoObjectTypes.ElementContainer, UmbracoObjectTypes.Element],
+                0, // pageIndex = 0 because we continuously delete items as we move through the descendants
+                DescendantsIteratorPageSize,
+                trashed: true,
+                out total);
+
+            foreach (IEntitySlim recycleBinRootItem in recycleBinRootItems)
+            {
+                DeleteDescendantsLocked(recycleBinRootItem.Key);
+
+                if (recycleBinRootItem.NodeObjectType == Constants.ObjectTypes.Element)
+                {
+                    IElement? element = _elementRepository.Get(recycleBinRootItem.Key);
+                    if (element is not null)
+                    {
+                        _elementRepository.Delete(element);
+                    }
+                }
+                else
+                {
+                    EntityContainer? container = await GetAsync(recycleBinRootItem.Key);
+                    if (container is not null)
+                    {
+                        _entityContainerRepository.Delete(container);
+                    }
+                }
+            }
+        }
+        while (total > DescendantsIteratorPageSize);
 
         await AuditAsync(AuditType.Delete, userKey, Constants.System.RecycleBinElement, "Recycle bin emptied");
 
@@ -316,7 +350,7 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
         return Attempt.SucceedWithStatus<EntityContainer?, EntityContainerOperationStatus>(EntityContainerOperationStatus.Success, container);
     }
 
-    private void DeleteDescendantsLocked(Guid? key)
+    private void DeleteDescendantsLocked(Guid key)
     {
         long total;
 
@@ -326,7 +360,7 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
                 key,
                 UmbracoObjectTypes.ElementContainer,
                 [UmbracoObjectTypes.ElementContainer, UmbracoObjectTypes.Element],
-                0, // pageIndex = 0 because the move operation is path based (starts-with), and we update paths as we move through the descendants
+                0, // pageIndex = 0 because we continuously delete items as we move through the descendants
                 DescendantsIteratorPageSize,
                 out total);
 
