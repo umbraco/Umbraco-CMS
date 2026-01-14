@@ -10,15 +10,22 @@ import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/ev
 
 @customElement('umb-element-item-ref')
 export class UmbElementItemRefElement extends UmbLitElement {
+	#item?: UmbElementItemModel;
+
 	@property({ type: Object })
 	public set item(value: UmbElementItemModel | undefined) {
+		this.#item = value;
+
 		if (!value) return;
 
 		this._unique = value.unique;
-		this._name = 'TODO: Implmenent element name'; // TODO: Implement name when available in the API. [LK:2026-01-06]
+		this._name = value.variants[0].name; // TODO: Implement name when available in the API. [LK:2026-01-06]
 		this._icon = value.documentType.icon;
 		this._isTrashed = value.isTrashed ?? false;
 		this._isDraft = false;
+	}
+	public get item(): UmbElementItemModel | undefined {
+		return this.#item;
 	}
 
 	@property({ type: Boolean, reflect: true })
@@ -66,14 +73,14 @@ export class UmbElementItemRefElement extends UmbLitElement {
 				return { data: { entityType: UMB_ELEMENT_ENTITY_TYPE, preset: {} } };
 			})
 			.observeRouteBuilder((routeBuilder) => {
-				this._editPath = routeBuilder({});
+				this._editPath = routeBuilder({ entityType: UMB_ELEMENT_ENTITY_TYPE });
 			});
 	}
 
 	#getHref() {
 		if (!this._unique) return;
 		const path = UMB_EDIT_ELEMENT_WORKSPACE_PATH_PATTERN.generateLocal({ unique: this._unique });
-		return `${this._editPath}/${path}`;
+		return this._editPath + path;
 	}
 
 	#onSelected(event: UUISelectableEvent) {

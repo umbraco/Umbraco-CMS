@@ -25,7 +25,6 @@ import { manifests as textareaManifests } from './textarea/manifests.js';
 import { manifests as textBoxManifests } from './text-box/manifests.js';
 import { manifests as toggleManifests } from './toggle/manifests.js';
 import { manifests as contentPickerManifests } from './content-picker/manifests.js';
-import { manifests as elementPickerManifests } from './element-picker/manifests.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	...checkboxListManifests,
@@ -46,7 +45,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 	...textBoxManifests,
 	...toggleManifests,
 	...contentPickerManifests,
-	...elementPickerManifests,
 	acceptedType,
 	colorEditor,
 	dimensions,
