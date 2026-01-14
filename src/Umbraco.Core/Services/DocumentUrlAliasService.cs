@@ -209,13 +209,47 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         ThrowIfNotInitialized();
 
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        scope.WriteLock(Constants.Locks.DocumentUrlAliases);
 
+        await CreateOrUpdateAliasesInternalAsync(documentKey);
+
+        scope.Complete();
+    }
+
+    /// <inheritdoc/>
+    public async Task CreateOrUpdateAliasesWithDescendantsAsync(Guid documentKey)
+    {
+        ThrowIfNotInitialized();
+
+        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        scope.WriteLock(Constants.Locks.DocumentUrlAliases);
+
+        // Get document and all descendants
+        var documentKeys = new List<Guid> { documentKey };
+        if (_documentNavigationQueryService.TryGetDescendantsKeys(documentKey, out IEnumerable<Guid> descendantKeys))
+        {
+            documentKeys.AddRange(descendantKeys);
+        }
+
+        foreach (Guid key in documentKeys)
+        {
+            await CreateOrUpdateAliasesInternalAsync(key);
+        }
+
+        scope.Complete();
+    }
+
+    /// <summary>
+    /// Internal implementation that processes a single document without creating its own scope.
+    /// Caller must ensure a scope with write lock is active.
+    /// </summary>
+    private async Task CreateOrUpdateAliasesInternalAsync(Guid documentKey)
+    {
         IContent? document = _contentService.GetById(documentKey);
         if (document is null || document.Trashed || document.Blueprint)
         {
             // Remove from cache if document doesn't exist, is trashed, or is a blueprint.
             RemoveFromCacheDeferred(_coreScopeProvider.Context!, documentKey);
-            scope.Complete();
             return;
         }
 
@@ -223,8 +257,6 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
 
         // Remove old aliases from cache (deferred until scope completes)
         RemoveFromCacheDeferred(_coreScopeProvider.Context!, documentKey);
-
-        scope.WriteLock(Constants.Locks.DocumentUrlAliases);
 
         // Save to database (handles insert/update/delete via diff) and add to cache
         if (aliases.Count > 0)
@@ -241,30 +273,6 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
             // No aliases - delete any existing aliases for this document from the database
             _documentUrlAliasRepository.DeleteByDocumentKey(new[] { documentKey });
         }
-
-        scope.Complete();
-    }
-
-    /// <inheritdoc/>
-    public async Task CreateOrUpdateAliasesWithDescendantsAsync(Guid documentKey)
-    {
-        ThrowIfNotInitialized();
-
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
-
-        // Get document and all descendants
-        var documentKeys = new List<Guid> { documentKey };
-        if (_documentNavigationQueryService.TryGetDescendantsKeys(documentKey, out IEnumerable<Guid> descendantKeys))
-        {
-            documentKeys.AddRange(descendantKeys);
-        }
-
-        foreach (Guid key in documentKeys)
-        {
-            await CreateOrUpdateAliasesAsync(key);
-        }
-
-        scope.Complete();
     }
 
     /// <inheritdoc/>
