@@ -44,17 +44,6 @@ public class ElementTreeControllerBase : UserStartNodeFolderTreeControllerBase<E
 
     protected override UmbracoObjectTypes FolderObjectType => UmbracoObjectTypes.ElementContainer;
 
-    protected override Ordering ItemOrdering
-    {
-        get
-        {
-            var ordering = Ordering.By(nameof(Infrastructure.Persistence.Dtos.NodeDto.NodeObjectType), Direction.Descending); // We need to override to change direction
-            ordering.Next = Ordering.By(nameof(Infrastructure.Persistence.Dtos.NodeDto.Text));
-
-            return ordering;
-        }
-    }
-
     protected override int[] GetUserStartNodeIds()
         => _backOfficeSecurityAccessor
                .BackOfficeSecurity?
