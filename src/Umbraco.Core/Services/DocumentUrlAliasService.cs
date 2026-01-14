@@ -42,8 +42,8 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     // Reverse lookup: document -> aliases (for cache invalidation).
     private readonly ConcurrentDictionary<Guid, HashSet<AliasCacheKey>> _documentToAliasesCache = new();
 
-    // Culture to language ID map (for memory efficiency).
-    private readonly ConcurrentDictionary<string, int> _cultureToLanguageIdMap = new();
+    // Culture to language ID map (for memory efficiency). Case-insensitive for culture codes like "en-US" vs "en-us".
+    private readonly ConcurrentDictionary<string, int> _cultureToLanguageIdMap = new(StringComparer.OrdinalIgnoreCase);
 
     private bool _isInitialized;
 
@@ -53,7 +53,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     internal readonly struct AliasCacheKey : IEquatable<AliasCacheKey>
     {
         /// <summary>
-        /// Initializes a new instance of the AliasCacheKey class with the specified normalized alias and language
+        /// Initializes a new instance of the <see cref="AliasCacheKey"/> struct.
         /// identifier.
         /// </summary>
         /// <param name="normalizedAlias">The alias string that has been normalized for consistent comparison.</param>
@@ -163,19 +163,19 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         // Default to the default language when culture is not specified (like DocumentUrlService)
         culture ??= _languageService.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
 
-        if (!TryGetLanguageId(culture, out var languageId))
+        if (TryGetLanguageId(culture, out var languageId) is false)
         {
             return [];
         }
 
         var cacheKey = new AliasCacheKey(normalizedAlias, languageId);
 
-        if (!_aliasCache.TryGetValue(cacheKey, out List<Guid>? documentKeys) || documentKeys.Count == 0)
+        if (_aliasCache.TryGetValue(cacheKey, out List<Guid>? documentKeys) is false || documentKeys.Count == 0)
         {
             return [];
         }
 
-        // Return all matching document keys
+        // Return all matching document keys.
         return documentKeys;
     }
 
@@ -187,17 +187,17 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         // Default to the default language when culture is not specified (like DocumentUrlService)
         culture ??= _languageService.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
 
-        if (!TryGetLanguageId(culture, out var languageId))
+        if (TryGetLanguageId(culture, out var languageId) is false)
         {
             return [];
         }
 
-        if (!_documentToAliasesCache.TryGetValue(documentKey, out HashSet<AliasCacheKey>? aliasKeys) || aliasKeys.Count == 0)
+        if (_documentToAliasesCache.TryGetValue(documentKey, out HashSet<AliasCacheKey>? aliasKeys) is false || aliasKeys.Count == 0)
         {
             return [];
         }
 
-        // Filter by language and return the alias strings
+        // Filter by language and return the alias strings.
         return aliasKeys
             .Where(key => key.LanguageId == languageId)
             .Select(key => key.NormalizedAlias)
@@ -214,7 +214,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         IContent? document = _contentService.GetById(documentKey);
         if (document is null || document.Trashed || document.Blueprint)
         {
-            // Remove from cache if document doesn't exist, is trashed, or is a blueprint
+            // Remove from cache if document doesn't exist, is trashed, or is a blueprint.
             RemoveFromCacheDeferred(_coreScopeProvider.Context!, documentKey);
             scope.Complete();
             return;
@@ -375,8 +375,8 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         var aliases = new List<PublishedDocumentUrlAlias>();
         IEnumerable<ILanguage> languages = await _languageService.GetAllAsync();
 
-        // Handle invariant content - store alias for ALL languages (like DocumentUrlService)
-        // This avoids cache invalidation when languages change or content varies by culture changes
+        // Handle invariant content - store alias for ALL languages (like DocumentUrlService).
+        // This avoids cache invalidation when languages change or content varies by culture changes.
         if (document.ContentType.VariesByCulture() is false)
         {
             var aliasValue = document.GetValue<string>(Constants.Conventions.Content.UrlAlias);
@@ -427,7 +427,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     private bool ShouldRebuildAliases()
     {
         var persistedValue = _keyValueService.GetValue(RebuildKey);
-        return !string.Equals(persistedValue, CurrentRebuildValue, StringComparison.Ordinal);
+        return string.Equals(persistedValue, CurrentRebuildValue, StringComparison.Ordinal) is false;
     }
 
     private void PopulateCultureToLanguageIdMap(IEnumerable<ILanguage> languages)
@@ -465,13 +465,13 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
             _ => new List<Guid> { alias.DocumentKey },
             (_, existingList) =>
             {
-                // Avoid duplicates - use immutable pattern for thread safety
+                // Avoid duplicates - use immutable pattern for thread safety.
                 if (existingList.Contains(alias.DocumentKey))
                 {
                     return existingList;
                 }
 
-                // Create new list to avoid concurrent modification
+                // Create new list to avoid concurrent modification.
                 var newList = new List<Guid>(existingList.Count + 1);
                 newList.AddRange(existingList);
                 newList.Add(alias.DocumentKey);
@@ -488,7 +488,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
                     return existingSet;
                 }
 
-                // Create new set to avoid concurrent modification
+                // Create new set to avoid concurrent modification.
                 return new HashSet<AliasCacheKey>(existingSet) { cacheKey };
             });
     }
@@ -497,21 +497,19 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     /// Adds an alias to the cache when the scope completes successfully.
     /// This ensures cache updates are rolled back if the database transaction fails.
     /// </summary>
-    private void AddToCacheDeferred(IScopeContext scopeContext, PublishedDocumentUrlAlias alias)
-    {
+    private void AddToCacheDeferred(IScopeContext scopeContext, PublishedDocumentUrlAlias alias) =>
         scopeContext.Enlist($"AddAliasToCache_{alias.DocumentKey}_{alias.Alias}_{alias.LanguageId}", () =>
         {
             AddToCache(alias);
             return true;
         });
-    }
 
     /// <summary>
     /// Removes all aliases for a document from the cache immediately. Used during initialization and rebuild.
     /// </summary>
     private void RemoveFromCache(Guid documentKey)
     {
-        if (!_documentToAliasesCache.TryRemove(documentKey, out HashSet<AliasCacheKey>? keys))
+        if (_documentToAliasesCache.TryRemove(documentKey, out HashSet<AliasCacheKey>? keys) is false)
         {
             return;
         }
@@ -528,10 +526,14 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
                     return existingList.Where(k => k != documentKey).ToList();
                 });
 
-            // Clean up empty entries
+            // Clean up empty entries using atomic compare-and-remove.
+            // This ensures we only remove if the value reference hasn't changed since we checked.
+            // If another thread added a document (creating a new list via immutable pattern),
+            // this removal will safely fail because the list reference won't match.
             if (_aliasCache.TryGetValue(key, out List<Guid>? documentKeys) && documentKeys.Count == 0)
             {
-                _aliasCache.TryRemove(key, out _);
+                ((ICollection<KeyValuePair<AliasCacheKey, List<Guid>>>)_aliasCache)
+                    .Remove(new KeyValuePair<AliasCacheKey, List<Guid>>(key, documentKeys));
             }
         }
     }
@@ -540,23 +542,19 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     /// Removes all aliases for a document from the cache when the scope completes successfully.
     /// This ensures cache updates are rolled back if the database transaction fails.
     /// </summary>
-    private void RemoveFromCacheDeferred(IScopeContext scopeContext, Guid documentKey)
-    {
+    private void RemoveFromCacheDeferred(IScopeContext scopeContext, Guid documentKey) =>
         scopeContext.Enlist($"RemoveAliasFromCache_{documentKey}", () =>
         {
             RemoveFromCache(documentKey);
             return true;
         });
-    }
 
-    private static string NormalizeAlias(string alias)
-    {
-        return alias
+    private static string NormalizeAlias(string alias) =>
+        alias
             .Trim()
             .TrimStart('/')
             .TrimEnd('/')
             .ToLowerInvariant();
-    }
 
     private static IEnumerable<string> NormalizeAliases(string? rawValue)
     {
@@ -577,7 +575,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
 
     private void ThrowIfNotInitialized()
     {
-        if (!_isInitialized)
+        if (_isInitialized is false)
         {
             throw new InvalidOperationException("The DocumentUrlAliasService needs to be initialized before it can be used.");
         }
