@@ -72,7 +72,7 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 	#generateRoutes() {
 		if (!this.#variants || this.#variants.length === 0 || !this.#appCulture) {
 			this._routes = [];
-			this.#ensureForbiddenRoute();
+			this.#ensureForbiddenRoute(this._routes);
 			return;
 		}
 
@@ -144,7 +144,7 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 			});
 		}
 
-		this.#ensureForbiddenRoute();
+		this.#ensureForbiddenRoute(routes);
 
 		this._routes = routes;
 	}
@@ -154,8 +154,8 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 	 * This route will display a forbidden message when the user does not have permission to access certain resources.
 	 * Also handles not found routes.
 	 */
-	#ensureForbiddenRoute() {
-		this._routes?.push({
+	#ensureForbiddenRoute(routes: Array<UmbRoute> = []) {
+		routes.push({
 			path: '**',
 			component: async () => {
 				const router = await import('@umbraco-cms/backoffice/router');
