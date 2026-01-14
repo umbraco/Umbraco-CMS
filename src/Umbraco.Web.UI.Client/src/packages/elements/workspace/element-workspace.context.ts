@@ -42,6 +42,7 @@ export class UmbElementWorkspaceContext
 	readonly isTrashed = this._data.createObservablePartOfCurrent((data) => data?.isTrashed);
 
 	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
+
 	#isTrashedContext = new UmbIsTrashedEntityContext(this);
 
 	constructor(host: UmbControllerHost) {

@@ -1,4 +1,4 @@
-import type { UmbElementTreeItemModel, UmbElementTreeRootModel } from '../types.js';
+import type { UmbElementTreeItemModel, UmbElementTreeRootModel } from './types.js';
 import { UmbDefaultTreeItemContext } from '@umbraco-cms/backoffice/tree';
 import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
