@@ -155,7 +155,7 @@ test("can see parent of start node but not access it", async ({
   );
 });
 
-test.only("see no-access view when deep-linking to restricted document", async ({
+test("see no-access view when deep-linking to restricted document", async ({
   umbracoApi,
   umbracoUi,
 }) => {
