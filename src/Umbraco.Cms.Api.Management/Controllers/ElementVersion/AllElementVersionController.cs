@@ -15,14 +15,14 @@ namespace Umbraco.Cms.Api.Management.Controllers.ElementVersion;
 [ApiVersion("1.0")]
 public class AllElementVersionController : ElementVersionControllerBase
 {
-    private readonly IElementVersionService _contentVersionService;
+    private readonly IElementVersionService _elementVersionService;
     private readonly IElementVersionPresentationFactory _elementVersionPresentationFactory;
 
     public AllElementVersionController(
-        IElementVersionService contentVersionService,
+        IElementVersionService elementVersionService,
         IElementVersionPresentationFactory elementVersionPresentationFactory)
     {
-        _contentVersionService = contentVersionService;
+        _elementVersionService = elementVersionService;
         _elementVersionPresentationFactory = elementVersionPresentationFactory;
     }
 
@@ -39,7 +39,7 @@ public class AllElementVersionController : ElementVersionControllerBase
         int take = 100)
     {
         Attempt<PagedModel<ContentVersionMeta>?, ContentVersionOperationStatus> attempt =
-            await _contentVersionService.GetPagedContentVersionsAsync(elementId, culture, skip, take);
+            await _elementVersionService.GetPagedContentVersionsAsync(elementId, culture, skip, take);
 
         if (attempt.Success is false)
         {
