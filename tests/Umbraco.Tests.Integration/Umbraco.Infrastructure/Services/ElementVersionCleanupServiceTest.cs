@@ -101,7 +101,7 @@ internal class ElementVersionCleanupServiceTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task PerformElementVersionCleanup_CanPrecentCleanupOfSpecificVersions()
+    public async Task PerformElementVersionCleanup_CanPreventCleanupOfSpecificVersions()
     {
         var elementType = ContentTypeBuilder.CreateSimpleElementType();
 
