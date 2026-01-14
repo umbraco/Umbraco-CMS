@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -97,6 +98,67 @@ internal class ElementVersionCleanupServiceTest : UmbracoIntegrationTest
             Assert.AreEqual(before.ElementVersions, after.ElementVersions);
             Assert.AreEqual(before.PropertyData, after.PropertyData);
         });
+    }
+
+    [Test]
+    public async Task PerformElementVersionCleanup_CanPrecentCleanupOfSpecificVersions()
+    {
+        var elementType = ContentTypeBuilder.CreateSimpleElementType();
+
+        // Kill all historic
+        elementType.HistoryCleanup.PreventCleanup = false;
+        elementType.HistoryCleanup.KeepAllVersionsNewerThanDays = 0;
+        elementType.HistoryCleanup.KeepLatestVersionPerDayForDays = 0;
+
+        ContentTypeService.Save(elementType);
+
+        var element = ElementBuilder.CreateSimpleElement(elementType);
+        ElementService.Save(element);
+        ElementService.Publish(element, Array.Empty<string>());
+
+        var retainedVersionIds = new List<int>();
+        for (var i = 0; i < 10; i++)
+        {
+            var result = ElementService.Publish(element, Array.Empty<string>());
+            if (i < 5)
+            {
+                retainedVersionIds.Add(result.Content.VersionId);
+                await ElementVersionService.SetPreventCleanupAsync(retainedVersionIds.Last().ToGuid(), true, Constants.Security.SuperUserKey);
+            }
+        }
+
+        var before = GetReport();
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(12, before.ContentVersions); // 10 historic + current draft + current published
+            Assert.AreEqual(12, before.ElementVersions);
+            Assert.AreEqual(12 * 3, before.PropertyData); // CreateSimpleContentType = 3 props
+        });
+
+        ElementVersionService.PerformContentVersionCleanup(DateTime.UtcNow.AddHours(1));
+
+        var after = GetReport();
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(7, after.ContentVersions); // current draft, current published + 5 retained versions
+            Assert.AreEqual(7, after.ElementVersions);
+            Assert.AreEqual(7 * 3, after.PropertyData); // CreateSimpleContentType = 3 props
+        });
+
+        var allVersions = await ElementVersionService.GetPagedContentVersionsAsync(element.Key, null, 0, 1000);
+        Assert.IsTrue(allVersions.Success);
+        Assert.AreEqual(7, allVersions.Result.Total);
+
+        var allVersionIds = allVersions.Result.Items.Select(item => item.VersionId).ToArray();
+        Assert.AreNotEqual(element.VersionId, element.PublishedVersionId);
+        Assert.Contains(element.VersionId, allVersionIds);
+        Assert.Contains(element.PublishedVersionId, allVersionIds);
+        foreach (var retainedVersionId in retainedVersionIds)
+        {
+            Assert.Contains(retainedVersionId, allVersionIds);
+        }
     }
 
     private Report GetReport()
