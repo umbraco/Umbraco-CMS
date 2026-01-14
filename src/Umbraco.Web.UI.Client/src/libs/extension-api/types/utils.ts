@@ -54,10 +54,12 @@ export type JsLoaderProperty<JsExportType> =
 export type ElementLoaderProperty<ElementType extends HTMLElement = HTMLElement> =
 	| string
 	| ElementLoaderPromise<ElementType>
+	| ElementLoaderExports<ElementType>
 	| ClassConstructor<ElementType>;
 export type ApiLoaderProperty<ApiType extends UmbApi = UmbApi> =
 	| string
 	| ApiLoaderPromise<ApiType>
+	| ApiLoaderExports<ApiType>
 	| ClassConstructor<ApiType>;
 export type ElementAndApiLoaderProperty<
 	ElementType extends HTMLElement = HTMLElement,
@@ -65,5 +67,8 @@ export type ElementAndApiLoaderProperty<
 > =
 	| string
 	| ElementAndApiLoaderPromise<ElementType, ApiType>
+	| ElementAndApiLoaderExports<ElementType, ApiType>
 	| ElementLoaderPromise<ElementType>
-	| ApiLoaderPromise<ApiType>;
+	| ElementLoaderExports<ElementType>
+	| ApiLoaderPromise<ApiType>
+	| ApiLoaderExports<ApiType>;
