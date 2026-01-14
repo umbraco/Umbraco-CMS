@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
@@ -11,6 +12,7 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Element.Tree;
 
+[ApiVersion("1.0")]
 public class SiblingsElementTreeController : ElementTreeControllerBase
 {
     public SiblingsElementTreeController(
@@ -26,6 +28,7 @@ public class SiblingsElementTreeController : ElementTreeControllerBase
     }
 
     [HttpGet("siblings")]
+    [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(SubsetViewModel<ElementTreeItemResponseModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult<SubsetViewModel<ElementTreeItemResponseModel>>> Siblings(
         CancellationToken cancellationToken,
