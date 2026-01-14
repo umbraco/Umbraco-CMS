@@ -3,6 +3,7 @@ import type {
 	ClassConstructor,
 	ElementAndApiLoaderProperty,
 	ElementLoaderExports,
+	ElementLoaderPromise,
 	ElementLoaderProperty,
 } from '../types/utils.js';
 
@@ -19,8 +20,8 @@ export async function loadManifestElement<ElementType extends HTMLElement>(
 			// Class Constructor
 			return property as ClassConstructor<ElementType>;
 		} else {
-			// Promise function
-			const result = await (property as Exclude<Exclude<typeof property, string>, ClassConstructor<ElementType>>)();
+			// Promise function (dynamic import)
+			const result = await (property as ElementLoaderPromise<ElementType>)();
 			if (typeof result === 'object' && result !== null) {
 				const exportValue =
 					('element' in result ? result.element : undefined) ||
@@ -41,6 +42,14 @@ export async function loadManifestElement<ElementType extends HTMLElement>(
 			if (exportValue && typeof exportValue === 'function') {
 				return exportValue;
 			}
+		}
+	} else if (propType === 'object' && property !== null) {
+		// Already resolved module object (statically imported)
+		const result = property as ElementLoaderExports<ElementType>;
+		const exportValue =
+			('element' in result ? result.element : undefined) || ('default' in result ? result.default : undefined);
+		if (exportValue && typeof exportValue === 'function') {
+			return exportValue;
 		}
 	}
 	return undefined;
