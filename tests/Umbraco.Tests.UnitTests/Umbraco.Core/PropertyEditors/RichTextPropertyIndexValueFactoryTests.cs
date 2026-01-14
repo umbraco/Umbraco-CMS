@@ -32,15 +32,19 @@ public class RichTextPropertyIndexValueFactoryTests
     [TestCase("<p>Text with <code>inline code</code></p>", "Text with inline code")]
     [TestCase("<p>Text with <pre><code>code block</code></pre></p>", "Text with code block")]
     [TestCase("<p>Text with <blockquote>quoted text</blockquote></p>", "Text with quoted text")]
-    [TestCase("<p>Text with <ul><li>list item 1</li><li>list item 2</li></ul></p>",
+    [TestCase(
+        "<p>Text with <ul><li>list item 1</li><li>list item 2</li></ul></p>",
         "Text with list item 1list item 2")]
-    [TestCase("<p>Text with <ol><li>ordered item 1</li><li>ordered item 2</li></ol></p>",
+    [TestCase(
+        "<p>Text with <ol><li>ordered item 1</li><li>ordered item 2</li></ol></p>",
         "Text with ordered item 1ordered item 2")]
     [TestCase("<p>Text with <div class=\"class-name\">div content</div></p>", "Text with div content")]
     [TestCase("<p>Text with <span class=\"class-name\">span content</span></p>", "Text with span content")]
-    [TestCase("<p>Text with <strong>bold</strong> and <em>italic</em> content</p>",
+    [TestCase(
+        "<p>Text with <strong>bold</strong> and <em>italic</em> content</p>",
         "Text with bold and italic content")]
-    [TestCase("<p>Text with <a href=\"https://example.com\" target=\"_blank\">external link</a></p>",
+    [TestCase(
+        "<p>Text with <a href=\"https://example.com\" target=\"_blank\">external link</a></p>",
         "Text with external link")]
     [TestCase("<p>John Smith<br class=\"test\">Company ABC<br>London</p>", "John Smith Company ABC London")]
     [TestCase("<p>John Smith<br \r\n />Company ABC<br>London</p>", "John Smith Company ABC London")]
@@ -61,7 +65,9 @@ public class RichTextPropertyIndexValueFactoryTests
 
         // create a mock property with the rich text value
         var property = Mock.Of<IProperty>(p => p.Alias == alias
-                                               && (string)p.GetValue(It.IsAny<string>(), It.IsAny<string>(),
+                                               && (string)p.GetValue(
+                                                   It.IsAny<string>(),
+                                                   It.IsAny<string>(),
                                                    It.IsAny<bool>()) == testContent);
 
         // get the index value for the property

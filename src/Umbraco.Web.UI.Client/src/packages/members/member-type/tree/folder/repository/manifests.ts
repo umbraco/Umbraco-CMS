@@ -1,4 +1,5 @@
 import { UMB_MEMBER_TYPE_FOLDER_REPOSITORY_ALIAS, UMB_MEMBER_TYPE_FOLDER_STORE_ALIAS } from './constants.js';
+import { UmbMemberTypeFolderStore } from './member-type-folder.store.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -11,6 +12,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'store',
 		alias: UMB_MEMBER_TYPE_FOLDER_STORE_ALIAS,
 		name: 'Member Type Folder Store',
-		api: () => import('./member-type-folder.store.js'),
+		api: UmbMemberTypeFolderStore,
 	},
 ];

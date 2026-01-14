@@ -64,7 +64,9 @@ public class TempFileCleanupJob : IRecurringBackgroundJob
             case CleanFolderResultStatus.FailedWithException:
                 foreach (CleanFolderResult.Error error in result.Errors!)
                 {
-                    _logger.LogError(error.Exception, "Could not delete temp file {FileName}",
+                    _logger.LogError(
+                        error.Exception,
+                        "Could not delete temp file {FileName}",
                         error.ErroringFile.FullName);
                 }
 

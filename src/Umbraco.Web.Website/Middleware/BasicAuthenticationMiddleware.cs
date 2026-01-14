@@ -106,7 +106,7 @@ public class BasicAuthenticationMiddleware : IMiddleware
         else
         {
             context.Response.StatusCode = 401;
-            context.Response.Headers.Add("WWW-Authenticate", "Basic realm=\"Umbraco login\"");
+            context.Response.Headers.Append("WWW-Authenticate", "Basic realm=\"Umbraco login\"");
         }
     }
 }

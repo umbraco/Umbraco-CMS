@@ -7,6 +7,8 @@ import {
 import { manifests as createManifests } from './create/manifests.js';
 import { manifests as moveManifests } from './move-to/manifests.js';
 import { manifests as duplicateManifests } from './duplicate/manifests.js';
+import { UMB_DATA_TYPE_ALLOW_DELETE_CONDITION_ALIAS } from './conditions/allow-delete/index.js';
+import { manifests as conditionManifests } from './conditions/manifests.js';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
@@ -21,8 +23,14 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 			itemRepositoryAlias: UMB_DATA_TYPE_ITEM_REPOSITORY_ALIAS,
 			referenceRepositoryAlias: UMB_DATA_TYPE_REFERENCE_REPOSITORY_ALIAS,
 		},
+		conditions: [
+			{
+				alias: UMB_DATA_TYPE_ALLOW_DELETE_CONDITION_ALIAS,
+			},
+		],
 	},
 	...createManifests,
 	...moveManifests,
 	...duplicateManifests,
+	...conditionManifests,
 ];
