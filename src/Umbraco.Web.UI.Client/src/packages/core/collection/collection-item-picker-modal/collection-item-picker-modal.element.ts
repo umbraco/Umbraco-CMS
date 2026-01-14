@@ -2,7 +2,7 @@ import type { UmbCollectionSelectionConfiguration } from '../types.js';
 import { UmbCollectionItemPickerContext } from './collection-item-picker-modal.context.js';
 import type { UmbCollectionItemPickerModalData, UmbCollectionItemPickerModalValue } from './types.js';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
-import { html, customElement, state, nothing, ifDefined, css } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, state, nothing, ifDefined, css, classMap } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 
@@ -21,6 +21,9 @@ export class UmbCollectionItemPickerModalElement extends UmbModalBaseElement<
 
 	@state()
 	private _hasSelection: boolean = false;
+
+	@state()
+	private _isSearchable: boolean = false;
 
 	@state()
 	private _searchQuery?: string;
@@ -81,6 +84,11 @@ export class UmbCollectionItemPickerModalElement extends UmbModalBaseElement<
 
 	#observeSearch() {
 		this.observe(
+			this.#pickerContext?.search.searchable,
+			(isSearchable) => (this._isSearchable = isSearchable ?? false),
+		);
+
+		this.observe(
 			this.#pickerContext.search.query,
 			(query) => {
 				this._searchQuery = query?.query;
@@ -104,21 +112,26 @@ export class UmbCollectionItemPickerModalElement extends UmbModalBaseElement<
 	#searchSelectableFilter = () => true;
 
 	override render() {
-		const hasCollectionAlias = !!this.data?.collection.alias;
+		const renderFullCollection = !!this.data?.collection.alias;
 
 		return html`
-			<umb-body-layout headline="${this.localize.term('general_choose')}" ?main-no-padding=${hasCollectionAlias}>
-				${this.#renderSearch()} ${this.#renderMain(hasCollectionAlias)} ${this.#renderActions()}
+			<umb-body-layout
+				headline="${this.localize.term('general_choose')}"
+				?main-no-padding=${renderFullCollection}
+				class=${classMap({ 'has-search': this._isSearchable })}>
+				${this.#renderSearch()} ${this.#renderMain(renderFullCollection)} ${this.#renderActions()}
 			</umb-body-layout>
 		`;
 	}
 
 	#renderSearch() {
+		if (!this._isSearchable) return nothing;
+
 		const selectableFilter =
 			this.data?.search?.pickableFilter ?? this.data?.pickableFilter ?? this.#searchSelectableFilter;
 
 		return html`
-			<div id="picker-search">
+			<div id="search-container">
 				<umb-picker-search-field></umb-picker-search-field>
 				<umb-picker-search-result .pickableFilter=${selectableFilter}></umb-picker-search-result>
 			</div>
@@ -183,14 +196,20 @@ export class UmbCollectionItemPickerModalElement extends UmbModalBaseElement<
 
 	static override styles = [
 		css`
-			#picker-search {
-				margin: var(--uui-size-layout-1);
-				margin-bottom: 0;
-			}
-
 			umb-collection {
 				display: block;
 				height: fit-content;
+			}
+
+			umb-body-layout[main-no-padding].has-search {
+				#search-container {
+					padding: var(--uui-size-layout-1);
+					padding-bottom: 0;
+				}
+
+				umb-collection {
+					margin-top: calc(-1 * var(--uui-size-4));
+				}
 			}
 		`,
 	];

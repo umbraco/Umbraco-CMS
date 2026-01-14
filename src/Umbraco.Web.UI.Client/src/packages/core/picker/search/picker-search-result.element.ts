@@ -72,7 +72,7 @@ export class UmbPickerSearchResultElement extends UmbLitElement {
 	}
 
 	#renderEmptyResult() {
-		return html`<uui-box id="result-container">
+		return html`<uui-box>
 			<small>No result for <strong>"${this._query?.query}"</strong>.</small>
 		</uui-box>`;
 	}
@@ -102,10 +102,6 @@ export class UmbPickerSearchResultElement extends UmbLitElement {
 		css`
 			host: {
 				display: block;
-			}
-
-			#result-container {
-				margin-top: var(--uui-size-4);
 			}
 
 			umb-extension-with-api-slot {

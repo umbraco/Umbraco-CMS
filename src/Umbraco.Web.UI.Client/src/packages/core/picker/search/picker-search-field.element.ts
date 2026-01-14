@@ -63,12 +63,9 @@ export class UmbPickerSearchFieldElement extends UmbLitElement {
 	static override readonly styles = [
 		UmbTextStyles,
 		css`
-			host: {
-				display: block;
-			}
-
 			uui-input {
 				width: 100%;
+				margin-bottom: var(--uui-size-4);
 			}
 
 			uui-input [slot='prepend'] {

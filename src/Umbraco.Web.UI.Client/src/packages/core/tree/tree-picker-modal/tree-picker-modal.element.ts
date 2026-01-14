@@ -186,10 +186,8 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 			this.data?.search?.pickableFilter ?? this.data?.pickableFilter ?? this.#searchSelectableFilter;
 
 		return html`
-			<div id="picker-search">
-				<umb-picker-search-field></umb-picker-search-field>
-				<umb-picker-search-result .pickableFilter=${selectableFilter}></umb-picker-search-result>
-			</div>
+			<umb-picker-search-field></umb-picker-search-field>
+			<umb-picker-search-result .pickableFilter=${selectableFilter}></umb-picker-search-result>
 		`;
 	}
 
@@ -239,14 +237,6 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 			</div>
 		`;
 	}
-
-	static override styles = [
-		css`
-			#picker-search {
-				margin-bottom: var(--uui-size-layout-1);
-			}
-		`,
-	];
 }
 
 export default UmbTreePickerModalElement;
