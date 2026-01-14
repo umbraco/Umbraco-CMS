@@ -54,7 +54,6 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="AliasCacheKey"/> struct.
-        /// identifier.
         /// </summary>
         /// <param name="normalizedAlias">The alias string that has been normalized for consistent comparison.</param>
         /// <param name="languageId">The identifier of the language associated with the alias.</param>
