@@ -291,4 +291,91 @@ public class ContentFinderByUrlAliasTests
         ctx.PublishedContentCache.Verify(x => x.GetById(documentUnderDomainB), Times.Once);
         ctx.PublishedContentCache.Verify(x => x.GetById(documentUnderDomainA), Times.Never);
     }
+
+    [Test]
+    public async Task Returns_False_When_Domain_Is_Set_But_No_Match_Under_Domain()
+    {
+        // Arrange - Domain is set, alias matches documents but none are under the domain
+        var ctx = new TestContext();
+        var domainRootId = 1234;
+        var domainRootKey = Guid.NewGuid();
+        var documentOutsideDomain = Guid.NewGuid();
+        var anotherDocumentOutsideDomain = Guid.NewGuid();
+        var unrelatedRootKey = Guid.NewGuid();
+
+        ctx.SetupDomainRoot(domainRootId, domainRootKey);
+        ctx.SetupAliasReturnsDocuments("my-alias", documentOutsideDomain, anotherDocumentOutsideDomain);
+        ctx.SetupDocumentAncestors(documentOutsideDomain, unrelatedRootKey); // Under a different root
+        ctx.SetupDocumentAncestors(anotherDocumentOutsideDomain, unrelatedRootKey); // Also under a different root
+
+        var domain = new DomainAndUri(new Domain(1, "localhost", domainRootId, null, false, 1), new Uri("http://localhost"));
+        var requestBuilder = ctx.CreateRequestBuilder("http://localhost/my-alias", domain);
+
+        // Act
+        var result = await ctx.CreateContentFinder().TryFindContent(requestBuilder);
+
+        // Assert - should return false, NOT fall back to first match
+        Assert.That(result, Is.False);
+        Assert.That(requestBuilder.PublishedContent, Is.Null);
+        ctx.PublishedContentCache.Verify(x => x.GetById(It.IsAny<Guid>()), Times.Never);
+    }
+
+    [Test]
+    public async Task Returns_False_When_Alias_Only_Exists_Under_Different_Domain()
+    {
+        // Arrange - Request is for domain A, but alias only exists under domain B
+        var ctx = new TestContext();
+
+        var domainARootId = 1000;
+        var domainARootKey = Guid.NewGuid();
+
+        var domainBRootKey = Guid.NewGuid();
+        var documentUnderDomainB = Guid.NewGuid();
+
+        ctx.SetupDomainRoot(domainARootId, domainARootKey);
+        ctx.SetupAliasReturnsDocuments("alias-only-in-b", documentUnderDomainB);
+        ctx.SetupDocumentAncestors(documentUnderDomainB, domainBRootKey); // Under domain B, not domain A
+
+        var domainA = new DomainAndUri(new Domain(1, "domain-a.com", domainARootId, null, false, 1), new Uri("http://domain-a.com"));
+        var requestBuilder = ctx.CreateRequestBuilder("http://domain-a.com/alias-only-in-b", domainA);
+
+        // Act
+        var result = await ctx.CreateContentFinder().TryFindContent(requestBuilder);
+
+        // Assert - should return false, document exists but is not under the requested domain
+        Assert.That(result, Is.False);
+        Assert.That(requestBuilder.PublishedContent, Is.Null);
+        ctx.PublishedContentCache.Verify(x => x.GetById(documentUnderDomainB), Times.Never);
+    }
+
+    [Test]
+    public async Task Returns_Match_Under_Domain_Even_When_First_Match_Is_Outside_Domain()
+    {
+        // Arrange - First match is outside domain, second is inside domain
+        // Should skip the first and return the second
+        var ctx = new TestContext();
+        var domainRootId = 3000;
+        var domainRootKey = Guid.NewGuid();
+        var firstMatchOutsideDomain = Guid.NewGuid();
+        var secondMatchUnderDomain = Guid.NewGuid();
+        var otherRootKey = Guid.NewGuid();
+
+        ctx.SetupDomainRoot(domainRootId, domainRootKey);
+        ctx.SetupAliasReturnsDocuments("shared-alias", firstMatchOutsideDomain, secondMatchUnderDomain);
+        ctx.SetupDocumentAncestors(firstMatchOutsideDomain, otherRootKey); // Outside domain
+        ctx.SetupDocumentAncestors(secondMatchUnderDomain, domainRootKey); // Inside domain
+        ctx.SetupContentItem(secondMatchUnderDomain, 3001);
+
+        var domain = new DomainAndUri(new Domain(1, "example.com", domainRootId, null, false, 1), new Uri("http://example.com"));
+        var requestBuilder = ctx.CreateRequestBuilder("http://example.com/shared-alias", domain);
+
+        // Act
+        var result = await ctx.CreateContentFinder().TryFindContent(requestBuilder);
+
+        // Assert - should skip first match and return second match (under domain)
+        Assert.That(result, Is.True);
+        Assert.That(requestBuilder.PublishedContent!.Id, Is.EqualTo(3001));
+        ctx.PublishedContentCache.Verify(x => x.GetById(firstMatchOutsideDomain), Times.Never);
+        ctx.PublishedContentCache.Verify(x => x.GetById(secondMatchUnderDomain), Times.Once);
+    }
 }

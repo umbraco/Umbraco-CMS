@@ -160,7 +160,7 @@ public class ContentFinderByUrlAlias : IContentFinder
 
         Guid? matchingKey = null;
 
-        // Convert domain root ID to Guid for scoping
+        // Convert domain root ID to Guid for scoping.
         Guid? domainRootKey = null;
         if (rootNodeId > 0)
         {
@@ -168,7 +168,7 @@ public class ContentFinderByUrlAlias : IContentFinder
             domainRootKey = attempt.Success ? attempt.Result : null;
         }
 
-        // If we have a domain root, find the first document that's under that domain
+        // If we have a domain root, find the first document that's under that domain.
         if (domainRootKey.HasValue)
         {
             foreach (Guid documentKey in documentKeys)
@@ -179,10 +179,18 @@ public class ContentFinderByUrlAlias : IContentFinder
                     break;
                 }
             }
-        }
 
-        // Fall back to first match if no domain or no match within domain
-        matchingKey ??= documentKeys.FirstOrDefault();
+            // If under a domain, and no match found, return null.
+            if (matchingKey == null)
+            {
+                return null;
+            }
+        }
+        else
+        {
+            // Use first match if no domain).
+            matchingKey = documentKeys.FirstOrDefault();
+        }
 
         return matchingKey != default ? cache.GetById(matchingKey.Value) : null;
     }
