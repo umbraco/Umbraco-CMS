@@ -169,7 +169,7 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 				--ease-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
 			}
 
-			/* Base positioning for browsers WITHOUT anchor positioning support (Safari) */
+			/* Close state */
 			.infobox {
 				position: absolute;
 				top: 18px;
@@ -180,10 +180,7 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 				padding: var(--uui-size-2) var(--uui-size-3);
 				font-size: 8px;
 				clip-path: inset(-10px calc(100% - 30px) calc(100% - 10px) -20px);
-				transition:
-					background-color 80ms 40ms linear,
-					clip-path 120ms var(--ease-bounce),
-					font-size 120ms var(--ease);
+
 				min-height: fit-content;
 				z-index: 1;
 			}
@@ -229,48 +226,45 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 				transition: opacity 120ms;
 			}
 
-			/*OPEN STATE -- Prevent the hover state in firefox(until support of the position-anchor)*/
-			@supports (position-anchor: --entity-sign) {
-				/* Open state for Chrome */
-				.infobox.is-open {
-					position: fixed;
-					position-anchor: --entity-sign;
-					inset-block-start: anchor(--entity-sign bottom);
-					inset-inline-start: anchor(--entity-sign right);
-
-					margin-top: 0;
-					margin-left: 0;
-					font-size: 12px;
-					color: var(--uui-color-text);
-					clip-path: inset(-12px);
-					--umb-sign-bundle-bg: var(--uui-color-surface);
-				}
-
-				.infobox.is-open::before {
-					right: 0;
-					bottom: 0;
-					opacity: 100;
-					background-color: var(--uui-color-surface);
-					display: block;
-					transition:
-						right 120ms var(--ease-bounce),
-						bottom 120ms var(--ease-bounce),
-						opacity 120ms var(--ease),
-						display 0 0;
-				}
-
-				.infobox.is-open > .sign-container {
-					transform: none;
-					align-items: center;
-					transition: transform 120ms var(--ease);
-					visibility: visible;
-				}
-
-				.infobox.is-open .sign-container .label {
-					opacity: 1;
-					pointer-events: auto;
-				}
+			/* Open state */
+			.infobox.is-open {
+				position: fixed;
+				position-anchor: --entity-sign;
+				inset-block-start: anchor(--entity-sign bottom);
+				inset-inline-start: anchor(--entity-sign right);
+				margin-top: 0;
+				margin-left: 0;
+				font-size: 12px;
+				color: var(--uui-color-text);
+				clip-path: inset(-12px);
+				--umb-sign-bundle-bg: var(--uui-color-surface);
 			}
+
+			.infobox.is-open::before {
+				right: 0;
+				bottom: 0;
+				opacity: 100;
+				background-color: var(--uui-color-surface);
+				display: block;
+				transition:
+					right 120ms var(--ease-bounce),
+					bottom 120ms var(--ease-bounce),
+					opacity 120ms var(--ease),
+					display 0 0;
+			}
+
+			.infobox.is-open > .sign-container {
+				transform: none;
+				align-items: center;
+				transition: transform 120ms var(--ease);
+				visibility: visible;
+			}
+
+			.infobox.is-open .sign-container .label {
+				opacity: 1;
+				pointer-events: auto;
+			}
+
 			@-moz-document url-prefix() {
 				.infobox {
 					top: 1px;
