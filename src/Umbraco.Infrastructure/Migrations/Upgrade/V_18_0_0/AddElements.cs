@@ -66,20 +66,39 @@ public class AddElements : AsyncMigrationBase
             return;
         }
 
-        Database.Insert(Constants.DatabaseSchema.Tables.Node, "id", false,
-            new NodeDto
-            {
-                NodeId = Constants.System.RecycleBinElement,
-                Trashed = false,
-                ParentId = -1,
-                UserId = -1,
-                Level = 0,
-                Path = "-1,-22",
-                SortOrder = 0,
-                UniqueId = Constants.System.RecycleBinElementKey,
-                Text = "Recycle Bin",
-                NodeObjectType = Constants.ObjectTypes.ElementRecycleBin,
-                CreateDate = DateTime.UtcNow,
-            });
+        ToggleIdentityInsertForNodes(true);
+        try
+        {
+            Database.Insert(
+                Constants.DatabaseSchema.Tables.Node,
+                "id",
+                false,
+                new NodeDto
+                {
+                    NodeId = Constants.System.RecycleBinElement,
+                    Trashed = false,
+                    ParentId = -1,
+                    UserId = -1,
+                    Level = 0,
+                    Path = "-1,-22",
+                    SortOrder = 0,
+                    UniqueId = Constants.System.RecycleBinElementKey,
+                    Text = "Recycle Bin",
+                    NodeObjectType = Constants.ObjectTypes.ElementRecycleBin,
+                    CreateDate = DateTime.UtcNow,
+                });
+        }
+        finally
+        {
+            ToggleIdentityInsertForNodes(false);
+        }
+    }
+
+    private void ToggleIdentityInsertForNodes(bool toggleOn)
+    {
+        if (SqlSyntax.SupportsIdentityInsert())
+        {
+            Database.Execute(new Sql($"SET IDENTITY_INSERT {SqlSyntax.GetQuotedTableName(NodeDto.TableName)} {(toggleOn ? "ON" : "OFF")} "));
+        }
     }
 }
