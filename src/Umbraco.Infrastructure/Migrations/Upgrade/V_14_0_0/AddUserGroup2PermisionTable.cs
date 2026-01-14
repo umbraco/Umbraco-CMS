@@ -6,13 +6,13 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_14_0_0;
 /// <summary>
 /// Adds the <see cref="UserGroup2PermissionDto"/> table to the database.
 /// </summary>
-public class AddUserGroupPermissionTable : MigrationBase
+public class AddUserGroup2PermisionTable : MigrationBase
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="AddUserGroupPermissionTable"/> class.
+    /// Initializes a new instance of the <see cref="AddUserGroup2PermisionTable"/> class.
     /// </summary>
     /// <param name="context">The migration context.</param>
-    public AddUserGroupPermissionTable(IMigrationContext context)
+    public AddUserGroup2PermisionTable(IMigrationContext context)
         : base(context)
     {
     }
