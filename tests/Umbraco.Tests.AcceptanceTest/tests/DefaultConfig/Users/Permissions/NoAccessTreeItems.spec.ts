@@ -257,7 +257,7 @@ test.describe("Document Tree NoAccess Property Tests", () => {
     // Assert - Child document should now be visible
     await umbracoUi.content.isChildContentInTreeVisible(
       rootDocumentName,
-      childDocumentName
+      `Expand child items for ${childDocumentName}`
     );
 
     // Verify the child also has noAccess styling (since start node is grandchild)
@@ -282,125 +282,6 @@ test.describe("Document Tree NoAccess Property Tests", () => {
       .filter({ hasText: grandchildDocumentName })
       .first();
     await expect(grandchildTreeItem).not.toHaveAttribute("no-access", "");
-  });
-
-  // TODO: Re-enable once picker modal infrastructure is more stable
-  test.skip("should filter noAccess items from document picker", async ({
-    umbracoApi,
-    umbracoUi,
-    page,
-  }) => {
-    // Arrange - Create a document type with a document picker property
-    const pickerDocumentTypeName = "PickerDocumentType";
-    const pickerDocumentName = "PickerDocument";
-    const propertyName = "DocumentPicker";
-
-    await umbracoApi.documentType.ensureNameNotExists(pickerDocumentTypeName);
-
-    // Get the Content Picker data type
-    const contentPickerDataType = await umbracoApi.dataType.getByName(
-      "Content Picker"
-    );
-
-    // Create document type with content picker
-    const pickerDocumentTypeId =
-      await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(
-        pickerDocumentTypeName,
-        propertyName,
-        contentPickerDataType!.id
-      );
-
-    // Create a document at the child level with picker property
-    const pickerDocumentId =
-      await umbracoApi.document.createDefaultDocumentWithParent(
-        pickerDocumentName,
-        pickerDocumentTypeId!,
-        childDocumentId!
-      );
-
-    // Create user with start node at child level (root will be noAccess)
-    userGroupId =
-      await umbracoApi.userGroup.createUserGroupWithDocumentStartNode(
-        userGroupName,
-        childDocumentId!
-      );
-    await umbracoApi.user.setUserPermissions(
-      testUser.name,
-      testUser.email,
-      testUser.password,
-      userGroupId!
-    );
-    testUserCookieAndToken = (await umbracoApi.user.loginToUser(
-      testUser.name,
-      testUser.email,
-      testUser.password
-    ))!;
-    await umbracoUi.goToBackOffice();
-
-    // Act - Navigate to content section and open the picker document
-    await umbracoUi.userGroup.goToSection(
-      ConstantHelper.sections.content,
-      false
-    );
-    await umbracoUi.content.goToContentWithName(pickerDocumentName);
-
-    // Open the document picker
-    const addButton = page.locator(
-      'uui-ref-node-document-type[name="' + propertyName + '"] uui-button'
-    );
-    await addButton.click();
-
-    // Wait for picker modal to open
-    const pickerModal = page.locator("umb-document-picker-modal");
-    await expect(pickerModal).toBeVisible();
-
-    // Assert - Root document (noAccess) should be visible in the tree but NOT selectable
-    const rootInPicker = pickerModal
-      .locator(`umb-document-tree-item`)
-      .filter({ hasText: rootDocumentName })
-      .first();
-    await expect(rootInPicker).toBeVisible();
-
-    // Verify the tree item has no-access attribute in picker
-    await expect(rootInPicker).toHaveAttribute("no-access", "");
-
-    // Try to click on the noAccess item - it should not become selected
-    await rootInPicker.click();
-
-    // Wait a moment
-    await page.waitForTimeout(500);
-
-    // The submit button should still be disabled (nothing selected)
-    const submitButton = pickerModal.locator(
-      'uui-button[type="button"][look="primary"]'
-    );
-    await expect(submitButton).toBeDisabled();
-
-    // Now expand the root and try to select the accessible child
-    const expandButton = rootInPicker.locator("uui-symbol-expand");
-    await expandButton.click();
-
-    // Wait for child to be visible
-    const childInPicker = pickerModal
-      .locator(`umb-document-tree-item`)
-      .filter({ hasText: childDocumentName });
-    await expect(childInPicker.first()).toBeVisible();
-
-    // Verify child does NOT have no-access attribute (it's the start node)
-    await expect(childInPicker.first()).not.toHaveAttribute("no-access", "");
-
-    // Click on the accessible child - it should be selectable
-    await childInPicker.first().click();
-
-    // Wait for selection
-    await page.waitForTimeout(500);
-
-    // Submit button should now be enabled
-    await expect(submitButton).toBeEnabled();
-
-    // Clean up
-    await umbracoApi.document.ensureNameNotExists(pickerDocumentName);
-    await umbracoApi.documentType.ensureNameNotExists(pickerDocumentTypeName);
   });
 });
 
@@ -548,7 +429,10 @@ test.describe("Media Tree NoAccess Property Tests", () => {
     await umbracoUi.media.openMediaCaretButtonForName(rootMediaName);
 
     // Assert - Child media should now be visible
-    await umbracoUi.media.isChildMediaVisible(rootMediaName, childMediaName);
+    await umbracoUi.media.isChildMediaVisible(
+      rootMediaName,
+      `Expand child items for ${childMediaName}`
+    );
 
     // Verify the child does NOT have noAccess attribute (it's the start node)
     const childMediaTreeItem = page
@@ -556,124 +440,5 @@ test.describe("Media Tree NoAccess Property Tests", () => {
       .filter({ hasText: childMediaName })
       .first();
     await expect(childMediaTreeItem).not.toHaveAttribute("no-access", "");
-  });
-
-  // TODO: Re-enable once picker modal infrastructure is more stable
-  test.skip("should filter noAccess items from media picker", async ({
-    umbracoApi,
-    umbracoUi,
-    page,
-  }) => {
-    // Arrange - Create a document type with a media picker property
-    const pickerDocumentTypeName = "MediaPickerDocumentType";
-    const pickerDocumentName = "MediaPickerDocument";
-    const propertyName = "MediaPicker";
-
-    await umbracoApi.documentType.ensureNameNotExists(pickerDocumentTypeName);
-
-    // Get the Media Picker data type
-    const mediaPickerDataType = await umbracoApi.dataType.getByName(
-      "Media Picker"
-    );
-
-    // Create document type with media picker
-    const pickerDocumentTypeId =
-      await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(
-        pickerDocumentTypeName,
-        propertyName,
-        mediaPickerDataType!.id
-      );
-
-    // Create a document with media picker property
-    await umbracoApi.document.createDefaultDocument(
-      pickerDocumentName,
-      pickerDocumentTypeId!
-    );
-
-    // Create user with media start node at child level (root will be noAccess)
-    userGroupId = await umbracoApi.userGroup.createUserGroupWithMediaStartNode(
-      userGroupName,
-      childMediaId!
-    );
-    await umbracoApi.user.setUserPermissions(
-      testUser.name,
-      testUser.email,
-      testUser.password,
-      userGroupId!
-    );
-    testUserCookieAndToken = (await umbracoApi.user.loginToUser(
-      testUser.name,
-      testUser.email,
-      testUser.password
-    ))!;
-    await umbracoUi.goToBackOffice();
-
-    // Act - Navigate to content section and open the document with media picker
-    await umbracoUi.userGroup.goToSection(
-      ConstantHelper.sections.content,
-      false
-    );
-    await umbracoUi.content.goToContentWithName(pickerDocumentName);
-
-    // Open the media picker
-    const addButton = page.locator(
-      'umb-input-media[alias="' + propertyName + '"] uui-button[label="Add"]'
-    );
-    await addButton.click();
-
-    // Wait for picker modal to open
-    const pickerModal = page.locator("umb-media-picker-modal");
-    await expect(pickerModal).toBeVisible();
-
-    // Assert - Root media (noAccess) should be visible in the tree but NOT selectable
-    const rootMediaInPicker = pickerModal
-      .locator(`umb-media-tree-item`)
-      .filter({ hasText: rootMediaName })
-      .first();
-    await expect(rootMediaInPicker).toBeVisible();
-
-    // Verify the tree item has no-access attribute in picker
-    await expect(rootMediaInPicker).toHaveAttribute("no-access", "");
-
-    // Try to click on the noAccess item - it should not become selected
-    await rootMediaInPicker.click();
-
-    // Wait a moment
-    await page.waitForTimeout(500);
-
-    // The submit button should still be disabled (nothing selected)
-    const submitButton = pickerModal.locator(
-      'uui-button[type="button"][look="primary"]'
-    );
-    await expect(submitButton).toBeDisabled();
-
-    // Now expand the root and try to select the accessible child
-    const expandButton = rootMediaInPicker.locator("uui-symbol-expand");
-    await expandButton.click();
-
-    // Wait for child to be visible
-    const childMediaInPicker = pickerModal
-      .locator(`umb-media-tree-item`)
-      .filter({ hasText: childMediaName });
-    await expect(childMediaInPicker.first()).toBeVisible();
-
-    // Verify child does NOT have no-access attribute (it's the start node)
-    await expect(childMediaInPicker.first()).not.toHaveAttribute(
-      "no-access",
-      ""
-    );
-
-    // Click on the accessible child - it should be selectable
-    await childMediaInPicker.first().click();
-
-    // Wait for selection
-    await page.waitForTimeout(500);
-
-    // Submit button should now be enabled
-    await expect(submitButton).toBeEnabled();
-
-    // Clean up
-    await umbracoApi.document.ensureNameNotExists(pickerDocumentName);
-    await umbracoApi.documentType.ensureNameNotExists(pickerDocumentTypeName);
   });
 });
