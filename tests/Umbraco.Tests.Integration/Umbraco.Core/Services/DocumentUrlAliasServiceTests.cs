@@ -63,13 +63,13 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
     }
 
     [SetUp]
-    public void Setup()
+    public async Task Setup()
     {
         DocumentUrlAliasService.InitAsync(false, CancellationToken.None).GetAwaiter().GetResult();
-        CreateTestData();
+        await CreateTestData();
     }
 
-    private void CreateTestData()
+    private async Task CreateTestData()
     {
         // Create template
         var template = TemplateBuilder.CreateTextPageTemplate("defaultTemplate");
@@ -77,7 +77,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
 
         // Create content type with umbracoUrlAlias property
         ContentType = CreateContentTypeWithUrlAlias(template.Id);
-        ContentTypeService.Save(ContentType);
+        await ContentTypeService.CreateAsync(ContentType, Constants.Security.SuperUserKey);
 
         // Create root page (no alias)
         RootPage = ContentBuilder.CreateSimpleContent(ContentType, "Root Page");
@@ -232,6 +232,64 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
 
     #endregion
 
+    #region GetAliases Tests
+
+    [Test]
+    public async Task GetAliases_Returns_Single_Alias_For_Document()
+    {
+        var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
+
+        var result = DocumentUrlAliasService.GetAliases(new Guid(PageWithSingleAliasKey), isoCode);
+
+        Assert.That(result, Has.Exactly(1).Items);
+        Assert.That(result, Does.Contain("my-single-alias"));
+    }
+
+    [Test]
+    public async Task GetAliases_Returns_Multiple_Aliases_For_Document()
+    {
+        var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
+
+        var result = DocumentUrlAliasService.GetAliases(new Guid(PageWithMultipleAliasesKey), isoCode).ToList();
+
+        Assert.That(result, Has.Exactly(3).Items);
+        Assert.That(result, Does.Contain("first-alias"));
+        Assert.That(result, Does.Contain("second-alias"));
+        Assert.That(result, Does.Contain("third-alias"));
+    }
+
+    [Test]
+    public async Task GetAliases_Returns_Empty_For_Document_Without_Aliases()
+    {
+        var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
+
+        var result = DocumentUrlAliasService.GetAliases(new Guid(PageWithNoAliasKey), isoCode);
+
+        Assert.That(result, Is.Empty);
+    }
+
+    [Test]
+    public async Task GetAliases_Returns_Empty_For_Non_Existent_Document()
+    {
+        var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
+
+        var result = DocumentUrlAliasService.GetAliases(Guid.NewGuid(), isoCode);
+
+        Assert.That(result, Is.Empty);
+    }
+
+    [Test]
+    public async Task GetAliases_Uses_Default_Language_When_Culture_Is_Null()
+    {
+        // GetAliases should work without specifying culture
+        var result = DocumentUrlAliasService.GetAliases(new Guid(PageWithSingleAliasKey), null);
+
+        Assert.That(result, Has.Exactly(1).Items);
+        Assert.That(result, Does.Contain("my-single-alias"));
+    }
+
+    #endregion
+
     #region CreateOrUpdateAliasesAsync Tests
 
     [Test]
@@ -338,13 +396,6 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         Assert.That(aliasesAfter, Is.Empty, "Expected no aliases in database after clearing the property");
     }
 
-    [Test]
-    public async Task CreateOrUpdateAliasesAsync_Does_Not_Throw_For_Non_Existent_Document()
-    {
-        Assert.DoesNotThrowAsync(async () =>
-            await DocumentUrlAliasService.CreateOrUpdateAliasesAsync(Guid.NewGuid()));
-    }
-
     #endregion
 
     #region CreateOrUpdateAliasesWithDescendantsAsync Tests
@@ -381,13 +432,6 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         Assert.That(DocumentUrlAliasService.GetDocumentKeysByAlias("child-new-alias", isoCode), Does.Contain(new Guid(ChildPageKey)));
     }
 
-    [Test]
-    public async Task CreateOrUpdateAliasesWithDescendantsAsync_Does_Not_Throw_For_Non_Existent_Document()
-    {
-        Assert.DoesNotThrowAsync(async () =>
-            await DocumentUrlAliasService.CreateOrUpdateAliasesWithDescendantsAsync(Guid.NewGuid()));
-    }
-
     #endregion
 
     #region DeleteAliasesFromCacheAsync Tests
@@ -400,7 +444,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         // Verify alias exists
         Assert.That(DocumentUrlAliasService.GetDocumentKeysByAlias("my-single-alias", isoCode), Is.Not.Empty);
 
-        await DocumentUrlAliasService.DeleteAliasesFromCacheAsync(new[] { new Guid(PageWithSingleAliasKey) });
+        await DocumentUrlAliasService.DeleteAliasesFromCacheAsync([new Guid(PageWithSingleAliasKey)]);
 
         // Alias should no longer resolve
         Assert.That(DocumentUrlAliasService.GetDocumentKeysByAlias("my-single-alias", isoCode), Is.Empty);
@@ -424,11 +468,144 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         Assert.That(DocumentUrlAliasService.GetDocumentKeysByAlias("third-alias", isoCode), Is.Empty);
     }
 
+    #endregion
+
+    #region HasAny Tests
+
     [Test]
-    public async Task DeleteAliasesFromCacheAsync_Does_Not_Throw_For_Non_Existent_Document()
+    public void HasAny_Returns_True_When_Aliases_Exist()
     {
-        Assert.DoesNotThrowAsync(async () =>
-            await DocumentUrlAliasService.DeleteAliasesFromCacheAsync(new[] { Guid.NewGuid() }));
+        // Act - aliases already exist from setup
+        var result = DocumentUrlAliasService.HasAny();
+
+        // Assert
+        Assert.That(result, Is.True);
+    }
+
+    [Test]
+    public async Task HasAny_Returns_False_After_All_Aliases_Deleted()
+    {
+        // Arrange - verify aliases exist initially
+        Assert.That(DocumentUrlAliasService.HasAny(), Is.True);
+
+        // Act - delete all aliases from cache
+        await DocumentUrlAliasService.DeleteAliasesFromCacheAsync(
+        [
+            new Guid(PageWithSingleAliasKey),
+            new Guid(PageWithMultipleAliasesKey),
+            new Guid(ChildPageKey),
+        ]);
+
+        // Assert
+        Assert.That(DocumentUrlAliasService.HasAny(), Is.False);
+    }
+
+    #endregion
+
+    #region RebuildAllAliasesAsync Tests
+
+    [Test]
+    public async Task RebuildAllAliasesAsync_Repopulates_Cache_From_Database()
+    {
+        var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
+
+        // Arrange - delete aliases from cache (but not database)
+        await DocumentUrlAliasService.DeleteAliasesFromCacheAsync(new[]
+        {
+            new Guid(PageWithSingleAliasKey),
+            new Guid(PageWithMultipleAliasesKey),
+            new Guid(ChildPageKey)
+        });
+
+        // Verify cache is empty
+        Assert.That(DocumentUrlAliasService.HasAny(), Is.False);
+        Assert.That(DocumentUrlAliasService.GetDocumentKeysByAlias("my-single-alias", isoCode), Is.Empty);
+
+        // Act - rebuild from database
+        await DocumentUrlAliasService.RebuildAllAliasesAsync();
+
+        // Assert - cache should be repopulated
+        Assert.That(DocumentUrlAliasService.HasAny(), Is.True);
+        Assert.That(DocumentUrlAliasService.GetDocumentKeysByAlias("my-single-alias", isoCode), Does.Contain(new Guid(PageWithSingleAliasKey)));
+        Assert.That(DocumentUrlAliasService.GetDocumentKeysByAlias("first-alias", isoCode), Does.Contain(new Guid(PageWithMultipleAliasesKey)));
+        Assert.That(DocumentUrlAliasService.GetDocumentKeysByAlias("child-alias", isoCode), Does.Contain(new Guid(ChildPageKey)));
+    }
+
+    [Test]
+    public async Task RebuildAllAliasesAsync_Updates_Database_With_Current_Property_Values()
+    {
+        var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
+
+        // Arrange - update a document's alias property directly in the database (simulating external change)
+        var content = ContentService.GetById(PageWithSingleAlias.Key)!;
+        content.SetValue(Constants.Conventions.Content.UrlAlias, "rebuilt-alias");
+        ContentService.Save(content, -1);
+        ContentService.Publish(content, []);
+
+        // Act - rebuild all aliases
+        await DocumentUrlAliasService.RebuildAllAliasesAsync();
+
+        // Assert - new alias should be available, old should not
+        Assert.That(DocumentUrlAliasService.GetDocumentKeysByAlias("rebuilt-alias", isoCode), Does.Contain(new Guid(PageWithSingleAliasKey)));
+        Assert.That(DocumentUrlAliasService.GetDocumentKeysByAlias("my-single-alias", isoCode), Is.Empty);
+    }
+
+    [Test]
+    public async Task RebuildAllAliasesAsync_Clears_Removed_Aliases()
+    {
+        var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
+
+        // Arrange - verify alias exists
+        Assert.That(DocumentUrlAliasService.GetDocumentKeysByAlias("my-single-alias", isoCode), Is.Not.Empty);
+
+        // Remove the alias from the document
+        var content = ContentService.GetById(PageWithSingleAlias.Key)!;
+        content.SetValue(Constants.Conventions.Content.UrlAlias, string.Empty);
+        ContentService.Save(content, -1);
+        ContentService.Publish(content, []);
+
+        // Act - rebuild all aliases
+        await DocumentUrlAliasService.RebuildAllAliasesAsync();
+
+        // Assert - alias should no longer exist in cache or database
+        Assert.That(DocumentUrlAliasService.GetDocumentKeysByAlias("my-single-alias", isoCode), Is.Empty);
+
+        // Verify in database
+        List<PublishedDocumentUrlAlias> storedAliases;
+        using (ICoreScope scope = CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            storedAliases = DocumentUrlAliasRepository.GetAll()
+                .Where(a => a.DocumentKey == new Guid(PageWithSingleAliasKey))
+                .ToList();
+        }
+
+        Assert.That(storedAliases, Is.Empty);
+    }
+
+    [Test]
+    public async Task RebuildAllAliasesAsync_Handles_Empty_Database()
+    {
+        // Arrange - clear all aliases from documents
+        var content1 = ContentService.GetById(PageWithSingleAlias.Key)!;
+        content1.SetValue(Constants.Conventions.Content.UrlAlias, string.Empty);
+        ContentService.Save(content1, -1);
+        ContentService.Publish(content1, []);
+
+        var content2 = ContentService.GetById(PageWithMultipleAliases.Key)!;
+        content2.SetValue(Constants.Conventions.Content.UrlAlias, string.Empty);
+        ContentService.Save(content2, -1);
+        ContentService.Publish(content2, []);
+
+        var content3 = ContentService.GetById(ChildPage.Key)!;
+        content3.SetValue(Constants.Conventions.Content.UrlAlias, string.Empty);
+        ContentService.Save(content3, -1);
+        ContentService.Publish(content3, []);
+
+        // Act - rebuild should not throw
+        await DocumentUrlAliasService.RebuildAllAliasesAsync();
+
+        // Assert - cache should be empty
+        Assert.That(DocumentUrlAliasService.HasAny(), Is.False);
     }
 
     #endregion

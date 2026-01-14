@@ -121,7 +121,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         if (ShouldRebuildAliases())
         {
             _logger.LogInformation("Rebuilding all document aliases.");
-            await RebuildAllAliasesAsync();
+            await RebuildAllAliasesInternalAsync();
         }
 
         _logger.LogInformation("Caching document aliases.");
@@ -180,6 +180,31 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     }
 
     /// <inheritdoc/>
+    public IEnumerable<string> GetAliases(Guid documentKey, string? culture)
+    {
+        ThrowIfNotInitialized();
+
+        // Default to the default language when culture is not specified (like DocumentUrlService)
+        culture ??= _languageService.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
+
+        if (!TryGetLanguageId(culture, out var languageId))
+        {
+            return [];
+        }
+
+        if (!_documentToAliasesCache.TryGetValue(documentKey, out HashSet<AliasCacheKey>? aliasKeys) || aliasKeys.Count == 0)
+        {
+            return [];
+        }
+
+        // Filter by language and return the alias strings
+        return aliasKeys
+            .Where(key => key.LanguageId == languageId)
+            .Select(key => key.NormalizedAlias)
+            .ToList();
+    }
+
+    /// <inheritdoc/>
     public async Task CreateOrUpdateAliasesAsync(Guid documentKey)
     {
         ThrowIfNotInitialized();
@@ -190,15 +215,15 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         if (document is null || document.Trashed || document.Blueprint)
         {
             // Remove from cache if document doesn't exist, is trashed, or is a blueprint
-            RemoveFromCache(documentKey);
+            RemoveFromCacheDeferred(_coreScopeProvider.Context!, documentKey);
             scope.Complete();
             return;
         }
 
         List<PublishedDocumentUrlAlias> aliases = await ExtractAliasesFromDocumentAsync(document);
 
-        // Remove old aliases from cache
-        RemoveFromCache(documentKey);
+        // Remove old aliases from cache (deferred until scope completes)
+        RemoveFromCacheDeferred(_coreScopeProvider.Context!, documentKey);
 
         scope.WriteLock(Constants.Locks.DocumentUrlAliases);
 
@@ -209,7 +234,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
 
             foreach (PublishedDocumentUrlAlias alias in aliases)
             {
-                AddToCache(alias);
+                AddToCacheDeferred(_coreScopeProvider.Context!, alias);
             }
         }
         else
@@ -248,15 +273,32 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     {
         ThrowIfNotInitialized();
 
+        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+
         foreach (Guid documentKey in documentKeys)
         {
-            RemoveFromCache(documentKey);
+            RemoveFromCacheDeferred(_coreScopeProvider.Context!, documentKey);
         }
 
+        scope.Complete();
         return Task.CompletedTask;
     }
 
-    private async Task RebuildAllAliasesAsync()
+    /// <inheritdoc/>
+    public bool HasAny()
+    {
+        ThrowIfNotInitialized();
+        return _aliasCache.Count > 0;
+    }
+
+    /// <inheritdoc/>
+    public async Task RebuildAllAliasesAsync()
+    {
+        ThrowIfNotInitialized();
+        await RebuildAllAliasesInternalAsync();
+    }
+
+    private async Task RebuildAllAliasesInternalAsync()
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         scope.ReadLock(Constants.Locks.ContentTree);
@@ -304,7 +346,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
             }
         }
 
-        // Clear existing and save new
+        // Clear existing database records and save new
         scope.WriteLock(Constants.Locks.DocumentUrlAliases);
         _documentUrlAliasRepository.DeleteByDocumentKey(documentKeys);
         if (toSave.Count > 0)
@@ -313,6 +355,17 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         }
 
         _keyValueService.SetValue(RebuildKey, CurrentRebuildValue);
+
+        // Clear and repopulate the in-memory cache
+        _aliasCache.Clear();
+        _documentToAliasesCache.Clear();
+
+        foreach (PublishedDocumentUrlAlias alias in toSave)
+        {
+            AddToCache(alias);
+        }
+
+        _logger.LogInformation("Rebuilt {AliasCount} document aliases.", toSave.Count);
 
         scope.Complete();
     }
@@ -400,6 +453,9 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         return _cultureToLanguageIdMap.TryGetValue(culture, out languageId);
     }
 
+    /// <summary>
+    /// Adds an alias to the cache immediately. Used during initialization and rebuild.
+    /// </summary>
     private void AddToCache(PublishedDocumentUrlAlias alias)
     {
         var cacheKey = new AliasCacheKey(alias.Alias, alias.LanguageId);
@@ -437,6 +493,22 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
             });
     }
 
+    /// <summary>
+    /// Adds an alias to the cache when the scope completes successfully.
+    /// This ensures cache updates are rolled back if the database transaction fails.
+    /// </summary>
+    private void AddToCacheDeferred(IScopeContext scopeContext, PublishedDocumentUrlAlias alias)
+    {
+        scopeContext.Enlist($"AddAliasToCache_{alias.DocumentKey}_{alias.Alias}_{alias.LanguageId}", () =>
+        {
+            AddToCache(alias);
+            return true;
+        });
+    }
+
+    /// <summary>
+    /// Removes all aliases for a document from the cache immediately. Used during initialization and rebuild.
+    /// </summary>
     private void RemoveFromCache(Guid documentKey)
     {
         if (!_documentToAliasesCache.TryRemove(documentKey, out HashSet<AliasCacheKey>? keys))
@@ -462,6 +534,19 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
                 _aliasCache.TryRemove(key, out _);
             }
         }
+    }
+
+    /// <summary>
+    /// Removes all aliases for a document from the cache when the scope completes successfully.
+    /// This ensures cache updates are rolled back if the database transaction fails.
+    /// </summary>
+    private void RemoveFromCacheDeferred(IScopeContext scopeContext, Guid documentKey)
+    {
+        scopeContext.Enlist($"RemoveAliasFromCache_{documentKey}", () =>
+        {
+            RemoveFromCache(documentKey);
+            return true;
+        });
     }
 
     private static string NormalizeAlias(string alias)

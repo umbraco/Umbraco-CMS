@@ -21,6 +21,14 @@ public interface IDocumentUrlAliasService
     IEnumerable<Guid> GetDocumentKeysByAlias(string alias, string? culture);
 
     /// <summary>
+    /// Gets all URL aliases for a given document.
+    /// </summary>
+    /// <param name="documentKey">The document key.</param>
+    /// <param name="culture">The culture code (null for default language).</param>
+    /// <returns>All aliases for the document in the specified culture, or empty if none found.</returns>
+    IEnumerable<string> GetAliases(Guid documentKey, string? culture);
+
+    /// <summary>
     /// Creates or updates the aliases for a single document.
     /// </summary>
     /// <param name="documentKey">The document key.</param>
@@ -37,4 +45,19 @@ public interface IDocumentUrlAliasService
     /// </summary>
     /// <param name="documentKeys">The collection of document keys.</param>
     Task DeleteAliasesFromCacheAsync(IEnumerable<Guid> documentKeys);
+
+    /// <summary>
+    /// Rebuilds all URL aliases from the database.
+    /// </summary>
+    /// <remarks>
+    /// This method clears the existing alias cache and database records,
+    /// then rebuilds from the umbracoUrlAlias property values on all documents.
+    /// </remarks>
+    Task RebuildAllAliasesAsync();
+
+    /// <summary>
+    /// Checks whether any aliases are cached.
+    /// </summary>
+    /// <returns><c>true</c> if there are any aliases in the cache; otherwise, <c>false</c>.</returns>
+    bool HasAny();
 }
