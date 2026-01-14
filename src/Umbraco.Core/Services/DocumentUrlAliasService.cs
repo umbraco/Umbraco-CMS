@@ -206,8 +206,6 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     /// <inheritdoc/>
     public async Task CreateOrUpdateAliasesAsync(Guid documentKey)
     {
-        ThrowIfNotInitialized();
-
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         scope.WriteLock(Constants.Locks.DocumentUrlAliases);
 
@@ -219,8 +217,6 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     /// <inheritdoc/>
     public async Task CreateOrUpdateAliasesWithDescendantsAsync(Guid documentKey)
     {
-        ThrowIfNotInitialized();
-
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         scope.WriteLock(Constants.Locks.DocumentUrlAliases);
 
@@ -278,8 +274,6 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     /// <inheritdoc/>
     public Task DeleteAliasesFromCacheAsync(IEnumerable<Guid> documentKeys)
     {
-        ThrowIfNotInitialized();
-
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
 
         foreach (Guid documentKey in documentKeys)
