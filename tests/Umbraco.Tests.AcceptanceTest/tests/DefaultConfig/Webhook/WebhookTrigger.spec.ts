@@ -39,10 +39,9 @@ test('can trigger when content is published', async ({umbracoApi, umbracoUi}) =>
 
   // Act
   await umbracoUi.content.goToContentWithName(documentName);
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   const webhookSiteData = await umbracoApi.webhook.getWebhookSiteRequestResponse(webhookSiteToken);
   expect(webhookSiteData[0].content).toContain(documentName);
 });
@@ -60,10 +59,9 @@ test('can trigger when content is deleted', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.content.clickEmptyRecycleBinButton();
-  await umbracoUi.content.clickConfirmEmptyRecycleBinButton();
+  await umbracoUi.content.clickConfirmEmptyRecycleBinButtonAndWaitForRecycleBinToBeEmptied();
 
   // Assert
-  await umbracoUi.content.waitForRecycleBinToBeEmptied();
   const webhookSiteData = await umbracoApi.webhook.getWebhookSiteRequestResponse(webhookSiteToken);
   expect(webhookSiteData[0].content).toContain(contentId);
 });
@@ -102,8 +100,7 @@ test('can trigger when media is saved', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.media.goToMediaWithName(mediaName);
-  await umbracoUi.media.clickSaveButton();
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
+  await umbracoUi.media.clickSaveButtonAndWaitForMediaToBeUpdated();
 
   // Assert
   const webhookSiteData = await umbracoApi.webhook.getWebhookSiteRequestResponse(webhookSiteToken);
@@ -124,8 +121,7 @@ test('can trigger when media is deleted', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.media.isItemVisibleInRecycleBin(mediaName, true, true);
-  await umbracoUi.media.deleteMediaItem(mediaName);
-  await umbracoUi.media.waitForMediaToBeTrashed();
+  await umbracoUi.media.deleteMediaItemAndWaitForMediaToBeDeleted(mediaName);
 
   // Assert
   const webhookSiteData = await umbracoApi.webhook.getWebhookSiteRequestResponse(webhookSiteToken);
@@ -179,11 +175,11 @@ test('can trigger the webhook for a specific content type', async ({umbracoApi, 
   await umbracoUi.content.clickActionsMenuForContent(documentName);
   await umbracoUi.content.clickPublishActionMenuOption();
   await umbracoUi.content.clickConfirmToPublishButton();
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
+  await umbracoUi.content.isSuccessNotificationVisible();
   await umbracoUi.content.clickActionsMenuForContent(secondDocumentName);
   await umbracoUi.content.clickPublishActionMenuOption();
   await umbracoUi.content.clickConfirmToPublishButton();
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
+  await umbracoUi.content.isSuccessNotificationVisible();
 
   // Assert
   const webhookSiteData = await umbracoApi.webhook.getWebhookSiteRequestResponse(webhookSiteToken);
@@ -210,7 +206,7 @@ test('cannot trigger when the webhook is disabled', async ({umbracoApi, umbracoU
   await umbracoUi.content.clickActionsMenuForContent(documentName);
   await umbracoUi.content.clickPublishActionMenuOption();
   await umbracoUi.content.clickConfirmToPublishButton();
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
+  await umbracoUi.content.isSuccessNotificationVisible();
 
   // Assert
   const webhookSiteData = await umbracoApi.webhook.getWebhookSiteRequestResponse(webhookSiteToken, 7000);
@@ -234,7 +230,7 @@ test('can custom header for the webhook request', async ({umbracoApi, umbracoUi}
   await umbracoUi.content.clickActionsMenuForContent(documentName);
   await umbracoUi.content.clickPublishActionMenuOption();
   await umbracoUi.content.clickConfirmToPublishButton();
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
+  await umbracoUi.content.isSuccessNotificationVisible();
 
   // Assert
   const webhookSiteData = await umbracoApi.webhook.getWebhookSiteRequestResponse(webhookSiteToken);

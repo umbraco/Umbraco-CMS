@@ -178,14 +178,17 @@ internal class MigrateTours : UnscopedMigrationBase
         [Constraint(Default = "0")]
         public bool NoConsole { get; set; }
 
-        [Column("userName")] public string UserName { get; set; } = null!;
+        [Column("userName")]
+        public string UserName { get; set; } = null!;
 
         [Column("userLogin")]
         [Length(125)]
         [Index(IndexTypes.NonClustered)]
         public string? Login { get; set; }
 
-        [Column("userPassword")] [Length(500)] public string? Password { get; set; }
+        [Column("userPassword")]
+        [Length(500)]
+        public string? Password { get; set; }
 
         /// <summary>
         ///     This will represent a JSON structure of how the password has been created (i.e hash algorithm, iterations)
@@ -195,7 +198,8 @@ internal class MigrateTours : UnscopedMigrationBase
         [Length(500)]
         public string? PasswordConfig { get; set; }
 
-        [Column("userEmail")] public string Email { get; set; } = null!;
+        [Column("userEmail")]
+        public string Email { get; set; } = null!;
 
         [Column("userLanguage")]
         [NullSetting(NullSetting = NullSettings.Null)]

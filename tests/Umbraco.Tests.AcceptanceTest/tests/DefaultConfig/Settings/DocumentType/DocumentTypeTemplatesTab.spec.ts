@@ -28,10 +28,9 @@ test('can add an allowed template to a document type', {tag: '@smoke'}, async ({
   await umbracoUi.documentType.clickChooseButton();
   await umbracoUi.documentType.clickLabelWithName(templateName);
   await umbracoUi.documentType.clickChooseModalButton();
-  await umbracoUi.documentType.clickSaveButton();
+  await umbracoUi.documentType.clickSaveButtonAndWaitForDocumentTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.documentType.isSuccessStateVisibleForSaveButton();
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeData.allowedTemplates[0].id).toBe(templateId);
 });
@@ -48,10 +47,9 @@ test('can set an allowed template as default for document type', async ({umbraco
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
   await umbracoUi.documentType.clickDocumentTypeTemplatesTab();
   await umbracoUi.documentType.clickSetAsDefaultButton();
-  await umbracoUi.documentType.clickSaveButton();
+  await umbracoUi.documentType.clickSaveButtonAndWaitForDocumentTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.documentType.isSuccessStateVisibleForSaveButton();
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeData.allowedTemplates).toHaveLength(2);
   expect(documentTypeData.defaultTemplate.id).toBe(secondTemplateId);
@@ -69,10 +67,9 @@ test('can remove an allowed template from a document type', async ({umbracoApi, 
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
   await umbracoUi.documentType.clickDocumentTypeTemplatesTab();
   await umbracoUi.documentType.clickRemoveWithName(templateName);
-  await umbracoUi.documentType.clickSaveButton();
+  await umbracoUi.documentType.clickSaveButtonAndWaitForDocumentTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.documentType.isSuccessStateVisibleForSaveButton();
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeData.allowedTemplates).toHaveLength(0);
 });

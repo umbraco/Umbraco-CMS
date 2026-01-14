@@ -17,6 +17,7 @@ public class ValidateLogFileSizeLogViewerController : LogViewerControllerBase
     /// <summary>
     ///     Gets a value indicating whether or not you are able to view logs for a specified date range.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <param name="startDate">The start date for the date range (can be null).</param>
     /// <param name="endDate">The end date for the date range (can be null).</param>
     /// <returns>The boolean result.</returns>

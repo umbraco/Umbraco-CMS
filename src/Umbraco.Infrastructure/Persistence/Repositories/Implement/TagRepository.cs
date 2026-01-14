@@ -47,7 +47,9 @@ internal sealed class TagRepository : EntityRepositoryBase<int, ITag>, ITagRepos
     {
         IEnumerable<TagDto> dtos = ids?.Length == 0
             ? Database.Fetch<TagDto>(Sql().Select<TagDto>().From<TagDto>())
-            : Database.FetchByGroups<TagDto, int>(ids!, Constants.Sql.MaxParameterCount,
+            : Database.FetchByGroups<TagDto, int>(
+                ids!,
+                Constants.Sql.MaxParameterCount,
                 batch => Sql().Select<TagDto>().From<TagDto>().WhereIn<TagDto>(x => x.Id, batch));
 
         return dtos.Select(TagFactory.BuildEntity).ToList();
@@ -331,7 +333,9 @@ ON (tagset.tag = {cmsTags}.tag AND tagset.{group} = {cmsTags}.{group} AND COALES
     }
 
     /// <inheritdoc />
-    public IEnumerable<TaggedEntity> GetTaggedEntitiesByTagGroup(TaggableObjectTypes objectType, string group,
+    public IEnumerable<TaggedEntity> GetTaggedEntitiesByTagGroup(
+        TaggableObjectTypes objectType,
+        string group,
         string? culture = null)
     {
         Sql<ISqlContext> sql = GetTaggedEntitiesSql(objectType, culture);
@@ -343,8 +347,11 @@ ON (tagset.tag = {cmsTags}.tag AND tagset.{group} = {cmsTags}.{group} AND COALES
     }
 
     /// <inheritdoc />
-    public IEnumerable<TaggedEntity> GetTaggedEntitiesByTag(TaggableObjectTypes objectType, string tag,
-        string? group = null, string? culture = null)
+    public IEnumerable<TaggedEntity> GetTaggedEntitiesByTag(
+        TaggableObjectTypes objectType,
+        string tag,
+        string? group = null,
+        string? culture = null)
     {
         Sql<ISqlContext> sql = GetTaggedEntitiesSql(objectType, culture);
 
@@ -365,10 +372,13 @@ ON (tagset.tag = {cmsTags}.tag AND tagset.{group} = {cmsTags}.{group} AND COALES
         Sql<ISqlContext> sql = Sql()
             .Select<TagRelationshipDto>(x => Alias(x.NodeId, "NodeId"))
             .AndSelect<PropertyTypeDto>(
-            x => Alias(x.Alias, "PropertyTypeAlias"),
+                x => Alias(x.Alias, "PropertyTypeAlias"),
                 x => Alias(x.Id, "PropertyTypeId"))
-            .AndSelect<TagDto>(x => Alias(x.Id, "TagId"), x => Alias(x.Text, "TagText"),
-                x => Alias(x.Group, "TagGroup"), x => Alias(x.LanguageId, "TagLanguage"))
+            .AndSelect<TagDto>(
+                x => Alias(x.Id, "TagId"),
+                x => Alias(x.Text, "TagText"),
+                x => Alias(x.Group, "TagGroup"),
+                x => Alias(x.LanguageId, "TagLanguage"))
             .From<TagDto>()
             .InnerJoin<TagRelationshipDto>().On<TagDto, TagRelationshipDto>((tag, rel) => tag.Id == rel.TagId)
             .InnerJoin<ContentDto>()
@@ -486,7 +496,10 @@ ON (tagset.tag = {cmsTags}.tag AND tagset.{group} = {cmsTags}.{group} AND COALES
     }
 
     /// <inheritdoc />
-    public IEnumerable<ITag> GetTagsForProperty(int contentId, string propertyTypeAlias, string? group = null,
+    public IEnumerable<ITag> GetTagsForProperty(
+        int contentId,
+        string propertyTypeAlias,
+        string? group = null,
         string? culture = null)
     {
         Sql<ISqlContext> sql = GetTagsSql(culture);
@@ -509,7 +522,10 @@ ON (tagset.tag = {cmsTags}.tag AND tagset.{group} = {cmsTags}.{group} AND COALES
     }
 
     /// <inheritdoc />
-    public IEnumerable<ITag> GetTagsForProperty(Guid contentId, string propertyTypeAlias, string? group = null,
+    public IEnumerable<ITag> GetTagsForProperty(
+        Guid contentId,
+        string propertyTypeAlias,
+        string? group = null,
         string? culture = null)
     {
         Sql<ISqlContext> sql = GetTagsSql(culture);
