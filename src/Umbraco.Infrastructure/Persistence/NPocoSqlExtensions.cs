@@ -93,14 +93,23 @@ namespace Umbraco.Extensions
         /// <returns>The Sql statement.</returns>
         public static Sql<ISqlContext> WhereIn<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> field, IEnumerable? values)
         {
+            if (values == null)
+            {
+                return sql;
+            }
+
             var fieldName = sql.SqlContext.SqlSyntax.GetFieldName(field);
 
-            Attempt<string[]> attempt = values.TryConvertTo<string[]>();
-            if (attempt.Success)
+            string[] stringValues = [.. values.OfType<string>()]; // This is necessary to avoid failing attempting to convert to string[] when values contains non-string types
+            if (stringValues.Length > 0)
             {
-                values = attempt.Result?.Select(v => v?.ToLower());
-                sql.Where($"LOWER({fieldName}) IN (@values)", new { values });
-                return sql;
+                Attempt<string[]> attempt = values.TryConvertTo<string[]>();
+                if (attempt.Success)
+                {
+                    values = attempt.Result?.Select(v => v?.ToLower());
+                    sql.Where($"LOWER({fieldName}) IN (@values)", new { values });
+                    return sql;
+                }
             }
 
             sql.Where($"{fieldName} IN (@values)", new { values });
