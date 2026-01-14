@@ -1,4 +1,5 @@
 import { UMB_ELEMENT_FOLDER_ENTITY_TYPE } from '../../entity.js';
+import type { UmbElementFolderModel } from '../types.js';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { ElementService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
@@ -11,7 +12,7 @@ import type { UmbFolderModel } from '@umbraco-cms/backoffice/tree';
  * @class UmbElementFolderServerDataSource
  * @implements {UmbDetailDataSource}
  */
-export class UmbElementFolderServerDataSource implements UmbDetailDataSource<UmbFolderModel> {
+export class UmbElementFolderServerDataSource implements UmbDetailDataSource<UmbElementFolderModel> {
 	#host: UmbControllerHost;
 
 	/**
@@ -29,7 +30,7 @@ export class UmbElementFolderServerDataSource implements UmbDetailDataSource<Umb
 	 * @memberof UmbElementFolderServerDataSource
 	 */
 	async createScaffold() {
-		const scaffold: UmbFolderModel = {
+		const scaffold: UmbElementFolderModel = {
 			entityType: UMB_ELEMENT_FOLDER_ENTITY_TYPE,
 			unique: UmbId.new(),
 			name: '',
@@ -59,6 +60,7 @@ export class UmbElementFolderServerDataSource implements UmbDetailDataSource<Umb
 				entityType: UMB_ELEMENT_FOLDER_ENTITY_TYPE,
 				unique: data.id,
 				name: data.name,
+				isTrashed: false, // TODO: [LK] We need to have `isTrashed` returned from the server.
 			};
 
 			return { data: mappedData };

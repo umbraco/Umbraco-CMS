@@ -1,5 +1,6 @@
 import { UMB_ELEMENT_FOLDER_ENTITY_TYPE } from '../entity.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
+import { manifests as treeManifests } from './tree/manifests.js';
 import { manifests as workspaceManifests } from './workspace/manifests.js';
 import { UMB_ELEMENT_FOLDER_REPOSITORY_ALIAS } from './repository/constants.js';
 import { UMB_ENTITY_IS_TRASHED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/recycle-bin';
@@ -50,5 +51,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		],
 	},
 	...repositoryManifests,
+	...treeManifests,
 	...workspaceManifests,
 ];

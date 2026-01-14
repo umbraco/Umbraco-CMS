@@ -1,7 +1,12 @@
 import { UMB_ELEMENT_DETAIL_REPOSITORY_ALIAS } from '../../repository/detail/constants.js';
-import { UMB_ELEMENT_ENTITY_TYPE } from '../../entity.js';
+import { UMB_ELEMENT_ENTITY_TYPE, UMB_ELEMENT_FOLDER_ENTITY_TYPE } from '../../entity.js';
+import { UMB_ELEMENT_FOLDER_REPOSITORY_ALIAS } from '../../folder/repository/constants.js';
 import { UMB_ELEMENT_ITEM_REPOSITORY_ALIAS } from '../../item/constants.js';
-import { UMB_ELEMENT_RECYCLE_BIN_REPOSITORY_ALIAS, UMB_ELEMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE } from '../constants.js';
+import {
+	UMB_ELEMENT_FOLDER_RECYCLE_BIN_REPOSITORY_ALIAS,
+	UMB_ELEMENT_RECYCLE_BIN_REPOSITORY_ALIAS,
+	UMB_ELEMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE,
+} from '../constants.js';
 import { UMB_ELEMENT_REFERENCE_REPOSITORY_ALIAS } from '../../reference/constants.js';
 import { UMB_ENTITY_HAS_CHILDREN_CONDITION_ALIAS } from '@umbraco-cms/backoffice/entity-action';
 import {
@@ -9,7 +14,7 @@ import {
 	UMB_ENTITY_IS_TRASHED_CONDITION_ALIAS,
 } from '@umbraco-cms/backoffice/recycle-bin';
 
-export const manifests: Array<UmbExtensionManifest> = [
+const elementActions: Array<UmbExtensionManifest> = [
 	{
 		type: 'entityAction',
 		kind: 'trashWithRelation',
@@ -21,11 +26,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			recycleBinRepositoryAlias: UMB_ELEMENT_RECYCLE_BIN_REPOSITORY_ALIAS,
 			referenceRepositoryAlias: UMB_ELEMENT_REFERENCE_REPOSITORY_ALIAS,
 		},
-		conditions: [
-			{
-				alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
-			},
-		],
+		conditions: [{ alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS }],
 	},
 	{
 		type: 'entityAction',
@@ -39,11 +40,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			detailRepositoryAlias: UMB_ELEMENT_DETAIL_REPOSITORY_ALIAS,
 			referenceRepositoryAlias: UMB_ELEMENT_REFERENCE_REPOSITORY_ALIAS,
 		},
-		conditions: [
-			{
-				alias: UMB_ENTITY_IS_TRASHED_CONDITION_ALIAS,
-			},
-		],
+		conditions: [{ alias: UMB_ENTITY_IS_TRASHED_CONDITION_ALIAS }],
 	},
 	// {
 	// 	type: 'entityAction',
@@ -63,26 +60,47 @@ export const manifests: Array<UmbExtensionManifest> = [
 	// 		},
 	// 	],
 	// },
+];
+
+const folderActions: Array<UmbExtensionManifest> = [
 	{
 		type: 'entityAction',
-		kind: 'emptyRecycleBin',
-		alias: 'Umb.EntityAction.Element.RecycleBin.Empty',
-		name: 'Empty Element Recycle Bin Entity Action',
-		forEntityTypes: [UMB_ELEMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE],
+		kind: 'trashFolder',
+		alias: 'Umb.EntityAction.Element.Folder.Trash',
+		name: 'Trash Element Folder Entity Action',
+		forEntityTypes: [UMB_ELEMENT_FOLDER_ENTITY_TYPE],
 		meta: {
-			recycleBinRepositoryAlias: UMB_ELEMENT_RECYCLE_BIN_REPOSITORY_ALIAS,
+			folderRepositoryAlias: UMB_ELEMENT_FOLDER_REPOSITORY_ALIAS,
+			recycleBinRepositoryAlias: UMB_ELEMENT_FOLDER_RECYCLE_BIN_REPOSITORY_ALIAS,
 		},
-		conditions: [
-			{
-				alias: UMB_ENTITY_HAS_CHILDREN_CONDITION_ALIAS,
-			},
-		],
+		conditions: [{ alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS }],
 	},
-	{
-		type: 'entityAction',
-		kind: 'reloadTreeItemChildren',
-		alias: 'Umb.EntityAction.ElementRecycleBin.Tree.ReloadChildrenOf',
-		name: 'Reload Element Recycle Bin Tree Item Children Entity Action',
-		forEntityTypes: [UMB_ELEMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE],
+];
+
+const emptyRecycleBin: UmbExtensionManifest = {
+	type: 'entityAction',
+	kind: 'emptyRecycleBin',
+	alias: 'Umb.EntityAction.Element.RecycleBin.Empty',
+	name: 'Empty Element Recycle Bin Entity Action',
+	forEntityTypes: [UMB_ELEMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE],
+	meta: {
+		recycleBinRepositoryAlias: UMB_ELEMENT_RECYCLE_BIN_REPOSITORY_ALIAS,
 	},
+	conditions: [{ alias: UMB_ENTITY_HAS_CHILDREN_CONDITION_ALIAS }],
+};
+
+const reloadTreeItemChildren: UmbExtensionManifest = {
+	type: 'entityAction',
+	kind: 'reloadTreeItemChildren',
+	alias: 'Umb.EntityAction.ElementRecycleBin.Tree.ReloadChildrenOf',
+	name: 'Reload Element Recycle Bin Tree Item Children Entity Action',
+	forEntityTypes: [UMB_ELEMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE],
+	meta: {},
+};
+
+export const manifests: Array<UmbExtensionManifest> = [
+	...elementActions,
+	...folderActions,
+	emptyRecycleBin,
+	reloadTreeItemChildren,
 ];

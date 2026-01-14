@@ -70,7 +70,7 @@ const mapper = (item: ElementRecycleBinItemResponseModel): UmbElementRecycleBinT
 				: UMB_ELEMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE,
 		},
 		entityType: item.isFolder ? UMB_ELEMENT_FOLDER_ENTITY_TYPE : UMB_ELEMENT_ENTITY_TYPE,
-		icon: item.documentType?.icon,
+		icon: item.isFolder ? 'icon-folder' : (item.documentType?.icon ?? 'icon-document'),
 		isTrashed: true,
 		hasChildren: item.hasChildren,
 		//isProtected: false,
