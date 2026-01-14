@@ -15,7 +15,94 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing;
 [TestFixture]
 public class ContentFinderByUrlAliasTests
 {
-    private static readonly Guid DocumentKey = Guid.NewGuid();
+    private static readonly Guid _documentKey = Guid.NewGuid();
+
+    private delegate void TryGetUmbracoContextDelegate(out IUmbracoContext? umbracoContext);
+
+    /// <summary>
+    /// Holds all mocks needed for ContentFinderByUrlAlias tests.
+    /// </summary>
+    private sealed class TestContext
+    {
+        public Mock<IUmbracoContextAccessor> UmbracoContextAccessor { get; } = new();
+
+        public Mock<IUmbracoContext> UmbracoContext { get; } = new();
+
+        public Mock<IPublishedContentCache> PublishedContentCache { get; } = new();
+
+        public Mock<IDocumentUrlAliasService> DocumentUrlAliasService { get; } = new();
+
+        public Mock<IDocumentNavigationQueryService> DocumentNavigationQueryService { get; } = new();
+
+        public Mock<IIdKeyMap> IdKeyMap { get; } = new();
+
+        public Mock<IFileService> FileService { get; } = new();
+
+        public TestContext()
+        {
+            // Default setup: UmbracoContext is available and returns content cache
+            UmbracoContextAccessor
+                .Setup(x => x.TryGetUmbracoContext(out It.Ref<IUmbracoContext?>.IsAny))
+                .Callback(new TryGetUmbracoContextDelegate((out IUmbracoContext? ctx) => ctx = UmbracoContext.Object))
+                .Returns(true);
+            UmbracoContext.Setup(x => x.Content).Returns(PublishedContentCache.Object);
+        }
+
+        public ContentFinderByUrlAlias CreateContentFinder() =>
+            new(
+                Mock.Of<ILogger<ContentFinderByUrlAlias>>(),
+                UmbracoContextAccessor.Object,
+                DocumentNavigationQueryService.Object,
+                DocumentUrlAliasService.Object,
+                IdKeyMap.Object);
+
+        public PublishedRequestBuilder CreateRequestBuilder(string url, DomainAndUri? domain = null)
+        {
+            var builder = new PublishedRequestBuilder(new Uri(url, UriKind.Absolute), FileService.Object);
+            if (domain is not null)
+            {
+                builder.SetDomain(domain);
+            }
+
+            return builder;
+        }
+
+        public void SetupAliasReturnsDocuments(string alias, params Guid[] documentKeys) =>
+            DocumentUrlAliasService
+                .Setup(x => x.GetDocumentKeysByAlias(alias, It.IsAny<string?>()))
+                .Returns(documentKeys);
+
+        public void SetupAliasReturnsEmpty() =>
+            DocumentUrlAliasService
+                .Setup(x => x.GetDocumentKeysByAlias(It.IsAny<string>(), It.IsAny<string?>()))
+                .Returns([]);
+
+        public void SetupDomainRoot(int domainRootId, Guid domainRootKey) =>
+            IdKeyMap
+                .Setup(x => x.GetKeyForId(domainRootId, UmbracoObjectTypes.Document))
+                .Returns(Attempt<Guid>.Succeed(domainRootKey));
+
+        public void SetupDocumentAncestors(Guid documentKey, params Guid[] ancestorKeys)
+        {
+            IEnumerable<Guid> ancestors = ancestorKeys;
+            DocumentNavigationQueryService
+                .Setup(x => x.TryGetAncestorsKeys(documentKey, out ancestors))
+                .Returns(true);
+        }
+
+        public Mock<IPublishedContent> SetupContentItem(Guid documentKey, int nodeId)
+        {
+            var contentItem = new Mock<IPublishedContent>();
+            contentItem.Setup(x => x.Id).Returns(nodeId);
+            PublishedContentCache.Setup(x => x.GetById(documentKey)).Returns(contentItem.Object);
+            return contentItem;
+        }
+
+        public void SetupNoUmbracoContext() =>
+            UmbracoContextAccessor
+                .Setup(x => x.TryGetUmbracoContext(out It.Ref<IUmbracoContext?>.IsAny))
+                .Returns(false);
+    }
 
     [TestCase("/this/is/my/alias", 1001)]
     [TestCase("/anotheralias", 1001)]
@@ -27,118 +114,53 @@ public class ContentFinderByUrlAliasTests
     public async Task Lookup_By_Url_Alias(string relativeUrl, int nodeMatch)
     {
         // Arrange
-        var absoluteUrl = "http://localhost" + relativeUrl;
-
-        // Normalize the alias the same way the service does
+        var ctx = new TestContext();
         var normalizedAlias = relativeUrl.TrimStart('/').TrimEnd('/').ToLowerInvariant();
 
-        var umbracoContextAccessor = new Mock<IUmbracoContextAccessor>();
-        var umbracoContext = new Mock<IUmbracoContext>();
-        var publishedContentCache = new Mock<IPublishedContentCache>();
-        var documentUrlAliasService = new Mock<IDocumentUrlAliasService>();
-        var idKeyMap = new Mock<IIdKeyMap>();
-        var contentItem = new Mock<IPublishedContent>();
-        var fileService = new Mock<IFileService>();
+        ctx.SetupAliasReturnsDocuments(normalizedAlias, _documentKey);
+        ctx.SetupContentItem(_documentKey, nodeMatch);
 
-        umbracoContextAccessor.Setup(x => x.TryGetUmbracoContext(out It.Ref<IUmbracoContext?>.IsAny))
-            .Callback(new TryGetUmbracoContextDelegate((out IUmbracoContext? ctx) => ctx = umbracoContext.Object))
-            .Returns(true);
-        umbracoContext.Setup(x => x.Content).Returns(publishedContentCache.Object);
-
-        // Setup the document alias service to return the document key for the alias
-        documentUrlAliasService
-            .Setup(x => x.GetDocumentKeyByAlias(normalizedAlias, It.IsAny<string?>(), It.IsAny<Guid?>()))
-            .Returns(DocumentKey);
-
-        // Setup the published content cache to return the content item
-        publishedContentCache.Setup(x => x.GetById(DocumentKey)).Returns(contentItem.Object);
-        contentItem.Setup(x => x.Id).Returns(nodeMatch);
-
-        var publishedRequestBuilder = new PublishedRequestBuilder(new Uri(absoluteUrl, UriKind.Absolute), fileService.Object);
+        var requestBuilder = ctx.CreateRequestBuilder("http://localhost" + relativeUrl);
 
         // Act
-        var sut = new ContentFinderByUrlAlias(
-            Mock.Of<ILogger<ContentFinderByUrlAlias>>(),
-            umbracoContextAccessor.Object,
-            documentUrlAliasService.Object,
-            idKeyMap.Object);
-        var result = await sut.TryFindContent(publishedRequestBuilder);
+        var result = await ctx.CreateContentFinder().TryFindContent(requestBuilder);
 
         // Assert
         Assert.That(result, Is.True);
-        Assert.That(publishedRequestBuilder.PublishedContent!.Id, Is.EqualTo(nodeMatch));
+        Assert.That(requestBuilder.PublishedContent!.Id, Is.EqualTo(nodeMatch));
     }
 
     [Test]
     public async Task Returns_False_When_No_Alias_Match()
     {
         // Arrange
-        var absoluteUrl = "http://localhost/non-existent-alias";
+        var ctx = new TestContext();
+        ctx.SetupAliasReturnsEmpty();
 
-        var umbracoContextAccessor = new Mock<IUmbracoContextAccessor>();
-        var umbracoContext = new Mock<IUmbracoContext>();
-        var publishedContentCache = new Mock<IPublishedContentCache>();
-        var documentUrlAliasService = new Mock<IDocumentUrlAliasService>();
-        var idKeyMap = new Mock<IIdKeyMap>();
-        var fileService = new Mock<IFileService>();
-
-        umbracoContextAccessor.Setup(x => x.TryGetUmbracoContext(out It.Ref<IUmbracoContext?>.IsAny))
-            .Callback(new TryGetUmbracoContextDelegate((out IUmbracoContext? ctx) => ctx = umbracoContext.Object))
-            .Returns(true);
-        umbracoContext.Setup(x => x.Content).Returns(publishedContentCache.Object);
-
-        // Setup the document alias service to return null (no match)
-        documentUrlAliasService
-            .Setup(x => x.GetDocumentKeyByAlias(It.IsAny<string>(), It.IsAny<string?>(), It.IsAny<Guid?>()))
-            .Returns((Guid?)null);
-
-        var publishedRequestBuilder = new PublishedRequestBuilder(new Uri(absoluteUrl, UriKind.Absolute), fileService.Object);
+        var requestBuilder = ctx.CreateRequestBuilder("http://localhost/non-existent-alias");
 
         // Act
-        var sut = new ContentFinderByUrlAlias(
-            Mock.Of<ILogger<ContentFinderByUrlAlias>>(),
-            umbracoContextAccessor.Object,
-            documentUrlAliasService.Object,
-            idKeyMap.Object);
-        var result = await sut.TryFindContent(publishedRequestBuilder);
+        var result = await ctx.CreateContentFinder().TryFindContent(requestBuilder);
 
         // Assert
         Assert.That(result, Is.False);
-        Assert.That(publishedRequestBuilder.PublishedContent, Is.Null);
+        Assert.That(requestBuilder.PublishedContent, Is.Null);
     }
 
     [Test]
     public async Task Returns_False_For_Root_Path()
     {
         // Arrange
-        var absoluteUrl = "http://localhost/";
-
-        var umbracoContextAccessor = new Mock<IUmbracoContextAccessor>();
-        var umbracoContext = new Mock<IUmbracoContext>();
-        var publishedContentCache = new Mock<IPublishedContentCache>();
-        var documentUrlAliasService = new Mock<IDocumentUrlAliasService>();
-        var idKeyMap = new Mock<IIdKeyMap>();
-        var fileService = new Mock<IFileService>();
-
-        umbracoContextAccessor.Setup(x => x.TryGetUmbracoContext(out It.Ref<IUmbracoContext?>.IsAny))
-            .Callback(new TryGetUmbracoContextDelegate((out IUmbracoContext? ctx) => ctx = umbracoContext.Object))
-            .Returns(true);
-        umbracoContext.Setup(x => x.Content).Returns(publishedContentCache.Object);
-
-        var publishedRequestBuilder = new PublishedRequestBuilder(new Uri(absoluteUrl, UriKind.Absolute), fileService.Object);
+        var ctx = new TestContext();
+        var requestBuilder = ctx.CreateRequestBuilder("http://localhost/");
 
         // Act
-        var sut = new ContentFinderByUrlAlias(
-            Mock.Of<ILogger<ContentFinderByUrlAlias>>(),
-            umbracoContextAccessor.Object,
-            documentUrlAliasService.Object,
-            idKeyMap.Object);
-        var result = await sut.TryFindContent(publishedRequestBuilder);
+        var result = await ctx.CreateContentFinder().TryFindContent(requestBuilder);
 
         // Assert - root path "/" should not trigger alias lookup
         Assert.That(result, Is.False);
-        documentUrlAliasService.Verify(
-            x => x.GetDocumentKeyByAlias(It.IsAny<string>(), It.IsAny<string?>(), It.IsAny<Guid?>()),
+        ctx.DocumentUrlAliasService.Verify(
+            x => x.GetDocumentKeysByAlias(It.IsAny<string>(), It.IsAny<string?>()),
             Times.Never);
     }
 
@@ -146,85 +168,127 @@ public class ContentFinderByUrlAliasTests
     public async Task Returns_False_When_No_Umbraco_Context()
     {
         // Arrange
-        var absoluteUrl = "http://localhost/some-alias";
+        var ctx = new TestContext();
+        ctx.SetupNoUmbracoContext();
 
-        var umbracoContextAccessor = new Mock<IUmbracoContextAccessor>();
-        var documentUrlAliasService = new Mock<IDocumentUrlAliasService>();
-        var idKeyMap = new Mock<IIdKeyMap>();
-        var fileService = new Mock<IFileService>();
+        var requestBuilder = ctx.CreateRequestBuilder("http://localhost/some-alias");
 
-        umbracoContextAccessor.Setup(x => x.TryGetUmbracoContext(out It.Ref<IUmbracoContext?>.IsAny))
-            .Returns(false);
-
-        var publishedRequestBuilder = new PublishedRequestBuilder(new Uri(absoluteUrl, UriKind.Absolute), fileService.Object);
-
-        // Act
+        // Act - use the full constructor for this edge case
         var sut = new ContentFinderByUrlAlias(
             Mock.Of<ILogger<ContentFinderByUrlAlias>>(),
             Mock.Of<IPublishedValueFallback>(),
-            umbracoContextAccessor.Object,
-            Mock.Of<IDocumentNavigationQueryService>(),
+            ctx.UmbracoContextAccessor.Object,
+            ctx.DocumentNavigationQueryService.Object,
             Mock.Of<IPublishedContentStatusFilteringService>(),
-            documentUrlAliasService.Object,
-            idKeyMap.Object);
-        var result = await sut.TryFindContent(publishedRequestBuilder);
+            ctx.DocumentUrlAliasService.Object,
+            ctx.IdKeyMap.Object);
+        var result = await sut.TryFindContent(requestBuilder);
 
         // Assert
         Assert.That(result, Is.False);
     }
 
     [Test]
-    public async Task Uses_Domain_Root_Key_When_Domain_Is_Set()
+    public async Task Returns_Document_Under_Domain_Root_When_Multiple_Matches()
     {
         // Arrange
-        var absoluteUrl = "http://localhost/my-alias";
+        var ctx = new TestContext();
+        var domainRootId = 1234;
+        var domainRootKey = Guid.NewGuid();
+        var documentUnderDomain = Guid.NewGuid();
+        var documentOutsideDomain = Guid.NewGuid();
+
+        ctx.SetupDomainRoot(domainRootId, domainRootKey);
+        ctx.SetupAliasReturnsDocuments("my-alias", documentOutsideDomain, documentUnderDomain);
+        ctx.SetupDocumentAncestors(documentOutsideDomain); // No ancestors matching domain
+        ctx.SetupDocumentAncestors(documentUnderDomain, domainRootKey);
+        ctx.SetupContentItem(documentUnderDomain, 999);
+
+        var domain = new DomainAndUri(new Domain(1, "localhost", domainRootId, null, false, 1), new Uri("http://localhost"));
+        var requestBuilder = ctx.CreateRequestBuilder("http://localhost/my-alias", domain);
+
+        // Act
+        var result = await ctx.CreateContentFinder().TryFindContent(requestBuilder);
+
+        // Assert - should find the document under the domain, not the first one
+        Assert.That(result, Is.True);
+        ctx.PublishedContentCache.Verify(x => x.GetById(documentUnderDomain), Times.Once);
+        ctx.PublishedContentCache.Verify(x => x.GetById(documentOutsideDomain), Times.Never);
+    }
+
+    [Test]
+    public async Task Returns_First_Match_When_No_Domain_Is_Set()
+    {
+        // Arrange
+        var ctx = new TestContext();
+        var firstDocument = Guid.NewGuid();
+        var secondDocument = Guid.NewGuid();
+
+        ctx.SetupAliasReturnsDocuments("my-alias", firstDocument, secondDocument);
+        ctx.SetupContentItem(firstDocument, 123);
+
+        var requestBuilder = ctx.CreateRequestBuilder("http://localhost/my-alias");
+
+        // Act
+        var result = await ctx.CreateContentFinder().TryFindContent(requestBuilder);
+
+        // Assert - should return the first match when no domain is set
+        Assert.That(result, Is.True);
+        ctx.PublishedContentCache.Verify(x => x.GetById(firstDocument), Times.Once);
+        ctx.PublishedContentCache.Verify(x => x.GetById(secondDocument), Times.Never);
+    }
+
+    [Test]
+    public async Task Returns_Document_When_It_Is_The_Domain_Root()
+    {
+        // Arrange
+        var ctx = new TestContext();
         var domainRootId = 1234;
         var domainRootKey = Guid.NewGuid();
 
-        var umbracoContextAccessor = new Mock<IUmbracoContextAccessor>();
-        var umbracoContext = new Mock<IUmbracoContext>();
-        var publishedContentCache = new Mock<IPublishedContentCache>();
-        var documentUrlAliasService = new Mock<IDocumentUrlAliasService>();
-        var idKeyMap = new Mock<IIdKeyMap>();
-        var contentItem = new Mock<IPublishedContent>();
-        var fileService = new Mock<IFileService>();
-        var domain = new Domain(1, "localhost", domainRootId, null, false, 1);
-        var domainAndUri = new DomainAndUri(domain, new Uri("http://localhost"));
+        ctx.SetupDomainRoot(domainRootId, domainRootKey);
+        ctx.SetupAliasReturnsDocuments("my-alias", domainRootKey);
+        ctx.SetupContentItem(domainRootKey, 999);
 
-        umbracoContextAccessor.Setup(x => x.TryGetUmbracoContext(out It.Ref<IUmbracoContext?>.IsAny))
-            .Callback(new TryGetUmbracoContextDelegate((out IUmbracoContext? ctx) => ctx = umbracoContext.Object))
-            .Returns(true);
-        umbracoContext.Setup(x => x.Content).Returns(publishedContentCache.Object);
-
-        // Setup IdKeyMap to convert domain root ID to key
-        idKeyMap.Setup(x => x.GetKeyForId(domainRootId, UmbracoObjectTypes.Document))
-            .Returns(Attempt<Guid>.Succeed(domainRootKey));
-
-        // Setup the document alias service - verify it's called with the domain root key
-        documentUrlAliasService
-            .Setup(x => x.GetDocumentKeyByAlias("my-alias", It.IsAny<string?>(), domainRootKey))
-            .Returns(DocumentKey);
-
-        publishedContentCache.Setup(x => x.GetById(DocumentKey)).Returns(contentItem.Object);
-        contentItem.Setup(x => x.Id).Returns(999);
-
-        var publishedRequestBuilder = new PublishedRequestBuilder(new Uri(absoluteUrl, UriKind.Absolute), fileService.Object);
-        publishedRequestBuilder.SetDomain(domainAndUri);
+        var domain = new DomainAndUri(new Domain(1, "localhost", domainRootId, null, false, 1), new Uri("http://localhost"));
+        var requestBuilder = ctx.CreateRequestBuilder("http://localhost/my-alias", domain);
 
         // Act
-        var sut = new ContentFinderByUrlAlias(
-            Mock.Of<ILogger<ContentFinderByUrlAlias>>(),
-            umbracoContextAccessor.Object,
-            documentUrlAliasService.Object,
-            idKeyMap.Object);
-        var result = await sut.TryFindContent(publishedRequestBuilder);
+        var result = await ctx.CreateContentFinder().TryFindContent(requestBuilder);
 
-        // Assert
+        // Assert - should find the document because it IS the domain root
         Assert.That(result, Is.True);
-        documentUrlAliasService.Verify(
-            x => x.GetDocumentKeyByAlias("my-alias", It.IsAny<string?>(), domainRootKey),
-            Times.Once);
+        ctx.PublishedContentCache.Verify(x => x.GetById(domainRootKey), Times.Once);
     }
 
-    private delegate void TryGetUmbracoContextDelegate(out IUmbracoContext? umbracoContext);
+    [Test]
+    public async Task Returns_Correct_Document_When_Same_Alias_Exists_Under_Different_Domains()
+    {
+        // Arrange - Two domains with different roots, each having a document with the same alias
+        var ctx = new TestContext();
+
+        var domainARootKey = Guid.NewGuid();
+        var documentUnderDomainA = Guid.NewGuid();
+
+        var domainBRootId = 2000;
+        var domainBRootKey = Guid.NewGuid();
+        var documentUnderDomainB = Guid.NewGuid();
+
+        ctx.SetupDomainRoot(domainBRootId, domainBRootKey);
+        ctx.SetupAliasReturnsDocuments("shared-alias", documentUnderDomainA, documentUnderDomainB);
+        ctx.SetupDocumentAncestors(documentUnderDomainA, domainARootKey);
+        ctx.SetupDocumentAncestors(documentUnderDomainB, domainBRootKey);
+        ctx.SetupContentItem(documentUnderDomainB, 2001);
+
+        var domainB = new DomainAndUri(new Domain(2, "domain-b.com", domainBRootId, null, false, 1), new Uri("http://domain-b.com"));
+        var requestBuilder = ctx.CreateRequestBuilder("http://domain-b.com/shared-alias", domainB);
+
+        // Act
+        var result = await ctx.CreateContentFinder().TryFindContent(requestBuilder);
+
+        // Assert - should return document B (under domain B), NOT document A (even though A comes first)
+        Assert.That(result, Is.True);
+        ctx.PublishedContentCache.Verify(x => x.GetById(documentUnderDomainB), Times.Once);
+        ctx.PublishedContentCache.Verify(x => x.GetById(documentUnderDomainA), Times.Never);
+    }
 }

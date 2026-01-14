@@ -25,13 +25,14 @@ public class ContentFinderByUrlAlias : IContentFinder
     private readonly ILogger<ContentFinderByUrlAlias> _logger;
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
     private readonly IDocumentUrlAliasService _documentUrlAliasService;
+    private readonly IDocumentNavigationQueryService _documentNavigationQueryService;
     private readonly IIdKeyMap _idKeyMap;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ContentFinderByUrlAlias" /> class.
     /// </summary>
-    // TODO (V18): Remove this constructor and the unsued parameters from the remaining one. They are only retained to avoid
-    // an ambiguous constructor error.
+    // TODO (V18): Remove this constructor and the unused parameters from the remaining one. They are only retained to avoid
+    // an ambiguous constructor error. Also removed the internal "Simplified constructor for testing purposes".
     [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
     public ContentFinderByUrlAlias(
         ILogger<ContentFinderByUrlAlias> logger,
@@ -57,8 +58,10 @@ public class ContentFinderByUrlAlias : IContentFinder
         ILogger<ContentFinderByUrlAlias> logger,
 #pragma warning disable IDE0060 // Remove unused parameter
         IPublishedValueFallback publishedValueFallback,
+#pragma warning restore IDE0060 // Remove unused parameter
         IUmbracoContextAccessor umbracoContextAccessor,
         IDocumentNavigationQueryService documentNavigationQueryService,
+#pragma warning disable IDE0060 // Remove unused parameter
         IPublishedContentStatusFilteringService publishedContentStatusFilteringService,
 #pragma warning restore IDE0060 // Remove unused parameter
         IDocumentUrlAliasService documentUrlAliasService,
@@ -66,6 +69,25 @@ public class ContentFinderByUrlAlias : IContentFinder
     {
         _logger = logger;
         _umbracoContextAccessor = umbracoContextAccessor;
+        _documentNavigationQueryService = documentNavigationQueryService;
+        _documentUrlAliasService = documentUrlAliasService;
+        _idKeyMap = idKeyMap;
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ContentFinderByUrlAlias" /> class.
+    /// </summary>
+    /// <remarks>Simplified constructor for testing purposes.</remarks>
+    internal ContentFinderByUrlAlias(
+        ILogger<ContentFinderByUrlAlias> logger,
+        IUmbracoContextAccessor umbracoContextAccessor,
+        IDocumentNavigationQueryService documentNavigationQueryService,
+        IDocumentUrlAliasService documentUrlAliasService,
+        IIdKeyMap idKeyMap)
+    {
+        _logger = logger;
+        _umbracoContextAccessor = umbracoContextAccessor;
+        _documentNavigationQueryService = documentNavigationQueryService;
         _documentUrlAliasService = documentUrlAliasService;
         _idKeyMap = idKeyMap;
     }
@@ -131,6 +153,13 @@ public class ContentFinderByUrlAlias : IContentFinder
             return null;
         }
 
+        // Get all matching document keys for the alias
+        IEnumerable<Guid> documentKeys = _documentUrlAliasService.GetDocumentKeysByAlias(
+            normalizedAlias,
+            culture);
+
+        Guid? matchingKey = null;
+
         // Convert domain root ID to Guid for scoping
         Guid? domainRootKey = null;
         if (rootNodeId > 0)
@@ -139,12 +168,39 @@ public class ContentFinderByUrlAlias : IContentFinder
             domainRootKey = attempt.Success ? attempt.Result : null;
         }
 
-        // O(1) lookup instead of O(n) tree traversal
-        Guid? documentKey = _documentUrlAliasService.GetDocumentKeyByAlias(
-            normalizedAlias,
-            culture,
-            domainRootKey);
+        // If we have a domain root, find the first document that's under that domain
+        if (domainRootKey.HasValue)
+        {
+            foreach (Guid documentKey in documentKeys)
+            {
+                if (IsDocumentUnderDomainRoot(documentKey, domainRootKey.Value))
+                {
+                    matchingKey = documentKey;
+                    break;
+                }
+            }
+        }
 
-        return documentKey.HasValue ? cache.GetById(documentKey.Value) : null;
+        // Fall back to first match if no domain or no match within domain
+        matchingKey ??= documentKeys.FirstOrDefault();
+
+        return matchingKey != default ? cache.GetById(matchingKey.Value) : null;
+    }
+
+    private bool IsDocumentUnderDomainRoot(Guid documentKey, Guid domainRootKey)
+    {
+        // Document is the domain root itself
+        if (documentKey == domainRootKey)
+        {
+            return true;
+        }
+
+        // Check if document is a descendant of the domain root
+        if (_documentNavigationQueryService.TryGetAncestorsKeys(documentKey, out IEnumerable<Guid> ancestorKeys))
+        {
+            return ancestorKeys.Contains(domainRootKey);
+        }
+
+        return false;
     }
 }

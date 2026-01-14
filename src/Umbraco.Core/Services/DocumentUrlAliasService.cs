@@ -36,8 +36,8 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     private readonly IContentService _contentService;
     private readonly IDocumentNavigationQueryService _documentNavigationQueryService;
 
-    // Lookup: alias -> list of matching documents (multiple docs can have same alias).
-    private readonly ConcurrentDictionary<AliasCacheKey, List<DocumentUrlAliasEntry>> _aliasCache = new();
+    // Lookup: alias -> list of matching document keys (multiple docs can have same alias).
+    private readonly ConcurrentDictionary<AliasCacheKey, List<Guid>> _aliasCache = new();
 
     // Reverse lookup: document -> aliases (for cache invalidation).
     private readonly ConcurrentDictionary<Guid, HashSet<AliasCacheKey>> _documentToAliasesCache = new();
@@ -84,17 +84,6 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
 
         /// <inheritdoc/>
         public override int GetHashCode() => HashCode.Combine(NormalizedAlias, LanguageId);
-    }
-
-    /// <summary>
-    /// Entry stores document key for alias lookup.
-    /// </summary>
-    internal sealed class DocumentUrlAliasEntry
-    {
-        /// <summary>
-        /// Gets the unique identifier for the document.
-        /// </summary>
-        public Guid DocumentKey { get; init; }
     }
 
     /// <summary>
@@ -161,14 +150,14 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     }
 
     /// <inheritdoc/>
-    public Guid? GetDocumentKeyByAlias(string alias, string? culture, Guid? domainRootKey)
+    public IEnumerable<Guid> GetDocumentKeysByAlias(string alias, string? culture)
     {
         ThrowIfNotInitialized();
 
         var normalizedAlias = NormalizeAlias(alias);
         if (string.IsNullOrEmpty(normalizedAlias))
         {
-            return null;
+            return [];
         }
 
         // Default to the default language when culture is not specified (like DocumentUrlService)
@@ -176,19 +165,18 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
 
         if (!TryGetLanguageId(culture, out var languageId))
         {
-            return null;
+            return [];
         }
 
         var cacheKey = new AliasCacheKey(normalizedAlias, languageId);
 
-        if (!_aliasCache.TryGetValue(cacheKey, out List<DocumentUrlAliasEntry>? entries) || entries.Count == 0)
+        if (!_aliasCache.TryGetValue(cacheKey, out List<Guid>? documentKeys) || documentKeys.Count == 0)
         {
-            return null;
+            return [];
         }
 
-        // Return first match
-        // Note: domainRootKey is currently unused but kept in the interface for future domain scoping support
-        return entries[0].DocumentKey;
+        // Return all matching document keys
+        return documentKeys;
     }
 
     /// <inheritdoc/>
@@ -415,26 +403,22 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     private void AddToCache(PublishedDocumentUrlAlias alias)
     {
         var cacheKey = new AliasCacheKey(alias.Alias, alias.LanguageId);
-        var entry = new DocumentUrlAliasEntry
-        {
-            DocumentKey = alias.DocumentKey,
-        };
 
         _aliasCache.AddOrUpdate(
             cacheKey,
-            _ => new List<DocumentUrlAliasEntry> { entry },
+            _ => new List<Guid> { alias.DocumentKey },
             (_, existingList) =>
             {
                 // Avoid duplicates - use immutable pattern for thread safety
-                if (existingList.Any(e => e.DocumentKey == entry.DocumentKey))
+                if (existingList.Contains(alias.DocumentKey))
                 {
                     return existingList;
                 }
 
                 // Create new list to avoid concurrent modification
-                var newList = new List<DocumentUrlAliasEntry>(existingList.Count + 1);
+                var newList = new List<Guid>(existingList.Count + 1);
                 newList.AddRange(existingList);
-                newList.Add(entry);
+                newList.Add(alias.DocumentKey);
                 return newList;
             });
 
@@ -465,15 +449,15 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
             // Use AddOrUpdate with immutable pattern for thread safety
             _aliasCache.AddOrUpdate(
                 key,
-                _ => new List<DocumentUrlAliasEntry>(), // Key doesn't exist, return empty list
+                _ => new List<Guid>(), // Key doesn't exist, return empty list
                 (_, existingList) =>
                 {
                     // Create new list excluding the document being removed
-                    return existingList.Where(e => e.DocumentKey != documentKey).ToList();
+                    return existingList.Where(k => k != documentKey).ToList();
                 });
 
             // Clean up empty entries
-            if (_aliasCache.TryGetValue(key, out List<DocumentUrlAliasEntry>? entries) && entries.Count == 0)
+            if (_aliasCache.TryGetValue(key, out List<Guid>? documentKeys) && documentKeys.Count == 0)
             {
                 _aliasCache.TryRemove(key, out _);
             }

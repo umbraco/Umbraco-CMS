@@ -13,13 +13,12 @@ public interface IDocumentUrlAliasService
     Task InitAsync(bool forceEmpty, CancellationToken cancellationToken);
 
     /// <summary>
-    /// Gets the document key for a given URL alias.
+    /// Gets all document keys that match a given URL alias.
     /// </summary>
     /// <param name="alias">The URL alias (normalized: lowercase, no leading slash).</param>
     /// <param name="culture">The culture code (null for invariant).</param>
-    /// <param name="domainRootKey">The domain root key for scoping.</param>
-    /// <returns>The document key, or null if not found.</returns>
-    Guid? GetDocumentKeyByAlias(string alias, string? culture, Guid? domainRootKey);
+    /// <returns>All document keys that have the specified alias, or empty if none found.</returns>
+    IEnumerable<Guid> GetDocumentKeysByAlias(string alias, string? culture);
 
     /// <summary>
     /// Creates or updates the aliases for a single document.
