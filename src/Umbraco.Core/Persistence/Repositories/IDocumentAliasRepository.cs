@@ -27,7 +27,7 @@ public interface IDocumentAliasRepository
     void DeleteByDocumentKey(IEnumerable<Guid> documentKeys);
 
     /// <summary>
-    /// Gets all document aliases directly from property data (optimized SQL query).
+    /// Gets all document aliases.
     /// </summary>
     /// <returns>Raw alias data from documents with umbracoUrlAlias property.</returns>
     IEnumerable<DocumentAliasRaw> GetAllDocumentAliases();

@@ -8,10 +8,15 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
+/// <inheritdoc />
 internal class DocumentAliasRepository : IDocumentAliasRepository
 {
     private readonly IScopeAccessor _scopeAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DocumentAliasRepository"/> class.
+    /// </summary>
+    /// <param name="scopeAccessor">The scope accessor. </param>
     public DocumentAliasRepository(IScopeAccessor scopeAccessor) => _scopeAccessor = scopeAccessor;
 
     private IUmbracoDatabase Database
@@ -27,11 +32,12 @@ internal class DocumentAliasRepository : IDocumentAliasRepository
         }
     }
 
+    /// <inheritdoc/>
     public void Save(IEnumerable<PublishedDocumentAlias> aliases)
     {
         IEnumerable<Guid> documentKeys = aliases.Select(x => x.DocumentKey).Distinct();
 
-        Dictionary<(Guid UniqueId, int LanguageId, string Alias), DocumentAliasDto> dtoDictionary = aliases
+        var dtoDictionary = aliases
             .Select(BuildDto)
             .ToDictionary(x => (x.UniqueId, x.LanguageId, x.Alias));
 
@@ -73,6 +79,7 @@ internal class DocumentAliasRepository : IDocumentAliasRepository
         Database.InsertBulk(toInsert.Values);
     }
 
+    /// <inheritdoc/>
     public IEnumerable<PublishedDocumentAlias> GetAll()
     {
         List<DocumentAliasDto>? dtos = Database.Fetch<DocumentAliasDto>(
@@ -81,6 +88,7 @@ internal class DocumentAliasRepository : IDocumentAliasRepository
         return dtos.Select(BuildModel);
     }
 
+    /// <inheritdoc/>
     public void DeleteByDocumentKey(IEnumerable<Guid> documentKeys)
     {
         foreach (IEnumerable<Guid> group in documentKeys.InGroupsOf(Constants.Sql.MaxParameterCount))
@@ -91,10 +99,13 @@ internal class DocumentAliasRepository : IDocumentAliasRepository
         }
     }
 
+    /// <inheritdoc/>
+    /// <remarks>
+    /// This gets all document aliases directly from property data (using an optimized SQL query).
+    /// This is more efficient than loading all IContent objects.
+    /// </remarks>
     public IEnumerable<DocumentAliasRaw> GetAllDocumentAliases()
     {
-        // Direct SQL query - only fetches documents with umbracoUrlAlias property
-        // This is more efficient than loading all IContent objects
         Sql<ISqlContext> sql = Database.SqlContext.Sql()
             .Select<NodeDto>("n", x => x.UniqueId)
             .AndSelect<PropertyDataDto>("pd", x => x.LanguageId)
@@ -118,7 +129,7 @@ internal class DocumentAliasRepository : IDocumentAliasRepository
             Alias = dto.Alias,
             DocumentKey = dto.UniqueId,
             LanguageId = dto.LanguageId,
-            RootAncestorKey = dto.RootAncestorKey
+            RootAncestorKey = dto.RootAncestorKey,
         };
 
     private DocumentAliasDto BuildDto(PublishedDocumentAlias model) =>
@@ -127,6 +138,6 @@ internal class DocumentAliasRepository : IDocumentAliasRepository
             Alias = model.Alias,
             UniqueId = model.DocumentKey,
             LanguageId = model.LanguageId,
-            RootAncestorKey = model.RootAncestorKey
+            RootAncestorKey = model.RootAncestorKey,
         };
 }

@@ -14,7 +14,19 @@ namespace Umbraco.Cms.Core.Services;
 public class DocumentAliasService : IDocumentAliasService
 {
     private const string RebuildKey = "Umbraco.Core.DocumentAlias.Generation";
-    private const string CurrentRebuildValue = "1"; // Increment when alias parsing logic changes
+
+    /// <summary>
+    /// Represents the current rebuild version value used to track changes in alias parsing logic.
+    /// </summary>
+    /// <remarks>
+    /// With the analagous <see cref="DocumentUrlService"/>, implementors can customize how segments are created.
+    /// As such we track what URL providers are registered and store that as a value against the rebuild key. If on startup
+    /// we find it's changed, we rebuild.
+    /// Here, however, the alias parsing logic is internal and not customizable, so we simply use a constant value.
+    /// By doing this we can keep the same logic for rebuild on startup after a migration, provide a means of triggering
+    /// a rebuild, and we have future-proofing in case the alias parsing logic changes in future versions.
+    /// </remarks>
+    private const string CurrentRebuildValue = "1";
 
     private readonly ILogger<DocumentAliasService> _logger;
     private readonly IDocumentAliasRepository _documentAliasRepository;
@@ -24,13 +36,13 @@ public class DocumentAliasService : IDocumentAliasService
     private readonly IContentService _contentService;
     private readonly IDocumentNavigationQueryService _documentNavigationQueryService;
 
-    // Fast lookup: alias -> list of matching documents (multiple docs can have same alias)
+    // Lookup: alias -> list of matching documents (multiple docs can have same alias).
     private readonly ConcurrentDictionary<AliasCacheKey, List<DocumentAliasEntry>> _aliasCache = new();
 
-    // Reverse lookup: document -> aliases (for cache invalidation)
+    // Reverse lookup: document -> aliases (for cache invalidation).
     private readonly ConcurrentDictionary<Guid, HashSet<AliasCacheKey>> _documentToAliasesCache = new();
 
-    // Culture to language ID map (for memory efficiency)
+    // Culture to language ID map (for memory efficiency).
     private readonly ConcurrentDictionary<string, int> _cultureToLanguageIdMap = new();
 
     private bool _isInitialized;
@@ -40,21 +52,37 @@ public class DocumentAliasService : IDocumentAliasService
     /// </summary>
     internal readonly struct AliasCacheKey : IEquatable<AliasCacheKey>
     {
-        public string NormalizedAlias { get; }
-        public int LanguageId { get; }
-
+        /// <summary>
+        /// Initializes a new instance of the AliasCacheKey class with the specified normalized alias and language
+        /// identifier.
+        /// </summary>
+        /// <param name="normalizedAlias">The alias string that has been normalized for consistent comparison.</param>
+        /// <param name="languageId">The identifier of the language associated with the alias.</param>
         public AliasCacheKey(string normalizedAlias, int languageId)
         {
             NormalizedAlias = normalizedAlias;
             LanguageId = languageId;
         }
 
+        /// <summary>
+        /// Gets the normalized alias (lowercase, no leading/trailing slashes).
+        /// </summary>
+        public string NormalizedAlias { get; }
+
+        /// <summary>
+        /// Gets the unique identifier for the language associated with this instance.
+        /// </summary>
+        public int LanguageId { get; }
+
+        /// <inheritdoc/>
         public bool Equals(AliasCacheKey other) =>
             NormalizedAlias == other.NormalizedAlias &&
             LanguageId == other.LanguageId;
 
+        /// <inheritdoc/>
         public override bool Equals(object? obj) => obj is AliasCacheKey other && Equals(other);
 
+        /// <inheritdoc/>
         public override int GetHashCode() => HashCode.Combine(NormalizedAlias, LanguageId);
     }
 
@@ -63,7 +91,14 @@ public class DocumentAliasService : IDocumentAliasService
     /// </summary>
     internal sealed class DocumentAliasEntry
     {
+        /// <summary>
+        /// Gets the unique identifier for the document.
+        /// </summary>
         public Guid DocumentKey { get; init; }
+
+        /// <summary>
+        /// Gets the unique identifier of the root ancestor entity in the hierarchy.
+        /// </summary>
         public Guid RootAncestorKey { get; init; }
     }
 
@@ -177,29 +212,6 @@ public class DocumentAliasService : IDocumentAliasService
     }
 
     /// <inheritdoc/>
-    public IEnumerable<string> GetAliases(Guid documentKey, string? culture)
-    {
-        ThrowIfNotInitialized();
-
-        if (!_documentToAliasesCache.TryGetValue(documentKey, out HashSet<AliasCacheKey>? keys))
-        {
-            return Enumerable.Empty<string>();
-        }
-
-        // Default to the default language when culture is not specified
-        culture ??= _languageService.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
-
-        if (!TryGetLanguageId(culture, out var languageId))
-        {
-            return Enumerable.Empty<string>();
-        }
-
-        return keys
-            .Where(k => k.LanguageId == languageId)
-            .Select(k => k.NormalizedAlias);
-    }
-
-    /// <inheritdoc/>
     public async Task CreateOrUpdateAliasesAsync(Guid documentKey)
     {
         ThrowIfNotInitialized();
@@ -215,7 +227,7 @@ public class DocumentAliasService : IDocumentAliasService
             return;
         }
 
-        var aliases = await ExtractAliasesFromDocumentAsync(document);
+        List<PublishedDocumentAlias> aliases = await ExtractAliasesFromDocumentAsync(document);
 
         // Remove old aliases from cache
         RemoveFromCache(documentKey);
@@ -270,41 +282,33 @@ public class DocumentAliasService : IDocumentAliasService
         return Task.CompletedTask;
     }
 
-    /// <inheritdoc/>
-    public bool HasAny()
-    {
-        ThrowIfNotInitialized();
-        return !_aliasCache.IsEmpty;
-    }
-
     private async Task RebuildAllAliasesAsync()
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         scope.ReadLock(Constants.Locks.ContentTree);
 
         // Get all languages for culture-to-languageId mapping
-        IEnumerable<ILanguage> languages = await _languageService.GetAllAsync();
-        List<ILanguage> languageList = languages.ToList();
-        PopulateCultureToLanguageIdMap(languageList);
+        var languages = (await _languageService.GetAllAsync()).ToList();
+        PopulateCultureToLanguageIdMap(languages);
 
         // Use optimized SQL query to fetch only documents with aliases
         IEnumerable<DocumentAliasRaw> rawAliases = _documentAliasRepository.GetAllDocumentAliases();
 
         // Get root ancestor keys for domain scoping
         var documentKeys = rawAliases.Select(x => x.DocumentKey).Distinct().ToList();
-        var rootAncestorMap = GetRootAncestorKeys(documentKeys);
+        Dictionary<Guid, Guid> rootAncestorMap = GetRootAncestorKeys(documentKeys);
 
         var toSave = new List<PublishedDocumentAlias>();
 
         foreach (DocumentAliasRaw raw in rawAliases)
         {
-            var rootAncestorKey = rootAncestorMap.GetValueOrDefault(raw.DocumentKey, raw.DocumentKey);
+            Guid rootAncestorKey = rootAncestorMap.GetValueOrDefault(raw.DocumentKey, raw.DocumentKey);
 
             // Invariant content (LanguageId = null) is stored for ALL languages (like DocumentUrlService)
             // This avoids cache invalidation when languages change or content varies by culture changes
             if (raw.LanguageId is null)
             {
-                foreach (ILanguage language in languageList)
+                foreach (ILanguage language in languages)
                 {
                     foreach (var alias in NormalizeAliases(raw.AliasValue))
                     {
@@ -313,7 +317,7 @@ public class DocumentAliasService : IDocumentAliasService
                             DocumentKey = raw.DocumentKey,
                             LanguageId = language.Id,
                             Alias = alias,
-                            RootAncestorKey = rootAncestorKey
+                            RootAncestorKey = rootAncestorKey,
                         });
                     }
                 }
@@ -327,7 +331,7 @@ public class DocumentAliasService : IDocumentAliasService
                         DocumentKey = raw.DocumentKey,
                         LanguageId = raw.LanguageId.Value,
                         Alias = alias,
-                        RootAncestorKey = rootAncestorKey
+                        RootAncestorKey = rootAncestorKey,
                     });
                 }
             }
@@ -349,7 +353,7 @@ public class DocumentAliasService : IDocumentAliasService
     private async Task<List<PublishedDocumentAlias>> ExtractAliasesFromDocumentAsync(IContent document)
     {
         var aliases = new List<PublishedDocumentAlias>();
-        var rootAncestorKey = GetRootAncestorKey(document.Key);
+        Guid rootAncestorKey = GetRootAncestorKey(document.Key);
         IEnumerable<ILanguage> languages = await _languageService.GetAllAsync();
 
         // Handle invariant content - store alias for ALL languages (like DocumentUrlService)
@@ -369,7 +373,7 @@ public class DocumentAliasService : IDocumentAliasService
                             DocumentKey = document.Key,
                             LanguageId = language.Id,
                             Alias = alias,
-                            RootAncestorKey = rootAncestorKey
+                            RootAncestorKey = rootAncestorKey,
                         });
                     }
                 }
@@ -395,7 +399,7 @@ public class DocumentAliasService : IDocumentAliasService
                     DocumentKey = document.Key,
                     LanguageId = language.Id,
                     Alias = alias,
-                    RootAncestorKey = rootAncestorKey
+                    RootAncestorKey = rootAncestorKey,
                 });
             }
         }

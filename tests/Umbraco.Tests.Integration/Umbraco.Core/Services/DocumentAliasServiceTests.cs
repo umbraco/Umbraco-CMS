@@ -226,54 +226,6 @@ internal sealed class DocumentAliasServiceTests : UmbracoIntegrationTest
 
     #endregion
 
-    #region GetAliases Tests
-
-    [Test]
-    public async Task GetAliases_Returns_Single_Alias_For_Document()
-    {
-        var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
-
-        var result = DocumentAliasService.GetAliases(new Guid(PageWithSingleAliasKey), isoCode).ToList();
-
-        Assert.That(result, Has.Count.EqualTo(1));
-        Assert.That(result, Does.Contain("my-single-alias"));
-    }
-
-    [Test]
-    public async Task GetAliases_Returns_All_Aliases_For_Document_With_Multiple_Aliases()
-    {
-        var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
-
-        var result = DocumentAliasService.GetAliases(new Guid(PageWithMultipleAliasesKey), isoCode).ToList();
-
-        Assert.That(result, Has.Count.EqualTo(3));
-        Assert.That(result, Does.Contain("first-alias"));
-        Assert.That(result, Does.Contain("second-alias"));
-        Assert.That(result, Does.Contain("third-alias"));
-    }
-
-    [Test]
-    public async Task GetAliases_Returns_Empty_For_Document_Without_Alias()
-    {
-        var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
-
-        var result = DocumentAliasService.GetAliases(new Guid(PageWithNoAliasKey), isoCode).ToList();
-
-        Assert.That(result, Is.Empty);
-    }
-
-    [Test]
-    public async Task GetAliases_Returns_Empty_For_Non_Existent_Document()
-    {
-        var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
-
-        var result = DocumentAliasService.GetAliases(Guid.NewGuid(), isoCode).ToList();
-
-        Assert.That(result, Is.Empty);
-    }
-
-    #endregion
-
     #region CreateOrUpdateAliasesAsync Tests
 
     [Test]
@@ -432,30 +384,6 @@ internal sealed class DocumentAliasServiceTests : UmbracoIntegrationTest
     {
         Assert.DoesNotThrowAsync(async () =>
             await DocumentAliasService.DeleteAliasesFromCacheAsync(new[] { Guid.NewGuid() }));
-    }
-
-    #endregion
-
-    #region HasAny Tests
-
-    [Test]
-    public void HasAny_Returns_True_When_Aliases_Exist()
-    {
-        Assert.That(DocumentAliasService.HasAny(), Is.True);
-    }
-
-    [Test]
-    public async Task HasAny_Returns_False_When_No_Aliases_Exist()
-    {
-        // Delete all aliases
-        await DocumentAliasService.DeleteAliasesFromCacheAsync(new[]
-        {
-            new Guid(PageWithSingleAliasKey),
-            new Guid(PageWithMultipleAliasesKey),
-            new Guid(ChildPageKey)
-        });
-
-        Assert.That(DocumentAliasService.HasAny(), Is.False);
     }
 
     #endregion

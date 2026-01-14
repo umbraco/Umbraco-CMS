@@ -17,17 +17,9 @@ public interface IDocumentAliasService
     /// </summary>
     /// <param name="alias">The URL alias (normalized: lowercase, no leading slash).</param>
     /// <param name="culture">The culture code (null for invariant).</param>
-    /// <param name="domainRootKey">The domain root key for scoping (null for all domains).</param>
+    /// <param name="domainRootKey">The domain root key for scoping.</param>
     /// <returns>The document key, or null if not found.</returns>
     Guid? GetDocumentKeyByAlias(string alias, string? culture, Guid? domainRootKey);
-
-    /// <summary>
-    /// Gets all aliases for a document.
-    /// </summary>
-    /// <param name="documentKey">The document key.</param>
-    /// <param name="culture">The culture code (null for invariant).</param>
-    /// <returns>The aliases for the document.</returns>
-    IEnumerable<string> GetAliases(Guid documentKey, string? culture);
 
     /// <summary>
     /// Creates or updates the aliases for a single document.
@@ -46,9 +38,4 @@ public interface IDocumentAliasService
     /// </summary>
     /// <param name="documentKeys">The collection of document keys.</param>
     Task DeleteAliasesFromCacheAsync(IEnumerable<Guid> documentKeys);
-
-    /// <summary>
-    /// Gets a value indicating whether any aliases have been cached.
-    /// </summary>
-    bool HasAny();
 }
