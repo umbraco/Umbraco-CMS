@@ -1,3 +1,4 @@
+import { UMB_CURRENT_USER_ALLOW_ELEMENT_RECYCLE_BIN_CONDITION_ALIAS } from '../conditions/allow-element-recycle-bin.condition.js';
 import { UMB_ELEMENT_MENU_ALIAS } from '../../menu/constants.js';
 import { UMB_ELEMENT_WORKSPACE_ALIAS } from '../../workspace/constants.js';
 import { UMB_ELEMENT_RECYCLE_BIN_TREE_ALIAS } from '../tree/constants.js';
@@ -19,6 +20,7 @@ const menuItem: ManifestMenuItemTreeKind = {
 		menus: [UMB_ELEMENT_MENU_ALIAS],
 		treeAlias: UMB_ELEMENT_RECYCLE_BIN_TREE_ALIAS,
 	},
+	conditions: [{ alias: UMB_CURRENT_USER_ALLOW_ELEMENT_RECYCLE_BIN_CONDITION_ALIAS }],
 };
 
 const workspaceContext: ManifestWorkspaceContextMenuStructureKind = {

@@ -35,11 +35,11 @@ export interface UmbUserDetailModel extends UmbUserStartNodesModel {
 
 export interface UmbUserStartNodesModel {
 	documentStartNodeUniques: Array<UmbReferenceByUnique>;
+	elementStartNodeUniques: Array<UmbReferenceByUnique>;
 	hasDocumentRootAccess: boolean;
 	hasMediaRootAccess: boolean;
 	hasElementRootAccess: boolean;
 	mediaStartNodeUniques: Array<UmbReferenceByUnique>;
-	elementStartNodeUniques: Array<UmbReferenceByUnique>;
 }
 
 export type UmbUserMfaProviderModel = UserTwoFactorProviderModel;
