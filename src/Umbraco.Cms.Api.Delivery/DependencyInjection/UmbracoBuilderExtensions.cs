@@ -153,7 +153,8 @@ public static class UmbracoBuilderExtensions
     /// Replaces the OpenApiSchemaService to use the Delivery API JSON serializer options, instead of the default http JSON options.
     /// </summary>
     /// <param name="serviceCollection">The <see cref="IServiceCollection"/>.</param>
-    /// <remarks>This is needed because the OpenAPI schema generation relies on the JSON options to determine how to generate the schemas.</remarks>
+    /// <remarks>This is needed because the OpenAPI schema generation relies on the JSON options to determine how to generate the schemas.
+    /// There is a proposal to add support for this currently open: https://github.com/dotnet/aspnetcore/issues/60738.</remarks>
     private static void ReplaceOpenApiSchemaService(this IServiceCollection serviceCollection)
     {
         ServiceDescriptor serviceDescriptor = serviceCollection
