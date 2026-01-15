@@ -145,7 +145,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     {
         ContentSourceDto? dto = await GetContentSourceDto(key);
 
-        if (dto == null)
+        if (dto is null)
         {
             return null;
         }
@@ -163,7 +163,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     {
         ContentSourceDto? dto = await GetContentSourceDto(key);
 
-        if (dto == null)
+        if (dto is null)
         {
             return (null, null);
         }
