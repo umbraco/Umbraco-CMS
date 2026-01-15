@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.OpenApi;
 
-namespace Umbraco.Cms.Api.Delivery.Filters.OpenApi;
+namespace Umbraco.Cms.Api.Delivery.OpenApi.Transformers;
 
 internal abstract class DeliveryApiTransformerBase : IOpenApiOperationTransformer
 {

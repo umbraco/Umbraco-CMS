@@ -6,7 +6,7 @@ using Umbraco.Cms.Api.Delivery.Configuration;
 using Umbraco.Cms.Api.Delivery.Controllers.Media;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Api.Delivery.Filters.OpenApi;
+namespace Umbraco.Cms.Api.Delivery.OpenApi.Transformers;
 
 /// <summary>
 /// Transforms OpenAPI operations for the Media API, adding relevant parameters and documentation.

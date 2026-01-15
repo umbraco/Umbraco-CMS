@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.OpenApi;
 using Umbraco.Cms.Api.Common.Configuration;
-using Umbraco.Cms.Api.Delivery.Filters.OpenApi;
+using Umbraco.Cms.Api.Delivery.OpenApi.Transformers;
 
 namespace Umbraco.Cms.Api.Delivery.Configuration;
 

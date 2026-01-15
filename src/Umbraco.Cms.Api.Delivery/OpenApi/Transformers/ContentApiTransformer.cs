@@ -7,7 +7,7 @@ using Umbraco.Cms.Api.Delivery.Controllers.Content;
 using Umbraco.Cms.Core;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Api.Delivery.Filters.OpenApi;
+namespace Umbraco.Cms.Api.Delivery.OpenApi.Transformers;
 
 /// <summary>
 /// Transforms OpenAPI operations for the Content API, adding relevant parameters and documentation.

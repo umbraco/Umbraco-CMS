@@ -2,7 +2,7 @@
 using Microsoft.OpenApi;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Api.Delivery.Filters.OpenApi;
+namespace Umbraco.Cms.Api.Delivery.OpenApi.Transformers;
 
 /// <summary>
 /// This filter explicitly removes all other mime types than application/json from a named OpenAPI document when application/json is accepted.

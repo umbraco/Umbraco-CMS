@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.OpenApi;
 using Microsoft.OpenApi;
 using Umbraco.Cms.Core;
 
-namespace Umbraco.Cms.Api.Delivery.Filters.OpenApi;
+namespace Umbraco.Cms.Api.Delivery.OpenApi.Transformers;
 
 /// <summary>
 /// Transforms the OpenAPI document to include API key security scheme.
