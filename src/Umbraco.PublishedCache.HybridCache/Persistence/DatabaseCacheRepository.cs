@@ -318,23 +318,28 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
     private async Task OnRepositoryRefreshedTyped(IContentCacheDataSerializer serializer, ContentCacheNode content, bool preview)
     {
-        ContentNuDto dto = GetDtoFromCacheNode(content, !preview, serializer);
+        ContentNuDto newOrCachedEntity = GetDtoFromCacheNode(content, !preview, serializer);
 
-        dto.RawData ??= [];
-        dto.Rv++;
-        ContentNuDto? existing = await Database.FirstOrDefaultAsync<ContentNuDto>(
-            Sql()
-                .SelectAll()
-                .From<ContentNuDto>()
-                .Where<ContentNuDto>(x => x.NodeId == dto.NodeId && x.Published == dto.Published));
-        if (existing is null)
+        newOrCachedEntity.RawData ??= [];
+        newOrCachedEntity.Rv++;
+        Sql<ISqlContext> existingSql = Sql()
+            .SelectAll()
+            .From<ContentNuDto>()
+            .Where<ContentNuDto>(x => x.NodeId == newOrCachedEntity.NodeId && x.Published == newOrCachedEntity.Published);
+        ContentNuDto? existingEntity = await Database.FirstOrDefaultAsync<ContentNuDto>(existingSql);
+
+        if (existingEntity is null)
         {
-            await Database.InsertAsync(dto);
+            await Database.InsertAsync(newOrCachedEntity);
         }
         else
         {
-            Sql<ISqlContext> updateSql = Sql().Update<ContentNuDto>(u => u.Set(d => d.Data, dto.Data).Set(rd => rd.RawData, dto.RawData).Set(v => v.Rv, dto.Rv))
-                .Where<ContentNuDto>(x => x.NodeId == dto.NodeId && x.Published == dto.Published);
+            Sql<ISqlContext> updateSql = Sql()
+                .Update<ContentNuDto>(u => u
+                    .Set(d => d.Data, newOrCachedEntity.Data)
+                    .Set(rd => rd.RawData, newOrCachedEntity.RawData)
+                    .Set(v => v.Rv, newOrCachedEntity.Rv))
+                .Where<ContentNuDto>(x => x.NodeId == newOrCachedEntity.NodeId && x.Published == newOrCachedEntity.Published);
             await Database.ExecuteAsync(updateSql);
         }
     }
