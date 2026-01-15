@@ -109,7 +109,7 @@ internal sealed class ImageCropperPropertyValueEditor : DataValueEditor, IDispos
     ///     <para>The <paramref name="currentValue" /> is used to re-use the folder, if possible.</para>
     ///     <para>
     ///         editorValue.Value is used to figure out editorFile and, if it has been cleared, remove the old file.
-    ///         If editorValue.Value deserializes as <see cref="ImageCropperValue"/> and the <see cref="ImageCropperValue.Src"/>
+    ///         If editorValue.Value deserializes as <see cref="ImageCropperValue"/> and the <see cref="TemporaryFileUploadValueBase.Src"/>
     ///         value is a GUID, it is assumed to contain a temporary file key, and we will attempt to replace the currently
     ///         selected file with the corresponding temporary file.
     ///     </para>
